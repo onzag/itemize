@@ -42,7 +42,7 @@ The renderer args
 
 #### Defined in
 
-[client/internal/renderer.ts:19](https://github.com/onzag/itemize/blob/f2f29986/client/internal/renderer.ts#L19)
+[client/internal/renderer.ts:19](https://github.com/onzag/itemize/blob/5c2808d3/client/internal/renderer.ts#L19)
 
 ___
 
@@ -58,7 +58,7 @@ The current value to be displayed
 
 #### Defined in
 
-[client/internal/components/PropertyView/index.tsx:43](https://github.com/onzag/itemize/blob/f2f29986/client/internal/components/PropertyView/index.tsx#L43)
+[client/internal/components/PropertyView/index.tsx:43](https://github.com/onzag/itemize/blob/5c2808d3/client/internal/components/PropertyView/index.tsx#L43)
 
 ___
 
@@ -70,7 +70,7 @@ Whether it is rich text, as in its subtype is html
 
 #### Defined in
 
-[client/internal/components/PropertyView/PropertyViewText.tsx:24](https://github.com/onzag/itemize/blob/f2f29986/client/internal/components/PropertyView/PropertyViewText.tsx#L24)
+[client/internal/components/PropertyView/PropertyViewText.tsx:24](https://github.com/onzag/itemize/blob/5c2808d3/client/internal/components/PropertyView/PropertyViewText.tsx#L24)
 
 ___
 
@@ -86,7 +86,7 @@ Whether it is in rtl mode for a rtl language
 
 #### Defined in
 
-[client/internal/renderer.ts:15](https://github.com/onzag/itemize/blob/f2f29986/client/internal/renderer.ts#L15)
+[client/internal/renderer.ts:15](https://github.com/onzag/itemize/blob/5c2808d3/client/internal/renderer.ts#L15)
 
 ___
 
@@ -98,4 +98,4 @@ Whether it is type html or plain
 
 #### Defined in
 
-[client/internal/components/PropertyView/PropertyViewText.tsx:28](https://github.com/onzag/itemize/blob/f2f29986/client/internal/components/PropertyView/PropertyViewText.tsx#L28)
+[client/internal/components/PropertyView/PropertyViewText.tsx:28](https://github.com/onzag/itemize/blob/5c2808d3/client/internal/components/PropertyView/PropertyViewText.tsx#L28)

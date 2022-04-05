@@ -31,4 +31,4 @@
 
 #### Defined in
 
-[ussd/index.ts:66](https://github.com/onzag/itemize/blob/f2f29986/ussd/index.ts#L66)
+[ussd/index.ts:66](https://github.com/onzag/itemize/blob/5c2808d3/ussd/index.ts#L66)

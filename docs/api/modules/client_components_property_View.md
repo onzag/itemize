@@ -35,4 +35,4 @@ a react component
 
 #### Defined in
 
-[client/components/property/View.tsx:20](https://github.com/onzag/itemize/blob/f2f29986/client/components/property/View.tsx#L20)
+[client/components/property/View.tsx:20](https://github.com/onzag/itemize/blob/5c2808d3/client/components/property/View.tsx#L20)

@@ -36,7 +36,7 @@ rather than a string
 
 #### Defined in
 
-[client/components/localization/I18nRead.tsx:82](https://github.com/onzag/itemize/blob/f2f29986/client/components/localization/I18nRead.tsx#L82)
+[client/components/localization/I18nRead.tsx:82](https://github.com/onzag/itemize/blob/5c2808d3/client/components/localization/I18nRead.tsx#L82)
 
 ___
 
@@ -48,7 +48,7 @@ Whether to capitalize the output
 
 #### Defined in
 
-[client/components/localization/I18nRead.tsx:101](https://github.com/onzag/itemize/blob/f2f29986/client/components/localization/I18nRead.tsx#L101)
+[client/components/localization/I18nRead.tsx:101](https://github.com/onzag/itemize/blob/5c2808d3/client/components/localization/I18nRead.tsx#L101)
 
 ___
 
@@ -62,7 +62,7 @@ does not serialize
 
 #### Defined in
 
-[client/components/localization/I18nRead.tsx:88](https://github.com/onzag/itemize/blob/f2f29986/client/components/localization/I18nRead.tsx#L88)
+[client/components/localization/I18nRead.tsx:88](https://github.com/onzag/itemize/blob/5c2808d3/client/components/localization/I18nRead.tsx#L88)
 
 ___
 
@@ -74,7 +74,7 @@ The wrapping tag for using in the html mode, by default is a div
 
 #### Defined in
 
-[client/components/localization/I18nRead.tsx:92](https://github.com/onzag/itemize/blob/f2f29986/client/components/localization/I18nRead.tsx#L92)
+[client/components/localization/I18nRead.tsx:92](https://github.com/onzag/itemize/blob/5c2808d3/client/components/localization/I18nRead.tsx#L92)
 
 ___
 
@@ -103,7 +103,7 @@ if nothing found in this last context, an error is thrown
 
 #### Defined in
 
-[client/components/localization/I18nRead.tsx:63](https://github.com/onzag/itemize/blob/f2f29986/client/components/localization/I18nRead.tsx#L63)
+[client/components/localization/I18nRead.tsx:63](https://github.com/onzag/itemize/blob/5c2808d3/client/components/localization/I18nRead.tsx#L63)
 
 ___
 
@@ -115,7 +115,7 @@ A policy name to use as context, must go along policy type
 
 #### Defined in
 
-[client/components/localization/I18nRead.tsx:75](https://github.com/onzag/itemize/blob/f2f29986/client/components/localization/I18nRead.tsx#L75)
+[client/components/localization/I18nRead.tsx:75](https://github.com/onzag/itemize/blob/5c2808d3/client/components/localization/I18nRead.tsx#L75)
 
 ___
 
@@ -127,7 +127,7 @@ A policy type to use as context, must go along policy name
 
 #### Defined in
 
-[client/components/localization/I18nRead.tsx:71](https://github.com/onzag/itemize/blob/f2f29986/client/components/localization/I18nRead.tsx#L71)
+[client/components/localization/I18nRead.tsx:71](https://github.com/onzag/itemize/blob/5c2808d3/client/components/localization/I18nRead.tsx#L71)
 
 ___
 
@@ -139,7 +139,7 @@ A property id to use as context
 
 #### Defined in
 
-[client/components/localization/I18nRead.tsx:67](https://github.com/onzag/itemize/blob/f2f29986/client/components/localization/I18nRead.tsx#L67)
+[client/components/localization/I18nRead.tsx:67](https://github.com/onzag/itemize/blob/5c2808d3/client/components/localization/I18nRead.tsx#L67)
 
 ## Methods
 
@@ -162,4 +162,4 @@ otherwise it's just rendered
 
 #### Defined in
 
-[client/components/localization/I18nRead.tsx:97](https://github.com/onzag/itemize/blob/f2f29986/client/components/localization/I18nRead.tsx#L97)
+[client/components/localization/I18nRead.tsx:97](https://github.com/onzag/itemize/blob/5c2808d3/client/components/localization/I18nRead.tsx#L97)

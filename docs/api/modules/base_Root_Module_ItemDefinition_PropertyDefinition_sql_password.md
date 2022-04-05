@@ -35,7 +35,7 @@ a raw value
 
 #### Defined in
 
-[base/Root/Module/ItemDefinition/PropertyDefinition/sql/password.ts:31](https://github.com/onzag/itemize/blob/f2f29986/base/Root/Module/ItemDefinition/PropertyDefinition/sql/password.ts#L31)
+[base/Root/Module/ItemDefinition/PropertyDefinition/sql/password.ts:31](https://github.com/onzag/itemize/blob/5c2808d3/base/Root/Module/ItemDefinition/PropertyDefinition/sql/password.ts#L31)
 
 ___
 
@@ -59,7 +59,7 @@ Specifies how to SQL in the password
 
 #### Defined in
 
-[base/Root/Module/ItemDefinition/PropertyDefinition/sql/password.ts:15](https://github.com/onzag/itemize/blob/f2f29986/base/Root/Module/ItemDefinition/PropertyDefinition/sql/password.ts#L15)
+[base/Root/Module/ItemDefinition/PropertyDefinition/sql/password.ts:15](https://github.com/onzag/itemize/blob/5c2808d3/base/Root/Module/ItemDefinition/PropertyDefinition/sql/password.ts#L15)
 
 ___
 
@@ -83,7 +83,7 @@ a boolean
 
 #### Defined in
 
-[base/Root/Module/ItemDefinition/PropertyDefinition/sql/password.ts:45](https://github.com/onzag/itemize/blob/f2f29986/base/Root/Module/ItemDefinition/PropertyDefinition/sql/password.ts#L45)
+[base/Root/Module/ItemDefinition/PropertyDefinition/sql/password.ts:45](https://github.com/onzag/itemize/blob/5c2808d3/base/Root/Module/ItemDefinition/PropertyDefinition/sql/password.ts#L45)
 
 ___
 
@@ -101,4 +101,4 @@ nothing, it just throws an error
 
 #### Defined in
 
-[base/Root/Module/ItemDefinition/PropertyDefinition/sql/password.ts:69](https://github.com/onzag/itemize/blob/f2f29986/base/Root/Module/ItemDefinition/PropertyDefinition/sql/password.ts#L69)
+[base/Root/Module/ItemDefinition/PropertyDefinition/sql/password.ts:69](https://github.com/onzag/itemize/blob/5c2808d3/base/Root/Module/ItemDefinition/PropertyDefinition/sql/password.ts#L69)

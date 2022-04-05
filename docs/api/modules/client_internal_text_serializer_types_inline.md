@@ -37,4 +37,4 @@ reigstry
 
 #### Defined in
 
-[client/internal/text/serializer/types/inline.ts:18](https://github.com/onzag/itemize/blob/f2f29986/client/internal/text/serializer/types/inline.ts#L18)
+[client/internal/text/serializer/types/inline.ts:18](https://github.com/onzag/itemize/blob/5c2808d3/client/internal/text/serializer/types/inline.ts#L18)

@@ -84,7 +84,7 @@ the styles for the file entry
 
 #### Defined in
 
-[client/fast-prototyping/renderers/PropertyEntry/PropertyEntryFiles.tsx:35](https://github.com/onzag/itemize/blob/f2f29986/client/fast-prototyping/renderers/PropertyEntry/PropertyEntryFiles.tsx#L35)
+[client/fast-prototyping/renderers/PropertyEntry/PropertyEntryFiles.tsx:35](https://github.com/onzag/itemize/blob/5c2808d3/client/fast-prototyping/renderers/PropertyEntry/PropertyEntryFiles.tsx#L35)
 
 ## Functions
 
@@ -109,4 +109,4 @@ a react element
 
 #### Defined in
 
-[client/fast-prototyping/renderers/PropertyEntry/PropertyEntryFiles.tsx:145](https://github.com/onzag/itemize/blob/f2f29986/client/fast-prototyping/renderers/PropertyEntry/PropertyEntryFiles.tsx#L145)
+[client/fast-prototyping/renderers/PropertyEntry/PropertyEntryFiles.tsx:145](https://github.com/onzag/itemize/blob/5c2808d3/client/fast-prototyping/renderers/PropertyEntry/PropertyEntryFiles.tsx#L145)

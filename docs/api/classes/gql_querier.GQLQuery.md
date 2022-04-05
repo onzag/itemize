@@ -55,7 +55,7 @@ Build a graphql query
 
 #### Defined in
 
-[gql-querier.ts:192](https://github.com/onzag/itemize/blob/f2f29986/gql-querier.ts#L192)
+[gql-querier.ts:192](https://github.com/onzag/itemize/blob/5c2808d3/gql-querier.ts#L192)
 
 ## Properties
 
@@ -67,7 +67,7 @@ Files that have been found that are unprocessed
 
 #### Defined in
 
-[gql-querier.ts:177](https://github.com/onzag/itemize/blob/f2f29986/gql-querier.ts#L177)
+[gql-querier.ts:177](https://github.com/onzag/itemize/blob/5c2808d3/gql-querier.ts#L177)
 
 ___
 
@@ -79,7 +79,7 @@ list of listeners
 
 #### Defined in
 
-[gql-querier.ts:181](https://github.com/onzag/itemize/blob/f2f29986/gql-querier.ts#L181)
+[gql-querier.ts:181](https://github.com/onzag/itemize/blob/5c2808d3/gql-querier.ts#L181)
 
 ___
 
@@ -91,7 +91,7 @@ All the processed queries from the query list
 
 #### Defined in
 
-[gql-querier.ts:169](https://github.com/onzag/itemize/blob/f2f29986/gql-querier.ts#L169)
+[gql-querier.ts:169](https://github.com/onzag/itemize/blob/5c2808d3/gql-querier.ts#L169)
 
 ___
 
@@ -103,7 +103,7 @@ list of progress listeners
 
 #### Defined in
 
-[gql-querier.ts:185](https://github.com/onzag/itemize/blob/f2f29986/gql-querier.ts#L185)
+[gql-querier.ts:185](https://github.com/onzag/itemize/blob/5c2808d3/gql-querier.ts#L185)
 
 ___
 
@@ -115,7 +115,7 @@ The type of this query
 
 #### Defined in
 
-[gql-querier.ts:173](https://github.com/onzag/itemize/blob/f2f29986/gql-querier.ts#L173)
+[gql-querier.ts:173](https://github.com/onzag/itemize/blob/5c2808d3/gql-querier.ts#L173)
 
 ## Methods
 
@@ -137,7 +137,7 @@ add a listener for when a reply is informed
 
 #### Defined in
 
-[gql-querier.ts:341](https://github.com/onzag/itemize/blob/f2f29986/gql-querier.ts#L341)
+[gql-querier.ts:341](https://github.com/onzag/itemize/blob/5c2808d3/gql-querier.ts#L341)
 
 ___
 
@@ -157,7 +157,7 @@ ___
 
 #### Defined in
 
-[gql-querier.ts:334](https://github.com/onzag/itemize/blob/f2f29986/gql-querier.ts#L334)
+[gql-querier.ts:334](https://github.com/onzag/itemize/blob/5c2808d3/gql-querier.ts#L334)
 
 ___
 
@@ -183,7 +183,7 @@ new processed args
 
 #### Defined in
 
-[gql-querier.ts:405](https://github.com/onzag/itemize/blob/f2f29986/gql-querier.ts#L405)
+[gql-querier.ts:405](https://github.com/onzag/itemize/blob/5c2808d3/gql-querier.ts#L405)
 
 ___
 
@@ -199,7 +199,7 @@ Provides all the attached files
 
 #### Defined in
 
-[gql-querier.ts:371](https://github.com/onzag/itemize/blob/f2f29986/gql-querier.ts#L371)
+[gql-querier.ts:371](https://github.com/onzag/itemize/blob/5c2808d3/gql-querier.ts#L371)
 
 ___
 
@@ -216,7 +216,7 @@ how the main query is expected to recieve those arguments
 
 #### Defined in
 
-[gql-querier.ts:390](https://github.com/onzag/itemize/blob/f2f29986/gql-querier.ts#L390)
+[gql-querier.ts:390](https://github.com/onzag/itemize/blob/5c2808d3/gql-querier.ts#L390)
 
 ___
 
@@ -233,7 +233,7 @@ file form that will map the variables to the form data
 
 #### Defined in
 
-[gql-querier.ts:360](https://github.com/onzag/itemize/blob/f2f29986/gql-querier.ts#L360)
+[gql-querier.ts:360](https://github.com/onzag/itemize/blob/5c2808d3/gql-querier.ts#L360)
 
 ___
 
@@ -256,7 +256,7 @@ the formdata for the operations
 
 #### Defined in
 
-[gql-querier.ts:349](https://github.com/onzag/itemize/blob/f2f29986/gql-querier.ts#L349)
+[gql-querier.ts:349](https://github.com/onzag/itemize/blob/5c2808d3/gql-querier.ts#L349)
 
 ___
 
@@ -273,7 +273,7 @@ spec that will map to the operations
 
 #### Defined in
 
-[gql-querier.ts:379](https://github.com/onzag/itemize/blob/f2f29986/gql-querier.ts#L379)
+[gql-querier.ts:379](https://github.com/onzag/itemize/blob/5c2808d3/gql-querier.ts#L379)
 
 ___
 
@@ -293,7 +293,7 @@ ___
 
 #### Defined in
 
-[gql-querier.ts:330](https://github.com/onzag/itemize/blob/f2f29986/gql-querier.ts#L330)
+[gql-querier.ts:330](https://github.com/onzag/itemize/blob/5c2808d3/gql-querier.ts#L330)
 
 ___
 
@@ -315,7 +315,7 @@ inform a reply to the query in case this has event listeners to that
 
 #### Defined in
 
-[gql-querier.ts:326](https://github.com/onzag/itemize/blob/f2f29986/gql-querier.ts#L326)
+[gql-querier.ts:326](https://github.com/onzag/itemize/blob/5c2808d3/gql-querier.ts#L326)
 
 ___
 
@@ -337,7 +337,7 @@ Check whether it's mergable
 
 #### Defined in
 
-[gql-querier.ts:217](https://github.com/onzag/itemize/blob/f2f29986/gql-querier.ts#L217)
+[gql-querier.ts:217](https://github.com/onzag/itemize/blob/5c2808d3/gql-querier.ts#L217)
 
 ___
 
@@ -358,7 +358,7 @@ ___
 
 #### Defined in
 
-[gql-querier.ts:247](https://github.com/onzag/itemize/blob/f2f29986/gql-querier.ts#L247)
+[gql-querier.ts:247](https://github.com/onzag/itemize/blob/5c2808d3/gql-querier.ts#L247)
 
 ___
 
@@ -382,4 +382,4 @@ a list of aliases to remap the results from to the given name
 
 #### Defined in
 
-[gql-querier.ts:267](https://github.com/onzag/itemize/blob/f2f29986/gql-querier.ts#L267)
+[gql-querier.ts:267](https://github.com/onzag/itemize/blob/5c2808d3/gql-querier.ts#L267)

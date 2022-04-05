@@ -61,7 +61,7 @@ check index values
 
 #### Defined in
 
-[base/Root/Module/ItemDefinition/PropertyDefinition/index.ts:390](https://github.com/onzag/itemize/blob/f2f29986/base/Root/Module/ItemDefinition/PropertyDefinition/index.ts#L390)
+[base/Root/Module/ItemDefinition/PropertyDefinition/index.ts:390](https://github.com/onzag/itemize/blob/5c2808d3/base/Root/Module/ItemDefinition/PropertyDefinition/index.ts#L390)
 
 ___
 
@@ -73,4 +73,4 @@ And this is combined
 
 #### Defined in
 
-[base/Root/Module/ItemDefinition/PropertyDefinition/index.ts:382](https://github.com/onzag/itemize/blob/f2f29986/base/Root/Module/ItemDefinition/PropertyDefinition/index.ts#L382)
+[base/Root/Module/ItemDefinition/PropertyDefinition/index.ts:382](https://github.com/onzag/itemize/blob/5c2808d3/base/Root/Module/ItemDefinition/PropertyDefinition/index.ts#L382)

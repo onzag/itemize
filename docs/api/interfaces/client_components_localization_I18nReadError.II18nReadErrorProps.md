@@ -27,7 +27,7 @@ Whether the error message should be capitalized
 
 #### Defined in
 
-[client/components/localization/I18nReadError.tsx:36](https://github.com/onzag/itemize/blob/f2f29986/client/components/localization/I18nReadError.tsx#L36)
+[client/components/localization/I18nReadError.tsx:36](https://github.com/onzag/itemize/blob/5c2808d3/client/components/localization/I18nReadError.tsx#L36)
 
 ___
 
@@ -40,7 +40,7 @@ so they can be displayed by passing it here
 
 #### Defined in
 
-[client/components/localization/I18nReadError.tsx:32](https://github.com/onzag/itemize/blob/f2f29986/client/components/localization/I18nReadError.tsx#L32)
+[client/components/localization/I18nReadError.tsx:32](https://github.com/onzag/itemize/blob/5c2808d3/client/components/localization/I18nReadError.tsx#L32)
 
 ## Methods
 
@@ -62,4 +62,4 @@ the children that passes the value to the consumer
 
 #### Defined in
 
-[client/components/localization/I18nReadError.tsx:40](https://github.com/onzag/itemize/blob/f2f29986/client/components/localization/I18nReadError.tsx#L40)
+[client/components/localization/I18nReadError.tsx:40](https://github.com/onzag/itemize/blob/5c2808d3/client/components/localization/I18nReadError.tsx#L40)

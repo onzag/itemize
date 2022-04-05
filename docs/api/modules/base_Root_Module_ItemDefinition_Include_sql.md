@@ -31,7 +31,7 @@ Builds a sql query for an include
 | `itemDefinition` | [`default`](../classes/base_Root_Module_ItemDefinition.default.md) | the item definition that contains the include |
 | `include` | [`default`](../classes/base_Root_Module_ItemDefinition_Include.default.md) | the include in question |
 | `args` | [`IGQLArgs`](../interfaces/gql_querier.IGQLArgs.md) | the args as they come from the search module, specific for this item (not nested) |
-| `whereBuilder` | `WhereBuilder` | - |
+| `whereBuilder` | [`WhereBuilder`](../classes/database_WhereBuilder.WhereBuilder.md) | - |
 | `dictionary` | `string` | the dictionary to use to build the search |
 
 #### Returns
@@ -40,7 +40,7 @@ Builds a sql query for an include
 
 #### Defined in
 
-[base/Root/Module/ItemDefinition/Include/sql.ts:213](https://github.com/onzag/itemize/blob/f2f29986/base/Root/Module/ItemDefinition/Include/sql.ts#L213)
+[base/Root/Module/ItemDefinition/Include/sql.ts:213](https://github.com/onzag/itemize/blob/5c2808d3/base/Root/Module/ItemDefinition/Include/sql.ts#L213)
 
 ___
 
@@ -73,7 +73,7 @@ the partial sql result to be added into the table
 
 #### Defined in
 
-[base/Root/Module/ItemDefinition/Include/sql.ts:137](https://github.com/onzag/itemize/blob/f2f29986/base/Root/Module/ItemDefinition/Include/sql.ts#L137)
+[base/Root/Module/ItemDefinition/Include/sql.ts:137](https://github.com/onzag/itemize/blob/5c2808d3/base/Root/Module/ItemDefinition/Include/sql.ts#L137)
 
 ___
 
@@ -102,7 +102,7 @@ a partial graphql value
 
 #### Defined in
 
-[base/Root/Module/ItemDefinition/Include/sql.ts:75](https://github.com/onzag/itemize/blob/f2f29986/base/Root/Module/ItemDefinition/Include/sql.ts#L75)
+[base/Root/Module/ItemDefinition/Include/sql.ts:75](https://github.com/onzag/itemize/blob/5c2808d3/base/Root/Module/ItemDefinition/Include/sql.ts#L75)
 
 ___
 
@@ -128,4 +128,4 @@ the partial table definition schema for the include, prefixed and with the exclu
 
 #### Defined in
 
-[base/Root/Module/ItemDefinition/Include/sql.ts:30](https://github.com/onzag/itemize/blob/f2f29986/base/Root/Module/ItemDefinition/Include/sql.ts#L30)
+[base/Root/Module/ItemDefinition/Include/sql.ts:30](https://github.com/onzag/itemize/blob/5c2808d3/base/Root/Module/ItemDefinition/Include/sql.ts#L30)

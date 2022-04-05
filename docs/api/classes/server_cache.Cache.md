@@ -70,7 +70,7 @@ it is instantiaded by te listener at the same time
 | Name | Type | Description |
 | :------ | :------ | :------ |
 | `redisClient` | [`ItemizeRedisClient`](server_redis.ItemizeRedisClient.md) | the redis client that is used for storing values |
-| `databaseConnection` | `DatabaseConnection` | - |
+| `databaseConnection` | [`DatabaseConnection`](database.DatabaseConnection.md) | - |
 | `sensitiveConfig` | [`ISensitiveConfigRawJSONDataType`](../interfaces/config.ISensitiveConfigRawJSONDataType.md) | - |
 | `storageClients` | [`IStorageProvidersObject`](../interfaces/server_services_base_StorageProvider.IStorageProvidersObject.md) | - |
 | `domain` | `string` | - |
@@ -79,7 +79,7 @@ it is instantiaded by te listener at the same time
 
 #### Defined in
 
-[server/cache.ts:80](https://github.com/onzag/itemize/blob/f2f29986/server/cache.ts#L80)
+[server/cache.ts:80](https://github.com/onzag/itemize/blob/5c2808d3/server/cache.ts#L80)
 
 ## Properties
 
@@ -89,17 +89,17 @@ it is instantiaded by te listener at the same time
 
 #### Defined in
 
-[server/cache.ts:69](https://github.com/onzag/itemize/blob/f2f29986/server/cache.ts#L69)
+[server/cache.ts:69](https://github.com/onzag/itemize/blob/5c2808d3/server/cache.ts#L69)
 
 ___
 
 ### databaseConnection
 
-• `Private` **databaseConnection**: `DatabaseConnection`
+• `Private` **databaseConnection**: [`DatabaseConnection`](database.DatabaseConnection.md)
 
 #### Defined in
 
-[server/cache.ts:57](https://github.com/onzag/itemize/blob/f2f29986/server/cache.ts#L57)
+[server/cache.ts:57](https://github.com/onzag/itemize/blob/5c2808d3/server/cache.ts#L57)
 
 ___
 
@@ -109,7 +109,7 @@ ___
 
 #### Defined in
 
-[server/cache.ts:58](https://github.com/onzag/itemize/blob/f2f29986/server/cache.ts#L58)
+[server/cache.ts:58](https://github.com/onzag/itemize/blob/5c2808d3/server/cache.ts#L58)
 
 ___
 
@@ -119,7 +119,7 @@ ___
 
 #### Defined in
 
-[server/cache.ts:62](https://github.com/onzag/itemize/blob/f2f29986/server/cache.ts#L62)
+[server/cache.ts:62](https://github.com/onzag/itemize/blob/5c2808d3/server/cache.ts#L62)
 
 ___
 
@@ -133,7 +133,7 @@ ___
 
 #### Defined in
 
-[server/cache.ts:64](https://github.com/onzag/itemize/blob/f2f29986/server/cache.ts#L64)
+[server/cache.ts:64](https://github.com/onzag/itemize/blob/5c2808d3/server/cache.ts#L64)
 
 ___
 
@@ -143,7 +143,7 @@ ___
 
 #### Defined in
 
-[server/cache.ts:56](https://github.com/onzag/itemize/blob/f2f29986/server/cache.ts#L56)
+[server/cache.ts:56](https://github.com/onzag/itemize/blob/5c2808d3/server/cache.ts#L56)
 
 ___
 
@@ -153,7 +153,7 @@ ___
 
 #### Defined in
 
-[server/cache.ts:60](https://github.com/onzag/itemize/blob/f2f29986/server/cache.ts#L60)
+[server/cache.ts:60](https://github.com/onzag/itemize/blob/5c2808d3/server/cache.ts#L60)
 
 ___
 
@@ -163,7 +163,7 @@ ___
 
 #### Defined in
 
-[server/cache.ts:63](https://github.com/onzag/itemize/blob/f2f29986/server/cache.ts#L63)
+[server/cache.ts:63](https://github.com/onzag/itemize/blob/5c2808d3/server/cache.ts#L63)
 
 ___
 
@@ -173,7 +173,7 @@ ___
 
 #### Defined in
 
-[server/cache.ts:61](https://github.com/onzag/itemize/blob/f2f29986/server/cache.ts#L61)
+[server/cache.ts:61](https://github.com/onzag/itemize/blob/5c2808d3/server/cache.ts#L61)
 
 ___
 
@@ -183,7 +183,7 @@ ___
 
 #### Defined in
 
-[server/cache.ts:59](https://github.com/onzag/itemize/blob/f2f29986/server/cache.ts#L59)
+[server/cache.ts:59](https://github.com/onzag/itemize/blob/5c2808d3/server/cache.ts#L59)
 
 ## Methods
 
@@ -210,7 +210,7 @@ a simple boolean
 
 #### Defined in
 
-[server/cache.ts:1477](https://github.com/onzag/itemize/blob/f2f29986/server/cache.ts#L1477)
+[server/cache.ts:1477](https://github.com/onzag/itemize/blob/5c2808d3/server/cache.ts#L1477)
 
 ___
 
@@ -236,7 +236,7 @@ a list of modules
 
 #### Defined in
 
-[server/cache.ts:1493](https://github.com/onzag/itemize/blob/f2f29986/server/cache.ts#L1493)
+[server/cache.ts:1493](https://github.com/onzag/itemize/blob/5c2808d3/server/cache.ts#L1493)
 
 ___
 
@@ -261,7 +261,7 @@ item definition value
 
 #### Defined in
 
-[server/cache.ts:1523](https://github.com/onzag/itemize/blob/f2f29986/server/cache.ts#L1523)
+[server/cache.ts:1523](https://github.com/onzag/itemize/blob/5c2808d3/server/cache.ts#L1523)
 
 ___
 
@@ -286,7 +286,7 @@ forces a cached value for a given item definition table in an id and version
 
 #### Defined in
 
-[server/cache.ts:193](https://github.com/onzag/itemize/blob/f2f29986/server/cache.ts#L193)
+[server/cache.ts:193](https://github.com/onzag/itemize/blob/5c2808d3/server/cache.ts#L193)
 
 ___
 
@@ -316,7 +316,7 @@ a promise with the value
 
 #### Defined in
 
-[server/cache.ts:113](https://github.com/onzag/itemize/blob/f2f29986/server/cache.ts#L113)
+[server/cache.ts:113](https://github.com/onzag/itemize/blob/5c2808d3/server/cache.ts#L113)
 
 ___
 
@@ -332,7 +332,7 @@ Provides the current server data
 
 #### Defined in
 
-[server/cache.ts:2165](https://github.com/onzag/itemize/blob/f2f29986/server/cache.ts#L2165)
+[server/cache.ts:2165](https://github.com/onzag/itemize/blob/5c2808d3/server/cache.ts#L2165)
 
 ___
 
@@ -360,7 +360,7 @@ a void promise when done
 
 #### Defined in
 
-[server/cache.ts:2189](https://github.com/onzag/itemize/blob/f2f29986/server/cache.ts#L2189)
+[server/cache.ts:2189](https://github.com/onzag/itemize/blob/5c2808d3/server/cache.ts#L2189)
 
 ___
 
@@ -386,7 +386,7 @@ manually fetched
 
 #### Defined in
 
-[server/cache.ts:2257](https://github.com/onzag/itemize/blob/f2f29986/server/cache.ts#L2257)
+[server/cache.ts:2257](https://github.com/onzag/itemize/blob/5c2808d3/server/cache.ts#L2257)
 
 ___
 
@@ -408,7 +408,7 @@ This function is called once new server data was informed by a redis event
 
 #### Defined in
 
-[server/cache.ts:2173](https://github.com/onzag/itemize/blob/f2f29986/server/cache.ts#L2173)
+[server/cache.ts:2173](https://github.com/onzag/itemize/blob/5c2808d3/server/cache.ts#L2173)
 
 ___
 
@@ -430,7 +430,7 @@ Resets the expiration clock of a given identifier
 
 #### Defined in
 
-[server/cache.ts:172](https://github.com/onzag/itemize/blob/f2f29986/server/cache.ts#L172)
+[server/cache.ts:172](https://github.com/onzag/itemize/blob/5c2808d3/server/cache.ts#L172)
 
 ___
 
@@ -467,7 +467,7 @@ with all its files and everything
 
 #### Defined in
 
-[server/cache.ts:773](https://github.com/onzag/itemize/blob/f2f29986/server/cache.ts#L773)
+[server/cache.ts:773](https://github.com/onzag/itemize/blob/5c2808d3/server/cache.ts#L773)
 
 ___
 
@@ -505,7 +505,7 @@ a total sql combined row value that can be converted into grapqhl
 
 #### Defined in
 
-[server/cache.ts:348](https://github.com/onzag/itemize/blob/f2f29986/server/cache.ts#L348)
+[server/cache.ts:348](https://github.com/onzag/itemize/blob/5c2808d3/server/cache.ts#L348)
 
 ___
 
@@ -534,7 +534,7 @@ Request the deletition of an item definition value
 
 #### Defined in
 
-[server/cache.ts:1629](https://github.com/onzag/itemize/blob/f2f29986/server/cache.ts#L1629)
+[server/cache.ts:1629](https://github.com/onzag/itemize/blob/5c2808d3/server/cache.ts#L1629)
 
 ___
 
@@ -559,7 +559,7 @@ a list of whole sql combined table row values
 
 #### Defined in
 
-[server/cache.ts:2154](https://github.com/onzag/itemize/blob/f2f29986/server/cache.ts#L2154)
+[server/cache.ts:2154](https://github.com/onzag/itemize/blob/5c2808d3/server/cache.ts#L2154)
 
 ___
 
@@ -585,7 +585,7 @@ these tokens for redirected logins
 
 #### Defined in
 
-[server/cache.ts:2024](https://github.com/onzag/itemize/blob/f2f29986/server/cache.ts#L2024)
+[server/cache.ts:2024](https://github.com/onzag/itemize/blob/5c2808d3/server/cache.ts#L2024)
 
 ___
 
@@ -630,7 +630,7 @@ a total combined table row value that can be converted into graphql
 
 #### Defined in
 
-[server/cache.ts:973](https://github.com/onzag/itemize/blob/f2f29986/server/cache.ts#L973)
+[server/cache.ts:973](https://github.com/onzag/itemize/blob/5c2808d3/server/cache.ts#L973)
 
 ___
 
@@ -661,7 +661,7 @@ this might have more overhead than the normal request update
 
 #### Defined in
 
-[server/cache.ts:906](https://github.com/onzag/itemize/blob/f2f29986/server/cache.ts#L906)
+[server/cache.ts:906](https://github.com/onzag/itemize/blob/5c2808d3/server/cache.ts#L906)
 
 ___
 
@@ -690,7 +690,7 @@ a whole sql value that can be converted into graphql if necessary
 
 #### Defined in
 
-[server/cache.ts:2058](https://github.com/onzag/itemize/blob/f2f29986/server/cache.ts#L2058)
+[server/cache.ts:2058](https://github.com/onzag/itemize/blob/5c2808d3/server/cache.ts#L2058)
 
 ___
 
@@ -713,7 +713,7 @@ where this app is contained
 
 #### Defined in
 
-[server/cache.ts:2266](https://github.com/onzag/itemize/blob/f2f29986/server/cache.ts#L2266)
+[server/cache.ts:2266](https://github.com/onzag/itemize/blob/5c2808d3/server/cache.ts#L2266)
 
 ___
 
@@ -738,7 +738,7 @@ comes from redis
 
 #### Defined in
 
-[server/cache.ts:104](https://github.com/onzag/itemize/blob/f2f29986/server/cache.ts#L104)
+[server/cache.ts:104](https://github.com/onzag/itemize/blob/5c2808d3/server/cache.ts#L104)
 
 ___
 
@@ -759,7 +759,7 @@ ___
 
 #### Defined in
 
-[server/cache.ts:150](https://github.com/onzag/itemize/blob/f2f29986/server/cache.ts#L150)
+[server/cache.ts:150](https://github.com/onzag/itemize/blob/5c2808d3/server/cache.ts#L150)
 
 ___
 
@@ -787,7 +787,7 @@ ___
 
 #### Defined in
 
-[server/cache.ts:210](https://github.com/onzag/itemize/blob/f2f29986/server/cache.ts#L210)
+[server/cache.ts:210](https://github.com/onzag/itemize/blob/5c2808d3/server/cache.ts#L210)
 
 ___
 
@@ -805,4 +805,4 @@ the cache is wiped by the cluster manager which handles the cache
 
 #### Defined in
 
-[server/cache.ts:2237](https://github.com/onzag/itemize/blob/f2f29986/server/cache.ts#L2237)
+[server/cache.ts:2237](https://github.com/onzag/itemize/blob/5c2808d3/server/cache.ts#L2237)

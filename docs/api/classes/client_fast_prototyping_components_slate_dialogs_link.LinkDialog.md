@@ -72,7 +72,7 @@ React.PureComponent&lt;ILinkDialogProps, ILinkDialogState\&gt;.constructor
 
 #### Defined in
 
-[client/fast-prototyping/components/slate/dialogs/link.tsx:164](https://github.com/onzag/itemize/blob/f2f29986/client/fast-prototyping/components/slate/dialogs/link.tsx#L164)
+[client/fast-prototyping/components/slate/dialogs/link.tsx:164](https://github.com/onzag/itemize/blob/5c2808d3/client/fast-prototyping/components/slate/dialogs/link.tsx#L164)
 
 ## Properties
 
@@ -161,7 +161,7 @@ We grab a ref for the text field in order to focus
 
 #### Defined in
 
-[client/fast-prototyping/components/slate/dialogs/link.tsx:158](https://github.com/onzag/itemize/blob/f2f29986/client/fast-prototyping/components/slate/dialogs/link.tsx#L158)
+[client/fast-prototyping/components/slate/dialogs/link.tsx:158](https://github.com/onzag/itemize/blob/5c2808d3/client/fast-prototyping/components/slate/dialogs/link.tsx#L158)
 
 ___
 
@@ -326,7 +326,7 @@ to accept the link we have given
 
 #### Defined in
 
-[client/fast-prototyping/components/slate/dialogs/link.tsx:278](https://github.com/onzag/itemize/blob/f2f29986/client/fast-prototyping/components/slate/dialogs/link.tsx#L278)
+[client/fast-prototyping/components/slate/dialogs/link.tsx:278](https://github.com/onzag/itemize/blob/5c2808d3/client/fast-prototyping/components/slate/dialogs/link.tsx#L278)
 
 ___
 
@@ -343,7 +343,7 @@ to be closed
 
 #### Defined in
 
-[client/fast-prototyping/components/slate/dialogs/link.tsx:318](https://github.com/onzag/itemize/blob/f2f29986/client/fast-prototyping/components/slate/dialogs/link.tsx#L318)
+[client/fast-prototyping/components/slate/dialogs/link.tsx:318](https://github.com/onzag/itemize/blob/5c2808d3/client/fast-prototyping/components/slate/dialogs/link.tsx#L318)
 
 ___
 
@@ -568,7 +568,7 @@ to focus the text field
 
 #### Defined in
 
-[client/fast-prototyping/components/slate/dialogs/link.tsx:188](https://github.com/onzag/itemize/blob/f2f29986/client/fast-prototyping/components/slate/dialogs/link.tsx#L188)
+[client/fast-prototyping/components/slate/dialogs/link.tsx:188](https://github.com/onzag/itemize/blob/5c2808d3/client/fast-prototyping/components/slate/dialogs/link.tsx#L188)
 
 ___
 
@@ -640,7 +640,7 @@ Triggers when the dialog is opening
 
 #### Defined in
 
-[client/fast-prototyping/components/slate/dialogs/link.tsx:195](https://github.com/onzag/itemize/blob/f2f29986/client/fast-prototyping/components/slate/dialogs/link.tsx#L195)
+[client/fast-prototyping/components/slate/dialogs/link.tsx:195](https://github.com/onzag/itemize/blob/5c2808d3/client/fast-prototyping/components/slate/dialogs/link.tsx#L195)
 
 ___
 
@@ -660,7 +660,7 @@ React.PureComponent.render
 
 #### Defined in
 
-[client/fast-prototyping/components/slate/dialogs/link.tsx:338](https://github.com/onzag/itemize/blob/f2f29986/client/fast-prototyping/components/slate/dialogs/link.tsx#L338)
+[client/fast-prototyping/components/slate/dialogs/link.tsx:338](https://github.com/onzag/itemize/blob/5c2808d3/client/fast-prototyping/components/slate/dialogs/link.tsx#L338)
 
 ___
 
@@ -749,7 +749,7 @@ value in the state
 
 #### Defined in
 
-[client/fast-prototyping/components/slate/dialogs/link.tsx:308](https://github.com/onzag/itemize/blob/f2f29986/client/fast-prototyping/components/slate/dialogs/link.tsx#L308)
+[client/fast-prototyping/components/slate/dialogs/link.tsx:308](https://github.com/onzag/itemize/blob/5c2808d3/client/fast-prototyping/components/slate/dialogs/link.tsx#L308)
 
 ___
 
@@ -771,4 +771,4 @@ Triggers on each keystroke to update the link url itself
 
 #### Defined in
 
-[client/fast-prototyping/components/slate/dialogs/link.tsx:297](https://github.com/onzag/itemize/blob/f2f29986/client/fast-prototyping/components/slate/dialogs/link.tsx#L297)
+[client/fast-prototyping/components/slate/dialogs/link.tsx:297](https://github.com/onzag/itemize/blob/5c2808d3/client/fast-prototyping/components/slate/dialogs/link.tsx#L297)

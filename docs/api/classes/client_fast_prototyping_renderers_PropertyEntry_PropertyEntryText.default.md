@@ -66,7 +66,7 @@ React.PureComponent&lt;IPropertyEntryTextRendererProps, IPropertyEntryTextRender
 
 #### Defined in
 
-[client/fast-prototyping/renderers/PropertyEntry/PropertyEntryText.tsx:130](https://github.com/onzag/itemize/blob/f2f29986/client/fast-prototyping/renderers/PropertyEntry/PropertyEntryText.tsx#L130)
+[client/fast-prototyping/renderers/PropertyEntry/PropertyEntryText.tsx:130](https://github.com/onzag/itemize/blob/5c2808d3/client/fast-prototyping/renderers/PropertyEntry/PropertyEntryText.tsx#L130)
 
 ## Properties
 
@@ -569,7 +569,7 @@ ___
 
 #### Defined in
 
-[client/fast-prototyping/renderers/PropertyEntry/PropertyEntryText.tsx:146](https://github.com/onzag/itemize/blob/f2f29986/client/fast-prototyping/renderers/PropertyEntry/PropertyEntryText.tsx#L146)
+[client/fast-prototyping/renderers/PropertyEntry/PropertyEntryText.tsx:146](https://github.com/onzag/itemize/blob/5c2808d3/client/fast-prototyping/renderers/PropertyEntry/PropertyEntryText.tsx#L146)
 
 ___
 
@@ -583,7 +583,7 @@ ___
 
 #### Defined in
 
-[client/fast-prototyping/renderers/PropertyEntry/PropertyEntryText.tsx:141](https://github.com/onzag/itemize/blob/f2f29986/client/fast-prototyping/renderers/PropertyEntry/PropertyEntryText.tsx#L141)
+[client/fast-prototyping/renderers/PropertyEntry/PropertyEntryText.tsx:141](https://github.com/onzag/itemize/blob/5c2808d3/client/fast-prototyping/renderers/PropertyEntry/PropertyEntryText.tsx#L141)
 
 ___
 
@@ -601,7 +601,7 @@ React.PureComponent.render
 
 #### Defined in
 
-[client/fast-prototyping/renderers/PropertyEntry/PropertyEntryText.tsx:152](https://github.com/onzag/itemize/blob/f2f29986/client/fast-prototyping/renderers/PropertyEntry/PropertyEntryText.tsx#L152)
+[client/fast-prototyping/renderers/PropertyEntry/PropertyEntryText.tsx:152](https://github.com/onzag/itemize/blob/5c2808d3/client/fast-prototyping/renderers/PropertyEntry/PropertyEntryText.tsx#L152)
 
 ___
 

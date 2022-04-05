@@ -177,7 +177,7 @@ ___
 
 #### Defined in
 
-[client/components/util/SetVar.tsx:12](https://github.com/onzag/itemize/blob/f2f29986/client/components/util/SetVar.tsx#L12)
+[client/components/util/SetVar.tsx:12](https://github.com/onzag/itemize/blob/5c2808d3/client/components/util/SetVar.tsx#L12)
 
 ___
 
@@ -191,7 +191,7 @@ ___
 
 #### Defined in
 
-[client/components/util/SetVar.tsx:11](https://github.com/onzag/itemize/blob/f2f29986/client/components/util/SetVar.tsx#L11)
+[client/components/util/SetVar.tsx:11](https://github.com/onzag/itemize/blob/5c2808d3/client/components/util/SetVar.tsx#L11)
 
 ___
 
@@ -385,7 +385,7 @@ React.Component.componentDidMount
 
 #### Defined in
 
-[client/components/util/SetVar.tsx:36](https://github.com/onzag/itemize/blob/f2f29986/client/components/util/SetVar.tsx#L36)
+[client/components/util/SetVar.tsx:36](https://github.com/onzag/itemize/blob/5c2808d3/client/components/util/SetVar.tsx#L36)
 
 ___
 
@@ -503,7 +503,7 @@ React.Component.componentWillUnmount
 
 #### Defined in
 
-[client/components/util/SetVar.tsx:95](https://github.com/onzag/itemize/blob/f2f29986/client/components/util/SetVar.tsx#L95)
+[client/components/util/SetVar.tsx:95](https://github.com/onzag/itemize/blob/5c2808d3/client/components/util/SetVar.tsx#L95)
 
 ___
 
@@ -616,7 +616,7 @@ React.Component.render
 
 #### Defined in
 
-[client/components/util/SetVar.tsx:112](https://github.com/onzag/itemize/blob/f2f29986/client/components/util/SetVar.tsx#L112)
+[client/components/util/SetVar.tsx:112](https://github.com/onzag/itemize/blob/5c2808d3/client/components/util/SetVar.tsx#L112)
 
 ___
 
@@ -671,7 +671,7 @@ React.Component.shouldComponentUpdate
 
 #### Defined in
 
-[client/components/util/SetVar.tsx:48](https://github.com/onzag/itemize/blob/f2f29986/client/components/util/SetVar.tsx#L48)
+[client/components/util/SetVar.tsx:48](https://github.com/onzag/itemize/blob/5c2808d3/client/components/util/SetVar.tsx#L48)
 
 ___
 
@@ -691,7 +691,7 @@ ___
 
 #### Defined in
 
-[client/components/util/SetVar.tsx:30](https://github.com/onzag/itemize/blob/f2f29986/client/components/util/SetVar.tsx#L30)
+[client/components/util/SetVar.tsx:30](https://github.com/onzag/itemize/blob/5c2808d3/client/components/util/SetVar.tsx#L30)
 
 ___
 
@@ -712,7 +712,7 @@ ___
 
 #### Defined in
 
-[client/components/util/SetVar.tsx:13](https://github.com/onzag/itemize/blob/f2f29986/client/components/util/SetVar.tsx#L13)
+[client/components/util/SetVar.tsx:13](https://github.com/onzag/itemize/blob/5c2808d3/client/components/util/SetVar.tsx#L13)
 
 ___
 
@@ -733,4 +733,4 @@ ___
 
 #### Defined in
 
-[client/components/util/SetVar.tsx:21](https://github.com/onzag/itemize/blob/f2f29986/client/components/util/SetVar.tsx#L21)
+[client/components/util/SetVar.tsx:21](https://github.com/onzag/itemize/blob/5c2808d3/client/components/util/SetVar.tsx#L21)

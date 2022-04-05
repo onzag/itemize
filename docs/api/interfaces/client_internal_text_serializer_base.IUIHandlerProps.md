@@ -41,7 +41,7 @@ mode or not
 
 #### Defined in
 
-[client/internal/text/serializer/base.tsx:46](https://github.com/onzag/itemize/blob/f2f29986/client/internal/text/serializer/base.tsx#L46)
+[client/internal/text/serializer/base.tsx:46](https://github.com/onzag/itemize/blob/5c2808d3/client/internal/text/serializer/base.tsx#L46)
 
 ___
 
@@ -54,7 +54,7 @@ please ensure to use them specially if in slate mode
 
 #### Defined in
 
-[client/internal/text/serializer/base.tsx:57](https://github.com/onzag/itemize/blob/f2f29986/client/internal/text/serializer/base.tsx#L57)
+[client/internal/text/serializer/base.tsx:57](https://github.com/onzag/itemize/blob/5c2808d3/client/internal/text/serializer/base.tsx#L57)
 
 ___
 
@@ -66,7 +66,7 @@ An optional class name
 
 #### Defined in
 
-[client/internal/text/serializer/base.tsx:61](https://github.com/onzag/itemize/blob/f2f29986/client/internal/text/serializer/base.tsx#L61)
+[client/internal/text/serializer/base.tsx:61](https://github.com/onzag/itemize/blob/5c2808d3/client/internal/text/serializer/base.tsx#L61)
 
 ___
 
@@ -78,7 +78,7 @@ The element that the ui handler belongs to
 
 #### Defined in
 
-[client/internal/text/serializer/base.tsx:52](https://github.com/onzag/itemize/blob/f2f29986/client/internal/text/serializer/base.tsx#L52)
+[client/internal/text/serializer/base.tsx:52](https://github.com/onzag/itemize/blob/5c2808d3/client/internal/text/serializer/base.tsx#L52)
 
 ___
 
@@ -90,7 +90,7 @@ contains events that should be added to the element
 
 #### Defined in
 
-[client/internal/text/serializer/base.tsx:77](https://github.com/onzag/itemize/blob/f2f29986/client/internal/text/serializer/base.tsx#L77)
+[client/internal/text/serializer/base.tsx:77](https://github.com/onzag/itemize/blob/5c2808d3/client/internal/text/serializer/base.tsx#L77)
 
 ___
 
@@ -102,7 +102,7 @@ The style object
 
 #### Defined in
 
-[client/internal/text/serializer/base.tsx:65](https://github.com/onzag/itemize/blob/f2f29986/client/internal/text/serializer/base.tsx#L65)
+[client/internal/text/serializer/base.tsx:65](https://github.com/onzag/itemize/blob/5c2808d3/client/internal/text/serializer/base.tsx#L65)
 
 ___
 
@@ -114,7 +114,7 @@ The style active object
 
 #### Defined in
 
-[client/internal/text/serializer/base.tsx:69](https://github.com/onzag/itemize/blob/f2f29986/client/internal/text/serializer/base.tsx#L69)
+[client/internal/text/serializer/base.tsx:69](https://github.com/onzag/itemize/blob/5c2808d3/client/internal/text/serializer/base.tsx#L69)
 
 ___
 
@@ -126,4 +126,4 @@ The style hover object
 
 #### Defined in
 
-[client/internal/text/serializer/base.tsx:73](https://github.com/onzag/itemize/blob/f2f29986/client/internal/text/serializer/base.tsx#L73)
+[client/internal/text/serializer/base.tsx:73](https://github.com/onzag/itemize/blob/5c2808d3/client/internal/text/serializer/base.tsx#L73)

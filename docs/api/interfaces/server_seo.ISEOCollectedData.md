@@ -30,7 +30,7 @@ the ISEOCollectionRequest
 
 #### Defined in
 
-[server/seo/index.ts:33](https://github.com/onzag/itemize/blob/f2f29986/server/seo/index.ts#L33)
+[server/seo/index.ts:33](https://github.com/onzag/itemize/blob/5c2808d3/server/seo/index.ts#L33)
 
 ___
 
@@ -40,7 +40,7 @@ ___
 
 #### Defined in
 
-[server/seo/index.ts:31](https://github.com/onzag/itemize/blob/f2f29986/server/seo/index.ts#L31)
+[server/seo/index.ts:31](https://github.com/onzag/itemize/blob/5c2808d3/server/seo/index.ts#L31)
 
 ___
 
@@ -50,4 +50,4 @@ ___
 
 #### Defined in
 
-[server/seo/index.ts:32](https://github.com/onzag/itemize/blob/f2f29986/server/seo/index.ts#L32)
+[server/seo/index.ts:32](https://github.com/onzag/itemize/blob/5c2808d3/server/seo/index.ts#L32)

@@ -50,7 +50,7 @@ ancestor that is a block type
 
 #### Defined in
 
-[client/fast-prototyping/components/slate/index.tsx:877](https://github.com/onzag/itemize/blob/f2f29986/client/fast-prototyping/components/slate/index.tsx#L877)
+[client/fast-prototyping/components/slate/index.tsx:877](https://github.com/onzag/itemize/blob/5c2808d3/client/fast-prototyping/components/slate/index.tsx#L877)
 
 ___
 
@@ -62,7 +62,7 @@ The current path followed for block
 
 #### Defined in
 
-[client/fast-prototyping/components/slate/index.tsx:972](https://github.com/onzag/itemize/blob/f2f29986/client/fast-prototyping/components/slate/index.tsx#L972)
+[client/fast-prototyping/components/slate/index.tsx:972](https://github.com/onzag/itemize/blob/5c2808d3/client/fast-prototyping/components/slate/index.tsx#L972)
 
 ___
 
@@ -76,7 +76,7 @@ from that base context
 
 #### Defined in
 
-[client/fast-prototyping/components/slate/index.tsx:929](https://github.com/onzag/itemize/blob/f2f29986/client/fast-prototyping/components/slate/index.tsx#L929)
+[client/fast-prototyping/components/slate/index.tsx:929](https://github.com/onzag/itemize/blob/5c2808d3/client/fast-prototyping/components/slate/index.tsx#L929)
 
 ___
 
@@ -91,7 +91,7 @@ it will mostly always be a block type
 
 #### Defined in
 
-[client/fast-prototyping/components/slate/index.tsx:869](https://github.com/onzag/itemize/blob/f2f29986/client/fast-prototyping/components/slate/index.tsx#L869)
+[client/fast-prototyping/components/slate/index.tsx:869](https://github.com/onzag/itemize/blob/5c2808d3/client/fast-prototyping/components/slate/index.tsx#L869)
 
 ___
 
@@ -103,7 +103,7 @@ The current path followed, for element
 
 #### Defined in
 
-[client/fast-prototyping/components/slate/index.tsx:967](https://github.com/onzag/itemize/blob/f2f29986/client/fast-prototyping/components/slate/index.tsx#L967)
+[client/fast-prototyping/components/slate/index.tsx:967](https://github.com/onzag/itemize/blob/5c2808d3/client/fast-prototyping/components/slate/index.tsx#L967)
 
 ___
 
@@ -115,7 +115,7 @@ root context
 
 #### Defined in
 
-[client/fast-prototyping/components/slate/index.tsx:934](https://github.com/onzag/itemize/blob/f2f29986/client/fast-prototyping/components/slate/index.tsx#L934)
+[client/fast-prototyping/components/slate/index.tsx:934](https://github.com/onzag/itemize/blob/5c2808d3/client/fast-prototyping/components/slate/index.tsx#L934)
 
 ___
 
@@ -131,7 +131,7 @@ then it will be selected instead
 
 #### Defined in
 
-[client/fast-prototyping/components/slate/index.tsx:908](https://github.com/onzag/itemize/blob/f2f29986/client/fast-prototyping/components/slate/index.tsx#L908)
+[client/fast-prototyping/components/slate/index.tsx:908](https://github.com/onzag/itemize/blob/5c2808d3/client/fast-prototyping/components/slate/index.tsx#L908)
 
 ___
 
@@ -143,7 +143,7 @@ Selected anchor
 
 #### Defined in
 
-[client/fast-prototyping/components/slate/index.tsx:987](https://github.com/onzag/itemize/blob/f2f29986/client/fast-prototyping/components/slate/index.tsx#L987)
+[client/fast-prototyping/components/slate/index.tsx:987](https://github.com/onzag/itemize/blob/5c2808d3/client/fast-prototyping/components/slate/index.tsx#L987)
 
 ___
 
@@ -159,7 +159,7 @@ then it will be selected instead
 
 #### Defined in
 
-[client/fast-prototyping/components/slate/index.tsx:899](https://github.com/onzag/itemize/blob/f2f29986/client/fast-prototyping/components/slate/index.tsx#L899)
+[client/fast-prototyping/components/slate/index.tsx:899](https://github.com/onzag/itemize/blob/5c2808d3/client/fast-prototyping/components/slate/index.tsx#L899)
 
 ___
 
@@ -171,7 +171,7 @@ Selected anchor
 
 #### Defined in
 
-[client/fast-prototyping/components/slate/index.tsx:982](https://github.com/onzag/itemize/blob/f2f29986/client/fast-prototyping/components/slate/index.tsx#L982)
+[client/fast-prototyping/components/slate/index.tsx:982](https://github.com/onzag/itemize/blob/5c2808d3/client/fast-prototyping/components/slate/index.tsx#L982)
 
 ___
 
@@ -183,7 +183,7 @@ The current selected element templating context
 
 #### Defined in
 
-[client/fast-prototyping/components/slate/index.tsx:939](https://github.com/onzag/itemize/blob/f2f29986/client/fast-prototyping/components/slate/index.tsx#L939)
+[client/fast-prototyping/components/slate/index.tsx:939](https://github.com/onzag/itemize/blob/5c2808d3/client/fast-prototyping/components/slate/index.tsx#L939)
 
 ___
 
@@ -196,7 +196,7 @@ are
 
 #### Defined in
 
-[client/fast-prototyping/components/slate/index.tsx:951](https://github.com/onzag/itemize/blob/f2f29986/client/fast-prototyping/components/slate/index.tsx#L951)
+[client/fast-prototyping/components/slate/index.tsx:951](https://github.com/onzag/itemize/blob/5c2808d3/client/fast-prototyping/components/slate/index.tsx#L951)
 
 ___
 
@@ -209,7 +209,7 @@ are
 
 #### Defined in
 
-[client/fast-prototyping/components/slate/index.tsx:945](https://github.com/onzag/itemize/blob/f2f29986/client/fast-prototyping/components/slate/index.tsx#L945)
+[client/fast-prototyping/components/slate/index.tsx:945](https://github.com/onzag/itemize/blob/5c2808d3/client/fast-prototyping/components/slate/index.tsx#L945)
 
 ___
 
@@ -225,7 +225,7 @@ then it will be selected instead
 
 #### Defined in
 
-[client/fast-prototyping/components/slate/index.tsx:917](https://github.com/onzag/itemize/blob/f2f29986/client/fast-prototyping/components/slate/index.tsx#L917)
+[client/fast-prototyping/components/slate/index.tsx:917](https://github.com/onzag/itemize/blob/5c2808d3/client/fast-prototyping/components/slate/index.tsx#L917)
 
 ___
 
@@ -237,7 +237,7 @@ Selected anchor
 
 #### Defined in
 
-[client/fast-prototyping/components/slate/index.tsx:992](https://github.com/onzag/itemize/blob/f2f29986/client/fast-prototyping/components/slate/index.tsx#L992)
+[client/fast-prototyping/components/slate/index.tsx:992](https://github.com/onzag/itemize/blob/5c2808d3/client/fast-prototyping/components/slate/index.tsx#L992)
 
 ___
 
@@ -249,7 +249,7 @@ Based on the current selected element or the current text
 
 #### Defined in
 
-[client/fast-prototyping/components/slate/index.tsx:922](https://github.com/onzag/itemize/blob/f2f29986/client/fast-prototyping/components/slate/index.tsx#L922)
+[client/fast-prototyping/components/slate/index.tsx:922](https://github.com/onzag/itemize/blob/5c2808d3/client/fast-prototyping/components/slate/index.tsx#L922)
 
 ___
 
@@ -263,7 +263,7 @@ element
 
 #### Defined in
 
-[client/fast-prototyping/components/slate/index.tsx:884](https://github.com/onzag/itemize/blob/f2f29986/client/fast-prototyping/components/slate/index.tsx#L884)
+[client/fast-prototyping/components/slate/index.tsx:884](https://github.com/onzag/itemize/blob/5c2808d3/client/fast-prototyping/components/slate/index.tsx#L884)
 
 ___
 
@@ -275,7 +275,7 @@ The current path followed for super block
 
 #### Defined in
 
-[client/fast-prototyping/components/slate/index.tsx:977](https://github.com/onzag/itemize/blob/f2f29986/client/fast-prototyping/components/slate/index.tsx#L977)
+[client/fast-prototyping/components/slate/index.tsx:977](https://github.com/onzag/itemize/blob/5c2808d3/client/fast-prototyping/components/slate/index.tsx#L977)
 
 ___
 
@@ -288,7 +288,7 @@ a text node where the caret is currently placed
 
 #### Defined in
 
-[client/fast-prototyping/components/slate/index.tsx:890](https://github.com/onzag/itemize/blob/f2f29986/client/fast-prototyping/components/slate/index.tsx#L890)
+[client/fast-prototyping/components/slate/index.tsx:890](https://github.com/onzag/itemize/blob/5c2808d3/client/fast-prototyping/components/slate/index.tsx#L890)
 
 ___
 
@@ -302,7 +302,7 @@ and it's used for stylistic purposes
 
 #### Defined in
 
-[client/fast-prototyping/components/slate/index.tsx:861](https://github.com/onzag/itemize/blob/f2f29986/client/fast-prototyping/components/slate/index.tsx#L861)
+[client/fast-prototyping/components/slate/index.tsx:861](https://github.com/onzag/itemize/blob/5c2808d3/client/fast-prototyping/components/slate/index.tsx#L861)
 
 ___
 
@@ -315,7 +315,7 @@ in the slate rich text editor
 
 #### Defined in
 
-[client/fast-prototyping/components/slate/index.tsx:957](https://github.com/onzag/itemize/blob/f2f29986/client/fast-prototyping/components/slate/index.tsx#L957)
+[client/fast-prototyping/components/slate/index.tsx:957](https://github.com/onzag/itemize/blob/5c2808d3/client/fast-prototyping/components/slate/index.tsx#L957)
 
 ___
 
@@ -329,7 +329,7 @@ state of the editor
 
 #### Defined in
 
-[client/fast-prototyping/components/slate/index.tsx:839](https://github.com/onzag/itemize/blob/f2f29986/client/fast-prototyping/components/slate/index.tsx#L839)
+[client/fast-prototyping/components/slate/index.tsx:839](https://github.com/onzag/itemize/blob/5c2808d3/client/fast-prototyping/components/slate/index.tsx#L839)
 
 ___
 
@@ -351,7 +351,7 @@ the props of the editor
 
 #### Defined in
 
-[client/fast-prototyping/components/slate/index.tsx:854](https://github.com/onzag/itemize/blob/f2f29986/client/fast-prototyping/components/slate/index.tsx#L854)
+[client/fast-prototyping/components/slate/index.tsx:854](https://github.com/onzag/itemize/blob/5c2808d3/client/fast-prototyping/components/slate/index.tsx#L854)
 
 ___
 
@@ -363,4 +363,4 @@ The current path followed, text path for the current text
 
 #### Defined in
 
-[client/fast-prototyping/components/slate/index.tsx:962](https://github.com/onzag/itemize/blob/f2f29986/client/fast-prototyping/components/slate/index.tsx#L962)
+[client/fast-prototyping/components/slate/index.tsx:962](https://github.com/onzag/itemize/blob/5c2808d3/client/fast-prototyping/components/slate/index.tsx#L962)

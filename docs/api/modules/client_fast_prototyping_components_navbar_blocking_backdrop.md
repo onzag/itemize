@@ -35,4 +35,4 @@ a react component
 
 #### Defined in
 
-[client/fast-prototyping/components/navbar/blocking-backdrop.tsx:57](https://github.com/onzag/itemize/blob/f2f29986/client/fast-prototyping/components/navbar/blocking-backdrop.tsx#L57)
+[client/fast-prototyping/components/navbar/blocking-backdrop.tsx:57](https://github.com/onzag/itemize/blob/5c2808d3/client/fast-prototyping/components/navbar/blocking-backdrop.tsx#L57)

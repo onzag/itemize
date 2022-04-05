@@ -16,4 +16,4 @@
 
 #### Defined in
 
-[server/logger.ts:10](https://github.com/onzag/itemize/blob/f2f29986/server/logger.ts#L10)
+[server/logger.ts:10](https://github.com/onzag/itemize/blob/5c2808d3/server/logger.ts#L10)

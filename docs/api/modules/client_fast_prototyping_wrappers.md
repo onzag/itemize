@@ -25,7 +25,7 @@ with the itemize application in the fast prototyping mode
 
 #### Defined in
 
-[client/fast-prototyping/wrappers.tsx:20](https://github.com/onzag/itemize/blob/f2f29986/client/fast-prototyping/wrappers.tsx#L20)
+[client/fast-prototyping/wrappers.tsx:20](https://github.com/onzag/itemize/blob/5c2808d3/client/fast-prototyping/wrappers.tsx#L20)
 
 ## Functions
 
@@ -51,7 +51,7 @@ For fast prototyping we use material ui, and as such we pass those providers her
 
 #### Defined in
 
-[client/fast-prototyping/wrappers.tsx:53](https://github.com/onzag/itemize/blob/f2f29986/client/fast-prototyping/wrappers.tsx#L53)
+[client/fast-prototyping/wrappers.tsx:53](https://github.com/onzag/itemize/blob/5c2808d3/client/fast-prototyping/wrappers.tsx#L53)
 
 ___
 
@@ -65,7 +65,7 @@ ___
 
 #### Defined in
 
-[client/fast-prototyping/wrappers.tsx:40](https://github.com/onzag/itemize/blob/f2f29986/client/fast-prototyping/wrappers.tsx#L40)
+[client/fast-prototyping/wrappers.tsx:40](https://github.com/onzag/itemize/blob/5c2808d3/client/fast-prototyping/wrappers.tsx#L40)
 
 ___
 
@@ -93,4 +93,4 @@ need to change according to locale
 
 #### Defined in
 
-[client/fast-prototyping/wrappers.tsx:113](https://github.com/onzag/itemize/blob/f2f29986/client/fast-prototyping/wrappers.tsx#L113)
+[client/fast-prototyping/wrappers.tsx:113](https://github.com/onzag/itemize/blob/5c2808d3/client/fast-prototyping/wrappers.tsx#L113)

@@ -21,7 +21,7 @@ Props for the config provider
 
 #### Defined in
 
-[client/internal/providers/config-provider.tsx:18](https://github.com/onzag/itemize/blob/f2f29986/client/internal/providers/config-provider.tsx#L18)
+[client/internal/providers/config-provider.tsx:18](https://github.com/onzag/itemize/blob/5c2808d3/client/internal/providers/config-provider.tsx#L18)
 
 ___
 
@@ -31,4 +31,4 @@ ___
 
 #### Defined in
 
-[client/internal/providers/config-provider.tsx:19](https://github.com/onzag/itemize/blob/f2f29986/client/internal/providers/config-provider.tsx#L19)
+[client/internal/providers/config-provider.tsx:19](https://github.com/onzag/itemize/blob/5c2808d3/client/internal/providers/config-provider.tsx#L19)

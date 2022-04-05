@@ -33,4 +33,4 @@ these general options are the specific options for the generic components
 
 #### Defined in
 
-[client/fast-prototyping/components/slate/drawer/general.tsx:1108](https://github.com/onzag/itemize/blob/f2f29986/client/fast-prototyping/components/slate/drawer/general.tsx#L1108)
+[client/fast-prototyping/components/slate/drawer/general.tsx:1108](https://github.com/onzag/itemize/blob/5c2808d3/client/fast-prototyping/components/slate/drawer/general.tsx#L1108)

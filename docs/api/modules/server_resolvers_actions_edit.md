@@ -29,7 +29,7 @@
 
 #### Defined in
 
-[server/resolvers/actions/edit.ts:41](https://github.com/onzag/itemize/blob/f2f29986/server/resolvers/actions/edit.ts#L41)
+[server/resolvers/actions/edit.ts:41](https://github.com/onzag/itemize/blob/5c2808d3/server/resolvers/actions/edit.ts#L41)
 
 ___
 
@@ -49,4 +49,4 @@ ___
 
 #### Defined in
 
-[server/resolvers/actions/edit.ts:558](https://github.com/onzag/itemize/blob/f2f29986/server/resolvers/actions/edit.ts#L558)
+[server/resolvers/actions/edit.ts:558](https://github.com/onzag/itemize/blob/5c2808d3/server/resolvers/actions/edit.ts#L558)

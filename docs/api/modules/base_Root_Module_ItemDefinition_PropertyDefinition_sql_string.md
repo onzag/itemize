@@ -30,7 +30,7 @@ This file contains the sql server side functions for the string type
 
 #### Defined in
 
-[base/Root/Module/ItemDefinition/PropertyDefinition/sql/string.ts:12](https://github.com/onzag/itemize/blob/f2f29986/base/Root/Module/ItemDefinition/PropertyDefinition/sql/string.ts#L12)
+[base/Root/Module/ItemDefinition/PropertyDefinition/sql/string.ts:12](https://github.com/onzag/itemize/blob/5c2808d3/base/Root/Module/ItemDefinition/PropertyDefinition/sql/string.ts#L12)
 
 ___
 
@@ -54,7 +54,7 @@ a boolean on whether it was searched by it
 
 #### Defined in
 
-[base/Root/Module/ItemDefinition/PropertyDefinition/sql/string.ts:41](https://github.com/onzag/itemize/blob/f2f29986/base/Root/Module/ItemDefinition/PropertyDefinition/sql/string.ts#L41)
+[base/Root/Module/ItemDefinition/PropertyDefinition/sql/string.ts:41](https://github.com/onzag/itemize/blob/5c2808d3/base/Root/Module/ItemDefinition/PropertyDefinition/sql/string.ts#L41)
 
 ___
 
@@ -78,4 +78,4 @@ a boolean on whether it was searched by it
 
 #### Defined in
 
-[base/Root/Module/ItemDefinition/PropertyDefinition/sql/string.ts:95](https://github.com/onzag/itemize/blob/f2f29986/base/Root/Module/ItemDefinition/PropertyDefinition/sql/string.ts#L95)
+[base/Root/Module/ItemDefinition/PropertyDefinition/sql/string.ts:95](https://github.com/onzag/itemize/blob/5c2808d3/base/Root/Module/ItemDefinition/PropertyDefinition/sql/string.ts#L95)

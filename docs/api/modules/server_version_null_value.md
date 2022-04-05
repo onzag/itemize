@@ -34,4 +34,4 @@ the same value, this function modifies the value in place
 
 #### Defined in
 
-[server/version-null-value.ts:15](https://github.com/onzag/itemize/blob/f2f29986/server/version-null-value.ts#L15)
+[server/version-null-value.ts:15](https://github.com/onzag/itemize/blob/5c2808d3/server/version-null-value.ts#L15)

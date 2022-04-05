@@ -45,7 +45,7 @@ where it is expected to be used
 
 #### Defined in
 
-[client/fast-prototyping/components/slate/index.tsx:1028](https://github.com/onzag/itemize/blob/f2f29986/client/fast-prototyping/components/slate/index.tsx#L1028)
+[client/fast-prototyping/components/slate/index.tsx:1028](https://github.com/onzag/itemize/blob/5c2808d3/client/fast-prototyping/components/slate/index.tsx#L1028)
 
 ___
 
@@ -61,7 +61,7 @@ indeed provide this as a prop for the render
 
 #### Defined in
 
-[client/fast-prototyping/components/slate/index.tsx:1036](https://github.com/onzag/itemize/blob/f2f29986/client/fast-prototyping/components/slate/index.tsx#L1036)
+[client/fast-prototyping/components/slate/index.tsx:1036](https://github.com/onzag/itemize/blob/5c2808d3/client/fast-prototyping/components/slate/index.tsx#L1036)
 
 ___
 
@@ -75,7 +75,7 @@ and whatnot from it
 
 #### Defined in
 
-[client/fast-prototyping/components/slate/index.tsx:1016](https://github.com/onzag/itemize/blob/f2f29986/client/fast-prototyping/components/slate/index.tsx#L1016)
+[client/fast-prototyping/components/slate/index.tsx:1016](https://github.com/onzag/itemize/blob/5c2808d3/client/fast-prototyping/components/slate/index.tsx#L1016)
 
 ___
 
@@ -88,7 +88,7 @@ and modify nodes
 
 #### Defined in
 
-[client/fast-prototyping/components/slate/index.tsx:1021](https://github.com/onzag/itemize/blob/f2f29986/client/fast-prototyping/components/slate/index.tsx#L1021)
+[client/fast-prototyping/components/slate/index.tsx:1021](https://github.com/onzag/itemize/blob/5c2808d3/client/fast-prototyping/components/slate/index.tsx#L1021)
 
 ___
 
@@ -102,7 +102,7 @@ so it can get state information
 
 #### Defined in
 
-[client/fast-prototyping/components/slate/index.tsx:1010](https://github.com/onzag/itemize/blob/f2f29986/client/fast-prototyping/components/slate/index.tsx#L1010)
+[client/fast-prototyping/components/slate/index.tsx:1010](https://github.com/onzag/itemize/blob/5c2808d3/client/fast-prototyping/components/slate/index.tsx#L1010)
 
 ## Methods
 
@@ -119,4 +119,4 @@ as the currentLoadError
 
 #### Defined in
 
-[client/fast-prototyping/components/slate/index.tsx:1041](https://github.com/onzag/itemize/blob/f2f29986/client/fast-prototyping/components/slate/index.tsx#L1041)
+[client/fast-prototyping/components/slate/index.tsx:1041](https://github.com/onzag/itemize/blob/5c2808d3/client/fast-prototyping/components/slate/index.tsx#L1041)

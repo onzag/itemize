@@ -75,7 +75,7 @@ React.PureComponent&lt;ITreeProps, ITreeState\&gt;.constructor
 
 #### Defined in
 
-[client/fast-prototyping/components/slate/drawer/tree.tsx:233](https://github.com/onzag/itemize/blob/f2f29986/client/fast-prototyping/components/slate/drawer/tree.tsx#L233)
+[client/fast-prototyping/components/slate/drawer/tree.tsx:233](https://github.com/onzag/itemize/blob/5c2808d3/client/fast-prototyping/components/slate/drawer/tree.tsx#L233)
 
 ## Properties
 
@@ -85,7 +85,7 @@ React.PureComponent&lt;ITreeProps, ITreeState\&gt;.constructor
 
 #### Defined in
 
-[client/fast-prototyping/components/slate/drawer/tree.tsx:229](https://github.com/onzag/itemize/blob/f2f29986/client/fast-prototyping/components/slate/drawer/tree.tsx#L229)
+[client/fast-prototyping/components/slate/drawer/tree.tsx:229](https://github.com/onzag/itemize/blob/5c2808d3/client/fast-prototyping/components/slate/drawer/tree.tsx#L229)
 
 ___
 
@@ -95,7 +95,7 @@ ___
 
 #### Defined in
 
-[client/fast-prototyping/components/slate/drawer/tree.tsx:232](https://github.com/onzag/itemize/blob/f2f29986/client/fast-prototyping/components/slate/drawer/tree.tsx#L232)
+[client/fast-prototyping/components/slate/drawer/tree.tsx:232](https://github.com/onzag/itemize/blob/5c2808d3/client/fast-prototyping/components/slate/drawer/tree.tsx#L232)
 
 ___
 
@@ -133,7 +133,7 @@ ___
 
 #### Defined in
 
-[client/fast-prototyping/components/slate/drawer/tree.tsx:231](https://github.com/onzag/itemize/blob/f2f29986/client/fast-prototyping/components/slate/drawer/tree.tsx#L231)
+[client/fast-prototyping/components/slate/drawer/tree.tsx:231](https://github.com/onzag/itemize/blob/5c2808d3/client/fast-prototyping/components/slate/drawer/tree.tsx#L231)
 
 ___
 
@@ -143,7 +143,7 @@ ___
 
 #### Defined in
 
-[client/fast-prototyping/components/slate/drawer/tree.tsx:230](https://github.com/onzag/itemize/blob/f2f29986/client/fast-prototyping/components/slate/drawer/tree.tsx#L230)
+[client/fast-prototyping/components/slate/drawer/tree.tsx:230](https://github.com/onzag/itemize/blob/5c2808d3/client/fast-prototyping/components/slate/drawer/tree.tsx#L230)
 
 ___
 
@@ -413,7 +413,7 @@ React.PureComponent.componentDidUpdate
 
 #### Defined in
 
-[client/fast-prototyping/components/slate/drawer/tree.tsx:259](https://github.com/onzag/itemize/blob/f2f29986/client/fast-prototyping/components/slate/drawer/tree.tsx#L259)
+[client/fast-prototyping/components/slate/drawer/tree.tsx:259](https://github.com/onzag/itemize/blob/5c2808d3/client/fast-prototyping/components/slate/drawer/tree.tsx#L259)
 
 ___
 
@@ -557,7 +557,7 @@ ___
 
 #### Defined in
 
-[client/fast-prototyping/components/slate/drawer/tree.tsx:362](https://github.com/onzag/itemize/blob/f2f29986/client/fast-prototyping/components/slate/drawer/tree.tsx#L362)
+[client/fast-prototyping/components/slate/drawer/tree.tsx:362](https://github.com/onzag/itemize/blob/5c2808d3/client/fast-prototyping/components/slate/drawer/tree.tsx#L362)
 
 ___
 
@@ -577,7 +577,7 @@ ___
 
 #### Defined in
 
-[client/fast-prototyping/components/slate/drawer/tree.tsx:352](https://github.com/onzag/itemize/blob/f2f29986/client/fast-prototyping/components/slate/drawer/tree.tsx#L352)
+[client/fast-prototyping/components/slate/drawer/tree.tsx:352](https://github.com/onzag/itemize/blob/5c2808d3/client/fast-prototyping/components/slate/drawer/tree.tsx#L352)
 
 ___
 
@@ -597,7 +597,7 @@ ___
 
 #### Defined in
 
-[client/fast-prototyping/components/slate/drawer/tree.tsx:357](https://github.com/onzag/itemize/blob/f2f29986/client/fast-prototyping/components/slate/drawer/tree.tsx#L357)
+[client/fast-prototyping/components/slate/drawer/tree.tsx:357](https://github.com/onzag/itemize/blob/5c2808d3/client/fast-prototyping/components/slate/drawer/tree.tsx#L357)
 
 ___
 
@@ -674,7 +674,7 @@ ___
 
 #### Defined in
 
-[client/fast-prototyping/components/slate/drawer/tree.tsx:342](https://github.com/onzag/itemize/blob/f2f29986/client/fast-prototyping/components/slate/drawer/tree.tsx#L342)
+[client/fast-prototyping/components/slate/drawer/tree.tsx:342](https://github.com/onzag/itemize/blob/5c2808d3/client/fast-prototyping/components/slate/drawer/tree.tsx#L342)
 
 ___
 
@@ -694,7 +694,7 @@ ___
 
 #### Defined in
 
-[client/fast-prototyping/components/slate/drawer/tree.tsx:336](https://github.com/onzag/itemize/blob/f2f29986/client/fast-prototyping/components/slate/drawer/tree.tsx#L336)
+[client/fast-prototyping/components/slate/drawer/tree.tsx:336](https://github.com/onzag/itemize/blob/5c2808d3/client/fast-prototyping/components/slate/drawer/tree.tsx#L336)
 
 ___
 
@@ -714,7 +714,7 @@ ___
 
 #### Defined in
 
-[client/fast-prototyping/components/slate/drawer/tree.tsx:339](https://github.com/onzag/itemize/blob/f2f29986/client/fast-prototyping/components/slate/drawer/tree.tsx#L339)
+[client/fast-prototyping/components/slate/drawer/tree.tsx:339](https://github.com/onzag/itemize/blob/5c2808d3/client/fast-prototyping/components/slate/drawer/tree.tsx#L339)
 
 ___
 
@@ -735,7 +735,7 @@ ___
 
 #### Defined in
 
-[client/fast-prototyping/components/slate/drawer/tree.tsx:296](https://github.com/onzag/itemize/blob/f2f29986/client/fast-prototyping/components/slate/drawer/tree.tsx#L296)
+[client/fast-prototyping/components/slate/drawer/tree.tsx:296](https://github.com/onzag/itemize/blob/5c2808d3/client/fast-prototyping/components/slate/drawer/tree.tsx#L296)
 
 ___
 
@@ -749,7 +749,7 @@ ___
 
 #### Defined in
 
-[client/fast-prototyping/components/slate/drawer/tree.tsx:305](https://github.com/onzag/itemize/blob/f2f29986/client/fast-prototyping/components/slate/drawer/tree.tsx#L305)
+[client/fast-prototyping/components/slate/drawer/tree.tsx:305](https://github.com/onzag/itemize/blob/5c2808d3/client/fast-prototyping/components/slate/drawer/tree.tsx#L305)
 
 ___
 
@@ -767,7 +767,7 @@ React.PureComponent.render
 
 #### Defined in
 
-[client/fast-prototyping/components/slate/drawer/tree.tsx:391](https://github.com/onzag/itemize/blob/f2f29986/client/fast-prototyping/components/slate/drawer/tree.tsx#L391)
+[client/fast-prototyping/components/slate/drawer/tree.tsx:391](https://github.com/onzag/itemize/blob/5c2808d3/client/fast-prototyping/components/slate/drawer/tree.tsx#L391)
 
 ___
 
@@ -854,7 +854,7 @@ ___
 
 #### Defined in
 
-[client/fast-prototyping/components/slate/drawer/tree.tsx:321](https://github.com/onzag/itemize/blob/f2f29986/client/fast-prototyping/components/slate/drawer/tree.tsx#L321)
+[client/fast-prototyping/components/slate/drawer/tree.tsx:321](https://github.com/onzag/itemize/blob/5c2808d3/client/fast-prototyping/components/slate/drawer/tree.tsx#L321)
 
 ___
 
@@ -874,7 +874,7 @@ ___
 
 #### Defined in
 
-[client/fast-prototyping/components/slate/drawer/tree.tsx:311](https://github.com/onzag/itemize/blob/f2f29986/client/fast-prototyping/components/slate/drawer/tree.tsx#L311)
+[client/fast-prototyping/components/slate/drawer/tree.tsx:311](https://github.com/onzag/itemize/blob/5c2808d3/client/fast-prototyping/components/slate/drawer/tree.tsx#L311)
 
 ___
 
@@ -894,4 +894,4 @@ ___
 
 #### Defined in
 
-[client/fast-prototyping/components/slate/drawer/tree.tsx:316](https://github.com/onzag/itemize/blob/f2f29986/client/fast-prototyping/components/slate/drawer/tree.tsx#L316)
+[client/fast-prototyping/components/slate/drawer/tree.tsx:316](https://github.com/onzag/itemize/blob/5c2808d3/client/fast-prototyping/components/slate/drawer/tree.tsx#L316)

@@ -29,4 +29,4 @@ to any component that demands it
 
 #### Defined in
 
-[client/internal/providers/locale-provider.tsx:77](https://github.com/onzag/itemize/blob/f2f29986/client/internal/providers/locale-provider.tsx#L77)
+[client/internal/providers/locale-provider.tsx:77](https://github.com/onzag/itemize/blob/5c2808d3/client/internal/providers/locale-provider.tsx#L77)

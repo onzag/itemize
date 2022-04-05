@@ -31,7 +31,7 @@ component
 
 #### Defined in
 
-[client/internal/providers/token-provider.tsx:118](https://github.com/onzag/itemize/blob/f2f29986/client/internal/providers/token-provider.tsx#L118)
+[client/internal/providers/token-provider.tsx:118](https://github.com/onzag/itemize/blob/5c2808d3/client/internal/providers/token-provider.tsx#L118)
 
 ## Functions
 
@@ -55,4 +55,4 @@ a react element
 
 #### Defined in
 
-[client/internal/providers/token-provider.tsx:125](https://github.com/onzag/itemize/blob/f2f29986/client/internal/providers/token-provider.tsx#L125)
+[client/internal/providers/token-provider.tsx:125](https://github.com/onzag/itemize/blob/5c2808d3/client/internal/providers/token-provider.tsx#L125)

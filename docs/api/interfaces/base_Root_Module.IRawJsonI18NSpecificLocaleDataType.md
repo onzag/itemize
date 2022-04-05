@@ -34,7 +34,7 @@ Custom translation fields
 
 #### Defined in
 
-[base/Root/Module/index.ts:61](https://github.com/onzag/itemize/blob/f2f29986/base/Root/Module/index.ts#L61)
+[base/Root/Module/index.ts:61](https://github.com/onzag/itemize/blob/5c2808d3/base/Root/Module/index.ts#L61)
 
 ___
 
@@ -46,7 +46,7 @@ The name of the module or the item definition
 
 #### Defined in
 
-[base/Root/Module/index.ts:41](https://github.com/onzag/itemize/blob/f2f29986/base/Root/Module/index.ts#L41)
+[base/Root/Module/index.ts:41](https://github.com/onzag/itemize/blob/5c2808d3/base/Root/Module/index.ts#L41)
 
 ___
 
@@ -68,7 +68,7 @@ since modules do not hold policies
 
 #### Defined in
 
-[base/Root/Module/index.ts:68](https://github.com/onzag/itemize/blob/f2f29986/base/Root/Module/index.ts#L68)
+[base/Root/Module/index.ts:68](https://github.com/onzag/itemize/blob/5c2808d3/base/Root/Module/index.ts#L68)
 
 ___
 
@@ -80,7 +80,7 @@ The full text search field label for full text search mode
 
 #### Defined in
 
-[base/Root/Module/index.ts:45](https://github.com/onzag/itemize/blob/f2f29986/base/Root/Module/index.ts#L45)
+[base/Root/Module/index.ts:45](https://github.com/onzag/itemize/blob/5c2808d3/base/Root/Module/index.ts#L45)
 
 ___
 
@@ -92,7 +92,7 @@ The full text search placeholder for full text search mode
 
 #### Defined in
 
-[base/Root/Module/index.ts:49](https://github.com/onzag/itemize/blob/f2f29986/base/Root/Module/index.ts#L49)
+[base/Root/Module/index.ts:49](https://github.com/onzag/itemize/blob/5c2808d3/base/Root/Module/index.ts#L49)
 
 ___
 
@@ -104,7 +104,7 @@ A comma separated list of strings for full text search mode
 
 #### Defined in
 
-[base/Root/Module/index.ts:57](https://github.com/onzag/itemize/blob/f2f29986/base/Root/Module/index.ts#L57)
+[base/Root/Module/index.ts:57](https://github.com/onzag/itemize/blob/5c2808d3/base/Root/Module/index.ts#L57)
 
 ___
 
@@ -116,4 +116,4 @@ The error that comes from the full text search mode when you have input too much
 
 #### Defined in
 
-[base/Root/Module/index.ts:53](https://github.com/onzag/itemize/blob/f2f29986/base/Root/Module/index.ts#L53)
+[base/Root/Module/index.ts:53](https://github.com/onzag/itemize/blob/5c2808d3/base/Root/Module/index.ts#L53)

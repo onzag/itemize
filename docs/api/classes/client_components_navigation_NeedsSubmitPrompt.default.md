@@ -337,7 +337,7 @@ a react component
 
 #### Defined in
 
-[client/components/navigation/NeedsSubmitPrompt.tsx:73](https://github.com/onzag/itemize/blob/f2f29986/client/components/navigation/NeedsSubmitPrompt.tsx#L73)
+[client/components/navigation/NeedsSubmitPrompt.tsx:73](https://github.com/onzag/itemize/blob/5c2808d3/client/components/navigation/NeedsSubmitPrompt.tsx#L73)
 
 ___
 
@@ -569,7 +569,7 @@ a promise for an error (or null)
 
 #### Defined in
 
-[client/components/navigation/NeedsSubmitPrompt.tsx:59](https://github.com/onzag/itemize/blob/f2f29986/client/components/navigation/NeedsSubmitPrompt.tsx#L59)
+[client/components/navigation/NeedsSubmitPrompt.tsx:59](https://github.com/onzag/itemize/blob/5c2808d3/client/components/navigation/NeedsSubmitPrompt.tsx#L59)
 
 ___
 
@@ -645,7 +645,7 @@ React.PureComponent.render
 
 #### Defined in
 
-[client/components/navigation/NeedsSubmitPrompt.tsx:96](https://github.com/onzag/itemize/blob/f2f29986/client/components/navigation/NeedsSubmitPrompt.tsx#L96)
+[client/components/navigation/NeedsSubmitPrompt.tsx:96](https://github.com/onzag/itemize/blob/5c2808d3/client/components/navigation/NeedsSubmitPrompt.tsx#L96)
 
 ___
 

@@ -64,7 +64,7 @@ A json validating schema for the dump configuration
 
 #### Defined in
 
-[config.ts:450](https://github.com/onzag/itemize/blob/f2f29986/config.ts#L450)
+[config.ts:450](https://github.com/onzag/itemize/blob/5c2808d3/config.ts#L450)
 
 ___
 
@@ -157,7 +157,7 @@ A json validating schema for the standard configuration
 
 #### Defined in
 
-[config.ts:563](https://github.com/onzag/itemize/blob/f2f29986/config.ts#L563)
+[config.ts:563](https://github.com/onzag/itemize/blob/5c2808d3/config.ts#L563)
 
 ___
 
@@ -188,7 +188,7 @@ A json validating schema for the database configuration
 
 #### Defined in
 
-[config.ts:704](https://github.com/onzag/itemize/blob/f2f29986/config.ts#L704)
+[config.ts:704](https://github.com/onzag/itemize/blob/5c2808d3/config.ts#L704)
 
 ___
 
@@ -252,7 +252,7 @@ ___
 
 #### Defined in
 
-[config.ts:786](https://github.com/onzag/itemize/blob/f2f29986/config.ts#L786)
+[config.ts:786](https://github.com/onzag/itemize/blob/5c2808d3/config.ts#L786)
 
 ___
 
@@ -283,7 +283,7 @@ A json validating schema for the redis config
 
 #### Defined in
 
-[config.ts:736](https://github.com/onzag/itemize/blob/f2f29986/config.ts#L736)
+[config.ts:736](https://github.com/onzag/itemize/blob/5c2808d3/config.ts#L736)
 
 ___
 
@@ -355,4 +355,4 @@ A JSON validating schema for the sensitive configuration
 
 #### Defined in
 
-[config.ts:350](https://github.com/onzag/itemize/blob/f2f29986/config.ts#L350)
+[config.ts:350](https://github.com/onzag/itemize/blob/5c2808d3/config.ts#L350)

@@ -24,7 +24,7 @@
 
 #### Defined in
 
-[testing/itemize.ts:21](https://github.com/onzag/itemize/blob/f2f29986/testing/itemize.ts#L21)
+[testing/itemize.ts:21](https://github.com/onzag/itemize/blob/5c2808d3/testing/itemize.ts#L21)
 
 ___
 
@@ -34,7 +34,7 @@ ___
 
 #### Defined in
 
-[testing/itemize.ts:16](https://github.com/onzag/itemize/blob/f2f29986/testing/itemize.ts#L16)
+[testing/itemize.ts:16](https://github.com/onzag/itemize/blob/5c2808d3/testing/itemize.ts#L16)
 
 ___
 
@@ -44,7 +44,7 @@ ___
 
 #### Defined in
 
-[testing/itemize.ts:18](https://github.com/onzag/itemize/blob/f2f29986/testing/itemize.ts#L18)
+[testing/itemize.ts:18](https://github.com/onzag/itemize/blob/5c2808d3/testing/itemize.ts#L18)
 
 ___
 
@@ -54,7 +54,7 @@ ___
 
 #### Defined in
 
-[testing/itemize.ts:20](https://github.com/onzag/itemize/blob/f2f29986/testing/itemize.ts#L20)
+[testing/itemize.ts:20](https://github.com/onzag/itemize/blob/5c2808d3/testing/itemize.ts#L20)
 
 ___
 
@@ -64,7 +64,7 @@ ___
 
 #### Defined in
 
-[testing/itemize.ts:19](https://github.com/onzag/itemize/blob/f2f29986/testing/itemize.ts#L19)
+[testing/itemize.ts:19](https://github.com/onzag/itemize/blob/5c2808d3/testing/itemize.ts#L19)
 
 ___
 
@@ -74,7 +74,7 @@ ___
 
 #### Defined in
 
-[testing/itemize.ts:15](https://github.com/onzag/itemize/blob/f2f29986/testing/itemize.ts#L15)
+[testing/itemize.ts:15](https://github.com/onzag/itemize/blob/5c2808d3/testing/itemize.ts#L15)
 
 ___
 
@@ -84,4 +84,4 @@ ___
 
 #### Defined in
 
-[testing/itemize.ts:17](https://github.com/onzag/itemize/blob/f2f29986/testing/itemize.ts#L17)
+[testing/itemize.ts:17](https://github.com/onzag/itemize/blob/5c2808d3/testing/itemize.ts#L17)

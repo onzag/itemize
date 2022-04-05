@@ -46,7 +46,7 @@
 
 #### Defined in
 
-[server/resolvers/triggers.ts:149](https://github.com/onzag/itemize/blob/f2f29986/server/resolvers/triggers.ts#L149)
+[server/resolvers/triggers.ts:149](https://github.com/onzag/itemize/blob/5c2808d3/server/resolvers/triggers.ts#L149)
 
 ___
 
@@ -70,7 +70,7 @@ ___
 
 #### Defined in
 
-[server/resolvers/triggers.ts:150](https://github.com/onzag/itemize/blob/f2f29986/server/resolvers/triggers.ts#L150)
+[server/resolvers/triggers.ts:150](https://github.com/onzag/itemize/blob/5c2808d3/server/resolvers/triggers.ts#L150)
 
 ## Functions
 
@@ -90,4 +90,4 @@ ___
 
 #### Defined in
 
-[server/resolvers/triggers.ts:225](https://github.com/onzag/itemize/blob/f2f29986/server/resolvers/triggers.ts#L225)
+[server/resolvers/triggers.ts:225](https://github.com/onzag/itemize/blob/5c2808d3/server/resolvers/triggers.ts#L225)

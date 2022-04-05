@@ -43,7 +43,7 @@ marked as incomplete
 
 #### Defined in
 
-[client/providers/renderer.tsx:38](https://github.com/onzag/itemize/blob/f2f29986/client/providers/renderer.tsx#L38)
+[client/providers/renderer.tsx:38](https://github.com/onzag/itemize/blob/5c2808d3/client/providers/renderer.tsx#L38)
 
 ___
 
@@ -55,7 +55,7 @@ The property entry boolean renderer, non-special
 
 #### Defined in
 
-[client/providers/renderer.tsx:84](https://github.com/onzag/itemize/blob/f2f29986/client/providers/renderer.tsx#L84)
+[client/providers/renderer.tsx:84](https://github.com/onzag/itemize/blob/5c2808d3/client/providers/renderer.tsx#L84)
 
 ___
 
@@ -68,7 +68,7 @@ the given format
 
 #### Defined in
 
-[client/providers/renderer.tsx:123](https://github.com/onzag/itemize/blob/f2f29986/client/providers/renderer.tsx#L123)
+[client/providers/renderer.tsx:123](https://github.com/onzag/itemize/blob/5c2808d3/client/providers/renderer.tsx#L123)
 
 ___
 
@@ -88,7 +88,7 @@ its own handler logic
 
 #### Defined in
 
-[client/providers/renderer.tsx:51](https://github.com/onzag/itemize/blob/f2f29986/client/providers/renderer.tsx#L51)
+[client/providers/renderer.tsx:51](https://github.com/onzag/itemize/blob/5c2808d3/client/providers/renderer.tsx#L51)
 
 ___
 
@@ -102,7 +102,7 @@ Do not use the onChange function to update, use onSetFile instead
 
 #### Defined in
 
-[client/providers/renderer.tsx:74](https://github.com/onzag/itemize/blob/f2f29986/client/providers/renderer.tsx#L74)
+[client/providers/renderer.tsx:74](https://github.com/onzag/itemize/blob/5c2808d3/client/providers/renderer.tsx#L74)
 
 ___
 
@@ -116,7 +116,7 @@ Do not use the onChange function to update, use onSetFile instead
 
 #### Defined in
 
-[client/providers/renderer.tsx:80](https://github.com/onzag/itemize/blob/f2f29986/client/providers/renderer.tsx#L80)
+[client/providers/renderer.tsx:80](https://github.com/onzag/itemize/blob/5c2808d3/client/providers/renderer.tsx#L80)
 
 ___
 
@@ -132,7 +132,7 @@ using the default service as it is programmed in the server side
 
 #### Defined in
 
-[client/providers/renderer.tsx:92](https://github.com/onzag/itemize/blob/f2f29986/client/providers/renderer.tsx#L92)
+[client/providers/renderer.tsx:92](https://github.com/onzag/itemize/blob/5c2808d3/client/providers/renderer.tsx#L92)
 
 ___
 
@@ -148,7 +148,7 @@ so forth
 
 #### Defined in
 
-[client/providers/renderer.tsx:131](https://github.com/onzag/itemize/blob/f2f29986/client/providers/renderer.tsx#L131)
+[client/providers/renderer.tsx:131](https://github.com/onzag/itemize/blob/5c2808d3/client/providers/renderer.tsx#L131)
 
 ___
 
@@ -172,7 +172,7 @@ larger than 0
 
 #### Defined in
 
-[client/providers/renderer.tsx:68](https://github.com/onzag/itemize/blob/f2f29986/client/providers/renderer.tsx#L68)
+[client/providers/renderer.tsx:68](https://github.com/onzag/itemize/blob/5c2808d3/client/providers/renderer.tsx#L68)
 
 ___
 
@@ -185,7 +185,7 @@ it is, supports both texual and numerical types, otherwise works as standard
 
 #### Defined in
 
-[client/providers/renderer.tsx:97](https://github.com/onzag/itemize/blob/f2f29986/client/providers/renderer.tsx#L97)
+[client/providers/renderer.tsx:97](https://github.com/onzag/itemize/blob/5c2808d3/client/providers/renderer.tsx#L97)
 
 ___
 
@@ -214,7 +214,7 @@ HTML in the render function of your renderer
 
 #### Defined in
 
-[client/providers/renderer.tsx:118](https://github.com/onzag/itemize/blob/f2f29986/client/providers/renderer.tsx#L118)
+[client/providers/renderer.tsx:118](https://github.com/onzag/itemize/blob/5c2808d3/client/providers/renderer.tsx#L118)
 
 ___
 
@@ -227,7 +227,7 @@ true or false, we expect a diverging rendering
 
 #### Defined in
 
-[client/providers/renderer.tsx:137](https://github.com/onzag/itemize/blob/f2f29986/client/providers/renderer.tsx#L137)
+[client/providers/renderer.tsx:137](https://github.com/onzag/itemize/blob/5c2808d3/client/providers/renderer.tsx#L137)
 
 ___
 
@@ -242,7 +242,7 @@ for conversions is relevant
 
 #### Defined in
 
-[client/providers/renderer.tsx:170](https://github.com/onzag/itemize/blob/f2f29986/client/providers/renderer.tsx#L170)
+[client/providers/renderer.tsx:170](https://github.com/onzag/itemize/blob/5c2808d3/client/providers/renderer.tsx#L170)
 
 ___
 
@@ -254,7 +254,7 @@ The date time renderer
 
 #### Defined in
 
-[client/providers/renderer.tsx:152](https://github.com/onzag/itemize/blob/f2f29986/client/providers/renderer.tsx#L152)
+[client/providers/renderer.tsx:152](https://github.com/onzag/itemize/blob/5c2808d3/client/providers/renderer.tsx#L152)
 
 ___
 
@@ -268,7 +268,7 @@ used for files
 
 #### Defined in
 
-[client/providers/renderer.tsx:158](https://github.com/onzag/itemize/blob/f2f29986/client/providers/renderer.tsx#L158)
+[client/providers/renderer.tsx:158](https://github.com/onzag/itemize/blob/5c2808d3/client/providers/renderer.tsx#L158)
 
 ___
 
@@ -281,7 +281,7 @@ this renderer can be used as a realtime location renderer
 
 #### Defined in
 
-[client/providers/renderer.tsx:163](https://github.com/onzag/itemize/blob/f2f29986/client/providers/renderer.tsx#L163)
+[client/providers/renderer.tsx:163](https://github.com/onzag/itemize/blob/5c2808d3/client/providers/renderer.tsx#L163)
 
 ___
 
@@ -295,7 +295,7 @@ these values can be null
 
 #### Defined in
 
-[client/providers/renderer.tsx:143](https://github.com/onzag/itemize/blob/f2f29986/client/providers/renderer.tsx#L143)
+[client/providers/renderer.tsx:143](https://github.com/onzag/itemize/blob/5c2808d3/client/providers/renderer.tsx#L143)
 
 ___
 
@@ -308,4 +308,4 @@ on html rich text mode can be complex
 
 #### Defined in
 
-[client/providers/renderer.tsx:148](https://github.com/onzag/itemize/blob/f2f29986/client/providers/renderer.tsx#L148)
+[client/providers/renderer.tsx:148](https://github.com/onzag/itemize/blob/5c2808d3/client/providers/renderer.tsx#L148)

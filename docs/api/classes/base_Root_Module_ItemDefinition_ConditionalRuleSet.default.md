@@ -95,7 +95,7 @@ Constructor
 
 #### Defined in
 
-[base/Root/Module/ItemDefinition/ConditionalRuleSet/index.ts:206](https://github.com/onzag/itemize/blob/f2f29986/base/Root/Module/ItemDefinition/ConditionalRuleSet/index.ts#L206)
+[base/Root/Module/ItemDefinition/ConditionalRuleSet/index.ts:206](https://github.com/onzag/itemize/blob/5c2808d3/base/Root/Module/ItemDefinition/ConditionalRuleSet/index.ts#L206)
 
 ## Properties
 
@@ -107,7 +107,7 @@ an internal condition for nested conditions
 
 #### Defined in
 
-[base/Root/Module/ItemDefinition/ConditionalRuleSet/index.ts:193](https://github.com/onzag/itemize/blob/f2f29986/base/Root/Module/ItemDefinition/ConditionalRuleSet/index.ts#L193)
+[base/Root/Module/ItemDefinition/ConditionalRuleSet/index.ts:193](https://github.com/onzag/itemize/blob/5c2808d3/base/Root/Module/ItemDefinition/ConditionalRuleSet/index.ts#L193)
 
 ___
 
@@ -119,7 +119,7 @@ a parent include, if available, might be null
 
 #### Defined in
 
-[base/Root/Module/ItemDefinition/ConditionalRuleSet/index.ts:184](https://github.com/onzag/itemize/blob/f2f29986/base/Root/Module/ItemDefinition/ConditionalRuleSet/index.ts#L184)
+[base/Root/Module/ItemDefinition/ConditionalRuleSet/index.ts:184](https://github.com/onzag/itemize/blob/5c2808d3/base/Root/Module/ItemDefinition/ConditionalRuleSet/index.ts#L184)
 
 ___
 
@@ -131,7 +131,7 @@ the item definition where it is contained
 
 #### Defined in
 
-[base/Root/Module/ItemDefinition/ConditionalRuleSet/index.ts:176](https://github.com/onzag/itemize/blob/f2f29986/base/Root/Module/ItemDefinition/ConditionalRuleSet/index.ts#L176)
+[base/Root/Module/ItemDefinition/ConditionalRuleSet/index.ts:176](https://github.com/onzag/itemize/blob/5c2808d3/base/Root/Module/ItemDefinition/ConditionalRuleSet/index.ts#L176)
 
 ___
 
@@ -143,7 +143,7 @@ the parent module of this condition
 
 #### Defined in
 
-[base/Root/Module/ItemDefinition/ConditionalRuleSet/index.ts:172](https://github.com/onzag/itemize/blob/f2f29986/base/Root/Module/ItemDefinition/ConditionalRuleSet/index.ts#L172)
+[base/Root/Module/ItemDefinition/ConditionalRuleSet/index.ts:172](https://github.com/onzag/itemize/blob/5c2808d3/base/Root/Module/ItemDefinition/ConditionalRuleSet/index.ts#L172)
 
 ___
 
@@ -155,7 +155,7 @@ the property that it is contained within, might be null for prop extensions
 
 #### Defined in
 
-[base/Root/Module/ItemDefinition/ConditionalRuleSet/index.ts:180](https://github.com/onzag/itemize/blob/f2f29986/base/Root/Module/ItemDefinition/ConditionalRuleSet/index.ts#L180)
+[base/Root/Module/ItemDefinition/ConditionalRuleSet/index.ts:180](https://github.com/onzag/itemize/blob/5c2808d3/base/Root/Module/ItemDefinition/ConditionalRuleSet/index.ts#L180)
 
 ___
 
@@ -167,7 +167,7 @@ the raw data that was used to generate this conditional rule set
 
 #### Defined in
 
-[base/Root/Module/ItemDefinition/ConditionalRuleSet/index.ts:188](https://github.com/onzag/itemize/blob/f2f29986/base/Root/Module/ItemDefinition/ConditionalRuleSet/index.ts#L188)
+[base/Root/Module/ItemDefinition/ConditionalRuleSet/index.ts:188](https://github.com/onzag/itemize/blob/5c2808d3/base/Root/Module/ItemDefinition/ConditionalRuleSet/index.ts#L188)
 
 ## Methods
 
@@ -193,4 +193,4 @@ a boolean on whether the conditional rule set passes or not
 
 #### Defined in
 
-[base/Root/Module/ItemDefinition/ConditionalRuleSet/index.ts:232](https://github.com/onzag/itemize/blob/f2f29986/base/Root/Module/ItemDefinition/ConditionalRuleSet/index.ts#L232)
+[base/Root/Module/ItemDefinition/ConditionalRuleSet/index.ts:232](https://github.com/onzag/itemize/blob/5c2808d3/base/Root/Module/ItemDefinition/ConditionalRuleSet/index.ts#L232)

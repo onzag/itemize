@@ -32,8 +32,8 @@ within itself in the database
 | `serverData` | `any` | the server data |
 | `mod` | [`default`](../classes/base_Root_Module.default.md) | the module in question |
 | `args` | [`IGQLArgs`](../interfaces/gql_querier.IGQLArgs.md) | the args for the query from graphql |
-| `whereBuilder` | `WhereBuilder` | the where builder |
-| `orderByBuilder` | `OrderByBuilder` | the order by builder |
+| `whereBuilder` | [`WhereBuilder`](../classes/database_WhereBuilder.WhereBuilder.md) | the where builder |
+| `orderByBuilder` | [`OrderByBuilder`](../classes/database_OrderByBuilder.OrderByBuilder.md) | the order by builder |
 | `dictionary` | `string` | the dictionary used |
 | `search` | `string` | the search |
 | `orderBy` | [`IOrderByRuleType`](../interfaces/constants.IOrderByRuleType.md) | the order by rule |
@@ -44,7 +44,7 @@ within itself in the database
 
 #### Defined in
 
-[base/Root/Module/sql.ts:302](https://github.com/onzag/itemize/blob/f2f29986/base/Root/Module/sql.ts#L302)
+[base/Root/Module/sql.ts:302](https://github.com/onzag/itemize/blob/5c2808d3/base/Root/Module/sql.ts#L302)
 
 ___
 
@@ -76,7 +76,7 @@ the composed row value with the consume streams function
 
 #### Defined in
 
-[base/Root/Module/sql.ts:195](https://github.com/onzag/itemize/blob/f2f29986/base/Root/Module/sql.ts#L195)
+[base/Root/Module/sql.ts:195](https://github.com/onzag/itemize/blob/5c2808d3/base/Root/Module/sql.ts#L195)
 
 ___
 
@@ -106,7 +106,7 @@ a graphql value
 
 #### Defined in
 
-[base/Root/Module/sql.ts:259](https://github.com/onzag/itemize/blob/f2f29986/base/Root/Module/sql.ts#L259)
+[base/Root/Module/sql.ts:259](https://github.com/onzag/itemize/blob/5c2808d3/base/Root/Module/sql.ts#L259)
 
 ___
 
@@ -131,7 +131,7 @@ a whole table schema for the module table
 
 #### Defined in
 
-[base/Root/Module/sql.ts:34](https://github.com/onzag/itemize/blob/f2f29986/base/Root/Module/sql.ts#L34)
+[base/Root/Module/sql.ts:34](https://github.com/onzag/itemize/blob/5c2808d3/base/Root/Module/sql.ts#L34)
 
 ___
 
@@ -157,4 +157,4 @@ a partial database schema for the module itself, all the child modules, and the 
 
 #### Defined in
 
-[base/Root/Module/sql.ts:156](https://github.com/onzag/itemize/blob/f2f29986/base/Root/Module/sql.ts#L156)
+[base/Root/Module/sql.ts:156](https://github.com/onzag/itemize/blob/5c2808d3/base/Root/Module/sql.ts#L156)

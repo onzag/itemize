@@ -34,4 +34,4 @@ TODO support searchId to keep navigation in sync
 
 #### Defined in
 
-[client/fast-prototyping/components/search-loader-with-pagination.tsx:48](https://github.com/onzag/itemize/blob/f2f29986/client/fast-prototyping/components/search-loader-with-pagination.tsx#L48)
+[client/fast-prototyping/components/search-loader-with-pagination.tsx:48](https://github.com/onzag/itemize/blob/5c2808d3/client/fast-prototyping/components/search-loader-with-pagination.tsx#L48)

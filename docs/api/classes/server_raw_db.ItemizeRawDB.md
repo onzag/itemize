@@ -58,22 +58,22 @@ Builds a new instance of the change informer
 | Name | Type | Description |
 | :------ | :------ | :------ |
 | `redisPub` | [`ItemizeRedisClient`](server_redis.ItemizeRedisClient.md) | the redis publish instance |
-| `databaseConnection` | `DatabaseConnection` | a connection to the database |
+| `databaseConnection` | [`DatabaseConnection`](database.DatabaseConnection.md) | a connection to the database |
 | `root` | [`default`](base_Root.default.md) | the root instance |
 
 #### Defined in
 
-[server/raw-db.ts:69](https://github.com/onzag/itemize/blob/f2f29986/server/raw-db.ts#L69)
+[server/raw-db.ts:69](https://github.com/onzag/itemize/blob/5c2808d3/server/raw-db.ts#L69)
 
 ## Properties
 
 ### databaseConnection
 
-• **databaseConnection**: `DatabaseConnection`
+• **databaseConnection**: [`DatabaseConnection`](database.DatabaseConnection.md)
 
 #### Defined in
 
-[server/raw-db.ts:61](https://github.com/onzag/itemize/blob/f2f29986/server/raw-db.ts#L61)
+[server/raw-db.ts:61](https://github.com/onzag/itemize/blob/5c2808d3/server/raw-db.ts#L61)
 
 ___
 
@@ -83,7 +83,7 @@ ___
 
 #### Defined in
 
-[server/raw-db.ts:55](https://github.com/onzag/itemize/blob/f2f29986/server/raw-db.ts#L55)
+[server/raw-db.ts:55](https://github.com/onzag/itemize/blob/5c2808d3/server/raw-db.ts#L55)
 
 ___
 
@@ -93,7 +93,7 @@ ___
 
 #### Defined in
 
-[server/raw-db.ts:56](https://github.com/onzag/itemize/blob/f2f29986/server/raw-db.ts#L56)
+[server/raw-db.ts:56](https://github.com/onzag/itemize/blob/5c2808d3/server/raw-db.ts#L56)
 
 ___
 
@@ -103,7 +103,7 @@ ___
 
 #### Defined in
 
-[server/raw-db.ts:58](https://github.com/onzag/itemize/blob/f2f29986/server/raw-db.ts#L58)
+[server/raw-db.ts:58](https://github.com/onzag/itemize/blob/5c2808d3/server/raw-db.ts#L58)
 
 ___
 
@@ -113,29 +113,29 @@ ___
 
 #### Defined in
 
-[server/raw-db.ts:59](https://github.com/onzag/itemize/blob/f2f29986/server/raw-db.ts#L59)
+[server/raw-db.ts:59](https://github.com/onzag/itemize/blob/5c2808d3/server/raw-db.ts#L59)
 
 ## Methods
 
 ### \_retrieveRawDBSelect
 
-▸ `Private` **_retrieveRawDBSelect**(`itemDefinitionOrModule`, `selecter`, `preventJoin?`): `SelectBuilder`
+▸ `Private` **_retrieveRawDBSelect**(`itemDefinitionOrModule`, `selecter`, `preventJoin?`): [`SelectBuilder`](database_SelectBuilder.SelectBuilder.md)
 
 #### Parameters
 
 | Name | Type |
 | :------ | :------ |
 | `itemDefinitionOrModule` | `string` \| [`default`](base_Root_Module.default.md) \| [`default`](base_Root_Module_ItemDefinition.default.md) |
-| `selecter` | (`builder`: `SelectBuilder`) => `void` |
+| `selecter` | (`builder`: [`SelectBuilder`](database_SelectBuilder.SelectBuilder.md)) => `void` |
 | `preventJoin?` | `boolean` |
 
 #### Returns
 
-`SelectBuilder`
+[`SelectBuilder`](database_SelectBuilder.SelectBuilder.md)
 
 #### Defined in
 
-[server/raw-db.ts:804](https://github.com/onzag/itemize/blob/f2f29986/server/raw-db.ts#L804)
+[server/raw-db.ts:804](https://github.com/onzag/itemize/blob/5c2808d3/server/raw-db.ts#L804)
 
 ___
 
@@ -160,7 +160,7 @@ row
 
 #### Defined in
 
-[server/raw-db.ts:205](https://github.com/onzag/itemize/blob/f2f29986/server/raw-db.ts#L205)
+[server/raw-db.ts:205](https://github.com/onzag/itemize/blob/5c2808d3/server/raw-db.ts#L205)
 
 ___
 
@@ -187,7 +187,7 @@ the clients that are related to those rows
 
 #### Defined in
 
-[server/raw-db.ts:289](https://github.com/onzag/itemize/blob/f2f29986/server/raw-db.ts#L289)
+[server/raw-db.ts:289](https://github.com/onzag/itemize/blob/5c2808d3/server/raw-db.ts#L289)
 
 ___
 
@@ -227,7 +227,7 @@ for the database for the value
 
 #### Defined in
 
-[server/raw-db.ts:608](https://github.com/onzag/itemize/blob/f2f29986/server/raw-db.ts#L608)
+[server/raw-db.ts:608](https://github.com/onzag/itemize/blob/5c2808d3/server/raw-db.ts#L608)
 
 ___
 
@@ -264,7 +264,7 @@ last_modified
 
 #### Defined in
 
-[server/raw-db.ts:579](https://github.com/onzag/itemize/blob/f2f29986/server/raw-db.ts#L579)
+[server/raw-db.ts:579](https://github.com/onzag/itemize/blob/5c2808d3/server/raw-db.ts#L579)
 
 ___
 
@@ -309,7 +309,7 @@ for the database for an updated value.
 
 #### Defined in
 
-[server/raw-db.ts:555](https://github.com/onzag/itemize/blob/f2f29986/server/raw-db.ts#L555)
+[server/raw-db.ts:555](https://github.com/onzag/itemize/blob/5c2808d3/server/raw-db.ts#L555)
 
 ___
 
@@ -325,7 +325,7 @@ ___
 | `deleter` | `Object` |
 | `deleter.dangerousUseSilentMode?` | `boolean` |
 | `deleter.preventJoin?` | `boolean` |
-| `deleter.select` | (`builder`: `SelectBuilder`) => `void` |
+| `deleter.select` | (`builder`: [`SelectBuilder`](database_SelectBuilder.SelectBuilder.md)) => `void` |
 
 #### Returns
 
@@ -333,7 +333,7 @@ ___
 
 #### Defined in
 
-[server/raw-db.ts:683](https://github.com/onzag/itemize/blob/f2f29986/server/raw-db.ts#L683)
+[server/raw-db.ts:683](https://github.com/onzag/itemize/blob/5c2808d3/server/raw-db.ts#L683)
 
 ___
 
@@ -355,11 +355,11 @@ TODO allow for optimizations
 | `item` | `string` \| [`default`](base_Root_Module_ItemDefinition.default.md) |
 | `updater` | `Object` |
 | `updater.dangerousUseSilentMode?` | `boolean` |
-| `updater.itemTableUpdate?` | `IManyValueType` |
-| `updater.moduleTableUpdate?` | `IManyValueType` |
-| `updater.itemTableUpdater?` | (`arg`: `SetBuilder`, `redoDictionaries`: `RedoDictionariesFn`) => `void` |
-| `updater.moduleTableUpdater?` | (`arg`: `SetBuilder`, `redoDictionaries`: `RedoDictionariesFn`) => `void` |
-| `updater.whereCriteriaSelector` | (`arg`: `WhereBuilder`) => `void` |
+| `updater.itemTableUpdate?` | [`IManyValueType`](../interfaces/database_base.IManyValueType.md) |
+| `updater.moduleTableUpdate?` | [`IManyValueType`](../interfaces/database_base.IManyValueType.md) |
+| `updater.itemTableUpdater?` | (`arg`: [`SetBuilder`](database_SetBuilder.SetBuilder.md), `redoDictionaries`: `RedoDictionariesFn`) => `void` |
+| `updater.moduleTableUpdater?` | (`arg`: [`SetBuilder`](database_SetBuilder.SetBuilder.md), `redoDictionaries`: `RedoDictionariesFn`) => `void` |
+| `updater.whereCriteriaSelector` | (`arg`: [`WhereBuilder`](database_WhereBuilder.WhereBuilder.md)) => `void` |
 
 #### Returns
 
@@ -367,7 +367,7 @@ TODO allow for optimizations
 
 #### Defined in
 
-[server/raw-db.ts:879](https://github.com/onzag/itemize/blob/f2f29986/server/raw-db.ts#L879)
+[server/raw-db.ts:879](https://github.com/onzag/itemize/blob/5c2808d3/server/raw-db.ts#L879)
 
 ___
 
@@ -389,9 +389,9 @@ TODO allow for optimizations
 | `moduleToUpdate` | `string` \| [`default`](base_Root_Module.default.md) |
 | `updater` | `Object` |
 | `updater.dangerousUseSilentMode?` | `boolean` |
-| `updater.moduleTableUpdate?` | `IManyValueType` |
-| `updater.moduleTableUpdater?` | (`arg`: `SetBuilder`, `redoDictionaries`: `RedoDictionariesFnPropertyBased`) => `void` |
-| `updater.whereCriteriaSelector` | (`arg`: `WhereBuilder`) => `void` |
+| `updater.moduleTableUpdate?` | [`IManyValueType`](../interfaces/database_base.IManyValueType.md) |
+| `updater.moduleTableUpdater?` | (`arg`: [`SetBuilder`](database_SetBuilder.SetBuilder.md), `redoDictionaries`: `RedoDictionariesFnPropertyBased`) => `void` |
+| `updater.whereCriteriaSelector` | (`arg`: [`WhereBuilder`](database_WhereBuilder.WhereBuilder.md)) => `void` |
 
 #### Returns
 
@@ -399,7 +399,7 @@ TODO allow for optimizations
 
 #### Defined in
 
-[server/raw-db.ts:1023](https://github.com/onzag/itemize/blob/f2f29986/server/raw-db.ts#L1023)
+[server/raw-db.ts:1023](https://github.com/onzag/itemize/blob/5c2808d3/server/raw-db.ts#L1023)
 
 ___
 
@@ -423,7 +423,7 @@ ___
 
 #### Defined in
 
-[server/raw-db.ts:669](https://github.com/onzag/itemize/blob/f2f29986/server/raw-db.ts#L669)
+[server/raw-db.ts:669](https://github.com/onzag/itemize/blob/5c2808d3/server/raw-db.ts#L669)
 
 ___
 
@@ -449,7 +449,7 @@ TODO returning builder access in order to modify what to return
 | `item` | `string` \| [`default`](base_Root_Module_ItemDefinition.default.md) |
 | `inserter` | `Object` |
 | `inserter.dangerousUseSilentMode?` | `boolean` |
-| `inserter.values` | { `itemTableInsert`: `IManyValueType` ; `moduleTableInsert`: `IManyValueType`  }[] |
+| `inserter.values` | { `itemTableInsert`: [`IManyValueType`](../interfaces/database_base.IManyValueType.md) ; `moduleTableInsert`: [`IManyValueType`](../interfaces/database_base.IManyValueType.md)  }[] |
 
 #### Returns
 
@@ -457,7 +457,7 @@ TODO returning builder access in order to modify what to return
 
 #### Defined in
 
-[server/raw-db.ts:713](https://github.com/onzag/itemize/blob/f2f29986/server/raw-db.ts#L713)
+[server/raw-db.ts:713](https://github.com/onzag/itemize/blob/5c2808d3/server/raw-db.ts#L713)
 
 ___
 
@@ -472,7 +472,7 @@ Provides a db query builder for the given item or a module
 | Name | Type | Description |
 | :------ | :------ | :------ |
 | `itemDefinitionOrModule` | `string` \| [`default`](base_Root_Module.default.md) \| [`default`](base_Root_Module_ItemDefinition.default.md) | the item or module |
-| `selecter` | (`builder`: `SelectBuilder`) => `void` | - |
+| `selecter` | (`builder`: [`SelectBuilder`](database_SelectBuilder.SelectBuilder.md)) => `void` | - |
 | `preventJoin?` | `boolean` | when using an item, if you will not be using properties that are in the module table, like id, parents, creators, and prop extensions then you can prevent the join from happening |
 
 #### Returns
@@ -481,7 +481,7 @@ Provides a db query builder for the given item or a module
 
 #### Defined in
 
-[server/raw-db.ts:838](https://github.com/onzag/itemize/blob/f2f29986/server/raw-db.ts#L838)
+[server/raw-db.ts:838](https://github.com/onzag/itemize/blob/5c2808d3/server/raw-db.ts#L838)
 
 ___
 
@@ -503,10 +503,10 @@ TODO returning builder access
 | `version` | `string` |
 | `updater` | `Object` |
 | `updater.dangerousUseSilentMode?` | `boolean` |
-| `updater.itemTableUpdate?` | `IManyValueType` |
-| `updater.moduleTableUpdate?` | `IManyValueType` |
-| `updater.itemTableUpdater?` | (`arg`: `SetBuilder`, `redoDictionaries`: `RedoDictionariesFn`) => `void` |
-| `updater.moduleTableUpdater?` | (`arg`: `SetBuilder`, `redoDictionaries`: `RedoDictionariesFn`) => `void` |
+| `updater.itemTableUpdate?` | [`IManyValueType`](../interfaces/database_base.IManyValueType.md) |
+| `updater.moduleTableUpdate?` | [`IManyValueType`](../interfaces/database_base.IManyValueType.md) |
+| `updater.itemTableUpdater?` | (`arg`: [`SetBuilder`](database_SetBuilder.SetBuilder.md), `redoDictionaries`: `RedoDictionariesFn`) => `void` |
+| `updater.moduleTableUpdater?` | (`arg`: [`SetBuilder`](database_SetBuilder.SetBuilder.md), `redoDictionaries`: `RedoDictionariesFn`) => `void` |
 
 #### Returns
 
@@ -514,7 +514,7 @@ TODO returning builder access
 
 #### Defined in
 
-[server/raw-db.ts:1100](https://github.com/onzag/itemize/blob/f2f29986/server/raw-db.ts#L1100)
+[server/raw-db.ts:1100](https://github.com/onzag/itemize/blob/5c2808d3/server/raw-db.ts#L1100)
 
 ___
 
@@ -554,7 +554,7 @@ an object which contains the total or partial values of the row to be inserted o
 
 #### Defined in
 
-[server/raw-db.ts:134](https://github.com/onzag/itemize/blob/f2f29986/server/raw-db.ts#L134)
+[server/raw-db.ts:134](https://github.com/onzag/itemize/blob/5c2808d3/server/raw-db.ts#L134)
 
 ___
 
@@ -579,7 +579,7 @@ a url safe v5 uuid
 
 #### Defined in
 
-[server/raw-db.ts:109](https://github.com/onzag/itemize/blob/f2f29986/server/raw-db.ts#L109)
+[server/raw-db.ts:109](https://github.com/onzag/itemize/blob/5c2808d3/server/raw-db.ts#L109)
 
 ___
 
@@ -600,7 +600,7 @@ a url safe v4 uuid
 
 #### Defined in
 
-[server/raw-db.ts:99](https://github.com/onzag/itemize/blob/f2f29986/server/raw-db.ts#L99)
+[server/raw-db.ts:99](https://github.com/onzag/itemize/blob/5c2808d3/server/raw-db.ts#L99)
 
 ___
 
@@ -617,7 +617,7 @@ of given properties
 | Name | Type |
 | :------ | :------ |
 | `itemDefinitionOrModule` | [`default`](base_Root_Module.default.md) \| [`default`](base_Root_Module_ItemDefinition.default.md) |
-| `setBuilder` | `SetBuilder` |
+| `setBuilder` | [`SetBuilder`](database_SetBuilder.SetBuilder.md) |
 | `dictionary` | `string` |
 | `propertyOrInclude` | `string` |
 | `property` | `string` |
@@ -628,13 +628,13 @@ of given properties
 
 #### Defined in
 
-[server/raw-db.ts:624](https://github.com/onzag/itemize/blob/f2f29986/server/raw-db.ts#L624)
+[server/raw-db.ts:624](https://github.com/onzag/itemize/blob/5c2808d3/server/raw-db.ts#L624)
 
 ___
 
 ### retrieveRawDBSelect
 
-▸ **retrieveRawDBSelect**(`itemDefinitionOrModule`, `selecter`, `preventJoin?`): [`string`, `BasicBindingType`[]]
+▸ **retrieveRawDBSelect**(`itemDefinitionOrModule`, `selecter`, `preventJoin?`): [`string`, [`BasicBindingType`](../modules/database_base.md#basicbindingtype)[]]
 
 Retrieves a raw db select query in order to be used to assign values in updates
 
@@ -643,16 +643,16 @@ Retrieves a raw db select query in order to be used to assign values in updates
 | Name | Type |
 | :------ | :------ |
 | `itemDefinitionOrModule` | `string` \| [`default`](base_Root_Module.default.md) \| [`default`](base_Root_Module_ItemDefinition.default.md) |
-| `selecter` | (`builder`: `SelectBuilder`) => `void` |
+| `selecter` | (`builder`: [`SelectBuilder`](database_SelectBuilder.SelectBuilder.md)) => `void` |
 | `preventJoin?` | `boolean` |
 
 #### Returns
 
-[`string`, `BasicBindingType`[]]
+[`string`, [`BasicBindingType`](../modules/database_base.md#basicbindingtype)[]]
 
 #### Defined in
 
-[server/raw-db.ts:855](https://github.com/onzag/itemize/blob/f2f29986/server/raw-db.ts#L855)
+[server/raw-db.ts:855](https://github.com/onzag/itemize/blob/5c2808d3/server/raw-db.ts#L855)
 
 ___
 
@@ -682,7 +682,7 @@ whatever is returned in the transactional function
 
 #### Defined in
 
-[server/raw-db.ts:80](https://github.com/onzag/itemize/blob/f2f29986/server/raw-db.ts#L80)
+[server/raw-db.ts:80](https://github.com/onzag/itemize/blob/5c2808d3/server/raw-db.ts#L80)
 
 ___
 
@@ -707,4 +707,4 @@ the transaction time
 
 #### Defined in
 
-[server/raw-db.ts:175](https://github.com/onzag/itemize/blob/f2f29986/server/raw-db.ts#L175)
+[server/raw-db.ts:175](https://github.com/onzag/itemize/blob/5c2808d3/server/raw-db.ts#L175)

@@ -50,7 +50,7 @@ that matches this ui handler signature
 
 #### Defined in
 
-[client/fast-prototyping/components/slate/index.tsx:146](https://github.com/onzag/itemize/blob/f2f29986/client/fast-prototyping/components/slate/index.tsx#L146)
+[client/fast-prototyping/components/slate/index.tsx:146](https://github.com/onzag/itemize/blob/5c2808d3/client/fast-prototyping/components/slate/index.tsx#L146)
 
 ___
 
@@ -64,7 +64,7 @@ will be created in it
 
 #### Defined in
 
-[client/fast-prototyping/components/slate/index.tsx:178](https://github.com/onzag/itemize/blob/f2f29986/client/fast-prototyping/components/slate/index.tsx#L178)
+[client/fast-prototyping/components/slate/index.tsx:178](https://github.com/onzag/itemize/blob/5c2808d3/client/fast-prototyping/components/slate/index.tsx#L178)
 
 ___
 
@@ -80,7 +80,7 @@ and have different functionality
 
 #### Defined in
 
-[client/fast-prototyping/components/slate/index.tsx:154](https://github.com/onzag/itemize/blob/f2f29986/client/fast-prototyping/components/slate/index.tsx#L154)
+[client/fast-prototyping/components/slate/index.tsx:154](https://github.com/onzag/itemize/blob/5c2808d3/client/fast-prototyping/components/slate/index.tsx#L154)
 
 ___
 
@@ -93,7 +93,7 @@ have children and it's managed all within itself
 
 #### Defined in
 
-[client/fast-prototyping/components/slate/index.tsx:166](https://github.com/onzag/itemize/blob/f2f29986/client/fast-prototyping/components/slate/index.tsx#L166)
+[client/fast-prototyping/components/slate/index.tsx:166](https://github.com/onzag/itemize/blob/5c2808d3/client/fast-prototyping/components/slate/index.tsx#L166)
 
 ___
 
@@ -107,7 +107,7 @@ use this method to keep and use the split method
 
 #### Defined in
 
-[client/fast-prototyping/components/slate/index.tsx:172](https://github.com/onzag/itemize/blob/f2f29986/client/fast-prototyping/components/slate/index.tsx#L172)
+[client/fast-prototyping/components/slate/index.tsx:172](https://github.com/onzag/itemize/blob/5c2808d3/client/fast-prototyping/components/slate/index.tsx#L172)
 
 ___
 
@@ -122,7 +122,7 @@ for the rich text, these include
 
 #### Defined in
 
-[client/fast-prototyping/components/slate/index.tsx:161](https://github.com/onzag/itemize/blob/f2f29986/client/fast-prototyping/components/slate/index.tsx#L161)
+[client/fast-prototyping/components/slate/index.tsx:161](https://github.com/onzag/itemize/blob/5c2808d3/client/fast-prototyping/components/slate/index.tsx#L161)
 
 ___
 
@@ -137,7 +137,7 @@ a react component
 
 #### Defined in
 
-[client/fast-prototyping/components/slate/index.tsx:134](https://github.com/onzag/itemize/blob/f2f29986/client/fast-prototyping/components/slate/index.tsx#L134)
+[client/fast-prototyping/components/slate/index.tsx:134](https://github.com/onzag/itemize/blob/5c2808d3/client/fast-prototyping/components/slate/index.tsx#L134)
 
 ___
 
@@ -166,7 +166,7 @@ A react node can also be given to pass the i18n component
 
 #### Defined in
 
-[client/fast-prototyping/components/slate/index.tsx:119](https://github.com/onzag/itemize/blob/f2f29986/client/fast-prototyping/components/slate/index.tsx#L119)
+[client/fast-prototyping/components/slate/index.tsx:119](https://github.com/onzag/itemize/blob/5c2808d3/client/fast-prototyping/components/slate/index.tsx#L119)
 
 ___
 
@@ -180,7 +180,7 @@ TODO implement
 
 #### Defined in
 
-[client/fast-prototyping/components/slate/index.tsx:126](https://github.com/onzag/itemize/blob/f2f29986/client/fast-prototyping/components/slate/index.tsx#L126)
+[client/fast-prototyping/components/slate/index.tsx:126](https://github.com/onzag/itemize/blob/5c2808d3/client/fast-prototyping/components/slate/index.tsx#L126)
 
 ___
 
@@ -193,7 +193,7 @@ the text content signature
 
 #### Defined in
 
-[client/fast-prototyping/components/slate/index.tsx:140](https://github.com/onzag/itemize/blob/f2f29986/client/fast-prototyping/components/slate/index.tsx#L140)
+[client/fast-prototyping/components/slate/index.tsx:140](https://github.com/onzag/itemize/blob/5c2808d3/client/fast-prototyping/components/slate/index.tsx#L140)
 
 ___
 
@@ -213,4 +213,4 @@ the ui-handler full potential
 
 #### Defined in
 
-[client/fast-prototyping/components/slate/index.tsx:97](https://github.com/onzag/itemize/blob/f2f29986/client/fast-prototyping/components/slate/index.tsx#L97)
+[client/fast-prototyping/components/slate/index.tsx:97](https://github.com/onzag/itemize/blob/5c2808d3/client/fast-prototyping/components/slate/index.tsx#L97)

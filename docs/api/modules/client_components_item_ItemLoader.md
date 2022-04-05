@@ -39,4 +39,4 @@ is specified as that requires loading
 
 #### Defined in
 
-[client/components/item/ItemLoader.tsx:116](https://github.com/onzag/itemize/blob/f2f29986/client/components/item/ItemLoader.tsx#L116)
+[client/components/item/ItemLoader.tsx:116](https://github.com/onzag/itemize/blob/5c2808d3/client/components/item/ItemLoader.tsx#L116)

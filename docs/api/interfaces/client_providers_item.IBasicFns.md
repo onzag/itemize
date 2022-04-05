@@ -42,7 +42,7 @@
 
 #### Defined in
 
-[client/providers/item.tsx:450](https://github.com/onzag/itemize/blob/f2f29986/client/providers/item.tsx#L450)
+[client/providers/item.tsx:450](https://github.com/onzag/itemize/blob/5c2808d3/client/providers/item.tsx#L450)
 
 ___
 
@@ -56,7 +56,7 @@ ___
 
 #### Defined in
 
-[client/providers/item.tsx:448](https://github.com/onzag/itemize/blob/f2f29986/client/providers/item.tsx#L448)
+[client/providers/item.tsx:448](https://github.com/onzag/itemize/blob/5c2808d3/client/providers/item.tsx#L448)
 
 ___
 
@@ -76,7 +76,7 @@ ___
 
 #### Defined in
 
-[client/providers/item.tsx:438](https://github.com/onzag/itemize/blob/f2f29986/client/providers/item.tsx#L438)
+[client/providers/item.tsx:438](https://github.com/onzag/itemize/blob/5c2808d3/client/providers/item.tsx#L438)
 
 ___
 
@@ -96,7 +96,7 @@ ___
 
 #### Defined in
 
-[client/providers/item.tsx:443](https://github.com/onzag/itemize/blob/f2f29986/client/providers/item.tsx#L443)
+[client/providers/item.tsx:443](https://github.com/onzag/itemize/blob/5c2808d3/client/providers/item.tsx#L443)
 
 ___
 
@@ -116,7 +116,7 @@ ___
 
 #### Defined in
 
-[client/providers/item.tsx:455](https://github.com/onzag/itemize/blob/f2f29986/client/providers/item.tsx#L455)
+[client/providers/item.tsx:455](https://github.com/onzag/itemize/blob/5c2808d3/client/providers/item.tsx#L455)
 
 ___
 
@@ -136,7 +136,7 @@ ___
 
 #### Defined in
 
-[client/providers/item.tsx:446](https://github.com/onzag/itemize/blob/f2f29986/client/providers/item.tsx#L446)
+[client/providers/item.tsx:446](https://github.com/onzag/itemize/blob/5c2808d3/client/providers/item.tsx#L446)
 
 ___
 
@@ -150,4 +150,4 @@ ___
 
 #### Defined in
 
-[client/providers/item.tsx:439](https://github.com/onzag/itemize/blob/f2f29986/client/providers/item.tsx#L439)
+[client/providers/item.tsx:439](https://github.com/onzag/itemize/blob/5c2808d3/client/providers/item.tsx#L439)

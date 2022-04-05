@@ -37,7 +37,7 @@ it is not valid for the render static
 
 #### Defined in
 
-[client/internal/text/serializer/template-args.ts:97](https://github.com/onzag/itemize/blob/f2f29986/client/internal/text/serializer/template-args.ts#L97)
+[client/internal/text/serializer/template-args.ts:97](https://github.com/onzag/itemize/blob/5c2808d3/client/internal/text/serializer/template-args.ts#L97)
 
 ## Properties
 
@@ -47,7 +47,7 @@ it is not valid for the render static
 
 #### Defined in
 
-[client/internal/text/serializer/template-args.ts:94](https://github.com/onzag/itemize/blob/f2f29986/client/internal/text/serializer/template-args.ts#L94)
+[client/internal/text/serializer/template-args.ts:94](https://github.com/onzag/itemize/blob/5c2808d3/client/internal/text/serializer/template-args.ts#L94)
 
 ___
 
@@ -71,7 +71,7 @@ ___
 
 #### Defined in
 
-[client/internal/text/serializer/template-args.ts:95](https://github.com/onzag/itemize/blob/f2f29986/client/internal/text/serializer/template-args.ts#L95)
+[client/internal/text/serializer/template-args.ts:95](https://github.com/onzag/itemize/blob/5c2808d3/client/internal/text/serializer/template-args.ts#L95)
 
 ## Methods
 
@@ -91,4 +91,4 @@ ___
 
 #### Defined in
 
-[client/internal/text/serializer/template-args.ts:101](https://github.com/onzag/itemize/blob/f2f29986/client/internal/text/serializer/template-args.ts#L101)
+[client/internal/text/serializer/template-args.ts:101](https://github.com/onzag/itemize/blob/5c2808d3/client/internal/text/serializer/template-args.ts#L101)

@@ -26,4 +26,4 @@
 
 #### Defined in
 
-[client/fast-prototyping/renderers/PropertyEntry/general.tsx:30](https://github.com/onzag/itemize/blob/f2f29986/client/fast-prototyping/renderers/PropertyEntry/general.tsx#L30)
+[client/fast-prototyping/renderers/PropertyEntry/general.tsx:30](https://github.com/onzag/itemize/blob/5c2808d3/client/fast-prototyping/renderers/PropertyEntry/general.tsx#L30)

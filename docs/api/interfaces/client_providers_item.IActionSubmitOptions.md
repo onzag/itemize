@@ -73,7 +73,7 @@ aka edit, aka add
 
 #### Defined in
 
-[client/providers/item.tsx:323](https://github.com/onzag/itemize/blob/f2f29986/client/providers/item.tsx#L323)
+[client/providers/item.tsx:323](https://github.com/onzag/itemize/blob/5c2808d3/client/providers/item.tsx#L323)
 
 ___
 
@@ -83,7 +83,7 @@ ___
 
 #### Defined in
 
-[client/providers/item.tsx:326](https://github.com/onzag/itemize/blob/f2f29986/client/providers/item.tsx#L326)
+[client/providers/item.tsx:326](https://github.com/onzag/itemize/blob/5c2808d3/client/providers/item.tsx#L326)
 
 ___
 
@@ -93,7 +93,7 @@ ___
 
 #### Defined in
 
-[client/providers/item.tsx:324](https://github.com/onzag/itemize/blob/f2f29986/client/providers/item.tsx#L324)
+[client/providers/item.tsx:324](https://github.com/onzag/itemize/blob/5c2808d3/client/providers/item.tsx#L324)
 
 ___
 
@@ -103,7 +103,7 @@ ___
 
 #### Defined in
 
-[client/providers/item.tsx:325](https://github.com/onzag/itemize/blob/f2f29986/client/providers/item.tsx#L325)
+[client/providers/item.tsx:325](https://github.com/onzag/itemize/blob/5c2808d3/client/providers/item.tsx#L325)
 
 ___
 
@@ -119,7 +119,7 @@ cleans the search results
 
 #### Defined in
 
-[client/providers/item.tsx:251](https://github.com/onzag/itemize/blob/f2f29986/client/providers/item.tsx#L251)
+[client/providers/item.tsx:251](https://github.com/onzag/itemize/blob/5c2808d3/client/providers/item.tsx#L251)
 
 ___
 
@@ -135,7 +135,7 @@ cleans the search results
 
 #### Defined in
 
-[client/providers/item.tsx:255](https://github.com/onzag/itemize/blob/f2f29986/client/providers/item.tsx#L255)
+[client/providers/item.tsx:255](https://github.com/onzag/itemize/blob/5c2808d3/client/providers/item.tsx#L255)
 
 ___
 
@@ -151,7 +151,7 @@ cleans the search results
 
 #### Defined in
 
-[client/providers/item.tsx:247](https://github.com/onzag/itemize/blob/f2f29986/client/providers/item.tsx#L247)
+[client/providers/item.tsx:247](https://github.com/onzag/itemize/blob/5c2808d3/client/providers/item.tsx#L247)
 
 ___
 
@@ -172,7 +172,7 @@ and itemize might decide that it's better not to provide it
 
 #### Defined in
 
-[client/providers/item.tsx:297](https://github.com/onzag/itemize/blob/f2f29986/client/providers/item.tsx#L297)
+[client/providers/item.tsx:297](https://github.com/onzag/itemize/blob/5c2808d3/client/providers/item.tsx#L297)
 
 ___
 
@@ -193,7 +193,7 @@ and itemize might decide that it's better not to provide it
 
 #### Defined in
 
-[client/providers/item.tsx:288](https://github.com/onzag/itemize/blob/f2f29986/client/providers/item.tsx#L288)
+[client/providers/item.tsx:288](https://github.com/onzag/itemize/blob/5c2808d3/client/providers/item.tsx#L288)
 
 ___
 
@@ -214,7 +214,7 @@ and itemize might decide that it's better not to provide it
 
 #### Defined in
 
-[client/providers/item.tsx:279](https://github.com/onzag/itemize/blob/f2f29986/client/providers/item.tsx#L279)
+[client/providers/item.tsx:279](https://github.com/onzag/itemize/blob/5c2808d3/client/providers/item.tsx#L279)
 
 ___
 
@@ -224,7 +224,7 @@ ___
 
 #### Defined in
 
-[client/providers/item.tsx:349](https://github.com/onzag/itemize/blob/f2f29986/client/providers/item.tsx#L349)
+[client/providers/item.tsx:349](https://github.com/onzag/itemize/blob/5c2808d3/client/providers/item.tsx#L349)
 
 ___
 
@@ -234,7 +234,7 @@ ___
 
 #### Defined in
 
-[client/providers/item.tsx:308](https://github.com/onzag/itemize/blob/f2f29986/client/providers/item.tsx#L308)
+[client/providers/item.tsx:308](https://github.com/onzag/itemize/blob/5c2808d3/client/providers/item.tsx#L308)
 
 ___
 
@@ -244,7 +244,7 @@ ___
 
 #### Defined in
 
-[client/providers/item.tsx:334](https://github.com/onzag/itemize/blob/f2f29986/client/providers/item.tsx#L334)
+[client/providers/item.tsx:334](https://github.com/onzag/itemize/blob/5c2808d3/client/providers/item.tsx#L334)
 
 ___
 
@@ -254,7 +254,7 @@ ___
 
 #### Defined in
 
-[client/providers/item.tsx:336](https://github.com/onzag/itemize/blob/f2f29986/client/providers/item.tsx#L336)
+[client/providers/item.tsx:336](https://github.com/onzag/itemize/blob/5c2808d3/client/providers/item.tsx#L336)
 
 ___
 
@@ -268,7 +268,7 @@ ___
 
 #### Defined in
 
-[client/providers/item.tsx:309](https://github.com/onzag/itemize/blob/f2f29986/client/providers/item.tsx#L309)
+[client/providers/item.tsx:309](https://github.com/onzag/itemize/blob/5c2808d3/client/providers/item.tsx#L309)
 
 ___
 
@@ -285,7 +285,7 @@ or null if it doesn't have such
 
 #### Defined in
 
-[client/providers/item.tsx:226](https://github.com/onzag/itemize/blob/f2f29986/client/providers/item.tsx#L226)
+[client/providers/item.tsx:226](https://github.com/onzag/itemize/blob/5c2808d3/client/providers/item.tsx#L226)
 
 ___
 
@@ -302,7 +302,7 @@ or null if it doesn't have such
 
 #### Defined in
 
-[client/providers/item.tsx:231](https://github.com/onzag/itemize/blob/f2f29986/client/providers/item.tsx#L231)
+[client/providers/item.tsx:231](https://github.com/onzag/itemize/blob/5c2808d3/client/providers/item.tsx#L231)
 
 ___
 
@@ -319,7 +319,7 @@ or null if it doesn't have such
 
 #### Defined in
 
-[client/providers/item.tsx:221](https://github.com/onzag/itemize/blob/f2f29986/client/providers/item.tsx#L221)
+[client/providers/item.tsx:221](https://github.com/onzag/itemize/blob/5c2808d3/client/providers/item.tsx#L221)
 
 ___
 
@@ -329,7 +329,7 @@ ___
 
 #### Defined in
 
-[client/providers/item.tsx:337](https://github.com/onzag/itemize/blob/f2f29986/client/providers/item.tsx#L337)
+[client/providers/item.tsx:337](https://github.com/onzag/itemize/blob/5c2808d3/client/providers/item.tsx#L337)
 
 ___
 
@@ -347,7 +347,7 @@ ___
 
 #### Defined in
 
-[client/providers/item.tsx:312](https://github.com/onzag/itemize/blob/f2f29986/client/providers/item.tsx#L312)
+[client/providers/item.tsx:312](https://github.com/onzag/itemize/blob/5c2808d3/client/providers/item.tsx#L312)
 
 ___
 
@@ -361,7 +361,7 @@ will be of add type
 
 #### Defined in
 
-[client/providers/item.tsx:322](https://github.com/onzag/itemize/blob/f2f29986/client/providers/item.tsx#L322)
+[client/providers/item.tsx:322](https://github.com/onzag/itemize/blob/5c2808d3/client/providers/item.tsx#L322)
 
 ___
 
@@ -377,7 +377,7 @@ in case you want that behaviour
 
 #### Defined in
 
-[client/providers/item.tsx:347](https://github.com/onzag/itemize/blob/f2f29986/client/providers/item.tsx#L347)
+[client/providers/item.tsx:347](https://github.com/onzag/itemize/blob/5c2808d3/client/providers/item.tsx#L347)
 
 ___
 
@@ -387,7 +387,7 @@ ___
 
 #### Defined in
 
-[client/providers/item.tsx:310](https://github.com/onzag/itemize/blob/f2f29986/client/providers/item.tsx#L310)
+[client/providers/item.tsx:310](https://github.com/onzag/itemize/blob/5c2808d3/client/providers/item.tsx#L310)
 
 ___
 
@@ -403,7 +403,7 @@ Cleans the value of a policy back to null
 
 #### Defined in
 
-[client/providers/item.tsx:197](https://github.com/onzag/itemize/blob/f2f29986/client/providers/item.tsx#L197)
+[client/providers/item.tsx:197](https://github.com/onzag/itemize/blob/5c2808d3/client/providers/item.tsx#L197)
 
 ___
 
@@ -419,7 +419,7 @@ Cleans the value of a policy back to null
 
 #### Defined in
 
-[client/providers/item.tsx:201](https://github.com/onzag/itemize/blob/f2f29986/client/providers/item.tsx#L201)
+[client/providers/item.tsx:201](https://github.com/onzag/itemize/blob/5c2808d3/client/providers/item.tsx#L201)
 
 ___
 
@@ -435,7 +435,7 @@ Cleans the value of a policy back to null
 
 #### Defined in
 
-[client/providers/item.tsx:193](https://github.com/onzag/itemize/blob/f2f29986/client/providers/item.tsx#L193)
+[client/providers/item.tsx:193](https://github.com/onzag/itemize/blob/5c2808d3/client/providers/item.tsx#L193)
 
 ___
 
@@ -445,7 +445,7 @@ ___
 
 #### Defined in
 
-[client/providers/item.tsx:339](https://github.com/onzag/itemize/blob/f2f29986/client/providers/item.tsx#L339)
+[client/providers/item.tsx:339](https://github.com/onzag/itemize/blob/5c2808d3/client/providers/item.tsx#L339)
 
 ___
 
@@ -455,7 +455,7 @@ ___
 
 #### Defined in
 
-[client/providers/item.tsx:307](https://github.com/onzag/itemize/blob/f2f29986/client/providers/item.tsx#L307)
+[client/providers/item.tsx:307](https://github.com/onzag/itemize/blob/5c2808d3/client/providers/item.tsx#L307)
 
 ___
 
@@ -472,7 +472,7 @@ or null if it doesn't have such
 
 #### Defined in
 
-[client/providers/item.tsx:211](https://github.com/onzag/itemize/blob/f2f29986/client/providers/item.tsx#L211)
+[client/providers/item.tsx:211](https://github.com/onzag/itemize/blob/5c2808d3/client/providers/item.tsx#L211)
 
 ___
 
@@ -489,7 +489,7 @@ or null if it doesn't have such
 
 #### Defined in
 
-[client/providers/item.tsx:216](https://github.com/onzag/itemize/blob/f2f29986/client/providers/item.tsx#L216)
+[client/providers/item.tsx:216](https://github.com/onzag/itemize/blob/5c2808d3/client/providers/item.tsx#L216)
 
 ___
 
@@ -506,7 +506,7 @@ or null if it doesn't have such
 
 #### Defined in
 
-[client/providers/item.tsx:206](https://github.com/onzag/itemize/blob/f2f29986/client/providers/item.tsx#L206)
+[client/providers/item.tsx:206](https://github.com/onzag/itemize/blob/5c2808d3/client/providers/item.tsx#L206)
 
 ___
 
@@ -516,7 +516,7 @@ ___
 
 #### Defined in
 
-[client/providers/item.tsx:335](https://github.com/onzag/itemize/blob/f2f29986/client/providers/item.tsx#L335)
+[client/providers/item.tsx:335](https://github.com/onzag/itemize/blob/5c2808d3/client/providers/item.tsx#L335)
 
 ___
 
@@ -533,7 +533,7 @@ this will be a clean if no applied value exists
 
 #### Defined in
 
-[client/providers/item.tsx:265](https://github.com/onzag/itemize/blob/f2f29986/client/providers/item.tsx#L265)
+[client/providers/item.tsx:265](https://github.com/onzag/itemize/blob/5c2808d3/client/providers/item.tsx#L265)
 
 ___
 
@@ -550,7 +550,7 @@ this will be a clean if no applied value exists
 
 #### Defined in
 
-[client/providers/item.tsx:270](https://github.com/onzag/itemize/blob/f2f29986/client/providers/item.tsx#L270)
+[client/providers/item.tsx:270](https://github.com/onzag/itemize/blob/5c2808d3/client/providers/item.tsx#L270)
 
 ___
 
@@ -567,7 +567,7 @@ this will be a clean if no applied value exists
 
 #### Defined in
 
-[client/providers/item.tsx:260](https://github.com/onzag/itemize/blob/f2f29986/client/providers/item.tsx#L260)
+[client/providers/item.tsx:260](https://github.com/onzag/itemize/blob/5c2808d3/client/providers/item.tsx#L260)
 
 ___
 
@@ -577,7 +577,7 @@ ___
 
 #### Defined in
 
-[client/providers/item.tsx:348](https://github.com/onzag/itemize/blob/f2f29986/client/providers/item.tsx#L348)
+[client/providers/item.tsx:348](https://github.com/onzag/itemize/blob/5c2808d3/client/providers/item.tsx#L348)
 
 ___
 
@@ -587,7 +587,7 @@ ___
 
 #### Defined in
 
-[client/providers/item.tsx:327](https://github.com/onzag/itemize/blob/f2f29986/client/providers/item.tsx#L327)
+[client/providers/item.tsx:327](https://github.com/onzag/itemize/blob/5c2808d3/client/providers/item.tsx#L327)
 
 ___
 
@@ -600,7 +600,7 @@ one
 
 #### Defined in
 
-[client/providers/item.tsx:333](https://github.com/onzag/itemize/blob/f2f29986/client/providers/item.tsx#L333)
+[client/providers/item.tsx:333](https://github.com/onzag/itemize/blob/5c2808d3/client/providers/item.tsx#L333)
 
 ___
 
@@ -610,7 +610,7 @@ ___
 
 #### Defined in
 
-[client/providers/item.tsx:328](https://github.com/onzag/itemize/blob/f2f29986/client/providers/item.tsx#L328)
+[client/providers/item.tsx:328](https://github.com/onzag/itemize/blob/5c2808d3/client/providers/item.tsx#L328)
 
 ___
 
@@ -626,7 +626,7 @@ Makes all properties unpoked (invalid won't show)
 
 #### Defined in
 
-[client/providers/item.tsx:239](https://github.com/onzag/itemize/blob/f2f29986/client/providers/item.tsx#L239)
+[client/providers/item.tsx:239](https://github.com/onzag/itemize/blob/5c2808d3/client/providers/item.tsx#L239)
 
 ___
 
@@ -642,7 +642,7 @@ Makes all properties unpoked (invalid won't show)
 
 #### Defined in
 
-[client/providers/item.tsx:243](https://github.com/onzag/itemize/blob/f2f29986/client/providers/item.tsx#L243)
+[client/providers/item.tsx:243](https://github.com/onzag/itemize/blob/5c2808d3/client/providers/item.tsx#L243)
 
 ___
 
@@ -658,7 +658,7 @@ Makes all properties unpoked (invalid won't show)
 
 #### Defined in
 
-[client/providers/item.tsx:235](https://github.com/onzag/itemize/blob/f2f29986/client/providers/item.tsx#L235)
+[client/providers/item.tsx:235](https://github.com/onzag/itemize/blob/5c2808d3/client/providers/item.tsx#L235)
 
 ___
 
@@ -668,7 +668,7 @@ ___
 
 #### Defined in
 
-[client/providers/item.tsx:338](https://github.com/onzag/itemize/blob/f2f29986/client/providers/item.tsx#L338)
+[client/providers/item.tsx:338](https://github.com/onzag/itemize/blob/5c2808d3/client/providers/item.tsx#L338)
 
 ## Methods
 
@@ -682,4 +682,4 @@ ___
 
 #### Defined in
 
-[client/providers/item.tsx:311](https://github.com/onzag/itemize/blob/f2f29986/client/providers/item.tsx#L311)
+[client/providers/item.tsx:311](https://github.com/onzag/itemize/blob/5c2808d3/client/providers/item.tsx#L311)

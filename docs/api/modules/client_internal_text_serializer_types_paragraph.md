@@ -34,7 +34,7 @@ for the paragraph element
 
 #### Defined in
 
-[client/internal/text/serializer/types/paragraph.ts:15](https://github.com/onzag/itemize/blob/f2f29986/client/internal/text/serializer/types/paragraph.ts#L15)
+[client/internal/text/serializer/types/paragraph.ts:15](https://github.com/onzag/itemize/blob/5c2808d3/client/internal/text/serializer/types/paragraph.ts#L15)
 
 ___
 
@@ -57,4 +57,4 @@ registry
 
 #### Defined in
 
-[client/internal/text/serializer/types/paragraph.ts:36](https://github.com/onzag/itemize/blob/f2f29986/client/internal/text/serializer/types/paragraph.ts#L36)
+[client/internal/text/serializer/types/paragraph.ts:36](https://github.com/onzag/itemize/blob/5c2808d3/client/internal/text/serializer/types/paragraph.ts#L36)

@@ -59,7 +59,7 @@ represent a list of rules
 
 #### Defined in
 
-[base/Root/Module/ItemDefinition/index.ts:253](https://github.com/onzag/itemize/blob/f2f29986/base/Root/Module/ItemDefinition/index.ts#L253)
+[base/Root/Module/ItemDefinition/index.ts:253](https://github.com/onzag/itemize/blob/5c2808d3/base/Root/Module/ItemDefinition/index.ts#L253)
 
 ___
 
@@ -71,7 +71,7 @@ Whether an user role can create in behalf
 
 #### Defined in
 
-[base/Root/Module/ItemDefinition/index.ts:229](https://github.com/onzag/itemize/blob/f2f29986/base/Root/Module/ItemDefinition/index.ts#L229)
+[base/Root/Module/ItemDefinition/index.ts:229](https://github.com/onzag/itemize/blob/5c2808d3/base/Root/Module/ItemDefinition/index.ts#L229)
 
 ___
 
@@ -85,7 +85,7 @@ aka it recurses as a tree
 
 #### Defined in
 
-[base/Root/Module/ItemDefinition/index.ts:198](https://github.com/onzag/itemize/blob/f2f29986/base/Root/Module/ItemDefinition/index.ts#L198)
+[base/Root/Module/ItemDefinition/index.ts:198](https://github.com/onzag/itemize/blob/5c2808d3/base/Root/Module/ItemDefinition/index.ts#L198)
 
 ___
 
@@ -98,7 +98,7 @@ used to create in behalf
 
 #### Defined in
 
-[base/Root/Module/ItemDefinition/index.ts:235](https://github.com/onzag/itemize/blob/f2f29986/base/Root/Module/ItemDefinition/index.ts#L235)
+[base/Root/Module/ItemDefinition/index.ts:235](https://github.com/onzag/itemize/blob/5c2808d3/base/Root/Module/ItemDefinition/index.ts#L235)
 
 ___
 
@@ -111,7 +111,7 @@ in behalf to
 
 #### Defined in
 
-[base/Root/Module/ItemDefinition/index.ts:247](https://github.com/onzag/itemize/blob/f2f29986/base/Root/Module/ItemDefinition/index.ts#L247)
+[base/Root/Module/ItemDefinition/index.ts:247](https://github.com/onzag/itemize/blob/5c2808d3/base/Root/Module/ItemDefinition/index.ts#L247)
 
 ___
 
@@ -123,7 +123,7 @@ Create role permissions
 
 #### Defined in
 
-[base/Root/Module/ItemDefinition/index.ts:176](https://github.com/onzag/itemize/blob/f2f29986/base/Root/Module/ItemDefinition/index.ts#L176)
+[base/Root/Module/ItemDefinition/index.ts:176](https://github.com/onzag/itemize/blob/5c2808d3/base/Root/Module/ItemDefinition/index.ts#L176)
 
 ___
 
@@ -136,7 +136,7 @@ be used to make custom ids
 
 #### Defined in
 
-[base/Root/Module/ItemDefinition/index.ts:241](https://github.com/onzag/itemize/blob/f2f29986/base/Root/Module/ItemDefinition/index.ts#L241)
+[base/Root/Module/ItemDefinition/index.ts:241](https://github.com/onzag/itemize/blob/5c2808d3/base/Root/Module/ItemDefinition/index.ts#L241)
 
 ___
 
@@ -148,7 +148,7 @@ Delete role permissions
 
 #### Defined in
 
-[base/Root/Module/ItemDefinition/index.ts:184](https://github.com/onzag/itemize/blob/f2f29986/base/Root/Module/ItemDefinition/index.ts#L184)
+[base/Root/Module/ItemDefinition/index.ts:184](https://github.com/onzag/itemize/blob/5c2808d3/base/Root/Module/ItemDefinition/index.ts#L184)
 
 ___
 
@@ -160,7 +160,7 @@ Edit role permissions
 
 #### Defined in
 
-[base/Root/Module/ItemDefinition/index.ts:180](https://github.com/onzag/itemize/blob/f2f29986/base/Root/Module/ItemDefinition/index.ts#L180)
+[base/Root/Module/ItemDefinition/index.ts:180](https://github.com/onzag/itemize/blob/5c2808d3/base/Root/Module/ItemDefinition/index.ts#L180)
 
 ___
 
@@ -173,7 +173,7 @@ by providing a new parent during edit
 
 #### Defined in
 
-[base/Root/Module/ItemDefinition/index.ts:268](https://github.com/onzag/itemize/blob/f2f29986/base/Root/Module/ItemDefinition/index.ts#L268)
+[base/Root/Module/ItemDefinition/index.ts:268](https://github.com/onzag/itemize/blob/5c2808d3/base/Root/Module/ItemDefinition/index.ts#L268)
 
 ___
 
@@ -185,7 +185,7 @@ Whether versioning is enabled
 
 #### Defined in
 
-[base/Root/Module/ItemDefinition/index.ts:143](https://github.com/onzag/itemize/blob/f2f29986/base/Root/Module/ItemDefinition/index.ts#L143)
+[base/Root/Module/ItemDefinition/index.ts:143](https://github.com/onzag/itemize/blob/5c2808d3/base/Root/Module/ItemDefinition/index.ts#L143)
 
 ___
 
@@ -198,7 +198,7 @@ in the unprocessed data but comes from the properties file
 
 #### Defined in
 
-[base/Root/Module/ItemDefinition/index.ts:129](https://github.com/onzag/itemize/blob/f2f29986/base/Root/Module/ItemDefinition/index.ts#L129)
+[base/Root/Module/ItemDefinition/index.ts:129](https://github.com/onzag/itemize/blob/5c2808d3/base/Root/Module/ItemDefinition/index.ts#L129)
 
 ___
 
@@ -211,7 +211,7 @@ i18n properties file
 
 #### Defined in
 
-[base/Root/Module/ItemDefinition/index.ts:108](https://github.com/onzag/itemize/blob/f2f29986/base/Root/Module/ItemDefinition/index.ts#L108)
+[base/Root/Module/ItemDefinition/index.ts:108](https://github.com/onzag/itemize/blob/5c2808d3/base/Root/Module/ItemDefinition/index.ts#L108)
 
 ___
 
@@ -226,7 +226,7 @@ these are paths
 
 #### Defined in
 
-[base/Root/Module/ItemDefinition/index.ts:192](https://github.com/onzag/itemize/blob/f2f29986/base/Root/Module/ItemDefinition/index.ts#L192)
+[base/Root/Module/ItemDefinition/index.ts:192](https://github.com/onzag/itemize/blob/5c2808d3/base/Root/Module/ItemDefinition/index.ts#L192)
 
 ___
 
@@ -238,7 +238,7 @@ The includes exist within the item definition
 
 #### Defined in
 
-[base/Root/Module/ItemDefinition/index.ts:134](https://github.com/onzag/itemize/blob/f2f29986/base/Root/Module/ItemDefinition/index.ts#L134)
+[base/Root/Module/ItemDefinition/index.ts:134](https://github.com/onzag/itemize/blob/5c2808d3/base/Root/Module/ItemDefinition/index.ts#L134)
 
 ___
 
@@ -251,7 +251,7 @@ and represents the file location the file is
 
 #### Defined in
 
-[base/Root/Module/ItemDefinition/index.ts:103](https://github.com/onzag/itemize/blob/f2f29986/base/Root/Module/ItemDefinition/index.ts#L103)
+[base/Root/Module/ItemDefinition/index.ts:103](https://github.com/onzag/itemize/blob/5c2808d3/base/Root/Module/ItemDefinition/index.ts#L103)
 
 ___
 
@@ -263,7 +263,7 @@ Whether it actually must always be parented
 
 #### Defined in
 
-[base/Root/Module/ItemDefinition/index.ts:272](https://github.com/onzag/itemize/blob/f2f29986/base/Root/Module/ItemDefinition/index.ts#L272)
+[base/Root/Module/ItemDefinition/index.ts:272](https://github.com/onzag/itemize/blob/5c2808d3/base/Root/Module/ItemDefinition/index.ts#L272)
 
 ___
 
@@ -276,7 +276,7 @@ it's equal to the file name or the folder name in case of index.json
 
 #### Defined in
 
-[base/Root/Module/ItemDefinition/index.ts:124](https://github.com/onzag/itemize/blob/f2f29986/base/Root/Module/ItemDefinition/index.ts#L124)
+[base/Root/Module/ItemDefinition/index.ts:124](https://github.com/onzag/itemize/blob/5c2808d3/base/Root/Module/ItemDefinition/index.ts#L124)
 
 ___
 
@@ -290,7 +290,7 @@ attribute
 
 #### Defined in
 
-[base/Root/Module/ItemDefinition/index.ts:211](https://github.com/onzag/itemize/blob/f2f29986/base/Root/Module/ItemDefinition/index.ts#L211)
+[base/Root/Module/ItemDefinition/index.ts:211](https://github.com/onzag/itemize/blob/5c2808d3/base/Root/Module/ItemDefinition/index.ts#L211)
 
 ___
 
@@ -304,7 +304,7 @@ the unspecified owner
 
 #### Defined in
 
-[base/Root/Module/ItemDefinition/index.ts:218](https://github.com/onzag/itemize/blob/f2f29986/base/Root/Module/ItemDefinition/index.ts#L218)
+[base/Root/Module/ItemDefinition/index.ts:218](https://github.com/onzag/itemize/blob/5c2808d3/base/Root/Module/ItemDefinition/index.ts#L218)
 
 ___
 
@@ -317,7 +317,7 @@ by the any type
 
 #### Defined in
 
-[base/Root/Module/ItemDefinition/index.ts:263](https://github.com/onzag/itemize/blob/f2f29986/base/Root/Module/ItemDefinition/index.ts#L263)
+[base/Root/Module/ItemDefinition/index.ts:263](https://github.com/onzag/itemize/blob/5c2808d3/base/Root/Module/ItemDefinition/index.ts#L263)
 
 ___
 
@@ -330,7 +330,7 @@ by the same type
 
 #### Defined in
 
-[base/Root/Module/ItemDefinition/index.ts:258](https://github.com/onzag/itemize/blob/f2f29986/base/Root/Module/ItemDefinition/index.ts#L258)
+[base/Root/Module/ItemDefinition/index.ts:258](https://github.com/onzag/itemize/blob/5c2808d3/base/Root/Module/ItemDefinition/index.ts#L258)
 
 ___
 
@@ -342,7 +342,7 @@ A list of roles who have access to parenting
 
 #### Defined in
 
-[base/Root/Module/ItemDefinition/index.ts:284](https://github.com/onzag/itemize/blob/f2f29986/base/Root/Module/ItemDefinition/index.ts#L284)
+[base/Root/Module/ItemDefinition/index.ts:284](https://github.com/onzag/itemize/blob/5c2808d3/base/Root/Module/ItemDefinition/index.ts#L284)
 
 ___
 
@@ -358,7 +358,7 @@ MANY is the default there can be as many children of the same type as it wants
 
 #### Defined in
 
-[base/Root/Module/ItemDefinition/index.ts:280](https://github.com/onzag/itemize/blob/f2f29986/base/Root/Module/ItemDefinition/index.ts#L280)
+[base/Root/Module/ItemDefinition/index.ts:280](https://github.com/onzag/itemize/blob/5c2808d3/base/Root/Module/ItemDefinition/index.ts#L280)
 
 ___
 
@@ -371,7 +371,7 @@ after built and it's used to create tracebacks from the raw data
 
 #### Defined in
 
-[base/Root/Module/ItemDefinition/index.ts:113](https://github.com/onzag/itemize/blob/f2f29986/base/Root/Module/ItemDefinition/index.ts#L113)
+[base/Root/Module/ItemDefinition/index.ts:113](https://github.com/onzag/itemize/blob/5c2808d3/base/Root/Module/ItemDefinition/index.ts#L113)
 
 ___
 
@@ -384,7 +384,7 @@ in the unprocessed file
 
 #### Defined in
 
-[base/Root/Module/ItemDefinition/index.ts:204](https://github.com/onzag/itemize/blob/f2f29986/base/Root/Module/ItemDefinition/index.ts#L204)
+[base/Root/Module/ItemDefinition/index.ts:204](https://github.com/onzag/itemize/blob/5c2808d3/base/Root/Module/ItemDefinition/index.ts#L204)
 
 ___
 
@@ -396,7 +396,7 @@ The properties represent the list of properties it has
 
 #### Defined in
 
-[base/Root/Module/ItemDefinition/index.ts:138](https://github.com/onzag/itemize/blob/f2f29986/base/Root/Module/ItemDefinition/index.ts#L138)
+[base/Root/Module/ItemDefinition/index.ts:138](https://github.com/onzag/itemize/blob/5c2808d3/base/Root/Module/ItemDefinition/index.ts#L138)
 
 ___
 
@@ -409,7 +409,7 @@ stripped after built is done
 
 #### Defined in
 
-[base/Root/Module/ItemDefinition/index.ts:118](https://github.com/onzag/itemize/blob/f2f29986/base/Root/Module/ItemDefinition/index.ts#L118)
+[base/Root/Module/ItemDefinition/index.ts:118](https://github.com/onzag/itemize/blob/5c2808d3/base/Root/Module/ItemDefinition/index.ts#L118)
 
 ___
 
@@ -421,7 +421,7 @@ Read role permissions
 
 #### Defined in
 
-[base/Root/Module/ItemDefinition/index.ts:172](https://github.com/onzag/itemize/blob/f2f29986/base/Root/Module/ItemDefinition/index.ts#L172)
+[base/Root/Module/ItemDefinition/index.ts:172](https://github.com/onzag/itemize/blob/5c2808d3/base/Root/Module/ItemDefinition/index.ts#L172)
 
 ___
 
@@ -433,7 +433,7 @@ the request limiters
 
 #### Defined in
 
-[base/Root/Module/ItemDefinition/index.ts:288](https://github.com/onzag/itemize/blob/f2f29986/base/Root/Module/ItemDefinition/index.ts#L288)
+[base/Root/Module/ItemDefinition/index.ts:288](https://github.com/onzag/itemize/blob/5c2808d3/base/Root/Module/ItemDefinition/index.ts#L288)
 
 ___
 
@@ -445,7 +445,7 @@ Permissions for search purposes
 
 #### Defined in
 
-[base/Root/Module/ItemDefinition/index.ts:168](https://github.com/onzag/itemize/blob/f2f29986/base/Root/Module/ItemDefinition/index.ts#L168)
+[base/Root/Module/ItemDefinition/index.ts:168](https://github.com/onzag/itemize/blob/5c2808d3/base/Root/Module/ItemDefinition/index.ts#L168)
 
 ___
 
@@ -458,7 +458,7 @@ and the item definition is not, the module precedes
 
 #### Defined in
 
-[base/Root/Module/ItemDefinition/index.ts:224](https://github.com/onzag/itemize/blob/f2f29986/base/Root/Module/ItemDefinition/index.ts#L224)
+[base/Root/Module/ItemDefinition/index.ts:224](https://github.com/onzag/itemize/blob/5c2808d3/base/Root/Module/ItemDefinition/index.ts#L224)
 
 ___
 
@@ -470,7 +470,7 @@ Basic type
 
 #### Defined in
 
-[base/Root/Module/ItemDefinition/index.ts:97](https://github.com/onzag/itemize/blob/f2f29986/base/Root/Module/ItemDefinition/index.ts#L97)
+[base/Root/Module/ItemDefinition/index.ts:97](https://github.com/onzag/itemize/blob/5c2808d3/base/Root/Module/ItemDefinition/index.ts#L97)
 
 ___
 
@@ -482,7 +482,7 @@ Whether the version can be a country
 
 #### Defined in
 
-[base/Root/Module/ItemDefinition/index.ts:153](https://github.com/onzag/itemize/blob/f2f29986/base/Root/Module/ItemDefinition/index.ts#L153)
+[base/Root/Module/ItemDefinition/index.ts:153](https://github.com/onzag/itemize/blob/5c2808d3/base/Root/Module/ItemDefinition/index.ts#L153)
 
 ___
 
@@ -494,7 +494,7 @@ Whether the version can be a language
 
 #### Defined in
 
-[base/Root/Module/ItemDefinition/index.ts:158](https://github.com/onzag/itemize/blob/f2f29986/base/Root/Module/ItemDefinition/index.ts#L158)
+[base/Root/Module/ItemDefinition/index.ts:158](https://github.com/onzag/itemize/blob/5c2808d3/base/Root/Module/ItemDefinition/index.ts#L158)
 
 ___
 
@@ -506,7 +506,7 @@ Whether the version can be a country language concat pair such as en-US or fi-FI
 
 #### Defined in
 
-[base/Root/Module/ItemDefinition/index.ts:148](https://github.com/onzag/itemize/blob/f2f29986/base/Root/Module/ItemDefinition/index.ts#L148)
+[base/Root/Module/ItemDefinition/index.ts:148](https://github.com/onzag/itemize/blob/5c2808d3/base/Root/Module/ItemDefinition/index.ts#L148)
 
 ___
 
@@ -518,4 +518,4 @@ The roles that are allowed to do versioning
 
 #### Defined in
 
-[base/Root/Module/ItemDefinition/index.ts:163](https://github.com/onzag/itemize/blob/f2f29986/base/Root/Module/ItemDefinition/index.ts#L163)
+[base/Root/Module/ItemDefinition/index.ts:163](https://github.com/onzag/itemize/blob/5c2808d3/base/Root/Module/ItemDefinition/index.ts#L163)

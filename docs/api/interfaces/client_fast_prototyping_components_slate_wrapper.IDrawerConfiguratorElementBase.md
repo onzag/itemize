@@ -33,7 +33,7 @@ work
 
 #### Defined in
 
-[client/fast-prototyping/components/slate/wrapper.tsx:364](https://github.com/onzag/itemize/blob/f2f29986/client/fast-prototyping/components/slate/wrapper.tsx#L364)
+[client/fast-prototyping/components/slate/wrapper.tsx:364](https://github.com/onzag/itemize/blob/5c2808d3/client/fast-prototyping/components/slate/wrapper.tsx#L364)
 
 ___
 
@@ -46,7 +46,7 @@ it is the selected one
 
 #### Defined in
 
-[client/fast-prototyping/components/slate/wrapper.tsx:351](https://github.com/onzag/itemize/blob/f2f29986/client/fast-prototyping/components/slate/wrapper.tsx#L351)
+[client/fast-prototyping/components/slate/wrapper.tsx:351](https://github.com/onzag/itemize/blob/5c2808d3/client/fast-prototyping/components/slate/wrapper.tsx#L351)
 
 ___
 
@@ -61,7 +61,7 @@ is not selectable
 
 #### Defined in
 
-[client/fast-prototyping/components/slate/wrapper.tsx:358](https://github.com/onzag/itemize/blob/f2f29986/client/fast-prototyping/components/slate/wrapper.tsx#L358)
+[client/fast-prototyping/components/slate/wrapper.tsx:358](https://github.com/onzag/itemize/blob/5c2808d3/client/fast-prototyping/components/slate/wrapper.tsx#L358)
 
 ___
 
@@ -73,7 +73,7 @@ The way for the input to be specified
 
 #### Defined in
 
-[client/fast-prototyping/components/slate/wrapper.tsx:372](https://github.com/onzag/itemize/blob/f2f29986/client/fast-prototyping/components/slate/wrapper.tsx#L372)
+[client/fast-prototyping/components/slate/wrapper.tsx:372](https://github.com/onzag/itemize/blob/5c2808d3/client/fast-prototyping/components/slate/wrapper.tsx#L372)
 
 ___
 
@@ -85,7 +85,7 @@ The ui handler in question
 
 #### Defined in
 
-[client/fast-prototyping/components/slate/wrapper.tsx:346](https://github.com/onzag/itemize/blob/f2f29986/client/fast-prototyping/components/slate/wrapper.tsx#L346)
+[client/fast-prototyping/components/slate/wrapper.tsx:346](https://github.com/onzag/itemize/blob/5c2808d3/client/fast-prototyping/components/slate/wrapper.tsx#L346)
 
 ## Methods
 
@@ -107,4 +107,4 @@ A condition that uses the args as basis on whether this would appear or not
 
 #### Defined in
 
-[client/fast-prototyping/components/slate/wrapper.tsx:368](https://github.com/onzag/itemize/blob/f2f29986/client/fast-prototyping/components/slate/wrapper.tsx#L368)
+[client/fast-prototyping/components/slate/wrapper.tsx:368](https://github.com/onzag/itemize/blob/5c2808d3/client/fast-prototyping/components/slate/wrapper.tsx#L368)

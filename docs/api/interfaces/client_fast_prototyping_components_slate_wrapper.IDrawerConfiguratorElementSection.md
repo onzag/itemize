@@ -23,7 +23,7 @@
 
 #### Defined in
 
-[client/fast-prototyping/components/slate/wrapper.tsx:384](https://github.com/onzag/itemize/blob/f2f29986/client/fast-prototyping/components/slate/wrapper.tsx#L384)
+[client/fast-prototyping/components/slate/wrapper.tsx:384](https://github.com/onzag/itemize/blob/5c2808d3/client/fast-prototyping/components/slate/wrapper.tsx#L384)
 
 ___
 
@@ -38,7 +38,7 @@ is not selectable
 
 #### Defined in
 
-[client/fast-prototyping/components/slate/wrapper.tsx:391](https://github.com/onzag/itemize/blob/f2f29986/client/fast-prototyping/components/slate/wrapper.tsx#L391)
+[client/fast-prototyping/components/slate/wrapper.tsx:391](https://github.com/onzag/itemize/blob/5c2808d3/client/fast-prototyping/components/slate/wrapper.tsx#L391)
 
 ___
 
@@ -48,7 +48,7 @@ ___
 
 #### Defined in
 
-[client/fast-prototyping/components/slate/wrapper.tsx:394](https://github.com/onzag/itemize/blob/f2f29986/client/fast-prototyping/components/slate/wrapper.tsx#L394)
+[client/fast-prototyping/components/slate/wrapper.tsx:394](https://github.com/onzag/itemize/blob/5c2808d3/client/fast-prototyping/components/slate/wrapper.tsx#L394)
 
 ___
 
@@ -58,7 +58,7 @@ ___
 
 #### Defined in
 
-[client/fast-prototyping/components/slate/wrapper.tsx:393](https://github.com/onzag/itemize/blob/f2f29986/client/fast-prototyping/components/slate/wrapper.tsx#L393)
+[client/fast-prototyping/components/slate/wrapper.tsx:393](https://github.com/onzag/itemize/blob/5c2808d3/client/fast-prototyping/components/slate/wrapper.tsx#L393)
 
 ___
 
@@ -70,7 +70,7 @@ The ui handler in question
 
 #### Defined in
 
-[client/fast-prototyping/components/slate/wrapper.tsx:383](https://github.com/onzag/itemize/blob/f2f29986/client/fast-prototyping/components/slate/wrapper.tsx#L383)
+[client/fast-prototyping/components/slate/wrapper.tsx:383](https://github.com/onzag/itemize/blob/5c2808d3/client/fast-prototyping/components/slate/wrapper.tsx#L383)
 
 ___
 
@@ -80,4 +80,4 @@ ___
 
 #### Defined in
 
-[client/fast-prototyping/components/slate/wrapper.tsx:392](https://github.com/onzag/itemize/blob/f2f29986/client/fast-prototyping/components/slate/wrapper.tsx#L392)
+[client/fast-prototyping/components/slate/wrapper.tsx:392](https://github.com/onzag/itemize/blob/5c2808d3/client/fast-prototyping/components/slate/wrapper.tsx#L392)

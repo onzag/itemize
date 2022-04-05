@@ -26,7 +26,7 @@ The sensitive openstack container information
 
 #### Defined in
 
-[server/services/openstack.ts:29](https://github.com/onzag/itemize/blob/f2f29986/server/services/openstack.ts#L29)
+[server/services/openstack.ts:29](https://github.com/onzag/itemize/blob/5c2808d3/server/services/openstack.ts#L29)
 
 ___
 
@@ -36,7 +36,7 @@ ___
 
 #### Defined in
 
-[server/services/openstack.ts:30](https://github.com/onzag/itemize/blob/f2f29986/server/services/openstack.ts#L30)
+[server/services/openstack.ts:30](https://github.com/onzag/itemize/blob/5c2808d3/server/services/openstack.ts#L30)
 
 ___
 
@@ -46,7 +46,7 @@ ___
 
 #### Defined in
 
-[server/services/openstack.ts:27](https://github.com/onzag/itemize/blob/f2f29986/server/services/openstack.ts#L27)
+[server/services/openstack.ts:27](https://github.com/onzag/itemize/blob/5c2808d3/server/services/openstack.ts#L27)
 
 ___
 
@@ -56,7 +56,7 @@ ___
 
 #### Defined in
 
-[server/services/openstack.ts:28](https://github.com/onzag/itemize/blob/f2f29986/server/services/openstack.ts#L28)
+[server/services/openstack.ts:28](https://github.com/onzag/itemize/blob/5c2808d3/server/services/openstack.ts#L28)
 
 ___
 
@@ -66,7 +66,7 @@ ___
 
 #### Defined in
 
-[server/services/openstack.ts:25](https://github.com/onzag/itemize/blob/f2f29986/server/services/openstack.ts#L25)
+[server/services/openstack.ts:25](https://github.com/onzag/itemize/blob/5c2808d3/server/services/openstack.ts#L25)
 
 ___
 
@@ -76,7 +76,7 @@ ___
 
 #### Defined in
 
-[server/services/openstack.ts:26](https://github.com/onzag/itemize/blob/f2f29986/server/services/openstack.ts#L26)
+[server/services/openstack.ts:26](https://github.com/onzag/itemize/blob/5c2808d3/server/services/openstack.ts#L26)
 
 ___
 
@@ -86,4 +86,4 @@ ___
 
 #### Defined in
 
-[server/services/openstack.ts:24](https://github.com/onzag/itemize/blob/f2f29986/server/services/openstack.ts#L24)
+[server/services/openstack.ts:24](https://github.com/onzag/itemize/blob/5c2808d3/server/services/openstack.ts#L24)

@@ -45,7 +45,7 @@ a query string url with the service worker query string parameters
 
 #### Defined in
 
-[client/components/util/index.tsx:252](https://github.com/onzag/itemize/blob/f2f29986/client/components/util/index.tsx#L252)
+[client/components/util/index.tsx:252](https://github.com/onzag/itemize/blob/5c2808d3/client/components/util/index.tsx#L252)
 
 ___
 
@@ -68,7 +68,7 @@ Gets all the available image sizes for a given file
 
 #### Defined in
 
-[client/components/util/index.tsx:170](https://github.com/onzag/itemize/blob/f2f29986/client/components/util/index.tsx#L170)
+[client/components/util/index.tsx:170](https://github.com/onzag/itemize/blob/5c2808d3/client/components/util/index.tsx#L170)
 
 ___
 
@@ -97,4 +97,4 @@ local files are supported
 
 #### Defined in
 
-[client/components/util/index.tsx:25](https://github.com/onzag/itemize/blob/f2f29986/client/components/util/index.tsx#L25)
+[client/components/util/index.tsx:25](https://github.com/onzag/itemize/blob/5c2808d3/client/components/util/index.tsx#L25)

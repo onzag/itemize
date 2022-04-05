@@ -26,4 +26,4 @@ it needs to consume such component
 
 #### Defined in
 
-[client/components/navigation/Prompt.tsx:18](https://github.com/onzag/itemize/blob/f2f29986/client/components/navigation/Prompt.tsx#L18)
+[client/components/navigation/Prompt.tsx:18](https://github.com/onzag/itemize/blob/5c2808d3/client/components/navigation/Prompt.tsx#L18)

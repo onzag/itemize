@@ -31,7 +31,7 @@ A response given by submit and delete
 
 #### Defined in
 
-[client/providers/item.tsx:172](https://github.com/onzag/itemize/blob/f2f29986/client/providers/item.tsx#L172)
+[client/providers/item.tsx:172](https://github.com/onzag/itemize/blob/5c2808d3/client/providers/item.tsx#L172)
 
 ___
 
@@ -41,7 +41,7 @@ ___
 
 #### Defined in
 
-[client/providers/item.tsx:171](https://github.com/onzag/itemize/blob/f2f29986/client/providers/item.tsx#L171)
+[client/providers/item.tsx:171](https://github.com/onzag/itemize/blob/5c2808d3/client/providers/item.tsx#L171)
 
 ___
 
@@ -55,7 +55,7 @@ ___
 
 #### Defined in
 
-[client/providers/item.tsx:152](https://github.com/onzag/itemize/blob/f2f29986/client/providers/item.tsx#L152)
+[client/providers/item.tsx:152](https://github.com/onzag/itemize/blob/5c2808d3/client/providers/item.tsx#L152)
 
 ___
 
@@ -65,7 +65,7 @@ ___
 
 #### Defined in
 
-[client/providers/item.tsx:168](https://github.com/onzag/itemize/blob/f2f29986/client/providers/item.tsx#L168)
+[client/providers/item.tsx:168](https://github.com/onzag/itemize/blob/5c2808d3/client/providers/item.tsx#L168)
 
 ___
 
@@ -75,7 +75,7 @@ ___
 
 #### Defined in
 
-[client/providers/item.tsx:170](https://github.com/onzag/itemize/blob/f2f29986/client/providers/item.tsx#L170)
+[client/providers/item.tsx:170](https://github.com/onzag/itemize/blob/5c2808d3/client/providers/item.tsx#L170)
 
 ___
 
@@ -85,4 +85,4 @@ ___
 
 #### Defined in
 
-[client/providers/item.tsx:169](https://github.com/onzag/itemize/blob/f2f29986/client/providers/item.tsx#L169)
+[client/providers/item.tsx:169](https://github.com/onzag/itemize/blob/5c2808d3/client/providers/item.tsx#L169)

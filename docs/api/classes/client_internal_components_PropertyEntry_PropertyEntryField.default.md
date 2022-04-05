@@ -72,7 +72,7 @@ React.Component&lt;
 
 #### Defined in
 
-[client/internal/components/PropertyEntry/PropertyEntryField.tsx:254](https://github.com/onzag/itemize/blob/f2f29986/client/internal/components/PropertyEntry/PropertyEntryField.tsx#L254)
+[client/internal/components/PropertyEntry/PropertyEntryField.tsx:254](https://github.com/onzag/itemize/blob/5c2808d3/client/internal/components/PropertyEntry/PropertyEntryField.tsx#L254)
 
 ## Properties
 
@@ -343,7 +343,7 @@ React.Component.componentDidMount
 
 #### Defined in
 
-[client/internal/components/PropertyEntry/PropertyEntryField.tsx:301](https://github.com/onzag/itemize/blob/f2f29986/client/internal/components/PropertyEntry/PropertyEntryField.tsx#L301)
+[client/internal/components/PropertyEntry/PropertyEntryField.tsx:301](https://github.com/onzag/itemize/blob/5c2808d3/client/internal/components/PropertyEntry/PropertyEntryField.tsx#L301)
 
 ___
 
@@ -367,7 +367,7 @@ React.Component.componentDidUpdate
 
 #### Defined in
 
-[client/internal/components/PropertyEntry/PropertyEntryField.tsx:317](https://github.com/onzag/itemize/blob/f2f29986/client/internal/components/PropertyEntry/PropertyEntryField.tsx#L317)
+[client/internal/components/PropertyEntry/PropertyEntryField.tsx:317](https://github.com/onzag/itemize/blob/5c2808d3/client/internal/components/PropertyEntry/PropertyEntryField.tsx#L317)
 
 ___
 
@@ -511,7 +511,7 @@ ___
 
 #### Defined in
 
-[client/internal/components/PropertyEntry/PropertyEntryField.tsx:386](https://github.com/onzag/itemize/blob/f2f29986/client/internal/components/PropertyEntry/PropertyEntryField.tsx#L386)
+[client/internal/components/PropertyEntry/PropertyEntryField.tsx:386](https://github.com/onzag/itemize/blob/5c2808d3/client/internal/components/PropertyEntry/PropertyEntryField.tsx#L386)
 
 ___
 
@@ -554,7 +554,7 @@ according to what we have selected in our localization options
 
 #### Defined in
 
-[client/internal/components/PropertyEntry/PropertyEntryField.tsx:509](https://github.com/onzag/itemize/blob/f2f29986/client/internal/components/PropertyEntry/PropertyEntryField.tsx#L509)
+[client/internal/components/PropertyEntry/PropertyEntryField.tsx:509](https://github.com/onzag/itemize/blob/5c2808d3/client/internal/components/PropertyEntry/PropertyEntryField.tsx#L509)
 
 ___
 
@@ -574,7 +574,7 @@ an array where, 0 is currentUnit by state, 1 is the standard metric unit code to
 
 #### Defined in
 
-[client/internal/components/PropertyEntry/PropertyEntryField.tsx:480](https://github.com/onzag/itemize/blob/f2f29986/client/internal/components/PropertyEntry/PropertyEntryField.tsx#L480)
+[client/internal/components/PropertyEntry/PropertyEntryField.tsx:480](https://github.com/onzag/itemize/blob/5c2808d3/client/internal/components/PropertyEntry/PropertyEntryField.tsx#L480)
 
 ___
 
@@ -629,7 +629,7 @@ it is, and controls the internal value based on that
 
 #### Defined in
 
-[client/internal/components/PropertyEntry/PropertyEntryField.tsx:525](https://github.com/onzag/itemize/blob/f2f29986/client/internal/components/PropertyEntry/PropertyEntryField.tsx#L525)
+[client/internal/components/PropertyEntry/PropertyEntryField.tsx:525](https://github.com/onzag/itemize/blob/5c2808d3/client/internal/components/PropertyEntry/PropertyEntryField.tsx#L525)
 
 ___
 
@@ -651,7 +651,7 @@ Change the currency code
 
 #### Defined in
 
-[client/internal/components/PropertyEntry/PropertyEntryField.tsx:439](https://github.com/onzag/itemize/blob/f2f29986/client/internal/components/PropertyEntry/PropertyEntryField.tsx#L439)
+[client/internal/components/PropertyEntry/PropertyEntryField.tsx:439](https://github.com/onzag/itemize/blob/5c2808d3/client/internal/components/PropertyEntry/PropertyEntryField.tsx#L439)
 
 ___
 
@@ -673,7 +673,7 @@ Changes the unit to a new unit
 
 #### Defined in
 
-[client/internal/components/PropertyEntry/PropertyEntryField.tsx:396](https://github.com/onzag/itemize/blob/f2f29986/client/internal/components/PropertyEntry/PropertyEntryField.tsx#L396)
+[client/internal/components/PropertyEntry/PropertyEntryField.tsx:396](https://github.com/onzag/itemize/blob/5c2808d3/client/internal/components/PropertyEntry/PropertyEntryField.tsx#L396)
 
 ___
 
@@ -691,7 +691,7 @@ React.Component.render
 
 #### Defined in
 
-[client/internal/components/PropertyEntry/PropertyEntryField.tsx:683](https://github.com/onzag/itemize/blob/f2f29986/client/internal/components/PropertyEntry/PropertyEntryField.tsx#L683)
+[client/internal/components/PropertyEntry/PropertyEntryField.tsx:683](https://github.com/onzag/itemize/blob/5c2808d3/client/internal/components/PropertyEntry/PropertyEntryField.tsx#L683)
 
 ___
 
@@ -747,7 +747,7 @@ React.Component.shouldComponentUpdate
 
 #### Defined in
 
-[client/internal/components/PropertyEntry/PropertyEntryField.tsx:361](https://github.com/onzag/itemize/blob/f2f29986/client/internal/components/PropertyEntry/PropertyEntryField.tsx#L361)
+[client/internal/components/PropertyEntry/PropertyEntryField.tsx:361](https://github.com/onzag/itemize/blob/5c2808d3/client/internal/components/PropertyEntry/PropertyEntryField.tsx#L361)
 
 ___
 
@@ -772,4 +772,4 @@ a react element
 
 #### Defined in
 
-[client/internal/components/PropertyEntry/PropertyEntryField.tsx:278](https://github.com/onzag/itemize/blob/f2f29986/client/internal/components/PropertyEntry/PropertyEntryField.tsx#L278)
+[client/internal/components/PropertyEntry/PropertyEntryField.tsx:278](https://github.com/onzag/itemize/blob/5c2808d3/client/internal/components/PropertyEntry/PropertyEntryField.tsx#L278)

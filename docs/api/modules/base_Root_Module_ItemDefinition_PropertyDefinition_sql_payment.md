@@ -42,7 +42,7 @@ a partial row definition
 
 #### Defined in
 
-[base/Root/Module/ItemDefinition/PropertyDefinition/sql/payment.ts:29](https://github.com/onzag/itemize/blob/f2f29986/base/Root/Module/ItemDefinition/PropertyDefinition/sql/payment.ts#L29)
+[base/Root/Module/ItemDefinition/PropertyDefinition/sql/payment.ts:29](https://github.com/onzag/itemize/blob/5c2808d3/base/Root/Module/ItemDefinition/PropertyDefinition/sql/payment.ts#L29)
 
 ___
 
@@ -66,7 +66,7 @@ the columns to index
 
 #### Defined in
 
-[base/Root/Module/ItemDefinition/PropertyDefinition/sql/payment.ts:187](https://github.com/onzag/itemize/blob/f2f29986/base/Root/Module/ItemDefinition/PropertyDefinition/sql/payment.ts#L187)
+[base/Root/Module/ItemDefinition/PropertyDefinition/sql/payment.ts:187](https://github.com/onzag/itemize/blob/5c2808d3/base/Root/Module/ItemDefinition/PropertyDefinition/sql/payment.ts#L187)
 
 ___
 
@@ -88,7 +88,7 @@ How to consider equality with a value
 
 #### Defined in
 
-[base/Root/Module/ItemDefinition/PropertyDefinition/sql/payment.ts:196](https://github.com/onzag/itemize/blob/f2f29986/base/Root/Module/ItemDefinition/PropertyDefinition/sql/payment.ts#L196)
+[base/Root/Module/ItemDefinition/PropertyDefinition/sql/payment.ts:196](https://github.com/onzag/itemize/blob/5c2808d3/base/Root/Module/ItemDefinition/PropertyDefinition/sql/payment.ts#L196)
 
 ___
 
@@ -112,7 +112,7 @@ by the provider
 
 #### Defined in
 
-[base/Root/Module/ItemDefinition/PropertyDefinition/sql/payment.ts:62](https://github.com/onzag/itemize/blob/f2f29986/base/Root/Module/ItemDefinition/PropertyDefinition/sql/payment.ts#L62)
+[base/Root/Module/ItemDefinition/PropertyDefinition/sql/payment.ts:62](https://github.com/onzag/itemize/blob/5c2808d3/base/Root/Module/ItemDefinition/PropertyDefinition/sql/payment.ts#L62)
 
 ___
 
@@ -136,7 +136,7 @@ a partial row
 
 #### Defined in
 
-[base/Root/Module/ItemDefinition/PropertyDefinition/sql/payment.ts:71](https://github.com/onzag/itemize/blob/f2f29986/base/Root/Module/ItemDefinition/PropertyDefinition/sql/payment.ts#L71)
+[base/Root/Module/ItemDefinition/PropertyDefinition/sql/payment.ts:71](https://github.com/onzag/itemize/blob/5c2808d3/base/Root/Module/ItemDefinition/PropertyDefinition/sql/payment.ts#L71)
 
 ___
 
@@ -160,7 +160,7 @@ a property definition supported payment type (or null)
 
 #### Defined in
 
-[base/Root/Module/ItemDefinition/PropertyDefinition/sql/payment.ts:101](https://github.com/onzag/itemize/blob/f2f29986/base/Root/Module/ItemDefinition/PropertyDefinition/sql/payment.ts#L101)
+[base/Root/Module/ItemDefinition/PropertyDefinition/sql/payment.ts:101](https://github.com/onzag/itemize/blob/5c2808d3/base/Root/Module/ItemDefinition/PropertyDefinition/sql/payment.ts#L101)
 
 ___
 
@@ -184,7 +184,7 @@ graphql does things to it, and this will trigger what is necessary to  it
 
 #### Defined in
 
-[base/Root/Module/ItemDefinition/PropertyDefinition/sql/payment.ts:313](https://github.com/onzag/itemize/blob/f2f29986/base/Root/Module/ItemDefinition/PropertyDefinition/sql/payment.ts#L313)
+[base/Root/Module/ItemDefinition/PropertyDefinition/sql/payment.ts:313](https://github.com/onzag/itemize/blob/5c2808d3/base/Root/Module/ItemDefinition/PropertyDefinition/sql/payment.ts#L313)
 
 ___
 
@@ -208,7 +208,7 @@ a boolean
 
 #### Defined in
 
-[base/Root/Module/ItemDefinition/PropertyDefinition/sql/payment.ts:211](https://github.com/onzag/itemize/blob/f2f29986/base/Root/Module/ItemDefinition/PropertyDefinition/sql/payment.ts#L211)
+[base/Root/Module/ItemDefinition/PropertyDefinition/sql/payment.ts:211](https://github.com/onzag/itemize/blob/5c2808d3/base/Root/Module/ItemDefinition/PropertyDefinition/sql/payment.ts#L211)
 
 ___
 
@@ -232,7 +232,7 @@ a boolean on whether it's searched by it or not
 
 #### Defined in
 
-[base/Root/Module/ItemDefinition/PropertyDefinition/sql/payment.ts:127](https://github.com/onzag/itemize/blob/f2f29986/base/Root/Module/ItemDefinition/PropertyDefinition/sql/payment.ts#L127)
+[base/Root/Module/ItemDefinition/PropertyDefinition/sql/payment.ts:127](https://github.com/onzag/itemize/blob/5c2808d3/base/Root/Module/ItemDefinition/PropertyDefinition/sql/payment.ts#L127)
 
 ___
 
@@ -254,7 +254,7 @@ The selection for the payment in searches
 
 #### Defined in
 
-[base/Root/Module/ItemDefinition/PropertyDefinition/sql/payment.ts:45](https://github.com/onzag/itemize/blob/f2f29986/base/Root/Module/ItemDefinition/PropertyDefinition/sql/payment.ts#L45)
+[base/Root/Module/ItemDefinition/PropertyDefinition/sql/payment.ts:45](https://github.com/onzag/itemize/blob/5c2808d3/base/Root/Module/ItemDefinition/PropertyDefinition/sql/payment.ts#L45)
 
 ___
 
@@ -278,4 +278,4 @@ graphql does things to it, and this will trigger what is necessary to  it
 
 #### Defined in
 
-[base/Root/Module/ItemDefinition/PropertyDefinition/sql/payment.ts:224](https://github.com/onzag/itemize/blob/f2f29986/base/Root/Module/ItemDefinition/PropertyDefinition/sql/payment.ts#L224)
+[base/Root/Module/ItemDefinition/PropertyDefinition/sql/payment.ts:224](https://github.com/onzag/itemize/blob/5c2808d3/base/Root/Module/ItemDefinition/PropertyDefinition/sql/payment.ts#L224)

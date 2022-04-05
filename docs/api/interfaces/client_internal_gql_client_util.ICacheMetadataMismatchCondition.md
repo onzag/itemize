@@ -21,7 +21,7 @@
 
 #### Defined in
 
-[client/internal/gql-client-util.ts:45](https://github.com/onzag/itemize/blob/f2f29986/client/internal/gql-client-util.ts#L45)
+[client/internal/gql-client-util.ts:45](https://github.com/onzag/itemize/blob/5c2808d3/client/internal/gql-client-util.ts#L45)
 
 ___
 
@@ -31,7 +31,7 @@ ___
 
 #### Defined in
 
-[client/internal/gql-client-util.ts:46](https://github.com/onzag/itemize/blob/f2f29986/client/internal/gql-client-util.ts#L46)
+[client/internal/gql-client-util.ts:46](https://github.com/onzag/itemize/blob/5c2808d3/client/internal/gql-client-util.ts#L46)
 
 ___
 
@@ -41,7 +41,7 @@ ___
 
 #### Defined in
 
-[client/internal/gql-client-util.ts:47](https://github.com/onzag/itemize/blob/f2f29986/client/internal/gql-client-util.ts#L47)
+[client/internal/gql-client-util.ts:47](https://github.com/onzag/itemize/blob/5c2808d3/client/internal/gql-client-util.ts#L47)
 
 ___
 
@@ -51,4 +51,4 @@ ___
 
 #### Defined in
 
-[client/internal/gql-client-util.ts:48](https://github.com/onzag/itemize/blob/f2f29986/client/internal/gql-client-util.ts#L48)
+[client/internal/gql-client-util.ts:48](https://github.com/onzag/itemize/blob/5c2808d3/client/internal/gql-client-util.ts#L48)

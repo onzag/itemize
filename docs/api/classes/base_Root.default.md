@@ -61,7 +61,7 @@ Builds a root from raw data
 
 #### Defined in
 
-[base/Root/index.ts:247](https://github.com/onzag/itemize/blob/f2f29986/base/Root/index.ts#L247)
+[base/Root/index.ts:247](https://github.com/onzag/itemize/blob/5c2808d3/base/Root/index.ts#L247)
 
 ## Properties
 
@@ -75,7 +75,7 @@ The child modules
 
 #### Defined in
 
-[base/Root/index.ts:202](https://github.com/onzag/itemize/blob/f2f29986/base/Root/index.ts#L202)
+[base/Root/index.ts:202](https://github.com/onzag/itemize/blob/5c2808d3/base/Root/index.ts#L202)
 
 ___
 
@@ -89,7 +89,7 @@ The raw data this root was generated from
 
 #### Defined in
 
-[base/Root/index.ts:171](https://github.com/onzag/itemize/blob/f2f29986/base/Root/index.ts#L171)
+[base/Root/index.ts:171](https://github.com/onzag/itemize/blob/5c2808d3/base/Root/index.ts#L171)
 
 ___
 
@@ -123,7 +123,7 @@ The registry is a quick utility that can be used to access these values
 
 #### Defined in
 
-[base/Root/index.ts:194](https://github.com/onzag/itemize/blob/f2f29986/base/Root/index.ts#L194)
+[base/Root/index.ts:194](https://github.com/onzag/itemize/blob/5c2808d3/base/Root/index.ts#L194)
 
 ___
 
@@ -139,7 +139,7 @@ by the beforeSSRRender functionality
 
 #### Defined in
 
-[base/Root/index.ts:217](https://github.com/onzag/itemize/blob/f2f29986/base/Root/index.ts#L217)
+[base/Root/index.ts:217](https://github.com/onzag/itemize/blob/5c2808d3/base/Root/index.ts#L217)
 
 ___
 
@@ -155,7 +155,7 @@ by the beforeSSRRender functionality
 
 #### Defined in
 
-[base/Root/index.ts:233](https://github.com/onzag/itemize/blob/f2f29986/base/Root/index.ts#L233)
+[base/Root/index.ts:233](https://github.com/onzag/itemize/blob/5c2808d3/base/Root/index.ts#L233)
 
 ___
 
@@ -171,7 +171,7 @@ by the beforeSSRRender functionality
 
 #### Defined in
 
-[base/Root/index.ts:225](https://github.com/onzag/itemize/blob/f2f29986/base/Root/index.ts#L225)
+[base/Root/index.ts:225](https://github.com/onzag/itemize/blob/5c2808d3/base/Root/index.ts#L225)
 
 ___
 
@@ -185,7 +185,7 @@ in the root about execution
 
 #### Defined in
 
-[base/Root/index.ts:209](https://github.com/onzag/itemize/blob/f2f29986/base/Root/index.ts#L209)
+[base/Root/index.ts:209](https://github.com/onzag/itemize/blob/5c2808d3/base/Root/index.ts#L209)
 
 ___
 
@@ -201,7 +201,7 @@ conditional rule set about what it should evaluate
 
 #### Defined in
 
-[base/Root/index.ts:241](https://github.com/onzag/itemize/blob/f2f29986/base/Root/index.ts#L241)
+[base/Root/index.ts:241](https://github.com/onzag/itemize/blob/5c2808d3/base/Root/index.ts#L241)
 
 ## Methods
 
@@ -229,7 +229,7 @@ root
 
 #### Defined in
 
-[base/Root/index.ts:348](https://github.com/onzag/itemize/blob/f2f29986/base/Root/index.ts#L348)
+[base/Root/index.ts:348](https://github.com/onzag/itemize/blob/5c2808d3/base/Root/index.ts#L348)
 
 ___
 
@@ -254,7 +254,7 @@ Calls the request manager to request for a given resource
 
 #### Defined in
 
-[base/Root/index.ts:358](https://github.com/onzag/itemize/blob/f2f29986/base/Root/index.ts#L358)
+[base/Root/index.ts:358](https://github.com/onzag/itemize/blob/5c2808d3/base/Root/index.ts#L358)
 
 ___
 
@@ -283,7 +283,7 @@ root
 
 #### Defined in
 
-[base/Root/index.ts:335](https://github.com/onzag/itemize/blob/f2f29986/base/Root/index.ts#L335)
+[base/Root/index.ts:335](https://github.com/onzag/itemize/blob/5c2808d3/base/Root/index.ts#L335)
 
 ___
 
@@ -303,7 +303,7 @@ the root to a clean pristine state
 
 #### Defined in
 
-[base/Root/index.ts:265](https://github.com/onzag/itemize/blob/f2f29986/base/Root/index.ts#L265)
+[base/Root/index.ts:265](https://github.com/onzag/itemize/blob/5c2808d3/base/Root/index.ts#L265)
 
 ___
 
@@ -331,7 +331,7 @@ an array of Module
 
 #### Defined in
 
-[base/Root/index.ts:393](https://github.com/onzag/itemize/blob/f2f29986/base/Root/index.ts#L393)
+[base/Root/index.ts:393](https://github.com/onzag/itemize/blob/5c2808d3/base/Root/index.ts#L393)
 
 ___
 
@@ -367,7 +367,7 @@ the whole i18n data object
 
 #### Defined in
 
-[base/Root/index.ts:492](https://github.com/onzag/itemize/blob/f2f29986/base/Root/index.ts#L492)
+[base/Root/index.ts:492](https://github.com/onzag/itemize/blob/5c2808d3/base/Root/index.ts#L492)
 
 ___
 
@@ -406,7 +406,7 @@ an object or null (if locale does not exist)
 
 #### Defined in
 
-[base/Root/index.ts:517](https://github.com/onzag/itemize/blob/f2f29986/base/Root/index.ts#L517)
+[base/Root/index.ts:517](https://github.com/onzag/itemize/blob/5c2808d3/base/Root/index.ts#L517)
 
 ___
 
@@ -451,7 +451,7 @@ an specific module
 
 #### Defined in
 
-[base/Root/index.ts:424](https://github.com/onzag/itemize/blob/f2f29986/base/Root/index.ts#L424)
+[base/Root/index.ts:424](https://github.com/onzag/itemize/blob/5c2808d3/base/Root/index.ts#L424)
 
 ___
 
@@ -473,7 +473,7 @@ an array of string that represents the server flags
 
 #### Defined in
 
-[base/Root/index.ts:544](https://github.com/onzag/itemize/blob/f2f29986/base/Root/index.ts#L544)
+[base/Root/index.ts:544](https://github.com/onzag/itemize/blob/5c2808d3/base/Root/index.ts#L544)
 
 ___
 
@@ -500,7 +500,7 @@ the previously stored value or null
 
 #### Defined in
 
-[base/Root/index.ts:291](https://github.com/onzag/itemize/blob/f2f29986/base/Root/index.ts#L291)
+[base/Root/index.ts:291](https://github.com/onzag/itemize/blob/5c2808d3/base/Root/index.ts#L291)
 
 ___
 
@@ -525,7 +525,7 @@ an array of string with the module names
 
 #### Defined in
 
-[base/Root/index.ts:374](https://github.com/onzag/itemize/blob/f2f29986/base/Root/index.ts#L374)
+[base/Root/index.ts:374](https://github.com/onzag/itemize/blob/5c2808d3/base/Root/index.ts#L374)
 
 ___
 
@@ -554,7 +554,7 @@ are trying to fetch as that's the only important bit
 
 #### Defined in
 
-[base/Root/index.ts:456](https://github.com/onzag/itemize/blob/f2f29986/base/Root/index.ts#L456)
+[base/Root/index.ts:456](https://github.com/onzag/itemize/blob/5c2808d3/base/Root/index.ts#L456)
 
 ___
 
@@ -580,7 +580,7 @@ definitions in id and version
 
 #### Defined in
 
-[base/Root/index.ts:313](https://github.com/onzag/itemize/blob/f2f29986/base/Root/index.ts#L313)
+[base/Root/index.ts:313](https://github.com/onzag/itemize/blob/5c2808d3/base/Root/index.ts#L313)
 
 ___
 
@@ -605,7 +605,7 @@ during the SSR renders
 
 #### Defined in
 
-[base/Root/index.ts:323](https://github.com/onzag/itemize/blob/f2f29986/base/Root/index.ts#L323)
+[base/Root/index.ts:323](https://github.com/onzag/itemize/blob/5c2808d3/base/Root/index.ts#L323)
 
 ___
 
@@ -631,7 +631,7 @@ definitions in id and version
 
 #### Defined in
 
-[base/Root/index.ts:302](https://github.com/onzag/itemize/blob/f2f29986/base/Root/index.ts#L302)
+[base/Root/index.ts:302](https://github.com/onzag/itemize/blob/5c2808d3/base/Root/index.ts#L302)
 
 ___
 
@@ -659,7 +659,7 @@ during a specific action
 
 #### Defined in
 
-[base/Root/index.ts:531](https://github.com/onzag/itemize/blob/f2f29986/base/Root/index.ts#L531)
+[base/Root/index.ts:531](https://github.com/onzag/itemize/blob/5c2808d3/base/Root/index.ts#L531)
 
 ___
 
@@ -686,7 +686,7 @@ during the SSR functionality, keys such as title, ogTitle etc...
 
 #### Defined in
 
-[base/Root/index.ts:280](https://github.com/onzag/itemize/blob/f2f29986/base/Root/index.ts#L280)
+[base/Root/index.ts:280](https://github.com/onzag/itemize/blob/5c2808d3/base/Root/index.ts#L280)
 
 ___
 
@@ -715,4 +715,4 @@ a raw module or null
 
 #### Defined in
 
-[base/Root/index.ts:131](https://github.com/onzag/itemize/blob/f2f29986/base/Root/index.ts#L131)
+[base/Root/index.ts:131](https://github.com/onzag/itemize/blob/5c2808d3/base/Root/index.ts#L131)

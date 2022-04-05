@@ -68,7 +68,7 @@ React.Component&lt;IPropertyEntrySelectRendererProps\&gt;.constructor
 
 #### Defined in
 
-[client/fast-prototyping/renderers/PropertyEntry/PropertyEntrySelect.tsx:118](https://github.com/onzag/itemize/blob/f2f29986/client/fast-prototyping/renderers/PropertyEntry/PropertyEntrySelect.tsx#L118)
+[client/fast-prototyping/renderers/PropertyEntry/PropertyEntrySelect.tsx:118](https://github.com/onzag/itemize/blob/5c2808d3/client/fast-prototyping/renderers/PropertyEntry/PropertyEntrySelect.tsx#L118)
 
 ## Properties
 
@@ -577,7 +577,7 @@ ___
 
 #### Defined in
 
-[client/fast-prototyping/renderers/PropertyEntry/PropertyEntrySelect.tsx:124](https://github.com/onzag/itemize/blob/f2f29986/client/fast-prototyping/renderers/PropertyEntry/PropertyEntrySelect.tsx#L124)
+[client/fast-prototyping/renderers/PropertyEntry/PropertyEntrySelect.tsx:124](https://github.com/onzag/itemize/blob/5c2808d3/client/fast-prototyping/renderers/PropertyEntry/PropertyEntrySelect.tsx#L124)
 
 ___
 
@@ -595,7 +595,7 @@ React.Component.render
 
 #### Defined in
 
-[client/fast-prototyping/renderers/PropertyEntry/PropertyEntrySelect.tsx:149](https://github.com/onzag/itemize/blob/f2f29986/client/fast-prototyping/renderers/PropertyEntry/PropertyEntrySelect.tsx#L149)
+[client/fast-prototyping/renderers/PropertyEntry/PropertyEntrySelect.tsx:149](https://github.com/onzag/itemize/blob/5c2808d3/client/fast-prototyping/renderers/PropertyEntry/PropertyEntrySelect.tsx#L149)
 
 ___
 

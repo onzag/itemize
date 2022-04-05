@@ -46,7 +46,7 @@ database for the itemize project should be described
 
 #### Defined in
 
-[base/Root/sql.ts:111](https://github.com/onzag/itemize/blob/f2f29986/base/Root/sql.ts#L111)
+[base/Root/sql.ts:111](https://github.com/onzag/itemize/blob/5c2808d3/base/Root/sql.ts#L111)
 
 ## Functions
 
@@ -72,4 +72,4 @@ a total database schema
 
 #### Defined in
 
-[base/Root/sql.ts:128](https://github.com/onzag/itemize/blob/f2f29986/base/Root/sql.ts#L128)
+[base/Root/sql.ts:128](https://github.com/onzag/itemize/blob/5c2808d3/base/Root/sql.ts#L128)

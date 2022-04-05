@@ -24,7 +24,7 @@ For currency, unit and number
 
 #### Defined in
 
-[client/internal/components/PropertyEntry/PropertyEntryField.tsx:24](https://github.com/onzag/itemize/blob/f2f29986/client/internal/components/PropertyEntry/PropertyEntryField.tsx#L24)
+[client/internal/components/PropertyEntry/PropertyEntryField.tsx:24](https://github.com/onzag/itemize/blob/5c2808d3/client/internal/components/PropertyEntry/PropertyEntryField.tsx#L24)
 
 ___
 
@@ -36,7 +36,7 @@ For year, integer
 
 #### Defined in
 
-[client/internal/components/PropertyEntry/PropertyEntryField.tsx:28](https://github.com/onzag/itemize/blob/f2f29986/client/internal/components/PropertyEntry/PropertyEntryField.tsx#L28)
+[client/internal/components/PropertyEntry/PropertyEntryField.tsx:28](https://github.com/onzag/itemize/blob/5c2808d3/client/internal/components/PropertyEntry/PropertyEntryField.tsx#L28)
 
 ___
 
@@ -48,4 +48,4 @@ Not a number, for textual types
 
 #### Defined in
 
-[client/internal/components/PropertyEntry/PropertyEntryField.tsx:32](https://github.com/onzag/itemize/blob/f2f29986/client/internal/components/PropertyEntry/PropertyEntryField.tsx#L32)
+[client/internal/components/PropertyEntry/PropertyEntryField.tsx:32](https://github.com/onzag/itemize/blob/5c2808d3/client/internal/components/PropertyEntry/PropertyEntryField.tsx#L32)

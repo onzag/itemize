@@ -55,7 +55,7 @@ by the graphql resolver
 
 #### Defined in
 
-[server/resolvers/basic.ts:517](https://github.com/onzag/itemize/blob/f2f29986/server/resolvers/basic.ts#L517)
+[server/resolvers/basic.ts:517](https://github.com/onzag/itemize/blob/5c2808d3/server/resolvers/basic.ts#L517)
 
 ___
 
@@ -80,7 +80,7 @@ defintion allows
 
 #### Defined in
 
-[server/resolvers/basic.ts:469](https://github.com/onzag/itemize/blob/f2f29986/server/resolvers/basic.ts#L469)
+[server/resolvers/basic.ts:469](https://github.com/onzag/itemize/blob/5c2808d3/server/resolvers/basic.ts#L469)
 
 ___
 
@@ -101,7 +101,7 @@ ___
 
 #### Defined in
 
-[server/resolvers/basic.ts:317](https://github.com/onzag/itemize/blob/f2f29986/server/resolvers/basic.ts#L317)
+[server/resolvers/basic.ts:317](https://github.com/onzag/itemize/blob/5c2808d3/server/resolvers/basic.ts#L317)
 
 ___
 
@@ -122,7 +122,7 @@ ___
 
 #### Defined in
 
-[server/resolvers/basic.ts:483](https://github.com/onzag/itemize/blob/f2f29986/server/resolvers/basic.ts#L483)
+[server/resolvers/basic.ts:483](https://github.com/onzag/itemize/blob/5c2808d3/server/resolvers/basic.ts#L483)
 
 ___
 
@@ -146,7 +146,7 @@ this function checks and throws an error if there's such a thing
 
 #### Defined in
 
-[server/resolvers/basic.ts:962](https://github.com/onzag/itemize/blob/f2f29986/server/resolvers/basic.ts#L962)
+[server/resolvers/basic.ts:962](https://github.com/onzag/itemize/blob/5c2808d3/server/resolvers/basic.ts#L962)
 
 ___
 
@@ -171,7 +171,7 @@ as it was requested
 
 #### Defined in
 
-[server/resolvers/basic.ts:548](https://github.com/onzag/itemize/blob/f2f29986/server/resolvers/basic.ts#L548)
+[server/resolvers/basic.ts:548](https://github.com/onzag/itemize/blob/5c2808d3/server/resolvers/basic.ts#L548)
 
 ___
 
@@ -192,7 +192,7 @@ ___
 
 #### Defined in
 
-[server/resolvers/basic.ts:666](https://github.com/onzag/itemize/blob/f2f29986/server/resolvers/basic.ts#L666)
+[server/resolvers/basic.ts:666](https://github.com/onzag/itemize/blob/5c2808d3/server/resolvers/basic.ts#L666)
 
 ___
 
@@ -213,7 +213,7 @@ ___
 
 #### Defined in
 
-[server/resolvers/basic.ts:50](https://github.com/onzag/itemize/blob/f2f29986/server/resolvers/basic.ts#L50)
+[server/resolvers/basic.ts:50](https://github.com/onzag/itemize/blob/5c2808d3/server/resolvers/basic.ts#L50)
 
 ___
 
@@ -234,7 +234,7 @@ ___
 
 #### Defined in
 
-[server/resolvers/basic.ts:61](https://github.com/onzag/itemize/blob/f2f29986/server/resolvers/basic.ts#L61)
+[server/resolvers/basic.ts:61](https://github.com/onzag/itemize/blob/5c2808d3/server/resolvers/basic.ts#L61)
 
 ___
 
@@ -248,7 +248,7 @@ ___
 
 #### Defined in
 
-[server/resolvers/basic.ts:57](https://github.com/onzag/itemize/blob/f2f29986/server/resolvers/basic.ts#L57)
+[server/resolvers/basic.ts:57](https://github.com/onzag/itemize/blob/5c2808d3/server/resolvers/basic.ts#L57)
 
 ___
 
@@ -281,7 +281,7 @@ the form comes with the DATA and the externalized fields
 
 #### Defined in
 
-[server/resolvers/basic.ts:711](https://github.com/onzag/itemize/blob/f2f29986/server/resolvers/basic.ts#L711)
+[server/resolvers/basic.ts:711](https://github.com/onzag/itemize/blob/5c2808d3/server/resolvers/basic.ts#L711)
 
 ___
 
@@ -305,7 +305,7 @@ and the language of choice
 
 #### Defined in
 
-[server/resolvers/basic.ts:580](https://github.com/onzag/itemize/blob/f2f29986/server/resolvers/basic.ts#L580)
+[server/resolvers/basic.ts:580](https://github.com/onzag/itemize/blob/5c2808d3/server/resolvers/basic.ts#L580)
 
 ___
 
@@ -325,7 +325,7 @@ ___
 
 #### Defined in
 
-[server/resolvers/basic.ts:302](https://github.com/onzag/itemize/blob/f2f29986/server/resolvers/basic.ts#L302)
+[server/resolvers/basic.ts:302](https://github.com/onzag/itemize/blob/5c2808d3/server/resolvers/basic.ts#L302)
 
 ___
 
@@ -361,7 +361,7 @@ Runs a policy check on the requested information
 
 #### Defined in
 
-[server/resolvers/basic.ts:1039](https://github.com/onzag/itemize/blob/f2f29986/server/resolvers/basic.ts#L1039)
+[server/resolvers/basic.ts:1039](https://github.com/onzag/itemize/blob/5c2808d3/server/resolvers/basic.ts#L1039)
 
 ___
 
@@ -392,7 +392,7 @@ you should run itemDefinition.applyValue(gqlArgValue);
 
 #### Defined in
 
-[server/resolvers/basic.ts:811](https://github.com/onzag/itemize/blob/f2f29986/server/resolvers/basic.ts#L811)
+[server/resolvers/basic.ts:811](https://github.com/onzag/itemize/blob/5c2808d3/server/resolvers/basic.ts#L811)
 
 ___
 
@@ -417,7 +417,7 @@ that are used within the query
 
 #### Defined in
 
-[server/resolvers/basic.ts:993](https://github.com/onzag/itemize/blob/f2f29986/server/resolvers/basic.ts#L993)
+[server/resolvers/basic.ts:993](https://github.com/onzag/itemize/blob/5c2808d3/server/resolvers/basic.ts#L993)
 
 ___
 
@@ -441,7 +441,7 @@ to store data in
 
 #### Defined in
 
-[server/resolvers/basic.ts:594](https://github.com/onzag/itemize/blob/f2f29986/server/resolvers/basic.ts#L594)
+[server/resolvers/basic.ts:594](https://github.com/onzag/itemize/blob/5c2808d3/server/resolvers/basic.ts#L594)
 
 ___
 
@@ -461,7 +461,7 @@ ___
 
 #### Defined in
 
-[server/resolvers/basic.ts:73](https://github.com/onzag/itemize/blob/f2f29986/server/resolvers/basic.ts#L73)
+[server/resolvers/basic.ts:73](https://github.com/onzag/itemize/blob/5c2808d3/server/resolvers/basic.ts#L73)
 
 ___
 
@@ -493,7 +493,7 @@ in question that wants to be created
 
 #### Defined in
 
-[server/resolvers/basic.ts:139](https://github.com/onzag/itemize/blob/f2f29986/server/resolvers/basic.ts#L139)
+[server/resolvers/basic.ts:139](https://github.com/onzag/itemize/blob/5c2808d3/server/resolvers/basic.ts#L139)
 
 ___
 
@@ -517,7 +517,7 @@ for use in the system
 
 #### Defined in
 
-[server/resolvers/basic.ts:87](https://github.com/onzag/itemize/blob/f2f29986/server/resolvers/basic.ts#L87)
+[server/resolvers/basic.ts:87](https://github.com/onzag/itemize/blob/5c2808d3/server/resolvers/basic.ts#L87)
 
 ___
 
@@ -541,4 +541,4 @@ by the rules of the session id, user is removed, or invalid credentials
 
 #### Defined in
 
-[server/resolvers/basic.ts:617](https://github.com/onzag/itemize/blob/f2f29986/server/resolvers/basic.ts#L617)
+[server/resolvers/basic.ts:617](https://github.com/onzag/itemize/blob/5c2808d3/server/resolvers/basic.ts#L617)

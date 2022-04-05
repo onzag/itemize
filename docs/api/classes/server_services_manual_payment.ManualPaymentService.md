@@ -102,7 +102,7 @@ This is basically what you use for cash only services
 
 #### Defined in
 
-[server/services/index.ts:58](https://github.com/onzag/itemize/blob/f2f29986/server/services/index.ts#L58)
+[server/services/index.ts:58](https://github.com/onzag/itemize/blob/5c2808d3/server/services/index.ts#L58)
 
 ## Properties
 
@@ -116,7 +116,7 @@ This is basically what you use for cash only services
 
 #### Defined in
 
-[server/services/index.ts:37](https://github.com/onzag/itemize/blob/f2f29986/server/services/index.ts#L37)
+[server/services/index.ts:37](https://github.com/onzag/itemize/blob/5c2808d3/server/services/index.ts#L37)
 
 ___
 
@@ -130,7 +130,7 @@ ___
 
 #### Defined in
 
-[server/services/index.ts:38](https://github.com/onzag/itemize/blob/f2f29986/server/services/index.ts#L38)
+[server/services/index.ts:38](https://github.com/onzag/itemize/blob/5c2808d3/server/services/index.ts#L38)
 
 ___
 
@@ -144,7 +144,7 @@ ___
 
 #### Defined in
 
-[server/services/index.ts:35](https://github.com/onzag/itemize/blob/f2f29986/server/services/index.ts#L35)
+[server/services/index.ts:35](https://github.com/onzag/itemize/blob/5c2808d3/server/services/index.ts#L35)
 
 ___
 
@@ -162,13 +162,13 @@ ___
 
 #### Defined in
 
-[server/services/index.ts:48](https://github.com/onzag/itemize/blob/f2f29986/server/services/index.ts#L48)
+[server/services/index.ts:48](https://github.com/onzag/itemize/blob/5c2808d3/server/services/index.ts#L48)
 
 ___
 
 ### globalDatabaseConnection
 
-• **globalDatabaseConnection**: `DatabaseConnection`
+• **globalDatabaseConnection**: [`DatabaseConnection`](database.DatabaseConnection.md)
 
 #### Inherited from
 
@@ -176,7 +176,7 @@ ___
 
 #### Defined in
 
-[server/services/index.ts:40](https://github.com/onzag/itemize/blob/f2f29986/server/services/index.ts#L40)
+[server/services/index.ts:40](https://github.com/onzag/itemize/blob/5c2808d3/server/services/index.ts#L40)
 
 ___
 
@@ -190,7 +190,7 @@ ___
 
 #### Defined in
 
-[server/services/index.ts:55](https://github.com/onzag/itemize/blob/f2f29986/server/services/index.ts#L55)
+[server/services/index.ts:55](https://github.com/onzag/itemize/blob/5c2808d3/server/services/index.ts#L55)
 
 ___
 
@@ -204,7 +204,7 @@ ___
 
 #### Defined in
 
-[server/services/index.ts:46](https://github.com/onzag/itemize/blob/f2f29986/server/services/index.ts#L46)
+[server/services/index.ts:46](https://github.com/onzag/itemize/blob/5c2808d3/server/services/index.ts#L46)
 
 ___
 
@@ -218,7 +218,7 @@ ___
 
 #### Defined in
 
-[server/services/index.ts:47](https://github.com/onzag/itemize/blob/f2f29986/server/services/index.ts#L47)
+[server/services/index.ts:47](https://github.com/onzag/itemize/blob/5c2808d3/server/services/index.ts#L47)
 
 ___
 
@@ -232,7 +232,7 @@ ___
 
 #### Defined in
 
-[server/services/index.ts:44](https://github.com/onzag/itemize/blob/f2f29986/server/services/index.ts#L44)
+[server/services/index.ts:44](https://github.com/onzag/itemize/blob/5c2808d3/server/services/index.ts#L44)
 
 ___
 
@@ -246,7 +246,7 @@ ___
 
 #### Defined in
 
-[server/services/index.ts:43](https://github.com/onzag/itemize/blob/f2f29986/server/services/index.ts#L43)
+[server/services/index.ts:43](https://github.com/onzag/itemize/blob/5c2808d3/server/services/index.ts#L43)
 
 ___
 
@@ -260,7 +260,7 @@ ___
 
 #### Defined in
 
-[server/services/index.ts:41](https://github.com/onzag/itemize/blob/f2f29986/server/services/index.ts#L41)
+[server/services/index.ts:41](https://github.com/onzag/itemize/blob/5c2808d3/server/services/index.ts#L41)
 
 ___
 
@@ -274,7 +274,7 @@ ___
 
 #### Defined in
 
-[server/services/index.ts:42](https://github.com/onzag/itemize/blob/f2f29986/server/services/index.ts#L42)
+[server/services/index.ts:42](https://github.com/onzag/itemize/blob/5c2808d3/server/services/index.ts#L42)
 
 ___
 
@@ -288,7 +288,7 @@ ___
 
 #### Defined in
 
-[server/services/index.ts:45](https://github.com/onzag/itemize/blob/f2f29986/server/services/index.ts#L45)
+[server/services/index.ts:45](https://github.com/onzag/itemize/blob/5c2808d3/server/services/index.ts#L45)
 
 ___
 
@@ -302,7 +302,7 @@ ___
 
 #### Defined in
 
-[server/services/index.ts:54](https://github.com/onzag/itemize/blob/f2f29986/server/services/index.ts#L54)
+[server/services/index.ts:54](https://github.com/onzag/itemize/blob/5c2808d3/server/services/index.ts#L54)
 
 ___
 
@@ -316,7 +316,7 @@ ___
 
 #### Defined in
 
-[server/services/index.ts:52](https://github.com/onzag/itemize/blob/f2f29986/server/services/index.ts#L52)
+[server/services/index.ts:52](https://github.com/onzag/itemize/blob/5c2808d3/server/services/index.ts#L52)
 
 ___
 
@@ -330,7 +330,7 @@ ___
 
 #### Defined in
 
-[server/services/index.ts:56](https://github.com/onzag/itemize/blob/f2f29986/server/services/index.ts#L56)
+[server/services/index.ts:56](https://github.com/onzag/itemize/blob/5c2808d3/server/services/index.ts#L56)
 
 ___
 
@@ -344,7 +344,7 @@ ___
 
 #### Defined in
 
-[server/services/index.ts:36](https://github.com/onzag/itemize/blob/f2f29986/server/services/index.ts#L36)
+[server/services/index.ts:36](https://github.com/onzag/itemize/blob/5c2808d3/server/services/index.ts#L36)
 
 ## Methods
 
@@ -376,7 +376,7 @@ a void promise
 
 #### Defined in
 
-[server/services/base/PaymentProvider.ts:559](https://github.com/onzag/itemize/blob/f2f29986/server/services/base/PaymentProvider.ts#L559)
+[server/services/base/PaymentProvider.ts:559](https://github.com/onzag/itemize/blob/5c2808d3/server/services/base/PaymentProvider.ts#L559)
 
 ___
 
@@ -403,7 +403,7 @@ Adds an event listener to execute when a payment event has occurred
 
 #### Defined in
 
-[server/services/base/PaymentProvider.ts:696](https://github.com/onzag/itemize/blob/f2f29986/server/services/base/PaymentProvider.ts#L696)
+[server/services/base/PaymentProvider.ts:696](https://github.com/onzag/itemize/blob/5c2808d3/server/services/base/PaymentProvider.ts#L696)
 
 ___
 
@@ -435,7 +435,7 @@ a void promise
 
 #### Defined in
 
-[server/services/base/PaymentProvider.ts:538](https://github.com/onzag/itemize/blob/f2f29986/server/services/base/PaymentProvider.ts#L538)
+[server/services/base/PaymentProvider.ts:538](https://github.com/onzag/itemize/blob/5c2808d3/server/services/base/PaymentProvider.ts#L538)
 
 ___
 
@@ -468,7 +468,7 @@ as well as whatever listeners are around
 
 #### Defined in
 
-[server/services/base/PaymentProvider.ts:631](https://github.com/onzag/itemize/blob/f2f29986/server/services/base/PaymentProvider.ts#L631)
+[server/services/base/PaymentProvider.ts:631](https://github.com/onzag/itemize/blob/5c2808d3/server/services/base/PaymentProvider.ts#L631)
 
 ___
 
@@ -497,7 +497,7 @@ A simple function for custom functionality
 
 #### Defined in
 
-[server/services/base/PaymentProvider.ts:745](https://github.com/onzag/itemize/blob/f2f29986/server/services/base/PaymentProvider.ts#L745)
+[server/services/base/PaymentProvider.ts:745](https://github.com/onzag/itemize/blob/5c2808d3/server/services/base/PaymentProvider.ts#L745)
 
 ___
 
@@ -518,7 +518,7 @@ it will do the run function and then re-run as specified
 
 #### Defined in
 
-[server/services/index.ts:164](https://github.com/onzag/itemize/blob/f2f29986/server/services/index.ts#L164)
+[server/services/index.ts:164](https://github.com/onzag/itemize/blob/5c2808d3/server/services/index.ts#L164)
 
 ___
 
@@ -552,7 +552,7 @@ payment
 
 #### Defined in
 
-[server/services/base/PaymentProvider.ts:727](https://github.com/onzag/itemize/blob/f2f29986/server/services/base/PaymentProvider.ts#L727)
+[server/services/base/PaymentProvider.ts:727](https://github.com/onzag/itemize/blob/5c2808d3/server/services/base/PaymentProvider.ts#L727)
 
 ___
 
@@ -576,7 +576,7 @@ ___
 
 #### Defined in
 
-[server/services/index.ts:110](https://github.com/onzag/itemize/blob/f2f29986/server/services/index.ts#L110)
+[server/services/index.ts:110](https://github.com/onzag/itemize/blob/5c2808d3/server/services/index.ts#L110)
 
 ___
 
@@ -594,7 +594,7 @@ ___
 
 #### Defined in
 
-[server/services/index.ts:74](https://github.com/onzag/itemize/blob/f2f29986/server/services/index.ts#L74)
+[server/services/index.ts:74](https://github.com/onzag/itemize/blob/5c2808d3/server/services/index.ts#L74)
 
 ___
 
@@ -632,7 +632,7 @@ The router gets attached to /rest/service
 
 #### Defined in
 
-[server/services/index.ts:251](https://github.com/onzag/itemize/blob/f2f29986/server/services/index.ts#L251)
+[server/services/index.ts:251](https://github.com/onzag/itemize/blob/5c2808d3/server/services/index.ts#L251)
 
 ___
 
@@ -655,7 +655,7 @@ should run over again
 
 #### Defined in
 
-[server/services/index.ts:224](https://github.com/onzag/itemize/blob/f2f29986/server/services/index.ts#L224)
+[server/services/index.ts:224](https://github.com/onzag/itemize/blob/5c2808d3/server/services/index.ts#L224)
 
 ___
 
@@ -678,7 +678,7 @@ so that they trigger just as normal trigger will do
 
 #### Defined in
 
-[server/services/index.ts:278](https://github.com/onzag/itemize/blob/f2f29986/server/services/index.ts#L278)
+[server/services/index.ts:278](https://github.com/onzag/itemize/blob/5c2808d3/server/services/index.ts#L278)
 
 ___
 
@@ -706,7 +706,7 @@ the row of the database and it's unique for that payment object
 
 #### Defined in
 
-[server/services/base/PaymentProvider.ts:410](https://github.com/onzag/itemize/blob/f2f29986/server/services/base/PaymentProvider.ts#L410)
+[server/services/base/PaymentProvider.ts:410](https://github.com/onzag/itemize/blob/5c2808d3/server/services/base/PaymentProvider.ts#L410)
 
 ___
 
@@ -731,7 +731,7 @@ this function executes
 
 #### Defined in
 
-[server/services/manual-payment.ts:19](https://github.com/onzag/itemize/blob/f2f29986/server/services/manual-payment.ts#L19)
+[server/services/manual-payment.ts:19](https://github.com/onzag/itemize/blob/5c2808d3/server/services/manual-payment.ts#L19)
 
 ___
 
@@ -749,7 +749,7 @@ ___
 
 #### Defined in
 
-[server/services/index.ts:78](https://github.com/onzag/itemize/blob/f2f29986/server/services/index.ts#L78)
+[server/services/index.ts:78](https://github.com/onzag/itemize/blob/5c2808d3/server/services/index.ts#L78)
 
 ___
 
@@ -767,7 +767,7 @@ ___
 
 #### Defined in
 
-[server/services/index.ts:82](https://github.com/onzag/itemize/blob/f2f29986/server/services/index.ts#L82)
+[server/services/index.ts:82](https://github.com/onzag/itemize/blob/5c2808d3/server/services/index.ts#L82)
 
 ___
 
@@ -792,7 +792,7 @@ ___
 
 #### Defined in
 
-[server/services/index.ts:90](https://github.com/onzag/itemize/blob/f2f29986/server/services/index.ts#L90)
+[server/services/index.ts:90](https://github.com/onzag/itemize/blob/5c2808d3/server/services/index.ts#L90)
 
 ___
 
@@ -817,7 +817,7 @@ ___
 
 #### Defined in
 
-[server/services/index.ts:94](https://github.com/onzag/itemize/blob/f2f29986/server/services/index.ts#L94)
+[server/services/index.ts:94](https://github.com/onzag/itemize/blob/5c2808d3/server/services/index.ts#L94)
 
 ___
 
@@ -842,7 +842,7 @@ ___
 
 #### Defined in
 
-[server/services/index.ts:86](https://github.com/onzag/itemize/blob/f2f29986/server/services/index.ts#L86)
+[server/services/index.ts:86](https://github.com/onzag/itemize/blob/5c2808d3/server/services/index.ts#L86)
 
 ___
 
@@ -862,7 +862,7 @@ ___
 
 #### Defined in
 
-[server/services/manual-payment.ts:32](https://github.com/onzag/itemize/blob/f2f29986/server/services/manual-payment.ts#L32)
+[server/services/manual-payment.ts:32](https://github.com/onzag/itemize/blob/5c2808d3/server/services/manual-payment.ts#L32)
 
 ___
 
@@ -889,7 +889,7 @@ removes an event listener to execute when a payment event has occurred
 
 #### Defined in
 
-[server/services/base/PaymentProvider.ts:706](https://github.com/onzag/itemize/blob/f2f29986/server/services/base/PaymentProvider.ts#L706)
+[server/services/base/PaymentProvider.ts:706](https://github.com/onzag/itemize/blob/5c2808d3/server/services/base/PaymentProvider.ts#L706)
 
 ___
 
@@ -914,7 +914,7 @@ ___
 
 #### Defined in
 
-[server/services/base/PaymentProvider.ts:573](https://github.com/onzag/itemize/blob/f2f29986/server/services/base/PaymentProvider.ts#L573)
+[server/services/base/PaymentProvider.ts:573](https://github.com/onzag/itemize/blob/5c2808d3/server/services/base/PaymentProvider.ts#L573)
 
 ___
 
@@ -936,7 +936,7 @@ Executes some code
 
 #### Defined in
 
-[server/services/index.ts:232](https://github.com/onzag/itemize/blob/f2f29986/server/services/index.ts#L232)
+[server/services/index.ts:232](https://github.com/onzag/itemize/blob/5c2808d3/server/services/index.ts#L232)
 
 ___
 
@@ -965,7 +965,7 @@ the hidden metadata value that was stored
 
 #### Defined in
 
-[server/services/base/PaymentProvider.ts:399](https://github.com/onzag/itemize/blob/f2f29986/server/services/base/PaymentProvider.ts#L399)
+[server/services/base/PaymentProvider.ts:399](https://github.com/onzag/itemize/blob/5c2808d3/server/services/base/PaymentProvider.ts#L399)
 
 ___
 
@@ -989,7 +989,7 @@ ___
 
 #### Defined in
 
-[server/services/index.ts:70](https://github.com/onzag/itemize/blob/f2f29986/server/services/index.ts#L70)
+[server/services/index.ts:70](https://github.com/onzag/itemize/blob/5c2808d3/server/services/index.ts#L70)
 
 ___
 
@@ -1001,7 +1001,7 @@ ___
 
 | Name | Type |
 | :------ | :------ |
-| `globalDatabaseConnection` | `DatabaseConnection` |
+| `globalDatabaseConnection` | [`DatabaseConnection`](database.DatabaseConnection.md) |
 | `globalClient` | [`ItemizeRedisClient`](server_redis.ItemizeRedisClient.md) |
 | `globalPub` | [`ItemizeRedisClient`](server_redis.ItemizeRedisClient.md) |
 | `globalSub` | [`ItemizeRedisClient`](server_redis.ItemizeRedisClient.md) |
@@ -1020,7 +1020,7 @@ ___
 
 #### Defined in
 
-[server/services/index.ts:118](https://github.com/onzag/itemize/blob/f2f29986/server/services/index.ts#L118)
+[server/services/index.ts:118](https://github.com/onzag/itemize/blob/5c2808d3/server/services/index.ts#L118)
 
 ___
 
@@ -1044,7 +1044,7 @@ ___
 
 #### Defined in
 
-[server/services/index.ts:142](https://github.com/onzag/itemize/blob/f2f29986/server/services/index.ts#L142)
+[server/services/index.ts:142](https://github.com/onzag/itemize/blob/5c2808d3/server/services/index.ts#L142)
 
 ___
 
@@ -1080,7 +1080,7 @@ the end value of the hidden metadata row as stored
 
 #### Defined in
 
-[server/services/base/PaymentProvider.ts:497](https://github.com/onzag/itemize/blob/f2f29986/server/services/base/PaymentProvider.ts#L497)
+[server/services/base/PaymentProvider.ts:497](https://github.com/onzag/itemize/blob/5c2808d3/server/services/base/PaymentProvider.ts#L497)
 
 ___
 
@@ -1109,7 +1109,7 @@ the payment object location
 
 #### Defined in
 
-[server/services/base/PaymentProvider.ts:441](https://github.com/onzag/itemize/blob/f2f29986/server/services/base/PaymentProvider.ts#L441)
+[server/services/base/PaymentProvider.ts:441](https://github.com/onzag/itemize/blob/5c2808d3/server/services/base/PaymentProvider.ts#L441)
 
 ___
 
@@ -1133,7 +1133,7 @@ ___
 
 #### Defined in
 
-[server/services/index.ts:114](https://github.com/onzag/itemize/blob/f2f29986/server/services/index.ts#L114)
+[server/services/index.ts:114](https://github.com/onzag/itemize/blob/5c2808d3/server/services/index.ts#L114)
 
 ___
 
@@ -1169,7 +1169,7 @@ the router gets attached to /rest/service
 
 #### Defined in
 
-[server/services/index.ts:268](https://github.com/onzag/itemize/blob/f2f29986/server/services/index.ts#L268)
+[server/services/index.ts:268](https://github.com/onzag/itemize/blob/5c2808d3/server/services/index.ts#L268)
 
 ___
 
@@ -1194,7 +1194,7 @@ This gets attached if a class is used rather than per instance
 
 #### Defined in
 
-[server/services/index.ts:290](https://github.com/onzag/itemize/blob/f2f29986/server/services/index.ts#L290)
+[server/services/index.ts:290](https://github.com/onzag/itemize/blob/5c2808d3/server/services/index.ts#L290)
 
 ___
 
@@ -1218,7 +1218,7 @@ LOCAL
 
 #### Defined in
 
-[server/services/base/PaymentProvider.ts:247](https://github.com/onzag/itemize/blob/f2f29986/server/services/base/PaymentProvider.ts#L247)
+[server/services/base/PaymentProvider.ts:247](https://github.com/onzag/itemize/blob/5c2808d3/server/services/base/PaymentProvider.ts#L247)
 
 ___
 
@@ -1243,7 +1243,7 @@ ___
 
 #### Defined in
 
-[server/services/index.ts:102](https://github.com/onzag/itemize/blob/f2f29986/server/services/index.ts#L102)
+[server/services/index.ts:102](https://github.com/onzag/itemize/blob/5c2808d3/server/services/index.ts#L102)
 
 ___
 
@@ -1268,7 +1268,7 @@ ___
 
 #### Defined in
 
-[server/services/index.ts:106](https://github.com/onzag/itemize/blob/f2f29986/server/services/index.ts#L106)
+[server/services/index.ts:106](https://github.com/onzag/itemize/blob/5c2808d3/server/services/index.ts#L106)
 
 ___
 
@@ -1293,4 +1293,4 @@ ___
 
 #### Defined in
 
-[server/services/index.ts:98](https://github.com/onzag/itemize/blob/f2f29986/server/services/index.ts#L98)
+[server/services/index.ts:98](https://github.com/onzag/itemize/blob/5c2808d3/server/services/index.ts#L98)

@@ -28,7 +28,7 @@ Specifies the SSR configuration for the multiple pages
 
 #### Defined in
 
-[server/index.ts:110](https://github.com/onzag/itemize/blob/f2f29986/server/index.ts#L110)
+[server/index.ts:110](https://github.com/onzag/itemize/blob/5c2808d3/server/index.ts#L110)
 
 ___
 
@@ -38,7 +38,7 @@ ___
 
 #### Defined in
 
-[server/index.ts:107](https://github.com/onzag/itemize/blob/f2f29986/server/index.ts#L107)
+[server/index.ts:107](https://github.com/onzag/itemize/blob/5c2808d3/server/index.ts#L107)
 
 ___
 
@@ -48,7 +48,7 @@ ___
 
 #### Defined in
 
-[server/index.ts:106](https://github.com/onzag/itemize/blob/f2f29986/server/index.ts#L106)
+[server/index.ts:106](https://github.com/onzag/itemize/blob/5c2808d3/server/index.ts#L106)
 
 ___
 
@@ -68,7 +68,7 @@ ___
 
 #### Defined in
 
-[server/index.ts:111](https://github.com/onzag/itemize/blob/f2f29986/server/index.ts#L111)
+[server/index.ts:111](https://github.com/onzag/itemize/blob/5c2808d3/server/index.ts#L111)
 
 ## Methods
 
@@ -89,7 +89,7 @@ ___
 
 #### Defined in
 
-[server/index.ts:108](https://github.com/onzag/itemize/blob/f2f29986/server/index.ts#L108)
+[server/index.ts:108](https://github.com/onzag/itemize/blob/5c2808d3/server/index.ts#L108)
 
 ___
 
@@ -111,4 +111,4 @@ ___
 
 #### Defined in
 
-[server/index.ts:109](https://github.com/onzag/itemize/blob/f2f29986/server/index.ts#L109)
+[server/index.ts:109](https://github.com/onzag/itemize/blob/5c2808d3/server/index.ts#L109)

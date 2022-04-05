@@ -24,7 +24,7 @@ received
 
 #### Defined in
 
-[server/services/base/MailProvider.ts:89](https://github.com/onzag/itemize/blob/f2f29986/server/services/base/MailProvider.ts#L89)
+[server/services/base/MailProvider.ts:89](https://github.com/onzag/itemize/blob/5c2808d3/server/services/base/MailProvider.ts#L89)
 
 ___
 
@@ -34,7 +34,7 @@ ___
 
 #### Defined in
 
-[server/services/base/MailProvider.ts:86](https://github.com/onzag/itemize/blob/f2f29986/server/services/base/MailProvider.ts#L86)
+[server/services/base/MailProvider.ts:86](https://github.com/onzag/itemize/blob/5c2808d3/server/services/base/MailProvider.ts#L86)
 
 ___
 
@@ -44,7 +44,7 @@ ___
 
 #### Defined in
 
-[server/services/base/MailProvider.ts:88](https://github.com/onzag/itemize/blob/f2f29986/server/services/base/MailProvider.ts#L88)
+[server/services/base/MailProvider.ts:88](https://github.com/onzag/itemize/blob/5c2808d3/server/services/base/MailProvider.ts#L88)
 
 ___
 
@@ -54,4 +54,4 @@ ___
 
 #### Defined in
 
-[server/services/base/MailProvider.ts:87](https://github.com/onzag/itemize/blob/f2f29986/server/services/base/MailProvider.ts#L87)
+[server/services/base/MailProvider.ts:87](https://github.com/onzag/itemize/blob/5c2808d3/server/services/base/MailProvider.ts#L87)

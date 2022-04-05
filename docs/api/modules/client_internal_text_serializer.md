@@ -41,7 +41,7 @@ but it's not a text
 
 #### Defined in
 
-[client/internal/text/serializer/index.ts:187](https://github.com/onzag/itemize/blob/f2f29986/client/internal/text/serializer/index.ts#L187)
+[client/internal/text/serializer/index.ts:187](https://github.com/onzag/itemize/blob/5c2808d3/client/internal/text/serializer/index.ts#L187)
 
 ## Variables
 
@@ -54,7 +54,7 @@ by default is started up empty
 
 #### Defined in
 
-[client/internal/text/serializer/index.ts:155](https://github.com/onzag/itemize/blob/f2f29986/client/internal/text/serializer/index.ts#L155)
+[client/internal/text/serializer/index.ts:155](https://github.com/onzag/itemize/blob/5c2808d3/client/internal/text/serializer/index.ts#L155)
 
 ## Functions
 
@@ -79,7 +79,7 @@ a root level document
 
 #### Defined in
 
-[client/internal/text/serializer/index.ts:316](https://github.com/onzag/itemize/blob/f2f29986/client/internal/text/serializer/index.ts#L316)
+[client/internal/text/serializer/index.ts:316](https://github.com/onzag/itemize/blob/5c2808d3/client/internal/text/serializer/index.ts#L316)
 
 ___
 
@@ -100,7 +100,7 @@ ___
 
 #### Defined in
 
-[client/internal/text/serializer/index.ts:419](https://github.com/onzag/itemize/blob/f2f29986/client/internal/text/serializer/index.ts#L419)
+[client/internal/text/serializer/index.ts:419](https://github.com/onzag/itemize/blob/5c2808d3/client/internal/text/serializer/index.ts#L419)
 
 ___
 
@@ -127,7 +127,7 @@ a RichElement or a text node
 
 #### Defined in
 
-[client/internal/text/serializer/index.ts:450](https://github.com/onzag/itemize/blob/f2f29986/client/internal/text/serializer/index.ts#L450)
+[client/internal/text/serializer/index.ts:450](https://github.com/onzag/itemize/blob/5c2808d3/client/internal/text/serializer/index.ts#L450)
 
 ___
 
@@ -151,7 +151,7 @@ that is like a rich text, but split in paragraphs
 
 #### Defined in
 
-[client/internal/text/serializer/index.ts:733](https://github.com/onzag/itemize/blob/f2f29986/client/internal/text/serializer/index.ts#L733)
+[client/internal/text/serializer/index.ts:733](https://github.com/onzag/itemize/blob/5c2808d3/client/internal/text/serializer/index.ts#L733)
 
 ___
 
@@ -175,4 +175,4 @@ or a string for plain documents
 
 #### Defined in
 
-[client/internal/text/serializer/index.ts:219](https://github.com/onzag/itemize/blob/f2f29986/client/internal/text/serializer/index.ts#L219)
+[client/internal/text/serializer/index.ts:219](https://github.com/onzag/itemize/blob/5c2808d3/client/internal/text/serializer/index.ts#L219)

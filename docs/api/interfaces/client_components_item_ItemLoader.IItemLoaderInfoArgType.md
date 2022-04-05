@@ -34,7 +34,7 @@ Whether the item is blocked
 
 #### Defined in
 
-[client/components/item/ItemLoader.tsx:37](https://github.com/onzag/itemize/blob/f2f29986/client/components/item/ItemLoader.tsx#L37)
+[client/components/item/ItemLoader.tsx:37](https://github.com/onzag/itemize/blob/5c2808d3/client/components/item/ItemLoader.tsx#L37)
 
 ___
 
@@ -47,7 +47,7 @@ as null is a valid value, this is more for forbidden, no network, and whatnot
 
 #### Defined in
 
-[client/components/item/ItemLoader.tsx:46](https://github.com/onzag/itemize/blob/f2f29986/client/components/item/ItemLoader.tsx#L46)
+[client/components/item/ItemLoader.tsx:46](https://github.com/onzag/itemize/blob/5c2808d3/client/components/item/ItemLoader.tsx#L46)
 
 ___
 
@@ -59,7 +59,7 @@ Whether you have moderation access to the item despite it being blocked
 
 #### Defined in
 
-[client/components/item/ItemLoader.tsx:41](https://github.com/onzag/itemize/blob/f2f29986/client/components/item/ItemLoader.tsx#L41)
+[client/components/item/ItemLoader.tsx:41](https://github.com/onzag/itemize/blob/5c2808d3/client/components/item/ItemLoader.tsx#L41)
 
 ___
 
@@ -71,7 +71,7 @@ Whether it is ready and loaded
 
 #### Defined in
 
-[client/components/item/ItemLoader.tsx:25](https://github.com/onzag/itemize/blob/f2f29986/client/components/item/ItemLoader.tsx#L25)
+[client/components/item/ItemLoader.tsx:25](https://github.com/onzag/itemize/blob/5c2808d3/client/components/item/ItemLoader.tsx#L25)
 
 ___
 
@@ -83,7 +83,7 @@ Whether is currently loading, from memory, cache, etc...
 
 #### Defined in
 
-[client/components/item/ItemLoader.tsx:29](https://github.com/onzag/itemize/blob/f2f29986/client/components/item/ItemLoader.tsx#L29)
+[client/components/item/ItemLoader.tsx:29](https://github.com/onzag/itemize/blob/5c2808d3/client/components/item/ItemLoader.tsx#L29)
 
 ___
 
@@ -95,7 +95,7 @@ Whether it is not found, as in the item definition did not exist
 
 #### Defined in
 
-[client/components/item/ItemLoader.tsx:33](https://github.com/onzag/itemize/blob/f2f29986/client/components/item/ItemLoader.tsx#L33)
+[client/components/item/ItemLoader.tsx:33](https://github.com/onzag/itemize/blob/5c2808d3/client/components/item/ItemLoader.tsx#L33)
 
 ## Methods
 
@@ -119,7 +119,7 @@ its files and download them
 
 #### Defined in
 
-[client/components/item/ItemLoader.tsx:55](https://github.com/onzag/itemize/blob/f2f29986/client/components/item/ItemLoader.tsx#L55)
+[client/components/item/ItemLoader.tsx:55](https://github.com/onzag/itemize/blob/5c2808d3/client/components/item/ItemLoader.tsx#L55)
 
 ___
 
@@ -144,7 +144,7 @@ been downloaded and packaged
 
 #### Defined in
 
-[client/components/item/ItemLoader.tsx:60](https://github.com/onzag/itemize/blob/f2f29986/client/components/item/ItemLoader.tsx#L60)
+[client/components/item/ItemLoader.tsx:60](https://github.com/onzag/itemize/blob/5c2808d3/client/components/item/ItemLoader.tsx#L60)
 
 ___
 
@@ -160,4 +160,4 @@ A function that allows to try to reload the element
 
 #### Defined in
 
-[client/components/item/ItemLoader.tsx:50](https://github.com/onzag/itemize/blob/f2f29986/client/components/item/ItemLoader.tsx#L50)
+[client/components/item/ItemLoader.tsx:50](https://github.com/onzag/itemize/blob/5c2808d3/client/components/item/ItemLoader.tsx#L50)

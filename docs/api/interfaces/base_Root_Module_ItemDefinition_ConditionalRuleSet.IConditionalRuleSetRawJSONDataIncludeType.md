@@ -34,7 +34,7 @@ IConditionalRuleSetRawJSONDataBaseType.condition
 
 #### Defined in
 
-[base/Root/Module/ItemDefinition/ConditionalRuleSet/index.ts:54](https://github.com/onzag/itemize/blob/f2f29986/base/Root/Module/ItemDefinition/ConditionalRuleSet/index.ts#L54)
+[base/Root/Module/ItemDefinition/ConditionalRuleSet/index.ts:54](https://github.com/onzag/itemize/blob/5c2808d3/base/Root/Module/ItemDefinition/ConditionalRuleSet/index.ts#L54)
 
 ___
 
@@ -48,7 +48,7 @@ IConditionalRuleSetRawJSONDataBaseType.gate
 
 #### Defined in
 
-[base/Root/Module/ItemDefinition/ConditionalRuleSet/index.ts:53](https://github.com/onzag/itemize/blob/f2f29986/base/Root/Module/ItemDefinition/ConditionalRuleSet/index.ts#L53)
+[base/Root/Module/ItemDefinition/ConditionalRuleSet/index.ts:53](https://github.com/onzag/itemize/blob/5c2808d3/base/Root/Module/ItemDefinition/ConditionalRuleSet/index.ts#L53)
 
 ___
 
@@ -62,7 +62,7 @@ and the name just doesn't include the numeral
 
 #### Defined in
 
-[base/Root/Module/ItemDefinition/ConditionalRuleSet/index.ts:100](https://github.com/onzag/itemize/blob/f2f29986/base/Root/Module/ItemDefinition/ConditionalRuleSet/index.ts#L100)
+[base/Root/Module/ItemDefinition/ConditionalRuleSet/index.ts:100](https://github.com/onzag/itemize/blob/5c2808d3/base/Root/Module/ItemDefinition/ConditionalRuleSet/index.ts#L100)
 
 ___
 
@@ -74,7 +74,7 @@ the inclusion state expected for the conditional rule to apply
 
 #### Defined in
 
-[base/Root/Module/ItemDefinition/ConditionalRuleSet/index.ts:104](https://github.com/onzag/itemize/blob/f2f29986/base/Root/Module/ItemDefinition/ConditionalRuleSet/index.ts#L104)
+[base/Root/Module/ItemDefinition/ConditionalRuleSet/index.ts:104](https://github.com/onzag/itemize/blob/5c2808d3/base/Root/Module/ItemDefinition/ConditionalRuleSet/index.ts#L104)
 
 ___
 
@@ -88,4 +88,4 @@ IConditionalRuleSetRawJSONDataBaseType.serverFlag
 
 #### Defined in
 
-[base/Root/Module/ItemDefinition/ConditionalRuleSet/index.ts:55](https://github.com/onzag/itemize/blob/f2f29986/base/Root/Module/ItemDefinition/ConditionalRuleSet/index.ts#L55)
+[base/Root/Module/ItemDefinition/ConditionalRuleSet/index.ts:55](https://github.com/onzag/itemize/blob/5c2808d3/base/Root/Module/ItemDefinition/ConditionalRuleSet/index.ts#L55)

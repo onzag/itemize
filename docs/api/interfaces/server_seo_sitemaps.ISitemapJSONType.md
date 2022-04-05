@@ -26,7 +26,7 @@ Just a list of urls
 
 #### Defined in
 
-[server/seo/sitemaps.ts:30](https://github.com/onzag/itemize/blob/f2f29986/server/seo/sitemaps.ts#L30)
+[server/seo/sitemaps.ts:30](https://github.com/onzag/itemize/blob/5c2808d3/server/seo/sitemaps.ts#L30)
 
 ___
 
@@ -38,7 +38,7 @@ Whether it is an index type, index types is what truly contains these fields on 
 
 #### Defined in
 
-[server/seo/sitemaps.ts:26](https://github.com/onzag/itemize/blob/f2f29986/server/seo/sitemaps.ts#L26)
+[server/seo/sitemaps.ts:26](https://github.com/onzag/itemize/blob/5c2808d3/server/seo/sitemaps.ts#L26)
 
 ___
 
@@ -52,4 +52,4 @@ and it contains a date where it will ask for what it was created after that, thi
 
 #### Defined in
 
-[server/seo/sitemaps.ts:22](https://github.com/onzag/itemize/blob/f2f29986/server/seo/sitemaps.ts#L22)
+[server/seo/sitemaps.ts:22](https://github.com/onzag/itemize/blob/5c2808d3/server/seo/sitemaps.ts#L22)

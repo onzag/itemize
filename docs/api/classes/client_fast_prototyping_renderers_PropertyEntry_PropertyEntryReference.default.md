@@ -82,7 +82,7 @@ React.Component&lt;IPropertyEntryReferenceRendererProps\&gt;.constructor
 
 #### Defined in
 
-[client/fast-prototyping/renderers/PropertyEntry/PropertyEntryReference.tsx:211](https://github.com/onzag/itemize/blob/f2f29986/client/fast-prototyping/renderers/PropertyEntry/PropertyEntryReference.tsx#L211)
+[client/fast-prototyping/renderers/PropertyEntry/PropertyEntryReference.tsx:211](https://github.com/onzag/itemize/blob/5c2808d3/client/fast-prototyping/renderers/PropertyEntry/PropertyEntryReference.tsx#L211)
 
 ## Properties
 
@@ -120,7 +120,7 @@ ___
 
 #### Defined in
 
-[client/fast-prototyping/renderers/PropertyEntry/PropertyEntryReference.tsx:209](https://github.com/onzag/itemize/blob/f2f29986/client/fast-prototyping/renderers/PropertyEntry/PropertyEntryReference.tsx#L209)
+[client/fast-prototyping/renderers/PropertyEntry/PropertyEntryReference.tsx:209](https://github.com/onzag/itemize/blob/5c2808d3/client/fast-prototyping/renderers/PropertyEntry/PropertyEntryReference.tsx#L209)
 
 ___
 
@@ -340,7 +340,7 @@ anything
 
 #### Defined in
 
-[client/fast-prototyping/renderers/PropertyEntry/PropertyEntryReference.tsx:257](https://github.com/onzag/itemize/blob/f2f29986/client/fast-prototyping/renderers/PropertyEntry/PropertyEntryReference.tsx#L257)
+[client/fast-prototyping/renderers/PropertyEntry/PropertyEntryReference.tsx:257](https://github.com/onzag/itemize/blob/5c2808d3/client/fast-prototyping/renderers/PropertyEntry/PropertyEntryReference.tsx#L257)
 
 ___
 
@@ -386,7 +386,7 @@ React.Component.componentDidMount
 
 #### Defined in
 
-[client/fast-prototyping/renderers/PropertyEntry/PropertyEntryReference.tsx:226](https://github.com/onzag/itemize/blob/f2f29986/client/fast-prototyping/renderers/PropertyEntry/PropertyEntryReference.tsx#L226)
+[client/fast-prototyping/renderers/PropertyEntry/PropertyEntryReference.tsx:226](https://github.com/onzag/itemize/blob/5c2808d3/client/fast-prototyping/renderers/PropertyEntry/PropertyEntryReference.tsx#L226)
 
 ___
 
@@ -410,7 +410,7 @@ React.Component.componentDidUpdate
 
 #### Defined in
 
-[client/fast-prototyping/renderers/PropertyEntry/PropertyEntryReference.tsx:240](https://github.com/onzag/itemize/blob/f2f29986/client/fast-prototyping/renderers/PropertyEntry/PropertyEntryReference.tsx#L240)
+[client/fast-prototyping/renderers/PropertyEntry/PropertyEntryReference.tsx:240](https://github.com/onzag/itemize/blob/5c2808d3/client/fast-prototyping/renderers/PropertyEntry/PropertyEntryReference.tsx#L240)
 
 ___
 
@@ -618,7 +618,7 @@ Provides the suggestion value
 
 #### Defined in
 
-[client/fast-prototyping/renderers/PropertyEntry/PropertyEntryReference.tsx:527](https://github.com/onzag/itemize/blob/f2f29986/client/fast-prototyping/renderers/PropertyEntry/PropertyEntryReference.tsx#L527)
+[client/fast-prototyping/renderers/PropertyEntry/PropertyEntryReference.tsx:527](https://github.com/onzag/itemize/blob/5c2808d3/client/fast-prototyping/renderers/PropertyEntry/PropertyEntryReference.tsx#L527)
 
 ___
 
@@ -642,7 +642,7 @@ or by default, if not autosuggest override given
 
 #### Defined in
 
-[client/fast-prototyping/renderers/PropertyEntry/PropertyEntryReference.tsx:294](https://github.com/onzag/itemize/blob/f2f29986/client/fast-prototyping/renderers/PropertyEntry/PropertyEntryReference.tsx#L294)
+[client/fast-prototyping/renderers/PropertyEntry/PropertyEntryReference.tsx:294](https://github.com/onzag/itemize/blob/5c2808d3/client/fast-prototyping/renderers/PropertyEntry/PropertyEntryReference.tsx#L294)
 
 ___
 
@@ -664,7 +664,7 @@ The change event but by the raw text field
 
 #### Defined in
 
-[client/fast-prototyping/renderers/PropertyEntry/PropertyEntryReference.tsx:265](https://github.com/onzag/itemize/blob/f2f29986/client/fast-prototyping/renderers/PropertyEntry/PropertyEntryReference.tsx#L265)
+[client/fast-prototyping/renderers/PropertyEntry/PropertyEntryReference.tsx:265](https://github.com/onzag/itemize/blob/5c2808d3/client/fast-prototyping/renderers/PropertyEntry/PropertyEntryReference.tsx#L265)
 
 ___
 
@@ -686,7 +686,7 @@ Change used with the select element
 
 #### Defined in
 
-[client/fast-prototyping/renderers/PropertyEntry/PropertyEntryReference.tsx:277](https://github.com/onzag/itemize/blob/f2f29986/client/fast-prototyping/renderers/PropertyEntry/PropertyEntryReference.tsx#L277)
+[client/fast-prototyping/renderers/PropertyEntry/PropertyEntryReference.tsx:277](https://github.com/onzag/itemize/blob/5c2808d3/client/fast-prototyping/renderers/PropertyEntry/PropertyEntryReference.tsx#L277)
 
 ___
 
@@ -708,7 +708,7 @@ The event on key down for the text field
 
 #### Defined in
 
-[client/fast-prototyping/renderers/PropertyEntry/PropertyEntryReference.tsx:321](https://github.com/onzag/itemize/blob/f2f29986/client/fast-prototyping/renderers/PropertyEntry/PropertyEntryReference.tsx#L321)
+[client/fast-prototyping/renderers/PropertyEntry/PropertyEntryReference.tsx:321](https://github.com/onzag/itemize/blob/5c2808d3/client/fast-prototyping/renderers/PropertyEntry/PropertyEntryReference.tsx#L321)
 
 ___
 
@@ -732,7 +732,7 @@ When the suggestion fetch is triggered
 
 #### Defined in
 
-[client/fast-prototyping/renderers/PropertyEntry/PropertyEntryReference.tsx:539](https://github.com/onzag/itemize/blob/f2f29986/client/fast-prototyping/renderers/PropertyEntry/PropertyEntryReference.tsx#L539)
+[client/fast-prototyping/renderers/PropertyEntry/PropertyEntryReference.tsx:539](https://github.com/onzag/itemize/blob/5c2808d3/client/fast-prototyping/renderers/PropertyEntry/PropertyEntryReference.tsx#L539)
 
 ___
 
@@ -750,7 +750,7 @@ React.Component.render
 
 #### Defined in
 
-[client/fast-prototyping/renderers/PropertyEntry/PropertyEntryReference.tsx:545](https://github.com/onzag/itemize/blob/f2f29986/client/fast-prototyping/renderers/PropertyEntry/PropertyEntryReference.tsx#L545)
+[client/fast-prototyping/renderers/PropertyEntry/PropertyEntryReference.tsx:545](https://github.com/onzag/itemize/blob/5c2808d3/client/fast-prototyping/renderers/PropertyEntry/PropertyEntryReference.tsx#L545)
 
 ___
 
@@ -766,7 +766,7 @@ render function
 
 #### Defined in
 
-[client/fast-prototyping/renderers/PropertyEntry/PropertyEntryReference.tsx:604](https://github.com/onzag/itemize/blob/f2f29986/client/fast-prototyping/renderers/PropertyEntry/PropertyEntryReference.tsx#L604)
+[client/fast-prototyping/renderers/PropertyEntry/PropertyEntryReference.tsx:604](https://github.com/onzag/itemize/blob/5c2808d3/client/fast-prototyping/renderers/PropertyEntry/PropertyEntryReference.tsx#L604)
 
 ___
 
@@ -780,7 +780,7 @@ ___
 
 #### Defined in
 
-[client/fast-prototyping/renderers/PropertyEntry/PropertyEntryReference.tsx:553](https://github.com/onzag/itemize/blob/f2f29986/client/fast-prototyping/renderers/PropertyEntry/PropertyEntryReference.tsx#L553)
+[client/fast-prototyping/renderers/PropertyEntry/PropertyEntryReference.tsx:553](https://github.com/onzag/itemize/blob/5c2808d3/client/fast-prototyping/renderers/PropertyEntry/PropertyEntryReference.tsx#L553)
 
 ___
 
@@ -802,7 +802,7 @@ renders the autosuggest container for the reference
 
 #### Defined in
 
-[client/fast-prototyping/renderers/PropertyEntry/PropertyEntryReference.tsx:469](https://github.com/onzag/itemize/blob/f2f29986/client/fast-prototyping/renderers/PropertyEntry/PropertyEntryReference.tsx#L469)
+[client/fast-prototyping/renderers/PropertyEntry/PropertyEntryReference.tsx:469](https://github.com/onzag/itemize/blob/5c2808d3/client/fast-prototyping/renderers/PropertyEntry/PropertyEntryReference.tsx#L469)
 
 ___
 
@@ -825,7 +825,7 @@ Render the autosuggest suggestion for the reference
 
 #### Defined in
 
-[client/fast-prototyping/renderers/PropertyEntry/PropertyEntryReference.tsx:489](https://github.com/onzag/itemize/blob/f2f29986/client/fast-prototyping/renderers/PropertyEntry/PropertyEntryReference.tsx#L489)
+[client/fast-prototyping/renderers/PropertyEntry/PropertyEntryReference.tsx:489](https://github.com/onzag/itemize/blob/5c2808d3/client/fast-prototyping/renderers/PropertyEntry/PropertyEntryReference.tsx#L489)
 
 ___
 
@@ -847,7 +847,7 @@ Render the basic text field for the reference
 
 #### Defined in
 
-[client/fast-prototyping/renderers/PropertyEntry/PropertyEntryReference.tsx:331](https://github.com/onzag/itemize/blob/f2f29986/client/fast-prototyping/renderers/PropertyEntry/PropertyEntryReference.tsx#L331)
+[client/fast-prototyping/renderers/PropertyEntry/PropertyEntryReference.tsx:331](https://github.com/onzag/itemize/blob/5c2808d3/client/fast-prototyping/renderers/PropertyEntry/PropertyEntryReference.tsx#L331)
 
 ___
 

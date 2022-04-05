@@ -28,7 +28,7 @@
 
 #### Defined in
 
-[server/resolvers/triggers.ts:136](https://github.com/onzag/itemize/blob/f2f29986/server/resolvers/triggers.ts#L136)
+[server/resolvers/triggers.ts:136](https://github.com/onzag/itemize/blob/5c2808d3/server/resolvers/triggers.ts#L136)
 
 ___
 
@@ -38,7 +38,7 @@ ___
 
 #### Defined in
 
-[server/resolvers/triggers.ts:139](https://github.com/onzag/itemize/blob/f2f29986/server/resolvers/triggers.ts#L139)
+[server/resolvers/triggers.ts:139](https://github.com/onzag/itemize/blob/5c2808d3/server/resolvers/triggers.ts#L139)
 
 ___
 
@@ -50,7 +50,7 @@ The dictionary that was obtained from the language
 
 #### Defined in
 
-[server/resolvers/triggers.ts:135](https://github.com/onzag/itemize/blob/f2f29986/server/resolvers/triggers.ts#L135)
+[server/resolvers/triggers.ts:135](https://github.com/onzag/itemize/blob/5c2808d3/server/resolvers/triggers.ts#L135)
 
 ___
 
@@ -60,7 +60,7 @@ ___
 
 #### Defined in
 
-[server/resolvers/triggers.ts:137](https://github.com/onzag/itemize/blob/f2f29986/server/resolvers/triggers.ts#L137)
+[server/resolvers/triggers.ts:137](https://github.com/onzag/itemize/blob/5c2808d3/server/resolvers/triggers.ts#L137)
 
 ___
 
@@ -70,7 +70,7 @@ ___
 
 #### Defined in
 
-[server/resolvers/triggers.ts:138](https://github.com/onzag/itemize/blob/f2f29986/server/resolvers/triggers.ts#L138)
+[server/resolvers/triggers.ts:138](https://github.com/onzag/itemize/blob/5c2808d3/server/resolvers/triggers.ts#L138)
 
 ___
 
@@ -88,17 +88,17 @@ ___
 
 #### Defined in
 
-[server/resolvers/triggers.ts:140](https://github.com/onzag/itemize/blob/f2f29986/server/resolvers/triggers.ts#L140)
+[server/resolvers/triggers.ts:140](https://github.com/onzag/itemize/blob/5c2808d3/server/resolvers/triggers.ts#L140)
 
 ___
 
 ### whereBuilder
 
-• **whereBuilder**: `WhereBuilder`
+• **whereBuilder**: [`WhereBuilder`](../classes/database_WhereBuilder.WhereBuilder.md)
 
 #### Defined in
 
-[server/resolvers/triggers.ts:145](https://github.com/onzag/itemize/blob/f2f29986/server/resolvers/triggers.ts#L145)
+[server/resolvers/triggers.ts:145](https://github.com/onzag/itemize/blob/5c2808d3/server/resolvers/triggers.ts#L145)
 
 ## Methods
 
@@ -119,4 +119,4 @@ ___
 
 #### Defined in
 
-[server/resolvers/triggers.ts:146](https://github.com/onzag/itemize/blob/f2f29986/server/resolvers/triggers.ts#L146)
+[server/resolvers/triggers.ts:146](https://github.com/onzag/itemize/blob/5c2808d3/server/resolvers/triggers.ts#L146)

@@ -40,7 +40,7 @@ The renderer args
 
 #### Defined in
 
-[client/internal/renderer.ts:19](https://github.com/onzag/itemize/blob/f2f29986/client/internal/renderer.ts#L19)
+[client/internal/renderer.ts:19](https://github.com/onzag/itemize/blob/5c2808d3/client/internal/renderer.ts#L19)
 
 ___
 
@@ -52,7 +52,7 @@ Whether it should capitalize
 
 #### Defined in
 
-[client/internal/components/PropertyView/PropertyViewSimple.tsx:19](https://github.com/onzag/itemize/blob/f2f29986/client/internal/components/PropertyView/PropertyViewSimple.tsx#L19)
+[client/internal/components/PropertyView/PropertyViewSimple.tsx:19](https://github.com/onzag/itemize/blob/5c2808d3/client/internal/components/PropertyView/PropertyViewSimple.tsx#L19)
 
 ___
 
@@ -68,7 +68,7 @@ The current value to be displayed
 
 #### Defined in
 
-[client/internal/components/PropertyView/index.tsx:43](https://github.com/onzag/itemize/blob/f2f29986/client/internal/components/PropertyView/index.tsx#L43)
+[client/internal/components/PropertyView/index.tsx:43](https://github.com/onzag/itemize/blob/5c2808d3/client/internal/components/PropertyView/index.tsx#L43)
 
 ___
 
@@ -80,7 +80,7 @@ The language code it's currently using
 
 #### Defined in
 
-[client/internal/components/PropertyView/PropertyViewSimple.tsx:23](https://github.com/onzag/itemize/blob/f2f29986/client/internal/components/PropertyView/PropertyViewSimple.tsx#L23)
+[client/internal/components/PropertyView/PropertyViewSimple.tsx:23](https://github.com/onzag/itemize/blob/5c2808d3/client/internal/components/PropertyView/PropertyViewSimple.tsx#L23)
 
 ___
 
@@ -96,4 +96,4 @@ Whether it is in rtl mode for a rtl language
 
 #### Defined in
 
-[client/internal/renderer.ts:15](https://github.com/onzag/itemize/blob/f2f29986/client/internal/renderer.ts#L15)
+[client/internal/renderer.ts:15](https://github.com/onzag/itemize/blob/5c2808d3/client/internal/renderer.ts#L15)

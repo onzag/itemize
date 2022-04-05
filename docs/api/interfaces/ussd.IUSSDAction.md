@@ -28,7 +28,7 @@ Represents the label of the given action
 
 #### Defined in
 
-[ussd/index.ts:13](https://github.com/onzag/itemize/blob/f2f29986/ussd/index.ts#L13)
+[ussd/index.ts:13](https://github.com/onzag/itemize/blob/5c2808d3/ussd/index.ts#L13)
 
 ___
 
@@ -43,7 +43,7 @@ these dinamically
 
 #### Defined in
 
-[ussd/index.ts:38](https://github.com/onzag/itemize/blob/f2f29986/ussd/index.ts#L38)
+[ussd/index.ts:38](https://github.com/onzag/itemize/blob/5c2808d3/ussd/index.ts#L38)
 
 ___
 
@@ -58,7 +58,7 @@ these dinamically, this represents a graphql request body
 
 #### Defined in
 
-[ussd/index.ts:21](https://github.com/onzag/itemize/blob/f2f29986/ussd/index.ts#L21)
+[ussd/index.ts:21](https://github.com/onzag/itemize/blob/5c2808d3/ussd/index.ts#L21)
 
 ___
 
@@ -74,4 +74,4 @@ these dinamically
 
 #### Defined in
 
-[ussd/index.ts:30](https://github.com/onzag/itemize/blob/f2f29986/ussd/index.ts#L30)
+[ussd/index.ts:30](https://github.com/onzag/itemize/blob/5c2808d3/ussd/index.ts#L30)

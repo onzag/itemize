@@ -24,4 +24,4 @@ The type of a curreny type specifies how it behaves in the app
 
 #### Defined in
 
-[base/Root/Module/ItemDefinition/PropertyDefinition/types/currency.ts:38](https://github.com/onzag/itemize/blob/f2f29986/base/Root/Module/ItemDefinition/PropertyDefinition/types/currency.ts#L38)
+[base/Root/Module/ItemDefinition/PropertyDefinition/types/currency.ts:38](https://github.com/onzag/itemize/blob/5c2808d3/base/Root/Module/ItemDefinition/PropertyDefinition/types/currency.ts#L38)

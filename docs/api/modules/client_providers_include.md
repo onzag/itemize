@@ -24,7 +24,7 @@
 
 #### Defined in
 
-[client/providers/include.tsx:11](https://github.com/onzag/itemize/blob/f2f29986/client/providers/include.tsx#L11)
+[client/providers/include.tsx:11](https://github.com/onzag/itemize/blob/5c2808d3/client/providers/include.tsx#L11)
 
 ## Functions
 
@@ -44,4 +44,4 @@
 
 #### Defined in
 
-[client/providers/include.tsx:45](https://github.com/onzag/itemize/blob/f2f29986/client/providers/include.tsx#L45)
+[client/providers/include.tsx:45](https://github.com/onzag/itemize/blob/5c2808d3/client/providers/include.tsx#L45)

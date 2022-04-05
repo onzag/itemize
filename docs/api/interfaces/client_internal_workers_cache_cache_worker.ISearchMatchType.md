@@ -30,7 +30,7 @@ as matched on the cache itself
 
 #### Defined in
 
-[client/internal/workers/cache/cache.worker.ts:89](https://github.com/onzag/itemize/blob/f2f29986/client/internal/workers/cache/cache.worker.ts#L89)
+[client/internal/workers/cache/cache.worker.ts:89](https://github.com/onzag/itemize/blob/5c2808d3/client/internal/workers/cache/cache.worker.ts#L89)
 
 ___
 
@@ -43,7 +43,7 @@ it's tried to be kept in sync
 
 #### Defined in
 
-[client/internal/workers/cache/cache.worker.ts:103](https://github.com/onzag/itemize/blob/f2f29986/client/internal/workers/cache/cache.worker.ts#L103)
+[client/internal/workers/cache/cache.worker.ts:103](https://github.com/onzag/itemize/blob/5c2808d3/client/internal/workers/cache/cache.worker.ts#L103)
 
 ___
 
@@ -56,7 +56,7 @@ in each one of these search matches
 
 #### Defined in
 
-[client/internal/workers/cache/cache.worker.ts:80](https://github.com/onzag/itemize/blob/f2f29986/client/internal/workers/cache/cache.worker.ts#L80)
+[client/internal/workers/cache/cache.worker.ts:80](https://github.com/onzag/itemize/blob/5c2808d3/client/internal/workers/cache/cache.worker.ts#L80)
 
 ___
 
@@ -68,7 +68,7 @@ The last record date of that records list
 
 #### Defined in
 
-[client/internal/workers/cache/cache.worker.ts:93](https://github.com/onzag/itemize/blob/f2f29986/client/internal/workers/cache/cache.worker.ts#L93)
+[client/internal/workers/cache/cache.worker.ts:93](https://github.com/onzag/itemize/blob/5c2808d3/client/internal/workers/cache/cache.worker.ts#L93)
 
 ___
 
@@ -81,7 +81,7 @@ be larger than the limit as it might grow by events
 
 #### Defined in
 
-[client/internal/workers/cache/cache.worker.ts:98](https://github.com/onzag/itemize/blob/f2f29986/client/internal/workers/cache/cache.worker.ts#L98)
+[client/internal/workers/cache/cache.worker.ts:98](https://github.com/onzag/itemize/blob/5c2808d3/client/internal/workers/cache/cache.worker.ts#L98)
 
 ___
 
@@ -93,4 +93,4 @@ The value as a list of search records
 
 #### Defined in
 
-[client/internal/workers/cache/cache.worker.ts:84](https://github.com/onzag/itemize/blob/f2f29986/client/internal/workers/cache/cache.worker.ts#L84)
+[client/internal/workers/cache/cache.worker.ts:84](https://github.com/onzag/itemize/blob/5c2808d3/client/internal/workers/cache/cache.worker.ts#L84)

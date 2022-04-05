@@ -32,7 +32,7 @@ there's no SSR context then it should fetch
 
 #### Defined in
 
-[client/internal/providers/ssr-provider.tsx:54](https://github.com/onzag/itemize/blob/f2f29986/client/internal/providers/ssr-provider.tsx#L54)
+[client/internal/providers/ssr-provider.tsx:54](https://github.com/onzag/itemize/blob/5c2808d3/client/internal/providers/ssr-provider.tsx#L54)
 
 ___
 
@@ -44,7 +44,7 @@ Collected queries
 
 #### Defined in
 
-[client/internal/providers/ssr-provider.tsx:60](https://github.com/onzag/itemize/blob/f2f29986/client/internal/providers/ssr-provider.tsx#L60)
+[client/internal/providers/ssr-provider.tsx:60](https://github.com/onzag/itemize/blob/5c2808d3/client/internal/providers/ssr-provider.tsx#L60)
 
 ___
 
@@ -56,7 +56,7 @@ Collected resources map
 
 #### Defined in
 
-[client/internal/providers/ssr-provider.tsx:64](https://github.com/onzag/itemize/blob/f2f29986/client/internal/providers/ssr-provider.tsx#L64)
+[client/internal/providers/ssr-provider.tsx:64](https://github.com/onzag/itemize/blob/5c2808d3/client/internal/providers/ssr-provider.tsx#L64)
 
 ___
 
@@ -69,7 +69,7 @@ but the server has no access to the dom, so to keep things consistent it's here
 
 #### Defined in
 
-[client/internal/providers/ssr-provider.tsx:90](https://github.com/onzag/itemize/blob/f2f29986/client/internal/providers/ssr-provider.tsx#L90)
+[client/internal/providers/ssr-provider.tsx:90](https://github.com/onzag/itemize/blob/5c2808d3/client/internal/providers/ssr-provider.tsx#L90)
 
 ___
 
@@ -89,4 +89,4 @@ The user we refer about
 
 #### Defined in
 
-[client/internal/providers/ssr-provider.tsx:68](https://github.com/onzag/itemize/blob/f2f29986/client/internal/providers/ssr-provider.tsx#L68)
+[client/internal/providers/ssr-provider.tsx:68](https://github.com/onzag/itemize/blob/5c2808d3/client/internal/providers/ssr-provider.tsx#L68)

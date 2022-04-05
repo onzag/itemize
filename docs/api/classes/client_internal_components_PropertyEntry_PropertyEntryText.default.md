@@ -82,7 +82,7 @@ React.Component&lt;IPropertyEntryHandlerProps&lt;string, IPropertyEntryTextRende
 
 #### Defined in
 
-[client/internal/components/PropertyEntry/PropertyEntryText.tsx:292](https://github.com/onzag/itemize/blob/f2f29986/client/internal/components/PropertyEntry/PropertyEntryText.tsx#L292)
+[client/internal/components/PropertyEntry/PropertyEntryText.tsx:292](https://github.com/onzag/itemize/blob/5c2808d3/client/internal/components/PropertyEntry/PropertyEntryText.tsx#L292)
 
 ## Properties
 
@@ -98,7 +98,7 @@ Contains a list of active data uris for the blob elements
 
 #### Defined in
 
-[client/internal/components/PropertyEntry/PropertyEntryText.tsx:288](https://github.com/onzag/itemize/blob/f2f29986/client/internal/components/PropertyEntry/PropertyEntryText.tsx#L288)
+[client/internal/components/PropertyEntry/PropertyEntryText.tsx:288](https://github.com/onzag/itemize/blob/5c2808d3/client/internal/components/PropertyEntry/PropertyEntryText.tsx#L288)
 
 ___
 
@@ -110,7 +110,7 @@ We hold and cache our media property
 
 #### Defined in
 
-[client/internal/components/PropertyEntry/PropertyEntryText.tsx:262](https://github.com/onzag/itemize/blob/f2f29986/client/internal/components/PropertyEntry/PropertyEntryText.tsx#L262)
+[client/internal/components/PropertyEntry/PropertyEntryText.tsx:262](https://github.com/onzag/itemize/blob/5c2808d3/client/internal/components/PropertyEntry/PropertyEntryText.tsx#L262)
 
 ___
 
@@ -122,7 +122,7 @@ We hold and cache our accepts for the media property
 
 #### Defined in
 
-[client/internal/components/PropertyEntry/PropertyEntryText.tsx:266](https://github.com/onzag/itemize/blob/f2f29986/client/internal/components/PropertyEntry/PropertyEntryText.tsx#L266)
+[client/internal/components/PropertyEntry/PropertyEntryText.tsx:266](https://github.com/onzag/itemize/blob/5c2808d3/client/internal/components/PropertyEntry/PropertyEntryText.tsx#L266)
 
 ___
 
@@ -134,7 +134,7 @@ We hold and cache our accpets for the images in the media property
 
 #### Defined in
 
-[client/internal/components/PropertyEntry/PropertyEntryText.tsx:270](https://github.com/onzag/itemize/blob/f2f29986/client/internal/components/PropertyEntry/PropertyEntryText.tsx#L270)
+[client/internal/components/PropertyEntry/PropertyEntryText.tsx:270](https://github.com/onzag/itemize/blob/5c2808d3/client/internal/components/PropertyEntry/PropertyEntryText.tsx#L270)
 
 ___
 
@@ -184,7 +184,7 @@ so avoid having two entry at the same time
 
 #### Defined in
 
-[client/internal/components/PropertyEntry/PropertyEntryText.tsx:281](https://github.com/onzag/itemize/blob/f2f29986/client/internal/components/PropertyEntry/PropertyEntryText.tsx#L281)
+[client/internal/components/PropertyEntry/PropertyEntryText.tsx:281](https://github.com/onzag/itemize/blob/5c2808d3/client/internal/components/PropertyEntry/PropertyEntryText.tsx#L281)
 
 ___
 
@@ -397,7 +397,7 @@ Ran during mount of updates, caches the files that are in the media property
 
 #### Defined in
 
-[client/internal/components/PropertyEntry/PropertyEntryText.tsx:369](https://github.com/onzag/itemize/blob/f2f29986/client/internal/components/PropertyEntry/PropertyEntryText.tsx#L369)
+[client/internal/components/PropertyEntry/PropertyEntryText.tsx:369](https://github.com/onzag/itemize/blob/5c2808d3/client/internal/components/PropertyEntry/PropertyEntryText.tsx#L369)
 
 ___
 
@@ -419,7 +419,7 @@ Called during initial setup
 
 #### Defined in
 
-[client/internal/components/PropertyEntry/PropertyEntryText.tsx:343](https://github.com/onzag/itemize/blob/f2f29986/client/internal/components/PropertyEntry/PropertyEntryText.tsx#L343)
+[client/internal/components/PropertyEntry/PropertyEntryText.tsx:343](https://github.com/onzag/itemize/blob/5c2808d3/client/internal/components/PropertyEntry/PropertyEntryText.tsx#L343)
 
 ___
 
@@ -465,7 +465,7 @@ React.Component.componentDidMount
 
 #### Defined in
 
-[client/internal/components/PropertyEntry/PropertyEntryText.tsx:410](https://github.com/onzag/itemize/blob/f2f29986/client/internal/components/PropertyEntry/PropertyEntryText.tsx#L410)
+[client/internal/components/PropertyEntry/PropertyEntryText.tsx:410](https://github.com/onzag/itemize/blob/5c2808d3/client/internal/components/PropertyEntry/PropertyEntryText.tsx#L410)
 
 ___
 
@@ -489,7 +489,7 @@ React.Component.componentDidUpdate
 
 #### Defined in
 
-[client/internal/components/PropertyEntry/PropertyEntryText.tsx:419](https://github.com/onzag/itemize/blob/f2f29986/client/internal/components/PropertyEntry/PropertyEntryText.tsx#L419)
+[client/internal/components/PropertyEntry/PropertyEntryText.tsx:419](https://github.com/onzag/itemize/blob/5c2808d3/client/internal/components/PropertyEntry/PropertyEntryText.tsx#L419)
 
 ___
 
@@ -577,7 +577,7 @@ React.Component.componentWillUnmount
 
 #### Defined in
 
-[client/internal/components/PropertyEntry/PropertyEntryText.tsx:328](https://github.com/onzag/itemize/blob/f2f29986/client/internal/components/PropertyEntry/PropertyEntryText.tsx#L328)
+[client/internal/components/PropertyEntry/PropertyEntryText.tsx:328](https://github.com/onzag/itemize/blob/5c2808d3/client/internal/components/PropertyEntry/PropertyEntryText.tsx#L328)
 
 ___
 
@@ -630,7 +630,7 @@ ___
 
 #### Defined in
 
-[client/internal/components/PropertyEntry/PropertyEntryText.tsx:322](https://github.com/onzag/itemize/blob/f2f29986/client/internal/components/PropertyEntry/PropertyEntryText.tsx#L322)
+[client/internal/components/PropertyEntry/PropertyEntryText.tsx:322](https://github.com/onzag/itemize/blob/5c2808d3/client/internal/components/PropertyEntry/PropertyEntryText.tsx#L322)
 
 ___
 
@@ -644,7 +644,7 @@ ___
 
 #### Defined in
 
-[client/internal/components/PropertyEntry/PropertyEntryText.tsx:316](https://github.com/onzag/itemize/blob/f2f29986/client/internal/components/PropertyEntry/PropertyEntryText.tsx#L316)
+[client/internal/components/PropertyEntry/PropertyEntryText.tsx:316](https://github.com/onzag/itemize/blob/5c2808d3/client/internal/components/PropertyEntry/PropertyEntryText.tsx#L316)
 
 ___
 
@@ -727,7 +727,7 @@ so it makes sense
 
 #### Defined in
 
-[client/internal/components/PropertyEntry/PropertyEntryText.tsx:440](https://github.com/onzag/itemize/blob/f2f29986/client/internal/components/PropertyEntry/PropertyEntryText.tsx#L440)
+[client/internal/components/PropertyEntry/PropertyEntryText.tsx:440](https://github.com/onzag/itemize/blob/5c2808d3/client/internal/components/PropertyEntry/PropertyEntryText.tsx#L440)
 
 ___
 
@@ -747,7 +747,7 @@ ___
 
 #### Defined in
 
-[client/internal/components/PropertyEntry/PropertyEntryText.tsx:553](https://github.com/onzag/itemize/blob/f2f29986/client/internal/components/PropertyEntry/PropertyEntryText.tsx#L553)
+[client/internal/components/PropertyEntry/PropertyEntryText.tsx:553](https://github.com/onzag/itemize/blob/5c2808d3/client/internal/components/PropertyEntry/PropertyEntryText.tsx#L553)
 
 ___
 
@@ -771,7 +771,7 @@ Inserts a file in the media property
 
 #### Defined in
 
-[client/internal/components/PropertyEntry/PropertyEntryText.tsx:637](https://github.com/onzag/itemize/blob/f2f29986/client/internal/components/PropertyEntry/PropertyEntryText.tsx#L637)
+[client/internal/components/PropertyEntry/PropertyEntryText.tsx:637](https://github.com/onzag/itemize/blob/5c2808d3/client/internal/components/PropertyEntry/PropertyEntryText.tsx#L637)
 
 ___
 
@@ -796,7 +796,7 @@ an url, note that this will read and append the file from there
 
 #### Defined in
 
-[client/internal/components/PropertyEntry/PropertyEntryText.tsx:575](https://github.com/onzag/itemize/blob/f2f29986/client/internal/components/PropertyEntry/PropertyEntryText.tsx#L575)
+[client/internal/components/PropertyEntry/PropertyEntryText.tsx:575](https://github.com/onzag/itemize/blob/5c2808d3/client/internal/components/PropertyEntry/PropertyEntryText.tsx#L575)
 
 ___
 
@@ -819,7 +819,7 @@ it remains however in the cache itself
 
 #### Defined in
 
-[client/internal/components/PropertyEntry/PropertyEntryText.tsx:536](https://github.com/onzag/itemize/blob/f2f29986/client/internal/components/PropertyEntry/PropertyEntryText.tsx#L536)
+[client/internal/components/PropertyEntry/PropertyEntryText.tsx:536](https://github.com/onzag/itemize/blob/5c2808d3/client/internal/components/PropertyEntry/PropertyEntryText.tsx#L536)
 
 ___
 
@@ -837,7 +837,7 @@ restoration, but also restore its related media property
 
 #### Defined in
 
-[client/internal/components/PropertyEntry/PropertyEntryText.tsx:483](https://github.com/onzag/itemize/blob/f2f29986/client/internal/components/PropertyEntry/PropertyEntryText.tsx#L483)
+[client/internal/components/PropertyEntry/PropertyEntryText.tsx:483](https://github.com/onzag/itemize/blob/5c2808d3/client/internal/components/PropertyEntry/PropertyEntryText.tsx#L483)
 
 ___
 
@@ -860,7 +860,7 @@ such as done by an undo ctrl+z event
 
 #### Defined in
 
-[client/internal/components/PropertyEntry/PropertyEntryText.tsx:497](https://github.com/onzag/itemize/blob/f2f29986/client/internal/components/PropertyEntry/PropertyEntryText.tsx#L497)
+[client/internal/components/PropertyEntry/PropertyEntryText.tsx:497](https://github.com/onzag/itemize/blob/5c2808d3/client/internal/components/PropertyEntry/PropertyEntryText.tsx#L497)
 
 ___
 
@@ -880,7 +880,7 @@ ___
 
 #### Defined in
 
-[client/internal/components/PropertyEntry/PropertyEntryText.tsx:564](https://github.com/onzag/itemize/blob/f2f29986/client/internal/components/PropertyEntry/PropertyEntryText.tsx#L564)
+[client/internal/components/PropertyEntry/PropertyEntryText.tsx:564](https://github.com/onzag/itemize/blob/5c2808d3/client/internal/components/PropertyEntry/PropertyEntryText.tsx#L564)
 
 ___
 
@@ -900,7 +900,7 @@ ___
 
 #### Defined in
 
-[client/internal/components/PropertyEntry/PropertyEntryText.tsx:557](https://github.com/onzag/itemize/blob/f2f29986/client/internal/components/PropertyEntry/PropertyEntryText.tsx#L557)
+[client/internal/components/PropertyEntry/PropertyEntryText.tsx:557](https://github.com/onzag/itemize/blob/5c2808d3/client/internal/components/PropertyEntry/PropertyEntryText.tsx#L557)
 
 ___
 
@@ -920,7 +920,7 @@ ___
 
 #### Defined in
 
-[client/internal/components/PropertyEntry/PropertyEntryText.tsx:606](https://github.com/onzag/itemize/blob/f2f29986/client/internal/components/PropertyEntry/PropertyEntryText.tsx#L606)
+[client/internal/components/PropertyEntry/PropertyEntryText.tsx:606](https://github.com/onzag/itemize/blob/5c2808d3/client/internal/components/PropertyEntry/PropertyEntryText.tsx#L606)
 
 ___
 
@@ -940,7 +940,7 @@ ___
 
 #### Defined in
 
-[client/internal/components/PropertyEntry/PropertyEntryText.tsx:623](https://github.com/onzag/itemize/blob/f2f29986/client/internal/components/PropertyEntry/PropertyEntryText.tsx#L623)
+[client/internal/components/PropertyEntry/PropertyEntryText.tsx:623](https://github.com/onzag/itemize/blob/5c2808d3/client/internal/components/PropertyEntry/PropertyEntryText.tsx#L623)
 
 ___
 
@@ -958,7 +958,7 @@ React.Component.render
 
 #### Defined in
 
-[client/internal/components/PropertyEntry/PropertyEntryText.tsx:784](https://github.com/onzag/itemize/blob/f2f29986/client/internal/components/PropertyEntry/PropertyEntryText.tsx#L784)
+[client/internal/components/PropertyEntry/PropertyEntryText.tsx:784](https://github.com/onzag/itemize/blob/5c2808d3/client/internal/components/PropertyEntry/PropertyEntryText.tsx#L784)
 
 ___
 
@@ -1014,4 +1014,4 @@ React.Component.shouldComponentUpdate
 
 #### Defined in
 
-[client/internal/components/PropertyEntry/PropertyEntryText.tsx:756](https://github.com/onzag/itemize/blob/f2f29986/client/internal/components/PropertyEntry/PropertyEntryText.tsx#L756)
+[client/internal/components/PropertyEntry/PropertyEntryText.tsx:756](https://github.com/onzag/itemize/blob/5c2808d3/client/internal/components/PropertyEntry/PropertyEntryText.tsx#L756)

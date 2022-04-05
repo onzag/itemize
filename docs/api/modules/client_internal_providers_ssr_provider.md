@@ -31,7 +31,7 @@ The ssr context passes the context value all the way to all the components
 
 #### Defined in
 
-[client/internal/providers/ssr-provider.tsx:96](https://github.com/onzag/itemize/blob/f2f29986/client/internal/providers/ssr-provider.tsx#L96)
+[client/internal/providers/ssr-provider.tsx:96](https://github.com/onzag/itemize/blob/5c2808d3/client/internal/providers/ssr-provider.tsx#L96)
 
 ## Functions
 
@@ -59,4 +59,4 @@ This should sit on top of the itemize app
 
 #### Defined in
 
-[client/internal/providers/ssr-provider.tsx:117](https://github.com/onzag/itemize/blob/f2f29986/client/internal/providers/ssr-provider.tsx#L117)
+[client/internal/providers/ssr-provider.tsx:117](https://github.com/onzag/itemize/blob/5c2808d3/client/internal/providers/ssr-provider.tsx#L117)

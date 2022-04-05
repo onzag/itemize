@@ -29,7 +29,7 @@ to be rechecked an update
 
 #### Defined in
 
-[client/internal/workers/cache/cache.worker.ts:58](https://github.com/onzag/itemize/blob/f2f29986/client/internal/workers/cache/cache.worker.ts#L58)
+[client/internal/workers/cache/cache.worker.ts:58](https://github.com/onzag/itemize/blob/5c2808d3/client/internal/workers/cache/cache.worker.ts#L58)
 
 ___
 
@@ -41,7 +41,7 @@ The graphql value that it emulates from the server side
 
 #### Defined in
 
-[client/internal/workers/cache/cache.worker.ts:53](https://github.com/onzag/itemize/blob/f2f29986/client/internal/workers/cache/cache.worker.ts#L53)
+[client/internal/workers/cache/cache.worker.ts:53](https://github.com/onzag/itemize/blob/5c2808d3/client/internal/workers/cache/cache.worker.ts#L53)
 
 ___
 
@@ -53,7 +53,7 @@ When was this last search modified
 
 #### Defined in
 
-[client/internal/workers/cache/cache.worker.ts:62](https://github.com/onzag/itemize/blob/f2f29986/client/internal/workers/cache/cache.worker.ts#L62)
+[client/internal/workers/cache/cache.worker.ts:62](https://github.com/onzag/itemize/blob/5c2808d3/client/internal/workers/cache/cache.worker.ts#L62)
 
 ___
 
@@ -65,7 +65,7 @@ The source records that were used in the search
 
 #### Defined in
 
-[client/internal/workers/cache/cache.worker.ts:66](https://github.com/onzag/itemize/blob/f2f29986/client/internal/workers/cache/cache.worker.ts#L66)
+[client/internal/workers/cache/cache.worker.ts:66](https://github.com/onzag/itemize/blob/5c2808d3/client/internal/workers/cache/cache.worker.ts#L66)
 
 ___
 
@@ -75,4 +75,4 @@ ___
 
 #### Defined in
 
-[client/internal/workers/cache/cache.worker.ts:67](https://github.com/onzag/itemize/blob/f2f29986/client/internal/workers/cache/cache.worker.ts#L67)
+[client/internal/workers/cache/cache.worker.ts:67](https://github.com/onzag/itemize/blob/5c2808d3/client/internal/workers/cache/cache.worker.ts#L67)

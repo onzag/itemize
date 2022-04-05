@@ -33,4 +33,4 @@ a react node
 
 #### Defined in
 
-[client/components/localization/AppCountryRetriever.tsx:25](https://github.com/onzag/itemize/blob/f2f29986/client/components/localization/AppCountryRetriever.tsx#L25)
+[client/components/localization/AppCountryRetriever.tsx:25](https://github.com/onzag/itemize/blob/5c2808d3/client/components/localization/AppCountryRetriever.tsx#L25)

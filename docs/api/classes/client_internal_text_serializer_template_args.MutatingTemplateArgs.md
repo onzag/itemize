@@ -30,7 +30,7 @@ Allows to specify not very defined arguments into the serializer during a dynami
 
 #### Defined in
 
-[client/internal/text/serializer/template-args.ts:112](https://github.com/onzag/itemize/blob/f2f29986/client/internal/text/serializer/template-args.ts#L112)
+[client/internal/text/serializer/template-args.ts:112](https://github.com/onzag/itemize/blob/5c2808d3/client/internal/text/serializer/template-args.ts#L112)
 
 ## Properties
 
@@ -40,4 +40,4 @@ Allows to specify not very defined arguments into the serializer during a dynami
 
 #### Defined in
 
-[client/internal/text/serializer/template-args.ts:111](https://github.com/onzag/itemize/blob/f2f29986/client/internal/text/serializer/template-args.ts#L111)
+[client/internal/text/serializer/template-args.ts:111](https://github.com/onzag/itemize/blob/5c2808d3/client/internal/text/serializer/template-args.ts#L111)

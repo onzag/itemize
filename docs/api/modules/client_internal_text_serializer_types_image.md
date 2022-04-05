@@ -36,4 +36,4 @@ registry
 
 #### Defined in
 
-[client/internal/text/serializer/types/image.tsx:19](https://github.com/onzag/itemize/blob/f2f29986/client/internal/text/serializer/types/image.tsx#L19)
+[client/internal/text/serializer/types/image.tsx:19](https://github.com/onzag/itemize/blob/5c2808d3/client/internal/text/serializer/types/image.tsx#L19)

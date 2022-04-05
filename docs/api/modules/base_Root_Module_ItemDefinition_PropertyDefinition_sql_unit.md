@@ -40,7 +40,7 @@ a patial row definition
 
 #### Defined in
 
-[base/Root/Module/ItemDefinition/PropertyDefinition/sql/unit.ts:17](https://github.com/onzag/itemize/blob/f2f29986/base/Root/Module/ItemDefinition/PropertyDefinition/sql/unit.ts#L17)
+[base/Root/Module/ItemDefinition/PropertyDefinition/sql/unit.ts:17](https://github.com/onzag/itemize/blob/5c2808d3/base/Root/Module/ItemDefinition/PropertyDefinition/sql/unit.ts#L17)
 
 ___
 
@@ -64,7 +64,7 @@ the rows to be btree indexed
 
 #### Defined in
 
-[base/Root/Module/ItemDefinition/PropertyDefinition/sql/unit.ts:140](https://github.com/onzag/itemize/blob/f2f29986/base/Root/Module/ItemDefinition/PropertyDefinition/sql/unit.ts#L140)
+[base/Root/Module/ItemDefinition/PropertyDefinition/sql/unit.ts:140](https://github.com/onzag/itemize/blob/5c2808d3/base/Root/Module/ItemDefinition/PropertyDefinition/sql/unit.ts#L140)
 
 ___
 
@@ -88,7 +88,7 @@ a partial row comparison
 
 #### Defined in
 
-[base/Root/Module/ItemDefinition/PropertyDefinition/sql/unit.ts:149](https://github.com/onzag/itemize/blob/f2f29986/base/Root/Module/ItemDefinition/PropertyDefinition/sql/unit.ts#L149)
+[base/Root/Module/ItemDefinition/PropertyDefinition/sql/unit.ts:149](https://github.com/onzag/itemize/blob/5c2808d3/base/Root/Module/ItemDefinition/PropertyDefinition/sql/unit.ts#L149)
 
 ___
 
@@ -112,7 +112,7 @@ a partial row value
 
 #### Defined in
 
-[base/Root/Module/ItemDefinition/PropertyDefinition/sql/unit.ts:52](https://github.com/onzag/itemize/blob/f2f29986/base/Root/Module/ItemDefinition/PropertyDefinition/sql/unit.ts#L52)
+[base/Root/Module/ItemDefinition/PropertyDefinition/sql/unit.ts:52](https://github.com/onzag/itemize/blob/5c2808d3/base/Root/Module/ItemDefinition/PropertyDefinition/sql/unit.ts#L52)
 
 ___
 
@@ -136,7 +136,7 @@ the three string order by rule
 
 #### Defined in
 
-[base/Root/Module/ItemDefinition/PropertyDefinition/sql/unit.ts:131](https://github.com/onzag/itemize/blob/f2f29986/base/Root/Module/ItemDefinition/PropertyDefinition/sql/unit.ts#L131)
+[base/Root/Module/ItemDefinition/PropertyDefinition/sql/unit.ts:131](https://github.com/onzag/itemize/blob/5c2808d3/base/Root/Module/ItemDefinition/PropertyDefinition/sql/unit.ts#L131)
 
 ___
 
@@ -160,7 +160,7 @@ a supported unit type (or null)
 
 #### Defined in
 
-[base/Root/Module/ItemDefinition/PropertyDefinition/sql/unit.ts:75](https://github.com/onzag/itemize/blob/f2f29986/base/Root/Module/ItemDefinition/PropertyDefinition/sql/unit.ts#L75)
+[base/Root/Module/ItemDefinition/PropertyDefinition/sql/unit.ts:75](https://github.com/onzag/itemize/blob/5c2808d3/base/Root/Module/ItemDefinition/PropertyDefinition/sql/unit.ts#L75)
 
 ___
 
@@ -184,7 +184,7 @@ a boolean on whether the equality succeed or not
 
 #### Defined in
 
-[base/Root/Module/ItemDefinition/PropertyDefinition/sql/unit.ts:159](https://github.com/onzag/itemize/blob/f2f29986/base/Root/Module/ItemDefinition/PropertyDefinition/sql/unit.ts#L159)
+[base/Root/Module/ItemDefinition/PropertyDefinition/sql/unit.ts:159](https://github.com/onzag/itemize/blob/5c2808d3/base/Root/Module/ItemDefinition/PropertyDefinition/sql/unit.ts#L159)
 
 ___
 
@@ -208,7 +208,7 @@ a boolean on whether it was searched by it
 
 #### Defined in
 
-[base/Root/Module/ItemDefinition/PropertyDefinition/sql/unit.ts:93](https://github.com/onzag/itemize/blob/f2f29986/base/Root/Module/ItemDefinition/PropertyDefinition/sql/unit.ts#L93)
+[base/Root/Module/ItemDefinition/PropertyDefinition/sql/unit.ts:93](https://github.com/onzag/itemize/blob/5c2808d3/base/Root/Module/ItemDefinition/PropertyDefinition/sql/unit.ts#L93)
 
 ___
 
@@ -230,4 +230,4 @@ the selection function for unit based elements
 
 #### Defined in
 
-[base/Root/Module/ItemDefinition/PropertyDefinition/sql/unit.ts:38](https://github.com/onzag/itemize/blob/f2f29986/base/Root/Module/ItemDefinition/PropertyDefinition/sql/unit.ts#L38)
+[base/Root/Module/ItemDefinition/PropertyDefinition/sql/unit.ts:38](https://github.com/onzag/itemize/blob/5c2808d3/base/Root/Module/ItemDefinition/PropertyDefinition/sql/unit.ts#L38)

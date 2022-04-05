@@ -31,7 +31,7 @@ will crash any time when rendering
 
 #### Defined in
 
-[client/providers/renderer.tsx:178](https://github.com/onzag/itemize/blob/f2f29986/client/providers/renderer.tsx#L178)
+[client/providers/renderer.tsx:178](https://github.com/onzag/itemize/blob/5c2808d3/client/providers/renderer.tsx#L178)
 
 ## Functions
 
@@ -58,4 +58,4 @@ a react element
 
 #### Defined in
 
-[client/providers/renderer.tsx:196](https://github.com/onzag/itemize/blob/f2f29986/client/providers/renderer.tsx#L196)
+[client/providers/renderer.tsx:196](https://github.com/onzag/itemize/blob/5c2808d3/client/providers/renderer.tsx#L196)

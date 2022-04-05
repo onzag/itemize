@@ -33,7 +33,7 @@ Whether the alt key is currently pressed
 
 #### Defined in
 
-[client/fast-prototyping/components/slate/wrapper.tsx:1432](https://github.com/onzag/itemize/blob/f2f29986/client/fast-prototyping/components/slate/wrapper.tsx#L1432)
+[client/fast-prototyping/components/slate/wrapper.tsx:1432](https://github.com/onzag/itemize/blob/5c2808d3/client/fast-prototyping/components/slate/wrapper.tsx#L1432)
 
 ___
 
@@ -45,7 +45,7 @@ Specifies the state of the drawer
 
 #### Defined in
 
-[client/fast-prototyping/components/slate/wrapper.tsx:1404](https://github.com/onzag/itemize/blob/f2f29986/client/fast-prototyping/components/slate/wrapper.tsx#L1404)
+[client/fast-prototyping/components/slate/wrapper.tsx:1404](https://github.com/onzag/itemize/blob/5c2808d3/client/fast-prototyping/components/slate/wrapper.tsx#L1404)
 
 ___
 
@@ -60,7 +60,7 @@ before that happened
 
 #### Defined in
 
-[client/fast-prototyping/components/slate/wrapper.tsx:1427](https://github.com/onzag/itemize/blob/f2f29986/client/fast-prototyping/components/slate/wrapper.tsx#L1427)
+[client/fast-prototyping/components/slate/wrapper.tsx:1427](https://github.com/onzag/itemize/blob/5c2808d3/client/fast-prototyping/components/slate/wrapper.tsx#L1427)
 
 ___
 
@@ -72,7 +72,7 @@ Specifies whether the link dialog to input links and template links is open
 
 #### Defined in
 
-[client/fast-prototyping/components/slate/wrapper.tsx:1389](https://github.com/onzag/itemize/blob/f2f29986/client/fast-prototyping/components/slate/wrapper.tsx#L1389)
+[client/fast-prototyping/components/slate/wrapper.tsx:1389](https://github.com/onzag/itemize/blob/5c2808d3/client/fast-prototyping/components/slate/wrapper.tsx#L1389)
 
 ___
 
@@ -88,7 +88,7 @@ of the state as it's only used there
 
 #### Defined in
 
-[client/fast-prototyping/components/slate/wrapper.tsx:1419](https://github.com/onzag/itemize/blob/f2f29986/client/fast-prototyping/components/slate/wrapper.tsx#L1419)
+[client/fast-prototyping/components/slate/wrapper.tsx:1419](https://github.com/onzag/itemize/blob/5c2808d3/client/fast-prototyping/components/slate/wrapper.tsx#L1419)
 
 ___
 
@@ -98,7 +98,7 @@ ___
 
 #### Defined in
 
-[client/fast-prototyping/components/slate/wrapper.tsx:1433](https://github.com/onzag/itemize/blob/f2f29986/client/fast-prototyping/components/slate/wrapper.tsx#L1433)
+[client/fast-prototyping/components/slate/wrapper.tsx:1433](https://github.com/onzag/itemize/blob/5c2808d3/client/fast-prototyping/components/slate/wrapper.tsx#L1433)
 
 ___
 
@@ -110,7 +110,7 @@ Specifies whether the link dialog to input templated html is open
 
 #### Defined in
 
-[client/fast-prototyping/components/slate/wrapper.tsx:1399](https://github.com/onzag/itemize/blob/f2f29986/client/fast-prototyping/components/slate/wrapper.tsx#L1399)
+[client/fast-prototyping/components/slate/wrapper.tsx:1399](https://github.com/onzag/itemize/blob/5c2808d3/client/fast-prototyping/components/slate/wrapper.tsx#L1399)
 
 ___
 
@@ -122,7 +122,7 @@ Specifies whether the link dialog to input templated text is open
 
 #### Defined in
 
-[client/fast-prototyping/components/slate/wrapper.tsx:1394](https://github.com/onzag/itemize/blob/f2f29986/client/fast-prototyping/components/slate/wrapper.tsx#L1394)
+[client/fast-prototyping/components/slate/wrapper.tsx:1394](https://github.com/onzag/itemize/blob/5c2808d3/client/fast-prototyping/components/slate/wrapper.tsx#L1394)
 
 ___
 
@@ -135,7 +135,7 @@ when the drawer is open in disjointed mode
 
 #### Defined in
 
-[client/fast-prototyping/components/slate/wrapper.tsx:1410](https://github.com/onzag/itemize/blob/f2f29986/client/fast-prototyping/components/slate/wrapper.tsx#L1410)
+[client/fast-prototyping/components/slate/wrapper.tsx:1410](https://github.com/onzag/itemize/blob/5c2808d3/client/fast-prototyping/components/slate/wrapper.tsx#L1410)
 
 ___
 
@@ -147,4 +147,4 @@ Specifies whether the video dialog to input the url for the video is open
 
 #### Defined in
 
-[client/fast-prototyping/components/slate/wrapper.tsx:1384](https://github.com/onzag/itemize/blob/f2f29986/client/fast-prototyping/components/slate/wrapper.tsx#L1384)
+[client/fast-prototyping/components/slate/wrapper.tsx:1384](https://github.com/onzag/itemize/blob/5c2808d3/client/fast-prototyping/components/slate/wrapper.tsx#L1384)

@@ -81,7 +81,7 @@ A react node can be given, used for passing the I18n component
 
 #### Defined in
 
-[client/fast-prototyping/components/slate/index.tsx:248](https://github.com/onzag/itemize/blob/f2f29986/client/fast-prototyping/components/slate/index.tsx#L248)
+[client/fast-prototyping/components/slate/index.tsx:248](https://github.com/onzag/itemize/blob/5c2808d3/client/fast-prototyping/components/slate/index.tsx#L248)
 
 ___
 
@@ -94,7 +94,7 @@ of many views
 
 #### Defined in
 
-[client/fast-prototyping/components/slate/index.tsx:257](https://github.com/onzag/itemize/blob/f2f29986/client/fast-prototyping/components/slate/index.tsx#L257)
+[client/fast-prototyping/components/slate/index.tsx:257](https://github.com/onzag/itemize/blob/5c2808d3/client/fast-prototyping/components/slate/index.tsx#L257)
 
 ___
 
@@ -106,7 +106,7 @@ If the context is an array or iterable, then mark it as such
 
 #### Defined in
 
-[client/fast-prototyping/components/slate/index.tsx:252](https://github.com/onzag/itemize/blob/f2f29986/client/fast-prototyping/components/slate/index.tsx#L252)
+[client/fast-prototyping/components/slate/index.tsx:252](https://github.com/onzag/itemize/blob/5c2808d3/client/fast-prototyping/components/slate/index.tsx#L252)
 
 ___
 
@@ -122,7 +122,7 @@ The properties that the context contains
 
 #### Defined in
 
-[client/fast-prototyping/components/slate/index.tsx:261](https://github.com/onzag/itemize/blob/f2f29986/client/fast-prototyping/components/slate/index.tsx#L261)
+[client/fast-prototyping/components/slate/index.tsx:261](https://github.com/onzag/itemize/blob/5c2808d3/client/fast-prototyping/components/slate/index.tsx#L261)
 
 ___
 
@@ -134,7 +134,7 @@ The type which will always be "context"
 
 #### Defined in
 
-[client/fast-prototyping/components/slate/index.tsx:237](https://github.com/onzag/itemize/blob/f2f29986/client/fast-prototyping/components/slate/index.tsx#L237)
+[client/fast-prototyping/components/slate/index.tsx:237](https://github.com/onzag/itemize/blob/5c2808d3/client/fast-prototyping/components/slate/index.tsx#L237)
 
 ## Methods
 
@@ -157,4 +157,4 @@ Allows to specify a wrapper to wrap based on the context
 
 #### Defined in
 
-[client/fast-prototyping/components/slate/index.tsx:241](https://github.com/onzag/itemize/blob/f2f29986/client/fast-prototyping/components/slate/index.tsx#L241)
+[client/fast-prototyping/components/slate/index.tsx:241](https://github.com/onzag/itemize/blob/5c2808d3/client/fast-prototyping/components/slate/index.tsx#L241)

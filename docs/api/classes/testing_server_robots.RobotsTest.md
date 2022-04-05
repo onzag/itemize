@@ -66,7 +66,7 @@
 
 #### Defined in
 
-[testing/server/robots.ts:15](https://github.com/onzag/itemize/blob/f2f29986/testing/server/robots.ts#L15)
+[testing/server/robots.ts:15](https://github.com/onzag/itemize/blob/5c2808d3/testing/server/robots.ts#L15)
 
 ## Properties
 
@@ -76,7 +76,7 @@
 
 #### Defined in
 
-[testing/server/robots.ts:8](https://github.com/onzag/itemize/blob/f2f29986/testing/server/robots.ts#L8)
+[testing/server/robots.ts:8](https://github.com/onzag/itemize/blob/5c2808d3/testing/server/robots.ts#L8)
 
 ___
 
@@ -86,7 +86,7 @@ ___
 
 #### Defined in
 
-[testing/server/robots.ts:10](https://github.com/onzag/itemize/blob/f2f29986/testing/server/robots.ts#L10)
+[testing/server/robots.ts:10](https://github.com/onzag/itemize/blob/5c2808d3/testing/server/robots.ts#L10)
 
 ___
 
@@ -96,7 +96,7 @@ ___
 
 #### Defined in
 
-[testing/server/robots.ts:12](https://github.com/onzag/itemize/blob/f2f29986/testing/server/robots.ts#L12)
+[testing/server/robots.ts:12](https://github.com/onzag/itemize/blob/5c2808d3/testing/server/robots.ts#L12)
 
 ___
 
@@ -106,7 +106,7 @@ ___
 
 #### Defined in
 
-[testing/server/robots.ts:13](https://github.com/onzag/itemize/blob/f2f29986/testing/server/robots.ts#L13)
+[testing/server/robots.ts:13](https://github.com/onzag/itemize/blob/5c2808d3/testing/server/robots.ts#L13)
 
 ___
 
@@ -116,7 +116,7 @@ ___
 
 #### Defined in
 
-[testing/server/robots.ts:11](https://github.com/onzag/itemize/blob/f2f29986/testing/server/robots.ts#L11)
+[testing/server/robots.ts:11](https://github.com/onzag/itemize/blob/5c2808d3/testing/server/robots.ts#L11)
 
 ___
 
@@ -126,7 +126,7 @@ ___
 
 #### Defined in
 
-[testing/server/robots.ts:9](https://github.com/onzag/itemize/blob/f2f29986/testing/server/robots.ts#L9)
+[testing/server/robots.ts:9](https://github.com/onzag/itemize/blob/5c2808d3/testing/server/robots.ts#L9)
 
 ## Methods
 
@@ -149,7 +149,7 @@ use for cleanup
 
 #### Defined in
 
-[testing/index.ts:105](https://github.com/onzag/itemize/blob/f2f29986/testing/index.ts#L105)
+[testing/index.ts:105](https://github.com/onzag/itemize/blob/5c2808d3/testing/index.ts#L105)
 
 ___
 
@@ -173,7 +173,7 @@ well
 
 #### Defined in
 
-[testing/index.ts:88](https://github.com/onzag/itemize/blob/f2f29986/testing/index.ts#L88)
+[testing/index.ts:88](https://github.com/onzag/itemize/blob/5c2808d3/testing/index.ts#L88)
 
 ___
 
@@ -193,7 +193,7 @@ Build a brand new instance
 
 #### Defined in
 
-[testing/index.ts:71](https://github.com/onzag/itemize/blob/f2f29986/testing/index.ts#L71)
+[testing/index.ts:71](https://github.com/onzag/itemize/blob/5c2808d3/testing/index.ts#L71)
 
 ___
 
@@ -220,7 +220,7 @@ Define a new test
 
 #### Defined in
 
-[testing/index.ts:114](https://github.com/onzag/itemize/blob/f2f29986/testing/index.ts#L114)
+[testing/index.ts:114](https://github.com/onzag/itemize/blob/5c2808d3/testing/index.ts#L114)
 
 ___
 
@@ -240,7 +240,7 @@ Executes during just after before has been executed
 
 #### Defined in
 
-[testing/server/robots.ts:115](https://github.com/onzag/itemize/blob/f2f29986/testing/server/robots.ts#L115)
+[testing/server/robots.ts:115](https://github.com/onzag/itemize/blob/5c2808d3/testing/server/robots.ts#L115)
 
 ___
 
@@ -264,7 +264,7 @@ ___
 
 #### Defined in
 
-[testing/index.ts:162](https://github.com/onzag/itemize/blob/f2f29986/testing/index.ts#L162)
+[testing/index.ts:162](https://github.com/onzag/itemize/blob/5c2808d3/testing/index.ts#L162)
 
 ___
 
@@ -291,7 +291,7 @@ Define a new assertion
 
 #### Defined in
 
-[testing/index.ts:129](https://github.com/onzag/itemize/blob/f2f29986/testing/index.ts#L129)
+[testing/index.ts:129](https://github.com/onzag/itemize/blob/5c2808d3/testing/index.ts#L129)
 
 ___
 
@@ -311,7 +311,7 @@ Quits this test
 
 #### Defined in
 
-[testing/index.ts:220](https://github.com/onzag/itemize/blob/f2f29986/testing/index.ts#L220)
+[testing/index.ts:220](https://github.com/onzag/itemize/blob/5c2808d3/testing/index.ts#L220)
 
 ___
 
@@ -331,7 +331,7 @@ ___
 
 #### Defined in
 
-[testing/server/robots.ts:57](https://github.com/onzag/itemize/blob/f2f29986/testing/server/robots.ts#L57)
+[testing/server/robots.ts:57](https://github.com/onzag/itemize/blob/5c2808d3/testing/server/robots.ts#L57)
 
 ___
 
@@ -352,7 +352,7 @@ and by all it means all of them
 
 #### Defined in
 
-[testing/index.ts:186](https://github.com/onzag/itemize/blob/f2f29986/testing/index.ts#L186)
+[testing/index.ts:186](https://github.com/onzag/itemize/blob/5c2808d3/testing/index.ts#L186)
 
 ___
 
@@ -374,7 +374,7 @@ this
 
 #### Defined in
 
-[testing/index.ts:201](https://github.com/onzag/itemize/blob/f2f29986/testing/index.ts#L201)
+[testing/index.ts:201](https://github.com/onzag/itemize/blob/5c2808d3/testing/index.ts#L201)
 
 ___
 
@@ -395,7 +395,7 @@ they should be on the same layer
 
 #### Defined in
 
-[testing/index.ts:172](https://github.com/onzag/itemize/blob/f2f29986/testing/index.ts#L172)
+[testing/index.ts:172](https://github.com/onzag/itemize/blob/5c2808d3/testing/index.ts#L172)
 
 ___
 
@@ -419,7 +419,7 @@ ___
 
 #### Defined in
 
-[testing/index.ts:141](https://github.com/onzag/itemize/blob/f2f29986/testing/index.ts#L141)
+[testing/index.ts:141](https://github.com/onzag/itemize/blob/5c2808d3/testing/index.ts#L141)
 
 ___
 
@@ -439,7 +439,7 @@ ___
 
 #### Defined in
 
-[testing/server/robots.ts:30](https://github.com/onzag/itemize/blob/f2f29986/testing/server/robots.ts#L30)
+[testing/server/robots.ts:30](https://github.com/onzag/itemize/blob/5c2808d3/testing/server/robots.ts#L30)
 
 ___
 
@@ -463,7 +463,7 @@ ___
 
 #### Defined in
 
-[testing/index.ts:211](https://github.com/onzag/itemize/blob/f2f29986/testing/index.ts#L211)
+[testing/index.ts:211](https://github.com/onzag/itemize/blob/5c2808d3/testing/index.ts#L211)
 
 ___
 
@@ -487,4 +487,4 @@ ___
 
 #### Defined in
 
-[testing/index.ts:152](https://github.com/onzag/itemize/blob/f2f29986/testing/index.ts#L152)
+[testing/index.ts:152](https://github.com/onzag/itemize/blob/5c2808d3/testing/index.ts#L152)

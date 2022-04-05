@@ -38,4 +38,4 @@ graphql definition
 
 #### Defined in
 
-[server/custom-graphql/index.ts:103](https://github.com/onzag/itemize/blob/f2f29986/server/custom-graphql/index.ts#L103)
+[server/custom-graphql/index.ts:103](https://github.com/onzag/itemize/blob/5c2808d3/server/custom-graphql/index.ts#L103)

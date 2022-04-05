@@ -588,7 +588,7 @@ React.PureComponent.render
 
 #### Defined in
 
-[client/fast-prototyping/components/slate/current-element.tsx:16](https://github.com/onzag/itemize/blob/f2f29986/client/fast-prototyping/components/slate/current-element.tsx#L16)
+[client/fast-prototyping/components/slate/current-element.tsx:16](https://github.com/onzag/itemize/blob/5c2808d3/client/fast-prototyping/components/slate/current-element.tsx#L16)
 
 ___
 

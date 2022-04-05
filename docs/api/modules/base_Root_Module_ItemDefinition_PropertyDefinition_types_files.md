@@ -29,7 +29,7 @@ the gqlFields and the gqlAddFileToFields which adds file functionality
 
 #### Defined in
 
-[base/Root/Module/ItemDefinition/PropertyDefinition/types/files.ts:22](https://github.com/onzag/itemize/blob/f2f29986/base/Root/Module/ItemDefinition/PropertyDefinition/types/files.ts#L22)
+[base/Root/Module/ItemDefinition/PropertyDefinition/types/files.ts:22](https://github.com/onzag/itemize/blob/5c2808d3/base/Root/Module/ItemDefinition/PropertyDefinition/types/files.ts#L22)
 
 ## Variables
 
@@ -41,4 +41,4 @@ The type value represents the behaviour of files in the app
 
 #### Defined in
 
-[base/Root/Module/ItemDefinition/PropertyDefinition/types/files.ts:27](https://github.com/onzag/itemize/blob/f2f29986/base/Root/Module/ItemDefinition/PropertyDefinition/types/files.ts#L27)
+[base/Root/Module/ItemDefinition/PropertyDefinition/types/files.ts:27](https://github.com/onzag/itemize/blob/5c2808d3/base/Root/Module/ItemDefinition/PropertyDefinition/types/files.ts#L27)

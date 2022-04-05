@@ -32,8 +32,8 @@ queried for searches
 | `serverData` | `any` | the server data |
 | `itemDefinition` | [`default`](../classes/base_Root_Module_ItemDefinition.default.md) | the item definition that is being requested (normal form) |
 | `args` | [`IGQLArgs`](../interfaces/gql_querier.IGQLArgs.md) | the args from the search mode |
-| `whereBuilder` | `WhereBuilder` | the where builder instance |
-| `orderByBuilder` | `OrderByBuilder` | the order by builder instance |
+| `whereBuilder` | [`WhereBuilder`](../classes/database_WhereBuilder.WhereBuilder.md) | the where builder instance |
+| `orderByBuilder` | [`OrderByBuilder`](../classes/database_OrderByBuilder.OrderByBuilder.md) | the order by builder instance |
 | `dictionary` | `string` | the dictionary being used |
 | `search` | `string` | the search arg value |
 | `orderBy` | [`IOrderByRuleType`](../interfaces/constants.IOrderByRuleType.md) | the order by rules |
@@ -46,7 +46,7 @@ a list of raw added selected fields
 
 #### Defined in
 
-[base/Root/Module/ItemDefinition/sql.ts:361](https://github.com/onzag/itemize/blob/f2f29986/base/Root/Module/ItemDefinition/sql.ts#L361)
+[base/Root/Module/ItemDefinition/sql.ts:361](https://github.com/onzag/itemize/blob/5c2808d3/base/Root/Module/ItemDefinition/sql.ts#L361)
 
 ___
 
@@ -79,7 +79,7 @@ a sql value
 
 #### Defined in
 
-[base/Root/Module/ItemDefinition/sql.ts:270](https://github.com/onzag/itemize/blob/f2f29986/base/Root/Module/ItemDefinition/sql.ts#L270)
+[base/Root/Module/ItemDefinition/sql.ts:270](https://github.com/onzag/itemize/blob/5c2808d3/base/Root/Module/ItemDefinition/sql.ts#L270)
 
 ___
 
@@ -109,7 +109,7 @@ a graphql value
 
 #### Defined in
 
-[base/Root/Module/ItemDefinition/sql.ts:198](https://github.com/onzag/itemize/blob/f2f29986/base/Root/Module/ItemDefinition/sql.ts#L198)
+[base/Root/Module/ItemDefinition/sql.ts:198](https://github.com/onzag/itemize/blob/5c2808d3/base/Root/Module/ItemDefinition/sql.ts#L198)
 
 ___
 
@@ -137,7 +137,7 @@ a complete table definition type
 
 #### Defined in
 
-[base/Root/Module/ItemDefinition/sql.ts:47](https://github.com/onzag/itemize/blob/f2f29986/base/Root/Module/ItemDefinition/sql.ts#L47)
+[base/Root/Module/ItemDefinition/sql.ts:47](https://github.com/onzag/itemize/blob/5c2808d3/base/Root/Module/ItemDefinition/sql.ts#L47)
 
 ___
 
@@ -163,4 +163,4 @@ a partial sql schema definition for the whole database (adds tables)
 
 #### Defined in
 
-[base/Root/Module/ItemDefinition/sql.ts:167](https://github.com/onzag/itemize/blob/f2f29986/base/Root/Module/ItemDefinition/sql.ts#L167)
+[base/Root/Module/ItemDefinition/sql.ts:167](https://github.com/onzag/itemize/blob/5c2808d3/base/Root/Module/ItemDefinition/sql.ts#L167)

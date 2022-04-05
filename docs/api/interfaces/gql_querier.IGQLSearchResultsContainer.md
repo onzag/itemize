@@ -25,7 +25,7 @@ of traditional searches rather than records based search
 
 #### Defined in
 
-[gql-querier.ts:58](https://github.com/onzag/itemize/blob/f2f29986/gql-querier.ts#L58)
+[gql-querier.ts:58](https://github.com/onzag/itemize/blob/5c2808d3/gql-querier.ts#L58)
 
 ___
 
@@ -35,7 +35,7 @@ ___
 
 #### Defined in
 
-[gql-querier.ts:61](https://github.com/onzag/itemize/blob/f2f29986/gql-querier.ts#L61)
+[gql-querier.ts:61](https://github.com/onzag/itemize/blob/5c2808d3/gql-querier.ts#L61)
 
 ___
 
@@ -45,7 +45,7 @@ ___
 
 #### Defined in
 
-[gql-querier.ts:59](https://github.com/onzag/itemize/blob/f2f29986/gql-querier.ts#L59)
+[gql-querier.ts:59](https://github.com/onzag/itemize/blob/5c2808d3/gql-querier.ts#L59)
 
 ___
 
@@ -55,7 +55,7 @@ ___
 
 #### Defined in
 
-[gql-querier.ts:60](https://github.com/onzag/itemize/blob/f2f29986/gql-querier.ts#L60)
+[gql-querier.ts:60](https://github.com/onzag/itemize/blob/5c2808d3/gql-querier.ts#L60)
 
 ___
 
@@ -65,4 +65,4 @@ ___
 
 #### Defined in
 
-[gql-querier.ts:57](https://github.com/onzag/itemize/blob/f2f29986/gql-querier.ts#L57)
+[gql-querier.ts:57](https://github.com/onzag/itemize/blob/5c2808d3/gql-querier.ts#L57)

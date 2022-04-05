@@ -82,7 +82,7 @@ The renderer args
 
 #### Defined in
 
-[client/internal/renderer.ts:19](https://github.com/onzag/itemize/blob/f2f29986/client/internal/renderer.ts#L19)
+[client/internal/renderer.ts:19](https://github.com/onzag/itemize/blob/5c2808d3/client/internal/renderer.ts#L19)
 
 ___
 
@@ -98,7 +98,7 @@ Whether the entry should autofocus
 
 #### Defined in
 
-[client/internal/components/PropertyEntry/index.tsx:105](https://github.com/onzag/itemize/blob/f2f29986/client/internal/components/PropertyEntry/index.tsx#L105)
+[client/internal/components/PropertyEntry/index.tsx:105](https://github.com/onzag/itemize/blob/5c2808d3/client/internal/components/PropertyEntry/index.tsx#L105)
 
 ___
 
@@ -115,7 +115,7 @@ current value, this check is exceptional as it uses the local equal function
 
 #### Defined in
 
-[client/internal/components/PropertyEntry/index.tsx:77](https://github.com/onzag/itemize/blob/f2f29986/client/internal/components/PropertyEntry/index.tsx#L77)
+[client/internal/components/PropertyEntry/index.tsx:77](https://github.com/onzag/itemize/blob/5c2808d3/client/internal/components/PropertyEntry/index.tsx#L77)
 
 ___
 
@@ -127,7 +127,7 @@ The countries we have available, only avaliable if subtype is phone, country or 
 
 #### Defined in
 
-[client/internal/components/PropertyEntry/PropertyEntryField.tsx:145](https://github.com/onzag/itemize/blob/f2f29986/client/internal/components/PropertyEntry/PropertyEntryField.tsx#L145)
+[client/internal/components/PropertyEntry/PropertyEntryField.tsx:145](https://github.com/onzag/itemize/blob/5c2808d3/client/internal/components/PropertyEntry/PropertyEntryField.tsx#L145)
 
 ___
 
@@ -139,7 +139,7 @@ So the curency we are currently using, only available if type="currency"
 
 #### Defined in
 
-[client/internal/components/PropertyEntry/PropertyEntryField.tsx:163](https://github.com/onzag/itemize/blob/f2f29986/client/internal/components/PropertyEntry/PropertyEntryField.tsx#L163)
+[client/internal/components/PropertyEntry/PropertyEntryField.tsx:163](https://github.com/onzag/itemize/blob/5c2808d3/client/internal/components/PropertyEntry/PropertyEntryField.tsx#L163)
 
 ___
 
@@ -152,7 +152,7 @@ an alternative currency, only available if type="currency" or subtype is currenc
 
 #### Defined in
 
-[client/internal/components/PropertyEntry/PropertyEntryField.tsx:173](https://github.com/onzag/itemize/blob/f2f29986/client/internal/components/PropertyEntry/PropertyEntryField.tsx#L173)
+[client/internal/components/PropertyEntry/PropertyEntryField.tsx:173](https://github.com/onzag/itemize/blob/5c2808d3/client/internal/components/PropertyEntry/PropertyEntryField.tsx#L173)
 
 ___
 
@@ -165,7 +165,7 @@ whether the currency symbol goes first or last, only available if type="currency
 
 #### Defined in
 
-[client/internal/components/PropertyEntry/PropertyEntryField.tsx:168](https://github.com/onzag/itemize/blob/f2f29986/client/internal/components/PropertyEntry/PropertyEntryField.tsx#L168)
+[client/internal/components/PropertyEntry/PropertyEntryField.tsx:168](https://github.com/onzag/itemize/blob/5c2808d3/client/internal/components/PropertyEntry/PropertyEntryField.tsx#L168)
 
 ___
 
@@ -177,7 +177,7 @@ The currency i18n data, only available if type="currency"
 
 #### Defined in
 
-[client/internal/components/PropertyEntry/PropertyEntryField.tsx:177](https://github.com/onzag/itemize/blob/f2f29986/client/internal/components/PropertyEntry/PropertyEntryField.tsx#L177)
+[client/internal/components/PropertyEntry/PropertyEntryField.tsx:177](https://github.com/onzag/itemize/blob/5c2808d3/client/internal/components/PropertyEntry/PropertyEntryField.tsx#L177)
 
 ___
 
@@ -193,7 +193,7 @@ The currently applied value that is in sync with the server side
 
 #### Defined in
 
-[client/internal/components/PropertyEntry/index.tsx:72](https://github.com/onzag/itemize/blob/f2f29986/client/internal/components/PropertyEntry/index.tsx#L72)
+[client/internal/components/PropertyEntry/index.tsx:72](https://github.com/onzag/itemize/blob/5c2808d3/client/internal/components/PropertyEntry/index.tsx#L72)
 
 ___
 
@@ -209,7 +209,7 @@ The current internal value, if any given
 
 #### Defined in
 
-[client/internal/components/PropertyEntry/index.tsx:100](https://github.com/onzag/itemize/blob/f2f29986/client/internal/components/PropertyEntry/index.tsx#L100)
+[client/internal/components/PropertyEntry/index.tsx:100](https://github.com/onzag/itemize/blob/5c2808d3/client/internal/components/PropertyEntry/index.tsx#L100)
 
 ___
 
@@ -229,7 +229,7 @@ of a flag
 
 #### Defined in
 
-[client/internal/components/PropertyEntry/index.tsx:96](https://github.com/onzag/itemize/blob/f2f29986/client/internal/components/PropertyEntry/index.tsx#L96)
+[client/internal/components/PropertyEntry/index.tsx:96](https://github.com/onzag/itemize/blob/5c2808d3/client/internal/components/PropertyEntry/index.tsx#L96)
 
 ___
 
@@ -242,7 +242,7 @@ instead of any of the internal value or the current value
 
 #### Defined in
 
-[client/internal/components/PropertyEntry/PropertyEntryField.tsx:130](https://github.com/onzag/itemize/blob/f2f29986/client/internal/components/PropertyEntry/PropertyEntryField.tsx#L130)
+[client/internal/components/PropertyEntry/PropertyEntryField.tsx:130](https://github.com/onzag/itemize/blob/5c2808d3/client/internal/components/PropertyEntry/PropertyEntryField.tsx#L130)
 
 ___
 
@@ -261,7 +261,7 @@ a value for this play a role as well
 
 #### Defined in
 
-[client/internal/components/PropertyEntry/index.tsx:88](https://github.com/onzag/itemize/blob/f2f29986/client/internal/components/PropertyEntry/index.tsx#L88)
+[client/internal/components/PropertyEntry/index.tsx:88](https://github.com/onzag/itemize/blob/5c2808d3/client/internal/components/PropertyEntry/index.tsx#L88)
 
 ___
 
@@ -277,7 +277,7 @@ The current value
 
 #### Defined in
 
-[client/internal/components/PropertyEntry/index.tsx:81](https://github.com/onzag/itemize/blob/f2f29986/client/internal/components/PropertyEntry/index.tsx#L81)
+[client/internal/components/PropertyEntry/index.tsx:81](https://github.com/onzag/itemize/blob/5c2808d3/client/internal/components/PropertyEntry/index.tsx#L81)
 
 ___
 
@@ -289,7 +289,7 @@ The country we are currently using, only avaliable if subtype is phone, country 
 
 #### Defined in
 
-[client/internal/components/PropertyEntry/PropertyEntryField.tsx:141](https://github.com/onzag/itemize/blob/f2f29986/client/internal/components/PropertyEntry/PropertyEntryField.tsx#L141)
+[client/internal/components/PropertyEntry/PropertyEntryField.tsx:141](https://github.com/onzag/itemize/blob/5c2808d3/client/internal/components/PropertyEntry/PropertyEntryField.tsx#L141)
 
 ___
 
@@ -301,7 +301,7 @@ The currency we are currently using, only avaliable if subtype is currency or ty
 
 #### Defined in
 
-[client/internal/components/PropertyEntry/PropertyEntryField.tsx:159](https://github.com/onzag/itemize/blob/f2f29986/client/internal/components/PropertyEntry/PropertyEntryField.tsx#L159)
+[client/internal/components/PropertyEntry/PropertyEntryField.tsx:159](https://github.com/onzag/itemize/blob/5c2808d3/client/internal/components/PropertyEntry/PropertyEntryField.tsx#L159)
 
 ___
 
@@ -313,7 +313,7 @@ The language we are currently using, only avaliable if subtype is language
 
 #### Defined in
 
-[client/internal/components/PropertyEntry/PropertyEntryField.tsx:150](https://github.com/onzag/itemize/blob/f2f29986/client/internal/components/PropertyEntry/PropertyEntryField.tsx#L150)
+[client/internal/components/PropertyEntry/PropertyEntryField.tsx:150](https://github.com/onzag/itemize/blob/5c2808d3/client/internal/components/PropertyEntry/PropertyEntryField.tsx#L150)
 
 ___
 
@@ -330,7 +330,7 @@ this is locale specific; the description might not be passed if specified by the
 
 #### Defined in
 
-[client/internal/components/PropertyEntry/index.tsx:63](https://github.com/onzag/itemize/blob/f2f29986/client/internal/components/PropertyEntry/index.tsx#L63)
+[client/internal/components/PropertyEntry/index.tsx:63](https://github.com/onzag/itemize/blob/5c2808d3/client/internal/components/PropertyEntry/index.tsx#L63)
 
 ___
 
@@ -348,7 +348,7 @@ and attempts are futile to modify
 
 #### Defined in
 
-[client/internal/components/PropertyEntry/index.tsx:111](https://github.com/onzag/itemize/blob/f2f29986/client/internal/components/PropertyEntry/index.tsx#L111)
+[client/internal/components/PropertyEntry/index.tsx:111](https://github.com/onzag/itemize/blob/5c2808d3/client/internal/components/PropertyEntry/index.tsx#L111)
 
 ___
 
@@ -361,7 +361,7 @@ to be html autocompleted
 
 #### Defined in
 
-[client/internal/components/PropertyEntry/PropertyEntryField.tsx:120](https://github.com/onzag/itemize/blob/f2f29986/client/internal/components/PropertyEntry/PropertyEntryField.tsx#L120)
+[client/internal/components/PropertyEntry/PropertyEntryField.tsx:120](https://github.com/onzag/itemize/blob/5c2808d3/client/internal/components/PropertyEntry/PropertyEntryField.tsx#L120)
 
 ___
 
@@ -377,7 +377,7 @@ Icon are an UI defined property for an icon to use during the view, handle as yo
 
 #### Defined in
 
-[client/internal/components/PropertyEntry/index.tsx:67](https://github.com/onzag/itemize/blob/f2f29986/client/internal/components/PropertyEntry/index.tsx#L67)
+[client/internal/components/PropertyEntry/index.tsx:67](https://github.com/onzag/itemize/blob/5c2808d3/client/internal/components/PropertyEntry/index.tsx#L67)
 
 ___
 
@@ -389,7 +389,7 @@ Whether the type is a numeric type, INTEGER or FLOAT apply
 
 #### Defined in
 
-[client/internal/components/PropertyEntry/PropertyEntryField.tsx:125](https://github.com/onzag/itemize/blob/f2f29986/client/internal/components/PropertyEntry/PropertyEntryField.tsx#L125)
+[client/internal/components/PropertyEntry/PropertyEntryField.tsx:125](https://github.com/onzag/itemize/blob/5c2808d3/client/internal/components/PropertyEntry/PropertyEntryField.tsx#L125)
 
 ___
 
@@ -406,7 +406,7 @@ this is locale specific
 
 #### Defined in
 
-[client/internal/components/PropertyEntry/index.tsx:53](https://github.com/onzag/itemize/blob/f2f29986/client/internal/components/PropertyEntry/index.tsx#L53)
+[client/internal/components/PropertyEntry/index.tsx:53](https://github.com/onzag/itemize/blob/5c2808d3/client/internal/components/PropertyEntry/index.tsx#L53)
 
 ___
 
@@ -418,7 +418,7 @@ The languages we have available
 
 #### Defined in
 
-[client/internal/components/PropertyEntry/PropertyEntryField.tsx:154](https://github.com/onzag/itemize/blob/f2f29986/client/internal/components/PropertyEntry/PropertyEntryField.tsx#L154)
+[client/internal/components/PropertyEntry/PropertyEntryField.tsx:154](https://github.com/onzag/itemize/blob/5c2808d3/client/internal/components/PropertyEntry/PropertyEntryField.tsx#L154)
 
 ___
 
@@ -435,7 +435,7 @@ this is locale specific
 
 #### Defined in
 
-[client/internal/components/PropertyEntry/index.tsx:58](https://github.com/onzag/itemize/blob/f2f29986/client/internal/components/PropertyEntry/index.tsx#L58)
+[client/internal/components/PropertyEntry/index.tsx:58](https://github.com/onzag/itemize/blob/5c2808d3/client/internal/components/PropertyEntry/index.tsx#L58)
 
 ___
 
@@ -451,7 +451,7 @@ The property id in question
 
 #### Defined in
 
-[client/internal/components/PropertyEntry/index.tsx:47](https://github.com/onzag/itemize/blob/f2f29986/client/internal/components/PropertyEntry/index.tsx#L47)
+[client/internal/components/PropertyEntry/index.tsx:47](https://github.com/onzag/itemize/blob/5c2808d3/client/internal/components/PropertyEntry/index.tsx#L47)
 
 ___
 
@@ -467,7 +467,7 @@ Whether it is in rtl mode for a rtl language
 
 #### Defined in
 
-[client/internal/renderer.ts:15](https://github.com/onzag/itemize/blob/f2f29986/client/internal/renderer.ts#L15)
+[client/internal/renderer.ts:15](https://github.com/onzag/itemize/blob/5c2808d3/client/internal/renderer.ts#L15)
 
 ___
 
@@ -479,7 +479,7 @@ These are the subtypes
 
 #### Defined in
 
-[client/internal/components/PropertyEntry/PropertyEntryField.tsx:115](https://github.com/onzag/itemize/blob/f2f29986/client/internal/components/PropertyEntry/PropertyEntryField.tsx#L115)
+[client/internal/components/PropertyEntry/PropertyEntryField.tsx:115](https://github.com/onzag/itemize/blob/5c2808d3/client/internal/components/PropertyEntry/PropertyEntryField.tsx#L115)
 
 ___
 
@@ -492,7 +492,7 @@ makes it easier so implementing it shouldn't be too hard
 
 #### Defined in
 
-[client/internal/components/PropertyEntry/PropertyEntryField.tsx:111](https://github.com/onzag/itemize/blob/f2f29986/client/internal/components/PropertyEntry/PropertyEntryField.tsx#L111)
+[client/internal/components/PropertyEntry/PropertyEntryField.tsx:111](https://github.com/onzag/itemize/blob/5c2808d3/client/internal/components/PropertyEntry/PropertyEntryField.tsx#L111)
 
 ___
 
@@ -504,7 +504,7 @@ The current unit code, only available if type="unit"
 
 #### Defined in
 
-[client/internal/components/PropertyEntry/PropertyEntryField.tsx:188](https://github.com/onzag/itemize/blob/f2f29986/client/internal/components/PropertyEntry/PropertyEntryField.tsx#L188)
+[client/internal/components/PropertyEntry/PropertyEntryField.tsx:188](https://github.com/onzag/itemize/blob/5c2808d3/client/internal/components/PropertyEntry/PropertyEntryField.tsx#L188)
 
 ___
 
@@ -517,7 +517,7 @@ only available if type="unit"
 
 #### Defined in
 
-[client/internal/components/PropertyEntry/PropertyEntryField.tsx:222](https://github.com/onzag/itemize/blob/f2f29986/client/internal/components/PropertyEntry/PropertyEntryField.tsx#L222)
+[client/internal/components/PropertyEntry/PropertyEntryField.tsx:222](https://github.com/onzag/itemize/blob/5c2808d3/client/internal/components/PropertyEntry/PropertyEntryField.tsx#L222)
 
 ___
 
@@ -530,7 +530,7 @@ use these options to build a list to change the unit
 
 #### Defined in
 
-[client/internal/components/PropertyEntry/PropertyEntryField.tsx:206](https://github.com/onzag/itemize/blob/f2f29986/client/internal/components/PropertyEntry/PropertyEntryField.tsx#L206)
+[client/internal/components/PropertyEntry/PropertyEntryField.tsx:206](https://github.com/onzag/itemize/blob/5c2808d3/client/internal/components/PropertyEntry/PropertyEntryField.tsx#L206)
 
 ___
 
@@ -544,7 +544,7 @@ only available if type="unit"
 
 #### Defined in
 
-[client/internal/components/PropertyEntry/PropertyEntryField.tsx:217](https://github.com/onzag/itemize/blob/f2f29986/client/internal/components/PropertyEntry/PropertyEntryField.tsx#L217)
+[client/internal/components/PropertyEntry/PropertyEntryField.tsx:217](https://github.com/onzag/itemize/blob/5c2808d3/client/internal/components/PropertyEntry/PropertyEntryField.tsx#L217)
 
 ___
 
@@ -557,7 +557,7 @@ use these options to build a list to change the unit
 
 #### Defined in
 
-[client/internal/components/PropertyEntry/PropertyEntryField.tsx:201](https://github.com/onzag/itemize/blob/f2f29986/client/internal/components/PropertyEntry/PropertyEntryField.tsx#L201)
+[client/internal/components/PropertyEntry/PropertyEntryField.tsx:201](https://github.com/onzag/itemize/blob/5c2808d3/client/internal/components/PropertyEntry/PropertyEntryField.tsx#L201)
 
 ___
 
@@ -570,7 +570,7 @@ only available if type="unit"
 
 #### Defined in
 
-[client/internal/components/PropertyEntry/PropertyEntryField.tsx:211](https://github.com/onzag/itemize/blob/f2f29986/client/internal/components/PropertyEntry/PropertyEntryField.tsx#L211)
+[client/internal/components/PropertyEntry/PropertyEntryField.tsx:211](https://github.com/onzag/itemize/blob/5c2808d3/client/internal/components/PropertyEntry/PropertyEntryField.tsx#L211)
 
 ___
 
@@ -582,7 +582,7 @@ The code for the primary metric unit, only available if type="unit"
 
 #### Defined in
 
-[client/internal/components/PropertyEntry/PropertyEntryField.tsx:192](https://github.com/onzag/itemize/blob/f2f29986/client/internal/components/PropertyEntry/PropertyEntryField.tsx#L192)
+[client/internal/components/PropertyEntry/PropertyEntryField.tsx:192](https://github.com/onzag/itemize/blob/5c2808d3/client/internal/components/PropertyEntry/PropertyEntryField.tsx#L192)
 
 ___
 
@@ -594,7 +594,7 @@ The code for the primary imperial unit, only available if type="unit"
 
 #### Defined in
 
-[client/internal/components/PropertyEntry/PropertyEntryField.tsx:196](https://github.com/onzag/itemize/blob/f2f29986/client/internal/components/PropertyEntry/PropertyEntryField.tsx#L196)
+[client/internal/components/PropertyEntry/PropertyEntryField.tsx:196](https://github.com/onzag/itemize/blob/5c2808d3/client/internal/components/PropertyEntry/PropertyEntryField.tsx#L196)
 
 ## Methods
 
@@ -616,7 +616,7 @@ currentInvalidReason gets populated even if the field is not poked
 
 #### Defined in
 
-[client/internal/components/PropertyEntry/index.tsx:118](https://github.com/onzag/itemize/blob/f2f29986/client/internal/components/PropertyEntry/index.tsx#L118)
+[client/internal/components/PropertyEntry/index.tsx:118](https://github.com/onzag/itemize/blob/5c2808d3/client/internal/components/PropertyEntry/index.tsx#L118)
 
 ___
 
@@ -646,7 +646,7 @@ caution is advised which one to use
 
 #### Defined in
 
-[client/internal/components/PropertyEntry/index.tsx:126](https://github.com/onzag/itemize/blob/f2f29986/client/internal/components/PropertyEntry/index.tsx#L126)
+[client/internal/components/PropertyEntry/index.tsx:126](https://github.com/onzag/itemize/blob/5c2808d3/client/internal/components/PropertyEntry/index.tsx#L126)
 
 ___
 
@@ -670,7 +670,7 @@ of knowing what value to apply to the actual item definition
 
 #### Defined in
 
-[client/internal/components/PropertyEntry/PropertyEntryField.tsx:136](https://github.com/onzag/itemize/blob/f2f29986/client/internal/components/PropertyEntry/PropertyEntryField.tsx#L136)
+[client/internal/components/PropertyEntry/PropertyEntryField.tsx:136](https://github.com/onzag/itemize/blob/5c2808d3/client/internal/components/PropertyEntry/PropertyEntryField.tsx#L136)
 
 ___
 
@@ -694,7 +694,7 @@ should have a code, only available if type="currency"
 
 #### Defined in
 
-[client/internal/components/PropertyEntry/PropertyEntryField.tsx:183](https://github.com/onzag/itemize/blob/f2f29986/client/internal/components/PropertyEntry/PropertyEntryField.tsx#L183)
+[client/internal/components/PropertyEntry/PropertyEntryField.tsx:183](https://github.com/onzag/itemize/blob/5c2808d3/client/internal/components/PropertyEntry/PropertyEntryField.tsx#L183)
 
 ___
 
@@ -717,7 +717,7 @@ only available if type="unit"
 
 #### Defined in
 
-[client/internal/components/PropertyEntry/PropertyEntryField.tsx:233](https://github.com/onzag/itemize/blob/f2f29986/client/internal/components/PropertyEntry/PropertyEntryField.tsx#L233)
+[client/internal/components/PropertyEntry/PropertyEntryField.tsx:233](https://github.com/onzag/itemize/blob/5c2808d3/client/internal/components/PropertyEntry/PropertyEntryField.tsx#L233)
 
 ___
 
@@ -738,7 +738,7 @@ when doing this
 
 #### Defined in
 
-[client/internal/components/PropertyEntry/index.tsx:131](https://github.com/onzag/itemize/blob/f2f29986/client/internal/components/PropertyEntry/index.tsx#L131)
+[client/internal/components/PropertyEntry/index.tsx:131](https://github.com/onzag/itemize/blob/5c2808d3/client/internal/components/PropertyEntry/index.tsx#L131)
 
 ___
 
@@ -762,4 +762,4 @@ only available if type="unit"
 
 #### Defined in
 
-[client/internal/components/PropertyEntry/PropertyEntryField.tsx:228](https://github.com/onzag/itemize/blob/f2f29986/client/internal/components/PropertyEntry/PropertyEntryField.tsx#L228)
+[client/internal/components/PropertyEntry/PropertyEntryField.tsx:228](https://github.com/onzag/itemize/blob/5c2808d3/client/internal/components/PropertyEntry/PropertyEntryField.tsx#L228)

@@ -21,4 +21,4 @@ this is what a single collected result looks like
 
 #### Defined in
 
-[server/seo/index.ts:52](https://github.com/onzag/itemize/blob/f2f29986/server/seo/index.ts#L52)
+[server/seo/index.ts:52](https://github.com/onzag/itemize/blob/5c2808d3/server/seo/index.ts#L52)

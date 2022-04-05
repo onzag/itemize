@@ -69,7 +69,7 @@ React.Component&lt;IPagedSearchLoaderProps, IPagedSearchLoaderState\&gt;.constru
 
 #### Defined in
 
-[client/components/search/PagedSearchLoader.tsx:69](https://github.com/onzag/itemize/blob/f2f29986/client/components/search/PagedSearchLoader.tsx#L69)
+[client/components/search/PagedSearchLoader.tsx:69](https://github.com/onzag/itemize/blob/5c2808d3/client/components/search/PagedSearchLoader.tsx#L69)
 
 ## Properties
 
@@ -580,7 +580,7 @@ ___
 
 #### Defined in
 
-[client/components/search/PagedSearchLoader.tsx:82](https://github.com/onzag/itemize/blob/f2f29986/client/components/search/PagedSearchLoader.tsx#L82)
+[client/components/search/PagedSearchLoader.tsx:82](https://github.com/onzag/itemize/blob/5c2808d3/client/components/search/PagedSearchLoader.tsx#L82)
 
 ___
 
@@ -601,7 +601,7 @@ ___
 
 #### Defined in
 
-[client/components/search/PagedSearchLoader.tsx:100](https://github.com/onzag/itemize/blob/f2f29986/client/components/search/PagedSearchLoader.tsx#L100)
+[client/components/search/PagedSearchLoader.tsx:100](https://github.com/onzag/itemize/blob/5c2808d3/client/components/search/PagedSearchLoader.tsx#L100)
 
 ___
 
@@ -623,7 +623,7 @@ ___
 
 #### Defined in
 
-[client/components/search/PagedSearchLoader.tsx:91](https://github.com/onzag/itemize/blob/f2f29986/client/components/search/PagedSearchLoader.tsx#L91)
+[client/components/search/PagedSearchLoader.tsx:91](https://github.com/onzag/itemize/blob/5c2808d3/client/components/search/PagedSearchLoader.tsx#L91)
 
 ___
 
@@ -646,7 +646,7 @@ ___
 
 #### Defined in
 
-[client/components/search/PagedSearchLoader.tsx:110](https://github.com/onzag/itemize/blob/f2f29986/client/components/search/PagedSearchLoader.tsx#L110)
+[client/components/search/PagedSearchLoader.tsx:110](https://github.com/onzag/itemize/blob/5c2808d3/client/components/search/PagedSearchLoader.tsx#L110)
 
 ___
 
@@ -664,7 +664,7 @@ React.Component.render
 
 #### Defined in
 
-[client/components/search/PagedSearchLoader.tsx:148](https://github.com/onzag/itemize/blob/f2f29986/client/components/search/PagedSearchLoader.tsx#L148)
+[client/components/search/PagedSearchLoader.tsx:148](https://github.com/onzag/itemize/blob/5c2808d3/client/components/search/PagedSearchLoader.tsx#L148)
 
 ___
 
@@ -685,7 +685,7 @@ ___
 
 #### Defined in
 
-[client/components/search/PagedSearchLoader.tsx:126](https://github.com/onzag/itemize/blob/f2f29986/client/components/search/PagedSearchLoader.tsx#L126)
+[client/components/search/PagedSearchLoader.tsx:126](https://github.com/onzag/itemize/blob/5c2808d3/client/components/search/PagedSearchLoader.tsx#L126)
 
 ___
 
@@ -740,4 +740,4 @@ React.Component.shouldComponentUpdate
 
 #### Defined in
 
-[client/components/search/PagedSearchLoader.tsx:106](https://github.com/onzag/itemize/blob/f2f29986/client/components/search/PagedSearchLoader.tsx#L106)
+[client/components/search/PagedSearchLoader.tsx:106](https://github.com/onzag/itemize/blob/5c2808d3/client/components/search/PagedSearchLoader.tsx#L106)

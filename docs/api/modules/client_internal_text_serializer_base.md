@@ -46,7 +46,7 @@ react style object
 
 #### Defined in
 
-[client/internal/text/serializer/base.tsx:110](https://github.com/onzag/itemize/blob/f2f29986/client/internal/text/serializer/base.tsx#L110)
+[client/internal/text/serializer/base.tsx:110](https://github.com/onzag/itemize/blob/5c2808d3/client/internal/text/serializer/base.tsx#L110)
 
 ___
 
@@ -69,7 +69,7 @@ and leaves all the ones that are not in common
 
 #### Defined in
 
-[client/internal/text/serializer/base.tsx:1045](https://github.com/onzag/itemize/blob/f2f29986/client/internal/text/serializer/base.tsx#L1045)
+[client/internal/text/serializer/base.tsx:1045](https://github.com/onzag/itemize/blob/5c2808d3/client/internal/text/serializer/base.tsx#L1045)
 
 ___
 
@@ -93,7 +93,7 @@ and whatnot that are shared in between all the rich elements
 
 #### Defined in
 
-[client/internal/text/serializer/base.tsx:802](https://github.com/onzag/itemize/blob/f2f29986/client/internal/text/serializer/base.tsx#L802)
+[client/internal/text/serializer/base.tsx:802](https://github.com/onzag/itemize/blob/5c2808d3/client/internal/text/serializer/base.tsx#L802)
 
 ___
 
@@ -121,7 +121,7 @@ form, basically converts the element into a react one
 
 #### Defined in
 
-[client/internal/text/serializer/base.tsx:420](https://github.com/onzag/itemize/blob/f2f29986/client/internal/text/serializer/base.tsx#L420)
+[client/internal/text/serializer/base.tsx:420](https://github.com/onzag/itemize/blob/5c2808d3/client/internal/text/serializer/base.tsx#L420)
 
 ___
 
@@ -146,7 +146,7 @@ of a component to give value to a function
 
 #### Defined in
 
-[client/internal/text/serializer/base.tsx:168](https://github.com/onzag/itemize/blob/f2f29986/client/internal/text/serializer/base.tsx#L168)
+[client/internal/text/serializer/base.tsx:168](https://github.com/onzag/itemize/blob/5c2808d3/client/internal/text/serializer/base.tsx#L168)
 
 ___
 
@@ -172,7 +172,7 @@ including those that are meant to be mutating
 
 #### Defined in
 
-[client/internal/text/serializer/base.tsx:211](https://github.com/onzag/itemize/blob/f2f29986/client/internal/text/serializer/base.tsx#L211)
+[client/internal/text/serializer/base.tsx:211](https://github.com/onzag/itemize/blob/5c2808d3/client/internal/text/serializer/base.tsx#L211)
 
 ___
 
@@ -202,4 +202,4 @@ a html element
 
 #### Defined in
 
-[client/internal/text/serializer/base.tsx:332](https://github.com/onzag/itemize/blob/f2f29986/client/internal/text/serializer/base.tsx#L332)
+[client/internal/text/serializer/base.tsx:332](https://github.com/onzag/itemize/blob/5c2808d3/client/internal/text/serializer/base.tsx#L332)

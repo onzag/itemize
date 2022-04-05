@@ -46,7 +46,7 @@ Build a new nanodate
 
 #### Defined in
 
-[nanodate.ts:38](https://github.com/onzag/itemize/blob/f2f29986/nanodate.ts#L38)
+[nanodate.ts:38](https://github.com/onzag/itemize/blob/5c2808d3/nanodate.ts#L38)
 
 ## Properties
 
@@ -58,7 +58,7 @@ The original date
 
 #### Defined in
 
-[nanodate.ts:19](https://github.com/onzag/itemize/blob/f2f29986/nanodate.ts#L19)
+[nanodate.ts:19](https://github.com/onzag/itemize/blob/5c2808d3/nanodate.ts#L19)
 
 ___
 
@@ -70,7 +70,7 @@ The original string
 
 #### Defined in
 
-[nanodate.ts:23](https://github.com/onzag/itemize/blob/f2f29986/nanodate.ts#L23)
+[nanodate.ts:23](https://github.com/onzag/itemize/blob/5c2808d3/nanodate.ts#L23)
 
 ___
 
@@ -83,7 +83,7 @@ left after the first 3 numbers after the decimal in seconds
 
 #### Defined in
 
-[nanodate.ts:28](https://github.com/onzag/itemize/blob/f2f29986/nanodate.ts#L28)
+[nanodate.ts:28](https://github.com/onzag/itemize/blob/5c2808d3/nanodate.ts#L28)
 
 ___
 
@@ -95,7 +95,7 @@ the millisecond time
 
 #### Defined in
 
-[nanodate.ts:32](https://github.com/onzag/itemize/blob/f2f29986/nanodate.ts#L32)
+[nanodate.ts:32](https://github.com/onzag/itemize/blob/5c2808d3/nanodate.ts#L32)
 
 ## Methods
 
@@ -119,7 +119,7 @@ a boolean
 
 #### Defined in
 
-[nanodate.ts:131](https://github.com/onzag/itemize/blob/f2f29986/nanodate.ts#L131)
+[nanodate.ts:131](https://github.com/onzag/itemize/blob/5c2808d3/nanodate.ts#L131)
 
 ___
 
@@ -143,7 +143,7 @@ a boolean
 
 #### Defined in
 
-[nanodate.ts:65](https://github.com/onzag/itemize/blob/f2f29986/nanodate.ts#L65)
+[nanodate.ts:65](https://github.com/onzag/itemize/blob/5c2808d3/nanodate.ts#L65)
 
 ___
 
@@ -167,7 +167,7 @@ a boolean
 
 #### Defined in
 
-[nanodate.ts:83](https://github.com/onzag/itemize/blob/f2f29986/nanodate.ts#L83)
+[nanodate.ts:83](https://github.com/onzag/itemize/blob/5c2808d3/nanodate.ts#L83)
 
 ___
 
@@ -191,7 +191,7 @@ a boolean
 
 #### Defined in
 
-[nanodate.ts:99](https://github.com/onzag/itemize/blob/f2f29986/nanodate.ts#L99)
+[nanodate.ts:99](https://github.com/onzag/itemize/blob/5c2808d3/nanodate.ts#L99)
 
 ___
 
@@ -215,7 +215,7 @@ a boolean
 
 #### Defined in
 
-[nanodate.ts:115](https://github.com/onzag/itemize/blob/f2f29986/nanodate.ts#L115)
+[nanodate.ts:115](https://github.com/onzag/itemize/blob/5c2808d3/nanodate.ts#L115)
 
 ___
 
@@ -239,4 +239,4 @@ a boolean
 
 #### Defined in
 
-[nanodate.ts:140](https://github.com/onzag/itemize/blob/f2f29986/nanodate.ts#L140)
+[nanodate.ts:140](https://github.com/onzag/itemize/blob/5c2808d3/nanodate.ts#L140)

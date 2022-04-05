@@ -40,4 +40,4 @@ a react component
 
 #### Defined in
 
-[client/components/outdated/AppIsOutdatedChecker.tsx:90](https://github.com/onzag/itemize/blob/f2f29986/client/components/outdated/AppIsOutdatedChecker.tsx#L90)
+[client/components/outdated/AppIsOutdatedChecker.tsx:90](https://github.com/onzag/itemize/blob/5c2808d3/client/components/outdated/AppIsOutdatedChecker.tsx#L90)

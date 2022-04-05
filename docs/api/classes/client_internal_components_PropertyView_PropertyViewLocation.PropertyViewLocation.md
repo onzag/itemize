@@ -67,7 +67,7 @@ React.Component&lt;
 
 #### Defined in
 
-[client/internal/components/PropertyView/PropertyViewLocation.tsx:72](https://github.com/onzag/itemize/blob/f2f29986/client/internal/components/PropertyView/PropertyViewLocation.tsx#L72)
+[client/internal/components/PropertyView/PropertyViewLocation.tsx:72](https://github.com/onzag/itemize/blob/5c2808d3/client/internal/components/PropertyView/PropertyViewLocation.tsx#L72)
 
 ## Properties
 
@@ -364,7 +364,7 @@ React.Component.componentDidUpdate
 
 #### Defined in
 
-[client/internal/components/PropertyView/PropertyViewLocation.tsx:94](https://github.com/onzag/itemize/blob/f2f29986/client/internal/components/PropertyView/PropertyViewLocation.tsx#L94)
+[client/internal/components/PropertyView/PropertyViewLocation.tsx:94](https://github.com/onzag/itemize/blob/5c2808d3/client/internal/components/PropertyView/PropertyViewLocation.tsx#L94)
 
 ___
 
@@ -564,7 +564,7 @@ ___
 
 #### Defined in
 
-[client/internal/components/PropertyView/PropertyViewLocation.tsx:129](https://github.com/onzag/itemize/blob/f2f29986/client/internal/components/PropertyView/PropertyViewLocation.tsx#L129)
+[client/internal/components/PropertyView/PropertyViewLocation.tsx:129](https://github.com/onzag/itemize/blob/5c2808d3/client/internal/components/PropertyView/PropertyViewLocation.tsx#L129)
 
 ___
 
@@ -584,7 +584,7 @@ ___
 
 #### Defined in
 
-[client/internal/components/PropertyView/PropertyViewLocation.tsx:124](https://github.com/onzag/itemize/blob/f2f29986/client/internal/components/PropertyView/PropertyViewLocation.tsx#L124)
+[client/internal/components/PropertyView/PropertyViewLocation.tsx:124](https://github.com/onzag/itemize/blob/5c2808d3/client/internal/components/PropertyView/PropertyViewLocation.tsx#L124)
 
 ___
 
@@ -602,7 +602,7 @@ React.Component.render
 
 #### Defined in
 
-[client/internal/components/PropertyView/PropertyViewLocation.tsx:163](https://github.com/onzag/itemize/blob/f2f29986/client/internal/components/PropertyView/PropertyViewLocation.tsx#L163)
+[client/internal/components/PropertyView/PropertyViewLocation.tsx:163](https://github.com/onzag/itemize/blob/5c2808d3/client/internal/components/PropertyView/PropertyViewLocation.tsx#L163)
 
 ___
 
@@ -658,4 +658,4 @@ React.Component.shouldComponentUpdate
 
 #### Defined in
 
-[client/internal/components/PropertyView/PropertyViewLocation.tsx:148](https://github.com/onzag/itemize/blob/f2f29986/client/internal/components/PropertyView/PropertyViewLocation.tsx#L148)
+[client/internal/components/PropertyView/PropertyViewLocation.tsx:148](https://github.com/onzag/itemize/blob/5c2808d3/client/internal/components/PropertyView/PropertyViewLocation.tsx#L148)

@@ -24,7 +24,7 @@ The integer is descibred by a number
 
 #### Defined in
 
-[base/Root/Module/ItemDefinition/PropertyDefinition/types/integer.ts:38](https://github.com/onzag/itemize/blob/f2f29986/base/Root/Module/ItemDefinition/PropertyDefinition/types/integer.ts#L38)
+[base/Root/Module/ItemDefinition/PropertyDefinition/types/integer.ts:38](https://github.com/onzag/itemize/blob/5c2808d3/base/Root/Module/ItemDefinition/PropertyDefinition/types/integer.ts#L38)
 
 ## Variables
 
@@ -36,4 +36,4 @@ The type defines the behaviour of integers in the app
 
 #### Defined in
 
-[base/Root/Module/ItemDefinition/PropertyDefinition/types/integer.ts:43](https://github.com/onzag/itemize/blob/f2f29986/base/Root/Module/ItemDefinition/PropertyDefinition/types/integer.ts#L43)
+[base/Root/Module/ItemDefinition/PropertyDefinition/types/integer.ts:43](https://github.com/onzag/itemize/blob/5c2808d3/base/Root/Module/ItemDefinition/PropertyDefinition/types/integer.ts#L43)

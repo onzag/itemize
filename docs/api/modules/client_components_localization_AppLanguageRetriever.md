@@ -35,4 +35,4 @@ a react node
 
 #### Defined in
 
-[client/components/localization/AppLanguageRetriever.tsx:35](https://github.com/onzag/itemize/blob/f2f29986/client/components/localization/AppLanguageRetriever.tsx#L35)
+[client/components/localization/AppLanguageRetriever.tsx:35](https://github.com/onzag/itemize/blob/5c2808d3/client/components/localization/AppLanguageRetriever.tsx#L35)

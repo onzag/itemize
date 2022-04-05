@@ -31,7 +31,7 @@ as the user
 
 #### Defined in
 
-[server/services/base/MailProvider.ts:46](https://github.com/onzag/itemize/blob/f2f29986/server/services/base/MailProvider.ts#L46)
+[server/services/base/MailProvider.ts:46](https://github.com/onzag/itemize/blob/5c2808d3/server/services/base/MailProvider.ts#L46)
 
 ___
 
@@ -43,7 +43,7 @@ The html content
 
 #### Defined in
 
-[server/services/base/MailProvider.ts:63](https://github.com/onzag/itemize/blob/f2f29986/server/services/base/MailProvider.ts#L63)
+[server/services/base/MailProvider.ts:63](https://github.com/onzag/itemize/blob/5c2808d3/server/services/base/MailProvider.ts#L63)
 
 ___
 
@@ -55,7 +55,7 @@ The subject attribute
 
 #### Defined in
 
-[server/services/base/MailProvider.ts:55](https://github.com/onzag/itemize/blob/f2f29986/server/services/base/MailProvider.ts#L55)
+[server/services/base/MailProvider.ts:55](https://github.com/onzag/itemize/blob/5c2808d3/server/services/base/MailProvider.ts#L55)
 
 ___
 
@@ -67,7 +67,7 @@ The plain text content
 
 #### Defined in
 
-[server/services/base/MailProvider.ts:59](https://github.com/onzag/itemize/blob/f2f29986/server/services/base/MailProvider.ts#L59)
+[server/services/base/MailProvider.ts:59](https://github.com/onzag/itemize/blob/5c2808d3/server/services/base/MailProvider.ts#L59)
 
 ___
 
@@ -80,7 +80,7 @@ to be sent to
 
 #### Defined in
 
-[server/services/base/MailProvider.ts:51](https://github.com/onzag/itemize/blob/f2f29986/server/services/base/MailProvider.ts#L51)
+[server/services/base/MailProvider.ts:51](https://github.com/onzag/itemize/blob/5c2808d3/server/services/base/MailProvider.ts#L51)
 
 ___
 
@@ -94,7 +94,7 @@ and it is fairly generic
 
 #### Defined in
 
-[server/services/base/MailProvider.ts:69](https://github.com/onzag/itemize/blob/f2f29986/server/services/base/MailProvider.ts#L69)
+[server/services/base/MailProvider.ts:69](https://github.com/onzag/itemize/blob/5c2808d3/server/services/base/MailProvider.ts#L69)
 
 ___
 
@@ -113,4 +113,4 @@ over this one
 
 #### Defined in
 
-[server/services/base/MailProvider.ts:76](https://github.com/onzag/itemize/blob/f2f29986/server/services/base/MailProvider.ts#L76)
+[server/services/base/MailProvider.ts:76](https://github.com/onzag/itemize/blob/5c2808d3/server/services/base/MailProvider.ts#L76)

@@ -27,7 +27,7 @@ The center in the lat, lng form
 
 #### Defined in
 
-[client/internal/components/PropertyEntry/PropertyEntryLocation.tsx:44](https://github.com/onzag/itemize/blob/f2f29986/client/internal/components/PropertyEntry/PropertyEntryLocation.tsx#L44)
+[client/internal/components/PropertyEntry/PropertyEntryLocation.tsx:44](https://github.com/onzag/itemize/blob/5c2808d3/client/internal/components/PropertyEntry/PropertyEntryLocation.tsx#L44)
 
 ___
 
@@ -40,4 +40,4 @@ change an user defined custom number
 
 #### Defined in
 
-[client/internal/components/PropertyEntry/PropertyEntryLocation.tsx:49](https://github.com/onzag/itemize/blob/f2f29986/client/internal/components/PropertyEntry/PropertyEntryLocation.tsx#L49)
+[client/internal/components/PropertyEntry/PropertyEntryLocation.tsx:49](https://github.com/onzag/itemize/blob/5c2808d3/client/internal/components/PropertyEntry/PropertyEntryLocation.tsx#L49)

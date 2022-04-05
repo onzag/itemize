@@ -103,7 +103,7 @@ React.PureComponent&lt;MaterialUISlateWrapperWithStyles, MaterialUISlateWrapperS
 
 #### Defined in
 
-[client/fast-prototyping/components/slate/wrapper.tsx:1502](https://github.com/onzag/itemize/blob/f2f29986/client/fast-prototyping/components/slate/wrapper.tsx#L1502)
+[client/fast-prototyping/components/slate/wrapper.tsx:1502](https://github.com/onzag/itemize/blob/5c2808d3/client/fast-prototyping/components/slate/wrapper.tsx#L1502)
 
 ## Properties
 
@@ -115,7 +115,7 @@ The accumulated fast key combo
 
 #### Defined in
 
-[client/fast-prototyping/components/slate/wrapper.tsx:1494](https://github.com/onzag/itemize/blob/f2f29986/client/fast-prototyping/components/slate/wrapper.tsx#L1494)
+[client/fast-prototyping/components/slate/wrapper.tsx:1494](https://github.com/onzag/itemize/blob/5c2808d3/client/fast-prototyping/components/slate/wrapper.tsx#L1494)
 
 ___
 
@@ -155,7 +155,7 @@ The ref object for the input object for any file input
 
 #### Defined in
 
-[client/fast-prototyping/components/slate/wrapper.tsx:1459](https://github.com/onzag/itemize/blob/f2f29986/client/fast-prototyping/components/slate/wrapper.tsx#L1459)
+[client/fast-prototyping/components/slate/wrapper.tsx:1459](https://github.com/onzag/itemize/blob/5c2808d3/client/fast-prototyping/components/slate/wrapper.tsx#L1459)
 
 ___
 
@@ -167,7 +167,7 @@ The ref object for the input object for image input
 
 #### Defined in
 
-[client/fast-prototyping/components/slate/wrapper.tsx:1454](https://github.com/onzag/itemize/blob/f2f29986/client/fast-prototyping/components/slate/wrapper.tsx#L1454)
+[client/fast-prototyping/components/slate/wrapper.tsx:1454](https://github.com/onzag/itemize/blob/5c2808d3/client/fast-prototyping/components/slate/wrapper.tsx#L1454)
 
 ___
 
@@ -177,7 +177,7 @@ ___
 
 #### Defined in
 
-[client/fast-prototyping/components/slate/wrapper.tsx:1496](https://github.com/onzag/itemize/blob/f2f29986/client/fast-prototyping/components/slate/wrapper.tsx#L1496)
+[client/fast-prototyping/components/slate/wrapper.tsx:1496](https://github.com/onzag/itemize/blob/5c2808d3/client/fast-prototyping/components/slate/wrapper.tsx#L1496)
 
 ___
 
@@ -191,7 +191,7 @@ selection range, but that is lost when losing focus, so we need to remember it
 
 #### Defined in
 
-[client/fast-prototyping/components/slate/wrapper.tsx:1476](https://github.com/onzag/itemize/blob/f2f29986/client/fast-prototyping/components/slate/wrapper.tsx#L1476)
+[client/fast-prototyping/components/slate/wrapper.tsx:1476](https://github.com/onzag/itemize/blob/5c2808d3/client/fast-prototyping/components/slate/wrapper.tsx#L1476)
 
 ___
 
@@ -204,7 +204,7 @@ because we were workign in the range
 
 #### Defined in
 
-[client/fast-prototyping/components/slate/wrapper.tsx:1481](https://github.com/onzag/itemize/blob/f2f29986/client/fast-prototyping/components/slate/wrapper.tsx#L1481)
+[client/fast-prototyping/components/slate/wrapper.tsx:1481](https://github.com/onzag/itemize/blob/5c2808d3/client/fast-prototyping/components/slate/wrapper.tsx#L1481)
 
 ___
 
@@ -233,7 +233,7 @@ and the change event might not even trigger
 
 #### Defined in
 
-[client/fast-prototyping/components/slate/wrapper.tsx:1489](https://github.com/onzag/itemize/blob/f2f29986/client/fast-prototyping/components/slate/wrapper.tsx#L1489)
+[client/fast-prototyping/components/slate/wrapper.tsx:1489](https://github.com/onzag/itemize/blob/5c2808d3/client/fast-prototyping/components/slate/wrapper.tsx#L1489)
 
 ___
 
@@ -280,7 +280,7 @@ A ref for the toolbar
 
 #### Defined in
 
-[client/fast-prototyping/components/slate/wrapper.tsx:1469](https://github.com/onzag/itemize/blob/f2f29986/client/fast-prototyping/components/slate/wrapper.tsx#L1469)
+[client/fast-prototyping/components/slate/wrapper.tsx:1469](https://github.com/onzag/itemize/blob/5c2808d3/client/fast-prototyping/components/slate/wrapper.tsx#L1469)
 
 ___
 
@@ -292,7 +292,7 @@ A ref to the container
 
 #### Defined in
 
-[client/fast-prototyping/components/slate/wrapper.tsx:1464](https://github.com/onzag/itemize/blob/f2f29986/client/fast-prototyping/components/slate/wrapper.tsx#L1464)
+[client/fast-prototyping/components/slate/wrapper.tsx:1464](https://github.com/onzag/itemize/blob/5c2808d3/client/fast-prototyping/components/slate/wrapper.tsx#L1464)
 
 ___
 
@@ -466,7 +466,7 @@ a boolean on whether the insertion succeeded
 
 #### Defined in
 
-[client/fast-prototyping/components/slate/wrapper.tsx:2005](https://github.com/onzag/itemize/blob/f2f29986/client/fast-prototyping/components/slate/wrapper.tsx#L2005)
+[client/fast-prototyping/components/slate/wrapper.tsx:2005](https://github.com/onzag/itemize/blob/5c2808d3/client/fast-prototyping/components/slate/wrapper.tsx#L2005)
 
 ___
 
@@ -491,7 +491,7 @@ a boolean on whether the insertion succeeded
 
 #### Defined in
 
-[client/fast-prototyping/components/slate/wrapper.tsx:1992](https://github.com/onzag/itemize/blob/f2f29986/client/fast-prototyping/components/slate/wrapper.tsx#L1992)
+[client/fast-prototyping/components/slate/wrapper.tsx:1992](https://github.com/onzag/itemize/blob/5c2808d3/client/fast-prototyping/components/slate/wrapper.tsx#L1992)
 
 ___
 
@@ -507,7 +507,7 @@ Closes the dialog for the link input
 
 #### Defined in
 
-[client/fast-prototyping/components/slate/wrapper.tsx:1942](https://github.com/onzag/itemize/blob/f2f29986/client/fast-prototyping/components/slate/wrapper.tsx#L1942)
+[client/fast-prototyping/components/slate/wrapper.tsx:1942](https://github.com/onzag/itemize/blob/5c2808d3/client/fast-prototyping/components/slate/wrapper.tsx#L1942)
 
 ___
 
@@ -523,7 +523,7 @@ Closes the dialog for the template html input
 
 #### Defined in
 
-[client/fast-prototyping/components/slate/wrapper.tsx:1968](https://github.com/onzag/itemize/blob/f2f29986/client/fast-prototyping/components/slate/wrapper.tsx#L1968)
+[client/fast-prototyping/components/slate/wrapper.tsx:1968](https://github.com/onzag/itemize/blob/5c2808d3/client/fast-prototyping/components/slate/wrapper.tsx#L1968)
 
 ___
 
@@ -539,7 +539,7 @@ Closes the dialog for the template text input
 
 #### Defined in
 
-[client/fast-prototyping/components/slate/wrapper.tsx:1955](https://github.com/onzag/itemize/blob/f2f29986/client/fast-prototyping/components/slate/wrapper.tsx#L1955)
+[client/fast-prototyping/components/slate/wrapper.tsx:1955](https://github.com/onzag/itemize/blob/5c2808d3/client/fast-prototyping/components/slate/wrapper.tsx#L1955)
 
 ___
 
@@ -555,7 +555,7 @@ Closes the dialog for the video input
 
 #### Defined in
 
-[client/fast-prototyping/components/slate/wrapper.tsx:1929](https://github.com/onzag/itemize/blob/f2f29986/client/fast-prototyping/components/slate/wrapper.tsx#L1929)
+[client/fast-prototyping/components/slate/wrapper.tsx:1929](https://github.com/onzag/itemize/blob/5c2808d3/client/fast-prototyping/components/slate/wrapper.tsx#L1929)
 
 ___
 
@@ -603,7 +603,7 @@ React.PureComponent.componentDidMount
 
 #### Defined in
 
-[client/fast-prototyping/components/slate/wrapper.tsx:1575](https://github.com/onzag/itemize/blob/f2f29986/client/fast-prototyping/components/slate/wrapper.tsx#L1575)
+[client/fast-prototyping/components/slate/wrapper.tsx:1575](https://github.com/onzag/itemize/blob/5c2808d3/client/fast-prototyping/components/slate/wrapper.tsx#L1575)
 
 ___
 
@@ -721,7 +721,7 @@ React.PureComponent.componentWillUnmount
 
 #### Defined in
 
-[client/fast-prototyping/components/slate/wrapper.tsx:1609](https://github.com/onzag/itemize/blob/f2f29986/client/fast-prototyping/components/slate/wrapper.tsx#L1609)
+[client/fast-prototyping/components/slate/wrapper.tsx:1609](https://github.com/onzag/itemize/blob/5c2808d3/client/fast-prototyping/components/slate/wrapper.tsx#L1609)
 
 ___
 
@@ -832,7 +832,7 @@ Inserts a container, a basic one in place
 
 #### Defined in
 
-[client/fast-prototyping/components/slate/wrapper.tsx:1981](https://github.com/onzag/itemize/blob/f2f29986/client/fast-prototyping/components/slate/wrapper.tsx#L1981)
+[client/fast-prototyping/components/slate/wrapper.tsx:1981](https://github.com/onzag/itemize/blob/5c2808d3/client/fast-prototyping/components/slate/wrapper.tsx#L1981)
 
 ___
 
@@ -856,7 +856,7 @@ selected
 
 #### Defined in
 
-[client/fast-prototyping/components/slate/wrapper.tsx:2031](https://github.com/onzag/itemize/blob/f2f29986/client/fast-prototyping/components/slate/wrapper.tsx#L2031)
+[client/fast-prototyping/components/slate/wrapper.tsx:2031](https://github.com/onzag/itemize/blob/5c2808d3/client/fast-prototyping/components/slate/wrapper.tsx#L2031)
 
 ___
 
@@ -880,7 +880,7 @@ selected
 
 #### Defined in
 
-[client/fast-prototyping/components/slate/wrapper.tsx:2018](https://github.com/onzag/itemize/blob/f2f29986/client/fast-prototyping/components/slate/wrapper.tsx#L2018)
+[client/fast-prototyping/components/slate/wrapper.tsx:2018](https://github.com/onzag/itemize/blob/5c2808d3/client/fast-prototyping/components/slate/wrapper.tsx#L2018)
 
 ___
 
@@ -900,7 +900,7 @@ ___
 
 #### Defined in
 
-[client/fast-prototyping/components/slate/wrapper.tsx:1735](https://github.com/onzag/itemize/blob/f2f29986/client/fast-prototyping/components/slate/wrapper.tsx#L1735)
+[client/fast-prototyping/components/slate/wrapper.tsx:1735](https://github.com/onzag/itemize/blob/5c2808d3/client/fast-prototyping/components/slate/wrapper.tsx#L1735)
 
 ___
 
@@ -920,7 +920,7 @@ ___
 
 #### Defined in
 
-[client/fast-prototyping/components/slate/wrapper.tsx:1619](https://github.com/onzag/itemize/blob/f2f29986/client/fast-prototyping/components/slate/wrapper.tsx#L1619)
+[client/fast-prototyping/components/slate/wrapper.tsx:1619](https://github.com/onzag/itemize/blob/5c2808d3/client/fast-prototyping/components/slate/wrapper.tsx#L1619)
 
 ___
 
@@ -940,7 +940,7 @@ ___
 
 #### Defined in
 
-[client/fast-prototyping/components/slate/wrapper.tsx:1679](https://github.com/onzag/itemize/blob/f2f29986/client/fast-prototyping/components/slate/wrapper.tsx#L1679)
+[client/fast-prototyping/components/slate/wrapper.tsx:1679](https://github.com/onzag/itemize/blob/5c2808d3/client/fast-prototyping/components/slate/wrapper.tsx#L1679)
 
 ___
 
@@ -957,7 +957,7 @@ dialog that is native for the file upload
 
 #### Defined in
 
-[client/fast-prototyping/components/slate/wrapper.tsx:1856](https://github.com/onzag/itemize/blob/f2f29986/client/fast-prototyping/components/slate/wrapper.tsx#L1856)
+[client/fast-prototyping/components/slate/wrapper.tsx:1856](https://github.com/onzag/itemize/blob/5c2808d3/client/fast-prototyping/components/slate/wrapper.tsx#L1856)
 
 ___
 
@@ -981,7 +981,7 @@ reading
 
 #### Defined in
 
-[client/fast-prototyping/components/slate/wrapper.tsx:2064](https://github.com/onzag/itemize/blob/f2f29986/client/fast-prototyping/components/slate/wrapper.tsx#L2064)
+[client/fast-prototyping/components/slate/wrapper.tsx:2064](https://github.com/onzag/itemize/blob/5c2808d3/client/fast-prototyping/components/slate/wrapper.tsx#L2064)
 
 ___
 
@@ -1001,7 +1001,7 @@ ___
 
 #### Defined in
 
-[client/fast-prototyping/components/slate/wrapper.tsx:1564](https://github.com/onzag/itemize/blob/f2f29986/client/fast-prototyping/components/slate/wrapper.tsx#L1564)
+[client/fast-prototyping/components/slate/wrapper.tsx:1564](https://github.com/onzag/itemize/blob/5c2808d3/client/fast-prototyping/components/slate/wrapper.tsx#L1564)
 
 ___
 
@@ -1025,7 +1025,7 @@ reading
 
 #### Defined in
 
-[client/fast-prototyping/components/slate/wrapper.tsx:2044](https://github.com/onzag/itemize/blob/f2f29986/client/fast-prototyping/components/slate/wrapper.tsx#L2044)
+[client/fast-prototyping/components/slate/wrapper.tsx:2044](https://github.com/onzag/itemize/blob/5c2808d3/client/fast-prototyping/components/slate/wrapper.tsx#L2044)
 
 ___
 
@@ -1042,7 +1042,7 @@ mainly used by dialogs once they haave closed
 
 #### Defined in
 
-[client/fast-prototyping/components/slate/wrapper.tsx:1840](https://github.com/onzag/itemize/blob/f2f29986/client/fast-prototyping/components/slate/wrapper.tsx#L1840)
+[client/fast-prototyping/components/slate/wrapper.tsx:1840](https://github.com/onzag/itemize/blob/5c2808d3/client/fast-prototyping/components/slate/wrapper.tsx#L1840)
 
 ___
 
@@ -1062,7 +1062,7 @@ React.PureComponent.render
 
 #### Defined in
 
-[client/fast-prototyping/components/slate/wrapper.tsx:2081](https://github.com/onzag/itemize/blob/f2f29986/client/fast-prototyping/components/slate/wrapper.tsx#L2081)
+[client/fast-prototyping/components/slate/wrapper.tsx:2081](https://github.com/onzag/itemize/blob/5c2808d3/client/fast-prototyping/components/slate/wrapper.tsx#L2081)
 
 ___
 
@@ -1079,7 +1079,7 @@ via this file upload dialog
 
 #### Defined in
 
-[client/fast-prototyping/components/slate/wrapper.tsx:1790](https://github.com/onzag/itemize/blob/f2f29986/client/fast-prototyping/components/slate/wrapper.tsx#L1790)
+[client/fast-prototyping/components/slate/wrapper.tsx:1790](https://github.com/onzag/itemize/blob/5c2808d3/client/fast-prototyping/components/slate/wrapper.tsx#L1790)
 
 ___
 
@@ -1096,7 +1096,7 @@ via this file upload dialog
 
 #### Defined in
 
-[client/fast-prototyping/components/slate/wrapper.tsx:1772](https://github.com/onzag/itemize/blob/f2f29986/client/fast-prototyping/components/slate/wrapper.tsx#L1772)
+[client/fast-prototyping/components/slate/wrapper.tsx:1772](https://github.com/onzag/itemize/blob/5c2808d3/client/fast-prototyping/components/slate/wrapper.tsx#L1772)
 
 ___
 
@@ -1113,7 +1113,7 @@ requesting insertion of a link or template link if available
 
 #### Defined in
 
-[client/fast-prototyping/components/slate/wrapper.tsx:1913](https://github.com/onzag/itemize/blob/f2f29986/client/fast-prototyping/components/slate/wrapper.tsx#L1913)
+[client/fast-prototyping/components/slate/wrapper.tsx:1913](https://github.com/onzag/itemize/blob/5c2808d3/client/fast-prototyping/components/slate/wrapper.tsx#L1913)
 
 ___
 
@@ -1130,7 +1130,7 @@ requesting insertion of a template html bit
 
 #### Defined in
 
-[client/fast-prototyping/components/slate/wrapper.tsx:1899](https://github.com/onzag/itemize/blob/f2f29986/client/fast-prototyping/components/slate/wrapper.tsx#L1899)
+[client/fast-prototyping/components/slate/wrapper.tsx:1899](https://github.com/onzag/itemize/blob/5c2808d3/client/fast-prototyping/components/slate/wrapper.tsx#L1899)
 
 ___
 
@@ -1147,7 +1147,7 @@ requesting insertion of a template text bit
 
 #### Defined in
 
-[client/fast-prototyping/components/slate/wrapper.tsx:1885](https://github.com/onzag/itemize/blob/f2f29986/client/fast-prototyping/components/slate/wrapper.tsx#L1885)
+[client/fast-prototyping/components/slate/wrapper.tsx:1885](https://github.com/onzag/itemize/blob/5c2808d3/client/fast-prototyping/components/slate/wrapper.tsx#L1885)
 
 ___
 
@@ -1164,7 +1164,7 @@ requesting a video
 
 #### Defined in
 
-[client/fast-prototyping/components/slate/wrapper.tsx:1871](https://github.com/onzag/itemize/blob/f2f29986/client/fast-prototyping/components/slate/wrapper.tsx#L1871)
+[client/fast-prototyping/components/slate/wrapper.tsx:1871](https://github.com/onzag/itemize/blob/5c2808d3/client/fast-prototyping/components/slate/wrapper.tsx#L1871)
 
 ___
 
@@ -1187,7 +1187,7 @@ only truly valid in disjointed mode
 
 #### Defined in
 
-[client/fast-prototyping/components/slate/wrapper.tsx:1825](https://github.com/onzag/itemize/blob/f2f29986/client/fast-prototyping/components/slate/wrapper.tsx#L1825)
+[client/fast-prototyping/components/slate/wrapper.tsx:1825](https://github.com/onzag/itemize/blob/5c2808d3/client/fast-prototyping/components/slate/wrapper.tsx#L1825)
 
 ___
 
@@ -1207,7 +1207,7 @@ ___
 
 #### Defined in
 
-[client/fast-prototyping/components/slate/wrapper.tsx:1699](https://github.com/onzag/itemize/blob/f2f29986/client/fast-prototyping/components/slate/wrapper.tsx#L1699)
+[client/fast-prototyping/components/slate/wrapper.tsx:1699](https://github.com/onzag/itemize/blob/5c2808d3/client/fast-prototyping/components/slate/wrapper.tsx#L1699)
 
 ___
 
@@ -1291,7 +1291,7 @@ a boolean on this fact
 
 #### Defined in
 
-[client/fast-prototyping/components/slate/wrapper.tsx:1751](https://github.com/onzag/itemize/blob/f2f29986/client/fast-prototyping/components/slate/wrapper.tsx#L1751)
+[client/fast-prototyping/components/slate/wrapper.tsx:1751](https://github.com/onzag/itemize/blob/5c2808d3/client/fast-prototyping/components/slate/wrapper.tsx#L1751)
 
 ___
 
@@ -1307,7 +1307,7 @@ Opens/closes the drawer
 
 #### Defined in
 
-[client/fast-prototyping/components/slate/wrapper.tsx:1807](https://github.com/onzag/itemize/blob/f2f29986/client/fast-prototyping/components/slate/wrapper.tsx#L1807)
+[client/fast-prototyping/components/slate/wrapper.tsx:1807](https://github.com/onzag/itemize/blob/5c2808d3/client/fast-prototyping/components/slate/wrapper.tsx#L1807)
 
 ___
 
@@ -1321,7 +1321,7 @@ ___
 
 #### Defined in
 
-[client/fast-prototyping/components/slate/wrapper.tsx:1719](https://github.com/onzag/itemize/blob/f2f29986/client/fast-prototyping/components/slate/wrapper.tsx#L1719)
+[client/fast-prototyping/components/slate/wrapper.tsx:1719](https://github.com/onzag/itemize/blob/5c2808d3/client/fast-prototyping/components/slate/wrapper.tsx#L1719)
 
 ___
 
@@ -1335,4 +1335,4 @@ ___
 
 #### Defined in
 
-[client/fast-prototyping/components/slate/wrapper.tsx:1728](https://github.com/onzag/itemize/blob/f2f29986/client/fast-prototyping/components/slate/wrapper.tsx#L1728)
+[client/fast-prototyping/components/slate/wrapper.tsx:1728](https://github.com/onzag/itemize/blob/5c2808d3/client/fast-prototyping/components/slate/wrapper.tsx#L1728)

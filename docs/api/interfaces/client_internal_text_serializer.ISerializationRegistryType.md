@@ -35,7 +35,7 @@ node into the rich element counterpart as required
 
 #### Defined in
 
-[client/internal/text/serializer/index.ts:121](https://github.com/onzag/itemize/blob/f2f29986/client/internal/text/serializer/index.ts#L121)
+[client/internal/text/serializer/index.ts:121](https://github.com/onzag/itemize/blob/5c2808d3/client/internal/text/serializer/index.ts#L121)
 
 ___
 
@@ -52,7 +52,7 @@ into a react component
 
 #### Defined in
 
-[client/internal/text/serializer/index.ts:146](https://github.com/onzag/itemize/blob/f2f29986/client/internal/text/serializer/index.ts#L146)
+[client/internal/text/serializer/index.ts:146](https://github.com/onzag/itemize/blob/5c2808d3/client/internal/text/serializer/index.ts#L146)
 
 ___
 
@@ -72,4 +72,4 @@ eg. paragraph, file, image etc...
 
 #### Defined in
 
-[client/internal/text/serializer/index.ts:109](https://github.com/onzag/itemize/blob/f2f29986/client/internal/text/serializer/index.ts#L109)
+[client/internal/text/serializer/index.ts:109](https://github.com/onzag/itemize/blob/5c2808d3/client/internal/text/serializer/index.ts#L109)

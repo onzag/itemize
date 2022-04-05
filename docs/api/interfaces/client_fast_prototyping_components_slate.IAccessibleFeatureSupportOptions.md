@@ -68,7 +68,7 @@ The classes that are available for the containers
 
 #### Defined in
 
-[client/fast-prototyping/components/slate/index.tsx:541](https://github.com/onzag/itemize/blob/f2f29986/client/fast-prototyping/components/slate/index.tsx#L541)
+[client/fast-prototyping/components/slate/index.tsx:541](https://github.com/onzag/itemize/blob/5c2808d3/client/fast-prototyping/components/slate/index.tsx#L541)
 
 ___
 
@@ -80,7 +80,7 @@ The customs that are available
 
 #### Defined in
 
-[client/fast-prototyping/components/slate/index.tsx:537](https://github.com/onzag/itemize/blob/f2f29986/client/fast-prototyping/components/slate/index.tsx#L537)
+[client/fast-prototyping/components/slate/index.tsx:537](https://github.com/onzag/itemize/blob/5c2808d3/client/fast-prototyping/components/slate/index.tsx#L537)
 
 ___
 
@@ -93,7 +93,7 @@ non prefixed
 
 #### Defined in
 
-[client/fast-prototyping/components/slate/index.tsx:533](https://github.com/onzag/itemize/blob/f2f29986/client/fast-prototyping/components/slate/index.tsx#L533)
+[client/fast-prototyping/components/slate/index.tsx:533](https://github.com/onzag/itemize/blob/5c2808d3/client/fast-prototyping/components/slate/index.tsx#L533)
 
 ___
 
@@ -106,7 +106,7 @@ custom toolbar
 
 #### Defined in
 
-[client/fast-prototyping/components/slate/index.tsx:527](https://github.com/onzag/itemize/blob/f2f29986/client/fast-prototyping/components/slate/index.tsx#L527)
+[client/fast-prototyping/components/slate/index.tsx:527](https://github.com/onzag/itemize/blob/5c2808d3/client/fast-prototyping/components/slate/index.tsx#L527)
 
 ___
 
@@ -118,7 +118,7 @@ Whether a container can be inserted at the given location
 
 #### Defined in
 
-[client/fast-prototyping/components/slate/index.tsx:465](https://github.com/onzag/itemize/blob/f2f29986/client/fast-prototyping/components/slate/index.tsx#L465)
+[client/fast-prototyping/components/slate/index.tsx:465](https://github.com/onzag/itemize/blob/5c2808d3/client/fast-prototyping/components/slate/index.tsx#L465)
 
 ___
 
@@ -131,7 +131,7 @@ location
 
 #### Defined in
 
-[client/fast-prototyping/components/slate/index.tsx:474](https://github.com/onzag/itemize/blob/f2f29986/client/fast-prototyping/components/slate/index.tsx#L474)
+[client/fast-prototyping/components/slate/index.tsx:474](https://github.com/onzag/itemize/blob/5c2808d3/client/fast-prototyping/components/slate/index.tsx#L474)
 
 ___
 
@@ -143,7 +143,7 @@ Whether a file can be inserted at the given location
 
 #### Defined in
 
-[client/fast-prototyping/components/slate/index.tsx:457](https://github.com/onzag/itemize/blob/f2f29986/client/fast-prototyping/components/slate/index.tsx#L457)
+[client/fast-prototyping/components/slate/index.tsx:457](https://github.com/onzag/itemize/blob/5c2808d3/client/fast-prototyping/components/slate/index.tsx#L457)
 
 ___
 
@@ -155,7 +155,7 @@ Whether an image can be inserted at the given location
 
 #### Defined in
 
-[client/fast-prototyping/components/slate/index.tsx:449](https://github.com/onzag/itemize/blob/f2f29986/client/fast-prototyping/components/slate/index.tsx#L449)
+[client/fast-prototyping/components/slate/index.tsx:449](https://github.com/onzag/itemize/blob/5c2808d3/client/fast-prototyping/components/slate/index.tsx#L449)
 
 ___
 
@@ -167,7 +167,7 @@ Whether a link can be inserted at the given location
 
 #### Defined in
 
-[client/fast-prototyping/components/slate/index.tsx:461](https://github.com/onzag/itemize/blob/f2f29986/client/fast-prototyping/components/slate/index.tsx#L461)
+[client/fast-prototyping/components/slate/index.tsx:461](https://github.com/onzag/itemize/blob/5c2808d3/client/fast-prototyping/components/slate/index.tsx#L461)
 
 ___
 
@@ -179,7 +179,7 @@ Whether a list can be inserted at the given location
 
 #### Defined in
 
-[client/fast-prototyping/components/slate/index.tsx:469](https://github.com/onzag/itemize/blob/f2f29986/client/fast-prototyping/components/slate/index.tsx#L469)
+[client/fast-prototyping/components/slate/index.tsx:469](https://github.com/onzag/itemize/blob/5c2808d3/client/fast-prototyping/components/slate/index.tsx#L469)
 
 ___
 
@@ -191,7 +191,7 @@ Whether a quote can be inserted at the given location
 
 #### Defined in
 
-[client/fast-prototyping/components/slate/index.tsx:478](https://github.com/onzag/itemize/blob/f2f29986/client/fast-prototyping/components/slate/index.tsx#L478)
+[client/fast-prototyping/components/slate/index.tsx:478](https://github.com/onzag/itemize/blob/5c2808d3/client/fast-prototyping/components/slate/index.tsx#L478)
 
 ___
 
@@ -203,7 +203,7 @@ Whether a rich class element can be inserted at the given location
 
 #### Defined in
 
-[client/fast-prototyping/components/slate/index.tsx:486](https://github.com/onzag/itemize/blob/f2f29986/client/fast-prototyping/components/slate/index.tsx#L486)
+[client/fast-prototyping/components/slate/index.tsx:486](https://github.com/onzag/itemize/blob/5c2808d3/client/fast-prototyping/components/slate/index.tsx#L486)
 
 ___
 
@@ -215,7 +215,7 @@ Whether a title element can be inserted at the given location
 
 #### Defined in
 
-[client/fast-prototyping/components/slate/index.tsx:482](https://github.com/onzag/itemize/blob/f2f29986/client/fast-prototyping/components/slate/index.tsx#L482)
+[client/fast-prototyping/components/slate/index.tsx:482](https://github.com/onzag/itemize/blob/5c2808d3/client/fast-prototyping/components/slate/index.tsx#L482)
 
 ___
 
@@ -227,7 +227,7 @@ Whether a video can be inserted at the given location
 
 #### Defined in
 
-[client/fast-prototyping/components/slate/index.tsx:453](https://github.com/onzag/itemize/blob/f2f29986/client/fast-prototyping/components/slate/index.tsx#L453)
+[client/fast-prototyping/components/slate/index.tsx:453](https://github.com/onzag/itemize/blob/5c2808d3/client/fast-prototyping/components/slate/index.tsx#L453)
 
 ___
 
@@ -240,7 +240,7 @@ normally true if templating is true
 
 #### Defined in
 
-[client/fast-prototyping/components/slate/index.tsx:517](https://github.com/onzag/itemize/blob/f2f29986/client/fast-prototyping/components/slate/index.tsx#L517)
+[client/fast-prototyping/components/slate/index.tsx:517](https://github.com/onzag/itemize/blob/5c2808d3/client/fast-prototyping/components/slate/index.tsx#L517)
 
 ___
 
@@ -253,7 +253,7 @@ normally true if templating is true
 
 #### Defined in
 
-[client/fast-prototyping/components/slate/index.tsx:502](https://github.com/onzag/itemize/blob/f2f29986/client/fast-prototyping/components/slate/index.tsx#L502)
+[client/fast-prototyping/components/slate/index.tsx:502](https://github.com/onzag/itemize/blob/5c2808d3/client/fast-prototyping/components/slate/index.tsx#L502)
 
 ___
 
@@ -266,7 +266,7 @@ normally true if templating is true
 
 #### Defined in
 
-[client/fast-prototyping/components/slate/index.tsx:507](https://github.com/onzag/itemize/blob/f2f29986/client/fast-prototyping/components/slate/index.tsx#L507)
+[client/fast-prototyping/components/slate/index.tsx:507](https://github.com/onzag/itemize/blob/5c2808d3/client/fast-prototyping/components/slate/index.tsx#L507)
 
 ___
 
@@ -279,7 +279,7 @@ normally true if templating is true
 
 #### Defined in
 
-[client/fast-prototyping/components/slate/index.tsx:497](https://github.com/onzag/itemize/blob/f2f29986/client/fast-prototyping/components/slate/index.tsx#L497)
+[client/fast-prototyping/components/slate/index.tsx:497](https://github.com/onzag/itemize/blob/5c2808d3/client/fast-prototyping/components/slate/index.tsx#L497)
 
 ___
 
@@ -292,7 +292,7 @@ normally true if templating is true
 
 #### Defined in
 
-[client/fast-prototyping/components/slate/index.tsx:522](https://github.com/onzag/itemize/blob/f2f29986/client/fast-prototyping/components/slate/index.tsx#L522)
+[client/fast-prototyping/components/slate/index.tsx:522](https://github.com/onzag/itemize/blob/5c2808d3/client/fast-prototyping/components/slate/index.tsx#L522)
 
 ___
 
@@ -304,7 +304,7 @@ Whether the style of the current element can be set
 
 #### Defined in
 
-[client/fast-prototyping/components/slate/index.tsx:491](https://github.com/onzag/itemize/blob/f2f29986/client/fast-prototyping/components/slate/index.tsx#L491)
+[client/fast-prototyping/components/slate/index.tsx:491](https://github.com/onzag/itemize/blob/5c2808d3/client/fast-prototyping/components/slate/index.tsx#L491)
 
 ___
 
@@ -317,7 +317,7 @@ normally true if templating is true
 
 #### Defined in
 
-[client/fast-prototyping/components/slate/index.tsx:512](https://github.com/onzag/itemize/blob/f2f29986/client/fast-prototyping/components/slate/index.tsx#L512)
+[client/fast-prototyping/components/slate/index.tsx:512](https://github.com/onzag/itemize/blob/5c2808d3/client/fast-prototyping/components/slate/index.tsx#L512)
 
 ___
 
@@ -335,7 +335,7 @@ not affect the base container
 
 #### Defined in
 
-[client/internal/text/index.tsx:231](https://github.com/onzag/itemize/blob/f2f29986/client/internal/text/index.tsx#L231)
+[client/internal/text/index.tsx:231](https://github.com/onzag/itemize/blob/5c2808d3/client/internal/text/index.tsx#L231)
 
 ___
 
@@ -351,7 +351,7 @@ the supported custom elements
 
 #### Defined in
 
-[client/internal/text/index.tsx:221](https://github.com/onzag/itemize/blob/f2f29986/client/internal/text/index.tsx#L221)
+[client/internal/text/index.tsx:221](https://github.com/onzag/itemize/blob/5c2808d3/client/internal/text/index.tsx#L221)
 
 ___
 
@@ -368,7 +368,7 @@ if all supported
 
 #### Defined in
 
-[client/internal/text/index.tsx:240](https://github.com/onzag/itemize/blob/f2f29986/client/internal/text/index.tsx#L240)
+[client/internal/text/index.tsx:240](https://github.com/onzag/itemize/blob/5c2808d3/client/internal/text/index.tsx#L240)
 
 ___
 
@@ -384,7 +384,7 @@ whether we support containers
 
 #### Defined in
 
-[client/internal/text/index.tsx:225](https://github.com/onzag/itemize/blob/f2f29986/client/internal/text/index.tsx#L225)
+[client/internal/text/index.tsx:225](https://github.com/onzag/itemize/blob/5c2808d3/client/internal/text/index.tsx#L225)
 
 ___
 
@@ -400,7 +400,7 @@ Whether we support customs
 
 #### Defined in
 
-[client/internal/text/index.tsx:217](https://github.com/onzag/itemize/blob/f2f29986/client/internal/text/index.tsx#L217)
+[client/internal/text/index.tsx:217](https://github.com/onzag/itemize/blob/5c2808d3/client/internal/text/index.tsx#L217)
 
 ___
 
@@ -417,7 +417,7 @@ are acceptable
 
 #### Defined in
 
-[client/internal/text/index.tsx:208](https://github.com/onzag/itemize/blob/f2f29986/client/internal/text/index.tsx#L208)
+[client/internal/text/index.tsx:208](https://github.com/onzag/itemize/blob/5c2808d3/client/internal/text/index.tsx#L208)
 
 ___
 
@@ -434,7 +434,7 @@ protocol outside the current page are acceptable
 
 #### Defined in
 
-[client/internal/text/index.tsx:191](https://github.com/onzag/itemize/blob/f2f29986/client/internal/text/index.tsx#L191)
+[client/internal/text/index.tsx:191](https://github.com/onzag/itemize/blob/5c2808d3/client/internal/text/index.tsx#L191)
 
 ___
 
@@ -450,7 +450,7 @@ Whether files are supporeted
 
 #### Defined in
 
-[client/internal/text/index.tsx:176](https://github.com/onzag/itemize/blob/f2f29986/client/internal/text/index.tsx#L176)
+[client/internal/text/index.tsx:176](https://github.com/onzag/itemize/blob/5c2808d3/client/internal/text/index.tsx#L176)
 
 ___
 
@@ -468,7 +468,7 @@ it doesn't support files, or when viewing
 
 #### Defined in
 
-[client/internal/text/index.tsx:182](https://github.com/onzag/itemize/blob/f2f29986/client/internal/text/index.tsx#L182)
+[client/internal/text/index.tsx:182](https://github.com/onzag/itemize/blob/5c2808d3/client/internal/text/index.tsx#L182)
 
 ___
 
@@ -484,7 +484,7 @@ Whether it supports images
 
 #### Defined in
 
-[client/internal/text/index.tsx:162](https://github.com/onzag/itemize/blob/f2f29986/client/internal/text/index.tsx#L162)
+[client/internal/text/index.tsx:162](https://github.com/onzag/itemize/blob/5c2808d3/client/internal/text/index.tsx#L162)
 
 ___
 
@@ -502,7 +502,7 @@ it doesn't support images, or when viewing
 
 #### Defined in
 
-[client/internal/text/index.tsx:168](https://github.com/onzag/itemize/blob/f2f29986/client/internal/text/index.tsx#L168)
+[client/internal/text/index.tsx:168](https://github.com/onzag/itemize/blob/5c2808d3/client/internal/text/index.tsx#L168)
 
 ___
 
@@ -518,7 +518,7 @@ Whether links are acceptable
 
 #### Defined in
 
-[client/internal/text/index.tsx:186](https://github.com/onzag/itemize/blob/f2f29986/client/internal/text/index.tsx#L186)
+[client/internal/text/index.tsx:186](https://github.com/onzag/itemize/blob/5c2808d3/client/internal/text/index.tsx#L186)
 
 ___
 
@@ -534,7 +534,7 @@ Whether lists are acceptable, ul, ol etc...
 
 #### Defined in
 
-[client/internal/text/index.tsx:195](https://github.com/onzag/itemize/blob/f2f29986/client/internal/text/index.tsx#L195)
+[client/internal/text/index.tsx:195](https://github.com/onzag/itemize/blob/5c2808d3/client/internal/text/index.tsx#L195)
 
 ___
 
@@ -550,7 +550,7 @@ Whether quotes are acceptable
 
 #### Defined in
 
-[client/internal/text/index.tsx:199](https://github.com/onzag/itemize/blob/f2f29986/client/internal/text/index.tsx#L199)
+[client/internal/text/index.tsx:199](https://github.com/onzag/itemize/blob/5c2808d3/client/internal/text/index.tsx#L199)
 
 ___
 
@@ -566,7 +566,7 @@ whether rich classes are supported
 
 #### Defined in
 
-[client/internal/text/index.tsx:235](https://github.com/onzag/itemize/blob/f2f29986/client/internal/text/index.tsx#L235)
+[client/internal/text/index.tsx:235](https://github.com/onzag/itemize/blob/5c2808d3/client/internal/text/index.tsx#L235)
 
 ___
 
@@ -582,7 +582,7 @@ Whether templating is supported
 
 #### Defined in
 
-[client/internal/text/index.tsx:212](https://github.com/onzag/itemize/blob/f2f29986/client/internal/text/index.tsx#L212)
+[client/internal/text/index.tsx:212](https://github.com/onzag/itemize/blob/5c2808d3/client/internal/text/index.tsx#L212)
 
 ___
 
@@ -598,7 +598,7 @@ Whether titles are acceptable
 
 #### Defined in
 
-[client/internal/text/index.tsx:203](https://github.com/onzag/itemize/blob/f2f29986/client/internal/text/index.tsx#L203)
+[client/internal/text/index.tsx:203](https://github.com/onzag/itemize/blob/5c2808d3/client/internal/text/index.tsx#L203)
 
 ___
 
@@ -614,4 +614,4 @@ Whether it supports videos
 
 #### Defined in
 
-[client/internal/text/index.tsx:172](https://github.com/onzag/itemize/blob/f2f29986/client/internal/text/index.tsx#L172)
+[client/internal/text/index.tsx:172](https://github.com/onzag/itemize/blob/5c2808d3/client/internal/text/index.tsx#L172)

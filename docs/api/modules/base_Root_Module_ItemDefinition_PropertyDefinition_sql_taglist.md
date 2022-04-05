@@ -34,7 +34,7 @@ for where many
 
 #### Defined in
 
-[base/Root/Module/ItemDefinition/PropertyDefinition/sql/taglist.ts:66](https://github.com/onzag/itemize/blob/f2f29986/base/Root/Module/ItemDefinition/PropertyDefinition/sql/taglist.ts#L66)
+[base/Root/Module/ItemDefinition/PropertyDefinition/sql/taglist.ts:66](https://github.com/onzag/itemize/blob/5c2808d3/base/Root/Module/ItemDefinition/PropertyDefinition/sql/taglist.ts#L66)
 
 ___
 
@@ -59,7 +59,7 @@ the partial row value
 
 #### Defined in
 
-[base/Root/Module/ItemDefinition/PropertyDefinition/sql/taglist.ts:13](https://github.com/onzag/itemize/blob/f2f29986/base/Root/Module/ItemDefinition/PropertyDefinition/sql/taglist.ts#L13)
+[base/Root/Module/ItemDefinition/PropertyDefinition/sql/taglist.ts:13](https://github.com/onzag/itemize/blob/5c2808d3/base/Root/Module/ItemDefinition/PropertyDefinition/sql/taglist.ts#L13)
 
 ___
 
@@ -86,7 +86,7 @@ a boolean on whether it equals
 
 #### Defined in
 
-[base/Root/Module/ItemDefinition/PropertyDefinition/sql/taglist.ts:92](https://github.com/onzag/itemize/blob/f2f29986/base/Root/Module/ItemDefinition/PropertyDefinition/sql/taglist.ts#L92)
+[base/Root/Module/ItemDefinition/PropertyDefinition/sql/taglist.ts:92](https://github.com/onzag/itemize/blob/5c2808d3/base/Root/Module/ItemDefinition/PropertyDefinition/sql/taglist.ts#L92)
 
 ___
 
@@ -110,4 +110,4 @@ a boolean on whether it was searched by it
 
 #### Defined in
 
-[base/Root/Module/ItemDefinition/PropertyDefinition/sql/taglist.ts:35](https://github.com/onzag/itemize/blob/f2f29986/base/Root/Module/ItemDefinition/PropertyDefinition/sql/taglist.ts#L35)
+[base/Root/Module/ItemDefinition/PropertyDefinition/sql/taglist.ts:35](https://github.com/onzag/itemize/blob/5c2808d3/base/Root/Module/ItemDefinition/PropertyDefinition/sql/taglist.ts#L35)

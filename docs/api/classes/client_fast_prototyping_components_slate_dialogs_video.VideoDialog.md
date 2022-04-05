@@ -71,7 +71,7 @@ React.PureComponent&lt;IVideoDialogProps, IVideoDialogState\&gt;.constructor
 
 #### Defined in
 
-[client/fast-prototyping/components/slate/dialogs/video.tsx:82](https://github.com/onzag/itemize/blob/f2f29986/client/fast-prototyping/components/slate/dialogs/video.tsx#L82)
+[client/fast-prototyping/components/slate/dialogs/video.tsx:82](https://github.com/onzag/itemize/blob/5c2808d3/client/fast-prototyping/components/slate/dialogs/video.tsx#L82)
 
 ## Properties
 
@@ -160,7 +160,7 @@ The reference used in the text field input used for focusing
 
 #### Defined in
 
-[client/fast-prototyping/components/slate/dialogs/video.tsx:76](https://github.com/onzag/itemize/blob/f2f29986/client/fast-prototyping/components/slate/dialogs/video.tsx#L76)
+[client/fast-prototyping/components/slate/dialogs/video.tsx:76](https://github.com/onzag/itemize/blob/5c2808d3/client/fast-prototyping/components/slate/dialogs/video.tsx#L76)
 
 ___
 
@@ -326,7 +326,7 @@ status decides whether to show an error or close
 
 #### Defined in
 
-[client/fast-prototyping/components/slate/dialogs/video.tsx:111](https://github.com/onzag/itemize/blob/f2f29986/client/fast-prototyping/components/slate/dialogs/video.tsx#L111)
+[client/fast-prototyping/components/slate/dialogs/video.tsx:111](https://github.com/onzag/itemize/blob/5c2808d3/client/fast-prototyping/components/slate/dialogs/video.tsx#L111)
 
 ___
 
@@ -342,7 +342,7 @@ Closes the dialog in place
 
 #### Defined in
 
-[client/fast-prototyping/components/slate/dialogs/video.tsx:142](https://github.com/onzag/itemize/blob/f2f29986/client/fast-prototyping/components/slate/dialogs/video.tsx#L142)
+[client/fast-prototyping/components/slate/dialogs/video.tsx:142](https://github.com/onzag/itemize/blob/5c2808d3/client/fast-prototyping/components/slate/dialogs/video.tsx#L142)
 
 ___
 
@@ -566,7 +566,7 @@ Focuses the video text field on mount
 
 #### Defined in
 
-[client/fast-prototyping/components/slate/dialogs/video.tsx:102](https://github.com/onzag/itemize/blob/f2f29986/client/fast-prototyping/components/slate/dialogs/video.tsx#L102)
+[client/fast-prototyping/components/slate/dialogs/video.tsx:102](https://github.com/onzag/itemize/blob/5c2808d3/client/fast-prototyping/components/slate/dialogs/video.tsx#L102)
 
 ___
 
@@ -636,7 +636,7 @@ ___
 
 #### Defined in
 
-[client/fast-prototyping/components/slate/dialogs/video.tsx:157](https://github.com/onzag/itemize/blob/f2f29986/client/fast-prototyping/components/slate/dialogs/video.tsx#L157)
+[client/fast-prototyping/components/slate/dialogs/video.tsx:157](https://github.com/onzag/itemize/blob/5c2808d3/client/fast-prototyping/components/slate/dialogs/video.tsx#L157)
 
 ___
 
@@ -656,7 +656,7 @@ React.PureComponent.render
 
 #### Defined in
 
-[client/fast-prototyping/components/slate/dialogs/video.tsx:164](https://github.com/onzag/itemize/blob/f2f29986/client/fast-prototyping/components/slate/dialogs/video.tsx#L164)
+[client/fast-prototyping/components/slate/dialogs/video.tsx:164](https://github.com/onzag/itemize/blob/5c2808d3/client/fast-prototyping/components/slate/dialogs/video.tsx#L164)
 
 ___
 
@@ -744,4 +744,4 @@ Updates the video url in the state on each keystroke
 
 #### Defined in
 
-[client/fast-prototyping/components/slate/dialogs/video.tsx:131](https://github.com/onzag/itemize/blob/f2f29986/client/fast-prototyping/components/slate/dialogs/video.tsx#L131)
+[client/fast-prototyping/components/slate/dialogs/video.tsx:131](https://github.com/onzag/itemize/blob/5c2808d3/client/fast-prototyping/components/slate/dialogs/video.tsx#L131)

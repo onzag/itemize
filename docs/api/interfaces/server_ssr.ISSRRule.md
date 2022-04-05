@@ -36,7 +36,7 @@ The user we are rendering for
 
 #### Defined in
 
-[server/ssr/index.ts:29](https://github.com/onzag/itemize/blob/f2f29986/server/ssr/index.ts#L29)
+[server/ssr/index.ts:29](https://github.com/onzag/itemize/blob/5c2808d3/server/ssr/index.ts#L29)
 
 ___
 
@@ -48,7 +48,7 @@ The language that the rule is rendering at
 
 #### Defined in
 
-[server/ssr/index.ts:15](https://github.com/onzag/itemize/blob/f2f29986/server/ssr/index.ts#L15)
+[server/ssr/index.ts:15](https://github.com/onzag/itemize/blob/5c2808d3/server/ssr/index.ts#L15)
 
 ___
 
@@ -61,7 +61,7 @@ the href langs
 
 #### Defined in
 
-[server/ssr/index.ts:20](https://github.com/onzag/itemize/blob/f2f29986/server/ssr/index.ts#L20)
+[server/ssr/index.ts:20](https://github.com/onzag/itemize/blob/5c2808d3/server/ssr/index.ts#L20)
 
 ___
 
@@ -73,7 +73,7 @@ Whether we will simply not use SSR at all
 
 #### Defined in
 
-[server/ssr/index.ts:38](https://github.com/onzag/itemize/blob/f2f29986/server/ssr/index.ts#L38)
+[server/ssr/index.ts:38](https://github.com/onzag/itemize/blob/5c2808d3/server/ssr/index.ts#L38)
 
 ___
 
@@ -86,4 +86,4 @@ can be accounted for in the HTML
 
 #### Defined in
 
-[server/ssr/index.ts:25](https://github.com/onzag/itemize/blob/f2f29986/server/ssr/index.ts#L25)
+[server/ssr/index.ts:25](https://github.com/onzag/itemize/blob/5c2808d3/server/ssr/index.ts#L25)

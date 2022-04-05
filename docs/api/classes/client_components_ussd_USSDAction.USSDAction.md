@@ -588,7 +588,7 @@ React.Component.render
 
 #### Defined in
 
-[client/components/ussd/USSDAction.tsx:96](https://github.com/onzag/itemize/blob/f2f29986/client/components/ussd/USSDAction.tsx#L96)
+[client/components/ussd/USSDAction.tsx:96](https://github.com/onzag/itemize/blob/5c2808d3/client/components/ussd/USSDAction.tsx#L96)
 
 ___
 

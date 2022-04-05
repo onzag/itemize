@@ -35,7 +35,7 @@ Types for the conditions
 
 #### Defined in
 
-[base/Root/Module/ItemDefinition/ConditionalRuleSet/index.ts:38](https://github.com/onzag/itemize/blob/f2f29986/base/Root/Module/ItemDefinition/ConditionalRuleSet/index.ts#L38)
+[base/Root/Module/ItemDefinition/ConditionalRuleSet/index.ts:38](https://github.com/onzag/itemize/blob/5c2808d3/base/Root/Module/ItemDefinition/ConditionalRuleSet/index.ts#L38)
 
 ___
 
@@ -47,7 +47,7 @@ Types for the gates that are available
 
 #### Defined in
 
-[base/Root/Module/ItemDefinition/ConditionalRuleSet/index.ts:43](https://github.com/onzag/itemize/blob/f2f29986/base/Root/Module/ItemDefinition/ConditionalRuleSet/index.ts#L43)
+[base/Root/Module/ItemDefinition/ConditionalRuleSet/index.ts:43](https://github.com/onzag/itemize/blob/5c2808d3/base/Root/Module/ItemDefinition/ConditionalRuleSet/index.ts#L43)
 
 ___
 
@@ -59,7 +59,7 @@ Server flags available for the conditional rule set
 
 #### Defined in
 
-[base/Root/Module/ItemDefinition/ConditionalRuleSet/index.ts:47](https://github.com/onzag/itemize/blob/f2f29986/base/Root/Module/ItemDefinition/ConditionalRuleSet/index.ts#L47)
+[base/Root/Module/ItemDefinition/ConditionalRuleSet/index.ts:47](https://github.com/onzag/itemize/blob/5c2808d3/base/Root/Module/ItemDefinition/ConditionalRuleSet/index.ts#L47)
 
 ___
 
@@ -71,4 +71,4 @@ both types of conditions combined
 
 #### Defined in
 
-[base/Root/Module/ItemDefinition/ConditionalRuleSet/index.ts:110](https://github.com/onzag/itemize/blob/f2f29986/base/Root/Module/ItemDefinition/ConditionalRuleSet/index.ts#L110)
+[base/Root/Module/ItemDefinition/ConditionalRuleSet/index.ts:110](https://github.com/onzag/itemize/blob/5c2808d3/base/Root/Module/ItemDefinition/ConditionalRuleSet/index.ts#L110)

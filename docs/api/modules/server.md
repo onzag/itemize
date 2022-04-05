@@ -34,7 +34,7 @@ of the server side of things
 
 #### Defined in
 
-[server/index.ts:97](https://github.com/onzag/itemize/blob/f2f29986/server/index.ts#L97)
+[server/index.ts:97](https://github.com/onzag/itemize/blob/5c2808d3/server/index.ts#L97)
 
 ## Functions
 
@@ -57,7 +57,7 @@ of the server side of things
 
 #### Defined in
 
-[server/index.ts:196](https://github.com/onzag/itemize/blob/f2f29986/server/index.ts#L196)
+[server/index.ts:196](https://github.com/onzag/itemize/blob/5c2808d3/server/index.ts#L196)
 
 ___
 
@@ -81,4 +81,4 @@ Initializes the itemize server with its custom configuration
 
 #### Defined in
 
-[server/index.ts:286](https://github.com/onzag/itemize/blob/f2f29986/server/index.ts#L286)
+[server/index.ts:286](https://github.com/onzag/itemize/blob/5c2808d3/server/index.ts#L286)

@@ -49,7 +49,7 @@ All the supported types combined
 
 #### Defined in
 
-[base/Root/Module/ItemDefinition/PropertyDefinition/types/index.ts:465](https://github.com/onzag/itemize/blob/f2f29986/base/Root/Module/ItemDefinition/PropertyDefinition/types/index.ts#L465)
+[base/Root/Module/ItemDefinition/PropertyDefinition/types/index.ts:465](https://github.com/onzag/itemize/blob/5c2808d3/base/Root/Module/ItemDefinition/PropertyDefinition/types/index.ts#L465)
 
 ___
 
@@ -61,7 +61,7 @@ All the supported property types
 
 #### Defined in
 
-[base/Root/Module/ItemDefinition/PropertyDefinition/types/index.ts:40](https://github.com/onzag/itemize/blob/f2f29986/base/Root/Module/ItemDefinition/PropertyDefinition/types/index.ts#L40)
+[base/Root/Module/ItemDefinition/PropertyDefinition/types/index.ts:40](https://github.com/onzag/itemize/blob/5c2808d3/base/Root/Module/ItemDefinition/PropertyDefinition/types/index.ts#L40)
 
 ___
 
@@ -74,7 +74,7 @@ how they are supposed to be managed
 
 #### Defined in
 
-[base/Root/Module/ItemDefinition/PropertyDefinition/types/index.ts:411](https://github.com/onzag/itemize/blob/f2f29986/base/Root/Module/ItemDefinition/PropertyDefinition/types/index.ts#L411)
+[base/Root/Module/ItemDefinition/PropertyDefinition/types/index.ts:411](https://github.com/onzag/itemize/blob/5c2808d3/base/Root/Module/ItemDefinition/PropertyDefinition/types/index.ts#L411)
 
 ## Variables
 
@@ -86,4 +86,4 @@ The standard definition and registry of all types in itemize
 
 #### Defined in
 
-[base/Root/Module/ItemDefinition/PropertyDefinition/types/index.ts:417](https://github.com/onzag/itemize/blob/f2f29986/base/Root/Module/ItemDefinition/PropertyDefinition/types/index.ts#L417)
+[base/Root/Module/ItemDefinition/PropertyDefinition/types/index.ts:417](https://github.com/onzag/itemize/blob/5c2808d3/base/Root/Module/ItemDefinition/PropertyDefinition/types/index.ts#L417)

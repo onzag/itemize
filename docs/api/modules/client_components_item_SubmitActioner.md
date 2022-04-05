@@ -43,4 +43,4 @@ a react component
 
 #### Defined in
 
-[client/components/item/SubmitActioner.tsx:108](https://github.com/onzag/itemize/blob/f2f29986/client/components/item/SubmitActioner.tsx#L108)
+[client/components/item/SubmitActioner.tsx:108](https://github.com/onzag/itemize/blob/5c2808d3/client/components/item/SubmitActioner.tsx#L108)

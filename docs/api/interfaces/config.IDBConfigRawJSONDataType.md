@@ -24,7 +24,7 @@ The database config
 
 #### Defined in
 
-[config.ts:311](https://github.com/onzag/itemize/blob/f2f29986/config.ts#L311)
+[config.ts:311](https://github.com/onzag/itemize/blob/5c2808d3/config.ts#L311)
 
 ___
 
@@ -34,7 +34,7 @@ ___
 
 #### Defined in
 
-[config.ts:307](https://github.com/onzag/itemize/blob/f2f29986/config.ts#L307)
+[config.ts:307](https://github.com/onzag/itemize/blob/5c2808d3/config.ts#L307)
 
 ___
 
@@ -44,7 +44,7 @@ ___
 
 #### Defined in
 
-[config.ts:310](https://github.com/onzag/itemize/blob/f2f29986/config.ts#L310)
+[config.ts:310](https://github.com/onzag/itemize/blob/5c2808d3/config.ts#L310)
 
 ___
 
@@ -54,7 +54,7 @@ ___
 
 #### Defined in
 
-[config.ts:308](https://github.com/onzag/itemize/blob/f2f29986/config.ts#L308)
+[config.ts:308](https://github.com/onzag/itemize/blob/5c2808d3/config.ts#L308)
 
 ___
 
@@ -64,4 +64,4 @@ ___
 
 #### Defined in
 
-[config.ts:309](https://github.com/onzag/itemize/blob/f2f29986/config.ts#L309)
+[config.ts:309](https://github.com/onzag/itemize/blob/5c2808d3/config.ts#L309)

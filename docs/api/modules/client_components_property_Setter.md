@@ -39,4 +39,4 @@ a react component
 
 #### Defined in
 
-[client/components/property/Setter.tsx:22](https://github.com/onzag/itemize/blob/f2f29986/client/components/property/Setter.tsx#L22)
+[client/components/property/Setter.tsx:22](https://github.com/onzag/itemize/blob/5c2808d3/client/components/property/Setter.tsx#L22)

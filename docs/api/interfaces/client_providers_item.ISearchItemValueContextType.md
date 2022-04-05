@@ -19,7 +19,7 @@
 
 #### Defined in
 
-[client/providers/item.tsx:596](https://github.com/onzag/itemize/blob/f2f29986/client/providers/item.tsx#L596)
+[client/providers/item.tsx:596](https://github.com/onzag/itemize/blob/5c2808d3/client/providers/item.tsx#L596)
 
 ___
 
@@ -29,4 +29,4 @@ ___
 
 #### Defined in
 
-[client/providers/item.tsx:597](https://github.com/onzag/itemize/blob/f2f29986/client/providers/item.tsx#L597)
+[client/providers/item.tsx:597](https://github.com/onzag/itemize/blob/5c2808d3/client/providers/item.tsx#L597)

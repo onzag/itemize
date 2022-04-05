@@ -23,7 +23,7 @@
 
 #### Defined in
 
-[server/resolvers/basic.ts:45](https://github.com/onzag/itemize/blob/f2f29986/server/resolvers/basic.ts#L45)
+[server/resolvers/basic.ts:45](https://github.com/onzag/itemize/blob/5c2808d3/server/resolvers/basic.ts#L45)
 
 ___
 
@@ -33,7 +33,7 @@ ___
 
 #### Defined in
 
-[server/resolvers/basic.ts:47](https://github.com/onzag/itemize/blob/f2f29986/server/resolvers/basic.ts#L47)
+[server/resolvers/basic.ts:47](https://github.com/onzag/itemize/blob/5c2808d3/server/resolvers/basic.ts#L47)
 
 ___
 
@@ -43,7 +43,7 @@ ___
 
 #### Defined in
 
-[server/resolvers/basic.ts:41](https://github.com/onzag/itemize/blob/f2f29986/server/resolvers/basic.ts#L41)
+[server/resolvers/basic.ts:41](https://github.com/onzag/itemize/blob/5c2808d3/server/resolvers/basic.ts#L41)
 
 ___
 
@@ -53,7 +53,7 @@ ___
 
 #### Defined in
 
-[server/resolvers/basic.ts:46](https://github.com/onzag/itemize/blob/f2f29986/server/resolvers/basic.ts#L46)
+[server/resolvers/basic.ts:46](https://github.com/onzag/itemize/blob/5c2808d3/server/resolvers/basic.ts#L46)
 
 ___
 
@@ -63,7 +63,7 @@ ___
 
 #### Defined in
 
-[server/resolvers/basic.ts:38](https://github.com/onzag/itemize/blob/f2f29986/server/resolvers/basic.ts#L38)
+[server/resolvers/basic.ts:38](https://github.com/onzag/itemize/blob/5c2808d3/server/resolvers/basic.ts#L38)
 
 ___
 
@@ -73,4 +73,4 @@ ___
 
 #### Defined in
 
-[server/resolvers/basic.ts:42](https://github.com/onzag/itemize/blob/f2f29986/server/resolvers/basic.ts#L42)
+[server/resolvers/basic.ts:42](https://github.com/onzag/itemize/blob/5c2808d3/server/resolvers/basic.ts#L42)

@@ -34,4 +34,4 @@ a react node
 
 #### Defined in
 
-[client/components/localization/AppCurrencyRetriever.tsx:26](https://github.com/onzag/itemize/blob/f2f29986/client/components/localization/AppCurrencyRetriever.tsx#L26)
+[client/components/localization/AppCurrencyRetriever.tsx:26](https://github.com/onzag/itemize/blob/5c2808d3/client/components/localization/AppCurrencyRetriever.tsx#L26)

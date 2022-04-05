@@ -34,7 +34,7 @@ An error that occured during login
 
 #### Defined in
 
-[client/internal/providers/token-provider.tsx:36](https://github.com/onzag/itemize/blob/f2f29986/client/internal/providers/token-provider.tsx#L36)
+[client/internal/providers/token-provider.tsx:36](https://github.com/onzag/itemize/blob/5c2808d3/client/internal/providers/token-provider.tsx#L36)
 
 ___
 
@@ -46,7 +46,7 @@ The user id
 
 #### Defined in
 
-[client/internal/providers/token-provider.tsx:28](https://github.com/onzag/itemize/blob/f2f29986/client/internal/providers/token-provider.tsx#L28)
+[client/internal/providers/token-provider.tsx:28](https://github.com/onzag/itemize/blob/5c2808d3/client/internal/providers/token-provider.tsx#L28)
 
 ___
 
@@ -58,7 +58,7 @@ Whether it's currently logging in
 
 #### Defined in
 
-[client/internal/providers/token-provider.tsx:40](https://github.com/onzag/itemize/blob/f2f29986/client/internal/providers/token-provider.tsx#L40)
+[client/internal/providers/token-provider.tsx:40](https://github.com/onzag/itemize/blob/5c2808d3/client/internal/providers/token-provider.tsx#L40)
 
 ___
 
@@ -76,7 +76,7 @@ the token
 
 #### Defined in
 
-[client/internal/providers/token-provider.tsx:50](https://github.com/onzag/itemize/blob/f2f29986/client/internal/providers/token-provider.tsx#L50)
+[client/internal/providers/token-provider.tsx:50](https://github.com/onzag/itemize/blob/5c2808d3/client/internal/providers/token-provider.tsx#L50)
 
 ___
 
@@ -88,7 +88,7 @@ The user role
 
 #### Defined in
 
-[client/internal/providers/token-provider.tsx:32](https://github.com/onzag/itemize/blob/f2f29986/client/internal/providers/token-provider.tsx#L32)
+[client/internal/providers/token-provider.tsx:32](https://github.com/onzag/itemize/blob/5c2808d3/client/internal/providers/token-provider.tsx#L32)
 
 ___
 
@@ -100,4 +100,4 @@ The token we have got now
 
 #### Defined in
 
-[client/internal/providers/token-provider.tsx:24](https://github.com/onzag/itemize/blob/f2f29986/client/internal/providers/token-provider.tsx#L24)
+[client/internal/providers/token-provider.tsx:24](https://github.com/onzag/itemize/blob/5c2808d3/client/internal/providers/token-provider.tsx#L24)

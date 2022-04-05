@@ -36,7 +36,7 @@ the attribute of that property, as some properties are objects
 
 #### Defined in
 
-[base/Root/Module/ItemDefinition/ConditionalRuleSet/index.ts:70](https://github.com/onzag/itemize/blob/f2f29986/base/Root/Module/ItemDefinition/ConditionalRuleSet/index.ts#L70)
+[base/Root/Module/ItemDefinition/ConditionalRuleSet/index.ts:70](https://github.com/onzag/itemize/blob/5c2808d3/base/Root/Module/ItemDefinition/ConditionalRuleSet/index.ts#L70)
 
 ___
 
@@ -48,7 +48,7 @@ the comparator, equal, greater than, etc...
 
 #### Defined in
 
-[base/Root/Module/ItemDefinition/ConditionalRuleSet/index.ts:78](https://github.com/onzag/itemize/blob/f2f29986/base/Root/Module/ItemDefinition/ConditionalRuleSet/index.ts#L78)
+[base/Root/Module/ItemDefinition/ConditionalRuleSet/index.ts:78](https://github.com/onzag/itemize/blob/5c2808d3/base/Root/Module/ItemDefinition/ConditionalRuleSet/index.ts#L78)
 
 ___
 
@@ -62,7 +62,7 @@ IConditionalRuleSetRawJSONDataBaseType.condition
 
 #### Defined in
 
-[base/Root/Module/ItemDefinition/ConditionalRuleSet/index.ts:54](https://github.com/onzag/itemize/blob/f2f29986/base/Root/Module/ItemDefinition/ConditionalRuleSet/index.ts#L54)
+[base/Root/Module/ItemDefinition/ConditionalRuleSet/index.ts:54](https://github.com/onzag/itemize/blob/5c2808d3/base/Root/Module/ItemDefinition/ConditionalRuleSet/index.ts#L54)
 
 ___
 
@@ -76,7 +76,7 @@ IConditionalRuleSetRawJSONDataBaseType.gate
 
 #### Defined in
 
-[base/Root/Module/ItemDefinition/ConditionalRuleSet/index.ts:53](https://github.com/onzag/itemize/blob/f2f29986/base/Root/Module/ItemDefinition/ConditionalRuleSet/index.ts#L53)
+[base/Root/Module/ItemDefinition/ConditionalRuleSet/index.ts:53](https://github.com/onzag/itemize/blob/5c2808d3/base/Root/Module/ItemDefinition/ConditionalRuleSet/index.ts#L53)
 
 ___
 
@@ -88,7 +88,7 @@ the method, default, string or datetime (uses Date)
 
 #### Defined in
 
-[base/Root/Module/ItemDefinition/ConditionalRuleSet/index.ts:74](https://github.com/onzag/itemize/blob/f2f29986/base/Root/Module/ItemDefinition/ConditionalRuleSet/index.ts#L74)
+[base/Root/Module/ItemDefinition/ConditionalRuleSet/index.ts:74](https://github.com/onzag/itemize/blob/5c2808d3/base/Root/Module/ItemDefinition/ConditionalRuleSet/index.ts#L74)
 
 ___
 
@@ -100,7 +100,7 @@ the property to be compared
 
 #### Defined in
 
-[base/Root/Module/ItemDefinition/ConditionalRuleSet/index.ts:66](https://github.com/onzag/itemize/blob/f2f29986/base/Root/Module/ItemDefinition/ConditionalRuleSet/index.ts#L66)
+[base/Root/Module/ItemDefinition/ConditionalRuleSet/index.ts:66](https://github.com/onzag/itemize/blob/5c2808d3/base/Root/Module/ItemDefinition/ConditionalRuleSet/index.ts#L66)
 
 ___
 
@@ -114,7 +114,7 @@ IConditionalRuleSetRawJSONDataBaseType.serverFlag
 
 #### Defined in
 
-[base/Root/Module/ItemDefinition/ConditionalRuleSet/index.ts:55](https://github.com/onzag/itemize/blob/f2f29986/base/Root/Module/ItemDefinition/ConditionalRuleSet/index.ts#L55)
+[base/Root/Module/ItemDefinition/ConditionalRuleSet/index.ts:55](https://github.com/onzag/itemize/blob/5c2808d3/base/Root/Module/ItemDefinition/ConditionalRuleSet/index.ts#L55)
 
 ___
 
@@ -126,7 +126,7 @@ the value to be compared against, either a value itself, or alternatively, a pro
 
 #### Defined in
 
-[base/Root/Module/ItemDefinition/ConditionalRuleSet/index.ts:82](https://github.com/onzag/itemize/blob/f2f29986/base/Root/Module/ItemDefinition/ConditionalRuleSet/index.ts#L82)
+[base/Root/Module/ItemDefinition/ConditionalRuleSet/index.ts:82](https://github.com/onzag/itemize/blob/5c2808d3/base/Root/Module/ItemDefinition/ConditionalRuleSet/index.ts#L82)
 
 ___
 
@@ -139,4 +139,4 @@ with the comparator, rather than the value of itself
 
 #### Defined in
 
-[base/Root/Module/ItemDefinition/ConditionalRuleSet/index.ts:87](https://github.com/onzag/itemize/blob/f2f29986/base/Root/Module/ItemDefinition/ConditionalRuleSet/index.ts#L87)
+[base/Root/Module/ItemDefinition/ConditionalRuleSet/index.ts:87](https://github.com/onzag/itemize/blob/5c2808d3/base/Root/Module/ItemDefinition/ConditionalRuleSet/index.ts#L87)

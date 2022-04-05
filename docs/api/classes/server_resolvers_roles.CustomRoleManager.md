@@ -38,7 +38,7 @@
 
 #### Defined in
 
-[server/resolvers/roles.ts:54](https://github.com/onzag/itemize/blob/f2f29986/server/resolvers/roles.ts#L54)
+[server/resolvers/roles.ts:54](https://github.com/onzag/itemize/blob/5c2808d3/server/resolvers/roles.ts#L54)
 
 ## Properties
 
@@ -48,7 +48,7 @@
 
 #### Defined in
 
-[server/resolvers/roles.ts:51](https://github.com/onzag/itemize/blob/f2f29986/server/resolvers/roles.ts#L51)
+[server/resolvers/roles.ts:51](https://github.com/onzag/itemize/blob/5c2808d3/server/resolvers/roles.ts#L51)
 
 ___
 
@@ -58,7 +58,7 @@ ___
 
 #### Defined in
 
-[server/resolvers/roles.ts:53](https://github.com/onzag/itemize/blob/f2f29986/server/resolvers/roles.ts#L53)
+[server/resolvers/roles.ts:53](https://github.com/onzag/itemize/blob/5c2808d3/server/resolvers/roles.ts#L53)
 
 ___
 
@@ -68,7 +68,7 @@ ___
 
 #### Defined in
 
-[server/resolvers/roles.ts:50](https://github.com/onzag/itemize/blob/f2f29986/server/resolvers/roles.ts#L50)
+[server/resolvers/roles.ts:50](https://github.com/onzag/itemize/blob/5c2808d3/server/resolvers/roles.ts#L50)
 
 ___
 
@@ -82,7 +82,7 @@ ___
 
 #### Defined in
 
-[server/resolvers/roles.ts:52](https://github.com/onzag/itemize/blob/f2f29986/server/resolvers/roles.ts#L52)
+[server/resolvers/roles.ts:52](https://github.com/onzag/itemize/blob/5c2808d3/server/resolvers/roles.ts#L52)
 
 ## Methods
 
@@ -102,7 +102,7 @@ ___
 
 #### Defined in
 
-[server/resolvers/roles.ts:91](https://github.com/onzag/itemize/blob/f2f29986/server/resolvers/roles.ts#L91)
+[server/resolvers/roles.ts:91](https://github.com/onzag/itemize/blob/5c2808d3/server/resolvers/roles.ts#L91)
 
 ___
 
@@ -122,7 +122,7 @@ ___
 
 #### Defined in
 
-[server/resolvers/roles.ts:73](https://github.com/onzag/itemize/blob/f2f29986/server/resolvers/roles.ts#L73)
+[server/resolvers/roles.ts:73](https://github.com/onzag/itemize/blob/5c2808d3/server/resolvers/roles.ts#L73)
 
 ___
 
@@ -142,4 +142,4 @@ ___
 
 #### Defined in
 
-[server/resolvers/roles.ts:116](https://github.com/onzag/itemize/blob/f2f29986/server/resolvers/roles.ts#L116)
+[server/resolvers/roles.ts:116](https://github.com/onzag/itemize/blob/5c2808d3/server/resolvers/roles.ts#L116)

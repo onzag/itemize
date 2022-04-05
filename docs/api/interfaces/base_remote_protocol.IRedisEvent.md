@@ -25,7 +25,7 @@
 
 #### Defined in
 
-[base/remote-protocol.ts:671](https://github.com/onzag/itemize/blob/f2f29986/base/remote-protocol.ts#L671)
+[base/remote-protocol.ts:671](https://github.com/onzag/itemize/blob/5c2808d3/base/remote-protocol.ts#L671)
 
 ___
 
@@ -35,7 +35,7 @@ ___
 
 #### Defined in
 
-[base/remote-protocol.ts:666](https://github.com/onzag/itemize/blob/f2f29986/base/remote-protocol.ts#L666)
+[base/remote-protocol.ts:666](https://github.com/onzag/itemize/blob/5c2808d3/base/remote-protocol.ts#L666)
 
 ___
 
@@ -45,7 +45,7 @@ ___
 
 #### Defined in
 
-[base/remote-protocol.ts:667](https://github.com/onzag/itemize/blob/f2f29986/base/remote-protocol.ts#L667)
+[base/remote-protocol.ts:667](https://github.com/onzag/itemize/blob/5c2808d3/base/remote-protocol.ts#L667)
 
 ___
 
@@ -55,7 +55,7 @@ ___
 
 #### Defined in
 
-[base/remote-protocol.ts:670](https://github.com/onzag/itemize/blob/f2f29986/base/remote-protocol.ts#L670)
+[base/remote-protocol.ts:670](https://github.com/onzag/itemize/blob/5c2808d3/base/remote-protocol.ts#L670)
 
 ___
 
@@ -65,7 +65,7 @@ ___
 
 #### Defined in
 
-[base/remote-protocol.ts:665](https://github.com/onzag/itemize/blob/f2f29986/base/remote-protocol.ts#L665)
+[base/remote-protocol.ts:665](https://github.com/onzag/itemize/blob/5c2808d3/base/remote-protocol.ts#L665)
 
 ___
 
@@ -75,7 +75,7 @@ ___
 
 #### Defined in
 
-[base/remote-protocol.ts:669](https://github.com/onzag/itemize/blob/f2f29986/base/remote-protocol.ts#L669)
+[base/remote-protocol.ts:669](https://github.com/onzag/itemize/blob/5c2808d3/base/remote-protocol.ts#L669)
 
 ___
 
@@ -85,7 +85,7 @@ ___
 
 #### Defined in
 
-[base/remote-protocol.ts:668](https://github.com/onzag/itemize/blob/f2f29986/base/remote-protocol.ts#L668)
+[base/remote-protocol.ts:668](https://github.com/onzag/itemize/blob/5c2808d3/base/remote-protocol.ts#L668)
 
 ___
 
@@ -95,4 +95,4 @@ ___
 
 #### Defined in
 
-[base/remote-protocol.ts:664](https://github.com/onzag/itemize/blob/f2f29986/base/remote-protocol.ts#L664)
+[base/remote-protocol.ts:664](https://github.com/onzag/itemize/blob/5c2808d3/base/remote-protocol.ts#L664)

@@ -95,7 +95,7 @@ Instantiates a new remote listener
 
 #### Defined in
 
-[client/internal/app/remote-listener.ts:263](https://github.com/onzag/itemize/blob/f2f29986/client/internal/app/remote-listener.ts#L263)
+[client/internal/app/remote-listener.ts:263](https://github.com/onzag/itemize/blob/5c2808d3/client/internal/app/remote-listener.ts#L263)
 
 ## Properties
 
@@ -108,7 +108,7 @@ event is received
 
 #### Defined in
 
-[client/internal/app/remote-listener.ts:214](https://github.com/onzag/itemize/blob/f2f29986/client/internal/app/remote-listener.ts#L214)
+[client/internal/app/remote-listener.ts:214](https://github.com/onzag/itemize/blob/5c2808d3/client/internal/app/remote-listener.ts#L214)
 
 ___
 
@@ -120,7 +120,7 @@ Listeners for connection change status, offline/online
 
 #### Defined in
 
-[client/internal/app/remote-listener.ts:209](https://github.com/onzag/itemize/blob/f2f29986/client/internal/app/remote-listener.ts#L209)
+[client/internal/app/remote-listener.ts:209](https://github.com/onzag/itemize/blob/5c2808d3/client/internal/app/remote-listener.ts#L209)
 
 ___
 
@@ -141,7 +141,7 @@ sets this function
 
 #### Defined in
 
-[client/internal/app/remote-listener.ts:253](https://github.com/onzag/itemize/blob/f2f29986/client/internal/app/remote-listener.ts#L253)
+[client/internal/app/remote-listener.ts:253](https://github.com/onzag/itemize/blob/5c2808d3/client/internal/app/remote-listener.ts#L253)
 
 ___
 
@@ -155,7 +155,7 @@ a little bit
 
 #### Defined in
 
-[client/internal/app/remote-listener.ts:205](https://github.com/onzag/itemize/blob/f2f29986/client/internal/app/remote-listener.ts#L205)
+[client/internal/app/remote-listener.ts:205](https://github.com/onzag/itemize/blob/5c2808d3/client/internal/app/remote-listener.ts#L205)
 
 ___
 
@@ -167,7 +167,7 @@ whether the identifying token has been set
 
 #### Defined in
 
-[client/internal/app/remote-listener.ts:231](https://github.com/onzag/itemize/blob/f2f29986/client/internal/app/remote-listener.ts#L231)
+[client/internal/app/remote-listener.ts:231](https://github.com/onzag/itemize/blob/5c2808d3/client/internal/app/remote-listener.ts#L231)
 
 ___
 
@@ -179,7 +179,7 @@ Whether it's ready to attach events
 
 #### Defined in
 
-[client/internal/app/remote-listener.ts:239](https://github.com/onzag/itemize/blob/f2f29986/client/internal/app/remote-listener.ts#L239)
+[client/internal/app/remote-listener.ts:239](https://github.com/onzag/itemize/blob/5c2808d3/client/internal/app/remote-listener.ts#L239)
 
 ___
 
@@ -192,7 +192,7 @@ buildnumber
 
 #### Defined in
 
-[client/internal/app/remote-listener.ts:219](https://github.com/onzag/itemize/blob/f2f29986/client/internal/app/remote-listener.ts#L219)
+[client/internal/app/remote-listener.ts:219](https://github.com/onzag/itemize/blob/5c2808d3/client/internal/app/remote-listener.ts#L219)
 
 ___
 
@@ -204,7 +204,7 @@ Counts how many listeners have been registered
 
 #### Defined in
 
-[client/internal/app/remote-listener.ts:257](https://github.com/onzag/itemize/blob/f2f29986/client/internal/app/remote-listener.ts#L257)
+[client/internal/app/remote-listener.ts:257](https://github.com/onzag/itemize/blob/5c2808d3/client/internal/app/remote-listener.ts#L257)
 
 ___
 
@@ -224,7 +224,7 @@ the version, we only need one listener at a time
 
 #### Defined in
 
-[client/internal/app/remote-listener.ts:90](https://github.com/onzag/itemize/blob/f2f29986/client/internal/app/remote-listener.ts#L90)
+[client/internal/app/remote-listener.ts:90](https://github.com/onzag/itemize/blob/5c2808d3/client/internal/app/remote-listener.ts#L90)
 
 ___
 
@@ -245,7 +245,7 @@ this comes from the current active token provider
 
 #### Defined in
 
-[client/internal/app/remote-listener.ts:244](https://github.com/onzag/itemize/blob/f2f29986/client/internal/app/remote-listener.ts#L244)
+[client/internal/app/remote-listener.ts:244](https://github.com/onzag/itemize/blob/5c2808d3/client/internal/app/remote-listener.ts#L244)
 
 ___
 
@@ -257,7 +257,7 @@ Whether it's currently offline
 
 #### Defined in
 
-[client/internal/app/remote-listener.ts:227](https://github.com/onzag/itemize/blob/f2f29986/client/internal/app/remote-listener.ts#L227)
+[client/internal/app/remote-listener.ts:227](https://github.com/onzag/itemize/blob/5c2808d3/client/internal/app/remote-listener.ts#L227)
 
 ___
 
@@ -277,7 +277,7 @@ parenting information of what we are listening to
 
 #### Defined in
 
-[client/internal/app/remote-listener.ts:175](https://github.com/onzag/itemize/blob/f2f29986/client/internal/app/remote-listener.ts#L175)
+[client/internal/app/remote-listener.ts:175](https://github.com/onzag/itemize/blob/5c2808d3/client/internal/app/remote-listener.ts#L175)
 
 ___
 
@@ -297,7 +297,7 @@ or a module with the owner id attached to it as an identifier
 
 #### Defined in
 
-[client/internal/app/remote-listener.ts:114](https://github.com/onzag/itemize/blob/f2f29986/client/internal/app/remote-listener.ts#L114)
+[client/internal/app/remote-listener.ts:114](https://github.com/onzag/itemize/blob/5c2808d3/client/internal/app/remote-listener.ts#L114)
 
 ___
 
@@ -317,7 +317,7 @@ parenting information of what we are listening to
 
 #### Defined in
 
-[client/internal/app/remote-listener.ts:146](https://github.com/onzag/itemize/blob/f2f29986/client/internal/app/remote-listener.ts#L146)
+[client/internal/app/remote-listener.ts:146](https://github.com/onzag/itemize/blob/5c2808d3/client/internal/app/remote-listener.ts#L146)
 
 ___
 
@@ -329,7 +329,7 @@ The root we are using
 
 #### Defined in
 
-[client/internal/app/remote-listener.ts:84](https://github.com/onzag/itemize/blob/f2f29986/client/internal/app/remote-listener.ts#L84)
+[client/internal/app/remote-listener.ts:84](https://github.com/onzag/itemize/blob/5c2808d3/client/internal/app/remote-listener.ts#L84)
 
 ___
 
@@ -341,7 +341,7 @@ The time when this instance was instantiated
 
 #### Defined in
 
-[client/internal/app/remote-listener.ts:248](https://github.com/onzag/itemize/blob/f2f29986/client/internal/app/remote-listener.ts#L248)
+[client/internal/app/remote-listener.ts:248](https://github.com/onzag/itemize/blob/5c2808d3/client/internal/app/remote-listener.ts#L248)
 
 ___
 
@@ -353,7 +353,7 @@ The socket io client
 
 #### Defined in
 
-[client/internal/app/remote-listener.ts:80](https://github.com/onzag/itemize/blob/f2f29986/client/internal/app/remote-listener.ts#L80)
+[client/internal/app/remote-listener.ts:80](https://github.com/onzag/itemize/blob/5c2808d3/client/internal/app/remote-listener.ts#L80)
 
 ___
 
@@ -365,7 +365,7 @@ The token that has been set
 
 #### Defined in
 
-[client/internal/app/remote-listener.ts:235](https://github.com/onzag/itemize/blob/f2f29986/client/internal/app/remote-listener.ts#L235)
+[client/internal/app/remote-listener.ts:235](https://github.com/onzag/itemize/blob/5c2808d3/client/internal/app/remote-listener.ts#L235)
 
 ___
 
@@ -377,7 +377,7 @@ An uuid to randomly identify this listener
 
 #### Defined in
 
-[client/internal/app/remote-listener.ts:223](https://github.com/onzag/itemize/blob/f2f29986/client/internal/app/remote-listener.ts#L223)
+[client/internal/app/remote-listener.ts:223](https://github.com/onzag/itemize/blob/5c2808d3/client/internal/app/remote-listener.ts#L223)
 
 ## Methods
 
@@ -399,7 +399,7 @@ Adds a listener for when the app updates (aka buildnumber mismatch)
 
 #### Defined in
 
-[client/internal/app/remote-listener.ts:399](https://github.com/onzag/itemize/blob/f2f29986/client/internal/app/remote-listener.ts#L399)
+[client/internal/app/remote-listener.ts:399](https://github.com/onzag/itemize/blob/5c2808d3/client/internal/app/remote-listener.ts#L399)
 
 ___
 
@@ -421,7 +421,7 @@ Adds a listener for when the app online status changes
 
 #### Defined in
 
-[client/internal/app/remote-listener.ts:425](https://github.com/onzag/itemize/blob/f2f29986/client/internal/app/remote-listener.ts#L425)
+[client/internal/app/remote-listener.ts:425](https://github.com/onzag/itemize/blob/5c2808d3/client/internal/app/remote-listener.ts#L425)
 
 ___
 
@@ -447,7 +447,7 @@ so that a reload can be called
 
 #### Defined in
 
-[client/internal/app/remote-listener.ts:504](https://github.com/onzag/itemize/blob/f2f29986/client/internal/app/remote-listener.ts#L504)
+[client/internal/app/remote-listener.ts:504](https://github.com/onzag/itemize/blob/5c2808d3/client/internal/app/remote-listener.ts#L504)
 
 ___
 
@@ -476,7 +476,7 @@ Adds a parented and owned search listener for a cached search via parenting
 
 #### Defined in
 
-[client/internal/app/remote-listener.ts:910](https://github.com/onzag/itemize/blob/f2f29986/client/internal/app/remote-listener.ts#L910)
+[client/internal/app/remote-listener.ts:910](https://github.com/onzag/itemize/blob/5c2808d3/client/internal/app/remote-listener.ts#L910)
 
 ___
 
@@ -502,7 +502,7 @@ Adds a listener for an owned search
 
 #### Defined in
 
-[client/internal/app/remote-listener.ts:703](https://github.com/onzag/itemize/blob/f2f29986/client/internal/app/remote-listener.ts#L703)
+[client/internal/app/remote-listener.ts:703](https://github.com/onzag/itemize/blob/5c2808d3/client/internal/app/remote-listener.ts#L703)
 
 ___
 
@@ -530,7 +530,7 @@ Adds a parented search listener for a cached search via parenting
 
 #### Defined in
 
-[client/internal/app/remote-listener.ts:851](https://github.com/onzag/itemize/blob/f2f29986/client/internal/app/remote-listener.ts#L851)
+[client/internal/app/remote-listener.ts:851](https://github.com/onzag/itemize/blob/5c2808d3/client/internal/app/remote-listener.ts#L851)
 
 ___
 
@@ -546,7 +546,7 @@ Reattachs the detached requests
 
 #### Defined in
 
-[client/internal/app/remote-listener.ts:1536](https://github.com/onzag/itemize/blob/f2f29986/client/internal/app/remote-listener.ts#L1536)
+[client/internal/app/remote-listener.ts:1536](https://github.com/onzag/itemize/blob/5c2808d3/client/internal/app/remote-listener.ts#L1536)
 
 ___
 
@@ -569,7 +569,7 @@ item definition using a register request
 
 #### Defined in
 
-[client/internal/app/remote-listener.ts:547](https://github.com/onzag/itemize/blob/f2f29986/client/internal/app/remote-listener.ts#L547)
+[client/internal/app/remote-listener.ts:547](https://github.com/onzag/itemize/blob/5c2808d3/client/internal/app/remote-listener.ts#L547)
 
 ___
 
@@ -592,7 +592,7 @@ as in the app is online
 
 #### Defined in
 
-[client/internal/app/remote-listener.ts:989](https://github.com/onzag/itemize/blob/f2f29986/client/internal/app/remote-listener.ts#L989)
+[client/internal/app/remote-listener.ts:989](https://github.com/onzag/itemize/blob/5c2808d3/client/internal/app/remote-listener.ts#L989)
 
 ___
 
@@ -614,7 +614,7 @@ Attaches if possible the owned search listener for a cached by owner search type
 
 #### Defined in
 
-[client/internal/app/remote-listener.ts:751](https://github.com/onzag/itemize/blob/f2f29986/client/internal/app/remote-listener.ts#L751)
+[client/internal/app/remote-listener.ts:751](https://github.com/onzag/itemize/blob/5c2808d3/client/internal/app/remote-listener.ts#L751)
 
 ___
 
@@ -637,7 +637,7 @@ as in the app is online
 
 #### Defined in
 
-[client/internal/app/remote-listener.ts:966](https://github.com/onzag/itemize/blob/f2f29986/client/internal/app/remote-listener.ts#L966)
+[client/internal/app/remote-listener.ts:966](https://github.com/onzag/itemize/blob/5c2808d3/client/internal/app/remote-listener.ts#L966)
 
 ___
 
@@ -653,7 +653,7 @@ Consumes the delayed feedbacks that might exist
 
 #### Defined in
 
-[client/internal/app/remote-listener.ts:665](https://github.com/onzag/itemize/blob/f2f29986/client/internal/app/remote-listener.ts#L665)
+[client/internal/app/remote-listener.ts:665](https://github.com/onzag/itemize/blob/5c2808d3/client/internal/app/remote-listener.ts#L665)
 
 ___
 
@@ -669,7 +669,7 @@ Provides the remote listener uuid
 
 #### Defined in
 
-[client/internal/app/remote-listener.ts:383](https://github.com/onzag/itemize/blob/f2f29986/client/internal/app/remote-listener.ts#L383)
+[client/internal/app/remote-listener.ts:383](https://github.com/onzag/itemize/blob/5c2808d3/client/internal/app/remote-listener.ts#L383)
 
 ___
 
@@ -685,7 +685,7 @@ Checks whether the app is uppdated compared to what we are running right now
 
 #### Defined in
 
-[client/internal/app/remote-listener.ts:417](https://github.com/onzag/itemize/blob/f2f29986/client/internal/app/remote-listener.ts#L417)
+[client/internal/app/remote-listener.ts:417](https://github.com/onzag/itemize/blob/5c2808d3/client/internal/app/remote-listener.ts#L417)
 
 ___
 
@@ -702,7 +702,7 @@ which also defines whether the app itself is offline
 
 #### Defined in
 
-[client/internal/app/remote-listener.ts:391](https://github.com/onzag/itemize/blob/f2f29986/client/internal/app/remote-listener.ts#L391)
+[client/internal/app/remote-listener.ts:391](https://github.com/onzag/itemize/blob/5c2808d3/client/internal/app/remote-listener.ts#L391)
 
 ___
 
@@ -726,7 +726,7 @@ triggers just on connection, as well as on update
 
 #### Defined in
 
-[client/internal/app/remote-listener.ts:480](https://github.com/onzag/itemize/blob/f2f29986/client/internal/app/remote-listener.ts#L480)
+[client/internal/app/remote-listener.ts:480](https://github.com/onzag/itemize/blob/5c2808d3/client/internal/app/remote-listener.ts#L480)
 
 ___
 
@@ -748,7 +748,7 @@ Triggers on a changed or a feedback event
 
 #### Defined in
 
-[client/internal/app/remote-listener.ts:1178](https://github.com/onzag/itemize/blob/f2f29986/client/internal/app/remote-listener.ts#L1178)
+[client/internal/app/remote-listener.ts:1178](https://github.com/onzag/itemize/blob/5c2808d3/client/internal/app/remote-listener.ts#L1178)
 
 ___
 
@@ -764,7 +764,7 @@ Triggers once the websocket connects
 
 #### Defined in
 
-[client/internal/app/remote-listener.ts:1489](https://github.com/onzag/itemize/blob/f2f29986/client/internal/app/remote-listener.ts#L1489)
+[client/internal/app/remote-listener.ts:1489](https://github.com/onzag/itemize/blob/5c2808d3/client/internal/app/remote-listener.ts#L1489)
 
 ___
 
@@ -780,7 +780,7 @@ Triggers when losing connection
 
 #### Defined in
 
-[client/internal/app/remote-listener.ts:1613](https://github.com/onzag/itemize/blob/f2f29986/client/internal/app/remote-listener.ts#L1613)
+[client/internal/app/remote-listener.ts:1613](https://github.com/onzag/itemize/blob/5c2808d3/client/internal/app/remote-listener.ts#L1613)
 
 ___
 
@@ -803,7 +803,7 @@ a remote error event
 
 #### Defined in
 
-[client/internal/app/remote-listener.ts:455](https://github.com/onzag/itemize/blob/f2f29986/client/internal/app/remote-listener.ts#L455)
+[client/internal/app/remote-listener.ts:455](https://github.com/onzag/itemize/blob/5c2808d3/client/internal/app/remote-listener.ts#L455)
 
 ___
 
@@ -822,7 +822,7 @@ void or a void promise for when it's done
 
 #### Defined in
 
-[client/internal/app/remote-listener.ts:1457](https://github.com/onzag/itemize/blob/f2f29986/client/internal/app/remote-listener.ts#L1457)
+[client/internal/app/remote-listener.ts:1457](https://github.com/onzag/itemize/blob/5c2808d3/client/internal/app/remote-listener.ts#L1457)
 
 ___
 
@@ -839,7 +839,7 @@ by a logout all event
 
 #### Defined in
 
-[client/internal/app/remote-listener.ts:444](https://github.com/onzag/itemize/blob/f2f29986/client/internal/app/remote-listener.ts#L444)
+[client/internal/app/remote-listener.ts:444](https://github.com/onzag/itemize/blob/5c2808d3/client/internal/app/remote-listener.ts#L444)
 
 ___
 
@@ -862,7 +862,7 @@ result that is cached by parent
 
 #### Defined in
 
-[client/internal/app/remote-listener.ts:1398](https://github.com/onzag/itemize/blob/f2f29986/client/internal/app/remote-listener.ts#L1398)
+[client/internal/app/remote-listener.ts:1398](https://github.com/onzag/itemize/blob/5c2808d3/client/internal/app/remote-listener.ts#L1398)
 
 ___
 
@@ -885,7 +885,7 @@ result that is cached by owner
 
 #### Defined in
 
-[client/internal/app/remote-listener.ts:1281](https://github.com/onzag/itemize/blob/f2f29986/client/internal/app/remote-listener.ts#L1281)
+[client/internal/app/remote-listener.ts:1281](https://github.com/onzag/itemize/blob/5c2808d3/client/internal/app/remote-listener.ts#L1281)
 
 ___
 
@@ -908,7 +908,7 @@ result that is cached by parent
 
 #### Defined in
 
-[client/internal/app/remote-listener.ts:1339](https://github.com/onzag/itemize/blob/f2f29986/client/internal/app/remote-listener.ts#L1339)
+[client/internal/app/remote-listener.ts:1339](https://github.com/onzag/itemize/blob/5c2808d3/client/internal/app/remote-listener.ts#L1339)
 
 ___
 
@@ -932,7 +932,7 @@ to the given slot in the socket data
 
 #### Defined in
 
-[client/internal/app/remote-listener.ts:335](https://github.com/onzag/itemize/blob/f2f29986/client/internal/app/remote-listener.ts#L335)
+[client/internal/app/remote-listener.ts:335](https://github.com/onzag/itemize/blob/5c2808d3/client/internal/app/remote-listener.ts#L335)
 
 ___
 
@@ -954,7 +954,7 @@ Removes a listener for when the app updates (aka buildnumber mismatch)
 
 #### Defined in
 
-[client/internal/app/remote-listener.ts:407](https://github.com/onzag/itemize/blob/f2f29986/client/internal/app/remote-listener.ts#L407)
+[client/internal/app/remote-listener.ts:407](https://github.com/onzag/itemize/blob/5c2808d3/client/internal/app/remote-listener.ts#L407)
 
 ___
 
@@ -976,7 +976,7 @@ Removes a listener for when the app online status changes
 
 #### Defined in
 
-[client/internal/app/remote-listener.ts:433](https://github.com/onzag/itemize/blob/f2f29986/client/internal/app/remote-listener.ts#L433)
+[client/internal/app/remote-listener.ts:433](https://github.com/onzag/itemize/blob/5c2808d3/client/internal/app/remote-listener.ts#L433)
 
 ___
 
@@ -1001,7 +1001,7 @@ Remove an item definition listener for a given parent instance
 
 #### Defined in
 
-[client/internal/app/remote-listener.ts:571](https://github.com/onzag/itemize/blob/f2f29986/client/internal/app/remote-listener.ts#L571)
+[client/internal/app/remote-listener.ts:571](https://github.com/onzag/itemize/blob/5c2808d3/client/internal/app/remote-listener.ts#L571)
 
 ___
 
@@ -1029,7 +1029,7 @@ that is related to
 
 #### Defined in
 
-[client/internal/app/remote-listener.ts:1077](https://github.com/onzag/itemize/blob/f2f29986/client/internal/app/remote-listener.ts#L1077)
+[client/internal/app/remote-listener.ts:1077](https://github.com/onzag/itemize/blob/5c2808d3/client/internal/app/remote-listener.ts#L1077)
 
 ___
 
@@ -1053,7 +1053,7 @@ Removes an owned search listener
 
 #### Defined in
 
-[client/internal/app/remote-listener.ts:774](https://github.com/onzag/itemize/blob/f2f29986/client/internal/app/remote-listener.ts#L774)
+[client/internal/app/remote-listener.ts:774](https://github.com/onzag/itemize/blob/5c2808d3/client/internal/app/remote-listener.ts#L774)
 
 ___
 
@@ -1080,7 +1080,7 @@ that is related to
 
 #### Defined in
 
-[client/internal/app/remote-listener.ts:1016](https://github.com/onzag/itemize/blob/f2f29986/client/internal/app/remote-listener.ts#L1016)
+[client/internal/app/remote-listener.ts:1016](https://github.com/onzag/itemize/blob/5c2808d3/client/internal/app/remote-listener.ts#L1016)
 
 ___
 
@@ -1104,7 +1104,7 @@ hasn't somehow changed since it was last checked
 
 #### Defined in
 
-[client/internal/app/remote-listener.ts:627](https://github.com/onzag/itemize/blob/f2f29986/client/internal/app/remote-listener.ts#L627)
+[client/internal/app/remote-listener.ts:627](https://github.com/onzag/itemize/blob/5c2808d3/client/internal/app/remote-listener.ts#L627)
 
 ___
 
@@ -1126,7 +1126,7 @@ Requests feedback for a parented seach, if possible
 
 #### Defined in
 
-[client/internal/app/remote-listener.ts:1156](https://github.com/onzag/itemize/blob/f2f29986/client/internal/app/remote-listener.ts#L1156)
+[client/internal/app/remote-listener.ts:1156](https://github.com/onzag/itemize/blob/5c2808d3/client/internal/app/remote-listener.ts#L1156)
 
 ___
 
@@ -1148,7 +1148,7 @@ Requests feedback for an owned search, if possible
 
 #### Defined in
 
-[client/internal/app/remote-listener.ts:824](https://github.com/onzag/itemize/blob/f2f29986/client/internal/app/remote-listener.ts#L824)
+[client/internal/app/remote-listener.ts:824](https://github.com/onzag/itemize/blob/5c2808d3/client/internal/app/remote-listener.ts#L824)
 
 ___
 
@@ -1170,7 +1170,7 @@ Requests feedback for a parented seach, if possible
 
 #### Defined in
 
-[client/internal/app/remote-listener.ts:1134](https://github.com/onzag/itemize/blob/f2f29986/client/internal/app/remote-listener.ts#L1134)
+[client/internal/app/remote-listener.ts:1134](https://github.com/onzag/itemize/blob/5c2808d3/client/internal/app/remote-listener.ts#L1134)
 
 ___
 
@@ -1193,7 +1193,7 @@ done immediately after initialization
 
 #### Defined in
 
-[client/internal/app/remote-listener.ts:316](https://github.com/onzag/itemize/blob/f2f29986/client/internal/app/remote-listener.ts#L316)
+[client/internal/app/remote-listener.ts:316](https://github.com/onzag/itemize/blob/5c2808d3/client/internal/app/remote-listener.ts#L316)
 
 ___
 
@@ -1216,7 +1216,7 @@ if the user has been kicked by a logout all event
 
 #### Defined in
 
-[client/internal/app/remote-listener.ts:325](https://github.com/onzag/itemize/blob/f2f29986/client/internal/app/remote-listener.ts#L325)
+[client/internal/app/remote-listener.ts:325](https://github.com/onzag/itemize/blob/5c2808d3/client/internal/app/remote-listener.ts#L325)
 
 ___
 
@@ -1241,7 +1241,7 @@ Makes the app ready
 
 #### Defined in
 
-[client/internal/app/remote-listener.ts:358](https://github.com/onzag/itemize/blob/f2f29986/client/internal/app/remote-listener.ts#L358)
+[client/internal/app/remote-listener.ts:358](https://github.com/onzag/itemize/blob/5c2808d3/client/internal/app/remote-listener.ts#L358)
 
 ___
 
@@ -1259,4 +1259,4 @@ as they might have changed
 
 #### Defined in
 
-[client/internal/app/remote-listener.ts:307](https://github.com/onzag/itemize/blob/f2f29986/client/internal/app/remote-listener.ts#L307)
+[client/internal/app/remote-listener.ts:307](https://github.com/onzag/itemize/blob/5c2808d3/client/internal/app/remote-listener.ts#L307)

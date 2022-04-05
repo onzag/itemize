@@ -37,7 +37,7 @@ The feedback version of [IOwnedParentedSearchRegisterRequest](base_remote_protoc
 
 #### Defined in
 
-[base/remote-protocol.ts:558](https://github.com/onzag/itemize/blob/f2f29986/base/remote-protocol.ts#L558)
+[base/remote-protocol.ts:558](https://github.com/onzag/itemize/blob/5c2808d3/base/remote-protocol.ts#L558)
 
 ___
 
@@ -55,7 +55,7 @@ something has been added
 
 #### Defined in
 
-[base/remote-protocol.ts:547](https://github.com/onzag/itemize/blob/f2f29986/base/remote-protocol.ts#L547)
+[base/remote-protocol.ts:547](https://github.com/onzag/itemize/blob/5c2808d3/base/remote-protocol.ts#L547)
 
 ___
 
@@ -69,7 +69,7 @@ ___
 
 #### Defined in
 
-[base/remote-protocol.ts:590](https://github.com/onzag/itemize/blob/f2f29986/base/remote-protocol.ts#L590)
+[base/remote-protocol.ts:590](https://github.com/onzag/itemize/blob/5c2808d3/base/remote-protocol.ts#L590)
 
 ___
 
@@ -83,7 +83,7 @@ ___
 
 #### Defined in
 
-[base/remote-protocol.ts:589](https://github.com/onzag/itemize/blob/f2f29986/base/remote-protocol.ts#L589)
+[base/remote-protocol.ts:589](https://github.com/onzag/itemize/blob/5c2808d3/base/remote-protocol.ts#L589)
 
 ___
 
@@ -97,7 +97,7 @@ ___
 
 #### Defined in
 
-[base/remote-protocol.ts:591](https://github.com/onzag/itemize/blob/f2f29986/base/remote-protocol.ts#L591)
+[base/remote-protocol.ts:591](https://github.com/onzag/itemize/blob/5c2808d3/base/remote-protocol.ts#L591)
 
 ___
 
@@ -114,4 +114,4 @@ or item definition
 
 #### Defined in
 
-[base/remote-protocol.ts:541](https://github.com/onzag/itemize/blob/f2f29986/base/remote-protocol.ts#L541)
+[base/remote-protocol.ts:541](https://github.com/onzag/itemize/blob/5c2808d3/base/remote-protocol.ts#L541)

@@ -69,7 +69,7 @@ React.PureComponent&lt;ITemplateElementDialogProps, ITemplateElementState\&gt;.c
 
 #### Defined in
 
-[client/fast-prototyping/components/slate/dialogs/template-element.tsx:113](https://github.com/onzag/itemize/blob/f2f29986/client/fast-prototyping/components/slate/dialogs/template-element.tsx#L113)
+[client/fast-prototyping/components/slate/dialogs/template-element.tsx:113](https://github.com/onzag/itemize/blob/5c2808d3/client/fast-prototyping/components/slate/dialogs/template-element.tsx#L113)
 
 ## Properties
 
@@ -311,7 +311,7 @@ and it should be done into the rich text
 
 #### Defined in
 
-[client/fast-prototyping/components/slate/dialogs/template-element.tsx:191](https://github.com/onzag/itemize/blob/f2f29986/client/fast-prototyping/components/slate/dialogs/template-element.tsx#L191)
+[client/fast-prototyping/components/slate/dialogs/template-element.tsx:191](https://github.com/onzag/itemize/blob/5c2808d3/client/fast-prototyping/components/slate/dialogs/template-element.tsx#L191)
 
 ___
 
@@ -327,7 +327,7 @@ Triggers once the dialog closes
 
 #### Defined in
 
-[client/fast-prototyping/components/slate/dialogs/template-element.tsx:231](https://github.com/onzag/itemize/blob/f2f29986/client/fast-prototyping/components/slate/dialogs/template-element.tsx#L231)
+[client/fast-prototyping/components/slate/dialogs/template-element.tsx:231](https://github.com/onzag/itemize/blob/5c2808d3/client/fast-prototyping/components/slate/dialogs/template-element.tsx#L231)
 
 ___
 
@@ -608,7 +608,7 @@ the initial state
 
 #### Defined in
 
-[client/fast-prototyping/components/slate/dialogs/template-element.tsx:132](https://github.com/onzag/itemize/blob/f2f29986/client/fast-prototyping/components/slate/dialogs/template-element.tsx#L132)
+[client/fast-prototyping/components/slate/dialogs/template-element.tsx:132](https://github.com/onzag/itemize/blob/5c2808d3/client/fast-prototyping/components/slate/dialogs/template-element.tsx#L132)
 
 ___
 
@@ -628,7 +628,7 @@ React.PureComponent.render
 
 #### Defined in
 
-[client/fast-prototyping/components/slate/dialogs/template-element.tsx:250](https://github.com/onzag/itemize/blob/f2f29986/client/fast-prototyping/components/slate/dialogs/template-element.tsx#L250)
+[client/fast-prototyping/components/slate/dialogs/template-element.tsx:250](https://github.com/onzag/itemize/blob/5c2808d3/client/fast-prototyping/components/slate/dialogs/template-element.tsx#L250)
 
 ___
 
@@ -716,4 +716,4 @@ Triggers once the value has changed and needs to be update
 
 #### Defined in
 
-[client/fast-prototyping/components/slate/dialogs/template-element.tsx:206](https://github.com/onzag/itemize/blob/f2f29986/client/fast-prototyping/components/slate/dialogs/template-element.tsx#L206)
+[client/fast-prototyping/components/slate/dialogs/template-element.tsx:206](https://github.com/onzag/itemize/blob/5c2808d3/client/fast-prototyping/components/slate/dialogs/template-element.tsx#L206)

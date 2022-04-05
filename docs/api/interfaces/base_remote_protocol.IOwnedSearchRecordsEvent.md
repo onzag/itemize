@@ -36,7 +36,7 @@ check [IOwnedSearchRegisterRequest](base_remote_protocol.IOwnedSearchRegisterReq
 
 #### Defined in
 
-[base/remote-protocol.ts:136](https://github.com/onzag/itemize/blob/f2f29986/base/remote-protocol.ts#L136)
+[base/remote-protocol.ts:136](https://github.com/onzag/itemize/blob/5c2808d3/base/remote-protocol.ts#L136)
 
 ___
 
@@ -52,7 +52,7 @@ IBaseSearchRecordsEvent.lostRecords
 
 #### Defined in
 
-[base/remote-protocol.ts:115](https://github.com/onzag/itemize/blob/f2f29986/base/remote-protocol.ts#L115)
+[base/remote-protocol.ts:115](https://github.com/onzag/itemize/blob/5c2808d3/base/remote-protocol.ts#L115)
 
 ___
 
@@ -68,7 +68,7 @@ IBaseSearchRecordsEvent.modifiedRecords
 
 #### Defined in
 
-[base/remote-protocol.ts:119](https://github.com/onzag/itemize/blob/f2f29986/base/remote-protocol.ts#L119)
+[base/remote-protocol.ts:119](https://github.com/onzag/itemize/blob/5c2808d3/base/remote-protocol.ts#L119)
 
 ___
 
@@ -84,7 +84,7 @@ IBaseSearchRecordsEvent.newLastModified
 
 #### Defined in
 
-[base/remote-protocol.ts:123](https://github.com/onzag/itemize/blob/f2f29986/base/remote-protocol.ts#L123)
+[base/remote-protocol.ts:123](https://github.com/onzag/itemize/blob/5c2808d3/base/remote-protocol.ts#L123)
 
 ___
 
@@ -100,7 +100,7 @@ IBaseSearchRecordsEvent.newRecords
 
 #### Defined in
 
-[base/remote-protocol.ts:111](https://github.com/onzag/itemize/blob/f2f29986/base/remote-protocol.ts#L111)
+[base/remote-protocol.ts:111](https://github.com/onzag/itemize/blob/5c2808d3/base/remote-protocol.ts#L111)
 
 ___
 
@@ -116,4 +116,4 @@ IBaseSearchRecordsEvent.qualifiedPathName
 
 #### Defined in
 
-[base/remote-protocol.ts:107](https://github.com/onzag/itemize/blob/f2f29986/base/remote-protocol.ts#L107)
+[base/remote-protocol.ts:107](https://github.com/onzag/itemize/blob/5c2808d3/base/remote-protocol.ts#L107)

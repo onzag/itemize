@@ -31,7 +31,7 @@ the source path as a string, by default it is /rest/resource/
 
 #### Defined in
 
-[client/components/resources/ResourceLoader.tsx:24](https://github.com/onzag/itemize/blob/f2f29986/client/components/resources/ResourceLoader.tsx#L24)
+[client/components/resources/ResourceLoader.tsx:24](https://github.com/onzag/itemize/blob/5c2808d3/client/components/resources/ResourceLoader.tsx#L24)
 
 ___
 
@@ -44,7 +44,7 @@ defined in the path
 
 #### Defined in
 
-[client/components/resources/ResourceLoader.tsx:36](https://github.com/onzag/itemize/blob/f2f29986/client/components/resources/ResourceLoader.tsx#L36)
+[client/components/resources/ResourceLoader.tsx:36](https://github.com/onzag/itemize/blob/5c2808d3/client/components/resources/ResourceLoader.tsx#L36)
 
 ___
 
@@ -56,7 +56,7 @@ sw cacheable flag, defaults to true
 
 #### Defined in
 
-[client/components/resources/ResourceLoader.tsx:44](https://github.com/onzag/itemize/blob/f2f29986/client/components/resources/ResourceLoader.tsx#L44)
+[client/components/resources/ResourceLoader.tsx:44](https://github.com/onzag/itemize/blob/5c2808d3/client/components/resources/ResourceLoader.tsx#L44)
 
 ___
 
@@ -68,7 +68,7 @@ sw network first flag, defaults to false
 
 #### Defined in
 
-[client/components/resources/ResourceLoader.tsx:48](https://github.com/onzag/itemize/blob/f2f29986/client/components/resources/ResourceLoader.tsx#L48)
+[client/components/resources/ResourceLoader.tsx:48](https://github.com/onzag/itemize/blob/5c2808d3/client/components/resources/ResourceLoader.tsx#L48)
 
 ___
 
@@ -80,7 +80,7 @@ sw recheck flag, rechecks the content after done, defaults to false
 
 #### Defined in
 
-[client/components/resources/ResourceLoader.tsx:52](https://github.com/onzag/itemize/blob/f2f29986/client/components/resources/ResourceLoader.tsx#L52)
+[client/components/resources/ResourceLoader.tsx:52](https://github.com/onzag/itemize/blob/5c2808d3/client/components/resources/ResourceLoader.tsx#L52)
 
 ## Methods
 
@@ -104,7 +104,7 @@ To define how the data is to be used
 
 #### Defined in
 
-[client/components/resources/ResourceLoader.tsx:40](https://github.com/onzag/itemize/blob/f2f29986/client/components/resources/ResourceLoader.tsx#L40)
+[client/components/resources/ResourceLoader.tsx:40](https://github.com/onzag/itemize/blob/5c2808d3/client/components/resources/ResourceLoader.tsx#L40)
 
 ___
 
@@ -129,4 +129,4 @@ in our SSR and request manager
 
 #### Defined in
 
-[client/components/resources/ResourceLoader.tsx:31](https://github.com/onzag/itemize/blob/f2f29986/client/components/resources/ResourceLoader.tsx#L31)
+[client/components/resources/ResourceLoader.tsx:31](https://github.com/onzag/itemize/blob/5c2808d3/client/components/resources/ResourceLoader.tsx#L31)

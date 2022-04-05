@@ -28,7 +28,7 @@ Contains the internal initialization function for initializing itemize app
 
 #### Defined in
 
-[client/index.tsx:108](https://github.com/onzag/itemize/blob/f2f29986/client/index.tsx#L108)
+[client/index.tsx:108](https://github.com/onzag/itemize/blob/5c2808d3/client/index.tsx#L108)
 
 ## Functions
 
@@ -53,7 +53,7 @@ the value of the cookie as a string or null
 
 #### Defined in
 
-[client/index.tsx:40](https://github.com/onzag/itemize/blob/f2f29986/client/index.tsx#L40)
+[client/index.tsx:40](https://github.com/onzag/itemize/blob/5c2808d3/client/index.tsx#L40)
 
 ___
 
@@ -75,7 +75,7 @@ This function imports a file given a url
 
 #### Defined in
 
-[client/index.tsx:117](https://github.com/onzag/itemize/blob/f2f29986/client/index.tsx#L117)
+[client/index.tsx:117](https://github.com/onzag/itemize/blob/5c2808d3/client/index.tsx#L117)
 
 ___
 
@@ -117,4 +117,4 @@ and SSR is secondary
 
 #### Defined in
 
-[client/index.tsx:223](https://github.com/onzag/itemize/blob/f2f29986/client/index.tsx#L223)
+[client/index.tsx:223](https://github.com/onzag/itemize/blob/5c2808d3/client/index.tsx#L223)

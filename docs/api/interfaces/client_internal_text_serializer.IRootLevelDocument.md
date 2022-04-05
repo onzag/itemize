@@ -25,7 +25,7 @@ an unique uuid
 
 #### Defined in
 
-[client/internal/text/serializer/index.ts:199](https://github.com/onzag/itemize/blob/f2f29986/client/internal/text/serializer/index.ts#L199)
+[client/internal/text/serializer/index.ts:199](https://github.com/onzag/itemize/blob/5c2808d3/client/internal/text/serializer/index.ts#L199)
 
 ___
 
@@ -35,7 +35,7 @@ ___
 
 #### Defined in
 
-[client/internal/text/serializer/index.ts:198](https://github.com/onzag/itemize/blob/f2f29986/client/internal/text/serializer/index.ts#L198)
+[client/internal/text/serializer/index.ts:198](https://github.com/onzag/itemize/blob/5c2808d3/client/internal/text/serializer/index.ts#L198)
 
 ___
 
@@ -45,7 +45,7 @@ ___
 
 #### Defined in
 
-[client/internal/text/serializer/index.ts:197](https://github.com/onzag/itemize/blob/f2f29986/client/internal/text/serializer/index.ts#L197)
+[client/internal/text/serializer/index.ts:197](https://github.com/onzag/itemize/blob/5c2808d3/client/internal/text/serializer/index.ts#L197)
 
 ___
 
@@ -55,4 +55,4 @@ ___
 
 #### Defined in
 
-[client/internal/text/serializer/index.ts:196](https://github.com/onzag/itemize/blob/f2f29986/client/internal/text/serializer/index.ts#L196)
+[client/internal/text/serializer/index.ts:196](https://github.com/onzag/itemize/blob/5c2808d3/client/internal/text/serializer/index.ts#L196)

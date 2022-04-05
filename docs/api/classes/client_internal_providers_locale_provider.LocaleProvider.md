@@ -592,7 +592,7 @@ React.Component.render
 
 #### Defined in
 
-[client/internal/providers/locale-provider.tsx:102](https://github.com/onzag/itemize/blob/f2f29986/client/internal/providers/locale-provider.tsx#L102)
+[client/internal/providers/locale-provider.tsx:102](https://github.com/onzag/itemize/blob/5c2808d3/client/internal/providers/locale-provider.tsx#L102)
 
 ___
 
@@ -647,4 +647,4 @@ React.Component.shouldComponentUpdate
 
 #### Defined in
 
-[client/internal/providers/locale-provider.tsx:93](https://github.com/onzag/itemize/blob/f2f29986/client/internal/providers/locale-provider.tsx#L93)
+[client/internal/providers/locale-provider.tsx:93](https://github.com/onzag/itemize/blob/5c2808d3/client/internal/providers/locale-provider.tsx#L93)

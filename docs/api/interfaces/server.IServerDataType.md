@@ -22,4 +22,4 @@
 
 #### Defined in
 
-[server/index.ts:163](https://github.com/onzag/itemize/blob/f2f29986/server/index.ts#L163)
+[server/index.ts:163](https://github.com/onzag/itemize/blob/5c2808d3/server/index.ts#L163)

@@ -39,4 +39,4 @@ for use within the graphql description
 
 #### Defined in
 
-[base/Root/Module/ItemDefinition/Include/gql.ts:28](https://github.com/onzag/itemize/blob/f2f29986/base/Root/Module/ItemDefinition/Include/gql.ts#L28)
+[base/Root/Module/ItemDefinition/Include/gql.ts:28](https://github.com/onzag/itemize/blob/5c2808d3/base/Root/Module/ItemDefinition/Include/gql.ts#L28)

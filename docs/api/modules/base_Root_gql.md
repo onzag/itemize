@@ -53,7 +53,7 @@ be defined
 
 #### Defined in
 
-[base/Root/gql.ts:31](https://github.com/onzag/itemize/blob/f2f29986/base/Root/gql.ts#L31)
+[base/Root/gql.ts:31](https://github.com/onzag/itemize/blob/5c2808d3/base/Root/gql.ts#L31)
 
 ___
 
@@ -80,7 +80,7 @@ This is how a module resolver is supposed to be defined
 
 #### Defined in
 
-[base/Root/gql.ts:39](https://github.com/onzag/itemize/blob/f2f29986/base/Root/gql.ts#L39)
+[base/Root/gql.ts:39](https://github.com/onzag/itemize/blob/5c2808d3/base/Root/gql.ts#L39)
 
 ## Functions
 
@@ -108,4 +108,4 @@ a graphql schema with all the resolvers applied
 
 #### Defined in
 
-[base/Root/gql.ts:101](https://github.com/onzag/itemize/blob/f2f29986/base/Root/gql.ts#L101)
+[base/Root/gql.ts:101](https://github.com/onzag/itemize/blob/5c2808d3/base/Root/gql.ts#L101)

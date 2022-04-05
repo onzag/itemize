@@ -19,7 +19,7 @@
 
 #### Defined in
 
-[client/internal/components/PropertyEntry/PropertyEntryReference.tsx:13](https://github.com/onzag/itemize/blob/f2f29986/client/internal/components/PropertyEntry/PropertyEntryReference.tsx#L13)
+[client/internal/components/PropertyEntry/PropertyEntryReference.tsx:13](https://github.com/onzag/itemize/blob/5c2808d3/client/internal/components/PropertyEntry/PropertyEntryReference.tsx#L13)
 
 ___
 
@@ -29,4 +29,4 @@ ___
 
 #### Defined in
 
-[client/internal/components/PropertyEntry/PropertyEntryReference.tsx:14](https://github.com/onzag/itemize/blob/f2f29986/client/internal/components/PropertyEntry/PropertyEntryReference.tsx#L14)
+[client/internal/components/PropertyEntry/PropertyEntryReference.tsx:14](https://github.com/onzag/itemize/blob/5c2808d3/client/internal/components/PropertyEntry/PropertyEntryReference.tsx#L14)

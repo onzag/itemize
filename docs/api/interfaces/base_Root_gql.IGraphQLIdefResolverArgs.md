@@ -24,7 +24,7 @@ rather than passing four args
 
 #### Defined in
 
-[base/Root/gql.ts:22](https://github.com/onzag/itemize/blob/f2f29986/base/Root/gql.ts#L22)
+[base/Root/gql.ts:22](https://github.com/onzag/itemize/blob/5c2808d3/base/Root/gql.ts#L22)
 
 ___
 
@@ -34,7 +34,7 @@ ___
 
 #### Defined in
 
-[base/Root/gql.ts:23](https://github.com/onzag/itemize/blob/f2f29986/base/Root/gql.ts#L23)
+[base/Root/gql.ts:23](https://github.com/onzag/itemize/blob/5c2808d3/base/Root/gql.ts#L23)
 
 ___
 
@@ -44,7 +44,7 @@ ___
 
 #### Defined in
 
-[base/Root/gql.ts:24](https://github.com/onzag/itemize/blob/f2f29986/base/Root/gql.ts#L24)
+[base/Root/gql.ts:24](https://github.com/onzag/itemize/blob/5c2808d3/base/Root/gql.ts#L24)
 
 ___
 
@@ -54,4 +54,4 @@ ___
 
 #### Defined in
 
-[base/Root/gql.ts:21](https://github.com/onzag/itemize/blob/f2f29986/base/Root/gql.ts#L21)
+[base/Root/gql.ts:21](https://github.com/onzag/itemize/blob/5c2808d3/base/Root/gql.ts#L21)

@@ -22,7 +22,7 @@
 
 #### Defined in
 
-[client/internal/testing.ts:47](https://github.com/onzag/itemize/blob/f2f29986/client/internal/testing.ts#L47)
+[client/internal/testing.ts:47](https://github.com/onzag/itemize/blob/5c2808d3/client/internal/testing.ts#L47)
 
 ___
 
@@ -32,7 +32,7 @@ ___
 
 #### Defined in
 
-[client/internal/testing.ts:48](https://github.com/onzag/itemize/blob/f2f29986/client/internal/testing.ts#L48)
+[client/internal/testing.ts:48](https://github.com/onzag/itemize/blob/5c2808d3/client/internal/testing.ts#L48)
 
 ___
 
@@ -42,7 +42,7 @@ ___
 
 #### Defined in
 
-[client/internal/testing.ts:49](https://github.com/onzag/itemize/blob/f2f29986/client/internal/testing.ts#L49)
+[client/internal/testing.ts:49](https://github.com/onzag/itemize/blob/5c2808d3/client/internal/testing.ts#L49)
 
 ___
 
@@ -52,7 +52,7 @@ ___
 
 #### Defined in
 
-[client/internal/testing.ts:51](https://github.com/onzag/itemize/blob/f2f29986/client/internal/testing.ts#L51)
+[client/internal/testing.ts:51](https://github.com/onzag/itemize/blob/5c2808d3/client/internal/testing.ts#L51)
 
 ___
 
@@ -62,4 +62,4 @@ ___
 
 #### Defined in
 
-[client/internal/testing.ts:50](https://github.com/onzag/itemize/blob/f2f29986/client/internal/testing.ts#L50)
+[client/internal/testing.ts:50](https://github.com/onzag/itemize/blob/5c2808d3/client/internal/testing.ts#L50)

@@ -37,7 +37,7 @@ emulated searches within it
 
 #### Defined in
 
-[client/internal/workers/cache/cache.worker.ts:148](https://github.com/onzag/itemize/blob/f2f29986/client/internal/workers/cache/cache.worker.ts#L148)
+[client/internal/workers/cache/cache.worker.ts:148](https://github.com/onzag/itemize/blob/5c2808d3/client/internal/workers/cache/cache.worker.ts#L148)
 
 ___
 
@@ -47,7 +47,7 @@ ___
 
 #### Defined in
 
-[client/internal/workers/cache/cache.worker.ts:153](https://github.com/onzag/itemize/blob/f2f29986/client/internal/workers/cache/cache.worker.ts#L153)
+[client/internal/workers/cache/cache.worker.ts:153](https://github.com/onzag/itemize/blob/5c2808d3/client/internal/workers/cache/cache.worker.ts#L153)
 
 ___
 
@@ -57,7 +57,7 @@ ___
 
 #### Defined in
 
-[client/internal/workers/cache/cache.worker.ts:150](https://github.com/onzag/itemize/blob/f2f29986/client/internal/workers/cache/cache.worker.ts#L150)
+[client/internal/workers/cache/cache.worker.ts:150](https://github.com/onzag/itemize/blob/5c2808d3/client/internal/workers/cache/cache.worker.ts#L150)
 
 ___
 
@@ -67,7 +67,7 @@ ___
 
 #### Defined in
 
-[client/internal/workers/cache/cache.worker.ts:151](https://github.com/onzag/itemize/blob/f2f29986/client/internal/workers/cache/cache.worker.ts#L151)
+[client/internal/workers/cache/cache.worker.ts:151](https://github.com/onzag/itemize/blob/5c2808d3/client/internal/workers/cache/cache.worker.ts#L151)
 
 ___
 
@@ -77,4 +77,4 @@ ___
 
 #### Defined in
 
-[client/internal/workers/cache/cache.worker.ts:152](https://github.com/onzag/itemize/blob/f2f29986/client/internal/workers/cache/cache.worker.ts#L152)
+[client/internal/workers/cache/cache.worker.ts:152](https://github.com/onzag/itemize/blob/5c2808d3/client/internal/workers/cache/cache.worker.ts#L152)

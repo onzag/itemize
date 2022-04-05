@@ -67,7 +67,7 @@ React.PureComponent&lt;IReactifiedElementWithHoverAndActiveProps, IReactifiedEle
 
 #### Defined in
 
-[client/internal/text/serializer/dynamic-component.tsx:32](https://github.com/onzag/itemize/blob/f2f29986/client/internal/text/serializer/dynamic-component.tsx#L32)
+[client/internal/text/serializer/dynamic-component.tsx:32](https://github.com/onzag/itemize/blob/5c2808d3/client/internal/text/serializer/dynamic-component.tsx#L32)
 
 ## Properties
 
@@ -577,7 +577,7 @@ ___
 
 #### Defined in
 
-[client/internal/text/serializer/dynamic-component.tsx:70](https://github.com/onzag/itemize/blob/f2f29986/client/internal/text/serializer/dynamic-component.tsx#L70)
+[client/internal/text/serializer/dynamic-component.tsx:70](https://github.com/onzag/itemize/blob/5c2808d3/client/internal/text/serializer/dynamic-component.tsx#L70)
 
 ___
 
@@ -598,7 +598,7 @@ ___
 
 #### Defined in
 
-[client/internal/text/serializer/dynamic-component.tsx:62](https://github.com/onzag/itemize/blob/f2f29986/client/internal/text/serializer/dynamic-component.tsx#L62)
+[client/internal/text/serializer/dynamic-component.tsx:62](https://github.com/onzag/itemize/blob/5c2808d3/client/internal/text/serializer/dynamic-component.tsx#L62)
 
 ___
 
@@ -619,7 +619,7 @@ ___
 
 #### Defined in
 
-[client/internal/text/serializer/dynamic-component.tsx:54](https://github.com/onzag/itemize/blob/f2f29986/client/internal/text/serializer/dynamic-component.tsx#L54)
+[client/internal/text/serializer/dynamic-component.tsx:54](https://github.com/onzag/itemize/blob/5c2808d3/client/internal/text/serializer/dynamic-component.tsx#L54)
 
 ___
 
@@ -640,7 +640,7 @@ ___
 
 #### Defined in
 
-[client/internal/text/serializer/dynamic-component.tsx:46](https://github.com/onzag/itemize/blob/f2f29986/client/internal/text/serializer/dynamic-component.tsx#L46)
+[client/internal/text/serializer/dynamic-component.tsx:46](https://github.com/onzag/itemize/blob/5c2808d3/client/internal/text/serializer/dynamic-component.tsx#L46)
 
 ___
 
@@ -658,7 +658,7 @@ React.PureComponent.render
 
 #### Defined in
 
-[client/internal/text/serializer/dynamic-component.tsx:78](https://github.com/onzag/itemize/blob/f2f29986/client/internal/text/serializer/dynamic-component.tsx#L78)
+[client/internal/text/serializer/dynamic-component.tsx:78](https://github.com/onzag/itemize/blob/5c2808d3/client/internal/text/serializer/dynamic-component.tsx#L78)
 
 ___
 

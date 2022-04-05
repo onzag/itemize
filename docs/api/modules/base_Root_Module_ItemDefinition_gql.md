@@ -46,7 +46,7 @@ a fields definition object that represents the whole item definition as it was s
 
 #### Defined in
 
-[base/Root/Module/ItemDefinition/gql.ts:50](https://github.com/onzag/itemize/blob/f2f29986/base/Root/Module/ItemDefinition/gql.ts#L50)
+[base/Root/Module/ItemDefinition/gql.ts:50](https://github.com/onzag/itemize/blob/5c2808d3/base/Root/Module/ItemDefinition/gql.ts#L50)
 
 ___
 
@@ -74,7 +74,7 @@ a partial graphql fields definition that only contains the policies
 
 #### Defined in
 
-[base/Root/Module/ItemDefinition/gql.ts:127](https://github.com/onzag/itemize/blob/f2f29986/base/Root/Module/ItemDefinition/gql.ts#L127)
+[base/Root/Module/ItemDefinition/gql.ts:127](https://github.com/onzag/itemize/blob/5c2808d3/base/Root/Module/ItemDefinition/gql.ts#L127)
 
 ___
 
@@ -101,7 +101,7 @@ the mutation fields for the mutation object to do ADD, EDIT and DELETE
 
 #### Defined in
 
-[base/Root/Module/ItemDefinition/gql.ts:440](https://github.com/onzag/itemize/blob/f2f29986/base/Root/Module/ItemDefinition/gql.ts#L440)
+[base/Root/Module/ItemDefinition/gql.ts:440](https://github.com/onzag/itemize/blob/5c2808d3/base/Root/Module/ItemDefinition/gql.ts#L440)
 
 ___
 
@@ -127,7 +127,7 @@ the fields for the main query object to do GET, GET_LIST and SEARCH
 
 #### Defined in
 
-[base/Root/Module/ItemDefinition/gql.ts:294](https://github.com/onzag/itemize/blob/f2f29986/base/Root/Module/ItemDefinition/gql.ts#L294)
+[base/Root/Module/ItemDefinition/gql.ts:294](https://github.com/onzag/itemize/blob/5c2808d3/base/Root/Module/ItemDefinition/gql.ts#L294)
 
 ___
 
@@ -154,7 +154,7 @@ the same as it's flattened
 
 #### Defined in
 
-[base/Root/Module/ItemDefinition/gql.ts:194](https://github.com/onzag/itemize/blob/f2f29986/base/Root/Module/ItemDefinition/gql.ts#L194)
+[base/Root/Module/ItemDefinition/gql.ts:194](https://github.com/onzag/itemize/blob/5c2808d3/base/Root/Module/ItemDefinition/gql.ts#L194)
 
 ___
 
@@ -180,4 +180,4 @@ the same as it's cached once it's first retrieved
 
 #### Defined in
 
-[base/Root/Module/ItemDefinition/gql.ts:161](https://github.com/onzag/itemize/blob/f2f29986/base/Root/Module/ItemDefinition/gql.ts#L161)
+[base/Root/Module/ItemDefinition/gql.ts:161](https://github.com/onzag/itemize/blob/5c2808d3/base/Root/Module/ItemDefinition/gql.ts#L161)

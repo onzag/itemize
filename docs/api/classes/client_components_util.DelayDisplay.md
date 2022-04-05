@@ -63,7 +63,7 @@ React.PureComponent&lt;DelayDisplayProps, DelayDisplayState\&gt;.constructor
 
 #### Defined in
 
-[client/components/util/index.tsx:301](https://github.com/onzag/itemize/blob/f2f29986/client/components/util/index.tsx#L301)
+[client/components/util/index.tsx:301](https://github.com/onzag/itemize/blob/5c2808d3/client/components/util/index.tsx#L301)
 
 ## Properties
 
@@ -150,7 +150,7 @@ ___
 
 #### Defined in
 
-[client/components/util/index.tsx:300](https://github.com/onzag/itemize/blob/f2f29986/client/components/util/index.tsx#L300)
+[client/components/util/index.tsx:300](https://github.com/onzag/itemize/blob/5c2808d3/client/components/util/index.tsx#L300)
 
 ___
 
@@ -344,7 +344,7 @@ React.PureComponent.componentDidMount
 
 #### Defined in
 
-[client/components/util/index.tsx:308](https://github.com/onzag/itemize/blob/f2f29986/client/components/util/index.tsx#L308)
+[client/components/util/index.tsx:308](https://github.com/onzag/itemize/blob/5c2808d3/client/components/util/index.tsx#L308)
 
 ___
 
@@ -462,7 +462,7 @@ React.PureComponent.componentWillUnmount
 
 #### Defined in
 
-[client/components/util/index.tsx:315](https://github.com/onzag/itemize/blob/f2f29986/client/components/util/index.tsx#L315)
+[client/components/util/index.tsx:315](https://github.com/onzag/itemize/blob/5c2808d3/client/components/util/index.tsx#L315)
 
 ___
 
@@ -575,7 +575,7 @@ React.PureComponent.render
 
 #### Defined in
 
-[client/components/util/index.tsx:318](https://github.com/onzag/itemize/blob/f2f29986/client/components/util/index.tsx#L318)
+[client/components/util/index.tsx:318](https://github.com/onzag/itemize/blob/5c2808d3/client/components/util/index.tsx#L318)
 
 ___
 

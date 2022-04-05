@@ -29,4 +29,4 @@ the update is blocked to any component that demands it under the tree
 
 #### Defined in
 
-[client/internal/providers/appdata-provider.tsx:35](https://github.com/onzag/itemize/blob/f2f29986/client/internal/providers/appdata-provider.tsx#L35)
+[client/internal/providers/appdata-provider.tsx:35](https://github.com/onzag/itemize/blob/5c2808d3/client/internal/providers/appdata-provider.tsx#L35)

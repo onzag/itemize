@@ -38,7 +38,7 @@ a partial row definition
 
 #### Defined in
 
-[base/Root/Module/ItemDefinition/PropertyDefinition/sql/text.ts:16](https://github.com/onzag/itemize/blob/f2f29986/base/Root/Module/ItemDefinition/PropertyDefinition/sql/text.ts#L16)
+[base/Root/Module/ItemDefinition/PropertyDefinition/sql/text.ts:16](https://github.com/onzag/itemize/blob/5c2808d3/base/Root/Module/ItemDefinition/PropertyDefinition/sql/text.ts#L16)
 
 ___
 
@@ -54,7 +54,7 @@ Provides the btree indexable function for text type
 
 #### Defined in
 
-[base/Root/Module/ItemDefinition/PropertyDefinition/sql/text.ts:216](https://github.com/onzag/itemize/blob/f2f29986/base/Root/Module/ItemDefinition/PropertyDefinition/sql/text.ts#L216)
+[base/Root/Module/ItemDefinition/PropertyDefinition/sql/text.ts:216](https://github.com/onzag/itemize/blob/5c2808d3/base/Root/Module/ItemDefinition/PropertyDefinition/sql/text.ts#L216)
 
 ___
 
@@ -78,7 +78,7 @@ a partial row value
 
 #### Defined in
 
-[base/Root/Module/ItemDefinition/PropertyDefinition/sql/text.ts:55](https://github.com/onzag/itemize/blob/f2f29986/base/Root/Module/ItemDefinition/PropertyDefinition/sql/text.ts#L55)
+[base/Root/Module/ItemDefinition/PropertyDefinition/sql/text.ts:55](https://github.com/onzag/itemize/blob/5c2808d3/base/Root/Module/ItemDefinition/PropertyDefinition/sql/text.ts#L55)
 
 ___
 
@@ -102,7 +102,7 @@ the order by rule string array (or null) if not possible to order
 
 #### Defined in
 
-[base/Root/Module/ItemDefinition/PropertyDefinition/sql/text.ts:202](https://github.com/onzag/itemize/blob/f2f29986/base/Root/Module/ItemDefinition/PropertyDefinition/sql/text.ts#L202)
+[base/Root/Module/ItemDefinition/PropertyDefinition/sql/text.ts:202](https://github.com/onzag/itemize/blob/5c2808d3/base/Root/Module/ItemDefinition/PropertyDefinition/sql/text.ts#L202)
 
 ___
 
@@ -126,7 +126,7 @@ a boolean on whether it was searched by it, and a complementary column order by 
 
 #### Defined in
 
-[base/Root/Module/ItemDefinition/PropertyDefinition/sql/text.ts:129](https://github.com/onzag/itemize/blob/f2f29986/base/Root/Module/ItemDefinition/PropertyDefinition/sql/text.ts#L129)
+[base/Root/Module/ItemDefinition/PropertyDefinition/sql/text.ts:129](https://github.com/onzag/itemize/blob/5c2808d3/base/Root/Module/ItemDefinition/PropertyDefinition/sql/text.ts#L129)
 
 ___
 
@@ -150,7 +150,7 @@ a boolean on whether it was searched by it, and a complementary column order by 
 
 #### Defined in
 
-[base/Root/Module/ItemDefinition/PropertyDefinition/sql/text.ts:172](https://github.com/onzag/itemize/blob/f2f29986/base/Root/Module/ItemDefinition/PropertyDefinition/sql/text.ts#L172)
+[base/Root/Module/ItemDefinition/PropertyDefinition/sql/text.ts:172](https://github.com/onzag/itemize/blob/5c2808d3/base/Root/Module/ItemDefinition/PropertyDefinition/sql/text.ts#L172)
 
 ___
 
@@ -174,4 +174,4 @@ a partial row value
 
 #### Defined in
 
-[base/Root/Module/ItemDefinition/PropertyDefinition/sql/text.ts:111](https://github.com/onzag/itemize/blob/f2f29986/base/Root/Module/ItemDefinition/PropertyDefinition/sql/text.ts#L111)
+[base/Root/Module/ItemDefinition/PropertyDefinition/sql/text.ts:111](https://github.com/onzag/itemize/blob/5c2808d3/base/Root/Module/ItemDefinition/PropertyDefinition/sql/text.ts#L111)

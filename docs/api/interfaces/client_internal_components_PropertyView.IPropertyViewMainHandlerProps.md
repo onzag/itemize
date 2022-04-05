@@ -47,7 +47,7 @@ Whether file urls are to be cached
 
 #### Defined in
 
-[client/internal/components/PropertyView/index.tsx:133](https://github.com/onzag/itemize/blob/f2f29986/client/internal/components/PropertyView/index.tsx#L133)
+[client/internal/components/PropertyView/index.tsx:133](https://github.com/onzag/itemize/blob/5c2808d3/client/internal/components/PropertyView/index.tsx#L133)
 
 ___
 
@@ -61,7 +61,7 @@ Provided by the user check base.tsx
 
 #### Defined in
 
-[client/internal/components/PropertyView/index.tsx:101](https://github.com/onzag/itemize/blob/f2f29986/client/internal/components/PropertyView/index.tsx#L101)
+[client/internal/components/PropertyView/index.tsx:101](https://github.com/onzag/itemize/blob/5c2808d3/client/internal/components/PropertyView/index.tsx#L101)
 
 ___
 
@@ -78,7 +78,7 @@ retrieved from the applied value from the item-definition.tsx context in the giv
 
 #### Defined in
 
-[client/internal/components/PropertyView/index.tsx:59](https://github.com/onzag/itemize/blob/f2f29986/client/internal/components/PropertyView/index.tsx#L59)
+[client/internal/components/PropertyView/index.tsx:59](https://github.com/onzag/itemize/blob/5c2808d3/client/internal/components/PropertyView/index.tsx#L59)
 
 ___
 
@@ -90,7 +90,7 @@ Will display even if it's hidden
 
 #### Defined in
 
-[client/internal/components/PropertyView/index.tsx:137](https://github.com/onzag/itemize/blob/f2f29986/client/internal/components/PropertyView/index.tsx#L137)
+[client/internal/components/PropertyView/index.tsx:137](https://github.com/onzag/itemize/blob/5c2808d3/client/internal/components/PropertyView/index.tsx#L137)
 
 ___
 
@@ -105,7 +105,7 @@ retrieved from the item-definition.tsx context
 
 #### Defined in
 
-[client/internal/components/PropertyView/index.tsx:81](https://github.com/onzag/itemize/blob/f2f29986/client/internal/components/PropertyView/index.tsx#L81)
+[client/internal/components/PropertyView/index.tsx:81](https://github.com/onzag/itemize/blob/5c2808d3/client/internal/components/PropertyView/index.tsx#L81)
 
 ___
 
@@ -120,7 +120,7 @@ retrieved from the item-definition.tsx context
 
 #### Defined in
 
-[client/internal/components/PropertyView/index.tsx:88](https://github.com/onzag/itemize/blob/f2f29986/client/internal/components/PropertyView/index.tsx#L88)
+[client/internal/components/PropertyView/index.tsx:88](https://github.com/onzag/itemize/blob/5c2808d3/client/internal/components/PropertyView/index.tsx#L88)
 
 ___
 
@@ -135,7 +135,7 @@ retrieved from the item-definition.tsx context
 
 #### Defined in
 
-[client/internal/components/PropertyView/index.tsx:66](https://github.com/onzag/itemize/blob/f2f29986/client/internal/components/PropertyView/index.tsx#L66)
+[client/internal/components/PropertyView/index.tsx:66](https://github.com/onzag/itemize/blob/5c2808d3/client/internal/components/PropertyView/index.tsx#L66)
 
 ___
 
@@ -151,7 +151,7 @@ retrieved from the item-definition.tsx context
 
 #### Defined in
 
-[client/internal/components/PropertyView/index.tsx:74](https://github.com/onzag/itemize/blob/f2f29986/client/internal/components/PropertyView/index.tsx#L74)
+[client/internal/components/PropertyView/index.tsx:74](https://github.com/onzag/itemize/blob/5c2808d3/client/internal/components/PropertyView/index.tsx#L74)
 
 ___
 
@@ -166,7 +166,7 @@ retrieved from the item-definition.tsx context
 
 #### Defined in
 
-[client/internal/components/PropertyView/index.tsx:95](https://github.com/onzag/itemize/blob/f2f29986/client/internal/components/PropertyView/index.tsx#L95)
+[client/internal/components/PropertyView/index.tsx:95](https://github.com/onzag/itemize/blob/5c2808d3/client/internal/components/PropertyView/index.tsx#L95)
 
 ___
 
@@ -180,7 +180,7 @@ Developer Provided check base.tsx
 
 #### Defined in
 
-[client/internal/components/PropertyView/index.tsx:122](https://github.com/onzag/itemize/blob/f2f29986/client/internal/components/PropertyView/index.tsx#L122)
+[client/internal/components/PropertyView/index.tsx:122](https://github.com/onzag/itemize/blob/5c2808d3/client/internal/components/PropertyView/index.tsx#L122)
 
 ___
 
@@ -195,7 +195,7 @@ Developer Provided check base.tsx
 
 #### Defined in
 
-[client/internal/components/PropertyView/index.tsx:129](https://github.com/onzag/itemize/blob/f2f29986/client/internal/components/PropertyView/index.tsx#L129)
+[client/internal/components/PropertyView/index.tsx:129](https://github.com/onzag/itemize/blob/5c2808d3/client/internal/components/PropertyView/index.tsx#L129)
 
 ___
 
@@ -211,7 +211,7 @@ filtered for this specific property from the item-definition.tsx context state v
 
 #### Defined in
 
-[client/internal/components/PropertyView/index.tsx:109](https://github.com/onzag/itemize/blob/f2f29986/client/internal/components/PropertyView/index.tsx#L109)
+[client/internal/components/PropertyView/index.tsx:109](https://github.com/onzag/itemize/blob/5c2808d3/client/internal/components/PropertyView/index.tsx#L109)
 
 ___
 
@@ -226,4 +226,4 @@ Provided by the user check base.tsx
 
 #### Defined in
 
-[client/internal/components/PropertyView/index.tsx:116](https://github.com/onzag/itemize/blob/f2f29986/client/internal/components/PropertyView/index.tsx#L116)
+[client/internal/components/PropertyView/index.tsx:116](https://github.com/onzag/itemize/blob/5c2808d3/client/internal/components/PropertyView/index.tsx#L116)

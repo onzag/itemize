@@ -60,7 +60,7 @@ where it is expected to be used
 
 #### Defined in
 
-[client/fast-prototyping/components/slate/index.tsx:1028](https://github.com/onzag/itemize/blob/f2f29986/client/fast-prototyping/components/slate/index.tsx#L1028)
+[client/fast-prototyping/components/slate/index.tsx:1028](https://github.com/onzag/itemize/blob/5c2808d3/client/fast-prototyping/components/slate/index.tsx#L1028)
 
 ___
 
@@ -80,7 +80,7 @@ indeed provide this as a prop for the render
 
 #### Defined in
 
-[client/fast-prototyping/components/slate/index.tsx:1036](https://github.com/onzag/itemize/blob/f2f29986/client/fast-prototyping/components/slate/index.tsx#L1036)
+[client/fast-prototyping/components/slate/index.tsx:1036](https://github.com/onzag/itemize/blob/5c2808d3/client/fast-prototyping/components/slate/index.tsx#L1036)
 
 ___
 
@@ -96,7 +96,7 @@ Function to be used to specify a whole custom toolbar down to the very basics
 
 #### Defined in
 
-[client/fast-prototyping/components/slate/wrapper.tsx:459](https://github.com/onzag/itemize/blob/f2f29986/client/fast-prototyping/components/slate/wrapper.tsx#L459)
+[client/fast-prototyping/components/slate/wrapper.tsx:459](https://github.com/onzag/itemize/blob/5c2808d3/client/fast-prototyping/components/slate/wrapper.tsx#L459)
 
 ___
 
@@ -112,7 +112,7 @@ The disjointed mode
 
 #### Defined in
 
-[client/fast-prototyping/components/slate/wrapper.tsx:479](https://github.com/onzag/itemize/blob/f2f29986/client/fast-prototyping/components/slate/wrapper.tsx#L479)
+[client/fast-prototyping/components/slate/wrapper.tsx:479](https://github.com/onzag/itemize/blob/5c2808d3/client/fast-prototyping/components/slate/wrapper.tsx#L479)
 
 ___
 
@@ -128,7 +128,7 @@ Drawer extras for the ui handled types
 
 #### Defined in
 
-[client/fast-prototyping/components/slate/wrapper.tsx:463](https://github.com/onzag/itemize/blob/f2f29986/client/fast-prototyping/components/slate/wrapper.tsx#L463)
+[client/fast-prototyping/components/slate/wrapper.tsx:463](https://github.com/onzag/itemize/blob/5c2808d3/client/fast-prototyping/components/slate/wrapper.tsx#L463)
 
 ___
 
@@ -144,7 +144,7 @@ Drawer mode
 
 #### Defined in
 
-[client/fast-prototyping/components/slate/wrapper.tsx:475](https://github.com/onzag/itemize/blob/f2f29986/client/fast-prototyping/components/slate/wrapper.tsx#L475)
+[client/fast-prototyping/components/slate/wrapper.tsx:475](https://github.com/onzag/itemize/blob/5c2808d3/client/fast-prototyping/components/slate/wrapper.tsx#L475)
 
 ___
 
@@ -154,7 +154,7 @@ ___
 
 #### Defined in
 
-[client/fast-prototyping/components/slate/wrapper.tsx:2303](https://github.com/onzag/itemize/blob/f2f29986/client/fast-prototyping/components/slate/wrapper.tsx#L2303)
+[client/fast-prototyping/components/slate/wrapper.tsx:2303](https://github.com/onzag/itemize/blob/5c2808d3/client/fast-prototyping/components/slate/wrapper.tsx#L2303)
 
 ___
 
@@ -164,7 +164,7 @@ ___
 
 #### Defined in
 
-[client/fast-prototyping/components/slate/wrapper.tsx:2306](https://github.com/onzag/itemize/blob/f2f29986/client/fast-prototyping/components/slate/wrapper.tsx#L2306)
+[client/fast-prototyping/components/slate/wrapper.tsx:2306](https://github.com/onzag/itemize/blob/5c2808d3/client/fast-prototyping/components/slate/wrapper.tsx#L2306)
 
 ___
 
@@ -182,7 +182,7 @@ and whatnot from it
 
 #### Defined in
 
-[client/fast-prototyping/components/slate/index.tsx:1016](https://github.com/onzag/itemize/blob/f2f29986/client/fast-prototyping/components/slate/index.tsx#L1016)
+[client/fast-prototyping/components/slate/index.tsx:1016](https://github.com/onzag/itemize/blob/5c2808d3/client/fast-prototyping/components/slate/index.tsx#L1016)
 
 ___
 
@@ -199,7 +199,7 @@ and modify nodes
 
 #### Defined in
 
-[client/fast-prototyping/components/slate/index.tsx:1021](https://github.com/onzag/itemize/blob/f2f29986/client/fast-prototyping/components/slate/index.tsx#L1021)
+[client/fast-prototyping/components/slate/index.tsx:1021](https://github.com/onzag/itemize/blob/5c2808d3/client/fast-prototyping/components/slate/index.tsx#L1021)
 
 ___
 
@@ -215,7 +215,7 @@ Whether to hide the drawer
 
 #### Defined in
 
-[client/fast-prototyping/components/slate/wrapper.tsx:467](https://github.com/onzag/itemize/blob/f2f29986/client/fast-prototyping/components/slate/wrapper.tsx#L467)
+[client/fast-prototyping/components/slate/wrapper.tsx:467](https://github.com/onzag/itemize/blob/5c2808d3/client/fast-prototyping/components/slate/wrapper.tsx#L467)
 
 ___
 
@@ -231,7 +231,7 @@ Whether to hide the tree
 
 #### Defined in
 
-[client/fast-prototyping/components/slate/wrapper.tsx:471](https://github.com/onzag/itemize/blob/f2f29986/client/fast-prototyping/components/slate/wrapper.tsx#L471)
+[client/fast-prototyping/components/slate/wrapper.tsx:471](https://github.com/onzag/itemize/blob/5c2808d3/client/fast-prototyping/components/slate/wrapper.tsx#L471)
 
 ___
 
@@ -247,7 +247,7 @@ A generic error message
 
 #### Defined in
 
-[client/fast-prototyping/components/slate/wrapper.tsx:442](https://github.com/onzag/itemize/blob/f2f29986/client/fast-prototyping/components/slate/wrapper.tsx#L442)
+[client/fast-prototyping/components/slate/wrapper.tsx:442](https://github.com/onzag/itemize/blob/5c2808d3/client/fast-prototyping/components/slate/wrapper.tsx#L442)
 
 ___
 
@@ -263,7 +263,7 @@ A generic ok
 
 #### Defined in
 
-[client/fast-prototyping/components/slate/wrapper.tsx:446](https://github.com/onzag/itemize/blob/f2f29986/client/fast-prototyping/components/slate/wrapper.tsx#L446)
+[client/fast-prototyping/components/slate/wrapper.tsx:446](https://github.com/onzag/itemize/blob/5c2808d3/client/fast-prototyping/components/slate/wrapper.tsx#L446)
 
 ___
 
@@ -279,7 +279,7 @@ The whole of the i18n rich information that is given by default
 
 #### Defined in
 
-[client/fast-prototyping/components/slate/wrapper.tsx:450](https://github.com/onzag/itemize/blob/f2f29986/client/fast-prototyping/components/slate/wrapper.tsx#L450)
+[client/fast-prototyping/components/slate/wrapper.tsx:450](https://github.com/onzag/itemize/blob/5c2808d3/client/fast-prototyping/components/slate/wrapper.tsx#L450)
 
 ___
 
@@ -289,7 +289,7 @@ ___
 
 #### Defined in
 
-[client/fast-prototyping/components/slate/wrapper.tsx:2305](https://github.com/onzag/itemize/blob/f2f29986/client/fast-prototyping/components/slate/wrapper.tsx#L2305)
+[client/fast-prototyping/components/slate/wrapper.tsx:2305](https://github.com/onzag/itemize/blob/5c2808d3/client/fast-prototyping/components/slate/wrapper.tsx#L2305)
 
 ___
 
@@ -307,7 +307,7 @@ so it can get state information
 
 #### Defined in
 
-[client/fast-prototyping/components/slate/index.tsx:1010](https://github.com/onzag/itemize/blob/f2f29986/client/fast-prototyping/components/slate/index.tsx#L1010)
+[client/fast-prototyping/components/slate/index.tsx:1010](https://github.com/onzag/itemize/blob/5c2808d3/client/fast-prototyping/components/slate/index.tsx#L1010)
 
 ___
 
@@ -324,7 +324,7 @@ to be used either by ui handled components and whatnot
 
 #### Defined in
 
-[client/fast-prototyping/components/slate/wrapper.tsx:455](https://github.com/onzag/itemize/blob/f2f29986/client/fast-prototyping/components/slate/wrapper.tsx#L455)
+[client/fast-prototyping/components/slate/wrapper.tsx:455](https://github.com/onzag/itemize/blob/5c2808d3/client/fast-prototyping/components/slate/wrapper.tsx#L455)
 
 ___
 
@@ -334,7 +334,7 @@ ___
 
 #### Defined in
 
-[client/fast-prototyping/components/slate/wrapper.tsx:2304](https://github.com/onzag/itemize/blob/f2f29986/client/fast-prototyping/components/slate/wrapper.tsx#L2304)
+[client/fast-prototyping/components/slate/wrapper.tsx:2304](https://github.com/onzag/itemize/blob/5c2808d3/client/fast-prototyping/components/slate/wrapper.tsx#L2304)
 
 ___
 
@@ -350,7 +350,7 @@ Add a class name to the entire wrapper
 
 #### Defined in
 
-[client/fast-prototyping/components/slate/wrapper.tsx:483](https://github.com/onzag/itemize/blob/f2f29986/client/fast-prototyping/components/slate/wrapper.tsx#L483)
+[client/fast-prototyping/components/slate/wrapper.tsx:483](https://github.com/onzag/itemize/blob/5c2808d3/client/fast-prototyping/components/slate/wrapper.tsx#L483)
 
 ___
 
@@ -364,7 +364,7 @@ ___
 
 #### Defined in
 
-[client/fast-prototyping/components/slate/wrapper.tsx:484](https://github.com/onzag/itemize/blob/f2f29986/client/fast-prototyping/components/slate/wrapper.tsx#L484)
+[client/fast-prototyping/components/slate/wrapper.tsx:484](https://github.com/onzag/itemize/blob/5c2808d3/client/fast-prototyping/components/slate/wrapper.tsx#L484)
 
 ___
 
@@ -380,7 +380,7 @@ Add a class name to the container in the wrapper
 
 #### Defined in
 
-[client/fast-prototyping/components/slate/wrapper.tsx:488](https://github.com/onzag/itemize/blob/f2f29986/client/fast-prototyping/components/slate/wrapper.tsx#L488)
+[client/fast-prototyping/components/slate/wrapper.tsx:488](https://github.com/onzag/itemize/blob/5c2808d3/client/fast-prototyping/components/slate/wrapper.tsx#L488)
 
 ___
 
@@ -394,7 +394,7 @@ ___
 
 #### Defined in
 
-[client/fast-prototyping/components/slate/wrapper.tsx:489](https://github.com/onzag/itemize/blob/f2f29986/client/fast-prototyping/components/slate/wrapper.tsx#L489)
+[client/fast-prototyping/components/slate/wrapper.tsx:489](https://github.com/onzag/itemize/blob/5c2808d3/client/fast-prototyping/components/slate/wrapper.tsx#L489)
 
 ## Methods
 
@@ -421,7 +421,7 @@ A function to define custom extra children
 
 #### Defined in
 
-[client/fast-prototyping/components/slate/wrapper.tsx:493](https://github.com/onzag/itemize/blob/f2f29986/client/fast-prototyping/components/slate/wrapper.tsx#L493)
+[client/fast-prototyping/components/slate/wrapper.tsx:493](https://github.com/onzag/itemize/blob/5c2808d3/client/fast-prototyping/components/slate/wrapper.tsx#L493)
 
 ___
 
@@ -442,4 +442,4 @@ as the currentLoadError
 
 #### Defined in
 
-[client/fast-prototyping/components/slate/index.tsx:1041](https://github.com/onzag/itemize/blob/f2f29986/client/fast-prototyping/components/slate/index.tsx#L1041)
+[client/fast-prototyping/components/slate/index.tsx:1041](https://github.com/onzag/itemize/blob/5c2808d3/client/fast-prototyping/components/slate/index.tsx#L1041)

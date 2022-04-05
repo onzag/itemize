@@ -50,7 +50,7 @@ Error.constructor
 
 #### Defined in
 
-[base/errors.ts:84](https://github.com/onzag/itemize/blob/f2f29986/base/errors.ts#L84)
+[base/errors.ts:84](https://github.com/onzag/itemize/blob/5c2808d3/base/errors.ts#L84)
 
 ## Properties
 
@@ -60,7 +60,7 @@ Error.constructor
 
 #### Defined in
 
-[base/errors.ts:82](https://github.com/onzag/itemize/blob/f2f29986/base/errors.ts#L82)
+[base/errors.ts:82](https://github.com/onzag/itemize/blob/5c2808d3/base/errors.ts#L82)
 
 ___
 

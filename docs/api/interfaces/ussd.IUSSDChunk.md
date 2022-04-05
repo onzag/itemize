@@ -23,7 +23,7 @@ Represents actions that belong to this chunk
 
 #### Defined in
 
-[ussd/index.ts:63](https://github.com/onzag/itemize/blob/f2f29986/ussd/index.ts#L63)
+[ussd/index.ts:63](https://github.com/onzag/itemize/blob/5c2808d3/ussd/index.ts#L63)
 
 ___
 
@@ -35,7 +35,7 @@ Represents children chunks
 
 #### Defined in
 
-[ussd/index.ts:58](https://github.com/onzag/itemize/blob/f2f29986/ussd/index.ts#L58)
+[ussd/index.ts:58](https://github.com/onzag/itemize/blob/5c2808d3/ussd/index.ts#L58)
 
 ___
 
@@ -51,7 +51,7 @@ content you should go to its children chunks
 
 #### Defined in
 
-[ussd/index.ts:53](https://github.com/onzag/itemize/blob/f2f29986/ussd/index.ts#L53)
+[ussd/index.ts:53](https://github.com/onzag/itemize/blob/5c2808d3/ussd/index.ts#L53)
 
 ___
 
@@ -63,4 +63,4 @@ Represents the label of the given chunk
 
 #### Defined in
 
-[ussd/index.ts:45](https://github.com/onzag/itemize/blob/f2f29986/ussd/index.ts#L45)
+[ussd/index.ts:45](https://github.com/onzag/itemize/blob/5c2808d3/ussd/index.ts#L45)

@@ -32,7 +32,7 @@ retrieved from the item-definition.tsx context
 
 #### Defined in
 
-[client/internal/components/PropertySetter/index.tsx:25](https://github.com/onzag/itemize/blob/f2f29986/client/internal/components/PropertySetter/index.tsx#L25)
+[client/internal/components/PropertySetter/index.tsx:25](https://github.com/onzag/itemize/blob/5c2808d3/client/internal/components/PropertySetter/index.tsx#L25)
 
 ___
 
@@ -45,7 +45,7 @@ retrieved from the item-definition.tsx context
 
 #### Defined in
 
-[client/internal/components/PropertySetter/index.tsx:30](https://github.com/onzag/itemize/blob/f2f29986/client/internal/components/PropertySetter/index.tsx#L30)
+[client/internal/components/PropertySetter/index.tsx:30](https://github.com/onzag/itemize/blob/5c2808d3/client/internal/components/PropertySetter/index.tsx#L30)
 
 ___
 
@@ -58,7 +58,7 @@ retrieved from the item-definition.tsx context
 
 #### Defined in
 
-[client/internal/components/PropertySetter/index.tsx:20](https://github.com/onzag/itemize/blob/f2f29986/client/internal/components/PropertySetter/index.tsx#L20)
+[client/internal/components/PropertySetter/index.tsx:20](https://github.com/onzag/itemize/blob/5c2808d3/client/internal/components/PropertySetter/index.tsx#L20)
 
 ___
 
@@ -71,7 +71,7 @@ Provided by the user
 
 #### Defined in
 
-[client/internal/components/PropertySetter/index.tsx:35](https://github.com/onzag/itemize/blob/f2f29986/client/internal/components/PropertySetter/index.tsx#L35)
+[client/internal/components/PropertySetter/index.tsx:35](https://github.com/onzag/itemize/blob/5c2808d3/client/internal/components/PropertySetter/index.tsx#L35)
 
 ## Methods
 
@@ -96,7 +96,7 @@ retrieved from the item-definition.tsx context
 
 #### Defined in
 
-[client/internal/components/PropertySetter/index.tsx:45](https://github.com/onzag/itemize/blob/f2f29986/client/internal/components/PropertySetter/index.tsx#L45)
+[client/internal/components/PropertySetter/index.tsx:45](https://github.com/onzag/itemize/blob/5c2808d3/client/internal/components/PropertySetter/index.tsx#L45)
 
 ___
 
@@ -122,4 +122,4 @@ retrieved from the item-definition.tsx context
 
 #### Defined in
 
-[client/internal/components/PropertySetter/index.tsx:40](https://github.com/onzag/itemize/blob/f2f29986/client/internal/components/PropertySetter/index.tsx#L40)
+[client/internal/components/PropertySetter/index.tsx:40](https://github.com/onzag/itemize/blob/5c2808d3/client/internal/components/PropertySetter/index.tsx#L40)

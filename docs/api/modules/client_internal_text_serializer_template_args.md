@@ -43,7 +43,7 @@
 
 #### Defined in
 
-[client/internal/text/serializer/template-args.ts:117](https://github.com/onzag/itemize/blob/f2f29986/client/internal/text/serializer/template-args.ts#L117)
+[client/internal/text/serializer/template-args.ts:117](https://github.com/onzag/itemize/blob/5c2808d3/client/internal/text/serializer/template-args.ts#L117)
 
 ___
 
@@ -116,7 +116,7 @@ new TemplateArgs({
 
 #### Defined in
 
-[client/internal/text/serializer/template-args.ts:86](https://github.com/onzag/itemize/blob/f2f29986/client/internal/text/serializer/template-args.ts#L86)
+[client/internal/text/serializer/template-args.ts:86](https://github.com/onzag/itemize/blob/5c2808d3/client/internal/text/serializer/template-args.ts#L86)
 
 ___
 
@@ -143,4 +143,4 @@ to be wrapped within this
 
 #### Defined in
 
-[client/internal/text/serializer/template-args.ts:34](https://github.com/onzag/itemize/blob/f2f29986/client/internal/text/serializer/template-args.ts#L34)
+[client/internal/text/serializer/template-args.ts:34](https://github.com/onzag/itemize/blob/5c2808d3/client/internal/text/serializer/template-args.ts#L34)

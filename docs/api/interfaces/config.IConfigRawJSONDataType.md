@@ -40,7 +40,7 @@ The application name
 
 #### Defined in
 
-[config.ts:48](https://github.com/onzag/itemize/blob/f2f29986/config.ts#L48)
+[config.ts:48](https://github.com/onzag/itemize/blob/5c2808d3/config.ts#L48)
 
 ___
 
@@ -53,7 +53,7 @@ that these hostnames should be cached
 
 #### Defined in
 
-[config.ts:85](https://github.com/onzag/itemize/blob/f2f29986/config.ts#L85)
+[config.ts:85](https://github.com/onzag/itemize/blob/5c2808d3/config.ts#L85)
 
 ___
 
@@ -71,7 +71,7 @@ eg. myopenstackprovider.com/mycontainer/AUTH_123/ or whatever custom domain you 
 
 #### Defined in
 
-[config.ts:127](https://github.com/onzag/itemize/blob/f2f29986/config.ts#L127)
+[config.ts:127](https://github.com/onzag/itemize/blob/5c2808d3/config.ts#L127)
 
 ___
 
@@ -89,7 +89,7 @@ the value should be container id
 
 #### Defined in
 
-[config.ts:119](https://github.com/onzag/itemize/blob/f2f29986/config.ts#L119)
+[config.ts:119](https://github.com/onzag/itemize/blob/5c2808d3/config.ts#L119)
 
 ___
 
@@ -105,7 +105,7 @@ Special custom configuration
 
 #### Defined in
 
-[config.ts:133](https://github.com/onzag/itemize/blob/f2f29986/config.ts#L133)
+[config.ts:133](https://github.com/onzag/itemize/blob/5c2808d3/config.ts#L133)
 
 ___
 
@@ -117,7 +117,7 @@ The hostname used in development mode, used to avoid SEO hijaking
 
 #### Defined in
 
-[config.ts:108](https://github.com/onzag/itemize/blob/f2f29986/config.ts#L108)
+[config.ts:108](https://github.com/onzag/itemize/blob/5c2808d3/config.ts#L108)
 
 ___
 
@@ -134,7 +134,7 @@ you might specify only unregionalized versions, eg instead of en-GB en-US only e
 
 #### Defined in
 
-[config.ts:61](https://github.com/onzag/itemize/blob/f2f29986/config.ts#L61)
+[config.ts:61](https://github.com/onzag/itemize/blob/5c2808d3/config.ts#L61)
 
 ___
 
@@ -146,7 +146,7 @@ The schema entry, usually schema/root
 
 #### Defined in
 
-[config.ts:44](https://github.com/onzag/itemize/blob/f2f29986/config.ts#L44)
+[config.ts:44](https://github.com/onzag/itemize/blob/5c2808d3/config.ts#L44)
 
 ___
 
@@ -159,7 +159,7 @@ also the default for development
 
 #### Defined in
 
-[config.ts:92](https://github.com/onzag/itemize/blob/f2f29986/config.ts#L92)
+[config.ts:92](https://github.com/onzag/itemize/blob/5c2808d3/config.ts#L92)
 
 ___
 
@@ -172,7 +172,7 @@ also the default for development
 
 #### Defined in
 
-[config.ts:102](https://github.com/onzag/itemize/blob/f2f29986/config.ts#L102)
+[config.ts:102](https://github.com/onzag/itemize/blob/5c2808d3/config.ts#L102)
 
 ___
 
@@ -185,7 +185,7 @@ also the default for development
 
 #### Defined in
 
-[config.ts:97](https://github.com/onzag/itemize/blob/f2f29986/config.ts#L97)
+[config.ts:97](https://github.com/onzag/itemize/blob/5c2808d3/config.ts#L97)
 
 ___
 
@@ -197,7 +197,7 @@ The font name to use
 
 #### Defined in
 
-[config.ts:80](https://github.com/onzag/itemize/blob/f2f29986/config.ts#L80)
+[config.ts:80](https://github.com/onzag/itemize/blob/5c2808d3/config.ts#L80)
 
 ___
 
@@ -209,7 +209,7 @@ The font url to use
 
 #### Defined in
 
-[config.ts:76](https://github.com/onzag/itemize/blob/f2f29986/config.ts#L76)
+[config.ts:76](https://github.com/onzag/itemize/blob/5c2808d3/config.ts#L76)
 
 ___
 
@@ -221,7 +221,7 @@ The web manifest configuration
 
 #### Defined in
 
-[config.ts:72](https://github.com/onzag/itemize/blob/f2f29986/config.ts#L72)
+[config.ts:72](https://github.com/onzag/itemize/blob/5c2808d3/config.ts#L72)
 
 ___
 
@@ -233,7 +233,7 @@ The hostname used in production mode, used to avoid SEO hijacking
 
 #### Defined in
 
-[config.ts:112](https://github.com/onzag/itemize/blob/f2f29986/config.ts#L112)
+[config.ts:112](https://github.com/onzag/itemize/blob/5c2808d3/config.ts#L112)
 
 ___
 
@@ -246,7 +246,7 @@ ADMIN is an expected role for this
 
 #### Defined in
 
-[config.ts:68](https://github.com/onzag/itemize/blob/f2f29986/config.ts#L68)
+[config.ts:68](https://github.com/onzag/itemize/blob/5c2808d3/config.ts#L68)
 
 ___
 
@@ -258,7 +258,7 @@ Of the supported languages, which ones are right to left
 
 #### Defined in
 
-[config.ts:56](https://github.com/onzag/itemize/blob/f2f29986/config.ts#L56)
+[config.ts:56](https://github.com/onzag/itemize/blob/5c2808d3/config.ts#L56)
 
 ___
 
@@ -275,7 +275,7 @@ but kept into the sensitive or standard file (eg. client side api keys)
 
 #### Defined in
 
-[config.ts:140](https://github.com/onzag/itemize/blob/f2f29986/config.ts#L140)
+[config.ts:140](https://github.com/onzag/itemize/blob/5c2808d3/config.ts#L140)
 
 ___
 
@@ -287,4 +287,4 @@ The supported languages as an array of string
 
 #### Defined in
 
-[config.ts:52](https://github.com/onzag/itemize/blob/f2f29986/config.ts#L52)
+[config.ts:52](https://github.com/onzag/itemize/blob/5c2808d3/config.ts#L52)

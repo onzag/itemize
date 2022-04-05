@@ -33,4 +33,4 @@ language if the location is absolute
 
 #### Defined in
 
-[client/components/navigation/Link.tsx:78](https://github.com/onzag/itemize/blob/f2f29986/client/components/navigation/Link.tsx#L78)
+[client/components/navigation/Link.tsx:78](https://github.com/onzag/itemize/blob/5c2808d3/client/components/navigation/Link.tsx#L78)

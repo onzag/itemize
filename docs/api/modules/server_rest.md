@@ -32,4 +32,4 @@ by returning a router that holds them inside the
 
 #### Defined in
 
-[server/rest.ts:24](https://github.com/onzag/itemize/blob/f2f29986/server/rest.ts#L24)
+[server/rest.ts:24](https://github.com/onzag/itemize/blob/5c2808d3/server/rest.ts#L24)

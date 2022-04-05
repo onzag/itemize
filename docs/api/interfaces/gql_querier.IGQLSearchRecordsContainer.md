@@ -25,7 +25,7 @@ when it returns a bunch of records
 
 #### Defined in
 
-[gql-querier.ts:47](https://github.com/onzag/itemize/blob/f2f29986/gql-querier.ts#L47)
+[gql-querier.ts:47](https://github.com/onzag/itemize/blob/5c2808d3/gql-querier.ts#L47)
 
 ___
 
@@ -35,7 +35,7 @@ ___
 
 #### Defined in
 
-[gql-querier.ts:46](https://github.com/onzag/itemize/blob/f2f29986/gql-querier.ts#L46)
+[gql-querier.ts:46](https://github.com/onzag/itemize/blob/5c2808d3/gql-querier.ts#L46)
 
 ___
 
@@ -45,7 +45,7 @@ ___
 
 #### Defined in
 
-[gql-querier.ts:48](https://github.com/onzag/itemize/blob/f2f29986/gql-querier.ts#L48)
+[gql-querier.ts:48](https://github.com/onzag/itemize/blob/5c2808d3/gql-querier.ts#L48)
 
 ___
 
@@ -55,7 +55,7 @@ ___
 
 #### Defined in
 
-[gql-querier.ts:49](https://github.com/onzag/itemize/blob/f2f29986/gql-querier.ts#L49)
+[gql-querier.ts:49](https://github.com/onzag/itemize/blob/5c2808d3/gql-querier.ts#L49)
 
 ___
 
@@ -65,4 +65,4 @@ ___
 
 #### Defined in
 
-[gql-querier.ts:45](https://github.com/onzag/itemize/blob/f2f29986/gql-querier.ts#L45)
+[gql-querier.ts:45](https://github.com/onzag/itemize/blob/5c2808d3/gql-querier.ts#L45)

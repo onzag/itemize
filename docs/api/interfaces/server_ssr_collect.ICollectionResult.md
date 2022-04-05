@@ -24,7 +24,7 @@ The date when the result was last modified
 
 #### Defined in
 
-[server/ssr/collect.ts:28](https://github.com/onzag/itemize/blob/f2f29986/server/ssr/collect.ts#L28)
+[server/ssr/collect.ts:28](https://github.com/onzag/itemize/blob/5c2808d3/server/ssr/collect.ts#L28)
 
 ___
 
@@ -37,7 +37,7 @@ this contains the value and all the attributes
 
 #### Defined in
 
-[server/ssr/collect.ts:37](https://github.com/onzag/itemize/blob/f2f29986/server/ssr/collect.ts#L37)
+[server/ssr/collect.ts:37](https://github.com/onzag/itemize/blob/5c2808d3/server/ssr/collect.ts#L37)
 
 ___
 
@@ -49,4 +49,4 @@ The signature for this specific collection result
 
 #### Defined in
 
-[server/ssr/collect.ts:32](https://github.com/onzag/itemize/blob/f2f29986/server/ssr/collect.ts#L32)
+[server/ssr/collect.ts:32](https://github.com/onzag/itemize/blob/5c2808d3/server/ssr/collect.ts#L32)

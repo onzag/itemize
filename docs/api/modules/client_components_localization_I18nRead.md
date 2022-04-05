@@ -42,4 +42,4 @@ a react node
 
 #### Defined in
 
-[client/components/localization/I18nRead.tsx:342](https://github.com/onzag/itemize/blob/f2f29986/client/components/localization/I18nRead.tsx#L342)
+[client/components/localization/I18nRead.tsx:342](https://github.com/onzag/itemize/blob/5c2808d3/client/components/localization/I18nRead.tsx#L342)

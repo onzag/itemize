@@ -40,4 +40,4 @@ a boolean on whether the unique index is valid
 
 #### Defined in
 
-[base/Root/Module/ItemDefinition/PropertyDefinition/server-checkers.ts:27](https://github.com/onzag/itemize/blob/f2f29986/base/Root/Module/ItemDefinition/PropertyDefinition/server-checkers.ts#L27)
+[base/Root/Module/ItemDefinition/PropertyDefinition/server-checkers.ts:27](https://github.com/onzag/itemize/blob/5c2808d3/base/Root/Module/ItemDefinition/PropertyDefinition/server-checkers.ts#L27)

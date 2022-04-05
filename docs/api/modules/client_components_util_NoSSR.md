@@ -33,4 +33,4 @@ pass, this will ensure things are in sync
 
 #### Defined in
 
-[client/components/util/NoSSR.tsx:58](https://github.com/onzag/itemize/blob/f2f29986/client/components/util/NoSSR.tsx#L58)
+[client/components/util/NoSSR.tsx:58](https://github.com/onzag/itemize/blob/5c2808d3/client/components/util/NoSSR.tsx#L58)

@@ -35,7 +35,7 @@ off a search
 
 #### Defined in
 
-[client/components/search/SearchLoader.tsx:173](https://github.com/onzag/itemize/blob/f2f29986/client/components/search/SearchLoader.tsx#L173)
+[client/components/search/SearchLoader.tsx:173](https://github.com/onzag/itemize/blob/5c2808d3/client/components/search/SearchLoader.tsx#L173)
 
 ___
 
@@ -47,7 +47,7 @@ Whether the resulting search results should clean on dismount
 
 #### Defined in
 
-[client/components/search/SearchLoader.tsx:162](https://github.com/onzag/itemize/blob/f2f29986/client/components/search/SearchLoader.tsx#L162)
+[client/components/search/SearchLoader.tsx:162](https://github.com/onzag/itemize/blob/5c2808d3/client/components/search/SearchLoader.tsx#L162)
 
 ___
 
@@ -59,7 +59,7 @@ The current page we are in
 
 #### Defined in
 
-[client/components/search/SearchLoader.tsx:149](https://github.com/onzag/itemize/blob/f2f29986/client/components/search/SearchLoader.tsx#L149)
+[client/components/search/SearchLoader.tsx:149](https://github.com/onzag/itemize/blob/5c2808d3/client/components/search/SearchLoader.tsx#L149)
 
 ___
 
@@ -72,7 +72,7 @@ results provider props
 
 #### Defined in
 
-[client/components/search/SearchLoader.tsx:167](https://github.com/onzag/itemize/blob/f2f29986/client/components/search/SearchLoader.tsx#L167)
+[client/components/search/SearchLoader.tsx:167](https://github.com/onzag/itemize/blob/5c2808d3/client/components/search/SearchLoader.tsx#L167)
 
 ___
 
@@ -85,7 +85,7 @@ item definition loader props
 
 #### Defined in
 
-[client/components/search/SearchLoader.tsx:158](https://github.com/onzag/itemize/blob/f2f29986/client/components/search/SearchLoader.tsx#L158)
+[client/components/search/SearchLoader.tsx:158](https://github.com/onzag/itemize/blob/5c2808d3/client/components/search/SearchLoader.tsx#L158)
 
 ___
 
@@ -99,7 +99,7 @@ at once
 
 #### Defined in
 
-[client/components/search/SearchLoader.tsx:145](https://github.com/onzag/itemize/blob/f2f29986/client/components/search/SearchLoader.tsx#L145)
+[client/components/search/SearchLoader.tsx:145](https://github.com/onzag/itemize/blob/5c2808d3/client/components/search/SearchLoader.tsx#L145)
 
 ___
 
@@ -113,7 +113,7 @@ or NO_LISTENING for just not getting updates but asking for feedback
 
 #### Defined in
 
-[client/components/search/SearchLoader.tsx:179](https://github.com/onzag/itemize/blob/f2f29986/client/components/search/SearchLoader.tsx#L179)
+[client/components/search/SearchLoader.tsx:179](https://github.com/onzag/itemize/blob/5c2808d3/client/components/search/SearchLoader.tsx#L179)
 
 ## Methods
 
@@ -135,7 +135,7 @@ The children function which specifies how to retrieve these results
 
 #### Defined in
 
-[client/components/search/SearchLoader.tsx:153](https://github.com/onzag/itemize/blob/f2f29986/client/components/search/SearchLoader.tsx#L153)
+[client/components/search/SearchLoader.tsx:153](https://github.com/onzag/itemize/blob/5c2808d3/client/components/search/SearchLoader.tsx#L153)
 
 ___
 
@@ -164,4 +164,4 @@ after this fact, so avoid weirdness
 
 #### Defined in
 
-[client/components/search/SearchLoader.tsx:189](https://github.com/onzag/itemize/blob/f2f29986/client/components/search/SearchLoader.tsx#L189)
+[client/components/search/SearchLoader.tsx:189](https://github.com/onzag/itemize/blob/5c2808d3/client/components/search/SearchLoader.tsx#L189)

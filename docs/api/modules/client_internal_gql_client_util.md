@@ -50,7 +50,7 @@ itself as it performs a lot of storing, checking and so on
 
 #### Defined in
 
-[client/internal/gql-client-util.ts:63](https://github.com/onzag/itemize/blob/f2f29986/client/internal/gql-client-util.ts#L63)
+[client/internal/gql-client-util.ts:63](https://github.com/onzag/itemize/blob/5c2808d3/client/internal/gql-client-util.ts#L63)
 
 ___
 
@@ -98,7 +98,7 @@ to create a query
 
 #### Defined in
 
-[client/internal/gql-client-util.ts:131](https://github.com/onzag/itemize/blob/f2f29986/client/internal/gql-client-util.ts#L131)
+[client/internal/gql-client-util.ts:131](https://github.com/onzag/itemize/blob/5c2808d3/client/internal/gql-client-util.ts#L131)
 
 ___
 
@@ -132,7 +132,7 @@ regarding these files
 
 #### Defined in
 
-[client/internal/gql-client-util.ts:424](https://github.com/onzag/itemize/blob/f2f29986/client/internal/gql-client-util.ts#L424)
+[client/internal/gql-client-util.ts:424](https://github.com/onzag/itemize/blob/5c2808d3/client/internal/gql-client-util.ts#L424)
 
 ___
 
@@ -161,7 +161,7 @@ to specify a blob this function will do such job
 
 #### Defined in
 
-[client/internal/gql-client-util.ts:370](https://github.com/onzag/itemize/blob/f2f29986/client/internal/gql-client-util.ts#L370)
+[client/internal/gql-client-util.ts:370](https://github.com/onzag/itemize/blob/5c2808d3/client/internal/gql-client-util.ts#L370)
 
 ___
 
@@ -198,7 +198,7 @@ query, and the value that was retrieved
 
 #### Defined in
 
-[client/internal/gql-client-util.ts:956](https://github.com/onzag/itemize/blob/f2f29986/client/internal/gql-client-util.ts#L956)
+[client/internal/gql-client-util.ts:956](https://github.com/onzag/itemize/blob/5c2808d3/client/internal/gql-client-util.ts#L956)
 
 ___
 
@@ -230,7 +230,7 @@ a promise with an error on whether it succeed or not
 
 #### Defined in
 
-[client/internal/gql-client-util.ts:870](https://github.com/onzag/itemize/blob/f2f29986/client/internal/gql-client-util.ts#L870)
+[client/internal/gql-client-util.ts:870](https://github.com/onzag/itemize/blob/5c2808d3/client/internal/gql-client-util.ts#L870)
 
 ___
 
@@ -263,7 +263,7 @@ Runs an edit query for a given item definition
 
 #### Defined in
 
-[client/internal/gql-client-util.ts:1058](https://github.com/onzag/itemize/blob/f2f29986/client/internal/gql-client-util.ts#L1058)
+[client/internal/gql-client-util.ts:1058](https://github.com/onzag/itemize/blob/5c2808d3/client/internal/gql-client-util.ts#L1058)
 
 ___
 
@@ -303,7 +303,7 @@ a promise with a bunch of information
 
 #### Defined in
 
-[client/internal/gql-client-util.ts:635](https://github.com/onzag/itemize/blob/f2f29986/client/internal/gql-client-util.ts#L635)
+[client/internal/gql-client-util.ts:635](https://github.com/onzag/itemize/blob/5c2808d3/client/internal/gql-client-util.ts#L635)
 
 ___
 
@@ -330,4 +330,4 @@ be equal to the limit, and the offset given
 
 #### Defined in
 
-[client/internal/gql-client-util.ts:1248](https://github.com/onzag/itemize/blob/f2f29986/client/internal/gql-client-util.ts#L1248)
+[client/internal/gql-client-util.ts:1248](https://github.com/onzag/itemize/blob/5c2808d3/client/internal/gql-client-util.ts#L1248)

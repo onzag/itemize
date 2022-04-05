@@ -40,4 +40,4 @@ Converts a json sitemap file to a proper sitemap
 
 #### Defined in
 
-[server/seo/sitemaps.ts:41](https://github.com/onzag/itemize/blob/f2f29986/server/seo/sitemaps.ts#L41)
+[server/seo/sitemaps.ts:41](https://github.com/onzag/itemize/blob/5c2808d3/server/seo/sitemaps.ts#L41)

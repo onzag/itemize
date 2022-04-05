@@ -70,7 +70,7 @@ React.Component&lt;IPropertyViewHandlerProps&lt;IPropertyViewSimpleRendererProps
 
 #### Defined in
 
-[client/internal/components/PropertyView/PropertyViewReference.tsx:49](https://github.com/onzag/itemize/blob/f2f29986/client/internal/components/PropertyView/PropertyViewReference.tsx#L49)
+[client/internal/components/PropertyView/PropertyViewReference.tsx:49](https://github.com/onzag/itemize/blob/5c2808d3/client/internal/components/PropertyView/PropertyViewReference.tsx#L49)
 
 ## Properties
 
@@ -108,7 +108,7 @@ ___
 
 #### Defined in
 
-[client/internal/components/PropertyView/PropertyViewReference.tsx:46](https://github.com/onzag/itemize/blob/f2f29986/client/internal/components/PropertyView/PropertyViewReference.tsx#L46)
+[client/internal/components/PropertyView/PropertyViewReference.tsx:46](https://github.com/onzag/itemize/blob/5c2808d3/client/internal/components/PropertyView/PropertyViewReference.tsx#L46)
 
 ___
 
@@ -153,7 +153,7 @@ ___
 
 #### Defined in
 
-[client/internal/components/PropertyView/PropertyViewReference.tsx:47](https://github.com/onzag/itemize/blob/f2f29986/client/internal/components/PropertyView/PropertyViewReference.tsx#L47)
+[client/internal/components/PropertyView/PropertyViewReference.tsx:47](https://github.com/onzag/itemize/blob/5c2808d3/client/internal/components/PropertyView/PropertyViewReference.tsx#L47)
 
 ___
 
@@ -329,7 +329,7 @@ ___
 
 #### Defined in
 
-[client/internal/components/PropertyView/PropertyViewReference.tsx:167](https://github.com/onzag/itemize/blob/f2f29986/client/internal/components/PropertyView/PropertyViewReference.tsx#L167)
+[client/internal/components/PropertyView/PropertyViewReference.tsx:167](https://github.com/onzag/itemize/blob/5c2808d3/client/internal/components/PropertyView/PropertyViewReference.tsx#L167)
 
 ___
 
@@ -375,7 +375,7 @@ React.Component.componentDidMount
 
 #### Defined in
 
-[client/internal/components/PropertyView/PropertyViewReference.tsx:65](https://github.com/onzag/itemize/blob/f2f29986/client/internal/components/PropertyView/PropertyViewReference.tsx#L65)
+[client/internal/components/PropertyView/PropertyViewReference.tsx:65](https://github.com/onzag/itemize/blob/5c2808d3/client/internal/components/PropertyView/PropertyViewReference.tsx#L65)
 
 ___
 
@@ -399,7 +399,7 @@ React.Component.componentDidUpdate
 
 #### Defined in
 
-[client/internal/components/PropertyView/PropertyViewReference.tsx:278](https://github.com/onzag/itemize/blob/f2f29986/client/internal/components/PropertyView/PropertyViewReference.tsx#L278)
+[client/internal/components/PropertyView/PropertyViewReference.tsx:278](https://github.com/onzag/itemize/blob/5c2808d3/client/internal/components/PropertyView/PropertyViewReference.tsx#L278)
 
 ___
 
@@ -552,7 +552,7 @@ Finds the current string value for the given id and version
 
 #### Defined in
 
-[client/internal/components/PropertyView/PropertyViewReference.tsx:195](https://github.com/onzag/itemize/blob/f2f29986/client/internal/components/PropertyView/PropertyViewReference.tsx#L195)
+[client/internal/components/PropertyView/PropertyViewReference.tsx:195](https://github.com/onzag/itemize/blob/5c2808d3/client/internal/components/PropertyView/PropertyViewReference.tsx#L195)
 
 ___
 
@@ -601,7 +601,7 @@ a string value or null if nothing found
 
 #### Defined in
 
-[client/internal/components/PropertyView/PropertyViewReference.tsx:133](https://github.com/onzag/itemize/blob/f2f29986/client/internal/components/PropertyView/PropertyViewReference.tsx#L133)
+[client/internal/components/PropertyView/PropertyViewReference.tsx:133](https://github.com/onzag/itemize/blob/5c2808d3/client/internal/components/PropertyView/PropertyViewReference.tsx#L133)
 
 ___
 
@@ -652,7 +652,7 @@ we are using for display
 
 #### Defined in
 
-[client/internal/components/PropertyView/PropertyViewReference.tsx:98](https://github.com/onzag/itemize/blob/f2f29986/client/internal/components/PropertyView/PropertyViewReference.tsx#L98)
+[client/internal/components/PropertyView/PropertyViewReference.tsx:98](https://github.com/onzag/itemize/blob/5c2808d3/client/internal/components/PropertyView/PropertyViewReference.tsx#L98)
 
 ___
 
@@ -670,7 +670,7 @@ React.Component.render
 
 #### Defined in
 
-[client/internal/components/PropertyView/PropertyViewReference.tsx:337](https://github.com/onzag/itemize/blob/f2f29986/client/internal/components/PropertyView/PropertyViewReference.tsx#L337)
+[client/internal/components/PropertyView/PropertyViewReference.tsx:337](https://github.com/onzag/itemize/blob/5c2808d3/client/internal/components/PropertyView/PropertyViewReference.tsx#L337)
 
 ___
 
@@ -726,4 +726,4 @@ React.Component.shouldComponentUpdate
 
 #### Defined in
 
-[client/internal/components/PropertyView/PropertyViewReference.tsx:319](https://github.com/onzag/itemize/blob/f2f29986/client/internal/components/PropertyView/PropertyViewReference.tsx#L319)
+[client/internal/components/PropertyView/PropertyViewReference.tsx:319](https://github.com/onzag/itemize/blob/5c2808d3/client/internal/components/PropertyView/PropertyViewReference.tsx#L319)

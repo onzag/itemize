@@ -24,7 +24,7 @@
 
 #### Defined in
 
-[client/providers/item.tsx:432](https://github.com/onzag/itemize/blob/f2f29986/client/providers/item.tsx#L432)
+[client/providers/item.tsx:432](https://github.com/onzag/itemize/blob/5c2808d3/client/providers/item.tsx#L432)
 
 ___
 
@@ -34,7 +34,7 @@ ___
 
 #### Defined in
 
-[client/providers/item.tsx:433](https://github.com/onzag/itemize/blob/f2f29986/client/providers/item.tsx#L433)
+[client/providers/item.tsx:433](https://github.com/onzag/itemize/blob/5c2808d3/client/providers/item.tsx#L433)
 
 ___
 
@@ -44,4 +44,4 @@ ___
 
 #### Defined in
 
-[client/providers/item.tsx:431](https://github.com/onzag/itemize/blob/f2f29986/client/providers/item.tsx#L431)
+[client/providers/item.tsx:431](https://github.com/onzag/itemize/blob/5c2808d3/client/providers/item.tsx#L431)

@@ -51,7 +51,7 @@ this will prevent users from class injection
 
 #### Defined in
 
-[client/internal/text/index.tsx:31](https://github.com/onzag/itemize/blob/f2f29986/client/internal/text/index.tsx#L31)
+[client/internal/text/index.tsx:31](https://github.com/onzag/itemize/blob/5c2808d3/client/internal/text/index.tsx#L31)
 
 ___
 
@@ -63,7 +63,7 @@ The list of allowed prefixes
 
 #### Defined in
 
-[client/internal/text/index.tsx:45](https://github.com/onzag/itemize/blob/f2f29986/client/internal/text/index.tsx#L45)
+[client/internal/text/index.tsx:45](https://github.com/onzag/itemize/blob/5c2808d3/client/internal/text/index.tsx#L45)
 
 ___
 
@@ -73,7 +73,7 @@ ___
 
 #### Defined in
 
-[client/internal/text/index.tsx:38](https://github.com/onzag/itemize/blob/f2f29986/client/internal/text/index.tsx#L38)
+[client/internal/text/index.tsx:38](https://github.com/onzag/itemize/blob/5c2808d3/client/internal/text/index.tsx#L38)
 
 ___
 
@@ -83,7 +83,7 @@ ___
 
 #### Defined in
 
-[client/internal/text/index.tsx:39](https://github.com/onzag/itemize/blob/f2f29986/client/internal/text/index.tsx#L39)
+[client/internal/text/index.tsx:39](https://github.com/onzag/itemize/blob/5c2808d3/client/internal/text/index.tsx#L39)
 
 ___
 
@@ -93,7 +93,7 @@ ___
 
 #### Defined in
 
-[client/internal/text/index.tsx:40](https://github.com/onzag/itemize/blob/f2f29986/client/internal/text/index.tsx#L40)
+[client/internal/text/index.tsx:40](https://github.com/onzag/itemize/blob/5c2808d3/client/internal/text/index.tsx#L40)
 
 ___
 
@@ -103,7 +103,7 @@ ___
 
 #### Defined in
 
-[client/internal/text/index.tsx:37](https://github.com/onzag/itemize/blob/f2f29986/client/internal/text/index.tsx#L37)
+[client/internal/text/index.tsx:37](https://github.com/onzag/itemize/blob/5c2808d3/client/internal/text/index.tsx#L37)
 
 ___
 
@@ -123,7 +123,7 @@ Sanitazation standard configuraton
 
 #### Defined in
 
-[client/internal/text/index.tsx:18](https://github.com/onzag/itemize/blob/f2f29986/client/internal/text/index.tsx#L18)
+[client/internal/text/index.tsx:18](https://github.com/onzag/itemize/blob/5c2808d3/client/internal/text/index.tsx#L18)
 
 ___
 
@@ -136,7 +136,7 @@ the template args
 
 #### Defined in
 
-[client/internal/text/index.tsx:89](https://github.com/onzag/itemize/blob/f2f29986/client/internal/text/index.tsx#L89)
+[client/internal/text/index.tsx:89](https://github.com/onzag/itemize/blob/5c2808d3/client/internal/text/index.tsx#L89)
 
 ___
 
@@ -149,7 +149,7 @@ use args
 
 #### Defined in
 
-[client/internal/text/index.tsx:98](https://github.com/onzag/itemize/blob/f2f29986/client/internal/text/index.tsx#L98)
+[client/internal/text/index.tsx:98](https://github.com/onzag/itemize/blob/5c2808d3/client/internal/text/index.tsx#L98)
 
 ___
 
@@ -162,7 +162,7 @@ exist as data-on-[event]="{{event}}"
 
 #### Defined in
 
-[client/internal/text/index.tsx:53](https://github.com/onzag/itemize/blob/f2f29986/client/internal/text/index.tsx#L53)
+[client/internal/text/index.tsx:53](https://github.com/onzag/itemize/blob/5c2808d3/client/internal/text/index.tsx#L53)
 
 ___
 
@@ -175,7 +175,7 @@ exist as data-[supportedTemplateStyle]-style="position:absolute;"
 
 #### Defined in
 
-[client/internal/text/index.tsx:80](https://github.com/onzag/itemize/blob/f2f29986/client/internal/text/index.tsx#L80)
+[client/internal/text/index.tsx:80](https://github.com/onzag/itemize/blob/5c2808d3/client/internal/text/index.tsx#L80)
 
 ___
 
@@ -185,7 +185,7 @@ ___
 
 #### Defined in
 
-[client/internal/text/index.tsx:911](https://github.com/onzag/itemize/blob/f2f29986/client/internal/text/index.tsx#L911)
+[client/internal/text/index.tsx:911](https://github.com/onzag/itemize/blob/5c2808d3/client/internal/text/index.tsx#L911)
 
 ## Functions
 
@@ -208,7 +208,7 @@ compares two text for equivalence
 
 #### Defined in
 
-[client/internal/text/index.tsx:886](https://github.com/onzag/itemize/blob/f2f29986/client/internal/text/index.tsx#L886)
+[client/internal/text/index.tsx:886](https://github.com/onzag/itemize/blob/5c2808d3/client/internal/text/index.tsx#L886)
 
 ___
 
@@ -231,7 +231,7 @@ compares two plain text for equivalence
 
 #### Defined in
 
-[client/internal/text/index.tsx:906](https://github.com/onzag/itemize/blob/f2f29986/client/internal/text/index.tsx#L906)
+[client/internal/text/index.tsx:906](https://github.com/onzag/itemize/blob/5c2808d3/client/internal/text/index.tsx#L906)
 
 ___
 
@@ -251,7 +251,7 @@ ___
 
 #### Defined in
 
-[client/internal/text/index.tsx:937](https://github.com/onzag/itemize/blob/f2f29986/client/internal/text/index.tsx#L937)
+[client/internal/text/index.tsx:937](https://github.com/onzag/itemize/blob/5c2808d3/client/internal/text/index.tsx#L937)
 
 ___
 
@@ -273,7 +273,7 @@ Counts the size of the document
 
 #### Defined in
 
-[client/internal/text/index.tsx:528](https://github.com/onzag/itemize/blob/f2f29986/client/internal/text/index.tsx#L528)
+[client/internal/text/index.tsx:528](https://github.com/onzag/itemize/blob/5c2808d3/client/internal/text/index.tsx#L528)
 
 ___
 
@@ -295,7 +295,7 @@ Counts the size and words of the document
 
 #### Defined in
 
-[client/internal/text/index.tsx:564](https://github.com/onzag/itemize/blob/f2f29986/client/internal/text/index.tsx#L564)
+[client/internal/text/index.tsx:564](https://github.com/onzag/itemize/blob/5c2808d3/client/internal/text/index.tsx#L564)
 
 ___
 
@@ -317,7 +317,7 @@ Counts the words of the document
 
 #### Defined in
 
-[client/internal/text/index.tsx:546](https://github.com/onzag/itemize/blob/f2f29986/client/internal/text/index.tsx#L546)
+[client/internal/text/index.tsx:546](https://github.com/onzag/itemize/blob/5c2808d3/client/internal/text/index.tsx#L546)
 
 ___
 
@@ -346,7 +346,7 @@ the given content
 
 #### Defined in
 
-[client/internal/text/index.tsx:593](https://github.com/onzag/itemize/blob/f2f29986/client/internal/text/index.tsx#L593)
+[client/internal/text/index.tsx:593](https://github.com/onzag/itemize/blob/5c2808d3/client/internal/text/index.tsx#L593)
 
 ___
 
@@ -374,7 +374,7 @@ a node
 
 #### Defined in
 
-[client/internal/text/index.tsx:276](https://github.com/onzag/itemize/blob/f2f29986/client/internal/text/index.tsx#L276)
+[client/internal/text/index.tsx:276](https://github.com/onzag/itemize/blob/5c2808d3/client/internal/text/index.tsx#L276)
 
 ___
 
@@ -412,7 +412,7 @@ use the renderTemplateDynamically method
 
 #### Defined in
 
-[client/internal/text/index.tsx:804](https://github.com/onzag/itemize/blob/f2f29986/client/internal/text/index.tsx#L804)
+[client/internal/text/index.tsx:804](https://github.com/onzag/itemize/blob/5c2808d3/client/internal/text/index.tsx#L804)
 
 ___
 
@@ -436,7 +436,7 @@ the div as a raw HTML result
 
 #### Defined in
 
-[client/internal/text/index.tsx:766](https://github.com/onzag/itemize/blob/f2f29986/client/internal/text/index.tsx#L766)
+[client/internal/text/index.tsx:766](https://github.com/onzag/itemize/blob/5c2808d3/client/internal/text/index.tsx#L766)
 
 ___
 
@@ -469,7 +469,7 @@ takes a document instead
 
 #### Defined in
 
-[client/internal/text/index.tsx:826](https://github.com/onzag/itemize/blob/f2f29986/client/internal/text/index.tsx#L826)
+[client/internal/text/index.tsx:826](https://github.com/onzag/itemize/blob/5c2808d3/client/internal/text/index.tsx#L826)
 
 ___
 
@@ -496,7 +496,7 @@ then be passed to the serializer or displayed as it is
 
 #### Defined in
 
-[client/internal/text/index.tsx:251](https://github.com/onzag/itemize/blob/f2f29986/client/internal/text/index.tsx#L251)
+[client/internal/text/index.tsx:251](https://github.com/onzag/itemize/blob/5c2808d3/client/internal/text/index.tsx#L251)
 
 ___
 
@@ -519,7 +519,7 @@ HTML
 
 #### Defined in
 
-[client/internal/text/index.tsx:507](https://github.com/onzag/itemize/blob/f2f29986/client/internal/text/index.tsx#L507)
+[client/internal/text/index.tsx:507](https://github.com/onzag/itemize/blob/5c2808d3/client/internal/text/index.tsx#L507)
 
 ___
 
@@ -542,4 +542,4 @@ rather than a bunch of nodes
 
 #### Defined in
 
-[client/internal/text/index.tsx:516](https://github.com/onzag/itemize/blob/f2f29986/client/internal/text/index.tsx#L516)
+[client/internal/text/index.tsx:516](https://github.com/onzag/itemize/blob/5c2808d3/client/internal/text/index.tsx#L516)

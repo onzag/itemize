@@ -19,7 +19,7 @@
 
 #### Defined in
 
-[gql-querier.ts:673](https://github.com/onzag/itemize/blob/f2f29986/gql-querier.ts#L673)
+[gql-querier.ts:673](https://github.com/onzag/itemize/blob/5c2808d3/gql-querier.ts#L673)
 
 ___
 
@@ -29,4 +29,4 @@ ___
 
 #### Defined in
 
-[gql-querier.ts:672](https://github.com/onzag/itemize/blob/f2f29986/gql-querier.ts#L672)
+[gql-querier.ts:672](https://github.com/onzag/itemize/blob/5c2808d3/gql-querier.ts#L672)

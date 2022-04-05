@@ -24,7 +24,7 @@ per field
 
 #### Defined in
 
-[base/Root/gql.ts:68](https://github.com/onzag/itemize/blob/f2f29986/base/Root/gql.ts#L68)
+[base/Root/gql.ts:68](https://github.com/onzag/itemize/blob/5c2808d3/base/Root/gql.ts#L68)
 
 ___
 
@@ -34,4 +34,4 @@ ___
 
 #### Defined in
 
-[base/Root/gql.ts:67](https://github.com/onzag/itemize/blob/f2f29986/base/Root/gql.ts#L67)
+[base/Root/gql.ts:67](https://github.com/onzag/itemize/blob/5c2808d3/base/Root/gql.ts#L67)

@@ -69,7 +69,7 @@
 
 #### Defined in
 
-[client/providers/item.tsx:360](https://github.com/onzag/itemize/blob/f2f29986/client/providers/item.tsx#L360)
+[client/providers/item.tsx:360](https://github.com/onzag/itemize/blob/5c2808d3/client/providers/item.tsx#L360)
 
 ___
 
@@ -79,7 +79,7 @@ ___
 
 #### Defined in
 
-[client/providers/item.tsx:4311](https://github.com/onzag/itemize/blob/f2f29986/client/providers/item.tsx#L4311)
+[client/providers/item.tsx:4311](https://github.com/onzag/itemize/blob/5c2808d3/client/providers/item.tsx#L4311)
 
 ___
 
@@ -89,7 +89,7 @@ ___
 
 #### Defined in
 
-[client/providers/item.tsx:4310](https://github.com/onzag/itemize/blob/f2f29986/client/providers/item.tsx#L4310)
+[client/providers/item.tsx:4310](https://github.com/onzag/itemize/blob/5c2808d3/client/providers/item.tsx#L4310)
 
 ___
 
@@ -99,7 +99,7 @@ ___
 
 #### Defined in
 
-[client/providers/item.tsx:187](https://github.com/onzag/itemize/blob/f2f29986/client/providers/item.tsx#L187)
+[client/providers/item.tsx:187](https://github.com/onzag/itemize/blob/5c2808d3/client/providers/item.tsx#L187)
 
 ## Variables
 
@@ -109,7 +109,7 @@ ___
 
 #### Defined in
 
-[client/providers/item.tsx:601](https://github.com/onzag/itemize/blob/f2f29986/client/providers/item.tsx#L601)
+[client/providers/item.tsx:601](https://github.com/onzag/itemize/blob/5c2808d3/client/providers/item.tsx#L601)
 
 ___
 
@@ -119,7 +119,7 @@ ___
 
 #### Defined in
 
-[client/providers/item.tsx:602](https://github.com/onzag/itemize/blob/f2f29986/client/providers/item.tsx#L602)
+[client/providers/item.tsx:602](https://github.com/onzag/itemize/blob/5c2808d3/client/providers/item.tsx#L602)
 
 ___
 
@@ -129,7 +129,7 @@ ___
 
 #### Defined in
 
-[client/providers/item.tsx:4312](https://github.com/onzag/itemize/blob/f2f29986/client/providers/item.tsx#L4312)
+[client/providers/item.tsx:4312](https://github.com/onzag/itemize/blob/5c2808d3/client/providers/item.tsx#L4312)
 
 ___
 
@@ -139,7 +139,7 @@ ___
 
 #### Defined in
 
-[client/providers/item.tsx:603](https://github.com/onzag/itemize/blob/f2f29986/client/providers/item.tsx#L603)
+[client/providers/item.tsx:603](https://github.com/onzag/itemize/blob/5c2808d3/client/providers/item.tsx#L603)
 
 ## Functions
 
@@ -161,7 +161,7 @@ ___
 
 #### Defined in
 
-[client/providers/item.tsx:4508](https://github.com/onzag/itemize/blob/f2f29986/client/providers/item.tsx#L4508)
+[client/providers/item.tsx:4508](https://github.com/onzag/itemize/blob/5c2808d3/client/providers/item.tsx#L4508)
 
 ___
 
@@ -183,7 +183,7 @@ ___
 
 #### Defined in
 
-[client/providers/item.tsx:4529](https://github.com/onzag/itemize/blob/f2f29986/client/providers/item.tsx#L4529)
+[client/providers/item.tsx:4529](https://github.com/onzag/itemize/blob/5c2808d3/client/providers/item.tsx#L4529)
 
 ___
 
@@ -203,7 +203,7 @@ ___
 
 #### Defined in
 
-[client/providers/item.tsx:4457](https://github.com/onzag/itemize/blob/f2f29986/client/providers/item.tsx#L4457)
+[client/providers/item.tsx:4457](https://github.com/onzag/itemize/blob/5c2808d3/client/providers/item.tsx#L4457)
 
 ___
 
@@ -228,4 +228,4 @@ Provides a previously injected parent context
 
 #### Defined in
 
-[client/providers/item.tsx:4493](https://github.com/onzag/itemize/blob/f2f29986/client/providers/item.tsx#L4493)
+[client/providers/item.tsx:4493](https://github.com/onzag/itemize/blob/5c2808d3/client/providers/item.tsx#L4493)
