@@ -36,4 +36,8 @@ export interface ISSRRule {
    * Whether we will simply not use SSR at all
    */
   noSSR: boolean;
+  /**
+   * The mode the user is going with
+   */
+  mode: "development" | "production";
 }

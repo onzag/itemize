@@ -3,8 +3,9 @@
  * @module
  */
 
+import type { ICompoundSearchStateType } from "../../../base/Root/Module/ItemDefinition";
 import React from "react";
-import { IGQLValue, IGQLRequestFields } from "../../../gql-querier";
+import type { IGQLValue, IGQLRequestFields } from "../../../gql-querier";
 
 /**
  * The SSR collected information
@@ -33,6 +34,28 @@ export interface ISSRCollectedQueryType {
 }
 
 /**
+ * The SSR collected information
+ */
+ export interface ISSRCollectedSearchType {
+  /**
+   * The item defintion qualified name
+   */
+  idef: string,
+  /**
+   * The id
+   */
+  id: string,
+  /**
+   * The version or null
+   */
+  version: string,
+  /**
+   * The search state
+   */
+  state: ICompoundSearchStateType,
+}
+
+/**
  * The list of collected resources
  */
 export interface ISSRCollectedResourcesType {
@@ -57,11 +80,15 @@ export interface ISSRContextType {
   /**
    * Collected queries
    */
-  queries: ISSRCollectedQueryType[],
+  queries: ISSRCollectedQueryType[];
   /**
    * Collected resources map
    */
-  resources: ISSRCollectedResourcesType,
+  resources: ISSRCollectedResourcesType;
+  /**
+   * Collected searches
+   */
+  searches: ISSRCollectedSearchType[];
   /**
    * The user we refer about
    */

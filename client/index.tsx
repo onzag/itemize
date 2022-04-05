@@ -536,6 +536,19 @@ export async function initializeItemizeApp(
         );
       }
     });
+    ssrContext && ssrContext.searches.forEach((search) => {
+      if (!search) {
+        return;
+      }
+      const idef: ItemDefinition = root.registry[search.idef] as ItemDefinition;
+      if (idef) {
+        idef.setSearchState(
+          search.id,
+          search.version,
+          search.state,
+        );
+      }
+    });
 
     const actualApp = (
       <ConfigProvider value={config}>

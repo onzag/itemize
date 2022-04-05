@@ -10,31 +10,62 @@ import ItemDefinition, { ItemDefinitionIOActions } from "../../base/Root/Module/
 import { filterAndPrepareGQLValue } from "../resolvers/basic";
 import { IAppDataType } from "../../server";
 import { logger } from "../logger";
-import { UNSPECIFIED_OWNER } from "../../constants";
-import { ISSRCollectedQueryType } from "../../client/internal/providers/ssr-provider";
+import { PROTECTED_RESOURCES, UNSPECIFIED_OWNER } from "../../constants";
+import { ISSRCollectedQueryType, ISSRCollectedResourcesType, ISSRCollectedSearchType } from "../../client/internal/providers/ssr-provider";
 import { ISSRRule } from ".";
 import { IOTriggerActions } from "../resolvers/triggers";
 import { CustomRoleGranterEnvironment, CustomRoleManager } from "../resolvers/roles";
 import { convertSQLValueToGQLValueForItemDefinition } from "../../base/Root/Module/ItemDefinition/sql";
 import type { IActionSearchOptions } from "../../client/providers/item";
+import fs from "fs";
+import path from "path";
+
+const fsAsync = fs.promises;
+
+interface IBaseCollectionResult {
+  /**
+   * The date when the result was last modified
+   */
+  lastModified: Date;
+  /**
+   * The signature for this specific collection result
+   * make it something unique, and include the last modified date within it
+   * separate by dots, this specifies this exact data point
+   */
+  signature: string;
+
+  /**
+   * The type
+   * @override
+   */
+  type: string;
+}
+
+export interface IResourceCollectionResult extends IBaseCollectionResult {
+  /**
+   * The data collected if any
+   */
+  data: string;
+  /**
+   * The type collected
+   */
+  type: "resource";
+}
+
+interface IInternalResourceCollectionResult extends IResourceCollectionResult {
+  path: string;
+}
 
 /**
  * This is what a collection result looks like
  */
-export interface ICollectionResult {
-  /**
-   * The date when the result was last modified
-   */
-  lastModified: Date,
-  /**
-   * The signature for this specific collection result
-   */
-  signature: string,
+export interface IQueryCollectionResult extends IBaseCollectionResult {
   /**
    * The query value, the same that is passed to the client side
    * this contains the value and all the attributes
    */
-  query: ISSRCollectedQueryType,
+  query: ISSRCollectedQueryType;
+  type: "query";
 };
 
 /**
@@ -54,12 +85,18 @@ export class Collector {
   /**
    * Represents all the collected results
    */
-  private results: ICollectionResult[] = [];
+  private results: Array<IInternalResourceCollectionResult | IQueryCollectionResult> = [];
   /**
    * All the collection statuses per result
    */
   private collectionStatuses: {
     [mergedID: string]: boolean;
+  } = {};
+  /**
+   * All the collection statuses per result
+   */
+  private collectionData: {
+    [mergedID: string]: any;
   } = {};
   /**
    * Collection requests callbacks of other
@@ -68,13 +105,13 @@ export class Collector {
    * for collection for the same item
    */
   private collectionRequestsCbs: {
-    [mergedID: string]: Array<() => void>;
+    [mergedID: string]: Array<(data?: any) => void>;
   } = {};
   /**
    * Same but gives a rejected promise instead
    */
   private collectionRequestsRejectedCbs: {
-    [mergedID: string]: Array<() => void>;
+    [mergedID: string]: Array<(data?: any) => void>;
   } = {};
 
   /**
@@ -131,21 +168,25 @@ export class Collector {
    */
   public getQueries() {
     // remove the non-accessible ones
-    return this.results.filter((r) => r !== null).map((r) => r.query);
+    return this.results.filter((r) => r !== null && r.type !== "query").map((r: IQueryCollectionResult) => r.query);
   }
 
   /**
    * TODO
    */
-  public getSearches() {
-
+  public getSearches(): ISSRCollectedSearchType[] {
+    return [];
   }
 
   /**
-   * TODO
+   * Provides the map of all the resulting resources that were fetched
    */
-  public getResources() {
-
+  public getResources(): ISSRCollectedResourcesType {
+    const rs: ISSRCollectedResourcesType = {};
+    this.results.filter((r) => r !== null && r.type !== "resource").forEach((r: IInternalResourceCollectionResult) => {
+      rs[r.path] = r.data;
+    });
+    return rs;
   }
 
   /**
@@ -177,23 +218,124 @@ export class Collector {
     return this.results.some((r) => r === null);
   }
 
-  public async collectResource(finalPath: string, customResolver: (appData: IAppDataType) => Promise<string>): Promise<string> {
+  public async collectResource(finalPath: string, customResolver: (appData: IAppDataType) => Promise<IResourceCollectionResult>): Promise<string> {
     const mergedID = "__RESOURCE__" + finalPath;
 
+    // request has been done and it's ready
+    if (this.collectionStatuses[mergedID]) {
+      return this.collectionData[mergedID].toString();
+    } else if (this.collectionStatuses[mergedID] === false) {
+      // request is in progress, add it to queue
+      return new Promise<string>((resolve, reject) => {
+        this.collectionRequestsCbs[mergedID].push(resolve);
+        this.collectionRequestsRejectedCbs[mergedID].push(reject);
+      });
+    }
+
+    // mark it as in progress
     this.collectionStatuses[mergedID] = false;
+    this.collectionData[mergedID] = null;
     this.collectionRequestsCbs[mergedID] = [];
     this.collectionRequestsRejectedCbs[mergedID] = [];
 
-    // TODO collect resource
-    // resources will use a hash of the content itself for signature
-    // completed
-    this.collectionStatuses[mergedID] = true;
-    this.collectionRequestsCbs[mergedID].forEach((r) => r());
+    let result: IResourceCollectionResult;
+    let forbiddenToDevKey: boolean = false;
 
-    return null;
+    if (customResolver) {
+      try {
+        result = await customResolver(this.appData);
+
+        if (!result.lastModified) {
+          result.lastModified = new Date();
+        }
+      } catch (err) {
+        logger.error(
+          "ssrGenerator [SERIOUS]: Collection of resource at " + finalPath + " failed due to error in custom resolver",
+          {
+            errStack: err.stack,
+            errMessage: err.message,
+            path: finalPath,
+          }
+        )
+
+        this.collectionRequestsRejectedCbs[mergedID].forEach((r) => r());
+
+        throw err;
+      }
+    } else {
+      // Potential security vulnerability here because we try to read a file
+      // but we must ensure such a file only exist within the resource folder
+      // we must also respect the protected resources
+      try {
+        if (!finalPath.startsWith("/rest/resource/")) {
+          throw new Error("Trying to access non-resource with no custom resolver");
+        }
+
+        const finalPathNonRes = finalPath.replace("/rest/resource/", "");
+
+        if (finalPathNonRes.includes("..")) {
+          throw new Error("Invalid resource path that includes double dots in it");
+        }
+
+        const isProtectedResource = PROTECTED_RESOURCES.includes(finalPathNonRes);
+        if (isProtectedResource && this.appliedRule.mode !== "development") {
+          forbiddenToDevKey = true;
+          result = {
+            lastModified: new Date(this.appData.buildnumber),
+            data: null,
+            // no need for last modified since it uses the buildnumber
+            signature: finalPath,
+            type: "resource",
+          };
+        } else {
+          const fullPath = path.join(path.resolve(path.join("dist", "data")), finalPath);
+          const data = await fsAsync.readFile(fullPath, "utf-8");
+  
+          result = {
+            lastModified: new Date(this.appData.buildnumber),
+            data,
+            // no need for last modified since it uses the buildnumber
+            signature: finalPath,
+            type: "resource",
+          }
+        }
+      } catch (err) {
+        logger.error(
+          "ssrGenerator [SERIOUS]: Collection of resource at " + finalPath + " failed due to missing file or unreadable",
+          {
+            errStack: err.stack,
+            errMessage: err.message,
+            path: finalPath,
+          }
+        );
+
+        this.collectionRequestsRejectedCbs[mergedID].forEach((r) => r());
+
+        throw err;
+      }
+    }
+
+    this.collectionStatuses[mergedID] = true;
+    this.collectionData[mergedID] = result.data;
+    this.collectionRequestsCbs[mergedID].forEach((r) => r(result.data));
+
+    if (forbiddenToDevKey) {
+      this.forbiddenSignature.push(finalPath + "[FORBIDDEN_PROTECTED_RESOURCE]");
+    } else {
+      this.results.push({
+        ...result,
+        path: finalPath,
+      });
+    }
+
+    return result.data;
   }
 
   public async collectSearch(idef: ItemDefinition, id: string, version: string, args: IActionSearchOptions): Promise<void> {
+    if (args.clientOnly || (args.cachePolicy && args.cachePolicy !== "none")) {
+      return null;
+    }
+
     const mergedID = idef.getQualifiedPathName() + "." + id + "." + (version || "");
 
     // request has been done and it's ready
@@ -452,6 +594,7 @@ export class Collector {
         lastModified,
         signature,
         query,
+        type: "query" as "query",
       };
       this.results.push(result);
       idef.applyValue(

@@ -133,6 +133,7 @@ export async function ssrGenerator(
       rtl: false,
       languages: config.supportedLanguages,
       forUser: null,
+      mode,
     }
 
     // standard etag with an asterisk which means this is the general version
@@ -212,6 +213,7 @@ export async function ssrGenerator(
       rtl: config.rtlLanguages.includes(language),
       languages: config.supportedLanguages,
       forUser: userAfterValidate,
+      mode,
     }
 
     // creating etag for this url
@@ -289,6 +291,7 @@ export async function ssrGenerator(
     const ssr: ISSRContextType = {
       queries: [],
       resources: {},
+      searches: [],
       user: appliedRule.forUser,
       title: "__SSR_TITLE__",
       currencyFactors: appData.cache.getServerData()[CURRENCY_FACTORS_IDENTIFIER],
@@ -443,6 +446,9 @@ export async function ssrGenerator(
 
       ssr.title = usedTitle;
       ssr.queries = collector.getQueries();
+      ssr.resources = collector.getResources();
+      ssr.searches = collector.getSearches();
+
       clientSSR.title = ssr.title;
       clientSSR.queries = ssr.queries;
 

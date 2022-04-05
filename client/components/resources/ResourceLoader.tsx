@@ -13,6 +13,7 @@ import React from "react";
 import { ISSRContextType, SSRContext } from "../../internal/providers/ssr-provider";
 import RootRetriever from "../root/RootRetriever";
 import type { IAppDataType } from "../../../server";
+import type { IResourceCollectionResult } from "../../../server/ssr/collect";
 
 /**
  * The props for the html resource loader
@@ -28,7 +29,7 @@ export interface IResourceLoaderProps {
    * to realize how this is resolved we need to support resources
    * in our SSR and request manager
    */
-  serverSideResolver?: (appData: IAppDataType) => Promise<string>;
+  serverSideResolver?: (appData: IAppDataType) => Promise<IResourceCollectionResult>;
   /**
    * the source as a string, without the /rest/resource/ part, which is
    * defined in the path
@@ -243,19 +244,6 @@ class ActualResourceLoader
     // run the load function if the src changes
     if (prevProps.src !== this.props.src || prevProps.path !== this.props.path) {
       this.load();
-    }
-  }
-  public async beforeSSRRender() {
-    let path = this.props.path || "/rest/resource/";
-    if (!path.endsWith("/")) {
-      path += "/";
-    }
-    const actualSrc = path + (this.props.src[0] === "/" ? this.props.src.substr(1) : this.props.src);
-    const value = await this.props.root.callRequestManagerResource(actualSrc, this.props.serverSideResolver);
-    this.state = {
-      content: value,
-      loading: false,
-      failed: false,
     }
   }
   public render() {

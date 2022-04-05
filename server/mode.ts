@@ -7,7 +7,7 @@
  */
 
 import express from "express";
-import { IAppDataType } from ".";
+import { IAppDataType } from ".";
 
 /**
  * Provides the value of a cookie using a very cheap method
@@ -19,7 +19,7 @@ export function getCookie(splittedCookie: string[], name: string): string {
   const foundCookie = splittedCookie.find((cookieValue) => {
     return cookieValue.startsWith(nameEQ);
   });
-  if (!foundCookie) {
+  if (!foundCookie) {
     return null;
   }
   return foundCookie.substr(nameEQ.length) || null;
