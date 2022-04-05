@@ -2236,7 +2236,7 @@ export class MaterialUISlateWrapper extends React.PureComponent<MaterialUISlateW
               "rich-text " +
               (this.props.wrapperTextEditorClassName ? " " + this.props.wrapperTextEditorClassName : "") +
               (this.props.state.isFocused ? " focused" : "")
-            } sx={this.props.wrapperSx}>
+            } sx={this.props.wrapperTextEditorSx}>
               {this.props.children}
             </Box>
             {extraChildren}

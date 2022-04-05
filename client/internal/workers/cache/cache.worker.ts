@@ -1156,7 +1156,10 @@ export default class CacheWorker {
                   // we return the true limit, because records might grow over the limit
                   limit: (records.length < searchArgs.limit ? searchArgs.limit : records.length) as number,
                   offset: 0,
-                  count: resultsCount,
+
+                  // this used to be the count given from the count event but this count is only regarding the count of
+                  // all the elements during the search, which may not be right during a filtering situation
+                  count: records.length,
                 },
               },
             };
@@ -1414,7 +1417,10 @@ export default class CacheWorker {
             records,
             limit: (records.length < searchArgs.limit ? searchArgs.limit : records.length) as number,
             offset: 0,
-            count: resultsCount,
+
+            // this used to be the count given from the count event but this count is only regarding the count of
+            // all the elements during the search, which may not be right during a filtering situation
+            count: records.length,
           },
         },
       };

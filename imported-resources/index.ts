@@ -69,28 +69,28 @@ export const countries: ICountryDataType = countriesJSON as any;
 export const currencies: ICurrencyDataType = currenciesJSON as any;
 export const languages: ILanguageDataType = languagesJSON as any;
 export const arrCountries: ICountryType[] = Object.keys(countries).map((code) => countries[code]).sort((a, b) => {
-  if (a.native > b.native) {
+  if (a.native.toLowerCase() > b.native.toLowerCase()) {
       return 1;
   }
-  if (b.native > a.native) {
+  if (b.native.toLowerCase() > a.native.toLowerCase()) {
       return -1;
   }
   return 0;
 });
 export const arrCurrencies: ICurrencyType[] = Object.keys(currencies).map((code) => currencies[code]).sort((a, b) => {
-  if (a.name > b.name) {
+  if (a.name.toLowerCase() > b.name.toLowerCase()) {
       return 1;
   }
-  if (b.name > a.name) {
+  if (b.name.toLowerCase() > a.name.toLowerCase()) {
       return -1;
   }
   return 0;
 });
 export const arrLanguages: ILanguageType[] = Object.keys(languages).map((code) => languages[code]).sort((a, b) => {
-  if (a.native > b.native) {
+  if (a.native.toLowerCase() > b.native.toLowerCase()) {
       return 1;
   }
-  if (b.native > a.native) {
+  if (b.native.toLowerCase() > a.native.toLowerCase()) {
       return -1;
   }
   return 0;
