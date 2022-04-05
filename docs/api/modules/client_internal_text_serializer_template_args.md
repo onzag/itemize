@@ -1,4 +1,4 @@
-[](../README.md) / [Exports](../modules.md) / client/internal/text/serializer/template-args
+[@onzag/itemize](../README.md) / [Modules](../modules.md) / client/internal/text/serializer/template-args
 
 # Module: client/internal/text/serializer/template-args
 
@@ -6,13 +6,13 @@
 
 ### Classes
 
-- [MutatingFunctionArg](../classes/client_internal_text_serializer_template_args.mutatingfunctionarg.md)
-- [MutatingTemplateArgs](../classes/client_internal_text_serializer_template_args.mutatingtemplateargs.md)
-- [TemplateArgs](../classes/client_internal_text_serializer_template_args.templateargs.md)
+- [MutatingFunctionArg](../classes/client_internal_text_serializer_template_args.MutatingFunctionArg.md)
+- [MutatingTemplateArgs](../classes/client_internal_text_serializer_template_args.MutatingTemplateArgs.md)
+- [TemplateArgs](../classes/client_internal_text_serializer_template_args.TemplateArgs.md)
 
 ### Interfaces
 
-- [ITemplateArgsProperties](../interfaces/client_internal_text_serializer_template_args.itemplateargsproperties.md)
+- [ITemplateArgsProperties](../interfaces/client_internal_text_serializer_template_args.ITemplateArgsProperties.md)
 
 ### Type aliases
 
@@ -24,28 +24,36 @@
 
 ### TemplateArgFunctionalWrapperFn
 
-Ƭ **TemplateArgFunctionalWrapperFn**: (`children`: (`fn`: Function) => React.ReactNode, `fnKey`: *string*) => React.ReactNode
+Ƭ **TemplateArgFunctionalWrapperFn**: (`children`: (`fn`: `Function`) => `React.ReactNode`, `fnKey`: `string`) => `React.ReactNode`
 
-#### Type declaration:
+#### Type declaration
 
-▸ (`children`: (`fn`: Function) => React.ReactNode, `fnKey`: *string*): React.ReactNode
+▸ (`children`, `fnKey`): `React.ReactNode`
 
-#### Parameters:
+##### Parameters
 
-Name | Type |
-:------ | :------ |
-`children` | (`fn`: Function) => React.ReactNode |
-`fnKey` | *string* |
+| Name | Type |
+| :------ | :------ |
+| `children` | (`fn`: `Function`) => `React.ReactNode` |
+| `fnKey` | `string` |
 
-**Returns:** React.ReactNode
+##### Returns
 
-Defined in: [client/internal/text/serializer/template-args.ts:117](https://github.com/onzag/itemize/blob/5fcde7cf/client/internal/text/serializer/template-args.ts#L117)
+`React.ReactNode`
+
+#### Defined in
+
+[client/internal/text/serializer/template-args.ts:117](https://github.com/onzag/itemize/blob/5c2808d3/client/internal/text/serializer/template-args.ts#L117)
 
 ___
 
 ### TemplateArgMutatingWrapperFn
 
-Ƭ **TemplateArgMutatingWrapperFn**: (`children`: (`newContext`: [*TemplateArgs*](../classes/client_internal_text_serializer_template_args.templateargs.md), `key?`: *string* \| *number*) => React.ReactNode) => React.ReactNode
+Ƭ **TemplateArgMutatingWrapperFn**: (`children`: (`newContext`: [`TemplateArgs`](../classes/client_internal_text_serializer_template_args.TemplateArgs.md), `key?`: `string` \| `number`) => `React.ReactNode`) => `React.ReactNode`
+
+#### Type declaration
+
+▸ (`children`): `React.ReactNode`
 
 Provides a function that returns the node that should be children of it
 in the case of setting mutating context it should be used as eg.
@@ -96,39 +104,43 @@ new TemplateArgs({
   );
 });
 
-#### Type declaration:
+##### Parameters
 
-▸ (`children`: (`newContext`: [*TemplateArgs*](../classes/client_internal_text_serializer_template_args.templateargs.md), `key?`: *string* \| *number*) => React.ReactNode): React.ReactNode
+| Name | Type |
+| :------ | :------ |
+| `children` | (`newContext`: [`TemplateArgs`](../classes/client_internal_text_serializer_template_args.TemplateArgs.md), `key?`: `string` \| `number`) => `React.ReactNode` |
 
-#### Parameters:
+##### Returns
 
-Name | Type |
-:------ | :------ |
-`children` | (`newContext`: [*TemplateArgs*](../classes/client_internal_text_serializer_template_args.templateargs.md), `key?`: *string* \| *number*) => React.ReactNode |
+`React.ReactNode`
 
-**Returns:** React.ReactNode
+#### Defined in
 
-Defined in: [client/internal/text/serializer/template-args.ts:86](https://github.com/onzag/itemize/blob/5fcde7cf/client/internal/text/serializer/template-args.ts#L86)
+[client/internal/text/serializer/template-args.ts:86](https://github.com/onzag/itemize/blob/5c2808d3/client/internal/text/serializer/template-args.ts#L86)
 
 ___
 
 ### TemplateArgStandardWrapperFn
 
-Ƭ **TemplateArgStandardWrapperFn**: (`n`: React.ReactNode) => React.ReactNode
+Ƭ **TemplateArgStandardWrapperFn**: (`n`: `React.ReactNode`) => `React.ReactNode`
+
+#### Type declaration
+
+▸ (`n`): `React.ReactNode`
 
 Just takes a node and should return a node, allows everything within that context
 to be wrapped within this
 
-#### Type declaration:
+##### Parameters
 
-▸ (`n`: React.ReactNode): React.ReactNode
+| Name | Type |
+| :------ | :------ |
+| `n` | `React.ReactNode` |
 
-#### Parameters:
+##### Returns
 
-Name | Type |
-:------ | :------ |
-`n` | React.ReactNode |
+`React.ReactNode`
 
-**Returns:** React.ReactNode
+#### Defined in
 
-Defined in: [client/internal/text/serializer/template-args.ts:34](https://github.com/onzag/itemize/blob/5fcde7cf/client/internal/text/serializer/template-args.ts#L34)
+[client/internal/text/serializer/template-args.ts:34](https://github.com/onzag/itemize/blob/5c2808d3/client/internal/text/serializer/template-args.ts#L34)

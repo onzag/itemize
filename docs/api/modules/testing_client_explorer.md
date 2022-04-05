@@ -1,4 +1,4 @@
-[](../README.md) / [Exports](../modules.md) / testing/client/explorer
+[@onzag/itemize](../README.md) / [Modules](../modules.md) / testing/client/explorer
 
 # Module: testing/client/explorer
 
@@ -6,4 +6,4 @@
 
 ### Classes
 
-- [ExplorerText](../classes/testing_client_explorer.explorertext.md)
+- [ExplorerText](../classes/testing_client_explorer.ExplorerText.md)

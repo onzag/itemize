@@ -1,4 +1,4 @@
-[](../README.md) / [Exports](../modules.md) / client/internal/text/serializer/types/paragraph
+[@onzag/itemize](../README.md) / [Modules](../modules.md) / client/internal/text/serializer/types/paragraph
 
 # Module: client/internal/text/serializer/types/paragraph
 
@@ -9,7 +9,7 @@ for the paragraph element
 
 ### Interfaces
 
-- [IParagraph](../interfaces/client_internal_text_serializer_types_paragraph.iparagraph.md)
+- [IParagraph](../interfaces/client_internal_text_serializer_types_paragraph.IParagraph.md)
 
 ### Functions
 
@@ -20,27 +20,41 @@ for the paragraph element
 
 ### STANDARD\_PARAGRAPH
 
-▸ **STANDARD_PARAGRAPH**(): [*IParagraph*](../interfaces/client_internal_text_serializer_types_paragraph.iparagraph.md)
+▸ **STANDARD_PARAGRAPH**(`text?`): [`IParagraph`](../interfaces/client_internal_text_serializer_types_paragraph.IParagraph.md)
 
-**Returns:** [*IParagraph*](../interfaces/client_internal_text_serializer_types_paragraph.iparagraph.md)
+#### Parameters
 
-Defined in: [client/internal/text/serializer/types/paragraph.ts:14](https://github.com/onzag/itemize/blob/5fcde7cf/client/internal/text/serializer/types/paragraph.ts#L14)
+| Name | Type |
+| :------ | :------ |
+| `text?` | `string` \| [`IText`](../interfaces/client_internal_text_serializer_types_text.IText.md) |
+
+#### Returns
+
+[`IParagraph`](../interfaces/client_internal_text_serializer_types_paragraph.IParagraph.md)
+
+#### Defined in
+
+[client/internal/text/serializer/types/paragraph.ts:15](https://github.com/onzag/itemize/blob/5c2808d3/client/internal/text/serializer/types/paragraph.ts#L15)
 
 ___
 
 ### registerParagraph
 
-▸ **registerParagraph**(`registry`: [*ISerializationRegistryType*](../interfaces/client_internal_text_serializer.iserializationregistrytype.md)): *void*
+▸ **registerParagraph**(`registry`): `void`
 
 The function that registers and adds the paragraph element in the given
 registry
 
-#### Parameters:
+#### Parameters
 
-Name | Type | Description |
-:------ | :------ | :------ |
-`registry` | [*ISerializationRegistryType*](../interfaces/client_internal_text_serializer.iserializationregistrytype.md) | the registry to modify    |
+| Name | Type | Description |
+| :------ | :------ | :------ |
+| `registry` | [`ISerializationRegistryType`](../interfaces/client_internal_text_serializer.ISerializationRegistryType.md) | the registry to modify |
 
-**Returns:** *void*
+#### Returns
 
-Defined in: [client/internal/text/serializer/types/paragraph.ts:27](https://github.com/onzag/itemize/blob/5fcde7cf/client/internal/text/serializer/types/paragraph.ts#L27)
+`void`
+
+#### Defined in
+
+[client/internal/text/serializer/types/paragraph.ts:36](https://github.com/onzag/itemize/blob/5c2808d3/client/internal/text/serializer/types/paragraph.ts#L36)

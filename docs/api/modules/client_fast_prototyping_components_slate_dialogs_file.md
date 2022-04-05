@@ -1,4 +1,4 @@
-[](../README.md) / [Exports](../modules.md) / client/fast-prototyping/components/slate/dialogs/file
+[@onzag/itemize](../README.md) / [Modules](../modules.md) / client/fast-prototyping/components/slate/dialogs/file
 
 # Module: client/fast-prototyping/components/slate/dialogs/file
 
@@ -8,4 +8,4 @@ Provides the dialogs that are used for the file
 
 ### Classes
 
-- [FileLoadErrorDialog](../classes/client_fast_prototyping_components_slate_dialogs_file.fileloaderrordialog.md)
+- [FileLoadErrorDialog](../classes/client_fast_prototyping_components_slate_dialogs_file.FileLoadErrorDialog.md)

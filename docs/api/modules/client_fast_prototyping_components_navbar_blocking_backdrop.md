@@ -1,4 +1,4 @@
-[](../README.md) / [Exports](../modules.md) / client/fast-prototyping/components/navbar/blocking-backdrop
+[@onzag/itemize](../README.md) / [Modules](../modules.md) / client/fast-prototyping/components/navbar/blocking-backdrop
 
 # Module: client/fast-prototyping/components/navbar/blocking-backdrop
 
@@ -6,23 +6,33 @@ The blocking backdrop is the component that appears when the app is blocked from
 
 ## Table of contents
 
-### Variables
+### Functions
 
 - [BlockingBackdrop](client_fast_prototyping_components_navbar_blocking_backdrop.md#blockingbackdrop)
 
-## Variables
+## Functions
 
 ### BlockingBackdrop
 
-• `Const` **BlockingBackdrop**: *ComponentType*<*Pick*<BlockingBackdropProps, *exclude*\> & *StyledComponentProps*<*backdrop* \| *backdropTextContainer*\>\>
+▸ **BlockingBackdrop**(`props`): `Element`
 
 The blocking backdrop fast prototyping class which appears when the app is blocked
 from an update check AppIsBlockedFromUpdate component to see when this appears
 
 it is part of the navbar by default
 
-**`param`** the props for the blocking backdrop
+#### Parameters
 
-**`returns`** a react component
+| Name | Type | Description |
+| :------ | :------ | :------ |
+| `props` | `BlockingBackdropProps` | the props for the blocking backdrop |
 
-Defined in: [client/fast-prototyping/components/navbar/blocking-backdrop.tsx:52](https://github.com/onzag/itemize/blob/5fcde7cf/client/fast-prototyping/components/navbar/blocking-backdrop.tsx#L52)
+#### Returns
+
+`Element`
+
+a react component
+
+#### Defined in
+
+[client/fast-prototyping/components/navbar/blocking-backdrop.tsx:57](https://github.com/onzag/itemize/blob/5c2808d3/client/fast-prototyping/components/navbar/blocking-backdrop.tsx#L57)

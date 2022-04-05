@@ -1,4 +1,4 @@
-[](../README.md) / [Exports](../modules.md) / client/fast-prototyping/components/snackbar
+[@onzag/itemize](../README.md) / [Modules](../modules.md) / client/fast-prototyping/components/snackbar
 
 # Module: client/fast-prototyping/components/snackbar
 
@@ -6,12 +6,6 @@ Contains the snackbar component to display success and error messages
 
 ## Table of contents
 
-### Properties
+### Classes
 
-- [default](client_fast_prototyping_components_snackbar.md#default)
-
-## Properties
-
-### default
-
-• **default**: *ComponentType*<*Pick*<ISnackbarProps, *id* \| *open* \| *onClose* \| *i18nDisplay* \| *severity*\> & *StyledComponentProps*<*error* \| *success* \| *info* \| *warning*\>\>
+- [default](../classes/client_fast_prototyping_components_snackbar.default.md)

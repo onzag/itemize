@@ -1,4 +1,4 @@
-[](../README.md) / [Exports](../modules.md) / util
+[@onzag/itemize](../README.md) / [Modules](../modules.md) / util
 
 # Module: util
 
@@ -15,8 +15,12 @@ Contains general utility functions to be used within the itemize app
 
 ### Functions
 
+- [blobToTransferrable](util.md#blobtotransferrable)
 - [capitalize](util.md#capitalize)
 - [checkFileInAccepts](util.md#checkfileinaccepts)
+- [checkIsPossiblePhoneNumber](util.md#checkispossiblephonenumber)
+- [convertCurrencyValue](util.md#convertcurrencyvalue)
+- [convertPhoneNumberToInternational](util.md#convertphonenumbertointernational)
 - [createCurrencyValue](util.md#createcurrencyvalue)
 - [createDateTimeValue](util.md#createdatetimevalue)
 - [createDateValue](util.md#createdatevalue)
@@ -27,621 +31,958 @@ Contains general utility functions to be used within the itemize app
 - [createUnitValue](util.md#createunitvalue)
 - [delayedExecutionFn](util.md#delayedexecutionfn)
 - [escapeStringRegexp](util.md#escapestringregexp)
+- [extensionToMimeType](util.md#extensiontomimetype)
 - [fileArrayURLAbsoluter](util.md#filearrayurlabsoluter)
 - [fileURLAbsoluter](util.md#fileurlabsoluter)
 - [formatDate](util.md#formatdate)
 - [formatDateTime](util.md#formatdatetime)
 - [formatTime](util.md#formattime)
+- [getFileExtension](util.md#getfileextension)
 - [getLocalizedDateFormat](util.md#getlocalizeddateformat)
 - [getLocalizedDateTimeFormat](util.md#getlocalizeddatetimeformat)
 - [getLocalizedTimeFormat](util.md#getlocalizedtimeformat)
 - [getNow](util.md#getnow)
 - [getTime](util.md#gettime)
 - [getToday](util.md#gettoday)
+- [isSupportedImage](util.md#issupportedimage)
 - [localeReplacer](util.md#localereplacer)
 - [localeReplacerToArray](util.md#localereplacertoarray)
 - [mimeTypeToExtension](util.md#mimetypetoextension)
 - [parseDate](util.md#parsedate)
 - [parseDateTime](util.md#parsedatetime)
 - [parseTime](util.md#parsetime)
+- [prettySize](util.md#prettysize)
 - [processAccepts](util.md#processaccepts)
+- [transferrableToBlob](util.md#transferrabletoblob)
 
 ## Variables
 
 ### DOMPurify
 
-• `Const` **DOMPurify**: DOMPurifyI
+• **DOMPurify**: `DOMPurifyI`
 
-Defined in: [util.ts:543](https://github.com/onzag/itemize/blob/5fcde7cf/util.ts#L543)
+#### Defined in
+
+[util.ts:803](https://github.com/onzag/itemize/blob/5c2808d3/util.ts#L803)
 
 ___
 
 ### DOMWindow
 
-• `Const` **DOMWindow**: Window & *typeof* globalThis \| DOMWindow
+• **DOMWindow**: `Window` & typeof `globalThis` \| `DOMWindow`
 
-Defined in: [util.ts:542](https://github.com/onzag/itemize/blob/5fcde7cf/util.ts#L542)
+#### Defined in
+
+[util.ts:802](https://github.com/onzag/itemize/blob/5c2808d3/util.ts#L802)
 
 ___
 
 ### JSDOM
 
-• `Const` **JSDOM**: *typeof* JSDOM
+• **JSDOM**: typeof `JSDOM` = `JSDOMDef`
 
-Defined in: [util.ts:22](https://github.com/onzag/itemize/blob/5fcde7cf/util.ts#L22)
+#### Defined in
+
+[util.ts:25](https://github.com/onzag/itemize/blob/5c2808d3/util.ts#L25)
 
 ___
 
 ### Moment
 
-• `Const` **Moment**: *typeof* moment
+• **Moment**: typeof `moment` = `MomentDef`
 
-Defined in: [util.ts:21](https://github.com/onzag/itemize/blob/5fcde7cf/util.ts#L21)
+#### Defined in
+
+[util.ts:24](https://github.com/onzag/itemize/blob/5c2808d3/util.ts#L24)
 
 ## Functions
 
+### blobToTransferrable
+
+▸ **blobToTransferrable**(`blob`): `Promise`<`any`\>
+
+Converts a blob back into the json transferrable form
+
+#### Parameters
+
+| Name | Type |
+| :------ | :------ |
+| `blob` | `File` \| `Blob` |
+
+#### Returns
+
+`Promise`<`any`\>
+
+#### Defined in
+
+[util.ts:137](https://github.com/onzag/itemize/blob/5c2808d3/util.ts#L137)
+
+___
+
 ### capitalize
 
-▸ **capitalize**(`str`: *string*): *string*
+▸ **capitalize**(`str`): `string`
 
 capitalizes a string
 
-#### Parameters:
+#### Parameters
 
-Name | Type | Description |
-:------ | :------ | :------ |
-`str` | *string* | the string to capitalize    |
+| Name | Type | Description |
+| :------ | :------ | :------ |
+| `str` | `string` | the string to capitalize |
 
-**Returns:** *string*
+#### Returns
 
-Defined in: [util.ts:58](https://github.com/onzag/itemize/blob/5fcde7cf/util.ts#L58)
+`string`
+
+#### Defined in
+
+[util.ts:214](https://github.com/onzag/itemize/blob/5c2808d3/util.ts#L214)
 
 ___
 
 ### checkFileInAccepts
 
-▸ **checkFileInAccepts**(`fileType`: *string*, `accept`: *string*): *boolean*
+▸ **checkFileInAccepts**(`fileType`, `accept`): `boolean`
 
 Checks whether the file type exists in the accept property
 
-#### Parameters:
+#### Parameters
 
-Name | Type | Description |
-:------ | :------ | :------ |
-`fileType` | *string* | the file.type   |
-`accept` | *string* | the accept property    |
+| Name | Type | Description |
+| :------ | :------ | :------ |
+| `fileType` | `string` | the file.type |
+| `accept` | `string` | the accept property |
 
-**Returns:** *boolean*
+#### Returns
 
-Defined in: [util.ts:190](https://github.com/onzag/itemize/blob/5fcde7cf/util.ts#L190)
+`boolean`
+
+#### Defined in
+
+[util.ts:346](https://github.com/onzag/itemize/blob/5c2808d3/util.ts#L346)
+
+___
+
+### checkIsPossiblePhoneNumber
+
+▸ **checkIsPossiblePhoneNumber**(`number`): `boolean`
+
+#### Parameters
+
+| Name | Type |
+| :------ | :------ |
+| `number` | `string` |
+
+#### Returns
+
+`boolean`
+
+#### Defined in
+
+[util.ts:749](https://github.com/onzag/itemize/blob/5c2808d3/util.ts#L749)
+
+___
+
+### convertCurrencyValue
+
+▸ **convertCurrencyValue**(`value`, `code`, `appData`): [`IPropertyDefinitionSupportedCurrencyType`](../interfaces/base_Root_Module_ItemDefinition_PropertyDefinition_types_currency.IPropertyDefinitionSupportedCurrencyType.md)
+
+#### Parameters
+
+| Name | Type |
+| :------ | :------ |
+| `value` | [`IPropertyDefinitionSupportedCurrencyType`](../interfaces/base_Root_Module_ItemDefinition_PropertyDefinition_types_currency.IPropertyDefinitionSupportedCurrencyType.md) |
+| `code` | `string` |
+| `appData` | [`IAppDataType`](../interfaces/server.IAppDataType.md) |
+
+#### Returns
+
+[`IPropertyDefinitionSupportedCurrencyType`](../interfaces/base_Root_Module_ItemDefinition_PropertyDefinition_types_currency.IPropertyDefinitionSupportedCurrencyType.md)
+
+#### Defined in
+
+[util.ts:774](https://github.com/onzag/itemize/blob/5c2808d3/util.ts#L774)
+
+___
+
+### convertPhoneNumberToInternational
+
+▸ **convertPhoneNumberToInternational**(`number`, `countryCode`): `string`
+
+#### Parameters
+
+| Name | Type |
+| :------ | :------ |
+| `number` | `string` |
+| `countryCode` | `string` |
+
+#### Returns
+
+`string`
+
+#### Defined in
+
+[util.ts:753](https://github.com/onzag/itemize/blob/5c2808d3/util.ts#L753)
 
 ___
 
 ### createCurrencyValue
 
-▸ **createCurrencyValue**(`value`: *number*, `currency`: *string*): [*IPropertyDefinitionSupportedCurrencyType*](../interfaces/base_root_module_itemdefinition_propertydefinition_types_currency.ipropertydefinitionsupportedcurrencytype.md)
+▸ **createCurrencyValue**(`value`, `currency`): [`IPropertyDefinitionSupportedCurrencyType`](../interfaces/base_Root_Module_ItemDefinition_PropertyDefinition_types_currency.IPropertyDefinitionSupportedCurrencyType.md)
 
 Creates a currency value to use with prefills and setters
 
-#### Parameters:
+#### Parameters
 
-Name | Type | Description |
-:------ | :------ | :------ |
-`value` | *number* | the currency numeric value   |
-`currency` | *string* | the currency itself    |
+| Name | Type | Description |
+| :------ | :------ | :------ |
+| `value` | `number` | the currency numeric value |
+| `currency` | `string` | the currency itself |
 
-**Returns:** [*IPropertyDefinitionSupportedCurrencyType*](../interfaces/base_root_module_itemdefinition_propertydefinition_types_currency.ipropertydefinitionsupportedcurrencytype.md)
+#### Returns
 
-Defined in: [util.ts:420](https://github.com/onzag/itemize/blob/5fcde7cf/util.ts#L420)
+[`IPropertyDefinitionSupportedCurrencyType`](../interfaces/base_Root_Module_ItemDefinition_PropertyDefinition_types_currency.IPropertyDefinitionSupportedCurrencyType.md)
+
+#### Defined in
+
+[util.ts:624](https://github.com/onzag/itemize/blob/5c2808d3/util.ts#L624)
 
 ___
 
 ### createDateTimeValue
 
-▸ **createDateTimeValue**(`value`: Date \| *string*): *string*
+▸ **createDateTimeValue**(`value`): `string`
 
 Creates a datetime value to be used with prefills and setters
 
-#### Parameters:
+#### Parameters
 
-Name | Type |
-:------ | :------ |
-`value` | Date \| *string* |
+| Name | Type |
+| :------ | :------ |
+| `value` | `string` \| `Date` |
 
-**Returns:** *string*
+#### Returns
 
-Defined in: [util.ts:439](https://github.com/onzag/itemize/blob/5fcde7cf/util.ts#L439)
+`string`
+
+#### Defined in
+
+[util.ts:643](https://github.com/onzag/itemize/blob/5c2808d3/util.ts#L643)
 
 ___
 
 ### createDateValue
 
-▸ **createDateValue**(`value`: Date \| *string*): *string*
+▸ **createDateValue**(`value`): `string`
 
 Creates a date value to be used with prefills and setters
 
-#### Parameters:
+#### Parameters
 
-Name | Type |
-:------ | :------ |
-`value` | Date \| *string* |
+| Name | Type |
+| :------ | :------ |
+| `value` | `string` \| `Date` |
 
-**Returns:** *string*
+#### Returns
 
-Defined in: [util.ts:431](https://github.com/onzag/itemize/blob/5fcde7cf/util.ts#L431)
+`string`
+
+#### Defined in
+
+[util.ts:635](https://github.com/onzag/itemize/blob/5c2808d3/util.ts#L635)
 
 ___
 
 ### createFakeFileValue
 
-▸ **createFakeFileValue**(`id`: *string*, `name`: *string*, `url`: *string*, `type?`: *string*, `size?`: *number*): [*PropertyDefinitionSupportedFileType*](base_root_module_itemdefinition_propertydefinition_types_file.md#propertydefinitionsupportedfiletype)
+▸ **createFakeFileValue**(`id`, `name`, `url`, `type?`, `size?`): [`PropertyDefinitionSupportedFileType`](base_Root_Module_ItemDefinition_PropertyDefinition_types_file.md#propertydefinitionsupportedfiletype)
 
 A fake file value that you should not submit as it's an invalid value
 you can use this to setup a placeholder of sorts
 
-#### Parameters:
+#### Parameters
 
-Name | Type |
-:------ | :------ |
-`id` | *string* |
-`name` | *string* |
-`url` | *string* |
-`type?` | *string* |
-`size?` | *number* |
+| Name | Type |
+| :------ | :------ |
+| `id` | `string` |
+| `name` | `string` |
+| `url` | `string` |
+| `type?` | `string` |
+| `size?` | `number` |
 
-**Returns:** [*PropertyDefinitionSupportedFileType*](base_root_module_itemdefinition_propertydefinition_types_file.md#propertydefinitionsupportedfiletype)
+#### Returns
 
-Defined in: [util.ts:494](https://github.com/onzag/itemize/blob/5fcde7cf/util.ts#L494)
+[`PropertyDefinitionSupportedFileType`](base_Root_Module_ItemDefinition_PropertyDefinition_types_file.md#propertydefinitionsupportedfiletype)
+
+#### Defined in
+
+[util.ts:698](https://github.com/onzag/itemize/blob/5c2808d3/util.ts#L698)
 
 ___
 
 ### createLocationValue
 
-▸ **createLocationValue**(`txt`: *string*, `atxt`: *string*, `lat?`: *number*, `lng?`: *number*, `id?`: *string*): [*IPropertyDefinitionSupportedLocationType*](../interfaces/base_root_module_itemdefinition_propertydefinition_types_location.ipropertydefinitionsupportedlocationtype.md)
+▸ **createLocationValue**(`txt`, `atxt`, `lat?`, `lng?`, `id?`): [`IPropertyDefinitionSupportedLocationType`](../interfaces/base_Root_Module_ItemDefinition_PropertyDefinition_types_location.IPropertyDefinitionSupportedLocationType.md)
 
 Creates an location value to be used with prefills and setters
 
-#### Parameters:
+#### Parameters
 
-Name | Type | Description |
-:------ | :------ | :------ |
-`txt` | *string* |  |
-`atxt` | *string* |  |
-`lat?` | *number* |  |
-`lng?` | *number* |  |
-`id?` | *string* | non necessary if not planning to submit    |
+| Name | Type | Description |
+| :------ | :------ | :------ |
+| `txt` | `string` |  |
+| `atxt` | `string` |  |
+| `lat?` | `number` |  |
+| `lng?` | `number` |  |
+| `id?` | `string` | non necessary if not planning to submit |
 
-**Returns:** [*IPropertyDefinitionSupportedLocationType*](../interfaces/base_root_module_itemdefinition_propertydefinition_types_location.ipropertydefinitionsupportedlocationtype.md)
+#### Returns
 
-Defined in: [util.ts:475](https://github.com/onzag/itemize/blob/5fcde7cf/util.ts#L475)
+[`IPropertyDefinitionSupportedLocationType`](../interfaces/base_Root_Module_ItemDefinition_PropertyDefinition_types_location.IPropertyDefinitionSupportedLocationType.md)
+
+#### Defined in
+
+[util.ts:679](https://github.com/onzag/itemize/blob/5c2808d3/util.ts#L679)
 
 ___
 
 ### createRealFileValue
 
-▸ **createRealFileValue**(`id`: *string*, `file`: File, `objectURL`: *string*, `imageMetadataGeneratorInfo?`: { `height`: *number* ; `property`: [*default*](../classes/base_root_module_itemdefinition_propertydefinition.default.md) ; `width`: *number*  }): [*PropertyDefinitionSupportedFileType*](base_root_module_itemdefinition_propertydefinition_types_file.md#propertydefinitionsupportedfiletype)
+▸ **createRealFileValue**(`id`, `file`, `objectURL`, `imageMetadataGeneratorInfo?`): [`PropertyDefinitionSupportedFileType`](base_Root_Module_ItemDefinition_PropertyDefinition_types_file.md#propertydefinitionsupportedfiletype)
 
 Creates a real image value to prefill with that can be used to generate
 values that can be submitted
 
-#### Parameters:
+#### Parameters
 
-Name | Type |
-:------ | :------ |
-`id` | *string* |
-`file` | File |
-`objectURL` | *string* |
-`imageMetadataGeneratorInfo?` | *object* |
-`imageMetadataGeneratorInfo.height` | *number* |
-`imageMetadataGeneratorInfo.property` | [*default*](../classes/base_root_module_itemdefinition_propertydefinition.default.md) |
-`imageMetadataGeneratorInfo.width` | *number* |
+| Name | Type |
+| :------ | :------ |
+| `id` | `string` |
+| `file` | `File` |
+| `objectURL` | `string` |
+| `imageMetadataGeneratorInfo?` | `Object` |
+| `imageMetadataGeneratorInfo.height` | `number` |
+| `imageMetadataGeneratorInfo.property` | [`default`](../classes/base_Root_Module_ItemDefinition_PropertyDefinition.default.md) |
+| `imageMetadataGeneratorInfo.width` | `number` |
 
-**Returns:** [*PropertyDefinitionSupportedFileType*](base_root_module_itemdefinition_propertydefinition_types_file.md#propertydefinitionsupportedfiletype)
+#### Returns
 
-Defined in: [util.ts:513](https://github.com/onzag/itemize/blob/5fcde7cf/util.ts#L513)
+[`PropertyDefinitionSupportedFileType`](base_Root_Module_ItemDefinition_PropertyDefinition_types_file.md#propertydefinitionsupportedfiletype)
+
+#### Defined in
+
+[util.ts:717](https://github.com/onzag/itemize/blob/5c2808d3/util.ts#L717)
 
 ___
 
 ### createTimeValue
 
-▸ **createTimeValue**(`value`: Date \| *string*): *string*
+▸ **createTimeValue**(`value`): `string`
 
 Creates a time value to be used with prefills and setters
 
-#### Parameters:
+#### Parameters
 
-Name | Type |
-:------ | :------ |
-`value` | Date \| *string* |
+| Name | Type |
+| :------ | :------ |
+| `value` | `string` \| `Date` |
 
-**Returns:** *string*
+#### Returns
 
-Defined in: [util.ts:447](https://github.com/onzag/itemize/blob/5fcde7cf/util.ts#L447)
+`string`
+
+#### Defined in
+
+[util.ts:651](https://github.com/onzag/itemize/blob/5c2808d3/util.ts#L651)
 
 ___
 
 ### createUnitValue
 
-▸ **createUnitValue**(`value`: *number*, `unit`: *string*, `normalizedUnit`: *string*): [*IPropertyDefinitionSupportedUnitType*](../interfaces/base_root_module_itemdefinition_propertydefinition_types_unit.ipropertydefinitionsupportedunittype.md)
+▸ **createUnitValue**(`value`, `unit`, `normalizedUnit`): [`IPropertyDefinitionSupportedUnitType`](../interfaces/base_Root_Module_ItemDefinition_PropertyDefinition_types_unit.IPropertyDefinitionSupportedUnitType.md)
 
 Creates an unit value to be used with prefills and setters
 
-#### Parameters:
+#### Parameters
 
-Name | Type |
-:------ | :------ |
-`value` | *number* |
-`unit` | *string* |
-`normalizedUnit` | *string* |
+| Name | Type |
+| :------ | :------ |
+| `value` | `number` |
+| `unit` | `string` |
+| `normalizedUnit` | `string` |
 
-**Returns:** [*IPropertyDefinitionSupportedUnitType*](../interfaces/base_root_module_itemdefinition_propertydefinition_types_unit.ipropertydefinitionsupportedunittype.md)
+#### Returns
 
-Defined in: [util.ts:457](https://github.com/onzag/itemize/blob/5fcde7cf/util.ts#L457)
+[`IPropertyDefinitionSupportedUnitType`](../interfaces/base_Root_Module_ItemDefinition_PropertyDefinition_types_unit.IPropertyDefinitionSupportedUnitType.md)
+
+#### Defined in
+
+[util.ts:661](https://github.com/onzag/itemize/blob/5c2808d3/util.ts#L661)
 
 ___
 
 ### delayedExecutionFn
 
-▸ **delayedExecutionFn**(`fn`: *any*, `id`: *string*, `ms`: *number*): TimedExecutedFn
+▸ **delayedExecutionFn**(`fn`, `id`, `ms`): `TimedExecutedFn`
 
 Delays the execution of a function by given milliseconds
 ensure these do not stack together
 
-#### Parameters:
+#### Parameters
 
-Name | Type | Description |
-:------ | :------ | :------ |
-`fn` | *any* | the function in question   |
-`id` | *string* | the id to use   |
-`ms` | *number* | the milliseconds delay before submitting   |
+| Name | Type | Description |
+| :------ | :------ | :------ |
+| `fn` | `any` | the function in question |
+| `id` | `string` | the id to use |
+| `ms` | `number` | the milliseconds delay before submitting |
 
-**Returns:** TimedExecutedFn
+#### Returns
+
+`TimedExecutedFn`
 
 a function without parameters
 
-Defined in: [util.ts:41](https://github.com/onzag/itemize/blob/5fcde7cf/util.ts#L41)
+#### Defined in
+
+[util.ts:197](https://github.com/onzag/itemize/blob/5c2808d3/util.ts#L197)
 
 ___
 
 ### escapeStringRegexp
 
-▸ **escapeStringRegexp**(`str`: *string*): *string*
+▸ **escapeStringRegexp**(`str`): `string`
 
 Escapes a string into a regex
 
-#### Parameters:
+#### Parameters
 
-Name | Type | Description |
-:------ | :------ | :------ |
-`str` | *string* | the string to escape   |
+| Name | Type | Description |
+| :------ | :------ | :------ |
+| `str` | `string` | the string to escape |
 
-**Returns:** *string*
+#### Returns
+
+`string`
 
 a string that is regex ready
 
-Defined in: [util.ts:103](https://github.com/onzag/itemize/blob/5fcde7cf/util.ts#L103)
+#### Defined in
+
+[util.ts:259](https://github.com/onzag/itemize/blob/5c2808d3/util.ts#L259)
+
+___
+
+### extensionToMimeType
+
+▸ **extensionToMimeType**(`ext`): `string`
+
+Gives the mime type based on a extension
+
+#### Parameters
+
+| Name | Type |
+| :------ | :------ |
+| `ext` | `string` |
+
+#### Returns
+
+`string`
+
+#### Defined in
+
+[util.ts:369](https://github.com/onzag/itemize/blob/5c2808d3/util.ts#L369)
 
 ___
 
 ### fileArrayURLAbsoluter
 
-▸ **fileArrayURLAbsoluter**(`domain`: *string*, `containerHostnamePrefixes`: { [key: string]: *string*;  }, `files`: [*IGQLFile*](../interfaces/gql_querier.igqlfile.md)[], `itemDefinition`: [*default*](../classes/base_root_module_itemdefinition.default.md), `id`: *string*, `version`: *string*, `containerId`: *string*, `include`: [*default*](../classes/base_root_module_itemdefinition_include.default.md), `property`: [*default*](../classes/base_root_module_itemdefinition_propertydefinition.default.md), `cacheable`: *boolean*): [*IGQLFile*](../interfaces/gql_querier.igqlfile.md)[]
+▸ **fileArrayURLAbsoluter**(`domain`, `containerHostnamePrefixes`, `files`, `itemDefinition`, `id`, `version`, `containerId`, `include`, `property`, `cacheable`): [`IGQLFile`](../interfaces/gql_querier.IGQLFile.md)[]
 
 Converts an array of files to its absolute url counterpart
 
-#### Parameters:
+#### Parameters
 
-Name | Type | Description |
-:------ | :------ | :------ |
-`domain` | *string* | the domain that is being used according to the env   |
-`containerHostnamePrefixes` | *object* | the containers hostnames prefixes that allow to identify the url prefix to access a given container   |
-`files` | [*IGQLFile*](../interfaces/gql_querier.igqlfile.md)[] | the array of files to convert   |
-`itemDefinition` | [*default*](../classes/base_root_module_itemdefinition.default.md) | the item definition this file is in and stored as, it is required even for prop extensions, because every stored value has an item definition attached to it   |
-`id` | *string* | the id   |
-`version` | *string* | the version   |
-`containerId` | *string* | the container id this file was found to be in   |
-`include` | [*default*](../classes/base_root_module_itemdefinition_include.default.md) | the include (or null)   |
-`property` | [*default*](../classes/base_root_module_itemdefinition_propertydefinition.default.md) | the property it came from   |
-`cacheable` | *boolean* | whether the resulting urls should be cacheable   |
+| Name | Type | Description |
+| :------ | :------ | :------ |
+| `domain` | `string` | the domain that is being used according to the env |
+| `containerHostnamePrefixes` | `Object` | the containers hostnames prefixes that allow to identify the url prefix to access a given container |
+| `files` | [`IGQLFile`](../interfaces/gql_querier.IGQLFile.md)[] | the array of files to convert |
+| `itemDefinition` | [`default`](../classes/base_Root_Module_ItemDefinition.default.md) | the item definition this file is in and stored as, it is required even for prop extensions, because every stored value has an item definition attached to it |
+| `id` | `string` | the id |
+| `version` | `string` | the version |
+| `containerId` | `string` | the container id this file was found to be in |
+| `include` | [`default`](../classes/base_Root_Module_ItemDefinition_Include.default.md) | the include (or null) |
+| `property` | [`default`](../classes/base_Root_Module_ItemDefinition_PropertyDefinition.default.md) | the property it came from |
+| `cacheable` | `boolean` | whether the resulting urls should be cacheable |
 
-**Returns:** [*IGQLFile*](../interfaces/gql_querier.igqlfile.md)[]
+#### Returns
+
+[`IGQLFile`](../interfaces/gql_querier.IGQLFile.md)[]
 
 a new array of files
 
-Defined in: [util.ts:392](https://github.com/onzag/itemize/blob/5fcde7cf/util.ts#L392)
+#### Defined in
+
+[util.ts:596](https://github.com/onzag/itemize/blob/5c2808d3/util.ts#L596)
 
 ___
 
 ### fileURLAbsoluter
 
-▸ **fileURLAbsoluter**(`domain`: *string*, `containerHostnamePrefixes`: { [key: string]: *string*;  }, `file`: [*IGQLFile*](../interfaces/gql_querier.igqlfile.md), `itemDefinition`: [*default*](../classes/base_root_module_itemdefinition.default.md), `id`: *string*, `version`: *string*, `containerId`: *string*, `include`: [*default*](../classes/base_root_module_itemdefinition_include.default.md), `property`: [*default*](../classes/base_root_module_itemdefinition_propertydefinition.default.md), `cacheable`: *boolean*): [*IGQLFile*](../interfaces/gql_querier.igqlfile.md)
+▸ **fileURLAbsoluter**(`domain`, `containerHostnamePrefixes`, `file`, `itemDefinition`, `id`, `version`, `containerId`, `include`, `property`, `cacheable`): [`IGQLFile`](../interfaces/gql_querier.IGQLFile.md)
 
 Converts a file to its absolute URL counterpart
 
-#### Parameters:
+#### Parameters
 
-Name | Type | Description |
-:------ | :------ | :------ |
-`domain` | *string* | the domain that is being used according to the env   |
-`containerHostnamePrefixes` | *object* | the containers hostnames prefixes that allow to identify the url prefix to access a given container   |
-`file` | [*IGQLFile*](../interfaces/gql_querier.igqlfile.md) | the file to convert   |
-`itemDefinition` | [*default*](../classes/base_root_module_itemdefinition.default.md) | the item definition this file is in and stored as, it is required even for prop extensions, because every stored value has an item definition attached to it   |
-`id` | *string* | the id   |
-`version` | *string* | the version   |
-`containerId` | *string* | the container id this file was found to be in   |
-`include` | [*default*](../classes/base_root_module_itemdefinition_include.default.md) | the include (or null)   |
-`property` | [*default*](../classes/base_root_module_itemdefinition_propertydefinition.default.md) | the property it came from   |
-`cacheable` | *boolean* | whether the resulting url should be cached   |
+| Name | Type | Description |
+| :------ | :------ | :------ |
+| `domain` | `string` | the domain that is being used according to the env |
+| `containerHostnamePrefixes` | `Object` | the containers hostnames prefixes that allow to identify the url prefix to access a given container |
+| `file` | [`IGQLFile`](../interfaces/gql_querier.IGQLFile.md) | the file to convert |
+| `itemDefinition` | [`default`](../classes/base_Root_Module_ItemDefinition.default.md) | the item definition this file is in and stored as, it is required even for prop extensions, because every stored value has an item definition attached to it |
+| `id` | `string` | the id |
+| `version` | `string` | the version |
+| `containerId` | `string` | the container id this file was found to be in |
+| `include` | [`default`](../classes/base_Root_Module_ItemDefinition_Include.default.md) | the include (or null) |
+| `property` | [`default`](../classes/base_Root_Module_ItemDefinition_PropertyDefinition.default.md) | the property it came from |
+| `cacheable` | `boolean` | whether the resulting url should be cached |
 
-**Returns:** [*IGQLFile*](../interfaces/gql_querier.igqlfile.md)
+#### Returns
+
+[`IGQLFile`](../interfaces/gql_querier.IGQLFile.md)
 
 a new IGQLFile but absolute
 
-Defined in: [util.ts:318](https://github.com/onzag/itemize/blob/5fcde7cf/util.ts#L318)
+#### Defined in
+
+[util.ts:522](https://github.com/onzag/itemize/blob/5c2808d3/util.ts#L522)
 
 ___
 
 ### formatDate
 
-▸ **formatDate**(`locale`: *string*, `date`: *string*): *string*
+▸ **formatDate**(`locale`, `date`): `string`
 
-#### Parameters:
+#### Parameters
 
-Name | Type |
-:------ | :------ |
-`locale` | *string* |
-`date` | *string* |
+| Name | Type |
+| :------ | :------ |
+| `locale` | `string` |
+| `date` | `string` |
 
-**Returns:** *string*
+#### Returns
 
-Defined in: [util.ts:275](https://github.com/onzag/itemize/blob/5fcde7cf/util.ts#L275)
+`string`
+
+#### Defined in
+
+[util.ts:479](https://github.com/onzag/itemize/blob/5c2808d3/util.ts#L479)
 
 ___
 
 ### formatDateTime
 
-▸ **formatDateTime**(`locale`: *string*, `datetime`: *string*): *string*
+▸ **formatDateTime**(`locale`, `datetime`): `string`
 
-#### Parameters:
+#### Parameters
 
-Name | Type |
-:------ | :------ |
-`locale` | *string* |
-`datetime` | *string* |
+| Name | Type |
+| :------ | :------ |
+| `locale` | `string` |
+| `datetime` | `string` |
 
-**Returns:** *string*
+#### Returns
 
-Defined in: [util.ts:285](https://github.com/onzag/itemize/blob/5fcde7cf/util.ts#L285)
+`string`
+
+#### Defined in
+
+[util.ts:489](https://github.com/onzag/itemize/blob/5c2808d3/util.ts#L489)
 
 ___
 
 ### formatTime
 
-▸ **formatTime**(`locale`: *string*, `time`: *string*): *string*
+▸ **formatTime**(`locale`, `time`): `string`
 
-#### Parameters:
+#### Parameters
 
-Name | Type |
-:------ | :------ |
-`locale` | *string* |
-`time` | *string* |
+| Name | Type |
+| :------ | :------ |
+| `locale` | `string` |
+| `time` | `string` |
 
-**Returns:** *string*
+#### Returns
 
-Defined in: [util.ts:280](https://github.com/onzag/itemize/blob/5fcde7cf/util.ts#L280)
+`string`
+
+#### Defined in
+
+[util.ts:484](https://github.com/onzag/itemize/blob/5c2808d3/util.ts#L484)
+
+___
+
+### getFileExtension
+
+▸ **getFileExtension**(`fileName`): `string`
+
+Gets the extension from a given file name
+
+#### Parameters
+
+| Name | Type |
+| :------ | :------ |
+| `fileName` | `string` |
+
+#### Returns
+
+`string`
+
+#### Defined in
+
+[util.ts:381](https://github.com/onzag/itemize/blob/5c2808d3/util.ts#L381)
 
 ___
 
 ### getLocalizedDateFormat
 
-▸ **getLocalizedDateFormat**(`locale`: *string*): *any*
+▸ **getLocalizedDateFormat**(`locale`): `any`
 
-#### Parameters:
+#### Parameters
 
-Name | Type |
-:------ | :------ |
-`locale` | *string* |
+| Name | Type |
+| :------ | :------ |
+| `locale` | `string` |
 
-**Returns:** *any*
+#### Returns
 
-Defined in: [util.ts:265](https://github.com/onzag/itemize/blob/5fcde7cf/util.ts#L265)
+`any`
+
+#### Defined in
+
+[util.ts:469](https://github.com/onzag/itemize/blob/5c2808d3/util.ts#L469)
 
 ___
 
 ### getLocalizedDateTimeFormat
 
-▸ **getLocalizedDateTimeFormat**(`locale`: *string*): *string*
+▸ **getLocalizedDateTimeFormat**(`locale`): `string`
 
-#### Parameters:
+#### Parameters
 
-Name | Type |
-:------ | :------ |
-`locale` | *string* |
+| Name | Type |
+| :------ | :------ |
+| `locale` | `string` |
 
-**Returns:** *string*
+#### Returns
 
-Defined in: [util.ts:271](https://github.com/onzag/itemize/blob/5fcde7cf/util.ts#L271)
+`string`
+
+#### Defined in
+
+[util.ts:475](https://github.com/onzag/itemize/blob/5c2808d3/util.ts#L475)
 
 ___
 
 ### getLocalizedTimeFormat
 
-▸ **getLocalizedTimeFormat**(`locale`: *string*): *any*
+▸ **getLocalizedTimeFormat**(`locale`): `any`
 
-#### Parameters:
+#### Parameters
 
-Name | Type |
-:------ | :------ |
-`locale` | *string* |
+| Name | Type |
+| :------ | :------ |
+| `locale` | `string` |
 
-**Returns:** *any*
+#### Returns
 
-Defined in: [util.ts:259](https://github.com/onzag/itemize/blob/5fcde7cf/util.ts#L259)
+`any`
+
+#### Defined in
+
+[util.ts:463](https://github.com/onzag/itemize/blob/5c2808d3/util.ts#L463)
 
 ___
 
 ### getNow
 
-▸ **getNow**(): *string*
+▸ **getNow**(): `string`
 
 Provides now
 
-**Returns:** *string*
+#### Returns
 
-Defined in: [util.ts:83](https://github.com/onzag/itemize/blob/5fcde7cf/util.ts#L83)
+`string`
+
+#### Defined in
+
+[util.ts:239](https://github.com/onzag/itemize/blob/5c2808d3/util.ts#L239)
 
 ___
 
 ### getTime
 
-▸ **getTime**(): *string*
+▸ **getTime**(): `string`
 
 Provides time
 
-**Returns:** *string*
+#### Returns
 
-Defined in: [util.ts:90](https://github.com/onzag/itemize/blob/5fcde7cf/util.ts#L90)
+`string`
+
+#### Defined in
+
+[util.ts:246](https://github.com/onzag/itemize/blob/5c2808d3/util.ts#L246)
 
 ___
 
 ### getToday
 
-▸ **getToday**(): *string*
+▸ **getToday**(): `string`
 
 Provides today
 
-**Returns:** *string*
+#### Returns
 
-Defined in: [util.ts:76](https://github.com/onzag/itemize/blob/5fcde7cf/util.ts#L76)
+`string`
+
+#### Defined in
+
+[util.ts:232](https://github.com/onzag/itemize/blob/5c2808d3/util.ts#L232)
+
+___
+
+### isSupportedImage
+
+▸ **isSupportedImage**(`mimeType`): `boolean`
+
+Specifies whether the given mime type is of a supported image
+
+#### Parameters
+
+| Name | Type |
+| :------ | :------ |
+| `mimeType` | `string` |
+
+#### Returns
+
+`boolean`
+
+#### Defined in
+
+[util.ts:391](https://github.com/onzag/itemize/blob/5c2808d3/util.ts#L391)
 
 ___
 
 ### localeReplacer
 
-▸ **localeReplacer**(`str`: *string*, ...`args`: *any*[]): *string*
+▸ **localeReplacer**(`str`, ...`args`): `string`
 
 Replaces a string to another for locale usage
 eg. `"hello {0} world {1}"` with `["foo", "bar"]` become
 `"hello foo world bar"`
 
-#### Parameters:
+TODO build cache here this is way too expensive to be running
+all the time
 
-Name | Type | Description |
-:------ | :------ | :------ |
-`str` | *string* | the string   |
-`...args` | *any*[] | the args to pass   |
+#### Parameters
 
-**Returns:** *string*
+| Name | Type | Description |
+| :------ | :------ | :------ |
+| `str` | `string` | the string |
+| `...args` | `any`[] | the args to pass |
+
+#### Returns
+
+`string`
 
 a string
 
-Defined in: [util.ts:216](https://github.com/onzag/itemize/blob/5fcde7cf/util.ts#L216)
+#### Defined in
+
+[util.ts:416](https://github.com/onzag/itemize/blob/5c2808d3/util.ts#L416)
 
 ___
 
 ### localeReplacerToArray
 
-▸ **localeReplacerToArray**(`str`: *string*, ...`args`: *any*[]): *any*[]
+▸ **localeReplacerToArray**(`str`, ...`args`): `any`[]
 
 Replaces a string to an array of whatever it was sent
 for locale usage
 eg. `"hello {0} world {1}"` with `[<span>foo</span>, <span>bar</span>]` become
 `["hello ",<span>foo</span>," world ",<span>bar</span>]`
 
-#### Parameters:
+TODO build cache here this is way too expensive to be running
+all the time
 
-Name | Type | Description |
-:------ | :------ | :------ |
-`str` | *string* | the string   |
-`...args` | *any*[] | the args to pass   |
+#### Parameters
 
-**Returns:** *any*[]
+| Name | Type | Description |
+| :------ | :------ | :------ |
+| `str` | `string` | the string |
+| `...args` | `any`[] | the args to pass |
+
+#### Returns
+
+`any`[]
 
 a an array
 
-Defined in: [util.ts:236](https://github.com/onzag/itemize/blob/5fcde7cf/util.ts#L236)
+#### Defined in
+
+[util.ts:440](https://github.com/onzag/itemize/blob/5c2808d3/util.ts#L440)
 
 ___
 
 ### mimeTypeToExtension
 
-▸ **mimeTypeToExtension**(`str`: *string*): *any*
+▸ **mimeTypeToExtension**(`str`): `any`
 
 Converts a mime type to an extension using a known extension list
 
-#### Parameters:
+#### Parameters
 
-Name | Type | Description |
-:------ | :------ | :------ |
-`str` | *string* | the string that represents the mime type   |
+| Name | Type | Description |
+| :------ | :------ | :------ |
+| `str` | `string` | the string that represents the mime type |
 
-**Returns:** *any*
+#### Returns
+
+`any`
 
 an extension or txt if it doesn't know
 
-Defined in: [util.ts:200](https://github.com/onzag/itemize/blob/5fcde7cf/util.ts#L200)
+#### Defined in
+
+[util.ts:356](https://github.com/onzag/itemize/blob/5c2808d3/util.ts#L356)
 
 ___
 
 ### parseDate
 
-▸ **parseDate**(`date`: *string*): Moment
+▸ **parseDate**(`date`): `Moment`
 
-#### Parameters:
+#### Parameters
 
-Name | Type |
-:------ | :------ |
-`date` | *string* |
+| Name | Type |
+| :------ | :------ |
+| `date` | `string` |
 
-**Returns:** Moment
+#### Returns
 
-Defined in: [util.ts:290](https://github.com/onzag/itemize/blob/5fcde7cf/util.ts#L290)
+`Moment`
+
+#### Defined in
+
+[util.ts:494](https://github.com/onzag/itemize/blob/5c2808d3/util.ts#L494)
 
 ___
 
 ### parseDateTime
 
-▸ **parseDateTime**(`datetime`: *string*): Moment
+▸ **parseDateTime**(`datetime`): `Moment`
 
-#### Parameters:
+#### Parameters
 
-Name | Type |
-:------ | :------ |
-`datetime` | *string* |
+| Name | Type |
+| :------ | :------ |
+| `datetime` | `string` |
 
-**Returns:** Moment
+#### Returns
 
-Defined in: [util.ts:298](https://github.com/onzag/itemize/blob/5fcde7cf/util.ts#L298)
+`Moment`
+
+#### Defined in
+
+[util.ts:502](https://github.com/onzag/itemize/blob/5c2808d3/util.ts#L502)
 
 ___
 
 ### parseTime
 
-▸ **parseTime**(`time`: *string*): Moment
+▸ **parseTime**(`time`): `Moment`
 
-#### Parameters:
+#### Parameters
 
-Name | Type |
-:------ | :------ |
-`time` | *string* |
+| Name | Type |
+| :------ | :------ |
+| `time` | `string` |
 
-**Returns:** Moment
+#### Returns
 
-Defined in: [util.ts:294](https://github.com/onzag/itemize/blob/5fcde7cf/util.ts#L294)
+`Moment`
+
+#### Defined in
+
+[util.ts:498](https://github.com/onzag/itemize/blob/5c2808d3/util.ts#L498)
+
+___
+
+### prettySize
+
+▸ **prettySize**(`size`): `string`
+
+Basically an extension to pretty bytes
+
+#### Parameters
+
+| Name | Type |
+| :------ | :------ |
+| `size` | `number` |
+
+#### Returns
+
+`string`
+
+#### Defined in
+
+[util.ts:400](https://github.com/onzag/itemize/blob/5c2808d3/util.ts#L400)
 
 ___
 
 ### processAccepts
 
-▸ **processAccepts**(`accept`: *string*, `isExpectingImages?`: *boolean*): *string*
+▸ **processAccepts**(`accept`, `isExpectingImages?`): `string`
 
-#### Parameters:
+#### Parameters
 
-Name | Type |
-:------ | :------ |
-`accept` | *string* |
-`isExpectingImages?` | *boolean* |
+| Name | Type |
+| :------ | :------ |
+| `accept` | `string` |
+| `isExpectingImages?` | `boolean` |
 
-**Returns:** *string*
+#### Returns
 
-Defined in: [util.ts:178](https://github.com/onzag/itemize/blob/5fcde7cf/util.ts#L178)
+`string`
+
+#### Defined in
+
+[util.ts:334](https://github.com/onzag/itemize/blob/5c2808d3/util.ts#L334)
+
+___
+
+### transferrableToBlob
+
+▸ **transferrableToBlob**(`transferrable`): `Blob`
+
+Converts a transferrable object, that contains blobs within its structure
+to a simple blob that contains everything including these blobs
+
+#### Parameters
+
+| Name | Type | Description |
+| :------ | :------ | :------ |
+| `transferrable` | `any` | the transferrable object |
+
+#### Returns
+
+`Blob`
+
+a blob that contains everything
+
+#### Defined in
+
+[util.ts:109](https://github.com/onzag/itemize/blob/5c2808d3/util.ts#L109)

@@ -1,4 +1,4 @@
-[](../README.md) / [Exports](../modules.md) / server/token
+[@onzag/itemize](../README.md) / [Modules](../modules.md) / server/token
 
 # Module: server/token
 
@@ -20,69 +20,81 @@ can be able to communicate with an itemize server easily
 
 ### jwtDecode
 
-▸ **jwtDecode**<T\>(`token`: *string*, `options?`: jwt.DecodeOptions): T
+▸ **jwtDecode**<`T`\>(`token`, `options?`): `T`
 
 Decode a JWT token and does not verify whether it's valid
 
-#### Type parameters:
+#### Type parameters
 
-Name |
-:------ |
-`T` |
+| Name |
+| :------ |
+| `T` |
 
-#### Parameters:
+#### Parameters
 
-Name | Type | Description |
-:------ | :------ | :------ |
-`token` | *string* | the token in question   |
-`options?` | jwt.DecodeOptions | the options    |
+| Name | Type | Description |
+| :------ | :------ | :------ |
+| `token` | `string` | the token in question |
+| `options?` | `DecodeOptions` | the options |
 
-**Returns:** T
+#### Returns
 
-Defined in: [server/token.ts:61](https://github.com/onzag/itemize/blob/5fcde7cf/server/token.ts#L61)
+`T`
+
+#### Defined in
+
+[server/token.ts:61](https://github.com/onzag/itemize/blob/5c2808d3/server/token.ts#L61)
 
 ___
 
 ### jwtSign
 
-▸ **jwtSign**(`payload`: *string* \| *object* \| Buffer, `secretOrPrivateKey`: jwt.Secret, `options?`: jwt.SignOptions): *Promise*<string\>
+▸ **jwtSign**(`payload`, `secretOrPrivateKey`, `options?`): `Promise`<`string`\>
 
 Sign a payload
 
-#### Parameters:
+#### Parameters
 
-Name | Type | Description |
-:------ | :------ | :------ |
-`payload` | *string* \| *object* \| Buffer | the payload to sign   |
-`secretOrPrivateKey` | jwt.Secret | the secret in question   |
-`options?` | jwt.SignOptions | the options    |
+| Name | Type | Description |
+| :------ | :------ | :------ |
+| `payload` | `string` \| `object` \| `Buffer` | the payload to sign |
+| `secretOrPrivateKey` | `Secret` | the secret in question |
+| `options?` | `SignOptions` | the options |
 
-**Returns:** *Promise*<string\>
+#### Returns
 
-Defined in: [server/token.ts:18](https://github.com/onzag/itemize/blob/5fcde7cf/server/token.ts#L18)
+`Promise`<`string`\>
+
+#### Defined in
+
+[server/token.ts:18](https://github.com/onzag/itemize/blob/5c2808d3/server/token.ts#L18)
 
 ___
 
 ### jwtVerify
 
-▸ **jwtVerify**<T\>(`token`: *string*, `secretOrPublicKey`: jwt.Secret, `options?`: jwt.VerifyOptions): *Promise*<T\>
+▸ **jwtVerify**<`T`\>(`token`, `secretOrPublicKey`, `options?`): `Promise`<`T`\>
 
 Verify and decode a key
 
-#### Type parameters:
+#### Type parameters
 
-Name |
-:------ |
-`T` |
+| Name |
+| :------ |
+| `T` |
 
-#### Parameters:
+#### Parameters
 
-Name | Type | Description |
-:------ | :------ | :------ |
-`token` | *string* | the token in question   |
-`secretOrPublicKey` | jwt.Secret | the key   |
-`options?` | jwt.VerifyOptions | verify options    |
+| Name | Type | Description |
+| :------ | :------ | :------ |
+| `token` | `string` | the token in question |
+| `secretOrPublicKey` | `Secret` | the key |
+| `options?` | `VerifyOptions` | verify options |
 
-**Returns:** *Promise*<T\>
+#### Returns
 
-Defined in: [server/token.ts:40](https://github.com/onzag/itemize/blob/5fcde7cf/server/token.ts#L40)
+`Promise`<`T`\>
+
+#### Defined in
+
+[server/token.ts:40](https://github.com/onzag/itemize/blob/5c2808d3/server/token.ts#L40)

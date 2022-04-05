@@ -1,4 +1,4 @@
-[](../README.md) / [Exports](../modules.md) / testing/server
+[@onzag/itemize](../README.md) / [Modules](../modules.md) / testing/server
 
 # Module: testing/server
 
@@ -6,8 +6,8 @@
 
 ### Classes
 
-- [ServerTest](../classes/testing_server.servertest.md)
+- [ServerTest](../classes/testing_server.ServerTest.md)
 
 ### Interfaces
 
-- [IUserInfoAndTokensForTesting](../interfaces/testing_server.iuserinfoandtokensfortesting.md)
+- [IUserInfoAndTokensForTesting](../interfaces/testing_server.IUserInfoAndTokensForTesting.md)

@@ -1,4 +1,4 @@
-[](../README.md) / [Exports](../modules.md) / client/internal/app/remote-listener
+[@onzag/itemize](../README.md) / [Modules](../modules.md) / client/internal/app/remote-listener
 
 # Module: client/internal/app/remote-listener
 
@@ -10,8 +10,8 @@ listeners
 
 ### Classes
 
-- [RemoteListener](../classes/client_internal_app_remote_listener.remotelistener.md)
+- [RemoteListener](../classes/client_internal_app_remote_listener.RemoteListener.md)
 
 ### Interfaces
 
-- [IRemoteListenerRecordsCallbackArg](../interfaces/client_internal_app_remote_listener.iremotelistenerrecordscallbackarg.md)
+- [IRemoteListenerRecordsCallbackArg](../interfaces/client_internal_app_remote_listener.IRemoteListenerRecordsCallbackArg.md)

@@ -1,4 +1,4 @@
-[](../README.md) / [Exports](../modules.md) / client/fast-prototyping/components/slate/wrapper
+[@onzag/itemize](../README.md) / [Modules](../modules.md) / client/fast-prototyping/components/slate/wrapper
 
 # Module: client/fast-prototyping/components/slate/wrapper
 
@@ -10,19 +10,93 @@ can be added as replacement, you can also design your own wrapper based on this 
 
 ## Table of contents
 
+### Classes
+
+- [MaterialUISlateWrapper](../classes/client_fast_prototyping_components_slate_wrapper.MaterialUISlateWrapper.md)
+
 ### Interfaces
 
-- [MaterialUISlateWrapperState](../interfaces/client_fast_prototyping_components_slate_wrapper.materialuislatewrapperstate.md)
-- [MaterialUISlateWrapperWithStyles](../interfaces/client_fast_prototyping_components_slate_wrapper.materialuislatewrapperwithstyles.md)
+- [IDrawerConfiguratorElementBase](../interfaces/client_fast_prototyping_components_slate_wrapper.IDrawerConfiguratorElementBase.md)
+- [IDrawerConfiguratorElementSection](../interfaces/client_fast_prototyping_components_slate_wrapper.IDrawerConfiguratorElementSection.md)
+- [IDrawerUIHandlerElementConfigBoolean](../interfaces/client_fast_prototyping_components_slate_wrapper.IDrawerUIHandlerElementConfigBoolean.md)
+- [IDrawerUIHandlerElementConfigCustom](../interfaces/client_fast_prototyping_components_slate_wrapper.IDrawerUIHandlerElementConfigCustom.md)
+- [IDrawerUIHandlerElementConfigCustomProps](../interfaces/client_fast_prototyping_components_slate_wrapper.IDrawerUIHandlerElementConfigCustomProps.md)
+- [IDrawerUIHandlerElementConfigInput](../interfaces/client_fast_prototyping_components_slate_wrapper.IDrawerUIHandlerElementConfigInput.md)
+- [IDrawerUIHandlerElementConfigSelect](../interfaces/client_fast_prototyping_components_slate_wrapper.IDrawerUIHandlerElementConfigSelect.md)
+- [IToolbarPrescenseElement](../interfaces/client_fast_prototyping_components_slate_wrapper.IToolbarPrescenseElement.md)
+- [IWrapperContainerProps](../interfaces/client_fast_prototyping_components_slate_wrapper.IWrapperContainerProps.md)
+- [MaterialUISlateWrapperState](../interfaces/client_fast_prototyping_components_slate_wrapper.MaterialUISlateWrapperState.md)
+- [MaterialUISlateWrapperWithStyles](../interfaces/client_fast_prototyping_components_slate_wrapper.MaterialUISlateWrapperWithStyles.md)
+- [RichTextEditorToolbarProps](../interfaces/client_fast_prototyping_components_slate_wrapper.RichTextEditorToolbarProps.md)
 
-### Variables
+### Type aliases
 
-- [MaterialUISlateWrapper](client_fast_prototyping_components_slate_wrapper.md#materialuislatewrapper)
+- [DrawerConfiguratorElement](client_fast_prototyping_components_slate_wrapper.md#drawerconfiguratorelement)
+- [SlateEditorWrapperCustomToolbarElement](client_fast_prototyping_components_slate_wrapper.md#slateeditorwrappercustomtoolbarelement)
+- [SlateEditorWrapperCustomToolbarElementBaseForm](client_fast_prototyping_components_slate_wrapper.md#slateeditorwrappercustomtoolbarelementbaseform)
+- [SlateEditorWrapperCustomToolbarElementFnForm](client_fast_prototyping_components_slate_wrapper.md#slateeditorwrappercustomtoolbarelementfnform)
+- [SlateEditorWrapperCustomToolbarIdentifiedElement](client_fast_prototyping_components_slate_wrapper.md#slateeditorwrappercustomtoolbaridentifiedelement)
 
-## Variables
+## Type aliases
 
-### MaterialUISlateWrapper
+### DrawerConfiguratorElement
 
-• `Const` **MaterialUISlateWrapper**: *ComponentType*<*Pick*<[*MaterialUISlateWrapperWithStyles*](../interfaces/client_fast_prototyping_components_slate_wrapper.materialuislatewrapperwithstyles.md), *children* \| *currentLoadError* \| *dismissCurrentLoadError* \| *i18nGenericError* \| *i18nOk* \| *i18nRichInfo* \| *toolbarExtras* \| *drawerExtras* \| *hideDrawer* \| *disjointedMode* \| *state* \| *featureSupport* \| *helpers*\> & *StyledComponentProps*<*separator* \| *tab* \| *toolbar* \| *input* \| *appbar* \| *selectionInput* \| *box* \| *chips* \| *chip* \| *editorContainer* \| *wrapperButton* \| *treeChildrenBox* \| *treeDataBox* \| *dropPositionEnabled* \| *dropPositionDisabled* \| *badge* \| *badgeDisabled* \| *elementTitle* \| *editorDrawer* \| *editorDrawerAppbarSpacer* \| *editorDrawerFixed* \| *editorDrawerNoAnimate* \| *editorDrawerBody* \| *drawerSettingsForNodePaper* \| *editor* \| *divider* \| *appbarFixed* \| *moreOptionsSpacer* \| *linkTemplateOptionsBox* \| *linkTemplateOptionsText* \| *optionPrimary*\> & [*ISlateEditorWrapperBaseProps*](../interfaces/client_fast_prototyping_components_slate.islateeditorwrapperbaseprops.md)\>
+Ƭ **DrawerConfiguratorElement**: [`IDrawerConfiguratorElementBase`](../interfaces/client_fast_prototyping_components_slate_wrapper.IDrawerConfiguratorElementBase.md) \| [`IDrawerConfiguratorElementSection`](../interfaces/client_fast_prototyping_components_slate_wrapper.IDrawerConfiguratorElementSection.md)
 
-Defined in: [client/fast-prototyping/components/slate/wrapper.tsx:1424](https://github.com/onzag/itemize/blob/5fcde7cf/client/fast-prototyping/components/slate/wrapper.tsx#L1424)
+#### Defined in
+
+[client/fast-prototyping/components/slate/wrapper.tsx:397](https://github.com/onzag/itemize/blob/5c2808d3/client/fast-prototyping/components/slate/wrapper.tsx#L397)
+
+___
+
+### SlateEditorWrapperCustomToolbarElement
+
+Ƭ **SlateEditorWrapperCustomToolbarElement**: [`SlateEditorWrapperCustomToolbarElementBaseForm`](client_fast_prototyping_components_slate_wrapper.md#slateeditorwrappercustomtoolbarelementbaseform) \| [`SlateEditorWrapperCustomToolbarElementFnForm`](client_fast_prototyping_components_slate_wrapper.md#slateeditorwrappercustomtoolbarelementfnform)
+
+#### Defined in
+
+[client/fast-prototyping/components/slate/wrapper.tsx:426](https://github.com/onzag/itemize/blob/5c2808d3/client/fast-prototyping/components/slate/wrapper.tsx#L426)
+
+___
+
+### SlateEditorWrapperCustomToolbarElementBaseForm
+
+Ƭ **SlateEditorWrapperCustomToolbarElementBaseForm**: [`IToolbarPrescenseElement`](../interfaces/client_fast_prototyping_components_slate_wrapper.IToolbarPrescenseElement.md) \| [`SlateEditorWrapperCustomToolbarIdentifiedElement`](client_fast_prototyping_components_slate_wrapper.md#slateeditorwrappercustomtoolbaridentifiedelement)
+
+#### Defined in
+
+[client/fast-prototyping/components/slate/wrapper.tsx:419](https://github.com/onzag/itemize/blob/5c2808d3/client/fast-prototyping/components/slate/wrapper.tsx#L419)
+
+___
+
+### SlateEditorWrapperCustomToolbarElementFnForm
+
+Ƭ **SlateEditorWrapperCustomToolbarElementFnForm**: (`toolbarProps`: `any`) => [`SlateEditorWrapperCustomToolbarElementBaseForm`](client_fast_prototyping_components_slate_wrapper.md#slateeditorwrappercustomtoolbarelementbaseform)
+
+#### Type declaration
+
+▸ (`toolbarProps`): [`SlateEditorWrapperCustomToolbarElementBaseForm`](client_fast_prototyping_components_slate_wrapper.md#slateeditorwrappercustomtoolbarelementbaseform)
+
+##### Parameters
+
+| Name | Type |
+| :------ | :------ |
+| `toolbarProps` | `any` |
+
+##### Returns
+
+[`SlateEditorWrapperCustomToolbarElementBaseForm`](client_fast_prototyping_components_slate_wrapper.md#slateeditorwrappercustomtoolbarelementbaseform)
+
+#### Defined in
+
+[client/fast-prototyping/components/slate/wrapper.tsx:423](https://github.com/onzag/itemize/blob/5c2808d3/client/fast-prototyping/components/slate/wrapper.tsx#L423)
+
+___
+
+### SlateEditorWrapperCustomToolbarIdentifiedElement
+
+Ƭ **SlateEditorWrapperCustomToolbarIdentifiedElement**: ``"bold"`` \| ``"italic"`` \| ``"underline"`` \| ``"link"`` \| ``"title"`` \| ``"bulleted-list"`` \| ``"numbered-list"`` \| ``"image"`` \| ``"video"`` \| ``"file"`` \| ``"quote"`` \| ``"container"`` \| ``"template-text"`` \| ``"template-html"`` \| ``"extras"`` \| ``"none"`` \| ``"divider"`` \| ``"hdivider"``
+
+#### Defined in
+
+[client/fast-prototyping/components/slate/wrapper.tsx:399](https://github.com/onzag/itemize/blob/5c2808d3/client/fast-prototyping/components/slate/wrapper.tsx#L399)

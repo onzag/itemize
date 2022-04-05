@@ -1,4 +1,4 @@
-[](../README.md) / [Exports](../modules.md) / client/internal/text/serializer/base
+[@onzag/itemize](../README.md) / [Modules](../modules.md) / client/internal/text/serializer/base
 
 # Module: client/internal/text/serializer/base
 
@@ -10,10 +10,10 @@ are the properties that every node has
 
 ### Interfaces
 
-- [IAttrs](../interfaces/client_internal_text_serializer_base.iattrs.md)
-- [IElementBase](../interfaces/client_internal_text_serializer_base.ielementbase.md)
-- [IUIHandlerEvents](../interfaces/client_internal_text_serializer_base.iuihandlerevents.md)
-- [IUIHandlerProps](../interfaces/client_internal_text_serializer_base.iuihandlerprops.md)
+- [IAttrs](../interfaces/client_internal_text_serializer_base.IAttrs.md)
+- [IElementBase](../interfaces/client_internal_text_serializer_base.IElementBase.md)
+- [IUIHandlerEvents](../interfaces/client_internal_text_serializer_base.IUIHandlerEvents.md)
+- [IUIHandlerProps](../interfaces/client_internal_text_serializer_base.IUIHandlerProps.md)
 
 ### Functions
 
@@ -29,149 +29,177 @@ are the properties that every node has
 
 ### convertStyleStringToReactObject
 
-▸ **convertStyleStringToReactObject**(`str`: *string*): *object*
+▸ **convertStyleStringToReactObject**(`str`): `Object`
 
 Converts a style string such a text-align:center;padding:0; into a
 react style object
 
-#### Parameters:
+#### Parameters
 
-Name | Type | Description |
-:------ | :------ | :------ |
-`str` | *string* | the style string    |
+| Name | Type | Description |
+| :------ | :------ | :------ |
+| `str` | `string` | the style string |
 
-**Returns:** *object*
+#### Returns
 
-Defined in: [client/internal/text/serializer/base.tsx:110](https://github.com/onzag/itemize/blob/5fcde7cf/client/internal/text/serializer/base.tsx#L110)
+`Object`
+
+#### Defined in
+
+[client/internal/text/serializer/base.tsx:110](https://github.com/onzag/itemize/blob/5c2808d3/client/internal/text/serializer/base.tsx#L110)
 
 ___
 
 ### copyElementBase
 
-▸ **copyElementBase**(`src`: [*IElementBase*](../interfaces/client_internal_text_serializer_base.ielementbase.md)): [*IElementBase*](../interfaces/client_internal_text_serializer_base.ielementbase.md)
+▸ **copyElementBase**(`src`): [`IElementBase`](../interfaces/client_internal_text_serializer_base.IElementBase.md)
 
 Clones the base of an element of all the properties in common
 and leaves all the ones that are not in common
 
-#### Parameters:
+#### Parameters
 
-Name | Type |
-:------ | :------ |
-`src` | [*IElementBase*](../interfaces/client_internal_text_serializer_base.ielementbase.md) |
+| Name | Type |
+| :------ | :------ |
+| `src` | [`IElementBase`](../interfaces/client_internal_text_serializer_base.IElementBase.md) |
 
-**Returns:** [*IElementBase*](../interfaces/client_internal_text_serializer_base.ielementbase.md)
+#### Returns
 
-Defined in: [client/internal/text/serializer/base.tsx:1041](https://github.com/onzag/itemize/blob/5fcde7cf/client/internal/text/serializer/base.tsx#L1041)
+[`IElementBase`](../interfaces/client_internal_text_serializer_base.IElementBase.md)
+
+#### Defined in
+
+[client/internal/text/serializer/base.tsx:1045](https://github.com/onzag/itemize/blob/5c2808d3/client/internal/text/serializer/base.tsx#L1045)
 
 ___
 
 ### deserializeElementBase
 
-▸ **deserializeElementBase**(`node`: HTMLElement): [*IElementBase*](../interfaces/client_internal_text_serializer_base.ielementbase.md)
+▸ **deserializeElementBase**(`node`): [`IElementBase`](../interfaces/client_internal_text_serializer_base.IElementBase.md)
 
 Deseriazes a element that is an HTML element into its RichElement
 base form, so it extracts all the generic data-x properties and styles
 and whatnot that are shared in between all the rich elements
 
-#### Parameters:
+#### Parameters
 
-Name | Type | Description |
-:------ | :------ | :------ |
-`node` | HTMLElement | the node in question    |
+| Name | Type | Description |
+| :------ | :------ | :------ |
+| `node` | `HTMLElement` | the node in question |
 
-**Returns:** [*IElementBase*](../interfaces/client_internal_text_serializer_base.ielementbase.md)
+#### Returns
 
-Defined in: [client/internal/text/serializer/base.tsx:798](https://github.com/onzag/itemize/blob/5fcde7cf/client/internal/text/serializer/base.tsx#L798)
+[`IElementBase`](../interfaces/client_internal_text_serializer_base.IElementBase.md)
+
+#### Defined in
+
+[client/internal/text/serializer/base.tsx:802](https://github.com/onzag/itemize/blob/5c2808d3/client/internal/text/serializer/base.tsx#L802)
 
 ___
 
 ### reactifyElementBase
 
-▸ **reactifyElementBase**(`registry`: [*ISerializationRegistryType*](../interfaces/client_internal_text_serializer.iserializationregistrytype.md), `Tag`: *string*, `baseClass`: *string*, `children`: ([*RichElement*](client_internal_text_serializer.md#richelement) \| [*IText*](../interfaces/client_internal_text_serializer_types_text.itext.md))[], `wrapChildren`: (`node`: React.ReactNode) => React.ReactNode, `arg`: [*IReactifyArg*](../interfaces/client_internal_text_serializer.ireactifyarg.md)<[*RichElement*](client_internal_text_serializer.md#richelement) \| [*IText*](../interfaces/client_internal_text_serializer_types_text.itext.md)\>): React.ReactNode
+▸ **reactifyElementBase**(`registry`, `Tag`, `baseClass`, `children`, `wrapChildren`, `arg`): `React.ReactNode`
 
 Reactifies an element so that it can be given its react
 form, basically converts the element into a react one
 
-#### Parameters:
+#### Parameters
 
-Name | Type | Description |
-:------ | :------ | :------ |
-`registry` | [*ISerializationRegistryType*](../interfaces/client_internal_text_serializer.iserializationregistrytype.md) | the registry that is currently in use   |
-`Tag` | *string* | the tag we are using for the component to render   |
-`baseClass` | *string* | the base class that should have   |
-`children` | ([*RichElement*](client_internal_text_serializer.md#richelement) \| [*IText*](../interfaces/client_internal_text_serializer_types_text.itext.md))[] | represents the children in the serialized form, as in RichElement or text nodes that it has as children and should be used, that is of course unless these children are overriden by other nodes   |
-`wrapChildren` | (`node`: React.ReactNode) => React.ReactNode | a function that is given so that you can return new children to wrap the current children, basically define your own children wrappage, for example, images and videos provide their own custom children nested structure   |
-`arg` | [*IReactifyArg*](../interfaces/client_internal_text_serializer.ireactifyarg.md)<[*RichElement*](client_internal_text_serializer.md#richelement) \| [*IText*](../interfaces/client_internal_text_serializer_types_text.itext.md)\> | the reactification argument that is passed originally to the reactification function and provides the fine customization details as well as custom children in case and whether it should be a template or not    |
+| Name | Type | Description |
+| :------ | :------ | :------ |
+| `registry` | [`ISerializationRegistryType`](../interfaces/client_internal_text_serializer.ISerializationRegistryType.md) | the registry that is currently in use |
+| `Tag` | `string` | the tag we are using for the component to render |
+| `baseClass` | `string` | the base class that should have |
+| `children` | ([`RichElement`](client_internal_text_serializer.md#richelement) \| [`IText`](../interfaces/client_internal_text_serializer_types_text.IText.md))[] | represents the children in the serialized form, as in RichElement or text nodes that it has as children and should be used, that is of course unless these children are overriden by other nodes |
+| `wrapChildren` | (`node`: `ReactNode`) => `ReactNode` | a function that is given so that you can return new children to wrap the current children, basically define your own children wrappage, for example, images and videos provide their own custom children nested structure |
+| `arg` | [`IReactifyArg`](../interfaces/client_internal_text_serializer.IReactifyArg.md)<[`RichElement`](client_internal_text_serializer.md#richelement) \| [`IText`](../interfaces/client_internal_text_serializer_types_text.IText.md)\> | the reactification argument that is passed originally to the reactification function and provides the fine customization details as well as custom children in case and whether it should be a template or not |
 
-**Returns:** React.ReactNode
+#### Returns
 
-Defined in: [client/internal/text/serializer/base.tsx:420](https://github.com/onzag/itemize/blob/5fcde7cf/client/internal/text/serializer/base.tsx#L420)
+`React.ReactNode`
+
+#### Defined in
+
+[client/internal/text/serializer/base.tsx:420](https://github.com/onzag/itemize/blob/5c2808d3/client/internal/text/serializer/base.tsx#L420)
 
 ___
 
 ### recurseAndConsumeMutatingActions
 
-▸ **recurseAndConsumeMutatingActions**(`basicActions`: [*IUIHandlerEvents*](../interfaces/client_internal_text_serializer_base.iuihandlerevents.md), `mutatingActions`: [*IUIHandlerEvents*](../interfaces/client_internal_text_serializer_base.iuihandlerevents.md), `children`: (`args`: [*IUIHandlerEvents*](../interfaces/client_internal_text_serializer_base.iuihandlerevents.md)) => React.ReactNode): React.ReactNode
+▸ **recurseAndConsumeMutatingActions**(`basicActions`, `mutatingActions`, `children`): `React.ReactNode`
 
 Sets the contexts for the mutating actions that reside on top
 of a component to give value to a function
 
-#### Parameters:
+#### Parameters
 
-Name | Type | Description |
-:------ | :------ | :------ |
-`basicActions` | [*IUIHandlerEvents*](../interfaces/client_internal_text_serializer_base.iuihandlerevents.md) | the basic actions that already got a defined value   |
-`mutatingActions` | [*IUIHandlerEvents*](../interfaces/client_internal_text_serializer_base.iuihandlerevents.md) | the mutating actions that need a value from the context   |
-`children` | (`args`: [*IUIHandlerEvents*](../interfaces/client_internal_text_serializer_base.iuihandlerevents.md)) => React.ReactNode | the children that will be fed all those values    |
+| Name | Type | Description |
+| :------ | :------ | :------ |
+| `basicActions` | [`IUIHandlerEvents`](../interfaces/client_internal_text_serializer_base.IUIHandlerEvents.md) | the basic actions that already got a defined value |
+| `mutatingActions` | [`IUIHandlerEvents`](../interfaces/client_internal_text_serializer_base.IUIHandlerEvents.md) | the mutating actions that need a value from the context |
+| `children` | (`args`: [`IUIHandlerEvents`](../interfaces/client_internal_text_serializer_base.IUIHandlerEvents.md)) => `ReactNode` | the children that will be fed all those values |
 
-**Returns:** React.ReactNode
+#### Returns
 
-Defined in: [client/internal/text/serializer/base.tsx:168](https://github.com/onzag/itemize/blob/5fcde7cf/client/internal/text/serializer/base.tsx#L168)
+`React.ReactNode`
+
+#### Defined in
+
+[client/internal/text/serializer/base.tsx:168](https://github.com/onzag/itemize/blob/5c2808d3/client/internal/text/serializer/base.tsx#L168)
 
 ___
 
 ### retrieveElementActionsForReact
 
-▸ **retrieveElementActionsForReact**(`base`: [*IElementBase*](../interfaces/client_internal_text_serializer_base.ielementbase.md), `context`: [*TemplateArgs*](../classes/client_internal_text_serializer_template_args.templateargs.md), `rootContext`: [*TemplateArgs*](../classes/client_internal_text_serializer_template_args.templateargs.md), `children`: (`args`: [*IUIHandlerEvents*](../interfaces/client_internal_text_serializer_base.iuihandlerevents.md)) => React.ReactNode): React.ReactNode
+▸ **retrieveElementActionsForReact**(`base`, `context`, `rootContext`, `children`): `React.ReactNode`
 
 Provides all the actions that are specified for a given node
 including those that are meant to be mutating
 
-#### Parameters:
+#### Parameters
 
-Name | Type | Description |
-:------ | :------ | :------ |
-`base` | [*IElementBase*](../interfaces/client_internal_text_serializer_base.ielementbase.md) | the base element that is to be fed properties   |
-`context` | [*TemplateArgs*](../classes/client_internal_text_serializer_template_args.templateargs.md) | the context where we need to find the values of such   |
-`rootContext` | [*TemplateArgs*](../classes/client_internal_text_serializer_template_args.templateargs.md) | - |
-`children` | (`args`: [*IUIHandlerEvents*](../interfaces/client_internal_text_serializer_base.iuihandlerevents.md)) => React.ReactNode | this is the node itself where the args are fed to this way it allows to set contexts and wrappers on top of it    |
+| Name | Type | Description |
+| :------ | :------ | :------ |
+| `base` | [`IElementBase`](../interfaces/client_internal_text_serializer_base.IElementBase.md) | the base element that is to be fed properties |
+| `context` | [`TemplateArgs`](../classes/client_internal_text_serializer_template_args.TemplateArgs.md) | the context where we need to find the values of such |
+| `rootContext` | [`TemplateArgs`](../classes/client_internal_text_serializer_template_args.TemplateArgs.md) | - |
+| `children` | (`args`: [`IUIHandlerEvents`](../interfaces/client_internal_text_serializer_base.IUIHandlerEvents.md)) => `ReactNode` | this is the node itself where the args are fed to this way it allows to set contexts and wrappers on top of it |
 
-**Returns:** React.ReactNode
+#### Returns
 
-Defined in: [client/internal/text/serializer/base.tsx:211](https://github.com/onzag/itemize/blob/5fcde7cf/client/internal/text/serializer/base.tsx#L211)
+`React.ReactNode`
+
+#### Defined in
+
+[client/internal/text/serializer/base.tsx:211](https://github.com/onzag/itemize/blob/5c2808d3/client/internal/text/serializer/base.tsx#L211)
 
 ___
 
 ### serializeElementBase
 
-▸ **serializeElementBase**(`registry`: [*ISerializationRegistryType*](../interfaces/client_internal_text_serializer.iserializationregistrytype.md), `base`: [*IElementBase*](../interfaces/client_internal_text_serializer_base.ielementbase.md), `tag`: *string*, `baseClass`: *string*, `attrs`: [*IAttrs*](../interfaces/client_internal_text_serializer_base.iattrs.md), `children`: ([*RichElement*](client_internal_text_serializer.md#richelement) \| [*IText*](../interfaces/client_internal_text_serializer_types_text.itext.md))[]): HTMLElement
+▸ **serializeElementBase**(`registry`, `base`, `tag`, `baseClass`, `attrs`, `children`): `HTMLElement`
 
 Serializes an element from its form
 as a RichElement to a HTML element
 
-#### Parameters:
+#### Parameters
 
-Name | Type | Description |
-:------ | :------ | :------ |
-`registry` | [*ISerializationRegistryType*](../interfaces/client_internal_text_serializer.iserializationregistrytype.md) | the registry to use   |
-`base` | [*IElementBase*](../interfaces/client_internal_text_serializer_base.ielementbase.md) | the base element   |
-`tag` | *string* | the tag to use to build this element   |
-`baseClass` | *string* | the base class to use, eg. image, container, etc...   |
-`attrs` | [*IAttrs*](../interfaces/client_internal_text_serializer_base.iattrs.md) | the attributes to use   |
-`children` | ([*RichElement*](client_internal_text_serializer.md#richelement) \| [*IText*](../interfaces/client_internal_text_serializer_types_text.itext.md))[] | the children that also need to be serialized under it note that they need to be explictly set even if they are in the base   |
+| Name | Type | Description |
+| :------ | :------ | :------ |
+| `registry` | [`ISerializationRegistryType`](../interfaces/client_internal_text_serializer.ISerializationRegistryType.md) | the registry to use |
+| `base` | [`IElementBase`](../interfaces/client_internal_text_serializer_base.IElementBase.md) | the base element |
+| `tag` | `string` | the tag to use to build this element |
+| `baseClass` | `string` | the base class to use, eg. image, container, etc... |
+| `attrs` | [`IAttrs`](../interfaces/client_internal_text_serializer_base.IAttrs.md) | the attributes to use |
+| `children` | ([`RichElement`](client_internal_text_serializer.md#richelement) \| [`IText`](../interfaces/client_internal_text_serializer_types_text.IText.md))[] | the children that also need to be serialized under it note that they need to be explictly set even if they are in the base |
 
-**Returns:** HTMLElement
+#### Returns
+
+`HTMLElement`
 
 a html element
 
-Defined in: [client/internal/text/serializer/base.tsx:332](https://github.com/onzag/itemize/blob/5fcde7cf/client/internal/text/serializer/base.tsx#L332)
+#### Defined in
+
+[client/internal/text/serializer/base.tsx:332](https://github.com/onzag/itemize/blob/5c2808d3/client/internal/text/serializer/base.tsx#L332)

@@ -1,8 +1,13 @@
-[](../README.md) / [Exports](../modules.md) / server/user/queries
+[@onzag/itemize](../README.md) / [Modules](../modules.md) / server/user/queries
 
 # Module: server/user/queries
 
 ## Table of contents
+
+### Interfaces
+
+- [IValidateUserTokenDataType](../interfaces/server_user_queries.IValidateUserTokenDataType.md)
+- [RecoverPasswordTokenType](../interfaces/server_user_queries.RecoverPasswordTokenType.md)
 
 ### Functions
 
@@ -12,14 +17,18 @@
 
 ### customUserQueries
 
-▸ `Const`**customUserQueries**(`appData`: [*IAppDataType*](../interfaces/server.iappdatatype.md)): [*IGQLQueryFieldsDefinitionType*](../interfaces/base_root_gql.igqlqueryfieldsdefinitiontype.md)
+▸ `Const` **customUserQueries**(`appData`): [`IGQLQueryFieldsDefinitionType`](../interfaces/base_Root_gql.IGQLQueryFieldsDefinitionType.md)
 
-#### Parameters:
+#### Parameters
 
-Name | Type |
-:------ | :------ |
-`appData` | [*IAppDataType*](../interfaces/server.iappdatatype.md) |
+| Name | Type |
+| :------ | :------ |
+| `appData` | [`IAppDataType`](../interfaces/server.IAppDataType.md) |
 
-**Returns:** [*IGQLQueryFieldsDefinitionType*](../interfaces/base_root_gql.igqlqueryfieldsdefinitiontype.md)
+#### Returns
 
-Defined in: [server/user/queries.ts:26](https://github.com/onzag/itemize/blob/5fcde7cf/server/user/queries.ts#L26)
+[`IGQLQueryFieldsDefinitionType`](../interfaces/base_Root_gql.IGQLQueryFieldsDefinitionType.md)
+
+#### Defined in
+
+[server/user/queries.ts:42](https://github.com/onzag/itemize/blob/5c2808d3/server/user/queries.ts#L42)

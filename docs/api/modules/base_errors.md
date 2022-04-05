@@ -1,4 +1,4 @@
-[](../README.md) / [Exports](../modules.md) / base/errors
+[@onzag/itemize](../README.md) / [Modules](../modules.md) / base/errors
 
 # Module: base/errors
 
@@ -10,7 +10,7 @@ to send errors from the server side to the client side
 
 ### Classes
 
-- [EndpointError](../classes/base_errors.endpointerror.md)
+- [EndpointError](../classes/base_errors.EndpointError.md)
 
 ### Type aliases
 
@@ -20,8 +20,10 @@ to send errors from the server side to the client side
 
 ### EndpointErrorType
 
-Ƭ **EndpointErrorType**: IEndpointErrorBaseType \| IEndpointErrorOverloadPropExtensionType \| IEndpointErrorOverloadPropertyType \| IEndpointErrorOverloadPropertyInIncludeType \| IEndpointErrorOverloadPolicyType \| IEndpointErrorOverloadIncludeType
+Ƭ **EndpointErrorType**: `IEndpointErrorBaseType` \| `IEndpointErrorOverloadPropExtensionType` \| `IEndpointErrorOverloadPropertyType` \| `IEndpointErrorOverloadPropertyInIncludeType` \| `IEndpointErrorOverloadPolicyType` \| `IEndpointErrorOverloadIncludeType`
 
 All errors
 
-Defined in: [base/errors.ts:69](https://github.com/onzag/itemize/blob/5fcde7cf/base/errors.ts#L69)
+#### Defined in
+
+[base/errors.ts:69](https://github.com/onzag/itemize/blob/5c2808d3/base/errors.ts#L69)

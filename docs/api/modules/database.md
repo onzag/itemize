@@ -1,4 +1,4 @@
-[](../README.md) / [Exports](../modules.md) / database
+[@onzag/itemize](../README.md) / [Modules](../modules.md) / database
 
 # Module: database
 
@@ -10,8 +10,8 @@ or using its many query builders
 
 ### Classes
 
-- [DatabaseConnection](../classes/database.databaseconnection.md)
+- [DatabaseConnection](../classes/database.DatabaseConnection.md)
 
 ### Interfaces
 
-- [IDatbaseConnectionInfo](../interfaces/database.idatbaseconnectioninfo.md)
+- [IDatbaseConnectionInfo](../interfaces/database.IDatbaseConnectionInfo.md)

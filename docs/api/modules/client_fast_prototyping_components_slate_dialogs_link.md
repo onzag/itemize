@@ -1,4 +1,4 @@
-[](../README.md) / [Exports](../modules.md) / client/fast-prototyping/components/slate/dialogs/link
+[@onzag/itemize](../README.md) / [Modules](../modules.md) / client/fast-prototyping/components/slate/dialogs/link
 
 # Module: client/fast-prototyping/components/slate/dialogs/link
 
@@ -8,4 +8,4 @@ Provides the dialogs pertinent to links
 
 ### Classes
 
-- [LinkDialog](../classes/client_fast_prototyping_components_slate_dialogs_link.linkdialog.md)
+- [LinkDialog](../classes/client_fast_prototyping_components_slate_dialogs_link.LinkDialog.md)

@@ -1,4 +1,4 @@
-[](../README.md) / [Exports](../modules.md) / client/fast-prototyping/components/needs-submit-prompt
+[@onzag/itemize](../README.md) / [Modules](../modules.md) / client/fast-prototyping/components/needs-submit-prompt
 
 # Module: client/fast-prototyping/components/needs-submit-prompt
 
@@ -9,4 +9,4 @@ about missing changes
 
 ### Classes
 
-- [NeedsSubmitPrompt](../classes/client_fast_prototyping_components_needs_submit_prompt.needssubmitprompt.md)
+- [NeedsSubmitPrompt](../classes/client_fast_prototyping_components_needs_submit_prompt.NeedsSubmitPrompt.md)

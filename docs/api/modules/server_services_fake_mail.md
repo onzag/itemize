@@ -1,4 +1,4 @@
-[](../README.md) / [Exports](../modules.md) / server/services/fake-mail
+[@onzag/itemize](../README.md) / [Modules](../modules.md) / server/services/fake-mail
 
 # Module: server/services/fake-mail
 
@@ -6,4 +6,4 @@
 
 ### Classes
 
-- [FakeMailService](../classes/server_services_fake_mail.fakemailservice.md)
+- [FakeMailService](../classes/server_services_fake_mail.FakeMailService.md)

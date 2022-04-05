@@ -1,4 +1,4 @@
-[](../README.md) / [Exports](../modules.md) / server/resolvers/triggers
+[@onzag/itemize](../README.md) / [Modules](../modules.md) / server/resolvers/triggers
 
 # Module: server/resolvers/triggers
 
@@ -6,14 +6,14 @@
 
 ### Enumerations
 
-- [IOTriggerActions](../enums/server_resolvers_triggers.iotriggeractions.md)
+- [IOTriggerActions](../enums/server_resolvers_triggers.IOTriggerActions.md)
 
 ### Interfaces
 
-- [IBaseTriggerRegistry](../interfaces/server_resolvers_triggers.ibasetriggerregistry.md)
-- [IOTriggerArgType](../interfaces/server_resolvers_triggers.iotriggerargtype.md)
-- [ISearchTriggerArgType](../interfaces/server_resolvers_triggers.isearchtriggerargtype.md)
-- [ITriggerRegistry](../interfaces/server_resolvers_triggers.itriggerregistry.md)
+- [IBaseTriggerRegistry](../interfaces/server_resolvers_triggers.IBaseTriggerRegistry.md)
+- [IOTriggerArgType](../interfaces/server_resolvers_triggers.IOTriggerArgType.md)
+- [ISearchTriggerArgType](../interfaces/server_resolvers_triggers.ISearchTriggerArgType.md)
+- [ITriggerRegistry](../interfaces/server_resolvers_triggers.ITriggerRegistry.md)
 
 ### Type aliases
 
@@ -28,54 +28,66 @@
 
 ### IOTriggerType
 
-Ƭ **IOTriggerType**: (`arg`: [*IOTriggerArgType*](../interfaces/server_resolvers_triggers.iotriggerargtype.md)) => [*IGQLValue*](../interfaces/gql_querier.igqlvalue.md) \| *Promise*<[*IGQLValue*](../interfaces/gql_querier.igqlvalue.md)\>
+Ƭ **IOTriggerType**: (`arg`: [`IOTriggerArgType`](../interfaces/server_resolvers_triggers.IOTriggerArgType.md)) => [`IGQLValue`](../interfaces/gql_querier.IGQLValue.md) \| `Promise`<[`IGQLValue`](../interfaces/gql_querier.IGQLValue.md)\> \| [`IGQLArgs`](../interfaces/gql_querier.IGQLArgs.md) \| `Promise`<[`IGQLArgs`](../interfaces/gql_querier.IGQLArgs.md)\>
 
-#### Type declaration:
+#### Type declaration
 
-▸ (`arg`: [*IOTriggerArgType*](../interfaces/server_resolvers_triggers.iotriggerargtype.md)): [*IGQLValue*](../interfaces/gql_querier.igqlvalue.md) \| *Promise*<[*IGQLValue*](../interfaces/gql_querier.igqlvalue.md)\>
+▸ (`arg`): [`IGQLValue`](../interfaces/gql_querier.IGQLValue.md) \| `Promise`<[`IGQLValue`](../interfaces/gql_querier.IGQLValue.md)\> \| [`IGQLArgs`](../interfaces/gql_querier.IGQLArgs.md) \| `Promise`<[`IGQLArgs`](../interfaces/gql_querier.IGQLArgs.md)\>
 
-#### Parameters:
+##### Parameters
 
-Name | Type |
-:------ | :------ |
-`arg` | [*IOTriggerArgType*](../interfaces/server_resolvers_triggers.iotriggerargtype.md) |
+| Name | Type |
+| :------ | :------ |
+| `arg` | [`IOTriggerArgType`](../interfaces/server_resolvers_triggers.IOTriggerArgType.md) |
 
-**Returns:** [*IGQLValue*](../interfaces/gql_querier.igqlvalue.md) \| *Promise*<[*IGQLValue*](../interfaces/gql_querier.igqlvalue.md)\>
+##### Returns
 
-Defined in: [server/resolvers/triggers.ts:90](https://github.com/onzag/itemize/blob/5fcde7cf/server/resolvers/triggers.ts#L90)
+[`IGQLValue`](../interfaces/gql_querier.IGQLValue.md) \| `Promise`<[`IGQLValue`](../interfaces/gql_querier.IGQLValue.md)\> \| [`IGQLArgs`](../interfaces/gql_querier.IGQLArgs.md) \| `Promise`<[`IGQLArgs`](../interfaces/gql_querier.IGQLArgs.md)\>
+
+#### Defined in
+
+[server/resolvers/triggers.ts:149](https://github.com/onzag/itemize/blob/5c2808d3/server/resolvers/triggers.ts#L149)
 
 ___
 
 ### SearchTriggerType
 
-Ƭ **SearchTriggerType**: (`arg`: [*ISearchTriggerArgType*](../interfaces/server_resolvers_triggers.isearchtriggerargtype.md)) => *void* \| *Promise*<void\>
+Ƭ **SearchTriggerType**: (`arg`: [`ISearchTriggerArgType`](../interfaces/server_resolvers_triggers.ISearchTriggerArgType.md)) => `void` \| `Promise`<`void`\>
 
-#### Type declaration:
+#### Type declaration
 
-▸ (`arg`: [*ISearchTriggerArgType*](../interfaces/server_resolvers_triggers.isearchtriggerargtype.md)): *void* \| *Promise*<void\>
+▸ (`arg`): `void` \| `Promise`<`void`\>
 
-#### Parameters:
+##### Parameters
 
-Name | Type |
-:------ | :------ |
-`arg` | [*ISearchTriggerArgType*](../interfaces/server_resolvers_triggers.isearchtriggerargtype.md) |
+| Name | Type |
+| :------ | :------ |
+| `arg` | [`ISearchTriggerArgType`](../interfaces/server_resolvers_triggers.ISearchTriggerArgType.md) |
 
-**Returns:** *void* \| *Promise*<void\>
+##### Returns
 
-Defined in: [server/resolvers/triggers.ts:91](https://github.com/onzag/itemize/blob/5fcde7cf/server/resolvers/triggers.ts#L91)
+`void` \| `Promise`<`void`\>
+
+#### Defined in
+
+[server/resolvers/triggers.ts:150](https://github.com/onzag/itemize/blob/5c2808d3/server/resolvers/triggers.ts#L150)
 
 ## Functions
 
 ### mergeTriggerRegistries
 
-▸ **mergeTriggerRegistries**(...`triggers`: [*ITriggerRegistry*](../interfaces/server_resolvers_triggers.itriggerregistry.md)[]): [*ITriggerRegistry*](../interfaces/server_resolvers_triggers.itriggerregistry.md)
+▸ **mergeTriggerRegistries**(...`triggers`): [`ITriggerRegistry`](../interfaces/server_resolvers_triggers.ITriggerRegistry.md)
 
-#### Parameters:
+#### Parameters
 
-Name | Type |
-:------ | :------ |
-`...triggers` | [*ITriggerRegistry*](../interfaces/server_resolvers_triggers.itriggerregistry.md)[] |
+| Name | Type |
+| :------ | :------ |
+| `...triggers` | [`ITriggerRegistry`](../interfaces/server_resolvers_triggers.ITriggerRegistry.md)[] |
 
-**Returns:** [*ITriggerRegistry*](../interfaces/server_resolvers_triggers.itriggerregistry.md)
+#### Returns
 
-Defined in: [server/resolvers/triggers.ts:166](https://github.com/onzag/itemize/blob/5fcde7cf/server/resolvers/triggers.ts#L166)
+[`ITriggerRegistry`](../interfaces/server_resolvers_triggers.ITriggerRegistry.md)
+
+#### Defined in
+
+[server/resolvers/triggers.ts:225](https://github.com/onzag/itemize/blob/5c2808d3/server/resolvers/triggers.ts#L225)

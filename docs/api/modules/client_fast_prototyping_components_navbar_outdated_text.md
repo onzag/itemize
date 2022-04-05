@@ -1,4 +1,4 @@
-[](../README.md) / [Exports](../modules.md) / client/fast-prototyping/components/navbar/outdated-text
+[@onzag/itemize](../README.md) / [Modules](../modules.md) / client/fast-prototyping/components/navbar/outdated-text
 
 # Module: client/fast-prototyping/components/navbar/outdated-text
 
@@ -14,18 +14,22 @@ The outdated text similarly to the outdated dialog will pop up if the app is out
 
 ### OutdatedText
 
-▸ **OutdatedText**(`props`: OutdatedTextProps): *Element*
+▸ **OutdatedText**(`props`): `Element`
 
 Displays an outdated text in the navbar when the app is outdated
 
-#### Parameters:
+#### Parameters
 
-Name | Type | Description |
-:------ | :------ | :------ |
-`props` | OutdatedTextProps | the props for the outated text   |
+| Name | Type | Description |
+| :------ | :------ | :------ |
+| `props` | `OutdatedTextProps` | the props for the outated text |
 
-**Returns:** *Element*
+#### Returns
+
+`Element`
 
 a react element
 
-Defined in: [client/fast-prototyping/components/navbar/outdated-text.tsx:25](https://github.com/onzag/itemize/blob/5fcde7cf/client/fast-prototyping/components/navbar/outdated-text.tsx#L25)
+#### Defined in
+
+[client/fast-prototyping/components/navbar/outdated-text.tsx:26](https://github.com/onzag/itemize/blob/5c2808d3/client/fast-prototyping/components/navbar/outdated-text.tsx#L26)

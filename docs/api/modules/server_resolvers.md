@@ -1,4 +1,4 @@
-[](../README.md) / [Exports](../modules.md) / server/resolvers
+[@onzag/itemize](../README.md) / [Modules](../modules.md) / server/resolvers
 
 # Module: server/resolvers
 
@@ -12,14 +12,18 @@
 
 ### default
 
-▸ **default**(`appData`: [*IAppDataType*](../interfaces/server.iappdatatype.md)): [*IGraphQLResolversType*](../interfaces/base_root_gql.igraphqlresolverstype.md)
+▸ **default**(`appData`): [`IGraphQLResolversType`](../interfaces/base_Root_gql.IGraphQLResolversType.md)
 
-#### Parameters:
+#### Parameters
 
-Name | Type |
-:------ | :------ |
-`appData` | [*IAppDataType*](../interfaces/server.iappdatatype.md) |
+| Name | Type |
+| :------ | :------ |
+| `appData` | [`IAppDataType`](../interfaces/server.IAppDataType.md) |
 
-**Returns:** [*IGraphQLResolversType*](../interfaces/base_root_gql.igraphqlresolverstype.md)
+#### Returns
 
-Defined in: [server/resolvers/index.ts:11](https://github.com/onzag/itemize/blob/5fcde7cf/server/resolvers/index.ts#L11)
+[`IGraphQLResolversType`](../interfaces/base_Root_gql.IGraphQLResolversType.md)
+
+#### Defined in
+
+[server/resolvers/index.ts:9](https://github.com/onzag/itemize/blob/5c2808d3/server/resolvers/index.ts#L9)

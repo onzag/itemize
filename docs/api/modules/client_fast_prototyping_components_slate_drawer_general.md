@@ -1,4 +1,4 @@
-[](../README.md) / [Exports](../modules.md) / client/fast-prototyping/components/slate/drawer/general
+[@onzag/itemize](../README.md) / [Modules](../modules.md) / client/fast-prototyping/components/slate/drawer/general
 
 # Module: client/fast-prototyping/components/slate/drawer/general
 
@@ -16,17 +16,21 @@ option to delete the node
 
 ### GeneralOptions
 
-▸ **GeneralOptions**(`props`: [*MaterialUISlateWrapperWithStyles*](../interfaces/client_fast_prototyping_components_slate_wrapper.materialuislatewrapperwithstyles.md)): *Element*
+▸ **GeneralOptions**(`props`): `Element`
 
 Provides the drawer section with all the general options of a given component
 these general options are the specific options for the generic components
 
-#### Parameters:
+#### Parameters
 
-Name | Type | Description |
-:------ | :------ | :------ |
-`props` | [*MaterialUISlateWrapperWithStyles*](../interfaces/client_fast_prototyping_components_slate_wrapper.materialuislatewrapperwithstyles.md) | all the entire wrapper props    |
+| Name | Type | Description |
+| :------ | :------ | :------ |
+| `props` | [`IWrapperContainerProps`](../interfaces/client_fast_prototyping_components_slate_wrapper.IWrapperContainerProps.md) | all the entire wrapper props |
 
-**Returns:** *Element*
+#### Returns
 
-Defined in: [client/fast-prototyping/components/slate/drawer/general.tsx:813](https://github.com/onzag/itemize/blob/5fcde7cf/client/fast-prototyping/components/slate/drawer/general.tsx#L813)
+`Element`
+
+#### Defined in
+
+[client/fast-prototyping/components/slate/drawer/general.tsx:1108](https://github.com/onzag/itemize/blob/5c2808d3/client/fast-prototyping/components/slate/drawer/general.tsx#L1108)

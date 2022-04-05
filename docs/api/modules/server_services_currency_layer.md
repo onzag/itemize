@@ -1,4 +1,4 @@
-[](../README.md) / [Exports](../modules.md) / server/services/currency-layer
+[@onzag/itemize](../README.md) / [Modules](../modules.md) / server/services/currency-layer
 
 # Module: server/services/currency-layer
 
@@ -6,8 +6,8 @@
 
 ### Classes
 
-- [CurrencyLayerService](../classes/server_services_currency_layer.currencylayerservice.md)
+- [CurrencyLayerService](../classes/server_services_currency_layer.CurrencyLayerService.md)
 
 ### Interfaces
 
-- [ICurrencyLayerConfig](../interfaces/server_services_currency_layer.icurrencylayerconfig.md)
+- [ICurrencyLayerConfig](../interfaces/server_services_currency_layer.ICurrencyLayerConfig.md)

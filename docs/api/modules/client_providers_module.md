@@ -1,4 +1,4 @@
-[](../README.md) / [Exports](../modules.md) / client/providers/module
+[@onzag/itemize](../README.md) / [Modules](../modules.md) / client/providers/module
 
 # Module: client/providers/module
 
@@ -6,7 +6,7 @@
 
 ### Interfaces
 
-- [IModuleContextType](../interfaces/client_providers_module.imodulecontexttype.md)
+- [IModuleContextType](../interfaces/client_providers_module.IModuleContextType.md)
 
 ### Variables
 
@@ -20,22 +20,28 @@
 
 ### ModuleContext
 
-• `Const` **ModuleContext**: *Context*<[*IModuleContextType*](../interfaces/client_providers_module.imodulecontexttype.md)\>
+• **ModuleContext**: `Context`<[`IModuleContextType`](../interfaces/client_providers_module.IModuleContextType.md)\>
 
-Defined in: [client/providers/module.tsx:13](https://github.com/onzag/itemize/blob/5fcde7cf/client/providers/module.tsx#L13)
+#### Defined in
+
+[client/providers/module.tsx:14](https://github.com/onzag/itemize/blob/5c2808d3/client/providers/module.tsx#L14)
 
 ## Functions
 
 ### ModuleProvider
 
-▸ **ModuleProvider**(`props`: IModuleProviderProps): *Element*
+▸ **ModuleProvider**(`props`): `Element`
 
-#### Parameters:
+#### Parameters
 
-Name | Type |
-:------ | :------ |
-`props` | IModuleProviderProps |
+| Name | Type |
+| :------ | :------ |
+| `props` | `IModuleProviderProps` |
 
-**Returns:** *Element*
+#### Returns
 
-Defined in: [client/providers/module.tsx:92](https://github.com/onzag/itemize/blob/5fcde7cf/client/providers/module.tsx#L92)
+`Element`
+
+#### Defined in
+
+[client/providers/module.tsx:94](https://github.com/onzag/itemize/blob/5c2808d3/client/providers/module.tsx#L94)

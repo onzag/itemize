@@ -1,4 +1,4 @@
-[](../README.md) / [Exports](../modules.md) / client/internal/text/serializer/types/link
+[@onzag/itemize](../README.md) / [Modules](../modules.md) / client/internal/text/serializer/types/link
 
 # Module: client/internal/text/serializer/types/link
 
@@ -9,7 +9,7 @@ for the link element
 
 ### Interfaces
 
-- [ILink](../interfaces/client_internal_text_serializer_types_link.ilink.md)
+- [ILink](../interfaces/client_internal_text_serializer_types_link.ILink.md)
 
 ### Functions
 
@@ -19,17 +19,21 @@ for the link element
 
 ### registerLink
 
-▸ **registerLink**(`registry`: [*ISerializationRegistryType*](../interfaces/client_internal_text_serializer.iserializationregistrytype.md)): *void*
+▸ **registerLink**(`registry`): `void`
 
 The function that registers and adds the link element in the given
 registry
 
-#### Parameters:
+#### Parameters
 
-Name | Type | Description |
-:------ | :------ | :------ |
-`registry` | [*ISerializationRegistryType*](../interfaces/client_internal_text_serializer.iserializationregistrytype.md) | the registry to modify    |
+| Name | Type | Description |
+| :------ | :------ | :------ |
+| `registry` | [`ISerializationRegistryType`](../interfaces/client_internal_text_serializer.ISerializationRegistryType.md) | the registry to modify |
 
-**Returns:** *void*
+#### Returns
 
-Defined in: [client/internal/text/serializer/types/link.ts:17](https://github.com/onzag/itemize/blob/5fcde7cf/client/internal/text/serializer/types/link.ts#L17)
+`void`
+
+#### Defined in
+
+[client/internal/text/serializer/types/link.ts:17](https://github.com/onzag/itemize/blob/5c2808d3/client/internal/text/serializer/types/link.ts#L17)

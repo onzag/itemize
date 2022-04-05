@@ -1,4 +1,4 @@
-[](../README.md) / [Exports](../modules.md) / server/rootpool
+[@onzag/itemize](../README.md) / [Modules](../modules.md) / server/rootpool
 
 # Module: server/rootpool
 
@@ -16,16 +16,20 @@ as the root registires are modified during SSR rendering
 
 ### retrieveRootPool
 
-▸ **retrieveRootPool**(`rawData`: [*IRootRawJSONDataType*](../interfaces/base_root.irootrawjsondatatype.md)): *Pool*<[*default*](../classes/base_root.default.md)\>
+▸ **retrieveRootPool**(`rawData`): `Pool`<[`default`](../classes/base_Root.default.md)\>
 
 Provides a pool of root
 
-#### Parameters:
+#### Parameters
 
-Name | Type | Description |
-:------ | :------ | :------ |
-`rawData` | [*IRootRawJSONDataType*](../interfaces/base_root.irootrawjsondatatype.md) | the root raw data    |
+| Name | Type | Description |
+| :------ | :------ | :------ |
+| `rawData` | [`IRootRawJSONDataType`](../interfaces/base_Root.IRootRawJSONDataType.md) | the root raw data |
 
-**Returns:** *Pool*<[*default*](../classes/base_root.default.md)\>
+#### Returns
 
-Defined in: [server/rootpool.ts:21](https://github.com/onzag/itemize/blob/5fcde7cf/server/rootpool.ts#L21)
+`Pool`<[`default`](../classes/base_Root.default.md)\>
+
+#### Defined in
+
+[server/rootpool.ts:21](https://github.com/onzag/itemize/blob/5c2808d3/server/rootpool.ts#L21)

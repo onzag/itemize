@@ -1,4 +1,4 @@
-[](../README.md) / [Exports](../modules.md) / client/internal/text/serializer/types/container
+[@onzag/itemize](../README.md) / [Modules](../modules.md) / client/internal/text/serializer/types/container
 
 # Module: client/internal/text/serializer/types/container
 
@@ -10,7 +10,7 @@ class name
 
 ### Interfaces
 
-- [IContainer](../interfaces/client_internal_text_serializer_types_container.icontainer.md)
+- [IContainer](../interfaces/client_internal_text_serializer_types_container.IContainer.md)
 
 ### Functions
 
@@ -20,17 +20,21 @@ class name
 
 ### registerContainer
 
-▸ **registerContainer**(`registry`: [*ISerializationRegistryType*](../interfaces/client_internal_text_serializer.iserializationregistrytype.md)): *void*
+▸ **registerContainer**(`registry`): `void`
 
 The function that registers and adds the container in the given
 reigstry
 
-#### Parameters:
+#### Parameters
 
-Name | Type | Description |
-:------ | :------ | :------ |
-`registry` | [*ISerializationRegistryType*](../interfaces/client_internal_text_serializer.iserializationregistrytype.md) | the registry to modify    |
+| Name | Type | Description |
+| :------ | :------ | :------ |
+| `registry` | [`ISerializationRegistryType`](../interfaces/client_internal_text_serializer.ISerializationRegistryType.md) | the registry to modify |
 
-**Returns:** *void*
+#### Returns
 
-Defined in: [client/internal/text/serializer/types/container.ts:20](https://github.com/onzag/itemize/blob/5fcde7cf/client/internal/text/serializer/types/container.ts#L20)
+`void`
+
+#### Defined in
+
+[client/internal/text/serializer/types/container.ts:20](https://github.com/onzag/itemize/blob/5c2808d3/client/internal/text/serializer/types/container.ts#L20)

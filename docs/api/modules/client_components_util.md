@@ -1,4 +1,4 @@
-[](../README.md) / [Exports](../modules.md) / client/components/util
+[@onzag/itemize](../README.md) / [Modules](../modules.md) / client/components/util
 
 # Module: client/components/util
 
@@ -9,11 +9,11 @@ the itemize application for many purposes
 
 ### Classes
 
-- [DelayDisplay](../classes/client_components_util.delaydisplay.md)
+- [DelayDisplay](../classes/client_components_util.DelayDisplay.md)
 
 ### Interfaces
 
-- [IImageSizes](../interfaces/client_components_util.iimagesizes.md)
+- [IImageSizes](../interfaces/client_components_util.IImageSizes.md)
 
 ### Functions
 
@@ -25,48 +25,56 @@ the itemize application for many purposes
 
 ### cacheableQSLoader
 
-▸ **cacheableQSLoader**(`url`: *string*, `recheck?`: *boolean*): *string*
+▸ **cacheableQSLoader**(`url`, `recheck?`): `string`
 
 Allows to load images that are remote, but yet uses the service worker logic in order to cache these
 images and keep them up to date
 
-#### Parameters:
+#### Parameters
 
-Name | Type | Description |
-:------ | :------ | :------ |
-`url` | *string* | the url to request where the image is and to cache from   |
-`recheck?` | *boolean* | whether to constantly recheck this image for updates, mainly useless, unless loading from other sources   |
+| Name | Type | Description |
+| :------ | :------ | :------ |
+| `url` | `string` | the url to request where the image is and to cache from |
+| `recheck?` | `boolean` | whether to constantly recheck this image for updates, mainly useless, unless loading from other sources |
 
-**Returns:** *string*
+#### Returns
+
+`string`
 
 a query string url with the service worker query string parameters
 
-Defined in: [client/components/util/index.tsx:249](https://github.com/onzag/itemize/blob/5fcde7cf/client/components/util/index.tsx#L249)
+#### Defined in
+
+[client/components/util/index.tsx:252](https://github.com/onzag/itemize/blob/5c2808d3/client/components/util/index.tsx#L252)
 
 ___
 
 ### imageSizeRetriever
 
-▸ **imageSizeRetriever**(`fileData`: [*IGQLFile*](../interfaces/gql_querier.igqlfile.md), `property?`: [*default*](../classes/base_root_module_itemdefinition_propertydefinition.default.md)): [*IImageSizes*](../interfaces/client_components_util.iimagesizes.md)
+▸ **imageSizeRetriever**(`fileData`, `property?`): [`IImageSizes`](../interfaces/client_components_util.IImageSizes.md)
 
 Gets all the available image sizes for a given file
 
-#### Parameters:
+#### Parameters
 
-Name | Type | Description |
-:------ | :------ | :------ |
-`fileData` | [*IGQLFile*](../interfaces/gql_querier.igqlfile.md) | the file data   |
-`property?` | [*default*](../classes/base_root_module_itemdefinition_propertydefinition.default.md) | if not passed only returns the default image sizes, medium, small, large and the standard one custom sizes can be used and it needs access to the property in order to know these urls    |
+| Name | Type | Description |
+| :------ | :------ | :------ |
+| `fileData` | [`IGQLFile`](../interfaces/gql_querier.IGQLFile.md) | the file data |
+| `property?` | [`default`](../classes/base_Root_Module_ItemDefinition_PropertyDefinition.default.md) | if not passed only returns the default image sizes, medium, small, large and the standard one custom sizes can be used and it needs access to the property in order to know these urls |
 
-**Returns:** [*IImageSizes*](../interfaces/client_components_util.iimagesizes.md)
+#### Returns
 
-Defined in: [client/components/util/index.tsx:170](https://github.com/onzag/itemize/blob/5fcde7cf/client/components/util/index.tsx#L170)
+[`IImageSizes`](../interfaces/client_components_util.IImageSizes.md)
+
+#### Defined in
+
+[client/components/util/index.tsx:170](https://github.com/onzag/itemize/blob/5c2808d3/client/components/util/index.tsx#L170)
 
 ___
 
 ### imageSrcSetRetriever
 
-▸ **imageSrcSetRetriever**(`fileData`: [*IGQLFile*](../interfaces/gql_querier.igqlfile.md), `property`: [*default*](../classes/base_root_module_itemdefinition_propertydefinition.default.md), `imageSizes?`: [*IImageSizes*](../interfaces/client_components_util.iimagesizes.md)): *string*
+▸ **imageSrcSetRetriever**(`fileData`, `property`, `imageSizes?`): `string`
 
 The image source set retriver allows to generate a srcset based on a property, the current file
 data value, and optionally the image sizes (obtained via the imageSizeRetriever in this same file)
@@ -75,14 +83,18 @@ if image sizes are not provided they are calculated
 Note that sometimes srcset is empty eg. image is a svg or it currently represents a local blob yes
 local files are supported
 
-#### Parameters:
+#### Parameters
 
-Name | Type | Description |
-:------ | :------ | :------ |
-`fileData` | [*IGQLFile*](../interfaces/gql_querier.igqlfile.md) | the file itself   |
-`property` | [*default*](../classes/base_root_module_itemdefinition_propertydefinition.default.md) | the property in question this file applies to   |
-`imageSizes?` | [*IImageSizes*](../interfaces/client_components_util.iimagesizes.md) | an optional already calculated image sizes, via the imageSizeRetriever; if not provided it is calculated    |
+| Name | Type | Description |
+| :------ | :------ | :------ |
+| `fileData` | [`IGQLFile`](../interfaces/gql_querier.IGQLFile.md) | the file itself |
+| `property` | [`default`](../classes/base_Root_Module_ItemDefinition_PropertyDefinition.default.md) | the property in question this file applies to |
+| `imageSizes?` | [`IImageSizes`](../interfaces/client_components_util.IImageSizes.md) | an optional already calculated image sizes, via the imageSizeRetriever; if not provided it is calculated |
 
-**Returns:** *string*
+#### Returns
 
-Defined in: [client/components/util/index.tsx:25](https://github.com/onzag/itemize/blob/5fcde7cf/client/components/util/index.tsx#L25)
+`string`
+
+#### Defined in
+
+[client/components/util/index.tsx:25](https://github.com/onzag/itemize/blob/5c2808d3/client/components/util/index.tsx#L25)

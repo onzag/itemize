@@ -1,4 +1,4 @@
-[](../README.md) / [Exports](../modules.md) / client/fast-prototyping/renderers
+[@onzag/itemize](../README.md) / [Modules](../modules.md) / client/fast-prototyping/renderers
 
 # Module: client/fast-prototyping/renderers
 
@@ -15,6 +15,8 @@ contains all the components that take form for the renderer context for fast pro
 
 ### rendererContext
 
-• `Const` **rendererContext**: [*IRendererContext*](../interfaces/client_providers_renderer.irenderercontext.md)
+• **rendererContext**: [`IRendererContext`](../interfaces/client_providers_renderer.IRendererContext.md)
 
-Defined in: [client/fast-prototyping/renderers/index.ts:26](https://github.com/onzag/itemize/blob/5fcde7cf/client/fast-prototyping/renderers/index.ts#L26)
+#### Defined in
+
+[client/fast-prototyping/renderers/index.ts:28](https://github.com/onzag/itemize/blob/5c2808d3/client/fast-prototyping/renderers/index.ts#L28)

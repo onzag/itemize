@@ -1,4 +1,4 @@
-[](../README.md) / [Exports](../modules.md) / server/seo/generator
+[@onzag/itemize](../README.md) / [Modules](../modules.md) / server/seo/generator
 
 # Module: server/seo/generator
 
@@ -9,4 +9,4 @@ for using for SEO purposes
 
 ### Classes
 
-- [SEOGenerator](../classes/server_seo_generator.seogenerator.md)
+- [SEOGenerator](../classes/server_seo_generator.SEOGenerator.md)

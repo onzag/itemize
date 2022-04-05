@@ -1,4 +1,4 @@
-[](../README.md) / [Exports](../modules.md) / nanodate
+[@onzag/itemize](../README.md) / [Modules](../modules.md) / nanodate
 
 # Module: nanodate
 
@@ -8,4 +8,4 @@ Contains the nanodate class in it
 
 ### Classes
 
-- [NanoSecondComposedDate](../classes/nanodate.nanosecondcomposeddate.md)
+- [NanoSecondComposedDate](../classes/nanodate.NanoSecondComposedDate.md)

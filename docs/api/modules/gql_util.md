@@ -1,4 +1,4 @@
-[](../README.md) / [Exports](../modules.md) / gql-util
+[@onzag/itemize](../README.md) / [Modules](../modules.md) / gql-util
 
 # Module: gql-util
 
@@ -17,60 +17,72 @@ the itemize app
 
 ### deepMerge
 
-▸ **deepMerge**(`gqlValueOrFieldsOverride`: *any*, `gqlValueOfFieldsOverriden`: *any*): *any*
+▸ **deepMerge**(`gqlValueOrFieldsOverride`, `gqlValueOfFieldsOverriden`): `any`
 
 Merges request fields or values together
 
-#### Parameters:
+#### Parameters
 
-Name | Type | Description |
-:------ | :------ | :------ |
-`gqlValueOrFieldsOverride` | *any* | the value that overrides   |
-`gqlValueOfFieldsOverriden` | *any* | the value that is overriden   |
+| Name | Type | Description |
+| :------ | :------ | :------ |
+| `gqlValueOrFieldsOverride` | `any` | the value that overrides |
+| `gqlValueOfFieldsOverriden` | `any` | the value that is overriden |
 
-**Returns:** *any*
+#### Returns
+
+`any`
 
 new merged request fields
 
-Defined in: [gql-util.ts:61](https://github.com/onzag/itemize/blob/5fcde7cf/gql-util.ts#L61)
+#### Defined in
+
+[gql-util.ts:61](https://github.com/onzag/itemize/blob/5c2808d3/gql-util.ts#L61)
 
 ___
 
 ### flattenRawGQLValueOrFields
 
-▸ **flattenRawGQLValueOrFields**(`fieldsOrValue`: [*IGQLValue*](../interfaces/gql_querier.igqlvalue.md) \| [*IGQLRequestFields*](../interfaces/gql_querier.igqlrequestfields.md)): *any*
+▸ **flattenRawGQLValueOrFields**(`fieldsOrValue`): `any`
 
 When requesting fields the DATA can be there, so it needs to be flattened
 into the flattened form without the DATA but all data free
 
-#### Parameters:
+#### Parameters
 
-Name | Type |
-:------ | :------ |
-`fieldsOrValue` | [*IGQLValue*](../interfaces/gql_querier.igqlvalue.md) \| [*IGQLRequestFields*](../interfaces/gql_querier.igqlrequestfields.md) |
+| Name | Type |
+| :------ | :------ |
+| `fieldsOrValue` | [`IGQLValue`](../interfaces/gql_querier.IGQLValue.md) \| [`IGQLRequestFields`](../interfaces/gql_querier.IGQLRequestFields.md) |
 
-**Returns:** *any*
+#### Returns
 
-Defined in: [gql-util.ts:100](https://github.com/onzag/itemize/blob/5fcde7cf/gql-util.ts#L100)
+`any`
+
+#### Defined in
+
+[gql-util.ts:100](https://github.com/onzag/itemize/blob/5c2808d3/gql-util.ts#L100)
 
 ___
 
 ### requestFieldsAreContained
 
-▸ **requestFieldsAreContained**(`requestFieldsSubset`: [*IGQLRequestFields*](../interfaces/gql_querier.igqlrequestfields.md), `requestFieldsOrValueMain`: [*IGQLRequestFields*](../interfaces/gql_querier.igqlrequestfields.md) \| [*IGQLValue*](../interfaces/gql_querier.igqlvalue.md)): *boolean*
+▸ **requestFieldsAreContained**(`requestFieldsSubset`, `requestFieldsOrValueMain`): `boolean`
 
 Checks whether a subset is contained within other subset of
 request fields or a value, preferably use against other request fields
 
-#### Parameters:
+#### Parameters
 
-Name | Type | Description |
-:------ | :------ | :------ |
-`requestFieldsSubset` | [*IGQLRequestFields*](../interfaces/gql_querier.igqlrequestfields.md) | the request fields that is supposed to be a subset   |
-`requestFieldsOrValueMain` | [*IGQLRequestFields*](../interfaces/gql_querier.igqlrequestfields.md) \| [*IGQLValue*](../interfaces/gql_querier.igqlvalue.md) | the request fields or the value   |
+| Name | Type | Description |
+| :------ | :------ | :------ |
+| `requestFieldsSubset` | [`IGQLRequestFields`](../interfaces/gql_querier.IGQLRequestFields.md) | the request fields that is supposed to be a subset |
+| `requestFieldsOrValueMain` | [`IGQLValue`](../interfaces/gql_querier.IGQLValue.md) \| [`IGQLRequestFields`](../interfaces/gql_querier.IGQLRequestFields.md) | the request fields or the value |
 
-**Returns:** *boolean*
+#### Returns
+
+`boolean`
 
 a boolean
 
-Defined in: [gql-util.ts:17](https://github.com/onzag/itemize/blob/5fcde7cf/gql-util.ts#L17)
+#### Defined in
+
+[gql-util.ts:17](https://github.com/onzag/itemize/blob/5c2808d3/gql-util.ts#L17)

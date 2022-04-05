@@ -1,4 +1,4 @@
-[](../README.md) / [Exports](../modules.md) / client/providers/include
+[@onzag/itemize](../README.md) / [Modules](../modules.md) / client/providers/include
 
 # Module: client/providers/include
 
@@ -6,7 +6,7 @@
 
 ### Interfaces
 
-- [IIncludeContext](../interfaces/client_providers_include.iincludecontext.md)
+- [IIncludeContext](../interfaces/client_providers_include.IIncludeContext.md)
 
 ### Variables
 
@@ -20,22 +20,28 @@
 
 ### IncludeContext
 
-• `Const` **IncludeContext**: *Context*<[*IIncludeContext*](../interfaces/client_providers_include.iincludecontext.md)\>
+• **IncludeContext**: `Context`<[`IIncludeContext`](../interfaces/client_providers_include.IIncludeContext.md)\>
 
-Defined in: [client/providers/include.tsx:11](https://github.com/onzag/itemize/blob/5fcde7cf/client/providers/include.tsx#L11)
+#### Defined in
+
+[client/providers/include.tsx:11](https://github.com/onzag/itemize/blob/5c2808d3/client/providers/include.tsx#L11)
 
 ## Functions
 
 ### IncludeProvider
 
-▸ **IncludeProvider**(`props`: IIncludeProviderProps): *Element*
+▸ **IncludeProvider**(`props`): `Element`
 
-#### Parameters:
+#### Parameters
 
-Name | Type |
-:------ | :------ |
-`props` | IIncludeProviderProps |
+| Name | Type |
+| :------ | :------ |
+| `props` | `IIncludeProviderProps` |
 
-**Returns:** *Element*
+#### Returns
 
-Defined in: [client/providers/include.tsx:45](https://github.com/onzag/itemize/blob/5fcde7cf/client/providers/include.tsx#L45)
+`Element`
+
+#### Defined in
+
+[client/providers/include.tsx:45](https://github.com/onzag/itemize/blob/5c2808d3/client/providers/include.tsx#L45)

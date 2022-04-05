@@ -1,5 +1,6 @@
 {
-  "entryPoints": ["./"],
+  "entryPoints": ["./base", "./client", "./constants.ts", "./gql-querier.ts", "./imported-resources", "./nanodate.ts", "./server", "./testing", "./ussd", "./config.ts", "./gql-util.ts", "./util.ts", "./main.ts", "./database"],
+  "entryPointStrategy": "expand",
   "exclude": ["./nodejs", "./node_modules", "./types", "./docs", "./builder", "./dbbuilder", "./dev-environment", "./getdeployable", "./setup"],
   "out": "docs/api"
 }

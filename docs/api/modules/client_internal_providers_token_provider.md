@@ -1,4 +1,4 @@
-[](../README.md) / [Exports](../modules.md) / client/internal/providers/token-provider
+[@onzag/itemize](../README.md) / [Modules](../modules.md) / client/internal/providers/token-provider
 
 # Module: client/internal/providers/token-provider
 
@@ -8,8 +8,8 @@ The token provider component
 
 ### Interfaces
 
-- [IActualTokenProviderState](../interfaces/client_internal_providers_token_provider.iactualtokenproviderstate.md)
-- [ITokenContextType](../interfaces/client_internal_providers_token_provider.itokencontexttype.md)
+- [IActualTokenProviderState](../interfaces/client_internal_providers_token_provider.IActualTokenProviderState.md)
+- [ITokenContextType](../interfaces/client_internal_providers_token_provider.ITokenContextType.md)
 
 ### Variables
 
@@ -23,30 +23,36 @@ The token provider component
 
 ### TokenContext
 
-• `Const` **TokenContext**: *Context*<[*ITokenContextType*](../interfaces/client_internal_providers_token_provider.itokencontexttype.md)\>
+• **TokenContext**: `Context`<[`ITokenContextType`](../interfaces/client_internal_providers_token_provider.ITokenContextType.md)\>
 
 The token context contains the current token state as well as several
 functions, it should sit inside the application and over the main
 component
 
-Defined in: [client/internal/providers/token-provider.tsx:118](https://github.com/onzag/itemize/blob/5fcde7cf/client/internal/providers/token-provider.tsx#L118)
+#### Defined in
+
+[client/internal/providers/token-provider.tsx:118](https://github.com/onzag/itemize/blob/5c2808d3/client/internal/providers/token-provider.tsx#L118)
 
 ## Functions
 
 ### TokenProvider
 
-▸ **TokenProvider**(`props`: ITokenProviderProps): *Element*
+▸ **TokenProvider**(`props`): `Element`
 
 The token provider that creates the token context
 
-#### Parameters:
+#### Parameters
 
-Name | Type | Description |
-:------ | :------ | :------ |
-`props` | ITokenProviderProps | the props for the token provider   |
+| Name | Type | Description |
+| :------ | :------ | :------ |
+| `props` | `ITokenProviderProps` | the props for the token provider |
 
-**Returns:** *Element*
+#### Returns
+
+`Element`
 
 a react element
 
-Defined in: [client/internal/providers/token-provider.tsx:125](https://github.com/onzag/itemize/blob/5fcde7cf/client/internal/providers/token-provider.tsx#L125)
+#### Defined in
+
+[client/internal/providers/token-provider.tsx:125](https://github.com/onzag/itemize/blob/5c2808d3/client/internal/providers/token-provider.tsx#L125)

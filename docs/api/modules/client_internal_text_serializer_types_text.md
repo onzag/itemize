@@ -1,4 +1,4 @@
-[](../README.md) / [Exports](../modules.md) / client/internal/text/serializer/types/text
+[@onzag/itemize](../README.md) / [Modules](../modules.md) / client/internal/text/serializer/types/text
 
 # Module: client/internal/text/serializer/types/text
 
@@ -12,7 +12,7 @@ quite different things from the rich element itself
 
 ### Interfaces
 
-- [IText](../interfaces/client_internal_text_serializer_types_text.itext.md)
+- [IText](../interfaces/client_internal_text_serializer_types_text.IText.md)
 
 ### Functions
 
@@ -23,37 +23,44 @@ quite different things from the rich element itself
 
 ### STANDARD\_TEXT\_NODE
 
-▸ `Const`**STANDARD_TEXT_NODE**(): *object*
+▸ `Const` **STANDARD_TEXT_NODE**(`text?`): [`IText`](../interfaces/client_internal_text_serializer_types_text.IText.md)
 
 Represents a standard text node as it should be given
 for a void text node
 
-**Returns:** *object*
+#### Parameters
 
-Name | Type |
-:------ | :------ |
-`bold` | *boolean* |
-`italic` | *boolean* |
-`text` | *string* |
-`underline` | *boolean* |
+| Name | Type |
+| :------ | :------ |
+| `text?` | `string` |
 
-Defined in: [client/internal/text/serializer/types/text.tsx:18](https://github.com/onzag/itemize/blob/5fcde7cf/client/internal/text/serializer/types/text.tsx#L18)
+#### Returns
+
+[`IText`](../interfaces/client_internal_text_serializer_types_text.IText.md)
+
+#### Defined in
+
+[client/internal/text/serializer/types/text.tsx:19](https://github.com/onzag/itemize/blob/5c2808d3/client/internal/text/serializer/types/text.tsx#L19)
 
 ___
 
 ### registerText
 
-▸ **registerText**(`registry`: [*ISerializationRegistryType*](../interfaces/client_internal_text_serializer.iserializationregistrytype.md)): *void*
+▸ **registerText**(`registry`): `void`
 
 The function that registers and adds the text node in the given
 registry
 
-#### Parameters:
+#### Parameters
 
-Name | Type | Description |
-:------ | :------ | :------ |
-`registry` | [*ISerializationRegistryType*](../interfaces/client_internal_text_serializer.iserializationregistrytype.md) | the registry to modify    |
+| Name | Type | Description |
+| :------ | :------ | :------ |
+| `registry` | [`ISerializationRegistryType`](../interfaces/client_internal_text_serializer.ISerializationRegistryType.md) | the registry to modify |
 
-**Returns:** *void*
+#### Returns
 
-Defined in: [client/internal/text/serializer/types/text.tsx:32](https://github.com/onzag/itemize/blob/5fcde7cf/client/internal/text/serializer/types/text.tsx#L32)
+`void`
+
+#### Defined in
+
+[client/internal/text/serializer/types/text.tsx:33](https://github.com/onzag/itemize/blob/5c2808d3/client/internal/text/serializer/types/text.tsx#L33)

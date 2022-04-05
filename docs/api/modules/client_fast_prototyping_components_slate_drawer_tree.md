@@ -1,4 +1,4 @@
-[](../README.md) / [Exports](../modules.md) / client/fast-prototyping/components/slate/drawer/tree
+[@onzag/itemize](../README.md) / [Modules](../modules.md) / client/fast-prototyping/components/slate/drawer/tree
 
 # Module: client/fast-prototyping/components/slate/drawer/tree
 
@@ -6,7 +6,7 @@
 
 ### Classes
 
-- [Tree](../classes/client_fast_prototyping_components_slate_drawer_tree.tree.md)
+- [Tree](../classes/client_fast_prototyping_components_slate_drawer_tree.Tree.md)
 
 ### Functions
 
@@ -16,19 +16,23 @@
 
 ### getInfoOf
 
-▸ **getInfoOf**(`node`: *any*, `i18nData`: [*IPropertyEntryI18nRichTextInfo*](../interfaces/client_internal_components_propertyentry_propertyentrytext.ipropertyentryi18nrichtextinfo.md)): INodeInfo
+▸ **getInfoOf**(`node`, `i18nData`): `INodeInfo`
 
 Provides the node info of a given node
 
-#### Parameters:
+#### Parameters
 
-Name | Type | Description |
-:------ | :------ | :------ |
-`node` | *any* | the node, either text or rich element   |
-`i18nData` | [*IPropertyEntryI18nRichTextInfo*](../interfaces/client_internal_components_propertyentry_propertyentrytext.ipropertyentryi18nrichtextinfo.md) | the i18n information to be used to create the name   |
+| Name | Type | Description |
+| :------ | :------ | :------ |
+| `node` | `any` | the node, either text or rich element |
+| `i18nData` | [`IPropertyEntryI18nRichTextInfo`](../interfaces/client_internal_components_PropertyEntry_PropertyEntryText.IPropertyEntryI18nRichTextInfo.md) | the i18n information to be used to create the name |
 
-**Returns:** INodeInfo
+#### Returns
+
+`INodeInfo`
 
 the node information
 
-Defined in: [client/fast-prototyping/components/slate/drawer/tree.tsx:88](https://github.com/onzag/itemize/blob/5fcde7cf/client/fast-prototyping/components/slate/drawer/tree.tsx#L88)
+#### Defined in
+
+[client/fast-prototyping/components/slate/drawer/tree.tsx:131](https://github.com/onzag/itemize/blob/5c2808d3/client/fast-prototyping/components/slate/drawer/tree.tsx#L131)

@@ -1,4 +1,4 @@
-[](../README.md) / [Exports](../modules.md) / client/fast-prototyping/components/language-picker
+[@onzag/itemize](../README.md) / [Modules](../modules.md) / client/fast-prototyping/components/language-picker
 
 # Module: client/fast-prototyping/components/language-picker
 
@@ -8,4 +8,4 @@ The language picker component allows the user to choose a language and update th
 
 ### Classes
 
-- [LanguagePicker](../classes/client_fast_prototyping_components_language_picker.languagepicker.md)
+- [LanguagePicker](../classes/client_fast_prototyping_components_language_picker.LanguagePicker.md)

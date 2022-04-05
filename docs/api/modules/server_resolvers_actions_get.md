@@ -1,4 +1,4 @@
-[](../README.md) / [Exports](../modules.md) / server/resolvers/actions/get
+[@onzag/itemize](../README.md) / [Modules](../modules.md) / server/resolvers/actions/get
 
 # Module: server/resolvers/actions/get
 
@@ -17,100 +17,124 @@
 
 ### getItemDefinition
 
-▸ **getItemDefinition**(`appData`: [*IAppDataType*](../interfaces/server.iappdatatype.md), `resolverArgs`: [*IGraphQLIdefResolverArgs*](../interfaces/base_root_gql.igraphqlidefresolverargs.md), `itemDefinition`: [*default*](../classes/base_root_module_itemdefinition.default.md)): *Promise*<any\>
+▸ **getItemDefinition**(`appData`, `resolverArgs`, `itemDefinition`): `Promise`<`any`\>
 
-#### Parameters:
+#### Parameters
 
-Name | Type |
-:------ | :------ |
-`appData` | [*IAppDataType*](../interfaces/server.iappdatatype.md) |
-`resolverArgs` | [*IGraphQLIdefResolverArgs*](../interfaces/base_root_gql.igraphqlidefresolverargs.md) |
-`itemDefinition` | [*default*](../classes/base_root_module_itemdefinition.default.md) |
+| Name | Type |
+| :------ | :------ |
+| `appData` | [`IAppDataType`](../interfaces/server.IAppDataType.md) |
+| `resolverArgs` | [`IGraphQLIdefResolverArgs`](../interfaces/base_Root_gql.IGraphQLIdefResolverArgs.md) |
+| `itemDefinition` | [`default`](../classes/base_Root_Module_ItemDefinition.default.md) |
 
-**Returns:** *Promise*<any\>
+#### Returns
 
-Defined in: [server/resolvers/actions/get.ts:37](https://github.com/onzag/itemize/blob/5fcde7cf/server/resolvers/actions/get.ts#L37)
+`Promise`<`any`\>
+
+#### Defined in
+
+[server/resolvers/actions/get.ts:38](https://github.com/onzag/itemize/blob/5c2808d3/server/resolvers/actions/get.ts#L38)
 
 ___
 
 ### getItemDefinitionFn
 
-▸ **getItemDefinitionFn**(`appData`: [*IAppDataType*](../interfaces/server.iappdatatype.md)): [*FGraphQLIdefResolverType*](base_root_gql.md#fgraphqlidefresolvertype)
+▸ **getItemDefinitionFn**(`appData`): [`FGraphQLIdefResolverType`](base_Root_gql.md#fgraphqlidefresolvertype)
 
-#### Parameters:
+#### Parameters
 
-Name | Type |
-:------ | :------ |
-`appData` | [*IAppDataType*](../interfaces/server.iappdatatype.md) |
+| Name | Type |
+| :------ | :------ |
+| `appData` | [`IAppDataType`](../interfaces/server.IAppDataType.md) |
 
-**Returns:** [*FGraphQLIdefResolverType*](base_root_gql.md#fgraphqlidefresolvertype)
+#### Returns
 
-Defined in: [server/resolvers/actions/get.ts:642](https://github.com/onzag/itemize/blob/5fcde7cf/server/resolvers/actions/get.ts#L642)
+[`FGraphQLIdefResolverType`](base_Root_gql.md#fgraphqlidefresolvertype)
+
+#### Defined in
+
+[server/resolvers/actions/get.ts:724](https://github.com/onzag/itemize/blob/5c2808d3/server/resolvers/actions/get.ts#L724)
 
 ___
 
 ### getItemDefinitionList
 
-▸ **getItemDefinitionList**(`appData`: [*IAppDataType*](../interfaces/server.iappdatatype.md), `resolverArgs`: [*IGraphQLIdefResolverArgs*](../interfaces/base_root_gql.igraphqlidefresolverargs.md), `itemDefinition`: [*default*](../classes/base_root_module_itemdefinition.default.md)): *Promise*<{ `results`: *any*[]  }\>
+▸ **getItemDefinitionList**(`appData`, `resolverArgs`, `itemDefinition`): `Promise`<{ `results`: `any`[] = finalValues }\>
 
-#### Parameters:
+#### Parameters
 
-Name | Type |
-:------ | :------ |
-`appData` | [*IAppDataType*](../interfaces/server.iappdatatype.md) |
-`resolverArgs` | [*IGraphQLIdefResolverArgs*](../interfaces/base_root_gql.igraphqlidefresolverargs.md) |
-`itemDefinition` | [*default*](../classes/base_root_module_itemdefinition.default.md) |
+| Name | Type |
+| :------ | :------ |
+| `appData` | [`IAppDataType`](../interfaces/server.IAppDataType.md) |
+| `resolverArgs` | [`IGraphQLIdefResolverArgs`](../interfaces/base_Root_gql.IGraphQLIdefResolverArgs.md) |
+| `itemDefinition` | [`default`](../classes/base_Root_Module_ItemDefinition.default.md) |
 
-**Returns:** *Promise*<{ `results`: *any*[]  }\>
+#### Returns
 
-Defined in: [server/resolvers/actions/get.ts:261](https://github.com/onzag/itemize/blob/5fcde7cf/server/resolvers/actions/get.ts#L261)
+`Promise`<{ `results`: `any`[] = finalValues }\>
+
+#### Defined in
+
+[server/resolvers/actions/get.ts:288](https://github.com/onzag/itemize/blob/5c2808d3/server/resolvers/actions/get.ts#L288)
 
 ___
 
 ### getItemDefinitionListFn
 
-▸ **getItemDefinitionListFn**(`appData`: [*IAppDataType*](../interfaces/server.iappdatatype.md)): [*FGraphQLIdefResolverType*](base_root_gql.md#fgraphqlidefresolvertype)
+▸ **getItemDefinitionListFn**(`appData`): [`FGraphQLIdefResolverType`](base_Root_gql.md#fgraphqlidefresolvertype)
 
-#### Parameters:
+#### Parameters
 
-Name | Type |
-:------ | :------ |
-`appData` | [*IAppDataType*](../interfaces/server.iappdatatype.md) |
+| Name | Type |
+| :------ | :------ |
+| `appData` | [`IAppDataType`](../interfaces/server.IAppDataType.md) |
 
-**Returns:** [*FGraphQLIdefResolverType*](base_root_gql.md#fgraphqlidefresolvertype)
+#### Returns
 
-Defined in: [server/resolvers/actions/get.ts:646](https://github.com/onzag/itemize/blob/5fcde7cf/server/resolvers/actions/get.ts#L646)
+[`FGraphQLIdefResolverType`](base_Root_gql.md#fgraphqlidefresolvertype)
+
+#### Defined in
+
+[server/resolvers/actions/get.ts:728](https://github.com/onzag/itemize/blob/5c2808d3/server/resolvers/actions/get.ts#L728)
 
 ___
 
 ### getModuleList
 
-▸ **getModuleList**(`appData`: [*IAppDataType*](../interfaces/server.iappdatatype.md), `resolverArgs`: [*IGraphQLIdefResolverArgs*](../interfaces/base_root_gql.igraphqlidefresolverargs.md), `mod`: [*default*](../classes/base_root_module.default.md)): *Promise*<{ `results`: *any*[]  }\>
+▸ **getModuleList**(`appData`, `resolverArgs`, `mod`): `Promise`<{ `results`: `any`[] = finalValues }\>
 
-#### Parameters:
+#### Parameters
 
-Name | Type |
-:------ | :------ |
-`appData` | [*IAppDataType*](../interfaces/server.iappdatatype.md) |
-`resolverArgs` | [*IGraphQLIdefResolverArgs*](../interfaces/base_root_gql.igraphqlidefresolverargs.md) |
-`mod` | [*default*](../classes/base_root_module.default.md) |
+| Name | Type |
+| :------ | :------ |
+| `appData` | [`IAppDataType`](../interfaces/server.IAppDataType.md) |
+| `resolverArgs` | [`IGraphQLIdefResolverArgs`](../interfaces/base_Root_gql.IGraphQLIdefResolverArgs.md) |
+| `mod` | [`default`](../classes/base_Root_Module.default.md) |
 
-**Returns:** *Promise*<{ `results`: *any*[]  }\>
+#### Returns
 
-Defined in: [server/resolvers/actions/get.ts:462](https://github.com/onzag/itemize/blob/5fcde7cf/server/resolvers/actions/get.ts#L462)
+`Promise`<{ `results`: `any`[] = finalValues }\>
+
+#### Defined in
+
+[server/resolvers/actions/get.ts:517](https://github.com/onzag/itemize/blob/5c2808d3/server/resolvers/actions/get.ts#L517)
 
 ___
 
 ### getModuleListFn
 
-▸ **getModuleListFn**(`appData`: [*IAppDataType*](../interfaces/server.iappdatatype.md)): [*FGraphQLModResolverType*](base_root_gql.md#fgraphqlmodresolvertype)
+▸ **getModuleListFn**(`appData`): [`FGraphQLModResolverType`](base_Root_gql.md#fgraphqlmodresolvertype)
 
-#### Parameters:
+#### Parameters
 
-Name | Type |
-:------ | :------ |
-`appData` | [*IAppDataType*](../interfaces/server.iappdatatype.md) |
+| Name | Type |
+| :------ | :------ |
+| `appData` | [`IAppDataType`](../interfaces/server.IAppDataType.md) |
 
-**Returns:** [*FGraphQLModResolverType*](base_root_gql.md#fgraphqlmodresolvertype)
+#### Returns
 
-Defined in: [server/resolvers/actions/get.ts:650](https://github.com/onzag/itemize/blob/5fcde7cf/server/resolvers/actions/get.ts#L650)
+[`FGraphQLModResolverType`](base_Root_gql.md#fgraphqlmodresolvertype)
+
+#### Defined in
+
+[server/resolvers/actions/get.ts:732](https://github.com/onzag/itemize/blob/5c2808d3/server/resolvers/actions/get.ts#L732)

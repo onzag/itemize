@@ -1,4 +1,4 @@
-[](../README.md) / [Exports](../modules.md) / gql-querier
+[@onzag/itemize](../README.md) / [Modules](../modules.md) / gql-querier
 
 # Module: gql-querier
 
@@ -9,89 +9,154 @@ as the product interfaces for these queries
 
 ### Classes
 
-- [GQLEnum](../classes/gql_querier.gqlenum.md)
-- [GQLQuery](../classes/gql_querier.gqlquery.md)
-- [GQLRaw](../classes/gql_querier.gqlraw.md)
-- [GQLVar](../classes/gql_querier.gqlvar.md)
+- [GQLEnum](../classes/gql_querier.GQLEnum.md)
+- [GQLQuery](../classes/gql_querier.GQLQuery.md)
+- [GQLRaw](../classes/gql_querier.GQLRaw.md)
+- [GQLVar](../classes/gql_querier.GQLVar.md)
 
 ### Interfaces
 
-- [IGQLArgs](../interfaces/gql_querier.igqlargs.md)
-- [IGQLEndpointValue](../interfaces/gql_querier.igqlendpointvalue.md)
-- [IGQLFile](../interfaces/gql_querier.igqlfile.md)
-- [IGQLQueryObj](../interfaces/gql_querier.igqlqueryobj.md)
-- [IGQLRequestFields](../interfaces/gql_querier.igqlrequestfields.md)
-- [IGQLSearchRecord](../interfaces/gql_querier.igqlsearchrecord.md)
-- [IGQLSearchRecordsContainer](../interfaces/gql_querier.igqlsearchrecordscontainer.md)
-- [IGQLSearchResultsContainer](../interfaces/gql_querier.igqlsearchresultscontainer.md)
-- [IGQLValue](../interfaces/gql_querier.igqlvalue.md)
+- [IGQLArgs](../interfaces/gql_querier.IGQLArgs.md)
+- [IGQLEndpointValue](../interfaces/gql_querier.IGQLEndpointValue.md)
+- [IGQLFile](../interfaces/gql_querier.IGQLFile.md)
+- [IGQLQueryObj](../interfaces/gql_querier.IGQLQueryObj.md)
+- [IGQLRequestFields](../interfaces/gql_querier.IGQLRequestFields.md)
+- [IGQLSearchRecord](../interfaces/gql_querier.IGQLSearchRecord.md)
+- [IGQLSearchRecordsContainer](../interfaces/gql_querier.IGQLSearchRecordsContainer.md)
+- [IGQLSearchResultsContainer](../interfaces/gql_querier.IGQLSearchResultsContainer.md)
+- [IGQLValue](../interfaces/gql_querier.IGQLValue.md)
+- [IXMLHttpRequestProgressInfo](../interfaces/gql_querier.IXMLHttpRequestProgressInfo.md)
+
+### Type aliases
+
+- [ProgresserFn](gql_querier.md#progresserfn)
 
 ### Functions
 
 - [buildGqlMutation](gql_querier.md#buildgqlmutation)
 - [buildGqlQuery](gql_querier.md#buildgqlquery)
 - [gqlQuery](gql_querier.md#gqlquery)
+- [oldXMLHttpRequest](gql_querier.md#oldxmlhttprequest)
+
+## Type aliases
+
+### ProgresserFn
+
+Ƭ **ProgresserFn**: (`arg`: [`IXMLHttpRequestProgressInfo`](../interfaces/gql_querier.IXMLHttpRequestProgressInfo.md)) => `void`
+
+#### Type declaration
+
+▸ (`arg`): `void`
+
+##### Parameters
+
+| Name | Type |
+| :------ | :------ |
+| `arg` | [`IXMLHttpRequestProgressInfo`](../interfaces/gql_querier.IXMLHttpRequestProgressInfo.md) |
+
+##### Returns
+
+`void`
+
+#### Defined in
+
+[gql-querier.ts:158](https://github.com/onzag/itemize/blob/5c2808d3/gql-querier.ts#L158)
 
 ## Functions
 
 ### buildGqlMutation
 
-▸ **buildGqlMutation**(...`mutations`: [*IGQLQueryObj*](../interfaces/gql_querier.igqlqueryobj.md)[]): [*GQLQuery*](../classes/gql_querier.gqlquery.md)
+▸ **buildGqlMutation**(...`mutations`): [`GQLQuery`](../classes/gql_querier.GQLQuery.md)
 
 Builds a graphql mutation
 
-#### Parameters:
+#### Parameters
 
-Name | Type | Description |
-:------ | :------ | :------ |
-`...mutations` | [*IGQLQueryObj*](../interfaces/gql_querier.igqlqueryobj.md)[] | the mutations to run   |
+| Name | Type | Description |
+| :------ | :------ | :------ |
+| `...mutations` | [`IGQLQueryObj`](../interfaces/gql_querier.IGQLQueryObj.md)[] | the mutations to run |
 
-**Returns:** [*GQLQuery*](../classes/gql_querier.gqlquery.md)
+#### Returns
+
+[`GQLQuery`](../classes/gql_querier.GQLQuery.md)
 
 a grapqhl query class instance
 
-Defined in: [gql-querier.ts:645](https://github.com/onzag/itemize/blob/5fcde7cf/gql-querier.ts#L645)
+#### Defined in
+
+[gql-querier.ts:659](https://github.com/onzag/itemize/blob/5c2808d3/gql-querier.ts#L659)
 
 ___
 
 ### buildGqlQuery
 
-▸ **buildGqlQuery**(...`queries`: [*IGQLQueryObj*](../interfaces/gql_querier.igqlqueryobj.md)[]): [*GQLQuery*](../classes/gql_querier.gqlquery.md)
+▸ **buildGqlQuery**(...`queries`): [`GQLQuery`](../classes/gql_querier.GQLQuery.md)
 
 Builds a graphql query
 
-#### Parameters:
+#### Parameters
 
-Name | Type | Description |
-:------ | :------ | :------ |
-`...queries` | [*IGQLQueryObj*](../interfaces/gql_querier.igqlqueryobj.md)[] | the queries to run   |
+| Name | Type | Description |
+| :------ | :------ | :------ |
+| `...queries` | [`IGQLQueryObj`](../interfaces/gql_querier.IGQLQueryObj.md)[] | the queries to run |
 
-**Returns:** [*GQLQuery*](../classes/gql_querier.gqlquery.md)
+#### Returns
+
+[`GQLQuery`](../classes/gql_querier.GQLQuery.md)
 
 a grapqhl query class instance
 
-Defined in: [gql-querier.ts:636](https://github.com/onzag/itemize/blob/5fcde7cf/gql-querier.ts#L636)
+#### Defined in
+
+[gql-querier.ts:650](https://github.com/onzag/itemize/blob/5c2808d3/gql-querier.ts#L650)
 
 ___
 
 ### gqlQuery
 
-▸ **gqlQuery**(`query`: [*GQLQuery*](../classes/gql_querier.gqlquery.md), `options?`: { `host?`: *string* ; `merge?`: *boolean* ; `mergeMS?`: *number*  }): *Promise*<[*IGQLEndpointValue*](../interfaces/gql_querier.igqlendpointvalue.md)\>
+▸ **gqlQuery**(`query`, `options?`): `Promise`<[`IGQLEndpointValue`](../interfaces/gql_querier.IGQLEndpointValue.md)\>
 
 Executes a graphql query
 
-#### Parameters:
+#### Parameters
 
-Name | Type | Description |
-:------ | :------ | :------ |
-`query` | [*GQLQuery*](../classes/gql_querier.gqlquery.md) | the query to run   |
-`options?` | *object* | - |
-`options.host?` | *string* | a host, required when running in NodeJS   |
-`options.merge?` | *boolean* | whether to merge graphql queries in one, adds delay to the queries, might be unwanted   |
-`options.mergeMS?` | *number* | how many ms of delay to add, default 70   |
+| Name | Type | Description |
+| :------ | :------ | :------ |
+| `query` | [`GQLQuery`](../classes/gql_querier.GQLQuery.md) | the query to run |
+| `options?` | `Object` | - |
+| `options.host?` | `string` | a host, required when running in NodeJS |
+| `options.merge?` | `boolean` | whether to merge graphql queries in one, adds delay to the queries, might be unwanted |
+| `options.mergeMS?` | `number` | how many ms of delay to add, default 70 |
+| `options.progresser?` | (`arg`: [`IXMLHttpRequestProgressInfo`](../interfaces/gql_querier.IXMLHttpRequestProgressInfo.md)) => `void` | - |
 
-**Returns:** *Promise*<[*IGQLEndpointValue*](../interfaces/gql_querier.igqlendpointvalue.md)\>
+#### Returns
+
+`Promise`<[`IGQLEndpointValue`](../interfaces/gql_querier.IGQLEndpointValue.md)\>
 
 a promise for a graphql endpoint value
 
-Defined in: [gql-querier.ts:665](https://github.com/onzag/itemize/blob/5fcde7cf/gql-querier.ts#L665)
+#### Defined in
+
+[gql-querier.ts:722](https://github.com/onzag/itemize/blob/5c2808d3/gql-querier.ts#L722)
+
+___
+
+### oldXMLHttpRequest
+
+▸ **oldXMLHttpRequest**(`host`, `body`, `query`): `Promise`<`any`\>
+
+#### Parameters
+
+| Name | Type |
+| :------ | :------ |
+| `host` | `string` |
+| `body` | `FormData` |
+| `query` | [`GQLQuery`](../classes/gql_querier.GQLQuery.md) |
+
+#### Returns
+
+`Promise`<`any`\>
+
+#### Defined in
+
+[gql-querier.ts:676](https://github.com/onzag/itemize/blob/5c2808d3/gql-querier.ts#L676)

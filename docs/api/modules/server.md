@@ -1,4 +1,4 @@
-[](../README.md) / [Exports](../modules.md) / server
+[@onzag/itemize](../README.md) / [Modules](../modules.md) / server
 
 # Module: server
 
@@ -9,18 +9,17 @@ of the server side of things
 
 ### Interfaces
 
-- [IAppDataType](../interfaces/server.iappdatatype.md)
-- [ISEOConfig](../interfaces/server.iseoconfig.md)
-- [ISSRConfig](../interfaces/server.issrconfig.md)
-- [IServerCustomizationDataType](../interfaces/server.iservercustomizationdatatype.md)
-- [IServerDataType](../interfaces/server.iserverdatatype.md)
-- [IServiceCustomizationType](../interfaces/server.iservicecustomizationtype.md)
-- [IStorageProviders](../interfaces/server.istorageproviders.md)
+- [IAppDataType](../interfaces/server.IAppDataType.md)
+- [ISEOConfig](../interfaces/server.ISEOConfig.md)
+- [ISSRConfig](../interfaces/server.ISSRConfig.md)
+- [IServerCustomizationDataType](../interfaces/server.IServerCustomizationDataType.md)
+- [IServerDataType](../interfaces/server.IServerDataType.md)
+- [IServiceCustomizationType](../interfaces/server.IServiceCustomizationType.md)
+- [IStorageProviders](../interfaces/server.IStorageProviders.md)
 
 ### Variables
 
 - [app](server.md#app)
-- [logger](server.md#logger)
 
 ### Functions
 
@@ -31,53 +30,55 @@ of the server side of things
 
 ### app
 
-• `Const` **app**: *Express*
+• **app**: `Express`
 
-Defined in: [server/index.ts:118](https://github.com/onzag/itemize/blob/5fcde7cf/server/index.ts#L118)
+#### Defined in
 
-___
-
-### logger
-
-• `Const` **logger**: winston.Logger
-
-Defined in: [server/index.ts:78](https://github.com/onzag/itemize/blob/5fcde7cf/server/index.ts#L78)
+[server/index.ts:97](https://github.com/onzag/itemize/blob/5c2808d3/server/index.ts#L97)
 
 ## Functions
 
 ### getStorageProviders
 
-▸ **getStorageProviders**(`config`: [*IConfigRawJSONDataType*](../interfaces/config.iconfigrawjsondatatype.md), `sensitiveConfig`: [*ISensitiveConfigRawJSONDataType*](../interfaces/config.isensitiveconfigrawjsondatatype.md), `storageServiceProviders`: [*IStorageProviders*](../interfaces/server.istorageproviders.md), `registry`: [*RegistryService*](../classes/server_services_registry.registryservice.md)): *Promise*<{ `classesUsed`: [*IServiceProviderClassType*](../interfaces/server_services.iserviceproviderclasstype.md)<any\>[] ; `cloudClients`: [*IStorageProvidersObject*](../interfaces/server_services_base_storageprovider.istorageprovidersobject.md) ; `instancesUsed`: [*default*](../classes/server_services_base_storageprovider.default.md)<any\>[]  }\>
+▸ **getStorageProviders**(`config`, `sensitiveConfig`, `storageServiceProviders`, `registry`): `Promise`<{ `classesUsed`: [`IServiceProviderClassType`](../interfaces/server_services.IServiceProviderClassType.md)<`any`\>[] ; `cloudClients`: [`IStorageProvidersObject`](../interfaces/server_services_base_StorageProvider.IStorageProvidersObject.md) ; `instancesUsed`: [`default`](../classes/server_services_base_StorageProvider.default.md)<`any`\>[]  }\>
 
-#### Parameters:
+#### Parameters
 
-Name | Type |
-:------ | :------ |
-`config` | [*IConfigRawJSONDataType*](../interfaces/config.iconfigrawjsondatatype.md) |
-`sensitiveConfig` | [*ISensitiveConfigRawJSONDataType*](../interfaces/config.isensitiveconfigrawjsondatatype.md) |
-`storageServiceProviders` | [*IStorageProviders*](../interfaces/server.istorageproviders.md) |
-`registry` | [*RegistryService*](../classes/server_services_registry.registryservice.md) |
+| Name | Type |
+| :------ | :------ |
+| `config` | [`IConfigRawJSONDataType`](../interfaces/config.IConfigRawJSONDataType.md) |
+| `sensitiveConfig` | [`ISensitiveConfigRawJSONDataType`](../interfaces/config.ISensitiveConfigRawJSONDataType.md) |
+| `storageServiceProviders` | [`IStorageProviders`](../interfaces/server.IStorageProviders.md) |
+| `registry` | [`RegistryService`](../classes/server_services_registry.RegistryService.md) |
 
-**Returns:** *Promise*<{ `classesUsed`: [*IServiceProviderClassType*](../interfaces/server_services.iserviceproviderclasstype.md)<any\>[] ; `cloudClients`: [*IStorageProvidersObject*](../interfaces/server_services_base_storageprovider.istorageprovidersobject.md) ; `instancesUsed`: [*default*](../classes/server_services_base_storageprovider.default.md)<any\>[]  }\>
+#### Returns
 
-Defined in: [server/index.ts:204](https://github.com/onzag/itemize/blob/5fcde7cf/server/index.ts#L204)
+`Promise`<{ `classesUsed`: [`IServiceProviderClassType`](../interfaces/server_services.IServiceProviderClassType.md)<`any`\>[] ; `cloudClients`: [`IStorageProvidersObject`](../interfaces/server_services_base_StorageProvider.IStorageProvidersObject.md) ; `instancesUsed`: [`default`](../classes/server_services_base_StorageProvider.default.md)<`any`\>[]  }\>
+
+#### Defined in
+
+[server/index.ts:196](https://github.com/onzag/itemize/blob/5c2808d3/server/index.ts#L196)
 
 ___
 
 ### initializeServer
 
-▸ **initializeServer**(`ssrConfig`: [*ISSRConfig*](../interfaces/server.issrconfig.md), `seoConfig`: [*ISEOConfig*](../interfaces/server.iseoconfig.md), `custom?`: [*IServerCustomizationDataType*](../interfaces/server.iservercustomizationdatatype.md)): *Promise*<void\>
+▸ **initializeServer**(`ssrConfig`, `seoConfig`, `custom?`): `Promise`<`void`\>
 
 Initializes the itemize server with its custom configuration
 
-#### Parameters:
+#### Parameters
 
-Name | Type | Description |
-:------ | :------ | :------ |
-`ssrConfig` | [*ISSRConfig*](../interfaces/server.issrconfig.md) | the server side rendering rules   |
-`seoConfig` | [*ISEOConfig*](../interfaces/server.iseoconfig.md) | - |
-`custom` | [*IServerCustomizationDataType*](../interfaces/server.iservercustomizationdatatype.md) | the customization details   |
+| Name | Type | Description |
+| :------ | :------ | :------ |
+| `ssrConfig` | [`ISSRConfig`](../interfaces/server.ISSRConfig.md) | the server side rendering rules |
+| `seoConfig` | [`ISEOConfig`](../interfaces/server.ISEOConfig.md) | - |
+| `custom` | [`IServerCustomizationDataType`](../interfaces/server.IServerCustomizationDataType.md) | the customization details |
 
-**Returns:** *Promise*<void\>
+#### Returns
 
-Defined in: [server/index.ts:294](https://github.com/onzag/itemize/blob/5fcde7cf/server/index.ts#L294)
+`Promise`<`void`\>
+
+#### Defined in
+
+[server/index.ts:286](https://github.com/onzag/itemize/blob/5c2808d3/server/index.ts#L286)

@@ -1,4 +1,4 @@
-[](../README.md) / [Exports](../modules.md) / server/services
+[@onzag/itemize](../README.md) / [Modules](../modules.md) / server/services
 
 # Module: server/services
 
@@ -6,12 +6,12 @@
 
 ### Enumerations
 
-- [ServiceProviderType](../enums/server_services.serviceprovidertype.md)
+- [ServiceProviderType](../enums/server_services.ServiceProviderType.md)
 
 ### Classes
 
-- [ServiceProvider](../classes/server_services.serviceprovider.md)
+- [ServiceProvider](../classes/server_services.ServiceProvider.md)
 
 ### Interfaces
 
-- [IServiceProviderClassType](../interfaces/server_services.iserviceproviderclasstype.md)
+- [IServiceProviderClassType](../interfaces/server_services.IServiceProviderClassType.md)

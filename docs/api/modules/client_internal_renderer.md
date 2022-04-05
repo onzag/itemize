@@ -1,4 +1,4 @@
-[](../README.md) / [Exports](../modules.md) / client/internal/renderer
+[@onzag/itemize](../README.md) / [Modules](../modules.md) / client/internal/renderer
 
 # Module: client/internal/renderer
 
@@ -9,4 +9,4 @@ renderer should have accessible
 
 ### Interfaces
 
-- [IRendererProps](../interfaces/client_internal_renderer.irendererprops.md)
+- [IRendererProps](../interfaces/client_internal_renderer.IRendererProps.md)

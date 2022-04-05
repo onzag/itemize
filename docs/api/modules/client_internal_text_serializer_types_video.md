@@ -1,4 +1,4 @@
-[](../README.md) / [Exports](../modules.md) / client/internal/text/serializer/types/video
+[@onzag/itemize](../README.md) / [Modules](../modules.md) / client/internal/text/serializer/types/video
 
 # Module: client/internal/text/serializer/types/video
 
@@ -9,7 +9,7 @@ for the video element
 
 ### Interfaces
 
-- [IVideo](../interfaces/client_internal_text_serializer_types_video.ivideo.md)
+- [IVideo](../interfaces/client_internal_text_serializer_types_video.IVideo.md)
 
 ### Functions
 
@@ -19,17 +19,21 @@ for the video element
 
 ### registerVideo
 
-▸ **registerVideo**(`registry`: [*ISerializationRegistryType*](../interfaces/client_internal_text_serializer.iserializationregistrytype.md)): *void*
+▸ **registerVideo**(`registry`): `void`
 
 The function that registers and adds the video element in the given
 registry
 
-#### Parameters:
+#### Parameters
 
-Name | Type | Description |
-:------ | :------ | :------ |
-`registry` | [*ISerializationRegistryType*](../interfaces/client_internal_text_serializer.iserializationregistrytype.md) | the registry to modify    |
+| Name | Type | Description |
+| :------ | :------ | :------ |
+| `registry` | [`ISerializationRegistryType`](../interfaces/client_internal_text_serializer.ISerializationRegistryType.md) | the registry to modify |
 
-**Returns:** *void*
+#### Returns
 
-Defined in: [client/internal/text/serializer/types/video.tsx:20](https://github.com/onzag/itemize/blob/5fcde7cf/client/internal/text/serializer/types/video.tsx#L20)
+`void`
+
+#### Defined in
+
+[client/internal/text/serializer/types/video.tsx:20](https://github.com/onzag/itemize/blob/5c2808d3/client/internal/text/serializer/types/video.tsx#L20)

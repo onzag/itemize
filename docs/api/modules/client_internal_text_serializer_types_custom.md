@@ -1,4 +1,4 @@
-[](../README.md) / [Exports](../modules.md) / client/internal/text/serializer/types/custom
+[@onzag/itemize](../README.md) / [Modules](../modules.md) / client/internal/text/serializer/types/custom
 
 # Module: client/internal/text/serializer/types/custom
 
@@ -10,7 +10,7 @@ class name
 
 ### Interfaces
 
-- [ICustom](../interfaces/client_internal_text_serializer_types_custom.icustom.md)
+- [ICustom](../interfaces/client_internal_text_serializer_types_custom.ICustom.md)
 
 ### Functions
 
@@ -20,17 +20,21 @@ class name
 
 ### registerCustom
 
-▸ **registerCustom**(`registry`: [*ISerializationRegistryType*](../interfaces/client_internal_text_serializer.iserializationregistrytype.md)): *void*
+▸ **registerCustom**(`registry`): `void`
 
 The function that registers and adds the custom in the given
 reigstry
 
-#### Parameters:
+#### Parameters
 
-Name | Type | Description |
-:------ | :------ | :------ |
-`registry` | [*ISerializationRegistryType*](../interfaces/client_internal_text_serializer.iserializationregistrytype.md) | the registry to modify    |
+| Name | Type | Description |
+| :------ | :------ | :------ |
+| `registry` | [`ISerializationRegistryType`](../interfaces/client_internal_text_serializer.ISerializationRegistryType.md) | the registry to modify |
 
-**Returns:** *void*
+#### Returns
 
-Defined in: [client/internal/text/serializer/types/custom.ts:20](https://github.com/onzag/itemize/blob/5fcde7cf/client/internal/text/serializer/types/custom.ts#L20)
+`void`
+
+#### Defined in
+
+[client/internal/text/serializer/types/custom.ts:19](https://github.com/onzag/itemize/blob/5c2808d3/client/internal/text/serializer/types/custom.ts#L19)

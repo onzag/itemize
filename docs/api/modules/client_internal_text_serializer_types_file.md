@@ -1,4 +1,4 @@
-[](../README.md) / [Exports](../modules.md) / client/internal/text/serializer/types/file
+[@onzag/itemize](../README.md) / [Modules](../modules.md) / client/internal/text/serializer/types/file
 
 # Module: client/internal/text/serializer/types/file
 
@@ -9,7 +9,7 @@ for the file element
 
 ### Interfaces
 
-- [IFile](../interfaces/client_internal_text_serializer_types_file.ifile.md)
+- [IFile](../interfaces/client_internal_text_serializer_types_file.IFile.md)
 
 ### Functions
 
@@ -19,17 +19,21 @@ for the file element
 
 ### registerFile
 
-▸ **registerFile**(`registry`: [*ISerializationRegistryType*](../interfaces/client_internal_text_serializer.iserializationregistrytype.md)): *void*
+▸ **registerFile**(`registry`): `void`
 
 The function that registers and adds the file in the given
 reigstry
 
-#### Parameters:
+#### Parameters
 
-Name | Type | Description |
-:------ | :------ | :------ |
-`registry` | [*ISerializationRegistryType*](../interfaces/client_internal_text_serializer.iserializationregistrytype.md) | the registry to modify    |
+| Name | Type | Description |
+| :------ | :------ | :------ |
+| `registry` | [`ISerializationRegistryType`](../interfaces/client_internal_text_serializer.ISerializationRegistryType.md) | the registry to modify |
 
-**Returns:** *void*
+#### Returns
 
-Defined in: [client/internal/text/serializer/types/file.tsx:19](https://github.com/onzag/itemize/blob/5fcde7cf/client/internal/text/serializer/types/file.tsx#L19)
+`void`
+
+#### Defined in
+
+[client/internal/text/serializer/types/file.tsx:19](https://github.com/onzag/itemize/blob/5c2808d3/client/internal/text/serializer/types/file.tsx#L19)

@@ -1,4 +1,4 @@
-[](../README.md) / [Exports](../modules.md) / client/internal/testing
+[@onzag/itemize](../README.md) / [Modules](../modules.md) / client/internal/testing
 
 # Module: client/internal/testing
 
@@ -12,25 +12,25 @@ This data is serializable on purpose
 
 ### Interfaces
 
-- [IChangedFeedbackEventWithTime](../interfaces/client_internal_testing.ichangedfeedbackeventwithtime.md)
-- [IErrorEventWithTime](../interfaces/client_internal_testing.ierroreventwithtime.md)
-- [IFeedbackRequestWithTime](../interfaces/client_internal_testing.ifeedbackrequestwithtime.md)
-- [IGlobalTestingType](../interfaces/client_internal_testing.iglobaltestingtype.md)
-- [IIdentifiedEventWithTime](../interfaces/client_internal_testing.iidentifiedeventwithtime.md)
-- [IIdentifyRequestWithTime](../interfaces/client_internal_testing.iidentifyrequestwithtime.md)
-- [IMountedExplorers](../interfaces/client_internal_testing.imountedexplorers.md)
-- [IMountedItem](../interfaces/client_internal_testing.imounteditem.md)
-- [IMountedModule](../interfaces/client_internal_testing.imountedmodule.md)
-- [IOwnedSearchFeedbackRequestWithTime](../interfaces/client_internal_testing.iownedsearchfeedbackrequestwithtime.md)
-- [IOwnedSearchRecordsAddedEventWithTime](../interfaces/client_internal_testing.iownedsearchrecordsaddedeventwithtime.md)
-- [IOwnedSearchRegisterRequestWithTime](../interfaces/client_internal_testing.iownedsearchregisterrequestwithtime.md)
-- [IOwnedSearchUnregisterRequestWithTime](../interfaces/client_internal_testing.iownedsearchunregisterrequestwithtime.md)
-- [IParentedSearchFeedbackRequestWithTime](../interfaces/client_internal_testing.iparentedsearchfeedbackrequestwithtime.md)
-- [IParentedSearchRecordsAddedEventWithTime](../interfaces/client_internal_testing.iparentedsearchrecordsaddedeventwithtime.md)
-- [IParentedSearchRegisterRequestWithTime](../interfaces/client_internal_testing.iparentedsearchregisterrequestwithtime.md)
-- [IParentedSearchUnregisterRequestWithTime](../interfaces/client_internal_testing.iparentedsearchunregisterrequestwithtime.md)
-- [IRegisterRequestWithTime](../interfaces/client_internal_testing.iregisterrequestwithtime.md)
-- [IUnregisterRequestWithTime](../interfaces/client_internal_testing.iunregisterrequestwithtime.md)
+- [IChangedFeedbackEventWithTime](../interfaces/client_internal_testing.IChangedFeedbackEventWithTime.md)
+- [IErrorEventWithTime](../interfaces/client_internal_testing.IErrorEventWithTime.md)
+- [IFeedbackRequestWithTime](../interfaces/client_internal_testing.IFeedbackRequestWithTime.md)
+- [IGlobalTestingType](../interfaces/client_internal_testing.IGlobalTestingType.md)
+- [IIdentifiedEventWithTime](../interfaces/client_internal_testing.IIdentifiedEventWithTime.md)
+- [IIdentifyRequestWithTime](../interfaces/client_internal_testing.IIdentifyRequestWithTime.md)
+- [IMountedExplorers](../interfaces/client_internal_testing.IMountedExplorers.md)
+- [IMountedItem](../interfaces/client_internal_testing.IMountedItem.md)
+- [IMountedModule](../interfaces/client_internal_testing.IMountedModule.md)
+- [IOwnedSearchFeedbackRequestWithTime](../interfaces/client_internal_testing.IOwnedSearchFeedbackRequestWithTime.md)
+- [IOwnedSearchRecordsAddedEventWithTime](../interfaces/client_internal_testing.IOwnedSearchRecordsAddedEventWithTime.md)
+- [IOwnedSearchRegisterRequestWithTime](../interfaces/client_internal_testing.IOwnedSearchRegisterRequestWithTime.md)
+- [IOwnedSearchUnregisterRequestWithTime](../interfaces/client_internal_testing.IOwnedSearchUnregisterRequestWithTime.md)
+- [IParentedSearchFeedbackRequestWithTime](../interfaces/client_internal_testing.IParentedSearchFeedbackRequestWithTime.md)
+- [IParentedSearchRecordsAddedEventWithTime](../interfaces/client_internal_testing.IParentedSearchRecordsAddedEventWithTime.md)
+- [IParentedSearchRegisterRequestWithTime](../interfaces/client_internal_testing.IParentedSearchRegisterRequestWithTime.md)
+- [IParentedSearchUnregisterRequestWithTime](../interfaces/client_internal_testing.IParentedSearchUnregisterRequestWithTime.md)
+- [IRegisterRequestWithTime](../interfaces/client_internal_testing.IRegisterRequestWithTime.md)
+- [IUnregisterRequestWithTime](../interfaces/client_internal_testing.IUnregisterRequestWithTime.md)
 
 ### Functions
 
@@ -40,8 +40,12 @@ This data is serializable on purpose
 
 ### setupTesting
 
-▸ **setupTesting**(): *void*
+▸ **setupTesting**(): `void`
 
-**Returns:** *void*
+#### Returns
 
-Defined in: [client/internal/testing.ts:147](https://github.com/onzag/itemize/blob/5fcde7cf/client/internal/testing.ts#L147)
+`void`
+
+#### Defined in
+
+[client/internal/testing.ts:147](https://github.com/onzag/itemize/blob/5c2808d3/client/internal/testing.ts#L147)
