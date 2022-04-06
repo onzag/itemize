@@ -14,7 +14,6 @@ import {
   defaultTriggerInvalidForbiddenFunction,
   validateParentingRules,
 } from "../basic";
-import graphqlFields from "graphql-fields";
 import {
   INCLUDE_PREFIX,
   EXCLUSION_STATE_SUFFIX,
@@ -76,7 +75,7 @@ export async function editItemDefinition(
   await validateTokenIsntBlocked(appData.cache, tokenData);
 
   // now we get the requested fields, and check they are available for the given role
-  const requestedFields = flattenRawGQLValueOrFields(graphqlFields(resolverArgs.info));
+  const requestedFields = flattenRawGQLValueOrFields(resolverArgs.fields);
 
   // now we get the basic information
   const mod = itemDefinition.getParentModule();

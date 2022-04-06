@@ -11,7 +11,6 @@ import {
   defaultTriggerInvalidForbiddenFunction,
   getDictionary,
 } from "../basic";
-import graphqlFields from "graphql-fields";
 import { EndpointError } from "../../../base/errors";
 import {
   ENDPOINT_ERRORS, ANYONE_LOGGED_METAROLE, ANYONE_METAROLE,

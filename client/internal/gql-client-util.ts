@@ -21,7 +21,7 @@ import {
   INCLUDE_PREFIX,
 } from "../../constants";
 import ItemDefinition from "../../base/Root/Module/ItemDefinition";
-import { IGQLValue, IGQLRequestFields, IGQLArgs, buildGqlQuery, gqlQuery, buildGqlMutation, IGQLEndpointValue, IGQLSearchRecord, GQLEnum, IGQLFile, ProgresserFn } from "../../gql-querier";
+import { IGQLValue, IGQLRequestFields, IGQLArgs, buildGqlQuery, gqlQuery, buildGqlMutation, IGQLEndpointValue, IGQLSearchRecord, GQLEnum, IGQLFile, ProgresserFn, GQLQuery } from "../../gql-querier";
 import { deepMerge, requestFieldsAreContained } from "../../gql-util";
 import CacheWorkerInstance from "./workers/cache";
 import { EndpointErrorType } from "../../base/errors";
@@ -33,6 +33,9 @@ import { IConfigRawJSONDataType } from "../../config";
 import PropertyDefinition from "../../base/Root/Module/ItemDefinition/PropertyDefinition";
 import equals from "deep-equal";
 import type { ICacheMatchType, ICacheMetadataMatchType } from "./workers/cache/cache.worker";
+import { PropertyDefinitionSearchInterfacesPrefixes } from "../../base/Root/Module/ItemDefinition/PropertyDefinition/search-interfaces";
+import { getConversionIds } from "../../base/Root/Module/ItemDefinition/PropertyDefinition/search-mode";
+import type { IPropertyCoreProps } from "../../client/components/property/base";
 
 type cacheMetadataCheckFn = (value: PropertyDefinitionSupportedType | { [property: string]: PropertyDefinitionSupportedType }) => boolean;
 type cacheMetadataComparisonFn = (oldValue: any, newValue: any) => boolean;
@@ -110,6 +113,35 @@ export interface IIncludeOverride {
   id: string;
   exclusionState?: "INCLUDED" | "EXCLUDED" | "ANY",
   overrides?: IPropertyOverride[];
+}
+
+export function getPropertyListForSearchMode(properties: Array<string | IPropertyCoreProps>, standardCounterpart: ItemDefinition) {
+  let result: string[] = [];
+  properties.forEach((property) => {
+
+    const propertyId = typeof property === "string" ? property : property.id;
+    const searchVariantSpecified = typeof property !== "string" ? property.searchVariant : null;
+
+    if (
+      propertyId === "search" ||
+      propertyId === "created_by" ||
+      propertyId === "since" ||
+      (!searchVariantSpecified && standardCounterpart.isPropertyInSearchModeOnly(propertyId))
+    ) {
+      result.push(propertyId);
+      return;
+    }
+
+    const standardProperty = standardCounterpart.getPropertyDefinitionFor(propertyId, true);
+
+    if (!searchVariantSpecified) {
+      result = result.concat(getConversionIds(standardProperty.rawData, true));
+    } else {
+      const id = PropertyDefinitionSearchInterfacesPrefixes[searchVariantSpecified.toUpperCase()] + propertyId;
+      result.push(id);
+    }
+  });
+  return result;
 }
 
 /**
@@ -400,7 +432,7 @@ export async function reprocessQueryArgumentsForFiles(
         argumentsForQuery[path[0]] = await reprocessFileArgument(argumentsForQuery[path[0]], {
           config: config,
           containerId: originalContainerIdOfContent,
-          forId:forId || null,
+          forId: forId || null,
           forVersion: forVersion || null,
           include: null,
           itemDefinition: itemDefinitionInstance,
@@ -492,10 +524,10 @@ function deleteNulls<T>(
     if (value !== null) {
       if (typeof value === "object" && !Array.isArray(value)) {
         newArgs[argKey] = deleteNulls(value);
-      } else {
+      } else {
         newArgs[argKey] = value;
       }
-      
+
     }
   });
 
@@ -934,6 +966,52 @@ export async function runDeleteQueryFor(
   }
 }
 
+export function getAddQueryFor(
+  arg: {
+    args: IGQLArgs,
+    fields: IGQLRequestFields,
+    itemDefinition: ItemDefinition,
+    token: string,
+    language: string,
+    listenerUUID: string,
+    cacheStore: boolean,
+    forId: string,
+    forVersion: string,
+    containerId: string,
+    waitAndMerge?: boolean,
+  },
+): GQLQuery {
+  const queryName = PREFIX_ADD + arg.itemDefinition.getQualifiedPathName();
+  const args = getQueryArgsFor(
+    arg.args,
+    arg.token,
+    arg.language,
+  );
+  args.listener_uuid = arg.listenerUUID;
+  if (arg.forId) {
+    args.for_id = arg.forId;
+  }
+  if (arg.forVersion) {
+    args.version = arg.forVersion;
+  }
+
+  args.container_id = arg.containerId;
+
+  const query = buildGqlMutation({
+    name: queryName,
+    args,
+    // last modified is necessary for cache manipulation
+    // so we add it here if it was not added, normally it gets
+    // added automatically using functions, but that might not be the case
+    fields: !arg.fields.last_modified ? {
+      ...arg.fields,
+      last_modified: {},
+    } : arg.fields,
+  });
+
+  return query;
+}
+
 /**
  * Runs an add query for a given item definition
  * @param arg the arg information
@@ -973,33 +1051,8 @@ export async function runAddQueryFor(
   value: IGQLValue,
   getQueryFields: IGQLRequestFields,
 }> {
-  const queryName = PREFIX_ADD + arg.itemDefinition.getQualifiedPathName();
-  const args = getQueryArgsFor(
-    arg.args,
-    arg.token,
-    arg.language,
-  );
-  args.listener_uuid = arg.listenerUUID;
-  if (arg.forId) {
-    args.for_id = arg.forId;
-  }
-  if (arg.forVersion) {
-    args.version = arg.forVersion;
-  }
-
-  args.container_id = arg.containerId;
-
-  const query = buildGqlMutation({
-    name: queryName,
-    args,
-    // last modified is necessary for cache manipulation
-    // so we add it here if it was not added, normally it gets
-    // added automatically using functions, but that might not be the case
-    fields: !arg.fields.last_modified ? {
-      ...arg.fields,
-      last_modified: {},
-    } : arg.fields,
-  })
+  const query = getAddQueryFor(arg);
+  const queryName = query.getQueryByIndex(0).name;
 
   // now we get the gql value using the gql query function
   // and this function will always run using the network
@@ -1041,6 +1094,44 @@ export async function runAddQueryFor(
   }
 }
 
+export function getEditQueryFor(
+  arg: {
+    args: IGQLArgs,
+    fields: IGQLRequestFields,
+    itemDefinition: ItemDefinition,
+    token: string,
+    language: string,
+    id: string,
+    version: string,
+    listenerUUID: string,
+  },
+) {
+  // so we do this
+  const queryName = PREFIX_EDIT + arg.itemDefinition.getQualifiedPathName();
+  const args = getQueryArgsFor(
+    arg.args,
+    arg.token,
+    arg.language,
+    arg.id,
+    arg.version,
+  );
+  args.listener_uuid = arg.listenerUUID;
+
+  const query = buildGqlMutation({
+    name: queryName,
+    args,
+    // last modified is necessary for cache manipulation
+    // so we add it here if it was not added, normally it gets
+    // added automatically using functions, but that might not be the case
+    fields: !arg.fields.last_modified ? {
+      ...arg.fields,
+      last_modified: {},
+    } : arg.fields,
+  });
+
+  return query;
+}
+
 /**
  * Runs an edit query for a given item definition
  * @param arg the arg with the get query information
@@ -1074,28 +1165,8 @@ export async function runEditQueryFor(
   value: IGQLValue,
   getQueryFields: IGQLRequestFields,
 }> {
-  // so we do this
-  const queryName = PREFIX_EDIT + arg.itemDefinition.getQualifiedPathName();
-  const args = getQueryArgsFor(
-    arg.args,
-    arg.token,
-    arg.language,
-    arg.id,
-    arg.version,
-  );
-  args.listener_uuid = arg.listenerUUID;
-
-  const query = buildGqlMutation({
-    name: queryName,
-    args,
-    // last modified is necessary for cache manipulation
-    // so we add it here if it was not added, normally it gets
-    // added automatically using functions, but that might not be the case
-    fields: !arg.fields.last_modified ? {
-      ...arg.fields,
-      last_modified: {},
-    } : arg.fields,
-  });
+  const query = getEditQueryFor(arg);
+  const queryName = query.getQueryByIndex(0).name;
 
   // now we get the gql value using the gql query function
   // and this function will always run using the network
@@ -1156,7 +1227,7 @@ function convertOrderByRule(orderBy: IOrderByRuleType) {
   return result;
 }
 
-interface IRunSearchQueryArg {
+interface ISearchQueryArg {
   args: IGQLArgs,
   fields: IGQLRequestFields,
   itemDefinition: ItemDefinition,
@@ -1169,18 +1240,21 @@ interface IRunSearchQueryArg {
     version: string,
   };
   types?: string[];
+  enableNulls: boolean;
+  traditional: boolean;
+  limit: number;
+  offset: number;
+  token: string;
+  language: string;
+  versionFilter?: string;
+}
+
+interface IRunSearchQueryArg extends ISearchQueryArg {
   cachePolicy: "by-owner" | "by-parent" | "by-owner-and-parent" | "none",
   cacheStoreMetadata?: any,
-  cacheStoreMetadataMismatchAction?: ISearchCacheMetadataMismatchAction,
-  enableNulls: boolean,
-  traditional: boolean,
-  limit: number,
-  offset: number,
-  token: string,
-  language: string,
-  versionFilter?: string,
-  waitAndMerge?: boolean,
-  progresser?: ProgresserFn,
+  cacheStoreMetadataMismatchAction?: ISearchCacheMetadataMismatchAction;
+  waitAndMerge?: boolean;
+  progresser?: ProgresserFn;
 }
 
 interface IRunSearchQuerySearchOptions {
@@ -1196,6 +1270,80 @@ interface IRunSearchQueryResult {
   limit: number,
   offset: number,
   lastModified: string,
+}
+
+export function getSearchArgsFor(
+  arg: ISearchQueryArg
+) {
+  const searchArgs = getQueryArgsFor(
+    arg.enableNulls ? arg.args : deleteNulls(arg.args),
+    arg.token,
+    arg.language,
+  );
+
+  if (arg.versionFilter) {
+    searchArgs.version_filter = arg.versionFilter;
+  }
+
+  if (arg.createdBy) {
+    searchArgs.created_by = arg.createdBy;
+  }
+
+  if (arg.since) {
+    searchArgs.since = arg.since;
+  }
+
+  if (arg.types) {
+    searchArgs.types = arg.types;
+  }
+
+  if (arg.parentedBy) {
+    searchArgs.parent_type = arg.parentedBy.itemDefinition.getQualifiedPathName();
+    searchArgs.parent_id = arg.parentedBy.id;
+    searchArgs.parent_version = arg.parentedBy.version || null;
+  }
+
+  searchArgs.order_by = convertOrderByRule(arg.orderBy);
+  searchArgs.limit = arg.limit;
+  searchArgs.offset = arg.offset;
+
+  return searchArgs;
+}
+
+export function getSearchQueryFor(
+  arg: ISearchQueryArg
+) {
+  const qualifiedName = (arg.itemDefinition.isExtensionsInstance() ?
+    arg.itemDefinition.getParentModule().getQualifiedPathName() :
+    arg.itemDefinition.getQualifiedPathName());
+  const queryName = (arg.traditional ? PREFIX_TRADITIONAL_SEARCH : PREFIX_SEARCH) + qualifiedName;
+
+  const searchArgs = getSearchArgsFor(arg);
+
+  const query = buildGqlQuery({
+    name: queryName,
+    args: searchArgs,
+    fields: arg.traditional ? {
+      results: arg.fields,
+      count: {},
+      limit: {},
+      offset: {},
+      last_modified: {},
+    } : {
+      records: {
+        id: {},
+        version: {},
+        type: {},
+        last_modified: {},
+      },
+      count: {},
+      limit: {},
+      offset: {},
+      last_modified: {},
+    },
+  });
+
+  return query;
 }
 
 /**
@@ -1254,37 +1402,7 @@ export async function runSearchQueryFor(
     arg.itemDefinition.getQualifiedPathName());
   const queryName = (arg.traditional ? PREFIX_TRADITIONAL_SEARCH : PREFIX_SEARCH) + qualifiedName;
 
-  const searchArgs = getQueryArgsFor(
-    arg.enableNulls ? arg.args : deleteNulls(arg.args),
-    arg.token,
-    arg.language,
-  );
-
-  if (arg.versionFilter) {
-    searchArgs.version_filter = arg.versionFilter;
-  }
-
-  if (arg.createdBy) {
-    searchArgs.created_by = arg.createdBy;
-  }
-
-  if (arg.since) {
-    searchArgs.since = arg.since;
-  }
-
-  if (arg.types) {
-    searchArgs.types = arg.types;
-  }
-
-  if (arg.parentedBy) {
-    searchArgs.parent_type = arg.parentedBy.itemDefinition.getQualifiedPathName();
-    searchArgs.parent_id = arg.parentedBy.id;
-    searchArgs.parent_version = arg.parentedBy.version || null;
-  }
-
-  searchArgs.order_by = convertOrderByRule(arg.orderBy);
-  searchArgs.limit = arg.limit;
-  searchArgs.offset = arg.offset;
+  const searchArgs = getSearchArgsFor(arg);
 
   // when the search was last modified
   // in practice the last modified of the last record
@@ -1563,7 +1681,7 @@ export async function runSearchQueryFor(
         type: v.type,
         version: v.version || null,
         id: v.id || null,
-        last_modified: (v.DATA && (v.DATA as any).last_modified) || null
+        last_modified: v.last_modified || null
       }))
     ) as IGQLSearchRecord[] || null;
 

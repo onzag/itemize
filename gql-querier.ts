@@ -334,6 +334,24 @@ export class GQLQuery {
   public addProgresserListener(prog: (arg: IXMLHttpRequestProgressInfo) => void) {
     this.progressers.push(prog);
   }
+  
+  /**
+   * Provides all queries
+   * use this for internal use only
+   * @returns 
+   */
+  public getAllQueries() {
+    return this.processedQueries;
+  }
+
+  /**
+   * Provides a processed query given an index
+   * @param index 
+   * @returns 
+   */
+  public getQueryByIndex(index: number) {
+    return this.processedQueries[index];
+  }
 
   /**
    * add a listener for when a reply is informed

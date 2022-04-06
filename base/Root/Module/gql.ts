@@ -24,6 +24,7 @@ import { getGQLQueryFieldsForItemDefinition, getGQLMutationFieldsForItemDefiniti
 import { IGQLFieldsDefinitionType, IGraphQLResolversType, IGQLQueryFieldsDefinitionType } from "../gql";
 import { ItemDefinitionIOActions } from "./ItemDefinition";
 import { EndpointError } from "../../errors";
+import graphqlFields from "graphql-fields";
 
 /**
  * Provides the fields definition for the module itself, and for all
@@ -156,10 +157,8 @@ async function resolveGenericFunction(
   if (resolvers) {
     try {
       value = await resolvers[resolveToUse]({
-        source,
         args,
-        context,
-        info,
+        fields: graphqlFields(info),
       }, mod);
     } catch (err) {
       if (err instanceof EndpointError) {

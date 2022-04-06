@@ -18,10 +18,8 @@ import { getGQLQueryFieldsForModule, getGQLMutationFieldsForModule } from "./Mod
  * rather than passing four args
  */
 export interface IGraphQLIdefResolverArgs {
-  source: any;
   args: any;
-  context: any;
-  info: any;
+  fields: any;
 }
 
 /**

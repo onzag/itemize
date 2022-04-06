@@ -12,7 +12,6 @@ import {
   MEMCACHED_DESTRUCTION_MARKERS_LOCATION,
   DESTRUCTION_MARKERS_LOCATION,
   IOrderByRuleType,
-  INCLUDE_PREFIX,
   MEMCACHED_SEARCH_DESTRUCTION_MARKERS_LOCATION,
   SEARCH_DESTRUCTION_MARKERS_LOCATION,
 } from "../../constants";
@@ -21,13 +20,12 @@ import { requestFieldsAreContained } from "../../gql-util";
 import { EndpointErrorType } from "../../base/errors";
 import equals from "deep-equal";
 import { ModuleContext } from "./module";
-import { getConversionIds } from "../../base/Root/Module/ItemDefinition/PropertyDefinition/search-mode";
 import CacheWorkerInstance from "../internal/workers/cache";
 import { IRemoteListenerRecordsCallbackArg, RemoteListener } from "../internal/app/remote-listener";
 import uuid from "uuid";
 import {
   getFieldsAndArgs, runGetQueryFor, runDeleteQueryFor, runEditQueryFor, runAddQueryFor, runSearchQueryFor, IIncludeOverride,
-  IPropertyOverride, ICacheMetadataMismatchAction, ISearchCacheMetadataMismatchAction, reprocessQueryArgumentsForFiles
+  IPropertyOverride, ICacheMetadataMismatchAction, ISearchCacheMetadataMismatchAction, reprocessQueryArgumentsForFiles, getPropertyListForSearchMode
 } from "../internal/gql-client-util";
 import { IPropertyCoreProps, IPropertySetterProps } from "../components/property/base";
 import { PropertyDefinitionSearchInterfacesPrefixes } from "../../base/Root/Module/ItemDefinition/PropertyDefinition/search-interfaces";
@@ -39,6 +37,9 @@ import { Location } from "history";
 import type { ICacheMetadataMatchType } from "../internal/workers/cache/cache.worker";
 
 const isDevelopment = process.env.NODE_ENV === "development";
+
+const SSR_GRACE_TIME = 10000;
+const LOAD_TIME = (new Date()).getTime();
 
 // THIS IS THE MOST IMPORTANT FILE OF WHOLE ITEMIZE
 // HERE IS WHERE THE MAGIC HAPPENS
@@ -64,35 +65,6 @@ function getSearchStateOf(state: IActualItemProviderState): IItemSearchStateType
     searchShouldCache: state.searchShouldCache,
     searching: state.searching,
   };
-}
-
-function getPropertyListForSearchMode(properties: Array<string | IPropertyCoreProps>, standardCounterpart: ItemDefinition) {
-  let result: string[] = [];
-  properties.forEach((property) => {
-
-    const propertyId = typeof property === "string" ? property : property.id;
-    const searchVariantSpecified = typeof property !== "string" ? property.searchVariant : null;
-
-    if (
-      propertyId === "search" ||
-      propertyId === "created_by" ||
-      propertyId === "since" ||
-      (!searchVariantSpecified && standardCounterpart.isPropertyInSearchModeOnly(propertyId))
-    ) {
-      result.push(propertyId);
-      return;
-    }
-
-    const standardProperty = standardCounterpart.getPropertyDefinitionFor(propertyId, true);
-
-    if (!searchVariantSpecified) {
-      result = result.concat(getConversionIds(standardProperty.rawData, true));
-    } else {
-      const id = PropertyDefinitionSearchInterfacesPrefixes[searchVariantSpecified.toUpperCase()] + propertyId;
-      result.push(id);
-    }
-  });
-  return result;
 }
 
 function getPropertyForSetter(setter: IPropertySetterProps, itemDefinition: ItemDefinition) {
@@ -397,9 +369,12 @@ export interface IActionSearchOptions extends IActionCleanOptions {
   };
 
   /**
-   * Simply disables search SSR
+   * Use this to enable SSR search
+   * SSR search is pretty heavy this is necessary for
+   * USSD apps to work or for extreme SEO optimization
+   * but it increases the payload retrieved by quite the amount
    */
-  clientOnly?: boolean;
+  ssrEnabled?: boolean;
 
   /**
    * The cache policy to perform the search, using a cache policy will disable
@@ -674,6 +649,13 @@ export interface IItemProviderProps {
    * a state
    */
   automaticSearchForce?: boolean;
+  /**
+   * For high accuracy realtime search, when search results are obtained during SSR
+   * from a SSR search id, they may be considered true to what is currently in the database
+   * however we are not certain because no listeners may have been installed (if the search has a listenPolicy)
+   * disabling the grace time ensures that it is always checked against the database
+   */
+  automaticSearchNoGraceTime?: boolean;
   /**
    * Makes automatic search happen only on mount
    */
@@ -1356,12 +1338,20 @@ export class ActualItemProvider extends
         this.initialAutomaticNextSearch = true;
         this.search(this.props.automaticSearch);
       } else {
+        // when we have a search that was done during SSR and was not stored
+        // somewhere in our stuff, we don't want to request feedback
+        // when we just loaded the app because then it makes no sense
+        // as the information should be up to date
+        const shouldRequestFeedback = this.state.searchId === "SSR_SEARCH" && !this.props.automaticSearchNoGraceTime ? (
+          (new Date()).getTime() - LOAD_TIME > SSR_GRACE_TIME
+        ) : true;
+
         this.searchListenersSetup(
           this.props.automaticSearch,
           this.state.searchLastModified,
           this.state.searchOwner,
           this.state.searchParent,
-          true,
+          shouldRequestFeedback,
         );
       }
     }
@@ -3671,6 +3661,10 @@ export class ActualItemProvider extends
       throw new Error("searchByProperties includes created by yet in the options an override was included as " + options.createdBy);
     } else if (options.searchByProperties.includes("since") && options.since) {
       throw new Error("searchByProperties includes created by yet in the options an override was included as " + options.createdBy);
+    }
+
+    if (options.ssrEnabled && options.cachePolicy && options.cachePolicy !== "none") {
+      console.warn("You have a SSR enabled search that uses cache policy, this will not execute in the server side due to conflicting instructions");
     }
 
     // we need the standard counterpart given we are in search mode right now, 
