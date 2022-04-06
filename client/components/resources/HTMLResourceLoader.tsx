@@ -7,6 +7,7 @@
  */
 
 import React from "react";
+import type { IResourceCollectionResult } from "../../../server/ssr/collect";
 import type { IAppDataType } from "../../../server";
 import type { IResourceLoaderProps } from "./ResourceLoader";
 import ResourceLoader from "./ResourceLoader";
@@ -42,7 +43,7 @@ interface IHTMLResourceLoaderProps extends Omit<IResourceLoaderProps, "children"
     * to realize how this is resolved we need to support resources
     * in our SSR and request manager
     */
-   serverSideResolver?: (appData: IAppDataType) => Promise<string>;
+   serverSideResolver?: (appData: IAppDataType) => Promise<IResourceCollectionResult>;
    /**
     * the source as a string, without the /rest/resource/ part, which is
     * defined in the path
