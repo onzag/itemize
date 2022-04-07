@@ -174,7 +174,7 @@ export class Collector {
    */
   public getQueries() {
     // remove the non-accessible ones
-    return this.results.filter((r) => r !== null && r.type !== "query").map((r: IQueryCollectionResult) => r.query);
+    return this.results.filter((r) => r !== null && r.type === "query").map((r: IQueryCollectionResult) => r.query);
   }
 
   /**
@@ -189,7 +189,7 @@ export class Collector {
    */
   public getResources(): ISSRCollectedResourcesType {
     const rs: ISSRCollectedResourcesType = {};
-    this.results.filter((r) => r !== null && r.type !== "resource").forEach((r: IInternalResourceCollectionResult) => {
+    this.results.filter((r) => r !== null && r.type === "resource").forEach((r: IInternalResourceCollectionResult) => {
       rs[r.path] = r.data;
     });
     return rs;

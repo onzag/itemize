@@ -33,6 +33,7 @@ import { getGQLFieldsDefinitionForInclude } from "./Include/gql";
 import { getGQLFieldsDefinitionForModule } from "../gql";
 import { IGQLFieldsDefinitionType, IGraphQLResolversType, IGQLQueryFieldsDefinitionType } from "../../gql";
 import { EndpointError } from "../../../errors";
+import graphqlFields from "graphql-fields";
 
 /**
  * Provides all the graphql fields that this item definition contains as well as its
@@ -259,10 +260,8 @@ async function resolveGenericFunction(
     // are expected to be async functions
     try {
       value = await resolvers[resolveToUse]({
-        source,
         args,
-        context,
-        info,
+        fields: graphqlFields(info),
       }, itemDefinition);
     } catch (err) {
       // if we catch an error, we check
