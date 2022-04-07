@@ -31,7 +31,6 @@ import { buildSQLQueryForItemDefinition, convertSQLValueToGQLValueForItemDefinit
 import { IGQLSearchRecord, IGQLSearchRecordsContainer, IGQLSearchResultsContainer } from "../../../gql-querier";
 import { convertVersionsIntoNullsWhenNecessary } from "../../version-null-value";
 import { flattenRawGQLValueOrFields } from "../../../gql-util";
-import graphqlFields from "graphql-fields";
 import { NanoSecondComposedDate } from "../../../nanodate";
 import Root from "../../../base/Root";
 import { EndpointError } from "../../../base/errors";
@@ -196,7 +195,7 @@ export async function searchModule(
 
   let sqlFieldsToRequest: string[] = ["id", "version", "type", "last_modified"];
   let requestedFields: any = null;
-  const generalFields = graphqlFields(resolverArgs.info);
+  const generalFields = resolverArgs.fields;
   if (traditional) {
     requestedFields = flattenRawGQLValueOrFields(generalFields.results);
     const fieldsToRequestRawValue = Object.keys(requestedFields);
@@ -620,7 +619,7 @@ export async function searchItemDefinition(
 
   let sqlFieldsToRequest: string[] = ["id", "version", "type", "last_modified"];
   let requestedFields: any = null;
-  const generalFields = graphqlFields(resolverArgs.info);
+  const generalFields = resolverArgs.fields;
   if (traditional) {
     requestedFields = flattenRawGQLValueOrFields(generalFields.results);
     const fieldsToRequestRawValue = Object.keys(requestedFields);

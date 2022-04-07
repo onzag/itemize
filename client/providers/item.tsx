@@ -1,6 +1,6 @@
 import React from "react";
 import { LocaleContext, ILocaleContextType } from "../internal/providers/locale-provider";
-import ItemDefinition, { IItemStateType } from "../../base/Root/Module/ItemDefinition";
+import ItemDefinition, { IItemSearchStateType, IItemStateType } from "../../base/Root/Module/ItemDefinition";
 import PropertyDefinition, { IPropertyDefinitionState } from "../../base/Root/Module/ItemDefinition/PropertyDefinition";
 import { PropertyDefinitionSupportedType } from "../../base/Root/Module/ItemDefinition/PropertyDefinition/types";
 import Include, { IncludeExclusionState } from "../../base/Root/Module/ItemDefinition/Include";
@@ -12,7 +12,6 @@ import {
   MEMCACHED_DESTRUCTION_MARKERS_LOCATION,
   DESTRUCTION_MARKERS_LOCATION,
   IOrderByRuleType,
-  INCLUDE_PREFIX,
   MEMCACHED_SEARCH_DESTRUCTION_MARKERS_LOCATION,
   SEARCH_DESTRUCTION_MARKERS_LOCATION,
 } from "../../constants";
@@ -21,13 +20,12 @@ import { requestFieldsAreContained } from "../../gql-util";
 import { EndpointErrorType } from "../../base/errors";
 import equals from "deep-equal";
 import { ModuleContext } from "./module";
-import { getConversionIds } from "../../base/Root/Module/ItemDefinition/PropertyDefinition/search-mode";
 import CacheWorkerInstance from "../internal/workers/cache";
 import { IRemoteListenerRecordsCallbackArg, RemoteListener } from "../internal/app/remote-listener";
 import uuid from "uuid";
 import {
   getFieldsAndArgs, runGetQueryFor, runDeleteQueryFor, runEditQueryFor, runAddQueryFor, runSearchQueryFor, IIncludeOverride,
-  IPropertyOverride, ICacheMetadataMismatchAction, ISearchCacheMetadataMismatchAction, reprocessQueryArgumentsForFiles
+  IPropertyOverride, ICacheMetadataMismatchAction, ISearchCacheMetadataMismatchAction, reprocessQueryArgumentsForFiles, getPropertyListForSearchMode
 } from "../internal/gql-client-util";
 import { IPropertyCoreProps, IPropertySetterProps } from "../components/property/base";
 import { PropertyDefinitionSearchInterfacesPrefixes } from "../../base/Root/Module/ItemDefinition/PropertyDefinition/search-interfaces";
@@ -40,13 +38,16 @@ import type { ICacheMetadataMatchType } from "../internal/workers/cache/cache.wo
 
 const isDevelopment = process.env.NODE_ENV === "development";
 
+const SSR_GRACE_TIME = 10000;
+const LOAD_TIME = (new Date()).getTime();
+
 // THIS IS THE MOST IMPORTANT FILE OF WHOLE ITEMIZE
 // HERE IS WHERE THE MAGIC HAPPENS
 
 // TODO cache policy search destruction markers
 // destruct a whole search and its children on logout
 
-function getSearchStateOf(state: IActualItemProviderState): IActualItemProviderSearchState {
+function getSearchStateOf(state: IActualItemProviderState): IItemSearchStateType {
   return {
     searchCount: state.searchCount,
     searchError: state.searchError,
@@ -64,35 +65,6 @@ function getSearchStateOf(state: IActualItemProviderState): IActualItemProviderS
     searchShouldCache: state.searchShouldCache,
     searching: state.searching,
   };
-}
-
-function getPropertyListForSearchMode(properties: Array<string | IPropertyCoreProps>, standardCounterpart: ItemDefinition) {
-  let result: string[] = [];
-  properties.forEach((property) => {
-
-    const propertyId = typeof property === "string" ? property : property.id;
-    const searchVariantSpecified = typeof property !== "string" ? property.searchVariant : null;
-
-    if (
-      propertyId === "search" ||
-      propertyId === "created_by" ||
-      propertyId === "since" ||
-      (!searchVariantSpecified && standardCounterpart.isPropertyInSearchModeOnly(propertyId))
-    ) {
-      result.push(propertyId);
-      return;
-    }
-
-    const standardProperty = standardCounterpart.getPropertyDefinitionFor(propertyId, true);
-
-    if (!searchVariantSpecified) {
-      result = result.concat(getConversionIds(standardProperty.rawData, true));
-    } else {
-      const id = PropertyDefinitionSearchInterfacesPrefixes[searchVariantSpecified.toUpperCase()] + propertyId;
-      result.push(id);
-    }
-  });
-  return result;
 }
 
 function getPropertyForSetter(setter: IPropertySetterProps, itemDefinition: ItemDefinition) {
@@ -395,6 +367,19 @@ export interface IActionSearchOptions extends IActionCleanOptions {
     id: string,
     version?: string,
   };
+
+  /**
+   * Use this to enable SSR search
+   * SSR search is pretty heavy this is necessary for
+   * USSD apps to work or for extreme SEO optimization
+   * but it increases the payload retrieved by quite the amount
+   */
+  ssrEnabled?: boolean;
+
+  /**
+   * The cache policy to perform the search, using a cache policy will disable
+   * any possibility of SSR since it can't be performed in the server side
+   */
   cachePolicy?: "by-owner" | "by-parent" | "by-owner-and-parent" | "none";
   cacheMetadata?: any;
   cacheMetadataMismatchAction?: ISearchCacheMetadataMismatchAction;
@@ -665,6 +650,13 @@ export interface IItemProviderProps {
    */
   automaticSearchForce?: boolean;
   /**
+   * For high accuracy realtime search, when search results are obtained during SSR
+   * from a SSR search id, they may be considered true to what is currently in the database
+   * however we are not certain because no listeners may have been installed (if the search has a listenPolicy)
+   * disabling the grace time ensures that it is always checked against the database
+   */
+  automaticSearchNoGraceTime?: boolean;
+  /**
    * Makes automatic search happen only on mount
    */
   automaticSearchIsOnlyInitial?: boolean;
@@ -766,12 +758,12 @@ export interface IItemProviderProps {
    * the item state, not just when a new search has been executed but
    * also when memory data has been fetched or from location
    */
-  onSearchStateChange?: (data: IActualItemProviderSearchState) => void;
+  onSearchStateChange?: (data: IItemSearchStateType) => void;
   /**
    * Occurs when a search state is preloaded at mount time taken from the
    * memory rather than a search action
    */
-  onSearchStateLoaded?: (data: IActualItemProviderSearchState) => void;
+  onSearchStateLoaded?: (data: IItemSearchStateType) => void;
   /**
    * Callback triggers on submit
    */
@@ -824,27 +816,9 @@ interface IActualItemProviderProps extends IItemProviderProps {
   location?: Location<any>;
 }
 
-export interface IActualItemProviderSearchState {
-  searchError: EndpointErrorType;
-  searching: boolean;
-  searchRecords: IGQLSearchRecord[];
-  searchResults: IGQLValue[];
-  searchLimit: number;
-  searchOffset: number;
-  searchCount: number;
-  searchId: string;
-  searchOwner: string;
-  searchLastModified: string;
-  searchParent: [string, string, string];
-  searchShouldCache: boolean;
-  searchRequestedProperties: string[];
-  searchRequestedIncludes: { [include: string]: string[] };
-  searchFields: any;
-};
-
 // This is the state of such, it's basically a copy of the
 // context, so refer to that, the context is avobe
-interface IActualItemProviderState extends IActualItemProviderSearchState {
+interface IActualItemProviderState extends IItemSearchStateType {
   searchWasRestored: boolean;
   itemState: IItemStateType;
   isBlocked: boolean;
@@ -1040,7 +1014,7 @@ export class ActualItemProvider extends
       isNotFound = memoryLoadedAndValid && appliedGQLValue.rawValue === null;
     }
 
-    let searchState: IActualItemProviderSearchState = {
+    let searchState: IItemSearchStateType = {
       searchError: null,
       searching: false,
       searchResults: null,
@@ -1057,13 +1031,13 @@ export class ActualItemProvider extends
       searchRequestedIncludes: {},
       searchRequestedProperties: [],
     };
-    const internalState = props.itemDefinitionInstance.getInternalState(
+    const searchStateComplex = props.itemDefinitionInstance.getSearchState(
       props.forId || null, props.forVersion || null,
     );
-    if (internalState) {
-      searchState = internalState.searchState;
+    if (searchStateComplex) {
+      searchState = searchStateComplex.searchState;
 
-      const state = internalState.state;
+      const state = searchStateComplex.state;
       props.itemDefinitionInstance.applyState(
         props.forId || null,
         props.forVersion || null,
@@ -1321,7 +1295,7 @@ export class ActualItemProvider extends
           null,
         );
       });
-      props.itemDefinitionInstance.cleanInternalState(props.forId || null, props.forVersion || null);
+      props.itemDefinitionInstance.cleanSearchState(props.forId || null, props.forVersion || null);
       props.itemDefinitionInstance.triggerListeners(
         "change",
         props.forId || null,
@@ -1364,12 +1338,20 @@ export class ActualItemProvider extends
         this.initialAutomaticNextSearch = true;
         this.search(this.props.automaticSearch);
       } else {
+        // when we have a search that was done during SSR and was not stored
+        // somewhere in our stuff, we don't want to request feedback
+        // when we just loaded the app because then it makes no sense
+        // as the information should be up to date
+        const shouldRequestFeedback = this.state.searchId === "SSR_SEARCH" && !this.props.automaticSearchNoGraceTime ? (
+          (new Date()).getTime() - LOAD_TIME > SSR_GRACE_TIME
+        ) : true;
+
         this.searchListenersSetup(
           this.props.automaticSearch,
           this.state.searchLastModified,
           this.state.searchOwner,
           this.state.searchParent,
-          true,
+          shouldRequestFeedback,
         );
       }
     }
@@ -1833,7 +1815,7 @@ export class ActualItemProvider extends
     }
   }
   public changeSearchListener() {
-    let searchState: IActualItemProviderSearchState = {
+    let searchState: IItemSearchStateType = {
       searchError: null,
       searching: false,
       searchResults: null,
@@ -1851,11 +1833,11 @@ export class ActualItemProvider extends
       searchRequestedProperties: [],
     };
 
-    const internalState = this.props.itemDefinitionInstance.getInternalState(
+    const searchStateComplex = this.props.itemDefinitionInstance.getSearchState(
       this.props.forId || null, this.props.forVersion || null,
     );
-    if (internalState) {
-      searchState = internalState.searchState;
+    if (searchStateComplex) {
+      searchState = searchStateComplex.searchState;
     }
 
     this.changedSearchListenerLastCollectedSearchId = {
@@ -2531,7 +2513,7 @@ export class ActualItemProvider extends
       this.props.forId || null,
       this.props.forVersion || null,
     );
-    this.props.itemDefinitionInstance.cleanInternalState(this.props.forId || null, this.props.forVersion || null);
+    this.props.itemDefinitionInstance.cleanSearchState(this.props.forId || null, this.props.forVersion || null);
     this.onPropertyChangeOrRestoreFinal();
   }
   public async onPropertyChange(
@@ -2552,7 +2534,7 @@ export class ActualItemProvider extends
       value,
       internalValue,
     );
-    this.props.itemDefinitionInstance.cleanInternalState(this.props.forId || null, this.props.forVersion || null);
+    this.props.itemDefinitionInstance.cleanSearchState(this.props.forId || null, this.props.forVersion || null);
     this.onPropertyChangeOrRestoreFinal();
   }
   public onPropertyEnforceOrClearFinal(
@@ -2585,7 +2567,7 @@ export class ActualItemProvider extends
     // since they might be out of sync that's why the id is passed
     // the setter enforces values
     property.setSuperEnforced(givenForId || null, givenForVersion || null, value, this);
-    this.props.itemDefinitionInstance.cleanInternalState(this.props.forId || null, this.props.forVersion || null);
+    this.props.itemDefinitionInstance.cleanSearchState(this.props.forId || null, this.props.forVersion || null);
     this.onPropertyEnforceOrClearFinal(givenForId, givenForVersion, internal);
   }
   public onPropertyClearEnforce(
@@ -2596,7 +2578,7 @@ export class ActualItemProvider extends
   ) {
     // same but removes the enforcement
     property.clearSuperEnforced(givenForId || null, givenForVersion || null, this);
-    this.props.itemDefinitionInstance.cleanInternalState(this.props.forId || null, this.props.forVersion || null);
+    this.props.itemDefinitionInstance.cleanSearchState(this.props.forId || null, this.props.forVersion || null);
     this.onPropertyEnforceOrClearFinal(givenForId, givenForVersion, internal);
   }
   public runDismountOn(props: IActualItemProviderProps = this.props) {
@@ -2611,7 +2593,7 @@ export class ActualItemProvider extends
         );
 
         if (props.itemDefinitionInstance.isInSearchMode()) {
-          props.itemDefinitionInstance.cleanInternalState(props.forId || null, props.forVersion || null);
+          props.itemDefinitionInstance.cleanSearchState(props.forId || null, props.forVersion || null);
           props.itemDefinitionInstance.triggerListeners("search-change", props.forId || null, props.forVersion || null);
         }
       } else {
@@ -3105,7 +3087,7 @@ export class ActualItemProvider extends
       options.cleanSearchResultsOnSuccess && state === "success"
     ) {
       needsSearchUpdate = true;
-      props.itemDefinitionInstance.cleanInternalState(props.forId || null, props.forVersion || null);
+      props.itemDefinitionInstance.cleanSearchState(props.forId || null, props.forVersion || null);
     }
 
     // NOw we check if we need an update in the listeners and if we are allowed to trigger it
@@ -3681,6 +3663,10 @@ export class ActualItemProvider extends
       throw new Error("searchByProperties includes created by yet in the options an override was included as " + options.createdBy);
     }
 
+    if (options.ssrEnabled && options.cachePolicy && options.cachePolicy !== "none") {
+      console.warn("You have a SSR enabled search that uses cache policy, this will not execute in the server side due to conflicting instructions");
+    }
+
     // we need the standard counterpart given we are in search mode right now, 
     const standardCounterpart = this.props.itemDefinitionInstance.getStandardCounterpart();
     // first we calculate the properties that are to be submitted, by using the standard counterpart
@@ -3914,7 +3900,7 @@ export class ActualItemProvider extends
         !options.cleanSearchResultsOnAny &&
         !options.cleanSearchResultsOnFailure
       ) {
-        this.props.itemDefinitionInstance.setInternalState(
+        this.props.itemDefinitionInstance.setSearchState(
           this.props.forId || null,
           this.props.forVersion || null,
           {
@@ -3986,7 +3972,7 @@ export class ActualItemProvider extends
         !options.cleanSearchResultsOnAny &&
         !options.cleanSearchResultsOnSuccess
       ) {
-        this.props.itemDefinitionInstance.setInternalState(
+        this.props.itemDefinitionInstance.setSearchState(
           this.props.forId || null,
           this.props.forVersion || null,
           {
@@ -4191,36 +4177,6 @@ export class ActualItemProvider extends
         policies: [],
       },
     });
-  }
-  public async beforeSSRRender(): Promise<void> {
-    if (
-      this.props.itemDefinitionInstance.isInSearchMode() &&
-      this.props.automaticSearch
-    ) {
-      // cheesy way to get to the root
-      const root = this.props.itemDefinitionInstance.getParentModule().getParentRoot();
-      const id = this.props.forId || null;
-      const version = this.props.forVersion || null;
-      await root.callRequestManagerSearch(this.props.itemDefinitionInstance, id, version, this.props.automaticSearch);
-      this.state = ActualItemProvider.setupInitialState(this.props);
-      return;
-    } else if (
-      this.state.loaded ||
-      this.props.forId === null ||
-      this.props.itemDefinitionInstance.isInSearchMode() ||
-      this.props.itemDefinitionInstance.isExtensionsInstance() ||
-      this.props.avoidLoading
-    ) {
-      return null;
-    }
-
-    // cheesy way to get to the root
-    const root = this.props.itemDefinitionInstance.getParentModule().getParentRoot();
-    const id = this.props.forId;
-    const version = this.props.forVersion || null;
-
-    await root.callRequestManager(this.props.itemDefinitionInstance, id, version);
-    this.state = ActualItemProvider.setupInitialState(this.props);
   }
   public render() {
     if (

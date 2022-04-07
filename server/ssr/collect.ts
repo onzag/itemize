@@ -5,36 +5,75 @@
  */
 
 import { ISQLTableRowValue } from "../../base/Root/sql";
-import { IGQLRequestFields } from "../../gql-querier";
+import { IGQLRequestFields, IGQLSearchRecord, IGQLSearchResultsContainer, IGQLValue } from "../../gql-querier";
 import ItemDefinition, { ItemDefinitionIOActions } from "../../base/Root/Module/ItemDefinition";
 import { filterAndPrepareGQLValue } from "../resolvers/basic";
 import { IAppDataType } from "../../server";
 import { logger } from "../logger";
-import { UNSPECIFIED_OWNER } from "../../constants";
-import { ISSRCollectedQueryType } from "../../client/internal/providers/ssr-provider";
+import { ENDPOINT_ERRORS, PROTECTED_RESOURCES, UNSPECIFIED_OWNER } from "../../constants";
+import { ISSRCollectedQueryType, ISSRCollectedResourcesType, ISSRCollectedSearchType } from "../../client/internal/providers/ssr-provider";
 import { ISSRRule } from ".";
 import { IOTriggerActions } from "../resolvers/triggers";
 import { CustomRoleGranterEnvironment, CustomRoleManager } from "../resolvers/roles";
 import { convertSQLValueToGQLValueForItemDefinition } from "../../base/Root/Module/ItemDefinition/sql";
 import type { IActionSearchOptions } from "../../client/providers/item";
+import fs from "fs";
+import path from "path";
+import { getFieldsAndArgs, getPropertyListForSearchMode, getSearchQueryFor } from "../../client/internal/gql-client-util";
+import { searchItemDefinition, searchModule } from "../resolvers/actions/search";
+import { EndpointError } from "../../base/errors";
+
+const fsAsync = fs.promises;
+
+interface IBaseCollectionResult {
+  /**
+   * The date when the result was last modified
+   */
+  lastModified: Date;
+  /**
+   * The signature for this specific collection result
+   * make it something unique, and include the last modified date within it
+   * separate by dots, this specifies this exact data point
+   */
+  signature: string;
+
+  /**
+   * The type
+   * @override
+   */
+  type: string;
+}
+
+export interface IResourceCollectionResult extends IBaseCollectionResult {
+  /**
+   * The data collected if any
+   */
+  data: string;
+  /**
+   * The type collected
+   */
+  type: "resource";
+}
+
+interface IInternalResourceCollectionResult extends IResourceCollectionResult {
+  path: string;
+}
 
 /**
  * This is what a collection result looks like
  */
-export interface ICollectionResult {
-  /**
-   * The date when the result was last modified
-   */
-  lastModified: Date,
-  /**
-   * The signature for this specific collection result
-   */
-  signature: string,
+export interface IQueryCollectionResult extends IBaseCollectionResult {
   /**
    * The query value, the same that is passed to the client side
    * this contains the value and all the attributes
    */
-  query: ISSRCollectedQueryType,
+  query: ISSRCollectedQueryType;
+  type: "query";
+};
+
+export interface ISearchCollectionResult extends IBaseCollectionResult {
+  search: ISSRCollectedSearchType;
+  type: "search";
 };
 
 /**
@@ -54,12 +93,18 @@ export class Collector {
   /**
    * Represents all the collected results
    */
-  private results: ICollectionResult[] = [];
+  private results: Array<IInternalResourceCollectionResult | IQueryCollectionResult | ISearchCollectionResult> = [];
   /**
    * All the collection statuses per result
    */
   private collectionStatuses: {
     [mergedID: string]: boolean;
+  } = {};
+  /**
+   * All the collection statuses per result
+   */
+  private collectionData: {
+    [mergedID: string]: any;
   } = {};
   /**
    * Collection requests callbacks of other
@@ -68,13 +113,13 @@ export class Collector {
    * for collection for the same item
    */
   private collectionRequestsCbs: {
-    [mergedID: string]: Array<() => void>;
+    [mergedID: string]: Array<(data?: any) => void>;
   } = {};
   /**
    * Same but gives a rejected promise instead
    */
   private collectionRequestsRejectedCbs: {
-    [mergedID: string]: Array<() => void>;
+    [mergedID: string]: Array<(data?: any) => void>;
   } = {};
 
   /**
@@ -121,8 +166,6 @@ export class Collector {
         final = r.lastModified;
       }
     });
-    // TODO add resources and whatnot to calculate
-    // do we need to then add last modified into the math for resources?
     return final;
   }
 
@@ -131,21 +174,25 @@ export class Collector {
    */
   public getQueries() {
     // remove the non-accessible ones
-    return this.results.filter((r) => r !== null).map((r) => r.query);
+    return this.results.filter((r) => r !== null && r.type !== "query").map((r: IQueryCollectionResult) => r.query);
   }
 
   /**
    * TODO
    */
-  public getSearches() {
-
+  public getSearches(): ISSRCollectedSearchType[] {
+    return [];
   }
 
   /**
-   * TODO
+   * Provides the map of all the resulting resources that were fetched
    */
-  public getResources() {
-
+  public getResources(): ISSRCollectedResourcesType {
+    const rs: ISSRCollectedResourcesType = {};
+    this.results.filter((r) => r !== null && r.type !== "resource").forEach((r: IInternalResourceCollectionResult) => {
+      rs[r.path] = r.data;
+    });
+    return rs;
   }
 
   /**
@@ -177,23 +224,124 @@ export class Collector {
     return this.results.some((r) => r === null);
   }
 
-  public async collectResource(finalPath: string, customResolver: (appData: IAppDataType) => Promise<string>): Promise<string> {
+  public async collectResource(finalPath: string, customResolver: (appData: IAppDataType) => Promise<IResourceCollectionResult>): Promise<string> {
     const mergedID = "__RESOURCE__" + finalPath;
 
+    // request has been done and it's ready
+    if (this.collectionStatuses[mergedID]) {
+      return this.collectionData[mergedID].toString();
+    } else if (this.collectionStatuses[mergedID] === false) {
+      // request is in progress, add it to queue
+      return new Promise<string>((resolve, reject) => {
+        this.collectionRequestsCbs[mergedID].push(resolve);
+        this.collectionRequestsRejectedCbs[mergedID].push(reject);
+      });
+    }
+
+    // mark it as in progress
     this.collectionStatuses[mergedID] = false;
+    this.collectionData[mergedID] = null;
     this.collectionRequestsCbs[mergedID] = [];
     this.collectionRequestsRejectedCbs[mergedID] = [];
 
-    // TODO collect resource
-    // resources will use a hash of the content itself for signature
-    // completed
-    this.collectionStatuses[mergedID] = true;
-    this.collectionRequestsCbs[mergedID].forEach((r) => r());
+    let result: IResourceCollectionResult;
+    let forbiddenToDevKey: boolean = false;
 
-    return null;
+    if (customResolver) {
+      try {
+        result = await customResolver(this.appData);
+
+        if (!result.lastModified) {
+          result.lastModified = new Date();
+        }
+      } catch (err) {
+        logger.error(
+          "ssrGenerator [SERIOUS]: Collection of resource at " + finalPath + " failed due to error in custom resolver",
+          {
+            errStack: err.stack,
+            errMessage: err.message,
+            path: finalPath,
+          }
+        )
+
+        this.collectionRequestsRejectedCbs[mergedID].forEach((r) => r());
+
+        throw err;
+      }
+    } else {
+      // Potential security vulnerability here because we try to read a file
+      // but we must ensure such a file only exist within the resource folder
+      // we must also respect the protected resources
+      try {
+        if (!finalPath.startsWith("/rest/resource/")) {
+          throw new Error("Trying to access non-resource with no custom resolver");
+        }
+
+        const finalPathNonRes = finalPath.replace("/rest/resource/", "");
+
+        if (finalPathNonRes.includes("..")) {
+          throw new Error("Invalid resource path that includes double dots in it");
+        }
+
+        const isProtectedResource = PROTECTED_RESOURCES.includes(finalPathNonRes);
+        if (isProtectedResource && this.appliedRule.mode !== "development") {
+          forbiddenToDevKey = true;
+          result = {
+            lastModified: new Date(this.appData.buildnumber),
+            data: null,
+            // no need for last modified since it uses the buildnumber
+            signature: finalPath,
+            type: "resource",
+          };
+        } else {
+          const fullPath = path.join(path.resolve(path.join("dist", "data")), finalPath);
+          const data = await fsAsync.readFile(fullPath, "utf-8");
+
+          result = {
+            lastModified: new Date(this.appData.buildnumber),
+            data,
+            // no need for last modified since it uses the buildnumber
+            signature: finalPath,
+            type: "resource",
+          }
+        }
+      } catch (err) {
+        logger.error(
+          "ssrGenerator [SERIOUS]: Collection of resource at " + finalPath + " failed due to missing file or unreadable",
+          {
+            errStack: err.stack,
+            errMessage: err.message,
+            path: finalPath,
+          }
+        );
+
+        this.collectionRequestsRejectedCbs[mergedID].forEach((r) => r());
+
+        throw err;
+      }
+    }
+
+    this.collectionStatuses[mergedID] = true;
+    this.collectionData[mergedID] = result.data;
+    this.collectionRequestsCbs[mergedID].forEach((r) => r(result.data));
+
+    if (forbiddenToDevKey) {
+      this.forbiddenSignature.push(finalPath + "[FORBIDDEN_PROTECTED_RESOURCE]");
+    } else {
+      this.results.push({
+        ...result,
+        path: finalPath,
+      });
+    }
+
+    return result.data;
   }
 
   public async collectSearch(idef: ItemDefinition, id: string, version: string, args: IActionSearchOptions): Promise<void> {
+    if (!args.ssrEnabled || (args.cachePolicy && args.cachePolicy !== "none")) {
+      return null;
+    }
+
     const mergedID = idef.getQualifiedPathName() + "." + id + "." + (version || "");
 
     // request has been done and it's ready
@@ -212,11 +360,209 @@ export class Collector {
     this.collectionRequestsCbs[mergedID] = [];
     this.collectionRequestsRejectedCbs[mergedID] = [];
 
-    // TODO collect search results
     // this function is too complicated to be like the second so it's better to just use searchModule and work
     // from that, basically create a token for the given user (or pass a flag?), build the args, do everything like
     // the thing wants to, copy the client search to see how it's done to create the args
-    // TODO SSR excluded requested properties too that need to be added
+
+    // we need the standard counterpart given we are in search mode right now, 
+    const standardCounterpart = idef.getStandardCounterpart();
+    // first we calculate the properties that are to be submitted, by using the standard counterpart
+    // a search action is only to be executed if the item definition (either a real item definition or
+    // one representing a module) is actually in search mode, otherwise this would crash
+    const propertiesForArgs = getPropertyListForSearchMode(args.searchByProperties, standardCounterpart);
+
+    // the args of the item definition depend on the search mode, hence we use
+    // our current item definition instance to get the arguments we want to load
+    // in order to perform the search based on the search mode
+
+    // THIS IS A COPY AND PASTE FROM ITEM THAT IS MODIFIED
+    try {
+      const {
+        argumentsForQuery,
+      } = getFieldsAndArgs({
+        includeArgs: true,
+        includeFields: false,
+        propertiesForArgs,
+        includesForArgs: args.searchByIncludes || {},
+        itemDefinitionInstance: idef,
+        forId: id || null,
+        forVersion: version || null,
+      });
+
+      // the fields nevertheless are another story as it uses the standard logic
+      const searchFieldsAndArgs = getFieldsAndArgs({
+        includeArgs: false,
+        includeFields: true,
+        properties: args.requestedProperties,
+        includes: args.requestedIncludes || {},
+        itemDefinitionInstance: standardCounterpart,
+        forId: null,
+        forVersion: null,
+      });
+
+      let types: string[] = null;
+      if (args.types) {
+        const root = idef.getParentModule().getParentRoot();
+        types = args.types.map((t) => root.registry[t].getQualifiedPathName());
+      }
+
+      // while these search fields are of virtually no use for standard searchs
+      // these are used when doing a traditional search and when doing a search
+      // in a cache policy mode
+      const requestedSearchFields = searchFieldsAndArgs.requestFields;
+
+      let parentedBy = null;
+      if (args.parentedBy) {
+        const root = idef.getParentModule().getParentRoot();
+        const parentIdef = root.registry[args.parentedBy.item] as ItemDefinition;
+        parentedBy = {
+          itemDefinition: parentIdef,
+          id: args.parentedBy.id,
+          version: args.parentedBy.version || null,
+        };
+      }
+
+      const query = getSearchQueryFor({
+        args: argumentsForQuery,
+        fields: requestedSearchFields,
+        itemDefinition: idef,
+        createdBy: args.createdBy || null,
+        since: args.since || null,
+        orderBy: args.orderBy || {
+          created_at: {
+            priority: 0,
+            nulls: "last",
+            direction: "desc",
+          }
+        },
+        types,
+        // note how we override and make it traditional
+        // we want a traditional search we will steal
+        // the records from that
+        traditional: true,//!!args.traditional,
+        token: this.appliedRule.forUser.token,
+        language: this.appliedRule.language,
+        limit: args.limit,
+        offset: args.offset,
+        enableNulls: args.enableNulls,
+        parentedBy,
+      });
+
+      const stateOfSearch = idef.getStateNoExternalChecking(
+        id || null,
+        version || null,
+      );
+
+      const basicQueryElement = query.getQueryByIndex(0);
+
+      // now we can use this to pass directly and straight to the search function
+      // depending on what we are doing we need those records and for that
+      // we will use a traditional search
+      const isModuleSearch = idef.isExtensionsInstance();
+      let rs: IGQLSearchResultsContainer;
+      if (isModuleSearch) {
+        rs = await searchModule(
+          this.appData,
+          {
+            args: basicQueryElement.args,
+            fields: basicQueryElement.fields,
+          },
+          idef.getParentModule().getStandardModule(),
+          true,
+        ) as IGQLSearchResultsContainer;
+      } else {
+        rs = await searchItemDefinition(
+          this.appData,
+          {
+            args: basicQueryElement.args,
+            fields: basicQueryElement.fields,
+          },
+          idef.getStandardCounterpart(),
+          true,
+        ) as IGQLSearchResultsContainer;
+      }
+
+      const records = (rs.results as IGQLValue[]).map((v) => ({
+        type: v.type,
+        version: v.version || null,
+        id: v.id || null,
+        last_modified: v.last_modified || null
+      })) as IGQLSearchRecord[];
+
+      let searchParent: [string, string, string] = null;
+      if (args.parentedBy) {
+        const itemDefinitionInQuestion = idef.getParentModule()
+          .getParentRoot().registry[args.parentedBy.item] as ItemDefinition;
+
+        // and that way we calculate the search parent
+        searchParent = [
+          itemDefinitionInQuestion.getQualifiedPathName(),
+          args.parentedBy.id,
+          args.parentedBy.version || null,
+        ];
+      }
+
+      const searchState = {
+        searchError: null as any,
+        searching: false,
+        searchResults: rs.results,
+        searchRecords: records,
+        searchCount: rs.count,
+        searchLimit: rs.limit,
+        searchOffset: rs.offset,
+        searchId: "SSR_SEARCH",
+        searchOwner: args.createdBy || null,
+        searchParent,
+        searchShouldCache: !!args.cachePolicy,
+        searchFields: requestedSearchFields,
+        searchRequestedProperties: args.requestedProperties,
+        searchRequestedIncludes: args.requestedIncludes || {},
+        searchLastModified: rs.last_modified,
+      };
+
+      const state = {
+        searchState,
+        state: stateOfSearch,
+      };
+
+      idef.setSearchState(
+        id || null,
+        version || null,
+        state,
+      );
+
+      this.results.push({
+        lastModified: new Date(rs.last_modified),
+        signature: mergedID,
+        search: {
+          id: id || null,
+          version: version || null,
+          idef: idef.getQualifiedPathName(),
+          state,
+        },
+        type: "search" as "search",
+      });
+    } catch (err) {
+      if (err instanceof EndpointError && err.data.code === ENDPOINT_ERRORS.FORBIDDEN) {
+        this.results.push(null);
+        this.forbiddenSignature.push(mergedID + "[FORBIDDEN]");
+      } else {
+        logger.error(
+          "ssrGenerator [SERIOUS]: Search collection failed due to request not passing",
+          {
+            errStack: err.stack,
+            errMessage: err.message,
+          }
+        )
+  
+        // reject all these will also cause rendering to crash as the bottom line
+        this.collectionRequestsRejectedCbs[mergedID].forEach((r) => r());
+  
+        // this is bad our collection failed, this will cause the rendering to crash
+        // and it will fallback to no SSR
+        throw err;
+      }
+    }
 
     // completed
     this.collectionStatuses[mergedID] = true;
@@ -452,6 +798,7 @@ export class Collector {
         lastModified,
         signature,
         query,
+        type: "query" as "query",
       };
       this.results.push(result);
       idef.applyValue(

@@ -23,7 +23,6 @@ import {
   defaultTriggerInvalidForbiddenFunction,
   validateCustomId,
 } from "../basic";
-import graphqlFields from "graphql-fields";
 import {
   INCLUDE_PREFIX,
   UNSPECIFIED_OWNER,
@@ -180,7 +179,7 @@ export async function addItemDefinition(
   // now we see which fields are being requested for the answer after adding, first
   // we flatten the fields, remember that we have external and internal fields
   // contained in the DATA value, we flatten that first
-  const requestedFields = flattenRawGQLValueOrFields(graphqlFields(resolverArgs.info));
+  const requestedFields = flattenRawGQLValueOrFields(resolverArgs.fields);
 
   // now we extract the fields that we are actually adding to the item
   // definition, that is what is valid for adding and nothing else

@@ -25,14 +25,37 @@ import {
   RESERVED_BASE_PROPERTIES,
 } from "../../../../constants";
 import { GraphQLOutputType, GraphQLObjectType } from "graphql";
-import { EndpointError } from "../../../errors";
+import { EndpointError, EndpointErrorType } from "../../../errors";
 import uuid from "uuid";
 import { flattenRawGQLValueOrFields, requestFieldsAreContained } from "../../../../gql-util";
-import { IGQLValue, IGQLRequestFields, IGQLFile } from "../../../../gql-querier";
+import { IGQLValue, IGQLRequestFields, IGQLFile, IGQLSearchRecord } from "../../../../gql-querier";
 import { countries } from "../../../../imported-resources";
 import Root, { ICustomRoleManager, IRequestLimitersType } from "../../../Root";
 import { transferrableToBlob, blobToTransferrable, fileURLAbsoluter } from "../../../../util";
 import type { IConfigRawJSONDataType } from "../../../../config";
+
+export interface IItemSearchStateType {
+  searchError: EndpointErrorType;
+  searching: boolean;
+  searchRecords: IGQLSearchRecord[];
+  searchResults: IGQLValue[];
+  searchLimit: number;
+  searchOffset: number;
+  searchCount: number;
+  searchId: string;
+  searchOwner: string;
+  searchLastModified: string;
+  searchParent: [string, string, string];
+  searchShouldCache: boolean;
+  searchRequestedProperties: string[];
+  searchRequestedIncludes: { [include: string]: string[] };
+  searchFields: any;
+};
+
+export interface ICompoundSearchStateType {
+  searchState: IItemSearchStateType;
+  state: IItemStateType;
+}
 
 /**
  * Policies eg, readRoleAccess, editRoleAccess, createRoleAccess
@@ -346,12 +369,12 @@ export interface IItemStateType {
    */
   forVersion: string;
   /**
-   * An internal state for this state in the given slot, in practise
+   * An search state for this state in the given slot, in practise
    * this is used in the search mode in order to store search results as a way
    * to keep them linked to the state that is used in that way some data
    * might be assigned to this state
    */
-  internalState: any;
+  searchState?: any;
 }
 
 /**
@@ -725,7 +748,7 @@ export default class ItemDefinition {
   /**
    * The internal state
    */
-  private stateInternal: {
+  private stateSearch: {
     [mergedID: string]: any;
   }
   /**
@@ -795,7 +818,7 @@ export default class ItemDefinition {
   public cleanState(init?: boolean) {
     this.stateHasAppliedValueTo = {};
     this.stateGQLAppliedValue = {};
-    this.stateInternal = {};
+    this.stateSearch = {};
     this.cleansBlocked = {};
 
     if (!init) {
@@ -1447,7 +1470,7 @@ export default class ItemDefinition {
     }
 
     const gqlOriginal = this.getGQLAppliedValue(id, version);
-    const internalState = this.getInternalState(id, version);
+    const searchState = this.getSearchState(id, version);
     return {
       moduleName: this.getModuleName(),
       itemDefQualifiedName: this.getQualifiedPathName(),
@@ -1458,7 +1481,7 @@ export default class ItemDefinition {
       gqlOriginalFlattenedValue: (gqlOriginal && gqlOriginal.flattenedValue) || null,
       forId: id,
       forVersion: version,
-      internalState,
+      searchState,
     };
   }
 
@@ -1517,7 +1540,7 @@ export default class ItemDefinition {
     }
 
     const gqlOriginal = this.getGQLAppliedValue(id, version);
-    const internalState = this.getInternalState(id, version);
+    const searchState = this.getSearchState(id, version);
     return {
       moduleName: this.getModuleName(),
       itemDefQualifiedName: this.getQualifiedPathName(),
@@ -1528,7 +1551,7 @@ export default class ItemDefinition {
       gqlOriginalFlattenedValue: (gqlOriginal && gqlOriginal.flattenedValue) || null,
       forId: id,
       forVersion: version,
-      internalState,
+      searchState,
     };
   }
 
@@ -1645,7 +1668,7 @@ export default class ItemDefinition {
 
     // we make it we have an applied value
     this.stateHasAppliedValueTo[mergedID] = true;
-    this.stateInternal[mergedID] = null;
+    this.stateSearch[mergedID] = null;
     // and set all the data regarding that value
     this.stateGQLAppliedValue[mergedID] = {
       rawValue: value,
@@ -1810,7 +1833,7 @@ export default class ItemDefinition {
     // delete all from memory
     delete this.stateHasAppliedValueTo[mergedID];
     delete this.stateGQLAppliedValue[mergedID];
-    delete this.stateInternal[mergedID];
+    delete this.stateSearch[mergedID];
 
     // gather the properties
     const properties =
@@ -1847,9 +1870,9 @@ export default class ItemDefinition {
    * @param id 
    * @param version 
    */
-  public getInternalState(id: string, version: string): any {
+  public getSearchState(id: string, version: string): ICompoundSearchStateType {
     const mergedID = id + "." + (version || "");
-    return this.stateInternal[mergedID] || null;
+    return this.stateSearch[mergedID] || null;
   }
 
   /**
@@ -1858,9 +1881,9 @@ export default class ItemDefinition {
    * @param version 
    * @param value 
    */
-  public setInternalState(id: string, version: string, value: any) {
+  public setSearchState(id: string, version: string, value: ICompoundSearchStateType) {
     const mergedID = id + "." + (version || "");
-    this.stateInternal[mergedID] = value;
+    this.stateSearch[mergedID] = value;
   }
 
   /**
@@ -1868,9 +1891,9 @@ export default class ItemDefinition {
    * @param id 
    * @param version 
    */
-  public cleanInternalState(id: string, version: string) {
+  public cleanSearchState(id: string, version: string) {
     const mergedID = id + "." + (version || "");
-    delete this.stateInternal[mergedID];
+    delete this.stateSearch[mergedID];
   }
 
   /**

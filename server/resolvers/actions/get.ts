@@ -14,7 +14,6 @@ import {
   defaultTriggerForbiddenFunction,
   getDictionary,
 } from "../basic";
-import graphqlFields from "graphql-fields";
 import {
   INCLUDE_PREFIX,
   UNSPECIFIED_OWNER,
@@ -51,7 +50,7 @@ export async function getItemDefinition(
 
   // now we find the requested fields that are requested
   // in the get request
-  const rawFields = graphqlFields(resolverArgs.info);
+  const rawFields = resolverArgs.fields;
   const requestedFields = flattenRawGQLValueOrFields(rawFields);
 
   // so we run the policy check for read, this item definition,
@@ -308,7 +307,7 @@ export async function getItemDefinitionList(
 
   // now we find the requested fields that are requested
   // in the get request
-  const requestedFields = flattenRawGQLValueOrFields(graphqlFields(resolverArgs.info).results);
+  const requestedFields = flattenRawGQLValueOrFields(resolverArgs.fields.results);
 
   // we get the requested fields that take part of the item definition
   // description
@@ -532,7 +531,7 @@ export async function getModuleList(
 
   // now we find the requested fields that are requested
   // in the get request
-  const requestedFields = flattenRawGQLValueOrFields(graphqlFields(resolverArgs.info).results);
+  const requestedFields = flattenRawGQLValueOrFields(resolverArgs.fields.results);
 
   // we get the requested fields that take part of the item definition
   // description

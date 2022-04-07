@@ -30,6 +30,8 @@ interface IPropertyViewReferenceState {
    * or null
    */
   currentStrValue: string;
+
+  ssrServerOnlyValue: string;
 }
 
 const SSR_GRACE_TIME = 10000;
@@ -44,7 +46,6 @@ export default class PropertyViewReference
   extends React.Component<IPropertyViewHandlerProps<IPropertyViewSimpleRendererProps>, IPropertyViewReferenceState> {
 
   private currentlyFindingValueFor: [string, string];
-  private ssrServerOnlyValue: string;
 
   constructor(props: IPropertyViewHandlerProps<IPropertyViewSimpleRendererProps>) {
     super(props);
@@ -56,6 +57,7 @@ export default class PropertyViewReference
     this.state = {
       currentStrValue: "",
       currentFindError: null,
+      ssrServerOnlyValue: null,
     };
 
     // find the current string value
@@ -95,28 +97,28 @@ export default class PropertyViewReference
    * @returns an array where 0 is the item definition that is target, 1 is the property definition
    * we are using for display
    */
-  public getSpecialData(): [ItemDefinition, PropertyDefinition] {
-    const modPath = this.props.property.getSpecialProperty("referencedModule") as string;
+  public static getSpecialData(props: IPropertyViewHandlerProps<IPropertyViewSimpleRendererProps>): [ItemDefinition, PropertyDefinition] {
+    const modPath = props.property.getSpecialProperty("referencedModule") as string;
     if (!modPath) {
       throw new Error(
-        "For usage with references you must specify a referencedModule special property for " + this.props.property.getId()
+        "For usage with references you must specify a referencedModule special property for " + props.property.getId()
       );
     }
-    const idefPath = this.props.property.getSpecialProperty("referencedItemDefinition") as string;
+    const idefPath = props.property.getSpecialProperty("referencedItemDefinition") as string;
     if (!idefPath) {
       throw new Error(
-        "For usage with references you must specify a referencedItemDefinition special property for " + this.props.property.getId()
+        "For usage with references you must specify a referencedItemDefinition special property for " + props.property.getId()
       );
     }
-    const displayProp = this.props.property.getSpecialProperty("referencedDisplayProperty") as string;
+    const displayProp = props.property.getSpecialProperty("referencedDisplayProperty") as string;
     if (!displayProp) {
       throw new Error(
-        "For usage with references you must specify a referencedDisplayProperty special property for " + this.props.property.getId()
+        "For usage with references you must specify a referencedDisplayProperty special property for " + props.property.getId()
       );
     }
 
 
-    const root = this.props.property.getParentModule().getParentRoot();
+    const root = props.property.getParentModule().getParentRoot();
     const mod = root.getModuleFor(modPath.split("/"));
     const idef = mod.getItemDefinitionFor(idefPath.split("/"));
     const dProp = idef.getPropertyDefinitionFor(displayProp, true);
@@ -142,7 +144,7 @@ export default class PropertyViewReference
     }
 
     // we get our special data
-    const [idef, dProp] = this.getSpecialData();
+    const [idef, dProp] = PropertyViewReference.getSpecialData(this.props);
 
     // and try to find a match in the queries that do fit our id and version
     const match =
@@ -164,24 +166,30 @@ export default class PropertyViewReference
     return pMatch.toString();
   }
 
-  public async beforeSSRRender(): Promise<void> {
-    const id = this.props.useAppliedValue ? this.props.state.stateAppliedValue as string : this.props.state.value as string;
+  public static async getDerivedServerSideStateFromProps(
+    props: IPropertyViewHandlerProps<IPropertyViewSimpleRendererProps>,
+    state: IPropertyViewReferenceState,
+  ): Promise<Partial<IPropertyViewReferenceState>> {
+    const id = props.useAppliedValue ? props.state.stateAppliedValue as string : props.state.value as string;
     if (
       !id
     ) {
       return null;
     }
 
-    const filterByLanguage = this.props.property.getSpecialProperty("referencedFilterByLanguage") as boolean;
-    const version = filterByLanguage ? this.props.language : null;
+    const filterByLanguage = props.property.getSpecialProperty("referencedFilterByLanguage") as boolean;
+    const version = filterByLanguage ? props.language : null;
 
     // we get our special data
     try {
-      const [idef, dProp] = this.getSpecialData();
+      const [idef, dProp] = PropertyViewReference.getSpecialData(props);
       const root = idef.getParentModule().getParentRoot();
       await root.callRequestManager(idef, id, version);
 
-      this.ssrServerOnlyValue = dProp.getCurrentValue(id, version).toString();
+      const value = dProp.getCurrentValue(id, version);
+      return {
+        ssrServerOnlyValue: !value ? null : value.toString(),
+      }
     } catch {
       // ignore the error and move on
     }
@@ -217,12 +225,12 @@ export default class PropertyViewReference
     this.currentlyFindingValueFor = [forId, forVersion];
 
     // get these
-    const [idef, dProp] = this.getSpecialData();
+    const [idef, dProp] = PropertyViewReference.getSpecialData(this.props);
 
     // and let's build the fields we are needing for it
     const fields: IGQLRequestFields = {
       DATA: {
-        [dProp.getId()]: dProp.getPropertyDefinitionDescription().gqlFields || {} as any,
+        [dProp.getId()]: dProp.getPropertyDefinitionDescription().gqlFields || {} as any,
       }
     } as IGQLRequestFields;
 
@@ -358,7 +366,7 @@ export default class PropertyViewReference
         this.getSSRFoundValue(
           this.props.useAppliedValue ? this.props.state.stateAppliedValue as string : this.props.state.value as string,
           filterByLanguage ? this.props.language : null,
-        ) || this.ssrServerOnlyValue || ""
+        ) || this.state.ssrServerOnlyValue || ""
       );
 
     const RendererElement = this.props.renderer;

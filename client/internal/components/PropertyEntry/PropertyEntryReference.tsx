@@ -46,6 +46,8 @@ interface IPropertyEntryReferenceState {
   currentSearchError: EndpointErrorType;
   currentFindError: EndpointErrorType;
   showUserSetErrors: boolean;
+
+  ssrServerOnlyValue: string;
 }
 
 export default class PropertyEntryReference
@@ -65,9 +67,43 @@ export default class PropertyEntryReference
   private lastCachedSearchPreventedPropertiesIds: string[];
   private lastCachedSearchPreventedIds: string[];
 
-  private ssrServerOnlyValue: string;
-
   private isUnmounted = false;
+
+  public static getSpecialData(props: IPropertyEntryHandlerProps<string, IPropertyEntryReferenceRendererProps>): [ItemDefinition, PropertyDefinition, PropertyDefinition] {
+    const modPath = props.property.getSpecialProperty("referencedModule") as string;
+    if (!modPath) {
+      throw new Error(
+        "For usage with references you must specify a referencedModule special property for " + props.property.getId()
+      );
+    }
+    const idefPath = props.property.getSpecialProperty("referencedItemDefinition") as string;
+    if (!idefPath) {
+      throw new Error(
+        "For usage with references you must specify a referencedItemDefinition special property for " + props.property.getId()
+      );
+    }
+    const searchProp = props.property.getSpecialProperty("referencedSearchProperty") as string;
+    if (!searchProp) {
+      throw new Error(
+        "For usage with references you must specify a referencedSearchProperty special property for " + props.property.getId()
+      );
+    }
+    const displayProp = props.property.getSpecialProperty("referencedDisplayProperty") as string;
+    if (!displayProp) {
+      throw new Error(
+        "For usage with references you must specify a referencedDisplayProperty special property for " + props.property.getId()
+      );
+    }
+
+
+    const root = props.property.getParentModule().getParentRoot();
+    const mod = root.getModuleFor(modPath.split("/"));
+    const idef = mod.getItemDefinitionFor(idefPath.split("/"));
+    const dProp = idef.getPropertyDefinitionFor(displayProp, true);
+    const sProp = idef.getPropertyDefinitionFor(searchProp, true);
+
+    return [idef, dProp, sProp];
+  }
 
   constructor(props: IPropertyEntryHandlerProps<string, IPropertyEntryReferenceRendererProps>) {
     super(props);
@@ -78,6 +114,8 @@ export default class PropertyEntryReference
       currentSearchError: null,
       currentFindError: null,
       showUserSetErrors: false,
+
+      ssrServerOnlyValue: null,
     };
 
     this.onChangeSearch = this.onChangeSearch.bind(this);
@@ -202,7 +240,7 @@ export default class PropertyEntryReference
     this.lastSearchArgumentPreventEqualityWithProperties = preventEqualityWithProperties;
 
     const strToSearchForValue = this.props.state.internalValue || "";
-    const [idef, dProp, sProp] = this.getSpecialData();
+    const [idef, dProp, sProp] = PropertyEntryReference.getSpecialData(this.props);
     const filterByLanguage = this.props.property.getSpecialProperty("referencedFilterByLanguage") as boolean;
 
     const fields: IGQLRequestFields = {
@@ -377,60 +415,30 @@ export default class PropertyEntryReference
     }
   }
 
-  public getSpecialData(): [ItemDefinition, PropertyDefinition, PropertyDefinition] {
-    const modPath = this.props.property.getSpecialProperty("referencedModule") as string;
-    if (!modPath) {
-      throw new Error(
-        "For usage with references you must specify a referencedModule special property for " + this.props.property.getId()
-      );
-    }
-    const idefPath = this.props.property.getSpecialProperty("referencedItemDefinition") as string;
-    if (!idefPath) {
-      throw new Error(
-        "For usage with references you must specify a referencedItemDefinition special property for " + this.props.property.getId()
-      );
-    }
-    const searchProp = this.props.property.getSpecialProperty("referencedSearchProperty") as string;
-    if (!searchProp) {
-      throw new Error(
-        "For usage with references you must specify a referencedSearchProperty special property for " + this.props.property.getId()
-      );
-    }
-    const displayProp = this.props.property.getSpecialProperty("referencedDisplayProperty") as string;
-    if (!displayProp) {
-      throw new Error(
-        "For usage with references you must specify a referencedDisplayProperty special property for " + this.props.property.getId()
-      );
-    }
-
-
-    const root = this.props.property.getParentModule().getParentRoot();
-    const mod = root.getModuleFor(modPath.split("/"));
-    const idef = mod.getItemDefinitionFor(idefPath.split("/"));
-    const dProp = idef.getPropertyDefinitionFor(displayProp, true);
-    const sProp = idef.getPropertyDefinitionFor(searchProp, true);
-
-    return [idef, dProp, sProp];
-  }
-
-  public async beforeSSRRender(): Promise<void> {
-    const id = this.props.state.value as string;
+  public static async getDerivedServerSideStateFromProps(
+    props: IPropertyEntryHandlerProps<string, IPropertyEntryReferenceRendererProps>,
+    state: IPropertyEntryReferenceState,
+  ): Promise<Partial<IPropertyEntryReferenceState>> {
+    const id = props.state.value as string;
     if (
       !id
     ) {
       return null;
     }
 
-    const filterByLanguage = this.props.property.getSpecialProperty("referencedFilterByLanguage") as boolean;
-    const version = filterByLanguage ? this.props.language : null;
+    const filterByLanguage = props.property.getSpecialProperty("referencedFilterByLanguage") as boolean;
+    const version = filterByLanguage ? props.language : null;
 
     // we get our special data
     try {
-      const [idef, dProp] = this.getSpecialData();
+      const [idef, dProp] = PropertyEntryReference.getSpecialData(props);
       const root = idef.getParentModule().getParentRoot();
       await root.callRequestManager(idef, id, version);
 
-      this.ssrServerOnlyValue = dProp.getCurrentValue(id, version).toString();
+      const value = dProp.getCurrentValue(id, version);
+      return {
+        ssrServerOnlyValue: !value ? null : value.toString(),
+      }
     } catch {
       // ignore the error and move on
     }
@@ -447,7 +455,7 @@ export default class PropertyEntryReference
       return null;
     }
 
-    const [idef, dProp] = this.getSpecialData();
+    const [idef, dProp] = PropertyEntryReference.getSpecialData(this.props);
     const match =
       this.props.ssr.queries.find((v) => v.idef === idef.getQualifiedPathName() && v.id === forId && v.version === forVersion);
     if (!match) {
@@ -493,7 +501,7 @@ export default class PropertyEntryReference
 
     this.currentlyFindingValueFor = [forId, forVersion];
 
-    const [idef, dProp] = this.getSpecialData();
+    const [idef, dProp] = PropertyEntryReference.getSpecialData(this.props);
 
     const fields: IGQLRequestFields = {
       DATA: {
@@ -759,7 +767,7 @@ export default class PropertyEntryReference
       currentTextualValue: this.props.state.internalValue || this.getSSRFoundValue(
         this.props.state.value as string,
         filterByLanguage ? this.props.language : null,
-      ) || this.ssrServerOnlyValue || "",
+      ) || this.state.ssrServerOnlyValue || "",
       currentValueIsFullfilled: !!this.props.state.value,
       currentOptions: this.state.currentOptions,
       currentSearchError: this.state.currentSearchError,
