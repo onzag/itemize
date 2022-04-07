@@ -1,6 +1,6 @@
 ## FIRST STEP TO PREPARE NPM INSTALL
 
-FROM node:alpine
+FROM node:15-alpine
 
 USER node
 RUN mkdir -p /home/node/app
@@ -8,17 +8,17 @@ WORKDIR /home/node/app
 
 ARG NPM_TOKEN
 # needed by the builder as it checks the configuration
-COPY config config
-COPY package.json .
-COPY package-lock.json .
-COPY tsconfig.json .
-COPY src src
-COPY schema schema
-COPY resources resources
-COPY webpack.config.js webpack.config.js
-COPY itemize.config.js itemize.config.js
-COPY babel.config.json babel.config.json
-COPY .npmrc-docker .npmrc
+COPY --chown=node config config
+COPY --chown=node package.json .
+COPY --chown=node package-lock.json .
+COPY --chown=node tsconfig.json .
+COPY --chown=node src src
+COPY --chown=node schema schema
+COPY --chown=node resources resources
+COPY --chown=node webpack.config.js webpack.config.js
+COPY --chown=node itemize.config.js itemize.config.js
+COPY --chown=node babel.config.json babel.config.json
+COPY --chown=node .npmrc-docker .npmrc
 
 USER root
 RUN apk --no-cache add --virtual builds-deps build-base python
@@ -29,7 +29,7 @@ RUN rm -f .npmrc
 
 ## SECOND STEP TO ACTUALLY COPY THE FILES REQUIRED BY THE SERVER
 
-FROM node:alpine
+FROM node:15-alpine
 
 ENV NODE_ENV development
 # ENV NODE_ENV production

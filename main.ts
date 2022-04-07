@@ -88,7 +88,7 @@ const actionRegistry: {
       console.log("usage: " + colors.yellow(actionRegistry[action].usage))
     } else {
       // otherwise we try to execute
-      try {
+      try {
         await actionRegistry[action].fn(...remainingArgs);
       } catch (err) {
         // if something failed during the process we show the error stack and exit with status 1

@@ -25,8 +25,6 @@ import { walkReactTree } from "./react-analyze";
 import ReactDOMServer from "react-dom/server";
 
 // This is a custom react dom build
-const ReactDOMServerOnza = require('@onzag/react-dom/server');
-
 const developmentISSSRMode = process.env.NODE_ENV !== "production";
 const NO_SSR = process.env.NO_SSR === "true";
 const DATE_RFC2822 = "ddd, DD MMM YYYY HH:mm:ss ZZ";

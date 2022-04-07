@@ -250,10 +250,15 @@ export async function walkReactTree(
     }
   } else if (type === REACT_PROVIDER_TYPE) {
     const newContextMap = new Map(contextMap);
-    newContextMap.set(element.type._context, element.props.value);
+    const contextToSet = element.type._context ? element.type._context : element.type;
+    newContextMap.set(contextToSet, element.props.value);
     await walkReactTree(element.props.children, newContextMap);
   } else if (type === REACT_CONTEXT_TYPE) {
-    const contextualValue = contextMap.get(element.type._context);
+    const contextToRead = element.type._context ? element.type._context : element.type;
+    let contextualValue = contextMap.get(contextToRead);
+    if (contextualValue === undefined) {
+      contextualValue = contextToRead._currentValue;
+    }
     const apparentChild = element.props.children(contextualValue);
     await walkReactTree(apparentChild, contextMap);
   } else if (
