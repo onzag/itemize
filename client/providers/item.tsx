@@ -373,6 +373,10 @@ export interface IActionSearchOptions extends IActionCleanOptions {
    * SSR search is pretty heavy this is necessary for
    * USSD apps to work or for extreme SEO optimization
    * but it increases the payload retrieved by quite the amount
+   * 
+   * Cannot use cache policy
+   * Only allowed in traditional search
+   * It will not work otherwise
    */
   ssrEnabled?: boolean;
 
@@ -579,7 +583,8 @@ export interface IItemContextType extends IBasicFns {
 
 export interface ISearchItemValueContextType {
   currentlySearching: IGQLSearchRecord[];
-  searchFields: any;
+  searchFields: IGQLRequestFields;
+  searchRecords: IGQLSearchRecord[];
 }
 
 // This is the context that will serve it
@@ -973,12 +978,46 @@ export class ActualItemProvider extends
       return null;
     }
 
-    // cheesy way to get to the root
-    const root = props.itemDefinitionInstance.getParentModule().getParentRoot();
     const id = props.forId;
     const version = props.forVersion || null;
 
-    await root.callRequestManager(props.itemDefinitionInstance, id, version);
+    const { requestFields } = getFieldsAndArgs({
+      includeArgs: false,
+      includeFields: true,
+      includes: props.includes || {},
+      properties: props.properties || [],
+      itemDefinitionInstance: props.itemDefinitionInstance,
+      forId: id,
+      forVersion: version,
+    });
+
+    // let's check if what we have loaded this already as part of the search records
+    // we have loaded, when there are search records this mean that the search loader
+    // will have loaded these results in the state
+    if (
+      props.searchContext &&
+      props.searchContext.searchRecords &&
+      props.searchContext.searchRecords.find(
+        (s) =>
+          s.id === id &&
+          s.version === version &&
+          s.type === props.itemDefinitionInstance.getQualifiedPathName(),
+      ) &&
+      requestFieldsAreContained(requestFields, props.searchContext.searchFields)
+    ) {
+      // no need to load they are already in memory and the collector
+      return null;
+    }
+
+    // cheesy way to get to the root
+    const root = props.itemDefinitionInstance.getParentModule().getParentRoot();
+
+    await root.callRequestManager(
+      props.itemDefinitionInstance,
+      id,
+      version,
+      requestFields,
+    );
     return ActualItemProvider.setupInitialState(props);
   }
 
@@ -1173,8 +1212,8 @@ export class ActualItemProvider extends
     // first we setup the listeners, this includes the on change listener that would make
     // the entire app respond to actions, otherwise the fields might as well be disabled
     // we do this here to avoid useless callback changes as the listeners are not ready
-    this.installSetters();
-    this.installPrefills();
+    this.installSetters(props, true);
+    this.installPrefills(props, true);
 
     if (typeof document !== "undefined") {
       this.setupListeners();
@@ -1268,11 +1307,11 @@ export class ActualItemProvider extends
       localStorage.setItem(SEARCH_DESTRUCTION_MARKERS_LOCATION, JSON.stringify((window as any)[MEMCACHED_SEARCH_DESTRUCTION_MARKERS_LOCATION]));
     }
   }
-  public installSetters(props: IActualItemProviderProps = this.props) {
+  public installSetters(props: IActualItemProviderProps = this.props, doNotCleanSearchState: boolean = false) {
     if (props.setters) {
       props.setters.forEach((setter) => {
         const property = getPropertyForSetter(setter, props.itemDefinitionInstance);
-        this.onPropertyEnforce(property, setter.value, props.forId || null, props.forVersion || null, true);
+        this.onPropertyEnforce(property, setter.value, props.forId || null, props.forVersion || null, true, doNotCleanSearchState);
       });
     }
   }
@@ -1284,7 +1323,7 @@ export class ActualItemProvider extends
       });
     }
   }
-  public installPrefills(props: IActualItemProviderProps = this.props) {
+  public installPrefills(props: IActualItemProviderProps = this.props, doNotCleanSearchState: boolean = false) {
     if (props.prefills) {
       props.prefills.forEach((prefill) => {
         const property = getPropertyForSetter(prefill, props.itemDefinitionInstance);
@@ -1295,7 +1334,7 @@ export class ActualItemProvider extends
           null,
         );
       });
-      props.itemDefinitionInstance.cleanSearchState(props.forId || null, props.forVersion || null);
+      !doNotCleanSearchState && props.itemDefinitionInstance.cleanSearchState(props.forId || null, props.forVersion || null);
       props.itemDefinitionInstance.triggerListeners(
         "change",
         props.forId || null,
@@ -2562,12 +2601,13 @@ export class ActualItemProvider extends
     givenForId: string,
     givenForVersion: string,
     internal?: boolean,
+    doNotCleanSearchState?: boolean,
   ) {
     // this function is basically run by the setter
     // since they might be out of sync that's why the id is passed
     // the setter enforces values
     property.setSuperEnforced(givenForId || null, givenForVersion || null, value, this);
-    this.props.itemDefinitionInstance.cleanSearchState(this.props.forId || null, this.props.forVersion || null);
+    !doNotCleanSearchState && this.props.itemDefinitionInstance.cleanSearchState(this.props.forId || null, this.props.forVersion || null);
     this.onPropertyEnforceOrClearFinal(givenForId, givenForVersion, internal);
   }
   public onPropertyClearEnforce(
@@ -3665,6 +3705,10 @@ export class ActualItemProvider extends
 
     if (options.ssrEnabled && options.cachePolicy && options.cachePolicy !== "none") {
       console.warn("You have a SSR enabled search that uses cache policy, this will not execute in the server side due to conflicting instructions");
+    }
+
+    if (options.ssrEnabled && !options.traditional) {
+      console.warn("You have a SSR enabled search that does not use traditional search, this will not execute in the server side due to conflicting instructions");
     }
 
     // we need the standard counterpart given we are in search mode right now, 

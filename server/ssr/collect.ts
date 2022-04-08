@@ -22,6 +22,7 @@ import path from "path";
 import { getFieldsAndArgs, getPropertyListForSearchMode, getSearchQueryFor } from "../../client/internal/gql-client-util";
 import { searchItemDefinition, searchModule } from "../resolvers/actions/search";
 import { EndpointError } from "../../base/errors";
+import { deepMerge } from "../../gql-util";
 
 const fsAsync = fs.promises;
 
@@ -68,6 +69,7 @@ export interface IQueryCollectionResult extends IBaseCollectionResult {
    * this contains the value and all the attributes
    */
   query: ISSRCollectedQueryType;
+  requestFieldsAcc: IGQLRequestFields;
   type: "query";
 };
 
@@ -173,15 +175,18 @@ export class Collector {
    * Provides all the resulting queries for use in the client side
    */
   public getQueries() {
+    // TODO filter by requested fields by the accumulator, add the requested fields in each collection
+    // and in the final only add those
+
     // remove the non-accessible ones
     return this.results.filter((r) => r !== null && r.type === "query").map((r: IQueryCollectionResult) => r.query);
   }
 
   /**
-   * TODO
+   * Provides all the resulting searches for use in the client side
    */
   public getSearches(): ISSRCollectedSearchType[] {
-    return [];
+    return this.results.filter((r) => r !== null && r.type === "search").map((r: ISearchCollectionResult) => r.search);
   }
 
   /**
@@ -338,7 +343,7 @@ export class Collector {
   }
 
   public async collectSearch(idef: ItemDefinition, id: string, version: string, args: IActionSearchOptions): Promise<void> {
-    if (!args.ssrEnabled || (args.cachePolicy && args.cachePolicy !== "none")) {
+    if (!args.ssrEnabled || (args.cachePolicy && args.cachePolicy !== "none") || !args.traditional) {
       return null;
     }
 
@@ -453,7 +458,8 @@ export class Collector {
         version || null,
       );
 
-      const basicQueryElement = query.getQueryByIndex(0);
+      // we use the server side call to get what we would receive
+      const basicQueryElement = query.getServerSideQueryByIndex(0);
 
       // now we can use this to pass directly and straight to the search function
       // depending on what we are doing we need those records and for that
@@ -576,17 +582,33 @@ export class Collector {
    * @param id the id we want
    * @param version the version we want
    */
-  public async collect(idef: ItemDefinition, id: string, version: string): Promise<void> {
+  public async collect(idef: ItemDefinition, id: string, version: string, requestFields: IGQLRequestFields): Promise<void> {
     // now we build the merged id
     const mergedID = idef.getQualifiedPathName() + "." + id + "." + (version || "");
 
+    const onRequestDone = () => {
+      const query: IQueryCollectionResult = this.collectionData[mergedID];
+
+      // was forbidden
+      if (query === null) {
+        return;
+      }
+
+      // we can manage to add the accumulated properties
+      query.requestFieldsAcc = deepMerge(requestFields, query.requestFieldsAcc);
+    };
+
     // request has been done and it's ready
     if (this.collectionStatuses[mergedID]) {
+      onRequestDone();
       return;
     } else if (this.collectionStatuses[mergedID] === false) {
       // request is in progress, add it to queue
       return new Promise((resolve, reject) => {
-        this.collectionRequestsCbs[mergedID].push(resolve);
+        this.collectionRequestsCbs[mergedID].push(() => {
+          onRequestDone();
+          resolve();
+        });
         this.collectionRequestsRejectedCbs[mergedID].push(reject);
       });
     }
@@ -792,14 +814,17 @@ export class Collector {
     // no access
     if (query === null) {
       this.results.push(null);
+      this.collectionData[mergedID] = null;
       this.forbiddenSignature.push(mergedID + forbiddenSignatureReason);
     } else {
       const result = {
         lastModified,
         signature,
         query,
+        requestFieldsAcc: requestFields,
         type: "query" as "query",
       };
+      this.collectionData[mergedID] = result;
       this.results.push(result);
       idef.applyValue(
         query.id,

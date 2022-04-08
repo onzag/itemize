@@ -13,6 +13,7 @@ import type { IResourceCollectionResult } from "../../server/ssr/collect";
 import type { IAppDataType } from "../../server";
 import Module, { IModuleRawJSONDataType } from "./Module";
 import ItemDefinition from "./Module/ItemDefinition";
+import type { IGQLRequestFields } from "../../gql-querier";
 
 /**
  * The standard i18n information for usage
@@ -64,7 +65,7 @@ export interface ICustomRoleManager {
   checkRoleAccessFor: (roles: string[]) => Promise<ICustomRoleManagerRoleStatus>;
 }
 
-type RequestManagerFn = (itemDefinition: ItemDefinition, id: string, version: string) => Promise<void>;
+type RequestManagerFn = (itemDefinition: ItemDefinition, id: string, version: string, requestFields: IGQLRequestFields) => Promise<void>;
 type RequestManagerSearchFn = (itemDefinition: ItemDefinition, id: string, version: string, args: any) => Promise<void>;
 type RequestManagerResourceFn = (finalPath: string, customResolver?: (appData: IAppDataType) => Promise<IResourceCollectionResult>) => Promise<string>;
 
@@ -346,8 +347,8 @@ export default class Root {
    * @param version the version
    * @internal
    */
-  public async callRequestManager(itemDefinition: ItemDefinition, id: string, version: string) {
-    await this.requestManager(itemDefinition, id, version);
+  public async callRequestManager(itemDefinition: ItemDefinition, id: string, version: string, requestFields: IGQLRequestFields) {
+    await this.requestManager(itemDefinition, id, version, requestFields);
   }
 
   /**

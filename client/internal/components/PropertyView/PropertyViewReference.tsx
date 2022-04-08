@@ -8,7 +8,7 @@ import React from "react";
 import equals from "deep-equal";
 import { IPropertyViewHandlerProps } from ".";
 import { EndpointErrorType } from "../../../../base/errors";
-import { runGetQueryFor } from "../../../../client/internal/gql-client-util";
+import { getFieldsAndArgs, runGetQueryFor } from "../../../../client/internal/gql-client-util";
 import { IGQLRequestFields } from "../../../../gql-querier";
 import ItemDefinition from "../../../../base/Root/Module/ItemDefinition";
 import PropertyDefinition from "../../../../base/Root/Module/ItemDefinition/PropertyDefinition";
@@ -184,7 +184,23 @@ export default class PropertyViewReference
     try {
       const [idef, dProp] = PropertyViewReference.getSpecialData(props);
       const root = idef.getParentModule().getParentRoot();
-      await root.callRequestManager(idef, id, version);
+      
+      const { requestFields } = getFieldsAndArgs({
+        includeArgs: false,
+        includeFields: true,
+        includes: {},
+        properties: [dProp.getId()],
+        itemDefinitionInstance: idef,
+        forId: id,
+        forVersion: version,
+      });
+
+      await root.callRequestManager(
+        idef,
+        id,
+        version,
+        requestFields,
+      );
 
       const value = dProp.getCurrentValue(id, version);
       return {

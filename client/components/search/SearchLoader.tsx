@@ -418,6 +418,9 @@ class ActualSearchLoader extends React.Component<IActualSearchLoaderProps, IActu
         }),
         searchFields: this.props.searchFields,
       };
+      if (isConstruct) {
+        this.loadSearchResults();
+      }
       !isConstruct && this.setState(newState as any);
       return newState;
     }
@@ -782,6 +785,7 @@ class ActualSearchLoader extends React.Component<IActualSearchLoaderProps, IActu
           {
             currentlySearching: this.state.currentlySearching,
             searchFields: this.state.searchFields,
+            searchRecords: this.state.error ? [] : this.state.currentSearchRecords,
           }
         }
       >

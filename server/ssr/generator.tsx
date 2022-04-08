@@ -449,6 +449,8 @@ export async function ssrGenerator(
 
       clientSSR.title = ssr.title;
       clientSSR.queries = ssr.queries;
+      clientSSR.searches = ssr.searches;
+      clientSSR.resources= ssr.resources;
 
       const app = (
         <StaticRouter location={req.originalUrl}>

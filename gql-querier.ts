@@ -167,6 +167,7 @@ export class GQLQuery {
    * All the processed queries from the query list
    */
   private processedQueries: IGQLQueryObj[];
+  private unprocessedQueries: IGQLQueryObj[];
   /**
    * The type of this query
    */
@@ -200,6 +201,7 @@ export class GQLQuery {
     this.isNameMergableWith = this.isNameMergableWith.bind(this);
 
     // we take all the queries and try to extract the args
+    this.unprocessedQueries = queries;
     this.processedQueries = queries.map((query) => {
       if (query.args) {
         return {
@@ -268,7 +270,8 @@ export class GQLQuery {
     this.foundUnprocessedArgFiles = this.foundUnprocessedArgFiles.concat(query.foundUnprocessedArgFiles);
 
     // first we find all the processed queries we have gotten that we are meant to merge
-    return query.processedQueries.map((q) => {
+    return query.processedQueries.map((q, index) => {
+      const unprocessedCounterpart = query.getQueryByIndex(index, true);
       // now we try to find the query with the same name as ours
       const matchingQueries = this.processedQueries.map((sq, index) => ({
         processedQuery: sq,
@@ -279,6 +282,7 @@ export class GQLQuery {
       if (matchingQueries.length === 0) {
         // just add it there
         this.processedQueries.push(q);
+        this.unprocessedQueries.push(unprocessedCounterpart);
         return [q.name, q.name];
       } else {
         let mergeId: [string, string] = null;
@@ -289,6 +293,7 @@ export class GQLQuery {
           if (isNameMergable) {
             if (requestFieldsAreContained(matchingQuery.processedQuery.fields, q.fields)) {
               this.processedQueries[matchingQuery.index].fields = q.fields;
+              this.unprocessedQueries[matchingQuery.index].fields = unprocessedCounterpart.fields;
             }
 
             mergeId = [matchingQuery.processedQuery.alias || matchingQuery.processedQuery.name, q.name];
@@ -311,7 +316,13 @@ export class GQLQuery {
           }
           queryClone.alias = newAlias;
 
+          const unProcessedQueryClone = {
+            ...unprocessedCounterpart,
+            alias: queryClone.alias,
+          };
+
           this.processedQueries.push(queryClone);
+          this.unprocessedQueries.push(unProcessedQueryClone);
           return [newAlias, q.name];
         } else {
           return mergeId;
@@ -334,14 +345,9 @@ export class GQLQuery {
   public addProgresserListener(prog: (arg: IXMLHttpRequestProgressInfo) => void) {
     this.progressers.push(prog);
   }
-  
-  /**
-   * Provides all queries
-   * use this for internal use only
-   * @returns 
-   */
-  public getAllQueries() {
-    return this.processedQueries;
+
+  public getQueries(unprocessed?: boolean) {
+    return unprocessed ? this.unprocessedQueries : this.processedQueries;
   }
 
   /**
@@ -349,8 +355,8 @@ export class GQLQuery {
    * @param index 
    * @returns 
    */
-  public getQueryByIndex(index: number) {
-    return this.processedQueries[index];
+  public getQueryByIndex(index: number, unprocessed?: boolean) {
+    return unprocessed ? this.unprocessedQueries[index] : this.processedQueries[index];
   }
 
   /**
@@ -358,6 +364,23 @@ export class GQLQuery {
    */
   public addEventListenerOnReplyInformed(listener: IGQLQueryListenerType) {
     this.listeners.push(listener);
+  }
+
+  /**
+   * Unlike providing a standard query object this provides
+   * a version of the query the server side would recieve once it is
+   * parsed, rather than a client side version
+   * @param index 
+   * @returns 
+   */
+  public getServerSideQueryByIndex(index: number): IGQLQueryObj {
+    const newQuery = {
+      ...this.getQueryByIndex(index, true),
+    }
+    if (newQuery.args) {
+      newQuery.args = buildArgsServerSide(newQuery.args);
+    }
+    return newQuery;
   }
 
   /**
@@ -578,6 +601,41 @@ function buildFields(fields: IGQLRequestFields) {
   // close the bracket
   fieldsStr += "}";
   return fieldsStr;
+}
+
+/**
+ * Builds the arguments of a grapqhl as the server would receive it
+ * @param args the arguments to build
+ * @returns the serialized args
+ */
+ function buildArgsServerSide(
+  args: any,
+): any {
+  // if it's not an object or if it's null
+  if (typeof args !== "object" || args === null) {
+    // return it as it is
+    return args;
+  }
+
+  // if we have a variable
+  if (args instanceof GQLVar) {
+    // cannot handle vars
+    // should've used unprocessed
+    return null;
+  } else if (args instanceof GQLEnum || args instanceof GQLRaw) {
+    // for enums and raw
+    return args.value;
+  } else if (Array.isArray(args)) {
+    // if an array, we just wrap it around array brackets and join the results
+    return args.map(buildArgsServerSide);
+  }
+
+  // otherwise we just return the args
+  const newArgs = {};
+  Object.keys(args).forEach((k) => {
+    newArgs[k] = buildArgsServerSide(args[k]);
+  });
+  return newArgs;
 }
 
 /**
