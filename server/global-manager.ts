@@ -47,6 +47,7 @@ const wait = (time: number) => {
 
 export class GlobalManager {
   private root: Root;
+  private buildnumber: string;
   private databaseConnection: DatabaseConnection;
   private rawDB: ItemizeRawDB;
   private globalCache: ItemizeRedisClient;
@@ -70,6 +71,7 @@ export class GlobalManager {
   private phoneProvider: PhoneProvider<any>;
 
   constructor(
+    buildnumber: string,
     root: Root,
     databaseConnection: DatabaseConnection,
     rawDB: ItemizeRawDB,
@@ -83,6 +85,7 @@ export class GlobalManager {
     phoneProvider: PhoneProvider<any>,
     registry: RegistryService
   ) {
+    this.buildnumber = buildnumber;
     this.root = root;
     this.databaseConnection = databaseConnection;
     this.rawDB = rawDB;
@@ -797,6 +800,7 @@ export class GlobalManager {
 
     try {
       this.serverData = {
+        BUILDNUMBER: this.buildnumber,
         [CURRENCY_FACTORS_IDENTIFIER]: this.currencyFactorsProvider
           ? await this.currencyFactorsProvider.getFactors()
           : null,

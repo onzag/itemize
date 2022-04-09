@@ -65,6 +65,8 @@ import {
   FAKE_SMS,
   INSTANCE_GROUP_ID,
   PORT,
+  buildEnvironmentInfo,
+  INSTANCE_UUID,
 } from "./environment";
 
 // load the custom services configuration
@@ -162,6 +164,7 @@ export interface IAppDataType {
 }
 
 export interface IServerDataType {
+  BUILDNUMBER: string;
   CURRENCY_FACTORS: {
     [usdto: string]: number;
   }
@@ -463,6 +466,38 @@ export async function initializeServer(
           }
         });
 
+    let redisGlobalClient: ItemizeRedisClient;
+
+    if (INSTANCE_MODE !== "CLEAN_SITEMAPS" && INSTANCE_MODE !== "CLEAN_STORAGE") {
+      logger.info(
+        "initializeServer: initializing redis global cache client",
+      );
+      redisGlobalClient = await setupRedisClient("global", redisConfig.global);
+
+      const envInfo = buildEnvironmentInfo(
+        buildnumber,
+        redisConfig,
+        dbConfig,
+      );
+
+      redisGlobalClient.createPing({
+        tkey: PING_DATA_IDENTIFIER,
+        dataKey: INSTANCE_UUID,
+        data: envInfo,
+        statusRetriever: () => {
+          return {
+            cpuUsage: process.cpuUsage(),
+            memoryUsage: process.memoryUsage(),
+          }
+        }
+      });
+
+      // will this even run?... it notifies redis that it died
+      process.on("exit", () => {
+        redisGlobalClient.stopPinging();
+      });
+    }
+
     // now for the cluster manager, which manages a specific cluster, it goes here, and it doesn't
     // go futher, the job of the cluster manager is to mantain the cluster redis database
     // up to date, and handle the requests for these up to date requests, it basically
@@ -504,11 +539,6 @@ export async function initializeServer(
       listener.informClusterManagerReset();
       return;
     }
-
-    logger.info(
-      "initializeServer: initializing redis global cache client",
-    );
-    const redisGlobalClient: ItemizeRedisClient = await setupRedisClient("global", redisConfig.global);
 
     logger.info(
       "initializeServer: initializing itemize server root",
@@ -605,6 +635,7 @@ export async function initializeServer(
         ) : null) as any;
 
       const manager: GlobalManager = new GlobalManager(
+        buildnumber,
         root,
         databaseConnection,
         rawDB,

@@ -20,7 +20,7 @@ interface IRedisPingSetter<T, N> extends IRedisPing<T> {
 }
 
 interface IPingEvent {
-  event: "STARTPING" | "ENDPING" | "RECONNECT";
+  event: "CONNECT" | "DISCONNECT" | "RECONNECT";
   time: number;
 }
 
@@ -92,10 +92,34 @@ export class ItemizeRedisClient {
     this.createPing = this.createPing.bind(this);
     this.stopPinging = this.stopPinging.bind(this);
     this.setupPings = this.setupPings.bind(this);
+    this.ping = this.ping.bind(this);
+  }
+
+  public async deletePingFor(tkey: string, key: string): Promise<"NOT_FOUND" | "NOT_DEAD" | "OK"> {
+    const allPings = (await this.hgetall(tkey)) || {};
+    if (!allPings[key]) {
+      return "NOT_FOUND";
+    }
+
+    const lastPingTime = parseInt(allPings[key + "_LASTPING"]) || 0;
+    const diff = lastPingTime - (new Date()).getTime();
+    const isAssumedDead = diff >= (PING_TIME * 2);
+
+    if (!isAssumedDead) {
+      return "NOT_DEAD";
+    }
+
+    await this.hdel(tkey, key);
+    await this.hdel(tkey, key + "_LASTPING");
+    await this.hdel(tkey, key + "_LASTSTATUS");
+
+    await this.del(tkey + "_" + key);
+
+    return "OK";
   }
 
   public async getAllStoredPings<T, N>(tkey: string): Promise<IPingInfo<T, N>[]> {
-    const allPings = await this.hgetall(tkey);
+    const allPings = (await this.hgetall(tkey)) || {};
 
     return await Promise.all(Object.keys(allPings).filter((pingKey) => {
       return (!pingKey.endsWith("_LASTPING") && !pingKey.endsWith("_LASTSTATUS"));
@@ -128,7 +152,7 @@ export class ItemizeRedisClient {
         assumeDead: false,
       };
 
-      const pingEvents = await this.hgetall(tkey + "_" + dataKey);
+      const pingEvents = (await this.hgetall(tkey + "_" + dataKey)) || {};
       pingInfo.events = Object.keys(pingEvents).map((timeKey) => {
         const timeValue = parseInt(timeKey) || 0;
         const event = pingEvents[timeKey] as any;
@@ -143,7 +167,7 @@ export class ItemizeRedisClient {
         }
       }).sort((a, b) => b.time - a.time);
 
-      pingInfo.isCorrupted = !pingInfo.events.some((e) => e.event === "STARTPING");
+      pingInfo.isCorrupted = !pingInfo.events.some((e) => e.event === "CONNECT");
 
       if (!pingInfo.isDead) {
         const lastPingTime = pingInfo.lastPing;
@@ -167,19 +191,19 @@ export class ItemizeRedisClient {
       await this.hset(ping.tkey, ping.dataKey + "_LASTSTATUS", JSON.stringify(ping.lastStatus));
 
       for (const event of ping.events) {
-        await this.hset(ping.tkey + ping.dataKey, event.time.toString(), event.event);
+        await this.hset(ping.tkey + "_" + ping.dataKey, event.time.toString(), event.event);
       }
     }));
   }
 
   public createPing<T, N>(ping: IRedisPingSetter<T, N>) {
     if (this.isConnected) {
-      this.setupPing(ping, false);
+      this.setupPing(ping, true);
     }
     this.pings.push(ping);
   }
 
-  public async stopPinging(endStatus?: string) {
+  public async stopPinging() {
     this.endPings();
 
     await Promise.all(this.pings.map(async (ping) => {

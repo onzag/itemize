@@ -12,8 +12,9 @@ import { serverSideIndexChecker } from "../base/Root/Module/ItemDefinition/Prope
 import PropertyDefinition from "../base/Root/Module/ItemDefinition/PropertyDefinition";
 import ItemDefinition from "../base/Root/Module/ItemDefinition";
 import bodyParser from "body-parser";
-import { PROTECTED_RESOURCES, ENDPOINT_ERRORS } from "../constants";
+import { PROTECTED_RESOURCES, ENDPOINT_ERRORS, PING_DATA_IDENTIFIER } from "../constants";
 import { getMode } from "./mode";
+import { ENVIRONMENT_DETAILS } from "./environment";
 
 /**
  * this function contains and build all the rest services
@@ -230,7 +231,7 @@ export default function restServices(appData: IAppDataType) {
     const finalResult = await appData.locationSearchService.requestGeocodeFor(
       req.query.lat as string,
       req.query.lng as string,
-      req.query.q as string || null,
+      req.query.q as string || null,
       req.query.lang as string,
       req.query.sep as string,
     );
@@ -344,6 +345,23 @@ export default function restServices(appData: IAppDataType) {
   router.get("/currency-factors", (req, res) => {
     res.setHeader("content-type", "application/json; charset=utf-8");
     res.end(JSON.stringify(appData.cache.getServerData().CURRENCY_FACTORS));
+  });
+
+  router.get("/clusters/info", async (req, res) => {
+    res.setHeader("content-type", "application/json; charset=utf-8");
+    const allPings = await appData.redisGlobal.getAllStoredPings(PING_DATA_IDENTIFIER);
+    res.end(JSON.stringify({
+      self: ENVIRONMENT_DETAILS,
+      pings: allPings,
+    }));
+  });
+
+  router.delete("/clusters/info/:uuid", async (req, res) => {
+    res.setHeader("content-type", "application/json; charset=utf-8");
+    const status = await appData.redisGlobal.deletePingFor(PING_DATA_IDENTIFIER, req.params.uuid);
+    res.status(status === "NOT_FOUND" ? 404 : (status === "NOT_DEAD" ? 403 : 200)).end(JSON.stringify({
+      status,
+    }));
   });
 
   // now we add a 404

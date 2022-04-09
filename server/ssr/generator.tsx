@@ -23,10 +23,10 @@ import { IServerSideTokenDataType } from "../resolvers/basic";
 import { convertHTMLToUSSDTree } from "../../ussd";
 import { walkReactTree } from "./react-analyze";
 import ReactDOMServer from "react-dom/server";
+import { NODE_ENV, NO_SSR } from "../environment";
 
 // This is a custom react dom build
-const developmentISSSRMode = process.env.NODE_ENV !== "production";
-const NO_SSR = process.env.NO_SSR === "true";
+const developmentISSSRMode = NODE_ENV !== "production";
 const DATE_RFC2822 = "ddd, DD MMM YYYY HH:mm:ss ZZ";
 
 export async function ssrGenerator(
