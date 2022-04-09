@@ -30,12 +30,7 @@ import { IGQLArgs } from "../../../gql-querier";
 import { IOTriggerActions } from "../triggers";
 import Root from "../../../base/Root";
 import { CustomRoleGranterEnvironment, CustomRoleManager } from "../roles";
-
-// Used to optimize, it is found out that passing unecessary logs to the transport
-// can slow the logger down even if it won't display
-const LOG_LEVEL = process.env.LOG_LEVEL;
-const CAN_LOG_DEBUG = LOG_LEVEL === "debug" || LOG_LEVEL === "silly" || (!LOG_LEVEL && process.env.NODE_ENV !== "production");
-const CAN_LOG_SILLY = LOG_LEVEL === "silly";
+import { CAN_LOG_DEBUG, CAN_LOG_SILLY } from "../../environment";
 
 export async function editItemDefinition(
   appData: IAppDataType,

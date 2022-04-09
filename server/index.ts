@@ -11,7 +11,7 @@ import fs from "fs";
 import Root, { IRootRawJSONDataType, ILangLocalesType } from "../base/Root";
 import { IGQLQueryFieldsDefinitionType } from "../base/Root/gql";
 import { types } from "pg";
-import { SERVER_DATA_IDENTIFIER, CACHED_CURRENCY_RESPONSE } from "../constants";
+import { SERVER_DATA_IDENTIFIER, CACHED_CURRENCY_RESPONSE, PING_DATA_IDENTIFIER } from "../constants";
 import PropertyDefinition from "../base/Root/Module/ItemDefinition/PropertyDefinition";
 import { serverSideIndexChecker } from "../base/Root/Module/ItemDefinition/PropertyDefinition/server-checkers";
 import { Listener } from "./listener";
@@ -56,6 +56,16 @@ import { logger } from "./logger";
 import { ManualPaymentService } from "./services/manual-payment";
 import { TwilioService } from "./services/twilio";
 import { FakeSMSService } from "./services/fake-sms";
+import {
+  INSTANCE_MODE,
+  NODE_ENV,
+  USING_DOCKER,
+  PING_GOOGLE,
+  FAKE_EMAILS,
+  FAKE_SMS,
+  INSTANCE_GROUP_ID,
+  PORT,
+} from "./environment";
 
 // load the custom services configuration
 let serviceCustom: IServiceCustomizationType = {};
@@ -69,14 +79,6 @@ try {
   }
 } catch {
 }
-
-// get the environment in order to be able to set it up
-const NODE_ENV = process.env.NODE_ENV;
-const PORT = process.env.PORT || 8000;
-const INSTANCE_GROUP_ID = process.env.INSTANCE_GROUP_ID || "UNIDENTIFIED";
-const INSTANCE_MODE: "CLUSTER_MANAGER" | "GLOBAL_MANAGER" | "ABSOLUTE" | "EXTENDED" | "BUILD_DATABASE" | "LOAD_DATABASE_DUMP" | "CLEAN_STORAGE" | "CLEAN_SITEMAPS" = process.env.INSTANCE_MODE || "ABSOLUTE" as any;
-const USING_DOCKER = JSON.parse(process.env.USING_DOCKER || "false");
-const PING_GOOGLE = JSON.parse(process.env.PING_GOOGLE || "false");
 
 // Setting the parsers, postgresql comes with
 // its own way to return this data but we don't want it
@@ -447,12 +449,16 @@ export async function initializeServer(
             // from the currency factors, and so we flush all
             const serverDataStr = await client.get(SERVER_DATA_IDENTIFIER) || null;
             const currencyFactorsCachedResponseRestore = await client.get(CACHED_CURRENCY_RESPONSE) || null;
+            const pingInfo = await client.getAllStoredPings(PING_DATA_IDENTIFIER);
             await client.flushall();
             if (serverDataStr) {
               await client.set(SERVER_DATA_IDENTIFIER, serverDataStr);
             }
             if (currencyFactorsCachedResponseRestore) {
               await client.set(CACHED_CURRENCY_RESPONSE, currencyFactorsCachedResponseRestore);
+            }
+            if (pingInfo.length) {
+              await client.restorePings(pingInfo);
             }
           }
         });
@@ -562,15 +568,14 @@ export async function initializeServer(
         throw new Error("The mail service class is not a hybrid type, and that's not allowed");
       }
 
-      const usesFakeMail = process.env.FAKE_EMAILS === "true";
-      if (usesFakeMail) {
+      if (FAKE_EMAILS) {
         logger.info(
           "initializeServer: using fake email service",
         );
         // typescript messes the types again
         MailServiceClass = FakeMailService as any;
       }
-      const mailService: MailProvider<any> = ((sensitiveConfig.mail || usesFakeMail) ?
+      const mailService: MailProvider<any> = ((sensitiveConfig.mail || FAKE_EMAILS) ?
         new MailServiceClass(
           sensitiveConfig.mail,
           registry,
@@ -583,8 +588,7 @@ export async function initializeServer(
         throw new Error("The phone service class is not a hybrid type, and that's not allowed");
       }
 
-      const usesFakeSMS = process.env.FAKE_SMS === "true";
-      if (usesFakeSMS) {
+      if (FAKE_SMS) {
         logger.info(
           "initializeServer: using fake sms service",
         );
@@ -592,7 +596,7 @@ export async function initializeServer(
         PhoneServiceClass = FakeSMSService as any;
       }
 
-      const phoneService: PhoneProvider<any> = ((sensitiveConfig.phone || usesFakeMail) ?
+      const phoneService: PhoneProvider<any> = ((sensitiveConfig.phone || FAKE_SMS) ?
         new PhoneServiceClass(
           sensitiveConfig.phone,
           registry,
@@ -802,15 +806,14 @@ export async function initializeServer(
       throw new Error("The mail service class is not a hybrid type, and that's not allowed");
     }
 
-    const usesFakeMail = process.env.FAKE_EMAILS === "true";
-    if (usesFakeMail) {
+    if (FAKE_EMAILS) {
       logger.info(
         "initializeServer: using fake email service",
       );
       // typescript messes the types again
       MailServiceClass = FakeMailService as any;
     }
-    const mailService: MailProvider<any> = ((sensitiveConfig.mail || usesFakeMail) ?
+    const mailService: MailProvider<any> = ((sensitiveConfig.mail || FAKE_EMAILS) ?
       new MailServiceClass(
         sensitiveConfig.mail,
         registry,
@@ -823,15 +826,14 @@ export async function initializeServer(
       throw new Error("The phone service class is not a hybrid type, and that's not allowed");
     }
 
-    const usesFakeSMS = process.env.FAKE_SMS === "true";
-    if (usesFakeSMS) {
+    if (FAKE_SMS) {
       logger.info(
         "initializeServer: using fake sms service",
       );
       // typescript messes the types again
       PhoneServiceClass = FakeSMSService as any;
     }
-    const phoneService: PhoneProvider<any> = ((sensitiveConfig.phone || usesFakeSMS) ?
+    const phoneService: PhoneProvider<any> = ((sensitiveConfig.phone || FAKE_SMS) ?
       new PhoneServiceClass(
         sensitiveConfig.phone,
         registry,

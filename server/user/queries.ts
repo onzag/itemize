@@ -14,6 +14,7 @@ import { ISQLTableRowValue } from "../../base/Root/sql";
 import TOKEN_OBJECT from "../custom-graphql/graphql-token-object";
 import STANDARD_REPLY from "../custom-graphql/graphql-standard-reply-object";
 import { capitalize, checkIsPossiblePhoneNumber, convertPhoneNumberToInternational } from "../../util";
+import { NODE_ENV } from "../environment";
 
 const chars = "0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ";
 function generateRandomId(size: number) {
@@ -778,7 +779,7 @@ export const customUserQueries = (appData: IAppDataType): IGQLQueryFieldsDefinit
         });
 
         const validateLink = (
-          process.env.NODE_ENV === "development" ? appData.config.developmentHostname : appData.config.productionHostname
+          NODE_ENV === "development" ? appData.config.developmentHostname : appData.config.productionHostname
         ) +
           "/rest/user/validate?token=" + encodeURIComponent(validateToken) + "&id=" + encodeURIComponent(decoded.id);
 
@@ -1040,7 +1041,7 @@ export const customUserQueries = (appData: IAppDataType): IGQLQueryFieldsDefinit
         });
 
         const resetPasswordLink = (
-          process.env.NODE_ENV === "development" ? appData.config.developmentHostname : appData.config.productionHostname
+          NODE_ENV === "development" ? appData.config.developmentHostname : appData.config.productionHostname
         ) +
           i18nData.custom.forgot_password_link_target + "?token=" +
           encodeURIComponent(resetToken) + "&id=" +

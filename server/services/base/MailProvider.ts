@@ -16,6 +16,7 @@ import type { IGQLValue } from "../../../gql-querier";
 import { jwtSign } from "../../token";
 import { IUnsubscribeUserTokenDataType } from "../../user/rest";
 import { ServiceProvider, ServiceProviderType } from "..";
+import { NODE_ENV } from "../../environment";
 
 /**
  * The unsubscribe url form
@@ -382,7 +383,7 @@ export default class MailProvider<T> extends ServiceProvider<T> {
     }
 
     // now we need the hostname
-    const hostname = process.env.NODE_ENV === "development" ?
+    const hostname = NODE_ENV === "development" ?
       this.appConfig.developmentHostname :
       this.appConfig.productionHostname;
 

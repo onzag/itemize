@@ -37,14 +37,13 @@ import { UpdateBuilder } from "../database/UpdateBuilder";
 import { SelectBuilder } from "../database/SelectBuilder";
 import { convertSQLValueToGQLValueForProperty } from "../base/Root/Module/ItemDefinition/PropertyDefinition/sql";
 
+import {
+  CAN_LOG_DEBUG,
+  CAN_LOG_SILLY
+} from "./environment";
+
 const CACHE_EXPIRES_DAYS = 14;
 const MEMCACHE_EXPIRES_MS = 1000;
-
-// Used to optimize, it is found out that passing unecessary logs to the transport
-// can slow the logger down even if it won't display
-const LOG_LEVEL = process.env.LOG_LEVEL;
-const CAN_LOG_DEBUG = LOG_LEVEL === "debug" || LOG_LEVEL === "silly" || (!LOG_LEVEL && process.env.NODE_ENV !== "production");
-const CAN_LOG_SILLY = LOG_LEVEL === "silly";
 
 /**
  * The cache class that provides all the functionality that is

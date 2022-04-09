@@ -25,13 +25,13 @@ import { IGQLValue, IGQLSearchRecord, IGQLArgs, IGQLRequestFields } from "../../
 import { PropertyDefinitionSupportedType } from "../../base/Root/Module/ItemDefinition/PropertyDefinition/types";
 import { ISensitiveConfigRawJSONDataType } from "../../config";
 import { getConversionIds } from "../../base/Root/Module/ItemDefinition/PropertyDefinition/search-mode";
-import { ICustomRoleManager } from "../../base/Root";
 import { CustomRoleGranterEnvironment, CustomRoleManager } from "./roles";
 
 // Used to optimize, it is found out that passing unecessary logs to the transport
 // can slow the logger down even if it won't display
-const LOG_LEVEL = process.env.LOG_LEVEL;
-const CAN_LOG_SILLY = LOG_LEVEL === "silly";
+import {
+  CAN_LOG_SILLY
+} from "../environment";
 
 export interface IServerSideTokenDataType {
   // role always present

@@ -19,11 +19,9 @@ import sharp from "sharp";
 import { logger } from "../../../../../../server/logger";
 import Module from "../../..";
 import StorageProvider from "../../../../../../server/services/base/StorageProvider";
-
-// Used to optimize, it is found out that passing unecessary logs to the transport
-// can slow the logger down even if it won't display
-const LOG_LEVEL = process.env.LOG_LEVEL;
-const CAN_LOG_DEBUG = LOG_LEVEL === "debug" || LOG_LEVEL === "silly" || (!LOG_LEVEL && process.env.NODE_ENV !== "production");
+import {
+  CAN_LOG_DEBUG
+} from "../../../../../../server/environment";
 
 /**
  * Processes an extended list based
@@ -50,7 +48,7 @@ export function processFileListFor(
   consumeStreams: ConsumeStreamsFnType;
 } {
   // the values might be null so let's ensure them
-  const actualNewValues = newValues || [];
+  const actualNewValues = newValues || [];
   const actualOldValues = oldValues || [];
 
   // now let's get a list of the removed files

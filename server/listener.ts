@@ -82,11 +82,7 @@ import { findLastRecordLastModifiedDate } from "./resolvers/actions/search";
 import { CustomRoleGranterEnvironment, CustomRoleManager, ICustomRoleType } from "./resolvers/roles";
 import { convertSQLValueToGQLValueForItemDefinition } from "../base/Root/Module/ItemDefinition/sql";
 import { ItemizeRawDB } from "./raw-db";
-
-// Used to optimize, it is found out that passing unecessary logs to the transport
-// can slow the logger down even if it won't display
-const LOG_LEVEL = process.env.LOG_LEVEL;
-const CAN_LOG_DEBUG = LOG_LEVEL === "debug" || LOG_LEVEL === "silly" || (!LOG_LEVEL && process.env.NODE_ENV !== "production");
+import { CAN_LOG_DEBUG, INSTANCE_GROUP_ID, INSTANCE_MODE } from "./environment";
 
 const ajv = new Ajv();
 
@@ -145,9 +141,6 @@ interface IListenerList {
 interface IServerListensList {
   [mergedIndexIdentifier: string]: boolean;
 }
-
-const INSTANCE_MODE = process.env.INSTANCE_MODE || "ABSOLUTE";
-const INSTANCE_GROUP_ID = process.env.INSTANCE_GROUP_ID || "UNIDENTIFIED";
 
 const CLUSTER_MANAGER_REGISTER_SS = "CLUSTER_MANAGER_REGISTER_SS";
 const CLUSTER_MANAGER_RESET = "CLUSTER_MANAGER_RESET";

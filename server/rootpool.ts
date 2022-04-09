@@ -8,11 +8,9 @@
 import { Pool } from "tarn";
 import Root, { IRootRawJSONDataType } from "../base/Root";
 import { logger } from "./logger";
-
-// Used to optimize, it is found out that passing unecessary logs to the transport
-// can slow the logger down even if it won't display
-const LOG_LEVEL = process.env.LOG_LEVEL;
-const CAN_LOG_DEBUG = LOG_LEVEL === "debug" || LOG_LEVEL === "silly" || (!LOG_LEVEL && process.env.NODE_ENV !== "production");
+import {
+  CAN_LOG_DEBUG,
+} from "./environment";
 
 /**
  * Provides a pool of root

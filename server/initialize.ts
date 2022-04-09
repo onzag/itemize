@@ -22,11 +22,9 @@ import { graphqlUploadExpress } from "graphql-upload";
 import { buildCustomTokenQueries } from "./custom-graphql";
 import { getMode } from "./mode";
 import { userRestServices } from "./user/rest";
+import { NODE_ENV, NO_SEO } from "./environment";
 
 import { ssrGenerator } from "./ssr/generator";
-
-const NODE_ENV = process.env.NODE_ENV;
-const NO_SEO = process.env.NO_SEO === "true";
 
 /**
  * This is the function that catches the errors that are thrown
@@ -242,7 +240,7 @@ export function initializeApp(appData: IAppDataType, custom: IServerCustomizatio
       if (prefix.startsWith("/")) {
         host = "https://" +
           (
-            process.env.NODE_ENV === "production" ?
+            NODE_ENV === "production" ?
             appData.config.productionHostname :
             appData.config.developmentHostname
           );

@@ -1368,6 +1368,11 @@ export const PROTECTED_RESOURCES = [
 export const SERVER_DATA_IDENTIFIER = "SERVER_DATA";
 
 /**
+ * An identifier for the ping information
+ */
+export const PING_DATA_IDENTIFIER = "PING_DATA";
+
+/**
  * An identifier from when the server kicks an user from the
  * login (aka sudden remote logout)
  */

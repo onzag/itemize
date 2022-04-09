@@ -8,6 +8,7 @@
 
 import express from "express";
 import { IAppDataType } from ".";
+import { NODE_ENV } from "./environment";
 
 /**
  * Provides the value of a cookie using a very cheap method
@@ -32,7 +33,7 @@ export function getCookie(splittedCookie: string[], name: string): string {
  */
 export function getMode(appData: IAppDataType, req: express.Request): "development" | "production" {
   // our default mode is.... our NODE_ENV
-  let defaultMode: "development" | "production" = process.env.NODE_ENV as any;
+  let defaultMode: "development" | "production" = NODE_ENV as any;
 
   // if the default mode is not any of those we default to development
   if (defaultMode !== "development" && defaultMode !== "production") {

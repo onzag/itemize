@@ -14,6 +14,7 @@ import { ISQLTableRowValue } from "../../../base/Root/sql";
 import { renderTemplateAsNode, convertNodeToText } from "../../../client/internal/text";
 import type { IGQLValue } from "../../../gql-querier";
 import { ServiceProvider, ServiceProviderType } from "..";
+import { NODE_ENV } from "../../environment";
 
 /**
  * The shape of an sms that is being wanted to be sent
@@ -259,7 +260,7 @@ export default class PhoneProvider<T> extends ServiceProvider<T> {
     }
 
     // now we need the hostname
-    const hostname = process.env.NODE_ENV === "development" ?
+    const hostname = NODE_ENV === "development" ?
       this.appConfig.developmentHostname :
       this.appConfig.productionHostname;
 

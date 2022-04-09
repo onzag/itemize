@@ -2,6 +2,7 @@ import Mailgun from "mailgun-js";
 import MailProvider, { ISendEmailData } from "./base/MailProvider";
 import type { Router } from "express";
 import { ServiceProviderType } from ".";
+import { NODE_ENV, INSTANCE_MODE } from "../environment";
 
 export class MailgunService extends MailProvider<Mailgun.ConstructorParams> {
   private mailgun: Mailgun.Mailgun;
@@ -19,7 +20,7 @@ export class MailgunService extends MailProvider<Mailgun.ConstructorParams> {
       limit: 100,
     });
 
-    const hostname = process.env.NODE_ENV === "development" ?
+    const hostname = NODE_ENV === "development" ?
       this.appConfig.developmentHostname : this.appConfig.productionHostname;
 
     const customID = "MAILGUN_ITEMIZE_TRIGGER_" + hostname;
@@ -116,8 +117,8 @@ export class MailgunService extends MailProvider<Mailgun.ConstructorParams> {
   public getRunCycleTime() {
     if (
       !this.cantReceiveEmail &&
-      process.env.NODE_ENV === "development" &&
-      process.env.INSTANCE_MODE === "ABSOLUTE"
+      NODE_ENV === "development" &&
+      INSTANCE_MODE === "ABSOLUTE"
     ) {
       // because we are most likely running for localhost
       // as we are in a development environment we have no
@@ -134,7 +135,7 @@ export class MailgunService extends MailProvider<Mailgun.ConstructorParams> {
   }
 
   public run() {
-    if (process.env.NODE_ENV === "development" && process.env.INSTANCE_MODE === "ABSOLUTE") {
+    if (NODE_ENV === "development" && INSTANCE_MODE === "ABSOLUTE") {
       this.checkForNewMail();
     }
   }

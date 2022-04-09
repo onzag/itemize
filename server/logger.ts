@@ -1,10 +1,6 @@
 import winston from "winston";
 import "winston-daily-rotate-file";
-
-// get the environment in order to be able to set it up
-const NODE_ENV = process.env.NODE_ENV;
-const LOG_LEVEL = process.env.LOG_LEVEL;
-const INSTANCE_MODE: "CLUSTER_MANAGER" | "GLOBAL_MANAGER" | "ABSOLUTE" | "EXTENDED" | "BUILD_DATABASE" | "LOAD_DATABASE_DUMP" | "CLEAN_STORAGE" | "CLEAN_SITEMAPS" = process.env.INSTANCE_MODE || "ABSOLUTE" as any;
+import { INSTANCE_MODE, LOG_LEVEL, NODE_ENV } from "./environment";
 
 // building the logger
 export const logger: winston.Logger = (

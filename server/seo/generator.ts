@@ -18,12 +18,7 @@ import StorageProvider from "../services/base/StorageProvider";
 import { convertVersionsIntoNullsWhenNecessary } from "../version-null-value";
 import { ItemizeRawDB } from "../../server/raw-db";
 import { SelectBuilder } from "../../database/SelectBuilder";
-
-/**
- * Whether seo is disabled
- * @ignore
- */
-const NO_SEO = process.env.NO_SEO === "true";
+import { NO_SEO } from "../environment";
 
 /**
  * Represents the list of results

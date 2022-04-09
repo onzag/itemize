@@ -12,9 +12,7 @@ import express from "express";
 import { IConfigRawJSONDataType } from "../../config";
 import { ISensitiveConfigRawJSONDataType } from "../../config";
 import PhoneProvider from "./base/PhoneProvider";
-
-const LOG_LEVEL = process.env.LOG_LEVEL;
-const CAN_LOG_DEBUG = LOG_LEVEL === "debug" || LOG_LEVEL === "silly" || (!LOG_LEVEL && process.env.NODE_ENV !== "production");
+import { CAN_LOG_DEBUG } from "../environment";
 
 const wait = (time: number) => {
   return new Promise((resolve) => {
