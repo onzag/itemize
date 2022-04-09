@@ -799,5 +799,65 @@ export function convertCurrencyValue(value: IPropertyDefinitionSupportedCurrency
   };
 }
 
+export async function loadLib(id: string, url: string, checker?: () => boolean): Promise<void> {
+  return new Promise((resolve) => {
+    const element = document.getElementById(id);
+
+    const onload = () => {
+      if (checker) {
+        if (checker()) {
+          const scriptDone = document.getElementById(id);
+          scriptDone.dataset.loading = "false";
+          resolve();
+        } else {
+          setTimeout(onload, 70);
+        }
+      } else {
+        resolve();
+      }
+    };
+
+    if (!element) {
+      const script = document.createElement("script");
+      script.src = url;
+      script.async = true;
+      script.defer = true;
+      script.id = id;
+      script.dataset.loading = "true";
+      document.head.appendChild(script);
+      script.onload = () => {
+        onload();
+      };
+      script.onerror = () => {
+        document.head.removeChild(script);
+        setTimeout(async () => {
+          await loadLib(id, url, checker);
+          resolve();
+        }, 1000);
+      };
+    } else {
+      onload();
+    }
+  });
+}
+
+export function loadCSS(id: string, url: string) {
+  const element = document.getElementById(id);
+  if (element) {
+    return;
+  }
+
+  const link = document.createElement("link");
+  link.rel = "stylesheet";
+  link.href = url;
+  link.id = id;
+  document.head.appendChild(link);
+}
+
+export function isLibReady(id: string): boolean {
+  const element = document.getElementById(id);
+  return element && element.dataset.loading !== "true";
+}
+
 export const DOMWindow = JSDOM ? (new JSDOM("")).window : window;
 export const DOMPurify = createDOMPurify(DOMWindow);

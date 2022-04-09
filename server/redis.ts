@@ -9,7 +9,7 @@ import redis, { RedisClient } from "redis";
 import { logger } from "./logger";
 import { promisify } from "util";
 
-interface IRedisPing<T> {
+export interface IRedisPing<T> {
   tkey: string;
   dataKey: string;
   data: T;
@@ -19,12 +19,12 @@ interface IRedisPingSetter<T, N> extends IRedisPing<T> {
   statusRetriever: () => N;
 }
 
-interface IPingEvent {
+export interface IPingEvent {
   event: "CONNECT" | "DISCONNECT" | "RECONNECT";
   time: number;
 }
 
-interface IPingInfo<T, N> extends IRedisPing<T> {
+export interface IPingInfo<T, N> extends IRedisPing<T> {
   lastStatus: N;
   lastPing: number;
   events: IPingEvent[];
@@ -102,7 +102,7 @@ export class ItemizeRedisClient {
     }
 
     const lastPingTime = parseInt(allPings[key + "_LASTPING"]) || 0;
-    const diff = lastPingTime - (new Date()).getTime();
+    const diff = (new Date()).getTime() - lastPingTime;
     const isAssumedDead = diff >= (PING_TIME * 2);
 
     if (!isAssumedDead) {
@@ -171,7 +171,7 @@ export class ItemizeRedisClient {
 
       if (!pingInfo.isDead) {
         const lastPingTime = pingInfo.lastPing;
-        const diff = lastPingTime - (new Date()).getTime();
+        const diff = (new Date()).getTime() - lastPingTime;
   
         // twice the time has passed of the normal ping time
         // and it hasn't pinged

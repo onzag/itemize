@@ -348,7 +348,6 @@ export default function restServices(appData: IAppDataType) {
       result = await jwtVerify<IServerSideTokenDataType>(token, appData.sensitiveConfig.jwtKey);
       forbidden = (
         typeof result.id !== "string" ||
-        typeof result.role !== "string" ||
         typeof result.sessionId !== "number" ||
         result.role !== "ADMIN"
       );
@@ -372,11 +371,11 @@ export default function restServices(appData: IAppDataType) {
   router.get("/clusters/info", async (req, res) => {
     res.setHeader("content-type", "application/json; charset=utf-8");
   
-    const forbidden = validateToken(req);
+    const forbidden = await validateToken(req);
     if (forbidden) {
-      res.status(401).end({
+      res.status(401).end(JSON.stringify({
         status: "NOT_AUTHORIZED",
-      });
+      }));
       return;
     }
 
@@ -391,11 +390,11 @@ export default function restServices(appData: IAppDataType) {
   router.delete("/clusters/info/:uuid", async (req, res) => {
     res.setHeader("content-type", "application/json; charset=utf-8");
 
-    const forbidden = validateToken(req);
+    const forbidden = await validateToken(req);
     if (forbidden) {
-      res.status(401).end({
+      res.status(401).end(JSON.stringify({
         status: "NOT_AUTHORIZED",
-      });
+      }));
       return;
     }
 

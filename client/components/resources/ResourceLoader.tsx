@@ -51,6 +51,16 @@ export interface IResourceLoaderProps {
    * sw recheck flag, rechecks the content after done, defaults to false
    */
   swRecheck?: boolean;
+  /**
+   * Causes the resource to be requested with pooling
+   */
+  pollEvery?: number;
+  /**
+   * The content will not change during loading
+   * and it will be mantained as value so that the
+   * screen does not blink
+   */
+  keepContentDuringLoading?: boolean;
 }
 
 /**
@@ -79,6 +89,9 @@ class ActualResourceLoader
   extends React.PureComponent<IActualResourceLoaderProps, IActualResourceLoaderState> {
 
   private isUnmounted: boolean = false;
+
+  private pollIntervalSetAt: number = null;
+  private pollInterval: any = null;
 
   public static async getDerivedServerSideStateFromProps(props: IActualResourceLoaderProps) {
     let path = props.path || "/rest/resource/";
@@ -116,6 +129,8 @@ class ActualResourceLoader
       loading: false,
       failed: false,
     };
+
+    this.load = this.load.bind(this);
   }
 
   public componentWillUnmount() {
@@ -126,6 +141,17 @@ class ActualResourceLoader
    * Performs the loading of a html resource
    */
   public async load() {
+    if (this.props.pollEvery) {
+      if (this.props.pollEvery !== this.pollIntervalSetAt) {
+        clearInterval(this.pollInterval);
+        setInterval(this.load, this.props.pollEvery * 1000);
+        this.pollIntervalSetAt = this.props.pollEvery;
+      }
+    } else {
+      this.pollIntervalSetAt = null;
+      clearInterval(this.pollInterval);
+    }
+
     let path = this.props.path || "/rest/resource/";
     if (!path.endsWith("/")) {
       path += "/";
@@ -175,7 +201,6 @@ class ActualResourceLoader
     // a loading component for 1 microsecond or how fast the
     // interner might be, so for now, we just clear it up
     this.setState({
-      content: null,
       failed: false,
       loading: false,
     });
@@ -185,9 +210,16 @@ class ActualResourceLoader
     // no need for flickering
     const waitTimeoutForLoading = setTimeout(() => {
       if (!this.isUnmounted) {
-        this.setState({
-          loading: true,
-        });
+        if (this.props.keepContentDuringLoading) {
+          this.setState({
+            loading: true,
+          });
+        } else {
+          this.setState({
+            content: null,
+            loading: true,
+          });
+        }
       }
     }, 600);
 
