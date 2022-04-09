@@ -15,6 +15,8 @@ import bodyParser from "body-parser";
 import { PROTECTED_RESOURCES, ENDPOINT_ERRORS, PING_DATA_IDENTIFIER } from "../constants";
 import { getMode } from "./mode";
 import { ENVIRONMENT_DETAILS } from "./environment";
+import { jwtVerify } from "./token";
+import { IServerSideTokenDataType } from "./resolvers/basic";
 
 /**
  * this function contains and build all the rest services
@@ -337,6 +339,26 @@ export default function restServices(appData: IAppDataType) {
   // now let's get all modules
   appData.root.getAllModules().forEach(buildRouteForModule);
 
+  async function validateToken(req: any) {
+    const token = req.query.token.toString();
+    
+    let result: IServerSideTokenDataType;
+    let forbidden: boolean = false;
+    try {
+      result = await jwtVerify<IServerSideTokenDataType>(token, appData.sensitiveConfig.jwtKey);
+      forbidden = (
+        typeof result.id !== "string" ||
+        typeof result.role !== "string" ||
+        typeof result.sessionId !== "number" ||
+        result.role !== "ADMIN"
+      );
+    } catch (err) {
+      forbidden = true;
+    }
+
+    return forbidden;
+  }
+
   router.get("/buildnumber", (req, res) => {
     res.setHeader("content-type", "application/json; charset=utf-8");
     res.end(appData.buildnumber.toString());
@@ -349,8 +371,18 @@ export default function restServices(appData: IAppDataType) {
 
   router.get("/clusters/info", async (req, res) => {
     res.setHeader("content-type", "application/json; charset=utf-8");
+  
+    const forbidden = validateToken(req);
+    if (forbidden) {
+      res.status(401).end({
+        status: "NOT_AUTHORIZED",
+      });
+      return;
+    }
+
     const allPings = await appData.redisGlobal.getAllStoredPings(PING_DATA_IDENTIFIER);
     res.end(JSON.stringify({
+      status: "OK",
       self: ENVIRONMENT_DETAILS,
       pings: allPings,
     }));
@@ -358,6 +390,15 @@ export default function restServices(appData: IAppDataType) {
 
   router.delete("/clusters/info/:uuid", async (req, res) => {
     res.setHeader("content-type", "application/json; charset=utf-8");
+
+    const forbidden = validateToken(req);
+    if (forbidden) {
+      res.status(401).end({
+        status: "NOT_AUTHORIZED",
+      });
+      return;
+    }
+
     const status = await appData.redisGlobal.deletePingFor(PING_DATA_IDENTIFIER, req.params.uuid);
     res.status(status === "NOT_FOUND" ? 404 : (status === "NOT_DEAD" ? 403 : 200)).end(JSON.stringify({
       status,
