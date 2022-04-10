@@ -94,7 +94,7 @@ export class DatabaseConnection {
    */
   async query(what: string | QueryBuilder, bindings?: BasicBindingType[], useHoles?: boolean): Promise<QueryResult> {
     let queryValue = typeof what === "string" ? what : what.compile();
-    const queryBindings = (typeof what === "string" ? bindings : what.getBindings()) || [];
+    const queryBindings = (typeof what === "string" ? bindings : what.getBindings()) || [];
     // let optimizedBindings: BasicBindingType[];
 
     if (typeof what !== "string" || useHoles) {

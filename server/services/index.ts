@@ -9,7 +9,7 @@ import { ItemizeRawDB } from "../raw-db";
 import { IAppDataType } from "..";
 import { logger } from "../logger";
 import express from "express";
-import { IConfigRawJSONDataType } from "../../config";
+import { IConfigRawJSONDataType, IDBConfigRawJSONDataType, IRedisConfigRawJSONDataType } from "../../config";
 import { ISensitiveConfigRawJSONDataType } from "../../config";
 import PhoneProvider from "./base/PhoneProvider";
 import { CAN_LOG_DEBUG } from "../environment";
@@ -34,6 +34,8 @@ export class ServiceProvider<T> {
   public registry: RegistryService;
   public appConfig: IConfigRawJSONDataType;
   public appSensitiveConfig: ISensitiveConfigRawJSONDataType;
+  public appDbConfig: IDBConfigRawJSONDataType;
+  public appRedisConfig: IRedisConfigRawJSONDataType;
 
   public globalDatabaseConnection: DatabaseConnection;
   public globalRedisPub: ItemizeRedisClient;
@@ -56,13 +58,19 @@ export class ServiceProvider<T> {
   constructor(
     config: T,
     registry: RegistryService,
-    appConfig: IConfigRawJSONDataType,
-    appSensitiveConfig: ISensitiveConfigRawJSONDataType,
+    configs: {
+      config: IConfigRawJSONDataType,
+      sensitiveConfig: ISensitiveConfigRawJSONDataType,
+      redisConfig: IRedisConfigRawJSONDataType,
+      dbConfig: IDBConfigRawJSONDataType,
+    }
   ) {
     this.config = config;
     this.registry = registry;
-    this.appConfig = appConfig;
-    this.appSensitiveConfig = appSensitiveConfig;
+    this.appConfig = configs.config;
+    this.appSensitiveConfig = configs.sensitiveConfig;
+    this.appDbConfig = configs.dbConfig;
+    this.appRedisConfig = configs.redisConfig;
   }
 
   public setInstanceName(n: string) {
@@ -294,8 +302,12 @@ export interface IServiceProviderClassType<T> {
   new(
     config: T,
     registry: RegistryService,
-    appConfig: IConfigRawJSONDataType,
-    appSensitiveConfig: ISensitiveConfigRawJSONDataType,
+    configs: {
+      config: IConfigRawJSONDataType,
+      sensitiveConfig: ISensitiveConfigRawJSONDataType,
+      redisConfig: IRedisConfigRawJSONDataType,
+      dbConfig: IDBConfigRawJSONDataType,
+    }
   ): ServiceProvider<T>;
   getRouter: (appData: IAppDataType) => express.Router | Promise<express.Router>;
   getTriggerRegistry: () => ITriggerRegistry | Promise<ITriggerRegistry>;

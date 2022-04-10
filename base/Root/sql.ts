@@ -7,7 +7,9 @@
 
 import { getSQLTablesSchemaForModule } from "./Module/sql";
 import Root from ".";
-import { CREATED_BY_INDEX, CURRENCY_FACTORS_IDENTIFIER, DELETED_REGISTRY_IDENTIFIER, PARENT_INDEX, REGISTRY_IDENTIFIER } from "../../constants";
+import { CREATED_BY_INDEX, CURRENCY_FACTORS_IDENTIFIER,
+  DELETED_REGISTRY_IDENTIFIER, PARENT_INDEX, REGISTRY_IDENTIFIER,
+  LOGS_IDENTIFIER } from "../../constants";
 
 export interface ISQLTableIndexType {
   /**
@@ -226,6 +228,41 @@ export function getSQLTablesSchemaForRoot(root: Root): ISQLSchemaDefinitionType 
         notNull: true,
       },
     },
+    [LOGS_IDENTIFIER]: {
+      id: {
+        type: "BIGSERIAL",
+        notNull: true,
+        index: {
+          id: "log_index",
+          type: "primary",
+          level: 0,
+        },
+      },
+      instance_id: {
+        type: "TEXT",
+        index: {
+          id: "log_instance_index",
+          type: "btree",
+          level: 0,
+        },
+      },
+      level: {
+        type: "TEXT",
+        index: {
+          id: "log_instance_index",
+          type: "btree",
+          level: 1,
+        },
+      },
+      data: {
+        type: "TEXT",
+        notNull: true,
+      },
+      created_at: {
+        type: "TIMESTAMPTZ",
+        notNull: true,
+      },
+    }
   };
   root.getAllModules().forEach((cModule) => {
     // add together the schemas of all the modules

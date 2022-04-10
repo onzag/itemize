@@ -340,7 +340,11 @@ export default function restServices(appData: IAppDataType) {
   appData.root.getAllModules().forEach(buildRouteForModule);
 
   async function validateToken(req: any) {
-    const token = req.query.token.toString();
+    const token = req.query.token && req.query.token.toString();
+
+    if (!token) {
+      return true;
+    }
     
     let result: IServerSideTokenDataType;
     let forbidden: boolean = false;
@@ -366,6 +370,74 @@ export default function restServices(appData: IAppDataType) {
   router.get("/currency-factors", (req, res) => {
     res.setHeader("content-type", "application/json; charset=utf-8");
     res.end(JSON.stringify(appData.cache.getServerData().CURRENCY_FACTORS));
+  });
+
+  // ADMINISTRATIVE STUFF
+  router.get("/logs/:level/:id", async (req, res) => {
+    res.setHeader("content-type", "application/json; charset=utf-8");
+  
+    const forbidden = await validateToken(req);
+    if (forbidden) {
+      res.status(401).end(JSON.stringify({
+        status: "NOT_AUTHORIZED",
+      }));
+      return;
+    }
+
+    let fromMs = req.query.from && Date.parse(req.query.from.toString());
+    let toMs = req.query.to && Date.parse(req.query.to.toString());
+    const level: "info" | "error" = req.params.level as any;
+    const id = req.params.id;
+
+    if (!fromMs || isNaN(fromMs) || !toMs || isNaN(toMs) || !id || (level !== "info" && level !== "error")) {
+      res.status(400).end(JSON.stringify({
+        status: "BAD_REQUEST",
+      }));
+    }
+
+    const fromD = new Date(fromMs);
+    const toD = new Date(toMs);
+
+    const allLogs = await appData.loggingService.getLogsOf(id, level, fromD, toD);
+    res.end(JSON.stringify({
+      status: "OK",
+      logs: allLogs,
+    }));
+  });
+
+  router.get("/logs", async (req, res) => {
+    res.setHeader("content-type", "application/json; charset=utf-8");
+  
+    const forbidden = await validateToken(req);
+    if (forbidden) {
+      res.status(401).end(JSON.stringify({
+        status: "NOT_AUTHORIZED",
+      }));
+      return;
+    }
+
+    const allLogInstances = await appData.loggingService.getLogsInstanceIds();
+    res.end(JSON.stringify({
+      status: "OK",
+      ids: allLogInstances,
+    }));
+  })
+
+  router.delete("/logs/:id", async (req, res) => {
+    res.setHeader("content-type", "application/json; charset=utf-8");
+
+    const forbidden = await validateToken(req);
+    if (forbidden) {
+      res.status(401).end(JSON.stringify({
+        status: "NOT_AUTHORIZED",
+      }));
+      return;
+    }
+
+    const status = await appData.loggingService.clearLogsOf(req.params.id);
+    res.status(status === "OK" ? 200 : (status === "NOT_AUTHORIZED" ? 403 : 500)).end(JSON.stringify({
+      status,
+    }));
   });
 
   router.get("/clusters/info", async (req, res) => {

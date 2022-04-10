@@ -10,8 +10,10 @@ if (NODE_ENV !== "development" && NODE_ENV !== "production") {
 export const PORT: number = process.env.PORT ? (parseInt(process.env.PORT) || 8000) : 8000;
 export const INSTANCE_GROUP_ID = process.env.INSTANCE_GROUP_ID || "UNIDENTIFIED";
 export const INSTANCE_MODE: "CLUSTER_MANAGER" | "GLOBAL_MANAGER" | "ABSOLUTE" | "EXTENDED" | "BUILD_DATABASE" | "LOAD_DATABASE_DUMP" | "CLEAN_STORAGE" | "CLEAN_SITEMAPS" = process.env.INSTANCE_MODE || "ABSOLUTE" as any;
-export const INSTANCE_UUID = uuid.v4().replace(/-/g, "");
+export const INSTANCE_UUID = INSTANCE_MODE + "_" + INSTANCE_GROUP_ID + "_" + uuid.v4().replace(/-/g, "");
 export const INSTANCE_CREATION_TIME = new Date();
+export const INSTANCE_LOG_FILE = `logs/info.${INSTANCE_UUID}.log`;
+export const INSTANCE_LOG_ERROR_FILE = `logs/error.${INSTANCE_UUID}.log`;
 
 if (
   INSTANCE_MODE !== "CLUSTER_MANAGER" &&

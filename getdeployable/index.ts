@@ -54,7 +54,6 @@ export default async function build(version: string, buildID: string, services: 
   // and we make all these directories
   await fsAsync.mkdir(path.join("deployments", buildID));
   await fsAsync.mkdir(path.join("deployments", buildID, "config"));
-  await fsAsync.mkdir(path.join("deployments", buildID, "logs"));
 
   // Retrieve the config for the database
   const dbConfigToUse = version === "development" ? "db.sensitive.json" : `db.${version}.sensitive.json`;

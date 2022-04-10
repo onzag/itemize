@@ -1395,6 +1395,11 @@ export const DELETED_REGISTRY_IDENTIFIER = "DELETED_REGISTRY";
 export const REGISTRY_IDENTIFIER = "REGISTRY";
 
 /**
+ * Used for logging, usually as a temporary solution
+ */
+export const LOGS_IDENTIFIER = "LOGS";
+
+/**
  * An identifier for caching the currency api response
  * for currency conversion in redis
  */

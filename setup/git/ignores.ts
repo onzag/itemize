@@ -13,8 +13,6 @@ export default [
   "/node_modules",
   // the dev environment that is created when docker is launched for dev mode
   "/devenv",
-  // the logs that the server generates when using winston
-  "/logs",
   // the deployments folder for when the get-deployable script is created
   "/deployments",
   // uploads folder

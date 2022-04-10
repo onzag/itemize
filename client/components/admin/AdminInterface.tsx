@@ -5,7 +5,7 @@ import equals from "deep-equal";
 import { TokenContext } from "../../internal/providers/token-provider";
 import ResourceLoader from "../resources/ResourceLoader";
 import React, { useEffect, useState } from "react";
-import { loadLib } from "../../../util";
+import { loadLib, parseDate } from "../../../util";
 import ReactDOM from "react-dom";
 
 
@@ -42,10 +42,6 @@ interface IBasicNode extends INode {
   type: "EXTENDED" | "CLUSTER_MANAGER" | "ABSOLUTE" | "GLOBAL_MANAGER";
   isSelf: boolean;
   dead: boolean;
-}
-
-interface IBasicNodeWithData extends IBasicNode {
-  data: IPingInfo<IEnvironmentInfo, INodeInfo>;
 }
 
 type IFinalNode = IBasicNode | IRedisNode | IPGNode;
@@ -158,7 +154,7 @@ export function getGraphFromClusterInfo(self: any, pings: IPingInfo<IEnvironment
     let redisCacheId = getRedisId(s.data.redisCache);
     const redisGlobalId = getRedisId(s.data.redisGlobal);
     const redisPubSubId = getRedisId(s.data.redisPubSub);
-    const databaseId = getPGId(s.data.postgresql);
+    let databaseId = getPGId(s.data.postgresql);
 
     let redisCacheForce = 3;
     let redisGlobalForce = 2;
@@ -167,6 +163,7 @@ export function getGraphFromClusterInfo(self: any, pings: IPingInfo<IEnvironment
 
     if (s.data.environment.INSTANCE_MODE === "CLUSTER_MANAGER") {
       redisCacheForce = 5;
+      databaseId = null;
     } else if (s.data.environment.INSTANCE_MODE === "GLOBAL_MANAGER" || s.data.environment.INSTANCE_MODE === "ABSOLUTE") {
       redisCacheForce = 5;
       if (s.data.environment.INSTANCE_MODE === "GLOBAL_MANAGER") {
@@ -197,22 +194,24 @@ export function getGraphFromClusterInfo(self: any, pings: IPingInfo<IEnvironment
       value: redisPubSubForce,
       type: isDead ? "deadlink" : "network",
     });
-    graphConnections.push({
-      target: s.dataKey,
-      source: databaseId,
-      value: databaseForce,
-      type: isDead ? "deadlink" : "network",
-    });
+    if (databaseId) {
+      graphConnections.push({
+        target: s.dataKey,
+        source: databaseId,
+        value: databaseForce,
+        type: isDead ? "deadlink" : "network",
+      });
+    }
   });
 
   graphResult.forEach((r, index) => {
     const existantNode = memoizedNodes.find((mR) => {
       return Object.keys(r).every((k) => {
-        return equals(r[k], mR[k], {strict: true});
+        return equals(r[k], mR[k], { strict: true });
       });
     });
     if (existantNode) {
-      graphResult[index] =  existantNode;
+      graphResult[index] = existantNode;
     } else {
       memoizedNodes.push(r);
     }
@@ -224,11 +223,11 @@ export function getGraphFromClusterInfo(self: any, pings: IPingInfo<IEnvironment
         if (k === "source" || k === "target") {
           return c[k] === (mC[k] as any).id;
         }
-        return equals(c[k], mC[k], {strict: true});
+        return equals(c[k], mC[k], { strict: true });
       });
     });
     if (existantConnection) {
-      graphConnections[index] =  existantConnection;
+      graphConnections[index] = existantConnection;
     } else {
       memoizedConnections.push(c);
     }
@@ -242,6 +241,8 @@ export function getGraphFromClusterInfo(self: any, pings: IPingInfo<IEnvironment
 
 export default function AdminInterface() {
   const [isReady, setReady] = useState(false);
+  const [selectedInstance, setSelectedInstance] = useState(null);
+
   useEffect(() => {
     (async () => {
       (window as any).React = React;
@@ -253,66 +254,131 @@ export default function AdminInterface() {
     })();
   }, [])
   return (
-    <TokenContext.Consumer>
-      {(context) => (
-        <ResourceLoader
-          src={"info?token=" + context.token}
-          path="/rest/clusters"
-          pollEvery={10}
-          keepContentDuringLoading={true}
-        >
-          {(data: string) => {
-            if (!data || !isReady) {
-              return null;
-            }
+    <div style={{ position: "fixed", top: 0, left: 0, width: "100%", height: "100%" }}>
+      <TokenContext.Consumer>
+        {(context) => (
+          <>
+            <ResourceLoader
+              src={"info?token=" + context.token}
+              path="/rest/clusters"
+              pollEvery={10}
+              keepContentDuringLoading={true}
+            >
+              {(data: string) => {
+                if (!data || !isReady) {
+                  return null;
+                }
 
-            const parsedData = JSON.parse(data);
+                const parsedData = JSON.parse(data);
 
-            if (parsedData.status !== "OK") {
-              return null;
-            }
+                if (parsedData.status !== "OK") {
+                  return null;
+                }
 
-            const graphData = getGraphFromClusterInfo(parsedData.self, parsedData.pings);
-            const ForceGraph2D = (window as any).ForceGraph2D;
-            return (
-              <ForceGraph2D
-                graphData={graphData}
-                nodeLabel="label"
-                nodeColor={(n: IFinalNode) => {
-                  if (n.type === "PG") {
-                    return "#d50000";
-                  } else if (n.type === "REDIS") {
-                    return "#6200ea";
-                  } else if (n.type === "GLOBAL_MANAGER") {
-                    if (n.dead) {
-                      return "#e8f5e9";
-                    }
-                    return "#a5d6a7";
-                  } else if (n.type === "CLUSTER_MANAGER") {
-                    if (n.dead) {
-                      return "#fff3e0";
-                    }
-                    return "#ffcc80";
-                  } else if (n.type === "EXTENDED") {
-                    if (n.dead) {
-                      return "#f9fbe7";
-                    }
-                    return "#e6ee9c";
-                  } else {
-                    if (n.dead) {
-                      return "#eeeeee";
-                    }
-                    return "#616161";
+                const graphData = getGraphFromClusterInfo(parsedData.self, parsedData.pings);
+                const ForceGraph2D = (window as any).ForceGraph2D;
+                return (
+                  <ForceGraph2D
+                    graphData={graphData}
+                    nodeLabel="label"
+                    nodeColor={(n: IFinalNode) => {
+                      if ((n as any).isSelf) {
+                        return "#000";
+                      }
+
+                      if (n.type === "PG") {
+                        return "#d50000";
+                      } else if (n.type === "REDIS") {
+                        return "#6200ea";
+                      } else if (n.type === "GLOBAL_MANAGER") {
+                        if (n.dead) {
+                          return "#e8f5e9";
+                        }
+                        return "#a5d6a7";
+                      } else if (n.type === "CLUSTER_MANAGER") {
+                        if (n.dead) {
+                          return "#fff3e0";
+                        }
+                        return "#ffcc80";
+                      } else if (n.type === "EXTENDED") {
+                        if (n.dead) {
+                          return "#f9fbe7";
+                        }
+                        return "#e6ee9c";
+                      } else {
+                        if (n.dead) {
+                          return "#eeeeee";
+                        }
+                        return "#616161";
+                      }
+                    }}
+                    onNodeClick={(d: IFinalNode) => d.type === "ABSOLUTE" || d.type === "EXTENDED" || d.type === "CLUSTER_MANAGER" || d.type === "GLOBAL_MANAGER" ? setSelectedInstance(d.id) : null}
+                    linkWidth={(d: IConnection) => d.type === "deadlink" ? 1 : (d.type === "network" ? 2 : 0)}
+                    linkDirectionalParticles={(d: IConnection) => d.type === "network" ? d.value : 0}
+                    linkDirectionalParticleSpeed={(d: IConnection) => d.type === "deadlink" ? 0 : d.value * 0.0005}
+                  />
+                );
+              }}
+            </ResourceLoader>
+            <ResourceLoader
+              src={"logs?token=" + context.token}
+              path="/rest"
+              pollEvery={10}
+              keepContentDuringLoading={true}
+            >
+              {(data: string) => {
+                if (!data) {
+                  return null;
+                }
+
+                const parsedData = JSON.parse(data);
+
+                if (parsedData.status !== "OK") {
+                  return null;
+                }
+
+                const logsInstances: string[] = parsedData.ids;
+
+                return (
+                  <div style={{ position: "absolute", right: 0, width: "50%", bottom: 0 }}>
+                    {logsInstances.map((i) => (
+                      <button key={i} style={{ fontSize: 12, display: "block" }} onClick={setSelectedInstance.bind(null, i)}>{i}</button>
+                    ))}
+                  </div>
+                )
+              }}
+            </ResourceLoader>
+            {selectedInstance ? (
+              <div style={{ position: "absolute", left: 0, width: "50%", height: "50%", overflow: "scroll", bottom: 0, backgroundColor: "white" }}>
+                <ResourceLoader
+                  src={
+                    selectedInstance +
+                    "?token=" +
+                    context.token +
+                    "&from=" + (new Date((new Date().getTime() - 86400000))).toISOString() +
+                    "&to=" + (new Date((new Date().getTime() + 86400000))).toISOString()
                   }
-                }}
-                linkWidth={(d: IConnection) => d.type === "deadlink" ? 1 : (d.type === "network" ? 2 : 0)}
-                linkDirectionalParticles={(d: IConnection) => d.type === "network" ? d.value : 0}
-                linkDirectionalParticleSpeed={(d: IConnection) => d.type === "deadlink" ? 0 : d.value * 0.0005}
-              />
-            );
-          }}
-        </ResourceLoader>
-      )}
-    </TokenContext.Consumer>
-  )
+                  path="/rest/logs/info"
+                >
+                  {(data: string) => {
+                    if (!data) {
+                      return null;
+                    }
+
+                    const parsedData = JSON.parse(data);
+
+                    if (parsedData.status !== "OK") {
+                      return null;
+                    }
+
+                    return JSON.stringify(parsedData);
+                  }}
+                </ResourceLoader>
+              </div>
+            ) : null}
+          </>
+        )}
+      </TokenContext.Consumer>
+    </div>
+  );
 }

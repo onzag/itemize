@@ -39,10 +39,12 @@ import { MailgunService } from "./services/mailgun";
 import { HereMapsService } from "./services/here";
 import { CurrencyLayerService } from "./services/currency-layer";
 import { FakeMailService } from "./services/fake-mail";
+import { PgLoggerService } from "./services/pg-logger";
 import { ServiceProvider, IServiceProviderClassType, ServiceProviderType } from "./services";
 import LocationSearchProvider from "./services/base/LocationSearchProvider";
 import MailProvider from "./services/base/MailProvider";
 import PhoneProvider from "./services/base/PhoneProvider";
+import type LoggingProvider from "./services/base/LoggingProvider";
 import StorageProvider, { IStorageProvidersObject } from "./services/base/StorageProvider";
 import UserLocalizationProvider from "./services/base/UserLocalizationProvider";
 import { RegistryService } from "./services/registry";
@@ -52,7 +54,7 @@ import { ItemizeRawDB } from "./raw-db";
 import CurrencyFactorsProvider from "./services/base/CurrencyFactorsProvider";
 import { DatabaseConnection } from "../database";
 import PaymentProvider from "./services/base/PaymentProvider";
-import { logger } from "./logger";
+import { extendLoggerWith, logger } from "./logger";
 import { ManualPaymentService } from "./services/manual-payment";
 import { TwilioService } from "./services/twilio";
 import { FakeSMSService } from "./services/fake-sms";
@@ -152,6 +154,7 @@ export interface IAppDataType {
   mailService: MailProvider<any>;
   phoneService: PhoneProvider<any>;
   paymentService: PaymentProvider<any>;
+  loggingService: LoggingProvider<any>;
   userLocalizationService: UserLocalizationProvider<any>;
   locationSearchService: LocationSearchProvider<any>;
   registry: RegistryService;
@@ -182,6 +185,7 @@ export interface IServiceCustomizationType {
   currencyFactorsProvider?: IServiceProviderClassType<any>;
   locationSearchProvider?: IServiceProviderClassType<any>;
   paymentProvider?: IServiceProviderClassType<any>;
+  loggingServiceProvider?: IServiceProviderClassType<any>;
   customServices?: {
     [name: string]: IServiceProviderClassType<any>,
   };
@@ -201,6 +205,8 @@ export interface IServerCustomizationDataType {
 export async function getStorageProviders(
   config: IConfigRawJSONDataType,
   sensitiveConfig: ISensitiveConfigRawJSONDataType,
+  dbConfig: IDBConfigRawJSONDataType,
+  redisConfig: IRedisConfigRawJSONDataType,
   storageServiceProviders: IStorageProviders,
   registry: RegistryService,
 ): Promise<{
@@ -214,6 +220,13 @@ export async function getStorageProviders(
     cloudClients: {} as IStorageProvidersObject,
   };
 
+  const configsObj = {
+    config,
+    sensitiveConfig,
+    dbConfig,
+    redisConfig,
+  };
+
   if (sensitiveConfig.localContainer) {
     let prefix = config.containersHostnamePrefixes[sensitiveConfig.localContainer];
     if (!prefix) {
@@ -225,7 +238,7 @@ export async function getStorageProviders(
     if (prefix.indexOf("/") !== 0) {
       prefix = "https://" + prefix;
     }
-    const localClient = new LocalStorageService(null, registry, config, sensitiveConfig);
+    const localClient = new LocalStorageService(null, registry, configsObj);
     localClient.setPrefix(prefix);
     localClient.setId(sensitiveConfig.localContainer);
 
@@ -259,7 +272,7 @@ export async function getStorageProviders(
         throw new Error("The service class for storage is not of type NONE");
       }
 
-      const client: StorageProvider<any> = (new ServiceClass(containerData.config, registry, config, sensitiveConfig)) as any;
+      const client: StorageProvider<any> = (new ServiceClass(containerData.config, registry, configsObj)) as any;
       client.setPrefix(prefix);
       client.setId(containerIdX);
       await client.initialize();
@@ -348,6 +361,22 @@ export async function initializeServer(
     const redisConfig: IRedisConfigRawJSONDataType = JSON.parse(rawRedisConfig);
     const build: IRootRawJSONDataType = JSON.parse(rawBuild);
     const langLocales: ILangLocalesType = JSON.parse(rawLangLocales);
+
+    const configsObj = {
+      config,
+      sensitiveConfig,
+      dbConfig,
+      redisConfig,
+    };
+
+    const LoggingServiceClass = (serviceCustom && serviceCustom.loggingServiceProvider) || PgLoggerService;
+    const loggingService: LoggingProvider<any> = new LoggingServiceClass(
+      sensitiveConfig.logging,
+      null,
+      configsObj,
+    ) as any;
+    await loggingService.initialize();
+    extendLoggerWith(loggingService);
 
     // redis configuration despite instructions actually tries to use null
     // values as it checks for undefined so we need to strip these if null
@@ -545,6 +574,7 @@ export async function initializeServer(
     );
     const root = new Root(build);
 
+    // we only need one client instance
     // Create the connection string
     const dbConnectionConfig = {
       host: dbConfig.host,
@@ -557,14 +587,12 @@ export async function initializeServer(
     logger.info(
       "initializeServer: setting up database connection to " + dbConfig.host,
     );
-
-    // we only need one client instance
     const databaseConnection = new DatabaseConnection(dbConnectionConfig);
     const rawDB = new ItemizeRawDB(
       redisPub,
       databaseConnection,
       root,
-    )
+    );
 
     const domain = NODE_ENV === "production" ? config.productionHostname : config.developmentHostname;
 
@@ -573,7 +601,7 @@ export async function initializeServer(
     );
     const registry = new RegistryService({
       databaseConnection,
-    }, null, config, sensitiveConfig);
+    }, null, configsObj);
     await registry.initialize();
 
     if (INSTANCE_MODE === "GLOBAL_MANAGER" || INSTANCE_MODE === "ABSOLUTE") {
@@ -585,7 +613,7 @@ export async function initializeServer(
         throw new Error("Currency factors custom provider class is not a global type");
       }
       const currencyFactorsService: CurrencyFactorsProvider<any> = (sensitiveConfig.currencyFactors ?
-        new CurrencyFactorsClass(sensitiveConfig.currencyFactors, registry, config, sensitiveConfig) :
+        new CurrencyFactorsClass(sensitiveConfig.currencyFactors, registry, configsObj) :
         null) as any;
 
       if (sensitiveConfig.mail) {
@@ -609,8 +637,7 @@ export async function initializeServer(
         new MailServiceClass(
           sensitiveConfig.mail,
           registry,
-          config,
-          sensitiveConfig,
+          configsObj,
         ) : null) as any;
 
       let PhoneServiceClass = (serviceCustom && serviceCustom.phoneServiceProvider) || TwilioService;
@@ -630,8 +657,7 @@ export async function initializeServer(
         new PhoneServiceClass(
           sensitiveConfig.phone,
           registry,
-          config,
-          sensitiveConfig,
+          configsObj,
         ) : null) as any;
 
       const manager: GlobalManager = new GlobalManager(
@@ -663,7 +689,7 @@ export async function initializeServer(
             ...(sensitiveConfig.custom && sensitiveConfig.custom[keyName]),
             ...(config.custom && config.custom[keyName]),
           };
-          const customGlobalService = new CustomServiceClass(configData, registry, config, sensitiveConfig);
+          const customGlobalService = new CustomServiceClass(configData, registry, configsObj);
           customGlobalService.setInstanceName(keyName);
           manager.installGlobalService(customGlobalService);
         });
@@ -696,11 +722,11 @@ export async function initializeServer(
 
           let storageClient: StorageProvider<any>;
           if (isLocalInstead) {
-            storageClient = new LocalStorageService(null, registry, config, sensitiveConfig);
+            storageClient = new LocalStorageService(null, registry, configsObj);
           } else {
             const type = seoContainerData.type;
             const ServiceClass = (serviceCustom && serviceCustom.storageServiceProviders[type]) || OpenstackService;
-            storageClient = (new ServiceClass(seoContainerData.config, registry, config, sensitiveConfig)) as any;
+            storageClient = (new ServiceClass(seoContainerData.config, registry, configsObj)) as any;
           }
 
           storageClient.setId(sensitiveConfig.seoContainerID);
@@ -735,6 +761,8 @@ export async function initializeServer(
     const storageClients = await getStorageProviders(
       config,
       sensitiveConfig,
+      dbConfig,
+      redisConfig,
       serviceCustom && serviceCustom.storageServiceProviders,
       registry,
     );
@@ -824,7 +852,7 @@ export async function initializeServer(
       throw new Error("The user localization service class is not a local type, and that's not allowed");
     }
     const userLocalizationService: UserLocalizationProvider<any> = (sensitiveConfig.userLocalization ?
-      new UserLocalizationServiceClass(sensitiveConfig.userLocalization, registry, config, sensitiveConfig) :
+      new UserLocalizationServiceClass(sensitiveConfig.userLocalization, registry, configsObj) :
       null) as any;
 
     if (sensitiveConfig.mail) {
@@ -848,8 +876,7 @@ export async function initializeServer(
       new MailServiceClass(
         sensitiveConfig.mail,
         registry,
-        config,
-        sensitiveConfig,
+        configsObj,
       ) : null) as any;
 
     let PhoneServiceClass = (serviceCustom && serviceCustom.phoneServiceProvider) || TwilioService;
@@ -868,8 +895,7 @@ export async function initializeServer(
       new PhoneServiceClass(
         sensitiveConfig.phone,
         registry,
-        config,
-        sensitiveConfig,
+        configsObj,
       ) : null) as any;
 
     if (sensitiveConfig.locationSearch) {
@@ -882,7 +908,7 @@ export async function initializeServer(
       throw new Error("The location search service class is not a local type, and that's not allowed");
     }
     const locationSearchService: LocationSearchProvider<any> = (sensitiveConfig.locationSearch ?
-      new LocationSearchClass(sensitiveConfig.locationSearch, registry, config, sensitiveConfig) : null) as any;
+      new LocationSearchClass(sensitiveConfig.locationSearch, registry, configsObj) : null) as any;
 
     if (sensitiveConfig.payment) {
       logger.info(
@@ -897,7 +923,7 @@ export async function initializeServer(
     if (PaymentClass.getType() !== ServiceProviderType.LOCAL) {
       throw new Error("The payment service class is not a local type, and that's not allowed");
     }
-    const paymentService: PaymentProvider<any> = new PaymentClass(sensitiveConfig.payment, registry, config, sensitiveConfig) as any;
+    const paymentService: PaymentProvider<any> = new PaymentClass(sensitiveConfig.payment, registry, configsObj) as any;
 
     const customServices: {
       [name: string]: ServiceProvider<any>,
@@ -919,7 +945,7 @@ export async function initializeServer(
           ...(sensitiveConfig.custom && sensitiveConfig.custom[keyName]),
           ...(config.custom && config.custom[keyName]),
         };
-        customServices[keyName] = new CustomServiceClass(configData, registry, config, sensitiveConfig);
+        customServices[keyName] = new CustomServiceClass(configData, registry, configsObj);
         customServices[keyName].setInstanceName(keyName);
 
         customServicesInstances.push(customServices[keyName]);
@@ -991,6 +1017,7 @@ export async function initializeServer(
       phoneService,
       storage: storageClients.cloudClients,
       logger,
+      loggingService,
       customServices,
       registry,
       customRoles: custom.customRoles || [],

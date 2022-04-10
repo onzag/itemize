@@ -238,6 +238,10 @@ export interface ISensitiveConfigRawJSONDataType {
    */
   phone: any;
   /**
+   * The logging service information
+   */
+  logging: any;
+  /**
    * The mail domain that is used when sending emails from
    */
   mailDomain: string;
@@ -374,6 +378,10 @@ export const rawSensitiveConfigSchema = {
       type: ["object", "null"],
       additionalProperties: {},
     },
+    logging: {
+      type: ["object", "null"],
+      additionalProperties: {},
+    },
     mailDomain: {
       type: ["string", "null"],
     },
@@ -434,6 +442,7 @@ export const rawSensitiveConfigSchema = {
     "payment",
     "mail",
     "phone",
+    "logging",
     "mailDomain",
     "mailStorage",
     "defaultContainerID",

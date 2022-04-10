@@ -189,6 +189,15 @@ export async function sensitiveConfigSetup(
         cantRerun: true,
       },
       {
+        variableName: "logging",
+        message: "The API configuration used for logging, leave it null to log into main database, but this is not recommended for production",
+        type: "config",
+        defaultValue: null,
+        extractData: [],
+        preferUnfilled: true,
+        cantRerun: true,
+      },
+      {
         variableName: "mailDomain",
         message: "This is the domain that the template generator uses as domain, so when the users receive an email they see user@mail.mysite.com " +
         "this has nothing to do with the configuration, it is simply what goes in the subject line when sending emails",

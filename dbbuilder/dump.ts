@@ -10,7 +10,7 @@ import path from "path";
 import colors from "colors/safe";
 
 import Root from "../base/Root";
-import { IConfigRawJSONDataType, IDumpConfigRawJSONDataType, ISensitiveConfigRawJSONDataType } from "../config";
+import { IConfigRawJSONDataType, IDBConfigRawJSONDataType, IDumpConfigRawJSONDataType, IRedisConfigRawJSONDataType, ISensitiveConfigRawJSONDataType } from "../config";
 import ItemDefinition from "../base/Root/Module/ItemDefinition";
 import Module from "../base/Root/Module";
 import { ISQLTableRowValue } from "../base/Root/sql";
@@ -291,17 +291,30 @@ export default async function dump(version: string, databaseConnection: Database
     await fsAsync.readFile(path.join("config", "index.json"), "utf8"),
   );
 
+  const redisConfig: IRedisConfigRawJSONDataType = JSON.parse(
+    await fsAsync.readFile(path.join("config", version === "development" ? "redis.sensitive.json" : `redis.${version}.sensitive.json`), "utf8"),
+  );
+
+  const dbConfig: IDBConfigRawJSONDataType = JSON.parse(
+    await fsAsync.readFile(path.join("config", version === "development" ? "db.sensitive.json" : `db.${version}.sensitive.json`), "utf8"),
+  );
+
   const dumpConfig: IDumpConfigRawJSONDataType = JSON.parse(
     await fsAsync.readFile(path.join("config", "dump.json"), "utf8"),
   );
 
   const registry = new RegistryService({
     databaseConnection,
-  }, null, config, sensitiveConfig);
+  }, null, {
+    config,
+    redisConfig,
+    dbConfig,
+    sensitiveConfig,
+  });
   await registry.initialize();
 
   // and our containers
-  const { cloudClients } = await getStorageProviders(config, sensitiveConfig, serviceCustom.storageServiceProviders, registry);
+  const { cloudClients } = await getStorageProviders(config, sensitiveConfig, dbConfig, redisConfig, serviceCustom.storageServiceProviders, registry);
 
   // we can specify we have loaded them
   console.log(`Loaded ${Object.keys(cloudClients).length} storage containers: ` +
