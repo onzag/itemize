@@ -283,6 +283,7 @@ export async function ssrGenerator(
     newHTML = newHTML.replace(/\$SSROGIMG/g, usedOgImage);
     newHTML = newHTML.replace(/\$SSRAPP/g, "");
     newHTML = newHTML.replace(/\"\$SSR\"/g, "null");
+    newHTML = newHTML.replace(/\"\$CONFIG\"/g, JSON.stringify(config));
     newHTML = newHTML.replace(/\<SSRHEAD\>\s*\<\/SSRHEAD\>|\<SSRHEAD\/\>|\<SSRHEAD\>/ig, langHrefLangTags);
   } else {
     // otherwise with the SSR
@@ -510,6 +511,7 @@ export async function ssrGenerator(
 
         // we replace the HTML with the SSR information that we are using
         newHTML = newHTML.replace(/\"\$SSR\"/g, JSON.stringify(clientSSR));
+        newHTML = newHTML.replace(/\"\$CONFIG\"/g, JSON.stringify(config));
 
         // but we need the SSR head which includes our hreflang tags
         let finalSSRHead: string = langHrefLangTags;
@@ -552,6 +554,7 @@ export async function ssrGenerator(
       newHTML = newHTML.replace(/\$SSROGIMG/g, usedOgImage);
       newHTML = newHTML.replace(/\$SSRAPP/g, "");
       newHTML = newHTML.replace(/\"\$SSR\"/g, "null");
+      newHTML = newHTML.replace(/\"\$CONFIG\"/g, JSON.stringify(config));
       newHTML = newHTML.replace(/\<SSRHEAD\>\s*\<\/SSRHEAD\>|\<SSRHEAD\/\>|\<SSRHEAD\>/ig, langHrefLangTags);
 
       // cannot set etag or cache headers because the rendering failed

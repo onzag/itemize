@@ -99,6 +99,12 @@ class ActualResourceLoader
       path += "/";
     }
     const actualSrc = path + (props.src[0] === "/" ? props.src.substr(1) : props.src);
+
+    // cannot resolve in the server side
+    if (!actualSrc.startsWith("/rest/resource/") && !props.serverSideResolver) {
+      return null;
+    }
+
     const value = await props.root.callRequestManagerResource(actualSrc, props.serverSideResolver);
     return {
       content: value,

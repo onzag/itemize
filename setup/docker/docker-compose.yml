@@ -26,6 +26,7 @@ services:
             - redis
             - pgsql
         environment:
+            - INSTANCE_GROUP_ID=${INSTANCE_GROUP_ID}
             - INSTANCE_MODE=GLOBAL_MANAGER
             - NODE_ENV=%{NODE_ENV}
             - LOG_LEVEL=info

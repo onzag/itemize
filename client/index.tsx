@@ -285,6 +285,8 @@ export async function initializeItemizeApp(
       location.hostname !== config.developmentHostname &&
       location.hostname !== "localhost"
     ) {
+      document.body.innerHTML =
+        `<a href="https://${config.productionHostname}">Please visit the real website at ${config.productionHostname}</a>`;
       return;
     }
   }

@@ -54,10 +54,17 @@ class LoggingProviderTransport extends Transport {
   }
 
   public async log(info: any, next: () => void) {
+    const level = info.level as string;
+
+    if (level !== "info" && level !== "error") {
+      next();
+      return;
+    }
+
     try {
-      await this.provider.log(INSTANCE_UUID, this.level as any, info);
+      await this.provider.log(INSTANCE_UUID, level, info);
     } catch (err) {
-      await this.provider.logToFallback(err, INSTANCE_UUID, this.level as any, info);
+      await this.provider.logToFallback(err, INSTANCE_UUID, level, info);
     }
     next();
   }
@@ -72,12 +79,7 @@ export function extendLoggerWith(p: LoggingProvider<any>) {
     level: "info",
   }, p);
 
-  const errorTransport = new LoggingProviderTransport({
-    level: "error",
-  }, p);
-
   logger.add(infoTransport);
-  logger.add(errorTransport);
 
   logger.remove(standardInfoTransport);
   logger.remove(standardErrorTransport);
