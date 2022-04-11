@@ -1,3 +1,4 @@
+import { USING_DOCKER } from "../environment";
 import { LOGS_IDENTIFIER } from "../../constants";
 import { DatabaseConnection } from "../../database";
 import LoggingProvider, { ILogsResult } from "./base/LoggingProvider";
@@ -13,6 +14,10 @@ export class PgLoggerService extends LoggingProvider<null> {
       password: this.appDbConfig.password,
       database: this.appDbConfig.database,
     };
+
+    if (USING_DOCKER && (dbConnectionConfig.host === "localhost" || dbConnectionConfig.host === "127.0.0.1")) {
+      dbConnectionConfig.host = "pgsql";
+    }
 
     this.database = new DatabaseConnection(dbConnectionConfig);
     this.database.suppressLogging();

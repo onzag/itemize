@@ -1,5 +1,6 @@
 import type { IDBConfigRawJSONDataType, IRedisConfigRawJSONDataType, ISingleRedisConfigRawJSONDataType } from "../config";
 import uuid from "uuid";
+import fs from "fs";
 
 // get the environment in order to be able to set it up
 export const NODE_ENV: "development" | "production" = process.env.NODE_ENV as any || "development";
@@ -25,6 +26,10 @@ if (
   INSTANCE_MODE !== "CLEAN_SITEMAPS" &&
   INSTANCE_MODE !== "CLEAN_STORAGE"
 ) {
+  fs.writeFileSync(INSTANCE_LOG_ERROR_FILE, JSON.stringify({
+    error: "Unknown INSTANCE_MODE",
+    INSTANCE_MODE,
+  }));
   console.error("Unknown INSTANCE_MODE ", INSTANCE_MODE);
   process.exit(1);
 }
@@ -33,14 +38,19 @@ export const USING_DOCKER = process.env.USING_DOCKER === "true";
 export const PING_GOOGLE = process.env.PING_GOOGLE === "true";
 export const FAKE_SMS = process.env.FAKE_SMS === "true";
 export const FAKE_EMAILS = process.env.FAKE_EMAILS === "true";
-export const LOG_LEVEL: "debug" | "silly" | "info" = process.env.LOG_LEVEL as any || null;
+export const LOG_LEVEL: "debug" | "silly" | "info" | "error" = process.env.LOG_LEVEL as any || null;
 if (
   LOG_LEVEL &&
   LOG_LEVEL !== "debug" &&
   LOG_LEVEL !== "silly" &&
+  LOG_LEVEL !== "error" &&
   LOG_LEVEL !== "info"
 ) {
-  console.error("Unknown LOG_LEVEL ", LOG_LEVEL);
+  fs.writeFileSync(INSTANCE_LOG_ERROR_FILE, JSON.stringify({
+    error: "Unknown LOG_LEVEL",
+    LOG_LEVEL,
+  }));
+  console.error("Unknown INSTANCE_MODE ", INSTANCE_MODE);
   process.exit(1);
 }
 

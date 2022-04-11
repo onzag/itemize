@@ -29,7 +29,6 @@ export const logger: winston.Logger = disableLogger ? null : winston.createLogge
   format: winston.format.combine(
     winston.format.timestamp(),
     winston.format.json(),
-    
   ),
   transports: [
     standardInfoTransport,

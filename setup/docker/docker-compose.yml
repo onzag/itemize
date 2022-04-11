@@ -13,7 +13,7 @@ services:
             - INSTANCE_GROUP_ID=${INSTANCE_GROUP_ID}
             - INSTANCE_MODE=CLUSTER_MANAGER
             - NODE_ENV=%{NODE_ENV}
-            - LOG_LEVEL=error
+            - LOG_LEVEL=info
             - USING_DOCKER=true
     global-manager:
         image: app:latest
@@ -28,7 +28,7 @@ services:
         environment:
             - INSTANCE_MODE=GLOBAL_MANAGER
             - NODE_ENV=%{NODE_ENV}
-            - LOG_LEVEL=error
+            - LOG_LEVEL=info
             - USING_DOCKER=true
             - NO_SEO=false
             - PING_GOOGLE=false
@@ -51,7 +51,7 @@ services:
             - INSTANCE_MODE=EXTENDED
             - NODE_ENV=%{NODE_ENV}
             - PORT=8000
-            - LOG_LEVEL=error
+            - LOG_LEVEL=info
             - USING_DOCKER=true
             - NO_SSR=false
             - FAKE_EMAILS=false
