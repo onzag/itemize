@@ -629,7 +629,7 @@ export class ItemizeRawDB {
     property: string,
   ) {
     const actualProperty = property || propertyOrInclude;
-    const actualInclude = property ? null : propertyOrInclude;
+    const actualInclude = property ? propertyOrInclude : null;
 
     if (!actualProperty) {
       return;
@@ -638,21 +638,21 @@ export class ItemizeRawDB {
     let prefix: string = "";
     let propertyObj: PropertyDefinition;
     let includeObj: Include = null;
-    if (actualInclude) {
+    if (actualInclude && itemDefinitionOrModule instanceof ItemDefinition) {
       includeObj = (itemDefinitionOrModule as ItemDefinition).getIncludeFor(actualInclude);
       prefix = includeObj.getPrefixedQualifiedIdentifier();
-      propertyObj = includeObj.getSinkingPropertyFor(property);
+      propertyObj = includeObj.getSinkingPropertyFor(actualProperty);
     } else {
       if (itemDefinitionOrModule instanceof ItemDefinition) {
-        propertyObj = itemDefinitionOrModule.getPropertyDefinitionFor(property, true);
+        propertyObj = itemDefinitionOrModule.getPropertyDefinitionFor(actualProperty, true);
       } else {
-        propertyObj = itemDefinitionOrModule.getPropExtensionFor(property);
+        propertyObj = itemDefinitionOrModule.getPropExtensionFor(actualProperty);
       }
     }
 
     if (propertyObj.getPropertyDefinitionDescription().sqlRedoDictionaryIndex) {
       const redoIndexSetter = propertyObj.getPropertyDefinitionDescription().sqlRedoDictionaryIndex({
-        id: property,
+        id: actualProperty,
         itemDefinition: itemDefinitionOrModule instanceof ItemDefinition ? itemDefinitionOrModule : null,
         newDictionary: dictionary,
         prefix,
