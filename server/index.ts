@@ -119,7 +119,6 @@ export interface ISSRConfig {
     mainComponent: React.ReactElement;
     appWrapper?: (app: React.ReactElement, config: IConfigRawJSONDataType) => React.ReactElement;
     mainWrapper?: (mainComponet: React.ReactElement, config: IConfigRawJSONDataType, localeContext: ILocaleContextType) => React.ReactElement;
-    collector?: ICollectorType;
   },
 }
 

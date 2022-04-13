@@ -20,7 +20,7 @@ import { Collector } from "./collect";
 import { capitalize, DOMWindow } from "../../util";
 import { jwtDecode } from "../token";
 import { IServerSideTokenDataType } from "../resolvers/basic";
-import { convertHTMLToUSSDTree } from "../../ussd";
+import { convertHTMLToUSSDTree, IUSSDChunk } from "../../ussd";
 import { walkReactTree } from "./react-analyze";
 import ReactDOMServer from "react-dom/server";
 import { NODE_ENV, NO_SSR } from "../environment";
@@ -29,36 +29,52 @@ import { NODE_ENV, NO_SSR } from "../environment";
 const developmentISSSRMode = NODE_ENV !== "production";
 const DATE_RFC2822 = "ddd, DD MMM YYYY HH:mm:ss ZZ";
 
+interface ISSRGeneratorHTMLResponse {
+  mode: "html";
+  req: express.Request;
+  res: express.Response;
+  html: string;
+}
+
+interface ISSRGeneratorUSSDResponse {
+  mode: "ussd";
+  token: string;
+  url: string;
+
+  clientLanguage: string;
+  clientCurrency: string;
+  clientCountry: string;
+}
+
 export async function ssrGenerator(
-  req: express.Request,
-  res: express.Response,
-  html: string,
   appData: IAppDataType,
   mode: "development" | "production",
-): Promise<void> {
+  info: ISSRGeneratorHTMLResponse | ISSRGeneratorUSSDResponse
+): Promise<void | IUSSDChunk> {
   // do a security check first
-  const hostname = req.headers["host"];
-  if (
-    hostname !== "localhost" &&
-    hostname.indexOf("localhost") !== 0 &&
-    hostname !== appData.config.developmentHostname &&
-    hostname !== appData.config.productionHostname
-  ) {
-    res.status(403).end("Invalid Hostname");
-    return;
+  if (info.mode === "html") {
+    const hostname = info.req.headers["host"];
+    if (
+      hostname !== "localhost" &&
+      hostname.indexOf("localhost") !== 0 &&
+      hostname !== appData.config.developmentHostname &&
+      hostname !== appData.config.productionHostname
+    ) {
+      info.res.status(403).end("Invalid Hostname");
+      return;
+    }
   }
 
   // USSD mode, loads the application for usage in the USSD method
-  const isUSSD = req.headers["ussd"] === "true";
-  const ussdToken = isUSSD ? req.headers["ussd-token"] : null;
-  const submode = isUSSD ? "ussd" : "std";
+  const isUSSD = info.mode === "ussd";
+  const ussdToken = isUSSD ? info.token : null;
+  const submode = info.mode;
 
   if (isUSSD && !appData.ssrConfig.ussdConfig) {
-    res.status(400).end("This server does not support USSD style responses");
-    return;
+    throw new Error("This server does not support USSD style responses");
   }
 
-  const ifNoneMatch = req.headers["if-none-match"];
+  const ifNoneMatch = info.mode === "html" ? info.req.headers["if-none-match"] : null;
 
   // now we need to see if we are going to use SSR, due to the fact the NODE_ENV must
   // match between the client and the server in order to produce valid SSR, we check the mode
@@ -69,25 +85,18 @@ export async function ssrGenerator(
     (mode === "development" && !developmentISSSRMode) ||
     (mode === "production" && developmentISSSRMode);
   const SSRIsDisabledInThisMode =
-    (isUSSD ? false : NO_SSR) ||
-    SSRIsDisabledBecauseOfMismatchOfSignature
-
-  // SSR must be enabled when
-  if (SSRIsDisabledInThisMode && isUSSD) {
-    res.status(500).end("Cannot provide a USSD style response when SSR is disabled");
-    return;
-  }
+    isUSSD ? false : NO_SSR || SSRIsDisabledBecauseOfMismatchOfSignature
 
   // now we get the config, and the language, from the original path, rememebr this generator runs
   // on an express router
   const config = appData.config;
-  const language = req.originalUrl.split("/")[1];
+  const language = info.mode === "html" ? info.req.originalUrl.split("/")[1] : info.url.split("/")[1];
 
   // and we need to figure out the SSR rule for this path, for that we got to calculate it
   let appliedRule: ISSRRule;
 
   // we need the cookies in order to extract our client data
-  const cookies = req.headers["cookie"];
+  const cookies = info.mode === "html" ? info.req.headers["cookie"] : null;
   const splittedCookies = cookies ? cookies.split(";").map((c) => c.trim()) : [];
 
   // now we need to wonder whether we will use the SSR itself
@@ -99,13 +108,12 @@ export async function ssrGenerator(
     // this will cause the server not to give a redirect to the proper language
     // as in a 302 status to the appropiate language but noredirect is used
     // by the service worker to fetch a no-ssr file that is totally clean
-    (!language && !req.query.noredirect)
+    (!language && (info.mode === "html" ? !info.req.query.noredirect : true))
   );
 
   // SSR must be enabled when
   if (!willUseSSR && isUSSD) {
-    res.status(400).end("The language is unsupported or not provided, you should specify a language by the URL");
-    return;
+    throw new Error("The language is unsupported or not provided, you should specify a language by the URL");
   }
 
   // prepare to build etag
@@ -143,18 +151,19 @@ export async function ssrGenerator(
     quotedEtag = JSON.stringify(etag);
 
     if (
+      info.mode === "html" &&
       ifNoneMatch &&
       // this actually even would check the buildnumber
       ifNoneMatch === quotedEtag
     ) {
-      res.setHeader("Last-Modified", Moment(lastModified).utc().locale("en").format(DATE_RFC2822));
-      res.setHeader("Date", Moment().utc().locale("en").format(DATE_RFC2822));
-      res.setHeader("ETag", quotedEtag);
-      res.setHeader("Cache-Control", "public, max-age=0");
+      info.res.setHeader("Last-Modified", Moment(lastModified).utc().locale("en").format(DATE_RFC2822));
+      info.res.setHeader("Date", Moment().utc().locale("en").format(DATE_RFC2822));
+      info.res.setHeader("ETag", quotedEtag);
+      info.res.setHeader("Cache-Control", "public, max-age=0");
       if (language && config.supportedLanguages.includes(language)) {
-        res.setHeader("Content-Language", language);
+        info.res.setHeader("Content-Language", language);
       }
-      res.status(304).end();
+      info.res.status(304).end();
       return;
     }
 
@@ -231,7 +240,11 @@ export async function ssrGenerator(
         errMessage: err.message,
       }
     )
-    res.status(500).end("Internal Server Error");
+    if (info.mode === "html") {
+      info.res.status(500).end("Internal Server Error");
+    } else {
+      throw new Error("Could not adquire a root from the pool");
+    }
     return;
   }
 
@@ -243,19 +256,19 @@ export async function ssrGenerator(
 
   // and we start replacing from the HTML itself, note how these things might have returned null for some
   let newHTML: string = null;
-  let newText: string = null;
+  let finalReturnTree: IUSSDChunk = null;
   let langHrefLangTags: string = null;
 
   // only need to go over these expenses if the result is HTML
   if (!isUSSD) {
-    newHTML = html;
+    newHTML = info.html;
     newHTML = newHTML.replace(/\$SSRLANG/g, appliedRule.language || "");
     newHTML = newHTML.replace(/\$SSRMANIFESTSRC/g, appliedRule.language ? `/rest/resource/manifest.${appliedRule.language}.json` : "");
     newHTML = newHTML.replace(/\$SSRDIR/g, usedDir);
 
     // and now the href lang tags
     langHrefLangTags = appliedRule.languages.map((language: string) => {
-      return `<link rel="alternate" href="https://${req.get("host")}${req.originalUrl.replace(appliedRule.language, language)}" hreflang="${language}">`
+      return `<link rel="alternate" href="https://${info.req.get("host")}${info.req.originalUrl.replace(appliedRule.language, language)}" hreflang="${language}">`
     }).join("");
   }
 
@@ -332,20 +345,38 @@ export async function ssrGenerator(
     root.setRequestManagerResource(collector.collectResource);
 
     try {
+      let redirectedTo: string = null;
+      const redirectTo = (n: string) => {
+        redirectedTo = n;
+
+        if (info.mode === "html") {
+          info.res.redirect(n);
+        }
+      }
+
+      const XFF = info.mode === "html" ? (info.req.headers["X-Forwarded-For"] || info.req.headers["x-forwarded-for"]) : null;
+      let ip = info.mode === "html" ? info.req.connection.remoteAddress : null;
+      if (typeof XFF === "string") {
+        ip = XFF.split(",")[0].trim();
+      } else if (Array.isArray(XFF)) {
+        ip = XFF[0];
+      }
+
       const serverModeOptions = {
-        collector: isUSSD ? appData.ssrConfig.ussdConfig.collector : appData.ssrConfig.collector,
+        collector: appData.ssrConfig.collector,
         config: appData.config,
         ssrContext: ssr,
         clientDetails: {
-          lang: getCookie(splittedCookies, "lang"),
-          currency: getCookie(splittedCookies, "currency"),
-          country: getCookie(splittedCookies, "country"),
-          guessedData: getCookie(splittedCookies, "guessedData"),
+          lang: isUSSD ? info.clientLanguage : getCookie(splittedCookies, "lang"),
+          currency: isUSSD ? info.clientCurrency : getCookie(splittedCookies, "currency"),
+          country: isUSSD ? info.clientCountry : getCookie(splittedCookies, "country"),
+          guessedData: isUSSD ? null : getCookie(splittedCookies, "guessedData"),
         },
         langLocales: appData.langLocales,
         root: root,
-        req: req,
-        res: res,
+        originalUrl: info.mode === "html" ? info.req.originalUrl : info.url,
+        redirectTo: redirectTo,
+        ip,
         userLocalizationService: appData.userLocalizationService,
       };
       const options = {
@@ -370,6 +401,17 @@ export async function ssrGenerator(
         // further processing
         root.cleanState();
         appData.rootPool.release(root);
+
+        if (isUSSD && redirectedTo) {
+          return ssrGenerator(
+            appData,
+            mode,
+            {
+              ...info,
+              url: redirectedTo,
+            }
+          );
+        }
         return;
       }
 
@@ -396,7 +438,7 @@ export async function ssrGenerator(
       // as in server mode no router is used so we need this static router to match
       // with SSR
       const prepassApp = (
-        <StaticRouter location={req.originalUrl}>
+        <StaticRouter location={isUSSD ? info.url : info.req.originalUrl}>
           {prepassAppData.node}
         </StaticRouter>
       );
@@ -416,22 +458,23 @@ export async function ssrGenerator(
       // now here we just happen to be able to short circuit again if the client
       // says that the request can be cached as well
       if (
+        !isUSSD &&
         ifNoneMatch &&
         // this actually even would check the buildnumber
         ifNoneMatch === quotedEtag
       ) {
-        res.setHeader("Last-Modified", Moment(lastModified).utc().locale("en").format(DATE_RFC2822));
-        res.setHeader("Date", Moment().utc().locale("en").format(DATE_RFC2822));
-        res.setHeader("ETag", quotedEtag);
+        info.res.setHeader("Last-Modified", Moment(lastModified).utc().locale("en").format(DATE_RFC2822));
+        info.res.setHeader("Date", Moment().utc().locale("en").format(DATE_RFC2822));
+        info.res.setHeader("ETag", quotedEtag);
         if (appliedRule.forUser && appliedRule.forUser.id) {
-          res.setHeader("Cache-Control", "private");
+          info.res.setHeader("Cache-Control", "private");
         } else {
-          res.setHeader("Cache-Control", "public, max-age=0");
+          info.res.setHeader("Cache-Control", "public, max-age=0");
         }
         if (appliedRule.language) {
-          res.setHeader("Content-Language", appliedRule.language);
+          info.res.setHeader("Content-Language", appliedRule.language);
         }
-        res.status(304).end();
+        info.res.status(304).end();
 
         // Release root
         root.cleanState();
@@ -454,23 +497,17 @@ export async function ssrGenerator(
       clientSSR.resources= ssr.resources;
 
       const app = (
-        <StaticRouter location={req.originalUrl}>
+        <StaticRouter location={isUSSD ? info.url : info.req.originalUrl}>
           {serverAppData.node}
         </StaticRouter>
       );
       const staticMarkup = ReactDOMServer.renderToStaticMarkup(app);
 
       if (isUSSD) {
-        // TODO use staticMarkup and parse it in order to make a text only representation
-        // p and div tags make newlines
-        // chunks will use divs with data-chunk tags
-        // actions will use span tags with data-action tags
-        newHTML = staticMarkup;
-
         const cheapdiv = DOMWindow.document.createElement("div");
-        cheapdiv.innerHTML = html;
+        cheapdiv.innerHTML = staticMarkup;
 
-        newText = JSON.stringify(convertHTMLToUSSDTree(cheapdiv));
+        finalReturnTree = convertHTMLToUSSDTree(cheapdiv, root);
       } else {
         // now we calculate the og fields that are final, given they can be functions
         // if it's a string, use it as it is, otherwise call the function to get the actual value, they might use values from the queries
@@ -485,7 +522,7 @@ export async function ssrGenerator(
         // we check if it's an absolute path with no host
         if (finalOgImage && finalOgImage.startsWith("/")) {
           // and add the host
-          finalOgImage = `https://${req.get("host")}` + finalOgImage;
+          finalOgImage = `https://${info.req.get("host")}` + finalOgImage;
         } else if (finalOgImage && !finalOgImage.includes("://")) {
           // otherwise we just add the protocol if it was not added
           finalOgImage = `https://` + finalOgImage;
@@ -538,8 +575,7 @@ export async function ssrGenerator(
       if (isUSSD) {
         root.cleanState();
         appData.rootPool.release(root);
-        res.status(500).end("Failed to run SSR due to failed initialization");
-        return;
+        throw e;
       }
 
       const usedTitle = i18nAppName || config.appName || "";
@@ -561,53 +597,49 @@ export async function ssrGenerator(
       // this is why we end abruptly here
       errorOccured = true;
     }
-  }
+  } 
 
   // and finally answer the client
-  if (isUSSD) {
-    res.setHeader("content-type", "application/json; charset=utf-8");
-  } else {
-    res.setHeader("content-type", "text/html; charset=utf-8");
+  if (!isUSSD) {
+    info.res.setHeader("content-type", "text/html; charset=utf-8");
   }
-  if (!errorOccured) {
-    res.setHeader("Last-Modified", Moment(lastModified).utc().locale("en").format(DATE_RFC2822));
-    res.setHeader("Date", Moment().utc().locale("en").format(DATE_RFC2822));
-    res.setHeader("ETag", quotedEtag);
+  if (!errorOccured && !isUSSD) {
+    info.res.setHeader("Last-Modified", Moment(lastModified).utc().locale("en").format(DATE_RFC2822));
+    info.res.setHeader("Date", Moment().utc().locale("en").format(DATE_RFC2822));
+    info.res.setHeader("ETag", quotedEtag);
     // for individual users the cache control is then
     // set to private
     if (appliedRule.forUser && appliedRule.forUser.id) {
-      res.setHeader("Cache-Control", "private");
+      info.res.setHeader("Cache-Control", "private");
     } else {
-      res.setHeader("Cache-Control", "public, max-age=0");
+      info.res.setHeader("Cache-Control", "public, max-age=0");
     }
 
     if (!appliedRule.noSSR) {
-      res.setHeader("x-ssr", "true");
-    }
-
-    if (isUSSD) {
-      res.setHeader("x-ussd", "true");
+      info.res.setHeader("x-ssr", "true");
     }
 
     if (appliedRule.language) {
-      res.setHeader("Content-Language", appliedRule.language);
+      info.res.setHeader("Content-Language", appliedRule.language);
     }
 
     if (shouldBe403) {
       if (forbiddenSignature) {
-        res.setHeader("x-forbidden-signature", forbiddenSignature);
+        info.res.setHeader("x-forbidden-signature", forbiddenSignature);
       }
-      res.status(403);
+      info.res.status(403);
     }
   }
 
-  if (isUSSD) {
-    res.end(newText);
-  } else {
-    res.end(newHTML);
+  if (!isUSSD) {
+    info.res.end(newHTML);
   }
 
   // clean and release, it's done!!!
   root.cleanState();
   appData.rootPool.release(root);
+
+  if (isUSSD) {
+    return finalReturnTree;
+  }
 }

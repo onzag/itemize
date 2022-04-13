@@ -238,16 +238,17 @@ export async function initializeItemizeApp(
       config: IConfigRawJSONDataType,
       ssrContext: ISSRContextType;
       clientDetails: {
-        lang: string,
-        currency: string,
-        country: string,
-        guessedData: string,
-      },
-      langLocales: ILangLocalesType,
-      root: Root,
-      req: any,
-      res: any,
-      userLocalizationService: any,
+        lang: string;
+        currency: string;
+        country: string;
+        guessedData: string;
+      };
+      langLocales: ILangLocalesType;
+      root: Root;
+      originalUrl: string;
+      redirectTo: (path: string) => void;
+      userLocalizationService: any;
+      ip: string;
     }
   }
 ) {
@@ -262,7 +263,7 @@ export async function initializeItemizeApp(
   // language is the first argument of the location url
   // so /en/whatever /fi/whatever, determine the language
   // there should be an url language set
-  const pathNameSplitted = serverMode ? serverMode.req.originalUrl.split("/") : window.location.pathname.split("/");
+  const pathNameSplitted = serverMode ? serverMode.originalUrl.split("/") : window.location.pathname.split("/");
   let urlLanguage = pathNameSplitted[1];
 
   // The stored locale data takes priority over everything
@@ -307,7 +308,7 @@ export async function initializeItemizeApp(
       history.replace(newPathName + window.location.search);
     } else {
       // in server mode this does contain the query string as it uses the original url
-      serverMode.res.redirect(newPathName);
+      serverMode.redirectTo(newPathName);
       // returning nothing in server mode will cancel further processing of the response
       return;
     }
@@ -350,24 +351,17 @@ export async function initializeItemizeApp(
           language: config.fallbackLanguage,
         };
 
-        const XFF = serverMode.req.headers["X-Forwarded-For"] || serverMode.req.headers["x-forwarded-for"];
-        let ip = serverMode.req.connection.remoteAddress;
-        if (typeof XFF === "string") {
-          ip = XFF.split(",")[0].trim();
-        } else if (Array.isArray(XFF)) {
-          ip = XFF[0];
-        }
-
         // This only occurs during development
         if (
-          ip === "127.0.0.1" ||
-          ip === "::1" ||
-          ip === "::ffff:127.0.0.1" ||
+          serverMode.ip === "127.0.0.1" ||
+          serverMode.ip === "::1" ||
+          serverMode.ip === "::ffff:127.0.0.1" ||
+          !serverMode.ip ||
           !serverMode.userLocalizationService
         ) {
           guessedUserData = standardAPIResponse;
         } else {
-          guessedUserData = await serverMode.userLocalizationService.getLocalizationFor(ip, standardAPIResponse);
+          guessedUserData = await serverMode.userLocalizationService.getLocalizationFor(serverMode.ip, standardAPIResponse);
         }
       }
     } catch (err) {
@@ -411,7 +405,7 @@ export async function initializeItemizeApp(
         history.replace(newPathName + window.location.search);
       } else {
         // do the redirect
-        serverMode.res.redirect(newPathName);
+        serverMode.redirectTo(newPathName);
         // returning nothing will prevent further processing in server mode
         // and the user will be redirected
         return;

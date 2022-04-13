@@ -264,9 +264,17 @@ export function initializeApp(appData: IAppDataType, custom: IServerCustomizatio
   app.get("*", (req, res) => {
     const mode = getMode(appData, req);
     if (mode === "development") {
-      ssrGenerator(req, res, appData.indexDevelopment, appData, mode);
+      ssrGenerator(appData, mode, {
+        mode: "html",
+        req, res,
+        html: appData.indexDevelopment,
+      });
     } else {
-      ssrGenerator(req, res, appData.indexProduction, appData, mode);
+      ssrGenerator(appData, mode, {
+        mode: "html",
+        req, res,
+        html: appData.indexProduction,
+      });
     }
   });
 }
