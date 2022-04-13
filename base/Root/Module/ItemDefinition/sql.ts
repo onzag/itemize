@@ -274,6 +274,7 @@ export function convertGQLValueToSQLValueForItemDefinition(
   oldData: IGQLValue,
   uploadsClient: StorageProvider<any>,
   domain: string,
+  language: string,
   dictionary: string,
   partialFields?: IGQLRequestFields | IGQLArgs | IGQLValue,
 ): ISQLStreamComposedTableRowValue {
@@ -298,6 +299,7 @@ export function convertGQLValueToSQLValueForItemDefinition(
         oldData,
         uploadsClient,
         domain,
+        language,
         dictionary,
       );
       Object.assign(
@@ -326,6 +328,7 @@ export function convertGQLValueToSQLValueForItemDefinition(
         oldData,
         uploadsClient,
         domain,
+        language,
         dictionary,
         innerPartialFields,
       );
@@ -364,6 +367,7 @@ export function buildSQLQueryForItemDefinition(
   args: IGQLArgs,
   whereBuilder: WhereBuilder,
   orderByBuilder: OrderByBuilder,
+  language: string,
   dictionary: string,
   search: string,
   orderBy: IOrderByRuleType,
@@ -386,6 +390,7 @@ export function buildSQLQueryForItemDefinition(
       pd,
       args,
       whereBuilder,
+      language,
       dictionary,
       isOrderedByIt,
     );
@@ -405,6 +410,7 @@ export function buildSQLQueryForItemDefinition(
       include,
       args,
       whereBuilder,
+      language,
       dictionary,
     );
   });
@@ -427,6 +433,7 @@ export function buildSQLQueryForItemDefinition(
             args,
             search,
             orBuilder,
+            language,
             dictionary,
             isOrderedByIt,
           );

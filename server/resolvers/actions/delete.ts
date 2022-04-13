@@ -177,6 +177,7 @@ export async function deleteItemDefinition(
     if (moduleTrigger) {
       // we execute the trigger
       await moduleTrigger({
+        language: resolverArgs.args.language,
         dictionary,
         appData,
         itemDefinition,
@@ -209,6 +210,7 @@ export async function deleteItemDefinition(
     if (itemDefinitionTrigger) {
       // we call the trigger
       await itemDefinitionTrigger({
+        language: resolverArgs.args.language,
         dictionary,
         appData,
         itemDefinition,
@@ -251,6 +253,7 @@ export async function deleteItemDefinition(
   if (moduleTrigger) {
     // we execute the trigger
     await moduleTrigger({
+      language: resolverArgs.args.language,
       dictionary,
       appData,
       itemDefinition,
@@ -284,6 +287,7 @@ export async function deleteItemDefinition(
   if (itemDefinitionTrigger) {
     // we call the trigger
     await itemDefinitionTrigger({
+      language: resolverArgs.args.language,
       dictionary,
       appData,
       itemDefinition,

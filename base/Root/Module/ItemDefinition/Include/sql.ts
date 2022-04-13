@@ -142,6 +142,7 @@ export function convertGQLValueToSQLValueForInclude(
   oldData: IGQLValue,
   uploadsClient: StorageProvider<any>,
   domain: string,
+  language: string,
   dictionary: string,
   partialFields?: any,
 ): ISQLStreamComposedTableRowValue {
@@ -182,6 +183,7 @@ export function convertGQLValueToSQLValueForInclude(
           (oldData && oldData[include.getQualifiedIdentifier()] as IGQLValue) || null,
           uploadsClient,
           domain,
+          language,
           dictionary,
         );
         Object.assign(
@@ -216,6 +218,7 @@ export function buildSQLQueryForInclude(
   include: Include,
   args: IGQLArgs,
   whereBuilder: WhereBuilder,
+  language: string,
   dictionary: string,
 ) {
   // we need all these prefixes
@@ -250,6 +253,7 @@ export function buildSQLQueryForInclude(
             pd,
             includeArgs,
             secondBuilder,
+            language,
             dictionary,
             false,
           );

@@ -31,8 +31,8 @@ import { DeleteBuilder } from "../database/DeleteBuilder";
 import type PropertyDefinition from "../base/Root/Module/ItemDefinition/PropertyDefinition";
 import type Include from "../base/Root/Module/ItemDefinition/Include";
 
-type RedoDictionariesFnPropertyBased = (dictionary: string, property: string) => void;
-type RedoDictionariesFnPropertyIncludeBased = (dictionary: string, include: string, property: string) => void;
+type RedoDictionariesFnPropertyBased = (language: string, dictionary: string, property: string) => void;
+type RedoDictionariesFnPropertyIncludeBased = (language: string, dictionary: string, include: string, property: string) => void;
 type RedoDictionariesFn = RedoDictionariesFnPropertyBased | RedoDictionariesFnPropertyIncludeBased;
 
 const NAMESPACE = "23ab4609-af49-4cdf-921b-4700adb284f3";
@@ -624,6 +624,7 @@ export class ItemizeRawDB {
   private redoDictionariesFn(
     itemDefinitionOrModule: ItemDefinition | Module,
     setBuilder: SetBuilder,
+    language: string,
     dictionary: string,
     propertyOrInclude: string,
     property: string,
@@ -655,6 +656,7 @@ export class ItemizeRawDB {
         id: actualProperty,
         itemDefinition: itemDefinitionOrModule instanceof ItemDefinition ? itemDefinitionOrModule : null,
         newDictionary: dictionary,
+        newLanguage: language,
         prefix,
         property: propertyObj,
         include: includeObj,

@@ -199,6 +199,7 @@ export function convertGQLValueToSQLValueForModule(
   oldData: IGQLValue,
   uploadsClient: StorageProvider<any>,
   domain: string,
+  language: string,
   dictionary: string,
   partialFields?: IGQLRequestFields | IGQLArgs | IGQLValue,
 ): ISQLStreamComposedTableRowValue {
@@ -223,6 +224,7 @@ export function convertGQLValueToSQLValueForModule(
         oldData,
         uploadsClient,
         domain,
+        language,
         dictionary,
       );
       Object.assign(
@@ -305,6 +307,7 @@ export function buildSQLQueryForModule(
   args: IGQLArgs,
   whereBuilder: WhereBuilder,
   orderByBuilder: OrderByBuilder,
+  language: string,
   dictionary: string,
   search: string,
   orderBy: IOrderByRuleType,
@@ -319,7 +322,7 @@ export function buildSQLQueryForModule(
     }
 
     const isOrderedByIt = !!(orderBy && orderBy[pd.getId()]);
-    const wasSearchedBy = buildSQLQueryForProperty(serverData, null, null, pd, args, whereBuilder, dictionary, isOrderedByIt);
+    const wasSearchedBy = buildSQLQueryForProperty(serverData, null, null, pd, args, whereBuilder, language, dictionary, isOrderedByIt);
     if (wasSearchedBy) {
       if (Array.isArray(wasSearchedBy)) {
         addedSelectFields.push(wasSearchedBy);
@@ -337,7 +340,7 @@ export function buildSQLQueryForModule(
         const isOrderedByIt = !!(orderBy && orderBy[pd.getId()]);
         builder.orWhere((orBuilder) => {
           const wasStrSearchedBy = buildSQLStrSearchQueryForProperty(
-            serverData, null, null, pd, args, search, orBuilder, dictionary, isOrderedByIt,
+            serverData, null, null, pd, args, search, orBuilder, language, dictionary, isOrderedByIt,
           );
           if (wasStrSearchedBy) {
             if (Array.isArray(wasStrSearchedBy)) {

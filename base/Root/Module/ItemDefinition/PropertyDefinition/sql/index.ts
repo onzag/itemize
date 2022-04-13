@@ -328,6 +328,7 @@ export function convertGQLValueToSQLValueForProperty(
   oldData: IGQLValue,
   uploadsClient: StorageProvider<any>,
   domain: string,
+  language: string,
   dictionary: string,
 ): ISQLStreamComposedTableRowValue {
   // and this is the value of the property, again, properties
@@ -398,6 +399,7 @@ export function convertGQLValueToSQLValueForProperty(
       include,
       property: propertyDefinition,
       id: propertyDefinition.getId(),
+      language,
       dictionary,
     }),
     consumeStreams,
@@ -423,6 +425,7 @@ export function buildSQLQueryForProperty(
   propertyDefinition: PropertyDefinition,
   args: IGQLArgs,
   whereBuilder: WhereBuilder,
+  language: string,
   dictionary: string,
   isOrderedByIt: boolean,
 ) {
@@ -434,6 +437,7 @@ export function buildSQLQueryForProperty(
     prefix: include ? include.getPrefixedQualifiedIdentifier() : "",
     id: propertyDefinition.getId(),
     whereBuilder,
+    language,
     dictionary,
     isOrderedByIt,
     property: propertyDefinition,
@@ -461,6 +465,7 @@ export function buildSQLStrSearchQueryForProperty(
   args: IGQLArgs,
   search: string,
   whereBuilder: WhereBuilder,
+  language: string,
   dictionary: string,
   isOrderedByIt: boolean,
 ) {
@@ -473,6 +478,7 @@ export function buildSQLStrSearchQueryForProperty(
       prefix: include ? include.getPrefixedQualifiedIdentifier() : "",
       id: propertyDefinition.getId(),
       whereBuilder,
+      language,
       dictionary,
       isOrderedByIt,
       property: propertyDefinition,

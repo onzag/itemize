@@ -190,6 +190,7 @@ export async function getItemDefinition(
 
     if (moduleTrigger) {
       await moduleTrigger({
+        language: resolverArgs.args.language,
         dictionary,
         appData,
         itemDefinition,
@@ -221,6 +222,7 @@ export async function getItemDefinition(
 
     if (itemDefinitionTrigger) {
       await itemDefinitionTrigger({
+        language: resolverArgs.args.language,
         dictionary,
         appData,
         itemDefinition,
@@ -417,6 +419,7 @@ export async function getItemDefinitionList(
 
         if (moduleTrigger) {
           await moduleTrigger({
+            language: resolverArgs.args.language,
             dictionary,
             appData,
             itemDefinition,
@@ -448,6 +451,7 @@ export async function getItemDefinitionList(
 
         if (itemDefinitionTrigger) {
           await itemDefinitionTrigger({
+            language: resolverArgs.args.language,
             dictionary,
             appData,
             itemDefinition,
@@ -624,6 +628,7 @@ export async function getModuleList(
 
         if (moduleTrigger) {
           await moduleTrigger({
+            language: resolverArgs.args.language,
             dictionary,
             appData,
             itemDefinition,
@@ -655,6 +660,7 @@ export async function getModuleList(
 
         if (itemDefinitionTrigger) {
           await itemDefinitionTrigger({
+            language: resolverArgs.args.language,
             dictionary,
             appData,
             itemDefinition,

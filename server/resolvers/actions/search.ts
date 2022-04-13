@@ -274,6 +274,7 @@ export async function searchModule(
 
   if (moduleTrigger) {
     await moduleTrigger({
+      language: resolverArgs.args.language,
       dictionary,
       appData,
       module: mod,
@@ -296,6 +297,7 @@ export async function searchModule(
     resolverArgs.args,
     queryModel.whereBuilder,
     queryModel.orderByBuilder,
+    resolverArgs.args.language,
     dictionary,
     resolverArgs.args.search,
     resolverArgs.args.order_by,
@@ -362,6 +364,7 @@ export async function searchModule(
 
             if (moduleTrigger) {
               await moduleTrigger({
+                language: resolverArgs.args.language,
                 dictionary,
                 appData,
                 itemDefinition,
@@ -393,6 +396,7 @@ export async function searchModule(
 
             if (itemDefinitionTrigger) {
               await itemDefinitionTrigger({
+                language: resolverArgs.args.language,
                 dictionary,
                 appData,
                 itemDefinition,
@@ -742,6 +746,7 @@ export async function searchItemDefinition(
 
   if (moduleTrigger || idefTrigger) {
     const args = {
+      language: resolverArgs.args.language,
       dictionary,
       appData,
       module: mod,
@@ -772,6 +777,7 @@ export async function searchItemDefinition(
     resolverArgs.args,
     queryModel.whereBuilder,
     queryModel.orderByBuilder,
+    resolverArgs.args.language,
     dictionary,
     resolverArgs.args.search,
     resolverArgs.args.order_by,
@@ -826,6 +832,7 @@ export async function searchItemDefinition(
 
             if (moduleTrigger) {
               await moduleTrigger({
+                language: resolverArgs.args.language,
                 dictionary,
                 appData,
                 itemDefinition,
@@ -857,6 +864,7 @@ export async function searchItemDefinition(
 
             if (itemDefinitionTrigger) {
               await itemDefinitionTrigger({
+                language: resolverArgs.args.language,
                 dictionary,
                 appData,
                 itemDefinition,

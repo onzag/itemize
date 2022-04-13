@@ -726,7 +726,8 @@ export class Collector {
 
         if (moduleTrigger) {
           await moduleTrigger({
-            dictionary: null,
+            language: this.appliedRule.language,
+            dictionary: this.appData.config.dictionaries[this.appliedRule.language] || this.appData.config.dictionaries["*"],
             appData: this.appData,
             itemDefinition: idef,
             module: mod,
@@ -760,7 +761,8 @@ export class Collector {
 
         if (itemDefinitionTrigger) {
           await itemDefinitionTrigger({
-            dictionary: null,
+            language: this.appliedRule.language,
+            dictionary: this.appData.config.dictionaries[this.appliedRule.language] || this.appData.config.dictionaries["*"],
             appData: this.appData,
             itemDefinition: idef,
             module: mod,

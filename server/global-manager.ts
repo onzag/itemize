@@ -272,6 +272,7 @@ export class GlobalManager {
             .getPropertyDefinitionDescription()
             .sqlIn({
               dictionary: "english",
+              language: "en",
               id,
               itemDefinition: userIdef,
               prefix: "",

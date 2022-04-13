@@ -72,6 +72,7 @@ export interface IArgInfo {
 
 export interface ISQLRedoDictionaryBasedIndex extends IArgInfo {
   newDictionary: string;
+  newLanguage: string;
 }
 
 export interface ISQLArgInfo extends IArgInfo {
@@ -81,6 +82,7 @@ export interface ISQLArgInfo extends IArgInfo {
 export interface ISQLInInfo extends ISQLArgInfo {
   value: PropertyDefinitionSupportedType;
   dictionary: string;
+  language: string;
 }
 
 export interface ISQLOutInfo extends ISQLArgInfo {
@@ -88,6 +90,7 @@ export interface ISQLOutInfo extends ISQLArgInfo {
 }
 
 export interface ISQLSearchInfo extends ISQLArgInfo {
+  language: string;
   dictionary: string;
   whereBuilder: WhereBuilder;
   args: IGQLArgs;
@@ -95,13 +98,14 @@ export interface ISQLSearchInfo extends ISQLArgInfo {
 }
 
 export interface ISQLStrSearchInfo extends ISQLArgInfo {
+  language: string;
   dictionary: string;
   whereBuilder: WhereBuilder;
   search: string;
   isOrderedByIt: boolean;
 }
 
-export interface ISQLEqualInfo extends ISQLArgInfo {
+export interface ISQLEqualInfo extends ISQLArgInfo {
   value: PropertyDefinitionSupportedType;
   whereBuilder: WhereBuilder;
   ignoreCase: boolean;

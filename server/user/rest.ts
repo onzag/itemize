@@ -130,6 +130,7 @@ export function userRestServices(appData: IAppDataType) {
           [decoded.validateType === "email" ? "e_validated" : "p_validated"]: true,
         },
         null,
+        null,
       );
     } catch (err) {
       logger.error(
@@ -377,6 +378,7 @@ export function userRestServices(appData: IAppDataType) {
         {
           [tokenData.unsubscribeProperty]: false,
         },
+        null,
         null,
       );
     } catch (err) {

@@ -503,6 +503,7 @@ export const customUserQueries = (appData: IAppDataType): IGQLQueryFieldsDefinit
               [decoded.validateType === "email" ? "e_validated" : "p_validated"]: true,
             },
             null,
+            null,
           );
         } catch (err) {
           logger.error(
@@ -1298,6 +1299,7 @@ export const customUserQueries = (appData: IAppDataType): IGQLQueryFieldsDefinit
             {
               password: args.new_password,
             },
+            null,
             null,
           );
         } catch (err) {

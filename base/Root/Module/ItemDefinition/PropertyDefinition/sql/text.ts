@@ -24,6 +24,9 @@ export function textSQL(arg: ISQLArgInfo) {
     [arg.prefix + arg.id + "_DICTIONARY"]: {
       type: "REGCONFIG",
     },
+    [arg.prefix + arg.id + "_LANGUAGE"]: {
+      type: "TEXT",
+    },
     [arg.prefix + arg.id + "_VECTOR"]: {
       type: "TSVECTOR",
       index: {
@@ -59,6 +62,7 @@ export function textSQLIn(arg: ISQLInInfo) {
       [arg.prefix + arg.id]: null,
       [arg.prefix + arg.id + "_PLAIN"]: null,
       [arg.prefix + arg.id + "_VECTOR"]: null,
+      [arg.prefix + arg.id + "_LANGUAGE"]: null,
       [arg.prefix + arg.id + "_DICTIONARY"]: arg.dictionary,
     };
   }
@@ -92,6 +96,7 @@ export function textSQLIn(arg: ISQLInInfo) {
   return {
     [arg.prefix + arg.id]: purifiedText,
     [arg.prefix + arg.id + "_PLAIN"]: arg.property.isRichText() ? escapedText : null,
+    [arg.prefix + arg.id + "_LANGUAGE"]: arg.language,
     [arg.prefix + arg.id + "_DICTIONARY"]: arg.dictionary,
     [arg.prefix + arg.id + "_VECTOR"]: [
       "to_tsvector(?, ?)",
@@ -112,6 +117,7 @@ export function textSqlRedoDictionaryIndex(arg: ISQLRedoDictionaryBasedIndex) {
   const plainLocation = arg.property.isRichText() ? arg.prefix + arg.id + "_PLAIN" : arg.prefix + arg.id;
   return {
     [arg.prefix + arg.id + "_DICTIONARY"]: arg.newDictionary,
+    [arg.prefix + arg.id + "_LANGUAGE"]: arg.newLanguage,
     [arg.prefix + arg.id + "_VECTOR"]: [
       "to_tsvector(?, " + JSON.stringify(plainLocation) + ")",
       [

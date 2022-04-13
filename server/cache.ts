@@ -350,6 +350,7 @@ export class Cache {
     version: string,
     value: IGQLArgs | IGQLValue | ISQLTableRowValue,
     createdBy: string,
+    language: string,
     dictionary: string,
     containerId: string,
     parent: {
@@ -479,6 +480,7 @@ export class Cache {
         null,
         containerExists ? this.storageClients[containerId] : null,
         this.domain,
+        language,
         dictionary,
       );
       const sqlModDataComposed: ISQLStreamComposedTableRowValue = convertGQLValueToSQLValueForModule(
@@ -488,6 +490,7 @@ export class Cache {
         null,
         containerExists ? this.storageClients[containerId] : null,
         this.domain,
+        language,
         dictionary,
       );
       sqlModData = sqlModDataComposed.value;
@@ -828,6 +831,7 @@ export class Cache {
         currentValue,
         targetCreatedBy || currentValue.created_by,
         null,
+        null,
         targetContainerId || currentContainerId,
         targetParent || (currentValue.parent_id ? {
           id: currentValue.parent_id,
@@ -907,6 +911,7 @@ export class Cache {
     id: string,
     version: string,
     update: IGQLArgs,
+    language: string,
     dictionary: string,
     currentRawValueSQL?: ISQLTableRowValue,
     options?: {
@@ -932,6 +937,7 @@ export class Cache {
       currentValue,
       currentValueAsGQL,
       null,
+      language,
       dictionary,
       currentValue.container_id,
       null,
@@ -977,6 +983,7 @@ export class Cache {
     currentSQLValue: ISQLTableRowValue,
     currentValue: IGQLValue,
     editedBy: string,
+    language: string,
     dictionary: string,
     containerId: string,
     listenerUUID: string,
@@ -1085,6 +1092,7 @@ export class Cache {
       currentValue,
       containerExists ? this.storageClients[containerId] : null,
       this.domain,
+      language,
       dictionary,
       partialUpdateFields,
     );
@@ -1095,6 +1103,7 @@ export class Cache {
       currentValue,
       containerExists ? this.storageClients[containerId] : null,
       this.domain,
+      language,
       dictionary,
       partialUpdateFields,
     );

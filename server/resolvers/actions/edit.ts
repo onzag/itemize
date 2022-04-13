@@ -291,6 +291,7 @@ export async function editItemDefinition(
         gqlValueToConvert.parent_id || gqlValueToConvert.parent_type || gqlValueToConvert.parent_version
       );
       const newValueAccordingToModule = await moduleTrigger({
+        language: resolverArgs.args.language,
         dictionary,
         appData,
         itemDefinition,
@@ -335,6 +336,7 @@ export async function editItemDefinition(
         gqlValueToConvert.parent_id || gqlValueToConvert.parent_type || gqlValueToConvert.parent_version
       );
       const newValueAccordingToIdef = await itemDefinitionTrigger({
+        language: resolverArgs.args.language,
         dictionary,
         appData,
         itemDefinition,
@@ -385,6 +387,7 @@ export async function editItemDefinition(
     wholeSqlStoredValue,
     currentWholeValueAsGQL,
     tokenData.id,
+    resolverArgs.args.language,
     dictionary,
     wholeSqlStoredValue.container_id as string,
     resolverArgs.args.listener_uuid || null,
@@ -393,7 +396,7 @@ export async function editItemDefinition(
       version: gqlValueToConvert.parent_version as string,
       type: gqlValueToConvert.parent_type as string,
     } : null,
-    (isToUnblock || isToBlock) ? {
+    (isToUnblock || isToBlock) ? {
       reason: resolverArgs.args.blocked_reason,
       status: resolverArgs.args.blocked,
       until: resolverArgs.args.blocked_until,
@@ -418,6 +421,7 @@ export async function editItemDefinition(
   if (moduleTrigger) {
     // we execute the trigger
     await moduleTrigger({
+      language: resolverArgs.args.language,
       dictionary,
       appData,
       itemDefinition,
@@ -454,6 +458,7 @@ export async function editItemDefinition(
   if (itemDefinitionTrigger) {
     // we call the trigger
     await itemDefinitionTrigger({
+      language: resolverArgs.args.language,
       dictionary,
       appData,
       itemDefinition,

@@ -375,6 +375,7 @@ export async function addItemDefinition(
         gqlValueToConvert.parent_id || gqlValueToConvert.parent_type || gqlValueToConvert.parent_version
       );
       const newValueAccordingToModule = await moduleTrigger({
+        language: resolverArgs.args.language,
         dictionary,
         appData,
         itemDefinition: itemDefinition,
@@ -419,6 +420,7 @@ export async function addItemDefinition(
         gqlValueToConvert.parent_id || gqlValueToConvert.parent_type || gqlValueToConvert.parent_version
       );
       const newValueAccordingToIdef = await itemDefinitionTrigger({
+        language: resolverArgs.args.language,
         dictionary,
         appData,
         itemDefinition: itemDefinition,
@@ -469,6 +471,7 @@ export async function addItemDefinition(
     resolverArgs.args.version || null,
     gqlValueToConvert,
     finalOwner,
+    resolverArgs.args.language,
     dictionary,
     containerId,
     isNowParenting ? {
@@ -502,6 +505,7 @@ export async function addItemDefinition(
     moduleTrigger
   ) {
     await moduleTrigger({
+      language: resolverArgs.args.language,
       dictionary,
       appData,
       itemDefinition: itemDefinition,
@@ -536,6 +540,7 @@ export async function addItemDefinition(
   }
   if (itemDefinitionTrigger) {
     await itemDefinitionTrigger({
+      language: resolverArgs.args.language,
       dictionary,
       appData,
       itemDefinition: itemDefinition,
