@@ -238,6 +238,10 @@ export interface ISensitiveConfigRawJSONDataType {
    */
   phone: any;
   /**
+   * For ussd usage
+   */
+  ussd: any;
+  /**
    * The logging service information
    */
   logging: any;
@@ -378,6 +382,10 @@ export const rawSensitiveConfigSchema = {
       type: ["object", "null"],
       additionalProperties: {},
     },
+    ussd: {
+      type: ["object", "null"],
+      additionalProperties: {},
+    },
     logging: {
       type: ["object", "null"],
       additionalProperties: {},
@@ -442,6 +450,7 @@ export const rawSensitiveConfigSchema = {
     "payment",
     "mail",
     "phone",
+    "ussd",
     "logging",
     "mailDomain",
     "mailStorage",

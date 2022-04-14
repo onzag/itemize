@@ -32,7 +32,7 @@ export default async function webpackSetup(arg: ISetupConfigType): Promise<ISetu
   if (!exists) {
     console.log("emiting " + colors.green("webpack.config.js"));
     await fsAsync.writeFile("webpack.config.js", config);
-  } else if (content !== config)  {
+  } else if (content !== config) {
     if (await confirm("Webpack config is non-standard, would you like to emit the default?")) {
       console.log("emiting " + colors.green("webpack.config.js"));
       await fsAsync.writeFile("webpack.config.js", config);

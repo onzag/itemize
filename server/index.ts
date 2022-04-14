@@ -69,7 +69,10 @@ import {
   PORT,
   buildEnvironmentInfo,
   INSTANCE_UUID,
+  FAKE_USSD,
 } from "./environment";
+import USSDProvider from "./services/base/USSDProvider";
+import { FakeUSSDService } from "./services/fake-ussd";
 
 // load the custom services configuration
 let serviceCustom: IServiceCustomizationType = {};
@@ -156,6 +159,7 @@ export interface IAppDataType {
   loggingService: LoggingProvider<any>;
   userLocalizationService: UserLocalizationProvider<any>;
   locationSearchService: LocationSearchProvider<any>;
+  ussdService: USSDProvider<any>;
   registry: RegistryService;
   customServices: {
     [name: string]: ServiceProvider<any>;
@@ -180,6 +184,7 @@ export interface IServiceCustomizationType {
   storageServiceProviders?: IStorageProviders;
   mailServiceProvider?: IServiceProviderClassType<any>;
   phoneServiceProvider?: IServiceProviderClassType<any>;
+  ussdServiceProvider?: IServiceProviderClassType<any>;
   userLocalizationProvider?: IServiceProviderClassType<any>;
   currencyFactorsProvider?: IServiceProviderClassType<any>;
   locationSearchProvider?: IServiceProviderClassType<any>;
@@ -897,6 +902,20 @@ export async function initializeServer(
         configsObj,
       ) : null) as any;
 
+    let USSDServiceClass = (serviceCustom && serviceCustom.ussdServiceProvider as any) || null;
+    if (USSDServiceClass && USSDServiceClass.getType() !== ServiceProviderType.LOCAL) {
+      throw new Error("The ussd service class is not a local type, and that's not allowed");
+    }
+    if (FAKE_USSD) {
+      logger.info(
+        "initializeServer: using fake ussd service",
+      );
+      USSDServiceClass = FakeUSSDService as any;
+    }
+    const ussdService: USSDProvider<any> = (sensitiveConfig.ussd || FAKE_USSD) ? (
+      new USSDServiceClass(sensitiveConfig.ussd, registry, configsObj)
+    ) : null;
+
     if (sensitiveConfig.locationSearch) {
       logger.info(
         "initializeServer: initializing location search service",
@@ -1014,6 +1033,7 @@ export async function initializeServer(
       paymentService,
       mailService,
       phoneService,
+      ussdService,
       storage: storageClients.cloudClients,
       logger,
       loggingService,
@@ -1042,6 +1062,7 @@ export async function initializeServer(
     userLocalizationService && userLocalizationService.setupLocalResources(appData);
     mailService && mailService.setupLocalResources(appData);
     phoneService && phoneService.setupLocalResources(appData);
+    ussdService && ussdService.setupLocalResources(appData);
     locationSearchService && locationSearchService.setupLocalResources(appData);
     paymentService && paymentService.setupLocalResources(appData);
     storageClients.instancesUsed.forEach((i) => i.setupLocalResources(appData));
@@ -1053,6 +1074,7 @@ export async function initializeServer(
     userLocalizationService && await userLocalizationService.initialize();
     mailService && await mailService.initialize();
     phoneService && await phoneService.initialize();
+    ussdService && await ussdService.initialize();
     locationSearchService && await locationSearchService.initialize();
     paymentService && await paymentService.initialize();
     // the storage clients are a none type and initialize immediately
@@ -1078,6 +1100,8 @@ export async function initializeServer(
     const mailServiceClassRouter = mailService && await MailServiceClass.getRouter(appData);
     const phoneServiceInstanceRouter = phoneService && await phoneService.getRouter(appData);
     const phoneServiceClassRouter = phoneService && await PhoneServiceClass.getRouter(appData);
+    const ussdServiceInstanceRouter = ussdService && await ussdService.getRouter(appData);
+    const ussdServiceClassRouter = ussdService && await USSDProvider.getRouter(appData);
     const locationSearchServiceInstanceRouter = locationSearchService && await locationSearchService.getRouter(appData);
     const locationSearchServiceClassRouter = locationSearchService && await LocationSearchClass.getRouter(appData);
     const paymentServiceInstanceRouter = paymentService && await paymentService.getRouter(appData);
@@ -1101,6 +1125,8 @@ export async function initializeServer(
       locationSearchServiceClassRouter,
       paymentServiceInstanceRouter,
       paymentServiceClassRouter,
+      ussdServiceInstanceRouter,
+      ussdServiceClassRouter,
     ].filter((r) => !!r);
 
     if (custom.callback) {
