@@ -38,7 +38,7 @@ export const USING_DOCKER = process.env.USING_DOCKER === "true";
 export const PING_GOOGLE = process.env.PING_GOOGLE === "true";
 export const FAKE_SMS = process.env.FAKE_SMS === "true";
 export const FAKE_EMAILS = process.env.FAKE_EMAILS === "true";
-export const FAKE_USSD = process.env.FAKE_USSD = "true";
+export const FAKE_USSD = process.env.FAKE_USSD === "true";
 export const LOG_LEVEL: "debug" | "silly" | "info" | "error" = process.env.LOG_LEVEL as any || null;
 if (
   LOG_LEVEL &&
