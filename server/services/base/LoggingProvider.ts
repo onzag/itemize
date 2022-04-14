@@ -1,5 +1,5 @@
 /**
- * This file specifies a base for creating a phone provider
+ * This file specifies a base for creating a logging provider
  * and phone providers as, they contain functions that are
  * necessary and shouldn't be touched and others that should
  * be overriden into what is a standard service

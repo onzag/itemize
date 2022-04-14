@@ -15,6 +15,16 @@ export interface IUSSDAction {
   label: string;
 
   /**
+   * Whether to request input value
+   */
+  requestInputValue: boolean;
+
+  /**
+   * The label for such value
+   */
+  inputValueLabel: string;
+
+  /**
    * When an input is received this function is executed
    * if a string is returned it will redirect
    */
@@ -69,8 +79,10 @@ export function convertHTMLToUSSDTree(node: Node, root: Root): IUSSDChunk {
 
       if (actionId) {
         chunkInProgress.actions.push({
-          label: (cnode as HTMLElement).dataset.label,
+          label: (cnode as HTMLElement).dataset.ussdLabel,
           onInputReceived: root.getStateKey(actionId),
+          requestInputValue: (cnode as HTMLElement).dataset.ussdActionInput === "true",
+          inputValueLabel: (cnode as HTMLElement).dataset.ussdActionInputLabel,
         });
         return "";
       }

@@ -6,6 +6,8 @@ import uuid from "uuid";
 
 interface IUSSDActionProps {
   label: string;
+  requestInputValue?: boolean;
+  requestInputValueLabel?: string;
   onInput: (appData: IAppDataType, value: string) => string | void | Promise<string | void>;
 }
 
@@ -27,7 +29,12 @@ class ActualUSSDAction extends React.Component<IActualUSSDActionProps, IUSSDActi
   }
   render() {
     return (
-      <div data-ussd-action={this.state.ussdActionId} data-label={this.props.label} />
+      <div
+        data-ussd-action={this.state.ussdActionId}
+        data-ussd-label={this.props.label}
+        data-ussd-action-input-label={this.props.requestInputValueLabel || "NO_INPUT_LABEL"}
+        data-ussd-action-input={JSON.stringify(this.props.requestInputValue === true)}
+      />
     )
   }
 }
