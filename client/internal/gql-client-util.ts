@@ -1299,7 +1299,7 @@ export function getSearchArgsFor(
 
   if (arg.parentedBy) {
     searchArgs.parent_type = arg.parentedBy.itemDefinition.getQualifiedPathName();
-    searchArgs.parent_id = arg.parentedBy.id;
+    searchArgs.parent_id = arg.parentedBy.id || null;
     searchArgs.parent_version = arg.parentedBy.version || null;
   }
 
@@ -1427,8 +1427,8 @@ export async function runSearchQueryFor(
       throw new Error("Cache policy is set yet the offset is not 0");
     } else if ((arg.cachePolicy === "by-owner" || arg.cachePolicy === "by-owner-and-parent") && !arg.createdBy || arg.createdBy === UNSPECIFIED_OWNER) {
       throw new Error("Cache policy is by-owner yet there's no creator specified");
-    } else if ((arg.cachePolicy === "by-parent" || arg.cachePolicy === "by-owner-and-parent") && !arg.parentedBy) {
-      throw new Error("Cache policy is by-parent yet there's no parent specified");
+    } else if ((arg.cachePolicy === "by-parent" || arg.cachePolicy === "by-owner-and-parent") && (!arg.parentedBy || !arg.parentedBy.id)) {
+      throw new Error("Cache policy is by-parent yet there's no parent specified with a specific id");
     }
 
     const standardCounterpart = arg.itemDefinition.getStandardCounterpart();

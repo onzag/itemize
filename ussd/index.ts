@@ -47,7 +47,11 @@ export interface IUSSDChunk {
   actions: IUSSDAction[];
 }
 
-export function convertHTMLToUSSDTree(node: Node, root: Root, lang: string): IUSSDChunk {
+export function convertHTMLToUSSDTree(
+  node: Node,
+  root: Root,
+  lang: string,
+): IUSSDChunk {
   // if it's text node then we just return that
   if (node.nodeType === 3) {
     return {
@@ -128,11 +132,18 @@ export function convertHTMLToUSSDTree(node: Node, root: Root, lang: string): IUS
         return "";
       }
 
-      // let's see if it means to add a line after it
       const tagName = (cnode as HTMLElement).tagName.toLowerCase();
+      if (tagName === "br") {
+        // we use tabs as a cheatcode to represent double newlines that
+        // we actually have intended
+        return "\t";
+      };
+
+      // let's see if it means to add a line after it
       const childRepresentsLine =
         tagName === "img" ||
         tagName === "p" ||
+        tagName === "li" ||
         (node as HTMLElement).classList.contains("image") ||
         nodesThatRepresentLines.includes(tagName);
 
@@ -152,7 +163,15 @@ export function convertHTMLToUSSDTree(node: Node, root: Root, lang: string): IUS
   }).join("");
 
   // Remove double n, start n and end n, if they exist
-  chunkInProgress.content = content.trim().replace(/\n+/g, "\n").replace(/^\n/g, "").replace(/\n$/g, "");
+  chunkInProgress.content = content.trim().replace(/\n+/g, "\n").replace(/^\n/g, "").replace(/\n$/g, "")
+  
+    // restore the double newlines encoded as tab, remove potential triplets or more now for the double
+    // that it should have been
+    .replace(/\t/g, "\n\n").replace(/\n\n\n+/g, "\n\n");
+
+  if ((node as HTMLElement).tagName === "LI") {
+    chunkInProgress.content = "- " + chunkInProgress.content;
+  }
 
   // now we can return this chunk
   return chunkInProgress;

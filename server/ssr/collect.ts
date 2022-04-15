@@ -422,7 +422,7 @@ export class Collector {
         const parentIdef = root.registry[args.parentedBy.item] as ItemDefinition;
         parentedBy = {
           itemDefinition: parentIdef,
-          id: args.parentedBy.id,
+          id: args.parentedBy.id || null,
           version: args.parentedBy.version || null,
         };
       }
@@ -496,7 +496,7 @@ export class Collector {
       })) as IGQLSearchRecord[];
 
       let searchParent: [string, string, string] = null;
-      if (args.parentedBy) {
+      if (args.parentedBy && args.parentedBy.id) {
         const itemDefinitionInQuestion = idef.getParentModule()
           .getParentRoot().registry[args.parentedBy.item] as ItemDefinition;
 

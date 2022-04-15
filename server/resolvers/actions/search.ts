@@ -735,6 +735,9 @@ export async function searchItemDefinition(
       .andWhereColumn("parent_id", resolverArgs.args.parent_id)
       .andWhereColumn("parent_version", resolverArgs.args.parent_version || "")
       .andWhereColumn("parent_type", resolverArgs.args.parent_type);
+  } else if (resolverArgs.args.parent_type) {
+    queryModel.whereBuilder
+      .andWhereColumn("parent_type", resolverArgs.args.parent_type);
   }
 
   const pathOfThisModule = mod.getPath().join("/");

@@ -364,8 +364,9 @@ export default class USSDProvider<T> extends ServiceProvider<T> {
 
       chunks.forEach((c, index) => {
         const hasPaginatorPrev = index !== 0;
-        // either it's not the first or there are actions
-        const hasPaginatorNext = c.length - 1 !== index || chunk.actions.length;
+        // either it's not the last or there are actions
+        const isLast = index === chunks.length - 1;
+        const hasPaginatorNext = !isLast || chunk.actions.length;
         result.push(this.formatter(
           c,
           [],

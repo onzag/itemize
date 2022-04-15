@@ -364,7 +364,13 @@ export interface IActionSearchOptions extends IActionCleanOptions {
   since?: string;
   parentedBy?: {
     item: string,
-    id: string,
+
+    /**
+     * Parented by a specific element with an specific id
+     * otherwise it is used for simple filtering
+     * will not work to use with a cache policy as the id needs to be specified
+     */
+    id?: string,
     version?: string,
   };
 
@@ -3758,9 +3764,9 @@ export class ActualItemProvider extends
 
     // and the cache policy by parenting
     let searchParent: [string, string, string] = null;
-    if ((options.cachePolicy === "by-parent" || options.cachePolicy === "by-owner-and-parent") && !options.parentedBy) {
-      throw new Error("A by owner cache policy requires parentedBy option to be set");
-    } else if (options.parentedBy) {
+    if ((options.cachePolicy === "by-parent" || options.cachePolicy === "by-owner-and-parent") && (!options.parentedBy || !options.parentedBy.id)) {
+      throw new Error("A by owner cache policy requires parentedBy option to be set with a specific id");
+    } else if (options.parentedBy && options.parentedBy.id) {
       // because the parenting rule goes by a path, eg.... module/module  and then idef/idef
       // we need to loop and find it by the path in order to find both
       const itemDefinitionInQuestion = this.props.itemDefinitionInstance.getParentModule()
@@ -3858,7 +3864,7 @@ export class ActualItemProvider extends
       const parentIdef = root.registry[options.parentedBy.item] as ItemDefinition;
       parentedBy = {
         itemDefinition: parentIdef,
-        id: options.parentedBy.id,
+        id: options.parentedBy.id || null,
         version: options.parentedBy.version || null,
       };
     }
@@ -3872,8 +3878,8 @@ export class ActualItemProvider extends
 
     if ((listenPolicy === "by-owner" || listenPolicy === "by-owner-and-parent") && !options.createdBy || options.createdBy === UNSPECIFIED_OWNER) {
       throw new Error("Listen policy is by-owner yet there's no creator specified");
-    } else if ((listenPolicy === "by-parent" || listenPolicy === "by-owner-and-parent") && !parentedBy) {
-      throw new Error("Listen policy is by-parent yet there's no parent specified");
+    } else if ((listenPolicy === "by-parent" || listenPolicy === "by-owner-and-parent") && (!parentedBy || !parentedBy.id)) {
+      throw new Error("Listen policy is by-parent yet there's no parent specified with a specific id");
     }
 
     const {
