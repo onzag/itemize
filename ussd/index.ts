@@ -47,13 +47,54 @@ export interface IUSSDChunk {
   actions: IUSSDAction[];
 }
 
-export function convertHTMLToUSSDTree(node: Node, root: Root): IUSSDChunk {
+export function convertHTMLToUSSDTree(node: Node, root: Root, lang: string): IUSSDChunk {
   // if it's text node then we just return that
   if (node.nodeType === 3) {
     return {
       content: node.textContent,
       actions: [],
     };
+  }
+
+  if ((node as HTMLElement).tagName === "IMG" || ((node as HTMLElement).classList && (node as HTMLElement).classList.contains("image"))) {
+    const imgName = root.getI18nDataFor(lang).rich_image;
+    let childImg: HTMLImageElement = node as HTMLImageElement;
+    if (!(childImg.tagName === "IMG") && childImg.querySelector) {
+      childImg = childImg.querySelector("img");
+    }
+    const alt = childImg && childImg.alt;
+    return {
+      content: "[" + imgName + (alt ? " - " + alt : "" ) + "]",
+      actions: [],
+    }
+  }
+
+  if ((node as HTMLElement).classList && (node as HTMLElement).classList.contains("video")) {
+    const videoName = root.getI18nDataFor(lang).rich_video;
+    return {
+      content: "[" + videoName + "]",
+      actions: [],
+    }
+  }
+
+  if ((node as HTMLElement).classList && (node as HTMLElement).classList.contains("file")) {
+    let fileName = root.getI18nDataFor(lang).rich_file;
+    if ((node as HTMLElement).querySelector) {
+      const fileNameComponent = (node as HTMLElement).querySelector(".file-name");
+      const fileExtensionComponent = (node as HTMLElement).querySelector(".file-extension");
+
+      if (fileNameComponent && fileNameComponent.textContent) {
+        fileName = fileNameComponent.textContent;
+
+        if (fileExtensionComponent && fileExtensionComponent.textContent) {
+          fileName += "." + fileExtensionComponent.textContent;
+        }
+      }
+    }
+    return {
+      content: "[" + fileName + "]",
+      actions: [],
+    }
   }
 
   // if it has no children despite being html then it has nothing
@@ -88,10 +129,15 @@ export function convertHTMLToUSSDTree(node: Node, root: Root): IUSSDChunk {
       }
 
       // let's see if it means to add a line after it
-      const childRepresentsLine = nodesThatRepresentLines.includes((cnode as HTMLElement).tagName.toLowerCase());
+      const tagName = (cnode as HTMLElement).tagName.toLowerCase();
+      const childRepresentsLine =
+        tagName === "img" ||
+        tagName === "p" ||
+        (node as HTMLElement).classList.contains("image") ||
+        nodesThatRepresentLines.includes(tagName);
 
       // for that we get the resulting chunk
-      const resultingChildChunk = convertHTMLToUSSDTree(cnode, root);
+      const resultingChildChunk = convertHTMLToUSSDTree(cnode, root, lang);
 
       if (resultingChildChunk.actions) {
         chunkInProgress.actions = chunkInProgress.actions.concat(resultingChildChunk.actions);
@@ -100,19 +146,13 @@ export function convertHTMLToUSSDTree(node: Node, root: Root): IUSSDChunk {
       // and return its content
       return (childRepresentsLine ? "\n" : "") + (resultingChildChunk.content || "");
     } else {
-      const resultingChildChunk = convertHTMLToUSSDTree(cnode, root);
+      const resultingChildChunk = convertHTMLToUSSDTree(cnode, root, lang);
       return resultingChildChunk.content || "";
     }
   }).join("");
 
-  chunkInProgress.content = content.trim();
-
-  // why would you end a chunk content with an endline
-  // it's a waste of characters specially for USSD
-  // I mean it can happen due to an ending being div
-  if (chunkInProgress.content.endsWith("\n")) {
-    chunkInProgress.content.substr(0, chunkInProgress.content.length - 1);
-  }
+  // Remove double n, start n and end n, if they exist
+  chunkInProgress.content = content.trim().replace(/\n+/g, "\n").replace(/^\n/g, "").replace(/\n$/g, "");
 
   // now we can return this chunk
   return chunkInProgress;

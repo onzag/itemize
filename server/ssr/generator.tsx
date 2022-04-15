@@ -507,7 +507,7 @@ export async function ssrGenerator(
         const cheapdiv = DOMWindow.document.createElement("div");
         cheapdiv.innerHTML = staticMarkup;
 
-        finalReturnTree = convertHTMLToUSSDTree(cheapdiv, root);
+        finalReturnTree = convertHTMLToUSSDTree(cheapdiv, root, appliedRule.language);
       } else {
         // now we calculate the og fields that are final, given they can be functions
         // if it's a string, use it as it is, otherwise call the function to get the actual value, they might use values from the queries

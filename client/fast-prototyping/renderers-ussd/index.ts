@@ -5,6 +5,13 @@
  */
 
 import { IRendererContext } from "../../providers/renderer";
+import PropertyViewBooleanRenderer from "../renderers/PropertyView/PropertyViewBoolean";
+import PropertyViewDateTimeRenderer from "../renderers/PropertyView/PropertyViewDateTime";
+import PropertyViewSimpleRenderer from "../renderers/PropertyView/PropertyViewSimple";
+import PropertyViewTextRenderer from "../renderers/PropertyView/PropertyViewText";
+import PropertyViewCurrencyUSSDRenderer from "./PropertyView/PropertyViewCurrency";
+import PropertyViewFileUSSDRenderer from "./PropertyView/PropertyViewFile";
+import PropertyViewLocationUSSDRenderer from "./PropertyView/PropertyViewLocation";
 
 export const rendererContext: IRendererContext = {
   PropertyEntryField: null,
@@ -17,11 +24,11 @@ export const rendererContext: IRendererContext = {
   PropertyEntryDateTime: null,
   PropertyEntryPayment: null,
 
-  PropertyViewBoolean: null,
-  PropertyViewSimple: null,
-  PropertyViewText: null,
-  PropertyViewDateTime: null,
-  PropertyViewFile: null,
-  PropertyViewLocation: null,
-  PropertyViewCurrency: null,
+  PropertyViewBoolean: PropertyViewBooleanRenderer,
+  PropertyViewSimple: PropertyViewSimpleRenderer,
+  PropertyViewText: PropertyViewTextRenderer,
+  PropertyViewDateTime: PropertyViewDateTimeRenderer,
+  PropertyViewFile: PropertyViewFileUSSDRenderer,
+  PropertyViewLocation: PropertyViewLocationUSSDRenderer,
+  PropertyViewCurrency: PropertyViewCurrencyUSSDRenderer,
 }
