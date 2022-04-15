@@ -2,12 +2,15 @@ import Root from "../../../base/Root";
 import React from "react";
 import type { IAppDataType } from "../../../server";
 import RootRetriever from "../root/RootRetriever";
-import uuid from "uuid";
 
 interface IUSSDActionProps {
   label: string;
-  requestInputValue?: boolean;
-  requestInputValueLabel?: string;
+  /**
+   * An unique id that should identify this action specifically
+   * in the entire tree, it should be unique accross all actions
+   */
+  id: string;
+  requestInput?: string;
   onInput: (appData: IAppDataType, value: string) => string | void | Promise<string | void>;
 }
 
@@ -15,13 +18,9 @@ interface IActualUSSDActionProps extends IUSSDActionProps {
   root: Root;
 }
 
-interface IUSSDActionState {
-  ussdActionId: string;
-}
-
-class ActualUSSDAction extends React.Component<IActualUSSDActionProps, IUSSDActionState> {
+class ActualUSSDAction extends React.Component<IActualUSSDActionProps, {}> {
   public static getDerivedServerSideStateFromProps(props: IActualUSSDActionProps) {
-    const ussdActionId = "USSD" + uuid.v4().replace(/\-/g, "");
+    const ussdActionId = "USSD_" + props.id;
     props.root.setStateKey(ussdActionId, props.onInput);
     return {
       ussdActionId,
@@ -30,16 +29,15 @@ class ActualUSSDAction extends React.Component<IActualUSSDActionProps, IUSSDActi
   render() {
     return (
       <div
-        data-ussd-action={this.state.ussdActionId}
+        data-ussd-action={"USSD_" + this.props.id}
         data-ussd-label={this.props.label}
-        data-ussd-action-input-label={this.props.requestInputValueLabel || "NO_INPUT_LABEL"}
-        data-ussd-action-input={JSON.stringify(this.props.requestInputValue === true)}
+        data-ussd-action-input={typeof this.props.requestInput === "string" ? (this.props.requestInput || "NO_INPUT_LABEL") : ""}
       />
     )
   }
 }
 
-export function USSDAction(props: IUSSDActionProps) {
+export default function USSDAction(props: IUSSDActionProps) {
   return (
     <RootRetriever>
       {(root) => (

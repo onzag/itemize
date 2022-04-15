@@ -156,7 +156,7 @@ export default class USSDProvider<T> extends ServiceProvider<T> {
     // this means it was in input mode last time
     if (currentSession.activeDataAction) {
       // let's execute the action we had last time
-      const newURL = await currentSession.activeDataAction.onInputReceived(
+      let newURL = await currentSession.activeDataAction.onInputReceived(
         this.localAppData,
         input,
       );
@@ -166,6 +166,10 @@ export default class USSDProvider<T> extends ServiceProvider<T> {
 
       // if we were requested a redirect
       if (typeof newURL === "string") {
+        if (!newURL.startsWith("/")) {
+          newURL = "/" + newURL;
+        }
+
         // let's server side render the new chunk
         const newChunk = (await ssrGenerator(
           this.localAppData,
@@ -176,7 +180,7 @@ export default class USSDProvider<T> extends ServiceProvider<T> {
             clientCurrency: currentSession.currency,
             clientLanguage: currentSession.language,
             token: currentSession.token,
-            url: newURL,
+            url: "/" + currentSession.language + newURL,
           }
         )) as IUSSDChunk;
 
@@ -211,10 +215,14 @@ export default class USSDProvider<T> extends ServiceProvider<T> {
           }
         } else {
           // otherwise it's a bare action
-          const newURL = await executedAction.onInputReceived(this.localAppData, null);
+          let newURL = await executedAction.onInputReceived(this.localAppData, null);
 
           // and if it requests a redirect
           if (typeof newURL === "string") {
+            if (!newURL.startsWith("/")) {
+              newURL = "/" + newURL;
+            }
+
             // let's make a new chunk
             const newChunk = (await ssrGenerator(
               this.localAppData,
@@ -225,7 +233,7 @@ export default class USSDProvider<T> extends ServiceProvider<T> {
                 clientCurrency: currentSession.currency,
                 clientLanguage: currentSession.language,
                 token: currentSession.token,
-                url: newURL,
+                url: "/" + currentSession.language + newURL,
               }
             )) as IUSSDChunk;
 
@@ -259,9 +267,19 @@ export default class USSDProvider<T> extends ServiceProvider<T> {
   ): IUSSDSessionChunk {
     let content: string = (paginatorPrev ? paginatorPrev + (text ? "\n" : "") : "") + (text || "");
     const actionMap: any = {};
+
+    let offsetIndex: number = 0;
     actions.forEach((a, i) => {
-      content += (content ? "\n" : "") + (i + actionIndexBeginsAt).toString() + this.separator + a.label;
-      actionMap[i + actionIndexBeginsAt] = a;
+      let expectedIndex = i + actionIndexBeginsAt + offsetIndex;
+      if (
+        (paginatorPrev && this.paginatorPrevNumericId === expectedIndex) ||
+        (paginatorNext && this.paginatorNextNumericId === expectedIndex)
+      ) {
+        expectedIndex++;
+        offsetIndex++;
+      }
+      content += (content ? "\n" : "") + expectedIndex.toString() + this.separator + a.label;
+      actionMap[expectedIndex] = a;
     });
     if (paginatorNext) {
       content += (content ? "\n" : "") + paginatorNext;
@@ -345,12 +363,15 @@ export default class USSDProvider<T> extends ServiceProvider<T> {
       });
 
       chunks.forEach((c, index) => {
+        const hasPaginatorPrev = index !== 0;
+        // either it's not the first or there are actions
+        const hasPaginatorNext = c.length - 1 !== index || chunk.actions.length;
         result.push(this.formatter(
           c,
           [],
           1,
-          index === 0 ? null : paginatorPrev,
-          c.length - 1 !== index || chunk.actions.length ? paginatorNext : null,
+          hasPaginatorPrev ? paginatorPrev : null,
+          hasPaginatorNext ? paginatorNext : null,
         ));
       });
     }
@@ -407,6 +428,10 @@ export default class USSDProvider<T> extends ServiceProvider<T> {
         workInProgressActions = workInProgressActions ? workInProgressActions.concat([a]) : [a];
       }
     });
+
+    if (workInProgressActionChunk !== null) {
+      result.push(workInProgressActionChunk);
+    }
 
     return result;
   }

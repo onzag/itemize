@@ -81,14 +81,14 @@ export function convertHTMLToUSSDTree(node: Node, root: Root): IUSSDChunk {
         chunkInProgress.actions.push({
           label: (cnode as HTMLElement).dataset.ussdLabel,
           onInputReceived: root.getStateKey(actionId),
-          requestInputValue: (cnode as HTMLElement).dataset.ussdActionInput === "true",
-          inputValueLabel: (cnode as HTMLElement).dataset.ussdActionInputLabel,
+          requestInputValue: !!(cnode as HTMLElement).dataset.ussdActionInput,
+          inputValueLabel: (cnode as HTMLElement).dataset.ussdActionInput,
         });
         return "";
       }
 
       // let's see if it means to add a line after it
-      const childRepresentsLine = nodesThatRepresentLines.includes((cnode as HTMLElement).tagName);
+      const childRepresentsLine = nodesThatRepresentLines.includes((cnode as HTMLElement).tagName.toLowerCase());
 
       // for that we get the resulting chunk
       const resultingChildChunk = convertHTMLToUSSDTree(cnode, root);
@@ -98,7 +98,7 @@ export function convertHTMLToUSSDTree(node: Node, root: Root): IUSSDChunk {
       }
 
       // and return its content
-      return (resultingChildChunk.content || "") + (childRepresentsLine ? "\n" : "");
+      return (childRepresentsLine ? "\n" : "") + (resultingChildChunk.content || "");
     } else {
       const resultingChildChunk = convertHTMLToUSSDTree(cnode, root);
       return resultingChildChunk.content || "";

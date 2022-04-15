@@ -1,4 +1,4 @@
-import { Router } from "express";
+import { logger } from "../../server/logger";
 import { IAppDataType } from "../../server";
 import USSDProvider from "./base/USSDProvider";
 
@@ -57,7 +57,7 @@ export class FakeUSSDService extends USSDProvider<null> {
     }
 
     startObj.addEventListener("click", async () => {
-      const queryObj = "/rest/service/ussd/" + encodeURIComponent(phoneObj) + getQuery();
+      const queryObj = "/rest/service/ussd/" + encodeURIComponent(phoneObj.value) + getQuery();
 
       const rs = await (await fetch(queryObj)).text();
 
@@ -80,7 +80,7 @@ export class FakeUSSDService extends USSDProvider<null> {
       const input = inputObj.value;
       inputObj.value = "";
 
-      const queryObj = "/rest/service/ussd/" + encodeURIComponent(phoneObj) + getQuery() + "&input=" + encodeURIComponent(input);
+      const queryObj = "/rest/service/ussd/" + encodeURIComponent(phoneObj.value) + getQuery() + "&input=" + encodeURIComponent(input);
       const rs = await (await fetch(queryObj)).text();
       responseObj.innerText = rs;
     });
@@ -88,7 +88,7 @@ export class FakeUSSDService extends USSDProvider<null> {
     endObj.addEventListener("click", async () => {
       inputObj.value = "";
 
-      const queryObj = "/rest/service/ussd/" + encodeURIComponent(phoneObj) + getQuery() + "&end=t";
+      const queryObj = "/rest/service/ussd/" + encodeURIComponent(phoneObj.value) + getQuery() + "&end=t";
       const rs = await (await fetch(queryObj)).text();
       
       responseObj.innerText = "";
@@ -126,19 +126,31 @@ export class FakeUSSDService extends USSDProvider<null> {
       if (end === "t") {
         try {
           await this.endSession(req.params.phone);
-        } catch {
+        } catch (err) {
+          logger.error("fake-ussd [SERIOUS]: Could not end USSD session", {
+            errMessage: err.message,
+            errStack: err.stack,
+          });
         }
       } else if (this.hasSession(req.params.phone)) {
         try {
           rs = (await this.continueSession(req.params.phone, country, language, currency, input)).message;
-        } catch {
+        } catch (err) {
+          logger.error("fake-ussd [SERIOUS]: Could not return USSD response", {
+            errMessage: err.message,
+            errStack: err.stack,
+          });
           status = 500;
           rs = (this.localAppData.root.getI18nDataFor(language) || this.localAppData.root.getI18nDataFor("en")).error.INTERNAL_SERVER_ERROR;
         }
       } else {
         try {
           rs = (await this.startSession(req.params.phone, country, language, currency)).message;
-        } catch {
+        } catch (err) {
+          logger.error("fake-ussd [SERIOUS]: Could not return USSD response", {
+            errMessage: err.message,
+            errStack: err.stack,
+          });
           status = 500;
           rs = (this.localAppData.root.getI18nDataFor(language) || this.localAppData.root.getI18nDataFor("en")).error.INTERNAL_SERVER_ERROR;
         }
