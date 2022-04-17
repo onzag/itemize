@@ -79,3 +79,7 @@ export function passwordSQLSearch(): any {
     "Attempted to search by password",
   );
 }
+
+export function passwordSQLElasticIn(): any {
+  return {};
+}

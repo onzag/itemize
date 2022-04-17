@@ -181,6 +181,9 @@ export default {
     searchable: {
       type: "boolean",
     },
+    searchEngineEnabled: {
+      type: "boolean",
+    },
     searchRoleAccess: {
       type: "array",
       items: {

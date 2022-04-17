@@ -17,7 +17,7 @@ import {
   INCLUDE_PREFIX,
 } from "../../../../../../constants";
 import { PropertyDefinitionSearchInterfacesPrefixes, PropertyDefinitionSearchInterfacesType } from "../search-interfaces";
-import { paymentSQLSideEffect, paymentSQL, paymentSQLBtreeIndexable, paymentSQLEqual, paymentSQLIn, paymentSQLOut, paymentSQLSearch, paymentSQLSelect, paymentSQLSSCacheEqual, paymentSQLPreSideEffect } from "../sql/payment";
+import { paymentSQLSideEffect, paymentSQL, paymentSQLBtreeIndexable, paymentSQLEqual, paymentSQLIn, paymentSQLOut, paymentSQLSearch, paymentSQLSelect, paymentSQLSSCacheEqual, paymentSQLPreSideEffect, paymentSQLElasticIn, paymentElasticSearch } from "../sql/payment";
 import { currencies } from "../../../../../../imported-resources";
 
 export enum PaymentStatusType {
@@ -99,7 +99,9 @@ const typeValue: IPropertyDefinitionSupportedType<IPropertyDefinitionSupportedPa
   sqlSelect: paymentSQLSelect,
   sqlIn: paymentSQLIn,
   sqlOut: paymentSQLOut,
+  sqlElasticIn: paymentSQLElasticIn,
   sqlSearch: paymentSQLSearch,
+  elasticSearch: paymentElasticSearch,
   sqlStrSearch: null,
   localStrSearch: null,
   sqlOrderBy: null,

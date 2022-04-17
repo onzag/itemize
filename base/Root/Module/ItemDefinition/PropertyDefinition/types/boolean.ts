@@ -14,6 +14,8 @@ import {
   getStandardSQLFnFor,
   standardSQLBtreeIndexable,
   standardSQLSelect,
+  standardElasticSearchFnExactAndRange,
+  standardSQLElasticInFn,
 } from "../sql";
 import {
   standardSQLSSCacheEqualFn,
@@ -38,7 +40,9 @@ const typeValue: IPropertyDefinitionSupportedType<PropertyDefinitionSupportedBoo
   sqlSelect: standardSQLSelect,
   sqlIn: standardSQLInFn,
   sqlOut: standardSQLOutFn,
+  sqlElasticIn: standardSQLElasticInFn,
   sqlSearch: standardSQLSearchFnExactAndRange,
+  elasticSearch: standardElasticSearchFnExactAndRange,
   sqlStrSearch: null,
   localStrSearch: null,
   sqlEqual: standardSQLEqualFn,

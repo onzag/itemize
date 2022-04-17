@@ -12,6 +12,7 @@ import {
   standardSQLOutFn,
   getStandardSQLFnFor,
   standardSQLSelect,
+  standardSQLElasticInFn,
 } from "../sql";
 import { PropertyInvalidReason, IPropertyDefinitionRawJSONDataType } from "../../PropertyDefinition";
 import {
@@ -23,7 +24,7 @@ import {
   INCLUDE_PREFIX,
 } from "../../../../../../constants";
 import { PropertyDefinitionSearchInterfacesType, PropertyDefinitionSearchInterfacesPrefixes } from "../search-interfaces";
-import { taglistSQLEqualFn, taglistSQLIn, taglistSQLSearch, taglistSQLSSCacheEqualFn } from "../sql/taglist";
+import { tagListElasticSearch, taglistSQLEqualFn, taglistSQLIn, taglistSQLSearch, taglistSQLSSCacheEqualFn } from "../sql/taglist";
 
 /**
  * The string type is described, by, you guessed it, a string
@@ -47,7 +48,9 @@ const typeValue: IPropertyDefinitionSupportedType<PropertyDefinitionSupportedTag
   sqlSelect: standardSQLSelect,
   sqlIn: taglistSQLIn,
   sqlOut: standardSQLOutFn,
+  sqlElasticIn: standardSQLElasticInFn,
   sqlSearch: taglistSQLSearch,
+  elasticSearch: tagListElasticSearch,
   sqlEqual: taglistSQLEqualFn,
   sqlSSCacheEqual: taglistSQLSSCacheEqualFn,
   sqlBtreeIndexable: null,

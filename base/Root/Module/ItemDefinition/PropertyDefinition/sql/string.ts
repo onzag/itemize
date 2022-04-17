@@ -4,10 +4,10 @@
  * @module
  */
 
-import { ISQLArgInfo, ISQLEqualInfo, ISQLSearchInfo, ISQLStrSearchInfo } from "../types";
+import { ISQLArgInfo, ISQLElasticSearchInfo, ISQLEqualInfo, ISQLSearchInfo, ISQLStrSearchInfo } from "../types";
 import { PropertyDefinitionSearchInterfacesPrefixes } from "../search-interfaces";
 import { exactStringSearchSubtypes } from "../types/string";
-import { SQL_CONSTRAINT_PREFIX } from "../../../../../../constants";
+import { ELASTIC_INDEXABLE_NULL_VALUE, SQL_CONSTRAINT_PREFIX } from "../../../../../../constants";
 
 export function stringSQL(arg: ISQLArgInfo) {
   const subtype = arg.property.getSubtype();
@@ -81,6 +81,46 @@ export function stringSQLSearch(arg: ISQLSearchInfo): boolean {
       tagCompareCheck,
     );
 
+    return true;
+  }
+
+  return false;
+}
+
+export function stringElasticSearch(arg: ISQLElasticSearchInfo): boolean {
+  if (arg.property.getSubtype() === "json") {
+    return false;
+  }
+
+  const searchName = PropertyDefinitionSearchInterfacesPrefixes.SEARCH + arg.prefix + arg.id;
+  const inName = PropertyDefinitionSearchInterfacesPrefixes.IN + arg.prefix + arg.id;
+
+  if (typeof arg.args[searchName] !== "undefined" && arg.args[searchName] !== null) {
+    // and we check it...
+    if (exactStringSearchSubtypes.includes(arg.property.getSubtype())) {
+      arg.elasticQueryBuilder.mustTerm({
+        [arg.prefix + arg.id]: arg.args[searchName] as any,
+      });
+    } else {
+      arg.elasticQueryBuilder.mustMatch({
+        [arg.prefix + arg.id]: arg.args[searchName] as any,
+      });
+    }
+
+    return true;
+  } else if (arg.args[searchName] === null) {
+    arg.elasticQueryBuilder.mustTerm({
+      [arg.prefix + arg.id]: ELASTIC_INDEXABLE_NULL_VALUE,
+    });
+    return true;
+  }
+
+  // now we see if we have an argument for it
+  if (typeof arg.args[inName] !== "undefined" && arg.args[inName] !== null) {
+    const tagCompareCheck = arg.args[inName] as string[];
+    arg.elasticQueryBuilder.mustTerms({
+      [arg.prefix + arg.id]: tagCompareCheck
+    });
     return true;
   }
 

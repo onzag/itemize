@@ -5,7 +5,7 @@
  */
 
 import { IPropertyDefinitionSupportedType } from "../types";
-import { getStandardSQLFnFor, stardardSQLInWithJSONStringifyFn, standardSQLOutWithJSONParseFn, standardSQLSelect } from "../sql";
+import { getStandardSQLFnFor, stardardSQLInWithJSONStringifyFn, standardSQLOutWithJSONParseFn, standardSQLSelect, standardSQLElasticInFn } from "../sql";
 import { PropertyInvalidReason } from "../../PropertyDefinition";
 import { MAX_FILES_PER_PROPERTY, CLASSIC_BASE_I18N, CLASSIC_OPTIONAL_I18N } from "../../../../../../constants";
 import { IGQLFile } from "../../../../../../gql-querier";
@@ -61,8 +61,12 @@ const typeValue: IPropertyDefinitionSupportedType<PropertyDefinitionSupportedFil
   sqlSelect: standardSQLSelect,
   sqlIn: stardardSQLInWithJSONStringifyFn,
   sqlOut: standardSQLOutWithJSONParseFn,
+  sqlElasticIn: standardSQLElasticInFn,
   sqlSearch: () => {
     throw new Error("Attempted to search within files");
+  },
+  elasticSearch: () => {
+    throw new Error("Attempted to elastic search within files");
   },
   sqlStrSearch: null,
   localStrSearch: null,

@@ -4,10 +4,11 @@
  * @module
  */
 
-import { ISQLArgInfo, ISQLInInfo, ISQLOutInfo, ISQLSearchInfo, ISQLBtreeIndexableInfo, ISQLEqualInfo, ISQLSSCacheEqualInfo, ISQLSideEffectType } from "../types";
+import { ISQLArgInfo, ISQLInInfo, ISQLOutInfo, ISQLSearchInfo, ISQLBtreeIndexableInfo, ISQLEqualInfo, ISQLSSCacheEqualInfo, ISQLSideEffectType, ISQLElasticSearchInfo } from "../types";
 import { IPropertyDefinitionSupportedPaymentType, PaymentStatusType } from "../types/payment";
 import { PropertyDefinitionSearchInterfacesPrefixes } from "../search-interfaces";
 import { IPropertyDefinitionSupportedCurrencyType } from "../types/currency";
+import { ELASTIC_INDEXABLE_NULL_VALUE } from "../../../../../../constants";
 
 // based on the payment provider status to event
 // need to clone it because of circular dependencies
@@ -119,6 +120,17 @@ export function paymentSQLOut(arg: ISQLOutInfo) {
   return result;
 }
 
+export function paymentSQLElasticIn(arg: ISQLOutInfo) {
+  return {
+    [arg.prefix + arg.id + "_TYPE"]: arg.row[arg.prefix + arg.id + "_TYPE"],
+    [arg.prefix + arg.id + "_AMOUNT"]: [arg.prefix + arg.id + "_AMOUNT"],
+    [arg.prefix + arg.id + "_CURRENCY"]: arg.row[arg.prefix + arg.id + "_CURRENCY"],
+    [arg.prefix + arg.id + "_STATUS"]: arg.row[arg.prefix + arg.id + "_STATUS"],
+    [arg.prefix + arg.id + "_METADATA"]: arg.row[arg.prefix + arg.id + "_METADATA"],
+    [arg.prefix + arg.id + "_RO_METADATA"]: arg.row[arg.prefix + arg.id + "_RO_METADATA"],
+  };
+}
+
 /**
  * Searching for payment values
  * @param arg the argument search info
@@ -172,6 +184,95 @@ export function paymentSQLSearch(arg: ISQLSearchInfo) {
 
   if (typeof arg.args[paymentStatusName] !== "undefined" && arg.args[paymentStatusName] !== null) {
     arg.whereBuilder.andWhereColumn(argPrefixPlusId + "_STATUS", arg.args[paymentStatusName] as string);
+    searchedByIt = true;
+  }
+
+  // now we return if we have been searched by it at the end
+  return searchedByIt;
+}
+
+/**
+ * Searching for payment values
+ * @param arg the argument search info
+ * @returns a boolean on whether it's searched by it or not
+ */
+ export function paymentElasticSearch(arg: ISQLElasticSearchInfo) {
+  const argPrefixPlusId = arg.prefix + arg.id;
+
+  // first we need to get the arguments
+  const fromName = PropertyDefinitionSearchInterfacesPrefixes.FROM + argPrefixPlusId;
+  const toName = PropertyDefinitionSearchInterfacesPrefixes.TO + argPrefixPlusId;
+  const exactName = PropertyDefinitionSearchInterfacesPrefixes.EXACT + argPrefixPlusId;
+  const paymentTypeName = PropertyDefinitionSearchInterfacesPrefixes.PAYMENT_TYPE + argPrefixPlusId;
+  const paymentStatusName = PropertyDefinitionSearchInterfacesPrefixes.PAYMENT_STATUS + argPrefixPlusId;
+
+  // now if we are searching by it
+  let searchedByIt = false;
+
+  // if we have an exact search
+  if (typeof arg.args[exactName] !== "undefined" && arg.args[exactName] !== null) {
+    const exactArg = arg.args[exactName] as any as IPropertyDefinitionSupportedCurrencyType;
+    // we just match it as it is
+    arg.elasticQueryBuilder.mustTerm({
+      [argPrefixPlusId + "_AMOUNT"]: exactArg.value,
+      [argPrefixPlusId + "_CURRENCY"]: exactArg.currency,
+    });
+    searchedByIt = true;
+  } else if (arg.args[exactName] === null) {
+    arg.elasticQueryBuilder.mustTerm({
+      [argPrefixPlusId + "_AMOUNT"]: ELASTIC_INDEXABLE_NULL_VALUE,
+    });
+    searchedByIt = true;
+  }
+
+  const hasToDefined = typeof arg.args[toName] !== "undefined" && arg.args[toName] !== null;
+  const hasFromDefined = typeof arg.args[fromName] !== "undefined" && arg.args[fromName] !== null;
+
+  if (hasToDefined || hasFromDefined) {
+    const rule: any = {};
+    let currencyToUse: string = null;
+    let currencyToUse2: string = null;
+    if (hasFromDefined) {
+      const fromArg = arg.args[fromName] as any as IPropertyDefinitionSupportedCurrencyType;
+      rule.gte = fromArg.value;
+      currencyToUse = fromArg.currency;
+    }
+    if (hasToDefined) {
+      const toArg = arg.args[toName] as any as IPropertyDefinitionSupportedCurrencyType;
+      rule.lte = toArg.value;
+      if (!currencyToUse) {
+        currencyToUse = toArg.currency;
+      } else {
+        currencyToUse2 = toArg.currency;
+      }
+    }
+    arg.elasticQueryBuilder.mustRange({
+      [arg.prefix + arg.id + "_AMOUNT"]: rule,
+    });
+    arg.elasticQueryBuilder.mustTerm({
+      [arg.prefix + arg.id + "_CURRENCY"]: currencyToUse,
+    });
+    // should fail this is weird
+    // payments are not allowed to be requested on different currencies nor stored as such
+    if (currencyToUse2 && currencyToUse !== currencyToUse2) {
+      arg.elasticQueryBuilder.mustTerm({
+        [arg.prefix + arg.id + "_CURRENCY"]: currencyToUse2,
+      });
+    }
+    searchedByIt = true;
+  }
+
+  if (typeof arg.args[paymentTypeName] !== "undefined" && arg.args[paymentTypeName] !== null) {
+    arg.elasticQueryBuilder.mustTerm({
+      [argPrefixPlusId + "_TYPE"]: arg.args[paymentTypeName] as string,
+    });
+    searchedByIt = true;
+  }
+
+  if (typeof arg.args[paymentStatusName] !== "undefined" && arg.args[paymentStatusName] !== null) {
+    arg.elasticQueryBuilder.mustTerm({
+      [argPrefixPlusId + "_STATUS"]: arg.args[paymentStatusName] as string,
+    });
     searchedByIt = true;
   }
 

@@ -4,9 +4,10 @@
  * @module
  */
 
-import { ISQLArgInfo, ISQLInInfo, ISQLSearchInfo, ISQLOrderByInfo, ISQLStrSearchInfo, ISQLRedoDictionaryBasedIndex } from "../types";
+import { ISQLArgInfo, ISQLInInfo, ISQLSearchInfo, ISQLOrderByInfo, ISQLStrSearchInfo, ISQLRedoDictionaryBasedIndex, ISQLElasticSearchInfo } from "../types";
 import { PropertyDefinitionSearchInterfacesPrefixes } from "../search-interfaces";
 import { DOMWindow, DOMPurify } from "../../../../../../util";
+import { ELASTIC_INDEXABLE_NULL_VALUE } from "../../../../../../constants";
 
 /**
  * Provides the sql form for the text type
@@ -137,7 +138,6 @@ export function textSQLSearch(arg: ISQLSearchInfo): boolean | [string, any[]] {
 
   if (typeof arg.args[searchName] !== "undefined" && arg.args[searchName] !== null) {
     // TODO improve, this only matches exact words
-    // maybe https://github.com/zombodb/zombodb
     arg.whereBuilder.andWhere(
       JSON.stringify(arg.prefix + arg.id + "_VECTOR") + " @@ plainto_tsquery(" + JSON.stringify(arg.prefix + arg.id + "_DICTIONARY") + ", ?)",
       [
@@ -164,6 +164,32 @@ export function textSQLSearch(arg: ISQLSearchInfo): boolean | [string, any[]] {
     // order by nulls, this is used for ordering
     // and the ordering of text is complex, bit of a hack
     // but otherwise we would have to create the column for ranking
+    return false;
+  }
+
+  return false;
+}
+
+
+/**
+ * Provides the text sql search functionality
+ * @param arg the sql search arg info
+ * @returns a boolean on whether it was searched by it, and a complementary column order by in case it needs it
+ */
+ export function textElasticSearch(arg: ISQLElasticSearchInfo): boolean {
+  const searchName = PropertyDefinitionSearchInterfacesPrefixes.SEARCH + arg.prefix + arg.id;
+
+  if (typeof arg.args[searchName] !== "undefined" && arg.args[searchName] !== null) {
+    // TODO also must match partial words
+    arg.elasticQueryBuilder.mustMatch({
+      [arg.prefix + arg.id]: arg.args[searchName],
+    });
+
+    return true;
+  } else if (arg.args[searchName] === null) {
+    arg.elasticQueryBuilder.mustTerm({
+      [arg.prefix + arg.id]: ELASTIC_INDEXABLE_NULL_VALUE,
+    });
     return false;
   }
 

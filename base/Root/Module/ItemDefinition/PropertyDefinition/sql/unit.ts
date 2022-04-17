@@ -5,9 +5,10 @@
  */
 
 import { ISQLArgInfo, ISQLInInfo, ISQLOutInfo, ISQLSearchInfo, ISQLOrderByInfo, ISQLBtreeIndexableInfo,
-  ISQLEqualInfo, ISQLSSCacheEqualInfo } from "../types";
+  ISQLEqualInfo, ISQLSSCacheEqualInfo, ISQLElasticSearchInfo } from "../types";
 import { IPropertyDefinitionSupportedUnitType } from "../types/unit";
 import { PropertyDefinitionSearchInterfacesPrefixes } from "../search-interfaces";
+import { ELASTIC_INDEXABLE_NULL_VALUE } from "../../../../../../constants";
 
 /**
  * The unit sql function that specifies the schema
@@ -86,6 +87,20 @@ export function unitSQLOut(arg: ISQLOutInfo) {
 }
 
 /**
+ * Specifies how units are to be outputted from a raw row
+ * @param arg the sql out arg info
+ * @returns a supported unit type (or null)
+ */
+ export function unitSQLElasticIn(arg: ISQLOutInfo) {
+  return {
+    [arg.prefix + arg.id + "_VALUE"]: arg.row[arg.prefix + arg.id + "_VALUE"],
+    [arg.prefix + arg.id + "_UNIT"]: arg.row[arg.prefix + arg.id + "_UNIT"],
+    [arg.prefix + arg.id + "_NORMALIZED_VALUE"]: arg.row[arg.prefix + arg.id + "_NORMALIZED_VALUE"],
+    [arg.prefix + arg.id + "_NORMALIZED_UNIT"]: arg.row[arg.prefix + arg.id + "_NORMALIZED_UNIT"],
+  };
+}
+
+/**
  * Specifies how units are to be searched by
  * @param arg the sql search arg info
  * @returns a boolean on whether it was searched by it
@@ -117,6 +132,71 @@ export function unitSQLSearch(arg: ISQLSearchInfo) {
     const toAsUnit: IPropertyDefinitionSupportedUnitType = arg.args[toName] as any;
     arg.whereBuilder.andWhereColumn(arg.prefix + arg.id + "_NORMALIZED_UNIT", toAsUnit.normalizedUnit);
     arg.whereBuilder.andWhereColumn(arg.prefix + arg.id + "_NORMALIZED_VALUE", "<=", toAsUnit.normalizedValue);
+    searchedByIt = true;
+  }
+
+  return searchedByIt;
+}
+
+/**
+ * The standard function that build queries for the property
+ * @param arg the search info arg
+ * @returns a boolean on whether it was searched by it
+ */
+ export function unitElasticSearch(arg: ISQLElasticSearchInfo) {
+  const fromName = PropertyDefinitionSearchInterfacesPrefixes.FROM + arg.prefix + arg.id;
+  const toName = PropertyDefinitionSearchInterfacesPrefixes.TO + arg.prefix + arg.id;
+  const exactName = PropertyDefinitionSearchInterfacesPrefixes.EXACT + arg.prefix + arg.id;
+  let searchedByIt: boolean = false;
+
+  if (typeof arg.args[exactName] !== "undefined" && arg.args[exactName] !== null) {
+    const exactAsUnit: IPropertyDefinitionSupportedUnitType = arg.args[exactName] as any;
+    arg.elasticQueryBuilder.mustTerm({
+      [arg.prefix + arg.id + "_NORMALIZED_UNIT"]: exactAsUnit.normalizedUnit,
+      [arg.prefix + arg.id + "_NORMALIZED_VALUE"]: exactAsUnit.normalizedValue,
+    });
+    searchedByIt = true;
+  } else if (arg.args[exactName] === null) {
+    arg.elasticQueryBuilder.mustTerm({
+      [arg.prefix + arg.id + "_NORMALIZED_VALUE"]: ELASTIC_INDEXABLE_NULL_VALUE,
+    });
+    searchedByIt = true;
+  }
+
+  const hasToDefined = typeof arg.args[toName] !== "undefined" && arg.args[toName] !== null;
+  const hasFromDefined = typeof arg.args[fromName] !== "undefined" && arg.args[fromName] !== null;
+
+  if (hasToDefined || hasFromDefined) {
+    const rule: any = {};
+    let unitToUse: string = null;
+    let unitToUse2: string = null;
+    if (hasFromDefined) {
+      const fromAsUnit: IPropertyDefinitionSupportedUnitType = arg.args[fromName] as any;
+      rule.gte = fromAsUnit.normalizedValue;
+      unitToUse = fromAsUnit.normalizedUnit;
+    }
+    if (hasToDefined) {
+      const toAsUnit: IPropertyDefinitionSupportedUnitType = arg.args[toName] as any;
+      rule.lte = toAsUnit.normalizedValue;
+      if (!unitToUse) {
+        unitToUse = toAsUnit.normalizedUnit;
+      } else {
+        unitToUse2 = toAsUnit.normalizedUnit;
+      }
+    }
+    arg.elasticQueryBuilder.mustRange({
+      [arg.prefix + arg.id + "_NORMALIZED_VALUE"]: rule,
+    });
+    arg.elasticQueryBuilder.mustTerm({
+      [arg.prefix + arg.id + "_NORMALIZED_UNIT"]: unitToUse,
+    });
+    // should fail this is weird
+    // two different units somehow, comparing grams to liters? or what
+    if (unitToUse2 && unitToUse !== unitToUse2) {
+      arg.elasticQueryBuilder.mustTerm({
+        [arg.prefix + arg.id + "_NORMALIZED_UNIT"]: unitToUse2,
+      });
+    }
     searchedByIt = true;
   }
 

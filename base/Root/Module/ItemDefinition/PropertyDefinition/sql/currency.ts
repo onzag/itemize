@@ -4,9 +4,9 @@
  * @module
  */
 
-import { ISQLArgInfo, ISQLInInfo, ISQLOutInfo, ISQLSearchInfo, ISQLOrderByInfo, ISQLBtreeIndexableInfo, ISQLMantenienceType, ISQLEqualInfo, ISQLSSCacheEqualInfo } from "../types";
+import { ISQLArgInfo, ISQLInInfo, ISQLOutInfo, ISQLSearchInfo, ISQLOrderByInfo, ISQLBtreeIndexableInfo, ISQLMantenienceType, ISQLEqualInfo, ISQLSSCacheEqualInfo, ISQLElasticSearchInfo } from "../types";
 import { IPropertyDefinitionSupportedCurrencyType } from "../types/currency";
-import { CURRENCY_FACTORS_IDENTIFIER } from "../../../../../../constants";
+import { CURRENCY_FACTORS_IDENTIFIER, ELASTIC_INDEXABLE_NULL_VALUE } from "../../../../../../constants";
 import { PropertyDefinitionSearchInterfacesPrefixes } from "../search-interfaces";
 import { IGQLArgs } from "../../../../../../gql-querier";
 
@@ -18,9 +18,9 @@ import { IGQLArgs } from "../../../../../../gql-querier";
 export function currencySQL(arg: ISQLArgInfo) {
   // there are 3 fields, value, currency and normalized value
   return {
-    [arg.prefix + arg.id + "_VALUE"]: {type: "NUMERIC"},
-    [arg.prefix + arg.id + "_CURRENCY"]: {type: "TEXT"},
-    [arg.prefix + arg.id + "_NORMALIZED_VALUE"]: {type: "NUMERIC"},
+    [arg.prefix + arg.id + "_VALUE"]: { type: "NUMERIC" },
+    [arg.prefix + arg.id + "_CURRENCY"]: { type: "TEXT" },
+    [arg.prefix + arg.id + "_NORMALIZED_VALUE"]: { type: "NUMERIC" },
   };
 }
 
@@ -61,6 +61,19 @@ export function currencySQLIn(arg: ISQLInInfo) {
     [arg.prefix + arg.id + "_VALUE"]: value.value,
     [arg.prefix + arg.id + "_CURRENCY"]: value.currency,
     [arg.prefix + arg.id + "_NORMALIZED_VALUE"]: normalized,
+  };
+}
+
+/**
+ * The sql out function
+ * @param arg the argument out info
+ * @returns a property definition supported currency type (or null)
+ */
+ export function currencySQLElasticIn(arg: ISQLOutInfo) {
+  return {
+    [arg.prefix + arg.id + "_VALUE"]: arg.row[arg.prefix + arg.id + "_VALUE"],
+    [arg.prefix + arg.id + "_CURRENCY"]: arg.row[arg.prefix + arg.id + "_CURRENCY"],
+    [arg.prefix + arg.id + "_NORMALIZED_VALUE"]: arg.row[arg.prefix + arg.id + "_NORMALIZED_VALUE"]
   };
 }
 
@@ -128,10 +141,10 @@ export function currencySQLSearch(arg: ISQLSearchInfo) {
     arg.whereBuilder.andWhere((clause) => {
       clause
         .andWhereColumn(arg.prefix + arg.id + "_NORMALIZED_VALUE", ">=", normalized).orWhere((subclause) => {
-        subclause
-          .andWhereColumn(arg.prefix + arg.id + "_VALUE", ">=", fromArg.value)
-          .andWhereColumn(arg.prefix + arg.id + "_CURRENCY", fromArg.currency)
-      })
+          subclause
+            .andWhereColumn(arg.prefix + arg.id + "_VALUE", ">=", fromArg.value)
+            .andWhereColumn(arg.prefix + arg.id + "_CURRENCY", fromArg.currency)
+        })
     });
     searchedByIt = true;
   }
@@ -144,15 +157,117 @@ export function currencySQLSearch(arg: ISQLSearchInfo) {
     arg.whereBuilder.andWhere((clause) => {
       clause
         .andWhereColumn(arg.prefix + arg.id + "_NORMALIZED_VALUE", "<=", normalized).orWhere((subclause) => {
-        subclause
-          .andWhereColumn(arg.prefix + arg.id + "_VALUE", "<=", toArg.value)
-          .andWhereColumn(arg.prefix + arg.id + "_CURRENCY", toArg.currency)
-      })
+          subclause
+            .andWhereColumn(arg.prefix + arg.id + "_VALUE", "<=", toArg.value)
+            .andWhereColumn(arg.prefix + arg.id + "_CURRENCY", toArg.currency)
+        })
     });
     searchedByIt = true;
   }
 
   // now we return if we have been searched by it at the end
+  return searchedByIt;
+}
+
+export function currencyElasticSearch(arg: ISQLElasticSearchInfo) {
+  const fromName = PropertyDefinitionSearchInterfacesPrefixes.FROM + arg.prefix + arg.id;
+  const toName = PropertyDefinitionSearchInterfacesPrefixes.TO + arg.prefix + arg.id;
+  const exactName = PropertyDefinitionSearchInterfacesPrefixes.EXACT + arg.prefix + arg.id;
+  let searchedByIt: boolean = false;
+
+  if (typeof arg.args[exactName] !== "undefined" && arg.args[exactName] !== null) {
+    const exactArg = arg.args[exactName] as IGQLArgs;
+    arg.elasticQueryBuilder.mustMatch({
+      [arg.prefix + arg.id + "_CURRENCY"]: exactArg.currency as string,
+      [arg.prefix + arg.id + "_VALUE"]: exactArg.value as number,
+    });
+    searchedByIt = true;
+  } else if (arg.args[exactName] === null) {
+    arg.elasticQueryBuilder.mustMatch({
+      [arg.prefix + arg.id + "_VALUE"]: ELASTIC_INDEXABLE_NULL_VALUE,
+    });
+    searchedByIt = true;
+  }
+
+  const hasToDefined = typeof arg.args[toName] !== "undefined" && arg.args[toName] !== null;
+  const hasFromDefined = typeof arg.args[fromName] !== "undefined" && arg.args[fromName] !== null;
+
+  if (hasToDefined || hasFromDefined) {
+    const rule: any = {};
+    if (hasFromDefined) {
+      const fromArg = arg.args[fromName] as any as IPropertyDefinitionSupportedCurrencyType;
+      const factor: number = arg.serverData[CURRENCY_FACTORS_IDENTIFIER][fromArg.currency];
+
+      // in these cases we use the normalized values and for that we use the conversion
+      const normalized = factor ? factor * fromArg.value : null;
+
+      arg.elasticQueryBuilder.must({
+        bool: {
+          should: [
+            {
+              range: {
+                [arg.prefix + arg.id + "_NORMALIZED_VALUE"]: {
+                  gte: normalized,
+                }
+              },
+              bool: {
+                must: [
+                  {
+                    range: {
+                      [arg.prefix + arg.id + "_VALUE"]: {
+                        gte: fromArg.value
+                      },
+                    },
+                    match: {
+                      [arg.prefix + arg.id + "_CURRENCY"]: fromArg.currency,
+                    }
+                  }
+                ]
+              }
+            }
+          ]
+        }
+      });
+    }
+    if (hasToDefined) {
+      const toArg = arg.args[toName] as any as IPropertyDefinitionSupportedCurrencyType;
+      const factor: number = arg.serverData[CURRENCY_FACTORS_IDENTIFIER][toArg.currency];
+
+      // in these cases we use the normalized values and for that we use the conversion
+      const normalized = factor ? factor * toArg.value : null;
+
+      arg.elasticQueryBuilder.must({
+        bool: {
+          should: [
+            {
+              range: {
+                [arg.prefix + arg.id + "_NORMALIZED_VALUE"]: {
+                  lte: normalized,
+                }
+              },
+              bool: {
+                must: [
+                  {
+                    range: {
+                      [arg.prefix + arg.id + "_VALUE"]: {
+                        lte: toArg.value
+                      },
+                    },
+                    match: {
+                      [arg.prefix + arg.id + "_CURRENCY"]: toArg.currency,
+                    }
+                  }
+                ]
+              }
+            }
+          ]
+        }
+      });
+    }
+
+    searchedByIt = true;
+  }
+
   return searchedByIt;
 }
 

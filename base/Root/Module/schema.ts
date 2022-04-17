@@ -42,13 +42,16 @@ export default {
     searchable: {
       type: "boolean",
     },
+    searchEngineEnabled: {
+      type: "boolean",
+    },
     maxSearchResults: {
       type: "number",
     },
     maxSearchRecords: {
       type: "number",
     },
-    requestLimiters: {
+    requestLimiters: {
       type: "object",
       properties: {
         condition: {

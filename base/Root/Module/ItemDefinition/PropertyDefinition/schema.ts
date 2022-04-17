@@ -60,10 +60,10 @@ export default {
     i18nData: {
       type: "object",
     },
-    type:  {
+    type: {
       type: "string",
     },
-    subtype: {
+    subtype: {
       type: "string",
     },
     unique: {
@@ -204,6 +204,18 @@ export default {
     },
     searchable: {
       type: "boolean",
+    },
+    searchBehaviour: {
+      type: "string",
+      enum: [
+        "PREFER_SEARCH_ENGINE",
+        "PREFER_DATABASE",
+        "USE_SEARCH_ENGINE",
+        "USE_DATABASE",
+      ],
+    },
+    searchEngineBoost: {
+      type: "number",
     },
     disableRangedSearch: {
       type: "boolean",

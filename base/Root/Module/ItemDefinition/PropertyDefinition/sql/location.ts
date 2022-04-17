@@ -5,8 +5,8 @@
  */
 
 import { ISQLArgInfo, ISQLInInfo, ISQLOutInfo, ISQLSearchInfo, ISQLOrderByInfo,
-  ISQLEqualInfo, ISQLSSCacheEqualInfo } from "../types";
-import { SQL_CONSTRAINT_PREFIX } from "../../../../../../constants";
+  ISQLEqualInfo, ISQLSSCacheEqualInfo, ISQLElasticSearchInfo } from "../types";
+import { ELASTIC_INDEXABLE_NULL_VALUE, SQL_CONSTRAINT_PREFIX } from "../../../../../../constants";
 import { PropertyDefinitionSearchInterfacesPrefixes } from "../search-interfaces";
 import { IPropertyDefinitionSupportedLocationType } from "../types/location";
 import { IPropertyDefinitionSupportedUnitType } from "../types/unit";
@@ -116,6 +116,19 @@ export function locationSQLOut(arg: ISQLOutInfo) {
   return result;
 }
 
+export function locationSQLElasticIn(arg: ISQLOutInfo) {
+  return {
+    [arg.prefix + arg.id + "_LAT"]: arg.row[arg.prefix + arg.id + "_LAT"],
+    [arg.prefix + arg.id + "_LNG"]: arg.row[arg.prefix + arg.id + "_LNG"],
+    [arg.prefix + arg.id + "_TXT"]: arg.row[arg.prefix + arg.id + "_TXT"],
+    [arg.prefix + arg.id + "_ATXT"]: arg.row[arg.prefix + arg.id + "_ATXT"],
+    [arg.prefix + arg.id + "_GEO"]: [
+      arg.row[arg.prefix + arg.id + "_LNG"],
+      arg.row[arg.prefix + arg.id + "_LAT"],
+    ]
+  }
+}
+
 /**
  * Provides the search functionality for the location type
  * @param arg the sql search info arg
@@ -160,6 +173,41 @@ export function locationSQLSearch(arg: ISQLSearchInfo): boolean | [string, any[]
         ],
       ]
     }
+
+    return true;
+  }
+
+  return false;
+}
+
+export function locationElasticSearch(arg: ISQLElasticSearchInfo): boolean {
+  const radiusName = PropertyDefinitionSearchInterfacesPrefixes.RADIUS + arg.prefix + arg.id;
+  const locationName = PropertyDefinitionSearchInterfacesPrefixes.LOCATION + arg.prefix + arg.id;
+
+  if (arg.args[locationName] === null) {
+    arg.elasticQueryBuilder.mustTerm({
+      [arg.prefix + arg.id + "_GEO"]: ELASTIC_INDEXABLE_NULL_VALUE,
+    });
+    return true;
+  } else if (
+    typeof arg.args[locationName] !== "undefined" && arg.args[locationName] !== null &&
+    typeof arg.args[radiusName] !== "undefined" && arg.args[radiusName] !== null
+  ) {
+    const argAsLocation: IPropertyDefinitionSupportedLocationType = arg.args[locationName] as any;
+    const lng = argAsLocation.lng || 0;
+    const lat = argAsLocation.lat || 0;
+    const argAsUnit: IPropertyDefinitionSupportedUnitType = arg.args[radiusName] as any;
+    const distance = (argAsUnit.normalizedValue || 0) * 1000;
+
+    arg.elasticQueryBuilder.filter({
+      geo_distance: {
+        distance: distance + "m",
+        [arg.prefix + arg.id + "_GEO"]: [
+          lng,
+          lat,
+        ],
+      }
+    });
 
     return true;
   }

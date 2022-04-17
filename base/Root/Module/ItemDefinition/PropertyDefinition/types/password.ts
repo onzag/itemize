@@ -9,7 +9,7 @@ import { GraphQLString } from "graphql";
 import { standardSQLOutFn, getStandardSQLFnFor, standardSQLSelect } from "../sql";
 import { PropertyInvalidReason } from "../../PropertyDefinition";
 import { MAX_STRING_LENGTH, CLASSIC_BASE_I18N, CLASSIC_OPTIONAL_I18N } from "../../../../../../constants";
-import { passwordSQLIn, passwordSQLEqual, passwordSQLSSEqual, passwordSQLSearch } from "../sql/password";
+import { passwordSQLIn, passwordSQLEqual, passwordSQLSSEqual, passwordSQLSearch, passwordSQLElasticIn } from "../sql/password";
 
 /**
  * A password type is described by a string
@@ -26,7 +26,10 @@ const typeValue: IPropertyDefinitionSupportedType<PropertyDefinitionSupportedPas
   sqlSelect: standardSQLSelect,
   sqlIn: passwordSQLIn,
   sqlOut: standardSQLOutFn,
+  sqlElasticIn: passwordSQLElasticIn,
   sqlSearch: passwordSQLSearch,
+  // not supported, it must be performed against the database
+  elasticSearch: null,
   sqlStrSearch: null,
   localStrSearch: null,
   sqlOrderBy: null,

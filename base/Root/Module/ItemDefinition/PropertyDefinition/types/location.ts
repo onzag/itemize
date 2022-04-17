@@ -10,7 +10,8 @@ import { PropertyInvalidReason } from "../../PropertyDefinition";
 import { CLASSIC_BASE_I18N, CLASSIC_OPTIONAL_I18N, LOCATION_SEARCH_I18N,
   CLASSIC_SEARCH_OPTIONAL_I18N, INCLUDE_PREFIX, SQL_CONSTRAINT_PREFIX } from "../../../../../../constants";
 import { PropertyDefinitionSearchInterfacesType, PropertyDefinitionSearchInterfacesPrefixes } from "../search-interfaces";
-import { locationSQL, locationSQLIn, locationSQLOut, locationSQLSearch, locationSQLOrderBy, locationSQLEqual, locationSQLSSCacheEqual, locationSQLBtreeIndexable, locationSQLSelect } from "../sql/location";
+import { locationSQL, locationSQLIn, locationSQLOut, locationSQLSearch, locationSQLOrderBy, locationSQLEqual, locationSQLSSCacheEqual,
+  locationSQLBtreeIndexable, locationSQLSelect, locationSQLElasticIn, locationElasticSearch } from "../sql/location";
 
 /**
  * The haversine formula extracted from stackoverflow
@@ -86,7 +87,9 @@ const typeValue: IPropertyDefinitionSupportedType<IPropertyDefinitionSupportedLo
   sqlSelect: locationSQLSelect,
   sqlIn: locationSQLIn,
   sqlOut: locationSQLOut,
+  sqlElasticIn: locationSQLElasticIn,
   sqlSearch: locationSQLSearch,
+  elasticSearch: locationElasticSearch,
   sqlStrSearch: null,
   localStrSearch: null,
   sqlMantenience: null,

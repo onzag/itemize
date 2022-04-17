@@ -7,7 +7,7 @@
 
 import {
   ISQLArgInfo, ISQLInInfo, ISQLOutInfo,
-  ISQLSearchInfo, ISQLEqualInfo, ISQLBtreeIndexableInfo, ISQLOrderByInfo
+  ISQLSearchInfo, ISQLEqualInfo, ISQLBtreeIndexableInfo, ISQLOrderByInfo, ISQLElasticSearchInfo
 } from "../types";
 import PropertyDefinition from "../../PropertyDefinition";
 import {
@@ -19,7 +19,7 @@ import ItemDefinition from "../..";
 import Include from "../../Include";
 import { processFileListFor, processSingleFileFor } from "./file-management";
 import { IGQLArgs, IGQLValue } from "../../../../../../gql-querier";
-import { SQL_CONSTRAINT_PREFIX } from "../../../../../../constants";
+import { ELASTIC_INDEXABLE_NULL_VALUE, SQL_CONSTRAINT_PREFIX } from "../../../../../../constants";
 import Module from "../../..";
 import StorageProvider from "../../../../../../server/services/base/StorageProvider";
 import { WhereBuilder } from "../../../../../../database/WhereBuilder";
@@ -121,7 +121,25 @@ export function stardardSQLInWithJSONStringifyFn(arg: ISQLInInfo): ISQLTableRowV
  * @returns the property value out
  */
 export function standardSQLOutFn(arg: ISQLOutInfo): any {
-  return arg.row[arg.prefix + arg.id];
+  const value = arg.row[arg.prefix + arg.id];
+  // just in case I can imagine an edge case with passwords
+  // where the password is in elastic where it is not stored
+  // and then the conversion is attempted into a search
+  // technically these values can be retrieved
+  // but that won't work with passwords
+  return typeof value === "undefined" ? null : value;
+}
+
+/**
+ * The standard sql elastic out that converts to the elastic
+ * stored form
+ * @param arg the out arg info
+ * @returns the property value out
+ */
+ export function standardSQLElasticInFn(arg: ISQLOutInfo): any {
+  return {
+    [arg.prefix + arg.id]: arg.row[arg.prefix + arg.id]
+  };
 }
 
 /**
@@ -168,6 +186,44 @@ export function standardSQLSearchFnExactAndRange(arg: ISQLSearchInfo) {
 
   if (typeof arg.args[toName] !== "undefined" && arg.args[toName] !== null) {
     arg.whereBuilder.andWhereColumn(arg.prefix + arg.id, "<=", arg.args[toName] as any);
+    searchedByIt = true;
+  }
+
+  return searchedByIt;
+}
+
+export function standardElasticSearchFnExactAndRange(arg: ISQLElasticSearchInfo) {
+  const fromName = PropertyDefinitionSearchInterfacesPrefixes.FROM + arg.prefix + arg.id;
+  const toName = PropertyDefinitionSearchInterfacesPrefixes.TO + arg.prefix + arg.id;
+  const exactName = PropertyDefinitionSearchInterfacesPrefixes.EXACT + arg.prefix + arg.id;
+  let searchedByIt: boolean = false;
+
+  if (typeof arg.args[exactName] !== "undefined" && arg.args[exactName] !== null) {
+    arg.elasticQueryBuilder.mustTerm({
+      [arg.prefix + arg.id]: arg.args[exactName] as any,
+    });
+    searchedByIt = true;
+  } else if (arg.args[exactName] === null) {
+    arg.elasticQueryBuilder.mustTerm({
+      [arg.prefix + arg.id]: ELASTIC_INDEXABLE_NULL_VALUE,
+    });
+    searchedByIt = true;
+  }
+
+  const hasToDefined = typeof arg.args[toName] !== "undefined" && arg.args[toName] !== null;
+  const hasFromDefined = typeof arg.args[fromName] !== "undefined" && arg.args[fromName] !== null;
+
+  if (hasToDefined || hasFromDefined) {
+    const rule: any = {};
+    if (hasFromDefined) {
+      rule.gte = arg.args[fromName];
+    }
+    if (hasToDefined) {
+      rule.lte = arg.args[toName];
+    }
+    arg.elasticQueryBuilder.mustRange({
+      [arg.prefix + arg.id]: rule,
+    });
     searchedByIt = true;
   }
 

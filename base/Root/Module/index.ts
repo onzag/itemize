@@ -182,6 +182,10 @@ export interface IModuleRawJSONDataType {
    */
   searchable?: boolean;
   /**
+   * Wether it is to be indexed by elastic
+   */
+  searchEngineEnabled?: boolean;
+  /**
    * the children either module or item definition as found during the folder
    * search
    */
@@ -848,6 +852,14 @@ export default class Module {
       return this.rawData.searchable;
     }
     return true;
+  }
+
+  /**
+   * Wether the item is search engine enabled
+   * @returns a boolean
+   */
+   public isSearchEngineEnabled() {
+    return !!this.rawData.searchEngineEnabled;
   }
 
   /**

@@ -13,6 +13,7 @@ import {
   getStandardSQLFnFor,
   standardSQLBtreeIndexable,
   standardSQLSelect,
+  standardSQLElasticInFn,
 } from "../sql";
 import {
   standardSQLSSCacheEqualFn, standardLocalEqual,
@@ -28,7 +29,7 @@ import {
 } from "../../../../../../constants";
 import { PropertyDefinitionSearchInterfacesType, PropertyDefinitionSearchInterfacesPrefixes } from "../search-interfaces";
 import { countries, currencies } from "../../../../../../imported-resources";
-import { stringSQL, stringSQLSearch, stringSQLStrSearch } from "../sql/string";
+import { stringElasticSearch, stringSQL, stringSQLSearch, stringSQLStrSearch } from "../sql/string";
 
 /**
  * The email regex that is used to validate emails
@@ -85,7 +86,9 @@ const typeValue: IPropertyDefinitionSupportedType<PropertyDefinitionSupportedStr
   sqlSelect: standardSQLSelect,
   sqlIn: standardSQLInFn,
   sqlOut: standardSQLOutFn,
+  sqlElasticIn: standardSQLElasticInFn,
   sqlSearch: stringSQLSearch,
+  elasticSearch: stringElasticSearch,
   sqlEqual: standardSQLEqualFn,
   sqlSSCacheEqual: standardSQLSSCacheEqualFn,
   sqlBtreeIndexable: standardSQLBtreeIndexable,

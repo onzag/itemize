@@ -97,6 +97,14 @@ export interface ISQLSearchInfo extends ISQLArgInfo {
   isOrderedByIt: boolean;
 }
 
+export interface ISQLElasticSearchInfo extends ISQLArgInfo {
+  language: string;
+  dictionary: string;
+  elasticQueryBuilder: any;
+  args: IGQLArgs;
+  isOrderedByIt: boolean;
+}
+
 export interface ISQLStrSearchInfo extends ISQLArgInfo {
   language: string;
   dictionary: string;
@@ -136,12 +144,12 @@ export interface ILocalStrSearchInfo extends IArgInfo {
   gqlValue: IGQLValue;
 }
 
-export interface ILocalEqualInfo<T> extends IArgInfo {
+export interface ILocalEqualInfo<T> extends IArgInfo {
   a: T;
   b: T;
 }
 
-export interface ILocalOrderByInfo<T> extends IArgInfo {
+export interface ILocalOrderByInfo<T> extends IArgInfo {
   direction: "asc" | "desc";
   nulls: "first" | "last";
   a: T;
@@ -238,6 +246,11 @@ export interface IPropertyDefinitionSupportedType<T> {
    */
   sqlOut: (arg: ISQLOutInfo) => T;
   /**
+   * Defines how data is to be stored in elasticsearch
+   * similar to sql in in how it works
+   */
+  sqlElasticIn: (arg: ISQLOutInfo) => ISQLTableRowValue;
+  /**
    * Represents a search for an item
    * data is the graphql value obtained from the search query mode item definition
    * sqlPrefix is a prefix that everything is prefixed in sql, usually for the item
@@ -249,6 +262,10 @@ export interface IPropertyDefinitionSupportedType<T> {
    * to the selection, these represent arguments for a raw select query
    */
   sqlSearch: (arg: ISQLSearchInfo) => boolean | [string, any[]];
+  /**
+   * Defines how to perform elastic search into the property
+   */
+  elasticSearch: (arg: ISQLElasticSearchInfo) => boolean;
   /**
    * Represents a search for an item when the only input has been a string, make it null
    * to avoid supporting it

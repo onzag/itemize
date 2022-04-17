@@ -1,8 +1,9 @@
+import { ELASTIC_INDEXABLE_NULL_VALUE } from "../../../../../../constants";
 import {
   ISQLTableRowValue,
 } from "../../../../sql";
 import { PropertyDefinitionSearchInterfacesPrefixes } from "../search-interfaces";
-import { ISQLEqualInfo, ISQLInInfo, ISQLSearchInfo, ISQLSSCacheEqualInfo } from "../types";
+import { ISQLElasticSearchInfo, ISQLEqualInfo, ISQLInInfo, ISQLSearchInfo, ISQLSSCacheEqualInfo } from "../types";
 
 /**
  * The standard sql in function that specifies how a property inputs its value
@@ -51,6 +52,33 @@ export function taglistSQLIn(arg: ISQLInInfo): ISQLTableRowValue {
     return true;
   } else if (arg.args[searchName] === null) {
     arg.whereBuilder.andWhereColumnNull(arg.prefix + arg.id);
+    return true;
+  }
+
+  return false;
+}
+
+export function tagListElasticSearch(arg: ISQLElasticSearchInfo): boolean {
+  // first we analyze and get the search name
+  const searchName = PropertyDefinitionSearchInterfacesPrefixes.SEARCH + arg.prefix + arg.id;
+
+  // now we see if we have an argument for it
+  if (typeof arg.args[searchName] !== "undefined" && arg.args[searchName] !== null) {
+    const tagCompareCheck = arg.args[searchName] as string[];
+
+    // and we check it... we are using the includes containment
+    // where we ensure that all the provided tags are included
+    // into this search
+    arg.elasticQueryBuilder.mustTerms({
+      [arg.prefix + arg.id]: tagCompareCheck,
+      minimum_should_match : tagCompareCheck.length,
+    });
+
+    return true;
+  } else if (arg.args[searchName] === null) {
+    arg.elasticQueryBuilder.mustTerm({
+      [arg.prefix + arg.id]: ELASTIC_INDEXABLE_NULL_VALUE,
+    });
     return true;
   }
 

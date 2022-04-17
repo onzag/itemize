@@ -8,7 +8,7 @@ import {
   IPropertyDefinitionSupportedType,
 } from "../types";
 import { GraphQLString } from "graphql";
-import { standardSQLOutFn, standardSQLEqualFn, standardSQLSelect } from "../sql";
+import { standardSQLOutFn, standardSQLEqualFn, standardSQLSelect, standardSQLElasticInFn } from "../sql";
 import {
   standardSQLSSCacheEqualFn, standardLocalEqual,
 } from "../local-sql";
@@ -22,7 +22,7 @@ import {
 } from "../../../../../../constants";
 import { PropertyDefinitionSearchInterfacesPrefixes, PropertyDefinitionSearchInterfacesType } from "../search-interfaces";
 import { textSQL, textSQLIn, textSqlRedoDictionaryIndex, textSQLSearch,
-  textSQLStrSearch, textSQLBtreeIndexable, textSQLOrderBy } from "../sql/text";
+  textSQLStrSearch, textSQLBtreeIndexable, textSQLOrderBy, textElasticSearch } from "../sql/text";
 
 /**
  * The text is described by a string
@@ -125,7 +125,9 @@ const typeValue: IPropertyDefinitionSupportedType<PropertyDefinitionSupportedTex
   sqlIn: textSQLIn,
   sqlRedoDictionaryIndex: textSqlRedoDictionaryIndex,
   sqlOut: standardSQLOutFn,
+  sqlElasticIn: standardSQLElasticInFn,
   sqlSearch: textSQLSearch,
+  elasticSearch: textElasticSearch,
   sqlStrSearch: textSQLStrSearch,
   sqlBtreeIndexable: textSQLBtreeIndexable,
   sqlMantenience: null,

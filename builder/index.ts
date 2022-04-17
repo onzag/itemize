@@ -87,6 +87,7 @@ interface IFileModuleDataRawUntreatedJSONDataType {
   searchRoleAccess?: string[];
   readRoleAccess?: string[];
   searchable?: boolean;
+  searchEngineEnabled?: boolean;
   maxSearchResults?: number;
   maxSearchRecords?: number;
   requestLimiters?: IRequestLimitersType;
@@ -121,6 +122,7 @@ export interface IFileItemDefinitionUntreatedRawJSONDataType {
   ownerIsObjectId?: boolean;
   ownerReadRoleAccess?: string[];
   searchable?: boolean;
+  searchEngineEnabled?: boolean;
   versioningRoleAccess?: string[];
   enableVersioning?: boolean;
   versionIsLanguageAndCountry?: boolean;
@@ -531,6 +533,10 @@ async function buildModule(
     finalValue.searchable = actualEvaledFileData.searchable;
   }
 
+  if (typeof actualEvaledFileData.searchEngineEnabled !== "undefined") {
+    finalValue.searchEngineEnabled = actualEvaledFileData.searchEngineEnabled;
+  }
+
   // we add the propExtensions if necessary
   if (propExtensions) {
     finalValue.propExtensions = propExtensions;
@@ -654,6 +660,10 @@ async function buildItemDefinition(
 
   if (typeof actualEvaledFileData.searchable !== "undefined") {
     finalValue.searchable = actualEvaledFileData.searchable;
+  }
+
+  if (typeof actualEvaledFileData.searchEngineEnabled !== "undefined") {
+    finalValue.searchEngineEnabled = actualEvaledFileData.searchEngineEnabled;
   }
 
   if (actualEvaledFileData.readRoleAccess) {

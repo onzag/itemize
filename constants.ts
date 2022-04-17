@@ -1349,6 +1349,11 @@ export const UNIT_SUBTYPES = [
 ];
 
 /**
+ * The value for the indexable null value
+ */
+export const ELASTIC_INDEXABLE_NULL_VALUE = "";
+
+/**
  * When an owner is not specified, this is the value it holds
  * null is the user value of &GUEST hence it should not hold
  * the same value

@@ -247,6 +247,11 @@ export interface IItemDefinitionRawJSONDataType {
   searchable?: boolean;
 
   /**
+   * Used to specify if the elastic search engine is enabled for this element
+   */
+  searchEngineEnabled?: boolean;
+
+  /**
    * Whether an user role can create in behalf
    */
   canCreateInBehalf?: boolean;
@@ -2909,6 +2914,14 @@ export default class ItemDefinition {
       return this.rawData.searchable;
     }
     return true;
+  }
+
+  /**
+   * Wether the item is search engine enabled
+   * @returns a boolean
+   */
+  public isSearchEngineEnabled() {
+    return !!this.rawData.searchEngineEnabled;
   }
 
   /**
