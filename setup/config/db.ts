@@ -55,6 +55,38 @@ export async function dbConfigSetup(
         message: "The database name to use",
         defaultValue: packageJSON.name,
       },
+      {
+        variableName: "dictionaries",
+        type: "strobject",
+        message: "Now you need to specify the dictionaries, the dictionaries use simple ISO codes without regions; " +
+        "these are used for full text search, and you should have all languages you aim to support FTS. " +
+        "You may not want to modify this, this is the default for a standard postgreSQL installation",
+        defaultValue: {
+          "*": "simple",
+          "ar": "arabic",
+          "da": "danish",
+          "nl": "dutch",
+          "en": "english",
+          "fi": "finnish",
+          "fr": "french",
+          "de": "german",
+          "el": "greek",
+          "hu": "hungarian",
+          "id": "indonesian",
+          "ir": "irish",
+          "it": "italian",
+          "li": "lithuanian",
+          "ne": "nepali",
+          "no": "norwegian",
+          "pt": "portuguese",
+          "ro": "romanian",
+          "ru": "russian",
+          "es": "spanish",
+          "se": "swedish",
+          "ta": "tamil",
+          "tu": "turkish",
+        },
+      },
     ],
   );
 

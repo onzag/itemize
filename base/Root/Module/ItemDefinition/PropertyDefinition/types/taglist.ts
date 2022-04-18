@@ -13,6 +13,7 @@ import {
   getStandardSQLFnFor,
   standardSQLSelect,
   standardSQLElasticInFn,
+  getStandardElasticFor,
 } from "../sql";
 import { PropertyInvalidReason, IPropertyDefinitionRawJSONDataType } from "../../PropertyDefinition";
 import {
@@ -45,6 +46,7 @@ const typeValue: IPropertyDefinitionSupportedType<PropertyDefinitionSupportedTag
       level: 0,
     }
   }),
+  elastic: getStandardElasticFor && getStandardElasticFor("keyword"),
   sqlSelect: standardSQLSelect,
   sqlIn: taglistSQLIn,
   sqlOut: standardSQLOutFn,

@@ -526,7 +526,7 @@ export function checkLanguage(appData: IAppDataType, args: any) {
   // now we check if this is one of the languages we have
   // a dictionary assigned, only languages with a dictionary
   // assigned can be used by the database
-  if (!appData.config.dictionaries[args.language] && !appData.config.dictionaries["*"]) {
+  if (!appData.databaseConfig.dictionaries[args.language] && !appData.databaseConfig.dictionaries["*"]) {
     throw new EndpointError({
       message: "This language is not supported, as no dictionary has been set",
       code: ENDPOINT_ERRORS.UNSPECIFIED,
@@ -578,7 +578,7 @@ export function checkUserCanSearch(args: any, moduleOrIdef: Module | ItemDefinit
  * @param args the whole args of the graphql request
  */
 export function getDictionary(appData: IAppDataType, args: any): string {
-  const dictionary = appData.config.dictionaries[args.language] || appData.config.dictionaries["*"];
+  const dictionary = appData.databaseConfig.dictionaries[args.language] || appData.databaseConfig.dictionaries["*"];
   CAN_LOG_SILLY && logger.silly(
     "getDictionary: got dictionary " + dictionary,
   );

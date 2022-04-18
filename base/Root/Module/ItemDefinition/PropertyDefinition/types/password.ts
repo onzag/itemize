@@ -23,6 +23,8 @@ const typeValue: IPropertyDefinitionSupportedType<PropertyDefinitionSupportedPas
   gql: GraphQLString,
   nullableDefault: "",
   sql: getStandardSQLFnFor && getStandardSQLFnFor("TEXT", "pgcrypto"),
+  // not stored at all does not create an index
+  elastic: null,
   sqlSelect: standardSQLSelect,
   sqlIn: passwordSQLIn,
   sqlOut: standardSQLOutFn,

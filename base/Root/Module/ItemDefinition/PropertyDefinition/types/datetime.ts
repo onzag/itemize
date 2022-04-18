@@ -17,6 +17,7 @@ import {
   standardSQLSelect,
   standardElasticSearchFnExactAndRange,
   standardSQLElasticInFn,
+  getStandardElasticFor,
 } from "../sql";
 import {
   standardSQLSSCacheEqualFn, standardLocalEqual,
@@ -49,6 +50,7 @@ const typeValue: IPropertyDefinitionSupportedType<PropertyDefinitionSupportedDat
   searchable: true,
   searchInterface: PropertyDefinitionSearchInterfacesType.EXACT_AND_RANGE,
   sql: getStandardSQLFnFor && getStandardSQLFnFor("TIMESTAMPTZ"),
+  elastic: getStandardElasticFor && getStandardElasticFor("date", DATETIME_FORMAT),
   sqlSelect: standardSQLSelect,
   sqlIn: standardSQLInFn,
   sqlOut: standardSQLOutFn,

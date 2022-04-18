@@ -23,7 +23,7 @@ import {
 } from "../../../../../../constants";
 import { PropertyInvalidReason } from "../../PropertyDefinition";
 import { PropertyDefinitionSearchInterfacesPrefixes, PropertyDefinitionSearchInterfacesType } from "../search-interfaces";
-import { unitSQL, unitSQLIn, unitSQLOrderBy, unitSQLOut, unitSQLSearch, unitSQLEqual, unitSQLSSCacheEqual, unitSQLBtreeIndexable, unitSQLSelect, unitSQLElasticIn, unitElasticSearch } from "../sql/unit";
+import { unitSQL, unitSQLIn, unitSQLOrderBy, unitSQLOut, unitSQLSearch, unitSQLEqual, unitSQLSSCacheEqual, unitSQLBtreeIndexable, unitSQLSelect, unitSQLElasticIn, unitElasticSearch, unitElastic } from "../sql/unit";
 
 /**
  * Units are described by a value and a unit, in either SI
@@ -57,6 +57,7 @@ const typeValue: IPropertyDefinitionSupportedType<IPropertyDefinitionSupportedUn
     },
   },
   sql: unitSQL,
+  elastic: unitElastic,
   sqlIn: unitSQLIn,
   sqlSelect: unitSQLSelect,
   sqlOut: unitSQLOut,

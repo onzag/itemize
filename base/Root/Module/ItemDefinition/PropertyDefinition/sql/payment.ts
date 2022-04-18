@@ -4,7 +4,7 @@
  * @module
  */
 
-import { ISQLArgInfo, ISQLInInfo, ISQLOutInfo, ISQLSearchInfo, ISQLBtreeIndexableInfo, ISQLEqualInfo, ISQLSSCacheEqualInfo, ISQLSideEffectType, ISQLElasticSearchInfo } from "../types";
+import { ISQLArgInfo, ISQLInInfo, ISQLOutInfo, ISQLSearchInfo, ISQLBtreeIndexableInfo, ISQLEqualInfo, ISQLSSCacheEqualInfo, ISQLSideEffectType, IElasticSearchInfo, IArgInfo } from "../types";
 import { IPropertyDefinitionSupportedPaymentType, PaymentStatusType } from "../types/payment";
 import { PropertyDefinitionSearchInterfacesPrefixes } from "../search-interfaces";
 import { IPropertyDefinitionSupportedCurrencyType } from "../types/currency";
@@ -36,6 +36,32 @@ export function paymentSQL(arg: ISQLArgInfo) {
     [arg.prefix + arg.id + "_METADATA"]: { type: "TEXT" },
     [arg.prefix + arg.id + "_RO_METADATA"]: { type: "TEXT" },
     [arg.prefix + arg.id + "_HIDDEN_METADATA"]: { type: "TEXT" },
+  };
+}
+
+export function paymentElastic(arg: IArgInfo) {
+  return {
+    [arg.prefix + arg.id + "_TYPE"]: {
+      type: "keyword",
+    },
+    [arg.prefix + arg.id + "_AMOUNT"]: {
+      type: "float",
+      null_value: ELASTIC_INDEXABLE_NULL_VALUE,
+    },
+    [arg.prefix + arg.id + "_CURRENCY"]: {
+      type: "keyword",
+    },
+    [arg.prefix + arg.id + "_STATUS"]: {
+      type: "keyword",
+    },
+    [arg.prefix + arg.id + "_METADATA"]: {
+      type: "keyword",
+      enabled: false,
+    },
+    [arg.prefix + arg.id + "_RO_METADATA"]: {
+      type: "keyword",
+      enabled: false,
+    },
   };
 }
 
@@ -196,7 +222,7 @@ export function paymentSQLSearch(arg: ISQLSearchInfo) {
  * @param arg the argument search info
  * @returns a boolean on whether it's searched by it or not
  */
- export function paymentElasticSearch(arg: ISQLElasticSearchInfo) {
+ export function paymentElasticSearch(arg: IElasticSearchInfo) {
   const argPrefixPlusId = arg.prefix + arg.id;
 
   // first we need to get the arguments

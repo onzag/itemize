@@ -5,7 +5,7 @@
  */
 
 import { ISQLArgInfo, ISQLInInfo, ISQLOutInfo, ISQLSearchInfo, ISQLOrderByInfo, ISQLBtreeIndexableInfo,
-  ISQLEqualInfo, ISQLSSCacheEqualInfo, ISQLElasticSearchInfo } from "../types";
+  ISQLEqualInfo, ISQLSSCacheEqualInfo, IElasticSearchInfo, IArgInfo } from "../types";
 import { IPropertyDefinitionSupportedUnitType } from "../types/unit";
 import { PropertyDefinitionSearchInterfacesPrefixes } from "../search-interfaces";
 import { ELASTIC_INDEXABLE_NULL_VALUE } from "../../../../../../constants";
@@ -28,6 +28,26 @@ export function unitSQL(arg: ISQLArgInfo) {
     },
     [arg.prefix + arg.id + "_NORMALIZED_UNIT"]: {
       type: "TEXT",
+    },
+  };
+}
+
+export function unitElastic(arg: IArgInfo) {
+  return {
+    [arg.prefix + arg.id + "_VALUE"]: {
+      type: "float",
+      enabled: false,
+    },
+    [arg.prefix + arg.id + "_UNIT"]: {
+      type: "keyword",
+      enabled: false,
+    },
+    [arg.prefix + arg.id + "_NORMALIZED_VALUE"]: {
+      type: "float",
+      null_value: ELASTIC_INDEXABLE_NULL_VALUE,
+    },
+    [arg.prefix + arg.id + "_NORMALIZED_UNIT"]: {
+      type: "keyword",
     },
   };
 }
@@ -143,7 +163,7 @@ export function unitSQLSearch(arg: ISQLSearchInfo) {
  * @param arg the search info arg
  * @returns a boolean on whether it was searched by it
  */
- export function unitElasticSearch(arg: ISQLElasticSearchInfo) {
+ export function unitElasticSearch(arg: IElasticSearchInfo) {
   const fromName = PropertyDefinitionSearchInterfacesPrefixes.FROM + arg.prefix + arg.id;
   const toName = PropertyDefinitionSearchInterfacesPrefixes.TO + arg.prefix + arg.id;
   const exactName = PropertyDefinitionSearchInterfacesPrefixes.EXACT + arg.prefix + arg.id;

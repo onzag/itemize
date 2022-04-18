@@ -55,6 +55,7 @@ const typeValue: IPropertyDefinitionSupportedType<IPropertyDefinitionSupportedCu
   // from the sql file to save space as they are not
   // used in the client side
   sql: currencySQL,
+  elastic: currencyElastic,
   sqlSelect: currencySQLSelect,
   sqlIn: currencySQLIn,
   sqlOut: currencySQLOut,

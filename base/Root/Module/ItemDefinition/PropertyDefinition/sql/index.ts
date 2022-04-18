@@ -7,7 +7,7 @@
 
 import {
   ISQLArgInfo, ISQLInInfo, ISQLOutInfo,
-  ISQLSearchInfo, ISQLEqualInfo, ISQLBtreeIndexableInfo, ISQLOrderByInfo, ISQLElasticSearchInfo
+  ISQLSearchInfo, ISQLEqualInfo, ISQLBtreeIndexableInfo, ISQLOrderByInfo, IElasticSearchInfo, IArgInfo
 } from "../types";
 import PropertyDefinition from "../../PropertyDefinition";
 import {
@@ -59,6 +59,29 @@ export function getStandardSQLFnFor(
       },
     }
   };
+}
+
+export function getStandardElasticFor(
+  type: string,
+  format?: string,
+  disabled?: boolean,
+): (arg: IArgInfo) => any {
+  return (arg: IArgInfo) => {
+    const value: any = {
+      // the type is defined
+      type,
+      null_value: ELASTIC_INDEXABLE_NULL_VALUE,
+    };
+    if (format) {
+      value.format = format;
+    }
+    if (disabled) {
+      value.enabled = false;
+    }
+    return {
+      [arg.prefix + arg.id]: value,
+    }
+  }
 }
 
 /**
@@ -136,7 +159,7 @@ export function standardSQLOutFn(arg: ISQLOutInfo): any {
  * @param arg the out arg info
  * @returns the property value out
  */
- export function standardSQLElasticInFn(arg: ISQLOutInfo): any {
+export function standardSQLElasticInFn(arg: ISQLOutInfo): any {
   return {
     [arg.prefix + arg.id]: arg.row[arg.prefix + arg.id]
   };
@@ -192,7 +215,7 @@ export function standardSQLSearchFnExactAndRange(arg: ISQLSearchInfo) {
   return searchedByIt;
 }
 
-export function standardElasticSearchFnExactAndRange(arg: ISQLElasticSearchInfo) {
+export function standardElasticSearchFnExactAndRange(arg: IElasticSearchInfo) {
   const fromName = PropertyDefinitionSearchInterfacesPrefixes.FROM + arg.prefix + arg.id;
   const toName = PropertyDefinitionSearchInterfacesPrefixes.TO + arg.prefix + arg.id;
   const exactName = PropertyDefinitionSearchInterfacesPrefixes.EXACT + arg.prefix + arg.id;

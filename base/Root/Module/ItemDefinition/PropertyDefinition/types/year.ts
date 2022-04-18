@@ -17,6 +17,7 @@ import {
   standardSQLSelect,
   standardElasticSearchFnExactAndRange,
   standardSQLElasticInFn,
+  getStandardElasticFor,
 } from "../sql";
 import {
   standardSQLSSCacheEqualFn, standardLocalEqual,
@@ -48,6 +49,7 @@ const typeValue: IPropertyDefinitionSupportedType<PropertyDefinitionSupportedYea
   // years can be set as a number
   json: "number",
   sql: getStandardSQLFnFor && getStandardSQLFnFor("SMALLINT"),
+  elastic: getStandardElasticFor && getStandardElasticFor("short"),
   sqlSelect: standardSQLSelect,
   sqlIn: standardSQLInFn,
   sqlOut: standardSQLOutFn,

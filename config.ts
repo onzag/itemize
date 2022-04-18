@@ -55,13 +55,6 @@ export interface IConfigRawJSONDataType {
    */
   rtlLanguages: string[];
   /**
-   * The dictionaries assigned to the given supported languages
-   * you might specify only unregionalized versions, eg instead of en-GB en-US only en for english
-   */
-  dictionaries: {
-    [key: string]: string,
-  };
-  /**
    * The supported user roles
    * ADMIN is an expected role for this
    */
@@ -317,6 +310,13 @@ export interface IDBConfigRawJSONDataType {
   user: string;
   password: string;
   database: string;
+  /**
+   * The dictionaries assigned to the given supported languages
+   * you might specify only unregionalized versions, eg instead of en-GB en-US only en for english
+   */
+  dictionaries: {
+    [key: string]: string,
+  };
 }
 
 /**
@@ -599,12 +599,6 @@ export const rawConfigSchema = {
         type: "string",
       },
     },
-    dictionaries: {
-      type: "object",
-      additionalProperties: {
-        type: "string",
-      },
-    },
     roles: {
       type: "array",
       items: {
@@ -700,7 +694,6 @@ export const rawConfigSchema = {
     "appName",
     "supportedLanguages",
     "rtlLanguages",
-    "dictionaries",
     "roles",
     "fontUrl",
     "cacheableExtHostnames",
@@ -737,6 +730,12 @@ export const rawDBConfigSchema = {
     password: {
       type: "string",
     },
+    dictionaries: {
+      type: "object",
+      additionalProperties: {
+        type: "string",
+      },
+    },
   },
   additionalProperties: false,
   required: [
@@ -745,6 +744,7 @@ export const rawDBConfigSchema = {
     "user",
     "database",
     "password",
+    "dictionaries",
   ],
 };
 

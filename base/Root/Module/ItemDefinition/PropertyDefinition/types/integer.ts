@@ -17,6 +17,7 @@ import {
   standardSQLSelect,
   standardElasticSearchFnExactAndRange,
   standardSQLElasticInFn,
+  getStandardElasticFor,
 } from "../sql";
 import {
   standardSQLSSCacheEqualFn, standardLocalEqual,
@@ -47,6 +48,7 @@ const typeValue: IPropertyDefinitionSupportedType<PropertyDefinitionSupportedInt
   json: "number",
   gql: GraphQLInt,
   sql: getStandardSQLFnFor && getStandardSQLFnFor("INTEGER"),
+  elastic: getStandardElasticFor && getStandardElasticFor("long"),
   sqlSelect: standardSQLSelect,
   sqlIn: standardSQLInFn,
   sqlOut: standardSQLOutFn,

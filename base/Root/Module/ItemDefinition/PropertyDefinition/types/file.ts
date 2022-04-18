@@ -5,7 +5,7 @@
  */
 
 import { IPropertyDefinitionSupportedType } from "../types";
-import { getStandardSQLFnFor, stardardSQLInWithJSONStringifyFn, standardSQLOutWithJSONParseFn, standardSQLSelect, standardSQLElasticInFn } from "../sql";
+import { getStandardSQLFnFor, stardardSQLInWithJSONStringifyFn, standardSQLOutWithJSONParseFn, standardSQLSelect, standardSQLElasticInFn, getStandardElasticFor } from "../sql";
 import { CLASSIC_BASE_I18N, CLASSIC_OPTIONAL_I18N } from "../../../../../../constants";
 import { IGQLFile } from "../../../../../../gql-querier";
 import { standardLocalEqual } from "../local-sql";
@@ -49,6 +49,7 @@ const typeValue: IPropertyDefinitionSupportedType<PropertyDefinitionSupportedFil
     },
   ],
   sql: getStandardSQLFnFor && getStandardSQLFnFor("TEXT"),
+  elastic: getStandardElasticFor && getStandardElasticFor("keyword", null, true),
   sqlSelect: standardSQLSelect,
   sqlIn: stardardSQLInWithJSONStringifyFn,
   sqlOut: standardSQLOutWithJSONParseFn,

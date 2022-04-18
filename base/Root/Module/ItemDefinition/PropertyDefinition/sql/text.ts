@@ -4,7 +4,7 @@
  * @module
  */
 
-import { ISQLArgInfo, ISQLInInfo, ISQLSearchInfo, ISQLOrderByInfo, ISQLStrSearchInfo, ISQLRedoDictionaryBasedIndex, ISQLElasticSearchInfo } from "../types";
+import { ISQLArgInfo, ISQLInInfo, ISQLSearchInfo, ISQLOrderByInfo, ISQLStrSearchInfo, ISQLRedoDictionaryBasedIndex, IElasticSearchInfo, IArgInfo, ISQLOutInfo } from "../types";
 import { PropertyDefinitionSearchInterfacesPrefixes } from "../search-interfaces";
 import { DOMWindow, DOMPurify } from "../../../../../../util";
 import { ELASTIC_INDEXABLE_NULL_VALUE } from "../../../../../../constants";
@@ -37,6 +37,33 @@ export function textSQL(arg: ISQLArgInfo) {
       },
     },
   };
+}
+
+export function textElastic(arg: IArgInfo) {
+  const isRichText = arg.property.isRichText();
+
+  if (isRichText) {
+    return {
+      [arg.prefix + arg.id]: {
+        type: "text",
+        enabled: isRichText ? false : true,
+        null_value: ELASTIC_INDEXABLE_NULL_VALUE,
+      },
+      [arg.prefix + arg.id + "_PLAIN"]: {
+        type: "text",
+        enabled: isRichText ? true : false,
+        null_value: ELASTIC_INDEXABLE_NULL_VALUE,
+      }
+    }
+  } else {
+    return {
+      [arg.prefix + arg.id]: {
+        type: "text",
+        enabled: isRichText ? false : true,
+        null_value: ELASTIC_INDEXABLE_NULL_VALUE,
+      },
+    }
+  }
 }
 
 function fakeInnerText(ele: Node): string {
@@ -176,24 +203,39 @@ export function textSQLSearch(arg: ISQLSearchInfo): boolean | [string, any[]] {
  * @param arg the sql search arg info
  * @returns a boolean on whether it was searched by it, and a complementary column order by in case it needs it
  */
- export function textElasticSearch(arg: ISQLElasticSearchInfo): boolean {
+ export function textElasticSearch(arg: IElasticSearchInfo): boolean {
   const searchName = PropertyDefinitionSearchInterfacesPrefixes.SEARCH + arg.prefix + arg.id;
+  const isRichText = arg.property.isRichText();
 
   if (typeof arg.args[searchName] !== "undefined" && arg.args[searchName] !== null) {
     // TODO also must match partial words
     arg.elasticQueryBuilder.mustMatch({
-      [arg.prefix + arg.id]: arg.args[searchName],
+      [arg.prefix + arg.id + (isRichText ? "_PLAIN" : "")]: arg.args[searchName],
     });
 
     return true;
   } else if (arg.args[searchName] === null) {
     arg.elasticQueryBuilder.mustTerm({
-      [arg.prefix + arg.id]: ELASTIC_INDEXABLE_NULL_VALUE,
+      [arg.prefix + arg.id + (isRichText ? "_PLAIN" : "")]: ELASTIC_INDEXABLE_NULL_VALUE,
     });
     return false;
   }
 
   return false;
+}
+
+export function textElasticIn(arg: ISQLOutInfo) {
+  const isRichText = arg.property.isRichText();
+  if (isRichText) {
+    return {
+      [arg.prefix + arg.id]: arg.row[arg.prefix + arg.id],
+      [arg.prefix + arg.id + "_PLAIN"]: arg.row[arg.prefix + arg.id + "_PLAIN"],
+    };
+  } else {
+    return {
+      [arg.prefix + arg.id]: arg.row[arg.prefix + arg.id],
+    };
+  }
 }
 
 /**

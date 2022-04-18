@@ -97,7 +97,7 @@ export interface ISQLSearchInfo extends ISQLArgInfo {
   isOrderedByIt: boolean;
 }
 
-export interface ISQLElasticSearchInfo extends ISQLArgInfo {
+export interface IElasticSearchInfo extends ISQLArgInfo {
   language: string;
   dictionary: string;
   elasticQueryBuilder: any;
@@ -227,6 +227,11 @@ export interface IPropertyDefinitionSupportedType<T> {
    */
   sql: (arg: ISQLArgInfo) => ISQLTableDefinitionType;
   /**
+   * elastic index definition for the property
+   * it's used inside the mappings for creating the elastic index
+   */
+  elastic: (arg: IArgInfo) => any;
+  /**
    * On a simple search what fields should be selected that are
    * the minimum necessary to perform a selection, this is used
    * for traditional search mainly
@@ -265,7 +270,7 @@ export interface IPropertyDefinitionSupportedType<T> {
   /**
    * Defines how to perform elastic search into the property
    */
-  elasticSearch: (arg: ISQLElasticSearchInfo) => boolean;
+  elasticSearch: (arg: IElasticSearchInfo) => boolean;
   /**
    * Represents a search for an item when the only input has been a string, make it null
    * to avoid supporting it

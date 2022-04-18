@@ -45,16 +45,6 @@ export async function standardConfigSetup(
         defaultValue: [],
       },
       {
-        variableName: "dictionaries",
-        type: "strobject",
-        message: "Now you need to specify the dictionaries, the dictionaries use simple ISO codes without regions; " +
-        "these are used for full text search, and you should have all languages you aim to support FTS. " +
-        "Please insert the same way as before a list a comma separated values",
-        defaultValue: {
-          "en": "english"
-        },
-      },
-      {
         variableName: "roles",
         type: "strarray",
         message: "Now you should specify the user roles that your app supports, make these uppercase, no spaces",

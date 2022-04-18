@@ -22,7 +22,7 @@ import {
 } from "../../../../../../constants";
 import { PropertyDefinitionSearchInterfacesPrefixes, PropertyDefinitionSearchInterfacesType } from "../search-interfaces";
 import { textSQL, textSQLIn, textSqlRedoDictionaryIndex, textSQLSearch,
-  textSQLStrSearch, textSQLBtreeIndexable, textSQLOrderBy, textElasticSearch } from "../sql/text";
+  textSQLStrSearch, textSQLBtreeIndexable, textSQLOrderBy, textElasticSearch, textElastic } from "../sql/text";
 
 /**
  * The text is described by a string
@@ -120,6 +120,7 @@ const typeValue: IPropertyDefinitionSupportedType<PropertyDefinitionSupportedTex
       required: ["html"],
     },
   ],
+  elastic: textElastic,
   sql: textSQL,
   sqlSelect: standardSQLSelect,
   sqlIn: textSQLIn,

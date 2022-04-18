@@ -3,7 +3,7 @@ import {
   ISQLTableRowValue,
 } from "../../../../sql";
 import { PropertyDefinitionSearchInterfacesPrefixes } from "../search-interfaces";
-import { ISQLElasticSearchInfo, ISQLEqualInfo, ISQLInInfo, ISQLSearchInfo, ISQLSSCacheEqualInfo } from "../types";
+import { IElasticSearchInfo, ISQLEqualInfo, ISQLInInfo, ISQLSearchInfo, ISQLSSCacheEqualInfo } from "../types";
 
 /**
  * The standard sql in function that specifies how a property inputs its value
@@ -58,7 +58,7 @@ export function taglistSQLIn(arg: ISQLInInfo): ISQLTableRowValue {
   return false;
 }
 
-export function tagListElasticSearch(arg: ISQLElasticSearchInfo): boolean {
+export function tagListElasticSearch(arg: IElasticSearchInfo): boolean {
   // first we analyze and get the search name
   const searchName = PropertyDefinitionSearchInterfacesPrefixes.SEARCH + arg.prefix + arg.id;
 

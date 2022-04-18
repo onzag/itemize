@@ -139,6 +139,7 @@ export interface IAppDataType {
   indexProduction: string;
   config: IConfigRawJSONDataType;
   sensitiveConfig: ISensitiveConfigRawJSONDataType;
+  databaseConfig: IDBConfigRawJSONDataType;
   databaseConnection: DatabaseConnection,
   listener: Listener;
   cache: Cache;
@@ -1014,6 +1015,7 @@ export async function initializeServer(
       config,
       sensitiveConfig,
       databaseConnection,
+      databaseConfig: dbConfig,
       listener,
       redis: redisClient,
       redisGlobal: redisGlobalClient,

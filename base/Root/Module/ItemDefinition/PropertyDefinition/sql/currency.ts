@@ -4,7 +4,7 @@
  * @module
  */
 
-import { ISQLArgInfo, ISQLInInfo, ISQLOutInfo, ISQLSearchInfo, ISQLOrderByInfo, ISQLBtreeIndexableInfo, ISQLMantenienceType, ISQLEqualInfo, ISQLSSCacheEqualInfo, ISQLElasticSearchInfo } from "../types";
+import { ISQLArgInfo, ISQLInInfo, ISQLOutInfo, ISQLSearchInfo, ISQLOrderByInfo, ISQLBtreeIndexableInfo, ISQLMantenienceType, ISQLEqualInfo, ISQLSSCacheEqualInfo, IElasticSearchInfo, IArgInfo } from "../types";
 import { IPropertyDefinitionSupportedCurrencyType } from "../types/currency";
 import { CURRENCY_FACTORS_IDENTIFIER, ELASTIC_INDEXABLE_NULL_VALUE } from "../../../../../../constants";
 import { PropertyDefinitionSearchInterfacesPrefixes } from "../search-interfaces";
@@ -22,6 +22,21 @@ export function currencySQL(arg: ISQLArgInfo) {
     [arg.prefix + arg.id + "_CURRENCY"]: { type: "TEXT" },
     [arg.prefix + arg.id + "_NORMALIZED_VALUE"]: { type: "NUMERIC" },
   };
+}
+
+export function currencyElastic(arg: IArgInfo) {
+  return {
+    [arg.prefix + arg.id + "_VALUE"]: {
+      type: "float",
+      null_value: ELASTIC_INDEXABLE_NULL_VALUE,
+    },
+    [arg.prefix + arg.id + "_CURRENCY"]: {
+      type: "keyword",
+    },
+    [arg.prefix + arg.id + "_NORMALIZED_VALUE"]: {
+      type: "float",
+    },
+  }
 }
 
 /**
@@ -169,7 +184,7 @@ export function currencySQLSearch(arg: ISQLSearchInfo) {
   return searchedByIt;
 }
 
-export function currencyElasticSearch(arg: ISQLElasticSearchInfo) {
+export function currencyElasticSearch(arg: IElasticSearchInfo) {
   const fromName = PropertyDefinitionSearchInterfacesPrefixes.FROM + arg.prefix + arg.id;
   const toName = PropertyDefinitionSearchInterfacesPrefixes.TO + arg.prefix + arg.id;
   const exactName = PropertyDefinitionSearchInterfacesPrefixes.EXACT + arg.prefix + arg.id;
@@ -177,13 +192,13 @@ export function currencyElasticSearch(arg: ISQLElasticSearchInfo) {
 
   if (typeof arg.args[exactName] !== "undefined" && arg.args[exactName] !== null) {
     const exactArg = arg.args[exactName] as IGQLArgs;
-    arg.elasticQueryBuilder.mustMatch({
+    arg.elasticQueryBuilder.mustTerm({
       [arg.prefix + arg.id + "_CURRENCY"]: exactArg.currency as string,
       [arg.prefix + arg.id + "_VALUE"]: exactArg.value as number,
     });
     searchedByIt = true;
   } else if (arg.args[exactName] === null) {
-    arg.elasticQueryBuilder.mustMatch({
+    arg.elasticQueryBuilder.mustTerm({
       [arg.prefix + arg.id + "_VALUE"]: ELASTIC_INDEXABLE_NULL_VALUE,
     });
     searchedByIt = true;
@@ -193,7 +208,6 @@ export function currencyElasticSearch(arg: ISQLElasticSearchInfo) {
   const hasFromDefined = typeof arg.args[fromName] !== "undefined" && arg.args[fromName] !== null;
 
   if (hasToDefined || hasFromDefined) {
-    const rule: any = {};
     if (hasFromDefined) {
       const fromArg = arg.args[fromName] as any as IPropertyDefinitionSupportedCurrencyType;
       const factor: number = arg.serverData[CURRENCY_FACTORS_IDENTIFIER][fromArg.currency];

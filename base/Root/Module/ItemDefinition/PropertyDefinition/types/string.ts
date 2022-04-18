@@ -29,7 +29,7 @@ import {
 } from "../../../../../../constants";
 import { PropertyDefinitionSearchInterfacesType, PropertyDefinitionSearchInterfacesPrefixes } from "../search-interfaces";
 import { countries, currencies } from "../../../../../../imported-resources";
-import { stringElasticSearch, stringSQL, stringSQLSearch, stringSQLStrSearch } from "../sql/string";
+import { stringElastic, stringElasticSearch, stringSQL, stringSQLElasticIn, stringSQLSearch, stringSQLStrSearch } from "../sql/string";
 
 /**
  * The email regex that is used to validate emails
@@ -83,10 +83,11 @@ const typeValue: IPropertyDefinitionSupportedType<PropertyDefinitionSupportedStr
   // a string is a string
   json: "string",
   sql: stringSQL,
+  elastic: stringElastic,
   sqlSelect: standardSQLSelect,
   sqlIn: standardSQLInFn,
   sqlOut: standardSQLOutFn,
-  sqlElasticIn: standardSQLElasticInFn,
+  sqlElasticIn: stringSQLElasticIn,
   sqlSearch: stringSQLSearch,
   elasticSearch: stringElasticSearch,
   sqlEqual: standardSQLEqualFn,

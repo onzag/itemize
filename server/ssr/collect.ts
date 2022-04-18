@@ -727,7 +727,7 @@ export class Collector {
         if (moduleTrigger) {
           await moduleTrigger({
             language: this.appliedRule.language,
-            dictionary: this.appData.config.dictionaries[this.appliedRule.language] || this.appData.config.dictionaries["*"],
+            dictionary: this.appData.databaseConfig.dictionaries[this.appliedRule.language] || this.appData.databaseConfig.dictionaries["*"],
             appData: this.appData,
             itemDefinition: idef,
             module: mod,
@@ -762,7 +762,7 @@ export class Collector {
         if (itemDefinitionTrigger) {
           await itemDefinitionTrigger({
             language: this.appliedRule.language,
-            dictionary: this.appData.config.dictionaries[this.appliedRule.language] || this.appData.config.dictionaries["*"],
+            dictionary: this.appData.databaseConfig.dictionaries[this.appliedRule.language] || this.appData.databaseConfig.dictionaries["*"],
             appData: this.appData,
             itemDefinition: idef,
             module: mod,
