@@ -113,6 +113,15 @@ export interface ISQLStrSearchInfo extends ISQLArgInfo {
   isOrderedByIt: boolean;
 }
 
+export interface IElasticStrSearchInfo extends ISQLArgInfo {
+  language: string;
+  dictionary: string;
+  elasticQueryBuilder: any;
+  search: string;
+  boost: number;
+  isOrderedByIt: boolean;
+}
+
 export interface ISQLEqualInfo extends ISQLArgInfo {
   value: PropertyDefinitionSupportedType;
   whereBuilder: WhereBuilder;
@@ -277,6 +286,10 @@ export interface IPropertyDefinitionSupportedType<T> {
    * return a boolean on whether it searched by it or it didn't
    */
   sqlStrSearch: (arg: ISQLStrSearchInfo) => boolean | [string, any[]];
+  /**
+   * Represents a str based search using the elastic interface
+   */
+  elasticStrSearch: (arg: IElasticStrSearchInfo) => boolean;
   /**
    * Provides the rows that are expected to be indexed and in the order that they are expected
    * when an index is added via a request limiter in the module

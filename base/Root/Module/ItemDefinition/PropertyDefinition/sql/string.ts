@@ -4,7 +4,7 @@
  * @module
  */
 
-import { ISQLArgInfo, IElasticSearchInfo, ISQLEqualInfo, ISQLSearchInfo, ISQLStrSearchInfo, ISQLOutInfo, IArgInfo } from "../types";
+import { ISQLArgInfo, IElasticSearchInfo, ISQLEqualInfo, ISQLSearchInfo, ISQLStrSearchInfo, ISQLOutInfo, IArgInfo, IElasticStrSearchInfo } from "../types";
 import { PropertyDefinitionSearchInterfacesPrefixes } from "../search-interfaces";
 import { exactStringSearchSubtypes } from "../types/string";
 import { ELASTIC_INDEXABLE_NULL_VALUE, SQL_CONSTRAINT_PREFIX } from "../../../../../../constants";
@@ -184,6 +184,24 @@ export function stringSQLStrSearch(arg: ISQLStrSearchInfo) {
         "\\",
       ],
     );
+  }
+
+  return true;
+}
+
+export function stringElasticStrSearch(arg: IElasticStrSearchInfo) {
+  if (arg.property.getSubtype() === "json" || arg.boost === 0) {
+    return false;
+  }
+
+  if (exactStringSearchSubtypes.includes(arg.property.getSubtype())) {
+    arg.elasticQueryBuilder.mustTerm({
+      [arg.prefix + arg.id]: arg.search,
+    }, arg.boost);
+  } else {
+    arg.elasticQueryBuilder.mustMatch({
+      [arg.prefix + arg.id]: arg.search,
+    }, arg.boost);
   }
 
   return true;

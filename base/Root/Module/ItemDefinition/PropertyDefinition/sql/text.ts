@@ -4,7 +4,7 @@
  * @module
  */
 
-import { ISQLArgInfo, ISQLInInfo, ISQLSearchInfo, ISQLOrderByInfo, ISQLStrSearchInfo, ISQLRedoDictionaryBasedIndex, IElasticSearchInfo, IArgInfo, ISQLOutInfo } from "../types";
+import { ISQLArgInfo, ISQLInInfo, ISQLSearchInfo, ISQLOrderByInfo, ISQLStrSearchInfo, ISQLRedoDictionaryBasedIndex, IElasticSearchInfo, IArgInfo, ISQLOutInfo, IElasticStrSearchInfo } from "../types";
 import { PropertyDefinitionSearchInterfacesPrefixes } from "../search-interfaces";
 import { DOMWindow, DOMPurify } from "../../../../../../util";
 import { ELASTIC_INDEXABLE_NULL_VALUE } from "../../../../../../constants";
@@ -264,6 +264,22 @@ export function textSQLStrSearch(arg: ISQLStrSearchInfo): boolean | [string, any
       ]
     ];
   }
+
+  return true;
+}
+
+/**
+ * Provides the text FTS str sql search functionality
+ */
+ export function textElasticStrSearch(arg: IElasticStrSearchInfo): boolean {
+  if (arg.boost === 0) {
+    return false;
+  }
+
+  const isRichText = arg.property.isRichText();
+  arg.elasticQueryBuilder && arg.elasticQueryBuilder.mustMatch({
+    [arg.prefix + arg.id + (isRichText ? "_PLAIN" : "")]: arg.search,
+  }, arg.boost);
 
   return true;
 }

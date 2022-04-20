@@ -70,6 +70,7 @@ const typeValue: IPropertyDefinitionSupportedType<PropertyDefinitionSupportedFil
     throw new Error("Attempted to elastic search within files");
   },
   sqlStrSearch: null,
+  elasticStrSearch: null,
   localStrSearch: null,
   sqlOrderBy: null,
   localOrderBy: null,

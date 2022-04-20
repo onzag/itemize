@@ -46,6 +46,7 @@ const typeValue: IPropertyDefinitionSupportedType<PropertyDefinitionSupportedBoo
   sqlSearch: standardSQLSearchFnExactAndRange,
   elasticSearch: standardElasticSearchFnExactAndRange,
   sqlStrSearch: null,
+  elasticStrSearch: null,
   localStrSearch: null,
   sqlEqual: standardSQLEqualFn,
   sqlSSCacheEqual: standardSQLSSCacheEqualFn,

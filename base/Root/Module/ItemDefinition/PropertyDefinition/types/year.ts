@@ -60,6 +60,7 @@ const typeValue: IPropertyDefinitionSupportedType<PropertyDefinitionSupportedYea
   sqlSSCacheEqual: standardSQLSSCacheEqualFn,
   sqlBtreeIndexable: standardSQLBtreeIndexable,
   sqlStrSearch: null,
+  elasticStrSearch: null,
   localStrSearch: null,
   sqlMantenience: null,
   sqlOrderBy: standardSQLOrderBy,

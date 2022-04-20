@@ -58,6 +58,7 @@ const typeValue: IPropertyDefinitionSupportedType<PropertyDefinitionSupportedTag
   sqlBtreeIndexable: null,
   sqlMantenience: null,
   sqlStrSearch: null,
+  elasticStrSearch: null,
   localStrSearch: null,
   sqlOrderBy: null,
   localOrderBy: null,

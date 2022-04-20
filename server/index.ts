@@ -532,6 +532,13 @@ export async function initializeServer(
       });
     }
 
+    const domain = NODE_ENV === "production" ? config.productionHostname : config.developmentHostname;
+
+    logger.info(
+      "initializeServer: initializing itemize server root",
+    );
+    const root = new Root(build);
+
     // now for the cluster manager, which manages a specific cluster, it goes here, and it doesn't
     // go futher, the job of the cluster manager is to mantain the cluster redis database
     // up to date, and handle the requests for these up to date requests, it basically
@@ -539,7 +546,15 @@ export async function initializeServer(
     // changed events of the same type the client uses to update the redis database
     if (INSTANCE_MODE === "CLUSTER_MANAGER") {
       // as such 
-      const cache = new Cache(redisClient, null, null, null, null, null, null);
+      const cache = new Cache(
+        redisClient,
+        null,
+        sensitiveConfig,
+        null,
+        domain,
+        root,
+        null,
+      );
       const listener = new Listener(
         buildnumber,
         redisSub,
@@ -574,11 +589,6 @@ export async function initializeServer(
       return;
     }
 
-    logger.info(
-      "initializeServer: initializing itemize server root",
-    );
-    const root = new Root(build);
-
     // we only need one client instance
     // Create the connection string
     const dbConnectionConfig = {
@@ -598,8 +608,6 @@ export async function initializeServer(
       databaseConnection,
       root,
     );
-
-    const domain = NODE_ENV === "production" ? config.productionHostname : config.developmentHostname;
 
     logger.info(
       "initializeServer: initializing registry",

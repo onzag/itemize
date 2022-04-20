@@ -104,6 +104,7 @@ const typeValue: IPropertyDefinitionSupportedType<IPropertyDefinitionSupportedPa
   sqlSearch: paymentSQLSearch,
   elasticSearch: paymentElasticSearch,
   sqlStrSearch: null,
+  elasticStrSearch: null,
   localStrSearch: null,
   sqlOrderBy: null,
   sqlBtreeIndexable: paymentSQLBtreeIndexable,

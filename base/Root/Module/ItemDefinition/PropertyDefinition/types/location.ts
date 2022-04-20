@@ -92,6 +92,7 @@ const typeValue: IPropertyDefinitionSupportedType<IPropertyDefinitionSupportedLo
   sqlSearch: locationSQLSearch,
   elasticSearch: locationElasticSearch,
   sqlStrSearch: null,
+  elasticStrSearch: null,
   localStrSearch: null,
   sqlMantenience: null,
   sqlOrderBy: locationSQLOrderBy,

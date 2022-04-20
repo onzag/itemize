@@ -62,6 +62,7 @@ const typeValue: IPropertyDefinitionSupportedType<PropertyDefinitionSupportedNum
   sqlBtreeIndexable: standardSQLBtreeIndexable,
   sqlMantenience: null,
   sqlStrSearch: null,
+  elasticStrSearch: null,
   localStrSearch: null,
   sqlOrderBy: standardSQLOrderBy,
   localOrderBy: (arg) => {

@@ -317,6 +317,13 @@ export interface IDBConfigRawJSONDataType {
   dictionaries: {
     [key: string]: string,
   };
+
+  // elasticsearch compound
+  // https://www.elastic.co/guide/en/elasticsearch/client/javascript-api/current/basic-config.html
+  elastic: any;
+  elasticLangAnalizers: {
+    [key: string]: string,
+  },
 }
 
 /**
@@ -736,6 +743,16 @@ export const rawDBConfigSchema = {
         type: "string",
       },
     },
+    elastic: {
+      type: ["object", "null"],
+      additionalProperties: {},
+    },
+    elasticLangAnalizers: {
+      type: ["object", "null"],
+      additionalProperties: {
+        type: "string",
+      },
+    },
   },
   additionalProperties: false,
   required: [
@@ -745,6 +762,8 @@ export const rawDBConfigSchema = {
     "database",
     "password",
     "dictionaries",
+    "elastic",
+    "elasticLangAnalizers",
   ],
 };
 

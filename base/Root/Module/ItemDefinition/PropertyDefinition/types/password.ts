@@ -33,6 +33,7 @@ const typeValue: IPropertyDefinitionSupportedType<PropertyDefinitionSupportedPas
   // not supported, it must be performed against the database
   elasticSearch: null,
   sqlStrSearch: null,
+  elasticStrSearch: null,
   localStrSearch: null,
   sqlOrderBy: null,
   localOrderBy: null,

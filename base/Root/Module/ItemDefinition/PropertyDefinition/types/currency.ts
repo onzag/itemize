@@ -25,7 +25,8 @@ import { PropertyDefinitionSearchInterfacesPrefixes, PropertyDefinitionSearchInt
 import { currencySQL, currencySQLIn, currencySQLOut, currencySQLSearch, currencySQLOrderBy,
   currencySQLBtreeIndexable, currencySQLMantenience, currencySQLEqual, currencySQLSSCacheEqual, currencySQLSelect,
   currencyElasticSearch, 
-  currencySQLElasticIn} from "../sql/currency";
+  currencySQLElasticIn,
+  currencyElastic} from "../sql/currency";
 
 /**
  * The currency definition is described by an object
@@ -63,6 +64,7 @@ const typeValue: IPropertyDefinitionSupportedType<IPropertyDefinitionSupportedCu
   sqlSearch: currencySQLSearch,
   elasticSearch: currencyElasticSearch,
   sqlStrSearch: null,
+  elasticStrSearch: null,
   localStrSearch: null,
   sqlOrderBy: currencySQLOrderBy,
   sqlBtreeIndexable: currencySQLBtreeIndexable,

@@ -29,7 +29,7 @@ import {
 } from "../../../../../../constants";
 import { PropertyDefinitionSearchInterfacesType, PropertyDefinitionSearchInterfacesPrefixes } from "../search-interfaces";
 import { countries, currencies } from "../../../../../../imported-resources";
-import { stringElastic, stringElasticSearch, stringSQL, stringSQLElasticIn, stringSQLSearch, stringSQLStrSearch } from "../sql/string";
+import { stringElastic, stringElasticSearch, stringElasticStrSearch, stringSQL, stringSQLElasticIn, stringSQLSearch, stringSQLStrSearch } from "../sql/string";
 
 /**
  * The email regex that is used to validate emails
@@ -95,6 +95,7 @@ const typeValue: IPropertyDefinitionSupportedType<PropertyDefinitionSupportedStr
   sqlBtreeIndexable: standardSQLBtreeIndexable,
   sqlMantenience: null,
   sqlStrSearch: stringSQLStrSearch,
+  elasticStrSearch: stringElasticStrSearch,
   localStrSearch: (arg) => {
     // item is deleted
     if (!arg.gqlValue) {

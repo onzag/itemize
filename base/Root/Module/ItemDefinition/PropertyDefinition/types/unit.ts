@@ -65,6 +65,7 @@ const typeValue: IPropertyDefinitionSupportedType<IPropertyDefinitionSupportedUn
   sqlSearch: unitSQLSearch,
   elasticSearch: unitElasticSearch,
   sqlStrSearch: null,
+  elasticStrSearch: null,
   localStrSearch: null,
   sqlOrderBy: unitSQLOrderBy,
   sqlEqual: unitSQLEqual,
