@@ -100,6 +100,72 @@ export async function start(version: string) {
     }
   }
 
+  if (dbConfig.elastic) {
+    const elasticNode = dbConfig.elastic.node;
+    const proxy = dbConfig.elastic.proxy;
+    if (proxy) {
+      console.log(colors.red("Development environment elastic database is setup woth a proxy at ") + proxy);
+      console.log(colors.red("As so it cannot be initialized"));
+    } else if (elasticNode) {
+      let elasticURL = typeof elasticNode === "string" || (elasticNode instanceof URL) ? elasticNode : elasticNode.url;
+      if (typeof elasticURL === "string") {
+        elasticURL = new URL(elasticURL);
+      }
+      if (elasticURL) {
+        const hostname = (elasticURL as URL).hostname;
+        const port = (elasticURL as URL).port;
+        const protocol = (elasticURL as URL).protocol;
+        const username = dbConfig.elastic.auth && dbConfig.elastic.auth.username;
+        const password = dbConfig.elastic.auth && dbConfig.elastic.auth.password;
+        if ((hostname === "localhost" || hostname === "127.0.0.1") && protocol === "https:" && username === "elastic") {
+          console.log(colors.yellow("Please allow Itemize to create a docker container for elasticsearch"));
+          console.log(colors.yellow("The execution might take a while, please wait..."));
+
+          try {
+            // and we execute this command with the configuration
+            // it will execute for localhost of course
+            await execSudo(
+              "sysctl -w vm.max_map_count=262144",
+              "Itemize Sysctl setup for elasticsearch",
+            );
+            await execSudo(
+              `docker run --name ${dockerprefixer}_devedb -e ELASTIC_PASSWORD=${password} ` +
+              `-p ${port}:9200 -d docker.elastic.co/elasticsearch/elasticsearch:8.1.3`,
+              "Itemize Docker Contained Elasticsearch Database",
+            );
+          } catch (err) {
+            // if something fails show a message
+            console.log(colors.red(err.message));
+            console.log(colors.yellow("Something went wrong please allow for cleanup..."));
+            try {
+              await execSudo(
+                `docker rm ${dockerprefixer}_devedb`,
+                "Itemize Docker Contained Elasticsearch Database",
+              );
+            } catch {
+            }
+            throw err;
+          }
+        } else if (hostname !== "localhost" && hostname !== "127.0.0.1") {
+          console.log(colors.red("Development environment elastic database host is connecting to ") + hostname);
+          console.log(colors.red("As so it cannot be initialized"));
+        } else if (username !== "elastic") {
+          console.log(colors.red("Development environment elastic database is using username (should be elastic) ") + username);
+          console.log(colors.red("As so it cannot be initialized"));
+        } else if (protocol !== "https:") {
+          console.log(colors.red("Development environment elastic database host is using protocol ") + protocol);
+          console.log(colors.red("As so it cannot be initialized"));
+        }
+      } else {
+        console.log(colors.red("Development environment elastic database node has no url to connect to"));
+        console.log(colors.red("As so it cannot be initialized"));
+      }
+    } else {
+      console.log(colors.red("Development environment elastic database does not have a single node setup, it may have no node or multinode"));
+      console.log(colors.red("As so it cannot be initialized"));
+    }
+  }
+
   // now we need to check fr this, we have global, pubsub and local cache
   // which we all need, for development, we should usually use a single instance
   // the devenv uses the global as reference
@@ -182,18 +248,55 @@ export async function stop(version: string) {
     dbConfig.host === "127.0.0.1"
   ) {
     try {
-      console.log(colors.yellow("Please allow Itemize to stop the PGSQL docker container"));
+      // console.log(colors.yellow("Please allow Itemize to stop the PGSQL docker container"));
       await execSudo(
         `docker stop ${dockerprefixer}_devdb`,
         "Itemize Docker Contained PGSQL Database",
       );
 
-      console.log(colors.yellow("Now we attempt to remove the PGSQL docker container"));
+      // console.log(colors.yellow("Now we attempt to remove the PGSQL docker container"));
       await execSudo(
         `docker rm ${dockerprefixer}_devdb`,
         "Itemize Docker Contained PGSQL Database",
       );
     } catch (err) {
+    }
+  }
+
+  if (
+    dbConfig.elastic
+  ) {
+    const elasticNode = dbConfig.elastic.node;
+    const proxy = dbConfig.elastic.proxy;
+    const username = dbConfig.elastic.auth && dbConfig.elastic.auth.username;
+
+    if (!proxy && elasticNode && username === "elastic") {
+      let elasticURL = typeof elasticNode === "string" || (elasticNode instanceof URL) ? elasticNode : elasticNode.url;
+      if (typeof elasticURL === "string") {
+        elasticURL = new URL(elasticURL);
+      }
+
+      if (elasticURL) {
+        const hostname = (elasticURL as URL).hostname;
+        const protocol = (elasticURL as URL).protocol;
+
+        if ((hostname === "localhost" || hostname === "127.0.0.1") && protocol === "https:") {
+          try {
+            console.log(colors.yellow("Please allow Itemize to stop the Elastic docker container"));
+            await execSudo(
+              `docker stop ${dockerprefixer}_devedb`,
+              "Itemize Docker Contained Elasticsearch Database",
+            );
+      
+            console.log(colors.yellow("Now we attempt to remove the Elastic docker container"));
+            await execSudo(
+              `docker rm ${dockerprefixer}_devedb`,
+              "Itemize Docker Contained Elasticsearch Database",
+            );
+          } catch (err) {
+          }
+        }
+      }
     }
   }
 
@@ -207,13 +310,13 @@ export async function stop(version: string) {
     !redisConfig.global.path
   ) {
     try {
-      console.log(colors.yellow("Please allow Itemize to stop the REDIS docker container"));
+      // console.log(colors.yellow("Please allow Itemize to stop the REDIS docker container"));
       await execSudo(
         `docker stop ${dockerprefixer}_devredis`,
         "Itemize Docker Contained REDIS Database",
       );
 
-      console.log(colors.yellow("Now we attempt to remove the REDIS docker container"));
+      // console.log(colors.yellow("Now we attempt to remove the REDIS docker container"));
       await execSudo(
         `docker rm ${dockerprefixer}_devredis`,
         "Itemize Docker Contained REDIS Database",

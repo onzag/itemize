@@ -96,12 +96,22 @@ export async function dbConfigSetup(
           {
             variableName: "node",
             message: "The node to connect to",
-            defaultValue: "http://localhost:9200",
+            defaultValue: "https://localhost:9200",
+            hidden: true,
+            nullifyFalseValues: true,
+          },
+          {
+            variableName: "auth",
+            message: "The elastic auth config",
+            type: "strobject",
+            defaultValue: {
+              username: "elastic",
+              password: packageJSON.name + "_elastic_password",
+            },
             hidden: true,
             nullifyFalseValues: true,
           },
         ],
-        preferUnfilled: true,
         cantRerun: true,
       },
       {

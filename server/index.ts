@@ -73,6 +73,8 @@ import {
 } from "./environment";
 import USSDProvider from "./services/base/USSDProvider";
 import { FakeUSSDService } from "./services/fake-ussd";
+import { Client } from "@elastic/elasticsearch";
+import { ItemizeElasticClient } from "./elastic";
 
 // load the custom services configuration
 let serviceCustom: IServiceCustomizationType = {};
@@ -168,6 +170,7 @@ export interface IAppDataType {
   express: typeof express,
   customRoles: ICustomRoleType[];
   rawDB: ItemizeRawDB;
+  elastic: ItemizeElasticClient,
 }
 
 export interface IServerDataType {
@@ -608,6 +611,21 @@ export async function initializeServer(
       databaseConnection,
       root,
     );
+
+    if (dbConfig.elastic) {
+      logger.info(
+        "initializeServer: setting up elastic connection",
+      );
+    }
+    const elasticConnection = dbConfig.elastic ? new Client(dbConfig.elastic) : null;
+    const elastic = dbConfig.elastic ? new ItemizeElasticClient(
+      root,
+      rawDB,
+      elasticConnection,
+    ) : null;
+    if (elastic) {
+      await elastic.prepareInstance();
+    }
 
     logger.info(
       "initializeServer: initializing registry",
@@ -1051,6 +1069,7 @@ export async function initializeServer(
       registry,
       customRoles: custom.customRoles || [],
       rawDB,
+      elastic,
       express,
       // assigned later during rest setup
       customUserTokenQuery: null,
