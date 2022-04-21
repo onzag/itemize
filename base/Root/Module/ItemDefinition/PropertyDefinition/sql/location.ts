@@ -4,8 +4,10 @@
  * @module
  */
 
-import { ISQLArgInfo, ISQLInInfo, ISQLOutInfo, ISQLSearchInfo, ISQLOrderByInfo,
-  ISQLEqualInfo, ISQLSSCacheEqualInfo, IElasticSearchInfo, IArgInfo } from "../types";
+import {
+  ISQLArgInfo, ISQLInInfo, ISQLOutInfo, ISQLSearchInfo, ISQLOrderByInfo,
+  ISQLEqualInfo, ISQLSSCacheEqualInfo, IElasticSearchInfo, IArgInfo
+} from "../types";
 import { ELASTIC_INDEXABLE_NULL_VALUE, SQL_CONSTRAINT_PREFIX } from "../../../../../../constants";
 import { PropertyDefinitionSearchInterfacesPrefixes } from "../search-interfaces";
 import { IPropertyDefinitionSupportedLocationType } from "../types/location";
@@ -53,31 +55,33 @@ export function locationSQL(arg: ISQLArgInfo) {
   };
 }
 
-export function locationElastic(arg: IArgInfo) {
+export function locationElastic(arg: ISQLArgInfo) {
   return {
-    [arg.prefix + arg.id + "_ID"]: {
-      type: "keyword",
-      enabled: false,
-    },
-    [arg.prefix + arg.id + "_LAT"]: {
-      type: "float",
-      enabled: false,
-    },
-    [arg.prefix + arg.id + "_LNG"]: {
-      type: "float",
-      enabled: false,
-    },
-    [arg.prefix + arg.id + "_TXT"]: {
-      type: "keyword",
-      enabled: false,
-    },
-    [arg.prefix + arg.id + "_ATXT"]: {
-      type: "keyword",
-      enabled: false,
-    },
-    [arg.prefix + arg.id + "_GEO"]: {
-      type: "geo_point",
-      null_value: ELASTIC_INDEXABLE_NULL_VALUE,
+    properties: {
+      [arg.prefix + arg.id + "_ID"]: {
+        type: "keyword",
+        enabled: false,
+      },
+      [arg.prefix + arg.id + "_LAT"]: {
+        type: "float",
+        enabled: false,
+      },
+      [arg.prefix + arg.id + "_LNG"]: {
+        type: "float",
+        enabled: false,
+      },
+      [arg.prefix + arg.id + "_TXT"]: {
+        type: "keyword",
+        enabled: false,
+      },
+      [arg.prefix + arg.id + "_ATXT"]: {
+        type: "keyword",
+        enabled: false,
+      },
+      [arg.prefix + arg.id + "_GEO"]: {
+        type: "geo_point",
+        null_value: ELASTIC_INDEXABLE_NULL_VALUE,
+      },
     },
   }
 }

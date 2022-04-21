@@ -12,13 +12,60 @@ import {
   convertSQLValueToGQLValueForProperty,
   convertGQLValueToSQLValueForProperty,
   buildSQLQueryForProperty,
+  getElasticSchemaForProperty,
 } from "../PropertyDefinition/sql";
 import Include, { IncludeExclusionState } from "../Include";
-import { ISQLTableDefinitionType, ISQLTableRowValue, ISQLStreamComposedTableRowValue, ConsumeStreamsFnType } from "../../../sql";
+import { ISQLTableDefinitionType, ISQLTableRowValue, ISQLStreamComposedTableRowValue, ConsumeStreamsFnType, IElasticIndexDefinitionType } from "../../../sql";
 import ItemDefinition from "..";
 import { IGQLValue, IGQLArgs } from "../../../../../gql-querier";
 import StorageProvider from "../../../../../server/services/base/StorageProvider";
 import { WhereBuilder } from "../../../../../database/WhereBuilder";
+
+export function getElasticSchemaForInclude(itemDefinition: ItemDefinition, include: Include, serverData: any): IElasticIndexDefinitionType {
+  // the exclusion state needs to be stored in the table bit
+  // so we basically need to get a prefix for this item definition
+  // this is usually INCLUDE_ the include prefix, and the id of the include
+  // eg INCLUDE_wheel, we build a prefix as INCLUDE_wheel_
+  const prefix = include.getPrefixedQualifiedIdentifier();
+
+  // the result table schema contains the table definition of all
+  // the columns, the first column we add is the exclusion state
+  // because the exclusion state uses a suffix it is defined as
+  // ITEM_wheel_ + _EXCLUSION_STATE
+  let resultIndexSchema: IElasticIndexDefinitionType = {
+    properties: {
+      [prefix + EXCLUSION_STATE_SUFFIX]: {
+        type: "keyword",
+      },
+    },
+    runtime: {},
+  };
+  // we need all the sinking properties and those are the
+  // ones added to the table
+  include.getSinkingProperties().forEach((sinkingProperty) => {
+    const result = getElasticSchemaForProperty(
+      itemDefinition,
+      include,
+      sinkingProperty,
+      serverData,
+    );
+
+    Object.assign(
+      resultIndexSchema.properties,
+      result.properties,
+    );
+
+    if (result.runtime) {
+      Object.assign(
+        resultIndexSchema.runtime,
+        result.runtime,
+      );
+    }
+  });
+
+  // we return the resulting schema
+  return resultIndexSchema;
+}
 
 /**
  * Provides the table bit that is necessary to store include data

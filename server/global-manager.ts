@@ -32,6 +32,7 @@ import { DatabaseConnection } from "../database";
 import { IManyValueType } from "../database/base";
 import PhoneProvider from "./services/base/PhoneProvider";
 import { ItemizeRawDB } from "./raw-db";
+import { ItemizeElasticClient } from "./elastic";
 
 interface IMantainProp {
   pdef: PropertyDefinition;
@@ -50,6 +51,7 @@ export class GlobalManager {
   private buildnumber: string;
   private databaseConnection: DatabaseConnection;
   private rawDB: ItemizeRawDB;
+  private elastic: ItemizeElasticClient;
   private globalCache: ItemizeRedisClient;
   private redisPub: ItemizeRedisClient;
   private redisSub: ItemizeRedisClient;
@@ -75,6 +77,7 @@ export class GlobalManager {
     root: Root,
     databaseConnection: DatabaseConnection,
     rawDB: ItemizeRawDB,
+    elastic: ItemizeElasticClient,
     globalCache: ItemizeRedisClient,
     redisPub: ItemizeRedisClient,
     redisSub: ItemizeRedisClient,
@@ -100,6 +103,7 @@ export class GlobalManager {
     this.registry = registry;
     this.mailProvider = mailProvider;
     this.phoneProvider = phoneProvider;
+    this.elastic = elastic;
 
     this.currencyFactorsProvider = currencyFactorsProvider;
 
@@ -147,7 +151,13 @@ export class GlobalManager {
     const modules = this.root.getAllModules();
     modules.forEach(this.processModule);
 
-    this.addAdminUserIfMissing();
+    // we want to make sure the admin user is added in case
+    // before preparing the instance so that it is
+    // indexed if our schema defines it as such
+    (async () => {
+      await this.addAdminUserIfMissing();
+      this.elastic && this.elastic.prepareInstance();
+    })();
   }
   public setSEOGenerator(seoGenerator: SEOGenerator) {
     this.seoGenerator = seoGenerator;
@@ -857,6 +867,8 @@ export class GlobalManager {
           }
         );
       }
+
+      this.elastic && this.elastic.informNewServerData(this.serverData);
     }
 
     logger.info(

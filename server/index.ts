@@ -622,10 +622,8 @@ export async function initializeServer(
       root,
       rawDB,
       elasticConnection,
+      dbConfig.elasticLangAnalizers,
     ) : null;
-    if (elastic) {
-      await elastic.prepareInstance();
-    }
 
     logger.info(
       "initializeServer: initializing registry",
@@ -639,6 +637,7 @@ export async function initializeServer(
       logger.info(
         "initializeServer: setting up global manager",
       );
+
       const CurrencyFactorsClass = (serviceCustom && serviceCustom.currencyFactorsProvider) || CurrencyLayerService;
       if (CurrencyFactorsClass.getType() !== ServiceProviderType.GLOBAL) {
         throw new Error("Currency factors custom provider class is not a global type");
@@ -696,6 +695,7 @@ export async function initializeServer(
         root,
         databaseConnection,
         rawDB,
+        elastic,
         redisGlobalClient,
         redisPub,
         redisSub,
@@ -781,6 +781,13 @@ export async function initializeServer(
       if (INSTANCE_MODE === "GLOBAL_MANAGER") {
         return;
       }
+    }
+
+    if (elastic) {
+      logger.info(
+        "initializeServer: waiting for elastic service to be ready",
+      );
+      await elastic.confirmInstanceReadiness();
     }
 
     // due to a bug in the types the create client function is missing

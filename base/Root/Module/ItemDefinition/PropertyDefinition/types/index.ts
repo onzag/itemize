@@ -8,7 +8,7 @@
 
 import { GraphQLOutputType } from "graphql";
 import { IGQLFieldsDefinitionType } from "../../../../gql";
-import { ISQLTableRowValue, ISQLTableDefinitionType } from "../../../../sql";
+import type { ISQLTableRowValue, ISQLTableDefinitionType, IElasticIndexDefinitionType } from "../../../../sql";
 import PropertyDefinition, { PropertyInvalidReason, IPropertyDefinitionRawJSONDataType } from "../../PropertyDefinition";
 import boolean, { PropertyDefinitionSupportedBooleanType } from "./boolean";
 import number, { PropertyDefinitionSupportedNumberType } from "./number";
@@ -239,7 +239,7 @@ export interface IPropertyDefinitionSupportedType<T> {
    * elastic index definition for the property
    * it's used inside the mappings for creating the elastic index
    */
-  elastic: (arg: IArgInfo) => any;
+  elastic: (arg: ISQLArgInfo) => IElasticIndexDefinitionType;
   /**
    * On a simple search what fields should be selected that are
    * the minimum necessary to perform a selection, this is used

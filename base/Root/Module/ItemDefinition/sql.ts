@@ -21,6 +21,7 @@ import {
   buildSQLStrSearchQueryForProperty,
   buildSQLOrderByForProperty,
   buildSQLOrderByForInternalRequiredProperty,
+  getElasticSchemaForProperty,
 } from "./PropertyDefinition/sql";
 import ItemDefinition from ".";
 import {
@@ -28,12 +29,60 @@ import {
   convertSQLValueToGQLValueForInclude,
   convertGQLValueToSQLValueForInclude,
   buildSQLQueryForInclude,
+  getElasticSchemaForInclude,
 } from "./Include/sql";
-import { ISQLTableDefinitionType, ISQLSchemaDefinitionType, ISQLTableRowValue, ISQLStreamComposedTableRowValue, ConsumeStreamsFnType } from "../../sql";
+import { ISQLTableDefinitionType, ISQLSchemaDefinitionType, ISQLTableRowValue, ISQLStreamComposedTableRowValue, ConsumeStreamsFnType, IElasticIndexDefinitionType, IElasticSchemaDefinitionType } from "../../sql";
 import { IGQLValue, IGQLRequestFields, IGQLArgs } from "../../../../gql-querier";
 import StorageProvider from "../../../../server/services/base/StorageProvider";
 import { WhereBuilder } from "../../../../database/WhereBuilder";
 import { OrderByBuilder } from "../../../../database/OrderByBuilder";
+
+export function getElasticSchemaForItemDefinition(
+  itemDefinition: ItemDefinition,
+  moduleIndexSchema: IElasticIndexDefinitionType,
+  serverData: any,
+) {
+  const qualifiedName = itemDefinition.getQualifiedPathName();
+  const resultSchema: IElasticSchemaDefinitionType = {
+    [qualifiedName]: {
+      properties: {...moduleIndexSchema.properties},
+      runtime: {...moduleIndexSchema.runtime},
+    },
+  }
+
+  itemDefinition.getAllPropertyDefinitions().forEach((pd) => {
+    const result = getElasticSchemaForProperty(itemDefinition, null, pd, serverData);
+    Object.assign(
+      resultSchema[qualifiedName].properties,
+      result.properties,
+    );
+
+    if (result.runtime) {
+      Object.assign(
+        resultSchema[qualifiedName].runtime,
+        result.runtime,
+      );
+    }
+  });
+
+  // now we loop over the child items
+  itemDefinition.getAllIncludes().forEach((i) => {
+    const result = getElasticSchemaForInclude(itemDefinition, i, serverData);
+    Object.assign(
+      resultSchema[qualifiedName].properties,
+      result.properties,
+    );
+
+    if (result.runtime) {
+      Object.assign(
+        resultSchema[qualifiedName].runtime,
+        result.runtime,
+      );
+    }
+  });
+
+  return resultSchema;
+}
 
 /**
  * Provides the table that is necesary to include this item definition as a whole

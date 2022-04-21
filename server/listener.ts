@@ -1081,7 +1081,7 @@ export class Listener {
           mod.getQualifiedPathName(),
           request.createdBy,
           request.lastModified || null,
-          requiredType || null,
+          requiredType || null,
         ].filter((v) => v !== null),
         true,
       );

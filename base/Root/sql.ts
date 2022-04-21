@@ -5,11 +5,13 @@
  * @module
  */
 
-import { getSQLTablesSchemaForModule } from "./Module/sql";
+import { getElasticSchemaForModule, getSQLTablesSchemaForModule } from "./Module/sql";
 import Root from ".";
-import { CREATED_BY_INDEX, CURRENCY_FACTORS_IDENTIFIER,
+import {
+  CREATED_BY_INDEX, CURRENCY_FACTORS_IDENTIFIER,
   DELETED_REGISTRY_IDENTIFIER, PARENT_INDEX, REGISTRY_IDENTIFIER,
-  LOGS_IDENTIFIER } from "../../constants";
+  LOGS_IDENTIFIER
+} from "../../constants";
 
 export interface ISQLTableIndexType {
   /**
@@ -110,6 +112,19 @@ export interface ISQLTableRowValue {
   [columnName: string]: any;
 }
 
+export interface IElasticIndexDefinitionType {
+  properties: {
+    [propertyName: string]: any;
+  };
+  runtime?: {
+    [propertyName: string]: any;
+  };
+};
+
+export interface IElasticSchemaDefinitionType {
+  [indexName: string]: IElasticIndexDefinitionType;
+}
+
 export type ConsumeStreamsFnType = (propertyLocationId: string) => Promise<void>;
 
 /**
@@ -118,6 +133,34 @@ export type ConsumeStreamsFnType = (propertyLocationId: string) => Promise<void>
 export interface ISQLStreamComposedTableRowValue {
   value: ISQLTableRowValue,
   consumeStreams: ConsumeStreamsFnType,
+}
+
+export function getElasticSchemaForRoot(root: Root, serverData: any): IElasticSchemaDefinitionType {
+  let resultSchema: IElasticSchemaDefinitionType = {
+    [LOGS_IDENTIFIER]: {
+      properties: {
+        instance_id: {
+          type: "keyword",
+        },
+        level: {
+          type: "keyword",
+        },
+        data: {
+          type: "object",
+        },
+        created_at: {
+          type: "date",
+        },
+      }
+    }
+  }
+
+  root.getAllModules().forEach((cModule) => {
+    // add together the schemas of all the modules
+    resultSchema = { ...resultSchema, ...getElasticSchemaForModule(cModule, serverData) };
+  });
+
+  return resultSchema;
 }
 
 /**

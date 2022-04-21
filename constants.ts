@@ -17,7 +17,7 @@ import {
   GraphQLBoolean,
 } from "graphql";
 import { IGQLFieldsDefinitionType } from "./base/Root/gql";
-import { ISQLTableDefinitionType } from "./base/Root/sql";
+import { IElasticIndexDefinitionType, ISQLTableDefinitionType } from "./base/Root/sql";
 import path from "path";
 
 export interface IItemizeConstantsConfig {
@@ -880,6 +880,65 @@ export const RESERVED_BASE_PROPERTIES_SQL: (combinedIndexes: string[], addedInde
     type: "TEXT",
   },
 });
+
+export const RESERVED_BASE_PROPERTIES_ELASTIC: IElasticIndexDefinitionType = {
+  properties: {
+    id: {
+      type: "keyword",
+    },
+    version: {
+      type: "keyword",
+    },
+    type: {
+      type: "keyword",
+    },
+    parent_id: {
+      type: "keyword",
+    },
+    parent_version: {
+      type: "keyword",
+    },
+    parent_type: {
+      type: "keyword",
+    },
+    container_id: {
+      type: "keyword",
+    },
+    created_at: {
+      type: "date",
+    },
+    created_by: {
+      type: "keyword",
+    },
+    edited_at: {
+      type: "date",
+    },
+    edited_by: {
+      type: "keyword",
+    },
+    reviewed_at: {
+      type: "date",
+    },
+    reviewed_by: {
+      type: "keyword",
+    },
+    last_modified: {
+      type: "date",
+    },
+    blocked_at: {
+      type: "date",
+    },
+    blocked_until: {
+      type: "date",
+    },
+    blocked_by: {
+      type: "keyword",
+    },
+    blocked_reason: {
+      type: "keyword",
+    },
+  }
+}
 
 /**
  * The column name of the foreign key that connects the module table

@@ -747,7 +747,7 @@ export const rawDBConfigSchema = {
       type: ["object", "null"],
       additionalProperties: {},
     },
-    elasticLangAnalizers: {
+    elasticLangAnalyzers: {
       type: ["object", "null"],
       additionalProperties: {
         type: "string",
@@ -763,7 +763,7 @@ export const rawDBConfigSchema = {
     "password",
     "dictionaries",
     "elastic",
-    "elasticLangAnalizers",
+    "elasticLangAnalyzers",
   ],
 };
 

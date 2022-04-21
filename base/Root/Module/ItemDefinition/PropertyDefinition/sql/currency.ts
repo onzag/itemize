@@ -24,17 +24,28 @@ export function currencySQL(arg: ISQLArgInfo) {
   };
 }
 
-export function currencyElastic(arg: IArgInfo) {
+export function currencyElastic(arg: ISQLArgInfo) {
+  const currencyFactors = arg.serverData[CURRENCY_FACTORS_IDENTIFIER];
+
   return {
-    [arg.prefix + arg.id + "_VALUE"]: {
-      type: "float",
-      null_value: ELASTIC_INDEXABLE_NULL_VALUE,
+    properties: {
+      [arg.prefix + arg.id + "_VALUE"]: {
+        type: "float",
+        null_value: ELASTIC_INDEXABLE_NULL_VALUE,
+      },
+      [arg.prefix + arg.id + "_CURRENCY"]: {
+        type: "keyword",
+      },
     },
-    [arg.prefix + arg.id + "_CURRENCY"]: {
-      type: "keyword",
-    },
-    [arg.prefix + arg.id + "_NORMALIZED_VALUE"]: {
-      type: "float",
+    runtime: {
+      [arg.prefix + arg.id + "_NORMALIZED_VALUE"]: {
+        type: "float",
+        script: {
+          lang: "painless",
+          source: "emit(doc['" + arg.prefix + arg.id + "_VALUE" + "'].value * params[doc['" + arg.prefix + arg.id + "_CURRENCY" + "'].value])",
+          params: currencyFactors || {},
+        }
+      }
     },
   }
 }

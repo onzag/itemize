@@ -6,7 +6,7 @@
  * @module
  */
 
-import { RESERVED_BASE_PROPERTIES_SQL, RESERVED_BASE_PROPERTIES, COMBINED_INDEX, IOrderByRuleType } from "../../../constants";
+import { RESERVED_BASE_PROPERTIES_SQL, RESERVED_BASE_PROPERTIES, COMBINED_INDEX, IOrderByRuleType, RESERVED_BASE_PROPERTIES_ELASTIC } from "../../../constants";
 import Module from ".";
 import {
   getSQLTableDefinitionForProperty,
@@ -16,14 +16,57 @@ import {
   buildSQLStrSearchQueryForProperty,
   buildSQLOrderByForProperty,
   buildSQLOrderByForInternalRequiredProperty,
+  getElasticSchemaForProperty,
 } from "./ItemDefinition/PropertyDefinition/sql";
-import { getSQLTablesSchemaForItemDefinition } from "./ItemDefinition/sql";
-import { ISQLTableDefinitionType, ISQLSchemaDefinitionType, ISQLTableRowValue, ISQLStreamComposedTableRowValue, ConsumeStreamsFnType } from "../sql";
+import { getElasticSchemaForItemDefinition, getSQLTablesSchemaForItemDefinition } from "./ItemDefinition/sql";
+import { ISQLTableDefinitionType, ISQLSchemaDefinitionType, ISQLTableRowValue, ISQLStreamComposedTableRowValue, ConsumeStreamsFnType, IElasticSchemaDefinitionType } from "../sql";
 import { IGQLRequestFields, IGQLValue, IGQLArgs } from "../../../gql-querier";
 import StorageProvider from "../../../server/services/base/StorageProvider";
 import { WhereBuilder } from "../../../database/WhereBuilder";
 import { OrderByBuilder } from "../../../database/OrderByBuilder";
 
+export function getElasticSchemaForModule(mod: Module, serverData: any): IElasticSchemaDefinitionType {
+  const pathName = mod.getQualifiedPathName();
+  const resultSchema: IElasticSchemaDefinitionType = {
+    [pathName]: {
+      properties: {...RESERVED_BASE_PROPERTIES_ELASTIC.properties},
+      runtime: {...RESERVED_BASE_PROPERTIES_ELASTIC.runtime},
+    }
+  }
+
+  mod.getAllPropExtensions().forEach((pd) => {
+    const result = getElasticSchemaForProperty(null, null, pd, serverData);
+    Object.assign(
+      resultSchema[pathName].properties,
+      result.properties,
+    );
+
+    if (result.runtime) {
+      Object.assign(
+        resultSchema[pathName].runtime,
+        result.runtime,
+      );
+    }
+  });
+
+  mod.getAllModules().forEach((cModule) => {
+    // first with child modules
+    Object.assign(
+      resultSchema,
+      getElasticSchemaForModule(cModule, serverData),
+    );
+  });
+
+  // then with child item definitions
+  mod.getAllChildItemDefinitions().forEach((cIdef) => {
+    Object.assign(
+      resultSchema,
+      getElasticSchemaForItemDefinition(cIdef, resultSchema[pathName], serverData),
+    );
+  });
+
+  return resultSchema;
+}
 
 /**
  * Provides the table that is necesary to include this module and all
@@ -31,7 +74,7 @@ import { OrderByBuilder } from "../../../database/OrderByBuilder";
  * @param mod the module in question
  * @returns a whole table schema for the module table
  */
-export function getSQLTableDefinitionForModule( mod: Module): ISQLTableDefinitionType {
+export function getSQLTableDefinitionForModule(mod: Module): ISQLTableDefinitionType {
   // first we need to calculate the initial combined and added indexes
   // these are the indexes that get added to the standard module fields
   // we don't want indexes that won't be used in search so we want to check

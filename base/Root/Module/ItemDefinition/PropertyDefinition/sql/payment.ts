@@ -39,28 +39,30 @@ export function paymentSQL(arg: ISQLArgInfo) {
   };
 }
 
-export function paymentElastic(arg: IArgInfo) {
+export function paymentElastic(arg: ISQLArgInfo) {
   return {
-    [arg.prefix + arg.id + "_TYPE"]: {
-      type: "keyword",
-    },
-    [arg.prefix + arg.id + "_AMOUNT"]: {
-      type: "float",
-      null_value: ELASTIC_INDEXABLE_NULL_VALUE,
-    },
-    [arg.prefix + arg.id + "_CURRENCY"]: {
-      type: "keyword",
-    },
-    [arg.prefix + arg.id + "_STATUS"]: {
-      type: "keyword",
-    },
-    [arg.prefix + arg.id + "_METADATA"]: {
-      type: "keyword",
-      enabled: false,
-    },
-    [arg.prefix + arg.id + "_RO_METADATA"]: {
-      type: "keyword",
-      enabled: false,
+    properties: {
+      [arg.prefix + arg.id + "_TYPE"]: {
+        type: "keyword",
+      },
+      [arg.prefix + arg.id + "_AMOUNT"]: {
+        type: "float",
+        null_value: ELASTIC_INDEXABLE_NULL_VALUE,
+      },
+      [arg.prefix + arg.id + "_CURRENCY"]: {
+        type: "keyword",
+      },
+      [arg.prefix + arg.id + "_STATUS"]: {
+        type: "keyword",
+      },
+      [arg.prefix + arg.id + "_METADATA"]: {
+        type: "keyword",
+        enabled: false,
+      },
+      [arg.prefix + arg.id + "_RO_METADATA"]: {
+        type: "keyword",
+        enabled: false,
+      },
     },
   };
 }
@@ -222,7 +224,7 @@ export function paymentSQLSearch(arg: ISQLSearchInfo) {
  * @param arg the argument search info
  * @returns a boolean on whether it's searched by it or not
  */
- export function paymentElasticSearch(arg: IElasticSearchInfo) {
+export function paymentElasticSearch(arg: IElasticSearchInfo) {
   const argPrefixPlusId = arg.prefix + arg.id;
 
   // first we need to get the arguments

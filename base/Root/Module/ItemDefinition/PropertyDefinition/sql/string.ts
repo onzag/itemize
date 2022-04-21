@@ -33,25 +33,29 @@ export function stringSQL(arg: ISQLArgInfo) {
   }
 };
 
-export function stringElastic(arg: IArgInfo) {
+export function stringElastic(arg: ISQLArgInfo) {
   const subtype = arg.property.getSubtype();
 
   if (subtype === "json") {
     return {
-      // totally dynamic object
-      [arg.prefix + arg.id]: {
-        type: "object",
-        enabled: true,
-        null_value: ELASTIC_INDEXABLE_NULL_VALUE,
+      properties: {
+        // totally dynamic object
+        [arg.prefix + arg.id]: {
+          type: "object",
+          enabled: true,
+          null_value: ELASTIC_INDEXABLE_NULL_VALUE,
+        }
       },
     }
   }
   return {
-    // the sql prefix defined plus the id, eg for includes
-    [arg.prefix + arg.id]: {
-      type: exactStringSearchSubtypes.includes(subtype) ? "keyword" : "text",
-      null_value: ELASTIC_INDEXABLE_NULL_VALUE,
-    },
+    properties: {
+      // the sql prefix defined plus the id, eg for includes
+      [arg.prefix + arg.id]: {
+        type: exactStringSearchSubtypes.includes(subtype) ? "keyword" : "text",
+        null_value: ELASTIC_INDEXABLE_NULL_VALUE,
+      },
+    }
   }
 }
 
@@ -60,7 +64,7 @@ export function stringSQLElasticIn(arg: ISQLOutInfo) {
   return {
     [arg.prefix + arg.id]: subtype === "json" ? (
       arg.row[arg.prefix + arg.id] === null ? null : JSON.parse(arg.row[arg.prefix + arg.id])
-    ) :  arg.row[arg.prefix + arg.id],
+    ) : arg.row[arg.prefix + arg.id],
   };
 }
 

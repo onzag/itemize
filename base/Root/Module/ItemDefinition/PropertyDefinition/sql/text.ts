@@ -39,29 +39,33 @@ export function textSQL(arg: ISQLArgInfo) {
   };
 }
 
-export function textElastic(arg: IArgInfo) {
+export function textElastic(arg: ISQLArgInfo) {
   const isRichText = arg.property.isRichText();
 
   if (isRichText) {
     return {
-      [arg.prefix + arg.id]: {
-        type: "text",
-        enabled: isRichText ? false : true,
-        null_value: ELASTIC_INDEXABLE_NULL_VALUE,
-      },
-      [arg.prefix + arg.id + "_PLAIN"]: {
-        type: "text",
-        enabled: isRichText ? true : false,
-        null_value: ELASTIC_INDEXABLE_NULL_VALUE,
+      properties: {
+        [arg.prefix + arg.id]: {
+          type: "text",
+          enabled: isRichText ? false : true,
+          null_value: ELASTIC_INDEXABLE_NULL_VALUE,
+        },
+        [arg.prefix + arg.id + "_PLAIN"]: {
+          type: "text",
+          enabled: isRichText ? true : false,
+          null_value: ELASTIC_INDEXABLE_NULL_VALUE,
+        }
       }
     }
   } else {
     return {
-      [arg.prefix + arg.id]: {
-        type: "text",
-        enabled: isRichText ? false : true,
-        null_value: ELASTIC_INDEXABLE_NULL_VALUE,
-      },
+      properties: {
+        [arg.prefix + arg.id]: {
+          type: "text",
+          enabled: isRichText ? false : true,
+          null_value: ELASTIC_INDEXABLE_NULL_VALUE,
+        },
+      }
     }
   }
 }
@@ -203,7 +207,7 @@ export function textSQLSearch(arg: ISQLSearchInfo): boolean | [string, any[]] {
  * @param arg the sql search arg info
  * @returns a boolean on whether it was searched by it, and a complementary column order by in case it needs it
  */
- export function textElasticSearch(arg: IElasticSearchInfo): boolean {
+export function textElasticSearch(arg: IElasticSearchInfo): boolean {
   const searchName = PropertyDefinitionSearchInterfacesPrefixes.SEARCH + arg.prefix + arg.id;
   const isRichText = arg.property.isRichText();
 
@@ -271,7 +275,7 @@ export function textSQLStrSearch(arg: ISQLStrSearchInfo): boolean | [string, any
 /**
  * Provides the text FTS str sql search functionality
  */
- export function textElasticStrSearch(arg: IElasticStrSearchInfo): boolean {
+export function textElasticStrSearch(arg: IElasticStrSearchInfo): boolean {
   if (arg.boost === 0) {
     return false;
   }

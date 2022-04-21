@@ -12,7 +12,7 @@ import {
 import PropertyDefinition from "../../PropertyDefinition";
 import {
   ISQLTableRowValue, ISQLTableDefinitionType, ISQLStreamComposedTableRowValue,
-  ConsumeStreamsFnType, ISQLTableIndexType
+  ConsumeStreamsFnType, ISQLTableIndexType, IElasticIndexDefinitionType
 } from "../../../../sql";
 import { PropertyDefinitionSearchInterfacesPrefixes } from "../search-interfaces";
 import ItemDefinition from "../..";
@@ -65,7 +65,7 @@ export function getStandardElasticFor(
   type: string,
   format?: string,
   disabled?: boolean,
-): (arg: IArgInfo) => any {
+): (arg: IArgInfo) => IElasticIndexDefinitionType {
   return (arg: IArgInfo) => {
     const value: any = {
       // the type is defined
@@ -79,7 +79,7 @@ export function getStandardElasticFor(
       value.enabled = false;
     }
     return {
-      [arg.prefix + arg.id]: value,
+      properties: { [arg.prefix + arg.id]: value },
     }
   }
 }
@@ -310,6 +310,29 @@ export function getSQLTableDefinitionForProperty(
     // server data unavailable
     serverData: null,
   });
+}
+
+export function getElasticSchemaForProperty(
+  itemDefinition: ItemDefinition,
+  include: Include,
+  propertyDefinition: PropertyDefinition,
+  serverData: any,
+): IElasticIndexDefinitionType {
+  const elasticFn = propertyDefinition.getPropertyDefinitionDescription().elastic;
+  if (elasticFn) {
+    return elasticFn({
+      prefix: include ? include.getPrefixedQualifiedIdentifier() : "",
+      id: propertyDefinition.getId(),
+      property: propertyDefinition,
+      itemDefinition,
+      include,
+      serverData,
+    });
+  }
+
+  return {
+    properties: {},
+  };
 }
 
 /**
