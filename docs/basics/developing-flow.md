@@ -20,7 +20,7 @@ No matter the situation, this method should completely work regardless in order 
  1. Kill the dev server via ctrl+c
  2. `npm run build`
  3. `npm run build-database development` (if there are changes to the schema files)
- 4. `npm run start-dev-server` or `NO_SSR=true NO_SEO=true npm run start-dev-server`
+ 4. `npm run start-dev-server` or `NODE_TLS_REJECT_UNAUTHORIZED=0 FAKE_USSD=true FAKE_EMAILS=true FAKE_SMS=true NO_SSR=true NO_SEO=true npm run start-dev-server`
  5. Your browser should complain that the app is outdated, run the refresh.
 
 This method is however not optimal in most scenarios, one thing, it's slow, and it builds more than it should be necessary.
@@ -61,7 +61,7 @@ If you have performed changes to the internationalization `.properties` files, o
  1. Kill the server via ctrl+c
  2. `npm run build-data`
  3. `npm run build-database development`
- 4. `npm run start-dev-server` or `NO_SSR=true NO_SEO=true npm run start-dev-server`
+ 4. `npm run start-dev-server` or `NODE_TLS_REJECT_UNAUTHORIZED=0 FAKE_USSD=true FAKE_EMAILS=true FAKE_SMS=true NO_SSR=true NO_SEO=true npm run start-dev-server`
 
 This should provide a new fresh instance that contains all the updates in the server side, your client now should complain of the app being outdated, and receive the updates as well.
 
@@ -71,7 +71,7 @@ If you have done changes to the server side, the proces to update the server cod
 
  1. Kill the server via ctrl+c
  2. `npm run install`
- 3. `npm run start-dev-server` or `NO_SSR=true NO_SEO=true npm run start-dev-server`
+ 3. `npm run start-dev-server` or `NODE_TLS_REJECT_UNAUTHORIZED=0 FAKE_USSD=true FAKE_EMAILS=true FAKE_SMS=true NO_SSR=true NO_SEO=true npm run start-dev-server`
 
 Note that this will not affect your client side at all.
 
@@ -118,7 +118,7 @@ You should have your own local repository of itemize for this, and do the change
  1. Kill the server of the itemize powered application. (within the project directory)
  2. `npm run install` (within the itemize repository)
  3. `cp -r nodejs/ directory/of/your/project/node_modules/@onzag/itemize` (within the itemize repository)
- 4. `npm run start-dev-server` or `NO_SSR=true NO_SEO=true npm run start-dev-server` (within the project directory)
+ 4. `npm run start-dev-server` or `NODE_TLS_REJECT_UNAUTHORIZED=0 FAKE_USSD=true FAKE_EMAILS=true FAKE_SMS=true NO_SSR=true NO_SEO=true npm run start-dev-server` (within the project directory)
 
 ### Itemize Specific Client Changes
 
@@ -126,7 +126,7 @@ You should have your own local repository of itemize for this, and do the change
  2. `npm run install` (within the itemize repository)
  3. `cp -r * directory/of/your/project/node_modules/@onzag/itemize` (within the itemize repository)
  4. `npm run webpack-dev` or `npm run webpack` (within the project directory)
- 5. `npm run start-dev-server` or `NO_SSR=true NO_SEO=true npm run start-dev-server` (within the project directory)
+ 5. `npm run start-dev-server` or `NODE_TLS_REJECT_UNAUTHORIZED=0 FAKE_USSD=true FAKE_EMAILS=true FAKE_SMS=true NO_SSR=true NO_SEO=true npm run start-dev-server` (within the project directory)
 
 ### Testing debugging
 

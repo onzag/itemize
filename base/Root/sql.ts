@@ -152,7 +152,7 @@ export function getElasticSchemaForRoot(root: Root, serverData: any): IElasticSc
           type: "date",
         },
       }
-    }
+    },
   }
 
   root.getAllModules().forEach((cModule) => {

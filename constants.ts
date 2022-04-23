@@ -97,6 +97,13 @@ export interface IItemizeConstantsConfig {
    */
   SERVER_BLOCK_UNTIL_REFRESH_TIME?: number;
   /**
+   * The time it takes for elasticsearch (if available)
+   * to be cleaned the old records that are not expected to be retrieved
+   * this has to do with the since limiter that may exist within
+   * indexes
+   */
+  SERVER_ELASTIC_CONSISTENCY_CHECK_TIME?: number;
+  /**
    * The maximum amount of remote listeners a socket can
    * have at once before the server denies adding more
    * these are used for realtime updates
@@ -183,8 +190,8 @@ export const MAX_FILES_PER_PROPERTY = R_ITEMIZE_CONSTANTS_CONFIG.MAX_FILES_PER_P
  */
 export const MAX_FILES_PER_REQUEST =
   R_ITEMIZE_CONSTANTS_CONFIG.MAX_FILES_PER_REQUEST ?
-  R_ITEMIZE_CONSTANTS_CONFIG.MAX_FILES_PER_REQUEST :
-  MAX_FILES_PER_PROPERTY * 10;
+    R_ITEMIZE_CONSTANTS_CONFIG.MAX_FILES_PER_REQUEST :
+    MAX_FILES_PER_PROPERTY * 10;
 /**
  * Another just a security concern, this
  * is the size of the graphql query, 1MB should be way more than enough for a graphql query
@@ -217,9 +224,15 @@ export const SERVER_DATA_MIN_UPDATE_TIME = R_ITEMIZE_CONSTANTS_CONFIG.SERVER_DAT
 export const SERVER_MAPPING_TIME = R_ITEMIZE_CONSTANTS_CONFIG.SERVER_MAPPING_TIME || 86400000; // 1 day, to sitemap the site
 
 /**
- * The time it takes for blocks to be refreshed
+ * The time it takes for blocks to be refreshed, the blocks represent the blocked_at and blocked_until functionality
+ * that automatically gets removed
  */
 export const SERVER_BLOCK_UNTIL_REFRESH_TIME = R_ITEMIZE_CONSTANTS_CONFIG.SERVER_BLOCK_UNTIL_REFRESH_TIME || 86400000; // 1 day
+
+/**
+ * The time it takes to run a cleanup process into the elastic instance
+ */
+export const SERVER_ELASTIC_CONSISTENCY_CHECK_TIME = R_ITEMIZE_CONSTANTS_CONFIG.SERVER_ELASTIC_CONSISTENCY_CHECK_TIME || 30000; // every 30 seconds
 
 /**
  * The maximum amount of remote listeners a socket supports
@@ -797,10 +810,10 @@ export const RESERVED_BASE_PROPERTIES_SQL: (combinedIndexes: string[], addedInde
       type: "btree",
       level: combinedIndexes.indexOf("parent_id"),
     } : {
-        id: PARENT_INDEX,
-        type: "btree",
-        level: 0,
-      },
+      id: PARENT_INDEX,
+      type: "btree",
+      level: 0,
+    },
   },
   parent_version: {
     type: "TEXT",
@@ -809,10 +822,10 @@ export const RESERVED_BASE_PROPERTIES_SQL: (combinedIndexes: string[], addedInde
       type: "btree",
       level: combinedIndexes.indexOf("parent_version"),
     } : {
-        id: PARENT_INDEX,
-        type: "btree",
-        level: 1,
-      },
+      id: PARENT_INDEX,
+      type: "btree",
+      level: 1,
+    },
   },
   parent_type: {
     type: "TEXT",
@@ -821,10 +834,10 @@ export const RESERVED_BASE_PROPERTIES_SQL: (combinedIndexes: string[], addedInde
       type: "btree",
       level: combinedIndexes.indexOf("parent_type"),
     } : {
-        id: PARENT_INDEX,
-        type: "btree",
-        level: 2,
-      },
+      id: PARENT_INDEX,
+      type: "btree",
+      level: 2,
+    },
   },
   container_id: {
     type: "TEXT",
@@ -847,10 +860,10 @@ export const RESERVED_BASE_PROPERTIES_SQL: (combinedIndexes: string[], addedInde
       type: "btree",
       level: combinedIndexes.indexOf("created_by"),
     } : {
-        id: CREATED_BY_INDEX,
-        type: "btree",
-        level: 0,
-      },
+      id: CREATED_BY_INDEX,
+      type: "btree",
+      level: 0,
+    },
   },
   edited_at: {
     type: "TIMESTAMPTZ",

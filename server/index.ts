@@ -622,7 +622,7 @@ export async function initializeServer(
       root,
       rawDB,
       elasticConnection,
-      dbConfig.elasticLangAnalizers,
+      dbConfig.elasticLangAnalyzers,
     ) : null;
 
     logger.info(

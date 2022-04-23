@@ -24,7 +24,7 @@ Make sure you have grabbed your admin user.
 
 Now that we have decided to start on development ensure to disable service workers, in chrome this is done by going to the developer tools `Application Tab -> Service Workers -> Tick "Bypass for network"`, however some browsers lack the feature, you can brute force the disabling of the service workers by using local storage via `localStorage.setItem("DISABLE_SERVICE_WORKER", "true")`
 
-You should then kill the server and start it in a more development friendly mode using `NO_SSR=true NO_SEO=true FAKE_EMAILS=true FAKE_SMS=true npm run start-dev-server` and that should restart your server without SSR enabled, SEO and making it non-capable of sending emails (if you had configured a mail provider), either way it's good practique to use FAKE_EMAILS and FAKE_SMS, for all the available variable check out [Server Env Variables](.././basics/server-env-variables.md)
+You should then kill the server and start it in a more development friendly mode using `NODE_TLS_REJECT_UNAUTHORIZED=0 FAKE_USSD=true FAKE_EMAILS=true FAKE_SMS=true NO_SSR=true NO_SEO=true npm run start-dev-server` and that should restart your server without SSR enabled, SEO and making it non-capable of sending emails (if you had configured a mail provider), either way it's good practique to use FAKE_EMAILS and FAKE_SMS, for all the available variable check out [Server Env Variables](.././basics/server-env-variables.md)
 
 Now we are ready to turn this template website into something that is more reminiscent of a hosting app.
 

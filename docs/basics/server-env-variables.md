@@ -67,6 +67,16 @@ Note that only one manager instace should run at a time, otherwise this will res
 
 The global manager that connects to postgresql and performs type mantenience tasks, this global manager then sends messages to the cluster managers and extended instances about any updates it has performed to the values in the database, these will in turn keep the users updated, mantaining the realtime of things.
 
+The global manager can be split into multiple global managers, by default a global manager is started in absolute mode, however you can change it by using the environment variable `GLOBAL_MANAGER_MODE` which can take the following values
+
+ - ABSOLUTE - will do everything and run every single service, useful for development however can also be ran like that in production
+ - ELASTIC - will perform the elasticsearch consistency check if elasticsearch is available as given for the configuration
+ - SITEMAPS - will use the seo generator in order to build the sitemaps for the website
+ - SERVER_DATA - will be in use to update the server data, aka its currency factors
+ - SERVICES - 
+
+And when the variable is set as `GLOBAL_MANAGER_MODE=SERVICES` you can further specify which services you are tasked to run
+
 ### ABSOLUTE
 
 The absolute is a combination of an extended instance, global manager and cluster manager instance, not only it manages its local instance, but also performs standard API server logic, this mode is useful when running a dev environment as you want to have as little complexity as possible, even when it doesn't show the reality of a real life cluster where there will be one CLUSTER_MANAGER and as many EXTENDED servers as necessary
@@ -119,3 +129,13 @@ Emails do not get delivered instead get logged to console, useful for developmen
 Default `false`
 
 Sms do not get delivered instead get logged to console, useful for development
+
+## FAKE_USSD
+
+Default `false`
+
+When creating an app that supports USSD, use the fake ussd mode to create an endpoint at `rest/service/ussd` that will allow to debug an USSD based application with a fake USSD interface, note that this service is dangerous because it allows anyone to identify as anyone else and is meant for development purposes
+
+## NODE_TLS_REJECT_UNAUTHORIZED
+
+Use this in development when running a dev environment in order to enable elasticseach to property connect when using certificates

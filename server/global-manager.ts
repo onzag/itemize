@@ -12,6 +12,7 @@ import {
   UNSPECIFIED_OWNER,
   SERVER_MAPPING_TIME,
   SERVER_BLOCK_UNTIL_REFRESH_TIME,
+  SERVER_ELASTIC_CONSISTENCY_CHECK_TIME,
 } from "../constants";
 import {
   ISensitiveConfigRawJSONDataType,
@@ -33,6 +34,7 @@ import { IManyValueType } from "../database/base";
 import PhoneProvider from "./services/base/PhoneProvider";
 import { ItemizeRawDB } from "./raw-db";
 import { ItemizeElasticClient } from "./elastic";
+import { GLOBAL_MANAGER_MODE, GLOBAL_MANAGER_SERVICES } from "./environment";
 
 interface IMantainProp {
   pdef: PropertyDefinition;
@@ -60,6 +62,7 @@ export class GlobalManager {
   private serverData: IServerDataType;
   private serverDataLastUpdated: number;
   private seoGenLastUpdated: number;
+  private elasticCleanupLastExecuted: number;
   private blocksReleaseLastExecuted: number;
   private currencyFactorsProvider: CurrencyFactorsProvider<any>;
   private sensitiveConfig: ISensitiveConfigRawJSONDataType;
@@ -109,18 +112,18 @@ export class GlobalManager {
 
     this.customServices = {};
 
-    mailProvider &&
-      mailProvider.setupGlobalResources(
-        this.databaseConnection,
-        this.globalCache,
-        this.redisPub,
-        this.redisSub,
-        this.mailProvider,
-        this.phoneProvider,
-        this.customServices,
-        this.root
-      );
-    phoneProvider &&
+    mailProvider && (GLOBAL_MANAGER_MODE === "ABSOLUTE" || GLOBAL_MANAGER_MODE === "SERVER_DATA" || GLOBAL_MANAGER_MODE === "SERVICES")
+    mailProvider.setupGlobalResources(
+      this.databaseConnection,
+      this.globalCache,
+      this.redisPub,
+      this.redisSub,
+      this.mailProvider,
+      this.phoneProvider,
+      this.customServices,
+      this.root
+    );
+    phoneProvider && (GLOBAL_MANAGER_MODE === "ABSOLUTE" || GLOBAL_MANAGER_MODE === "SERVER_DATA" || GLOBAL_MANAGER_MODE === "SERVICES") &&
       phoneProvider.setupGlobalResources(
         this.databaseConnection,
         this.globalCache,
@@ -131,7 +134,7 @@ export class GlobalManager {
         this.customServices,
         this.root
       );
-    currencyFactorsProvider &&
+    currencyFactorsProvider && (GLOBAL_MANAGER_MODE === "ABSOLUTE" || GLOBAL_MANAGER_MODE === "SERVER_DATA") &&
       currencyFactorsProvider.setupGlobalResources(
         this.databaseConnection,
         this.globalCache,
@@ -154,43 +157,55 @@ export class GlobalManager {
     // we want to make sure the admin user is added in case
     // before preparing the instance so that it is
     // indexed if our schema defines it as such
-    (async () => {
-      await this.addAdminUserIfMissing();
-      this.elastic && this.elastic.prepareInstance();
-    })();
+    if (GLOBAL_MANAGER_MODE === "ABSOLUTE" || GLOBAL_MANAGER_MODE === "SERVER_DATA") {
+      (async () => {
+        await this.addAdminUserIfMissing();
+        this.elastic && this.elastic.prepareInstance();
+      })();
+    }
   }
   public setSEOGenerator(seoGenerator: SEOGenerator) {
     this.seoGenerator = seoGenerator;
   }
   public installGlobalService(service: ServiceProvider<any>) {
-    this.customServices[service.getInstanceName()] = service;
-    service.setupGlobalResources(
-      this.databaseConnection,
-      this.globalCache,
-      this.redisPub,
-      this.redisSub,
-      this.mailProvider,
-      this.phoneProvider,
-      this.customServices,
-      this.root
-    );
+    if (
+      GLOBAL_MANAGER_MODE === "ABSOLUTE" ||
+      (
+        GLOBAL_MANAGER_MODE === "SERVICES" &&
+        (GLOBAL_MANAGER_SERVICES.includes(service.getInstanceName()) || GLOBAL_MANAGER_SERVICES.length === 0)
+      )
+    ) {
+      this.customServices[service.getInstanceName()] = service;
+      service.setupGlobalResources(
+        this.databaseConnection,
+        this.globalCache,
+        this.redisPub,
+        this.redisSub,
+        this.mailProvider,
+        this.phoneProvider,
+        this.customServices,
+        this.root
+      );
+    }
   }
   public async initializeServices() {
-    if (this.mailProvider) {
+    if (this.mailProvider && (GLOBAL_MANAGER_MODE === "ABSOLUTE" || GLOBAL_MANAGER_MODE === "SERVER_DATA" || GLOBAL_MANAGER_MODE === "SERVICES")) {
       await this.mailProvider.initialize();
     }
-    if (this.phoneProvider) {
+    if (this.phoneProvider && (GLOBAL_MANAGER_MODE === "ABSOLUTE" || GLOBAL_MANAGER_MODE === "SERVER_DATA" || GLOBAL_MANAGER_MODE === "SERVICES")) {
       await this.phoneProvider.initialize();
     }
-    if (this.currencyFactorsProvider) {
+    if (this.currencyFactorsProvider && (GLOBAL_MANAGER_MODE === "ABSOLUTE" || GLOBAL_MANAGER_MODE === "SERVER_DATA")) {
       await this.currencyFactorsProvider.initialize();
     }
 
-    await Promise.all(
-      Object.keys(this.customServices).map((sKey) => {
-        return this.customServices[sKey].initialize();
-      })
-    );
+    if (GLOBAL_MANAGER_MODE === "ABSOLUTE" || GLOBAL_MANAGER_MODE === "SERVICES") {
+      await Promise.all(
+        Object.keys(this.customServices).map((sKey) => {
+          return this.customServices[sKey].initialize();
+        })
+      );
+    }
   }
   private async addAdminUserIfMissing() {
     if (!this.config.roles.includes("ADMIN")) {
@@ -487,15 +502,20 @@ export class GlobalManager {
   public run() {
     logger.info("GlobalManager.run: running global manager");
 
-    this.releaseBlocks();
+    if (GLOBAL_MANAGER_MODE === "ABSOLUTE" || GLOBAL_MANAGER_MODE === "SERVER_DATA") {
+      this.releaseBlocks();
+    }
 
     // currency factors shoudn't really have its own execution but who knows
-    if (this.currencyFactorsProvider) {
+    if (
+      this.currencyFactorsProvider &&
+      (GLOBAL_MANAGER_MODE === "ABSOLUTE" || GLOBAL_MANAGER_MODE === "SERVER_DATA")
+    ) {
       this.currencyFactorsProvider.execute();
     }
 
     // hijack the seo generator and do our own executions
-    if (this.seoGenerator) {
+    if (this.seoGenerator && (GLOBAL_MANAGER_MODE === "ABSOLUTE" || GLOBAL_MANAGER_MODE === "SITEMAPS")) {
       (async () => {
         while (true) {
           this.seoGenLastUpdated = new Date().getTime();
@@ -538,55 +558,164 @@ export class GlobalManager {
       })();
     }
 
+    if (this.elastic && (GLOBAL_MANAGER_MODE === "ABSOLUTE" || GLOBAL_MANAGER_MODE === "ELASTIC")) {
+      (async () => {
+        while (true) {
+          this.elasticCleanupLastExecuted = new Date().getTime();
+
+          logger.info("GlobalManager.run: running elasticsearch consistency check");
+          try {
+            await this.elastic.runConsistencyCheck();
+          } catch (err) {
+            logger.error(
+              "GlobalManager.run [SERIOUS]: Elasticsearch consistency check failed to run",
+              {
+                errStack: err.stack,
+                errMessage: err.message,
+              }
+            );
+          }
+
+          const nowTime = new Date().getTime();
+          const timeItPassedSinceElasticCleanupRan = nowTime - this.elasticCleanupLastExecuted;
+          const timeUntilElasticCleanupNeedsToRun =
+            SERVER_ELASTIC_CONSISTENCY_CHECK_TIME - timeItPassedSinceElasticCleanupRan;
+
+          if (timeUntilElasticCleanupNeedsToRun <= 0) {
+            logger.error(
+              "GlobalManager.run [SERIOUS]: during the processing of events the time needed until next elastic consistency check was negative" +
+              " this means the server took forever doing the last consistency check, clearly something is off",
+              {
+                timeUntilElasticCleanupNeedsToRun,
+              }
+            );
+          } else {
+            logger.info(
+              "GlobalManager.run: elasticsearch consistency check tasked to run in " +
+              timeUntilElasticCleanupNeedsToRun +
+              "ms"
+            );
+            await wait(timeUntilElasticCleanupNeedsToRun);
+          }
+        }
+      })();
+    }
+
     // this is what it's used with currency factors in reality
-    (async () => {
-      while (true) {
-        this.serverDataLastUpdated = new Date().getTime();
+    if (
+      GLOBAL_MANAGER_MODE === "ABSOLUTE" || GLOBAL_MANAGER_MODE === "SERVER_DATA"
+    ) {
+      (async () => {
+        while (true) {
+          this.serverDataLastUpdated = new Date().getTime();
 
-        await this.calculateServerData();
+          await this.calculateServerData();
 
-        try {
-          await this.runOnce();
-        } catch (err) {
-          logger.error(
-            "GlobalManager.run [SERIOUS]: run once function failed to run",
-            {
-              errStack: err.stack,
-              errMessage: err.message,
-            }
-          );
+          try {
+            await this.runOnce();
+          } catch (err) {
+            logger.error(
+              "GlobalManager.run [SERIOUS]: run once function failed to run",
+              {
+                errStack: err.stack,
+                errMessage: err.message,
+              }
+            );
+          }
+
+          const nowTime = new Date().getTime();
+          const timeItPassedSinceServerDataLastUpdated =
+            nowTime - this.serverDataLastUpdated;
+          const timeUntilItNeedsToUpdate =
+            SERVER_DATA_MIN_UPDATE_TIME - timeItPassedSinceServerDataLastUpdated;
+
+          if (timeUntilItNeedsToUpdate <= 0) {
+            logger.error(
+              "GlobalManager.run [SERIOUS]: during the processing of events the time needed until next update was negative" +
+              " this means the server took too long doing mantenience tasks, this means your database is very large, while this is not " +
+              " a real error as it was handled gracefully, this should be addressed to itemize developers",
+              {
+                timeUntilItNeedsToUpdate,
+              }
+            );
+          } else {
+            logger.info(
+              "GlobalManager.run: Server data and updater tasked to run in " +
+              timeUntilItNeedsToUpdate +
+              "ms"
+            );
+            await wait(timeUntilItNeedsToUpdate);
+          }
+        }
+      })();
+    }
+
+    // when the global manager mode is not absolute but only the elastic type then we are
+    // required to hook into the event to inform new server data because in the absolute mode
+    // we cheat and inform new server data directly
+    if (GLOBAL_MANAGER_MODE === "ELASTIC") {
+      // we need to setup this function to setup the listener
+      (async () => {
+        // first let's see if we got anything stored in memory
+        const storedStrValue = await this.globalCache.get(SERVER_DATA_IDENTIFIER) || null;
+        // if we do then we can use that as it is
+        if (storedStrValue) {
+          // and use it inside if we can
+          try {
+            const storedValue = JSON.parse(storedStrValue);
+            this.elastic.informNewServerData(storedValue);
+          } catch (err) {
+            logger.error(
+              "GlobalManager.run [SERIOUS]: unable to parse server data stored in redis",
+              {
+                storedStrValue,
+              }
+            );
+          }
         }
 
-        const nowTime = new Date().getTime();
-        const timeItPassedSinceServerDataLastUpdated =
-          nowTime - this.serverDataLastUpdated;
-        const timeUntilItNeedsToUpdate =
-          SERVER_DATA_MIN_UPDATE_TIME - timeItPassedSinceServerDataLastUpdated;
-
-        if (timeUntilItNeedsToUpdate <= 0) {
-          logger.error(
-            "GlobalManager.run [SERIOUS]: during the processing of events the time needed until next update was negative" +
-            " this means the server took too long doing mantenience tasks, this means your database is very large, while this is not " +
-            " a real error as it was handled gracefully, this should be addressed to itemize developers",
-            {
-              timeUntilItNeedsToUpdate,
+        // and now we can setup the events and subscriptions for the server data
+        this.redisSub.redisClient.subscribe(SERVER_DATA_IDENTIFIER);
+        // once we get it
+        this.redisSub.redisClient.on("message", (channel, message) => {
+          // then we need to grab that event
+          try {
+            const redisEvent: IRedisEvent = JSON.parse(message);
+            if (redisEvent.type === SERVER_DATA_IDENTIFIER) {
+              const data = redisEvent.data;
+              if (!data) {
+                logger.error(
+                  "GlobalManager.run [SERIOUS]: did not get any data in the redis event at " + channel,
+                  {
+                    message,
+                    redisEvent,
+                  }
+                );
+              } else {
+                // and send that data to elasticsearch
+                this.elastic.informNewServerData(data);
+              }
             }
-          );
-        } else {
-          logger.info(
-            "GlobalManager.run: Server data and updater tasked to run in " +
-            timeUntilItNeedsToUpdate +
-            "ms"
-          );
-          await wait(timeUntilItNeedsToUpdate);
-        }
-      }
-    })();
+          } catch (err) {
+            logger.error(
+              "GlobalManager.run [SERIOUS]: unable to process redis event at " + channel,
+              {
+                message,
+                errMessage: err.message,
+                errStack: err.stack,
+              }
+            );
+          }
+        });
+      })();
+    }
 
     // execute every custom service
-    Object.keys(this.customServices).forEach((s) =>
-      this.customServices[s].execute()
-    );
+    if (GLOBAL_MANAGER_MODE === "ABSOLUTE" || GLOBAL_MANAGER_MODE === "SERVICES") {
+      Object.keys(this.customServices).forEach((s) =>
+        this.customServices[s].execute()
+      );
+    }
   }
   private async runOnce() {
     for (const mod of this.modNeedsMantenience) {
@@ -868,7 +997,11 @@ export class GlobalManager {
         );
       }
 
-      this.elastic && this.elastic.informNewServerData(this.serverData);
+      // because we are in absolute mode we can both get the server data
+      // and inform it to elastic right away, otherwise elastic is meant to hook into the event
+      if (GLOBAL_MANAGER_MODE === "ABSOLUTE") {
+        this.elastic && this.elastic.informNewServerData(this.serverData);
+      }
     }
 
     logger.info(

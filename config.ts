@@ -321,7 +321,7 @@ export interface IDBConfigRawJSONDataType {
   // elasticsearch compound
   // https://www.elastic.co/guide/en/elasticsearch/client/javascript-api/current/basic-config.html
   elastic: any;
-  elasticLangAnalizers: {
+  elasticLangAnalyzers: {
     [key: string]: string,
   },
 }
