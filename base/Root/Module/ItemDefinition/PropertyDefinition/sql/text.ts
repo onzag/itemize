@@ -93,7 +93,7 @@ export function textSQLIn(arg: ISQLInInfo) {
       [arg.prefix + arg.id]: null,
       [arg.prefix + arg.id + "_PLAIN"]: null,
       [arg.prefix + arg.id + "_VECTOR"]: null,
-      [arg.prefix + arg.id + "_LANGUAGE"]: null,
+      [arg.prefix + arg.id + "_LANGUAGE"]: arg.language,
       [arg.prefix + arg.id + "_DICTIONARY"]: arg.dictionary,
     };
   }

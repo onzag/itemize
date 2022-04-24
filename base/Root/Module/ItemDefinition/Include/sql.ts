@@ -13,6 +13,7 @@ import {
   convertGQLValueToSQLValueForProperty,
   buildSQLQueryForProperty,
   getElasticSchemaForProperty,
+  convertSQLValueToElasticSQLValueForProperty,
 } from "../PropertyDefinition/sql";
 import Include, { IncludeExclusionState } from "../Include";
 import { ISQLTableDefinitionType, ISQLTableRowValue, ISQLStreamComposedTableRowValue, ConsumeStreamsFnType, IElasticIndexDefinitionType } from "../../../sql";
@@ -133,7 +134,7 @@ export function convertSQLValueToGQLValueForInclude(
   // the output should be
   // ITEM_wheel__EXCLUSION_STATE: ..., ITEM_wheel: {bolt: ... rubber: ...}
   // this gqlParentResult represents what is in ITEM_wheel
-  let gqlParentResult: IGQLValue = {};
+  const gqlParentResult: IGQLValue = {};
 
   // for that we need all the sinking properties
   include.getSinkingProperties().filter(
@@ -142,16 +143,16 @@ export function convertSQLValueToGQLValueForInclude(
     // and we add them for the row data, notice how we add the prefix
     // telling the property definition that its properties are prefixed in
     // the sql data with ITEM_wheel_
-    gqlParentResult = {
-      ...gqlParentResult,
-      ...convertSQLValueToGQLValueForProperty(
+    Object.assign(
+      gqlParentResult,
+      convertSQLValueToGQLValueForProperty(
         serverData,
         itemDefinition,
         include,
         sinkingProperty,
         row,
       ),
-    };
+    );
   });
 
   // now we return both info, the exclusion state, and the item data
@@ -160,6 +161,35 @@ export function convertSQLValueToGQLValueForInclude(
     [include.getQualifiedExclusionStateIdentifier()]: row[include.getQualifiedExclusionStateIdentifier()],
     [include.getQualifiedIdentifier()]: gqlParentResult,
   };
+}
+
+export function convertSQLValueToElasticSQLValueForInclude(
+  serverData: any,
+  itemDefinition: ItemDefinition, 
+  include: Include,
+  row: ISQLTableRowValue,
+): IGQLValue {
+  let result: ISQLTableRowValue = {
+    [include.getQualifiedExclusionStateIdentifier()]: row[include.getQualifiedExclusionStateIdentifier()],
+  };
+
+  // for that we need all the sinking properties
+  include.getSinkingProperties().forEach((sinkingProperty) => {
+    Object.assign(
+      result,
+      convertSQLValueToElasticSQLValueForProperty(
+        serverData,
+        itemDefinition,
+        include,
+        sinkingProperty,
+        row,
+      ),
+    );
+  });
+
+  // now we return both info, the exclusion state, and the item data
+  // prefixed as necessary
+  return result;
 }
 
 /**

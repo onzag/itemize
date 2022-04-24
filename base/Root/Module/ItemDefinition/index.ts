@@ -2945,15 +2945,30 @@ export default class ItemDefinition {
   }
 
   /**
+   * Solves the main language from the row
+   * @param rowValue 
+   * @returns 
+   */
+  public getSearchEngineMainLanguageFromRow(rowValue: any) {
+    if (this.rawData.searchEngineMainLang) {
+      return this.rawData.searchEngineMainLang === "none" ? null : (this.rawData.searchEngineMainLang || null);
+    }
+    
+    if (this.rawData.searchEngineMainLangBasedOnProperty) {
+      return rowValue[this.rawData.searchEngineMainLangBasedOnProperty] || null;
+    } else if (this.rawData.searchEngineMainLangProperty) {
+      return rowValue[this.rawData.searchEngineMainLangProperty + "_LANG"] || null;
+    }
+    return null;
+  }
+
+  /**
    * If was provided gives the search engine main
    * language to use to define the search
    * @returns a 2 iso string
    */
   public getSearchEngineMainLanguage() {
-    if (this.rawData.searchEngineMainLang === "none") {
-      return null;
-    }
-    return this.rawData.searchEngineMainLang || null;
+    return this.rawData.searchEngineMainLang === "none" ? null : (this.rawData.searchEngineMainLang || null);
   }
 
   /**
@@ -2961,9 +2976,9 @@ export default class ItemDefinition {
    * language to use as it was stored in the columns
    * @returns the sql text column name that contains the language to index the whole
    */
-  public getDynamicMainLanguageColumn() {
+  public getSearchEngineDynamicMainLanguageColumn() {
     if (this.rawData.searchEngineMainLangBasedOnProperty) {
-      return this.rawData.searchEngineMainLangBasedOnProperty;
+      return ;
     } else if (this.rawData.searchEngineMainLangProperty) {
       return this.rawData.searchEngineMainLangProperty + "_LANG";
     }

@@ -30,6 +30,7 @@ import uuidv5 from "uuid/v5";
 import { DeleteBuilder } from "../database/DeleteBuilder";
 import type PropertyDefinition from "../base/Root/Module/ItemDefinition/PropertyDefinition";
 import type Include from "../base/Root/Module/ItemDefinition/Include";
+import { ItemizeElasticClient } from "./elastic";
 
 type RedoDictionariesFnPropertyBased = (language: string, dictionary: string, property: string) => void;
 type RedoDictionariesFnPropertyIncludeBased = (language: string, dictionary: string, include: string, property: string) => void;
@@ -54,6 +55,7 @@ const requiredProperties = ["id", "version", "type", "created_by", "parent_id", 
 export class ItemizeRawDB {
   private redisPub: ItemizeRedisClient;
   private root: Root;
+  private elastic: ItemizeElasticClient;
 
   private transacting: boolean;
   private transactingQueue: Function[] = [];
@@ -70,6 +72,15 @@ export class ItemizeRawDB {
     this.redisPub = redisPub;
     this.databaseConnection = databaseConnection;
     this.root = root;
+  }
+
+  /**
+   * the elastic instance depends on raw db and raw db depends on the
+   * elastic instance, as such elastic adds itself in here when initialized
+   * @param elastic the elastic instance
+   */
+  public setupElastic(elastic: ItemizeElasticClient) {
+    this.elastic = elastic;
   }
 
   /**
@@ -195,19 +206,11 @@ export class ItemizeRawDB {
     return insertQueryValue.transaction_time as string;
   }
 
-  /**
-   * Informs all the caches all the way to the clients of a change in a given
-   * row 
-   * @param row the row to inform a change on
-   * @param action what happened to the row
-   * @param dataIsComplete whether the row contains complete data
-   */
-  private async informChangeOnRow(row: ISQLTableRowValue, action: "created" | "deleted" | "modified", dataIsComplete: boolean) {
-    // first let's check whether the row is valid for the bare minimum
-    const isRowValid = row && requiredProperties.every((p) => {
+  private async checkRowValidityForInformingChanges(row: ISQLTableRowValue) {
+    return !!(row && requiredProperties.every((p) => {
       if (typeof row[p] === "undefined") {
         logger && logger.error(
-          "ItemizeRawDB.informChangeOnRow: row data is invalid as it misses property " + p,
+          "ItemizeRawDB.checkRowValidityForInformingChanges: row data is invalid as it misses property " + p,
           {
             row,
           }
@@ -216,15 +219,117 @@ export class ItemizeRawDB {
       }
 
       return true;
-    });
+    }));
+  }
+
+  private async informChangeOnRowElastic(
+    row: ISQLTableRowValue,
+    action: "created" | "deleted" | "modified",
+    elasticLanguageOverride: string,
+    dataIsComplete: boolean,
+    hasBeenChecked: boolean,
+  ) {
+    if (!hasBeenChecked) {
+      const isValid = this.checkRowValidityForInformingChanges(row);
+      if (!isValid) {
+        return;
+      }
+    }
+
+    const idef = (this.root.registry[row.type] as ItemDefinition);
+
+    // send to elasticsearch
+    if (this.elastic) {
+      // because this can be none, which returns null to fallback
+      // to the standard language, we need to realize this that null
+      // means we got it
+      const hasBaseLanguageSpecified = typeof elasticLanguageOverride !== "undefined" || !!idef.rawData.searchEngineMainLang;
+
+      // otherwise here we are checking what the dynamic column is and if we have it in
+      // our element
+      const reliesOnARowField = idef.getSearchEngineDynamicMainLanguageColumn();
+      const containsSuchRowField = reliesOnARowField && typeof row[reliesOnARowField] !== "undefined";
+
+      // all of it is known, we can proceed with a known update
+      let language: string = null;
+      if (hasBaseLanguageSpecified || (reliesOnARowField && containsSuchRowField)) {
+        language = typeof elasticLanguageOverride !== "undefined" ? elasticLanguageOverride : idef.getSearchEngineMainLanguageFromRow(row)
+      }
+
+      if (action === "created") {
+        if (language) {
+          this.elastic.createDocument(
+            idef,
+            language,
+            row.id,
+            row.version || null,
+            dataIsComplete ? row : null,
+          );
+        } else {
+          this.elastic.createDocumentUnknownEverything(
+            idef,
+            row.id,
+            row.version || null,
+          );
+        }
+      } else if (action === "deleted") {
+        if (language) {
+          this.elastic.deleteDocument(
+            idef,
+            language,
+            row.id,
+            row.version || null,
+          );
+        } else {
+          this.elastic.deleteDocumentUnknownLanguage(
+            idef,
+            row.id,
+            row.version || null,
+          );
+        }
+      } else {
+        if (language) {
+          this.elastic.updateDocumentUnknownOriginalLanguage(
+            idef,
+            language,
+            row.id,
+            row.version || null,
+            dataIsComplete ? row : null,
+          );
+        } else {
+          this.elastic.updateDocumentUnknownEverything(
+            idef,
+            row.id,
+            row.version || null,
+          );
+        }
+      }
+    }
+  }
+
+  /**
+   * Informs all the caches all the way to the clients of a change in a given
+   * row 
+   * @param row the row to inform a change on
+   * @param action what happened to the row
+   * @param elasticLanguageOverride the elastic language override
+   * @param dataIsComplete whether the row contains complete data
+   */
+  private async informChangeOnRow(row: ISQLTableRowValue, action: "created" | "deleted" | "modified", elasticLanguageOverride: string, dataIsComplete: boolean) {
+    // first let's check whether the row is valid for the bare minimum
+    const isRowValid = this.checkRowValidityForInformingChanges(row);
 
     // if it's not valid we return null
     if (!isRowValid) {
       return null;
     }
 
+    const idef = (this.root.registry[row.type] as ItemDefinition);
+
+    this.informChangeOnRowElastic(row, action, elasticLanguageOverride, dataIsComplete, true);
+
     // now let's grab the module qualified name
-    const moduleName = this.root.registry[row.type].getParentModule().getQualifiedPathName();
+    const moduleName = idef.getParentModule().getQualifiedPathName();
 
     // and set into the deleted registry if we don't have it
     let lastModified = row.last_modified;
@@ -276,6 +381,15 @@ export class ItemizeRawDB {
     };
   }
 
+  private informChangeOnRowsElasticOnly(
+    rows: ISQLTableRowValue[],
+    action: "created" | "deleted" | "modified",
+    elasticLanguageOverride: string,
+    rowDataIsComplete: boolean,
+  ) {
+    rows.forEach((r) => this.informChangeOnRowElastic(r, action, elasticLanguageOverride, rowDataIsComplete, false));
+  }
+
   /**
    * Actually does the job on informing changes in the rows
    * this function calls the changed mechanism and then does
@@ -289,10 +403,11 @@ export class ItemizeRawDB {
   private async informChangeOnRows(
     rows: ISQLTableRowValue[],
     action: "created" | "deleted" | "modified",
-    rowDataIsComplete: boolean
+    elasticLanguageOverride: string,
+    rowDataIsComplete: boolean,
   ) {
     // first we call to change every single row so that the changed events propagate
-    const processedChanges = (await Promise.all(rows.map((r) => this.informChangeOnRow(r, action, rowDataIsComplete)))).filter((r) => r !== null);
+    const processedChanges = (await Promise.all(rows.map((r) => this.informChangeOnRow(r, action, elasticLanguageOverride, rowDataIsComplete)))).filter((r) => r !== null);
 
     // now we can grab where we are putting the records for searches, depending on what occured to these rows
     const recordsLocation = action === "deleted" ? "lostRecords" : (action === "created" ? "newRecords" : "modifiedRecords");
@@ -550,10 +665,14 @@ export class ItemizeRawDB {
    * for the database for an updated value.
    * 
    * @param rows the rows to inform a change on
+   * @param elasticLanguageOverride the language override, null is a valid value, please provide undefined for unspecified
    * @param rowDataIsComplete whether the rows contain complete data
    */
-  public async informRowsHaveBeenModified(rows: ISQLTableRowValue[], rowDataIsComplete?: boolean) {
-    return await this.informChangeOnRows(rows, "modified", rowDataIsComplete);
+  public async informRowsHaveBeenModified(rows: ISQLTableRowValue[], elasticLanguageOverride?: string, rowDataIsComplete?: boolean) {
+    return await this.informChangeOnRows(rows, "modified", elasticLanguageOverride, rowDataIsComplete);
+  }
+  public async informRowsHaveBeenModifiedElasticOnly(rows: ISQLTableRowValue[], elasticLanguageOverride?: string, rowDataIsComplete?: boolean) {
+    return this.informChangeOnRowsElasticOnly(rows, "modified", elasticLanguageOverride, rowDataIsComplete);
   }
 
   /**
@@ -579,7 +698,12 @@ export class ItemizeRawDB {
   public async informRowsHaveBeenDeleted(rows: ISQLTableRowValue[]) {
     // on delete the data being complete is irrelevant as the value that
     // is passed to data is always null
-    return await this.informChangeOnRows(rows, "deleted", false);
+    return await this.informChangeOnRows(rows, "deleted", null, false);
+  }
+  public async informRowsHaveBeenDeletedElasticOnly(rows: ISQLTableRowValue[]) {
+    // on delete the data being complete is irrelevant as the value that
+    // is passed to data is always null
+    return this.informChangeOnRowsElasticOnly(rows, "deleted", null, false);
   }
 
   /**
@@ -603,10 +727,14 @@ export class ItemizeRawDB {
    * for the database for the value
    * 
    * @param rows the rows to inform a change on
+   * @param elasticLanguageOverride the language override, null is a valid value, please provide undefined for unspecified
    * @param rowDataIsComplete whether the rows contain complete data
    */
-  public async informRowsHaveBeenAdded(rows: ISQLTableRowValue[], rowDataIsComplete?: boolean) {
-    return await this.informChangeOnRows(rows, "created", rowDataIsComplete);
+  public async informRowsHaveBeenAdded(rows: ISQLTableRowValue[], elasticLanguageOverride?: string, rowDataIsComplete?: boolean) {
+    return await this.informChangeOnRows(rows, "created", elasticLanguageOverride, rowDataIsComplete);
+  }
+  public async informRowsHaveBeenAddedElasticOnly(rows: ISQLTableRowValue[], elasticLanguageOverride?: string, rowDataIsComplete?: boolean) {
+    return this.informChangeOnRowsElasticOnly(rows, "created", elasticLanguageOverride, rowDataIsComplete);
   }
 
   /**
@@ -722,10 +850,21 @@ export class ItemizeRawDB {
         }
       >;
 
-      // does not inform for updates to other clusters
-      // or caches or anything at all, mantains last modified
-      // value
+      /**
+       * Does not inform of updates or anything to the clusters
+       * or elastic or anything at all, does not modify the last modified
+       * signature
+       */
       dangerousUseSilentMode?: boolean;
+      /**
+       * Forces a language update to the given language, will ignore silent
+       * mode if provided
+       */
+      dangerousForceElasticLangUpdateTo?: string;
+      /**
+       * Will update search indices anyway
+       */
+      dangerousForceElasticUpdate?: boolean;
     }
   ) {
     inserter.values.forEach((v) => {
@@ -794,9 +933,15 @@ export class ItemizeRawDB {
 
     if (!inserter.dangerousUseSilentMode) {
       if (this.transacting) {
-        this.transactingQueue.push(this.informRowsHaveBeenAdded.bind(this, result, true));
+        this.transactingQueue.push(this.informRowsHaveBeenAdded.bind(this, result, inserter.dangerousForceElasticLangUpdateTo, true));
       } else {
-        await this.informRowsHaveBeenAdded(result, true);
+        await this.informRowsHaveBeenAdded(result, inserter.dangerousForceElasticLangUpdateTo, true);
+      }
+    } else if (typeof inserter.dangerousForceElasticLangUpdateTo !== "undefined" || inserter.dangerousForceElasticUpdate) {
+      if (this.transacting) {
+        this.transactingQueue.push(this.informRowsHaveBeenAddedElasticOnly.bind(this, result, inserter.dangerousForceElasticLangUpdateTo, true));
+      } else {
+        await this.informRowsHaveBeenAddedElasticOnly(result, inserter.dangerousForceElasticLangUpdateTo, true);
       }
     }
 
@@ -872,9 +1017,6 @@ export class ItemizeRawDB {
    * in the database this is a very powerful and quite
    * advanced method
    * 
-   * TODO returning builder somehow
-   * TODO allow for optimizations
-   * 
    * @param item 
    * @param updater 
    */
@@ -889,10 +1031,21 @@ export class ItemizeRawDB {
       // you only want to use set in these
       moduleTableUpdater?: (arg: SetBuilder, redoDictionaries: RedoDictionariesFn) => void;
       itemTableUpdater?: (arg: SetBuilder, redoDictionaries: RedoDictionariesFn) => void;
-      // does not inform for updates to other clusters
-      // or caches or anything at all, mantains last modified
-      // value
+      /**
+       * Does not inform of updates or anything to the clusters
+       * or elastic or anything at all, does not modify the last modified
+       * signature
+       */
       dangerousUseSilentMode?: boolean;
+      /**
+       * Forces a language update to the given language, will ignore silent
+       * mode if provided
+       */
+      dangerousForceElasticLangUpdateTo?: string;
+      /**
+       * Will update search indices anyway
+       */
+       dangerousForceElasticUpdate?: boolean;
     },
   ): Promise<ISQLTableRowValue[]> {
     if (
@@ -1002,9 +1155,15 @@ export class ItemizeRawDB {
 
     if (!updater.dangerousUseSilentMode) {
       if (this.transacting) {
-        this.transactingQueue.push(this.informRowsHaveBeenModified.bind(this, result, true));
+        this.transactingQueue.push(this.informRowsHaveBeenModified.bind(this, result, updater.dangerousForceElasticLangUpdateTo, true));
       } else {
-        await this.informRowsHaveBeenModified(result, true);
+        await this.informRowsHaveBeenModified(result, updater.dangerousForceElasticLangUpdateTo, true);
+      }
+    } else if (typeof updater.dangerousForceElasticLangUpdateTo !== "undefined" || updater.dangerousForceElasticUpdate) {
+      if (this.transacting) {
+        this.transactingQueue.push(this.informRowsHaveBeenModifiedElasticOnly.bind(this, result, updater.dangerousForceElasticLangUpdateTo, true));
+      } else {
+        this.informRowsHaveBeenModifiedElasticOnly(result, updater.dangerousForceElasticLangUpdateTo, true);
       }
     }
 
@@ -1016,8 +1175,7 @@ export class ItemizeRawDB {
    * in the database this is a very powerful and quite
    * advanced method
    * 
-   * TODO returning builder somehow
-   * TODO allow for optimizations
+   * NOTE that 
    * 
    * @param moduleToUpdate 
    * @param updater 
@@ -1030,10 +1188,21 @@ export class ItemizeRawDB {
 
       moduleTableUpdate?: IManyValueType;
       moduleTableUpdater?: (arg: SetBuilder, redoDictionaries: RedoDictionariesFnPropertyBased) => void;
-      // does not inform for updates to other clusters
-      // or caches or anything at all, mantains last modified
-      // value
+      /**
+       * Does not inform of updates or anything to the clusters
+       * or elastic or anything at all, does not modify the last modified
+       * signature
+       */
       dangerousUseSilentMode?: boolean;
+      /**
+       * Forces a language update to the given language, will ignore silent
+       * mode if provided
+       */
+      dangerousForceElasticLangUpdateTo?: string;
+      /**
+       * Will update search indices anyway
+       */
+       dangerousForceElasticUpdate?: boolean;
     },
   ): Promise<ISQLTableRowValue[]> {
     if (
@@ -1079,9 +1248,17 @@ export class ItemizeRawDB {
       if (this.transacting) {
         // row data is not complete so we pass false
         // otherwise we would corrupt the cache
-        this.transactingQueue.push(this.informRowsHaveBeenModified.bind(this, result, false));
+        this.transactingQueue.push(this.informRowsHaveBeenModified.bind(this, result, updater.dangerousForceElasticLangUpdateTo, false));
       } else {
-        await this.informRowsHaveBeenModified(result, false);
+        await this.informRowsHaveBeenModified(result, updater.dangerousForceElasticLangUpdateTo, false);
+      }
+    } else if (typeof updater.dangerousForceElasticLangUpdateTo !== "undefined" || updater.dangerousForceElasticUpdate) {
+      if (this.transacting) {
+        // row data is not complete so we pass false
+        // otherwise we would corrupt the cache
+        this.transactingQueue.push(this.informRowsHaveBeenModifiedElasticOnly.bind(this, result, updater.dangerousForceElasticLangUpdateTo, false));
+      } else {
+        this.informRowsHaveBeenModifiedElasticOnly(result, updater.dangerousForceElasticLangUpdateTo, false);
       }
     }
 
@@ -1109,10 +1286,21 @@ export class ItemizeRawDB {
       // you only want to use set in these, not select not anything
       moduleTableUpdater?: (arg: SetBuilder, redoDictionaries: RedoDictionariesFn) => void;
       itemTableUpdater?: (arg: SetBuilder, redoDictionaries: RedoDictionariesFn) => void;
-      // does not inform for updates to other clusters
-      // or caches or anything at all, mantains last modified
-      // value
+      /**
+       * Does not inform of updates or anything to the clusters
+       * or elastic or anything at all, does not modify the last modified
+       * signature
+       */
       dangerousUseSilentMode?: boolean;
+      /**
+       * Forces a language update to the given language, will ignore silent
+       * mode if provided
+       */
+      dangerousForceElasticLangUpdateTo?: string;
+      /**
+       * Will update search indices anyway
+       */
+       dangerousForceElasticUpdate?: boolean;
     }
   ): Promise<ISQLTableRowValue> {
     if (
@@ -1214,9 +1402,15 @@ export class ItemizeRawDB {
 
     if (!updater.dangerousUseSilentMode) {
       if (this.transacting) {
-        this.transactingQueue.push(this.informRowsHaveBeenModified.bind(this, [sqlValue], true));
+        this.transactingQueue.push(this.informRowsHaveBeenModified.bind(this, [sqlValue], updater.dangerousForceElasticLangUpdateTo, true));
       } else {
-        await this.informRowsHaveBeenModified([sqlValue], true);
+        await this.informRowsHaveBeenModified([sqlValue], updater.dangerousForceElasticLangUpdateTo, true);
+      }
+    } else if (typeof updater.dangerousForceElasticLangUpdateTo !== "undefined" || updater.dangerousForceElasticUpdate) {
+      if (this.transacting) {
+        this.transactingQueue.push(this.informRowsHaveBeenModifiedElasticOnly.bind(this, [sqlValue], updater.dangerousForceElasticLangUpdateTo, true));
+      } else {
+        this.informRowsHaveBeenModifiedElasticOnly([sqlValue], updater.dangerousForceElasticLangUpdateTo, true);
       }
     }
 

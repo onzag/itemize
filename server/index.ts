@@ -552,6 +552,7 @@ export async function initializeServer(
       const cache = new Cache(
         redisClient,
         null,
+        null,
         sensitiveConfig,
         null,
         domain,
@@ -857,7 +858,7 @@ export async function initializeServer(
     logger.info(
       "initializeServer: initializing cache instance",
     );
-    const cache = new Cache(redisClient, databaseConnection, sensitiveConfig, storageClients.cloudClients, domain, root, serverData);
+    const cache = new Cache(redisClient, databaseConnection, elastic, sensitiveConfig, storageClients.cloudClients, domain, root, serverData);
     logger.info(
       "initializeServer: creating server",
     );

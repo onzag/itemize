@@ -455,6 +455,26 @@ export function convertSQLValueToGQLValueForProperty(
   };
 }
 
+export function convertSQLValueToElasticSQLValueForProperty(
+  serverData: any,
+  itemDefinition: ItemDefinition,
+  include: Include,
+  propertyDefinition: PropertyDefinition,
+  row: ISQLTableRowValue,
+): IGQLValue {
+  const sqlElasticIn = propertyDefinition.getPropertyDefinitionDescription().sqlElasticIn;
+  let value = sqlElasticIn({
+    row,
+    prefix: include ? include.getPrefixedQualifiedIdentifier() : "",
+    serverData,
+    itemDefinition,
+    include,
+    property: propertyDefinition,
+    id: propertyDefinition.getId(),
+  });
+  return value;
+}
+
 /**
  * Converts a graphql value into a sql value, that is graphql data into row
  * data to be immediately added to the database as it is

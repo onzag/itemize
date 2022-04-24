@@ -41,6 +41,7 @@ import {
   CAN_LOG_DEBUG,
   CAN_LOG_SILLY
 } from "./environment";
+import { ItemizeElasticClient } from "./elastic";
 
 const CACHE_EXPIRES_DAYS = 14;
 const MEMCACHE_EXPIRES_MS = 1000;
@@ -54,6 +55,7 @@ const MEMCACHE_EXPIRES_MS = 1000;
 export class Cache {
   private redisClient: ItemizeRedisClient;
   private databaseConnection: DatabaseConnection;
+  private elastic: ItemizeElasticClient;
   private domain: string;
   private storageClients: IStorageProvidersObject;
   private root: Root;
@@ -79,6 +81,7 @@ export class Cache {
   constructor(
     redisClient: ItemizeRedisClient,
     databaseConnection: DatabaseConnection,
+    elastic: ItemizeElasticClient,
     sensitiveConfig: ISensitiveConfigRawJSONDataType,
     storageClients: IStorageProvidersObject,
     domain: string,
@@ -86,6 +89,7 @@ export class Cache {
     initialServerData: IServerDataType
   ) {
     this.redisClient = redisClient;
+    this.elastic = elastic;
     this.databaseConnection = databaseConnection;
     this.root = root;
     this.storageClients = storageClients;
@@ -702,6 +706,27 @@ export class Cache {
         "new",
       );
     })();
+
+    if (this.elastic) {
+      (async () => {
+        const language = itemDefinition.getSearchEngineMainLanguageFromRow(sqlValue);
+        try {
+          await this.elastic.createDocument(selfTable, language, sqlValue.id, sqlValue.version, sqlValue);
+        } catch (err) {
+          logger.error(
+            "Cache.requestCreation (detached) [SERIOUS]: could not update value to elastic",
+            {
+              errMessage: err.message,
+              errStack: err.stack,
+              selfTable,
+              moduleTable,
+              forId,
+              version,
+            }
+          );
+        }
+      })();
+    }
 
     // Execute side effects of modification according
     // to the given side effected types
@@ -1411,6 +1436,28 @@ export class Cache {
       }
     })();
 
+    if (this.elastic) {
+      (async () => {
+        const language = itemDefinition.getSearchEngineMainLanguageFromRow(sqlValue);
+        const originalLanguage = itemDefinition.getSearchEngineMainLanguageFromRow(currentSQLValue);
+        try {
+          await this.elastic.updateDocument(selfTable, originalLanguage, language, sqlValue.id, sqlValue.version, sqlValue);
+        } catch (err) {
+          logger.error(
+            "Cache.requestUpdate (detached) [SERIOUS]: could not update value to elastic",
+            {
+              errMessage: err.message,
+              errStack: err.stack,
+              selfTable,
+              moduleTable,
+              id,
+              version,
+            }
+          );
+        }
+      })();
+    }
+
     // Execute side effects of modification according
     // to the given side effected types
     !options.ignoreSideEffects ? (async () => {
@@ -1743,7 +1790,12 @@ export class Cache {
 
     // performs the proper deletetition of whatever is in there
     // it takes the record that represents what we are deleting, the parent (or null) and the creator
-    const performProperDeleteOf = async (record: IGQLSearchRecord, parent: { id: string; version: string; type: string }, createdBy: string) => {
+    const performProperDeleteOf = async (
+      row: ISQLTableRowValue,
+      record: IGQLSearchRecord,
+      parent: { id: string; version: string; type: string },
+      createdBy: string
+    ) => {
       // got to cascade and delete all the children, this method should be able to execute after
       this.deletePossibleChildrenOf(itemDefinition, id, record.version);
       // got to trigger the search listeners saying we have just lost an item
@@ -1776,15 +1828,42 @@ export class Cache {
           }
         );
       }
+
+      if (this.elastic) {
+        try {
+          const language = itemDefinition.getSearchEngineMainLanguageFromRow(row);
+          await this.elastic.deleteDocument(itemDefinition, language, record.id, record.version);
+        } catch (err) {
+          logger.error(
+            "Cache.requestDelete: Could not delete the value in elasticsearch",
+            {
+              errMessage: err.message,
+              errStack: err.stack,
+            }
+          );
+        }
+      }
     }
 
     // now time to do this and actually do the dropping
     try {
       let rowsToPerformDeleteSideEffects: ISQLTableRowValue[] = null;
 
+      const searchEngineEnabled = itemDefinition.isSearchEngineEnabled();
+      const searchEngineLanguage = itemDefinition.getSearchEngineMainLanguage();
+      let extraLanguageColumn = "";
+      if (searchEngineEnabled && !searchEngineLanguage) {
+        const searchEngineLanguageColumn = itemDefinition.getSearchEngineDynamicMainLanguageColumn();
+        if (searchEngineLanguageColumn) {
+          extraLanguageColumn = ", " + JSON.stringify(searchEngineLanguageColumn);
+        }
+      }
+
       const sideEffectedProperties = itemDefinition.getAllSideEffectedProperties();
       const needSideEffects = sideEffectedProperties.length !== 0;
-      const returningElements = needSideEffects ? "*" : `"version", "parent_id", "parent_type", "parent_version", "created_by"`;
+      const returningElements = needSideEffects ?
+        "*" :
+        `"version", "parent_id", "parent_type", "parent_version", "created_by"${extraLanguageColumn}`;
 
       // dropping all versions is a tricky process, first we need to drop everything
       if (dropAllVersions) {
@@ -1873,7 +1952,7 @@ export class Cache {
           // we update the caches
           // we do this without awaiting, as for all it concerns
           // our action is done and only events will need to fire
-          performProperDeleteOf(record, parent, createdBy);
+          performProperDeleteOf(row, record, parent, createdBy);
         });
       } else {
         const deleteQueryBase = `DELETE FROM ${JSON.stringify(moduleTable)} WHERE ` +
@@ -1948,7 +2027,7 @@ export class Cache {
         } : null;
         const createdBy = row.created_by;
         // we don't want to await any of this
-        performProperDeleteOf(record, parent, createdBy);
+        performProperDeleteOf(row, record, parent, createdBy);
       }
 
       if (rowsToPerformDeleteSideEffects && rowsToPerformDeleteSideEffects.length) {

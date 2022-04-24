@@ -317,7 +317,7 @@ export function checkItemDefinition(
     });
   }
 
-  if (rawData.searchEngineEnabled || parentModule.searchEngineEnabled) {
+  if (rawData.searchEngineEnabled) {
     if (rawData.searchEngineMainLangBasedOnProperty && rawData.searchEngineMainLangProperty) {
       throw new CheckUpError(
         "Cannot have both searchEngineMainLangBasedOnProperty and searchEngineMainLangProperty",
@@ -347,11 +347,15 @@ export function checkItemDefinition(
     }
   }
 
-  if (!rawData.searchEngineEnabled && !parentModule.searchEngineEnabled) {
+  if (!rawData.searchEngineEnabled) {
     if (rawData.searchEngineMainLangBasedOnProperty || rawData.searchEngineMainLangProperty || rawData.searchEngineMainLang) {
       throw new CheckUpError(
         "Does not need any of searchEngineMainLangBasedOnProperty, searchEngineMainLangProperty nor searchEngineMainLang",
-        actualTraceback.newTraceToBit("searchEngineEnabled"),
+        actualTraceback.newTraceToBit(
+          rawData.searchEngineMainLangBasedOnProperty ? "searchEngineMainLangBasedOnProperty" : (
+            rawData.searchEngineMainLangProperty ? "searchEngineMainLangProperty" : "searchEngineMainLang"
+          )
+        ),
       );
     }
   }
@@ -1416,6 +1420,17 @@ export function checkModule(
         );
       }
     });
+  }
+
+  if (rawData.searchEngineEnabled) {
+    const someChildrenAreEnabledToo = rawData.children.some((c) => c.type === "item" && c.searchEngineEnabled);
+    if (!someChildrenAreEnabledToo) {
+      throw new CheckUpError(
+        "The module is search engine enabled but none of the item children to it are, this means nothing will get indexed due " +
+        "to the nuances of how data is indexed, it needs to be specified from the item as well",
+        actualTraceback.newTraceToBit("searchEngineEnabled"),
+      );
+    }
   }
 }
 

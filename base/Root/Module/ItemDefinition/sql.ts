@@ -22,6 +22,7 @@ import {
   buildSQLOrderByForProperty,
   buildSQLOrderByForInternalRequiredProperty,
   getElasticSchemaForProperty,
+  convertSQLValueToElasticSQLValueForProperty,
 } from "./PropertyDefinition/sql";
 import ItemDefinition from ".";
 import {
@@ -30,6 +31,7 @@ import {
   convertGQLValueToSQLValueForInclude,
   buildSQLQueryForInclude,
   getElasticSchemaForInclude,
+  convertSQLValueToElasticSQLValueForInclude,
 } from "./Include/sql";
 import { ISQLTableDefinitionType, ISQLSchemaDefinitionType, ISQLTableRowValue, ISQLStreamComposedTableRowValue, ConsumeStreamsFnType, IElasticIndexDefinitionType, IElasticSchemaDefinitionType } from "../../sql";
 import { IGQLValue, IGQLRequestFields, IGQLArgs } from "../../../../gql-querier";
@@ -290,6 +292,48 @@ export function convertSQLValueToGQLValueForItemDefinition(
         include,
         row,
         !graphqlFields ? null : graphqlFields[include.getQualifiedIdentifier()],
+      ),
+    );
+  });
+
+  return result;
+}
+
+export function convertSQLValueToElasticSQLValueForItemDefinition(
+  serverData: any,
+  itemDefinition: ItemDefinition,
+  row: ISQLTableRowValue,
+): IGQLValue {
+  const result: ISQLTableRowValue = {};
+
+  // now we take all the base properties that we have
+  // in the graphql model
+  Object.keys(RESERVED_BASE_PROPERTIES).forEach((basePropertyKey) => {
+    result[basePropertyKey] = row[basePropertyKey] || null;
+  });
+
+  // we also take all the property definitions we have
+  // in this item definitions, and convert them one by one
+  // with the row data, this basically also gives graphql value
+  // in the key:value format
+  itemDefinition.getParentModule().getAllPropExtensions().concat(
+    itemDefinition.getAllPropertyDefinitions()
+  ).forEach((pd) => {
+    Object.assign(
+      result,
+      convertSQLValueToElasticSQLValueForProperty(serverData, itemDefinition, null, pd, row),
+    );
+  });
+
+  // now we do the same for the items
+  itemDefinition.getAllIncludes().forEach((include) => {
+    Object.assign(
+      result,
+      convertSQLValueToElasticSQLValueForInclude(
+        serverData,
+        itemDefinition,
+        include,
+        row,
       ),
     );
   });

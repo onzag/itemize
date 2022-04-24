@@ -6,6 +6,8 @@ import type Root from "../base/Root";
 import { getElasticSchemaForRoot, IElasticIndexDefinitionType, IElasticSchemaDefinitionType, ISQLTableRowValue } from "../base/Root/sql";
 import { logger } from "./logger";
 import equals from "deep-equal";
+import { convertSQLValueToElasticSQLValueForModule } from "../base/Root/Module/sql";
+import { convertSQLValueToElasticSQLValueForItemDefinition } from "../base/Root/Module/ItemDefinition/sql";
 
 interface ILangAnalyzers {
   [key: string]: string;
@@ -153,6 +155,7 @@ export class ItemizeElasticClient {
     this.root = root;
     this.rootSchema = null;
     this.rawDB = rawDB;
+    this.rawDB.setupElastic(this);
     this.elasticClient = elasticClient;
     this.langAnalyzers = langAnalyzers;
     this.serverData = null;
@@ -212,29 +215,6 @@ export class ItemizeElasticClient {
     }
 
     await this.serverDataPromise;
-  }
-
-  /**
-   * This function is automatically called by the global manager in oder to perform cleanup
-   * functions regarding indexes, please do not call yourself as this is not a useful function
-   * otherwise
-   */
-  public async cleanupElastic() {
-    await this.prepareInstancePromise;
-
-    try {
-      // TODO remove all the elastic data that is outdated due to the since limiter
-      // that will not allow it to be retrieved
-    } catch (err) {
-      logger.error(
-        "ItemizeElasticClient.cleanupElastic [SERIOUS]: elastic cleanup failed",
-        {
-          errStack: err.stack,
-          errMessage: err.message,
-        }
-      );
-      throw err;
-    }
   }
 
   /**
@@ -542,7 +522,7 @@ export class ItemizeElasticClient {
       "ItemizeElasticClient.createOrUpdateSimpleIndex: ensuring index for " + id,
     );
 
-    const analyzer = this.langAnalyzers["en"] || this.langAnalyzers["*"];
+    const analyzer = this.langAnalyzers["en"] || this.langAnalyzers["*"] || "standard";
     const analyzerLow = analyzer.toLowerCase();
 
     const indexName = id.toLowerCase();
@@ -879,19 +859,25 @@ export class ItemizeElasticClient {
    * regarding how often these consistency checks are ran regarding SERVER_ELASTIC_CLEANUP_TIME
    * 
    * Will also flush old records that do not respect the since limiter
+   * 
+   * Will also find duplicates in some cases that are not in the right language, as it tries to find and check against
+   * all the records that match given ids on the list, if it finds two of those, one of those must be invalid
    */
   public async runConsistencyCheck() {
     // TODO
   }
 
   private async generateMissingIndexInGroup(
-    qualifiedName: string,
+    indexName: string,
     language: string,
     value: IElasticIndexDefinitionType,
   ) {
-    const indexName = qualifiedName.toLowerCase() + "_" + language;
-    const analyzer = this.langAnalyzers[language] || this.langAnalyzers["*"];
+    const analyzer = this.langAnalyzers[language || "*"] || this.langAnalyzers["*"] || "standard";
     const analyzerLow = analyzer.toLowerCase();
+
+    logger.info(
+      "ItemizeElasticClient.generateMissingIndexInGroup: index " + indexName + " to be created",
+    );
 
     await this.elasticClient.indices.create({
       index: indexName,
@@ -913,6 +899,52 @@ export class ItemizeElasticClient {
     });
   }
 
+  public async deleteDocumentUnknownLanguage(
+    itemDefinition: string | ItemDefinition,
+    id: string,
+    version: string,
+  ) {
+    const idef = typeof itemDefinition === "string" ? this.root.registry[itemDefinition] : itemDefinition;
+    const mod = idef.getParentModule();
+
+    if (!idef.isSearchEngineEnabled()) {
+      return;
+    }
+
+    const qualifiedNameItem = idef.getQualifiedPathName();
+    const qualifiedNameMod = mod.getQualifiedPathName();
+
+    const indexNameIdef = qualifiedNameItem.toLowerCase() + "_*";
+    const indexNameMod = qualifiedNameMod.toLowerCase() + "_*";
+
+    let finalIndex: string = "";
+    if (mod.isSearchEngineEnabled()) {
+      finalIndex = indexNameMod;
+    }
+    if (idef.isSearchEngineEnabled()) {
+      if (finalIndex) {
+        finalIndex += ","
+      }
+      finalIndex += indexNameIdef;
+    }
+
+    const mergedId = id + "." + (version || "");
+
+    // basically we will run a blanket delete
+    // we are hoping to delete, 1 or 2, or whatever
+    // maybe nothing, we don't care just blow everything
+    // up that has the same id
+    await this.elasticClient.deleteByQuery({
+      index: finalIndex,
+      query: {
+        match: {
+          _id: mergedId,
+        }
+      },
+      allow_no_indices: true,
+    });
+  }
+
   public async deleteDocument(
     itemDefinition: string | ItemDefinition,
     language: string,
@@ -922,15 +954,15 @@ export class ItemizeElasticClient {
     const idef = typeof itemDefinition === "string" ? this.root.registry[itemDefinition] : itemDefinition;
     const mod = idef.getParentModule();
 
-    if (!idef.isSearchEngineEnabled() && !mod.isSearchEngineEnabled()) {
+    if (!idef.isSearchEngineEnabled()) {
       return;
     }
 
     const qualifiedNameItem = idef.getQualifiedPathName();
     const qualifiedNameMod = mod.getQualifiedPathName();
 
-    const indexNameIdef = qualifiedNameItem.toLowerCase() + "_" + language;
-    const indexNameMod = qualifiedNameItem.toLowerCase() + "_" + language;
+    const indexNameIdef = qualifiedNameItem.toLowerCase() + "_" + (language || "none");
+    const indexNameMod = qualifiedNameMod.toLowerCase() + "_" + (language || "none");
 
     const givenID = id + "." + (version || "");
 
@@ -974,6 +1006,69 @@ export class ItemizeElasticClient {
     }
   }
 
+  public async createDocumentUnknownEverything(
+    itemDefinition: string | ItemDefinition,
+    id: string,
+    version: string,
+  ) {
+    const idef = (typeof itemDefinition === "string" ? this.root.registry[itemDefinition] : itemDefinition) as ItemDefinition;
+
+    if (!idef.isSearchEngineEnabled()) {
+      return;
+    }
+
+    const value = (await this.rawDB.performRawDBSelect(
+      idef,
+      (b) => b.selectAll().whereBuilder.andWhereColumn("id", id).andWhereColumn("version", version || "")
+    ))[0] || null;
+
+    if (value) {
+      const language = idef.getSearchEngineMainLanguageFromRow(value);
+      // now we are ready to call the update to the document
+      // and we do just like a creation
+      await this.createDocument(itemDefinition, language, id, version, value);
+    }
+  }
+
+  public async updateDocumentUnknownEverything(
+    itemDefinition: string | ItemDefinition,
+    id: string,
+    version: string,
+  ) {
+    const idef = (typeof itemDefinition === "string" ? this.root.registry[itemDefinition] : itemDefinition) as ItemDefinition;
+
+    if (!idef.isSearchEngineEnabled()) {
+      return;
+    }
+
+    const value = (await this.rawDB.performRawDBSelect(
+      idef,
+      (b) => b.selectAll().whereBuilder.andWhereColumn("id", id).andWhereColumn("version", version || "")
+    ))[0] || null;
+
+    await this.deleteDocumentUnknownLanguage(itemDefinition, id, version);
+
+    if (value) {
+      const language = idef.getSearchEngineMainLanguageFromRow(value);
+      // now we are ready to call the update to the document
+      // and we do just like a creation
+      await this.createDocument(itemDefinition, language, id, version, value);
+    }
+  }
+
+  public async updateDocumentUnknownOriginalLanguage(
+    itemDefinition: string | ItemDefinition,
+    language: string,
+    id: string,
+    version: string,
+    value?: ISQLTableRowValue,
+  ) {
+    await this.deleteDocumentUnknownLanguage(itemDefinition, id, version);
+    // now we are ready to call the update to the document
+    // and we do just like a creation
+    await this.createDocument(itemDefinition, language, id, version, value);
+  }
+
   /**
    * Updates a document for a given index
    * if the index does not exist the whole operation is ingored and instead
@@ -987,14 +1082,14 @@ export class ItemizeElasticClient {
     version: string,
     value?: ISQLTableRowValue,
   ): Promise<void> {
-    const idef = typeof itemDefinition === "string" ? this.root.registry[itemDefinition] : itemDefinition;
+    const idef = (typeof itemDefinition === "string" ? this.root.registry[itemDefinition] : itemDefinition) as ItemDefinition;
     const mod = idef.getParentModule();
 
-    if (!idef.isSearchEngineEnabled() && !mod.isSearchEngineEnabled()) {
+    if (!idef.isSearchEngineEnabled()) {
       return;
     }
 
-    if (originalLanguage && originalLanguage !== language) {
+    if (originalLanguage !== language) {
       await this.deleteDocument(itemDefinition, originalLanguage, id, version);
     }
     const newValue = value || ((await this.rawDB.performRawDBSelect(
@@ -1006,21 +1101,96 @@ export class ItemizeElasticClient {
     if (!newValue) {
       return;
     }
-    
-    // convertSQLValueToElasticValueForModule
-    // convertSQLValueToElasticValueForItemDefinition
+
+    const mergedId = id + "." + (version || "");
+    if (mod.isSearchEngineEnabled()) {
+      const elasticFormMod = convertSQLValueToElasticSQLValueForModule(
+        this.serverData,
+        mod,
+        newValue,
+      );
+      const qualifiedNameMod = mod.getQualifiedPathName();
+      const indexName = qualifiedNameMod.toLowerCase() + "_" + (language || "none");
+
+      const updateAction = {
+        id: mergedId,
+        index: indexName,
+        doc: elasticFormMod,
+        doc_as_upsert: true,
+      };
+
+      try {
+        try {
+          await this.elasticClient.update(updateAction);
+        } catch (err) {
+          if (err.meta.statusCode === 404) {
+            await this.generateMissingIndexInGroup(indexName, language, this.rootSchema[qualifiedNameMod]);
+            await this.elasticClient.update(updateAction);
+          } else {
+            throw err;
+          }
+        }
+      } catch (err) {
+        logger.error(
+          "ItemizeElasticClient.deleteDocument [SERIOUS]: could not create an elastic document for " + mergedId + " at " + indexName,
+          {
+            errStack: err.stack,
+            errMessage: err.message,
+          }
+        );
+      }
+    }
+
+    if (idef.isSearchEngineEnabled()) {
+      const elasticFormIdef = convertSQLValueToElasticSQLValueForItemDefinition(
+        this.serverData,
+        idef,
+        newValue,
+      );
+
+      const qualifiedNameIdef = idef.getQualifiedPathName();
+      const indexName = qualifiedNameIdef.toLowerCase() + "_" + (language || "none");
+
+      const updateAction = {
+        id: mergedId,
+        index: indexName,
+        doc: elasticFormIdef,
+        doc_as_upsert: true,
+      };
+
+      try {
+        try {
+          await this.elasticClient.update(updateAction);
+        } catch (err) {
+          if (err.meta.statusCode === 404) {
+            await this.generateMissingIndexInGroup(indexName, language, this.rootSchema[qualifiedNameIdef]);
+            await this.elasticClient.update(updateAction);
+          } else {
+            throw err;
+          }
+        }
+      } catch (err) {
+        logger.error(
+          "ItemizeElasticClient.deleteDocument [SERIOUS]: could not create an elastic document for " + mergedId + " at " + indexName,
+          {
+            errStack: err.stack,
+            errMessage: err.message,
+          }
+        );
+      }
+    }
   }
 
-  public async updateDocumentBulk(
+  public createDocument(
     itemDefinition: string | ItemDefinition,
     language: string,
-    values: Array<{
-      id: string,
-      version: string,
-      value?: ISQLTableRowValue,
-    }>
-  ): Promise<void> {
-    return null;
+    id: string,
+    version: string,
+    value?: ISQLTableRowValue,
+  ) {
+    // we cheat and pass the same as the original and target language
+    // so that the old version is not checked for whatever it is
+    return this.updateDocument(itemDefinition, language, language, id, version, value);
   }
 
   /**

@@ -17,6 +17,7 @@ import {
   buildSQLOrderByForProperty,
   buildSQLOrderByForInternalRequiredProperty,
   getElasticSchemaForProperty,
+  convertSQLValueToElasticSQLValueForProperty,
 } from "./ItemDefinition/PropertyDefinition/sql";
 import { getElasticSchemaForItemDefinition, getSQLTablesSchemaForItemDefinition } from "./ItemDefinition/sql";
 import { ISQLTableDefinitionType, ISQLSchemaDefinitionType, ISQLTableRowValue, ISQLStreamComposedTableRowValue, ConsumeStreamsFnType, IElasticSchemaDefinitionType } from "../sql";
@@ -29,8 +30,8 @@ export function getElasticSchemaForModule(mod: Module, serverData: any): IElasti
   const pathName = mod.getQualifiedPathName();
   const resultSchema: IElasticSchemaDefinitionType = {
     [pathName]: {
-      properties: {...RESERVED_BASE_PROPERTIES_ELASTIC.properties},
-      runtime: {...RESERVED_BASE_PROPERTIES_ELASTIC.runtime},
+      properties: { ...RESERVED_BASE_PROPERTIES_ELASTIC.properties },
+      runtime: { ...RESERVED_BASE_PROPERTIES_ELASTIC.runtime },
     }
   }
 
@@ -196,7 +197,7 @@ export function getSQLTableDefinitionForModule(mod: Module): ISQLTableDefinition
  * @param mod the module in question
  * @returns a partial database schema for the module itself, all the child modules, and the item definition
  */
-export function getSQLTablesSchemaForModule( mod: Module): ISQLSchemaDefinitionType {
+export function getSQLTablesSchemaForModule(mod: Module): ISQLSchemaDefinitionType {
   // this is where it will be contained
   const resultSchema = {
     [mod.getQualifiedPathName()]: getSQLTableDefinitionForModule(mod),
@@ -331,6 +332,35 @@ export function convertSQLValueToGQLValueForModule(
 
   return result;
 }
+
+export function convertSQLValueToElasticSQLValueForModule(
+  serverData: any,
+  mod: Module,
+  row: ISQLTableRowValue,
+) {
+  // first we create the graphql result
+  const result: ISQLTableRowValue = {};
+
+  // now we take all the base properties that we have
+  // in the graphql model
+  Object.keys(RESERVED_BASE_PROPERTIES).forEach((basePropertyKey) => {
+    result[basePropertyKey] = row[basePropertyKey] || null;
+  });
+
+  // we also take all the property definitions we have
+  // in this item definitions, and convert them one by one
+  // with the row data, this basically also gives graphql value
+  // in the key:value format
+  mod.getAllPropExtensions().forEach((pd) => {
+    Object.assign(
+      result,
+      convertSQLValueToElasticSQLValueForProperty(serverData, null, null, pd, row),
+    );
+  });
+
+  return result;
+}
+
 
 /**
  * Builds a sql query specific for this module to search
