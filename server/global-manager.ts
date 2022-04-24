@@ -158,10 +158,11 @@ export class GlobalManager {
     // before preparing the instance so that it is
     // indexed if our schema defines it as such
     if (GLOBAL_MANAGER_MODE === "ABSOLUTE" || GLOBAL_MANAGER_MODE === "SERVER_DATA") {
-      (async () => {
-        await this.addAdminUserIfMissing();
-        this.elastic && this.elastic.prepareInstance();
-      })();
+      this.addAdminUserIfMissing();
+    }
+
+    if (GLOBAL_MANAGER_MODE === "ABSOLUTE" || GLOBAL_MANAGER_MODE === "ELASTIC") {
+      this.elastic && this.elastic.prepareInstance();
     }
   }
   public setSEOGenerator(seoGenerator: SEOGenerator) {
@@ -609,18 +610,103 @@ export class GlobalManager {
         while (true) {
           this.serverDataLastUpdated = new Date().getTime();
 
-          await this.calculateServerData();
-
-          try {
-            await this.runOnce();
-          } catch (err) {
-            logger.error(
-              "GlobalManager.run [SERIOUS]: run once function failed to run",
-              {
-                errStack: err.stack,
-                errMessage: err.message,
+          let retries: number = 0;
+          let gaveUp: boolean = false;
+          // setup this retries protocol because as it seems
+          // losing connection in the server due to shoddy connectivity is possible
+          while (true) {
+            try {
+              await this.calculateServerData();
+              break;
+            } catch (err) {
+              if (retries <= 5) {
+                logger.error(
+                  "GlobalManager.run [SERIOUS]: Server data calculation failed, attempting retry in 10s",
+                  {
+                    errMessage: err.message,
+                    errStack: err.stack,
+                  }
+                );
+                await wait(10000);
+                retries++;
+              } else {
+                logger.error(
+                  "GlobalManager.run [SERIOUS]: Server data calculation failed, giving up",
+                  {
+                    errMessage: err.message,
+                    errStack: err.stack,
+                  }
+                );
+                gaveUp = true;
+                break;
               }
-            );
+            }
+          }
+
+          if (!gaveUp) {
+            retries = 0;
+
+            while (true) {
+              try {
+                await this.informNewServerData();
+                break;
+              } catch (err) {
+                if (retries <= 5) {
+                  logger.error(
+                    "GlobalManager.run [SERIOUS]: Informing new server data failed, attempting retry in 10s",
+                    {
+                      errMessage: err.message,
+                      errStack: err.stack,
+                    }
+                  );
+                  await wait(10000);
+                  retries++;
+                } else {
+                  logger.error(
+                    "GlobalManager.run [SERIOUS]: Informing new server data failed, giving up",
+                    {
+                      errMessage: err.message,
+                      errStack: err.stack,
+                    }
+                  );
+                  gaveUp = true;
+                  break;
+                }
+              }
+            }
+
+            if (!gaveUp) {
+              retries = 0;
+
+              while (true) {
+                try {
+                  await this.runOnce();
+                  break;
+                } catch (err) {
+                  if (retries <= 5) {
+                    logger.error(
+                      "GlobalManager.run [SERIOUS]: run once function failed to run, attempting retry in 10s",
+                      {
+                        errMessage: err.message,
+                        errStack: err.stack,
+                      }
+                    );
+                    await wait(10000);
+                    retries++;
+                  } else {
+                    logger.error(
+                      "GlobalManager.run [SERIOUS]: run once function failed, giving up",
+                      {
+                        errMessage: err.message,
+                        errStack: err.stack,
+                      }
+                    );
+                    gaveUp = true;
+                    break;
+                  }
+                }
+              }
+            }
           }
 
           const nowTime = new Date().getTime();
@@ -945,7 +1031,6 @@ export class GlobalManager {
           ? await this.currencyFactorsProvider.getFactors()
           : null,
       };
-      await this.informNewServerData();
     } catch (err) {
       logger.error(
         "GlobalManager.calculateServerData [SERIOUS]: failed to calculate server data",
@@ -954,6 +1039,7 @@ export class GlobalManager {
           errStack: err.stack,
         }
       );
+      throw err;
     }
   }
   private async informNewServerData() {
@@ -995,6 +1081,7 @@ export class GlobalManager {
             errStack: err.stack,
           }
         );
+        throw err;
       }
 
       // because we are in absolute mode we can both get the server data

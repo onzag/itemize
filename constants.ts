@@ -232,7 +232,7 @@ export const SERVER_BLOCK_UNTIL_REFRESH_TIME = R_ITEMIZE_CONSTANTS_CONFIG.SERVER
 /**
  * The time it takes to run a cleanup process into the elastic instance
  */
-export const SERVER_ELASTIC_CONSISTENCY_CHECK_TIME = R_ITEMIZE_CONSTANTS_CONFIG.SERVER_ELASTIC_CONSISTENCY_CHECK_TIME || 30000; // every 30 seconds
+export const SERVER_ELASTIC_CONSISTENCY_CHECK_TIME = R_ITEMIZE_CONSTANTS_CONFIG.SERVER_ELASTIC_CONSISTENCY_CHECK_TIME || 60000; // every minute
 
 /**
  * The maximum amount of remote listeners a socket supports
@@ -1419,11 +1419,6 @@ export const UNIT_SUBTYPES = [
   "reactiveEnergy",
   "angle",
 ];
-
-/**
- * The value for the indexable null value
- */
-export const ELASTIC_INDEXABLE_NULL_VALUE = "";
 
 /**
  * When an owner is not specified, this is the value it holds

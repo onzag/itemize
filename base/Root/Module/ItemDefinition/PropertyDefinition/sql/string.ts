@@ -7,7 +7,7 @@
 import { ISQLArgInfo, IElasticSearchInfo, ISQLEqualInfo, ISQLSearchInfo, ISQLStrSearchInfo, ISQLOutInfo, IArgInfo, IElasticStrSearchInfo } from "../types";
 import { PropertyDefinitionSearchInterfacesPrefixes } from "../search-interfaces";
 import { exactStringSearchSubtypes } from "../types/string";
-import { ELASTIC_INDEXABLE_NULL_VALUE, SQL_CONSTRAINT_PREFIX } from "../../../../../../constants";
+import { SQL_CONSTRAINT_PREFIX } from "../../../../../../constants";
 
 export function stringSQL(arg: ISQLArgInfo) {
   const subtype = arg.property.getSubtype();
@@ -43,7 +43,6 @@ export function stringElastic(arg: ISQLArgInfo) {
         [arg.prefix + arg.id]: {
           type: "object",
           enabled: true,
-          null_value: ELASTIC_INDEXABLE_NULL_VALUE,
         }
       },
     }
@@ -53,7 +52,7 @@ export function stringElastic(arg: ISQLArgInfo) {
       // the sql prefix defined plus the id, eg for includes
       [arg.prefix + arg.id]: {
         type: exactStringSearchSubtypes.includes(subtype) ? "keyword" : "text",
-        null_value: ELASTIC_INDEXABLE_NULL_VALUE,
+        null_value: "",
       },
     }
   }
@@ -132,23 +131,18 @@ export function stringElasticSearch(arg: IElasticSearchInfo): boolean {
   const searchName = PropertyDefinitionSearchInterfacesPrefixes.SEARCH + arg.prefix + arg.id;
   const inName = PropertyDefinitionSearchInterfacesPrefixes.IN + arg.prefix + arg.id;
 
-  if (typeof arg.args[searchName] !== "undefined" && arg.args[searchName] !== null) {
+  if (typeof arg.args[searchName] !== "undefined") {
+    const value = arg.args[searchName] as any;
     // and we check it...
     if (exactStringSearchSubtypes.includes(arg.property.getSubtype())) {
       arg.elasticQueryBuilder.mustTerm({
-        [arg.prefix + arg.id]: arg.args[searchName] as any,
+        [arg.prefix + arg.id]: value === null ? "" : value,
       });
     } else {
       arg.elasticQueryBuilder.mustMatch({
-        [arg.prefix + arg.id]: arg.args[searchName] as any,
+        [arg.prefix + arg.id]: value === null ? "" : value,
       });
     }
-
-    return true;
-  } else if (arg.args[searchName] === null) {
-    arg.elasticQueryBuilder.mustTerm({
-      [arg.prefix + arg.id]: ELASTIC_INDEXABLE_NULL_VALUE,
-    });
     return true;
   }
 

@@ -19,7 +19,7 @@ import ItemDefinition from "../..";
 import Include from "../../Include";
 import { processFileListFor, processSingleFileFor } from "./file-management";
 import { IGQLArgs, IGQLValue } from "../../../../../../gql-querier";
-import { ELASTIC_INDEXABLE_NULL_VALUE, SQL_CONSTRAINT_PREFIX } from "../../../../../../constants";
+import { SQL_CONSTRAINT_PREFIX } from "../../../../../../constants";
 import Module from "../../..";
 import StorageProvider from "../../../../../../server/services/base/StorageProvider";
 import { WhereBuilder } from "../../../../../../database/WhereBuilder";
@@ -63,6 +63,7 @@ export function getStandardSQLFnFor(
 
 export function getStandardElasticFor(
   type: string,
+  nullValue: any,
   format?: string,
   disabled?: boolean,
 ): (arg: IArgInfo) => IElasticIndexDefinitionType {
@@ -70,7 +71,7 @@ export function getStandardElasticFor(
     const value: any = {
       // the type is defined
       type,
-      null_value: ELASTIC_INDEXABLE_NULL_VALUE,
+      null_value: nullValue,
     };
     if (format) {
       value.format = format;
@@ -80,6 +81,33 @@ export function getStandardElasticFor(
     }
     return {
       properties: { [arg.prefix + arg.id]: value },
+    }
+  }
+}
+
+export function getStandardElasticForWithNullField(
+  type: string,
+  format?: string,
+  disabled?: boolean,
+): (arg: IArgInfo) => IElasticIndexDefinitionType {
+  return (arg: IArgInfo) => {
+    const value: any = {
+      // the type is defined
+      type,
+    };
+    if (format) {
+      value.format = format;
+    }
+    if (disabled) {
+      value.enabled = false;
+    }
+    return {
+      properties: {
+        [arg.prefix + arg.id]: value,
+        [arg.prefix + arg.id + "_NULL"]: {
+          type: "boolean",
+        }
+      },
     }
   }
 }
@@ -215,7 +243,7 @@ export function standardSQLSearchFnExactAndRange(arg: ISQLSearchInfo) {
   return searchedByIt;
 }
 
-export function standardElasticSearchFnExactAndRange(arg: IElasticSearchInfo) {
+function internalElasticSeachFn(arg: IElasticSearchInfo, nullFieldValue: string, nullStyle: boolean) {
   const fromName = PropertyDefinitionSearchInterfacesPrefixes.FROM + arg.prefix + arg.id;
   const toName = PropertyDefinitionSearchInterfacesPrefixes.TO + arg.prefix + arg.id;
   const exactName = PropertyDefinitionSearchInterfacesPrefixes.EXACT + arg.prefix + arg.id;
@@ -227,9 +255,15 @@ export function standardElasticSearchFnExactAndRange(arg: IElasticSearchInfo) {
     });
     searchedByIt = true;
   } else if (arg.args[exactName] === null) {
-    arg.elasticQueryBuilder.mustTerm({
-      [arg.prefix + arg.id]: ELASTIC_INDEXABLE_NULL_VALUE,
-    });
+    if (!nullStyle) {
+      arg.elasticQueryBuilder.mustTerm({
+        [arg.prefix + arg.id]: nullFieldValue,
+      });
+    } else {
+      arg.elasticQueryBuilder.mustTerm({
+        [arg.prefix + arg.id + "_NULL"]: true,
+      });
+    }
     searchedByIt = true;
   }
 
@@ -244,13 +278,30 @@ export function standardElasticSearchFnExactAndRange(arg: IElasticSearchInfo) {
     if (hasToDefined) {
       rule.lte = arg.args[toName];
     }
+
     arg.elasticQueryBuilder.mustRange({
       [arg.prefix + arg.id]: rule,
     });
+    
     searchedByIt = true;
   }
 
   return searchedByIt;
+}
+
+/**
+ * You must ensure no overlap in ranged search, if they are availbe in order
+ * for this function to be useful, it will not pluck them out
+ * @param nullFieldValue 
+ * @param arg 
+ * @returns 
+ */
+export function standardElasticSearchFnExactAndRange(nullFieldValue: string, arg: IElasticSearchInfo) {
+  return internalElasticSeachFn(arg, nullFieldValue, false);
+}
+
+export function standardElasticSearchFnWithNullFieldExactAndRange(arg: IElasticSearchInfo) {
+  return internalElasticSeachFn(arg, null, true);
 }
 
 /**

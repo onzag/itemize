@@ -6,7 +6,7 @@
 
 import { ISQLArgInfo, ISQLInInfo, ISQLOutInfo, ISQLSearchInfo, ISQLOrderByInfo, ISQLBtreeIndexableInfo, ISQLMantenienceType, ISQLEqualInfo, ISQLSSCacheEqualInfo, IElasticSearchInfo, IArgInfo } from "../types";
 import { IPropertyDefinitionSupportedCurrencyType } from "../types/currency";
-import { CURRENCY_FACTORS_IDENTIFIER, ELASTIC_INDEXABLE_NULL_VALUE } from "../../../../../../constants";
+import { CURRENCY_FACTORS_IDENTIFIER } from "../../../../../../constants";
 import { PropertyDefinitionSearchInterfacesPrefixes } from "../search-interfaces";
 import { IGQLArgs } from "../../../../../../gql-querier";
 
@@ -31,10 +31,10 @@ export function currencyElastic(arg: ISQLArgInfo) {
     properties: {
       [arg.prefix + arg.id + "_VALUE"]: {
         type: "float",
-        null_value: ELASTIC_INDEXABLE_NULL_VALUE,
       },
       [arg.prefix + arg.id + "_CURRENCY"]: {
         type: "keyword",
+        null_value: "",
       },
     },
     runtime: {
@@ -210,7 +210,7 @@ export function currencyElasticSearch(arg: IElasticSearchInfo) {
     searchedByIt = true;
   } else if (arg.args[exactName] === null) {
     arg.elasticQueryBuilder.mustTerm({
-      [arg.prefix + arg.id + "_VALUE"]: ELASTIC_INDEXABLE_NULL_VALUE,
+      [arg.prefix + arg.id + "_CURRENCY"]: "",
     });
     searchedByIt = true;
   }

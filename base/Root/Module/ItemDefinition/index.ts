@@ -252,6 +252,26 @@ export interface IItemDefinitionRawJSONDataType {
   searchEngineEnabled?: boolean;
 
   /**
+   * A specific language used
+   */
+  searchEngineMainLang?: string;
+
+  /**
+   * Represents the property that is used in order to setup the elasticsearch
+   * index language, because itemize can be set in many languages
+   * 
+   * If nothing is found then there's no property for language and it will be stored as a languageless
+   * document in a common index that uses a standard tokenizer
+   */
+  searchEngineMainLangProperty?: string;
+
+  /**
+   * Unlike searchEngineMainLangProperty this will use the value of a string or text property itself
+   * as the language, the property should be type language in order to be valid
+   */
+  searchEngineMainLangBasedOnProperty?: string;
+
+  /**
    * Whether an user role can create in behalf
    */
   canCreateInBehalf?: boolean;
@@ -2922,6 +2942,33 @@ export default class ItemDefinition {
    */
   public isSearchEngineEnabled() {
     return !!this.rawData.searchEngineEnabled;
+  }
+
+  /**
+   * If was provided gives the search engine main
+   * language to use to define the search
+   * @returns a 2 iso string
+   */
+  public getSearchEngineMainLanguage() {
+    if (this.rawData.searchEngineMainLang === "none") {
+      return null;
+    }
+    return this.rawData.searchEngineMainLang || null;
+  }
+
+  /**
+   * If it was provided gives the search engine main
+   * language to use as it was stored in the columns
+   * @returns the sql text column name that contains the language to index the whole
+   */
+  public getDynamicMainLanguageColumn() {
+    if (this.rawData.searchEngineMainLangBasedOnProperty) {
+      return this.rawData.searchEngineMainLangBasedOnProperty;
+    } else if (this.rawData.searchEngineMainLangProperty) {
+      return this.rawData.searchEngineMainLangProperty + "_LANG";
+    }
+
+    return null;
   }
 
   /**

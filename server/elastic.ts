@@ -6,7 +6,6 @@ import type Root from "../base/Root";
 import { getElasticSchemaForRoot, IElasticIndexDefinitionType, IElasticSchemaDefinitionType, ISQLTableRowValue } from "../base/Root/sql";
 import { logger } from "./logger";
 import equals from "deep-equal";
-import { ELASTIC_INDEXABLE_NULL_VALUE } from "../constants";
 
 interface ILangAnalyzers {
   [key: string]: string;
@@ -145,8 +144,6 @@ export class ItemizeElasticClient {
   private prepareInstancePromise: Promise<void>;
   private prepareInstancePromiseResolve: () => void;
 
-  private cachedIndexStatusInfo: {[qualifiedName: string]: IElasticIndexInformationType};
-
   constructor(
     root: Root,
     rawDB: ItemizeRawDB,
@@ -190,6 +187,18 @@ export class ItemizeElasticClient {
     if (shouldResolvePrmomise) {
       this.serverDataPromiseResolve();
     }
+
+    // now that the server data is ready, the prepare instace may run properly
+    // because this function only runs in the global manager, we may now
+    // update all our mappings due to new server data
+
+    // if the promise is missing otherwise it is pointless as preparing will
+    // ensure that our server data is used
+    if (!this.prepareInstancePromise) {
+      // we now want our indexes to be rebuilt based on the new information
+      // we have received
+      await this._rebuildAllIndexes();
+    };
   }
 
   /**
@@ -268,35 +277,10 @@ export class ItemizeElasticClient {
 
     // now we can resolve the promise
     this.prepareInstancePromiseResolve();
+    this.prepareInstancePromise = null;
   }
 
-  /**
-   * Used internally for preparing the instance
-   * 
-   * this function may fail and throw an error, causing the instance to retry again,
-   * and again, and again, until it succeeds
-   * 
-   * @ignore
-   */
-  private async _prepareInstance(): Promise<void> {
-    // first we create or update the status
-    // index that we use internally for index information
-    // and metadata
-    await this.createOrUpdateSimpleIndex(
-      "status",
-      {
-        properties: {
-          lastConsisencyCheck: {
-            type: "date",
-            null_value: ELASTIC_INDEXABLE_NULL_VALUE,
-          },
-          sinceLimiter: {
-            type: "integer",
-          },
-        }
-      }
-    );
-
+  private async _rebuildAllIndexes(): Promise<string[]> {
     // now we can begin qeuing the indexes that we want created
     const modsQueued: Module[] = [];
     const listOfAll: string[] = [];
@@ -325,7 +309,7 @@ export class ItemizeElasticClient {
           }
           // and if the item itself is search engine enabled
           if (cIdef.isSearchEngineEnabled()) {
-            await this.rebuildIndex(cIdef);
+            await this.rebuildIndexes(cIdef);
           }
         })
       );
@@ -333,8 +317,40 @@ export class ItemizeElasticClient {
 
     // now we can build all the modules
     await Promise.all(modsQueued.map(async (mod) => {
-      await this.rebuildIndex(mod);
+      await this.rebuildIndexes(mod);
     }));
+
+    return listOfAll;
+  }
+
+  /**
+   * Used internally for preparing the instance
+   * 
+   * this function may fail and throw an error, causing the instance to retry again,
+   * and again, and again, until it succeeds
+   * 
+   * @ignore
+   */
+  private async _prepareInstance(): Promise<void> {
+    // first we create or update the status
+    // index that we use internally for index information
+    // and metadata
+    await this.createOrUpdateSimpleIndex(
+      "status",
+      {
+        properties: {
+          lastConsisencyCheck: {
+            type: "date",
+          },
+          sinceLimiter: {
+            type: "integer",
+          },
+        }
+      }
+    );
+
+    // we call this
+    const listOfAll = await this._rebuildAllIndexes();
 
     // and now let's get our remaining elements that are just special elements added by the schema
     const simpleIds = Object.keys(this.rootSchema).filter((key) => !listOfAll.includes(key));
@@ -381,7 +397,7 @@ export class ItemizeElasticClient {
         );
       } else {
         logger.error(
-          "ItemizeElasticClient.confirmInstanceReadiness [SERIOUS]: could not confrirm the elastic instance waiting " + secondsToWait + "s",
+          "ItemizeElasticClient.confirmInstanceReadiness [SERIOUS]: could not confirm the elastic instance waiting " + secondsToWait + "s",
           {
             errStack: err.stack,
             errMessage: err.message,
@@ -425,7 +441,7 @@ export class ItemizeElasticClient {
           }
           // ensure the item
           if (cIdef.isSearchEngineEnabled()) {
-            await this.ensureIndex(cIdef, true);
+            await this.ensureIndexes(cIdef, true);
           }
         })
       );
@@ -433,7 +449,7 @@ export class ItemizeElasticClient {
 
     // and ensure all the mods we qeued
     await Promise.all(modsQueued.map(async (mod) => {
-      await this.ensureIndex(mod, true);
+      await this.ensureIndexes(mod, true);
     }));
 
     // and now let's get our remaining elements that are just special elements added by the schema
@@ -478,7 +494,6 @@ export class ItemizeElasticClient {
     qualifiedName: string,
     value: IElasticIndexInformationType,
   ) {
-    this.cachedIndexStatusInfo[qualifiedName] = value;
     await this.elasticClient.update({
       id: qualifiedName,
       index: "status",
@@ -497,10 +512,6 @@ export class ItemizeElasticClient {
   private async retrieveIndexStatusInfo(
     qualifiedName: string,
   ): Promise<IElasticIndexInformationType> {
-    if (this.cachedIndexStatusInfo[qualifiedName]) {
-      return this.cachedIndexStatusInfo[qualifiedName];
-    }
-
     const results = await this.elasticClient.search({
       index: "status",
       query: {
@@ -519,7 +530,6 @@ export class ItemizeElasticClient {
       return null;
     } else {
       const rs = results.hits.hits[0]._source as any;
-      this.cachedIndexStatusInfo[qualifiedName] = rs;
       return rs;
     }
   }
@@ -557,6 +567,10 @@ export class ItemizeElasticClient {
           properties: value.properties,
           runtime: value.runtime || {},
         });
+      } else {
+        logger.info(
+          "ItemizeElasticClient.createOrUpdateSimpleIndex: index for " + id + " deemed compatible",
+        );
       }
     } else {
       logger.info(
@@ -597,13 +611,13 @@ export class ItemizeElasticClient {
    * @param value 
    * @param sinceLimiter 
    */
-  private async _rebuildIndex(
+  private async _rebuildIndexGroup(
     qualifiedName: string,
     value: IElasticIndexDefinitionType,
     sinceLimiter: number,
   ) {
     logger.info(
-      "ItemizeElasticClient._rebuildIndex: ensuring index validity for " + qualifiedName,
+      "ItemizeElasticClient._rebuildIndexGroup: ensuring index validity for " + qualifiedName,
     );
     const indexInfo = await this.retrieveIndexStatusInfo(qualifiedName);
 
@@ -613,7 +627,7 @@ export class ItemizeElasticClient {
 
     if (!indexInfo) {
       logger.info(
-        "ItemizeElasticClient._rebuildIndex: index for " + qualifiedName + " status to be created",
+        "ItemizeElasticClient._rebuildIndexGroup: index group for " + qualifiedName + " status to be created",
       );
 
       await this.setIndexStatusInfo(
@@ -626,7 +640,7 @@ export class ItemizeElasticClient {
 
       if (currentMapping) {
         logger.info(
-          "ItemizeElasticClient._rebuildIndex: index for " + qualifiedName + " deemed missing, but mapping found, destructive actions taken",
+          "ItemizeElasticClient._rebuildIndexGroup: index group for " + qualifiedName + " deemed missing, but mapping found, destructive actions taken",
         );
 
         const indexNames = allIndexNames.join(",");
@@ -652,7 +666,7 @@ export class ItemizeElasticClient {
       // is invalid and must be re-retrieved once again
       if (!compatibilityCheck.scriptsIgnored) {
         logger.info(
-          "ItemizeElasticClient._rebuildIndex: index for " + qualifiedName + " deemed incompatible, destructive actions taken",
+          "ItemizeElasticClient._rebuildIndexGroup: index group for " + qualifiedName + " deemed incompatible, destructive actions taken",
         );
         await this.setIndexStatusInfo(
           qualifiedName,
@@ -667,14 +681,22 @@ export class ItemizeElasticClient {
         })
       } else if (!compatibilityCheck.general) {
         logger.info(
-          "ItemizeElasticClient._rebuildIndex: index for " + qualifiedName + " to be updated",
+          "ItemizeElasticClient._rebuildIndexGroup: index group for " + qualifiedName + " to be updated",
         );
         await this.elasticClient.indices.putMapping({
           index: wildcardName,
           properties: value.properties,
           runtime: value.runtime || {},
         });
+      } else {
+        logger.info(
+          "ItemizeElasticClient._rebuildIndexGroup: index group for " + qualifiedName + " deemed compatible",
+        );
       }
+    } else {
+      logger.info(
+        "ItemizeElasticClient._rebuildIndexGroup: index group for " + qualifiedName + " deemed empty (compatible)",
+      );
     }
   }
 
@@ -683,7 +705,7 @@ export class ItemizeElasticClient {
    * the given schema, this function is ran automatically and you are not
    * supposed to use it
    */
-  public async rebuildIndex(
+  public async rebuildIndexes(
     itemDefinitionOrModule: string | ItemDefinition | Module,
   ): Promise<void> {
     await this.waitForServerData();
@@ -696,7 +718,7 @@ export class ItemizeElasticClient {
 
     const schemaToBuild = this.rootSchema[qualifiedName];
 
-    await this._rebuildIndex(
+    await this._rebuildIndexGroup(
       qualifiedName,
       schemaToBuild,
       sinceLimiter,
@@ -710,7 +732,12 @@ export class ItemizeElasticClient {
   ) {
     await this.waitForServerData();
 
-    const currentMapping = await this.retrieveCurrentSchemaDefinition(id);
+    logger.info(
+      "ItemizeElasticClient.ensureSimpleIndex: ensuring index validity for " + id,
+    );
+
+    const indexName = id.toLowerCase();
+    const currentMapping = await this.retrieveCurrentSchemaDefinition(indexName);
 
     // because it doesn't exist we can consider it not ready, this is unlike the other index type
     if (!currentMapping) {
@@ -739,7 +766,7 @@ export class ItemizeElasticClient {
     return compatibilityCheck.general;
   }
 
-  public async ensureIndex(
+  public async ensureIndexes(
     itemDefinitionOrModule: string | ItemDefinition | Module,
     throwError?: boolean,
   ) {
@@ -749,9 +776,16 @@ export class ItemizeElasticClient {
     const qualifiedName = idefOrMod.getQualifiedPathName();
     const schemaToBuild = this.rootSchema[qualifiedName];
 
+    logger.info(
+      "ItemizeElasticClient.ensureIndexes: ensuring index validity for " + qualifiedName,
+    );
+
     const indexInfo = await this.retrieveIndexStatusInfo(qualifiedName);
 
     if (!indexInfo) {
+      logger.info(
+        "ItemizeElasticClient.ensureIndexes: entire data for index " + qualifiedName + " is missing",
+      );
       if (throwError) {
         throw new NotReadyError("Index for " + qualifiedName + " is not ready because the info itself is missing");
       }
@@ -767,6 +801,9 @@ export class ItemizeElasticClient {
     // means that the index will be created the moment it is to be used in the right language
     // and it will have the right expected shape
     if (!currentMapping) {
+      logger.info(
+        "ItemizeElasticClient.ensureIndexes: index for " + qualifiedName + " deemed empty (compatible)",
+      );
       return true;
     }
 
@@ -781,11 +818,30 @@ export class ItemizeElasticClient {
 
     // and run a compatibility check
     const compatibilityCheck = mappingsAreCompatible(mappingAsElasticIndex, schemaToBuild);
-    if (!compatibilityCheck.scriptsIgnored && throwError) {
-      throw new NotReadyError("Index for " + qualifiedName + " does not have the right shape");
+    if (!compatibilityCheck.scriptsIgnored) {
+      logger.info(
+        "ItemizeElasticClient.ensureIndexes: index for " + qualifiedName + " does not have the right shape",
+      );
+      if (throwError) {
+        throw new NotReadyError("Index for " + qualifiedName + " does not have the right shape");
+      }
+    } else {
+      logger.info(
+        "ItemizeElasticClient.ensureIndexes: index for " + qualifiedName + " deemed compatible",
+      );
     }
 
     return compatibilityCheck.scriptsIgnored;
+  }
+
+  /**
+   * An alias for running a consistency check
+   * 
+   * this function can actually be ran from within a cluster, or extended instance
+   * if it believes it is doing something that warrants that mechanism
+   */
+  public updateIndices() {
+    return this.runConsistencyCheck();
   }
 
   /**
@@ -821,9 +877,101 @@ export class ItemizeElasticClient {
    * This function is run automatically with the elastic consistency checker that runs in the global manager in elastic mode or
    * in absolute mode, you may want to run a manual consistency check but it is unecessary check the server consistency check
    * regarding how often these consistency checks are ran regarding SERVER_ELASTIC_CLEANUP_TIME
+   * 
+   * Will also flush old records that do not respect the since limiter
    */
   public async runConsistencyCheck() {
     // TODO
+  }
+
+  private async generateMissingIndexInGroup(
+    qualifiedName: string,
+    language: string,
+    value: IElasticIndexDefinitionType,
+  ) {
+    const indexName = qualifiedName.toLowerCase() + "_" + language;
+    const analyzer = this.langAnalyzers[language] || this.langAnalyzers["*"];
+    const analyzerLow = analyzer.toLowerCase();
+
+    await this.elasticClient.indices.create({
+      index: indexName,
+      mappings: {
+        properties: value.properties,
+        runtime: value.runtime || {},
+      },
+      settings: {
+        analysis: {
+          analyzer: {
+            default: (analyzerLow === "standard" || analyzerLow === "simple") ? {
+              type: analyzerLow,
+            } : {
+              type: analyzerLow as any,
+            }
+          }
+        }
+      }
+    });
+  }
+
+  public async deleteDocument(
+    itemDefinition: string | ItemDefinition,
+    language: string,
+    id: string,
+    version: string,
+  ) {
+    const idef = typeof itemDefinition === "string" ? this.root.registry[itemDefinition] : itemDefinition;
+    const mod = idef.getParentModule();
+
+    if (!idef.isSearchEngineEnabled() && !mod.isSearchEngineEnabled()) {
+      return;
+    }
+
+    const qualifiedNameItem = idef.getQualifiedPathName();
+    const qualifiedNameMod = mod.getQualifiedPathName();
+
+    const indexNameIdef = qualifiedNameItem.toLowerCase() + "_" + language;
+    const indexNameMod = qualifiedNameItem.toLowerCase() + "_" + language;
+
+    const givenID = id + "." + (version || "");
+
+    if (idef.isSearchEngineEnabled()) {
+      try {
+        await this.elasticClient.delete({
+          id: givenID,
+          index: indexNameIdef,
+        });
+      } catch (err) {
+        // if index_not_found or not_found isn't the case
+        if (err.meta.statusCode !== 404) {
+          logger.error(
+            "ItemizeElasticClient.deleteDocument [SERIOUS]: could not delete document for " + givenID + " at " + indexNameIdef,
+            {
+              errStack: err.stack,
+              errMessage: err.message,
+            }
+          );
+        }
+      }
+    }
+
+    if (mod.isSearchEngineEnabled()) {
+      try {
+        await this.elasticClient.delete({
+          id: givenID,
+          index: indexNameMod,
+        });
+      } catch (err) {
+        if (err.meta.statusCode !== 404) {
+          logger.error(
+            "ItemizeElasticClient.deleteDocument [SERIOUS]: could not delete document for " + givenID + " at " + indexNameMod,
+            {
+              errStack: err.stack,
+              errMessage: err.message,
+            }
+          );
+        }
+      }
+    }
   }
 
   /**
@@ -833,12 +981,34 @@ export class ItemizeElasticClient {
    */
   public async updateDocument(
     itemDefinition: string | ItemDefinition,
+    originalLanguage: string,
     language: string,
     id: string,
     version: string,
     value?: ISQLTableRowValue,
   ): Promise<void> {
-    return null;
+    const idef = typeof itemDefinition === "string" ? this.root.registry[itemDefinition] : itemDefinition;
+    const mod = idef.getParentModule();
+
+    if (!idef.isSearchEngineEnabled() && !mod.isSearchEngineEnabled()) {
+      return;
+    }
+
+    if (originalLanguage && originalLanguage !== language) {
+      await this.deleteDocument(itemDefinition, originalLanguage, id, version);
+    }
+    const newValue = value || ((await this.rawDB.performRawDBSelect(
+      itemDefinition,
+      (b) => b.selectAll().whereBuilder.andWhereColumn("id", id).andWhereColumn("version", version || "")
+    ))[0] || null);
+
+    // database did not find anything for this
+    if (!newValue) {
+      return;
+    }
+    
+    // convertSQLValueToElasticValueForModule
+    // convertSQLValueToElasticValueForItemDefinition
   }
 
   public async updateDocumentBulk(

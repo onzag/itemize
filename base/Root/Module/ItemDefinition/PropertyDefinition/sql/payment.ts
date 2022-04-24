@@ -8,7 +8,6 @@ import { ISQLArgInfo, ISQLInInfo, ISQLOutInfo, ISQLSearchInfo, ISQLBtreeIndexabl
 import { IPropertyDefinitionSupportedPaymentType, PaymentStatusType } from "../types/payment";
 import { PropertyDefinitionSearchInterfacesPrefixes } from "../search-interfaces";
 import { IPropertyDefinitionSupportedCurrencyType } from "../types/currency";
-import { ELASTIC_INDEXABLE_NULL_VALUE } from "../../../../../../constants";
 
 // based on the payment provider status to event
 // need to clone it because of circular dependencies
@@ -44,10 +43,10 @@ export function paymentElastic(arg: ISQLArgInfo) {
     properties: {
       [arg.prefix + arg.id + "_TYPE"]: {
         type: "keyword",
+        null_value: "",
       },
       [arg.prefix + arg.id + "_AMOUNT"]: {
         type: "float",
-        null_value: ELASTIC_INDEXABLE_NULL_VALUE,
       },
       [arg.prefix + arg.id + "_CURRENCY"]: {
         type: "keyword",
@@ -227,6 +226,8 @@ export function paymentSQLSearch(arg: ISQLSearchInfo) {
 export function paymentElasticSearch(arg: IElasticSearchInfo) {
   const argPrefixPlusId = arg.prefix + arg.id;
 
+  const mustRule: any = {};
+
   // first we need to get the arguments
   const fromName = PropertyDefinitionSearchInterfacesPrefixes.FROM + argPrefixPlusId;
   const toName = PropertyDefinitionSearchInterfacesPrefixes.TO + argPrefixPlusId;
@@ -241,15 +242,27 @@ export function paymentElasticSearch(arg: IElasticSearchInfo) {
   if (typeof arg.args[exactName] !== "undefined" && arg.args[exactName] !== null) {
     const exactArg = arg.args[exactName] as any as IPropertyDefinitionSupportedCurrencyType;
     // we just match it as it is
-    arg.elasticQueryBuilder.mustTerm({
-      [argPrefixPlusId + "_AMOUNT"]: exactArg.value,
-      [argPrefixPlusId + "_CURRENCY"]: exactArg.currency,
-    });
+    mustRule.bool = {
+      must: [
+        {
+          term: {
+            [argPrefixPlusId + "_AMOUNT"]: exactArg.value,
+            [argPrefixPlusId + "_CURRENCY"]: exactArg.currency,
+          }
+        }
+      ]
+    };
     searchedByIt = true;
   } else if (arg.args[exactName] === null) {
-    arg.elasticQueryBuilder.mustTerm({
-      [argPrefixPlusId + "_AMOUNT"]: ELASTIC_INDEXABLE_NULL_VALUE,
-    });
+    mustRule.bool = {
+      must: [
+        {
+          term: {
+            [argPrefixPlusId + "_TYPE"]: "",
+          }
+        }
+      ]
+    };
     searchedByIt = true;
   }
 
@@ -274,34 +287,68 @@ export function paymentElasticSearch(arg: IElasticSearchInfo) {
         currencyToUse2 = toArg.currency;
       }
     }
-    arg.elasticQueryBuilder.mustRange({
-      [arg.prefix + arg.id + "_AMOUNT"]: rule,
-    });
-    arg.elasticQueryBuilder.mustTerm({
-      [arg.prefix + arg.id + "_CURRENCY"]: currencyToUse,
-    });
-    // should fail this is weird
-    // payments are not allowed to be requested on different currencies nor stored as such
-    if (currencyToUse2 && currencyToUse !== currencyToUse2) {
-      arg.elasticQueryBuilder.mustTerm({
-        [arg.prefix + arg.id + "_CURRENCY"]: currencyToUse2,
-      });
+
+    if (!mustRule.bool) {
+      mustRule.bool = {};
     }
+
+    if (!mustRule.bool.must) {
+      mustRule.bool.must = [];
+    }
+
+    mustRule.bool.must.push(
+      {
+        range: {
+          [arg.prefix + arg.id + "_AMOUNT"]: rule,
+        },
+        term: {
+          // should fail this is weird
+          // payments are not allowed to be requested on different currencies nor stored as such
+          [arg.prefix + arg.id + "_CURRENCY"]: currencyToUse2 && currencyToUse !== currencyToUse2 ? "" : currencyToUse,
+        }
+      }
+    );
+
     searchedByIt = true;
   }
 
   if (typeof arg.args[paymentTypeName] !== "undefined" && arg.args[paymentTypeName] !== null) {
-    arg.elasticQueryBuilder.mustTerm({
-      [argPrefixPlusId + "_TYPE"]: arg.args[paymentTypeName] as string,
+    if (!mustRule.bool) {
+      mustRule.bool = {};
+    }
+
+    if (!mustRule.bool.must) {
+      mustRule.bool.must = [];
+    }
+
+    mustRule.bool.must.push({
+      term: {
+        [argPrefixPlusId + "_TYPE"]: arg.args[paymentTypeName] as string,
+      }
     });
     searchedByIt = true;
   }
 
   if (typeof arg.args[paymentStatusName] !== "undefined" && arg.args[paymentStatusName] !== null) {
-    arg.elasticQueryBuilder.mustTerm({
-      [argPrefixPlusId + "_STATUS"]: arg.args[paymentStatusName] as string,
+    if (!mustRule.bool) {
+      mustRule.bool = {};
+    }
+
+    if (!mustRule.bool.must) {
+      mustRule.bool.must = [];
+    }
+
+    mustRule.bool.must.push({
+      term: {
+        [argPrefixPlusId + "_STATUS"]: arg.args[paymentStatusName] as string,
+      }
     });
+
     searchedByIt = true;
+  }
+
+  if (Object.keys(mustRule).length > 0) {
+    arg.elasticQueryBuilder.must(mustRule);
   }
 
   // now we return if we have been searched by it at the end

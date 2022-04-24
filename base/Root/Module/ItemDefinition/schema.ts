@@ -184,6 +184,15 @@ export default {
     searchEngineEnabled: {
       type: "boolean",
     },
+    searchEngineMainLang: {
+      type: "string",
+    },
+    searchEngineMainLangProperty: {
+      type: "string",
+    },
+    searchEngineMainLangBasedOnProperty: {
+      type: "string",
+    },
     searchRoleAccess: {
       type: "array",
       items: {

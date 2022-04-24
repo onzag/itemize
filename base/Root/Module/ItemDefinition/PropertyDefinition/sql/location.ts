@@ -8,7 +8,7 @@ import {
   ISQLArgInfo, ISQLInInfo, ISQLOutInfo, ISQLSearchInfo, ISQLOrderByInfo,
   ISQLEqualInfo, ISQLSSCacheEqualInfo, IElasticSearchInfo, IArgInfo
 } from "../types";
-import { ELASTIC_INDEXABLE_NULL_VALUE, SQL_CONSTRAINT_PREFIX } from "../../../../../../constants";
+import { SQL_CONSTRAINT_PREFIX } from "../../../../../../constants";
 import { PropertyDefinitionSearchInterfacesPrefixes } from "../search-interfaces";
 import { IPropertyDefinitionSupportedLocationType } from "../types/location";
 import { IPropertyDefinitionSupportedUnitType } from "../types/unit";
@@ -80,7 +80,8 @@ export function locationElastic(arg: ISQLArgInfo) {
       },
       [arg.prefix + arg.id + "_GEO"]: {
         type: "geo_point",
-        null_value: ELASTIC_INDEXABLE_NULL_VALUE,
+        // null island
+        null_value: [0, 0],
       },
     },
   }
@@ -219,7 +220,7 @@ export function locationElasticSearch(arg: IElasticSearchInfo): boolean {
 
   if (arg.args[locationName] === null) {
     arg.elasticQueryBuilder.mustTerm({
-      [arg.prefix + arg.id + "_GEO"]: ELASTIC_INDEXABLE_NULL_VALUE,
+      [arg.prefix + arg.id + "_GEO"]: [0, 0],
     });
     return true;
   } else if (
@@ -232,13 +233,26 @@ export function locationElasticSearch(arg: IElasticSearchInfo): boolean {
     const argAsUnit: IPropertyDefinitionSupportedUnitType = arg.args[radiusName] as any;
     const distance = (argAsUnit.normalizedValue || 0) * 1000;
 
-    arg.elasticQueryBuilder.filter({
-      geo_distance: {
-        distance: distance + "m",
-        [arg.prefix + arg.id + "_GEO"]: [
-          lng,
-          lat,
+    arg.elasticQueryBuilder.must({
+      bool: {
+        must_not: [
+          {
+            term: {
+              [arg.prefix + arg.id + "_GEO"]: [0, 0],
+            },
+          },
         ],
+        filter: [
+          {
+            geo_distance: {
+              distance: distance + "m",
+              [arg.prefix + arg.id + "_GEO"]: [
+                lng,
+                lat,
+              ],
+            }
+          }
+        ]
       }
     });
 

@@ -84,7 +84,7 @@ export class CurrencyLayerService extends CurrencyFactorsProvider<ICurrencyLayer
               });
             }).on("error", (err) => {
               logger.error(
-                "CurrencyLayer.requestInfo: https request to CurrencyLayer API failed",
+                "CurrencyLayer.requestInfo: request to CurrencyLayer API failed",
                 {
                   errMessage: err.message,
                   errStack: err.stack,

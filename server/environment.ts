@@ -12,7 +12,7 @@ export const PORT: number = process.env.PORT ? (parseInt(process.env.PORT) || 80
 export const INSTANCE_GROUP_ID = process.env.INSTANCE_GROUP_ID || "UNIDENTIFIED";
 export const INSTANCE_MODE: "CLUSTER_MANAGER" | "GLOBAL_MANAGER" | "ABSOLUTE" | "EXTENDED" | "BUILD_DATABASE" | "LOAD_DATABASE_DUMP" | "CLEAN_STORAGE" | "CLEAN_SITEMAPS" = process.env.INSTANCE_MODE || "ABSOLUTE" as any;
 export const GLOBAL_MANAGER_MODE: "ABSOLUTE" | "ELASTIC" | "SITEMAPS" | "SERVER_DATA" | "SERVICES" = process.env.GLOBAL_MANAGER_MODE || "ABSOLUTE" as any;
-export const GLOBAL_MANAGER_SERVICES: string[] = (process.env.GLOBAL_MANAGER_SERVICES && process.env.GLOBAL_MANAGER_SERVICES.split(",").map((s) => s.trim())) || []
+export const GLOBAL_MANAGER_SERVICES: string[] = (process.env.GLOBAL_MANAGER_SERVICES && process.env.GLOBAL_MANAGER_SERVICES.split(",").map((s) => s.trim())) || [];
 export const INSTANCE_UUID =
   INSTANCE_MODE + "_" +
   (INSTANCE_MODE === "GLOBAL_MANAGER" ? GLOBAL_MANAGER_MODE + "_" : "") +

@@ -10,7 +10,6 @@ import {
 } from "../types";
 import { IPropertyDefinitionSupportedUnitType } from "../types/unit";
 import { PropertyDefinitionSearchInterfacesPrefixes } from "../search-interfaces";
-import { ELASTIC_INDEXABLE_NULL_VALUE } from "../../../../../../constants";
 
 /**
  * The unit sql function that specifies the schema
@@ -47,10 +46,12 @@ export function unitElastic(arg: ISQLArgInfo) {
       },
       [arg.prefix + arg.id + "_NORMALIZED_VALUE"]: {
         type: "float",
-        null_value: ELASTIC_INDEXABLE_NULL_VALUE,
       },
       [arg.prefix + arg.id + "_NORMALIZED_UNIT"]: {
         type: "keyword",
+        // we are using the unit because for example normalized
+        // values of eg. celcius can be negative
+        null_value: "",
       },
     }
   };
@@ -182,7 +183,7 @@ export function unitElasticSearch(arg: IElasticSearchInfo) {
     searchedByIt = true;
   } else if (arg.args[exactName] === null) {
     arg.elasticQueryBuilder.mustTerm({
-      [arg.prefix + arg.id + "_NORMALIZED_VALUE"]: ELASTIC_INDEXABLE_NULL_VALUE,
+      [arg.prefix + arg.id + "_NORMALIZED_UNIT"]: "",
     });
     searchedByIt = true;
   }

@@ -1,4 +1,3 @@
-import { ELASTIC_INDEXABLE_NULL_VALUE } from "../../../../../../constants";
 import {
   ISQLTableRowValue,
 } from "../../../../sql";
@@ -77,7 +76,7 @@ export function tagListElasticSearch(arg: IElasticSearchInfo): boolean {
     return true;
   } else if (arg.args[searchName] === null) {
     arg.elasticQueryBuilder.mustTerm({
-      [arg.prefix + arg.id]: ELASTIC_INDEXABLE_NULL_VALUE,
+      [arg.prefix + arg.id + "_NULL"]: true,
     });
     return true;
   }

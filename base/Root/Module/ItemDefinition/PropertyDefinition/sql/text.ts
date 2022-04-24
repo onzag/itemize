@@ -7,7 +7,6 @@
 import { ISQLArgInfo, ISQLInInfo, ISQLSearchInfo, ISQLOrderByInfo, ISQLStrSearchInfo, ISQLRedoDictionaryBasedIndex, IElasticSearchInfo, IArgInfo, ISQLOutInfo, IElasticStrSearchInfo } from "../types";
 import { PropertyDefinitionSearchInterfacesPrefixes } from "../search-interfaces";
 import { DOMWindow, DOMPurify } from "../../../../../../util";
-import { ELASTIC_INDEXABLE_NULL_VALUE } from "../../../../../../constants";
 
 /**
  * Provides the sql form for the text type
@@ -48,12 +47,12 @@ export function textElastic(arg: ISQLArgInfo) {
         [arg.prefix + arg.id]: {
           type: "text",
           enabled: isRichText ? false : true,
-          null_value: ELASTIC_INDEXABLE_NULL_VALUE,
+          null_value: "",
         },
         [arg.prefix + arg.id + "_PLAIN"]: {
           type: "text",
           enabled: isRichText ? true : false,
-          null_value: ELASTIC_INDEXABLE_NULL_VALUE,
+          null_value: "",
         }
       }
     }
@@ -63,7 +62,7 @@ export function textElastic(arg: ISQLArgInfo) {
         [arg.prefix + arg.id]: {
           type: "text",
           enabled: isRichText ? false : true,
-          null_value: ELASTIC_INDEXABLE_NULL_VALUE,
+          null_value: "",
         },
       }
     }
@@ -219,8 +218,8 @@ export function textElasticSearch(arg: IElasticSearchInfo): boolean {
 
     return true;
   } else if (arg.args[searchName] === null) {
-    arg.elasticQueryBuilder.mustTerm({
-      [arg.prefix + arg.id + (isRichText ? "_PLAIN" : "")]: ELASTIC_INDEXABLE_NULL_VALUE,
+    arg.elasticQueryBuilder.mustMatch({
+      [arg.prefix + arg.id + (isRichText ? "_PLAIN" : "")]: "",
     });
     return false;
   }

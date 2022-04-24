@@ -40,6 +40,7 @@ import { IPropertiesValueMappingDefinitonRawJSONDataType } from "../base/Root/Mo
 import { PropertyDefinitionSearchInterfacesType } from "../base/Root/Module/ItemDefinition/PropertyDefinition/search-interfaces";
 import Module from "../base/Root/Module";
 import { ajvCheck, checkSpecialPropertyValueSetSchemaValidate } from "./schema-checks";
+import { languages } from "../imported-resources";
 
 /**
  * Checks a conditional rule set so that it is valid and contains valid
@@ -314,6 +315,88 @@ export function checkItemDefinition(
         );
       }
     });
+  }
+
+  if (rawData.searchEngineEnabled || parentModule.searchEngineEnabled) {
+    if (rawData.searchEngineMainLangBasedOnProperty && rawData.searchEngineMainLangProperty) {
+      throw new CheckUpError(
+        "Cannot have both searchEngineMainLangBasedOnProperty and searchEngineMainLangProperty",
+        actualTraceback.newTraceToBit("searchEngineMainLangBasedOnProperty"),
+      );
+    }
+
+    if (rawData.searchEngineMainLangBasedOnProperty && rawData.searchEngineMainLang) {
+      throw new CheckUpError(
+        "Cannot have both searchEngineMainLangBasedOnProperty and searchEngineMainLang",
+        actualTraceback.newTraceToBit("searchEngineMainLang"),
+      );
+    }
+
+    if (rawData.searchEngineMainLangProperty && rawData.searchEngineMainLang) {
+      throw new CheckUpError(
+        "Cannot have both searchEngineMainLangProperty and searchEngineMainLang",
+        actualTraceback.newTraceToBit("searchEngineMainLang"),
+      );
+    }
+    
+    if (!rawData.searchEngineMainLangBasedOnProperty && !rawData.searchEngineMainLangProperty && !rawData.searchEngineMainLang) {
+      throw new CheckUpError(
+        "Needs one of searchEngineMainLangBasedOnProperty, searchEngineMainLangProperty or searchEngineMainLang",
+        actualTraceback.newTraceToBit("searchEngineEnabled"),
+      );
+    }
+  }
+
+  if (!rawData.searchEngineEnabled && !parentModule.searchEngineEnabled) {
+    if (rawData.searchEngineMainLangBasedOnProperty || rawData.searchEngineMainLangProperty || rawData.searchEngineMainLang) {
+      throw new CheckUpError(
+        "Does not need any of searchEngineMainLangBasedOnProperty, searchEngineMainLangProperty nor searchEngineMainLang",
+        actualTraceback.newTraceToBit("searchEngineEnabled"),
+      );
+    }
+  }
+
+  if (rawData.searchEngineMainLang && rawData.searchEngineMainLang !== "none" && !languages[rawData.searchEngineMainLang]) {
+    throw new CheckUpError(
+      "Unknown language nor is (none) which is a valid language",
+      actualTraceback.newTraceToBit("searchEngineMainLang"),
+    );
+  }
+
+  if (rawData.searchEngineMainLangProperty) {
+    let property = rawData.properties && rawData.properties.find((p) => p.id === rawData.searchEngineMainLangProperty);
+    if (!property) {
+      property = parentModule.propExtensions && parentModule.propExtensions.find((p) => p.id === rawData.searchEngineMainLangProperty);
+    }
+    if (!property) {
+      throw new CheckUpError(
+        "Cannot find such property in the item or module",
+        actualTraceback.newTraceToBit("searchEngineMainLangProperty"),
+      );
+    } else if (property.type !== "text") {
+      throw new CheckUpError(
+        "The given property is not of type text but rather " + property.type,
+        actualTraceback.newTraceToBit("searchEngineMainLangProperty"),
+      );
+    }
+  }
+
+  if (rawData.searchEngineMainLangBasedOnProperty) {
+    let property = rawData.properties && rawData.properties.find((p) => p.id === rawData.searchEngineMainLangBasedOnProperty);
+    if (!property) {
+      property = parentModule.propExtensions && parentModule.propExtensions.find((p) => p.id === rawData.searchEngineMainLangBasedOnProperty);
+    }
+    if (!property) {
+      throw new CheckUpError(
+        "Cannot find such property in the item or module",
+        actualTraceback.newTraceToBit("searchEngineMainLangBasedOnProperty"),
+      );
+    } else if (property.type !== "string" && property.subtype !== "language") {
+      throw new CheckUpError(
+        "The given property is not of type string/language but rather " + property.type + "/" + (property.subtype || "none"),
+        actualTraceback.newTraceToBit("searchEngineMainLangBasedOnProperty"),
+      );
+    }
   }
 
   // check the custom consistency so that all custom keys are available

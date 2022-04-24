@@ -58,7 +58,7 @@ const typeValue: IPropertyDefinitionSupportedType<PropertyDefinitionSupportedFil
     },
   ],
   sql: getStandardSQLFnFor && getStandardSQLFnFor("TEXT"),
-  elastic: getStandardElasticFor && getStandardElasticFor("keyword", null, true),
+  elastic: getStandardElasticFor && getStandardElasticFor("keyword", "", null, true),
   sqlSelect: standardSQLSelect,
   sqlIn: stardardSQLInWithJSONStringifyFn,
   sqlOut: standardSQLOutWithJSONParseFn,
