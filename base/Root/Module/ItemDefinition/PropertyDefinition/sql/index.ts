@@ -68,6 +68,16 @@ export function getStandardElasticFor(
   disabled?: boolean,
 ): (arg: IArgInfo) => IElasticIndexDefinitionType {
   return (arg: IArgInfo) => {
+    if (disabled) {
+      return {
+        properties: {
+          [arg.prefix + arg.id]: {
+            enabled: false,
+          }
+        }
+      }
+    }
+
     const value: any = {
       // the type is defined
       type,
@@ -75,9 +85,6 @@ export function getStandardElasticFor(
     };
     if (format) {
       value.format = format;
-    }
-    if (disabled) {
-      value.enabled = false;
     }
     return {
       properties: { [arg.prefix + arg.id]: value },
@@ -279,10 +286,39 @@ function internalElasticSeachFn(arg: IElasticSearchInfo, nullFieldValue: string,
       rule.lte = arg.args[toName];
     }
 
-    arg.elasticQueryBuilder.mustRange({
-      [arg.prefix + arg.id]: rule,
-    });
-    
+    if (!nullStyle) {
+      arg.elasticQueryBuilder.must({
+        bool: {
+          must: [
+            {
+              range: {
+                [arg.prefix + arg.id]: rule,
+              },
+            }
+          ],
+          must_not: [
+            {
+              term: {
+                [arg.prefix + arg.id]: nullFieldValue,
+              }
+            }
+          ]
+        }
+      });
+    } else {
+      arg.elasticQueryBuilder.must({
+        bool: {
+          must: [
+            {
+              range: {
+                [arg.prefix + arg.id]: rule,
+              },
+            }
+          ],
+        }
+      });
+    }
+
     searchedByIt = true;
   }
 

@@ -30,7 +30,7 @@ export function currencyElastic(arg: ISQLArgInfo) {
   return {
     properties: {
       [arg.prefix + arg.id + "_VALUE"]: {
-        type: "float",
+        type: "double",
       },
       [arg.prefix + arg.id + "_CURRENCY"]: {
         type: "keyword",
@@ -39,7 +39,7 @@ export function currencyElastic(arg: ISQLArgInfo) {
     },
     runtime: {
       [arg.prefix + arg.id + "_NORMALIZED_VALUE"]: {
-        type: "float",
+        type: "double",
         script: {
           lang: "painless",
           source: "emit(doc['" + arg.prefix + arg.id + "_VALUE" + "'].value * params[doc['" + arg.prefix + arg.id + "_CURRENCY" + "'].value])",

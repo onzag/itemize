@@ -561,12 +561,17 @@ export class GlobalManager {
 
     if (this.elastic && (GLOBAL_MANAGER_MODE === "ABSOLUTE" || GLOBAL_MANAGER_MODE === "ELASTIC")) {
       (async () => {
+        let firstAvoided = false;
         while (true) {
           this.elasticCleanupLastExecuted = new Date().getTime();
 
-          logger.info("GlobalManager.run: running elasticsearch consistency check");
           try {
-            await this.elastic.runConsistencyCheck();
+            // we will avoid the first because instance preparation does a consistency check
+            if (firstAvoided) {
+              logger.info("GlobalManager.run: running elasticsearch consistency check");
+              await this.elastic.runConsistencyCheck();
+            }
+            firstAvoided = true;
           } catch (err) {
             logger.error(
               "GlobalManager.run [SERIOUS]: Elasticsearch consistency check failed to run",

@@ -243,7 +243,7 @@ export class ItemizeRawDB {
       // because this can be none, which returns null to fallback
       // to the standard language, we need to realize this that null
       // means we got it
-      const hasBaseLanguageSpecified = typeof elasticLanguageOverride !== "undefined" || !!idef.rawData.searchEngineMainLang;
+      const hasBaseLanguageSpecified = typeof elasticLanguageOverride !== "undefined" || !!idef.rawData.searchEngineFallbackLang;
 
       // otherwise here we are checking what the dynamic column is and if we have it in
       // our element

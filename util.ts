@@ -500,7 +500,7 @@ export function parseTime(time: string) {
 }
 
 export function parseDateTime(datetime: string) {
-  return Moment(datetime, DATETIME_FORMAT);
+  return Moment.utc(datetime);
 }
 
 /**

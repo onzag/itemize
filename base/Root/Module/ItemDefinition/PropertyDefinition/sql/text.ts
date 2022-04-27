@@ -45,14 +45,13 @@ export function textElastic(arg: ISQLArgInfo) {
     return {
       properties: {
         [arg.prefix + arg.id]: {
-          type: "text",
-          enabled: isRichText ? false : true,
-          null_value: "",
+          enabled: false,
         },
         [arg.prefix + arg.id + "_PLAIN"]: {
           type: "text",
-          enabled: isRichText ? true : false,
-          null_value: "",
+        },
+        [arg.prefix + arg.id + "_NULL"]: {
+          type: "boolean",
         }
       }
     }
@@ -61,9 +60,10 @@ export function textElastic(arg: ISQLArgInfo) {
       properties: {
         [arg.prefix + arg.id]: {
           type: "text",
-          enabled: isRichText ? false : true,
-          null_value: "",
         },
+        [arg.prefix + arg.id + "_NULL"]: {
+          type: "boolean",
+        }
       }
     }
   }
@@ -218,10 +218,10 @@ export function textElasticSearch(arg: IElasticSearchInfo): boolean {
 
     return true;
   } else if (arg.args[searchName] === null) {
-    arg.elasticQueryBuilder.mustMatch({
-      [arg.prefix + arg.id + (isRichText ? "_PLAIN" : "")]: "",
+    arg.elasticQueryBuilder.mustTerm({
+      [arg.prefix + arg.id + "_NULL"]: true,
     });
-    return false;
+    return true;
   }
 
   return false;
@@ -233,10 +233,12 @@ export function textElasticIn(arg: ISQLOutInfo) {
     return {
       [arg.prefix + arg.id]: arg.row[arg.prefix + arg.id],
       [arg.prefix + arg.id + "_PLAIN"]: arg.row[arg.prefix + arg.id + "_PLAIN"],
+      [arg.prefix + arg.id + "_NULL"]: !arg.row[arg.prefix + arg.id],
     };
   } else {
     return {
       [arg.prefix + arg.id]: arg.row[arg.prefix + arg.id],
+      [arg.prefix + arg.id + "_NULL"]: !arg.row[arg.prefix + arg.id],
     };
   }
 }

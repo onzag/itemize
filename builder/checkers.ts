@@ -324,47 +324,48 @@ export function checkItemDefinition(
         actualTraceback.newTraceToBit("searchEngineMainLangBasedOnProperty"),
       );
     }
-
-    if (rawData.searchEngineMainLangBasedOnProperty && rawData.searchEngineMainLang) {
-      throw new CheckUpError(
-        "Cannot have both searchEngineMainLangBasedOnProperty and searchEngineMainLang",
-        actualTraceback.newTraceToBit("searchEngineMainLang"),
-      );
-    }
-
-    if (rawData.searchEngineMainLangProperty && rawData.searchEngineMainLang) {
-      throw new CheckUpError(
-        "Cannot have both searchEngineMainLangProperty and searchEngineMainLang",
-        actualTraceback.newTraceToBit("searchEngineMainLang"),
-      );
-    }
-    
-    if (!rawData.searchEngineMainLangBasedOnProperty && !rawData.searchEngineMainLangProperty && !rawData.searchEngineMainLang) {
-      throw new CheckUpError(
-        "Needs one of searchEngineMainLangBasedOnProperty, searchEngineMainLangProperty or searchEngineMainLang",
-        actualTraceback.newTraceToBit("searchEngineEnabled"),
-      );
-    }
   }
 
   if (!rawData.searchEngineEnabled) {
-    if (rawData.searchEngineMainLangBasedOnProperty || rawData.searchEngineMainLangProperty || rawData.searchEngineMainLang) {
+    if (
+      rawData.searchEngineMainLangBasedOnProperty ||
+      rawData.searchEngineMainLangProperty ||
+      rawData.searchEngineFallbackLang ||
+      typeof rawData.searchEngineLangUseVersion !== "undefined"
+    ) {
       throw new CheckUpError(
-        "Does not need any of searchEngineMainLangBasedOnProperty, searchEngineMainLangProperty nor searchEngineMainLang",
+        "Does not need any of searchEngineMainLangBasedOnProperty, searchEngineMainLangProperty, searchEngineLangUseVersion nor searchEngineFallbackLang",
         actualTraceback.newTraceToBit(
           rawData.searchEngineMainLangBasedOnProperty ? "searchEngineMainLangBasedOnProperty" : (
-            rawData.searchEngineMainLangProperty ? "searchEngineMainLangProperty" : "searchEngineMainLang"
+            rawData.searchEngineMainLangProperty ? "searchEngineMainLangProperty" : (
+              typeof rawData.searchEngineLangUseVersion !== "undefined" ? "searchEngineLangUseVersion" : "searchEngineFallbackLang"
+            )
           )
         ),
       );
     }
   }
 
-  if (rawData.searchEngineMainLang && rawData.searchEngineMainLang !== "none" && !languages[rawData.searchEngineMainLang]) {
+  if (rawData.searchEngineFallbackLang && !languages[rawData.searchEngineFallbackLang]) {
     throw new CheckUpError(
-      "Unknown language nor is (none) which is a valid language",
-      actualTraceback.newTraceToBit("searchEngineMainLang"),
+      "Unknown language",
+      actualTraceback.newTraceToBit("searchEngineFallbackLang"),
     );
+  }
+
+  if (rawData.searchEngineLangUseVersion) {
+    if (!rawData.enableVersioning) {
+      throw new CheckUpError(
+        "Search engine uses version but versioning is disabled",
+        actualTraceback.newTraceToBit("searchEngineLangUseVersion"),
+      );
+    } else if (!rawData.versionIsLanguage && !rawData.versionIsLanguageAndCountry) {
+      throw new CheckUpError(
+        "Search engine uses version but versioning does not contain any language or localization data that can be used to obtain a language, " +
+        "you should use either versionIsLanguage or versionIsLanguageAndCountry",
+        actualTraceback.newTraceToBit("searchEngineLangUseVersion"),
+      );
+    }
   }
 
   if (rawData.searchEngineMainLangProperty) {

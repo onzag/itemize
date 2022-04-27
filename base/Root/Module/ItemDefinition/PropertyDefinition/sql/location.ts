@@ -59,23 +59,18 @@ export function locationElastic(arg: ISQLArgInfo) {
   return {
     properties: {
       [arg.prefix + arg.id + "_ID"]: {
-        type: "keyword",
         enabled: false,
       },
       [arg.prefix + arg.id + "_LAT"]: {
-        type: "float",
         enabled: false,
       },
       [arg.prefix + arg.id + "_LNG"]: {
-        type: "float",
         enabled: false,
       },
       [arg.prefix + arg.id + "_TXT"]: {
-        type: "keyword",
         enabled: false,
       },
       [arg.prefix + arg.id + "_ATXT"]: {
-        type: "keyword",
         enabled: false,
       },
       [arg.prefix + arg.id + "_GEO"]: {

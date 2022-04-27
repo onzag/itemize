@@ -679,6 +679,28 @@ export const STANDARD_ACCESSIBLE_RESERVED_BASE_PROPERTIES = [
   "parent_version",
   "parent_type",
 ];
+
+/**
+ * The format that dates are expected to have in order to be exchanged
+ * these represent the SQL form, does not support nano date
+ */
+ export const DATETIME_FORMAT = "YYYY-MM-DD HH:mm:ss.SSSZ";
+ /**
+  * The format with the nano information included, used mainly for elastic
+  * parsing
+  */
+ export const DATETIME_FORMAT_ELASTIC_NANO = "yyyy-MM-dd HH:mm:ss.SSSSSSZZZZZ";
+ /**
+  * The format that time is expected to have in order to be exchanged
+  * this is the SQL form
+  */
+ export const TIME_FORMAT = "HH:mm:ss";
+ /**
+  * The format date has in order to be exchanged, this is
+  * the SQL form
+  */
+ export const DATE_FORMAT = "YYYY-MM-DD";
+
 /**
  * The reserved base properties that are exists within every graphql query
  * and should mirror the database
@@ -918,31 +940,37 @@ export const RESERVED_BASE_PROPERTIES_ELASTIC: IElasticIndexDefinitionType = {
       type: "keyword",
     },
     created_at: {
-      type: "date",
+      type: "date_nanos",
+      format: DATETIME_FORMAT_ELASTIC_NANO,
     },
     created_by: {
       type: "keyword",
     },
     edited_at: {
-      type: "date",
+      type: "date_nanos",
+      format: DATETIME_FORMAT_ELASTIC_NANO,
     },
     edited_by: {
       type: "keyword",
     },
     reviewed_at: {
-      type: "date",
+      type: "date_nanos",
+      format: DATETIME_FORMAT_ELASTIC_NANO,
     },
     reviewed_by: {
       type: "keyword",
     },
     last_modified: {
-      type: "date",
+      type: "date_nanos",
+      format: DATETIME_FORMAT_ELASTIC_NANO,
     },
     blocked_at: {
-      type: "date",
+      type: "date_nanos",
+      format: DATETIME_FORMAT_ELASTIC_NANO,
     },
     blocked_until: {
-      type: "date",
+      type: "date_nanos",
+      format: DATETIME_FORMAT_ELASTIC_NANO,
     },
     blocked_by: {
       type: "keyword",
@@ -1054,22 +1082,6 @@ export const POLICY_REQUIRED_I18N = [
 export const POLICY_OPTIONAL_I18N = [
   "description",
 ];
-
-/**
- * The format that dates are expected to have in order to be exchanged
- * these represent the SQL form, does not support nano date
- */
-export const DATETIME_FORMAT = "YYYY-MM-DD HH:mm:ss.SSSZ";
-/**
- * The format that time is expected to have in order to be exchanged
- * this is the SQL form
- */
-export const TIME_FORMAT = "HH:mm:ss";
-/**
- * The format date has in order to be exchanged, this is
- * the SQL form
- */
-export const DATE_FORMAT = "YYYY-MM-DD";
 
 /**
  * The ID element fields are the id and type unique identifiers

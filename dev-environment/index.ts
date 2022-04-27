@@ -60,6 +60,28 @@ export async function start(version: string) {
     await fsAsync.mkdir(path.join("devenv", "pgdata"));
   }
 
+  try {
+    // and we execute this command with the configuration
+    // it will execute for localhost of course
+    console.log(colors.yellow("Please allow Itemize to create a network"));
+    await execSudo(
+      `docker network create ${dockerprefixer}_network`,
+      "Itemize Docker Network Creator",
+    );
+  } catch (err) {
+    // if something fails show a message
+    console.log(colors.red(err.message));
+    console.log(colors.yellow("Something went wrong please allow for cleanup..."));
+    try {
+      await execSudo(
+        `docker network rm ${dockerprefixer}_network`,
+        "Itemize Docker Network Creator",
+      );
+    } catch {
+    }
+    throw err;
+  }
+
   // so because this is a devenv the config in order to make sense
   // should be in localhost
   if (
@@ -79,7 +101,7 @@ export async function start(version: string) {
       // and we execute this command with the configuration
       // it will execute for localhost of course
       await execSudo(
-        `docker run --name ${dockerprefixer}_devdb -e POSTGRES_PASSWORD=${dbConfig.password} ` +
+        `docker run --net ${dockerprefixer}_network --name ${dockerprefixer}_devdb -e POSTGRES_PASSWORD=${dbConfig.password} ` +
         `-e POSTGRES_USER=${dbConfig.user} -e POSTGRES_DB=${dbConfig.database} ` +
         `-v "$PWD/devenv/pgdata":/var/lib/postgresql/data ` +
         `-p ${dbConfig.port}:5432 -d postgis/postgis`,
@@ -129,7 +151,7 @@ export async function start(version: string) {
               "Itemize Sysctl setup for elasticsearch",
             );
             await execSudo(
-              `docker run --name ${dockerprefixer}_devedb -e ELASTIC_PASSWORD=${password} ` +
+              `docker run --net ${dockerprefixer}_network --name ${dockerprefixer}_devedb -e ELASTIC_PASSWORD=${password} ` +
               `-p ${port}:9200 -d docker.elastic.co/elasticsearch/elasticsearch:8.1.3`,
               "Itemize Docker Contained Elasticsearch Database",
             );
@@ -209,7 +231,7 @@ export async function start(version: string) {
     // and we attempt to execute
     try {
       await execSudo(
-        `docker run --name ${dockerprefixer}_devredis ` +
+        `docker run --net ${dockerprefixer}_network --name ${dockerprefixer}_devredis ` +
         `-p ${redisConfig.global.port}:6379 -d redis`,
         "Itemize Docker Contained REDIS Database",
       );
@@ -248,13 +270,13 @@ export async function stop(version: string) {
     dbConfig.host === "127.0.0.1"
   ) {
     try {
-      // console.log(colors.yellow("Please allow Itemize to stop the PGSQL docker container"));
+      console.log(colors.yellow("Please allow Itemize to stop the PGSQL docker container"));
       await execSudo(
         `docker stop ${dockerprefixer}_devdb`,
         "Itemize Docker Contained PGSQL Database",
       );
 
-      // console.log(colors.yellow("Now we attempt to remove the PGSQL docker container"));
+      console.log(colors.yellow("Now we attempt to remove the PGSQL docker container"));
       await execSudo(
         `docker rm ${dockerprefixer}_devdb`,
         "Itemize Docker Contained PGSQL Database",
@@ -310,18 +332,27 @@ export async function stop(version: string) {
     !redisConfig.global.path
   ) {
     try {
-      // console.log(colors.yellow("Please allow Itemize to stop the REDIS docker container"));
+      console.log(colors.yellow("Please allow Itemize to stop the REDIS docker container"));
       await execSudo(
         `docker stop ${dockerprefixer}_devredis`,
         "Itemize Docker Contained REDIS Database",
       );
 
-      // console.log(colors.yellow("Now we attempt to remove the REDIS docker container"));
+      console.log(colors.yellow("Now we attempt to remove the REDIS docker container"));
       await execSudo(
         `docker rm ${dockerprefixer}_devredis`,
         "Itemize Docker Contained REDIS Database",
       );
     } catch (err) {
     }
+  }
+
+  try {
+    console.log(colors.yellow("Please allow Itemize to remove the development network"));
+    await execSudo(
+      `docker network rm ${dockerprefixer}_network`,
+      "Itemize Docker Network",
+    );
+  } catch (err) {
   }
 }

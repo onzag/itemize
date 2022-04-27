@@ -27,24 +27,23 @@ import { WhereBuilder } from "../../../database/WhereBuilder";
 import { OrderByBuilder } from "../../../database/OrderByBuilder";
 
 export function getElasticSchemaForModule(mod: Module, serverData: any): IElasticSchemaDefinitionType {
-  const pathName = mod.getQualifiedPathName();
-  const resultSchema: IElasticSchemaDefinitionType = {
-    [pathName]: {
-      properties: { ...RESERVED_BASE_PROPERTIES_ELASTIC.properties },
-      runtime: { ...RESERVED_BASE_PROPERTIES_ELASTIC.runtime },
-    }
-  }
+  const resultSchema: IElasticSchemaDefinitionType = {};
+
+  const moduleSchema = {
+    properties: { ...RESERVED_BASE_PROPERTIES_ELASTIC.properties },
+    runtime: { ...RESERVED_BASE_PROPERTIES_ELASTIC.runtime },
+  };
 
   mod.getAllPropExtensions().forEach((pd) => {
     const result = getElasticSchemaForProperty(null, null, pd, serverData);
     Object.assign(
-      resultSchema[pathName].properties,
+      moduleSchema.properties,
       result.properties,
     );
 
     if (result.runtime) {
       Object.assign(
-        resultSchema[pathName].runtime,
+        moduleSchema.runtime,
         result.runtime,
       );
     }
@@ -62,7 +61,7 @@ export function getElasticSchemaForModule(mod: Module, serverData: any): IElasti
   mod.getAllChildItemDefinitions().forEach((cIdef) => {
     Object.assign(
       resultSchema,
-      getElasticSchemaForItemDefinition(cIdef, resultSchema[pathName], serverData),
+      getElasticSchemaForItemDefinition(cIdef, moduleSchema, serverData),
     );
   });
 

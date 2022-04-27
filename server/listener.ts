@@ -1281,7 +1281,7 @@ export class Listener {
         [
           mod.getQualifiedPathName(),
           parentingId,
-          request.lastModified || null,
+          request.lastModified || null,
           requiredType || null,
         ].filter((v) => v !== null),
         true,

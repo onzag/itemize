@@ -49,7 +49,7 @@ const typeValue: IPropertyDefinitionSupportedType<PropertyDefinitionSupportedDat
   searchable: true,
   searchInterface: PropertyDefinitionSearchInterfacesType.EXACT_AND_RANGE,
   sql: getStandardSQLFnFor && getStandardSQLFnFor("DATE"),
-  elastic: getStandardElasticForWithNullField && getStandardElasticForWithNullField("date", DATE_FORMAT),
+  elastic: getStandardElasticForWithNullField && getStandardElasticForWithNullField("date", "yyyy-MM-dd"),
   sqlSelect: standardSQLSelect,
   sqlIn: standardSQLInFn,
   sqlOut: standardSQLOutFn,

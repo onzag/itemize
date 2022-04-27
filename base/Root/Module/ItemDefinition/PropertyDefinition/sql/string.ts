@@ -42,29 +42,49 @@ export function stringElastic(arg: ISQLArgInfo) {
         // totally dynamic object
         [arg.prefix + arg.id]: {
           type: "object",
-          enabled: true,
-        }
+        },
       },
     }
   }
-  return {
-    properties: {
-      // the sql prefix defined plus the id, eg for includes
-      [arg.prefix + arg.id]: {
-        type: exactStringSearchSubtypes.includes(subtype) ? "keyword" : "text",
-        null_value: "",
-      },
+
+  if (exactStringSearchSubtypes.includes(subtype)) {
+    return {
+      properties: {
+        // the sql prefix defined plus the id, eg for includes
+        [arg.prefix + arg.id]: {
+          type: "keyword",
+          null_value: "",
+        },
+      }
+    }
+  } else {
+    return {
+      properties: {
+        // the sql prefix defined plus the id, eg for includes
+        [arg.prefix + arg.id]: {
+          type: "text",
+        },
+        [arg.prefix + arg.id + "_NULL"]: {
+          type: "boolean",
+        },
+      }
     }
   }
 }
 
 export function stringSQLElasticIn(arg: ISQLOutInfo) {
   const subtype = arg.property.getSubtype();
-  return {
+  const basis = {
     [arg.prefix + arg.id]: subtype === "json" ? (
       arg.row[arg.prefix + arg.id] === null ? null : JSON.parse(arg.row[arg.prefix + arg.id])
     ) : arg.row[arg.prefix + arg.id],
   };
+
+  if (subtype !== "json" && exactStringSearchSubtypes.includes(subtype)) {
+    basis[arg.prefix + arg.id + "_NULL"] = !arg.row[arg.prefix + arg.id];
+  }
+
+  return basis;
 }
 
 /**
@@ -137,6 +157,10 @@ export function stringElasticSearch(arg: IElasticSearchInfo): boolean {
     if (exactStringSearchSubtypes.includes(arg.property.getSubtype())) {
       arg.elasticQueryBuilder.mustTerm({
         [arg.prefix + arg.id]: value === null ? "" : value,
+      });
+    } else if (value === null) {
+      arg.elasticQueryBuilder.mustTerm({
+        [arg.prefix + arg.id + "_NULL"]: true,
       });
     } else {
       arg.elasticQueryBuilder.mustMatch({

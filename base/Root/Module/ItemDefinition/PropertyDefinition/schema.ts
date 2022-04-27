@@ -205,15 +205,6 @@ export default {
     searchable: {
       type: "boolean",
     },
-    searchBehaviour: {
-      type: "string",
-      enum: [
-        "PREFER_SEARCH_ENGINE",
-        "PREFER_DATABASE",
-        "USE_SEARCH_ENGINE",
-        "USE_DATABASE",
-      ],
-    },
     searchEngineBoost: {
       type: "number",
     },

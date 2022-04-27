@@ -1850,9 +1850,8 @@ export class Cache {
       let rowsToPerformDeleteSideEffects: ISQLTableRowValue[] = null;
 
       const searchEngineEnabled = itemDefinition.isSearchEngineEnabled();
-      const searchEngineLanguage = itemDefinition.getSearchEngineMainLanguage();
       let extraLanguageColumn = "";
-      if (searchEngineEnabled && !searchEngineLanguage) {
+      if (searchEngineEnabled) {
         const searchEngineLanguageColumn = itemDefinition.getSearchEngineDynamicMainLanguageColumn();
         if (searchEngineLanguageColumn) {
           extraLanguageColumn = ", " + JSON.stringify(searchEngineLanguageColumn);

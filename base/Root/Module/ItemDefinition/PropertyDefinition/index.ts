@@ -71,13 +71,6 @@ export interface IPropertyDefinitionRawJSONInvalidRuleDataType {
   if: IConditionalRuleSetRawJSONDataType;
 }
 
-export enum SearchBehaviourType {
-  PREFER_SEARCH_ENGINE = "PREFER_SEARCH_ENGINE",
-  PREFER_DATABASE = "PREFER_DATABASE",
-  USE_SEARCH_ENGINE = "USE_SEARCH_ENGINE",
-  USE_DATABASE = "USE_DATABASE",
-}
-
 /**
  * this is what a raw property definition looks like
  */
@@ -215,10 +208,6 @@ export interface IPropertyDefinitionRawJSONDataType {
    * whether it is searchable or not
    */
   searchable?: boolean;
-  /**
-   * The preferred search mechanism
-   */
-  searchBehaviour?: SearchBehaviourType;
   /**
    * A boost to give in elasticsearch if exists
    */
@@ -2125,10 +2114,6 @@ export default class PropertyDefinition {
       return this.rawData.searchable;
     }
     return false;
-  }
-
-  public getSearchBehaviour(): SearchBehaviourType {
-    return this.rawData.searchBehaviour || SearchBehaviourType.PREFER_SEARCH_ENGINE;
   }
 
   public getSearchBoost() {

@@ -184,8 +184,11 @@ export default {
     searchEngineEnabled: {
       type: "boolean",
     },
-    searchEngineMainLang: {
+    searchEngineFallbackLang: {
       type: "string",
+    },
+    searchEngineLangUseVersion: {
+      type: "boolean",
     },
     searchEngineMainLangProperty: {
       type: "string",

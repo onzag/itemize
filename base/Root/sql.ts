@@ -136,24 +136,7 @@ export interface ISQLStreamComposedTableRowValue {
 }
 
 export function getElasticSchemaForRoot(root: Root, serverData: any): IElasticSchemaDefinitionType {
-  let resultSchema: IElasticSchemaDefinitionType = {
-    [LOGS_IDENTIFIER]: {
-      properties: {
-        instance_id: {
-          type: "keyword",
-        },
-        level: {
-          type: "keyword",
-        },
-        data: {
-          type: "object",
-        },
-        created_at: {
-          type: "date",
-        },
-      }
-    },
-  }
+  let resultSchema: IElasticSchemaDefinitionType = {};
 
   root.getAllModules().forEach((cModule) => {
     // add together the schemas of all the modules

@@ -32,6 +32,7 @@ import {
   CLASSIC_SEARCH_RANGED_I18N,
   CLASSIC_SEARCH_RANGED_OPTIONAL_I18N,
   DATETIME_FORMAT,
+  DATETIME_FORMAT_ELASTIC_NANO,
 } from "../../../../../../constants";
 import Moment from "moment";
 import { PropertyDefinitionSearchInterfacesType } from "../search-interfaces";
@@ -50,7 +51,7 @@ const typeValue: IPropertyDefinitionSupportedType<PropertyDefinitionSupportedDat
   searchable: true,
   searchInterface: PropertyDefinitionSearchInterfacesType.EXACT_AND_RANGE,
   sql: getStandardSQLFnFor && getStandardSQLFnFor("TIMESTAMPTZ"),
-  elastic: getStandardElasticForWithNullField && getStandardElasticForWithNullField("date", DATETIME_FORMAT),
+  elastic: getStandardElasticForWithNullField && getStandardElasticForWithNullField("date", DATETIME_FORMAT_ELASTIC_NANO),
   sqlSelect: standardSQLSelect,
   sqlIn: standardSQLInFn,
   sqlOut: standardSQLOutFn,

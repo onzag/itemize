@@ -37,11 +37,9 @@ export function unitElastic(arg: ISQLArgInfo) {
   return {
     properties: {
       [arg.prefix + arg.id + "_VALUE"]: {
-        type: "float",
         enabled: false,
       },
       [arg.prefix + arg.id + "_UNIT"]: {
-        type: "keyword",
         enabled: false,
       },
       [arg.prefix + arg.id + "_NORMALIZED_VALUE"]: {

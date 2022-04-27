@@ -16,7 +16,7 @@ export const GLOBAL_MANAGER_SERVICES: string[] = (process.env.GLOBAL_MANAGER_SER
 export const INSTANCE_UUID =
   INSTANCE_MODE + "_" +
   (INSTANCE_MODE === "GLOBAL_MANAGER" ? GLOBAL_MANAGER_MODE + "_" : "") +
-  (INSTANCE_MODE === "GLOBAL_MANAGER" && GLOBAL_MANAGER_MODE === "SERVICES" ? (GLOBAL_MANAGER_SERVICES.join(",") || "ALL_SERVICES") + "_" : "")
+  (INSTANCE_MODE === "GLOBAL_MANAGER" && GLOBAL_MANAGER_MODE === "SERVICES" ? (GLOBAL_MANAGER_SERVICES.join(",") || "ALL_SERVICES") + "_" : "") +
   INSTANCE_GROUP_ID + "_" + uuid.v4().replace(/-/g, "");
 export const INSTANCE_CREATION_TIME = new Date();
 export const INSTANCE_LOG_FILE = `logs/info.${INSTANCE_UUID}.log`;

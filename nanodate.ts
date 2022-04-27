@@ -43,7 +43,11 @@ export class NanoSecondComposedDate {
     // now we need to remove timezone data, to the left, now we split
     // for the seconds section, and get the remainder; the date component
     // can parse the first 3 values, but not the remaining values
-    let strRemainder = str.split("+")[0].split(".")[1].substr(3);
+    let splitted = str.split("+");
+    if (splitted.length === 1) {
+      splitted = str.split("-");
+    }
+    let strRemainder = splitted[0].split(".")[1].substr(3);
 
     // since we are using a total number, we need to ensure the size is exact
     // as our precision because we are parsing decimals

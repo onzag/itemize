@@ -37,11 +37,55 @@ Please ensure docker is installed and running
 
 Before running this step you might want to consider getting api keys from the following services, without these Itemize will not work at its full potential, if you are coming from the tutorial you might skip all these.
 
-`https://www.ovhcloud.com/en-gb/public-cloud/object-storage/` You need an openstack object storage container, for usage for files and sitemaps, it's necessary for SEO and file support, OVH is one such provider, without adding an object storage provider, the file types and file uploading won't work whatsoever.
+#### Container Storage Provider
+
+By default you do not need any container storage provider, as it will be simply stored as a file to the hard drive, this however requires that you only have one cluster as this will not work with clusters over different machines, it is only recommended for development, for production unless you have a very small service, you should not have any local storage provider and instead get containers.
+
+The storage is necessary for SEO and file support,
+
+##### Openstack Object Storage
+
+Object storage is provided by several providers, and it's the default used in itemize when no provider has been specified it will assume that it is object storage, you can get as many as you want to but try to have them acrross different countries.
+
+Some providers of object storage are (you can combine them):
+
+- `https://www.ovhcloud.com/en-gb/public-cloud/object-storage/`
+- `https://www.linode.com/content/deploying-object-storage-bucket/`
+
+Once you get credentials for these buckets you may add them as such:
+
+```
+{
+    "containers": {
+        "EUROPE": {
+            "username": "YudxasaPrC",
+            "password": "secret",
+            "region": "DE",
+            "domainId": "default",
+            "domainName": 
+        }
+    }
+}
+```
 
 You might get many of these containers in order to setup a CDN of kinds, different countries can have different containers where data is stored for such.
 
-`https://developer.here.com/` For usage in geocoding, geolocation, and autocomplete; the service doesn't need to be paid for initial usage; use it if you have the location type in your schema
+#### Mapping
+
+`https://developer.here.com/` For usage in geocoding, geolocation, and autocomplete; the service doesn't need to be paid for initial usage; use it if you have the location type in your schema.
+
+You can activate here maps, over OSM in the maps visual as well by setting up your `index.sensitive.json` with the following `shared` configuration, replace API_KEY_HERE with your api key.
+
+Note that this is specific to the fast prototyping location entry and view renderer, if using other renderer this will have no effect.
+
+```
+"shared": {
+    "leafletAttribution": "&copy; HERE 2019",
+    "leafletUrl": "https://2.base.maps.ls.hereapi.com/maptile/2.1/maptile/newest/normal.day/{z}/{x}/{y}/512/png8?ppi=320&apiKey=API_KEY_HERE"
+}
+```
+
+#### Email
 
 `https://www.mailgun.com/email-api/` Mailgun email API, for usage to send emails to user as well as validation and recovery, if not available, you might want to consider removing the email and e_validated property and restructuring the app, without mailgun sending validation emails and recovering accounts as well as login with email is not truly possible.
 
@@ -147,9 +191,50 @@ Install docker compose in order to be able to run deployments
 
 Having SSR enabled can disrupt development, because this means that there will be a mismatch whenever you do changes and rebuild and package your application, this is seen in depth in [Developing Flow](./developing-flow.md) this usually goes in combination with disabling service workers as otherwise changes will not reflect, so a common way to start your development server is:
 
-`NO_SSR=true NO_SEO=true FAKE_EMAILS=true FAKE_SMS=true npm run start-dev-server`
+`NODE_TLS_REJECT_UNAUHORIZED=0 NO_SSR=true NO_SEO=true FAKE_EMAILS=true FAKE_SMS=true npm run start-dev-server`
 
 Note that restarts are still required if for example there are changes to the schema files.
+
+The reason you accept unauthorized is because the dev environment (if running elasticsearch) uses a self signed certificate, and it's a different one with each dev environment so accepting unauthorized is the better option for development only.
+
+In production you should rather have your own elasticsearch instance.
+
+#### Start Kibana (if you are using elasticsearch)
+
+If you are using elasticsearch and have configured it you can access the logs as well as the cached search information for used in fast and full text search with the elastic strategy.
+
+In order to start kibana in this development environment you will need to first create an enrollment token, first find the countainer that ends with the `_devedb` suffix and is running elasticsearch.
+
+```sh
+sudo docker ps
+```
+
+Find the container that ends with `_devedb` it should have your application name before it, you will need that identifier.
+
+```sh
+sudo docker exec -it my_application_name_devedb /usr/share/elasticsearch/bin/elasticsearch-create-enrollment-token -s kibana
+```
+
+You will be output a token, copy it, you will need it; now you shall get kibana running, you will need to do the same regarding the network name that you will use and connect it to your development environment
+
+```sh
+sudo docker network ls
+```
+
+Find the one that contains your application name within it, eg. `my_application_name_network` that is the one that the dev environment is using, now you can launch kibana with that
+
+```sh
+sudo docker run --net my_application_name_network --name kibana -p 5601:5601 docker.elastic.co/kibana/kibana:8.1.3
+```
+
+It will prompt you in your browser and request you for the token, once you paste the token you will then proceed to login, your username should be `elastic` and the password is whatever you put in the `db.sensitive.json` for elastic password.
+
+And that's all you should be within kibana with those steps, remember once you are done to stop this container before running `stop-dev-environment`.
+
+```sh
+sudo docker stop kibana
+sudo docker rm kibana
+```
 
 ### Start the silly server
 

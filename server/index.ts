@@ -75,6 +75,7 @@ import USSDProvider from "./services/base/USSDProvider";
 import { FakeUSSDService } from "./services/fake-ussd";
 import { Client } from "@elastic/elasticsearch";
 import { ItemizeElasticClient } from "./elastic";
+import { ElasticLoggerService } from "./services/elastic-logger";
 
 // load the custom services configuration
 let serviceCustom: IServiceCustomizationType = {};
@@ -97,7 +98,48 @@ const TIMESTAMPTZ_OID = 1184;
 const TIME_OID = 1083;
 const DATE_OID = 1082;
 types.setTypeParser(TIMESTAMP_OID, (val) => val);
-types.setTypeParser(TIMESTAMPTZ_OID, (val) => val);
+types.setTypeParser(
+  TIMESTAMPTZ_OID,
+  (val) => {
+    // postgreSQL time is not normalized, we are trying here
+    // first by splitting the value from the timezone bit
+    let splitted = val.split("+");
+    let symbol = "+";
+    if (splitted.length === 1) {
+      splitted = val.split("-");
+      symbol = "-";
+    }
+
+    // now we need both bits
+    let [timePart, zonePart] = splitted;
+
+    // if there's no zone information then it's 0
+    if (!zonePart) {
+      zonePart = "00:00";
+    } else {
+      // otherwise we add the missing extra time info
+      zonePart += ":00";
+    }
+
+    // now we can do this cheaply by having the len
+    let len = timePart.length;
+    while (len < 26) {
+      // if it's 19, basically the shortest it can be
+      // then we need to add a dot to add the 6 mising decimals
+      if (len === 19) {
+        timePart += ".";
+      } else {
+        // and here we add such decimals
+        timePart += "0";
+      }
+      // and we have just increased the lenght
+      len++;
+    }
+
+    // once we hit 26 we are done
+    return timePart + symbol + zonePart;
+  }
+);
 types.setTypeParser(TIME_OID, (val) => val);
 types.setTypeParser(DATE_OID, (val) => val);
 
@@ -377,7 +419,9 @@ export async function initializeServer(
       redisConfig,
     };
 
-    const LoggingServiceClass = (serviceCustom && serviceCustom.loggingServiceProvider) || PgLoggerService;
+    const LoggingServiceClass = (serviceCustom && serviceCustom.loggingServiceProvider) || (
+      dbConfig.elastic ? ElasticLoggerService : PgLoggerService
+    );
     const loggingService: LoggingProvider<any> = new LoggingServiceClass(
       sensitiveConfig.logging,
       null,

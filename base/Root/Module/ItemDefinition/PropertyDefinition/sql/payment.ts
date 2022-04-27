@@ -55,11 +55,9 @@ export function paymentElastic(arg: ISQLArgInfo) {
         type: "keyword",
       },
       [arg.prefix + arg.id + "_METADATA"]: {
-        type: "keyword",
         enabled: false,
       },
       [arg.prefix + arg.id + "_RO_METADATA"]: {
-        type: "keyword",
         enabled: false,
       },
     },

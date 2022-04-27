@@ -23,6 +23,7 @@ import {
   PREFIX_BUILD,
   POLICY_PREFIXES,
   RESERVED_BASE_PROPERTIES,
+  CONNECTOR_SQL_COLUMN_VERSION_FK_NAME,
 } from "../../../../constants";
 import { GraphQLOutputType, GraphQLObjectType } from "graphql";
 import { EndpointError, EndpointErrorType } from "../../../errors";
@@ -254,7 +255,18 @@ export interface IItemDefinitionRawJSONDataType {
   /**
    * A specific language used
    */
-  searchEngineMainLang?: string;
+  searchEngineFallbackLang?: string;
+
+  /**
+   * Wether to use the version as a fallback for language
+   * setting, it can be used in conjuction with the standard fallback
+   * and the property, this takes a second spot
+   * 
+   * 1. Property is checked, if nothing is found
+   * 2. version will be checked if unversioned
+   * 3. Fallback will be used
+   */
+  searchEngineLangUseVersion?: boolean;
 
   /**
    * Represents the property that is used in order to setup the elasticsearch
@@ -2950,16 +2962,20 @@ export default class ItemDefinition {
    * @returns 
    */
   public getSearchEngineMainLanguageFromRow(rowValue: any) {
-    if (this.rawData.searchEngineMainLang) {
-      return this.rawData.searchEngineMainLang === "none" ? null : (this.rawData.searchEngineMainLang || null);
-    }
-    
+    let value: string = null;
     if (this.rawData.searchEngineMainLangBasedOnProperty) {
-      return rowValue[this.rawData.searchEngineMainLangBasedOnProperty] || null;
+      value = rowValue[this.rawData.searchEngineMainLangBasedOnProperty] || null;
     } else if (this.rawData.searchEngineMainLangProperty) {
-      return rowValue[this.rawData.searchEngineMainLangProperty + "_LANG"] || null;
+      value = rowValue[this.rawData.searchEngineMainLangProperty + "_LANGUAGE"] || null;
+    } else if (this.rawData.searchEngineLangUseVersion) {
+      value = rowValue["version"] || rowValue[CONNECTOR_SQL_COLUMN_VERSION_FK_NAME] || null;
     }
-    return null;
+
+    if (value) {
+      return value.split("-")[0];
+    }
+
+    return this.getSearchEngineFallbackLanguage();
   }
 
   /**
@@ -2967,8 +2983,26 @@ export default class ItemDefinition {
    * language to use to define the search
    * @returns a 2 iso string
    */
-  public getSearchEngineMainLanguage() {
-    return this.rawData.searchEngineMainLang === "none" ? null : (this.rawData.searchEngineMainLang || null);
+  public getSearchEngineFallbackLanguage() {
+    const value = this.rawData.searchEngineFallbackLang || null;
+    if (!value) {
+      return value;
+    }
+    return value.split("-")[0];
+  }
+
+  /**
+   * Tells wether the search engine dynamic main language column
+   * is from a property or a prop extension
+   */
+  public isSearchEngineDynamicMainLanguageColumnInModule() {
+    const element = this.rawData.searchEngineMainLangBasedOnProperty || this.rawData.searchEngineMainLangProperty || null;
+    // can't know
+    if (!element) {
+      return false;
+    }
+
+    return this.getParentModule().hasPropExtensionFor(element);
   }
 
   /**
@@ -2978,9 +3012,9 @@ export default class ItemDefinition {
    */
   public getSearchEngineDynamicMainLanguageColumn() {
     if (this.rawData.searchEngineMainLangBasedOnProperty) {
-      return ;
+      return this.rawData.searchEngineMainLangBasedOnProperty;
     } else if (this.rawData.searchEngineMainLangProperty) {
-      return this.rawData.searchEngineMainLangProperty + "_LANG";
+      return this.rawData.searchEngineMainLangProperty + "_LANGUAGE";
     }
 
     return null;

@@ -123,7 +123,8 @@ export interface IFileItemDefinitionUntreatedRawJSONDataType {
   ownerReadRoleAccess?: string[];
   searchable?: boolean;
   searchEngineEnabled?: boolean;
-  searchEngineMainLang?: string;
+  searchEngineFallbackLang?: string;
+  searchEngineLangUseVersion?: boolean;
   searchEngineMainLangProperty?: string;
   searchEngineMainLangBasedOnProperty?: string;
   versioningRoleAccess?: string[];
@@ -677,8 +678,12 @@ async function buildItemDefinition(
     finalValue.searchEngineMainLangProperty = actualEvaledFileData.searchEngineMainLangProperty;
   }
 
-  if (actualEvaledFileData.searchEngineMainLang) {
-    finalValue.searchEngineMainLang = actualEvaledFileData.searchEngineMainLang;
+  if (actualEvaledFileData.searchEngineFallbackLang) {
+    finalValue.searchEngineFallbackLang = actualEvaledFileData.searchEngineFallbackLang;
+  }
+
+  if (actualEvaledFileData.searchEngineLangUseVersion) {
+    finalValue.searchEngineLangUseVersion = actualEvaledFileData.searchEngineLangUseVersion;
   }
 
   if (actualEvaledFileData.readRoleAccess) {
