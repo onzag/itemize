@@ -1015,7 +1015,7 @@ export class ItemizeElasticClient {
 
       if (documentsDeletedSinceLastRan.length) {
         CAN_LOG_DEBUG && logger.debug(
-          "ItemizeElasticClient._runConsistencyCheck: removing all documents found for " + qualifiedPathName,
+          "ItemizeElasticClient._runConsistencyCheck: removing all documents found (they most likely already have been deleted) for " + qualifiedPathName,
           {
             documentsDeletedSinceLastRan,
           }
@@ -1306,7 +1306,7 @@ export class ItemizeElasticClient {
         });
       } else if (CAN_LOG_DEBUG) {
         logger.debug(
-          "ItemizeElasticClient.runConsistencyCheck: did not recieve any new documents for " + qualifiedPathName,
+          "ItemizeElasticClient.runConsistencyCheck: did not recieve any new documents (that are missing or outdated in elastic) for " + qualifiedPathName,
         );
       }
 
@@ -1536,7 +1536,7 @@ export class ItemizeElasticClient {
     const givenID = id + "." + (version || "");
 
     CAN_LOG_DEBUG && logger.debug(
-      "ItemizeElasticClient.updateDocument: document for " + qualifiedNameItem + " to be deleted",
+      "ItemizeElasticClient.deleteDocument: document for " + qualifiedNameItem + " to be deleted",
       {
         id,
         version,

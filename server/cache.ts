@@ -1850,25 +1850,50 @@ export class Cache {
       let rowsToPerformDeleteSideEffects: ISQLTableRowValue[] = null;
 
       const searchEngineEnabled = itemDefinition.isSearchEngineEnabled();
-      let extraLanguageColumn = "";
+
+      // we are going to see what extra stuff we need due to the language info
+      // and elastic cache and whatnot
+      let extraLanguageColumnModule = "";
+      let extraLanguageColumnIdef = "";
+      // only if we are search engine enabled
       if (searchEngineEnabled) {
+        // let's get the extra column we use (if any)
         const searchEngineLanguageColumn = itemDefinition.getSearchEngineDynamicMainLanguageColumn();
+        // and if there is one
         if (searchEngineLanguageColumn) {
-          extraLanguageColumn = ", " + JSON.stringify(searchEngineLanguageColumn);
+          // is it in the module or item definition
+          if (itemDefinition.isSearchEngineDynamicMainLanguageColumnInModule()) {
+            extraLanguageColumnModule = ", " + JSON.stringify(searchEngineLanguageColumn);
+          } else {
+            extraLanguageColumnIdef = ", " + JSON.stringify(searchEngineLanguageColumn);
+          }
         }
       }
 
+      // now we check for side effects if we have side effect (basically currency stuff)
+      // we would need all the data of what we just have dropped to be processsed
+      // eg. that happens in the case of payments
       const sideEffectedProperties = itemDefinition.getAllSideEffectedProperties();
       const needSideEffects = sideEffectedProperties.length !== 0;
-      const returningElements = needSideEffects ?
+
+      // now we see what we are going to return if we got side effects, everything, otherwise
+      // it's just some basic stuff with that extra row
+      const returningElementsIdef = needSideEffects ?
         "*" :
-        `"version", "parent_id", "parent_type", "parent_version", "created_by"${extraLanguageColumn}`;
+        `${JSON.stringify(CONNECTOR_SQL_COLUMN_ID_FK_NAME)}, ${JSON.stringify(CONNECTOR_SQL_COLUMN_VERSION_FK_NAME)}${extraLanguageColumnIdef}`;
+      // but we only truly add those elements if we either need an idef join wether we have
+      // side effects, and want all the data, or we have that extra column we want
+      const needsIdefJoin = needSideEffects || extraLanguageColumnIdef;
+      // as for the module, this is always going to be retrieved
+      const returningElementsModule = needSideEffects ?
+        "*" :
+        `"id", "version", "parent_id", "parent_type", "parent_version", "created_by"${extraLanguageColumnModule}`;
 
       // dropping all versions is a tricky process, first we need to drop everything
       if (dropAllVersions) {
-        const deleteQueryBase = `DELETE FROM ${JSON.stringify(moduleTable)} WHERE "id" = $1 AND "type" = $2 RETURNING ${returningElements}`;
-        const deleteQuery = needSideEffects ?
-          `WITH "ITABLE" AS (SELECT * FROM ${JSON.stringify(selfTable)
+        const deleteQueryBase = `DELETE FROM ${JSON.stringify(moduleTable)} WHERE "id" = $1 AND "type" = $2 RETURNING ${returningElementsModule}`;
+        const deleteQuery = needsIdefJoin ?
+          `WITH "ITABLE" AS (SELECT ${returningElementsIdef} FROM ${JSON.stringify(selfTable)
           } WHERE ${JSON.stringify(CONNECTOR_SQL_COLUMN_ID_FK_NAME)
           } = $1), "MTABLE" AS (${deleteQueryBase
           }) ` +
@@ -1955,9 +1980,9 @@ export class Cache {
         });
       } else {
         const deleteQueryBase = `DELETE FROM ${JSON.stringify(moduleTable)} WHERE ` +
-          `"id" = $1 AND "version" = $2 AND "type" = $3 RETURNING ${returningElements}`;
-        const deleteQuery = needSideEffects ?
-          `WITH "ITABLE" AS (SELECT * FROM ${JSON.stringify(selfTable)
+          `"id" = $1 AND "version" = $2 AND "type" = $3 RETURNING ${returningElementsModule}`;
+        const deleteQuery = needsIdefJoin ?
+          `WITH "ITABLE" AS (SELECT ${returningElementsIdef} FROM ${JSON.stringify(selfTable)
           } WHERE ${JSON.stringify(CONNECTOR_SQL_COLUMN_ID_FK_NAME)
           } = $1 AND ${JSON.stringify(CONNECTOR_SQL_COLUMN_VERSION_FK_NAME)
           } = $2), "MTABLE" AS (${deleteQueryBase
