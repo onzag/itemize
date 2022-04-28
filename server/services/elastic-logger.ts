@@ -6,7 +6,6 @@ const logsIndex = LOGS_IDENTIFIER.toLowerCase();
 
 export class ElasticLoggerService extends LoggingProvider<null> {
   private elastic: Client;
-  private bulkLogQueue: any[] = [];
 
   public async initialize(): Promise<void> {
     this.elastic = new Client(this.appDbConfig.elastic);
@@ -38,14 +37,6 @@ export class ElasticLoggerService extends LoggingProvider<null> {
     }
   }
 
-  public getRunCycleTime(): number {
-    return 1000;
-  }
-
-  public run() {
-    console.log("COLLECTING INFO LOGS");
-  }
-
   public async log(instanceId: string, level: string, data: any) {
     const document = {
       instance_id: instanceId,
@@ -53,12 +44,10 @@ export class ElasticLoggerService extends LoggingProvider<null> {
       level: level,
       created_at: (new Date()).toISOString(),
     };
-    if (true || level === "error") {
-      await this.elastic.index({
-        index: logsIndex,
-        document,
-      });
-    }
+    await this.elastic.index({
+      index: logsIndex,
+      document,
+    });
   }
 
   public async getLogsInstanceIds(): Promise<string[]> {

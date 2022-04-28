@@ -146,15 +146,19 @@ export function locationSQLOut(arg: ISQLOutInfo) {
 }
 
 export function locationSQLElasticIn(arg: ISQLOutInfo) {
+  const lat = arg.row[arg.prefix + arg.id + "_LAT"];
+  const lng = arg.row[arg.prefix + arg.id + "_LNG"];
+  const geo = (lat === null || lng === null) ? null : [
+    lng,
+    lat,
+  ];
+  
   return {
-    [arg.prefix + arg.id + "_LAT"]: arg.row[arg.prefix + arg.id + "_LAT"],
-    [arg.prefix + arg.id + "_LNG"]: arg.row[arg.prefix + arg.id + "_LNG"],
+    [arg.prefix + arg.id + "_LAT"]: lat,
+    [arg.prefix + arg.id + "_LNG"]: lng,
     [arg.prefix + arg.id + "_TXT"]: arg.row[arg.prefix + arg.id + "_TXT"],
     [arg.prefix + arg.id + "_ATXT"]: arg.row[arg.prefix + arg.id + "_ATXT"],
-    [arg.prefix + arg.id + "_GEO"]: [
-      arg.row[arg.prefix + arg.id + "_LNG"],
-      arg.row[arg.prefix + arg.id + "_LAT"],
-    ]
+    [arg.prefix + arg.id + "_GEO"]: geo
   }
 }
 

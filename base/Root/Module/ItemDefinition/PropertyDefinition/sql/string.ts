@@ -47,27 +47,15 @@ export function stringElastic(arg: ISQLArgInfo) {
     }
   }
 
-  if (exactStringSearchSubtypes.includes(subtype)) {
-    return {
-      properties: {
-        // the sql prefix defined plus the id, eg for includes
-        [arg.prefix + arg.id]: {
-          type: "keyword",
-          null_value: "",
-        },
-      }
-    }
-  } else {
-    return {
-      properties: {
-        // the sql prefix defined plus the id, eg for includes
-        [arg.prefix + arg.id]: {
-          type: "text",
-        },
-        [arg.prefix + arg.id + "_NULL"]: {
-          type: "boolean",
-        },
-      }
+  return {
+    properties: {
+      // the sql prefix defined plus the id, eg for includes
+      [arg.prefix + arg.id]: {
+        type: "text",
+      },
+      [arg.prefix + arg.id + "_NULL"]: {
+        type: "boolean",
+      },
     }
   }
 }
@@ -80,7 +68,7 @@ export function stringSQLElasticIn(arg: ISQLOutInfo) {
     ) : arg.row[arg.prefix + arg.id],
   };
 
-  if (subtype !== "json" && exactStringSearchSubtypes.includes(subtype)) {
+  if (subtype !== "json") {
     basis[arg.prefix + arg.id + "_NULL"] = !arg.row[arg.prefix + arg.id];
   }
 
@@ -154,17 +142,17 @@ export function stringElasticSearch(arg: IElasticSearchInfo): boolean {
   if (typeof arg.args[searchName] !== "undefined") {
     const value = arg.args[searchName] as any;
     // and we check it...
-    if (exactStringSearchSubtypes.includes(arg.property.getSubtype())) {
-      arg.elasticQueryBuilder.mustTerm({
-        [arg.prefix + arg.id]: value === null ? "" : value,
-      });
-    } else if (value === null) {
+    if (value === null) {
       arg.elasticQueryBuilder.mustTerm({
         [arg.prefix + arg.id + "_NULL"]: true,
       });
-    } else {
+    } else if (exactStringSearchSubtypes.includes(arg.property.getSubtype())) {
+      arg.elasticQueryBuilder.mustTerm({
+        [arg.prefix + arg.id]: value,
+      });
+    }  else {
       arg.elasticQueryBuilder.mustMatch({
-        [arg.prefix + arg.id]: value === null ? "" : value,
+        [arg.prefix + arg.id]: value,
       });
     }
     return true;

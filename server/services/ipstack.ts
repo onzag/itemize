@@ -117,8 +117,8 @@ export class IPStackService extends UserLocalizationProvider<IPStackConfig> {
         standardResponse.location.languages[0] && standardResponse.location.languages[0].code
       return {
         country: standardResponse.country_code,
-        currency: countries[standardResponse.country_code] ? countries[standardResponse.country_code].currency || "EUR" : "EUR",
-        language: languageCode ? languageCode : (countries[standardResponse.country_code].languages[0] || "en"),
+        currency: countries[standardResponse.country_code] ? countries[standardResponse.country_code].currency || fallback.currency : fallback.currency,
+        language: languageCode ? languageCode : (countries[standardResponse.country_code].languages[0] || fallback.language),
       }
     } catch (err) {
       return fallback;

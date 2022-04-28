@@ -43,7 +43,9 @@ export function paymentElastic(arg: ISQLArgInfo) {
     properties: {
       [arg.prefix + arg.id + "_TYPE"]: {
         type: "keyword",
-        null_value: "",
+
+        // This is an invalid type for payment so it works fine
+        null_value: "NULL",
       },
       [arg.prefix + arg.id + "_AMOUNT"]: {
         type: "float",

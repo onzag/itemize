@@ -49,7 +49,8 @@ export function unitElastic(arg: ISQLArgInfo) {
         type: "keyword",
         // we are using the unit because for example normalized
         // values of eg. celcius can be negative
-        null_value: "",
+        // THIS IS AN INVALID UNIT TYPE SO IT CAN BE USED
+        null_value: "NULL",
       },
     }
   };

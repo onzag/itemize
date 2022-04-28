@@ -76,6 +76,7 @@ import { FakeUSSDService } from "./services/fake-ussd";
 import { Client } from "@elastic/elasticsearch";
 import { ItemizeElasticClient } from "./elastic";
 import { ElasticLoggerService } from "./services/elastic-logger";
+import { ElasticLocationService } from "./services/elastic-location";
 
 // load the custom services configuration
 let serviceCustom: IServiceCustomizationType = {};
@@ -930,7 +931,9 @@ export async function initializeServer(
         "initializeServer: initializing user localization service",
       );
     }
-    const UserLocalizationServiceClass = (serviceCustom && serviceCustom.userLocalizationProvider) || IPStackService;
+    const UserLocalizationServiceClass = (serviceCustom && serviceCustom.userLocalizationProvider) || (
+      elastic ? ElasticLocationService : IPStackService
+    );
     if (UserLocalizationServiceClass.getType() !== ServiceProviderType.LOCAL) {
       throw new Error("The user localization service class is not a local type, and that's not allowed");
     }

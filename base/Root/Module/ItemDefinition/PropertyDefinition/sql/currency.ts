@@ -34,7 +34,8 @@ export function currencyElastic(arg: ISQLArgInfo) {
       },
       [arg.prefix + arg.id + "_CURRENCY"]: {
         type: "keyword",
-        null_value: "",
+        // this is an invalid ISO code so it works fine
+        null_value: "NULL",
       },
     },
     runtime: {
