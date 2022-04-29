@@ -38,6 +38,12 @@ export default function PropertyViewSimpleRenderer(props: IPropertyViewSimpleRen
     value = <NullComponent {...nullArgs}/>;
   }
 
+  if (props.isRichText) {
+    return (
+      <span dangerouslySetInnerHTML={{__html: props.currentValue}}/>
+    );
+  }
+
   return (
     <span>
       {value}

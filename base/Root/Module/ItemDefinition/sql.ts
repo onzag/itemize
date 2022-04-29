@@ -44,6 +44,7 @@ import StorageProvider from "../../../../server/services/base/StorageProvider";
 import { WhereBuilder } from "../../../../database/WhereBuilder";
 import { OrderByBuilder } from "../../../../database/OrderByBuilder";
 import type { ElasticQueryBuilder } from "../../../../server/elastic";
+import { IElasticHighlightReply } from "./PropertyDefinition/types";
 
 export function getElasticSchemaForItemDefinition(
   itemDefinition: ItemDefinition,
@@ -619,6 +620,7 @@ export function buildElasticQueryForItemDefinition(
 ) {
   const includedInSearchProperties: string[] = [];
   const includedInStrSearchProperties: string[] = [];
+  const finalHighlights: IElasticHighlightReply = {};
 
   // first we need to get all the prop and extensions and build their query
   itemDefinition.getAllPropertyDefinitionsAndExtensions().forEach((pd) => {
@@ -640,11 +642,13 @@ export function buildElasticQueryForItemDefinition(
     );
     if (wasSearchedBy) {
       includedInSearchProperties.push(pd.getId());
+      Object.assign(finalHighlights, wasSearchedBy);
     };
   });
 
   // then we ned to add all the includes
   itemDefinition.getAllIncludes().forEach((include) => {
+    // TODO add includes in highlights
     buildElasticQueryForInclude(
       serverData,
       itemDefinition,
@@ -681,6 +685,7 @@ export function buildElasticQueryForItemDefinition(
 
           if (wasStrSearchedBy) {
             includedInStrSearchProperties.push(pd.getId());
+            Object.assign(finalHighlights, wasStrSearchedBy);
           };
         });
       });
@@ -741,4 +746,6 @@ export function buildElasticQueryForItemDefinition(
   }
 
   elasticQueryBuilder.sortBy(orderByRule);
+
+  return finalHighlights;
 }

@@ -17,6 +17,7 @@ import { LocaleContext, ILocaleContextType } from "../../internal/providers/loca
 import { TokenContext, ITokenContextType } from "../../internal/providers/token-provider";
 import { EndpointErrorType } from "../../../base/errors";
 import { RemoteListener } from "../../internal/app/remote-listener";
+import type { IElasticHighlightRecordInfo, IElasticHighlightSingleRecordInfo } from "../../../base/Root/Module/ItemDefinition/PropertyDefinition/types";
 
 /**
  * The property for the provider but with the key and no children
@@ -62,7 +63,7 @@ interface IGQLSearchRecordWithPopulateData extends IGQLSearchRecord {
   /**
    * The highlight information retrieved
    */
-  highlights?: ISearchHighlight;
+  highlights?: IElasticHighlightSingleRecordInfo;
 }
 
 /**
@@ -193,8 +194,6 @@ export interface ISearchLoaderProps {
   onSearchDataChange?: (searchId: string, wasRestored: boolean) => number | void;
 }
 
-interface ISearchHighlight { [key: string]: string[] };
-
 /**
  * The actual search loader props contains all this extra
  * data which allows it to extract the search records (and possible results)
@@ -225,7 +224,7 @@ interface IActualSearchLoaderProps extends ISearchLoaderProps {
   searchEngineEnabled: boolean;
   searchEngineEnabledLang: string;
   searchEngineHighlightArgs: { [key: string]: string };
-  searchHighlights: { [mergedId: string]: ISearchHighlight };
+  searchHighlights: IElasticHighlightRecordInfo;
 }
 
 /**
@@ -239,7 +238,7 @@ interface IActualSearchLoaderState {
   currentSearchRecords: IGQLSearchRecord[];
   currentSearchResultsFromTheRecords: IGQLValue[];
   error: EndpointErrorType;
-  retrievedHighlights: IItemSearchStateHighlightArgsType;
+  retrievedHighlights: IElasticHighlightRecordInfo;
 }
 
 /**
@@ -695,6 +694,13 @@ class ActualSearchLoader extends React.Component<IActualSearchLoaderProps, IActu
         args.created_by = this.props.searchOwner;
       }
 
+      if (this.props.searchEngineEnabled) {
+        args.searchengine = true;
+        if (this.props.searchEngineEnabledLang) {
+          args.searchengine_language = this.props.searchEngineEnabledLang;
+        }
+      }
+
       // and now we make a grapqhl query for this
       const listQuery = buildGqlQuery({
         name: getListQueryName,
@@ -742,7 +748,13 @@ class ActualSearchLoader extends React.Component<IActualSearchLoaderProps, IActu
           ...newSearchResultsFromTheRecords,
         ];
 
-        const newHighlights = (gqlValue.data[getListQueryName].highlights as any) || {};
+        let highlightsParsed: any;
+        try {
+          highlightsParsed = JSON.parse(gqlValue.data[getListQueryName].highlights as any) || {};
+        } catch {
+          highlightsParsed = {};
+        }
+        const newHighlights = highlightsParsed || {};
         // if the new highlights are considered fully new and not recycled, then we can take
         // the new highlights and delete the old ones, because we have updated every single
         // value with new highlights, otherwise if we have recycled, we may still have
@@ -899,6 +911,7 @@ class ActualSearchLoader extends React.Component<IActualSearchLoaderProps, IActu
                   static: this.props.static,
                   longTermCaching: this.props.searchShouldCache,
                   disableExternalChecks: this.props.disableExternalChecks,
+                  highlights,
                 },
                 itemDefinition,
                 searchResult,

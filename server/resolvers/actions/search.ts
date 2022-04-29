@@ -39,6 +39,7 @@ import { CustomRoleGranterEnvironment, CustomRoleManager } from "../roles";
 import { CAN_LOG_DEBUG } from "../../environment";
 import type { SelectBuilder } from "../../../database/SelectBuilder";
 import type { ElasticQueryBuilder } from "../../elastic";
+import type { IElasticHighlightRecordInfo } from "../../../base/Root/Module/ItemDefinition/PropertyDefinition/types";
 
 export function findLastRecordLastModifiedDate(...records: IGQLSearchRecord[][]): string {
   const recordsRespectiveNanoSecondAccuracyArray = records.flat().map((r) => new NanoSecondComposedDate(r.last_modified));
@@ -388,12 +389,13 @@ export async function searchModule(
 
   const limit: number = resolverArgs.args.limit;
   const offset: number = resolverArgs.args.offset;
+  let highlights: string = null;
 
   let baseResult: ISQLTableRowValue[] = [];
   let count: number = 0;
 
   if (usesElastic) {
-    buildElasticQueryForModule(
+    const rHighReply = buildElasticQueryForModule(
       appData.cache.getServerData(),
       mod,
       resolverArgs.args,
@@ -407,20 +409,33 @@ export async function searchModule(
     elasticQuery.setSourceIncludes(sqlFieldsToRequest);
     elasticQuery.setSize(limit);
 
+    const highlightKeys = Object.keys(rHighReply);
+    elasticQuery.setHighlightsOn(highlightKeys);
+
     const requestBaseResult = (generalFields.results || generalFields.records);
     const requestCount = generalFields.count;
 
     // we have the count from here anyway
     if (requestBaseResult) {
       const result = await appData.elastic.executeQuery(elasticQuery);
+      const highlightsJSON: IElasticHighlightRecordInfo = {};
       if (typeof result.hits.total === "number") {
         count = result.hits.total;
       } else {
         count = result.hits.total.value;
       }
       baseResult = result.hits.hits.map((r) => {
+        highlightsJSON[r._id] = {};
+        highlightKeys.forEach((highlightNameOriginal) => {
+          const originalMatch = rHighReply[highlightNameOriginal];
+          highlightsJSON[r._id][originalMatch.name] = {
+            highlights: (r.highlight && r.highlight[highlightNameOriginal]) || null,
+            match: originalMatch.match,
+          }
+        });
         return r._source;
-      })
+      });
+      highlights = JSON.stringify(highlightsJSON);
     } else if (requestCount) {
       const result = await appData.elastic.executeCountQuery(elasticQuery);
       count = result.count;
@@ -582,7 +597,7 @@ export async function searchModule(
       limit,
       offset,
       count,
-      highlights: null as string,
+      highlights,
     }
 
     CAN_LOG_DEBUG && logger.debug(
@@ -976,11 +991,12 @@ export async function searchItemDefinition(
   // into such query
   let count: number = 0;
   let baseResult: ISQLTableRowValue[] = [];
+  let highlights: string = null;
   const limit: number = resolverArgs.args.limit;
   const offset: number = resolverArgs.args.offset;
 
   if (usesElastic) {
-    buildElasticQueryForItemDefinition(
+    const rHighReply = buildElasticQueryForItemDefinition(
       appData.cache.getServerData(),
       itemDefinition,
       resolverArgs.args,
@@ -994,20 +1010,33 @@ export async function searchItemDefinition(
     elasticQuery.setSourceIncludes(sqlFieldsToRequest);
     elasticQuery.setSize(limit);
 
+    const highlightKeys = Object.keys(rHighReply);
+    elasticQuery.setHighlightsOn(highlightKeys);
+
     const requestBaseResult = (generalFields.results || generalFields.records);
     const requestCount = generalFields.count;
 
     // we have the count from here anyway
     if (requestBaseResult) {
       const result = await appData.elastic.executeQuery(elasticQuery);
+      const highlightsJSON: IElasticHighlightRecordInfo = {};
       if (typeof result.hits.total === "number") {
         count = result.hits.total;
       } else {
         count = result.hits.total.value;
       }
       baseResult = result.hits.hits.map((r) => {
+        highlightsJSON[r._id] = {};
+        highlightKeys.forEach((highlightNameOriginal) => {
+          const originalMatch = rHighReply[highlightNameOriginal];
+          highlightsJSON[r._id][originalMatch.name] = {
+            highlights: (r.highlight && r.highlight[highlightNameOriginal]) || null,
+            match: originalMatch.match,
+          }
+        });
         return r._source;
-      })
+      });
+      highlights = JSON.stringify(highlightsJSON);
     } else if (requestCount) {
       const result = await appData.elastic.executeCountQuery(elasticQuery);
       count = result.count;
@@ -1167,7 +1196,7 @@ export async function searchItemDefinition(
       limit,
       offset,
       count,
-      highlights: null,
+      highlights,
     }
 
     CAN_LOG_DEBUG && logger.debug(

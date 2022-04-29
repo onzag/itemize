@@ -20,14 +20,14 @@ import {
   UNSPECIFIED_OWNER,
   INCLUDE_PREFIX,
 } from "../../constants";
-import ItemDefinition, { IItemSearchStateHighlightsType } from "../../base/Root/Module/ItemDefinition";
+import ItemDefinition from "../../base/Root/Module/ItemDefinition";
 import { IGQLValue, IGQLRequestFields, IGQLArgs, buildGqlQuery, gqlQuery, buildGqlMutation, IGQLEndpointValue, IGQLSearchRecord, GQLEnum, IGQLFile, ProgresserFn, GQLQuery } from "../../gql-querier";
 import { deepMerge, requestFieldsAreContained } from "../../gql-util";
 import CacheWorkerInstance from "./workers/cache";
 import { EndpointErrorType } from "../../base/errors";
 import { RemoteListener } from "./app/remote-listener";
 import Include, { IncludeExclusionState } from "../../base/Root/Module/ItemDefinition/Include";
-import { PropertyDefinitionSupportedType } from "../../base/Root/Module/ItemDefinition/PropertyDefinition/types";
+import { IElasticHighlightRecordInfo, PropertyDefinitionSupportedType } from "../../base/Root/Module/ItemDefinition/PropertyDefinition/types";
 import { fileURLAbsoluter } from "../../util";
 import { IConfigRawJSONDataType } from "../../config";
 import PropertyDefinition from "../../base/Root/Module/ItemDefinition/PropertyDefinition";
@@ -1271,7 +1271,7 @@ interface IRunSearchQueryResult {
   limit: number,
   offset: number,
   lastModified: string,
-  highlights: IItemSearchStateHighlightsType,
+  highlights: IElasticHighlightRecordInfo,
 }
 
 export function getSearchArgsFor(
@@ -1652,7 +1652,7 @@ export async function runSearchQueryFor(
   let offset: number = (data && data.offset as number);
   let count: number = (data && data.count as number);
 
-  let highlights: IItemSearchStateHighlightsType = null;
+  let highlights: IElasticHighlightRecordInfo = null;
   try {
     if (data && data.highlights) {
       highlights = JSON.parse(data.highlights as string) || {};

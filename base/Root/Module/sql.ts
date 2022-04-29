@@ -30,6 +30,7 @@ import StorageProvider from "../../../server/services/base/StorageProvider";
 import { WhereBuilder } from "../../../database/WhereBuilder";
 import { OrderByBuilder } from "../../../database/OrderByBuilder";
 import type { ElasticQueryBuilder } from "../../../server/elastic";
+import { IElasticHighlightReply } from "./ItemDefinition/PropertyDefinition/types";
 
 export function getElasticSchemaForModule(mod: Module, serverData: any): IElasticSchemaDefinitionType {
   const resultSchema: IElasticSchemaDefinitionType = {};
@@ -498,6 +499,7 @@ export function buildSQLQueryForModule(
 ) {
   const includedInSearchProperties: string[] = [];
   const includedInStrSearchProperties: string[] = [];
+  const finalHighlights: IElasticHighlightReply = {};
 
   mod.getAllPropExtensions().forEach((pd) => {
     if (!pd.isSearchable()) {
@@ -508,6 +510,7 @@ export function buildSQLQueryForModule(
     const wasSearchedBy = buildElasticQueryForProperty(serverData, null, null, pd, args, elasticQueryBuilder, language, dictionary, isOrderedByIt);
     if (wasSearchedBy) {
       includedInSearchProperties.push(pd.getId());
+      Object.assign(finalHighlights, wasSearchedBy);
     };
   });
 
@@ -524,6 +527,7 @@ export function buildSQLQueryForModule(
           );
           if (wasStrSearchedBy) {
             includedInStrSearchProperties.push(pd.getId());
+            Object.assign(finalHighlights, wasStrSearchedBy);
           };
         });
       });
@@ -582,4 +586,6 @@ export function buildSQLQueryForModule(
   }
 
   elasticQueryBuilder.sortBy(orderByRule);
+
+  return finalHighlights;
 }

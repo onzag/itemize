@@ -8,6 +8,7 @@ import { IPropertyViewHandlerProps, IPropertyViewRendererProps } from ".";
 import equals from "deep-equal";
 import { getNumericType, NumericType } from "../PropertyEntry/PropertyEntryField";
 import { deepRendererArgsComparer } from "../general-fn";
+import { applyHighlights } from "./highlights";
 
 /**
  * The property view simple renderer props
@@ -21,6 +22,11 @@ export interface IPropertyViewSimpleRendererProps extends IPropertyViewRendererP
    * The language code it's currently using
    */
   language: string;
+  /**
+   * wether it is using rich text, this is not full blown rich text
+   * and only regards to highlights
+   */
+  isRichText: boolean;
 }
 
 /**
@@ -81,7 +87,20 @@ export class PropertyViewSimple extends React.Component<IPropertyViewHandlerProp
       language: this.props.language,
       currentValue,
       capitalize: !!this.props.capitalize,
+      isRichText: false,
     };
+
+    if (numericType === NumericType.NAN && this.props.highlights) {
+      const appliedHighlightsInfo = applyHighlights(
+        currentValue,
+        this.props.highlights,
+      );
+
+      if (appliedHighlightsInfo.applied) {
+        rendererArgs.currentValue = appliedHighlightsInfo.value;
+        rendererArgs.isRichText = true;
+      }
+    }
 
     return <RendererElement {...rendererArgs}/>
   }

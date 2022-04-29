@@ -11,7 +11,7 @@ import React from "react";
 import { LocaleContext } from "../../providers/locale-provider";
 import { Ii18NType } from "../../../../base/Root";
 import {
-  PropertyDefinitionSupportedTypeName, PropertyDefinitionSupportedType,
+  PropertyDefinitionSupportedTypeName, PropertyDefinitionSupportedType, IElasticHighlighPropertyInfo,
 } from "../../../../base/Root/Module/ItemDefinition/PropertyDefinition/types";
 import { currencies, countries, ICurrencyType, ICountryType } from "../../../../imported-resources";
 import { IRendererProps } from "../../renderer";
@@ -135,6 +135,13 @@ export interface IPropertyViewMainHandlerProps<RendererPropsType> {
    * Will display even if it's hidden
    */
   displayHidden?: boolean;
+  /**
+   * The highlights
+   * 
+   * Provided by the item via the record properties
+   * may be developer provided in the item
+   */
+  highlights: IElasticHighlighPropertyInfo;
 }
 
 /**
@@ -402,6 +409,7 @@ export function RawBasePropertyView(props: {
                     renderer={renderer}
                     rendererArgs={props.rendererArgs || {}}
                     cacheFiles={false}
+                    highlights={null}
                   />
                 );
               }

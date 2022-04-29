@@ -226,7 +226,7 @@ export function unitElasticSearch(arg: IElasticSearchInfo) {
     searchedByIt = true;
   }
 
-  return searchedByIt;
+  return searchedByIt ? {} : null;
 }
 
 /**

@@ -130,10 +130,10 @@ export function stringSQLSearch(arg: ISQLSearchInfo): boolean {
   return false;
 }
 
-export function stringElasticSearch(arg: IElasticSearchInfo): boolean {
+export function stringElasticSearch(arg: IElasticSearchInfo) {
   if (arg.property.getSubtype() === "json") {
     // can't elasticsearch this
-    return false;
+    return null;
   }
 
   const searchName = PropertyDefinitionSearchInterfacesPrefixes.SEARCH + arg.prefix + arg.id;
@@ -146,16 +146,23 @@ export function stringElasticSearch(arg: IElasticSearchInfo): boolean {
       arg.elasticQueryBuilder.mustTerm({
         [arg.prefix + arg.id + "_NULL"]: true,
       }, arg.boost);
+      return {};
     } else if (exactStringSearchSubtypes.includes(arg.property.getSubtype())) {
       arg.elasticQueryBuilder.mustTerm({
         [arg.prefix + arg.id]: value,
       }, arg.boost);
+      return {};
     }  else {
       arg.elasticQueryBuilder.mustMatchPhrasePrefix({
         [arg.prefix + arg.id]: value,
       }, arg.boost);
+      return {
+        [arg.prefix + arg.id]: {
+          name: arg.prefix + arg.id,
+          match: value,
+        },
+      };
     }
-    return true;
   }
 
   // now we see if we have an argument for it
@@ -181,10 +188,10 @@ export function stringElasticSearch(arg: IElasticSearchInfo): boolean {
         }
       });
     }
-    return true;
+    return {};
   }
 
-  return false;
+  return null;
 }
 
 /**
@@ -218,18 +225,23 @@ export function stringSQLStrSearch(arg: ISQLStrSearchInfo) {
 
 export function stringElasticStrSearch(arg: IElasticStrSearchInfo) {
   if (arg.property.getSubtype() === "json" || arg.boost === 0) {
-    return false;
+    return null;
   }
 
   if (exactStringSearchSubtypes.includes(arg.property.getSubtype())) {
     arg.elasticQueryBuilder.mustTerm({
       [arg.prefix + arg.id]: arg.search,
     }, arg.boost);
+    return {};
   } else {
-    arg.elasticQueryBuilder.mustMatch({
+    arg.elasticQueryBuilder.mustMatchPhrasePrefix({
       [arg.prefix + arg.id]: arg.search,
     }, arg.boost);
+    return {
+      [arg.prefix + arg.id]: {
+        name: arg.prefix + arg.id,
+        match: arg.search,
+      },
+    };
   }
-
-  return true;
 }

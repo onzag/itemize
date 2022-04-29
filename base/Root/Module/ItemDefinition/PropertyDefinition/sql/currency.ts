@@ -294,7 +294,7 @@ export function currencyElasticSearch(arg: IElasticSearchInfo) {
     searchedByIt = true;
   }
 
-  return searchedByIt;
+  return searchedByIt ? {} : null;
 }
 
 /**

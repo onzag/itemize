@@ -25,9 +25,11 @@ import { flattenRawGQLValueOrFields } from "../../../gql-util";
 import { EndpointError } from "../../../base/errors";
 import { IGQLSearchRecord } from "../../../gql-querier";
 import { IOTriggerActions } from "../triggers";
-import { convertSQLValueToGQLValueForItemDefinition } from "../../../base/Root/Module/ItemDefinition/sql";
+import { buildElasticQueryForItemDefinition, convertSQLValueToGQLValueForItemDefinition } from "../../../base/Root/Module/ItemDefinition/sql";
 import { CustomRoleGranterEnvironment, CustomRoleManager } from "../roles";
 import { CAN_LOG_DEBUG, CAN_LOG_SILLY } from "../../environment";
+import type { IElasticHighlightReply, IElasticHighlightRecordInfo } from "../../../base/Root/Module/ItemDefinition/PropertyDefinition/types";
+import { buildElasticQueryForModule } from "../../../base/Root/Module/sql";
 
 export async function getItemDefinition(
   appData: IAppDataType,
@@ -290,6 +292,16 @@ export async function getItemDefinitionList(
     "getItemDefinitionList: executed get list for " + itemDefinition.getQualifiedPathName(),
   );
 
+  const usesElastic = resolverArgs.args.searchengine === true;
+  const elasticIndexLang = (usesElastic && resolverArgs.args.searchengine_language) || null;
+
+  if (usesElastic && !itemDefinition.isSearchEngineEnabled()) {
+    throw new EndpointError({
+      message: itemDefinition.getQualifiedPathName() + " does not support search engine searches",
+      code: ENDPOINT_ERRORS.UNSPECIFIED,
+    });
+  }
+
   // first we check that the language and region provided are
   // right and available
   checkLanguage(appData, resolverArgs.args);
@@ -344,9 +356,56 @@ export async function getItemDefinitionList(
     }
   });
 
-  const resultValues: ISQLTableRowValue[] = await appData.cache.requestListCache(
-    resolverArgs.args.records,
-  );
+  let highlights: string = null;
+  let resultValues: ISQLTableRowValue[];
+
+  if (usesElastic) {
+    const resultQuery = appData.elastic.getSelectBuilder(
+      itemDefinition,
+      elasticIndexLang,
+    );
+    resultQuery.mustTerms({
+      _id: resolverArgs.args.records.map((r: IGQLSearchRecord) => r.id + "." + (r.version || ""))
+    });
+
+    const dictionary = getDictionary(appData, resolverArgs.args);
+
+    let rHighReply: IElasticHighlightReply = {};
+    resultQuery.should((q) => {
+      rHighReply = buildElasticQueryForItemDefinition(
+        appData.cache.getServerData(),
+        itemDefinition,
+        resolverArgs.args,
+        q,
+        resolverArgs.args.language,
+        dictionary,
+        resolverArgs.args.search,
+        resolverArgs.args.order_by,
+      );
+    });
+
+    const highlightKeys = Object.keys(rHighReply);
+    resultQuery.setHighlightsOn(highlightKeys);
+
+    const result = await appData.elastic.executeQuery(resultQuery);
+    const highlightsJSON: IElasticHighlightRecordInfo = {};
+    resultValues = result.hits.hits.map((r) => {
+      highlightsJSON[r._id] = {};
+      highlightKeys.forEach((highlightNameOriginal) => {
+        const originalMatch = rHighReply[highlightNameOriginal];
+        highlightsJSON[r._id][originalMatch.name] = {
+          highlights: (r.highlight && r.highlight[highlightNameOriginal]) || null,
+          match: originalMatch.match,
+        }
+      });
+      return r._source;
+    });
+    highlights = JSON.stringify(highlightsJSON);
+  } else {
+    resultValues = await appData.cache.requestListCache(
+      resolverArgs.args.records,
+    );
+  }
 
   const finalValues = await Promise.all(resultValues.map(
     async (value) => {
@@ -506,7 +565,7 @@ export async function getItemDefinitionList(
 
   const resultAsObject = {
     results: finalValues,
-    highlights: null as string,
+    highlights,
   };
   CAN_LOG_DEBUG && logger.debug("getItemDefinitionList: done");
 
@@ -521,6 +580,17 @@ export async function getModuleList(
   CAN_LOG_DEBUG && logger.debug(
     "getModuleList: executed get list for " + mod.getQualifiedPathName(),
   );
+
+  const usesElastic = resolverArgs.args.searchengine === true;
+  const elasticIndexLang = (usesElastic && resolverArgs.args.searchengine_language) || null;
+
+  if (usesElastic && !mod.isSearchEngineEnabled()) {
+    throw new EndpointError({
+      message: mod.getQualifiedPathName() + " does not support search engine searches",
+      code: ENDPOINT_ERRORS.UNSPECIFIED,
+    });
+  }
+
   // first we check that the language and region provided are
   // right and available
   checkLanguage(appData, resolverArgs.args);
@@ -552,9 +622,56 @@ export async function getModuleList(
     ownerToCheckAgainst = created_by;
   }
 
-  const resultValues: ISQLTableRowValue[] = await appData.cache.requestListCache(
-    resolverArgs.args.records,
-  );
+  let highlights: string = null;
+  let resultValues: ISQLTableRowValue[];
+
+  if (usesElastic) {
+    const resultQuery = appData.elastic.getSelectBuilder(
+      mod,
+      elasticIndexLang,
+    );
+    resultQuery.mustTerms({
+      _id: resolverArgs.args.records.map((r: IGQLSearchRecord) => r.id + "." + (r.version || ""))
+    });
+
+    const dictionary = getDictionary(appData, resolverArgs.args);
+
+    let rHighReply: IElasticHighlightReply = {};
+    resultQuery.should((q) => {
+      rHighReply = buildElasticQueryForModule(
+        appData.cache.getServerData(),
+        mod,
+        resolverArgs.args,
+        q,
+        resolverArgs.args.language,
+        dictionary,
+        resolverArgs.args.search,
+        resolverArgs.args.order_by,
+      );
+    });
+
+    const highlightKeys = Object.keys(rHighReply);
+    resultQuery.setHighlightsOn(highlightKeys);
+
+    const result = await appData.elastic.executeQuery(resultQuery);
+    const highlightsJSON: IElasticHighlightRecordInfo = {};
+    resultValues = result.hits.hits.map((r) => {
+      highlightsJSON[r._id] = {};
+      highlightKeys.forEach((highlightNameOriginal) => {
+        const originalMatch = rHighReply[highlightNameOriginal];
+        highlightsJSON[r._id][originalMatch.name] = {
+          highlights: (r.highlight && r.highlight[highlightNameOriginal]) || null,
+          match: originalMatch.match,
+        }
+      });
+      return r._source;
+    });
+    highlights = JSON.stringify(highlightsJSON);
+  } else {
+    resultValues = await appData.cache.requestListCache(
+      resolverArgs.args.records,
+    );
+  }
 
   // return if otherwise succeeds
   const finalValues = await Promise.all(resultValues.map(
@@ -716,7 +833,7 @@ export async function getModuleList(
 
   const resultAsObject = {
     results: finalValues,
-    highlights: null as string,
+    highlights,
   };
 
   CAN_LOG_DEBUG && logger.debug("getModuleList: done");

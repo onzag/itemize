@@ -324,7 +324,7 @@ function internalElasticSeachFn(arg: IElasticSearchInfo, nullFieldValue: string,
     searchedByIt = true;
   }
 
-  return searchedByIt;
+  return searchedByIt ? {} : null;
 }
 
 /**
@@ -694,6 +694,8 @@ export function buildSQLQueryForProperty(
       boost: propertyDefinition.getSearchBoost(),
     });
   }
+
+  return null;
 }
 
 /**
@@ -782,7 +784,7 @@ export function buildSQLStrSearchQueryForProperty(
     });
   }
 
-  return false;
+  return null;
 }
 
 

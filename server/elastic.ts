@@ -1834,7 +1834,7 @@ export class ElasticQueryBuilder {
     this.children.forEach((c) => {
       const cRequest = c.builder.getRequest();
 
-      if (cRequest.query) {
+      if (cRequest.query && Object.keys(cRequest.query).length !== 0) {
         if (!resultRequest.query.bool[c.type]) {
           resultRequest.query.bool[c.type] = [];
         }
@@ -1848,6 +1848,7 @@ export class ElasticQueryBuilder {
   private _q(q: QueryDslQueryContainer | SubBuilderFn, boost: number, r: string) {
     if (typeof q === "function") {
       const child = new ElasticQueryBuilder({});
+      q(child);
       this.children.push({
         builder: child,
         type: r,
@@ -2043,5 +2044,21 @@ export class ElasticQueryBuilder {
 
   public setSize(size: number) {
     this.request.size = size;
+  }
+
+  public setHighlightsOn(fields: string[]) {
+    if (fields && fields.length) {
+      this.request.highlight = {
+        fields: {},
+      }
+  
+      fields.forEach((f) => {
+        this.request.highlight.fields[f] = {
+          fragment_size: 1,
+          pre_tags: "",
+          post_tags: ""
+        } as any;
+      });
+    }
   }
 }

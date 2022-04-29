@@ -57,7 +57,7 @@ export function taglistSQLIn(arg: ISQLInInfo): ISQLTableRowValue {
   return false;
 }
 
-export function tagListElasticSearch(arg: IElasticSearchInfo): boolean {
+export function tagListElasticSearch(arg: IElasticSearchInfo) {
   // first we analyze and get the search name
   const searchName = PropertyDefinitionSearchInterfacesPrefixes.SEARCH + arg.prefix + arg.id;
 
@@ -73,15 +73,15 @@ export function tagListElasticSearch(arg: IElasticSearchInfo): boolean {
       minimum_should_match : tagCompareCheck.length,
     }, arg.boost);
 
-    return true;
+    return {};
   } else if (arg.args[searchName] === null) {
     arg.elasticQueryBuilder.mustTerm({
       [arg.prefix + arg.id + "_NULL"]: true,
     }, arg.boost);
-    return true;
+    return {};
   }
 
-  return false;
+  return null;
 }
 
 /**

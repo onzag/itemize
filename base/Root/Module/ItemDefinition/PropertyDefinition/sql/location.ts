@@ -215,7 +215,7 @@ export function locationSQLSearch(arg: ISQLSearchInfo): boolean | [string, any[]
   return false;
 }
 
-export function locationElasticSearch(arg: IElasticSearchInfo): boolean {
+export function locationElasticSearch(arg: IElasticSearchInfo) {
   const radiusName = PropertyDefinitionSearchInterfacesPrefixes.RADIUS + arg.prefix + arg.id;
   const locationName = PropertyDefinitionSearchInterfacesPrefixes.LOCATION + arg.prefix + arg.id;
 
@@ -223,7 +223,7 @@ export function locationElasticSearch(arg: IElasticSearchInfo): boolean {
     arg.elasticQueryBuilder.mustTerm({
       [arg.prefix + arg.id + "_NULL"]: true,
     }, arg.boost);
-    return true;
+    return {};
   } else if (
     typeof arg.args[locationName] !== "undefined" && arg.args[locationName] !== null &&
     typeof arg.args[radiusName] !== "undefined" && arg.args[radiusName] !== null
@@ -252,10 +252,10 @@ export function locationElasticSearch(arg: IElasticSearchInfo): boolean {
       }
     });
 
-    return true;
+    return {};
   }
 
-  return false;
+  return null;
 }
 
 /**

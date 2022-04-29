@@ -34,13 +34,10 @@ import { countries } from "../../../../imported-resources";
 import Root, { ICustomRoleManager, IRequestLimitersType } from "../../../Root";
 import { transferrableToBlob, blobToTransferrable, fileURLAbsoluter } from "../../../../util";
 import type { IConfigRawJSONDataType } from "../../../../config";
+import type { IElasticHighlightRecordInfo } from "./PropertyDefinition/types";
 
 export interface IItemSearchStateHighlightType {
   [pId: string]: string[];
-}
-
-export interface IItemSearchStateHighlightsType {
-  [mergedId: string]: IItemSearchStateHighlightType;
 }
 
 export interface IItemSearchStateHighlightArgsType {
@@ -69,7 +66,7 @@ export interface IItemSearchStateType {
   // these are used when standard search is done
   searchEngineHighlightArgs: IItemSearchStateHighlightArgsType;
   // similar to results, obtained from traditional search
-  searchHighlights: IItemSearchStateHighlightsType;
+  searchHighlights: IElasticHighlightRecordInfo;
 };
 
 export interface ICompoundSearchStateType {

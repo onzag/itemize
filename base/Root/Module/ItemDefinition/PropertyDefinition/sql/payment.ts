@@ -352,7 +352,7 @@ export function paymentElasticSearch(arg: IElasticSearchInfo) {
   }
 
   // now we return if we have been searched by it at the end
-  return searchedByIt;
+  return searchedByIt ? {} : null;
 }
 
 /**

@@ -206,7 +206,7 @@ export function textSQLSearch(arg: ISQLSearchInfo): boolean | [string, any[]] {
  * @param arg the sql search arg info
  * @returns a boolean on whether it was searched by it, and a complementary column order by in case it needs it
  */
-export function textElasticSearch(arg: IElasticSearchInfo): boolean {
+export function textElasticSearch(arg: IElasticSearchInfo) {
   const searchName = PropertyDefinitionSearchInterfacesPrefixes.SEARCH + arg.prefix + arg.id;
   const isRichText = arg.property.isRichText();
 
@@ -221,15 +221,20 @@ export function textElasticSearch(arg: IElasticSearchInfo): boolean {
       arg.elasticQueryBuilder.mustMatch(matchRule, arg.boost);
     }
 
-    return true;
+    return {
+      [arg.prefix + arg.id + (isRichText ? "_PLAIN" : "")]: {
+        name: arg.prefix + arg.id,
+        match: arg.args[searchName] as string,
+      },
+    };
   } else if (arg.args[searchName] === null) {
     arg.elasticQueryBuilder.mustTerm({
       [arg.prefix + arg.id + "_NULL"]: true,
     }, arg.boost);
-    return true;
+    return {};
   }
 
-  return false;
+  return null;
 }
 
 export function textElasticIn(arg: ISQLOutInfo) {
@@ -281,17 +286,18 @@ export function textSQLStrSearch(arg: ISQLStrSearchInfo): boolean | [string, any
 /**
  * Provides the text FTS str sql search functionality
  */
-export function textElasticStrSearch(arg: IElasticStrSearchInfo): boolean {
-  if (arg.boost === 0) {
-    return false;
-  }
-
+export function textElasticStrSearch(arg: IElasticStrSearchInfo) {
   const isRichText = arg.property.isRichText();
   arg.elasticQueryBuilder && arg.elasticQueryBuilder.mustMatch({
     [arg.prefix + arg.id + (isRichText ? "_PLAIN" : "")]: arg.search,
   }, arg.boost);
 
-  return true;
+  return {
+    [arg.prefix + arg.id + (isRichText ? "_PLAIN" : "")]: {
+      name: arg.prefix + arg.id,
+      match: arg.search,
+    },
+  };
 }
 
 /**

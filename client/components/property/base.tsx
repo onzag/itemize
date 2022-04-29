@@ -369,6 +369,7 @@ export function EntryViewReadSet(
                             useAppliedValue={props.useAppliedValue}
                             cacheFiles={props.cacheFiles}
                             displayHidden={props.displayHidden}
+                            highlights={itemContextualValue.highlights && itemContextualValue.highlights[property.getId()]}
                           />
                         );
                       }

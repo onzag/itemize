@@ -11,6 +11,7 @@ import { PropertyDefinitionSupportedTextType } from "../../../../base/Root/Modul
 import { PropertyDefinitionSupportedFilesType } from "../../../../base/Root/Module/ItemDefinition/PropertyDefinition/types/files";
 import { sanitize } from "../../../internal/text";
 import { deepRendererArgsComparer } from "../general-fn";
+import { applyHighlights } from "./highlights";
 
 /**
  * The property view renderer props as it requires the properties
@@ -122,12 +123,17 @@ export default class PropertyViewText extends React.Component<IPropertyViewHandl
       );
     }
 
+    const appliedHighlightsInfo = applyHighlights(
+      currentValue,
+      this.props.highlights,
+    );
+
     const RendererElement = this.props.renderer;
     const rendererArgs: IPropertyViewTextRendererProps = {
       args: this.props.rendererArgs,
       rtl: this.props.rtl,
-      currentValue,
-      isRichText: this.props.property.isRichText(),
+      currentValue: appliedHighlightsInfo.applied ? appliedHighlightsInfo.value : currentValue,
+      isRichText: this.props.property.isRichText() || appliedHighlightsInfo.applied,
       subtype: this.props.property.getSubtype() as any,
     };
 

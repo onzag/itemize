@@ -1,8 +1,8 @@
 import React from "react";
 import { LocaleContext, ILocaleContextType } from "../internal/providers/locale-provider";
-import ItemDefinition, { IItemSearchStateHighlightArgsType, IItemSearchStateHighlightsType, IItemSearchStateType, IItemStateType } from "../../base/Root/Module/ItemDefinition";
+import ItemDefinition, { IItemSearchStateHighlightArgsType, IItemSearchStateType, IItemStateType } from "../../base/Root/Module/ItemDefinition";
 import PropertyDefinition, { IPropertyDefinitionState } from "../../base/Root/Module/ItemDefinition/PropertyDefinition";
-import { PropertyDefinitionSupportedType } from "../../base/Root/Module/ItemDefinition/PropertyDefinition/types";
+import { IElasticHighlightRecordInfo, IElasticHighlightSingleRecordInfo, PropertyDefinitionSupportedType } from "../../base/Root/Module/ItemDefinition/PropertyDefinition/types";
 import Include, { IncludeExclusionState } from "../../base/Root/Module/ItemDefinition/Include";
 import { TokenContext, ITokenContextType } from "../internal/providers/token-provider";
 import {
@@ -538,7 +538,8 @@ export interface IItemContextType extends IBasicFns {
   searchEngineEnabled: boolean;
   searchEngineEnabledLang: string;
   searchEngineHighlightArgs: IItemSearchStateHighlightArgsType;
-  searchHighlights: IItemSearchStateHighlightsType;
+  searchHighlights: IElasticHighlightRecordInfo;
+  highlights: IElasticHighlightSingleRecordInfo;
   // poked is a flag that is raised to mean to ignore
   // anything regarding user set statuses and just mark
   // things as they are, for example, by default many fields
@@ -815,6 +816,12 @@ export interface IItemProviderProps {
    * from a cache worker
    */
   onStateLoadedFromStore?: (state: IItemStateType, fns: IBasicFns) => void;
+
+  /**
+   * Mainly for internal use and set by the record on its own
+   * set the highlights for this element
+   */
+  highlights?: IElasticHighlightSingleRecordInfo;
 }
 
 // This represents the actual provider that does the job, it takes on some extra properties
@@ -4041,7 +4048,12 @@ export class ActualItemProvider extends
             const pValue = this.props.itemDefinitionInstance.getPropertyDefinitionFor(pId, true);
 
             if (pValue.getType() === "string" && pValue.getSubtype() === "search") {
-              highlightArgs[pId] = argumentsForQuery[pId];
+              const value = argumentsForQuery[pId];
+              // highlighting is only useful if it's not null
+              // otherwise it's plain useless
+              if (value !== null) {
+                highlightArgs[pId] = value;
+              }
             }
           }
         });
@@ -4339,6 +4351,7 @@ export class ActualItemProvider extends
           searchEngineEnabledLang: this.state.searchEngineEnabledLang,
           searchEngineHighlightArgs: this.state.searchEngineHighlightArgs,
           searchHighlights: this.state.searchHighlights,
+          highlights: this.props.highlights,
           pokedElements: this.state.pokedElements,
           submit: this.submit,
           reload: this.loadValue,

@@ -107,6 +107,26 @@ export interface IElasticSearchInfo extends ISQLArgInfo {
   boost: number;
 }
 
+export interface IElasticHighlightReply {
+  [highlightName: string]: {
+    name: string;
+    match: string;
+  }
+}
+
+export interface IElasticHighlighPropertyInfo {
+  highlights: string[];
+  match: string;
+}
+
+export interface IElasticHighlightSingleRecordInfo {
+  [propertyId: string]: IElasticHighlighPropertyInfo;
+}
+
+export interface IElasticHighlightRecordInfo {
+  [mergedId: string]: IElasticHighlightSingleRecordInfo;
+}
+
 export interface ISQLStrSearchInfo extends ISQLArgInfo {
   language: string;
   dictionary: string;
@@ -282,7 +302,7 @@ export interface IPropertyDefinitionSupportedType<T> {
   /**
    * Defines how to perform elastic search into the property
    */
-  elasticSearch: (arg: IElasticSearchInfo) => boolean;
+  elasticSearch: (arg: IElasticSearchInfo) => IElasticHighlightReply;
   /**
    * Represents a search for an item when the only input has been a string, make it null
    * to avoid supporting it
@@ -292,7 +312,7 @@ export interface IPropertyDefinitionSupportedType<T> {
   /**
    * Represents a str based search using the elastic interface
    */
-  elasticStrSearch: (arg: IElasticStrSearchInfo) => boolean;
+  elasticStrSearch: (arg: IElasticStrSearchInfo) => IElasticHighlightReply;
   /**
    * Provides the rows that are expected to be indexed and in the order that they are expected
    * when an index is added via a request limiter in the module
