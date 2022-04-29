@@ -211,7 +211,7 @@ export function currencyElasticSearch(arg: IElasticSearchInfo) {
     searchedByIt = true;
   } else if (arg.args[exactName] === null) {
     arg.elasticQueryBuilder.mustTerm({
-      [arg.prefix + arg.id + "_CURRENCY"]: "",
+      [arg.prefix + arg.id + "_CURRENCY"]: "NULL",
     }, arg.boost);
     searchedByIt = true;
   }

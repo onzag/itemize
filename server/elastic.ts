@@ -1779,12 +1779,20 @@ export class ItemizeElasticClient {
   }
 
   public async executeQuery(elasticQuery: ElasticQueryBuilder) {
-    const response = await this.elasticClient.search<ISQLTableRowValue>(elasticQuery.getRequest());
+    const request = elasticQuery.getRequest();
+    if (process.env.NODE_ENV === "development") {
+      console.log(JSON.stringify(request, null, 2));
+    }
+    const response = await this.elasticClient.search<ISQLTableRowValue>(request);
     return response;
   }
 
   public async executeCountQuery(elasticQuery: ElasticQueryBuilder) {
-    const response = await this.elasticClient.count(elasticQuery.getRequest());
+    const request = elasticQuery.getRequest();
+    if (process.env.NODE_ENV === "development") {
+      console.log(JSON.stringify(request, null, 2));
+    }
+    const response = await this.elasticClient.count(request);
     return response;
   }
 }
@@ -1940,6 +1948,20 @@ export class ElasticQueryBuilder {
     this.mustNot(query, boost);
   }
 
+  public mustMatchPhrasePrefix(matchRule: Partial<Record<string, string | QueryDslMatchPhraseQuery>>, boost?: number) {
+    const query: QueryDslQueryContainer = {
+      match_phrase_prefix: matchRule,
+    };
+    this.must(query, boost);
+  }
+
+  public mustNotMatchPhrasePrefix(matchRule: Partial<Record<string, string | QueryDslMatchPhraseQuery>>, boost?: number) {
+    const query: QueryDslQueryContainer = {
+      match_phrase_prefix: matchRule,
+    };
+    this.mustNot(query, boost);
+  }
+
   public shouldTerm(termRule: Partial<Record<string, QueryDslTermQuery | FieldValue>>, boost?: number) {
     const query: QueryDslQueryContainer = {
       term: termRule,
@@ -1993,6 +2015,20 @@ export class ElasticQueryBuilder {
   public shouldNotMatchPhrase(matchRule: Partial<Record<string, string | QueryDslMatchPhraseQuery>>, boost?: number) {
     const query: QueryDslQueryContainer = {
       match_phrase: matchRule,
+    };
+    this.shouldNot(query, boost);
+  }
+
+  public shouldMatchPhrasePrefix(matchRule: Partial<Record<string, string | QueryDslMatchPhraseQuery>>, boost?: number) {
+    const query: QueryDslQueryContainer = {
+      match_phrase_prefix: matchRule,
+    };
+    this.should(query, boost);
+  }
+
+  public shouldNotMatchPhrasePrefix(matchRule: Partial<Record<string, string | QueryDslMatchPhraseQuery>>, boost?: number) {
+    const query: QueryDslQueryContainer = {
+      match_phrase_prefix: matchRule,
     };
     this.shouldNot(query, boost);
   }

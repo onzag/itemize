@@ -274,7 +274,7 @@ export async function searchModule(
       resolverArgs.args.types,
     );
     elasticQuery.mustTerm({
-      blocked_by: null,
+      blocked_by: "?NULL",
     });
 
     if (created_by) {
@@ -413,7 +413,11 @@ export async function searchModule(
     // we have the count from here anyway
     if (requestBaseResult) {
       const result = await appData.elastic.executeQuery(elasticQuery);
-      count = result.hits.total as number;
+      if (typeof result.hits.total === "number") {
+        count = result.hits.total;
+      } else {
+        count = result.hits.total.value;
+      }
       baseResult = result.hits.hits.map((r) => {
         return r._source;
       })
@@ -864,7 +868,7 @@ export async function searchItemDefinition(
       elasticIndexLang,
     );
     elasticQuery.mustTerm({
-      blocked_by: null,
+      blocked_by: "?NULL",
     });
 
     if (created_by) {
@@ -995,7 +999,11 @@ export async function searchItemDefinition(
     // we have the count from here anyway
     if (requestBaseResult) {
       const result = await appData.elastic.executeQuery(elasticQuery);
-      count = result.hits.total as number;
+      if (typeof result.hits.total === "number") {
+        count = result.hits.total;
+      } else {
+        count = result.hits.total.value;
+      }
       baseResult = result.hits.hits.map((r) => {
         return r._source;
       })

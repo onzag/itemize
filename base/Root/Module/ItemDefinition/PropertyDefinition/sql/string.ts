@@ -51,7 +51,7 @@ export function stringElastic(arg: ISQLArgInfo) {
     properties: {
       // the sql prefix defined plus the id, eg for includes
       [arg.prefix + arg.id]: {
-        type: "text",
+        type: exactStringSearchSubtypes.includes(subtype) ? "keyword" : "text",
       },
       [arg.prefix + arg.id + "_NULL"]: {
         type: "boolean",
@@ -151,7 +151,7 @@ export function stringElasticSearch(arg: IElasticSearchInfo): boolean {
         [arg.prefix + arg.id]: value,
       }, arg.boost);
     }  else {
-      arg.elasticQueryBuilder.mustMatch({
+      arg.elasticQueryBuilder.mustMatchPhrasePrefix({
         [arg.prefix + arg.id]: value,
       }, arg.boost);
     }
@@ -161,9 +161,26 @@ export function stringElasticSearch(arg: IElasticSearchInfo): boolean {
   // now we see if we have an argument for it
   if (typeof arg.args[inName] !== "undefined" && arg.args[inName] !== null) {
     const tagCompareCheck = arg.args[inName] as string[];
-    arg.elasticQueryBuilder.mustTerms({
-      [arg.prefix + arg.id]: tagCompareCheck
-    }, arg.boost);
+    if (exactStringSearchSubtypes.includes(arg.property.getSubtype())) {
+      arg.elasticQueryBuilder.mustTerms({
+        [arg.prefix + arg.id]: tagCompareCheck
+      }, arg.boost);
+    } else {
+      arg.elasticQueryBuilder.must({
+        bool: {
+          should: tagCompareCheck.map((c) => {
+            return (
+              {
+                [arg.prefix + arg.id]: {
+                  match: c,
+                }
+              }
+            );
+          }),
+          boost: arg.boost,
+        }
+      });
+    }
     return true;
   }
 
