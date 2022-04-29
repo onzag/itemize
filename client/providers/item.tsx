@@ -1,6 +1,6 @@
 import React from "react";
 import { LocaleContext, ILocaleContextType } from "../internal/providers/locale-provider";
-import ItemDefinition, { IItemSearchStateType, IItemStateType } from "../../base/Root/Module/ItemDefinition";
+import ItemDefinition, { IItemSearchStateHighlightArgsType, IItemSearchStateHighlightsType, IItemSearchStateType, IItemStateType } from "../../base/Root/Module/ItemDefinition";
 import PropertyDefinition, { IPropertyDefinitionState } from "../../base/Root/Module/ItemDefinition/PropertyDefinition";
 import { PropertyDefinitionSupportedType } from "../../base/Root/Module/ItemDefinition/PropertyDefinition/types";
 import Include, { IncludeExclusionState } from "../../base/Root/Module/ItemDefinition/Include";
@@ -64,6 +64,10 @@ function getSearchStateOf(state: IActualItemProviderState): IItemSearchStateType
     searchResults: state.searchResults,
     searchShouldCache: state.searchShouldCache,
     searching: state.searching,
+    searchEngineEnabled: state.searchEngineEnabled,
+    searchEngineEnabledLang: state.searchEngineEnabledLang,
+    searchEngineHighlightArgs: state.searchEngineHighlightArgs,
+    searchHighlights: state.searchHighlights,
   };
 }
 
@@ -422,6 +426,8 @@ export interface IActionSearchOptions extends IActionCleanOptions {
    * Uses the search engine instead of the standard database level query, provides some limitations
    * such as that it cannot anymore have offset that are non-zero so traditional pagination
    * is not feasible
+   * 
+   * if given a string value it represents the language that it is used, boolean uses all languages
    */
   useSearchEngine?: boolean | string;
 
@@ -529,6 +535,10 @@ export interface IItemContextType extends IBasicFns {
   searchFields: any;
   searchRequestedProperties: string[];
   searchRequestedIncludes: { [include: string]: string[] };
+  searchEngineEnabled: boolean;
+  searchEngineEnabledLang: string;
+  searchEngineHighlightArgs: IItemSearchStateHighlightArgsType;
+  searchHighlights: IItemSearchStateHighlightsType;
   // poked is a flag that is raised to mean to ignore
   // anything regarding user set statuses and just mark
   // things as they are, for example, by default many fields
@@ -1082,6 +1092,10 @@ export class ActualItemProvider extends
       searchFields: null,
       searchRequestedIncludes: {},
       searchRequestedProperties: [],
+      searchEngineEnabled: false,
+      searchEngineEnabledLang: null,
+      searchEngineHighlightArgs: null,
+      searchHighlights: {},
     };
     const searchStateComplex = props.itemDefinitionInstance.getSearchState(
       props.forId || null, props.forVersion || null,
@@ -1883,6 +1897,10 @@ export class ActualItemProvider extends
       searchFields: null,
       searchRequestedIncludes: {},
       searchRequestedProperties: [],
+      searchEngineEnabled: false,
+      searchEngineEnabledLang: null,
+      searchEngineHighlightArgs: null,
+      searchHighlights: {},
     };
 
     const searchStateComplex = this.props.itemDefinitionInstance.getSearchState(
@@ -3897,6 +3915,7 @@ export class ActualItemProvider extends
       offset,
       error,
       lastModified,
+      highlights,
     } = await runSearchQueryFor({
       args: argumentsForQuery,
       fields: requestedSearchFields,
@@ -3939,6 +3958,7 @@ export class ActualItemProvider extends
         searchError: error,
         searching: false,
         searchResults: results,
+        searchHighlights: highlights,
         searchRecords: records,
         searchCount: count,
         searchLimit: limit,
@@ -3951,6 +3971,9 @@ export class ActualItemProvider extends
         searchRequestedProperties: options.requestedProperties,
         searchRequestedIncludes: options.requestedIncludes || {},
         searchLastModified: lastModified,
+        searchEngineEnabled: !!options.useSearchEngine,
+        searchEngineEnabledLang: typeof options.useSearchEngine === "string" ? options.useSearchEngine : null,
+        searchEngineHighlightArgs: null as any,
       };
 
       // this would be a wasted instruction otherwise as it'd be reversed
@@ -4007,10 +4030,28 @@ export class ActualItemProvider extends
       }
       this.cleanWithProps(this.props, options, "fail");
     } else {
+      let highlightArgs: any = null;
+
+      if (!options.traditional && options.useSearchEngine) {
+        // we are passing these highlight args that are used in the argument
+        // we don't need to pass them down the line otherwise
+        highlightArgs = {};
+        Object.keys(argumentsForQuery).forEach((pId) => {
+          if (this.props.itemDefinitionInstance.hasPropertyDefinitionFor(pId, true)) {
+            const pValue = this.props.itemDefinitionInstance.getPropertyDefinitionFor(pId, true);
+
+            if (pValue.getType() === "string" && pValue.getSubtype() === "search") {
+              highlightArgs[pId] = argumentsForQuery[pId];
+            }
+          }
+        });
+      }
+
       const searchState = {
         searchError: null as any,
         searching: false,
         searchResults: results,
+        searchHighlights: highlights,
         searchRecords: records,
         searchCount: count,
         searchLimit: limit,
@@ -4023,6 +4064,9 @@ export class ActualItemProvider extends
         searchRequestedProperties: options.requestedProperties,
         searchRequestedIncludes: options.requestedIncludes || {},
         searchLastModified: lastModified,
+        searchEngineEnabled: !!options.useSearchEngine,
+        searchEngineEnabledLang: typeof options.useSearchEngine === "string" ? options.useSearchEngine : null,
+        searchEngineHighlightArgs: highlightArgs,
       };
 
       // this would be a wasted instruction otherwise as it'd be reversed
@@ -4291,6 +4335,10 @@ export class ActualItemProvider extends
           searchFields: this.state.searchFields,
           searchRequestedProperties: this.state.searchRequestedProperties,
           searchRequestedIncludes: this.state.searchRequestedIncludes,
+          searchEngineEnabled: this.state.searchEngineEnabled,
+          searchEngineEnabledLang: this.state.searchEngineEnabledLang,
+          searchEngineHighlightArgs: this.state.searchEngineHighlightArgs,
+          searchHighlights: this.state.searchHighlights,
           pokedElements: this.state.pokedElements,
           submit: this.submit,
           reload: this.loadValue,

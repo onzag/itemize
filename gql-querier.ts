@@ -54,11 +54,12 @@ export interface IGQLSearchRecordsContainer {
  * of traditional searches rather than records based search
  */
 export interface IGQLSearchResultsContainer {
-  results: IGQLValue[],
-  count: number,
-  limit: number,
-  offset: number,
-  last_modified: string,
+  results: IGQLValue[];
+  count: number;
+  limit: number;
+  offset: number;
+  last_modified: string;
+  highlights: string;
 }
 
 /**

@@ -1005,7 +1005,7 @@ export class ItemizeElasticClient {
       const documentsDeletedSinceLastRan = await this.rawDB.databaseConnection.queryRows(
         `SELECT "id", "version" FROM ${JSON.stringify(DELETED_REGISTRY_IDENTIFIER)} ` +
         `WHERE "type" = ?` + (
-          statusInfo.lastConsisencyCheck ? `AND "transaction_time" >= ?` : ""
+          statusInfo.lastConsisencyCheck ? ` AND "transaction_time" >= ?` : ""
         ),
         [
           qualifiedPathName,

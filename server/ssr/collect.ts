@@ -508,10 +508,18 @@ export class Collector {
         ];
       }
 
+      let highlights: any;
+      try {
+        highlights = rs.highlights ? (JSON.parse(rs.highlights) || {}) : {};
+      } catch {
+        highlights = {};
+      }
+
       const searchState = {
         searchError: null as any,
         searching: false,
         searchResults: rs.results,
+        searchHighlights: highlights,
         searchRecords: records,
         searchCount: rs.count,
         searchLimit: rs.limit,
@@ -524,6 +532,11 @@ export class Collector {
         searchRequestedProperties: args.requestedProperties,
         searchRequestedIncludes: args.requestedIncludes || {},
         searchLastModified: rs.last_modified,
+        searchEngineEnabled: !!args.useSearchEngine,
+        searchEngineEnabledLang: typeof args.useSearchEngine === "string" ? args.useSearchEngine : null,
+
+        // we don't need because they are traditional
+        searchEngineHighlightArgs: null as any,
       };
 
       const state = {

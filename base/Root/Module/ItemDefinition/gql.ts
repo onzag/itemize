@@ -56,6 +56,7 @@ export function getGQLFieldsDefinitionForItemDefinition(
     propertiesAsInput: boolean,
     optionalForm: boolean,
     includePolicy: string | string[];
+    onlyTextFilters: boolean,
   },
 ): IGQLFieldsDefinitionType {
   // the fields result in graphql field form
@@ -66,6 +67,10 @@ export function getGQLFieldsDefinitionForItemDefinition(
   itemDefinition.getAllPropertyDefinitions().forEach((pd) => {
     // we deny adding those whose retrieval is disabled
     if (pd.isRetrievalDisabled() && options.retrievalMode) {
+      return;
+    }
+
+    if (options.onlyTextFilters && (pd.getType() !== "string" || pd.getSubtype() !== "search")) {
       return;
     }
 
@@ -81,15 +86,17 @@ export function getGQLFieldsDefinitionForItemDefinition(
   });
 
   // We do the same with the includes
-  itemDefinition.getAllIncludes().forEach((i) => {
-    Object.assign(
-      fieldsResult,
-      getGQLFieldsDefinitionForInclude(i, {
-        propertiesAsInput: options.propertiesAsInput,
-        optionalForm: options.optionalForm,
-      }),
-    );
-  });
+  if (!options.onlyTextFilters) {
+    itemDefinition.getAllIncludes().forEach((i) => {
+      Object.assign(
+        fieldsResult,
+        getGQLFieldsDefinitionForInclude(i, {
+          propertiesAsInput: options.propertiesAsInput,
+          optionalForm: options.optionalForm,
+        }),
+      );
+    });
+  }
 
   // return that
   if (!options.includePolicy) {
@@ -171,6 +178,7 @@ export function getGQLTypeForItemDefinition(itemDefinition: ItemDefinition): Gra
         propertiesAsInput: false,
         optionalForm: false,
         includePolicy: null,
+        onlyTextFilters: false,
       }),
       description:
         "CREATE ACCESS: " + itemDefinition.getRolesWithAccessTo(ItemDefinitionIOActions.CREATE).join(", ") + " - " +
@@ -331,6 +339,9 @@ export function getGQLQueryFieldsForItemDefinition(
         results: {
           type: GraphQLList(type),
         },
+        highlights: {
+          type: GraphQLString,
+        },
       },
       description: "An array of results for the result list",
     });
@@ -351,6 +362,9 @@ export function getGQLQueryFieldsForItemDefinition(
           type: GraphQLNonNull(GraphQLInt),
         },
         last_modified: {
+          type: GraphQLString,
+        },
+        highlights: {
           type: GraphQLString,
         },
       },
@@ -383,32 +397,49 @@ export function getGQLQueryFieldsForItemDefinition(
       description: "This object can be ordered by using these rules",
     });
 
+    const searchPropertiesAdded = getGQLFieldsDefinitionForItemDefinition(searchModeCounterpart, {
+      retrievalMode: false,
+      propertiesAsInput: true,
+      excludeBase: true,
+      optionalForm: true,
+      includePolicy: null,
+      onlyTextFilters: false,
+    });
+
     const searchArgs = {
-      ...getGQLFieldsDefinitionForItemDefinition(searchModeCounterpart, {
-        retrievalMode: false,
-        propertiesAsInput: true,
-        excludeBase: true,
-        optionalForm: true,
-        includePolicy: null,
-      }),
+      ...searchPropertiesAdded,
       ...RESERVED_IDEF_SEARCH_PROPERTIES(orderByRule),
     };
+
+    const searchPropertiesGetList = getGQLFieldsDefinitionForItemDefinition(searchModeCounterpart, {
+      retrievalMode: false,
+      propertiesAsInput: true,
+      excludeBase: true,
+      optionalForm: true,
+      includePolicy: null,
+      onlyTextFilters: true,
+    });
+
+    const getterListArgs = {
+      ...searchPropertiesGetList,
+      ...RESERVED_GETTER_LIST_PROPERTIES,
+    }
 
     // for the list we just make a list of our basic externalized output with DATA type
     fields[PREFIX_GET_LIST + itemDefinition.getQualifiedPathName()] = {
       type: listTypeForThisRetrieval,
-      args: RESERVED_GETTER_LIST_PROPERTIES,
+      args: getterListArgs,
       resolve: resolveGenericFunction.bind(null, "getItemDefinitionList", itemDefinition, resolvers),
     },
-    // now this is the search query, note how we use the search mode counterpart
-    // retrieval mode is false, properties are meant to be in input mode for the args,
-    // we exclude the base properties, eg. id, version, type, etc... make all the fields optional,
-    // and don't include any policy (there are no policies in search mode anyway)
-    fields[PREFIX_SEARCH + itemDefinition.getSearchModeCounterpart().getQualifiedPathName()] = {
-      type: SEARCH_RECORDS_CONTAINER_GQL,
-      args: searchArgs,
-      resolve: resolveGenericFunction.bind(null, "searchItemDefinition", itemDefinition, resolvers),
-    };
+      // now this is the search query, note how we use the search mode counterpart
+      // retrieval mode is false, properties are meant to be in input mode for the args,
+      // we exclude the base properties, eg. id, version, type, etc... make all the fields optional,
+      // and don't include any policy (there are no policies in search mode anyway)
+      fields[PREFIX_SEARCH + itemDefinition.getSearchModeCounterpart().getQualifiedPathName()] = {
+        type: SEARCH_RECORDS_CONTAINER_GQL,
+        args: searchArgs,
+        resolve: resolveGenericFunction.bind(null, "searchItemDefinition", itemDefinition, resolvers),
+      };
     fields[PREFIX_TRADITIONAL_SEARCH + itemDefinition.getSearchModeCounterpart().getQualifiedPathName()] = {
       type: listTypeForThisRetrievalWithSearchData,
       args: searchArgs,
@@ -465,6 +496,7 @@ export function getGQLMutationFieldsForItemDefinition(
           excludeBase: true,
           optionalForm: false,
           includePolicy: "parent",
+          onlyTextFilters: false,
         }),
       },
       resolve: resolveGenericFunction.bind(null, "addItemDefinition", itemDefinition, resolvers),
@@ -483,6 +515,7 @@ export function getGQLMutationFieldsForItemDefinition(
           excludeBase: true,
           optionalForm: true,
           includePolicy: ["edit", "read"],
+          onlyTextFilters: false,
         }),
       },
       resolve: resolveGenericFunction.bind(null, "editItemDefinition", itemDefinition, resolvers),

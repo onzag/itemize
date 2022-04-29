@@ -298,6 +298,7 @@ export function buildSearchModePropertyDefinitions(
   // full text changes to a simple string tex tfield
   if (newPropDef.type === "text") {
     newPropDef.type = "string";
+    newPropDef.subtype = "search";
   }
 
   // use the search default instead of the standard default

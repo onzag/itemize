@@ -35,6 +35,19 @@ import Root, { ICustomRoleManager, IRequestLimitersType } from "../../../Root";
 import { transferrableToBlob, blobToTransferrable, fileURLAbsoluter } from "../../../../util";
 import type { IConfigRawJSONDataType } from "../../../../config";
 
+export interface IItemSearchStateHighlightType {
+  [pId: string]: string[];
+}
+
+export interface IItemSearchStateHighlightsType {
+  [mergedId: string]: IItemSearchStateHighlightType;
+}
+
+export interface IItemSearchStateHighlightArgsType {
+  [argId: string]: string;
+}
+
+
 export interface IItemSearchStateType {
   searchError: EndpointErrorType;
   searching: boolean;
@@ -51,6 +64,12 @@ export interface IItemSearchStateType {
   searchRequestedProperties: string[];
   searchRequestedIncludes: { [include: string]: string[] };
   searchFields: any;
+  searchEngineEnabled: boolean;
+  searchEngineEnabledLang: string;
+  // these are used when standard search is done
+  searchEngineHighlightArgs: IItemSearchStateHighlightArgsType;
+  // similar to results, obtained from traditional search
+  searchHighlights: IItemSearchStateHighlightsType;
 };
 
 export interface ICompoundSearchStateType {

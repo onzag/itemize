@@ -345,7 +345,7 @@ export default function restServices(appData: IAppDataType) {
     if (!token) {
       return true;
     }
-    
+
     let result: IServerSideTokenDataType;
     let forbidden: boolean = false;
     try {
@@ -375,7 +375,7 @@ export default function restServices(appData: IAppDataType) {
   // ADMINISTRATIVE STUFF
   router.get("/logs/:level/:id", async (req, res) => {
     res.setHeader("content-type", "application/json; charset=utf-8");
-  
+
     const forbidden = await validateToken(req);
     if (forbidden) {
       res.status(401).end(JSON.stringify({
@@ -407,7 +407,7 @@ export default function restServices(appData: IAppDataType) {
 
   router.get("/logs", async (req, res) => {
     res.setHeader("content-type", "application/json; charset=utf-8");
-  
+
     const forbidden = await validateToken(req);
     if (forbidden) {
       res.status(401).end(JSON.stringify({
@@ -442,7 +442,7 @@ export default function restServices(appData: IAppDataType) {
 
   router.get("/clusters/info", async (req, res) => {
     res.setHeader("content-type", "application/json; charset=utf-8");
-  
+
     const forbidden = await validateToken(req);
     if (forbidden) {
       res.status(401).end(JSON.stringify({

@@ -20,7 +20,7 @@ import {
   UNSPECIFIED_OWNER,
   INCLUDE_PREFIX,
 } from "../../constants";
-import ItemDefinition from "../../base/Root/Module/ItemDefinition";
+import ItemDefinition, { IItemSearchStateHighlightsType } from "../../base/Root/Module/ItemDefinition";
 import { IGQLValue, IGQLRequestFields, IGQLArgs, buildGqlQuery, gqlQuery, buildGqlMutation, IGQLEndpointValue, IGQLSearchRecord, GQLEnum, IGQLFile, ProgresserFn, GQLQuery } from "../../gql-querier";
 import { deepMerge, requestFieldsAreContained } from "../../gql-util";
 import CacheWorkerInstance from "./workers/cache";
@@ -1271,6 +1271,7 @@ interface IRunSearchQueryResult {
   limit: number,
   offset: number,
   lastModified: string,
+  highlights: IItemSearchStateHighlightsType,
 }
 
 export function getSearchArgsFor(
@@ -1337,6 +1338,7 @@ export function getSearchQueryFor(
       limit: {},
       offset: {},
       last_modified: {},
+      highlights: {},
     } : {
       records: {
         id: {},
@@ -1628,6 +1630,7 @@ export async function runSearchQueryFor(
         limit: {},
         offset: {},
         last_modified: {},
+        highlights: {},
       },
     });
 
@@ -1648,6 +1651,17 @@ export async function runSearchQueryFor(
   let limit: number = (data && data.limit as number);
   let offset: number = (data && data.offset as number);
   let count: number = (data && data.count as number);
+
+  let highlights: IItemSearchStateHighlightsType = null;
+  try {
+    if (data && data.highlights) {
+      highlights = JSON.parse(data.highlights as string) || {};
+    } else {
+      highlights = {};
+    }
+  } catch {
+    highlights = {};
+  }
 
   if (typeof limit === "undefined") {
     limit = null;
@@ -1682,6 +1696,7 @@ export async function runSearchQueryFor(
       offset,
       count,
       lastModified,
+      highlights,
     };
   } else {
     const records: IGQLSearchRecord[] = (
@@ -1701,6 +1716,7 @@ export async function runSearchQueryFor(
       offset,
       count,
       lastModified,
+      highlights,
     };
   }
 }

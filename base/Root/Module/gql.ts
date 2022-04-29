@@ -44,6 +44,7 @@ export function getGQLFieldsDefinitionForModule(
     excludeBase: boolean,
     propertiesAsInput: boolean,
     optionalForm: boolean,
+    onlyTextFilters: boolean,
   },
 ): IGQLFieldsDefinitionType {
   // first create the base considering on whether we exclude or include
@@ -56,6 +57,11 @@ export function getGQLFieldsDefinitionForModule(
     if (options.retrievalMode && propExtension.isRetrievalDisabled()) {
       return;
     }
+
+    if (options.onlyTextFilters && (propExtension.getType() !== "string" || propExtension.getSubtype() !== "search")) {
+      return;
+    }
+
     // and basically get the fields for that property
     resultFieldsSchema = {
       ...resultFieldsSchema,
@@ -90,6 +96,7 @@ export function getGQLTypeForModule(mod: Module): GraphQLObjectType {
         excludeBase: false,
         propertiesAsInput: false,
         optionalForm: false,
+        onlyTextFilters: false,
       }),
       description: "READ ACCESS: " + mod.getRolesWithAccessTo(ItemDefinitionIOActions.READ).join(", "),
     });
@@ -207,6 +214,9 @@ export function getGQLQueryFieldsForModule(
         results: {
           type: GraphQLList(gOuput),
         },
+        highlights: {
+          type: GraphQLString,
+        },
       },
       description: "An array of results for the result list",
     });
@@ -227,6 +237,9 @@ export function getGQLQueryFieldsForModule(
           type: GraphQLNonNull(GraphQLInt),
         },
         last_modified: {
+          type: GraphQLString,
+        },
+        highlights: {
           type: GraphQLString,
         },
       },
@@ -266,6 +279,20 @@ export function getGQLQueryFieldsForModule(
         excludeBase: true,
         propertiesAsInput: true,
         optionalForm: true,
+        onlyTextFilters: false,
+      }),
+      ...RESERVED_MODULE_SEARCH_PROPERTIES(orderByRule),
+    };
+
+    const getterListArgs = {
+      // as you can realize the arguments exclude the base and make it into input mode
+      // that means no RESERVED_BASE_PROPERTIES
+      ...getGQLFieldsDefinitionForModule(mod.getSearchModule(), {
+        retrievalMode: false,
+        excludeBase: true,
+        propertiesAsInput: true,
+        optionalForm: true,
+        onlyTextFilters: true,
       }),
       ...RESERVED_MODULE_SEARCH_PROPERTIES(orderByRule),
     };

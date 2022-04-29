@@ -66,6 +66,7 @@ export function buildSearchModeItemDefinition(
     newItemDef.properties.push({
       id: "search",
       type: "string",
+      subtype: "search",
       nullable: true,
       maxLength: MAX_SEARCH_FIELD_LENGTH,
       i18nData: searchI18nData,

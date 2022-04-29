@@ -6,9 +6,9 @@
  */
 
 import React from "react";
-import { ItemContext, SearchItemValueContext, IItemProviderProps, CacheMetadataGeneratorFn } from "../../providers/item";
+import { ItemContext, SearchItemValueContext, IItemProviderProps } from "../../providers/item";
 import equals from "deep-equal";
-import ItemDefinition, { IItemDefinitionGQLValueType } from "../../../base/Root/Module/ItemDefinition";
+import ItemDefinition, { IItemDefinitionGQLValueType, IItemSearchStateHighlightArgsType } from "../../../base/Root/Module/ItemDefinition";
 import { PREFIX_GET_LIST, PREFIX_GET } from "../../../constants";
 import CacheWorkerInstance from "../../internal/workers/cache";
 import { requestFieldsAreContained, deepMerge } from "../../../gql-util";
@@ -59,6 +59,10 @@ interface IGQLSearchRecordWithPopulateData extends IGQLSearchRecord {
    * The search result that you have retrieved
    */
   searchResult?: IGQLValue;
+  /**
+   * The highlight information retrieved
+   */
+  highlights?: ISearchHighlight;
 }
 
 /**
@@ -189,6 +193,8 @@ export interface ISearchLoaderProps {
   onSearchDataChange?: (searchId: string, wasRestored: boolean) => number | void;
 }
 
+interface ISearchHighlight { [key: string]: string[] };
+
 /**
  * The actual search loader props contains all this extra
  * data which allows it to extract the search records (and possible results)
@@ -216,6 +222,10 @@ interface IActualSearchLoaderProps extends ISearchLoaderProps {
   searchFields: IGQLRequestFields;
   searchRequestedProperties: string[];
   searchRequestedIncludes: { [include: string]: string[] };
+  searchEngineEnabled: boolean;
+  searchEngineEnabledLang: string;
+  searchEngineHighlightArgs: { [key: string]: string };
+  searchHighlights: { [mergedId: string]: ISearchHighlight };
 }
 
 /**
@@ -229,6 +239,7 @@ interface IActualSearchLoaderState {
   currentSearchRecords: IGQLSearchRecord[];
   currentSearchResultsFromTheRecords: IGQLValue[];
   error: EndpointErrorType;
+  retrievedHighlights: IItemSearchStateHighlightArgsType;
 }
 
 /**
@@ -236,6 +247,8 @@ interface IActualSearchLoaderState {
  */
 class ActualSearchLoader extends React.Component<IActualSearchLoaderProps, IActualSearchLoaderState> {
   private lastSearchLoadValuesTime: number;
+  private lastUsedElement: string;
+  private lastUsedHighlightArgs: any;
   private isUnmounted: boolean = false;
   constructor(props: IActualSearchLoaderProps) {
     super(props);
@@ -250,6 +263,7 @@ class ActualSearchLoader extends React.Component<IActualSearchLoaderProps, IActu
       searchFields: null,
       currentSearchRecords: [],
       currentSearchResultsFromTheRecords: [],
+      retrievedHighlights: {},
       error: null,
       ...this.refreshPage(true),
     };
@@ -289,15 +303,41 @@ class ActualSearchLoader extends React.Component<IActualSearchLoaderProps, IActu
     this.isUnmounted = true;
     this.ensureCleanupOfOldSearchResults(this.props, null);
   }
+  public willProduceNewHighlights() {
+    // if this is a cache policy thing, then producing new highlights will simply
+    // destroy the cache policy mechanism, rendering it useless
+    // otherwise we check if we have anything to create highlights from
+    const canProduceNewHighlights = !this.props.searchShouldCache &&
+      this.props.searchEngineHighlightArgs !== null &&
+      Object.keys(this.props.searchEngineHighlightArgs).length !== 0;
+    
+    // if we do
+    let willProduceNewHighlights = canProduceNewHighlights;
+
+    // we will check wether we should produce these new highlights
+    const qName = this.props.itemDefinitionInstance.getQualifiedPathName();
+    if (canProduceNewHighlights) {
+      // if it's the same as last time, then it's useless to do so
+      const avoidProducingNewBecauseSameHighlightArgs = this.lastUsedElement === qName &&
+      equals(this.lastUsedHighlightArgs, this.props.searchEngineHighlightArgs, { strict: true });
+      if (avoidProducingNewBecauseSameHighlightArgs) {
+        willProduceNewHighlights = false;
+      }
+    }
+
+    return willProduceNewHighlights;
+  }
   public componentDidUpdate(prevProps: IActualSearchLoaderProps) {
     // on update we must seek what the current page is to
     // see if something changes
     let currentPage = this.props.currentPage;
 
     // and then we slice our records to see what we need to load
+    const sliceStart = this.props.pageSize * currentPage;
+    const sliceEnd = this.props.pageSize * (currentPage + 1);
     const currentSearchRecords = (this.props.searchRecords || []).slice(
-      this.props.pageSize * currentPage,
-      this.props.pageSize * (currentPage + 1),
+      sliceStart,
+      sliceEnd,
     );
 
     // if this is a new search
@@ -323,6 +363,7 @@ class ActualSearchLoader extends React.Component<IActualSearchLoaderProps, IActu
 
     // if it doesn't equal what we currently have loaded
     if (
+      this.willProduceNewHighlights() ||
       !equals(this.state.currentSearchRecords, currentSearchRecords, { strict: true }) ||
       !equals(this.props.searchResults, prevProps.searchResults, { strict: true })
     ) {
@@ -332,9 +373,11 @@ class ActualSearchLoader extends React.Component<IActualSearchLoaderProps, IActu
   }
   public refreshPage(isConstruct?: boolean): Partial<IActualSearchLoaderState> {
     // a refresh will reload regardless
+    const sliceStart = this.props.pageSize * this.props.currentPage;
+    const sliceEnd = this.props.pageSize * (this.props.currentPage + 1);
     const currentSearchRecords = (this.props.searchRecords || []).slice(
-      this.props.pageSize * this.props.currentPage,
-      this.props.pageSize * (this.props.currentPage + 1),
+      sliceStart,
+      sliceEnd,
     );
     return this.loadValues(currentSearchRecords, isConstruct);
   }
@@ -365,7 +408,10 @@ class ActualSearchLoader extends React.Component<IActualSearchLoaderProps, IActu
       itemDefintionInQuestion.triggerListeners("load", sr.id as string, sr.version as string);
     });
   }
-  public loadValues(currentSearchRecords: IGQLSearchRecord[], isConstruct?: boolean): Partial<IActualSearchLoaderState> {
+  public loadValues(
+    currentSearchRecords: IGQLSearchRecord[],
+    isConstruct?: boolean,
+  ): Partial<IActualSearchLoaderState> {
     if (this.isUnmounted) {
       return;
     } else if (this.props.avoidLoadingSearchResults) {
@@ -374,6 +420,7 @@ class ActualSearchLoader extends React.Component<IActualSearchLoaderProps, IActu
         currentlySearching: [],
         currentSearchRecords,
         currentSearchResultsFromTheRecords: currentSearchRecords.map((r) => null),
+        retrievedHighlights: {},
         searchFields: this.props.searchFields,
       };
       !isConstruct && this.setState(newState as any);
@@ -421,9 +468,19 @@ class ActualSearchLoader extends React.Component<IActualSearchLoaderProps, IActu
       if (isConstruct) {
         this.loadSearchResults();
       }
+
+      this.lastUsedElement = this.props.itemDefinitionInstance.getQualifiedPathName();
+      this.lastUsedHighlightArgs = this.props.searchEngineHighlightArgs;
+
       !isConstruct && this.setState(newState as any);
       return newState;
     }
+    
+    // if we do
+    const willProduceNewHighlights = this.willProduceNewHighlights();
+
+    this.lastUsedElement = this.props.itemDefinitionInstance.getQualifiedPathName();
+    this.lastUsedHighlightArgs = this.props.searchEngineHighlightArgs;
 
     const foundIndexes = currentSearchRecords.map((r, index) => {
       return false;
@@ -443,7 +500,9 @@ class ActualSearchLoader extends React.Component<IActualSearchLoaderProps, IActu
         requestFieldsAreContained(this.props.searchFields, appliedGQLValue.requestFields) &&
         appliedGQLValue.flattenedValue.last_modified === searchRecord.last_modified
       ) {
-        foundIndexes[index] = true;
+        if (!willProduceNewHighlights) {
+          foundIndexes[index] = true;
+        }
         return appliedGQLValue.rawValue;
       }
 
@@ -466,7 +525,13 @@ class ActualSearchLoader extends React.Component<IActualSearchLoaderProps, IActu
 
     if (!isConstruct) {
       this.setState(newState as any);
-      this.loadValuesAsyncPart(currentSearchLoadTime, currentSearchResultsFromTheRecords, currentSearchRecords, foundIndexes);
+      this.loadValuesAsyncPart(
+        currentSearchLoadTime,
+        currentSearchResultsFromTheRecords,
+        currentSearchRecords,
+        foundIndexes,
+        willProduceNewHighlights,
+      );
     }
 
     return newState;
@@ -477,6 +542,7 @@ class ActualSearchLoader extends React.Component<IActualSearchLoaderProps, IActu
     currentSearchResultsFromTheRecords: IGQLValue[],
     currentSearchRecords: IGQLSearchRecord[],
     foundIndexes: boolean[],
+    willProduceNewHighlights: boolean,
   ) {
     // We are done with this since all that follows is async and cannot be executed
     // during construction
@@ -516,7 +582,8 @@ class ActualSearchLoader extends React.Component<IActualSearchLoaderProps, IActu
 
       // otherwise let's see our cache
       // if it's not supported then we push already to our uncached results
-      if (!CacheWorkerInstance.isSupported) {
+      // also if we need to produce new results for uncached we can't use cache
+      if (willProduceNewHighlights || !CacheWorkerInstance.isSupported) {
         uncachedResults.push(searchRecord);
         uncachedResultsToIndex.push(index);
         return null;
@@ -619,6 +686,7 @@ class ActualSearchLoader extends React.Component<IActualSearchLoaderProps, IActu
         token: this.props.tokenData.token,
         language: this.props.localeData.language.split("-")[0],
         records: uncachedResults,
+        ...this.props.searchEngineHighlightArgs,
       };
 
       // if we have a search owner we add it as it's necessary or otherwise
@@ -633,6 +701,7 @@ class ActualSearchLoader extends React.Component<IActualSearchLoaderProps, IActu
         args,
         fields: {
           results: this.props.searchFields,
+          highlights: {},
         },
       });
 
@@ -658,6 +727,7 @@ class ActualSearchLoader extends React.Component<IActualSearchLoaderProps, IActu
       const finalState: Partial<IActualSearchLoaderState> = {
         error,
         currentlySearching: [],
+        retrievedHighlights: {},
       };
 
       // now we need to see if we got information
@@ -671,6 +741,16 @@ class ActualSearchLoader extends React.Component<IActualSearchLoaderProps, IActu
         const loadedNewSearchResultsFromTheRecords = [
           ...newSearchResultsFromTheRecords,
         ];
+
+        const newHighlights = (gqlValue.data[getListQueryName].highlights as any) || {};
+        // if the new highlights are considered fully new and not recycled, then we can take
+        // the new highlights and delete the old ones, because we have updated every single
+        // value with new highlights, otherwise if we have recycled, we may still have
+        // new stuff around that we needed to add, so we merge with the old
+        finalState.retrievedHighlights = willProduceNewHighlights ? newHighlights : {
+          ...this.state.retrievedHighlights,
+          ...newHighlights,
+        };
 
         // and we loop into them
         (gqlValue.data[getListQueryName].results as IGQLValue[]).forEach((value, index) => {
@@ -799,6 +879,8 @@ class ActualSearchLoader extends React.Component<IActualSearchLoaderProps, IActu
 
               // fird the search result information, if any, for the given record
               const searchResult = this.state.currentSearchResultsFromTheRecords[index];
+              const mergedId = searchRecord.id + "." + (searchRecord.version || "");
+              const highlights = (this.props.searchHighlights[mergedId] || this.state.retrievedHighlights[mergedId]) || {};
 
               // and we add something called the provider props, which explains how to instantiate
               // a item definition provider so that it's in sync with this seach and loads what this search
@@ -820,10 +902,11 @@ class ActualSearchLoader extends React.Component<IActualSearchLoaderProps, IActu
                 },
                 itemDefinition,
                 searchResult,
+                highlights,
                 getAppliedValue: () => {
                   return itemDefinition.getGQLAppliedValue(searchRecord.id, searchRecord.version || null);
                 },
-              };
+              } as IGQLSearchRecordWithPopulateData;
             }),
             pageCount,
             accessibleCount,
@@ -873,6 +956,10 @@ export default function SearchLoader(props: ISearchLoaderProps) {
                       searchShouldCache={itemContext.searchShouldCache}
                       searchRequestedIncludes={itemContext.searchRequestedIncludes}
                       searchRequestedProperties={itemContext.searchRequestedProperties}
+                      searchEngineEnabled={itemContext.searchEngineEnabled}
+                      searchEngineEnabledLang={itemContext.searchEngineEnabledLang}
+                      searchEngineHighlightArgs={itemContext.searchEngineHighlightArgs}
+                      searchHighlights={itemContext.searchHighlights}
                       searchFields={itemContext.searchFields}
                       searching={itemContext.searching}
                       tokenData={tokenData}

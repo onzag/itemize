@@ -582,6 +582,7 @@ export async function searchModule(
       limit,
       offset,
       count,
+      highlights: null as string,
     }
 
     CAN_LOG_DEBUG && logger.debug(
@@ -1166,6 +1167,7 @@ export async function searchItemDefinition(
       limit,
       offset,
       count,
+      highlights: null,
     }
 
     CAN_LOG_DEBUG && logger.debug(

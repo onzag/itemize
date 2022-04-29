@@ -1358,6 +1358,19 @@ export const RESERVED_GETTER_LIST_PROPERTIES = {
     type: GraphQLNonNull && GraphQLNonNull(GraphQLList(SEARCH_RECORD_INPUT_GQL)),
     description: "the records to fetch for that item",
   },
+  search: {
+    type: GraphQLString,
+    description: "A search string, searches within the prop extensions and the prop extensions only",
+  },
+  searchengine: {
+    type: GraphQLBoolean,
+    description: "Wether to use the search engine instead of searching from database records (results can be differ)",
+  },
+  searchengine_language: {
+    type: GraphQLString,
+    description: "A ISO code for a language to use to limit the search engine indexes against " +
+    "for example if you are sure you only want english results that have been indexed in english, then pass en here",
+  },
   created_by: {
     type: GraphQLString,
     description: "An specified owner to filter by (this affects permissions)",

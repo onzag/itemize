@@ -506,6 +506,7 @@ export async function getItemDefinitionList(
 
   const resultAsObject = {
     results: finalValues,
+    highlights: null as string,
   };
   CAN_LOG_DEBUG && logger.debug("getItemDefinitionList: done");
 
@@ -715,6 +716,7 @@ export async function getModuleList(
 
   const resultAsObject = {
     results: finalValues,
+    highlights: null as string,
   };
 
   CAN_LOG_DEBUG && logger.debug("getModuleList: done");
