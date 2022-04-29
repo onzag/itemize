@@ -26,7 +26,8 @@ import { currencySQL, currencySQLIn, currencySQLOut, currencySQLSearch, currency
   currencySQLBtreeIndexable, currencySQLMantenience, currencySQLEqual, currencySQLSSCacheEqual, currencySQLSelect,
   currencyElasticSearch, 
   currencySQLElasticIn,
-  currencyElastic} from "../sql/currency";
+  currencyElastic,
+  currencyElasticOrderBy} from "../sql/currency";
 
 /**
  * The currency definition is described by an object
@@ -67,6 +68,7 @@ const typeValue: IPropertyDefinitionSupportedType<IPropertyDefinitionSupportedCu
   elasticStrSearch: null,
   localStrSearch: null,
   sqlOrderBy: currencySQLOrderBy,
+  elasticSort: currencyElasticOrderBy,
   sqlBtreeIndexable: currencySQLBtreeIndexable,
   sqlMantenience: currencySQLMantenience,
   sqlEqual: currencySQLEqual,

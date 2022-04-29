@@ -120,6 +120,7 @@ const typeValue: IPropertyDefinitionSupportedType<PropertyDefinitionSupportedStr
     return true;
   },
   sqlOrderBy: null,
+  elasticSort: null,
   localOrderBy: null,
 
   localSearch: (arg) => {

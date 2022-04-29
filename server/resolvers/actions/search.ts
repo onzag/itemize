@@ -17,7 +17,7 @@ import {
   checkUserCanSearch,
 } from "../basic";
 import ItemDefinition, { ItemDefinitionIOActions } from "../../../base/Root/Module/ItemDefinition";
-import { buildSQLQueryForModule } from "../../../base/Root/Module/sql";
+import { buildElasticQueryForModule, buildSQLQueryForModule } from "../../../base/Root/Module/sql";
 import { ISQLTableRowValue } from "../../../base/Root/sql";
 import {
   INCLUDE_PREFIX,
@@ -27,7 +27,7 @@ import {
   ENDPOINT_ERRORS,
   EXCLUSION_STATE_SUFFIX,
 } from "../../../constants";
-import { buildSQLQueryForItemDefinition, convertSQLValueToGQLValueForItemDefinition } from "../../../base/Root/Module/ItemDefinition/sql";
+import { buildElasticQueryForItemDefinition, buildSQLQueryForItemDefinition, convertSQLValueToGQLValueForItemDefinition } from "../../../base/Root/Module/ItemDefinition/sql";
 import { IGQLSearchRecord, IGQLSearchRecordsContainer, IGQLSearchResultsContainer } from "../../../gql-querier";
 import { convertVersionsIntoNullsWhenNecessary } from "../../version-null-value";
 import { flattenRawGQLValueOrFields } from "../../../gql-util";
@@ -37,6 +37,8 @@ import { EndpointError } from "../../../base/errors";
 import { IOTriggerActions } from "../triggers";
 import { CustomRoleGranterEnvironment, CustomRoleManager } from "../roles";
 import { CAN_LOG_DEBUG } from "../../environment";
+import type { SelectBuilder } from "../../../database/SelectBuilder";
+import type { ElasticQueryBuilder } from "../../elastic";
 
 export function findLastRecordLastModifiedDate(...records: IGQLSearchRecord[][]): string {
   const recordsRespectiveNanoSecondAccuracyArray = records.flat().map((r) => new NanoSecondComposedDate(r.last_modified));
@@ -66,6 +68,24 @@ export async function searchModule(
   CAN_LOG_DEBUG && logger.debug(
     "searchModule: executed search for " + mod.getQualifiedPathName(),
   );
+
+  const usesElastic = resolverArgs.args.searchengine === true;
+  const elasticIndexLang = (usesElastic && resolverArgs.args.searchengine_language) || null;
+
+  if (usesElastic && !mod.isSearchEngineEnabled()) {
+    throw new EndpointError({
+      message: mod.getQualifiedPathName() + " does not support search engine searches",
+      code: ENDPOINT_ERRORS.UNSPECIFIED,
+    });
+  } else if (usesElastic && resolverArgs.args.offset !== 0) {
+    // this is a limitation of elasticsearch that it doesn't allow for pagination
+    // with more than 10000 hits, and this is something we cannot ensure
+    // as a result we disable the whole thing
+    throw new EndpointError({
+      message: "Using the search engine does not support non-zero offsets",
+      code: ENDPOINT_ERRORS.UNSPECIFIED,
+    });
+  }
 
   const since = retrieveSince(resolverArgs.args);
   checkLimit(resolverArgs.args.limit as number, mod, traditional);
@@ -143,7 +163,7 @@ export async function searchModule(
   // have the basic readRoleAccess as well into them
   let typesToCheckReadToo: ItemDefinition[];
   if (!resolverArgs.args.types) {
-    typesToCheckReadToo = mod.getAllChildDefinitionsRecursive();
+    typesToCheckReadToo = mod.getAllChildItemDefinitions();
   } else {
     typesToCheckReadToo = resolverArgs.args.types.map((t: string) => {
       const idef = appData.root.registry[t] as ItemDefinition;
@@ -242,29 +262,103 @@ export async function searchModule(
     }
   }
 
+  let elasticQuery: ElasticQueryBuilder;
+  let queryModel: SelectBuilder;
+
   // now we build the search query, the search query only matches an id
   // note how we remove blocked_at
-  const queryModel = appData.databaseConnection.getSelectBuilder();
-  queryModel.fromBuilder.from(mod.getQualifiedPathName());
-  queryModel.whereBuilder.andWhereColumnNull("blocked_at");
+  if (usesElastic) {
+    elasticQuery = appData.elastic.getSelectBuilder(
+      mod,
+      elasticIndexLang,
+      resolverArgs.args.types,
+    );
+    elasticQuery.mustTerm({
+      blocked_by: null,
+    });
 
-  if (created_by) {
-    // we need to check for all the possible results we might get
-    await Promise.all(mod.getAllChildDefinitionsRecursive().map(async (idef) => {
-      // we need to check whether the user can read the owner field for that creator
-      // that is specifying, this is because you are reading the owner if you are
-      // searching by it, indirectly
-      await idef.checkRoleCanReadOwner(tokenData.role, tokenData.id, created_by, rolesManager, true);
-    }));
-    queryModel.whereBuilder.andWhereColumn("created_by", created_by);
-  }
+    if (created_by) {
+      // we need to check for all the possible results we might get
+      await Promise.all(mod.getAllChildItemDefinitions().map(async (idef) => {
+        // we need to check whether the user can read the owner field for that creator
+        // that is specifying, this is because you are reading the owner if you are
+        // searching by it, indirectly
+        await idef.checkRoleCanReadOwner(tokenData.role, tokenData.id, created_by, rolesManager, true);
+      }));
 
-  if (since) {
-    queryModel.whereBuilder.andWhereColumn("created_at", ">=", since);
-  }
+      elasticQuery.mustTerm({
+        created_by: created_by,
+      });
+    }
 
-  if (typeof resolverArgs.args.version_filter !== "undefined") {
-    queryModel.whereBuilder.andWhereColumn("version", resolverArgs.args.version_filter || "");
+    if (since) {
+      elasticQuery.must({
+        range: {
+          created_at: {
+            gte: since,
+          }
+        }
+      });
+    }
+
+    if (typeof resolverArgs.args.version_filter !== "undefined") {
+      elasticQuery.mustTerm({
+        version: resolverArgs.args.version_filter || null,
+      });
+    }
+
+    if (resolverArgs.args.parent_id && resolverArgs.args.parent_type) {
+      elasticQuery.mustTerm({
+        parent_id: resolverArgs.args.parent_id,
+        parent_version: resolverArgs.args.parent_version || null,
+        parent_type: resolverArgs.args.parent_type,
+      });
+    } else if (resolverArgs.args.parent_type) {
+      elasticQuery.mustTerm({
+        parent_type: resolverArgs.args.parent_type,
+      });
+    }
+  } else {
+    queryModel = appData.databaseConnection.getSelectBuilder();
+    queryModel.fromBuilder.from(mod.getQualifiedPathName());
+    queryModel.whereBuilder.andWhereColumnNull("blocked_at");
+
+    if (created_by) {
+      // we need to check for all the possible results we might get
+      await Promise.all(mod.getAllChildItemDefinitions().map(async (idef) => {
+        // we need to check whether the user can read the owner field for that creator
+        // that is specifying, this is because you are reading the owner if you are
+        // searching by it, indirectly
+        await idef.checkRoleCanReadOwner(tokenData.role, tokenData.id, created_by, rolesManager, true);
+      }));
+      queryModel.whereBuilder.andWhereColumn("created_by", created_by);
+    }
+
+    if (since) {
+      queryModel.whereBuilder.andWhereColumn("created_at", ">=", since);
+    }
+
+    if (typeof resolverArgs.args.version_filter !== "undefined") {
+      queryModel.whereBuilder.andWhereColumn("version", resolverArgs.args.version_filter || "");
+    }
+
+    if (resolverArgs.args.parent_id && resolverArgs.args.parent_type) {
+      queryModel.whereBuilder
+        .andWhereColumn("parent_id", resolverArgs.args.parent_id)
+        .andWhereColumn("parent_version", resolverArgs.args.parent_version || "")
+        .andWhereColumn("parent_type", resolverArgs.args.parent_type);
+    } else if (resolverArgs.args.parent_type) {
+      queryModel.whereBuilder
+        .andWhereColumn("parent_type", resolverArgs.args.parent_type);
+    }
+
+    // if we filter by type
+    if (resolverArgs.args.types) {
+      queryModel.whereBuilder.andWhere(
+        `"type" = ANY(ARRAY[${resolverArgs.args.types.map(() => "?").join(",")}]::TEXT[])`,
+        resolverArgs.args.types,
+      );
+    }
   }
 
   const pathOfThisModule = mod.getPath().join("/");
@@ -285,54 +379,87 @@ export async function searchModule(
         id: tokenData.id,
         customData: tokenData.customData,
       },
+      usesElastic,
+      elasticQueryBuilder: elasticQuery,
       whereBuilder: queryModel.whereBuilder,
       forbid: defaultTriggerForbiddenFunction,
     });
   }
 
-  // now we build the sql query for the module
-  const addedSearchRaw = buildSQLQueryForModule(
-    appData.cache.getServerData(),
-    mod,
-    resolverArgs.args,
-    queryModel.whereBuilder,
-    queryModel.orderByBuilder,
-    resolverArgs.args.language,
-    dictionary,
-    resolverArgs.args.search,
-    resolverArgs.args.order_by,
-  );
-
-  // if we filter by type
-  if (resolverArgs.args.types) {
-    queryModel.whereBuilder.andWhere(
-      `"type" = ANY(ARRAY[${resolverArgs.args.types.map(() => "?").join(",")}]::TEXT[])`,
-      resolverArgs.args.types,
-    );
-  }
-
   const limit: number = resolverArgs.args.limit;
   const offset: number = resolverArgs.args.offset;
 
-  queryModel.select(...sqlFieldsToRequest);
-  addedSearchRaw.forEach((srApplyArgs) => {
-    queryModel.selectExpression(srApplyArgs[0], srApplyArgs[1]);
-  });
-  queryModel.limit(limit).offset(offset);
+  let baseResult: ISQLTableRowValue[] = [];
+  let count: number = 0;
 
-  // return using the base result, and only using the id
-  const baseResult: ISQLTableRowValue[] = (generalFields.results || generalFields.records) ?
-    (await appData.databaseConnection.queryRows(queryModel)).map(convertVersionsIntoNullsWhenNecessary) as IGQLSearchRecord[] :
-    [];
+  if (usesElastic) {
+    buildElasticQueryForModule(
+      appData.cache.getServerData(),
+      mod,
+      resolverArgs.args,
+      elasticQuery,
+      resolverArgs.args.language,
+      dictionary,
+      resolverArgs.args.search,
+      resolverArgs.args.order_by,
+    );
 
-  queryModel.clear();
-  queryModel.selectExpression(`COUNT(*) AS "count"`);
-  queryModel.orderByBuilder.clear();
+    elasticQuery.setSourceIncludes(sqlFieldsToRequest);
+    elasticQuery.setSize(limit);
 
-  const countResult: ISQLTableRowValue = generalFields.count ? (
-    await appData.databaseConnection.queryFirst(queryModel)
-  ) : null;
-  const count = countResult ? countResult.count : null;
+    const requestBaseResult = (generalFields.results || generalFields.records);
+    const requestCount = generalFields.count;
+
+    // we have the count from here anyway
+    if (requestBaseResult) {
+      const result = await appData.elastic.executeQuery(elasticQuery);
+      count = result.hits.total as number;
+      baseResult = result.hits.hits.map((r) => {
+        return r._source;
+      })
+    } else if (requestCount) {
+      const result = await appData.elastic.executeCountQuery(elasticQuery);
+      count = result.count;
+    }
+  } else {
+    // now we build the sql query for the module
+    const addedSearchRaw = buildSQLQueryForModule(
+      appData.cache.getServerData(),
+      mod,
+      resolverArgs.args,
+      queryModel.whereBuilder,
+      queryModel.orderByBuilder,
+      resolverArgs.args.language,
+      dictionary,
+      resolverArgs.args.search,
+      resolverArgs.args.order_by,
+    );
+
+    queryModel.select(...sqlFieldsToRequest);
+    addedSearchRaw.forEach((srApplyArgs) => {
+      queryModel.selectExpression(srApplyArgs[0], srApplyArgs[1]);
+    });
+    queryModel.limit(limit).offset(offset);
+
+    // return using the base result, and only using the id
+    const requestBaseResult = (generalFields.results || generalFields.records);
+    baseResult = requestBaseResult ?
+      (await appData.databaseConnection.queryRows(queryModel)).map(convertVersionsIntoNullsWhenNecessary) as IGQLSearchRecord[] :
+      [];
+
+    queryModel.clear();
+    queryModel.selectExpression(`COUNT(*) AS "count"`);
+    queryModel.orderByBuilder.clear();
+
+    // if we have requested for a base result, and we got less than the limit, we know the count right away
+    // it's the same as our array len plus the offset
+    if (requestBaseResult && baseResult.length < limit) {
+      count = baseResult.length + offset;
+    } else {
+      const countResult: ISQLTableRowValue = generalFields.count ? (await appData.databaseConnection.queryFirst(queryModel)) : null;
+      count = countResult ? countResult.count : null;
+    }
+  }
 
   if (traditional) {
     const finalResult: IGQLSearchResultsContainer = {
@@ -489,6 +616,24 @@ export async function searchItemDefinition(
   resolverItemDefinition: ItemDefinition,
   traditional?: boolean,
 ) {
+  const usesElastic = resolverArgs.args.searchengine === true;
+  const elasticIndexLang = (usesElastic && resolverArgs.args.searchengine_language) || null;
+
+  if (usesElastic && !resolverItemDefinition.isSearchEngineEnabled()) {
+    throw new EndpointError({
+      message: resolverItemDefinition.getQualifiedPathName() + " does not support search engine searches",
+      code: ENDPOINT_ERRORS.UNSPECIFIED,
+    });
+  } else if (usesElastic && resolverArgs.args.offset !== 0) {
+    // this is a limitation of elasticsearch that it doesn't allow for pagination
+    // with more than 10000 hits, and this is something we cannot ensure
+    // as a result we disable the whole thing
+    throw new EndpointError({
+      message: "Using the search engine does not support non-zero offsets",
+      code: ENDPOINT_ERRORS.UNSPECIFIED,
+    });
+  }
+
   let pooledRoot: Root;
   try {
     pooledRoot = await appData.rootPool.acquire().promise;
@@ -709,35 +854,83 @@ export async function searchItemDefinition(
     );
   }
 
+  let elasticQuery: ElasticQueryBuilder;
+  let queryModel: SelectBuilder;
+
   // now we build the search query
-  const queryModel = appData.databaseConnection.getSelectBuilder();
-  queryModel.fromBuilder.from(selfTable);
-  queryModel.joinBuilder.join(moduleTable, (clause) => {
-    clause.onColumnEquals("id", CONNECTOR_SQL_COLUMN_ID_FK_NAME);
-    clause.onColumnEquals("version", CONNECTOR_SQL_COLUMN_VERSION_FK_NAME);
-  });
-  queryModel.whereBuilder.andWhereColumnNull("blocked_at");
+  if (usesElastic) {
+    elasticQuery = appData.elastic.getSelectBuilder(
+      itemDefinition,
+      elasticIndexLang,
+    );
+    elasticQuery.mustTerm({
+      blocked_by: null,
+    });
 
-  if (created_by) {
-    queryModel.whereBuilder.andWhereColumn("created_by", created_by);
-  }
+    if (created_by) {
+      elasticQuery.mustTerm({
+        created_by: created_by,
+      });
+    }
 
-  if (since) {
-    queryModel.whereBuilder.andWhereColumn("created_at", ">=", since);
-  }
+    if (since) {
+      elasticQuery.must({
+        range: {
+          created_at: {
+            gte: since,
+          }
+        }
+      });
+    }
 
-  if (typeof resolverArgs.args.version_filter !== "undefined") {
-    queryModel.whereBuilder.andWhereColumn("version", resolverArgs.args.version_filter || "");
-  }
+    if (typeof resolverArgs.args.version_filter !== "undefined") {
+      elasticQuery.mustTerm({
+        version: resolverArgs.args.version_filter || null,
+      });
+    }
 
-  if (resolverArgs.args.parent_id && resolverArgs.args.parent_type) {
-    queryModel.whereBuilder
-      .andWhereColumn("parent_id", resolverArgs.args.parent_id)
-      .andWhereColumn("parent_version", resolverArgs.args.parent_version || "")
-      .andWhereColumn("parent_type", resolverArgs.args.parent_type);
-  } else if (resolverArgs.args.parent_type) {
-    queryModel.whereBuilder
-      .andWhereColumn("parent_type", resolverArgs.args.parent_type);
+    if (resolverArgs.args.parent_id && resolverArgs.args.parent_type) {
+      elasticQuery.mustTerm({
+        parent_id: resolverArgs.args.parent_id,
+        parent_version: resolverArgs.args.parent_version || null,
+        parent_type: resolverArgs.args.parent_type,
+      });
+    } else if (resolverArgs.args.parent_type) {
+      elasticQuery.mustTerm({
+        parent_type: resolverArgs.args.parent_type,
+      });
+    }
+
+  } else {
+    queryModel = appData.databaseConnection.getSelectBuilder();
+    queryModel.fromBuilder.from(selfTable);
+    queryModel.joinBuilder.join(moduleTable, (clause) => {
+      clause.onColumnEquals("id", CONNECTOR_SQL_COLUMN_ID_FK_NAME);
+      clause.onColumnEquals("version", CONNECTOR_SQL_COLUMN_VERSION_FK_NAME);
+    });
+    queryModel.whereBuilder.andWhereColumnNull("blocked_at");
+
+    if (created_by) {
+      queryModel.whereBuilder.andWhereColumn("created_by", created_by);
+    }
+
+    if (since) {
+      queryModel.whereBuilder.andWhereColumn("created_at", ">=", since);
+    }
+
+    if (typeof resolverArgs.args.version_filter !== "undefined") {
+      queryModel.whereBuilder.andWhereColumn("version", resolverArgs.args.version_filter || "");
+    }
+
+    if (resolverArgs.args.parent_id && resolverArgs.args.parent_type) {
+      queryModel.whereBuilder
+        .andWhereColumn("parent_id", resolverArgs.args.parent_id)
+        .andWhereColumn("parent_version", resolverArgs.args.parent_version || "")
+        .andWhereColumn("parent_type", resolverArgs.args.parent_type);
+    } else if (resolverArgs.args.parent_type) {
+      queryModel.whereBuilder
+        .andWhereColumn("parent_type", resolverArgs.args.parent_type);
+    }
   }
 
   const pathOfThisModule = mod.getPath().join("/");
@@ -760,7 +953,9 @@ export async function searchItemDefinition(
         id: tokenData.id,
         customData: tokenData.customData,
       },
-      whereBuilder: queryModel.whereBuilder,
+      usesElastic,
+      whereBuilder: queryModel ? queryModel.whereBuilder : null,
+      elasticQueryBuilder: elasticQuery || null,
       forbid: defaultTriggerForbiddenFunction,
     };
     if (moduleTrigger) {
@@ -774,38 +969,79 @@ export async function searchItemDefinition(
   // and now we call the function that builds the query itself into
   // that parent query, and adds the andWhere as required
   // into such query
-  const addedSearchRaw = buildSQLQueryForItemDefinition(
-    appData.cache.getServerData(),
-    itemDefinition,
-    resolverArgs.args,
-    queryModel.whereBuilder,
-    queryModel.orderByBuilder,
-    resolverArgs.args.language,
-    dictionary,
-    resolverArgs.args.search,
-    resolverArgs.args.order_by,
-  );
-
+  let count: number = 0;
+  let baseResult: ISQLTableRowValue[] = [];
   const limit: number = resolverArgs.args.limit;
   const offset: number = resolverArgs.args.offset;
 
-  queryModel.select(...sqlFieldsToRequest);
-  addedSearchRaw.forEach((srApplyArgs) => {
-    queryModel.selectExpression(srApplyArgs[0], srApplyArgs[1]);
-  });
-  queryModel.limit(limit).offset(offset);
+  if (usesElastic) {
+    buildElasticQueryForItemDefinition(
+      appData.cache.getServerData(),
+      itemDefinition,
+      resolverArgs.args,
+      elasticQuery,
+      resolverArgs.args.language,
+      dictionary,
+      resolverArgs.args.search,
+      resolverArgs.args.order_by,
+    );
 
-  // return using the base result, and only using the id
-  const baseResult: ISQLTableRowValue[] = (generalFields.results || generalFields.records) ?
-    (await appData.databaseConnection.queryRows(queryModel)).map(convertVersionsIntoNullsWhenNecessary) as IGQLSearchRecord[] :
-    [];
+    elasticQuery.setSourceIncludes(sqlFieldsToRequest);
+    elasticQuery.setSize(limit);
 
-  queryModel.clear();
-  queryModel.selectExpression(`COUNT(*) AS "count"`);
-  queryModel.orderByBuilder.clear();
+    const requestBaseResult = (generalFields.results || generalFields.records);
+    const requestCount = generalFields.count;
 
-  const countResult: ISQLTableRowValue = generalFields.count ? (await appData.databaseConnection.queryFirst(queryModel)) : null;
-  const count = countResult ? countResult.count : null;
+    // we have the count from here anyway
+    if (requestBaseResult) {
+      const result = await appData.elastic.executeQuery(elasticQuery);
+      count = result.hits.total as number;
+      baseResult = result.hits.hits.map((r) => {
+        return r._source;
+      })
+    } else if (requestCount) {
+      const result = await appData.elastic.executeCountQuery(elasticQuery);
+      count = result.count;
+    }
+  } else {
+    const addedSearchRaw = buildSQLQueryForItemDefinition(
+      appData.cache.getServerData(),
+      itemDefinition,
+      resolverArgs.args,
+      queryModel.whereBuilder,
+      queryModel.orderByBuilder,
+      resolverArgs.args.language,
+      dictionary,
+      resolverArgs.args.search,
+      resolverArgs.args.order_by,
+    );
+
+    queryModel.select(...sqlFieldsToRequest);
+    addedSearchRaw.forEach((srApplyArgs) => {
+      queryModel.selectExpression(srApplyArgs[0], srApplyArgs[1]);
+    });
+    queryModel.limit(limit).offset(offset);
+
+    // return using the base result, and only using the id
+    const requestBaseResult = (generalFields.results || generalFields.records);
+    baseResult = requestBaseResult ?
+      (await appData.databaseConnection.queryRows(queryModel)).map(convertVersionsIntoNullsWhenNecessary) as IGQLSearchRecord[] :
+      [];
+
+    queryModel.clear();
+    queryModel.selectExpression(`COUNT(*) AS "count"`);
+    queryModel.orderByBuilder.clear();
+
+    // if we have requested for a base result, and we got less than the limit, we know the count right away
+    // it's the same as our array len plus the offset
+    if (requestBaseResult && baseResult.length < limit) {
+      count = baseResult.length + offset;
+    } else {
+      const countResult: ISQLTableRowValue = generalFields.count ? (await appData.databaseConnection.queryFirst(queryModel)) : null;
+      count = countResult ? countResult.count : null;
+    }
+  }
+
   if (traditional) {
     const finalResult: IGQLSearchResultsContainer = {
       results: await Promise.all(

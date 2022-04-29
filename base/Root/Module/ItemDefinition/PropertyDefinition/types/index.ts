@@ -33,6 +33,7 @@ import ItemDefinition from "../..";
 import Include from "../../Include";
 import { WhereBuilder } from "../../../../../../database/WhereBuilder";
 import type { IAppDataType } from "../../../../../../server";
+import type { ElasticQueryBuilder } from "../../../../../../server/elastic";
 
 /**
  * All the supported property types
@@ -100,9 +101,10 @@ export interface ISQLSearchInfo extends ISQLArgInfo {
 export interface IElasticSearchInfo extends ISQLArgInfo {
   language: string;
   dictionary: string;
-  elasticQueryBuilder: any;
+  elasticQueryBuilder: ElasticQueryBuilder;
   args: IGQLArgs;
   isOrderedByIt: boolean;
+  boost: number;
 }
 
 export interface ISQLStrSearchInfo extends ISQLArgInfo {
@@ -116,7 +118,7 @@ export interface ISQLStrSearchInfo extends ISQLArgInfo {
 export interface IElasticStrSearchInfo extends ISQLArgInfo {
   language: string;
   dictionary: string;
-  elasticQueryBuilder: any;
+  elasticQueryBuilder: ElasticQueryBuilder;
   search: string;
   boost: number;
   isOrderedByIt: boolean;
@@ -138,6 +140,7 @@ export interface ISQLOrderByInfo extends ISQLArgInfo {
   nulls: "first" | "last";
   wasIncludedInSearch: boolean;
   wasIncludedInStrSearch: boolean;
+  args: IGQLArgs;
 }
 
 export interface ISQLBtreeIndexableInfo extends ISQLArgInfo {
@@ -328,7 +331,13 @@ export interface IPropertyDefinitionSupportedType<T> {
    * by certain criteria, make it null to specify that this item can't
    * be ordered by, attempts to order by it will give an error
    */
-  sqlOrderBy: (arg: ISQLOrderByInfo) => [string, string, string],
+  sqlOrderBy: (arg: ISQLOrderByInfo) => [string, string, string];
+  /**
+   * similar to sql order by but done against elasticsearch sort
+   * you must return values that are valid for sort as they will
+   * be appended to the array of sort that elasticsearch expects
+   */
+  elasticSort: (arg: ISQLOrderByInfo) => any;
   /**
    * The local order by function that tells a client how to order by it
    * basically this is fed to a sort function the same way sorting would

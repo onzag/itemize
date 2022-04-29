@@ -23,6 +23,10 @@ import {
   buildSQLOrderByForInternalRequiredProperty,
   getElasticSchemaForProperty,
   convertSQLValueToElasticSQLValueForProperty,
+  buildElasticStrSearchQueryForProperty,
+  buildElasticOrderByForProperty,
+  buildElasticOrderByForInternalRequiredProperty,
+  buildElasticQueryForProperty,
 } from "./PropertyDefinition/sql";
 import ItemDefinition from ".";
 import {
@@ -32,12 +36,14 @@ import {
   buildSQLQueryForInclude,
   getElasticSchemaForInclude,
   convertSQLValueToElasticSQLValueForInclude,
+  buildElasticQueryForInclude,
 } from "./Include/sql";
 import { ISQLTableDefinitionType, ISQLSchemaDefinitionType, ISQLTableRowValue, ISQLStreamComposedTableRowValue, ConsumeStreamsFnType, IElasticIndexDefinitionType, IElasticSchemaDefinitionType } from "../../sql";
 import { IGQLValue, IGQLRequestFields, IGQLArgs } from "../../../../gql-querier";
 import StorageProvider from "../../../../server/services/base/StorageProvider";
 import { WhereBuilder } from "../../../../database/WhereBuilder";
 import { OrderByBuilder } from "../../../../database/OrderByBuilder";
+import type { ElasticQueryBuilder } from "../../../../server/elastic";
 
 export function getElasticSchemaForItemDefinition(
   itemDefinition: ItemDefinition,
@@ -47,8 +53,8 @@ export function getElasticSchemaForItemDefinition(
   const qualifiedName = itemDefinition.getQualifiedPathName();
   const resultSchema: IElasticSchemaDefinitionType = {
     [qualifiedName]: {
-      properties: {...moduleIndexSchema.properties},
-      runtime: {...moduleIndexSchema.runtime},
+      properties: { ...moduleIndexSchema.properties },
+      runtime: { ...moduleIndexSchema.runtime },
     },
   }
 
@@ -268,10 +274,10 @@ export function convertSQLValueToGQLValueForItemDefinition(
   // with the row data, this basically also gives graphql value
   // in the key:value format
   itemDefinition.getParentModule().getAllPropExtensions().filter(
-    (property) =>  !graphqlFields ? true : graphqlFields[property.getId()],
+    (property) => !graphqlFields ? true : graphqlFields[property.getId()],
   ).concat(
     itemDefinition.getAllPropertyDefinitions().filter(
-      (property) =>  !graphqlFields ? true : graphqlFields[property.getId()],
+      (property) => !graphqlFields ? true : graphqlFields[property.getId()],
     ),
   ).forEach((pd) => {
     Object.assign(
@@ -282,7 +288,7 @@ export function convertSQLValueToGQLValueForItemDefinition(
 
   // now we do the same for the items
   itemDefinition.getAllIncludes().filter(
-    (include) =>  !graphqlFields ? true : graphqlFields[include.getQualifiedIdentifier()],
+    (include) => !graphqlFields ? true : graphqlFields[include.getQualifiedIdentifier()],
   ).forEach((include) => {
     Object.assign(
       result,
@@ -435,7 +441,7 @@ export function convertGQLValueToSQLValueForItemDefinition(
 
   return {
     value: result,
-    consumeStreams: async (containerId: string) => {
+    consumeStreams: async (containerId: string) => {
       await Promise.all(consumeStreamsFns.map(fn => fn(containerId)));
     }
   };
@@ -559,6 +565,7 @@ export function buildSQLQueryForItemDefinition(
         buildSQLOrderByForInternalRequiredProperty(
           itemDefinition,
           pSet.property,
+          args,
           orderByBuilder,
           pSet.direction,
           pSet.nulls,
@@ -575,6 +582,7 @@ export function buildSQLQueryForItemDefinition(
         itemDefinition,
         null,
         pd,
+        args,
         orderByBuilder,
         pSet.direction,
         pSet.nulls,
@@ -585,4 +593,152 @@ export function buildSQLQueryForItemDefinition(
   }
 
   return addedSelectFields;
+}
+
+/**
+ * Builds a elastic query for an item definition so that it can be
+ * queried for searches
+ * @param serverData the server data
+ * @param itemDefinition the item definition that is being requested (normal form)
+ * @param args the args from the search mode
+ * @param elasticQueryBuilder the where builder instance
+ * @param dictionary the dictionary being used
+ * @param search the search arg value
+ * @param orderBy the order by rules
+ * @returns a list of raw added selected fields
+ */
+export function buildElasticQueryForItemDefinition(
+  serverData: any,
+  itemDefinition: ItemDefinition,
+  args: IGQLArgs,
+  elasticQueryBuilder: ElasticQueryBuilder,
+  language: string,
+  dictionary: string,
+  search: string,
+  orderBy: IOrderByRuleType,
+) {
+  const includedInSearchProperties: string[] = [];
+  const includedInStrSearchProperties: string[] = [];
+
+  // first we need to get all the prop and extensions and build their query
+  itemDefinition.getAllPropertyDefinitionsAndExtensions().forEach((pd) => {
+    if (!pd.isSearchable()) {
+      return;
+    }
+
+    const isOrderedByIt = !!(orderBy && orderBy[pd.getId()]);
+    const wasSearchedBy = buildElasticQueryForProperty(
+      serverData,
+      itemDefinition,
+      null,
+      pd,
+      args,
+      elasticQueryBuilder,
+      language,
+      dictionary,
+      isOrderedByIt,
+    );
+    if (wasSearchedBy) {
+      includedInSearchProperties.push(pd.getId());
+    };
+  });
+
+  // then we ned to add all the includes
+  itemDefinition.getAllIncludes().forEach((include) => {
+    buildElasticQueryForInclude(
+      serverData,
+      itemDefinition,
+      include,
+      args,
+      elasticQueryBuilder,
+      language,
+      dictionary,
+    );
+  });
+
+  if (search) {
+    // because these don't happen in the main, they don't get immediately executed but rather
+    // during the await time
+    elasticQueryBuilder.must((builder) => {
+      itemDefinition.getAllPropertyDefinitionsAndExtensions().forEach((pd) => {
+        if (!pd.isSearchable()) {
+          return;
+        }
+        const isOrderedByIt = !!(orderBy && orderBy[pd.getId()]);
+        builder.should((orBuilder) => {
+          const wasStrSearchedBy = buildElasticStrSearchQueryForProperty(
+            serverData,
+            itemDefinition,
+            null,
+            pd,
+            args,
+            search,
+            orBuilder,
+            language,
+            dictionary,
+            isOrderedByIt,
+          );
+
+          if (wasStrSearchedBy) {
+            includedInStrSearchProperties.push(pd.getId());
+          };
+        });
+      });
+
+      // TODO add includes in the search
+    });
+  }
+
+  const orderByRule: any[] = [
+    {
+      _score: "desc",
+    }
+  ];
+  if (orderBy) {
+    const orderBySorted = Object.keys(orderBy).map((orderByProperty: string) => {
+      return {
+        property: orderByProperty,
+        priority: orderBy[orderByProperty].priority,
+        nulls: orderBy[orderByProperty].nulls,
+        direction: orderBy[orderByProperty].direction,
+      }
+    }).sort((a, b) => a.priority - b.priority);
+
+    orderBySorted.forEach((pSet) => {
+      if (!itemDefinition.hasPropertyDefinitionFor(pSet.property, true)) {
+        const orderRule = buildElasticOrderByForInternalRequiredProperty(
+          itemDefinition,
+          pSet.property,
+          args,
+          pSet.direction,
+          pSet.nulls,
+        );
+        if (orderRule) {
+          orderByRule.push(orderRule);
+        }
+        return;
+      }
+
+      const pd = itemDefinition.getPropertyDefinitionFor(pSet.property, true);
+      const wasIncludedInSearch = includedInSearchProperties.includes(pSet.property);
+      const wasIncludedInStrSearch = includedInStrSearchProperties.includes(pSet.property);
+
+      const orderRule = buildElasticOrderByForProperty(
+        serverData,
+        itemDefinition,
+        null,
+        pd,
+        args,
+        pSet.direction,
+        pSet.nulls,
+        wasIncludedInSearch,
+        wasIncludedInStrSearch,
+      );
+      if (orderRule) {
+        orderByRule.push(orderRule);
+      }
+    });
+  }
+
+  elasticQueryBuilder.sortBy(orderByRule);
 }

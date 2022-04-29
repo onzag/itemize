@@ -75,8 +75,9 @@ export function locationElastic(arg: ISQLArgInfo) {
       },
       [arg.prefix + arg.id + "_GEO"]: {
         type: "geo_point",
-        // null island
-        null_value: [0, 0],
+      },
+      [arg.prefix + arg.id + "_NULL"]: {
+        type: "boolean",
       },
     },
   }
@@ -158,7 +159,8 @@ export function locationSQLElasticIn(arg: ISQLOutInfo) {
     [arg.prefix + arg.id + "_LNG"]: lng,
     [arg.prefix + arg.id + "_TXT"]: arg.row[arg.prefix + arg.id + "_TXT"],
     [arg.prefix + arg.id + "_ATXT"]: arg.row[arg.prefix + arg.id + "_ATXT"],
-    [arg.prefix + arg.id + "_GEO"]: geo
+    [arg.prefix + arg.id + "_GEO"]: geo,
+    [arg.prefix + arg.id + "_NULL"]: geo === null,
   }
 }
 
@@ -219,8 +221,8 @@ export function locationElasticSearch(arg: IElasticSearchInfo): boolean {
 
   if (arg.args[locationName] === null) {
     arg.elasticQueryBuilder.mustTerm({
-      [arg.prefix + arg.id + "_GEO"]: [0, 0],
-    });
+      [arg.prefix + arg.id + "_NULL"]: true,
+    }, arg.boost);
     return true;
   } else if (
     typeof arg.args[locationName] !== "undefined" && arg.args[locationName] !== null &&
@@ -234,13 +236,6 @@ export function locationElasticSearch(arg: IElasticSearchInfo): boolean {
 
     arg.elasticQueryBuilder.must({
       bool: {
-        must_not: [
-          {
-            term: {
-              [arg.prefix + arg.id + "_GEO"]: [0, 0],
-            },
-          },
-        ],
         filter: [
           {
             geo_distance: {
@@ -249,6 +244,8 @@ export function locationElasticSearch(arg: IElasticSearchInfo): boolean {
                 lng,
                 lat,
               ],
+              _name: "_geo_distance_" + arg.prefix + arg.id,
+              boost: arg.boost,
             }
           }
         ]
@@ -269,6 +266,32 @@ export function locationElasticSearch(arg: IElasticSearchInfo): boolean {
 export function locationSQLOrderBy(arg: ISQLOrderByInfo): [string, string, string] {
   if (arg.wasIncludedInSearch) {
     return [arg.prefix + arg.id + "_CALC_RADIUS", arg.direction, arg.nulls];
+  }
+  return null;
+}
+
+/**
+ * Provides the functionality on how to order by
+ * @param arg the order by rule info
+ * @returns the order by rule string array
+ */
+ export function locationElasticOrderBy(arg: ISQLOrderByInfo) {
+  if (arg.wasIncludedInSearch) {
+    const locationName = PropertyDefinitionSearchInterfacesPrefixes.LOCATION + arg.prefix + arg.id;
+    const argAsLocation: IPropertyDefinitionSupportedLocationType = arg.args[locationName] as any;
+    const lng = argAsLocation.lng || 0;
+    const lat = argAsLocation.lat || 0;
+
+    return {
+      ["_geo_distance_" + arg.prefix + arg.id]: {
+        gps: {
+          lat,
+          lon: lng,
+        },
+        order: arg.direction,
+        distance_type: "plane",
+      }
+    }
   }
   return null;
 }

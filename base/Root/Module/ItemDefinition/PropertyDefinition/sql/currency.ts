@@ -207,12 +207,12 @@ export function currencyElasticSearch(arg: IElasticSearchInfo) {
     arg.elasticQueryBuilder.mustTerm({
       [arg.prefix + arg.id + "_CURRENCY"]: exactArg.currency as string,
       [arg.prefix + arg.id + "_VALUE"]: exactArg.value as number,
-    });
+    }, arg.boost);
     searchedByIt = true;
   } else if (arg.args[exactName] === null) {
     arg.elasticQueryBuilder.mustTerm({
       [arg.prefix + arg.id + "_CURRENCY"]: "",
-    });
+    }, arg.boost);
     searchedByIt = true;
   }
 
@@ -253,7 +253,7 @@ export function currencyElasticSearch(arg: IElasticSearchInfo) {
             }
           ]
         }
-      });
+      }, arg.boost);
     }
     if (hasToDefined) {
       const toArg = arg.args[toName] as any as IPropertyDefinitionSupportedCurrencyType;
@@ -288,7 +288,7 @@ export function currencyElasticSearch(arg: IElasticSearchInfo) {
             }
           ]
         }
-      });
+      }, arg.boost);
     }
 
     searchedByIt = true;
@@ -306,6 +306,19 @@ export function currencySQLOrderBy(arg: ISQLOrderByInfo): [string, string, strin
   // we order via the normalized value as a matter of fact
   return [arg.prefix + arg.id + "_NORMALIZED_VALUE", arg.direction, arg.nulls];
 }
+
+/**
+ * The order by functionality for the currency type
+ * @param arg the order by arg
+ * @returns the elastic rule
+ */
+export function currencyElasticOrderBy(arg: ISQLOrderByInfo) {
+  // we order via the normalized value as a matter of fact
+  return {
+    [arg.prefix + arg.id + "_NORMALIZED_VALUE"]: arg.direction
+  }
+}
+
 
 /**
  * The btree indexable used in searches

@@ -14,6 +14,7 @@ import {
   buildSQLQueryForProperty,
   getElasticSchemaForProperty,
   convertSQLValueToElasticSQLValueForProperty,
+  buildElasticQueryForProperty,
 } from "../PropertyDefinition/sql";
 import Include, { IncludeExclusionState } from "../Include";
 import { ISQLTableDefinitionType, ISQLTableRowValue, ISQLStreamComposedTableRowValue, ConsumeStreamsFnType, IElasticIndexDefinitionType } from "../../../sql";
@@ -21,6 +22,7 @@ import ItemDefinition from "..";
 import { IGQLValue, IGQLArgs } from "../../../../../gql-querier";
 import StorageProvider from "../../../../../server/services/base/StorageProvider";
 import { WhereBuilder } from "../../../../../database/WhereBuilder";
+import type { ElasticQueryBuilder } from "../../../../../server/elastic";
 
 export function getElasticSchemaForInclude(itemDefinition: ItemDefinition, include: Include, serverData: any): IElasticIndexDefinitionType {
   // the exclusion state needs to be stored in the table bit
@@ -275,7 +277,7 @@ export function convertGQLValueToSQLValueForInclude(
   // we return that
   return {
     value: result,
-    consumeStreams: async (containerId: string) => {
+    consumeStreams: async (containerId: string) => {
       await Promise.all(consumeStreamsFns.map(fn => fn(containerId)));
     }
   };
@@ -341,6 +343,77 @@ export function buildSQLQueryForInclude(
       if (expectedExclusionState === IncludeExclusionState.ANY) {
         // then we add the excluded state to the subquery
         builder.orWhereColumn(prefix + EXCLUSION_STATE_SUFFIX, IncludeExclusionState.EXCLUDED);
+      }
+    });
+  }
+}
+
+/**
+ * Builds a sql query for an include
+ * @param serverData the server data information
+ * @param itemDefinition the item definition that contains the include
+ * @param include the include in question
+ * @param args the args as they come from the search module, specific for this item (not nested)
+ * @param dictionary the dictionary to use to build the search
+ */
+ export function buildElasticQueryForInclude(
+  serverData: any,
+  itemDefinition: ItemDefinition,
+  include: Include,
+  args: IGQLArgs,
+  elasticQueryBuilder: ElasticQueryBuilder,
+  language: string,
+  dictionary: string,
+) {
+  // we need all these prefixes
+  const prefix = include.getPrefixedQualifiedIdentifier();
+  const exclusionStateQualifiedId = include.getQualifiedExclusionStateIdentifier();
+  const expectedExclusionState = args[exclusionStateQualifiedId];
+
+  // if the expected exclusion state is to be excluded
+  if (expectedExclusionState === IncludeExclusionState.EXCLUDED) {
+    // we tell the connection that is to be the case
+    elasticQueryBuilder.mustTerm({
+      exclusionStateQualifiedId: IncludeExclusionState.EXCLUDED,
+    });
+  } else {
+    // otherwise if we are expecting something else like ANY and INCLUDED
+    elasticQueryBuilder.must((builder) => {
+      // we extract a subquery builder
+      builder.should((secondBuilder) => {
+        // and make a where query for all the properties
+        elasticQueryBuilder.mustTerm({
+          exclusionStateQualifiedId: IncludeExclusionState.INCLUDED,
+        });
+
+        // get the args for that specific include
+        const includeArgs = args[include.getQualifiedIdentifier()] as IGQLArgs;
+
+        // and apply the search for all the sinking properties
+        include.getSinkingProperties().forEach((pd) => {
+          if (!pd.isSearchable()) {
+            return;
+          }
+          buildElasticQueryForProperty(
+            serverData,
+            itemDefinition,
+            include,
+            pd,
+            includeArgs,
+            secondBuilder,
+            language,
+            dictionary,
+            false,
+          );
+        });
+      });
+
+      // if we have an specific exclusion state that can be ANY
+      if (expectedExclusionState === IncludeExclusionState.ANY) {
+        // then we add the excluded state to the subquery
+        elasticQueryBuilder.shouldTerm({
+          exclusionStateQualifiedId: IncludeExclusionState.EXCLUDED,
+        });
       }
     });
   }

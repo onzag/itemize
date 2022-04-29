@@ -418,6 +418,13 @@ export interface IActionSearchOptions extends IActionCleanOptions {
   storeResultsInNavigation?: string;
   waitAndMerge?: boolean;
   progresser?: ProgresserFn;
+  /**
+   * Uses the search engine instead of the standard database level query, provides some limitations
+   * such as that it cannot anymore have offset that are non-zero so traditional pagination
+   * is not feasible
+   */
+  useSearchEngine?: boolean | string;
+
   // TODO implement pile search
   pileSearch?: boolean;
 }
@@ -3897,13 +3904,13 @@ export class ActualItemProvider extends
       cachePolicy: options.cachePolicy || "none",
       createdBy: options.createdBy || null,
       since: options.since || null,
-      orderBy: options.orderBy || {
+      orderBy: options.orderBy || (options.useSearchEngine ? {} :{
         created_at: {
           priority: 0,
           nulls: "last",
           direction: "desc",
         }
-      },
+      }),
       types,
       traditional: !!options.traditional,
       token: this.props.tokenData.token,
@@ -3916,6 +3923,7 @@ export class ActualItemProvider extends
       progresser: options.progresser,
       cacheStoreMetadata: options.cacheMetadata,
       cacheStoreMetadataMismatchAction: options.cacheMetadataMismatchAction,
+      useSearchEngine: options.useSearchEngine,
     }, {
       remoteListener: this.props.remoteListener,
       preventCacheStaleFeeback: preventSearchFeedbackOnPossibleStaleData,

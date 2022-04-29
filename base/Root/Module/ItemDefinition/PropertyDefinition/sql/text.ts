@@ -211,16 +211,22 @@ export function textElasticSearch(arg: IElasticSearchInfo): boolean {
   const isRichText = arg.property.isRichText();
 
   if (typeof arg.args[searchName] !== "undefined" && arg.args[searchName] !== null) {
-    // TODO also must match partial words
-    arg.elasticQueryBuilder.mustMatch({
-      [arg.prefix + arg.id + (isRichText ? "_PLAIN" : "")]: arg.args[searchName],
-    });
+    // TODO also must match partial words 
+    const usePhrase = arg.property.getSpecialProperty("searchUsesMatchPhrase");
+    const matchRule = {
+      [arg.prefix + arg.id + (isRichText ? "_PLAIN" : "")]: arg.args[searchName] as string,
+    };
+    if (usePhrase) {
+      arg.elasticQueryBuilder.mustMatchPhrase(matchRule, arg.boost);
+    } else {
+      arg.elasticQueryBuilder.mustMatch(matchRule, arg.boost);
+    }
 
     return true;
   } else if (arg.args[searchName] === null) {
     arg.elasticQueryBuilder.mustTerm({
       [arg.prefix + arg.id + "_NULL"]: true,
-    });
+    }, arg.boost);
     return true;
   }
 

@@ -119,6 +119,21 @@ const typeValue: IPropertyDefinitionSupportedType<PropertyDefinitionSupportedTex
       type: "boolean",
       required: ["html"],
     },
+
+    // very expensive property allows to build using partial
+    // word matching, eg. if this is a title or short text
+    // "this is a title" it will ensure that the prefixes
+    // will be tokenized so that "th i a ti" also match
+    // but more like it "titl" incomplete words can match
+    // TODO implement https://stackoverflow.com/questions/50478023/query-in-elasticsearch-to-match-part-of-the-word
+    {
+      name: "searchEnablePartialMatching",
+      type: "boolean",
+    },
+    {
+      name: "searchUsesMatchPhrase",
+      type: "boolean",
+    },
   ],
   elastic: textElastic,
   sql: textSQL,
@@ -131,6 +146,7 @@ const typeValue: IPropertyDefinitionSupportedType<PropertyDefinitionSupportedTex
   elasticSearch: textElasticSearch,
   sqlStrSearch: textSQLStrSearch,
   elasticStrSearch: textElasticStrSearch,
+  elasticSort: null,
   sqlBtreeIndexable: textSQLBtreeIndexable,
   sqlMantenience: null,
   localSearch: (arg) => {

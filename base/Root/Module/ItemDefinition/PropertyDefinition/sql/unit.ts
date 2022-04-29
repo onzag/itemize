@@ -178,12 +178,12 @@ export function unitElasticSearch(arg: IElasticSearchInfo) {
     arg.elasticQueryBuilder.mustTerm({
       [arg.prefix + arg.id + "_NORMALIZED_UNIT"]: exactAsUnit.normalizedUnit,
       [arg.prefix + arg.id + "_NORMALIZED_VALUE"]: exactAsUnit.normalizedValue,
-    });
+    }, arg.boost);
     searchedByIt = true;
   } else if (arg.args[exactName] === null) {
     arg.elasticQueryBuilder.mustTerm({
       [arg.prefix + arg.id + "_NORMALIZED_UNIT"]: "",
-    });
+    }, arg.boost);
     searchedByIt = true;
   }
 
@@ -208,12 +208,14 @@ export function unitElasticSearch(arg: IElasticSearchInfo) {
         unitToUse2 = toAsUnit.normalizedUnit;
       }
     }
-    arg.elasticQueryBuilder.mustRange({
-      [arg.prefix + arg.id + "_NORMALIZED_VALUE"]: rule,
-    });
-    arg.elasticQueryBuilder.mustTerm({
-      [arg.prefix + arg.id + "_NORMALIZED_UNIT"]: unitToUse,
-    });
+    arg.elasticQueryBuilder.must({
+      range: {
+        [arg.prefix + arg.id + "_NORMALIZED_VALUE"]: rule,
+      },
+      term: {
+        [arg.prefix + arg.id + "_NORMALIZED_UNIT"]: unitToUse,
+      }
+    }, arg.boost);
     // should fail this is weird
     // two different units somehow, comparing grams to liters? or what
     if (unitToUse2 && unitToUse !== unitToUse2) {
@@ -235,6 +237,18 @@ export function unitElasticSearch(arg: IElasticSearchInfo) {
 export function unitSQLOrderBy(arg: ISQLOrderByInfo): [string, string, string] {
   return [arg.prefix + arg.id + "_NORMALIZED_VALUE", arg.direction, arg.nulls];
 }
+
+/**
+ * Specifies how units are to be ordered by
+ * @param arg the sql order by info arg
+ * @returns the three string order by rule
+ */
+ export function unitElasticOrderBy(arg: ISQLOrderByInfo) {
+  return {
+    [arg.prefix + arg.id + "_NORMALIZED_VALUE"]: arg.direction,
+  }
+}
+
 
 /**
  * Specifies how units are to be btree indexed to accelerate searches

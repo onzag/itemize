@@ -10,6 +10,7 @@ import { convertSQLValueToElasticSQLValueForItemDefinition } from "../base/Root/
 import { DELETED_REGISTRY_IDENTIFIER } from "../constants";
 import { CAN_LOG_DEBUG } from "./environment";
 import { NanoSecondComposedDate } from "../nanodate";
+import { FieldValue, QueryDslMatchPhraseQuery, QueryDslMatchQuery, QueryDslQueryContainer, QueryDslTermQuery, QueryDslTermsQuery, SearchRequest } from "@elastic/elasticsearch/lib/api/types";
 
 interface ILangAnalyzers {
   [key: string]: string;
@@ -1737,11 +1738,274 @@ export class ItemizeElasticClient {
    */
   public async performElasticSelect(
     itemDefinitionOrModule: string | ItemDefinition | Module,
-    selecter: (builder: any) => void,
+    selecter: (builder: ElasticQueryBuilder) => void,
     language?: string,
-  ): Promise<ISQLTableRowValue[]> {
+  ) {
+    const builder = this.getSelectBuilder(itemDefinitionOrModule, language);
+    selecter(builder);
+    return await this.executeQuery(builder);
+  }
+
+  public getSelectBuilder(
+    itemDefinitionOrModule: string | ItemDefinition | Module,
+    language?: string,
+    types?: (string | ItemDefinition)[],
+  ) {
     const idefOrMod = typeof itemDefinitionOrModule === "string" ? this.root.registry[itemDefinitionOrModule] : itemDefinitionOrModule;
-    const indexAsterisk = idefOrMod.getQualifiedPathName() + "_*";
-    return null;
+    let indexToUse: string;
+    if (types && idefOrMod instanceof Module) {
+      // these types should have been checked by the search function already
+      // and so we can assume they are safe
+      indexToUse = types.map((t) => {
+        const v = typeof t === "string" ? this.root.registry[t] as ItemDefinition : t;
+        if (!v.isSearchEngineEnabled()) {
+          return null;
+        }
+        return v.getQualifiedPathName().toLowerCase() + "_" + (language || "*");
+      }).filter((v) => v).join(",");
+    } else if (idefOrMod instanceof ItemDefinition) {
+      indexToUse = idefOrMod.getQualifiedPathName().toLowerCase() + "_" + (language || "*");
+    } else if (language) {
+      indexToUse = idefOrMod.getQualifiedPathName().toLowerCase() + "_*_" + language;
+    } else {
+      indexToUse = idefOrMod.getQualifiedPathName().toLowerCase() + "_*";
+    }
+
+    const builder = new ElasticQueryBuilder({
+      index: indexToUse,
+    });
+
+    return builder;
+  }
+
+  public async executeQuery(elasticQuery: ElasticQueryBuilder) {
+    const response = await this.elasticClient.search<ISQLTableRowValue>(elasticQuery.getRequest());
+    return response;
+  }
+
+  public async executeCountQuery(elasticQuery: ElasticQueryBuilder) {
+    const response = await this.elasticClient.count(elasticQuery.getRequest());
+    return response;
+  }
+}
+
+type SubBuilderFn = (sb: ElasticQueryBuilder) => void;
+
+export class ElasticQueryBuilder {
+  private request: SearchRequest;
+  private children: Array<
+    {
+      type: string;
+      builder: ElasticQueryBuilder;
+    }
+  > = [];
+
+  constructor(request: SearchRequest) {
+    this.request = request;
+    if (!this.request.query) {
+      this.request.query = {};
+    }
+  }
+
+  public getRequest() {
+    if (!this.children.length) {
+      return this.request;
+    }
+
+    const resultRequest = {
+      ...this.request,
+      query: {
+        ...this.request.query,
+      }
+    };
+
+    if (!resultRequest.query.bool) {
+      resultRequest.query.bool = {};
+    }
+
+    this.children.forEach((c) => {
+      const cRequest = c.builder.getRequest();
+
+      if (cRequest.query) {
+        if (!resultRequest.query.bool[c.type]) {
+          resultRequest.query.bool[c.type] = [];
+        }
+        resultRequest.query.bool[c.type].push(cRequest.query);
+      }
+    });
+
+    return resultRequest;
+  }
+
+  private _q(q: QueryDslQueryContainer | SubBuilderFn, boost: number, r: string) {
+    if (typeof q === "function") {
+      const child = new ElasticQueryBuilder({});
+      this.children.push({
+        builder: child,
+        type: r,
+      });
+      return;
+    }
+
+    if (!this.request.query.bool) {
+      this.request.query.bool = {};
+    }
+    if (!this.request.query.bool.must) {
+      this.request.query.bool[r] = [];
+    }
+
+    let queryToUse = q;
+    if (typeof boost === "number") {
+      queryToUse = {
+        bool: {
+          must: q,
+          boost,
+        }
+      }
+    }
+
+    (this.request.query.bool[r] as QueryDslQueryContainer[]).push(queryToUse);
+  }
+
+  public must(q: QueryDslQueryContainer | SubBuilderFn, boost?: number) {
+    this._q(q, boost, "must");
+  }
+
+  public mustNot(q: QueryDslQueryContainer | SubBuilderFn, boost?: number) {
+    this._q(q, boost, "must_not");
+  }
+
+  public should(q: QueryDslQueryContainer | SubBuilderFn, boost?: number) {
+    this._q(q, boost, "should");
+  }
+
+  public shouldNot(q: QueryDslQueryContainer | SubBuilderFn, boost?: number) {
+    this._q(q, boost, "should_not");
+  }
+
+  public mustTerm(termRule: Partial<Record<string, QueryDslTermQuery | FieldValue>>, boost?: number) {
+    const query: QueryDslQueryContainer = {
+      term: termRule,
+    };
+
+    this.must(query, boost);
+  }
+
+  public mustNotTerm(termRule: Partial<Record<string, QueryDslTermQuery | FieldValue>>, boost?: number) {
+    const query: QueryDslQueryContainer = {
+      term: termRule,
+    };
+    this.mustNot(query, boost);
+  }
+
+  public mustTerms(termsRule: QueryDslTermsQuery, boost?: number) {
+    const query: QueryDslQueryContainer = {
+      terms: termsRule,
+    };
+    this.must(query, boost);
+  }
+
+  public mustNotTerms(termsRule: QueryDslTermsQuery, boost?: number) {
+    const query: QueryDslQueryContainer = {
+      terms: termsRule,
+    };
+    this.mustNot(query, boost);
+  }
+
+  public mustMatch(matchRule: Partial<Record<string, string | number | boolean | QueryDslMatchQuery>>, boost?: number) {
+    const query: QueryDslQueryContainer = {
+      match: matchRule,
+    };
+    this.must(query, boost);
+  }
+
+  public mustNotMatch(matchRule: Partial<Record<string, string | number | boolean | QueryDslMatchQuery>>, boost?: number) {
+    const query: QueryDslQueryContainer = {
+      match: matchRule,
+    };
+    this.mustNot(query, boost);
+  }
+
+  public mustMatchPhrase(matchRule: Partial<Record<string, string | QueryDslMatchPhraseQuery>>, boost?: number) {
+    const query: QueryDslQueryContainer = {
+      match_phrase: matchRule,
+    };
+    this.must(query, boost);
+  }
+
+  public mustNotMatchPhrase(matchRule: Partial<Record<string, string | QueryDslMatchPhraseQuery>>, boost?: number) {
+    const query: QueryDslQueryContainer = {
+      match_phrase: matchRule,
+    };
+    this.mustNot(query, boost);
+  }
+
+  public shouldTerm(termRule: Partial<Record<string, QueryDslTermQuery | FieldValue>>, boost?: number) {
+    const query: QueryDslQueryContainer = {
+      term: termRule,
+    };
+
+    this.should(query, boost);
+  }
+
+  public shouldNotTerm(termRule: Partial<Record<string, QueryDslTermQuery | FieldValue>>, boost?: number) {
+    const query: QueryDslQueryContainer = {
+      term: termRule,
+    };
+    this.shouldNot(query, boost);
+  }
+
+  public shouldTerms(termsRule: QueryDslTermsQuery, boost?: number) {
+    const query: QueryDslQueryContainer = {
+      terms: termsRule,
+    };
+    this.should(query, boost);
+  }
+
+  public shouldNotTerms(termsRule: QueryDslTermsQuery, boost?: number) {
+    const query: QueryDslQueryContainer = {
+      terms: termsRule,
+    };
+    this.shouldNot(query, boost);
+  }
+
+  public shouldMatch(matchRule: Partial<Record<string, string | number | boolean | QueryDslMatchQuery>>, boost?: number) {
+    const query: QueryDslQueryContainer = {
+      match: matchRule,
+    };
+    this.should(query, boost);
+  }
+
+  public shouldNotMatch(matchRule: Partial<Record<string, string | number | boolean | QueryDslMatchQuery>>, boost?: number) {
+    const query: QueryDslQueryContainer = {
+      match: matchRule,
+    };
+    this.shouldNot(query, boost);
+  }
+
+  public shouldMatchPhrase(matchRule: Partial<Record<string, string | QueryDslMatchPhraseQuery>>, boost?: number) {
+    const query: QueryDslQueryContainer = {
+      match_phrase: matchRule,
+    };
+    this.should(query, boost);
+  }
+
+  public shouldNotMatchPhrase(matchRule: Partial<Record<string, string | QueryDslMatchPhraseQuery>>, boost?: number) {
+    const query: QueryDslQueryContainer = {
+      match_phrase: matchRule,
+    };
+    this.shouldNot(query, boost);
+  }
+
+  public setSourceIncludes(list: string[]) {
+    this.request._source = list;
+  }
+
+  public sortBy(v: any) {
+    this.request.sort = v;
+  }
+
+  public setSize(size: number) {
+    this.request.size = size;
   }
 }

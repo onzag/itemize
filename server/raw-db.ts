@@ -989,7 +989,7 @@ export class ItemizeRawDB {
   ): Promise<ISQLTableRowValue[]> {
     const builder = this._retrieveRawDBSelect(itemDefinitionOrModule, selecter, preventJoin);
 
-    return await this.databaseConnection.queryRows(builder);
+    return (await this.databaseConnection.queryRows(builder)).map(convertVersionsIntoNullsWhenNecessary);
   }
 
   /**

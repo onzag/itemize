@@ -18,6 +18,10 @@ import {
   buildSQLOrderByForInternalRequiredProperty,
   getElasticSchemaForProperty,
   convertSQLValueToElasticSQLValueForProperty,
+  buildElasticStrSearchQueryForProperty,
+  buildElasticQueryForProperty,
+  buildElasticOrderByForInternalRequiredProperty,
+  buildElasticOrderByForProperty,
 } from "./ItemDefinition/PropertyDefinition/sql";
 import { getElasticSchemaForItemDefinition, getSQLTablesSchemaForItemDefinition } from "./ItemDefinition/sql";
 import { ISQLTableDefinitionType, ISQLSchemaDefinitionType, ISQLTableRowValue, ISQLStreamComposedTableRowValue, ConsumeStreamsFnType, IElasticSchemaDefinitionType } from "../sql";
@@ -25,6 +29,7 @@ import { IGQLRequestFields, IGQLValue, IGQLArgs } from "../../../gql-querier";
 import StorageProvider from "../../../server/services/base/StorageProvider";
 import { WhereBuilder } from "../../../database/WhereBuilder";
 import { OrderByBuilder } from "../../../database/OrderByBuilder";
+import type { ElasticQueryBuilder } from "../../../server/elastic";
 
 export function getElasticSchemaForModule(mod: Module, serverData: any): IElasticSchemaDefinitionType {
   const resultSchema: IElasticSchemaDefinitionType = {};
@@ -440,6 +445,7 @@ export function buildSQLQueryForModule(
         buildSQLOrderByForInternalRequiredProperty(
           null,
           pSet.property,
+          args,
           orderByBuilder,
           pSet.direction,
           pSet.nulls,
@@ -456,6 +462,7 @@ export function buildSQLQueryForModule(
         null,
         null,
         pd,
+        args,
         orderByBuilder,
         pSet.direction,
         pSet.nulls,
@@ -466,4 +473,113 @@ export function buildSQLQueryForModule(
   }
 
   return addedSelectFields;
+}
+
+/**
+ * Builds a sql query specific for this module to search
+ * within itself in the database
+ * @param serverData the server data
+ * @param mod the module in question
+ * @param args the args for the query from graphql
+ * @param elasticQueryBuilder the where builder
+ * @param dictionary the dictionary used
+ * @param search the search
+ * @param orderBy the order by rule
+ */
+ export function buildElasticQueryForModule(
+  serverData: any,
+  mod: Module,
+  args: IGQLArgs,
+  elasticQueryBuilder: ElasticQueryBuilder,
+  language: string,
+  dictionary: string,
+  search: string,
+  orderBy: IOrderByRuleType,
+) {
+  const includedInSearchProperties: string[] = [];
+  const includedInStrSearchProperties: string[] = [];
+
+  mod.getAllPropExtensions().forEach((pd) => {
+    if (!pd.isSearchable()) {
+      return;
+    }
+
+    const isOrderedByIt = !!(orderBy && orderBy[pd.getId()]);
+    const wasSearchedBy = buildElasticQueryForProperty(serverData, null, null, pd, args, elasticQueryBuilder, language, dictionary, isOrderedByIt);
+    if (wasSearchedBy) {
+      includedInSearchProperties.push(pd.getId());
+    };
+  });
+
+  if (search) {
+    elasticQueryBuilder.must((builder) => {
+      mod.getAllPropExtensions().forEach((pd) => {
+        if (!pd.isSearchable()) {
+          return;
+        }
+        const isOrderedByIt = !!(orderBy && orderBy[pd.getId()]);
+        builder.should((orBuilder) => {
+          const wasStrSearchedBy = buildElasticStrSearchQueryForProperty(
+            serverData, null, null, pd, args, search, orBuilder, language, dictionary, isOrderedByIt,
+          );
+          if (wasStrSearchedBy) {
+            includedInStrSearchProperties.push(pd.getId());
+          };
+        });
+      });
+    });
+  }
+
+  const orderByRule: any[] = [
+    {
+      _score: "desc",
+    }
+  ];
+  if (orderBy) {
+    const orderBySorted = Object.keys(orderBy).map((orderByProperty: string) => {
+      return {
+        property: orderByProperty,
+        priority: orderBy[orderByProperty].priority,
+        nulls: orderBy[orderByProperty].nulls,
+        direction: orderBy[orderByProperty].direction,
+      }
+    }).sort((a, b) => a.priority - b.priority);
+
+    orderBySorted.forEach((pSet) => {
+      if (!mod.hasPropExtensionFor(pSet.property)) {
+        const orderRule = buildElasticOrderByForInternalRequiredProperty(
+          null,
+          pSet.property,
+          args,
+          pSet.direction,
+          pSet.nulls,
+        );
+        if (orderRule) {
+          orderByRule.push(orderRule);
+        }
+        return;
+      }
+
+      const pd = mod.getPropExtensionFor(pSet.property);
+      const wasIncludedInSearch = includedInSearchProperties.includes(pSet.property);
+      const wasIncludedInStrSearch = includedInStrSearchProperties.includes(pSet.property);
+
+      const orderRule = buildElasticOrderByForProperty(
+        serverData,
+        null,
+        null,
+        pd,
+        args,
+        pSet.direction,
+        pSet.nulls,
+        wasIncludedInSearch,
+        wasIncludedInStrSearch,
+      );
+      if (orderRule) {
+        orderByRule.push(orderRule);
+      }
+    });
+  }
+
+  elasticQueryBuilder.sortBy(orderByRule);
 }

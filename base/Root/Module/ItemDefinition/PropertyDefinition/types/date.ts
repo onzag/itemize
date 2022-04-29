@@ -18,6 +18,7 @@ import {
   standardSQLElasticInFn,
   getStandardElasticForWithNullField,
   standardElasticSearchFnWithNullFieldExactAndRange,
+  standardElasticOrderBy,
 } from "../sql";
 import {
   standardSQLSSCacheEqualFn, standardLocalEqual,
@@ -64,6 +65,7 @@ const typeValue: IPropertyDefinitionSupportedType<PropertyDefinitionSupportedDat
   elasticStrSearch: null,
   localStrSearch: null,
   sqlOrderBy: standardSQLOrderBy,
+  elasticSort: standardElasticOrderBy,
   localOrderBy: (arg) => {
     if (arg.a === null && arg.b === null) {
       return 0;

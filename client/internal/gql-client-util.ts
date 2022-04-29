@@ -1247,6 +1247,7 @@ interface ISearchQueryArg {
   token: string;
   language: string;
   versionFilter?: string;
+  useSearchEngine?: boolean | string;
 }
 
 interface IRunSearchQueryArg extends ISearchQueryArg {
@@ -1295,6 +1296,13 @@ export function getSearchArgsFor(
 
   if (arg.types) {
     searchArgs.types = arg.types;
+  }
+
+  if (arg.useSearchEngine) {
+    searchArgs.searchengine = true;
+    if (typeof arg.useSearchEngine === "string") {
+      searchArgs.searchengine_language = arg.useSearchEngine;
+    }
   }
 
   if (arg.parentedBy) {

@@ -923,6 +923,9 @@ export const RESERVED_BASE_PROPERTIES_ELASTIC: IElasticIndexDefinitionType = {
     },
     version: {
       type: "keyword",
+      // this is an invalid id in the itemize structure as the ? is not a valid
+      // character which allows us to use it as null
+      null_value: "?NULL",
     },
     type: {
       type: "keyword",
@@ -932,6 +935,9 @@ export const RESERVED_BASE_PROPERTIES_ELASTIC: IElasticIndexDefinitionType = {
     },
     parent_version: {
       type: "keyword",
+      // this is an invalid id in the itemize structure as the ? is not a valid
+      // character which allows us to use it as null
+      null_value: "?NULL",
     },
     parent_type: {
       type: "keyword",
@@ -974,6 +980,9 @@ export const RESERVED_BASE_PROPERTIES_ELASTIC: IElasticIndexDefinitionType = {
     },
     blocked_by: {
       type: "keyword",
+      // this is an invalid id in the itemize structure as the ? is not a valid
+      // character which allows us to use it as null
+      null_value: "?NULL",
     },
     blocked_reason: {
       type: "keyword",
@@ -1267,6 +1276,15 @@ export const RESERVED_IDEF_SEARCH_PROPERTIES = (orderByRule: any) => ({
     type: GraphQLString,
     description: "A search string, searches within the prop extensions and the prop extensions only",
   },
+  searchengine: {
+    type: GraphQLBoolean,
+    description: "Wether to use the search engine instead of searching from database records (results can be differ)",
+  },
+  searchengine_language: {
+    type: GraphQLString,
+    description: "A ISO code for a language to use to limit the search engine indexes against " +
+    "for example if you are sure you only want english results that have been indexed in english, then pass en here",
+  }
 });
 
 /**

@@ -24,6 +24,7 @@ import Module from "../../..";
 import StorageProvider from "../../../../../../server/services/base/StorageProvider";
 import { WhereBuilder } from "../../../../../../database/WhereBuilder";
 import { OrderByBuilder } from "../../../../../../database/OrderByBuilder";
+import type { ElasticQueryBuilder } from "../../../../../../server/elastic";
 
 /**
  * Provides the sql function that defines the schema that is used to build
@@ -126,6 +127,12 @@ export function getStandardElasticForWithNullField(
  */
 export function standardSQLOrderBy(arg: ISQLOrderByInfo) {
   return [arg.prefix + arg.id, arg.direction, arg.nulls] as [string, string, string];
+}
+
+export function standardElasticOrderBy(arg: ISQLOrderByInfo) {
+  return {
+    [arg.prefix + arg.id]: arg.direction,
+  }
 }
 
 /**
@@ -259,17 +266,17 @@ function internalElasticSeachFn(arg: IElasticSearchInfo, nullFieldValue: string,
   if (typeof arg.args[exactName] !== "undefined" && arg.args[exactName] !== null) {
     arg.elasticQueryBuilder.mustTerm({
       [arg.prefix + arg.id]: arg.args[exactName] as any,
-    });
+    }, arg.boost);
     searchedByIt = true;
   } else if (arg.args[exactName] === null) {
     if (!nullStyle) {
       arg.elasticQueryBuilder.mustTerm({
         [arg.prefix + arg.id]: nullFieldValue,
-      });
+      }, arg.boost);
     } else {
       arg.elasticQueryBuilder.mustTerm({
         [arg.prefix + arg.id + "_NULL"]: true,
-      });
+      }, arg.boost);
     }
     searchedByIt = true;
   }
@@ -302,21 +309,16 @@ function internalElasticSeachFn(arg: IElasticSearchInfo, nullFieldValue: string,
                 [arg.prefix + arg.id]: nullFieldValue,
               }
             }
-          ]
+          ],
+          boost: arg.boost,
         }
       });
     } else {
       arg.elasticQueryBuilder.must({
-        bool: {
-          must: [
-            {
-              range: {
-                [arg.prefix + arg.id]: rule,
-              },
-            }
-          ],
-        }
-      });
+        range: {
+          [arg.prefix + arg.id]: rule,
+        },
+      }, arg.boost);
     }
 
     searchedByIt = true;
@@ -654,6 +656,47 @@ export function buildSQLQueryForProperty(
 }
 
 /**
+ * Builds a sql search query from a given property definition, the data
+ * coming from the search module, a sql prefix to use
+ * @param serverData the server data
+ * @param itemDefinition the item definition that contains the property
+ * @param include the include within the item definition, or null
+ * @param propertyDefinition the property definition in question
+ * @param args the args coming from the search module in such format
+ * @param elasticQueryBuilder the elastic building instance
+ * @param dictionary the dictionary that is being used
+ * @param isOrderedByIt whether there will be a subsequent order by request
+ */
+ export function buildElasticQueryForProperty(
+  serverData: any,
+  itemDefinition: ItemDefinition,
+  include: Include,
+  propertyDefinition: PropertyDefinition,
+  args: IGQLArgs,
+  elasticQueryBuilder: ElasticQueryBuilder,
+  language: string,
+  dictionary: string,
+  isOrderedByIt: boolean,
+) {
+  const searchFn = propertyDefinition.getPropertyDefinitionDescription().elasticSearch;
+  if (searchFn) {
+    return searchFn({
+      serverData,
+      itemDefinition,
+      args,
+      prefix: include ? include.getPrefixedQualifiedIdentifier() : "",
+      id: propertyDefinition.getId(),
+      elasticQueryBuilder,
+      language,
+      dictionary,
+      isOrderedByIt,
+      property: propertyDefinition,
+      boost: propertyDefinition.getSearchBoost(),
+    });
+  }
+}
+
+/**
  * Builds a sql str FTS search query from a given property definition, the data
  * coming from the search module, a sql prefix to use, and the builder
  * @param serverData the server data
@@ -697,6 +740,52 @@ export function buildSQLStrSearchQueryForProperty(
   return false;
 }
 
+/**
+ * Builds a sql str FTS search query from a given property definition, the data
+ * coming from the search module, a sql prefix to use, and the builder
+ * @param serverData the server data
+ * @param itemDefinition the item definition that contains the property
+ * @param include the include within the item definition, or null
+ * @param propertyDefinition the property definition in question
+ * @param args the args coming from the search module in such format
+ * @param search the search string that is being used
+ * @param elasticQueryBuilder the building instance
+ * @param dictionary the dictionary that is being used
+ * @param isOrderedByIt whether there will be a subsequent order by request
+ */
+ export function buildElasticStrSearchQueryForProperty(
+  serverData: any,
+  itemDefinition: ItemDefinition,
+  include: Include,
+  propertyDefinition: PropertyDefinition,
+  args: IGQLArgs,
+  search: string,
+  elasticQueryBuilder: ElasticQueryBuilder,
+  language: string,
+  dictionary: string,
+  isOrderedByIt: boolean,
+) {
+  const searchFn = propertyDefinition.getPropertyDefinitionDescription().elasticStrSearch;
+  if (searchFn) {
+    return searchFn({
+      serverData,
+      itemDefinition,
+      search,
+      prefix: include ? include.getPrefixedQualifiedIdentifier() : "",
+      id: propertyDefinition.getId(),
+      elasticQueryBuilder,
+      language,
+      dictionary,
+      isOrderedByIt,
+      property: propertyDefinition,
+      boost: propertyDefinition.getSearchBoost(),
+    });
+  }
+
+  return false;
+}
+
+
 // Just in case to avoid sql injection
 // if for some reason the gql security is taken
 // remember that the direction variable, and nulls, comes directly
@@ -727,6 +816,7 @@ export function buildSQLOrderByForProperty(
   itemDefinition: ItemDefinition,
   include: Include,
   propertyDefinition: PropertyDefinition,
+  args: IGQLArgs,
   orderByBuilder: OrderByBuilder,
   direction: "asc" | "desc",
   nulls: "first" | "last",
@@ -749,6 +839,7 @@ export function buildSQLOrderByForProperty(
       nulls,
       wasIncludedInSearch,
       wasIncludedInStrSearch,
+      args,
     });
 
     // if we have a result at all
@@ -763,6 +854,53 @@ export function buildSQLOrderByForProperty(
 }
 
 /**
+ * Builds an order by query for a given property
+ * @param serverData the server data that is being used
+ * @param itemDefinition the item definition in question
+ * @param include the include (or null)
+ * @param propertyDefinition the property in question
+ * @param direction the direction to be accounted for
+ * @param nulls the nulls (first or last)
+ * @param wasIncludedInSearch whether this property was included in search
+ * @param wasIncludedInStrSearch whether this property was included in the str FTS search
+ */
+ export function buildElasticOrderByForProperty(
+  serverData: any,
+  itemDefinition: ItemDefinition,
+  include: Include,
+  propertyDefinition: PropertyDefinition,
+  args: IGQLArgs,
+  direction: "asc" | "desc",
+  nulls: "first" | "last",
+  wasIncludedInSearch: boolean,
+  wasIncludedInStrSearch: boolean,
+) {
+  // first we need to check whether there's even a sql order by function
+  const elasticSort = propertyDefinition.getPropertyDefinitionDescription().elasticSort;
+  // if we have one
+  if (elasticSort) {
+    // we call it
+    const result = elasticSort({
+      serverData,
+      itemDefinition,
+      include,
+      property: propertyDefinition,
+      id: propertyDefinition.getId(),
+      prefix: include ? include.getPrefixedQualifiedIdentifier() : "",
+      direction,
+      nulls,
+      wasIncludedInSearch,
+      wasIncludedInStrSearch,
+      args,
+    });
+
+    return result || null;
+  }
+
+  return null;
+}
+
+/**
  * Builds the order by functionality for the internal properties, such as
  * created_at, edited_at, etc...
  * @param itemDefinition the item definition
@@ -774,6 +912,7 @@ export function buildSQLOrderByForProperty(
 export function buildSQLOrderByForInternalRequiredProperty(
   itemDefinition: ItemDefinition,
   which: string,
+  args: IGQLArgs,
   orderByBuilder: OrderByBuilder,
   direction: "asc" | "desc",
   nulls: "first" | "last",
@@ -790,6 +929,7 @@ export function buildSQLOrderByForInternalRequiredProperty(
     wasIncludedInSearch: null,
     wasIncludedInStrSearch: null,
     serverData: null,
+    args,
   });
 
   // if we have a result, we add it (we should have one, but who knows)
@@ -800,4 +940,37 @@ export function buildSQLOrderByForInternalRequiredProperty(
       actualNulls[result[2].toLowerCase()] || "LAST",
     );
   }
+}
+
+/**
+ * Builds the order by functionality for the internal properties, such as
+ * created_at, edited_at, etc...
+ * @param itemDefinition the item definition
+ * @param which basically the column name
+ * @param direction the direction of the order by rule
+ * @param nulls whether nulls are first or last
+ */
+ export function buildElasticOrderByForInternalRequiredProperty(
+  itemDefinition: ItemDefinition,
+  which: string,
+  args: IGQLArgs,
+  direction: "asc" | "desc",
+  nulls: "first" | "last",
+) {
+  // so we call our standard function
+  const result = standardElasticOrderBy({
+    prefix: "",
+    id: which,
+    property: null,
+    include: null,
+    itemDefinition,
+    direction,
+    nulls,
+    wasIncludedInSearch: null,
+    wasIncludedInStrSearch: null,
+    serverData: null,
+    args,
+  });
+
+  return result || null;
 }

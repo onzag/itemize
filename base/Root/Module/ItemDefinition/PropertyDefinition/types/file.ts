@@ -64,6 +64,7 @@ const typeValue: IPropertyDefinitionSupportedType<PropertyDefinitionSupportedFil
   elasticStrSearch: null,
   localStrSearch: null,
   sqlOrderBy: null,
+  elasticSort: null,
   localOrderBy: null,
   localSearch: () => {
     throw new Error("Attempted to search within a file locally");

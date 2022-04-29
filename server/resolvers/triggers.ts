@@ -4,6 +4,7 @@ import { IAppDataType } from "..";
 import Module from "../../base/Root/Module";
 import { WhereBuilder } from "../../database/WhereBuilder";
 import { ISQLTableRowValue } from "../../base/Root/sql";
+import type { ElasticQueryBuilder } from "../elastic";
 
 export enum IOTriggerActions {
   CREATE,
@@ -136,8 +137,8 @@ export interface ISearchTriggerArgType {
   /**
    * The dictionary that was obtained from the language
    */
-   dictionary: string;
-   language: string;
+  dictionary: string;
+  language: string;
   appData: IAppDataType;
   itemDefinition: ItemDefinition;
   module: Module;
@@ -147,7 +148,9 @@ export interface ISearchTriggerArgType {
     id: string;
     customData: any;
   };
+  usesElastic: boolean;
   whereBuilder: WhereBuilder;
+  elasticQueryBuilder: ElasticQueryBuilder;
   forbid: (message: string, customCode?: string) => void;
 }
 

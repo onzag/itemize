@@ -145,15 +145,15 @@ export function stringElasticSearch(arg: IElasticSearchInfo): boolean {
     if (value === null) {
       arg.elasticQueryBuilder.mustTerm({
         [arg.prefix + arg.id + "_NULL"]: true,
-      });
+      }, arg.boost);
     } else if (exactStringSearchSubtypes.includes(arg.property.getSubtype())) {
       arg.elasticQueryBuilder.mustTerm({
         [arg.prefix + arg.id]: value,
-      });
+      }, arg.boost);
     }  else {
       arg.elasticQueryBuilder.mustMatch({
         [arg.prefix + arg.id]: value,
-      });
+      }, arg.boost);
     }
     return true;
   }
@@ -163,7 +163,7 @@ export function stringElasticSearch(arg: IElasticSearchInfo): boolean {
     const tagCompareCheck = arg.args[inName] as string[];
     arg.elasticQueryBuilder.mustTerms({
       [arg.prefix + arg.id]: tagCompareCheck
-    });
+    }, arg.boost);
     return true;
   }
 

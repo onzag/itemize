@@ -71,13 +71,13 @@ export function tagListElasticSearch(arg: IElasticSearchInfo): boolean {
     arg.elasticQueryBuilder.mustTerms({
       [arg.prefix + arg.id]: tagCompareCheck,
       minimum_should_match : tagCompareCheck.length,
-    });
+    }, arg.boost);
 
     return true;
   } else if (arg.args[searchName] === null) {
     arg.elasticQueryBuilder.mustTerm({
       [arg.prefix + arg.id + "_NULL"]: true,
-    });
+    }, arg.boost);
     return true;
   }
 

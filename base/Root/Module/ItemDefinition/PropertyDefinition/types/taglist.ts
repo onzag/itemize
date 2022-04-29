@@ -62,6 +62,7 @@ const typeValue: IPropertyDefinitionSupportedType<PropertyDefinitionSupportedTag
   elasticStrSearch: null,
   localStrSearch: null,
   sqlOrderBy: null,
+  elasticSort: null,
   localOrderBy: null,
   supportedSubtypes: ["arbitrary-tags"],
 

@@ -348,7 +348,7 @@ export function paymentElasticSearch(arg: IElasticSearchInfo) {
   }
 
   if (Object.keys(mustRule).length > 0) {
-    arg.elasticQueryBuilder.must(mustRule);
+    arg.elasticQueryBuilder.must(mustRule, arg.boost);
   }
 
   // now we return if we have been searched by it at the end
