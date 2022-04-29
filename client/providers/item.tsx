@@ -1600,7 +1600,8 @@ export class ActualItemProvider extends
       !equals(nextProps.longTermCachingMetadata, this.props.longTermCachingMetadata, { strict: true }) ||
       !equals(nextProps.setters, this.props.setters, { strict: true }) ||
       nextProps.location !== this.props.location ||
-      !equals(nextProps.injectedParentContext, this.props.injectedParentContext, { strict: true });
+      !equals(nextProps.injectedParentContext, this.props.injectedParentContext, { strict: true }) ||
+      !equals(nextProps.highlights, this.props.highlights);
   }
   public async componentDidUpdate(
     prevProps: IActualItemProviderProps,

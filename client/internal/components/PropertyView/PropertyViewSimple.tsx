@@ -48,6 +48,7 @@ export class PropertyViewSimple extends React.Component<IPropertyViewHandlerProp
       nextProps.capitalize !== this.props.capitalize ||
       !!this.props.rtl !== !!nextProps.rtl ||
       this.props.language !== nextProps.language ||
+      nextProps.highlights !== this.props.highlights ||
       !deepRendererArgsComparer(this.props.rendererArgs, nextProps.rendererArgs);
   }
   public render() {

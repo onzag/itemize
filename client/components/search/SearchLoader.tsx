@@ -306,9 +306,7 @@ class ActualSearchLoader extends React.Component<IActualSearchLoaderProps, IActu
     // if this is a cache policy thing, then producing new highlights will simply
     // destroy the cache policy mechanism, rendering it useless
     // otherwise we check if we have anything to create highlights from
-    const canProduceNewHighlights = !this.props.searchShouldCache &&
-      this.props.searchEngineHighlightArgs !== null &&
-      Object.keys(this.props.searchEngineHighlightArgs).length !== 0;
+    const canProduceNewHighlights = this.canProduceHighlights();
     
     // if we do
     let willProduceNewHighlights = canProduceNewHighlights;
@@ -325,6 +323,11 @@ class ActualSearchLoader extends React.Component<IActualSearchLoaderProps, IActu
     }
 
     return willProduceNewHighlights;
+  }
+  public canProduceHighlights() {
+    return !this.props.searchShouldCache &&
+      this.props.searchEngineHighlightArgs !== null &&
+      Object.keys(this.props.searchEngineHighlightArgs).length !== 0;
   }
   public componentDidUpdate(prevProps: IActualSearchLoaderProps) {
     // on update we must seek what the current page is to
@@ -529,6 +532,7 @@ class ActualSearchLoader extends React.Component<IActualSearchLoaderProps, IActu
         currentSearchResultsFromTheRecords,
         currentSearchRecords,
         foundIndexes,
+        this.canProduceHighlights(),
         willProduceNewHighlights,
       );
     }
@@ -541,6 +545,7 @@ class ActualSearchLoader extends React.Component<IActualSearchLoaderProps, IActu
     currentSearchResultsFromTheRecords: IGQLValue[],
     currentSearchRecords: IGQLSearchRecord[],
     foundIndexes: boolean[],
+    canProduceHighlights: boolean,
     willProduceNewHighlights: boolean,
   ) {
     // We are done with this since all that follows is async and cannot be executed
@@ -763,6 +768,12 @@ class ActualSearchLoader extends React.Component<IActualSearchLoaderProps, IActu
           ...this.state.retrievedHighlights,
           ...newHighlights,
         };
+        // we remove all highlights if we are not supposed to be capable of producing any
+        // this can happen if we remove all highlighting criteria but there's old highlight data
+        // around that we try to merge, but it makes no sense because we aren't supposed to have any
+        if (!canProduceHighlights) {
+          finalState.retrievedHighlights = {};
+        }
 
         // and we loop into them
         (gqlValue.data[getListQueryName].results as IGQLValue[]).forEach((value, index) => {
@@ -837,10 +848,18 @@ class ActualSearchLoader extends React.Component<IActualSearchLoaderProps, IActu
       }
       // otherwise if there's nothing left from the uncached
       // results and we had everything cached, then no error, and nothing being searched
-      this.setState({
-        error: null,
-        currentlySearching: [],
-      });
+      if (!canProduceHighlights) {
+        this.setState({
+          error: null,
+          currentlySearching: [],
+          retrievedHighlights: {},
+        });
+      } else {
+        this.setState({
+          error: null,
+          currentlySearching: [],
+        });
+      }
     }
   }
   public shouldComponentUpdate(nextProps: IActualSearchLoaderProps, nextState: IActualSearchLoaderState) {

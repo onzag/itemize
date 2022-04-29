@@ -392,6 +392,7 @@ export default class PropertyViewReference
       language: this.props.language,
       currentValue,
       capitalize: !!this.props.capitalize,
+      isRichText: false,
     };
 
     return <RendererElement {...rendererArgs}/>

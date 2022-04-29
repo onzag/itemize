@@ -48,6 +48,7 @@ export default class PropertyViewText extends React.Component<IPropertyViewHandl
       nextProps.forId !== this.props.forId ||
       nextProps.forVersion !== this.props.forVersion ||
       !!this.props.rtl !== !!nextProps.rtl ||
+      nextProps.highlights !== this.props.highlights ||
       !deepRendererArgsComparer(this.props.rendererArgs, nextProps.rendererArgs);
   }
   public render() {
