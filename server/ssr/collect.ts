@@ -261,11 +261,15 @@ export class Collector {
         }
       } catch (err) {
         logger.error(
-          "ssrGenerator [SERIOUS]: Collection of resource at " + finalPath + " failed due to error in custom resolver",
           {
-            errStack: err.stack,
-            errMessage: err.message,
-            path: finalPath,
+            className: "Collector",
+            methodName: "collectResource",
+            message: "Collection of resource at " + finalPath + " failed due to error in custom resolver",
+            serious: true,
+            err,
+            data: {
+              path: finalPath,
+            },
           }
         )
 
@@ -312,11 +316,15 @@ export class Collector {
         }
       } catch (err) {
         logger.error(
-          "ssrGenerator [SERIOUS]: Collection of resource at " + finalPath + " failed due to missing file or unreadable",
           {
-            errStack: err.stack,
-            errMessage: err.message,
-            path: finalPath,
+            className: "Collector",
+            methodName: "collectResource",
+            message: "Collection of resource at " + finalPath + " failed due to missing file or unreadable",
+            serious: true,
+            err,
+            data: {
+              path: finalPath,
+            },
           }
         );
 
@@ -567,16 +575,18 @@ export class Collector {
         this.forbiddenSignature.push(mergedID + "[FORBIDDEN]");
       } else {
         logger.error(
-          "ssrGenerator [SERIOUS]: Search collection failed due to request not passing",
           {
-            errStack: err.stack,
-            errMessage: err.message,
+            className: "Collector",
+            methodName: "collectSearch",
+            message: "Search collection failed due to request not passing",
+            serious: true,
+            err,
           }
         )
-  
+
         // reject all these will also cause rendering to crash as the bottom line
         this.collectionRequestsRejectedCbs[mergedID].forEach((r) => r());
-  
+
         // this is bad our collection failed, this will cause the rendering to crash
         // and it will fallback to no SSR
         throw err;
@@ -642,10 +652,12 @@ export class Collector {
       rowValue = await this.appData.cache.requestValue(idef, id, version);
     } catch (err) {
       logger.error(
-        "ssrGenerator [SERIOUS]: Collection failed due to request not passing",
         {
-          errStack: err.stack,
-          errMessage: err.message,
+          className: "Collector",
+          methodName: "collect",
+          message: "Collection failed due to request not passing",
+          serious: true,
+          err,
         }
       )
 

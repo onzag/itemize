@@ -14,7 +14,7 @@ export const customUserTriggers: ITriggerRegistry = {
         const hasEvalidated = arg.itemDefinition.hasPropertyDefinitionFor("e_validated", false);
         const hasPhone = arg.itemDefinition.hasPropertyDefinitionFor("phone", false);
         const hasPValidated = arg.itemDefinition.hasPropertyDefinitionFor("p_validated", false);
-        
+
         // check for sessionId changes in order to trigger a whole kick
         // event
         if (
@@ -84,8 +84,13 @@ export const customUserTriggers: ITriggerRegistry = {
                 ],
               );
             } catch (err) {
-              logger.error("customUserTriggers [SERIOUS]: Failed to execute SQL query to check " +
-                "if email had been taken for email " + newEmail + " this caused the whole user not to be able to update/create");
+              logger.error({
+                functionName: "customUserTriggers",
+                message: "Failed to execute SQL query to check " +
+                  "if email had been taken for email " + newEmail + " this caused the whole user not to be able to update/create",
+                serious: true,
+                err,
+              });
               throw err;
             }
 
@@ -140,8 +145,13 @@ export const customUserTriggers: ITriggerRegistry = {
                 ],
               );
             } catch (err) {
-              logger.error("customUserTriggers [SERIOUS]: Failed to execute SQL query to check " +
-                "if phone had been taken for phone " + newPhone + " this caused the whole user not to be able to update/create");
+              logger.error({
+                functionName: "customUserTriggers",
+                message: "Failed to execute SQL query to check " +
+                  "if phone had been taken for phone " + newPhone + " this caused the whole user not to be able to update/create",
+                serious: true,
+                err,
+              });
               throw err;
             }
 

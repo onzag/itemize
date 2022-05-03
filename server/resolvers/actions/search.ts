@@ -67,7 +67,10 @@ export async function searchModule(
   traditional?: boolean,
 ) {
   CAN_LOG_DEBUG && logger.debug(
-    "searchModule: executed search for " + mod.getQualifiedPathName(),
+    {
+      functionName: "searchModule",
+      message: "Executed search for " + mod.getQualifiedPathName(),
+    },
   );
 
   const usesElastic = resolverArgs.args.searchengine === true;
@@ -111,11 +114,6 @@ export async function searchModule(
     }
   });
 
-  CAN_LOG_DEBUG && logger.debug(
-    "searchModule: retrieved search fields as",
-    searchingFields,
-  );
-
   const created_by = resolverArgs.args.created_by;
   let ownerToCheckAgainst = UNSPECIFIED_OWNER;
   if (created_by) {
@@ -126,7 +124,10 @@ export async function searchModule(
   // yes they are not being directly read but they can
   // be brute forced this way, and we are paranoid as hell
   CAN_LOG_DEBUG && logger.debug(
-    "searchModule: checking read role access based on " + searchModeCounterpart.getQualifiedPathName(),
+    {
+      functionName: "searchModule",
+      message: "Checking read role access based on " + searchModeCounterpart.getQualifiedPathName(),
+    },
   );
 
   const ownerId = resolverArgs.args.created_by || null;
@@ -223,10 +224,6 @@ export async function searchModule(
         requestedFieldsInMod[arg] = requestedFields[arg];
       }
     });
-    CAN_LOG_DEBUG && logger.debug(
-      "searchModule: Extracted requested fields from module",
-      fieldsToRequestRawValue,
-    );
 
     await mod.checkRoleAccessFor(
       ItemDefinitionIOActions.READ,
@@ -601,7 +598,10 @@ export async function searchModule(
     }
 
     CAN_LOG_DEBUG && logger.debug(
-      "searchModule: succeed traditionally",
+      {
+        functionName: "searchModule",
+        message: "Succeed traditionally",
+      },
     );
 
     return finalResult;
@@ -615,7 +615,10 @@ export async function searchModule(
     };
 
     CAN_LOG_DEBUG && logger.debug(
-      "searchModule: succeed with records",
+      {
+        functionName: "searchModule",
+        message: "Succeed with records",
+      },
     );
 
     return finalResult;
@@ -659,10 +662,11 @@ export async function searchItemDefinition(
     pooledRoot = await appData.rootPool.acquire().promise;
   } catch (err) {
     logger.error(
-      "addItemDefinition [SERIOUS]: Failed to retrieve root from the pool",
       {
-        errMessage: err.message,
-        errStack: err.stack,
+        functionName: "searchItemDefinition",
+        message: "Failed to retrieve root from the pool",
+        serious: true,
+        err,
       },
     );
     throw new EndpointError({
@@ -675,7 +679,10 @@ export async function searchItemDefinition(
   const itemDefinition = pooledRoot.registry[resolverItemDefinition.getQualifiedPathName()] as ItemDefinition;
 
   CAN_LOG_DEBUG && logger.debug(
-    "searchItemDefinition: executed search for " + itemDefinition.getQualifiedPathName(),
+    {
+      functionName: "searchItemDefinition",
+      message: "Executed search for " + itemDefinition.getQualifiedPathName(),
+    },
   );
 
   const since = retrieveSince(resolverArgs.args);
@@ -709,11 +716,6 @@ export async function searchItemDefinition(
       searchingFields[arg] = resolverArgs.args[arg];
     }
   });
-
-  CAN_LOG_DEBUG && logger.debug(
-    "searchItemDefinition: retrieved search fields as",
-    searchingFields,
-  );
 
   const ownerId = resolverArgs.args.created_by || null;
   const rolesManager = new CustomRoleManager(appData.customRoles, {
@@ -756,7 +758,10 @@ export async function searchItemDefinition(
   // until he matches the phone number, this is a leak, a weak one
   // but a leak nevertheless, we are so paranoid we prevent this
   CAN_LOG_DEBUG && logger.debug(
-    "searchItemDefinition: checking role access based on " + searchModeCounterpart.getQualifiedPathName(),
+    {
+      functionName: "searchItemDefinition",
+      message: "Checking role access based on " + searchModeCounterpart.getQualifiedPathName(),
+    },
   );
   await searchModeCounterpart.checkRoleAccessFor(
     ItemDefinitionIOActions.READ,
@@ -798,10 +803,6 @@ export async function searchItemDefinition(
         requestedFieldsInIdef[arg] = requestedFields[arg];
       }
     });
-    CAN_LOG_DEBUG && logger.debug(
-      "searchItemDefinition: Extracted requested fields from module",
-      fieldsToRequestRawValue,
-    );
 
     sqlFieldsToRequest = [];
     fieldsToRequestRawValue.forEach((v) => {
@@ -1200,7 +1201,10 @@ export async function searchItemDefinition(
     }
 
     CAN_LOG_DEBUG && logger.debug(
-      "searchItemDefinition: succeed traditionally",
+      {
+        functionName: "searchItemDefinition",
+        message: "Succeed traditionally",
+      },
     );
 
     pooledRoot.cleanState();
@@ -1216,7 +1220,10 @@ export async function searchItemDefinition(
     };
 
     CAN_LOG_DEBUG && logger.debug(
-      "searchItemDefinition: succeed with records",
+      {
+        functionName: "searchItemDefinition",
+        message: "Succeed with records",
+      },
     );
 
     pooledRoot.cleanState();

@@ -7,8 +7,12 @@ export class FakeMailService extends MailProvider<null> {
   }
   public async sendEmail(data: ISendEmailData) {
     this.logInfo(
-      "FakeMailService.sendEmail: Fake email being sent",
-      data,
+      {
+        className: "FakeMailService",
+        methodName: "sendEmail",
+        message: "Fake email being sent",
+        data,
+      },
     );
   }
 }

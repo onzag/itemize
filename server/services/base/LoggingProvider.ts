@@ -13,6 +13,7 @@ import fs from "fs";
 import { INSTANCE_LOG_FILE, INSTANCE_LOG_ERROR_FILE, NODE_ENV } from "../../../server/environment";
 import { IConfigRawJSONDataType, IDBConfigRawJSONDataType, IRedisConfigRawJSONDataType, ISensitiveConfigRawJSONDataType } from "../../../config";
 import { RegistryService } from "../registry";
+import { IItemizeFinalLoggingObject } from "../../logger";
 
 export interface ILogsRecord {
   data: any;
@@ -62,27 +63,42 @@ export default class LoggingProvider<T> extends ServiceProvider<T> {
     this.fallbackErrorStream.once("open", this.onStreamReady.bind(this, "error"));
   }
 
-  public logDebug(str: string, extra?: any): void {
+  public logDebug(): void {
     // prevent infinite loops
     return;
   }
 
-  public logError(str: string, extra?: any): void {
+  public logError(): void {
     // prevent infinite loops
     return;
   }
 
-  public logInfo(str: string, extra?: any): void {
+  public logInfo(): void {
     // prevent infinite loops
     return;
   }
 
-  public async logToFallback(err: Error, instanceId: string, level: "info" | "error", data: any) {
+  public static logDebug(): void {
+    // prevent infinite loops
+    return;
+  }
+
+  public static logError(): void {
+    // prevent infinite loops
+    return;
+  }
+
+  public static logInfo(): void {
+    // prevent infinite loops
+    return;
+  }
+
+  public async logToFallback(err: Error, instanceId: string, level: "info" | "error", data: IItemizeFinalLoggingObject) {
     const streamSource: WriteStream = level === "info" ? this.fallbackInfoStream : this.fallbackErrorStream;
     const streamReady = level === "info" ? this.infoStreamReady : this.errorStreamReady;
 
-    data.fallbackErrorStack = err.stack;
-    data.fallbackErrorMessage = err.message;
+    (data as any).fallbackErrorStack = err.stack;
+    (data as any).fallbackErrorMessage = err.message;
 
     if (NODE_ENV === "development") {
       console.error(
@@ -116,7 +132,7 @@ export default class LoggingProvider<T> extends ServiceProvider<T> {
     }
   }
 
-  private storeFallbackLog(stream: WriteStream, data: any) {
+  private storeFallbackLog(stream: WriteStream, data: IItemizeFinalLoggingObject) {
     stream.write(JSON.stringify(data) + "\n");
   }
 
@@ -132,7 +148,7 @@ export default class LoggingProvider<T> extends ServiceProvider<T> {
    * @param data 
    * @override
    */
-  public async log(instanceId: string, level: "info" | "error", data: any) {
+  public async log(instanceId: string, level: "info" | "error", data: IItemizeFinalLoggingObject) {
 
   }
 

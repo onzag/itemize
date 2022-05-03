@@ -7,7 +7,6 @@
  * @module
  */
 
-import { logger } from "../../logger";
 import ItemDefinition from "../../../base/Root/Module/ItemDefinition";
 import PropertyDefinition from "../../../base/Root/Module/ItemDefinition/PropertyDefinition";
 import { ISQLTableRowValue } from "../../../base/Root/sql";
@@ -76,13 +75,17 @@ export default class PhoneProvider<T> extends ServiceProvider<T> {
 
     // if for some reson we have none to send to
     if (arg.to === null || (Array.isArray(arg.to) && arg.to.length === 0)) {
-      logger && logger.warn(
-        "MailProvider.sendUnverifiedTemplateSMS: Attempted to send a SMS without recepient",
+      this.logError(
         {
-          itemDefinition: actualItemDefinition.getQualifiedPathName(),
-          id: arg.id,
-          version: arg.version,
-        },
+          className: "MailProvider",
+          methodName: "sendUnverifiedTemplateSMS",
+          message: "Attempted to send a SMS without recepient",
+          data: {
+            itemDefinition: actualItemDefinition.getQualifiedPathName(),
+            id: arg.id,
+            version: arg.version,
+          },
+        }
       );
       return;
     }
@@ -111,7 +114,7 @@ export default class PhoneProvider<T> extends ServiceProvider<T> {
                 version: arg.version || "",
               });
             })
-          )[0] || null;
+          )[0] || null;
 
         // if not found and we have a version, what we assume is a language
         // we fallback to the unversioned
@@ -126,7 +129,7 @@ export default class PhoneProvider<T> extends ServiceProvider<T> {
                   version: "",
                 });
               })
-            )[0] || null;
+            )[0] || null;
         }
 
         // now we need the property value
@@ -142,13 +145,17 @@ export default class PhoneProvider<T> extends ServiceProvider<T> {
         }
       } catch (err) {
         this.logError(
-          "MailProvider.sendUnverifiedTemplateEmail [SERIOUS]: failed to retrieve item definition",
           {
-            errMessage: err.message,
-            errStack: err.stack,
-            itemDefinition: actualItemDefinition.getQualifiedPathName(),
-            id: arg.id,
-            version: arg.version,
+            className: "MailProvider",
+            methodName: "sendUnverifiedTemplateEmail",
+            message: "Failed to retrieve item definition",
+            serious: true,
+            err,
+            data: {
+              itemDefinition: actualItemDefinition.getQualifiedPathName(),
+              id: arg.id,
+              version: arg.version,
+            },
           },
         );
         throw err;
@@ -177,11 +184,15 @@ export default class PhoneProvider<T> extends ServiceProvider<T> {
       await this.sendSMS(args);
     } catch (err) {
       this.logError(
-        "MailProvider.sendUnverifiedTemplateSMS [SERIOUS]: API failed to deliver a SMS",
         {
-          errMessage: err.message,
-          errStack: err.stack,
-          args,
+          className: "MailProvider",
+          methodName: "sendUnverifiedTemplateSMS",
+          message: "API failed to deliver a SMS",
+          serious: true,
+          err,
+          data: {
+            args,
+          },
         },
       );
       throw err;
@@ -236,11 +247,16 @@ export default class PhoneProvider<T> extends ServiceProvider<T> {
     // and we expect the user item definition to have it
     if (!userIdef.hasPropertyDefinitionFor(phonePropertyUsed, true)) {
       this.logError(
-        "MailProvider.sendTemplateEmail [SERIOUS]: there is no " + phonePropertyUsed + " property in the item definition for user",
         {
-          itemDefinition: typeof arg.itemDefinition === "string" ? arg.itemDefinition : arg.itemDefinition.getQualifiedPathName(),
-          id: arg.id,
-          version: arg.version,
+          className: "MailProvider",
+          methodName: "sendTemplateEmail",
+          message: "There is no " + phonePropertyUsed + " property in the item definition for user",
+          serious: true,
+          data: {
+            itemDefinition: typeof arg.itemDefinition === "string" ? arg.itemDefinition : arg.itemDefinition.getQualifiedPathName(),
+            id: arg.id,
+            version: arg.version,
+          },
         },
       );
       throw new Error("There is no " + phonePropertyUsed + " property in the item definition for user");
@@ -249,11 +265,16 @@ export default class PhoneProvider<T> extends ServiceProvider<T> {
     // we need to check the subscribe property too
     if (arg.subscribeProperty && !userIdef.hasPropertyDefinitionFor(arg.subscribeProperty, true)) {
       this.logError(
-        "MailProvider.sendTemplateEmail [SERIOUS]: there is no " + arg.subscribeProperty + " property in the item definition for user",
         {
-          itemDefinition: typeof arg.itemDefinition === "string" ? arg.itemDefinition : arg.itemDefinition.getQualifiedPathName(),
-          id: arg.id,
-          version: arg.version,
+          className: "MailProvider",
+          methodName: "sendTemplateEmail",
+          message: "There is no " + arg.subscribeProperty + " property in the item definition for user",
+          serious: true,
+          data: {
+            itemDefinition: typeof arg.itemDefinition === "string" ? arg.itemDefinition : arg.itemDefinition.getQualifiedPathName(),
+            id: arg.id,
+            version: arg.version,
+          },
         },
       );
       throw new Error("There is no " + arg.subscribeProperty + " property in the item definition for user");
@@ -298,7 +319,7 @@ export default class PhoneProvider<T> extends ServiceProvider<T> {
                 });
               }
             )
-          )[0] || null;
+          )[0] || null;
       }
 
       // if there's no value, there's no user,
@@ -420,8 +441,13 @@ export default class PhoneProvider<T> extends ServiceProvider<T> {
    */
   public async sendSMS(data: ISendSMSData): Promise<void> {
     this.logError(
-      "MailProvider.sendEmail [SERIOUS]: Attempted to send an sms with a raw provider, there's no API available to complete this action",
-      data,
+      {
+        className: "MailProvider",
+        methodName: "sendEmail",
+        message: "Attempted to send an sms with a raw provider; there's no API available to complete this action",
+        serious: true,
+        data,
+      },
     );
   }
 }

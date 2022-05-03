@@ -210,9 +210,13 @@ export class ItemizeRawDB {
     return !!(row && requiredProperties.every((p) => {
       if (typeof row[p] === "undefined") {
         logger && logger.error(
-          "ItemizeRawDB.checkRowValidityForInformingChanges: row data is invalid as it misses property " + p,
           {
-            row,
+            className: "ItemizeRawDB",
+            methodName: "checkRowValidityForInformingChanges",
+            message: "row data is invalid as it misses property " + p,
+            data: {
+              row
+            },
           }
         );
         return false;

@@ -7,7 +7,7 @@ import type { DatabaseConnection } from "../../database";
 
 import { ItemizeRawDB } from "../raw-db";
 import { IAppDataType } from "..";
-import { logger } from "../logger";
+import { IItemizeLoggingErrorStructure, IItemizeLoggingStructure, logger } from "../logger";
 import express from "express";
 import { IConfigRawJSONDataType, IDBConfigRawJSONDataType, IRedisConfigRawJSONDataType } from "../../config";
 import { ISensitiveConfigRawJSONDataType } from "../../config";
@@ -89,28 +89,28 @@ export class ServiceProvider<T> {
     return this.localInstance;
   }
 
-  public logInfo(str: string, extra?: any) {
-    logger && logger.info(str, extra);
+  public logInfo<T>(data: IItemizeLoggingStructure<T>) {
+    logger && logger.info(data);
   }
 
-  public logDebug(str: string, extra?: any) {
-    CAN_LOG_DEBUG && logger && logger.info(str, extra);
+  public logDebug<T>(data: IItemizeLoggingStructure<T>) {
+    CAN_LOG_DEBUG && logger && logger.info(data);
   }
 
-  public logError(str: string, extra?: any) {
-    logger && logger.error(str, extra);
+  public logError<T>(data: IItemizeLoggingErrorStructure<T>) {
+    logger && logger.error(data);
   }
 
-  public static logInfo(str: string, extra?: any) {
-    logger && logger.info(str, extra);
+  public static logInfo<T>(data: IItemizeLoggingStructure<T>) {
+    logger && logger.info(data);
   }
 
-  public static logDebug(str: string, extra?: any) {
-    CAN_LOG_DEBUG && logger && logger.info(str, extra);
+  public static logDebug<T>(data: IItemizeLoggingStructure<T>) {
+    CAN_LOG_DEBUG && logger && logger.info(data);
   }
 
-  public static logError(str: string, extra?: any) {
-    logger && logger.error(str, extra);
+  public static logError<T>(data: IItemizeLoggingErrorStructure<T>) {
+    logger && logger.error(data);
   }
 
   public expressRouter(options?: express.RouterOptions) {
@@ -176,11 +176,15 @@ export class ServiceProvider<T> {
           await this.run();
         } catch (err) {
           logger.error(
-            "ServiceManager.run [SERIOUS]: a service crashed during running " + this.constructor.name,
             {
-              errStack: err.stack,
-              errMessage: err.message,
-              config: this.config,
+              className: "ServiceManager",
+              methodName: "run",
+              message: "A service crashed during running " + this.constructor.name,
+              serious: true,
+              err,
+              data: {
+                config: this.config,
+              },
             }
           );
         }
@@ -197,9 +201,14 @@ export class ServiceProvider<T> {
 
         if (timeUntilItNeedsToRun <= 0) {
           logger.error(
-            "ServiceManager.run [SERIOUS]: a service took so long to run " + this.constructor.name,
             {
-              timeUntilItNeedsToRun,
+              className: "ServiceManager",
+              methodName: "run",
+              message: "A service took so long to run " + this.constructor.name,
+              serious: true,
+              data: {
+                timeUntilItNeedsToRun,
+              },
             }
           );
         } else {

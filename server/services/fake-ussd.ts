@@ -1,4 +1,3 @@
-import { logger } from "../../server/logger";
 import { IAppDataType } from "../../server";
 import USSDProvider from "./base/USSDProvider";
 
@@ -127,18 +126,24 @@ export class FakeUSSDService extends USSDProvider<null> {
         try {
           await this.endSession(req.params.phone);
         } catch (err) {
-          logger.error("fake-ussd [SERIOUS]: Could not end USSD session", {
-            errMessage: err.message,
-            errStack: err.stack,
+          this.logError({
+            className: "FakeUSSDService",
+            endpoint: "ussd/" + req.params.phone,
+            message: "Could not end USSD session",
+            serious: true,
+            err,
           });
         }
       } else if (this.hasSession(req.params.phone)) {
         try {
           rs = (await this.continueSession(req.params.phone, country, language, currency, input)).message;
         } catch (err) {
-          logger.error("fake-ussd [SERIOUS]: Could not return USSD response", {
-            errMessage: err.message,
-            errStack: err.stack,
+          this.logError({
+            className: "FakeUSSDService",
+            endpoint: "ussd/" + req.params.phone,
+            message: "Could not return USSD response",
+            serious: true,
+            err,
           });
           status = 500;
           rs = (this.localAppData.root.getI18nDataFor(language) || this.localAppData.root.getI18nDataFor("en")).error.INTERNAL_SERVER_ERROR;
@@ -147,10 +152,14 @@ export class FakeUSSDService extends USSDProvider<null> {
         try {
           rs = (await this.startSession(req.params.phone, country, language, currency)).message;
         } catch (err) {
-          logger.error("fake-ussd [SERIOUS]: Could not return USSD response", {
-            errMessage: err.message,
-            errStack: err.stack,
+          this.logError({
+            className: "FakeUSSDService",
+            endpoint: "ussd/" + req.params.phone,
+            message: "Could not return USSD response",
+            serious: true,
+            err,
           });
+
           status = 500;
           rs = (this.localAppData.root.getI18nDataFor(language) || this.localAppData.root.getI18nDataFor("en")).error.INTERNAL_SERVER_ERROR;
         }

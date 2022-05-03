@@ -11,7 +11,7 @@ import fs from "fs";
 import Root, { IRootRawJSONDataType, ILangLocalesType } from "../base/Root";
 import { IGQLQueryFieldsDefinitionType } from "../base/Root/gql";
 import { types } from "pg";
-import { SERVER_DATA_IDENTIFIER, CACHED_CURRENCY_RESPONSE, PING_DATA_IDENTIFIER } from "../constants";
+import { SERVER_DATA_IDENTIFIER, CACHED_CURRENCY_RESPONSE, PING_DATA_IDENTIFIER, PING_STATUS_IDENTIFIER } from "../constants";
 import PropertyDefinition from "../base/Root/Module/ItemDefinition/PropertyDefinition";
 import { serverSideIndexChecker } from "../base/Root/Module/ItemDefinition/PropertyDefinition/server-checkers";
 import { Listener } from "./listener";
@@ -20,7 +20,6 @@ import { ICustomTokensType } from "./custom-graphql";
 import { IConfigRawJSONDataType, ISensitiveConfigRawJSONDataType, IDBConfigRawJSONDataType, IRedisConfigRawJSONDataType } from "../config";
 import { ITriggerRegistry, mergeTriggerRegistries } from "./resolvers/triggers";
 import { customUserTriggers } from "./user/triggers";
-import type winston from "winston";
 
 import build from "../dbbuilder";
 import { GlobalManager } from "./global-manager";
@@ -39,7 +38,6 @@ import { MailgunService } from "./services/mailgun";
 import { HereMapsService } from "./services/here";
 import { CurrencyLayerService } from "./services/currency-layer";
 import { FakeMailService } from "./services/fake-mail";
-import { PgLoggerService } from "./services/pg-logger";
 import { ServiceProvider, IServiceProviderClassType, ServiceProviderType } from "./services";
 import LocationSearchProvider from "./services/base/LocationSearchProvider";
 import MailProvider from "./services/base/MailProvider";
@@ -54,7 +52,7 @@ import { ItemizeRawDB } from "./raw-db";
 import CurrencyFactorsProvider from "./services/base/CurrencyFactorsProvider";
 import { DatabaseConnection } from "../database";
 import PaymentProvider from "./services/base/PaymentProvider";
-import { extendLoggerWith, logger } from "./logger";
+import { extendLoggerWith, ILoggerType, logger } from "./logger";
 import { ManualPaymentService } from "./services/manual-payment";
 import { TwilioService } from "./services/twilio";
 import { FakeSMSService } from "./services/fake-sms";
@@ -198,7 +196,7 @@ export interface IAppDataType {
   triggers: ITriggerRegistry;
   storage: IStorageProvidersObject;
   customUserTokenQuery: any;
-  logger: winston.Logger;
+  logger: ILoggerType;
   mailService: MailProvider<any>;
   phoneService: PhoneProvider<any>;
   paymentService: PaymentProvider<any>;
@@ -282,7 +280,11 @@ export async function getStorageProviders(
     let prefix = config.containersHostnamePrefixes[sensitiveConfig.localContainer];
     if (!prefix) {
       logger && logger.error(
-        "initializeServer [SERIOUS]: Could not find prefix for local container '" + sensitiveConfig.localContainer + "'",
+        {
+          functionName: "initializeServer",
+          message: "Could not find prefix for local container '" + sensitiveConfig.localContainer + "'",
+          serious: true,
+        },
       );
       throw new Error("Could not find prefix for local container " + sensitiveConfig.localContainer);
     }
@@ -308,7 +310,11 @@ export async function getStorageProviders(
       let prefix = config.containersHostnamePrefixes[containerIdX];
       if (!prefix) {
         logger && logger.error(
-          "initializeServer [SERIOUS]: Could not find prefix for container in '" + containerIdX + "'",
+          {
+            functionName: "initializeServer",
+            message: "Could not find prefix for container in '" + containerIdX + "'",
+            serious: true,
+          },
         );
         throw new Error("Could not find prefix for container in " + containerIdX);
       }
@@ -366,7 +372,10 @@ export async function initializeServer(
   // now we try to read the basic configuration
   try {
     logger.info(
-      "initializeServer: reading configuration data"
+      {
+        functionName: "initializeServer",
+        message: "Reading configuration data",
+      },
     );
 
     // first let's read all the configurations
@@ -421,15 +430,15 @@ export async function initializeServer(
     };
 
     const LoggingServiceClass = (serviceCustom && serviceCustom.loggingServiceProvider) || (
-      dbConfig.elastic ? ElasticLoggerService : PgLoggerService
+      dbConfig.elastic ? ElasticLoggerService : null
     );
-    const loggingService: LoggingProvider<any> = new LoggingServiceClass(
+    const loggingService: LoggingProvider<any> = LoggingServiceClass ? new LoggingServiceClass(
       sensitiveConfig.logging,
       null,
       configsObj,
-    ) as any;
-    await loggingService.initialize();
-    extendLoggerWith(loggingService);
+    ) as any : null;
+    loggingService && await loggingService.initialize();
+    loggingService && extendLoggerWith(loggingService);
 
     // redis configuration despite instructions actually tries to use null
     // values as it checks for undefined so we need to strip these if null
@@ -450,7 +459,10 @@ export async function initializeServer(
     });
 
     logger.info(
-      "initializeServer: using docker " + USING_DOCKER,
+      {
+        functionName: "initializeServer",
+        message: "Using docker " + USING_DOCKER,
+      },
     );
     // We change the hosts depending to whether we are using docker or not
     // and if our hosts are set to the local
@@ -472,11 +484,17 @@ export async function initializeServer(
     // this shouldn't be necessary but we do it anyway
     buildnumber = buildnumber.replace("\n", "").trim();
     logger.info(
-      "initializeServer: buildnumber is " + buildnumber,
+      {
+        functionName: "initializeServer",
+        message: "Buildnumber is " + buildnumber,
+      },
     );
 
     logger.info(
-      "initializeServer: INSTANCE_MODE is " + INSTANCE_MODE,
+      {
+        functionName: "initializeServer",
+        message: "INSTANCE_MODE is " + INSTANCE_MODE,
+      },
     );
 
     // now we create the pub sub clients or only the pub client
@@ -485,9 +503,12 @@ export async function initializeServer(
     // needs to inform of new server data, absolute mode will also do
     // this
     logger.info(
-      INSTANCE_MODE === "GLOBAL_MANAGER" ?
-        "initializeServer: initializing redis global pub client" :
-        "initializeServer: initializing redis global pub/sub client",
+      {
+        functionName: "initializeServer",
+        message: INSTANCE_MODE === "GLOBAL_MANAGER" ?
+          "initializeServer: initializing redis global pub client" :
+          "initializeServer: initializing redis global pub/sub client"
+      },
     );
     const redisPub: ItemizeRedisClient = await setupRedisClient("pub", redisConfig.pubSub);
     const redisSub: ItemizeRedisClient = await setupRedisClient("sub", redisConfig.pubSub);
@@ -497,7 +518,10 @@ export async function initializeServer(
     // the local redis
     if (INSTANCE_MODE !== "GLOBAL_MANAGER") {
       logger.info(
-        "initializeServer: initializing local redis pub/sub client",
+        {
+          functionName: "initializeServer",
+          message: "Initializing local redis pub/sub client",
+        },
       );
     }
     const redisLocalPub: ItemizeRedisClient = INSTANCE_MODE === "GLOBAL_MANAGER" ? null : await setupRedisClient("local pub", redisConfig.cache);
@@ -506,7 +530,10 @@ export async function initializeServer(
     // same for this, for the cache, as the cache is the same that is used for local pub/sub
     if (INSTANCE_MODE !== "GLOBAL_MANAGER") {
       logger.info(
-        "initializeServer: initializing redis cache client",
+        {
+          functionName: "initializeServer",
+          message: "Initializing redis cache client",
+        },
       );
     }
     const redisClient: ItemizeRedisClient =
@@ -520,11 +547,17 @@ export async function initializeServer(
           if (INSTANCE_MODE === "CLUSTER_MANAGER" || INSTANCE_MODE === "ABSOLUTE") {
             if (!isReconnect) {
               logger.info(
-                "initializeServer: server initialized in cluster manager/absolute mode flushing redis",
+                {
+                  functionName: "initializeServer",
+                  message: "Server initialized in cluster manager/absolute mode flushing redis",
+                },
               );
             } else {
               logger.info(
-                "initializeServer: server re-initialized in cluster manager/absolute mode flushing redis",
+                {
+                  functionName: "initializeServer",
+                  message: "Server re-initialized in cluster manager/absolute mode flushing redis",
+                },
               );
             }
 
@@ -534,16 +567,12 @@ export async function initializeServer(
             // from the currency factors, and so we flush all
             const serverDataStr = await client.get(SERVER_DATA_IDENTIFIER) || null;
             const currencyFactorsCachedResponseRestore = await client.get(CACHED_CURRENCY_RESPONSE) || null;
-            const pingInfo = await client.getAllStoredPings(PING_DATA_IDENTIFIER);
             await client.flushall();
             if (serverDataStr) {
               await client.set(SERVER_DATA_IDENTIFIER, serverDataStr);
             }
             if (currencyFactorsCachedResponseRestore) {
               await client.set(CACHED_CURRENCY_RESPONSE, currencyFactorsCachedResponseRestore);
-            }
-            if (pingInfo.length) {
-              await client.restorePings(pingInfo);
             }
           }
         });
@@ -552,38 +581,21 @@ export async function initializeServer(
 
     if (INSTANCE_MODE !== "CLEAN_SITEMAPS" && INSTANCE_MODE !== "CLEAN_STORAGE") {
       logger.info(
-        "initializeServer: initializing redis global cache client",
+        {
+          functionName: "initializeServer",
+          message: "Initializing redis global cache client",
+        },
       );
       redisGlobalClient = await setupRedisClient("global", redisConfig.global);
-
-      const envInfo = buildEnvironmentInfo(
-        buildnumber,
-        redisConfig,
-        dbConfig,
-      );
-
-      redisGlobalClient.createPing({
-        tkey: PING_DATA_IDENTIFIER,
-        dataKey: INSTANCE_UUID,
-        data: envInfo,
-        statusRetriever: () => {
-          return {
-            cpuUsage: process.cpuUsage(),
-            memoryUsage: process.memoryUsage(),
-          }
-        }
-      });
-
-      // will this even run?... it notifies redis that it died
-      process.on("exit", () => {
-        redisGlobalClient.stopPinging();
-      });
     }
 
     const domain = NODE_ENV === "production" ? config.productionHostname : config.developmentHostname;
 
     logger.info(
-      "initializeServer: initializing itemize server root",
+      {
+        functionName: "initializeServer",
+        message: "Initializing itemize server root",
+      },
     );
     const root = new Root(build);
 
@@ -649,7 +661,10 @@ export async function initializeServer(
     };
 
     logger.info(
-      "initializeServer: setting up database connection to " + dbConfig.host,
+      {
+        functionName: "initializeServer",
+        message: "Setting up database connection to " + dbConfig.host,
+      },
     );
     const databaseConnection = new DatabaseConnection(dbConnectionConfig);
     const rawDB = new ItemizeRawDB(
@@ -660,7 +675,10 @@ export async function initializeServer(
 
     if (dbConfig.elastic) {
       logger.info(
-        "initializeServer: setting up elastic connection",
+        {
+          functionName: "initializeServer",
+          message: "Setting up elastic connection",
+        },
       );
     }
     const elasticConnection = dbConfig.elastic ? new Client(dbConfig.elastic) : null;
@@ -671,8 +689,31 @@ export async function initializeServer(
       dbConfig.elasticLangAnalyzers,
     ) : null;
 
+    if (elastic) {
+      const envInfo = buildEnvironmentInfo(
+        buildnumber,
+        redisConfig,
+        dbConfig,
+      );
+
+      elastic.createPing({
+        data: envInfo,
+        dataIndex: PING_DATA_IDENTIFIER,
+        statusIndex: PING_STATUS_IDENTIFIER,
+        statusRetriever: () => {
+          return {
+            cpuUsage: process.cpuUsage(),
+            memoryUsage: process.memoryUsage(),
+          }
+        }
+      })
+    }
+
     logger.info(
-      "initializeServer: initializing registry",
+      {
+        functionName: "initializeServer",
+        message: "Initializing registry",
+      },
     );
     const registry = new RegistryService({
       databaseConnection,
@@ -681,7 +722,10 @@ export async function initializeServer(
 
     if (INSTANCE_MODE === "GLOBAL_MANAGER" || INSTANCE_MODE === "ABSOLUTE") {
       logger.info(
-        "initializeServer: setting up global manager",
+        {
+          functionName: "initializeServer",
+          message: "Setting up global manager",
+        },
       );
 
       const CurrencyFactorsClass = (serviceCustom && serviceCustom.currencyFactorsProvider) || CurrencyLayerService;
@@ -694,7 +738,10 @@ export async function initializeServer(
 
       if (sensitiveConfig.mail) {
         logger.info(
-          "initializeServer: initializing global mail service",
+          {
+            functionName: "initializeServer",
+            message: "Initializing global mail service",
+          },
         );
       }
       let MailServiceClass = (serviceCustom && serviceCustom.mailServiceProvider) || MailgunService;
@@ -704,7 +751,10 @@ export async function initializeServer(
 
       if (FAKE_EMAILS) {
         logger.info(
-          "initializeServer: using fake email service",
+          {
+            functionName: "initializeServer",
+            message: "Using fake email service",
+          },
         );
         // typescript messes the types again
         MailServiceClass = FakeMailService as any;
@@ -723,7 +773,10 @@ export async function initializeServer(
 
       if (FAKE_SMS) {
         logger.info(
-          "initializeServer: using fake sms service",
+          {
+            functionName: "initializeServer",
+            message: "Using fake sms service",
+          },
         );
         // typescript messes the types again
         PhoneServiceClass = FakeSMSService as any;
@@ -776,20 +829,31 @@ export async function initializeServer(
 
       if (seoConfig && sensitiveConfig.seoContainerID) {
         logger.info(
-          "initializeServer: initializing SEO configuration",
+          {
+            functionName: "initializeServer",
+            message: "Initializing SEO configuration",
+          },
         );
         const seoContainerData = sensitiveConfig.containers &&
           sensitiveConfig.containers[sensitiveConfig.seoContainerID];
         const isLocalInstead = sensitiveConfig.seoContainerID === sensitiveConfig.localContainer;
         if (!seoContainerData && !isLocalInstead) {
           logger.error(
-            "initializeServer [SERIOUS]: Invalid seo container id for the container '" + sensitiveConfig.seoContainerID + "'",
+            {
+              functionName: "initializeServer",
+              message: "Invalid seo container id for the container '" + sensitiveConfig.seoContainerID + "'",
+              serious: true,
+            },
           );
         } else {
           let prefix = config.containersHostnamePrefixes[sensitiveConfig.seoContainerID];
           if (!prefix) {
             logger.error(
-              "initializeServer [SERIOUS]: Could not find prefix for SEO in '" + sensitiveConfig.seoContainerID + "'",
+              {
+                functionName: "initializeServer",
+                message: "Could not find prefix for SEO in '" + sensitiveConfig.seoContainerID + "'",
+                serious: true,
+              },
             );
             return;
           }
@@ -831,7 +895,10 @@ export async function initializeServer(
 
     if (elastic) {
       logger.info(
-        "initializeServer: waiting for elastic service to be ready",
+        {
+          functionName: "initializeServer",
+          message: "Waiting for elastic service to be ready",
+        },
       );
       await elastic.confirmInstanceReadiness();
     }
@@ -839,7 +906,10 @@ export async function initializeServer(
     // due to a bug in the types the create client function is missing
     // domainId and domainName
     logger.info(
-      "initializeServer: initializing cloud clients",
+      {
+        functionName: "initializeServer",
+        message: "Initializing cloud clients",
+      },
     );
 
     const storageClients = await getStorageProviders(
@@ -853,19 +923,28 @@ export async function initializeServer(
 
     if (INSTANCE_MODE === "CLEAN_STORAGE" || INSTANCE_MODE === "CLEAN_SITEMAPS") {
       logger.info(
-        "initializeServer: cleaning storage",
+        {
+          functionName: "initializeServer",
+          message: "Cleaning storage",
+        },
       );
 
       await Promise.all(Object.keys(storageClients.cloudClients).map(async (containerId) => {
         if (INSTANCE_MODE === "CLEAN_SITEMAPS") {
           logger.info(
-            "initializeServer: cleaning " + containerId + " sitemaps for " + domain,
+            {
+              functionName: "initializeServer",
+              message: "Cleaning " + containerId + " sitemaps for " + domain,
+            },
           );
           const client = storageClients.cloudClients[containerId];
           await client.removeFolder("sitemaps/" + domain);
         } else {
           logger.info(
-            "initializeServer: cleaning " + containerId + " data for " + domain,
+            {
+              functionName: "initializeServer",
+              message: "Cleaning " + containerId + " data for " + domain,
+            },
           );
           const client = storageClients.cloudClients[containerId];
           await client.removeFolder(domain);
@@ -877,7 +956,10 @@ export async function initializeServer(
 
     // RETRIEVING INITIAL SERVER DATA
     logger.info(
-      "initializeServer: attempting to retrieve server data",
+      {
+        functionName: "initializeServer",
+        message: "Attempting to retrieve server data",
+      },
     );
     const wait = (time: number) => {
       return new Promise((resolve) => {
@@ -887,13 +969,19 @@ export async function initializeServer(
     let serverData: IServerDataType = null;
     while (serverData === null) {
       logger.info(
-        "initializeServer: waiting one second",
+        {
+          functionName: "initializeServer",
+          message: "Waiting one second",
+        },
       );
       await wait(1000);
       const serverDataStr = await redisGlobalClient.get(SERVER_DATA_IDENTIFIER) || null;
       if (!serverDataStr) {
         logger.info(
-          "initializeServer: server data not available, is global cache and global manager running?",
+          {
+            functionName: "initializeServer",
+            message: "Server data not available; is global cache and global manager running?",
+          },
         );
       } else {
         serverData = JSON.parse(serverDataStr);
@@ -901,16 +989,25 @@ export async function initializeServer(
     }
 
     logger.info(
-      "initializeServer: initializing cache instance",
+      {
+        functionName: "initializeServer",
+        message: "Initializing cache instance",
+      },
     );
     const cache = new Cache(redisClient, databaseConnection, elastic, sensitiveConfig, storageClients.cloudClients, domain, root, serverData);
     logger.info(
-      "initializeServer: creating server",
+      {
+        functionName: "initializeServer",
+        message: "Creating server",
+      },
     );
     const server = http.createServer(app);
 
     logger.info(
-      "initializeServer: setting up websocket socket.io listener",
+      {
+        functionName: "initializeServer",
+        message: "Setting up websocket socket.io listener",
+      },
     );
     const listener = new Listener(
       buildnumber,
@@ -928,7 +1025,10 @@ export async function initializeServer(
 
     if (sensitiveConfig.userLocalization) {
       logger.info(
-        "initializeServer: initializing user localization service",
+        {
+          functionName: "initializeServer",
+          message: "Initializing user localization service",
+        },
       );
     }
     const UserLocalizationServiceClass = (serviceCustom && serviceCustom.userLocalizationProvider) || (
@@ -943,7 +1043,10 @@ export async function initializeServer(
 
     if (sensitiveConfig.mail) {
       logger.info(
-        "initializeServer: initializing mail service",
+        {
+          functionName: "initializeServer",
+          message: "Initializing mail service",
+        },
       );
     }
     let MailServiceClass = (serviceCustom && serviceCustom.mailServiceProvider) || MailgunService;
@@ -953,7 +1056,10 @@ export async function initializeServer(
 
     if (FAKE_EMAILS) {
       logger.info(
-        "initializeServer: using fake email service",
+        {
+          functionName: "initializeServer",
+          message: "Using fake email service",
+        },
       );
       // typescript messes the types again
       MailServiceClass = FakeMailService as any;
@@ -972,7 +1078,10 @@ export async function initializeServer(
 
     if (FAKE_SMS) {
       logger.info(
-        "initializeServer: using fake sms service",
+        {
+          functionName: "initializeServer",
+          message: "Using fake sms service",
+        },
       );
       // typescript messes the types again
       PhoneServiceClass = FakeSMSService as any;
@@ -990,7 +1099,10 @@ export async function initializeServer(
     }
     if (FAKE_USSD) {
       logger.info(
-        "initializeServer: using fake ussd service",
+        {
+          functionName: "initializeServer",
+          message: "Using fake ussd service",
+        },
       );
       USSDServiceClass = FakeUSSDService as any;
     }
@@ -1000,7 +1112,10 @@ export async function initializeServer(
 
     if (sensitiveConfig.locationSearch) {
       logger.info(
-        "initializeServer: initializing location search service",
+        {
+          functionName: "initializeServer",
+          message: "Initializing location search service",
+        },
       );
     }
     const LocationSearchClass = (serviceCustom && serviceCustom.locationSearchProvider) || HereMapsService;
@@ -1012,7 +1127,10 @@ export async function initializeServer(
 
     if (sensitiveConfig.payment) {
       logger.info(
-        "initializeServer: initializing payment service",
+        {
+          functionName: "initializeServer",
+          message: "Initializing payment service",
+        },
       );
     }
 
@@ -1056,7 +1174,10 @@ export async function initializeServer(
     }
 
     logger.info(
-      "initializeServer: extracting triggers from all the providers",
+      {
+        functionName: "initializeServer",
+        message: "Extracting triggers from all the providers",
+      },
     );
     const userLocalizationInstanceTrigger = userLocalizationService && await userLocalizationService.getTriggerRegistry();
     const userLocalizationClassTrigger = userLocalizationService && await UserLocalizationServiceClass.getTriggerRegistry();
@@ -1137,11 +1258,10 @@ export async function initializeServer(
     PropertyDefinition.indexChecker = serverSideIndexChecker.bind(null, appData);
 
     logger.info(
-      "initializeServer: INSTANCE_GROUP_ID is " + INSTANCE_GROUP_ID,
-    );
-
-    logger.info(
-      "initializeServer: setting local environment of all service providers",
+      {
+        functionName: "initializeServer",
+        message: "Setting local environment of all service providers",
+      },
     );
     userLocalizationService && userLocalizationService.setupLocalResources(appData);
     mailService && mailService.setupLocalResources(appData);
@@ -1153,7 +1273,10 @@ export async function initializeServer(
     customServicesInstances.forEach((i) => i.setupLocalResources(appData));
 
     logger.info(
-      "initializeServer: initializing all the providers",
+      {
+        functionName: "initializeServer",
+        message: "Initializing all the providers",
+      },
     );
     userLocalizationService && await userLocalizationService.initialize();
     mailService && await mailService.initialize();
@@ -1165,7 +1288,10 @@ export async function initializeServer(
     await Promise.all(customServicesInstances.map((i) => i.initialize()));
 
     logger.info(
-      "initializeServer: setting execution of all service providers",
+      {
+        functionName: "initializeServer",
+        message: "Setting execution of all service providers",
+      },
     );
     userLocalizationService && userLocalizationService.execute();
     mailService && mailService.execute();
@@ -1176,7 +1302,10 @@ export async function initializeServer(
     customServicesInstances.forEach((i) => i.execute());
 
     logger.info(
-      "initializeServer: extracting routers of all the providers",
+      {
+        functionName: "initializeServer",
+        message: "Extracting routers of all the providers",
+      },
     );
     const userLocalizationInstanceRouter = userLocalizationService && await userLocalizationService.getRouter(appData);
     const userLocalizationClassRouter = userLocalizationService && await UserLocalizationServiceClass.getRouter(appData);
@@ -1215,31 +1344,43 @@ export async function initializeServer(
 
     if (custom.callback) {
       logger.info(
-        "initializeServer: calling callback",
+        {
+          functionName: "initializeServer",
+          message: "Calling callback",
+        },
       );
 
       await custom.callback(appData);
     }
 
     logger.info(
-      "initializeServer: setting up endpoints",
+      {
+        functionName: "initializeServer",
+        message: "Setting up endpoints",
+      },
     );
     initializeApp(appData, custom, routers);
 
     logger.info(
-      "initializeServer: attempting to listen at " + PORT,
+      {
+        functionName: "initializeServer",
+        message: "Attempting to listen at " + PORT,
+      }
     );
     server.listen(PORT, () => {
       logger.info(
-        "initializeServer: listening at " + PORT,
+        {
+          functionName: "initializeServer",
+          message: "Listening at " + PORT,
+        },
       );
     });
   } catch (err) {
     logger.error(
-      "initializeServer: Failed to initialize server due to error",
       {
-        errMessage: err.message,
-        errStack: err.stack,
+        functionName: "initializeServer",
+        message: "Failed to initialize server due to error",
+        err,
       }
     );
     process.exitCode = 1;

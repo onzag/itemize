@@ -268,45 +268,56 @@ export class SEOGenerator {
       // are added yet no new dynamic are added
       if (changed && this.pingGoogle) {
         const googleURL = "https://google.com/ping?sitemap=https://" + this.hostname + "/sitemap.xml";
-        logger.info("SEOGenerator.run: Pinging google at  " + googleURL);
+        logger.info({
+          className: "SEOGenerator",
+          methodName: "run",
+          message: "Pinging google at " + googleURL,
+        });
 
         try {
           https.get(googleURL, (res) => {
             if (res.statusCode !== 200 && res.statusCode !== 0) {
               logger.error(
-                "SEOGenerator.run: failed to ping google due to invalid status code",
                 {
-                  statusCode: res.statusCode,
-                  statusMessage: res.statusMessage,
+                  className: "SEOGenerator",
+                  methodName: "run",
+                  message: "Failed to ping google due to invalid status code",
+                  data: {
+                    statusCode: res.statusCode,
+                    statusMessage: res.statusMessage,
+                  },
                 }
               );
             }
             res.on("error", (err) => {
               logger.error(
-                "SEOGenerator.run: failed to ping google",
                 {
-                  errMessage: err.message,
-                  errStack: err.stack,
+                  className: "SEOGenerator",
+                  methodName: "run",
+                  message: "Failed to ping google",
+                  err,
                 }
               );
             });
           });
         } catch (err) {
           logger.error(
-            "SEOGenerator.run: failed to ping google",
             {
-              errMessage: err.message,
-              errStack: err.stack,
+              className: "SEOGenerator",
+              methodName: "run",
+              message: "Failed to ping google",
+              err,
             }
           );
         }
       }
     } catch (err) {
       logger.error(
-        "SEOGenerator.run [SEVERE]: failed to generate sitemaps",
         {
-          errMessage: err.message,
-          errStack: err.stack,
+          className: "SEOGenerator",
+          methodName: "run [SEVERE]",
+          message: "Failed to generate sitemaps",
+          err,
         }
       );
     }
@@ -322,7 +333,11 @@ export class SEOGenerator {
    * @param target the target endpoint url
    */
   private async writeFile(data: string, target: string): Promise<void> {
-    logger.info("SEOGenerator.writeFile: Attempting to write file at: " + target);
+    logger.info({
+      className: "SEOGenerator",
+      methodName: "writeFile",
+      message: "Attempting to write file at " + target,
+    });
 
     const readStream = Readable.from(data);
     await this.storageClient.upload(
@@ -346,7 +361,11 @@ export class SEOGenerator {
     prefix?: string,
     suffix?: string,
   ) {
-    logger.info("SEOGenerator.writeSitemapFile: Attempting to write sitemap file at: " + target);
+    logger.info({
+      className: "SEOGenerator",
+      methodName: "writeSitemapFile",
+      message: "Attempting to write sitemap file at " + target,
+    });
 
     await this.writeFile(toXML(src, this.hostname, this.storageClient.getPrefix(), prefix, suffix), target);
   }
@@ -437,7 +456,11 @@ export class SEOGenerator {
    * @param rule the rule that we are following
    */
   private async runFor(key: string, rule: ISEORule): Promise<ISEOPreResult> {
-    logger.info("SEOGenerator.runFor: Parsing sitemap for urls " + key);
+    logger.info({
+      className: "SEOGenerator",
+      methodName: "runFor",
+      message: "Parsing sitemap for urls " + key,
+    });
 
     // if it's not crawable
     if (!rule.crawable) {

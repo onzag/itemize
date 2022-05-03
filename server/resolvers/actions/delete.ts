@@ -30,7 +30,10 @@ export async function deleteItemDefinition(
   itemDefinition: ItemDefinition,
 ): Promise<any> {
   CAN_LOG_DEBUG && logger.debug(
-    "deleteItemDefinition: executed delete for " + itemDefinition.getQualifiedPathName(),
+    {
+      functionName: "deleteItemDefinition",
+      message: "Executed delete for " + itemDefinition.getQualifiedPathName(),
+    },
   );
 
   // do the basic things, check the language and region
@@ -46,7 +49,10 @@ export async function deleteItemDefinition(
   const selfTable = itemDefinition.getQualifiedPathName();
 
   CAN_LOG_DEBUG && logger.debug(
-    "deleteItemDefinition: checking policy check for delete",
+    {
+      functionName: "deleteItemDefinition",
+      message: "Checking policy check for delete",
+    },
   );
 
   // we need to run the policy check for delete,
@@ -75,7 +81,10 @@ export async function deleteItemDefinition(
         // if there is no userId then the row was null, we throw an error
         if (!content) {
           CAN_LOG_DEBUG && logger.debug(
-            "deleteItemDefinition: failed due to lack of content data",
+            {
+              functionName: "deleteItemDefinition",
+              message: "Failed due to lack of content data",
+            },
           );
           throw new EndpointError({
             message: `There's no ${selfTable} with id ${resolverArgs.args.id}`,
@@ -104,7 +113,10 @@ export async function deleteItemDefinition(
             rolesThatHaveAccessToModeration.includes(tokenData.role);
           if (!hasAccessToModerationFields) {
             CAN_LOG_DEBUG && logger.debug(
-              "deleteItemDefinition: failed due to blocked content and no moderation access for role " + tokenData.role,
+              {
+                functionName: "deleteItemDefinition",
+                message: "Failed due to blocked content and no moderation access for role " + tokenData.role,
+              },
             );
             throw new EndpointError({
               message: "The item is blocked, only users with role " +
@@ -148,7 +160,10 @@ export async function deleteItemDefinition(
   // note how we don't pass requested fields, because that's irrelevant
   // for the delete action
   CAN_LOG_DEBUG && logger.debug(
-    "deleteItemDefinition: checking role access for delete",
+    {
+      functionName: "deleteItemDefinition",
+      message: "Checking role access for delete",
+    },
   );
   await itemDefinition.checkRoleAccessFor(
     ItemDefinitionIOActions.DELETE,
@@ -318,7 +333,10 @@ export async function deleteItemDefinition(
   }
 
   CAN_LOG_DEBUG && logger.debug(
-    "deleteItemDefinition: done",
+    {
+      functionName: "deleteItemDefinition",
+      message: "Done",
+    },
   );
 
   // return null, yep, the output is always null, because it's gone

@@ -1485,7 +1485,8 @@ export const SERVER_DATA_IDENTIFIER = "SERVER_DATA";
 /**
  * An identifier for the ping information
  */
-export const PING_DATA_IDENTIFIER = "PING_DATA";
+export const PING_DATA_IDENTIFIER = "ping_data";
+export const PING_STATUS_IDENTIFIER = "ping_status";
 
 /**
  * An identifier from when the server kicks an user from the

@@ -80,7 +80,11 @@ export class OpenstackService extends StorageProvider<ISensitiveConfigOpenstackC
   private verifyResourceIsReady(url: URL, done: () => void) {
     // so we get the url string value, for debugging purposes
     const strURL = url.toString();
-    this.logDebug("OpenstackService.verifyResourceIsReady: Verifying readiness of " + strURL);
+    this.logDebug({
+      className: "OpenstackService",
+      methodName: "verifyResourceIsReady",
+      message: "Verifying readiness of " + strURL,
+    });
 
     // now we use https to call and do a head request to check the status
     https.get({
@@ -90,11 +94,19 @@ export class OpenstackService extends StorageProvider<ISensitiveConfigOpenstackC
     }, (resp) => {
       // status is succesful
       if (resp.statusCode === 200 || resp.statusCode === 0) {
-        this.logDebug("OpenstackService.verifyResourceIsReady: Verification succeed " + strURL);
+        this.logDebug({
+          className: "OpenstackService",
+          methodName: "verifyResourceIsReady",
+          message: "Verification succeed " + strURL,
+        });
         done();
       } else {
         // otherwise we wait 100 milliseconds, and recursively execute until it's ready
-        this.logDebug("OpenstackService.verifyResourceIsReady: Resource is not yet ready " + strURL);
+        this.logDebug({
+          className: "OpenstackService",
+          methodName: "verifyResourceIsReady",
+          message: "Resource is not yet ready " + strURL,
+        });
         setTimeout(this.verifyResourceIsReady.bind(this, url, done), 100);
       }
     });
@@ -125,7 +137,12 @@ export class OpenstackService extends StorageProvider<ISensitiveConfigOpenstackC
 
   public removeFolder(at: string): Promise<void> {
     return new Promise((resolve, reject) => {
-      this.logDebug("OpenstackService.removeFolder: Deleting folder for", { at });
+      this.logDebug({
+        className: "OpenstackService",
+        methodName: "removeFolder",
+        message: "Deleting folder for",
+        data: { at },
+      });
 
       (this.container as any).getFiles({
         prefix: at,
@@ -133,7 +150,12 @@ export class OpenstackService extends StorageProvider<ISensitiveConfigOpenstackC
         if (err) {
           reject(err);
         } else if (files && files.length) {
-          this.logDebug("OpenstackService.removeFolder: Bulk deleting", { files });
+          this.logDebug({
+            className: "OpenstackService",
+            methodName: "removeFolder",
+            message: "Bulk deleting",
+            data: { files },
+          });
           (this.client as any).bulkDelete(this.container, files, (err: pkgcloud.ClientError) => {
             if (err) {
               reject(err);
@@ -142,7 +164,11 @@ export class OpenstackService extends StorageProvider<ISensitiveConfigOpenstackC
             }
           });
         } else {
-          this.logDebug("OpenstackService.removeFolder: Could not find any files");
+          this.logDebug({
+            className: "OpenstackService",
+            methodName: "removeFolder",
+            message: "Could not find any files",
+          });
           resolve();
         }
       });
@@ -231,9 +257,17 @@ export class OpenstackService extends StorageProvider<ISensitiveConfigOpenstackC
           path: url.pathname,
         }, (resp) => {
           if (resp.statusCode === 200 || resp.statusCode === 0) {
-            this.logInfo("OpenstackService.exists: Checking succeed " + at);
+            this.logInfo({
+              className: "OpenstackService",
+              methodName: "exists",
+              message: "Checking succeed " + at,
+            });
           } else {
-            this.logInfo("OpenstackService.exists: Checking failed " + at);
+            this.logInfo({
+              className: "OpenstackService",
+              methodName: "exists",
+              message: "Checking failed " + at,
+            });
           }
 
           return resolve(resp.statusCode === 200 || resp.statusCode === 0);
@@ -255,7 +289,11 @@ export class OpenstackService extends StorageProvider<ISensitiveConfigOpenstackC
           path: url.pathname,
         }, (resp) => {
           if (resp.statusCode === 200 || resp.statusCode === 0) {
-            this.logInfo("OpenstackService.read: Retrieving succeed " + at);
+            this.logInfo({
+              className: "OpenstackService",
+              methodName: "read",
+              message: "Retrieving succeed " + at,
+            });
             let data = "";
             resp.on("data", (chunk) => {
               data += chunk;
@@ -267,7 +305,11 @@ export class OpenstackService extends StorageProvider<ISensitiveConfigOpenstackC
               resolve(data);
             });
           } else {
-            this.logInfo("OpenstackService.read: Retrieving failed " + at);
+            this.logInfo({
+              className: "OpenstackService",
+              methodName: "read",
+              message: "Retrieving failed " + at,
+            });
             resolve(null);
           }
         });

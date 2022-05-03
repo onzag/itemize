@@ -72,11 +72,16 @@ export class RegistryService extends ServiceProvider<IRegistryConfig> {
         result[r.skey] = JSON.parse(r.value);
       } catch {
         this.logError(
-          "RegistryService.getAllInPkey [SERIOUS]: Received invalid json for a key",
           {
-            pkey,
-            skey: r.skey,
-            value: r.value,
+            className: "RegistryService",
+            methodName: "getAllInPkey",
+            message: "Received invalid json for a key",
+            serious: true,
+            data: {
+              pkey,
+              skey: r.skey,
+              value: r.value,
+            },
           }
         );
       }
@@ -101,7 +106,7 @@ export class RegistryService extends ServiceProvider<IRegistryConfig> {
         skey ? skey : "",
       ]
     );
-  
+
     // if we have a value
     if (row && row.value) {
       // we give it by parsing
@@ -109,11 +114,16 @@ export class RegistryService extends ServiceProvider<IRegistryConfig> {
         return JSON.parse(row.value);
       } catch {
         this.logError(
-          "RegistryService.getKey [SERIOUS]: Received invalid json for a key",
           {
-            pkey,
-            skey,
-            value: row.value,
+            className: "RegistryService",
+            methodName: "getKey",
+            message: "Received invalid json for a key",
+            serious: true,
+            data: {
+              pkey,
+              skey,
+              value: row.value,
+            },
           }
         );
       }

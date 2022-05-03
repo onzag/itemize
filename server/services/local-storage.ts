@@ -36,7 +36,7 @@ export class LocalStorageService extends StorageProvider<null> {
   public static getType() {
     return ServiceProviderType.NONE;
   }
-  
+
   public async upload(at: string, readStream: ReadStream): Promise<void> {
     const remote = at;
     const targetPath = remote.split("/");
@@ -63,7 +63,14 @@ export class LocalStorageService extends StorageProvider<null> {
   }
 
   public async removeFolder(at: string): Promise<void> {
-    this.logDebug("LocalStorageService.removeFolder: Deleting folder for", { at });
+    this.logDebug({
+      className: "LocalStorageService",
+      methodName: "removeFolder",
+      message: "Deleting folder for",
+      data: {
+        at
+      },
+    });
 
     const targetPath = at.split("/");
 
@@ -76,7 +83,11 @@ export class LocalStorageService extends StorageProvider<null> {
         recursive: true,
       });
     } catch {
-      this.logDebug("LocalStorageService.removeFolder: Could not find any local files");
+      this.logDebug({
+        className: "LocalStorageService",
+        methodName: "removeFolder",
+        message: "Could not find any local files",
+      });
     }
   }
 
@@ -99,10 +110,18 @@ export class LocalStorageService extends StorageProvider<null> {
     let exists = true;
     try {
       await fsAsync.access(localPath, fs.constants.F_OK);
-      this.logInfo("LocalStorageService.exists: Checking succeed " + at);
+      this.logInfo({
+        className: "LocalStorageService",
+        methodName: "exists",
+        message: "Checking succeed " + at,
+      });
     } catch (e) {
       exists = false;
-      this.logInfo("LocalStorageService.exists: Checking failed " + at);
+      this.logInfo({
+        className: "LocalStorageService",
+        methodName: "exists",
+        message: "Checking failed " + at,
+      });
     }
 
     return exists;
@@ -114,7 +133,11 @@ export class LocalStorageService extends StorageProvider<null> {
     try {
       return await fsAsync.readFile(localPath, "utf-8");
     } catch {
-      this.logInfo("LocalStorageService.read: Retrieving failed " + at);
+      this.logInfo({
+        className: "LocalStorageService",
+        methodName: "read",
+        message: "Retrieving failed " + at,
+      });
       return null;
     }
   }

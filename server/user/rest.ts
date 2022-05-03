@@ -72,11 +72,14 @@ export function userRestServices(appData: IAppDataType) {
       }
     } catch (err) {
       logger.error(
-        "userRestServices/validate: failed to retrieve user from token credentials",
         {
-          errMessage: err.message,
-          errStack: err.stack,
-          decoded,
+          functionName: "userRestServices",
+          endpoint: "validate",
+          message: "Failed to retrieve user from token credentials",
+          err,
+          data: {
+            decoded,
+          },
         }
       );
       throw err;
@@ -111,11 +114,14 @@ export function userRestServices(appData: IAppDataType) {
       }
     } catch (err) {
       logger.error(
-        "userRestServices/validate: failed to request users",
         {
-          errMessage: err.message,
-          errStack: err.stack,
-          user,
+          functionName: "userRestServices",
+          endpoint: "validate",
+          message: "Failed to request users",
+          err,
+          data: {
+            user,
+          },
         }
       );
       throw err;
@@ -134,11 +140,14 @@ export function userRestServices(appData: IAppDataType) {
       );
     } catch (err) {
       logger.error(
-        "userRestServices/validate: failed to set validated status to true",
         {
-          errMessage: err.message,
-          errStack: err.stack,
-          user,
+          functionName: "userRestServices",
+          endpoint: "validate",
+          message: "Failed to set validated status to true",
+          err,
+          data: {
+            user,
+          },
         }
       );
       throw err;
@@ -162,11 +171,15 @@ export function userRestServices(appData: IAppDataType) {
     if (!userId || (!password && !token)) {
       res.redirect("/en/?err=" + ENDPOINT_ERRORS.UNSPECIFIED);
       logger.error(
-        "userRestServices/redirected-login: user id not provided or password nor token provided",
         {
-          userId,
-          passwordGiven: !!password,
-          tokenGiven: !!token,
+          functionName: "userRestServices",
+          endpoint: "redirected-login",
+          message: "User id not provided or password nor token provided",
+          data: {
+            userId,
+            passwordGiven: !!password,
+            tokenGiven: !!token,
+          },
         }
       );
       return;
@@ -179,9 +192,13 @@ export function userRestServices(appData: IAppDataType) {
         if (tokenData.custom && !tokenData.isRealUser) {
           res.redirect(`/en/?err=${ENDPOINT_ERRORS.UNSPECIFIED}`);
           logger.error(
-            "userRestServices/redirected-login: tried to login with a custom token that is not a real user",
             {
-              tokenData,
+              functionName: "userRestServices",
+              endpoint: "redirected-login",
+              message: "Tried to login with a custom token that is not a real user",
+              data: {
+                tokenData,
+              },
             }
           );
           return;
@@ -204,10 +221,11 @@ export function userRestServices(appData: IAppDataType) {
       }
     } catch (err) {
       logger.error(
-        "userRestServices/redirected-login: failed to retrieve user from the id",
         {
-          errMessage: err.message,
-          errStack: err.stack,
+          functionName: "userRestServices",
+          endpoint: "redirected-login",
+          message: "Failed to retrieve user from the id",
+          err,
         }
       );
       throw err;
@@ -316,10 +334,11 @@ export function userRestServices(appData: IAppDataType) {
       }
     } catch (err) {
       logger.error(
-        "userRestServices/unsubscribe: failed to retrieve user from the id",
         {
-          errMessage: err.message,
-          errStack: err.stack,
+          functionName: "userRestServices",
+          endpoint: "unsubscribe",
+          message: "Failed to retrieve user from the id",
+          err,
         }
       );
       throw err;
@@ -339,9 +358,13 @@ export function userRestServices(appData: IAppDataType) {
           // invalid shape
           noRedirect ? res.status(403).end() : res.redirect(`/${user.app_language}/?err=${ENDPOINT_ERRORS.UNSPECIFIED}`);
           logger.error(
-            "userRestServices/unsubscribe: The token provided was invalid and did not respect the shape",
             {
-              tokenData,
+              functionName: "userRestServices",
+              endpoint: "unsubscribe",
+              message: "The token provided was invalid and did not respect the shape",
+              data: {
+                tokenData,
+              },
             }
           );
           return;
@@ -383,11 +406,14 @@ export function userRestServices(appData: IAppDataType) {
       );
     } catch (err) {
       logger.error(
-        "userRestServices/unsubscribe: failed to set " + tokenData.unsubscribeProperty + " status to false",
         {
-          errMessage: err.message,
-          errStack: err.stack,
-          user,
+          functionName: "userRestServices",
+          endpoint: "unsubscribe",
+          message: "Failed to set " + tokenData.unsubscribeProperty + " status to false",
+          err,
+          data: {
+            user,
+          },
         }
       );
       throw err;

@@ -138,6 +138,6 @@ When creating an app that supports USSD, use the fake ussd mode to create an end
 
 ## NODE_TLS_REJECT_UNAUTHORIZED
 
-Use this in development when running a dev environment in order to enable elasticseach to property connect when using certificates, it is used as `NODE_TLS_REJECT_UNAUHORIZED=0`
+Use this in development when running a dev environment in order to enable elasticseach to property connect when using certificates, it is used as `NODE_TLS_REJECT_UNAUTHORIZED=0`
 
 If you don't wish to do this you should save your http certificate so that it can connect, however, every dev environment has a different certificate making it painful in practique.

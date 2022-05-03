@@ -1,6 +1,7 @@
 import { LOGS_IDENTIFIER } from "../../constants";
 import LoggingProvider, { ILogsResult } from "./base/LoggingProvider";
 import { Client } from "@elastic/elasticsearch";
+import { IItemizeFinalLoggingObject } from "../logger";
 
 const logsIndex = LOGS_IDENTIFIER.toLowerCase();
 
@@ -25,11 +26,32 @@ export class ElasticLoggerService extends LoggingProvider<null> {
             level: {
               type: "keyword",
             },
-            data: {
-              type: "object",
+            className: {
+              type: "text",
             },
-            created_at: {
+            functionName: {
+              type: "text",
+            },
+            methodName: {
+              type: "text",
+            },
+            endpoint: {
+              type: "text",
+            },
+            message: {
+              type: "text",
+            },
+            serious: {
+              type: "boolean"
+            },
+            orphan: {
+              type: "boolean"
+            },
+            timestamp: {
               type: "date",
+            },
+            data: {
+              enabled: false,
             },
           }
         }
@@ -37,16 +59,12 @@ export class ElasticLoggerService extends LoggingProvider<null> {
     }
   }
 
-  public async log(instanceId: string, level: string, data: any) {
-    const document = {
-      instance_id: instanceId,
-      data: data,
-      level: level,
-      created_at: (new Date()).toISOString(),
-    };
+  public async log(instanceId: string, level: string, data: IItemizeFinalLoggingObject) {
+    (data as any).instance_id = instanceId;
+    (data as any).level = level;
     await this.elastic.index({
       index: logsIndex,
-      document,
+      document: data,
     });
   }
 
@@ -62,6 +80,7 @@ export class ElasticLoggerService extends LoggingProvider<null> {
       }
     });
 
+    // TODO
     console.log(results)
 
     return [];

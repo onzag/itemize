@@ -30,7 +30,7 @@ import { IGQLArgs } from "../../../gql-querier";
 import { IOTriggerActions } from "../triggers";
 import Root from "../../../base/Root";
 import { CustomRoleGranterEnvironment, CustomRoleManager } from "../roles";
-import { CAN_LOG_DEBUG, CAN_LOG_SILLY } from "../../environment";
+import { CAN_LOG_DEBUG } from "../../environment";
 
 export async function editItemDefinition(
   appData: IAppDataType,
@@ -42,10 +42,11 @@ export async function editItemDefinition(
     pooledRoot = await appData.rootPool.acquire().promise;
   } catch (err) {
     logger.error(
-      "addItemDefinition [SERIOUS]: Failed to retrieve root from the pool",
       {
-        errMessage: err.message,
-        errStack: err.stack,
+        functionName: "editItemDefinition",
+        message: "Failed to retrieve root from the pool",
+        serious: true,
+        err,
       },
     );
     throw new EndpointError({
@@ -58,7 +59,10 @@ export async function editItemDefinition(
   const itemDefinition = pooledRoot.registry[resolverItemDefinition.getQualifiedPathName()] as ItemDefinition;
 
   CAN_LOG_DEBUG && logger.debug(
-    "editItemDefinition: executed edit for " + itemDefinition.getQualifiedPathName(),
+    {
+      functionName: "editItemDefinition",
+      message: "Executed edit for " + itemDefinition.getQualifiedPathName(),
+    },
   );
 
   // First we check the language and region of the item
@@ -77,7 +81,10 @@ export async function editItemDefinition(
   const selfTable = itemDefinition.getQualifiedPathName();
 
   CAN_LOG_DEBUG && logger.debug(
-    "editItemDefinition: retrieving actual owner of this item",
+    {
+      functionName: "editItemDefinition",
+      message: "Retrieving actual owner of this item",
+    },
   );
 
   // so we run the policy check for edit, this item definition,
@@ -96,7 +103,10 @@ export async function editItemDefinition(
         // if we don't get an user id this means that there's no owner, this is bad input
         if (!content) {
           CAN_LOG_DEBUG && logger.debug(
-            "editItemDefinition: failed due to lack of content data",
+            {
+              functionName: "editItemDefinition",
+              message: "Failed due to lack of content data",
+            },
           );
           throw new EndpointError({
             message: `There's no ${selfTable} with id ${resolverArgs.args.id} and version ${resolverArgs.args.version}`,
@@ -107,7 +117,10 @@ export async function editItemDefinition(
         // also throw an error if it's blocked
         if (content.blocked_at !== null) {
           CAN_LOG_DEBUG && logger.debug(
-            "editItemDefinition: failed due to element being blocked",
+            {
+              functionName: "editItemDefinition",
+              message: "Failed due to element being blocked",
+            },
           );
           throw new EndpointError({
             message: "The item is blocked",
@@ -222,10 +235,6 @@ export async function editItemDefinition(
     }
   });
 
-  CAN_LOG_DEBUG && logger.debug(
-    "editItemDefinition: Fields to be edited from the idef have been extracted as",
-    editingFields,
-  );
   const requestedFieldsInIdef = {};
   Object.keys(requestedFields).forEach((arg) => {
     if (
@@ -236,12 +245,10 @@ export async function editItemDefinition(
     }
   });
 
-  CAN_LOG_DEBUG && logger.debug(
-    "editItemDefinition: Fields to be requested from the idef have been extracted as",
-    requestedFieldsInIdef,
-  );
-
-  CAN_LOG_DEBUG && logger.debug("editItemDefinition: Checking role access for editing");
+  CAN_LOG_DEBUG && logger.debug({
+    functionName: "editItemDefinition",
+    message: "Checking role access for editing",
+  });
   // checking the role access for both
   await itemDefinition.checkRoleAccessFor(
     ItemDefinitionIOActions.EDIT,
@@ -404,11 +411,10 @@ export async function editItemDefinition(
   );
 
   CAN_LOG_DEBUG && logger.debug(
-    "editItemDefinition: SQL ouput retrieved",
-  );
-  CAN_LOG_SILLY && logger.silly(
-    "editItemDefinition: Value is",
-    sqlValue,
+    {
+      functionName: "editItemDefinition",
+      message: "SQL ouput retrieved",
+    },
   );
 
   // convert it using the requested fields for that, and ignoring everything else
@@ -497,7 +503,10 @@ export async function editItemDefinition(
     value: gqlValue,
   });
 
-  CAN_LOG_DEBUG && logger.debug("editItemDefinition: Checking role access for read");
+  CAN_LOG_DEBUG && logger.debug({
+    functionName: "editItemDefinition",
+    message: "Checking role access for read",
+  });
   await itemDefinition.checkRoleAccessFor(
     ItemDefinitionIOActions.READ,
     tokenData.role,
@@ -541,11 +550,10 @@ export async function editItemDefinition(
   }
 
   CAN_LOG_DEBUG && logger.debug(
-    "editItemDefinition: GQL ouput retrieved",
-  );
-  CAN_LOG_SILLY && logger.silly(
-    "editItemDefinition: value is",
-    finalOutput,
+    {
+      functionName: "editItemDefinition",
+      message: "GQL ouput retrieved",
+    },
   );
 
   pooledRoot.cleanState();

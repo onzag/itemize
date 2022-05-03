@@ -46,10 +46,10 @@ const customFormatErrorFn = (error: GraphQLError) => {
       break;
     default:
       logger.error(
-        "customFormatErrorFn: Caught unexpected error from graphql parsing",
         {
-          errMessage: error.message,
-          errStack: error.stack,
+          functionName: "customFormatErrorFn",
+          message: "Caught unexpected error from graphql parsing",
+          err: error,
         },
       );
       extensions = {
@@ -87,10 +87,10 @@ async function customResolveWrapper(
       throw err;
     }
     logger.error(
-      "customResolveWrapper: Found internal server error",
       {
-        errStack: err.stack,
-        errMessage: err.message,
+        functionName: "customResolveWrapper",
+        message: "Found internal server error",
+        err,
       }
     );
     throw new EndpointError({
@@ -189,8 +189,11 @@ export function initializeApp(appData: IAppDataType, custom: IServerCustomizatio
   });
 
   if (appData.sensitiveConfig.localContainer) {
-    logger.warn(
-      "initializeApp: Initializing an uploads endpoint for the cluster",
+    logger.info(
+      {
+        functionName: "initializeApp",
+        message: "Initializing an uploads endpoint for the cluster",
+      },
     );
 
     app.use(
@@ -241,12 +244,12 @@ export function initializeApp(appData: IAppDataType, custom: IServerCustomizatio
         host = "https://" +
           (
             NODE_ENV === "production" ?
-            appData.config.productionHostname :
-            appData.config.developmentHostname
+              appData.config.productionHostname :
+              appData.config.developmentHostname
           );
       }
       result += "Sitemap: " + host +
-        prefix + (prefix.endsWith("/") ? "" : "/") + 
+        prefix + (prefix.endsWith("/") ? "" : "/") +
         "sitemaps/" + hostname + "/index.xml";
     }
 

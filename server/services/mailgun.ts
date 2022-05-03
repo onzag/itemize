@@ -39,11 +39,16 @@ export class MailgunService extends MailProvider<Mailgun.ConstructorParams> {
             }, (error, body) => {
               if (error) {
                 this.logError(
-                  "MailgunService.initialize [SERIOUS]: Could not add the mailgun callback, receiving emails is not possible",
                   {
-                    message: error.message,
-                    statusCode: error.statusCode,
-                  },
+                    className: "MailgunService",
+                    methodName: "initialize",
+                    message: "Could not add the mailgun callback; receiving emails is not possible",
+                    serious: true,
+                    data: {
+                      message: error.message,
+                      statusCode: error.statusCode,
+                    },
+                  }
                 );
                 this.cantReceiveEmail = true;
               } else {
@@ -150,7 +155,12 @@ export class MailgunService extends MailProvider<Mailgun.ConstructorParams> {
   public async getRouter(): Promise<Router> {
     if (this.cantReceiveEmail) {
       this.logError(
-        "MaigunService.getRouter [SERIOUS]: Could not setup the router for callbacks because receiving emails is not possible",
+        {
+          className: "MaigunService",
+          methodName: "getRouter",
+          message: "Could not setup the router for callbacks because receiving emails is not possible",
+          serious: true,
+        },
       );
       return;
     }

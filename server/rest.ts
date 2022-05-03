@@ -12,7 +12,7 @@ import { serverSideIndexChecker } from "../base/Root/Module/ItemDefinition/Prope
 import PropertyDefinition from "../base/Root/Module/ItemDefinition/PropertyDefinition";
 import ItemDefinition from "../base/Root/Module/ItemDefinition";
 import bodyParser from "body-parser";
-import { PROTECTED_RESOURCES, ENDPOINT_ERRORS, PING_DATA_IDENTIFIER } from "../constants";
+import { PROTECTED_RESOURCES, ENDPOINT_ERRORS, PING_DATA_IDENTIFIER, PING_STATUS_IDENTIFIER } from "../constants";
 import { getMode } from "./mode";
 import { ENVIRONMENT_DETAILS } from "./environment";
 import { jwtVerify } from "./token";
@@ -195,8 +195,6 @@ export default function restServices(appData: IAppDataType) {
       res.end(JSON.stringify(standardAPIResponse));
       return;
     }
-
-    logger.info("Requesting location for ip address of " + ip);
 
     const serviceResponse = await appData.userLocalizationService.getLocalizationFor(ip, standardAPIResponse);
     res.end(JSON.stringify(serviceResponse));
@@ -451,7 +449,7 @@ export default function restServices(appData: IAppDataType) {
       return;
     }
 
-    const allPings = await appData.redisGlobal.getAllStoredPings(PING_DATA_IDENTIFIER);
+    const allPings = await appData.elastic.getAllStoredPingsAt(PING_DATA_IDENTIFIER);
     res.end(JSON.stringify({
       status: "OK",
       self: ENVIRONMENT_DETAILS,
@@ -470,8 +468,8 @@ export default function restServices(appData: IAppDataType) {
       return;
     }
 
-    const status = await appData.redisGlobal.deletePingFor(PING_DATA_IDENTIFIER, req.params.uuid);
-    res.status(status === "NOT_FOUND" ? 404 : (status === "NOT_DEAD" ? 403 : 200)).end(JSON.stringify({
+    const status = await appData.elastic.deletePingsFor(PING_DATA_IDENTIFIER, PING_STATUS_IDENTIFIER, req.params.uuid);
+    res.status(status === "NOT_DEAD" ? 403 : 200).end(JSON.stringify({
       status,
     }));
   });

@@ -27,7 +27,7 @@ import { IGQLSearchRecord } from "../../../gql-querier";
 import { IOTriggerActions } from "../triggers";
 import { buildElasticQueryForItemDefinition, convertSQLValueToGQLValueForItemDefinition } from "../../../base/Root/Module/ItemDefinition/sql";
 import { CustomRoleGranterEnvironment, CustomRoleManager } from "../roles";
-import { CAN_LOG_DEBUG, CAN_LOG_SILLY } from "../../environment";
+import { CAN_LOG_DEBUG } from "../../environment";
 import type { IElasticHighlightReply, IElasticHighlightRecordInfo } from "../../../base/Root/Module/ItemDefinition/PropertyDefinition/types";
 import { buildElasticQueryForModule } from "../../../base/Root/Module/sql";
 
@@ -37,7 +37,10 @@ export async function getItemDefinition(
   itemDefinition: ItemDefinition,
 ) {
   CAN_LOG_DEBUG && logger.debug(
-    "getItemDefinition: executed get for " + itemDefinition.getQualifiedPathName(),
+    {
+      functionName: "getItemDefinition",
+      message: "Executed get for " + itemDefinition.getQualifiedPathName(),
+    },
   );
   // first we check that the language and region provided are
   // right and available
@@ -132,7 +135,10 @@ export async function getItemDefinition(
       true,
     );
     CAN_LOG_DEBUG && logger.debug(
-      "getItemDefinition: no results found returning null",
+      {
+        functionName: "getItemDefinition",
+        message: "No results found returning null",
+      },
     );
     // We do not return the 404, just return null in this case
     return null;
@@ -144,7 +150,10 @@ export async function getItemDefinition(
   }
 
   CAN_LOG_DEBUG && logger.debug(
-    "getItemDefinition: checking role access for read",
+    {
+      functionName: "getItemDefinition",
+      message: "Checking role access for read",
+    },
   );
   // now we check the role access, this function will throw an error
   // if that fails, and we only check for the requested fields
@@ -159,11 +168,10 @@ export async function getItemDefinition(
   );
 
   CAN_LOG_DEBUG && logger.debug(
-    "getItemDefinition: SQL ouput retrieved",
-  );
-  CAN_LOG_SILLY && logger.silly(
-    "getItemDefinition: value is",
-    selectQueryValue,
+    {
+      functionName: "getItemDefinition",
+      message: "SQL ouput retrieved",
+    },
   );
 
   const valueToProvide = await filterAndPrepareGQLValue(
@@ -272,11 +280,10 @@ export async function getItemDefinition(
   }
 
   CAN_LOG_DEBUG && logger.debug(
-    "getItemDefinition: GQL ouput retrieved",
-  );
-  CAN_LOG_SILLY && logger.silly(
-    "getItemDefinition: value is",
-    toReturnToUser,
+    {
+      functionName: "getItemDefinition",
+      message: "GQL ouput retrieved",
+    },
   );
 
   // return if otherwise succeeds
@@ -289,7 +296,10 @@ export async function getItemDefinitionList(
   itemDefinition: ItemDefinition,
 ) {
   CAN_LOG_DEBUG && logger.debug(
-    "getItemDefinitionList: executed get list for " + itemDefinition.getQualifiedPathName(),
+    {
+      functionName: "getItemDefinitionList",
+      message: "Executed get list for " + itemDefinition.getQualifiedPathName(),
+    },
   );
 
   const usesElastic = resolverArgs.args.searchengine === true;
@@ -329,11 +339,6 @@ export async function getItemDefinitionList(
       requestedFieldsInIdef[arg] = requestedFields[arg];
     }
   });
-
-  CAN_LOG_DEBUG && logger.debug(
-    "getItemDefinitionList: Extracted requested fields from idef",
-    requestedFields,
-  );
 
   const created_by = resolverArgs.args.created_by;
   let ownerToCheckAgainst = UNSPECIFIED_OWNER;
@@ -424,7 +429,10 @@ export async function getItemDefinitionList(
       const itemDefinitionTrigger = appData.triggers.item.io[pathOfThisIdef];
 
       CAN_LOG_DEBUG && logger.debug(
-        "getItemDefinitionList: checking role access for read",
+        {
+          functionName: "getItemDefinitionList",
+          message: "Checking role access for read",
+        },
       );
       const currentWholeValueAsGQL = convertSQLValueToGQLValueForItemDefinition(
         appData.cache.getServerData(),
@@ -567,7 +575,10 @@ export async function getItemDefinitionList(
     results: finalValues,
     highlights,
   };
-  CAN_LOG_DEBUG && logger.debug("getItemDefinitionList: done");
+  CAN_LOG_DEBUG && logger.debug({
+    functionName: "getItemDefinitionList",
+    message: "Done",
+  });
 
   return resultAsObject;
 }
@@ -578,7 +589,10 @@ export async function getModuleList(
   mod: Module,
 ) {
   CAN_LOG_DEBUG && logger.debug(
-    "getModuleList: executed get list for " + mod.getQualifiedPathName(),
+    {
+      functionName: "getModuleList",
+      message: "Executed get list for " + mod.getQualifiedPathName(),
+    },
   );
 
   const usesElastic = resolverArgs.args.searchengine === true;
@@ -611,10 +625,6 @@ export async function getModuleList(
       requestedFieldsInMod[arg] = requestedFields[arg];
     }
   });
-  CAN_LOG_DEBUG && logger.debug(
-    "getModuleList: Extracted requested fields from idef",
-    requestedFieldsInMod,
-  );
 
   const created_by = resolverArgs.args.created_by;
   let ownerToCheckAgainst = UNSPECIFIED_OWNER;
@@ -698,7 +708,10 @@ export async function getModuleList(
       );
 
       CAN_LOG_DEBUG && logger.debug(
-        "getModuleList: checking role access for read",
+        {
+          functionName: "getModuleList",
+          message: "Checking role access for read",
+        },
       );
       const ownerId = itemDefinition.isOwnerObjectId() ? value.id : value.created_by;
       const rolesManager = new CustomRoleManager(appData.customRoles, {
@@ -836,7 +849,10 @@ export async function getModuleList(
     highlights,
   };
 
-  CAN_LOG_DEBUG && logger.debug("getModuleList: done");
+  CAN_LOG_DEBUG && logger.debug({
+    functionName: "getModuleList",
+    message: "Done",
+  });
   return resultAsObject;
 }
 

@@ -31,14 +31,18 @@ export class ManualPaymentService extends PaymentProvider<null> {
 
   public onPayment(evObj: IPaymentEventObject) {
     logger.info(
-      "Processed payment event " + evObj.event,
       {
-        event: evObj.event,
-        id: evObj.id,
-        version: evObj.version,
-        uuid: evObj.uuid,
-        payment: evObj.payment,
-        hiddentMetadata: evObj.getHiddenMetadata(),
+        className: "ManualPaymentService",
+        methodName: "onPayment",
+        message: "Processed payment event " + evObj.event,
+        data: {
+          event: evObj.event,
+          id: evObj.id,
+          version: evObj.version,
+          uuid: evObj.uuid,
+          payment: evObj.payment,
+          hiddentMetadata: evObj.getHiddenMetadata(),
+        },
       }
     );
   }

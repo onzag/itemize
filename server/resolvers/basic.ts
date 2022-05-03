@@ -27,12 +27,6 @@ import { ISensitiveConfigRawJSONDataType } from "../../config";
 import { getConversionIds } from "../../base/Root/Module/ItemDefinition/PropertyDefinition/search-mode";
 import { CustomRoleGranterEnvironment, CustomRoleManager } from "./roles";
 
-// Used to optimize, it is found out that passing unecessary logs to the transport
-// can slow the logger down even if it won't display
-import {
-  CAN_LOG_SILLY
-} from "../environment";
-
 export interface IServerSideTokenDataType {
   // role always present
   role: string;
@@ -60,10 +54,13 @@ export function defaultTriggerWaitForPromiseFunction() {
 
 export function defaultTriggerInvalidForbiddenFunction(message: string, customCode?: string) {
   logger.error(
-    "Attempted to forbid on an already allowed action, this means that you attempted to call forbid on CREATED, EDITED or DELETED",
     {
-      message,
-      customCode,
+      functionName: "defaultTriggerInvalidForbiddenFunction",
+      message: "Attempted to forbid on an already allowed action, this means that you attempted to call forbid on CREATED, EDITED or DELETED",
+      data: {
+        message,
+        customCode,
+      },
     }
   );
   return;
@@ -115,13 +112,6 @@ export async function validateTokenAndGetData(appData: IAppDataType, token: stri
       });
     }
   }
-  CAN_LOG_SILLY && logger.silly(
-    "validateTokenAndGetData: validating token for user succeed",
-    {
-      token,
-      result,
-    },
-  );
   return result;
 }
 
@@ -252,13 +242,16 @@ export async function validateParentingRules(
       );
     } catch (err) {
       logger.error(
-        "validateParentingRules [SERIOUS]: could not retrieve item definition value to validate parenting rules",
         {
-          errStack: err.stack,
-          errMessage: err.message,
-          parentId,
-          parentVersion,
-          parentingItemDefinition,
+          functionName: "validateParentingRules",
+          message: "Could not retrieve item definition value to validate parenting rules",
+          serious: true,
+          err,
+          data: {
+            parentId,
+            parentVersion,
+            parentingItemDefinition,
+          },
         }
       );
       throw err;
@@ -293,10 +286,6 @@ export async function validateParentingRules(
     })
     await itemDefinition.checkRoleAccessForParenting(role, userId, parentOwnerId, parentingRolesManager, true);
   }
-
-  CAN_LOG_SILLY && logger.silly(
-    "validateParentingRules: parenting rules have passed",
-  );
 }
 
 export function retrieveSince(args: IGQLArgs): string {
@@ -475,9 +464,6 @@ export function checkLimit(limit: number, idefOrMod: Module | ItemDefinition, tr
       code: ENDPOINT_ERRORS.UNSPECIFIED,
     });
   }
-  CAN_LOG_SILLY && logger.silly(
-    "checkLimit: checking limits succeed",
-  );
 }
 
 export function checkListTypes(records: IGQLSearchRecord[], mod: Module) {
@@ -502,10 +488,6 @@ export function checkListTypes(records: IGQLSearchRecord[], mod: Module) {
       });
     }
   });
-
-  CAN_LOG_SILLY && logger.silly(
-    "checkListLimit: checking list types succeed",
-  );
 }
 
 /**
@@ -532,10 +514,6 @@ export function checkLanguage(appData: IAppDataType, args: any) {
       code: ENDPOINT_ERRORS.UNSPECIFIED,
     });
   }
-
-  CAN_LOG_SILLY && logger.silly(
-    "checkLanguage: checking limits succeed",
-  );
 }
 
 /**
@@ -579,9 +557,6 @@ export function checkUserCanSearch(args: any, moduleOrIdef: Module | ItemDefinit
  */
 export function getDictionary(appData: IAppDataType, args: any): string {
   const dictionary = appData.databaseConfig.dictionaries[args.language] || appData.databaseConfig.dictionaries["*"];
-  CAN_LOG_SILLY && logger.silly(
-    "getDictionary: got dictionary " + dictionary,
-  );
   return dictionary;
 }
 
@@ -627,11 +602,14 @@ export async function validateTokenIsntBlocked(
       );
     } catch (err) {
       logger.error(
-        "validateTokenIsntBlocked [SERIOUS]: Couldn't validate whether the token is blocked or not",
         {
-          errStack: err.stack,
-          errMessage: err.message,
-          tokenData,
+          functionName: "validateTokenIsntBlocked",
+          message: "Couldn't validate whether the token is blocked or not",
+          serious: true,
+          err,
+          data: {
+            tokenData,
+          },
         }
       );
       throw err;
@@ -658,9 +636,6 @@ export async function validateTokenIsntBlocked(
       });
     }
   }
-  CAN_LOG_SILLY && logger.silly(
-    "validateTokenIsntBlocked: token block checking succeed",
-  );
 }
 
 export async function checkUserExists(cache: Cache, id: string) {
@@ -671,11 +646,14 @@ export async function checkUserExists(cache: Cache, id: string) {
     );
   } catch (err) {
     logger.error(
-      "checkUserExists [SERIOUS]: Couldn't check whether the user exists",
       {
-        errStack: err.stack,
-        errMessage: err.message,
-        userId: id,
+        functionName: "checkUserExists",
+        message: "Couldn't check whether the user exists",
+        serious: true,
+        err,
+        data: {
+          userId: id,
+        },
       }
     );
     throw err;
@@ -686,9 +664,6 @@ export async function checkUserExists(cache: Cache, id: string) {
       code: ENDPOINT_ERRORS.USER_REMOVED,
     });
   }
-  CAN_LOG_SILLY && logger.silly(
-    "checkUserExists: check user exist succeed",
-  );
 }
 
 export interface IFilteredAndPreparedValueType {
@@ -788,10 +763,6 @@ export async function filterAndPrepareGQLValue(
     }
   }
 
-  CAN_LOG_SILLY && logger.silly(
-    "validateTokenIsntBlocked: prepared the value to provide",
-    valueToProvide,
-  );
   return valueToProvide;
 }
 
@@ -822,34 +793,29 @@ export async function serverSideCheckItemDefinitionAgainst(
     currentValue = await itemDefinition.getState(id, version);
   } catch (err) {
     logger.error(
-      "serverSideCheckItemDefinitionAgainst [SERIOUS]: Couldn't retrieve item definition state",
       {
-        errStack: err.stack,
-        errMessage: err.message,
-        id,
-        version,
-        itemDefinition: itemDefinition.getQualifiedPathName(),
-        referredInclude: referredInclude ? referredInclude.getQualifiedIdentifier() : null,
-        referredParentOfInclude: referredParentOfInclude ? referredParentOfInclude.getQualifiedPathName() : null,
+        functionName: "serverSideCheckItemDefinitionAgainst",
+        message: "Couldn't retrieve item definition state",
+        serious: true,
+        err,
+        data: {
+          id,
+          version,
+          itemDefinition: itemDefinition.getQualifiedPathName(),
+          referredInclude: referredInclude ? referredInclude.getQualifiedIdentifier() : null,
+          referredParentOfInclude: referredParentOfInclude ? referredParentOfInclude.getQualifiedPathName() : null,
+        },
       }
     );
     throw err;
   }
 
-  CAN_LOG_SILLY && logger.silly(
-    "serverSideCheckItemDefinitionAgainst: current state value for " + id + " and " + version,
-    currentValue,
-  )
   // now we are going to loop over the properties of that value
   currentValue.properties.forEach((propertyValue) => {
     // and we get what is set in the graphql value
     const gqlPropertyValue = gqlArgValue[propertyValue.propertyId];
     // now we check if it has an invalid reason
     if (propertyValue.invalidReason) {
-      CAN_LOG_SILLY && logger.silly(
-        "serverSideCheckItemDefinitionAgainst: failed due to property " + propertyValue.propertyId + " failing",
-        propertyValue,
-      );
       // throw an error then
       throw new EndpointError({
         message: `validation failed at property ${propertyValue.propertyId} with error ${propertyValue.invalidReason}`,
@@ -865,13 +831,6 @@ export async function serverSideCheckItemDefinitionAgainst(
       // we also check that the values are matching, but only if they have been
       // defined in the graphql value
     } else if (typeof gqlPropertyValue !== "undefined" && !equals(gqlPropertyValue, propertyValue.value)) {
-      CAN_LOG_SILLY && logger.silly(
-        "serverSideCheckItemDefinitionAgainst: failed due to property " + propertyValue.propertyId + " being unequal",
-        {
-          propertyValue,
-          gqlPropertyValue,
-        }
-      );
       throw new EndpointError({
         message: `validation failed at property ${propertyValue.propertyId} with a mismatch of calculated` +
           ` value expected ${JSON.stringify(propertyValue.value)} received ${JSON.stringify(gqlPropertyValue)}`,
@@ -903,13 +862,6 @@ export async function serverSideCheckItemDefinitionAgainst(
     const gqlExclusionState = gqlArgValue[include.getQualifiedExclusionStateIdentifier()] || null;
     // now we check if the exclusion states match
     if (includeValue.exclusionState !== gqlExclusionState) {
-      CAN_LOG_SILLY && logger.silly(
-        "serverSideCheckItemDefinitionAgainst: failed due to exclusion mismatch",
-        {
-          includeValue,
-          gqlExclusionState,
-        }
-      );
       throw new EndpointError({
         message: `validation failed at include ${includeValue.includeId} with a mismatch of exclusion state`,
         code: ENDPOINT_ERRORS.INVALID_INCLUDE,
@@ -920,13 +872,6 @@ export async function serverSideCheckItemDefinitionAgainst(
       });
       // and we check if the there's a value set despite it being excluded
     } else if (gqlExclusionState === IncludeExclusionState.EXCLUDED && gqlIncludeValue !== null) {
-      CAN_LOG_SILLY && logger.silly(
-        "serverSideCheckItemDefinitionAgainst: failed due to value set on include where it was excluded",
-        {
-          includeValue,
-          gqlExclusionState,
-        }
-      );
       throw new EndpointError({
         message: `validation failed at include ${includeValue.includeId} with an excluded item but data set for it`,
         code: ENDPOINT_ERRORS.INVALID_INCLUDE,
@@ -947,10 +892,6 @@ export async function serverSideCheckItemDefinitionAgainst(
       referredParentOfInclude || itemDefinition,
     );
   }
-
-  CAN_LOG_SILLY && logger.silly(
-    "serverSideCheckItemDefinitionAgainst: succeed checking item definition consistency",
-  );
 }
 
 /**
@@ -977,9 +918,6 @@ export function checkReadPoliciesAllowThisUserToSearch(
       });
     }
   });
-  CAN_LOG_SILLY && logger.silly(
-    "checkReadPoliciesAllowThisUserToSearch: succeed checking policies allow user to search",
-  );
 }
 
 const reservedKeys = Object.keys(RESERVED_BASE_PROPERTIES);
@@ -1009,10 +947,6 @@ export function splitArgsInGraphqlQuery(
       resultingExtraArgs[key] = args[key];
     }
   });
-
-  CAN_LOG_SILLY && logger.silly(
-    "splitArgsInGraphqlQuery: succeed splitting args for graphql",
-  );
 
   return [resultingSelfValues, resultingExtraArgs];
 }
@@ -1054,10 +988,6 @@ export async function runPolicyCheck(
     preParentValidation?: (content: ISQLTableRowValue) => void | ISQLTableRowValue,
   },
 ) {
-  CAN_LOG_SILLY && logger.silly(
-    "runPolicyCheck: Executed policy check for item definition",
-  );
-
   // so now we get the information we need first
   const mod = arg.itemDefinition.getParentModule();
 
@@ -1068,11 +998,16 @@ export async function runPolicyCheck(
       selectQueryValue = await arg.cache.requestValue(arg.itemDefinition, arg.id, arg.version);
     } catch (err) {
       logger.error(
-        "runPolicyCheck [SERIOUS]: could not run policy checks due to cache/database fail",
         {
-          id: arg.id,
-          version: arg.version,
-          itemDefinition: arg.itemDefinition,
+          functionName: "runPolicyCheck",
+          message: "Could not run policy checks due to cache/database fail",
+          serious: true,
+          err,
+          data: {
+            id: arg.id,
+            version: arg.version,
+            itemDefinition: arg.itemDefinition,
+          },
         }
       );
       throw err;
@@ -1085,12 +1020,17 @@ export async function runPolicyCheck(
       );
     } catch (err) {
       logger.error(
-        "runPolicyCheck [SERIOUS]: could not run policy checks due to cache/database fail on parent rule",
         {
-          parentVersion: arg.parentVersion,
-          parentId: arg.parentId,
-          parentType: arg.parentType,
-          parentModule: arg.parentModule
+          functionName: "runPolicyCheck",
+          message: "Could not run policy checks due to cache/database fail on parent rule",
+          serious: true,
+          err,
+          data: {
+            parentVersion: arg.parentVersion,
+            parentId: arg.parentId,
+            parentType: arg.parentType,
+            parentModule: arg.parentModule
+          },
         }
       );
       throw err;
@@ -1117,24 +1057,10 @@ export async function runPolicyCheck(
 
     // so we loop in these policies
     for (const policyName of policiesForThisType) {
-      CAN_LOG_SILLY && logger.silly(
-        "runPolicyCheck: Found policy",
-        {
-          policyName,
-        }
-      );
       // and we get the roles that need to apply to this policy
       const rolesForThisSpecificPolicy = arg.itemDefinition.getRolesForPolicy(policyType, policyName);
       // if this is not our user, we can just continue with the next
       if (!rolesForThisSpecificPolicy.includes(arg.role)) {
-        CAN_LOG_SILLY && logger.silly(
-          "ignoring policy the role does not require it",
-          {
-            policyName,
-            role: arg.role,
-            rolesForThisSpecificPolicy,
-          }
-        );
         continue;
       }
 
@@ -1180,13 +1106,6 @@ export async function runPolicyCheck(
         }
 
         if (!someIncludeOrPropertyIsApplied) {
-          CAN_LOG_SILLY && logger.silly(
-            "runPolicyCheck: ignoring policy as there was no match for applying property or include",
-            {
-              policyName,
-              applyingPropertyIds,
-            }
-          );
           continue;
         }
       }
@@ -1196,13 +1115,6 @@ export async function runPolicyCheck(
       const propertiesInContext = arg.itemDefinition.getPropertiesForPolicy(policyType, policyName);
       // we loop through those properties
       for (const property of propertiesInContext) {
-        CAN_LOG_SILLY && logger.silly(
-          "runPolicyCheck: found property in policy",
-          {
-            propertyId: property.getId(),
-          }
-        );
-
         // now we need the qualified policy identifier, that's where in the args
         // the value for this policy is stored
         const qualifiedPolicyIdentifier = property.getQualifiedPolicyIdentifier(policyType, policyName);
@@ -1213,14 +1125,6 @@ export async function runPolicyCheck(
           policyValueForTheProperty = null;
         }
 
-        CAN_LOG_SILLY && logger.silly(
-          "runPolicyCheck: Property qualified policy identifier found and value is set",
-          {
-            qualifiedPolicyIdentifier,
-            policyValueForTheProperty,
-          }
-        );
-
         // now we check if it's a valid value, the value we have given, for the given property
         // this is a shallow check but works
         let invalidReason: string;
@@ -1228,11 +1132,16 @@ export async function runPolicyCheck(
           invalidReason = await property.isValidValue(arg.id, arg.version, policyValueForTheProperty);
         } catch (err) {
           logger.error(
-            "runPolicyCheck [SERIOUS]: couldn't check if the value is valid",
             {
-              id: arg.id,
-              version: arg.version,
-              policyValueForTheProperty,
+              functionName: "runPolicyCheck",
+              message: "Couldn't check if the value is valid",
+              serious: true,
+              err,
+              data: {
+                id: arg.id,
+                version: arg.version,
+                policyValueForTheProperty,
+              },
             }
           );
           throw err;
@@ -1240,12 +1149,6 @@ export async function runPolicyCheck(
 
         // if we get an invalid reason, the policy cannot even pass there
         if (invalidReason) {
-          CAN_LOG_SILLY && logger.silly(
-            "runPolicyCheck: Failed for not passing property validation",
-            {
-              invalidReason,
-            }
-          );
           throw new EndpointError({
             message: `validation failed for ${qualifiedPolicyIdentifier} with reason ${invalidReason}`,
             code: ENDPOINT_ERRORS.INVALID_POLICY,
@@ -1271,12 +1174,6 @@ export async function runPolicyCheck(
         });
 
         if (!policyMatches) {
-          CAN_LOG_SILLY && logger.silly(
-            "runPolicyCheck: Failed due to policy not pasing",
-            {
-              policyName,
-            }
-          );
           throw new EndpointError({
             message: `validation failed for policy ${policyName}`,
             code: ENDPOINT_ERRORS.INVALID_POLICY,
@@ -1289,10 +1186,6 @@ export async function runPolicyCheck(
       }
     }
   }
-
-  CAN_LOG_SILLY && logger.silly(
-    "runPolicyCheck: Completed checking policies",
-  );
 
   return selectQueryValue;
 }

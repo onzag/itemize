@@ -32,7 +32,10 @@ export function retrieveRootPool(rawData: IRootRawJSONDataType): Pool<Root> {
     },
     log: (message) => {
       CAN_LOG_DEBUG && logger.debug(
-        message,
+        {
+          message,
+          functionName: "retrieveRootPool",
+        }
       );
     },
     min: 10,

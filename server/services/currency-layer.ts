@@ -1,7 +1,6 @@
 import http from "http";
 import https from "https";
 import { ServiceProviderType } from ".";
-import { logger } from "../logger";
 import { CACHED_CURRENCY_RESPONSE } from "../../constants";
 import CurrencyFactorsProvider, { ICurrencyFactors } from "./base/CurrencyFactorsProvider";
 
@@ -33,7 +32,11 @@ export class CurrencyLayerService extends CurrencyFactorsProvider<ICurrencyLayer
         (err, cachedData) => {
           const parsedCachedData: CurrencyLayerResponse = cachedData && !err && JSON.parse(cachedData);
           if (!parsedCachedData || (new Date()).getTime() - (parsedCachedData.timestamp * 1000) >= 86400000) {
-            logger.info("CurrencyLayer.requestInfo: requesting fresh info");
+            this.logInfo({
+              className: "CurrencyLayer",
+              methodName: "requestInfo",
+              message: "Requesting fresh info",
+            });
             (this.config.httpsEnabled ? https : http).get(`http://api.currencylayer.com/live?access_key=${this.config.apiKey}`, (resp) => {
               // let's get the response from the stream
               let data = "";
@@ -41,11 +44,12 @@ export class CurrencyLayerService extends CurrencyFactorsProvider<ICurrencyLayer
                 data += chunk;
               });
               resp.on("error", (err) => {
-                logger.error(
-                  "CurrencyLayer.requestInfo: request to the ip stack ip returned error",
+                this.logError(
                   {
-                    errMessage: err.message,
-                    errStack: err.stack,
+                    className: "CurrencyLayer",
+                    methodName: "requestInfo",
+                    message: "Request to the ip stack ip returned error",
+                    err,
                   }
                 );
                 reject(err);
@@ -55,11 +59,15 @@ export class CurrencyLayerService extends CurrencyFactorsProvider<ICurrencyLayer
                 try {
                   const parsedData = JSON.parse(data);
                   if (parsedData.error) {
-                    logger.error(
-                      "CurrencyLayer.requestInfo: CurrencyLayer provided a custom error",
+                    this.logError(
                       {
-                        errMessage: parsedData.error,
-                        data,
+                        className: "CurrencyLayer",
+                        methodName: "requestInfo",
+                        message: "CurrencyLayer provided a custom error",
+                        err,
+                        data: {
+                          data,
+                        },
                       }
                     );
                     reject(new Error(parsedData.error));
@@ -71,29 +79,37 @@ export class CurrencyLayerService extends CurrencyFactorsProvider<ICurrencyLayer
                     resolve(parsedData);
                   }
                 } catch (err) {
-                  logger.error(
-                    "CurrencyLayer.requestInfo: request currency layer returned invalid data",
+                  this.logError(
                     {
-                      errMessage: err.message,
-                      errStack: err.stack,
-                      data,
+                      className: "CurrencyLayer",
+                      methodName: "requestInfo",
+                      message: "Request currency layer returned invalid data",
+                      err,
+                      data: {
+                        data,
+                      },
                     }
                   );
                   reject(err);
                 }
               });
             }).on("error", (err) => {
-              logger.error(
-                "CurrencyLayer.requestInfo: request to CurrencyLayer API failed",
+              this.logError(
                 {
-                  errMessage: err.message,
-                  errStack: err.stack,
+                  className: "CurrencyLayer",
+                  methodName: "requestInfo",
+                  message: "Request to CurrencyLayer API failed",
+                  err,
                 }
               );
               reject(err);
             });
           } else {
-            logger.info("CurrencyLayer.requestInfo: reusing an existant value");
+            this.logInfo({
+              className: "CurrencyLayer",
+              methodName: "requestInfo",
+              message: "Reusing an existant value",
+            });
             resolve(parsedCachedData);
           }
         }

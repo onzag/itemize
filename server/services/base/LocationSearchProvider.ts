@@ -6,8 +6,7 @@
 
 import { IPropertyDefinitionSupportedLocationType } from "../../../base/Root/Module/ItemDefinition/PropertyDefinition/types/location";
 import uuidv5 from "uuid/v5";
-import { IServiceProviderClassType, ServiceProvider, ServiceProviderType } from "..";
-import { RegistryService } from "../registry";
+import { ServiceProvider, ServiceProviderType } from "..";
 
 /**
  * this id can be whatever just to ensure lat and long produce the same id no matter what

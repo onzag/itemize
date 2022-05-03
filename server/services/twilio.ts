@@ -8,8 +8,12 @@ export class TwilioService extends PhoneProvider<null> {
   public async sendSMS(data: ISendSMSData) {
     // TODO Not implemented
     this.logInfo(
-      "TwilioService.sendSMS: NOT IMPLEMENTED",
-      data,
+      {
+        className: "TwilioService",
+        methodName: "sendSMS",
+        message: "NOT IMPLEMENTED",
+        data,
+      },
     );
   }
 }

@@ -8,9 +8,24 @@ import { logger } from "./logger";
 import equals from "deep-equal";
 import { convertSQLValueToElasticSQLValueForItemDefinition } from "../base/Root/Module/ItemDefinition/sql";
 import { DELETED_REGISTRY_IDENTIFIER } from "../constants";
-import { CAN_LOG_DEBUG } from "./environment";
+import { CAN_LOG_DEBUG, INSTANCE_UUID } from "./environment";
 import { NanoSecondComposedDate } from "../nanodate";
 import { FieldValue, QueryDslMatchPhraseQuery, QueryDslMatchQuery, QueryDslQueryContainer, QueryDslTermQuery, QueryDslTermsQuery, SearchRequest } from "@elastic/elasticsearch/lib/api/types";
+import { setInterval } from "timers";
+
+export interface IElasticPing<N> {
+  statusIndex: string;
+  dataIndex: string;
+  data: N;
+}
+
+interface IElasticPingSetter<N, T> extends IElasticPing<N> {
+  statusRetriever: () => T;
+}
+
+export interface IPingEvent<N, T> extends IElasticPing<N> {
+  status: T;
+}
 
 interface ILangAnalyzers {
   [key: string]: string;
@@ -189,6 +204,9 @@ export class ItemizeElasticClient {
 
   private currentlyEnsuringIndexInGroup: { [n: string]: Promise<boolean> } = {};
 
+  private pings: IElasticPingSetter<any, any>[] = [];
+  private pingsInitialDataSet: boolean[] = [];
+
   constructor(
     root: Root,
     rawDB: ItemizeRawDB,
@@ -216,6 +234,8 @@ export class ItemizeElasticClient {
     // in absolute mode, when both are called, so it will block it
     // in extended mode where prepare instance is never called
     this.prepareInstancePromise = null;
+
+    setInterval(this.executePings.bind(this), 5000);
   }
 
   /**
@@ -294,10 +314,12 @@ export class ItemizeElasticClient {
 
         const timeToWait = 1000 * secondsToWait;
         logger.error(
-          "ItemizeElasticClient.prepareInstance [SERIOUS]: could not prepare elastic instance waiting " + secondsToWait + "s",
           {
-            errStack: err.stack,
-            errMessage: err.message,
+            className: "ItemizeElasticClient",
+            methodName: "prepareInstance",
+            message: "Could not prepare elastic instance waiting " + secondsToWait + "s",
+            serious: true,
+            err,
           }
         );
 
@@ -382,11 +404,19 @@ export class ItemizeElasticClient {
     if (this.prepareInstancePromise) {
       await this.prepareInstancePromise;
       logger.info(
-        "ItemizeElasticClient.confirmInstanceReadiness: instance was launched with preparation and confirmation at once, waiting for preparation",
+        {
+          className: "ItemizeElasticClient",
+          methodName: "confirmInstanceReadiness",
+          message: "Instance was launched with preparation and confirmation at once, waiting for preparation",
+        },
       );
     } else {
       logger.info(
-        "ItemizeElasticClient.confirmInstanceReadiness: instance was launched withoout known preparation, confirming immediately",
+        {
+          className: "ItemizeElasticClient",
+          methodName: "confirmInstanceReadiness",
+          message: "Instance was launched withoout known preparation, confirming immediately",
+        },
       );
     }
 
@@ -408,17 +438,23 @@ export class ItemizeElasticClient {
         // as it's not a real error
         if (err instanceof NotReadyError) {
           logger.info(
-            "ItemizeElasticClient.confirmInstanceReadiness: not ready, waiting " + secondsToWait + "s",
             {
-              message: err.message,
+              className: "ItemizeElasticClient",
+              methodName: "confirmInstanceReadiness",
+              message: "Not ready, waiting " + secondsToWait + "s",
+              data: {
+                message: err.message,
+              },
             }
           );
         } else {
           logger.error(
-            "ItemizeElasticClient.confirmInstanceReadiness [SERIOUS]: could not confirm the elastic instance waiting " + secondsToWait + "s",
             {
-              errStack: err.stack,
-              errMessage: err.message,
+              className: "ItemizeElasticClient",
+              methodName: "confirmInstanceReadiness",
+              message: "Could not confirm the elastic instance waiting " + secondsToWait + "s",
+              serious: true,
+              err,
             }
           );
         }
@@ -428,7 +464,11 @@ export class ItemizeElasticClient {
     }
 
     logger.info(
-      "ItemizeElasticClient.confirmInstanceReadiness: confirmation has been successful, ending block",
+      {
+        className: "ItemizeElasticClient",
+        methodName: "confirmInstanceReadiness",
+        message: "Confirmation has been successful, ending block",
+      },
     );
   }
 
@@ -439,7 +479,11 @@ export class ItemizeElasticClient {
    */
   private async _confirmInstanceReadiness(): Promise<void> {
     logger.info(
-      "ItemizeElasticClient._confirmInstanceReadiness: now confirming",
+      {
+        className: "ItemizeElasticClient",
+        methodName: "_confirmInstanceReadiness",
+        message: "Now confirming",
+      },
     );
 
     // this is similar to the prepare function but we do not update
@@ -547,7 +591,11 @@ export class ItemizeElasticClient {
     value: IElasticIndexDefinitionType,
   ) {
     logger.info(
-      "ItemizeElasticClient.createOrUpdateSimpleIndex: ensuring index for " + id,
+      {
+        className: "ItemizeElasticClient",
+        methodName: "createOrUpdateSimpleIndex",
+        message: "Ensuring index for " + id,
+      },
     );
 
     const analyzer = this.langAnalyzers["en"] || this.langAnalyzers["*"] || "standard";
@@ -569,7 +617,11 @@ export class ItemizeElasticClient {
       const isCompatible = compCheck.general;
       if (!isCompatible) {
         logger.info(
-          "ItemizeElasticClient.createOrUpdateSimpleIndex: index for " + id + " to be updated: " + compCheck.generalFalseReason,
+          {
+            className: "ItemizeElasticClient",
+            methodName: "createOrUpdateSimpleIndex",
+            message: "Index for " + id + " to be updated: " + compCheck.generalFalseReason,
+          },
         );
         await this.elasticClient.indices.putMapping({
           index: indexName,
@@ -578,12 +630,20 @@ export class ItemizeElasticClient {
         });
       } else {
         logger.info(
-          "ItemizeElasticClient.createOrUpdateSimpleIndex: index for " + id + " deemed compatible",
+          {
+            className: "ItemizeElasticClient",
+            methodName: "createOrUpdateSimpleIndex",
+            message: "Index for " + id + " deemed compatible",
+          },
         );
       }
     } else {
       logger.info(
-        "ItemizeElasticClient.createOrUpdateSimpleIndex: index for " + id + " to be created",
+        {
+          className: "ItemizeElasticClient",
+          methodName: "createOrUpdateSimpleIndex",
+          message: "Index for " + id + " to be created",
+        },
       );
       await this.elasticClient.indices.create({
         index: indexName,
@@ -616,7 +676,11 @@ export class ItemizeElasticClient {
     value: IElasticIndexDefinitionType,
   ) {
     logger.info(
-      "ItemizeElasticClient._rebuildIndexGroup: ensuring index validity for " + qualifiedName,
+      {
+        className: "ItemizeElasticClient",
+        methodName: "_rebuildIndexGroup",
+        message: "Ensuring index validity for " + qualifiedName,
+      },
     );
     const indexInfo = await this.retrieveIndexStatusInfo(qualifiedName);
 
@@ -626,7 +690,11 @@ export class ItemizeElasticClient {
 
     if (!indexInfo) {
       logger.info(
-        "ItemizeElasticClient._rebuildIndexGroup: index group for " + qualifiedName + " status to be created",
+        {
+          className: "ItemizeElasticClient",
+          methodName: "_rebuildIndexGroup",
+          message: "Index group for " + qualifiedName + " status to be created",
+        },
       );
 
       await this.setIndexStatusInfo(
@@ -638,7 +706,11 @@ export class ItemizeElasticClient {
 
       if (currentMapping) {
         logger.info(
-          "ItemizeElasticClient._rebuildIndexGroup: index group for " + qualifiedName + " deemed missing, but mapping found, destructive actions taken",
+          {
+            className: "ItemizeElasticClient",
+            methodName: "_rebuildIndexGroup",
+            message: "Index group for " + qualifiedName + " deemed missing, but mapping found, destructive actions taken",
+          },
         );
 
         const indexNames = allIndexNames.join(",");
@@ -664,10 +736,14 @@ export class ItemizeElasticClient {
       // is invalid and must be re-retrieved once again
       if (!compatibilityCheck.scriptsIgnored) {
         logger.info(
-          "ItemizeElasticClient._rebuildIndexGroup: index group for " +
-          qualifiedName +
-          " deemed incompatible, destructive actions taken: " +
-          compatibilityCheck.scriptsIgnoredFalseReason,
+          {
+            className: "ItemizeElasticClient",
+            methodName: "_rebuildIndexGroup",
+            message: "Index group for " +
+              qualifiedName +
+              " deemed incompatible; destructive actions taken: " +
+              compatibilityCheck.scriptsIgnoredFalseReason,
+          },
         );
         await this.setIndexStatusInfo(
           qualifiedName,
@@ -681,10 +757,14 @@ export class ItemizeElasticClient {
         })
       } else if (!compatibilityCheck.general) {
         logger.info(
-          "ItemizeElasticClient._rebuildIndexGroup: index group for " +
-          qualifiedName +
-          " to be updated: " +
-          compatibilityCheck.generalFalseReason,
+          {
+            className: "ItemizeElasticClient",
+            methodName: "_rebuildIndexGroup",
+            message: "Index group for " +
+              qualifiedName +
+              " to be updated: " +
+              compatibilityCheck.generalFalseReason,
+          },
         );
         await this.elasticClient.indices.putMapping({
           index: wildcardName,
@@ -693,12 +773,20 @@ export class ItemizeElasticClient {
         });
       } else {
         logger.info(
-          "ItemizeElasticClient._rebuildIndexGroup: index group for " + qualifiedName + " deemed compatible",
+          {
+            className: "ItemizeElasticClient",
+            methodName: "_rebuildIndexGroup",
+            message: "Index group for " + qualifiedName + " deemed compatible",
+          },
         );
       }
     } else {
       logger.info(
-        "ItemizeElasticClient._rebuildIndexGroup: index group for " + qualifiedName + " deemed empty (compatible)",
+        {
+          className: "ItemizeElasticClient",
+          methodName: "_rebuildIndexGroup",
+          message: "Index group for " + qualifiedName + " deemed empty (compatible)",
+        },
       );
     }
   }
@@ -738,7 +826,11 @@ export class ItemizeElasticClient {
     await this.waitForServerData();
 
     logger.info(
-      "ItemizeElasticClient.ensureSimpleIndex: ensuring index validity for " + id,
+      {
+        className: "ItemizeElasticClient",
+        methodName: "ensureSimpleIndex",
+        message: "Ensuring index validity for " + id,
+      },
     );
 
     const indexName = id.toLowerCase();
@@ -787,14 +879,22 @@ export class ItemizeElasticClient {
     const schemaToBuild = this.rootSchema[qualifiedName];
 
     logger.info(
-      "ItemizeElasticClient.ensureIndexes: ensuring index validity for " + qualifiedName,
+      {
+        className: "ItemizeElasticClient",
+        methodName: "ensureIndexes",
+        message: "Ensuring index validity for " + qualifiedName,
+      },
     );
 
     const indexInfo = await this.retrieveIndexStatusInfo(qualifiedName);
 
     if (!indexInfo) {
       logger.info(
-        "ItemizeElasticClient.ensureIndexes: entire data for index " + qualifiedName + " is missing",
+        {
+          className: "ItemizeElasticClient",
+          methodName: "ensureIndexes",
+          message: "Entire data for index " + qualifiedName + " is missing",
+        },
       );
       if (throwError) {
         throw new NotReadyError("Index for " + qualifiedName + " is not ready because the info itself is missing");
@@ -812,7 +912,11 @@ export class ItemizeElasticClient {
     // and it will have the right expected shape
     if (!currentMapping) {
       logger.info(
-        "ItemizeElasticClient.ensureIndexes: index for " + qualifiedName + " deemed empty (compatible)",
+        {
+          className: "ItemizeElasticClient",
+          methodName: "ensureIndexes",
+          message: "Index for " + qualifiedName + " deemed empty (compatible)",
+        },
       );
       return true;
     }
@@ -830,18 +934,26 @@ export class ItemizeElasticClient {
     const compatibilityCheck = mappingsAreCompatible(mappingAsElasticIndex, schemaToBuild);
     if (!compatibilityCheck.scriptsIgnored) {
       const infoMsg = (
-        "ItemizeElasticClient.ensureIndexes: index for " +
+        "Index for " +
         qualifiedName +
         " does not have the right shape: " +
         compatibilityCheck.scriptsIgnoredFalseReason
       );
-      logger.info(infoMsg);
+      logger.info({
+        className: "ItemizeElasticClient",
+        methodName: "ensureIndexes",
+        message: infoMsg,
+      });
       if (throwError) {
         throw new NotReadyError(infoMsg);
       }
     } else {
       logger.info(
-        "ItemizeElasticClient.ensureIndexes: index for " + qualifiedName + " deemed compatible",
+        {
+          className: "ItemizeElasticClient",
+          methodName: "ensureIndexes",
+          message: "Index for " + qualifiedName + " deemed compatible",
+        },
       );
     }
 
@@ -933,10 +1045,14 @@ export class ItemizeElasticClient {
 
     const qualifiedPathName = idef.getQualifiedPathName();
     CAN_LOG_DEBUG && logger.debug(
-      "ItemizeElasticClient._runConsistencyCheck: index for " + qualifiedPathName + " to be checked for",
       {
-        batchNumber,
-        timeRan,
+        className: "ItemizeElasticClient",
+        methodName: "_runConsistencyCheck",
+        message: "Index for " + qualifiedPathName + " to be checked for",
+        data: {
+          batchNumber,
+          timeRan,
+        },
       }
     );
 
@@ -978,7 +1094,11 @@ export class ItemizeElasticClient {
 
       if (batchNumber === 0) {
         CAN_LOG_DEBUG && logger.debug(
-          "ItemizeElasticClient._runConsistencyCheck: removing all documents for " + qualifiedPathName + " older than " + minimumCreatedAt,
+          {
+            className: "ItemizeElasticClient",
+            methodName: "_runConsistencyCheck",
+            message: "Removing all documents for " + qualifiedPathName + " older than " + minimumCreatedAt,
+          },
         );
 
         await this.elasticClient.deleteByQuery({
@@ -995,7 +1115,11 @@ export class ItemizeElasticClient {
       }
     } else if (CAN_LOG_DEBUG && batchNumber === 0) {
       logger.debug(
-        "ItemizeElasticClient._runConsistencyCheck: " + qualifiedPathName + " does not have any since limiter",
+        {
+          className: "ItemizeElasticClient",
+          methodName: "_runConsistencyCheck",
+          message: "" + qualifiedPathName + " does not have any since limiter",
+        },
       );
     }
 
@@ -1016,9 +1140,13 @@ export class ItemizeElasticClient {
 
       if (documentsDeletedSinceLastRan.length) {
         CAN_LOG_DEBUG && logger.debug(
-          "ItemizeElasticClient._runConsistencyCheck: removing all documents found (they most likely already have been deleted) for " + qualifiedPathName,
           {
-            documentsDeletedSinceLastRan,
+            className: "ItemizeElasticClient",
+            methodName: "_runConsistencyCheck",
+            message: "Removing all documents found (they most likely already have been deleted) for " + qualifiedPathName,
+            data: {
+              documentsDeletedSinceLastRan,
+            },
           }
         );
         await this.deleteDocumentsUnknownLanguage(
@@ -1027,7 +1155,11 @@ export class ItemizeElasticClient {
         );
       } else if (CAN_LOG_DEBUG) {
         logger.debug(
-          "ItemizeElasticClient.runConsistencyCheck: did not recieve any documents to delete for " + qualifiedPathName,
+          {
+            className: "ItemizeElasticClient",
+            methodName: "runConsistencyCheck",
+            message: "Did not recieve any documents to delete for " + qualifiedPathName,
+          },
         );
       }
     }
@@ -1201,11 +1333,15 @@ export class ItemizeElasticClient {
           }
 
           CAN_LOG_DEBUG && logger.debug(
-            "ItemizeElasticClient.runConsistencyCheck: operation for " + qualifiedPathName + " has been added (wrong language)",
             {
-              operation: "delete",
-              index: hit._index,
-              id: hit._id,
+              className: "ItemizeElasticClient",
+              methodName: "runConsistencyCheck",
+              message: "Operation for " + qualifiedPathName + " has been added (wrong language)",
+              data: {
+                operation: "delete",
+                index: hit._index,
+                id: hit._id,
+              },
             }
           );
 
@@ -1270,11 +1406,15 @@ export class ItemizeElasticClient {
           }
 
           CAN_LOG_DEBUG && logger.debug(
-            "ItemizeElasticClient.runConsistencyCheck: operation for " + qualifiedPathName + " has been added",
             {
-              operation: isOutdated ? "update" : "create",
-              index: indexItWillBelongTo,
-              id,
+              className: "ItemizeElasticClient",
+              methodName: "runConsistencyCheck",
+              message: "Operation for " + qualifiedPathName + " has been added",
+              data: {
+                operation: isOutdated ? "update" : "create",
+                index: indexItWillBelongTo,
+                id,
+              },
             }
           );
 
@@ -1307,18 +1447,25 @@ export class ItemizeElasticClient {
         });
       } else if (CAN_LOG_DEBUG) {
         logger.debug(
-          "ItemizeElasticClient.runConsistencyCheck: did not recieve any new documents (that are missing or outdated in elastic) for " + qualifiedPathName,
+          {
+            className: "ItemizeElasticClient",
+            methodName: "runConsistencyCheck",
+            message: "Did not recieve any new documents (that are missing or outdated in elastic) for " + qualifiedPathName,
+          },
         );
       }
 
       if (bulkOperations.length) {
-        CAN_LOG_DEBUG && logger.debug(
-          "ItemizeElasticClient.runConsistencyCheck: " +
-          bulkOperations.length +
-          " bulk operations have been created for batch " +
-          (batchNumber + 1) +
-          " of " +
-          qualifiedPathName,
+        logger.info(
+          {
+            className: "ItemizeElasticClient",
+            methodName: "runConsistencyCheck",
+            message: bulkOperations.length +
+              " bulk operations have been created for batch " +
+              (batchNumber + 1) +
+              " of " +
+              qualifiedPathName,
+          },
         );
         // we are done
         try {
@@ -1327,15 +1474,19 @@ export class ItemizeElasticClient {
           // as some of these elastic servers can really take very tiny payloads
           // this will ensure a rather constant stream of data
           await Promise.all(bulkOperations.map(async (bulkOp, index) => {
-            CAN_LOG_DEBUG && logger.debug(
-              "ItemizeElasticClient.runConsistencyCheck: executing bulk number " +
-              (index + 1) +
-              "/" +
-              bulkOperations.length +
-              " for batch " +
-              (batchNumber + 1) +
-              " of " +
-              qualifiedPathName,
+            logger.info(
+              {
+                className: "ItemizeElasticClient",
+                methodName: "runConsistencyCheck",
+                message: "Executing bulk number " +
+                  (index + 1) +
+                  "/" +
+                  bulkOperations.length +
+                  " for batch " +
+                  (batchNumber + 1) +
+                  " of " +
+                  qualifiedPathName,
+              },
             );
 
             const operations = await this.elasticClient.bulk({
@@ -1366,17 +1517,23 @@ export class ItemizeElasticClient {
           }));
         } catch (err) {
           logger.error(
-            "ItemizeElasticClient.runConsistencyCheck [SERIOUS]: bulk operations failed for " + qualifiedPathName,
             {
-              errMessage: err.message,
-              errStack: err.stack,
+              className: "ItemizeElasticClient",
+              methodName: "runConsistencyCheck",
+              message: "Bulk operations failed for " + qualifiedPathName,
+              serious: true,
+              err,
             }
           );
           throw err;
         }
       } else if (CAN_LOG_DEBUG) {
         logger.debug(
-          "ItemizeElasticClient.runConsistencyCheck: did not recieve any bulk operations for " + qualifiedPathName,
+          {
+            className: "ItemizeElasticClient",
+            methodName: "runConsistencyCheck",
+            message: "Did not recieve any bulk operations for " + qualifiedPathName,
+          },
         );
       }
     }
@@ -1449,7 +1606,11 @@ export class ItemizeElasticClient {
     const analyzerLow = analyzer.toLowerCase();
 
     logger.info(
-      "ItemizeElasticClient.generateMissingIndexInGroup: index " + indexName + " to be created",
+      {
+        className: "ItemizeElasticClient",
+        methodName: "generateMissingIndexInGroup",
+        message: "Index " + indexName + " to be created",
+      },
     );
 
     await this.elasticClient.indices.create({
@@ -1537,11 +1698,15 @@ export class ItemizeElasticClient {
     const givenID = id + "." + (version || "");
 
     CAN_LOG_DEBUG && logger.debug(
-      "ItemizeElasticClient.deleteDocument: document for " + qualifiedNameItem + " to be deleted",
       {
-        id,
-        version,
-        language,
+        className: "ItemizeElasticClient",
+        methodName: "deleteDocument",
+        message: "Document for " + qualifiedNameItem + " to be deleted",
+        data: {
+          id,
+          version,
+          language,
+        },
       }
     );
 
@@ -1554,10 +1719,12 @@ export class ItemizeElasticClient {
       // if index_not_found or not_found isn't the case
       if (err.meta.statusCode !== 404) {
         logger.error(
-          "ItemizeElasticClient.deleteDocument [SERIOUS]: could not delete document for " + givenID + " at " + indexNameIdef,
           {
-            errStack: err.stack,
-            errMessage: err.message,
+            className: "ItemizeElasticClient",
+            methodName: "deleteDocument",
+            message: "Could not delete document for " + givenID + " at " + indexNameIdef,
+            serious: true,
+            err,
           }
         );
       }
@@ -1647,12 +1814,16 @@ export class ItemizeElasticClient {
     }
 
     CAN_LOG_DEBUG && logger.debug(
-      "ItemizeElasticClient.updateDocument: document for " + idef.getQualifiedPathName() + " to be updated with new data",
       {
-        id,
-        version,
-        language,
-        originalLanguage,
+        className: "ItemizeElasticClient",
+        methodName: "updateDocument",
+        message: "Document for " + idef.getQualifiedPathName() + " to be updated with new data",
+        data: {
+          id,
+          version,
+          language,
+          originalLanguage,
+        },
       }
     );
 
@@ -1705,10 +1876,12 @@ export class ItemizeElasticClient {
       }
     } catch (err) {
       logger.error(
-        "ItemizeElasticClient.deleteDocument [SERIOUS]: could not create an elastic document for " + mergedId + " at " + indexName,
         {
-          errStack: err.stack,
-          errMessage: err.message,
+          className: "ItemizeElasticClient",
+          methodName: "deleteDocument",
+          message: "Could not create an elastic document for " + mergedId + " at " + indexName,
+          serious: true,
+          err,
         }
       );
     }
@@ -1794,6 +1967,134 @@ export class ItemizeElasticClient {
     }
     const response = await this.elasticClient.count(request);
     return response;
+  }
+
+  // ping functionality
+  public createPing<N, T>(setter: IElasticPingSetter<N, T>) {
+    this.pings.push(setter);
+    this.pingsInitialDataSet.push(false);
+  }
+
+  private async executePing(index: number) {
+    const setter = this.pings[index];
+    const initialDataSet = this.pingsInitialDataSet[index];
+
+    if (!initialDataSet) {
+      const initialData = { ...setter.data };
+      initialData.timestamp = (new Date()).toISOString();
+
+      try {
+        await this.elasticClient.index({
+          index: setter.dataIndex,
+          id: INSTANCE_UUID,
+          document: initialData,
+        });
+        this.pingsInitialDataSet[index] = true;
+      } catch (err) {
+        logger.error(
+          {
+            className: "ItemizeElasticClient",
+            methodName: "executePing",
+            message: "Could not execute a given ping initial data",
+            serious: true,
+            err,
+          }
+        );
+      }
+    }
+
+    try {
+      const status = setter.statusRetriever();
+      status.instanceId = INSTANCE_UUID;
+      status.timestamp = (new Date()).toISOString();
+
+      await this.elasticClient.index({
+        index: setter.statusIndex,
+        document: status,
+      });
+    } catch (err) {
+      logger.error(
+        {
+          className: "ItemizeElasticClient",
+          methodName: "executePing",
+          message: "Could not execute a ping",
+          serious: true,
+          err,
+        }
+      );
+    }
+  }
+
+  private async executePings() {
+    await Promise.all(this.pings.map((p, index) => this.executePing(index)));
+  }
+
+  public async getAllStoredPingsAt<N>(dataIndex: string) {
+    const allResults = await this.elasticClient.search<N>({
+      index: dataIndex,
+    });
+
+    const resultKeyd: { [key: string]: N } = {};
+
+    allResults.hits.hits.forEach((hit) => {
+      resultKeyd[hit._id] = hit._source;
+    });
+
+    return resultKeyd;
+  }
+
+  public async deletePingsFor(dataIndex: string, statusIndex: string, instanceId: string): Promise<"NOT_DEAD" | "OK"> {
+    const lastStatusGiven = await this.elasticClient.search({
+      index: statusIndex,
+      size: 1,
+      _source: false,
+      query: {
+        match: {
+          instanceId,
+        }
+      },
+      fields: [
+        "timestamp",
+      ],
+      sort: [
+        {
+          timestamp: {
+            order: "desc",
+          }
+        } as any,
+      ]
+    });
+
+    if (lastStatusGiven.hits.total !== 0) {
+      const now = (new Date()).getTime();
+      const timestamp = (new Date(lastStatusGiven.hits[0].fields.timestamp[0])).getTime();
+
+      const diff = timestamp - now;
+      // can't assume dead until 30 seconds have passed
+      if (diff <= 30000) {
+        return "NOT_DEAD";
+      }
+
+      await this.elasticClient.deleteByQuery({
+        index: statusIndex,
+        query: {
+          match: {
+            instanceId,
+          }
+        },
+      });
+    }
+
+    await this.elasticClient.deleteByQuery({
+      index: dataIndex,
+      query: {
+        term: {
+          _id: instanceId,
+        }
+      },
+    });
+
+    return "OK";
   }
 }
 
@@ -2051,7 +2352,7 @@ export class ElasticQueryBuilder {
       this.request.highlight = {
         fields: {},
       }
-  
+
       fields.forEach((f) => {
         this.request.highlight.fields[f] = {
           fragment_size: 1,

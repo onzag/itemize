@@ -211,7 +211,11 @@ export class GlobalManager {
   private async addAdminUserIfMissing() {
     if (!this.config.roles.includes("ADMIN")) {
       logger.info(
-        "GlobalManager.addAdminUserIfMissing: admin role is not included within the roles, avoiding this check"
+        {
+          className: "GlobalManager",
+          methodName: "addAdminUserIfMissing",
+          message: "Admin role is not included within the roles; avoiding this check",
+        }
       );
       return;
     }
@@ -229,17 +233,23 @@ export class GlobalManager {
       );
     } catch (err) {
       logger.error(
-        "GlobalManager.addAdminUserIfMissing [SERIOUS]: database does not appear to be connected",
         {
-          errMessage: err.message,
-          errStack: err.stack,
+          className: "GlobalManager",
+          methodName: "addAdminUserIfMissing",
+          message: "Database does not appear to be connected",
+          serious: true,
+          err,
         }
       );
     }
 
     if (!primaryAdminUser) {
       logger.info(
-        "GlobalManager.addAdminUserIfMissing: admin user is considered missing, adding one"
+        {
+          className: "GlobalManager",
+          methodName: "addAdminUserIfMissing",
+          message: "Admin user is considered missing; adding one",
+        }
       );
 
       let currentAdminUserWithSuchUsername: any;
@@ -251,10 +261,12 @@ export class GlobalManager {
         );
       } catch (err) {
         logger.error(
-          "GlobalManager.addAdminUserIfMissing [SERIOUS]: database does not appear to be connected",
           {
-            errMessage: err.message,
-            errStack: err.stack,
+            className: "GlobalManager",
+            methodName: "addAdminUserIfMissing",
+            message: "Database does not appear to be connected",
+            serious: true,
+            err,
           }
         );
       }
@@ -347,19 +359,24 @@ export class GlobalManager {
         );
       } catch (err) {
         logger.error(
-          "GlobalManager.addAdminUserIfMissing: Failed to add admin user when it was considered missing",
           {
-            errMessage: err.message,
-            errStack: err.stack,
+            className: "GlobalManager",
+            methodName: "addAdminUserIfMissing",
+            message: "Failed to add admin user when it was considered missing",
+            err,
           }
         );
       }
 
       logger.info(
-        "GlobalManager.addAdminUserIfMissing: Sucessfully added admin user",
         {
-          username,
-          password,
+          className: "GlobalManager",
+          methodName: "addAdminUserIfMissing",
+          message: "Sucessfully added admin user",
+          data: {
+            username,
+            password,
+          },
         }
       );
     }
@@ -375,8 +392,12 @@ export class GlobalManager {
       );
     if (hasSqlManteniedProperties) {
       logger.info(
-        "GlobalManager.processModule: found module that needs mantenience " +
-        mod.getQualifiedPathName()
+        {
+          className: "GlobalManager",
+          methodName: "processModule",
+          message: "Found module that needs mantenience " +
+            mod.getQualifiedPathName(),
+        }
       );
       this.modNeedsMantenience.push(mod);
 
@@ -387,8 +408,12 @@ export class GlobalManager {
         requestLimiters.since;
       if (!requestLimiters || !sinceLimiter) {
         logger.info(
-          "GlobalManager.processModule: module has definitions that need mantenience but they hold no AND since request limiter " +
-          mod.getQualifiedPathName()
+          {
+            className: "GlobalManager",
+            methodName: "processModule",
+            message: "Module has definitions that need mantenience but they hold no AND since request limiter " +
+              mod.getQualifiedPathName(),
+          }
         );
       }
     }
@@ -418,8 +443,12 @@ export class GlobalManager {
 
     if (hasSqlManteniedProperties || hasIncludeSQLManteniedProperties) {
       logger.info(
-        "GlobalManager.processIdef: found item definition that needs mantenience " +
-        idef.getQualifiedPathName()
+        {
+          className: "GlobalManager",
+          methodName: "processIdef",
+          message: "Found item definition that needs mantenience " +
+            idef.getQualifiedPathName(),
+        }
       );
       this.idefNeedsMantenience.push(idef);
 
@@ -432,8 +461,12 @@ export class GlobalManager {
         requestLimiters.since;
       if (!requestLimiters || !sinceLimiter) {
         logger.info(
-          "GlobalManager.processIdef: item definition need mantenience but item definition nor module holds no AND since request limiter " +
-          idef.getQualifiedPathName()
+          {
+            className: "GlobalManager",
+            methodName: "processIdef",
+            message: "Item definition need mantenience but item definition nor module holds no AND since request limiter " +
+              idef.getQualifiedPathName(),
+          }
         );
       }
     }
@@ -464,15 +497,20 @@ export class GlobalManager {
     while (true) {
       this.blocksReleaseLastExecuted = new Date().getTime();
 
-      logger.info("GlobalManager.releaseBlocks: running release temporary blocks");
+      logger.info({
+        className: "GlobalManager",
+        methodName: "releaseBlocks",
+        message: "Running release temporary blocks",
+      });
       try {
         await this.releaseBlocksFor(this.root);
       } catch (err) {
         logger.error(
-          "GlobalManager.releaseBlocks: temporary blocks failed to be released",
           {
-            errStack: err.stack,
-            errMessage: err.message,
+            className: "GlobalManager",
+            methodName: "releaseBlocks",
+            message: "Temporary blocks failed to be released",
+            err,
           }
         );
       }
@@ -484,24 +522,37 @@ export class GlobalManager {
 
       if (timeUntilBlockReleaseNeedsToRun <= 0) {
         logger.error(
-          "GlobalManager.releaseBlocks [SERIOUS]: during the processing of events the time needed until releasing blocks was negative" +
-          " this means the server took forever doing the last mapping, clearly something is off",
           {
-            timeUntilBlockReleaseNeedsToRun,
+            className: "GlobalManager",
+            methodName: "releaseBlocks",
+            message: "During the processing of events the time needed until releasing blocks was negative" +
+              " this means the server took forever doing the last mapping; clearly something is off",
+            serious: true,
+            data: {
+              timeUntilBlockReleaseNeedsToRun,
+            },
           }
         );
       } else {
         logger.info(
-          "GlobalManager.releaseBlocks: Blocking releaser tasked to run in " +
-          timeUntilBlockReleaseNeedsToRun +
-          "ms"
+          {
+            className: "GlobalManager",
+            methodName: "releaseBlocks",
+            message: "Blocking releaser tasked to run in " +
+              timeUntilBlockReleaseNeedsToRun +
+              "ms",
+          }
         );
         await wait(timeUntilBlockReleaseNeedsToRun);
       }
     }
   }
   public run() {
-    logger.info("GlobalManager.run: running global manager");
+    logger.info({
+      className: "GlobalManager",
+      methodName: "run",
+      message: "Running global manager",
+    });
 
     if (GLOBAL_MANAGER_MODE === "ABSOLUTE" || GLOBAL_MANAGER_MODE === "SERVER_DATA") {
       this.releaseBlocks();
@@ -521,15 +572,21 @@ export class GlobalManager {
         while (true) {
           this.seoGenLastUpdated = new Date().getTime();
 
-          logger.info("GlobalManager.run: running SEO Generator");
+          logger.info({
+            className: "GlobalManager",
+            methodName: "run",
+            message: "Running SEO Generator",
+          });
           try {
             await this.seoGenerator.run();
           } catch (err) {
             logger.error(
-              "GlobalManager.run [SERIOUS]: Seo generator failed to run",
               {
-                errStack: err.stack,
-                errMessage: err.message,
+                className: "GlobalManager",
+                methodName: "run",
+                message: "Seo generator failed to run",
+                serious: true,
+                err,
               }
             );
           }
@@ -541,17 +598,26 @@ export class GlobalManager {
 
           if (timeUntilSeoGenNeedsToRun <= 0) {
             logger.error(
-              "GlobalManager.run [SERIOUS]: during the processing of events the time needed until next mapping was negative" +
-              " this means the server took forever doing the last mapping, clearly something is off",
               {
-                timeUntilSeoGenNeedsToRun,
+                className: "GlobalManager",
+                methodName: "run",
+                message: "During the processing of events the time needed until next mapping was negative" +
+                  " this means the server took forever doing the last mapping; clearly something is off",
+                serious: true,
+                data: {
+                  timeUntilSeoGenNeedsToRun,
+                },
               }
             );
           } else {
             logger.info(
-              "GlobalManager.run: SEO generator tasked to run in " +
-              timeUntilSeoGenNeedsToRun +
-              "ms"
+              {
+                className: "GlobalManager",
+                methodName: "run",
+                message: "SEO generator tasked to run in " +
+                  timeUntilSeoGenNeedsToRun +
+                  "ms",
+              }
             );
             await wait(timeUntilSeoGenNeedsToRun);
           }
@@ -568,16 +634,22 @@ export class GlobalManager {
           try {
             // we will avoid the first because instance preparation does a consistency check
             if (firstAvoided) {
-              logger.info("GlobalManager.run: running elasticsearch consistency check");
+              logger.info({
+                className: "GlobalManager",
+                methodName: "run",
+                message: "Running elasticsearch consistency check",
+              });
               await this.elastic.runConsistencyCheck();
             }
             firstAvoided = true;
           } catch (err) {
             logger.error(
-              "GlobalManager.run [SERIOUS]: Elasticsearch consistency check failed to run",
               {
-                errStack: err.stack,
-                errMessage: err.message,
+                className: "GlobalManager",
+                methodName: "run",
+                message: "Elasticsearch consistency check failed to run",
+                serious: true,
+                err,
               }
             );
           }
@@ -589,17 +661,26 @@ export class GlobalManager {
 
           if (timeUntilElasticCleanupNeedsToRun <= 0) {
             logger.error(
-              "GlobalManager.run [SERIOUS]: during the processing of events the time needed until next elastic consistency check was negative" +
-              " this means the server took forever doing the last consistency check, clearly something is off",
               {
-                timeUntilElasticCleanupNeedsToRun,
+                className: "GlobalManager",
+                methodName: "run",
+                message: "During the processing of events the time needed until next elastic consistency check was negative" +
+                  " this means the server took forever doing the last consistency check; clearly something is off",
+                serious: true,
+                data: {
+                  timeUntilElasticCleanupNeedsToRun,
+                },
               }
             );
           } else {
             logger.info(
-              "GlobalManager.run: elasticsearch consistency check tasked to run in " +
-              timeUntilElasticCleanupNeedsToRun +
-              "ms"
+              {
+                className: "GlobalManager",
+                methodName: "run",
+                message: "Elasticsearch consistency check tasked to run in " +
+                  timeUntilElasticCleanupNeedsToRun +
+                  "ms",
+              }
             );
             await wait(timeUntilElasticCleanupNeedsToRun);
           }
@@ -626,20 +707,24 @@ export class GlobalManager {
             } catch (err) {
               if (retries <= 5) {
                 logger.error(
-                  "GlobalManager.run [SERIOUS]: Server data calculation failed, attempting retry in 10s",
                   {
-                    errMessage: err.message,
-                    errStack: err.stack,
+                    className: "GlobalManager",
+                    methodName: "run",
+                    message: "Server data calculation failed; attempting retry in 10s",
+                    serious: true,
+                    err,
                   }
                 );
                 await wait(10000);
                 retries++;
               } else {
                 logger.error(
-                  "GlobalManager.run [SERIOUS]: Server data calculation failed, giving up",
                   {
-                    errMessage: err.message,
-                    errStack: err.stack,
+                    className: "GlobalManager",
+                    methodName: "run",
+                    message: "Server data calculation failed; giving up",
+                    serious: true,
+                    err,
                   }
                 );
                 gaveUp = true;
@@ -658,20 +743,24 @@ export class GlobalManager {
               } catch (err) {
                 if (retries <= 5) {
                   logger.error(
-                    "GlobalManager.run [SERIOUS]: Informing new server data failed, attempting retry in 10s",
                     {
-                      errMessage: err.message,
-                      errStack: err.stack,
+                      className: "GlobalManager",
+                      methodName: "run",
+                      message: "Informing new server data failed; attempting retry in 10s",
+                      serious: true,
+                      err,
                     }
                   );
                   await wait(10000);
                   retries++;
                 } else {
                   logger.error(
-                    "GlobalManager.run [SERIOUS]: Informing new server data failed, giving up",
                     {
-                      errMessage: err.message,
-                      errStack: err.stack,
+                      className: "GlobalManager",
+                      methodName: "run",
+                      message: "Informing new server data failed; giving up",
+                      serious: true,
+                      err,
                     }
                   );
                   gaveUp = true;
@@ -690,20 +779,24 @@ export class GlobalManager {
                 } catch (err) {
                   if (retries <= 5) {
                     logger.error(
-                      "GlobalManager.run [SERIOUS]: run once function failed to run, attempting retry in 10s",
                       {
-                        errMessage: err.message,
-                        errStack: err.stack,
+                        className: "GlobalManager",
+                        methodName: "run",
+                        message: "Run once function failed to run; attempting retry in 10s",
+                        serious: true,
+                        err,
                       }
                     );
                     await wait(10000);
                     retries++;
                   } else {
                     logger.error(
-                      "GlobalManager.run [SERIOUS]: run once function failed, giving up",
                       {
-                        errMessage: err.message,
-                        errStack: err.stack,
+                        className: "GlobalManager",
+                        methodName: "run",
+                        message: "Run once function failed; giving up",
+                        serious: true,
+                        err,
                       }
                     );
                     gaveUp = true;
@@ -722,18 +815,24 @@ export class GlobalManager {
 
           if (timeUntilItNeedsToUpdate <= 0) {
             logger.error(
-              "GlobalManager.run [SERIOUS]: during the processing of events the time needed until next update was negative" +
-              " this means the server took too long doing mantenience tasks, this means your database is very large, while this is not " +
-              " a real error as it was handled gracefully, this should be addressed to itemize developers",
               {
-                timeUntilItNeedsToUpdate,
-              }
+                message: "GlobalManager.run [SERIOUS]: during the processing of events the time needed until next update was negative" +
+                  " this means the server took too long doing mantenience tasks, this means your database is very large, while this is not " +
+                  " a real error as it was handled gracefully, this should be addressed to itemize developers",
+                data: {
+                  timeUntilItNeedsToUpdate,
+                }
+              },
             );
           } else {
             logger.info(
-              "GlobalManager.run: Server data and updater tasked to run in " +
-              timeUntilItNeedsToUpdate +
-              "ms"
+              {
+                className: "GlobalManager",
+                methodName: "run",
+                message: "Server data and updater tasked to run in " +
+                  timeUntilItNeedsToUpdate +
+                  "ms",
+              }
             );
             await wait(timeUntilItNeedsToUpdate);
           }
@@ -757,9 +856,15 @@ export class GlobalManager {
             this.elastic.informNewServerData(storedValue);
           } catch (err) {
             logger.error(
-              "GlobalManager.run [SERIOUS]: unable to parse server data stored in redis",
               {
-                storedStrValue,
+                className: "GlobalManager",
+                methodName: "run",
+                message: "Unable to parse server data stored in redis",
+                serious: true,
+                err,
+                data: {
+                  storedStrValue,
+                },
               }
             );
           }
@@ -776,10 +881,15 @@ export class GlobalManager {
               const data = redisEvent.data;
               if (!data) {
                 logger.error(
-                  "GlobalManager.run [SERIOUS]: did not get any data in the redis event at " + channel,
                   {
-                    message,
-                    redisEvent,
+                    className: "GlobalManager",
+                    methodName: "run",
+                    message: "Did not get any data in the redis event at " + channel,
+                    serious: true,
+                    data: {
+                      message,
+                      redisEvent,
+                    },
                   }
                 );
               } else {
@@ -789,11 +899,15 @@ export class GlobalManager {
             }
           } catch (err) {
             logger.error(
-              "GlobalManager.run [SERIOUS]: unable to process redis event at " + channel,
               {
-                message,
-                errMessage: err.message,
-                errStack: err.stack,
+                className: "GlobalManager",
+                methodName: "run",
+                message: "Unable to process redis event at " + channel,
+                serious: true,
+                err,
+                data: {
+                  message,
+                },
               }
             );
           }
@@ -1027,7 +1141,11 @@ export class GlobalManager {
     // buggy typescript again
   }
   private async calculateServerData() {
-    logger.info("GlobalManager.calculateServerData: Updating server data");
+    logger.info({
+      className: "GlobalManager",
+      methodName: "calculateServerData",
+      message: "Updating server data",
+    });
 
     try {
       this.serverData = {
@@ -1038,10 +1156,12 @@ export class GlobalManager {
       };
     } catch (err) {
       logger.error(
-        "GlobalManager.calculateServerData [SERIOUS]: failed to calculate server data",
         {
-          errMessage: err.message,
-          errStack: err.stack,
+          className: "GlobalManager",
+          methodName: "calculateServerData",
+          message: "Failed to calculate server data",
+          serious: true,
+          err,
         }
       );
       throw err;
@@ -1049,7 +1169,11 @@ export class GlobalManager {
   }
   private async informNewServerData() {
     logger.info(
-      "GlobalManager.informNewServerData: Updating database with new server data"
+      {
+        className: "GlobalManager",
+        methodName: "informNewServerData",
+        message: "Updating database with new server data",
+      }
     );
 
     // STORE currency factors in the database if available
@@ -1080,10 +1204,11 @@ export class GlobalManager {
         );
       } catch (err) {
         logger.error(
-          "GlobalManager.informNewServerData: [SERIOUS] was unable to update database new currency data",
           {
-            errMessage: err.message,
-            errStack: err.stack,
+            className: "GlobalManager",
+            methodName: "informNewServerData",
+            message: "[SERIOUS] was unable to update database new currency data",
+            err,
           }
         );
         throw err;
@@ -1097,7 +1222,11 @@ export class GlobalManager {
     }
 
     logger.info(
-      "GlobalManager.informNewServerData: Updating global cache with new server data"
+      {
+        className: "GlobalManager",
+        methodName: "informNewServerData",
+        message: "Updating global cache with new server data",
+      }
     );
 
     // stringify the server data
@@ -1110,10 +1239,12 @@ export class GlobalManager {
       (err: Error) => {
         if (err) {
           logger.error(
-            "GlobalManager.informNewServerData: [SERIOUS] was unable to inform for new server data in set",
             {
-              errMessage: err.message,
-              errStack: err.stack,
+              className: "GlobalManager",
+              methodName: "informNewServerData",
+              message: "Was unable to inform for new server data in set",
+              serious: true,
+              err,
             }
           );
         }
@@ -1121,7 +1252,11 @@ export class GlobalManager {
     );
 
     logger.info(
-      "GlobalManager.informNewServerData: Informing clusters of new server data"
+      {
+        className: "GlobalManager",
+        methodName: "informNewServerData",
+        message: "Informing clusters of new server data",
+      }
     );
 
     const redisEvent: IRedisEvent = {
@@ -1139,10 +1274,12 @@ export class GlobalManager {
       (err: Error) => {
         if (err) {
           logger.error(
-            "GlobalManager.informNewServerData: [SERIOUS] was unable to inform for new server data in publish",
             {
-              errMessage: err.message,
-              errStack: err.stack,
+              className: "GlobalManager",
+              methodName: "informNewServerData",
+              serious: true,
+              message: "was unable to inform for new server data in publish",
+              err,
             }
           );
         }

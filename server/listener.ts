@@ -356,10 +356,14 @@ export class Listener {
     const valid = checkIdentifyRequest(request);
     if (!valid) {
       CAN_LOG_DEBUG && logger.debug(
-        "Listener.identify: can't indentify due to invalid request",
         {
-          errors: checkIdentifyRequest.errors,
-        }
+          className: "Listener",
+          methodName: "identify",
+          message: "Can't indentify due to invalid request",
+          data: {
+            errors: checkIdentifyRequest.errors,
+          }
+        },
       );
       this.emitError(socket, "can't identify user due to invalid request", request);
       return;
@@ -390,11 +394,13 @@ export class Listener {
           );
         } catch (err) {
           logger.error(
-            "Listener.identify [SERIOUS]: socket " + socket.id + " failed to identify because of the cache failed",
             {
-              errMessage: err.message,
-              errStack: err.stack,
-            }
+              className: "Listener",
+              methodName: "identify",
+              serious: true,
+              message: "socket " + socket.id + " failed to identify because of the cache failed",
+              err,
+            },
           );
           return;
         }
@@ -423,7 +429,11 @@ export class Listener {
 
     if (invalid) {
       CAN_LOG_DEBUG && logger.debug(
-        "Listener.identify: socket " + socket.id + " failed to identify due to " + invalidReason,
+        {
+          className: "Listener",
+          methodName: "identify",
+          message: "socket " + socket.id + " failed to identify due to " + invalidReason,
+        }
       );
       this.emitError(socket, "failed to identify due to " + invalidReason, request);
 
@@ -432,7 +442,11 @@ export class Listener {
     } else {
       if (!this.listeners[socket.id]) {
         CAN_LOG_DEBUG && logger.debug(
-          "Listener.identify: socket " + socket.id + " provides initial identification",
+          {
+            className: "Listener",
+            methodName: "identify",
+            message: "socket " + socket.id + " provides initial identification"
+          },
         );
         this.listeners[socket.id] = {
           socket,
@@ -444,7 +458,11 @@ export class Listener {
         };
       } else {
         CAN_LOG_DEBUG && logger.debug(
-          "Listener.identify: socket " + socket.id + " updates identification criteria",
+          {
+            className: "Listener",
+            methodName: "identify",
+            message: "socket " + socket.id + " updates identification criteria",
+          },
         );
         this.listeners[socket.id].uuid = request.uuid;
         this.listeners[socket.id].token = request.token;
@@ -465,19 +483,31 @@ export class Listener {
       request.version,
     );
     CAN_LOG_DEBUG && logger.debug(
-      "Listener.registerSS: Server instance requested subscribe to " + mergedIndexIdentifier,
+      {
+        className: "Listener",
+        methodName: "registerSS",
+        message: "Server instance requested subscribe to " + mergedIndexIdentifier,
+      },
     );
 
     if (this.listensSS[mergedIndexIdentifier]) {
       CAN_LOG_DEBUG && logger.debug(
-        "Listener.registerSS: already subscribed, ignoring",
+        {
+          className: "Listener",
+          methodName: "registerSS",
+          message: "Already subscribed, ignoring",
+        },
       );
       return;
     }
 
     if (INSTANCE_MODE !== "CLUSTER_MANAGER" && INSTANCE_MODE !== "ABSOLUTE") {
       CAN_LOG_DEBUG && logger.debug(
-        "Listener.registerSS: instance is not cluster manager nor absolute piping request to cluster manager",
+        {
+          className: "Listener",
+          methodName: "registerSS",
+          message: "Instance is not cluster manager nor absolute piping request to cluster manager",
+        },
       );
       const redisEvent: IRedisEvent = {
         type: CLUSTER_MANAGER_REGISTER_SS,
@@ -489,13 +519,21 @@ export class Listener {
       this.redisLocalPub.redisClient.publish(CLUSTER_MANAGER_REGISTER_SS, JSON.stringify(redisEvent));
     } else if (INSTANCE_MODE === "CLUSTER_MANAGER" || INSTANCE_MODE === "ABSOLUTE") {
       CAN_LOG_DEBUG && logger.debug(
-        "Listener.registerSS: performing subscription as cluster manager",
+        {
+          className: "Listener",
+          methodName: "registerSS",
+          message: "Performing subscription as cluster manager",
+        },
       );
       this.redisGlobalSub.redisClient.subscribe(mergedIndexIdentifier);
       this.listensSS[mergedIndexIdentifier] = true;
     } else {
       CAN_LOG_DEBUG && logger.debug(
-        "Listener.registerSS: invalid instance attempting a server side registration " + INSTANCE_MODE,
+        {
+          className: "Listener",
+          methodName: "registerSS",
+          message: "Invalid instance attempting a server side registration " + INSTANCE_MODE,
+        },
       );
     }
   }
@@ -506,7 +544,11 @@ export class Listener {
     const listenerData = this.listeners[socket.id];
     if (!listenerData) {
       CAN_LOG_DEBUG && logger.debug(
-        "Listener.register: can't register listener to an unidentified socket " + socket.id,
+        {
+          className: "Listener",
+          methodName: "register",
+          message: "Can't register listener to an unidentified socket " + socket.id,
+        },
       );
       this.emitError(socket, "socket is unidentified", request);
       return;
@@ -515,10 +557,14 @@ export class Listener {
     const valid = checkRegisterRequest(request);
     if (!valid) {
       CAN_LOG_DEBUG && logger.debug(
-        "Listener.register: can't register listener due to invalid request",
         {
-          errors: checkRegisterRequest.errors,
-        }
+          className: "Listener",
+          methodName: "register",
+          message: "Can't register listener due to invalid request",
+          data: {
+            errors: checkRegisterRequest.errors
+          }
+        },
       );
       this.emitError(socket, "invalid request", request);
       return;
@@ -527,7 +573,11 @@ export class Listener {
     // do not allow more than MAX_REMOTE_LISTENERS_PER_SOCKET concurrent listeners
     if (listenerData.amount > MAX_REMOTE_LISTENERS_PER_SOCKET) {
       CAN_LOG_DEBUG && logger.debug(
-        "Listener.register: socket " + socket.id + " has exceeded the amount of listeners it can attach",
+        {
+          className: "Listener",
+          methodName: "register",
+          message: "Socket " + socket.id + " has exceeded the amount of listeners it can attach",
+        },
       );
       this.emitError(socket, "exceeded socket max listeners per socket", request);
       return;
@@ -536,7 +586,11 @@ export class Listener {
     const itemDefinition: ItemDefinition = this.root.registry[request.itemDefinition] as ItemDefinition;
     if (!itemDefinition || !(itemDefinition instanceof ItemDefinition)) {
       CAN_LOG_DEBUG && logger.debug(
-        "Listener.register: could not find " + request.itemDefinition,
+        {
+          className: "Listener",
+          methodName: "register",
+          message: "Could not find " + request.itemDefinition,
+        },
       );
       this.emitError(socket, "could not find item definition", request);
       return;
@@ -546,11 +600,13 @@ export class Listener {
       value = await this.cache.requestValue(itemDefinition, request.id, request.version);
     } catch (err) {
       logger.error(
-        "Listener.identify [SERIOUS]: socket " + socket.id + " could not register due to cache failure",
         {
-          errMessage: err.message,
-          errStack: err.stack,
-        }
+          className: "Listener",
+          methodName: "identify",
+          message: "Socket " + socket.id + " could not register due to cache failure",
+          serious: true,
+          err,
+        },
       );
       return;
     }
@@ -595,19 +651,24 @@ export class Listener {
       );
       if (!hasAccess) {
         CAN_LOG_DEBUG && logger.debug(
-          "Listener.register: socket " + socket.id + " with user " + listenerData.user.id +
-          " with role " + listenerData.user.role + " cannot listen to " + itemDefinition,
+          {
+            className: "Listener",
+            methodName: "register",
+            message: "socket " + socket.id + " with user " + listenerData.user.id +
+              " with role " + listenerData.user.role + " cannot listen to " + itemDefinition,
+          },
         );
         this.emitError(socket, "user has not access", request);
         return;
       }
     } catch (err) {
       logger.error(
-        "Listener.register: failed to register",
         {
-          errMessage: err.message,
-          errStack: err.stack,
-        }
+          className: "Listener",
+          methodName: "register",
+          message: "Failed to register",
+          err,
+        },
       );
       return;
     }
@@ -619,7 +680,11 @@ export class Listener {
     );
     if (!this.listeners[socket.id].listens[mergedIndexIdentifier]) {
       CAN_LOG_DEBUG && logger.debug(
-        "Listener.register: Subscribing socket " + socket.id + " to " + mergedIndexIdentifier,
+        {
+          className: "Listener",
+          methodName: "register",
+          message: "Subscribing socket " + socket.id + " to " + mergedIndexIdentifier,
+        },
       );
       this.redisGlobalSub.redisClient.subscribe(mergedIndexIdentifier);
       this.listeners[socket.id].listens[mergedIndexIdentifier] = true;
@@ -633,7 +698,11 @@ export class Listener {
     const listenerData = this.listeners[socket.id];
     if (!listenerData) {
       CAN_LOG_DEBUG && logger.debug(
-        "Listener.ownedSearchRegister: can't register listener to an unidentified socket " + socket.id,
+        {
+          className: "Listener",
+          methodName: "ownedSearchRegister",
+          message: "Can't register listener to an unidentified socket " + socket.id,
+        },
       );
       this.emitError(socket, "socket is unidentified", request);
       return;
@@ -642,10 +711,14 @@ export class Listener {
     const valid = checkOwnedSearchRegisterRequest(request);
     if (!valid) {
       CAN_LOG_DEBUG && logger.debug(
-        "Listener.ownedSearchRegister: can't register listener due to invalid request",
         {
-          errors: checkOwnedSearchRegisterRequest.errors,
-        }
+          className: "Listener",
+          methodName: "ownedSearchRegister",
+          message: "Can't register listener due to invalid request",
+          data: {
+            errors: checkOwnedSearchRegisterRequest.errors,
+          }
+        },
       );
       this.emitError(socket, "invalid request", request);
       return;
@@ -654,7 +727,11 @@ export class Listener {
     // do not allow more than MAX_REMOTE_LISTENERS_PER_SOCKET concurrent listeners
     if (listenerData.amount > MAX_REMOTE_LISTENERS_PER_SOCKET) {
       CAN_LOG_DEBUG && logger.debug(
-        "Listener.ownedSearchRegister: socket " + socket.id + " has exceeded the amount of listeners it can attach",
+        {
+          className: "Listener",
+          methodName: "ownedSearchRegister",
+          message: "Socket " + socket.id + " has exceeded the amount of listeners it can attach",
+        },
       );
       this.emitError(socket, "exceeded socket max listeners per socket", request);
       return;
@@ -664,7 +741,11 @@ export class Listener {
     let hasAccess: boolean;
     if (!itemDefinitionOrModule) {
       CAN_LOG_DEBUG && logger.debug(
-        "Listener.ownedSearchRegister: could not find item definition or module for " + request.qualifiedPathName,
+        {
+          className: "Listener",
+          methodName: "ownedSearchRegister",
+          message: "Could not find item definition or module for " + request.qualifiedPathName,
+        },
       );
       this.emitError(socket, "could not find item definition or module", request);
       return;
@@ -682,7 +763,7 @@ export class Listener {
           value: null,
           environment: CustomRoleGranterEnvironment.SEARCHING_RECORDS,
           requestArgs: null,
-          owner: request.createdBy || UNSPECIFIED_OWNER,
+          owner: request.createdBy || UNSPECIFIED_OWNER,
           parent: null,
           customId: null,
         }
@@ -692,26 +773,31 @@ export class Listener {
           ItemDefinitionIOActions.READ,
           listenerData.user.role,
           listenerData.user.id,
-          request.createdBy || UNSPECIFIED_OWNER,
+          request.createdBy || UNSPECIFIED_OWNER,
           {},
           rolesManager,
           false,
         );
       } catch (err) {
         logger.error(
-          "Listener.ownedSearchRegister: failed to register",
           {
-            errMessage: err.message,
-            errStack: err.stack,
-          }
+            className: "Listener",
+            methodName: "ownedSearchRegister",
+            message: "Failed to register",
+            err,
+          },
         );
         return;
       }
     }
     if (!hasAccess) {
       CAN_LOG_DEBUG && logger.debug(
-        "Listener.ownedSearchRegister: socket " + socket.id + " with user " + listenerData.user.id +
-        " with role " + listenerData.user.role + " cannot listen to " + request.qualifiedPathName,
+        {
+          className: "Listener",
+          methodName: "ownedSearchRegister",
+          message: "Socket " + socket.id + " with user " + listenerData.user.id +
+            " with role " + listenerData.user.role + " cannot listen to " + request.qualifiedPathName,
+        },
       );
       this.emitError(socket, "user has not access", request);
       return;
@@ -721,10 +807,14 @@ export class Listener {
       request.qualifiedPathName,
       request.createdBy,
     );
-    
+
     if (!listenerData.listens[mergedIndexIdentifier]) {
       CAN_LOG_DEBUG && logger.debug(
-        "Listener.ownedSearchRegister: Subscribing socket " + socket.id + " to " + mergedIndexIdentifier,
+        {
+          className: "Listener",
+          methodName: "ownedSearchRegister",
+          message: "Subscribing socket " + socket.id + " to " + mergedIndexIdentifier,
+        },
       );
       this.redisGlobalSub.redisClient.subscribe(mergedIndexIdentifier);
       listenerData.listens[mergedIndexIdentifier] = true;
@@ -738,7 +828,11 @@ export class Listener {
     const listenerData = this.listeners[socket.id];
     if (!listenerData) {
       CAN_LOG_DEBUG && logger.debug(
-        "Listener.parentedSearchRegister: can't register listener to an unidentified socket " + socket.id,
+        {
+          className: "Listener",
+          methodName: "parentedSearchRegister",
+          message: "Can't register listener to an unidentified socket " + socket.id,
+        },
       );
       this.emitError(socket, "socket is unidentified", request);
       return;
@@ -747,10 +841,14 @@ export class Listener {
     const valid = checkParentedSearchRegisterRequest(request);
     if (!valid) {
       CAN_LOG_DEBUG && logger.debug(
-        "Listener.parentedSearchRegister: can't register listener due to invalid request",
         {
-          errors: checkParentedSearchRegisterRequest.errors,
-        }
+          className: "Listener",
+          methodName: "parentedSearchRegister",
+          message: "Can't register listener due to invalid request",
+          data: {
+            errors: checkParentedSearchRegisterRequest.errors
+          },
+        },
       );
       this.emitError(socket, "invalid request", request);
       return;
@@ -759,7 +857,11 @@ export class Listener {
     // do not allow more than MAX_REMOTE_LISTENERS_PER_SOCKET concurrent listeners
     if (this.listeners[socket.id].amount > MAX_REMOTE_LISTENERS_PER_SOCKET) {
       CAN_LOG_DEBUG && logger.debug(
-        "Listener.parentedSearchRegister: socket " + socket.id + " has exceeded the amount of listeners it can attach",
+        {
+          className: "Listener",
+          methodName: "parentedSearchRegister",
+          message: "Socket " + socket.id + " has exceeded the amount of listeners it can attach",
+        },
       );
       this.emitError(socket, "exceeded socket max listeners per socket", request);
       return;
@@ -769,7 +871,11 @@ export class Listener {
     let hasAccess: boolean;
     if (!itemDefinitionOrModule) {
       CAN_LOG_DEBUG && logger.debug(
-        "Listener.parentedSearchRegister: could not find item definition or module for " + request.qualifiedPathName,
+        {
+          className: "Listener",
+          methodName: "parentedSearchRegister",
+          message: "Could not find item definition or module for " + request.qualifiedPathName,
+        },
       );
       this.emitError(socket, "could not find item definition or module", request);
       return;
@@ -808,19 +914,24 @@ export class Listener {
         );
       } catch (err) {
         logger.error(
-          "Listener.parentedSearchRegister: failed to register",
           {
-            errMessage: err.message,
-            errStack: err.stack,
-          }
+            className: "Listener",
+            methodName: "parentedSearchRegister",
+            message: "Failed to register",
+            err,
+          },
         );
         return;
       }
     }
     if (!hasAccess) {
       CAN_LOG_DEBUG && logger.debug(
-        "Listener.parentedSearchRegister: socket " + socket.id + " with user " + listenerData.user.id +
-        " with role " + listenerData.user.role + " cannot listen to " + request.qualifiedPathName,
+        {
+          className: "Listener",
+          methodName: "parentedSearchRegister",
+          message: "Socket " + socket.id + " with user " + listenerData.user.id +
+            " with role " + listenerData.user.role + " cannot listen to " + request.qualifiedPathName,
+        },
       );
       this.emitError(socket, "user has not access", request);
       return;
@@ -834,7 +945,11 @@ export class Listener {
     );
     if (!this.listeners[socket.id].listens[mergedIndexIdentifier]) {
       CAN_LOG_DEBUG && logger.debug(
-        "Listener.parentedSearchRegister: Subscribing socket " + socket.id + " to " + mergedIndexIdentifier,
+        {
+          className: "Listener",
+          methodName: "parentedSearchRegister",
+          message: "Subscribing socket " + socket.id + " to " + mergedIndexIdentifier,
+        },
       );
       this.redisGlobalSub.redisClient.subscribe(mergedIndexIdentifier);
       this.listeners[socket.id].listens[mergedIndexIdentifier] = true;
@@ -848,7 +963,11 @@ export class Listener {
     const listenerData = this.listeners[socket.id];
     if (!listenerData) {
       CAN_LOG_DEBUG && logger.debug(
-        "Listener.ownedParentedSearchRegister: can't register listener to an unidentified socket " + socket.id,
+        {
+          className: "Listener",
+          methodName: "ownedParentedSearchRegister",
+          message: "Can't register listener to an unidentified socket " + socket.id,
+        },
       );
       this.emitError(socket, "socket is unidentified", request);
       return;
@@ -857,10 +976,14 @@ export class Listener {
     const valid = checkOwnedParentedSearchRegisterRequest(request);
     if (!valid) {
       CAN_LOG_DEBUG && logger.debug(
-        "Listener.parentedSearchRegister: can't register listener due to invalid request",
         {
-          errors: checkOwnedParentedSearchRegisterRequest.errors,
-        }
+          className: "Listener",
+          methodName: "parentedSearchRegister",
+          message: "Can't register listener due to invalid request",
+          data: {
+            errors: checkOwnedParentedSearchRegisterRequest.errors,
+          },
+        },
       );
       this.emitError(socket, "invalid request", request);
       return;
@@ -869,7 +992,11 @@ export class Listener {
     // do not allow more than MAX_REMOTE_LISTENERS_PER_SOCKET concurrent listeners
     if (this.listeners[socket.id].amount > MAX_REMOTE_LISTENERS_PER_SOCKET) {
       CAN_LOG_DEBUG && logger.debug(
-        "Listener.ownedParentedSearchRegister: socket " + socket.id + " has exceeded the amount of listeners it can attach",
+        {
+          className: "Listener",
+          methodName: "ownedParentedSearchRegister",
+          message: "Socket " + socket.id + " has exceeded the amount of listeners it can attach",
+        },
       );
       this.emitError(socket, "exceeded socket max listeners per socket", request);
       return;
@@ -879,7 +1006,11 @@ export class Listener {
     let hasAccess: boolean;
     if (!itemDefinitionOrModule) {
       CAN_LOG_DEBUG && logger.debug(
-        "Listener.parentedSearchRegister: could not find item definition or module for " + request.qualifiedPathName,
+        {
+          className: "Listener",
+          methodName: "parentedSearchRegister",
+          message: "Could not find item definition or module for " + request.qualifiedPathName,
+        },
       );
       this.emitError(socket, "could not find item definition or module", request);
       return;
@@ -918,19 +1049,24 @@ export class Listener {
         );
       } catch (err) {
         logger.error(
-          "Listener.parentedSearchRegister: failed to register",
           {
-            errMessage: err.message,
-            errStack: err.stack,
-          }
+            className: "Listener",
+            methodName: "parentedSearchRegister",
+            message: "Failed to register",
+            err,
+          },
         );
         return;
       }
     }
     if (!hasAccess) {
       CAN_LOG_DEBUG && logger.debug(
-        "Listener.ownedParentedSearchRegister: socket " + socket.id + " with user " + listenerData.user.id +
-        " with role " + listenerData.user.role + " cannot listen to " + request.qualifiedPathName,
+        {
+          className: "Listener",
+          methodName: "ownedParentedSearchRegister",
+          message: "Socket " + socket.id + " with user " + listenerData.user.id +
+            " with role " + listenerData.user.role + " cannot listen to " + request.qualifiedPathName,
+        },
       );
       this.emitError(socket, "user has not access", request);
       return;
@@ -939,12 +1075,16 @@ export class Listener {
     const mergedIndexIdentifier = generateOwnedParentedSearchMergedIndexIdentifier(
       request.qualifiedPathName,
       request.createdBy,
-      request.parentType,request.parentId,
+      request.parentType, request.parentId,
       request.parentVersion,
     );
     if (!this.listeners[socket.id].listens[mergedIndexIdentifier]) {
       CAN_LOG_DEBUG && logger.debug(
-        "Listener.ownedParentedSearchRegister: Subscribing socket " + socket.id + " to " + mergedIndexIdentifier,
+        {
+          className: "Listener",
+          methodName: "ownedParentedSearchRegister",
+          message: "Subscribing socket " + socket.id + " to " + mergedIndexIdentifier,
+        },
       );
       this.redisGlobalSub.redisClient.subscribe(mergedIndexIdentifier);
       this.listeners[socket.id].listens[mergedIndexIdentifier] = true;
@@ -958,7 +1098,11 @@ export class Listener {
     const listenerData = this.listeners[socket.id];
     if (!listenerData) {
       CAN_LOG_DEBUG && logger.debug(
-        "Listener.ownedSearchFeedback: can't give feedback to an unidentified socket " + socket.id,
+        {
+          className: "Listener",
+          methodName: "ownedSearchFeedback",
+          message: "Can't give feedback to an unidentified socket " + socket.id,
+        },
       );
       this.emitError(socket, "socket is unidentified", request);
       return;
@@ -967,9 +1111,13 @@ export class Listener {
     const valid = checkOwnedSearchFeedbackRequest(request);
     if (!valid) {
       CAN_LOG_DEBUG && logger.debug(
-        "Listener.ownedSearchFeedback: can't give feedback due to invalid request",
         {
-          errors: checkOwnedSearchFeedbackRequest.errors,
+          className: "Listener",
+          methodName: "ownedSearchFeedback",
+          message: "Can't give feedback due to invalid request",
+          data: {
+            errors: checkOwnedSearchFeedbackRequest.errors,
+          },
         }
       );
       this.emitError(socket, "invalid request", request);
@@ -979,7 +1127,11 @@ export class Listener {
       const itemDefinitionOrModule = this.root.registry[request.qualifiedPathName];
       if (!itemDefinitionOrModule) {
         CAN_LOG_DEBUG && logger.debug(
-          "Listener.ownedSearchFeedback: could not find " + request.qualifiedPathName,
+          {
+            className: "Listener",
+            methodName: "ownedSearchFeedback",
+            message: "Could not find " + request.qualifiedPathName,
+          },
         );
         this.emitError(socket, "could not find item definition or module", request);
         return;
@@ -1024,19 +1176,24 @@ export class Listener {
         )
         if (!hasAccess) {
           CAN_LOG_DEBUG && logger.debug(
-            "Listener.ownedSearchFeedback: socket " + socket.id + " with user " + listenerData.user.id +
-            " with role " + listenerData.user.role + " cannot listen to " + request.qualifiedPathName,
+            {
+              className: "Listener",
+              methodName: "ownedSearchFeedback",
+              message: "Socket " + socket.id + " with user " + listenerData.user.id +
+                " with role " + listenerData.user.role + " cannot listen to " + request.qualifiedPathName,
+            },
           );
           this.emitError(socket, "user has not access", request);
           return;
         }
       } catch (err) {
         logger.error(
-          "Listener.ownedSearchFeedback: failed to provide feedback",
           {
-            errMessage: err.message,
-            errStack: err.stack,
-          }
+            className: "Listener",
+            methodName: "ownedSearchFeedback",
+            message: "Failed to provide feedback",
+            err,
+          },
         );
         return;
       }
@@ -1125,8 +1282,14 @@ export class Listener {
           newLastModified: findLastRecordLastModifiedDate(newRecords, lostRecords, modifiedRecords),
         };
         CAN_LOG_DEBUG && logger.debug(
-          "Listener.ownedSearchFeedback: triggering " + OWNED_SEARCH_RECORDS_EVENT,
-          event,
+          {
+            className: "Listener",
+            methodName: "ownedSearchFeedback",
+            message: "Triggering " + OWNED_SEARCH_RECORDS_EVENT,
+            data: {
+              event,
+            }
+          },
         );
         socket.emit(
           OWNED_SEARCH_RECORDS_EVENT,
@@ -1135,10 +1298,11 @@ export class Listener {
       }
     } catch (err) {
       logger.error(
-        "Listener.ownedSearchFeedback: failed to provide feedback",
         {
-          errMessage: err.message,
-          errStack: err.stack,
+          className: "Listener",
+          methodName: "ownedSearchFeedback",
+          message: "Failed to provide feedback",
+          err,
         }
       );
     }
@@ -1150,7 +1314,11 @@ export class Listener {
     const listenerData = this.listeners[socket.id];
     if (!listenerData) {
       CAN_LOG_DEBUG && logger.debug(
-        "Listener.parentedSearchFeedback: can't give feedback to an unidentified socket " + socket.id,
+        {
+          className: "Listener",
+          methodName: "parentedSearchFeedback",
+          message: "Can't give feedback to an unidentified socket " + socket.id,
+        },
       );
       this.emitError(socket, "socket is unidentified", request);
       return;
@@ -1159,9 +1327,13 @@ export class Listener {
     const valid = checkParentedSearchFeedbackRequest(request);
     if (!valid) {
       CAN_LOG_DEBUG && logger.debug(
-        "Listener.parentedSearchFeedback: can't register listener due to invalid request",
         {
-          errors: checkParentedSearchFeedbackRequest.errors,
+          className: "Listener",
+          methodName: "parentedSearchFeedback",
+          message: "Can't register listener due to invalid request",
+          data: {
+            errors: checkParentedSearchFeedbackRequest.errors,
+          },
         }
       );
       this.emitError(socket, "invalid request", request);
@@ -1171,7 +1343,11 @@ export class Listener {
       const itemDefinitionOrModule = this.root.registry[request.qualifiedPathName];
       if (!itemDefinitionOrModule) {
         CAN_LOG_DEBUG && logger.debug(
-          "Listener.parentedSearchFeedback: could not find " + request.qualifiedPathName,
+          {
+            className: "Listener",
+            methodName: "parentedSearchFeedback",
+            message: "Could not find " + request.qualifiedPathName,
+          },
         );
         this.emitError(socket, "could not find item definition or module", request);
         return;
@@ -1221,18 +1397,23 @@ export class Listener {
         )
         if (!hasAccess) {
           CAN_LOG_DEBUG && logger.debug(
-            "Listener.parentedSearchFeedback: socket " + socket.id + " with user " + listenerData.user.id +
-            " with role " + listenerData.user.role + " cannot listen to " + request.qualifiedPathName,
+            {
+              className: "Listener",
+              methodName: "parentedSearchFeedback",
+              message: "Socket " + socket.id + " with user " + listenerData.user.id +
+                " with role " + listenerData.user.role + " cannot listen to " + request.qualifiedPathName,
+            },
           );
           this.emitError(socket, "user has not access", request);
           return;
         }
       } catch (err) {
         logger.error(
-          "Listener.parentedSearchFeedback: failed to provide feedback",
           {
-            errMessage: err.message,
-            errStack: err.stack,
+            className: "Listener",
+            methodName: "parentedSearchFeedback",
+            message: "Failed to provide feedback",
+            err,
           }
         );
         return;
@@ -1328,8 +1509,14 @@ export class Listener {
           newLastModified: findLastRecordLastModifiedDate(newRecords, modifiedRecords, lostRecords),
         };
         CAN_LOG_DEBUG && logger.debug(
-          "Listener.parentedSearchFeedback: emmitting " + PARENTED_SEARCH_RECORDS_EVENT,
-          event,
+          {
+            className: "Listener",
+            methodName: "parentedSearchFeedback",
+            message: "Emmitting " + PARENTED_SEARCH_RECORDS_EVENT,
+            data: {
+              event,
+            },
+          },
         );
         socket.emit(
           PARENTED_SEARCH_RECORDS_EVENT,
@@ -1338,10 +1525,11 @@ export class Listener {
       }
     } catch (err) {
       logger.error(
-        "Listener.parentedSearchFeedback: failed to provide feedback",
         {
-          errMessage: err.message,
-          errStack: err.stack,
+          className: "Listener",
+          methodName: "parentedSearchFeedback",
+          message: "Failed to provide feedback",
+          err,
         }
       );
     }
@@ -1353,7 +1541,11 @@ export class Listener {
     const listenerData = this.listeners[socket.id];
     if (!listenerData) {
       CAN_LOG_DEBUG && logger.debug(
-        "Listener.ownedParentedSearchFeedback: can't give feedback to an unidentified socket " + socket.id,
+        {
+          className: "Listener",
+          methodName: "ownedParentedSearchFeedback",
+          message: "Can't give feedback to an unidentified socket " + socket.id,
+        },
       );
       this.emitError(socket, "socket is unidentified", request);
       return;
@@ -1362,9 +1554,13 @@ export class Listener {
     const valid = checkOwnedParentedSearchFeedbackRequest(request);
     if (!valid) {
       CAN_LOG_DEBUG && logger.debug(
-        "Listener.parentedSearchFeedback: can't register listener due to invalid request",
         {
-          errors: checkParentedSearchFeedbackRequest.errors,
+          className: "Listener",
+          methodName: "parentedSearchFeedback",
+          message: "Can't register listener due to invalid request",
+          data: {
+            errors: checkParentedSearchFeedbackRequest.errors,
+          },
         }
       );
       this.emitError(socket, "invalid request", request);
@@ -1374,7 +1570,11 @@ export class Listener {
       const itemDefinitionOrModule = this.root.registry[request.qualifiedPathName];
       if (!itemDefinitionOrModule) {
         CAN_LOG_DEBUG && logger.debug(
-          "Listener.ownedParentedSearchFeedback: could not find " + request.qualifiedPathName,
+          {
+            className: "Listener",
+            methodName: "ownedParentedSearchFeedback",
+            message: "Could not find " + request.qualifiedPathName,
+          },
         );
         this.emitError(socket, "could not find item definition or module", request);
         return;
@@ -1401,7 +1601,7 @@ export class Listener {
           root: this.root,
           value: null,
           environment: CustomRoleGranterEnvironment.SEARCHING_RECORDS,
-          owner: request.createdBy || UNSPECIFIED_OWNER,
+          owner: request.createdBy || UNSPECIFIED_OWNER,
           requestArgs: null,
           parent: {
             id: request.parentId,
@@ -1417,25 +1617,30 @@ export class Listener {
           ItemDefinitionIOActions.READ,
           listenerData.user.role,
           listenerData.user.id,
-          request.createdBy || UNSPECIFIED_OWNER,
+          request.createdBy || UNSPECIFIED_OWNER,
           {},
           rolesManager,
           false,
         )
         if (!hasAccess) {
           CAN_LOG_DEBUG && logger.debug(
-            "Listener.ownedParentedSearchFeedback: socket " + socket.id + " with user " + listenerData.user.id +
-            " with role " + listenerData.user.role + " cannot listen to " + request.qualifiedPathName,
+            {
+              className: "Listener",
+              methodName: "ownedParentedSearchFeedback",
+              message: "Socket " + socket.id + " with user " + listenerData.user.id +
+                " with role " + listenerData.user.role + " cannot listen to " + request.qualifiedPathName,
+            },
           );
           this.emitError(socket, "user has not access", request);
           return;
         }
       } catch (err) {
         logger.error(
-          "Listener.ownedParentedSearchFeedback: failed to provide feedback",
           {
-            errMessage: err.message,
-            errStack: err.stack,
+            className: "Listener",
+            methodName: "ownedParentedSearchFeedback",
+            message: "Failed to provide feedback",
+            err,
           }
         );
         return;
@@ -1527,15 +1732,21 @@ export class Listener {
           parentVersion: request.parentVersion || null,
           parentType: request.parentType,
           qualifiedPathName: request.qualifiedPathName,
-          createdBy: request.createdBy || UNSPECIFIED_OWNER,
+          createdBy: request.createdBy || UNSPECIFIED_OWNER,
           newRecords,
           modifiedRecords,
           lostRecords,
           newLastModified: findLastRecordLastModifiedDate(newRecords, modifiedRecords, lostRecords),
         };
         CAN_LOG_DEBUG && logger.debug(
-          "Listener.parentedSearchFeedback: emmitting " + OWNED_PARENTED_SEARCH_RECORDS_EVENT,
-          event,
+          {
+            className: "Listener",
+            methodName: "parentedSearchFeedback",
+            message: "Emmitting " + OWNED_PARENTED_SEARCH_RECORDS_EVENT,
+            data: {
+              event,
+            },
+          },
         );
         socket.emit(
           OWNED_PARENTED_SEARCH_RECORDS_EVENT,
@@ -1544,10 +1755,11 @@ export class Listener {
       }
     } catch (err) {
       logger.error(
-        "Listener.ownedParentedSearchFeedback: failed to provide feedback",
         {
-          errMessage: err.message,
-          errStack: err.stack,
+          className: "Listener",
+          methodName: "ownedParentedSearchFeedback",
+          message: "Failed to provide feedback",
+          err,
         }
       );
     }
@@ -1559,7 +1771,11 @@ export class Listener {
     const listenerData = this.listeners[socket.id];
     if (!listenerData) {
       CAN_LOG_DEBUG && logger.debug(
-        "Listener.feedback: can't give feedback to an unidentified socket " + socket.id,
+        {
+          className: "Listener",
+          methodName: "feedback",
+          message: "Can't give feedback to an unidentified socket " + socket.id,
+        },
       );
       this.emitError(socket, "socket is unidentified", request);
       return;
@@ -1568,9 +1784,13 @@ export class Listener {
     const valid = checkFeedbackRequest(request);
     if (!valid) {
       CAN_LOG_DEBUG && logger.debug(
-        "Listener.feedback: can't register listener due to invalid request",
         {
-          errors: checkFeedbackRequest.errors,
+          className: "Listener",
+          methodName: "feedback",
+          message: "Can't register listener due to invalid request",
+          data: {
+            errors: checkFeedbackRequest.errors,
+          },
         }
       );
       this.emitError(socket, "invalid request", request);
@@ -1580,7 +1800,11 @@ export class Listener {
     const itemDefinition: ItemDefinition = this.root.registry[request.itemDefinition] as ItemDefinition;
     if (!itemDefinition || !(itemDefinition instanceof ItemDefinition)) {
       CAN_LOG_DEBUG && logger.debug(
-        "Listener.register: could not find " + request.itemDefinition,
+        {
+          className: "Listener",
+          methodName: "register",
+          message: "Could not find " + request.itemDefinition,
+        },
       );
       this.emitError(socket, "could not find item definition", request);
       return;
@@ -1591,10 +1815,12 @@ export class Listener {
       value = await this.cache.requestValue(itemDefinition, request.id, request.version);
     } catch (err) {
       logger.error(
-        "Listener.identify [SERIOUS]: socket " + socket.id + " could not retrieve feedback due to cache failure",
         {
-          errMessage: err.message,
-          errStack: err.stack,
+          className: "Listener",
+          methodName: "identify",
+          message: "Socket " + socket.id + " could not retrieve feedback due to cache failure",
+          serious: true,
+          err,
         }
       );
       return;
@@ -1640,8 +1866,12 @@ export class Listener {
       );
       if (!hasAccess) {
         CAN_LOG_DEBUG && logger.debug(
-          "Listener.register: socket " + socket.id + " with user " + listenerData.user.id +
-          " with role " + listenerData.user.role + " cannot listen to " + itemDefinition,
+          {
+            className: "Listener",
+            methodName: "register",
+            message: "Socket " + socket.id + " with user " + listenerData.user.id +
+              " with role " + listenerData.user.role + " cannot listen to " + itemDefinition,
+          },
         );
         this.emitError(socket, "user has not access", request);
         return;
@@ -1656,8 +1886,14 @@ export class Listener {
           lastModified: value.last_modified,
         };
         CAN_LOG_DEBUG && logger.debug(
-          "Listener.feedback: emitting " + CHANGED_FEEEDBACK_EVENT,
-          event,
+          {
+            className: "Listener",
+            methodName: "feedback",
+            message: "Emitting " + CHANGED_FEEEDBACK_EVENT,
+            data: {
+              event,
+            },
+          },
         );
         socket.emit(
           CHANGED_FEEEDBACK_EVENT,
@@ -1672,8 +1908,14 @@ export class Listener {
           lastModified: null,
         };
         CAN_LOG_DEBUG && logger.debug(
-          "Listener.feedback: emitting " + CHANGED_FEEEDBACK_EVENT,
-          event,
+          {
+            className: "Listener",
+            methodName: "feedback",
+            message: "Emitting " + CHANGED_FEEEDBACK_EVENT,
+            data: {
+              event,
+            },
+          },
         );
         socket.emit(
           CHANGED_FEEEDBACK_EVENT,
@@ -1682,10 +1924,11 @@ export class Listener {
       }
     } catch (err) {
       logger.error(
-        "Listener.feedback: failed to provide feedback",
         {
-          errMessage: err.message,
-          errStack: err.stack,
+          className: "Listener",
+          methodName: "feedback",
+          message: "Failed to provide feedback",
+          err,
         }
       );
     }
@@ -1698,7 +1941,11 @@ export class Listener {
     });
     if (noSocketsListeningLeft) {
       CAN_LOG_DEBUG && logger.debug(
-        "Listener.removeListenerFinal: founds no sockets left for " + mergedIndexIdentifier + " plugging off redis",
+        {
+          className: "Listener",
+          methodName: "removeListenerFinal",
+          message: "Founds no sockets left for " + mergedIndexIdentifier + " plugging off redis",
+        },
       );
       this.redisGlobalSub.redisClient.unsubscribe(mergedIndexIdentifier);
     }
@@ -1710,7 +1957,11 @@ export class Listener {
     const listenerData = this.listeners[socket.id];
     if (listenerData && listenerData.listens[mergedIndexIdentifier]) {
       CAN_LOG_DEBUG && logger.debug(
-        "Listener.removeListener: unsubscribing socket " + socket.id + " from " + mergedIndexIdentifier,
+        {
+          className: "Listener",
+          methodName: "removeListener",
+          message: "Unsubscribing socket " + socket.id + " from " + mergedIndexIdentifier,
+        },
       );
       delete listenerData.listens[mergedIndexIdentifier];
       listenerData.amount--;
@@ -1742,7 +1993,11 @@ export class Listener {
     const listenerData = this.listeners[socket.id];
     if (!listenerData) {
       CAN_LOG_DEBUG && logger.debug(
-        "Listener.unregister: can't unregister an unidentified socket " + socket.id,
+        {
+          className: "Listener",
+          methodName: "unregister",
+          message: "Can't unregister an unidentified socket " + socket.id,
+        },
       );
       this.emitError(socket, "socket is unidentified", request);
       return;
@@ -1751,9 +2006,13 @@ export class Listener {
     const valid = checkUnregisterRequest(request);
     if (!valid) {
       CAN_LOG_DEBUG && logger.debug(
-        "Listener.unregister: can't unregister due to invalid request",
         {
-          errors: checkUnregisterRequest.errors,
+          className: "Listener",
+          methodName: "unregister",
+          message: "Can't unregister due to invalid request",
+          data: {
+            errors: checkUnregisterRequest.errors,
+          },
         }
       );
       this.emitError(socket, "invalid request", request);
@@ -1773,7 +2032,11 @@ export class Listener {
     const listenerData = this.listeners[socket.id];
     if (!listenerData) {
       CAN_LOG_DEBUG && logger.debug(
-        "Listener.ownedSearchUnregister: can't owned search unregister an unidentified socket " + socket.id,
+        {
+          className: "Listener",
+          methodName: "ownedSearchUnregister",
+          message: "Can't owned search unregister an unidentified socket " + socket.id,
+        },
       );
       this.emitError(socket, "socket is unidentified", request);
       return;
@@ -1782,9 +2045,13 @@ export class Listener {
     const valid = checkOwnedSearchUnregisterRequest(request);
     if (!valid) {
       CAN_LOG_DEBUG && logger.debug(
-        "Listener.ownedSearchUnregister: can't unregister due to invalid request",
         {
-          errors: checkOwnedSearchUnregisterRequest.errors,
+          className: "Listener",
+          methodName: "ownedSearchUnregister",
+          message: "Can't unregister due to invalid request",
+          data: {
+            errors: checkOwnedSearchUnregisterRequest.errors,
+          },
         }
       );
       this.emitError(socket, "invalid request", request);
@@ -1803,7 +2070,11 @@ export class Listener {
     const listenerData = this.listeners[socket.id];
     if (!listenerData) {
       CAN_LOG_DEBUG && logger.debug(
-        "Listener.parentedSearchUnregister: can't parent search unregister an unidentified socket " + socket.id,
+        {
+          className: "Listener",
+          methodName: "parentedSearchUnregister",
+          message: "Can't parent search unregister an unidentified socket " + socket.id,
+        },
       );
       this.emitError(socket, "socket is unidentified", request);
       return;
@@ -1812,9 +2083,13 @@ export class Listener {
     const valid = checkParentedSearchUnregisterRequest(request);
     if (!valid) {
       CAN_LOG_DEBUG && logger.debug(
-        "Listener.parentedSearchUnregister: can't unregister due to invalid request",
         {
-          errors: checkParentedSearchUnregisterRequest.errors,
+          className: "Listener",
+          methodName: "parentedSearchUnregister",
+          message: "Can't unregister due to invalid request",
+          data: {
+            errors: checkParentedSearchUnregisterRequest.errors,
+          },
         }
       );
       this.emitError(socket, "invalid request", request);
@@ -1835,7 +2110,11 @@ export class Listener {
     const listenerData = this.listeners[socket.id];
     if (!listenerData) {
       CAN_LOG_DEBUG && logger.debug(
-        "Listener.ownedParentedSearchUnregister: can't parent search unregister an unidentified socket " + socket.id,
+        {
+          className: "Listener",
+          methodName: "ownedParentedSearchUnregister",
+          message: "Can't parent search unregister an unidentified socket " + socket.id,
+        },
       );
       this.emitError(socket, "socket is unidentified", request);
       return;
@@ -1844,9 +2123,13 @@ export class Listener {
     const valid = checkOwnedParentedSearchUnregisterRequest(request);
     if (!valid) {
       CAN_LOG_DEBUG && logger.debug(
-        "Listener.ownedParentedSearchUnregister: can't unregister due to invalid request",
         {
-          errors: checkOwnedParentedSearchUnregisterRequest.errors,
+          className: "Listener",
+          methodName: "ownedParentedSearchUnregister",
+          message: "Can't unregister due to invalid request",
+          data: {
+            errors: checkOwnedParentedSearchUnregisterRequest.errors,
+          },
         }
       );
       this.emitError(socket, "invalid request", request);
@@ -1879,11 +2162,15 @@ export class Listener {
 
     // due to data we avoid logging this, data can be fairly large
     CAN_LOG_DEBUG && logger.debug(
-      "Listener.triggerChangedListeners: triggering redis changed event for",
       {
-        event: redisEvent.event,
-        listenerUUID,
-        serverInstanceGroupId: INSTANCE_GROUP_ID,
+        className: "Listener",
+        methodName: "triggerChangedListeners",
+        message: "Triggering redis changed event for",
+        data: {
+          event: redisEvent.event,
+          listenerUUID,
+          serverInstanceGroupId: INSTANCE_GROUP_ID,
+        },
       },
     );
 
@@ -1906,8 +2193,14 @@ export class Listener {
       source: "global",
     };
     CAN_LOG_DEBUG && logger.debug(
-      "Listener.triggerOwnedSearchListeners: triggering redis event",
-      redisEvent,
+      {
+        className: "Listener",
+        methodName: "triggerOwnedSearchListeners",
+        message: "Triggering redis event",
+        data: {
+          event: redisEvent,
+        }
+      },
     );
     this.redisGlobalPub.redisClient.publish(mergedIndexIdentifier, JSON.stringify(redisEvent));
   }
@@ -1930,8 +2223,14 @@ export class Listener {
       source: "global",
     }
     CAN_LOG_DEBUG && logger.debug(
-      "Listener.triggerParentedSearchListeners: triggering redis event",
-      redisEvent,
+      {
+        className: "Listener",
+        methodName: "triggerParentedSearchListeners",
+        message: "Triggering redis event",
+        data: {
+          event: redisEvent,
+        },
+      },
     );
     this.redisGlobalPub.redisClient.publish(mergedIndexIdentifier, JSON.stringify(redisEvent));
   }
@@ -1955,8 +2254,14 @@ export class Listener {
       source: "global",
     }
     CAN_LOG_DEBUG && logger.debug(
-      "Listener.triggerOwnedParentedSearchListeners: triggering redis event",
-      redisEvent,
+      {
+        className: "Listener",
+        methodName: "triggerOwnedParentedSearchListeners",
+        message: "Triggering redis event",
+        data: {
+          event: redisEvent,
+        },
+      },
     );
     this.redisGlobalPub.redisClient.publish(mergedIndexIdentifier, JSON.stringify(redisEvent));
   }
@@ -1966,14 +2271,24 @@ export class Listener {
   ) {
     const redisEvent: IRedisEvent = JSON.parse(message);
     CAN_LOG_DEBUG && logger.debug(
-      "Listener.globalRedisListener: received redis event " + channel,
-      redisEvent,
+      {
+        className: "Listener",
+        methodName: "globalRedisListener",
+        message: "Received redis event " + channel,
+        data: {
+          event: redisEvent,
+        },
+      },
     );
 
     if (redisEvent.source !== "global") {
       // this happens when we use the same redis database for both global and local
       CAN_LOG_DEBUG && logger.debug(
-        "Listener.globalRedisListener: redis event source is not global, ignoring",
+        {
+          className: "Listener",
+          methodName: "globalRedisListener",
+          message: "Redis event source is not global; ignoring",
+        },
       );
       return;
     }
@@ -1990,7 +2305,11 @@ export class Listener {
       const serverInstanceGroupId = redisEvent.serverInstanceGroupId;
       if (serverInstanceGroupId === INSTANCE_GROUP_ID) {
         CAN_LOG_DEBUG && logger.debug(
-          "Listener.globalRedisListener: our own instance group id " + INSTANCE_GROUP_ID + " was the emitter of " + channel + ", ignoring event",
+          {
+            className: "Listener",
+            methodName: "globalRedisListener",
+            message: "Our own instance group id " + INSTANCE_GROUP_ID + " was the emitter of " + channel + "; ignoring event",
+          },
         );
       } else if (redisEvent.data && redisEvent.data.userId === "number") {
         this.onReceiveKickEvent(redisEvent.data.userId);
@@ -2002,7 +2321,11 @@ export class Listener {
     // as these are the remote listening functions
     if (redisEvent.mergedIndexIdentifier && this.listensSS[redisEvent.mergedIndexIdentifier]) {
       CAN_LOG_DEBUG && logger.debug(
-        "Listener.globalRedisListener: our own server is expecting " + channel,
+        {
+          className: "Listener",
+          methodName: "globalRedisListener",
+          message: "Our own server is expecting " + channel,
+        },
       );
 
       const serverInstanceGroupId = redisEvent.serverInstanceGroupId;
@@ -2010,7 +2333,11 @@ export class Listener {
         // when we were the originators, our local cache is expected
         // to have been updated, as such, we literally don't care
         CAN_LOG_DEBUG && logger.debug(
-          "Listener.globalRedisListener: our own instance group id " + INSTANCE_GROUP_ID + " was the emitter of " + channel + ", ignoring event",
+          {
+            className: "Listener",
+            methodName: "globalRedisListener",
+            message: "Our own instance group id " + INSTANCE_GROUP_ID + " was the emitter of " + channel + "; ignoring event",
+          },
         );
       } else {
         const event: IChangedFeedbackEvent = redisEvent.event;
@@ -2042,11 +2369,19 @@ export class Listener {
           ) {
             if (this.listeners[socketKey].uuid === redisEvent.listenerUUID) {
               CAN_LOG_DEBUG && logger.debug(
-                "Listener.globalRedisListener: socket " + socketKey + " is listening, but was also the initial emitter of " + channel + ", ignoring",
+                {
+                  className: "Listener",
+                  methodName: "globalRedisListener",
+                  message: "Socket " + socketKey + " is listening; but was also the initial emitter of " + channel + "; ignoring",
+                },
               );
             } else {
               CAN_LOG_DEBUG && logger.debug(
-                "Listener.globalRedisListener: socket " + socketKey + " was expecting " + channel + ", emitting",
+                {
+                  className: "Listener",
+                  methodName: "globalRedisListener",
+                  message: "Socket " + socketKey + " was expecting " + channel + "; emitting",
+                },
               );
               this.listeners[socketKey].socket.emit(
                 redisEvent.type,
@@ -2064,14 +2399,24 @@ export class Listener {
   ) {
     const redisEvent: IRedisEvent = JSON.parse(message);
     CAN_LOG_DEBUG && logger.debug(
-      "Listener.localRedisListener: recieved redis event",
-      redisEvent,
+      {
+        className: "Listener",
+        methodName: "localRedisListener",
+        message: "Recieved redis event",
+        data: {
+          event: redisEvent,
+        },
+      },
     );
 
     if (redisEvent.source !== "local") {
       // this happens when we use the same redis database for both global and local
       CAN_LOG_DEBUG && logger.debug(
-        "Listener.localRedisListener: redis event source is not local, ignoring",
+        {
+          className: "Listener",
+          methodName: "localRedisListener",
+          message: "Redis event source is not local; ignoring",
+        },
       );
       return;
     }
@@ -2092,7 +2437,11 @@ export class Listener {
     }
 
     CAN_LOG_DEBUG && logger.debug(
-      "Listener.removeSocket: removing socket " + socket.id,
+      {
+        className: "Listener",
+        methodName: "removeSocket",
+        message: "Removing socket " + socket.id,
+      },
     );
 
     Object.keys(listenerData.listens).forEach((listensMergedIdentifier) => {
@@ -2105,7 +2454,11 @@ export class Listener {
         });
       if (noSocketsListeningLeft) {
         CAN_LOG_DEBUG && logger.debug(
-          "Listener.removeSocket: redis unsubscribing off " + listensMergedIdentifier,
+          {
+            className: "Listener",
+            methodName: "removeSocket",
+            message: "Redis unsubscribing off " + listensMergedIdentifier,
+          },
         );
         this.redisGlobalSub.redisClient.unsubscribe(listensMergedIdentifier);
       }
@@ -2120,8 +2473,12 @@ export class Listener {
     // event
 
     CAN_LOG_DEBUG && logger.debug(
-      "Listener.onClusterManagerResetInformed [SERIOUS]: received cluster manager reset event, " +
-      "this means the cluster manager died out and restarted, now all the clients must be reconnected",
+      {
+        className: "Listener",
+        methodName: "onClusterManagerResetInformed",
+        message: "Received cluster manager reset event; " +
+          "this means the cluster manager died out and restarted; now all the clients must be reconnected",
+      },
     );
 
     // a cluster manager reset should not happen at all when starting the server
@@ -2138,7 +2495,11 @@ export class Listener {
   }
   public informClusterManagerReset() {
     CAN_LOG_DEBUG && logger.debug(
-      "Listener.informClusterManagerReset: informing a reset of the cluster manager",
+      {
+        className: "Listener",
+        methodName: "informClusterManagerReset",
+        message: "Informing a reset of the cluster manager",
+      },
     );
     const redisEvent: IRedisEvent = {
       type: CLUSTER_MANAGER_RESET,

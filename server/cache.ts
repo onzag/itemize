@@ -39,7 +39,6 @@ import { convertSQLValueToGQLValueForProperty } from "../base/Root/Module/ItemDe
 
 import {
   CAN_LOG_DEBUG,
-  CAN_LOG_SILLY
 } from "./environment";
 import { ItemizeElasticClient } from "./elastic";
 
@@ -117,7 +116,11 @@ export class Cache {
     key: string,
   ): Promise<{ value: T }> {
     CAN_LOG_DEBUG && logger.debug(
-      "Cache.getRaw: requesting " + key,
+      {
+        className: "Cache",
+        methodName: "getRaw",
+        message: "Requesting " + key,
+      },
     );
     // we build the promise
     // and call redis, note how we never reject
@@ -127,23 +130,27 @@ export class Cache {
         return null;
       }
       try {
+        // and poke the cache to reset the clock for expiration
+        this.pokeCache(key);
         return ({
           value: JSON.parse(value) as T,
         });
-        // and poke the cache to reset the clock for expiration
-        this.pokeCache(key);
       } catch (err) {
         logger.error(
-          "Cache.getRaw: could not JSON parse value from cache in " + key,
-          value,
+          {
+            className: "Cache",
+            methodName: "getRaw",
+            message: "Could not JSON parse value from cache in " + key,
+          },
         );
       }
-    } catch (error) {
+    } catch (err) {
       logger.error(
-        "Cache.getRaw: could not retrieve value from redis cache client for " + key + " with error",
         {
-          errStack: error.stack,
-          errMessage: error.message,
+          className: "Cache",
+          methodName: "getRaw",
+          message: "Could not retrieve value from redis cache client for " + key + " with error",
+          err,
         },
       );
       return null;
@@ -152,17 +159,22 @@ export class Cache {
 
   public async setRaw(key: string, value: any) {
     CAN_LOG_DEBUG && logger.debug(
-      "Cache.setRaw: setting " + key,
+      {
+        className: "Cache",
+        methodName: "setRaw",
+        message: "Setting " + key,
+      },
     );
     try {
       await this.redisClient.set(key, JSON.stringify(value));
       this.pokeCache(key);
-    } catch (error) {
+    } catch (err) {
       logger.error(
-        "Cache.forceCacheInto: could not set value for " + key + " with error",
         {
-          errStack: error.stack,
-          errMessage: error.message,
+          className: "Cache",
+          methodName: "forceCacheInto",
+          message: "Could not set value for " + key + " with error",
+          err,
         },
       );
     }
@@ -174,14 +186,22 @@ export class Cache {
    */
   private async pokeCache(keyIdentifier: string) {
     CAN_LOG_DEBUG && logger.debug(
-      "Cache.pokeCache: poking " + keyIdentifier,
+      {
+        className: "Cache",
+        methodName: "pokeCache",
+        message: "Poking " + keyIdentifier,
+      },
     );
     try {
       await this.redisClient.expire(keyIdentifier, CACHE_EXPIRES_DAYS * 86400);
     } catch (err) {
       logger.error(
-        "Cache.pokeCache: could not poke " + keyIdentifier + " with error",
-        err.stack ? err.stack : err.message,
+        {
+          className: "Cache",
+          methodName: "pokeCache",
+          message: "Could not poke " + keyIdentifier + " with error",
+          err,
+        },
       );
     }
   }
@@ -196,11 +216,11 @@ export class Cache {
   private forceCacheInto(idefTable: string, id: string, version: string, value: ISQLTableRowValue) {
     const idefQueryIdentifier = "IDEFQUERY:" + idefTable + "." + id.toString() + "." + (version || "");
     CAN_LOG_DEBUG && logger.debug(
-      "Cache.forceCacheInto: setting new cache value for " + idefQueryIdentifier,
-    );
-    CAN_LOG_SILLY && logger.silly(
-      "Cache.forceCacheInto: value is",
-      value,
+      {
+        className: "Cache",
+        methodName: "forceCacheInto",
+        message: "Setting new cache value for " + idefQueryIdentifier,
+      },
     );
     this.listener.registerSS({
       itemDefinition: idefTable,
@@ -237,8 +257,14 @@ export class Cache {
       };
 
       CAN_LOG_DEBUG && logger.debug(
-        "Cache.triggerSearchListenersFor (detached): built and triggering search result and event for active searches (item definition)",
-        itemDefinitionBasedOwnedEvent,
+        {
+          className: "Cache",
+          methodName: "triggerSearchListenersFor (detached)",
+          message: "Built and triggering search result and event for active searches (item definition)",
+          data: {
+            event: itemDefinitionBasedOwnedEvent,
+          },
+        },
       );
       this.listener.triggerOwnedSearchListeners(
         itemDefinitionBasedOwnedEvent,
@@ -251,8 +277,14 @@ export class Cache {
       };
 
       CAN_LOG_DEBUG && logger.debug(
-        "Cache.triggerSearchListenersFor (detached): built and triggering search result and event for active searches (module)",
-        moduleBasedOwnedEvent,
+        {
+          className: "Cache",
+          methodName: "triggerSearchListenersFor (detached)",
+          message: "Built and triggering search result and event for active searches (module)",
+          data: {
+            event: moduleBasedOwnedEvent,
+          },
+        },
       );
       this.listener.triggerOwnedSearchListeners(
         moduleBasedOwnedEvent,
@@ -272,8 +304,14 @@ export class Cache {
         newLastModified: record.last_modified,
       };
       CAN_LOG_DEBUG && logger.debug(
-        "Cache.triggerSearchListenersFor (detached): built and triggering search result and event for parented active searches (item definition)",
-        itemDefinitionBasedParentedEvent,
+        {
+          className: "Cache",
+          methodName: "triggerSearchListenersFor (detached)",
+          message: "Built and triggering search result and event for parented active searches (item definition)",
+          data: {
+            event: itemDefinitionBasedParentedEvent,
+          },
+        },
       );
       this.listener.triggerParentedSearchListeners(
         itemDefinitionBasedParentedEvent,
@@ -285,8 +323,14 @@ export class Cache {
         qualifiedPathName: modQualifiedPathName,
       };
       CAN_LOG_DEBUG && logger.debug(
-        "Cache.triggerSearchListenersFor (detached): built and triggering search result and event for parented active searches (module)",
-        moduleBasedParentedEvent,
+        {
+          className: "Cache",
+          methodName: "triggerSearchListenersFor (detached)",
+          message: "Built and triggering search result and event for parented active searches (module)",
+          data: {
+            event: moduleBasedParentedEvent,
+          },
+        },
       );
       this.listener.triggerParentedSearchListeners(
         moduleBasedParentedEvent,
@@ -307,8 +351,14 @@ export class Cache {
         newLastModified: record.last_modified,
       };
       CAN_LOG_DEBUG && logger.debug(
-        "Cache.triggerSearchListenersFor (detached): built and triggering search result and event for parented and owned active searches (item definition)",
-        itemDefinitionBasedOwnedParentedEvent,
+        {
+          className: "Cache",
+          methodName: "triggerSearchListenersFor (detached)",
+          message: "Built and triggering search result and event for parented and owned active searches (item definition)",
+          data: {
+            event: itemDefinitionBasedOwnedParentedEvent,
+          },
+        },
       );
       this.listener.triggerOwnedParentedSearchListeners(
         itemDefinitionBasedOwnedParentedEvent,
@@ -320,8 +370,14 @@ export class Cache {
         qualifiedPathName: modQualifiedPathName,
       };
       CAN_LOG_DEBUG && logger.debug(
-        "Cache.triggerSearchListenersFor (detached): built and triggering search result and event for parented and owned active searches (module)",
-        moduleBasedOwnedParentedEvent,
+        {
+          className: "Cache",
+          methodName: "triggerSearchListenersFor (detached)",
+          message: "Built and triggering search result and event for parented and owned active searches (module)",
+          data: {
+            event: moduleBasedOwnedParentedEvent,
+          },
+        },
       );
       this.listener.triggerOwnedParentedSearchListeners(
         moduleBasedOwnedParentedEvent,
@@ -372,8 +428,12 @@ export class Cache {
     const moduleTable = itemDefinition.getParentModule().getQualifiedPathName();
 
     CAN_LOG_DEBUG && logger.debug(
-      "Cache.requestCreation: requesting creation for " + selfTable + " at module " +
-      moduleTable + " for id " + forId + " and version " + version + " created by " + createdBy + " using dictionary " + dictionary,
+      {
+        className: "Cache",
+        methodName: "requestCreation",
+        message: "Requesting creation for " + selfTable + " at module " +
+          moduleTable + " for id " + forId + " and version " + version + " created by " + createdBy + " using dictionary " + dictionary,
+      },
     );
 
     const isSQLType = !!value.MODULE_ID;
@@ -561,7 +621,11 @@ export class Cache {
 
     if (parent) {
       CAN_LOG_DEBUG && logger.debug(
-        "Cache.requestCreation: parent specified is id " + parent.id + " with version " + parent.version + " and type " + parent.type,
+        {
+          className: "Cache",
+          methodName: "requestCreation",
+          message: "Parent specified is id " + parent.id + " with version " + parent.version + " and type " + parent.type,
+        },
       );
       sqlModData.parent_id = parent.id;
       // the version can never be null, so we must cast it into the invalid
@@ -571,13 +635,11 @@ export class Cache {
     }
 
     CAN_LOG_DEBUG && logger.debug(
-      "Cache.requestCreation: finalizing SQL data with module data",
-      sqlModData,
-    );
-
-    CAN_LOG_DEBUG && logger.debug(
-      "Cache.requestCreation: finalizing SQL data with item definition data",
-      sqlIdefData,
+      {
+        className: "Cache",
+        methodName: "requestCreation",
+        message: "Finalizing SQL creation",
+      },
     );
 
     // now let's build the transaction for the insert query which requires
@@ -618,37 +680,49 @@ export class Cache {
       );
     } catch (err) {
       logger.error(
-        "Cache.requestCreation [SERIOUS]: intercepted database insert error with error information",
         {
-          errMessage: err.message,
-          errStack: err.stack,
-          selfTable,
-          moduleTable,
-          forId,
-          version,
-          sqlIdefData,
-          sqlModData,
+          className: "Cache",
+          methodName: "requestCreation",
+          message: "Intercepted database insert error with error information",
+          serious: true,
+          err,
+          data: {
+            selfTable,
+            moduleTable,
+            forId,
+            version,
+            sqlIdefData,
+            sqlModData,
+          },
         }
       );
       throw err;
     }
 
     CAN_LOG_DEBUG && logger.debug(
-      "Cache.requestCreation: consuming binary information streams",
+      {
+        className: "Cache",
+        methodName: "requestCreation",
+        message: "Consuming binary information streams",
+      },
     );
 
     try {
       await consumeIdefStreams(sqlValue.id + "." + (sqlValue.version || ""));
     } catch (err) {
       logger.error(
-        "Cache.requestCreation [SERIOUS]: could not consume item definition streams, data is corrupted",
         {
-          errMessage: err.message,
-          errStack: err.stack,
-          selfTable,
-          moduleTable,
-          forId,
-          version,
+          className: "Cache",
+          methodName: "requestCreation",
+          message: "Could not consume item definition streams; data is corrupted",
+          serious: true,
+          err,
+          data: {
+            selfTable,
+            moduleTable,
+            forId,
+            version,
+          },
         }
       );
     }
@@ -656,21 +730,29 @@ export class Cache {
       await consumeModStreams(sqlValue.id + "." + (sqlValue.version || ""));
     } catch (err) {
       logger.error(
-        "Cache.requestCreation [SERIOUS]: could not consume module streams, data is corrupted",
         {
-          errMessage: err.message,
-          errStack: err.stack,
-          selfTable,
-          moduleTable,
-          forId,
-          version,
+          className: "Cache",
+          methodName: "requestCreation",
+          message: "Could not consume module streams; data is corrupted",
+          serious: true,
+          err,
+          data: {
+            selfTable,
+            moduleTable,
+            forId,
+            version,
+          },
         }
       );
     }
 
     (async () => {
       CAN_LOG_DEBUG && logger.debug(
-        "Cache.requestCreation (detached): storing cache value from the action",
+        {
+          className: "Cache",
+          methodName: "requestCreation",
+          message: "Storing cache value from the action",
+        },
       );
       await this.forceCacheInto(selfTable, sqlValue.id, sqlValue.version, sqlValue);
       const changeEvent: IChangedFeedbackEvent = {
@@ -682,8 +764,14 @@ export class Cache {
       };
 
       CAN_LOG_DEBUG && logger.debug(
-        "Cache.requestCreation (detached): built and triggering created change event",
-        changeEvent,
+        {
+          className: "Cache",
+          methodName: "requestCreation",
+          message: "Built and triggering created change event",
+          data: {
+            event: changeEvent,
+          },
+        },
       );
       this.listener.triggerChangedListeners(
         changeEvent,
@@ -714,14 +802,18 @@ export class Cache {
           await this.elastic.createDocument(selfTable, language, sqlValue.id, sqlValue.version, sqlValue);
         } catch (err) {
           logger.error(
-            "Cache.requestCreation (detached) [SERIOUS]: could not update value to elastic",
             {
-              errMessage: err.message,
-              errStack: err.stack,
-              selfTable,
-              moduleTable,
-              forId,
-              version,
+              className: "Cache",
+              methodName: "requestCreation (detached)",
+              message: "Could not update value to elastic",
+              serious: true,
+              err,
+              data: {
+                selfTable,
+                moduleTable,
+                forId,
+                version,
+              },
             }
           );
         }
@@ -765,15 +857,19 @@ export class Cache {
           });
         } catch (err) {
           logger.error(
-            "Cache.requestCreation (detached) [SERIOUS]: could not execute side effect function",
             {
-              errMessage: err.message,
-              errStack: err.stack,
-              selfTable,
-              moduleTable,
-              forId,
-              version,
-            }
+              className: "Cache",
+              methodName: "requestCreation (detached)",
+              message: "Could not execute side effect function",
+              serious: true,
+              err,
+              data: {
+                selfTable,
+                moduleTable,
+                forId,
+                version,
+              },
+            },
           );
         }
       });
@@ -873,12 +969,16 @@ export class Cache {
             await targetStorageClient.removeFolder(targetModuleFilesLocation);
           } catch (err2) {
             logger.error(
-              "Cache.requestCopy (detached) [ORPHANED]: could not remove orphaned folder",
               {
-                errMessage: err2.message,
-                errStack: err2.stack,
-                targetModuleFilesLocation,
-                targetContainerId,
+                className: "Cache",
+                methodName: "requestCopy",
+                message: "Could not remove orphaned folder",
+                orphan: true,
+                err: err2,
+                data: {
+                  targetModuleFilesLocation,
+                  targetContainerId,
+                },
               }
             );
           }
@@ -891,12 +991,16 @@ export class Cache {
             await targetStorageClient.removeFolder(targetItemFilesLocation);
           } catch (err2) {
             logger.error(
-              "Cache.requestCopy (detached) [ORPHANED]: could not remove orphaned folder",
               {
-                errMessage: err2.message,
-                errStack: err2.stack,
-                targetItemFilesLocation,
-                targetContainerId,
+                className: "Cache",
+                methodName: "requestCopy",
+                message: "Could not remove orphaned folder",
+                orphan: true,
+                err: err2,
+                data: {
+                  targetItemFilesLocation,
+                  targetContainerId,
+                },
               }
             );
           }
@@ -904,17 +1008,21 @@ export class Cache {
       }
 
       logger.error(
-        "Cache.requestCopy [SERIOUS]: could not copy item",
         {
-          errMessage: err.message,
-          errStack: err.stack,
-          targetItemFilesLocation,
-          targetModuleFilesLocation,
-          targetContainerId,
-          id,
-          version,
-          targetId,
-          targetVersion,
+          className: "Cache",
+          methodName: "requestCopy",
+          message: "Could not copy item",
+          serious: true,
+          err,
+          data: {
+            targetItemFilesLocation,
+            targetModuleFilesLocation,
+            targetContainerId,
+            id,
+            version,
+            targetId,
+            targetVersion,
+          },
         }
       );
 
@@ -1033,9 +1141,13 @@ export class Cache {
     const moduleTable = itemDefinition.getParentModule().getQualifiedPathName();
 
     CAN_LOG_DEBUG && logger.debug(
-      "Cache.requestUpdate: requesting update for " + selfTable + " at module " +
-      moduleTable + " for id " + id + " and version " + version + " edited by " + editedBy + " using dictionary " + dictionary + " and " +
-      "container id " + containerId,
+      {
+        className: "Cache",
+        methodName: "requestUpdate",
+        message: "Requesting update for " + selfTable + " at module " +
+          moduleTable + " for id " + id + " and version " + version + " edited by " + editedBy + " using dictionary " + dictionary + " and " +
+          "container id " + containerId,
+      },
     );
 
     if (!options.ignorePreSideEffects) {
@@ -1150,14 +1262,22 @@ export class Cache {
       ) {
         actualReparent = null;
         CAN_LOG_DEBUG && logger.debug(
-          "Cache.requestUpdate: re-parent specified but ignored because it's the same parent as now",
+          {
+            className: "Cache",
+            methodName: "requestUpdate",
+            message: "Re-parent specified but ignored because it's the same parent as now",
+          },
         );
       }
     }
 
     if (actualReparent) {
       CAN_LOG_DEBUG && logger.debug(
-        "Cache.requestUpdate: re-parent specified is id " + reparent.id + " with version " + reparent.version + " and type " + reparent.type,
+        {
+          className: "Cache",
+          methodName: "requestUpdate",
+          message: "Re-parent specified is id " + reparent.id + " with version " + reparent.version + " and type " + reparent.type,
+        },
       );
       sqlModData.parent_id = reparent.id;
       // the version can never be null, so we must cast it into the invalid
@@ -1168,7 +1288,11 @@ export class Cache {
 
     if (blocking) {
       CAN_LOG_DEBUG && logger.debug(
-        "Cache.requestUpdate: blocking for resource specified as " + blocking.status,
+        {
+          className: "Cache",
+          methodName: "requestUpdate",
+          message: "Blocking for resource specified as " + blocking.status,
+        },
       );
 
       if (blocking.status) {
@@ -1216,13 +1340,11 @@ export class Cache {
     ];
 
     CAN_LOG_DEBUG && logger.debug(
-      "Cache.requestUpdate: finalizing SQL data with module data",
-      sqlModData,
-    );
-
-    CAN_LOG_DEBUG && logger.debug(
-      "Cache.requestUpdate: finalizing SQL data with item definition data",
-      sqlIdefData,
+      {
+        className: "Cache",
+        methodName: "requestUpdate",
+        message: "Finalizing SQL data update",
+      },
     );
 
     const withQuery = new WithBuilder();
@@ -1289,37 +1411,49 @@ export class Cache {
       );
     } catch (err) {
       logger.error(
-        "Cache.requestUpdate [SERIOUS]: intercepted database update error with error information",
         {
-          errMessage: err.message,
-          errStack: err.stack,
-          selfTable,
-          moduleTable,
-          id,
-          version,
-          sqlIdefData,
-          sqlModData,
+          className: "Cache",
+          methodName: "requestUpdate",
+          message: "Intercepted database update error with error information",
+          serious: true,
+          err,
+          data: {
+            selfTable,
+            moduleTable,
+            id,
+            version,
+            sqlIdefData,
+            sqlModData,
+          },
         }
       );
       throw err;
     }
 
     CAN_LOG_DEBUG && logger.debug(
-      "Cache.requestUpdate: consuming binary information streams",
+      {
+        className: "Cache",
+        methodName: "requestUpdate",
+        message: "Consuming binary information streams",
+      },
     );
 
     try {
       await sqlIdefDataComposed.consumeStreams(sqlValue.id + "." + (sqlValue.version || ""));
     } catch (err) {
       logger.error(
-        "Cache.requestUpdate [SERIOUS]: could not consume item definition streams, data is corrupted",
         {
-          errMessage: err.message,
-          errStack: err.stack,
-          selfTable,
-          moduleTable,
-          id,
-          version,
+          className: "Cache",
+          methodName: "requestUpdate",
+          message: "Could not consume item definition streams; data is corrupted",
+          serious: true,
+          err,
+          data: {
+            selfTable,
+            moduleTable,
+            id,
+            version,
+          },
         }
       );
     }
@@ -1327,14 +1461,18 @@ export class Cache {
       await sqlModDataComposed.consumeStreams(sqlValue.id + "." + (sqlValue.version || ""));
     } catch (err) {
       logger.error(
-        "Cache.requestUpdate [SERIOUS]: could not consume module streams, data is corrupted",
         {
-          errMessage: err.message,
-          errStack: err.stack,
-          selfTable,
-          moduleTable,
-          id,
-          version,
+          className: "Cache",
+          methodName: "requestUpdate",
+          message: "Could not consume module streams; data is corrupted",
+          serious: true,
+          err,
+          data: {
+            selfTable,
+            moduleTable,
+            id,
+            version,
+          },
         }
       );
     }
@@ -1342,7 +1480,11 @@ export class Cache {
     // we return and this executes after it returns
     (async () => {
       CAN_LOG_DEBUG && logger.debug(
-        "Cache.requestUpdate (detached): storing cache value from the action",
+        {
+          className: "Cache",
+          methodName: "requestUpdate",
+          message: "Storing cache value from the action",
+        },
       );
       await this.forceCacheInto(selfTable, id, version, sqlValue);
       const changeEvent: IChangedFeedbackEvent = {
@@ -1353,8 +1495,14 @@ export class Cache {
         lastModified: null,
       };
       CAN_LOG_DEBUG && logger.debug(
-        "Cache.requestUpdate (detached): built and triggering updated change event",
-        changeEvent,
+        {
+          className: "Cache",
+          methodName: "requestUpdate (detached)",
+          message: "Built and triggering updated change event",
+          data: {
+            event: changeEvent,
+          },
+        },
       );
       this.listener.triggerChangedListeners(
         changeEvent,
@@ -1444,14 +1592,18 @@ export class Cache {
           await this.elastic.updateDocument(selfTable, originalLanguage, language, sqlValue.id, sqlValue.version, sqlValue);
         } catch (err) {
           logger.error(
-            "Cache.requestUpdate (detached) [SERIOUS]: could not update value to elastic",
             {
-              errMessage: err.message,
-              errStack: err.stack,
-              selfTable,
-              moduleTable,
-              id,
-              version,
+              className: "Cache",
+              methodName: "requestUpdate",
+              message: "Could not update value to elastic",
+              serious: true,
+              err,
+              data: {
+                selfTable,
+                moduleTable,
+                id,
+                version,
+              },
             }
           );
         }
@@ -1504,14 +1656,18 @@ export class Cache {
           });
         } catch (err) {
           logger.error(
-            "Cache.requestUpdate (detached) [SERIOUS]: could not execute side effect",
             {
-              errMessage: err.message,
-              errStack: err.stack,
-              selfTable,
-              moduleTable,
-              id: sqlValue.id,
-              version: sqlValue.version,
+              className: "Cache",
+              methodName: "requestUpdate",
+              message: "Could not execute side effect",
+              serious: true,
+              err,
+              data: {
+                selfTable,
+                moduleTable,
+                id: sqlValue.id,
+                version: sqlValue.version,
+              },
             }
           );
         }
@@ -1606,14 +1762,18 @@ export class Cache {
           );
         } catch (err) {
           logger.error(
-            "Cache.deletePossibleChildrenOf (MAYBE-ORPHANED): Failed to attempt to find orphans for deleting",
             {
-              errMessage: err.message,
-              errStack: err.stack,
-              parentItemDefinition: itemDefinition.getQualifiedPathName(),
-              parentId: id,
-              parentVersion: version,
-              moduleChildCheck: mod.getQualifiedPathName(),
+              className: "Cache",
+              methodName: "deletePossibleChildrenOf",
+              orphan: true,
+              message: "Failed to attempt to find orphans for deleting",
+              err,
+              data: {
+                parentItemDefinition: itemDefinition.getQualifiedPathName(),
+                parentId: id,
+                parentVersion: version,
+                moduleChildCheck: mod.getQualifiedPathName(),
+              },
             },
           );
           return;
@@ -1652,13 +1812,17 @@ export class Cache {
               );
             } catch (err) {
               logger.error(
-                "Cache.deletePossibleChildrenOf (ORPHANED): Failed to delete an orphan",
                 {
-                  errMessage: err.message,
-                  errStack: err.stack,
-                  orphanItemDefinition: deleteItemDefinition.getQualifiedPathName(),
-                  orphanId: r.id,
-                  orphanVersion: r.version || null,
+                  className: "Cache",
+                  methodName: "deletePossibleChildrenOf",
+                  message: "Failed to delete an orphan",
+                  orphan: true,
+                  err,
+                  data: {
+                    orphanItemDefinition: deleteItemDefinition.getQualifiedPathName(),
+                    orphanId: r.id,
+                    orphanVersion: r.version || null,
+                  },
                 },
               );
             }
@@ -1701,8 +1865,12 @@ export class Cache {
     const moduleTable = itemDefinition.getParentModule().getQualifiedPathName();
 
     CAN_LOG_DEBUG && logger.debug(
-      "Cache.requestDelete: requesting delete for " + selfTable + " at module " +
-      moduleTable + " for id " + id + " and version " + version + " drop all versions is " + dropAllVersions,
+      {
+        className: "Cache",
+        methodName: "requestDelete",
+        message: "Requesting delete for " + selfTable + " at module " +
+          moduleTable + " for id " + id + " and version " + version + " drop all versions is " + dropAllVersions,
+      },
     );
 
     // whether we have a container for this
@@ -1735,21 +1903,31 @@ export class Cache {
             );
           } catch (err) {
             logger.error(
-              "Cache.requestDelete [SERIOUS]: Could not remove all the files for item definition storage",
               {
-                domain: this.domain,
-                containerId,
-                itemDefinition: itemDefinition.getQualifiedPathName(),
-                id,
-                version: specifiedVersion || null,
+                className: "Cache",
+                methodName: "requestDelete",
+                message: "Could not remove all the files for item definition storage",
+                serious: true,
+                err,
+                data: {
+                  domain: this.domain,
+                  containerId,
+                  itemDefinition: itemDefinition.getQualifiedPathName(),
+                  id,
+                  version: specifiedVersion || null,
+                },
               }
             );
           }
         } else {
-          logger.warn(
-            "Cache.requestDelete: Item for " + selfTable + " contains a file field but no container id for data storage is available",
+          logger.error(
             {
-              containerId,
+              className: "Cache",
+              methodName: "requestDelete",
+              message: "Item for " + selfTable + " contains a file field but no container id for data storage is available",
+              data: {
+                containerId,
+              },
             }
           );
         }
@@ -1767,21 +1945,31 @@ export class Cache {
             );
           } catch (err) {
             logger.error(
-              "Cache.requestDelete [SERIOUS]: Could not remove all the files for module storage",
               {
-                domain: this.domain,
-                containerId,
-                module: itemDefinition.getParentModule().getQualifiedPathName(),
-                id,
-                version: specifiedVersion || null,
+                className: "Cache",
+                methodName: "requestDelete",
+                message: "Could not remove all the files for module storage",
+                serious: true,
+                err,
+                data: {
+                  domain: this.domain,
+                  containerId,
+                  module: itemDefinition.getParentModule().getQualifiedPathName(),
+                  id,
+                  version: specifiedVersion || null,
+                },
               }
             );
           }
         } else {
-          logger.warn(
-            "Cache.requestDelete: Item for " + selfTable + " at module contains a file field but no container id for data storage is available",
+          logger.error(
             {
-              containerId,
+              className: "Cache",
+              methodName: "requestDelete",
+              message: "Item for " + selfTable + " at module contains a file field but no container id for data storage is available",
+              data: {
+                containerId,
+              },
             }
           );
         }
@@ -1821,10 +2009,11 @@ export class Cache {
         deleteFilesInContainer(record.version);
       } catch (err) {
         logger.error(
-          "Cache.requestDelete: Could not force cache into new value",
           {
-            errMessage: err.message,
-            errStack: err.stack,
+            className: "Cache",
+            methodName: "requestDelete",
+            message: "Could not force cache into new value",
+            err,
           }
         );
       }
@@ -1835,10 +2024,11 @@ export class Cache {
           await this.elastic.deleteDocument(itemDefinition, language, record.id, record.version);
         } catch (err) {
           logger.error(
-            "Cache.requestDelete: Could not delete the value in elasticsearch",
             {
-              errMessage: err.message,
-              errStack: err.stack,
+              className: "Cache",
+              methodName: "requestDelete",
+              message: "Could not delete the value in elasticsearch",
+              err,
             }
           );
         }
@@ -2091,15 +2281,19 @@ export class Cache {
                 });
               } catch (err) {
                 logger.error(
-                  "Cache.requestDelete (detached) [SERIOUS]: could not execute side effect function",
                   {
-                    errMessage: err.message,
-                    errStack: err.stack,
-                    selfTable,
-                    moduleTable,
-                    id: sqlValue.id,
-                    version: sqlValue.version,
-                    dropAllVersions,
+                    className: "Cache",
+                    methodName: "requestDelete",
+                    message: "Could not execute side effect function",
+                    serious: true,
+                    err,
+                    data: {
+                      selfTable,
+                      moduleTable,
+                      id: sqlValue.id,
+                      version: sqlValue.version,
+                      dropAllVersions,
+                    },
                   }
                 );
               }
@@ -2109,15 +2303,19 @@ export class Cache {
       }
     } catch (err) {
       logger.error(
-        "Cache.requestDelete [SERIOUS]: intercepted database delete error with error information",
         {
-          errMessage: err.message,
-          errStack: err.stack,
-          selfTable,
-          moduleTable,
-          id,
-          version,
-          dropAllVersions,
+          className: "Cache",
+          methodName: "requestDelete",
+          message: "Intercepted database delete error with error information",
+          serious: true,
+          err,
+          data: {
+            selfTable,
+            moduleTable,
+            id,
+            version,
+            dropAllVersions,
+          },
         }
       );
       throw err;
@@ -2186,8 +2384,12 @@ export class Cache {
     const moduleTable = itemDefinition.getParentModule().getQualifiedPathName();
 
     CAN_LOG_DEBUG && logger.debug(
-      "Cache.requestValue: requesting value for " + idefTable + " at module " +
-      moduleTable + " for id " + id + " and version " + version + " with refresh " + !!refresh,
+      {
+        className: "Cache",
+        methodName: "requestValue",
+        message: "Requesting value for " + idefTable + " at module " +
+          moduleTable + " for id " + id + " and version " + version + " with refresh " + !!refresh,
+      },
     );
 
     if (!refresh) {
@@ -2208,7 +2410,11 @@ export class Cache {
     }
 
     CAN_LOG_DEBUG && logger.debug(
-      "Cache.requestValue: not found in memory or refresh expected, requesting database",
+      {
+        className: "Cache",
+        methodName: "requestValue",
+        message: "Not found in memory or refresh expected; requesting database",
+      },
     );
 
     try {
@@ -2242,14 +2448,18 @@ export class Cache {
       return queryValue;
     } catch (err) {
       logger.error(
-        "Cache.requestValue [SERIOUS]: intercepted database request error with error information",
         {
-          errMessage: err.message,
-          errStack: err.stack,
-          idefTable,
-          moduleTable,
-          id,
-          version,
+          className: "Cache",
+          methodName: "requestValue",
+          message: "Intercepted database request error with error information",
+          serious: true,
+          err,
+          data: {
+            idefTable,
+            moduleTable,
+            id,
+            version,
+          },
         }
       );
       throw err;
@@ -2282,8 +2492,12 @@ export class Cache {
    * @param newData the new server data that redis is giving
    */
   public onServerDataChangeInformed(newData: IServerDataType) {
-    CAN_LOG_DEBUG && logger.debug(
-      "Cache.onServerDataChangeInformed: new server data has been informed",
+    logger.info(
+      {
+        className: "Cache",
+        methodName: "onServerDataChangeInformed",
+        message: "New server data has been informed",
+      },
     );
     this.serverData = newData;
   }
@@ -2329,12 +2543,13 @@ export class Cache {
           version,
         });
       }
-    } catch (error) {
+    } catch (err) {
       logger.error(
-        "Cache.onChangeInformed: could not retrieve existance for " + idefQueryIdentifier,
         {
-          errStack: error.stack,
-          errMessage: error.message,
+          className: "Cache",
+          methodName: "onChangeInformed",
+          message: "Could not retrieve existance for " + idefQueryIdentifier,
+          err,
         },
       );
     }

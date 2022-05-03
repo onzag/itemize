@@ -96,7 +96,7 @@ export function processFileListFor(
   // return what we've got
   return {
     value: filteredNewValues,
-    consumeStreams: async (propertyLocationId: string) => {
+    consumeStreams: async (propertyLocationId: string) => {
       await Promise.all(allNewValues.map(fn => fn.consumeStreams(propertyLocationId)));
     }
   }
@@ -165,7 +165,7 @@ export function processSingleFileFor(
 
     return {
       value: secondStepOutput.value,
-      consumeStreams: async (propertyLocationId: string) => {
+      consumeStreams: async (propertyLocationId: string) => {
         await Promise.all([initialStepOutput, secondStepOutput].map(fn => fn.consumeStreams(propertyLocationId)));
       }
     }
@@ -205,8 +205,11 @@ function processOneFileAndItsSameIDReplacement(
         // is there an old version actually?
         if (oldVersion) {
           if (!uploadsClient) {
-            logger.warn(
-              "processOneFileAndItsSameIDReplacement: a file container is unavailable yet a file change has been attempted",
+            logger.error(
+              {
+                functionName: "processOneFileAndItsSameIDReplacement",
+                message: "A file container is unavailable yet a file change has been attempted",
+              },
             );
             return;
           }
@@ -223,10 +226,10 @@ function processOneFileAndItsSameIDReplacement(
               await uploadsClient.removeFolder(fileLocationPath);
             } catch (err) {
               logger.error(
-                "processOneFileAndItsSameIDReplacement: could not remove folder at in " + fileLocationPath,
                 {
-                  errStack: err.stack,
-                  errMessage: err.message,
+                  functionName: "processOneFileAndItsSameIDReplacement",
+                  message: "Could not remove folder at in " + fileLocationPath,
+                  err,
                 },
               );
             }
@@ -264,7 +267,7 @@ function processOneFileAndItsSameIDReplacement(
         consumeStreams: () => null,
       };
     }
-    
+
     // otherwise if we had an old value, we reject
     // any url change, and use the old url
     return {
@@ -290,7 +293,7 @@ function processOneFileAndItsSameIDReplacement(
     };
   }
 
-  const curatedFileName = newVersion.name.replace(/\s/g, "_").replace(/\-/g,"_").replace(/[^A-Za-z0-9_\.]/g, "x");
+  const curatedFileName = newVersion.name.replace(/\s/g, "_").replace(/\-/g, "_").replace(/[^A-Za-z0-9_\.]/g, "x");
 
   const value = {
     ...newVersionWithoutSrc,
@@ -304,8 +307,11 @@ function processOneFileAndItsSameIDReplacement(
     value,
     consumeStreams: async (propertyLocationId: string) => {
       if (!uploadsClient) {
-        logger.warn(
-          "processOneFileAndItsSameIDReplacement: a file container is unavailable yet a file change has been attempted",
+        logger.error(
+          {
+            functionName: "processOneFileAndItsSameIDReplacement",
+            message: "A file container is unavailable yet a file change has been attempted",
+          },
         );
         return;
       }
@@ -426,7 +432,11 @@ export async function sqlUploadPipeFile(
 ): Promise<void> {
   const finalLocation = domain + "/" + remote;
 
-  CAN_LOG_DEBUG && logger.debug("sqlUploadPipeFile: Uploading", {path: finalLocation});
+  CAN_LOG_DEBUG && logger.debug({
+    functionName: "sqlUploadPipeFile",
+    message: "Uploading",
+    data: { path: finalLocation },
+  });
 
   await uploadsClient.upload(finalLocation, readStream, true);
 }

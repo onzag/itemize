@@ -40,7 +40,6 @@ import Root from "../../../base/Root";
 import { CustomRoleGranterEnvironment, CustomRoleManager } from "../roles";
 import {
   CAN_LOG_DEBUG,
-  CAN_LOG_SILLY
 } from "../../environment";
 
 export async function addItemDefinition(
@@ -53,10 +52,11 @@ export async function addItemDefinition(
     pooledRoot = await appData.rootPool.acquire().promise;
   } catch (err) {
     logger.error(
-      "addItemDefinition [SERIOUS]: Failed to retrieve root from the pool",
       {
-        errMessage: err.message,
-        errStack: err.stack,
+        functionName: "addItemDefinition",
+        message: "Failed to retrieve root from the pool",
+        serious: true,
+        err,
       },
     );
     throw new EndpointError({
@@ -69,7 +69,10 @@ export async function addItemDefinition(
   const itemDefinition = pooledRoot.registry[resolverItemDefinition.getQualifiedPathName()] as ItemDefinition;
 
   CAN_LOG_DEBUG && logger.debug(
-    "addItemDefinition: executed adding for " + itemDefinition.getQualifiedPathName(),
+    {
+      functionName: "addItemDefinition",
+      message: "Executed adding for " + itemDefinition.getQualifiedPathName(),
+    }
   );
 
   // First we check the language and the region, based on the args
@@ -229,12 +232,10 @@ export async function addItemDefinition(
   );
 
   CAN_LOG_DEBUG && logger.debug(
-    "addItemDefinition: Fields to add have been extracted",
-    addingFields,
-  );
-
-  CAN_LOG_DEBUG && logger.debug(
-    "addItemDefinition: Checking basic role access for creation",
+    {
+      functionName: "addItemDefinition",
+      message: "Checking basic role access for creation",
+    },
   );
 
   // now we check the role access for the given
@@ -264,12 +265,10 @@ export async function addItemDefinition(
   });
 
   CAN_LOG_DEBUG && logger.debug(
-    "addItemDefinition: Fields to be requested have been extracted",
-    requestedFieldsThatRepresentPropertiesAndIncludes,
-  );
-
-  CAN_LOG_DEBUG && logger.debug(
-    "addItemDefinition: Checking basic role access for read",
+    {
+      functionName: "addItemDefinition",
+      message: "Checking basic role access for read",
+    },
   );
 
   // if all that has succeed we take the item definition and apply
@@ -307,7 +306,10 @@ export async function addItemDefinition(
         // checked whether it existed, but we check anyway
         if (!content) {
           CAN_LOG_DEBUG && logger.debug(
-            "addItemDefinition: failed due to lack of content data",
+            {
+              functionName: "addItemDefinition",
+              message: "Failed due to lack of content data",
+            },
           );
           throw new EndpointError({
             message: `There's no parent ${resolverArgs.args.parent_type} with ` +
@@ -320,7 +322,10 @@ export async function addItemDefinition(
         // but we check anyway
         if (content.blocked_at !== null) {
           CAN_LOG_DEBUG && logger.debug(
-            "addItemDefinition: failed due to element being blocked",
+            {
+              functionName: "addItemDefinition",
+              message: "Failed due to element being blocked",
+            },
           );
           throw new EndpointError({
             message: "The parent is blocked",
@@ -483,11 +488,10 @@ export async function addItemDefinition(
   );
 
   CAN_LOG_DEBUG && logger.debug(
-    "addItemDefinition: SQL ouput retrieved",
-  );
-  CAN_LOG_SILLY && logger.silly(
-    "addItemDefinition: Value is",
-    value,
+    {
+      functionName: "addItemDefinition",
+      message: "SQL ouput retrieved",
+    },
   );
 
   // now we convert that SQL value to the respective GQL value
@@ -620,11 +624,6 @@ export async function addItemDefinition(
     }
     (finalOutput as any).DATA.created_by = UNSPECIFIED_OWNER;
   }
-
-  CAN_LOG_DEBUG && logger.debug(
-    "addItemDefinition: GQL output calculated",
-    finalOutput,
-  );
 
   pooledRoot.cleanState();
   appData.rootPool.release(pooledRoot);

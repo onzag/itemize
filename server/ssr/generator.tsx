@@ -234,10 +234,11 @@ export async function ssrGenerator(
     root = await appData.rootPool.acquire().promise;
   } catch (err) {
     logger.error(
-      "ssrGenerator [SERIOUS]: Could not adquire a root from the pool",
       {
-        errStack: err.stack,
-        errMessage: err.message,
+        functionName: "ssrGenerator",
+        message: "Could not adquire a root from the pool",
+        serious: true,
+        err,
       }
     )
     if (info.mode === "html") {
@@ -494,7 +495,7 @@ export async function ssrGenerator(
       clientSSR.title = ssr.title;
       clientSSR.queries = ssr.queries;
       clientSSR.searches = ssr.searches;
-      clientSSR.resources= ssr.resources;
+      clientSSR.resources = ssr.resources;
 
       const app = (
         <StaticRouter location={isUSSD ? info.url : info.req.originalUrl}>
@@ -561,21 +562,24 @@ export async function ssrGenerator(
         newHTML = newHTML.replace(/\<SSRHEAD\>\s*\<\/SSRHEAD\>|\<SSRHEAD\/\>|\<SSRHEAD\>/ig, finalSSRHead);
       }
 
-    } catch (e) {
+    } catch (err) {
       // if it fails then we can't do SSR and we just provide without SSR
       logger.error(
-        "ssrGenerator [SERIOUS]: Failed to run SSR due to failed initialization",
         {
-          errStack: e.stack,
-          errMessage: e.message,
-          appliedRule,
+          functionName: "ssrGenerator",
+          message: "Failed to run SSR due to failed initialization",
+          serious: true,
+          err,
+          data: {
+            appliedRule,
+          },
         }
       );
 
       if (isUSSD) {
         root.cleanState();
         appData.rootPool.release(root);
-        throw e;
+        throw err;
       }
 
       const usedTitle = i18nAppName || config.appName || "";
@@ -597,7 +601,7 @@ export async function ssrGenerator(
       // this is why we end abruptly here
       errorOccured = true;
     }
-  } 
+  }
 
   // and finally answer the client
   if (!isUSSD) {

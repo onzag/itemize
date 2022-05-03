@@ -1,7 +1,6 @@
 import http from "http";
 import https from "https";
 import { countries } from "../../imported-resources";
-import { logger } from "../logger";
 import UserLocalizationProvider, { IUserLocalizationType } from "./base/UserLocalizationProvider";
 import { ServiceProviderType } from ".";
 
@@ -51,12 +50,15 @@ export class IPStackService extends UserLocalizationProvider<IPStackConfig> {
           data += chunk;
         });
         resp.on("error", (err) => {
-          logger.error(
-            "IPStackService.requestInfoFor: request to the ip stack ip returned error",
+          this.logError(
             {
-              errMessage: err.message,
-              errStack: err.stack,
-              ip,
+              className: "IPStackService",
+              methodName: "requestInfoFor",
+              message: "Request to the ip stack ip returned error",
+              err,
+              data: {
+                ip,
+              },
             }
           );
           reject(err);
@@ -66,12 +68,15 @@ export class IPStackService extends UserLocalizationProvider<IPStackConfig> {
           try {
             const parsedData = JSON.parse(data);
             if (parsedData.error) {
-              logger.error(
-                "IPStackService.requestInfoFor: ipstack provided a custom error",
+              this.logError(
                 {
-                  errMessage: parsedData.error,
-                  ip,
-                  data,
+                  className: "IPStackService",
+                  methodName: "requestInfoFor",
+                  message: "Ipstack provided a custom error",
+                  data: {
+                    ip,
+                    data,
+                  },
                 }
               );
               reject(new Error(parsedData.error));
@@ -79,25 +84,31 @@ export class IPStackService extends UserLocalizationProvider<IPStackConfig> {
               resolve(parsedData);
             }
           } catch (err) {
-            logger.error(
-              "IPStackService.requestInfoFor: request to the ip stack ip returned invalid data",
+            this.logError(
               {
-                errMessage: err.message,
-                errStack: err.stack,
-                ip,
-                data,
+                className: "IPStackService",
+                methodName: "requestInfoFor",
+                message: "Request to the ip stack ip returned invalid data",
+                err,
+                data: {
+                  ip,
+                  data,
+                },
               }
             );
             reject(err);
           }
         });
       }).on("error", (err) => {
-        logger.error(
-          "IPStackService.requestInfoFor: https request to ipstack API failed",
+        this.logError(
           {
-            errMessage: err.message,
-            errStack: err.stack,
-            ip,
+            className: "IPStackService",
+            methodName: "requestInfoFor",
+            message: "Https request to ipstack API failed",
+            err,
+            data: {
+              ip,
+            },
           }
         );
         reject(err);

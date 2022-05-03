@@ -7,8 +7,12 @@ export class FakeSMSService extends PhoneProvider<null> {
   }
   public async sendSMS(data: ISendSMSData) {
     this.logInfo(
-      "FakeSMSService.sendSMS: Fake SMS being sent",
-      data,
+      {
+        className: "FakeSMSService",
+        methodName: "sendSMS",
+        message: "Fake SMS being sent",
+        data,
+      },
     );
   }
 }

@@ -169,14 +169,18 @@ export default class MailProvider<T> extends ServiceProvider<T> {
 
     // if for some reson we have none to send to
     if (arg.to === null || (Array.isArray(arg.to) && arg.to.length === 0)) {
-      logger && logger.warn(
-        "MailProvider.sendUnverifiedTemplateEmail: Attempted to send an email without recepient",
+      this.logError(
         {
-          fromUsername: arg.fromUsername,
-          fromEmailHandle: arg.fromEmailHandle,
-          itemDefinition: actualItemDefinition.getQualifiedPathName(),
-          id: arg.id,
-          version: arg.version,
+          className: "MailProvider",
+          methodName: "sendUnverifiedTemplateEmail",
+          message: "Attempted to send an email without recepient",
+          data: {
+            fromUsername: arg.fromUsername,
+            fromEmailHandle: arg.fromEmailHandle,
+            itemDefinition: actualItemDefinition.getQualifiedPathName(),
+            id: arg.id,
+            version: arg.version,
+          },
         },
       );
       return;
@@ -221,7 +225,7 @@ export default class MailProvider<T> extends ServiceProvider<T> {
                   version: "",
                 });
               })
-            )[0] || null;
+            )[0] || null;
         }
 
         // now we need the property value
@@ -237,13 +241,17 @@ export default class MailProvider<T> extends ServiceProvider<T> {
         }
       } catch (err) {
         this.logError(
-          "MailProvider.sendUnverifiedTemplateEmail [SERIOUS]: failed to retrieve item definition",
           {
-            errMessage: err.message,
-            errStack: err.stack,
-            itemDefinition: actualItemDefinition.getQualifiedPathName(),
-            id: arg.id,
-            version: arg.version,
+            className: "MailProvider",
+            methodName: "sendUnverifiedTemplateEmail",
+            message: "Failed to retrieve item definition",
+            serious: true,
+            err,
+            data: {
+              itemDefinition: actualItemDefinition.getQualifiedPathName(),
+              id: arg.id,
+              version: arg.version,
+            },
           },
         );
         throw err;
@@ -285,11 +293,15 @@ export default class MailProvider<T> extends ServiceProvider<T> {
       await this.sendEmail(args);
     } catch (err) {
       this.logError(
-        "MailProvider.sendUnverifiedTemplateEmail [SERIOUS]: API failed to deliver an email",
         {
-          errMessage: err.message,
-          errStack: err.stack,
-          args,
+          className: "MailProvider",
+          methodName: "sendUnverifiedTemplateEmail",
+          message: "API failed to deliver an email",
+          serious: true,
+          err,
+          data: {
+            args,
+          },
         },
       );
       throw err;
@@ -357,12 +369,17 @@ export default class MailProvider<T> extends ServiceProvider<T> {
     // and we expect the user item definition to have it
     if (!userIdef.hasPropertyDefinitionFor(emailPropertyUsed, true)) {
       this.logError(
-        "MailProvider.sendTemplateEmail [SERIOUS]: there is no " + emailPropertyUsed + " property in the item definition for user",
         {
-          subject: arg.subject,
-          itemDefinition: typeof arg.itemDefinition === "string" ? arg.itemDefinition : arg.itemDefinition.getQualifiedPathName(),
-          id: arg.id,
-          version: arg.version,
+          className: "MailProvider",
+          methodName: "sendTemplateEmail",
+          message: "There is no " + emailPropertyUsed + " property in the item definition for user",
+          serious: true,
+          data: {
+            subject: arg.subject,
+            itemDefinition: typeof arg.itemDefinition === "string" ? arg.itemDefinition : arg.itemDefinition.getQualifiedPathName(),
+            id: arg.id,
+            version: arg.version,
+          },
         },
       );
       throw new Error("There is no " + emailPropertyUsed + " property in the item definition for user");
@@ -371,12 +388,17 @@ export default class MailProvider<T> extends ServiceProvider<T> {
     // we need to check the subscribe property too
     if (arg.subscribeProperty && !userIdef.hasPropertyDefinitionFor(arg.subscribeProperty, true)) {
       this.logError(
-        "MailProvider.sendTemplateEmail [SERIOUS]: there is no " + arg.subscribeProperty + " property in the item definition for user",
         {
-          subject: arg.subject,
-          itemDefinition: typeof arg.itemDefinition === "string" ? arg.itemDefinition : arg.itemDefinition.getQualifiedPathName(),
-          id: arg.id,
-          version: arg.version,
+          className: "MailProvider",
+          methodName: "sendTemplateEmail",
+          message: "There is no " + arg.subscribeProperty + " property in the item definition for user",
+          serious: true,
+          data: {
+            subject: arg.subject,
+            itemDefinition: typeof arg.itemDefinition === "string" ? arg.itemDefinition : arg.itemDefinition.getQualifiedPathName(),
+            id: arg.id,
+            version: arg.version,
+          },
         },
       );
       throw new Error("There is no " + arg.subscribeProperty + " property in the item definition for user");
@@ -609,8 +631,13 @@ export default class MailProvider<T> extends ServiceProvider<T> {
    */
   public async sendEmail(data: ISendEmailData): Promise<void> {
     this.logError(
-      "MailProvider.sendEmail [SERIOUS]: Attempted to send an email with a raw provider, there's no API available to complete this action",
-      data,
+      {
+        className: "MailProvider",
+        methodName: "sendEmail",
+        message: "Attempted to send an email with a raw provider; there's no API available to complete this action",
+        serious: true,
+        data,
+      },
     );
   }
 }

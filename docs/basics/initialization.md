@@ -191,7 +191,7 @@ Install docker compose in order to be able to run deployments
 
 Having SSR enabled can disrupt development, because this means that there will be a mismatch whenever you do changes and rebuild and package your application, this is seen in depth in [Developing Flow](./developing-flow.md) this usually goes in combination with disabling service workers as otherwise changes will not reflect, so a common way to start your development server is:
 
-`NODE_TLS_REJECT_UNAUHORIZED=0 NO_SSR=true NO_SEO=true FAKE_EMAILS=true FAKE_SMS=true npm run start-dev-server`
+`NODE_TLS_REJECT_UNAUTHORIZED=0 NO_SSR=true NO_SEO=true FAKE_EMAILS=true FAKE_SMS=true npm run start-dev-server`
 
 Note that restarts are still required if for example there are changes to the schema files.
 

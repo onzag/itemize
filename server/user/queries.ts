@@ -132,11 +132,15 @@ export const customUserQueries = (appData: IAppDataType): IGQLQueryFieldsDefinit
             );
           } catch (err) {
             logger.error(
-              "customUserQueries.token [SERIOUS]: failed to retrieve user value from cache/database which caused the user not to login",
               {
-                errMessage: err.message,
-                errStack: err.stack,
-                id: decoded.id,
+                functionName: "customUserQueries",
+                endpoint: "token",
+                message: "Failed to retrieve user value from cache/database which caused the user not to login",
+                serious: true,
+                err,
+                data: {
+                  id: decoded.id,
+                },
               },
             );
             throw err;
@@ -288,12 +292,16 @@ export const customUserQueries = (appData: IAppDataType): IGQLQueryFieldsDefinit
             resultUser = await appData.databaseConnection.queryFirst(selectQuery) || null;
           } catch (err) {
             logger.error(
-              "customUserQueries.token [SERIOUS]: failed to execute sql query in order to retrieve " +
-              "a user which caused the user to be unable to login",
               {
-                errMessage: err.message,
-                errStack: err.stack,
-                username: args.username,
+                functionName: "customUserQueries",
+                endpoint: "token",
+                message: "Failed to execute sql query in order to retrieve " +
+                  "a user which caused the user to be unable to login",
+                serious: true,
+                err,
+                data: {
+                  username: args.username,
+                },
               },
             );
             throw err;
@@ -336,11 +344,15 @@ export const customUserQueries = (appData: IAppDataType): IGQLQueryFieldsDefinit
             };
           } catch (err) {
             logger.error(
-              "customUserQueries.token [SERIOUS]: failed to sign token which caused user to be unable to login",
               {
-                errMessage: err.message,
-                errStack: err.stack,
-                resultUser,
+                className: "customUserQueries",
+                methodName: "token",
+                message: "Failed to sign token which caused user to be unable to login",
+                serious: true,
+                err,
+                data: {
+                  resultUser,
+                },
               },
             );
             throw err;
@@ -376,7 +388,7 @@ export const customUserQueries = (appData: IAppDataType): IGQLQueryFieldsDefinit
             code: ENDPOINT_ERRORS.INVALID_CREDENTIALS,
           });
         }
-    
+
         let token = args.token;
         if (args.random_id) {
           token = await appData.redisGlobal.get(
@@ -390,7 +402,7 @@ export const customUserQueries = (appData: IAppDataType): IGQLQueryFieldsDefinit
             code: ENDPOINT_ERRORS.TOKEN_EXPIRED,
           });
         }
-    
+
         let decoded: IValidateUserTokenDataType;
         try {
           // we attempt to decode it
@@ -401,7 +413,7 @@ export const customUserQueries = (appData: IAppDataType): IGQLQueryFieldsDefinit
             code: ENDPOINT_ERRORS.INVALID_CREDENTIALS,
           });
         };
-    
+
         if (decoded.validateType === "email" && !emailProperty || !eValidatedProperty) {
           throw new EndpointError({
             message: "This server does not support emails",
@@ -413,16 +425,16 @@ export const customUserQueries = (appData: IAppDataType): IGQLQueryFieldsDefinit
             code: ENDPOINT_ERRORS.UNSPECIFIED,
           });
         }
-    
+
         if (!decoded.validateUserId || !decoded.validateValue) {
           throw new EndpointError({
             message: "Invalid token shape",
             code: ENDPOINT_ERRORS.INVALID_CREDENTIALS,
           });
         }
-    
+
         let user: ISQLTableRowValue;
-    
+
         try {
           user = await appData.cache.requestValue(userIdef, decoded.validateUserId, null);
           if (!user) {
@@ -438,16 +450,19 @@ export const customUserQueries = (appData: IAppDataType): IGQLQueryFieldsDefinit
           }
         } catch (err) {
           logger.error(
-            "customUserQueries/validate: failed to retrieve user from token credentials",
             {
-              errMessage: err.message,
-              errStack: err.stack,
-              decoded,
+              functionName: "customUserQueries",
+              endpoint: "validate",
+              message: "Failed to retrieve user from token credentials",
+              err,
+              data: {
+                decoded,
+              },
             }
           );
           throw err;
         }
-    
+
         // this happens when the user sends a validation email/phone, then changes the email/phone
         // immediately and tries to use the previous token to validate the email/phone
         // a security concern
@@ -458,7 +473,7 @@ export const customUserQueries = (appData: IAppDataType): IGQLQueryFieldsDefinit
             code: ENDPOINT_ERRORS.INVALID_CREDENTIALS,
           });
         }
-    
+
         try {
           const result = await appData.databaseConnection.queryFirst(
             `SELECT ${JSON.stringify(CONNECTOR_SQL_COLUMN_ID_FK_NAME)} FROM ${JSON.stringify(userTable)} ` +
@@ -469,7 +484,7 @@ export const customUserQueries = (appData: IAppDataType): IGQLQueryFieldsDefinit
               true,
             ],
           );
-    
+
           if (result) {
             if (result[CONNECTOR_SQL_COLUMN_ID_FK_NAME] !== user.id) {
               throw new EndpointError({
@@ -484,16 +499,19 @@ export const customUserQueries = (appData: IAppDataType): IGQLQueryFieldsDefinit
           }
         } catch (err) {
           logger.error(
-            "customUserQueries/validate: failed to request users",
             {
-              errMessage: err.message,
-              errStack: err.stack,
-              user,
+              functionName: "customUserQueries",
+              endpoint: "validate",
+              message: "Failed to request users",
+              err,
+              data: {
+                user,
+              },
             }
           );
           throw err;
         }
-    
+
         try {
           await appData.cache.requestUpdateSimple(
             userIdef,
@@ -507,16 +525,19 @@ export const customUserQueries = (appData: IAppDataType): IGQLQueryFieldsDefinit
           );
         } catch (err) {
           logger.error(
-            "customUserQueries/validate: failed to set validated status to true",
             {
-              errMessage: err.message,
-              errStack: err.stack,
-              user,
+              functionName: "customUserQueries",
+              endpoint: "validate",
+              message: "Failed to set validated status to true",
+              err,
+              data: {
+                user,
+              },
             }
           );
           throw err;
         }
-    
+
         return {
           status: "OK",
         };
@@ -579,11 +600,15 @@ export const customUserQueries = (appData: IAppDataType): IGQLQueryFieldsDefinit
           resultUser = await appData.cache.requestValue(userIdef, decoded.id, null);
         } catch (err) {
           logger.error(
-            "customUserQueries.send_validate [SERIOUS]: failed to retrieve user",
             {
-              errMessage: err.message,
-              errStack: err.stack,
-              id: decoded.id,
+              functionName: "customUserQueries",
+              endpoint: "send_validate",
+              message: "Failed to retrieve user",
+              serious: true,
+              err,
+              data: {
+                id: decoded.id,
+              },
             },
           );
           throw err;
@@ -638,12 +663,16 @@ export const customUserQueries = (appData: IAppDataType): IGQLQueryFieldsDefinit
             );
           } catch (err) {
             logger.error(
-              "customUserQueries.send_validate [SERIOUS]: could not perform the SQL query to find out if user with same email but " +
-              "validated existed which caused the current user to be unable to send a validation email",
               {
-                errMessage: err.message,
-                errStack: err.stack,
-                resultUser,
+                functionName: "customUserQueries",
+                endpoint: "send_validate",
+                message: "Could not perform the SQL query to find out if user with same email but " +
+                  "validated existed which caused the current user to be unable to send a validation email",
+                serious: true,
+                err,
+                data: {
+                  resultUser,
+                },
               },
             );
             throw err;
@@ -669,12 +698,16 @@ export const customUserQueries = (appData: IAppDataType): IGQLQueryFieldsDefinit
             );
           } catch (err) {
             logger.error(
-              "customUserQueries.send_validate [SERIOUS]: could not perform the SQL query to find out if user with same phone but " +
-              "validated existed which caused the current user to be unable to send a validation SMS",
               {
-                errMessage: err.message,
-                errStack: err.stack,
-                resultUser,
+                functionName: "customUserQueries",
+                endpoint: "send_validate",
+                message: "Could not perform the SQL query to find out if user with same phone but " +
+                  "validated existed which caused the current user to be unable to send a validation SMS",
+                serious: true,
+                err,
+                data: {
+                  resultUser,
+                },
               },
             );
             throw err;
@@ -699,12 +732,16 @@ export const customUserQueries = (appData: IAppDataType): IGQLQueryFieldsDefinit
           }
         } catch (err) {
           logger.error(
-            "customUserQueries.send_validate [SERIOUS]: failed to retrieve flag from global redis instance to avoid sending " +
-            "which caused to be unable to send the email at all",
             {
-              errMessage: err.message,
-              errStack: err.stack,
-              resultUser,
+              functionName: "customUserQueries",
+              endpoint: "send_validate",
+              message: "Failed to retrieve flag from global redis instance to avoid sending " +
+                "which caused to be unable to send the email at all",
+              serious: true,
+              err,
+              data: {
+                resultUser,
+              },
             },
           );
           throw err;
@@ -722,11 +759,15 @@ export const customUserQueries = (appData: IAppDataType): IGQLQueryFieldsDefinit
           }, appData.sensitiveConfig.secondaryJwtKey);
         } catch (err) {
           logger.error(
-            "customUserQueries.send_validate [SERIOUS]: could not sign the validation email token",
             {
-              errMessage: err.message,
-              errStack: err.stack,
-              resultUser,
+              functionName: "customUserQueries",
+              endpoint: "send_validate",
+              message: "Could not sign the validation email token",
+              serious: true,
+              err,
+              data: {
+                resultUser,
+              },
             },
           );
           throw err;
@@ -751,11 +792,15 @@ export const customUserQueries = (appData: IAppDataType): IGQLQueryFieldsDefinit
           );
         } catch (err) {
           logger.error(
-            "customUserQueries.send_validate [SERIOUS]: could not set the global values for the temporary avoid sending email flags",
             {
-              errMessage: err.message,
-              errStack: err.stack,
-              resultUser,
+              functionName: "customUserQueries",
+              endpoint: "send_validate",
+              message: "Could not set the global values for the temporary avoid sending email flags",
+              serious: true,
+              err,
+              data: {
+                resultUser,
+              },
             },
           );
           throw err;
@@ -944,11 +989,15 @@ export const customUserQueries = (appData: IAppDataType): IGQLQueryFieldsDefinit
           resultUser = await appData.databaseConnection.queryFirst(selectQuery);
         } catch (err) {
           logger.error(
-            "customUserQueries.send_reset_password [SERIOUS]: could not request user from user table by email/phone",
             {
-              errMessage: err.message,
-              errStack: err.stack,
-              email: args.email,
+              functionName: "customUserQueries",
+              endpoint: "send_reset_password",
+              message: "Could not request user from user table by email/phone",
+              serious: true,
+              err,
+              data: {
+                email: args.email,
+              },
             },
           );
           throw err;
@@ -980,12 +1029,16 @@ export const customUserQueries = (appData: IAppDataType): IGQLQueryFieldsDefinit
           }
         } catch (err) {
           logger.error(
-            "customUserQueries.send_reset_password [SERIOUS]: failed to retrieve flag from global redis instance to avoid sending " +
-            "which caused to be unable to send the email at all",
             {
-              errMessage: err.message,
-              errStack: err.stack,
-              resultUser,
+              functionName: "customUserQueries",
+              endpoint: "send_reset_password",
+              message: "Failed to retrieve flag from global redis instance to avoid sending " +
+                "which caused to be unable to send the email at all",
+              serious: true,
+              err,
+              data: {
+                resultUser,
+              },
             },
           );
           throw err;
@@ -1001,12 +1054,16 @@ export const customUserQueries = (appData: IAppDataType): IGQLQueryFieldsDefinit
           }, appData.sensitiveConfig.secondaryJwtKey);
         } catch (err) {
           logger.error(
-            "customUserQueries.send_reset_password [SERIOUS]: failed to sign reset token",
             {
-              errMessage: err.message,
-              errStack: err.stack,
-              resultUser,
-              randomId,
+              functionName: "customUserQueries",
+              endpoint: "send_reset_password",
+              message: "Failed to sign reset token",
+              serious: true,
+              err,
+              data: {
+                resultUser,
+                randomId,
+              },
             },
           );
           throw err;
@@ -1019,13 +1076,17 @@ export const customUserQueries = (appData: IAppDataType): IGQLQueryFieldsDefinit
           await appData.redisGlobal.expire("USER_RESET_PASSWORD_TEMP_AVOID_SENDING." + userId, RESET_PASSWORD_EMAIL_RESEND_SECONDS_TIME);
         } catch (err) {
           logger.error(
-            "customUserQueries.send_reset_password [SERIOUS]: failed to set flags into global redis instance to avoid sending " +
-            "which caused to be unable to send the email at all",
             {
-              errMessage: err.message,
-              errStack: err.stack,
-              resultUser,
-              randomId,
+              functionName: "customUserQueries",
+              endpoint: "send_reset_password",
+              message: "Failed to set flags into global redis instance to avoid sending " +
+                "which caused to be unable to send the email at all",
+              serious: true,
+              err,
+              data: {
+                resultUser,
+                randomId,
+              },
             },
           );
           throw err;
@@ -1162,11 +1223,15 @@ export const customUserQueries = (appData: IAppDataType): IGQLQueryFieldsDefinit
             );
           } catch (err) {
             logger.error(
-              "customUserQueries.reset_password [SERIOUS]: failed to retrieve user",
               {
-                errMessage: err.message,
-                errStack: err.stack,
-                decoded,
+                functionName: "customUserQueries",
+                endpoint: "reset_password",
+                message: "Failed to retrieve user",
+                serious: true,
+                err,
+                data: {
+                  decoded,
+                },
               },
             );
             throw err;
@@ -1239,12 +1304,16 @@ export const customUserQueries = (appData: IAppDataType): IGQLQueryFieldsDefinit
             userId = resultUser[CONNECTOR_SQL_COLUMN_ID_FK_NAME];
           } catch (err) {
             logger.error(
-              "customUserQueries.send_reset_password [SERIOUS]: could not request user from user table by email/phone",
               {
-                errMessage: err.message,
-                errStack: err.stack,
-                email: args.email,
-                phone: args.phone,
+                functionName: "customUserQueries",
+                endpoint: "send_reset_password",
+                message: "Could not request user from user table by email/phone",
+                serious: true,
+                err,
+                data: {
+                  email: args.email,
+                  phone: args.phone,
+                },
               },
             );
             throw err;
@@ -1262,10 +1331,12 @@ export const customUserQueries = (appData: IAppDataType): IGQLQueryFieldsDefinit
           codeWasSent = await appData.redisGlobal.get("USER_RESET_PASSWORD_TEMP_TOKEN_CODE." + userId + "." + randomId);
         } catch (err) {
           logger.error(
-            "customUserQueries.reset_password [SERIOUS]: failed to check the token code that was sent",
             {
-              errMessage: err.message,
-              errStack: err.stack,
+              functionName: "customUserQueries",
+              endpoint: "reset_password",
+              message: "Failed to check the token code that was sent",
+              serious: true,
+              err,
             },
           );
           throw err;
@@ -1304,10 +1375,12 @@ export const customUserQueries = (appData: IAppDataType): IGQLQueryFieldsDefinit
           );
         } catch (err) {
           logger.error(
-            "customUserQueries.reset_password [SERIOUS]: failed to run password update request",
             {
-              errMessage: err.message,
-              errStack: err.stack,
+              functionName: "customUserQueries",
+              endpoint: "reset_password",
+              message: "Failed to run password update request",
+              serious: true,
+              err,
             },
           );
           throw err;
@@ -1318,10 +1391,11 @@ export const customUserQueries = (appData: IAppDataType): IGQLQueryFieldsDefinit
             await appData.redisGlobal.del("USER_RESET_PASSWORD_TEMP_TOKEN_CODE." + userId + "." + randomId);
           } catch (err) {
             logger.error(
-              "customUserQueries.reset_password (detached): failed to remove temporary token code for password reset",
               {
-                errMessage: err.message,
-                errStack: err.stack,
+                functionName: "customUserQueries",
+                endpoint: "reset_password (detached)",
+                message: "Failed to remove temporary token code for password reset",
+                err,
               },
             );
           }

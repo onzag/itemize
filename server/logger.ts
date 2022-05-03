@@ -22,8 +22,32 @@ const standardErrorTransport = disableLogger ? null : (
   })
 );
 
+export interface IItemizeLoggingStructure<T> {
+  message: string;
+
+  className?: string;
+  methodName?: string;
+  functionName?: string;
+  endpoint?: string;
+  data?: T;
+}
+
+export interface IItemizeLoggingErrorStructure<T> extends IItemizeLoggingStructure<T> {
+  serious?: boolean;
+  err?: Error;
+  orphan?: boolean;
+}
+
+export interface IItemizeFinalLoggingObject extends IItemizeLoggingStructure<any> {
+  serious?: boolean;
+  errMessage?: string;
+  errStack?: string;
+  orphan?: boolean;
+  timestamp: string;
+}
+
 // building the logger
-export const logger: winston.Logger = disableLogger ? null : winston.createLogger({
+const rawLogger: winston.Logger = disableLogger ? null : winston.createLogger({
   // buggy typescript somehow the definitions change all the time and will not work
   level: (LOG_LEVEL || (NODE_ENV !== "production" ? "debug" : "info")) as any,
   format: winston.format.combine(
@@ -37,13 +61,64 @@ export const logger: winston.Logger = disableLogger ? null : winston.createLogge
 });
 
 // if not production add a console.log
-if (NODE_ENV !== "production" && logger) {
-  logger.add(
+if (NODE_ENV !== "production" && rawLogger) {
+  rawLogger.add(
     new winston.transports.Console({
       format: winston.format.simple()
     })
   );
 }
+
+function converterFn(level: string, obj: IItemizeLoggingErrorStructure<any>) {
+  let msg = "";
+  if (obj.className) {
+    msg += obj.className;
+  }
+  if (obj.methodName) {
+    if (msg) {
+      msg += ".";
+    }
+    msg += obj.methodName;
+  } else if (obj.functionName) {
+    if (msg) {
+      msg += ".";
+    }
+    msg += obj.functionName;
+  }
+
+  if (obj.serious) {
+    if (msg) {
+      msg += " ";
+    }
+    msg += "[SERIOUS]";
+  }
+
+  if (msg) {
+    msg += ": ";
+  }
+
+  msg += obj.message;
+
+  delete obj.message;
+
+  if (obj.err) {
+    const err = obj.err;
+    delete obj.err;
+
+    (obj as any).errMessage = err.message;
+    (obj as any).errStack = err.stack;
+  }
+
+  return rawLogger[level](msg, obj);
+}
+
+export const logger = disableLogger ? null : {
+  info: converterFn.bind(null, "info") as (arg: IItemizeLoggingStructure<any>) => void,
+  debug: converterFn.bind(null, "debug") as (arg: IItemizeLoggingStructure<any>) => void,
+  error: converterFn.bind(null, "error") as (arg: IItemizeLoggingErrorStructure<any>) => void,
+}
+
+export type ILoggerType = typeof logger;
 
 class LoggingProviderTransport extends Transport {
   private provider: LoggingProvider<any>;
@@ -79,8 +154,8 @@ export function extendLoggerWith(p: LoggingProvider<any>) {
     level: "info",
   }, p);
 
-  logger.add(infoTransport);
+  rawLogger.add(infoTransport);
 
-  logger.remove(standardInfoTransport);
-  logger.remove(standardErrorTransport);
+  rawLogger.remove(standardInfoTransport);
+  rawLogger.remove(standardErrorTransport);
 }

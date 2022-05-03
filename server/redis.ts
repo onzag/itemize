@@ -9,34 +9,6 @@ import redis, { RedisClient } from "redis";
 import { logger } from "./logger";
 import { promisify } from "util";
 
-export interface IRedisPing<T> {
-  tkey: string;
-  dataKey: string;
-  data: T;
-}
-
-interface IRedisPingSetter<T, N> extends IRedisPing<T> {
-  statusRetriever: () => N;
-}
-
-export interface IPingEvent {
-  event: "CONNECT" | "DISCONNECT" | "RECONNECT";
-  time: number;
-}
-
-export interface IPingInfo<T, N> extends IRedisPing<T> {
-  lastStatus: N;
-  lastPing: number;
-  events: IPingEvent[];
-
-  assumeDead: boolean;
-  isDead: boolean;
-  isCorrupted: boolean;
-  isPinging: boolean;
-}
-
-const PING_TIME = 5000;
-
 /**
  * The itemize redis client is different from the standard client
  * for once it contains some quality get, set, etc... functions that are
@@ -46,9 +18,6 @@ const PING_TIME = 5000;
 export class ItemizeRedisClient {
   private isReconnecting: boolean = false;
   private isConnected: boolean = false;
-
-  private pings: IRedisPingSetter<any, any>[] = [];
-  private pingTimeout: any = null;
 
   public name: string;
   public redisClient: RedisClient;
@@ -87,160 +56,6 @@ export class ItemizeRedisClient {
     this.expire = promisify(this.redisClient.expire).bind(this.redisClient);
     this.del = promisify(this.redisClient.del).bind(this.redisClient);
     this.hdel = promisify(this.redisClient.hdel).bind(this.redisClient);
-
-    this.setupPing = this.setupPing.bind(this);
-    this.createPing = this.createPing.bind(this);
-    this.stopPinging = this.stopPinging.bind(this);
-    this.setupPings = this.setupPings.bind(this);
-    this.ping = this.ping.bind(this);
-  }
-
-  public async deletePingFor(tkey: string, key: string): Promise<"NOT_FOUND" | "NOT_DEAD" | "OK"> {
-    const allPings = (await this.hgetall(tkey)) || {};
-    if (!allPings[key]) {
-      return "NOT_FOUND";
-    }
-
-    const lastPingTime = parseInt(allPings[key + "_LASTPING"]) || 0;
-    const diff = (new Date()).getTime() - lastPingTime;
-    const isAssumedDead = diff >= (PING_TIME * 2);
-
-    if (!isAssumedDead) {
-      return "NOT_DEAD";
-    }
-
-    await this.hdel(tkey, key);
-    await this.hdel(tkey, key + "_LASTPING");
-    await this.hdel(tkey, key + "_LASTSTATUS");
-
-    await this.del(tkey + "_" + key);
-
-    return "OK";
-  }
-
-  public async getAllStoredPings<T, N>(tkey: string): Promise<IPingInfo<T, N>[]> {
-    const allPings = (await this.hgetall(tkey)) || {};
-
-    return await Promise.all(Object.keys(allPings).filter((pingKey) => {
-      return (!pingKey.endsWith("_LASTPING") && !pingKey.endsWith("_LASTSTATUS"));
-    }).map(async (dataKey) => {
-      let pingData: T = null;
-      try {
-        pingData = JSON.parse(allPings[dataKey]);
-      } catch {
-      }
-
-      const pingLastPing = parseInt(allPings[dataKey + "_LASTPING"]) || null;
-      
-      let pingLastStatus: N = null;
-      try {
-        pingLastStatus = JSON.parse(allPings[dataKey + "_LASTSTATUS"]);
-      } catch {
-      }
-
-      const pingInfo: IPingInfo<T, N> = {
-        tkey,
-        dataKey,
-        data: pingData,
-        events: [],
-        lastPing: pingLastPing,
-        lastStatus: pingLastStatus,
-        
-        isPinging: false,
-        isDead: false,
-        isCorrupted: false,
-        assumeDead: false,
-      };
-
-      const pingEvents = (await this.hgetall(tkey + "_" + dataKey)) || {};
-      pingInfo.events = Object.keys(pingEvents).map((timeKey) => {
-        const timeValue = parseInt(timeKey) || 0;
-        const event = pingEvents[timeKey] as any;
-
-        if (event === "ENDPING") {
-          pingInfo.isDead = true;
-        }
-
-        return {
-          time: timeValue,
-          event,
-        }
-      }).sort((a, b) => b.time - a.time);
-
-      pingInfo.isCorrupted = !pingInfo.events.some((e) => e.event === "CONNECT");
-
-      if (!pingInfo.isDead) {
-        const lastPingTime = pingInfo.lastPing;
-        const diff = (new Date()).getTime() - lastPingTime;
-  
-        // twice the time has passed of the normal ping time
-        // and it hasn't pinged
-        pingInfo.assumeDead = diff >= (PING_TIME * 2);
-      }
-
-      pingInfo.isPinging = !pingInfo.isDead && !pingInfo.assumeDead;
-
-      return pingInfo;
-    }));
-  }
-
-  public async restorePings<T, N>(pings: IPingInfo<T, N>[]): Promise<void> {
-    await Promise.all(pings.map(async (ping) => {
-      await this.hset(ping.tkey, ping.dataKey, JSON.stringify(ping.data));
-      await this.hset(ping.tkey, ping.dataKey + "_LASTPING", (new Date()).getTime().toString());
-      await this.hset(ping.tkey, ping.dataKey + "_LASTSTATUS", JSON.stringify(ping.lastStatus));
-
-      for (const event of ping.events) {
-        await this.hset(ping.tkey + "_" + ping.dataKey, event.time.toString(), event.event);
-      }
-    }));
-  }
-
-  public createPing<T, N>(ping: IRedisPingSetter<T, N>) {
-    if (this.isConnected) {
-      this.setupPing(ping, true);
-    }
-    this.pings.push(ping);
-  }
-
-  public async stopPinging() {
-    this.endPings();
-
-    await Promise.all(this.pings.map(async (ping) => {
-      await this.hset(ping.tkey + "_" + ping.dataKey, (new Date()).getTime().toString(), "DISCONNECT");
-    }));
-  }
-
-  private setupPing<T, N>(ping: IRedisPingSetter<T, N>, markAsConnected: boolean) {
-    this.hset(ping.tkey, ping.dataKey, JSON.stringify(ping.data));
-    this.hset(ping.tkey, ping.dataKey + "_LASTPING", (new Date()).getTime().toString());
-    this.hset(ping.tkey, ping.dataKey + "_LASTSTATUS", JSON.stringify(ping.statusRetriever()));
-  
-    if (markAsConnected) {
-      this.hset(ping.tkey + "_" + ping.dataKey,  (new Date()).getTime().toString(), "CONNECT");
-    } else {
-      this.hset(ping.tkey + "_" + ping.dataKey, (new Date()).getTime().toString(), "RECONNECT");
-    }
-  }
-
-  private setupPings(wasARecconect: boolean) {
-    this.pings.forEach(this.setupPing.bind(this, !wasARecconect));
-    this.pingTimeout = setInterval(this.ping, PING_TIME);
-  }
-
-  private ping() {
-    if (!this.isConnected) {
-      return;
-    }
-
-    this.pings.forEach((ping) => {
-      this.hset(ping.tkey, ping.dataKey + "_LASTPING", (new Date()).getTime().toString());
-      this.hset(ping.tkey, ping.dataKey + "_LASTSTATUS", JSON.stringify(ping.statusRetriever()));
-    });
-  }
-
-  private endPings() {
-    clearInterval(this.pingTimeout);
   }
 
   /**
@@ -261,8 +76,11 @@ export class ItemizeRedisClient {
           this.isReconnecting = false;
           this.isConnected = true;
           
-          logger && logger.info("ItemizeRedisClient.setup: Redis client " + this.name + " succesfully connected");
-          this.setupPings(wasAReconnect);
+          logger && logger.info({
+            className: "ItemizeRedisClient",
+            methodName: "setup",
+            message: "Redis client " + this.name + " succesfully connected",
+          });
 
           // here as we do
           if (onConnect) {
@@ -286,8 +104,11 @@ export class ItemizeRedisClient {
         "reconnecting",
         () => {
           this.isConnected = false;
-          this.endPings();
-          logger && logger.info("ItemizeRedisClient.setup: Redis client " + this.name + " is attempting reconnect");
+          logger && logger.info({
+            className: "ItemizeRedisClient",
+            methodName: "setup",
+            message: "Redis client " + this.name + " is attempting reconnect",
+          });
           this.isReconnecting = true;
         }
       );
@@ -298,10 +119,12 @@ export class ItemizeRedisClient {
         "error",
         (err) => {
           logger && logger.error(
-            "ItemizeRedisClient.setup [SERIOUS]: Redis client " + this.name + " has encountered an error",
             {
-              errMessage: err.message,
-              errStack: err.stack,
+              className: "ItemizeRedisClient",
+              methodName: "setup",
+              serious: true,
+              message: "Redis client " + this.name + " has encountered an error",
+              err,
             }
           );
         }
@@ -312,8 +135,12 @@ export class ItemizeRedisClient {
         "end",
         () => {
           this.isConnected = false;
-          this.endPings();
-          logger && logger.error("ItemizeRedisClient.setup [SERIOUS]: Redis client " + this.name + " has ended its connection");
+          logger && logger.error({
+            className: "ItemizeRedisClient",
+            methodName: "setup",
+            serious: true,
+            message: "Redis client " + this.name + " has ended its connection"
+          });
         }
       );
     });
@@ -346,7 +173,10 @@ export function setupRedisClient(
   config: ISingleRedisConfigRawJSONDataType,
   onConnect?: (client: ItemizeRedisClient, isReconnect: boolean) => Promise<void>,
 ): Promise<ItemizeRedisClient> {
-  logger && logger.info("setupRedisClient: Initializing " + name + " redis client");
+  logger && logger.info({
+    functionName: "setupRedisClient",
+    message: "Initializing " + name + " redis client"
+  });
 
   const client = redis.createClient(config);
   const itemizeClient = new ItemizeRedisClient(name, client);
