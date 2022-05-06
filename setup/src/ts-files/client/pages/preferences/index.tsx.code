@@ -20,6 +20,7 @@ import DoneOutlineIcon from "@mui/icons-material/DoneOutline";
 import NotificationsIcon from "@mui/icons-material/Notifications";
 import PersonPinIcon from "@mui/icons-material/PersonPin";
 import MenuBookIcon from "@mui/icons-material/MenuBook";
+import SecurityIcon from "@mui/icons-material/Security";
 
 /**
  * The styles for the preferences page
@@ -91,6 +92,7 @@ export function Preferences() {
 										<Entry id="e_notifications" icon={<NotificationsIcon />} />
 										<Entry id="p_notifications" icon={<PhoneIphoneIcon />} />
 										<Entry id="e_newsletter" icon={<MenuBookIcon />} />
+										<Entry id="consent" icon={<SecurityIcon />} />
 
 										<Entry id="address" icon={<PersonPinIcon />} rendererArgs={{ descriptionAsAlert: true }} />
 
@@ -100,7 +102,7 @@ export function Preferences() {
 											<SubmitButton
 												i18nId="update_your_preferences"
 												options={{
-													properties: ["e_notifications", "p_notifications", "e_newsletter", "address"],
+													properties: ["e_notifications", "p_notifications", "e_newsletter", "consent", "address"],
 													differingOnly: true,
 													unpokeAfterAny: true,
 												}}

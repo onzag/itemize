@@ -152,7 +152,7 @@ export async function start(version: string) {
             );
             await execSudo(
               `docker run --net ${dockerprefixer}_network --name ${dockerprefixer}_devedb -e ELASTIC_PASSWORD=${password} ` +
-              `-p ${port}:9200 -d docker.elastic.co/elasticsearch/elasticsearch:8.1.3`,
+              `-p ${port}:9200 -d docker.elastic.co/elasticsearch/elasticsearch:8.2.0`,
               "Itemize Docker Contained Elasticsearch Database",
             );
           } catch (err) {

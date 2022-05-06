@@ -119,7 +119,7 @@ export async function dbConfigSetup(
         type: "strobject",
         message: "Now you need to specify the elastic language analyzers, the analyzers use simple ISO codes without regions; " +
         "these are used for full text search, and you should have all languages you aim to support FTS. " +
-        "You may not want to modify this, this is the default for a standard elastic 8.1+ installation",
+        "You may not want to modify this, this is the default for a standard elastic 8.2+ installation",
         defaultValue: {
           "*": "standard",
           "ar": "arabic",

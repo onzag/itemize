@@ -55,6 +55,7 @@ custom.change_password_success = password updated!
 
 custom.delete_account = delete account
 custom.delete_account_warning = Warning! this will delete your account and all associated data, this action cannot be reversed, do you wish to proceed?
+custom.delete_analytics = delete analytics data
 
 custom.recover_account = account recovery
 custom.recover_account_message = Note that your email needs to be set and validated in order for the recover account to function
@@ -102,6 +103,9 @@ properties.username.error.NOT_NULLABLE = missing username
 properties.username.error.TOO_LARGE = username is too long
 properties.username.error.NOT_UNIQUE = username is taken
 properties.username.error.INVALID_SUBTYPE_VALUE = special characters and spaces are not allowed
+
+properties.consent.label = help improve $APPNAME
+properties.consent.description = Help improve $APPNAME by providing analytics and usage information to our staff
 
 properties.phone.label = phone number
 properties.phone.placeholder = your phone number
@@ -221,6 +225,7 @@ custom.change_password_success = ¡contraseña actualizada!
 
 custom.delete_account = eliminar la cuenta
 custom.delete_account_warning = ¡Atención! esto eliminará su cuenta y todos los datos asociados, la acción no se puede revertir ¿Seguro desea continuar?
+custom.delete_analytics = eliminar información sobre el uso
 
 custom.recover_account = recuperar acceso
 custom.recover_account_message = ¡Atención! su email debe estar validado para poder ser capáz de recuperar su cuenta
@@ -268,6 +273,9 @@ properties.username.error.NOT_NULLABLE = falta el nombre del usuario
 properties.username.error.TOO_LARGE = el nombre de usuario es demasiado largo
 properties.username.error.NOT_UNIQUE = el nombre de usuario ya ha sido tomado
 properties.username.error.INVALID_SUBTYPE_VALUE = los caractéres especiales y espacios no se permiten
+
+properties.consent.label = ayúdenos a mejorar
+properties.consent.description = Ayude a mejorar $APPNAME proveyendo información analítica de sus patrones de uso
 
 properties.phone.label = número telefónico
 properties.phone.placeholder = número telefónico
@@ -351,5 +359,5 @@ return config.supportedLanguages.map((language) => {
     return l.replace("$EXTRAROLES", extraRoles);
   }
 }).map((l) => {
-  return l.replace(/\$APPNAME/g, config.appName.replace(/\s/g, "_"));
+  return l.replace(/\$APPNAME/g, config.appName);
 }).join("\n\n");

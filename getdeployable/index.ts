@@ -20,11 +20,11 @@ async function copyDir(src: string, dest: string) {
   const files = await fsAsync.readdir(src);
   for (let file of files) {
     const current = await fsAsync.stat(path.join(src, file));
-		if(current.isDirectory()) {
-			await copyDir(path.join(src, file), path.join(dest, file));
-		} else {
-			await fsAsync.copyFile(path.join(src, file), path.join(dest, file));
-		}
+    if (current.isDirectory()) {
+      await copyDir(path.join(src, file), path.join(dest, file));
+    } else {
+      await fsAsync.copyFile(path.join(src, file), path.join(dest, file));
+    }
   }
 };
 
@@ -86,7 +86,7 @@ export default async function build(version: string, buildID: string, services: 
   // now the actual services we are adding
   let actualServices: string[] = [];
   if (services === "full") {
-    actualServices = ["cluster-manager", "servers", "redis", "nginx", "global-manager", "pgsql"];
+    actualServices = ["cluster-manager", "servers", "redis", "nginx", "global-manager", "pgsql", "elastic", "kibana"];
   } else if (services === "standard") {
     actualServices = ["cluster-manager", "servers", "redis", "nginx"];
   } else if (services === "slim") {
@@ -267,7 +267,7 @@ export default async function build(version: string, buildID: string, services: 
     );
     await execSudo(
       `chmod 777 ${saveAbsPath}`,
-      "Itemize Docker Contained PGSQL Postgis Enabled Database Save",
+      "Itemize Docker App Builder",
     );
   }
 
@@ -292,20 +292,56 @@ export default async function build(version: string, buildID: string, services: 
       "\nstop the database by doing" +
       "\ndocker-compose down";
 
+    const pgSQLOnlyParsed = {
+      ...parsed,
+    };
+    pgSQLOnlyParsed.services = {
+      ...pgSQLOnlyParsed.services,
+    }
+
     // and now we want to make a docker compose file for the build
     // database mode, and as such it will only have the pgsql service
-    Object.keys(parsed.services).forEach((service) => {
+    Object.keys(pgSQLOnlyParsed.services).forEach((service) => {
       if (service !== "pgsql") {
-        delete parsed.services[service];
-      } else if (parsed.services[service].depends_on) {
-        delete parsed.services[service].depends_on;
+        delete pgSQLOnlyParsed.services[service];
+      } else if (pgSQLOnlyParsed.services[service].depends_on) {
+        delete pgSQLOnlyParsed.services[service].depends_on;
       }
     });
 
     // we emit such file
     const yamlPath = path.join("deployments", buildID, "docker-compose-only-db.yml");
     console.log("emiting " + colors.green(yamlPath));
-    await fsAsync.writeFile(yamlPath, YAML.stringify(parsed));
+    await fsAsync.writeFile(yamlPath, YAML.stringify(pgSQLOnlyParsed));
+  }
+
+  // now for postgresql
+  if (actualServices.includes("elastic")) {
+    message += "\n\nYou have included elastic in your build, this is the central search database, and it's not expected you do" +
+      "\nthis, very often including elastic in the build is a mistake, nevertheless, it might be the case for standalone clusters" +
+      "\nremember that the data is stored in TODO"
+
+    const elasticOnlyParsed = {
+      ...parsed,
+    };
+    elasticOnlyParsed.services = {
+      ...elasticOnlyParsed.services,
+    }
+
+    // and now we want to make a docker compose file for the build
+    // database mode, and as such it will only have the elastic service
+    Object.keys(elasticOnlyParsed.services).forEach((service) => {
+      if (service !== "elastic" && service !== "kibana") {
+        delete elasticOnlyParsed.services[service];
+      } else if (elasticOnlyParsed.services[service].depends_on) {
+        delete elasticOnlyParsed.services[service].depends_on;
+      }
+    });
+
+    // we emit such file
+    const yamlPath = path.join("deployments", buildID, "docker-compose-only-elastic.yml");
+    console.log("emiting " + colors.green(yamlPath));
+    await fsAsync.writeFile(yamlPath, YAML.stringify(elasticOnlyParsed));
   }
 
   // and finally our readme

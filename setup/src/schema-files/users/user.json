@@ -31,6 +31,15 @@
             "searchable": false
         },
         {
+            "id": "consent",
+            "type": "boolean",
+            "default": true,
+            "nullable": true,
+            "searchable": false,
+            "readRoleAccess": ["&OWNER"],
+            "coerceNullsIntoDefault": true
+        },
+        {
             "id": "phone",
             "type": "string",
             "subtype": "phone",

@@ -406,8 +406,11 @@ export async function searchModule(
     elasticQuery.setSourceIncludes(sqlFieldsToRequest);
     elasticQuery.setSize(limit);
 
-    const highlightKeys = Object.keys(rHighReply);
-    elasticQuery.setHighlightsOn(highlightKeys);
+    let highlightKeys: string[] = null;
+    if (traditional) {
+      highlightKeys = Object.keys(rHighReply);
+      elasticQuery.setHighlightsOn(highlightKeys);
+    }
 
     const requestBaseResult = (generalFields.results || generalFields.records);
     const requestCount = generalFields.count;
@@ -423,16 +426,20 @@ export async function searchModule(
       }
       baseResult = result.hits.hits.map((r) => {
         highlightsJSON[r._id] = {};
-        highlightKeys.forEach((highlightNameOriginal) => {
-          const originalMatch = rHighReply[highlightNameOriginal];
-          highlightsJSON[r._id][originalMatch.name] = {
-            highlights: (r.highlight && r.highlight[highlightNameOriginal]) || null,
-            match: originalMatch.match,
-          }
-        });
+        if (traditional) {
+          highlightKeys.forEach((highlightNameOriginal) => {
+            const originalMatch = rHighReply[highlightNameOriginal];
+            highlightsJSON[r._id][originalMatch.name] = {
+              highlights: (r.highlight && r.highlight[highlightNameOriginal]) || null,
+              match: originalMatch.match,
+            }
+          });
+        }
         return r._source;
       });
-      highlights = JSON.stringify(highlightsJSON);
+      if (traditional) {
+        highlights = JSON.stringify(highlightsJSON);
+      }
     } else if (requestCount) {
       const result = await appData.elastic.executeCountQuery(elasticQuery);
       count = result.count;
@@ -1011,8 +1018,11 @@ export async function searchItemDefinition(
     elasticQuery.setSourceIncludes(sqlFieldsToRequest);
     elasticQuery.setSize(limit);
 
-    const highlightKeys = Object.keys(rHighReply);
-    elasticQuery.setHighlightsOn(highlightKeys);
+    let highlightKeys: string[] = null;
+    if (traditional) {
+      highlightKeys = Object.keys(rHighReply);
+      elasticQuery.setHighlightsOn(highlightKeys);
+    }
 
     const requestBaseResult = (generalFields.results || generalFields.records);
     const requestCount = generalFields.count;
@@ -1028,16 +1038,20 @@ export async function searchItemDefinition(
       }
       baseResult = result.hits.hits.map((r) => {
         highlightsJSON[r._id] = {};
-        highlightKeys.forEach((highlightNameOriginal) => {
-          const originalMatch = rHighReply[highlightNameOriginal];
-          highlightsJSON[r._id][originalMatch.name] = {
-            highlights: (r.highlight && r.highlight[highlightNameOriginal]) || null,
-            match: originalMatch.match,
-          }
-        });
+        if (traditional) {
+          highlightKeys.forEach((highlightNameOriginal) => {
+            const originalMatch = rHighReply[highlightNameOriginal];
+            highlightsJSON[r._id][originalMatch.name] = {
+              highlights: (r.highlight && r.highlight[highlightNameOriginal]) || null,
+              match: originalMatch.match,
+            }
+          });
+        }
         return r._source;
       });
-      highlights = JSON.stringify(highlightsJSON);
+      if (traditional) {
+        highlights = JSON.stringify(highlightsJSON);
+      }
     } else if (requestCount) {
       const result = await appData.elastic.executeCountQuery(elasticQuery);
       count = result.count;

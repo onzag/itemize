@@ -281,9 +281,12 @@ export async function initializeItemizeApp(
   // the client side
   if (!serverMode && document) {
     // prevent SEO hijacking
+    // allows subdomains to be allowable
     if (
       location.hostname !== config.productionHostname &&
+      !location.hostname.endsWith("." + config.productionHostname) &&
       location.hostname !== config.developmentHostname &&
+      !location.hostname.endsWith("." + config.developmentHostname) &&
       location.hostname !== "localhost"
     ) {
       document.body.innerHTML =

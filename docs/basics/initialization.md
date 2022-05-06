@@ -224,7 +224,7 @@ sudo docker network ls
 Find the one that contains your application name within it, eg. `my_application_name_network` that is the one that the dev environment is using, now you can launch kibana with that
 
 ```sh
-sudo docker run --net my_application_name_network --name kibana -p 5601:5601 docker.elastic.co/kibana/kibana:8.1.3
+sudo docker run --net my_application_name_network --name kibana -p 5601:5601 docker.elastic.co/kibana/kibana:8.2.0
 ```
 
 It will prompt you in your browser and request you for the token, once you paste the token you will then proceed to login, your username should be `elastic` and the password is whatever you put in the `db.sensitive.json` for elastic password.

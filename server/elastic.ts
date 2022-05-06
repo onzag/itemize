@@ -1207,6 +1207,12 @@ export class ItemizeElasticClient {
           whereBuilder.andWhereColumn("last_modified", ">", statusInfo.lastConsisencyCheck);
         }
 
+        // if we only use the module we must ensure we are getting
+        // the right type and not something else entirely
+        if (useModuleOnly) {
+          whereBuilder.andWhereColumn("type", qualifiedPathName);
+        }
+
         // ensure consistency, because we are pulling in batches we want to ensure we are not checking
         // stuff that has been suddenly added while we are pulling these batches, but only pull what
         // hasn't been pulled before, so we use the time we have ran this consistency check at not to pull
@@ -1452,7 +1458,7 @@ export class ItemizeElasticClient {
             methodName: "runConsistencyCheck",
             message: "Did not recieve any new documents (that are missing or outdated in elastic) for " + qualifiedPathName,
           },
-        );
+        );  
       }
 
       if (bulkOperations.length) {
@@ -1536,6 +1542,14 @@ export class ItemizeElasticClient {
           },
         );
       }
+    } else if (CAN_LOG_DEBUG) {
+      logger.debug(
+        {
+          className: "ItemizeElasticClient",
+          methodName: "runConsistencyCheck",
+          message: "Did not recieve any new documents since nothing has changed since last check for " + qualifiedPathName,
+        },
+      );
     }
 
     // if we have another batch then we should consume such batch
