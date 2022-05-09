@@ -104,6 +104,13 @@ export interface IItemizeConstantsConfig {
    */
   SERVER_ELASTIC_CONSISTENCY_CHECK_TIME?: number;
   /**
+   * The time it takes for elasticsearch (if available)
+   * to run the pings that send information about the state of the server
+   * by default this sends the status of the machine, CPU, memory usage, every
+   * 10 seconds, aka 10000ms
+   */
+  SERVER_ELASTIC_PING_INTERVAL_TIME?: number;
+  /**
    * The maximum amount of remote listeners a socket can
    * have at once before the server denies adding more
    * these are used for realtime updates
@@ -233,6 +240,11 @@ export const SERVER_BLOCK_UNTIL_REFRESH_TIME = R_ITEMIZE_CONSTANTS_CONFIG.SERVER
  * The time it takes to run a cleanup process into the elastic instance
  */
 export const SERVER_ELASTIC_CONSISTENCY_CHECK_TIME = R_ITEMIZE_CONSTANTS_CONFIG.SERVER_ELASTIC_CONSISTENCY_CHECK_TIME || 60000; // every minute
+
+/**
+ * The time to inform ping information
+ */
+export const SERVER_ELASTIC_PING_INTERVAL_TIME = R_ITEMIZE_CONSTANTS_CONFIG.SERVER_ELASTIC_PING_INTERVAL_TIME || 10000; // every 10 seconds
 
 /**
  * The maximum amount of remote listeners a socket supports
@@ -684,22 +696,22 @@ export const STANDARD_ACCESSIBLE_RESERVED_BASE_PROPERTIES = [
  * The format that dates are expected to have in order to be exchanged
  * these represent the SQL form, does not support nano date
  */
- export const DATETIME_FORMAT = "YYYY-MM-DD HH:mm:ss.SSSZ";
- /**
-  * The format with the nano information included, used mainly for elastic
-  * parsing
-  */
- export const DATETIME_FORMAT_ELASTIC_NANO = "yyyy-MM-dd HH:mm:ss.SSSSSSZZZZZ";
- /**
-  * The format that time is expected to have in order to be exchanged
-  * this is the SQL form
-  */
- export const TIME_FORMAT = "HH:mm:ss";
- /**
-  * The format date has in order to be exchanged, this is
-  * the SQL form
-  */
- export const DATE_FORMAT = "YYYY-MM-DD";
+export const DATETIME_FORMAT = "YYYY-MM-DD HH:mm:ss.SSSZ";
+/**
+ * The format with the nano information included, used mainly for elastic
+ * parsing
+ */
+export const DATETIME_FORMAT_ELASTIC_NANO = "yyyy-MM-dd HH:mm:ss.SSSSSSZZZZZ";
+/**
+ * The format that time is expected to have in order to be exchanged
+ * this is the SQL form
+ */
+export const TIME_FORMAT = "HH:mm:ss";
+/**
+ * The format date has in order to be exchanged, this is
+ * the SQL form
+ */
+export const DATE_FORMAT = "YYYY-MM-DD";
 
 /**
  * The reserved base properties that are exists within every graphql query
@@ -1283,7 +1295,7 @@ export const RESERVED_IDEF_SEARCH_PROPERTIES = (orderByRule: any) => ({
   searchengine_language: {
     type: GraphQLString,
     description: "A ISO code for a language to use to limit the search engine indexes against " +
-    "for example if you are sure you only want english results that have been indexed in english, then pass en here",
+      "for example if you are sure you only want english results that have been indexed in english, then pass en here",
   }
 });
 
@@ -1369,7 +1381,7 @@ export const RESERVED_GETTER_LIST_PROPERTIES = {
   searchengine_language: {
     type: GraphQLString,
     description: "A ISO code for a language to use to limit the search engine indexes against " +
-    "for example if you are sure you only want english results that have been indexed in english, then pass en here",
+      "for example if you are sure you only want english results that have been indexed in english, then pass en here",
   },
   created_by: {
     type: GraphQLString,

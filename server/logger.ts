@@ -1,6 +1,6 @@
 import winston from "winston";
 import Transport from "winston-transport";
-import { INSTANCE_LOG_ERROR_FILE, INSTANCE_LOG_FILE, INSTANCE_MODE, INSTANCE_UUID, LOG_LEVEL, NODE_ENV } from "./environment";
+import { FORCE_CONSOLE_LOGS, INSTANCE_LOG_ERROR_FILE, INSTANCE_LOG_FILE, INSTANCE_MODE, INSTANCE_UUID, LOG_LEVEL, NODE_ENV } from "./environment";
 import type LoggingProvider from "./services/base/LoggingProvider";
 
 const disableLogger = (
@@ -61,7 +61,7 @@ const rawLogger: winston.Logger = disableLogger ? null : winston.createLogger({
 });
 
 // if not production add a console.log
-if (NODE_ENV !== "production" && rawLogger) {
+if ((NODE_ENV !== "production" || FORCE_CONSOLE_LOGS) && rawLogger) {
   rawLogger.add(
     new winston.transports.Console({
       format: winston.format.simple()
@@ -159,3 +159,29 @@ export function extendLoggerWith(p: LoggingProvider<any>) {
   rawLogger.remove(standardInfoTransport);
   rawLogger.remove(standardErrorTransport);
 }
+
+process.on('warning', (warningInfo) => {
+  logger.error({
+    message: warningInfo.message,
+    err: warningInfo,
+    serious: true,
+  });
+});
+
+process.on('uncaughtException', async (err) => {
+  logger.error({
+    message: err.message,
+    err,
+    serious: true,
+  });
+
+  // give it time to save but it should die
+  await wait(1000);
+  process.exit(1);
+});
+
+const wait = (time: number) => {
+  return new Promise((resolve) => {
+    setTimeout(resolve, time);
+  });
+};

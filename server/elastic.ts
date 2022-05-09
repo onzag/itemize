@@ -7,7 +7,7 @@ import { getElasticSchemaForRoot, IElasticIndexDefinitionType, IElasticSchemaDef
 import { logger } from "./logger";
 import equals from "deep-equal";
 import { convertSQLValueToElasticSQLValueForItemDefinition } from "../base/Root/Module/ItemDefinition/sql";
-import { DELETED_REGISTRY_IDENTIFIER } from "../constants";
+import { DELETED_REGISTRY_IDENTIFIER, SERVER_ELASTIC_PING_INTERVAL_TIME } from "../constants";
 import { CAN_LOG_DEBUG, INSTANCE_UUID } from "./environment";
 import { NanoSecondComposedDate } from "../nanodate";
 import { FieldValue, QueryDslMatchPhraseQuery, QueryDslMatchQuery, QueryDslQueryContainer, QueryDslTermQuery, QueryDslTermsQuery, SearchRequest } from "@elastic/elasticsearch/lib/api/types";
@@ -195,6 +195,7 @@ export class ItemizeElasticClient {
   private langAnalyzers: ILangAnalyzers;
   private serverData: any;
   private lastFailedWaitMultiplied: number = 0;
+  private runningConsistencyCheckOn: {[key: string]: Promise<void>} = {};
 
   private serverDataPromise: Promise<void>;
   private serverDataPromiseResolve: () => void;
@@ -234,8 +235,9 @@ export class ItemizeElasticClient {
     // in absolute mode, when both are called, so it will block it
     // in extended mode where prepare instance is never called
     this.prepareInstancePromise = null;
+    this.prepareInstancePromiseResolve = null;
 
-    setInterval(this.executePings.bind(this), 5000);
+    setInterval(this.executePings.bind(this), SERVER_ELASTIC_PING_INTERVAL_TIME);
   }
 
   /**
@@ -247,24 +249,15 @@ export class ItemizeElasticClient {
     // first we check wether we should resolve the server data promise
     // that comes when our first server data has arrived
     const shouldResolvePrmomise = !this.serverData;
-    this.serverData = serverData;
-    this.rootSchema = getElasticSchemaForRoot(this.root, this.serverData);
+    
+    if (!this.serverData || !equals(this.serverData, serverData)) {
+      this.serverData = serverData;
+      this.rootSchema = getElasticSchemaForRoot(this.root, this.serverData);
+    }
 
     if (shouldResolvePrmomise) {
       this.serverDataPromiseResolve();
     }
-
-    // now that the server data is ready, the prepare instace may run properly
-    // because this function only runs in the global manager, we may now
-    // update all our mappings due to new server data
-
-    // if the promise is missing otherwise it is pointless as preparing will
-    // ensure that our server data is used
-    if (!this.prepareInstancePromise) {
-      // we now want our indexes to be rebuilt based on the new information
-      // we have received
-      await this._rebuildAllIndexes();
-    };
   }
 
   /**
@@ -291,7 +284,6 @@ export class ItemizeElasticClient {
     this.prepareInstancePromise = new Promise((r) => {
       this.prepareInstancePromiseResolve = r;
     });
-
     let wasPrepared: boolean = false;
 
     // now we can try to prepare it until it succeeds
@@ -301,7 +293,11 @@ export class ItemizeElasticClient {
           await this._prepareInstance();
           wasPrepared = true;
         }
-        await this.runConsistencyCheck();
+        // we are passing the force flag to ensure this runs
+        // and not get stuck in an infinite loop as the run consistency
+        // check function usually waits for preparation, if there is any
+        // so with this, we avoid a scenario of this non-ending
+        await this.runConsistencyCheck(null, true);
         this.lastFailedWaitMultiplied = 0;
         break;
       } catch (err) {
@@ -364,6 +360,13 @@ export class ItemizeElasticClient {
    * @ignore
    */
   private async _prepareInstance(): Promise<void> {
+    await this.elasticClient.cluster.putSettings({
+      persistent: {
+        // disable auto create index for mod to ensure we get an error
+        // when pushing for upserts because the guessed types are wrong
+        "action.auto_create_index": "-mod_*,-status,-logs,*",
+      }
+    });
     // first we create or update the status
     // index that we use internally for index information
     // and metadata
@@ -386,129 +389,6 @@ export class ItemizeElasticClient {
 
     // and now we can build those too
     await Promise.all(simpleIds.map((r) => this.createOrUpdateSimpleIndex(r, this.rootSchema[r])));
-  }
-
-  /**
-   * Returns when it believes elastic has been built and is ready
-   * use in other than the global manager
-   * 
-   * this function is called automatically before the server starts
-   * note that if the elastic schema and the instance schema differ, it will consider
-   * itself not ready until they do match, this means your server will simply, wait forever
-   * 
-   * @returns a void promise once it's done
-   */
-  public async confirmInstanceReadiness(): Promise<void> {
-    // we wait for the instance to be prepared
-    // this only truly is of use in ABSOLUTE mode
-    if (this.prepareInstancePromise) {
-      await this.prepareInstancePromise;
-      logger.info(
-        {
-          className: "ItemizeElasticClient",
-          methodName: "confirmInstanceReadiness",
-          message: "Instance was launched with preparation and confirmation at once, waiting for preparation",
-        },
-      );
-    } else {
-      logger.info(
-        {
-          className: "ItemizeElasticClient",
-          methodName: "confirmInstanceReadiness",
-          message: "Instance was launched withoout known preparation, confirming immediately",
-        },
-      );
-    }
-
-    while (true) {
-      try {
-        await this._confirmInstanceReadiness();
-        this.lastFailedWaitMultiplied = 0;
-        break;
-      } catch (err) {
-        this.lastFailedWaitMultiplied++;
-
-        let secondsToWait = 2 ** this.lastFailedWaitMultiplied;
-        if (secondsToWait >= 60) {
-          secondsToWait = 60;
-        }
-        const timeToWait = 1000 * secondsToWait;
-
-        // an specific not ready error, we rather don't log to eror
-        // as it's not a real error
-        if (err instanceof NotReadyError) {
-          logger.info(
-            {
-              className: "ItemizeElasticClient",
-              methodName: "confirmInstanceReadiness",
-              message: "Not ready, waiting " + secondsToWait + "s",
-              data: {
-                message: err.message,
-              },
-            }
-          );
-        } else {
-          logger.error(
-            {
-              className: "ItemizeElasticClient",
-              methodName: "confirmInstanceReadiness",
-              message: "Could not confirm the elastic instance waiting " + secondsToWait + "s",
-              serious: true,
-              err,
-            }
-          );
-        }
-
-        await wait(timeToWait);
-      }
-    }
-
-    logger.info(
-      {
-        className: "ItemizeElasticClient",
-        methodName: "confirmInstanceReadiness",
-        message: "Confirmation has been successful, ending block",
-      },
-    );
-  }
-
-  /**
-   * @ignore
-   * The actual function called to confirm that is ready
-   * it returns an error if it fails somehow, aka, not ready
-   */
-  private async _confirmInstanceReadiness(): Promise<void> {
-    logger.info(
-      {
-        className: "ItemizeElasticClient",
-        methodName: "_confirmInstanceReadiness",
-        message: "Now confirming",
-      },
-    );
-
-    // this is similar to the prepare function but we do not update
-    // anything, just ensure that everything is compatible
-    const listOfAll: string[] = [];
-
-    // now we can do the same and loop on these
-    await Promise.all(this.root.getAllModules().map(async (rootMod) => {
-      // add to the child item definitions checkup
-      return await Promise.all(
-        rootMod.getAllChildDefinitionsRecursive().map(async (cIdef) => {
-          listOfAll.push(cIdef.getQualifiedPathName());
-          // ensure the item
-          if (cIdef.isSearchEngineEnabled()) {
-            await this.ensureIndexes(cIdef, true);
-          }
-        })
-      );
-    }));
-
-    // and now let's get our remaining elements that are just special elements added by the schema
-    const simpleIds = Object.keys(this.rootSchema).filter((key) => !listOfAll.includes(key));
-
-    // and now we can check those too
-    await Promise.all(simpleIds.map((r) => this.ensureSimpleIndex(r, this.rootSchema[r], true)));
   }
 
   /**
@@ -809,7 +689,6 @@ export class ItemizeElasticClient {
     }
 
     const qualifiedName = idefOrMod.getQualifiedPathName();
-
     const schemaToBuild = this.rootSchema[qualifiedName];
 
     await this._rebuildIndexGroup(
@@ -876,6 +755,7 @@ export class ItemizeElasticClient {
     }
 
     const qualifiedName = idefOrMod.getQualifiedPathName();
+    await this.waitForServerData();
     const schemaToBuild = this.rootSchema[qualifiedName];
 
     logger.info(
@@ -966,8 +846,8 @@ export class ItemizeElasticClient {
    * this function can actually be ran from within a cluster, or extended instance
    * if it believes it is doing something that warrants that mechanism
    */
-  public updateIndices(onElement?: Module | ItemDefinition | string) {
-    return this.runConsistencyCheck(onElement);
+  public updateIndices(onElement?: Module | ItemDefinition | string, force?: boolean) {
+    return this.runConsistencyCheck(onElement, force);
   }
 
   /**
@@ -1008,23 +888,62 @@ export class ItemizeElasticClient {
    * 
    * Will also find duplicates in some cases that are not in the right language, as it tries to find and check against
    * all the records that match given ids on the list, if it finds two of those, one of those must be invalid
+   * 
+   * @param onElement the element to run the consistency check on, if none specified will run it on everything
+   * @param force by default the consistency will wait for preparation and will not overlap other consistency checks, use this
+   * to just run it right away regardless regardless of anything
    */
   public async runConsistencyCheck(
     onElement?: Module | ItemDefinition | string,
+    force?: boolean,
   ) {
     const actualOnElement = typeof onElement === "string" ? this.root.registry[onElement] : onElement;
+    const qPathName = (actualOnElement && actualOnElement.getQualifiedPathName()) || "null";
 
-    if (!actualOnElement) {
-      for (const rootMod of this.root.getAllModules()) {
-        await this.runConsistencyCheck(rootMod);
+    let pResolve: any = null;
+    let pReject: any = null;
+
+    if (!force) {
+      if (this.runningConsistencyCheckOn[qPathName]) {
+        logger.info({
+          className: "ItemizeElasticClient",
+          methodName: "runConsistencyCheck",
+          message: "A consistency check for " + qPathName + " is running already, reusing that",
+        });
+        return await this.runningConsistencyCheckOn[qPathName];
       }
-    } else if (actualOnElement instanceof Module) {
-      for (const item of actualOnElement.getAllChildDefinitionsRecursive()) {
-        await this.runConsistencyCheck(item);
-      }
-    } else if (actualOnElement instanceof ItemDefinition) {
-      await this._runConsistencyCheck(actualOnElement, new Date(), 0, null, {});
+      this.runningConsistencyCheckOn[qPathName] = new Promise((resolve, reject) => {
+        pResolve = resolve;
+        pReject = reject;
+      });
+      await this.prepareInstancePromise;
     }
+
+    try {
+      if (!actualOnElement) {
+        for (const rootMod of this.root.getAllModules()) {
+          await this.runConsistencyCheck(rootMod, force);
+        }
+      } else if (actualOnElement instanceof Module) {
+        for (const item of actualOnElement.getAllChildDefinitionsRecursive()) {
+          await this.runConsistencyCheck(item, force);
+        }
+      } else if (actualOnElement instanceof ItemDefinition) {
+        await this._runConsistencyCheck(actualOnElement, new Date(), 0, null, {});
+      }
+      pResolve && pResolve();
+      delete this.runningConsistencyCheckOn[qPathName];
+    } catch (err) {
+      pReject && pReject(err);
+      delete this.runningConsistencyCheckOn[qPathName];
+      throw err;
+    }
+  }
+
+  public isRunningConsistencyCheck(onElement?: Module | ItemDefinition | string) {
+    const actualOnElement = typeof onElement === "string" ? this.root.registry[onElement] : onElement;
+    const qPathName = (actualOnElement && actualOnElement.getQualifiedPathName()) || "null";
+    return !!this.runningConsistencyCheckOn[qPathName];
   }
 
   private async _runConsistencyCheck(
@@ -1458,7 +1377,7 @@ export class ItemizeElasticClient {
             methodName: "runConsistencyCheck",
             message: "Did not recieve any new documents (that are missing or outdated in elastic) for " + qualifiedPathName,
           },
-        );  
+        );
       }
 
       if (bulkOperations.length) {
@@ -1881,6 +1800,7 @@ export class ItemizeElasticClient {
           // if the index is missing it will crash and be added here then do it again
           // otherwise we would always check for this index existance which is 2 requests all the time
           // hence worse, this 3 request process is more expensive, but only occurs once
+          await this.waitForServerData();
           await this.generateMissingIndexInGroup(indexName, language, this.rootSchema[qualifiedNameIdef]);
           await this.elasticClient.update(updateAction);
         } else {
@@ -1892,7 +1812,7 @@ export class ItemizeElasticClient {
       logger.error(
         {
           className: "ItemizeElasticClient",
-          methodName: "deleteDocument",
+          methodName: "updateDocument",
           message: "Could not create an elastic document for " + mergedId + " at " + indexName,
           serious: true,
           err,
@@ -1985,6 +1905,15 @@ export class ItemizeElasticClient {
 
   // ping functionality
   public createPing<N, T>(setter: IElasticPingSetter<N, T>) {
+    if (setter.dataIndex.startsWith("mod_")) {
+      throw new Error("Index name for a ping cannot start with 'mod_' as in " + setter.dataIndex);
+    } else if (setter.statusIndex.startsWith("mod_")) {
+      throw new Error("Index status name for a ping cannot start with 'mod_' as in " + setter.statusIndex);
+    } else if (setter.dataIndex === "status" || setter.dataIndex === "logs") {
+      throw new Error("Index name for a ping cannot be " + setter.dataIndex);
+    } else if (setter.statusIndex === "status" || setter.statusIndex === "logs") {
+      throw new Error("Index status name for a ping cannot be " + setter.dataIndex);
+    }
     this.pings.push(setter);
     this.pingsInitialDataSet.push(false);
   }

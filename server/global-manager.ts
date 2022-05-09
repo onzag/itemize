@@ -112,17 +112,17 @@ export class GlobalManager {
 
     this.customServices = {};
 
-    mailProvider && (GLOBAL_MANAGER_MODE === "ABSOLUTE" || GLOBAL_MANAGER_MODE === "SERVER_DATA" || GLOBAL_MANAGER_MODE === "SERVICES")
-    mailProvider.setupGlobalResources(
-      this.databaseConnection,
-      this.globalCache,
-      this.redisPub,
-      this.redisSub,
-      this.mailProvider,
-      this.phoneProvider,
-      this.customServices,
-      this.root
-    );
+    mailProvider && (GLOBAL_MANAGER_MODE === "ABSOLUTE" || GLOBAL_MANAGER_MODE === "SERVER_DATA" || GLOBAL_MANAGER_MODE === "SERVICES") &&
+      mailProvider.setupGlobalResources(
+        this.databaseConnection,
+        this.globalCache,
+        this.redisPub,
+        this.redisSub,
+        this.mailProvider,
+        this.phoneProvider,
+        this.customServices,
+        this.root
+      );
     phoneProvider && (GLOBAL_MANAGER_MODE === "ABSOLUTE" || GLOBAL_MANAGER_MODE === "SERVER_DATA" || GLOBAL_MANAGER_MODE === "SERVICES") &&
       phoneProvider.setupGlobalResources(
         this.databaseConnection,
@@ -639,7 +639,15 @@ export class GlobalManager {
                 methodName: "run",
                 message: "Running elasticsearch consistency check",
               });
-              await this.elastic.runConsistencyCheck();
+              if (!this.elastic.isRunningConsistencyCheck()) {
+                await this.elastic.runConsistencyCheck();
+              } else {
+                logger.info({
+                  className: "GlobalManager",
+                  methodName: "run",
+                  message: "The initial preparation consistency check is still running",
+                });
+              }
             }
             firstAvoided = true;
           } catch (err) {

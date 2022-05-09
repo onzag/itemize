@@ -39,6 +39,10 @@ This is the standard log level when `NODE_ENV=development`
 
 Use this log level when attempting to find hard bugs, this logs basically everything and can crowd your logs very fast
 
+## FORCE_CONSOLE_LOGS
+
+By default console logging only happens in development mode, with this variable set to `true` you can force them to be piped to console, useful for debugging stubborn clusters without having to rely on elastic or file logging
+
 ## PORT
 
 The port to be used, default is `8000`

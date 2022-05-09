@@ -63,10 +63,8 @@ import {
   PING_GOOGLE,
   FAKE_EMAILS,
   FAKE_SMS,
-  INSTANCE_GROUP_ID,
   PORT,
   buildEnvironmentInfo,
-  INSTANCE_UUID,
   FAKE_USSD,
 } from "./environment";
 import USSDProvider from "./services/base/USSDProvider";
@@ -429,9 +427,40 @@ export async function initializeServer(
       redisConfig,
     };
 
-    const LoggingServiceClass = (serviceCustom && serviceCustom.loggingServiceProvider) || (
+        // We change the hosts depending to whether we are using docker or not
+    // and if our hosts are set to the local
+    if (USING_DOCKER) {
+      if (redisConfig.cache.host === "127.0.0.1" || redisConfig.cache.host === "localhost") {
+        redisConfig.cache.host = "redis";
+      }
+      if (redisConfig.pubSub.host === "127.0.0.1" || redisConfig.pubSub.host === "localhost") {
+        redisConfig.pubSub.host = "redis";
+      }
+      if (redisConfig.global.host === "127.0.0.1" || redisConfig.global.host === "localhost") {
+        redisConfig.global.host = "redis";
+      }
+      if (dbConfig.host === "127.0.0.1" || dbConfig.host === "localhost") {
+        dbConfig.host = "pgsql";
+      }
+      if (
+        dbConfig.elastic &&
+        dbConfig.elastic.node &&
+        (
+          dbConfig.elastic.node.includes("localhost") ||
+          dbConfig.elastic.node.includes("127.0.0.1")
+        )
+      ) {
+        dbConfig.elastic.node = dbConfig.elastic.node.replace("localhost", "elastic").replace("127.0.0.1", "elastic");
+      }
+    }
+
+    const mayUseLoggerService =
+      INSTANCE_MODE !== "CLEAN_SITEMAPS" &&
+      INSTANCE_MODE !== "CLEAN_STORAGE";
+
+    const LoggingServiceClass = mayUseLoggerService ? (serviceCustom && serviceCustom.loggingServiceProvider) || (
       dbConfig.elastic ? ElasticLoggerService : null
-    );
+    ) : null;
     const loggingService: LoggingProvider<any> = LoggingServiceClass ? new LoggingServiceClass(
       sensitiveConfig.logging,
       null,
@@ -464,22 +493,6 @@ export async function initializeServer(
         message: "Using docker " + USING_DOCKER,
       },
     );
-    // We change the hosts depending to whether we are using docker or not
-    // and if our hosts are set to the local
-    if (USING_DOCKER) {
-      if (redisConfig.cache.host === "127.0.0.1" || redisConfig.cache.host === "localhost") {
-        redisConfig.cache.host = "redis";
-      }
-      if (redisConfig.pubSub.host === "127.0.0.1" || redisConfig.pubSub.host === "localhost") {
-        redisConfig.pubSub.host = "redis";
-      }
-      if (redisConfig.global.host === "127.0.0.1" || redisConfig.global.host === "localhost") {
-        redisConfig.global.host = "redis";
-      }
-      if (dbConfig.host === "127.0.0.1" || dbConfig.host === "localhost") {
-        dbConfig.host = "pgsql";
-      }
-    }
 
     // this shouldn't be necessary but we do it anyway
     buildnumber = buildnumber.replace("\n", "").trim();
@@ -647,6 +660,13 @@ export async function initializeServer(
       // the whole action on its own should repopulate the cache but again
       // the cluster manager shouldn't die
       listener.informClusterManagerReset();
+
+      logger.info(
+        {
+          functionName: "initializeServer",
+          message: "Cluster manager sucessfully setup",
+        },
+      );
       return;
     }
 
@@ -893,16 +913,6 @@ export async function initializeServer(
       }
     }
 
-    if (elastic) {
-      logger.info(
-        {
-          functionName: "initializeServer",
-          message: "Waiting for elastic service to be ready",
-        },
-      );
-      await elastic.confirmInstanceReadiness();
-    }
-
     // due to a bug in the types the create client function is missing
     // domainId and domainName
     logger.info(
@@ -961,11 +971,7 @@ export async function initializeServer(
         message: "Attempting to retrieve server data",
       },
     );
-    const wait = (time: number) => {
-      return new Promise((resolve) => {
-        setTimeout(resolve, time);
-      });
-    }
+
     let serverData: IServerDataType = null;
     while (serverData === null) {
       logger.info(
@@ -1384,5 +1390,15 @@ export async function initializeServer(
       }
     );
     process.exitCode = 1;
+
+    // sometimes it simply won't exit
+    await wait(1000);
+    process.exit(1);
   }
 }
+
+const wait = (time: number) => {
+  return new Promise((resolve) => {
+    setTimeout(resolve, time);
+  });
+};

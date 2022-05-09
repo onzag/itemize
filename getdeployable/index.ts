@@ -83,6 +83,14 @@ export default async function build(version: string, buildID: string, services: 
       .replace(/\%\{DB_PASSWORD\}/g, dbConfig.password)
       .replace(/\%\{DB_NAME\}/g, dbConfig.database);
 
+  if (dbConfig.elastic && dbConfig.elastic.auth && dbConfig.elastic.auth.password) {
+    fullYMLTemplate =
+      fullYMLTemplate.replace(/\%\{ELASTIC_PASSWORD\}/g, dbConfig.elastic.auth.password)
+  } else {
+    fullYMLTemplate =
+      fullYMLTemplate.replace(/\%\{ELASTIC_PASSWORD\}/g, "UNSPECIFIED")
+  }
+
   // now the actual services we are adding
   let actualServices: string[] = [];
   if (services === "full") {
@@ -127,6 +135,7 @@ export default async function build(version: string, buildID: string, services: 
       // we remove it
       console.log(colors.yellow("Dropping unused service: ") + service);
       delete parsed.services[service];
+      return;
     } else if (parsed.services[service].depends_on) {
       // also we nee to check our dependencies, we remove dependencies if they are not in there
       parsed.services[service].depends_on = parsed.services[service].depends_on.filter((serviceDependance: string) => {
@@ -137,6 +146,15 @@ export default async function build(version: string, buildID: string, services: 
       if (parsed.services[service].depends_on.length === 0) {
         delete parsed.services[service].depends_on;
       }
+    }
+
+    if (service === "global-manager" || service === "cluster-manager" || service === "servers" && (
+      actualServices.includes("elastic")
+    )) {
+      if (!parsed.services[service].environment) {
+        parsed.services[service].environment = [];
+      }
+      parsed.services[service].environment.push("NODE_TLS_REJECT_UNAUTHORIZED=0");
     }
   });
 
@@ -315,33 +333,32 @@ export default async function build(version: string, buildID: string, services: 
     await fsAsync.writeFile(yamlPath, YAML.stringify(pgSQLOnlyParsed));
   }
 
-  // now for postgresql
   if (actualServices.includes("elastic")) {
-    message += "\n\nYou have included elastic in your build, this is the central search database, and it's not expected you do" +
-      "\nthis, very often including elastic in the build is a mistake, nevertheless, it might be the case for standalone clusters" +
-      "\nremember that the data is stored in TODO"
+    message += `
 
-    const elasticOnlyParsed = {
-      ...parsed,
-    };
-    elasticOnlyParsed.services = {
-      ...elasticOnlyParsed.services,
-    }
+You have included elastic in your build, this is the central search database, and it's not expected you do
+this, including elastic in the build is usually a mistake, as this automatic configuration tends to be very barebones
+and provide little to no functionality and you should set it up by hand if you want it to be production worthy, it will, nevertheless
+work, please run the following command to ensure that it runs properly
+sysctl -w vm.max_map_count=262144
 
-    // and now we want to make a docker compose file for the build
-    // database mode, and as such it will only have the elastic service
-    Object.keys(elasticOnlyParsed.services).forEach((service) => {
-      if (service !== "elastic" && service !== "kibana") {
-        delete elasticOnlyParsed.services[service];
-      } else if (elasticOnlyParsed.services[service].depends_on) {
-        delete elasticOnlyParsed.services[service].depends_on;
-      }
-    });
+Because of elastic inclusion your servers are setup as NODE_TLS_REJECT_UNAUTHORIZED=0 because of the self signed certificate, because of the
+way elastic works you will need a proper elastic setup to get around this, something this deployable cannot do due to the inherent limitations
+of elastic running on docker, this is highly insecure, and you will get an error message in your logs`
+  }
 
-    // we emit such file
-    const yamlPath = path.join("deployments", buildID, "docker-compose-only-elastic.yml");
-    console.log("emiting " + colors.green(yamlPath));
-    await fsAsync.writeFile(yamlPath, YAML.stringify(elasticOnlyParsed));
+  if (actualServices.includes("kibana")) {
+    message += `
+
+You have included kibana in your build, this is used to analyze and handle analytics that occur in the elasticsearch cluster
+because it is also in a barebones form any outage will cause kibana to be misconfigured as it doesn't hold any state, either in kibana
+itself or in elasticsearch, every time it needs to be configured you should restart kibana, and get a new enrollment token
+run this only after your cluster is already running
+dir=\${PWD##*/}; docker exec -it "\${dir,,}_elastic_1" /usr/share/elasticsearch/bin/elasticsearch-create-enrollment-token -s kibana
+and then run
+dir=\${PWD##*/}; docker logs "\${dir,,}_kibana_1"
+and find the link there that you should visit
+your username should be elastic and your password should be whatever you set up in your configuration`
   }
 
   // and finally our readme

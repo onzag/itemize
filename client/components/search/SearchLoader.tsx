@@ -324,10 +324,10 @@ class ActualSearchLoader extends React.Component<IActualSearchLoaderProps, IActu
 
     return willProduceNewHighlights;
   }
-  public canProduceHighlights() {
-    return !this.props.searchShouldCache &&
-      this.props.searchEngineHighlightArgs !== null &&
-      Object.keys(this.props.searchEngineHighlightArgs).length !== 0;
+  public canProduceHighlights(props: IActualSearchLoaderProps = this.props) {
+    return !props.searchShouldCache &&
+      props.searchEngineHighlightArgs !== null &&
+      Object.keys(props.searchEngineHighlightArgs).length !== 0;
   }
   public componentDidUpdate(prevProps: IActualSearchLoaderProps) {
     // on update we must seek what the current page is to
@@ -366,6 +366,8 @@ class ActualSearchLoader extends React.Component<IActualSearchLoaderProps, IActu
     // if it doesn't equal what we currently have loaded
     if (
       this.willProduceNewHighlights() ||
+      // the capability to produce highlights changed
+      (this.canProduceHighlights(prevProps) !== this.canProduceHighlights()) ||
       !equals(this.state.currentSearchRecords, currentSearchRecords, { strict: true }) ||
       !equals(this.props.searchResults, prevProps.searchResults, { strict: true })
     ) {

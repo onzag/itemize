@@ -95,6 +95,10 @@ export class Cache {
     this.serverData = initialServerData;
     this.sensitiveConfig = sensitiveConfig;
     this.domain = domain;
+
+    // we inform of new server data here in the cache
+    // to the elastic client
+    this.elastic && this.elastic.informNewServerData(initialServerData);
   }
   /**
    * Sets the listener for the remote interaction with the clients
@@ -2500,6 +2504,7 @@ export class Cache {
       },
     );
     this.serverData = newData;
+    this.elastic.informNewServerData(newData);
   }
 
   /**

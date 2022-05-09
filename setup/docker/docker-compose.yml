@@ -57,6 +57,7 @@ services:
             - NO_SSR=false
             - FAKE_EMAILS=false
             - FAKE_SMS=false
+            - FAKE_USSD=false
     redis:
         image: redis:latest
         restart: always
@@ -76,8 +77,6 @@ services:
     pgsql:
         image: postgis/postgis:latest
         restart: always
-        ports:
-            - "127.0.0.1:%{DB_PORT}:5432"
         volumes: 
             - ./pgdata:/var/lib/postgresql/data
         environment:
@@ -87,9 +86,6 @@ services:
     elastic:
         image: docker.elastic.co/elasticsearch/elasticsearch:8.2.0
         restart: always
-        volumes:
-            - ./certs:/usr/share/elasticsearch/config/certs
-            - ./edata:/usr/share/elasticsearch/data
         environment:
             - ELASTIC_PASSWORD=%{ELASTIC_PASSWORD}
     kibana:
@@ -97,5 +93,3 @@ services:
         restart: always
         ports:
             - "5601:5601"
-        environment:
-            - ELASTIC_PASSWORD=%{ELASTIC_PASSWORD}
