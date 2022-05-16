@@ -1043,7 +1043,11 @@ export async function initializeServer(
     if (UserLocalizationServiceClass.getType() !== ServiceProviderType.LOCAL) {
       throw new Error("The user localization service class is not a local type, and that's not allowed");
     }
-    const userLocalizationService: UserLocalizationProvider<any> = (sensitiveConfig.userLocalization ?
+    const userLocalizationService: UserLocalizationProvider<any> = (
+      (
+        sensitiveConfig.userLocalization ||
+        UserLocalizationServiceClass === ElasticLocationService
+      ) ?
       new UserLocalizationServiceClass(sensitiveConfig.userLocalization, registry, configsObj) :
       null) as any;
 

@@ -141,6 +141,20 @@ export async function standardConfigSetup(
         validate: (v) => v.replace(/\s/g, "") === v,
       },
       {
+        variableName: "mailDomain",
+        message: "This is the domain that the template generator uses as domain, so when the users receive an email they see user@mail.mysite.com " +
+        "this has nothing to do with the configuration, it is simply what goes in the subject line when sending emails",
+        defaultValue: "mail." + packageJSON.name + ".com",
+        validate: (v) => v.replace(/\s/g, "") === v,
+        nullifyFalseValues: true,
+      },
+      {
+        variableName: "mailStorage",
+        message: "A path for an item definition in order to be used for storage of emails so that itemize acts as a mail client",
+        defaultValue: "users/mail",
+        nullifyFalseValues: true,
+      },
+      {
         variableName: "containersRegionMappers",
         type: "strobject",
         message: "Now you need to specify the container region mappers, as a comma separated list of ; separated countries (ISO uppercase) " +

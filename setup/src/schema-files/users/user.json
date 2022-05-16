@@ -88,6 +88,16 @@
             "coerceNullsIntoDefault": true
         },
         {
+            "id": "e_external",
+            "type": "boolean",
+            "nullable": true,
+            "default": false,
+            "searchable": false,
+            "readRoleAccess": ["&OWNER"],
+            "editRoleAccess": "$CONFIG:if(config.roles.includes('ADMIN')){return ['ADMIN', '&OWNER']}else{return ['&OWNER']}",
+            "coerceNullsIntoDefault": true
+        },
+        {
             "id": "e_notifications",
             "type": "boolean",
             "default": true,

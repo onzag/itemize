@@ -2504,7 +2504,7 @@ export class Cache {
       },
     );
     this.serverData = newData;
-    this.elastic.informNewServerData(newData);
+    this.elastic && this.elastic.informNewServerData(newData);
   }
 
   /**

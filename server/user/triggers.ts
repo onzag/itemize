@@ -41,7 +41,8 @@ export const customUserTriggers: ITriggerRegistry = {
             const host = (arg.requestedUpdate.email as string).split("@")[1];
             const isEmailPartOfThisHost =
               host === arg.appData.config.developmentHostname ||
-              host === arg.appData.config.productionHostname;
+              host === arg.appData.config.productionHostname ||
+              host === arg.appData.config.mailDomain;
             if (isEmailPartOfThisHost) {
               arg.forbid("Emails from the same domain are not allowed");
             }

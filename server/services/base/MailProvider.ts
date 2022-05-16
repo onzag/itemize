@@ -18,6 +18,15 @@ import { IUnsubscribeUserTokenDataType } from "../../user/rest";
 import { ServiceProvider, ServiceProviderType } from "..";
 import { NODE_ENV } from "../../environment";
 
+export interface IMailResolverInfo {
+  target: string;
+}
+
+export interface IMailResolverResponse {
+  email: string[];
+  userId: string[];
+}
+
 /**
  * The unsubscribe url form
  */
@@ -88,6 +97,10 @@ export interface IReceiveEmailData {
   to: string;
   subject: string;
   content: string;
+
+  spam?: boolean;
+  notify?: boolean;
+  notifyProperty?: string;
 }
 
 /**
@@ -268,7 +281,7 @@ export default class MailProvider<T> extends ServiceProvider<T> {
     }
 
     // build the from handle
-    const from = `${arg.fromUsername} <${arg.fromEmailHandle}@${this.appSensitiveConfig.mailDomain}>`;
+    const from = `${arg.fromUsername} <${arg.fromEmailHandle}@${this.appConfig.mailDomain}>`;
 
     // setup the args
     const args: ISendEmailData = {
@@ -603,6 +616,14 @@ export default class MailProvider<T> extends ServiceProvider<T> {
     }
   }
 
+  public standardInternalMailResolver() {
+
+  }
+
+  public setInternalMailResolver() {
+
+  }
+
   /**
    * This method should get called once an email has been received
    * the service provider that extended the raw mail provider should
@@ -611,15 +632,90 @@ export default class MailProvider<T> extends ServiceProvider<T> {
    * @param data the email data received, make sure to fill this information
    * properly
    */
-  public onEmailRecieved(data: IReceiveEmailData) {
-    const userHandle = data.from.split("@")[0];
-    if (userHandle === "unsubscribe") {
-      // TODO do the unsubscribe via the cache
-      // we have the email, we will need raw db in order
-      // to find the user it belongs to and then
-      // we can request an update
+  public async onExternalEmailRecieved(data: IReceiveEmailData) {
+    const targetUserHandle = data.to.split("@")[0];
+    const rawDB = this.isInstanceGlobal() ? this.globalRawDB : this.localAppData.rawDB;
+
+    const userIdef = (
+      this.isInstanceGlobal() ?
+        this.globalRoot.registry["users/user"] :
+        this.localAppData.root.registry["users/user"]
+    ) as ItemDefinition;
+    const hasEmail = userIdef.hasPropertyDefinitionFor("email", false);
+    const hasEvalidated = userIdef.hasPropertyDefinitionFor("e_validated", false);
+
+    if (!hasEmail || !hasEvalidated) {
+      return;
+    }
+
+    if (targetUserHandle === "unsubscribe") {
+      const unsubscribePropertyId = data.subject || "";
+      const hasUnsubscribeProperty = userIdef.hasPropertyDefinitionFor(unsubscribePropertyId, false);
+
+      if (!hasUnsubscribeProperty) {
+        return;
+      }
+
+      const unsubscribeProperty = userIdef.getPropertyDefinitionFor(unsubscribePropertyId, false);
+      if (unsubscribeProperty.getPropertyDefinitionDescription().json !== "boolean") {
+        return;
+      }
+
+      const users = await rawDB.performRawDBSelect(
+        userIdef,
+        (b) => {
+          b.select("id", unsubscribePropertyId).whereBuilder.andWhereColumn("email", data.from).andWhereColumn("e_validated", true);
+          b.limit(1);
+        }
+      );
+
+      const user = users[0];
+
+      if (!user || !user[unsubscribePropertyId]) {
+        return;
+      }
+
+      await rawDB.performRawDBUpdate(
+        userIdef,
+        user.id,
+        null,
+        {
+          itemTableUpdate: {
+            [unsubscribePropertyId]: false,
+          },
+        },
+      );
     } else if (this.storageIdef) {
-      // TODO find the user for that user handle
+      const hasEnotifications = userIdef.hasPropertyDefinitionFor("e_notifications", false);
+      let shouldNotify = !!data.notify;
+      const shouldCheckNotifyAt =
+        typeof data.notify !== "undefined" ?
+        null :
+        (data.notifyProperty || (hasEnotifications ? "e_notifications" : null));
+      
+      const users = await rawDB.performRawDBSelect(
+        userIdef,
+        (b) => {
+          if (shouldCheckNotifyAt) {
+            b.select(shouldCheckNotifyAt);
+          }
+          b.select("id").whereBuilder.andWhereColumn("username", targetUserHandle);
+          b.limit(1);
+        }
+      );
+
+      const user = users[0];
+      if (!user) {
+        return;
+      }
+
+      if (shouldCheckNotifyAt) {
+        shouldNotify = user[shouldCheckNotifyAt];
+      }
+
+
+
+      // TODO
       // attach a new message for it
     }
   }

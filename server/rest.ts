@@ -192,11 +192,27 @@ export default function restServices(appData: IAppDataType) {
       ip === "::ffff:127.0.0.1" ||
       !appData.userLocalizationService
     ) {
+      logger.info({
+        endpoint: "/util/country",
+        message: "using default API response because " +
+          (!appData.userLocalizationService ? "there's no localization service support" : "user is in localhost"),
+      });
+
       res.end(JSON.stringify(standardAPIResponse));
       return;
     }
 
     const serviceResponse = await appData.userLocalizationService.getLocalizationFor(ip, standardAPIResponse);
+
+    logger.info({
+      endpoint: "/util/country",
+      message: "Anonymous user has requested user localization information",
+      data: {
+        ip,
+        serviceResponse,
+      },
+    });
+
     res.end(JSON.stringify(serviceResponse));
   });
 

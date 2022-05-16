@@ -247,7 +247,7 @@ async function buildData(rawDataConfig: IBuilderBasicConfigType): Promise<IRootR
   };
 
   // check and run the checkers
-  checkRoot(resultJSON);
+  checkRoot(resultJSON, rawDataConfig.standard);
 
   // and let's emit such file tht only contains the language name
   console.log("emiting " + colors.green(path.join("dist", "data", "lang.json")));

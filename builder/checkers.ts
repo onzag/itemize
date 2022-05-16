@@ -41,6 +41,7 @@ import { PropertyDefinitionSearchInterfacesType } from "../base/Root/Module/Item
 import Module from "../base/Root/Module";
 import { ajvCheck, checkSpecialPropertyValueSetSchemaValidate } from "./schema-checks";
 import { languages } from "../imported-resources";
+import type { IConfigRawJSONDataType } from "../config";
 
 /**
  * Checks a conditional rule set so that it is valid and contains valid
@@ -1610,6 +1611,7 @@ export function checkUsersModule(
  */
 export function checkRoot(
   rawData: IRootRawJSONDataType,
+  config: IConfigRawJSONDataType,
 ) {
   // we build the traceback and setup the pointers
   const traceback = new Traceback(rawData.location);
@@ -1638,5 +1640,48 @@ export function checkRoot(
       rawData.children[usersModuleIndex],
       traceback.newTraceToBit("children").newTraceToBit(usersModuleIndex),
     );
+
+    if (config.mailStorage) {
+      let elementInQuestion: IRootRawJSONDataType | IModuleRawJSONDataType | IItemDefinitionRawJSONDataType = rawData;
+      let tracebackInQuestion = traceback;
+      const pathConsume = config.mailStorage.split("/").map((v) => v.trim()).filter((v) => !!v);
+      while (pathConsume.length) {
+        const elementToConsume = pathConsume.shift();
+        const elementInQuestionIndex: number = elementInQuestion.children.findIndex((v) => v.name === elementToConsume);
+        
+        if (elementInQuestionIndex === -1) {
+          throw new Error(
+            "Could not find mail storage location for " + config.mailStorage,
+          );
+        }
+        elementInQuestion = elementInQuestion.children[elementInQuestionIndex];
+        tracebackInQuestion = tracebackInQuestion.newTraceToBit("children").newTraceToBit(elementInQuestionIndex);
+        tracebackInQuestion.setupPointers(elementInQuestion.location, elementInQuestion.raw);
+      }
+
+      const item = elementInQuestion as any as IItemDefinitionRawJSONDataType;
+      if (item.type !== "item") {
+        throw new Error(
+          "Could not find an item at storage location for " + config.mailStorage,
+        );
+      }
+
+      checkMailItem(item, tracebackInQuestion);
+    }
   }
+}
+
+function checkMailItem(
+  rawData: IItemDefinitionRawJSONDataType,
+  traceback: Traceback,
+) {
+  // no need to setup pointers because they were already setup by the loop
+  if (!rawData.properties) {
+    throw new CheckUpError(
+      "Mail Item should include properties",
+      traceback,
+    );
+  }
+
+  // TODO
 }

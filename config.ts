@@ -105,6 +105,17 @@ export interface IConfigRawJSONDataType {
   productionHostname: string;
 
   /**
+   * The mail domain that is used when sending emails from
+   */
+  mailDomain: string;
+  /**
+   * The mail storage item definition path
+   * it must pass some criteria in order to be valid
+   * as emails get added there
+   */
+  mailStorage: string;
+
+  /**
    * Uploads info, maps countries to containers id
    * "*" asterisk represents a special match that will match all the non-matching
    * the value should be container id
@@ -238,16 +249,6 @@ export interface ISensitiveConfigRawJSONDataType {
    * The logging service information
    */
   logging: any;
-  /**
-   * The mail domain that is used when sending emails from
-   */
-  mailDomain: string;
-  /**
-   * The mail storage item definition path
-   * it must pass some criteria in order to be valid
-   * as emails get added there
-   */
-  mailStorage: string;
   /**
    * The containers, they should match the previously given
    * containers id
@@ -397,12 +398,6 @@ export const rawSensitiveConfigSchema = {
       type: ["object", "null"],
       additionalProperties: {},
     },
-    mailDomain: {
-      type: ["string", "null"],
-    },
-    mailStorage: {
-      type: ["string", "null"],
-    },
     jwtKey: {
       type: "string",
     },
@@ -459,8 +454,6 @@ export const rawSensitiveConfigSchema = {
     "phone",
     "ussd",
     "logging",
-    "mailDomain",
-    "mailStorage",
     "defaultContainerID",
     "seoContainerID",
     "jwtKey",
@@ -673,6 +666,12 @@ export const rawConfigSchema = {
     productionHostname: {
       type: "string",
     },
+    mailDomain: {
+      type: ["string", "null"],
+    },
+    mailStorage: {
+      type: ["string", "null"],
+    },
     containersRegionMappers: {
       type: "object",
       additionalProperties: {
@@ -711,6 +710,8 @@ export const rawConfigSchema = {
     "fallbackCurrency",
     "developmentHostname",
     "productionHostname",
+    "mailDomain",
+    "mailStorage",
     "containersRegionMappers",
     "containersHostnamePrefixes",
   ],

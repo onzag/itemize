@@ -34,7 +34,7 @@ export class MailgunService extends MailProvider<Mailgun.ConstructorParams> {
             {
               priority: 0,
               description: customID,
-              expression: `match_recipient(".*@${this.appSensitiveConfig.mailDomain}")`,
+              expression: `match_recipient(".*@${this.appConfig.mailDomain}")`,
               action: `store(notify=${JSON.stringify("https://" + hostname + "/rest/service/mailgun/callback")})`
             }, (error, body) => {
               if (error) {

@@ -131,6 +131,9 @@ properties.e_validated.description = Refers to whether the email is validated or
 properties.e_notifications.label = send email notifications
 properties.e_notifications.description = Do not miss content by recieving email notifications
 
+properties.e_external.label = external email
+properties.e_external.description = Activates an external email at {0}@{1}
+
 properties.e_newsletter.label = subscribe to newsletter
 properties.e_newsletter.description = Keep yourself updated with our amazing newsletter
 
@@ -297,6 +300,9 @@ properties.email.error.INVALID_SUBTYPE_VALUE = el correo electrónico es inváli
 
 properties.e_validated.label = el email ha sido confirmado
 properties.e_validated.description = indica si el correo electrónico ha sido confirmado por el usuario
+
+properties.e_external.label = email externo
+properties.e_external.description = Activa el correo electrónico {0}@{1}
 
 properties.e_notifications.label = notificaciones por correo electrónico
 properties.e_notifications.description = No se pierda de ningún contenido reciviendo notificaciones por correo
