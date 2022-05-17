@@ -1192,6 +1192,7 @@ export class ItemizeElasticClient {
         ],
         _source: false,
         allow_no_indices: true,
+        size: arrayOfIds.length,
       });
 
       const baseIndexPrefixLen = baseIndexPrefix.length;
@@ -1422,7 +1423,8 @@ export class ItemizeElasticClient {
             // invalid consistency and we must ensure consistency
             if (operations.errors) {
               operations.items.forEach((o) => {
-                const error = (o.create && o.create.error) ||
+                // avoid reporting version conflict engine exceptions as the values have been created
+                const error = (o.create && o.create.error && o.create.status !== 409 && o.create.error) ||
                   (o.update && o.update.error && o.update.error) ||
                   (o.delete && o.delete.error && o.delete.status !== 404 && o.delete.error);
 
