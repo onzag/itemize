@@ -15,8 +15,8 @@
             name="viewport"
             content="minimum-scale=1, initial-scale=1, width=device-width, shrink-to-fit=no"
         >
-        <link rel="stylesheet" defer href="/rest/resource/build.$MODE.css">
-        <link rel="stylesheet" defer href="/rest/resource/vendors~build.$MODE.css">
+        <link rel="stylesheet" defer href="/rest/resource/build.$MODE.css?buildnumber=%{BUILD_NUMBER}">
+        <link rel="stylesheet" defer href="/rest/resource/vendors~build.$MODE.css?buildnumber=%{BUILD_NUMBER}">
         <link rel="stylesheet" defer href="%{fontUrl}">
         <style>
             *, html, body, #root, #main, #app {
@@ -35,10 +35,10 @@
         <meta name="msapplication-config" content="/rest/resource/manifest/browserconfig.xml">
         <meta name="theme-color" content="%{manifest.themeColor}">
 
-        <script src="/rest/resource/polyfills.$MODE.js" defer></script>
-        <script src="/rest/resource/vendors~build.$MODE.js" defer></script>
-        <script src="/rest/resource/commons.$MODE.js" defer></script>
-        <script src="/rest/resource/build.$MODE.js" defer></script>
+        <script src="/rest/resource/polyfills.$MODE.js?buildnumber=%{BUILD_NUMBER}" defer></script>
+        <script src="/rest/resource/vendors~build.$MODE.js?buildnumber=%{BUILD_NUMBER}" defer></script>
+        <script src="/rest/resource/commons.$MODE.js?buildnumber=%{BUILD_NUMBER}" defer></script>
+        <script src="/rest/resource/build.$MODE.js?buildnumber=%{BUILD_NUMBER}" defer></script>
 
         <SSRHEAD>
     </head>

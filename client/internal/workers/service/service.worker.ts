@@ -7,30 +7,35 @@
 // any of that overall, we only need the regenerator runtime
 import "regenerator-runtime/runtime";
 import { IConfigRawJSONDataType } from "../../../../config";
+
 declare var CONFIG: string;
+declare var BUILDNUMBER: string;
 
 const isDevelopment = process.env.NODE_ENV === "development";
 // parsing and stringifying is more efficient
 const config: IConfigRawJSONDataType = JSON.parse(CONFIG);
+const buildnumber: string = (BUILDNUMBER).trim();
 
 const urlsToCache = [
   "/?noredirect=true",
   "/rest/currency-factors",
   "/rest/resource/lang.json",
   "/rest/resource/image-fail.svg",
-  isDevelopment ? "/rest/resource/build.development.js" : "/rest/resource/build.production.js",
-  isDevelopment ? "/rest/resource/commons.development.js" : "/rest/resource/commons.production.js",
-  isDevelopment ? "/rest/resource/vendors~build.development.js" : "/rest/resource/vendors~build.production.js",
-  isDevelopment ? "/rest/resource/build.development.css" : "/rest/resource/build.production.css",
-  isDevelopment ? "/rest/resource/vendors~build.development.css" : "/rest/resource/vendors~build.production.css",
+  isDevelopment ? "/rest/resource/build.development.js?buildnumber=" + buildnumber : "/rest/resource/build.production.js?buildnumber=" + buildnumber,
+  isDevelopment ? "/rest/resource/commons.development.js?buildnumber=" + buildnumber : "/rest/resource/commons.production.js?buildnumber=" + buildnumber,
+  isDevelopment ? "/rest/resource/vendors~build.development.js?buildnumber=" + buildnumber : "/rest/resource/vendors~build.production.js?buildnumber=" + buildnumber,
+  isDevelopment ? "/rest/resource/polyfills.development.js?buildnumber=" + buildnumber : "/rest/resource/polyfills.production.js?buildnumber=" + buildnumber,
+  isDevelopment ? "/rest/resource/build.development.css?buildnumber=" + buildnumber : "/rest/resource/build.production.css?buildnumber=" + buildnumber,
+  isDevelopment ? "/rest/resource/vendors~build.development.css?buildnumber=" + buildnumber : "/rest/resource/vendors~build.production.css?buildnumber=" + buildnumber,
   isDevelopment ? "/rest/resource/cache-worker.development.js" : "/rest/resource/cache-worker.production.js",
   isDevelopment ? "/rest/resource/cache-worker.injector.development.js" : "/rest/resource/cache-worker.injector.production.js",
   config.fontUrl,
 ];
-const CACHE_NAME = "ITEMIZEV1";
+let CACHE_NAME = "ITEMIZEV" + buildnumber;
 
 self.addEventListener("install", (event: any) => {
   console.log("SERVICE WORKER INSTALLING");
+  (self as any).skipWaiting();
   event.waitUntil(
     caches.open(CACHE_NAME)
       .then((cache) => {
@@ -94,6 +99,7 @@ self.addEventListener("fetch", (event: any) => {
     );
   // this basically means that we would be serving the response for / for the index response
   // rather than whatever the request was pointing too, that means we ignore the request
+  // note that this only has to do if the request fails
   const useNetworkFirstStrategyUseThisPathInstead =
     useNetworkFirstStrategy && urlAnalyzed.pathname.indexOf("/rest") !== 0 ? "/?noredirect=true" : null;
 
@@ -111,7 +117,8 @@ self.addEventListener("fetch", (event: any) => {
   const acceptHeader = event.request.headers.get("Accept");
   const expectsImage = acceptHeader && acceptHeader.indexOf("image") === 0;
   const isBuildNumberCheck = urlAnalyzed.pathname.indexOf("/rest/buildnumber") === 0;
-  const currentBuildNumber = isBuildNumberCheck ? urlAnalyzed.searchParams.get("current") : null;
+  const currentAppBuildNumber = isBuildNumberCheck ? urlAnalyzed.searchParams.get("current") : null;
+  const currentSwBuildNumber = buildnumber;
 
   // otherwise we are going to try to find matches
   // yes even from /rest we try to find matches
@@ -122,7 +129,7 @@ self.addEventListener("fetch", (event: any) => {
       try {
         // we don't even try to get the cache if it's one of our index paths, we will try
         // network first
-        const cachedResponse = useNetworkFirstStrategy ? null : await caches.match(event.request);
+        const cachedResponse = useNetworkFirstStrategy ? null : await (await caches.open(CACHE_NAME)).match(event.request);
         // if we get a match in our cache
         if (cachedResponse) {
           // if it should be rechecked
@@ -151,20 +158,47 @@ self.addEventListener("fetch", (event: any) => {
           // we clone the response stream
           const clonedResponse = netWorkResponse.clone();
           // let's parse the result
-          const serverProvidedBuildNumber = await clonedResponse.text();
+          const serverProvidedBuildNumber = (await clonedResponse.text()).trim();
           // if build numbers do not match
-          if (serverProvidedBuildNumber !== currentBuildNumber) {
+          if (
+            // the server build number does not match the app
+            serverProvidedBuildNumber !== currentAppBuildNumber ||
+            // the server build number doesn't match the service worker
+            serverProvidedBuildNumber !== currentSwBuildNumber ||
+            // the app build number doesn't match the service worker
+            currentAppBuildNumber !== currentSwBuildNumber
+
+            // in reality the app build number should always match the server provided
+            // so it will be the second that hits, the only situation this will not occur
+            // is if there was no network in which case we don't really have a 200 status
+            // as our fetch will simply crash
+          ) {
             console.log(
-              "Service worker wiping cache due to buildnumber mismatch",
+              "Service worker wiping itself due to buildnumber mismatch",
               serverProvidedBuildNumber,
-              currentBuildNumber,
+              currentAppBuildNumber,
+              currentSwBuildNumber,
             );
             await caches.delete(CACHE_NAME);
 
-            const recreatedCache = await caches.open(CACHE_NAME);
-            // we do not wait, if this fails that rare case
-            // where index fails to cache will save us
-            await recreatedCache.addAll(urlsToCache);
+            // We will update the cache name in case anything else is added to it
+            // and the user keeps using this and not updating the application as requested
+            CACHE_NAME = "ITEMIZEV" + serverProvidedBuildNumber;
+
+            // this is due to an error in the past, now that a request to the page uses the network
+            // first strategy it will always receive an updated buildnumber and when the client requests
+            // a buildnumber update it will always be up to date
+            // now the service worker is different with each buildnumber
+            // and it can know if it has cached things for an older cache as caches
+            // are also used numerically, once the client knows the service worker
+            // has changed it is able to reload
+            return new Response(
+              null,
+              {
+                status: 205,
+                statusText: "Reset Content",
+              },
+            );
           }
 
           // now for the network first logic
@@ -175,7 +209,7 @@ self.addEventListener("fetch", (event: any) => {
           console.log("network not available, using cached for network first request");
           let requestToUse: Request = useNetworkFirstStrategyUseThisPathInstead ?
             new Request(useNetworkFirstStrategyUseThisPathInstead) : event.request;
-          const cached = await caches.match(requestToUse);
+          const cached = await (await caches.open(CACHE_NAME)).match(requestToUse);
           if (cached) {
             console.log("Service worker cache hit for network first request ", event.request.url);
             return cached;
@@ -233,6 +267,7 @@ self.addEventListener("fetch", (event: any) => {
             // Nothing happens
           }
         }
+
         return new Response(null, {
           status: 503,
           statusText: "Service Unavailable",

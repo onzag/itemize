@@ -17,6 +17,7 @@ const isDevelopment = process.env.NODE_ENV === "development";
 const mode = isDevelopment ? "development" : "production";
 
 const config = fs.readFileSync("./config/index.json", "utf-8");
+const buildnumber = fs.readFileSync("./dist/buildnumber", "utf-8");
 
 const plugins = [
   // minifying CSS
@@ -32,6 +33,7 @@ const plugins = [
   // define the variable config for injecting the configuration
   new webpack.DefinePlugin({
     CONFIG: JSON.stringify(config),
+    BUILDNUMBER: JSON.stringify(buildnumber),
   }),
   
   // define itemize config to be injected

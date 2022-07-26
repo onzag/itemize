@@ -428,30 +428,86 @@ export async function initializeItemizeApp(
     // to import the locale moment data, we need to expose it to the global
     (window as any).moment = Moment;
 
-    let isExpectedToRender = true;
+    let isExpectedToReload = true;
     try {
       const response = await fetch("/rest/buildnumber?current=" + window.BUILD_NUMBER);
-      if (response.status === 200) {
-        const actualBuildNumber: string = await response.text();
-        if (actualBuildNumber !== window.BUILD_NUMBER) {
+      if (response.status === 200 || response.status === 205) {
+        // 205 responses don't have body and anyway we don't need to know
+        const actualBuildNumber: string = response.status === 205 ? null : (await response.text()).trim();
+        // either the build number from the server doesn't match the app, which
+        // shouldn't really happen because we use network first for this index
+        // or we have been given a 205 status which means we shall reload
+        // because the caches have been wiped
+        if (response.status === 205 || actualBuildNumber !== window.BUILD_NUMBER) {
           // refer to the setupVersion function in the cache for realization how
           // the object store in indexed db updates, since indexed db databases
           // are versioned, we don't need to worry
-          isExpectedToRender = false;
+          isExpectedToReload = false;
           // while for most of the cases this reload is unceccesary there is a reason
           // it's safer, if the index.html file has changed (say due to google analytics)
           // changes and whatnot, it also trigger that, the build number is coded in the
           // index as well, etc... so safer it is to reload, the cache should be cleaned
           // by the service worker after a mismatch so the next load should be clean
-          (location as any).reload(true);
-          // reload true is deprecated but we want it forced anyway
         }
       }
     } catch (err) {
 
     }
 
-    if (!isExpectedToRender) {
+    if (!isExpectedToReload) {
+      const loadingCss = `
+      .loader {
+        position: fixed;
+        left: 50%;
+        top: 50%;
+        z-index: 1;
+        width: 120px;
+        height: 120px;
+        margin: -76px 0 0 -76px;
+        border: 16px solid #f3f3f3;
+        border-radius: 50%;
+        border-top: 16px solid #3498db;
+        -webkit-animation: spin 2s linear infinite;
+        animation: spin 2s linear infinite;
+      }
+      
+      @-webkit-keyframes spin {
+        0% { -webkit-transform: rotate(0deg); }
+        100% { -webkit-transform: rotate(360deg); }
+      }
+      
+      @keyframes spin {
+        0% { transform: rotate(0deg); }
+        100% { transform: rotate(360deg); }
+      }
+      `;
+
+      const injectedStyle = document.createElement("style");
+      injectedStyle.type = "text/css";
+
+      if ((injectedStyle as any).styleSheet){
+        (injectedStyle as any).styleSheet.cssText = loadingCss;
+      } else {
+        injectedStyle.appendChild(document.createTextNode(loadingCss));
+      }
+
+      document.head.appendChild(injectedStyle);
+
+      const rotatingElement = document.createElement("div");
+      rotatingElement.className = "loader";
+
+      document.body.appendChild(rotatingElement);
+
+      window.navigator.serviceWorker.oncontrollerchange = ((self: any, ev: any) => {
+        (location as any).reload(true);
+      }) as any;
+
+      // just in case
+      setTimeout(() => {
+        (location as any).reload(true);
+      }, 20000);
+
+      // reload true is deprecated but we want it forced anyway
       return;
     }
   }

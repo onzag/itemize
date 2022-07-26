@@ -303,7 +303,7 @@ export class Collector {
             type: "resource",
           };
         } else {
-          const fullPath = path.join(path.resolve(path.join("dist", "data")), finalPath);
+          const fullPath = path.join(path.resolve(path.join("dist", "data")), finalPathNonRes);
           const data = await fsAsync.readFile(fullPath, "utf-8");
 
           result = {
