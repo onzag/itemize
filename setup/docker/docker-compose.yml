@@ -7,14 +7,18 @@ services:
             - ./config:/home/node/app/config
             - ./logs:/home/node/app/logs
             - ./uploads:/home/node/app/uploads
+            - ./patch/dist:/home/node/app/dist
+            - ./patch/nodejs:/home/node/app/node_modules/@onzag/itemize/nodejs
         depends_on:
             - redis
+            - elastic
         environment:
             - INSTANCE_GROUP_ID=${INSTANCE_GROUP_ID}
             - INSTANCE_MODE=CLUSTER_MANAGER
             - NODE_ENV=%{NODE_ENV}
             - LOG_LEVEL=info
             - USING_DOCKER=true
+            - FORCE_CONSOLE_LOGS=false
     global-manager:
         image: app:latest
         restart: always
@@ -22,9 +26,12 @@ services:
             - ./config:/home/node/app/config
             - ./logs:/home/node/app/logs
             - ./uploads:/home/node/app/uploads
+            - ./patch/dist:/home/node/app/dist
+            - ./patch/nodejs:/home/node/app/node_modules/@onzag/itemize/nodejs
         depends_on:
             - redis
             - pgsql
+            - elastic
         environment:
             - INSTANCE_GROUP_ID=${INSTANCE_GROUP_ID}
             - INSTANCE_MODE=GLOBAL_MANAGER
@@ -33,6 +40,7 @@ services:
             - USING_DOCKER=true
             - NO_SEO=false
             - PING_GOOGLE=false
+            - FORCE_CONSOLE_LOGS=false
     servers:
         image: app:latest
         restart: always
@@ -41,12 +49,15 @@ services:
             - pgsql
             - global-manager
             - cluster-manager
+            - elastic
         ports:
             - "8000"
         volumes:
             - ./config:/home/node/app/config
             - ./logs:/home/node/app/logs
             - ./uploads:/home/node/app/uploads
+            - ./patch/dist:/home/node/app/dist
+            - ./patch/nodejs:/home/node/app/node_modules/@onzag/itemize/nodejs
         environment: 
             - INSTANCE_GROUP_ID=${INSTANCE_GROUP_ID}
             - INSTANCE_MODE=EXTENDED
@@ -58,6 +69,7 @@ services:
             - FAKE_EMAILS=false
             - FAKE_SMS=false
             - FAKE_USSD=false
+            - FORCE_CONSOLE_LOGS=false
     redis:
         image: redis:latest
         restart: always

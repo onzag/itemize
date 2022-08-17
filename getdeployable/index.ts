@@ -11,7 +11,7 @@ import colors from "colors/safe";
 import { IDBConfigRawJSONDataType, IRedisConfigRawJSONDataType } from "../config";
 import YAML from 'yaml';
 import { request } from "../setup/read";
-import { execSudo } from "../setup/exec";
+import { execSudo, execAsync } from "../setup/exec";
 
 const fsAsync = fs.promises;
 
@@ -53,23 +53,22 @@ export default async function build(version: string, buildID: string, services: 
   }
   // and we make all these directories
   await fsAsync.mkdir(path.join("deployments", buildID));
-  await fsAsync.mkdir(path.join("deployments", buildID, "config"));
 
   // Retrieve the config for the database
   const dbConfigToUse = version === "development" ? "db.sensitive.json" : `db.${version}.sensitive.json`;
   const sensitiveConfigToUse = version === "development" ? "index.sensitive.json" : `index.${version}.sensitive.json`;
-  const dbConfig: IDBConfigRawJSONDataType = JSON.parse(await fsAsync.readFile(
+  const dbConfig: IDBConfigRawJSONDataType = version === "patch" ? null : JSON.parse(await fsAsync.readFile(
     path.join("config", dbConfigToUse),
     "utf8",
   ));
   const redisConfigToUse = version === "development" ? "redis.sensitive.json" : `redis.${version}.sensitive.json`;
-  const redisConfig: IRedisConfigRawJSONDataType = JSON.parse(await fsAsync.readFile(
+  const redisConfig: IRedisConfigRawJSONDataType = version === "patch" ? null : JSON.parse(await fsAsync.readFile(
     path.join("config", redisConfigToUse),
     "utf8",
   ));
 
   // and now we take our yml docker compose file
-  let fullYMLTemplate = await fsAsync.readFile(
+  let fullYMLTemplate = version === "patch" ? null : await fsAsync.readFile(
     "docker-compose.yml",
     "utf-8",
   );
@@ -93,14 +92,23 @@ export default async function build(version: string, buildID: string, services: 
 
   // now the actual services we are adding
   let actualServices: string[] = [];
-  if (services === "full") {
+  let isPatch = false;
+  if (services === "full" || !services) {
     actualServices = ["cluster-manager", "servers", "redis", "nginx", "global-manager", "pgsql", "elastic", "kibana"];
   } else if (services === "standard") {
     actualServices = ["cluster-manager", "servers", "redis", "nginx"];
   } else if (services === "slim") {
     actualServices = ["cluster-manager", "servers", "nginx"];
+  } else if (version === "patch") {
+    isPatch = true;
   } else {
     actualServices = services.split(",");
+  }
+
+  if (isPatch) {
+    message += "This build is a patch, patches can be unpredictable and are used to quickly wed out bugs and client side issues\n" +
+     "the patch can only patch server specific code, client side behaviour, and itemize itself, but it cannot resolve for new libraries\n" +
+     "patches should be not used very often, in order to patch, just replace the patch folder with this content and restart";
   }
 
   if (actualServices.includes("cluster-manager") || actualServices.includes("servers")) {
@@ -159,9 +167,11 @@ export default async function build(version: string, buildID: string, services: 
   });
 
   // now we can build the compose file
-  const yamlPath = path.join("deployments", buildID, "docker-compose.yml");
-  console.log("emiting " + colors.green(yamlPath));
-  await fsAsync.writeFile(yamlPath, YAML.stringify(parsed));
+  if (!isPatch) {
+    const yamlPath = path.join("deployments", buildID, "docker-compose.yml");
+    console.log("emiting " + colors.green(yamlPath));
+    await fsAsync.writeFile(yamlPath, YAML.stringify(parsed));  
+  }
 
   // these only need to be added if we have a server of sorts
   if (
@@ -169,6 +179,9 @@ export default async function build(version: string, buildID: string, services: 
     actualServices.includes("cluster-manager") ||
     actualServices.includes("global-manager")
   ) {
+    // creating the config directory
+    await fsAsync.mkdir(path.join("deployments", buildID, "config"));
+
     // the config file
     console.log("emiting " + colors.green(path.join("deployments", buildID, "config", "index.json")));
     await fsAsync.copyFile(path.join("config", "index.json"), path.join("deployments", buildID, "config", "index.json"));
@@ -203,14 +216,16 @@ export default async function build(version: string, buildID: string, services: 
   }
 
   // and the deployements start.sh file
-  console.log("emiting " + colors.green(path.join("deployments", buildID, "start.sh")));
-  await fsAsync.copyFile("start.sh", path.join("deployments", buildID, "start.sh"));
-
-  console.log("emiting " + colors.green(path.join("deployments", buildID, "stop.sh")));
-  await fsAsync.copyFile("stop.sh", path.join("deployments", buildID, "stop.sh"));
-
-  console.log("emiting " + colors.green(path.join("deployments", buildID, "run.sh")));
-  await fsAsync.copyFile("run.sh", path.join("deployments", buildID, "run.sh"));
+  if (!isPatch) {
+    console.log("emiting " + colors.green(path.join("deployments", buildID, "start.sh")));
+    await fsAsync.copyFile("start.sh", path.join("deployments", buildID, "start.sh"));
+  
+    console.log("emiting " + colors.green(path.join("deployments", buildID, "stop.sh")));
+    await fsAsync.copyFile("stop.sh", path.join("deployments", buildID, "stop.sh"));
+  
+    console.log("emiting " + colors.green(path.join("deployments", buildID, "run.sh")));
+    await fsAsync.copyFile("run.sh", path.join("deployments", buildID, "run.sh"));
+  }
 
   // finally our nginx file
   if (actualServices.includes("nginx")) {
@@ -271,6 +286,11 @@ export default async function build(version: string, buildID: string, services: 
       npmToken = (await fsAsync.readFile(".npm-token", "utf-8")).trim();
     }
 
+    // add the patch folder for fast patching
+    // the fast patching folder allows to patch the running application
+    // without having to do a re-deployment, very dangerous, but allowed
+    await fsAsync.mkdir(path.join("deployments", buildID, "patch"));
+
     // and now we need to execute the following docker commands
     const absPath = path.resolve(".");
     console.log(colors.yellow("PLEASE WAIT THIS MIGHT TAKE UP TO 5 MINUTES..."));
@@ -286,6 +306,50 @@ export default async function build(version: string, buildID: string, services: 
     await execSudo(
       `chmod 777 ${saveAbsPath}`,
       "Itemize Docker App Builder",
+    );
+
+    const patchAbsPath = path.resolve(`./deployments/${buildID}/patch`);
+    try {
+      await execSudo(
+        "docker create --name appdummy app",
+        "Itemize Docker create dummy app in order to build patch"
+      );
+      await execSudo(
+        `docker cp appdummy:/home/node/app/dist ${path.join(patchAbsPath, "dist")}`,
+        "Itemize Docker create app dist patch"
+      );
+      await execSudo(
+        `docker cp appdummy:/home/node/app/node_modules/@onzag/itemize/nodejs ${path.join(patchAbsPath, "nodejs")}`,
+        "Itemize Docker create app itemize server patch"
+      );
+      await execSudo(
+        "docker rm -f appdummy",
+        "Itemize Docker remove dummy app"
+      );
+    } catch {
+      await execSudo(
+        "docker rm -f appdummy",
+        "Itemize Docker remove dummy app cleanup"
+      );
+    }
+  }
+
+  // create a patch only
+  if (isPatch) {
+    await fsAsync.mkdir(path.join("deployments", buildID, "patch"));
+    const patchAbsPath = path.resolve(`./deployments/${buildID}/patch`);
+
+    await execAsync(
+      "npm run build"
+    );
+    await execAsync(
+      "npm run install"
+    );
+    await execAsync(
+      `cp -r ./dist ${patchAbsPath}`
+    );
+    await execAsync(
+      `cp -r ./node_modules/@onzag/itemize/nodejs ${patchAbsPath}`
     );
   }
 
