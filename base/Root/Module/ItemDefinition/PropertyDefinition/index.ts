@@ -2096,9 +2096,7 @@ export default class PropertyDefinition {
    * @returns a boolean
    */
   public isRangedSearchDisabled() {
-    return this.rawData.disableRangedSearch ||
-      (this.rawData.type === "integer" && this.rawData.subtype === "reference") ||
-      false;
+    return this.rawData.disableRangedSearch || false;
   }
 
   /**
@@ -2167,6 +2165,10 @@ export default class PropertyDefinition {
    */
   public isRichText() {
     return this.rawData.type === "text" && this.rawData.subtype === "html";
+  }
+
+  public isTracked() {
+    return this.rawData.type === "string" && this.rawData.subtype && this.rawData.subtype.endsWith("-tracked");
   }
 
   /**

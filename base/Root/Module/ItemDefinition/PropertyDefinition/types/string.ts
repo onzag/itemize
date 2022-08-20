@@ -69,7 +69,10 @@ export const exactStringSearchSubtypes = [
   "role",
   "exact-identifier",
   "exact-value",
+  "exact-value-tracked",
+  "exact-identifier-tracked",
   "reference",
+  "reference-tracked",
   // TODO check that JSON works well
   // it's an unchecked subtype
   "json",
@@ -161,16 +164,8 @@ const typeValue: IPropertyDefinitionSupportedType<PropertyDefinitionSupportedStr
     "email",
     "phone",
     "identifier",
-    "exact-identifier",
     "locale",
-    "comprehensive-locale",
-    "language",
-    "country",
-    "currency",
-    "role",
-    "exact-value",
-    "reference",
-  ],
+  ].concat(exactStringSearchSubtypes),
 
   validate: (s: PropertyDefinitionSupportedStringType, p: IPropertyDefinitionRawJSONDataType) => {
     if (typeof s !== "string") {
@@ -181,7 +176,7 @@ const typeValue: IPropertyDefinitionSupportedType<PropertyDefinitionSupportedStr
 
     const subtype = p.subtype;
 
-    if (subtype === "reference" && s === "") {
+    if ((subtype === "reference" || subtype === "reference-tracked") && s === "") {
       return PropertyInvalidReason.INVALID_SUBTYPE_VALUE;
     }
 
@@ -242,22 +237,22 @@ const typeValue: IPropertyDefinitionSupportedType<PropertyDefinitionSupportedStr
     {
       name: "referencedModule",
       type: "string",
-      required: ["reference"],
+      required: ["reference", "reference-tracked"],
     },
     {
       name: "referencedItemDefinition",
       type: "string",
-      required: ["reference"],
+      required: ["reference", "reference-tracked"],
     },
     {
       name: "referencedSearchProperty",
       type: "string",
-      required: ["reference"],
+      required: ["reference", "reference-tracked"],
     },
     {
       name: "referencedDisplayProperty",
       type: "string",
-      required: ["reference"],
+      required: ["reference", "reference-tracked"],
     },
     {
       name: "referencedFilteringPropertySet",

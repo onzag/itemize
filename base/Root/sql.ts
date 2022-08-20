@@ -9,8 +9,7 @@ import { getElasticSchemaForModule, getSQLTablesSchemaForModule } from "./Module
 import Root from ".";
 import {
   CREATED_BY_INDEX, CURRENCY_FACTORS_IDENTIFIER,
-  DELETED_REGISTRY_IDENTIFIER, PARENT_INDEX, REGISTRY_IDENTIFIER,
-  LOGS_IDENTIFIER
+  DELETED_REGISTRY_IDENTIFIER, PARENT_INDEX, REGISTRY_IDENTIFIER, TRACKERS_INDEX,
 } from "../../constants";
 
 export interface ISQLTableIndexType {
@@ -212,6 +211,14 @@ export function getSQLTablesSchemaForRoot(root: Root): ISQLSchemaDefinitionType 
       },
       transaction_time: {
         type: "TIMESTAMPTZ",
+      },
+      trackers: {
+        type: "JSONB",
+        index: {
+          id: TRACKERS_INDEX,
+          level: 0,
+          type: "hash",
+        },
       },
     },
     [REGISTRY_IDENTIFIER]: {

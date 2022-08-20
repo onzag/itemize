@@ -23,5 +23,11 @@ export function convertVersionsIntoNullsWhenNecessary(value: ISQLTableRowValue) 
   if (typeof value.parent_version !== "undefined" && !value.parent_version) {
     value.parent_version = null;
   }
+  if (typeof value.OLD_parent_version !== "undefined" && !value.OLD_parent_version) {
+    value.OLD_parent_version = null;
+  }
+  if (typeof value.OLD_version !== "undefined" && !value.OLD_version) {
+    value.OLD_version = null;
+  }
   return value;
 }

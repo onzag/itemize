@@ -492,6 +492,14 @@ const handlerRegistry:
         // values
         includeTokenDataAndSSR: true,
       },
+      ["reference-tracked"]: {
+        renderer: "PropertyEntryReference",
+        handler: PropertyEntryReference,
+        // references need the token and SSR in order
+        // to fetch values and assign itself
+        // values
+        includeTokenDataAndSSR: true,
+      }
     },
   },
   integer: {

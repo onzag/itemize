@@ -16,7 +16,7 @@ import {
   IOwnedSearchRegisterRequest,
   IParentedSearchRegisterRequest,
   IFeedbackRequest,
-  CHANGED_FEEEDBACK_EVENT,
+  CHANGED_FEEDBACK_EVENT,
   BUILDNUMBER_EVENT,
   OWNED_SEARCH_RECORDS_EVENT,
   PARENTED_SEARCH_RECORDS_EVENT,
@@ -52,6 +52,14 @@ import {
   OWNED_PARENTED_SEARCH_FEEDBACK_REQUEST,
   OWNED_PARENTED_SEARCH_RECORDS_EVENT,
   IOwnedParentedSearchRecordsEvent,
+  IPropertySearchRecordsEvent,
+  IPropertySearchRegisterRequest,
+  PROPERTY_SEARCH_REGISTER_REQUEST,
+  IPropertySearchUnregisterRequest,
+  PROPERTY_SEARCH_UNREGISTER_REQUEST,
+  IPropertySearchFeedbackRequest,
+  PROPERTY_SEARCH_FEEDBACK_REQUEST,
+  PROPERTY_SEARCH_RECORDS_EVENT,
 } from "../../../base/remote-protocol";
 import ItemDefinition from "../../../base/Root/Module/ItemDefinition";
 import type { IGQLSearchRecord } from "../../../gql-querier";
@@ -64,6 +72,8 @@ export interface IRemoteListenerRecordsCallbackArg {
   newRecords: IGQLSearchRecord[];
   modifiedRecords: IGQLSearchRecord[];
   lostRecords: IGQLSearchRecord[];
+  createdRecords: IGQLSearchRecord[];
+  deletedRecords: IGQLSearchRecord[];
 }
 
 type RemoteListenerRecordsCallback = (arg: IRemoteListenerRecordsCallbackArg) => void;
@@ -140,6 +150,38 @@ export class RemoteListener {
   };
 
   /**
+   * Registry of listeners that are listening
+   * for changes to an property based search cache
+   */
+  private propertySearchListeners: {
+    /**
+     * Similar with the qualified path name of either a item definition
+     * or a module with the owner id attached to it as an identifier
+     */
+    [qualifiedPathNameWithPropertyInfo: string]: {
+      /**
+       * The request that is used for this
+       */
+      request: IPropertySearchRegisterRequest;
+      /**
+       * The last known record date a record was updated (this is the last
+       * created_at of the last record of an owned search)
+       */
+      lastModified: string;
+      /**
+       * Similarly the callbacks that are called when the search updates
+       * unlike the instances part, these are direct callbacks that act
+       * as direct listeners
+       */
+      callbacks: RemoteListenerRecordsCallback[];
+      /**
+       * Whether to use the long term caching
+       */
+      useCacheWorker: boolean[];
+    },
+  };
+
+  /**
    * Registry of listeners that are listening for
    * changes to a parent based search that updates
    */
@@ -172,7 +214,7 @@ export class RemoteListener {
    * Registry of listeners that are listening for
    * changes to a owned+parent based search that updates
    */
-   private ownedParentedSearchListeners: {
+  private ownedParentedSearchListeners: {
     /**
      * Similar to the owned one but contains all the
      * parenting information of what we are listening to
@@ -267,6 +309,7 @@ export class RemoteListener {
     this.onDisconnect = this.onDisconnect.bind(this);
     this.onOwnedSearchRecordsEvent = this.onOwnedSearchRecordsEvent.bind(this);
     this.onParentedSearchRecordsEvent = this.onParentedSearchRecordsEvent.bind(this);
+    this.onPropertySearchRecordsEvent = this.onPropertySearchRecordsEvent.bind(this);
     this.onOwnedParentedSearchRecordsEvent = this.onOwnedParentedSearchRecordsEvent.bind(this);
     this.onKicked = this.onKicked.bind(this);
     this.setCurrencyFactorsHandler = this.setCurrencyFactorsHandler.bind(this);
@@ -280,6 +323,7 @@ export class RemoteListener {
     this.ownedSearchListeners = {};
     this.parentedSearchListeners = {};
     this.ownedParentedSearchListeners = {};
+    this.propertySearchListeners = {};
     this.connectionListeners = [];
     this.appUpdatedListeners = [];
     this.lastRecievedBuildNumber = window.BUILD_NUMBER;
@@ -290,10 +334,11 @@ export class RemoteListener {
     this.socket.on("connect", this.onConnect);
     this.socket.on("disconnect", this.onDisconnect);
     this.socket.on(KICKED_EVENT, this.onKicked);
-    this.socket.on(CHANGED_FEEEDBACK_EVENT, this.onChangeListened);
+    this.socket.on(CHANGED_FEEDBACK_EVENT, this.onChangeListened);
     this.socket.on(BUILDNUMBER_EVENT, this.onBuildnumberListened);
     this.socket.on(OWNED_SEARCH_RECORDS_EVENT, this.onOwnedSearchRecordsEvent);
     this.socket.on(PARENTED_SEARCH_RECORDS_EVENT, this.onParentedSearchRecordsEvent);
+    this.socket.on(PROPERTY_SEARCH_RECORDS_EVENT, this.onPropertySearchRecordsEvent);
     this.socket.on(OWNED_PARENTED_SEARCH_RECORDS_EVENT, this.onOwnedParentedSearchRecordsEvent);
     this.socket.on(ERROR_EVENT, this.onError);
     this.socket.on(CURRENCY_FACTORS_UPDATED_EVENT, this.triggerCurrencyFactorsHandler);
@@ -693,6 +738,52 @@ export class RemoteListener {
     this.delayedFeedbacks = [];
   }
 
+  public addPropertySearchListenerFor(
+    itemDefinitionOrModuleQualifiedPathName: string,
+    propertyId: string,
+    propertyValue: string,
+    lastModified: string,
+    callback: RemoteListenerRecordsCallback,
+    useCacheWorker: boolean,
+  ) {
+    // so we build our qualified identifier as well
+    const qualifiedIdentifier = itemDefinitionOrModuleQualifiedPathName + "." + propertyId + "." + propertyValue;
+    // if we have any in our owned search listener list
+    if (this.propertySearchListeners[qualifiedIdentifier]) {
+      const index = this.propertySearchListeners[qualifiedIdentifier].callbacks.indexOf(callback)
+      // and if this callback is not included yet
+      // this can actually hit here very often since every time that a search gets called
+      // in gql and it has a cache policy, it will attempt to add a listener
+      // and the same listener might have already been added before
+      if (index === -1) {
+        // so we push the callback
+        this.propertySearchListeners[qualifiedIdentifier].callbacks.push(callback);
+        this.propertySearchListeners[qualifiedIdentifier].useCacheWorker.push(useCacheWorker);
+      } else {
+        this.propertySearchListeners[qualifiedIdentifier].useCacheWorker[index] = useCacheWorker;
+      }
+      return;
+    }
+
+    this.listenerCount++;
+
+    // we now build the request
+    const request: IPropertySearchRegisterRequest = {
+      qualifiedPathName: itemDefinitionOrModuleQualifiedPathName,
+      propertyId,
+      propertyValue,
+    };
+    this.propertySearchListeners[qualifiedIdentifier] = {
+      request,
+      callbacks: [callback],
+      lastModified,
+      useCacheWorker: [useCacheWorker],
+    };
+
+    // and attach the owner listener if possible
+    this.attachPropertySearchListener(request);
+  }
+
   /**
    * Adds a listener for an owned search
    * @param itemDefinitionOrModuleQualifiedPathName the item definition or module we are listening for search changes
@@ -765,6 +856,23 @@ export class RemoteListener {
     }
   }
 
+  public async attachPropertySearchListener(request: IPropertySearchRegisterRequest) {
+    if (this.socket.connected) {
+      await this.onIdentificationDone();
+      // check if still connected after a possible await
+      if (this.socket.connected) {
+        this.pushTestingInfo(
+          "propertySearchRegisterRequests",
+          request,
+        );
+        this.socket.emit(
+          PROPERTY_SEARCH_REGISTER_REQUEST,
+          request,
+        );
+      }
+    }
+  }
+
   /**
    * Removes an owned search listener
    * @param callback the callback that we are removing for
@@ -818,6 +926,61 @@ export class RemoteListener {
   }
 
   /**
+   * Removes an property search listener
+   * @param callback the callback that we are removing for
+   * @param itemDefinitionOrModuleQualifiedPathName the item definition or module path name
+   * @param propertyId the property namespace
+   * @param propertyValue the property value namespace
+   */
+  public removePropertySearchListenerFor(
+    callback: RemoteListenerRecordsCallback,
+    itemDefinitionOrModuleQualifiedPathName: string,
+    propertyId: string,
+    propertyValue: string,
+  ) {
+    // first we build the qualified identifier
+    const qualifiedIdentifier = itemDefinitionOrModuleQualifiedPathName + "." + propertyId + "." + propertyValue;
+    // and then check what we got for the listener value
+    const listenerValue = this.propertySearchListeners[qualifiedIdentifier];
+    // if we have one
+    if (listenerValue) {
+      const index = listenerValue.callbacks.findIndex((i) => i === callback);
+
+      if (index === -1) {
+        return;
+      }
+
+      // we remove such callback from the list
+      listenerValue.callbacks.splice(index, 1);
+      listenerValue.useCacheWorker.splice(index, 1);
+
+      // if we got no callbacks remaining
+      if (listenerValue.callbacks.length === 0) {
+        // then we can delete the listener
+        delete this.propertySearchListeners[qualifiedIdentifier];
+        this.listenerCount--;
+        // and if we are connected
+        if (this.socket.connected) {
+          // we can perform the unregister request
+          const request: IPropertySearchUnregisterRequest = {
+            qualifiedPathName: itemDefinitionOrModuleQualifiedPathName,
+            propertyId,
+            propertyValue,
+          };
+          this.pushTestingInfo(
+            "propertySearchUnregisterRequests",
+            request,
+          );
+          this.socket.emit(
+            PROPERTY_SEARCH_UNREGISTER_REQUEST,
+            request,
+          );
+        }
+      }
+    }
+  }
+
+  /**
    * Requests feedback for an owned search, if possible
    * @param request the feedback request
    */
@@ -833,6 +996,28 @@ export class RemoteListener {
         );
         this.socket.emit(
           OWNED_SEARCH_FEEDBACK_REQUEST,
+          request,
+        );
+      }
+    }
+  }
+
+  /**
+   * Requests feedback for an property based search, if possible
+   * @param request the feedback request
+   */
+  public async requestPropertySearchFeedbackFor(request: IPropertySearchFeedbackRequest) {
+    if (this.socket.connected) {
+      await this.onIdentificationDone();
+
+      // check if still connected after a possible await
+      if (this.socket.connected) {
+        this.pushTestingInfo(
+          "propertySearchFeedbackRequests",
+          request,
+        );
+        this.socket.emit(
+          PROPERTY_SEARCH_FEEDBACK_REQUEST,
           request,
         );
       }
@@ -907,7 +1092,7 @@ export class RemoteListener {
    * @param lastModified the last known record date this listener knows of its stored values
    * @param callback the callback to trigger for
    */
-   public addOwnedParentedSearchListenerFor(
+  public addOwnedParentedSearchListenerFor(
     itemDefinitionOrModuleQualifiedPathName: string,
     createdBy: string,
     parentType: string,
@@ -986,7 +1171,7 @@ export class RemoteListener {
    * as in the app is online
    * @param request the request to attach
    */
-   public async attachOwnedParentedSearchListenerFor(request: IParentedSearchRegisterRequest) {
+  public async attachOwnedParentedSearchListenerFor(request: IParentedSearchRegisterRequest) {
     if (this.socket.connected) {
       await this.onIdentificationDone();
 
@@ -1074,7 +1259,7 @@ export class RemoteListener {
    * @param parentId parent id
    * @param parentVersion parent version (or null)
    */
-   public removeOwnedParentedSearchListenerFor(
+  public removeOwnedParentedSearchListenerFor(
     callback: RemoteListenerRecordsCallback,
     itemDefinitionOrModuleQualifiedPathName: string,
     createdBy: string,
@@ -1153,7 +1338,7 @@ export class RemoteListener {
    * Requests feedback for a parented seach, if possible
    * @param request the request to trigger
    */
-   public async requestOwnedParentedSearchFeedbackFor(request: IOwnedParentedSearchFeedbackRequest) {
+  public async requestOwnedParentedSearchFeedbackFor(request: IOwnedParentedSearchFeedbackRequest) {
     if (this.socket.connected) {
       await this.onIdentificationDone();
 
@@ -1282,7 +1467,7 @@ export class RemoteListener {
     event: IOwnedSearchRecordsEvent,
   ) {
     this.pushTestingInfo(
-      "ownedSearchRecordsAddedEvents",
+      "ownedSearchRecordsEvent",
       event,
     );
 
@@ -1312,11 +1497,15 @@ export class RemoteListener {
           null,
           null,
           null,
+          null,
+          null,
           event.newRecords,
+          event.createdRecords,
           event.modifiedRecords,
           event.lostRecords,
+          event.deletedRecords,
           event.newLastModified,
-          "by-owner",
+          "by-owner"
         );
       }
 
@@ -1327,6 +1516,8 @@ export class RemoteListener {
         newRecords: event.newRecords,
         lostRecords: event.lostRecords,
         modifiedRecords: event.modifiedRecords,
+        deletedRecords: event.deletedRecords,
+        createdRecords: event.createdRecords,
       }));
     }
   }
@@ -1340,7 +1531,7 @@ export class RemoteListener {
     event: IParentedSearchRecordsEvent,
   ) {
     this.pushTestingInfo(
-      "parentedSearchRecordsAddedEvents",
+      "parentedSearchRecordsEvent",
       event,
     );
 
@@ -1371,9 +1562,13 @@ export class RemoteListener {
           event.parentType,
           event.parentId,
           event.parentVersion,
+          null,
+          null,
           event.newRecords,
+          event.createdRecords,
           event.modifiedRecords,
           event.lostRecords,
+          event.deletedRecords,
           event.newLastModified,
           "by-parent",
         );
@@ -1386,6 +1581,67 @@ export class RemoteListener {
         newRecords: event.newRecords,
         lostRecords: event.lostRecords,
         modifiedRecords: event.modifiedRecords,
+        deletedRecords: event.deletedRecords,
+        createdRecords: event.createdRecords,
+      }));
+    }
+  }
+
+  private async onPropertySearchRecordsEvent(
+    event: IPropertySearchRecordsEvent,
+  ) {
+    this.pushTestingInfo(
+      "propertySearchRecordsEvent",
+      event,
+    );
+
+    // build the listener id
+    const propertyListener = this.propertySearchListeners[
+      event.qualifiedPathName + "." + event.propertyId + "." + event.propertyValue
+    ];
+
+    // and we still check it if exists
+    if (propertyListener) {
+      // do the same as in the owned version
+      propertyListener.lastModified = event.newLastModified;
+
+      // and equally we try to add these records
+      if (CacheWorkerInstance.isSupported && propertyListener.useCacheWorker.some((w) => w)) {
+        const itemDefinitionOrModule = this.root.registry[event.qualifiedPathName];
+        let itemDefinition: ItemDefinition;
+        if (itemDefinitionOrModule instanceof ItemDefinition) {
+          itemDefinition = itemDefinitionOrModule;
+        } else {
+          itemDefinition = itemDefinitionOrModule.getPropExtensionItemDefinition();
+        }
+
+        await CacheWorkerInstance.instance.updateRecordsOnCachedSearch(
+          PREFIX_SEARCH + itemDefinition.getSearchModeCounterpart().getQualifiedPathName(),
+          null,
+          null,
+          null,
+          null,
+          event.propertyId,
+          event.propertyValue,
+          event.newRecords,
+          event.createdRecords,
+          event.modifiedRecords,
+          event.lostRecords,
+          event.deletedRecords,
+          event.newLastModified,
+          "by-property",
+        );
+      }
+
+      // now we trigger the callbacks that should re-perform the cached
+      // search, and since all records should have been added, the new search
+      // should show the new results
+      propertyListener.callbacks.forEach((c) => c({
+        newRecords: event.newRecords,
+        lostRecords: event.lostRecords,
+        modifiedRecords: event.modifiedRecords,
+        deletedRecords: event.deletedRecords,
+        createdRecords: event.createdRecords,
       }));
     }
   }
@@ -1395,11 +1651,11 @@ export class RemoteListener {
    * result that is cached by parent
    * @param event the parent search records added event
    */
-   private async onOwnedParentedSearchRecordsEvent(
+  private async onOwnedParentedSearchRecordsEvent(
     event: IOwnedParentedSearchRecordsEvent,
   ) {
     this.pushTestingInfo(
-      "ownedParentedSearchRecordsAddedEvents",
+      "ownedParentedSearchRecordsEvent",
       event,
     );
 
@@ -1430,9 +1686,13 @@ export class RemoteListener {
           event.parentType,
           event.parentId,
           event.parentVersion,
+          null,
+          null,
           event.newRecords,
+          event.createdRecords,
           event.modifiedRecords,
           event.lostRecords,
+          event.deletedRecords,
           event.newLastModified,
           "by-owner-and-parent",
         );
@@ -1445,6 +1705,8 @@ export class RemoteListener {
         newRecords: event.newRecords,
         lostRecords: event.lostRecords,
         modifiedRecords: event.modifiedRecords,
+        deletedRecords: event.deletedRecords,
+        createdRecords: event.createdRecords,
       }));
     }
   }
@@ -1596,6 +1858,19 @@ export class RemoteListener {
         const lastModified = this.ownedParentedSearchListeners[listenerKey].lastModified;
         this.requestOwnedParentedSearchFeedbackFor({
           ...this.ownedParentedSearchListeners[listenerKey].request,
+          lastModified: lastModified,
+        });
+      }
+    });
+
+    // and the parented search listeners as well
+    Object.keys(this.propertySearchListeners).forEach((listenerKey) => {
+      this.attachPropertySearchListener(this.propertySearchListeners[listenerKey].request);
+
+      if (requiresFeedback) {
+        const lastModified = this.propertySearchListeners[listenerKey].lastModified;
+        this.requestPropertySearchFeedbackFor({
+          ...this.propertySearchListeners[listenerKey].request,
           lastModified: lastModified,
         });
       }

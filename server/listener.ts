@@ -33,7 +33,7 @@ import {
   IOwnedSearchRecordsEvent,
   IParentedSearchRecordsEvent,
   PARENTED_SEARCH_RECORDS_EVENT,
-  CHANGED_FEEEDBACK_EVENT,
+  CHANGED_FEEDBACK_EVENT,
   IChangedFeedbackEvent,
   IDENTIFIED_EVENT,
   RegisterRequestSchema,
@@ -65,6 +65,18 @@ import {
   generateOwnedSearchMergedIndexIdentifier,
   generateParentedSearchMergedIndexIdentifier,
   generateOwnedParentedSearchMergedIndexIdentifier,
+  PropertySearchRegisterRequestSchema,
+  PropertySearchFeedbackRequestSchema,
+  PropertySearchUnregisterRequestSchema,
+  PROPERTY_SEARCH_REGISTER_REQUEST,
+  IPropertySearchRegisterRequest,
+  IPropertySearchFeedbackRequest,
+  PROPERTY_SEARCH_FEEDBACK_REQUEST,
+  PROPERTY_SEARCH_UNREGISTER_REQUEST,
+  IPropertySearchUnregisterRequest,
+  generatePropertySearchMergedIndexIdentifier,
+  IPropertySearchRecordsEvent,
+  PROPERTY_SEARCH_RECORDS_EVENT,
 } from "../base/remote-protocol";
 import { IGQLSearchRecord } from "../gql-querier";
 import { convertVersionsIntoNullsWhenNecessary } from "./version-null-value";
@@ -92,6 +104,9 @@ const checkRegisterRequest =
 const checkOwnedSearchRegisterRequest =
   ajv.compile(OwnedSearchRegisterRequestSchema);
 
+const checkPropertySearchRegisterRequest =
+  ajv.compile(PropertySearchRegisterRequestSchema);
+
 const checkParentedSearchRegisterRequest =
   ajv.compile(ParentedSearchRegisterRequestSchema);
 
@@ -107,6 +122,9 @@ const checkFeedbackRequest =
 const checkOwnedSearchFeedbackRequest =
   ajv.compile(OwnedSearchFeedbackRequestSchema);
 
+const checkPropertySearchFeedbackRequest =
+  ajv.compile(PropertySearchFeedbackRequestSchema);
+
 const checkParentedSearchFeedbackRequest =
   ajv.compile(ParentedSearchFeedbackRequestSchema);
 
@@ -118,6 +136,9 @@ const checkUnregisterRequest =
 
 const checkOwnedSearchUnregisterRequest =
   ajv.compile(OwnedSearchUnregisterRequestSchema);
+
+const checkPropertySearchUnregisterRequest =
+  ajv.compile(PropertySearchUnregisterRequestSchema);
 
 const checkParentedSearchUnregisterRequest =
   ajv.compile(ParentedSearchUnregisterRequestSchema);
@@ -246,6 +267,9 @@ export class Listener {
       socket.on(OWNED_SEARCH_REGISTER_REQUEST, (request: IOwnedSearchRegisterRequest) => {
         this.ownedSearchRegister(socket, request);
       });
+      socket.on(PROPERTY_SEARCH_REGISTER_REQUEST, (request: IPropertySearchRegisterRequest) => {
+        this.propertySearchRegister(socket, request);
+      });
       socket.on(PARENTED_SEARCH_REGISTER_REQUEST, (request: IParentedSearchRegisterRequest) => {
         this.parentedSearchRegister(socket, request);
       });
@@ -261,6 +285,9 @@ export class Listener {
       socket.on(OWNED_SEARCH_FEEDBACK_REQUEST, (request: IOwnedSearchFeedbackRequest) => {
         this.ownedSearchFeedback(socket, request);
       });
+      socket.on(PROPERTY_SEARCH_FEEDBACK_REQUEST, (request: IPropertySearchFeedbackRequest) => {
+        this.propertySearchFeedback(socket, request);
+      });
       socket.on(PARENTED_SEARCH_FEEDBACK_REQUEST, (request: IParentedSearchFeedbackRequest) => {
         this.parentedSearchFeedback(socket, request);
       });
@@ -272,6 +299,9 @@ export class Listener {
       });
       socket.on(OWNED_SEARCH_UNREGISTER_REQUEST, (request: IOwnedSearchUnregisterRequest) => {
         this.ownedSearchUnregister(socket, request);
+      });
+      socket.on(PROPERTY_SEARCH_UNREGISTER_REQUEST, (request: IPropertySearchUnregisterRequest) => {
+        this.propertySearchUnregister(socket, request);
       });
       socket.on(PARENTED_SEARCH_UNREGISTER_REQUEST, (request: IParentedSearchUnregisterRequest) => {
         this.parentedSearchUnregister(socket, request);
@@ -628,7 +658,7 @@ export class Listener {
           value,
         ) : value,
         environment: CustomRoleGranterEnvironment.RETRIEVING,
-        requestArgs: null,
+        requestArgs: {},
         owner: value ? (itemDefinition.isOwnerObjectId() ? value.id : value.created_by) : null,
         parent: value && value.parent_id ? {
           id: value.parent_id,
@@ -762,7 +792,7 @@ export class Listener {
           root: this.root,
           value: null,
           environment: CustomRoleGranterEnvironment.SEARCHING_RECORDS,
-          requestArgs: null,
+          requestArgs: {},
           owner: request.createdBy || UNSPECIFIED_OWNER,
           parent: null,
           customId: null,
@@ -813,6 +843,181 @@ export class Listener {
         {
           className: "Listener",
           methodName: "ownedSearchRegister",
+          message: "Subscribing socket " + socket.id + " to " + mergedIndexIdentifier,
+        },
+      );
+      this.redisGlobalSub.redisClient.subscribe(mergedIndexIdentifier);
+      listenerData.listens[mergedIndexIdentifier] = true;
+      listenerData.amount++;
+    }
+  }
+  public async propertySearchRegister(
+    socket: Socket,
+    request: IPropertySearchRegisterRequest,
+  ) {
+    const listenerData = this.listeners[socket.id];
+    if (!listenerData) {
+      CAN_LOG_DEBUG && logger.debug(
+        {
+          className: "Listener",
+          methodName: "propertySearchRegister",
+          message: "Can't register listener to an unidentified socket " + socket.id,
+        },
+      );
+      this.emitError(socket, "socket is unidentified", request);
+      return;
+    }
+
+    const valid = checkPropertySearchRegisterRequest(request);
+    if (!valid) {
+      CAN_LOG_DEBUG && logger.debug(
+        {
+          className: "Listener",
+          methodName: "propertySearchRegister",
+          message: "Can't register listener due to invalid request",
+          data: {
+            errors: checkPropertySearchRegisterRequest.errors,
+          }
+        },
+      );
+      this.emitError(socket, "invalid request", request);
+      return;
+    }
+
+    if (!request.propertyValue) {
+      CAN_LOG_DEBUG && logger.debug(
+        {
+          className: "Listener",
+          methodName: "propertySearchRegister",
+          message: "Can't register listener due to invalid request",
+        },
+      );
+      this.emitError(socket, "invalid request (missing property value)", request);
+      return;
+    }
+
+    // do not allow more than MAX_REMOTE_LISTENERS_PER_SOCKET concurrent listeners
+    if (listenerData.amount > MAX_REMOTE_LISTENERS_PER_SOCKET) {
+      CAN_LOG_DEBUG && logger.debug(
+        {
+          className: "Listener",
+          methodName: "propertySearchRegister",
+          message: "Socket " + socket.id + " has exceeded the amount of listeners it can attach",
+        },
+      );
+      this.emitError(socket, "exceeded socket max listeners per socket", request);
+      return;
+    }
+
+    const itemDefinitionOrModule = this.root.registry[request.qualifiedPathName];
+    let hasAccess: boolean;
+    if (!itemDefinitionOrModule) {
+      CAN_LOG_DEBUG && logger.debug(
+        {
+          className: "Listener",
+          methodName: "propertySearchRegister",
+          message: "Could not find item definition or module for " + request.qualifiedPathName,
+        },
+      );
+      this.emitError(socket, "could not find item definition or module", request);
+      return;
+    } else {
+      const hasProperty = itemDefinitionOrModule instanceof ItemDefinition ?
+        itemDefinitionOrModule.hasPropertyDefinitionFor(request.propertyId, true) :
+        itemDefinitionOrModule.hasPropExtensionFor(request.propertyId);
+      if (!hasProperty) {
+        CAN_LOG_DEBUG && logger.debug(
+          {
+            className: "Listener",
+            methodName: "propertySearchRegister",
+            message: "Could not find property in item definition or module for " + request.propertyId,
+          },
+        );
+        this.emitError(socket, "could not property", request);
+        return;
+      }
+      const propDef = itemDefinitionOrModule instanceof ItemDefinition ?
+        itemDefinitionOrModule.getPropertyDefinitionFor(request.propertyId, true) :
+        itemDefinitionOrModule.getPropExtensionFor(request.propertyId);
+
+      if (!propDef.isTracked()) {
+        CAN_LOG_DEBUG && logger.debug(
+          {
+            className: "Listener",
+            methodName: "propertySearchRegister",
+            message: "Property " + request.propertyId + " is not a string tracked type",
+          },
+        );
+        this.emitError(socket, "property is not of the tracked type", request);
+        return;
+      }
+
+      const rolesManager = new CustomRoleManager(
+        this.customRoles,
+        {
+          cache: this.cache,
+          databaseConnection: this.rawDB.databaseConnection,
+          rawDB: this.rawDB,
+          item: itemDefinitionOrModule instanceof ItemDefinition ? itemDefinitionOrModule : null,
+          tokenData: listenerData.user,
+          module: itemDefinitionOrModule instanceof Module ? itemDefinitionOrModule : itemDefinitionOrModule.getParentModule(),
+          root: this.root,
+          value: null,
+          environment: CustomRoleGranterEnvironment.SEARCHING_RECORDS,
+          requestArgs: {
+            ["SEARCH_" + request.propertyId]: request.propertyValue,
+          },
+          owner: UNSPECIFIED_OWNER,
+          parent: null,
+          customId: null,
+        }
+      );
+      try {
+        hasAccess = await itemDefinitionOrModule.checkRoleAccessFor(
+          ItemDefinitionIOActions.READ,
+          listenerData.user.role,
+          listenerData.user.id,
+          UNSPECIFIED_OWNER,
+          {},
+          rolesManager,
+          false,
+        );
+      } catch (err) {
+        logger.error(
+          {
+            className: "Listener",
+            methodName: "propertySearchRegister",
+            message: "Failed to register",
+            err,
+          },
+        );
+        return;
+      }
+    }
+    if (!hasAccess) {
+      CAN_LOG_DEBUG && logger.debug(
+        {
+          className: "Listener",
+          methodName: "propertySearchRegister",
+          message: "Socket " + socket.id + " with user " + listenerData.user.id +
+            " with role " + listenerData.user.role + " cannot listen to " + request.qualifiedPathName,
+        },
+      );
+      this.emitError(socket, "user has not access", request);
+      return;
+    }
+
+    const mergedIndexIdentifier = generatePropertySearchMergedIndexIdentifier(
+      request.qualifiedPathName,
+      request.propertyId,
+      request.propertyValue,
+    );
+
+    if (!listenerData.listens[mergedIndexIdentifier]) {
+      CAN_LOG_DEBUG && logger.debug(
+        {
+          className: "Listener",
+          methodName: "propertySearchRegister",
           message: "Subscribing socket " + socket.id + " to " + mergedIndexIdentifier,
         },
       );
@@ -892,7 +1097,7 @@ export class Listener {
           root: this.root,
           value: null,
           environment: CustomRoleGranterEnvironment.SEARCHING_RECORDS,
-          requestArgs: null,
+          requestArgs: {},
           owner: null,
           parent: {
             id: request.parentId,
@@ -1028,7 +1233,7 @@ export class Listener {
           value: null,
           environment: CustomRoleGranterEnvironment.SEARCHING_RECORDS,
           owner: request.createdBy || UNSPECIFIED_OWNER,
-          requestArgs: null,
+          requestArgs: {},
           parent: {
             id: request.parentId,
             type: request.parentType,
@@ -1158,7 +1363,7 @@ export class Listener {
           root: this.root,
           value: null,
           environment: CustomRoleGranterEnvironment.SEARCHING_RECORDS,
-          requestArgs: null,
+          requestArgs: {},
           owner: request.createdBy || UNSPECIFIED_OWNER,
           parent: null,
           customId: null,
@@ -1198,7 +1403,7 @@ export class Listener {
         return;
       }
 
-      const newAndModifiedRecordsSQL: ISQLTableRowValue[] = (await this.rawDB.databaseConnection.queryRows(
+      const createdAndModifiedRecordsSQL: ISQLTableRowValue[] = (await this.rawDB.databaseConnection.queryRows(
         `SELECT "id", "version", "type", "last_modified", ` + (
           request.lastModified ?
             `"created_at" > ? AS "WAS_CREATED"` :
@@ -1243,7 +1448,7 @@ export class Listener {
         true,
       );
 
-      const lostRecords: IGQLSearchRecord[] = (await deletedQuery)
+      const deletedRecords: IGQLSearchRecord[] = (await deletedQuery)
         .map(convertVersionsIntoNullsWhenNecessary).map((r) => (
           {
             id: r.id,
@@ -1253,10 +1458,10 @@ export class Listener {
           }
         ));
 
-      const totalDiffRecordCount = newAndModifiedRecordsSQL.length + lostRecords.length;
+      const totalDiffRecordCount = createdAndModifiedRecordsSQL.length + deletedRecords.length;
 
       if (totalDiffRecordCount) {
-        const newRecords: IGQLSearchRecord[] = newAndModifiedRecordsSQL.filter((r) => r.WAS_CREATED).map((r) => (
+        const createdRecords: IGQLSearchRecord[] = createdAndModifiedRecordsSQL.filter((r) => r.WAS_CREATED).map((r) => (
           {
             id: r.id,
             version: r.version,
@@ -1264,7 +1469,7 @@ export class Listener {
             last_modified: r.last_modified,
           }
         ));
-        const modifiedRecords: IGQLSearchRecord[] = newAndModifiedRecordsSQL.filter((r) => !r.WAS_CREATED).map((r) => (
+        const modifiedRecords: IGQLSearchRecord[] = createdAndModifiedRecordsSQL.filter((r) => !r.WAS_CREATED).map((r) => (
           {
             id: r.id,
             version: r.version,
@@ -1276,10 +1481,12 @@ export class Listener {
         const event: IOwnedSearchRecordsEvent = {
           createdBy: request.createdBy,
           qualifiedPathName: request.qualifiedPathName,
-          newRecords,
-          lostRecords,
+          newRecords: [],
+          lostRecords: [],
+          createdRecords,
+          deletedRecords,
           modifiedRecords,
-          newLastModified: findLastRecordLastModifiedDate(newRecords, lostRecords, modifiedRecords),
+          newLastModified: findLastRecordLastModifiedDate(createdRecords, deletedRecords, modifiedRecords),
         };
         CAN_LOG_DEBUG && logger.debug(
           {
@@ -1301,6 +1508,273 @@ export class Listener {
         {
           className: "Listener",
           methodName: "ownedSearchFeedback",
+          message: "Failed to provide feedback",
+          err,
+        }
+      );
+    }
+  }
+  public async propertySearchFeedback(
+    socket: Socket,
+    request: IPropertySearchFeedbackRequest,
+  ) {
+    const listenerData = this.listeners[socket.id];
+    if (!listenerData) {
+      CAN_LOG_DEBUG && logger.debug(
+        {
+          className: "Listener",
+          methodName: "propertySearchFeedback",
+          message: "Can't give feedback to an unidentified socket " + socket.id,
+        },
+      );
+      this.emitError(socket, "socket is unidentified", request);
+      return;
+    }
+
+    const valid = checkPropertySearchFeedbackRequest(request);
+    if (!valid) {
+      CAN_LOG_DEBUG && logger.debug(
+        {
+          className: "Listener",
+          methodName: "propertySearchFeedback",
+          message: "Can't give feedback due to invalid request",
+          data: {
+            errors: checkPropertySearchFeedbackRequest.errors,
+          },
+        }
+      );
+      this.emitError(socket, "invalid request", request);
+      return;
+    }
+
+    if (!request.propertyValue) {
+      CAN_LOG_DEBUG && logger.debug(
+        {
+          className: "Listener",
+          methodName: "propertySearchFeedback",
+          message: "Can't register listener due to invalid request",
+        },
+      );
+      this.emitError(socket, "invalid request (missing property value)", request);
+      return;
+    }
+
+    try {
+      const itemDefinitionOrModule = this.root.registry[request.qualifiedPathName];
+      if (!itemDefinitionOrModule) {
+        CAN_LOG_DEBUG && logger.debug(
+          {
+            className: "Listener",
+            methodName: "propertySearchFeedback",
+            message: "Could not find " + request.qualifiedPathName,
+          },
+        );
+        this.emitError(socket, "could not find item definition or module", request);
+        return;
+      }
+
+      let mod: Module;
+      let requiredType: string = null;
+      if (itemDefinitionOrModule instanceof ItemDefinition) {
+        mod = itemDefinitionOrModule.getParentModule();
+        requiredType = request.qualifiedPathName;
+      } else {
+        mod = itemDefinitionOrModule;
+      }
+
+      const hasProperty = itemDefinitionOrModule instanceof ItemDefinition ?
+        itemDefinitionOrModule.hasPropertyDefinitionFor(request.propertyId, true) :
+        itemDefinitionOrModule.hasPropExtensionFor(request.propertyId);
+      if (!hasProperty) {
+        CAN_LOG_DEBUG && logger.debug(
+          {
+            className: "Listener",
+            methodName: "propertySearchFeedback",
+            message: "Could not find property in item definition or module for " + request.propertyId,
+          },
+        );
+        this.emitError(socket, "could not property", request);
+        return;
+      }
+      const propDef = itemDefinitionOrModule instanceof ItemDefinition ?
+        itemDefinitionOrModule.getPropertyDefinitionFor(request.propertyId, true) :
+        itemDefinitionOrModule.getPropExtensionFor(request.propertyId);
+
+      if (!propDef.isTracked()) {
+        CAN_LOG_DEBUG && logger.debug(
+          {
+            className: "Listener",
+            methodName: "propertySearchFeedback",
+            message: "Property " + request.propertyId + " is not a string tracked type",
+          },
+        );
+        this.emitError(socket, "property is not of the tracked type", request);
+        return;
+      }
+
+      const rolesManager = new CustomRoleManager(
+        this.customRoles,
+        {
+          cache: this.cache,
+          databaseConnection: this.rawDB.databaseConnection,
+          rawDB: this.rawDB,
+          item: itemDefinitionOrModule instanceof ItemDefinition ? itemDefinitionOrModule : null,
+          tokenData: listenerData.user,
+          module: itemDefinitionOrModule instanceof Module ? itemDefinitionOrModule : itemDefinitionOrModule.getParentModule(),
+          root: this.root,
+          value: null,
+          environment: CustomRoleGranterEnvironment.SEARCHING_RECORDS,
+          requestArgs: {
+            ["SEARCH_" + request.propertyId]: request.propertyValue,
+          },
+          owner: UNSPECIFIED_OWNER,
+          parent: null,
+          customId: null,
+        }
+      );
+      try {
+        const hasAccess = await itemDefinitionOrModule.checkRoleAccessFor(
+          ItemDefinitionIOActions.READ,
+          listenerData.user.role,
+          listenerData.user.id,
+          UNSPECIFIED_OWNER,
+          {},
+          rolesManager,
+          false,
+        )
+        if (!hasAccess) {
+          CAN_LOG_DEBUG && logger.debug(
+            {
+              className: "Listener",
+              methodName: "propertySearchFeedback",
+              message: "Socket " + socket.id + " with user " + listenerData.user.id +
+                " with role " + listenerData.user.role + " cannot listen to " + request.qualifiedPathName,
+            },
+          );
+          this.emitError(socket, "user has not access", request);
+          return;
+        }
+      } catch (err) {
+        logger.error(
+          {
+            className: "Listener",
+            methodName: "propertySearchFeedback",
+            message: "Failed to provide feedback",
+            err,
+          },
+        );
+        return;
+      }
+
+      const createdAndModifiedRecordsSQL: ISQLTableRowValue[] = (await this.rawDB.databaseConnection.queryRows(
+        `SELECT "id", "version", "type", "last_modified", ` + (
+          request.lastModified ?
+            `"created_at" > ? AS "WAS_CREATED"` :
+            `TRUE AS "WAS_CREATED"`
+        ) + ` FROM ${JSON.stringify(mod.getQualifiedPathName())} WHERE ` + (
+          requiredType ?
+            `"type" = ? AND ` :
+            ""
+        ) + (
+          request.lastModified ?
+            `"last_modified" > ? AND ` :
+            ""
+        ) + `${JSON.stringify(request.propertyId)} = ?`,
+        [
+          request.lastModified || null,
+          requiredType || null,
+          request.lastModified || null,
+          request.propertyValue,
+        ].filter((v) => v !== null),
+        true,
+      )).map(convertVersionsIntoNullsWhenNecessary);
+
+      const deletedQuery = this.rawDB.databaseConnection.queryRows(
+        `SELECT "id", "version", "type", "transaction_time" FROM ${JSON.stringify(DELETED_REGISTRY_IDENTIFIER)} ` +
+        `WHERE "module" = ? AND "trackers" ->> ? = ?` +
+        (
+          request.lastModified ?
+            ` AND "transaction_time" > ?` :
+            ""
+        ) +
+        (
+          requiredType ?
+            ` AND "type" = ?` :
+            ""
+        ),
+        [
+          mod.getQualifiedPathName(),
+          request.propertyId,
+          request.propertyValue,
+          request.lastModified || null,
+          requiredType || null,
+        ].filter((v) => v !== null),
+        true,
+      );
+
+      const deletedRecords: IGQLSearchRecord[] = (await deletedQuery)
+        .map(convertVersionsIntoNullsWhenNecessary).map((r) => (
+          {
+            id: r.id,
+            version: r.version,
+            type: r.type,
+            last_modified: r.transaction_time,
+          }
+        ));
+
+      const totalDiffRecordCount = createdAndModifiedRecordsSQL.length + deletedRecords.length;
+
+      if (totalDiffRecordCount) {
+        const createdRecords: IGQLSearchRecord[] = createdAndModifiedRecordsSQL.filter((r) => r.WAS_CREATED).map((r) => (
+          {
+            id: r.id,
+            version: r.version,
+            type: r.type,
+            last_modified: r.last_modified,
+          }
+        ));
+        const modifiedRecords: IGQLSearchRecord[] = createdAndModifiedRecordsSQL.filter((r) => !r.WAS_CREATED).map((r) => (
+          {
+            id: r.id,
+            version: r.version,
+            type: r.type,
+            last_modified: r.last_modified,
+          }
+        ));
+
+        // TODOIMPORTANT we need to get the new records and the old records product of a tracked property change
+        // this happens in reparent or change of reproperty
+        const event: IPropertySearchRecordsEvent = {
+          propertyId: request.propertyId,
+          propertyValue: request.propertyValue,
+          qualifiedPathName: request.qualifiedPathName,
+          newRecords: [],
+          lostRecords: [],
+          createdRecords,
+          deletedRecords,
+          modifiedRecords,
+          newLastModified: findLastRecordLastModifiedDate(createdRecords, deletedRecords, modifiedRecords),
+        };
+        CAN_LOG_DEBUG && logger.debug(
+          {
+            className: "Listener",
+            methodName: "propertySearchFeedback",
+            message: "Triggering " + PROPERTY_SEARCH_RECORDS_EVENT,
+            data: {
+              event,
+            }
+          },
+        );
+        socket.emit(
+          PROPERTY_SEARCH_RECORDS_EVENT,
+          event,
+        );
+      }
+    } catch (err) {
+      logger.error(
+        {
+          className: "Listener",
+          methodName: "propertySearchFeedback",
           message: "Failed to provide feedback",
           err,
         }
@@ -1374,7 +1848,7 @@ export class Listener {
           root: this.root,
           value: null,
           environment: CustomRoleGranterEnvironment.SEARCHING_RECORDS,
-          requestArgs: null,
+          requestArgs: {},
           owner: null,
           parent: {
             id: request.parentId,
@@ -1419,7 +1893,7 @@ export class Listener {
         return;
       }
 
-      const newAndModifiedRecordsSQL: ISQLTableRowValue[] = (await this.rawDB.databaseConnection.queryRows(
+      const createdAndModifiedRecordsSQL: ISQLTableRowValue[] = (await this.rawDB.databaseConnection.queryRows(
         `SELECT "id", "version", "type", "last_modified", ` + (
           request.lastModified ?
             `"created_at" > ? AS "WAS_CREATED"` :
@@ -1468,7 +1942,7 @@ export class Listener {
         true,
       );
 
-      const lostRecords: IGQLSearchRecord[] = (await deletedQuery)
+      const deletedRecords: IGQLSearchRecord[] = (await deletedQuery)
         .map(convertVersionsIntoNullsWhenNecessary).map((r) => (
           {
             id: r.id,
@@ -1478,10 +1952,10 @@ export class Listener {
           }
         ));
 
-      const totalDiffRecordCount = newAndModifiedRecordsSQL.length + lostRecords.length;
+      const totalDiffRecordCount = createdAndModifiedRecordsSQL.length + deletedRecords.length;
 
       if (totalDiffRecordCount) {
-        const newRecords: IGQLSearchRecord[] = newAndModifiedRecordsSQL.filter((r) => r.WAS_CREATED).map((r) => (
+        const createdRecords: IGQLSearchRecord[] = createdAndModifiedRecordsSQL.filter((r) => r.WAS_CREATED).map((r) => (
           {
             id: r.id,
             version: r.version,
@@ -1489,7 +1963,7 @@ export class Listener {
             last_modified: r.last_modified,
           }
         ));
-        const modifiedRecords: IGQLSearchRecord[] = newAndModifiedRecordsSQL.filter((r) => !r.WAS_CREATED).map((r) => (
+        const modifiedRecords: IGQLSearchRecord[] = createdAndModifiedRecordsSQL.filter((r) => !r.WAS_CREATED).map((r) => (
           {
             id: r.id,
             version: r.version,
@@ -1503,10 +1977,12 @@ export class Listener {
           parentVersion: request.parentVersion || null,
           parentType: request.parentType,
           qualifiedPathName: request.qualifiedPathName,
-          newRecords,
+          newRecords: [],
+          lostRecords: [],
+          createdRecords,
           modifiedRecords,
-          lostRecords,
-          newLastModified: findLastRecordLastModifiedDate(newRecords, modifiedRecords, lostRecords),
+          deletedRecords,
+          newLastModified: findLastRecordLastModifiedDate(createdRecords, modifiedRecords, deletedRecords),
         };
         CAN_LOG_DEBUG && logger.debug(
           {
@@ -1602,7 +2078,7 @@ export class Listener {
           value: null,
           environment: CustomRoleGranterEnvironment.SEARCHING_RECORDS,
           owner: request.createdBy || UNSPECIFIED_OWNER,
-          requestArgs: null,
+          requestArgs: {},
           parent: {
             id: request.parentId,
             type: request.parentType,
@@ -1646,7 +2122,7 @@ export class Listener {
         return;
       }
 
-      const newAndModifiedRecordsSQL: ISQLTableRowValue[] = (await this.rawDB.databaseConnection.queryRows(
+      const createdAndModifiedRecordsSQL: ISQLTableRowValue[] = (await this.rawDB.databaseConnection.queryRows(
         `SELECT "id", "version", "type", "last_modified", ` + (
           request.lastModified ?
             `"created_at" > ? AS "WAS_CREATED"` :
@@ -1697,7 +2173,7 @@ export class Listener {
         true,
       );
 
-      const lostRecords: IGQLSearchRecord[] = (await deletedQuery)
+      const deletedRecords: IGQLSearchRecord[] = (await deletedQuery)
         .map(convertVersionsIntoNullsWhenNecessary).map((r) => (
           {
             id: r.id,
@@ -1707,10 +2183,10 @@ export class Listener {
           }
         ));
 
-      const totalDiffRecordCount = newAndModifiedRecordsSQL.length + lostRecords.length;
+      const totalDiffRecordCount = createdAndModifiedRecordsSQL.length + deletedRecords.length;
 
       if (totalDiffRecordCount) {
-        const newRecords: IGQLSearchRecord[] = newAndModifiedRecordsSQL.filter((r) => r.WAS_CREATED).map((r) => (
+        const createdRecords: IGQLSearchRecord[] = createdAndModifiedRecordsSQL.filter((r) => r.WAS_CREATED).map((r) => (
           {
             id: r.id,
             version: r.version,
@@ -1718,7 +2194,7 @@ export class Listener {
             last_modified: r.last_modified,
           }
         ));
-        const modifiedRecords: IGQLSearchRecord[] = newAndModifiedRecordsSQL.filter((r) => !r.WAS_CREATED).map((r) => (
+        const modifiedRecords: IGQLSearchRecord[] = createdAndModifiedRecordsSQL.filter((r) => !r.WAS_CREATED).map((r) => (
           {
             id: r.id,
             version: r.version,
@@ -1733,10 +2209,12 @@ export class Listener {
           parentType: request.parentType,
           qualifiedPathName: request.qualifiedPathName,
           createdBy: request.createdBy || UNSPECIFIED_OWNER,
-          newRecords,
+          createdRecords,
           modifiedRecords,
-          lostRecords,
-          newLastModified: findLastRecordLastModifiedDate(newRecords, modifiedRecords, lostRecords),
+          deletedRecords,
+          lostRecords: [],
+          newRecords: [],
+          newLastModified: findLastRecordLastModifiedDate(createdRecords, modifiedRecords, deletedRecords),
         };
         CAN_LOG_DEBUG && logger.debug(
           {
@@ -1844,7 +2322,7 @@ export class Listener {
         ) : value,
         environment: CustomRoleGranterEnvironment.RETRIEVING,
         owner: value ? (itemDefinition.isOwnerObjectId() ? value.id : value.created_by) : null,
-        requestArgs: null,
+        requestArgs: {},
         parent: value && value.parent_id ? {
           id: value.parent_id,
           type: value.parent_type,
@@ -1889,14 +2367,14 @@ export class Listener {
           {
             className: "Listener",
             methodName: "feedback",
-            message: "Emitting " + CHANGED_FEEEDBACK_EVENT,
+            message: "Emitting " + CHANGED_FEEDBACK_EVENT,
             data: {
               event,
             },
           },
         );
         socket.emit(
-          CHANGED_FEEEDBACK_EVENT,
+          CHANGED_FEEDBACK_EVENT,
           event,
         );
       } else {
@@ -1911,14 +2389,14 @@ export class Listener {
           {
             className: "Listener",
             methodName: "feedback",
-            message: "Emitting " + CHANGED_FEEEDBACK_EVENT,
+            message: "Emitting " + CHANGED_FEEDBACK_EVENT,
             data: {
               event,
             },
           },
         );
         socket.emit(
-          CHANGED_FEEEDBACK_EVENT,
+          CHANGED_FEEDBACK_EVENT,
           event,
         );
       }
@@ -2063,6 +2541,45 @@ export class Listener {
     );
     this.removeListener(socket, mergedIndexIdentifier);
   }
+  public propertySearchUnregister(
+    socket: Socket,
+    request: IPropertySearchUnregisterRequest,
+  ) {
+    const listenerData = this.listeners[socket.id];
+    if (!listenerData) {
+      CAN_LOG_DEBUG && logger.debug(
+        {
+          className: "Listener",
+          methodName: "propertySearchUnregister",
+          message: "Can't property search unregister an unidentified socket " + socket.id,
+        },
+      );
+      this.emitError(socket, "socket is unidentified", request);
+      return;
+    }
+
+    const valid = checkPropertySearchUnregisterRequest(request);
+    if (!valid) {
+      CAN_LOG_DEBUG && logger.debug(
+        {
+          className: "Listener",
+          methodName: "propertySearchUnregister",
+          message: "Can't unregister due to invalid request",
+          data: {
+            errors: checkPropertySearchUnregisterRequest.errors,
+          },
+        }
+      );
+      this.emitError(socket, "invalid request", request);
+      return;
+    }
+    const mergedIndexIdentifier = generatePropertySearchMergedIndexIdentifier(
+      request.qualifiedPathName,
+      request.propertyId,
+      request.propertyValue,
+    );
+    this.removeListener(socket, mergedIndexIdentifier);
+  }
   public parentedSearchUnregister(
     socket: Socket,
     request: IParentedSearchUnregisterRequest,
@@ -2156,7 +2673,7 @@ export class Listener {
       serverInstanceGroupId: INSTANCE_GROUP_ID,
       source: "global",
       mergedIndexIdentifier,
-      type: CHANGED_FEEEDBACK_EVENT,
+      type: CHANGED_FEEDBACK_EVENT,
       data,
     };
 
@@ -2196,6 +2713,35 @@ export class Listener {
       {
         className: "Listener",
         methodName: "triggerOwnedSearchListeners",
+        message: "Triggering redis event",
+        data: {
+          event: redisEvent,
+        }
+      },
+    );
+    this.redisGlobalPub.redisClient.publish(mergedIndexIdentifier, JSON.stringify(redisEvent));
+  }
+  public triggerPropertySearchListeners(
+    event: IPropertySearchRecordsEvent,
+    listenerUUID: string,
+  ) {
+    const mergedIndexIdentifier = generatePropertySearchMergedIndexIdentifier(
+      event.qualifiedPathName,
+      event.propertyId,
+      event.propertyValue,
+    );
+    const redisEvent: IRedisEvent = {
+      type: PROPERTY_SEARCH_RECORDS_EVENT,
+      event,
+      listenerUUID,
+      mergedIndexIdentifier,
+      serverInstanceGroupId: INSTANCE_GROUP_ID,
+      source: "global",
+    };
+    CAN_LOG_DEBUG && logger.debug(
+      {
+        className: "Listener",
+        methodName: "triggerPropertySearchListeners",
         message: "Triggering redis event",
         data: {
           event: redisEvent,

@@ -180,6 +180,12 @@ export interface ISearchLoaderProps {
    * The static state for the children item definition, TOTAL for
    * basically not even asking for feedback (useful when the search was traditional)
    * or NO_LISTENING for just not getting updates but asking for feedback
+   * 
+   * by default searches do not listen and use total as they act like static
+   * results
+   * 
+   * Note that if the search was done using a listen policy the item will update anyway
+   * this is why total is the better option
    */
   static?: "TOTAL" | "NO_LISTENING";
   /**
@@ -929,7 +935,7 @@ class ActualSearchLoader extends React.Component<IActualSearchLoaderProps, IActu
                   includes: this.props.searchRequestedIncludes,
                   includePolicies: this.props.includePolicies,
                   cleanOnDismount: this.props.cleanOnDismount,
-                  static: this.props.static,
+                  static: this.props.static || "TOTAL",
                   longTermCaching: this.props.searchShouldCache,
                   disableExternalChecks: this.props.disableExternalChecks,
                   highlights,

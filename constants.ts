@@ -803,6 +803,7 @@ export const CREATED_AT_INDEX = "CREATED_AT_INDEX";
 export const CREATED_BY_INDEX = "CREATED_BY_INDEX";
 export const PARENT_INDEX = "PARENT_INDEX";
 export const COMBINED_INDEX = "COMBINED_INDEX";
+export const TRACKERS_INDEX = "TRACKERS_INDEX";
 
 /**
  * The reserved base properties but in SQL form

@@ -59,6 +59,7 @@ function getSearchStateOf(state: IActualItemProviderState): IItemSearchStateType
     searchOwner: state.searchOwner,
     searchParent: state.searchParent,
     searchRecords: state.searchRecords,
+    searchCacheUsesProperty: state.searchCacheUsesProperty,
     searchRequestedIncludes: state.searchRequestedIncludes,
     searchRequestedProperties: state.searchRequestedProperties,
     searchResults: state.searchResults,
@@ -394,10 +395,11 @@ export interface IActionSearchOptions extends IActionCleanOptions {
    * The cache policy to perform the search, using a cache policy will disable
    * any possibility of SSR since it can't be performed in the server side
    */
-  cachePolicy?: "by-owner" | "by-parent" | "by-owner-and-parent" | "none";
+  cachePolicy?: "by-owner" | "by-parent" | "by-owner-and-parent" | "by-property" | "none";
+  trackedProperty?: string;
   cacheMetadata?: any;
   cacheMetadataMismatchAction?: ISearchCacheMetadataMismatchAction;
-  listenPolicy?: "by-owner" | "by-parent" | "by-owner-and-parent" | "none";
+  listenPolicy?: "by-owner" | "by-parent" | "by-owner-and-parent" | "by-property" | "none";
   markForDestructionOnLogout?: boolean;
   traditional?: boolean;
   limit: number;
@@ -1095,6 +1097,7 @@ export class ActualItemProvider extends
       searchOwner: null,
       searchLastModified: null,
       searchParent: null,
+      searchCacheUsesProperty: null,
       searchShouldCache: false,
       searchFields: null,
       searchRequestedIncludes: {},
@@ -1312,10 +1315,11 @@ export class ActualItemProvider extends
     }
   }
   public markSearchForDestruction(
-    type: "by-parent" | "by-owner" | "by-owner-and-parent",
+    type: "by-parent" | "by-owner" | "by-owner-and-parent" | "by-property",
     qualifiedName: string,
     owner: string,
     parent: [string, string, string],
+    property: [string, string],
   ) {
     (window as any)[MEMCACHED_SEARCH_DESTRUCTION_MARKERS_LOCATION] =
       (window as any)[MEMCACHED_SEARCH_DESTRUCTION_MARKERS_LOCATION] ||
@@ -1323,17 +1327,17 @@ export class ActualItemProvider extends
     let changed = false;
     if (!(window as any)[MEMCACHED_SEARCH_DESTRUCTION_MARKERS_LOCATION][qualifiedName]) {
       (window as any)[MEMCACHED_SEARCH_DESTRUCTION_MARKERS_LOCATION][qualifiedName] = [
-        [type, owner, parent],
+        [type, owner, parent, property],
       ];
       changed = true;
     } else {
       if (
         !(window as any)[MEMCACHED_SEARCH_DESTRUCTION_MARKERS_LOCATION][qualifiedName]
-          .find((m: [string, string, [string, string, string]]) =>
-            m[0] === type && equals(m[1], owner, { strict: true }) && equals(m[2], parent, { strict: true }))
+          .find((m: [string, string, [string, string, string], [string, string]]) =>
+            m[0] === type && equals(m[1], owner, { strict: true }) && equals(m[2], parent, { strict: true }) && equals(m[3], property, {strict: true}))
       ) {
         changed = true;
-        (window as any)[MEMCACHED_SEARCH_DESTRUCTION_MARKERS_LOCATION][qualifiedName].push([type, owner, parent]);
+        (window as any)[MEMCACHED_SEARCH_DESTRUCTION_MARKERS_LOCATION][qualifiedName].push([type, owner, parent, property]);
       }
     }
 
@@ -1424,6 +1428,7 @@ export class ActualItemProvider extends
           this.state.searchLastModified,
           this.state.searchOwner,
           this.state.searchParent,
+          this.state.searchCacheUsesProperty,
           shouldRequestFeedback,
         );
       }
@@ -1901,6 +1906,7 @@ export class ActualItemProvider extends
       searchOwner: null,
       searchLastModified: null,
       searchParent: null,
+      searchCacheUsesProperty: null,
       searchShouldCache: false,
       searchFields: null,
       searchRequestedIncludes: {},
@@ -3623,13 +3629,14 @@ export class ActualItemProvider extends
     lastModified: string,
     createdBy: string,
     parentedBy: [string, string, string],
+    property: [string, string],
     requestFeedbackToo?: boolean
   ) {
     const listenPolicy = options.listenPolicy || options.cachePolicy || "none";
 
     if (listenPolicy === "none") {
       if (requestFeedbackToo) {
-        this.searchFeedback(options, lastModified, createdBy, parentedBy);
+        this.searchFeedback(options, lastModified, createdBy, parentedBy, property);
       }
 
       return;
@@ -3669,10 +3676,19 @@ export class ActualItemProvider extends
         this.onSearchReload,
         (options.cachePolicy || "none") !== "none"
       );
+    } else if (listenPolicy === "by-property") {
+      this.props.remoteListener.addPropertySearchListenerFor(
+        standardCounterpartQualifiedName,
+        property[0],
+        property[1],
+        lastModified,
+        this.onSearchReload,
+        (options.cachePolicy || "none") !== "none"
+      );
     }
 
     if (requestFeedbackToo) {
-      this.searchFeedback(options, lastModified, createdBy, parentedBy);
+      this.searchFeedback(options, lastModified, createdBy, parentedBy, property);
     }
 
     this.lastOptionsUsedForSearch = options;
@@ -3682,6 +3698,7 @@ export class ActualItemProvider extends
     lastModified: string,
     createdBy: string,
     parentedBy: [string, string, string],
+    property: [string, string],
   ) {
     if (options.cachePolicy === "none") {
       return;
@@ -3713,6 +3730,13 @@ export class ActualItemProvider extends
         parentType: parentedBy[0],
         parentId: parentedBy[1],
         parentVersion: parentedBy[2],
+        lastModified: lastModified,
+      });
+    } else if (options.cachePolicy === "by-property") {
+      this.props.remoteListener.requestPropertySearchFeedbackFor({
+        qualifiedPathName: standardCounterpartQualifiedName,
+        propertyId: property[0],
+        propertyValue: property[1],
         lastModified: lastModified,
       });
     }
@@ -3795,6 +3819,21 @@ export class ActualItemProvider extends
       throw new Error("A by owner cache policy requires createdBy option to be set");
     }
 
+    let trackedPropertyDef: PropertyDefinition = null;
+    let trackedPropertyVal: string = null;
+    if (options.cachePolicy === "by-property" && !options.trackedProperty && !options.listenPolicy) {
+      throw new Error("A by property cache policy requires trackedProperty option to be set");
+    } else if (options.trackedProperty && (options.cachePolicy ? options.cachePolicy !== "by-property" : options.listenPolicy !== "by-property")) {
+      throw new Error("trackedProperty can only be used with by-property cache policy or listen policy");
+    }
+
+    if (options.trackedProperty) {
+      trackedPropertyDef = standardCounterpart.getPropertyDefinitionFor(options.trackedProperty, true);
+      if (!trackedPropertyDef.isTracked()) {
+        throw new Error("trackedProperty can only be used with string properties that are tracked");
+      }
+    }
+
     // and the cache policy by parenting
     let searchParent: [string, string, string] = null;
     if ((options.cachePolicy === "by-parent" || options.cachePolicy === "by-owner-and-parent") && (!options.parentedBy || !options.parentedBy.id)) {
@@ -3813,45 +3852,14 @@ export class ActualItemProvider extends
       ];
 
       if (options.markForDestructionOnLogout && (options.cachePolicy === "by-parent" || options.cachePolicy === "by-owner-and-parent")) {
-        this.markSearchForDestruction(options.cachePolicy, this.props.itemDefinitionInstance.getQualifiedPathName(), options.createdBy || null, searchParent);
+        this.markSearchForDestruction(
+          options.cachePolicy,
+          this.props.itemDefinitionInstance.getQualifiedPathName(),
+          options.createdBy || null,
+          searchParent,
+          null,
+        );
       }
-    }
-
-    if (options.cachePolicy === "by-owner") {
-      if (options.createdBy !== this.state.searchOwner) {
-        // this search listener is bad because the search
-        // owner has changed, and the previously registered listener
-        // if any does not match the owner, remember the search owner is the created by
-        // value, and we are now redoing the search, and we might have a search listener
-        // registered already for this search if that is the case
-        this.removePossibleSearchListeners();
-      }
-
-      if (options.markForDestructionOnLogout) {
-        this.markSearchForDestruction(options.cachePolicy, this.props.itemDefinitionInstance.getQualifiedPathName(), options.createdBy, null);
-      }
-    } else if (options.cachePolicy === "by-parent") {
-      // we basically do the exact same here, same logic
-      if (!equals(searchParent, this.state.searchParent, { strict: true })) {
-        // this search listener is bad because the search
-        // parent has changed, and the previously registered listener
-        // if any does not match the owner
-        this.removePossibleSearchListeners();
-      }
-    } else {
-      // otherwise we are removing here because we have no cache policy
-      // and hence no reason to have search listeners at all to listen to changes
-      this.removePossibleSearchListeners();
-    }
-
-    // we save the last options used for our last search
-    this.lastOptionsUsedForSearch = options;
-
-    // and then set the state to searching
-    if (!this.isUnmounted) {
-      this.setState({
-        searching: true,
-      });
     }
 
     // the args of the item definition depend on the search mode, hence we use
@@ -3868,6 +3876,74 @@ export class ActualItemProvider extends
       forId: this.props.forId || null,
       forVersion: this.props.forVersion || null,
     });
+
+    let searchCacheUsesProperty: [string, string] = null;
+    if (trackedPropertyDef) {
+      trackedPropertyVal = argumentsForQuery["SEARCH_" + trackedPropertyDef.getId()];
+
+      if (!trackedPropertyVal) {
+        throw new Error("trackedProperty value is null or empty string, this is not allowed as a trackeable value");
+      }
+
+      searchCacheUsesProperty = [trackedPropertyDef.getId(), trackedPropertyVal];
+    }
+
+    if (options.cachePolicy === "by-owner") {
+      if (options.createdBy !== this.state.searchOwner) {
+        // this search listener is bad because the search
+        // owner has changed, and the previously registered listener
+        // if any does not match the owner, remember the search owner is the created by
+        // value, and we are now redoing the search, and we might have a search listener
+        // registered already for this search if that is the case
+        this.removePossibleSearchListeners();
+      }
+
+      if (options.markForDestructionOnLogout) {
+        this.markSearchForDestruction(
+          options.cachePolicy,
+          this.props.itemDefinitionInstance.getQualifiedPathName(),
+          options.createdBy,
+          null,
+          null,
+        );
+      }
+    } else if (options.cachePolicy === "by-parent") {
+      // we basically do the exact same here, same logic
+      if (!equals(searchParent, this.state.searchParent, { strict: true })) {
+        // this search listener is bad because the search
+        // parent has changed, and the previously registered listener
+        // if any does not match the owner
+        this.removePossibleSearchListeners();
+      }
+    } else if (options.cachePolicy === "by-property") {
+      if (!equals(searchCacheUsesProperty, this.state.searchCacheUsesProperty, { strict: true })) {
+        this.removePossibleSearchListeners();
+      }
+
+      if (options.markForDestructionOnLogout) {
+        this.markSearchForDestruction(
+          options.cachePolicy,
+          this.props.itemDefinitionInstance.getQualifiedPathName(),
+          null,
+          null,
+          searchCacheUsesProperty,
+        );
+      }
+    } else {
+      // otherwise we are removing here because we have no cache policy
+      // and hence no reason to have search listeners at all to listen to changes
+      this.removePossibleSearchListeners();
+    }
+
+    // we save the last options used for our last search
+    this.lastOptionsUsedForSearch = options;
+
+    // and then set the state to searching
+    if (!this.isUnmounted) {
+      this.setState({
+        searching: true,
+      });
+    }
 
     // the fields nevertheless are another story as it uses the standard logic
     const searchFieldsAndArgs = getFieldsAndArgs({
@@ -3929,6 +4005,7 @@ export class ActualItemProvider extends
       fields: requestedSearchFields,
       itemDefinition: this.props.itemDefinitionInstance,
       cachePolicy: options.cachePolicy || "none",
+      trackedProperty: options.trackedProperty || null,
       createdBy: options.createdBy || null,
       since: options.since || null,
       orderBy: options.orderBy || (options.useSearchEngine ? {} :{
@@ -3957,7 +4034,13 @@ export class ActualItemProvider extends
     });
 
     if (!error && listenPolicy !== "none") {
-      this.searchListenersSetup(options, lastModified, options.createdBy || null, searchParent);
+      this.searchListenersSetup(
+        options,
+        lastModified,
+        options.createdBy || null,
+        searchParent,
+        searchCacheUsesProperty,
+      );
     }
 
     const searchId = uuid.v4();
@@ -3974,7 +4057,8 @@ export class ActualItemProvider extends
         searchId,
         searchOwner: options.createdBy || null,
         searchParent,
-        searchShouldCache: !!options.cachePolicy,
+        searchCacheUsesProperty,
+        searchShouldCache: options.cachePolicy && options.cachePolicy !== "none",
         searchFields: requestedSearchFields,
         searchRequestedProperties: options.requestedProperties,
         searchRequestedIncludes: options.requestedIncludes || {},
@@ -4072,7 +4156,8 @@ export class ActualItemProvider extends
         searchId,
         searchOwner: options.createdBy || null,
         searchParent,
-        searchShouldCache: !!options.cachePolicy,
+        searchCacheUsesProperty,
+        searchShouldCache: options.cachePolicy && options.cachePolicy !== "none",
         searchFields: requestedSearchFields,
         searchRequestedProperties: options.requestedProperties,
         searchRequestedIncludes: options.requestedIncludes || {},
@@ -4204,7 +4289,7 @@ export class ActualItemProvider extends
       searchError: null,
     });
   }
-  public onSearchReload(arg: IRemoteListenerRecordsCallbackArg) {
+  public async onSearchReload(arg: IRemoteListenerRecordsCallbackArg) {
     // this function is called when remotely the search
     // is said to update, and it needs to be reloaded
     // however the server has already specified how the data
@@ -4216,7 +4301,19 @@ export class ActualItemProvider extends
     // feedback as we already got feedback
     this.preventSearchFeedbackOnPossibleStaleData = true;
     this.reloadNextSearch = true;
-    this.search(this.lastOptionsUsedForSearch);
+    await this.search(this.lastOptionsUsedForSearch);
+
+    // now that the search is done, any records in cache would have updated
+    // in the case of cachePolicy usages, and now we can trigger updates
+    // down the line
+    const root = this.props.itemDefinitionInstance.getParentModule().getParentRoot();
+    arg.modifiedRecords.forEach((record) => {
+      const iDef = root.registry[record.type] as ItemDefinition;
+      const gqlValue = iDef.getGQLAppliedValue(record.id, record.version);
+      if (!gqlValue || !gqlValue.flattenedValue || gqlValue.flattenedValue.last_modified !== record.last_modified) {
+        iDef.triggerListeners("reload", record.id, record.version);
+      }
+    });
   }
   public removePossibleSearchListeners(
     props: IActualItemProviderProps = this.props,

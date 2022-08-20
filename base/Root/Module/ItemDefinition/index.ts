@@ -58,6 +58,7 @@ export interface IItemSearchStateType {
   searchLastModified: string;
   searchParent: [string, string, string];
   searchShouldCache: boolean;
+  searchCacheUsesProperty: [string, string];
   searchRequestedProperties: string[];
   searchRequestedIncludes: { [include: string]: string[] };
   searchFields: any;

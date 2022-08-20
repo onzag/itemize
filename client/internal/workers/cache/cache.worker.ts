@@ -517,7 +517,9 @@ export default class CacheWorker {
 
   public async writeSearchMetadata(
     queryName: string,
-    cachePolicy: "by-owner" | "by-parent" | "by-owner-and-parent",
+    searchArgs: IGQLArgs,
+    cachePolicy: "by-owner" | "by-parent" | "by-owner-and-parent" | "by-property",
+    trackedProperty: string,
     createdByIfKnown: string,
     parentTypeIfKnown: string,
     parentIdIfKnown: string,
@@ -541,6 +543,13 @@ export default class CacheWorker {
       storeKeyName += (createdByIfKnown || "");
     } else if (cachePolicy === "by-parent") {
       storeKeyName += parentTypeIfKnown + "." + parentIdIfKnown + "." + (parentVersionIfKnown || "");
+    } else if (cachePolicy === "by-property") {
+      const cachePropertyValue = searchArgs["SEARCH_" + trackedProperty] as string;
+      if (!cachePropertyValue || typeof cachePropertyValue !== "string") {
+        console.warn("Could not find a valid value for SEARCH_" + trackedProperty + " and hence the search cannot be executed");
+        return null;
+      }
+      storeKeyName += trackedProperty + "." + cachePropertyValue;
     } else {
       storeKeyName += (createdByIfKnown || "") + "." + parentTypeIfKnown + "." + parentIdIfKnown + "." + (parentVersionIfKnown || "");
     }
@@ -596,7 +605,9 @@ export default class CacheWorker {
 
   public async readSearchMetadata(
     queryName: string,
-    cachePolicy: "by-owner" | "by-parent" | "by-owner-and-parent",
+    searchArgs: IGQLArgs,
+    cachePolicy: "by-owner" | "by-parent" | "by-owner-and-parent" | "by-property",
+    trackedProperty: string,
     createdByIfKnown: string,
     parentTypeIfKnown: string,
     parentIdIfKnown: string,
@@ -619,6 +630,13 @@ export default class CacheWorker {
       storeKeyName += (createdByIfKnown || "");
     } else if (cachePolicy === "by-parent") {
       storeKeyName += parentTypeIfKnown + "." + parentIdIfKnown + "." + (parentVersionIfKnown || "");
+    } else if (cachePolicy === "by-property") {
+      const cachePropertyValue = searchArgs["SEARCH_" + trackedProperty] as string;
+      if (!cachePropertyValue || typeof cachePropertyValue !== "string") {
+        console.warn("Could not find a valid value for SEARCH_" + trackedProperty + " and hence the search cannot be executed");
+        return null;
+      }
+      storeKeyName += trackedProperty + "." + cachePropertyValue;
     } else {
       storeKeyName += (createdByIfKnown || "") + "." + parentTypeIfKnown + "." + parentIdIfKnown + "." + (parentVersionIfKnown || "");
     }
@@ -665,9 +683,10 @@ export default class CacheWorker {
    */
   public async deleteCachedSearch(
     queryName: string,
-    type: "by-parent" | "by-owner" | "by-owner-and-parent",
+    type: "by-parent" | "by-owner" | "by-owner-and-parent" | "by-property",
     owner: string,
     parent: [string, string, string],
+    property: [string, string],
   ) {
     // so we wait for the setup, just in case
     await this.waitForSetupPromise;
@@ -686,6 +705,8 @@ export default class CacheWorker {
       storeKeyName += parent[0] + "." + parent[1] + "." + (parent[2] || "");
     } else if (type === "by-owner-and-parent") {
       storeKeyName += (owner || "") + "." + parent[0] + "." + parent[1] + "." + (parent[2] || "");
+    } else if (type === "by-property") {
+      storeKeyName += property[0] + "." + property[1];
     }
 
     try {
@@ -867,11 +888,15 @@ export default class CacheWorker {
     parentTypeIfKnown: string,
     parentIdIfKnown: string,
     parentVersionIfKnown: string,
+    trackedProperty: string,
+    cachePropertyValue: string,
     newRecords: IGQLSearchRecord[],
+    createdRecords: IGQLSearchRecord[],
     modifiedRecords: IGQLSearchRecord[],
     lostRecords: IGQLSearchRecord[],
+    deletedRecords: IGQLSearchRecord[],
     newLastModified: string,
-    cachePolicy: "by-owner" | "by-parent" | "by-owner-and-parent",
+    cachePolicy: "by-owner" | "by-parent" | "by-property" | "by-owner-and-parent",
   ): Promise<boolean> {
     await this.waitForSetupPromise;
 
@@ -885,12 +910,14 @@ export default class CacheWorker {
       storeKeyName += (createdByIfKnown || "");
     } else if (cachePolicy === "by-parent") {
       storeKeyName += parentTypeIfKnown + "." + parentIdIfKnown + "." + (parentVersionIfKnown || "");
+    } else if (cachePolicy === "by-property") {
+      storeKeyName += trackedProperty + "." + cachePropertyValue;
     } else {
       storeKeyName += (createdByIfKnown || "") + "." + parentTypeIfKnown + "." + parentIdIfKnown + "." + (parentVersionIfKnown || "");
     }
 
     try {
-      await Promise.all(lostRecords.map((r) => {
+      await Promise.all(deletedRecords.map((r) => {
         return this.setCachedValue(
           PREFIX_GET + r.type,
           r.id,
@@ -922,14 +949,14 @@ export default class CacheWorker {
       // there might not be a current value, eg. if for some reason cache policy was set to none and yet
       // there was a listen policy for it, or if otherwise the data got somehow corrupted
       if (currentValue) {
-        let newCount = currentValue.count - lostRecords.length + newRecords.length;
+        let newCount = currentValue.count - lostRecords.length - deletedRecords.length + newRecords.length + createdRecords.length;
         // weird
         if (newCount < 0) {
           newCount = 0;
         }
 
         let newValue = currentValue.value.map((r) => {
-          const matchingLostRecord = lostRecords.find((lr) => lr.id === r.id && lr.version === r.version);
+          const matchingLostRecord = lostRecords.concat(deletedRecords).find((lr) => lr.id === r.id && lr.version === r.version);
           if (matchingLostRecord) {
             return null;
           }
@@ -955,7 +982,7 @@ export default class CacheWorker {
 
         // we need to filter the new records to stop duplicates from occurring
         // this can happen when there are several listeners going on at the same time
-        const newRecordsFiltered: IGQLSearchRecord[] = newRecords.filter((nr) => {
+        const newRecordsFiltered: IGQLSearchRecord[] = newRecords.concat(createdRecords).filter((nr) => {
           const recordAlreadyAdded = newValue.find((r) => r.id === nr.id && r.version === nr.version);
           return !recordAlreadyAdded;
         });
@@ -1008,7 +1035,8 @@ export default class CacheWorker {
     getListTokenArg: string,
     getListLangArg: string,
     getListRequestedFields: IGQLRequestFields,
-    cachePolicy: "by-owner" | "by-parent" | "by-owner-and-parent",
+    cachePolicy: "by-owner" | "by-parent" | "by-owner-and-parent" | "by-property",
+    trackedProperty: string,
     maxGetListResultsAtOnce: number,
     returnSources: boolean,
     redoSearch: boolean,
@@ -1020,12 +1048,20 @@ export default class CacheWorker {
       return null;
     }
 
+    let cachePropertyValue: string = null;
     let storeKeyName = searchQueryName + "." + cachePolicy.replace("-", "_") + ".";
     if (cachePolicy === "by-owner") {
       storeKeyName += searchArgs.created_by;
     } else if (cachePolicy === "by-parent") {
       storeKeyName += searchArgs.parent_type + "." +
         searchArgs.parent_id + "." + (searchArgs.parent_version || "");
+    } else if (cachePolicy === "by-property") {
+      cachePropertyValue = searchArgs["SEARCH_" + trackedProperty] as string;
+      if (!cachePropertyValue || typeof cachePropertyValue !== "string") {
+        console.warn("Could not find a valid value for SEARCH_" + trackedProperty + " and hence the search cannot be executed");
+        return null;
+      }
+      storeKeyName += trackedProperty + "." + cachePropertyValue;
     } else {
       storeKeyName += searchArgs.created_by + "." + searchArgs.parent_type + "." +
         searchArgs.parent_id + "." + (searchArgs.parent_version || "");
@@ -1077,6 +1113,10 @@ export default class CacheWorker {
           actualArgsToUseInGQLSearch.parent_type = searchArgs.parent_type;
           actualArgsToUseInGQLSearch.parent_id = searchArgs.parent_id;
           actualArgsToUseInGQLSearch.parent_version = searchArgs.parent_version;
+        }
+
+        if (cachePolicy === "by-property") {
+          actualArgsToUseInGQLSearch["SEARCH_" + trackedProperty] = cachePropertyValue;
         }
 
         // we request the server for this, in this case

@@ -1094,6 +1094,9 @@ export class ItemizeElasticClient {
     );
 
     // now we can do the select
+    // we only select 100 as limit when doing a initial consistency check
+    // that we have never done before because of the reason below in the comment
+    // we are getting more data
     const limit = statusInfo.lastConsisencyCheck === null ? 100 : 1000;
     const offset = batchNumber * limit;
     const documentsCreatedOrModifiedSinceLastRan = await this.rawDB.performRawDBSelect(
@@ -1585,6 +1588,17 @@ export class ItemizeElasticClient {
     const indexNameIdef = qualifiedNameItem.toLowerCase() + "_*";
     const mergedIds = ids.map((r) => r.id + "." + (r.version || ""));
 
+    CAN_LOG_DEBUG && logger.debug(
+      {
+        className: "ItemizeElasticClient",
+        methodName: "deleteDocumentsUnknownLanguage",
+        message: "Document for " + idef.getQualifiedPathName() + " to be deleted",
+        data: {
+          ids: mergedIds,
+        },
+      }
+    );
+
     // basically we will run a blanket delete
     // we are hoping to delete, 1 or 2, or whatever
     // maybe nothing, we don't care just blow everything
@@ -1605,7 +1619,7 @@ export class ItemizeElasticClient {
     id: string,
     version: string,
   ) {
-    this.deleteDocumentsUnknownLanguage(
+    return this.deleteDocumentsUnknownLanguage(
       itemDefinition,
       [
         {

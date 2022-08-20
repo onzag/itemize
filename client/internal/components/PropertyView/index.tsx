@@ -288,6 +288,11 @@ const handlerRegistry:
         renderer: "PropertyViewSimple",
         handler: PropertyViewReference,
         includeTokenDataAndSSR: true,
+      },
+      ["reference-tracked"]: {
+        renderer: "PropertyViewSimple",
+        handler: PropertyViewReference,
+        includeTokenDataAndSSR: true,
       }
     },
   },

@@ -7,7 +7,7 @@
  */
 
 import { ISQLTableRowValue } from "../base/Root/sql";
-import { CHANGED_FEEEDBACK_EVENT, generateOwnedParentedSearchMergedIndexIdentifier, generateOwnedSearchMergedIndexIdentifier, generateParentedSearchMergedIndexIdentifier, IChangedFeedbackEvent, IOwnedParentedSearchRecordsEvent, IOwnedSearchRecordsEvent, IParentedSearchRecordsEvent, IRedisEvent, OWNED_PARENTED_SEARCH_RECORDS_EVENT, OWNED_SEARCH_RECORDS_EVENT, PARENTED_SEARCH_RECORDS_EVENT } from "../base/remote-protocol";
+import { CHANGED_FEEDBACK_EVENT, generateOwnedParentedSearchMergedIndexIdentifier, generateOwnedSearchMergedIndexIdentifier, generateParentedSearchMergedIndexIdentifier, generatePropertySearchMergedIndexIdentifier, IChangedFeedbackEvent, IOwnedParentedSearchRecordsEvent, IOwnedSearchRecordsEvent, IParentedSearchRecordsEvent, IPropertySearchRecordsEvent, IRedisEvent, OWNED_PARENTED_SEARCH_RECORDS_EVENT, OWNED_SEARCH_RECORDS_EVENT, PARENTED_SEARCH_RECORDS_EVENT, PROPERTY_SEARCH_RECORDS_EVENT } from "../base/remote-protocol";
 import { CONNECTOR_SQL_COLUMN_ID_FK_NAME, CONNECTOR_SQL_COLUMN_VERSION_FK_NAME, DELETED_REGISTRY_IDENTIFIER, UNSPECIFIED_OWNER } from "../constants";
 import Root from "../base/Root";
 import { logger } from "./logger";
@@ -46,6 +46,7 @@ export function makeIdOutOf(str: string) {
  * @ignore
  */
 const requiredProperties = ["id", "version", "type", "created_by", "parent_id", "parent_type", "parent_version", "last_modified"];
+const invalidManualUpdate = ["id", "version", "type", "created_by", "last_modified", CONNECTOR_SQL_COLUMN_ID_FK_NAME, CONNECTOR_SQL_COLUMN_VERSION_FK_NAME];
 
 /**
  * This is a very advanced feature, if you are here is because you are doing raw database
@@ -183,8 +184,17 @@ export class ItemizeRawDB {
    * @param moduleName the module that it belongs to (based on the type)
    * @returns the transaction time
    */
-  private async storeInDeleteRegistry(row: ISQLTableRowValue, moduleName: string) {
+  private async storeInDeleteRegistry(row: ISQLTableRowValue, moduleName: string, trackedProperties: string[]) {
     const insertQuery = this.databaseConnection.getInsertBuilder();
+
+    const trackers: { [key: string]: string } = trackedProperties ? {} : null;
+    trackedProperties.forEach((pId) => {
+      const currentValue = row[pId] || null;
+      if (currentValue) {
+        trackers[pId] = currentValue;
+      }
+    });
+
     insertQuery.table(DELETED_REGISTRY_IDENTIFIER).insert({
       id: row.id,
       version: row.version,
@@ -206,8 +216,15 @@ export class ItemizeRawDB {
     return insertQueryValue.transaction_time as string;
   }
 
-  private async checkRowValidityForInformingChanges(row: ISQLTableRowValue) {
-    return !!(row && requiredProperties.every((p) => {
+  private async checkRowValidityForInformingChanges(row: ISQLTableRowValue, idef: ItemDefinition, doNotCheckTracked?: boolean) {
+    return !!(row && (
+      requiredProperties
+        .concat(
+          doNotCheckTracked ?
+            [] :
+            idef.getAllPropertyDefinitionsAndExtensions().filter((pdef) => pdef.isTracked()).map((pdef) => pdef.getId())
+        )
+    ).every((p) => {
       if (typeof row[p] === "undefined") {
         logger && logger.error(
           {
@@ -227,17 +244,29 @@ export class ItemizeRawDB {
   }
 
   private async informChangeOnRowElastic(
-    row: ISQLTableRowValue,
+    rowWithOlds: ISQLTableRowValue,
     action: "created" | "deleted" | "modified",
     elasticLanguageOverride: string,
     dataIsComplete: boolean,
     hasBeenChecked: boolean,
   ) {
     if (!hasBeenChecked) {
-      const isValid = this.checkRowValidityForInformingChanges(row);
+      // we don't need to check tracked properties for this
+      const isValid = this.checkRowValidityForInformingChanges(rowWithOlds, null, true);
       if (!isValid) {
         return;
       }
+    }
+
+    let row = rowWithOlds;
+    const keys = Object.keys(row);
+    if (action === "modified" && keys.some((key) => key.startsWith("OLD_"))) {
+      row = { ...rowWithOlds };
+      keys.forEach((k) => {
+        if (k.startsWith("OLD_")) {
+          delete row[k];
+        }
+      });
     }
 
     const idef = (this.root.registry[row.type] as ItemDefinition);
@@ -291,7 +320,7 @@ export class ItemizeRawDB {
             row.version || null,
           );
         }
-      } else {
+      } else if (action === "modified") {
         if (language) {
           this.elastic.updateDocumentUnknownOriginalLanguage(
             idef,
@@ -320,25 +349,37 @@ export class ItemizeRawDB {
    * @param dataIsComplete whether the row contains complete data
    */
   private async informChangeOnRow(row: ISQLTableRowValue, action: "created" | "deleted" | "modified", elasticLanguageOverride: string, dataIsComplete: boolean) {
+    if (!row.type) {
+      return null;
+    }
+
+    const idef = (this.root.registry[row.type] as ItemDefinition);
+
+    if (!idef) {
+      return null;
+    }
+
     // first let's check whether the row is valid for the bare minimum
-    const isRowValid = this.checkRowValidityForInformingChanges(row);
+    // also includes whether it contains the tracked properties which are
+    // required for this validity case
+    const isRowValid = this.checkRowValidityForInformingChanges(row, idef, false);
 
     // if it's not valid we return null
     if (!isRowValid) {
       return null;
     }
 
-    const idef = (this.root.registry[row.type] as ItemDefinition);
-
     this.informChangeOnRowElastic(row, action, elasticLanguageOverride, dataIsComplete, true);
 
     // now let's grab the module qualified name
     const moduleName = idef.getParentModule().getQualifiedPathName();
 
+    const tracked = idef.getAllPropertyDefinitionsAndExtensions().filter((pdef) => pdef.isTracked()).map((pdef) => pdef.getId());
+
     // and set into the deleted registry if we don't have it
     let lastModified = row.last_modified;
     if (action === "deleted") {
-      lastModified = await this.storeInDeleteRegistry(row, moduleName);
+      lastModified = await this.storeInDeleteRegistry(row, moduleName, tracked);
     }
 
     // build the change event
@@ -362,7 +403,7 @@ export class ItemizeRawDB {
       serverInstanceGroupId: null,
       source: "global",
       mergedIndexIdentifier,
-      type: CHANGED_FEEEDBACK_EVENT,
+      type: CHANGED_FEEDBACK_EVENT,
     }
 
     // if the data is complete, the data of the event
@@ -414,16 +455,25 @@ export class ItemizeRawDB {
     const processedChanges = (await Promise.all(rows.map((r) => this.informChangeOnRow(r, action, elasticLanguageOverride, rowDataIsComplete)))).filter((r) => r !== null);
 
     // now we can grab where we are putting the records for searches, depending on what occured to these rows
-    const recordsLocation = action === "deleted" ? "lostRecords" : (action === "created" ? "newRecords" : "modifiedRecords");
+    const recordsLocation = action === "deleted" ? "deletedRecords" : (action === "created" ? "createdRecords" : "modifiedRecords");
 
     // and let's start collecting all the events that we need to trigger about these records
     // because we have both parented and owned events, we will start collecting them
     const collectedOwned: { [key: string]: IOwnedSearchRecordsEvent } = {};
     const collectedParented: { [key: string]: IParentedSearchRecordsEvent } = {};
     const collectedOwnedParented: { [key: string]: IOwnedParentedSearchRecordsEvent } = {};
+    const collectedProperty: { [key: string]: IPropertySearchRecordsEvent } = {};
 
     // we will loop on the changes
     processedChanges.forEach((c) => {
+      // this is our record
+      const record = {
+        id: c.row.id,
+        last_modified: c.lastModified,
+        type: c.row.type,
+        version: c.row.version || null,
+      };
+
       // for the creator one
       if (c.row.created_by !== UNSPECIFIED_OWNER) {
         // these are the cache index identifiers for the module and item based search
@@ -444,6 +494,8 @@ export class ItemizeRawDB {
             newRecords: [],
             lostRecords: [],
             modifiedRecords: [],
+            createdRecords: [],
+            deletedRecords: [],
             newLastModified: null,
           }
         }
@@ -454,17 +506,11 @@ export class ItemizeRawDB {
             newRecords: [],
             lostRecords: [],
             modifiedRecords: [],
+            createdRecords: [],
+            deletedRecords: [],
             newLastModified: null,
           }
         }
-
-        // and this is our record
-        const record = {
-          id: c.row.id,
-          last_modified: c.lastModified,
-          type: c.row.type,
-          version: c.row.version || null,
-        };
 
         // we add it at the right place
         collectedOwned[ownedMergedIndexIdentifierOnItem][recordsLocation].push(record);
@@ -472,7 +518,12 @@ export class ItemizeRawDB {
       }
 
       // now for parenting, if we have a parent
-      if (c.row.parent_id) {
+      const oldParentId = typeof c.row.OLD_parent_id !== "undefined" ? c.row.OLD_parent_id : c.row.parent_id;
+      const oldParentType = typeof c.row.OLD_parent_type !== "undefined" ? c.row.OLD_parent_type : c.row.parent_type;
+      const oldParentVersion = typeof c.row.OLD_parent_version !== "undefined" ? c.row.OLD_parent_version : c.row.parent_version;
+      const isReparent = c.row.parent_id !== oldParentId || c.row.parent_version !== oldParentVersion || c.row.parent_type !== oldParentType;
+
+      if (c.row.parent_id || oldParentId) {
         // equally we build the cache identifiers for the parented searches both by module and by item
         const parentedMergedIndexIdentifierOnItem = generateParentedSearchMergedIndexIdentifier(
           c.itemQualifiedPathName,
@@ -497,6 +548,8 @@ export class ItemizeRawDB {
             newRecords: [],
             lostRecords: [],
             modifiedRecords: [],
+            createdRecords: [],
+            deletedRecords: [],
             newLastModified: null,
           }
         }
@@ -509,25 +562,75 @@ export class ItemizeRawDB {
             newRecords: [],
             lostRecords: [],
             modifiedRecords: [],
+            createdRecords: [],
+            deletedRecords: [],
             newLastModified: null,
           }
         }
 
-        // this is our record
-        const record = {
-          id: c.row.id,
-          last_modified: c.lastModified,
-          type: c.row.type,
-          version: c.row.version || null,
-        };
-
         // and we add it to the parented list
-        collectedParented[parentedMergedIndexIdentifierOnItem][recordsLocation].push(record);
-        collectedParented[parentedMergedIndexIdentifierOnModule][recordsLocation].push(record);
+        if (!isReparent) {
+          collectedParented[parentedMergedIndexIdentifierOnItem][recordsLocation].push(record);
+          collectedParented[parentedMergedIndexIdentifierOnModule][recordsLocation].push(record);
+        } else {
+          // we add to the new records because we have reparented
+          if (c.row.parent_id) {
+            collectedParented[parentedMergedIndexIdentifierOnItem].newRecords.push(record);
+            collectedParented[parentedMergedIndexIdentifierOnModule].newRecords.push(record);
+          }
+
+          if (oldParentId) {
+            const oldparentedMergedIndexIdentifierOnItem = generateParentedSearchMergedIndexIdentifier(
+              c.itemQualifiedPathName,
+              oldParentType,
+              oldParentId,
+              oldParentVersion,
+            );
+
+            const oldParentedMergedIndexIdentifierOnModule = generateParentedSearchMergedIndexIdentifier(
+              c.moduleQualifiedPathName,
+              oldParentType,
+              oldParentId,
+              oldParentVersion,
+            );
+
+            if (!collectedParented[oldparentedMergedIndexIdentifierOnItem]) {
+              collectedParented[oldparentedMergedIndexIdentifierOnItem] = {
+                parentId: oldParentId,
+                parentType: oldParentType,
+                parentVersion: oldParentVersion || null,
+                qualifiedPathName: c.itemQualifiedPathName,
+                newRecords: [],
+                lostRecords: [],
+                modifiedRecords: [],
+                createdRecords: [],
+                deletedRecords: [],
+                newLastModified: null,
+              }
+            }
+            if (!collectedParented[oldParentedMergedIndexIdentifierOnModule]) {
+              collectedParented[oldParentedMergedIndexIdentifierOnModule] = {
+                parentId: oldParentId,
+                parentType: oldParentType,
+                parentVersion: oldParentVersion || null,
+                qualifiedPathName: c.moduleQualifiedPathName,
+                newRecords: [],
+                lostRecords: [],
+                modifiedRecords: [],
+                createdRecords: [],
+                deletedRecords: [],
+                newLastModified: null,
+              }
+            }
+
+            collectedParented[oldparentedMergedIndexIdentifierOnItem].lostRecords.push(record);
+            collectedParented[oldParentedMergedIndexIdentifierOnModule].lostRecords.push(record);
+          }
+        }
       }
 
       // now for parenting, if we have a parent
-      if (c.row.parent_id && c.row.created_by !== UNSPECIFIED_OWNER) {
+      if ((c.row.parent_id || oldParentId) && c.row.created_by !== UNSPECIFIED_OWNER) {
         // equally we build the cache identifiers for the parented searches both by module and by item
         const ownedParentedMergedIndexIdentifierOnItem = generateOwnedParentedSearchMergedIndexIdentifier(
           c.itemQualifiedPathName,
@@ -555,6 +658,8 @@ export class ItemizeRawDB {
             newRecords: [],
             lostRecords: [],
             modifiedRecords: [],
+            createdRecords: [],
+            deletedRecords: [],
             newLastModified: null,
           }
         }
@@ -568,22 +673,176 @@ export class ItemizeRawDB {
             newRecords: [],
             lostRecords: [],
             modifiedRecords: [],
+            createdRecords: [],
+            deletedRecords: [],
             newLastModified: null,
           }
         }
 
-        // this is our record
-        const record = {
-          id: c.row.id,
-          last_modified: c.lastModified,
-          type: c.row.type,
-          version: c.row.version || null,
-        };
+        if (!isReparent) {
+          // and we add it to the parented list
+          collectedOwnedParented[ownedParentedMergedIndexIdentifierOnItem][recordsLocation].push(record);
+          collectedOwnedParented[ownedParentedMergedIndexIdentifierOnModule][recordsLocation].push(record);
+        } else {
+          if (c.row.parent_id) {
+            collectedOwnedParented[ownedParentedMergedIndexIdentifierOnItem].newRecords.push(record);
+            collectedOwnedParented[ownedParentedMergedIndexIdentifierOnModule].newRecords.push(record);
+          }
 
-        // and we add it to the parented list
-        collectedOwnedParented[ownedParentedMergedIndexIdentifierOnItem][recordsLocation].push(record);
-        collectedOwnedParented[ownedParentedMergedIndexIdentifierOnModule][recordsLocation].push(record);
+          if (oldParentId) {
+            const oldOwnedParentedMergedIndexIdentifierOnItem = generateOwnedParentedSearchMergedIndexIdentifier(
+              c.itemQualifiedPathName,
+              c.row.created_by,
+              oldParentType,
+              oldParentId,
+              oldParentVersion,
+            );
+            const oldOwnedParentedMergedIndexIdentifierOnModule = generateOwnedParentedSearchMergedIndexIdentifier(
+              c.moduleQualifiedPathName,
+              c.row.created_by,
+              oldParentType,
+              oldParentId,
+              oldParentVersion,
+            );
+
+            if (!collectedOwnedParented[oldOwnedParentedMergedIndexIdentifierOnItem]) {
+              collectedOwnedParented[oldOwnedParentedMergedIndexIdentifierOnItem] = {
+                parentId: oldParentId,
+                createdBy: c.row.created_by,
+                parentType: oldParentType,
+                parentVersion: oldParentVersion || null,
+                qualifiedPathName: c.itemQualifiedPathName,
+                newRecords: [],
+                lostRecords: [],
+                modifiedRecords: [],
+                createdRecords: [],
+                deletedRecords: [],
+                newLastModified: null,
+              }
+            }
+            if (!collectedOwnedParented[oldOwnedParentedMergedIndexIdentifierOnModule]) {
+              collectedOwnedParented[oldOwnedParentedMergedIndexIdentifierOnModule] = {
+                parentId: oldParentId,
+                createdBy: c.row.created_by,
+                parentType: oldParentType,
+                parentVersion: oldParentVersion || null,
+                qualifiedPathName: c.moduleQualifiedPathName,
+                newRecords: [],
+                lostRecords: [],
+                modifiedRecords: [],
+                createdRecords: [],
+                deletedRecords: [],
+                newLastModified: null,
+              }
+            }
+
+            collectedOwnedParented[oldOwnedParentedMergedIndexIdentifierOnItem].lostRecords.push(record);
+            collectedOwnedParented[oldOwnedParentedMergedIndexIdentifierOnModule].lostRecords.push(record);
+          }
+        }
       }
+
+      const idef = this.root.registry[c.itemQualifiedPathName] as ItemDefinition;
+      idef.getAllPropertyDefinitionsAndExtensions().filter((p) => p.isTracked()).forEach((trackedProperty) => {
+        const currentValue = c.row[trackedProperty.getId()];
+        const oldValue = c.row["OLD_" + trackedProperty.getId()] || currentValue;
+        const isReproperty = oldValue !== currentValue;
+
+        // equally we build the cache identifiers for the parented searches both by module and by item
+        const propertyMergedIndexIdentifierOnItem = generatePropertySearchMergedIndexIdentifier(
+          c.itemQualifiedPathName,
+          trackedProperty.getId(),
+          currentValue,
+        );
+        const propertyMergedIndexIdentifierOnModule = generatePropertySearchMergedIndexIdentifier(
+          c.moduleQualifiedPathName,
+          trackedProperty.getId(),
+          currentValue,
+        );
+
+        // and equally create the collection
+        if (!collectedProperty[propertyMergedIndexIdentifierOnItem]) {
+          collectedProperty[propertyMergedIndexIdentifierOnItem] = {
+            propertyId: trackedProperty.getId(),
+            propertyValue: currentValue,
+            qualifiedPathName: c.itemQualifiedPathName,
+            newRecords: [],
+            lostRecords: [],
+            modifiedRecords: [],
+            createdRecords: [],
+            deletedRecords: [],
+            newLastModified: null,
+          }
+        }
+        if (!collectedProperty[propertyMergedIndexIdentifierOnModule]) {
+          collectedProperty[propertyMergedIndexIdentifierOnModule] = {
+            propertyId: trackedProperty.getId(),
+            propertyValue: currentValue,
+            qualifiedPathName: c.moduleQualifiedPathName,
+            newRecords: [],
+            lostRecords: [],
+            modifiedRecords: [],
+            createdRecords: [],
+            deletedRecords: [],
+            newLastModified: null,
+          }
+        }
+
+        if (!isReproperty) {
+          // and we add it to the parented list
+          collectedProperty[propertyMergedIndexIdentifierOnItem][recordsLocation].push(record);
+          collectedProperty[propertyMergedIndexIdentifierOnModule][recordsLocation].push(record);
+        } else {
+          if (currentValue) {
+            collectedProperty[propertyMergedIndexIdentifierOnItem].newRecords.push(record);
+            collectedProperty[propertyMergedIndexIdentifierOnModule].newRecords.push(record);
+          }
+
+          if (oldValue) {
+            // equally we build the cache identifiers for the parented searches both by module and by item
+            const oldPropertyMergedIndexIdentifierOnItem = generatePropertySearchMergedIndexIdentifier(
+              c.itemQualifiedPathName,
+              trackedProperty.getId(),
+              oldValue,
+            );
+            const oldPropertyMergedIndexIdentifierOnModule = generatePropertySearchMergedIndexIdentifier(
+              c.moduleQualifiedPathName,
+              trackedProperty.getId(),
+              oldValue,
+            );
+
+            if (!collectedProperty[oldPropertyMergedIndexIdentifierOnItem]) {
+              collectedProperty[oldPropertyMergedIndexIdentifierOnItem] = {
+                propertyId: trackedProperty.getId(),
+                propertyValue: oldValue,
+                qualifiedPathName: c.itemQualifiedPathName,
+                newRecords: [],
+                lostRecords: [],
+                modifiedRecords: [],
+                createdRecords: [],
+                deletedRecords: [],
+                newLastModified: null,
+              }
+            }
+            if (!collectedProperty[oldPropertyMergedIndexIdentifierOnModule]) {
+              collectedProperty[oldPropertyMergedIndexIdentifierOnModule] = {
+                propertyId: trackedProperty.getId(),
+                propertyValue: oldValue,
+                qualifiedPathName: c.moduleQualifiedPathName,
+                newRecords: [],
+                lostRecords: [],
+                modifiedRecords: [],
+                createdRecords: [],
+                deletedRecords: [],
+                newLastModified: null,
+              }
+            }
+
+            collectedProperty[oldPropertyMergedIndexIdentifierOnItem].lostRecords.push(record);
+            collectedProperty[oldPropertyMergedIndexIdentifierOnModule].lostRecords.push(record);
+          }
+        }
+      });
     });
 
     // now we can start emitting these events, first with the owned ones
@@ -591,7 +850,13 @@ export class ItemizeRawDB {
       // grab the event
       const ownedEvent = collectedOwned[mergedIndexIdentifier];
       // we set our last modified date now from the records
-      ownedEvent.newLastModified = findLastRecordLastModifiedDate(ownedEvent.newRecords, ownedEvent.modifiedRecords, ownedEvent.lostRecords);
+      ownedEvent.newLastModified = findLastRecordLastModifiedDate(
+        ownedEvent.newRecords,
+        ownedEvent.modifiedRecords,
+        ownedEvent.lostRecords,
+        ownedEvent.deletedRecords,
+        ownedEvent.createdRecords,
+      );
 
       const redisEvent: IRedisEvent = {
         event: ownedEvent,
@@ -609,7 +874,13 @@ export class ItemizeRawDB {
       // grab the event
       const parentedEvent = collectedParented[mergedIndexIdentifier];
       // we set our last modified date now from the records
-      parentedEvent.newLastModified = findLastRecordLastModifiedDate(parentedEvent.newRecords, parentedEvent.modifiedRecords, parentedEvent.lostRecords);
+      parentedEvent.newLastModified = findLastRecordLastModifiedDate(
+        parentedEvent.newRecords,
+        parentedEvent.modifiedRecords,
+        parentedEvent.lostRecords,
+        parentedEvent.deletedRecords,
+        parentedEvent.createdRecords,
+      );
 
       const redisEvent: IRedisEvent = {
         event: parentedEvent,
@@ -627,7 +898,13 @@ export class ItemizeRawDB {
       // grab the event
       const ownedParentedEvent = collectedOwnedParented[mergedIndexIdentifier];
       // we set our last modified date now from the records
-      ownedParentedEvent.newLastModified = findLastRecordLastModifiedDate(ownedParentedEvent.newRecords, ownedParentedEvent.modifiedRecords, ownedParentedEvent.lostRecords);
+      ownedParentedEvent.newLastModified = findLastRecordLastModifiedDate(
+        ownedParentedEvent.newRecords,
+        ownedParentedEvent.modifiedRecords,
+        ownedParentedEvent.lostRecords,
+        ownedParentedEvent.deletedRecords,
+        ownedParentedEvent.createdRecords,
+      );
 
       const redisEvent: IRedisEvent = {
         event: ownedParentedEvent,
@@ -639,6 +916,31 @@ export class ItemizeRawDB {
 
       this.redisPub.redisClient.publish(mergedIndexIdentifier, JSON.stringify(redisEvent));
     });
+
+    // now with the parented ones
+    Object.keys(collectedProperty).forEach((mergedIndexIdentifier) => {
+      // grab the event
+      const propertyEvent = collectedProperty[mergedIndexIdentifier];
+      // we set our last modified date now from the records
+      propertyEvent.newLastModified = findLastRecordLastModifiedDate(
+        propertyEvent.newRecords,
+        propertyEvent.modifiedRecords,
+        propertyEvent.lostRecords,
+        propertyEvent.deletedRecords,
+        propertyEvent.createdRecords,
+      );
+
+      const redisEvent: IRedisEvent = {
+        event: propertyEvent,
+        serverInstanceGroupId: null,
+        source: "global",
+        type: PROPERTY_SEARCH_RECORDS_EVENT,
+        mergedIndexIdentifier,
+      };
+
+      this.redisPub.redisClient.publish(mergedIndexIdentifier, JSON.stringify(redisEvent));
+    });
+
 
     // all events have been published
   }
@@ -1049,7 +1351,7 @@ export class ItemizeRawDB {
       /**
        * Will update search indices anyway
        */
-       dangerousForceElasticUpdate?: boolean;
+      dangerousForceElasticUpdate?: boolean;
     },
   ): Promise<ISQLTableRowValue[]> {
     if (
@@ -1085,18 +1387,56 @@ export class ItemizeRawDB {
     } else {
       const moduleUpdateQuery = new UpdateBuilder();
       moduleUpdateQuery.table(moduleTable);
-      // here we will update our last modified
-      if (!updater.dangerousUseSilentMode) {
-        moduleUpdateQuery.setBuilder.set(JSON.stringify("last_modified") + " = NOW()", []);
-      }
       if (updater.moduleTableUpdate) {
         moduleUpdateQuery.setBuilder.setMany(updater.moduleTableUpdate);
       }
+
       updater.moduleTableUpdater &&
         updater.moduleTableUpdater(
           moduleUpdateQuery.setBuilder,
           this.redoDictionariesFn.bind(this, itemDefinition, moduleUpdateQuery.setBuilder)
         );
+
+      moduleUpdateQuery.setBuilder.knownAffectedColumns.forEach((affected) => {
+        if (affected[0] === null && invalidManualUpdate.includes(affected[1])) {
+          throw new Error("Cannot use a raw db update to modify the column " + affected[1]);
+        }
+      });
+
+      // here we will update our last modified
+      if (!updater.dangerousUseSilentMode) {
+        moduleUpdateQuery.setBuilder.set(JSON.stringify("last_modified") + " = NOW()", [], "last_modified");
+      }
+
+      const basicModTracked = mod.getAllPropExtensions().filter((pExt) => pExt.isTracked()).map((pExt) => pExt.getId());
+
+      const allModTracked = [
+        "parent_id",
+        "parent_type",
+        "parent_version",
+      ].concat(basicModTracked);
+
+      // now we get all the potentially affected tracked properties that may have changed
+      const potentialAffectedTrackedProperties = moduleUpdateQuery.setBuilder.hasUnknownAffectedColumnExpression ? allModTracked : (
+        allModTracked.filter((tracked) => moduleUpdateQuery.setBuilder.knownAffectedColumns.some(
+          (affected) => affected[0] === null && affected[1] === tracked
+        ))
+      );
+
+      // now we may want to know the old values of these columnd
+      // if they had happened to be affected as we have to know
+      // what value they used to hold in order to trigger an update
+      // to the old (eg. a reparent that a record was lost)
+      // and to the new (eg. that a record was gained)
+      if (potentialAffectedTrackedProperties.length) {
+        moduleUpdateQuery.fromBuilder.from([moduleTable, "MOD_TABLE_OLD"])
+        moduleUpdateQuery.whereBuilder.andWhereColumn("id", ["\"MOD_TABLE_OLD\".\"id\"", []]);
+        moduleUpdateQuery.whereBuilder.andWhereColumn("version", ["\"MOD_TABLE_OLD\".\"version\"", []]);
+
+        potentialAffectedTrackedProperties.forEach((p) => {
+          moduleUpdateQuery.returningBuilder.returning("\"MOD_TABLE_OLD\"." + JSON.stringify(p) + " AS " + JSON.stringify("OLD_" + p), []);
+        });
+      }
 
       // and join it on id and version match
       moduleUpdateQuery.whereBuilder.andWhere(JSON.stringify("id") + "=" + JSON.stringify(CONNECTOR_SQL_COLUMN_ID_FK_NAME));
@@ -1127,6 +1467,41 @@ export class ItemizeRawDB {
           itemUpdateQuery.setBuilder,
           this.redoDictionariesFn.bind(this, itemDefinition, itemUpdateQuery.setBuilder),
         );
+
+      itemUpdateQuery.setBuilder.knownAffectedColumns.forEach((affected) => {
+        if (affected[0] === null && invalidManualUpdate.includes(affected[1])) {
+          throw new Error("Cannot use a raw db update to modify the column " + affected[1]);
+        }
+      });
+
+      const basicIdefTracked = mod.getAllPropExtensions().filter((pExt) => pExt.isTracked()).map((pExt) => pExt.getId());
+
+      const potentialAffectedTrackedProperties = itemUpdateQuery.setBuilder.hasUnknownAffectedColumnExpression ? basicIdefTracked : (
+        basicIdefTracked.filter((tracked) => itemUpdateQuery.setBuilder.knownAffectedColumns.some(
+          (affected) => affected[0] === null && affected[1] === tracked
+        ))
+      );
+
+      // now we may want to know the old values of these columnd
+      // if they had happened to be affected as we have to know
+      // what value they used to hold in order to trigger an update
+      // to the old (eg. a reparent that a record was lost)
+      // and to the new (eg. that a record was gained)
+      if (potentialAffectedTrackedProperties.length) {
+        itemUpdateQuery.fromBuilder.from([moduleTable, "IDEF_TABLE_OLD"])
+        itemUpdateQuery.whereBuilder.andWhereColumn(
+          CONNECTOR_SQL_COLUMN_ID_FK_NAME,
+          ["\"IDEF_TABLE_OLD\"." + JSON.stringify(CONNECTOR_SQL_COLUMN_ID_FK_NAME), []],
+        );
+        itemUpdateQuery.whereBuilder.andWhereColumn(
+          CONNECTOR_SQL_COLUMN_VERSION_FK_NAME,
+          ["\"IDEF_TABLE_OLD\"." + JSON.stringify(CONNECTOR_SQL_COLUMN_VERSION_FK_NAME), []],
+        );
+
+        potentialAffectedTrackedProperties.forEach((p) => {
+          itemUpdateQuery.returningBuilder.returning("\"IDEF_TABLE_OLD\"." + JSON.stringify(p) + " AS " + JSON.stringify("OLD_" + p), []);
+        });
+      }
 
       withQuery.with("ITABLE", itemUpdateQuery);
     } else {
@@ -1179,8 +1554,6 @@ export class ItemizeRawDB {
    * in the database this is a very powerful and quite
    * advanced method
    * 
-   * NOTE that 
-   * 
    * @param moduleToUpdate 
    * @param updater 
    */
@@ -1206,7 +1579,7 @@ export class ItemizeRawDB {
       /**
        * Will update search indices anyway
        */
-       dangerousForceElasticUpdate?: boolean;
+      dangerousForceElasticUpdate?: boolean;
     },
   ): Promise<ISQLTableRowValue[]> {
     if (
@@ -1219,21 +1592,51 @@ export class ItemizeRawDB {
     const mod = moduleToUpdate instanceof Module ? moduleToUpdate : this.root.registry[moduleToUpdate] as Module;
     const moduleTable = mod.getQualifiedPathName();
 
+    // we are going to check that no tracked properties exist in the item, otherwise the update can't be done
+    // using a batch raw db update because we are missing the tracked properties of each item definition for that
+    if (!updater.dangerousUseSilentMode) {
+      let affectedId: string = "";
+      const affectedIdef = mod.getAllChildItemDefinitions().find((cIdef) => {
+        const pdef = cIdef.getAllPropertyDefinitions().find((pIdef) => pIdef.isTracked());
+        if (pdef) {
+          affectedId = pdef.getId();
+          return true;
+        }
+
+        return false;
+      });
+
+      if (affectedIdef) {
+        throw new Error("Cannot run a batch module based update because child item " +
+          affectedIdef.getName() + " has a tracked property " + affectedId);
+      }
+    }
+
     const moduleUpdateQuery = new UpdateBuilder();
     moduleUpdateQuery.table(moduleTable);
-    // here we will update our last modified
-    if (!updater.dangerousUseSilentMode) {
-      moduleUpdateQuery.setBuilder.set(JSON.stringify("last_modified") + " = NOW()", []);
-    }
     if (updater.moduleTableUpdate) {
       moduleUpdateQuery.setBuilder.setMany(updater.moduleTableUpdate);
     }
+
+    moduleUpdateQuery.setBuilder.knownAffectedColumns.forEach((affected) => {
+      if (affected[0] === null && invalidManualUpdate.includes(affected[1])) {
+        throw new Error("Cannot use a raw db update to modify the column " + affected[1]);
+      }
+    });
+
+    // here we will update our last modified
+    if (!updater.dangerousUseSilentMode) {
+      moduleUpdateQuery.setBuilder.set(JSON.stringify("last_modified") + " = NOW()", [], "last_modified");
+    }
+
+    const basicTracked = mod.getAllPropExtensions().filter((pExt) => pExt.isTracked()).map((pExt) => pExt.getId());
 
     updater.moduleTableUpdater && updater.moduleTableUpdater(
       moduleUpdateQuery.setBuilder,
       this.redoDictionariesFn.bind(this, mod, moduleUpdateQuery.setBuilder),
     );
     updater.whereCriteriaSelector(moduleUpdateQuery.whereBuilder);
+
     moduleUpdateQuery.returningBuilder.returningColumn("id");
     moduleUpdateQuery.returningBuilder.returningColumn("version");
     moduleUpdateQuery.returningBuilder.returningColumn("type");
@@ -1242,6 +1645,43 @@ export class ItemizeRawDB {
     moduleUpdateQuery.returningBuilder.returningColumn("parent_type");
     moduleUpdateQuery.returningBuilder.returningColumn("parent_version");
     moduleUpdateQuery.returningBuilder.returningColumn("last_modified");
+
+    if (!updater.dangerousUseSilentMode) {
+      const allTracked = [
+        "parent_id",
+        "parent_type",
+        "parent_version",
+        "id",
+        "version",
+      ].concat(basicTracked);
+
+      // now we get all the potentially affected tracked properties that may have changed
+      const potentialAffectedTrackedProperties = moduleUpdateQuery.setBuilder.hasUnknownAffectedColumnExpression ? allTracked : (
+        allTracked.filter((tracked) => moduleUpdateQuery.setBuilder.knownAffectedColumns.some(
+          (affected) => affected[0] === null && affected[1] === tracked
+        ))
+      );
+
+      // add the tracked columns
+      basicTracked.forEach((t) => {
+        moduleUpdateQuery.returningBuilder.returningColumn(t);
+      });
+
+      // now we may want to know the old values of these columnd
+      // if they had happened to be affected as we have to know
+      // what value they used to hold in order to trigger an update
+      // to the old (eg. a reparent that a record was lost)
+      // and to the new (eg. that a record was gained)
+      if (potentialAffectedTrackedProperties.length) {
+        moduleUpdateQuery.fromBuilder.from([moduleTable, "MOD_TABLE_OLD"])
+        moduleUpdateQuery.whereBuilder.andWhereColumn("id", ["\"MOD_TABLE_OLD\".\"id\"", []]);
+        moduleUpdateQuery.whereBuilder.andWhereColumn("version", ["\"MOD_TABLE_OLD\".\"version\"", []]);
+
+        potentialAffectedTrackedProperties.forEach((p) => {
+          moduleUpdateQuery.returningBuilder.returning("\"MOD_TABLE_OLD\"." + JSON.stringify(p) + " AS " + JSON.stringify("OLD_" + p), []);
+        });
+      }
+    }
 
     // we got to get all rows, first we create a pseudo table
     // for our module
@@ -1273,7 +1713,7 @@ export class ItemizeRawDB {
    * Performs a raw database update, use this method in order to update critical data that could
    * lead to race conditions, otherwise stay by updating through the cache
    * 
-   * TODO returning builder access
+   * TODO returning builder access will affect tracked properties
    *
    * @param item 
    * @param id 
@@ -1304,120 +1744,17 @@ export class ItemizeRawDB {
       /**
        * Will update search indices anyway
        */
-       dangerousForceElasticUpdate?: boolean;
+      dangerousForceElasticUpdate?: boolean;
     }
   ): Promise<ISQLTableRowValue> {
-    if (
-      !updater.moduleTableUpdate &&
-      !updater.itemTableUpdate &&
-      !updater.moduleTableUpdater &&
-      !updater.itemTableUpdater
-    ) {
-      throw new Error("no module update and no item update was specified into the updater");
-    }
-
-    const itemDefinition = item instanceof ItemDefinition ? item : this.root.registry[item] as ItemDefinition;
-    const mod = itemDefinition.getParentModule();
-
-    const moduleTable = mod.getQualifiedPathName();
-    const selfTable = itemDefinition.getQualifiedPathName();
-
-    const withQuery = new WithBuilder();
-
-    if (
-      updater.dangerousUseSilentMode &&
-      (!updater.moduleTableUpdate || Object.keys(updater.moduleTableUpdate).length === 0) &&
-      !updater.moduleTableUpdater
-    ) {
-      const moduleSelectQuery = new SelectBuilder();
-      moduleSelectQuery.selectAll().fromBuilder.from(moduleTable);
-      moduleSelectQuery.whereBuilder.andWhereColumn("id", id);
-      moduleSelectQuery.whereBuilder.andWhereColumn("version", version || "");
-      withQuery.with("MTABLE", moduleSelectQuery);
-    } else {
-      const moduleUpdateQuery = new UpdateBuilder();
-      moduleUpdateQuery.table(moduleTable);
-
-      // here we will update our last modified
-      if (!updater.dangerousUseSilentMode) {
-        moduleUpdateQuery.setBuilder.set(JSON.stringify("last_modified") + " = NOW()", []);
+    return (await this.performBatchRawDBUpdate(
+      item,
+      {
+        ...updater,
+        whereCriteriaSelector: (arg) => {
+          arg.andWhereColumn("id", id).andWhereColumn("version", version)
+        },
       }
-      if (updater.moduleTableUpdate) {
-        moduleUpdateQuery.setBuilder.setMany(updater.moduleTableUpdate);
-      }
-      updater.moduleTableUpdater && updater.moduleTableUpdater(
-        moduleUpdateQuery.setBuilder, this.redoDictionariesFn.bind(this, itemDefinition, moduleUpdateQuery.setBuilder),
-      );
-      // and join it on id and version match
-      moduleUpdateQuery.whereBuilder.andWhereColumn("id", id);
-      moduleUpdateQuery.whereBuilder.andWhereColumn("version", version || "");
-
-      // returning only the module table information
-      moduleUpdateQuery.returningBuilder.returningAll();
-
-      withQuery.with("MTABLE", moduleUpdateQuery);
-    }
-
-    if (updater.itemTableUpdater || updater.itemTableUpdate) {
-      const itemUpdateQuery = new UpdateBuilder();
-      itemUpdateQuery.table(selfTable);
-      // and join it on id and version match
-      itemUpdateQuery.whereBuilder.andWhereColumn(CONNECTOR_SQL_COLUMN_ID_FK_NAME, id);
-      itemUpdateQuery.whereBuilder.andWhereColumn(CONNECTOR_SQL_COLUMN_VERSION_FK_NAME, version || "");
-      // returning only the item table information
-      itemUpdateQuery.returningBuilder.returningAll();
-
-      if (updater.itemTableUpdate) {
-        itemUpdateQuery.setBuilder.setMany(updater.itemTableUpdate);
-      }
-      updater.itemTableUpdater && updater.itemTableUpdater(
-        itemUpdateQuery.setBuilder, this.redoDictionariesFn.bind(this, itemDefinition, itemUpdateQuery.setBuilder),
-      );
-
-      withQuery.with("ITABLE", itemUpdateQuery);
-    } else {
-      const itemSelectQuery = new SelectBuilder();
-      // from both tables
-      itemSelectQuery.fromBuilder.from(selfTable);
-      // where they match the id and version so that it joins
-      itemSelectQuery.whereBuilder.andWhereColumn(CONNECTOR_SQL_COLUMN_ID_FK_NAME, id);
-      itemSelectQuery.whereBuilder.andWhereColumn(CONNECTOR_SQL_COLUMN_VERSION_FK_NAME, version || "");
-      // here we would do a simple select of only the properties
-      // of the item definition table
-      itemSelectQuery.selectAll();
-
-      withQuery.with("ITABLE", itemSelectQuery);
-    }
-
-    const selectQuery = new SelectBuilder();
-    selectQuery.selectAll().fromBuilder.from("MTABLE");
-    selectQuery.joinBuilder.join("ITABLE", (rule) => {
-      rule.onColumnEquals(CONNECTOR_SQL_COLUMN_ID_FK_NAME, "id");
-      rule.onColumnEquals(CONNECTOR_SQL_COLUMN_VERSION_FK_NAME, "version");
-    });
-    selectQuery.limit(1);
-
-    withQuery.do(selectQuery);
-
-    // this is basically the same as the cache one
-    const sqlValue = convertVersionsIntoNullsWhenNecessary(
-      await this.databaseConnection.queryFirst(withQuery),
-    );
-
-    if (!updater.dangerousUseSilentMode) {
-      if (this.transacting) {
-        this.transactingQueue.push(this.informRowsHaveBeenModified.bind(this, [sqlValue], updater.dangerousForceElasticLangUpdateTo, true));
-      } else {
-        await this.informRowsHaveBeenModified([sqlValue], updater.dangerousForceElasticLangUpdateTo, true);
-      }
-    } else if (typeof updater.dangerousForceElasticLangUpdateTo !== "undefined" || updater.dangerousForceElasticUpdate) {
-      if (this.transacting) {
-        this.transactingQueue.push(this.informRowsHaveBeenModifiedElasticOnly.bind(this, [sqlValue], updater.dangerousForceElasticLangUpdateTo, true));
-      } else {
-        this.informRowsHaveBeenModifiedElasticOnly([sqlValue], updater.dangerousForceElasticLangUpdateTo, true);
-      }
-    }
-
-    return sqlValue;
+    ))[0] || null;
   }
 }

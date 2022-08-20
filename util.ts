@@ -855,6 +855,9 @@ export function loadCSS(id: string, url: string) {
 }
 
 export function isLibReady(id: string): boolean {
+  if (typeof document === "undefined") {
+    return false;
+  }
   const element = document.getElementById(id);
   return element && element.dataset.loading !== "true";
 }

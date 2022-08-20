@@ -510,13 +510,14 @@ class ActualTokenProvider extends React.Component<IActualTokenProviderProps, IAc
 
     // now we loop over the destruction markers
     Object.keys(searchDestructionMarkers).forEach((qualifiedPathName: string) => {
-      searchDestructionMarkers[qualifiedPathName].forEach((marker: [string, string, [string, string, string]]) => {
+      searchDestructionMarkers[qualifiedPathName].forEach((marker: [string, string, [string, string, string], [string, string]]) => {
         // and delete everything within it
         CacheWorkerInstance.instance.deleteCachedSearch(
           PREFIX_SEARCH + qualifiedPathName,
           marker[0] as any,
           marker[1],
           marker[2],
+          marker[3],
         );
       });
     });

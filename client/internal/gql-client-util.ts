@@ -1251,9 +1251,10 @@ interface ISearchQueryArg {
 }
 
 interface IRunSearchQueryArg extends ISearchQueryArg {
-  cachePolicy: "by-owner" | "by-parent" | "by-owner-and-parent" | "none",
+  cachePolicy: "by-owner" | "by-parent" | "by-owner-and-parent" | "by-property" | "none",
   cacheStoreMetadata?: any,
   cacheStoreMetadataMismatchAction?: ISearchCacheMetadataMismatchAction;
+  trackedProperty?: string;
   waitAndMerge?: boolean;
   progresser?: ProgresserFn;
 }
@@ -1362,7 +1363,7 @@ export function getSearchQueryFor(
  * @param arg.args the search args, contains our search options for the properties
  * such as EXACT_property_id and things like that
  * @param arg.fields the fields we want to request for the result, not the record,
- * these fields are used either for cache policied by-owner or by-parent searches,
+ * these fields are used either for cache policied by-owner, by-parent, by-parent-and-owner or by-property searches,
  * as well as traditional mode, but they are not used in other circumstances
  * @param arg.itemDefinition the item definition we are running a search query for
  * it should be an extensions instance if we are doing it for a module
@@ -1372,11 +1373,13 @@ export function getSearchQueryFor(
  * @param arg.parentedBy in order to filter by parenting, should be present
  * if cachePolicy is by-parent otherwise null
  * @param arg.cachePolicy either "by-owner" (must specify createdBy) or "by-parent" (must specify parented-by) or
+ * "by-property" which means the trackedProperty should be defined and it should specify the property value in the args as
  * otherwise "none", this will make it so that searches are ran in the cache rather than querying the
  * endpoint, they will be ran inside the cache worker; this means the capabilities of search are limited
  * compared to running them right into the endpoint, but that means searches can be performed offline
  * as well as many results be cached, eg. a list of messages; cache policy is a very powerful
  * option. Remember that offset must be 0, as we need to cache the latest result.
+ * @param arg.trackedProperty if it was defined as a property then the cache property is to be defined here
  * @param arg.traditional a traditional search, doesn't support any cache policy
  * @param arg.limit the limit to limit by, this should be less or equal to the limit
  * that you can get search results (for traditional) or search records (for standard)
@@ -1454,6 +1457,7 @@ export async function runSearchQueryFor(
       arg.language.split("-")[0],
       arg.fields,
       arg.cachePolicy,
+      arg.trackedProperty,
       standardCounterpartModule.getMaxSearchResults(),
       !!arg.cacheStoreMetadataMismatchAction,
       false,
@@ -1474,7 +1478,9 @@ export async function runSearchQueryFor(
       // let's get our current metadata
       const currentMetadata = await CacheWorkerInstance.instance.readSearchMetadata(
         queryName,
+        searchArgs,
         arg.cachePolicy,
+        arg.trackedProperty,
         arg.createdBy,
         arg.parentedBy.itemDefinition.getQualifiedPathName(),
         arg.parentedBy.id,
@@ -1530,6 +1536,7 @@ export async function runSearchQueryFor(
           arg.language.split("-")[0],
           arg.fields,
           arg.cachePolicy,
+          arg.trackedProperty,
           standardCounterpartModule.getMaxSearchResults(),
           false,
           redoSearch,
@@ -1546,7 +1553,9 @@ export async function runSearchQueryFor(
     ) {
       await CacheWorkerInstance.instance.writeSearchMetadata(
         queryName,
+        searchArgs,
         arg.cachePolicy,
+        arg.trackedProperty,
         arg.createdBy,
         arg.parentedBy.itemDefinition.getQualifiedPathName(),
         arg.parentedBy.id,

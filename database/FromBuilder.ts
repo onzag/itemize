@@ -12,7 +12,7 @@ export class FromBuilder extends QueryBuilder {
   /**
    * The tables we do the from rule
    */
-  private tables: string[] = [];
+  private tables: Array<string | [string, string]> = [];
 
   /**
    * builds a new from builder
@@ -26,7 +26,7 @@ export class FromBuilder extends QueryBuilder {
    * @param tableNames the tables to select
    * @returns itself
    */
-  public from(...tableNames: string[]) {
+  public from(...tableNames: Array<string | [string, string]>) {
     this.tables = this.tables.concat(tableNames);
     return this;
   }
@@ -49,6 +49,10 @@ export class FromBuilder extends QueryBuilder {
     if (!this.tables.length) {
       return "";
     }
-    return "FROM " + this.tables.map((t) => JSON.stringify(t)).join(", ");
+    return "FROM " + this.tables.map((t) =>
+      typeof t === "string" ?
+        JSON.stringify(t) :
+        JSON.stringify(t[0]) + " " + JSON.stringify(t[1])
+      ).join(", ");
   }
 }

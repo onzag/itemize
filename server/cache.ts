@@ -20,7 +20,7 @@ import Root from "../base/Root";
 import { convertGQLValueToSQLValueForItemDefinition, convertSQLValueToGQLValueForItemDefinition } from "../base/Root/Module/ItemDefinition/sql";
 import { convertGQLValueToSQLValueForModule } from "../base/Root/Module/sql";
 import { deleteEverythingInFilesContainerId } from "../base/Root/Module/ItemDefinition/PropertyDefinition/sql/file-management";
-import { IOwnedParentedSearchRecordsEvent, IOwnedSearchRecordsEvent, IParentedSearchRecordsEvent } from "../base/remote-protocol";
+import { IOwnedParentedSearchRecordsEvent, IOwnedSearchRecordsEvent, IParentedSearchRecordsEvent, IPropertySearchRecordsEvent } from "../base/remote-protocol";
 import { IChangedFeedbackEvent } from "../base/remote-protocol";
 import { EndpointError } from "../base/errors";
 import { IServerDataType, IAppDataType } from ".";
@@ -44,6 +44,12 @@ import { ItemizeElasticClient } from "./elastic";
 
 const CACHE_EXPIRES_DAYS = 14;
 const MEMCACHE_EXPIRES_MS = 1000;
+
+interface IPropertyMapElement {
+  id: string,
+  newValue: string,
+  originalValue: string,
+}
 
 /**
  * The cache class that provides all the functionality that is
@@ -237,25 +243,32 @@ export class Cache {
   public triggerSearchListenersFor(
     itemDefinition: ItemDefinition,
     createdBy: string,
-    parent: {
+    newParent: {
       type: string,
       id: string,
       version: string,
     },
+    originalParent: {
+      type: string,
+      id: string,
+      version: string,
+    },
+    propertyMap: IPropertyMapElement[],
     record: IGQLSearchRecord,
-    location: "new" | "lost" | "modified",
-    doNotTriggerOwnedEventsBecauseItsReparent?: boolean,
+    location: "new" | "deleted" | "modified",
   ) {
     const newRecordArr = [record];
     const idefQualifiedPathName = itemDefinition.getQualifiedPathName();
     const modQualifiedPathName = itemDefinition.getParentModule().getQualifiedPathName();
 
-    if (createdBy && !doNotTriggerOwnedEventsBecauseItsReparent) {
+    if (createdBy) {
       const itemDefinitionBasedOwnedEvent: IOwnedSearchRecordsEvent = {
         qualifiedPathName: idefQualifiedPathName,
         createdBy: itemDefinition.isOwnerObjectId() ? record.id : createdBy,
-        newRecords: location === "new" ? newRecordArr : [],
-        lostRecords: location === "lost" ? newRecordArr : [],
+        newRecords: [],
+        createdRecords: location === "new" ? newRecordArr : [],
+        lostRecords: [],
+        deletedRecords: location === "deleted" ? newRecordArr : [],
         modifiedRecords: location === "modified" ? newRecordArr : [],
         newLastModified: record.last_modified,
       };
@@ -296,98 +309,459 @@ export class Cache {
       );
     }
 
-    if (parent) {
-      const itemDefinitionBasedParentedEvent: IParentedSearchRecordsEvent = {
-        qualifiedPathName: idefQualifiedPathName,
-        parentId: parent.id,
-        parentVersion: parent.version || null,
-        parentType: parent.type,
-        newRecords: location === "new" ? newRecordArr : [],
-        lostRecords: location === "lost" ? newRecordArr : [],
-        modifiedRecords: location === "modified" ? newRecordArr : [],
-        newLastModified: record.last_modified,
-      };
-      CAN_LOG_DEBUG && logger.debug(
-        {
-          className: "Cache",
-          methodName: "triggerSearchListenersFor (detached)",
-          message: "Built and triggering search result and event for parented active searches (item definition)",
-          data: {
-            event: itemDefinitionBasedParentedEvent,
-          },
-        },
-      );
-      this.listener.triggerParentedSearchListeners(
-        itemDefinitionBasedParentedEvent,
-        null, // TODO add the listener uuid, maybe?
-      );
+    if (newParent) {
+      const isReparent =
+        location === "modified" &&
+        originalParent &&
+        (
+          originalParent.id !== newParent.id ||
+          originalParent.version !== newParent.version ||
+          originalParent.type !== newParent.type
+        );
 
-      const moduleBasedParentedEvent: IParentedSearchRecordsEvent = {
-        ...itemDefinitionBasedParentedEvent,
-        qualifiedPathName: modQualifiedPathName,
-      };
-      CAN_LOG_DEBUG && logger.debug(
-        {
-          className: "Cache",
-          methodName: "triggerSearchListenersFor (detached)",
-          message: "Built and triggering search result and event for parented active searches (module)",
-          data: {
-            event: moduleBasedParentedEvent,
+      if (!isReparent) {
+        const itemDefinitionBasedParentedEvent: IParentedSearchRecordsEvent = {
+          qualifiedPathName: idefQualifiedPathName,
+          parentId: newParent.id,
+          parentVersion: newParent.version || null,
+          parentType: newParent.type,
+          newRecords: [],
+          createdRecords: location === "new" ? newRecordArr : [],
+          lostRecords: [],
+          deletedRecords: location === "deleted" ? newRecordArr : [],
+          modifiedRecords: location === "modified" ? newRecordArr : [],
+          newLastModified: record.last_modified,
+        };
+        CAN_LOG_DEBUG && logger.debug(
+          {
+            className: "Cache",
+            methodName: "triggerSearchListenersFor (detached)",
+            message: "Built and triggering search result and event for parented active searches (item definition)",
+            data: {
+              event: itemDefinitionBasedParentedEvent,
+            },
           },
-        },
-      );
-      this.listener.triggerParentedSearchListeners(
-        moduleBasedParentedEvent,
-        null, // TODO add the listener uuid, maybe?
-      );
+        );
+        this.listener.triggerParentedSearchListeners(
+          itemDefinitionBasedParentedEvent,
+          null, // TODO add the listener uuid, maybe?
+        );
+
+        const moduleBasedParentedEvent: IParentedSearchRecordsEvent = {
+          ...itemDefinitionBasedParentedEvent,
+          qualifiedPathName: modQualifiedPathName,
+        };
+        CAN_LOG_DEBUG && logger.debug(
+          {
+            className: "Cache",
+            methodName: "triggerSearchListenersFor (detached)",
+            message: "Built and triggering search result and event for parented active searches (module)",
+            data: {
+              event: moduleBasedParentedEvent,
+            },
+          },
+        );
+        this.listener.triggerParentedSearchListeners(
+          moduleBasedParentedEvent,
+          null, // TODO add the listener uuid, maybe?
+        );
+      } else {
+        const itemDefinitionBasedParentedEventForNewParent: IParentedSearchRecordsEvent = {
+          qualifiedPathName: idefQualifiedPathName,
+          parentId: newParent.id,
+          parentVersion: newParent.version || null,
+          parentType: newParent.type,
+          newRecords: newRecordArr,
+          lostRecords: [],
+          modifiedRecords: [],
+          createdRecords: [],
+          deletedRecords: [],
+          newLastModified: record.last_modified,
+        };
+        const itemDefinitionBasedParentedEventForOldParent: IParentedSearchRecordsEvent = {
+          qualifiedPathName: idefQualifiedPathName,
+          parentId: originalParent.id,
+          parentVersion: originalParent.version || null,
+          parentType: originalParent.type,
+          newRecords: [],
+          lostRecords: newRecordArr,
+          modifiedRecords: [],
+          createdRecords: [],
+          deletedRecords: [],
+          newLastModified: record.last_modified,
+        };
+        CAN_LOG_DEBUG && logger.debug(
+          {
+            className: "Cache",
+            methodName: "triggerSearchListenersFor (detached)",
+            message: "Built and triggering search result and event for parented active searches (item definition)",
+            data: {
+              event: itemDefinitionBasedParentedEventForNewParent,
+            },
+          },
+        );
+        CAN_LOG_DEBUG && logger.debug(
+          {
+            className: "Cache",
+            methodName: "triggerSearchListenersFor (detached)",
+            message: "Built and triggering search result and event for parented active searches (item definition)",
+            data: {
+              event: itemDefinitionBasedParentedEventForOldParent,
+            },
+          },
+        );
+        this.listener.triggerParentedSearchListeners(
+          itemDefinitionBasedParentedEventForNewParent,
+          null, // TODO add the listener uuid, maybe?
+        );
+        this.listener.triggerParentedSearchListeners(
+          itemDefinitionBasedParentedEventForOldParent,
+          null, // TODO add the listener uuid, maybe?
+        );
+
+        const moduleBasedParentedEventForNewParent: IParentedSearchRecordsEvent = {
+          ...itemDefinitionBasedParentedEventForNewParent,
+          qualifiedPathName: modQualifiedPathName,
+        };
+        const moduleBasedParentedEventForOldParent: IParentedSearchRecordsEvent = {
+          ...itemDefinitionBasedParentedEventForOldParent,
+          qualifiedPathName: modQualifiedPathName,
+        };
+        CAN_LOG_DEBUG && logger.debug(
+          {
+            className: "Cache",
+            methodName: "triggerSearchListenersFor (detached)",
+            message: "Built and triggering search result and event for parented active searches (module)",
+            data: {
+              event: moduleBasedParentedEventForNewParent,
+            },
+          },
+        );
+        CAN_LOG_DEBUG && logger.debug(
+          {
+            className: "Cache",
+            methodName: "triggerSearchListenersFor (detached)",
+            message: "Built and triggering search result and event for parented active searches (module)",
+            data: {
+              event: moduleBasedParentedEventForOldParent,
+            },
+          },
+        );
+        this.listener.triggerParentedSearchListeners(
+          moduleBasedParentedEventForNewParent,
+          null, // TODO add the listener uuid, maybe?
+        );
+        this.listener.triggerParentedSearchListeners(
+          moduleBasedParentedEventForOldParent,
+          null, // TODO add the listener uuid, maybe?
+        );
+      }
     }
 
-    if (parent && createdBy) {
-      const itemDefinitionBasedOwnedParentedEvent: IOwnedParentedSearchRecordsEvent = {
-        qualifiedPathName: idefQualifiedPathName,
-        createdBy: createdBy,
-        parentId: parent.id,
-        parentVersion: parent.version || null,
-        parentType: parent.type,
-        newRecords: location === "new" ? newRecordArr : [],
-        lostRecords: location === "lost" ? newRecordArr : [],
-        modifiedRecords: location === "modified" ? newRecordArr : [],
-        newLastModified: record.last_modified,
-      };
-      CAN_LOG_DEBUG && logger.debug(
-        {
-          className: "Cache",
-          methodName: "triggerSearchListenersFor (detached)",
-          message: "Built and triggering search result and event for parented and owned active searches (item definition)",
-          data: {
-            event: itemDefinitionBasedOwnedParentedEvent,
-          },
-        },
-      );
-      this.listener.triggerOwnedParentedSearchListeners(
-        itemDefinitionBasedOwnedParentedEvent,
-        null, // TODO add the listener uuid, maybe?
-      );
+    if (newParent && createdBy) {
+      const isReparent =
+        location === "modified" &&
+        originalParent &&
+        (
+          originalParent.id !== newParent.id ||
+          originalParent.version !== newParent.version ||
+          originalParent.type !== newParent.type
+        );
 
-      const moduleBasedOwnedParentedEvent: IOwnedParentedSearchRecordsEvent = {
-        ...itemDefinitionBasedOwnedParentedEvent,
-        qualifiedPathName: modQualifiedPathName,
-      };
-      CAN_LOG_DEBUG && logger.debug(
-        {
-          className: "Cache",
-          methodName: "triggerSearchListenersFor (detached)",
-          message: "Built and triggering search result and event for parented and owned active searches (module)",
-          data: {
-            event: moduleBasedOwnedParentedEvent,
+      if (!isReparent) {
+        const itemDefinitionBasedOwnedParentedEvent: IOwnedParentedSearchRecordsEvent = {
+          qualifiedPathName: idefQualifiedPathName,
+          createdBy: createdBy,
+          parentId: newParent.id,
+          parentVersion: newParent.version || null,
+          parentType: newParent.type,
+          newRecords: [],
+          createdRecords: location === "new" ? newRecordArr : [],
+          lostRecords: [],
+          deletedRecords: location === "deleted" ? newRecordArr : [],
+          modifiedRecords: location === "modified" ? newRecordArr : [],
+          newLastModified: record.last_modified,
+        };
+        CAN_LOG_DEBUG && logger.debug(
+          {
+            className: "Cache",
+            methodName: "triggerSearchListenersFor (detached)",
+            message: "Built and triggering search result and event for parented and owned active searches (item definition)",
+            data: {
+              event: itemDefinitionBasedOwnedParentedEvent,
+            },
           },
-        },
-      );
-      this.listener.triggerOwnedParentedSearchListeners(
-        moduleBasedOwnedParentedEvent,
-        null, // TODO add the listener uuid, maybe?
-      );
+        );
+        this.listener.triggerOwnedParentedSearchListeners(
+          itemDefinitionBasedOwnedParentedEvent,
+          null, // TODO add the listener uuid, maybe?
+        );
+
+        const moduleBasedOwnedParentedEvent: IOwnedParentedSearchRecordsEvent = {
+          ...itemDefinitionBasedOwnedParentedEvent,
+          qualifiedPathName: modQualifiedPathName,
+        };
+        CAN_LOG_DEBUG && logger.debug(
+          {
+            className: "Cache",
+            methodName: "triggerSearchListenersFor (detached)",
+            message: "Built and triggering search result and event for parented and owned active searches (module)",
+            data: {
+              event: moduleBasedOwnedParentedEvent,
+            },
+          },
+        );
+        this.listener.triggerOwnedParentedSearchListeners(
+          moduleBasedOwnedParentedEvent,
+          null, // TODO add the listener uuid, maybe?
+        );
+      } else {
+        const itemDefinitionBasedOwnedParentedEventForNewParent: IOwnedParentedSearchRecordsEvent = {
+          qualifiedPathName: idefQualifiedPathName,
+          createdBy: createdBy,
+          parentId: newParent.id,
+          parentVersion: newParent.version || null,
+          parentType: newParent.type,
+          newRecords: newRecordArr,
+          lostRecords: [],
+          modifiedRecords: [],
+          createdRecords: [],
+          deletedRecords: [],
+          newLastModified: record.last_modified,
+        };
+        const itemDefinitionBasedOwnedParentedEventForOldParent: IOwnedParentedSearchRecordsEvent = {
+          qualifiedPathName: idefQualifiedPathName,
+          createdBy: createdBy,
+          parentId: originalParent.id,
+          parentVersion: originalParent.version || null,
+          parentType: originalParent.type,
+          newRecords: [],
+          lostRecords: newRecordArr,
+          modifiedRecords: [],
+          createdRecords: [],
+          deletedRecords: [],
+          newLastModified: record.last_modified,
+        };
+        CAN_LOG_DEBUG && logger.debug(
+          {
+            className: "Cache",
+            methodName: "triggerSearchListenersFor (detached)",
+            message: "Built and triggering search result and event for parented and owned active searches (item definition)",
+            data: {
+              event: itemDefinitionBasedOwnedParentedEventForNewParent,
+            },
+          },
+        );
+        CAN_LOG_DEBUG && logger.debug(
+          {
+            className: "Cache",
+            methodName: "triggerSearchListenersFor (detached)",
+            message: "Built and triggering search result and event for parented and owned active searches (item definition)",
+            data: {
+              event: itemDefinitionBasedOwnedParentedEventForOldParent,
+            },
+          },
+        );
+        this.listener.triggerOwnedParentedSearchListeners(
+          itemDefinitionBasedOwnedParentedEventForNewParent,
+          null, // TODO add the listener uuid, maybe?
+        );
+        this.listener.triggerOwnedParentedSearchListeners(
+          itemDefinitionBasedOwnedParentedEventForOldParent,
+          null, // TODO add the listener uuid, maybe?
+        );
+
+        const moduleBasedOwnedParentedEventForNewParent: IOwnedParentedSearchRecordsEvent = {
+          ...itemDefinitionBasedOwnedParentedEventForNewParent,
+          qualifiedPathName: modQualifiedPathName,
+        };
+        const moduleBasedOwnedParentedEventForOldParent: IOwnedParentedSearchRecordsEvent = {
+          ...itemDefinitionBasedOwnedParentedEventForOldParent,
+          qualifiedPathName: modQualifiedPathName,
+        };
+        CAN_LOG_DEBUG && logger.debug(
+          {
+            className: "Cache",
+            methodName: "triggerSearchListenersFor (detached)",
+            message: "Built and triggering search result and event for parented and owned active searches (module)",
+            data: {
+              event: moduleBasedOwnedParentedEventForNewParent,
+            },
+          },
+        );
+        CAN_LOG_DEBUG && logger.debug(
+          {
+            className: "Cache",
+            methodName: "triggerSearchListenersFor (detached)",
+            message: "Built and triggering search result and event for parented and owned active searches (module)",
+            data: {
+              event: moduleBasedOwnedParentedEventForOldParent,
+            },
+          },
+        );
+        this.listener.triggerOwnedParentedSearchListeners(
+          moduleBasedOwnedParentedEventForNewParent,
+          null, // TODO add the listener uuid, maybe?
+        );
+        this.listener.triggerOwnedParentedSearchListeners(
+          moduleBasedOwnedParentedEventForOldParent,
+          null, // TODO add the listener uuid, maybe?
+        );
+      }
     }
+
+    propertyMap.forEach((p) => {
+      const isRepropertize = location === "modified" && p.originalValue !== p.newValue;
+
+      if (!isRepropertize) {
+        const itemDefinitionBasedPropertyEvent: IPropertySearchRecordsEvent = {
+          qualifiedPathName: idefQualifiedPathName,
+          propertyId: p.id,
+          propertyValue: p.newValue,
+          newRecords: [],
+          createdRecords: location === "new" ? newRecordArr : [],
+          lostRecords: [],
+          deletedRecords: location === "deleted" ? newRecordArr : [],
+          modifiedRecords: location === "modified" ? newRecordArr : [],
+          newLastModified: record.last_modified,
+        };
+
+        CAN_LOG_DEBUG && logger.debug(
+          {
+            className: "Cache",
+            methodName: "triggerSearchListenersFor (detached)",
+            message: "Built and triggering search result and event for property searches (item definition)",
+            data: {
+              event: itemDefinitionBasedPropertyEvent,
+            },
+          },
+        );
+
+        this.listener.triggerPropertySearchListeners(
+          itemDefinitionBasedPropertyEvent,
+          null, // TODO add the listener uuid, maybe?
+        );
+        const moduleBasedPropertyEvent: IPropertySearchRecordsEvent = {
+          ...itemDefinitionBasedPropertyEvent,
+          qualifiedPathName: modQualifiedPathName,
+        };
+
+        CAN_LOG_DEBUG && logger.debug(
+          {
+            className: "Cache",
+            methodName: "triggerSearchListenersFor (detached)",
+            message: "Built and triggering search result and event for property searches (module)",
+            data: {
+              event: moduleBasedPropertyEvent,
+            },
+          },
+        );
+
+        this.listener.triggerPropertySearchListeners(
+          moduleBasedPropertyEvent,
+          null, // TODO add the listener uuid, maybe?
+        );
+      } else {
+        const itemDefinitionBasedPropertyEventForNewPropertyValue: IPropertySearchRecordsEvent = {
+          qualifiedPathName: idefQualifiedPathName,
+          propertyId: p.id,
+          propertyValue: p.newValue,
+          newRecords: newRecordArr,
+          lostRecords: [],
+          modifiedRecords: [],
+          createdRecords: [],
+          deletedRecords: [],
+          newLastModified: record.last_modified,
+        };
+
+        const itemDefinitionBasedPropertyEventForOldPropertyValue: IPropertySearchRecordsEvent = {
+          qualifiedPathName: idefQualifiedPathName,
+          propertyId: p.id,
+          propertyValue: p.originalValue,
+          newRecords: newRecordArr,
+          lostRecords: [],
+          modifiedRecords: [],
+          createdRecords: [],
+          deletedRecords: [],
+          newLastModified: record.last_modified,
+        };
+
+
+        CAN_LOG_DEBUG && logger.debug(
+          {
+            className: "Cache",
+            methodName: "triggerSearchListenersFor (detached)",
+            message: "Built and triggering search result and event for property searches (item definition)",
+            data: {
+              event: itemDefinitionBasedPropertyEventForNewPropertyValue,
+            },
+          },
+        );
+
+        CAN_LOG_DEBUG && logger.debug(
+          {
+            className: "Cache",
+            methodName: "triggerSearchListenersFor (detached)",
+            message: "Built and triggering search result and event for property searches (item definition)",
+            data: {
+              event: itemDefinitionBasedPropertyEventForOldPropertyValue,
+            },
+          },
+        );
+
+        this.listener.triggerPropertySearchListeners(
+          itemDefinitionBasedPropertyEventForNewPropertyValue,
+          null, // TODO add the listener uuid, maybe?
+        );
+
+        this.listener.triggerPropertySearchListeners(
+          itemDefinitionBasedPropertyEventForOldPropertyValue,
+          null, // TODO add the listener uuid, maybe?
+        );
+
+        const moduleBasedPropertyEventForNewPropertyValue: IPropertySearchRecordsEvent = {
+          ...itemDefinitionBasedPropertyEventForNewPropertyValue,
+          qualifiedPathName: modQualifiedPathName,
+        };
+
+        const moduleBasedPropertyEventForOldPropertyValue: IPropertySearchRecordsEvent = {
+          ...itemDefinitionBasedPropertyEventForOldPropertyValue,
+          qualifiedPathName: modQualifiedPathName,
+        };
+
+        CAN_LOG_DEBUG && logger.debug(
+          {
+            className: "Cache",
+            methodName: "triggerSearchListenersFor (detached)",
+            message: "Built and triggering search result and event for property searches (module)",
+            data: {
+              event: moduleBasedPropertyEventForNewPropertyValue,
+            },
+          },
+        );
+
+        CAN_LOG_DEBUG && logger.debug(
+          {
+            className: "Cache",
+            methodName: "triggerSearchListenersFor (detached)",
+            message: "Built and triggering search result and event for property searches (module)",
+            data: {
+              event: moduleBasedPropertyEventForOldPropertyValue,
+            },
+          },
+        );
+
+        this.listener.triggerPropertySearchListeners(
+          moduleBasedPropertyEventForNewPropertyValue,
+          null, // TODO add the listener uuid, maybe?
+        );
+
+        this.listener.triggerPropertySearchListeners(
+          moduleBasedPropertyEventForOldPropertyValue,
+          null, // TODO add the listener uuid, maybe?
+        );
+      }
+    });
   }
 
   /**
@@ -441,6 +815,17 @@ export class Cache {
     );
 
     const isSQLType = !!value.MODULE_ID;
+
+    const propertyMap: IPropertyMapElement[] = [];
+    itemDefinition.getAllPropertyDefinitionsAndExtensions().forEach((pDef) => {
+      if (pDef.isTracked()) {
+        propertyMap.push({
+          id: pDef.getId(),
+          newValue: value[pDef.getId()] || null,
+          originalValue: null,
+        });
+      }
+    });
 
     if (!options.ignorePreSideEffects) {
       const gqlValue = isSQLType ? (
@@ -794,6 +1179,8 @@ export class Cache {
         itemDefinition,
         createdBy,
         parent,
+        null,
+        propertyMap,
         searchResultForThisValue,
         "new",
       );
@@ -1143,6 +1530,19 @@ export class Cache {
 
     const selfTable = itemDefinition.getQualifiedPathName();
     const moduleTable = itemDefinition.getParentModule().getQualifiedPathName();
+
+    const propertyMap: IPropertyMapElement[] = [];
+    itemDefinition.getAllPropertyDefinitionsAndExtensions().forEach((pDef) => {
+      if (pDef.isTracked()) {
+        const currentValue = currentSQLValue[pDef.getId()] || null;
+        propertyMap.push({
+          id: pDef.getId(),
+          newValue: (update[pDef.getId()] as string) || currentValue,
+          originalValue: currentValue,
+        });
+      }
+    });
+
 
     CAN_LOG_DEBUG && logger.debug(
       {
@@ -1521,71 +1921,25 @@ export class Cache {
         last_modified: sqlValue.last_modified,
       };
 
-      if (!actualReparent) {
-        this.triggerSearchListenersFor(
-          itemDefinition,
-          sqlValue.created_by || null,
-          (
-            sqlValue.parent_id ? {
-              id: sqlValue.parent_id,
-              version: sqlValue.parent_version || null,
-              type: sqlValue.parent_type,
-            } : null
-          ),
-          searchRecord,
-          "modified",
-        );
-      } else {
-        // for the listeners that are searching
-        // by owner they do not care about the parent
-        // so we can just trigger a modified listener
-        // on that basis alone
-        this.triggerSearchListenersFor(
-          itemDefinition,
-          sqlValue.created_by,
-          null,
-          searchRecord,
-          "modified",
-        );
-
-        // for the parenting ones, now for the ones that
-        // now receive that new record, both by parent
-        // and the combination of by owner and parent
-        // however, the ones listening by owner alone should
-        // not be triggered with a new record because they
-        // aren't filtering by that
-        this.triggerSearchListenersFor(
-          itemDefinition,
-          sqlValue.created_by,
-          {
+      this.triggerSearchListenersFor(
+        itemDefinition,
+        sqlValue.created_by || null,
+        (
+          sqlValue.parent_id ? {
             id: sqlValue.parent_id,
             version: sqlValue.parent_version || null,
             type: sqlValue.parent_type,
-          },
-          searchRecord,
-          "new",
-          true,
-        );
-
-        // and if we had a previous parent
-        if (currentSQLValue.parent_id) {
-          // now we can trigger that listener for lost values
-          // equally ignoring the by-owner basis and only telling
-          // the ones that lost
-          this.triggerSearchListenersFor(
-            itemDefinition,
-            currentSQLValue.created_by,
-            {
-              id: currentSQLValue.parent_id,
-              version: currentSQLValue.parent_version || null,
-              type: currentSQLValue.parent_type,
-            },
-            searchRecord,
-            "lost",
-            true,
-          );
-        }
-      }
+          } : null
+        ),
+        {
+          id: currentSQLValue.parent_id,
+          version: currentSQLValue.parent_version || null,
+          type: currentSQLValue.parent_type,
+        },
+        propertyMap,
+        searchRecord,
+        "modified",
+      );
     })();
 
     if (this.elastic) {
@@ -1986,12 +2340,24 @@ export class Cache {
       row: ISQLTableRowValue,
       record: IGQLSearchRecord,
       parent: { id: string; version: string; type: string },
-      createdBy: string
+      createdBy: string,
+      trackedProperties: string[],
     ) => {
       // got to cascade and delete all the children, this method should be able to execute after
       this.deletePossibleChildrenOf(itemDefinition, id, record.version);
+
+      const propertyMap: IPropertyMapElement[] = [];
+      trackedProperties.forEach((pId) => {
+        const currentValue = row[pId] || null;
+        propertyMap.push({
+          id: pId,
+          newValue: currentValue,
+          originalValue: currentValue,
+        });
+      });
+
       // got to trigger the search listeners saying we have just lost an item
-      this.triggerSearchListenersFor(itemDefinition, createdBy, parent, record, "lost");
+      this.triggerSearchListenersFor(itemDefinition, createdBy, parent, parent, propertyMap, record, "deleted");
 
       try {
         // update the cache with the new value
@@ -2070,18 +2436,30 @@ export class Cache {
       const sideEffectedProperties = itemDefinition.getAllSideEffectedProperties();
       const needSideEffects = sideEffectedProperties.length !== 0;
 
+      const trackedPropertiesIdef = itemDefinition.getAllPropertyDefinitions()
+        .filter((p) => p.isTracked());
+      const trackedPropertiesIdefStr = trackedPropertiesIdef.length ? "," + trackedPropertiesIdef.map((p) => {
+        return JSON.stringify(p.getId());
+      }).join(",") : "";
+      const trackedPropertiesMod = itemDefinition.getParentModule().getAllPropExtensions()
+        .filter((p) => p.isTracked());
+      const trackedPropertiesModStr = trackedPropertiesMod.length ? "," + trackedPropertiesMod.map((p) => {
+        return JSON.stringify(p.getId());
+      }).join(",") : "";
+      const trackedProperties = trackedPropertiesIdef.concat(trackedPropertiesMod).map((p) => p.getId());
+
       // now we see what we are going to return if we got side effects, everything, otherwise
       // it's just some basic stuff with that extra row
       const returningElementsIdef = needSideEffects ?
         "*" :
-        `${JSON.stringify(CONNECTOR_SQL_COLUMN_ID_FK_NAME)}, ${JSON.stringify(CONNECTOR_SQL_COLUMN_VERSION_FK_NAME)}${extraLanguageColumnIdef}`;
+        `${JSON.stringify(CONNECTOR_SQL_COLUMN_ID_FK_NAME)},${JSON.stringify(CONNECTOR_SQL_COLUMN_VERSION_FK_NAME)}${trackedPropertiesIdefStr}${extraLanguageColumnIdef}`;
       // but we only truly add those elements if we either need an idef join wether we have
       // side effects, and want all the data, or we have that extra column we want
-      const needsIdefJoin = needSideEffects || extraLanguageColumnIdef;
+      const needsIdefJoin = needSideEffects || trackedPropertiesIdefStr || extraLanguageColumnIdef;
       // as for the module, this is always going to be retrieved
       const returningElementsModule = needSideEffects ?
         "*" :
-        `"id", "version", "parent_id", "parent_type", "parent_version", "created_by"${extraLanguageColumnModule}`;
+        `"id","version","parent_id","parent_type","parent_version","created_by"${trackedPropertiesModStr}${extraLanguageColumnModule}`;
 
       // dropping all versions is a tricky process, first we need to drop everything
       if (dropAllVersions) {
@@ -2117,6 +2495,15 @@ export class Cache {
             insertQueryBuilder.table(DELETED_REGISTRY_IDENTIFIER);
 
             allVersionsDroppedInternal.forEach(async (row) => {
+
+              const trackers: { [key: string]: string } = trackedProperties ? {} : null;
+              trackedProperties.forEach((pId) => {
+                const currentValue = row[pId] || null;
+                if (currentValue) {
+                  trackers[pId] = currentValue;
+                }
+              });
+
               insertQueryBuilder.insert({
                 id,
                 version: version || "",
@@ -2128,6 +2515,7 @@ export class Cache {
                   "NOW()",
                   [],
                 ],
+                trackers: trackers ? JSON.stringify(trackers) : null,
               })
             });
 
@@ -2170,7 +2558,7 @@ export class Cache {
           // we update the caches
           // we do this without awaiting, as for all it concerns
           // our action is done and only events will need to fire
-          performProperDeleteOf(row, record, parent, createdBy);
+          performProperDeleteOf(row, record, parent, createdBy, trackedProperties);
         });
       } else {
         const deleteQueryBase = `DELETE FROM ${JSON.stringify(moduleTable)} WHERE ` +
@@ -2198,6 +2586,14 @@ export class Cache {
             ]
           );
 
+          const trackers: { [key: string]: string } = trackedProperties ? {} : null;
+          trackedProperties.forEach((pId) => {
+            const currentValue = interalDroppedRow[pId] || null;
+            if (currentValue) {
+              trackers[pId] = currentValue;
+            }
+          });
+
           rowsToPerformDeleteSideEffects = needSideEffects ? [interalDroppedRow] : null;
 
           const insertQueryBuilder = transactingDatabase.getInsertBuilder();
@@ -2215,6 +2611,7 @@ export class Cache {
               "NOW()",
               [],
             ],
+            trackers: trackers ? JSON.stringify(trackers) : null,
           })
 
           insertQueryBuilder.returningBuilder.returningColumn("transaction_time");
@@ -2245,7 +2642,7 @@ export class Cache {
         } : null;
         const createdBy = row.created_by;
         // we don't want to await any of this
-        performProperDeleteOf(row, record, parent, createdBy);
+        performProperDeleteOf(row, record, parent, createdBy, trackedProperties);
       }
 
       if (rowsToPerformDeleteSideEffects && rowsToPerformDeleteSideEffects.length) {

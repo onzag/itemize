@@ -64,7 +64,7 @@ export const KICKED_EVENT = "kicked";
  * Event that comes from the server when something has
  * changed or as an answer from a feedback request
  */
-export const CHANGED_FEEEDBACK_EVENT = "changed";
+export const CHANGED_FEEDBACK_EVENT = "changed";
 /**
  * The changed feedback event contains very specific fields
  */
@@ -109,10 +109,12 @@ interface IBaseSearchRecordsEvent {
    * the new records that have been added
    */
   newRecords: IGQLSearchRecord[];
+  createdRecords: IGQLSearchRecord[];
   /**
    * the records that have been deleted
    */
   lostRecords: IGQLSearchRecord[];
+  deletedRecords: IGQLSearchRecord[];
   /**
    * the records that have been modified
    */
@@ -162,6 +164,20 @@ export const OWNED_PARENTED_SEARCH_RECORDS_EVENT = "owned-parented-search-record
  */
 export interface IOwnedParentedSearchRecordsEvent extends IParentedSearchRecordsEvent, IOwnedSearchRecordsEvent {
 }
+
+/**
+ * When the records are related to the value of a property
+ */
+export const PROPERTY_SEARCH_RECORDS_EVENT = "property-search-records";
+
+/**
+ * Adds the property id and value from the event
+ */
+export interface IPropertySearchRecordsEvent extends IBaseSearchRecordsEvent {
+  propertyId: string;
+  propertyValue: string;
+}
+
 
 // REQUESTS
 
@@ -305,7 +321,7 @@ export const FeedbackRequestSchema = {
  * listening for changes in an owned or parented search
  * either by module or item definition
  *
- * This is the request version [[IBaseSearchRecordsAddedEvent]]
+ * This is the request version [[IBaseSearchRecordsEvent]]
  */
 interface IBaseSearchRegisterRequest {
   qualifiedPathName: string;
@@ -318,7 +334,7 @@ interface IBaseSearchRegisterRequest {
 export const OWNED_SEARCH_REGISTER_REQUEST = "owned-search-register";
 /**
  * The owned serach register request to register owned searches by adding a created by field
- * check [[IOwnedSearchRecordsAddedEvent]]
+ * check [[IOwnedSearchRecordsEvent]]
  */
 export interface IOwnedSearchRegisterRequest extends IBaseSearchRegisterRequest {
   createdBy: string;
@@ -354,7 +370,7 @@ export const OWNED_PARENTED_SEARCH_REGISTER_REQUEST = "owned-parented-search-reg
 
 /**
  * The parented search register request adds the parent type and parent id
- * check [[IParentedSearchRecordsAddedEvent]]
+ * check [[IParentedSearchRecordsEvent]]
  */
 export interface IParentedSearchRegisterRequest extends IBaseSearchRegisterRequest {
   parentType: string;
@@ -387,7 +403,7 @@ export const ParentedSearchRegisterRequestSchema = {
 
 /**
  * The owned parented search register request adds the parent type and parent id
- * check [[IOwnedParentedSearchRecordsAddedEvent]]
+ * check [[IOwnedParentedSearchRecordsEvent]]
  */
 export interface IOwnedParentedSearchRegisterRequest extends IParentedSearchRegisterRequest, IOwnedSearchRegisterRequest {
 }
@@ -416,6 +432,40 @@ export const OwnedParentedSearchRegisterRequestSchema = {
     "parentId",
     "parentVersion",
     "createdBy",
+  ],
+}
+
+/**
+ * this is necessary for property searches in order to run created by
+ * cached searches and then request for updates
+ */
+export const PROPERTY_SEARCH_REGISTER_REQUEST = "property-search-register";
+/**
+ * The property serach register request to property searches by adding a created by field
+ * check [[IPropertySearchRecordsEvent]]
+ */
+export interface IPropertySearchRegisterRequest extends IBaseSearchRegisterRequest {
+  propertyId: string;
+  propertyValue: string;
+}
+
+export const PropertySearchRegisterRequestSchema = {
+  type: "object",
+  properties: {
+    qualifiedPathName: {
+      type: "string",
+    },
+    propertyId: {
+      type: "string",
+    },
+    propertyValue: {
+      type: "string",
+    },
+  },
+  required: [
+    "qualifiedPathName",
+    "propertyId",
+    "propertyValue",
   ],
 }
 
@@ -451,6 +501,37 @@ export const OwnedSearchUnregisterRequestSchema = {
   required: [
     "qualifiedPathName",
     "createdBy",
+  ],
+}
+
+/**
+ * The unregister version of [[PROPERTY_SEARCH_REGISTER_REQUEST]]
+ */
+export const PROPERTY_SEARCH_UNREGISTER_REQUEST = "property-search-unregister";
+/**
+ * The unregister version of [[IPropertySearchRegisterRequest]]
+ */
+export interface IPropertySearchUnregisterRequest extends IBaseSearchUnregisterRequest {
+  propertyId: string;
+  propertyValue: string;
+}
+export const PropertySearchUnregisterRequestSchema = {
+  type: "object",
+  properties: {
+    qualifiedPathName: {
+      type: "string",
+    },
+    propertyId: {
+      type: "string",
+    },
+    propertyValue: {
+      type: "string",
+    },
+  },
+  required: [
+    "qualifiedPathName",
+    "propertyId",
+    "propertyValue",
   ],
 }
 
@@ -581,6 +662,42 @@ export const OwnedSearchFeedbackRequestSchema = {
 /**
  * The feedback version of [[PARENTED_SEARCH_REGISTER_REQUEST]]
  */
+ export const PROPERTY_SEARCH_FEEDBACK_REQUEST = "property-search-feedback";
+ /**
+  * The feedback version of [[IParentedSearchRegisterRequest]]
+  */
+ export interface IPropertySearchFeedbackRequest extends IBaseSearchFeedbackRequest {
+   propertyId: string;
+   propertyValue: string;
+ }
+ 
+ export const PropertySearchFeedbackRequestSchema = {
+   type: "object",
+   properties: {
+     qualifiedPathName: {
+       type: "string",
+     },
+     lastModified: {
+       type: ["string", "null"],
+     },
+     propertyId: {
+      type: "string",
+     },
+     propertyValue: {
+      type: "string",
+     }
+   },
+   required: [
+     "qualifiedPathName",
+     "lastModified",
+     "propertyId",
+     "propertyValue",
+   ],
+ }
+
+/**
+ * The feedback version of [[PARENTED_SEARCH_REGISTER_REQUEST]]
+ */
 export const PARENTED_SEARCH_FEEDBACK_REQUEST = "parented-search-feedback";
 /**
  * The feedback version of [[IParentedSearchRegisterRequest]]
@@ -676,7 +793,7 @@ export function generateBasicMergedIndexIdentifier(
   id: string,
   version: string,
 ) {
-  return idefOrMod + "." + id + "." + (version || "")
+  return idefOrMod + "." + id + "." + (version || "")
 }
 
 export function generateOwnedSearchMergedIndexIdentifier(
@@ -686,13 +803,21 @@ export function generateOwnedSearchMergedIndexIdentifier(
   return "OWNED_SEARCH." + idefOrModSearchIsAgainst + "." + createdBy
 }
 
+export function generatePropertySearchMergedIndexIdentifier(
+  idefOrModSearchIsAgainst: string,
+  propertyId: string,
+  propertyValue: string,
+) {
+  return "PROPERTY_SEARCH." + idefOrModSearchIsAgainst + "." + propertyId + "." + propertyValue
+}
+
 export function generateParentedSearchMergedIndexIdentifier(
   idefOrModSearchIsAgainst: string,
   parentType: string,
   parentId: string,
   parentVersion: string,
 ) {
-  return "PARENTED_SEARCH." + idefOrModSearchIsAgainst + "." + parentType + "." + parentId + "." + (parentVersion || "");
+  return "PARENTED_SEARCH." + idefOrModSearchIsAgainst + "." + parentType + "." + parentId + "." + (parentVersion || "");
 }
 
 export function generateOwnedParentedSearchMergedIndexIdentifier(
@@ -702,5 +827,5 @@ export function generateOwnedParentedSearchMergedIndexIdentifier(
   parentId: string,
   parentVersion: string,
 ) {
-  return "OWNED_PARENTED_SEARCH." + idefOrModSearchIsAgainst + "." + createdBy + "." + parentType + "." + parentId + "." + (parentVersion || "");
+  return "OWNED_PARENTED_SEARCH." + idefOrModSearchIsAgainst + "." + createdBy + "." + parentType + "." + parentId + "." + (parentVersion || "");
 }

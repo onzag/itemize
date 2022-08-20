@@ -14,6 +14,8 @@ export class SetBuilder extends QueryBuilder {
    * What we are setting as expressions
    */
   private expressions: string[] = [];
+  public knownAffectedColumns: Array<[string, string]> = [];
+  public hasUnknownAffectedColumnExpression: boolean = false;
 
   /**
    * Builds a new set builder
@@ -55,16 +57,21 @@ export class SetBuilder extends QueryBuilder {
   public setColumnWithTable(tableName: string, columnName: string, value: ValueType) {
     let rule = (tableName ? JSON.stringify(tableName) + "." : "") + JSON.stringify(columnName) + " = ";
     // if it's an array raw rule
+
+    const affectedColumn: [string, string] = [tableName || null, columnName];
+
     if (Array.isArray(value)) {
       // we add the value just there
       rule += value[0];
       // and set the bindings
-      return this.set(rule, value[1]);
+      this.set(rule, value[1], affectedColumn);
     } else {
       // otherwise the default placeholder
       rule += "?";
-      return this.set(rule, [value]);
+      this.set(rule, [value], affectedColumn);
     }
+
+    return this;
   }
 
   /**
@@ -73,9 +80,20 @@ export class SetBuilder extends QueryBuilder {
    * @param value the value to set
    * @returns itself
    */
-  public set(expression: string, bindings?: BasicBindingType[]) {
+  public set(expression: string, bindings?: BasicBindingType[], affectedColumn?: [string, string] | string) {
     this.expressions.push(expression);
     this.addBindingSources(bindings);
+
+    if (affectedColumn) {
+      if (typeof affectedColumn === "string") {
+        this.knownAffectedColumns.push([null, affectedColumn]);
+      } else {
+        this.knownAffectedColumns.push(affectedColumn);
+      } 
+    } else {
+      this.hasUnknownAffectedColumnExpression = true;
+    }
+
     return this;
   }
 
@@ -96,6 +114,8 @@ export class SetBuilder extends QueryBuilder {
    */
   public clear() {
     this.expressions = [];
+    this.knownAffectedColumns = [];
+    this.hasUnknownAffectedColumnExpression = false;
     this.clearBindingSources();
     return this;
   }
