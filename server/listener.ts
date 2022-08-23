@@ -83,7 +83,7 @@ import { convertVersionsIntoNullsWhenNecessary } from "./version-null-value";
 import { logger } from "./logger";
 import {
   SERVER_DATA_IDENTIFIER, SERVER_USER_KICK_IDENTIFIER,
-  UNSPECIFIED_OWNER, MAX_REMOTE_LISTENERS_PER_SOCKET, GUEST_METAROLE, CURRENCY_FACTORS_IDENTIFIER, DELETED_REGISTRY_IDENTIFIER
+  UNSPECIFIED_OWNER, MAX_REMOTE_LISTENERS_PER_SOCKET, GUEST_METAROLE, CURRENCY_FACTORS_IDENTIFIER, DELETED_REGISTRY_IDENTIFIER, TRACKERS_REGISTRY_IDENTIFIER
 } from "../constants";
 import Ajv from "ajv";
 import { jwtVerify } from "./token";
@@ -1722,7 +1722,31 @@ export class Listener {
           }
         ));
 
-      const totalDiffRecordCount = createdAndModifiedRecordsSQL.length + deletedRecords.length;
+      const gainedOrLostRecordsQuery = this.rawDB.databaseConnection.queryRows(
+        `SELECT "id", "version", "type", "transaction_time", "status" FROM ${JSON.stringify(TRACKERS_REGISTRY_IDENTIFIER)} ` +
+        `WHERE "property" = ? AND "value" = ?` +
+        (
+          request.lastModified ?
+            ` AND "transaction_time" > ?` :
+            ""
+        ) +
+        (
+          requiredType ?
+            ` AND "type" = ?` :
+            ""
+        ),
+        [
+          request.propertyId,
+          request.propertyValue,
+          request.lastModified || null,
+          requiredType || null,
+        ].filter((v) => v !== null),
+        true,
+      );
+
+      const gainedOrLostRecordsSQL = (await gainedOrLostRecordsQuery).map(convertVersionsIntoNullsWhenNecessary);
+
+      const totalDiffRecordCount = createdAndModifiedRecordsSQL.length + deletedRecords.length + gainedOrLostRecordsSQL.length;
 
       if (totalDiffRecordCount) {
         const createdRecords: IGQLSearchRecord[] = createdAndModifiedRecordsSQL.filter((r) => r.WAS_CREATED).map((r) => (
@@ -1741,15 +1765,29 @@ export class Listener {
             last_modified: r.last_modified,
           }
         ));
+        const newRecords: IGQLSearchRecord[] = gainedOrLostRecordsSQL.filter((r) => r.status).map((r) => (
+          {
+            id: r.id,
+            version: r.version,
+            type: r.type,
+            last_modified: r.last_modified,
+          }
+        ));
+        const lostRecords: IGQLSearchRecord[] = gainedOrLostRecordsSQL.filter((r) => !r.status).map((r) => (
+          {
+            id: r.id,
+            version: r.version,
+            type: r.type,
+            last_modified: r.last_modified,
+          }
+        ));
 
-        // TODOIMPORTANT we need to get the new records and the old records product of a tracked property change
-        // this happens in reparent or change of reproperty
         const event: IPropertySearchRecordsEvent = {
           propertyId: request.propertyId,
           propertyValue: request.propertyValue,
           qualifiedPathName: request.qualifiedPathName,
-          newRecords: [],
-          lostRecords: [],
+          newRecords,
+          lostRecords,
           createdRecords,
           deletedRecords,
           modifiedRecords,
@@ -1952,7 +1990,31 @@ export class Listener {
           }
         ));
 
-      const totalDiffRecordCount = createdAndModifiedRecordsSQL.length + deletedRecords.length;
+      const gainedOrLostRecordsQuery = this.rawDB.databaseConnection.queryRows(
+        `SELECT "id", "version", "type", "transaction_time", "status" FROM ${JSON.stringify(TRACKERS_REGISTRY_IDENTIFIER)} ` +
+        `WHERE "property" = ? AND "value" = ?` +
+        (
+          request.lastModified ?
+            ` AND "transaction_time" > ?` :
+            ""
+        ) +
+        (
+          requiredType ?
+            ` AND "type" = ?` :
+            ""
+        ),
+        [
+          "PARENT",
+          parentingId,
+          request.lastModified || null,
+          requiredType || null,
+        ].filter((v) => v !== null),
+        true,
+      );
+
+      const gainedOrLostRecordsSQL = (await gainedOrLostRecordsQuery).map(convertVersionsIntoNullsWhenNecessary);
+
+      const totalDiffRecordCount = createdAndModifiedRecordsSQL.length + deletedRecords.length + gainedOrLostRecordsSQL.length;
 
       if (totalDiffRecordCount) {
         const createdRecords: IGQLSearchRecord[] = createdAndModifiedRecordsSQL.filter((r) => r.WAS_CREATED).map((r) => (
@@ -1971,14 +2033,30 @@ export class Listener {
             last_modified: r.last_modified,
           }
         ));
+        const newRecords: IGQLSearchRecord[] = gainedOrLostRecordsSQL.filter((r) => r.status).map((r) => (
+          {
+            id: r.id,
+            version: r.version,
+            type: r.type,
+            last_modified: r.last_modified,
+          }
+        ));
+        const lostRecords: IGQLSearchRecord[] = gainedOrLostRecordsSQL.filter((r) => !r.status).map((r) => (
+          {
+            id: r.id,
+            version: r.version,
+            type: r.type,
+            last_modified: r.last_modified,
+          }
+        ));
 
         const event: IParentedSearchRecordsEvent = {
           parentId: request.parentId,
           parentVersion: request.parentVersion || null,
           parentType: request.parentType,
           qualifiedPathName: request.qualifiedPathName,
-          newRecords: [],
-          lostRecords: [],
+          newRecords,
+          lostRecords,
           createdRecords,
           modifiedRecords,
           deletedRecords,

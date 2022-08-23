@@ -130,7 +130,7 @@ const typeValue: IPropertyDefinitionSupportedType<IPropertyDefinitionSupportedPa
     }
 
     const argPrefixPlusId = arg.prefix + arg.id;
-  
+
     const fromName = PropertyDefinitionSearchInterfacesPrefixes.FROM + argPrefixPlusId;
     const toName = PropertyDefinitionSearchInterfacesPrefixes.TO + argPrefixPlusId;
     const exactName = PropertyDefinitionSearchInterfacesPrefixes.EXACT + argPrefixPlusId;
@@ -143,50 +143,65 @@ const typeValue: IPropertyDefinitionSupportedType<IPropertyDefinitionSupportedPa
     const propertyValue: IPropertyDefinitionSupportedPaymentType =
       includeId ? arg.gqlValue.DATA[includeId][arg.id] : arg.gqlValue.DATA[arg.id];
 
-    const conditions: boolean[] = [];
-    if (typeof usefulArgs[exactName] !== "undefined") {
-      if (usefulArgs[exactName] === null) {
+    if (
+      typeof usefulArgs[exactName] !== "undefined" ||
+      typeof usefulArgs[fromName] !== "undefined" && usefulArgs[fromName] !== null ||
+      typeof usefulArgs[toName] !== "undefined" && usefulArgs[toName] !== null ||
+      typeof usefulArgs[paymentTypeName] !== "undefined" && usefulArgs[paymentTypeName] !== null ||
+      typeof usefulArgs[paymentStatusName] !== "undefined" && usefulArgs[paymentStatusName] !== null
+    ) {
+      if (typeof propertyValue === "undefined") {
+        console.warn("Attempted to local search by the property " + arg.id + " but could not find it in the local given value");
+        return false;
+      }
+
+      const conditions: boolean[] = [];
+      if (typeof usefulArgs[exactName] !== "undefined") {
+        if (usefulArgs[exactName] === null) {
+          conditions.push(
+            propertyValue.amount === null,
+          );
+        } else {
+          conditions.push(
+            propertyValue.amount === usefulArgs[exactName].amount &&
+            propertyValue.currency === usefulArgs[exactName].currency,
+          );
+        }
+      }
+
+      if (typeof usefulArgs[fromName] !== "undefined" && usefulArgs[fromName] !== null) {
         conditions.push(
-          propertyValue.amount === null,
-        );
-      } else {
-        conditions.push(
-          propertyValue.amount === usefulArgs[exactName].amount &&
-          propertyValue.currency === usefulArgs[exactName].currency,
+          propertyValue.currency === usefulArgs[fromName].currency &&
+          propertyValue.amount >= usefulArgs[fromName].amount
         );
       }
-    }
 
-    if (typeof usefulArgs[fromName] !== "undefined" && usefulArgs[fromName] !== null) {
-      conditions.push(
-        propertyValue.currency === usefulArgs[fromName].currency &&
-        propertyValue.amount >= usefulArgs[fromName].amount
-      );
-    }
+      if (typeof usefulArgs[toName] !== "undefined" && usefulArgs[toName] !== null) {
+        conditions.push(
+          propertyValue.currency === usefulArgs[toName].currency &&
+          propertyValue.amount <= usefulArgs[toName].amount
+        );
+      }
 
-    if (typeof usefulArgs[toName] !== "undefined" && usefulArgs[toName] !== null) {
-      conditions.push(
-        propertyValue.currency === usefulArgs[toName].currency &&
-        propertyValue.amount <= usefulArgs[toName].amount
-      );
-    }
+      if (typeof usefulArgs[paymentTypeName] !== "undefined" && usefulArgs[paymentTypeName] !== null) {
+        conditions.push(
+          propertyValue.type === usefulArgs[paymentTypeName].type
+        );
+      }
 
-    if (typeof usefulArgs[paymentTypeName] !== "undefined" && usefulArgs[paymentTypeName] !== null) {
-      conditions.push(
-        propertyValue.type === usefulArgs[paymentTypeName].type
-      );
-    }
+      if (typeof usefulArgs[paymentStatusName] !== "undefined" && usefulArgs[paymentStatusName] !== null) {
+        conditions.push(
+          propertyValue.status === usefulArgs[paymentStatusName].status
+        );
+      }
 
-    if (typeof usefulArgs[paymentStatusName] !== "undefined" && usefulArgs[paymentStatusName] !== null) {
-      conditions.push(
-        propertyValue.status === usefulArgs[paymentStatusName].status
-      );
-    }
-
-    if (!conditions.length) {
-      return true;
+      if (!conditions.length) {
+        return true;
+      } else {
+        return conditions.every((c) => c);
+      }
     } else {
-      return conditions.every((c) => c);
+      return true;
     }
   },
   localEqual: (arg) => {

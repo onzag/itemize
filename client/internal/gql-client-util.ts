@@ -1323,9 +1323,10 @@ export function getSearchArgsFor(
 export function getSearchQueryFor(
   arg: ISearchQueryArg
 ) {
-  const qualifiedName = (arg.itemDefinition.isExtensionsInstance() ?
-    arg.itemDefinition.getParentModule().getQualifiedPathName() :
-    arg.itemDefinition.getQualifiedPathName());
+  const standardCounterpart = arg.itemDefinition.isInSearchMode() ? arg.itemDefinition.getStandardCounterpart() : arg.itemDefinition;
+  const qualifiedName = (standardCounterpart.isExtensionsInstance() ?
+    standardCounterpart.getParentModule().getQualifiedPathName() :
+    standardCounterpart.getQualifiedPathName());
   const queryName = (arg.traditional ? PREFIX_TRADITIONAL_SEARCH : PREFIX_SEARCH) + qualifiedName;
 
   const searchArgs = getSearchArgsFor(arg);
@@ -1410,10 +1411,13 @@ export async function runSearchQueryFor(
   arg: IRunSearchQueryArg,
   searchOptions: IRunSearchQuerySearchOptions,
 ): Promise<IRunSearchQueryResult> {
-  const qualifiedName = (arg.itemDefinition.isExtensionsInstance() ?
-    arg.itemDefinition.getParentModule().getQualifiedPathName() :
-    arg.itemDefinition.getQualifiedPathName());
-  const queryName = (arg.traditional ? PREFIX_TRADITIONAL_SEARCH : PREFIX_SEARCH) + qualifiedName;
+  const standardCounterpart = arg.itemDefinition.getStandardCounterpart();
+  const standardCounterpartModule = standardCounterpart.getParentModule();
+  const standardCounterpartQualifiedName = (standardCounterpart.isExtensionsInstance() ?
+      standardCounterpart.getParentModule().getQualifiedPathName() :
+      standardCounterpart.getQualifiedPathName());
+
+  const queryName = (arg.traditional ? PREFIX_TRADITIONAL_SEARCH : PREFIX_SEARCH) + standardCounterpartQualifiedName;
 
   const searchArgs = getSearchArgsFor(arg);
 
@@ -1442,13 +1446,12 @@ export async function runSearchQueryFor(
       throw new Error("Cache policy is by-owner yet there's no creator specified");
     } else if ((arg.cachePolicy === "by-parent" || arg.cachePolicy === "by-owner-and-parent") && (!arg.parentedBy || !arg.parentedBy.id)) {
       throw new Error("Cache policy is by-parent yet there's no parent specified with a specific id");
+    } else if (arg.trackedProperty && (typeof searchArgs["SEARCH_" + arg.trackedProperty] !== "string" || !searchArgs["SEARCH_" + arg.trackedProperty])) {
+      throw new Error("A tracked property has been set for " + arg.trackedProperty + " but SEARCH_" + arg.trackedProperty + " does not exist");
+    } else if (arg.cachePolicy === "by-property" && !arg.trackedProperty) {
+      throw new Error("Cache policy is by-property yet there's no tracked property set");
     }
 
-    const standardCounterpart = arg.itemDefinition.getStandardCounterpart();
-    const standardCounterpartQualifiedName = (standardCounterpart.isExtensionsInstance() ?
-      standardCounterpart.getParentModule().getQualifiedPathName() :
-      standardCounterpart.getQualifiedPathName());
-    const standardCounterpartModule = standardCounterpart.getParentModule();
     let cacheWorkerGivenSearchValue = await CacheWorkerInstance.instance.runCachedSearch(
       queryName,
       searchArgs,
@@ -1587,6 +1590,13 @@ export async function runSearchQueryFor(
             parentType: arg.parentedBy.itemDefinition.getQualifiedPathName(),
             parentId: arg.parentedBy.id,
             parentVersion: arg.parentedBy.version || null,
+            lastModified: cacheWorkerGivenSearchValue.lastModified,
+          });
+        } else if (arg.cachePolicy === "by-property") {
+          searchOptions.remoteListener.requestPropertySearchFeedbackFor({
+            qualifiedPathName: standardCounterpartQualifiedName,
+            propertyId: arg.trackedProperty,
+            propertyValue: searchArgs["SEARCH_" + arg.trackedProperty] as string,
             lastModified: cacheWorkerGivenSearchValue.lastModified,
           });
         } else {

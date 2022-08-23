@@ -98,46 +98,59 @@ const typeValue: IPropertyDefinitionSupportedType<IPropertyDefinitionSupportedUn
     }
 
     const fromName = PropertyDefinitionSearchInterfacesPrefixes.FROM + arg.prefix + arg.id;
-    const toName = PropertyDefinitionSearchInterfacesPrefixes.TO + arg.prefix +arg.id;
+    const toName = PropertyDefinitionSearchInterfacesPrefixes.TO + arg.prefix + arg.id;
     const exactName = PropertyDefinitionSearchInterfacesPrefixes.EXACT + arg.prefix + arg.id;
 
     const usefulArgs = arg.include ? arg.args[INCLUDE_PREFIX + arg.include.getId()] || {} : arg.args;
 
-    const propertyValue: IPropertyDefinitionSupportedUnitType =
-      arg.include ? arg.gqlValue.DATA[arg.include.getId()][arg.id] : arg.gqlValue.DATA[arg.id];
+    if (
+      typeof usefulArgs[exactName] !== "undefined" ||
+      typeof usefulArgs[fromName] !== "undefined" && usefulArgs[fromName] !== null ||
+      typeof usefulArgs[toName] !== "undefined" && usefulArgs[toName] !== null
+    ) {
+      const propertyValue: IPropertyDefinitionSupportedUnitType =
+        arg.include ? arg.gqlValue.DATA[arg.include.getId()][arg.id] : arg.gqlValue.DATA[arg.id];
 
-    const conditions: boolean[] = [];
-    if (typeof usefulArgs[exactName] !== "undefined") {
-      if (usefulArgs[exactName] === null) {
+      if (typeof propertyValue === "undefined") {
+        console.warn("Attempted to local search by the property " + arg.id + " but could not find it in the local given value");
+        return false;
+      }
+
+      const conditions: boolean[] = [];
+      if (typeof usefulArgs[exactName] !== "undefined") {
+        if (usefulArgs[exactName] === null) {
+          conditions.push(
+            propertyValue.normalizedValue === null,
+          );
+        } else {
+          conditions.push(
+            propertyValue.normalizedValue === usefulArgs[exactName].normalizedValue &&
+            propertyValue.normalizedUnit === usefulArgs[exactName].normalizedUnit,
+          );
+        }
+      }
+
+      if (typeof usefulArgs[fromName] !== "undefined" && usefulArgs[fromName] !== null) {
         conditions.push(
-          propertyValue.normalizedValue === null,
-        );
-      } else {
-        conditions.push(
-          propertyValue.normalizedValue === usefulArgs[exactName].normalizedValue &&
-          propertyValue.normalizedUnit === usefulArgs[exactName].normalizedUnit,
+          propertyValue.normalizedValue >= usefulArgs[fromName].normalizedValue &&
+          propertyValue.normalizedUnit === usefulArgs[fromName].normalizedUnit,
         );
       }
-    }
 
-    if (typeof usefulArgs[fromName] !== "undefined" && usefulArgs[fromName] !== null) {
-      conditions.push(
-        propertyValue.normalizedValue >= usefulArgs[fromName].normalizedValue &&
-        propertyValue.normalizedUnit === usefulArgs[fromName].normalizedUnit,
-      );
-    }
+      if (typeof usefulArgs[toName] !== "undefined" && usefulArgs[toName] !== null) {
+        conditions.push(
+          propertyValue.normalizedValue <= usefulArgs[toName].normalizedValue &&
+          propertyValue.normalizedUnit === usefulArgs[toName].normalizedUnit,
+        );
+      }
 
-    if (typeof usefulArgs[toName] !== "undefined" && usefulArgs[toName] !== null) {
-      conditions.push(
-        propertyValue.normalizedValue <= usefulArgs[toName].normalizedValue &&
-        propertyValue.normalizedUnit === usefulArgs[toName].normalizedUnit,
-      );
-    }
-
-    if (!conditions.length) {
-      return true;
+      if (!conditions.length) {
+        return true;
+      } else {
+        return conditions.every((c) => c);
+      }
     } else {
-      return conditions.every((c) => c);
+      return true;
     }
   },
   localEqual: (arg) => {

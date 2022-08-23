@@ -159,6 +159,11 @@ const typeValue: IPropertyDefinitionSupportedType<PropertyDefinitionSupportedTex
       const searchMatch = usefulArgs[searchName];
       const propertyValue = arg.include ? arg.gqlValue.DATA[arg.include.getId()][arg.id] : arg.gqlValue.DATA[arg.id];
 
+      if (typeof propertyValue === "undefined") {
+        console.warn("Attempted to local search by the property " + arg.id + " but could not find it in the local given value");
+        return false;
+      }
+
       if (propertyValue === null) {
         return false;
       }
@@ -168,6 +173,10 @@ const typeValue: IPropertyDefinitionSupportedType<PropertyDefinitionSupportedTex
       return propertyValue.includes(searchMatch);
     } else if (usefulArgs[searchName] === null) {
       const propertyValue = arg.include ? arg.gqlValue.DATA[arg.include.getId()][arg.id] : arg.gqlValue.DATA[arg.id];
+      if (typeof propertyValue === "undefined") {
+        console.warn("Attempted to local search by the property " + arg.id + " but could not find it in the local given value");
+        return false;
+      }
       return propertyValue === null;
     }
 

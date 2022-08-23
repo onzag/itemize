@@ -8,7 +8,7 @@
 
 import { ISQLTableRowValue } from "../base/Root/sql";
 import { CHANGED_FEEDBACK_EVENT, generateOwnedParentedSearchMergedIndexIdentifier, generateOwnedSearchMergedIndexIdentifier, generateParentedSearchMergedIndexIdentifier, generatePropertySearchMergedIndexIdentifier, IChangedFeedbackEvent, IOwnedParentedSearchRecordsEvent, IOwnedSearchRecordsEvent, IParentedSearchRecordsEvent, IPropertySearchRecordsEvent, IRedisEvent, OWNED_PARENTED_SEARCH_RECORDS_EVENT, OWNED_SEARCH_RECORDS_EVENT, PARENTED_SEARCH_RECORDS_EVENT, PROPERTY_SEARCH_RECORDS_EVENT } from "../base/remote-protocol";
-import { CONNECTOR_SQL_COLUMN_ID_FK_NAME, CONNECTOR_SQL_COLUMN_VERSION_FK_NAME, DELETED_REGISTRY_IDENTIFIER, UNSPECIFIED_OWNER } from "../constants";
+import { CONNECTOR_SQL_COLUMN_ID_FK_NAME, CONNECTOR_SQL_COLUMN_VERSION_FK_NAME, DELETED_REGISTRY_IDENTIFIER, TRACKERS_REGISTRY_IDENTIFIER, UNSPECIFIED_OWNER } from "../constants";
 import Root from "../base/Root";
 import { logger } from "./logger";
 import { ItemizeRedisClient } from "./redis";
@@ -31,6 +31,7 @@ import { DeleteBuilder } from "../database/DeleteBuilder";
 import type PropertyDefinition from "../base/Root/Module/ItemDefinition/PropertyDefinition";
 import type Include from "../base/Root/Module/ItemDefinition/Include";
 import { ItemizeElasticClient } from "./elastic";
+import { InsertBuilder } from "../database/InsertBuilder";
 
 type RedoDictionariesFnPropertyBased = (language: string, dictionary: string, property: string) => void;
 type RedoDictionariesFnPropertyIncludeBased = (language: string, dictionary: string, include: string, property: string) => void;
@@ -1371,6 +1372,8 @@ export class ItemizeRawDB {
 
     const withQuery = new WithBuilder();
 
+    let potentialAffectedTrackedProperties: string[] = [];
+
     if (
       updater.dangerousUseSilentMode &&
       (!updater.moduleTableUpdate || Object.keys(updater.moduleTableUpdate).length === 0) &&
@@ -1417,23 +1420,25 @@ export class ItemizeRawDB {
       ].concat(basicModTracked);
 
       // now we get all the potentially affected tracked properties that may have changed
-      const potentialAffectedTrackedProperties = moduleUpdateQuery.setBuilder.hasUnknownAffectedColumnExpression ? allModTracked : (
+      const potentialAffectedTrackedModProperties = moduleUpdateQuery.setBuilder.hasUnknownAffectedColumnExpression ? allModTracked : (
         allModTracked.filter((tracked) => moduleUpdateQuery.setBuilder.knownAffectedColumns.some(
           (affected) => affected[0] === null && affected[1] === tracked
         ))
       );
+
+      potentialAffectedTrackedProperties = potentialAffectedTrackedModProperties;
 
       // now we may want to know the old values of these columnd
       // if they had happened to be affected as we have to know
       // what value they used to hold in order to trigger an update
       // to the old (eg. a reparent that a record was lost)
       // and to the new (eg. that a record was gained)
-      if (potentialAffectedTrackedProperties.length) {
+      if (potentialAffectedTrackedModProperties.length && !updater.dangerousUseSilentMode) {
         moduleUpdateQuery.fromBuilder.from([moduleTable, "MOD_TABLE_OLD"])
         moduleUpdateQuery.whereBuilder.andWhereColumn("id", ["\"MOD_TABLE_OLD\".\"id\"", []]);
         moduleUpdateQuery.whereBuilder.andWhereColumn("version", ["\"MOD_TABLE_OLD\".\"version\"", []]);
 
-        potentialAffectedTrackedProperties.forEach((p) => {
+        potentialAffectedTrackedModProperties.forEach((p) => {
           moduleUpdateQuery.returningBuilder.returning("\"MOD_TABLE_OLD\"." + JSON.stringify(p) + " AS " + JSON.stringify("OLD_" + p), []);
         });
       }
@@ -1476,18 +1481,20 @@ export class ItemizeRawDB {
 
       const basicIdefTracked = mod.getAllPropExtensions().filter((pExt) => pExt.isTracked()).map((pExt) => pExt.getId());
 
-      const potentialAffectedTrackedProperties = itemUpdateQuery.setBuilder.hasUnknownAffectedColumnExpression ? basicIdefTracked : (
+      const potentialAffectedTrackedIdefProperties = itemUpdateQuery.setBuilder.hasUnknownAffectedColumnExpression ? basicIdefTracked : (
         basicIdefTracked.filter((tracked) => itemUpdateQuery.setBuilder.knownAffectedColumns.some(
           (affected) => affected[0] === null && affected[1] === tracked
         ))
       );
+
+      potentialAffectedTrackedProperties = potentialAffectedTrackedProperties.concat(potentialAffectedTrackedIdefProperties);
 
       // now we may want to know the old values of these columnd
       // if they had happened to be affected as we have to know
       // what value they used to hold in order to trigger an update
       // to the old (eg. a reparent that a record was lost)
       // and to the new (eg. that a record was gained)
-      if (potentialAffectedTrackedProperties.length) {
+      if (potentialAffectedTrackedIdefProperties.length && !updater.dangerousUseSilentMode) {
         itemUpdateQuery.fromBuilder.from([moduleTable, "IDEF_TABLE_OLD"])
         itemUpdateQuery.whereBuilder.andWhereColumn(
           CONNECTOR_SQL_COLUMN_ID_FK_NAME,
@@ -1498,7 +1505,7 @@ export class ItemizeRawDB {
           ["\"IDEF_TABLE_OLD\"." + JSON.stringify(CONNECTOR_SQL_COLUMN_VERSION_FK_NAME), []],
         );
 
-        potentialAffectedTrackedProperties.forEach((p) => {
+        potentialAffectedTrackedIdefProperties.forEach((p) => {
           itemUpdateQuery.returningBuilder.returning("\"IDEF_TABLE_OLD\"." + JSON.stringify(p) + " AS " + JSON.stringify("OLD_" + p), []);
         });
       }
@@ -1529,7 +1536,22 @@ export class ItemizeRawDB {
 
     // we got to get all rows, first we create a pseudo table
     // for our module
-    const allRows = await this.databaseConnection.queryRows(withQuery);
+    const allRows = potentialAffectedTrackedProperties.length && !updater.dangerousUseSilentMode ? (
+      await this.databaseConnection.startTransaction(async (transactingDb) => {
+        const results = await transactingDb.queryRows(withQuery);
+
+        await this.updateTrackers(
+          transactingDb,
+          results,
+          potentialAffectedTrackedProperties,
+          moduleTable,
+        );
+
+        return results;
+      })
+    ) : (
+      await this.databaseConnection.queryRows(withQuery)
+    );
     const result = allRows.map(convertVersionsIntoNullsWhenNecessary);
 
     if (!updater.dangerousUseSilentMode) {
@@ -1547,6 +1569,139 @@ export class ItemizeRawDB {
     }
 
     return result;
+  }
+
+  private async updateTrackers(
+    transactingDb: DatabaseConnection,
+    results: ISQLTableRowValue[],
+    potentialAffectedTrackedProperties: string[],
+    moduleTable: string,
+  ) {
+    const insertQueryBuilder = transactingDb.getInsertBuilder();
+    insertQueryBuilder.table(TRACKERS_REGISTRY_IDENTIFIER);
+    let hasAddedAtLeastOneInsert = false;
+
+    results.forEach((result) => {
+      let hasCheckedParent = false;
+
+      potentialAffectedTrackedProperties.forEach((propertyId) => {
+        if (propertyId === "parent_id" || propertyId === "parent_type" || propertyId === "parent_version") {
+          if (hasCheckedParent) {
+            return;
+          }
+          hasCheckedParent = true;
+
+          const currentParent = {
+            id: result.parent_id,
+            version: result.parent_version || null,
+            type: result.parent_type || null,
+          };
+
+          const oldParent = {
+            id: typeof result.OLD_parent_id === "undefined" ? currentParent.id : result.OLD_parent_id,
+            version: typeof result.OLD_parent_version === "undefined" ? currentParent.id : result.OLD_parent_version,
+            type: typeof result.OLD_parent_id === "undefined" ? currentParent.id : result.OLD_parent_id,
+          }
+
+          if (currentParent.id !== oldParent.id || currentParent.type !== oldParent.type || currentParent.version !== oldParent.version) {
+            if (currentParent.id) {
+              // store the new parenting
+              insertQueryBuilder.insert({
+                id: result.id,
+                version: result.version || "",
+                type: result.type,
+                module: moduleTable,
+                property: "PARENT",
+                value: currentParent.type + "." + currentParent.id + "." + (currentParent.version || ""),
+                status: true,
+                transaction_time: [
+                  "NOW()",
+                  [],
+                ],
+              });
+              hasAddedAtLeastOneInsert = true;
+            }
+            if (oldParent.id) {
+              insertQueryBuilder.insert({
+                id: result.id,
+                version: result.version || "",
+                type: result.type,
+                module: moduleTable,
+                property: "PARENT",
+                value: oldParent.type + "." + oldParent.id + "." + (oldParent.version || ""),
+                status: false,
+                transaction_time: [
+                  "NOW()",
+                  [],
+                ],
+              });
+              hasAddedAtLeastOneInsert = true;
+            }
+          }
+        } else {
+          const currentValue = result[propertyId];
+          const oldValue = typeof result["OLD_" + propertyId] === "undefined" ? currentValue : result["OLD_" + propertyId];
+
+          if (currentValue !== oldValue) {
+            if (currentValue) {
+              insertQueryBuilder.insert({
+                id: result.id,
+                version: result.version || "",
+                type: result.type,
+                module: moduleTable,
+                property: propertyId,
+                value: currentValue,
+                status: true,
+                transaction_time: [
+                  "NOW()",
+                  [],
+                ],
+              });
+              hasAddedAtLeastOneInsert = true;
+            }
+            if (oldValue) {
+              insertQueryBuilder.insert({
+                id: result.id,
+                version: result.version || "",
+                type: result.type,
+                module: moduleTable,
+                property: propertyId,
+                value: oldValue,
+                status: false,
+                transaction_time: [
+                  "NOW()",
+                  [],
+                ],
+              });
+              hasAddedAtLeastOneInsert = true;
+            }
+          }
+        }
+      });
+    });
+
+    // there can only be one property tracker in the trackers table on whether
+    // the given property id, property value, id, version, type combo; whether
+    // it was lost or gained, as all other info is irrelevant, this uniqueness constrain
+    // will be abused to ensure updates and to keep the tracking database small
+    insertQueryBuilder.onConflict("UPDATE", (setBlder) => {
+      setBlder.setColumn(
+        "transaction_time", [
+        "NOW()",
+        [],
+      ],
+      );
+      setBlder.setColumn(
+        "status", [
+        "EXCLUDED.\"status\"",
+        [],
+      ],
+      );
+    });
+
+    if (hasAddedAtLeastOneInsert) {
+      await transactingDb.queryRows(insertQueryBuilder);
+    }
   }
 
   /**
@@ -1646,22 +1801,20 @@ export class ItemizeRawDB {
     moduleUpdateQuery.returningBuilder.returningColumn("parent_version");
     moduleUpdateQuery.returningBuilder.returningColumn("last_modified");
 
+    const allTracked = [
+      "parent_id",
+      "parent_type",
+      "parent_version",
+    ].concat(basicTracked);
+
+    // now we get all the potentially affected tracked properties that may have changed
+    const potentialAffectedTrackedProperties = moduleUpdateQuery.setBuilder.hasUnknownAffectedColumnExpression ? allTracked : (
+      allTracked.filter((tracked) => moduleUpdateQuery.setBuilder.knownAffectedColumns.some(
+        (affected) => affected[0] === null && affected[1] === tracked
+      ))
+    );
+
     if (!updater.dangerousUseSilentMode) {
-      const allTracked = [
-        "parent_id",
-        "parent_type",
-        "parent_version",
-        "id",
-        "version",
-      ].concat(basicTracked);
-
-      // now we get all the potentially affected tracked properties that may have changed
-      const potentialAffectedTrackedProperties = moduleUpdateQuery.setBuilder.hasUnknownAffectedColumnExpression ? allTracked : (
-        allTracked.filter((tracked) => moduleUpdateQuery.setBuilder.knownAffectedColumns.some(
-          (affected) => affected[0] === null && affected[1] === tracked
-        ))
-      );
-
       // add the tracked columns
       basicTracked.forEach((t) => {
         moduleUpdateQuery.returningBuilder.returningColumn(t);
@@ -1685,7 +1838,24 @@ export class ItemizeRawDB {
 
     // we got to get all rows, first we create a pseudo table
     // for our module
-    const allRows = await this.databaseConnection.queryRows(moduleUpdateQuery);
+    // TODOIMPORTANT here make a transaction to update and add the tracked details
+    // must add to the other one too
+    const allRows = potentialAffectedTrackedProperties.length && !updater.dangerousUseSilentMode ? (
+      await this.databaseConnection.startTransaction(async (transactingDb) => {
+        const results = await transactingDb.queryRows(moduleUpdateQuery);
+
+        await this.updateTrackers(
+          transactingDb,
+          results,
+          potentialAffectedTrackedProperties,
+          moduleTable,
+        );
+
+        return results;
+      })
+    ) : (
+      await this.databaseConnection.queryRows(moduleUpdateQuery)
+    );
     const result = allRows.map(convertVersionsIntoNullsWhenNecessary);
 
     if (!updater.dangerousUseSilentMode) {

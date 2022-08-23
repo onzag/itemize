@@ -229,7 +229,7 @@ export async function ssrGenerator(
 
   // now we need a root instance, because this will be used
   // like an UI thread we need a clean instance from the pool
-  let root: Root;
+  let root: Root = null;
   try {
     root = await appData.rootPool.acquire().promise;
   } catch (err) {
@@ -241,15 +241,15 @@ export async function ssrGenerator(
         err,
       }
     )
-    if (info.mode === "html") {
-      info.res.status(500).end("Internal Server Error");
-    } else {
+
+    appliedRule.noSSR = true;
+
+    if (info.mode !== "html") {
       throw new Error("Could not adquire a root from the pool");
     }
-    return;
   }
 
-  const i18nData = root.getI18nDataFor(language);
+  const i18nData = (root || appData.root).getI18nDataFor(language);
   const i18nAppName = i18nData && i18nData.app_name && capitalize(i18nData.app_name);
   const i18nAppDescription = i18nData && i18nData.app_description && capitalize(i18nData.app_description);
 
@@ -275,7 +275,7 @@ export async function ssrGenerator(
 
   // this flags marks whether we can use etags
   // due to an error
-  let errorOccured = false;
+  let errorOccured = !root ? true : false;
   let shouldBe403 = false;
   let forbiddenSignature: string = null;
 
@@ -640,8 +640,10 @@ export async function ssrGenerator(
   }
 
   // clean and release, it's done!!!
-  root.cleanState();
-  appData.rootPool.release(root);
+  if (root) {
+    root.cleanState();
+    appData.rootPool.release(root);
+  }
 
   if (isUSSD) {
     return finalReturnTree;

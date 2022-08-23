@@ -118,12 +118,24 @@ const typeValue: IPropertyDefinitionSupportedType<IPropertyDefinitionSupportedLo
     const usefulArgs = arg.include ? arg.args[INCLUDE_PREFIX + arg.include.getId()] || {} : arg.args;
     if (typeof usefulArgs[locationName] === null) {
       const propertyValue = arg.include ? arg.gqlValue.DATA[arg.include.getId()][arg.id] : arg.gqlValue.DATA[arg.id];
+
+      if (typeof propertyValue === "undefined") {
+        console.warn("Attempted to local search by the property " + arg.id + " but could not find it in the local given value");
+        return false;
+      }
+
       return propertyValue === null;
     } else if (
       typeof usefulArgs[locationName] !== "undefined" && usefulArgs[locationName] !== null &&
       typeof usefulArgs[radiusName] !== "undefined" && usefulArgs[radiusName] !== null
     ) {
       const propertyValue = arg.include ? arg.gqlValue.DATA[arg.include.getId()][arg.id] : arg.gqlValue.DATA[arg.id];
+
+      if (typeof propertyValue === "undefined") {
+        console.warn("Attempted to local search by the property " + arg.id + " but could not find it in the local given value");
+        return false;
+      }
+
       if (propertyValue === null) {
         return false;
       }

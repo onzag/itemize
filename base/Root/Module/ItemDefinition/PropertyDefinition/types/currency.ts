@@ -22,12 +22,14 @@ import {
   MIN_SUPPORTED_REAL,
 } from "../../../../../../constants";
 import { PropertyDefinitionSearchInterfacesPrefixes, PropertyDefinitionSearchInterfacesType } from "../search-interfaces";
-import { currencySQL, currencySQLIn, currencySQLOut, currencySQLSearch, currencySQLOrderBy,
+import {
+  currencySQL, currencySQLIn, currencySQLOut, currencySQLSearch, currencySQLOrderBy,
   currencySQLBtreeIndexable, currencySQLMantenience, currencySQLEqual, currencySQLSSCacheEqual, currencySQLSelect,
-  currencyElasticSearch, 
+  currencyElasticSearch,
   currencySQLElasticIn,
   currencyElastic,
-  currencyElasticOrderBy} from "../sql/currency";
+  currencyElasticOrderBy
+} from "../sql/currency";
 
 /**
  * The currency definition is described by an object
@@ -111,41 +113,55 @@ const typeValue: IPropertyDefinitionSupportedType<IPropertyDefinitionSupportedCu
     const includeId = arg.include ? arg.include.getId() : null;
     const usefulArgs = includeId ? arg.args[INCLUDE_PREFIX + includeId] || {} : arg.args;
 
-    const propertyValue: IPropertyDefinitionSupportedCurrencyType =
-      includeId ? arg.gqlValue.DATA[includeId][arg.id] : arg.gqlValue.DATA[arg.id];
+    if (
+      typeof usefulArgs[exactName] !== "undefined" ||
+      typeof usefulArgs[fromName] !== "undefined" && usefulArgs[fromName] !== null ||
+      typeof usefulArgs[toName] !== "undefined" && usefulArgs[toName] !== null
+    ) {
 
-    const conditions: boolean[] = [];
-    if (typeof usefulArgs[exactName] !== "undefined") {
-      if (usefulArgs[exactName] === null) {
+      const propertyValue: IPropertyDefinitionSupportedCurrencyType =
+        includeId ? arg.gqlValue.DATA[includeId][arg.id] : arg.gqlValue.DATA[arg.id];
+
+      if (typeof propertyValue === "undefined") {
+        console.warn("Attempted to local search by the property " + arg.id + " but could not find it in the local given value");
+        return false;
+      }
+
+      const conditions: boolean[] = [];
+      if (typeof usefulArgs[exactName] !== "undefined") {
+        if (usefulArgs[exactName] === null) {
+          conditions.push(
+            propertyValue.value === null,
+          );
+        } else {
+          conditions.push(
+            propertyValue.value === usefulArgs[exactName].value &&
+            propertyValue.currency === usefulArgs[exactName].currency,
+          );
+        }
+      }
+
+      if (typeof usefulArgs[fromName] !== "undefined" && usefulArgs[fromName] !== null) {
         conditions.push(
-          propertyValue.value === null,
-        );
-      } else {
-        conditions.push(
-          propertyValue.value === usefulArgs[exactName].value &&
-          propertyValue.currency === usefulArgs[exactName].currency,
+          propertyValue.currency === usefulArgs[fromName].currency &&
+          propertyValue.value >= usefulArgs[fromName].value
         );
       }
-    }
 
-    if (typeof usefulArgs[fromName] !== "undefined" && usefulArgs[fromName] !== null) {
-      conditions.push(
-        propertyValue.currency === usefulArgs[fromName].currency &&
-        propertyValue.value >= usefulArgs[fromName].value
-      );
-    }
+      if (typeof usefulArgs[toName] !== "undefined" && usefulArgs[toName] !== null) {
+        conditions.push(
+          propertyValue.currency === usefulArgs[toName].currency &&
+          propertyValue.value <= usefulArgs[toName].value
+        );
+      }
 
-    if (typeof usefulArgs[toName] !== "undefined" && usefulArgs[toName] !== null) {
-      conditions.push(
-        propertyValue.currency === usefulArgs[toName].currency &&
-        propertyValue.value <= usefulArgs[toName].value
-      );
-    }
-
-    if (!conditions.length) {
-      return true;
+      if (!conditions.length) {
+        return true;
+      } else {
+        return conditions.every((c) => c);
+      }
     } else {
-      return conditions.every((c) => c);
+      return true;
     }
   },
   localEqual: (arg) => {
@@ -184,7 +200,7 @@ const typeValue: IPropertyDefinitionSupportedType<IPropertyDefinitionSupportedCu
       }
       isZeroPrevented = p.specialProperties.preventZero;
     }
-  
+
     if (maxValue === 0 && isZeroPrevented ? l.value >= maxValue : l.value > maxValue) {
       return PropertyInvalidReason.TOO_LARGE;
     } else if (minValue === 0 && isZeroPrevented ? l.value <= minValue : l.value < minValue) {

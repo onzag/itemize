@@ -9,7 +9,7 @@ import { getElasticSchemaForModule, getSQLTablesSchemaForModule } from "./Module
 import Root from ".";
 import {
   CREATED_BY_INDEX, CURRENCY_FACTORS_IDENTIFIER,
-  DELETED_REGISTRY_IDENTIFIER, PARENT_INDEX, REGISTRY_IDENTIFIER, TRACKERS_INDEX,
+  DELETED_REGISTRY_IDENTIFIER, PARENT_INDEX, REGISTRY_IDENTIFIER, TRACKERS_INDEX, TRACKERS_REGISTRY_IDENTIFIER,
 } from "../../constants";
 
 export interface ISQLTableIndexType {
@@ -167,23 +167,24 @@ export function getSQLTablesSchemaForRoot(root: Root): ISQLSchemaDefinitionType 
         type: "DECIMAL"
       }
     },
-    [DELETED_REGISTRY_IDENTIFIER]: {
-      reg_id: {
-        type: "serial",
+    [TRACKERS_REGISTRY_IDENTIFIER]: {
+      id: {
+        type: "TEXT",
         notNull: true,
         index: {
           id: "PRIMARY_KEY",
           type: "primary",
-          level: 0,
+          level: 3,
         },
-      },
-      id: {
-        type: "TEXT",
-        notNull: true,
       },
       version: {
         type: "TEXT",
         notNull: true,
+        index: {
+          id: "PRIMARY_KEY",
+          type: "primary",
+          level: 4,
+        },
       },
       module: {
         type: "TEXT",
@@ -191,7 +192,70 @@ export function getSQLTablesSchemaForRoot(root: Root): ISQLSchemaDefinitionType 
       },
       type: {
         type: "TEXT",
+        notNull: true,
+        index: {
+          id: "PRIMARY_KEY",
+          type: "primary",
+          level: 2,
+        },
+      },
+      property: {
+        type: "TEXT",
+        notNull: true,
+        index: {
+          id: "PRIMARY_KEY",
+          type: "primary",
+          level: 0,
+        },
+      },
+      value: {
+        type: "TEXT",
+        notNull: true,
+        index: {
+          id: "PRIMARY_KEY",
+          type: "primary",
+          level: 1,
+        },
+      },
+      status: {
+        type: "BOOLEAN",
         notNull: true
+      },
+      transaction_time: {
+        type: "TIMESTAMPTZ",
+      },
+    },
+    [DELETED_REGISTRY_IDENTIFIER]: {
+      id: {
+        type: "TEXT",
+        notNull: true,
+        index: {
+          id: "PRIMARY_KEY",
+          type: "primary",
+          level: 0,
+        },
+      },
+      version: {
+        type: "TEXT",
+        notNull: true,
+        index: {
+          id: "PRIMARY_KEY",
+          type: "primary",
+          level: 1,
+        },
+      },
+      module: {
+        type: "TEXT",
+        notNull: true
+      },
+      type: {
+        type: "TEXT",
+        notNull: true,
+        index: {
+          id: "PRIMARY_KEY",
+          type: "primary",
+          level: 2,
+        },
       },
       created_by: {
         type: "TEXT",

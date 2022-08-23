@@ -435,12 +435,12 @@ export function getGQLQueryFieldsForItemDefinition(
       // retrieval mode is false, properties are meant to be in input mode for the args,
       // we exclude the base properties, eg. id, version, type, etc... make all the fields optional,
       // and don't include any policy (there are no policies in search mode anyway)
-      fields[PREFIX_SEARCH + itemDefinition.getSearchModeCounterpart().getQualifiedPathName()] = {
+      fields[PREFIX_SEARCH + itemDefinition.getQualifiedPathName()] = {
         type: SEARCH_RECORDS_CONTAINER_GQL,
         args: searchArgs,
         resolve: resolveGenericFunction.bind(null, "searchItemDefinition", itemDefinition, resolvers),
       };
-    fields[PREFIX_TRADITIONAL_SEARCH + itemDefinition.getSearchModeCounterpart().getQualifiedPathName()] = {
+    fields[PREFIX_TRADITIONAL_SEARCH + itemDefinition.getQualifiedPathName()] = {
       type: listTypeForThisRetrievalWithSearchData,
       args: searchArgs,
       resolve: resolveGenericFunction.bind(null, "searchItemDefinitionTraditional", itemDefinition, resolvers),

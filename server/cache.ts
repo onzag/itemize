@@ -9,7 +9,7 @@
 
 import {
   CONNECTOR_SQL_COLUMN_ID_FK_NAME, CONNECTOR_SQL_COLUMN_VERSION_FK_NAME,
-  UNSPECIFIED_OWNER, ENDPOINT_ERRORS, INCLUDE_PREFIX, EXCLUSION_STATE_SUFFIX, DELETED_REGISTRY_IDENTIFIER, CACHED_CURRENCY_RESPONSE, SERVER_DATA_IDENTIFIER, RESERVED_BASE_PROPERTIES
+  UNSPECIFIED_OWNER, ENDPOINT_ERRORS, INCLUDE_PREFIX, EXCLUSION_STATE_SUFFIX, DELETED_REGISTRY_IDENTIFIER, CACHED_CURRENCY_RESPONSE, SERVER_DATA_IDENTIFIER, RESERVED_BASE_PROPERTIES, TRACKERS_REGISTRY_IDENTIFIER
 } from "../constants";
 import { ISQLTableRowValue, ISQLStreamComposedTableRowValue, ConsumeStreamsFnType } from "../base/Root/sql";
 import { IGQLSearchRecord, IGQLArgs, IGQLValue } from "../gql-querier";
@@ -1810,9 +1810,117 @@ export class Cache {
     // we build the transaction for the action
     let sqlValue: ISQLTableRowValue;
     try {
-      sqlValue = convertVersionsIntoNullsWhenNecessary(
-        await this.databaseConnection.queryFirst(withQuery),
+      const changedPropertyMap = propertyMap.filter((v) => v.newValue !== v.originalValue);
+
+      sqlValue = (actualReparent || changedPropertyMap.length) ? (
+        this.databaseConnection.startTransaction(async (transactingDatabase) => {
+          const internalSQLValue = convertVersionsIntoNullsWhenNecessary(
+            await transactingDatabase.queryFirst(withQuery),
+          );
+
+          const insertQueryBuilder = transactingDatabase.getInsertBuilder();
+          insertQueryBuilder.table(TRACKERS_REGISTRY_IDENTIFIER);
+
+          if (reparent) {
+            const originalParent = {
+              id: currentSQLValue.parent_id,
+              version: currentSQLValue.parent_version || null,
+              type: currentSQLValue.parent_type,
+            };
+
+            if (actualReparent.id) {
+              // store the new parenting
+              insertQueryBuilder.insert({
+                id,
+                version: version || "",
+                type: selfTable,
+                module: moduleTable,
+                property: "PARENT",
+                value: actualReparent.type + "." + actualReparent.id + "." + (actualReparent.version || ""),
+                status: true,
+                transaction_time: [
+                  "NOW()",
+                  [],
+                ],
+              });
+            }
+            if (originalParent.id) {
+              insertQueryBuilder.insert({
+                id,
+                version: version || "",
+                type: selfTable,
+                module: moduleTable,
+                property: "PARENT",
+                value: originalParent.type + "." + originalParent.id + "." + (originalParent.version || ""),
+                status: false,
+                transaction_time: [
+                  "NOW()",
+                  [],
+                ],
+              });
+            }
+          }
+
+          changedPropertyMap.forEach((v) => {
+            if (v.originalValue) {
+              insertQueryBuilder.insert({
+                id,
+                version: version || "",
+                type: selfTable,
+                module: moduleTable,
+                property: v.id,
+                value: v.originalValue,
+                status: false,
+                transaction_time: [
+                  "NOW()",
+                  [],
+                ],
+              });
+            }
+            if (v.newValue) {
+              insertQueryBuilder.insert({
+                id,
+                version: version || "",
+                type: selfTable,
+                module: moduleTable,
+                property: v.id,
+                value: v.newValue,
+                status: true,
+                transaction_time: [
+                  "NOW()",
+                  [],
+                ],
+              });
+            }
+          });
+
+          // there can only be one property tracker in the trackers table on whether
+          // the given property id, property value, id, version, type combo; whether
+          // it was lost or gained, as all other info is irrelevant, this uniqueness constrain
+          // will be abused to ensure updates and to keep the tracking database small
+          insertQueryBuilder.onConflict("UPDATE", (setBlder) => {
+            setBlder.setColumn(
+              "transaction_time", [
+                "NOW()",
+                [],
+              ],
+            );
+            setBlder.setColumn(
+              "status", [
+                "EXCLUDED.\"status\"",
+                [],
+              ],
+            );
+          });
+
+          return internalSQLValue;
+        })
+      ) : (
+        convertVersionsIntoNullsWhenNecessary(
+          await this.databaseConnection.queryFirst(withQuery),
+        )
       );
+
     } catch (err) {
       logger.error(
         {
@@ -2448,6 +2556,8 @@ export class Cache {
       }).join(",") : "";
       const trackedProperties = trackedPropertiesIdef.concat(trackedPropertiesMod).map((p) => p.getId());
 
+      const hasPotentialTrackers = trackedProperties.length || itemDefinition.isReparentingEnabled();
+
       // now we see what we are going to return if we got side effects, everything, otherwise
       // it's just some basic stuff with that extra row
       const returningElementsIdef = needSideEffects ?
@@ -2473,6 +2583,7 @@ export class Cache {
           `${JSON.stringify(CONNECTOR_SQL_COLUMN_VERSION_FK_NAME)}="version"` :
           deleteQueryBase;
 
+        const deleteAllTrackers = `DELETE FROM ${JSON.stringify(TRACKERS_REGISTRY_IDENTIFIER)} WHERE "id" = $1 AND "type" = $2`;
 
         // for that we run a transaction
         const allVersionsDropped: ISQLTableRowValue[] = await this.databaseConnection.startTransaction(async (transactingDatabase) => {
@@ -2484,6 +2595,12 @@ export class Cache {
               selfTable,
             ]
           );
+
+          // delete all outdated trackers
+          if (hasPotentialTrackers) {
+            await transactingDatabase.queryRows(deleteAllTrackers, [id, selfTable]);
+          }
+
           rowsToPerformDeleteSideEffects = needSideEffects ? allVersionsDroppedInternal : null;
           // but yet we return the version to see what we dropped, and well parenting and creator
 
@@ -2516,7 +2633,7 @@ export class Cache {
                   [],
                 ],
                 trackers: trackers ? JSON.stringify(trackers) : null,
-              })
+              });
             });
 
             // but we need the transaction time for each as the new record
@@ -2573,6 +2690,8 @@ export class Cache {
           `${JSON.stringify(CONNECTOR_SQL_COLUMN_VERSION_FK_NAME)}="version"` :
           deleteQueryBase;
 
+        const deleteAllTrackers = `DELETE FROM ${JSON.stringify(TRACKERS_REGISTRY_IDENTIFIER)} WHERE "id" = $1 AND "version" = $2 AND "type" = $3`;
+
         // otherwise if we are deleting a specific version
         const row = await this.databaseConnection.startTransaction(async (transactingDatabase) => {
           // we run this
@@ -2585,6 +2704,11 @@ export class Cache {
               selfTable,
             ]
           );
+
+          // delete all outdated trackers
+          if (hasPotentialTrackers) {
+            await transactingDatabase.queryRows(deleteAllTrackers, [id, version || "", selfTable]);
+          }
 
           const trackers: { [key: string]: string } = trackedProperties ? {} : null;
           trackedProperties.forEach((pId) => {

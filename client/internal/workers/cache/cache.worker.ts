@@ -350,6 +350,7 @@ export default class CacheWorker {
 
     // so first we await for our database
     if (!this.db) {
+      console.warn("Could not retrieve IndexedDB");
       // what gives, we return
       return false;
     }
@@ -380,6 +381,7 @@ export default class CacheWorker {
 
     // so first we await for our database
     if (!this.db) {
+      console.warn("Could not retrieve IndexedDB");
       // what gives, we return
       return null;
     }
@@ -408,6 +410,7 @@ export default class CacheWorker {
 
     // so first we await for our database
     if (!this.db) {
+      console.warn("Could not retrieve IndexedDB");
       // what gives, we return
       return false;
     }
@@ -454,6 +457,7 @@ export default class CacheWorker {
 
     // so first we await for our database
     if (!this.db) {
+      console.warn("Could not retrieve IndexedDB");
       // what gives, we return
       return false;
     }
@@ -496,6 +500,7 @@ export default class CacheWorker {
 
     // if we don't have it
     if (!this.db) {
+      console.warn("Could not retrieve IndexedDB");
       // what gives, we return
       return false;
     }
@@ -534,6 +539,7 @@ export default class CacheWorker {
 
     // so first we await for our database
     if (!this.db) {
+      console.warn("Could not retrieve IndexedDB");
       // what gives, we return
       return false;
     }
@@ -581,6 +587,7 @@ export default class CacheWorker {
 
     // so first we await for our database
     if (!this.db) {
+      console.warn("Could not retrieve IndexedDB");
       // what gives, we return
       return false;
     }
@@ -621,6 +628,7 @@ export default class CacheWorker {
 
     // so first we await for our database
     if (!this.db) {
+      console.warn("Could not retrieve IndexedDB");
       // what gives, we return
       return null;
     }
@@ -660,6 +668,7 @@ export default class CacheWorker {
 
     // so first we await for our database
     if (!this.db) {
+      console.warn("Could not retrieve IndexedDB");
       // what gives, we return
       return null;
     }
@@ -694,6 +703,7 @@ export default class CacheWorker {
     // if we don't have it
     if (!this.db) {
       // what gives, we return
+      console.warn("Could not retrieve IndexedDB");
       return false;
     }
 
@@ -714,6 +724,7 @@ export default class CacheWorker {
       const currentValue: ISearchMatchType = await this.db.get(SEARCHES_TABLE_NAME, storeKeyName);
 
       if (!currentValue) {
+        console.warn("Requested to delete " + storeKeyName + " but no such search is found in IndexedDB");
         return false;
       }
 
@@ -835,6 +846,7 @@ export default class CacheWorker {
 
     // if we don't have a database no match
     if (!this.db) {
+      console.warn("Could not retrieve IndexedDB");
       return null;
     }
 
@@ -902,6 +914,7 @@ export default class CacheWorker {
 
     // so we fetch our db like usual
     if (!this.db) {
+      console.warn("Could not retrieve IndexedDB");
       return false;
     }
 
@@ -937,6 +950,7 @@ export default class CacheWorker {
       const currentValue: ISearchMatchType = await this.db.get(SEARCHES_TABLE_NAME, storeKeyName);
 
       if (!currentValue) {
+        console.warn("Requested update for " + storeKeyName + " but no such search is found in IndexedDB");
         return false;
       }
 
@@ -1045,6 +1059,7 @@ export default class CacheWorker {
     await this.waitForSetupPromise;
 
     if (!this.db) {
+      console.warn("Could not retrieve IndexedDB");
       return null;
     }
 

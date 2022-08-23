@@ -3766,6 +3766,22 @@ export class ActualItemProvider extends
       throw new Error("searchByProperties includes created by yet in the options an override was included as " + options.createdBy);
     }
 
+    if (options.cachePolicy !== "none" && options.cachePolicy) {
+      options.searchByProperties.forEach((p) => {
+        const propertyId = typeof p === "string" ? p : p.id;
+
+        if (!options.requestedProperties.includes(propertyId)) {
+          throw new Error(
+            "searchByProperties is using " +
+            propertyId +
+            " but this property is not requested, yet you are using a cache mode " +
+            options.cachePolicy +
+            " this is a problem because searches are resolved locally and it will lack this field to resolve the search"
+          );
+        }
+      });
+    }
+
     if (options.ssrEnabled && options.cachePolicy && options.cachePolicy !== "none") {
       console.warn("You have a SSR enabled search that uses cache policy, this will not execute in the server side due to conflicting instructions");
     }

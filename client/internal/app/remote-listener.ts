@@ -1481,18 +1481,10 @@ export class RemoteListener {
 
       // and if our cache worker is supported
       if (CacheWorkerInstance.isSupported && ownedListener.useCacheWorker.some((w) => w)) {
-        const itemDefinitionOrModule = this.root.registry[event.qualifiedPathName];
-        let itemDefinition: ItemDefinition;
-        if (itemDefinitionOrModule instanceof ItemDefinition) {
-          itemDefinition = itemDefinitionOrModule;
-        } else {
-          itemDefinition = itemDefinitionOrModule.getPropExtensionItemDefinition();
-        }
-
         // we are going to request it to add the new records that our event
         // comes loaded with the new records that were added to it
         await CacheWorkerInstance.instance.updateRecordsOnCachedSearch(
-          PREFIX_SEARCH + itemDefinition.getSearchModeCounterpart().getQualifiedPathName(),
+          PREFIX_SEARCH + event.qualifiedPathName,
           event.createdBy,
           null,
           null,
@@ -1548,16 +1540,8 @@ export class RemoteListener {
 
       // and equally we try to add these records
       if (CacheWorkerInstance.isSupported && parentedListener.useCacheWorker.some((w) => w)) {
-        const itemDefinitionOrModule = this.root.registry[event.qualifiedPathName];
-        let itemDefinition: ItemDefinition;
-        if (itemDefinitionOrModule instanceof ItemDefinition) {
-          itemDefinition = itemDefinitionOrModule;
-        } else {
-          itemDefinition = itemDefinitionOrModule.getPropExtensionItemDefinition();
-        }
-
         await CacheWorkerInstance.instance.updateRecordsOnCachedSearch(
-          PREFIX_SEARCH + itemDefinition.getSearchModeCounterpart().getQualifiedPathName(),
+          PREFIX_SEARCH + event.qualifiedPathName,
           null,
           event.parentType,
           event.parentId,
@@ -1607,16 +1591,8 @@ export class RemoteListener {
 
       // and equally we try to add these records
       if (CacheWorkerInstance.isSupported && propertyListener.useCacheWorker.some((w) => w)) {
-        const itemDefinitionOrModule = this.root.registry[event.qualifiedPathName];
-        let itemDefinition: ItemDefinition;
-        if (itemDefinitionOrModule instanceof ItemDefinition) {
-          itemDefinition = itemDefinitionOrModule;
-        } else {
-          itemDefinition = itemDefinitionOrModule.getPropExtensionItemDefinition();
-        }
-
         await CacheWorkerInstance.instance.updateRecordsOnCachedSearch(
-          PREFIX_SEARCH + itemDefinition.getSearchModeCounterpart().getQualifiedPathName(),
+          PREFIX_SEARCH + event.qualifiedPathName,
           null,
           null,
           null,
@@ -1672,16 +1648,8 @@ export class RemoteListener {
 
       // and equally we try to add these records
       if (CacheWorkerInstance.isSupported && ownedParentedListener.useCacheWorker.some((w) => w)) {
-        const itemDefinitionOrModule = this.root.registry[event.qualifiedPathName];
-        let itemDefinition: ItemDefinition;
-        if (itemDefinitionOrModule instanceof ItemDefinition) {
-          itemDefinition = itemDefinitionOrModule;
-        } else {
-          itemDefinition = itemDefinitionOrModule.getPropExtensionItemDefinition();
-        }
-
         await CacheWorkerInstance.instance.updateRecordsOnCachedSearch(
-          PREFIX_SEARCH + itemDefinition.getSearchModeCounterpart().getQualifiedPathName(),
+          PREFIX_SEARCH + event.qualifiedPathName,
           event.createdBy,
           event.parentType,
           event.parentId,

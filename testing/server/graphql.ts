@@ -37,8 +37,8 @@ class ModuleTest extends Test {
         "Should have module level for all 3 GET_LIST/SEARCH/TSEARCH",
         () => {
           const getListEndpoint = PREFIX_GET_LIST + this.mod.getQualifiedPathName();
-          const searchEndpoint = PREFIX_SEARCH + this.mod.getSearchModule().getQualifiedPathName();
-          const tsearchEndpoint = PREFIX_TRADITIONAL_SEARCH + this.mod.getSearchModule().getQualifiedPathName();
+          const searchEndpoint = PREFIX_SEARCH + this.mod.getQualifiedPathName();
+          const tsearchEndpoint = PREFIX_TRADITIONAL_SEARCH + this.mod.getQualifiedPathName();
 
           [getListEndpoint, searchEndpoint, tsearchEndpoint].forEach((endpoint) => {
             const foundGetListEndpoint = this.getSchemaFields().query.some((f) => f.name === endpoint);
@@ -78,8 +78,8 @@ class ModuleTest extends Test {
           "Should have all 3 GET_LIST/SEARCH/TSEARCH endpoints for " + idef.getPath(),
           () => {
             const getListEndpoint = PREFIX_GET_LIST + idef.getQualifiedPathName();
-            const searchEndpoint = PREFIX_SEARCH + idef.getSearchModeCounterpart().getQualifiedPathName();
-            const tsearchEndpoint = PREFIX_TRADITIONAL_SEARCH + idef.getSearchModeCounterpart().getQualifiedPathName();
+            const searchEndpoint = PREFIX_SEARCH + idef.getQualifiedPathName();
+            const tsearchEndpoint = PREFIX_TRADITIONAL_SEARCH + idef.getQualifiedPathName();
 
             [getListEndpoint, searchEndpoint, tsearchEndpoint].forEach((endpoint) => {
               const foundGetListEndpoint = this.getSchemaFields().query.some((f) => f.name === endpoint);

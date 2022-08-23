@@ -298,12 +298,12 @@ export function getGQLQueryFieldsForModule(
     };
 
     fields = {
-      [PREFIX_SEARCH + mod.getSearchModule().getQualifiedPathName()]: {
+      [PREFIX_SEARCH + mod.getQualifiedPathName()]: {
         type: SEARCH_RECORDS_CONTAINER_GQL,
         args: searchArgs,
         resolve: resolveGenericFunction.bind(null, "searchModule", mod, resolvers),
       },
-      [PREFIX_TRADITIONAL_SEARCH + mod.getSearchModule().getQualifiedPathName()]: {
+      [PREFIX_TRADITIONAL_SEARCH + mod.getQualifiedPathName()]: {
         type: listTypeForThisRetrievalWithSearchData,
         args: searchArgs,
         resolve: resolveGenericFunction.bind(null, "searchModuleTraditional", mod, resolvers),
