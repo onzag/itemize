@@ -597,6 +597,12 @@ export async function searchModule(
           return toReturnToUser;
         }),
       ),
+      // this is actually not the last modified date that is correct for this search
+      // the correct date is the one that includes the deleted registry of deleted records
+      // that affected this search, and the tracked records, if available... however
+      // for that we need to know, anyway, it doesn't really hurt the search functionality
+      // just that when it asks for feedback it will realize the mismatch and try to update
+      // if a newer record was created and then deleted
       last_modified: findLastRecordLastModifiedDate(baseResult as IGQLSearchRecord[]),
       limit,
       offset,
