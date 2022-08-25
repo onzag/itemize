@@ -1146,6 +1146,7 @@ export class ItemizeElasticClient {
       }
     );
     const hasNextBatch = documentsCreatedOrModifiedSinceLastRan.length === limit;
+    let error: Error = null;
 
     // cheap interface here
     /**
@@ -1220,21 +1221,16 @@ export class ItemizeElasticClient {
         const language = hit._index.substring(baseIndexPrefixLen);
         const lasModifiedStr = hit.fields.last_modified[0];
 
-        if (!lasModifiedStr) {
-          // this is rather corrupted
-          throw new Error(
-            "Missing last modified date in corrupt record " + hit._id + " at " + hit._index
-          );
-        }
-
-        const lastModified = new NanoSecondComposedDate(lasModifiedStr);
+        // lack of last modified means it's a corrupt record
+        const lastModified = !lasModifiedStr ? null : new NanoSecondComposedDate(lasModifiedStr);
+        const corruptRecord = !lastModified || lastModified.isInvalid();
 
         // this will delete duplicated values simply because one of them will
         // be in the wrong language by default because they don't occupy the same index
         // so the language will differ, if both of them are invalid they will also go away
         // for different reasons
         const isInTheWrongLanguage = objectInfo.language !== language;
-        const isOutdated = objectInfo.lastModified.notEqual(lastModified);
+        const isOutdated = corruptRecord ? true : objectInfo.lastModified.notEqual(lastModified);
 
         // we basically have confirmed these index exist
         // so we don't have to later
@@ -1425,10 +1421,10 @@ export class ItemizeElasticClient {
             // bulk fails silently but we must not accept this because this means
             // invalid consistency and we must ensure consistency
             if (operations.errors) {
-              operations.items.forEach((o) => {
+              const errored = operations.items.map((o) => {
                 // avoid reporting version conflict engine exceptions as the values have been created
                 const error = (o.create && o.create.error && o.create.status !== 409 && o.create.error) ||
-                  (o.update && o.update.error && o.update.error) ||
+                  (o.update && o.update.error) ||
                   (o.delete && o.delete.error && o.delete.status !== 404 && o.delete.error);
 
                 // ignoring race conditions where for some incredible reason of the gods
@@ -1437,12 +1433,15 @@ export class ItemizeElasticClient {
                 // but who knows, we ignore those cases
 
                 // as for update, we can't be sure why the document dissapeared
-                if (error) {
-                  throw new Error(
-                    JSON.stringify(error),
-                  );
-                }
-              });
+
+                return error || null;
+              }).filter((e) => !!e);
+
+              if (errored.length) {
+                throw new Error(
+                  JSON.stringify(errored),
+                );
+              }
             }
           }));
         } catch (err) {
@@ -1450,12 +1449,16 @@ export class ItemizeElasticClient {
             {
               className: "ItemizeElasticClient",
               methodName: "runConsistencyCheck",
-              message: "Bulk operations failed for " + qualifiedPathName,
+              message: "Some bulk operations failed for " + qualifiedPathName,
               serious: true,
               err,
+              data: {
+                batchNumber,
+              }
             }
           );
-          throw err;
+          // we consume the error and allow the function to recurse
+          error = err;
         }
       } else if (CAN_LOG_DEBUG) {
         logger.debug(
@@ -1485,9 +1488,20 @@ export class ItemizeElasticClient {
         statusInfo,
         ensuranceCache,
       );
+
+      // this will throw the error that occured in this layer
+      // but will allow to keep processing the other batches
+      // whatever happened hopefully will fix itself on the next
+      // consistency check round, but we tried to update and fix
+      // as many records as possible
+      if (error) {
+        throw error;
+      }
     }
 
     // we can update our timestamp if we are the initial and not some batch
+    // this wil not occur if an error is triggered
+    // causing it to retry from the same point
     if (batchNumber === 0) {
       await this.setIndexStatusInfo(
         qualifiedPathName,

@@ -14,7 +14,7 @@ type OfflineStatusCb = (offline: boolean) => React.ReactNode;
  * The props basically takes a children that tells if connected or not
  */
 interface IOfflineStatusRetrieverProps {
-  children?: React.ReactNode | OfflineStatusCb;
+  children?: React.ReactNode | OfflineStatusCb;
   onRestoredConnection?: () => void;
   onLostConnection?: () => void;
 }
@@ -122,7 +122,7 @@ class ActualOfflineStatusRetriever extends
       return this.props.children(this.state.canAcceptConclusion ? this.state.offline : false);
     }
 
-    return this.props.children || null;
+    return this.props.children || null;
   }
 }
 

@@ -335,7 +335,13 @@ export default {
       },
       additionalProperties: false,
       required: ["condition"],
-    }
+    },
+
+    // used for schema purposes and documentation only
+    // and removed during build
+    description: {
+      type: "string",
+    },
   },
   definitions: {
     PropertyDefinition: PropertyDefinitionSchema,

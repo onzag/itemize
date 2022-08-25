@@ -249,6 +249,12 @@ export default {
     searchOnlyProperty: {
       type: "boolean",
     },
+
+    // used for schema purposes and documentation only
+    // and removed during build
+    description: {
+      type: "string",
+    },
   },
   additionalProperties: false,
   definitions: {

@@ -543,7 +543,7 @@ async function buildModule(
 
   // we add the propExtensions if necessary
   if (propExtensions) {
-    finalValue.propExtensions = propExtensions;
+    finalValue.propExtensions = propExtensions.map(buildProperty);
     finalValue.propExtRaw = propExtRaw;
     finalValue.propExtPointers = propExtPointers;
     finalValue.propExtLocation = propExtLocation;
@@ -657,7 +657,7 @@ async function buildItemDefinition(
     pointers,
     raw,
     includes: actualEvaledFileData.includes,
-    properties: actualEvaledFileData.properties,
+    properties: actualEvaledFileData.properties ? actualEvaledFileData.properties.map(buildProperty) : actualEvaledFileData.properties,
     type: actualEvaledFileData.type,
     policies: actualEvaledFileData.policies,
   };
@@ -868,6 +868,18 @@ async function buildItemDefinition(
   }
 
   return finalValue;
+}
+
+/**
+ * Removes the meta properties that only exist part of the schema
+ * @param p 
+ * @returns 
+ */
+function buildProperty(p: IPropertyDefinitionRawJSONDataType) {
+  const p2 = {...p};
+  delete (p2 as any).description;
+
+  return p2;
 }
 
 /**

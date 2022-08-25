@@ -68,6 +68,15 @@ export class NanoSecondComposedDate {
     // this value will be 678000
     this.remainder = parseInt(strRemainder) || 0;
   }
+
+  /**
+   * Tells wether the date is invalid
+   * @returns 
+   */
+  public isInvalid() {
+    return isNaN(this.time);
+  }
+
   /**
    * Checks whether a given nano date is greater than another
    * @param otherDate the other date

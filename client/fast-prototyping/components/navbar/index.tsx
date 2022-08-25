@@ -23,6 +23,8 @@ import IconButton from "@mui/material/IconButton";
 import Typography from "@mui/material/Typography";
 import MenuIcon from "@mui/icons-material/Menu";
 import Box from "@mui/material/Box";
+import OfflineStatusRetriever from "../../../components/offline/OfflineStatusRetriever";
+import WifiOffIcon from "@mui/icons-material/WifiOff";
 
 /**
  * the navbar styles generator
@@ -52,6 +54,13 @@ const navbarStyles = {
       }
     )
   },
+  appBarOffline: {
+    backgroundColor: "#78909c",
+    transition: "background-color 2s",
+  },
+  appBarDefault: {
+    transition: "background-color 2s",
+  },
   title: (theme: Theme) => ({
     whiteSpace: "nowrap" as "nowrap",
     paddingLeft: "1rem",
@@ -69,7 +78,13 @@ const navbarStyles = {
   titleMargin: {
     paddingRight: "12px",
     display: "inline-block",
-  }
+  },
+  offlineIcon: {
+    marginLeft: "1rem",
+    marginRight: "-0.5rem",
+    fontSize: "1rem",
+    opacity: "0.75",
+  },
 };
 
 /**
@@ -151,44 +166,49 @@ export function Navbar(props: INavbarProps) {
           longTermCaching={true}
           markForDestructionOnLogout={true}
         >
-          <AppBar>
-            <Toolbar>
-              <I18nRead id="menu">
-                {
-                  (value: string) => (
-                    <IconButton
-                      edge="start"
-                      color="inherit"
-                      aria-label={value}
-                      onClick={setMenuOpen.bind(this, true)}
-                      size="large">
-                      <MenuIcon />
-                    </IconButton>
-                  )
-                }
-              </I18nRead>
-              <Box sx={navbarStyles.title}>
-                <Typography variant="body1" sx={navbarStyles.titleTypography}>
-                  <Box component="span" sx={navbarStyles.titleMargin}>
-                    <TitleReader />
+          <OfflineStatusRetriever>
+            {(offline) => (
+              <AppBar sx={offline ? navbarStyles.appBarOffline : navbarStyles.appBarDefault}>
+                <Toolbar>
+                  <I18nRead id="menu">
+                    {
+                      (value: string) => (
+                        <IconButton
+                          edge="start"
+                          color="inherit"
+                          aria-label={value}
+                          onClick={setMenuOpen.bind(this, true)}
+                          size="large">
+                          <MenuIcon />
+                        </IconButton>
+                      )
+                    }
+                  </I18nRead>
+                  {offline ? <WifiOffIcon sx={navbarStyles.offlineIcon}/> : null}
+                  <Box sx={navbarStyles.title}>
+                    <Typography variant="body1" sx={navbarStyles.titleTypography}>
+                      <Box component="span" sx={navbarStyles.titleMargin}>
+                        <TitleReader />
+                      </Box>
+                      <OutdatedText onClick={setIsOutdatedDialogAllowedToBeOpen.bind(this, true)} />
+                    </Typography>
                   </Box>
-                  <OutdatedText onClick={setIsOutdatedDialogAllowedToBeOpen.bind(this, true)} />
-                </Typography>
-              </Box>
-              <Box sx={navbarStyles.container}>
-                <Buttons
-                  excludeLanguagePicker={props.excludeLanguagePicker}
-                  LoginDialog={props.LoginDialog}
-                  SignupDialog={props.SignupDialog}
-                  RecoverDialog={props.RecoverDialog}
-                  AvatarComponent={props.AvatarComponent}
-                  avatarProps={props.avatarProps}
-                />
-                <ExternalDialogs />
-              </Box>
-              {props.toolbarExtraNode}
-            </Toolbar>
-          </AppBar>
+                  <Box sx={navbarStyles.container}>
+                    <Buttons
+                      excludeLanguagePicker={props.excludeLanguagePicker}
+                      LoginDialog={props.LoginDialog}
+                      SignupDialog={props.SignupDialog}
+                      RecoverDialog={props.RecoverDialog}
+                      AvatarComponent={props.AvatarComponent}
+                      avatarProps={props.avatarProps}
+                    />
+                    <ExternalDialogs />
+                  </Box>
+                  {props.toolbarExtraNode}
+                </Toolbar>
+              </AppBar>
+            )}
+          </OfflineStatusRetriever>
           <Box sx={navbarStyles.appBarSpacer} />
           <BlockingBackdrop exclude={props.excludeBlockingBackdrop} />
           <OutdatedDialog
