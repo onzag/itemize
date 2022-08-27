@@ -11,6 +11,7 @@ import { deserializeChildrenForNode, IReactifyArg, ISerializationRegistryType, R
 import { serializeElementBase, deserializeElementBase, IElementBase, reactifyElementBase } from "../base";
 import { IListItem } from "./list-item";
 import { STANDARD_PARAGRAPH } from "./paragraph";
+import { IText } from "./text";
 
 /**
  * The function that registers and adds the list element in the given
@@ -41,7 +42,7 @@ export function registerList(registry: ISerializationRegistryType) {
       list.children,
     );
   }
-  
+
   /**
    * Deserializes an HTML node into the given list
    * rich element
@@ -56,22 +57,9 @@ export function registerList(registry: ISerializationRegistryType) {
     const list: IList = {
       ...base,
       type: "list",
-      containment: "list-superblock",
       listType: node.tagName === "OL" ? "numbered" : "bulleted",
-      children: deserializeChildrenForNode(node, "list-superblock") as IListItem[],
+      children: deserializeChildrenForNode(node) as IListItem[],
     }
-
-    if (!list.children.length) {
-      list.children = [
-        {
-          type: "list-item",
-          containment: "superblock",
-          children: [
-            STANDARD_PARAGRAPH(),
-          ],
-        },
-      ];
-    };
 
     // return such
     return list;
@@ -98,10 +86,57 @@ export function registerList(registry: ISerializationRegistryType) {
       arg,
     );
   }
-  
+
   // register into the registry
   registry.REACTIFY.list = reactifyList;
   registry.SERIALIZE.list = serializeList;
+  registry.ALLOWS_CHILDREN.list = [
+    "list-item",
+  ];
+  registry.ON_EMPTY_FILL_WITH.list = () => {
+    return (
+      {
+        type: "list-item",
+        children: [
+          STANDARD_PARAGRAPH(),
+        ]
+      }
+    );
+  }
+
+  registry.ON_INVALID_TEXT_WRAP_WITH.list = (text: IText) => {
+    return [
+      STANDARD_PARAGRAPH(),
+      {
+        type: "list-item",
+        children: []
+      }
+    ];
+  }
+
+  registry.ON_INVALID_CHILDREN_WRAP_WITH.list = (child: RichElement) => {
+    if (child.type === "inline" || child.type === "file" || child.type === "link") {
+      return [
+        STANDARD_PARAGRAPH(),
+        {
+          type: "list-item",
+          children: []
+        }
+      ];
+    } else if (child.type === "title" || child.type === "paragraph") {
+      return [
+        {
+          type: "list-item",
+          children: []
+        }
+      ];
+    }
+
+    return null;
+  }
+  registry.INLINES.list = false;
+  registry.VOIDS.list = false;
+
   registry.DESERIALIZE.byTag.OL = deserializeList;
   registry.DESERIALIZE.byTag.UL = deserializeList;
 }
@@ -112,10 +147,6 @@ export function registerList(registry: ISerializationRegistryType) {
  */
 export interface IList extends IElementBase {
   type: "list";
-  /**
-   * it can only contain list items
-   */
-  containment: "list-superblock",
   /**
    * A the list type
    */

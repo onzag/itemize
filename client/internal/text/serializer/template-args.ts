@@ -22,7 +22,7 @@ export interface ITemplateArgsProperties {
     // for text content and whatnot
     string |
     // for ifs
-    boolean |
+    boolean |
     // eh?
     number;
 }

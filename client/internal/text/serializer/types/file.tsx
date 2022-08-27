@@ -86,7 +86,6 @@ export function registerFile(registry: ISerializationRegistryType) {
     // and return the given file element
     return {
       ...base,
-      containment: "void-inline",
       type: "file",
       srcId: node.dataset.srcId,
       fileName: fileNameNode.textContent,
@@ -141,6 +140,10 @@ export function registerFile(registry: ISerializationRegistryType) {
   // now we can do the registration in the passed registry
   registry.REACTIFY.file = reactifyFile;
   registry.SERIALIZE.file = serializeFile;
+  registry.ALLOWS_CHILDREN.file = [];
+  registry.INLINES.file = true;
+  registry.VOIDS.file = true;
+
   registry.DESERIALIZE.byClassName.file = deserializeFile;
 }
 
@@ -152,10 +155,6 @@ export interface IFile extends IElementBase {
    * The type
    */
   type: "file";
-  /**
-   * cannot contain anything
-   */
-  containment: "void-inline",
   /**
    * file name
    */

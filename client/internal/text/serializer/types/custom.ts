@@ -6,10 +6,18 @@
  * @module
  */
 
-import { RichElement, ISerializationRegistryType, deserializeElement, IReactifyArg, deserializeChildrenForNode } from "..";
+import { ISerializationRegistryType, IReactifyArg, deserializeChildrenForNode } from "..";
 import { CUSTOM_CLASS_PREFIX } from "../..";
 import { serializeElementBase, deserializeElementBase, IElementBase, reactifyElementBase } from "../base";
-import { STANDARD_PARAGRAPH } from "./paragraph";
+import { IContainer } from "./container";
+import { IFile } from "./file";
+import { IImage } from "./image";
+import { IList } from "./list";
+import { IParagraph, STANDARD_PARAGRAPH } from "./paragraph";
+import { IQuote } from "./quote";
+import { ITable } from "./table";
+import { ITitle } from "./title";
+import { IVideo } from "./video";
 
 /**
  * The function that registers and adds the custom in the given
@@ -63,9 +71,8 @@ export function registerCustom(registry: ISerializationRegistryType) {
     const custom: ICustom = {
       ...base,
       type: "custom",
-      containment: "superblock",
       customType,
-      children: deserializeChildrenForNode(node, "superblock") as RichElement[],
+      children: deserializeChildrenForNode(node) as any[],
     }
 
     if (!custom.children.length) {
@@ -104,6 +111,12 @@ export function registerCustom(registry: ISerializationRegistryType) {
   // add to the registry
   registry.REACTIFY.custom = reactifyCustom;
   registry.SERIALIZE.custom = serializeCustom;
+  registry.ALLOWS_CHILDREN.custom = registry.ALLOWS_CHILDREN.container;
+  registry.ON_EMPTY_FILL_WITH.custom = registry.ON_EMPTY_FILL_WITH.container;
+  registry.ON_INVALID_TEXT_WRAP_WITH.custom = registry.ON_INVALID_TEXT_WRAP_WITH.container;
+  registry.ON_INVALID_CHILDREN_WRAP_WITH.custom = registry.ON_INVALID_CHILDREN_WRAP_WITH.container;
+  registry.SUPERBLOCKS.custom = true;
+
   registry.DESERIALIZE.byClassNamePrefix.custom = deserializeCustom;
 }
 
@@ -116,15 +129,11 @@ export interface ICustom extends IElementBase {
    */
   type: "custom";
   /**
-   * refers to be able to contain blocks or other super blocks, etc...
-   */
-  containment: "superblock",
-  /**
    * Specifies which custom type it is
    */
   customType: string;
   /**
    * The children
    */
-  children: RichElement[];
+  children: Array<IContainer | ICustom | IFile | IParagraph | IList | IQuote | ITable | IVideo | ITitle | IImage>;
 }

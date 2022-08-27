@@ -9,8 +9,16 @@
 import { IReactifyArg, ISerializationRegistryType, RichElement, deserializeChildrenForNode } from "..";
 import { CONTAINER_CLASS, CONTAINER_CLASS_PREFIX } from "../..";
 import { serializeElementBase, deserializeElementBase, IElementBase, reactifyElementBase } from "../base";
-import { STANDARD_PARAGRAPH } from "./paragraph";
+import { ICustom } from "./custom";
+import { IFile } from "./file";
+import { IImage } from "./image";
+import { IList } from "./list";
+import { IParagraph, STANDARD_PARAGRAPH } from "./paragraph";
+import { IQuote } from "./quote";
+import { ITable } from "./table";
 import { IText } from "./text";
+import { ITitle } from "./title";
+import { IVideo } from "./video";
 
 /**
  * The function that registers and adds the container in the given
@@ -42,7 +50,7 @@ export function registerContainer(registry: ISerializationRegistryType) {
       container.children,
     );
   }
-  
+
   /**
    * Converts a HTML element that is already considered a container
    * into the IContainer form
@@ -65,15 +73,8 @@ export function registerContainer(registry: ISerializationRegistryType) {
     const container: IContainer = {
       ...base,
       type: "container",
-      containment: "superblock",
       containerType,
-      children: deserializeChildrenForNode(node, "superblock"),
-    }
-
-    if (!container.children.length) {
-      container.children = [
-        STANDARD_PARAGRAPH(),
-      ];
+      children: deserializeChildrenForNode(node) as any[],
     }
 
     // return it
@@ -106,6 +107,76 @@ export function registerContainer(registry: ISerializationRegistryType) {
   // register in the registry
   registry.REACTIFY.container = reactifyContainer;
   registry.SERIALIZE.container = serializeContainer;
+  registry.ALLOWS_CHILDREN.container = [
+    "container",
+    "custom",
+    "file",
+    "image",
+    "list",
+    "paragraph",
+    "quote",
+    "table",
+    "title",
+    "video",
+  ];
+  registry.ON_EMPTY_FILL_WITH.container = () => {
+    return STANDARD_PARAGRAPH();
+  }
+
+  const emptyRegex = /^\s+$/;
+  registry.ON_INVALID_TEXT_WRAP_WITH.container = (text: IText) => {
+    return [STANDARD_PARAGRAPH()];
+  }
+  registry.ON_INVALID_CHILDREN_WRAP_WITH.container = (child: RichElement) => {
+    if (child.type === "inline" || child.type === "file" || child.type === "link") {
+      return [STANDARD_PARAGRAPH()];
+    } else if (child.type === "thead" || child.type === "tbody") {
+      return [
+        {
+          type: "table",
+          children: [],
+        }
+      ]
+    } else if (child.type === "tr") {
+      return [
+        {
+          type: "tbody",
+          children: [],
+        },
+        {
+          type: "table",
+          children: [],
+        }
+      ];
+    } else if (child.type === "td") {
+      return [
+        {
+          type: "tr",
+          children: [],
+        },
+        {
+          type: "tbody",
+          children: [],
+        },
+        {
+          type: "table",
+          children: [],
+        }
+      ];
+    } else if (child.type === "list-item") {
+      return [
+        {
+          type: "list",
+          listType: "bulleted",
+          children: [],
+        }
+      ];
+    }
+
+    return null;
+  }
+  registry.SUPERBLOCKS.container = true;
+
   registry.DESERIALIZE.byClassName.container = deserializeContainer;
   registry.DESERIALIZE.byTag.DIV = deserializeContainer;
   registry.DESERIALIZE.byClassNamePrefix.container = deserializeContainer;
@@ -118,10 +189,6 @@ export function registerContainer(registry: ISerializationRegistryType) {
 export interface IContainer extends IElementBase {
   type: "container";
   /**
-   * refers to be able to contain blocks or other super blocks, etc...
-   */
-  containment: "superblock";
-  /**
    * A container type, might be null
    */
   containerType: string;
@@ -130,5 +197,5 @@ export interface IContainer extends IElementBase {
    * It can have as many children as it requires
    * but not text directly
    */
-  children: Array<RichElement | IText>;
+  children: Array<IContainer | ICustom | IFile | IParagraph | IList | IQuote | ITable | IVideo | ITitle | IImage>;
 }

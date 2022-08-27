@@ -6,7 +6,7 @@
  * @module
  */
 
-import { IReactifyArg, ISerializationRegistryType, deserializeChildrenForNode } from "..";
+import { IReactifyArg, ISerializationRegistryType, deserializeChildrenForNode, RichElement } from "..";
 import { serializeElementBase, deserializeElementBase, IElementBase, reactifyElementBase } from "../base";
 import { IText, STANDARD_TEXT_NODE } from "./text";
 
@@ -39,7 +39,7 @@ export function registerInline(registry: ISerializationRegistryType) {
       inline.children,
     );
   }
-  
+
   /**
    * Converts a HTML element that is already considered a inline
    * into the IInline form
@@ -50,13 +50,12 @@ export function registerInline(registry: ISerializationRegistryType) {
     // first we take the base
     const base = deserializeElementBase(node);
 
-    const children = deserializeChildrenForNode(node, "inline") as IText[];
+    const children = deserializeChildrenForNode(node) as IText[];
 
     // now we can build the inline itself
     const inline: IInline = {
       ...base,
       type: "inline",
-      containment: "inline",
       children: children.length ? children : [STANDARD_TEXT_NODE()],
     }
 
@@ -90,6 +89,8 @@ export function registerInline(registry: ISerializationRegistryType) {
   // register in the registry
   registry.REACTIFY.inline = reactifyInline;
   registry.SERIALIZE.inline = serializeInline;
+  registry.INLINES.inline = true;
+
   registry.DESERIALIZE.byClassName.inline = deserializeInline;
 }
 
@@ -99,10 +100,6 @@ export function registerInline(registry: ISerializationRegistryType) {
  */
 export interface IInline extends IElementBase {
   type: "inline";
-  /**
-   * refers to be able to contain blocks or other super blocks, etc...
-   */
-  containment: "inline";
 
   /**
    * It can have as many children as it requires

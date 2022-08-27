@@ -53,16 +53,13 @@ export function registerQuote(registry: ISerializationRegistryType) {
     const base = deserializeElementBase(node);
 
     // process the children
-    const children = deserializeChildrenForNode(node, "block") as any;
+    const children = deserializeChildrenForNode(node) as any;
 
     // and build the quote with the base
     const quote: IQuote = {
       ...base,
       type: "quote",
-      containment: "block",
-      children: children.length ? children : [
-        STANDARD_TEXT_NODE(),
-      ],
+      children,
     }
 
     // return the quote
@@ -95,6 +92,8 @@ export function registerQuote(registry: ISerializationRegistryType) {
   // add in the registry
   registry.REACTIFY.quote = reactifyQuote;
   registry.SERIALIZE.quote = serializeQuote;
+  registry.BLOCKS.quote = true;
+
   registry.DESERIALIZE.byTag.QUOTE = deserializeQuote;
 }
 
@@ -106,10 +105,6 @@ export interface IQuote extends IElementBase {
    * Represents the type
    */
   type: "quote";
-  /**
-   * refers that it can't contain anything
-   */
-  containment: "block",
   /**
    * Represents the children
    */

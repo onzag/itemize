@@ -151,7 +151,6 @@ export function registerImage(registry: ISerializationRegistryType) {
     return {
       ...base,
       type: "image",
-      containment: "void-block",
       alt: img.getAttribute("alt") || null,
       src: img.getAttribute("src"),
       srcId: img.dataset.srcId,
@@ -290,6 +289,9 @@ export function registerImage(registry: ISerializationRegistryType) {
 
   registry.REACTIFY.image = reactifyImage;
   registry.SERIALIZE.image = serializeImage;
+  registry.ALLOWS_CHILDREN.image = [];
+  registry.VOIDS.image = true;
+  registry.BLOCKS.image = true;
   registry.DESERIALIZE.byClassName.image = deserializeImage;
   registry.DESERIALIZE.byTag.IMG = deserializeImage;
 }
@@ -302,10 +304,6 @@ export interface IImage extends IElementBase {
    * Image type
    */
   type: "image";
-  /**
-   * refers that it can't contain anything
-   */
-  containment: "void-block",
   /**
    * Width of the image in pixels
    * data-src-width

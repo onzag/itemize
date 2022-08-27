@@ -10,6 +10,7 @@
 import { deserializeChildrenForNode, IReactifyArg, ISerializationRegistryType, RichElement } from "..";
 import { serializeElementBase, deserializeElementBase, IElementBase, reactifyElementBase } from "../base";
 import { ILink } from "./link";
+import { STANDARD_PARAGRAPH } from "./paragraph";
 import { IText, STANDARD_TEXT_NODE } from "./text";
 
 /**
@@ -40,13 +41,12 @@ export function registerListItem(registry: ISerializationRegistryType) {
     // first we prepare the base
     const base = deserializeElementBase(node);
     // then we deserialize all the child nodes with the generic function
-    const children = deserializeChildrenForNode(node, "superblock") as any;
+    const children = deserializeChildrenForNode(node) as any;
 
     // and now we can do this
     const li: IListItem = {
       ...base,
       type: "list-item",
-      containment: "superblock",
       children: children.length ? children : [STANDARD_TEXT_NODE()],
     }
 
@@ -80,6 +80,15 @@ export function registerListItem(registry: ISerializationRegistryType) {
   // register the list item
   registry.REACTIFY["list-item"] = reactifyListItem;
   registry.SERIALIZE["list-item"] = serializeListItem;
+  registry.ALLOWS_CHILDREN["list-item"] = [
+    "list",
+    "paragraph",
+    "title",
+  ];
+  registry.ON_INVALID_TEXT_WRAP_WITH["list-item"] = (text: IText) => {
+    return [STANDARD_PARAGRAPH()];
+  }
+  registry.SUPERBLOCKS["list-item"] = true;
   registry.DESERIALIZE.byTag.LI = deserializeListItem;
 }
 
@@ -89,10 +98,6 @@ export function registerListItem(registry: ISerializationRegistryType) {
  */
 export interface IListItem extends IElementBase {
   type: "list-item";
-  /**
-   * can only contain text
-   */
-  containment: "superblock",
 
   /**
    * It needs to have list item as children

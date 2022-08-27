@@ -18,7 +18,7 @@ import {
   IDrawerConfiguratorElementSection,
   IDrawerUIHandlerElementConfigCustomProps
 } from "../wrapper";
-import type { IHelperFunctions, ISlateEditorStateType } from "..";
+import type { IHelperFunctions, ISlateEditorInternalStateType } from "..";
 import Typography from "@mui/material/Typography";
 import TextField from "@mui/material/TextField";
 import InputLabel from "@mui/material/InputLabel";
@@ -562,7 +562,7 @@ interface IGeneralUIHandlerOptionProps extends IWrapperContainerProps {
   isBoolean: boolean;
   pattern?: string;
   subtype?: "text" | "number";
-  condition?: (state: ISlateEditorStateType) => boolean;
+  condition?: (state: ISlateEditorInternalStateType) => boolean;
   CustomComponent: React.ComponentType<IDrawerUIHandlerElementConfigCustomProps>;
   options?: Array<{ label: string | React.ReactNode, value: string }>;
 }

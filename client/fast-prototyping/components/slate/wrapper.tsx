@@ -10,7 +10,7 @@
 
 import { IPropertyEntryI18nRichTextInfo } from "../../../internal/components/PropertyEntry/PropertyEntryText";
 import React from "react";
-import { IHelperFunctions, ISlateEditorStateType, ISlateEditorWrapperBaseProps } from ".";
+import { IHelperFunctions, ISlateEditorInternalStateType, ISlateEditorWrapperBaseProps } from ".";
 import AttachFileIcon from "@mui/icons-material/AttachFile";
 import VideoLibraryIcon from "@mui/icons-material/VideoLibrary";
 import InsertPhotoIcon from "@mui/icons-material/InsertPhoto";
@@ -326,7 +326,7 @@ export interface IDrawerUIHandlerElementConfigCustomProps {
   onChange: (value: string) => void;
   onDelayedChange: (value: string) => void;
   helpers: IHelperFunctions;
-  state: ISlateEditorStateType;
+  state: ISlateEditorInternalStateType;
   fastKeyActive?: boolean;
 }
 
@@ -365,7 +365,7 @@ export interface IDrawerConfiguratorElementBase {
   /**
    * A condition that uses the args as basis on whether this would appear or not
    */
-  condition?: (state: ISlateEditorStateType) => boolean;
+  condition?: (state: ISlateEditorInternalStateType) => boolean;
   /**
    * The way for the input to be specified
    */
@@ -519,7 +519,7 @@ export interface RichTextEditorToolbarProps extends MaterialUISlateWrapperWithSt
   /**
    * The current state
    */
-  state: ISlateEditorStateType;
+  state: ISlateEditorInternalStateType;
 
   /**
    * call to request an image, opens a dialog so requires a state

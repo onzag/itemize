@@ -40,7 +40,7 @@ export function registerTitle(registry: ISerializationRegistryType) {
     // first we get the base
     const base = deserializeElementBase(node);
     // process the children
-    const children = deserializeChildrenForNode(node, "block") as any;
+    const children = deserializeChildrenForNode(node) as any;
 
     // and then build the title form
     const title: ITitle = {
@@ -48,7 +48,7 @@ export function registerTitle(registry: ISerializationRegistryType) {
       type: "title",
       containment: "block",
       subtype: node.tagName.toLowerCase() as any,
-      children: children.length ? children : [STANDARD_TEXT_NODE()],
+      children,
     }
 
     // return it
@@ -81,6 +81,7 @@ export function registerTitle(registry: ISerializationRegistryType) {
   // add all to the registry
   registry.REACTIFY.title = reactifyTitle;
   registry.SERIALIZE.title = serializeTitle;
+  registry.BLOCKS.title = true;
   registry.DESERIALIZE.byTag.H1 = deserializeTitle;
   registry.DESERIALIZE.byTag.H2 = deserializeTitle;
   registry.DESERIALIZE.byTag.H3 = deserializeTitle;

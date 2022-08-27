@@ -21,9 +21,10 @@ import { IVideo, registerVideo } from "./types/video";
 import { IList, registerList } from "./types/list";
 import { IListItem, registerListItem } from "./types/list-item";
 import { IInline, registerInline } from "./types/inline";
-import { ITableElement, registerTableElement } from "./types/table-element";
+import { ITable, ITbody, ITd, IThead, ITr, registerTableElements } from "./types/table";
 import { TemplateArgs } from "./template-args";
 import uuidv5 from "uuid/v5";
+import equals from "deep-equal";
 
 /**
  * Represents a basic deserialization function that takes a
@@ -146,6 +147,84 @@ export interface ISerializationRegistryType {
   REACTIFY: {
     [type: string]: (arg: IReactifyArg<RichElement | IText>) => React.ReactNode;
   };
+
+  /**
+   * Specify which children are allowed for a given object type
+   */
+  ALLOWS_CHILDREN: {
+    [type: string]: string[];
+  }
+
+  /**
+   * Specifies wether the given type allows plaintext
+   * inside of it
+   */
+  PROHIBIT_TEXT: {
+    [type: string]: boolean;
+  };
+
+  /**
+   * When received an invalid children that are not in ALLOWS_CHILDREN
+   */
+  ON_INVALID_CHILDREN_WRAP_WITH: {
+    [type: string]: (children: RichElement) => RichElement[];
+  };
+
+  /**
+   * When received text as children and PROHIBIT_TEXT is not
+   * true
+   */
+  ON_INVALID_TEXT_WRAP_WITH: {
+    [type: string]: (text: IText) => RichElement[];
+  };
+
+  /**
+   * An inline should be
+   * PROHIBIT_TEXT true
+   * ALLOWS_CHILDREN empty array
+   * 
+   * For example <a> <span class="inline"/> are known inlines
+   * 
+   * However the usage of this is for internal identification as in html
+   * a space is necessary between inline nodes for them to be selected
+   */
+  INLINES: {
+    [type: string]: boolean;
+  };
+
+  /**
+   * Whether it is a void element and has no children and no content
+   * within it
+   */
+  VOIDS: {
+    [type: string]: boolean;
+  };
+
+  /**
+   * Whether it is a void element and has no children and no content
+   * within it
+   */
+  BLOCKS: {
+    [type: string]: boolean;
+  };
+
+  /**
+   * Whether it is a void element and has no children and no content
+   * within it
+   */
+  SUPERBLOCKS: {
+    [type: string]: boolean;
+  };
+
+  /**
+   * Specifies what shall be done regarding empty
+   * elements without children
+   * 
+   * unnecessary if allows children text is true
+   */
+  ON_EMPTY_FILL_WITH: {
+    [type: string]: () => RichElement;
+  };
 }
 
 /**
@@ -160,6 +239,15 @@ export const SERIALIZATION_REGISTRY: ISerializationRegistryType = {
     byTag: {},
     text: null,
   },
+  ALLOWS_CHILDREN: {},
+  PROHIBIT_TEXT: {},
+  ON_EMPTY_FILL_WITH: {},
+  ON_INVALID_CHILDREN_WRAP_WITH: {},
+  ON_INVALID_TEXT_WRAP_WITH: {},
+  VOIDS: {},
+  INLINES: {},
+  BLOCKS: {},
+  SUPERBLOCKS: {},
   REACTIFY: {}
 }
 
@@ -178,14 +266,7 @@ registerTitle(SERIALIZATION_REGISTRY);
 registerVideo(SERIALIZATION_REGISTRY);
 registerList(SERIALIZATION_REGISTRY);
 registerListItem(SERIALIZATION_REGISTRY);
-registerTableElement(SERIALIZATION_REGISTRY);
-
-/**
- * This is what a rich element can be, it can be all these
- * but it's not a text
- */
-export type RichElement = IParagraph | IContainer | ICustom | ILink | IQuote | ITitle | IImage |
-  IFile | IVideo | IList | IListItem | IInline | ITableElement;
+registerTableElements(SERIALIZATION_REGISTRY);
 
 /**
  * Represents the root level document and a id
@@ -198,6 +279,13 @@ export interface IRootLevelDocument {
   id: string;
   children: RichElement[];
 }
+
+/**
+ * This is what a rich element can be, it can be all these
+ * but it's not a text
+ */
+export type RichElement = IRootLevelDocument | IParagraph | IContainer | ICustom | ILink | IQuote | ITitle | IImage |
+  IFile | IVideo | IList | IListItem | IInline | ITable | ITr | ITbody | IThead | ITd;
 
 /**
  * This is the text namespace, and it's used in uuid for creating
@@ -360,7 +448,7 @@ export function deserialize(html: string | Node[], comparer?: IRootLevelDocument
 
   // now we can use the final children as we call then via the deserializeElement
   // function, and remember to remove nulls
-  const finalChildren = deserializeChildrenForNode(childNodes, "superblock") as RichElement[];
+  const finalChildren = deserializeChildrenForNode({ childNodes: childNodes } as any) as RichElement[];
 
   // and now we can build the document
   const newDocument: IRootLevelDocument = {
@@ -373,85 +461,519 @@ export function deserialize(html: string | Node[], comparer?: IRootLevelDocument
       [
         {
           type: "paragraph",
-          containment: "block",
           children: [STANDARD_TEXT_NODE()]
         }
       ] :
       finalChildren,
   };
 
+  // normalize it
+  normalize(newDocument);
+
   // return it
   return newDocument;
 }
 
-function gatherAllInlines(ele: RichElement): (RichElement | IText)[] {
-  return ele.children.map((child) => {
-    if (
-      typeof (child as IText).text !== "undefined" ||
-      (child as RichElement).containment === "inline" ||
-      (child as RichElement).containment === "void-inline"
-    ) {
-      return child;
-    }
-
-    return gatherAllInlines(child as RichElement);
-  }).flat();
+export function normalize(
+  document: IRootLevelDocument,
+): IRootLevelDocument {
+  if (!document.rich) {
+    return document;
+  }
+  return normalizeElement(document as any, [], []) as any;
 }
 
-function gatherAllText(ele: RichElement): IText[] {
-  return ele.children.map((child) => {
-    if (
-      typeof (child as IText).text !== "undefined"
-    ) {
-      return child;
-    }
-
-    return gatherAllText(child as RichElement);
-  }).flat() as IText[];
-}
-
-interface INodeInfo {
-  raw: RichElement | IText | Array<RichElement | IText>;
-  normalized: RichElement | IText | Array<RichElement | IText>;
-  consumedPreviousSibling: boolean;
+interface ICustomExecution {
+  deleteTextNode: (node: IText, path: number[], parent: RichElement) => void,
+  deleteElement: (element: RichElement, path: number[], parent: RichElement) => void,
+  wrapTextNode: (node: IText, wrappers: RichElement[], path: number[], parent: RichElement) => void,
+  wrapElement: (element: RichElement, wrappers: RichElement[], path: number[], parent: RichElement) => void,
+  insertTextNode: (element: RichElement, path: number[], targetIndex: number, textToInsert: IText) => void,
+  insertElement: (element: RichElement, path: number[], targetIndex: number, elementToInsert: RichElement) => void,
+  mergeElements: (element: RichElement, path: number[], parent: RichElement, secondChild: RichElement, secondChildPath: number[]) => void,
+  mergeText: (text: IText, path: number[], parent: RichElement, secondChild: IText, secondChildPath: number[]) => void,
+  splitElementAndEscapeChildIntoParent: (element: RichElement, path: number[], parent: RichElement, escapingChildIndex: number) => void;
 };
 
-export function deserializeChildrenForNode(
-  node: Node | Array<Node>,
-  parentContainment: "block" | "superblock" | "list-superblock" | "inline",
-): Array<RichElement | IText> {
-  const nodes = Array.isArray(node) ? node : Array.from(node.childNodes);
+interface ISpecialRules {
+  ignorePaths: number[][];
 
-  const resultRaw: Array<RichElement | IText | Array<RichElement | IText>> = [];
-  let previousNodeInfo: INodeInfo = null;
-  for (node of nodes) {
-    const currentNodeInfo = deserializeElement(parentContainment, node, previousNodeInfo);
-    if (currentNodeInfo) {
-      if (currentNodeInfo.consumedPreviousSibling) {
-        resultRaw.pop();
-      }
-      resultRaw.push(currentNodeInfo.normalized);
-    }
-    previousNodeInfo = currentNodeInfo;
-  }
-
-  return resultRaw.flat().filter((n) => n !== null);
 }
 
-const emptyRegex = /^\s+$/;
+const standardExec: ICustomExecution = {
+  deleteTextNode(node: IText, path: number[], parent: RichElement) {
+    parent.children.splice(path[path.length - 1], 1);
+  },
+  deleteElement(node: RichElement, path: number[], parent: RichElement) {
+    parent.children.splice(path[path.length - 1], 1);
+  },
+  wrapTextNode(node: IText, wrappers: RichElement[], path: number[], parent: RichElement) {
+    const indexAtChild = path[path.length - 1];
+    wrappers.forEach((w) => {
+      const wrappedChild = w;
+      wrappedChild.children = [parent.children[indexAtChild]] as any;
+      parent.children[indexAtChild] = wrappedChild;
+    });
+  },
+  wrapElement(element: RichElement, wrappers: RichElement[], path: number[], parent: RichElement) {
+    const indexAtChild = path[path.length - 1];
+    wrappers.forEach((w) => {
+      const wrappedChild = w;
+      wrappedChild.children = [parent.children[indexAtChild]] as any;
+      parent.children[indexAtChild] = wrappedChild;
+    });
+  },
+  insertTextNode(element: RichElement, path: number[], targetIndex: number, textToInsert: IText) {
+    element.children.splice(targetIndex, 0, textToInsert);
+  },
+  insertElement(element: RichElement, path: number[], targetIndex: number, elementToInsert: RichElement) {
+    element.children.splice(targetIndex, 0, elementToInsert);
+  },
+  mergeElements(base: RichElement, path: number[], parent: RichElement, reference: RichElement, referencePath: number[]) {
+    base.children = (base.children as any).concat(reference.children);
+    parent.children.splice(referencePath[referencePath.length - 1], 1);
+  },
+  mergeText(base: IText, path: number[], parent: RichElement, reference: IText, referencePath: number[]) {
+    base.text += reference.text;
+    parent.children.splice(referencePath[referencePath.length - 1], 1);
+  },
+  splitElementAndEscapeChildIntoParent(element: RichElement, path: number[], parent: RichElement, escapingChildIndex: number) {
+    const allNodesBeforeThis = element.children.slice(0, escapingChildIndex);
+    const escapingChild = element.children[escapingChildIndex];
+    const allNodesAfterThis = element.children.slice(escapingChildIndex + 1);
+    element.children = allNodesBeforeThis;
+
+    const newElement = {
+      ...element,
+      children: allNodesAfterThis,
+    }
+
+    const indexAtParent = path[path.length - 1] + 1;
+
+    parent.children.splice(indexAtParent, 0, newElement as any);
+    parent.children.splice(indexAtParent, 0, escapingChild as any);
+  }
+}
+
+function normalizeSpacing(element: RichElement, path: number[], customExecution: ICustomExecution) {
+  // if there are children in the result and they happen
+  // to be some inline in them we need to ensure there are
+  // empty text nodes between the inlines so they
+  // can be selected properly
+  if (
+    element.children.length &&
+    element.children.some((r) => (r as RichElement).type && SERIALIZATION_REGISTRY.INLINES[(r as RichElement).type])
+  ) {
+    // and now we loop in each one of the children
+    let offset = 0;
+    for (let i = 0; i < element.children.length; i++) {
+      let actualIndex = i + offset;
+      const currentNode = element.children[actualIndex];
+      if ((currentNode as RichElement).type && SERIALIZATION_REGISTRY.INLINES[(currentNode as RichElement).type]) {
+        // get our current, prev, and next node from the parsed values
+        const prevNode: any = element.children[actualIndex - 1];
+        const nextNode: any = element.children[actualIndex + 1];
+
+        // we need these texts from reference and they are taken from
+        // the currentNode, inside the inline element, in order to populate
+        // the gaps
+        const textNodeStart = (currentNode as RichElement).children[0] as IText;
+        const textNodeEnd = (currentNode as RichElement).children[(currentNode as RichElement).children.length - 1] as IText;
+
+        if (!prevNode || typeof prevNode.text === "undefined") {
+          // we use the start text as a reference for the spacer gap
+          const textReference = {
+            bold: false,
+            italic: false,
+            underline: false,
+            ...copyElementBase(textNodeStart),
+            text: "",
+          }
+
+          customExecution.insertTextNode(
+            element,
+            path,
+            // insert where we are now and push us forwards
+            actualIndex,
+            textReference,
+          );
+
+          actualIndex += 1;
+          offset += 1;
+        }
+
+        if (!nextNode || typeof nextNode.text === "undefined") {
+          // we use the start text as a reference for the spacer gap
+          const textReference = {
+            bold: false,
+            italic: false,
+            underline: false,
+            ...copyElementBase(textNodeEnd),
+            text: "",
+          }
+
+          customExecution.insertTextNode(
+            element,
+            path,
+            // insert ahead of where we are now and push everything else
+            // forwards
+            actualIndex + 1,
+            textReference,
+          );
+
+          actualIndex += 1;
+          offset += 1;
+        }
+      }
+    };
+  }
+
+  // DELETE EMPTY TEXT NODES
+  if (element.children.length >= 2) {
+    let offset = 0;
+    for (let i = 1; i < element.children.length; i++) {
+      const actualIndex = i + offset;
+      const v = element.children[actualIndex];
+  
+      if (typeof (v as IText).text !== "undefined" && !(v as IText).text) {
+        customExecution.deleteTextNode(
+          v as IText,
+          [...path, actualIndex],
+          element,
+        );
+        offset -= 1;
+      }
+    }
+  }
+
+  if (
+    element.children.length === 0 &&
+    (
+      SERIALIZATION_REGISTRY.INLINES[element.type] ||
+      SERIALIZATION_REGISTRY.BLOCKS[element.type]
+    )
+  ) {
+    if (!SERIALIZATION_REGISTRY.PROHIBIT_TEXT[element.type]) {
+      customExecution.insertTextNode(
+        element,
+        path,
+        0,
+        STANDARD_TEXT_NODE(),
+      );
+    } else {
+      customExecution.insertElement(
+        element,
+        path,
+        0,
+        SERIALIZATION_REGISTRY.ON_EMPTY_FILL_WITH[element.type](),
+      );
+    }
+  } else if (element.children.length >= 2) {
+    let offset = 0;
+    for (let i = 0; i < element.children.length; i++) {
+      const actualIndex = i + offset;
+      if (i === 0) {
+        continue;
+      }
+
+      const n1 = element.children[actualIndex - 1];
+      const n2 = element.children[actualIndex];
+
+      const shouldMerge = checkShouldMerge(n1, n2);
+
+      if (shouldMerge) {
+        if (typeof (n1 as IText) !== "undefined") {
+          customExecution.mergeText(
+            n1 as IText,
+            [...path, actualIndex - 1],
+            element,
+            n2 as IText,
+            [...path, actualIndex],
+          );
+        } else {
+          customExecution.mergeElements(
+            n1 as RichElement,
+            [...path, actualIndex - 1],
+            element,
+            n2 as RichElement,
+            [...path, actualIndex],
+          );
+        }
+        offset -= 1;
+      }
+    }
+  }
+
+  element.children.forEach((c, index) => {
+    if ((c as RichElement).type) {
+      normalizeSpacing(c as RichElement, [...path, index], customExecution);
+    }
+  })
+}
+
+export function normalizeElement(
+  element: RichElement,
+  path: number[],
+  parentList: [RichElement, number[]][],
+  customExecution: ICustomExecution = standardExec
+) {
+  const type = element.type;
+
+  if (SERIALIZATION_REGISTRY.VOIDS[type]) {
+    element.children = [STANDARD_TEXT_NODE()];
+    return;
+  }
+
+  const parentListReversed = parentList.reverse();
+  const parentInline = parentListReversed.find((p) => SERIALIZATION_REGISTRY.INLINES[p[0].type]);
+  const parentBlock = parentListReversed.find((p) => SERIALIZATION_REGISTRY.BLOCKS[p[0].type]);
+  const parentSuperBlock = parentListReversed.find((p) => SERIALIZATION_REGISTRY.SUPERBLOCKS[p[0].type]);
+
+  const nextParentList: [RichElement, number[]][] = [...parentList, [element, path]];
+  // let's find invalid text inside superblock
+  let offset = 0;
+  let index = 0;
+  while (true) {
+    const actualChildIndex = index + offset;
+    const childrenPath = [...path, actualChildIndex];
+    const v = element.children[actualChildIndex];
+
+    if (!v) {
+      break;
+    }
+
+    const cannotHaveTextAsChildren = (
+      SERIALIZATION_REGISTRY.SUPERBLOCKS[type] ||
+      SERIALIZATION_REGISTRY.PROHIBIT_TEXT[type]
+    );
+
+    if (typeof (v as IText).text === "string" && cannotHaveTextAsChildren) {
+      const wrapper = (
+        SERIALIZATION_REGISTRY.ON_INVALID_TEXT_WRAP_WITH[type] ?
+          SERIALIZATION_REGISTRY.ON_INVALID_TEXT_WRAP_WITH[type](v as IText) :
+          null
+      );
+      if (!wrapper) {
+        customExecution.deleteTextNode(v as IText, childrenPath, element);
+        offset -= 1;
+      } else {
+        customExecution.wrapTextNode(v as IText, wrapper, childrenPath, element);
+      }
+    } else {
+      const isAllowedType = SERIALIZATION_REGISTRY.ALLOWS_CHILDREN[type] ?
+        SERIALIZATION_REGISTRY.ALLOWS_CHILDREN[type].includes((v as RichElement).type) : true;
+
+      const isTextDeniedInSuperBlock = typeof (v as IText).text !== "undefined" &&
+        SERIALIZATION_REGISTRY.SUPERBLOCKS[element.type];
+      const isInlineDeniedInSuperBlock = SERIALIZATION_REGISTRY.INLINES[(v as RichElement).type] &&
+        SERIALIZATION_REGISTRY.SUPERBLOCKS[element.type];
+      const isInlineDeniedInInline = SERIALIZATION_REGISTRY.INLINES[(v as RichElement).type] &&
+        SERIALIZATION_REGISTRY.INLINES[element.type];
+      const isBlockDeniedInBlock = SERIALIZATION_REGISTRY.BLOCKS[(v as RichElement).type] &&
+        SERIALIZATION_REGISTRY.BLOCKS[element.type];
+      const isBlockDeniedInInline = SERIALIZATION_REGISTRY.BLOCKS[(v as RichElement).type] &&
+        SERIALIZATION_REGISTRY.INLINES[element.type];
+      const isSuperblockDeniedInBlock = SERIALIZATION_REGISTRY.SUPERBLOCKS[(v as RichElement).type] &&
+        SERIALIZATION_REGISTRY.BLOCKS[element.type];
+      const isSuperblockDeniedInInline = SERIALIZATION_REGISTRY.SUPERBLOCKS[(v as RichElement).type] &&
+        SERIALIZATION_REGISTRY.INLINES[element.type];
+
+      const hasProblems = (
+        !isAllowedType ||
+        isInlineDeniedInSuperBlock ||
+        isInlineDeniedInInline ||
+        isBlockDeniedInBlock ||
+        isBlockDeniedInInline ||
+        isSuperblockDeniedInBlock ||
+        isSuperblockDeniedInInline
+      );
+
+      if (!hasProblems) {
+        if ((v as RichElement).type) {
+          normalizeElement(
+            v as RichElement,
+            childrenPath,
+            nextParentList,
+            customExecution,
+          );
+        }
+      } else {
+        const canSolveByWrapping = (
+          isInlineDeniedInSuperBlock ||
+          isTextDeniedInSuperBlock ||
+          (SERIALIZATION_REGISTRY.SUPERBLOCKS[element.type] && !isAllowedType)
+        );
+        
+        const canSolveBySplitting = (
+          isInlineDeniedInInline ||
+          isBlockDeniedInBlock ||
+          isSuperblockDeniedInBlock
+        );
+
+        const canSolveByDoubleSplitting = (
+          isSuperblockDeniedInInline
+        )
+
+        if (canSolveByWrapping) {
+          const wrapper = (
+            SERIALIZATION_REGISTRY.ON_INVALID_CHILDREN_WRAP_WITH[type] ?
+              SERIALIZATION_REGISTRY.ON_INVALID_CHILDREN_WRAP_WITH[type](v as RichElement) :
+              null
+          );
+          if (!wrapper) {
+            if (isTextDeniedInSuperBlock) {
+              customExecution.deleteTextNode(v as IText, childrenPath, element);
+            } else {
+              customExecution.deleteElement(v as RichElement, childrenPath, element);
+            }
+            offset -= 1;
+          } else {
+            if (isTextDeniedInSuperBlock) {
+              customExecution.wrapTextNode(v as IText, wrapper, childrenPath, element);
+            } else {
+              customExecution.wrapElement(v as RichElement, wrapper, childrenPath, element);
+              normalizeElement(
+                element.children[actualChildIndex] as RichElement,
+                childrenPath,
+                nextParentList,
+                customExecution,
+              );
+            }
+          }
+        } else if (canSolveBySplitting) {
+          const targetToStore = isBlockDeniedInBlock || isSuperblockDeniedInBlock ? (
+            parentSuperBlock || parentList[0]
+          ) : parentBlock;
+
+          // the target superblock is not its parent or no parent block was found
+          if (!targetToStore || targetToStore[1].length !== path.length - 1) {
+            console.warn("Cannot resolve, you have requested child normalization but the tree is invalid on the upper side");
+          } else {
+            // first let's create a new node after this that is a copy of this element
+            customExecution.splitElementAndEscapeChildIntoParent(
+              element,
+              path,
+              targetToStore[0],
+              actualChildIndex,
+            );
+            offset -= 1;
+
+            const newChildIndex = path[path.length - 1] + 1;
+
+            normalizeElement(
+              targetToStore[0].children[newChildIndex] as RichElement,
+              targetToStore[1].concat([newChildIndex]),
+              parentList,
+              customExecution,
+            );
+          }
+        } else if (canSolveByDoubleSplitting) {
+          // pretty much only happens when a superblock is inside an inline
+          const targetToStore = parentSuperBlock || parentList[0];
+
+          // this time we go two layers down to check, we are an inline and the child
+          // is a superblock, we need to find the other superblock which should be two layers above
+          if (!targetToStore || targetToStore[1].length !== path.length - 2) {
+            console.warn("Cannot resolve, you have requested child normalization but the tree is invalid on the upper side");
+          } else {
+            // first let's split the superblock and escape it into the block
+            customExecution.splitElementAndEscapeChildIntoParent(
+              element,
+              path,
+              parentBlock[0],
+              actualChildIndex,
+            );
+            offset -= 1;
+
+            const newChildIndexLvl1 = path[path.length - 1] + 1;
+
+            customExecution.splitElementAndEscapeChildIntoParent(
+              parentBlock[0],
+              parentBlock[1],
+              targetToStore[0],
+              // we expect the child to be now in the position
+              // where we are right now but one ahead
+              newChildIndexLvl1,
+            );
+
+            const newChildIndexLvl2 = path[path.length - 2] + 1;
+
+            normalizeElement(
+              targetToStore[0].children[newChildIndexLvl2] as RichElement,
+              targetToStore[1].concat([newChildIndexLvl2]),
+              parentList,
+              customExecution,
+            );
+          }
+        } else {
+          customExecution.deleteElement(v as RichElement, childrenPath, element);
+          offset -= 1;
+        }
+      }
+    }
+
+    index++;
+  }
+
+  normalizeSpacing(
+    element,
+    path,
+    customExecution,
+  );
+}
+
+export function deserializeChildrenForNode(
+  node: Node,
+): Array<RichElement | IText> {
+  const nodes = node.childNodes;
+
+  const resultRaw: Array<RichElement | IText | Array<RichElement | IText>> = [];
+  for (let cnode of nodes) {
+    const currentNodeInfo = deserializeElement(cnode);
+    resultRaw.push(currentNodeInfo);
+  }
+
+  let finalResult = resultRaw.flat().filter((n) => n !== null);
+  return finalResult;
+}
+
+/**
+  * Checks whether two nodes are mergable
+  * @param n1 the first node
+  * @param n2 the second node
+  * @returns a boolean on whether they should merge
+  */
+export function checkShouldMerge(n1: RichElement | IText, n2: RichElement | IText) {
+  const isN1Inline = typeof (n1 as IText).text === "string" || SERIALIZATION_REGISTRY.INLINES[(n1 as RichElement).type];
+  const isN2Inline = typeof (n2 as IText).text === "string" || SERIALIZATION_REGISTRY.INLINES[(n2 as RichElement).type];
+
+  if (!isN1Inline || !isN2Inline) {
+    return false;
+  }
+
+  // first we take all the properties of these nodes and check that
+  // every one of them passes
+  return Object.keys(n1).concat(Object.keys(n2)).every((key) => {
+    // we don't compare children nor the text content
+    // of these
+    if (key === "children" || key === "text") {
+      // assume they pass
+      return true;
+    }
+
+    // so we check for equality
+    return equals(n1[key], n2[key], { strict: true });
+  });
+}
 
 /**
  * Deserializes a single element from its node into a rich element
  * or a text
- * @param parentContainment specifies the containment of the parent
- * @param node the html node to deserialize
  * @returns a RichElement or a text node 
  */
-export function deserializeElement(
-  parentContainment: "block" | "superblock" | "list-superblock" | "inline",
+function deserializeElement(
   node: Node,
-  previousSibling: INodeInfo
-): INodeInfo {
+): RichElement | IText | Array<RichElement | IText> {
   // first we get the tag name
   const tagName = (node as HTMLElement).tagName;
   // and we prepare the result
@@ -494,234 +1016,31 @@ export function deserializeElement(
   }
 
   // invalid or unknown tag that can't deserialize
-  if (!raw) {
-    return null;
-  }
+  // if (!raw) {
+  //   return null;
+  // }
 
+  // const isText = typeof (raw as IText).text !== "undefined";
+  // if (isText && !SERIALIZATION_REGISTRY.PROHIBIT_TEXT[parent]) {
+  //   // text placed right in
+  //   return SERIALIZATION_REGISTRY.ON_INVALID_TEXT[parent] ?
+  //     SERIALIZATION_REGISTRY.ON_INVALID_TEXT[parent](raw as IText) :
+  //     null;
+  // } else if (
+  //   (SERIALIZATION_REGISTRY.SUPERBLOCKS[parent] && isText) ||
+  //   (SERIALIZATION_REGISTRY.BLOCKS[parent] && (
+  //     SERIALIZATION_REGISTRY.SUPERBLOCKS[(raw as RichElement).type] ||
+  //     SERIALIZATION_REGISTRY.BLOCKS[(raw as RichElement).type]
+  //   )) ||
+  //   (SERIALIZATION_REGISTRY.INLINES[parent] && !isText) ||
+  //   (SERIALIZATION_REGISTRY.ALLOWS_CHILDREN[parent] && !SERIALIZATION_REGISTRY.ALLOWS_CHILDREN[parent].includes((raw as RichElement).type))
+  // ) {
+  //   return SERIALIZATION_REGISTRY.ON_INVALID_CHILDREN[parent] ?
+  //     SERIALIZATION_REGISTRY.ON_INVALID_CHILDREN[parent](raw as RichElement) :
+  //     null;
+  // }
 
-  let normalized = raw;
-  let consumedPreviousSibling: boolean = false;
-  const isText = typeof (raw as IText).text !== "undefined";
-  if (isText) {
-    // if it's a text node that represents just a newline
-    // which is used in some other text editors
-    // to represent newlines within it
-    if (
-      (
-        parentContainment === "superblock" ||
-        parentContainment === "list-superblock"
-      ) &&
-      emptyRegex.test((raw as IText).text)
-    ) {
-      return null;
-    }
-
-    // text placed right in a superblock
-    // no paragraph
-    if (parentContainment === "superblock") {
-      // the previous was also a dangling text node
-      if (
-        previousSibling &&
-        (
-          typeof (previousSibling.raw as IText).text === "string" ||
-          (previousSibling.raw as RichElement).containment === "inline" ||
-          (previousSibling.raw as RichElement).containment === "void-inline"
-        )
-      ) {
-        // we normalize our raw with the previous dangling nodes
-        return {
-          raw,
-          normalized: {
-            ...previousSibling.normalized,
-            children: (previousSibling.normalized as any).children.concat([raw])
-          },
-          consumedPreviousSibling: true,
-        };
-      } else {
-        return {
-          raw,
-          normalized: STANDARD_PARAGRAPH(raw as IText),
-          consumedPreviousSibling: false,
-        };
-      }
-    } else if (parentContainment === "list-superblock") {
-      // text placed right into a list without
-      // the required li tag
-      return {
-        raw,
-        normalized: {
-          type: "list-item",
-          containment: "superblock",
-          children: [
-            STANDARD_PARAGRAPH(raw as IText)
-          ],
-        },
-        consumedPreviousSibling: false,
-      };
-    }
-  } else {
-    // Normalization for invalid text values
-    // this is done in case there are invalid values that create
-    // invalid structures
-    const richElement = (raw as RichElement);
-    if (parentContainment === "superblock") {
-      // eg a link placed inside a div and not within
-      // a paragraph
-      if (
-        richElement.containment !== "block" &&
-        richElement.containment !== "superblock" &&
-        richElement.containment !== "list-superblock" &&
-        richElement.containment !== "void-block"
-      ) {
-        const newP = STANDARD_PARAGRAPH();
-        newP.children = [
-          raw as any,
-        ];
-
-        if (
-          previousSibling &&
-          (
-            typeof (previousSibling.raw as IText).text === "string" ||
-            (previousSibling.raw as RichElement).containment === "inline" ||
-            (previousSibling.raw as RichElement).containment === "void-inline"
-          )
-        ) {
-          // we normalize our raw with the previous dangling nodes
-          normalized = {
-            ...previousSibling.normalized,
-            children: (previousSibling.normalized as any).children.concat([raw])
-          };
-          consumedPreviousSibling = true;
-        } else {
-          normalized = newP;
-        }
-      }
-    } else if (parentContainment === "list-superblock") {
-      // can't fix this, eg. a container inside a list
-      // or another list inside it
-      if (
-        richElement.type !== "list-item"
-      ) {
-        if (
-          richElement.containment === "inline" ||
-          richElement.containment === "void-inline"
-        ) {
-          const p = STANDARD_PARAGRAPH();
-          p.children = [raw as any];
-          const newLi: IListItem = {
-            type: "list-item",
-            containment: "superblock",
-            children: [p],
-          };
-          normalized = newLi;
-        } else {
-          const p = STANDARD_PARAGRAPH();
-          p.children = gatherAllInlines(richElement) as any;
-          const newLi: IListItem = {
-            type: "list-item",
-            containment: "superblock",
-            children: [p],
-          };
-          normalized = newLi;
-        }
-      }
-    } else if (parentContainment === "block") {
-      // a div within a paragraph
-      if (
-        richElement.containment !== "inline" &&
-        richElement.containment !== "void-inline"
-      ) {
-        normalized = gatherAllInlines(richElement);
-      }
-    } else if (parentContainment === "inline") {
-      // a paragraph within a link
-      normalized = gatherAllText(richElement);
-    }
-  }
-
-  // if there are children in the result and they happen
-  // to be some inline in them we need to ensure there are
-  // empty text nodes between the inlines so they
-  // can be selected properly
-  if (
-    (normalized as RichElement).children &&
-    (normalized as RichElement).children.length &&
-    (normalized as RichElement).children.some((r: any) => r.containment === "inline")
-  ) {
-    // so we prepare a modified array
-    let modifiedArrayVersion: any[] = [];
-
-    // and now we loop in each one of the children
-    (normalized as RichElement).children.forEach((currentNode: any, index: number) => {
-      if (currentNode.containment === "inline") {
-        // get our current, prev, and next node from the parsed values
-        const prevNode: any = (normalized as RichElement).children[index - 1];
-        const nextNode: any = (normalized as RichElement).children[index + 1];
-
-        // we need these texts from reference and they are taken from
-        // the currentNode, inside the inline element, in order to populate
-        // the gaps
-        const textNodeStart = currentNode.children[0];
-        const textNodeEnd = currentNode.children[currentNode.children.length - 1];
-
-        // and now we get our last node from the modified array version
-        // since it can be different from our standard as we keep adding these
-        // spacer gaps, we are trying to spot a gap, eg, when two inlines are together
-        const lastNodeInModified = modifiedArrayVersion[modifiedArrayVersion.length - 1];
-
-        // if there's no previous node, eg at the start of a paragraph there is an inline
-        // or when the previous is not a text, we need a spacer gap
-        // but we only need it if it's not already there in our modified
-        // array version eg. when two inlines are right next to each other
-        // one will add to the end, so this new one is not necessary
-        if (
-          (!prevNode || typeof prevNode.text === "undefined") &&
-          (!lastNodeInModified || typeof lastNodeInModified.text === "undefined")
-        ) {
-          // we use the start text as a reference for the spacer gap
-          const textReference = {
-            bold: false,
-            italic: false,
-            underline: false,
-            ...copyElementBase(textNodeStart),
-            text: "",
-          }
-
-          // and now we push it
-          modifiedArrayVersion.push(textReference);
-        }
-
-        // now we add our inline
-        modifiedArrayVersion.push(currentNode);
-
-        // and now we repeat the same process for the next node
-        // that should be between the inline
-        if (!nextNode || typeof nextNode.text === "undefined") {
-          const textReference = {
-            bold: false,
-            italic: false,
-            underline: false,
-            ...copyElementBase(textNodeEnd),
-            text: "",
-          }
-
-          modifiedArrayVersion.push(textReference);
-        }
-      } else {
-        // for whatever else we just add the node
-        modifiedArrayVersion.push(currentNode);
-      }
-    });
-
-    (normalized as RichElement).children = modifiedArrayVersion;
-  }
-
-  // return the given result
-  return {
-    raw,
-    normalized,
-    consumedPreviousSibling,
-  }
+  return raw || null;
 }
 
 /**
@@ -752,7 +1071,6 @@ export function deserializePlain(data: string, comparer?: IRootLevelDocument) {
     children: content.map((c) => {
       return {
         type: "paragraph",
-        containment: "block",
         subtype: "p",
         children: [
           {

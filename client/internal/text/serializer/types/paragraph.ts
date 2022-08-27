@@ -5,25 +5,30 @@
  * @module
  */
 
-import { deserializeChildrenForNode, IReactifyArg, ISerializationRegistryType } from "..";
+import { deserializeChildrenForNode, IReactifyArg, ISerializationRegistryType, RichElement } from "..";
 import { deserializeElementBase, IElementBase, reactifyElementBase, serializeElementBase } from "../base";
 import { IFile } from "./file";
 import { IInline } from "./inline";
 import { ILink } from "./link";
 import { IText, STANDARD_TEXT_NODE } from "./text";
 
-export function STANDARD_PARAGRAPH(text?: string | IText): IParagraph {
+export function STANDARD_PARAGRAPH(textOrInline?: string | IText | RichElement): IParagraph {
+  if ((textOrInline as RichElement).type) {
+    return {
+      type: "paragraph",
+      children: [textOrInline as any],
+    };
+  }
   return {
     type: "paragraph",
-    containment: "block",
     children: [
       (
-        typeof text !== "undefined" &&
-        text !== null &&
-        typeof (text as IText).text === "string"
+        typeof textOrInline !== "undefined" &&
+        textOrInline !== null &&
+        typeof (textOrInline as IText).text === "string"
       ) ?
-        (text as IText) :
-        STANDARD_TEXT_NODE(text as string)
+        (textOrInline as IText) :
+        STANDARD_TEXT_NODE(textOrInline as string)
     ],
   };
 };
@@ -56,14 +61,13 @@ export function registerParagraph(registry: ISerializationRegistryType) {
     // first let's get trhe base
     const base = deserializeElementBase(node);
     // now let's get the children
-    const children = deserializeChildrenForNode(node, "block") as Array<IText | ILink | IFile | IInline>;
+    const children = deserializeChildrenForNode(node) as Array<IText | ILink | IFile | IInline>;
 
     // and build the paragraph itself
     const paragraph: IParagraph = {
       ...base,
       type: "paragraph",
-      containment: "block",
-      children: children.length ? children : [STANDARD_TEXT_NODE()],
+      children: children,
     }
 
     // return it
@@ -95,6 +99,8 @@ export function registerParagraph(registry: ISerializationRegistryType) {
   // register in the registry
   registry.REACTIFY.paragraph = reactifyParagraph;
   registry.SERIALIZE.paragraph = serializeParagraph;
+  registry.BLOCKS.paragraph = true;
+
   registry.DESERIALIZE.byTag.P = deserializeParagraph;
 }
 
@@ -105,10 +111,6 @@ export function registerParagraph(registry: ISerializationRegistryType) {
  */
 export interface IParagraph extends IElementBase {
   type: "paragraph",
-  /**
-   * refers that it can't contain anything
-   */
-  containment: "block",
 
   /**
    * The paragraph children can be either text or link or file for the inlines

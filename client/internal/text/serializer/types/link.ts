@@ -71,13 +71,12 @@ export function registerLink(registry: ISerializationRegistryType) {
 
     // and now time to deserialize the children
     // because they should all be text nodes
-    const children = deserializeChildrenForNode(node, "inline") as IText[];
+    const children = deserializeChildrenForNode(node) as IText[];
   
     // and let's build the link
     const link: ILink = {
       ...base,
       type: "link",
-      containment: "inline",
       href,
       thref,
       children: children.length ? children : [STANDARD_TEXT_NODE()],
@@ -129,6 +128,9 @@ export function registerLink(registry: ISerializationRegistryType) {
   // we add it to the registry
   registry.REACTIFY.link = reactifyLink;
   registry.SERIALIZE.link = serializeLink;
+  registry.ALLOWS_CHILDREN.link = [];
+  registry.INLINES.link = true;
+
   registry.DESERIALIZE.byTag.A = deserializeLink;
 }
 
@@ -137,10 +139,6 @@ export function registerLink(registry: ISerializationRegistryType) {
  */
 export interface ILink extends IElementBase {
   type: "link";
-  /**
-   * can only contain text
-   */
-  containment: "inline",
   /**
    * Represents the standard href attribute
    */
