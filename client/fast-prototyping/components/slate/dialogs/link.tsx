@@ -5,7 +5,6 @@
 
 import React from "react";
 import { Dialog } from "../../dialog";
-import { ITemplateArgsContext } from "..";
 import { RichElement } from "../../../../internal/text/serializer";
 import Button from "@mui/material/Button";
 import TextField from "@mui/material/TextField";
@@ -16,6 +15,7 @@ import FilledInput from "@mui/material/FilledInput";
 import MenuItem from "@mui/material/MenuItem";
 import Box from "@mui/material/Box";
 import { SxProps, Theme } from "@mui/material/styles";
+import { ITemplateArgContextDefinition } from "../../../../internal/text/serializer/template-args";
 
 /**
  * The props for the dialog that allows to insert a link
@@ -29,7 +29,7 @@ interface ILinkDialogProps {
    * @returns a boolean when truthful the dialog closes, if false
    * will show an error
    */
-  acceptLink: (url: string, tvalue: string) => boolean;
+  acceptLink: (url: string, tvalue: string) => Promise<boolean>;
   /**
    * Triggers when the dialog closes
    */
@@ -41,11 +41,11 @@ interface ILinkDialogProps {
   /**
    * The current context the dialog was opened
    */
-  currentContext: ITemplateArgsContext;
+  currentContext: ITemplateArgContextDefinition;
   /**
    * The root context
    */
-  currentRootContext: ITemplateArgsContext;
+  currentRootContext: ITemplateArgContextDefinition;
   /**
    * The selected element that was chosen, before opening
    * the dialog, it might be or not present, it is used
@@ -263,7 +263,7 @@ export class LinkDialog extends React.PureComponent<ILinkDialogProps, ILinkDialo
 
     // now we can set the state from the analysis
     this.setState({
-      linkURL: (this.props.selectedElement as any).href || "",
+      linkURL: (this.props.selectedElement as any).href || "",
       linkTValue: selectedContextValue,
       linkTemplateOptions: linkPropertiesToUse,
     });
@@ -275,9 +275,9 @@ export class LinkDialog extends React.PureComponent<ILinkDialogProps, ILinkDialo
    * When we have written the values and clicked the button
    * to accept the link we have given
    */
-  public acceptLink() {
+  public async acceptLink() {
     // calling from the props
-    const status = this.props.acceptLink(this.state.linkURL, this.state.linkTValue);
+    const status = await this.props.acceptLink(this.state.linkURL, this.state.linkTValue);
     // if we are good to go
     if (status) {
       // close the dialog

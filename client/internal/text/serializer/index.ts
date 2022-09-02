@@ -6,8 +6,8 @@
  */
 
 import React from "react";
-import { DOMWindow } from "../../../../util";
-import { copyElementBase } from "./base";
+import { DOMWindow, localeReplacer } from "../../../../util";
+import { copyElementBase, IElementBase } from "./base";
 import { IContainer, registerContainer } from "./types/container";
 import { ICustom, registerCustom } from "./types/custom";
 import { IFile, registerFile } from "./types/file";
@@ -22,9 +22,13 @@ import { IList, registerList } from "./types/list";
 import { IListItem, registerListItem } from "./types/list-item";
 import { IInline, registerInline } from "./types/inline";
 import { ITable, ITbody, ITd, IThead, ITr, registerTableElements } from "./types/table";
-import { TemplateArgs } from "./template-args";
+import { ITemplateArgContextDefinition, ITemplateArgUIHandlerDefinition, TemplateArgs } from "./template-args";
 import uuidv5 from "uuid/v5";
 import equals from "deep-equal";
+import { IVoidBlock, registerVoidBlock } from "./types/void-block";
+import { IVoidSuperBlock, registerVoidSuperBlock } from "./types/void-superblock";
+import { IVoidInline, registerVoidInline } from "./types/void-inline";
+import type { IPropertyEntryI18nRichTextInfo } from "../../../internal/components/PropertyEntry/PropertyEntryText";
 
 /**
  * Represents a basic deserialization function that takes a
@@ -247,12 +251,15 @@ export const SERIALIZATION_REGISTRY: ISerializationRegistryType = {
   VOIDS: {},
   INLINES: {},
   BLOCKS: {},
-  SUPERBLOCKS: {},
+  SUPERBLOCKS: {
+    document: true,
+  },
   REACTIFY: {}
 }
 
 // NOW we register all the elements that are part of this
 // by passing them to the function
+registerVoidSuperBlock(SERIALIZATION_REGISTRY);
 registerContainer(SERIALIZATION_REGISTRY);
 registerInline(SERIALIZATION_REGISTRY);
 registerCustom(SERIALIZATION_REGISTRY);
@@ -267,6 +274,320 @@ registerVideo(SERIALIZATION_REGISTRY);
 registerList(SERIALIZATION_REGISTRY);
 registerListItem(SERIALIZATION_REGISTRY);
 registerTableElements(SERIALIZATION_REGISTRY);
+registerVoidBlock(SERIALIZATION_REGISTRY);
+registerVoidInline(SERIALIZATION_REGISTRY);
+
+export function isText(node: RichElement | IRootLevelDocument | IText) {
+  return typeof (node as IText).text === "string";
+}
+
+export function isElement(node: RichElement | IRootLevelDocument | IText) {
+  return typeof (node as RichElement).type === "string";
+}
+
+export function isInline(node: RichElement | IRootLevelDocument | IText) {
+  if (isText(node)) {
+    return false;
+  }
+  return !!SERIALIZATION_REGISTRY.INLINES[(node as RichElement).type];
+}
+
+export function isBlock(node: RichElement | IRootLevelDocument | IText) {
+  if (isText(node)) {
+    return false;
+  }
+  return !!SERIALIZATION_REGISTRY.BLOCKS[(node as RichElement).type];
+}
+
+export function isSuperBlock(node: RichElement | IRootLevelDocument | IText) {
+  if (isText(node)) {
+    return false;
+  }
+  return !!SERIALIZATION_REGISTRY.SUPERBLOCKS[(node as RichElement).type];
+}
+
+export function getAllowedChildrenTypes(node: RichElement | IRootLevelDocument) {
+  if (isVoid(node)) {
+    return [];
+  }
+
+  const allowedInternals = SERIALIZATION_REGISTRY.ALLOWS_CHILDREN[node.type];
+  if (allowedInternals) {
+    return allowedInternals;
+  }
+  if (isSuperBlock(node)) {
+    return Object.keys(SERIALIZATION_REGISTRY.BLOCKS);
+  } else if (isBlock(node)) {
+    return Object.keys(SERIALIZATION_REGISTRY.INLINES);
+  }
+
+  return [];
+}
+
+export function allowsText(node: RichElement | IRootLevelDocument) {
+  const prohibitTexts = SERIALIZATION_REGISTRY.PROHIBIT_TEXT[node.type];
+  if (prohibitTexts || isSuperBlock(node)) {
+    return false;
+  }
+
+  return true;
+}
+
+export function isVoid(node: RichElement | IRootLevelDocument | IText): boolean {
+  if (isText(node)) {
+    return false;
+  }
+  return !!(node as IElementBase).html || !!(node as IElementBase).textContent || !!SERIALIZATION_REGISTRY.VOIDS[(node as RichElement).type];
+}
+
+export function getUIHandlerValueWithKnownContextFor(
+  element: RichElement,
+  elementContext: ITemplateArgContextDefinition,
+  rootContext: ITemplateArgContextDefinition,
+) {
+  if (!elementContext || elementContext.type !== "context" || !element || !element.uiHandler || !rootContext) {
+    return null;
+  }
+
+  let uiHandlerValue: ITemplateArgUIHandlerDefinition = elementContext.properties[element.uiHandler] as ITemplateArgUIHandlerDefinition;
+  if (!uiHandlerValue || uiHandlerValue.type !== "ui-handler") {
+    uiHandlerValue = rootContext.properties[element.uiHandler] as ITemplateArgUIHandlerDefinition;
+    if (!uiHandlerValue || uiHandlerValue.type !== "ui-handler" || uiHandlerValue.nonRootInheritable) {
+      uiHandlerValue = null;
+    }
+  }
+
+  return uiHandlerValue;
+}
+
+export function getUIHandlerValueFor(
+  element: RichElement,
+  path: number[],
+  rootElement: IRootLevelDocument,
+  rootContext: ITemplateArgContextDefinition,
+) {
+  if (!element.uiHandler) {
+    return null;
+  }
+
+  const contextForThisElement = getContextFor(
+    path,
+    "final",
+    rootElement,
+    rootContext,
+  ) || rootContext;
+
+  return getUIHandlerValueWithKnownContextFor(
+    element,
+    contextForThisElement,
+    rootContext,
+  );
+}
+
+export function getNodeFor(
+  path: number[],
+  rootElement: IRootLevelDocument,
+): IRootLevelDocument | RichElement | IText {
+  if (path.length === 0) {
+    return rootElement;
+  }
+
+  let currentElement: IRootLevelDocument | RichElement = rootElement;
+  for (let i = 0; i < path.length; i++) {
+    currentElement = currentElement.children[path[i]] as any;
+  }
+
+  return currentElement;
+}
+
+export function getParentNodeFor(
+  path: number[],
+  rootElement: IRootLevelDocument,
+): IRootLevelDocument | RichElement {
+  if (path.length === 0) {
+    return null;
+  } else if (path.length === 1) {
+    return rootElement;
+  }
+
+  const newPath = [...path];
+  newPath.pop();
+
+  let currentElement: IRootLevelDocument | RichElement = rootElement;
+  for (let i = 0; i < newPath.length; i++) {
+    currentElement = currentElement.children[newPath[i]] as any;
+  }
+
+  return currentElement;
+}
+
+export function getContextFor(
+  path: number[],
+  level: "final" | "select-context" | "select-loop",
+  rootElement: IRootLevelDocument,
+  rootContext: ITemplateArgContextDefinition,
+): ITemplateArgContextDefinition {
+  if (!path || path.length === 0 || !rootContext) {
+    return null;
+  }
+
+  const nextPath = [...path];
+  const nextPathNumber = nextPath.shift();
+  const isFinal = nextPath.length === 0;
+
+  const nextElement = rootElement.children && rootElement.children[nextPathNumber];
+  if (!nextElement) {
+    return rootContext;
+  }
+
+  let nextContext = rootContext;
+
+  if (isFinal && level === "select-context") {
+    return nextContext;
+  }
+
+  const contextChange = (nextElement as IElementBase).context;
+  if (contextChange) {
+    const nextPotentialContext = nextContext.properties[contextChange];
+    if (nextPotentialContext.type !== "context" || nextPotentialContext.loopable) {
+      return null;
+    }
+    nextContext = nextPotentialContext;
+  }
+
+  if (isFinal && level === "select-loop") {
+    return nextContext;
+  }
+
+  const eachConextChange = (nextElement as IElementBase).forEach;
+  if (eachConextChange) {
+    const nextPotentialContext = nextContext.properties[contextChange];
+    if (nextPotentialContext.type !== "context" || !nextPotentialContext.loopable) {
+      return null;
+    }
+    nextContext = nextPotentialContext;
+  }
+
+  return isFinal ? nextContext : getContextFor(nextPath, level, nextElement as any, nextContext);
+}
+
+/**
+ * The interactive actions that exist that mark
+ * something as a templated element that is interactive
+ * @ignore
+ */
+const templatedInteractiveActions = [
+  "click",
+  "blur",
+  "focus",
+  "input",
+  "keydown",
+  "keypress",
+  "keyup",
+  "mousedown",
+  "mouseenter",
+  "mouseleave",
+  "mousemove",
+  "mouseover",
+  "mouseout",
+  "mouseup",
+  "mousewheel",
+  "touchstart",
+  "touchmove",
+  "touchend",
+  "touchcancel",
+  "wheel",
+];
+
+/**
+ * The attributes that exist in a given element that mark such
+ * as a templated element
+ * @ignore
+ */
+const templatedAttributes = [
+  "thref",
+  "textContent",
+  "html",
+  "forEach",
+  "context",
+  "uiHandler",
+];
+
+/**
+ * The attributes that exist in a given element that mark such
+ * as a templated styled elements
+ * @ignore
+ */
+const templatedStyledAttributes = [
+  "styleHover",
+  "styleActive",
+];
+
+/**
+ * The node information that is extracted of a given node used
+ * to be displayed to the user
+ */
+interface INodeInfo {
+  /**
+   * The name that is given, human readable in the given language
+   */
+  name: string;
+  /**
+   * Whether it represents a templated node
+   */
+  isTemplate: boolean;
+  /**
+   * Whether it represents a text node
+   */
+  isText: boolean;
+}
+
+/**
+ * Provides the node info of a given node
+ * @param node the node, either text or rich element
+ * @param i18nData the i18n information to be used to create the name
+ * @returns the node information
+ */
+export function getInfoFor(
+  node: RichElement | IText | IRootLevelDocument,
+  i18nData: IPropertyEntryI18nRichTextInfo,
+): INodeInfo {
+  if ((node as any).type === "document") {
+    return null;
+  }
+
+  // check for whether is interactive and other options
+  const isInteractive = templatedInteractiveActions.some((attr) => !!node[attr]);
+  const isTemplateStyled = templatedStyledAttributes.some((attr) => !!node[attr]);
+  const isBasicStyled = !!(node as RichElement).style || ((node as RichElement).richClassList && (node as RichElement).richClassList.length);
+  const isBasicTemplated = templatedAttributes.some((attr) => !!node[attr]);
+  const isTemplate = isInteractive || isTemplateStyled || isBasicTemplated;
+
+  // now let's build the name label for the given language
+  const foundCustomName = (!(node as RichElement).givenName && (node as RichElement).uiHandler) ?
+    i18nData.richUIHandlerElement[(node as RichElement).uiHandler.replace(/-/g, "_")] : null;
+  let nameLabel: string = (node as RichElement).givenName ? (node as RichElement).givenName : (
+    foundCustomName || ((node as RichElement).type ? (i18nData[(node as RichElement).type] || (node as RichElement).type) : i18nData.text)
+  );
+  if (!(node as RichElement).givenName && !foundCustomName) {
+    if (isBasicStyled || isTemplateStyled) {
+      nameLabel = localeReplacer(i18nData.styled, nameLabel);
+    }
+    if (isInteractive) {
+      nameLabel = localeReplacer(i18nData.interactive, nameLabel);
+    }
+    if (isTemplate) {
+      nameLabel = localeReplacer(i18nData.template, nameLabel);
+    }
+  }
+
+  // and we can return the information now
+  return {
+    isTemplate,
+    name: nameLabel,
+    isText: typeof (node as IText).text === "string",
+  }
+}
 
 /**
  * Represents the root level document and a id
@@ -284,8 +605,8 @@ export interface IRootLevelDocument {
  * This is what a rich element can be, it can be all these
  * but it's not a text
  */
-export type RichElement = IRootLevelDocument | IParagraph | IContainer | ICustom | ILink | IQuote | ITitle | IImage |
-  IFile | IVideo | IList | IListItem | IInline | ITable | ITr | ITbody | IThead | ITd;
+export type RichElement = IParagraph | IContainer | ICustom | ILink | IQuote | ITitle | IImage |
+  IFile | IVideo | IList | IListItem | IInline | ITable | ITr | ITbody | IThead | ITd | IVoidBlock | IVoidInline | IVoidSuperBlock;
 
 /**
  * This is the text namespace, and it's used in uuid for creating
@@ -401,7 +722,7 @@ function serializeElement(element: RichElement) {
  * it will be efficient and return such comparer instead
  * @returns a root level document
  */
-export function deserialize(html: string | Node[], comparer?: IRootLevelDocument) {
+export function deserialize(html: string | Node[], comparer?: IRootLevelDocument, specialRules?: ISpecialRules) {
 
   // first we need to build this data into a string
   // this is the html data of the child nodes
@@ -468,76 +789,92 @@ export function deserialize(html: string | Node[], comparer?: IRootLevelDocument
   };
 
   // normalize it
-  normalize(newDocument);
+  normalize(newDocument, specialRules || null);
 
   // return it
   return newDocument;
 }
 
 export function normalize(
-  document: IRootLevelDocument,
+  doc: IRootLevelDocument,
+  specialRules?: ISpecialRules,
 ): IRootLevelDocument {
-  if (!document.rich) {
-    return document;
+  if (!doc.rich) {
+    return doc;
   }
-  return normalizeElement(document as any, [], []) as any;
+  return normalizeElement(doc as any, [], doc, null, specialRules || null) as any;
 }
 
+(window as any).NORMALIZE = normalize;
+
 interface ICustomExecution {
-  deleteTextNode: (node: IText, path: number[], parent: RichElement) => void,
-  deleteElement: (element: RichElement, path: number[], parent: RichElement) => void,
-  wrapTextNode: (node: IText, wrappers: RichElement[], path: number[], parent: RichElement) => void,
-  wrapElement: (element: RichElement, wrappers: RichElement[], path: number[], parent: RichElement) => void,
-  insertTextNode: (element: RichElement, path: number[], targetIndex: number, textToInsert: IText) => void,
-  insertElement: (element: RichElement, path: number[], targetIndex: number, elementToInsert: RichElement) => void,
-  mergeElements: (element: RichElement, path: number[], parent: RichElement, secondChild: RichElement, secondChildPath: number[]) => void,
-  mergeText: (text: IText, path: number[], parent: RichElement, secondChild: IText, secondChildPath: number[]) => void,
-  splitElementAndEscapeChildIntoParent: (element: RichElement, path: number[], parent: RichElement, escapingChildIndex: number) => void;
+  workOnOriginal: boolean;
+  updateNodeAt: (path: number[], v: Partial<RichElement | IText>) => void,
+  deleteNodeAt: (path: number[]) => void,
+  wrapNodeAt: (path: number[], wrappers: RichElement[]) => void,
+  insertNodeAt: (path: number[], node: RichElement | IText, targetIndex: number) => void,
+  mergeNodesAt: (basePath: number[], referencePath: number[]) => void,
+  splitElementAndEscapeChildIntoParentAt: (path: number[], escapingChildIndex: number) => void;
+  getNodeAt: (path: number[]) => RichElement | IText;
 };
 
 interface ISpecialRules {
-  ignorePaths: number[][];
-
+  ignoreNodesAt?: Array<number[]>;
+  /**
+   * This should be the root context
+   */
+  useContextRulesOf?: ITemplateArgContextDefinition;
 }
 
-const standardExec: ICustomExecution = {
-  deleteTextNode(node: IText, path: number[], parent: RichElement) {
-    parent.children.splice(path[path.length - 1], 1);
-  },
-  deleteElement(node: RichElement, path: number[], parent: RichElement) {
-    parent.children.splice(path[path.length - 1], 1);
-  },
-  wrapTextNode(node: IText, wrappers: RichElement[], path: number[], parent: RichElement) {
-    const indexAtChild = path[path.length - 1];
-    wrappers.forEach((w) => {
-      const wrappedChild = w;
-      wrappedChild.children = [parent.children[indexAtChild]] as any;
-      parent.children[indexAtChild] = wrappedChild;
+const standardExecFn: (root: IRootLevelDocument) => ICustomExecution = (root) => ({
+  workOnOriginal: true,
+  updateNodeAt(path: number[], data: Partial<RichElement | IText>) {
+    const node = getNodeFor(path, root);
+    console.log("updating", JSON.stringify(node), "with", JSON.stringify(data));
+    Object.keys(data).forEach((k) => {
+      node[k] = data[k];
     });
   },
-  wrapElement(element: RichElement, wrappers: RichElement[], path: number[], parent: RichElement) {
+  deleteNodeAt(path: number[]) {
+    const node = getNodeFor(path, root);
+    const parent = getParentNodeFor(path, root);
+    console.log("deleting", JSON.stringify(node), "at", JSON.stringify(parent));
+    parent.children.splice(path[path.length - 1], 1);
+  },
+  wrapNodeAt(path: number[], wrappers: RichElement[]) {
+    const parentOfNodeToWrap = getParentNodeFor(path, root);
     const indexAtChild = path[path.length - 1];
+
+    console.log("wrapping", JSON.stringify(parentOfNodeToWrap.children[indexAtChild]), "with", JSON.stringify(wrappers));
     wrappers.forEach((w) => {
-      const wrappedChild = w;
-      wrappedChild.children = [parent.children[indexAtChild]] as any;
-      parent.children[indexAtChild] = wrappedChild;
+      const childToWrap = parentOfNodeToWrap.children[indexAtChild];
+      w.children = [childToWrap] as any;
+      parentOfNodeToWrap.children[indexAtChild] = w;
     });
   },
-  insertTextNode(element: RichElement, path: number[], targetIndex: number, textToInsert: IText) {
-    element.children.splice(targetIndex, 0, textToInsert);
+  insertNodeAt(path: number[], node: RichElement | IText, targetIndex: number) {
+    const element = getNodeFor(path, root) as RichElement;
+    console.log("inserting", JSON.stringify(node), "at", JSON.stringify(element));
+    element.children.splice(targetIndex, 0, node as any);
   },
-  insertElement(element: RichElement, path: number[], targetIndex: number, elementToInsert: RichElement) {
-    element.children.splice(targetIndex, 0, elementToInsert);
-  },
-  mergeElements(base: RichElement, path: number[], parent: RichElement, reference: RichElement, referencePath: number[]) {
-    base.children = (base.children as any).concat(reference.children);
+  mergeNodesAt(basePath: number[], referencePath: number[]) {
+    const base = getNodeFor(basePath, root);
+    const reference = getNodeFor(referencePath, root);
+    const parent = getParentNodeFor(basePath, root);
+    console.log("merging", JSON.stringify(base), "with", JSON.stringify(reference));
+    if (typeof (base as RichElement).type !== "undefined") {
+      (base as RichElement).children = ((base as RichElement).children as any).concat((reference as RichElement).children);
+    } else {
+      (base as IText).text += (reference as IText).text;
+    }
     parent.children.splice(referencePath[referencePath.length - 1], 1);
   },
-  mergeText(base: IText, path: number[], parent: RichElement, reference: IText, referencePath: number[]) {
-    base.text += reference.text;
-    parent.children.splice(referencePath[referencePath.length - 1], 1);
-  },
-  splitElementAndEscapeChildIntoParent(element: RichElement, path: number[], parent: RichElement, escapingChildIndex: number) {
+  splitElementAndEscapeChildIntoParentAt(path: number[], escapingChildIndex: number) {
+    const element = getNodeFor(path, root) as RichElement;
+    const parent = getParentNodeFor(path, root) as RichElement;
+
+    console.log("splitting", JSON.stringify(element), "at child index", JSON.stringify(escapingChildIndex));
+
     const allNodesBeforeThis = element.children.slice(0, escapingChildIndex);
     const escapingChild = element.children[escapingChildIndex];
     const allNodesAfterThis = element.children.slice(escapingChildIndex + 1);
@@ -552,24 +889,46 @@ const standardExec: ICustomExecution = {
 
     parent.children.splice(indexAtParent, 0, newElement as any);
     parent.children.splice(indexAtParent, 0, escapingChild as any);
+  },
+  getNodeAt(path: number[]) {
+    return getNodeFor(path, root) as any;
   }
-}
+});
 
-function normalizeSpacing(element: RichElement, path: number[], customExecution: ICustomExecution) {
+function normalizeSpacing(
+  element: RichElement | IRootLevelDocument,
+  path: number[],
+  primaryExecution: ICustomExecution,
+  secondaryExecution: ICustomExecution,
+  specialRules?: ISpecialRules,
+) {
+  const isIgnored = isIgnoredNode(path, specialRules);
+  if (isIgnored) {
+    return;
+  }
+
   // if there are children in the result and they happen
   // to be some inline in them we need to ensure there are
   // empty text nodes between the inlines so they
   // can be selected properly
   if (
     element.children.length &&
-    element.children.some((r) => (r as RichElement).type && SERIALIZATION_REGISTRY.INLINES[(r as RichElement).type])
+    element.children.some((r) => isInline(r))
   ) {
     // and now we loop in each one of the children
     let offset = 0;
-    for (let i = 0; i < element.children.length; i++) {
+    const childrenAmount = element.children.length;
+    for (let i = 0; i < childrenAmount; i++) {
       let actualIndex = i + offset;
       const currentNode = element.children[actualIndex];
-      if ((currentNode as RichElement).type && SERIALIZATION_REGISTRY.INLINES[(currentNode as RichElement).type]) {
+      const currentNodePath = [...path, actualIndex];
+      const isIgnored = isIgnoredNode(currentNodePath, specialRules);
+
+      if (isIgnored) {
+        continue;
+      }
+
+      if (isInline(currentNode)) {
         // get our current, prev, and next node from the parsed values
         const prevNode: any = element.children[actualIndex - 1];
         const nextNode: any = element.children[actualIndex + 1];
@@ -590,12 +949,17 @@ function normalizeSpacing(element: RichElement, path: number[], customExecution:
             text: "",
           }
 
-          customExecution.insertTextNode(
-            element,
+          primaryExecution.insertNodeAt(
             path,
+            textReference,
             // insert where we are now and push us forwards
             actualIndex,
+          );
+          secondaryExecution && secondaryExecution.insertNodeAt(
+            path,
             textReference,
+            // insert where we are now and push us forwards
+            actualIndex,
           );
 
           actualIndex += 1;
@@ -612,13 +976,19 @@ function normalizeSpacing(element: RichElement, path: number[], customExecution:
             text: "",
           }
 
-          customExecution.insertTextNode(
-            element,
+          primaryExecution.insertNodeAt(
             path,
+            textReference,
             // insert ahead of where we are now and push everything else
             // forwards
             actualIndex + 1,
+          );
+          secondaryExecution && secondaryExecution.insertNodeAt(
+            path,
             textReference,
+            // insert ahead of where we are now and push everything else
+            // forwards
+            actualIndex + 1,
           );
 
           actualIndex += 1;
@@ -630,47 +1000,65 @@ function normalizeSpacing(element: RichElement, path: number[], customExecution:
 
   // DELETE EMPTY TEXT NODES
   if (element.children.length >= 2) {
-    let offset = 0;
-    for (let i = 1; i < element.children.length; i++) {
-      const actualIndex = i + offset;
-      const v = element.children[actualIndex];
-  
-      if (typeof (v as IText).text !== "undefined" && !(v as IText).text) {
-        customExecution.deleteTextNode(
-          v as IText,
-          [...path, actualIndex],
-          element,
-        );
-        offset -= 1;
+    const childrenAmount = element.children.length;
+    if (childrenAmount >= 2) {
+      let offset = 0;
+      for (let i = 0; i < childrenAmount; i++) {
+        const actualIndex = i + offset;
+        const v = element.children[actualIndex];
+        const prevNode = element.children[actualIndex - 1];
+        const nextNode = element.children[actualIndex + 1];
+        const isInlineSeparator = (!prevNode || isInline(prevNode)) && (!nextNode || isInline(nextNode));
+
+        // we will stop right away even if we are not sure if this is a text node because, well
+        // it will be removed anyway
+        if (isInlineSeparator) {
+          continue;
+        }
+
+        const nodePath = [...path, actualIndex];
+        const isIgnored = isIgnoredNode(nodePath, specialRules);
+
+        if (isIgnored) {
+          continue;
+        }
+
+        if (typeof (v as IText).text !== "undefined" && !(v as IText).text) {
+          primaryExecution.deleteNodeAt(
+            nodePath,
+          );
+          secondaryExecution && secondaryExecution.deleteNodeAt(
+            nodePath,
+          );
+          offset -= 1;
+        }
       }
     }
   }
 
+  // add to empty elements
   if (
     element.children.length === 0 &&
     (
-      SERIALIZATION_REGISTRY.INLINES[element.type] ||
-      SERIALIZATION_REGISTRY.BLOCKS[element.type]
+      isInline(element) ||
+      isBlock(element)
     )
   ) {
-    if (!SERIALIZATION_REGISTRY.PROHIBIT_TEXT[element.type]) {
-      customExecution.insertTextNode(
-        element,
-        path,
-        0,
-        STANDARD_TEXT_NODE(),
-      );
-    } else {
-      customExecution.insertElement(
-        element,
-        path,
-        0,
-        SERIALIZATION_REGISTRY.ON_EMPTY_FILL_WITH[element.type](),
-      );
-    }
+    const nodeToInsert = allowsText(element) ? STANDARD_TEXT_NODE() : SERIALIZATION_REGISTRY.ON_EMPTY_FILL_WITH[element.type]();
+    primaryExecution.insertNodeAt(
+      path,
+      nodeToInsert,
+      0,
+    );
+    secondaryExecution && secondaryExecution.insertNodeAt(
+      path,
+      nodeToInsert,
+      0,
+    );
   } else if (element.children.length >= 2) {
     let offset = 0;
-    for (let i = 0; i < element.children.length; i++) {
+    const childrenAmount = element.children.length;
+    for (let i = 0; i < childrenAmount; i++) {
       const actualIndex = i + offset;
       if (i === 0) {
         continue;
@@ -682,54 +1070,121 @@ function normalizeSpacing(element: RichElement, path: number[], customExecution:
       const shouldMerge = checkShouldMerge(n1, n2);
 
       if (shouldMerge) {
-        if (typeof (n1 as IText) !== "undefined") {
-          customExecution.mergeText(
-            n1 as IText,
-            [...path, actualIndex - 1],
-            element,
-            n2 as IText,
-            [...path, actualIndex],
-          );
-        } else {
-          customExecution.mergeElements(
-            n1 as RichElement,
-            [...path, actualIndex - 1],
-            element,
-            n2 as RichElement,
-            [...path, actualIndex],
-          );
-        }
+        const basePath = [...path, actualIndex - 1];
+        const referencePath = [...path, actualIndex];
+        primaryExecution.mergeNodesAt(
+          basePath,
+          referencePath,
+        );
+        secondaryExecution && secondaryExecution.mergeNodesAt(
+          basePath,
+          referencePath,
+        );
         offset -= 1;
       }
     }
   }
 
   element.children.forEach((c, index) => {
-    if ((c as RichElement).type) {
-      normalizeSpacing(c as RichElement, [...path, index], customExecution);
+    const childrenPath = [...path, index];
+
+    const isIgnored = isIgnoredNode(childrenPath, specialRules);
+    if (!isIgnored && (c as RichElement).type) {
+      normalizeSpacing(c as RichElement, childrenPath, primaryExecution, secondaryExecution, specialRules);
+    }
+  });
+}
+
+function isIgnoredNode(path: number[], specialRules: ISpecialRules) {
+  if (!specialRules || !specialRules.ignoreNodesAt) {
+    return false;
+  }
+
+  return specialRules.ignoreNodesAt.some((ignorePath) => {
+    // the same exact node with the same memory address
+    return ignorePath.every((v, index) => path[index] === v);
+  });
+}
+
+function shallowRootCopy<T>(
+  element: T,
+): T {
+  const newElement: any = {}
+  const inlineOrText = isText(element as any) || isInline(element as any);
+  Object.keys(element).forEach((key) => {
+    if (key === "children") {
+      newElement.children = (element as any as RichElement).children.map(shallowRootCopy);
+    } else if (
+      key === "text"
+    ) {
+      // if there's text
+      if (element[key]) {
+        newElement[key] = "?";
+      } else {
+        // if there's no text
+        newElement[key] = "";
+      }
+    } else if (
+      // required for voids
+      key === "html" ||
+      key === "textContent"
+    ) {
+      newElement[key] = "?";
+    } else if (
+      // important
+      key === "type" ||
+      // inlines info are required all attributes for check for merging
+      // to see if it can be merged with the next one
+      inlineOrText ||
+      // ui handler are required to get the context
+      // for other normalization attributes
+      key === "uiHandler" ||
+      key === "context" ||
+      key === "forEach"
+    ) {
+      newElement[key] = element[key];
     }
   })
+
+  return newElement;
 }
 
 export function normalizeElement(
-  element: RichElement,
+  element: RichElement | IRootLevelDocument,
   path: number[],
-  parentList: [RichElement, number[]][],
-  customExecution: ICustomExecution = standardExec
+  root: IRootLevelDocument,
+  customExecution?: ICustomExecution,
+  specialRules?: ISpecialRules,
+) {
+  const primaryExecution = customExecution || standardExecFn(root);
+
+  let executionRoot = root;
+  let executionElement = element;
+  let secondaryExecution: ICustomExecution = null;
+  if (!primaryExecution.workOnOriginal) {
+    executionRoot = shallowRootCopy(root);
+    secondaryExecution = standardExecFn(executionRoot);
+    executionElement = getNodeFor(path, executionRoot) as RichElement;
+  }
+
+  internalNormalizeElement(executionElement, path, executionRoot, primaryExecution, secondaryExecution, specialRules);
+}
+
+function internalNormalizeElement(
+  element: RichElement | IRootLevelDocument,
+  path: number[],
+  executionRoot: IRootLevelDocument,
+  primaryExecution: ICustomExecution,
+  secondaryExecution: ICustomExecution,
+  specialRules?: ISpecialRules,
 ) {
   const type = element.type;
 
-  if (SERIALIZATION_REGISTRY.VOIDS[type]) {
-    element.children = [STANDARD_TEXT_NODE()];
+  const isIgnored = isIgnoredNode(path, specialRules);
+  if (isIgnored) {
     return;
   }
 
-  const parentListReversed = parentList.reverse();
-  const parentInline = parentListReversed.find((p) => SERIALIZATION_REGISTRY.INLINES[p[0].type]);
-  const parentBlock = parentListReversed.find((p) => SERIALIZATION_REGISTRY.BLOCKS[p[0].type]);
-  const parentSuperBlock = parentListReversed.find((p) => SERIALIZATION_REGISTRY.SUPERBLOCKS[p[0].type]);
-
-  const nextParentList: [RichElement, number[]][] = [...parentList, [element, path]];
   // let's find invalid text inside superblock
   let offset = 0;
   let index = 0;
@@ -737,8 +1192,11 @@ export function normalizeElement(
     const actualChildIndex = index + offset;
     const childrenPath = [...path, actualChildIndex];
     const v = element.children[actualChildIndex];
+    const isIgnored = isIgnoredNode(childrenPath, specialRules);
 
-    if (!v) {
+    if (isIgnored) {
+      continue;
+    } else if (!v) {
       break;
     }
 
@@ -747,17 +1205,21 @@ export function normalizeElement(
       SERIALIZATION_REGISTRY.PROHIBIT_TEXT[type]
     );
 
-    if (typeof (v as IText).text === "string" && cannotHaveTextAsChildren) {
-      const wrapper = (
-        SERIALIZATION_REGISTRY.ON_INVALID_TEXT_WRAP_WITH[type] ?
-          SERIALIZATION_REGISTRY.ON_INVALID_TEXT_WRAP_WITH[type](v as IText) :
-          null
-      );
-      if (!wrapper) {
-        customExecution.deleteTextNode(v as IText, childrenPath, element);
-        offset -= 1;
-      } else {
-        customExecution.wrapTextNode(v as IText, wrapper, childrenPath, element);
+    if (typeof (v as IText).text === "string") {
+      if (cannotHaveTextAsChildren) {
+        const wrapper = (
+          SERIALIZATION_REGISTRY.ON_INVALID_TEXT_WRAP_WITH[type] ?
+            SERIALIZATION_REGISTRY.ON_INVALID_TEXT_WRAP_WITH[type](v as IText) :
+            null
+        );
+        if (!wrapper) {
+          primaryExecution.deleteNodeAt(childrenPath);
+          secondaryExecution && secondaryExecution.deleteNodeAt(childrenPath);
+          offset -= 1;
+        } else {
+          primaryExecution.wrapNodeAt(childrenPath, wrapper);
+          secondaryExecution && secondaryExecution.wrapNodeAt(childrenPath, wrapper);
+        }
       }
     } else {
       const isAllowedType = SERIALIZATION_REGISTRY.ALLOWS_CHILDREN[type] ?
@@ -777,6 +1239,8 @@ export function normalizeElement(
         SERIALIZATION_REGISTRY.BLOCKS[element.type];
       const isSuperblockDeniedInInline = SERIALIZATION_REGISTRY.SUPERBLOCKS[(v as RichElement).type] &&
         SERIALIZATION_REGISTRY.INLINES[element.type];
+      const isNonTextDeniedInVoid = typeof (v as IText).text === "undefined" &&
+        SERIALIZATION_REGISTRY.VOIDS[element.type];
 
       const hasProblems = (
         !isAllowedType ||
@@ -785,16 +1249,19 @@ export function normalizeElement(
         isBlockDeniedInBlock ||
         isBlockDeniedInInline ||
         isSuperblockDeniedInBlock ||
-        isSuperblockDeniedInInline
+        isSuperblockDeniedInInline ||
+        isNonTextDeniedInVoid
       );
 
       if (!hasProblems) {
         if ((v as RichElement).type) {
-          normalizeElement(
+          internalNormalizeElement(
             v as RichElement,
             childrenPath,
-            nextParentList,
-            customExecution,
+            executionRoot,
+            primaryExecution,
+            secondaryExecution,
+            specialRules,
           );
         }
       } else {
@@ -803,7 +1270,7 @@ export function normalizeElement(
           isTextDeniedInSuperBlock ||
           (SERIALIZATION_REGISTRY.SUPERBLOCKS[element.type] && !isAllowedType)
         );
-        
+
         const canSolveBySplitting = (
           isInlineDeniedInInline ||
           isBlockDeniedInBlock ||
@@ -821,92 +1288,126 @@ export function normalizeElement(
               null
           );
           if (!wrapper) {
-            if (isTextDeniedInSuperBlock) {
-              customExecution.deleteTextNode(v as IText, childrenPath, element);
-            } else {
-              customExecution.deleteElement(v as RichElement, childrenPath, element);
-            }
+            primaryExecution.deleteNodeAt(childrenPath);
+            secondaryExecution && secondaryExecution.deleteNodeAt(childrenPath);
             offset -= 1;
           } else {
-            if (isTextDeniedInSuperBlock) {
-              customExecution.wrapTextNode(v as IText, wrapper, childrenPath, element);
-            } else {
-              customExecution.wrapElement(v as RichElement, wrapper, childrenPath, element);
-              normalizeElement(
+            primaryExecution.wrapNodeAt(childrenPath, wrapper);
+            secondaryExecution && secondaryExecution.wrapNodeAt(childrenPath, wrapper);
+            if (!isTextDeniedInSuperBlock) {
+              internalNormalizeElement(
                 element.children[actualChildIndex] as RichElement,
                 childrenPath,
-                nextParentList,
-                customExecution,
+                executionRoot,
+                primaryExecution,
+                secondaryExecution,
+                specialRules,
               );
             }
           }
         } else if (canSolveBySplitting) {
-          const targetToStore = isBlockDeniedInBlock || isSuperblockDeniedInBlock ? (
-            parentSuperBlock || parentList[0]
-          ) : parentBlock;
+          const expectedParentOfElementPath = [...path];
+          expectedParentOfElementPath.pop();
+
+          const targetToStorePath = isBlockDeniedInBlock || isSuperblockDeniedInBlock ? (
+            expectedParentOfElementPath || []
+          ) : expectedParentOfElementPath;
+
+          const targetToStore = getNodeFor(targetToStorePath, executionRoot);
+
+          const expectedType = isBlockDeniedInBlock || isSuperblockDeniedInBlock ? "superblock" : "block";
 
           // the target superblock is not its parent or no parent block was found
-          if (!targetToStore || targetToStore[1].length !== path.length - 1) {
+          if (!targetToStore || (expectedType === "superblock" ? isSuperBlock(targetToStore) : isBlock(targetToStore))) {
             console.warn("Cannot resolve, you have requested child normalization but the tree is invalid on the upper side");
           } else {
             // first let's create a new node after this that is a copy of this element
-            customExecution.splitElementAndEscapeChildIntoParent(
-              element,
+            primaryExecution.splitElementAndEscapeChildIntoParentAt(
               path,
-              targetToStore[0],
+              actualChildIndex,
+            );
+            secondaryExecution && secondaryExecution.splitElementAndEscapeChildIntoParentAt(
+              path,
               actualChildIndex,
             );
             offset -= 1;
 
+            // now our child exists next to the node we are normalizing
+            // or it should be there
             const newChildIndex = path[path.length - 1] + 1;
 
-            normalizeElement(
-              targetToStore[0].children[newChildIndex] as RichElement,
-              targetToStore[1].concat([newChildIndex]),
-              parentList,
-              customExecution,
+            internalNormalizeElement(
+              (targetToStore as RichElement).children[newChildIndex] as RichElement,
+              targetToStorePath.concat([newChildIndex]),
+              executionRoot,
+              primaryExecution,
+              secondaryExecution,
+              specialRules,
             );
           }
         } else if (canSolveByDoubleSplitting) {
           // pretty much only happens when a superblock is inside an inline
-          const targetToStore = parentSuperBlock || parentList[0];
+          // we move down two levels to get to the superblock
+          const targetBlockPath = [...path];
+          targetBlockPath.pop();
+
+          const targetSuperBlock = getParentNodeFor(targetBlockPath, executionRoot);
+          const targetBlock = getNodeFor(targetBlockPath, executionRoot);
 
           // this time we go two layers down to check, we are an inline and the child
           // is a superblock, we need to find the other superblock which should be two layers above
-          if (!targetToStore || targetToStore[1].length !== path.length - 2) {
+          if (!targetSuperBlock || !isSuperBlock(targetSuperBlock) || !targetBlock || !isBlock(targetBlock)) {
             console.warn("Cannot resolve, you have requested child normalization but the tree is invalid on the upper side");
           } else {
             // first let's split the superblock and escape it into the block
-            customExecution.splitElementAndEscapeChildIntoParent(
-              element,
+            // our element is the inline, and we are escaping the target superblock
+            primaryExecution.splitElementAndEscapeChildIntoParentAt(
               path,
-              parentBlock[0],
+              actualChildIndex,
+            );
+            secondaryExecution && secondaryExecution.splitElementAndEscapeChildIntoParentAt(
+              path,
               actualChildIndex,
             );
             offset -= 1;
 
-            const newChildIndexLvl1 = path[path.length - 1] + 1;
+            // now we need to find the child index that shoud be
+            // right next to us (the inline) in the block
+            // but that's still invalid
+            const newChildIndexAtBlock = path[path.length - 1] + 1;
 
-            customExecution.splitElementAndEscapeChildIntoParent(
-              parentBlock[0],
-              parentBlock[1],
-              targetToStore[0],
-              // we expect the child to be now in the position
-              // where we are right now but one ahead
-              newChildIndexLvl1,
+            // now we are escaping this same element, now from the parent block
+            // into the superblock
+            primaryExecution.splitElementAndEscapeChildIntoParentAt(
+              targetBlockPath,
+              newChildIndexAtBlock,
+            );
+            secondaryExecution && secondaryExecution.splitElementAndEscapeChildIntoParentAt(
+              targetBlockPath,
+              newChildIndexAtBlock,
             );
 
-            const newChildIndexLvl2 = path[path.length - 2] + 1;
+            // now we expect the child to be ahead of the target block
+            const newChildPath = [...targetBlockPath];
+            newChildPath[newChildPath.length - 1]++;
 
-            normalizeElement(
-              targetToStore[0].children[newChildIndexLvl2] as RichElement,
-              targetToStore[1].concat([newChildIndexLvl2]),
-              parentList,
-              customExecution,
+            const newChildIndexAtSuperBlock = newChildPath[newChildPath.length - 1];
+            const ourElement = targetSuperBlock.children[newChildIndexAtSuperBlock] as RichElement;
+
+            // and we request it to be normalized
+            internalNormalizeElement(
+              ourElement,
+              newChildPath,
+              executionRoot,
+              primaryExecution,
+              secondaryExecution,
+              specialRules,
             );
           }
         } else {
-          customExecution.deleteElement(v as RichElement, childrenPath, element);
+          // here goes isNonTextDeniedInVoid
+          primaryExecution.deleteNodeAt(childrenPath);
+          secondaryExecution && secondaryExecution.deleteNodeAt(childrenPath)
           offset -= 1;
         }
       }
@@ -915,11 +1416,181 @@ export function normalizeElement(
     index++;
   }
 
+  if (specialRules && specialRules.useContextRulesOf) {
+    normalizeAccordingToUIHAndlerRules(
+      element,
+      path,
+      executionRoot,
+      primaryExecution,
+      secondaryExecution,
+      specialRules,
+    );
+  }
+
   normalizeSpacing(
     element,
     path,
-    customExecution,
+    primaryExecution,
+    secondaryExecution,
+    specialRules,
   );
+}
+
+const patchList = {
+  inline: "void-inline",
+  "void-inline": "inline",
+  paragraph: "void-block",
+  "void-block": "paragraph",
+  container: "void-superblock",
+  "void-superblock": "container",
+}
+
+function normalizeAccordingToUIHAndlerRules(
+  element: RichElement | IRootLevelDocument,
+  path: number[],
+  executionRoot: IRootLevelDocument,
+  primaryExecution: ICustomExecution,
+  secondaryExecution: ICustomExecution,
+  specialRules?: ISpecialRules,
+) {
+  const isIgnored = isIgnoredNode(path, specialRules);
+  if (isIgnored) {
+    return;
+  }
+
+  const uiHandler = (element as IElementBase).uiHandler;
+  const contextForThisElement = getContextFor(
+    path,
+    "final",
+    executionRoot,
+    specialRules.useContextRulesOf,
+  ) || specialRules.useContextRulesOf;
+
+  let uiHandlerValue: ITemplateArgUIHandlerDefinition = contextForThisElement.properties[uiHandler] as ITemplateArgUIHandlerDefinition;
+  if (!uiHandlerValue || uiHandlerValue.type !== "ui-handler") {
+    uiHandlerValue = null;
+  }
+
+  const parentPath = [...path];
+  parentPath.pop();
+
+  let deleteAllChildren = false;
+  if (
+    uiHandlerValue &&
+    (
+      (
+        uiHandlerValue.mustBeOfType &&
+        (
+          Array.isArray(uiHandlerValue.mustBeOfType) ?
+            !uiHandlerValue.mustBeOfType.includes(element.type as any) :
+            uiHandlerValue.mustBeOfType !== element.type
+        )
+      )
+    )
+  ) {
+    const isPatchable = patchList[element.type] &&
+      (
+        Array.isArray(uiHandlerValue.mustBeOfType) ?
+          uiHandlerValue.mustBeOfType.includes(patchList[element.type]) :
+          uiHandlerValue.mustBeOfType === patchList[element.type]
+      );
+
+    if (!isPatchable) {
+      primaryExecution.deleteNodeAt(
+        path,
+      );
+      secondaryExecution && secondaryExecution.deleteNodeAt(
+        path,
+      );
+      return;
+    } else {
+      const patching: any = {
+        type: patchList[element.type],
+      };
+
+      if (patchList[element.type] === "container") {
+        patching.containerType = null;
+      }
+
+      primaryExecution.updateNodeAt(
+        path,
+        patching,
+      );
+      secondaryExecution && secondaryExecution.updateNodeAt(
+        path,
+        patching,
+      );
+
+      if (isVoid(element)) {
+        deleteAllChildren = true;
+      }
+      return;
+    }
+  } else if (
+    uiHandlerValue &&
+    (
+      (
+        uiHandlerValue.allowsParent &&
+        !uiHandlerValue.allowsParent(
+          primaryExecution.getNodeAt(parentPath) as RichElement,
+          primaryExecution.getNodeAt(path) as RichElement,
+        )
+      )
+    )
+  ) {
+    primaryExecution.deleteNodeAt(
+      path,
+    );
+    secondaryExecution && secondaryExecution.deleteNodeAt(
+      path,
+    );
+    return;
+  }
+
+  let offset = 0;
+  const childrenAmount = element.children.length;
+  for (let i = 0; i < childrenAmount; i++) {
+    let actualIndex = i + offset;
+    const currentNode = element.children[actualIndex];
+    const currentNodePath = [...path, actualIndex];
+    const isIgnored = isIgnoredNode(currentNodePath, specialRules);
+
+    if (isIgnored) {
+      continue;
+    }
+
+    if (isElement(currentNode) || deleteAllChildren) {
+      const shouldDelete = deleteAllChildren ||
+        (
+          uiHandlerValue &&
+          (
+            uiHandlerValue.allowsChildren &&
+            !uiHandlerValue.allowsChildren(
+              primaryExecution.getNodeAt(currentNodePath) as RichElement,
+              primaryExecution.getNodeAt(path) as RichElement,
+            )
+          )
+        );
+
+      if (shouldDelete) {
+        primaryExecution.deleteNodeAt(
+          currentNodePath,
+        );
+        secondaryExecution && secondaryExecution.deleteNodeAt(
+          currentNodePath,
+        );
+      } else {
+        normalizeAccordingToUIHAndlerRules(
+          currentNode as RichElement,
+          currentNodePath,
+          executionRoot,
+          primaryExecution,
+          secondaryExecution,
+          specialRules,
+        );
+      }
+    }
+  }
 }
 
 export function deserializeChildrenForNode(
@@ -1014,31 +1685,6 @@ function deserializeElement(
       raw = SERIALIZATION_REGISTRY.DESERIALIZE.byTag[tagName](node) as any;
     }
   }
-
-  // invalid or unknown tag that can't deserialize
-  // if (!raw) {
-  //   return null;
-  // }
-
-  // const isText = typeof (raw as IText).text !== "undefined";
-  // if (isText && !SERIALIZATION_REGISTRY.PROHIBIT_TEXT[parent]) {
-  //   // text placed right in
-  //   return SERIALIZATION_REGISTRY.ON_INVALID_TEXT[parent] ?
-  //     SERIALIZATION_REGISTRY.ON_INVALID_TEXT[parent](raw as IText) :
-  //     null;
-  // } else if (
-  //   (SERIALIZATION_REGISTRY.SUPERBLOCKS[parent] && isText) ||
-  //   (SERIALIZATION_REGISTRY.BLOCKS[parent] && (
-  //     SERIALIZATION_REGISTRY.SUPERBLOCKS[(raw as RichElement).type] ||
-  //     SERIALIZATION_REGISTRY.BLOCKS[(raw as RichElement).type]
-  //   )) ||
-  //   (SERIALIZATION_REGISTRY.INLINES[parent] && !isText) ||
-  //   (SERIALIZATION_REGISTRY.ALLOWS_CHILDREN[parent] && !SERIALIZATION_REGISTRY.ALLOWS_CHILDREN[parent].includes((raw as RichElement).type))
-  // ) {
-  //   return SERIALIZATION_REGISTRY.ON_INVALID_CHILDREN[parent] ?
-  //     SERIALIZATION_REGISTRY.ON_INVALID_CHILDREN[parent](raw as RichElement) :
-  //     null;
-  // }
 
   return raw || null;
 }

@@ -5,12 +5,11 @@
  * @module
  */
 
-import { title } from "process";
 import { deserializeChildrenForNode, IReactifyArg, ISerializationRegistryType } from "..";
 import { deserializeElementBase, IElementBase, reactifyElementBase, serializeElementBase } from "../base";
 import { IFile } from "./file";
 import { ILink } from "./link";
-import { IText, STANDARD_TEXT_NODE } from "./text";
+import { IText } from "./text";
 
 /**
  * The function that registers and adds the title element in the given
@@ -46,7 +45,6 @@ export function registerTitle(registry: ISerializationRegistryType) {
     const title: ITitle = {
       ...base,
       type: "title",
-      containment: "block",
       subtype: node.tagName.toLowerCase() as any,
       children,
     }
@@ -97,10 +95,6 @@ export function registerTitle(registry: ISerializationRegistryType) {
 export interface ITitle extends IElementBase {
   type: "title";
   subtype: "h1" | "h2" | "h3" | "h4" | "h5" | "h6";
-  /**
-   * refers that it can only contain inline elements
-   */
-  containment: "block",
 
   /**
    * The title only has one children and it's text

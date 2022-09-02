@@ -4,7 +4,7 @@
  * @module
  */
 
-import { RichElement } from "../../../../internal/text/serializer";
+import { getContextFor, RichElement } from "../../../../internal/text/serializer";
 import React from "react";
 import { IWrapperContainerProps } from "../wrapper";
 import FormControl from "@mui/material/FormControl";
@@ -233,10 +233,16 @@ export function TemplatingOptions(props: IWrapperContainerProps) {
   const allIfConditions: ISingleTemplatingElementOption[] = [];
 
   // if we have a context, otherwise without context there are no options
-  if (props.state.currentSelectedElementContextSelectContext) {
+  const currentSelectElementForSelectContext = getContextFor(
+    props.state.currentSelectedElementAnchor,
+    "select-context",
+    props.state.currentValue,
+    props.state.currentRootContext,
+  );
+  if (currentSelectElementForSelectContext) {
     // we build the key list
-    Object.keys(props.state.currentSelectedElementContextSelectContext.properties).forEach((p) => {
-      const value = props.state.currentSelectedElementContextSelectContext.properties[p];
+    Object.keys(currentSelectElementForSelectContext.properties).forEach((p) => {
+      const value = currentSelectElementForSelectContext.properties[p];
       // it needs to be a context type
       if (value.type !== "context" || value.loopable) {
         return null;
@@ -252,11 +258,17 @@ export function TemplatingOptions(props: IWrapperContainerProps) {
     });
   }
 
+  const currentSelectElementForEachContext = getContextFor(
+    props.state.currentSelectedElementAnchor,
+    "select-loop",
+    props.state.currentValue,
+    props.state.currentRootContext,
+  );
   // if we have a context, otherwise without context there are no options
-  if (props.state.currentSelectedElementEachSelectContext) {
+  if (currentSelectElementForEachContext) {
     // we build the key list
-    Object.keys(props.state.currentSelectedElementEachSelectContext.properties).forEach((p) => {
-      const value = props.state.currentSelectedElementEachSelectContext.properties[p];
+    Object.keys(currentSelectElementForEachContext.properties).forEach((p) => {
+      const value = currentSelectElementForEachContext.properties[p];
       // it needs to be a context type
       const isValidForBoolean = value.type === "boolean";
       const isValidForLoop = value.type === "context" && value.loopable;

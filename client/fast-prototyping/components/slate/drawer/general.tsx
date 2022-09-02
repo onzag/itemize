@@ -289,7 +289,7 @@ class GeneralTitleOptions extends React.PureComponent<IWrapperContainerProps, IG
       // which does an arbitrary partial value update at the selected
       // anchor
       this.props.helpers.set({
-        subtype: newValue,
+        subtype: newValue as any,
       }, this.props.state.currentSelectedElementAnchor);
     });
   }

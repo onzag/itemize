@@ -296,7 +296,6 @@ export class PropertyViewRichTextViewer extends React.Component<IPropertyViewRic
         const imgInfo: IImage = {
           ...base,
           type: "image",
-          containment: "void-block",
           alt: img.getAttribute("alt") || null,
           src: img.getAttribute("src") || img.dataset.src,
           srcId: img.dataset.srcId,

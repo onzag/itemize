@@ -4,7 +4,6 @@
  * @module
  */
 
-import { RichElement } from "../../../../internal/text/serializer";
 import React from "react";
 import { IWrapperContainerProps } from "../wrapper";
 import FormControl from "@mui/material/FormControl";
@@ -257,12 +256,22 @@ class SingleAction extends React.PureComponent<ISingleActionProps, ISingleAction
  */
 export function ActionsOptions(props: IWrapperContainerProps) {
   // get the current node that we have currently selected
-  const currentNode = props.state.currentSelectedElement as RichElement;
+  const currentNode = props.state.currentSelectedInlineElement ||
+    props.state.currentSelectedBlockElement ||
+    props.state.currentSelectedSuperBlockElement;
+
+  const currentNodeContext = props.state.currentSelectedInlineContext ||
+    props.state.currentSelectedBlockContext ||
+    props.state.currentSelectedSuperBlockContext;
+
+  const currentNodeAnchor = props.state.currentSelectedInlineElementAnchor ||
+    props.state.currentSelectedBlockElementAnchor ||
+    props.state.currentSelectedSuperBlockElementAnchor;
 
   // and now let's build all the options that we have for that we need to check our current context, if we have one
-  let allOptions = props.state.currentSelectedElementContext ? Object.keys(props.state.currentSelectedElementContext.properties).map((p) => {
+  let allOptions = currentNodeContext ? Object.keys(currentNodeContext.properties).map((p) => {
     // get the value of each property in the context properties
-    const value = props.state.currentSelectedElementContext.properties[p];
+    const value = currentNodeContext.properties[p];
 
     // and it needs to be a function to pass
     if (value.type !== "function") {
@@ -273,11 +282,11 @@ export function ActionsOptions(props: IWrapperContainerProps) {
     return {
       value: p,
       label: value.label,
-      primary: props.state.currentRootContext !== props.state.currentSelectedElementContext,
+      primary: props.state.currentRootContext !== currentNodeContext,
     }
   }).filter((v) => !!v) : [];
 
-  if (props.state.currentRootContext !== props.state.currentSelectedElementContext) {
+  if (props.state.currentRootContext !== currentNodeContext) {
     allOptions = allOptions.concat(Object.keys(props.state.currentRootContext.properties).map((p) => {
       // get the value of each property in the context properties
       const value = props.state.currentRootContext.properties[p];
@@ -310,7 +319,7 @@ export function ActionsOptions(props: IWrapperContainerProps) {
             name={v}
             actionValue={currentNode[v] || null}
             options={allOptions}
-            anchor={props.state.currentSelectedElementAnchor}
+            anchor={currentNodeAnchor}
             onChange={props.helpers.setAction}
           />
         ))

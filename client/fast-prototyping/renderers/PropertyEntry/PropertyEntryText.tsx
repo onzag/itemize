@@ -178,7 +178,7 @@ class PropertyEntryTextRenderer extends React.PureComponent<IPropertyEntryTextRe
         features={this.props.args.features ? { ...this.props.features, ...this.props.args.features } : this.props.features}
         value={this.props.currentValue}
         autoFocus={this.props.autoFocus}
-        internalValue={this.props.currentInternalValue}
+        currentValue={this.props.currentInternalValue}
         onChange={this.props.onChange}
         onInsertFile={this.props.onInsertFile}
         onInsertFileFromURL={this.props.onInsertFileFromURL}

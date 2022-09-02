@@ -48,7 +48,7 @@ interface IVideoDialogProps {
    * @returns a boolean on whether the url was accepted or not
    * on false it should show an error
    */
-  acceptVideo: (url: string) => boolean;
+  acceptVideo: (url: string) => Promise<boolean>;
 }
 
 /**
@@ -108,9 +108,9 @@ export class VideoDialog extends React.PureComponent<IVideoDialogProps, IVideoDi
    * that does the actual insertion and with the given
    * status decides whether to show an error or close
    */
-  public acceptVideo() {
+  public async acceptVideo() {
     // insert and get the status
-    const status = this.props.acceptVideo(this.state.videoURL);
+    const status = await this.props.acceptVideo(this.state.videoURL);
 
     // if it succeeded as the status was true
     if (status) {

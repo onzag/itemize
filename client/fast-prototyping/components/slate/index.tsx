@@ -12,15 +12,18 @@ import { BaseEditor, createEditor, Transforms, Range, Editor, Element, Node, Pat
 import { Slate, Editable, withReact, ReactEditor, RenderElementProps, RenderLeafProps } from "slate-react";
 import { withHistory, HistoryEditor } from "slate-history";
 
-import { IRootLevelDocument, deserialize, SERIALIZATION_REGISTRY, RichElement, deserializePlain, checkShouldMerge } from "../../../internal/text/serializer";
+import {
+  IRootLevelDocument, deserialize, SERIALIZATION_REGISTRY, RichElement, deserializePlain,
+  getContextFor, normalizeElement, getAllowedChildrenTypes, getUIHandlerValueWithKnownContextFor, isInline, isVoid, isSuperBlock, isBlock
+} from "../../../internal/text/serializer";
 import {
   CONTAINER_CLASS_PREFIX, countSize, CUSTOM_CLASS_PREFIX,
-  IFeatureSupportOptions, NULL_DOCUMENT, RICH_TEXT_CLASS_PREFIX, serializeString
+  IFeatureSupportOptions, RICH_TEXT_CLASS_PREFIX, serializeString
 } from "../../../internal/text";
 import { LAST_RICH_TEXT_CHANGE_LENGTH } from "../../../../constants";
 import uuid from "uuid";
 import { IInsertedFileInformationType } from "../../../internal/components/PropertyEntry/PropertyEntryText";
-import { convertStyleStringToReactObject, copyElementBase, IUIHandlerProps } from "../../../internal/text/serializer/base";
+import { convertStyleStringToReactObject, IUIHandlerProps } from "../../../internal/text/serializer/base";
 import { IVideo } from "../../../internal/text/serializer/types/video";
 import { mimeTypeToExtension } from "../../../../util";
 import prettyBytes from "pretty-bytes";
@@ -31,7 +34,10 @@ import { IText, STANDARD_TEXT_NODE } from "../../../internal/text/serializer/typ
 import { ICustom } from "../../../internal/text/serializer/types/custom";
 import { IInline } from "../../../internal/text/serializer/types/inline";
 import { CurrentElementProvider, CurrentElementRetriever } from "./current-element";
+import { IVoidBlock } from "../../../internal/text/serializer/types/void-block";
+import { IList } from "../../../internal/text/serializer/types/list";
 import { STANDARD_PARAGRAPH } from "../../../internal/text/serializer/types/paragraph";
+import { ITemplateArgContextDefinition, ITemplateArgHTMLDefinition, ITemplateArgTextDefinition, ITemplateArgUIHandlerDefinition } from "../../../internal/text/serializer/template-args";
 
 declare module 'slate' {
   interface CustomTypes {
@@ -68,207 +74,6 @@ export interface ISlateTemplateUIHandlerProps extends IUIHandlerProps {
    * requests extra info
    */
   selected?: boolean;
-}
-
-/**
- * The template argument is used in a template context in order
- * to specify the existant arguments that are going to be used during
- * a template construction of a rich text when such is meant to be rendered
- * as a template, put the example of a rich text that is expected to be a template where
- * a score and a name exist, so we have two properties that will be used, name and score
- * as
- * 
- * {name: "kitten", score: "3"}
- * 
- * Each property to be used will be defined as an argument as
- * 
- * {
- *   type: "text",
- *   label: "name",
- * }
- * 
- * we do not know the values of these only at render time, but then we know
- * these are available arguments
- */
-export interface ITemplateArg {
-  /**
-   * The type of the template argument, such are
-   * 1. text: basic text type, implies a string value
-   * 2. link: a link value, specifies a url
-   * 3. html: HTML content to replace the inner html of another component
-   * 4. function: a function, to be used within an action
-   * 5. ui-handler: a special type that represents an ui handled element, these
-   * can be used to specify custom types with custom functionality, remember to specify
-   * "handler", "handlerExtraArgs" and "handlerPassSlateInfo" to unlock
-   * the ui-handler full potential
-   */
-  type: "text" | "link" | "html" | "function" | "ui-handler" | "boolean";
-
-  /**
-   * The label to be used to specify this value, it should be given
-   * in the given language that wants to be shown as, the actual string
-   * value to be used depend on the key that the argument has eg.
-   * 
-   * {
-   *   type: "context",
-   *   label: "base",
-   *   properties: {
-   *     name: {
-   *       type: "text",
-   *       label: "nombre"
-   *     }
-   *   }
-   * }
-   * 
-   * where name is the actual value used, and label is a good i18n label
-   * 
-   * A react node can also be given to pass the i18n component
-   */
-  label: string | React.ReactNode;
-
-  /**
-   * A flag that specifies that when placed in the root the property
-   * should not really be accessible, mainly used for display purposes
-   * TODO implement
-   */
-  nonRootInheritable?: boolean;
-
-  /**
-   * an optional html content that can be used to render when it
-   * matches this html signature, when a string is given
-   * it will modify the inner html, otherwise it will be used as
-   * a react component
-   */
-  htmlDisplay?: string | React.ReactNode;
-
-  /**
-   * An optional text content that can be used to render when it matches
-   * the text content signature
-   */
-  textDisplay?: string;
-
-  /**
-   * A handler component to use during the edition of a component
-   * that matches this ui handler signature
-   */
-  handler?: React.ComponentType<ISlateTemplateUIHandlerProps>;
-  /**
-   * Extra arguments to pass to the handler component itself
-   * every instance of this given handler will be passed the same
-   * extra argument, it can be used to specify that the handler
-   * is being used in edit mode and as such render differently
-   * and have different functionality
-   */
-  handlerExtraArgs?: any;
-  /**
-   * Pass extra attributes to the props of the handler
-   * for the rich text, these include
-   * "selected" for when the rich text editor is selecting
-   * "helpers" for the rich text helpers
-   */
-  handlerPassSlateInfo?: boolean;
-  /**
-   * Makes the ui handler in question be void so it doesn't
-   * have children and it's managed all within itself
-   */
-  handlerIsVoid?: boolean;
-  /**
-   * When breaking an ui handler on an end of line a new paragraph will
-   * be created ignoring the previous ui handler
-   * use this method to keep and use the split method
-   */
-  handlerKeepOnBreaks?: boolean;
-  /**
-   * when super breaking in the ui handler this ui handler will also
-   * be escaped alongside it and as such no new element
-   * will be created in it
-   */
-  handlerEscapeOnSuperBreaks?: boolean;
-}
-
-
-/**
- * Represents the available args in the context, a context is a compound
- * of arguments that represent an object shape, that will be used to create
- * a template and render such
- * 
- * For example let's say a template consumes a context such as
- * 
- * {
- *   name: "kitten",
- *   score: "3",
- *   achievements: [
- *     {
- *       type: "bad-kitten"
- *     },
- *     {
- *       type: "angry-kitten"
- *     },
- *   ]
- * }
- * 
- * In order to create a context that specifies this structure
- * 
- * {
- *   type: "context",
- *   label: "root",
- *   properties: {
- *     name: {
- *       type: "text",
- *       label: "name",
- *     },
- *     score: {
- *       type: "text",
- *       label: "score",
- *     },
- *     achievements: {
- *       type: "context",
- *       label: "achievements",
- *       loopable: true,
- *       properties: {
- *         type: {
- *           type: "text",
- *           label: "type",
- *         }
- *       }
- *     }
- *   }
- * }
- * 
- * And that will enable the editor to understand the structure that it should
- * consume
- */
-export interface ITemplateArgsContext {
-  /**
-   * The type which will always be "context"
-   */
-  type: "context";
-  /**
-   * Allows to specify a wrapper to wrap based on the context
-   */
-  wrapper?: (n: React.ReactNode, emulatedIndex?: number) => React.ReactNode;
-  /**
-   * A human readable label for this given context value
-   * it should be in the given language
-   * 
-   * A react node can be given, used for passing the I18n component
-   */
-  label: string | React.ReactNode;
-  /**
-   * If the context is an array or iterable, then mark it as such
-   */
-  loopable?: boolean;
-  /**
-   * Emulate render the element a couple of times in order to give the effect
-   * of many views
-   */
-  loopEmulation?: number;
-  /**
-   * The properties that the context contains
-   */
-  properties: {
-    [name: string]: ITemplateArg | ITemplateArgsContext;
-  };
 }
 
 /**
@@ -452,89 +257,6 @@ const ALL_PROMISE = new Promise<void>(async (resolve) => {
  */
 export interface IAccessibleFeatureSupportOptions extends IFeatureSupportOptions {
   /**
-   * Whether an image can be inserted at the given location
-   */
-  canInsertImage: boolean;
-  /**
-   * Whether a video can be inserted at the given location
-   */
-  canInsertVideo: boolean;
-  /**
-   * Whether a file can be inserted at the given location
-   */
-  canInsertFile: boolean;
-  /**
-   * Whether a link can be inserted at the given location
-   */
-  canInsertLink: boolean;
-  /**
-   * Whether a container can be inserted at the given location
-   */
-  canInsertContainer: boolean;
-  /**
-   * Whether a list can be inserted at the given location
-   */
-  canInsertList: boolean;
-  /**
-   * Whether a custom element can be inserted at the given
-   * location
-   */
-  canInsertCustom: boolean;
-  /**
-   * Whether a quote can be inserted at the given location
-   */
-  canInsertQuote: boolean;
-  /**
-   * Whether a title element can be inserted at the given location
-   */
-  canInsertTitle: boolean;
-  /**
-   * Whether a rich class element can be inserted at the given location
-   */
-  canInsertRichClass: boolean;
-
-  /**
-   * Whether the style of the current element can be set
-   */
-  canSetStyle: boolean;
-  // Templating specific
-  /**
-   * Whether we can set the hover style
-   * normally true if templating is true
-   */
-  canSetHoverStyle: boolean;
-  /**
-   * Whether the active style can be set
-   * normally true if templating is true
-   */
-  canSetActiveStyle: boolean;
-  /**
-   * Whether the dynamic href can be set for links
-   * normally true if templating is true
-   */
-  canSetDynamicHref: boolean;
-  /**
-   * Whether an UI handler can be set on the given element
-   * normally true if templating is true
-   */
-  canSetUIHandler: boolean;
-  /**
-   * Whether an action function can be set on the given element
-   * normally true if templating is true
-   */
-  canSetActionFunction: boolean;
-  /**
-   * Whether a loop can be established
-   * normally true if templating is true
-   */
-  canSetLoop: boolean;
-  /**
-   * Able to insert any custom element from
-   * custom toolbar
-   */
-  canInsertAnyElement: boolean;
-
-  /**
    * The classes that are available by the rich text
    * non prefixed
    */
@@ -588,7 +310,7 @@ export interface IHelperFunctions {
   /**
    * Provies the context for the given path
    */
-  getContextFor: (path: Path) => ITemplateArgsContext;
+  getContextFor: (element: RichElement | IText | Path, level?: "final" | "select-context" | "select-loop", onlySwichingContext?: boolean) => ITemplateArgContextDefinition;
 
   /**
    * performs a pseudo selection at a given path
@@ -622,7 +344,7 @@ export interface IHelperFunctions {
    * Focuses at the desired location
    * @param at the range to insert at
    */
-  focusAt: (at: Range) => void;
+  focusAt: (at: Range | Path) => Promise<void>;
 
   /**
    * Will insert an image based on a given file that has
@@ -631,20 +353,20 @@ export interface IHelperFunctions {
    * @param at an optional range to insert at
    * @param standalone whether to make it a standalone image
    */
-  insertImage: (file: File, standalone: boolean, at?: Range | Path) => void;
+  insertImage: (file: File, standalone: boolean) => void;
   /**
    * Will insert a video given the information
    * @param url the url of the video, only youtube and vimeo supported as origin
    * @param at an optional range to insert at
    * @returns a boolean true if the video was properly inserted, false if the video url was invalid
    */
-  insertVideo: (url: string, at?: Range | Path) => boolean;
+  insertVideo: (url: string) => boolean;
   /**
    * Will insert a file based on the information given
    * @param file the file to insert
    * @param at an optional range to insert at
    */
-  insertFile: (file: File, at?: Range | Path) => void;
+  insertFile: (file: File) => void;
   /**
    * Will insert a container at the given location
    * @param type optional, the container type, otherwise will
@@ -654,7 +376,7 @@ export interface IHelperFunctions {
    * @param type the container type
    * @param at an optional range to insert at
    */
-  insertContainer: (type?: string, at?: Range | Path) => void;
+  insertContainer: (type?: string) => void;
   /**
    * Inserts a custom element
    * this is caret based unless you specify your own custom range
@@ -662,7 +384,7 @@ export interface IHelperFunctions {
    * @param type the custom type
    * @param at an optional range to insert at
    */
-  insertCustom: (type: string, at?: Range | Path) => void;
+  insertCustom: (type: string) => void;
   /**
    * Inserts a template text
    * this is caret based unless you specify your own custom range
@@ -671,7 +393,7 @@ export interface IHelperFunctions {
    * @param value the actual value for the template text to be used off the context
    * @param at an optional range to insert at
    */
-  insertTemplateText: (label: string, value: string, at?: Range | Path) => void;
+  insertTemplateText: (label: string, value: string) => void;
   /**
    * Inserts a template html fragment
    * this is caret based unless you specify your own custom range
@@ -680,41 +402,33 @@ export interface IHelperFunctions {
    * @param value the actual value for the template html to be used off the context
    * @param at an optional range to insert at
    */
-  insertTemplateHTML: (label: string, value: string, at?: Range | Path) => void;
-  /**
-   * Inserts an UI handled container
-   * @param type the type of the container
-   * @param value the ui handler identifier in the context
-   * @param args the args for the ui handler
-   * @param at an optional range to insert at
-   */
-  insertUIHandledContainer: (type: string, value: string, args: { [key: string]: string }, at?: Range | Path) => void;
+  insertTemplateHTML: (label: string, value: string) => void;
 
   /**
    * Inserts an element at the given position
    * @param element the element to insert
    * @param at optional range to insert at
    */
-  insertElement: (element: RichElement, at?: Range | Path) => void;
+  insertElement: (element: RichElement) => void;
 
   /**
    * Makes a quote out of the current element
    * this is caret based unless you specify your own custom range
    * note that calling this function will cause a refocus
    */
-  toggleQuote: (at?: Range | Path) => void;
+  toggleQuote: () => void;
   /**
    * Makes a title out of the current element
    * this is caret based unless you specify your own custom range
    * note that calling this function will cause a refocus
    */
-  toggleTitle: (type: "h1" | "h2" | "h3" | "h4" | "h5" | "h6", at?: Range | Path) => void;
+  toggleTitle: (type: "h1" | "h2" | "h3" | "h4" | "h5" | "h6") => void;
   /**
    * Makes a list out of the current element
    * this is caret based unless you specify your own custom range
    * note that calling this function will cause a refocus
    */
-  toggleList: (type: "bulleted" | "numbered", at?: Range | Path) => void;
+  insertList: (type: "bulleted" | "numbered") => void;
   /**
    * Makes a link out of the current element
    * this is caret based unless you specify your own custom range
@@ -722,7 +436,7 @@ export interface IHelperFunctions {
    * @returns a boolean specifying whether the toggling was succesful or it failed
    * for some reason, eg. invalid link, links are not supported
    */
-  toggleLink: (url: string, templateValue: string, at?: Range | Path) => boolean;
+  toggleLink: (url: string, templateValue: string) => boolean;
 
   /**
    * Formats the current text as bold
@@ -730,21 +444,7 @@ export interface IHelperFunctions {
    * ranges
    * It will refocus once done
    */
-  formatToggleBold: () => void;
-  /**
-   * formats the current text as italic
-   * this is always caret based and does not allow for custom
-   * ranges
-   * It will refocus once done
-   */
-  formatToggleItalic: () => void;
-  /**
-   * formats to underline
-   * this is always caret based and does not allow for custom
-   * ranges
-   * It will refocus once done
-   */
-  formatToggleUnderline: () => void;
+  formatToggle: (type: "bold" | "italic" | "underline") => void;
 
   /**
    * does an arbitrary update of arbitrary arguments off the current
@@ -753,7 +453,7 @@ export interface IHelperFunctions {
    * @param args the arbitrary arguments (partial value)
    * @param anchor the anchor where the update should take place (should point at an element)
    */
-  set: (args: any, anchor: Path) => void;
+  set: (args: Partial<RichElement> | Partial<IText>, anchor: Path) => void;
 
   /**
    * Sets the current style for the element
@@ -899,19 +599,38 @@ export interface ISlateEditorInternalStateType {
   currentSelectedInlineElement: RichElement;
   currentSelectedBlockElement: RichElement;
   currentSelectedSuperBlockElement: RichElement;
+  currentSelectedElement: RichElement;
 
   currentSelectedTextAnchor: Path;
   currentSelectedInlineElementAnchor: Path;
   currentSelectedBlockElementAnchor: Path;
   currentSelectedSuperBlockElementAnchor: Path;
+  currentSelectedElementAnchor: Path;
 
-  currentRootContext: ITemplateArgsContext;
+  currentRootContext: ITemplateArgContextDefinition;
+  currentSelectedSuperBlockContext: ITemplateArgContextDefinition;
+  currentSelectedBlockContext: ITemplateArgContextDefinition;
+  currentSelectedInlineContext: ITemplateArgContextDefinition;
+  currentSelectedElementContext: ITemplateArgContextDefinition;
 
   /**
    * The current value from the document that is used
    * in the slate rich text editor
    */
   currentValue: IRootLevelDocument;
+
+  /**
+   * Contextual, very specific to the current context
+   * where the cursor is located
+   */
+  allowsInsertElement: (element: RichElement) => boolean;
+  allowsText: boolean;
+  inlineIsVoid: boolean;
+  blockIsVoid: boolean;
+  superblockIsVoid: boolean;
+  superBlockUIHandler: ITemplateArgUIHandlerDefinition;
+  blockUIHandler: ITemplateArgUIHandlerDefinition;
+  inlineUIHandler: ITemplateArgUIHandlerDefinition;
 }
 
 /**
@@ -1029,7 +748,7 @@ interface ISlateEditorProps {
    * rendererArgs property it might be passed there, as this is a rendering
    * element
    */
-  rootContext: ITemplateArgsContext;
+  rootContext: ITemplateArgContextDefinition;
   /**
    * The root i18n, renderers have a way to receive the root i18n data
    * based on the property definition they are using
@@ -1161,6 +880,8 @@ interface ISlateEditorState extends ISlateEditorInternalStateType {
   allRichClasses: string[];
 }
 
+const falseFn = () => false;
+
 /**
  * Behold the component that does a lot of the magic
  * for rich text handling, this component does not have any definition
@@ -1211,6 +932,7 @@ export class SlateEditor extends React.Component<ISlateEditorProps, ISlateEditor
    * gone, not all the time
    */
   private ignoreCurrentLocationToRemoveEmpty: boolean = false;
+  private isInNormalization: boolean = false;
   /**
    * When a call to delete the current selected node is done, the selection anchors as they have been set
    * need to be removed and reset because otherwise they will be pointing to invalid nodes, this internal
@@ -1277,6 +999,21 @@ export class SlateEditor extends React.Component<ISlateEditorProps, ISlateEditor
             currentSelectedInlineElementAnchor: null,
             currentSelectedBlockElementAnchor: null,
             currentSelectedSuperBlockElementAnchor: null,
+            currentSelectedBlockContext: null,
+            currentSelectedInlineContext: null,
+            currentSelectedSuperBlockContext: null,
+            currentSelectedElement: null,
+            currentSelectedElementAnchor: null,
+            currentSelectedElementContext: null,
+
+            allowsInsertElement: falseFn,
+            allowsText: false,
+            inlineIsVoid: false,
+            blockIsVoid: false,
+            superblockIsVoid: false,
+            superBlockUIHandler: null,
+            blockUIHandler: null,
+            inlineUIHandler: null,
           };
         }
 
@@ -1285,7 +1022,9 @@ export class SlateEditor extends React.Component<ISlateEditorProps, ISlateEditor
       } else {
         // and deserialize it based on the props
         const newcurrentValue = props.isRichText ?
-          deserialize(props.value, state.currentValue) :
+          deserialize(props.value, state.currentValue, {
+            useContextRulesOf: state.currentRootContext,
+          }) :
           deserializePlain(props.value, state.currentValue);
 
         // if there's no internal value to compare, or the new internal value doesn't
@@ -1318,6 +1057,17 @@ export class SlateEditor extends React.Component<ISlateEditorProps, ISlateEditor
             currentSelectedInlineElementAnchor: null,
             currentSelectedBlockElementAnchor: null,
             currentSelectedSuperBlockElementAnchor: null,
+            currentSelectedElement: null,
+            currentSelectedElementAnchor: null,
+
+            allowsInsertElement: falseFn,
+            allowsText: false,
+            inlineIsVoid: false,
+            blockIsVoid: false,
+            superblockIsVoid: false,
+            superBlockUIHandler: null,
+            blockUIHandler: null,
+            inlineUIHandler: null,
           };
         }
       }
@@ -1337,7 +1087,9 @@ export class SlateEditor extends React.Component<ISlateEditorProps, ISlateEditor
       // setting up the internal value from the property
       // first we pick the internal value if available
       // or otherwise we parse one
-      currentValue: props.currentValue || (props.isRichText ? deserialize(props.value) : deserializePlain(props.value)),
+      currentValue: props.currentValue || (props.isRichText ? deserialize(props.value, null, {
+        useContextRulesOf: props.rootContext,
+      }) : deserializePlain(props.value)),
 
       // we are synced
       synced: true,
@@ -1362,9 +1114,15 @@ export class SlateEditor extends React.Component<ISlateEditorProps, ISlateEditor
       currentSelectedInlineElementAnchor: null,
       currentSelectedBlockElementAnchor: null,
       currentSelectedSuperBlockElementAnchor: null,
+      currentSelectedElement: null,
+      currentSelectedElementAnchor: null,
 
       isRichText: props.isRichText,
       currentRootContext: props.rootContext || null,
+      currentSelectedBlockContext: null,
+      currentSelectedInlineContext: null,
+      currentSelectedSuperBlockContext: null,
+      currentSelectedElementContext: null,
       currentValid: props.currentValid,
 
       // ensure SSR compatibility
@@ -1373,6 +1131,15 @@ export class SlateEditor extends React.Component<ISlateEditorProps, ISlateEditor
       allContainers: [],
       allCustom: [],
       allRichClasses: [],
+
+      allowsInsertElement: falseFn,
+      allowsText: false,
+      inlineIsVoid: false,
+      blockIsVoid: false,
+      superblockIsVoid: false,
+      superBlockUIHandler: null,
+      blockUIHandler: null,
+      inlineUIHandler: null,
     }
 
     this.isUnmounted = false;
@@ -1434,7 +1201,7 @@ export class SlateEditor extends React.Component<ISlateEditorProps, ISlateEditor
     this.insertCustom = this.insertCustom.bind(this);
     this.toggleQuote = this.toggleQuote.bind(this);
     this.toggleTitle = this.toggleTitle.bind(this);
-    this.toggleList = this.toggleList.bind(this);
+    this.insertList = this.insertList.bind(this);
     this.toggleLink = this.toggleLink.bind(this);
     this.setStyle = this.setStyle.bind(this);
     this.set = this.set.bind(this);
@@ -1444,11 +1211,8 @@ export class SlateEditor extends React.Component<ISlateEditorProps, ISlateEditor
     this.setContext = this.setContext.bind(this);
     this.setIfCondition = this.setIfCondition.bind(this);
     this.setForEach = this.setForEach.bind(this);
-    this.formatToggleBold = this.formatToggleBold.bind(this);
-    this.formatToggleItalic = this.formatToggleItalic.bind(this);
-    this.formatToggleUnderline = this.formatToggleUnderline.bind(this);
+    this.formatToggle = this.formatToggle.bind(this);
     this.setAction = this.setAction.bind(this);
-    this.insertUIHandledContainer = this.insertUIHandledContainer.bind(this);
     this.insertElement = this.insertElement.bind(this);
 
     this.availableFilteringFunction = this.availableFilteringFunction.bind(this);
@@ -1647,6 +1411,14 @@ export class SlateEditor extends React.Component<ISlateEditorProps, ISlateEditor
    * @param entry the entry we are normalizing
    */
   public normalizeNode(entry: NodeEntry<Node>) {
+    // the normalization function that comes
+    // from the serializer takes care of the
+    // entire serialization mechanism and shall not
+    // be recalled when it's doing its job
+    if (this.isInNormalization) {
+      return;
+    }
+
     const [node, path] = entry;
 
     // if it's the editor itself, this happens when clearing
@@ -1664,340 +1436,58 @@ export class SlateEditor extends React.Component<ISlateEditorProps, ISlateEditor
 
       // if it's an element
     } else if (Element.isElement(node)) {
-      const managedChildrenExistance = node.children.map((v) => true);
-      // the total current nodes
-      let totalNodes = node.children.length;
-      // we got to check first if we should merge the nodes
-      let n = 0;
-      // for that we loop
-      for (let i = 0; i < node.children.length; i++) {
-        let prevIndex = i - 1;
-        while (!managedChildrenExistance[prevIndex] && prevIndex >= 0) {
-          prevIndex--;
-        }
-        const prev = node.children[prevIndex];
-        const current = node.children[i];
-        const next = node.children[i + 1];
+      this.isInNormalization = true;
 
-        // if we have a text type inside
-        if (Text.isText(current)) {
-          // we get the previous and current path
-          const curPath = path.concat(n);
-          // and this is where we are now
-          const currentTextAnchorPath = this.editor.selection && this.editor.selection.anchor.path;
-          // if we have a previous that is also a text that is not our anchor and is mergable
-          if (
-            prev &&
-            Text.isText(prev) &&
-            checkShouldMerge(current, prev)
-          ) {
-            // we merge it
-            Transforms.mergeNodes(this.editor, { at: path.concat(n) });
-            n--;
-            totalNodes--;
-            // otherwise if we have an empty node and either it is not selected which means
-            // all non selected empty text nodes will dissapear regardless, or if it's able
-            // to merge which means that it's a pointless empty node
-            // note that we prevent to delete the node if that will leave us with no text nodes
-          } else if (
-            // empty text node
-            current.text === "" &&
-            // that is not our current anchor path or we have set it to ignore the current
-            (!equals(curPath, currentTextAnchorPath, { strict: true }) || this.ignoreCurrentLocationToRemoveEmpty) &&
-            // and total nodes in the entire thing is not justcurrentTextAnchorPath that one node (there's more)
-            totalNodes !== 1 &&
-            // is not the ending of an inline element, as there should be an empty text node after
-            // that in the end of the line
-            !(Element.isElement(prev) && this.editor.isInline(prev) && (!next || !Text.isText(next))) &&
-            // is not the start of an inline element, as there should be an empty text node after it
-            // before the start of the line
-            !(Element.isElement(next) && this.editor.isInline(next) && (!prev || !Text.isText(prev)))
-          ) {
-            // delete it
-            Transforms.delete(this.editor, { at: path.concat(n) });
-            n--;
-            totalNodes--;
-            managedChildrenExistance[i] = false;
-          }
-        } else if (Element.isElement(current) && this.editor.isInline(current)) {
-          // if we have an inline and they are both
-          // mergable the previous with the current
-          if (
-            prev &&
-            Element.isElement(prev) &&
-            this.editor.isInline(prev) &&
-            checkShouldMerge(current, prev)
-          ) {
-            // we merge it
-            Transforms.mergeNodes(this.editor, { at: path.concat(n) });
-            n--;
-            totalNodes--;
-          }
+      normalizeElement(
+        node,
+        path,
+        this.state.currentValue,
+        {
+          workOnOriginal: false,
+          updateNodeAt(path, v) {
+            Transforms.setNodes(this.editor, v, {
+              at: path,
+            });
+          },
+          deleteNodeAt(path) {
+            Transforms.delete(this.editor, {
+              at: path,
+            });
+          },
+          insertNodeAt(path, node, targetIndex) {
+            Transforms.insertNodes(this.editor, node, {
+              at: [...path, targetIndex],
+            });
+          },
+          mergeNodesAt(basePath, referencePath) {
+            const parentPath = [...basePath];
+            parentPath.pop();
 
-          // now if we don't have a text node after our inline element
-          if (!next || !Text.isText(next)) {
-            // let's pick the last text element
-            const lastText = (current as any).children[(current as any).children.length - 1];
-            // and insert it after the inline
-            Transforms.insertNodes(
-              this.editor,
-              {
-                bold: false,
-                italic: false,
-                underline: false,
-                ...copyElementBase(lastText),
-                text: "",
+            Transforms.mergeNodes(this.editor, {
+              at: parentPath,
+              match(node, pathMatch) {
+                return Path.equals(pathMatch, basePath) || Path.equals(pathMatch, referencePath);
               },
-              { at: path.concat(n + 1) }
-            );
-
-            n++;
-            totalNodes++;
-          }
-
-          // now if we don't have a prev node after our inline element
-          if (!prev || !Text.isText(prev)) {
-            // let's pick the first text element
-            const firstText = (current as any).children[0];
-            // and insert it after the inline
-            Transforms.insertNodes(
-              this.editor,
-              {
-                bold: false,
-                italic: false,
-                underline: false,
-                ...copyElementBase(firstText),
-                text: "",
-              },
-              { at: path.concat(n - 1) }
-            );
-
-            n++;
-            totalNodes++;
-          }
+            });
+          },
+          splitElementAndEscapeChildIntoParentAt(path, escapingChildIndex) {
+            // TODO
+          },
+          wrapNodeAt(path, wrappers) {
+            wrappers.forEach((wrapper) => {
+              Transforms.wrapNodes(this.editor, wrapper, {
+                at: path,
+              });
+            });
+          },
+          getNodeAt(path) {
+            return Node.get(this.editor, path) as RichElement;
+          },
         }
+      );
 
-        // one more
-        n++;
-      }
-
-      // just a cheap casting
-      const nodeAsRichElement = (node as any as RichElement);
-
-      // now if we have a children that can only have inline as children types
-      // because that's what a block basically is, it contains inlines as children
-      // as well as text
-      if (SERIALIZATION_REGISTRY.BLOCKS[nodeAsRichElement.type]) {
-        // we get the node from the given path
-        const newNode = Node.get(this.editor, path);
-
-        // and now we recalculate
-        let offset = 0;
-        for (let i = 0; i < ((newNode as any).children).length; i++) {
-          // we get the given children
-          const child = (newNode as any).children[i];
-          // and if these children are not inline components
-          if (Element.isElement(child) && !this.editor.isInline(child)) {
-            // then they should be unwrapped from it
-            Transforms.unwrapNodes(this.editor, { at: path.concat(i + offset) });
-            // and we offset from the children, we add how many new children
-            // we have added and offset by the lost node that we just unwrapped
-            offset += child.children.length - 1;
-          }
-        }
-
-        // if we have no children
-        if ((newNode as any).children.length === 0) {
-          // then we add a basic text node
-          Transforms.insertNodes(this.editor,
-            STANDARD_TEXT_NODE() as any,
-            { at: path.concat(0) }
-          );
-        }
-
-        // now for inlines that can only truly have
-        // texts as children
-      } else if (SERIALIZATION_REGISTRY.INLINES[nodeAsRichElement.type]) {
-        // get the node again
-        const newNode = Node.get(this.editor, path);
-
-        // and now we can check everything inside it
-        const nextPath = [...path];
-        nextPath[nextPath.length - 1]++;
-
-        let offset = 0;
-        let didATransform = false;
-        for (let i = 0; i < ((newNode as any).children as any).length; i++) {
-          // and now we can get the child
-          const child = (newNode as any).children[i];
-          // and if it's an element (not text) it's forbidden and should
-          // be unwrapped
-          if (Element.isElement(child)) {
-            didATransform = true;
-            if (SERIALIZATION_REGISTRY.SUPERBLOCKS[child.type]) {
-              // move to next to this inline so they are not inside
-              Transforms.moveNodes(this.editor, { at: path.concat(i + offset), to: nextPath });
-              nextPath[nextPath.length - 1]++;
-              offset -= 1;
-            } else {
-              // so we do so note that normalization will keep looping on itself
-              // until there are only text nodes left
-              Transforms.unwrapNodes(this.editor, { at: path.concat(i + offset) });
-              offset += child.children.length - 1;
-            }
-          }
-        }
-
-        const newerNode = Node.get(this.editor, path);
-        const isTextNodesEmpty: boolean = ((newerNode as any).children as any).length === 0 || ((newerNode as any).children as any).every((n: any) => {
-          if (Text.isText(n)) {
-            return n.text === "";
-          }
-
-          return true;
-        });
-
-        if (didATransform && isTextNodesEmpty) {
-          Transforms.removeNodes(this.editor, { at: path });
-          // and if we don't have children as well
-        } else if (((newerNode as any).children as any).length === 0) {
-          // equally we add a simple text node
-          Transforms.insertNodes(this.editor,
-            STANDARD_TEXT_NODE() as any,
-            { at: path.concat(0) }
-          );
-        }
-
-        // now for standard basic superblocks
-        // superblocks can only have blocks as children
-        // as well as other superblocks, they are made
-        // to be containers for the most part
-      } else if (
-        SERIALIZATION_REGISTRY.SUPERBLOCKS[nodeAsRichElement.type] &&
-        !nodeAsRichElement.html &&
-        nodeAsRichElement.type !== "list"
-      ) {
-        // we get the node
-        const newNode = Node.get(this.editor, path);
-
-        // and we loop around it
-        for (let i = 0; i < ((newNode as any).children as any).length; i++) {
-          // get the children
-          const child = (newNode as any).children[i];
-          // and if it's a text, aka not a block or it's an inline element
-          if (Text.isText(child) || this.editor.isInline(child)) {
-            // then we wrap the thing in a paragraph
-            Transforms.wrapNodes(this.editor, { type: "paragraph", children: [] }, { at: path.concat(i) });
-          }
-        }
-
-        // or if we have no children or in a list item
-        // we have no initial paragraph
-        if (
-          ((newNode as any).children as any).length === 0 ||
-          (
-            nodeAsRichElement.type === "list-item" &&
-            (
-              nodeAsRichElement.children[0].type !== "paragraph" &&
-              !Text.isText(nodeAsRichElement.children[0])
-            )
-          )
-        ) {
-          // we add an empty paragraph
-          Transforms.insertNodes(this.editor,
-            { type: "paragraph", children: [STANDARD_TEXT_NODE() as any] },
-            { at: path.concat(0) }
-          );
-        }
-
-        // list superblocks are equally superblocks but they can only contain
-        // list-item as children, these are blocks indeed, but that's the only
-        // allowed type
-      } else if (nodeAsRichElement.type === "list") {
-        // get the node
-        const newNode = Node.get(this.editor, path);
-
-        // and now start looping in the children
-        let offset = 0;
-        for (let i = 0; i < ((newNode as any).children as any).length; i++) {
-          // let's get the child
-          const child = (newNode as any).children[i] as any as RichElement;
-          // if it's an element and it's another list superblock inside it
-          if (Element.isElement(child) && child.type === "list") {
-            // we refuse
-            Transforms.unwrapNodes(this.editor, { at: path.concat(i + offset) });
-            offset += child.children.length - 1;
-          } else if (Text.isText(child) || child.type !== "list-item") {
-            // otherwise if it's a text or if it's something that is not a list item
-            // then we wrap it into a list item
-            // list item being a block will unwrap things inside it that are not
-            // inline
-            Transforms.wrapNodes(this.editor, { type: "list-item", children: [] }, { at: path.concat(i + offset) });
-          }
-        }
-
-        // otherwise if there are no children in the list superblock
-        if (((newNode as any).children as any).length === 0) {
-          // we need to add an emtpy list item node
-          Transforms.insertNodes(this.editor,
-            { type: "list-item", children: [STANDARD_PARAGRAPH() as any] },
-            { at: path.concat(0) }
-          );
-        }
-      }
+      this.isInNormalization = false;
     }
-  }
-
-  public getContextFor(
-    path: Path,
-    level: "final" | "select-context" | "select-loop",
-    originContext?: ITemplateArgsContext,
-    originElement?: RichElement,
-  ): ITemplateArgsContext {
-    const actualOriginContext = originContext || this.state.currentRootContext || null;
-    const actualOriginElement = originElement || this.state.currentValue;
-    if (path.length === 0 || !actualOriginContext) {
-      return actualOriginContext;
-    }
-
-    const nextPath = [...path];
-    const nextPathNumber = nextPath.shift();
-    const isFinal = nextPath.length === 0;
-
-    const nextElement = actualOriginElement.children && actualOriginElement.children[nextPathNumber];
-    if (!nextElement) {
-      return actualOriginContext;
-    }
-
-    let nextContext = actualOriginContext;
-
-    if (isFinal && level === "select-context") {
-      return nextContext;
-    }
-
-    const contextChange = (nextElement as RichElement).context;
-    if (contextChange) {
-      const nextPotentialContext = actualOriginContext.properties[contextChange];
-      if (nextPotentialContext.type !== "context" || nextPotentialContext.loopable) {
-        return null;
-      }
-      nextContext = nextPotentialContext;
-    }
-
-    if (isFinal && level === "select-loop") {
-      return nextContext;
-    }
-
-    const eachConextChange = (nextElement as RichElement).forEach;
-    if (eachConextChange) {
-      const nextPotentialContext = actualOriginContext.properties[contextChange];
-      if (nextPotentialContext.type !== "context" || !nextPotentialContext.loopable) {
-        return null;
-      }
-      nextContext = nextPotentialContext;
-    }
-
-    return isFinal ? nextContext : this.getContextFor(nextPath, level, nextContext, nextElement as RichElement);
   }
 
   /**
@@ -2006,7 +1496,7 @@ export class SlateEditor extends React.Component<ISlateEditorProps, ISlateEditor
    * @returns a boolean on whether it represents an inline element
    */
   public isInline(element: RichElement) {
-    return !!SERIALIZATION_REGISTRY.INLINES[element.type];
+    return isInline(element);
   }
 
   /**
@@ -2015,33 +1505,7 @@ export class SlateEditor extends React.Component<ISlateEditorProps, ISlateEditor
    * @returns a boolean on whether it represents a void element
    */
   public isVoid(element: RichElement) {
-    // void-block are for example videos, and void-inline are for example files
-    if (element.html || element.textContent || SERIALIZATION_REGISTRY.VOIDS[element.type]) {
-      return true;
-    }
-
-    if (element.uiHandler) {
-      try {
-        const context = this.findContextBasedOnNode(element as any);
-        if (context) {
-          const uiHandler = context.properties[element.uiHandler];
-          if (uiHandler && uiHandler.type === "ui-handler") {
-            return !!uiHandler.handlerIsVoid;
-          }
-        }
-      } catch {
-      }
-
-      const rootContext = this.props.rootContext;
-      if (rootContext) {
-        const uiHandler = rootContext.properties[element.uiHandler];
-        if (uiHandler && uiHandler.type === "ui-handler") {
-          return !!uiHandler.handlerIsVoid;
-        }
-      }
-    }
-
-    return false;
+    return isVoid(element);
   }
 
   /**
@@ -2118,18 +1582,7 @@ export class SlateEditor extends React.Component<ISlateEditorProps, ISlateEditor
       end.offset === finalBlockOffset &&
       Path.equals(finalBlockPath, end.path)
     );
-    let shouldCreateFreshParagraph = isEndOfLine;
-
-    if (this.state.currentBlockElement.uiHandler) {
-      const currentContext = this.getContextFor(this.state.currentBlockElementAnchor, "final");
-      const uiHandler =
-        (currentContext && currentContext.properties[this.state.currentBlockElement.uiHandler]) ||
-        (this.props.rootContext && this.props.rootContext.properties[this.state.currentBlockElement.uiHandler]);
-
-      if (uiHandler.type === "ui-handler" && uiHandler.handlerKeepOnBreaks) {
-        shouldCreateFreshParagraph = false;
-      }
-    }
+    const shouldCreateFreshParagraph = isEndOfLine;
 
     // if the end we are dealing with is exactly
     // at this last point and offset so we are right
@@ -2310,18 +1763,6 @@ export class SlateEditor extends React.Component<ISlateEditorProps, ISlateEditor
       // and now we need to get the next anchor that is next to such block
       const currentSuperBlockElementAnchor = this.state.currentSuperBlockElementAnchor;
       const nextAnchor = [...currentSuperBlockElementAnchor];
-
-      if (nextAnchor.length >= 2 && this.state.currentSuperBlockElement.uiHandler) {
-        const currentContext = this.getContextFor(this.state.currentSuperBlockElementAnchor, "final");
-        const uiHandler =
-          (currentContext && currentContext.properties[this.state.currentSuperBlockElement.uiHandler]) ||
-          (this.props.rootContext && this.props.rootContext.properties[this.state.currentSuperBlockElement.uiHandler])
-
-        if (uiHandler && uiHandler.type === "ui-handler" && uiHandler.handlerEscapeOnSuperBreaks) {
-          nextAnchor.pop();
-        }
-      }
-
       nextAnchor[nextAnchor.length - 1]++;
 
       if (this.state.currentSuperBlockElement === this.state.currentBlockElement) {
@@ -2513,6 +1954,86 @@ export class SlateEditor extends React.Component<ISlateEditorProps, ISlateEditor
       });
     }
 
+    const pseudoDocument: IRootLevelDocument = {
+      type: "document",
+      children: value as any,
+      id: this.state.currentValue.id,
+      rich: this.state.currentValue.rich,
+    };
+
+    const currentSelectedSuperBlockContext = getContextFor(
+      currentSelectedSuperBlockElementAnchor,
+      "final",
+      pseudoDocument,
+      this.state.currentRootContext,
+    );
+    const currentSelectedBlockContext = getContextFor(
+      currentSelectedBlockElementAnchor,
+      "final",
+      pseudoDocument,
+      this.state.currentRootContext,
+    );
+    const currentSelectedInlineContext = getContextFor(
+      currentSelectedInlineElementAnchor,
+      "final",
+      pseudoDocument,
+      this.state.currentRootContext,
+    );
+
+    // Calculation of other contextual information
+    const baseSuperBlock = currentSelectedSuperBlockElement || pseudoDocument;
+    const baseAllowedChildreOfSuperBlock = baseSuperBlock ? getAllowedChildrenTypes(baseSuperBlock) : [];
+
+    const superBlockUIHandler = getUIHandlerValueWithKnownContextFor(
+      baseSuperBlock as RichElement,
+      currentSelectedSuperBlockContext || this.state.currentRootContext,
+      this.state.currentRootContext,
+    );
+
+    const baseBlock = currentSelectedBlockElement;
+    const baseAllowedChildrenOfBlock = baseBlock ? getAllowedChildrenTypes(baseBlock) : [];
+
+    const blockUIHandler = getUIHandlerValueWithKnownContextFor(
+      baseBlock,
+      currentSelectedBlockContext,
+      this.state.currentRootContext,
+    );
+
+    const inlineUIHandler = getUIHandlerValueWithKnownContextFor(
+      currentSelectedInlineElement,
+      currentSelectedInlineContext,
+      this.state.currentRootContext,
+    );
+
+    const allowsInsertElement = (element: RichElement) => {
+      // we first need to check where it goes
+      if (isSuperBlock(element) || isBlock(element)) {
+        if (!baseAllowedChildreOfSuperBlock.includes(element.type)) {
+          return false;
+        }
+
+        return superBlockUIHandler && superBlockUIHandler.allowsChildren ?
+          superBlockUIHandler.allowsChildren(element, baseSuperBlock as RichElement) :
+          true;
+      } else if (isInline(element)) {
+        if (!baseAllowedChildrenOfBlock.includes(element.type)) {
+          return false;
+        }
+
+        return blockUIHandler && blockUIHandler.allowsChildren ?
+          blockUIHandler.allowsChildren(element, baseBlock) :
+          true;
+      } else {
+        return false;
+      }
+    }
+
+    const inlineIsVoid = currentSelectedInlineElement ? isVoid(currentSelectedInlineElement) : false;
+    const blockIsVoid = currentSelectedBlockElement ? isVoid(currentSelectedBlockElement) : false;
+    const superblockIsVoid = currentSelectedSuperBlockElement ? isVoid(currentSelectedSuperBlockElement) : false;
+    const voidElement = inlineIsVoid || blockIsVoid || superblockIsVoid;
+    const allowsText = !voidElement;
+
     // now we can return
     return {
       currentTextAnchor,
@@ -2531,6 +2052,22 @@ export class SlateEditor extends React.Component<ISlateEditorProps, ISlateEditor
       currentSelectedInlineElementAnchor,
       currentSelectedSuperBlockElement,
       currentSelectedSuperBlockElementAnchor,
+      currentSelectedElement: currentSelectedSuperBlockElement || currentSelectedBlockElement || currentSelectedInlineElement,
+      currentSelectedElementAnchor: currentSelectedSuperBlockElementAnchor || currentSelectedBlockElementAnchor || currentSelectedInlineElementAnchor,
+
+      currentSelectedSuperBlockContext,
+      currentSelectedBlockContext,
+      currentSelectedInlineContext,
+      currentSelectedElementContext: currentSelectedInlineContext || currentSelectedBlockContext || currentSelectedSuperBlockContext,
+
+      allowsInsertElement,
+      allowsText,
+      inlineIsVoid,
+      blockIsVoid,
+      superblockIsVoid,
+      superBlockUIHandler,
+      blockUIHandler,
+      inlineUIHandler,
     }
   }
 
@@ -2572,10 +2109,7 @@ export class SlateEditor extends React.Component<ISlateEditorProps, ISlateEditor
       this.props.onBlur && this.props.onBlur();
     }
 
-    const currentSelectedElementAnchor =
-      this.state.currentSelectedInlineElementAnchor||
-      this.state.currentSelectedBlockElementAnchor ||
-      this.state.currentSelectedSuperBlockElementAnchor;
+    const currentSelectedElementAnchor = this.state.currentSelectedElementAnchor;
 
     // now we can call this
     const anchorData = this.calculateAnchors(
@@ -2707,52 +2241,27 @@ export class SlateEditor extends React.Component<ISlateEditorProps, ISlateEditor
    * @param onlySwichingContext provides the context only if it was set
    * by the given node otherwise it will return null
    */
-  public findContextBasedOnNode(n: Node, onlySwichingContext?: boolean): ITemplateArgsContext {
+  public getContextFor(n: Node | Path, level?: "final" | "select-context" | "select-loop", onlySwichingContext?: boolean): ITemplateArgContextDefinition {
     if (onlySwichingContext) {
-      // it's not switching the context so it returns null
-      const nodeAsRichElement: RichElement = n as any;
+      const nodeAsRichElement: RichElement = (Path.isPath(n) ? Node.get(this.editor, n) : n) as RichElement;
       if (!nodeAsRichElement.context && !nodeAsRichElement.forEach) {
         return null;
       }
     }
 
-    const pathOfNode = ReactEditor.findPath(this.editor, n);
-    let currentContext = this.props.rootContext;
-    let currentElement: RichElement = this.editor as any;
-
-    pathOfNode.forEach((n: number) => {
-      // avoid further processing if we have hit a dead end
-      if (currentContext === null) {
-        return;
-      }
-      // we will treat them all as rich element, even if the last
-      // is text
-      currentElement = currentElement.children[n] as RichElement;
-
-      // now we need to fetch the context we are in
-      if (currentContext && currentElement.context) {
-        currentContext = currentContext.properties[currentElement.context] as ITemplateArgsContext || null;
-        if (currentContext.type !== "context" || currentContext.loopable) {
-          currentContext = null;
-        }
-      }
-
-      // also in the foreach context
-      if (currentContext && currentElement.forEach) {
-        currentContext = currentContext.properties[currentElement.forEach] as ITemplateArgsContext || null;
-        if (currentContext.type !== "context" || !currentContext.loopable) {
-          currentContext = null;
-        }
-      }
-    });
-
-    return currentContext;
+    const pathOfNode = Path.isPath(n) ? n : ReactEditor.findPath(this.editor, n);
+    return getContextFor(
+      pathOfNode,
+      level || "final",
+      this.state.currentValue,
+      this.state.currentRootContext,
+    );
   }
 
   public renderElement(props: RenderElementProps) {
     return (
       <CurrentElementRetriever
-        passProps={props}
+        {...props}
         fn={this.actuallyRenderElement}
       />
     )
@@ -2762,33 +2271,32 @@ export class SlateEditor extends React.Component<ISlateEditorProps, ISlateEditor
    * the render element function to be used in slate editor
    * @param props the properties that slate provides to render the component
    */
-  public actuallyRenderElement(props: RenderElementProps, currentElement: RichElement) {
+  public actuallyRenderElement(
+    props: RenderElementProps,
+    isSelected: boolean,
+    selectionCriteria: "block" | "superblock" | "inline",
+    isPrimary: boolean,
+  ) {
     // first we extract all these stuffs
     const { attributes, children, element } = props;
-
-    // now we check if we are in a selected elelement
-    // because the component is immutable, we can do this
-    const isSelected = (
-      (element as any) === currentElement
-    );
 
     // let's check for a ui handler
     const uiHandler = (element as any as RichElement).uiHandler;
 
     // if we have one
     if (uiHandler) {
-      const handlerContext = this.findContextBasedOnNode(element as any);
+      const handlerContext = this.getContextFor(element as any);
 
       // we extract the arguments for the ui handler that are in the rich element
       const uiHandlerArgs = (element as any as RichElement).uiHandlerArgs;
 
       // and now we try to get the ui handler from the context itself
       // either the root or the one in the property itself
-      let propertiesFromContext: ITemplateArg =
-        (handlerContext && handlerContext.properties && handlerContext.properties[uiHandler]) as ITemplateArg;
+      let propertiesFromContext: ITemplateArgUIHandlerDefinition =
+        (handlerContext && handlerContext.properties && handlerContext.properties[uiHandler]) as ITemplateArgUIHandlerDefinition;
 
       if (!propertiesFromContext) {
-        propertiesFromContext = (this.props.rootContext && this.props.rootContext.properties[uiHandler]) as ITemplateArg;
+        propertiesFromContext = (this.props.rootContext && this.props.rootContext.properties[uiHandler]) as ITemplateArgUIHandlerDefinition;
         if (propertiesFromContext && propertiesFromContext.nonRootInheritable) {
           propertiesFromContext = null;
         }
@@ -2799,18 +2307,18 @@ export class SlateEditor extends React.Component<ISlateEditorProps, ISlateEditor
       if (
         propertiesFromContext &&
         propertiesFromContext.type === "ui-handler" &&
-        propertiesFromContext.handler
+        propertiesFromContext.editorHandler
       ) {
         // now we can get the component, extra args and whatnot
-        const HandlerComponent = propertiesFromContext.handler;
-        const handlerExtraArgs = propertiesFromContext.handlerExtraArgs;
-        const passExtraInfo = propertiesFromContext.handlerPassSlateInfo;
+        const HandlerComponent = propertiesFromContext.editorHandler.Component;
+        const handlerExtraArgs = propertiesFromContext.editorHandler.extraArgs;
+        const passExtraInfo = propertiesFromContext.editorHandler.passSlateInfo;
 
         // the extra info that should be passed if necessary
         const extraInfo = passExtraInfo ?
           {
             helpers: this.getHelpers(),
-            selected: isSelected,
+            selected: isSelected && isPrimary,
           } : {};
 
         let className: string = null;
@@ -2840,27 +2348,35 @@ export class SlateEditor extends React.Component<ISlateEditorProps, ISlateEditor
           {children}
         </HandlerComponent>;
 
-        const contextSwichContext = this.findContextBasedOnNode(element as any, true);
+        const contextSwichContext = this.getContextFor(element as any, "final", true);
 
+        // if we are in a ui handler that is currently looping
+        // as we have entered a loopable context
         if (
           contextSwichContext &&
           contextSwichContext.loopable &&
-          contextSwichContext.loopEmulation &&
-          contextSwichContext.loopEmulation >= 1
+          contextSwichContext.editorArgs &&
+          contextSwichContext.editorArgs.loopEmulation &&
+          contextSwichContext.editorArgs.loopEmulation >= 1
         ) {
+          // and now we have entered loop emulation
           const arr: React.ReactNode[] = [];
-          for (let i = 0; i < contextSwichContext.loopEmulation; i++) {
-            if (contextSwichContext.wrapper) {
-              arr.push(<React.Fragment key={i}>{contextSwichContext.wrapper(toReturn, i)}</React.Fragment>);
+          // we are going to use the wrapper in each case to change the context
+          // which hopefully will change things down the line
+          for (let i = 0; i < contextSwichContext.editorArgs.loopEmulation; i++) {
+            if (contextSwichContext.editorArgs.wrapper) {
+              arr.push(<React.Fragment key={i}>{contextSwichContext.editorArgs.wrapper(toReturn, i)}</React.Fragment>);
             } else {
               arr.push(<React.Fragment key={i}>{toReturn}</React.Fragment>);
             }
           }
           toReturn = arr;
-        } else if (contextSwichContext && contextSwichContext.wrapper) {
-          toReturn = contextSwichContext.wrapper(toReturn);
+        } else if (contextSwichContext && contextSwichContext.editorArgs && contextSwichContext.editorArgs.wrapper) {
+          // otherwise if we got a standard context, with a wrapper, then we use it
+          toReturn = contextSwichContext.editorArgs.wrapper(toReturn);
         }
 
+        // otherwise return
         return toReturn;
       }
     }
@@ -2869,17 +2385,17 @@ export class SlateEditor extends React.Component<ISlateEditorProps, ISlateEditor
 
     const html = (element as any as RichElement).html;
     if (html) {
-      const htmlContext = this.findContextBasedOnNode(element as any);
-      let propertiesFromContext: ITemplateArg = htmlContext && htmlContext.properties && htmlContext.properties[html] as ITemplateArg;
+      const htmlContext = this.getContextFor(element as any);
+      let propertiesFromContext: ITemplateArgHTMLDefinition = htmlContext && htmlContext.properties && htmlContext.properties[html] as ITemplateArgHTMLDefinition;
       if (!propertiesFromContext) {
-        propertiesFromContext = this.props.rootContext && this.props.rootContext.properties && this.props.rootContext.properties[html] as ITemplateArg;
+        propertiesFromContext = this.props.rootContext && this.props.rootContext.properties && this.props.rootContext.properties[html] as ITemplateArgHTMLDefinition;
         if (propertiesFromContext && propertiesFromContext.nonRootInheritable) {
           propertiesFromContext = null;
         }
       }
 
-      if (propertiesFromContext && typeof propertiesFromContext.htmlDisplay !== "undefined") {
-        const toDisplay = propertiesFromContext.htmlDisplay;
+      if (propertiesFromContext && propertiesFromContext.type === "html" && typeof propertiesFromContext.editorDisplay !== "undefined") {
+        const toDisplay = propertiesFromContext.editorDisplay;
         if (typeof toDisplay === "string") {
           customProps.children = (
             <>
@@ -2909,55 +2425,59 @@ export class SlateEditor extends React.Component<ISlateEditorProps, ISlateEditor
 
     const text = (element as any as RichElement).textContent;
     if (text) {
-      const textContext = this.findContextBasedOnNode(element as any);
-      let propertiesFromContext: ITemplateArg = textContext &&
+      const textContext = this.getContextFor(element as any);
+      let propertiesFromContext: ITemplateArgTextDefinition = textContext &&
         textContext.properties &&
-        textContext.properties[text] as ITemplateArg;
+        textContext.properties[text] as ITemplateArgTextDefinition;
       if (!propertiesFromContext) {
         propertiesFromContext = this.props.rootContext &&
           this.props.rootContext.properties &&
-          this.props.rootContext.properties[text] as ITemplateArg;
+          this.props.rootContext.properties[text] as ITemplateArgTextDefinition;
         if (propertiesFromContext && propertiesFromContext.nonRootInheritable) {
           propertiesFromContext = null;
         }
       }
 
-      customProps.children = (
-        <>
-          {(propertiesFromContext && (propertiesFromContext.textDisplay || propertiesFromContext.label)) || (element as any).children[0].text}
-          {children}
-        </>
-      );
+      if (propertiesFromContext && propertiesFromContext.type === "text") {
+        customProps.children = (
+          <>
+            {(propertiesFromContext && (propertiesFromContext.editorDisplay || propertiesFromContext.label)) || (element as any).children[0].text}
+            {children}
+          </>
+        );
+      }
     }
 
     // and now we call the reactification
     let toReturn = SERIALIZATION_REGISTRY.REACTIFY[element.type as string]({
       active: false,
-      selected: isSelected,
+      selected: isSelected && isPrimary,
       element: element as any,
       asTemplate: false,
       customProps,
     }) as any;
 
-    const contextSwichContext = this.findContextBasedOnNode(element as any, true);
+    const contextSwichContext = this.getContextFor(element as any, "final", true);
 
+    // if we find ourselves in a loopable context as we are currently looping
     if (
       contextSwichContext &&
       contextSwichContext.loopable &&
-      contextSwichContext.loopEmulation &&
-      contextSwichContext.loopEmulation >= 1
+      contextSwichContext.editorArgs &&
+      contextSwichContext.editorArgs.loopEmulation &&
+      contextSwichContext.editorArgs.loopEmulation >= 1
     ) {
       const arr: React.ReactNode[] = [];
-      for (let i = 0; i < contextSwichContext.loopEmulation; i++) {
-        if (contextSwichContext.wrapper) {
-          arr.push(<React.Fragment key={i}>{contextSwichContext.wrapper(toReturn, i)}</React.Fragment>);
+      for (let i = 0; i < contextSwichContext.editorArgs.loopEmulation; i++) {
+        if (contextSwichContext.editorArgs.wrapper) {
+          arr.push(<React.Fragment key={i}>{contextSwichContext.editorArgs.wrapper(toReturn, i)}</React.Fragment>);
         } else {
           arr.push(<React.Fragment key={i}>{toReturn}</React.Fragment>);
         }
       }
       toReturn = arr;
-    } else if (contextSwichContext && contextSwichContext.wrapper) {
-      toReturn = contextSwichContext.wrapper(toReturn);
+    } else if (contextSwichContext && contextSwichContext.editorArgs && contextSwichContext.editorArgs.wrapper) {
+      toReturn = contextSwichContext.editorArgs.wrapper(toReturn);
     }
 
     return toReturn;
@@ -3054,6 +2574,12 @@ export class SlateEditor extends React.Component<ISlateEditorProps, ISlateEditor
       currentSelectedBlockElementAnchor: null,
       currentSelectedSuperBlockElement: null,
       currentSelectedSuperBlockElementAnchor: null,
+      currentSelectedInlineContext: null,
+      currentSelectedBlockContext: null,
+      currentSelectedSuperBlockContext: null,
+      currentSelectedElement: null,
+      currentSelectedElementAnchor: null,
+      currentSelectedElementContext: null,
     });
     Transforms.deselect(this.editor);
     ReactEditor.blur(this.editor);
@@ -3068,10 +2594,7 @@ export class SlateEditor extends React.Component<ISlateEditorProps, ISlateEditor
   }
 
   public deletePath(p: Path) {
-    const currentSelectedElementAnchor =
-      this.state.currentSelectedInlineElementAnchor||
-      this.state.currentSelectedBlockElementAnchor ||
-      this.state.currentSelectedSuperBlockElementAnchor;
+    const currentSelectedElementAnchor = this.state.currentSelectedElementAnchor;
 
     if (
       Path.equals(p, currentSelectedElementAnchor) ||
@@ -3122,11 +2645,7 @@ export class SlateEditor extends React.Component<ISlateEditorProps, ISlateEditor
       return;
     }
 
-    const selectedElement =
-      this.state.currentSelectedText ||
-      this.state.currentSelectedInlineElement ||
-      this.state.currentSelectedBlockElement ||
-      this.state.currentSelectedSuperBlockElement;
+    const selectedElement = this.state.currentSelectedElement;
 
     // due to a bug in the way the nodes are moved actually
     // it has to be done this way so first we need to find
@@ -3179,11 +2698,7 @@ export class SlateEditor extends React.Component<ISlateEditorProps, ISlateEditor
     // ensures to clear up the anchors just after the transform
     this.lastChangeWasSelectedDelete = true;
 
-    const selectedElementAnchor =
-      this.state.currentSelectedTextAnchor ||
-      this.state.currentSelectedInlineElementAnchor ||
-      this.state.currentSelectedBlockElementAnchor ||
-      this.state.currentSelectedSuperBlockElementAnchor;
+    const selectedElementAnchor = this.state.currentSelectedElementAnchor;
 
     // so we delete which will call onchange and normalization
     Transforms.delete(this.editor, {
@@ -3213,7 +2728,7 @@ export class SlateEditor extends React.Component<ISlateEditorProps, ISlateEditor
    * @param at the range to focus at
    * @returns a void promise once it's done
    */
-  public async focusAt(at: Range | Path) {
+  public async focusAt(at: Range | Path): Promise<void> {
     if (Range.isRange(at)) {
       return new Promise((r) => {
         setTimeout(() => {
@@ -3234,42 +2749,15 @@ export class SlateEditor extends React.Component<ISlateEditorProps, ISlateEditor
    * @param type 
    * @returns 
    */
-  public getFallbackInsertPathFor(type?: "block" | "superblock" | "inline") {
-    if (type === "block" || type === "superblock") {
-      const targetSuperBlock: Path =
-        this.state.currentSelectedSuperBlockElementAnchor ||
-        [];
-
-      const elementAtPath = Node.get(this.editor, targetSuperBlock) as RichElement;
-
-      const targetPath = [...targetSuperBlock];
-
-      if (this.state.currentSelectedBlockElementAnchor) {
-        targetPath.push(this.state.currentSelectedBlockElementAnchor[this.state.currentSelectedBlockElementAnchor.length - 1])
-      } else {
-        targetPath.push(elementAtPath.children.length);
-      }
-
-      return targetPath;
+  public getFallbackInsertPath() {
+    if (this.state.currentSelectedInlineElement) {
+      return [...this.state.currentSelectedInlineElementAnchor, this.state.currentSelectedInlineElement.children.length];
+    } else if (this.state.currentSelectedBlockElement) {
+      return [...this.state.currentSelectedBlockElementAnchor, this.state.currentSelectedBlockElement.children.length];
+    } else if (this.state.currentSelectedSuperBlockElement) {
+      return [...this.state.currentSelectedSuperBlockElementAnchor, this.state.currentSelectedSuperBlockElement.children.length];
     } else {
-      const targetBlock: Path =
-        this.state.currentSelectedBlockElementAnchor;
-
-      if (!targetBlock) {
-        console.warn("Could not get a fallback insert for inline type");
-        return null;
-      }
-
-      const targetPath = [...targetBlock];
-      
-      if (this.state.currentSelectedInlineElementAnchor) {
-        targetPath.push(this.state.currentSelectedInlineElementAnchor[this.state.currentSelectedInlineElementAnchor.length - 1])
-      } else {
-        const elementAtPath = Node.get(this.editor, targetBlock) as RichElement;
-        targetPath.push(elementAtPath.children.length);
-      }
-
-      return targetPath;
+      return [this.state.currentValue.children.length];
     }
   }
 
@@ -3289,31 +2777,8 @@ export class SlateEditor extends React.Component<ISlateEditorProps, ISlateEditor
   public async insertImage(file: File, standalone: boolean): Promise<void> {
     // we try
     try {
-      
-
       // now let's see what we get
       const data = await this.props.onInsertFile(file, true);
-      // if we got a path let's find the node
-      let nodeAtPath: Node;
-
-      try {
-        nodeAtPath = pathAt && Node.get(this.editor, pathAt);
-      } catch (e) {
-
-      }
-
-      let childIndex: number = 0;
-      // no node then let's use its parent
-      if (pathAt && !nodeAtPath) {
-        childIndex = pathAt.pop();
-        nodeAtPath = Node.get(this.editor, pathAt);
-      }
-
-      // let's refocus
-      if (at) {
-        await this.focusAt(pathAt || at);
-      }
-
       if (!data) {
         // something went wrong there should be an error in the props
         return;
@@ -3341,19 +2806,10 @@ export class SlateEditor extends React.Component<ISlateEditorProps, ISlateEditor
       };
 
       // and we call the insert node
-      if (pathAt) {
-        let newPath: Path;
-
-        if ((nodeAtPath as any).containment === "superblock") {
-          newPath = [...pathAt, childIndex];
-        } else {
-          newPath = [...pathAt];
-          newPath[newPath.length - 1]++;
-        }
-
-        Transforms.insertNodes(this.editor, imageNode as any, { at: newPath });
+      if (!this.editor.selection) {
+        Transforms.insertNodes(this.editor, imageNode as any, { at: this.getFallbackInsertPath() });
       } else {
-        this.editor.insertNode(imageNode as any);
+        Transforms.insertNodes(this.editor, imageNode);
       }
     } catch (err) {
     }
@@ -3367,30 +2823,7 @@ export class SlateEditor extends React.Component<ISlateEditorProps, ISlateEditor
    * @param at at which range to insert it (optional)
    * @returns a void promise
    */
-  public async insertTemplateText(label: string, value: string, at?: Range | Path) {
-    const pathAt: Path = !at || Path.isPath(at) ? (at as Path || this.state.currentSelectedElementAnchor) : null;
-    // if we got a path let's find the node
-    let nodeAtPath: Node;
-
-    try {
-      nodeAtPath = pathAt && Node.get(this.editor, pathAt);
-    } catch (e) {
-
-    }
-
-    let childIndex: number = 0;
-    // no node then let's use its parent
-    if (pathAt && !nodeAtPath) {
-      childIndex = pathAt.pop();
-      nodeAtPath = Node.get(this.editor, pathAt);
-    }
-
-    // if we have a range to insert at
-    if (at) {
-      // we focus there
-      await this.focusAt(pathAt || at);
-    }
-
+  public insertTemplateText(label: string, value: string) {
     // now we make the text node
     const textNode: IText = {
       bold: false,
@@ -3402,18 +2835,16 @@ export class SlateEditor extends React.Component<ISlateEditorProps, ISlateEditor
     // and now we build a paragraph node to put the text there
     const inlineNode: IInline = {
       children: [textNode],
-      containment: "inline",
       type: "inline",
       textContent: value,
       givenName: label,
     };
 
-    // and insert right there
-    if (pathAt) {
-      const newPath = [...pathAt, childIndex];
-      Transforms.insertNodes(this.editor, inlineNode as any, { at: newPath });
+    // and we call the insert node
+    if (!this.editor.selection) {
+      Transforms.insertNodes(this.editor, inlineNode as any, { at: this.getFallbackInsertPath() });
     } else {
-      this.editor.insertNode(inlineNode as any);
+      Transforms.insertNodes(this.editor, inlineNode);
     }
   }
 
@@ -3425,31 +2856,7 @@ export class SlateEditor extends React.Component<ISlateEditorProps, ISlateEditor
    * @param value the value that will be used from the context
    * @param at an optional range where to be inserted
    */
-  public async insertTemplateHTML(label: string, value: string, at?: Range | Path) {
-
-    const pathAt: Path = !at || Path.isPath(at) ? (at as Path || this.state.currentSelectedElementAnchor) : null;
-    // if we got a path let's find the node
-    let nodeAtPath: Node;
-
-    try {
-      nodeAtPath = pathAt && Node.get(this.editor, pathAt);
-    } catch (e) {
-
-    }
-
-    let childIndex: number = 0;
-    // no node then let's use its parent
-    if (pathAt && !nodeAtPath) {
-      childIndex = pathAt.pop();
-      nodeAtPath = Node.get(this.editor, pathAt);
-    }
-
-    // if we have a range to insert at
-    if (at) {
-      // we focus there
-      await this.focusAt(pathAt || at);
-    }
-
+  public insertTemplateHTML(label: string, value: string, at?: Range | Path) {
     // and create a text node based on that
     // which is where we put the label
     const textNode: IText = {
@@ -3461,28 +2868,18 @@ export class SlateEditor extends React.Component<ISlateEditorProps, ISlateEditor
 
     // and a container to make it be the inner html
     // container
-    const superBlock: IContainer = {
+    const voidBlock: IVoidBlock = {
       children: [textNode],
-      containment: "superblock",
-      containerType: null,
-      type: "container",
+      type: "void-block",
       html: value,
       givenName: label,
     }
 
-    // now we can insert that node
-    if (pathAt) {
-      let newPath: Path;
-
-      if ((nodeAtPath as any).containment === "superblock") {
-        newPath = [...pathAt, childIndex];
-      } else {
-        newPath = [...pathAt];
-        newPath[newPath.length - 1]++;
-      }
-      Transforms.insertNodes(this.editor, superBlock as any, { at: newPath });
+    // and we call the insert node
+    if (!this.editor.selection) {
+      Transforms.insertNodes(this.editor, voidBlock, { at: this.getFallbackInsertPath() });
     } else {
-      this.editor.insertNode(superBlock as any);
+      Transforms.insertNodes(this.editor, voidBlock);
     }
   }
 
@@ -3556,65 +2953,31 @@ export class SlateEditor extends React.Component<ISlateEditorProps, ISlateEditor
       status = true
     }
 
-    // now we can do this part async
-    (async () => {
-      const pathAt: Path = !at || Path.isPath(at) ? (at as Path || this.state.currentSelectedElementAnchor) : null;
-      // if we got a path let's find the node
-      let nodeAtPath: Node;
 
-      try {
-        nodeAtPath = pathAt && Node.get(this.editor, pathAt);
-      } catch (e) {
-
-      }
-
-      let childIndex: number = 0;
-      // no node then let's use its parent
-      if (pathAt && !nodeAtPath) {
-        childIndex = pathAt.pop();
-        nodeAtPath = Node.get(this.editor, pathAt);
-      }
-
-      // and set the focus
-      if (at) {
-        await this.focusAt(pathAt || at);
-      }
-
-      // and insert the video if we have been
-      // considered succesful
-      if (status) {
-        const videoNode: IVideo = {
-          type: "video",
-          containment: "void-block",
-          children: [
-            {
-              bold: false,
-              italic: false,
-              text: "",
-              underline: false,
-            }
-          ],
-          origin: origin as any,
-          src,
-        }
-
-        // insert the video node
-        if (pathAt) {
-          let newPath: Path;
-
-          if ((nodeAtPath as any).containment === "superblock") {
-            newPath = [...pathAt, childIndex];
-          } else {
-            newPath = [...pathAt];
-            newPath[newPath.length - 1]++;
+    // and insert the video if we have been
+    // considered succesful
+    if (status) {
+      const videoNode: IVideo = {
+        type: "video",
+        children: [
+          {
+            bold: false,
+            italic: false,
+            text: "",
+            underline: false,
           }
-
-          Transforms.insertNodes(this.editor, videoNode as any, { at: newPath });
-        } else {
-          this.editor.insertNode(videoNode as any);
-        }
+        ],
+        origin: origin as any,
+        src,
       }
-    })();
+
+      // and we call the insert node
+      if (!this.editor.selection) {
+        Transforms.insertNodes(this.editor, videoNode, { at: this.getFallbackInsertPath() });
+      } else {
+        Transforms.insertNodes(this.editor, videoNode);
+      }
+    }
 
     // return the status
     return status;
@@ -3626,34 +2989,12 @@ export class SlateEditor extends React.Component<ISlateEditorProps, ISlateEditor
    * @param file the file to insert
    * @param at a partial range to insert at
    */
-  public async insertFile(file: File, at?: Range | Path) {
+  public async insertFile(file: File) {
     // so we try
     try {
       // we call the insert file function, and pass false because
       // we are not dealing with an image
       const data = await this.props.onInsertFile(file, false);
-
-      const pathAt: Path = !at || Path.isPath(at) ? (at as Path || this.state.currentSelectedElementAnchor) : null;
-      // if we got a path let's find the node
-      let nodeAtPath: Node;
-
-      try {
-        nodeAtPath = pathAt && Node.get(this.editor, pathAt);
-      } catch (e) {
-
-      }
-
-      let childIndex: number = 0;
-      // no node then let's use its parent
-      if (pathAt && !nodeAtPath) {
-        childIndex = pathAt.pop();
-        nodeAtPath = Node.get(this.editor, pathAt);
-      }
-
-      // now we focus
-      if (at) {
-        await this.focusAt(pathAt || at);
-      }
 
       if (!data) {
         // something went wrong there should be an error in the state
@@ -3663,7 +3004,6 @@ export class SlateEditor extends React.Component<ISlateEditorProps, ISlateEditor
       // now we can build the file node
       const fileNode: IFile = {
         type: "file",
-        containment: "void-inline",
         children: [
           {
             bold: false,
@@ -3680,12 +3020,11 @@ export class SlateEditor extends React.Component<ISlateEditorProps, ISlateEditor
         srcId: data.result.id,
       };
 
-      // and insert it
-      if (pathAt) {
-        const newPath = [...pathAt, childIndex];
-        Transforms.insertNodes(this.editor, fileNode as any, { at: newPath });
+      // and we call the insert node
+      if (!this.editor.selection) {
+        Transforms.insertNodes(this.editor, fileNode, { at: this.getFallbackInsertPath() });
       } else {
-        this.editor.insertNode(fileNode as any);
+        Transforms.insertNodes(this.editor, fileNode);
       }
     } catch (err) {
     }
@@ -3696,35 +3035,11 @@ export class SlateEditor extends React.Component<ISlateEditorProps, ISlateEditor
    * @param type optional, the container type, otherwise will insert a standard container
    * @param at an optional range
    */
-  public async insertContainer(type?: string, at?: Range | Path) {
-    const pathAt: Path = !at || Path.isPath(at) ? (at as Path || this.state.currentSelectedElementAnchor) : null;
-    // if we got a path let's find the node
-    let nodeAtPath: Node;
-
-    try {
-      nodeAtPath = pathAt && Node.get(this.editor, pathAt);
-    } catch (e) {
-
-    }
-
-    let childIndex: number = 0;
-    // no node then let's use its parent
-    if (pathAt && !nodeAtPath) {
-      childIndex = pathAt.pop();
-      nodeAtPath = Node.get(this.editor, pathAt);
-    }
-
-    // if we are provided a range
-    if (at) {
-      // we focus at it
-      await this.focusAt(pathAt || at);
-    }
-
+  public async insertContainer(type?: string) {
     // now we can make the container
     const containerNode: IContainer = {
       type: "container",
       givenName: type || null,
-      containment: "superblock",
       children: [
         {
           type: "paragraph",
@@ -3739,32 +3054,16 @@ export class SlateEditor extends React.Component<ISlateEditorProps, ISlateEditor
               text: "",
             }
           ]
-        } as any
+        },
       ],
       containerType: type || null,
     };
 
-    // and wrap the thing
-    if (pathAt) {
-      const nodeAtPath = Node.get(this.editor, pathAt);
-      let newPath: Path;
-
-      if ((nodeAtPath as any).containment === "superblock") {
-        newPath = [...pathAt, childIndex];
-      } else {
-        newPath = [...pathAt];
-        newPath[newPath.length - 1]++;
-      }
-      Transforms.insertNodes(this.editor, containerNode as any, { at: newPath });
+    // and we call the insert node
+    if (!this.editor.selection) {
+      Transforms.insertNodes(this.editor, containerNode, { at: this.getFallbackInsertPath() });
     } else {
-      this.editor.insertNode(containerNode as any);
-    }
-
-    if (this.state.currentText) {
-      // now we need to refocus
-      ReactEditor.focus(this.editor);
-    } else {
-      ReactEditor.blur(this.editor);
+      Transforms.insertNodes(this.editor, containerNode);
     }
   };
 
@@ -3773,35 +3072,11 @@ export class SlateEditor extends React.Component<ISlateEditorProps, ISlateEditor
    * @param type the type for the custom element
    * @param at an optional at range to insert the custom at
    */
-  public async insertCustom(type: string, at?: Range | Path) {
-    const pathAt: Path = !at || Path.isPath(at) ? (at as Path || this.state.currentSelectedElementAnchor) : null;
-    // if we got a path let's find the node
-    let nodeAtPath: Node;
-
-    try {
-      nodeAtPath = pathAt && Node.get(this.editor, pathAt);
-    } catch (e) {
-
-    }
-
-    let childIndex: number = 0;
-    // no node then let's use its parent
-    if (pathAt && !nodeAtPath) {
-      childIndex = pathAt.pop();
-      nodeAtPath = Node.get(this.editor, pathAt);
-    }
-
-    // if we are provided a range
-    if (at) {
-      // we focus at it
-      await this.focusAt(pathAt || at);
-    }
-
+  public async insertCustom(type: string) {
     // now we can make the custom
     const customNode: ICustom = {
       type: "custom",
       givenName: type || null,
-      containment: "superblock",
       children: [
         {
           type: "paragraph",
@@ -3821,27 +3096,11 @@ export class SlateEditor extends React.Component<ISlateEditorProps, ISlateEditor
       customType: type,
     };
 
-    // and wrap the thing
-    if (pathAt) {
-      const nodeAtPath = Node.get(this.editor, pathAt);
-      let newPath: Path;
-
-      if ((nodeAtPath as any).containment === "superblock") {
-        newPath = [...pathAt, childIndex];
-      } else {
-        newPath = [...pathAt];
-        newPath[newPath.length - 1]++;
-      }
-      Transforms.insertNodes(this.editor, customNode as any, { at: newPath });
+    // and we call the insert node
+    if (!this.editor.selection) {
+      Transforms.insertNodes(this.editor, customNode, { at: this.getFallbackInsertPath() });
     } else {
-      this.editor.insertNode(customNode as any);
-    }
-
-    if (this.state.currentText) {
-      // now we need to refocus
-      ReactEditor.focus(this.editor);
-    } else {
-      ReactEditor.blur(this.editor);
+      Transforms.insertNodes(this.editor, customNode);
     }
   };
 
@@ -3849,84 +3108,26 @@ export class SlateEditor extends React.Component<ISlateEditorProps, ISlateEditor
    * Makes a quote out of the current element
    * @param at toggle at the given range, this will cause a focus
    */
-  public async toggleQuote(at?: Range | Path) {
-    // if we are offered a range
-    if (at) {
-      // use it
-      await this.focusAt(at);
-    }
+  public async toggleQuote() {
+    // now we got to check if we are collapsed
+    const isCollapsed = Range.isCollapsed(this.editor.selection);
 
-    if ((at && Range.isRange(at)) || (ReactEditor.isFocused(this.editor) && this.editor.selection)) {
-      // now we got to check if we are collapsed
-      const isCollapsed = Range.isCollapsed((at as Range) || this.editor.selection);
-      // and get the anchor data from the at, or from the state
-      const anchorData = at ? this.calculateAnchors((at as Range).anchor.path) : this.state;
-      // if our current block element is a quote
-      if (anchorData.currentBlockElement.type === "quote") {
-        // then we would actually want to wrap into a paragraph so
-        // that the quote itself is normalized out and it goes back
-        // into a paragraph
-        Transforms.wrapNodes(
+    if (isCollapsed && this.state.currentSelectedBlockElement) {
+      if (this.state.currentSelectedBlockElement.type === "quote") {
+        Transforms.setNodes(
           this.editor,
           {
-            ...copyElementBase(anchorData.currentBlockElement),
             type: "paragraph",
-            containment: "block",
-            children: [],
-          },
-          { split: !isCollapsed, at: isCollapsed ? anchorData.currentBlockElementAnchor : undefined },
-        );
-
-        // otherwise we want to wrap into a quote
-      } else {
-        // so we do
-        Transforms.wrapNodes(
-          this.editor,
-          {
-            ...copyElementBase(anchorData.currentBlockElement),
-            type: "quote",
-            containment: "block",
-            children: [],
-          },
-          { split: !isCollapsed, at: isCollapsed ? anchorData.currentBlockElementAnchor : undefined },
-        );
-      }
-    } else if ((at && Path.isPath(at)) || this.state.currentSelectedElementAnchor) {
-      const nodeAtPath = at ? Node.get(this.editor, at as Path) : this.state.currentSelectedElement;
-      const pathOfNode = at || this.state.currentSelectedElementAnchor;
-
-      if ((nodeAtPath as any).type === "quote") {
-        // then we wrap back into a paragraph to normalize the quote back into a paragraph
-        Transforms.wrapNodes(
-          this.editor,
-          {
-            ...copyElementBase(nodeAtPath as any),
-            type: "paragraph",
-            containment: "block",
-            children: [],
-          },
-          { at: pathOfNode },
+          }
         );
       } else {
-        // otherwise we wrap into the new quote
-        Transforms.wrapNodes(
+        Transforms.setNodes(
           this.editor,
           {
-            ...copyElementBase(nodeAtPath as any),
             type: "quote",
-            containment: "block",
-            children: [],
-          },
-          { at: pathOfNode },
+          }
         );
       }
-    }
-    // FOCUS
-    if (this.state.currentText) {
-      // now we need to refocus
-      ReactEditor.focus(this.editor);
-    } else {
-      ReactEditor.blur(this.editor);
     }
   };
 
@@ -3935,83 +3136,27 @@ export class SlateEditor extends React.Component<ISlateEditorProps, ISlateEditor
    * @param type the title type
    * @param at an optional range
    */
-  public async toggleTitle(type: "h1" | "h2" | "h3" | "h4" | "h5" | "h6", at?: Range | Path) {
-    // if we are provided a range
-    if (at) {
-      // let's focus at it there
-      await this.focusAt(at);
-    }
+  public async toggleTitle(type: "h1" | "h2" | "h3" | "h4" | "h5" | "h6") {
+    // now we got to check if we are collapsed
+    const isCollapsed = Range.isCollapsed(this.editor.selection);
 
-    if ((at && Range.isRange(at)) || (ReactEditor.isFocused(this.editor) && this.editor.selection)) {
-      // then let's get this information to know the state and if it's collapsed
-      const isCollapsed = Range.isCollapsed(at as Range || this.editor.selection);
-      const anchorData = at ? this.calculateAnchors((at as Range).anchor.path) : this.state;
-
-      // if we are already wrapped in it and we need to toggle
-      if (anchorData.currentBlockElement.type === "title" && anchorData.currentBlockElement.subtype === type) {
-        // then we wrap back into a paragraph to normalize the title back into a paragraph
-        Transforms.wrapNodes(
+    if (isCollapsed && this.state.currentSelectedBlockElement) {
+      if (this.state.currentSelectedBlockElement.type === "title" && this.state.currentSelectedBlockElement.subtype === type) {
+        Transforms.setNodes(
           this.editor,
           {
-            ...copyElementBase(anchorData.currentBlockElement),
             type: "paragraph",
-            containment: "block",
-            children: [],
-          },
-          { split: !isCollapsed, at: isCollapsed ? anchorData.currentBlockElementAnchor : undefined },
+          }
         );
       } else {
-        // otherwise we wrap into the new title
-        Transforms.wrapNodes(
+        Transforms.setNodes(
           this.editor,
           {
-            ...copyElementBase(anchorData.currentBlockElement),
             type: "title",
-            containment: "block",
             subtype: type,
-            children: [],
-          },
-          { split: !isCollapsed, at: isCollapsed ? anchorData.currentBlockElementAnchor : undefined },
+          }
         );
       }
-    } else if ((at && Path.isPath(at)) || this.state.currentSelectedElementAnchor) {
-      const nodeAtPath = at ? Node.get(this.editor, at as Path) : this.state.currentSelectedElement;
-      const pathOfNode = at || this.state.currentSelectedElementAnchor;
-
-      if ((nodeAtPath as any).type === "title" && (nodeAtPath as any).subtype === type) {
-        // then we wrap back into a paragraph to normalize the title back into a paragraph
-        Transforms.wrapNodes(
-          this.editor,
-          {
-            ...copyElementBase(nodeAtPath as any),
-            type: "paragraph",
-            containment: "block",
-            children: [],
-          },
-          { at: pathOfNode },
-        );
-      } else {
-        // otherwise we wrap into the new title
-        Transforms.wrapNodes(
-          this.editor,
-          {
-            ...copyElementBase(nodeAtPath as any),
-            type: "title",
-            containment: "block",
-            subtype: type,
-            children: [],
-          },
-          { at: pathOfNode },
-        );
-      }
-    }
-
-    // Focus
-    if (this.state.currentText) {
-      // now we need to refocus
-      ReactEditor.focus(this.editor);
-    } else {
-      ReactEditor.blur(this.editor);
     }
   };
 
@@ -4020,99 +3165,29 @@ export class SlateEditor extends React.Component<ISlateEditorProps, ISlateEditor
    * @param type the type of the list that is to be toggled, either bulleted or number
    * @param at an optional range
    */
-  public async toggleList(type: "bulleted" | "numbered", at?: Range | Path) {
+  public async insertList(type: "bulleted" | "numbered") {
+    // now we can make the lust
+    const listNode: IList = {
+      type: "list",
+      listType: type,
+      children: [
+        {
+          type: "list-item",
+          // we use the current block element here in case we don't find it
+          // the type is on top for case of emergency
+          givenName: null,
+          children: [
+            STANDARD_PARAGRAPH()
+          ]
+        },
+      ],
+    };
 
-    // if we have a range we focus at it
-    if (at) {
-      await this.focusAt(at);
-    }
-
-    if ((at && Range.isRange(at)) || this.state.currentElement) {
-      // now we need to check for the collapsing information and anchor data
-      const isCollapsed = Range.isCollapsed(at as Range || this.editor.selection);
-      const anchorData = at ? this.calculateAnchors((at as Range).anchor.path) : this.state;
-
-      // if we have a current super block and which is a list already
-      if (anchorData.currentSuperBlockElement && anchorData.currentSuperBlockElement.type === "list-item") {
-        const parentOfSuperBlockAnchor = [...anchorData.currentSuperBlockElementAnchor];
-        parentOfSuperBlockAnchor.pop();
-        const parentOfSuperBlock = Node.get(this.editor, parentOfSuperBlockAnchor) as any as RichElement;
-
-        if (parentOfSuperBlock.containment === "list-superblock") {
-          // if the super block is not of the same list type, then we basically rewrap
-          // to normalize it out
-          if (parentOfSuperBlock.listType !== type) {
-            // so here we rewrap with the new list type
-            Transforms.wrapNodes(
-              this.editor,
-              {
-                ...copyElementBase(parentOfSuperBlock),
-                type: "list",
-                listType: type,
-                containment: "list-superblock",
-                children: [],
-              },
-              { split: false, at: parentOfSuperBlockAnchor },
-            );
-          } else {
-            // otherwise we just break the list
-            // which will delete the list if all is chosen or whatever
-            // is chosen will be broken
-            this.breakList();
-          }
-        }
-      } else {
-        // otherwise we wrap into a new list
-        Transforms.wrapNodes(
-          this.editor,
-          {
-            ...copyElementBase(anchorData.currentBlockElement),
-            type: "list",
-            listType: type,
-            containment: "list-superblock",
-            children: [],
-          },
-          { split: !isCollapsed, at: isCollapsed ? anchorData.currentBlockElementAnchor : undefined },
-        );
-      }
-    } else if ((at && Path.isPath(at)) || this.state.currentSelectedElementAnchor) {
-      const nodeAtPath = at ? Node.get(this.editor, at as Path) : this.state.currentSelectedElement;
-      const pathOfNode = at || this.state.currentSelectedElementAnchor;
-
-      if ((nodeAtPath as any).type === "list" && (nodeAtPath as any).listType === type) {
-        // then we wrap back into a paragraph to normalize the list back into a paragraph
-        Transforms.wrapNodes(
-          this.editor,
-          {
-            ...copyElementBase(nodeAtPath as any),
-            type: "paragraph",
-            containment: "block",
-            children: [],
-          },
-          { at: pathOfNode },
-        );
-      } else {
-        // otherwise we wrap into the new list
-        Transforms.wrapNodes(
-          this.editor,
-          {
-            ...copyElementBase(nodeAtPath as any),
-            type: "list",
-            listType: type,
-            containment: "list-superblock",
-            children: [],
-          },
-          { at: pathOfNode },
-        );
-      }
-    }
-
-    // focus
-    if (this.state.currentText) {
-      // now we need to refocus
-      ReactEditor.focus(this.editor);
+    // and we call the insert node
+    if (!this.editor.selection) {
+      Transforms.insertNodes(this.editor, listNode, { at: this.getFallbackInsertPath() });
     } else {
-      ReactEditor.blur(this.editor);
+      Transforms.insertNodes(this.editor, listNode);
     }
   };
 
@@ -4123,12 +3198,9 @@ export class SlateEditor extends React.Component<ISlateEditorProps, ISlateEditor
    * @param at an optional range to pass
    * @returns a boolean if the link was valid and toggleLink
    */
-  public toggleLink(url: string, tvalue: string, at?: Range | Path): boolean {
-    // if we don't support a link
-    if (!this.props.features.supportsLinks) {
-      // we have failed
-      return false;
-    }
+  public toggleLink(url: string, tvalue: string): boolean {
+    // TODO
+
 
     // otherwise let's find what url we are using
     let urlToUse: string = url;
@@ -4155,130 +3227,6 @@ export class SlateEditor extends React.Component<ISlateEditorProps, ISlateEditor
       }
     }
 
-    // now if there is no link, no tvalue and no url
-    const noLink = !tvalue && !url;
-
-    if ((at && Range.isRange(at)) || (ReactEditor.isFocused(this.editor) && this.editor.selection)) {
-      // let's get this information
-      const isCollapsed = Range.isCollapsed((at as Range) || this.editor.selection);
-      const anchorData = at ? this.calculateAnchors((at as Range).anchor.path) : this.state;
-
-      (async () => {
-        // and now we can focus
-        if (at) {
-          await this.focusAt(at);
-        }
-
-        // if we are collapsed, we want to wrap
-        // the entire element
-        if (isCollapsed) {
-
-          // so we are going to check if we already just
-          // have a link in place
-          if (
-            anchorData.currentElement &&
-            anchorData.currentElement.type === "link"
-          ) {
-            // if we have a url to a tvalue
-            if (urlToUse || tvalue) {
-              // then we update the current link
-              Transforms.setNodes(
-                this.editor,
-                {
-                  href: !tvalue ? urlToUse : null,
-                  thref: tvalue ? tvalue : null,
-                },
-                { at: anchorData.currentElementAnchor }
-              );
-            } else {
-              // otherwise we unwrap the given link
-              Transforms.unwrapNodes(
-                this.editor,
-                { at: anchorData.currentElementAnchor }
-              );
-            }
-
-            // now if have link information to be used to create a link
-          } else if (!noLink) {
-            // we do so by wrapping
-            Transforms.wrapNodes(
-              this.editor,
-              {
-                type: "link",
-                containment: "inline",
-                href: !tvalue ? urlToUse : null,
-                thref: tvalue ? tvalue : null,
-                children: [],
-              },
-              { split: false, at: anchorData.currentBlockElementAnchor, match: (n: any) => n.containment === "inline" || Text.isText(n) },
-            );
-          }
-
-          // otherwise if we are not collapsed
-        } else {
-          // if we are within a link
-          if (
-            anchorData.currentElement &&
-            anchorData.currentElement.type === "link"
-          ) {
-            // then we reset the nodes
-            if (urlToUse || tvalue) {
-              Transforms.setNodes(
-                this.editor,
-                {
-                  href: !tvalue ? urlToUse : null,
-                  thref: tvalue ? tvalue : null,
-                },
-                { split: true, match: (n: any) => n.type === "link" }
-              );
-            } else {
-              // or we unwrap them if the link value or tvalue
-              // is not given so we have no link
-              Transforms.unwrapNodes(
-                this.editor,
-                { split: true, match: (n: any) => n.type === "link" },
-              );
-            }
-          } else {
-            // otherwise if we are not within the link
-            // we wrap with a link
-            Transforms.wrapNodes(
-              this.editor,
-              {
-                type: "link",
-                containment: "inline",
-                href: !tvalue ? urlToUse : null,
-                thref: tvalue ? tvalue : null,
-                children: [],
-              },
-              { split: true, match: (n: any) => n.containment === "inline" || Text.isText(n) },
-            );
-          }
-        }
-
-        // and then we focus
-        if (this.state.currentText) {
-          // now we need to refocus
-          ReactEditor.focus(this.editor);
-        } else {
-          ReactEditor.blur(this.editor);
-        }
-      })();
-
-    } else if ((at && Path.isPath(at)) || this.state.currentSelectedElementAnchor) {
-      const pathOfNode = at || this.state.currentSelectedElementAnchor;
-      Transforms.wrapNodes(
-        this.editor,
-        {
-          type: "link",
-          containment: "inline",
-          href: !tvalue ? urlToUse : null,
-          thref: tvalue ? tvalue : null,
-          children: [],
-        },
-        { at: pathOfNode },
-      );
-    }
 
     // we have succeeded
     return true;
@@ -4400,134 +3348,14 @@ export class SlateEditor extends React.Component<ISlateEditorProps, ISlateEditor
    * @param element the element 
    * @param at an optional position to do it at
    */
-  public async insertElement(element: RichElement, at?: Range | Path) {
-    const pathAt: Path = !at || Path.isPath(at) ? (at as Path || this.state.currentSelectedElementAnchor) : null;
-    // if we got a path let's find the node
-    let nodeAtPath: Node;
-
-    try {
-      nodeAtPath = pathAt && Node.get(this.editor, pathAt);
-    } catch (e) {
-
-    }
-
-    let childIndex: number = 0;
-    // no node then let's use its parent
-    if (pathAt && !nodeAtPath) {
-      childIndex = pathAt.pop();
-      nodeAtPath = Node.get(this.editor, pathAt);
-    }
-
-    // if we are provided a range
-    if (at) {
-      // we focus at it
-      await this.focusAt(pathAt || at);
-    }
-
-    // and insert the thing
-    const nodeToInsert = element.children ? element : { ...element };
-    if (!nodeToInsert.children) {
-      nodeToInsert.children = [
-        STANDARD_TEXT_NODE(),
-      ];
-    }
-
-    const shouldNotSpecifyInsertionDueToBeingInline =
-      nodeToInsert.containment === "inline" &&
-      this.state.currentSelectedElement &&
-      !at;
-
-    // and wrap the thing
-    if (!shouldNotSpecifyInsertionDueToBeingInline && pathAt) {
-      let newPath: Path;
-
-      // if we are in a superblock
-      if ((nodeAtPath as any).containment === "superblock") {
-        // we append at the end
-        newPath = [...pathAt, childIndex];
-      } else {
-        // otherwise we add next to it
-        newPath = [...pathAt];
-        newPath[newPath.length - 1]++;
-      }
-      Transforms.insertNodes(this.editor, nodeToInsert as any, { at: newPath });
+  public insertElement(element: RichElement) {
+    // and we call the insert node
+    if (!this.editor.selection) {
+      Transforms.insertNodes(this.editor, element, { at: this.getFallbackInsertPath() });
     } else {
-      this.editor.insertNode(nodeToInsert as any);
-    }
-
-    if (this.state.currentText) {
-      // now we need to refocus
-      ReactEditor.focus(this.editor);
-    } else {
-      ReactEditor.blur(this.editor);
+      Transforms.insertNodes(this.editor, element);
     }
   }
-
-  /**
-   * Will insert a container at the given location and assign it an UI handler
-   * @param type the container type
-   * @param value the value for the ui handler that should be taken out of the context
-   * @param args the args for the ui handler
-   * @param at an optional range
-   */
-  public async insertUIHandledContainer(type: string, value: string, args: { [key: string]: string }, at?: Range | Path) {
-    const pathAt: Path = !at || Path.isPath(at) ? (at as Path || this.state.currentSelectedElementAnchor) : null;
-    // if we got a path let's find the node
-    let nodeAtPath: Node;
-
-    try {
-      nodeAtPath = pathAt && Node.get(this.editor, pathAt);
-    } catch (e) {
-
-    }
-
-    let childIndex: number = 0;
-    // no node then let's use its parent
-    if (pathAt && !nodeAtPath) {
-      childIndex = pathAt.pop();
-      nodeAtPath = Node.get(this.editor, pathAt);
-    }
-
-    // if we are provided a range
-    if (at) {
-      // we focus at it
-      await this.focusAt(at);
-    }
-
-    // now we can make the container
-    const containerNode: IContainer = {
-      type: "container",
-      containment: "superblock",
-      children: [],
-      containerType: type || null,
-      uiHandler: value,
-      uiHandlerArgs: args,
-      givenName: type || null,
-    };
-
-    // and wrap the thing
-    if (pathAt) {
-      const nodeAtPath = Node.get(this.editor, pathAt);
-      let newPath: Path;
-
-      if ((nodeAtPath as any).containment === "superblock") {
-        newPath = [...pathAt, childIndex];
-      } else {
-        newPath = [...pathAt];
-        newPath[newPath.length - 1]++;
-      }
-      Transforms.insertNodes(this.editor, containerNode as any, { at: newPath });
-    } else {
-      this.editor.insertNode(containerNode as any);
-    }
-
-    if (this.state.currentText) {
-      // now we need to refocus
-      ReactEditor.focus(this.editor);
-    } else {
-      ReactEditor.blur(this.editor);
-    }
-  };
 
   /**
    * Sets the context key
@@ -4566,7 +3394,7 @@ export class SlateEditor extends React.Component<ISlateEditorProps, ISlateEditor
   /**
    * Formats the current text as bold
    */
-  public formatToggleBold() {
+  public formatToggle(key: "bold" | "italic" | "underline") {
     // if we have a selection and the points are equal
     // basically the same as a collapsed selection
     if (
@@ -4582,7 +3410,7 @@ export class SlateEditor extends React.Component<ISlateEditorProps, ISlateEditor
         {
           ...this.state.currentText,
           text: "",
-          bold: !this.state.currentText.bold,
+          [key]: !this.state.currentText[key],
         },
       );
     } else {
@@ -4590,119 +3418,18 @@ export class SlateEditor extends React.Component<ISlateEditorProps, ISlateEditor
       if (this.state.currentText) {
         Transforms.setNodes(
           this.editor,
-          { bold: !this.state.currentText.bold },
+          { [key]: !this.state.currentText[key] },
           { match: n => Text.isText(n), split: true }
         );
       } else if (this.state.currentSelectedText) {
         Transforms.setNodes(
           this.editor,
-          { bold: !this.state.currentSelectedText.bold },
-          { match: n => Text.isText(n), at: this.state.currentSelectedElementAnchor, mode: "all" }
+          { [key]: !this.state.currentSelectedText[key] },
+          { match: n => Text.isText(n), at: this.state.currentSelectedBlockElementAnchor, mode: "all" }
         );
       }
-    }
-
-    if (this.state.currentText) {
-      // now we need to refocus
-      ReactEditor.focus(this.editor);
-    } else {
-      ReactEditor.blur(this.editor);
     }
   }
-
-  /**
-   * formats the current text as italic
-   */
-  public formatToggleItalic() {
-    // if we have a selection and the points are equal
-    // basically the same as a collapsed selection
-    if (
-      this.state.currentText &&
-      this.editor.selection &&
-      Point.equals(this.editor.selection.anchor, this.editor.selection.focus)
-    ) {
-      // then we insert an empty text node, it will remain alive
-      // by virtue of it being the same location as our cursor so
-      // normalization won't remove it
-      Transforms.insertNodes(
-        this.editor,
-        {
-          ...this.state.currentText,
-          text: "",
-          italic: !this.state.currentText.italic,
-        },
-      );
-    } else {
-      // otherwise we just toggle
-      if (this.state.currentText) {
-        Transforms.setNodes(
-          this.editor,
-          { italic: !this.state.currentText.italic },
-          { match: n => Text.isText(n), split: true }
-        );
-      } else if (this.state.currentSelectedText) {
-        Transforms.setNodes(
-          this.editor,
-          { italic: !this.state.currentSelectedText.italic },
-          { match: n => Text.isText(n), at: this.state.currentSelectedElementAnchor, mode: "all" }
-        );
-      }
-    }
-
-    if (this.state.currentText) {
-      // now we need to refocus
-      ReactEditor.focus(this.editor);
-    } else {
-      ReactEditor.blur(this.editor);
-    }
-  };
-
-  /**
-   * formats the current text as italic
-   */
-  public formatToggleUnderline() {
-    // if we have a selection and the points are equal
-    // basically the same as a collapsed selection
-    if (
-      this.state.currentText &&
-      this.editor.selection &&
-      Point.equals(this.editor.selection.anchor, this.editor.selection.focus)
-    ) {
-      // then we insert an empty text node, it will remain alive
-      // by virtue of it being the same location as our cursor so
-      // normalization won't remove it
-      Transforms.insertNodes(
-        this.editor,
-        {
-          ...this.state.currentText,
-          text: "",
-          underline: !this.state.currentText.underline,
-        },
-      );
-    } else {
-      // otherwise we just toggle
-      if (this.state.currentText) {
-        Transforms.setNodes(
-          this.editor,
-          { underline: !this.state.currentText.underline },
-          { match: n => Text.isText(n), split: true }
-        );
-      } else if (this.state.currentSelectedText) {
-        Transforms.setNodes(
-          this.editor,
-          { underline: !this.state.currentSelectedText.underline },
-          { match: n => Text.isText(n), at: this.state.currentSelectedElementAnchor, mode: "all" }
-        );
-      }
-    }
-
-    if (this.state.currentText) {
-      // now we need to refocus
-      ReactEditor.focus(this.editor);
-    } else {
-      ReactEditor.blur(this.editor);
-    }
-  };
 
   /**
    * This is a helper function that is used in order to extract the available
@@ -4821,6 +3548,8 @@ export class SlateEditor extends React.Component<ISlateEditorProps, ISlateEditor
       HistoryEditor,
       Node,
 
+      getContextFor: this.getContextFor,
+
       selectPath: this.selectPath,
       deletePath: this.deletePath,
       movePaths: this.movePaths,
@@ -4830,9 +3559,7 @@ export class SlateEditor extends React.Component<ISlateEditorProps, ISlateEditor
       focus: this.focus,
       focusAt: this.focusAt,
 
-      formatToggleBold: this.formatToggleBold,
-      formatToggleItalic: this.formatToggleItalic,
-      formatToggleUnderline: this.formatToggleUnderline,
+      formatToggle: this.formatToggle,
       insertContainer: this.insertContainer,
       insertCustom: this.insertCustom,
       insertFile: this.insertFile,
@@ -4841,7 +3568,7 @@ export class SlateEditor extends React.Component<ISlateEditorProps, ISlateEditor
       insertTemplateText: this.insertTemplateText,
       insertTemplateHTML: this.insertTemplateHTML,
       toggleLink: this.toggleLink,
-      toggleList: this.toggleList,
+      insertList: this.insertList,
       toggleQuote: this.toggleQuote,
       toggleTitle: this.toggleTitle,
       setActiveStyle: this.setActiveStyle,
@@ -4855,7 +3582,6 @@ export class SlateEditor extends React.Component<ISlateEditorProps, ISlateEditor
       setAction: this.setAction,
       setUIHandler: this.setUIHandler,
       setUIHandlerArg: this.setUIHandlerArg,
-      insertUIHandledContainer: this.insertUIHandledContainer,
       insertElement: this.insertElement,
 
       blockBlur: this.blockBlur,
@@ -4881,38 +3607,15 @@ export class SlateEditor extends React.Component<ISlateEditorProps, ISlateEditor
     // we get these from the available filtering functions
     const availableCustoms = this.availableFilteringFunction("supportsCustom", "allCustom", "supportedCustoms", "custom");
     const availableRichClasses = this.availableFilteringFunction("supportsRichClasses", "allRichClasses", "supportedRichClasses", "rich");
-    const hasSelectionAndNonInlineNorVoid = this.state.currentSelectedElement &&
-      (
-        this.state.currentSelectedElement.containment !== "inline" ||
-        ReactEditor.isFocused(this.editor)
-      ) && !this.editor.isVoid(this.state.currentSelectedElement as any);
+    const availableContainers = this.availableFilteringFunction("supportsContainers", "allContainers", "supportedContainers", "containers");
 
     // and extend based on the features
     const newFeatureSupport: IAccessibleFeatureSupportOptions = {
       ...this.props.features,
 
-      availableContainers: this.availableFilteringFunction("supportsContainers", "allContainers", "supportedContainers", "containers"),
-      availableCustoms: availableCustoms,
+      availableContainers,
+      availableCustoms,
       availableRichClasses,
-
-      canInsertContainer: hasSelectionAndNonInlineNorVoid && this.props.features.supportsContainers,
-      canInsertCustom: hasSelectionAndNonInlineNorVoid && this.props.features.supportsCustom && !!availableCustoms.length,
-      canInsertFile: hasSelectionAndNonInlineNorVoid && this.props.features.supportsFiles,
-      canInsertImage: hasSelectionAndNonInlineNorVoid && this.props.features.supportsImages,
-      canInsertLink: hasSelectionAndNonInlineNorVoid && this.props.features.supportsLinks,
-      canInsertList: hasSelectionAndNonInlineNorVoid && this.props.features.supportsLists,
-      canInsertQuote: hasSelectionAndNonInlineNorVoid && this.props.features.supportsQuote,
-      canInsertRichClass: hasSelectionAndNonInlineNorVoid && this.props.features.supportsRichClasses && !!availableRichClasses.length,
-      canInsertTitle: hasSelectionAndNonInlineNorVoid && this.props.features.supportsTitle,
-      canInsertVideo: hasSelectionAndNonInlineNorVoid && this.props.features.supportsVideos,
-      canSetActionFunction: this.state.currentSelectedElement && this.props.features.supportsTemplating,
-      canSetActiveStyle: this.state.currentSelectedElement && this.props.features.supportsCustomStyles && this.props.features.supportsTemplating,
-      canSetDynamicHref: this.state.currentSelectedElement && this.props.features.supportsLinks && this.props.features.supportsTemplating,
-      canSetHoverStyle: this.state.currentSelectedElement && this.props.features.supportsCustomStyles && this.props.features.supportsTemplating,
-      canSetLoop: this.state.currentSelectedElement && this.props.features.supportsTemplating,
-      canSetStyle: this.state.currentSelectedElement && this.props.features.supportsCustomStyles,
-      canSetUIHandler: this.state.currentSelectedElement && this.props.features.supportsTemplating,
-      canInsertAnyElement: hasSelectionAndNonInlineNorVoid,
     };
 
     return newFeatureSupport;
@@ -4924,7 +3627,11 @@ export class SlateEditor extends React.Component<ISlateEditorProps, ISlateEditor
   public render() {
     // make the editable
     let children: React.ReactNode = (
-      <CurrentElementProvider element={this.state.currentSelectedElement}>
+      <CurrentElementProvider
+        block={this.state.currentSelectedBlockElement}
+        superblock={this.state.currentSelectedSuperBlockElement}
+        inline={this.state.currentSelectedInlineElement}
+      >
         <Editable
           id={this.props.id}
           onKeyDown={this.onKeyDown}
@@ -4944,41 +3651,12 @@ export class SlateEditor extends React.Component<ISlateEditorProps, ISlateEditor
 
     // if we have a wrapper
     if (Wrapper) {
-
-      // we get the state that we will feed
-      const state: ISlateEditorInternalStateType = {
-        currentValid: this.props.currentValid,
-        isFocused: this.state.focused,
-        currentContext: this.state.currentContext,
-        currentBlockElement: this.state.currentBlockElement,
-        currentSuperBlockElement: this.state.currentSuperBlockElement,
-        currentElement: this.state.currentElement,
-        currentText: this.state.currentText,
-        currentSelectedElement: this.state.currentSelectedElement,
-        currentSelectedBlockElement: this.state.currentSelectedBlockElement,
-        currentSelectedBlockElementAnchor: this.state.currentSelectedBlockElementAnchor,
-        currentSelectedSuperBlockElement: this.state.currentSelectedSuperBlockElement,
-        currentSelectedSuperBlockElementAnchor: this.state.currentSelectedSuperBlockElementAnchor,
-        isRichText: this.props.isRichText,
-        currentValue: this.state.currentValue,
-        textAnchor: this.state.currentAnchor,
-        currentBlockElementAnchor: this.state.currentBlockElementAnchor,
-        currentElementAnchor: this.state.currentElementAnchor,
-        currentSuperBlockElementAnchor: this.state.currentSuperBlockElementAnchor,
-        currentSelectedElementAnchor: this.state.currentSelectedElementAnchor,
-        currentSelectedText: this.state.currentSelectedText,
-        currentRootContext: this.props.rootContext || null,
-        currentSelectedElementContext: this.state.currentSelectedElementContext,
-        currentSelectedElementEachSelectContext: this.state.currentSelectedElementEachSelectContext,
-        currentSelectedElementContextSelectContext: this.state.currentSelectedElementContextSelectContext,
-      }
-
       // and we feed the thing in the wrapper as the new children
       // that is now wrapper inside the wrapper
       children = (
         <Wrapper
           {...this.props.wrapperArgs}
-          state={state}
+          state={this.state}
           helpers={this.getHelpers()}
           featureSupport={this.getFeatureSupport()}
           currentLoadError={this.props.currentLoadError}
@@ -4990,15 +3668,15 @@ export class SlateEditor extends React.Component<ISlateEditorProps, ISlateEditor
     }
 
     // wrapping based on the root context
-    if (this.props.rootContext && this.props.rootContext.wrapper) {
-      children = this.props.rootContext.wrapper(children);
+    if (this.props.rootContext && this.props.rootContext.editorArgs && this.props.rootContext.editorArgs.wrapper) {
+      children = this.props.rootContext.editorArgs.wrapper(children);
     }
 
     // now we can return
     return (
       <Slate
         editor={this.editor}
-        value={this.state.currentValue.children as any}
+        value={this.state.currentValue.children}
         onChange={this.onChange}
       >
         {children}

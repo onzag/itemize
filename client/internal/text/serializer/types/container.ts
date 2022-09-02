@@ -123,7 +123,6 @@ export function registerContainer(registry: ISerializationRegistryType) {
     return STANDARD_PARAGRAPH();
   }
 
-  const emptyRegex = /^\s+$/;
   registry.ON_INVALID_TEXT_WRAP_WITH.container = (text: IText) => {
     return [STANDARD_PARAGRAPH()];
   }

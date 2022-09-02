@@ -13,7 +13,7 @@ import { ILink } from "./link";
 import { IText, STANDARD_TEXT_NODE } from "./text";
 
 export function STANDARD_PARAGRAPH(textOrInline?: string | IText | RichElement): IParagraph {
-  if ((textOrInline as RichElement).type) {
+  if (textOrInline && (textOrInline as RichElement).type) {
     return {
       type: "paragraph",
       children: [textOrInline as any],

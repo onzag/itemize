@@ -12,7 +12,7 @@ import InputLabel from "@mui/material/InputLabel";
 import MenuItem from "@mui/material/MenuItem";
 import Select from "@mui/material/Select";
 import React from "react";
-import { ITemplateArgsContext } from "..";
+import { ITemplateArgContextDefinition } from "../../../../internal/text/serializer/template-args";
 import { Dialog } from "../../dialog";
 
 /**
@@ -34,11 +34,11 @@ interface ITemplateElementDialogProps {
   /**
    * The current context where the template element options are taken
    */
-  currentContext: ITemplateArgsContext;
+  currentContext: ITemplateArgContextDefinition;
   /**
    * The current root context
    */
-  currentRootContext: ITemplateArgsContext;
+  currentRootContext: ITemplateArgContextDefinition;
   /**
    * Whether the dialog should be open
    */

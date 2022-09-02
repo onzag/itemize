@@ -11,7 +11,6 @@ import { GeneralOptions } from "./general";
 import { StylesOptions } from "./styles";
 import { ActionsOptions } from "./actions";
 import { TemplatingOptions } from "./templating";
-import { getInfoOf, Tree } from "./tree";
 import Divider from "@mui/material/Divider";
 import Tabs from "@mui/material/Tabs";
 import Tab from "@mui/material/Tab";
@@ -20,7 +19,7 @@ import BorderStyleIcon from "@mui/icons-material/BorderStyle";
 import WebIcon from "@mui/icons-material/Web";
 import TouchAppIcon from "@mui/icons-material/TouchApp";
 import Typography from "@mui/material/Typography";
-import Box from "@mui/material/Box";
+import { getInfoFor, isText } from "../../../../internal/text/serializer";
 
 const style = {
   box: {
@@ -157,24 +156,6 @@ export function WrapperDrawer(props: IWrapperContainerProps) {
     }
   })
 
-  // but for that to be set we need to have something selected
-  // in the rich text editor state
-  const treeData = props.hideTree ? null : <Tree
-    currentRichElement={props.state.currentValue as any}
-    parentRichElement={null}
-    currentSelectedElement={props.state.currentSelectedElement as any}
-    currentSelectedElementPath={props.state.currentSelectedElementAnchor}
-    currentIsLastInPath={true}
-    currentPath={[]}
-    i18nRichInfo={props.i18nRichInfo}
-    onSelectPath={props.helpers.selectPath}
-    onDeletePath={props.helpers.deletePath}
-    onBeginDrag={setDragScroll.bind(null, true)}
-    onEndDrag={setDragScroll.bind(null, false)}
-    moveFromTo={props.helpers.movePaths}
-    scrollableAreaRef={scrollRef}
-  />
-
   // now we need to build the settings
   let settingsForNode: React.ReactNode = null;
   let titleForNode: string = null;
@@ -183,16 +164,13 @@ export function WrapperDrawer(props: IWrapperContainerProps) {
 
   // and that's done based on the selected node
   if (props.state.currentSelectedElement) {
-    // for that we get the info of the selected node
-    const selectedNodeInfo = getInfoOf(props.state.currentSelectedElement, props.i18nRichInfo);
-
     // and we need to see in which location we are
     let actualLocation = location;
     // for text nodes there's only the main location
     if (
       actualLocation !== "MAIN" &&
       (
-        selectedNodeInfo.isText ||
+        isText(props.state.currentSelectedElement) ||
         drawerMode === "simple" ||
         drawerMode === "barebones"
       )
@@ -227,6 +205,11 @@ export function WrapperDrawer(props: IWrapperContainerProps) {
         infoPanel = <TemplatingOptions {...props}/>;
         break;
     }
+
+    const selectedNodeInfo = getInfoFor(
+      props.state.currentSelectedElement,
+      props.i18nRichInfo,
+    );
 
     titleForNode = selectedNodeInfo.name;
 
@@ -301,13 +284,7 @@ export function WrapperDrawer(props: IWrapperContainerProps) {
   // now we return
   return (
     <>
-      {props.hideTree ? null : <>
-        <Typography sx={style.elementTitle} variant="h6">{titleForNode}</Typography>
-        <Divider sx={style.separator} />
-        <Box sx={style.treeDataBox} ref={scrollRef}>
-          {treeData}
-        </Box>
-      </>}
+      <Typography sx={style.elementTitle} variant="h6">{titleForNode}</Typography>
       {settingsForNode}
     </>
   );

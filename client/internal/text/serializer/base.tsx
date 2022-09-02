@@ -40,8 +40,9 @@ export interface IUIHandlerEvents {
 export interface IUIHandlerProps {
   /**
    * Represents the arguments that are retrieved
-   * by the handler itself, the args are provided in slate
-   * mode or not
+   * by the handler itself, eg in a component
+   * <div data-ui-handler="test" data-x="1" data-what-not="2"/>
+   * the args will be x and whatNot that are passed here
    */
   args: {
     [key: string]: any;
@@ -435,6 +436,7 @@ export function reactifyElementBase(
   // if we have a template and we are rendering as template
   if (arg.asTemplate && !arg.templateIgnoreContextualChanges) {
 
+    // so let's find the context we are working within
     let newTemplateArgs: TemplateArgs | MutatingTemplateArgs = currentTemplateArgs;
 
     // first we need to find the context
@@ -449,6 +451,8 @@ export function reactifyElementBase(
     // then we got to use the foreach context if we have one
     if (base.forEach) {
       const renderEachBasedOnContext = (resolvedContext: TemplateArgs): React.ReactNode => {
+        // and this resolved context is the context that is resolved either from the "context" key
+        // or the lack of it
         if (base.ifCondition) {
           const value = resolvedContext.properties[base.ifCondition];
           if (!value) {
@@ -497,6 +501,9 @@ export function reactifyElementBase(
             </React.Fragment>
           );
         } else if (loopElementBase instanceof MutatingTemplateArgs) {
+          // if it's mutating we got to do the same
+          // and call the wrapper which will render all the children
+          // itself and hopefully give them a key
           return (
             <React.Fragment key={arg.key}>
               {loopElementBase.mutatingWrapper(childrenRenderFn)}
@@ -508,6 +515,9 @@ export function reactifyElementBase(
         }
       }
 
+      // first we gotta see what kind of something we get for the foreach context
+      // if we got a mutating context from the move inside the "context" key
+      // we need to resolve it in order to get our context
       if (newTemplateArgs instanceof MutatingTemplateArgs) {
         return (
           <React.Fragment key={arg.key}>
@@ -518,7 +528,11 @@ export function reactifyElementBase(
         return renderEachBasedOnContext(newTemplateArgs);
       }
     } else if (newTemplateArgs instanceof MutatingTemplateArgs) {
+      // otherwise with no foreach loop alongside our context change
+      // we will simply use our mutating wrapper to resolve the new context
       return newTemplateArgs.mutatingWrapper((newContext: TemplateArgs) => {
+        // and request a re-reactification of this same element
+        // but with ignoring contextual changes
         return reactifyElementBase(
           registry,
           Tag,
@@ -540,10 +554,13 @@ export function reactifyElementBase(
         );
       })
     } else {
+      // otherwise it is not mutating it is simply template
+      // args so we reasign and keep going with this same execution
       currentTemplateArgs = newTemplateArgs;
     }
   }
 
+  // if we have an if condition we check for it
   if (arg.asTemplate && base.ifCondition) {
     const value = currentTemplateArgs && currentTemplateArgs.properties[base.ifCondition];
     if (!value) {
@@ -561,36 +578,38 @@ export function reactifyElementBase(
     const Handler: any = (
       currentTemplateArgs && currentTemplateArgs.properties[base.uiHandler]
     ) || (
-        currentTemplateRootArgs && currentTemplateRootArgs.properties[base.uiHandler]
-      );
-
-    const handlerChildren = children ? children.map((c, index: number) => {
-      // we use these options and we add the key
-      // in there
-      const specificChildTemplateOptions: IReactifyArg<RichElement | IText> = {
-        asTemplate: arg.asTemplate,
-        active: arg.active,
-        selected: arg.selected,
-        element: c,
-        templateArgs: currentTemplateArgs,
-        templateRootArgs: currentTemplateRootArgs,
-        key: index,
-        extraOptions: arg.extraOptions,
-      };
-
-      // and then we call the reactify
-      if ((c as IText).text) {
-        return registry.REACTIFY.text(specificChildTemplateOptions);
-      } else if (registry.SERIALIZE[(c as RichElement).type]) {
-        return registry.REACTIFY[(c as RichElement).type](specificChildTemplateOptions);
-      }
-
-      // ohteriwse null
-      return null;
-    }) : children;
+      currentTemplateRootArgs && currentTemplateRootArgs.properties[base.uiHandler]
+    );
 
     // if we have it, we use it
     if (Handler) {
+
+      // let's make the children for it
+      const handlerChildren = children ? children.map((c, index: number) => {
+        // we use these options and we add the key
+        // in there
+        const specificChildTemplateOptions: IReactifyArg<RichElement | IText> = {
+          asTemplate: arg.asTemplate,
+          active: arg.active,
+          selected: arg.selected,
+          element: c,
+          templateArgs: currentTemplateArgs,
+          templateRootArgs: currentTemplateRootArgs,
+          key: index,
+          extraOptions: arg.extraOptions,
+        };
+  
+        // and then we call the reactify
+        if ((c as IText).text) {
+          return registry.REACTIFY.text(specificChildTemplateOptions);
+        } else if (registry.SERIALIZE[(c as RichElement).type]) {
+          return registry.REACTIFY[(c as RichElement).type](specificChildTemplateOptions);
+        }
+  
+        // ohteriwse null
+        return null;
+      }) : children;
+
       let className: string = null;
       base.richClassList && base.richClassList.forEach((c) => {
         className = (className || "") + " rich-text--" + c;
@@ -602,6 +621,9 @@ export function reactifyElementBase(
       return (
         <React.Fragment key={arg.key}>
           {
+            // and we extract the potential events from the current template arguments
+            // that are used in the given base to pass it to the ui handler so it decides
+            // what to do with them
             retrieveElementActionsForReact(base, currentTemplateArgs, currentTemplateRootArgs, (events) => (
               <Handler
                 args={base.uiHandlerArgs}
