@@ -306,6 +306,10 @@ export interface IHelperFunctions {
    * This is the node class itself
    */
   Node: typeof Node;
+  /**
+   * The path type
+   */
+  Path: typeof Path;
 
   /**
    * Provies the context for the given path
@@ -335,6 +339,17 @@ export interface IHelperFunctions {
    * Deletes the node at the selected path
    */
   deleteSelectedNode: () => void;
+
+  /**
+   * Allows to kno what the previous selected element was
+   * before this one was selected
+   */
+  getPreviousSelectedElementAnchor: () => Path;
+  /**
+   * Allows to kno what the previous selected element was
+   * before this one was selected
+   */
+   getPreviousTextAnchor: () => Path;
 
   /**
    * focuses the text editor
@@ -515,20 +530,6 @@ export interface IHelperFunctions {
   setAction: (key: string, value: string, anchor: Path) => void;
 
   /**
-   * cancels the field from blurring
-   * you should use this on the mousedown on buttons that
-   * are outside the selected area
-   * not using this function should not have any effect
-   */
-  blockBlur: () => void;
-  /**
-   * releases the blur
-   * you should use this on the onmouseup on buttons that
-   * are outside the selected area
-   * not using this function should not have any effect
-   */
-  releaseBlur: () => void;
-  /**
    * Performs a hard blur, and even the selected paths are lost
    */
   hardBlur: () => void;
@@ -606,6 +607,8 @@ export interface ISlateEditorInternalStateType {
   currentSelectedBlockElementAnchor: Path;
   currentSelectedSuperBlockElementAnchor: Path;
   currentSelectedElementAnchor: Path;
+  previousSelectedElementAnchor: Path;
+  previousTextAnchor: Path;
 
   currentRootContext: ITemplateArgContextDefinition;
   currentSelectedSuperBlockContext: ITemplateArgContextDefinition;
@@ -913,20 +916,6 @@ export class SlateEditor extends React.Component<ISlateEditorProps, ISlateEditor
    */
   private updateTimeout: NodeJS.Timeout;
   /**
-   * Blurring is rather complex on this, and pressing the toolbar buttons and all around stuff
-   * causes flickering on the blur animations, so this blur timeout will ensure to call onblur
-   * only if it's not just to call onfocus later
-   */
-  private blurTimeout: NodeJS.Timeout;
-  /**
-   * This allows to block the blurring from happening, normally this is blocked via the blockBlur
-   * and releaseBlur functions and prevent the focused state to turn into false, it will not
-   * affect the actual focus, as the caret is anyway lost when you click on something like on a toolbar
-   * but most of these buttons once done cause a regain on focus, however, an animation might play
-   * that can be distracting and rather annoying otherwise
-   */
-  private blurBlocked: boolean = false;
-  /**
    * This flag allows to disable removing empty text nodes that exist in the current location
    * when set to true, eg. if we set a bold text node, while in most case we want these empty text nodes
    * gone, not all the time
@@ -1005,6 +994,8 @@ export class SlateEditor extends React.Component<ISlateEditorProps, ISlateEditor
             currentSelectedElement: null,
             currentSelectedElementAnchor: null,
             currentSelectedElementContext: null,
+            previousSelectedElementAnchor: null,
+            previousTextAnchor: null,
 
             allowsInsertElement: falseFn,
             allowsText: false,
@@ -1059,6 +1050,8 @@ export class SlateEditor extends React.Component<ISlateEditorProps, ISlateEditor
             currentSelectedSuperBlockElementAnchor: null,
             currentSelectedElement: null,
             currentSelectedElementAnchor: null,
+            previousSelectedElementAnchor: null,
+            previousTextAnchor: null,
 
             allowsInsertElement: falseFn,
             allowsText: false,
@@ -1116,6 +1109,8 @@ export class SlateEditor extends React.Component<ISlateEditorProps, ISlateEditor
       currentSelectedSuperBlockElementAnchor: null,
       currentSelectedElement: null,
       currentSelectedElementAnchor: null,
+      previousSelectedElementAnchor: null,
+      previousTextAnchor: null,
 
       isRichText: props.isRichText,
       currentRootContext: props.rootContext || null,
@@ -1176,6 +1171,9 @@ export class SlateEditor extends React.Component<ISlateEditorProps, ISlateEditor
     this.editor.setFragmentData = this.setFragmentData;
     this.editor.insertData = this.insertData;
 
+    this.getPreviousSelectedElementAnchor = this.getPreviousSelectedElementAnchor.bind(this);
+    this.getPreviousTextAnchor = this.getPreviousTextAnchor.bind(this);
+
     // other functions and heler utilities
     this.deleteSelectedNode = this.deleteSelectedNode.bind(this);
     this.deletePath = this.deletePath.bind(this);
@@ -1186,7 +1184,6 @@ export class SlateEditor extends React.Component<ISlateEditorProps, ISlateEditor
     this.renderText = this.renderText.bind(this);
     this.onFocusedChange = this.onFocusedChange.bind(this);
     this.onBlurredChange = this.onBlurredChange.bind(this);
-    this.onNativeBlur = this.onNativeBlur.bind(this);
     this.onKeyDown = this.onKeyDown.bind(this);
 
     this.selectPath = this.selectPath.bind(this);
@@ -1218,8 +1215,6 @@ export class SlateEditor extends React.Component<ISlateEditorProps, ISlateEditor
     this.availableFilteringFunction = this.availableFilteringFunction.bind(this);
     this.calculateAnchors = this.calculateAnchors.bind(this);
 
-    this.blockBlur = this.blockBlur.bind(this);
-    this.releaseBlur = this.releaseBlur.bind(this);
     this.hardBlur = this.hardBlur.bind(this);
     this.softBlur = this.softBlur.bind(this);
   }
@@ -1244,7 +1239,6 @@ export class SlateEditor extends React.Component<ISlateEditorProps, ISlateEditor
         // File belongs to this editor, nothing to do
       } else {
         // File belongs to a different editor, cloning the content
-
         const infoFromInsert = await this.props.onInsertFileFromURL(
           urlToReadFrom,
           (newElement as any).fileName || (newElement as any).alt || idSpecified,
@@ -1401,10 +1395,6 @@ export class SlateEditor extends React.Component<ISlateEditorProps, ISlateEditor
     }
   }
 
-  public componentDidUpdate(prevProps: ISlateEditorProps, prevState: ISlateEditorState) {
-
-  }
-
   /**
    * Normalization funciton that overrides the normalization
    * of the standard editor
@@ -1425,6 +1415,8 @@ export class SlateEditor extends React.Component<ISlateEditorProps, ISlateEditor
     // and deleting everything and the only thing left is the
     // editor itself
     if (Editor.isEditor(node)) {
+      this.isInNormalization = true;
+
       // this will basically be true every time
       if (node.children.length === 0) {
         // we insert a paragraph
@@ -1432,59 +1424,63 @@ export class SlateEditor extends React.Component<ISlateEditorProps, ISlateEditor
           { type: "paragraph", children: [STANDARD_TEXT_NODE() as any] },
           { at: path.concat(0) }
         );
-      }
-
-      // if it's an element
-    } else if (Element.isElement(node)) {
-      this.isInNormalization = true;
-
-      normalizeElement(
-        node,
-        path,
-        this.state.currentValue,
-        {
-          workOnOriginal: false,
-          updateNodeAt(path, v) {
-            Transforms.setNodes(this.editor, v, {
-              at: path,
-            });
-          },
-          deleteNodeAt(path) {
-            Transforms.delete(this.editor, {
-              at: path,
-            });
-          },
-          insertNodeAt(path, node, targetIndex) {
-            Transforms.insertNodes(this.editor, node, {
-              at: [...path, targetIndex],
-            });
-          },
-          mergeNodesAt(basePath, referencePath) {
-            const parentPath = [...basePath];
-            parentPath.pop();
-
-            Transforms.mergeNodes(this.editor, {
-              at: parentPath,
-              match(node, pathMatch) {
-                return Path.equals(pathMatch, basePath) || Path.equals(pathMatch, referencePath);
-              },
-            });
-          },
-          splitElementAndEscapeChildIntoParentAt(path, escapingChildIndex) {
-            // TODO
-          },
-          wrapNodeAt(path, wrappers) {
-            wrappers.forEach((wrapper) => {
-              Transforms.wrapNodes(this.editor, wrapper, {
+      } else {
+        const pseudoDocument: IRootLevelDocument = {
+          type: "document",
+          children: node.children as any,
+          id: this.state.currentValue.id,
+          rich: this.state.currentValue.rich,
+        };
+        normalizeElement(
+          pseudoDocument,
+          [],
+          pseudoDocument,
+          {
+            workOnOriginal: false,
+            updateNodeAt(path, v) {
+              Transforms.setNodes(this.editor, v, {
                 at: path,
               });
-            });
-          },
-          getNodeAt(path) {
-            return Node.get(this.editor, path) as RichElement;
-          },
-        }
-      );
+            },
+            deleteNodeAt(path) {
+              Transforms.delete(this.editor, {
+                at: path,
+              });
+            },
+            insertNodeAt(path, node, targetIndex) {
+              Transforms.insertNodes(this.editor, node, {
+                at: [...path, targetIndex],
+              });
+            },
+            mergeNodesAt(basePath, referencePath) {
+              const parentPath = [...basePath];
+              parentPath.pop();
+  
+              Transforms.mergeNodes(this.editor, {
+                at: parentPath,
+                match(node, pathMatch) {
+                  return Path.equals(pathMatch, basePath) || Path.equals(pathMatch, referencePath);
+                },
+              });
+            },
+            splitElementAndEscapeChildIntoParentAt(path, escapingChildIndex) {
+              Transforms.liftNodes(this.editor, {
+                at: [...path, escapingChildIndex],
+              })
+            },
+            wrapNodeAt(path, wrappers) {
+              wrappers.forEach((wrapper) => {
+                Transforms.wrapNodes(this.editor, wrapper, {
+                  at: path,
+                });
+              });
+            },
+            getNodeAt(path) {
+              return Node.get(this.editor, path) as RichElement;
+            },
+          }
+        );
+      }
 
       this.isInNormalization = false;
     }
@@ -1818,7 +1814,11 @@ export class SlateEditor extends React.Component<ISlateEditorProps, ISlateEditor
    * @param currentGivenSelectedNodeAnchor the selected node anchor, and text anchor if not provided
    * it will use the default values based on the logic of the calculated anchors
    */
-  public calculateAnchors(anchor: Path, value?: Node[], currentGivenSelectedNodeAnchor?: Path) {
+  public calculateAnchors(
+    anchor: Path,
+    value?: Node[],
+    currentGivenSelectedNodeAnchor?: Path,
+  ) {
     // first we set up all the basics to their null value
     let currentInlineElement: RichElement = null;
     let currentInlineElementAnchor: Path = null;
@@ -1829,15 +1829,12 @@ export class SlateEditor extends React.Component<ISlateEditorProps, ISlateEditor
     let currentText: IText = null;
     let currentTextAnchor: Path = null;
 
+    let previousSelectedElementAnchor: Path = this.state.currentSelectedElementAnchor;
+    let previousTextAnchor: Path = this.state.currentTextAnchor;
+
     // now we do need to setup the anchor if we have an anchor
     // in that case we need to populate these fields
     if (anchor) {
-      // the block and superblock need to be calculated
-      currentBlockElementAnchor = [];
-      currentSuperBlockElementAnchor = [];
-      currentInlineElementAnchor = [];
-      currentTextAnchor = anchor;
-
       // the current element
       let currentLoopingElement = value ? {
         children: value,
@@ -2034,6 +2031,9 @@ export class SlateEditor extends React.Component<ISlateEditorProps, ISlateEditor
     const voidElement = inlineIsVoid || blockIsVoid || superblockIsVoid;
     const allowsText = !voidElement;
 
+    const currentSelectedElement = currentSelectedInlineElement || currentSelectedBlockElement || currentSelectedSuperBlockElement;
+    const currentSelectedElementAnchor = currentSelectedInlineElementAnchor || currentSelectedBlockElementAnchor || currentSelectedSuperBlockElementAnchor;
+
     // now we can return
     return {
       currentTextAnchor,
@@ -2052,8 +2052,8 @@ export class SlateEditor extends React.Component<ISlateEditorProps, ISlateEditor
       currentSelectedInlineElementAnchor,
       currentSelectedSuperBlockElement,
       currentSelectedSuperBlockElementAnchor,
-      currentSelectedElement: currentSelectedSuperBlockElement || currentSelectedBlockElement || currentSelectedInlineElement,
-      currentSelectedElementAnchor: currentSelectedSuperBlockElementAnchor || currentSelectedBlockElementAnchor || currentSelectedInlineElementAnchor,
+      currentSelectedElement,
+      currentSelectedElementAnchor,
 
       currentSelectedSuperBlockContext,
       currentSelectedBlockContext,
@@ -2068,6 +2068,9 @@ export class SlateEditor extends React.Component<ISlateEditorProps, ISlateEditor
       superBlockUIHandler,
       blockUIHandler,
       inlineUIHandler,
+
+      previousSelectedElementAnchor,
+      previousTextAnchor,
     }
   }
 
@@ -2127,18 +2130,6 @@ export class SlateEditor extends React.Component<ISlateEditorProps, ISlateEditor
       focused: false,
       ...anchorData,
     });
-  }
-
-  /**
-   * Runs during the native blur off the content editable
-   * we need to avoid flickery animation and so we perform
-   * this trickery
-   */
-  public onNativeBlur() {
-    if (this.state.focused && !this.blurBlocked) {
-      this.blurTimeout = setTimeout(this.onBlurredChange, 70);
-    }
-    return false;
   }
 
   /**
@@ -2512,13 +2503,6 @@ export class SlateEditor extends React.Component<ISlateEditorProps, ISlateEditor
       return;
     }
 
-    // first we clear the timeout of the blur
-    // this is used during the blur blocking so now
-    // the field won't be blurred because a change occured
-    // but it will at the end depend on the editor selection
-    // whether it ends up being blurred or not
-    clearTimeout(this.blurTimeout);
-
     // if there's a selection
     if (this.editor.selection && ReactEditor.isFocused(this.editor)) {
       // we are on focus
@@ -2538,24 +2522,6 @@ export class SlateEditor extends React.Component<ISlateEditorProps, ISlateEditor
       // triggers for changes in the selection
       this.setValue(newValue);
     }
-  }
-
-  /**
-   * The blocking blur function it is a helper function that is called usually on the toolbars
-   * to prevent the field from blurring on mousedown, ups events, as this will cause a blur only
-   * to cause a refocus, this prevents that
-   */
-  public blockBlur() {
-    clearTimeout(this.blurTimeout);
-    this.blurBlocked = true;
-  }
-
-  /**
-   * This is part of the blur blocking event chain and releases
-   * the blocking of the blur event
-   */
-  public releaseBlur() {
-    this.blurBlocked = false;
   }
 
   /**
@@ -2580,6 +2546,8 @@ export class SlateEditor extends React.Component<ISlateEditorProps, ISlateEditor
       currentSelectedElement: null,
       currentSelectedElementAnchor: null,
       currentSelectedElementContext: null,
+      previousSelectedElementAnchor: this.state.currentSelectedElementAnchor,
+      previousTextAnchor: this.state.currentTextAnchor,
     });
     Transforms.deselect(this.editor);
     ReactEditor.blur(this.editor);
@@ -2685,6 +2653,14 @@ export class SlateEditor extends React.Component<ISlateEditorProps, ISlateEditor
       const newSelectedAnchor = selectedElement ? ReactEditor.findPath(this.editor, selectedElement) : null;
       this.setState(this.calculateAnchors(this.editor.selection && this.editor.selection.anchor.path, null, newSelectedAnchor))
     }, 0);
+  }
+
+  public getPreviousSelectedElementAnchor() {
+    return this.state.previousSelectedElementAnchor;
+  }
+
+  public getPreviousTextAnchor() {
+    return this.state.previousTextAnchor;
   }
 
   /**
@@ -3547,6 +3523,7 @@ export class SlateEditor extends React.Component<ISlateEditorProps, ISlateEditor
       ReactEditor,
       HistoryEditor,
       Node,
+      Path,
 
       getContextFor: this.getContextFor,
 
@@ -3555,6 +3532,9 @@ export class SlateEditor extends React.Component<ISlateEditorProps, ISlateEditor
       movePaths: this.movePaths,
 
       deleteSelectedNode: this.deleteSelectedNode,
+
+      getPreviousSelectedElementAnchor: this.getPreviousSelectedElementAnchor,
+      getPreviousTextAnchor: this.getPreviousTextAnchor,
 
       focus: this.focus,
       focusAt: this.focusAt,
@@ -3584,8 +3564,6 @@ export class SlateEditor extends React.Component<ISlateEditorProps, ISlateEditor
       setUIHandlerArg: this.setUIHandlerArg,
       insertElement: this.insertElement,
 
-      blockBlur: this.blockBlur,
-      releaseBlur: this.releaseBlur,
       hardBlur: this.hardBlur,
       softBlur: this.softBlur,
     }
@@ -3635,7 +3613,6 @@ export class SlateEditor extends React.Component<ISlateEditorProps, ISlateEditor
         <Editable
           id={this.props.id}
           onKeyDown={this.onKeyDown}
-          onBlur={this.onNativeBlur}
           renderElement={this.renderElement}
           renderLeaf={this.renderText}
           placeholder={this.props.placeholder}

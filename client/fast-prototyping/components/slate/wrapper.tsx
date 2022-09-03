@@ -197,6 +197,10 @@ const style = {
     border: "solid 1px #ccc",
     height: "2rem",
     margin: "0 0.5rem",
+
+    "& + hr": {
+      display: "none",
+    },
   },
   hdivider: {
     border: "solid 1px #ccc",
@@ -610,8 +614,6 @@ function Bold(props: RichTextEditorToolbarElementProps) {
       title={props.i18nRichInfo.formatBoldLabel}
       disabled={!props.state.currentSelectedText || !props.state.allowsText}
       color={props.state.currentSelectedText && props.state.currentSelectedText.bold ? "primary" : "default"}
-      onMouseDown={props.helpers.blockBlur}
-      onMouseUp={props.helpers.releaseBlur}
       onClick={props.helpers.formatToggle.bind(null, "bold")}
       data-fastkey={props.fastKey}
       size="large">
@@ -629,8 +631,6 @@ function Italic(props: RichTextEditorToolbarElementProps) {
       title={props.i18nRichInfo.formatItalicLabel}
       disabled={!props.state.currentSelectedText || !props.state.allowsText}
       color={props.state.currentSelectedText && props.state.currentSelectedText.italic ? "primary" : "default"}
-      onMouseDown={props.helpers.blockBlur}
-      onMouseUp={props.helpers.releaseBlur}
       onClick={props.helpers.formatToggle.bind(null, "italic")}
       data-fastkey={props.fastKey}
       size="large">
@@ -648,8 +648,6 @@ function Underline(props: RichTextEditorToolbarElementProps) {
       title={props.i18nRichInfo.formatUnderlineLabel}
       disabled={!props.state.currentSelectedText || !props.state.allowsText}
       color={props.state.currentSelectedText && props.state.currentSelectedText.underline ? "primary" : "default"}
-      onMouseDown={props.helpers.blockBlur}
-      onMouseUp={props.helpers.releaseBlur}
       onClick={props.helpers.formatToggle.bind(null, "underline")}
       data-fastkey={props.fastKey}
       size="large">
@@ -718,8 +716,6 @@ function Link(props: RichTextEditorToolbarElementProps) {
       color={props.state.currentSelectedInlineElement && props.state.currentSelectedInlineElement.type === "link" ? "primary" : "default"}
       disabled={props.state.allowsInsertElement({type: "link", href: "", children: [], thref: null})}
       onClick={props.requestLink}
-      onMouseDown={props.helpers.blockBlur}
-      onMouseUp={props.helpers.releaseBlur}
       data-fastkey={props.fastKey}
       size="large">
       <LinkIcon />
@@ -753,8 +749,6 @@ function Title(props: RichTextEditorToolbarElementProps) {
       color={props.state.currentSelectedBlockElement && props.state.currentSelectedBlockElement.type === "title" ? "primary" : "default"}
       disabled={props.state.allowsInsertElement({type: "title", subtype: "h1", children: []})}
       onClick={props.helpers.toggleTitle.bind(null, "h1")}
-      onMouseDown={props.helpers.blockBlur}
-      onMouseUp={props.helpers.releaseBlur}
       data-fastkey={props.fastKey}
       size="large">
       <TitleIcon />
@@ -776,8 +770,6 @@ function Quote(props: RichTextEditorToolbarElementProps) {
       color={props.state.currentSelectedBlockElement && props.state.currentSelectedBlockElement.type === "quote" ? "primary" : "default"}
       disabled={!props.state.allowsInsertElement({type: "quote", children: []})}
       onClick={props.helpers.toggleQuote}
-      onMouseDown={props.helpers.blockBlur}
-      onMouseUp={props.helpers.releaseBlur}
       data-fastkey={props.fastKey}
       size="large">
       <FormatQuoteIcon />
@@ -798,8 +790,6 @@ function NumberedList(props: RichTextEditorToolbarElementProps) {
       tabIndex={-1}
       title={props.i18nRichInfo.formatListNumberedLabel}
       onClick={props.helpers.insertList.bind(null, "numbered")}
-      onMouseDown={props.helpers.blockBlur}
-      onMouseUp={props.helpers.releaseBlur}
       data-fastkey={props.fastKey}
       size="large">
       <FormatListNumberedIcon />
@@ -819,8 +809,6 @@ function BulletedList(props: RichTextEditorToolbarElementProps) {
       tabIndex={-1}
       title={props.i18nRichInfo.formatListBulletedLabel}
       onClick={props.helpers.insertList.bind(null, "bulleted")}
-      onMouseDown={props.helpers.blockBlur}
-      onMouseUp={props.helpers.releaseBlur}
       data-fastkey={props.fastKey}
       size="large">
       <FormatListBulletedIcon />
@@ -856,8 +844,6 @@ function Image(props: RichTextEditorToolbarElementProps) {
       tabIndex={-1}
       title={props.i18nRichInfo.formatAddImageLabel}
       onClick={props.requestImage}
-      onMouseDown={props.helpers.blockBlur}
-      onMouseUp={props.helpers.releaseBlur}
       data-fastkey={props.fastKey}
       size="large">
       <InsertPhotoIcon />
@@ -886,9 +872,7 @@ function Video(props: RichTextEditorToolbarElementProps) {
     <IconButton
       tabIndex={-1}
       title={props.i18nRichInfo.formatAddVideoLabel}
-      onMouseDown={props.helpers.blockBlur}
       onClick={props.requestVideo}
-      onMouseUp={props.helpers.releaseBlur}
       data-fastkey={props.fastKey}
       size="large">
       <VideoLibraryIcon />
@@ -920,9 +904,7 @@ function File(props: RichTextEditorToolbarElementProps) {
     <IconButton
       tabIndex={-1}
       title={props.i18nRichInfo.formatAddFileLabel}
-      onMouseDown={props.helpers.blockBlur}
       onClick={props.requestFile}
-      onMouseUp={props.helpers.releaseBlur}
       data-fastkey={props.fastKey}
       size="large">
       <AttachFileIcon />
@@ -944,9 +926,7 @@ function Container(props: RichTextEditorToolbarElementProps) {
     <IconButton
       tabIndex={-1}
       title={props.i18nRichInfo.formatAddContainerLabel}
-      onMouseDown={props.helpers.blockBlur}
       onClick={props.insertContainer}
-      onMouseUp={props.helpers.releaseBlur}
       data-fastkey={props.fastKey}
       size="large">
       <CheckBoxOutlineBlankIcon />
@@ -1004,9 +984,7 @@ function TemplateText(props: RichTextEditorToolbarElementProps) {
     <IconButton
       tabIndex={-1}
       title={props.i18nRichInfo.formatAddTemplateText}
-      onMouseDown={props.helpers.blockBlur}
       onClick={props.requestTemplateText}
-      onMouseUp={props.helpers.releaseBlur}
       data-fastkey={props.fastKey}
       size="large">
       <TextFieldsIcon />
@@ -1078,9 +1056,7 @@ function TemplateHTML(props: RichTextEditorToolbarElementProps) {
     <IconButton
       tabIndex={-1}
       title={props.i18nRichInfo.formatAddTemplateHTML}
-      onMouseDown={props.helpers.blockBlur}
       onClick={props.requestTemplateHTML}
-      onMouseUp={props.helpers.releaseBlur}
       data-fastkey={props.fastKey}
       size="large">
       <CodeIcon />
@@ -1108,7 +1084,7 @@ interface IToolbarExtraProps extends RichTextEditorToolbarElementProps {
 
 function ToolbarExtra(props: IToolbarExtraProps) {
   const elementReference = typeof props.extra.element === "function" ? props.extra.element() : props.extra.element;
-  if (!props.state.allowsInsertElement(elementReference)) {
+  if (elementReference && !props.state.allowsInsertElement(elementReference)) {
     return null;
   }
 
@@ -1120,8 +1096,6 @@ function ToolbarExtra(props: IToolbarExtraProps) {
 
   const basicProps = {
     tabIndex: -1,
-    onMouseDown: props.helpers.blockBlur,
-    onMouseUp: props.helpers.releaseBlur,
     onClick: props.extra.onClick ? props.extra.onClick.bind(null, defaultAction) : defaultAction,
   }
 
@@ -1267,7 +1241,7 @@ class RichTextEditorToolbar extends React.Component<RichTextEditorToolbarProps, 
       return null;
     }
 
-    if (this.props.disjointedMode && !this.props.state.currentSelectedText) {
+    if (this.props.disjointedMode && !this.props.state.currentSelectedElement) {
       return null;
     }
 
@@ -1313,9 +1287,7 @@ class RichTextEditorToolbar extends React.Component<RichTextEditorToolbarProps, 
       this.props.shouldHaveDrawer() ?
         <IconButton
           tabIndex={-1}
-          onMouseDown={this.props.helpers.blockBlur}
           onClick={this.props.toggleDrawer}
-          onMouseUp={this.props.helpers.releaseBlur}
           size="large">
           {this.props.drawerOpen ? <ExpandLessIcon /> : <MoreHorizIcon />}
         </IconButton> :
@@ -1370,13 +1342,12 @@ class RichTextEditorToolbar extends React.Component<RichTextEditorToolbarProps, 
         sx={
           this.props.disjointedMode ? style.appbarFixed : style.appbar
         }
-        data-unblur="true"
         ref={(obj) => {
           this.appBarHeader = obj as any;
         }}
       >
         <Toolbar sx={style.toolbar}>
-          {}
+          {toolbarFormMapped}
           <Box sx={style.moreOptionsSpacer} />
           {drawerButton}
         </Toolbar>
@@ -1485,6 +1456,11 @@ export class MaterialUISlateWrapper extends React.PureComponent<MaterialUISlateW
   private wrapperContainerRef: React.RefObject<WrapperContainer>;
 
   /**
+   * a ref to the editor
+   */
+  private editorRef: React.RefObject<HTMLDivElement>;
+
+  /**
    * A ref for the toolbar
    */
   private toolbarRef: React.RefObject<RichTextEditorToolbar>;
@@ -1549,6 +1525,7 @@ export class MaterialUISlateWrapper extends React.PureComponent<MaterialUISlateW
     this.inputFileRef = React.createRef();
     this.wrapperContainerRef = React.createRef();
     this.toolbarRef = React.createRef();
+    this.editorRef = React.createRef();
 
     // bind all the functions
     this.onHeightChange = this.onHeightChange.bind(this);
@@ -1718,21 +1695,18 @@ export class MaterialUISlateWrapper extends React.PureComponent<MaterialUISlateW
   }
 
   public selectiveHardBlur(e: MouseEvent | KeyboardEvent) {
+    // we are currently in focus
     if (this.props.state.currentSelectedText) {
-      if ((e.target as any).parentElement) {
-        if (!this.isParentedBySlateOrUnblurred(e.target as any)) {
-          this.props.helpers.hardBlur();
-          this.setState({
-            altKey: false,
-            shiftKey: false,
-          });
-        }
-      } else {
+      // if it's an unblurred target, such as the toolbar
+      // or the drawer
+      if (this.isUnblurred(e.target as any)) {
+        // stop from losing focus
+        e.stopPropagation();
+        e.preventDefault();
+      } else if (!this.isInEditor(e.target as any)) {
+        // otherwise if we are not in the editor
+        // just lose all the focus
         this.props.helpers.hardBlur();
-        this.setState({
-          altKey: false,
-          shiftKey: false,
-        });
       }
     }
   }
@@ -1753,13 +1727,25 @@ export class MaterialUISlateWrapper extends React.PureComponent<MaterialUISlateW
     });
   }
 
-  public isParentedBySlateOrUnblurred(ele: HTMLElement): boolean {
-    if (ele.dataset.unblur || ele.dataset.slateNode || ele.dataset.slateLeaf || ele.dataset.slateVoid) {
+  public isUnblurred(ele: HTMLElement): boolean {
+    if (ele === this.toolbarRef.current.getAppbarHeader() || ele === this.wrapperContainerRef.current.getDrawerBody()) {
       return true;
     }
 
     if (ele.parentElement) {
-      return this.isParentedBySlateOrUnblurred(ele.parentElement);
+      return this.isUnblurred(ele.parentElement);
+    }
+
+    return false;
+  }
+
+  public isInEditor(ele: HTMLElement): boolean {
+    if (ele === this.editorRef.current) {
+      return true;
+    }
+
+    if (ele.parentElement) {
+      return this.isInEditor(ele.parentElement);
     }
 
     return false;
@@ -2270,7 +2256,7 @@ export class MaterialUISlateWrapper extends React.PureComponent<MaterialUISlateW
       return (
         <>
           {toolbar}
-          <Box className={this.props.wrapperClassName} sx={this.props.wrapperSx}>
+          <Box className={this.props.wrapperClassName} sx={this.props.wrapperSx} ref={this.editorRef}>
             <Box className={
               "rich-text " +
               (this.props.wrapperTextEditorClassName ? " " + this.props.wrapperTextEditorClassName : "") +
@@ -2305,6 +2291,7 @@ export class MaterialUISlateWrapper extends React.PureComponent<MaterialUISlateW
         {toolbar}
         <StyledEditorContainer sx={this.props.wrapperSx} className={this.props.wrapperClassName}>
           <StyledEditor
+            ref={this.editorRef}
             className={
               "rich-text" +
               (this.props.state.focused ? " focused" : "") +
@@ -2375,8 +2362,6 @@ class WrapperContainer extends React.Component<IWrapperContainerProps, IWrapperC
 
     const toReturn = (
       <Box
-        data-unblur="true"
-        onClick={this.props.helpers.softBlur}
         sx={[
           (this.props.disjointedMode ? style.editorDrawerFixed : style.editorDrawer),
           (this.props.noAnimate ? style.editorDrawerNoAnimate : null)
