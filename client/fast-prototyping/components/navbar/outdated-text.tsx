@@ -9,6 +9,7 @@ import AppIsOutdatedChecker from "../../../components/outdated/AppIsOutdatedChec
 import I18nRead from "../../../components/localization/I18nRead";
 import UpdateIcon from "@mui/icons-material/Update";
 import Button from "@mui/material/Button";
+import { AltBadgeReactioner } from "../alt-badge-reactioner";
 
 /**
  * The props are simple it just takes a click event
@@ -31,15 +32,22 @@ export function OutdatedText(props: OutdatedTextProps) {
           return (
             <I18nRead id="needs_update_navigation">
               {(i18nNeedsUpdate) => (
-                <Button
-                  variant="outlined"
-                  color="inherit"
-                  aria-label={i18nNeedsUpdate as string}
-                  startIcon={<UpdateIcon />}
-                  onClick={props.onClick}
+                <AltBadgeReactioner
+                  reactionKey="o"
+                  label="o"
+                  component="span"
+                  selector="button"
                 >
-                  {i18nNeedsUpdate}
-                </Button>
+                  <Button
+                    variant="outlined"
+                    color="inherit"
+                    aria-label={i18nNeedsUpdate as string}
+                    startIcon={<UpdateIcon />}
+                    onClick={props.onClick}
+                  >
+                    {i18nNeedsUpdate}
+                  </Button>
+                </AltBadgeReactioner>
               )}
             </I18nRead>
           );

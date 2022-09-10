@@ -173,7 +173,8 @@
                 "supportsRichClasses": false,
                 "supportsTitle": true,
                 "supportsCustomStyles": false,
-                "supportsTemplating": false
+                "supportsTemplating": false,
+                "supportsTables": false
             },
             "subtype": "html",
             "nullable": true,

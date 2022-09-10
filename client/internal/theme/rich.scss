@@ -20,6 +20,22 @@ $superblock-highlight-color: #33691e;
   white-space: pre-wrap;
   width: 100%;
 
+  table {
+    width: 100%;
+    border: solid 1px #ccc;
+
+    thead {
+      th {
+        background-color: #ccc;
+      }
+    }
+
+    td {
+      border: solid 1px #ccc;
+      padding: "0.5rem";
+    }
+  }
+
   a {
     color: $general-highlight-color;
     cursor: pointer;
@@ -231,6 +247,20 @@ $superblock-highlight-color: #33691e;
       padding-bottom: 56.25%;
       height: 0;
       position: relative;
+      background-color: #ccc;
+
+      &::before {
+        content: " ";
+        display: block;
+        position: absolute;
+        top: calc(50% - 50px);
+        left: calc(50% - 50px);
+        width: 100px;
+        height: 100px;
+        opacity: 0.5;
+        background-size: contain;
+        background-image: url("data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNTEycHgiIGhlaWdodD0iNTEycHgiIHZpZXdCb3g9IjAgMCA1MTIgNTEyIiB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciPjxwYXRoIGQ9Ik0xMzMsNDQwYTM1LjM3LDM1LjM3LDAsMCwxLTE3LjUtNC42N2MtMTItNi44LTE5LjQ2LTIwLTE5LjQ2LTM0LjMzVjExMWMwLTE0LjM3LDcuNDYtMjcuNTMsMTkuNDYtMzQuMzNhMzUuMTMsMzUuMTMsMCwwLDEsMzUuNzcuNDVMMzk5LjEyLDIyNS40OGEzNiwzNiwwLDAsMSwwLDYxTDE1MS4yMyw0MzQuODhBMzUuNSwzNS41LDAsMCwxLDEzMyw0NDBaIi8+PC9zdmc+Cg==");
+      }
   
       iframe {
         position: absolute;
@@ -244,6 +274,15 @@ $superblock-highlight-color: #33691e;
     &.selected {
       .video-container {
         box-shadow: 0 0 5px $general-highlight-color, 0 0 5px $general-highlight-color, 0 0 5px $general-highlight-color;
+      }
+    }
+
+    &.inactive {
+      .video-container::after {
+        content: " ";
+        width: 100%;
+        height: 100%;
+        position: absolute;
       }
     }
   }

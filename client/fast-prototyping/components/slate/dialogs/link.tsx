@@ -144,7 +144,7 @@ interface ILinkDialogState {
   /**
    * All our available options
    */
-  linkTemplateOptions: ILinkDialogTemplateOption[],
+  linkTemplateOptions: ILinkDialogTemplateOption[];
 }
 
 /**
@@ -263,7 +263,7 @@ export class LinkDialog extends React.PureComponent<ILinkDialogProps, ILinkDialo
 
     // now we can set the state from the analysis
     this.setState({
-      linkURL: (this.props.selectedElement as any).href || "",
+      linkURL: (this.props.selectedElement && (this.props.selectedElement as any).href) || "",
       linkTValue: selectedContextValue,
       linkTemplateOptions: linkPropertiesToUse,
     });
@@ -287,6 +287,7 @@ export class LinkDialog extends React.PureComponent<ILinkDialogProps, ILinkDialo
       this.setState({
         linkInvalid: true,
       });
+      this.focusLinkTextField();
     }
   }
 
@@ -326,10 +327,6 @@ export class LinkDialog extends React.PureComponent<ILinkDialogProps, ILinkDialo
       linkInvalid: false,
       linkTemplateOptions: [],
     });
-
-    setTimeout(() => {
-      delete document.body.dataset.unblur;
-    }, 100);
   }
 
   /**
@@ -349,7 +346,6 @@ export class LinkDialog extends React.PureComponent<ILinkDialogProps, ILinkDialo
             {this.props.i18nSetLinkSubmit}
           </Button>
         }
-        className="__unblur"
       >
         <div>
           <TextField

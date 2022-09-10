@@ -38,6 +38,7 @@ export const RICH_TEXT_CLASS_PREFIX = "rich-text--";
 export const CONTAINER_CLASS = "container";
 export const CONTAINER_CLASS_PREFIX = CONTAINER_CLASS + "-";
 export const CUSTOM_CLASS_PREFIX = "custom-";
+export const TABLE_CLASS_PREFIX = "table-";
 
 /**
  * The list of allowed prefixes
@@ -229,6 +230,14 @@ export interface IFeatureSupportOptions {
    * not affect the base container
    */
   supportedContainers: string[];
+  /**
+   * Whether tables are supported
+   */
+  supportsTables: boolean;
+  /**
+   * The list of supported tables
+   */
+  supportedTables: string[];
   /**
    * whether rich classes are supported
    */
@@ -441,11 +450,21 @@ export function postprocess(
         } else if (options.supportedRichClasses) {
           !options.supportedRichClasses.includes(className.substr(RICH_TEXT_CLASS_PREFIX.length)) && node.classList.remove(className);
         }
+      } else if (className.startsWith(TABLE_CLASS_PREFIX)) {
+        if (!options.supportsTables) {
+          node.classList.remove(className);
+        } else if (options.supportedTables) {
+          !options.supportedTables.includes(className.substr(TABLE_CLASS_PREFIX.length)) && node.classList.remove(className);
+        }
       }
     });
   }
 
   if (node.tagName === "QUOTE" && !options.supportsQuote) {
+    node.parentElement && node.parentElement.removeChild(node);
+  }
+
+  if (["TABLE", "THEAD", "TBODY", "TR", "TD"].includes(node.tagName) && !options.supportsTables) {
     node.parentElement && node.parentElement.removeChild(node);
   }
 

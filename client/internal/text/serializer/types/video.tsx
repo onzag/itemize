@@ -91,6 +91,30 @@ export function registerVideo(registry: ISerializationRegistryType) {
    * @param arg the reactification arg
    */
   function reactifyVideo(arg: IReactifyArg<IVideo>) {
+    if (!arg.element.origin) {
+      // now we might call the reactification
+      return reactifyElementBase(
+        // the registry
+        registry,
+        // we will be using a div to start with
+        "div",
+        // the video will be the base class
+        "video",
+        // no children itself
+        null,
+        // the wrapping function that sets up the iframe
+        (children: React.ReactNode) => {
+          return (
+            <div className="video-container">
+              {children}
+            </div>
+          );
+        },
+        // the arg itself
+        arg,
+      );
+    }
+
     // let's build the source for the iframe
     let iframeSrc: string;
     if (arg.element.origin === "youtube") {
@@ -113,7 +137,7 @@ export function registerVideo(registry: ISerializationRegistryType) {
       (children: React.ReactNode) => {
         return (
           <div className="video-container">
-            <iframe src={iframeSrc} allowFullScreen={true} frameBorder="0"/>
+            <iframe src={iframeSrc} allowFullScreen={true} frameBorder="0" />
             {children}
           </div>
         );

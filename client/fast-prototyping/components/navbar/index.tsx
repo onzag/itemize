@@ -25,6 +25,7 @@ import MenuIcon from "@mui/icons-material/Menu";
 import Box from "@mui/material/Box";
 import OfflineStatusRetriever from "../../../components/offline/OfflineStatusRetriever";
 import WifiOffIcon from "@mui/icons-material/WifiOff";
+import { AltBadgeReactioner } from "../alt-badge-reactioner";
 
 /**
  * the navbar styles generator
@@ -173,18 +174,25 @@ export function Navbar(props: INavbarProps) {
                   <I18nRead id="menu">
                     {
                       (value: string) => (
-                        <IconButton
-                          edge="start"
-                          color="inherit"
-                          aria-label={value}
-                          onClick={setMenuOpen.bind(this, true)}
-                          size="large">
-                          <MenuIcon />
-                        </IconButton>
+                        <AltBadgeReactioner
+                          reactionKey="m"
+                          label="m"
+                          component="span"
+                          selector="button"
+                        >
+                          <IconButton
+                            edge="start"
+                            color="inherit"
+                            aria-label={value}
+                            onClick={setMenuOpen.bind(this, true)}
+                            size="large">
+                            <MenuIcon />
+                          </IconButton>
+                        </AltBadgeReactioner>
                       )
                     }
                   </I18nRead>
-                  {offline ? <WifiOffIcon sx={navbarStyles.offlineIcon}/> : null}
+                  {offline ? <WifiOffIcon sx={navbarStyles.offlineIcon} /> : null}
                   <Box sx={navbarStyles.title}>
                     <Typography variant="body1" sx={navbarStyles.titleTypography}>
                       <Box component="span" sx={navbarStyles.titleMargin}>

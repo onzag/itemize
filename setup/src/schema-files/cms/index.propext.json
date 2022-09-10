@@ -21,7 +21,8 @@
             "supportsTitle": true,
             "supportsCustomStyles": true,
             "supportsTemplating": true,
-            "supportsLists": true
+            "supportsLists": true,
+            "supportsTables": true
         }
     },
     {

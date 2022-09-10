@@ -50,6 +50,13 @@ export interface IPropertyEntryI18nRichTextInfo {
   formatAddVideoLabel: string;
   formatAddFileLabel: string;
   formatAddContainerLabel: string;
+  formatAddTableLabel: string;
+  formatAddTheadLabel: string;
+  formatAddTbodyLabel: string;
+  formatAddTfootLabel: string;
+  formatAddTrLabel: string;
+  formatAddTdLabel: string;
+  formatAddThLabel: string;
   formatAddCustomLabel: string;
   formatSetStyleLabel: string;
   formatSetHoverStyleLabel: string;
@@ -83,6 +90,13 @@ export interface IPropertyEntryI18nRichTextInfo {
   paragraph: string;
   quote: string;
   title: string;
+  table: string;
+  thead: string;
+  tbody: string;
+  tfoot: string;
+  tr: string;
+  td: string;
+  th: string;
   video: string;
   styled: string;
   template: string;
@@ -801,6 +815,8 @@ export default class PropertyEntryText
       const supportsFiles = supportsMedia && !!this.props.property.getSpecialProperty("supportsFiles");
       const supportsContainers = this.props.property.getSpecialProperty("supportsContainers");
       const supportedContainers = this.props.property.getSpecialProperty("supportedContainers");
+      const supportsTables = this.props.property.getSpecialProperty("supportsTables");
+      const supportedTables = this.props.property.getSpecialProperty("supportedTables");
       const supportsLists = this.props.property.getSpecialProperty("supportsLists");
       const supportsCustom = this.props.property.getSpecialProperty("supportsCustom");
       const supportedCustoms = this.props.property.getSpecialProperty("supportedCustoms");
@@ -832,6 +848,8 @@ export default class PropertyEntryText
         supportedRichClasses,
         supportedCustoms,
         supportedContainers,
+        supportsTables,
+        supportedTables,
       }
     }
 
@@ -953,6 +971,13 @@ export default class PropertyEntryText
         formatAddTemplateText: i18nInLanguage.format_add_template_text,
         formatDeleteElement: i18nInLanguage.format_delete_element,
         formatMore: i18nInLanguage.format_more,
+        formatAddTableLabel: i18nInLanguage.format_add_table,
+        formatAddTbodyLabel: i18nInLanguage.format_add_tbody,
+        formatAddTfootLabel: i18nInLanguage.format_add_tfoot,
+        formatAddTdLabel: i18nInLanguage.format_add_td,
+        formatAddTrLabel: i18nInLanguage.format_add_tr,
+        formatAddThLabel: i18nInLanguage.format_add_th,
+        formatAddTheadLabel: i18nInLanguage.format_add_thead,
 
         name: i18nInLanguage.rich_name,
         alt: i18nInLanguage.rich_alt,
@@ -987,6 +1012,13 @@ export default class PropertyEntryText
         uiHandler: i18nInLanguage.rich_ui_handler,
         type: i18nInLanguage.rich_type,
         standalone: i18nInLanguage.rich_standalone,
+        table: i18nInLanguage.rich_table,
+        thead: i18nInLanguage.rich_thead,
+        tbody: i18nInLanguage.rich_tbody,
+        tfoot: i18nInLanguage.rich_tfoot,
+        tr: i18nInLanguage.rich_tr,
+        td: i18nInLanguage.rich_td,
+        th: i18nInLanguage.rich_th,
 
         loadVideo: {
           title: i18nInLanguage.video_loader_title,

@@ -21,7 +21,7 @@ import { IVideo, registerVideo } from "./types/video";
 import { IList, registerList } from "./types/list";
 import { IListItem, registerListItem } from "./types/list-item";
 import { IInline, registerInline } from "./types/inline";
-import { ITable, ITbody, ITd, IThead, ITr, registerTableElements } from "./types/table";
+import { ITable, ITbody, ITd, ITfoot, ITh, IThead, ITr, registerTableElements } from "./types/table";
 import { ITemplateArgContextDefinition, ITemplateArgUIHandlerDefinition, TemplateArgs } from "./template-args";
 import uuidv5 from "uuid/v5";
 import equals from "deep-equal";
@@ -229,6 +229,24 @@ export interface ISerializationRegistryType {
   ON_EMPTY_FILL_WITH: {
     [type: string]: () => RichElement;
   };
+
+  /**
+   * Specifies which elements are allowed to be merged with the next element
+   */
+  MERGABLES: {
+    [type: string]: boolean;
+  };
+
+  CUSTOM_NORMALIZER: {
+    [type: string]: (
+      element: any,
+      path: number[],
+      executionRoot: IRootLevelDocument,
+      primaryExecution: ICustomExecution,
+      secondaryExecution: ICustomExecution,
+      specialRules?: ISpecialRules,
+    ) => void;
+  }
 }
 
 /**
@@ -254,7 +272,9 @@ export const SERIALIZATION_REGISTRY: ISerializationRegistryType = {
   SUPERBLOCKS: {
     document: true,
   },
-  REACTIFY: {}
+  REACTIFY: {},
+  MERGABLES: {},
+  CUSTOM_NORMALIZER: {},
 }
 
 // NOW we register all the elements that are part of this
@@ -277,8 +297,20 @@ registerTableElements(SERIALIZATION_REGISTRY);
 registerVoidBlock(SERIALIZATION_REGISTRY);
 registerVoidInline(SERIALIZATION_REGISTRY);
 
+SERIALIZATION_REGISTRY.ALLOWS_CHILDREN.document = SERIALIZATION_REGISTRY.ALLOWS_CHILDREN.container;
+SERIALIZATION_REGISTRY.ON_INVALID_CHILDREN_WRAP_WITH.document = SERIALIZATION_REGISTRY.ON_INVALID_CHILDREN_WRAP_WITH.container;
+SERIALIZATION_REGISTRY.ON_INVALID_TEXT_WRAP_WITH.document = SERIALIZATION_REGISTRY.ON_INVALID_TEXT_WRAP_WITH.container;
+
 export function isText(node: RichElement | IRootLevelDocument | IText) {
   return typeof (node as IText).text === "string";
+}
+
+export function isMergable(node: RichElement | IRootLevelDocument | IText) {
+  if (isText(node)) {
+    return true;
+  }
+
+  return !!SERIALIZATION_REGISTRY.MERGABLES[(node as any).type];
 }
 
 export function isElement(node: RichElement | IRootLevelDocument | IText) {
@@ -316,7 +348,7 @@ export function getAllowedChildrenTypes(node: RichElement | IRootLevelDocument) 
     return allowedInternals;
   }
   if (isSuperBlock(node)) {
-    return Object.keys(SERIALIZATION_REGISTRY.BLOCKS);
+    return Object.keys(SERIALIZATION_REGISTRY.BLOCKS).concat(Object.keys(SERIALIZATION_REGISTRY.SUPERBLOCKS));
   } else if (isBlock(node)) {
     return Object.keys(SERIALIZATION_REGISTRY.INLINES);
   }
@@ -337,7 +369,9 @@ export function isVoid(node: RichElement | IRootLevelDocument | IText): boolean 
   if (isText(node)) {
     return false;
   }
-  return !!(node as IElementBase).html || !!(node as IElementBase).textContent || !!SERIALIZATION_REGISTRY.VOIDS[(node as RichElement).type];
+  return typeof (node as IElementBase).html === "string" ||
+    typeof (node as IElementBase).textContent === "string" ||
+    !!SERIALIZATION_REGISTRY.VOIDS[(node as RichElement).type];
 }
 
 export function getUIHandlerValueWithKnownContextFor(
@@ -606,7 +640,7 @@ export interface IRootLevelDocument {
  * but it's not a text
  */
 export type RichElement = IParagraph | IContainer | ICustom | ILink | IQuote | ITitle | IImage |
-  IFile | IVideo | IList | IListItem | IInline | ITable | ITr | ITbody | IThead | ITd | IVoidBlock | IVoidInline | IVoidSuperBlock;
+  IFile | IVideo | IList | IListItem | IInline | ITable | ITr | ITbody | IThead | ITfoot | ITd | ITh | IVoidBlock | IVoidInline | IVoidSuperBlock;
 
 /**
  * This is the text namespace, and it's used in uuid for creating
@@ -805,8 +839,6 @@ export function normalize(
   return normalizeElement(doc as any, [], doc, null, specialRules || null) as any;
 }
 
-(window as any).NORMALIZE = normalize;
-
 interface ICustomExecution {
   workOnOriginal: boolean;
   updateNodeAt: (path: number[], v: Partial<RichElement | IText>) => void,
@@ -816,6 +848,8 @@ interface ICustomExecution {
   mergeNodesAt: (basePath: number[], referencePath: number[]) => void,
   splitElementAndEscapeChildIntoParentAt: (path: number[], escapingChildIndex: number) => void;
   getNodeAt: (path: number[]) => RichElement | IText;
+  cloneElementAt: (fromPath: number[], toPath: number[]) => void;
+  moveNodeAt: (fromPath: number[], toPath: number[]) => void;
 };
 
 interface ISpecialRules {
@@ -892,6 +926,27 @@ const standardExecFn: (root: IRootLevelDocument) => ICustomExecution = (root) =>
   },
   getNodeAt(path: number[]) {
     return getNodeFor(path, root) as any;
+  },
+  cloneElementAt(fromPath: number[], toPath: number[]) {
+    const elementToCopy = getNodeFor(fromPath, root) as RichElement;
+    const copy = {...elementToCopy};
+    copy.children = [];
+
+    const parentTarget = getParentNodeFor(toPath, root) as RichElement;
+    const indexTarget = toPath[toPath.length - 1];
+
+    parentTarget.children.splice(indexTarget, 0, copy as any);
+  },
+  moveNodeAt(fromPath: number[], toPath: number[]) {
+    const elementToMove = getNodeFor(fromPath, root);
+    const parentSource = getParentNodeFor(fromPath, root);
+    const parentTarget = getParentNodeFor(toPath, root);
+    const indexTarget = toPath[toPath.length - 1];
+
+    // remove from source
+    parentSource.children.splice(fromPath[fromPath.length - 1], 1);
+    // add to target
+    parentTarget.children.splice(indexTarget, 0, elementToMove as any);
   }
 });
 
@@ -1041,7 +1096,8 @@ function normalizeSpacing(
     element.children.length === 0 &&
     (
       isInline(element) ||
-      isBlock(element)
+      isBlock(element) ||
+      isSuperBlock(element)
     )
   ) {
     const nodeToInsert = allowsText(element) ? STANDARD_TEXT_NODE() : SERIALIZATION_REGISTRY.ON_EMPTY_FILL_WITH[element.type]();
@@ -1110,7 +1166,7 @@ function shallowRootCopy<T>(
   element: T,
 ): T {
   const newElement: any = {}
-  const inlineOrText = isText(element as any) || isInline(element as any);
+  const mergable = isText(element as any) || isMergable(element as any);
   Object.keys(element).forEach((key) => {
     if (key === "children") {
       newElement.children = (element as any as RichElement).children.map(shallowRootCopy);
@@ -1135,7 +1191,7 @@ function shallowRootCopy<T>(
       key === "type" ||
       // inlines info are required all attributes for check for merging
       // to see if it can be merged with the next one
-      inlineOrText ||
+      mergable ||
       // ui handler are required to get the context
       // for other normalization attributes
       key === "uiHandler" ||
@@ -1195,6 +1251,7 @@ function internalNormalizeElement(
     const isIgnored = isIgnoredNode(childrenPath, specialRules);
 
     if (isIgnored) {
+      index++;
       continue;
     } else if (!v) {
       break;
@@ -1261,7 +1318,7 @@ function internalNormalizeElement(
             executionRoot,
             primaryExecution,
             secondaryExecution,
-            specialRules,
+            { ...specialRules, _parentHandling: true } as any,
           );
         }
       } else {
@@ -1301,7 +1358,7 @@ function internalNormalizeElement(
                 executionRoot,
                 primaryExecution,
                 secondaryExecution,
-                specialRules,
+                { ...specialRules, _parentHandling: true } as any,
               );
             }
           }
@@ -1342,7 +1399,7 @@ function internalNormalizeElement(
               executionRoot,
               primaryExecution,
               secondaryExecution,
-              specialRules,
+              { ...specialRules, _parentHandling: true } as any,
             );
           }
         } else if (canSolveByDoubleSplitting) {
@@ -1401,7 +1458,7 @@ function internalNormalizeElement(
               executionRoot,
               primaryExecution,
               secondaryExecution,
-              specialRules,
+              { ...specialRules, _parentHandling: true } as any,
             );
           }
         } else {
@@ -1416,8 +1473,29 @@ function internalNormalizeElement(
     index++;
   }
 
-  if (specialRules && specialRules.useContextRulesOf) {
-    normalizeAccordingToUIHAndlerRules(
+  // we only want to call these functions at the root level
+  // so we normalize from there
+  if (!specialRules || !(specialRules as any)._parentHandling) {
+    if (specialRules && specialRules.useContextRulesOf) {
+      normalizeAccordingToUIHAndlerRules(
+        element,
+        path,
+        executionRoot,
+        primaryExecution,
+        secondaryExecution,
+        specialRules,
+      );
+    }
+
+    normalizeSpacing(
+      element,
+      path,
+      primaryExecution,
+      secondaryExecution,
+      specialRules,
+    );
+
+    runCustomNorm(
       element,
       path,
       executionRoot,
@@ -1426,14 +1504,35 @@ function internalNormalizeElement(
       specialRules,
     );
   }
+}
 
-  normalizeSpacing(
-    element,
-    path,
-    primaryExecution,
-    secondaryExecution,
-    specialRules,
-  );
+function runCustomNorm(
+  element: RichElement | IRootLevelDocument,
+  path: number[],
+  executionRoot: IRootLevelDocument,
+  primaryExecution: ICustomExecution,
+  secondaryExecution: ICustomExecution,
+  specialRules: ISpecialRules,
+) {
+  const customNorm = SERIALIZATION_REGISTRY.CUSTOM_NORMALIZER[element.type];
+
+  if (customNorm) {
+    customNorm(element, path, executionRoot, primaryExecution, secondaryExecution, specialRules);
+  }
+
+  element.children.forEach((c, index) => {
+    if (isElement(c)) {
+      const childPath = [...path, index];
+      runCustomNorm(
+        c as any,
+        childPath,
+        executionRoot,
+        primaryExecution,
+        secondaryExecution,
+        specialRules,
+      )
+    }
+  });
 }
 
 const patchList = {
@@ -1615,10 +1714,10 @@ export function deserializeChildrenForNode(
   * @returns a boolean on whether they should merge
   */
 export function checkShouldMerge(n1: RichElement | IText, n2: RichElement | IText) {
-  const isN1Inline = typeof (n1 as IText).text === "string" || SERIALIZATION_REGISTRY.INLINES[(n1 as RichElement).type];
-  const isN2Inline = typeof (n2 as IText).text === "string" || SERIALIZATION_REGISTRY.INLINES[(n2 as RichElement).type];
+  const isN1Mergable = typeof (n1 as IText).text === "string" || SERIALIZATION_REGISTRY.MERGABLES[(n1 as RichElement).type];
+  const isN2Mergable = typeof (n2 as IText).text === "string" || SERIALIZATION_REGISTRY.MERGABLES[(n2 as RichElement).type];
 
-  if (!isN1Inline || !isN2Inline) {
+  if (!isN1Mergable || !isN2Mergable) {
     return false;
   }
 

@@ -130,6 +130,7 @@ export function registerLink(registry: ISerializationRegistryType) {
   registry.SERIALIZE.link = serializeLink;
   registry.ALLOWS_CHILDREN.link = [];
   registry.INLINES.link = true;
+  registry.MERGABLES.link = true;
 
   registry.DESERIALIZE.byTag.A = deserializeLink;
 }

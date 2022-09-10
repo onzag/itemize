@@ -83,13 +83,25 @@ export function registerListItem(registry: ISerializationRegistryType) {
   registry.ALLOWS_CHILDREN["list-item"] = [
     "list",
     "paragraph",
-    "title",
   ];
   registry.ON_INVALID_TEXT_WRAP_WITH["list-item"] = (text: IText) => {
     return [STANDARD_PARAGRAPH()];
   }
   registry.SUPERBLOCKS["list-item"] = true;
   registry.DESERIALIZE.byTag.LI = deserializeListItem;
+  registry.CUSTOM_NORMALIZER["list-item"] = (
+    listItem: IListItem,
+    path,
+    executionRoot,
+    primaryExecution,
+    secondaryExecution,
+    specialRules,
+  ) => {
+    if (listItem.children[0].type === "list") {
+      primaryExecution.insertNodeAt(path, STANDARD_PARAGRAPH(), 0);
+      secondaryExecution && secondaryExecution.insertNodeAt(path, STANDARD_PARAGRAPH(), 0);
+    }
+  }
 }
 
 /**

@@ -133,6 +133,7 @@ export function registerContainer(registry: ISerializationRegistryType) {
       return [
         {
           type: "table",
+          tableType: null,
           children: [],
         }
       ]
@@ -144,6 +145,7 @@ export function registerContainer(registry: ISerializationRegistryType) {
         },
         {
           type: "table",
+          tableType: null,
           children: [],
         }
       ];
@@ -159,6 +161,7 @@ export function registerContainer(registry: ISerializationRegistryType) {
         },
         {
           type: "table",
+          tableType: null,
           children: [],
         }
       ];

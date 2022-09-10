@@ -71,6 +71,15 @@ const typeValue: IPropertyDefinitionSupportedType<PropertyDefinitionSupportedTex
       type: "array-string",
     },
     {
+      name: "supportsTables",
+      type: "boolean",
+      required: ["html"],
+    },
+    {
+      name: "supportedTables",
+      type: "array-string",
+    },
+    {
       name: "supportsCustom",
       type: "boolean",
       required: ["html"],
@@ -99,7 +108,6 @@ const typeValue: IPropertyDefinitionSupportedType<PropertyDefinitionSupportedTex
       type: "boolean",
       required: ["html"],
     },
-    ,
     {
       name: "supportedRichClasses",
       type: "array-string",

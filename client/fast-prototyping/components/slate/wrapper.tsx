@@ -27,14 +27,12 @@ import LinkIcon from "@mui/icons-material/Link";
 import CheckBoxOutlineBlankIcon from "@mui/icons-material/CheckBoxOutlineBlank";
 import TextFieldsIcon from "@mui/icons-material/TextFields";
 import CodeIcon from "@mui/icons-material/Code";
+import ViewModuleIcon from '@mui/icons-material/ViewModule';
 
 import { Path, Range } from "slate";
 import { RichElement } from "../../../internal/text/serializer";
 import { WrapperDrawer } from "./drawer";
 import { FileLoadErrorDialog } from "./dialogs/file";
-import { LinkDialog } from "./dialogs/link";
-import { VideoDialog } from "./dialogs/video";
-import { TemplateElementDialog } from "./dialogs/template-element";
 import ReactDOM from "react-dom";
 import { countSizeAndWords } from "../../../internal/text";
 import Badge from "@mui/material/Badge";
@@ -45,6 +43,7 @@ import Toolbar from "@mui/material/Toolbar";
 import AppBar from "@mui/material/AppBar";
 import Box from "@mui/material/Box";
 import { STANDARD_TEXT_NODE } from "../../../internal/text/serializer/types/text";
+import { AltBadgeReactioner } from "../alt-badge-reactioner";
 
 /**
  * Defining a bunch of styles for the wrapper
@@ -59,22 +58,6 @@ const style = {
     "&. MuiBadge-badge": {
       transform: "scale(1) translate(0%, 0%)",
     }
-  },
-  badgeFastKey: {
-    "&. MuiBadge-badge": {
-      transform: "scale(1) translate(0%, 0%)",
-      backgroundColor: "#fffde7",
-      color: "#212121",
-      borderColor: "#f9a825",
-    },
-  },
-  badgeFastKeyShift: {
-    "&. MuiBadge-badge": {
-      transform: "scale(1) translate(0%, 0%)",
-      backgroundColor: "#e3f2fd",
-      color: "#212121",
-      borderColor: "#f9a825",
-    },
   },
   badgeDisabled: {
     "&. MuiBadge-badge": {
@@ -220,21 +203,6 @@ const style = {
     flex: "1 1 auto",
     height: "100%",
   },
-  linkTemplateOptionsBox: {
-    display: "flex",
-    flexDirection: "column",
-    padding: "1rem 0 0 0",
-  },
-  linkTemplateOptionsText: {
-    width: "100%",
-    textAlign: "center",
-    color: "#aaa",
-    paddingBottom: "1rem",
-  },
-  optionPrimary: {
-    fontWeight: 700,
-    color: "#1b5e20",
-  },
 };
 
 type RichElementFn = () => RichElement;
@@ -332,7 +300,6 @@ export interface IDrawerUIHandlerElementConfigCustomProps {
   onDelayedChange: (value: string) => void;
   helpers: IHelperFunctions;
   state: ISlateEditorInternalStateType;
-  fastKeyActive?: boolean;
 }
 
 export interface IDrawerUIHandlerElementConfigCustom {
@@ -414,6 +381,7 @@ export type SlateEditorWrapperCustomToolbarIdentifiedElement =
   "file" |
   "quote" |
   "container" |
+  "table" |
   "template-text" |
   "template-html" |
   "extras" |
@@ -471,14 +439,6 @@ export interface MaterialUISlateWrapperWithStyles extends ISlateEditorWrapperBas
    */
   hideDrawer?: boolean;
   /**
-   * Whether to hide the tree
-   */
-  hideTree?: boolean;
-  /**
-   * Drawer mode
-   */
-  drawerMode?: "full" | "with-styles" | "simple" | "barebones";
-  /**
    * The disjointed mode
    */
   disjointedMode?: boolean;
@@ -511,17 +471,6 @@ export interface RichTextEditorToolbarProps extends MaterialUISlateWrapperWithSt
   drawerOpen: boolean;
 
   /**
-   * Whether the alt key is pressed right now
-   * and it should show the effects
-   */
-  altKey: boolean;
-
-  /**
-   * Whether the shift key is pressed right now
-   */
-  shiftKey: boolean;
-
-  /**
    * The current state
    */
   state: ISlateEditorInternalStateType;
@@ -535,16 +484,6 @@ export interface RichTextEditorToolbarProps extends MaterialUISlateWrapperWithSt
    * Call to request a file, opens a dialog so requires a state
    */
   requestFile: () => void;
-
-  /**
-   * Call to request a video, opens a dialog so requires a state
-   */
-  requestVideo: () => void;
-
-  /**
-   * Call to request a link, opens a dialog so requires a state
-   */
-  requestLink: () => void;
 
   /**
    * A function that specifies whether the drawer should
@@ -562,16 +501,6 @@ export interface RichTextEditorToolbarProps extends MaterialUISlateWrapperWithSt
    * Call to insert a container, opens a dialog so requires a state
    */
   insertContainer: () => void;
-
-  /**
-   * Call to insert a template text bit from the context, opens a dialog so requires a state
-   */
-  requestTemplateText: () => void;
-
-  /**
-   * Call to insert a template html bit from the context, opens a dialog so requires a state
-   */
-  requestTemplateHTML: () => void;
   /**
    * Called when the height changes
    */
@@ -586,76 +515,78 @@ interface RichTextEditorToolbarElementProps extends RichTextEditorToolbarState, 
   fastKey: string;
 }
 
-function elementBadgeReturn(
+function elementFastKeyReturn(
   props: RichTextEditorToolbarElementProps,
   element: React.ReactNode,
+  altBadgedChildren: React.ReactNode,
+  priority: number,
+  disabled: boolean,
   fastKeyOverride?: string,
-  shiftKey?: boolean,
 ): any {
-  if (props.altKey && (shiftKey ? props.shiftKey : !props.shiftKey) && (fastKeyOverride || props.fastKey)) {
-    return (
-      <Badge
-        badgeContent={fastKeyOverride || props.fastKey}
-        color="primary"
-        sx={shiftKey ? style.badgeFastKeyShift : style.badgeFastKey }
-      >
-        {element}
-      </Badge>
-    );
-  } else {
-    return element;
-  }
+  const fastKey = fastKeyOverride || props.fastKey;
+  return (
+    <AltBadgeReactioner
+      reactionKey={fastKey}
+      label={fastKey === "arrowup" ? "↑" : (fastKey === "arrowdown" ? "↓" : fastKey)}
+      priority={priority}
+      disabled={disabled || !props.state.currentSelectedElement}
+      altBadgedChildren={altBadgedChildren}
+      selector="button"
+    >
+      {element}
+    </AltBadgeReactioner>
+  );
 }
 
 function Bold(props: RichTextEditorToolbarElementProps) {
+  const disabled = !props.state.currentSelectedText || !props.state.allowsText;
   const element = (
     <IconButton
       tabIndex={-1}
       title={props.i18nRichInfo.formatBoldLabel}
-      disabled={!props.state.currentSelectedText || !props.state.allowsText}
+      disabled={disabled}
       color={props.state.currentSelectedText && props.state.currentSelectedText.bold ? "primary" : "default"}
       onClick={props.helpers.formatToggle.bind(null, "bold")}
-      data-fastkey={props.fastKey}
       size="large">
       <FormatBoldIcon />
     </IconButton>
   );
 
-  return elementBadgeReturn(props, element);
+  return elementFastKeyReturn(props, element, null, 1, disabled);
 }
 
 function Italic(props: RichTextEditorToolbarElementProps) {
+  const disabled = !props.state.currentSelectedText || !props.state.allowsText;
   const element = (
     <IconButton
       tabIndex={-1}
       title={props.i18nRichInfo.formatItalicLabel}
-      disabled={!props.state.currentSelectedText || !props.state.allowsText}
+      disabled={disabled}
       color={props.state.currentSelectedText && props.state.currentSelectedText.italic ? "primary" : "default"}
       onClick={props.helpers.formatToggle.bind(null, "italic")}
-      data-fastkey={props.fastKey}
       size="large">
       <FormatItalicIcon />
     </IconButton>
   );
 
-  return elementBadgeReturn(props, element);
+  return elementFastKeyReturn(props, element, null, 1, disabled);
 }
 
 function Underline(props: RichTextEditorToolbarElementProps) {
+  const disabled = !props.state.currentSelectedText || !props.state.allowsText;
   const element = (
     <IconButton
       tabIndex={-1}
       title={props.i18nRichInfo.formatUnderlineLabel}
-      disabled={!props.state.currentSelectedText || !props.state.allowsText}
+      disabled={disabled}
       color={props.state.currentSelectedText && props.state.currentSelectedText.underline ? "primary" : "default"}
       onClick={props.helpers.formatToggle.bind(null, "underline")}
-      data-fastkey={props.fastKey}
       size="large">
       <FormatUnderlinedIcon />
     </IconButton>
   );
 
-  return elementBadgeReturn(props, element);
+  return elementFastKeyReturn(props, element, null, 1, disabled);
 }
 
 function VDivider(props: RichTextEditorToolbarElementProps) {
@@ -709,32 +640,36 @@ function Link(props: RichTextEditorToolbarElementProps) {
     });
   }
 
+  const disabled = !props.state.allowsInsertElement({ type: "link", href: "", children: [], thref: null });
   let linkBaseComponent = (
     <IconButton
       tabIndex={-1}
       title={props.i18nRichInfo.formatLinkLabel}
-      color={props.state.currentSelectedInlineElement && props.state.currentSelectedInlineElement.type === "link" ? "primary" : "default"}
-      disabled={props.state.allowsInsertElement({type: "link", href: "", children: [], thref: null})}
-      onClick={props.requestLink}
-      data-fastkey={props.fastKey}
+      color={
+        props.helpers.editor.selection &&
+          props.helpers.Range.isCollapsed(props.helpers.editor.selection) &&
+          props.state.currentSelectedInlineElement &&
+          props.state.currentSelectedInlineElement.type === "link" ?
+          "primary" :
+          "default"
+      }
+      disabled={disabled}
+      onClick={props.helpers.toggleLink.bind(null, null, null)}
       size="large">
       <LinkIcon />
     </IconButton>
   );
 
-  if (props.altKey && props.fastKey) {
-    return elementBadgeReturn(props, linkBaseComponent);
-  }
-
+  let linkBadged = linkBaseComponent;
   if (templateLinkAmount && props.isReady) {
-    linkBaseComponent = <Badge
+    linkBadged = <Badge
       badgeContent={templateLinkAmount}
       color="error"
       sx={props.state.currentSelectedBlockElement ? style.badge : style.badgeDisabled}
     >{linkBaseComponent}</Badge>
   }
 
-  return linkBaseComponent;
+  return elementFastKeyReturn(props, linkBadged, linkBaseComponent, 1, disabled);
 }
 
 function Title(props: RichTextEditorToolbarElementProps) {
@@ -742,20 +677,20 @@ function Title(props: RichTextEditorToolbarElementProps) {
     return null;
   }
 
+  const disabled = !props.state.allowsInsertElement({ type: "title", subtype: "h1", children: [] }, { collapsed: true });
   const element = (
     <IconButton
       tabIndex={-1}
       title={props.i18nRichInfo.formatTitleLabel}
       color={props.state.currentSelectedBlockElement && props.state.currentSelectedBlockElement.type === "title" ? "primary" : "default"}
-      disabled={props.state.allowsInsertElement({type: "title", subtype: "h1", children: []})}
+      disabled={disabled}
       onClick={props.helpers.toggleTitle.bind(null, "h1")}
-      data-fastkey={props.fastKey}
       size="large">
       <TitleIcon />
     </IconButton>
   );
 
-  return elementBadgeReturn(props, element);
+  return elementFastKeyReturn(props, element, null, 1, disabled);
 }
 
 function Quote(props: RichTextEditorToolbarElementProps) {
@@ -763,59 +698,61 @@ function Quote(props: RichTextEditorToolbarElementProps) {
     return null;
   }
 
+  const disabled = !props.state.allowsInsertElement({ type: "quote", children: [] }, { collapsed: true });
   const element = (
     <IconButton
       tabIndex={-1}
       title={props.i18nRichInfo.formatQuoteLabel}
       color={props.state.currentSelectedBlockElement && props.state.currentSelectedBlockElement.type === "quote" ? "primary" : "default"}
-      disabled={!props.state.allowsInsertElement({type: "quote", children: []})}
+      disabled={disabled}
       onClick={props.helpers.toggleQuote}
-      data-fastkey={props.fastKey}
       size="large">
       <FormatQuoteIcon />
     </IconButton>
   );
 
-  return elementBadgeReturn(props, element);
+  return elementFastKeyReturn(props, element, null, 1, disabled);
 }
 
 
 function NumberedList(props: RichTextEditorToolbarElementProps) {
-  if (!props.featureSupport.supportsLists || !props.state.allowsInsertElement({type: "list", listType: "numbered", children: []})) {
+  if (!props.featureSupport.supportsLists) {
     return null;
   }
 
+  const disabled = !props.state.allowsInsertElement({ type: "list", listType: "numbered", children: [] });
   const element = (
     <IconButton
       tabIndex={-1}
       title={props.i18nRichInfo.formatListNumberedLabel}
       onClick={props.helpers.insertList.bind(null, "numbered")}
-      data-fastkey={props.fastKey}
+      disabled={disabled}
       size="large">
       <FormatListNumberedIcon />
     </IconButton>
   );
 
-  return elementBadgeReturn(props, element);
+  return elementFastKeyReturn(props, element, null, 1, disabled);
 }
 
 function BulletedList(props: RichTextEditorToolbarElementProps) {
-  if (!props.featureSupport.supportsLists || !props.state.allowsInsertElement({type: "list", listType: "bulleted", children: []})) {
+  if (!props.featureSupport.supportsLists) {
     return null;
   }
 
+  const disabled = !props.state.allowsInsertElement({ type: "list", listType: "bulleted", children: [] });
   const element = (
     <IconButton
       tabIndex={-1}
       title={props.i18nRichInfo.formatListBulletedLabel}
       onClick={props.helpers.insertList.bind(null, "bulleted")}
-      data-fastkey={props.fastKey}
+      disabled={disabled}
       size="large">
       <FormatListBulletedIcon />
     </IconButton>
   );
 
-  return elementBadgeReturn(props, element);
+  return elementFastKeyReturn(props, element, null, 1, disabled);
 }
 
 const imgExample = {
@@ -833,24 +770,24 @@ const imgExample = {
 
 function Image(props: RichTextEditorToolbarElementProps) {
   if (
-    !props.featureSupport.supportsLists ||
-    !props.state.allowsInsertElement(imgExample)
+    !props.featureSupport.supportsLists
   ) {
     return null;
   }
 
+  const disabled = !props.state.allowsInsertElement(imgExample, { selected: true });
   const element = (
     <IconButton
       tabIndex={-1}
       title={props.i18nRichInfo.formatAddImageLabel}
+      disabled={disabled}
       onClick={props.requestImage}
-      data-fastkey={props.fastKey}
       size="large">
       <InsertPhotoIcon />
     </IconButton>
   );
 
-  return elementBadgeReturn(props, element);
+  return elementFastKeyReturn(props, element, null, 1, disabled);
 }
 
 const videoExample = {
@@ -862,24 +799,24 @@ const videoExample = {
 
 function Video(props: RichTextEditorToolbarElementProps) {
   if (
-    !props.featureSupport.supportsVideos ||
-    !props.state.allowsInsertElement(videoExample)
+    !props.featureSupport.supportsVideos
   ) {
     return null;
   }
 
+  const disabled = !props.state.allowsInsertElement(videoExample, { selected: true });
   const element = (
     <IconButton
       tabIndex={-1}
       title={props.i18nRichInfo.formatAddVideoLabel}
-      onClick={props.requestVideo}
-      data-fastkey={props.fastKey}
+      onClick={props.helpers.insertVideo.bind(null, null)}
+      disabled={disabled}
       size="large">
       <VideoLibraryIcon />
     </IconButton>
   );
 
-  return elementBadgeReturn(props, element);
+  return elementFastKeyReturn(props, element, null, 1, disabled);
 }
 
 const fileExample = {
@@ -894,53 +831,74 @@ const fileExample = {
 
 function File(props: RichTextEditorToolbarElementProps) {
   if (
-    !props.featureSupport.supportsFiles ||
-    !props.state.allowsInsertElement(fileExample)
+    !props.featureSupport.supportsFiles
   ) {
     return null;
   }
 
+  const disabled = !props.state.allowsInsertElement(fileExample, { selected: true });
   const element = (
     <IconButton
       tabIndex={-1}
       title={props.i18nRichInfo.formatAddFileLabel}
       onClick={props.requestFile}
-      data-fastkey={props.fastKey}
+      disabled={disabled}
       size="large">
       <AttachFileIcon />
     </IconButton>
   );
 
-  return elementBadgeReturn(props, element);
+  return elementFastKeyReturn(props, element, null, 1, disabled);
 }
 
 function Container(props: RichTextEditorToolbarElementProps) {
   if (
-    !props.featureSupport.supportsContainers ||
-    !props.state.allowsInsertElement({type: "container", containerType: null, children: []})
+    !props.featureSupport.supportsContainers
   ) {
     return null;
   }
 
+  const disabled = !props.state.allowsInsertElement({ type: "container", containerType: null, children: [] });
   const element = (
     <IconButton
       tabIndex={-1}
       title={props.i18nRichInfo.formatAddContainerLabel}
       onClick={props.insertContainer}
-      data-fastkey={props.fastKey}
+      disabled={disabled}
       size="large">
       <CheckBoxOutlineBlankIcon />
     </IconButton>
   );
 
-  return elementBadgeReturn(props, element);
+  return elementFastKeyReturn(props, element, null, 1, disabled);
+}
+
+function Table(props: RichTextEditorToolbarElementProps) {
+  if (
+    !props.featureSupport.supportsTables
+  ) {
+    return null;
+  }
+
+  const disabled = !props.state.allowsInsertElement({ type: "table", tableType: null, children: [] });
+  const element = (
+    <IconButton
+      tabIndex={-1}
+      title={props.i18nRichInfo.formatAddTableLabel}
+      onClick={props.helpers.insertTable.bind(null, null)}
+      disabled={disabled}
+      size="large">
+      <ViewModuleIcon />
+    </IconButton>
+  );
+
+  return elementFastKeyReturn(props, element, null, 1, disabled);
 }
 
 function TemplateText(props: RichTextEditorToolbarElementProps) {
   if (
     !props.isReady ||
-    !props.featureSupport.supportsTemplating ||
-    !props.state.allowsInsertElement({type: "inline", children: [], textContent: "text"})
+    !props.featureSupport.supportsTemplating
   ) {
     return null;
   }
@@ -980,22 +938,19 @@ function TemplateText(props: RichTextEditorToolbarElementProps) {
     return null;
   }
 
+  const disabled = !props.state.allowsInsertElement({ type: "inline", children: [], textContent: "text" });
   const element = (
     <IconButton
       tabIndex={-1}
       title={props.i18nRichInfo.formatAddTemplateText}
-      onClick={props.requestTemplateText}
-      data-fastkey={props.fastKey}
+      onClick={props.helpers.insertTemplateText.bind(null, null, null)}
+      disabled={disabled}
       size="large">
       <TextFieldsIcon />
     </IconButton>
   );
 
-  if (props.fastKey && props.altKey) {
-    return elementBadgeReturn(props, element);
-  }
-
-  return (
+  const elementBadged = (
     <Badge
       badgeContent={templateTextAmount}
       color="error"
@@ -1004,13 +959,14 @@ function TemplateText(props: RichTextEditorToolbarElementProps) {
       {element}
     </Badge>
   );
+
+  return elementFastKeyReturn(props, elementBadged, element, 1, disabled);
 }
 
 function TemplateHTML(props: RichTextEditorToolbarElementProps) {
   if (
     !props.isReady ||
-    !props.featureSupport.supportsTemplating ||
-    !props.state.allowsInsertElement({type: "void-block", children: [], html: "html"})
+    !props.featureSupport.supportsTemplating
   ) {
     return null;
   }
@@ -1052,22 +1008,19 @@ function TemplateHTML(props: RichTextEditorToolbarElementProps) {
     return null;
   }
 
+  const disabled = !props.state.allowsInsertElement({ type: "void-block", children: [], html: "html" });
   const element = (
     <IconButton
       tabIndex={-1}
       title={props.i18nRichInfo.formatAddTemplateHTML}
-      onClick={props.requestTemplateHTML}
-      data-fastkey={props.fastKey}
+      onClick={props.helpers.insertTemplateHTML.bind(null, null, null)}
+      disabled={disabled}
       size="large">
       <CodeIcon />
     </IconButton>
   );
 
-  if (props.fastKey && props.altKey) {
-    return elementBadgeReturn(props, element);
-  }
-
-  return (
+  const elementBadged = (
     <Badge
       badgeContent={templateHTMLAmount}
       color="error"
@@ -1076,6 +1029,8 @@ function TemplateHTML(props: RichTextEditorToolbarElementProps) {
       {element}
     </Badge>
   );
+
+  return elementFastKeyReturn(props, elementBadged, element, 1, disabled);
 }
 
 interface IToolbarExtraProps extends RichTextEditorToolbarElementProps {
@@ -1084,10 +1039,6 @@ interface IToolbarExtraProps extends RichTextEditorToolbarElementProps {
 
 function ToolbarExtra(props: IToolbarExtraProps) {
   const elementReference = typeof props.extra.element === "function" ? props.extra.element() : props.extra.element;
-  if (elementReference && !props.state.allowsInsertElement(elementReference)) {
-    return null;
-  }
-
   const defaultAction = () => {
     const element = typeof props.extra.element === "function" ? props.extra.element() : props.extra.element;
     props.helpers.insertElement(element);
@@ -1099,14 +1050,20 @@ function ToolbarExtra(props: IToolbarExtraProps) {
     onClick: props.extra.onClick ? props.extra.onClick.bind(null, defaultAction) : defaultAction,
   }
 
+  let disabled = false;
+  if (elementReference) {
+    disabled = !props.state.allowsInsertElement(elementReference);
+  }
+
   let returnNode: React.ReactNode;
   if (typeof props.extra.title === "string" || !props.extra.title) {
     returnNode = (
       <IconButton
         {...basicProps}
         title={props.extra.title as string}
-        data-fastkey={props.extra.fastKey}
-        size="large">
+        size="large"
+        disabled={disabled}
+      >
         {props.extra.icon}
       </IconButton>
     );
@@ -1117,8 +1074,9 @@ function ToolbarExtra(props: IToolbarExtraProps) {
         <IconButton
           {...basicProps}
           title={i18nTitle}
-          data-fastkey={props.extra.fastKey}
-          size="large">
+          size="large"
+          disabled={disabled}
+        >
           {props.extra.icon}
         </IconButton>
       )
@@ -1127,11 +1085,7 @@ function ToolbarExtra(props: IToolbarExtraProps) {
     returnNode = elementCloned;
   }
 
-  if (props.altKey && props.extra.fastKey) {
-    return elementBadgeReturn(props, returnNode, props.extra.fastKey);
-  } else {
-    return returnNode;
-  }
+  return elementFastKeyReturn(props, returnNode, null, 1, disabled, props.extra.fastKey);
 }
 
 function ToolbarExtras(props: RichTextEditorToolbarElementProps) {
@@ -1175,6 +1129,7 @@ const toolbarRegistry: Record<SlateEditorWrapperCustomToolbarIdentifiedElement, 
   link: Link,
   quote: Quote,
   video: Video,
+  table: Table,
 }
 
 const toolbarFastKeyRegistry: Record<SlateEditorWrapperCustomToolbarIdentifiedElement, string> = {
@@ -1186,13 +1141,14 @@ const toolbarFastKeyRegistry: Record<SlateEditorWrapperCustomToolbarIdentifiedEl
   "numbered-list": "n",
   "template-html": "h",
   "template-text": "j",
-  title: "t",
+  title: "a",
   container: "c",
   file: "f",
   image: "p",
   link: "l",
   quote: "q",
   video: "v",
+  table: "t",
   extras: null,
   divider: null,
   hdivider: null,
@@ -1261,6 +1217,7 @@ class RichTextEditorToolbar extends React.Component<RichTextEditorToolbarProps, 
         this.props.featureSupport.supportsQuote ? "quote" : "none",
         this.props.featureSupport.supportsLists ? "bulleted-list" : "none",
         this.props.featureSupport.supportsLists ? "numbered-list" : "none",
+        this.props.featureSupport.supportsTables ? "table" : "none",
         (
           this.props.featureSupport.supportsImages ||
           this.props.featureSupport.supportsFiles ||
@@ -1285,24 +1242,21 @@ class RichTextEditorToolbar extends React.Component<RichTextEditorToolbarProps, 
 
     let drawerButton = (
       this.props.shouldHaveDrawer() ?
-        <IconButton
-          tabIndex={-1}
-          onClick={this.props.toggleDrawer}
-          size="large">
-          {this.props.drawerOpen ? <ExpandLessIcon /> : <MoreHorizIcon />}
-        </IconButton> :
+        elementFastKeyReturn(
+          this.props as any,
+          <IconButton
+            tabIndex={-1}
+            onClick={this.props.toggleDrawer}
+            size="large">
+            {this.props.drawerOpen ? <ExpandLessIcon /> : <MoreHorizIcon />}
+          </IconButton>,
+          null,
+          this.props.drawerOpen ? 2 : 1,
+          false,
+          this.props.drawerOpen ? "arrowup" : "arrowdown",
+        ) :
         null
     );
-
-    if (this.props.altKey) {
-      if (this.props.shiftKey) {
-        if (this.props.drawerOpen) {
-          drawerButton = elementBadgeReturn(this.props as any, drawerButton, "↑↓", true);
-        }
-      } else {
-        drawerButton = elementBadgeReturn(this.props as any, drawerButton, this.props.drawerOpen ? "↑" : "↓");
-      }
-    }
 
     const toolbarFormMapped = (
       toolbarForm.map((ele, index) => {
@@ -1371,26 +1325,6 @@ class RichTextEditorToolbar extends React.Component<RichTextEditorToolbarProps, 
  */
 export interface MaterialUISlateWrapperState {
   /**
-   * Specifies whether the video dialog to input the url for the video is open
-   */
-  videoDialogOpen: boolean;
-
-  /**
-   * Specifies whether the link dialog to input links and template links is open
-   */
-  linkDialogOpen: boolean;
-
-  /**
-   * Specifies whether the link dialog to input templated text is open
-   */
-  templateTextDialogOpen: boolean;
-
-  /**
-   * Specifies whether the link dialog to input templated html is open
-   */
-  templateHTMLDialogOpen: boolean;
-
-  /**
    * Specifies the state of the drawer
    */
   drawerOpen: boolean;
@@ -1417,12 +1351,6 @@ export interface MaterialUISlateWrapperState {
    * before that happened
    */
   inlineElementThatWasCurrentBeforeLosingFocus: RichElement;
-
-  /**
-   * Whether the alt key is currently pressed
-   */
-  altKey: boolean;
-  shiftKey: boolean;
 }
 
 const StyledEditorContainer = styled("div")(style.editorContainer);
@@ -1485,11 +1413,6 @@ export class MaterialUISlateWrapper extends React.PureComponent<MaterialUISlateW
    */
   private refocusTimeout: NodeJS.Timeout;
 
-  /**
-   * The accumulated fast key combo
-   */
-  private accumulatedFastKeyCombo: string;
-
   private isUnmounted: boolean;
 
   /**
@@ -1503,10 +1426,6 @@ export class MaterialUISlateWrapper extends React.PureComponent<MaterialUISlateW
 
     // setup the initial state
     this.state = {
-      videoDialogOpen: false,
-      linkDialogOpen: false,
-      templateTextDialogOpen: false,
-      templateHTMLDialogOpen: false,
       inlineElementThatWasCurrentBeforeLosingFocus: null,
 
       // keep SSR compatibility by keeping the drawer closed at the start
@@ -1514,8 +1433,6 @@ export class MaterialUISlateWrapper extends React.PureComponent<MaterialUISlateW
       drawerOpen: false,
       toolbarHeight: 0,
       noAnimate: true,
-      altKey: false,
-      shiftKey: false,
     }
 
     this.isUnmounted = false;
@@ -1533,30 +1450,13 @@ export class MaterialUISlateWrapper extends React.PureComponent<MaterialUISlateW
     this.onFileLoad = this.onFileLoad.bind(this);
     this.requestImage = this.requestImage.bind(this);
     this.requestFile = this.requestFile.bind(this);
-    this.requestVideo = this.requestVideo.bind(this);
-    this.requestLink = this.requestLink.bind(this);
-    this.requestTemplateText = this.requestTemplateText.bind(this);
-    this.closeDialogVideo = this.closeDialogVideo.bind(this);
-    this.closeDialogLink = this.closeDialogLink.bind(this);
-    this.closeDialogTemplateText = this.closeDialogTemplateText.bind(this);
-    this.acceptVideo = this.acceptVideo.bind(this);
     this.onFileEventedReFocus = this.onFileEventedReFocus.bind(this);
     this.refocus = this.refocus.bind(this);
     this.shouldHaveDrawer = this.shouldHaveDrawer.bind(this);
     this.toggleDrawer = this.toggleDrawer.bind(this);
-    this.acceptLink = this.acceptLink.bind(this);
     this.insertContainer = this.insertContainer.bind(this);
-    this.insertTemplateText = this.insertTemplateText.bind(this);
-    this.requestTemplateHTML = this.requestTemplateHTML.bind(this);
-    this.closeDialogTemplateHTML = this.closeDialogTemplateHTML.bind(this);
-    this.insertTemplateHTML = this.insertTemplateHTML.bind(this);
     this.selectiveHardBlur = this.selectiveHardBlur.bind(this);
-    this.keyDownListener = this.keyDownListener.bind(this);
     this.keyUpListener = this.keyUpListener.bind(this);
-    this.visibilityListener = this.visibilityListener.bind(this);
-    this.windowfocusListener = this.windowfocusListener.bind(this);
-
-    this.accumulatedFastKeyCombo = "";
   }
 
   public onHeightChange(newHeight: number) {
@@ -1599,98 +1499,18 @@ export class MaterialUISlateWrapper extends React.PureComponent<MaterialUISlateW
     document.body.addEventListener("mousedown", this.selectiveHardBlur);
     document.body.addEventListener("touchstart", this.selectiveHardBlur);
     document.body.addEventListener("keyup", this.keyUpListener);
-    document.body.addEventListener("keydown", this.keyDownListener);
-    window.addEventListener("focus", this.windowfocusListener);
-    document.addEventListener("visibilitychange", this.visibilityListener);
   }
 
   public componentWillUnmount() {
     document.body.removeEventListener("mousedown", this.selectiveHardBlur);
     document.body.removeEventListener("touchstart", this.selectiveHardBlur);
     document.body.removeEventListener("keyup", this.keyUpListener);
-    document.body.removeEventListener("keydown", this.keyDownListener);
-    window.removeEventListener("focus", this.windowfocusListener);
-    document.removeEventListener("visibilitychange", this.visibilityListener);
     this.isUnmounted = true;
-  }
-
-  public keyDownListener(e: KeyboardEvent) {
-    if (this.props.state.currentSelectedText) {
-      if (e.key === "Alt") {
-        this.setState({
-          altKey: true,
-        });
-      } else if (e.key === "Shift") {
-        this.setState({
-          shiftKey: true,
-        });
-      }
-    }
-
-    if (
-      this.state.altKey &&
-      e.key !== "Alt" &&
-      e.key !== "Shift"
-    ) {
-      e.preventDefault();
-
-      if (
-        !this.state.shiftKey &&
-        ((e.key === "ArrowUp" && this.state.drawerOpen) ||
-          (e.key === "ArrowDown" && !this.state.drawerOpen))
-      ) {
-        this.toggleDrawer();
-        this.accumulatedFastKeyCombo = "";
-      } else if (this.state.shiftKey && this.state.drawerOpen && (e.key === "ArrowUp" || e.key === "ArrowDown")) {
-        this.scrollDrawer(e.key === "ArrowUp" ? "up" : "down");
-        this.accumulatedFastKeyCombo = "";
-      } else {
-        let actualKeyCombo = e.key.toLowerCase();
-        if (actualKeyCombo === "arrowleft") {
-          actualKeyCombo = "←";
-        } else if (actualKeyCombo === "arrowright") {
-          actualKeyCombo = "→";
-        }
-
-        actualKeyCombo = this.accumulatedFastKeyCombo + actualKeyCombo;
-
-        const fastkeySelector = (this.state.shiftKey ? "s" : "") + "fastkey";
-        const selector = "[data-" + fastkeySelector + "=\"" + actualKeyCombo + "\"]";
-        const toolbarElementMatching = this.toolbarRef.current &&
-          this.toolbarRef.current.getAppbarHeader().querySelector(selector);
-        const drawerElementMatching = this.wrapperContainerRef.current &&
-          this.wrapperContainerRef.current.getDrawerBody().querySelector(selector)
-        const elementMatching = toolbarElementMatching || drawerElementMatching;
-        if (elementMatching instanceof HTMLInputElement) {
-          elementMatching.focus();
-          this.accumulatedFastKeyCombo = "";
-        } else if (elementMatching instanceof HTMLElement) {
-          elementMatching.click();
-          this.accumulatedFastKeyCombo = "";
-        } else {
-          this.accumulatedFastKeyCombo = actualKeyCombo;
-        }
-      }
-    }
   }
 
   public keyUpListener(e: KeyboardEvent) {
     if (e.key === "Tab") {
       this.selectiveHardBlur(e);
-    }
-
-    if (this.state.altKey && e.key === "Alt") {
-      this.setState({
-        altKey: false,
-      });
-      this.accumulatedFastKeyCombo = "";
-    }
-
-    if (this.state.shiftKey && e.key === "Shift") {
-      this.setState({
-        shiftKey: false,
-      });
-      this.accumulatedFastKeyCombo = "";
     }
   }
 
@@ -1700,9 +1520,11 @@ export class MaterialUISlateWrapper extends React.PureComponent<MaterialUISlateW
       // if it's an unblurred target, such as the toolbar
       // or the drawer
       if (this.isUnblurred(e.target as any)) {
-        // stop from losing focus
-        e.stopPropagation();
-        e.preventDefault();
+        if ((e.target as HTMLElement).tagName !== "INPUT") {
+          // stop from losing focus
+          e.stopPropagation();
+          e.preventDefault();
+        }
       } else if (!this.isInEditor(e.target as any)) {
         // otherwise if we are not in the editor
         // just lose all the focus
@@ -1711,24 +1533,12 @@ export class MaterialUISlateWrapper extends React.PureComponent<MaterialUISlateW
     }
   }
 
-  public visibilityListener() {
-    if (document.visibilityState === "hidden") {
-      this.setState({
-        altKey: false,
-        shiftKey: false,
-      });
-    }
-  }
-
-  public windowfocusListener() {
-    this.setState({
-      altKey: false,
-      shiftKey: false,
-    });
-  }
-
   public isUnblurred(ele: HTMLElement): boolean {
-    if (ele === this.toolbarRef.current.getAppbarHeader() || ele === this.wrapperContainerRef.current.getDrawerBody()) {
+    if (
+      ele === this.toolbarRef.current.getAppbarHeader() ||
+      ele === this.wrapperContainerRef.current.getDrawerBody() ||
+      ele.dataset.unblur
+    ) {
       return true;
     }
 
@@ -1740,7 +1550,9 @@ export class MaterialUISlateWrapper extends React.PureComponent<MaterialUISlateW
   }
 
   public isInEditor(ele: HTMLElement): boolean {
-    if (ele === this.editorRef.current) {
+    if (
+      ele === this.editorRef.current
+    ) {
       return true;
     }
 
@@ -1786,10 +1598,6 @@ export class MaterialUISlateWrapper extends React.PureComponent<MaterialUISlateW
       this.props.state.currentSelectedSuperBlockElementAnchor;
     // trigger a click
     this.inputImageRef.current.click();
-    this.setState({
-      altKey: false,
-      shiftKey: false,
-    });
   }
 
   /**
@@ -1806,10 +1614,6 @@ export class MaterialUISlateWrapper extends React.PureComponent<MaterialUISlateW
       this.props.state.currentSelectedSuperBlockElementAnchor;
     // trigger a click
     this.inputFileRef.current.click();
-    this.setState({
-      altKey: false,
-      shiftKey: false,
-    });
   }
 
   /**
@@ -1823,6 +1627,10 @@ export class MaterialUISlateWrapper extends React.PureComponent<MaterialUISlateW
     this.setState({
       drawerOpen: newState,
     });
+
+    if (!this.props.disjointedMode) {
+      window.dispatchEvent(new Event("SLATE_DRAWER_OPEN"));
+    }
 
     // and put it in local storage
     localStorage.setItem("SLATE_DRAWER_OPEN", JSON.stringify(newState));
@@ -1853,6 +1661,8 @@ export class MaterialUISlateWrapper extends React.PureComponent<MaterialUISlateW
       return;
     }
 
+    // TODO FIX
+
     if (this.originalSelectionArea) {
       this.props.helpers.focusAt(this.originalSelectionArea);
     } else if (this.originalSelectionPath) {
@@ -1876,186 +1686,11 @@ export class MaterialUISlateWrapper extends React.PureComponent<MaterialUISlateW
   }
 
   /**
-   * Triggers the state change to open the html based dialog for
-   * requesting a video
-   */
-  public requestVideo() {
-    // save the selection area before losing focus
-    this.originalSelectionArea = this.props.state.currentText ? this.props.helpers.editor.selection : null;
-    this.originalSelectionPath = this.props.state.currentSelectedInlineElementAnchor ||
-      this.props.state.currentSelectedBlockElementAnchor ||
-      this.props.state.currentSelectedSuperBlockElementAnchor;
-    // set the state to open the dialog
-    this.setState({
-      videoDialogOpen: true,
-    });
-  }
-
-  /**
-   * Triggers the state change to open the html based dialog for
-   * requesting insertion of a template text bit
-   */
-  public requestTemplateText() {
-    // save the selection area before losing focus
-    this.originalSelectionArea = this.props.state.currentText ? this.props.helpers.editor.selection : null;
-    this.originalSelectionPath = this.props.state.currentSelectedInlineElementAnchor ||
-      this.props.state.currentSelectedBlockElementAnchor ||
-      this.props.state.currentSelectedSuperBlockElementAnchor;
-    // set the state to open the dialog
-    this.setState({
-      templateTextDialogOpen: true,
-    });
-  }
-
-  /**
-   * Triggers the state change to open the html based dialog for
-   * requesting insertion of a template html bit
-   */
-  public requestTemplateHTML() {
-    // save the selection area before losing focus
-    this.originalSelectionArea = this.props.state.currentText ? this.props.helpers.editor.selection : null;
-    this.originalSelectionPath = this.props.state.currentSelectedInlineElementAnchor ||
-      this.props.state.currentSelectedBlockElementAnchor ||
-      this.props.state.currentSelectedSuperBlockElementAnchor;
-    // set the state to open the dialog
-    this.setState({
-      templateHTMLDialogOpen: true,
-    });
-  }
-
-  /**
-   * Triggers the state change to open the html based dialog for
-   * requesting insertion of a link or template link if available
-   */
-  public requestLink() {
-    // save the selection area before losing focus
-    this.originalSelectionArea = this.props.state.currentText ? this.props.helpers.editor.selection : null;
-      this.originalSelectionPath = this.props.state.currentSelectedInlineElementAnchor ||
-      this.props.state.currentSelectedBlockElementAnchor ||
-      this.props.state.currentSelectedSuperBlockElementAnchor;
-    // now we open the dialog and we also save
-    // the current element because we might be opening
-    // in order to modify the current link
-    this.setState({
-      linkDialogOpen: true,
-      inlineElementThatWasCurrentBeforeLosingFocus: this.props.state.currentInlineElement,
-    });
-  }
-
-  /**
-   * Closes the dialog for the video input
-   */
-  public closeDialogVideo() {
-    // refocus back to where we were focused originally as we
-    // saved before opening the dialog
-    this.refocus();
-    // close the dialog
-    this.setState({
-      videoDialogOpen: false,
-    });
-  }
-
-  /**
-   * Closes the dialog for the link input
-   */
-  public closeDialogLink() {
-    // refocus back to where we were focused originally as we
-    // saved before opening the dialog
-    this.refocus();
-    // change the state to close the dialog
-    this.setState({
-      linkDialogOpen: false,
-    });
-  }
-
-  /**
-   * Closes the dialog for the template text input
-   */
-  public closeDialogTemplateText() {
-    // refocus back to where we were focused originally as we
-    // saved before opening the dialog
-    this.refocus();
-    // change the state to close the dialog
-    this.setState({
-      templateTextDialogOpen: false,
-    });
-  }
-
-  /**
-   * Closes the dialog for the template html input
-   */
-  public closeDialogTemplateHTML() {
-    // refocus back to where we were focused originally as we
-    // saved before opening the dialog
-    this.refocus();
-    // change the state to close the dialog
-    this.setState({
-      templateHTMLDialogOpen: false,
-    });
-  }
-
-  /**
    * Inserts a container, a basic one in place
    */
   public insertContainer() {
     // basically just calls the helper to insert the container
     this.props.helpers.insertContainer();
-  }
-
-  /**
-   * This function gets executed before the dialog for the video
-   * closes in order to accept the video url
-   * @param videoURL the video url in question
-   * @returns a boolean on whether the insertion succeeded
-   */
-  public async acceptVideo(videoURL: string) {
-    // we need to pass the original selection area to tell the helper
-    // where we are about to insert that video, in which range
-    // this will cause a refocus there
-    await this.props.helpers.focusAt(this.originalSelectionArea || this.originalSelectionPath);
-    return this.props.helpers.insertVideo(videoURL);
-  }
-
-  /**
-   * This function gets executed before the dialog for the video
-   * closes in order to accept the video url
-   * @param videoURL the video url in question
-   * @returns a boolean on whether the insertion succeeded
-   */
-  public async acceptLink(linkURL: string, linkTValue: string) {
-    // we need to pass the original selection area to tell the helper
-    // where we are about to insert that link, in which range
-    // this will cause a refocus there
-    await this.props.helpers.focusAt(this.originalSelectionArea || this.originalSelectionPath);
-    return this.props.helpers.toggleLink(linkURL, linkTValue);
-  }
-
-  /**
-   * Inserts a template text bit in the last location that was
-   * selected
-   * @param label the label that will be shown 
-   * @param value the value off the context to be taken to replace
-   */
-  public async insertTemplateText(label: string, value: string) {
-    // we need to pass the original selection area to tell the helper
-    // where we are about to insert that template text, in which range
-    // this will cause a refocus there
-    await this.props.helpers.focusAt(this.originalSelectionArea || this.originalSelectionPath);
-    this.props.helpers.insertTemplateText(label, value);
-  }
-
-  /**
-   * Inserts a template html in the last location that was
-   * selected
-   * @param label the label that will be shown 
-   * @param value the value off the context to be taken to replace
-   */
-  public async insertTemplateHTML(label: string, value: string) {
-    // we need to pass the original selection area to tell the helper
-    // where we are about to insert that template html, in which range
-    // this will cause a refocus there
-    await this.props.helpers.focusAt(this.originalSelectionArea || this.originalSelectionPath);
-    this.props.helpers.insertTemplateHTML(label, value);
   }
 
   /**
@@ -2148,101 +1783,17 @@ export class MaterialUISlateWrapper extends React.PureComponent<MaterialUISlateW
           />
         ) : null;
 
-    // the video dialog that allows for inserting
-    // videos in the rich text based on the url
-    const videoDialog = this.props.state.isRichText && this.props.featureSupport.supportsVideos ? (
-      <VideoDialog
-        acceptVideo={this.acceptVideo}
-        closeDialogVideo={this.closeDialogVideo}
-        videoDialogOpen={this.state.videoDialogOpen}
-        i18nLoadVideoInvalid={this.props.i18nRichInfo.loadVideo.invalid}
-        i18nLoadVideoLabel={this.props.i18nRichInfo.loadVideo.label}
-        i18nLoadVideoPlaceholder={this.props.i18nRichInfo.loadVideo.placeholder}
-        i18nLoadVideoSubmit={this.props.i18nRichInfo.loadVideo.submit}
-        i18nLoadVideoTitle={this.props.i18nRichInfo.loadVideo.title}
-      />
-    ) : null;
-
-    // the link dialog that allows for inserting links
-    // and tempalte links on the markup
-    const linkDialog = this.props.state.isRichText && this.props.featureSupport.supportsLinks ? (
-      <LinkDialog
-        acceptLink={this.acceptLink}
-        closeDialogLink={this.closeDialogLink}
-        i18nSetLinkInvalid={this.props.i18nRichInfo.setLink.invalid}
-        i18nSetLinkLabel={this.props.i18nRichInfo.setLink.label}
-        i18nSetLinkPlaceholder={this.props.i18nRichInfo.setLink.placeholder}
-        i18nSetLinkPlaceholderLocalOnly={this.props.i18nRichInfo.setLink.placeholderLocalOnly}
-        i18nSetLinkSubmit={this.props.i18nRichInfo.setLink.submit}
-        i18nSetLinkTemplated={this.props.i18nRichInfo.setLink.templated}
-        i18nSetLinkTemplatedLabel={this.props.i18nRichInfo.setLink.templatedLabel}
-        i18nSetLinkTemplatedPlaceholder={this.props.i18nRichInfo.setLink.templatedPlaceholder}
-        i18nSetLinkTemplatedUnspecified={this.props.i18nRichInfo.setLink.templatedUnspecified}
-        i18nSetLinkTitle={this.props.i18nRichInfo.setLink.title}
-        currentContext={this.props.state.currentSelectedBlockContext}
-        currentRootContext={this.props.state.currentRootContext}
-        linkDialogOpen={this.state.linkDialogOpen}
-        selectedElement={this.state.inlineElementThatWasCurrentBeforeLosingFocus}
-        supportsExternalLinks={this.props.featureSupport.supportsExternalLinks}
-        templateBoxSx={style.linkTemplateOptionsBox}
-        templateTextSx={style.linkTemplateOptionsText}
-        optionPrimarySx={style.optionPrimary}
-      />
-    ) : null;
-
-    // the template text dialog that allows to insert templated text fragments
-    // to the markup itself
-    const templateTextDialog = this.props.state.isRichText && this.props.featureSupport.supportsTemplating ? (
-      <TemplateElementDialog
-        insertTemplateElement={this.insertTemplateText}
-        closeTemplateElementDialog={this.closeDialogTemplateText}
-        templateElementDialogOpen={this.state.templateTextDialogOpen}
-        currentContext={this.props.state.currentSelectedBlockContext}
-        currentRootContext={this.props.state.currentRootContext}
-        i18nInsertTemplateElementLabel={this.props.i18nRichInfo.addTemplateText.label}
-        i18nInsertTemplateElementPlaceholder={this.props.i18nRichInfo.addTemplateText.placeholder}
-        i18nInsertTemplateElementSubmit={this.props.i18nRichInfo.addTemplateText.submit}
-        i18nInsertTemplateElementTitle={this.props.i18nRichInfo.addTemplateText.title}
-        elementType="text"
-        optionPrimarySx={style.optionPrimary}
-      />
-    ) : null;
-
-    // the template html dialog that allows to insert templated html fragments
-    // to the markup itself
-    const templateHTMLDialog = this.props.state.isRichText && this.props.featureSupport.supportsTemplating ? (
-      <TemplateElementDialog
-        insertTemplateElement={this.insertTemplateHTML}
-        closeTemplateElementDialog={this.closeDialogTemplateHTML}
-        templateElementDialogOpen={this.state.templateHTMLDialogOpen}
-        currentContext={this.props.state.currentSelectedSuperBlockContext}
-        currentRootContext={this.props.state.currentRootContext}
-        i18nInsertTemplateElementLabel={this.props.i18nRichInfo.addTemplateHTML.label}
-        i18nInsertTemplateElementPlaceholder={this.props.i18nRichInfo.addTemplateHTML.placeholder}
-        i18nInsertTemplateElementSubmit={this.props.i18nRichInfo.addTemplateHTML.submit}
-        i18nInsertTemplateElementTitle={this.props.i18nRichInfo.addTemplateHTML.title}
-        elementType="html"
-        optionPrimarySx={style.optionPrimary}
-      />
-    ) : null;
-
     const toolbar = (
       <RichTextEditorToolbar
         {...this.props}
         ref={this.toolbarRef}
-        altKey={this.state.altKey}
-        shiftKey={this.state.shiftKey}
         onHeightChange={this.onHeightChange}
         requestImage={this.requestImage}
         requestFile={this.requestFile}
-        requestVideo={this.requestVideo}
         shouldHaveDrawer={this.shouldHaveDrawer}
         drawerOpen={this.state.drawerOpen}
         toggleDrawer={this.toggleDrawer}
-        requestLink={this.requestLink}
         insertContainer={this.insertContainer}
-        requestTemplateText={this.requestTemplateText}
-        requestTemplateHTML={this.requestTemplateHTML}
       />
     );
 
@@ -2272,13 +1823,8 @@ export class MaterialUISlateWrapper extends React.PureComponent<MaterialUISlateW
             drawerOpen={this.state.drawerOpen}
             noAnimate={this.state.noAnimate}
             toolbarHeight={this.state.toolbarHeight}
-            fastKeyActive={this.state.altKey && this.state.shiftKey}
           />
           {fileLoadErrorDialog}
-          {videoDialog}
-          {linkDialog}
-          {templateTextDialog}
-          {templateHTMLDialog}
           {imageInput}
           {fileInput}
         </>
@@ -2310,14 +1856,9 @@ export class MaterialUISlateWrapper extends React.PureComponent<MaterialUISlateW
             drawerOpen={this.state.drawerOpen}
             noAnimate={this.state.noAnimate}
             toolbarHeight={this.state.toolbarHeight}
-            fastKeyActive={this.state.altKey && this.state.shiftKey}
           />
         </StyledEditorContainer>
         {fileLoadErrorDialog}
-        {videoDialog}
-        {linkDialog}
-        {templateTextDialog}
-        {templateHTMLDialog}
         {imageInput}
         {fileInput}
       </>
@@ -2329,7 +1870,6 @@ export interface IWrapperContainerProps extends MaterialUISlateWrapperWithStyles
   drawerOpen: boolean;
   toolbarHeight: number;
   noAnimate: boolean;
-  fastKeyActive: boolean;
 }
 
 interface IWrapperContainerState {

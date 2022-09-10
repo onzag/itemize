@@ -675,7 +675,7 @@ export function reactifyElementBase(
   // and set it up as template in the class if
   // html has been defined from the context as data-html
   // which is a templating attribute
-  if ((base.html || base.textContent) && !arg.active) {
+  if ((typeof base.html === "string" || typeof base.textContent === "string") && !arg.active) {
     finalProps.className = (finalProps.className || "") + " template";
   }
 
@@ -688,7 +688,7 @@ export function reactifyElementBase(
   }
 
   // if we are working as a template and we have a html data attribute
-  if (arg.asTemplate && base.html) {
+  if (arg.asTemplate && typeof base.html === "string") {
     // we remove the children if we have them
     delete finalProps.children;
 
@@ -708,7 +708,7 @@ export function reactifyElementBase(
     } else {
       finalProps.children = null;
     }
-  } else if (arg.asTemplate && base.textContent) {
+  } else if (arg.asTemplate && typeof base.textContent === "string") {
     // we remove the children if we have them
     delete finalProps.children;
     // and define the text content

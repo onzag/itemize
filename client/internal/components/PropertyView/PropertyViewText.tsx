@@ -67,6 +67,8 @@ export default class PropertyViewText extends React.Component<IPropertyViewHandl
     const supportsFiles = supportsMedia && !!this.props.property.getSpecialProperty("supportsFiles");
     const supportsContainers = this.props.property.getSpecialProperty("supportsContainers");
     const supportedContainers = this.props.property.getSpecialProperty("supportedContainers");
+    const supportsTables = this.props.property.getSpecialProperty("supportsTables");
+    const supportedTables = this.props.property.getSpecialProperty("supportedTables");
     const supportsLists = this.props.property.getSpecialProperty("supportsLists");
     const supportsCustom = this.props.property.getSpecialProperty("supportsCustom");
     const supportedCustoms = this.props.property.getSpecialProperty("supportedCustoms");
@@ -119,6 +121,8 @@ export default class PropertyViewText extends React.Component<IPropertyViewHandl
           supportedContainers,
           supportedCustoms,
           supportedRichClasses,
+          supportsTables,
+          supportedTables,
         },
         currentValue,
       );

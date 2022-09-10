@@ -18,14 +18,14 @@ import {
 } from "../../../internal/text/serializer";
 import {
   CONTAINER_CLASS_PREFIX, countSize, CUSTOM_CLASS_PREFIX,
-  IFeatureSupportOptions, RICH_TEXT_CLASS_PREFIX, serializeString
+  IFeatureSupportOptions, RICH_TEXT_CLASS_PREFIX, serializeString, TABLE_CLASS_PREFIX
 } from "../../../internal/text";
 import { LAST_RICH_TEXT_CHANGE_LENGTH } from "../../../../constants";
 import uuid from "uuid";
 import { IInsertedFileInformationType } from "../../../internal/components/PropertyEntry/PropertyEntryText";
 import { convertStyleStringToReactObject, IUIHandlerProps } from "../../../internal/text/serializer/base";
 import { IVideo } from "../../../internal/text/serializer/types/video";
-import { mimeTypeToExtension } from "../../../../util";
+import { localeReplacer, mimeTypeToExtension } from "../../../../util";
 import prettyBytes from "pretty-bytes";
 import { IContainer } from "../../../internal/text/serializer/types/container";
 import { IFile } from "../../../internal/text/serializer/types/file";
@@ -38,6 +38,8 @@ import { IVoidBlock } from "../../../internal/text/serializer/types/void-block";
 import { IList } from "../../../internal/text/serializer/types/list";
 import { STANDARD_PARAGRAPH } from "../../../internal/text/serializer/types/paragraph";
 import { ITemplateArgContextDefinition, ITemplateArgHTMLDefinition, ITemplateArgTextDefinition, ITemplateArgUIHandlerDefinition } from "../../../internal/text/serializer/template-args";
+import { ILink } from "../../../internal/text/serializer/types/link";
+import { ITable, ITbody, ITd, ITfoot, ITr } from "../../../internal/text/serializer/types/table";
 
 declare module 'slate' {
   interface CustomTypes {
@@ -118,6 +120,11 @@ interface IAvailableElementCSSClassName {
  */
 let ALL_CONTAINERS: string[] = [];
 /**
+ * All the tables that we could find so far
+ * @ignore
+ */
+let ALL_TABLES: string[] = [];
+/**
  * All the custom classes that we could find so far
  * @ignore
  */
@@ -178,6 +185,11 @@ function calculateStylesheet(stylesheet: CSSStyleSheet | CSSMediaRule) {
         const toPush = className.substr(CONTAINER_CLASS_PREFIX.length);
         if (!ALL_CONTAINERS.includes(toPush)) {
           ALL_CONTAINERS.push(toPush);
+        }
+      } else if (className.startsWith(TABLE_CLASS_PREFIX)) {
+        const toPush = className.substr(TABLE_CLASS_PREFIX.length);
+        if (!ALL_TABLES.includes(toPush)) {
+          ALL_TABLES.push(toPush);
         }
       } else if (className.startsWith(CUSTOM_CLASS_PREFIX)) {
         const toPush = className.substr(CUSTOM_CLASS_PREFIX.length);
@@ -269,6 +281,10 @@ export interface IAccessibleFeatureSupportOptions extends IFeatureSupportOptions
    * The classes that are available for the containers
    */
   availableContainers: IAvailableElementCSSClassName[];
+  /**
+   * The classes that are available for the containers
+   */
+  availableTables: IAvailableElementCSSClassName[];
 }
 
 /**
@@ -315,6 +331,8 @@ export interface IHelperFunctions {
    * Provies the context for the given path
    */
   getContextFor: (element: RichElement | IText | Path, level?: "final" | "select-context" | "select-loop", onlySwichingContext?: boolean) => ITemplateArgContextDefinition;
+  getRootContext: () => ITemplateArgContextDefinition;
+  getState: () => ISlateEditorInternalStateType;
 
   /**
    * performs a pseudo selection at a given path
@@ -349,7 +367,7 @@ export interface IHelperFunctions {
    * Allows to kno what the previous selected element was
    * before this one was selected
    */
-   getPreviousTextAnchor: () => Path;
+  getPreviousTextAnchor: () => Path;
 
   /**
    * focuses the text editor
@@ -376,6 +394,7 @@ export interface IHelperFunctions {
    * @returns a boolean true if the video was properly inserted, false if the video url was invalid
    */
   insertVideo: (url: string) => boolean;
+  updateVideo: (url: string) => boolean;
   /**
    * Will insert a file based on the information given
    * @param file the file to insert
@@ -409,6 +428,7 @@ export interface IHelperFunctions {
    * @param at an optional range to insert at
    */
   insertTemplateText: (label: string, value: string) => void;
+  updateTemplateText: (label: string, value: string) => void;
   /**
    * Inserts a template html fragment
    * this is caret based unless you specify your own custom range
@@ -418,6 +438,7 @@ export interface IHelperFunctions {
    * @param at an optional range to insert at
    */
   insertTemplateHTML: (label: string, value: string) => void;
+  updateTemplateHTML: (label: string, value: string) => void;
 
   /**
    * Inserts an element at the given position
@@ -425,6 +446,15 @@ export interface IHelperFunctions {
    * @param at optional range to insert at
    */
   insertElement: (element: RichElement) => void;
+
+  /**
+   * Inserts a table at the given location
+   */
+  insertTable: (tableType: string) => void;
+  insertTableColumn: () => void;
+  insertTableRow: () => void;
+  toggleTable: (element: "thead" | "tfoot") => void;
+  canToggleTable: (element: "thead" | "tfoot") => boolean;
 
   /**
    * Makes a quote out of the current element
@@ -452,6 +482,7 @@ export interface IHelperFunctions {
    * for some reason, eg. invalid link, links are not supported
    */
   toggleLink: (url: string, templateValue: string) => boolean;
+  updateLink: (url: string, templateValue: string) => boolean;
 
   /**
    * Formats the current text as bold
@@ -626,7 +657,7 @@ export interface ISlateEditorInternalStateType {
    * Contextual, very specific to the current context
    * where the cursor is located
    */
-  allowsInsertElement: (element: RichElement) => boolean;
+  allowsInsertElement: (element: RichElement, opts?: { collapsed?: boolean; extended?: boolean; selected?: boolean }) => boolean;
   allowsText: boolean;
   inlineIsVoid: boolean;
   blockIsVoid: boolean;
@@ -634,6 +665,39 @@ export interface ISlateEditorInternalStateType {
   superBlockUIHandler: ITemplateArgUIHandlerDefinition;
   blockUIHandler: ITemplateArgUIHandlerDefinition;
   inlineUIHandler: ITemplateArgUIHandlerDefinition;
+}
+
+/**
+ * The props that every element wrapper is going to get
+ * based on the standard that is pased by each element
+ * once such element is selected
+ */
+export interface ISlateEditorWrapperElementProps {
+  /**
+   * The element being selected
+   */
+  element: RichElement;
+  /**
+   * Whether the selection is primary
+   */
+  primarySelection: boolean;
+  /**
+   * wether is selected
+   */
+  isSelected: boolean;
+  /**
+   * The helpers functions
+   */
+  helpers: IHelperFunctions;
+  /**
+   * The element component itself that should
+   * be returned
+   */
+  children: React.ReactNode;
+  /**
+   * The feature support
+   */
+  featureSupport: IAccessibleFeatureSupportOptions;
 }
 
 /**
@@ -716,12 +780,25 @@ interface ISlateEditorProps {
    * and they can be provided via this argument
    */
   wrapperArgs?: any;
+
+  /**
+   * Wrappers for specific elements as they are selected and only if they are selected
+   */
+  elementWrappers?: {
+    [key: string]: React.ComponentType<ISlateEditorWrapperElementProps>;
+  };
+
+  /**
+   * Args passed to all the element wrappers
+   */
+  elementWrappersArgs: any;
+
   /**
    * The list of standard features that are supported
    * according to the definition, the property entry handler
    * provides this right away to the renderer
    */
-  features: IFeatureSupportOptions,
+  features: IFeatureSupportOptions;
   /**
    * The value as html or plain text, look at the
    * isRichText prop in this same structure in order
@@ -881,6 +958,15 @@ interface ISlateEditorState extends ISlateEditorInternalStateType {
    * from the stylesheets definition
    */
   allRichClasses: string[];
+  /**
+   * all tables that exist within the definitions
+   * for the css classes
+   * 
+   * They exist as state because of SSR
+   * The server side is not able to access these nor read the CSS file
+   * from the stylesheets definition
+   */
+  allTables: string[];
 }
 
 const falseFn = () => false;
@@ -915,13 +1001,8 @@ export class SlateEditor extends React.Component<ISlateEditorProps, ISlateEditor
    * the user stops typing and not on every keystroke, because rich text is expensive
    */
   private updateTimeout: NodeJS.Timeout;
-  /**
-   * This flag allows to disable removing empty text nodes that exist in the current location
-   * when set to true, eg. if we set a bold text node, while in most case we want these empty text nodes
-   * gone, not all the time
-   */
-  private ignoreCurrentLocationToRemoveEmpty: boolean = false;
   private isInNormalization: boolean = false;
+  private preventNormalize: boolean = false;
   /**
    * When a call to delete the current selected node is done, the selection anchors as they have been set
    * need to be removed and reset because otherwise they will be pointing to invalid nodes, this internal
@@ -1126,6 +1207,7 @@ export class SlateEditor extends React.Component<ISlateEditorProps, ISlateEditor
       allContainers: [],
       allCustom: [],
       allRichClasses: [],
+      allTables: [],
 
       allowsInsertElement: falseFn,
       allowsText: false,
@@ -1157,6 +1239,7 @@ export class SlateEditor extends React.Component<ISlateEditorProps, ISlateEditor
     this.findAndInsertFilesFromDataTransfer = this.findAndInsertFilesFromDataTransfer.bind(this);
     this.isVoid = this.isVoid.bind(this);
     this.getContextFor = this.getContextFor.bind(this);
+    this.getRootContext = this.getRootContext.bind(this);
 
     this.originalSetFragmentData = this.editor.setFragmentData;
     this.originalInsertData = this.editor.insertData;
@@ -1191,15 +1274,24 @@ export class SlateEditor extends React.Component<ISlateEditorProps, ISlateEditor
     this.focus = this.focus.bind(this);
     this.insertImage = this.insertImage.bind(this);
     this.insertVideo = this.insertVideo.bind(this);
+    this.updateVideo = this.updateVideo.bind(this);
     this.insertFile = this.insertFile.bind(this);
     this.insertTemplateText = this.insertTemplateText.bind(this);
+    this.updateTemplateText = this.updateTemplateText.bind(this);
     this.insertTemplateHTML = this.insertTemplateHTML.bind(this);
+    this.updateTemplateHTML = this.updateTemplateHTML.bind(this);
+    this.insertTable = this.insertTable.bind(this);
+    this.insertTableColumn = this.insertTableColumn.bind(this);
+    this.insertTableRow = this.insertTableRow.bind(this);
+    this.toggleTable = this.toggleTable.bind(this);
+    this.canToggleTable = this.canToggleTable.bind(this);
     this.insertContainer = this.insertContainer.bind(this);
     this.insertCustom = this.insertCustom.bind(this);
     this.toggleQuote = this.toggleQuote.bind(this);
     this.toggleTitle = this.toggleTitle.bind(this);
     this.insertList = this.insertList.bind(this);
     this.toggleLink = this.toggleLink.bind(this);
+    this.updateLink = this.updateLink.bind(this);
     this.setStyle = this.setStyle.bind(this);
     this.set = this.set.bind(this);
     this.setHoverStyle = this.setHoverStyle.bind(this);
@@ -1211,9 +1303,20 @@ export class SlateEditor extends React.Component<ISlateEditorProps, ISlateEditor
     this.formatToggle = this.formatToggle.bind(this);
     this.setAction = this.setAction.bind(this);
     this.insertElement = this.insertElement.bind(this);
+    this.getState = this.getState.bind(this);
 
     this.availableFilteringFunction = this.availableFilteringFunction.bind(this);
     this.calculateAnchors = this.calculateAnchors.bind(this);
+
+    this.updateNodeAt = this.updateNodeAt.bind(this);
+    this.insertNodeAt = this.insertNodeAt.bind(this);
+    this.deleteNodeAt = this.deleteNodeAt.bind(this);
+    this.mergeNodesAt = this.mergeNodesAt.bind(this);
+    this.splitElementAndEscapeChildIntoParentAt = this.splitElementAndEscapeChildIntoParentAt.bind(this);
+    this.wrapNodeAt = this.wrapNodeAt.bind(this);
+    this.getNodeAt = this.getNodeAt.bind(this);
+    this.cloneElementAt = this.cloneElementAt.bind(this);
+    this.moveNodeAt = this.moveNodeAt.bind(this);
 
     this.hardBlur = this.hardBlur.bind(this);
     this.softBlur = this.softBlur.bind(this);
@@ -1395,6 +1498,66 @@ export class SlateEditor extends React.Component<ISlateEditorProps, ISlateEditor
     }
   }
 
+  private updateNodeAt(path: Path, v: Partial<RichElement | IText>) {
+    Transforms.setNodes(this.editor, v, {
+      at: path,
+    });
+  }
+  private deleteNodeAt(path: Path) {
+    Transforms.delete(this.editor, {
+      at: path,
+    });
+  }
+  private insertNodeAt(path: Path, node: RichElement | IText, targetIndex: number) {
+    Transforms.insertNodes(this.editor, node, {
+      at: [...path, targetIndex],
+    });
+  }
+  private mergeNodesAt(basePath: Path, referencePath: Path) {
+    const parentPath = [...basePath];
+    parentPath.pop();
+
+    // due to a slate bug merging doesn't quite work
+    // it just does nothing, despite the specification
+    // the second argument doesn't pass either
+    Transforms.mergeNodes(this.editor, {
+      at: referencePath,
+      voids: true,
+    });
+  }
+  private splitElementAndEscapeChildIntoParentAt(path: Path, escapingChildIndex: number) {
+    Transforms.liftNodes(this.editor, {
+      at: [...path, escapingChildIndex],
+    })
+  }
+  private wrapNodeAt(path: Path, wrappers: RichElement[]) {
+    wrappers.forEach((wrapper) => {
+      Transforms.wrapNodes(this.editor, wrapper, {
+        at: path,
+      });
+    });
+  }
+  private getNodeAt(path: Path) {
+    return Node.get(this.editor, path) as RichElement | IText;
+  }
+  private cloneElementAt(fromPath: Path, toPath: Path) {
+    const toCopyNode = this.getNodeAt(fromPath) as RichElement;
+    const copy = {
+      ...toCopyNode,
+    }
+    copy.children = [];
+
+    Transforms.insertNodes(this.editor, copy, {
+      at: toPath,
+    });
+  }
+  private moveNodeAt(fromPath: Path, toPath: Path) {
+    Transforms.moveNodes(this.editor, {
+      at: fromPath,
+      to: toPath,
+    });
+  }
+
   /**
    * Normalization funciton that overrides the normalization
    * of the standard editor
@@ -1405,15 +1568,15 @@ export class SlateEditor extends React.Component<ISlateEditorProps, ISlateEditor
     // from the serializer takes care of the
     // entire serialization mechanism and shall not
     // be recalled when it's doing its job
-    if (this.isInNormalization) {
+    if (this.isInNormalization || this.preventNormalize) {
       return;
     }
 
     const [node, path] = entry;
 
-    // if it's the editor itself, this happens when clearing
-    // and deleting everything and the only thing left is the
-    // editor itself
+    // if it's the editor itself, this is the only case
+    // we want to normalize
+    // we want to avoid others as they are verbose
     if (Editor.isEditor(node)) {
       this.isInNormalization = true;
 
@@ -1431,53 +1594,32 @@ export class SlateEditor extends React.Component<ISlateEditorProps, ISlateEditor
           id: this.state.currentValue.id,
           rich: this.state.currentValue.rich,
         };
+
+        const nodeAtSelection = this.editor.selection ? this.getNodeAt(this.editor.selection.anchor.path) : null;
+        const nodeIgnore: Path[] = [];
+        if (Text.isText(nodeAtSelection) && nodeAtSelection.text === "") {
+          nodeIgnore.push(this.editor.selection.anchor.path);
+        }
+
         normalizeElement(
           pseudoDocument,
           [],
           pseudoDocument,
           {
             workOnOriginal: false,
-            updateNodeAt(path, v) {
-              Transforms.setNodes(this.editor, v, {
-                at: path,
-              });
-            },
-            deleteNodeAt(path) {
-              Transforms.delete(this.editor, {
-                at: path,
-              });
-            },
-            insertNodeAt(path, node, targetIndex) {
-              Transforms.insertNodes(this.editor, node, {
-                at: [...path, targetIndex],
-              });
-            },
-            mergeNodesAt(basePath, referencePath) {
-              const parentPath = [...basePath];
-              parentPath.pop();
-  
-              Transforms.mergeNodes(this.editor, {
-                at: parentPath,
-                match(node, pathMatch) {
-                  return Path.equals(pathMatch, basePath) || Path.equals(pathMatch, referencePath);
-                },
-              });
-            },
-            splitElementAndEscapeChildIntoParentAt(path, escapingChildIndex) {
-              Transforms.liftNodes(this.editor, {
-                at: [...path, escapingChildIndex],
-              })
-            },
-            wrapNodeAt(path, wrappers) {
-              wrappers.forEach((wrapper) => {
-                Transforms.wrapNodes(this.editor, wrapper, {
-                  at: path,
-                });
-              });
-            },
-            getNodeAt(path) {
-              return Node.get(this.editor, path) as RichElement;
-            },
+            updateNodeAt: this.updateNodeAt,
+            deleteNodeAt: this.deleteNodeAt,
+            insertNodeAt: this.insertNodeAt,
+            mergeNodesAt: this.mergeNodesAt,
+            splitElementAndEscapeChildIntoParentAt: this.splitElementAndEscapeChildIntoParentAt,
+            wrapNodeAt: this.wrapNodeAt,
+            getNodeAt: this.getNodeAt,
+            cloneElementAt: this.cloneElementAt,
+            moveNodeAt: this.moveNodeAt,
+          },
+          {
+            ignoreNodesAt: nodeIgnore,
+            useContextRulesOf: this.state.currentRootContext,
           }
         );
       }
@@ -1518,11 +1660,10 @@ export class SlateEditor extends React.Component<ISlateEditorProps, ISlateEditor
       Range.isCollapsed(this.editor.selection) &&
       // and we have a list item
       isListItemBreak &&
-      // and our current super block element, our list item, has
-      // only one children
-      this.state.currentSuperBlockElement.children.length === 1 &&
-      // and that children is an empty paragraph
+      // and that first children is an empty paragraph
+      // there may be a second list
       (this.state.currentSuperBlockElement.children[0] as any).type === "paragraph" &&
+      // with one empty text node
       (this.state.currentSuperBlockElement.children[0] as any).children.length === 1 &&
       Text.isText((this.state.currentSuperBlockElement.children[0] as any).children[0]) &&
       (this.state.currentSuperBlockElement.children[0] as any).children[0].text === ""
@@ -1535,6 +1676,12 @@ export class SlateEditor extends React.Component<ISlateEditorProps, ISlateEditor
     ) {
       // we need to break the list
       this.breakList();
+      return;
+    }
+
+    if (!this.state.currentBlockElement) {
+      // strange
+      Transforms.splitNodes(this.editor, { always: true });
       return;
     }
 
@@ -1578,60 +1725,29 @@ export class SlateEditor extends React.Component<ISlateEditorProps, ISlateEditor
       end.offset === finalBlockOffset &&
       Path.equals(finalBlockPath, end.path)
     );
-    const shouldCreateFreshParagraph = isEndOfLine;
 
-    // if the end we are dealing with is exactly
-    // at this last point and offset so we are right
-    // at the end of the given block
-    // we do this to avoid copying template text elements
-    // when we deal with text so that they don't also
-    // become template text
-    if (shouldCreateFreshParagraph) {
-      // then we want to clone the current block
-      // we are dealing with and copy all its properties
-      if (isListItemBreak) {
-        Transforms.insertNodes(this.editor, {
-          ...this.state.currentSuperBlockElement,
-          uiHandler: null,
-          uiHandlerArgs: null,
-          givenName: null,
-          // but certainly not its current text properties
-          // that we might be at, as we don't want to copy nor the
-          // text, nor the template text values
-          children: [
-            {
-              ...this.state.currentText,
-              text: "",
-            } as any
-          ]
-        }, {
-          match: (n: any) => n.type === "list-item"
-        });
-      } else {
-        Transforms.insertNodes(this.editor, {
-          ...this.state.currentBlockElement,
-          uiHandler: null,
-          uiHandlerArgs: null,
-          givenName: null,
-          // but certainly not its current text properties
-          // that we might be at, as we don't want to copy nor the
-          // text, nor the template text values
-          children: [
-            {
-              ...this.state.currentText,
-              text: "",
-            } as any
-          ]
-        });
-      }
+    if (isListItemBreak) {
+      // otherwise we do a simple split node
+      Transforms.splitNodes(this.editor, { always: true, match: (n: any) => n.type === "list-item" });
     } else {
-      if (isListItemBreak) {
-        // otherwise we do a simple split node
-        Transforms.splitNodes(this.editor, { always: true, match: (n: any) => n.type === "list-item" })
-      } else {
-        // otherwise we do a simple split node
-        Transforms.splitNodes(this.editor, { always: true })
-      }
+      // otherwise we do a simple split node
+      Transforms.splitNodes(this.editor, { always: true })
+    }
+
+    // gotta clear ui handlers and whatnot
+    if (isEndOfLine) {
+      Transforms.setNodes(this.editor, {
+        uiHandler: null,
+        html: null,
+        uiHandlerArgs: null,
+        textContent: null,
+      }, {
+        match: (n) => {
+          return isBlock(n as any);
+        },
+        mode: "lowest",
+        at: this.editor.selection.anchor.path,
+      })
     }
   }
 
@@ -1645,7 +1761,16 @@ export class SlateEditor extends React.Component<ISlateEditorProps, ISlateEditor
     const { selection } = this.editor
 
     if (selection && Range.isCollapsed(selection)) {
-      Transforms.delete(this.editor, { unit });
+      if (
+        this.state.currentBlockElement &&
+        this.state.currentBlockElement.children.length === 1 &&
+        Text.isText(this.state.currentBlockElement.children[0]) &&
+        this.state.currentBlockElement.children[0].text === ""
+      ) {
+        Transforms.delete(this.editor, { at: this.state.currentBlockElementAnchor });
+      } else {
+        Transforms.delete(this.editor, { unit });
+      }
     }
   }
 
@@ -1664,9 +1789,7 @@ export class SlateEditor extends React.Component<ISlateEditorProps, ISlateEditor
       // and it's collapsed
       Range.isCollapsed(selection) &&
       this.state.currentSuperBlockElement &&
-      this.state.currentSuperBlockElement.type === "list" &&
-      // and we are in a list item type
-      this.state.currentBlockElement.type === "list-item" &&
+      this.state.currentSuperBlockElement.type === "list-item" &&
       (
         // and we are deleting a character of a word
         (
@@ -1692,9 +1815,7 @@ export class SlateEditor extends React.Component<ISlateEditorProps, ISlateEditor
       // then we want to ensure that such is not removed
       // there are however in most circumstances we want to ensure
       // any empty text is removed even in the current caret
-      this.ignoreCurrentLocationToRemoveEmpty = true;
       Transforms.delete(this.editor, { unit, reverse: true });
-      this.ignoreCurrentLocationToRemoveEmpty = false;
       // otherwise
     }
   }
@@ -1706,6 +1827,8 @@ export class SlateEditor extends React.Component<ISlateEditorProps, ISlateEditor
    * list one
    */
   public breakList() {
+    this.preventNormalize = true;
+
     Transforms.unwrapNodes(
       this.editor,
       {
@@ -1716,29 +1839,14 @@ export class SlateEditor extends React.Component<ISlateEditorProps, ISlateEditor
         split: true,
       }
     );
+
+    this.preventNormalize = false;
+
     Transforms.unwrapNodes(
       this.editor,
       {
         match: (n: any) => {
           return n.type === "list-item";
-        },
-        mode: "lowest",
-        split: true,
-      }
-    );
-
-    // let's check if the now new nodes are laying right into
-    // the list item, which is valid indeed, but rather unwanted
-    // this should make it so that the paragraph that now dangles at
-    // the end is unwrapped
-    Transforms.unwrapNodes(
-      this.editor,
-      {
-        match: (n: any) => {
-          return n.type === "list-item" &&
-            n.children.length >= 2 &&
-            n.children[n.children.length - 1] &&
-            n.children[n.children.length - 1].type === "paragraph";
         },
         mode: "lowest",
         split: true,
@@ -1756,38 +1864,34 @@ export class SlateEditor extends React.Component<ISlateEditorProps, ISlateEditor
     if (
       this.state.currentSuperBlockElement
     ) {
+      const currentSuperBlockElementAnchor = [...this.state.currentSuperBlockElementAnchor];
+
+      // for tables we want to attack the table element
+      if (this.state.currentSuperBlockElement.type === "td" || this.state.currentSuperBlockElement.type === "th") {
+        //tr
+        currentSuperBlockElementAnchor.pop();
+        //tbody
+        currentSuperBlockElementAnchor.pop();
+        //table
+        currentSuperBlockElementAnchor.pop();
+      }
       // and now we need to get the next anchor that is next to such block
-      const currentSuperBlockElementAnchor = this.state.currentSuperBlockElementAnchor;
-      const nextAnchor = [...currentSuperBlockElementAnchor];
+      const nextAnchor = currentSuperBlockElementAnchor;
       nextAnchor[nextAnchor.length - 1]++;
 
-      if (this.state.currentSuperBlockElement === this.state.currentBlockElement) {
-        // in cases where the block is also the super block, these odd types
-        // that exist due to templating reasons
-        Transforms.insertNodes(this.editor, {
-          type: "paragraph",
-          children: [
-            {
-              ...this.state.currentText,
-              text: "",
-            }
-          ]
-        }, { at: nextAnchor });
-      } else {
-        // and we insert a clone based on the block itself
-        // with no text
-        Transforms.insertNodes(this.editor, {
-          ...this.state.currentBlockElement,
-          uiHandler: null,
-          uiHandlerArgs: null,
-          children: [
-            {
-              ...this.state.currentText,
-              text: "",
-            } as any
-          ]
-        }, { at: nextAnchor });
-      }
+      // and we insert a clone based on the block itself
+      // with no text
+      Transforms.insertNodes(this.editor, {
+        ...this.state.currentBlockElement,
+        uiHandler: null,
+        uiHandlerArgs: null,
+        children: [
+          {
+            ...this.state.currentText,
+            text: "",
+          } as any
+        ]
+      }, { at: nextAnchor });
 
       // and we want to focus on such text
       const nextAnchorText = nextAnchor.concat([0]);
@@ -2002,7 +2106,19 @@ export class SlateEditor extends React.Component<ISlateEditorProps, ISlateEditor
       this.state.currentRootContext,
     );
 
-    const allowsInsertElement = (element: RichElement) => {
+    const allowsInsertElement = (element: RichElement, opts: { collapsed?: boolean; extended?: boolean; selected?: boolean } = {}) => {
+      if (opts.collapsed || opts.extended || opts.selected) {
+        if (opts.selected && !this.editor.selection) {
+          return false;
+        }
+        const isCollapsed = this.editor.selection && Range.isCollapsed(this.editor.selection);
+        if (!isCollapsed && opts.collapsed) {
+          return false;
+        } else if (isCollapsed && opts.extended) {
+          return false;
+        }
+      }
+
       // we first need to check where it goes
       if (isSuperBlock(element) || isBlock(element)) {
         if (!baseAllowedChildreOfSuperBlock.includes(element.type)) {
@@ -2151,9 +2267,11 @@ export class SlateEditor extends React.Component<ISlateEditorProps, ISlateEditor
       nextState.currentRootContext !== this.state.currentRootContext ||
       nextProps.currentLoadError !== this.props.currentLoadError ||
       !equals(this.state.allContainers, nextState.allContainers, { strict: true }) ||
+      !equals(this.state.allTables, nextState.allTables, { strict: true }) ||
       !equals(this.state.allCustom, nextState.allCustom, { strict: true }) ||
       !equals(this.state.allRichClasses, nextState.allRichClasses, { strict: true }) ||
       !equals(nextProps.wrapperArgs, this.props.wrapperArgs, { strict: true }) ||
+      !equals(nextProps.elementWrappersArgs, this.props.elementWrappersArgs, { strict: true }) ||
       !equals(nextProps.features, this.props.features, { strict: true })
     )
 
@@ -2247,6 +2365,10 @@ export class SlateEditor extends React.Component<ISlateEditorProps, ISlateEditor
       this.state.currentValue,
       this.state.currentRootContext,
     );
+  }
+
+  public getRootContext() {
+    return this.state.currentRootContext;
   }
 
   public renderElement(props: RenderElementProps) {
@@ -2375,7 +2497,7 @@ export class SlateEditor extends React.Component<ISlateEditorProps, ISlateEditor
     const customProps: any = { ...attributes, children };
 
     const html = (element as any as RichElement).html;
-    if (html) {
+    if (typeof html === "string") {
       const htmlContext = this.getContextFor(element as any);
       let propertiesFromContext: ITemplateArgHTMLDefinition = htmlContext && htmlContext.properties && htmlContext.properties[html] as ITemplateArgHTMLDefinition;
       if (!propertiesFromContext) {
@@ -2414,8 +2536,8 @@ export class SlateEditor extends React.Component<ISlateEditorProps, ISlateEditor
       }
     }
 
-    const text = (element as any as RichElement).textContent;
-    if (text) {
+    const text = element.textContent;
+    if (typeof text === "string") {
       const textContext = this.getContextFor(element as any);
       let propertiesFromContext: ITemplateArgTextDefinition = textContext &&
         textContext.properties &&
@@ -2429,14 +2551,16 @@ export class SlateEditor extends React.Component<ISlateEditorProps, ISlateEditor
         }
       }
 
-      if (propertiesFromContext && propertiesFromContext.type === "text") {
-        customProps.children = (
-          <>
-            {(propertiesFromContext && (propertiesFromContext.editorDisplay || propertiesFromContext.label)) || (element as any).children[0].text}
-            {children}
-          </>
-        );
-      }
+      customProps.children = (
+        <>
+          {(
+            propertiesFromContext &&
+            propertiesFromContext.type === "text" &&
+            (propertiesFromContext.editorDisplay || propertiesFromContext.label)
+          ) || (element as any).children[0].text}
+          {children}
+        </>
+      );
     }
 
     // and now we call the reactification
@@ -2469,6 +2593,22 @@ export class SlateEditor extends React.Component<ISlateEditorProps, ISlateEditor
       toReturn = arr;
     } else if (contextSwichContext && contextSwichContext.editorArgs && contextSwichContext.editorArgs.wrapper) {
       toReturn = contextSwichContext.editorArgs.wrapper(toReturn);
+    }
+
+    if (this.props.elementWrappers && this.props.elementWrappers[element.type]) {
+      const ElementWrapper = this.props.elementWrappers[element.type];
+      return (
+        <ElementWrapper
+          element={element}
+          helpers={this.getHelpers()}
+          primarySelection={isPrimary}
+          isSelected={isSelected}
+          featureSupport={this.getFeatureSupport()}
+          {...this.props.elementWrappersArgs}
+        >
+          {toReturn}
+        </ElementWrapper>
+      );
     }
 
     return toReturn;
@@ -2710,7 +2850,7 @@ export class SlateEditor extends React.Component<ISlateEditorProps, ISlateEditor
         setTimeout(() => {
           ReactEditor.focus(this.editor);
           setTimeout(() => {
-            Transforms.setSelection(this.editor, at);
+            Transforms.select(this.editor, at);
             setTimeout(r, 0);
           }, 0);
         }, 0);
@@ -2791,6 +2931,17 @@ export class SlateEditor extends React.Component<ISlateEditorProps, ISlateEditor
     }
   }
 
+  public updateTemplateText(label: string, value: string) {
+    if (this.state.currentSelectedInlineElement) {
+      Transforms.setNodes(this.editor, {
+        textContent: value || "",
+      }, { at: this.state.currentSelectedInlineElementAnchor });
+      Transforms.setNodes(this.editor, {
+        text: label || localeReplacer(this.props.rootI18n.rich_template_component, this.props.rootI18n.rich_text),
+      }, { at: this.state.currentSelectedTextAnchor });
+    }
+  }
+
   /**
    * Will insert a bit of template text that is used for templating purposes
    * 
@@ -2805,15 +2956,14 @@ export class SlateEditor extends React.Component<ISlateEditorProps, ISlateEditor
       bold: false,
       italic: false,
       underline: false,
-      text: label,
-    }
+      text: label || localeReplacer(this.props.rootI18n.rich_template_component, this.props.rootI18n.rich_text),
+    };
 
     // and now we build a paragraph node to put the text there
     const inlineNode: IInline = {
       children: [textNode],
       type: "inline",
-      textContent: value,
-      givenName: label,
+      textContent: value || "",
     };
 
     // and we call the insert node
@@ -2821,6 +2971,17 @@ export class SlateEditor extends React.Component<ISlateEditorProps, ISlateEditor
       Transforms.insertNodes(this.editor, inlineNode as any, { at: this.getFallbackInsertPath() });
     } else {
       Transforms.insertNodes(this.editor, inlineNode);
+    }
+  }
+
+  public updateTemplateHTML(label: string, value: string) {
+    if (this.state.currentSelectedBlockElement) {
+      Transforms.setNodes(this.editor, {
+        textContent: value || "",
+      }, { at: this.state.currentSelectedBlockElementAnchor });
+      Transforms.setNodes(this.editor, {
+        text: label || localeReplacer(this.props.rootI18n.rich_template_component, this.props.rootI18n.rich_container),
+      }, { at: this.state.currentSelectedTextAnchor });
     }
   }
 
@@ -2832,14 +2993,14 @@ export class SlateEditor extends React.Component<ISlateEditorProps, ISlateEditor
    * @param value the value that will be used from the context
    * @param at an optional range where to be inserted
    */
-  public insertTemplateHTML(label: string, value: string, at?: Range | Path) {
+  public insertTemplateHTML(label: string, value: string) {
     // and create a text node based on that
     // which is where we put the label
     const textNode: IText = {
       bold: false,
       italic: false,
       underline: false,
-      text: label,
+      text: label || localeReplacer(this.props.rootI18n.rich_template_component, this.props.rootI18n.rich_container),
     }
 
     // and a container to make it be the inner html
@@ -2847,8 +3008,7 @@ export class SlateEditor extends React.Component<ISlateEditorProps, ISlateEditor
     const voidBlock: IVoidBlock = {
       children: [textNode],
       type: "void-block",
-      html: value,
-      givenName: label,
+      html: value || "",
     }
 
     // and we call the insert node
@@ -2860,103 +3020,634 @@ export class SlateEditor extends React.Component<ISlateEditorProps, ISlateEditor
   }
 
   /**
+   * Inserts a table at the given location
+   * @param type the type of the table
+   */
+  public insertTable(type?: string) {
+    // now we can make the container
+    const tableNode: ITable = {
+      type: "table",
+      children: [
+        {
+          type: "tbody",
+          children: [
+            {
+              type: "tr",
+              children: [
+                {
+                  type: "td",
+                  children: [
+                    STANDARD_PARAGRAPH(),
+                  ],
+                }
+              ]
+            }
+          ]
+        },
+      ],
+      tableType: type || null,
+    };
+
+    // and we call the insert node
+    if (!this.editor.selection) {
+      Transforms.insertNodes(this.editor, tableNode, { at: this.getFallbackInsertPath() });
+    } else {
+      Transforms.insertNodes(this.editor, tableNode);
+    }
+  }
+
+  public insertTableColumn() {
+    const currentColumn = this.state.currentSelectedSuperBlockElement;
+    if (currentColumn.type === "td" || currentColumn.type === "th") {
+      // this is where we end to focus as that's where we add the new row at
+      // however we do need to add a new column at the same index in every
+      // row
+      const targetColumnAnchor = [...this.state.currentSelectedSuperBlockElementAnchor];
+      targetColumnAnchor[targetColumnAnchor.length - 1]++;
+
+      const targetIndex = targetColumnAnchor[targetColumnAnchor.length - 1];
+
+      const tableAnchor = [...this.state.currentSelectedSuperBlockElementAnchor];
+      // tr
+      tableAnchor.pop();
+      // thead or tbody
+      tableAnchor.pop();
+      // table
+      tableAnchor.pop();
+
+      try {
+        const tableElement = this.getNodeAt(tableAnchor) as RichElement;
+
+        if (tableElement.type === "table") {
+          tableElement.children.forEach((theadOrTbodyOrTfoot, theadOrTbodyOrTFootIndex) => {
+            theadOrTbodyOrTfoot.children.forEach((row, rowIndex) => {
+              const column: ITd = {
+                type: "td",
+                children: [
+                  STANDARD_PARAGRAPH(),
+                ],
+              };
+
+              let actualTargetIndex: number = targetIndex;
+              if (actualTargetIndex > row.children.length) {
+                actualTargetIndex = row.children.length;
+              }
+
+              const insertPoint = [...tableAnchor, theadOrTbodyOrTFootIndex, rowIndex, actualTargetIndex];
+              Transforms.insertNodes(this.editor, column, { at: insertPoint });
+            });
+          });
+
+          const textAnchorOfColumn = targetColumnAnchor;
+          // paragraph
+          textAnchorOfColumn.push(0);
+          // text
+          textAnchorOfColumn.push(0);
+
+          this.focusAt({
+            anchor: {
+              offset: 0,
+              path: targetColumnAnchor,
+            },
+            focus: {
+              offset: 0,
+              path: targetColumnAnchor,
+            },
+          });
+        }
+      } catch {
+
+      }
+    }
+  }
+
+  public insertTableRow() {
+    const currentColumn = this.state.currentSelectedSuperBlockElement;
+    // the column where we are now
+    if (currentColumn.type === "td" || currentColumn.type === "th") {
+
+      // so what's the row anchor of this column
+      const currentRowAnchor = [...this.state.currentSelectedSuperBlockElementAnchor];
+      currentRowAnchor.pop();
+
+      // now let's get such row
+      const currentRow = this.getNodeAt(currentRowAnchor) as ITr;
+      const row: ITr = {
+        type: "tr",
+        children: currentRow.children.map((v) => (
+          {
+            type: "td",
+            children: [
+              STANDARD_PARAGRAPH(),
+            ],
+          }
+        )),
+      };
+
+      // of course needs to be a row
+      if (currentRow.type === "tr") {
+
+        // and now let's get the thead or tbody in question
+        const parentTbodyOrTheadOrTfootAnchor = [...currentRowAnchor];
+        parentTbodyOrTheadOrTfootAnchor.pop();
+        const parentTbodyOrTheadOrTfoot = this.getNodeAt(parentTbodyOrTheadOrTfootAnchor) as RichElement;
+
+        // if it's a tbody
+        if (parentTbodyOrTheadOrTfoot.type === "tbody") {
+          // we simply add the row next to the current
+          const targetRowAnchor = currentRowAnchor;
+          targetRowAnchor[targetRowAnchor.length - 1]++;
+          Transforms.insertNodes(this.editor, row, { at: targetRowAnchor });
+
+          const targetRowAnchorFirstText = targetRowAnchor;
+          // first td
+          targetRowAnchorFirstText.push(0);
+          // first paragraph
+          targetRowAnchorFirstText.push(0);
+          // first text in paragraph
+          targetRowAnchorFirstText.push(0);
+
+          this.focusAt({
+            anchor: {
+              offset: 0,
+              path: targetRowAnchorFirstText,
+            },
+            focus: {
+              offset: 0,
+              path: targetRowAnchorFirstText,
+            },
+          });
+        } else if (parentTbodyOrTheadOrTfoot.type === "thead") {
+          // otherwise we need to add the row in the tbody, that is next
+          // to the thead
+          const tbodyAnchor = [...parentTbodyOrTheadOrTfootAnchor];
+          tbodyAnchor[tbodyAnchor.length - 1]++;
+
+          // let's get the tbody
+          let tbody: RichElement = null;
+          try {
+            tbody = this.getNodeAt(tbodyAnchor) as RichElement;
+          } catch {
+
+          }
+
+          // if we have a tbody
+          if (tbody && tbody.type === "tbody") {
+            // new row at the start of the tbody
+            const targetRowAnchor = tbodyAnchor;
+            targetRowAnchor.push(0);
+            Transforms.insertNodes(this.editor, row, { at: targetRowAnchor });
+
+            const targetRowAnchorFirstText = targetRowAnchor;
+            // first td
+            targetRowAnchorFirstText.push(0);
+            // first paragraph
+            targetRowAnchorFirstText.push(0);
+            // first text in paragraph
+            targetRowAnchorFirstText.push(0);
+
+            this.focusAt({
+              anchor: {
+                offset: 0,
+                path: targetRowAnchorFirstText,
+              },
+              focus: {
+                offset: 0,
+                path: targetRowAnchorFirstText,
+              },
+            });
+          } else {
+            // no tbody, we need to add a new tbody where it should be
+            // could be a tfoot or downright missing
+            const tbody: ITbody = {
+              type: "tbody",
+              children: [row],
+            };
+
+            Transforms.insertNodes(this.editor, tbody, { at: tbodyAnchor });
+
+            const targetRowAnchorFirstText = tbodyAnchor;
+            // first tr
+            targetRowAnchorFirstText.push(0);
+            // first td
+            targetRowAnchorFirstText.push(0);
+            // first paragraph
+            targetRowAnchorFirstText.push(0);
+            // first text in paragraph
+            targetRowAnchorFirstText.push(0);
+
+            this.focusAt({
+              anchor: {
+                offset: 0,
+                path: targetRowAnchorFirstText,
+              },
+              focus: {
+                offset: 0,
+                path: targetRowAnchorFirstText,
+              },
+            });
+          }
+        } else if (parentTbodyOrTheadOrTfoot.type === "tfoot") {
+          // otherwise we need to add the row in the tbody, that is next
+          // to the thead
+          const tbodyAnchor = [...parentTbodyOrTheadOrTfootAnchor];
+          tbodyAnchor[tbodyAnchor.length - 1]--;
+
+          // let's get the tbody
+          let tbody: RichElement = null;
+          try {
+            tbody = this.getNodeAt(tbodyAnchor) as RichElement;
+          } catch {
+
+          }
+
+          const tfootClone = { ...parentTbodyOrTheadOrTfoot } as ITfoot;
+          tfootClone.children = tfootClone.children.map((v) => {
+            return {
+              type: "tr",
+              children: v.children.map(v2 => (
+                {
+                  type: "td",
+                  children: [
+                    STANDARD_PARAGRAPH(),
+                  ]
+                }
+              )),
+            }
+          });
+
+          // if we have a tbody
+          this.preventNormalize = true;
+          if (tbody && tbody.type === "tbody") {
+            // we update our tfoot to be tbody so that it merges
+            const currentTBodyPropsCopy = { ...tbody };
+            delete currentTBodyPropsCopy.children;
+            Transforms.setNodes(
+              this.editor,
+              currentTBodyPropsCopy as any,
+              {
+                at: parentTbodyOrTheadOrTfootAnchor,
+              }
+            );
+          } else {
+            // we simply make it into a tbody
+            Transforms.setNodes(
+              this.editor,
+              {
+                type: "tbody",
+              },
+              {
+                at: parentTbodyOrTheadOrTfootAnchor,
+              }
+            );
+          }
+          this.preventNormalize = false;
+
+          const nextAnchorForTfoot = [...parentTbodyOrTheadOrTfootAnchor];
+          nextAnchorForTfoot[nextAnchorForTfoot.length - 1]++;
+          Transforms.insertNodes(this.editor, tfootClone, { at: nextAnchorForTfoot });
+
+          // if there was a tbody the merging reaction caused that the next anchor is not
+          // anymore where our node is so we can use this one, otherwise it is the same as the next
+          const targetRowAnchorFirstText = tbody ? parentTbodyOrTheadOrTfootAnchor : nextAnchorForTfoot;
+          // first tr
+          targetRowAnchorFirstText.push(0);
+          // first td
+          targetRowAnchorFirstText.push(0);
+          // first paragraph
+          targetRowAnchorFirstText.push(0);
+          // first text in paragraph
+          targetRowAnchorFirstText.push(0);
+
+          this.focusAt({
+            anchor: {
+              offset: 0,
+              path: targetRowAnchorFirstText,
+            },
+            focus: {
+              offset: 0,
+              path: targetRowAnchorFirstText,
+            },
+          });
+        }
+      }
+    }
+  }
+
+  /**
+   * Tells whether the current table row can
+   * be toggled in the environment it is
+   */
+  public canToggleTable(element: "thead" | "tfoot") {
+    if (!this.state.currentSelectedSuperBlockElement) {
+      return false;
+    }
+
+    const potentialTd = this.state.currentSelectedSuperBlockElement;
+
+    if (potentialTd.type !== "td" && potentialTd.type !== "th") {
+      return false;
+    }
+
+    const rowPath = [...this.state.currentSelectedSuperBlockElementAnchor];
+    rowPath.pop();
+
+    const theadOrTbodyOrTfootPath = [...rowPath];
+    theadOrTbodyOrTfootPath.pop();
+
+    const tablePath = [...theadOrTbodyOrTfootPath];
+    tablePath.pop();
+
+    try {
+      const potentialRow = this.getNodeAt(rowPath) as RichElement;
+      if (potentialRow.type !== "tr") {
+        return false;
+      }
+
+      const theadOrTbodyOrTfoot = this.getNodeAt(theadOrTbodyOrTfootPath) as RichElement;
+      if (theadOrTbodyOrTfoot.type === element) {
+        // if we are already in a thead of course we can toggle it into a tbody
+        // row element
+        return true;
+      } else if (theadOrTbodyOrTfoot.type === "tfoot" || theadOrTbodyOrTfoot.type === "thead") {
+        // we can't convert the same thing as we are not in the right place
+        return false;
+      }
+
+      const tableParent = this.getNodeAt(tablePath) as RichElement;
+      if (tableParent.type !== "table") {
+        return false;
+      }
+
+      // we cannot toggle if we already have a thead
+      const theadOrTfootAlreadyExists = tableParent.children.find((c) => c.type === element);
+      if (theadOrTfootAlreadyExists) {
+        return false;
+      } else {
+        if (element === "thead") {
+          // otherwise we can only toggle if this is the first row of the table
+          return rowPath[rowPath.length - 1] === 0;
+        } else if (element === "tfoot") {
+          // otherwise we can only toggle if this is the last row of the table
+          return rowPath[rowPath.length - 1] === theadOrTbodyOrTfoot.children.length - 1;
+        }
+
+        return false;
+      }
+    } catch {
+      return false;
+    }
+  }
+
+  /**
+   * Only works when the first element of the table
+   * is selected, aka the first row
+   */
+  public toggleTable(element: "thead" | "tfoot") {
+    if (!this.canToggleTable(element)) {
+      return;
+    }
+
+    const rowPath = [...this.state.currentSelectedSuperBlockElementAnchor];
+    rowPath.pop();
+
+    const theadOrTbodyPath = [...rowPath];
+    theadOrTbodyPath.pop();
+
+    const tablePath = [...theadOrTbodyPath];
+    tablePath.pop();
+
+    const tableParent = this.getNodeAt(tablePath) as ITable;
+
+    // move all the thead elements into the tbody
+    const position = tableParent.children.findIndex((e) => e.type === element);
+    const bodyPosition = tableParent.children.findIndex((e) => e.type === "tbody");
+    if (position !== -1) {
+      const currentTBody = tableParent.children[bodyPosition];
+
+      if (!currentTBody) {
+        // no body let's make the whole thing the body
+        Transforms.setNodes(
+          this.editor,
+          {
+            type: "tbody",
+          },
+          {
+            at: [...tablePath, position],
+          }
+        );
+      } else {
+        // ensure they will merge and become 1 single body
+        // as they are mergable
+        const currentTBodyPropsCopy = { ...currentTBody };
+        delete currentTBodyPropsCopy.children;
+        Transforms.setNodes(
+          this.editor,
+          currentTBodyPropsCopy as any,
+          {
+            at: [...tablePath, position],
+          }
+        );
+      }
+    } else {
+      // move the first row of the tbody as a thead
+      const currentTBody = tableParent.children[bodyPosition];
+
+      if (!currentTBody) {
+        return;
+      }
+
+      // only that one row
+      if (currentTBody.children.length === 1) {
+        // no other than one row let's make the whole thing the thead
+        Transforms.setNodes(
+          this.editor,
+          {
+            type: element,
+          },
+          {
+            at: [...tablePath, bodyPosition],
+          }
+        );
+      } else {
+        const currentTBodyPropsCopy = { ...currentTBody };
+        currentTBodyPropsCopy.children = [];
+        currentTBodyPropsCopy.type = element;
+
+        // inserting empty element
+        this.preventNormalize = true;
+        Transforms.insertNodes(
+          this.editor,
+          currentTBodyPropsCopy as any,
+          {
+            at: [...tablePath, element === "thead" ? 0 : bodyPosition + 1],
+          }
+        );
+        this.preventNormalize = false;
+
+        if (element === "thead") {
+          Transforms.moveNodes(
+            this.editor,
+            {
+              // tbody is now in 1 ahead
+              // zero for the first row
+              at: [...tablePath, bodyPosition + 1, 0],
+              // this is our new thead
+              to: [...tablePath, 0, 0],
+            }
+          );
+        } else {
+          Transforms.moveNodes(
+            this.editor,
+            {
+              // tbody is at the same place as before
+              // we pick the last row
+              at: [...tablePath, bodyPosition, currentTBody.children.length - 1],
+              // this is our new tfoot which is after our body
+              to: [...tablePath, bodyPosition + 1, 0],
+            }
+          );
+        }
+      }
+    }
+  }
+
+  private _getVideoSrcOriginAndStatus(url: string) {
+    // first we parse the url, we only support youtube or vimeo
+    // urls for the video
+    let src: string = null;
+    let origin: string = null;
+    let status: boolean = true;
+
+    let parsedURL: URL = null;
+    if (url) {
+      try {
+        parsedURL = new URL(url);
+      } catch {
+        status = false;
+      }
+    }
+
+    // first we are going to check for youtube
+    // urls
+    if (parsedURL) {
+      if (
+        parsedURL.hostname === "youtube.com" ||
+        parsedURL.hostname === "www.youtube.com" ||
+        parsedURL.hostname === "youtu.be"
+      ) {
+        // set it as youtube in the origin
+        origin = "youtube";
+
+        // check for classic youtube urls
+        const isClassicYTUrl = (
+          parsedURL.hostname === "youtube.com" ||
+          parsedURL.hostname === "www.youtube.com"
+        );
+
+        // and then we can check for these as we try
+        // to get the source id
+        if (
+          isClassicYTUrl &&
+          parsedURL.pathname.startsWith("/embed/")
+        ) {
+          src = parsedURL.pathname.split("/")[2];
+        } else if (
+          isClassicYTUrl &&
+          parsedURL.pathname.startsWith("/watch")
+        ) {
+          let search = parsedURL.search;
+          if (search[0] === "?") {
+            search = search.substr(1);
+          }
+          search.split("&").forEach((v) => {
+            if (v.startsWith("v=")) {
+              src = v.substr(2);
+            }
+          });
+        } else if (
+          parsedURL.hostname === "youtu.be"
+        ) {
+          src = parsedURL.pathname.split("/")[1];
+        }
+
+        // we have succeded
+        status = true;
+
+        // now for vimeo
+      } else if (
+        parsedURL.host === "player.vimeo.com"
+      ) {
+        // much simpler
+        origin = "vimeo";
+        src = parsedURL.pathname.split("/")[2];
+        status = true
+      } else {
+        status = false;
+      }
+    }
+
+    return {
+      src,
+      origin,
+      status,
+    }
+  }
+
+  public updateVideo(url: string): boolean {
+    const data = this._getVideoSrcOriginAndStatus(url);
+
+    if (
+      data.status &&
+      this.state.currentSelectedBlockElement &&
+      this.state.currentSelectedBlockElement.type === "video"
+    ) {
+      Transforms.setNodes(this.editor, {
+        origin: data.origin,
+        src: data.src,
+      } as any, {
+        at: this.state.currentSelectedBlockElementAnchor
+      })
+    }
+
+    return data.status;
+  }
+
+  /**
    * Will insert a video given the information
    * @param url the url of the video
    * @param at a partial range to insert at
    * @returns a boolean on whether it succeeded
    */
-  public insertVideo(url: string, at?: Range | Path): boolean {
-
-    // first we parse the url, we only support youtube or vimeo
-    // urls for the video
-    const parsedURL = new URL(url);
-    let src: string;
-    let origin: string;
-    let status: boolean = false;
-
-    // first we are going to check for youtube
-    // urls
-    if (
-      parsedURL.hostname === "youtube.com" ||
-      parsedURL.hostname === "www.youtube.com" ||
-      parsedURL.hostname === "youtu.be"
-    ) {
-      // set it as youtube in the origin
-      origin = "youtube";
-
-      // check for classic youtube urls
-      const isClassicYTUrl = (
-        parsedURL.hostname === "youtube.com" ||
-        parsedURL.hostname === "www.youtube.com"
-      );
-
-      // and then we can check for these as we try
-      // to get the source id
-      if (
-        isClassicYTUrl &&
-        parsedURL.pathname.startsWith("/embed/")
-      ) {
-        src = parsedURL.pathname.split("/")[2];
-      } else if (
-        isClassicYTUrl &&
-        parsedURL.pathname.startsWith("/watch")
-      ) {
-        let search = parsedURL.search;
-        if (search[0] === "?") {
-          search = search.substr(1);
-        }
-        search.split("&").forEach((v) => {
-          if (v.startsWith("v=")) {
-            src = v.substr(2);
-          }
-        });
-      } else if (
-        parsedURL.hostname === "youtu.be"
-      ) {
-        src = parsedURL.pathname.split("/")[1];
-      }
-
-      // we have succeded
-      status = true;
-
-      // now for vimeo
-    } else if (
-      parsedURL.host === "player.vimeo.com"
-    ) {
-      // much simpler
-      origin = "vimeo";
-      src = parsedURL.pathname.split("/")[2];
-      status = true
-    }
+  public insertVideo(url: string): boolean {
+    const data = this._getVideoSrcOriginAndStatus(url);
 
 
     // and insert the video if we have been
     // considered succesful
-    if (status) {
-      const videoNode: IVideo = {
-        type: "video",
-        children: [
-          {
-            bold: false,
-            italic: false,
-            text: "",
-            underline: false,
-          }
-        ],
-        origin: origin as any,
-        src,
-      }
+    const videoNode: IVideo = {
+      type: "video",
+      children: [
+        {
+          bold: false,
+          italic: false,
+          text: "",
+          underline: false,
+        }
+      ],
+      origin: data.origin as any,
+      src: data.src,
+    }
 
-      // and we call the insert node
-      if (!this.editor.selection) {
-        Transforms.insertNodes(this.editor, videoNode, { at: this.getFallbackInsertPath() });
-      } else {
-        Transforms.insertNodes(this.editor, videoNode);
-      }
+    // and we call the insert node
+    if (!this.editor.selection) {
+      Transforms.insertNodes(this.editor, videoNode, { at: this.getFallbackInsertPath() });
+    } else {
+      Transforms.insertNodes(this.editor, videoNode);
     }
 
     // return the status
-    return status;
+    return data.status;
   };
   /**
    * Will insert a file based on the information given it uses
@@ -2990,7 +3681,6 @@ export class SlateEditor extends React.Component<ISlateEditorProps, ISlateEditor
         ],
         extension: mimeTypeToExtension(file.type),
         fileName: data.result.name,
-        givenName: data.result.name,
         size: prettyBytes(data.result.size),
         src: data.result.url,
         srcId: data.result.id,
@@ -3015,13 +3705,9 @@ export class SlateEditor extends React.Component<ISlateEditorProps, ISlateEditor
     // now we can make the container
     const containerNode: IContainer = {
       type: "container",
-      givenName: type || null,
       children: [
         {
           type: "paragraph",
-          // we use the current block element here in case we don't find it
-          // the type is on top for case of emergency
-          givenName: null,
           children: [
             {
               bold: false,
@@ -3052,13 +3738,9 @@ export class SlateEditor extends React.Component<ISlateEditorProps, ISlateEditor
     // now we can make the custom
     const customNode: ICustom = {
       type: "custom",
-      givenName: type || null,
       children: [
         {
           type: "paragraph",
-          // we use the current block element here in case we don't find it
-          // the type is on top for case of emergency
-          givenName: null,
           children: [
             {
               bold: false,
@@ -3149,11 +3831,8 @@ export class SlateEditor extends React.Component<ISlateEditorProps, ISlateEditor
       children: [
         {
           type: "list-item",
-          // we use the current block element here in case we don't find it
-          // the type is on top for case of emergency
-          givenName: null,
           children: [
-            STANDARD_PARAGRAPH()
+            STANDARD_PARAGRAPH(),
           ]
         },
       ],
@@ -3167,21 +3846,11 @@ export class SlateEditor extends React.Component<ISlateEditorProps, ISlateEditor
     }
   };
 
-  /**
-   * Makes a link out of the current element
-   * @param url the url that we are using (null if using tvalue)
-   * @param tvalue the template value to use (null if providing url)
-   * @param at an optional range to pass
-   * @returns a boolean if the link was valid and toggleLink
-   */
-  public toggleLink(url: string, tvalue: string): boolean {
-    // TODO
-
-
+  public updateLink(url: string, tvalue: string): boolean {
     // otherwise let's find what url we are using
-    let urlToUse: string = url;
+    let validState: boolean = true;
     // if there are no tvalue's given
-    if (!tvalue && url) {
+    if (url) {
       // we attempt to parse it
       try {
         // and so we do in order to check locality
@@ -3193,19 +3862,95 @@ export class SlateEditor extends React.Component<ISlateEditorProps, ISlateEditor
         // if it's such the case adn it's not a local url
         if (onlyLocal && !isLocal) {
           // we have failed
-          return false;
-        } else if (isLocal) {
-          // otherwise we rewrite the url
-          urlToUse = urlParsed.pathname + urlParsed.search + urlParsed.hash;
+          validState = false;
         }
       } catch {
-        return false;
+        validState = false;
       }
     }
 
+    if (
+      this.state.currentSelectedInlineElement &&
+      this.state.currentSelectedInlineElement.type === "link"
+    ) {
+      const link: Partial<ILink> = {
+        href: url,
+        thref: tvalue,
+      }
+      Transforms.setNodes(this.editor, link, {
+        at: this.state.currentSelectedInlineElementAnchor,
+      });
+    }
+
+    return validState;
+  }
+
+  /**
+   * Makes a link out of the current element
+   * @param url the url that we are using (null if using tvalue)
+   * @param tvalue the template value to use (null if providing url)
+   * @param at an optional range to pass
+   * @returns a boolean if the link was valid and toggleLink
+   */
+  public toggleLink(url: string, tvalue: string): boolean {
+    // otherwise let's find what url we are using
+    let validState: boolean = true;
+    // if there are no tvalue's given
+    if (url) {
+      // we attempt to parse it
+      try {
+        // and so we do in order to check locality
+        const urlParsed = new URL(url);
+        const isLocal = urlParsed.hostname === location.hostname;
+
+        // now as feature support maybe only local urls be allowed
+        const onlyLocal = !this.props.features.supportsExternalLinks;
+        // if it's such the case adn it's not a local url
+        if (onlyLocal && !isLocal) {
+          // we have failed
+          validState = false;
+        }
+      } catch {
+        validState = false;
+      }
+    }
+
+    const link: ILink = {
+      type: "link",
+      href: url,
+      thref: tvalue,
+      children: [
+        STANDARD_TEXT_NODE(this.props.rootI18n.rich_link)
+      ]
+    }
+
+    if (
+      this.editor.selection &&
+      Range.isCollapsed(this.editor.selection)
+    ) {
+      if (
+        this.state.currentSelectedInlineElement &&
+        this.state.currentSelectedInlineElement.type === "link"
+      ) {
+        Transforms.unwrapNodes(this.editor, {
+          at: this.state.currentSelectedInlineElementAnchor
+        });
+      } else {
+        Transforms.insertNodes(this.editor, link);
+      }
+    } else if (this.editor.selection) {
+      Transforms.wrapNodes(this.editor, link, {
+        match: (v) => Text.isText(v),
+        split: true,
+      });
+    } else {
+      Transforms.insertNodes(this.editor, link, {
+        at: this.getFallbackInsertPath(),
+      });
+    }
 
     // we have succeeded
-    return true;
+    return validState;
   };
 
   /**
@@ -3490,6 +4235,7 @@ export class SlateEditor extends React.Component<ISlateEditorProps, ISlateEditor
     if (!this.isUnmounted) {
       this.setState({
         allContainers: ALL_CONTAINERS,
+        allTables: ALL_TABLES,
         allCustom: ALL_CUSTOM,
         allRichClasses: ALL_RICH_CLASSES,
       });
@@ -3498,6 +4244,33 @@ export class SlateEditor extends React.Component<ISlateEditorProps, ISlateEditor
     if (this.props.autoFocus) {
       ReactEditor.focus(this.editor);
     }
+  }
+
+  public componentDidUpdate(prevProps: Readonly<ISlateEditorProps>, prevState: Readonly<ISlateEditorState>, snapshot?: any): void {
+    // if our prev selected text is empty
+    if (prevState.currentText && prevState.currentText.text === "") {
+      // let's find where it is now
+      const anchorInCurrent = ReactEditor.findPath(this.editor, prevState.currentText);
+      if (anchorInCurrent) {
+        // let's find what it is now
+        try {
+          const elementInCurrent = Node.get(this.editor, anchorInCurrent) as IText;
+          // if it's still empty and we are not over it, then we may want to delete it
+          if (elementInCurrent.text === "" && elementInCurrent !== this.state.currentText) {
+            // now we need to know if it's an inline spacer, void, etc...
+            // so we just call normalization
+            this.normalizeNode([this.editor, []]);
+          }
+        } catch {
+          // node is missing and slate somehow reports it at still being there
+          // causes an error, nothign to do, the node has been deleted
+        }
+      }
+    }
+  }
+
+  public getState() {
+    return this.state;
   }
 
   /**
@@ -3526,6 +4299,8 @@ export class SlateEditor extends React.Component<ISlateEditorProps, ISlateEditor
       Path,
 
       getContextFor: this.getContextFor,
+      getRootContext: this.getRootContext,
+      getState: this.getState,
 
       selectPath: this.selectPath,
       deletePath: this.deletePath,
@@ -3545,9 +4320,18 @@ export class SlateEditor extends React.Component<ISlateEditorProps, ISlateEditor
       insertFile: this.insertFile,
       insertImage: this.insertImage,
       insertVideo: this.insertVideo,
+      updateVideo: this.updateVideo,
       insertTemplateText: this.insertTemplateText,
+      updateTemplateText: this.updateTemplateText,
       insertTemplateHTML: this.insertTemplateHTML,
+      updateTemplateHTML: this.updateTemplateHTML,
+      insertTable: this.insertTable,
+      insertTableColumn: this.insertTableColumn,
+      insertTableRow: this.insertTableRow,
+      toggleTable: this.toggleTable,
+      canToggleTable: this.canToggleTable,
       toggleLink: this.toggleLink,
+      updateLink: this.updateLink,
       insertList: this.insertList,
       toggleQuote: this.toggleQuote,
       toggleTitle: this.toggleTitle,
@@ -3586,6 +4370,7 @@ export class SlateEditor extends React.Component<ISlateEditorProps, ISlateEditor
     const availableCustoms = this.availableFilteringFunction("supportsCustom", "allCustom", "supportedCustoms", "custom");
     const availableRichClasses = this.availableFilteringFunction("supportsRichClasses", "allRichClasses", "supportedRichClasses", "rich");
     const availableContainers = this.availableFilteringFunction("supportsContainers", "allContainers", "supportedContainers", "containers");
+    const availableTables = this.availableFilteringFunction("supportsTables", "allTables", "supportedTables", "tables");
 
     // and extend based on the features
     const newFeatureSupport: IAccessibleFeatureSupportOptions = {
@@ -3594,6 +4379,7 @@ export class SlateEditor extends React.Component<ISlateEditorProps, ISlateEditor
       availableContainers,
       availableCustoms,
       availableRichClasses,
+      availableTables,
     };
 
     return newFeatureSupport;

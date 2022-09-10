@@ -11,7 +11,6 @@ import { GeneralOptions } from "./general";
 import { StylesOptions } from "./styles";
 import { ActionsOptions } from "./actions";
 import { TemplatingOptions } from "./templating";
-import Divider from "@mui/material/Divider";
 import Tabs from "@mui/material/Tabs";
 import Tab from "@mui/material/Tab";
 import SettingsIcon from "@mui/icons-material/Settings";
@@ -19,7 +18,8 @@ import BorderStyleIcon from "@mui/icons-material/BorderStyle";
 import WebIcon from "@mui/icons-material/Web";
 import TouchAppIcon from "@mui/icons-material/TouchApp";
 import Typography from "@mui/material/Typography";
-import { getInfoFor, isText } from "../../../../internal/text/serializer";
+import { getInfoFor } from "../../../../internal/text/serializer";
+import { AltBadgeReactioner } from "../../alt-badge-reactioner";
 
 const style = {
   box: {
@@ -47,7 +47,6 @@ const style = {
     flex: "0 0 1rem",
   },
 };
-
 
 class ScrollSlowly {
   private speed: number;
@@ -160,49 +159,22 @@ export function WrapperDrawer(props: IWrapperContainerProps) {
   let settingsForNode: React.ReactNode = null;
   let titleForNode: string = null;
 
-  const drawerMode = props.drawerMode || "full";
-
   // and that's done based on the selected node
   if (props.state.currentSelectedElement) {
-    // and we need to see in which location we are
-    let actualLocation = location;
-    // for text nodes there's only the main location
-    if (
-      actualLocation !== "MAIN" &&
-      (
-        isText(props.state.currentSelectedElement) ||
-        drawerMode === "simple" ||
-        drawerMode === "barebones"
-      )
-    ) {
-      // so we override
-      actualLocation = "MAIN";
-    }
-
-    if (
-      actualLocation !== "MAIN" &&
-      actualLocation !== "STYLES" &&
-      drawerMode !== "full" &&
-      drawerMode !== "with-styles"
-    ) {
-      // so we override
-      actualLocation = "MAIN";
-    }
-
     // and according to that decide which panel to render
     let infoPanel: React.ReactNode = null;
-    switch (actualLocation) {
+    switch (location) {
       case "MAIN":
-        infoPanel = <GeneralOptions {...props}/>;
+        infoPanel = <GeneralOptions {...props} />;
         break;
       case "STYLES":
-        infoPanel = <StylesOptions {...props}/>;
+        infoPanel = <StylesOptions {...props} />;
         break;
       case "ACTIONS":
-        infoPanel = <ActionsOptions {...props}/>;
+        infoPanel = <ActionsOptions {...props} />;
         break;
       case "TEMPLATING":
-        infoPanel = <TemplatingOptions {...props}/>;
+        infoPanel = <TemplatingOptions {...props} />;
         break;
     }
 
@@ -223,56 +195,92 @@ export function WrapperDrawer(props: IWrapperContainerProps) {
           !selectedNodeInfo.isText ?
             (
               <>
-                {props.hideTree ? null : <Divider sx={style.separator} />}
-                {
-                  drawerMode !== "simple" && drawerMode !== "barebones" ? (
-                    <Tabs value={actualLocation} onChange={setLocationCallback}>
-                      <Tab
-                        sx={style.tab}
-                        label={<SettingsIcon />}
-                        value="MAIN"
-                        title={props.i18nRichInfo.settings}
-                      />
-                      {
-                        props.featureSupport.supportsCustomStyles || props.featureSupport.supportsRichClasses ?
-                          (
-                            <Tab
-                              sx={style.tab}
-                              label={<BorderStyleIcon />}
-                              value="STYLES"
-                              title={props.i18nRichInfo.styles}
-                            />
-                          ) :
-                          null
-                      }
-                      {
-                        (props.featureSupport.supportsTemplating && drawerMode === "full") ?
-                          (
-                            <Tab
-                            sx={style.tab}
-                              label={<WebIcon />}
-                              value="TEMPLATING"
-                              title={props.i18nRichInfo.templating}
-                            />
-                          ) :
-                          null
-                      }
-                      {
-                        (props.featureSupport.supportsTemplating && drawerMode === "full") ?
-                          (
-                            <Tab
-                            sx={style.tab}
-                              label={<TouchAppIcon />}
-                              value="ACTIONS"
-                              title={props.i18nRichInfo.actions}
-                            />
-                          ) :
-                          null
-                      }
-                    </Tabs>
-                  )
-                    : null
-                }
+                <Tabs value={location} onChange={setLocationCallback}>
+                  <Tab
+                    sx={style.tab}
+                    label={
+                      <AltBadgeReactioner
+                        reactionKey="m"
+                        label="m"
+                        priority={2}
+                        disabled={!props.state.currentSelectedElement}
+                        selectorGoUp={1}
+                      >
+                        <SettingsIcon />
+                      </AltBadgeReactioner>
+                    }
+                    value="MAIN"
+                    title={props.i18nRichInfo.settings}
+                  />
+
+                  {
+                    props.featureSupport.supportsCustomStyles || props.featureSupport.supportsRichClasses ?
+                      (
+
+                        <Tab
+                          sx={style.tab}
+                          label={
+                            <AltBadgeReactioner
+                              reactionKey="s"
+                              label="s"
+                              priority={2}
+                              disabled={!props.state.currentSelectedElement}
+                              selectorGoUp={1}
+                            >
+                              <BorderStyleIcon />
+                            </AltBadgeReactioner>
+                          }
+                          value="STYLES"
+                          title={props.i18nRichInfo.styles}
+                        />
+                      ) :
+                      null
+                  }
+                  {
+                    (props.featureSupport.supportsTemplating) ?
+                      (
+                        <Tab
+                          sx={style.tab}
+                          label={
+                            <AltBadgeReactioner
+                              reactionKey="t"
+                              label="t"
+                              priority={2}
+                              disabled={!props.state.currentSelectedElement}
+                              selectorGoUp={1}
+                            >
+                              <WebIcon />
+                            </AltBadgeReactioner>
+                          }
+                          value="TEMPLATING"
+                          title={props.i18nRichInfo.templating}
+                        />
+                      ) :
+                      null
+                  }
+                  {
+                    (props.featureSupport.supportsTemplating) ?
+                      (
+                        <Tab
+                          sx={style.tab}
+                          label={
+                            <AltBadgeReactioner
+                              reactionKey="a"
+                              label="a"
+                              priority={2}
+                              disabled={!props.state.currentSelectedElement}
+                              selectorGoUp={1}
+                            >
+                              <TouchAppIcon />
+                            </AltBadgeReactioner>
+                          }
+                          value="ACTIONS"
+                          title={props.i18nRichInfo.actions}
+                        />
+                      ) :
+                      null
+                  }
+                </Tabs>
               </>
             ) : null
         }

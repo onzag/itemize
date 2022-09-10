@@ -134,11 +134,53 @@ export function registerList(registry: ISerializationRegistryType) {
 
     return null;
   }
-  registry.INLINES.list = false;
-  registry.VOIDS.list = false;
 
+  registry.SUPERBLOCKS.list = true;
   registry.DESERIALIZE.byTag.OL = deserializeList;
   registry.DESERIALIZE.byTag.UL = deserializeList;
+  registry.MERGABLES.list = true;
+  registry.CUSTOM_NORMALIZER.list = (
+    list: IList,
+    path,
+    executionRoot,
+    primaryExecution,
+    secondaryExecution,
+    specialRules,
+  ) => {
+    let index = -1;
+    while (true) {
+      index++;
+      const child = list.children[index];
+      if (!child) {
+        break;
+      }
+
+      // so let's find in the list-item that is has as children, which place the second paragraph is
+      // but not the first
+      const secondParagraphPoint = child.children.findIndex((n, index) => n.type === "paragraph" && index !== 0);
+
+      if (secondParagraphPoint !== -1) {
+        // do a shallow copy with no children
+        const childPath = [...path, index];
+        const newChildPath = [...path, index + 1];
+        primaryExecution.cloneElementAt(childPath, newChildPath);
+        secondaryExecution && secondaryExecution.cloneElementAt(childPath, newChildPath);
+
+        // now we need to move all the children from the second paragraph forwards into this new target
+        // otherwise it will crash
+
+        // we now count all the children inside the list item itself
+        const allChildrenCount = child.children.length;
+
+        // and now from ahead the second paragraph point, which may be either in first
+        // or second we count to the end
+        for (let i = 0; i < (allChildrenCount - secondParagraphPoint); i++) {
+          primaryExecution.moveNodeAt([...childPath, secondParagraphPoint], [...newChildPath, i]);
+          secondaryExecution && secondaryExecution.moveNodeAt([...childPath, secondParagraphPoint], [...newChildPath, i]);
+        }
+      }
+    }
+  }
 }
 
 /**

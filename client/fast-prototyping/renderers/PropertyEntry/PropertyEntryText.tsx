@@ -21,6 +21,7 @@ import RestoreIcon from "@mui/icons-material/Restore";
 import ClearIcon from "@mui/icons-material/Clear";
 import Box from "@mui/material/Box";
 import { RestoreIconButton } from "./general";
+import { materialUIElementWrappers } from "../../components/slate/element-wrappers";
 
 /**
  * A simple helper function that says when it should show invalid
@@ -192,6 +193,15 @@ class PropertyEntryTextRenderer extends React.PureComponent<IPropertyEntryTextRe
         currentLoadError={this.props.lastLoadedFileError}
         dismissCurrentLoadError={this.props.dismissLastLoadedFileError}
         Wrapper={this.props.args.Wrapper || MaterialUISlateWrapper}
+        elementWrappers={this.props.args.ElementWrappers || materialUIElementWrappers}
+        elementWrappersArgs={
+          {
+            i18nGenericError: this.props.i18nGenericError,
+            i18nOk: this.props.i18nOk,
+            i18nRichInfo: this.props.i18nRichInfo,
+            ...this.props.args.elementWrapperArgs,
+          }
+        }
         rootI18n={this.props.i18nRoot}
         placeholder={this.props.placeholder}
         disabled={this.props.disabled}

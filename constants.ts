@@ -423,6 +423,13 @@ export const LOCALE_I18N = [
   "format_add_template_html",
   "format_delete_element",
   "format_more",
+  "format_add_table",
+  "format_add_thead",
+  "format_add_tbody",
+  "format_add_tr",
+  "format_add_td",
+  "format_add_th",
+  "format_add_tfoot",
 
   // extra rich element information
   "rich_name",
@@ -458,6 +465,13 @@ export const LOCALE_I18N = [
   "rich_ui_handler",
   "rich_type",
   "rich_standalone",
+  "rich_table",
+  "rich_thead",
+  "rich_tbody",
+  "rich_tr",
+  "rich_td",
+  "rich_th",
+  "rich_tfoot",
 
   // for filling the booleans and other things
   "yes",

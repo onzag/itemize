@@ -12,6 +12,7 @@ import LocationStateReader from "../../../components/navigation/LocationStateRea
 import { IfLogStatus } from "../../../components/login/IfLogStatus";
 import I18nRead from "../../../components/localization/I18nRead";
 import Button from "@mui/material/Button";
+import { AltBadgeReactioner } from "../alt-badge-reactioner";
 
 /**
  * provides the styles for the buttons
@@ -53,16 +54,16 @@ interface ButtonsProps {
   /**
    * The login dialog component, a custom one might be passed via the navbar config
    */
-  LoginDialog: React.ComponentType<{open: boolean, onClose: () => void, onSignupRequest: () => void, onRecoverRequest: () => void}>;
+  LoginDialog: React.ComponentType<{ open: boolean, onClose: () => void, onSignupRequest: () => void, onRecoverRequest: () => void }>;
   /**
    * the signup dialog component, a custom one might be passed via the navbar config
    * if no signup dialog is given no signup will be available
    */
-  SignupDialog?: React.ComponentType<{open: boolean, onClose: () => void, onLoginRequest: () => void}>;
+  SignupDialog?: React.ComponentType<{ open: boolean, onClose: () => void, onLoginRequest: () => void }>;
   /**
    * The recover password component a custom one might be passed via the navbar config
    */
-  RecoverDialog: React.ComponentType<{open: boolean, onClose: () => void, onLoginRequest: () => void}>;
+  RecoverDialog: React.ComponentType<{ open: boolean, onClose: () => void, onLoginRequest: () => void }>;
   /**
    * Component for avatar
    */
@@ -137,9 +138,16 @@ export function Buttons(props: ButtonsProps) {
             {(status) => {
               if (status === "LOGGED_OUT" || status === "LOGGING_IN") {
                 return <React.Fragment>
-                  <Button color="inherit" variant="outlined" onClick={openLoginDialog} sx={buttonsStyles.loginButton}>
-                    <I18nRead id="login" />
-                  </Button>
+                  <AltBadgeReactioner
+                    reactionKey="l"
+                    label="l"
+                    component="span"
+                    selector="button"
+                  >
+                    <Button color="inherit" variant="outlined" onClick={openLoginDialog} sx={buttonsStyles.loginButton}>
+                      <I18nRead id="login" />
+                    </Button>
+                  </AltBadgeReactioner>
                   {
                     !props.excludeLanguagePicker ?
                       <LanguagePicker
@@ -168,10 +176,19 @@ export function Buttons(props: ButtonsProps) {
                   />
                 </React.Fragment>;
               } else if (status === "LOGGED_IN") {
-                const Avatar = props.AvatarComponent; 
-                return <Avatar
-                  {...props.avatarProps}
-                />;
+                const Avatar = props.AvatarComponent;
+                return (
+                  <AltBadgeReactioner
+                    reactionKey="p"
+                    label="p"
+                    component="span"
+                    selector="a"
+                  >
+                    <Avatar
+                      {...props.avatarProps}
+                    />
+                  </AltBadgeReactioner>
+                );
               }
             }}
           </IfLogStatus>

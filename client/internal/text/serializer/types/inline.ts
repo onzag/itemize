@@ -92,6 +92,7 @@ export function registerInline(registry: ISerializationRegistryType) {
   registry.INLINES.inline = true;
 
   registry.DESERIALIZE.byClassName.inline = deserializeInline;
+  registry.MERGABLES.inline = true;
 }
 
 /**
