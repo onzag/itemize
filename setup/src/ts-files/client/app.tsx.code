@@ -26,6 +26,10 @@ import { LoginDialog } from "./components/login-dialog";
 import { SignupDialog } from "./components/signup-dialog";
 import { RecoverDialog } from "./components/recover-dialog";
 
+// this is for accessibility, use with the AltBadgeReactioner in order to supercharge
+// accessibility
+import { AltSectionScroller } from "@onzag/itemize/client/fast-prototyping/components/alt-section-scroller";
+
 // Remember that when adding fast prototyping components they might demand
 // localization data, if you get an error named
 // Uncaught Error: Unknown key in context: xxxxxxx from localization.tsx
@@ -125,6 +129,8 @@ export default function App()<0>{
 			<Route path="/contact" component={Contact}/>
 
 			<Footer/>
+
+			<AltSectionScroller parentSelector="html" positioning="fixed"/>
 		</>
 	);
 }

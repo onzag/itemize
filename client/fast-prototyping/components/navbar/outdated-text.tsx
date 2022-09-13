@@ -34,7 +34,6 @@ export function OutdatedText(props: OutdatedTextProps) {
               {(i18nNeedsUpdate) => (
                 <AltBadgeReactioner
                   reactionKey="o"
-                  label="o"
                   component="span"
                   selector="button"
                 >

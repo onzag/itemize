@@ -5,8 +5,8 @@
  */
 
 import { RichElement } from "../../../../internal/text/serializer";
-import React from "react";
-import { IWrapperContainerProps } from "../wrapper";
+import React, { useCallback } from "react";
+import { IDrawerContainerProps } from "../wrapper";
 import { Path } from "slate";
 import equals from "deep-equal";
 import TextField from "@mui/material/TextField";
@@ -17,6 +17,9 @@ import FilledInput from "@mui/material/FilledInput";
 import Chip from "@mui/material/Chip";
 import MenuItem from "@mui/material/MenuItem";
 import Box from "@mui/material/Box";
+import Checkbox from "@mui/material/Checkbox";
+import FormGroup from "@mui/material/FormGroup";
+import FormControlLabel from "@mui/material/FormControlLabel";
 
 const style = {
   selectionInput: {
@@ -198,14 +201,14 @@ interface IClassesOptionSelectorState {
  * Provides a picker for rich classes in the drawer for the given element
  * basically a select field
  */
-class ClassesOptionSelector extends React.PureComponent<IWrapperContainerProps, IClassesOptionSelectorState> {
+class ClassesOptionSelector extends React.PureComponent<IDrawerContainerProps, IClassesOptionSelectorState> {
 
   /**
    * We need the derived function in order to be able to update the value of the
    * selector in case, this is the more efficient way in these cases where things
    * are slightly out of sync
    */
-  static getDerivedStateFromProps(props: IWrapperContainerProps, state: IClassesOptionSelectorState) {
+  static getDerivedStateFromProps(props: IDrawerContainerProps, state: IClassesOptionSelectorState) {
     // we do it this way because this component eats the entire wrapper props so we need to pick it right
     // from the current selected node
     const selectedNode: RichElement = props.state.currentSelectedElement as any;
@@ -233,7 +236,7 @@ class ClassesOptionSelector extends React.PureComponent<IWrapperContainerProps, 
    * constructs a new class selector for rich classes
    * @param props the entire material ui slate wrapper props that the wrapper takes
    */
-  constructor(props: IWrapperContainerProps) {
+  constructor(props: IDrawerContainerProps) {
     super(props);
 
     // setup the initial state
@@ -326,10 +329,35 @@ class ClassesOptionSelector extends React.PureComponent<IWrapperContainerProps, 
  * @param props the props for the templating which is literally the whole
  * options of the wrapper itself
  */
-export function StylesOptions(props: IWrapperContainerProps) {
+export function StylesOptions(props: IDrawerContainerProps) {
+  const toggleStandalone = useCallback((e: React.ChangeEvent<HTMLInputElement>, checked: boolean) => {
+    props.helpers.set({
+      standalone: checked,
+    }, props.state.currentSelectedElementAnchor);
+  }, []);
+
+  if (!props.state.currentSelectedElement) {
+    return null;
+  }
+
+  const imgStandalone = props.state.currentSelectedElement.type === "image" ? (
+    <FormGroup>
+      <FormControlLabel
+        control={
+          <Checkbox
+            checked={props.state.currentSelectedElement.standalone}
+            onChange={toggleStandalone}
+          />
+        }
+        label={props.i18nRichInfo.standalone}
+      />
+    </FormGroup>
+  ) : null;
+
   const currentNode = props.state.currentSelectedElement as RichElement;
   return (
     <Box sx={style.box}>
+      {imgStandalone}
       {
         props.featureSupport.supportsRichClasses ?
           <ClassesOptionSelector {...props} /> : null

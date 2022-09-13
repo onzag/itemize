@@ -176,7 +176,6 @@ export function Navbar(props: INavbarProps) {
                       (value: string) => (
                         <AltBadgeReactioner
                           reactionKey="m"
-                          label="m"
                           component="span"
                           selector="button"
                         >

@@ -118,6 +118,8 @@ export function registerContainer(registry: ISerializationRegistryType) {
     "table",
     "title",
     "video",
+    "void-superblock",
+    "void-block",
   ];
   registry.ON_EMPTY_FILL_WITH.container = () => {
     return STANDARD_PARAGRAPH();

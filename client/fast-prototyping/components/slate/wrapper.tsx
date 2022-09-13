@@ -241,6 +241,11 @@ export interface IToolbarPrescenseElement {
    * The fast key value, if any
    */
   fastKey?: string;
+  /**
+   * For usage with the badge will use a style transform
+   * for the alt badge reactioner
+   */
+  useStyleTransform?: boolean;
 }
 
 /**
@@ -308,65 +313,12 @@ export interface IDrawerUIHandlerElementConfigCustom {
 }
 
 /**
- * Specifies a configurator to be added to the UI handled element
- * that is created to be chosen in the drawer
+ * Specifies a configurator to be added to the drawer
  */
-export interface IDrawerConfiguratorElementBase {
-  /**
-   * The ui handler in question
-   */
-  uiHandler?: null | string | string[];
-  /**
-   * The element it should work against, by default
-   * it is the selected one
-   */
-  basis?: "selected" | "block" | "superblock";
-  /**
-   * Will match parent of the given element instead useful for nested
-   * superblocks, so if you are in the current super block you may
-   * want to match the parent of it instead, eg. if such superblock
-   * is not selectable
-   */
-  basisParent?: number;
-  /**
-   * The relevant argument of the ui handler
-   * if not provided value will be null and change functions wont
-   * work
-   */
-  arg?: string;
-  /**
-   * A condition that uses the args as basis on whether this would appear or not
-   */
-  condition?: (state: ISlateEditorInternalStateType) => boolean;
-  /**
-   * The way for the input to be specified
-   */
-  input:
-  IDrawerUIHandlerElementConfigSelect |
-  IDrawerUIHandlerElementConfigInput |
-  IDrawerUIHandlerElementConfigBoolean |
-  IDrawerUIHandlerElementConfigCustom;
+export interface IDrawerConfiguratorElement {
+  key?: string | number;
+  Component: React.ComponentType<IDrawerContainerProps>;
 }
-
-export interface IDrawerConfiguratorElementSection {
-  /**
-   * The ui handler in question
-   */
-  uiHandler?: string;
-  basis?: "selected" | "block" | "superblock";
-  /**
-   * Will match parent of the given element instead useful for nested
-   * superblocks, so if you are in the current super block you may
-   * want to match the parent of it instead, eg. if such superblock
-   * is not selectable
-   */
-  basisParent?: number;
-  unblur?: boolean;
-  title: string | React.ReactNode;
-  elements: IDrawerConfiguratorElementBase[];
-}
-
-export type DrawerConfiguratorElement = IDrawerConfiguratorElementBase | IDrawerConfiguratorElementSection;
 
 export type SlateEditorWrapperCustomToolbarIdentifiedElement =
   "bold" |
@@ -433,7 +385,7 @@ export interface MaterialUISlateWrapperWithStyles extends ISlateEditorWrapperBas
   /**
    * Drawer extras for the ui handled types
    */
-  drawerExtras?: DrawerConfiguratorElement[];
+  drawerExtras?: IDrawerConfiguratorElement[];
   /**
    * Whether to hide the drawer
    */
@@ -513,6 +465,7 @@ interface RichTextEditorToolbarState {
 
 interface RichTextEditorToolbarElementProps extends RichTextEditorToolbarState, RichTextEditorToolbarProps {
   fastKey: string;
+  groupIndex: number;
 }
 
 function elementFastKeyReturn(
@@ -520,17 +473,20 @@ function elementFastKeyReturn(
   element: React.ReactNode,
   altBadgedChildren: React.ReactNode,
   priority: number,
+  groupIndex: number,
   disabled: boolean,
+  useStyleTransform?: boolean,
   fastKeyOverride?: string,
 ): any {
   const fastKey = fastKeyOverride || props.fastKey;
   return (
     <AltBadgeReactioner
       reactionKey={fastKey}
-      label={fastKey === "arrowup" ? "↑" : (fastKey === "arrowdown" ? "↓" : fastKey)}
       priority={priority}
       disabled={disabled || !props.state.currentSelectedElement}
       altBadgedChildren={altBadgedChildren}
+      groupPosition={groupIndex}
+      useTransform={useStyleTransform}
       selector="button"
     >
       {element}
@@ -552,7 +508,7 @@ function Bold(props: RichTextEditorToolbarElementProps) {
     </IconButton>
   );
 
-  return elementFastKeyReturn(props, element, null, 1, disabled);
+  return elementFastKeyReturn(props, element, null, 1, props.groupIndex, disabled);
 }
 
 function Italic(props: RichTextEditorToolbarElementProps) {
@@ -569,7 +525,7 @@ function Italic(props: RichTextEditorToolbarElementProps) {
     </IconButton>
   );
 
-  return elementFastKeyReturn(props, element, null, 1, disabled);
+  return elementFastKeyReturn(props, element, null, 1, props.groupIndex, disabled);
 }
 
 function Underline(props: RichTextEditorToolbarElementProps) {
@@ -586,7 +542,7 @@ function Underline(props: RichTextEditorToolbarElementProps) {
     </IconButton>
   );
 
-  return elementFastKeyReturn(props, element, null, 1, disabled);
+  return elementFastKeyReturn(props, element, null, 1, props.groupIndex, disabled);
 }
 
 function VDivider(props: RichTextEditorToolbarElementProps) {
@@ -669,7 +625,7 @@ function Link(props: RichTextEditorToolbarElementProps) {
     >{linkBaseComponent}</Badge>
   }
 
-  return elementFastKeyReturn(props, linkBadged, linkBaseComponent, 1, disabled);
+  return elementFastKeyReturn(props, linkBadged, linkBaseComponent, 1, props.groupIndex, disabled);
 }
 
 function Title(props: RichTextEditorToolbarElementProps) {
@@ -690,7 +646,7 @@ function Title(props: RichTextEditorToolbarElementProps) {
     </IconButton>
   );
 
-  return elementFastKeyReturn(props, element, null, 1, disabled);
+  return elementFastKeyReturn(props, element, null, 1, props.groupIndex, disabled);
 }
 
 function Quote(props: RichTextEditorToolbarElementProps) {
@@ -711,7 +667,7 @@ function Quote(props: RichTextEditorToolbarElementProps) {
     </IconButton>
   );
 
-  return elementFastKeyReturn(props, element, null, 1, disabled);
+  return elementFastKeyReturn(props, element, null, 1, props.groupIndex, disabled);
 }
 
 
@@ -732,7 +688,7 @@ function NumberedList(props: RichTextEditorToolbarElementProps) {
     </IconButton>
   );
 
-  return elementFastKeyReturn(props, element, null, 1, disabled);
+  return elementFastKeyReturn(props, element, null, 1, props.groupIndex, disabled);
 }
 
 function BulletedList(props: RichTextEditorToolbarElementProps) {
@@ -752,7 +708,7 @@ function BulletedList(props: RichTextEditorToolbarElementProps) {
     </IconButton>
   );
 
-  return elementFastKeyReturn(props, element, null, 1, disabled);
+  return elementFastKeyReturn(props, element, null, 1, props.groupIndex, disabled);
 }
 
 const imgExample = {
@@ -787,7 +743,7 @@ function Image(props: RichTextEditorToolbarElementProps) {
     </IconButton>
   );
 
-  return elementFastKeyReturn(props, element, null, 1, disabled);
+  return elementFastKeyReturn(props, element, null, 1, props.groupIndex, disabled);
 }
 
 const videoExample = {
@@ -816,7 +772,7 @@ function Video(props: RichTextEditorToolbarElementProps) {
     </IconButton>
   );
 
-  return elementFastKeyReturn(props, element, null, 1, disabled);
+  return elementFastKeyReturn(props, element, null, 1, props.groupIndex, disabled);
 }
 
 const fileExample = {
@@ -848,7 +804,7 @@ function File(props: RichTextEditorToolbarElementProps) {
     </IconButton>
   );
 
-  return elementFastKeyReturn(props, element, null, 1, disabled);
+  return elementFastKeyReturn(props, element, null, 1, props.groupIndex, disabled);
 }
 
 function Container(props: RichTextEditorToolbarElementProps) {
@@ -870,7 +826,7 @@ function Container(props: RichTextEditorToolbarElementProps) {
     </IconButton>
   );
 
-  return elementFastKeyReturn(props, element, null, 1, disabled);
+  return elementFastKeyReturn(props, element, null, 1, props.groupIndex, disabled);
 }
 
 function Table(props: RichTextEditorToolbarElementProps) {
@@ -892,7 +848,7 @@ function Table(props: RichTextEditorToolbarElementProps) {
     </IconButton>
   );
 
-  return elementFastKeyReturn(props, element, null, 1, disabled);
+  return elementFastKeyReturn(props, element, null, 1, props.groupIndex, disabled);
 }
 
 function TemplateText(props: RichTextEditorToolbarElementProps) {
@@ -960,7 +916,7 @@ function TemplateText(props: RichTextEditorToolbarElementProps) {
     </Badge>
   );
 
-  return elementFastKeyReturn(props, elementBadged, element, 1, disabled);
+  return elementFastKeyReturn(props, elementBadged, element, 1, props.groupIndex, disabled);
 }
 
 function TemplateHTML(props: RichTextEditorToolbarElementProps) {
@@ -1030,7 +986,7 @@ function TemplateHTML(props: RichTextEditorToolbarElementProps) {
     </Badge>
   );
 
-  return elementFastKeyReturn(props, elementBadged, element, 1, disabled);
+  return elementFastKeyReturn(props, elementBadged, element, 1, props.groupIndex, disabled);
 }
 
 interface IToolbarExtraProps extends RichTextEditorToolbarElementProps {
@@ -1085,7 +1041,16 @@ function ToolbarExtra(props: IToolbarExtraProps) {
     returnNode = elementCloned;
   }
 
-  return elementFastKeyReturn(props, returnNode, null, 1, disabled, props.extra.fastKey);
+  return elementFastKeyReturn(
+    props,
+    returnNode,
+    null,
+    1,
+    props.groupIndex,
+    disabled,
+    props.extra.useStyleTransform,
+    props.extra.fastKey,
+  );
 }
 
 function ToolbarExtras(props: RichTextEditorToolbarElementProps) {
@@ -1096,11 +1061,7 @@ function ToolbarExtras(props: RichTextEditorToolbarElementProps) {
       );
     });
 
-    return (
-      <>
-        {toolbarExtras}
-      </>
-    );
+    return toolbarExtras as any;
   }
 
   return null;
@@ -1252,8 +1213,10 @@ class RichTextEditorToolbar extends React.Component<RichTextEditorToolbarProps, 
           </IconButton>,
           null,
           this.props.drawerOpen ? 2 : 1,
+          999,
           false,
-          this.props.drawerOpen ? "arrowup" : "arrowdown",
+          false,
+          ".",
         ) :
         null
     );
@@ -1267,6 +1230,7 @@ class RichTextEditorToolbar extends React.Component<RichTextEditorToolbarProps, 
               {...this.props}
               isReady={this.state.isReady}
               key={index}
+              groupIndex={index}
               fastKey={toolbarFastKeyRegistry[ele]}
             />
           );
@@ -1277,6 +1241,7 @@ class RichTextEditorToolbar extends React.Component<RichTextEditorToolbarProps, 
               {...this.props}
               isReady={this.state.isReady}
               key={index}
+              groupIndex={index}
               extra={extraValue as IToolbarPrescenseElement}
               fastKey={null}
             />
@@ -1381,7 +1346,7 @@ export class MaterialUISlateWrapper extends React.PureComponent<MaterialUISlateW
   /**
    * A ref to the container
    */
-  private wrapperContainerRef: React.RefObject<WrapperContainer>;
+  private DrawerContainerRef: React.RefObject<DrawerContainer>;
 
   /**
    * a ref to the editor
@@ -1440,7 +1405,7 @@ export class MaterialUISlateWrapper extends React.PureComponent<MaterialUISlateW
     // create the refs
     this.inputImageRef = React.createRef();
     this.inputFileRef = React.createRef();
-    this.wrapperContainerRef = React.createRef();
+    this.DrawerContainerRef = React.createRef();
     this.toolbarRef = React.createRef();
     this.editorRef = React.createRef();
 
@@ -1522,7 +1487,6 @@ export class MaterialUISlateWrapper extends React.PureComponent<MaterialUISlateW
       if (this.isUnblurred(e.target as any)) {
         if ((e.target as HTMLElement).tagName !== "INPUT") {
           // stop from losing focus
-          e.stopPropagation();
           e.preventDefault();
         }
       } else if (!this.isInEditor(e.target as any)) {
@@ -1536,7 +1500,7 @@ export class MaterialUISlateWrapper extends React.PureComponent<MaterialUISlateW
   public isUnblurred(ele: HTMLElement): boolean {
     if (
       ele === this.toolbarRef.current.getAppbarHeader() ||
-      ele === this.wrapperContainerRef.current.getDrawerBody() ||
+      ele === this.DrawerContainerRef.current.getDrawerBody() ||
       ele.dataset.unblur
     ) {
       return true;
@@ -1634,22 +1598,6 @@ export class MaterialUISlateWrapper extends React.PureComponent<MaterialUISlateW
 
     // and put it in local storage
     localStorage.setItem("SLATE_DRAWER_OPEN", JSON.stringify(newState));
-  }
-
-  /**
-   * Scrolls the drawer in a given direction, used for accessibility purposes
-   * only truly valid in disjointed mode
-   * @param direction 
-   */
-  public scrollDrawer(direction: "up" | "down") {
-    const body = this.wrapperContainerRef.current && this.wrapperContainerRef.current.getDrawerBody();
-    if (body) {
-      let amount = direction === "up" ? -50 : 50;
-      body.scroll({
-        top: body.scrollTop + amount,
-        behavior: "smooth",
-      });
-    }
   }
 
   /**
@@ -1817,8 +1765,8 @@ export class MaterialUISlateWrapper extends React.PureComponent<MaterialUISlateW
             </Box>
             {extraChildren}
           </Box>
-          <WrapperContainer
-            ref={this.wrapperContainerRef}
+          <DrawerContainer
+            ref={this.DrawerContainerRef}
             {...this.props}
             drawerOpen={this.state.drawerOpen}
             noAnimate={this.state.noAnimate}
@@ -1850,9 +1798,9 @@ export class MaterialUISlateWrapper extends React.PureComponent<MaterialUISlateW
             {this.props.children}
           </StyledEditor>
           {extraChildren}
-          <WrapperContainer
+          <DrawerContainer
             {...this.props}
-            ref={this.wrapperContainerRef}
+            ref={this.DrawerContainerRef}
             drawerOpen={this.state.drawerOpen}
             noAnimate={this.state.noAnimate}
             toolbarHeight={this.state.toolbarHeight}
@@ -1866,19 +1814,19 @@ export class MaterialUISlateWrapper extends React.PureComponent<MaterialUISlateW
   }
 }
 
-export interface IWrapperContainerProps extends MaterialUISlateWrapperWithStyles {
+export interface IDrawerContainerProps extends MaterialUISlateWrapperWithStyles {
   drawerOpen: boolean;
   toolbarHeight: number;
   noAnimate: boolean;
 }
 
-interface IWrapperContainerState {
+interface IDrawerContainerState {
   isReady: boolean;
 }
 
-class WrapperContainer extends React.Component<IWrapperContainerProps, IWrapperContainerState> {
+class DrawerContainer extends React.Component<IDrawerContainerProps, IDrawerContainerState> {
   private editorDrawerBodyRef: React.RefObject<HTMLDivElement>;
-  constructor(props: IWrapperContainerProps) {
+  constructor(props: IDrawerContainerProps) {
     super(props);
 
     this.state = {
@@ -1896,7 +1844,7 @@ class WrapperContainer extends React.Component<IWrapperContainerProps, IWrapperC
     return this.editorDrawerBodyRef.current;
   }
   public render() {
-    if (this.props.disjointedMode && !this.props.state.currentSelectedText) {
+    if (this.props.disjointedMode && !this.props.state.currentSelectedElement) {
       return null;
     }
 

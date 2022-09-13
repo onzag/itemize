@@ -140,7 +140,6 @@ export function Buttons(props: ButtonsProps) {
                 return <React.Fragment>
                   <AltBadgeReactioner
                     reactionKey="l"
-                    label="l"
                     component="span"
                     selector="button"
                   >
@@ -180,7 +179,6 @@ export function Buttons(props: ButtonsProps) {
                 return (
                   <AltBadgeReactioner
                     reactionKey="p"
-                    label="p"
                     component="span"
                     selector="a"
                   >

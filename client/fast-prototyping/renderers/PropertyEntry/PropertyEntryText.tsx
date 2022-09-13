@@ -173,6 +173,22 @@ class PropertyEntryTextRenderer extends React.PureComponent<IPropertyEntryTextRe
 
     const descriptionAsAlert = this.props.args["descriptionAsAlert"];
 
+    // extending element wrappers
+    let elementWrappers = materialUIElementWrappers;
+    if (this.props.args.elementWrappers) {
+      elementWrappers = {...elementWrappers};
+      Object.keys(this.props.args.elementWrappers).forEach((k) => {
+        if (elementWrappers[k]) {
+          elementWrappers[k] = {...elementWrappers[k]};
+          Object.keys(this.props.args.elementWrappers[k]).forEach((k2) => {
+            elementWrappers[k][k2] = this.props.args.elementWrappers[k][k2];
+          });
+        } else {
+          elementWrappers[k] = this.props.args.elementWrappers[k];
+        }
+      });
+    }
+
     const editor =
       <SlateEditor
         id={this.props.propertyId}
@@ -193,7 +209,7 @@ class PropertyEntryTextRenderer extends React.PureComponent<IPropertyEntryTextRe
         currentLoadError={this.props.lastLoadedFileError}
         dismissCurrentLoadError={this.props.dismissLastLoadedFileError}
         Wrapper={this.props.args.Wrapper || MaterialUISlateWrapper}
-        elementWrappers={this.props.args.ElementWrappers || materialUIElementWrappers}
+        elementWrappers={elementWrappers as any}
         elementWrappersArgs={
           {
             i18nGenericError: this.props.i18nGenericError,

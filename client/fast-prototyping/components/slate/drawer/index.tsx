@@ -6,7 +6,7 @@
  */
 
 import React, { useCallback, useEffect, useRef, useState } from "react";
-import { IWrapperContainerProps } from "../wrapper";
+import { IDrawerContainerProps } from "../wrapper";
 import { GeneralOptions } from "./general";
 import { StylesOptions } from "./styles";
 import { ActionsOptions } from "./actions";
@@ -20,6 +20,7 @@ import TouchAppIcon from "@mui/icons-material/TouchApp";
 import Typography from "@mui/material/Typography";
 import { getInfoFor } from "../../../../internal/text/serializer";
 import { AltBadgeReactioner } from "../../alt-badge-reactioner";
+import { AltSectionScroller } from "../../alt-section-scroller";
 
 const style = {
   box: {
@@ -113,7 +114,7 @@ function scrollSlowly(speed: number, element: HTMLElement) {
  * This is the wrapper drawer itself
  * @param props it takes the entire wrapper props with the styles
  */
-export function WrapperDrawer(props: IWrapperContainerProps) {
+export function WrapperDrawer(props: IDrawerContainerProps) {
   // we grab this from local storage, this won't affect SSR because the drawer won't
   // ever render in the server side, it's client side only, it's always technically closed
   // on the server side
@@ -201,7 +202,6 @@ export function WrapperDrawer(props: IWrapperContainerProps) {
                     label={
                       <AltBadgeReactioner
                         reactionKey="m"
-                        label="m"
                         priority={2}
                         disabled={!props.state.currentSelectedElement}
                         selectorGoUp={1}
@@ -222,7 +222,6 @@ export function WrapperDrawer(props: IWrapperContainerProps) {
                           label={
                             <AltBadgeReactioner
                               reactionKey="s"
-                              label="s"
                               priority={2}
                               disabled={!props.state.currentSelectedElement}
                               selectorGoUp={1}
@@ -244,7 +243,6 @@ export function WrapperDrawer(props: IWrapperContainerProps) {
                           label={
                             <AltBadgeReactioner
                               reactionKey="t"
-                              label="t"
                               priority={2}
                               disabled={!props.state.currentSelectedElement}
                               selectorGoUp={1}
@@ -266,7 +264,6 @@ export function WrapperDrawer(props: IWrapperContainerProps) {
                           label={
                             <AltBadgeReactioner
                               reactionKey="a"
-                              label="a"
                               priority={2}
                               disabled={!props.state.currentSelectedElement}
                               selectorGoUp={1}
@@ -294,6 +291,7 @@ export function WrapperDrawer(props: IWrapperContainerProps) {
     <>
       <Typography sx={style.elementTitle} variant="h6">{titleForNode}</Typography>
       {settingsForNode}
+      <AltSectionScroller priority={1} positioning="absolute"/>
     </>
   );
 }

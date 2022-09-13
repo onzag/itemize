@@ -5,7 +5,7 @@
  */
 
 import React from "react";
-import { IWrapperContainerProps } from "../wrapper";
+import { IDrawerContainerProps } from "../wrapper";
 import FormControl from "@mui/material/FormControl";
 import InputLabel from "@mui/material/InputLabel";
 import Select from "@mui/material/Select";
@@ -13,6 +13,7 @@ import MenuItem from "@mui/material/MenuItem";
 import Box from "@mui/material/Box";
 import FilledInput from "@mui/material/FilledInput";
 import { Path } from "slate";
+import { AltBadgeReactioner } from "../../alt-badge-reactioner";
 
 const style = {
   box: {
@@ -202,48 +203,56 @@ class SingleAction extends React.PureComponent<ISingleActionProps, ISingleAction
   public render() {
     return (
       <Box>
-        <FormControl
-          variant="filled"
+        <AltBadgeReactioner
+          action="focus"
+          reactionKey={this.props.name[0]}
+          priority={2}
+          selector="div[tabindex]"
           fullWidth={true}
         >
-          <InputLabel
-            htmlFor={"slate-wrapper-action-entry-for-" + this.props.name}
-            shrink={true}
-          >
-            {this.props.name}
-          </InputLabel>
-          <Select
-            value={this.state.value}
-            onChange={this.onActionValueChange}
-            displayEmpty={true}
+          <FormControl
             variant="filled"
-            input={
-              <FilledInput
-                id={"slate-wrapper-action-entry-for-" + this.props.name}
-                placeholder={this.props.name}
-              />
-            }
-            onOpen={this.unblur}
-            onClose={this.resetBlur}
+            fullWidth={true}
           >
-            <MenuItem value="">
-              <em>{" - "}</em>
-            </MenuItem>
-            {
-              // render the valid values that we display and choose
-              this.props.options.map((vv) => {
-                // the i18n value from the i18n data
-                return <MenuItem
-                  key={vv.value}
-                  value={vv.value}
-                  sx={vv.primary ? style.optionPrimary : null}
-                >{
-                  vv.label
-                }</MenuItem>;
-              })
-            }
-          </Select>
-        </FormControl>
+            <InputLabel
+              htmlFor={"slate-wrapper-action-entry-for-" + this.props.name}
+              shrink={true}
+            >
+              {this.props.name}
+            </InputLabel>
+            <Select
+              value={this.state.value}
+              onChange={this.onActionValueChange}
+              displayEmpty={true}
+              variant="filled"
+              input={
+                <FilledInput
+                  id={"slate-wrapper-action-entry-for-" + this.props.name}
+                  placeholder={this.props.name}
+                />
+              }
+              onOpen={this.unblur}
+              onClose={this.resetBlur}
+            >
+              <MenuItem value="">
+                <em>{" - "}</em>
+              </MenuItem>
+              {
+                // render the valid values that we display and choose
+                this.props.options.map((vv) => {
+                  // the i18n value from the i18n data
+                  return <MenuItem
+                    key={vv.value}
+                    value={vv.value}
+                    sx={vv.primary ? style.optionPrimary : null}
+                  >{
+                      vv.label
+                    }</MenuItem>;
+                })
+              }
+            </Select>
+          </FormControl>
+        </AltBadgeReactioner>
       </Box>
     );
   }
@@ -254,7 +263,7 @@ class SingleAction extends React.PureComponent<ISingleActionProps, ISingleAction
  * based on the context
  * @param props the whole material ui slate wrapper with styles props from the drawer itself
  */
-export function ActionsOptions(props: IWrapperContainerProps) {
+export function ActionsOptions(props: IDrawerContainerProps) {
   // get the current node that we have currently selected
   const currentNode = props.state.currentSelectedInlineElement ||
     props.state.currentSelectedBlockElement ||
@@ -294,12 +303,12 @@ export function ActionsOptions(props: IWrapperContainerProps) {
       if ((value as any).nonRootInheritable) {
         return null;
       }
-  
+
       // and it needs to be a function to pass
       if (value.type !== "function") {
         return null;
       }
-  
+
       // now we can return it and give it the label it holds
       return {
         value: p,

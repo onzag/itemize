@@ -6,29 +6,8 @@
  */
 
 import React, { useCallback, useEffect, useRef, useState } from "react";
-import { IWrapperContainerProps } from "../wrapper";
-import { IContainer } from "../../../../internal/text/serializer/types/container";
-import { ITitle } from "../../../../internal/text/serializer/types/title";
-import { IImage } from "../../../../internal/text/serializer/types/image";
-import { Path, Text } from "slate";
-import type { RichElement } from "../../../../internal/text/serializer";
-import {
-  DrawerConfiguratorElement,
-  IDrawerConfiguratorElementBase,
-  IDrawerConfiguratorElementSection,
-  IDrawerUIHandlerElementConfigCustomProps
-} from "../wrapper";
-import type { IHelperFunctions, ISlateEditorInternalStateType } from "..";
-import Typography from "@mui/material/Typography";
+import { IDrawerContainerProps } from "../wrapper";
 import TextField from "@mui/material/TextField";
-import InputLabel from "@mui/material/InputLabel";
-import FormControl from "@mui/material/FormControl";
-import Select from "@mui/material/Select";
-import FilledInput from "@mui/material/FilledInput";
-import MenuItem from "@mui/material/MenuItem";
-import Paper from "@mui/material/Paper";
-import FormControlLabel from "@mui/material/FormControlLabel";
-import Switch from "@mui/material/Switch";
 import Box from "@mui/material/Box";
 
 const style = {
@@ -42,7 +21,7 @@ const style = {
  * these general options are the specific options for the generic components
  * @param props all the entire wrapper props
  */
-export function GeneralOptions(props: IWrapperContainerProps) {
+export function GeneralOptions(props: IDrawerContainerProps) {
   const [name, setName] = useState((props.state.currentSelectedElement && props.state.currentSelectedElement.givenName) || "");
 
   useEffect(() => {
@@ -59,7 +38,7 @@ export function GeneralOptions(props: IWrapperContainerProps) {
         givenName: e.target.value,
       }, props.state.currentSelectedElementAnchor);
     }, 600);
-  }, []);
+  }, [props.state.currentSelectedElement]);
 
   if (!props.state.currentSelectedElement) {
     return null;
@@ -76,6 +55,14 @@ export function GeneralOptions(props: IWrapperContainerProps) {
         onChange={updateName}
         fullWidth={true}
       />
+      {
+        props.drawerExtras ? (
+          props.drawerExtras.map((v, i) => {
+            const Element = v.Component as any;
+            return <Element key={v.key || i} {...props} />
+          })
+        ) : null
+      }
     </Box>
   );
 }

@@ -859,7 +859,7 @@ export function isLibReady(id: string): boolean {
     return false;
   }
   const element = document.getElementById(id);
-  return element && element.dataset.loading !== "true";
+  return !!(element && element.dataset.loading !== "true");
 }
 
 export const DOMWindow = JSDOM ? (new JSDOM("")).window : window;

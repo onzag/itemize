@@ -6,7 +6,7 @@
 
 import { getContextFor, RichElement } from "../../../../internal/text/serializer";
 import React from "react";
-import { IWrapperContainerProps } from "../wrapper";
+import { IDrawerContainerProps } from "../wrapper";
 import FormControl from "@mui/material/FormControl";
 import InputLabel from "@mui/material/InputLabel";
 import Select from "@mui/material/Select";
@@ -225,7 +225,7 @@ class SingleTemplatingElement extends React.PureComponent<ISingleTemplatingEleme
  * @param props the props for the templating which is literally the whole
  * options of the wrapper itself
  */
-export function TemplatingOptions(props: IWrapperContainerProps) {
+export function TemplatingOptions(props: IDrawerContainerProps) {
   // we need to pick these to make the option list
   const currentNode = props.state.currentSelectedElement as RichElement;
   const allEachContexts: ISingleTemplatingElementOption[] = [];

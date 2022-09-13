@@ -443,6 +443,7 @@ class PropertyEntryReferenceRenderer
             },
             disabled: this.props.disabled,
             ...appliedInputProps,
+            ...this.props.args.inputProps,
           }}
           InputLabelProps={{
             sx: style.label,

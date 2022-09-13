@@ -1,5 +1,5 @@
 import Badge from "@mui/material/Badge";
-import React from "react";
+import React, { useEffect, useState } from "react";
 import AltReactioner from "../../components/accessibility/AltReactioner";
 
 const style = {
@@ -16,6 +16,14 @@ const style = {
       color: "#fffde7 !important",
       borderColor: "#f9a825 !important",
     },
+  },
+  transformed: {
+    "& .MuiBadge-badge": {
+      transform: "translateY(0px)",
+    }
+  },
+  fullWidth: {
+    width: "100%",
   },
 }
 
@@ -45,7 +53,8 @@ interface IAltBadgeReactionerProps {
    */
   selectorGoUp?: number;
   /**
-   * The key to be used that will trigger the specific action
+   * The key to be used that will trigger the specific action, same rules use lowecase
+   * values only for keycodes and do not use the arrow keycodes
    */
   reactionKey: string;
   /**
@@ -70,21 +79,43 @@ interface IAltBadgeReactionerProps {
   priority?: number;
   /**
    * The label that is related to the reactionKey
+   * if no label is provided the reaction key will be used as a label
    */
-  label: string;
+  label?: string;
+  /**
+   * A positioning within the group in order to solve ambiguous reactions, the lowest
+   * it will be used for sorting, use it if you expect ambigous values
+   */
+  groupPosition?: number;
+  /**
+   * For stylistic purposes, uses a transform to keep the badge closer to the element
+   */
+  useTransform?: boolean;
+  /**
+   * full width for the badge
+   */
+  fullWidth?: boolean;
 }
 
 export function AltBadgeReactioner(
   props: IAltBadgeReactionerProps,
 ): any {
+  const [ambigousId, setAmbiguousId] = useState(null as number);
+
   const reactionerProps = { ...props } as any;
-  reactionerProps.children = (isSelected: boolean) => {
-    if (isSelected) {
+  reactionerProps.children = (displayed: boolean) => {
+    if (displayed) {
       return (
         <Badge
-          badgeContent={props.label}
+          badgeContent={((ambigousId && ambigousId.toString()) || props.label || props.reactionKey).toUpperCase()}
           color={(props.colorSchema || "default") === "default" ? "primary" : "default"}
-          sx={(props.colorSchema || "default") === "default" ? style.badgeFastKey : style.badgeFastKey2}
+          sx={
+            [
+              (props.colorSchema || "default") === "default" ? style.badgeFastKey : style.badgeFastKey2,
+              props.useTransform ? style.transformed : null,
+              props.fullWidth ? style.fullWidth : null,
+            ]
+          }
         >
           {props.altBadgedChildren || props.children}
         </Badge>
@@ -94,5 +125,5 @@ export function AltBadgeReactioner(
     }
   }
 
-  return <AltReactioner {...reactionerProps} />
+  return <AltReactioner {...reactionerProps} onAmbiguousReaction={setAmbiguousId} onAmbiguousClear={setAmbiguousId.bind(null, null)}/>
 }

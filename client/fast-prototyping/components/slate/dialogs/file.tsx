@@ -42,16 +42,9 @@ export class FileLoadErrorDialog extends React.PureComponent<IFileLoadErrorDialo
     super(props);
 
     this.onClose = this.onClose.bind(this);
-    this.onOpening = this.onOpening.bind(this);
   }
   public onClose() {
     this.props.dismissCurrentLoadError();
-    setTimeout(() => {
-      delete document.body.dataset.unblur;
-    }, 100);
-  }
-  public onOpening() {
-    document.body.dataset.unblur = "true";
   }
   /**
    * The render function
@@ -62,7 +55,6 @@ export class FileLoadErrorDialog extends React.PureComponent<IFileLoadErrorDialo
         fullScreen={false}
         open={!!this.props.currentLoadError}
         onClose={this.onClose}
-        onOpening={this.onOpening}
         title={capitalize(this.props.i18nGenericError)}
         buttons={
           <Button onClick={this.props.dismissCurrentLoadError}>

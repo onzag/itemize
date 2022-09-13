@@ -32,7 +32,11 @@ export interface IAltReactionerProps {
    */
   selectorGoUp?: number;
   /**
-   * The key to be used that will trigger the specific action
+   * The key to be used that will trigger the specific action,
+   * please use keycodes in lowercase, they need to be lowercase
+   * 
+   * avoid using arrowup, arrowright, arrowleft or arrowdown as they are used
+   * by the AltScroller component
    */
   reactionKey: string;
   /**
@@ -40,6 +44,16 @@ export interface IAltReactionerProps {
    * otherwise pass a function for a custom action
    */
   action?: "focus" | "click" | VoidFn;
+  /**
+   * Triggers when two reactions with the same id are found
+   * and provides a numeric id that represents the next number caught
+   * which shall be from 1 to 9
+   * 
+   * higher numbers are possible but represent an accessibility flaw and cannot
+   * truly be accessed
+   */
+  onAmbiguousReaction: (id: number) => void;
+  onAmbiguousClear: () => void;
   /**
    * whether it is currently disabled
    */
@@ -51,6 +65,11 @@ export interface IAltReactionerProps {
    * usable if you use it in conjuction with disabled
    */
   priority?: number;
+  /**
+   * A positioning within the group in order to solve ambiguous reactions, the lowest
+   * it will be used for sorting, use it if you expect ambigous values
+   */
+  groupPosition?: number;
 }
 
 interface IAltReactionerState {
@@ -62,12 +81,35 @@ const ALT_REGISTRY: {
 } = {};
 
 let ALT_REGISTRY_IS_IN_DISPLAY_LAST = false;
+let ALT_REGISTRY_IS_WAITING_FOR_KEYCODES = false;
+let ALT_REGISTRY_AWAITING_KEYCODES: AltReactioner[] = [];
 
-function hideAll() {
+function hideAll(butKeycodes: AltReactioner[] = []) {
   Object.keys(ALT_REGISTRY).forEach((reactionKey) => {
-    ALT_REGISTRY[reactionKey].forEach((v) => v.hide());
+    ALT_REGISTRY[reactionKey].forEach((v) => !butKeycodes.includes(v) ? v.hide() : null);
   });
-  ALT_REGISTRY_IS_IN_DISPLAY_LAST = false;
+
+  ALT_REGISTRY_AWAITING_KEYCODES.forEach((v) => {
+    v.triggerAmbiguousClear();
+  });
+
+  if (!butKeycodes.length) {
+    ALT_REGISTRY_IS_IN_DISPLAY_LAST = false;
+    ALT_REGISTRY_IS_WAITING_FOR_KEYCODES = false;
+    ALT_REGISTRY_AWAITING_KEYCODES = [];
+  } else {
+    ALT_REGISTRY_IS_WAITING_FOR_KEYCODES = true;
+    ALT_REGISTRY_AWAITING_KEYCODES = butKeycodes;
+  }
+}
+
+function recalculateAllRelevant() {
+  if (ALT_REGISTRY_IS_WAITING_FOR_KEYCODES) {
+    hideAll();
+    showAllRelevant();
+  } else if (ALT_REGISTRY_IS_IN_DISPLAY_LAST) {
+    showAllRelevant();
+  }
 }
 
 function showAllRelevant() {
@@ -85,29 +127,57 @@ function showAllRelevant() {
     ALT_REGISTRY[reactionKey].forEach((v) => {
       if (!v.isDisabled() && v.getPriority() === priorityToUse && v.isElementInView()) {
         v.display();
+      } else if (v.isDisplayed()) {
+        v.hide();
       }
     });
   });
   ALT_REGISTRY_IS_IN_DISPLAY_LAST = true;
+  ALT_REGISTRY_IS_WAITING_FOR_KEYCODES = false;
+  ALT_REGISTRY_AWAITING_KEYCODES = [];
 }
 
 function triggerBasedOn(code: string, callbackIfmatch: () => void) {
-  const value = ALT_REGISTRY[code];
-  let cb = callbackIfmatch;
+  const value = ALT_REGISTRY_IS_WAITING_FOR_KEYCODES ?
+    // can be nan if not a number but who minds that
+    ALT_REGISTRY_AWAITING_KEYCODES[parseInt(code) - 1] :
+    ALT_REGISTRY[code];
+  const matches: AltReactioner[] = []
   if (value) {
-    value.forEach((k) => {
-      if (k.isDisplayed()) {
-
-        // to make sure we call it only once
-        cb && cb();
-        cb = null as any;
-
-        k.trigger();
+    if (Array.isArray(value)) {
+      value.forEach((k) => {
+        if (k.isDisplayed()) {
+          matches.push(k);
+        }
+      });
+    } else {
+      if (value.isDisplayed()) {
+        matches.push(value);
       }
-    });
+    }
   }
-  hideAll();
+
+  if (matches.length) {
+    callbackIfmatch();
+  }
+
+  // one or zero matches
+  if (matches.length <= 1) {
+    hideAll();
+    matches.forEach((m) => m.trigger());
+  } else {
+    hideAll(matches);
+    matches.sort((a, b) => a.getGroupPosition() - b.getGroupPosition());
+    matches.forEach((m, index) => m.triggerAmbiguous(index + 1));
+  }
 }
+
+const arrows = [
+  "arrowup",
+  "arrowleft",
+  "arrowright",
+  "arrowdown",
+];
 
 if (typeof document !== "undefined") {
   window.addEventListener("focus", () => {
@@ -120,6 +190,7 @@ if (typeof document !== "undefined") {
   });
   document.addEventListener("keydown", (e) => {
     const keyCode = e.key.toLowerCase();
+    const isArrow = arrows.includes(keyCode);
     const isAltKey = e.altKey;
 
     const isPureAltKey = isAltKey && keyCode === "alt";
@@ -130,10 +201,9 @@ if (typeof document !== "undefined") {
       } else {
         showAllRelevant();
       }
-    } else if (isAltKey || ALT_REGISTRY_IS_IN_DISPLAY_LAST) {
+    } else if (!isArrow && (isAltKey || ALT_REGISTRY_IS_IN_DISPLAY_LAST)) {
       // if a match is found we want to prevent the default action
       triggerBasedOn(keyCode, () => {
-        e.stopPropagation();
         e.preventDefault();
       });
     }
@@ -142,8 +212,8 @@ if (typeof document !== "undefined") {
     hideAll();
   });
   window.addEventListener("scroll", () => {
-    hideAll();
-  });
+    recalculateAllRelevant();
+  }, true);
   window.addEventListener("mousedown", () => {
     hideAll();
   });
@@ -177,7 +247,7 @@ export default class AltReactioner extends React.PureComponent<IAltReactionerPro
   public register(props: IAltReactionerProps = this.props) {
     if (!ALT_REGISTRY[props.reactionKey]) {
       ALT_REGISTRY[props.reactionKey] = [this];
-    } else {
+    } else if (!ALT_REGISTRY[props.reactionKey].includes(this)) {
       ALT_REGISTRY[props.reactionKey].push(this);
     }
   }
@@ -269,6 +339,18 @@ export default class AltReactioner extends React.PureComponent<IAltReactionerPro
     return this.state.displayed;
   }
 
+  public getGroupPosition() {
+    return this.props.groupPosition || Number.MAX_SAFE_INTEGER;
+  }
+
+  public triggerAmbiguous(id: number) {
+    return this.props.onAmbiguousReaction(id)
+  }
+
+  public triggerAmbiguousClear() {
+    return this.props.onAmbiguousClear();
+  }
+
   public trigger() {
     const element = this.getElement();
     if (!element) {
@@ -276,7 +358,6 @@ export default class AltReactioner extends React.PureComponent<IAltReactionerPro
     }
 
     if (!this.props.action || this.props.action === "click") {
-      console.log(element);
       (element as HTMLElement).click();
     } else if (this.props.action === "focus") {
       (element as HTMLElement).focus();

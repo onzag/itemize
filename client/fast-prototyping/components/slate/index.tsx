@@ -163,45 +163,44 @@ function calculateStylesheet(stylesheet: CSSStyleSheet | CSSMediaRule) {
 
     // now we take that selection, we are only concerned with the classes
     // that match our prefixed things
-    selectorSplitted.forEach((s) => {
-      // if it's not a class, then we can ignore it
-      if (s[0] !== ".") {
-        // continue;
-        return;
-      }
+    selectorSplitted.forEach((sbase) => {
+      let internalSelectorSplitted = sbase.split(".");
+      internalSelectorSplitted.shift();
 
-      // now we take the class name
-      let className = s.substr(1);
-      if (className.includes(":")) {
-        className = className.split(":")[0];
-      }
-      if (className.endsWith(",")) {
-        className = className.substr(0, className.length - 1);
-      }
+      internalSelectorSplitted.forEach((s) => {
+        // now we take the class name
+        let className = s;
+        if (className.includes(":")) {
+          className = className.split(":")[0];
+        }
+        if (className.endsWith(",")) {
+          className = className.substr(0, className.length - 1);
+        }
 
-      // and we check whether it matches any of our prefixes that
-      // make it a valid class of the given type
-      if (className.startsWith(CONTAINER_CLASS_PREFIX)) {
-        const toPush = className.substr(CONTAINER_CLASS_PREFIX.length);
-        if (!ALL_CONTAINERS.includes(toPush)) {
-          ALL_CONTAINERS.push(toPush);
+        // and we check whether it matches any of our prefixes that
+        // make it a valid class of the given type
+        if (className.startsWith(CONTAINER_CLASS_PREFIX)) {
+          const toPush = className.substr(CONTAINER_CLASS_PREFIX.length);
+          if (!ALL_CONTAINERS.includes(toPush)) {
+            ALL_CONTAINERS.push(toPush);
+          }
+        } else if (className.startsWith(TABLE_CLASS_PREFIX)) {
+          const toPush = className.substr(TABLE_CLASS_PREFIX.length);
+          if (!ALL_TABLES.includes(toPush)) {
+            ALL_TABLES.push(toPush);
+          }
+        } else if (className.startsWith(CUSTOM_CLASS_PREFIX)) {
+          const toPush = className.substr(CUSTOM_CLASS_PREFIX.length);
+          if (!ALL_CUSTOM.includes(toPush)) {
+            ALL_CUSTOM.push(toPush);
+          }
+        } else if (className.startsWith(RICH_TEXT_CLASS_PREFIX)) {
+          const toPush = className.substr(RICH_TEXT_CLASS_PREFIX.length);
+          if (!ALL_RICH_CLASSES.includes(toPush)) {
+            ALL_RICH_CLASSES.push(toPush);
+          }
         }
-      } else if (className.startsWith(TABLE_CLASS_PREFIX)) {
-        const toPush = className.substr(TABLE_CLASS_PREFIX.length);
-        if (!ALL_TABLES.includes(toPush)) {
-          ALL_TABLES.push(toPush);
-        }
-      } else if (className.startsWith(CUSTOM_CLASS_PREFIX)) {
-        const toPush = className.substr(CUSTOM_CLASS_PREFIX.length);
-        if (!ALL_CUSTOM.includes(toPush)) {
-          ALL_CUSTOM.push(toPush);
-        }
-      } else if (className.startsWith(RICH_TEXT_CLASS_PREFIX)) {
-        const toPush = className.substr(RICH_TEXT_CLASS_PREFIX.length);
-        if (!ALL_RICH_CLASSES.includes(toPush)) {
-          ALL_RICH_CLASSES.push(toPush);
-        }
-      }
+      });
     });
   });
 }
@@ -701,6 +700,18 @@ export interface ISlateEditorWrapperElementProps {
 }
 
 /**
+ * The element wrappers
+ */
+export interface ISlateEditorElementWrappers {
+  components?: {
+    [key: string]: React.ComponentType<ISlateEditorWrapperElementProps>;
+  },
+  uiHandler?: {
+    [key: string]: React.ComponentType<ISlateEditorWrapperElementProps>;
+  },
+};
+
+/**
  * The base props that every wrapper is going to get
  * based on the standard that is passed by the component
  * that contains the base rich text editor
@@ -784,9 +795,7 @@ interface ISlateEditorProps {
   /**
    * Wrappers for specific elements as they are selected and only if they are selected
    */
-  elementWrappers?: {
-    [key: string]: React.ComponentType<ISlateEditorWrapperElementProps>;
-  };
+  elementWrappers?: ISlateEditorElementWrappers;
 
   /**
    * Args passed to all the element wrappers
@@ -2228,7 +2237,13 @@ export class SlateEditor extends React.Component<ISlateEditorProps, ISlateEditor
       this.props.onBlur && this.props.onBlur();
     }
 
-    const currentSelectedElementAnchor = this.state.currentSelectedElementAnchor;
+    // we pick the anchor based on specificity
+    // the one we got the most specific we pass that
+    const currentSelectedAnchor =
+      this.state.currentSelectedTextAnchor ||
+      this.state.currentSelectedInlineElementAnchor ||
+      this.state.currentSelectedBlockElementAnchor ||
+      this.state.currentSelectedSuperBlockElementAnchor;
 
     // now we can call this
     const anchorData = this.calculateAnchors(
@@ -2239,8 +2254,8 @@ export class SlateEditor extends React.Component<ISlateEditorProps, ISlateEditor
       // and we pass the selected node anchor as it
       // remains even after the selection only if
       // we have not just deleted that node
-      currentSelectedElementAnchor &&
-        !this.lastChangeWasSelectedDelete ? currentSelectedElementAnchor : null,
+      currentSelectedAnchor &&
+        !this.lastChangeWasSelectedDelete ? currentSelectedAnchor : null,
     );
     this.setState({
       focused: false,
@@ -2595,8 +2610,23 @@ export class SlateEditor extends React.Component<ISlateEditorProps, ISlateEditor
       toReturn = contextSwichContext.editorArgs.wrapper(toReturn);
     }
 
-    if (this.props.elementWrappers && this.props.elementWrappers[element.type]) {
-      const ElementWrapper = this.props.elementWrappers[element.type];
+    if (
+      this.props.elementWrappers &&
+      (
+        (
+          this.props.elementWrappers.components &&
+          this.props.elementWrappers.components[element.type]
+        ) || (
+          this.props.elementWrappers.uiHandler &&
+          this.props.elementWrappers.uiHandler[element.uiHandler]
+        )
+      )
+    ) {
+      const ElementWrapper =
+        (
+          this.props.elementWrappers.uiHandler &&
+          this.props.elementWrappers.uiHandler[element.uiHandler]
+        ) || this.props.elementWrappers.components[element.type];
       return (
         <ElementWrapper
           element={element}

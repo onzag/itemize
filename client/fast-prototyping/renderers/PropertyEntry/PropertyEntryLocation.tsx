@@ -742,6 +742,7 @@ class PropertyEntryLocationRenderer extends
           onChange: this.onSearchQueryChange,
           autoComplete: "new-address",
           type: "text",
+          ...this.props.args.inputProps,
         }}
       />
     );
