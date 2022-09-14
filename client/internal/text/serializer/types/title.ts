@@ -26,7 +26,7 @@ export function registerTitle(registry: ISerializationRegistryType) {
    */
   function serializeTitle(title: ITitle) {
     // we just call the base function
-    return serializeElementBase(registry, title, title.subtype, null, null, title.children);
+    return serializeElementBase(registry, title, title.titleType, null, null, title.children);
   }
   
   /**
@@ -45,7 +45,7 @@ export function registerTitle(registry: ISerializationRegistryType) {
     const title: ITitle = {
       ...base,
       type: "title",
-      subtype: node.tagName.toLowerCase() as any,
+      titleType: node.tagName.toLowerCase() as any,
       children,
     }
 
@@ -64,7 +64,7 @@ export function registerTitle(registry: ISerializationRegistryType) {
       // the registry
       registry,
       // the tag we are using is the same of the subtype, h1, h2, h3
-      arg.element.subtype,
+      arg.element.titleType,
       // no base class
       null,
       // the children to use
@@ -94,7 +94,7 @@ export function registerTitle(registry: ISerializationRegistryType) {
  */
 export interface ITitle extends IElementBase {
   type: "title";
-  subtype: "h1" | "h2" | "h3" | "h4" | "h5" | "h6";
+  titleType: "h1" | "h2" | "h3" | "h4" | "h5" | "h6";
 
   /**
    * The title only has one children and it's text

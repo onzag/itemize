@@ -125,26 +125,58 @@ interface IEditorDropdown {
   goIntoTreeDepth?: number;
 
   /**
-   * The element to use for anchoring, by default the html
-   * this is the scrollable box where the element is contained
+   * if true the element will trigger a onClose event when anything
+   * outside of it is clicked or touched
    */
-  anchorElement?: HTMLElement;
+  closeable?: boolean;
+
+  /**
+   * only relevant if closeable is true, will be called once the element
+   * gets triggered by something outside of it
+   */
+  onClose?: () => void;
+
+  /**
+   * Instead of creating a dropdown directly as its container
+   * it will position a container instead
+   */
+  containWithinBox?: boolean;
+  containerBoxSx?: SxProps<Theme>;
+
   /**
    * where to place the portal, by default the html body
    */
   portalElement?: HTMLElement;
 }
 
+function isInDropdownOrWrapper(
+  ele: HTMLElement,
+  dropdownItself: HTMLElement,
+  wrapperContainer: HTMLElement,
+): boolean {
+  if (
+    ele === dropdownItself ||
+    ele === wrapperContainer
+  ) {
+    return true;
+  }
+
+  if (ele.parentElement) {
+    return isInDropdownOrWrapper(ele.parentElement, dropdownItself, wrapperContainer);
+  }
+
+  return false;
+}
+
 export function EditorDropdown(props: IEditorDropdown) {
   const boxRef = useRef<HTMLElement>();
+  const dropdownRef = useRef<HTMLElement>();
   const [pos, setPos] = useState<[number, number, number]>(null);
 
   const updatePos = useCallback(() => {
     if (!boxRef.current) {
       return;
     }
-
-    const anchorElement = props.anchorElement || document.body.parentElement;
 
     // if it's using the sibling strategy where the element is in the sibling side rather than down in there
     // we gotta use the parent as the source of our children
@@ -178,14 +210,29 @@ export function EditorDropdown(props: IEditorDropdown) {
     let left: number = null;
     let right: number = null;
     if (leftMostPosition > (window.innerWidth / 2)) {
-      right = anchorElement.offsetWidth - rightMostPosition;
+      right = window.innerWidth - rightMostPosition;
     } else {
       left = leftMostPosition;
     }
 
-    const top = anchorElement.scrollTop + lowermostNodeClientRect.top + lowermostNodeClientRect.height;
+    const top = lowermostNodeClientRect.top + lowermostNodeClientRect.height;
 
     setPos([top, left, right]);
+  }, []);
+
+  const callCloseable = useCallback((e: MouseEvent) => {
+    if (props.closeable) {
+      let wrapperRef = boxRef.current;
+      if (props.goIntoTreeDepth) {
+        const goTowardsParent = props.goIntoTreeDepth < 0;
+        if (goTowardsParent) {
+          wrapperRef = wrapperRef.parentElement as HTMLElement;
+        }
+      }
+      if (!isInDropdownOrWrapper(e.target as HTMLElement, dropdownRef.current, wrapperRef)) {
+        props.onClose();
+      }
+    }
   }, []);
 
   const updatePosDelayed = useCallback(() => {
@@ -208,6 +255,9 @@ export function EditorDropdown(props: IEditorDropdown) {
       window.addEventListener("resize", updatePos);
       window.addEventListener("mouseup", updatePosDelayed);
       window.addEventListener("touchend", updatePosDelayed);
+      window.addEventListener("scroll", updatePos, true);
+      window.addEventListener("mousedown", callCloseable);
+      window.addEventListener("touchstart", callCloseable);
 
       return () => {
         window.removeEventListener("SLATE_DRAWER_OPEN", posMassTrigger);
@@ -215,20 +265,53 @@ export function EditorDropdown(props: IEditorDropdown) {
         window.removeEventListener("resize", updatePos);
         window.removeEventListener("mouseup", updatePosDelayed);
         window.removeEventListener("touchend", updatePosDelayed);
+        window.removeEventListener("scroll", updatePos, true);
+        window.removeEventListener("mousedown", callCloseable);
+        window.removeEventListener("touchstart", callCloseable);
       }
     }
   }, [props.isOpen]);
 
-  const portal = pos && props.isOpen ? ReactDOM.createPortal(
-    <Box
-      sx={[props.dropdownSx as any, props.dropdownSizable ? styles.dropdownSizable : styles.dropdown]}
-      style={{ position: "absolute", top: pos[0], left: pos[1], right: pos[2] }}
-      data-unblur="true"
-    >
-      {props.dropdown}
-    </Box>,
-    props.portalElement || document.body,
-  ) : null;
+  const sx = [props.dropdownSizable ? styles.dropdownSizable : styles.dropdown];
+
+  let portal: React.ReactNode = null;
+
+  if (props.isOpen) {
+    const style: any = pos ?
+      { position: "fixed", top: pos[0], left: pos[1], right: pos[2] } :
+      { position: "fixed", top: 0, left: 0, visibility: "hidden" };
+
+    let elementInsidePortal = (
+      <Box
+        sx={Array.isArray(props.dropdownSx) ? props.dropdownSx.concat(sx) : [props.dropdownSx].concat(sx)}
+        style={
+          props.containWithinBox ? null : style
+        }
+        data-unblur="true"
+        ref={props.containWithinBox ? null : dropdownRef}
+      >
+        {props.dropdown}
+      </Box>
+    );
+
+    if (props.containWithinBox) {
+      elementInsidePortal = (
+        <Box
+          sx={props.containerBoxSx}
+          style={style}
+          data-unblur="true"
+          ref={dropdownRef}
+        >
+          {elementInsidePortal}
+        </Box>
+      );
+    }
+
+    portal = ReactDOM.createPortal(
+      elementInsidePortal,
+      props.portalElement || document.body,
+    );
+  }
 
   return (
     <>

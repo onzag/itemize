@@ -8,8 +8,9 @@
  */
 
 import React from "react";
+import { showRelevant } from "./AltScroller";
 
-type VoidFn = (element: HTMLElement) => void;
+type VoidFn = (element: HTMLElement, triggerAltCycle: () => void) => void;
 
 export interface IAltReactionerProps {
   /**
@@ -42,8 +43,13 @@ export interface IAltReactionerProps {
   /**
    * The action to be executed, by default it will click the component, other actions are focus
    * otherwise pass a function for a custom action
+   * 
+   * focus will focus the element
+   * click will click the element
+   * none will do nothing
+   * a function
    */
-  action?: "focus" | "click" | VoidFn;
+  action?: "focus" | "click" | "none" | VoidFn;
   /**
    * Triggers when two reactions with the same id are found
    * and provides a numeric id that represents the next number caught
@@ -70,6 +76,19 @@ export interface IAltReactionerProps {
    * it will be used for sorting, use it if you expect ambigous values
    */
   groupPosition?: number;
+  /**
+   * By default the element is not considered if it's not in view, use this to override that behaviour
+   */
+  allowHidden?: boolean;
+  /**
+   * An alt label to use for screen reading purposes
+   * for this action
+   */
+  altScreenReaderLabel?: string;
+  /**
+   * will trigger a new input reaction after it has been completed
+   */
+  triggerAltAfterAction?: boolean;
 }
 
 interface IAltReactionerState {
@@ -233,6 +252,8 @@ export default class AltReactioner extends React.PureComponent<IAltReactionerPro
     }
 
     this.containerRef = React.createRef<HTMLElement>();
+
+    this.triggerAltCycle = this.triggerAltCycle.bind(this);
   }
 
   public unregister(props: IAltReactionerProps = this.props) {
@@ -303,6 +324,10 @@ export default class AltReactioner extends React.PureComponent<IAltReactionerPro
       return false;
     }
 
+    if (this.props.allowHidden) {
+      return true;
+    }
+
     const bounding = element.getBoundingClientRect();
     return (
       bounding.top >= 0 &&
@@ -351,6 +376,11 @@ export default class AltReactioner extends React.PureComponent<IAltReactionerPro
     return this.props.onAmbiguousClear();
   }
 
+  public triggerAltCycle() {
+    showAllRelevant();
+    showRelevant();
+  }
+
   public trigger() {
     const element = this.getElement();
     if (!element) {
@@ -361,8 +391,14 @@ export default class AltReactioner extends React.PureComponent<IAltReactionerPro
       (element as HTMLElement).click();
     } else if (this.props.action === "focus") {
       (element as HTMLElement).focus();
+    } else if (this.props.action === "none") {
+
     } else {
-      this.props.action(element as HTMLElement);
+      this.props.action(element as HTMLElement, this.triggerAltCycle);
+    }
+
+    if (this.props.triggerAltAfterAction) {
+      this.triggerAltCycle();
     }
   }
 

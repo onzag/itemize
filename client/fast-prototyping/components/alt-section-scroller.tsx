@@ -1,5 +1,5 @@
 import Box from "@mui/material/Box";
-import React, { useEffect, useState } from "react";
+import React, { useCallback, useEffect, useRef, useState } from "react";
 import AltScroller from "../../components/accessibility/AltScroller";
 import ArrowUpwardIcon from '@mui/icons-material/ArrowUpward';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
@@ -7,11 +7,21 @@ import ArrowDownwardIcon from '@mui/icons-material/ArrowDownward';
 import ArrowForwardIcon from '@mui/icons-material/ArrowForward';
 
 const style = {
-  overlayAbsolute: {
+  overlayContainer: {
+    width: "12rem",
+    height: "8rem",
+    zIndex: 100000,
+    top: "calc(50% - 4rem)",
+    left: "calc(50% - 6rem)",
+  },
+  absolute: {
     position: "absolute",
   },
-  overlayFixed: {
+  fixed: {
     position: "fixed",
+  },
+  hidden: {
+    display: "none",
   },
   overlay: {
     opacity: 0.5,
@@ -19,29 +29,34 @@ const style = {
     alignItems: "center",
     justifyContent: "center",
     height: "4rem",
-    zIndex: 100000,
     width: "4rem",
     backgroundColor: "#ffeb3b",
+    position: "absolute",
   },
   top: {
-    top: "calc(50% - 4rem)",
-    left: "calc(50% - 2rem)",
+    top: 0,
+    left: "4rem",
     borderRadius: "50% 50% 0 0",
   },
   bottom: {
-    top: "50%",
-    left: "calc(50% - 2rem)",
+    bottom: 0,
+    left: "4rem",
     borderRadius: "0 0 50% 50%",
   },
   left: {
-    top: "calc(50% - 2rem)",
-    left: "calc(50% - 6rem)",
+    top: "2rem",
+    left: 0,
     borderRadius: "50% 0 0 50%",
   },
   right: {
-    top: "calc(50% - 2rem)",
-    left: "calc(50% + 2rem)",
+    top: "2rem",
+    right: 0,
     borderRadius: "0 50% 50% 0",
+  },
+  middle: {
+    top: "2rem",
+    left: "4rem",
+    borderRadius: "50%",
   },
   available: {
     fontSize: "3rem",
@@ -55,13 +70,25 @@ interface IAltSectionScrollerProps {
   component?: string;
   /**
    * The positioning to use, by default absolute
+   * 
+   * dynamic fixed will find the centerpoint of the box and use fixed
+   * positioning instead
    */
-  positioning?: "absolute" | "fixed";
+  positioning?: "absolute" | "fixed" | "dynamic-fixed";
+  /**
+   * When using dynamic fixed you may want to calculate the positioning yourself rather than just
+   * use the dead center
+   */
+  dyamicFixedCalculator?: (element: HTMLElement, centerX: number, centerY: number) => [number, number];
   /**
    * a css selector to choose the component that is relevant that the
    * user is supposed to interact with, by default it will simply pick the first child node
    */
   parentSelector?: string;
+  /**
+   * Will select the scrollable box based on a child, can be combined with a parent
+   */
+  childSelector?: string;
   /**
    * What color to use
    */
@@ -82,54 +109,116 @@ interface IAltSectionScrollerProps {
 export function AltSectionScroller(
   props: IAltSectionScrollerProps,
 ): any {
+  const scrollerRef = useRef<AltScroller>();
+
+  const [fixedPos, setPos] = useState<[number, number]>(null);
+
+  const updateDynamicPos = useCallback(() => {
+    // we wait because react may not have things ready yet on mount
+    setTimeout(() => {
+      let element = scrollerRef.current.getScrollableComponent();
+
+      const boundingRect = element.getBoundingClientRect();
+  
+      let centerX = boundingRect.x + boundingRect.width / 2;
+      let centerY = boundingRect.y + boundingRect.height / 2;
+
+      if (props.dyamicFixedCalculator) {
+        [centerX, centerY] = props.dyamicFixedCalculator(element, centerX, centerY)
+      }
+
+      setPos([centerX, centerY]);
+    }, 70);
+  }, []);
+
+  useEffect(() => {
+    if (props.positioning === "dynamic-fixed") {
+      updateDynamicPos();
+
+      window.addEventListener("resize", updateDynamicPos);
+
+      return () => {
+        window.removeEventListener("resize", updateDynamicPos);
+      }
+    } else {
+      setPos(null);
+    }
+  }, [props.positioning]);
+
   return (
     <AltScroller
       {...props}
+      ref={scrollerRef}
     >
       {(scrolling, direction) => (
         !scrolling ? null : (
-          <>
+          <Box
+            sx={
+              [
+                style.overlayContainer,
+                (fixedPos || props.positioning === "fixed") ? style.fixed : (
+                  (props.positioning === "absolute" || !props.positioning) ? style.absolute : style.hidden
+                ),
+              ]
+            }
+            style={
+              fixedPos ? {
+                left: "calc(" + fixedPos[0] + "px - 6rem)",
+                top: "calc(" + fixedPos[1] + "px - 4rem)",
+              } : null
+            }
+          >
+            {
+              !direction.up &&
+                !direction.down &&
+                !direction.left &&
+                !direction.right ? (
+                <Box
+                  component={props.component as any || "div"}
+                  sx={[
+                    style.overlay,
+                    style.middle,
+                  ]}
+                ></Box>
+              ) : null
+            }
             {direction.up || direction.down ? <Box
               component={props.component as any || "div"}
               sx={[
-                props.positioning === "fixed" ? style.overlayFixed : style.overlayAbsolute,
                 style.overlay,
                 style.top,
               ]}
             >
-              <ArrowUpwardIcon sx={direction.up ? style.available : null}/>
+              <ArrowUpwardIcon sx={direction.up ? style.available : null} />
             </Box> : null}
             {direction.up || direction.down ? <Box
               component={props.component as any || "div"}
               sx={[
-                props.positioning === "fixed" ? style.overlayFixed : style.overlayAbsolute,
                 style.overlay,
                 style.bottom,
               ]}
             >
-              <ArrowDownwardIcon sx={direction.down ? style.available : null}/>
+              <ArrowDownwardIcon sx={direction.down ? style.available : null} />
             </Box> : null}
             {direction.left || direction.right ? <Box
               component={props.component as any || "div"}
               sx={[
-                props.positioning === "fixed" ? style.overlayFixed : style.overlayAbsolute,
                 style.overlay,
                 style.left,
               ]}
             >
-              <ArrowBackIcon sx={direction.left ? style.available : null}/>
+              <ArrowBackIcon sx={direction.left ? style.available : null} />
             </Box> : null}
             {direction.left || direction.right ? <Box
               component={props.component as any || "div"}
               sx={[
-                props.positioning === "fixed" ? style.overlayFixed : style.overlayAbsolute,
                 style.overlay,
                 style.right,
               ]}
             >
-              <ArrowForwardIcon sx={direction.right ? style.available : null}/>
+              <ArrowForwardIcon sx={direction.right ? style.available : null} />
             </Box> : null}
-          </>
+          </Box>
         )
       )}
     </AltScroller>

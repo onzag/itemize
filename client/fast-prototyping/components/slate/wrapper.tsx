@@ -229,7 +229,7 @@ export interface IToolbarPrescenseElement {
   /**
    * Alternatively an action
    */
-  onClick?: (defaultAction: () => RichElement) => void;
+  onClick?: (defaultAction: () => RichElement, e: React.MouseEvent<HTMLElement>) => void;
   /**
    * Manually specify whether it's disabled
    * if not specified it will check whether an element
@@ -246,6 +246,27 @@ export interface IToolbarPrescenseElement {
    * for the alt badge reactioner
    */
   useStyleTransform?: boolean;
+  /**
+   * will retrigger alt after usage with
+   * alt
+   */
+  useTriggerAltAfterAction?: boolean;
+
+  /**
+   * use this priority instead of the standard
+   * alt actioner priority
+   */
+  usePriority?: number;
+
+  /**
+   * whether it should be marked as selected
+   */
+  selected?: boolean;
+
+  /**
+   * Adds a custom children at the end of the toolbar
+   */
+  customChildren?: React.ReactNode;
 }
 
 /**
@@ -360,7 +381,7 @@ export type SlateEditorWrapperCustomToolbarElement =
  * the slate editor as a component the wrapper can receive wrapperArgs so these args are passed
  * when the editor is created with the wrapper itself
  */
-export interface MaterialUISlateWrapperWithStyles extends ISlateEditorWrapperBaseProps {
+export interface IMaterialUISlateWrapperProps extends ISlateEditorWrapperBaseProps {
   /**
    * A generic error message
    */
@@ -415,7 +436,7 @@ export interface MaterialUISlateWrapperWithStyles extends ISlateEditorWrapperBas
  * that the entire wrapper does, but adding these functions and flags taken from
  * the state of the wrapper or other functions
  */
-export interface RichTextEditorToolbarProps extends MaterialUISlateWrapperWithStyles {
+export interface RichTextEditorToolbarProps extends IMaterialUISlateWrapperProps {
   /**
    * Whether the drawer is open, the drawer is the side drawer that contains
    * a lot of functionality to edit the currently selected element
@@ -428,6 +449,16 @@ export interface RichTextEditorToolbarProps extends MaterialUISlateWrapperWithSt
   state: ISlateEditorInternalStateType;
 
   /**
+   * A custom toolbar state
+   */
+  toolbarState: string;
+
+  /**
+   * The toolbar height
+   */
+  toolbarHeight: number;
+
+  /**
    * call to request an image, opens a dialog so requires a state
    */
   requestImage: () => void;
@@ -436,6 +467,11 @@ export interface RichTextEditorToolbarProps extends MaterialUISlateWrapperWithSt
    * Call to request a file, opens a dialog so requires a state
    */
   requestFile: () => void;
+
+  /**
+   * sets the toolbar state
+   */
+  setToolbarState: (state: string | null) => void;
 
   /**
    * A function that specifies whether the drawer should
@@ -449,10 +485,6 @@ export interface RichTextEditorToolbarProps extends MaterialUISlateWrapperWithSt
    */
   toggleDrawer: () => void;
 
-  /**
-   * Call to insert a container, opens a dialog so requires a state
-   */
-  insertContainer: () => void;
   /**
    * Called when the height changes
    */
@@ -476,6 +508,7 @@ function elementFastKeyReturn(
   groupIndex: number,
   disabled: boolean,
   useStyleTransform?: boolean,
+  useTriggerAltAfterAction?: boolean,
   fastKeyOverride?: string,
 ): any {
   const fastKey = fastKeyOverride || props.fastKey;
@@ -487,6 +520,7 @@ function elementFastKeyReturn(
       altBadgedChildren={altBadgedChildren}
       groupPosition={groupIndex}
       useTransform={useStyleTransform}
+      triggerAltAfterAction={useTriggerAltAfterAction}
       selector="button"
     >
       {element}
@@ -508,7 +542,7 @@ function Bold(props: RichTextEditorToolbarElementProps) {
     </IconButton>
   );
 
-  return elementFastKeyReturn(props, element, null, 1, props.groupIndex, disabled);
+  return elementFastKeyReturn(props, element, null, 1, props.groupIndex, disabled, props.disjointedMode);
 }
 
 function Italic(props: RichTextEditorToolbarElementProps) {
@@ -525,7 +559,7 @@ function Italic(props: RichTextEditorToolbarElementProps) {
     </IconButton>
   );
 
-  return elementFastKeyReturn(props, element, null, 1, props.groupIndex, disabled);
+  return elementFastKeyReturn(props, element, null, 1, props.groupIndex, disabled, props.disjointedMode);
 }
 
 function Underline(props: RichTextEditorToolbarElementProps) {
@@ -542,7 +576,7 @@ function Underline(props: RichTextEditorToolbarElementProps) {
     </IconButton>
   );
 
-  return elementFastKeyReturn(props, element, null, 1, props.groupIndex, disabled);
+  return elementFastKeyReturn(props, element, null, 1, props.groupIndex, disabled, props.disjointedMode);
 }
 
 function VDivider(props: RichTextEditorToolbarElementProps) {
@@ -625,7 +659,7 @@ function Link(props: RichTextEditorToolbarElementProps) {
     >{linkBaseComponent}</Badge>
   }
 
-  return elementFastKeyReturn(props, linkBadged, linkBaseComponent, 1, props.groupIndex, disabled);
+  return elementFastKeyReturn(props, linkBadged, linkBaseComponent, 1, props.groupIndex, disabled, props.disjointedMode);
 }
 
 function Title(props: RichTextEditorToolbarElementProps) {
@@ -633,7 +667,7 @@ function Title(props: RichTextEditorToolbarElementProps) {
     return null;
   }
 
-  const disabled = !props.state.allowsInsertElement({ type: "title", subtype: "h1", children: [] }, { collapsed: true });
+  const disabled = !props.state.allowsInsertElement({ type: "title", titleType: "h1", children: [] }, { collapsed: true });
   const element = (
     <IconButton
       tabIndex={-1}
@@ -646,7 +680,7 @@ function Title(props: RichTextEditorToolbarElementProps) {
     </IconButton>
   );
 
-  return elementFastKeyReturn(props, element, null, 1, props.groupIndex, disabled);
+  return elementFastKeyReturn(props, element, null, 1, props.groupIndex, disabled, props.disjointedMode);
 }
 
 function Quote(props: RichTextEditorToolbarElementProps) {
@@ -667,7 +701,7 @@ function Quote(props: RichTextEditorToolbarElementProps) {
     </IconButton>
   );
 
-  return elementFastKeyReturn(props, element, null, 1, props.groupIndex, disabled);
+  return elementFastKeyReturn(props, element, null, 1, props.groupIndex, disabled, props.disjointedMode);
 }
 
 
@@ -688,7 +722,7 @@ function NumberedList(props: RichTextEditorToolbarElementProps) {
     </IconButton>
   );
 
-  return elementFastKeyReturn(props, element, null, 1, props.groupIndex, disabled);
+  return elementFastKeyReturn(props, element, null, 1, props.groupIndex, disabled, props.disjointedMode);
 }
 
 function BulletedList(props: RichTextEditorToolbarElementProps) {
@@ -708,7 +742,7 @@ function BulletedList(props: RichTextEditorToolbarElementProps) {
     </IconButton>
   );
 
-  return elementFastKeyReturn(props, element, null, 1, props.groupIndex, disabled);
+  return elementFastKeyReturn(props, element, null, 1, props.groupIndex, disabled, props.disjointedMode);
 }
 
 const imgExample = {
@@ -743,7 +777,7 @@ function Image(props: RichTextEditorToolbarElementProps) {
     </IconButton>
   );
 
-  return elementFastKeyReturn(props, element, null, 1, props.groupIndex, disabled);
+  return elementFastKeyReturn(props, element, null, 1, props.groupIndex, disabled, props.disjointedMode);
 }
 
 const videoExample = {
@@ -772,7 +806,7 @@ function Video(props: RichTextEditorToolbarElementProps) {
     </IconButton>
   );
 
-  return elementFastKeyReturn(props, element, null, 1, props.groupIndex, disabled);
+  return elementFastKeyReturn(props, element, null, 1, props.groupIndex, disabled, props.disjointedMode);
 }
 
 const fileExample = {
@@ -804,7 +838,7 @@ function File(props: RichTextEditorToolbarElementProps) {
     </IconButton>
   );
 
-  return elementFastKeyReturn(props, element, null, 1, props.groupIndex, disabled);
+  return elementFastKeyReturn(props, element, null, 1, props.groupIndex, disabled, props.disjointedMode);
 }
 
 function Container(props: RichTextEditorToolbarElementProps) {
@@ -819,14 +853,14 @@ function Container(props: RichTextEditorToolbarElementProps) {
     <IconButton
       tabIndex={-1}
       title={props.i18nRichInfo.formatAddContainerLabel}
-      onClick={props.insertContainer}
+      onClick={props.helpers.insertContainer.bind(null, null)}
       disabled={disabled}
       size="large">
       <CheckBoxOutlineBlankIcon />
     </IconButton>
   );
 
-  return elementFastKeyReturn(props, element, null, 1, props.groupIndex, disabled);
+  return elementFastKeyReturn(props, element, null, 1, props.groupIndex, disabled, props.disjointedMode);
 }
 
 function Table(props: RichTextEditorToolbarElementProps) {
@@ -848,7 +882,7 @@ function Table(props: RichTextEditorToolbarElementProps) {
     </IconButton>
   );
 
-  return elementFastKeyReturn(props, element, null, 1, props.groupIndex, disabled);
+  return elementFastKeyReturn(props, element, null, 1, props.groupIndex, disabled, props.disjointedMode);
 }
 
 function TemplateText(props: RichTextEditorToolbarElementProps) {
@@ -916,7 +950,7 @@ function TemplateText(props: RichTextEditorToolbarElementProps) {
     </Badge>
   );
 
-  return elementFastKeyReturn(props, elementBadged, element, 1, props.groupIndex, disabled);
+  return elementFastKeyReturn(props, elementBadged, element, 1, props.groupIndex, disabled, props.disjointedMode);
 }
 
 function TemplateHTML(props: RichTextEditorToolbarElementProps) {
@@ -986,7 +1020,7 @@ function TemplateHTML(props: RichTextEditorToolbarElementProps) {
     </Badge>
   );
 
-  return elementFastKeyReturn(props, elementBadged, element, 1, props.groupIndex, disabled);
+  return elementFastKeyReturn(props, elementBadged, element, 1, props.groupIndex, disabled, props.disjointedMode);
 }
 
 interface IToolbarExtraProps extends RichTextEditorToolbarElementProps {
@@ -1019,6 +1053,7 @@ function ToolbarExtra(props: IToolbarExtraProps) {
         title={props.extra.title as string}
         size="large"
         disabled={disabled}
+        color={props.extra.selected ? "primary" : "default"}
       >
         {props.extra.icon}
       </IconButton>
@@ -1032,6 +1067,7 @@ function ToolbarExtra(props: IToolbarExtraProps) {
           title={i18nTitle}
           size="large"
           disabled={disabled}
+          color={props.extra.selected ? "primary" : "default"}
         >
           {props.extra.icon}
         </IconButton>
@@ -1045,10 +1081,11 @@ function ToolbarExtra(props: IToolbarExtraProps) {
     props,
     returnNode,
     null,
-    1,
+    typeof props.extra.usePriority === "number" ? props.extra.usePriority : 1,
     props.groupIndex,
     disabled,
     props.extra.useStyleTransform,
+    props.extra.useTriggerAltAfterAction,
     props.extra.fastKey,
   );
 }
@@ -1061,7 +1098,16 @@ function ToolbarExtras(props: RichTextEditorToolbarElementProps) {
       );
     });
 
-    return toolbarExtras as any;
+    const customs = props.toolbarExtras.map((x, i) => (
+      x.customChildren ? <React.Fragment key={i}>{x.customChildren}</React.Fragment> : null
+    ));
+
+    return (
+      <>
+        {toolbarExtras}
+        {customs}
+      </>
+    );
   }
 
   return null;
@@ -1215,12 +1261,14 @@ class RichTextEditorToolbar extends React.Component<RichTextEditorToolbarProps, 
           this.props.drawerOpen ? 2 : 1,
           999,
           false,
-          false,
+          this.props.disjointedMode,
+          true,
           ".",
         ) :
         null
     );
 
+    const customChildren: React.ReactNode[] = [];
     const toolbarFormMapped = (
       toolbarForm.map((ele, index) => {
         if (typeof ele === "string") {
@@ -1236,6 +1284,15 @@ class RichTextEditorToolbar extends React.Component<RichTextEditorToolbarProps, 
           );
         } else {
           const extraValue = typeof ele === "function" ? ele(this.props) : ele;
+
+          if ((extraValue as IToolbarPrescenseElement).customChildren) {
+            customChildren.push(
+              <React.Fragment key={index}>
+                {(extraValue as IToolbarPrescenseElement).customChildren}
+              </React.Fragment>
+            );
+          }
+
           return (
             <ToolbarExtra
               {...this.props}
@@ -1267,6 +1324,7 @@ class RichTextEditorToolbar extends React.Component<RichTextEditorToolbarProps, 
       >
         <Toolbar sx={style.toolbar}>
           {toolbarFormMapped}
+          {customChildren}
           <Box sx={style.moreOptionsSpacer} />
           {drawerButton}
         </Toolbar>
@@ -1301,6 +1359,11 @@ export interface MaterialUISlateWrapperState {
   toolbarHeight: number;
 
   /**
+   * A custom toolbar state
+   */
+  toolbarState: string;
+
+  /**
    * The drawer being open or closed is stored in local storage, which is not available in the server
    * side, and the drawer animates when it's opened and closed, so this variable is always false at the
    * start, the drawer is always closed at the start, however, if we need to open the drawer at the start
@@ -1332,7 +1395,7 @@ const StyledEditor = styled("div", {
  * This represents the unwrapped class that is used for the wrapper, it is not
  * the exported one because it needs to be withStyles for stylization
  */
-export class MaterialUISlateWrapper extends React.PureComponent<MaterialUISlateWrapperWithStyles, MaterialUISlateWrapperState> {
+export class MaterialUISlateWrapper extends React.PureComponent<IMaterialUISlateWrapperProps, MaterialUISlateWrapperState> {
   /**
    * The ref object for the input object for image input
    */
@@ -1384,7 +1447,7 @@ export class MaterialUISlateWrapper extends React.PureComponent<MaterialUISlateW
    * Constructs a new material ui based wrapper for the slate editor
    * @param props the base properties that every wrapper gets extended for this specific wrapper
    */
-  constructor(props: MaterialUISlateWrapperWithStyles) {
+  constructor(props: IMaterialUISlateWrapperProps) {
 
     // super calling
     super(props);
@@ -1398,6 +1461,7 @@ export class MaterialUISlateWrapper extends React.PureComponent<MaterialUISlateW
       drawerOpen: false,
       toolbarHeight: 0,
       noAnimate: true,
+      toolbarState: null,
     }
 
     this.isUnmounted = false;
@@ -1419,7 +1483,7 @@ export class MaterialUISlateWrapper extends React.PureComponent<MaterialUISlateW
     this.refocus = this.refocus.bind(this);
     this.shouldHaveDrawer = this.shouldHaveDrawer.bind(this);
     this.toggleDrawer = this.toggleDrawer.bind(this);
-    this.insertContainer = this.insertContainer.bind(this);
+    this.setToolbarState = this.setToolbarState.bind(this);
     this.selectiveHardBlur = this.selectiveHardBlur.bind(this);
     this.keyUpListener = this.keyUpListener.bind(this);
   }
@@ -1633,12 +1697,10 @@ export class MaterialUISlateWrapper extends React.PureComponent<MaterialUISlateW
     this.refocusTimeout = setTimeout(this.refocus, 30);
   }
 
-  /**
-   * Inserts a container, a basic one in place
-   */
-  public insertContainer() {
-    // basically just calls the helper to insert the container
-    this.props.helpers.insertContainer();
+  public setToolbarState(state: string | null) {
+    if (this.state.toolbarState !== state) {
+      this.setState({toolbarState: state});
+    }
   }
 
   /**
@@ -1734,6 +1796,8 @@ export class MaterialUISlateWrapper extends React.PureComponent<MaterialUISlateW
     const toolbar = (
       <RichTextEditorToolbar
         {...this.props}
+        toolbarState={this.state.toolbarState}
+        toolbarHeight={this.state.toolbarHeight}
         ref={this.toolbarRef}
         onHeightChange={this.onHeightChange}
         requestImage={this.requestImage}
@@ -1741,7 +1805,7 @@ export class MaterialUISlateWrapper extends React.PureComponent<MaterialUISlateW
         shouldHaveDrawer={this.shouldHaveDrawer}
         drawerOpen={this.state.drawerOpen}
         toggleDrawer={this.toggleDrawer}
-        insertContainer={this.insertContainer}
+        setToolbarState={this.setToolbarState}
       />
     );
 
@@ -1814,7 +1878,7 @@ export class MaterialUISlateWrapper extends React.PureComponent<MaterialUISlateW
   }
 }
 
-export interface IDrawerContainerProps extends MaterialUISlateWrapperWithStyles {
+export interface IDrawerContainerProps extends IMaterialUISlateWrapperProps {
   drawerOpen: boolean;
   toolbarHeight: number;
   noAnimate: boolean;

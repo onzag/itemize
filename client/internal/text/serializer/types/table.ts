@@ -321,13 +321,13 @@ export function registerTableElements(registry: ISerializationRegistryType) {
     return [STANDARD_PARAGRAPH()];
   }
 
-  registry.DESERIALIZE.byTag.table = deserializeTableElement.bind(null, "table");
-  registry.DESERIALIZE.byTag.tbody = deserializeTableElement.bind(null, "tbody");
-  registry.DESERIALIZE.byTag.thead = deserializeTableElement.bind(null, "thead");
-  registry.DESERIALIZE.byTag.tfoot = deserializeTableElement.bind(null, "tfoot");
-  registry.DESERIALIZE.byTag.tr = deserializeTableElement.bind(null, "tr");
-  registry.DESERIALIZE.byTag.td = deserializeTableElement.bind(null, "td");
-  registry.DESERIALIZE.byTag.th = deserializeTableElement.bind(null, "th");
+  registry.DESERIALIZE.byTag.TABLE = deserializeTableElement.bind(null, "table");
+  registry.DESERIALIZE.byTag.TBODY = deserializeTableElement.bind(null, "tbody");
+  registry.DESERIALIZE.byTag.THEAD = deserializeTableElement.bind(null, "thead");
+  registry.DESERIALIZE.byTag.TFOOT = deserializeTableElement.bind(null, "tfoot");
+  registry.DESERIALIZE.byTag.TR = deserializeTableElement.bind(null, "tr");
+  registry.DESERIALIZE.byTag.TD = deserializeTableElement.bind(null, "td");
+  registry.DESERIALIZE.byTag.TH = deserializeTableElement.bind(null, "th");
 
   registry.ON_EMPTY_FILL_WITH.table = () => {
     return {

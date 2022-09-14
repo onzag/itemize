@@ -25,9 +25,14 @@ const style = {
   fullWidth: {
     width: "100%",
   },
+  hidden: {
+    "& .MuiBadge-badge": {
+      display: "none",
+    }
+  },
 }
 
-type VoidFn = (element: HTMLElement) => void;
+type VoidFn = (element: HTMLElement, triggerAltCycle: () => void) => void;
 
 interface IAltBadgeReactionerProps {
   /**
@@ -60,8 +65,13 @@ interface IAltBadgeReactionerProps {
   /**
    * The action to be executed, by default it will click the component, other actions are focus
    * otherwise pass a function for a custom action
+   * 
+   * focus will focus the element
+   * click will click the element
+   * none will do nothing
+   * a function
    */
-  action?: "focus" | "click" | VoidFn;
+  action?: "focus" | "click" | "none" | VoidFn;
   /**
    * What color to use
    */
@@ -83,6 +93,10 @@ interface IAltBadgeReactionerProps {
    */
   label?: string;
   /**
+ * By default the element is not considered if it's not in view, use this to override that behaviour
+ */
+  allowHidden?: boolean;
+  /**
    * A positioning within the group in order to solve ambiguous reactions, the lowest
    * it will be used for sorting, use it if you expect ambigous values
    */
@@ -95,6 +109,10 @@ interface IAltBadgeReactionerProps {
    * full width for the badge
    */
   fullWidth?: boolean;
+  /**
+ * will trigger a new input reaction after it has been completed
+ */
+  triggerAltAfterAction?: boolean;
 }
 
 export function AltBadgeReactioner(
@@ -104,26 +122,23 @@ export function AltBadgeReactioner(
 
   const reactionerProps = { ...props } as any;
   reactionerProps.children = (displayed: boolean) => {
-    if (displayed) {
-      return (
-        <Badge
-          badgeContent={((ambigousId && ambigousId.toString()) || props.label || props.reactionKey).toUpperCase()}
-          color={(props.colorSchema || "default") === "default" ? "primary" : "default"}
-          sx={
-            [
-              (props.colorSchema || "default") === "default" ? style.badgeFastKey : style.badgeFastKey2,
-              props.useTransform ? style.transformed : null,
-              props.fullWidth ? style.fullWidth : null,
-            ]
-          }
-        >
-          {props.altBadgedChildren || props.children}
-        </Badge>
-      );
-    } else {
-      return props.children;
-    }
+    return (
+      <Badge
+        badgeContent={((ambigousId && ambigousId.toString()) || props.label || props.reactionKey).toUpperCase()}
+        color={(props.colorSchema || "default") === "default" ? "primary" : "default"}
+        sx={
+          [
+            (props.colorSchema || "default") === "default" ? style.badgeFastKey : style.badgeFastKey2,
+            props.useTransform ? style.transformed : null,
+            props.fullWidth ? style.fullWidth : null,
+            displayed ? null : style.hidden,
+          ]
+        }
+      >
+        {displayed ? (props.altBadgedChildren || props.children) : props.children}
+      </Badge>
+    );
   }
 
-  return <AltReactioner {...reactionerProps} onAmbiguousReaction={setAmbiguousId} onAmbiguousClear={setAmbiguousId.bind(null, null)}/>
+  return <AltReactioner {...reactionerProps} onAmbiguousReaction={setAmbiguousId} onAmbiguousClear={setAmbiguousId.bind(null, null)} />
 }

@@ -1,9 +1,28 @@
 import React from "react";
 
 interface IAltScrollerProps {
+  /**
+   * The priority of the selector
+   */
   priority?: number;
+  /**
+   * wether it is disabled right now
+   */
   disabled?: boolean;
+  /**
+   * Will select the scrollable box as the parent that matches the given
+   * css selector, otherwise it will use the first parent
+   */
   parentSelector?: string;
+
+  /**
+   * Will select the scrollable box based on a child, can be combined with parent
+   */
+  childSelector?: string;
+
+  /**
+   * Pass as children in order to build the UI of choice
+   */
   children: (isScrolling: boolean, scrollDirections?: { up: boolean; left: boolean; right: boolean; down: boolean }) => React.ReactNode;
 }
 
@@ -43,7 +62,7 @@ const converts = {
   ArrowRight: "right",
 }
 
-function showRelevant() {
+export function showRelevant() {
   // first lets find the potential max priority
   let scrollerToTrigger: AltScroller = null as any;
   ALT_SREGISTRY.forEach((v) => {
@@ -191,6 +210,10 @@ export default class AltScroller extends React.PureComponent<IAltScrollerProps, 
       element = element.parentElement as HTMLElement;
     }
 
+    if (this.props.childSelector) {
+      element = element.querySelector(this.props.childSelector) as HTMLElement;
+    }
+
     return element;
   }
 
@@ -201,13 +224,13 @@ export default class AltScroller extends React.PureComponent<IAltScrollerProps, 
   public scroll(dir: "up" | "down" | "left" | "right") {
     const element = this.getScrollableComponent();
     if (dir === "up" || dir === "down") {
-      const scrollTop = element.scrollTop + (dir === "up" ? -50 : 50);
+      const scrollTop = element.scrollTop + (dir === "up" ? -element.offsetHeight/2 : element.offsetHeight/2);
       element.scroll({
         top: scrollTop,
         behavior: "smooth",
       });
     } else {
-      const scrollLeft = element.scrollLeft + (dir === "left" ? -50 : 50);
+      const scrollLeft = element.scrollLeft + (dir === "left" ? -element.offsetWidth/2 : element.offsetWidth/2);
       element.scroll({
         left: scrollLeft,
         behavior: "smooth",

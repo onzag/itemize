@@ -2410,6 +2410,8 @@ export class SlateEditor extends React.Component<ISlateEditorProps, ISlateEditor
 
     // let's check for a ui handler
     const uiHandler = (element as any as RichElement).uiHandler;
+    let toReturn: React.ReactNode = null;
+    let wasUIHandled = false;
 
     // if we have one
     if (uiHandler) {
@@ -2458,7 +2460,7 @@ export class SlateEditor extends React.Component<ISlateEditorProps, ISlateEditor
         const styleHover = convertStyleStringToReactObject((element as any as RichElement).styleHover);
 
         // now we can use the handler component that is given via the ui handler
-        let toReturn: React.ReactNode = <HandlerComponent
+        toReturn = <HandlerComponent
           args={{
             ...uiHandlerArgs,
             ...handlerExtraArgs,
@@ -2504,116 +2506,118 @@ export class SlateEditor extends React.Component<ISlateEditorProps, ISlateEditor
           toReturn = contextSwichContext.editorArgs.wrapper(toReturn);
         }
 
-        // otherwise return
-        return toReturn;
+        wasUIHandled = true;
       }
     }
 
-    const customProps: any = { ...attributes, children };
+    if (!wasUIHandled) {
+      const customProps: any = { ...attributes, children };
 
-    const html = (element as any as RichElement).html;
-    if (typeof html === "string") {
-      const htmlContext = this.getContextFor(element as any);
-      let propertiesFromContext: ITemplateArgHTMLDefinition = htmlContext && htmlContext.properties && htmlContext.properties[html] as ITemplateArgHTMLDefinition;
-      if (!propertiesFromContext) {
-        propertiesFromContext = this.props.rootContext && this.props.rootContext.properties && this.props.rootContext.properties[html] as ITemplateArgHTMLDefinition;
-        if (propertiesFromContext && propertiesFromContext.nonRootInheritable) {
-          propertiesFromContext = null;
+      const html = (element as any as RichElement).html;
+      if (typeof html === "string") {
+        const htmlContext = this.getContextFor(element as any);
+        let propertiesFromContext: ITemplateArgHTMLDefinition = htmlContext && htmlContext.properties && htmlContext.properties[html] as ITemplateArgHTMLDefinition;
+        if (!propertiesFromContext) {
+          propertiesFromContext = this.props.rootContext && this.props.rootContext.properties && this.props.rootContext.properties[html] as ITemplateArgHTMLDefinition;
+          if (propertiesFromContext && propertiesFromContext.nonRootInheritable) {
+            propertiesFromContext = null;
+          }
         }
-      }
 
-      if (propertiesFromContext && propertiesFromContext.type === "html" && typeof propertiesFromContext.editorDisplay !== "undefined") {
-        const toDisplay = propertiesFromContext.editorDisplay;
-        if (typeof toDisplay === "string") {
-          customProps.children = (
-            <>
-              <div contentEditable={false} dangerouslySetInnerHTML={{ __html: toDisplay }} style={{ display: "contents" }} />
-              {children}
-            </>
-          );
+        if (propertiesFromContext && propertiesFromContext.type === "html" && typeof propertiesFromContext.editorDisplay !== "undefined") {
+          const toDisplay = propertiesFromContext.editorDisplay;
+          if (typeof toDisplay === "string") {
+            customProps.children = (
+              <>
+                <div contentEditable={false} dangerouslySetInnerHTML={{ __html: toDisplay }} style={{ display: "contents" }} />
+                {children}
+              </>
+            );
+          } else {
+            customProps.children = (
+              <>
+                <div contentEditable={false} style={{ display: "contents" }}>
+                  {toDisplay}
+                </div>
+                {children}
+              </>
+            );
+          }
         } else {
           customProps.children = (
             <>
-              <div contentEditable={false} style={{ display: "contents" }}>
-                {toDisplay}
-              </div>
+              {(propertiesFromContext && propertiesFromContext.label) || (element as any).children[0].text}
               {children}
             </>
           );
         }
-      } else {
+      }
+
+      const text = element.textContent;
+      if (typeof text === "string") {
+        const textContext = this.getContextFor(element as any);
+        let propertiesFromContext: ITemplateArgTextDefinition = textContext &&
+          textContext.properties &&
+          textContext.properties[text] as ITemplateArgTextDefinition;
+        if (!propertiesFromContext) {
+          propertiesFromContext = this.props.rootContext &&
+            this.props.rootContext.properties &&
+            this.props.rootContext.properties[text] as ITemplateArgTextDefinition;
+          if (propertiesFromContext && propertiesFromContext.nonRootInheritable) {
+            propertiesFromContext = null;
+          }
+        }
+
         customProps.children = (
           <>
-            {(propertiesFromContext && propertiesFromContext.label) || (element as any).children[0].text}
+            {(
+              propertiesFromContext &&
+              propertiesFromContext.type === "text" &&
+              (propertiesFromContext.editorDisplay || propertiesFromContext.label)
+            ) || (element as any).children[0].text}
             {children}
           </>
         );
       }
-    }
 
-    const text = element.textContent;
-    if (typeof text === "string") {
-      const textContext = this.getContextFor(element as any);
-      let propertiesFromContext: ITemplateArgTextDefinition = textContext &&
-        textContext.properties &&
-        textContext.properties[text] as ITemplateArgTextDefinition;
-      if (!propertiesFromContext) {
-        propertiesFromContext = this.props.rootContext &&
-          this.props.rootContext.properties &&
-          this.props.rootContext.properties[text] as ITemplateArgTextDefinition;
-        if (propertiesFromContext && propertiesFromContext.nonRootInheritable) {
-          propertiesFromContext = null;
+      // and now we call the reactification
+      toReturn = SERIALIZATION_REGISTRY.REACTIFY[element.type as string]({
+        active: false,
+        selected: isSelected && isPrimary,
+        element: element as any,
+        asTemplate: false,
+        customProps,
+      }) as any;
+
+      const contextSwichContext = this.getContextFor(element as any, "final", true);
+
+      // if we find ourselves in a loopable context as we are currently looping
+      if (
+        contextSwichContext &&
+        contextSwichContext.loopable &&
+        contextSwichContext.editorArgs &&
+        contextSwichContext.editorArgs.loopEmulation &&
+        contextSwichContext.editorArgs.loopEmulation >= 1
+      ) {
+        const arr: React.ReactNode[] = [];
+        for (let i = 0; i < contextSwichContext.editorArgs.loopEmulation; i++) {
+          if (contextSwichContext.editorArgs.wrapper) {
+            arr.push(<React.Fragment key={i}>{contextSwichContext.editorArgs.wrapper(toReturn, i)}</React.Fragment>);
+          } else {
+            arr.push(<React.Fragment key={i}>{toReturn}</React.Fragment>);
+          }
         }
+        toReturn = arr;
+      } else if (contextSwichContext && contextSwichContext.editorArgs && contextSwichContext.editorArgs.wrapper) {
+        toReturn = contextSwichContext.editorArgs.wrapper(toReturn);
       }
-
-      customProps.children = (
-        <>
-          {(
-            propertiesFromContext &&
-            propertiesFromContext.type === "text" &&
-            (propertiesFromContext.editorDisplay || propertiesFromContext.label)
-          ) || (element as any).children[0].text}
-          {children}
-        </>
-      );
-    }
-
-    // and now we call the reactification
-    let toReturn = SERIALIZATION_REGISTRY.REACTIFY[element.type as string]({
-      active: false,
-      selected: isSelected && isPrimary,
-      element: element as any,
-      asTemplate: false,
-      customProps,
-    }) as any;
-
-    const contextSwichContext = this.getContextFor(element as any, "final", true);
-
-    // if we find ourselves in a loopable context as we are currently looping
-    if (
-      contextSwichContext &&
-      contextSwichContext.loopable &&
-      contextSwichContext.editorArgs &&
-      contextSwichContext.editorArgs.loopEmulation &&
-      contextSwichContext.editorArgs.loopEmulation >= 1
-    ) {
-      const arr: React.ReactNode[] = [];
-      for (let i = 0; i < contextSwichContext.editorArgs.loopEmulation; i++) {
-        if (contextSwichContext.editorArgs.wrapper) {
-          arr.push(<React.Fragment key={i}>{contextSwichContext.editorArgs.wrapper(toReturn, i)}</React.Fragment>);
-        } else {
-          arr.push(<React.Fragment key={i}>{toReturn}</React.Fragment>);
-        }
-      }
-      toReturn = arr;
-    } else if (contextSwichContext && contextSwichContext.editorArgs && contextSwichContext.editorArgs.wrapper) {
-      toReturn = contextSwichContext.editorArgs.wrapper(toReturn);
     }
 
     if (
       this.props.elementWrappers &&
       (
         (
+          !wasUIHandled &&
           this.props.elementWrappers.components &&
           this.props.elementWrappers.components[element.type]
         ) || (
@@ -3829,7 +3833,7 @@ export class SlateEditor extends React.Component<ISlateEditorProps, ISlateEditor
     const isCollapsed = Range.isCollapsed(this.editor.selection);
 
     if (isCollapsed && this.state.currentSelectedBlockElement) {
-      if (this.state.currentSelectedBlockElement.type === "title" && this.state.currentSelectedBlockElement.subtype === type) {
+      if (this.state.currentSelectedBlockElement.type === "title") {
         Transforms.setNodes(
           this.editor,
           {
@@ -3841,7 +3845,7 @@ export class SlateEditor extends React.Component<ISlateEditorProps, ISlateEditor
           this.editor,
           {
             type: "title",
-            subtype: type,
+            titleType: type,
           }
         );
       }

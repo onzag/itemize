@@ -17,6 +17,8 @@ import ViewWeekIcon from '@mui/icons-material/ViewWeek';
 import CreditCardIcon from '@mui/icons-material/CreditCard';
 import { EditorDropdown } from "../editor-dropdown";
 import { ITable } from "../../../internal/text/serializer/types/table";
+import { ITitle } from "../../../internal/text/serializer/types/title";
+import { IImage } from "../../../internal/text/serializer/types/image";
 
 const styles = {
   linkTemplateOptionsBox: {
@@ -54,7 +56,7 @@ interface ITemplateOption {
   primary: boolean;
 };
 
-interface IMaterialUIWrapperElement extends ISlateEditorWrapperElementProps {
+export interface IMaterialUIWrapperElementProps extends ISlateEditorWrapperElementProps {
   /**
  * A generic error message
  */
@@ -85,6 +87,10 @@ function hasASelectedInlineOrBlock(state: ISlateEditorInternalStateType) {
     return true;
   }
 
+  return hasASelectedInline(state);
+}
+
+function hasASelectedInline(state: ISlateEditorInternalStateType) {
   const inline = state.currentSelectedInlineElement;
   if (inline && ((inline.type === "inline" && inline.textContent) || inline.type === "link") && !inline.uiHandler) {
     return true;
@@ -93,7 +99,7 @@ function hasASelectedInlineOrBlock(state: ISlateEditorInternalStateType) {
   return false;
 }
 
-function TextWrapper(props: IMaterialUIWrapperElement) {
+function TextWrapper(props: IMaterialUIWrapperElementProps) {
   const [textOptions, setTextOptions] = useState<ITemplateOption[]>([]);
 
   const updateTextContent = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
@@ -215,7 +221,7 @@ function TextWrapper(props: IMaterialUIWrapperElement) {
   );
 }
 
-function TdAndTh(props: IMaterialUIWrapperElement) {
+function TdAndTh(props: IMaterialUIWrapperElementProps) {
   const path = props.helpers.ReactEditor.findPath(props.helpers.editor, props.element);
   const parentPath = [...path];
   // tr
@@ -348,7 +354,7 @@ function TdAndTh(props: IMaterialUIWrapperElement) {
 
 export const materialUIElementWrappers: ISlateEditorElementWrappers = {
   components: {
-    link: (props: IMaterialUIWrapperElement) => {
+    link: (props: IMaterialUIWrapperElementProps) => {
       const [valid, setValid] = useState(true);
       const [linkOptions, setLinkOptions] = useState<ITemplateOption[]>([]);
 
@@ -499,7 +505,7 @@ export const materialUIElementWrappers: ISlateEditorElementWrappers = {
         </EditorDropdown>
       );
     },
-    video: (props: IMaterialUIWrapperElement) => {
+    video: (props: IMaterialUIWrapperElementProps) => {
       const [value, setValue] = useState(getVideoURL(props.element as IVideo));
       const [valid, setValid] = useState(true);
 
@@ -532,16 +538,108 @@ export const materialUIElementWrappers: ISlateEditorElementWrappers = {
         </EditorDropdown>
       );
     },
+    image: (props: IMaterialUIWrapperElementProps) => {
+      const [alt, setAlt] = useState((props.element as IImage).alt || "");
+
+      useEffect(() => {
+        setAlt((props.element as IImage).alt || "");
+      }, [props.element]);
+
+      const updateAlt = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
+        const path = props.helpers.ReactEditor.findPath(props.helpers.editor, props.element);
+        props.helpers.set({
+          alt: e.target.value || null,
+        } as any, path);
+        setAlt(e.target.value);
+      }, []);
+
+      return (
+        <EditorDropdown
+          dropdown={
+            <TextField
+              value={alt}
+              onChange={updateAlt}
+              label={props.i18nRichInfo.alt}
+              placeholder={props.i18nRichInfo.alt}
+              fullWidth={true}
+              sx={styles.whiteBackgroundInput}
+            />
+          }
+          componentWrapper="div"
+          goIntoTreeDepth={(props.element as IImage).standalone ? null : 1}
+          isOpen={props.isSelected}
+        >
+          {props.children}
+        </EditorDropdown>
+      );
+    },
     td: TdAndTh as any,
     th: TdAndTh as any,
-    inline: (props: IMaterialUIWrapperElement) => {
+    title: (props: IMaterialUIWrapperElementProps) => {
+      const isOpen = props.isSelected && !hasASelectedInline(props.helpers.getState());
+
+      const updateTitleType = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
+        const path = props.helpers.ReactEditor.findPath(props.helpers.editor, props.element);
+        props.helpers.set({
+          titleType: e.target.value || null,
+        } as any, path);
+      }, []);
+
+      return (
+        <EditorDropdown
+          componentWrapper="div"
+          isOpen={isOpen}
+          dropdown={
+            <FormControl fullWidth={true}>
+              <InputLabel
+                htmlFor="slate-wrapper-title-entry-id"
+                shrink={true}
+              >
+                {props.i18nRichInfo.type}
+              </InputLabel>
+              <Select
+                value={(props.element as ITitle).titleType || ""}
+                onChange={updateTitleType}
+                displayEmpty={true}
+                sx={styles.whiteBackgroundInput}
+                input={
+                  <FilledInput
+                    id="slate-wrapper-title-entry-id"
+                    placeholder={props.i18nRichInfo.type}
+                    fullWidth={true}
+                  />
+                }
+              >
+                {
+                  // render the valid values that we display and choose
+                  ["h1", "h2", "h3", "h4", "h5", "h6"].map((Element: any) => {
+                    return <MenuItem
+                      data-unblur="true"
+                      key={Element}
+                      value={Element}
+                    >
+                      <Element>
+                        {props.i18nRichInfo.title}
+                      </Element>
+                    </MenuItem>;
+                  })
+                }
+              </Select>
+            </FormControl>
+          }
+        >
+          {props.children}
+        </EditorDropdown>
+      ) as any;
+    },
+    inline: (props: IMaterialUIWrapperElementProps) => {
       if (typeof props.element.textContent !== "string") {
         return props.children;
       }
 
       return (<TextWrapper {...props} />) as any;
     },
-    container: (props: IMaterialUIWrapperElement) => {
+    container: (props: IMaterialUIWrapperElementProps) => {
       const updateContainerType = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
         const path = props.helpers.ReactEditor.findPath(props.helpers.editor, props.element);
         props.helpers.set({
