@@ -7,8 +7,9 @@
  * @module
  */
 
-import React from "react";
+import React, { RefObject } from "react";
 import { showRelevant } from "./AltScroller";
+import { AltPriorityShifterContext } from "./AltPriorityShifter"
 
 type VoidFn = (element: HTMLElement, triggerAltCycle: () => void) => void;
 
@@ -37,7 +38,7 @@ export interface IAltReactionerProps {
    * please use keycodes in lowercase, they need to be lowercase
    * 
    * avoid using arrowup, arrowright, arrowleft or arrowdown as they are used
-   * by the AltScroller component
+   * by the AltReactioner component
    */
   reactionKey: string;
   /**
@@ -55,10 +56,13 @@ export interface IAltReactionerProps {
    * and provides a numeric id that represents the next number caught
    * which shall be from 1 to 9
    * 
+   * the pluscount is a modifier represented by the + sign that specifies
+   * the need to press that key in order to get towards that option group
+   * 
    * higher numbers are possible but represent an accessibility flaw and cannot
    * truly be accessed
    */
-  onAmbiguousReaction: (id: number) => void;
+  onAmbiguousReaction: (isExpected: boolean, id: number, plusCount: number) => void;
   onAmbiguousClear: () => void;
   /**
    * whether it is currently disabled
@@ -77,10 +81,6 @@ export interface IAltReactionerProps {
    */
   groupPosition?: number;
   /**
-   * By default the element is not considered if it's not in view, use this to override that behaviour
-   */
-  allowHidden?: boolean;
-  /**
    * An alt label to use for screen reading purposes
    * for this action
    */
@@ -91,19 +91,20 @@ export interface IAltReactionerProps {
   triggerAltAfterAction?: boolean;
 }
 
-interface IAltReactionerState {
+interface IActualAltReactionerState {
   displayed: boolean;
 }
 
 const ALT_REGISTRY: {
-  [reactionKey: string]: AltReactioner[]
+  [reactionKey: string]: ActualAltReactioner[]
 } = {};
 
 let ALT_REGISTRY_IS_IN_DISPLAY_LAST = false;
 let ALT_REGISTRY_IS_WAITING_FOR_KEYCODES = false;
-let ALT_REGISTRY_AWAITING_KEYCODES: AltReactioner[] = [];
+let ALT_REGISTRY_AWAITING_KEYCODES: ActualAltReactioner[] = [];
+let ALT_REGISTRY_PREVIOUS_FOCUSED_ELEMENT: Element = null;
 
-function hideAll(butKeycodes: AltReactioner[] = []) {
+function hideAll(butKeycodes: ActualAltReactioner[] = []) {
   Object.keys(ALT_REGISTRY).forEach((reactionKey) => {
     ALT_REGISTRY[reactionKey].forEach((v) => !butKeycodes.includes(v) ? v.hide() : null);
   });
@@ -122,46 +123,89 @@ function hideAll(butKeycodes: AltReactioner[] = []) {
   }
 }
 
-function recalculateAllRelevant() {
-  if (ALT_REGISTRY_IS_WAITING_FOR_KEYCODES) {
-    hideAll();
-    showAllRelevant();
-  } else if (ALT_REGISTRY_IS_IN_DISPLAY_LAST) {
-    showAllRelevant();
-  }
-}
-
 function showAllRelevant() {
   // first lets find the potential max priority
   let priorityToUse = 0;
   Object.keys(ALT_REGISTRY).forEach((reactionKey) => {
     ALT_REGISTRY[reactionKey].forEach((v) => {
-      if (!v.isDisabled() && v.getPriority() > priorityToUse && v.isElementInView()) {
+      if (!v.isDisabled() && v.getPriority() > priorityToUse) {
         priorityToUse = v.getPriority();
       }
     });
   });
 
+  const results: {
+    [reactionKey: string]: ActualAltReactioner[]
+  } = {};
   Object.keys(ALT_REGISTRY).forEach((reactionKey) => {
     ALT_REGISTRY[reactionKey].forEach((v) => {
-      if (!v.isDisabled() && v.getPriority() === priorityToUse && v.isElementInView()) {
-        v.display();
+      if (!v.isDisabled() && v.getPriority() === priorityToUse) {
+        if (!results[reactionKey]) {
+          results[reactionKey] = [v]; 
+        } else {
+          results[reactionKey].push(v);
+        }
       } else if (v.isDisplayed()) {
         v.hide();
       }
     });
   });
+
+  Object.keys(results).forEach((reactionKey) => {
+    results[reactionKey].sort((a, b) => a.getGroupPosition() - b.getGroupPosition());
+    results[reactionKey].forEach((v, index, arr) => {
+      if (arr.length >= 2) {
+        let ambigousId = index % 9;
+        ambigousId++;
+        const plusCount = Math.floor(index / 9);
+        v.triggerAmbiguous(true, ambigousId, plusCount);
+      } else {
+        v.triggerAmbiguousClear();
+      }
+
+      v.display();
+    });
+  });
+
   ALT_REGISTRY_IS_IN_DISPLAY_LAST = true;
   ALT_REGISTRY_IS_WAITING_FOR_KEYCODES = false;
   ALT_REGISTRY_AWAITING_KEYCODES = [];
 }
 
 function triggerBasedOn(code: string, callbackIfmatch: () => void) {
+  // requesting for the remaining options on an overflown list
+  // this occurs if there are just too many options available
+  // so that the shortcut is overflown
+  if (
+    ALT_REGISTRY_AWAITING_KEYCODES &&
+    code === "+" &&
+    ALT_REGISTRY_AWAITING_KEYCODES.length > 9
+  ) {
+    const cancelledKeycodes = ALT_REGISTRY_AWAITING_KEYCODES.splice(0, 9);
+    cancelledKeycodes.forEach((k) => {
+      k.hide();
+      k.triggerAmbiguousClear();
+    });
+
+    ALT_REGISTRY_AWAITING_KEYCODES.forEach((v, index) => {
+      let ambigousId = index % 9;
+      ambigousId++;
+      const plusCount = Math.floor(index / 9);
+      v.triggerAmbiguous(false, ambigousId, plusCount);
+    });
+
+    callbackIfmatch();
+    showRelevant();
+
+    return;
+  }
+
   const value = ALT_REGISTRY_IS_WAITING_FOR_KEYCODES ?
     // can be nan if not a number but who minds that
     ALT_REGISTRY_AWAITING_KEYCODES[parseInt(code) - 1] :
     ALT_REGISTRY[code];
-  const matches: AltReactioner[] = []
+
+  const matches: ActualAltReactioner[] = []
   if (value) {
     if (Array.isArray(value)) {
       value.forEach((k) => {
@@ -187,7 +231,13 @@ function triggerBasedOn(code: string, callbackIfmatch: () => void) {
   } else {
     hideAll(matches);
     matches.sort((a, b) => a.getGroupPosition() - b.getGroupPosition());
-    matches.forEach((m, index) => m.triggerAmbiguous(index + 1));
+    matches.forEach((m, index) => {
+      let ambigousId = index % 9;
+      ambigousId++;
+      const plusCount = Math.floor(index / 9);
+      m.triggerAmbiguous(false, ambigousId, plusCount);
+    });
+    showRelevant();
   }
 }
 
@@ -230,9 +280,6 @@ if (typeof document !== "undefined") {
   window.addEventListener("resize", () => {
     hideAll();
   });
-  window.addEventListener("scroll", () => {
-    recalculateAllRelevant();
-  }, true);
   window.addEventListener("mousedown", () => {
     hideAll();
   });
@@ -241,7 +288,7 @@ if (typeof document !== "undefined") {
   });
 }
 
-export default class AltReactioner extends React.PureComponent<IAltReactionerProps, IAltReactionerState> {
+export class ActualAltReactioner extends React.PureComponent<IAltReactionerProps, IActualAltReactionerState> {
   private containerRef: React.RefObject<HTMLElement>;
 
   constructor(props: IAltReactionerProps) {
@@ -318,25 +365,6 @@ export default class AltReactioner extends React.PureComponent<IAltReactionerPro
     return this.props.disabled || false;
   }
 
-  public isElementInView() {
-    const element = this.getElement();
-    if (!element) {
-      return false;
-    }
-
-    if (this.props.allowHidden) {
-      return true;
-    }
-
-    const bounding = element.getBoundingClientRect();
-    return (
-      bounding.top >= 0 &&
-      bounding.left >= 0 &&
-      bounding.right <= (window.innerWidth || document.documentElement.clientWidth) &&
-      bounding.bottom <= (window.innerHeight || document.documentElement.clientHeight)
-    );
-  }
-
   public getElement() {
     if (!this.containerRef.current) {
       return null;
@@ -368,8 +396,8 @@ export default class AltReactioner extends React.PureComponent<IAltReactionerPro
     return this.props.groupPosition || Number.MAX_SAFE_INTEGER;
   }
 
-  public triggerAmbiguous(id: number) {
-    return this.props.onAmbiguousReaction(id)
+  public triggerAmbiguous(expected: boolean, id: number, plusCount: number) {
+    return this.props.onAmbiguousReaction(expected, id, plusCount)
   }
 
   public triggerAmbiguousClear() {
@@ -411,3 +439,17 @@ export default class AltReactioner extends React.PureComponent<IAltReactionerPro
     );
   }
 }
+
+const AltReactioner = React.forwardRef((props: IAltReactionerProps, ref: RefObject<ActualAltReactioner>) => {
+  return (
+    <AltPriorityShifterContext.Consumer>
+      {(v) => {
+        return (
+          <ActualAltReactioner {...props} priority={(props.priority || 0) + v} ref={ref}/>
+        );
+      }}
+    </AltPriorityShifterContext.Consumer>
+  );
+});
+
+export default AltReactioner;

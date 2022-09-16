@@ -68,7 +68,7 @@ export function OutdatedDialog(props: IOutdatedDialogProps) {
                 },
               ]}
             >
-              {(needsUpdateTitle: string, needsUpdateContent: string, needsUpdateAction: string) => {
+              {(needsUpdateTitle, needsUpdateContent, needsUpdateAction) => {
                 return (
                   <DialogResponsive
                     title={needsUpdateTitle}
@@ -77,7 +77,6 @@ export function OutdatedDialog(props: IOutdatedDialogProps) {
                     buttons={
                       <Button
                         color="primary"
-                        aria-label={needsUpdateAction}
                         startIcon={<UpdateIcon />}
                         onClick={reloadApp}
                       >

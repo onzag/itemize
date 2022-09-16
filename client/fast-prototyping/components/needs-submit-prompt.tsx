@@ -18,6 +18,7 @@ import Button from "@mui/material/Button";
 import Typography from "@mui/material/Typography";
 import CloseIcon from "@mui/icons-material/Close";
 import DoneIcon from "@mui/icons-material/Done";
+import I18nRead from "../../components/localization/I18nRead";
 
 interface NeedsSubmitDialogProps {
   open: boolean;
@@ -79,10 +80,10 @@ class NeedsSubmitDialog extends React.PureComponent<NeedsSubmitDialogProps> {
       </Typography>
       {
         this.props.confirmationCallbackError ?
-        <Typography variant="body2" sx={needsSubmitDialogStyle.error}>
-          <I18nReadError error={this.props.confirmationCallbackError} capitalize={true}/>
-        </Typography> :
-        null
+          <Typography variant="body2" sx={needsSubmitDialogStyle.error}>
+            <I18nReadError error={this.props.confirmationCallbackError} capitalize={true} />
+          </Typography> :
+          null
       }
     </Dialog>
   }
@@ -131,42 +132,42 @@ interface NeedsSubmitPromptProps {
 export class NeedsSubmitPrompt extends React.PureComponent<NeedsSubmitPromptProps> {
   public render() {
     return (
-      <I18nReadMany
-        data={[
-          {
-            id: this.props.i18nMessage || "unsaved_changes",
-            capitalize: true,
-          },
-          {
-            id: this.props.i18nTitle || "generic_warning",
-            capitalize: true,
-          },
-          {
-            id: this.props.i18nConfirm || "save",
-            capitalize: true,
-          },
-          {
-            id: this.props.i18nDiscard || "discard",
-            capitalize: true
-          }
-        ]}
-      >
-        {(message: string, title: string, confirm: string, discard: string) => (
-          <ONeedsSubmitPrompt
-            properties={this.props.properties}
-            includes={this.props.includes}
-            confirmationSubmitOptions={this.props.confirmationSubmitOptions}
-            beforeUnloadMessage={message}
-            dialogArgs={{
-              message,
-              title,
-              confirm,
-              discard,
-            }}
-            Dialog={NeedsSubmitDialog}
-          ></ONeedsSubmitPrompt>
+      <I18nRead id={this.props.i18nMessage || "unsaved_changes"} capitalize={true}>
+        {(message: string) => (
+          <I18nReadMany
+            data={[
+              {
+                id: this.props.i18nTitle || "generic_warning",
+                capitalize: true,
+              },
+              {
+                id: this.props.i18nConfirm || "save",
+                capitalize: true,
+              },
+              {
+                id: this.props.i18nDiscard || "discard",
+                capitalize: true
+              }
+            ]}
+          >
+            {(title, confirm, discard) => (
+              <ONeedsSubmitPrompt
+                properties={this.props.properties}
+                includes={this.props.includes}
+                confirmationSubmitOptions={this.props.confirmationSubmitOptions}
+                beforeUnloadMessage={message}
+                dialogArgs={{
+                  message,
+                  title,
+                  confirm,
+                  discard,
+                }}
+                Dialog={NeedsSubmitDialog}
+              ></ONeedsSubmitPrompt>
+            )}
+          </I18nReadMany>
         )}
-      </I18nReadMany>
+      </I18nRead>
     )
   }
 }

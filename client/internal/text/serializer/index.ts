@@ -1258,7 +1258,11 @@ function internalNormalizeElement(
     }
 
     const cannotHaveTextAsChildren = (
-      SERIALIZATION_REGISTRY.SUPERBLOCKS[type] ||
+      (
+        SERIALIZATION_REGISTRY.SUPERBLOCKS[type] &&
+        // prevent deleting text in void superblocks
+        !SERIALIZATION_REGISTRY.VOIDS[type]
+      ) ||
       SERIALIZATION_REGISTRY.PROHIBIT_TEXT[type]
     );
 

@@ -1,4 +1,5 @@
-import React from "react";
+import React, { RefObject } from "react";
+import { AltPriorityShifterContext } from "./AltPriorityShifter";
 
 interface IAltScrollerProps {
   /**
@@ -26,7 +27,7 @@ interface IAltScrollerProps {
   children: (isScrolling: boolean, scrollDirections?: { up: boolean; left: boolean; right: boolean; down: boolean }) => React.ReactNode;
 }
 
-interface IAltScrollerState {
+interface IActualAltScrollerState {
   isScrolling: boolean;
   canScrollTop: boolean;
   canScrollLeft: boolean;
@@ -34,7 +35,7 @@ interface IAltScrollerState {
   canScrollBottom: boolean;
 }
 
-const ALT_SREGISTRY: AltScroller[] = [];
+const ALT_SREGISTRY: ActualAltScroller[] = [];
 
 let ALT_SREGISTRY_IS_IN_DISPLAY_LAST = false;
 
@@ -64,7 +65,7 @@ const converts = {
 
 export function showRelevant() {
   // first lets find the potential max priority
-  let scrollerToTrigger: AltScroller = null as any;
+  let scrollerToTrigger: ActualAltScroller = null as any;
   ALT_SREGISTRY.forEach((v) => {
     if (!v.isDisabled() && (!scrollerToTrigger || v.getPriority() >= scrollerToTrigger.getPriority())) {
       scrollerToTrigger = v;
@@ -130,7 +131,7 @@ if (typeof document !== "undefined") {
   }, true);
 }
 
-export default class AltScroller extends React.PureComponent<IAltScrollerProps, IAltScrollerState> {
+export class ActualAltScroller extends React.PureComponent<IAltScrollerProps, IActualAltScrollerState> {
   private spanRef: React.RefObject<HTMLSpanElement>;
   constructor(props: IAltScrollerProps) {
     super(props);
@@ -258,3 +259,17 @@ export default class AltScroller extends React.PureComponent<IAltScrollerProps, 
     );
   }
 }
+
+const AltScroller = React.forwardRef((props: IAltScrollerProps, ref: RefObject<ActualAltScroller>) => {
+  return (
+    <AltPriorityShifterContext.Consumer>
+      {(v) => {
+        return (
+          <ActualAltScroller {...props} priority={(props.priority || 0) + v} ref={ref}/>
+        );
+      }}
+    </AltPriorityShifterContext.Consumer>
+  );
+});
+
+export default AltScroller;

@@ -1891,6 +1891,7 @@ export class SlateEditor extends React.Component<ISlateEditorProps, ISlateEditor
       // and we insert a clone based on the block itself
       // with no text
       Transforms.insertNodes(this.editor, {
+        type: "paragraph" as any,
         ...this.state.currentBlockElement,
         uiHandler: null,
         uiHandlerArgs: null,

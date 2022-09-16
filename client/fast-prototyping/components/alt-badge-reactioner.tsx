@@ -1,5 +1,5 @@
 import Badge from "@mui/material/Badge";
-import React, { useEffect, useState } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import AltReactioner from "../../components/accessibility/AltReactioner";
 
 const style = {
@@ -63,6 +63,11 @@ interface IAltBadgeReactionerProps {
    */
   reactionKey: string;
   /**
+   * An alternative label to use instead of the reaction key
+   * for example, reaction key may be escape, but keyboard says esc
+   */
+  label?: string;
+  /**
    * The action to be executed, by default it will click the component, other actions are focus
    * otherwise pass a function for a custom action
    * 
@@ -88,15 +93,6 @@ interface IAltBadgeReactionerProps {
    */
   priority?: number;
   /**
-   * The label that is related to the reactionKey
-   * if no label is provided the reaction key will be used as a label
-   */
-  label?: string;
-  /**
- * By default the element is not considered if it's not in view, use this to override that behaviour
- */
-  allowHidden?: boolean;
-  /**
    * A positioning within the group in order to solve ambiguous reactions, the lowest
    * it will be used for sorting, use it if you expect ambigous values
    */
@@ -118,13 +114,27 @@ interface IAltBadgeReactionerProps {
 export function AltBadgeReactioner(
   props: IAltBadgeReactionerProps,
 ): any {
-  const [ambigousId, setAmbiguousId] = useState(null as number);
+  const [ambigousIdPlusCount, setAmbiguousIdPlusCount] = useState(null as [boolean, number, number]);
+
+  const onAmbiguousReaction = useCallback((expected: boolean, id: number, plusCount: number) => {
+    setAmbiguousIdPlusCount([expected, id, plusCount]);
+  }, []);
 
   const reactionerProps = { ...props } as any;
   reactionerProps.children = (displayed: boolean) => {
+    let content = props.label || props.reactionKey;
+    
+    if (ambigousIdPlusCount) {
+      if (!ambigousIdPlusCount[0]) {
+        content = "";
+      }
+
+      content += "+".repeat(ambigousIdPlusCount[2]) + ambigousIdPlusCount[1].toString();
+    }
+
     return (
       <Badge
-        badgeContent={((ambigousId && ambigousId.toString()) || props.label || props.reactionKey).toUpperCase()}
+        badgeContent={content.toUpperCase()}
         color={(props.colorSchema || "default") === "default" ? "primary" : "default"}
         sx={
           [
@@ -140,5 +150,11 @@ export function AltBadgeReactioner(
     );
   }
 
-  return <AltReactioner {...reactionerProps} onAmbiguousReaction={setAmbiguousId} onAmbiguousClear={setAmbiguousId.bind(null, null)} />
+  return (
+    <AltReactioner
+      {...reactionerProps}
+      onAmbiguousReaction={onAmbiguousReaction}
+      onAmbiguousClear={setAmbiguousIdPlusCount.bind(null, null)}
+    />
+  );
 }

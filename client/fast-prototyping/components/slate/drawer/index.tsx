@@ -101,6 +101,7 @@ export function WrapperDrawer(props: IDrawerContainerProps) {
                         priority={2}
                         disabled={!props.state.currentSelectedElement}
                         selectorGoUp={1}
+                        triggerAltAfterAction={true}
                       >
                         <SettingsIcon />
                       </AltBadgeReactioner>
@@ -121,6 +122,7 @@ export function WrapperDrawer(props: IDrawerContainerProps) {
                               priority={2}
                               disabled={!props.state.currentSelectedElement}
                               selectorGoUp={1}
+                              triggerAltAfterAction={true}
                             >
                               <BorderStyleIcon />
                             </AltBadgeReactioner>
@@ -142,6 +144,7 @@ export function WrapperDrawer(props: IDrawerContainerProps) {
                               priority={2}
                               disabled={!props.state.currentSelectedElement}
                               selectorGoUp={1}
+                              triggerAltAfterAction={true}
                             >
                               <WebIcon />
                             </AltBadgeReactioner>
@@ -163,6 +166,7 @@ export function WrapperDrawer(props: IDrawerContainerProps) {
                               priority={2}
                               disabled={!props.state.currentSelectedElement}
                               selectorGoUp={1}
+                              triggerAltAfterAction={true}
                             >
                               <TouchAppIcon />
                             </AltBadgeReactioner>

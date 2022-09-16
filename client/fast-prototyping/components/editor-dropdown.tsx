@@ -14,13 +14,13 @@ const styles = {
   },
   dropdown: {
     padding: "0.5rem 1rem",
-    backgroundColor: "#eee",
+    backgroundColor: "rgba(240, 240, 240, 0.9)",
     border: "solid 1px #ccc",
     width: "300px",
   },
   dropdownSizable: {
     padding: "0.5rem 1rem",
-    backgroundColor: "#eee",
+    backgroundColor: "rgba(240, 240, 240, 0.9)",
     border: "solid 1px #ccc",
   },
   linkTemplateOptionsBox: {

@@ -1,10 +1,11 @@
 import Box from "@mui/material/Box";
 import React, { useCallback, useEffect, useRef, useState } from "react";
-import AltScroller from "../../components/accessibility/AltScroller";
+import AltScroller, { ActualAltScroller } from "../../components/accessibility/AltScroller";
 import ArrowUpwardIcon from '@mui/icons-material/ArrowUpward';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import ArrowDownwardIcon from '@mui/icons-material/ArrowDownward';
 import ArrowForwardIcon from '@mui/icons-material/ArrowForward';
+import ReactDOM from "react-dom";
 
 const style = {
   overlayContainer: {
@@ -104,32 +105,39 @@ interface IAltSectionScrollerProps {
    * usable if you use it in conjuction with disabled
    */
   priority?: number;
+  /**
+   * Whether to use a portal, only truly relevant when
+   * its position is fixed or dynamic fixed
+   */
+  usePortal?: boolean;
 }
 
 export function AltSectionScroller(
   props: IAltSectionScrollerProps,
 ): any {
-  const scrollerRef = useRef<AltScroller>();
+  const scrollerRef = useRef<ActualAltScroller>();
 
   const [fixedPos, setPos] = useState<[number, number]>(null);
 
   const updateDynamicPos = useCallback(() => {
     // we wait because react may not have things ready yet on mount
     setTimeout(() => {
-      let element = scrollerRef.current.getScrollableComponent();
+      if (scrollerRef.current) {
+        let element = scrollerRef.current.getScrollableComponent();
 
-      const boundingRect = element.getBoundingClientRect();
+        const boundingRect = element.getBoundingClientRect();
+    
+        let centerX = boundingRect.x + boundingRect.width / 2;
+        let centerY = boundingRect.y + boundingRect.height / 2;
   
-      let centerX = boundingRect.x + boundingRect.width / 2;
-      let centerY = boundingRect.y + boundingRect.height / 2;
-
-      if (props.dyamicFixedCalculator) {
-        [centerX, centerY] = props.dyamicFixedCalculator(element, centerX, centerY)
+        if (props.dyamicFixedCalculator) {
+          [centerX, centerY] = props.dyamicFixedCalculator(element, centerX, centerY)
+        }
+  
+        setPos([centerX, centerY]);
       }
-
-      setPos([centerX, centerY]);
     }, 70);
-  }, []);
+  }, [scrollerRef]);
 
   useEffect(() => {
     if (props.positioning === "dynamic-fixed") {
@@ -150,8 +158,12 @@ export function AltSectionScroller(
       {...props}
       ref={scrollerRef}
     >
-      {(scrolling, direction) => (
-        !scrolling ? null : (
+      {(scrolling, direction) => {
+        if (!scrolling) {
+          return null;
+        }
+
+        const element = (
           <Box
             sx={
               [
@@ -219,8 +231,14 @@ export function AltSectionScroller(
               <ArrowForwardIcon sx={direction.right ? style.available : null} />
             </Box> : null}
           </Box>
-        )
-      )}
+        );
+
+        if (!props.usePortal) {
+          return element;
+        } else {
+          return ReactDOM.createPortal(element, document.body);
+        }
+      }}
     </AltScroller>
   );
 }

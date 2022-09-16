@@ -54,7 +54,7 @@ export function ExternalDialogs() {
             { id: description, capitalize: true },
             { id: "ok", capitalize: true }
           ]}>
-            {(i18nTitle: string, i18nDescription: string, ok: string) => {
+            {(i18nTitle, i18nDescription, ok) => {
               return (
                 <DialogResponsive
                   title={i18nTitle}
@@ -63,7 +63,6 @@ export function ExternalDialogs() {
                   buttons={
                     <Button
                       color="primary"
-                      aria-label={ok}
                       startIcon={<DoneIcon />}
                       onClick={clear}
                     >

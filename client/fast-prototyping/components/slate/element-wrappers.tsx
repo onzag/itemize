@@ -19,6 +19,7 @@ import { EditorDropdown } from "../editor-dropdown";
 import { ITable } from "../../../internal/text/serializer/types/table";
 import { ITitle } from "../../../internal/text/serializer/types/title";
 import { IImage } from "../../../internal/text/serializer/types/image";
+import { AltBadgeReactioner } from "../alt-badge-reactioner";
 
 const styles = {
   linkTemplateOptionsBox: {
@@ -179,41 +180,50 @@ function TextWrapper(props: IMaterialUIWrapperElementProps) {
       componentWrapper="span"
       isOpen={props.isSelected}
       dropdown={
-        <FormControl fullWidth={true}>
-          <InputLabel
-            htmlFor="slate-wrapper-template-entry-id"
-            shrink={true}
-          >
-            {props.i18nRichInfo.addTemplateText.label}
-          </InputLabel>
-          <Select
-            value={props.element.textContent}
-            onChange={updateTextContent}
-            sx={styles.whiteBackgroundInput}
-            input={
-              <FilledInput
-                id="slate-wrapper-template-entry-id"
-                placeholder={props.i18nRichInfo.addTemplateText.placeholder}
-                fullWidth={true}
-              />
-            }
-          >
-            {
-              // render the valid values that we display and choose
-              textOptions.map((vv) => {
-                // the i18n value from the i18n data
-                return <MenuItem
-                  data-unblur="true"
-                  key={vv.value}
-                  value={vv.value}
-                  sx={vv.primary ? styles.optionPrimary : null}
-                >{
-                    typeof vv.label == "string" ? vv.label : vv.label()
-                  }</MenuItem>;
-              })
-            }
-          </Select>
-        </FormControl>
+        <AltBadgeReactioner
+          reactionKey="t"
+          priority={1}
+          groupPosition={999}
+          selector="div[tabindex]"
+          action="focus"
+          fullWidth={true}
+        >
+          <FormControl fullWidth={true}>
+            <InputLabel
+              htmlFor="slate-wrapper-template-entry-id"
+              shrink={true}
+            >
+              {props.i18nRichInfo.addTemplateText.label}
+            </InputLabel>
+            <Select
+              value={props.element.textContent}
+              onChange={updateTextContent}
+              sx={styles.whiteBackgroundInput}
+              input={
+                <FilledInput
+                  id="slate-wrapper-template-entry-id"
+                  placeholder={props.i18nRichInfo.addTemplateText.placeholder}
+                  fullWidth={true}
+                />
+              }
+            >
+              {
+                // render the valid values that we display and choose
+                textOptions.map((vv) => {
+                  // the i18n value from the i18n data
+                  return <MenuItem
+                    data-unblur="true"
+                    key={vv.value}
+                    value={vv.value}
+                    sx={vv.primary ? styles.optionPrimary : null}
+                  >{
+                      typeof vv.label == "string" ? vv.label : vv.label()
+                    }</MenuItem>;
+                })
+              }
+            </Select>
+          </FormControl>
+        </AltBadgeReactioner>
       }
     >
       {props.children}
@@ -269,78 +279,114 @@ function TdAndTh(props: IMaterialUIWrapperElementProps) {
         dropdown={
           <>
             {props.featureSupport.availableTables.length ? (
-              <FormControl>
-                <InputLabel
-                  htmlFor="slate-wrapper-table-entry-id"
-                  shrink={true}
-                >
-                  {props.i18nRichInfo.type}
-                </InputLabel>
-                <Select
-                  value={tableType}
-                  onChange={updateTableType}
-                  displayEmpty={true}
-                  sx={[styles.whiteBackgroundInput, styles.fixedWidthInput]}
-                  input={
-                    <FilledInput
-                      id="slate-wrapper-table-entry-id"
-                      placeholder={props.i18nRichInfo.type}
-                    />
-                  }
-                >
-                  <MenuItem value="" data-unblur="true">
-                    <em>{" - "}</em>
-                  </MenuItem>
-                  {
-                    // render the valid values that we display and choose
-                    props.featureSupport.availableTables.map((vv) => {
-                      // the i18n value from the i18n data
-                      return <MenuItem
-                        data-unblur="true"
-                        key={vv.value}
-                        value={vv.value}
-                      >{
-                          vv.label
-                        }</MenuItem>;
-                    })
-                  }
-                </Select>
-              </FormControl>
+              <AltBadgeReactioner
+                reactionKey="t"
+                priority={1}
+                groupPosition={999}
+                selector="div[tabindex]"
+                action="focus"
+              >
+                <FormControl>
+                  <InputLabel
+                    htmlFor="slate-wrapper-table-entry-id"
+                    shrink={true}
+                  >
+                    {props.i18nRichInfo.type}
+                  </InputLabel>
+                  <Select
+                    value={tableType}
+                    onChange={updateTableType}
+                    displayEmpty={true}
+                    sx={[styles.whiteBackgroundInput, styles.fixedWidthInput]}
+                    input={
+                      <FilledInput
+                        id="slate-wrapper-table-entry-id"
+                        placeholder={props.i18nRichInfo.type}
+                      />
+                    }
+                  >
+                    <MenuItem value="" data-unblur="true">
+                      <em>{" - "}</em>
+                    </MenuItem>
+                    {
+                      // render the valid values that we display and choose
+                      props.featureSupport.availableTables.map((vv) => {
+                        // the i18n value from the i18n data
+                        return <MenuItem
+                          data-unblur="true"
+                          key={vv.value}
+                          value={vv.value}
+                        >{
+                            vv.label
+                          }</MenuItem>;
+                      })
+                    }
+                  </Select>
+                </FormControl>
+              </AltBadgeReactioner>
             ) : null}
-            <IconButton
-              tabIndex={-1}
-              title={props.i18nRichInfo.formatAddTdLabel}
-              onClick={props.helpers.insertTableColumn}
-              size="large">
-              <ViewWeekIcon />
-            </IconButton>
-            <IconButton
-              tabIndex={-1}
-              title={props.i18nRichInfo.formatAddTrLabel}
-              onClick={props.helpers.insertTableRow}
-              size="large">
-              <TableRowsIcon />
-            </IconButton>
-            <IconButton
-              tabIndex={-1}
-              title={props.i18nRichInfo.formatAddThLabel}
-              onClick={props.helpers.toggleTable.bind(null, "thead")}
-              disabled={!props.helpers.canToggleTable("thead")}
-              size="large"
-              color={props.element.type === "th" ? "primary" : "default"}
+            <AltBadgeReactioner
+              reactionKey="c"
+              priority={1}
+              groupPosition={1000}
+              selector="button"
             >
-              <CreditCardIcon />
-            </IconButton>
-            <IconButton
-              tabIndex={-1}
-              title={props.i18nRichInfo.formatAddTfootLabel}
-              onClick={props.helpers.toggleTable.bind(null, "tfoot")}
-              disabled={!props.helpers.canToggleTable("tfoot")}
-              size="large"
-              color={parentTheadOrTbodyOrTfoot.type === "tfoot" ? "primary" : "default"}
+              <IconButton
+                tabIndex={-1}
+                title={props.i18nRichInfo.formatAddTdLabel}
+                onClick={props.helpers.insertTableColumn}
+                size="large">
+                <ViewWeekIcon />
+              </IconButton>
+            </AltBadgeReactioner>
+            <AltBadgeReactioner
+              reactionKey="r"
+              priority={1}
+              groupPosition={1001}
+              selector="button"
             >
-              <CreditCardIcon sx={styles.upsideDown} />
-            </IconButton>
+              <IconButton
+                tabIndex={-1}
+                title={props.i18nRichInfo.formatAddTrLabel}
+                onClick={props.helpers.insertTableRow}
+                size="large">
+                <TableRowsIcon />
+              </IconButton>
+            </AltBadgeReactioner>
+            <AltBadgeReactioner
+              reactionKey="h"
+              priority={1}
+              groupPosition={1002}
+              selector="button"
+            >
+              <IconButton
+                tabIndex={-1}
+                title={props.i18nRichInfo.formatAddThLabel}
+                onClick={props.helpers.toggleTable.bind(null, "thead")}
+                disabled={!props.helpers.canToggleTable("thead")}
+                size="large"
+                color={props.element.type === "th" ? "primary" : "default"}
+              >
+                <CreditCardIcon />
+              </IconButton>
+            </AltBadgeReactioner>
+            <AltBadgeReactioner
+              reactionKey="f"
+              priority={1}
+              groupPosition={1003}
+              selector="button"
+            >
+              <IconButton
+                tabIndex={-1}
+                title={props.i18nRichInfo.formatAddTfootLabel}
+                onClick={props.helpers.toggleTable.bind(null, "tfoot")}
+                disabled={!props.helpers.canToggleTable("tfoot")}
+                size="large"
+                color={parentTheadOrTbodyOrTfoot.type === "tfoot" ? "primary" : "default"}
+              >
+                <CreditCardIcon sx={styles.upsideDown} />
+              </IconButton>
+            </AltBadgeReactioner>
           </>
         }
         isOpen={props.isSelected}
@@ -440,61 +486,81 @@ export const materialUIElementWrappers: ISlateEditorElementWrappers = {
           isOpen={props.isSelected}
           dropdown={
             <>
-              <TextField
-                value={(props.element as ILink).href || ""}
-                onChange={updateElementHref}
-                label={props.i18nRichInfo.setLink.label}
+              <AltBadgeReactioner
+                reactionKey="h"
+                priority={1}
+                groupPosition={999}
+                selector="input"
+                action="focus"
                 disabled={!!(props.element as ILink).thref}
-                placeholder={
-                  props.featureSupport.supportsExternalLinks ?
-                    props.i18nRichInfo.setLink.placeholder :
-                    props.i18nRichInfo.setLink.placeholderLocalOnly
-                }
                 fullWidth={true}
-                sx={!(props.element as ILink).thref ? styles.whiteBackgroundInput : null}
-              />
+              >
+                <TextField
+                  value={(props.element as ILink).href || ""}
+                  onChange={updateElementHref}
+                  label={props.i18nRichInfo.setLink.label}
+                  disabled={!!(props.element as ILink).thref}
+                  placeholder={
+                    props.featureSupport.supportsExternalLinks ?
+                      props.i18nRichInfo.setLink.placeholder :
+                      props.i18nRichInfo.setLink.placeholderLocalOnly
+                  }
+                  fullWidth={true}
+                  tabIndex={-1}
+                  sx={!(props.element as ILink).thref ? styles.whiteBackgroundInput : null}
+                />
+              </AltBadgeReactioner>
               {
                 linkOptions.length ?
                   <Box sx={styles.linkTemplateOptionsBox}>
                     <Box sx={styles.linkTemplateOptionsText}>{props.i18nRichInfo.setLink.templated}</Box>
-                    <FormControl>
-                      <InputLabel
-                        htmlFor="slate-wrapper-template-entry-id"
-                        shrink={true}
-                      >
-                        {props.i18nRichInfo.setLink.templatedLabel}
-                      </InputLabel>
-                      <Select
-                        value={(props.element as ILink).thref || ""}
-                        onChange={updateElementTHref}
-                        displayEmpty={true}
-                        sx={styles.whiteBackgroundInput}
-                        input={
-                          <FilledInput
-                            id="slate-wrapper-template-entry-id"
-                            placeholder={props.i18nRichInfo.setLink.templatedPlaceholder}
-                          />
-                        }
-                      >
-                        <MenuItem value="" data-unblur="true">
-                          <em>{props.i18nRichInfo.setLink.templatedUnspecified}</em>
-                        </MenuItem>
-                        {
-                          // render the valid values that we display and choose
-                          linkOptions.map((vv) => {
-                            // the i18n value from the i18n data
-                            return <MenuItem
-                              data-unblur="true"
-                              key={vv.value}
-                              value={vv.value}
-                              sx={vv.primary ? styles.optionPrimary : null}
-                            >{
-                                typeof vv.label == "string" ? vv.label : vv.label()
-                              }</MenuItem>;
-                          })
-                        }
-                      </Select>
-                    </FormControl>
+                    <AltBadgeReactioner
+                      reactionKey="t"
+                      priority={1}
+                      groupPosition={1000}
+                      selector="div[tabindex]"
+                      action="focus"
+                      fullWidth={true}
+                    >
+                      <FormControl>
+                        <InputLabel
+                          htmlFor="slate-wrapper-template-entry-id"
+                          shrink={true}
+                        >
+                          {props.i18nRichInfo.setLink.templatedLabel}
+                        </InputLabel>
+                        <Select
+                          value={(props.element as ILink).thref || ""}
+                          onChange={updateElementTHref}
+                          displayEmpty={true}
+                          sx={styles.whiteBackgroundInput}
+                          input={
+                            <FilledInput
+                              id="slate-wrapper-template-entry-id"
+                              placeholder={props.i18nRichInfo.setLink.templatedPlaceholder}
+                            />
+                          }
+                        >
+                          <MenuItem value="" data-unblur="true">
+                            <em>{props.i18nRichInfo.setLink.templatedUnspecified}</em>
+                          </MenuItem>
+                          {
+                            // render the valid values that we display and choose
+                            linkOptions.map((vv) => {
+                              // the i18n value from the i18n data
+                              return <MenuItem
+                                data-unblur="true"
+                                key={vv.value}
+                                value={vv.value}
+                                sx={vv.primary ? styles.optionPrimary : null}
+                              >{
+                                  typeof vv.label == "string" ? vv.label : vv.label()
+                                }</MenuItem>;
+                            })
+                          }
+                        </Select>
+                      </FormControl>
+                    </AltBadgeReactioner>
                   </Box> :
                   null
               }
@@ -521,14 +587,24 @@ export const materialUIElementWrappers: ISlateEditorElementWrappers = {
       return (
         <EditorDropdown
           dropdown={
-            <TextField
-              value={value}
-              onChange={updateVideoURL}
-              label={props.i18nRichInfo.loadVideo.label}
-              placeholder={props.i18nRichInfo.loadVideo.placeholder}
+            <AltBadgeReactioner
+              reactionKey="u"
+              priority={1}
+              groupPosition={999}
+              selector="input"
+              action="focus"
               fullWidth={true}
-              sx={styles.whiteBackgroundInput}
-            />
+            >
+              <TextField
+                value={value}
+                onChange={updateVideoURL}
+                label={props.i18nRichInfo.loadVideo.label}
+                placeholder={props.i18nRichInfo.loadVideo.placeholder}
+                fullWidth={true}
+                sx={styles.whiteBackgroundInput}
+                tabIndex={-1}
+              />
+            </AltBadgeReactioner>
           }
           componentWrapper="div"
           goIntoTreeDepth={1}
@@ -556,14 +632,24 @@ export const materialUIElementWrappers: ISlateEditorElementWrappers = {
       return (
         <EditorDropdown
           dropdown={
-            <TextField
-              value={alt}
-              onChange={updateAlt}
-              label={props.i18nRichInfo.alt}
-              placeholder={props.i18nRichInfo.alt}
+            <AltBadgeReactioner
+              reactionKey="a"
+              priority={1}
+              groupPosition={999}
+              selector="input"
+              action="focus"
               fullWidth={true}
-              sx={styles.whiteBackgroundInput}
-            />
+            >
+              <TextField
+                value={alt}
+                onChange={updateAlt}
+                label={props.i18nRichInfo.alt}
+                placeholder={props.i18nRichInfo.alt}
+                fullWidth={true}
+                sx={styles.whiteBackgroundInput}
+                tabIndex={-1}
+              />
+            </AltBadgeReactioner>
           }
           componentWrapper="div"
           goIntoTreeDepth={(props.element as IImage).standalone ? null : 1}
@@ -590,42 +676,51 @@ export const materialUIElementWrappers: ISlateEditorElementWrappers = {
           componentWrapper="div"
           isOpen={isOpen}
           dropdown={
-            <FormControl fullWidth={true}>
-              <InputLabel
-                htmlFor="slate-wrapper-title-entry-id"
-                shrink={true}
-              >
-                {props.i18nRichInfo.type}
-              </InputLabel>
-              <Select
-                value={(props.element as ITitle).titleType || ""}
-                onChange={updateTitleType}
-                displayEmpty={true}
-                sx={styles.whiteBackgroundInput}
-                input={
-                  <FilledInput
-                    id="slate-wrapper-title-entry-id"
-                    placeholder={props.i18nRichInfo.type}
-                    fullWidth={true}
-                  />
-                }
-              >
-                {
-                  // render the valid values that we display and choose
-                  ["h1", "h2", "h3", "h4", "h5", "h6"].map((Element: any) => {
-                    return <MenuItem
-                      data-unblur="true"
-                      key={Element}
-                      value={Element}
-                    >
-                      <Element>
-                        {props.i18nRichInfo.title}
-                      </Element>
-                    </MenuItem>;
-                  })
-                }
-              </Select>
-            </FormControl>
+            <AltBadgeReactioner
+              reactionKey="t"
+              priority={1}
+              groupPosition={999}
+              selector="div[tabindex]"
+              action="focus"
+              fullWidth={true}
+            >
+              <FormControl fullWidth={true}>
+                <InputLabel
+                  htmlFor="slate-wrapper-title-entry-id"
+                  shrink={true}
+                >
+                  {props.i18nRichInfo.type}
+                </InputLabel>
+                <Select
+                  value={(props.element as ITitle).titleType || ""}
+                  onChange={updateTitleType}
+                  displayEmpty={true}
+                  sx={styles.whiteBackgroundInput}
+                  input={
+                    <FilledInput
+                      id="slate-wrapper-title-entry-id"
+                      placeholder={props.i18nRichInfo.type}
+                      fullWidth={true}
+                    />
+                  }
+                >
+                  {
+                    // render the valid values that we display and choose
+                    ["h1", "h2", "h3", "h4", "h5", "h6"].map((Element: any) => {
+                      return <MenuItem
+                        data-unblur="true"
+                        key={Element}
+                        value={Element}
+                      >
+                        <Element>
+                          {props.i18nRichInfo.title}
+                        </Element>
+                      </MenuItem>;
+                    })
+                  }
+                </Select>
+              </FormControl>
+            </AltBadgeReactioner>
           }
         >
           {props.children}
@@ -658,44 +753,53 @@ export const materialUIElementWrappers: ISlateEditorElementWrappers = {
           componentWrapper="span"
           isOpen={isOpen}
           dropdown={
-            <FormControl fullWidth={true}>
-              <InputLabel
-                htmlFor="slate-wrapper-container-entry-id"
-                shrink={true}
-              >
-                {props.i18nRichInfo.type}
-              </InputLabel>
-              <Select
-                value={(props.element as IContainer).containerType || ""}
-                onChange={updateContainerType}
-                displayEmpty={true}
-                sx={styles.whiteBackgroundInput}
-                input={
-                  <FilledInput
-                    id="slate-wrapper-container-entry-id"
-                    placeholder={props.i18nRichInfo.type}
-                    fullWidth={true}
-                  />
-                }
-              >
-                <MenuItem value="" data-unblur="true">
-                  <em>{" - "}</em>
-                </MenuItem>
-                {
-                  // render the valid values that we display and choose
-                  props.featureSupport.availableContainers.map((vv) => {
-                    // the i18n value from the i18n data
-                    return <MenuItem
-                      data-unblur="true"
-                      key={vv.value}
-                      value={vv.value}
-                    >{
-                        vv.label
-                      }</MenuItem>;
-                  })
-                }
-              </Select>
-            </FormControl>
+            <AltBadgeReactioner
+              reactionKey="t"
+              priority={1}
+              groupPosition={999}
+              selector="div[tabindex]"
+              action="focus"
+              fullWidth={true}
+            >
+              <FormControl fullWidth={true}>
+                <InputLabel
+                  htmlFor="slate-wrapper-container-entry-id"
+                  shrink={true}
+                >
+                  {props.i18nRichInfo.type}
+                </InputLabel>
+                <Select
+                  value={(props.element as IContainer).containerType || ""}
+                  onChange={updateContainerType}
+                  displayEmpty={true}
+                  sx={styles.whiteBackgroundInput}
+                  input={
+                    <FilledInput
+                      id="slate-wrapper-container-entry-id"
+                      placeholder={props.i18nRichInfo.type}
+                      fullWidth={true}
+                    />
+                  }
+                >
+                  <MenuItem value="" data-unblur="true">
+                    <em>{" - "}</em>
+                  </MenuItem>
+                  {
+                    // render the valid values that we display and choose
+                    props.featureSupport.availableContainers.map((vv) => {
+                      // the i18n value from the i18n data
+                      return <MenuItem
+                        data-unblur="true"
+                        key={vv.value}
+                        value={vv.value}
+                      >{
+                          vv.label
+                        }</MenuItem>;
+                    })
+                  }
+                </Select>
+              </FormControl>
+            </AltBadgeReactioner>
           }
         >
           {props.children}

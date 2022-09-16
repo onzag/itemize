@@ -229,10 +229,12 @@ class SingleAction extends React.PureComponent<ISingleActionProps, ISingleAction
                 <FilledInput
                   id={"slate-wrapper-action-entry-for-" + this.props.name}
                   placeholder={this.props.name}
+                  tabIndex={-1}
                 />
               }
               onOpen={this.unblur}
               onClose={this.resetBlur}
+              tabIndex={-1}
             >
               <MenuItem value="">
                 <em>{" - "}</em>

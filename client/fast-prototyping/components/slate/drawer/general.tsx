@@ -9,6 +9,7 @@ import React, { useCallback, useEffect, useRef, useState } from "react";
 import { IDrawerContainerProps } from "../wrapper";
 import TextField from "@mui/material/TextField";
 import Box from "@mui/material/Box";
+import { AltBadgeReactioner } from "../../alt-badge-reactioner";
 
 const style = {
   box: {
@@ -47,14 +48,22 @@ export function GeneralOptions(props: IDrawerContainerProps) {
   // and return
   return (
     <Box sx={style.box}>
-      <TextField
-        value={name}
-        label={props.i18nRichInfo.name}
-        placeholder={props.i18nRichInfo.name}
-        variant="filled"
-        onChange={updateName}
+      <AltBadgeReactioner
+        action="focus"
+        reactionKey={props.i18nRichInfo.name[0]}
+        priority={2}
+        selector="input"
         fullWidth={true}
-      />
+      >
+        <TextField
+          value={name}
+          label={props.i18nRichInfo.name}
+          placeholder={props.i18nRichInfo.name}
+          variant="filled"
+          onChange={updateName}
+          fullWidth={true}
+        />
+      </AltBadgeReactioner>
       {
         props.drawerExtras ? (
           props.drawerExtras.map((v, i) => {
