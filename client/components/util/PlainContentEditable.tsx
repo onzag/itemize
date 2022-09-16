@@ -52,14 +52,14 @@ export default class PlainContentEditable extends React.Component<IPlainContentE
       }
     }
 
-    if (nextProps.children !== this.props.children) {
+    if (nextProps.children !== this.elemRef.current.textContent) {
       this.elemRef.current.textContent = nextProps.children;
     }
 
     return false;
   }
   public render() {
-    const Element: any = this.props.as || "span";
+    const Element: any = this.props.as || "span";
     return (
       <Element
         className={this.props.className}
