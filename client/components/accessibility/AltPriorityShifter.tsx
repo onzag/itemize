@@ -14,9 +14,13 @@ export default class AltPriorityShifter extends React.PureComponent<IAltPriority
 
   render() {
     return (
-      <AltPriorityShifterContext.Provider value={this.props.amount}>
-        {this.props.children}
-      </AltPriorityShifterContext.Provider>
+      <AltPriorityShifterContext.Consumer>
+        {(v) => (
+          <AltPriorityShifterContext.Provider value={this.props.amount + v}>
+            {this.props.children}
+          </AltPriorityShifterContext.Provider>
+        )}
+      </AltPriorityShifterContext.Consumer>
     )
   }
 }

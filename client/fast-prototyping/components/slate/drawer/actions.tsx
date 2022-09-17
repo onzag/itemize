@@ -210,7 +210,7 @@ class SingleAction extends React.PureComponent<ISingleActionProps, ISingleAction
         <AltBadgeReactioner
           action="focus"
           reactionKey={this.props.name[0]}
-          priority={2}
+          priority={3}
           selector="div[tabindex]"
           fullWidth={true}
           groupPosition={this.props.groupIndex + 10}
@@ -234,12 +234,10 @@ class SingleAction extends React.PureComponent<ISingleActionProps, ISingleAction
                 <FilledInput
                   id={"slate-wrapper-action-entry-for-" + this.props.name}
                   placeholder={this.props.name}
-                  tabIndex={-1}
                 />
               }
               onOpen={this.unblur}
               onClose={this.resetBlur}
-              tabIndex={-1}
             >
               <MenuItem value="">
                 <em>{" - "}</em>

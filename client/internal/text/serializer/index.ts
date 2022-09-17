@@ -1684,7 +1684,9 @@ function normalizeAccordingToUIHAndlerRules(
     const currentNodePath = [...path, actualIndex];
     const isIgnored = isIgnoredNode(currentNodePath, specialRules);
 
-    if (isIgnored) {
+    if (isIgnored || !currentNode) {
+      // I don't know why sometimes it randomly offsets offs
+      // the chrome debugger keeps crashing when I try to debug why
       continue;
     }
 

@@ -99,6 +99,9 @@ if (typeof document !== "undefined") {
   document.addEventListener("keydown", (e) => {
     // ignore these two
     if (e.key === "Shift" || e.key === "Tab") {
+      if (e.key === "Tab" && !ALT_SREGISTRY_IS_IN_DISPLAY_LAST) {
+        showRelevant();
+      }
       return;
     }
 

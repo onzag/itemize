@@ -51,7 +51,7 @@ export function GeneralOptions(props: IDrawerContainerProps) {
       <AltBadgeReactioner
         action="focus"
         reactionKey={props.i18nRichInfo.name[0]}
-        priority={2}
+        priority={3}
         selector="input"
         fullWidth={true}
         groupPosition={9}

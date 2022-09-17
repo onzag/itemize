@@ -21,6 +21,7 @@ import Typography from "@mui/material/Typography";
 import { getInfoFor } from "../../../../internal/text/serializer";
 import { AltBadgeReactioner } from "../../alt-badge-reactioner";
 import { AltSectionScroller } from "../../alt-section-scroller";
+import AltPriorityShifter from "../../../../components/accessibility/AltPriorityShifter";
 
 const style = {
   tab: {
@@ -45,11 +46,26 @@ export function WrapperDrawer(props: IDrawerContainerProps) {
   // ever render in the server side, it's client side only, it's always technically closed
   // on the server side
   const [location, setLocation] = useState(localStorage.getItem("SLATE_DRAWER_LAST_LOCATION") || "MAIN");
+  const [accessibilitySelectedOption, useAccessibilitySelectedOption] = useState(null as string);
+
+  useEffect(() => {
+    if (!props.drawerOpen) {
+      console.log("EFFECT NULL");
+      useAccessibilitySelectedOption(null);
+    }
+  }, [props.drawerOpen]);
+
+  console.log("SELECTED", accessibilitySelectedOption);
 
   // update the given location
   const setLocationCallback = useCallback((e: React.ChangeEvent, value: string) => {
     localStorage.setItem("SLATE_DRAWER_LAST_LOCATION", value);
+    useAccessibilitySelectedOption(value);
     setLocation(value);
+  }, []);
+
+  const forceOnClickEvent = useCallback((e: React.MouseEvent<HTMLElement>) => {
+    useAccessibilitySelectedOption((e.target as HTMLElement).dataset.value);
   }, []);
 
   // now we need to build the settings
@@ -92,7 +108,24 @@ export function WrapperDrawer(props: IDrawerContainerProps) {
           !selectedNodeInfo.isText ?
             (
               <>
-                <Tabs value={location} onChange={setLocationCallback}>
+                <AltBadgeReactioner
+                  reactionKey="escape"
+                  label="esc"
+                  priority={3}
+                  disabled={!accessibilitySelectedOption}
+                  triggerAltAfterAction={true}
+                  groupPosition={1}
+                  fullWidth={true}
+                  tabbable={false}
+                  selector="div"
+                >
+                  <div onClick={useAccessibilitySelectedOption.bind(null, null)}/>
+                </AltBadgeReactioner>
+                <Tabs
+                  value={location}
+                  onChange={setLocationCallback}
+                  onClick={forceOnClickEvent}
+                >
                   <Tab
                     sx={style.tab}
                     label={
@@ -108,6 +141,7 @@ export function WrapperDrawer(props: IDrawerContainerProps) {
                       </AltBadgeReactioner>
                     }
                     value="MAIN"
+                    data-value="MAIN"
                     title={props.i18nRichInfo.settings}
                   />
 
@@ -117,6 +151,7 @@ export function WrapperDrawer(props: IDrawerContainerProps) {
 
                         <Tab
                           sx={style.tab}
+                          data-value="STYLES"
                           label={
                             <AltBadgeReactioner
                               reactionKey="s"
@@ -153,6 +188,7 @@ export function WrapperDrawer(props: IDrawerContainerProps) {
                             </AltBadgeReactioner>
                           }
                           value="TEMPLATING"
+                          data-value="TEMPLATING"
                           title={props.i18nRichInfo.templating}
                         />
                       ) :
@@ -176,6 +212,7 @@ export function WrapperDrawer(props: IDrawerContainerProps) {
                             </AltBadgeReactioner>
                           }
                           value="ACTIONS"
+                          data-value="ACTIONS"
                           title={props.i18nRichInfo.actions}
                         />
                       ) :
@@ -185,7 +222,9 @@ export function WrapperDrawer(props: IDrawerContainerProps) {
               </>
             ) : null
         }
-        {infoPanel}
+        <AltPriorityShifter amount={!accessibilitySelectedOption ? -100 : 0}>
+          {infoPanel}
+        </AltPriorityShifter>
       </>
     );
   }
@@ -195,7 +234,7 @@ export function WrapperDrawer(props: IDrawerContainerProps) {
     <>
       <Typography sx={style.elementTitle} variant="h6">{titleForNode}</Typography>
       {settingsForNode}
-      <AltSectionScroller priority={1} positioning="absolute"/>
+      <AltSectionScroller priority={1} positioning="absolute" />
     </>
   );
 }

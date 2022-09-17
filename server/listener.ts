@@ -708,7 +708,11 @@ export class Listener {
       request.id,
       request.version,
     );
-    if (!this.listeners[socket.id].listens[mergedIndexIdentifier]) {
+
+    // socket disconnected during process
+    if (!this.listeners[socket.id]) {
+      return;
+    } else if (!this.listeners[socket.id].listens[mergedIndexIdentifier]) {
       CAN_LOG_DEBUG && logger.debug(
         {
           className: "Listener",
@@ -838,7 +842,10 @@ export class Listener {
       request.createdBy,
     );
 
-    if (!listenerData.listens[mergedIndexIdentifier]) {
+    // socket disconnected during process
+    if (!this.listeners[socket.id]) {
+      return;
+    } else if (!listenerData.listens[mergedIndexIdentifier]) {
       CAN_LOG_DEBUG && logger.debug(
         {
           className: "Listener",
@@ -1148,7 +1155,10 @@ export class Listener {
       request.parentId,
       request.parentVersion,
     );
-    if (!this.listeners[socket.id].listens[mergedIndexIdentifier]) {
+    // socket disconnected during process
+    if (!this.listeners[socket.id]) {
+      return;
+    } else if (!this.listeners[socket.id].listens[mergedIndexIdentifier]) {
       CAN_LOG_DEBUG && logger.debug(
         {
           className: "Listener",
@@ -1283,7 +1293,10 @@ export class Listener {
       request.parentType, request.parentId,
       request.parentVersion,
     );
-    if (!this.listeners[socket.id].listens[mergedIndexIdentifier]) {
+    // socket disconnected during process
+    if (!this.listeners[socket.id]) {
+      return;
+    } else if (!this.listeners[socket.id].listens[mergedIndexIdentifier]) {
       CAN_LOG_DEBUG && logger.debug(
         {
           className: "Listener",

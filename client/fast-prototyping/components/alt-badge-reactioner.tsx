@@ -31,12 +31,6 @@ const style = {
       display: "none",
     }
   },
-  focused: {
-    "& .MuiBadge-badge": {
-      fontWeight: 900,
-      border: "solid 1px #222",
-    }
-  },
 }
 
 type VoidFn = (element: HTMLElement, triggerAltCycle: () => void) => void;
@@ -80,10 +74,8 @@ interface IAltBadgeReactionerProps {
    * 
    * focus will focus the element
    * click will click the element
-   * none will do nothing
-   * a function
    */
-  action?: "focus" | "click" | "none" | VoidFn;
+  action?: "focus" | "click";
   /**
    * What color to use
    */
@@ -119,6 +111,10 @@ interface IAltBadgeReactionerProps {
    * custom sx for the badge
    */
   sx?: SxProps<Theme>;
+  /**
+   * whether the element can be tabbed
+   */
+  tabbable?: boolean;
 }
 
 export function AltBadgeReactioner(
@@ -131,7 +127,7 @@ export function AltBadgeReactioner(
   }, []);
 
   const reactionerProps = { ...props } as any;
-  reactionerProps.children = (displayed: boolean, pseudoFocused: boolean) => {
+  reactionerProps.children = (displayed: boolean) => {
     let content = props.label || props.reactionKey;
     
     if (ambigousIdPlusCount) {
@@ -155,7 +151,6 @@ export function AltBadgeReactioner(
             props.useTransform ? style.transformed : null,
             props.fullWidth ? style.fullWidth : null,
             displayed ? null : style.hidden,
-            pseudoFocused ? style.focused : null,
           ].concat(Array.isArray(props.sx) ? props.sx as any : [props.sx] as any)
         }
       >

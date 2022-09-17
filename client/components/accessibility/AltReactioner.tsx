@@ -11,13 +11,11 @@ import React, { RefObject } from "react";
 import { showRelevant } from "./AltScroller";
 import { AltPriorityShifterContext } from "./AltPriorityShifter"
 
-type VoidFn = (element: HTMLElement, triggerAltCycle: () => void) => void;
-
 export interface IAltReactionerProps {
   /**
    * The children that is to be rendered inside
    */
-  children: (displayed: boolean, pseudoFocus: boolean) => React.ReactNode;
+  children: (displayed: boolean) => React.ReactNode;
   /**
    * The wrapping component to use, by default it will use a div
    */
@@ -47,10 +45,8 @@ export interface IAltReactionerProps {
    * 
    * focus will focus the element
    * click will click the element
-   * none will do nothing
-   * a function
    */
-  action?: "focus" | "click" | "none" | VoidFn;
+  action?: "focus" | "click"
   /**
    * Triggers when two reactions with the same id are found
    * and provides a numeric id that represents the next number caught
@@ -84,11 +80,16 @@ export interface IAltReactionerProps {
    * will trigger a new input reaction after it has been completed
    */
   triggerAltAfterAction?: boolean;
+  /**
+   * when you press the tab button and want to wrap around
+   * elements, use this to specify whether the component is tabbable
+   * and can be focused via the tab key
+   */
+  tabbable?: boolean;
 }
 
 interface IActualAltReactionerState {
   displayed: boolean;
-  pseudoFocused: boolean;
 }
 
 const ALT_REGISTRY: {
@@ -97,22 +98,27 @@ const ALT_REGISTRY: {
 
 let ALT_REGISTRY_IS_IN_DISPLAY_LAST = false;
 let ALT_REGISTRY_IS_IN_DISPLAY_ELEMENTS: ActualAltReactioner[] = [];
-let ALT_REGISTRY_IS_IN_DISPLAY_ELEMENTS_FOCUS_INDEX: number = -1; 
+let ALT_REGISTRY_IS_IN_DISPLAY_ELEMENTS_FOCUS_INDEX: number = -1;
 let ALT_REGISTRY_IS_IN_DISPLAY_PRIORITY: number = null;
 let ALT_REGISTRY_IS_WAITING_FOR_KEYCODES = false;
 let ALT_REGISTRY_AWAITING_KEYCODES: ActualAltReactioner[] = [];
 let ALT_REGISTRY_AWAITING_KEYCODES_FOCUS_INDEX: number = -1;
-let ALT_REGISTRY_LAST_FOCUSED_SIGNATURE: {[priorityKey: number]: string} = {};
+let ALT_REGISTRY_LAST_FOCUSED_SIGNATURE: { [priorityKey: number]: string } = {};
 
 function hideAll(butKeycodes: ActualAltReactioner[] = []) {
   Object.keys(ALT_REGISTRY).forEach((reactionKey) => {
-    ALT_REGISTRY[reactionKey].forEach((v) => !butKeycodes.includes(v) ? v.hide() : null);
+    ALT_REGISTRY[reactionKey].forEach((v) => {
+      if (!butKeycodes.includes(v)) {
+        v.hide();
+      }
+    });
   });
 
   ALT_REGISTRY_AWAITING_KEYCODES.forEach((v) => {
     v.triggerAmbiguousClear();
   });
 
+  // clear everything we don't enter keycodes mode
   if (!butKeycodes.length) {
     ALT_REGISTRY_IS_IN_DISPLAY_LAST = false;
     ALT_REGISTRY_IS_IN_DISPLAY_ELEMENTS = [];
@@ -122,13 +128,10 @@ function hideAll(butKeycodes: ActualAltReactioner[] = []) {
     ALT_REGISTRY_AWAITING_KEYCODES = [];
     ALT_REGISTRY_AWAITING_KEYCODES_FOCUS_INDEX = -1;
   } else {
+    // enter keycodes mode
     ALT_REGISTRY_IS_WAITING_FOR_KEYCODES = true;
     ALT_REGISTRY_AWAITING_KEYCODES = butKeycodes;
-    ALT_REGISTRY_AWAITING_KEYCODES_FOCUS_INDEX = 0;
-
-    butKeycodes[0].pseudoFocus();
-
-    // TODO screen reader thingy
+    ALT_REGISTRY_AWAITING_KEYCODES_FOCUS_INDEX = -1;
   }
 }
 
@@ -150,7 +153,7 @@ function showAllRelevant() {
     ALT_REGISTRY[reactionKey].forEach((v) => {
       if (!v.isDisabled() && v.getPriority() === priorityToUse) {
         if (!results[reactionKey]) {
-          results[reactionKey] = [v]; 
+          results[reactionKey] = [v];
         } else {
           results[reactionKey].push(v);
         }
@@ -160,8 +163,6 @@ function showAllRelevant() {
     });
   });
 
-  const lastFocusedForPriority = ALT_REGISTRY_LAST_FOCUSED_SIGNATURE[priorityToUse] || null;
-  let foundAPseudoFocusMatch: ActualAltReactioner = null;
   const displayElements: ActualAltReactioner[] = [];
   Object.keys(results).forEach((reactionKey) => {
     results[reactionKey].sort((a, b) => a.getGroupPosition() - b.getGroupPosition());
@@ -175,77 +176,107 @@ function showAllRelevant() {
         v.triggerAmbiguousClear();
       }
 
-      const shouldBePseudoFocused = !foundAPseudoFocusMatch && v.getSignature() === lastFocusedForPriority;
-      if (shouldBePseudoFocused) {
-        foundAPseudoFocusMatch = v;
-      }
-      v.display(shouldBePseudoFocused);
+      v.display();
       displayElements.push(v);
     });
   });
 
   displayElements.sort((a, b) => a.getGroupPosition() - b.getGroupPosition());
-  const startingPositionElement = displayElements[0];
-
-  if (!foundAPseudoFocusMatch && startingPositionElement) {
-    foundAPseudoFocusMatch = startingPositionElement;
-    foundAPseudoFocusMatch.pseudoFocus();
-  }
-
-  if (foundAPseudoFocusMatch) {
-    // TODO screen reader interaction
-  }
 
   ALT_REGISTRY_IS_IN_DISPLAY_LAST = true;
   ALT_REGISTRY_IS_IN_DISPLAY_ELEMENTS = displayElements;
   ALT_REGISTRY_IS_IN_DISPLAY_PRIORITY = priorityToUse;
-  ALT_REGISTRY_IS_IN_DISPLAY_ELEMENTS_FOCUS_INDEX = !foundAPseudoFocusMatch ? -1 : (displayElements.findIndex((v) => v === foundAPseudoFocusMatch));
+  ALT_REGISTRY_IS_IN_DISPLAY_ELEMENTS_FOCUS_INDEX = -1;
   ALT_REGISTRY_IS_WAITING_FOR_KEYCODES = false;
   ALT_REGISTRY_AWAITING_KEYCODES = [];
 }
 
-function triggerBasedOn(code: string, shiftKey: boolean,callbackIfmatch: () => void) {
+function triggerBasedOn(code: string, shiftKey: boolean, callbackIfmatch: () => void) {
   if (code === "shift") {
     return;
   } else if (code === "tab") {
     if (ALT_REGISTRY_IS_WAITING_FOR_KEYCODES) {
       const len = ALT_REGISTRY_AWAITING_KEYCODES.length;
-      const nextIndex = ((ALT_REGISTRY_AWAITING_KEYCODES_FOCUS_INDEX + len + (!shiftKey ? 1 : -1))) % len;
-      const currentElement = ALT_REGISTRY_AWAITING_KEYCODES[ALT_REGISTRY_AWAITING_KEYCODES_FOCUS_INDEX];
-      currentElement.pseudoBlur();
-      const nextElement = ALT_REGISTRY_AWAITING_KEYCODES[nextIndex];
-      nextElement.pseudoFocus();
+      let nextIndex = ((ALT_REGISTRY_AWAITING_KEYCODES_FOCUS_INDEX + len + (!shiftKey ? 1 : -1))) % len;
+
+      if (ALT_REGISTRY_AWAITING_KEYCODES_FOCUS_INDEX === -1) {
+        const potentialNextIndex =
+          ALT_REGISTRY_AWAITING_KEYCODES.findIndex((e) => e.getSignature() === ALT_REGISTRY_LAST_FOCUSED_SIGNATURE[ALT_REGISTRY_IS_IN_DISPLAY_PRIORITY]);
+        if (potentialNextIndex !== -1) {
+          nextIndex = potentialNextIndex;
+        } else {
+          nextIndex = 0;
+        }
+      }
+
+      // make sure that there are tabbable components not to enter an infinite loop
+      if (!ALT_REGISTRY_AWAITING_KEYCODES.some((e) => e.isTabbale())) {
+        // break it and stop it now
+        callbackIfmatch();
+        return;
+      }
+
+      let nextElement = ALT_REGISTRY_AWAITING_KEYCODES[nextIndex];
+      while (!nextElement.isTabbale()) {
+        nextIndex = ((nextIndex + len + (!shiftKey ? 1 : -1))) % len;
+        nextElement = ALT_REGISTRY_AWAITING_KEYCODES[nextIndex];
+      }
+      // the index should be fine now and pointing to the next tabbable component
+
+      nextElement.focus();
+      if (!nextElement.isElementInView()) {
+        nextElement.getElement().scrollIntoView({ behavior: "smooth" });
+      }
       ALT_REGISTRY_AWAITING_KEYCODES_FOCUS_INDEX = nextIndex;
       ALT_REGISTRY_LAST_FOCUSED_SIGNATURE[ALT_REGISTRY_IS_IN_DISPLAY_PRIORITY] = nextElement.getSignature();
     } else {
       const len = ALT_REGISTRY_IS_IN_DISPLAY_ELEMENTS.length;
-      const nextIndex = ((ALT_REGISTRY_IS_IN_DISPLAY_ELEMENTS_FOCUS_INDEX + len + (!shiftKey ? 1 : -1))) % len;
-      const currentElement = ALT_REGISTRY_IS_IN_DISPLAY_ELEMENTS[ALT_REGISTRY_IS_IN_DISPLAY_ELEMENTS_FOCUS_INDEX];
-      currentElement.pseudoBlur();
-      const nextElement = ALT_REGISTRY_IS_IN_DISPLAY_ELEMENTS[nextIndex];
-      nextElement.pseudoFocus();
+      let nextIndex = ((ALT_REGISTRY_IS_IN_DISPLAY_ELEMENTS_FOCUS_INDEX + len + (!shiftKey ? 1 : -1))) % len;
+
+      if (ALT_REGISTRY_IS_IN_DISPLAY_ELEMENTS_FOCUS_INDEX === -1) {
+        // let's check if we are already focused in one of the elements that are relevant
+        // so we can go directly to the next one
+        const alreadyFocusedAtIndex =
+          ALT_REGISTRY_IS_IN_DISPLAY_ELEMENTS.findIndex((e) => e.isTabbale() && e.getElement() === document.activeElement);
+
+        if (alreadyFocusedAtIndex !== -1) {
+          nextIndex = ((alreadyFocusedAtIndex + len + (!shiftKey ? 1 : -1))) % len;
+        } else {
+          // this is for first time focus or when we have pressed tab and none of the potential elements
+          // are active in our list
+          const potentialNextIndex =
+            ALT_REGISTRY_IS_IN_DISPLAY_ELEMENTS.findIndex((e) => e.getSignature() === ALT_REGISTRY_LAST_FOCUSED_SIGNATURE[ALT_REGISTRY_IS_IN_DISPLAY_PRIORITY]);
+          if (potentialNextIndex !== -1) {
+            nextIndex = potentialNextIndex;
+          } else {
+            nextIndex = 0;
+          }
+        }
+      }
+
+      // make sure that there are tabbable components not to enter an infinite loop
+      if (!ALT_REGISTRY_IS_IN_DISPLAY_ELEMENTS.some((e) => e.isTabbale())) {
+        // break it and stop it now
+        callbackIfmatch();
+        return;
+      }
+
+      let nextElement = ALT_REGISTRY_IS_IN_DISPLAY_ELEMENTS[nextIndex];
+      while (!nextElement.isTabbale()) {
+        nextIndex = ((nextIndex + len + (!shiftKey ? 1 : -1))) % len;
+        nextElement = ALT_REGISTRY_IS_IN_DISPLAY_ELEMENTS[nextIndex];
+      }
+      // the index should be fine now and pointing to the next tabbable component
+
+      nextElement.focus();
+      if (!nextElement.isElementInView()) {
+        nextElement.getElement().scrollIntoView({ behavior: "smooth" });
+      }
       ALT_REGISTRY_IS_IN_DISPLAY_ELEMENTS_FOCUS_INDEX = nextIndex;
       ALT_REGISTRY_LAST_FOCUSED_SIGNATURE[ALT_REGISTRY_IS_IN_DISPLAY_PRIORITY] = nextElement.getSignature();
     }
 
     callbackIfmatch();
-    // TODO screen reader interaction
-    return;
-  }
-
-  if (code === " ") {
-    let match: ActualAltReactioner = null;
-    if (ALT_REGISTRY_IS_WAITING_FOR_KEYCODES) {
-      match = ALT_REGISTRY_AWAITING_KEYCODES[ALT_REGISTRY_AWAITING_KEYCODES_FOCUS_INDEX];
-    } else {
-      match = ALT_REGISTRY_IS_IN_DISPLAY_ELEMENTS[ALT_REGISTRY_IS_IN_DISPLAY_ELEMENTS_FOCUS_INDEX];
-    }
-
-    callbackIfmatch();
-    hideAll();
-    match.trigger();
-
-    // TODO screen reader interaction
     return;
   }
 
@@ -272,8 +303,20 @@ function triggerBasedOn(code: string, shiftKey: boolean,callbackIfmatch: () => v
 
     callbackIfmatch();
     showRelevant();
-
     return;
+  }
+
+  if (
+    code === "enter" ||
+    code === " "
+  ) {
+    const relatedActiveElement = ALT_REGISTRY_IS_IN_DISPLAY_ELEMENTS.find((v) => v.getElement() === document.activeElement);
+    if (relatedActiveElement && relatedActiveElement.props.action !== "focus") {
+      callbackIfmatch();
+      hideAll();
+      relatedActiveElement.trigger(true);
+      return;
+    }
   }
 
   const value = ALT_REGISTRY_IS_WAITING_FOR_KEYCODES ?
@@ -302,8 +345,9 @@ function triggerBasedOn(code: string, shiftKey: boolean,callbackIfmatch: () => v
 
   // one or zero matches
   if (matches.length <= 1) {
+    const isTabNavigatingCurrent = !!ALT_REGISTRY_IS_IN_DISPLAY_ELEMENTS.find((v) => v.getElement() === document.activeElement);
     hideAll();
-    matches.forEach((m) => m.trigger());
+    matches.forEach((m) => m.trigger(isTabNavigatingCurrent));
   } else {
     matches.sort((a, b) => a.getGroupPosition() - b.getGroupPosition());
     hideAll(matches);
@@ -337,14 +381,22 @@ if (typeof document !== "undefined") {
     const keyCode = e.key.toLowerCase();
     const isArrow = arrows.includes(keyCode);
     const isAltKey = e.altKey;
+    const isTab = keyCode === "tab";
 
     const isPureAltKey = isAltKey && keyCode === "alt";
 
-    if (isPureAltKey) {
+    if (isPureAltKey || (!ALT_REGISTRY_IS_IN_DISPLAY_LAST && isTab)) {
       if (ALT_REGISTRY_IS_IN_DISPLAY_LAST) {
         hideAll();
       } else {
         showAllRelevant();
+
+        if (isTab) {
+          triggerBasedOn(keyCode, e.shiftKey, () => {
+            e.stopPropagation();
+            e.preventDefault();
+          });
+        }
       }
     } else if (!isArrow && (isAltKey || ALT_REGISTRY_IS_IN_DISPLAY_LAST)) {
       // if a match is found we want to prevent the default action
@@ -373,12 +425,15 @@ export class ActualAltReactioner extends React.PureComponent<IAltReactionerProps
 
     this.state = {
       displayed: false,
-      pseudoFocused: false,
     }
 
     this.containerRef = React.createRef<HTMLElement>();
 
     this.triggerAltCycle = this.triggerAltCycle.bind(this);
+  }
+
+  public isTabbale() {
+    return typeof this.props.tabbable === "boolean" ? this.props.tabbable : true;
   }
 
   public unregister(props: IAltReactionerProps = this.props) {
@@ -388,6 +443,28 @@ export class ActualAltReactioner extends React.PureComponent<IAltReactionerProps
         ALT_REGISTRY[props.reactionKey].splice(index, 1);
       }
     }
+
+    // HANDLE DISSAPEARING ELEMENTS IN THE MIDDLE OF THE ACTION
+    // THIS SHOULDNT HAPPEN BUT CAN HAPPEN IF MISDESIGNED
+    // WHICH CAN CAUSE AN ISSUE WHEN THE REACTIONER TRIES TO FOCUS
+    // THINGS THAT DONT EXIST
+    const index2 = ALT_REGISTRY_IS_IN_DISPLAY_ELEMENTS.findIndex((e) => e === this);
+    if (index2 !== -1) {
+      // this can be undefined because of -1
+      const currentSelectedElem = ALT_REGISTRY_IS_IN_DISPLAY_ELEMENTS[ALT_REGISTRY_IS_IN_DISPLAY_ELEMENTS_FOCUS_INDEX];
+      ALT_REGISTRY_IS_IN_DISPLAY_ELEMENTS.splice(index2, 1);
+      // but we are okay with that because that will give a -1 back here
+      ALT_REGISTRY_IS_IN_DISPLAY_ELEMENTS_FOCUS_INDEX = ALT_REGISTRY_IS_IN_DISPLAY_ELEMENTS.findIndex((e) => e === currentSelectedElem);
+    }
+
+    const index3 = ALT_REGISTRY_AWAITING_KEYCODES.findIndex((e) => e === this);
+    if (index3 !== -1) {
+      // this can be undefined because of -1
+      const currentSelectedElem = ALT_REGISTRY_AWAITING_KEYCODES[ALT_REGISTRY_AWAITING_KEYCODES_FOCUS_INDEX];
+      ALT_REGISTRY_AWAITING_KEYCODES.splice(index3, 1);
+      // but we are okay with that because that will give a -1 back here
+      ALT_REGISTRY_AWAITING_KEYCODES_FOCUS_INDEX = ALT_REGISTRY_AWAITING_KEYCODES.findIndex((e) => e === currentSelectedElem);
+    }
   }
 
   public register(props: IAltReactionerProps = this.props) {
@@ -395,6 +472,17 @@ export class ActualAltReactioner extends React.PureComponent<IAltReactionerProps
       ALT_REGISTRY[props.reactionKey] = [this];
     } else if (!ALT_REGISTRY[props.reactionKey].includes(this)) {
       ALT_REGISTRY[props.reactionKey].push(this);
+    }
+
+    if (
+      ALT_REGISTRY_IS_IN_DISPLAY_LAST &&
+      !ALT_REGISTRY_IS_WAITING_FOR_KEYCODES &&
+      ALT_REGISTRY_IS_IN_DISPLAY_PRIORITY === (props.priority || 0) &&
+      !ALT_REGISTRY_IS_IN_DISPLAY_ELEMENTS.includes(this)
+    ) {
+      ALT_REGISTRY_IS_IN_DISPLAY_ELEMENTS.push(this);
+      ALT_REGISTRY_IS_IN_DISPLAY_ELEMENTS.sort((a, b) => a.getGroupPosition() - b.getGroupPosition());
+      this.display();
     }
   }
 
@@ -406,12 +494,11 @@ export class ActualAltReactioner extends React.PureComponent<IAltReactionerProps
     if (this.state.displayed && this.props.disabled) {
       this.setState({
         displayed: false,
-        pseudoFocused: false,
       });
     }
 
     if (this.props.reactionKey !== prevProps.reactionKey) {
-      this.unregister();
+      this.unregister(prevProps);
       this.register();
     }
   }
@@ -420,11 +507,10 @@ export class ActualAltReactioner extends React.PureComponent<IAltReactionerProps
     this.unregister();
   }
 
-  public display(pseudoFocused: boolean) {
-    if (!this.state.displayed || this.state.pseudoFocused !== pseudoFocused) {
+  public display() {
+    if (!this.state.displayed) {
       this.setState({
         displayed: true,
-        pseudoFocused: pseudoFocused,
       });
     }
   }
@@ -433,13 +519,8 @@ export class ActualAltReactioner extends React.PureComponent<IAltReactionerProps
     if (this.state.displayed) {
       this.setState({
         displayed: false,
-        pseudoFocused: false,
       });
     }
-  }
-
-  public isPseudoFocused() {
-    return this.state.pseudoFocused;
   }
 
   public getPriority() {
@@ -448,6 +529,21 @@ export class ActualAltReactioner extends React.PureComponent<IAltReactionerProps
 
   public isDisabled() {
     return this.props.disabled || false;
+  }
+
+  public isElementInView() {
+    const element = this.getElement();
+    if (!element) {
+      return false;
+    }
+
+    const bounding = element.getBoundingClientRect();
+    return (
+      bounding.top >= 0 &&
+      bounding.left >= 0 &&
+      bounding.right <= (window.innerWidth || document.documentElement.clientWidth) &&
+      bounding.bottom <= (window.innerHeight || document.documentElement.clientHeight)
+    );
   }
 
   public getElement() {
@@ -485,7 +581,8 @@ export class ActualAltReactioner extends React.PureComponent<IAltReactionerProps
     return (
       (this.props.priority || 0).toString() + "." +
       (this.props.action || "click").toString() + "." +
-      this.props.reactionKey.toString()
+      this.props.reactionKey.toString() + "." +
+      this.props.groupPosition.toString()
     );
   }
 
@@ -497,12 +594,17 @@ export class ActualAltReactioner extends React.PureComponent<IAltReactionerProps
     return this.props.onAmbiguousClear();
   }
 
-  public triggerAltCycle() {
+  public triggerAltCycle(isTabNavigatingCurrent: boolean) {
     showAllRelevant();
+    if (isTabNavigatingCurrent) {
+      // because we were tab navigating before we want to tab navigate
+      // the new cycle too and ensure something is selected
+      triggerBasedOn("tab", false, () => {});
+    }
     showRelevant();
   }
 
-  public trigger() {
+  public trigger(isTabNavigatingCurrent: boolean) {
     const element = this.getElement();
     if (!element) {
       return;
@@ -512,34 +614,28 @@ export class ActualAltReactioner extends React.PureComponent<IAltReactionerProps
       (element as HTMLElement).click();
     } else if (this.props.action === "focus") {
       (element as HTMLElement).focus();
-    } else if (this.props.action === "none") {
-
-    } else {
-      this.props.action(element as HTMLElement, this.triggerAltCycle);
     }
 
     if (this.props.triggerAltAfterAction) {
-      this.triggerAltCycle();
+      this.triggerAltCycle(isTabNavigatingCurrent);
     }
   }
 
-  public pseudoFocus() {
-    this.setState({
-      pseudoFocused: true,
-    });
+  public focus() {
+    const element = this.getElement();
+    (element as HTMLElement).focus();
   }
 
-  public pseudoBlur() {
-    this.setState({
-      pseudoFocused: false,
-    });
+  public blur() {
+    const element = this.getElement();
+    (element as HTMLElement).blur();
   }
 
   public render() {
     const Element = (this.props.component || "div") as any;
     return (
       <Element style={{ display: "contents" }} ref={this.containerRef}>
-        {this.props.children(this.state.displayed, this.state.pseudoFocused)}
+        {this.props.children(this.state.displayed)}
       </Element>
     );
   }
@@ -550,7 +646,7 @@ const AltReactioner = React.forwardRef((props: IAltReactionerProps, ref: RefObje
     <AltPriorityShifterContext.Consumer>
       {(v) => {
         return (
-          <ActualAltReactioner {...props} priority={(props.priority || 0) + v} ref={ref}/>
+          <ActualAltReactioner {...props} priority={(props.priority || 0) + v} ref={ref} />
         );
       }}
     </AltPriorityShifterContext.Consumer>
