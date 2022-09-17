@@ -246,6 +246,10 @@ function TdAndTh(props: IMaterialUIWrapperElementProps) {
 
   const [tableType, setTableType] = useState((tableElement as ITable).tableType || "");
 
+  useEffect(() => {
+    setTableType((tableElement as ITable).tableType || "");
+  }, [(tableElement as ITable).tableType]);
+
   const updateTableType = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
     const path = props.helpers.ReactEditor.findPath(props.helpers.editor, props.element);
     const tablePath = [...path];

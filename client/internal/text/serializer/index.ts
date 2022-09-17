@@ -237,7 +237,17 @@ export interface ISerializationRegistryType {
     [type: string]: boolean;
   };
 
-  CUSTOM_NORMALIZER: {
+  CUSTOM_NORMALIZER_PRE: {
+    [type: string]: (
+      element: any,
+      path: number[],
+      executionRoot: IRootLevelDocument,
+      primaryExecution: ICustomExecution,
+      secondaryExecution: ICustomExecution,
+      specialRules?: ISpecialRules,
+    ) => void;
+  }
+  CUSTOM_NORMALIZER_POST: {
     [type: string]: (
       element: any,
       path: number[],
@@ -274,7 +284,8 @@ export const SERIALIZATION_REGISTRY: ISerializationRegistryType = {
   },
   REACTIFY: {},
   MERGABLES: {},
-  CUSTOM_NORMALIZER: {},
+  CUSTOM_NORMALIZER_POST: {},
+  CUSTOM_NORMALIZER_PRE: {}
 }
 
 // NOW we register all the elements that are part of this
@@ -929,7 +940,7 @@ const standardExecFn: (root: IRootLevelDocument) => ICustomExecution = (root) =>
   },
   cloneElementAt(fromPath: number[], toPath: number[]) {
     const elementToCopy = getNodeFor(fromPath, root) as RichElement;
-    const copy = {...elementToCopy};
+    const copy = { ...elementToCopy };
     copy.children = [];
 
     const parentTarget = getParentNodeFor(toPath, root) as RichElement;
@@ -1241,6 +1252,18 @@ function internalNormalizeElement(
     return;
   }
 
+  if (!specialRules || !(specialRules as any)._parentHandling) {
+    runCustomNorm(
+      "pre",
+      element,
+      path,
+      executionRoot,
+      primaryExecution,
+      secondaryExecution,
+      specialRules,
+    );
+  }
+
   // let's find invalid text inside superblock
   let offset = 0;
   let index = 0;
@@ -1500,6 +1523,7 @@ function internalNormalizeElement(
     );
 
     runCustomNorm(
+      "post",
       element,
       path,
       executionRoot,
@@ -1511,6 +1535,7 @@ function internalNormalizeElement(
 }
 
 function runCustomNorm(
+  time: "pre" | "post",
   element: RichElement | IRootLevelDocument,
   path: number[],
   executionRoot: IRootLevelDocument,
@@ -1518,7 +1543,9 @@ function runCustomNorm(
   secondaryExecution: ICustomExecution,
   specialRules: ISpecialRules,
 ) {
-  const customNorm = SERIALIZATION_REGISTRY.CUSTOM_NORMALIZER[element.type];
+  const customNorm = time === "pre" ?
+    SERIALIZATION_REGISTRY.CUSTOM_NORMALIZER_PRE[element.type] :
+    SERIALIZATION_REGISTRY.CUSTOM_NORMALIZER_POST[element.type];
 
   if (customNorm) {
     customNorm(element, path, executionRoot, primaryExecution, secondaryExecution, specialRules);
@@ -1528,6 +1555,7 @@ function runCustomNorm(
     if (isElement(c)) {
       const childPath = [...path, index];
       runCustomNorm(
+        time,
         c as any,
         childPath,
         executionRoot,
@@ -1578,8 +1606,7 @@ function normalizeAccordingToUIHAndlerRules(
   parentPath.pop();
 
   let deleteAllChildren = false;
-  if (
-    uiHandlerValue &&
+  const isSelfInvalidTypeForUIHandler = uiHandlerValue &&
     (
       (
         uiHandlerValue.mustBeOfType &&
@@ -1589,9 +1616,19 @@ function normalizeAccordingToUIHAndlerRules(
             uiHandlerValue.mustBeOfType !== element.type
         )
       )
-    )
-  ) {
-    const isPatchable = patchList[element.type] &&
+    );
+  const isUnallowedBecaseItsParentIsNotWhatSelfWants = uiHandlerValue &&
+    (
+      (
+        uiHandlerValue.allowsParent &&
+        !uiHandlerValue.allowsParent(
+          primaryExecution.getNodeAt(parentPath) as RichElement,
+          primaryExecution.getNodeAt(path) as RichElement,
+        )
+      )
+    );
+  if (isSelfInvalidTypeForUIHandler) {
+    const isPatchable = !isUnallowedBecaseItsParentIsNotWhatSelfWants && patchList[element.type] &&
       (
         Array.isArray(uiHandlerValue.mustBeOfType) ?
           uiHandlerValue.mustBeOfType.includes(patchList[element.type]) :
@@ -1629,18 +1666,7 @@ function normalizeAccordingToUIHAndlerRules(
       }
       return;
     }
-  } else if (
-    uiHandlerValue &&
-    (
-      (
-        uiHandlerValue.allowsParent &&
-        !uiHandlerValue.allowsParent(
-          primaryExecution.getNodeAt(parentPath) as RichElement,
-          primaryExecution.getNodeAt(path) as RichElement,
-        )
-      )
-    )
-  ) {
+  } else if (isUnallowedBecaseItsParentIsNotWhatSelfWants) {
     primaryExecution.deleteNodeAt(
       path,
     );
@@ -1663,25 +1689,56 @@ function normalizeAccordingToUIHAndlerRules(
     }
 
     if (isElement(currentNode) || deleteAllChildren) {
+      const nodeActual = primaryExecution.getNodeAt(currentNodePath) as RichElement;
+      const selfActual = primaryExecution.getNodeAt(path) as RichElement;
+
       const shouldDelete = deleteAllChildren ||
         (
           uiHandlerValue &&
           (
             uiHandlerValue.allowsChildren &&
             !uiHandlerValue.allowsChildren(
-              primaryExecution.getNodeAt(currentNodePath) as RichElement,
-              primaryExecution.getNodeAt(path) as RichElement,
+              nodeActual,
+              selfActual,
             )
           )
         );
 
       if (shouldDelete) {
-        primaryExecution.deleteNodeAt(
-          currentNodePath,
-        );
-        secondaryExecution && secondaryExecution.deleteNodeAt(
-          currentNodePath,
-        );
+        const patch = deleteAllChildren ? null : (uiHandlerValue.patchChildren && uiHandlerValue.patchChildren(
+          nodeActual,
+          selfActual,
+        ));
+
+        if (patch) {
+          primaryExecution.updateNodeAt(
+            currentNodePath,
+            patch,
+          );
+          secondaryExecution && secondaryExecution.updateNodeAt(
+            currentNodePath,
+            patch,
+          );
+          // now update that node with the rules
+          normalizeAccordingToUIHAndlerRules(
+            primaryExecution.getNodeAt(
+              currentNodePath,
+            ) as RichElement,
+            currentNodePath,
+            executionRoot,
+            primaryExecution,
+            secondaryExecution,
+            specialRules,
+          );
+        } else {
+          primaryExecution.deleteNodeAt(
+            currentNodePath,
+          );
+          secondaryExecution && secondaryExecution.deleteNodeAt(
+            currentNodePath,
+          );
+          offset--;
+        }
       } else {
         normalizeAccordingToUIHAndlerRules(
           currentNode as RichElement,

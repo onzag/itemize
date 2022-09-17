@@ -389,7 +389,7 @@ export function registerTableElements(registry: ISerializationRegistryType) {
   registry.MERGABLES.tbody = true;
   registry.MERGABLES.tfoot = true;
 
-  registry.CUSTOM_NORMALIZER.table = (
+  registry.CUSTOM_NORMALIZER_POST.table = (
     table: ITable,
     path,
     executionRoot,

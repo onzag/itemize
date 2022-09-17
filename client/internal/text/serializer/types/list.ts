@@ -139,7 +139,7 @@ export function registerList(registry: ISerializationRegistryType) {
   registry.DESERIALIZE.byTag.OL = deserializeList;
   registry.DESERIALIZE.byTag.UL = deserializeList;
   registry.MERGABLES.list = true;
-  registry.CUSTOM_NORMALIZER.list = (
+  registry.CUSTOM_NORMALIZER_POST.list = (
     list: IList,
     path,
     executionRoot,

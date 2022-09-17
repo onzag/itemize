@@ -1,5 +1,6 @@
+import { SxProps, Theme } from "@mui/material";
 import Badge from "@mui/material/Badge";
-import React, { useCallback, useEffect, useState } from "react";
+import React, { useCallback, useState } from "react";
 import AltReactioner from "../../components/accessibility/AltReactioner";
 
 const style = {
@@ -28,6 +29,12 @@ const style = {
   hidden: {
     "& .MuiBadge-badge": {
       display: "none",
+    }
+  },
+  focused: {
+    "& .MuiBadge-badge": {
+      fontWeight: 900,
+      border: "solid 1px #222",
     }
   },
 }
@@ -93,10 +100,9 @@ interface IAltBadgeReactionerProps {
    */
   priority?: number;
   /**
-   * A positioning within the group in order to solve ambiguous reactions, the lowest
-   * it will be used for sorting, use it if you expect ambigous values
+   * A positioning within the group in order to solve ambiguous reactions and use tab navigation
    */
-  groupPosition?: number;
+  groupPosition: number;
   /**
    * For stylistic purposes, uses a transform to keep the badge closer to the element
    */
@@ -109,6 +115,10 @@ interface IAltBadgeReactionerProps {
  * will trigger a new input reaction after it has been completed
  */
   triggerAltAfterAction?: boolean;
+  /**
+   * custom sx for the badge
+   */
+  sx?: SxProps<Theme>;
 }
 
 export function AltBadgeReactioner(
@@ -121,7 +131,7 @@ export function AltBadgeReactioner(
   }, []);
 
   const reactionerProps = { ...props } as any;
-  reactionerProps.children = (displayed: boolean) => {
+  reactionerProps.children = (displayed: boolean, pseudoFocused: boolean) => {
     let content = props.label || props.reactionKey;
     
     if (ambigousIdPlusCount) {
@@ -132,17 +142,21 @@ export function AltBadgeReactioner(
       content += "+".repeat(ambigousIdPlusCount[2]) + ambigousIdPlusCount[1].toString();
     }
 
+    // the data attributes are for debugging purposes
     return (
       <Badge
         badgeContent={content.toUpperCase()}
         color={(props.colorSchema || "default") === "default" ? "primary" : "default"}
+        data-priority={props.priority || 0}
+        data-group-position={props.groupPosition}
         sx={
           [
             (props.colorSchema || "default") === "default" ? style.badgeFastKey : style.badgeFastKey2,
             props.useTransform ? style.transformed : null,
             props.fullWidth ? style.fullWidth : null,
             displayed ? null : style.hidden,
-          ]
+            pseudoFocused ? style.focused : null,
+          ].concat(Array.isArray(props.sx) ? props.sx as any : [props.sx] as any)
         }
       >
         {displayed ? (props.altBadgedChildren || props.children) : props.children}

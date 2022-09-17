@@ -89,7 +89,7 @@ export function registerListItem(registry: ISerializationRegistryType) {
   }
   registry.SUPERBLOCKS["list-item"] = true;
   registry.DESERIALIZE.byTag.LI = deserializeListItem;
-  registry.CUSTOM_NORMALIZER["list-item"] = (
+  registry.CUSTOM_NORMALIZER_POST["list-item"] = (
     listItem: IListItem,
     path,
     executionRoot,

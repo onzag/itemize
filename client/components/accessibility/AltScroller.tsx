@@ -97,6 +97,11 @@ if (typeof document !== "undefined") {
     }
   });
   document.addEventListener("keydown", (e) => {
+    // ignore these two
+    if (e.key === "Shift" || e.key === "Tab") {
+      return;
+    }
+
     const dir = converts[e.key];
     const isAltKey = e.altKey;
 

@@ -93,6 +93,10 @@ interface ISingleActionProps {
    */
   anchor: Path;
   /**
+   * The group index for accessibility
+   */
+  groupIndex: number;
+  /**
    * Trigger on change
    * @param key the action key, click, mouseover, etc...
    * @param value the value that is referred to
@@ -209,6 +213,7 @@ class SingleAction extends React.PureComponent<ISingleActionProps, ISingleAction
           priority={2}
           selector="div[tabindex]"
           fullWidth={true}
+          groupPosition={this.props.groupIndex + 10}
         >
           <FormControl
             variant="filled"
@@ -324,7 +329,7 @@ export function ActionsOptions(props: IDrawerContainerProps) {
   return (
     <Box sx={style.box}>
       {
-        EVENTS.map((v) => (
+        EVENTS.map((v, index) => (
           <SingleAction
             key={v}
             name={v}
@@ -332,6 +337,7 @@ export function ActionsOptions(props: IDrawerContainerProps) {
             options={allOptions}
             anchor={currentNodeAnchor}
             onChange={props.helpers.setAction}
+            groupIndex={index}
           />
         ))
       }

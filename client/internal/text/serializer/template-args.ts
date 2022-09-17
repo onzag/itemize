@@ -273,6 +273,11 @@ export interface ITemplateArgUIHandlerDefinition extends IBaseTemplateArg {
    */
   allowsChildren?: (child: RichElement, self: RichElement) => boolean;
   /**
+   * If a children is not allowed you may be able to patch it to make it work
+   * return null if not possible
+   */
+  patchChildren?: (child: RichElement, self: RichElement) => Partial<RichElement>;
+  /**
    * Forces the parent to have an ui handler of this specific type that
    * applies to this element itself, rather than its
    */

@@ -1610,27 +1610,31 @@ export class SlateEditor extends React.Component<ISlateEditorProps, ISlateEditor
           nodeIgnore.push(this.editor.selection.anchor.path);
         }
 
-        normalizeElement(
-          pseudoDocument,
-          [],
-          pseudoDocument,
-          {
-            workOnOriginal: false,
-            updateNodeAt: this.updateNodeAt,
-            deleteNodeAt: this.deleteNodeAt,
-            insertNodeAt: this.insertNodeAt,
-            mergeNodesAt: this.mergeNodesAt,
-            splitElementAndEscapeChildIntoParentAt: this.splitElementAndEscapeChildIntoParentAt,
-            wrapNodeAt: this.wrapNodeAt,
-            getNodeAt: this.getNodeAt,
-            cloneElementAt: this.cloneElementAt,
-            moveNodeAt: this.moveNodeAt,
-          },
-          {
-            ignoreNodesAt: nodeIgnore,
-            useContextRulesOf: this.state.currentRootContext,
-          }
-        );
+        try {
+          normalizeElement(
+            pseudoDocument,
+            [],
+            pseudoDocument,
+            {
+              workOnOriginal: false,
+              updateNodeAt: this.updateNodeAt,
+              deleteNodeAt: this.deleteNodeAt,
+              insertNodeAt: this.insertNodeAt,
+              mergeNodesAt: this.mergeNodesAt,
+              splitElementAndEscapeChildIntoParentAt: this.splitElementAndEscapeChildIntoParentAt,
+              wrapNodeAt: this.wrapNodeAt,
+              getNodeAt: this.getNodeAt,
+              cloneElementAt: this.cloneElementAt,
+              moveNodeAt: this.moveNodeAt,
+            },
+            {
+              ignoreNodesAt: nodeIgnore,
+              useContextRulesOf: this.state.currentRootContext,
+            }
+          );
+        } catch (err) {
+          console.error(err.stack);
+        }
       }
 
       this.isInNormalization = false;

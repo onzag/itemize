@@ -17,7 +17,7 @@ export interface IAltReactionerProps {
   /**
    * The children that is to be rendered inside
    */
-  children: (displayed: boolean) => React.ReactNode;
+  children: (displayed: boolean, pseudoFocus: boolean) => React.ReactNode;
   /**
    * The wrapping component to use, by default it will use a div
    */
@@ -76,15 +76,10 @@ export interface IAltReactionerProps {
    */
   priority?: number;
   /**
-   * A positioning within the group in order to solve ambiguous reactions, the lowest
-   * it will be used for sorting, use it if you expect ambigous values
+   * A positioning within the group in order to solve ambiguous reactions and perform
+   * tab navigation
    */
-  groupPosition?: number;
-  /**
-   * An alt label to use for screen reading purposes
-   * for this action
-   */
-  altScreenReaderLabel?: string;
+  groupPosition: number;
   /**
    * will trigger a new input reaction after it has been completed
    */
@@ -93,6 +88,7 @@ export interface IAltReactionerProps {
 
 interface IActualAltReactionerState {
   displayed: boolean;
+  pseudoFocused: boolean;
 }
 
 const ALT_REGISTRY: {
@@ -100,9 +96,13 @@ const ALT_REGISTRY: {
 } = {};
 
 let ALT_REGISTRY_IS_IN_DISPLAY_LAST = false;
+let ALT_REGISTRY_IS_IN_DISPLAY_ELEMENTS: ActualAltReactioner[] = [];
+let ALT_REGISTRY_IS_IN_DISPLAY_ELEMENTS_FOCUS_INDEX: number = -1; 
+let ALT_REGISTRY_IS_IN_DISPLAY_PRIORITY: number = null;
 let ALT_REGISTRY_IS_WAITING_FOR_KEYCODES = false;
 let ALT_REGISTRY_AWAITING_KEYCODES: ActualAltReactioner[] = [];
-let ALT_REGISTRY_PREVIOUS_FOCUSED_ELEMENT: Element = null;
+let ALT_REGISTRY_AWAITING_KEYCODES_FOCUS_INDEX: number = -1;
+let ALT_REGISTRY_LAST_FOCUSED_SIGNATURE: {[priorityKey: number]: string} = {};
 
 function hideAll(butKeycodes: ActualAltReactioner[] = []) {
   Object.keys(ALT_REGISTRY).forEach((reactionKey) => {
@@ -115,11 +115,20 @@ function hideAll(butKeycodes: ActualAltReactioner[] = []) {
 
   if (!butKeycodes.length) {
     ALT_REGISTRY_IS_IN_DISPLAY_LAST = false;
+    ALT_REGISTRY_IS_IN_DISPLAY_ELEMENTS = [];
+    ALT_REGISTRY_IS_IN_DISPLAY_ELEMENTS_FOCUS_INDEX = -1;
+    ALT_REGISTRY_IS_IN_DISPLAY_PRIORITY = null;
     ALT_REGISTRY_IS_WAITING_FOR_KEYCODES = false;
     ALT_REGISTRY_AWAITING_KEYCODES = [];
+    ALT_REGISTRY_AWAITING_KEYCODES_FOCUS_INDEX = -1;
   } else {
     ALT_REGISTRY_IS_WAITING_FOR_KEYCODES = true;
     ALT_REGISTRY_AWAITING_KEYCODES = butKeycodes;
+    ALT_REGISTRY_AWAITING_KEYCODES_FOCUS_INDEX = 0;
+
+    butKeycodes[0].pseudoFocus();
+
+    // TODO screen reader thingy
   }
 }
 
@@ -151,6 +160,9 @@ function showAllRelevant() {
     });
   });
 
+  const lastFocusedForPriority = ALT_REGISTRY_LAST_FOCUSED_SIGNATURE[priorityToUse] || null;
+  let foundAPseudoFocusMatch: ActualAltReactioner = null;
+  const displayElements: ActualAltReactioner[] = [];
   Object.keys(results).forEach((reactionKey) => {
     results[reactionKey].sort((a, b) => a.getGroupPosition() - b.getGroupPosition());
     results[reactionKey].forEach((v, index, arr) => {
@@ -163,21 +175,85 @@ function showAllRelevant() {
         v.triggerAmbiguousClear();
       }
 
-      v.display();
+      const shouldBePseudoFocused = !foundAPseudoFocusMatch && v.getSignature() === lastFocusedForPriority;
+      if (shouldBePseudoFocused) {
+        foundAPseudoFocusMatch = v;
+      }
+      v.display(shouldBePseudoFocused);
+      displayElements.push(v);
     });
   });
 
+  displayElements.sort((a, b) => a.getGroupPosition() - b.getGroupPosition());
+  const startingPositionElement = displayElements[0];
+
+  if (!foundAPseudoFocusMatch && startingPositionElement) {
+    foundAPseudoFocusMatch = startingPositionElement;
+    foundAPseudoFocusMatch.pseudoFocus();
+  }
+
+  if (foundAPseudoFocusMatch) {
+    // TODO screen reader interaction
+  }
+
   ALT_REGISTRY_IS_IN_DISPLAY_LAST = true;
+  ALT_REGISTRY_IS_IN_DISPLAY_ELEMENTS = displayElements;
+  ALT_REGISTRY_IS_IN_DISPLAY_PRIORITY = priorityToUse;
+  ALT_REGISTRY_IS_IN_DISPLAY_ELEMENTS_FOCUS_INDEX = !foundAPseudoFocusMatch ? -1 : (displayElements.findIndex((v) => v === foundAPseudoFocusMatch));
   ALT_REGISTRY_IS_WAITING_FOR_KEYCODES = false;
   ALT_REGISTRY_AWAITING_KEYCODES = [];
 }
 
-function triggerBasedOn(code: string, callbackIfmatch: () => void) {
+function triggerBasedOn(code: string, shiftKey: boolean,callbackIfmatch: () => void) {
+  if (code === "shift") {
+    return;
+  } else if (code === "tab") {
+    if (ALT_REGISTRY_IS_WAITING_FOR_KEYCODES) {
+      const len = ALT_REGISTRY_AWAITING_KEYCODES.length;
+      const nextIndex = ((ALT_REGISTRY_AWAITING_KEYCODES_FOCUS_INDEX + len + (!shiftKey ? 1 : -1))) % len;
+      const currentElement = ALT_REGISTRY_AWAITING_KEYCODES[ALT_REGISTRY_AWAITING_KEYCODES_FOCUS_INDEX];
+      currentElement.pseudoBlur();
+      const nextElement = ALT_REGISTRY_AWAITING_KEYCODES[nextIndex];
+      nextElement.pseudoFocus();
+      ALT_REGISTRY_AWAITING_KEYCODES_FOCUS_INDEX = nextIndex;
+      ALT_REGISTRY_LAST_FOCUSED_SIGNATURE[ALT_REGISTRY_IS_IN_DISPLAY_PRIORITY] = nextElement.getSignature();
+    } else {
+      const len = ALT_REGISTRY_IS_IN_DISPLAY_ELEMENTS.length;
+      const nextIndex = ((ALT_REGISTRY_IS_IN_DISPLAY_ELEMENTS_FOCUS_INDEX + len + (!shiftKey ? 1 : -1))) % len;
+      const currentElement = ALT_REGISTRY_IS_IN_DISPLAY_ELEMENTS[ALT_REGISTRY_IS_IN_DISPLAY_ELEMENTS_FOCUS_INDEX];
+      currentElement.pseudoBlur();
+      const nextElement = ALT_REGISTRY_IS_IN_DISPLAY_ELEMENTS[nextIndex];
+      nextElement.pseudoFocus();
+      ALT_REGISTRY_IS_IN_DISPLAY_ELEMENTS_FOCUS_INDEX = nextIndex;
+      ALT_REGISTRY_LAST_FOCUSED_SIGNATURE[ALT_REGISTRY_IS_IN_DISPLAY_PRIORITY] = nextElement.getSignature();
+    }
+
+    callbackIfmatch();
+    // TODO screen reader interaction
+    return;
+  }
+
+  if (code === " ") {
+    let match: ActualAltReactioner = null;
+    if (ALT_REGISTRY_IS_WAITING_FOR_KEYCODES) {
+      match = ALT_REGISTRY_AWAITING_KEYCODES[ALT_REGISTRY_AWAITING_KEYCODES_FOCUS_INDEX];
+    } else {
+      match = ALT_REGISTRY_IS_IN_DISPLAY_ELEMENTS[ALT_REGISTRY_IS_IN_DISPLAY_ELEMENTS_FOCUS_INDEX];
+    }
+
+    callbackIfmatch();
+    hideAll();
+    match.trigger();
+
+    // TODO screen reader interaction
+    return;
+  }
+
   // requesting for the remaining options on an overflown list
   // this occurs if there are just too many options available
   // so that the shortcut is overflown
   if (
-    ALT_REGISTRY_AWAITING_KEYCODES &&
+    ALT_REGISTRY_IS_WAITING_FOR_KEYCODES &&
     code === "+" &&
     ALT_REGISTRY_AWAITING_KEYCODES.length > 9
   ) {
@@ -229,8 +305,8 @@ function triggerBasedOn(code: string, callbackIfmatch: () => void) {
     hideAll();
     matches.forEach((m) => m.trigger());
   } else {
-    hideAll(matches);
     matches.sort((a, b) => a.getGroupPosition() - b.getGroupPosition());
+    hideAll(matches);
     matches.forEach((m, index) => {
       let ambigousId = index % 9;
       ambigousId++;
@@ -272,7 +348,8 @@ if (typeof document !== "undefined") {
       }
     } else if (!isArrow && (isAltKey || ALT_REGISTRY_IS_IN_DISPLAY_LAST)) {
       // if a match is found we want to prevent the default action
-      triggerBasedOn(keyCode, () => {
+      triggerBasedOn(keyCode, e.shiftKey, () => {
+        e.stopPropagation();
         e.preventDefault();
       });
     }
@@ -296,6 +373,7 @@ export class ActualAltReactioner extends React.PureComponent<IAltReactionerProps
 
     this.state = {
       displayed: false,
+      pseudoFocused: false,
     }
 
     this.containerRef = React.createRef<HTMLElement>();
@@ -328,6 +406,7 @@ export class ActualAltReactioner extends React.PureComponent<IAltReactionerProps
     if (this.state.displayed && this.props.disabled) {
       this.setState({
         displayed: false,
+        pseudoFocused: false,
       });
     }
 
@@ -341,10 +420,11 @@ export class ActualAltReactioner extends React.PureComponent<IAltReactionerProps
     this.unregister();
   }
 
-  public display() {
-    if (!this.state.displayed) {
+  public display(pseudoFocused: boolean) {
+    if (!this.state.displayed || this.state.pseudoFocused !== pseudoFocused) {
       this.setState({
         displayed: true,
+        pseudoFocused: pseudoFocused,
       });
     }
   }
@@ -353,8 +433,13 @@ export class ActualAltReactioner extends React.PureComponent<IAltReactionerProps
     if (this.state.displayed) {
       this.setState({
         displayed: false,
+        pseudoFocused: false,
       });
     }
+  }
+
+  public isPseudoFocused() {
+    return this.state.pseudoFocused;
   }
 
   public getPriority() {
@@ -393,7 +478,15 @@ export class ActualAltReactioner extends React.PureComponent<IAltReactionerProps
   }
 
   public getGroupPosition() {
-    return this.props.groupPosition || Number.MAX_SAFE_INTEGER;
+    return this.props.groupPosition;
+  }
+
+  public getSignature() {
+    return (
+      (this.props.priority || 0).toString() + "." +
+      (this.props.action || "click").toString() + "." +
+      this.props.reactionKey.toString()
+    );
   }
 
   public triggerAmbiguous(expected: boolean, id: number, plusCount: number) {
@@ -430,11 +523,23 @@ export class ActualAltReactioner extends React.PureComponent<IAltReactionerProps
     }
   }
 
+  public pseudoFocus() {
+    this.setState({
+      pseudoFocused: true,
+    });
+  }
+
+  public pseudoBlur() {
+    this.setState({
+      pseudoFocused: false,
+    });
+  }
+
   public render() {
     const Element = (this.props.component || "div") as any;
     return (
       <Element style={{ display: "contents" }} ref={this.containerRef}>
-        {this.props.children(this.state.displayed)}
+        {this.props.children(this.state.displayed, this.state.pseudoFocused)}
       </Element>
     );
   }
