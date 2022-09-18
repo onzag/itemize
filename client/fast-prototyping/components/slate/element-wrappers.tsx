@@ -407,9 +407,11 @@ export const materialUIElementWrappers: ISlateEditorElementWrappers = {
     link: (props: IMaterialUIWrapperElementProps) => {
       const [valid, setValid] = useState(true);
       const [linkOptions, setLinkOptions] = useState<ITemplateOption[]>([]);
+      const [elementHref, setElementHref] = useState((props.element as ILink).href || "");
 
       const updateElementHref = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
         const valid = props.helpers.updateLink(e.target.value, (props.element as ILink).thref || null);
+        setElementHref(e.target.value);
         setValid(valid);
       }, []);
 
@@ -481,6 +483,7 @@ export const materialUIElementWrappers: ISlateEditorElementWrappers = {
           });
         }
 
+        setElementHref((props.element as ILink).href || "");
         setLinkOptions(linkPropertiesToUse);
       }, [props.element, props.isSelected]);
 
@@ -500,7 +503,7 @@ export const materialUIElementWrappers: ISlateEditorElementWrappers = {
                 fullWidth={true}
               >
                 <TextField
-                  value={(props.element as ILink).href || ""}
+                  value={elementHref}
                   onChange={updateElementHref}
                   label={props.i18nRichInfo.setLink.label}
                   disabled={!!(props.element as ILink).thref}

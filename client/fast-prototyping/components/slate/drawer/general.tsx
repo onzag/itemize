@@ -50,7 +50,7 @@ export function GeneralOptions(props: IDrawerContainerProps) {
     <Box sx={style.box}>
       <AltBadgeReactioner
         action="focus"
-        reactionKey={props.i18nRichInfo.name[0]}
+        reactionKey="n"
         priority={3}
         selector="input"
         fullWidth={true}

@@ -378,12 +378,28 @@ if (typeof document !== "undefined") {
     }
   });
   document.addEventListener("keydown", (e) => {
-    const keyCode = e.key.toLowerCase();
+    // some special events don't have this
+    if (!e.code) {
+      return;
+    }
+
+    // make it work with exotic keybords
+    // so that special characters match, for example
+    // russian keyboard, japanese keyboard, arabic keyboard
+    let keyCode = e.code.toLowerCase().replace("key", "").replace("digit", "");
+    if (keyCode.startsWith("alt")) {
+      keyCode = "alt";
+    }
     const isArrow = arrows.includes(keyCode);
     const isAltKey = e.altKey;
     const isTab = keyCode === "tab";
 
     const isPureAltKey = isAltKey && keyCode === "alt";
+
+    if (isPureAltKey) {
+      e.stopPropagation();
+      e.preventDefault();
+    }
 
     if (isPureAltKey || (!ALT_REGISTRY_IS_IN_DISPLAY_LAST && isTab)) {
       if (ALT_REGISTRY_IS_IN_DISPLAY_LAST) {
@@ -405,9 +421,6 @@ if (typeof document !== "undefined") {
         e.preventDefault();
       });
     }
-  });
-  window.addEventListener("resize", () => {
-    hideAll();
   });
   window.addEventListener("mousedown", () => {
     hideAll();

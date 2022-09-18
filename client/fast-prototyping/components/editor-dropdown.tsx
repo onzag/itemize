@@ -191,7 +191,7 @@ export function EditorDropdown(props: IEditorDropdown) {
       for (let i = 0; i < Math.abs(props.goIntoTreeDepth); i++) {
         if (!goTowardsParent) {
           firstNode = firstNode.childNodes[0] as HTMLElement;
-          lastNode = lastNode.childNodes[0] as HTMLElement;
+          lastNode = lastNode.childNodes[lastNode.childNodes.length - 1] as HTMLElement;
         } else {
           firstNode = firstNode.parentElement as HTMLElement;
           lastNode = lastNode.parentElement as HTMLElement;

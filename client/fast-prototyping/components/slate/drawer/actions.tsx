@@ -209,7 +209,7 @@ class SingleAction extends React.PureComponent<ISingleActionProps, ISingleAction
       <Box>
         <AltBadgeReactioner
           action="focus"
-          reactionKey={this.props.name[0]}
+          reactionKey="n"
           priority={3}
           selector="div[tabindex]"
           fullWidth={true}

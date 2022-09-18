@@ -22,6 +22,12 @@ interface IAltScrollerProps {
   childSelector?: string;
 
   /**
+   * Triggers when the scroll has been recalculated because the window
+   * has changed size
+   */
+  onResize?: () => void;
+
+  /**
    * Pass as children in order to build the UI of choice
    */
   children: (isScrolling: boolean, scrollDirections?: { up: boolean; left: boolean; right: boolean; down: boolean }) => React.ReactNode;
@@ -79,10 +85,13 @@ export function showRelevant() {
   ALT_SREGISTRY_IS_IN_DISPLAY_LAST = true;
 }
 
-function recalculatePotentialScrolls() {
+function recalculatePotentialScrolls(resize: boolean) {
   ALT_SREGISTRY.forEach((v) => {
     if (v.isScrolling()) {
       v.recalculateScrolls();
+      if (resize) {
+        v.triggerResize();
+      }
     }
   });
 }
@@ -126,7 +135,7 @@ if (typeof document !== "undefined") {
     }
   });
   window.addEventListener("resize", () => {
-    hideAll();
+    recalculatePotentialScrolls(true);
   });
   window.addEventListener("mousedown", () => {
     hideAll();
@@ -135,7 +144,7 @@ if (typeof document !== "undefined") {
     hideAll();
   });
   window.addEventListener("scroll", () => {
-    recalculatePotentialScrolls();
+    recalculatePotentialScrolls(false);
   }, true);
 }
 
@@ -189,6 +198,12 @@ export class ActualAltScroller extends React.PureComponent<IAltScrollerProps, IA
   public register() {
     if (!ALT_SREGISTRY.includes(this)) {
       ALT_SREGISTRY.push(this);
+    }
+  }
+
+  public triggerResize() {
+    if (this.props.onResize) {
+      this.props.onResize();
     }
   }
 
