@@ -41,6 +41,7 @@ const actionRegistry: {
     description: "Provides the full docker compose deployable based on the config",
     usage: "itemize get-deployable [development|production|patch] [build-name] (full|standard|slim|(comma-separated-services))",
     needsArgs: 2,
+    arbitraryArgs: true,
   },
   "start-dev-environment": {
     fn: start,

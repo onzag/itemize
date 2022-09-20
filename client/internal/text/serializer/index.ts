@@ -875,7 +875,7 @@ const standardExecFn: (root: IRootLevelDocument) => ICustomExecution = (root) =>
   workOnOriginal: true,
   updateNodeAt(path: number[], data: Partial<RichElement | IText>) {
     const node = getNodeFor(path, root);
-    console.log("updating", JSON.stringify(node), "with", JSON.stringify(data));
+    // console.log("updating", JSON.stringify(node), "with", JSON.stringify(data));
     Object.keys(data).forEach((k) => {
       node[k] = data[k];
     });
@@ -883,14 +883,14 @@ const standardExecFn: (root: IRootLevelDocument) => ICustomExecution = (root) =>
   deleteNodeAt(path: number[]) {
     const node = getNodeFor(path, root);
     const parent = getParentNodeFor(path, root);
-    console.log("deleting", JSON.stringify(node), "at", JSON.stringify(parent));
+    // console.log("deleting", JSON.stringify(node), "at", JSON.stringify(parent));
     parent.children.splice(path[path.length - 1], 1);
   },
   wrapNodeAt(path: number[], wrappers: RichElement[]) {
     const parentOfNodeToWrap = getParentNodeFor(path, root);
     const indexAtChild = path[path.length - 1];
 
-    console.log("wrapping", JSON.stringify(parentOfNodeToWrap.children[indexAtChild]), "with", JSON.stringify(wrappers));
+    // console.log("wrapping", JSON.stringify(parentOfNodeToWrap.children[indexAtChild]), "with", JSON.stringify(wrappers));
     wrappers.forEach((w) => {
       const childToWrap = parentOfNodeToWrap.children[indexAtChild];
       w.children = [childToWrap] as any;
@@ -899,14 +899,14 @@ const standardExecFn: (root: IRootLevelDocument) => ICustomExecution = (root) =>
   },
   insertNodeAt(path: number[], node: RichElement | IText, targetIndex: number) {
     const element = getNodeFor(path, root) as RichElement;
-    console.log("inserting", JSON.stringify(node), "at", JSON.stringify(element));
+    // console.log("inserting", JSON.stringify(node), "at", JSON.stringify(element));
     element.children.splice(targetIndex, 0, node as any);
   },
   mergeNodesAt(basePath: number[], referencePath: number[]) {
     const base = getNodeFor(basePath, root);
     const reference = getNodeFor(referencePath, root);
     const parent = getParentNodeFor(basePath, root);
-    console.log("merging", JSON.stringify(base), "with", JSON.stringify(reference));
+    // console.log("merging", JSON.stringify(base), "with", JSON.stringify(reference));
     if (typeof (base as RichElement).type !== "undefined") {
       (base as RichElement).children = ((base as RichElement).children as any).concat((reference as RichElement).children);
     } else {
@@ -918,7 +918,7 @@ const standardExecFn: (root: IRootLevelDocument) => ICustomExecution = (root) =>
     const element = getNodeFor(path, root) as RichElement;
     const parent = getParentNodeFor(path, root) as RichElement;
 
-    console.log("splitting", JSON.stringify(element), "at child index", JSON.stringify(escapingChildIndex));
+    // console.log("splitting", JSON.stringify(element), "at child index", JSON.stringify(escapingChildIndex));
 
     const allNodesBeforeThis = element.children.slice(0, escapingChildIndex);
     const escapingChild = element.children[escapingChildIndex];
