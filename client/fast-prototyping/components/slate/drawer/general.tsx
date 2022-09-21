@@ -54,7 +54,6 @@ export function GeneralOptions(props: IDrawerContainerProps) {
         priority={3}
         selector="input"
         fullWidth={true}
-        groupPosition={9}
       >
         <TextField
           value={name}

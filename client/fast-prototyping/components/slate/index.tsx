@@ -905,6 +905,11 @@ interface ISlateEditorProps {
    * Whether the field is disabled
    */
   disabled?: boolean;
+  /**
+   * An specific scroll margin top to be used when scroll into view is used
+   * against this element
+   */
+  scrollMarginTop?: string | number;
 }
 
 /**
@@ -4443,6 +4448,7 @@ export class SlateEditor extends React.Component<ISlateEditorProps, ISlateEditor
           placeholder={this.props.placeholder}
           readOnly={this.props.disabled}
           disabled={this.props.disabled}
+          style={{scrollMarginTop: this.props.scrollMarginTop}}
         />
       </CurrentElementProvider>
     );

@@ -92,9 +92,10 @@ interface IAltBadgeReactionerProps {
    */
   priority?: number;
   /**
-   * A positioning within the group in order to solve ambiguous reactions and use tab navigation
+   * A positioning within the group used to specify what part of a scrolling box this belongs to
+   * for example -1 is often to be used with fixed navbar, 0 with the body content and 100 with footers
    */
-  groupPosition: number;
+  groupPosition?: number;
   /**
    * For stylistic purposes, uses a transform to keep the badge closer to the element
    */
@@ -115,6 +116,12 @@ interface IAltBadgeReactionerProps {
    * whether the element can be tabbed
    */
   tabbable?: boolean;
+  /**
+   * Will use the reactioner in the text flow as well so that it's selectable while
+   * going through textual elements, however it will not be displayed and be treated
+   * rather as a simple focusable element, but it will be displayed in alt mode
+   */
+  useInFlow?: boolean;
 }
 
 export function AltBadgeReactioner(
@@ -129,7 +136,7 @@ export function AltBadgeReactioner(
   const reactionerProps = { ...props } as any;
   reactionerProps.children = (displayed: boolean) => {
     let content = props.label || props.reactionKey;
-    
+
     if (ambigousIdPlusCount) {
       if (!ambigousIdPlusCount[0]) {
         content = "";

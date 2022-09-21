@@ -511,7 +511,6 @@ interface RichTextEditorToolbarState {
 
 interface RichTextEditorToolbarElementProps extends RichTextEditorToolbarState, RichTextEditorToolbarProps {
   fastKey: string;
-  groupIndex: number;
 }
 
 function elementFastKeyReturn(
@@ -519,7 +518,6 @@ function elementFastKeyReturn(
   element: React.ReactNode,
   altBadgedChildren: React.ReactNode,
   priority: number,
-  groupIndex: number,
   disabled: boolean,
   useStyleTransform?: boolean,
   useTriggerAltAfterAction?: boolean,
@@ -532,7 +530,7 @@ function elementFastKeyReturn(
       priority={priority}
       disabled={disabled || !props.state.currentSelectedElement}
       altBadgedChildren={altBadgedChildren}
-      groupPosition={groupIndex}
+      groupPosition={-1}
       label={fastKey === "escape" ? "esc" : null}
       tabbable={fastKey !== "escape"}
       useTransform={useStyleTransform}
@@ -557,7 +555,7 @@ function Bold(props: RichTextEditorToolbarElementProps) {
     </IconButton>
   );
 
-  return elementFastKeyReturn(props, element, null, 1, props.groupIndex, disabled, props.disjointedMode);
+  return elementFastKeyReturn(props, element, null, 1, disabled, props.disjointedMode);
 }
 
 function Italic(props: RichTextEditorToolbarElementProps) {
@@ -573,7 +571,7 @@ function Italic(props: RichTextEditorToolbarElementProps) {
     </IconButton>
   );
 
-  return elementFastKeyReturn(props, element, null, 1, props.groupIndex, disabled, props.disjointedMode);
+  return elementFastKeyReturn(props, element, null, 1, disabled, props.disjointedMode);
 }
 
 function Underline(props: RichTextEditorToolbarElementProps) {
@@ -589,7 +587,7 @@ function Underline(props: RichTextEditorToolbarElementProps) {
     </IconButton>
   );
 
-  return elementFastKeyReturn(props, element, null, 1, props.groupIndex, disabled, props.disjointedMode);
+  return elementFastKeyReturn(props, element, null, 1, disabled, props.disjointedMode);
 }
 
 function VDivider(props: RichTextEditorToolbarElementProps) {
@@ -671,7 +669,7 @@ function Link(props: RichTextEditorToolbarElementProps) {
     >{linkBaseComponent}</Badge>
   }
 
-  return elementFastKeyReturn(props, linkBadged, linkBaseComponent, 1, props.groupIndex, disabled, props.disjointedMode);
+  return elementFastKeyReturn(props, linkBadged, linkBaseComponent, 1, disabled, props.disjointedMode);
 }
 
 function Title(props: RichTextEditorToolbarElementProps) {
@@ -691,7 +689,7 @@ function Title(props: RichTextEditorToolbarElementProps) {
     </IconButton>
   );
 
-  return elementFastKeyReturn(props, element, null, 1, props.groupIndex, disabled, props.disjointedMode);
+  return elementFastKeyReturn(props, element, null, 1, disabled, props.disjointedMode);
 }
 
 function Quote(props: RichTextEditorToolbarElementProps) {
@@ -711,7 +709,7 @@ function Quote(props: RichTextEditorToolbarElementProps) {
     </IconButton>
   );
 
-  return elementFastKeyReturn(props, element, null, 1, props.groupIndex, disabled, props.disjointedMode);
+  return elementFastKeyReturn(props, element, null, 1, disabled, props.disjointedMode);
 }
 
 
@@ -731,7 +729,7 @@ function NumberedList(props: RichTextEditorToolbarElementProps) {
     </IconButton>
   );
 
-  return elementFastKeyReturn(props, element, null, 1, props.groupIndex, disabled, props.disjointedMode);
+  return elementFastKeyReturn(props, element, null, 1, disabled, props.disjointedMode);
 }
 
 function BulletedList(props: RichTextEditorToolbarElementProps) {
@@ -750,7 +748,7 @@ function BulletedList(props: RichTextEditorToolbarElementProps) {
     </IconButton>
   );
 
-  return elementFastKeyReturn(props, element, null, 1, props.groupIndex, disabled, props.disjointedMode);
+  return elementFastKeyReturn(props, element, null, 1, disabled, props.disjointedMode);
 }
 
 const imgExample = {
@@ -784,7 +782,7 @@ function Image(props: RichTextEditorToolbarElementProps) {
     </IconButton>
   );
 
-  return elementFastKeyReturn(props, element, null, 1, props.groupIndex, disabled, props.disjointedMode);
+  return elementFastKeyReturn(props, element, null, 1, disabled, props.disjointedMode);
 }
 
 const videoExample = {
@@ -812,7 +810,7 @@ function Video(props: RichTextEditorToolbarElementProps) {
     </IconButton>
   );
 
-  return elementFastKeyReturn(props, element, null, 1, props.groupIndex, disabled, props.disjointedMode);
+  return elementFastKeyReturn(props, element, null, 1, disabled, props.disjointedMode);
 }
 
 const fileExample = {
@@ -843,7 +841,7 @@ function File(props: RichTextEditorToolbarElementProps) {
     </IconButton>
   );
 
-  return elementFastKeyReturn(props, element, null, 1, props.groupIndex, disabled, props.disjointedMode);
+  return elementFastKeyReturn(props, element, null, 1, disabled, props.disjointedMode);
 }
 
 function Container(props: RichTextEditorToolbarElementProps) {
@@ -864,7 +862,7 @@ function Container(props: RichTextEditorToolbarElementProps) {
     </IconButton>
   );
 
-  return elementFastKeyReturn(props, element, null, 1, props.groupIndex, disabled, props.disjointedMode);
+  return elementFastKeyReturn(props, element, null, 1, disabled, props.disjointedMode);
 }
 
 function Table(props: RichTextEditorToolbarElementProps) {
@@ -885,7 +883,7 @@ function Table(props: RichTextEditorToolbarElementProps) {
     </IconButton>
   );
 
-  return elementFastKeyReturn(props, element, null, 1, props.groupIndex, disabled, props.disjointedMode);
+  return elementFastKeyReturn(props, element, null, 1, disabled, props.disjointedMode);
 }
 
 function TemplateText(props: RichTextEditorToolbarElementProps) {
@@ -952,7 +950,7 @@ function TemplateText(props: RichTextEditorToolbarElementProps) {
     </Badge>
   );
 
-  return elementFastKeyReturn(props, elementBadged, element, 1, props.groupIndex, disabled, props.disjointedMode);
+  return elementFastKeyReturn(props, elementBadged, element, 1, disabled, props.disjointedMode);
 }
 
 function TemplateHTML(props: RichTextEditorToolbarElementProps) {
@@ -1021,7 +1019,7 @@ function TemplateHTML(props: RichTextEditorToolbarElementProps) {
     </Badge>
   );
 
-  return elementFastKeyReturn(props, elementBadged, element, 1, props.groupIndex, disabled, props.disjointedMode);
+  return elementFastKeyReturn(props, elementBadged, element, 1, disabled, props.disjointedMode);
 }
 
 interface IToolbarExtraProps extends RichTextEditorToolbarElementProps {
@@ -1086,7 +1084,6 @@ function ToolbarExtra(props: IToolbarExtraProps) {
     returnNode,
     null,
     typeof props.extra.usePriority === "number" ? props.extra.usePriority : 1,
-    props.groupIndex,
     disabled,
     props.extra.useStyleTransform,
     props.extra.useTriggerAltAfterAction,
@@ -1262,7 +1259,6 @@ class RichTextEditorToolbar extends React.Component<RichTextEditorToolbarProps, 
           </IconButton>,
           null,
           this.props.drawerOpen ? 2 : 1,
-          499,
           false,
           this.props.disjointedMode,
           true,
@@ -1281,7 +1277,6 @@ class RichTextEditorToolbar extends React.Component<RichTextEditorToolbarProps, 
               {...this.props}
               isReady={this.state.isReady}
               key={index}
-              groupIndex={index}
               fastKey={toolbarFastKeyRegistry[ele]}
             />
           );
@@ -1301,7 +1296,6 @@ class RichTextEditorToolbar extends React.Component<RichTextEditorToolbarProps, 
               {...this.props}
               isReady={this.state.isReady}
               key={index}
-              groupIndex={index}
               extra={extraValue as IToolbarPrescenseElement}
               fastKey={null}
             />
@@ -1840,31 +1834,6 @@ export class MaterialUISlateWrapper extends React.PureComponent<IMaterialUISlate
           {extraChildren}
         </Box>
       );
-      // return (
-      //   <>
-      //     {toolbar}
-      //     <Box className={this.props.wrapperClassName} sx={this.props.wrapperSx} ref={this.editorRef}>
-      //     <Box className={
-      //       "rich-text " +
-      //       (this.props.wrapperTextEditorClassName ? " " + this.props.wrapperTextEditorClassName : "") +
-      //       (this.props.state.focused ? " focused" : "")
-      //     } sx={this.props.wrapperTextEditorSx}>
-      //       {this.props.children}
-      //     </Box>
-      //     {extraChildren}
-      //   </Box>
-      //     <DrawerContainer
-      //       ref={this.DrawerContainerRef}
-      //       {...this.props}
-      //       drawerOpen={this.state.drawerOpen}
-      //       noAnimate={this.state.noAnimate}
-      //       toolbarHeight={this.state.toolbarHeight}
-      //     />
-      //     {fileLoadErrorDialog}
-      //     {imageInput}
-      //     {fileInput}
-      //   </>
-      // );
     } else {
       box = (
         <>
@@ -1884,31 +1853,6 @@ export class MaterialUISlateWrapper extends React.PureComponent<IMaterialUISlate
           {extraChildren}
         </>
       );
-      // box = (
-      //   <StyledEditorContainer sx={this.props.wrapperSx} className={this.props.wrapperClassName}>
-      //   <StyledEditor
-      //   ref={this.editorRef}
-      //   className={
-      //     "rich-text" +
-      //     (this.props.state.focused ? " focused" : "") +
-      //     (this.props.wrapperTextEditorClassName ? " " + this.props.wrapperTextEditorClassName : "")
-      //   }
-      //   currentValid={this.props.state.currentValid}
-      //   isRichText={this.props.state.isRichText}
-      //   sx={this.props.wrapperTextEditorSx}
-      // >
-      //   {this.props.children}
-      // </StyledEditor>
-      // {extraChildren}
-      //     <DrawerContainer
-      //       {...this.props}
-      //       ref={this.DrawerContainerRef}
-      //       drawerOpen={this.state.drawerOpen}
-      //       noAnimate={this.state.noAnimate}
-      //       toolbarHeight={this.state.toolbarHeight}
-      //     />
-      //   </StyledEditorContainer>
-      // )
     }
 
     // we have reactioner specifications

@@ -36,7 +36,7 @@ export function OutdatedText(props: OutdatedTextProps) {
                   reactionKey="o"
                   component="span"
                   selector="button"
-                  groupPosition={-999}
+                  groupPosition={-100}
                 >
                   <Button
                     variant="outlined"

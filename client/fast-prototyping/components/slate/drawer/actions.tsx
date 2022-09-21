@@ -213,7 +213,6 @@ class SingleAction extends React.PureComponent<ISingleActionProps, ISingleAction
           priority={3}
           selector="div[tabindex]"
           fullWidth={true}
-          groupPosition={this.props.groupIndex + 10}
         >
           <FormControl
             variant="filled"

@@ -308,7 +308,7 @@ function PropertyEntryDateTimeRenderer(props: IPropertyEntryDateTimeRendererProp
     <Box sx={style.container}>
       {
         props.description && descriptionAsAlert ?
-          <Alert severity="info" sx={style.description}>
+          <Alert severity="info" sx={style.description} role="note">
             {props.description}
           </Alert> :
           null

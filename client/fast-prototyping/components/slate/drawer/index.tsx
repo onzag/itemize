@@ -114,7 +114,6 @@ export function WrapperDrawer(props: IDrawerContainerProps) {
                   priority={3}
                   disabled={!accessibilitySelectedOption}
                   triggerAltAfterAction={true}
-                  groupPosition={1}
                   fullWidth={true}
                   tabbable={false}
                   selector="div"
@@ -135,7 +134,6 @@ export function WrapperDrawer(props: IDrawerContainerProps) {
                         disabled={!props.state.currentSelectedElement}
                         selectorGoUp={1}
                         triggerAltAfterAction={true}
-                        groupPosition={1}
                       >
                         <SettingsIcon />
                       </AltBadgeReactioner>
@@ -159,7 +157,6 @@ export function WrapperDrawer(props: IDrawerContainerProps) {
                               disabled={!props.state.currentSelectedElement}
                               selectorGoUp={1}
                               triggerAltAfterAction={true}
-                              groupPosition={2}
                             >
                               <BorderStyleIcon />
                             </AltBadgeReactioner>
@@ -182,7 +179,6 @@ export function WrapperDrawer(props: IDrawerContainerProps) {
                               disabled={!props.state.currentSelectedElement}
                               selectorGoUp={1}
                               triggerAltAfterAction={true}
-                              groupPosition={3}
                             >
                               <WebIcon />
                             </AltBadgeReactioner>
@@ -206,7 +202,6 @@ export function WrapperDrawer(props: IDrawerContainerProps) {
                               disabled={!props.state.currentSelectedElement}
                               selectorGoUp={1}
                               triggerAltAfterAction={true}
-                              groupPosition={4}
                             >
                               <TouchAppIcon />
                             </AltBadgeReactioner>

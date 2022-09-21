@@ -544,7 +544,7 @@ class PropertyEntryLocationRenderer extends
       <Box sx={style.container}>
         {
           this.props.description && descriptionAsAlert ?
-            <Alert severity="info" sx={style.description}>
+            <Alert severity="info" sx={style.description} role="note">
               {this.props.description}
             </Alert> :
             null

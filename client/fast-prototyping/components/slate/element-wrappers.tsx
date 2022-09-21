@@ -183,7 +183,6 @@ function TextWrapper(props: IMaterialUIWrapperElementProps) {
         <AltBadgeReactioner
           reactionKey="t"
           priority={1}
-          groupPosition={999}
           selector="div[tabindex]"
           action="focus"
           fullWidth={true}
@@ -286,7 +285,6 @@ function TdAndTh(props: IMaterialUIWrapperElementProps) {
               <AltBadgeReactioner
                 reactionKey="t"
                 priority={1}
-                groupPosition={999}
                 selector="div[tabindex]"
                 action="focus"
               >
@@ -332,7 +330,6 @@ function TdAndTh(props: IMaterialUIWrapperElementProps) {
             <AltBadgeReactioner
               reactionKey="c"
               priority={1}
-              groupPosition={1000}
               selector="button"
             >
               <IconButton
@@ -346,7 +343,6 @@ function TdAndTh(props: IMaterialUIWrapperElementProps) {
             <AltBadgeReactioner
               reactionKey="r"
               priority={1}
-              groupPosition={1001}
               selector="button"
             >
               <IconButton
@@ -360,7 +356,6 @@ function TdAndTh(props: IMaterialUIWrapperElementProps) {
             <AltBadgeReactioner
               reactionKey="h"
               priority={1}
-              groupPosition={1002}
               selector="button"
             >
               <IconButton
@@ -377,7 +372,6 @@ function TdAndTh(props: IMaterialUIWrapperElementProps) {
             <AltBadgeReactioner
               reactionKey="f"
               priority={1}
-              groupPosition={1003}
               selector="button"
             >
               <IconButton
@@ -496,7 +490,6 @@ export const materialUIElementWrappers: ISlateEditorElementWrappers = {
               <AltBadgeReactioner
                 reactionKey="h"
                 priority={1}
-                groupPosition={999}
                 selector="input"
                 action="focus"
                 disabled={!!(props.element as ILink).thref}
@@ -524,7 +517,6 @@ export const materialUIElementWrappers: ISlateEditorElementWrappers = {
                     <AltBadgeReactioner
                       reactionKey="t"
                       priority={1}
-                      groupPosition={1000}
                       selector="div[tabindex]"
                       action="focus"
                       fullWidth={true}
@@ -597,7 +589,6 @@ export const materialUIElementWrappers: ISlateEditorElementWrappers = {
             <AltBadgeReactioner
               reactionKey="u"
               priority={1}
-              groupPosition={999}
               selector="input"
               action="focus"
               fullWidth={true}
@@ -642,7 +633,6 @@ export const materialUIElementWrappers: ISlateEditorElementWrappers = {
             <AltBadgeReactioner
               reactionKey="a"
               priority={1}
-              groupPosition={999}
               selector="input"
               action="focus"
               fullWidth={true}
@@ -686,7 +676,6 @@ export const materialUIElementWrappers: ISlateEditorElementWrappers = {
             <AltBadgeReactioner
               reactionKey="t"
               priority={1}
-              groupPosition={999}
               selector="div[tabindex]"
               action="focus"
               fullWidth={true}
@@ -763,7 +752,6 @@ export const materialUIElementWrappers: ISlateEditorElementWrappers = {
             <AltBadgeReactioner
               reactionKey="t"
               priority={1}
-              groupPosition={999}
               selector="div[tabindex]"
               action="focus"
               fullWidth={true}

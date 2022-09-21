@@ -181,7 +181,7 @@ function PropertyEntryBooleanRenderer(props: IPropertyEntryBooleanRendererProps)
   }
   return (
     <Box sx={style.container}>
-      {props.description && descriptionAsAlert ? <Alert severity="info" sx={style.description}>
+      {props.description && descriptionAsAlert ? <Alert severity="info" sx={style.description} role="note">
         {props.description}
       </Alert> : null}
       {internalContent}

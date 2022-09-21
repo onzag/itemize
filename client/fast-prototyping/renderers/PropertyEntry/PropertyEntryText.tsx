@@ -229,6 +229,7 @@ class PropertyEntryTextRenderer extends React.PureComponent<IPropertyEntryTextRe
             ...this.props.args.wrapperArgs,
           }
         }
+        scrollMarginTop={this.props.args.scrollMarginTop}
       />
 
     if (this.props.args.disjointedMode) {
@@ -240,8 +241,8 @@ class PropertyEntryTextRenderer extends React.PureComponent<IPropertyEntryTextRe
     return (
       <Box sx={style.container}>
         {
-          this.props.description && descriptionAsAlert ?
-            <Alert severity="info" sx={style.description}>
+          this.props.description && descriptionAsAlert ?  
+            <Alert severity="info" sx={style.description} role="note">
               {this.props.description}
             </Alert> :
             null
