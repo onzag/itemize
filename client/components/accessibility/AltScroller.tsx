@@ -107,10 +107,7 @@ if (typeof document !== "undefined") {
   });
   document.addEventListener("keydown", (e) => {
     // ignore these two
-    if (e.key === "Shift" || e.key === "Tab") {
-      if (e.key === "Tab" && !ALT_SREGISTRY_IS_IN_DISPLAY_LAST) {
-        showRelevant();
-      }
+    if (e.key === "Shift" || e.key === "Tab" || e.key === "AltGraph") {
       return;
     }
 
@@ -248,13 +245,13 @@ export class ActualAltScroller extends React.PureComponent<IAltScrollerProps, IA
   public scroll(dir: "up" | "down" | "left" | "right") {
     const element = this.getScrollableComponent();
     if (dir === "up" || dir === "down") {
-      const scrollTop = element.scrollTop + (dir === "up" ? -element.offsetHeight/2 : element.offsetHeight/2);
+      const scrollTop = element.scrollTop + (dir === "up" ? -element.offsetHeight / 2 : element.offsetHeight / 2);
       element.scroll({
         top: scrollTop,
         behavior: "smooth",
       });
     } else {
-      const scrollLeft = element.scrollLeft + (dir === "left" ? -element.offsetWidth/2 : element.offsetWidth/2);
+      const scrollLeft = element.scrollLeft + (dir === "left" ? -element.offsetWidth / 2 : element.offsetWidth / 2);
       element.scroll({
         left: scrollLeft,
         behavior: "smooth",
@@ -288,7 +285,11 @@ const AltScroller = React.forwardRef((props: IAltScrollerProps, ref: RefObject<A
     <AltPriorityShifterContext.Consumer>
       {(v) => {
         return (
-          <ActualAltScroller {...props} priority={(props.priority || 0) + v} ref={ref}/>
+          <ActualAltScroller
+            {...props}
+            priority={(props.priority || 0) + v.amount}
+            disabled={props.disabled || v.disable}
+            ref={ref} />
         );
       }}
     </AltPriorityShifterContext.Consumer>

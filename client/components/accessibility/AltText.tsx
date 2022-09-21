@@ -11,7 +11,12 @@ const AltText = React.forwardRef((props: IAltTextProps, ref: ForwardedRef<Actual
     <AltPriorityShifterContext.Consumer>
       {(v) => {
         return (
-          <ActualAltBase {...props} priority={(props.priority || 0) + v} ref={ref} />
+          <ActualAltBase
+            {...props}
+            priority={(props.priority || 0) + v.amount}
+            groupPosition={(props.groupPosition || 0) + v.groupPositionAmount}
+            disabled={props.disabled || v.disable}
+            ref={ref} />
         );
       }}
     </AltPriorityShifterContext.Consumer>

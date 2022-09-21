@@ -43,6 +43,12 @@ export interface IAltBaseProps {
    * and can be focused via the tab key
    */
   tabbable?: boolean;
+  /**
+   * When using alt+gr tab and shift alt+gr tab it will move quickly between
+   * elements of the same tabgroup, if using with an element without a tabgroup
+   * it will match the next element that holds a tabgroup
+   */
+  tabGroup?: string;
 }
 
 export interface IAltReactionerProps extends IAltBaseProps {
@@ -119,6 +125,7 @@ const ALT_REGISTRY: {
   awaitingKeycodesFocusIndex: number;
   lastFocusedActionSignatures: { [priorityKey: number]: string };
   lastFocusedFlowSignatures: { [priorityKey: number]: string };
+  isJumpingThroughGroups: boolean;
 } = {
   flow: [],
   activeFlow: null,
@@ -132,6 +139,7 @@ const ALT_REGISTRY: {
   awaitingKeycodesFocusIndex: -1,
   lastFocusedActionSignatures: {},
   lastFocusedFlowSignatures: {},
+  isJumpingThroughGroups: false,
 };
 
 function hideAll(butKeycodes: ActualAltReactioner[] = []) {
@@ -251,7 +259,7 @@ function showDisplayElements(priorityToUse: number) {
   }
 }
 
-function triggerBasedOn(code: string, shiftKey: boolean, callbackIfmatch: () => void) {
+function triggerBasedOn(code: string, shiftKey: boolean, callbackIfmatch: () => void, forceHidden?: boolean) {
   if (code === "shift") {
     return;
   } else if (code === "tab") {
@@ -269,15 +277,18 @@ function triggerBasedOn(code: string, shiftKey: boolean, callbackIfmatch: () => 
         }
       }
 
+      const selected = ALT_REGISTRY.awaitingKeycodes[ALT_REGISTRY.awaitingKeycodesFocusIndex];
+      const expectNextGroup = ALT_REGISTRY.isJumpingThroughGroups ? (selected ? selected.getTabGroup() : undefined) : undefined;
+
       // make sure that there are tabbable components not to enter an infinite loop
-      if (!ALT_REGISTRY.awaitingKeycodes.some((e) => e.isTabbale() && !e.isUsedInFlow())) {
+      if (!ALT_REGISTRY.awaitingKeycodes.some((e) => e.isTabbale() && !e.isUsedInFlow() && e.isCorrectMatchForTabGroup(expectNextGroup))) {
         // break it and stop it now
         callbackIfmatch();
         return;
       }
 
       let nextElement = ALT_REGISTRY.awaitingKeycodes[nextIndex];
-      while (!nextElement.isTabbale()) {
+      while (!nextElement.isTabbale() || nextElement.isUsedInFlow() || !nextElement.isCorrectMatchForTabGroup(expectNextGroup)) {
         nextIndex = ((nextIndex + len + (!shiftKey ? 1 : -1))) % len;
         nextElement = ALT_REGISTRY.awaitingKeycodes[nextIndex];
       }
@@ -314,15 +325,18 @@ function triggerBasedOn(code: string, shiftKey: boolean, callbackIfmatch: () => 
         }
       }
 
+      const selected = ALT_REGISTRY.isDisplayingActions[ALT_REGISTRY.displayedActionsFocusIndex];
+      const expectNextGroup = ALT_REGISTRY.isJumpingThroughGroups ? (selected ? selected.getTabGroup() : undefined) : undefined;
+
       // make sure that there are tabbable components not to enter an infinite loop
-      if (!ALT_REGISTRY.isDisplayingActions.some((e) => e.isTabbale() && !e.isUsedInFlow())) {
+      if (!ALT_REGISTRY.isDisplayingActions.some((e) => e.isTabbale() && !e.isUsedInFlow() && e.isCorrectMatchForTabGroup(expectNextGroup))) {
         // break it and stop it now
         callbackIfmatch();
         return;
       }
 
       let nextElement = ALT_REGISTRY.isDisplayingActions[nextIndex];
-      while (!(nextElement.isTabbale() || nextElement.isUsedInFlow())) {
+      while (!nextElement.isTabbale() || nextElement.isUsedInFlow() || !nextElement.isCorrectMatchForTabGroup(expectNextGroup)) {
         nextIndex = ((nextIndex + len + (!shiftKey ? 1 : -1))) % len;
         nextElement = ALT_REGISTRY.isDisplayingActions[nextIndex];
       }
@@ -359,17 +373,20 @@ function triggerBasedOn(code: string, shiftKey: boolean, callbackIfmatch: () => 
         }
       }
 
+      const selected = ALT_REGISTRY.activeFlow[ALT_REGISTRY.activeFlowFocusIndex];
+      const expectNextGroup = ALT_REGISTRY.isJumpingThroughGroups ? (selected ? selected.getTabGroup() : undefined) : undefined;
+
       // make sure that there are tabbable components not to enter an infinite loop
-      if (!ALT_REGISTRY.activeFlow.some((e) => e.isTabbale())) {
+      if (!ALT_REGISTRY.activeFlow.some((e) => e.isTabbale() && e.isCorrectMatchForTabGroup(expectNextGroup))) {
         // break it and stop it now
         callbackIfmatch();
         return;
       }
 
       let nextElement = ALT_REGISTRY.activeFlow[nextIndex];
-      while (!nextElement.isTabbale()) {
+      while (!nextElement.isTabbale() || !nextElement.isCorrectMatchForTabGroup(expectNextGroup)) {
         nextIndex = ((nextIndex + len + (!shiftKey ? 1 : -1))) % len;
-        nextElement = ALT_REGISTRY.isDisplayingActions[nextIndex];
+        nextElement = ALT_REGISTRY.activeFlow[nextIndex];
       }
       // the index should be fine now and pointing to the next tabbable component
 
@@ -424,21 +441,21 @@ function triggerBasedOn(code: string, shiftKey: boolean, callbackIfmatch: () => 
     }
   }
 
-  const value = ALT_REGISTRY.awaitingKeycodes ?
+  let value = ALT_REGISTRY.awaitingKeycodes ?
     // can be nan if not a number but who minds that
     ALT_REGISTRY.awaitingKeycodes[parseInt(code) - 1] :
-    ALT_REGISTRY[code];
+    ALT_REGISTRY.actions[code];
 
   const matches: ActualAltReactioner[] = []
   if (value) {
     if (Array.isArray(value)) {
       value.forEach((k) => {
-        if (k.isDisplayed()) {
+        if (k.getPriority() === ALT_REGISTRY.displayedActionsPriority && (k.isDisplayed() || forceHidden)) {
           matches.push(k);
         }
       });
     } else {
-      if (value.isDisplayed()) {
+      if (value.getPriority() === ALT_REGISTRY.displayedActionsPriority && (value.isDisplayed() || forceHidden)) {
         matches.push(value);
       }
     }
@@ -482,9 +499,20 @@ if (typeof document !== "undefined") {
       hideAll();
     }
   });
+  document.addEventListener("keyup", (e) => {
+    if (e.key === "AltGraph") {
+      ALT_REGISTRY.isJumpingThroughGroups = false;
+      return;
+    }
+  });
   document.addEventListener("keydown", (e) => {
     // some special events don't have this
     if (!e.code) {
+      return;
+    }
+
+    if (e.key === "AltGraph") {
+      ALT_REGISTRY.isJumpingThroughGroups = true;
       return;
     }
 
@@ -500,6 +528,7 @@ if (typeof document !== "undefined") {
     const isArrow = arrows.includes(keyCode);
     const isAltKey = e.altKey;
     const isTab = keyCode === "tab";
+    const isEscape = keyCode === "escape";
 
     const isPureAltKey = isAltKey && keyCode === "alt";
 
@@ -508,7 +537,7 @@ if (typeof document !== "undefined") {
       e.preventDefault();
     }
 
-    if (isPureAltKey || isTab) {
+    if (isPureAltKey || isTab || isEscape) {
       if (isPureAltKey) {
         if (ALT_REGISTRY.isDisplayingActions) {
           // pressing alt again
@@ -521,7 +550,7 @@ if (typeof document !== "undefined") {
 
           showDisplayElements(activeFlowPriority > displayElementsPriority ? activeFlowPriority : displayElementsPriority);
         }
-      } else if (isTab) {
+      } else if (isTab || isEscape) {
         const activeFlowPriority = calculateActiveFlow();
 
         if (!ALT_REGISTRY.isDisplayingActions) {
@@ -529,10 +558,21 @@ if (typeof document !== "undefined") {
           const displayElementsPriority = calculatePriorityOfDisplayElements();
 
           if (displayElementsPriority > activeFlowPriority) {
-            showDisplayElements(displayElementsPriority);
+            if (isEscape) {
+              // don't display just trigger force
+              triggerBasedOn(keyCode, e.shiftKey, () => {
+                e.stopPropagation();
+                e.preventDefault();
+              }, true);
+              return;
+            } else {
+              showDisplayElements(displayElementsPriority);
+              // make also the sroll visible
+              showRelevant();
+            }
           }
         }
-
+        
         triggerBasedOn(keyCode, e.shiftKey, () => {
           e.stopPropagation();
           e.preventDefault();
@@ -561,6 +601,22 @@ export class ActualAltBase<P extends IAltBaseProps, S> extends React.PureCompone
     super(props);
 
     this.containerRef = React.createRef<HTMLElement>();
+  }
+
+  public getTabGroup() {
+    return this.props.tabGroup || null;
+  }
+
+  public isCorrectMatchForTabGroup(v: string) {
+    // no tab group to match for, everything matches
+    if (typeof v === "undefined") {
+      return true;
+    } else if (v === null) {
+      // the expected match is for anything that has a tab group
+      return !!this.getTabGroup();
+    } else {
+      return this.getTabGroup() === v;
+    }
   }
 
   public isTabbale() {
@@ -744,7 +800,7 @@ export class ActualAltReactioner extends ActualAltBase<IAltReactionerProps, IAct
       super.unregister(props);
     }
 
-    if (ALT_REGISTRY[props.reactionKey]) {
+    if (ALT_REGISTRY.actions[props.reactionKey]) {
       const index = ALT_REGISTRY.actions[props.reactionKey].findIndex((e) => e === this);
       if (index !== -1) {
         ALT_REGISTRY.actions[props.reactionKey].splice(index, 1);
@@ -785,7 +841,7 @@ export class ActualAltReactioner extends ActualAltBase<IAltReactionerProps, IAct
 
     if (!ALT_REGISTRY.actions[props.reactionKey]) {
       ALT_REGISTRY.actions[props.reactionKey] = [this];
-    } else if (!ALT_REGISTRY[props.reactionKey].includes(this)) {
+    } else if (!ALT_REGISTRY.actions[props.reactionKey].includes(this)) {
       ALT_REGISTRY.actions[props.reactionKey].push(this);
     }
 
@@ -895,7 +951,13 @@ const AltReactioner = React.forwardRef((props: IAltReactionerProps, ref: Forward
     <AltPriorityShifterContext.Consumer>
       {(v) => {
         return (
-          <ActualAltReactioner {...props} priority={(props.priority || 0) + v} ref={ref} />
+          <ActualAltReactioner
+            {...props}
+            priority={(props.priority || 0) + v.amount}
+            groupPosition={(props.groupPosition || 0) + v.groupPositionAmount}
+            disabled={props.disabled || v.disable}
+            ref={ref}
+          />
         );
       }}
     </AltPriorityShifterContext.Consumer>

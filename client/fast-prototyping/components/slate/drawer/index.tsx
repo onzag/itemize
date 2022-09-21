@@ -5,7 +5,7 @@
  * @module
  */
 
-import React, { useCallback, useEffect, useRef, useState } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import { IDrawerContainerProps } from "../wrapper";
 import { GeneralOptions } from "./general";
 import { StylesOptions } from "./styles";
@@ -54,8 +54,6 @@ export function WrapperDrawer(props: IDrawerContainerProps) {
       useAccessibilitySelectedOption(null);
     }
   }, [props.drawerOpen]);
-
-  console.log("SELECTED", accessibilitySelectedOption);
 
   // update the given location
   const setLocationCallback = useCallback((e: React.ChangeEvent, value: string) => {

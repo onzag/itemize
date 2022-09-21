@@ -963,11 +963,16 @@ function TemplateHTML(props: RichTextEditorToolbarElementProps) {
 
   let templateHTMLAmount = 0;
 
+  const currentSelectedSuperBlockElement = this.state.currentSelectedSuperBlockElements &&
+    this.state.currentSelectedSuperBlockElements[
+    this.state.currentSelectedSuperBlockElements.length - 1
+    ];
+
   if (
-    props.state.currentSelectedSuperBlockElement
+    currentSelectedSuperBlockElement
   ) {
-    Object.keys(props.state.currentSelectedSuperBlockContext.properties).forEach((key) => {
-      const property = props.state.currentSelectedSuperBlockContext.properties[key];
+    Object.keys(props.state.currentSelectedTopmostSuperBlockContext.properties).forEach((key) => {
+      const property = props.state.currentSelectedTopmostSuperBlockContext.properties[key];
 
       // but they must be the given element type
       if (property.type === "html") {
@@ -979,7 +984,7 @@ function TemplateHTML(props: RichTextEditorToolbarElementProps) {
   if (
     props.featureSupport.supportsTemplating &&
     props.state.currentRootContext &&
-    props.state.currentRootContext !== props.state.currentSelectedSuperBlockContext
+    props.state.currentRootContext !== props.state.currentSelectedTopmostSuperBlockContext
   ) {
     Object.keys(props.state.currentRootContext.properties).forEach((key) => {
       const property = props.state.currentRootContext.properties[key];
@@ -1013,7 +1018,7 @@ function TemplateHTML(props: RichTextEditorToolbarElementProps) {
     <Badge
       badgeContent={templateHTMLAmount}
       color="error"
-      sx={props.state.currentSelectedSuperBlockElement ? style.badge : style.badgeDisabled}
+      sx={props.state.currentSelectedTopmostSuperBlockContext ? style.badge : style.badgeDisabled}
     >
       {element}
     </Badge>
@@ -1620,7 +1625,12 @@ export class MaterialUISlateWrapper extends React.PureComponent<IMaterialUISlate
     this.originalSelectionArea = this.props.state.currentText ? this.props.helpers.editor.selection : null;
     this.originalSelectionPath = this.props.state.currentSelectedInlineElementAnchor ||
       this.props.state.currentSelectedBlockElementAnchor ||
-      this.props.state.currentSelectedSuperBlockElementAnchor;
+      (
+        this.props.state.currentSelectedSuperBlockElementAnchors &&
+        this.props.state.currentSelectedSuperBlockElementAnchors[
+          this.props.state.currentSelectedSuperBlockElementAnchors.length - 1
+        ]
+      );
     // trigger a click
     this.inputImageRef.current.click();
   }
@@ -1636,7 +1646,12 @@ export class MaterialUISlateWrapper extends React.PureComponent<IMaterialUISlate
     this.originalSelectionArea = this.props.state.currentText ? this.props.helpers.editor.selection : null;
     this.originalSelectionPath = this.props.state.currentSelectedInlineElementAnchor ||
       this.props.state.currentSelectedBlockElementAnchor ||
-      this.props.state.currentSelectedSuperBlockElementAnchor;
+      (
+        this.props.state.currentSelectedSuperBlockElementAnchors &&
+        this.props.state.currentSelectedSuperBlockElementAnchors[
+          this.props.state.currentSelectedSuperBlockElementAnchors.length - 1
+        ]
+      );
     // trigger a click
     this.inputFileRef.current.click();
   }

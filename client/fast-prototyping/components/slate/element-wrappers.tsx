@@ -82,24 +82,6 @@ function getVideoURL(v: IVideo) {
   }
 }
 
-function hasASelectedInlineOrBlock(state: ISlateEditorInternalStateType) {
-  const block = state.currentSelectedBlockElement;
-  if (block && (block.type === "video" || (block.type === "void-block" && typeof block.html === "string")) && !block.uiHandler) {
-    return true;
-  }
-
-  return hasASelectedInline(state);
-}
-
-function hasASelectedInline(state: ISlateEditorInternalStateType) {
-  const inline = state.currentSelectedInlineElement;
-  if (inline && ((inline.type === "inline" && inline.textContent) || inline.type === "link") && !inline.uiHandler) {
-    return true;
-  }
-
-  return false;
-}
-
 function TextWrapper(props: IMaterialUIWrapperElementProps) {
   const [textOptions, setTextOptions] = useState<ITemplateOption[]>([]);
 
@@ -659,8 +641,6 @@ export const materialUIElementWrappers: ISlateEditorElementWrappers = {
     td: TdAndTh as any,
     th: TdAndTh as any,
     title: (props: IMaterialUIWrapperElementProps) => {
-      const isOpen = props.isSelected && !hasASelectedInline(props.helpers.getState());
-
       const updateTitleType = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
         const path = props.helpers.ReactEditor.findPath(props.helpers.editor, props.element);
         props.helpers.set({
@@ -671,7 +651,7 @@ export const materialUIElementWrappers: ISlateEditorElementWrappers = {
       return (
         <EditorDropdown
           componentWrapper="div"
-          isOpen={isOpen}
+          isOpen={props.isSelected}
           dropdown={
             <AltBadgeReactioner
               reactionKey="t"
@@ -742,12 +722,10 @@ export const materialUIElementWrappers: ISlateEditorElementWrappers = {
         return props.children;
       }
 
-      const isOpen = props.isSelected && !hasASelectedInlineOrBlock(props.helpers.getState());
-
       return (
         <EditorDropdown
           componentWrapper="span"
-          isOpen={isOpen}
+          isOpen={props.isSelected}
           dropdown={
             <AltBadgeReactioner
               reactionKey="t"

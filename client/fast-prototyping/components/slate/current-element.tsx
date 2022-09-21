@@ -4,7 +4,7 @@ import { RichElement, isBlock, isSuperBlock } from "../../../internal/text/seria
 
 interface ICurrentelementProviderProps {
   block: RichElement;
-  superblock: RichElement;
+  superblocks: RichElement[];
   inline: RichElement;
 }
 
@@ -60,15 +60,16 @@ export class CurrentElementRetriever extends React.PureComponent<ICurrentElement
     if (isBlock(elementInQuestion)) {
       selectionCriteria = "block";
       isSelected = selection.block === elementInQuestion;
-      selectionIsPrimary = !selection.inline;
+      selectionIsPrimary = isSelected && !selection.inline;
     } else if (isSuperBlock(elementInQuestion)) {
       selectionCriteria = "superblock";
-      isSelected = selection.superblock === elementInQuestion;
-      selectionIsPrimary = !selection.block && !selection.inline;
+      const index = selection.superblocks.findIndex((e) => e === elementInQuestion);
+      isSelected = index !== -1;
+      selectionIsPrimary = isSelected && !selection.block && !selection.inline && index === selection.superblocks.length - 1;
     } else {
       selectionCriteria = "inline";
       isSelected = selection.inline === elementInQuestion;
-      selectionIsPrimary = true;
+      selectionIsPrimary = isSelected;
     }
 
     return (

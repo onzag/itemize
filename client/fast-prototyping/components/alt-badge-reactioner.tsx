@@ -122,6 +122,12 @@ interface IAltBadgeReactionerProps {
    * rather as a simple focusable element, but it will be displayed in alt mode
    */
   useInFlow?: boolean;
+  /**
+   * When using alt+gr tab and shift alt+gr tab it will move quickly between
+   * elements of the same tabgroup, if using with an element without a tabgroup
+   * it will match the next element that holds a tabgroup
+   */
+  tabGroup?: string;
 }
 
 export function AltBadgeReactioner(

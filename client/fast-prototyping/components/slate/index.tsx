@@ -49,6 +49,17 @@ declare module 'slate' {
   }
 }
 
+function findLastIndex(arr: any[], fn: (ele: any) => boolean) {
+  let currentIndex = arr.length;
+  while (currentIndex--) {
+    if (fn(arr[currentIndex])) {
+      return currentIndex;
+    }
+  }
+
+  return -1;
+}
+
 /**
  * Combine both interfaces
  */
@@ -379,6 +390,12 @@ export interface IHelperFunctions {
   focusAt: (at: Range | Path) => Promise<void>;
 
   /**
+   * inserts a super break at the given position in order
+   * to add a paragraph
+   */
+  insertSuperbreak: (at?: Path, reverse?: boolean) => void;
+
+  /**
    * Will insert an image based on a given file that has
    * been taken as an input
    * @param file the file
@@ -611,7 +628,7 @@ export interface ISlateEditorInternalStateType {
   currentText: IText;
   currentInlineElement: RichElement;
   currentBlockElement: RichElement;
-  currentSuperBlockElement: RichElement;
+  currentSuperBlockElements: RichElement[];
 
   /**
    * The current path followed, text path for the current text
@@ -619,7 +636,7 @@ export interface ISlateEditorInternalStateType {
   currentTextAnchor: Path;
   currentInlineElementAnchor: Path;
   currentBlockElementAnchor: Path;
-  currentSuperBlockElementAnchor: Path;
+  currentSuperBlockElementAnchors: Path[];
 
   /**
    * The current selected node that is being worked with
@@ -629,19 +646,20 @@ export interface ISlateEditorInternalStateType {
   currentSelectedText: IText;
   currentSelectedInlineElement: RichElement;
   currentSelectedBlockElement: RichElement;
-  currentSelectedSuperBlockElement: RichElement;
+  currentSelectedSuperBlockElements: RichElement[];
   currentSelectedElement: RichElement;
 
   currentSelectedTextAnchor: Path;
   currentSelectedInlineElementAnchor: Path;
   currentSelectedBlockElementAnchor: Path;
-  currentSelectedSuperBlockElementAnchor: Path;
+  currentSelectedSuperBlockElementAnchors: Path[];
+
   currentSelectedElementAnchor: Path;
   previousSelectedElementAnchor: Path;
   previousTextAnchor: Path;
 
   currentRootContext: ITemplateArgContextDefinition;
-  currentSelectedSuperBlockContext: ITemplateArgContextDefinition;
+  currentSelectedTopmostSuperBlockContext: ITemplateArgContextDefinition;
   currentSelectedBlockContext: ITemplateArgContextDefinition;
   currentSelectedInlineContext: ITemplateArgContextDefinition;
   currentSelectedElementContext: ITemplateArgContextDefinition;
@@ -660,7 +678,7 @@ export interface ISlateEditorInternalStateType {
   allowsText: boolean;
   inlineIsVoid: boolean;
   blockIsVoid: boolean;
-  superblockIsVoid: boolean;
+  topmostSuperblockIsVoid: boolean;
   superBlockUIHandler: ITemplateArgUIHandlerDefinition;
   blockUIHandler: ITemplateArgUIHandlerDefinition;
   inlineUIHandler: ITemplateArgUIHandlerDefinition;
@@ -1069,23 +1087,23 @@ export class SlateEditor extends React.Component<ISlateEditorProps, ISlateEditor
             currentText: null,
             currentInlineElement: null,
             currentBlockElement: null,
-            currentSuperBlockElement: null,
+            currentSuperBlockElements: null,
             currentTextAnchor: null,
             currentInlineElementAnchor: null,
             currentBlockElementAnchor: null,
-            currentSuperBlockElementAnchor: null,
+            currentSuperBlockElementAnchors: null,
 
             currentSelectedText: null,
             currentSelectedInlineElement: null,
             currentSelectedBlockElement: null,
-            currentSelectedSuperBlockElement: null,
+            currentSelectedSuperBlockElements: null,
             currentSelectedTextAnchor: null,
             currentSelectedInlineElementAnchor: null,
             currentSelectedBlockElementAnchor: null,
-            currentSelectedSuperBlockElementAnchor: null,
+            currentSelectedSuperBlockElementAnchors: null,
             currentSelectedBlockContext: null,
             currentSelectedInlineContext: null,
-            currentSelectedSuperBlockContext: null,
+            currentSelectedTopmostSuperBlockContext: null,
             currentSelectedElement: null,
             currentSelectedElementAnchor: null,
             currentSelectedElementContext: null,
@@ -1096,7 +1114,7 @@ export class SlateEditor extends React.Component<ISlateEditorProps, ISlateEditor
             allowsText: false,
             inlineIsVoid: false,
             blockIsVoid: false,
-            superblockIsVoid: false,
+            topmostSuperblockIsVoid: false,
             superBlockUIHandler: null,
             blockUIHandler: null,
             inlineUIHandler: null,
@@ -1129,20 +1147,20 @@ export class SlateEditor extends React.Component<ISlateEditorProps, ISlateEditor
             currentText: null,
             currentInlineElement: null,
             currentBlockElement: null,
-            currentSuperBlockElement: null,
+            currentSuperBlockElements: null,
             currentTextAnchor: null,
             currentInlineElementAnchor: null,
             currentBlockElementAnchor: null,
-            currentSuperBlockElementAnchor: null,
+            currentSuperBlockElementAnchors: null,
 
             currentSelectedText: null,
             currentSelectedInlineElement: null,
             currentSelectedBlockElement: null,
-            currentSelectedSuperBlockElement: null,
+            currentSelectedSuperBlockElements: null,
             currentSelectedTextAnchor: null,
             currentSelectedInlineElementAnchor: null,
             currentSelectedBlockElementAnchor: null,
-            currentSelectedSuperBlockElementAnchor: null,
+            currentSelectedSuperBlockElementAnchors: null,
             currentSelectedElement: null,
             currentSelectedElementAnchor: null,
             previousSelectedElementAnchor: null,
@@ -1152,7 +1170,7 @@ export class SlateEditor extends React.Component<ISlateEditorProps, ISlateEditor
             allowsText: false,
             inlineIsVoid: false,
             blockIsVoid: false,
-            superblockIsVoid: false,
+            topmostSuperblockIsVoid: false,
             superBlockUIHandler: null,
             blockUIHandler: null,
             inlineUIHandler: null,
@@ -1188,20 +1206,20 @@ export class SlateEditor extends React.Component<ISlateEditorProps, ISlateEditor
       currentText: null,
       currentInlineElement: null,
       currentBlockElement: null,
-      currentSuperBlockElement: null,
+      currentSuperBlockElements: null,
       currentTextAnchor: null,
       currentInlineElementAnchor: null,
       currentBlockElementAnchor: null,
-      currentSuperBlockElementAnchor: null,
+      currentSuperBlockElementAnchors: null,
 
       currentSelectedText: null,
       currentSelectedInlineElement: null,
       currentSelectedBlockElement: null,
-      currentSelectedSuperBlockElement: null,
+      currentSelectedSuperBlockElements: null,
       currentSelectedTextAnchor: null,
       currentSelectedInlineElementAnchor: null,
       currentSelectedBlockElementAnchor: null,
-      currentSelectedSuperBlockElementAnchor: null,
+      currentSelectedSuperBlockElementAnchors: null,
       currentSelectedElement: null,
       currentSelectedElementAnchor: null,
       previousSelectedElementAnchor: null,
@@ -1211,7 +1229,7 @@ export class SlateEditor extends React.Component<ISlateEditorProps, ISlateEditor
       currentRootContext: props.rootContext || null,
       currentSelectedBlockContext: null,
       currentSelectedInlineContext: null,
-      currentSelectedSuperBlockContext: null,
+      currentSelectedTopmostSuperBlockContext: null,
       currentSelectedElementContext: null,
       currentValid: props.currentValid,
 
@@ -1227,7 +1245,7 @@ export class SlateEditor extends React.Component<ISlateEditorProps, ISlateEditor
       allowsText: false,
       inlineIsVoid: false,
       blockIsVoid: false,
-      superblockIsVoid: false,
+      topmostSuperblockIsVoid: false,
       superBlockUIHandler: null,
       blockUIHandler: null,
       inlineUIHandler: null,
@@ -1244,7 +1262,7 @@ export class SlateEditor extends React.Component<ISlateEditorProps, ISlateEditor
     // the defaults
     this.normalizeNode = this.normalizeNode.bind(this);
     this.insertBreak = this.insertBreak.bind(this);
-    this.insertSuperblockBreak = this.insertSuperblockBreak.bind(this);
+    this.insertSuperbreak = this.insertSuperbreak.bind(this);
     this.deleteBackward = this.deleteBackward.bind(this);
     this.deleteForward = this.deleteForward.bind(this);
     this.setFragmentData = this.setFragmentData.bind(this);
@@ -1435,16 +1453,23 @@ export class SlateEditor extends React.Component<ISlateEditorProps, ISlateEditor
       const parsed = (
         await Promise.all(JSON.parse(decoded).map(this.findAndInsertFilesFromDataTransfer.bind(this, data, blobs))) as Node[]
       ).filter(e => !!e) as any;
+
+      if (!parsed || !parsed.length) {
+
+      }
+
       // now we can insert that fragment once we are done
-      console.log("TODO", parsed);
-      // const parsedIsStandard = parsed.every((n: RichElement) => n.containment !== "superblock" && n.containment !== "list-superblock");
-      // if (parsedIsStandard) {
-      //   Transforms.insertFragment(this.editor, parsed);
-      // } else if (this.state.currentBlockElementAnchor) {
-      //   const pathForNext = [...this.state.currentBlockElementAnchor];
-      //   pathForNext[pathForNext.length - 1]++;
-      //   Transforms.insertNodes(this.editor, parsed, { at: pathForNext });
-      // }
+      const shouldUseInsertFragment = !isSuperBlock(parsed[0]);
+      if (shouldUseInsertFragment) {
+        // inserting a fragment allows merging of blocks
+        // with this we ensure that for example, a title can be pasted
+        // inside a paragraph
+        Transforms.insertFragment(this.editor, parsed);
+      } else if (this.state.currentBlockElementAnchor) {
+        // the next one is a superblock we are trying to push
+        // we do not allow it attempting to merge with our current
+        Transforms.insertNodes(this.editor, parsed);
+      }
       return;
     }
 
@@ -1668,10 +1693,13 @@ export class SlateEditor extends React.Component<ISlateEditorProps, ISlateEditor
    * Override for the default editor insert break function
    */
   public insertBreak() {
+    const currentSuperBlockElement = this.state.currentSuperBlockElements &&
+      this.state.currentSuperBlockElements[this.state.currentSuperBlockElements.length - 1];
+
     const isListItemBreak = (
-      this.state.currentSuperBlockElement &&
+      currentSuperBlockElement &&
       // and we are within a list and a list item
-      this.state.currentSuperBlockElement.type === "list-item"
+      currentSuperBlockElement.type === "list-item"
     );
     if (
       // if we are simply collapsed
@@ -1680,11 +1708,11 @@ export class SlateEditor extends React.Component<ISlateEditorProps, ISlateEditor
       isListItemBreak &&
       // and that first children is an empty paragraph
       // there may be a second list
-      (this.state.currentSuperBlockElement.children[0] as any).type === "paragraph" &&
+      (currentSuperBlockElement.children[0] as any).type === "paragraph" &&
       // with one empty text node
-      (this.state.currentSuperBlockElement.children[0] as any).children.length === 1 &&
-      Text.isText((this.state.currentSuperBlockElement.children[0] as any).children[0]) &&
-      (this.state.currentSuperBlockElement.children[0] as any).children[0].text === ""
+      (currentSuperBlockElement.children[0] as any).children.length === 1 &&
+      Text.isText((currentSuperBlockElement.children[0] as any).children[0]) &&
+      (currentSuperBlockElement.children[0] as any).children[0].text === ""
       // and that text node is empty
       // basically
       // 1. list item 1
@@ -1799,15 +1827,18 @@ export class SlateEditor extends React.Component<ISlateEditorProps, ISlateEditor
    */
   public deleteBackward(unit: "character" | "word" | "line" | "block") {
     // first we pick the current selection
-    const { selection } = this.editor
+    const { selection } = this.editor;
+
+    const currentSuperBlockElement = this.state.currentSuperBlockElements &&
+      this.state.currentSuperBlockElements[this.state.currentSuperBlockElements.length - 1];
 
     // if we have one of any kind
     if (
       selection &&
       // and it's collapsed
       Range.isCollapsed(selection) &&
-      this.state.currentSuperBlockElement &&
-      this.state.currentSuperBlockElement.type === "list-item" &&
+      currentSuperBlockElement &&
+      currentSuperBlockElement.type === "list-item" &&
       (
         // and we are deleting a character of a word
         (
@@ -1876,56 +1907,94 @@ export class SlateEditor extends React.Component<ISlateEditorProps, ISlateEditor
    * Inserts a superblock break, since you might not be able to escape
    * superblocks, eg. such as a single container, you will use a superblock break
    * alt+enter in order to escape the superblock
+   * 
+   * @param at the path of the superblock to insert a break at
+   * @param reverse whether to insert it before or after, by default it will be after, use this flag for before
    */
-  public insertSuperblockBreak() {
-    // of course there needs to be such a superblock
-    if (
-      this.state.currentSuperBlockElement
-    ) {
-      const currentSuperBlockElementAnchor = [...this.state.currentSuperBlockElementAnchor];
+  public insertSuperbreak(at?: Path, reverse?: boolean) {
+    let currentElementToBreakFromAnchor = at || (
+      this.state.currentBlockElement && isVoid(this.state.currentBlockElement) && this.state.currentBlockElementAnchor
+    ) || (
+        this.state.currentSuperBlockElements &&
+        this.state.currentSuperBlockElementAnchors[this.state.currentSuperBlockElementAnchors.length - 1]
+      );
 
-      // for tables we want to attack the table element
-      if (this.state.currentSuperBlockElement.type === "td" || this.state.currentSuperBlockElement.type === "th") {
-        //tr
-        currentSuperBlockElementAnchor.pop();
-        //tbody
-        currentSuperBlockElementAnchor.pop();
-        //table
-        currentSuperBlockElementAnchor.pop();
-      }
-      // and now we need to get the next anchor that is next to such block
-      const nextAnchor = currentSuperBlockElementAnchor;
-      nextAnchor[nextAnchor.length - 1]++;
-
-      // and we insert a clone based on the block itself
-      // with no text
-      Transforms.insertNodes(this.editor, {
-        type: "paragraph" as any,
-        ...this.state.currentBlockElement,
-        uiHandler: null,
-        uiHandlerArgs: null,
-        children: [
-          {
-            ...this.state.currentText,
-            text: "",
-          } as any
-        ]
-      }, { at: nextAnchor });
-
-      // and we want to focus on such text
-      const nextAnchorText = nextAnchor.concat([0]);
-
-      this.focusAt({
-        anchor: {
-          offset: 0,
-          path: nextAnchorText,
-        },
-        focus: {
-          offset: 0,
-          path: nextAnchorText,
-        },
-      });
+    if (!currentElementToBreakFromAnchor) {
+      return;
     }
+
+    let currentElementToBreakFrom = Node.get(this.editor, currentElementToBreakFromAnchor) as RichElement;
+    // make a copy
+    currentElementToBreakFromAnchor = [...currentElementToBreakFromAnchor];
+    // so we get this anchor for the parent
+    let parentSuperBlockElementAnchor = [...currentElementToBreakFromAnchor];
+    parentSuperBlockElementAnchor.pop();
+    let parentSuperBlockElement: RichElement = null;
+
+    // and now loop
+    while (true) {
+      // get the parent element and check that paragraphs can be added to it
+      parentSuperBlockElement = Node.get(this.editor, parentSuperBlockElementAnchor) as RichElement;
+      const allowsChildren = SERIALIZATION_REGISTRY.ALLOWS_CHILDREN[parentSuperBlockElement.type];
+      const canParentHaveParagraphAsChildren = !allowsChildren || allowsChildren.includes("paragraph");
+      const isASoloEscapableType = currentElementToBreakFrom.type === "list";
+
+      // could be the editor, so we stop
+      if (
+        (
+          // list and list items can be escaped by
+          // standard entering so we don't allow that as a break point
+          !isASoloEscapableType &&
+          canParentHaveParagraphAsChildren
+        ) ||
+        !parentSuperBlockElementAnchor.length
+      ) {
+        break;
+      }
+
+      // otherwise we go one level up for both
+      parentSuperBlockElementAnchor.pop();
+      currentElementToBreakFromAnchor.pop();
+      currentElementToBreakFrom = Node.get(this.editor, currentElementToBreakFromAnchor) as RichElement;
+    };
+
+    // cannot break as it's a solo escapable type
+    if (currentElementToBreakFrom.type === "list") {
+      return;
+    }
+
+    // and now we need to get the next anchor that is next to such block
+    const nextAnchor = currentElementToBreakFromAnchor;
+    if (!reverse) {
+      // if it's in reverse we actually just insert right in the same spot
+      // which will push the given superblock forwards
+      nextAnchor[nextAnchor.length - 1]++;
+    }
+
+    // and we insert a clone based on the block itself
+    // with no text
+    Transforms.insertNodes(this.editor, {
+      type: "paragraph" as any,
+      children: [
+        {
+          text: "",
+        } as any
+      ]
+    }, { at: nextAnchor });
+
+    // and we want to focus on such text
+    const nextAnchorText = nextAnchor.concat([0]);
+
+    this.focusAt({
+      anchor: {
+        offset: 0,
+        path: nextAnchorText,
+      },
+      focus: {
+        offset: 0,
+        path: nextAnchorText,
+      },
+    });
   }
 
   /**
@@ -1947,8 +2016,8 @@ export class SlateEditor extends React.Component<ISlateEditorProps, ISlateEditor
     let currentInlineElementAnchor: Path = null;
     let currentBlockElement: RichElement = null;
     let currentBlockElementAnchor: Path = null;
-    let currentSuperBlockElement: RichElement = null;
-    let currentSuperBlockElementAnchor: Path = null;
+    let currentSuperBlockElements: RichElement[] = null;
+    let currentSuperBlockElementAnchors: Path[] = null;
     let currentText: IText = null;
     let currentTextAnchor: Path = null;
 
@@ -1984,8 +2053,12 @@ export class SlateEditor extends React.Component<ISlateEditorProps, ISlateEditor
 
         // if we have a superblock or list-item element that contains lists
         if (currentLoopingElement && SERIALIZATION_REGISTRY.SUPERBLOCKS[currentLoopingElement.type]) {
-          currentSuperBlockElement = currentLoopingElement;
-          currentSuperBlockElementAnchor = [...loopingAnchor];
+          if (!currentSuperBlockElements) {
+            currentSuperBlockElements = [];
+            currentSuperBlockElementAnchors = [];
+          }
+          currentSuperBlockElements.push(currentLoopingElement);
+          currentSuperBlockElementAnchors.push([...loopingAnchor]);
         }
 
         if (currentLoopingElement && Text.isText(currentLoopingElement)) {
@@ -1999,9 +2072,9 @@ export class SlateEditor extends React.Component<ISlateEditorProps, ISlateEditor
     let currentSelectedInlineElementAnchor: Path = null;
     let currentSelectedInlineElement: RichElement = null;
     let currentSelectedBlockElement: RichElement = null;
-    let currentSelectedSuperBlockElement: RichElement = null;
+    let currentSelectedSuperBlockElements: RichElement[] = null;
     let currentSelectedBlockElementAnchor: Path = null;
-    let currentSelectedSuperBlockElementAnchor: Path = null;
+    let currentSelectedSuperBlockElementAnchors: Path[] = null;
     let currentSelectedText: IText = null;
     let currentSelectedTextAnchor: Path = null;
 
@@ -2031,8 +2104,8 @@ export class SlateEditor extends React.Component<ISlateEditorProps, ISlateEditor
       currentSelectedInlineElement = currentInlineElement;
       currentSelectedBlockElement = currentBlockElement;
       currentSelectedBlockElementAnchor = currentBlockElementAnchor;
-      currentSelectedSuperBlockElement = currentSuperBlockElement;
-      currentSelectedSuperBlockElementAnchor = currentSuperBlockElementAnchor;
+      currentSelectedSuperBlockElements = currentSuperBlockElements;
+      currentSelectedSuperBlockElementAnchors = currentSuperBlockElementAnchors;
       currentSelectedText = currentText;
       currentSelectedTextAnchor = currentTextAnchor;
     } else {
@@ -2063,8 +2136,12 @@ export class SlateEditor extends React.Component<ISlateEditorProps, ISlateEditor
 
         // if we have a superblock or list-item element that contains lists
         if (currentLoopingElement && SERIALIZATION_REGISTRY.SUPERBLOCKS[currentLoopingElement.type]) {
-          currentSelectedSuperBlockElement = currentLoopingElement;
-          currentSelectedSuperBlockElementAnchor = [...loopingAnchor];
+          if (!currentSelectedSuperBlockElements) {
+            currentSelectedSuperBlockElements = [];
+            currentSelectedSuperBlockElementAnchors = [];
+          }
+          currentSelectedSuperBlockElements.push(currentLoopingElement);
+          currentSelectedSuperBlockElementAnchors.push([...loopingAnchor]);
         }
 
         if (currentLoopingElement && Text.isText(currentLoopingElement)) {
@@ -2081,8 +2158,8 @@ export class SlateEditor extends React.Component<ISlateEditorProps, ISlateEditor
       rich: this.state.currentValue.rich,
     };
 
-    const currentSelectedSuperBlockContext = getContextFor(
-      currentSelectedSuperBlockElementAnchor,
+    const currentSelectedTopmostSuperBlockContext = getContextFor(
+      currentSelectedSuperBlockElementAnchors && currentSelectedSuperBlockElementAnchors[currentSelectedSuperBlockElementAnchors.length - 1],
       "final",
       pseudoDocument,
       this.state.currentRootContext,
@@ -2101,12 +2178,14 @@ export class SlateEditor extends React.Component<ISlateEditorProps, ISlateEditor
     );
 
     // Calculation of other contextual information
-    const baseSuperBlock = currentSelectedSuperBlockElement || pseudoDocument;
+    const baseSuperBlock = (
+      currentSelectedSuperBlockElements && currentSelectedSuperBlockElements[currentSelectedSuperBlockElements.length - 1]
+    ) || pseudoDocument;
     const baseAllowedChildreOfSuperBlock = baseSuperBlock ? getAllowedChildrenTypes(baseSuperBlock) : [];
 
     const superBlockUIHandler = getUIHandlerValueWithKnownContextFor(
       baseSuperBlock as RichElement,
-      currentSelectedSuperBlockContext || this.state.currentRootContext,
+      currentSelectedTopmostSuperBlockContext || this.state.currentRootContext,
       this.state.currentRootContext,
     );
 
@@ -2160,14 +2239,18 @@ export class SlateEditor extends React.Component<ISlateEditorProps, ISlateEditor
       }
     }
 
+    const topmostSuperblock = currentSelectedSuperBlockElements &&
+      currentSelectedSuperBlockElements[currentSelectedSuperBlockElements.length - 1];
+    const topmostSuperblockAnchor = currentSelectedSuperBlockElementAnchors &&
+      currentSelectedSuperBlockElementAnchors[currentSelectedSuperBlockElementAnchors.length - 1];
     const inlineIsVoid = currentSelectedInlineElement ? isVoid(currentSelectedInlineElement) : false;
     const blockIsVoid = currentSelectedBlockElement ? isVoid(currentSelectedBlockElement) : false;
-    const superblockIsVoid = currentSelectedSuperBlockElement ? isVoid(currentSelectedSuperBlockElement) : false;
-    const voidElement = inlineIsVoid || blockIsVoid || superblockIsVoid;
+    const topmostSuperblockIsVoid = topmostSuperblock ? isVoid(topmostSuperblock) : false;
+    const voidElement = inlineIsVoid || blockIsVoid || topmostSuperblockIsVoid;
     const allowsText = !voidElement;
 
-    const currentSelectedElement = currentSelectedInlineElement || currentSelectedBlockElement || currentSelectedSuperBlockElement;
-    const currentSelectedElementAnchor = currentSelectedInlineElementAnchor || currentSelectedBlockElementAnchor || currentSelectedSuperBlockElementAnchor;
+    const currentSelectedElement = currentSelectedInlineElement || currentSelectedBlockElement || topmostSuperblock || null;
+    const currentSelectedElementAnchor = currentSelectedInlineElementAnchor || currentSelectedBlockElementAnchor || topmostSuperblockAnchor || null;
 
     // now we can return
     return {
@@ -2177,29 +2260,29 @@ export class SlateEditor extends React.Component<ISlateEditorProps, ISlateEditor
       currentBlockElementAnchor,
       currentInlineElement,
       currentInlineElementAnchor,
-      currentSuperBlockElement,
-      currentSuperBlockElementAnchor,
+      currentSuperBlockElements,
+      currentSuperBlockElementAnchors,
       currentSelectedText,
       currentSelectedTextAnchor,
       currentSelectedBlockElement,
       currentSelectedBlockElementAnchor,
       currentSelectedInlineElement,
       currentSelectedInlineElementAnchor,
-      currentSelectedSuperBlockElement,
-      currentSelectedSuperBlockElementAnchor,
+      currentSelectedSuperBlockElements,
+      currentSelectedSuperBlockElementAnchors,
       currentSelectedElement,
       currentSelectedElementAnchor,
 
-      currentSelectedSuperBlockContext,
+      currentSelectedTopmostSuperBlockContext,
       currentSelectedBlockContext,
       currentSelectedInlineContext,
-      currentSelectedElementContext: currentSelectedInlineContext || currentSelectedBlockContext || currentSelectedSuperBlockContext,
+      currentSelectedElementContext: currentSelectedInlineContext || currentSelectedBlockContext || currentSelectedTopmostSuperBlockContext,
 
       allowsInsertElement,
       allowsText,
       inlineIsVoid,
       blockIsVoid,
-      superblockIsVoid,
+      topmostSuperblockIsVoid,
       superBlockUIHandler,
       blockUIHandler,
       inlineUIHandler,
@@ -2247,13 +2330,16 @@ export class SlateEditor extends React.Component<ISlateEditorProps, ISlateEditor
       this.props.onBlur && this.props.onBlur();
     }
 
+    const currentSelectedSuperBlockElementAnchor = this.state.currentSelectedSuperBlockElementAnchors &&
+      this.state.currentSelectedSuperBlockElementAnchors[this.state.currentSelectedSuperBlockElementAnchors.length - 1];
+
     // we pick the anchor based on specificity
     // the one we got the most specific we pass that
     const currentSelectedAnchor =
       this.state.currentSelectedTextAnchor ||
       this.state.currentSelectedInlineElementAnchor ||
       this.state.currentSelectedBlockElementAnchor ||
-      this.state.currentSelectedSuperBlockElementAnchor;
+      currentSelectedSuperBlockElementAnchor;
 
     // now we can call this
     const anchorData = this.calculateAnchors(
@@ -2722,11 +2808,11 @@ export class SlateEditor extends React.Component<ISlateEditorProps, ISlateEditor
       currentSelectedTextAnchor: null,
       currentSelectedBlockElement: null,
       currentSelectedBlockElementAnchor: null,
-      currentSelectedSuperBlockElement: null,
-      currentSelectedSuperBlockElementAnchor: null,
+      currentSelectedSuperBlockElements: null,
+      currentSelectedSuperBlockElementAnchors: null,
       currentSelectedInlineContext: null,
       currentSelectedBlockContext: null,
-      currentSelectedSuperBlockContext: null,
+      currentSelectedTopmostSuperBlockContext: null,
       currentSelectedElement: null,
       currentSelectedElementAnchor: null,
       currentSelectedElementContext: null,
@@ -2914,8 +3000,12 @@ export class SlateEditor extends React.Component<ISlateEditorProps, ISlateEditor
       return [...this.state.currentSelectedInlineElementAnchor, this.state.currentSelectedInlineElement.children.length];
     } else if (this.state.currentSelectedBlockElement) {
       return [...this.state.currentSelectedBlockElementAnchor, this.state.currentSelectedBlockElement.children.length];
-    } else if (this.state.currentSelectedSuperBlockElement) {
-      return [...this.state.currentSelectedSuperBlockElementAnchor, this.state.currentSelectedSuperBlockElement.children.length];
+    } else if (this.state.currentSelectedSuperBlockElements) {
+      const currentSelectedSuperBlockElementAnchor =
+        this.state.currentSelectedSuperBlockElementAnchors[this.state.currentSelectedSuperBlockElementAnchors.length - 1];
+      const currentSelectedSuperBlockElement =
+        this.state.currentSelectedSuperBlockElements[this.state.currentSelectedSuperBlockElements.length - 1];
+      return [...currentSelectedSuperBlockElementAnchor, currentSelectedSuperBlockElement.children.length];
     } else {
       return [this.state.currentValue.children.length];
     }
@@ -3101,280 +3191,290 @@ export class SlateEditor extends React.Component<ISlateEditorProps, ISlateEditor
   }
 
   public insertTableColumn() {
-    const currentColumn = this.state.currentSelectedSuperBlockElement;
-    if (currentColumn.type === "td" || currentColumn.type === "th") {
-      // this is where we end to focus as that's where we add the new row at
-      // however we do need to add a new column at the same index in every
-      // row
-      const targetColumnAnchor = [...this.state.currentSelectedSuperBlockElementAnchor];
-      targetColumnAnchor[targetColumnAnchor.length - 1]++;
+    if (!this.state.currentSelectedSuperBlockElements) {
+      return;
+    }
 
-      const targetIndex = targetColumnAnchor[targetColumnAnchor.length - 1];
+    const currentColumnIndex = this.state.currentSelectedSuperBlockElements &&
+      findLastIndex(this.state.currentSelectedSuperBlockElements, (e) => e.type === "td" || e.type === "th");
 
-      const tableAnchor = [...this.state.currentSelectedSuperBlockElementAnchor];
-      // tr
-      tableAnchor.pop();
-      // thead or tbody
-      tableAnchor.pop();
-      // table
-      tableAnchor.pop();
+    if (currentColumnIndex === -1) {
+      return;
+    }
 
-      try {
-        const tableElement = this.getNodeAt(tableAnchor) as RichElement;
+    const currentColumn = this.state.currentSelectedSuperBlockElements[currentColumnIndex];
+    const currentColumnAnchor = this.state.currentSelectedSuperBlockElementAnchors[currentColumnIndex];
 
-        if (tableElement.type === "table") {
-          tableElement.children.forEach((theadOrTbodyOrTfoot, theadOrTbodyOrTFootIndex) => {
-            theadOrTbodyOrTfoot.children.forEach((row, rowIndex) => {
-              const column: ITd = {
-                type: "td",
-                children: [
-                  STANDARD_PARAGRAPH(),
-                ],
-              };
+    // this is where we end to focus as that's where we add the new row at
+    // however we do need to add a new column at the same index in every
+    // row
+    const targetColumnAnchor = [...currentColumnAnchor];
+    targetColumnAnchor[targetColumnAnchor.length - 1]++;
 
-              let actualTargetIndex: number = targetIndex;
-              if (actualTargetIndex > row.children.length) {
-                actualTargetIndex = row.children.length;
-              }
+    const targetIndex = targetColumnAnchor[targetColumnAnchor.length - 1];
 
-              const insertPoint = [...tableAnchor, theadOrTbodyOrTFootIndex, rowIndex, actualTargetIndex];
-              Transforms.insertNodes(this.editor, column, { at: insertPoint });
-            });
+    const tableAnchor = [...currentColumnAnchor];
+    // tr
+    tableAnchor.pop();
+    // thead or tbody
+    tableAnchor.pop();
+    // table
+    tableAnchor.pop();
+
+    try {
+      const tableElement = this.getNodeAt(tableAnchor) as RichElement;
+
+      if (tableElement.type === "table") {
+        tableElement.children.forEach((theadOrTbodyOrTfoot, theadOrTbodyOrTFootIndex) => {
+          theadOrTbodyOrTfoot.children.forEach((row, rowIndex) => {
+            const column: ITd = {
+              type: "td",
+              children: [
+                STANDARD_PARAGRAPH(),
+              ],
+            };
+
+            let actualTargetIndex: number = targetIndex;
+            if (actualTargetIndex > row.children.length) {
+              actualTargetIndex = row.children.length;
+            }
+
+            const insertPoint = [...tableAnchor, theadOrTbodyOrTFootIndex, rowIndex, actualTargetIndex];
+            Transforms.insertNodes(this.editor, column, { at: insertPoint });
           });
+        });
 
-          const textAnchorOfColumn = targetColumnAnchor;
-          // paragraph
-          textAnchorOfColumn.push(0);
-          // text
-          textAnchorOfColumn.push(0);
+        const textAnchorOfColumn = targetColumnAnchor;
+        // paragraph
+        textAnchorOfColumn.push(0);
+        // text
+        textAnchorOfColumn.push(0);
 
-          this.focusAt({
-            anchor: {
-              offset: 0,
-              path: targetColumnAnchor,
-            },
-            focus: {
-              offset: 0,
-              path: targetColumnAnchor,
-            },
-          });
-        }
-      } catch {
-
+        this.focusAt({
+          anchor: {
+            offset: 0,
+            path: targetColumnAnchor,
+          },
+          focus: {
+            offset: 0,
+            path: targetColumnAnchor,
+          },
+        });
       }
+    } catch {
+
     }
   }
 
   public insertTableRow() {
-    const currentColumn = this.state.currentSelectedSuperBlockElement;
-    // the column where we are now
-    if (currentColumn.type === "td" || currentColumn.type === "th") {
+    if (!this.state.currentSelectedSuperBlockElements) {
+      return;
+    }
 
-      // so what's the row anchor of this column
-      const currentRowAnchor = [...this.state.currentSelectedSuperBlockElementAnchor];
-      currentRowAnchor.pop();
+    const currentRowIndex = this.state.currentSelectedSuperBlockElements &&
+      findLastIndex(this.state.currentSelectedSuperBlockElements, (e) => e.type === "tr");
 
-      // now let's get such row
-      const currentRow = this.getNodeAt(currentRowAnchor) as ITr;
-      const row: ITr = {
-        type: "tr",
-        children: currentRow.children.map((v) => (
-          {
-            type: "td",
-            children: [
-              STANDARD_PARAGRAPH(),
-            ],
-          }
-        )),
-      };
+    if (currentRowIndex === -1) {
+      return;
+    }
 
-      // of course needs to be a row
-      if (currentRow.type === "tr") {
+    const currentRow = this.state.currentSelectedSuperBlockElements[currentRowIndex];
+    const currentRowAnchor = this.state.currentSelectedSuperBlockElementAnchors[currentRowIndex];
 
-        // and now let's get the thead or tbody in question
-        const parentTbodyOrTheadOrTfootAnchor = [...currentRowAnchor];
-        parentTbodyOrTheadOrTfootAnchor.pop();
-        const parentTbodyOrTheadOrTfoot = this.getNodeAt(parentTbodyOrTheadOrTfootAnchor) as RichElement;
-
-        // if it's a tbody
-        if (parentTbodyOrTheadOrTfoot.type === "tbody") {
-          // we simply add the row next to the current
-          const targetRowAnchor = currentRowAnchor;
-          targetRowAnchor[targetRowAnchor.length - 1]++;
-          Transforms.insertNodes(this.editor, row, { at: targetRowAnchor });
-
-          const targetRowAnchorFirstText = targetRowAnchor;
-          // first td
-          targetRowAnchorFirstText.push(0);
-          // first paragraph
-          targetRowAnchorFirstText.push(0);
-          // first text in paragraph
-          targetRowAnchorFirstText.push(0);
-
-          this.focusAt({
-            anchor: {
-              offset: 0,
-              path: targetRowAnchorFirstText,
-            },
-            focus: {
-              offset: 0,
-              path: targetRowAnchorFirstText,
-            },
-          });
-        } else if (parentTbodyOrTheadOrTfoot.type === "thead") {
-          // otherwise we need to add the row in the tbody, that is next
-          // to the thead
-          const tbodyAnchor = [...parentTbodyOrTheadOrTfootAnchor];
-          tbodyAnchor[tbodyAnchor.length - 1]++;
-
-          // let's get the tbody
-          let tbody: RichElement = null;
-          try {
-            tbody = this.getNodeAt(tbodyAnchor) as RichElement;
-          } catch {
-
-          }
-
-          // if we have a tbody
-          if (tbody && tbody.type === "tbody") {
-            // new row at the start of the tbody
-            const targetRowAnchor = tbodyAnchor;
-            targetRowAnchor.push(0);
-            Transforms.insertNodes(this.editor, row, { at: targetRowAnchor });
-
-            const targetRowAnchorFirstText = targetRowAnchor;
-            // first td
-            targetRowAnchorFirstText.push(0);
-            // first paragraph
-            targetRowAnchorFirstText.push(0);
-            // first text in paragraph
-            targetRowAnchorFirstText.push(0);
-
-            this.focusAt({
-              anchor: {
-                offset: 0,
-                path: targetRowAnchorFirstText,
-              },
-              focus: {
-                offset: 0,
-                path: targetRowAnchorFirstText,
-              },
-            });
-          } else {
-            // no tbody, we need to add a new tbody where it should be
-            // could be a tfoot or downright missing
-            const tbody: ITbody = {
-              type: "tbody",
-              children: [row],
-            };
-
-            Transforms.insertNodes(this.editor, tbody, { at: tbodyAnchor });
-
-            const targetRowAnchorFirstText = tbodyAnchor;
-            // first tr
-            targetRowAnchorFirstText.push(0);
-            // first td
-            targetRowAnchorFirstText.push(0);
-            // first paragraph
-            targetRowAnchorFirstText.push(0);
-            // first text in paragraph
-            targetRowAnchorFirstText.push(0);
-
-            this.focusAt({
-              anchor: {
-                offset: 0,
-                path: targetRowAnchorFirstText,
-              },
-              focus: {
-                offset: 0,
-                path: targetRowAnchorFirstText,
-              },
-            });
-          }
-        } else if (parentTbodyOrTheadOrTfoot.type === "tfoot") {
-          // otherwise we need to add the row in the tbody, that is next
-          // to the thead
-          const tbodyAnchor = [...parentTbodyOrTheadOrTfootAnchor];
-          tbodyAnchor[tbodyAnchor.length - 1]--;
-
-          // let's get the tbody
-          let tbody: RichElement = null;
-          try {
-            tbody = this.getNodeAt(tbodyAnchor) as RichElement;
-          } catch {
-
-          }
-
-          const tfootClone = { ...parentTbodyOrTheadOrTfoot } as ITfoot;
-          tfootClone.children = tfootClone.children.map((v) => {
-            return {
-              type: "tr",
-              children: v.children.map(v2 => (
-                {
-                  type: "td",
-                  children: [
-                    STANDARD_PARAGRAPH(),
-                  ]
-                }
-              )),
-            }
-          });
-
-          // if we have a tbody
-          this.preventNormalize = true;
-          if (tbody && tbody.type === "tbody") {
-            // we update our tfoot to be tbody so that it merges
-            const currentTBodyPropsCopy = { ...tbody };
-            delete currentTBodyPropsCopy.children;
-            Transforms.setNodes(
-              this.editor,
-              currentTBodyPropsCopy as any,
-              {
-                at: parentTbodyOrTheadOrTfootAnchor,
-              }
-            );
-          } else {
-            // we simply make it into a tbody
-            Transforms.setNodes(
-              this.editor,
-              {
-                type: "tbody",
-              },
-              {
-                at: parentTbodyOrTheadOrTfootAnchor,
-              }
-            );
-          }
-          this.preventNormalize = false;
-
-          const nextAnchorForTfoot = [...parentTbodyOrTheadOrTfootAnchor];
-          nextAnchorForTfoot[nextAnchorForTfoot.length - 1]++;
-          Transforms.insertNodes(this.editor, tfootClone, { at: nextAnchorForTfoot });
-
-          // if there was a tbody the merging reaction caused that the next anchor is not
-          // anymore where our node is so we can use this one, otherwise it is the same as the next
-          const targetRowAnchorFirstText = tbody ? parentTbodyOrTheadOrTfootAnchor : nextAnchorForTfoot;
-          // first tr
-          targetRowAnchorFirstText.push(0);
-          // first td
-          targetRowAnchorFirstText.push(0);
-          // first paragraph
-          targetRowAnchorFirstText.push(0);
-          // first text in paragraph
-          targetRowAnchorFirstText.push(0);
-
-          this.focusAt({
-            anchor: {
-              offset: 0,
-              path: targetRowAnchorFirstText,
-            },
-            focus: {
-              offset: 0,
-              path: targetRowAnchorFirstText,
-            },
-          });
+    const row: ITr = {
+      type: "tr",
+      children: currentRow.children.map((v) => (
+        {
+          type: "td",
+          children: [
+            STANDARD_PARAGRAPH(),
+          ],
         }
+      )),
+    };
+
+    // and now let's get the thead or tbody in question
+    const parentTbodyOrTheadOrTfootAnchor = [...currentRowAnchor];
+    parentTbodyOrTheadOrTfootAnchor.pop();
+    const parentTbodyOrTheadOrTfoot = this.getNodeAt(parentTbodyOrTheadOrTfootAnchor) as RichElement;
+
+    // if it's a tbody
+    if (parentTbodyOrTheadOrTfoot.type === "tbody") {
+      // we simply add the row next to the current
+      const targetRowAnchor = currentRowAnchor;
+      targetRowAnchor[targetRowAnchor.length - 1]++;
+      Transforms.insertNodes(this.editor, row, { at: targetRowAnchor });
+
+      const targetRowAnchorFirstText = targetRowAnchor;
+      // first td
+      targetRowAnchorFirstText.push(0);
+      // first paragraph
+      targetRowAnchorFirstText.push(0);
+      // first text in paragraph
+      targetRowAnchorFirstText.push(0);
+
+      this.focusAt({
+        anchor: {
+          offset: 0,
+          path: targetRowAnchorFirstText,
+        },
+        focus: {
+          offset: 0,
+          path: targetRowAnchorFirstText,
+        },
+      });
+    } else if (parentTbodyOrTheadOrTfoot.type === "thead") {
+      // otherwise we need to add the row in the tbody, that is next
+      // to the thead
+      const tbodyAnchor = [...parentTbodyOrTheadOrTfootAnchor];
+      tbodyAnchor[tbodyAnchor.length - 1]++;
+
+      // let's get the tbody
+      let tbody: RichElement = null;
+      try {
+        tbody = this.getNodeAt(tbodyAnchor) as RichElement;
+      } catch {
+
       }
+
+      // if we have a tbody
+      if (tbody && tbody.type === "tbody") {
+        // new row at the start of the tbody
+        const targetRowAnchor = tbodyAnchor;
+        targetRowAnchor.push(0);
+        Transforms.insertNodes(this.editor, row, { at: targetRowAnchor });
+
+        const targetRowAnchorFirstText = targetRowAnchor;
+        // first td
+        targetRowAnchorFirstText.push(0);
+        // first paragraph
+        targetRowAnchorFirstText.push(0);
+        // first text in paragraph
+        targetRowAnchorFirstText.push(0);
+
+        this.focusAt({
+          anchor: {
+            offset: 0,
+            path: targetRowAnchorFirstText,
+          },
+          focus: {
+            offset: 0,
+            path: targetRowAnchorFirstText,
+          },
+        });
+      } else {
+        // no tbody, we need to add a new tbody where it should be
+        // could be a tfoot or downright missing
+        const tbody: ITbody = {
+          type: "tbody",
+          children: [row],
+        };
+
+        Transforms.insertNodes(this.editor, tbody, { at: tbodyAnchor });
+
+        const targetRowAnchorFirstText = tbodyAnchor;
+        // first tr
+        targetRowAnchorFirstText.push(0);
+        // first td
+        targetRowAnchorFirstText.push(0);
+        // first paragraph
+        targetRowAnchorFirstText.push(0);
+        // first text in paragraph
+        targetRowAnchorFirstText.push(0);
+
+        this.focusAt({
+          anchor: {
+            offset: 0,
+            path: targetRowAnchorFirstText,
+          },
+          focus: {
+            offset: 0,
+            path: targetRowAnchorFirstText,
+          },
+        });
+      }
+    } else if (parentTbodyOrTheadOrTfoot.type === "tfoot") {
+      // otherwise we need to add the row in the tbody, that is next
+      // to the thead
+      const tbodyAnchor = [...parentTbodyOrTheadOrTfootAnchor];
+      tbodyAnchor[tbodyAnchor.length - 1]--;
+
+      // let's get the tbody
+      let tbody: RichElement = null;
+      try {
+        tbody = this.getNodeAt(tbodyAnchor) as RichElement;
+      } catch {
+
+      }
+
+      const tfootClone = { ...parentTbodyOrTheadOrTfoot } as ITfoot;
+      tfootClone.children = tfootClone.children.map((v) => {
+        return {
+          type: "tr",
+          children: v.children.map(v2 => (
+            {
+              type: "td",
+              children: [
+                STANDARD_PARAGRAPH(),
+              ]
+            }
+          )),
+        }
+      });
+
+      // if we have a tbody
+      this.preventNormalize = true;
+      if (tbody && tbody.type === "tbody") {
+        // we update our tfoot to be tbody so that it merges
+        const currentTBodyPropsCopy = { ...tbody };
+        delete currentTBodyPropsCopy.children;
+        Transforms.setNodes(
+          this.editor,
+          currentTBodyPropsCopy as any,
+          {
+            at: parentTbodyOrTheadOrTfootAnchor,
+          }
+        );
+      } else {
+        // we simply make it into a tbody
+        Transforms.setNodes(
+          this.editor,
+          {
+            type: "tbody",
+          },
+          {
+            at: parentTbodyOrTheadOrTfootAnchor,
+          }
+        );
+      }
+      this.preventNormalize = false;
+
+      const nextAnchorForTfoot = [...parentTbodyOrTheadOrTfootAnchor];
+      nextAnchorForTfoot[nextAnchorForTfoot.length - 1]++;
+      Transforms.insertNodes(this.editor, tfootClone, { at: nextAnchorForTfoot });
+
+      // if there was a tbody the merging reaction caused that the next anchor is not
+      // anymore where our node is so we can use this one, otherwise it is the same as the next
+      const targetRowAnchorFirstText = tbody ? parentTbodyOrTheadOrTfootAnchor : nextAnchorForTfoot;
+      // first tr
+      targetRowAnchorFirstText.push(0);
+      // first td
+      targetRowAnchorFirstText.push(0);
+      // first paragraph
+      targetRowAnchorFirstText.push(0);
+      // first text in paragraph
+      targetRowAnchorFirstText.push(0);
+
+      this.focusAt({
+        anchor: {
+          offset: 0,
+          path: targetRowAnchorFirstText,
+        },
+        focus: {
+          offset: 0,
+          path: targetRowAnchorFirstText,
+        },
+      });
     }
   }
 
@@ -3383,17 +3483,19 @@ export class SlateEditor extends React.Component<ISlateEditorProps, ISlateEditor
    * be toggled in the environment it is
    */
   public canToggleTable(element: "thead" | "tfoot") {
-    if (!this.state.currentSelectedSuperBlockElement) {
+    if (!this.state.currentSelectedSuperBlockElements) {
       return false;
     }
 
-    const potentialTd = this.state.currentSelectedSuperBlockElement;
+    const potentialTdIndex = findLastIndex(this.state.currentSelectedSuperBlockElements, (e) => e.type === "td" || e.type === "th");
 
-    if (potentialTd.type !== "td" && potentialTd.type !== "th") {
+    if (potentialTdIndex === -1) {
       return false;
     }
 
-    const rowPath = [...this.state.currentSelectedSuperBlockElementAnchor];
+    const tdAnchor = this.state.currentSelectedSuperBlockElementAnchors[potentialTdIndex];
+
+    const rowPath = [...tdAnchor];
     rowPath.pop();
 
     const theadOrTbodyOrTfootPath = [...rowPath];
@@ -3452,7 +3554,10 @@ export class SlateEditor extends React.Component<ISlateEditorProps, ISlateEditor
       return;
     }
 
-    const rowPath = [...this.state.currentSelectedSuperBlockElementAnchor];
+    const potentialTdIndex = findLastIndex(this.state.currentSuperBlockElements, (e) => e.type === "td" || e.type === "th");
+    const tdAnchor = this.state.currentSelectedSuperBlockElementAnchors[potentialTdIndex];
+
+    const rowPath = [...tdAnchor];
     rowPath.pop();
 
     const theadOrTbodyPath = [...rowPath];
@@ -4260,7 +4365,7 @@ export class SlateEditor extends React.Component<ISlateEditorProps, ISlateEditor
   public onKeyDown(e: React.KeyboardEvent) {
     // on alt+enter we want to insert a super block break
     if (e.key === "Enter" && e.altKey) {
-      this.insertSuperblockBreak();
+      this.insertSuperbreak(null, e.shiftKey);
     } else if (e.key === "z" && e.ctrlKey && !e.shiftKey) {
       this.editor.undo();
     } else if ((e.key === "y" && e.ctrlKey) || (e.key === "z" && e.ctrlKey && e.shiftKey)) {
@@ -4358,6 +4463,8 @@ export class SlateEditor extends React.Component<ISlateEditorProps, ISlateEditor
       focus: this.focus,
       focusAt: this.focusAt,
 
+      insertSuperbreak: this.insertSuperbreak,
+
       formatToggle: this.formatToggle,
       insertContainer: this.insertContainer,
       insertCustom: this.insertCustom,
@@ -4437,7 +4544,7 @@ export class SlateEditor extends React.Component<ISlateEditorProps, ISlateEditor
     let children: React.ReactNode = (
       <CurrentElementProvider
         block={this.state.currentSelectedBlockElement}
-        superblock={this.state.currentSelectedSuperBlockElement}
+        superblocks={this.state.currentSelectedSuperBlockElements || []}
         inline={this.state.currentSelectedInlineElement}
       >
         <Editable
@@ -4448,7 +4555,7 @@ export class SlateEditor extends React.Component<ISlateEditorProps, ISlateEditor
           placeholder={this.props.placeholder}
           readOnly={this.props.disabled}
           disabled={this.props.disabled}
-          style={{scrollMarginTop: this.props.scrollMarginTop}}
+          style={{ scrollMarginTop: this.props.scrollMarginTop }}
         />
       </CurrentElementProvider>
     );

@@ -271,15 +271,25 @@ export function ActionsOptions(props: IDrawerContainerProps) {
   // get the current node that we have currently selected
   const currentNode = props.state.currentSelectedInlineElement ||
     props.state.currentSelectedBlockElement ||
-    props.state.currentSelectedSuperBlockElement;
+    (
+      props.state.currentSelectedSuperBlockElements &&
+      props.state.currentSelectedSuperBlockElements[
+        props.state.currentSelectedSuperBlockElements.length - 1
+      ]
+    );
 
   const currentNodeContext = props.state.currentSelectedInlineContext ||
     props.state.currentSelectedBlockContext ||
-    props.state.currentSelectedSuperBlockContext;
+    props.state.currentSelectedTopmostSuperBlockContext;
 
   const currentNodeAnchor = props.state.currentSelectedInlineElementAnchor ||
     props.state.currentSelectedBlockElementAnchor ||
-    props.state.currentSelectedSuperBlockElementAnchor;
+    (
+      props.state.currentSelectedSuperBlockElementAnchors &&
+      props.state.currentSelectedSuperBlockElementAnchors[
+        props.state.currentSelectedSuperBlockElementAnchors.length - 1
+      ]
+    );
 
   // and now let's build all the options that we have for that we need to check our current context, if we have one
   let allOptions = currentNodeContext ? Object.keys(currentNodeContext.properties).map((p) => {
