@@ -17,7 +17,7 @@ import type { IPropertyDefinitionSupportedUnitType } from "./base/Root/Module/It
 import { IPropertyDefinitionSupportedLocationType } from "./base/Root/Module/ItemDefinition/PropertyDefinition/types/location";
 import { PropertyDefinitionSupportedFileType } from "./base/Root/Module/ItemDefinition/PropertyDefinition/types/file";
 import convert from "convert-units";
-import { countries } from "./imported-resources";
+import { countries, currencies } from "./imported-resources";
 import type { IAppDataType } from "./server";
 import prettyBytes from "pretty-bytes";
 
@@ -771,7 +771,11 @@ export function convertPhoneNumberToInternational(
   return "+" + country.phone + newNumber;
 }
 
-export function convertCurrencyValue(value: IPropertyDefinitionSupportedCurrencyType, code: string, appData: IAppDataType): IPropertyDefinitionSupportedCurrencyType {
+export function convertCurrencyValue(
+  value: IPropertyDefinitionSupportedCurrencyType,
+  code: string,
+  appData: IAppDataType,
+): IPropertyDefinitionSupportedCurrencyType {
   if (value === null || code === null) {
     return null;
   } else if (value.currency === code) {
@@ -791,7 +795,19 @@ export function convertCurrencyValue(value: IPropertyDefinitionSupportedCurrency
 
   // convert from the normalized to the target currency
   const reverseFactor: number = currencyFactors[code];
-  const reversed = normalized / reverseFactor;
+  let reversed = normalized / reverseFactor;
+
+  // prevent too many decimals issues
+  let decimalCount = 0;
+  const decimalCountSplitted = reversed.toString().split(".");
+  if (decimalCountSplitted[1]) {
+    decimalCount = decimalCountSplitted[1].length;
+  }
+
+  const precision = currencies[code].decimals;
+  if (decimalCount >= precision) {
+    reversed = Math.round(reversed * (10**precision)) / (10**precision);
+  }
 
   return {
     value: reversed,

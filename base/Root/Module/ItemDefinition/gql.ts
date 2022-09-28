@@ -176,7 +176,11 @@ export function getGQLTypeForItemDefinition(itemDefinition: ItemDefinition): Gra
         retrievalMode: true,
         excludeBase: false,
         propertiesAsInput: false,
-        optionalForm: false,
+
+        // all fields are now optional due to corruption of data
+        // or soft reads causing issues and crashing the server
+        // due to invalid data being sent
+        optionalForm: true,
         includePolicy: null,
         onlyTextFilters: false,
       }),

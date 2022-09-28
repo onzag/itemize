@@ -132,7 +132,7 @@ export function locationSQLIn(arg: ISQLInInfo) {
  * @param arg the sql out info
  * @returns a property definition supported location type, or null
  */
-export function locationSQLOut(arg: ISQLOutInfo) {
+export function locationSQLOut(arg: ISQLOutInfo): IPropertyDefinitionSupportedLocationType {
   const result: IPropertyDefinitionSupportedLocationType = {
     lat: arg.row[arg.prefix + arg.id + "_LAT"],
     lng: arg.row[arg.prefix + arg.id + "_LNG"],
@@ -141,6 +141,15 @@ export function locationSQLOut(arg: ISQLOutInfo) {
     id: arg.row[arg.prefix + arg.id + "_ID"],
   };
   if (result.lat === null || result.lng === null) {
+    if (!arg.property.isNullable()) {
+      return (arg.property.getDefaultValue() as any) || {
+        lat: 0,
+        lng: 0,
+        txt: "Null Island",
+        atxt: "Null Island",
+        id: "NULL",
+      }
+    }
     return null;
   }
   return result;

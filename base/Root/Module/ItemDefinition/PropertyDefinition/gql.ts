@@ -132,7 +132,7 @@ export function getGQLFieldsDefinitionForProperty(
     gqlResult = GraphQLList(
       GraphQLNonNull(gqlDef),
     );
-  } else {
+  } else {
     gqlResult = gqlDef;
   }
 

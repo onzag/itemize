@@ -12,6 +12,15 @@ import { standardLocalEqual } from "../local-sql";
 
 export type PropertyDefinitionSupportedFileType = IGQLFile;
 
+const fakefile: PropertyDefinitionSupportedFileType = {
+  id: null,
+  metadata: null,
+  name: null,
+  size: 0,
+  type: "",
+  url: "",
+}
+
 /**
  * The type value represents the behaviour of files in the app
  */
@@ -52,7 +61,7 @@ const typeValue: IPropertyDefinitionSupportedType<PropertyDefinitionSupportedFil
   elastic: getStandardElasticFor && getStandardElasticFor("keyword", "null", null, true),
   sqlSelect: standardSQLSelect,
   sqlIn: stardardSQLInWithJSONStringifyFn,
-  sqlOut: standardSQLOutWithJSONParseFn,
+  sqlOut: standardSQLOutWithJSONParseFn.bind(null, fakefile),
   sqlElasticIn: standardSQLElasticInFn,
   sqlSearch: () => {
     throw new Error("Attempted to search within a file");

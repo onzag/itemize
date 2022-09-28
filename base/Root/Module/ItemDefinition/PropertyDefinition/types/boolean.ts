@@ -41,7 +41,7 @@ const typeValue: IPropertyDefinitionSupportedType<PropertyDefinitionSupportedBoo
   elastic: getStandardElasticForWithNullField && getStandardElasticForWithNullField("boolean"),
   sqlSelect: standardSQLSelect,
   sqlIn: standardSQLInFn,
-  sqlOut: standardSQLOutFn,
+  sqlOut: standardSQLOutFn.bind(null, false),
   sqlElasticIn: standardSQLElasticInFn,
   sqlSearch: standardSQLSearchFnExactAndRange,
   elasticSearch: standardElasticSearchFnWithNullFieldExactAndRange,

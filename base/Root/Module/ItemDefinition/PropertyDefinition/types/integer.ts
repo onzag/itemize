@@ -52,7 +52,7 @@ const typeValue: IPropertyDefinitionSupportedType<PropertyDefinitionSupportedInt
   elastic: getStandardElasticForWithNullField && getStandardElasticForWithNullField("long"),
   sqlSelect: standardSQLSelect,
   sqlIn: standardSQLInFn,
-  sqlOut: standardSQLOutFn,
+  sqlOut: standardSQLOutFn.bind(null, 0),
   sqlElasticIn: standardSQLElasticInFn,
   sqlSearch: standardSQLSearchFnExactAndRange,
   elasticSearch: standardElasticSearchFnWithNullFieldExactAndRange,

@@ -74,7 +74,7 @@ export default async function build(version: string, buildID: string, services: 
   );
 
   // and we need to replace these variables from it
-  fullYMLTemplate =
+  fullYMLTemplate = fullYMLTemplate &&
     fullYMLTemplate.replace(/\%\{NODE_ENV\}/g, version)
       .replace(/\%\{REDIS_PORT\}/g, redisConfig.cache.port.toString())
       .replace(/\%\{DB_PORT\}/g, dbConfig.port.toString())
@@ -82,33 +82,36 @@ export default async function build(version: string, buildID: string, services: 
       .replace(/\%\{DB_PASSWORD\}/g, dbConfig.password)
       .replace(/\%\{DB_NAME\}/g, dbConfig.database);
 
-  if (dbConfig.elastic && dbConfig.elastic.auth && dbConfig.elastic.auth.password) {
-    fullYMLTemplate =
-      fullYMLTemplate.replace(/\%\{ELASTIC_PASSWORD\}/g, dbConfig.elastic.auth.password)
-  } else {
-    fullYMLTemplate =
-      fullYMLTemplate.replace(/\%\{ELASTIC_PASSWORD\}/g, "UNSPECIFIED")
+  if (fullYMLTemplate) {
+    if (dbConfig.elastic && dbConfig.elastic.auth && dbConfig.elastic.auth.password) {
+      fullYMLTemplate =
+        fullYMLTemplate.replace(/\%\{ELASTIC_PASSWORD\}/g, dbConfig.elastic.auth.password)
+    } else {
+      fullYMLTemplate =
+        fullYMLTemplate.replace(/\%\{ELASTIC_PASSWORD\}/g, "UNSPECIFIED")
+    }
   }
 
   // now the actual services we are adding
   let actualServices: string[] = [];
   let isPatch = false;
-  if (services === "full" || !services) {
+  if (version === "patch") {
+    isPatch = true;
+  } else if (services === "full" || !services) {
     actualServices = ["cluster-manager", "servers", "redis", "nginx", "global-manager", "pgsql", "elastic", "kibana"];
   } else if (services === "standard") {
     actualServices = ["cluster-manager", "servers", "redis", "nginx"];
   } else if (services === "slim") {
     actualServices = ["cluster-manager", "servers", "nginx"];
-  } else if (version === "patch") {
-    isPatch = true;
   } else {
     actualServices = services.split(",");
+    process.exit(1);
   }
 
   if (isPatch) {
     message += "This build is a patch, patches can be unpredictable and are used to quickly wed out bugs and client side issues\n" +
-     "the patch can only patch server specific code, client side behaviour, and itemize itself, but it cannot resolve for new libraries\n" +
-     "patches should be not used very often, in order to patch, just replace the patch folder with this content and restart";
+      "the patch can only patch server specific code, client side behaviour, and itemize itself, but it cannot resolve for new libraries\n" +
+      "patches should be not used very often, in order to patch, just replace the patch folder with this content and restart";
   }
 
   if (actualServices.includes("cluster-manager") || actualServices.includes("servers")) {
@@ -120,8 +123,10 @@ export default async function build(version: string, buildID: string, services: 
       "execute such somewhere else, refer to the .env file which contains the identifier\n\n";
   }
 
-  // we include this information in our final message
-  message += "This build contains the following services: " + actualServices.join(", ");
+  if (!isPatch) {
+    // we include this information in our final message
+    message += "This build contains the following services: " + actualServices.join(", ");
+  }
 
   // if we are adding the proxy, add information about this, and add the nginx logs folder
   if (actualServices.includes("nginx")) {
@@ -131,46 +136,47 @@ export default async function build(version: string, buildID: string, services: 
       "\nthese are necessary for HTTPS, check out let's encrypt and acme.sh for the purposes of having these certificates";
   }
 
-  // now we log this information
-  console.log(colors.yellow("Services allowed are: ") + actualServices.join(", "));
-
-  // now we parse our yaml as it has been replaced
-  const parsed = YAML.parse(fullYMLTemplate);
-  // and we need to check every service we have added
-  Object.keys(parsed.services).forEach((service) => {
-    // if the service is not in the list of included services
-    if (!actualServices.includes(service)) {
-      // we remove it
-      console.log(colors.yellow("Dropping unused service: ") + service);
-      delete parsed.services[service];
-      return;
-    } else if (parsed.services[service].depends_on) {
-      // also we nee to check our dependencies, we remove dependencies if they are not in there
-      parsed.services[service].depends_on = parsed.services[service].depends_on.filter((serviceDependance: string) => {
-        return actualServices.includes(serviceDependance);
-      });
-
-      // and if we have removed all the dependencies we remove the entire thing altogether
-      if (parsed.services[service].depends_on.length === 0) {
-        delete parsed.services[service].depends_on;
-      }
-    }
-
-    if (service === "global-manager" || service === "cluster-manager" || service === "servers" && (
-      actualServices.includes("elastic")
-    )) {
-      if (!parsed.services[service].environment) {
-        parsed.services[service].environment = [];
-      }
-      parsed.services[service].environment.push("NODE_TLS_REJECT_UNAUTHORIZED=0");
-    }
-  });
-
   // now we can build the compose file
+  let parsed: any;
   if (!isPatch) {
+    // now we log this information
+    console.log(colors.yellow("Services allowed are: ") + actualServices.join(", "));
+
+    // now we parse our yaml as it has been replaced
+    parsed = YAML.parse(fullYMLTemplate);
+    // and we need to check every service we have added
+    Object.keys(parsed.services).forEach((service) => {
+      // if the service is not in the list of included services
+      if (!actualServices.includes(service)) {
+        // we remove it
+        console.log(colors.yellow("Dropping unused service: ") + service);
+        delete parsed.services[service];
+        return;
+      } else if (parsed.services[service].depends_on) {
+        // also we nee to check our dependencies, we remove dependencies if they are not in there
+        parsed.services[service].depends_on = parsed.services[service].depends_on.filter((serviceDependance: string) => {
+          return actualServices.includes(serviceDependance);
+        });
+
+        // and if we have removed all the dependencies we remove the entire thing altogether
+        if (parsed.services[service].depends_on.length === 0) {
+          delete parsed.services[service].depends_on;
+        }
+      }
+
+      if (service === "global-manager" || service === "cluster-manager" || service === "servers" && (
+        actualServices.includes("elastic")
+      )) {
+        if (!parsed.services[service].environment) {
+          parsed.services[service].environment = [];
+        }
+        parsed.services[service].environment.push("NODE_TLS_REJECT_UNAUTHORIZED=0");
+      }
+    });
+
     const yamlPath = path.join("deployments", buildID, "docker-compose.yml");
     console.log("emiting " + colors.green(yamlPath));
-    await fsAsync.writeFile(yamlPath, YAML.stringify(parsed));  
+    await fsAsync.writeFile(yamlPath, YAML.stringify(parsed));
   }
 
   // these only need to be added if we have a server of sorts
@@ -219,10 +225,10 @@ export default async function build(version: string, buildID: string, services: 
   if (!isPatch) {
     console.log("emiting " + colors.green(path.join("deployments", buildID, "start.sh")));
     await fsAsync.copyFile("start.sh", path.join("deployments", buildID, "start.sh"));
-  
+
     console.log("emiting " + colors.green(path.join("deployments", buildID, "stop.sh")));
     await fsAsync.copyFile("stop.sh", path.join("deployments", buildID, "stop.sh"));
-  
+
     console.log("emiting " + colors.green(path.join("deployments", buildID, "run.sh")));
     await fsAsync.copyFile("run.sh", path.join("deployments", buildID, "run.sh"));
   }

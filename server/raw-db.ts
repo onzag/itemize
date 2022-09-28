@@ -1434,21 +1434,34 @@ export class ItemizeRawDB {
       // to the old (eg. a reparent that a record was lost)
       // and to the new (eg. that a record was gained)
       if (potentialAffectedTrackedModProperties.length && !updater.dangerousUseSilentMode) {
-        moduleUpdateQuery.fromBuilder.from([moduleTable, "MOD_TABLE_OLD"])
-        moduleUpdateQuery.whereBuilder.andWhereColumn("id", ["\"MOD_TABLE_OLD\".\"id\"", []]);
-        moduleUpdateQuery.whereBuilder.andWhereColumn("version", ["\"MOD_TABLE_OLD\".\"version\"", []]);
-
         potentialAffectedTrackedModProperties.forEach((p) => {
-          moduleUpdateQuery.returningBuilder.returning("\"MOD_TABLE_OLD\"." + JSON.stringify(p) + " AS " + JSON.stringify("OLD_" + p), []);
+          moduleUpdateQuery.returningBuilder.returningColumn("OLD_" + p);
         });
+        moduleUpdateQuery.fromBuilder.fromSelect((b) => {
+          b.fromBuilder.from(moduleTable);
+          b.selectExpression("\"id\" \"OLD_id\"");
+          b.selectExpression("\"version\" \"OLD_version\"");
+          potentialAffectedTrackedModProperties.forEach((p) => {
+            b.selectExpression(JSON.stringify(p) + " " + JSON.stringify("OLD_" + p));
+          });
+          updater.whereCriteriaSelector(b.whereBuilder);
+          b.joinBuilder.join(selfTable, (builder) => {
+            builder.onColumnEquals("id", CONNECTOR_SQL_COLUMN_ID_FK_NAME);
+            builder.onColumnEquals("version", CONNECTOR_SQL_COLUMN_VERSION_FK_NAME);
+          });
+        }, "MOD_TABLE_OLD");
+        moduleUpdateQuery.whereBuilder.andWhereColumn("id", ["\"MOD_TABLE_OLD\".\"OLD_id\"", []]);
+        moduleUpdateQuery.whereBuilder.andWhereColumn("version", ["\"MOD_TABLE_OLD\".\"OLD_version\"", []]);
+      } else {
+        updater.whereCriteriaSelector(moduleUpdateQuery.whereBuilder);
+
+        // and join it on id and version match
+        moduleUpdateQuery.whereBuilder.andWhere(JSON.stringify("id") + "=" + JSON.stringify(CONNECTOR_SQL_COLUMN_ID_FK_NAME));
+        moduleUpdateQuery.whereBuilder.andWhere(JSON.stringify("version") + "=" + JSON.stringify(CONNECTOR_SQL_COLUMN_VERSION_FK_NAME));
+        // now we pass the where criteria selector for further filtering
+        moduleUpdateQuery.fromBuilder.from(selfTable);
       }
 
-      // and join it on id and version match
-      moduleUpdateQuery.whereBuilder.andWhere(JSON.stringify("id") + "=" + JSON.stringify(CONNECTOR_SQL_COLUMN_ID_FK_NAME));
-      moduleUpdateQuery.whereBuilder.andWhere(JSON.stringify("version") + "=" + JSON.stringify(CONNECTOR_SQL_COLUMN_VERSION_FK_NAME));
-      // now we pass the where criteria selector for further filtering
-      updater.whereCriteriaSelector(moduleUpdateQuery.whereBuilder);
-      moduleUpdateQuery.fromBuilder.from(selfTable);
       // returning only the module table information
       moduleUpdateQuery.returningBuilder.returningAll(moduleTable);
       withQuery.with("MTABLE", moduleUpdateQuery);
@@ -1457,12 +1470,6 @@ export class ItemizeRawDB {
     if (updater.itemTableUpdater || updater.itemTableUpdate) {
       const itemUpdateQuery = new UpdateBuilder();
       itemUpdateQuery.table(selfTable);
-      // and join it on id and version match
-      itemUpdateQuery.whereBuilder.andWhere(JSON.stringify("id") + "=" + JSON.stringify(CONNECTOR_SQL_COLUMN_ID_FK_NAME));
-      itemUpdateQuery.whereBuilder.andWhere(JSON.stringify("version") + "=" + JSON.stringify(CONNECTOR_SQL_COLUMN_VERSION_FK_NAME));
-      itemUpdateQuery.fromBuilder.from("MTABLE");
-      // returning only the item table information
-      itemUpdateQuery.returningBuilder.returningAll(selfTable);
 
       if (updater.itemTableUpdate) {
         itemUpdateQuery.setBuilder.setMany(updater.itemTableUpdate);
@@ -1495,20 +1502,39 @@ export class ItemizeRawDB {
       // to the old (eg. a reparent that a record was lost)
       // and to the new (eg. that a record was gained)
       if (potentialAffectedTrackedIdefProperties.length && !updater.dangerousUseSilentMode) {
-        itemUpdateQuery.fromBuilder.from([moduleTable, "IDEF_TABLE_OLD"])
+        potentialAffectedTrackedIdefProperties.forEach((p) => {
+          itemUpdateQuery.returningBuilder.returningColumn("OLD_" + p);
+        });
+        itemUpdateQuery.fromBuilder.fromSelect((b) => {
+          b.fromBuilder.from(selfTable);
+          b.selectExpression(JSON.stringify(CONNECTOR_SQL_COLUMN_ID_FK_NAME) + " " + JSON.stringify("OLD_" + CONNECTOR_SQL_COLUMN_ID_FK_NAME));
+          b.selectExpression(JSON.stringify(CONNECTOR_SQL_COLUMN_VERSION_FK_NAME) + " " + JSON.stringify("OLD_" + CONNECTOR_SQL_COLUMN_VERSION_FK_NAME));
+          potentialAffectedTrackedIdefProperties.forEach((p) => {
+            b.selectExpression(JSON.stringify(p) + " " + JSON.stringify("OLD_" + p));
+          });
+          updater.whereCriteriaSelector(b.whereBuilder);
+          b.joinBuilder.join(moduleTable, (builder) => {
+            builder.onColumnEquals(CONNECTOR_SQL_COLUMN_ID_FK_NAME, "id");
+            builder.onColumnEquals(CONNECTOR_SQL_COLUMN_VERSION_FK_NAME, "version");
+          });
+        }, "IDEF_TABLE_OLD");
         itemUpdateQuery.whereBuilder.andWhereColumn(
           CONNECTOR_SQL_COLUMN_ID_FK_NAME,
-          ["\"IDEF_TABLE_OLD\"." + JSON.stringify(CONNECTOR_SQL_COLUMN_ID_FK_NAME), []],
+          ["\"IDEF_TABLE_OLD\"." + JSON.stringify("OLD_" + CONNECTOR_SQL_COLUMN_ID_FK_NAME), []],
         );
         itemUpdateQuery.whereBuilder.andWhereColumn(
           CONNECTOR_SQL_COLUMN_VERSION_FK_NAME,
-          ["\"IDEF_TABLE_OLD\"." + JSON.stringify(CONNECTOR_SQL_COLUMN_VERSION_FK_NAME), []],
+          ["\"IDEF_TABLE_OLD\"." + JSON.stringify("OLD_" + CONNECTOR_SQL_COLUMN_VERSION_FK_NAME), []],
         );
-
-        potentialAffectedTrackedIdefProperties.forEach((p) => {
-          itemUpdateQuery.returningBuilder.returning("\"IDEF_TABLE_OLD\"." + JSON.stringify(p) + " AS " + JSON.stringify("OLD_" + p), []);
-        });
+      } else {
+        // and join it on id and version match
+        itemUpdateQuery.whereBuilder.andWhere(JSON.stringify("id") + "=" + JSON.stringify(CONNECTOR_SQL_COLUMN_ID_FK_NAME));
+        itemUpdateQuery.whereBuilder.andWhere(JSON.stringify("version") + "=" + JSON.stringify(CONNECTOR_SQL_COLUMN_VERSION_FK_NAME));
+        itemUpdateQuery.fromBuilder.from("MTABLE");
       }
+
+      // returning only the item table information
+      itemUpdateQuery.returningBuilder.returningAll(selfTable);
 
       withQuery.with("ITABLE", itemUpdateQuery);
     } else {
@@ -1599,8 +1625,8 @@ export class ItemizeRawDB {
 
           const oldParent = {
             id: typeof result.OLD_parent_id === "undefined" ? currentParent.id : result.OLD_parent_id,
-            version: typeof result.OLD_parent_version === "undefined" ? currentParent.id : result.OLD_parent_version,
-            type: typeof result.OLD_parent_id === "undefined" ? currentParent.id : result.OLD_parent_id,
+            version: (typeof result.OLD_parent_version === "undefined" ? currentParent.id : result.OLD_parent_version) || null,
+            type: (typeof result.OLD_parent_type === "undefined" ? currentParent.type : result.OLD_parent_type) || null,
           }
 
           if (currentParent.id !== oldParent.id || currentParent.type !== oldParent.type || currentParent.version !== oldParent.version) {
@@ -1684,20 +1710,23 @@ export class ItemizeRawDB {
     // the given property id, property value, id, version, type combo; whether
     // it was lost or gained, as all other info is irrelevant, this uniqueness constrain
     // will be abused to ensure updates and to keep the tracking database small
-    insertQueryBuilder.onConflict("UPDATE", (setBlder) => {
-      setBlder.setColumn(
-        "transaction_time", [
-        "NOW()",
-        [],
-      ],
-      );
-      setBlder.setColumn(
-        "status", [
-        "EXCLUDED.\"status\"",
-        [],
-      ],
-      );
-    });
+    insertQueryBuilder.onConflictOn(
+      ["property", "value", "type", "id", "version"],
+      "UPDATE",
+      (setBlder) => {
+        setBlder.setColumn(
+          "transaction_time", [
+          "NOW()",
+          [],
+        ],
+        );
+        setBlder.setColumn(
+          "status", [
+          "EXCLUDED.\"status\"",
+          [],
+        ],
+        );
+      });
 
     if (hasAddedAtLeastOneInsert) {
       await transactingDb.queryRows(insertQueryBuilder);
@@ -1790,7 +1819,6 @@ export class ItemizeRawDB {
       moduleUpdateQuery.setBuilder,
       this.redoDictionariesFn.bind(this, mod, moduleUpdateQuery.setBuilder),
     );
-    updater.whereCriteriaSelector(moduleUpdateQuery.whereBuilder);
 
     moduleUpdateQuery.returningBuilder.returningColumn("id");
     moduleUpdateQuery.returningBuilder.returningColumn("version");
@@ -1826,20 +1854,29 @@ export class ItemizeRawDB {
       // to the old (eg. a reparent that a record was lost)
       // and to the new (eg. that a record was gained)
       if (potentialAffectedTrackedProperties.length) {
-        moduleUpdateQuery.fromBuilder.from([moduleTable, "MOD_TABLE_OLD"])
-        moduleUpdateQuery.whereBuilder.andWhereColumn("id", ["\"MOD_TABLE_OLD\".\"id\"", []]);
-        moduleUpdateQuery.whereBuilder.andWhereColumn("version", ["\"MOD_TABLE_OLD\".\"version\"", []]);
-
         potentialAffectedTrackedProperties.forEach((p) => {
-          moduleUpdateQuery.returningBuilder.returning("\"MOD_TABLE_OLD\"." + JSON.stringify(p) + " AS " + JSON.stringify("OLD_" + p), []);
+          moduleUpdateQuery.returningBuilder.returningColumn("OLD_" + p);
         });
+        moduleUpdateQuery.fromBuilder.fromSelect((b) => {
+          b.fromBuilder.from(moduleTable);
+          b.selectExpression("\"id\" \"OLD_id\"");
+          b.selectExpression("\"version\" \"OLD_version\"");
+          potentialAffectedTrackedProperties.forEach((p) => {
+            b.selectExpression(JSON.stringify(p) + " " + JSON.stringify("OLD_" + p));
+          });
+          updater.whereCriteriaSelector(b.whereBuilder);
+        }, "MOD_TABLE_OLD");
+        moduleUpdateQuery.whereBuilder.andWhereColumn("id", ["\"MOD_TABLE_OLD\".\"OLD_id\"", []]);
+        moduleUpdateQuery.whereBuilder.andWhereColumn("version", ["\"MOD_TABLE_OLD\".\"OLD_version\"", []]);
+      } else {
+        updater.whereCriteriaSelector(moduleUpdateQuery.whereBuilder);
       }
+    } else {
+      updater.whereCriteriaSelector(moduleUpdateQuery.whereBuilder);
     }
 
     // we got to get all rows, first we create a pseudo table
     // for our module
-    // TODOIMPORTANT here make a transaction to update and add the tracked details
-    // must add to the other one too
     const allRows = potentialAffectedTrackedProperties.length && !updater.dangerousUseSilentMode ? (
       await this.databaseConnection.startTransaction(async (transactingDb) => {
         const results = await transactingDb.queryRows(moduleUpdateQuery);

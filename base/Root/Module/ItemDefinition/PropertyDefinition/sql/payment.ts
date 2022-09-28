@@ -8,6 +8,7 @@ import { ISQLArgInfo, ISQLInInfo, ISQLOutInfo, ISQLSearchInfo, ISQLBtreeIndexabl
 import { IPropertyDefinitionSupportedPaymentType, PaymentStatusType } from "../types/payment";
 import { PropertyDefinitionSearchInterfacesPrefixes } from "../search-interfaces";
 import { IPropertyDefinitionSupportedCurrencyType } from "../types/currency";
+import { currencies } from "../../../../../../imported-resources";
 
 // based on the payment provider status to event
 // need to clone it because of circular dependencies
@@ -111,9 +112,20 @@ export function paymentSQLIn(arg: ISQLInInfo) {
     };
   }
 
+  let roundedAmount = value.amount;
+  let maxDecimalCount = ((currencies[value.currency] && currencies[value.currency].decimals) || 2);
+  if (maxDecimalCount > arg.property.getMaxDecimalCount()) {
+    maxDecimalCount = arg.property.getMaxDecimalCount();
+  }
+
+  const decimalCount = (roundedAmount.toString().split(".")[1] || "").length;
+  if (decimalCount > maxDecimalCount) {
+    roundedAmount = Math.round(roundedAmount * (10 ** maxDecimalCount)) / (10 ** maxDecimalCount);
+  }
+
   return {
     [arg.prefix + arg.id + "_TYPE"]: value.type,
-    [arg.prefix + arg.id + "_AMOUNT"]: value.amount,
+    [arg.prefix + arg.id + "_AMOUNT"]: roundedAmount,
     [arg.prefix + arg.id + "_CURRENCY"]: value.currency,
     [arg.prefix + arg.id + "_STATUS"]: value.status,
     [arg.prefix + arg.id + "_METADATA"]: value.metadata || null,
@@ -129,6 +141,16 @@ export function paymentSQLIn(arg: ISQLInInfo) {
 export function paymentSQLOut(arg: ISQLOutInfo) {
   const amount = arg.row[arg.prefix + arg.id + "_AMOUNT"];
   if (amount === null) {
+    if (!arg.property.isNullable()) {
+      return (arg.property.getDefaultValue() as any) || {
+        type: "invoice",
+        amount: 0,
+        currency: "EUR",
+        status: PaymentStatusType.PAID,
+        metadata: null,
+        rometadata: null,
+      };
+    }
     return null;
   }
 
@@ -143,6 +165,16 @@ export function paymentSQLOut(arg: ISQLOutInfo) {
     metadata: arg.row[arg.prefix + arg.id + "_METADATA"] || null,
     rometadata: arg.row[arg.prefix + arg.id + "_RO_METADATA"] || null,
   };
+
+  let maxDecimalCount = ((currencies[result.currency] && currencies[result.currency].decimals) || 2);
+  if (maxDecimalCount > arg.property.getMaxDecimalCount()) {
+    maxDecimalCount = arg.property.getMaxDecimalCount();
+  }
+
+  const decimalCount = (result.amount.toString().split(".")[1] || "").length;
+  if (decimalCount > maxDecimalCount) {
+    result.amount = Math.round(result.amount * (10 ** maxDecimalCount)) / (10 ** maxDecimalCount);
+  }
 
   return result;
 }

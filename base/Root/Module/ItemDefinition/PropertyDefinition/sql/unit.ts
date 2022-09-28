@@ -10,6 +10,7 @@ import {
 } from "../types";
 import { IPropertyDefinitionSupportedUnitType } from "../types/unit";
 import { PropertyDefinitionSearchInterfacesPrefixes } from "../search-interfaces";
+import { MAX_DECIMAL_COUNT } from "../../../../../../constants";
 
 /**
  * The unit sql function that specifies the schema
@@ -84,10 +85,28 @@ export function unitSQLIn(arg: ISQLInInfo) {
     };
   }
   const value = arg.value as IPropertyDefinitionSupportedUnitType;
+  let roundedValue = value.value;
+  let roundedNormValue = value.normalizedValue;
+
+  let maxDecimalCount = arg.property.getMaxDecimalCount();
+  if (maxDecimalCount > MAX_DECIMAL_COUNT) {
+    maxDecimalCount = MAX_DECIMAL_COUNT;
+  }
+
+  const decimalCount = (roundedValue.toString().split(".")[1] || "").length;
+  if (decimalCount > maxDecimalCount) {
+    roundedValue = Math.round(roundedValue * (10 ** maxDecimalCount)) / (10 ** maxDecimalCount);
+  }
+
+  const decimalNormCount = (roundedNormValue.toString().split(".")[1] || "").length;
+  if (decimalNormCount > maxDecimalCount) {
+    roundedNormValue = Math.round(roundedNormValue * (10 ** maxDecimalCount)) / (10 ** maxDecimalCount);
+  }
+
   return {
-    [arg.prefix + arg.id + "_VALUE"]: value.value,
+    [arg.prefix + arg.id + "_VALUE"]: roundedValue,
     [arg.prefix + arg.id + "_UNIT"]: value.unit,
-    [arg.prefix + arg.id + "_NORMALIZED_VALUE"]: value.normalizedValue,
+    [arg.prefix + arg.id + "_NORMALIZED_VALUE"]: roundedNormValue,
     [arg.prefix + arg.id + "_NORMALIZED_UNIT"]: value.normalizedUnit,
   };
 }
@@ -107,6 +126,22 @@ export function unitSQLOut(arg: ISQLOutInfo) {
   if (result.value === null) {
     return null;
   }
+
+  let maxDecimalCount = arg.property.getMaxDecimalCount();
+  if (maxDecimalCount > MAX_DECIMAL_COUNT) {
+    maxDecimalCount = MAX_DECIMAL_COUNT;
+  }
+
+  const decimalCount = (result.value.toString().split(".")[1] || "").length;
+  if (decimalCount > maxDecimalCount) {
+    result.value = Math.round(result.value * (10 ** maxDecimalCount)) / (10 ** maxDecimalCount);
+  }
+
+  const decimalNormCount = (result.normalizedValue.toString().split(".")[1] || "").length;
+  if (decimalNormCount > maxDecimalCount) {
+    result.normalizedValue = Math.round(result.normalizedValue * (10 ** maxDecimalCount)) / (10 ** maxDecimalCount);
+  }
+
   return result;
 }
 
@@ -243,7 +278,7 @@ export function unitSQLOrderBy(arg: ISQLOrderByInfo): [string, string, string] {
  * @param arg the sql order by info arg
  * @returns the three string order by rule
  */
- export function unitElasticOrderBy(arg: ISQLOrderByInfo) {
+export function unitElasticOrderBy(arg: ISQLOrderByInfo) {
   return {
     [arg.prefix + arg.id + "_NORMALIZED_VALUE"]: arg.direction,
   }

@@ -2,7 +2,7 @@ import { LOGS_IDENTIFIER } from "../../constants";
 import LoggingProvider, { ILogsResult } from "./base/LoggingProvider";
 import { Client } from "@elastic/elasticsearch";
 import { IItemizeFinalLoggingObject } from "../logger";
-import { INSTANCE_UUID, NODE_ENV } from "../environment";
+import { FORCE_CONSOLE_LOGS, INSTANCE_UUID, NODE_ENV } from "../environment";
 
 const logsIndex = LOGS_IDENTIFIER.toLowerCase();
 
@@ -76,7 +76,7 @@ export class ElasticLoggerService extends LoggingProvider<null> {
           errStack: err.stack,
           methodName: "initialize",
         };
-        if (NODE_ENV === "production") {
+        if (NODE_ENV !== "production" || FORCE_CONSOLE_LOGS) {
           console.log(errData);
         }
         this.logToFallback(err, INSTANCE_UUID, "error", errData);

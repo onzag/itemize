@@ -53,7 +53,7 @@ const typeValue: IPropertyDefinitionSupportedType<PropertyDefinitionSupportedDat
   elastic: getStandardElasticForWithNullField && getStandardElasticForWithNullField("date", "yyyy-MM-dd"),
   sqlSelect: standardSQLSelect,
   sqlIn: standardSQLInFn,
-  sqlOut: standardSQLOutFn,
+  sqlOut: standardSQLOutFn.bind(null, "1970-01-01"),
   sqlElasticIn: standardSQLElasticInFn,
   sqlSearch: standardSQLSearchFnExactAndRange,
   elasticSearch: standardElasticSearchFnWithNullFieldExactAndRange,

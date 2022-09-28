@@ -42,7 +42,6 @@ export interface ICurrencyType {
   code: string;
   name: string;
   symbol: string;
-  rounding: number;
   decimals: number;
 }
 

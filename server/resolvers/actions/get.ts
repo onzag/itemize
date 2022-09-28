@@ -439,6 +439,7 @@ export async function getItemDefinitionList(
         itemDefinition,
         value,
       );
+
       const ownerId = itemDefinition.isOwnerObjectId() ? value.id : value.created_by;
       const rolesManager = new CustomRoleManager(appData.customRoles, {
         cache: appData.cache,
@@ -575,6 +576,7 @@ export async function getItemDefinitionList(
     results: finalValues,
     highlights,
   };
+
   CAN_LOG_DEBUG && logger.debug({
     functionName: "getItemDefinitionList",
     message: "Done",

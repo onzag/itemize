@@ -141,7 +141,7 @@ const typeValue: IPropertyDefinitionSupportedType<PropertyDefinitionSupportedTex
   sqlSelect: standardSQLSelect,
   sqlIn: textSQLIn,
   sqlRedoDictionaryIndex: textSqlRedoDictionaryIndex,
-  sqlOut: standardSQLOutFn,
+  sqlOut: standardSQLOutFn.bind(null, "?"),
   sqlElasticIn: textElasticIn,
   sqlSearch: textSQLSearch,
   elasticSearch: textElasticSearch,

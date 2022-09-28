@@ -54,7 +54,7 @@ const typeValue: IPropertyDefinitionSupportedType<PropertyDefinitionSupportedTim
   elastic: getStandardElasticForWithNullField && getStandardElasticForWithNullField("date", TIME_FORMAT),
   sqlSelect: standardSQLSelect,
   sqlIn: standardSQLInFn,
-  sqlOut: standardSQLOutFn,
+  sqlOut: standardSQLOutFn.bind(null, "00:00:00"),
   sqlElasticIn: standardSQLElasticInFn,
   sqlSearch: standardSQLSearchFnExactAndRange,
   elasticSearch: standardElasticSearchFnWithNullFieldExactAndRange,

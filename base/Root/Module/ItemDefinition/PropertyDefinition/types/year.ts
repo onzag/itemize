@@ -53,7 +53,7 @@ const typeValue: IPropertyDefinitionSupportedType<PropertyDefinitionSupportedYea
   elastic: getStandardElasticFor && getStandardElasticFor("short", -1),
   sqlSelect: standardSQLSelect,
   sqlIn: standardSQLInFn,
-  sqlOut: standardSQLOutFn,
+  sqlOut: standardSQLOutFn.bind(null, 0),
   sqlElasticIn: standardSQLElasticInFn,
   sqlSearch: standardSQLSearchFnExactAndRange,
   elasticSearch: standardElasticSearchFnExactAndRange && standardElasticSearchFnExactAndRange.bind(null, -1),
@@ -91,7 +91,7 @@ const typeValue: IPropertyDefinitionSupportedType<PropertyDefinitionSupportedYea
       return PropertyInvalidReason.INVALID_VALUE;
     } else if (n > MAX_SUPPORTED_YEAR) {
       return PropertyInvalidReason.TOO_LARGE;
-    } else if (n > MIN_SUPPORTED_YEAR) {
+    } else if (n < MIN_SUPPORTED_YEAR) {
       return PropertyInvalidReason.TOO_SMALL;
     }
 

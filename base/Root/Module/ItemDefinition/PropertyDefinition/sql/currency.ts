@@ -9,6 +9,7 @@ import { IPropertyDefinitionSupportedCurrencyType } from "../types/currency";
 import { CURRENCY_FACTORS_IDENTIFIER } from "../../../../../../constants";
 import { PropertyDefinitionSearchInterfacesPrefixes } from "../search-interfaces";
 import { IGQLArgs } from "../../../../../../gql-querier";
+import { currencies } from "../../../../../../imported-resources";
 
 /**
  * the sql function that setups the fields for currency
@@ -84,8 +85,19 @@ export function currencySQLIn(arg: ISQLInInfo) {
   const factor: number = arg.serverData[CURRENCY_FACTORS_IDENTIFIER][value.currency];
   const normalized = factor ? factor * value.value : null;
 
+  let roundedAmount = value.value;
+  let maxDecimalCount = ((currencies[value.currency] && currencies[value.currency].decimals) || 2);
+  if (maxDecimalCount > arg.property.getMaxDecimalCount()) {
+    maxDecimalCount = arg.property.getMaxDecimalCount();
+  }
+
+  const decimalCount = (roundedAmount.toString().split(".")[1] || "").length;
+  if (decimalCount > maxDecimalCount) {
+    roundedAmount = Math.round(roundedAmount * (10 ** maxDecimalCount)) / (10 ** maxDecimalCount);
+  }
+
   return {
-    [arg.prefix + arg.id + "_VALUE"]: value.value,
+    [arg.prefix + arg.id + "_VALUE"]: roundedAmount,
     [arg.prefix + arg.id + "_CURRENCY"]: value.currency,
     [arg.prefix + arg.id + "_NORMALIZED_VALUE"]: normalized,
   };
@@ -114,6 +126,14 @@ export function currencySQLOut(arg: ISQLOutInfo) {
 
   // if our value happens to be null
   if (value === null) {
+
+    if (!arg.property.isNullable()) {
+      return (arg.property.getDefaultValue() as any) || {
+        value: 0,
+        currency: "EUR",
+      };
+    }
+
     // return whole null as it should
     return null;
   }
@@ -125,6 +145,16 @@ export function currencySQLOut(arg: ISQLOutInfo) {
     value: parseFloat(value),
     currency: arg.row[arg.prefix + arg.id + "_CURRENCY"],
   };
+
+  let maxDecimalCount = ((currencies[result.currency] && currencies[result.currency].decimals) || 2);
+  if (maxDecimalCount > arg.property.getMaxDecimalCount()) {
+    maxDecimalCount = arg.property.getMaxDecimalCount();
+  }
+
+  const decimalCount = (result.value.toString().split(".")[1] || "").length;
+  if (decimalCount > maxDecimalCount) {
+    result.value = Math.round(result.value * (10 ** maxDecimalCount)) / (10 ** maxDecimalCount);
+  }
 
   // otherwise return the result itself, note how normalized
   // isn't included as the currency doesn't include the normalized

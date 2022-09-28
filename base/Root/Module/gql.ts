@@ -95,7 +95,11 @@ export function getGQLTypeForModule(mod: Module): GraphQLObjectType {
         retrievalMode: true,
         excludeBase: false,
         propertiesAsInput: false,
-        optionalForm: false,
+
+        // all fields are now optional due to corruption of data
+        // or soft reads causing issues and crashing the server
+        // due to invalid data being sent
+        optionalForm: true,
         onlyTextFilters: false,
       }),
       description: "READ ACCESS: " + mod.getRolesWithAccessTo(ItemDefinitionIOActions.READ).join(", "),
@@ -280,19 +284,6 @@ export function getGQLQueryFieldsForModule(
         propertiesAsInput: true,
         optionalForm: true,
         onlyTextFilters: false,
-      }),
-      ...RESERVED_MODULE_SEARCH_PROPERTIES(orderByRule),
-    };
-
-    const getterListArgs = {
-      // as you can realize the arguments exclude the base and make it into input mode
-      // that means no RESERVED_BASE_PROPERTIES
-      ...getGQLFieldsDefinitionForModule(mod.getSearchModule(), {
-        retrievalMode: false,
-        excludeBase: true,
-        propertiesAsInput: true,
-        optionalForm: true,
-        onlyTextFilters: true,
       }),
       ...RESERVED_MODULE_SEARCH_PROPERTIES(orderByRule),
     };

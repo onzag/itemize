@@ -80,6 +80,9 @@ const actionRegistry: {
     if (
       wantsSpecificHelp ||
       (
+        actionRegistry[action].needsArgs > remainingArgs.length &&
+        actionRegistry[action].arbitraryArgs
+      ) || (
         actionRegistry[action].needsArgs !== remainingArgs.length &&
         !actionRegistry[action].arbitraryArgs
       )

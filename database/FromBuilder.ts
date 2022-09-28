@@ -4,6 +4,7 @@
  */
 
 import { QueryBuilder } from "./base";
+import { SelectBuilder } from "./SelectBuilder";
 
 /**
  * Provides a builder for a FROM statments in SQL
@@ -13,6 +14,8 @@ export class FromBuilder extends QueryBuilder {
    * The tables we do the from rule
    */
   private tables: Array<string | [string, string]> = [];
+  private selectBuilder: SelectBuilder = null;
+  private selectBuilderAlias: string = null;
 
   /**
    * builds a new from builder
@@ -31,6 +34,14 @@ export class FromBuilder extends QueryBuilder {
     return this;
   }
 
+  public fromSelect(builder: (b: SelectBuilder) => void, alias: string) {
+    this.selectBuilder = new SelectBuilder();
+    builder(this.selectBuilder);
+    this.selectBuilderAlias = alias;
+    this.addBindingSource(this.selectBuilder);
+    return this;
+  }
+
   /**
    * On the from builder this will clear all the tables
    * @returns itself
@@ -38,6 +49,9 @@ export class FromBuilder extends QueryBuilder {
   public clear() {
     this.tables = [];
     this.clearBindingSources();
+    this.selectBuilder.clearBindingSources();
+    this.selectBuilder = null;
+    this.selectBuilderAlias = null;
     return this;
   }
 
@@ -46,8 +60,11 @@ export class FromBuilder extends QueryBuilder {
    * @returns a string that represents the compiled result
    */
   public compile() {
-    if (!this.tables.length) {
+    if (!this.tables.length && !this.selectBuilder) {
       return "";
+    }
+    if (this.selectBuilder) {
+      return "FROM (" + this.selectBuilder.compile() + ") " + JSON.stringify(this.selectBuilderAlias);
     }
     return "FROM " + this.tables.map((t) =>
       typeof t === "string" ?

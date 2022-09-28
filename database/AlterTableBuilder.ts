@@ -44,7 +44,7 @@ export class AlterTableBuilder extends QueryBuilder {
    * @param info the info about the column
    * @returns itself
    */
-  public affectColumn(action: "DROP COLUMN" | "ADD COLUMN" | "ALTER COLUMN", info: IAlterTableColumnData) {
+  public affectColumn(action: "DROP COLUMN" | "ADD COLUMN" | "ALTER COLUMN", info: IAlterTableColumnData) {
     if (this.columnRule) {
       throw new Error("Cannot modify many columns in one statement");
     }

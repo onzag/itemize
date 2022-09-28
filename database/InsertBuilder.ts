@@ -53,6 +53,8 @@ export class InsertBuilder extends QueryBuilder {
    * What to do on conflict
    */
   private doOnConflict: "NOTHING" | "UPDATE";
+  private doOnConflictRows: string[];
+  private doOnConflictConstraint: string;
 
   /**
    * Builds a new insert query
@@ -88,6 +90,9 @@ export class InsertBuilder extends QueryBuilder {
   public clear() {
     this.clearValues();
     this.tableName = null;
+    this.doOnConflict = null;
+    this.doOnConflictRows = null;
+    this.doOnConflictConstraint = null;
     return this;
   }
 
@@ -175,6 +180,20 @@ export class InsertBuilder extends QueryBuilder {
     return this;
   }
 
+  public onConclictOnConstraint(constraint: string, doWhat: "NOTHING" | "UPDATE", fn?: (setBuilder: SetBuilder, whereBuilder: WhereBuilder) => void) {
+    this.doOnConflictConstraint = constraint;
+    this.doOnConflictRows = null;
+
+    this.onConflict(doWhat, fn);
+  }
+
+  public onConflictOn(rows: string[] |Array<[string, string]>, doWhat: "NOTHING" | "UPDATE", fn?: (setBuilder: SetBuilder, whereBuilder: WhereBuilder) => void) {
+    this.doOnConflictRows = rows.map((r) => typeof r === "string" ? JSON.stringify(r) : JSON.stringify(r[0]) + "." + JSON.stringify(r[1]));
+    this.doOnConflictConstraint = null;
+
+    this.onConflict(doWhat, fn);
+  }
+
   /**
    * sets the on conflict rule for the insert
    * @param doWhat what to do NOTHING or UPDATE
@@ -219,7 +238,10 @@ export class InsertBuilder extends QueryBuilder {
     return "INSERT INTO " + JSON.stringify(this.tableName) +
       " (" + this.columnSignature + ") VALUES (" +
       this.valuesToInsert.join("), (") + ") " +
-      (this.doOnConflict ? "ON CONFLICT DO " + this.doOnConflict : "") +
+      (this.doOnConflict ? "ON CONFLICT" : "") +
+      (this.doOnConflictRows ? "(" + this.doOnConflictRows.join(", ") + ")" : "") +
+      (this.doOnConflictConstraint ? " ON CONSTRAINT " + this.doOnConflictConstraint : "") +
+      (this.doOnConflict ? " DO " + this.doOnConflict : "") +
       (this.upsertSetBuilder ? " " + this.upsertSetBuilder.compile() : "") +
       (this.upsertWhereBuilder ? " " + this.upsertWhereBuilder.compile() : "") +
       (returningRule ? " " + returningRule : "");

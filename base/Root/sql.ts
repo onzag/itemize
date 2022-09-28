@@ -168,6 +168,14 @@ export function getSQLTablesSchemaForRoot(root: Root): ISQLSchemaDefinitionType 
       }
     },
     [TRACKERS_REGISTRY_IDENTIFIER]: {
+      // property, value, id, version, type
+      // because id, version, type is basic identifier
+      // and one of those can have many of the properties
+      // and the value is important too, because such are lost or gained
+      // so the unique identifier for an event is the property it affected
+      // the value it affected
+      // the basic identifier
+      // and now the status can be either appeared or dissapeared
       id: {
         type: "TEXT",
         notNull: true,

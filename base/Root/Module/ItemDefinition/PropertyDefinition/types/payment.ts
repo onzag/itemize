@@ -254,11 +254,7 @@ const typeValue: IPropertyDefinitionSupportedType<IPropertyDefinitionSupportedPa
 
     const splittedDecimals = l.amount.toString().split(".");
     const currencyDefinitionDecimals = currencyData.decimals;
-    if (!splittedDecimals[1] ||
-      splittedDecimals[1].length <= currencyDefinitionDecimals) {
-      if (currencyData.rounding && !Number.isInteger((l.amount * 10 ** 2) / (currencyData.rounding * 10 ** 2))) {
-        return PropertyInvalidReason.INVALID_VALUE;
-      }
+    if (!splittedDecimals[1] || splittedDecimals[1].length <= currencyDefinitionDecimals) {
       return null;
     }
 

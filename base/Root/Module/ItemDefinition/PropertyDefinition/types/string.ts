@@ -89,7 +89,7 @@ const typeValue: IPropertyDefinitionSupportedType<PropertyDefinitionSupportedStr
   elastic: stringElastic,
   sqlSelect: standardSQLSelect,
   sqlIn: standardSQLInFn,
-  sqlOut: standardSQLOutFn,
+  sqlOut: standardSQLOutFn.bind(null, "?"),
   sqlElasticIn: stringSQLElasticIn,
   sqlSearch: stringSQLSearch,
   elasticSearch: stringElasticSearch,

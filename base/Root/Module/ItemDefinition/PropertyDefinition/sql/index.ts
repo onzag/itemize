@@ -19,7 +19,7 @@ import ItemDefinition from "../..";
 import Include from "../../Include";
 import { processFileListFor, processSingleFileFor } from "./file-management";
 import { IGQLArgs, IGQLValue } from "../../../../../../gql-querier";
-import { SQL_CONSTRAINT_PREFIX } from "../../../../../../constants";
+import { MAX_DECIMAL_COUNT, SQL_CONSTRAINT_PREFIX } from "../../../../../../constants";
 import Module from "../../..";
 import StorageProvider from "../../../../../../server/services/base/StorageProvider";
 import { WhereBuilder } from "../../../../../../database/WhereBuilder";
@@ -155,6 +155,18 @@ export function standardSQLSelect(arg: ISQLArgInfo): string[] {
  * @returns the partial row value
  */
 export function standardSQLInFn(arg: ISQLInInfo): ISQLTableRowValue {
+  if (typeof arg.value === "number") {
+    let maxDecimalCount = arg.property.getMaxDecimalCount();
+    if (maxDecimalCount > MAX_DECIMAL_COUNT) {
+      maxDecimalCount = MAX_DECIMAL_COUNT;
+    }
+    const decimalCount = (arg.value.toString().split(".")[1] || "").length;
+    if (decimalCount > maxDecimalCount) {
+      return {
+        [arg.prefix + arg.id]: Math.round(arg.value * (10**maxDecimalCount)) / (10**maxDecimalCount),
+      };
+    }
+  }
   // as simple as this
   return {
     [arg.prefix + arg.id]: arg.value,
@@ -185,8 +197,33 @@ export function stardardSQLInWithJSONStringifyFn(arg: ISQLInInfo): ISQLTableRowV
  * @param arg the out arg info
  * @returns the property value out
  */
-export function standardSQLOutFn(arg: ISQLOutInfo): any {
-  const value = arg.row[arg.prefix + arg.id];
+export function standardSQLOutFn(fallbackNull: any, arg: ISQLOutInfo): any {
+  let value = arg.row[arg.prefix + arg.id];
+
+  if (typeof value === "number") {
+    let maxDecimalCount = arg.property.getMaxDecimalCount();
+    if (maxDecimalCount > MAX_DECIMAL_COUNT) {
+      maxDecimalCount = MAX_DECIMAL_COUNT;
+    }
+    const decimalCount = (value.toString().split(".")[1] || "").length;
+    if (decimalCount > maxDecimalCount) {
+      value = Math.round(value * (10**maxDecimalCount)) / (10**maxDecimalCount);
+    }
+  }
+  
+  if (
+    (
+      typeof value === "undefined" ||
+      value === null
+    ) && !arg.property.isNullable()
+  ) {
+    const def = arg.property.getDefaultValue();
+    if (def !== null) {
+      return def;
+    }
+    return fallbackNull;
+  }
+
   // just in case I can imagine an edge case with passwords
   // where the password is in elastic where it is not stored
   // and then the conversion is attempted into a search
@@ -213,14 +250,28 @@ export function standardSQLElasticInFn(arg: ISQLOutInfo): any {
  * @param arg the sql out info arg
  * @returns the supported type json parsed
  */
-export function standardSQLOutWithJSONParseFn(arg: ISQLOutInfo): any {
+export function standardSQLOutWithJSONParseFn(fallbackNull: any, arg: ISQLOutInfo): any {
   if (arg.row[arg.prefix + arg.id] === null) {
+    if (!arg.property.isNullable()) {
+      const def = arg.property.getDefaultValue();
+      if (def !== null) {
+        return def;
+      }
+      return fallbackNull;
+    }
     return null;
   }
 
   try {
     return JSON.parse(arg.row[arg.prefix + arg.id]);
   } catch {
+    if (!arg.property.isNullable()) {
+      const def = arg.property.getDefaultValue();
+      if (def !== null) {
+        return def;
+      }
+      return fallbackNull;
+    }
     return null;
   }
 }
@@ -667,7 +718,7 @@ export function buildSQLQueryForProperty(
  * @param dictionary the dictionary that is being used
  * @param isOrderedByIt whether there will be a subsequent order by request
  */
- export function buildElasticQueryForProperty(
+export function buildElasticQueryForProperty(
   serverData: any,
   itemDefinition: ItemDefinition,
   include: Include,
@@ -755,7 +806,7 @@ export function buildSQLStrSearchQueryForProperty(
  * @param dictionary the dictionary that is being used
  * @param isOrderedByIt whether there will be a subsequent order by request
  */
- export function buildElasticStrSearchQueryForProperty(
+export function buildElasticStrSearchQueryForProperty(
   serverData: any,
   itemDefinition: ItemDefinition,
   include: Include,
@@ -866,7 +917,7 @@ export function buildSQLOrderByForProperty(
  * @param wasIncludedInSearch whether this property was included in search
  * @param wasIncludedInStrSearch whether this property was included in the str FTS search
  */
- export function buildElasticOrderByForProperty(
+export function buildElasticOrderByForProperty(
   serverData: any,
   itemDefinition: ItemDefinition,
   include: Include,
@@ -952,7 +1003,7 @@ export function buildSQLOrderByForInternalRequiredProperty(
  * @param direction the direction of the order by rule
  * @param nulls whether nulls are first or last
  */
- export function buildElasticOrderByForInternalRequiredProperty(
+export function buildElasticOrderByForInternalRequiredProperty(
   itemDefinition: ItemDefinition,
   which: string,
   args: IGQLArgs,
