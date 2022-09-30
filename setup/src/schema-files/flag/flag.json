@@ -6,18 +6,11 @@
             "type": "string",
             "subtype": "exact-value",
             "values": [
-                "NO_CONSENT_ADD",
                 "PORN",
                 "VIOLENCE",
-                "RELIGION",
-                "POLITICS",
-                "XENOPHOBIA",
-                "RACISM",
-                "MISOGYNY",
-                "ANTISCIENCE",
                 "OTHER"
             ],
-            "default": "NO_CONSENT_ADD"
+            "default": "PORN"
         },
         {
             "id": "status",

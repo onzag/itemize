@@ -7,7 +7,6 @@
  * @module
  */
 
-import { logger } from "../../logger";
 import ItemDefinition from "../../../base/Root/Module/ItemDefinition";
 import PropertyDefinition from "../../../base/Root/Module/ItemDefinition/PropertyDefinition";
 import { ISQLTableRowValue } from "../../../base/Root/sql";
@@ -17,6 +16,8 @@ import { jwtSign } from "../../token";
 import { IUnsubscribeUserTokenDataType } from "../../user/rest";
 import { ServiceProvider, ServiceProviderType } from "..";
 import { NODE_ENV } from "../../environment";
+import { PropertyDefinitionSupportedFilesType } from "../../../base/Root/Module/ItemDefinition/PropertyDefinition/types/files";
+import { IOTriggerActions, ITriggerRegistry } from "../../resolvers/triggers";
 
 export interface IMailResolverInfo {
   target: string;
@@ -45,7 +46,6 @@ export interface IUnsubscribeURL {
 
 /**
  * The shape of an email that is being wanted to be sent
- * TODO attachments
  */
 export interface ISendEmailData {
   /**
@@ -54,6 +54,10 @@ export interface ISendEmailData {
    * as the user
    */
   from: string;
+  /**
+   * The sender, original sender, if the email was forwarded
+   */
+  fromForwarded?: string;
   /**
    * A single email or a list of emails that are supposed
    * to be sent to
@@ -72,18 +76,26 @@ export interface ISendEmailData {
    */
   html?: string;
   /**
+   * Array of attachments to be added
+   */
+  attachments?: File[];
+  /**
+   * no reply email
+   */
+  noReply?: boolean;
+  /**
    * if provided this represents a mailto protocol
    * that can be used for the List-Unsubscribe header
    * and it is fairly generic
    */
-  unsubscribeMailto: string;
+  unsubscribeMailto?: string;
   /**
    * Unsubscribe urls are email specific and they can
    * also be used for the List-Unsubscribe header
    * however the mailto version should be preferred
    * over this one
    */
-  unsubscribeURLs: {
+  unsubscribeURLs?: {
     [email: string]: IUnsubscribeURL;
   };
 }
@@ -94,14 +106,16 @@ export interface ISendEmailData {
  */
 export interface IReceiveEmailData {
   from: string;
+  fromUsername?: string;
   to: string;
   subject: string;
-  content: string;
+  html: string;
+  attachments: File[];
 
   spam?: boolean;
-  notify?: boolean;
-  notifyProperty?: string;
 }
+
+const symbols = "+,|-?<>=!";
 
 /**
  * The MailProvider class is a service that provides mailing
@@ -135,6 +149,10 @@ export default class MailProvider<T> extends ServiceProvider<T> {
   private setMessageStorageItemDefinition(idef: ItemDefinition) {
     // TODO check that is valid for the shape necessary
     this.storageIdef = idef;
+  }
+
+  public escapeUserName(name: string) {
+    Array.from(name).map((v) => symbols.includes(v) ? " " : v).join("");
   }
 
   /**
@@ -243,11 +261,73 @@ export default class MailProvider<T> extends ServiceProvider<T> {
 
         // now we need the property value
         const propertyId = actualProperty.getId();
+        const mediaProperty = actualProperty.getSpecialProperty("mediaProperty");
 
         // and we extract it
         if (templateValue && templateValue[propertyId]) {
+          let currentFiles: PropertyDefinitionSupportedFilesType;
+          try {
+            currentFiles = mediaProperty ? JSON.parse(templateValue[mediaProperty]) : null;
+          } catch {
+            currentFiles = null;
+          }
+
+          const isRichText = actualProperty.isRichText();
+          const supportsVideos = isRichText && !!actualProperty.getSpecialProperty("supportsVideos");
+          const supportsImages = mediaProperty && !!actualProperty.getSpecialProperty("supportsImages");
+          const supportsFiles = mediaProperty && !!actualProperty.getSpecialProperty("supportsFiles");
+          const supportsContainers = actualProperty.getSpecialProperty("supportsContainers");
+          const supportedContainers = actualProperty.getSpecialProperty("supportedContainers");
+          const supportsTables = actualProperty.getSpecialProperty("supportsTables");
+          const supportedTables = actualProperty.getSpecialProperty("supportedTables");
+          const supportsLists = actualProperty.getSpecialProperty("supportsLists");
+          const supportsCustom = actualProperty.getSpecialProperty("supportsCustom");
+          const supportedCustoms = actualProperty.getSpecialProperty("supportedCustoms");
+          const supportsExternalLinks = actualProperty.getSpecialProperty("supportsExternalLinks");
+          const supportsLinks = actualProperty.getSpecialProperty("supportsLinks");
+          const supportsQuote = actualProperty.getSpecialProperty("supportsQuote");
+          const supportsRichClasses = actualProperty.getSpecialProperty("supportsRichClasses");
+          const supportedRichClasses = actualProperty.getSpecialProperty("supportedRichClasses");
+          const supportsTitle = actualProperty.getSpecialProperty("supportsTitle");
+          const supportsCustomStyles = actualProperty.getSpecialProperty("supportsCustomStyles");
+          const supportsTemplating = actualProperty.getSpecialProperty("supportsTemplating");
+
           // calling the render template function
           parsedTemplateValue = renderTemplate(
+            {
+              cacheFiles: false,
+              config: this.appConfig,
+              containerId: templateValue.container_id,
+              currentFiles,
+              forId: arg.id,
+              forVersion: arg.version,
+              forceFullURLs: true,
+              mediaProperty,
+              itemDefinition: actualItemDefinition,
+              include: null,
+            },
+            {
+              supportsFiles,
+              supportsImages,
+              supportsFilesAccept: "*",
+              supportsImagesAccept: "*",
+              supportsVideos,
+              supportsLists,
+              supportsContainers,
+              supportsCustom,
+              supportsExternalLinks,
+              supportsLinks,
+              supportsQuote,
+              supportsRichClasses,
+              supportsTitle,
+              supportsCustomStyles,
+              supportsTemplating,
+              supportedRichClasses,
+              supportedCustoms,
+              supportedContainers,
+              supportsTables,
+              supportedTables,
+            },
             templateValue[propertyId],
             arg.args,
           );
@@ -281,7 +361,7 @@ export default class MailProvider<T> extends ServiceProvider<T> {
     }
 
     // build the from handle
-    const from = `${arg.fromUsername} <${arg.fromEmailHandle}@${this.appConfig.mailDomain}>`;
+    const from = `${this.escapeUserName(arg.fromUsername)} <${arg.fromEmailHandle}@${this.appConfig.mailDomain}>`;
 
     // setup the args
     const args: ISendEmailData = {
@@ -539,7 +619,7 @@ export default class MailProvider<T> extends ServiceProvider<T> {
         }
         // and make up the url based on that
         const token = await jwtSign(tokenData, this.appSensitiveConfig.secondaryJwtKey);
-        const url = "https://" + hostname + "/rest/user/unsubscribe?userid=" + userData.id + "&token=" + encodeURIComponent(token);
+        const url = "https://" + hostname + "/rest/user/unsubscribe?userid=" + encodeURIComponent(userData.id) + "&token=" + encodeURIComponent(token);
         // create the url
         unsubscribeURLs[email] = {
           redirected: url,
@@ -616,14 +696,6 @@ export default class MailProvider<T> extends ServiceProvider<T> {
     }
   }
 
-  public standardInternalMailResolver() {
-
-  }
-
-  public setInternalMailResolver() {
-
-  }
-
   /**
    * This method should get called once an email has been received
    * the service provider that extended the raw mail provider should
@@ -641,14 +713,21 @@ export default class MailProvider<T> extends ServiceProvider<T> {
         this.globalRoot.registry["users/user"] :
         this.localAppData.root.registry["users/user"]
     ) as ItemDefinition;
+
+    // we need this to be able to receive external emails
     const hasEmail = userIdef.hasPropertyDefinitionFor("email", false);
     const hasEvalidated = userIdef.hasPropertyDefinitionFor("e_validated", false);
+    const hasEExternal = userIdef.hasPropertyDefinitionFor("e_external", false);
 
+    // if somehow user has no email or emails cannot be validated
+    // we cannot allow external emails to be received
     if (!hasEmail || !hasEvalidated) {
       return;
     }
 
+    // if this is an unsubscribe email action
     if (targetUserHandle === "unsubscribe") {
+      // let's find what we are unsubscribing for
       const unsubscribePropertyId = data.subject || "";
       const hasUnsubscribeProperty = userIdef.hasPropertyDefinitionFor(unsubscribePropertyId, false);
 
@@ -661,6 +740,7 @@ export default class MailProvider<T> extends ServiceProvider<T> {
         return;
       }
 
+      // get the user in question that suits the given email
       const users = await rawDB.performRawDBSelect(
         userIdef,
         (b) => {
@@ -675,6 +755,7 @@ export default class MailProvider<T> extends ServiceProvider<T> {
         return;
       }
 
+      // and unsubscribe from such property
       await rawDB.performRawDBUpdate(
         userIdef,
         user.id,
@@ -685,38 +766,473 @@ export default class MailProvider<T> extends ServiceProvider<T> {
           },
         },
       );
-    } else if (this.storageIdef) {
-      const hasEnotifications = userIdef.hasPropertyDefinitionFor("e_notifications", false);
-      let shouldNotify = !!data.notify;
-      const shouldCheckNotifyAt =
-        typeof data.notify !== "undefined" ?
-        null :
-        (data.notifyProperty || (hasEnotifications ? "e_notifications" : null));
-      
-      const users = await rawDB.performRawDBSelect(
+    } else {
+      // we may check for a potential sender that has used their email externally
+      // in order to reply
+      const potentialSender = (await rawDB.performRawDBSelect(
         userIdef,
         (b) => {
-          if (shouldCheckNotifyAt) {
-            b.select(shouldCheckNotifyAt);
-          }
-          b.select("id").whereBuilder.andWhereColumn("username", targetUserHandle);
+          b.selectAll().whereBuilder.andWhereColumn("email", data.from).andWhereColumn("e_validated", true);
           b.limit(1);
         }
-      );
+      ))[0] || null;
 
-      const user = users[0];
-      if (!user) {
-        return;
+      if (potentialSender && potentialSender.e_validated && this.storageIdef) {
+        // TODO
+        // store email in senders outbox, the email may be invalid and not have been received by
+        // anyone if no such user exists, but we are storing it anyway
       }
 
-      if (shouldCheckNotifyAt) {
-        shouldNotify = user[shouldCheckNotifyAt];
+      if (hasEExternal) {
+        // now let's grab the user that received such email
+        const users = await rawDB.performRawDBSelect(
+          userIdef,
+          (b) => {
+            b.selectAll().whereBuilder.andWhereColumn("username", targetUserHandle);
+            b.limit(1);
+          }
+        );
+
+        // here
+        const user = users[0];
+        // no user we are done and we disregard such email
+        if (!user) {
+          return;
+        }
+
+        // otherwise let's see if we should receive such email
+        const shouldReceive = user.e_external;
+
+        // if the user is marked with e_external as false, then that means they don't
+        // want to receive external email
+        if (!shouldReceive) {
+          return;
+        }
+
+        // we pass through the filter too
+        const shouldReceiveAllowed = await this.allowUserToReceiveExternalEmail(
+          user,
+          potentialSender,
+          data,
+        );
+
+        // the filter rejects it
+        if (shouldReceiveAllowed === "REJECT") {
+          return;
+        }
+
+        // TODO
+        // attach a new message for it in the idef
+        if (this.storageIdef) {
+          const isSpam = shouldReceiveAllowed === "SPAM";
+
+          // we have a known sender that was using their own
+          // email to contact users inside but they have their own
+          // email inside that is validated in that sense
+          // we will store it as that sender and do not leak the sender's actual
+          // email to the receiver
+          if (potentialSender) {
+            // TODO use the internal user's information
+          } else {
+            // use external information
+          }
+        }
+
+        // same here if the sender exists the default function
+        // will not leak the sender's email and use its own
+        // external email or otherwise notifications
+        await this.onUserReceivedExternalEmail(
+          user,
+          potentialSender,
+          data,
+          data.spam || shouldReceiveAllowed === "SPAM",
+        );
       }
+    }
+  }
 
+  /**
+   * @override use to filter spam and unwanted emails
+   * @param user the user that is receiving the email
+   * @param source the source will always be an email
+   * @param data the data that is being received
+   * @returns SPAM for when to mark it as spam, REJECT for rejecting the message entirely, ACCEPT for accepting it
+   */
+  public async allowUserToReceiveExternalEmail(user: ISQLTableRowValue, internalSender: ISQLTableRowValue, data: IReceiveEmailData): Promise<"SPAM" | "REJECT" | "ACCEPT"> {
+    return "ACCEPT";
+  }
 
+  /**
+   * @override to filter spam and unwanted emails
+   * triggers when an user is trying to send an email to another, when the target is a sql value
+   * it means that its using internal solving, as in two users that are in the same system, if the value
+   * is a plain string, it means it's trying to solve 
+   * @returns SPAM only works for internal usage and the message will be marked as spam for the recepient
+   * REJECT will not send the message on its entirety, and ACCEPT will send the message
+   */
+  public async allowUserToSendEmail(user: ISQLTableRowValue, target: string | ISQLTableRowValue): Promise<"SPAM" | "REJECT" | "ACCEPT"> {
+    return "ACCEPT";
+  }
 
-      // TODO
-      // attach a new message for it
+  /**
+   * @override
+   * An user received an email from an external source to their internal email, eg. from dude@gmail.com to girl@mysite.com
+   * by default this function will send an email notification based on the subscribe e_notifications property
+   * unless marked as spam
+   * @param user the user that got the external email
+   * @param internalSender the user that sent the message (or null) if it couldn't find one
+   * @param data the external email itself
+   * @param spam whether it was marked as spam, note that data.spam is whether it was marked by spam by the provider
+   * whereas this spam variable is affected by that as well as by allowUserToReceiveExternalEmail
+   */
+  public async onUserReceivedExternalEmail(user: ISQLTableRowValue, internalSender: ISQLTableRowValue, data: IReceiveEmailData, spam: boolean) {
+    const root = this.isInstanceGlobal() ? this.globalRoot : this.localAppData.root;
+    const userIdef = root.registry["users/user"] as ItemDefinition;
+
+    const hasEnotifications = userIdef.hasPropertyDefinitionFor("e_notifications", false);
+    const hasEvalidated = userIdef.hasPropertyDefinitionFor("e_validated", false);
+
+    if (!hasEnotifications || !hasEvalidated || spam || !user.e_notifications || !user.e_validated) {
+      return;
+    }
+
+    const hostname = NODE_ENV === "development" ?
+      this.appConfig.developmentHostname :
+      this.appConfig.productionHostname;
+
+    // first let's build a token for it
+    const tokenData: IUnsubscribeUserTokenDataType = {
+      unsubscribeUserId: user.id,
+      unsubscribeProperty: "e_notifications",
+    };
+
+    // and make up the url based on that
+    const token = await jwtSign(tokenData, this.appSensitiveConfig.secondaryJwtKey);
+    const url = (
+      "https://" + hostname + "/rest/user/unsubscribe?userid=" + encodeURIComponent(user.id) + "&token=" + encodeURIComponent(token)
+    );
+
+    // random person that is not in the system
+    if (!internalSender) {
+      this.sendEmail({
+        from: this.escapeUserName(data.fromUsername || data.from.split("@")[0].trim()) + " <notifications@" + this.appConfig.mailDomain + ">",
+        fromForwarded: data.from,
+        to: user.email,
+        subject: data.subject,
+        html: data.html,
+        attachments: data.attachments,
+        noReply: true,
+        unsubscribeMailto: "mailto:unsubscribe@" + hostname + "?subject=e_notifications&body=e_notifications",
+        unsubscribeURLs: {
+          [user.email]: {
+            redirected: url,
+            noRedirected: url + "&noredirect"
+          },
+        }
+      });
+    } else {
+      // treat it the same as an internal message
+      const senderInternalEmail = internalSender.e_external ? internalSender.username + "@" + this.appConfig.mailDomain : null;
+      this.sendEmail({
+        from: this.escapeUserName(internalSender.real_name || internalSender.actual_name || internalSender.name || internalSender.username) +
+          (senderInternalEmail ? " <" + senderInternalEmail + ">" : " <notifications@" + this.appConfig.mailDomain + ">"),
+        noReply: !senderInternalEmail,
+        to: user.email,
+        subject: data.subject,
+        html: data.html,
+        attachments: data.attachments,
+        unsubscribeMailto: "mailto:unsubscribe@" + hostname + "?subject=e_notifications&body=e_notifications",
+        unsubscribeURLs: {
+          [user.email]: {
+            redirected: url,
+            noRedirected: url + "&noredirect"
+          },
+        }
+      });
+    }
+  }
+
+  public renderMessageForMail(message: ISQLTableRowValue) {
+    const actualProperty = this.storageIdef.getPropertyDefinitionFor("content", false);
+    const mediaProperty = actualProperty.getSpecialProperty("mediaProperty");
+
+    const isRichText = actualProperty.isRichText();
+    const supportsVideos = isRichText && !!actualProperty.getSpecialProperty("supportsVideos");
+    const supportsImages = mediaProperty && !!actualProperty.getSpecialProperty("supportsImages");
+    const supportsFiles = mediaProperty && !!actualProperty.getSpecialProperty("supportsFiles");
+    const supportsContainers = actualProperty.getSpecialProperty("supportsContainers");
+    const supportedContainers = actualProperty.getSpecialProperty("supportedContainers");
+    const supportsTables = actualProperty.getSpecialProperty("supportsTables");
+    const supportedTables = actualProperty.getSpecialProperty("supportedTables");
+    const supportsLists = actualProperty.getSpecialProperty("supportsLists");
+    const supportsCustom = actualProperty.getSpecialProperty("supportsCustom");
+    const supportedCustoms = actualProperty.getSpecialProperty("supportedCustoms");
+    const supportsExternalLinks = actualProperty.getSpecialProperty("supportsExternalLinks");
+    const supportsLinks = actualProperty.getSpecialProperty("supportsLinks");
+    const supportsQuote = actualProperty.getSpecialProperty("supportsQuote");
+    const supportsRichClasses = actualProperty.getSpecialProperty("supportsRichClasses");
+    const supportedRichClasses = actualProperty.getSpecialProperty("supportedRichClasses");
+    const supportsTitle = actualProperty.getSpecialProperty("supportsTitle");
+    const supportsCustomStyles = actualProperty.getSpecialProperty("supportsCustomStyles");
+    const supportsTemplating = actualProperty.getSpecialProperty("supportsTemplating");
+
+    let currentFiles: PropertyDefinitionSupportedFilesType;
+    try {
+      currentFiles = mediaProperty ? JSON.parse(message[mediaProperty]) : null;
+    } catch {
+      currentFiles = null;
+    }
+
+    // calling the render template function
+    const html = renderTemplate(
+      {
+        cacheFiles: false,
+        config: this.appConfig,
+        containerId: message.container_id,
+        currentFiles,
+        forId: message.id,
+        forVersion: message.version || null,
+        forceFullURLs: true,
+        mediaProperty,
+        itemDefinition: this.storageIdef,
+        include: null,
+      },
+      {
+        supportsFiles,
+        supportsImages,
+        supportsFilesAccept: "*",
+        supportsImagesAccept: "*",
+        supportsVideos,
+        supportsLists,
+        supportsContainers,
+        supportsCustom,
+        supportsExternalLinks,
+        supportsLinks,
+        supportsQuote,
+        supportsRichClasses,
+        supportsTitle,
+        supportsCustomStyles,
+        supportsTemplating,
+        supportedRichClasses,
+        supportedCustoms,
+        supportedContainers,
+        supportsTables,
+        supportedTables,
+      },
+      message.content,
+      {},
+    );
+
+    return html;
+  }
+
+  /**
+   * @override
+   * An user received an email from one user to another user in the same domain, this is an internal
+   * message, in this case email addresses may not be explicit
+   * by default the message is assumed to have the right shape for the storage idef definition and will
+   * be used to render a message clone and send it to the targets real email
+   */
+  public async onUserReceivedInternalEmail(user: ISQLTableRowValue, sender: ISQLTableRowValue, message: ISQLTableRowValue, spam: boolean) {
+    const root = this.isInstanceGlobal() ? this.globalRoot : this.localAppData.root;
+    const userIdef = root.registry["users/user"] as ItemDefinition;
+
+    const hasEnotifications = userIdef.hasPropertyDefinitionFor("e_notifications", false);
+    const hasEvalidated = userIdef.hasPropertyDefinitionFor("e_validated", false);
+    const hasEExternal = userIdef.hasPropertyDefinitionFor("e_external", false);
+
+    if (!hasEnotifications || !hasEvalidated || spam || !user.e_notifications || !user.e_validated) {
+      return;
+    }
+
+    const hostname = NODE_ENV === "development" ?
+      this.appConfig.developmentHostname :
+      this.appConfig.productionHostname;
+
+    // first let's build a token for it
+    const tokenData: IUnsubscribeUserTokenDataType = {
+      unsubscribeUserId: user.id,
+      unsubscribeProperty: "e_notifications",
+    };
+
+    // and make up the url based on that
+    const token = await jwtSign(tokenData, this.appSensitiveConfig.secondaryJwtKey);
+    const url = (
+      "https://" + hostname + "/rest/user/unsubscribe?userid=" + encodeURIComponent(user.id) + "&token=" + encodeURIComponent(token)
+    );
+
+    const senderInternalEmail = hasEExternal && sender.e_external ? sender.username + "@" + this.appConfig.mailDomain : null;
+
+    this.sendEmail({
+      from:
+        this.escapeUserName(this.getSenderUsername(sender)) +
+        (senderInternalEmail ? " <" + senderInternalEmail + ">" : " <notifications@" + this.appConfig.mailDomain + ">"),
+      noReply: !senderInternalEmail,
+      to: user.email,
+      subject: message.subject,
+      html: this.renderMessageForMail(message),
+      unsubscribeMailto: "mailto:unsubscribe@" + hostname + "?subject=e_notifications&body=e_notifications",
+      unsubscribeURLs: {
+        [user.email]: {
+          redirected: url,
+          noRedirected: url + "&noredirect"
+        },
+      }
+    });
+  }
+
+  /**
+   * provides the user name for a given sender
+   * @param sender 
+   * @returns 
+   */
+  public getSenderUsername(sender: ISQLTableRowValue) {
+    return sender.real_name || sender.actual_name || sender.name || sender.username;
+  }
+
+  public getTriggerRegistry(): ITriggerRegistry {
+    if (!this.storageIdef) {
+      return null;
+    }
+
+    // if you need more control of how mail is delivered
+    // you will need an own mail provider class and change
+    // this method by overriding it
+    return {
+      item: {
+        io: {
+          [this.storageIdef.getPath().join("/")]: async (arg) => {
+            // before creating lets make sure the user can send external emails
+            // if such is trying to send an external email, the user cannot send an email to
+            // random.email@gmail.com if they don't have external email enabled
+
+            // while theorethically possible to allow using notifications, we run the risk of it being marked
+            // as spam as it cannot even be unsubscribed, so we simply won't allow it, want to send external emails
+            // then you should have somewhere for them to reply to
+            if (arg.action === IOTriggerActions.CREATE) {
+              const sender = arg.requestedUpdateCreatedBy;
+              const targets = arg.requestedUpdate.target as Array<string>;
+
+              const senderObj = await arg.appData.cache.requestValue("users/user", sender, null, { useMemoryCache: true });
+
+              targets.forEach((t) => {
+                const tSplitted = t.split("@");
+                const targetIsPotentiallyExternal = !!tSplitted[1];
+                const targetPotentialExtenalDomain = targetIsPotentiallyExternal && tSplitted[1].trim();
+
+                // aka is external
+                if (targetPotentialExtenalDomain !== this.appConfig.mailDomain && !senderObj.e_external) {
+                  return arg.forbid(
+                    "Cannot send external emails if user has no external email enabled",
+                  );
+                }
+              });
+            }
+
+            // these triggers are all when an user manually created these
+            // and not when it was manually attached, say by external
+            let renderedMessage: string = null;
+            if (arg.action === IOTriggerActions.CREATED) {
+              // in this case an user has created a brand new message inside
+              // the mail component that is used for storage, and we shall now
+              // send them to external sources or copy them to the given targets
+              const sender = arg.requestedUpdateCreatedBy;
+              const targets = arg.requestedUpdate.target as Array<string>;
+
+              if (targets && Array.isArray(targets) && targets.length) {
+                const senderObj = await arg.appData.cache.requestValue("users/user", sender, null, { useMemoryCache: true });
+
+                await Promise.all(targets.map(async (t, index) => {
+                  const tSplitted = t.split("@");
+                  const targetIsPotentiallyExternal = !!tSplitted[1];
+                  const targetPotentialExtenalDomain = targetIsPotentiallyExternal && tSplitted[1].trim();
+
+                  let internalTargetUser: ISQLTableRowValue = null;
+                  const isInternalButUsesEmail = targetPotentialExtenalDomain === this.appConfig.mailDomain;
+                  const isInternalWithId = tSplitted.length === 1;
+                  const isInternal = isInternalButUsesEmail || isInternalWithId;
+
+                  const makesNoSense = tSplitted.length > 2;
+                  const isRepeat = targets.indexOf(t) !== index;
+
+                  // do not send duplicates or nonsense
+                  if (makesNoSense || isRepeat) {
+                    return;
+                  }
+
+                  if (isInternalButUsesEmail) {
+                    const users = await arg.appData.rawDB.performRawDBSelect(
+                      "users/user",
+                      (b) => {
+                        b.selectAll().whereBuilder.andWhereColumn("username", tSplitted[0].trim());
+                        b.limit(1);
+                      }
+                    );
+                    internalTargetUser = users[0] || null;
+                  } else if (isInternalWithId) {
+                    internalTargetUser = await arg.appData.cache.requestValue("users/user", t, null, { useMemoryCache: true });
+                  }
+
+                  // sending to a non-existant user, let's cancel right away
+                  if (isInternal && !internalTargetUser) {
+                    return;
+                  }
+
+                  const allowsSend = await this.allowUserToSendEmail(senderObj, isInternal ? internalTargetUser : t);
+
+                  if (allowsSend === "REJECT") {
+                    return;
+                  }
+
+                  const isSpam = allowsSend === "SPAM";
+
+                  if (isInternal) {
+                    // let's make a copy of our current message and send it to the relevant
+                    // user, this should pop up straight away
+                    const sentEmail = await arg.appData.cache.requestCopy(
+                      this.storageIdef,
+                      arg.id,
+                      arg.version,
+                      arg.id + "_" + (arg.version || "") + "_" + index,
+                      null,
+                      null,
+                      internalTargetUser.id,
+                      null,
+                      {
+                        spam: isSpam,
+                        read: false,
+                        is_sender: false,
+                        is_receiver: true,
+                      },
+                      arg.newValueSQL,
+                    );
+
+                    await this.onUserReceivedInternalEmail(
+                      internalTargetUser,
+                      senderObj,
+                      sentEmail,
+                      isSpam,
+                    );
+                  } else {
+                    // we need to render the message as if it was a template and send it to the external source
+                    // let's avoid doing it twice
+                    renderedMessage = renderedMessage || this.renderMessageForMail(arg.newValueSQL);
+                    const senderInternalEmail = senderObj.username + "@" + this.appConfig.mailDomain;
+                    await this.sendEmail({
+                      from: this.escapeUserName(this.getSenderUsername(senderObj)) + " <" + senderInternalEmail + ">",
+                      to: t,
+                      subject: arg.newValueSQL.subject,
+                      html: renderedMessage,
+                    });
+                  }
+                }));
+              }
+            }
+
+            return null;
+          }
+        }
+      }
     }
   }
 

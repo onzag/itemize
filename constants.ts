@@ -256,7 +256,7 @@ export const MAX_REMOTE_LISTENERS_PER_SOCKET = R_ITEMIZE_CONSTANTS_CONFIG.MAX_RE
  */
 export const PROTECTED_USERNAMES = R_ITEMIZE_CONSTANTS_CONFIG.PROTECTED_USERNAMES ?
   R_ITEMIZE_CONSTANTS_CONFIG.PROTECTED_USERNAMES.concat(["unsubscribe"]) :
-  ["admin", "unsubscribe", "postmaster"];
+  ["admin", "unsubscribe", "postmaster", "notifications", "info", "warning", "payment", "payments"];
 
 
 /**

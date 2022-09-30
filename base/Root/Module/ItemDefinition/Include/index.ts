@@ -358,7 +358,7 @@ export default class Include {
       return;
     }
 
-    for (const requestedField of Object.keys(value || {})) {
+    for (const requestedField of Object.keys(value || {})) {
       const propDef = this.itemDefinition.getPropertyDefinitionFor(requestedField, false);
       const hasSoftAccess = await propDef.checkSoftReadRoleAccessFor(role, userId, ownerUserId, rolesManager);
       if (!hasSoftAccess) {

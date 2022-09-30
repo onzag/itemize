@@ -28,7 +28,7 @@ export function CreateReportDialog(props: IModerationCreateReportDialogProps) {
         };
 
         return (
-          <ModuleProvider module="users">
+          <ModuleProvider module="flag">
             <ItemProvider
               itemDefinition="flag"
               properties={[
@@ -45,7 +45,7 @@ export function CreateReportDialog(props: IModerationCreateReportDialogProps) {
                 buttons={
                   <>
                     <SubmitButton
-                      i18nId={props.i18nButtonLabel || "send"}
+                      i18nId={props.i18nButtonLabel || "send"}
                       options={{
                         properties: ["reason", "reason_text"],
                         action: "add",
@@ -60,7 +60,7 @@ export function CreateReportDialog(props: IModerationCreateReportDialogProps) {
                   </>
                 }
               >
-                {props.messageNode || null}
+                {props.messageNode || null}
                 <Entry id="reason" />
                 <Entry id="reason_text" />
               </DialogResponsive>

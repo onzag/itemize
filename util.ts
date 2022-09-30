@@ -532,6 +532,7 @@ export function fileURLAbsoluter(
   include: Include,
   property: PropertyDefinition,
   cacheable: boolean,
+  forceFullURLs?: boolean,
 ): IGQLFile {
   if (file === null) {
     return null;
@@ -552,12 +553,25 @@ export function fileURLAbsoluter(
     return null;
   }
 
+  // if it doesn't end in / this means we need to add it
   if (prefix[prefix.length - 1] !== "/") {
     prefix += "/";
   }
+  // and now we add the domain /mysite.com/ where all the data shall be stored for
+  // that container
   prefix += domain + "/";
+  // if it doesn't start with /, which means it's not a local url but its own domain eg. container.com/KEY/mysite.com/
+  // we want to add https to it
   if (prefix.indexOf("/") !== 0) {
     prefix = "https://" + prefix;
+  }
+
+  // now here we have a local url but we are forcing full urls
+  // eg /uploads/mysite.com/ when using local uploads which are not the best
+  // but can be of use during development
+  if (forceFullURLs && prefix.indexOf("/") === 0) {
+    // we force it to have the domain
+    prefix = "https://" + domain + prefix;
   }
 
   return {

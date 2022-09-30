@@ -1297,6 +1297,7 @@ export class Cache {
       type: string;
       version: string;
     },
+    targetOverrides?: ISQLTableRowValue,
     currentRawValueSQL?: ISQLTableRowValue,
     options: {
       ignorePreSideEffects?: boolean;
@@ -1307,7 +1308,11 @@ export class Cache {
       this.root.registry[item] as ItemDefinition :
       item;
 
-    const currentValue = currentRawValueSQL || await this.requestValue(itemDefinition, id, version);
+    const currentValueSrc = currentRawValueSQL || await this.requestValue(itemDefinition, id, version);
+    const valueToStore = targetOverrides ? {
+      ...currentValueSrc,
+      ...targetOverrides,
+    } : currentValueSrc;
 
     const allModuleFilesLocation = `${this.domain}/${itemDefinition.getParentModule().getQualifiedPathName()}/${id}.${version || ""}`;
     const allItemFilesLocation = `${this.domain}/${itemDefinition.getQualifiedPathName()}/${id}.${version || ""}`;
@@ -1315,7 +1320,7 @@ export class Cache {
     const targetModuleFilesLocation = `${this.domain}/${itemDefinition.getParentModule().getQualifiedPathName()}/${targetId}.${targetVersion || ""}`;
     const targetItemFilesLocation = `${this.domain}/${itemDefinition.getQualifiedPathName()}/${targetId}.${targetVersion || ""}`;
 
-    const currentContainerId = currentValue.container_id;
+    const currentContainerId = valueToStore.container_id;
     const currentStorageClient = this.storageClients[currentContainerId];
     const targetStorageClient = this.storageClients[targetContainerId || currentContainerId];
 
@@ -1340,15 +1345,15 @@ export class Cache {
         itemDefinition,
         targetId,
         targetVersion,
-        currentValue,
-        targetCreatedBy || currentValue.created_by,
+        valueToStore,
+        targetCreatedBy || currentValueSrc.created_by,
         null,
         null,
         targetContainerId || currentContainerId,
-        targetParent || (currentValue.parent_id ? {
-          id: currentValue.parent_id,
-          type: currentValue.parent_type,
-          version: currentValue.parent_version || null,
+        targetParent || (currentValueSrc.parent_id ? {
+          id: currentValueSrc.parent_id,
+          type: currentValueSrc.parent_type,
+          version: currentValueSrc.parent_version || null,
         } : null),
         null,
         options,

@@ -2,6 +2,7 @@
 	"type": "root",
 	"children": [
 		"users",
+		"flag",
 		"cms"
 	],
 	"i18n": "main-i18n.properties"

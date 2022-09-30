@@ -150,6 +150,12 @@ interface IPostProcessingContext {
    * so that the service workers cache it
    */
   cacheFiles: boolean;
+  /**
+   * When the context to be used is not the local context, for example
+   * when urls can be resolved as /uploads, this will force the urls
+   * to resolve to the full domain
+   */
+  forceFullURLs?: boolean;
 }
 
 /**
@@ -341,13 +347,19 @@ export function postprocess(
           context.include,
           context.mediaProperty,
           context.cacheFiles,
+          context.forceFullURLs,
         );
         const srcset = imageSrcSetRetriever(absolutedFile, context.mediaProperty);
+
+        let imageFail =  "/rest/resource/image-fail.svg";
+        if (context.forceFullURLs) {
+          imageFail = "https://" + domain + imageFail;
+        }
 
         // srcset
         node.setAttribute("srcset", srcset);
         // src
-        node.setAttribute("src", absolutedFile ? absolutedFile.url : "/rest/resource/image-fail.svg");
+        node.setAttribute("src", absolutedFile ? absolutedFile.url : imageFail);
         // sizes
         node.setAttribute("sizes", sizes);
         // data-src-width
@@ -384,6 +396,7 @@ export function postprocess(
           context.include,
           context.mediaProperty,
           context.cacheFiles,
+          context.forceFullURLs,
         );
 
         // data-src-id
@@ -779,6 +792,8 @@ function processTemplateInitialization(
  * Same as render template but will provide
  * the div as a raw HTML result
  * 
+ * this function does not sanitize!!!
+ * 
  * @param template the template in question
  * @param args the arguments
  */
@@ -809,11 +824,6 @@ export function renderTemplateAsNode(
  * 
  * It also does not support dynamic styles
  * 
- * If you want the template to render nicely you might want
- * to run it before over the sanitize function
- * 
- * eg. renderTemplate(sanitize(...), {...args})
- * 
  * for proper templates with full blown functionality you should
  * use the renderTemplateDynamically method
  * 
@@ -821,10 +831,14 @@ export function renderTemplateAsNode(
  * @param args the arguments
  */
 export function renderTemplate(
+  context: IPostProcessingContext,
+  featureSupport: IFeatureSupportOptions,
   template: string,
   args: any,
 ): string {
-  return renderTemplateAsNode(template, args).innerHTML;
+  const sanitized = sanitize(context, featureSupport, template);
+
+  return renderTemplateAsNode(sanitized, args).innerHTML;
 }
 
 /**
