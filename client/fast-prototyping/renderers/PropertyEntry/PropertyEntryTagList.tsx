@@ -211,6 +211,21 @@ function PropertyEntryTagListRenderer(props: IPropertyEntryTagListRendererProps)
   const updateValue = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
     setInputValue(e.target.value);
   }, []);
+  const handleBlur = useCallback(async () => {
+    const inputValueTrimmed = inputValue.trim();
+    setInputValue("");
+
+    if (props.args.onValueInputted) {
+      const newInputValue = await props.args.onValueInputted(inputValueTrimmed);
+      const newValue = props.currentValue ? [...props.currentValue] : [];
+      newValue.push(newInputValue);
+      props.onChange(newValue, null);
+    } else {
+      const newValue = props.currentValue ? [...props.currentValue] : [];
+      newValue.push(inputValueTrimmed);
+      props.onChange(newValue, null);
+    }
+  }, [inputValue, props.currentValue, props.args]);
   const handleKeyDown = useCallback(async (e: React.KeyboardEvent<HTMLInputElement>) => {
     const inputValueTrimmed = inputValue.trim();
     if (e.key === "Enter" && inputValueTrimmed) {
@@ -370,6 +385,7 @@ function PropertyEntryTagListRenderer(props: IPropertyEntryTagListRendererProps)
           placeholder={props.placeholder}
           endAdornment={addornment}
           startAdornment={chips}
+          onBlur={handleBlur}
           {...inputProps}
         />
       </FormControl>
@@ -380,6 +396,7 @@ function PropertyEntryTagListRenderer(props: IPropertyEntryTagListRendererProps)
     inputValue,
     updateValue,
     handleKeyDown,
+    handleBlur,
     props.disabled,
     props.placeholder,
     props.canRestore,

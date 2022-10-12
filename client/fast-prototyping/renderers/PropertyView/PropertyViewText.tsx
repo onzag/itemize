@@ -321,15 +321,15 @@ export class PropertyViewRichTextViewer extends React.Component<IPropertyViewRic
     });
 
     // about files, it's a bit different, we just want to add the click event to it
-    this.divref.current.querySelectorAll(".file").forEach((file: HTMLDivElement) => {
-      const container = file.querySelector(".file-container");
-      const title = file.querySelector(".file-title");
-      container.addEventListener("click", () => {
-        if (file.dataset.src) {
-          window.open(file.dataset.src, title ? title.textContent : "_blank");
-        }
-      });
-    });
+    // this.divref.current.querySelectorAll(".file").forEach((file: HTMLDivElement) => {
+    //   const container = file.querySelector(".file-container");
+    //   const title = file.querySelector(".file-title");
+    //   container.addEventListener("click", () => {
+    //     if (file.dataset.src) {
+    //       window.open(file.dataset.src, title ? title.textContent : "_blank");
+    //     }
+    //   });
+    // });
 
     // and now we trigger our old school listeners to it, since the images can be in view already
     // if there are no old school listeners this function will do nothing as none is listening

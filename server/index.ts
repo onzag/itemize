@@ -1183,39 +1183,6 @@ export async function initializeServer(
       });
     }
 
-    logger.info(
-      {
-        functionName: "initializeServer",
-        message: "Extracting triggers from all the providers",
-      },
-    );
-    const userLocalizationInstanceTrigger = userLocalizationService && await userLocalizationService.getTriggerRegistry();
-    const userLocalizationClassTrigger = userLocalizationService && await UserLocalizationServiceClass.getTriggerRegistry();
-    const mailServiceInstanceTrigger = mailService && await mailService.getTriggerRegistry();
-    const mailServiceClassTrigger = mailService && await MailServiceClass.getTriggerRegistry();
-    const locationSearchServiceInstanceTrigger = locationSearchService && await locationSearchService.getTriggerRegistry();
-    const locationSearchServiceClassTrigger = locationSearchService && await LocationSearchClass.getTriggerRegistry();
-    const paymentServiceInstanceTrigger = paymentService && await paymentService.getTriggerRegistry();
-    const paymentServiceClassTrigger = paymentService && await PaymentClass.getTriggerRegistry();
-    const instanceTriggers = await Promise.all(storageClients.instancesUsed.map((i) => i.getTriggerRegistry()));
-    const classTriggers = await Promise.all(storageClients.classesUsed.map((c) => c.getTriggerRegistry()));
-    const instaceTriggersCustom = await Promise.all(customServicesInstances.map((i) => i.getTriggerRegistry()));
-    const classTriggersCustom = await Promise.all(customServiceClassesUsed.map((c) => c.getTriggerRegistry()));
-    const triggers = [
-      ...instanceTriggers,
-      ...classTriggers,
-      ...instaceTriggersCustom,
-      ...classTriggersCustom,
-      userLocalizationInstanceTrigger,
-      userLocalizationClassTrigger,
-      mailServiceInstanceTrigger,
-      mailServiceClassTrigger,
-      locationSearchServiceInstanceTrigger,
-      locationSearchServiceClassTrigger,
-      paymentServiceInstanceTrigger,
-      paymentServiceClassTrigger,
-    ].filter((r) => !!r);
-
     const appData: IAppDataType = {
       root,
       rootPool: retrieveRootPool(root.rawData),
@@ -1237,11 +1204,8 @@ export async function initializeServer(
       redisLocalSub,
       cache,
       buildnumber,
-      triggers: mergeTriggerRegistries(
-        customUserTriggers,
-        custom.customTriggers,
-        ...triggers,
-      ),
+      // assigned later during setup
+      triggers: null,
       userLocalizationService,
       locationSearchService,
       paymentService,
@@ -1310,6 +1274,46 @@ export async function initializeServer(
     paymentService && paymentService.execute();
     storageClients.instancesUsed.forEach((i) => i.execute());
     customServicesInstances.forEach((i) => i.execute());
+
+    logger.info(
+      {
+        functionName: "initializeServer",
+        message: "Extracting triggers from all the providers",
+      },
+    );
+    const userLocalizationInstanceTrigger = userLocalizationService && await userLocalizationService.getTriggerRegistry();
+    const userLocalizationClassTrigger = userLocalizationService && await UserLocalizationServiceClass.getTriggerRegistry();
+    const mailServiceInstanceTrigger = mailService && await mailService.getTriggerRegistry();
+    const mailServiceClassTrigger = mailService && await MailServiceClass.getTriggerRegistry();
+    const locationSearchServiceInstanceTrigger = locationSearchService && await locationSearchService.getTriggerRegistry();
+    const locationSearchServiceClassTrigger = locationSearchService && await LocationSearchClass.getTriggerRegistry();
+    const paymentServiceInstanceTrigger = paymentService && await paymentService.getTriggerRegistry();
+    const paymentServiceClassTrigger = paymentService && await PaymentClass.getTriggerRegistry();
+    const instanceTriggers = await Promise.all(storageClients.instancesUsed.map((i) => i.getTriggerRegistry()));
+    const classTriggers = await Promise.all(storageClients.classesUsed.map((c) => c.getTriggerRegistry()));
+    const instaceTriggersCustom = await Promise.all(customServicesInstances.map((i) => i.getTriggerRegistry()));
+    const classTriggersCustom = await Promise.all(customServiceClassesUsed.map((c) => c.getTriggerRegistry()));
+    const triggers = [
+      ...instanceTriggers,
+      ...classTriggers,
+      ...instaceTriggersCustom,
+      ...classTriggersCustom,
+      userLocalizationInstanceTrigger,
+      userLocalizationClassTrigger,
+      mailServiceInstanceTrigger,
+      mailServiceClassTrigger,
+      locationSearchServiceInstanceTrigger,
+      locationSearchServiceClassTrigger,
+      paymentServiceInstanceTrigger,
+      paymentServiceClassTrigger,
+    ].filter((r) => !!r);
+
+    // now setting up the triggers
+    appData.triggers = mergeTriggerRegistries(
+      customUserTriggers,
+      custom.customTriggers,
+      ...triggers,
+    );
 
     logger.info(
       {

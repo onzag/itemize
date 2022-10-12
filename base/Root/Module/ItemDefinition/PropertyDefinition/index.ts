@@ -1540,15 +1540,25 @@ export default class PropertyDefinition {
         return;
       }
 
-      // otherwise the value is not the same and we are overriding
-      // on top of another
-      console.warn(
-        "Setting super enforced value at " +
-        JSON.stringify(value) +
-        " on top of another " +
-        JSON.stringify(this.stateSuperEnforcedValue[mergedID].value) +
-        " at " + this.getId() + " on slot " + mergedID
-      );
+      // updating a value that has a single specific owner
+      // so it can be overriden safely
+      if (
+        this.stateSuperEnforcedValue[mergedID].owners.length === 1 &&
+        this.stateSuperEnforcedValue[mergedID].owners[0] === owner
+      ) {
+        // it's fine, the value will be overriden but it will be
+        // safe
+      } else {
+        // otherwise the value is not the same and we are overriding
+        // on top of another that has who knows whose owners
+        console.warn(
+          "Setting super enforced value at " +
+          JSON.stringify(value) +
+          " on top of another " +
+          JSON.stringify(this.stateSuperEnforcedValue[mergedID].value) +
+          " at " + this.getId() + " on slot " + mergedID
+        );
+      }
     }
 
     this.stateSuperEnforcedValue[mergedID] = {
@@ -1793,7 +1803,7 @@ export default class PropertyDefinition {
             if (serverProvidedValue) {
               return {
                 ...serverProvidedValue,
-  
+
                 // we keep our current url as it may be a blob type
                 // and we prefer blob types because they are local
                 // if we don't keep these blob types they will not be found and
@@ -1807,7 +1817,7 @@ export default class PropertyDefinition {
                 url: v.url,
               };
             }
-  
+
             return v;
           });
         } else {
@@ -1889,7 +1899,7 @@ export default class PropertyDefinition {
     version: string,
   ) {
     const mergedID = id + "." + (version || "");
-  
+
     // let's clean up object urls that are in memory
     // only truly happens client side
     if ((this.getType() === "files" || this.getType() === "file") && URL.revokeObjectURL) {

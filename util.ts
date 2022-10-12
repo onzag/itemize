@@ -535,7 +535,7 @@ export function fileURLAbsoluter(
   cacheable: boolean,
   forceFullURLs?: boolean,
 ): IGQLFile {
-  if (file === null) {
+  if (file === null || !property) {
     return null;
   }
 

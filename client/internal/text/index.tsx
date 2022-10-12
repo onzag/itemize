@@ -156,6 +156,22 @@ interface IPostProcessingContext {
    * to resolve to the full domain
    */
   forceFullURLs?: boolean;
+
+  /**
+   * Makes it for usage in email
+   */
+  forMail?: boolean;
+
+  /**
+   * specifies when an image was collected for cid,
+   * files may for instance be removed instead
+   */
+  forMailCidCollected?: (f: IPropertyDefinitionSupportedSingleFilesType, index: number) => string;
+
+  /**
+   * specifies when an image was requested for storage
+   */
+  forMailFileCollected?: (f: IPropertyDefinitionSupportedSingleFilesType, index: number) => void;
 }
 
 /**
@@ -274,6 +290,42 @@ export function sanitize(
   return newValue;
 }
 
+const imageStyles = {
+  position: "relative",
+  width: "100%",
+  display: "flex",
+  alignItems: "center",
+  justifyContent: "center",
+};
+
+const imageContainerStyles = {
+  position: "relative",
+  width: "100%",
+  maxWidth: "700px",
+};
+
+const imagePadStyles = {
+  position: "relative",
+  width: "100%",
+}
+
+const imgStyles = {
+  position: "absolute",
+  top: 0,
+  left: 0,
+  width: "100%",
+};
+
+function applyStyle(element: HTMLElement, style: any) {
+  Object.keys(style).forEach((k) => {
+    if (element.style[k]) {
+      return;
+    }
+
+    element.style[k] = style[k];
+  });
+}
+
 /**
  * The postprocessing hook that cleans and sets the attributes
  * right for the rich text in order to follow the standards
@@ -324,7 +376,8 @@ export function postprocess(
   } else if (node.tagName === "IMG") {
     if (options.supportsImages) {
       const srcId = node.dataset.srcId;
-      const currentFile = context.currentFiles && context.currentFiles.find((f) => f.id === srcId);
+      const currentFileIndex = context.currentFiles ? context.currentFiles.findIndex((f) => f.id === srcId) : -1;
+      const currentFile = currentFileIndex !== -1 ? context.currentFiles[currentFileIndex] : null;
       const alt = (node as HTMLImageElement).alt || "";
       const srcHeight = node.dataset.srcHeight;
       const srcWidth = node.dataset.srcWidth;
@@ -334,9 +387,34 @@ export function postprocess(
 
       if (!srcId || !currentFile) {
         // node.parentElement && node.parentElement.removeChild(node);
+
+        const src = node.getAttribute("src") || "";
+
+        // remove stray hrefs
+        if (
+          //image-pad
+          node.parentElement &&
+          //image-container
+          node.parentElement.parentElement &&
+          //image
+          node.parentElement.parentElement.parentElement &&
+          node.parentElement.parentElement.parentElement.tagName === "A" &&
+          node.parentElement.parentElement.parentElement.classList.contains("image")
+        ) {
+          node.parentElement.parentElement.parentElement.removeAttribute("href");
+
+          // dompurify rechecks this which is really annoying
+          // after you move the image around and purify it
+          // it will run it again against the same code
+          if (context.forMail && !src.startsWith("cid")) {
+            node.parentElement.parentElement.parentElement.parentElement.removeChild(node.parentElement.parentElement.parentElement);
+          }
+        } else if (context.forMail && !src.startsWith("cid")) {
+          node.parentElement && node.parentElement.removeChild(node);
+        }
       } else {
         const domain = process.env.NODE_ENV === "production" ? context.config.productionHostname : context.config.developmentHostname;
-        const absolutedFile = fileURLAbsoluter(
+        const absolutedFile = context.forMail ? null : fileURLAbsoluter(
           domain,
           context.config.containersHostnamePrefixes,
           currentFile,
@@ -349,25 +427,81 @@ export function postprocess(
           context.cacheFiles,
           context.forceFullURLs,
         );
-        const srcset = imageSrcSetRetriever(absolutedFile, context.mediaProperty);
+        const srcset = context.forMail ? null : imageSrcSetRetriever(absolutedFile, context.mediaProperty);
 
-        let imageFail =  "/rest/resource/image-fail.svg";
-        if (context.forceFullURLs) {
+        let imageFail = "/rest/resource/image-fail.svg";
+        if (context.forceFullURLs || context.forMail) {
           imageFail = "https://" + domain + imageFail;
         }
 
         // srcset
-        node.setAttribute("srcset", srcset);
+        if (!context.forMail) {
+          node.setAttribute("srcset", srcset);
+        } else {
+          node.removeAttribute("srcset");
+        }
         // src
-        node.setAttribute("src", absolutedFile ? absolutedFile.url : imageFail);
+        if (!context.forMail) {
+          node.setAttribute("src", absolutedFile ? absolutedFile.url : imageFail);
+        } else {
+          const cid = context.forMailCidCollected && context.forMailCidCollected(currentFile, currentFileIndex);
+          node.setAttribute("src", "cid:" + (cid ? cid : currentFile.id));
+        }
+
+        if (
+          //image-pad
+          node.parentElement &&
+          //image-container
+          node.parentElement.parentElement &&
+          //image
+          node.parentElement.parentElement.parentElement &&
+          node.parentElement.parentElement.parentElement.tagName === "A" &&
+          node.parentElement.parentElement.parentElement.classList.contains("image")
+        ) {
+          node.parentElement.parentElement.parentElement.setAttribute("href", absolutedFile ? absolutedFile.url : imageFail);
+
+          if (context.forMail) {
+            const image = node.parentElement.parentElement.parentElement;
+            const imageContainer = node.parentElement.parentElement;
+            const imagePad = node.parentElement;
+            const img = node;
+
+            applyStyle(imagePad, imagePadStyles);
+            applyStyle(imageContainer, imageContainerStyles);
+            applyStyle(img, imgStyles);
+
+            const styleSet = image.getAttribute("style");
+
+            const newImage = DOMWindow.document.createElement("div");
+            newImage.appendChild(imageContainer);
+            newImage.setAttribute("style", styleSet);
+            applyStyle(newImage, imageStyles);
+
+            // remove the link object to the image because email clients
+            // don't like it
+            image.parentElement.replaceChild(
+              newImage,
+              image,
+            );
+          }
+        }
+
         // sizes
-        node.setAttribute("sizes", sizes);
-        // data-src-width
-        node.dataset.srcWidth = srcWidth;
-        // data-src-id
-        node.dataset.srcId = srcId;
-        // data-src-height
-        node.dataset.srcHeight = srcHeight;
+        if (!context.forMail) {
+          node.setAttribute("sizes", sizes);
+          // data-src-width
+          node.dataset.srcWidth = srcWidth;
+          // data-src-id
+          node.dataset.srcId = srcId;
+          // data-src-height
+          node.dataset.srcHeight = srcHeight;
+        } else {
+          node.removeAttribute("sizes");
+          delete node.dataset.srcId;
+          delete node.dataset.srcWidth;
+          delete node.dataset.srcHeight;
+        }
+
         // alt
         (node as HTMLImageElement).alt = alt;
       }
@@ -377,10 +511,15 @@ export function postprocess(
   } else if (node.className === "file") {
     if (options.supportsFiles) {
       const srcId = node.dataset.srcId;
-      const src = node.dataset.src;
-      const currentFile = context.currentFiles && context.currentFiles.find((f) => f.id === srcId);
+      const currentFileIndex = context.currentFiles ? context.currentFiles.findIndex((f) => f.id === srcId) : -1;
+      const currentFile = currentFileIndex !== -1 ? context.currentFiles[currentFileIndex] : null;
 
-      if (currentFile) {
+      if (context.forMail) {
+        if (currentFile) {
+          context.forMailFileCollected && context.forMailFileCollected(currentFile, currentFileIndex);
+        }
+        node.parentElement && node.parentElement.removeChild(node);
+      } else if (currentFile) {
         // spellcheck
         node.spellcheck = false;
 
@@ -396,7 +535,7 @@ export function postprocess(
           context.include,
           context.mediaProperty,
           context.cacheFiles,
-          context.forceFullURLs,
+          context.forceFullURLs || context.forMail,
         );
 
         // data-src-id
@@ -404,9 +543,7 @@ export function postprocess(
 
         // data-src
         if (absolutedFile) {
-          node.dataset.src = absolutedFile.url;
-        } else {
-          node.dataset.src = src;
+          node.setAttribute("src", absolutedFile.url);
         }
 
         // contenteditable
@@ -421,8 +558,8 @@ export function postprocess(
     }
   }
 
-  if (node.tagName === "A" && (node.hasAttribute("href") || node.hasAttribute("data-href"))) {
-    if (!options.supportsLinks || node.classList.contains("image")) {
+  if (node.tagName === "A" && (node.hasAttribute("href") || node.hasAttribute("data-href")) && !node.classList.contains("image")) {
+    if (!options.supportsLinks) {
       node.removeAttribute("href");
       node.removeAttribute("data-href");
     } else if (!options.supportsExternalLinks) {

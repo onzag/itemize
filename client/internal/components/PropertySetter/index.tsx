@@ -53,18 +53,18 @@ export default class PropertySetter extends React.Component<IPropertySetterBaseP
   constructor(props: IPropertySetterBaseProps) {
     super(props);
   }
-  public componentDidMount() {
+  public componentDidMount() {
     // on mount we call the enforce
     this.props.onEnforce(
       this.props.property,
       this.props.value,
       this.props.forId || null,
-      this.props.forVersion || null,
+      this.props.forVersion || null,
     );
   }
   public componentDidUpdate(prevProps: IPropertySetterBaseProps) {
     // on update we check for the id
-    const idHasChanged = (this.props.forId || null) !== (prevProps.forId || null) ||
+    const idHasChanged = (this.props.forId || null) !== (prevProps.forId || null) ||
       (this.props.forVersion || null) !== (prevProps.forVersion || null) ||
       prevProps.property !== this.props.property;
 

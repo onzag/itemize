@@ -105,6 +105,11 @@ export interface ISendEmailData {
    */
   attachments?: PropertyDefinitionSupportedFilesType;
   /**
+   * The content id map that maps the ids in the cid:xxxx form
+   * to the id of the attachment id
+   */
+  contentIdMap?: { [key: string]: string };
+  /**
    * no reply email
    */
   noReply?: boolean;
@@ -1407,7 +1412,8 @@ export default class MailProvider<T> extends ServiceProvider<T> {
    */
   public renderMessageForMail(message: ISQLTableRowValue) {
     const actualProperty = this.storageIdef.getPropertyDefinitionFor("content", false);
-    const mediaProperty = actualProperty.getSpecialProperty("mediaProperty");
+    const mediaPropertyId = actualProperty.getSpecialProperty("mediaProperty");
+    const mediaProperty = mediaPropertyId ? this.storageIdef.getPropertyDefinitionFor(mediaPropertyId, true) : null;
 
     const isRichText = actualProperty.isRichText();
     const supportsVideos = isRichText && !!actualProperty.getSpecialProperty("supportsVideos");
@@ -1429,42 +1435,21 @@ export default class MailProvider<T> extends ServiceProvider<T> {
     const supportsCustomStyles = actualProperty.getSpecialProperty("supportsCustomStyles");
     const supportsTemplating = actualProperty.getSpecialProperty("supportsTemplating");
 
-    let currentFiles: PropertyDefinitionSupportedFilesType;
+    let cidAttachments: PropertyDefinitionSupportedFilesType = [];
     try {
-      currentFiles = mediaProperty ? JSON.parse(message[mediaProperty]) : null;
+      cidAttachments = mediaProperty ? (JSON.parse(message[mediaPropertyId]) || []) : [];
     } catch {
-      currentFiles = null;
     }
 
-    let attachments: PropertyDefinitionSupportedFilesType;
+    const cidMap: {[key: string]: string} = {};
+    let attachments: PropertyDefinitionSupportedFilesType = [];
     try {
-      attachments = mediaProperty ? JSON.parse(message["attachments"]) : null;
-    } catch {
-      attachments = null;
-    }
-
-    if (attachments) {
-      attachments = attachments.map((v) => {
-        const location = path.join(
-          NODE_ENV === "production" ? this.appConfig.productionHostname : this.appConfig.developmentHostname,
-          this.storageIdef.getQualifiedPathName(),
-          message.id + "." + (message.version || ""),
-          "attachments",
-          v.id,
-          v.url,
-        );
-
-        return {
-          ...v,
-          src: new Promise((resolve) => {
-            resolve({
-              createReadStream: () => {
-                return this.localAppData.storage[message.container_id].download(location);
-              }
-            })
-          }),
-        }
+      attachments = JSON.parse(message["attachments"]) || [];
+      attachments.forEach((v, index) => {
+        const newId = "attachment_" + (index + 1);
+        cidMap[newId] = v.id;
       });
+    } catch {
     }
 
     // calling the sanitize function
@@ -1475,13 +1460,25 @@ export default class MailProvider<T> extends ServiceProvider<T> {
         cacheFiles: false,
         config: this.appConfig,
         containerId: message.container_id,
-        currentFiles,
+        currentFiles: cidAttachments,
         forId: message.id,
         forVersion: message.version || null,
         forceFullURLs: true,
         mediaProperty,
         itemDefinition: this.storageIdef,
         include: null,
+        forMail: true,
+        forMailCidCollected: (file, index) => {
+          attachments.push(file);
+          const newId = "cattachment_" + (index + 1);
+          cidMap[newId] = file.id;
+          return newId;
+        },
+        forMailFileCollected(file, index) {
+          attachments.push(file);
+          const newId = "cattachment_" + (index + 1);
+          cidMap[newId] = file.id;
+        },
       },
       {
         supportsFiles,
@@ -1508,9 +1505,34 @@ export default class MailProvider<T> extends ServiceProvider<T> {
       message.content,
     );
 
+    if (attachments.length) {
+      attachments = attachments.map((v) => {
+        const location = path.join(
+          NODE_ENV === "production" ? this.appConfig.productionHostname : this.appConfig.developmentHostname,
+          this.storageIdef.getQualifiedPathName(),
+          message.id + "." + (message.version || ""),
+          "attachments",
+          v.id,
+          v.url,
+        );
+
+        return {
+          ...v,
+          src: new Promise((resolve) => {
+            resolve({
+              createReadStream: () => {
+                return this.localAppData.storage[message.container_id].download(location);
+              }
+            })
+          }),
+        }
+      });
+    }
+
     return {
       html,
-      attachments
+      attachments: attachments.length ? attachments : null,
+      cidMap: attachments.length ? cidMap : null,
     };
   }
 
@@ -1562,6 +1584,7 @@ export default class MailProvider<T> extends ServiceProvider<T> {
       subject: message.subject,
       html: renderedData.html,
       attachments: renderedData.attachments,
+      contentIdMap: renderedData.cidMap,
       unsubscribeMailto: "mailto:unsubscribe@" + hostname + "?subject=e_notifications&body=e_notifications",
       unsubscribeURLs: {
         [user.email]: {
@@ -1661,7 +1684,7 @@ export default class MailProvider<T> extends ServiceProvider<T> {
     return {
       item: {
         io: {
-          [this.storageIdef.getPath().join("/")]: async (arg) => {
+          [this.storageIdef.getAbsolutePath().join("/")]: async (arg) => {
             // before creating lets make sure the user can send external emails
             // if such is trying to send an external email, the user cannot send an email to
             // random.email@gmail.com if they don't have external email enabled
@@ -1694,7 +1717,7 @@ export default class MailProvider<T> extends ServiceProvider<T> {
                 );
               }
 
-              const replyOf = (arg.requestedUpdateParent.id && await arg.appData.cache.requestValue(
+              const replyOf = (arg.requestedUpdateParent && arg.requestedUpdateParent.id && await arg.appData.cache.requestValue(
                 this.storageIdef,
                 arg.requestedUpdateParent.id,
                 arg.requestedUpdateParent.version,
@@ -1769,7 +1792,7 @@ export default class MailProvider<T> extends ServiceProvider<T> {
               const targets = arg.requestedUpdate.target as Array<string>;
               const externalTargets: string[] = [];
 
-              let replyOf = (arg.requestedUpdateParent.id && await arg.appData.cache.requestValue(
+              let replyOf = (arg.requestedUpdateParent && arg.requestedUpdateParent.id && await arg.appData.cache.requestValue(
                 this.storageIdef,
                 arg.requestedUpdateParent.id,
                 arg.requestedUpdateParent.version,
@@ -1957,6 +1980,8 @@ export default class MailProvider<T> extends ServiceProvider<T> {
                     html: renderedMessage.html,
                     attachments: renderedMessage.attachments,
                     replyOf: replyOf,
+                    id: arg.newValueSQL.uuid,
+                    contentIdMap: renderedMessage.cidMap,
                   });
                 }
               }

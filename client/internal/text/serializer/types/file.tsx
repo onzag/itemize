@@ -24,10 +24,10 @@ export function registerFile(registry: ISerializationRegistryType) {
    * @returns an HTML Element
    */
   function serializeFile(file: IFile) {
-    // first we use the serialization function in order to create the span that contains
+    // first we use the serialization function in order to create the a that contains
     // the file
-    const mainContainer = serializeElementBase(registry, file, "span", "file", null, null);
-    mainContainer.dataset.src = file.src;
+    const mainContainer = serializeElementBase(registry, file, "a", "file", null, null);
+    mainContainer.setAttribute("href", file.src);
     mainContainer.dataset.srcId = file.srcId;
 
     // but we need to add the container inside that main container
@@ -91,7 +91,7 @@ export function registerFile(registry: ISerializationRegistryType) {
       fileName: fileNameNode.textContent,
       extension: fileExtensionNode.textContent,
       size: fileSizeNode.textContent,
-      src: node.dataset.src,
+      src: node.getAttribute("href"),
       children: [STANDARD_TEXT_NODE()],
     };
   }

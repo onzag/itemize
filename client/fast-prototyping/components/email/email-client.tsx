@@ -41,6 +41,7 @@ import { runSearchQueryFor } from "../../../internal/gql-client-util";
 import { TokenContext } from "../../../internal/providers/token-provider";
 import { UNSPECIFIED_OWNER } from "../../../../constants";
 import type { ITagListSuggestion } from "../../renderers/PropertyEntry/PropertyEntryTagList";
+import Setter from "../../../components/property/Setter";
 
 const style = {
   flex: {
@@ -123,6 +124,19 @@ const style = {
   chip: {
     margin: "10px 10px 0 10px",
   },
+  avatarBox: {
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  avatarOverlayer: {
+    "&:not(:first-of-type)": {
+      marginLeft: "-30px",
+    },
+    "&:last-child": {
+      marginRight: "10px",
+    },
+  }
 }
 
 type LocationType = "INBOX" | "INBOX_UNREAD" | "INBOX_SPAM" | "OUTBOX";
@@ -263,6 +277,18 @@ function ActualMailSender(props: IActualMailSenderProps) {
         );
       }
 
+      if (isUser && id === props.userId) {
+        return (
+          <Chip
+            label={
+              <strong><I18nRead id="me" capitalize={true} /></strong>
+            }
+            sx={style.chip}
+            color="default"
+          />
+        );
+      }
+
       // this is the qualified name we should
       // be able to skip the module provider
       // this however means the module is in the wrong context
@@ -331,11 +357,27 @@ function ActualMailSender(props: IActualMailSenderProps) {
           "attachments",
           "cid_attachments",
           "subject",
+          "is_sender",
+          "is_receiver",
+          "read",
+          "spam",
         ]}
         setters={[
           {
             id: "source",
             value: props.userId,
+          },
+          {
+            id: "is_sender",
+            value: true,
+          },
+          {
+            id: "read",
+            value: true,
+          },
+          {
+            id: "spam",
+            value: false,
           },
         ]}
         prefills={props.targetPrefill ? [
@@ -357,6 +399,15 @@ function ActualMailSender(props: IActualMailSenderProps) {
         <Entry id="content" />
         <Entry id="attachments" />
 
+        <Reader id="target">
+          {(target: string[]) => {
+            const isReceiver = target ? target.includes(props.userId) : false;
+            return (
+              <Setter id="is_receiver" value={isReceiver} />
+            );
+          }}
+        </Reader>
+
         <SubmitButton
           i18nId="send"
           options={{
@@ -367,6 +418,10 @@ function ActualMailSender(props: IActualMailSenderProps) {
               "attachments",
               "cid_attachments",
               "subject",
+              "is_sender",
+              "is_receiver",
+              "read",
+              "spam",
             ],
             cleanStateOnSuccess: true,
             parentedBy: props.replyOf ? {
@@ -675,7 +730,7 @@ export function EmailReader(props: IEmailReaderProps) {
 const inboxUnread = [
   {
     id: "is_sender",
-    value: false,
+    value: null,
     searchVariant: "exact" as "exact",
   },
   {
@@ -703,7 +758,7 @@ const inboxUnread = [
 const inboxSpam = [
   {
     id: "is_sender",
-    value: false,
+    value: null,
     searchVariant: "exact" as "exact",
   },
   {
@@ -731,7 +786,7 @@ const inboxSpam = [
 const inbox = [
   {
     id: "is_sender",
-    value: false,
+    value: null,
     searchVariant: "exact" as "exact",
   },
   {
@@ -764,7 +819,7 @@ const outbox = [
   },
   {
     id: "is_receiver",
-    value: false,
+    value: null,
     searchVariant: "exact" as "exact",
   },
   {
@@ -789,6 +844,110 @@ const settersCriteria = {
   "INBOX_SPAM": inboxSpam,
   "INBOX": inbox,
   "OUTBOX": outbox,
+}
+
+interface IEmailMenuItemProps {
+  id: string;
+  sourceOrTargetToConsume: number;
+  sourceOrTargets: string[];
+  sourceOrTargetsUsernames: string[];
+  userAvatarElement: React.ReactNode;
+  userUsernameElement: React.ReactNode;
+  isUnread: boolean;
+  subject: string;
+  userLoadProperties: string[];
+  emailUrlResolver: (id: string) => string;
+
+  avatarAccum: React.ReactNode[];
+  usernameAccum: React.ReactNode[];
+}
+
+function EmailMenuItem(props: IEmailMenuItemProps) {
+  const sourceOrTarget = props.sourceOrTargets && props.sourceOrTargets[props.sourceOrTargetToConsume];
+  const sourceOrTargetUsername = props.sourceOrTargetsUsernames && props.sourceOrTargetsUsernames[props.sourceOrTargetToConsume];
+
+  let avatar: React.ReactNode = null;
+  let username: React.ReactNode = null;
+  if (!sourceOrTarget) {
+    avatar = <Box sx={style.avatarOverlayer} key={props.sourceOrTargetToConsume}><Avatar>?</Avatar></Box>;
+  } else if (sourceOrTarget.includes("@")) {
+    const letterToUse = (sourceOrTargetUsername ? sourceOrTargetUsername[0] : sourceOrTarget[0]).toUpperCase();
+    avatar = <Box sx={style.avatarOverlayer} key={props.sourceOrTargetToConsume}><Avatar>{letterToUse}</Avatar></Box>;
+    username = <React.Fragment key={props.sourceOrTargetToConsume}>{sourceOrTargetUsername || sourceOrTarget}</React.Fragment>;
+  } else {
+    avatar = (
+      <ModuleProvider module="users" key={props.sourceOrTargetToConsume}>
+        <ItemProvider
+          itemDefinition="user"
+          forId={sourceOrTarget}
+          static="TOTAL"
+          disableExternalChecks={true}
+          properties={props.userLoadProperties}
+          waitAndMerge={true}
+        >
+          <Box sx={style.avatarOverlayer}>{props.userAvatarElement}</Box>
+        </ItemProvider>
+      </ModuleProvider>
+    );
+    username = props.sourceOrTargetToConsume > 3 ? null : (
+      <ModuleProvider module="users" key={props.sourceOrTargetToConsume + "_username"}>
+        <ItemProvider
+          itemDefinition="user"
+          forId={sourceOrTarget}
+          static="TOTAL"
+          disableExternalChecks={true}
+          properties={props.userLoadProperties}
+          waitAndMerge={true}
+        >
+          {props.userUsernameElement}
+        </ItemProvider>
+      </ModuleProvider>
+    );
+  }
+
+  if (props.sourceOrTargets && props.sourceOrTargets[props.sourceOrTargetToConsume + 1]) {
+    return (
+      <EmailMenuItem
+        {...props}
+        sourceOrTargetToConsume={props.sourceOrTargetToConsume + 1}
+
+        avatarAccum={props.avatarAccum.concat([avatar])}
+        usernameAccum={props.usernameAccum.concat(username)}
+      />
+    );
+  } else {
+    const usernames = props.usernameAccum.concat([username]).filter((v) => !!v);
+    let finalUsernameText: React.ReactNode = null;
+    if (usernames.length === 1 || !usernames.length) {
+      finalUsernameText = usernames;
+    } else if (usernames.length === 2) {
+      finalUsernameText = (
+        <I18nRead id="and_two" args={usernames} />
+      );
+    } else if (usernames.length === 3) {
+      finalUsernameText = (
+        <I18nRead id="and_three" args={usernames} />
+      );
+    } else {
+      finalUsernameText = (
+        <I18nRead id="and_more" args={usernames.concat([usernames.length])} />
+      );
+    } 
+    return (
+      <Link to={props.emailUrlResolver(props.id)}>
+        <ListItemButton sx={props.isUnread ? style.unread : style.read}>
+          <ListItemAvatar sx={style.avatarBox}>
+            {props.avatarAccum.concat([avatar])}
+          </ListItemAvatar>
+
+          <ListItemText
+            primary={props.subject}
+            secondary={finalUsernameText}
+          />
+        </ListItemButton>
+      </Link>
+    );
+  }
 }
 
 export function EmailClient(props: IEmailClientProps) {
@@ -828,6 +987,7 @@ export function EmailClient(props: IEmailClientProps) {
                 "read",
                 "subject",
                 "source",
+                "target",
                 "source_username",
               ],
               searchByProperties: [
@@ -835,6 +995,7 @@ export function EmailClient(props: IEmailClientProps) {
                 "is_receiver",
                 "spam",
                 "read",
+                "tip",
               ],
               listenPolicy: "by-owner",
               createdBy: userData.id,
@@ -858,55 +1019,26 @@ export function EmailClient(props: IEmailClientProps) {
                   <List>
                     {arg.searchRecords.map((v) => (
                       <ItemProvider {...v.providerProps}>
-                        <ReaderMany data={["id", "source", "source_username", "subject", "read"]}>
-                          {(id: string, source: string, sourceUsername: string, subject: string, read: boolean) => {
+                        <ReaderMany data={["id", "source", "source_username", "subject", "read", "target"]}>
+                          {(id: string, source: string, sourceUsername: string, subject: string, read: boolean, target: string[]) => {
                             const isUnread = (props.location === "INBOX" || props.location === "INBOX_SPAM" || props.location === "INBOX_UNREAD") && !read;
 
-                            let avatar: React.ReactNode = null;
-                            let username: React.ReactNode = null;
-                            let useUser: boolean = false;
-                            if (!source) {
-                              avatar = <Avatar>?</Avatar>;
-                            } else if (source.includes("@")) {
-                              const letterToUse = (sourceUsername ? sourceUsername[0] : source[0]).toUpperCase();
-                              avatar = <Avatar>{letterToUse}</Avatar>;
-                              username = sourceUsername || source;
-                            } else {
-                              useUser = true;
-                              avatar = props.userAvatarElement;
-                              username = props.userUsernameElement;
-                            }
-
-                            const content = (
-                              <Link to={props.emailUrlResolver(id)}>
-                                <ListItemButton sx={isUnread ? style.unread : style.read}>
-                                  <ListItemAvatar>
-                                    {avatar}
-                                  </ListItemAvatar>
-
-                                  <ListItemText primary={subject} secondary={username} />
-                                </ListItemButton>
-                              </Link>
+                            return (
+                              <EmailMenuItem
+                                isUnread={isUnread}
+                                avatarAccum={[]}
+                                emailUrlResolver={props.emailUrlResolver}
+                                id={id}
+                                sourceOrTargetToConsume={0}
+                                sourceOrTargets={props.location === "OUTBOX" ? target : (source ? [source] : null)}
+                                sourceOrTargetsUsernames={props.location === "OUTBOX" ? null : (sourceUsername ? [sourceUsername] : null)}
+                                subject={subject}
+                                userAvatarElement={props.userAvatarElement}
+                                userLoadProperties={props.userLoadProperties}
+                                userUsernameElement={props.userUsernameElement}
+                                usernameAccum={[]}
+                              />
                             );
-
-                            if (useUser) {
-                              return (
-                                <ModuleProvider module="users">
-                                  <ItemProvider
-                                    itemDefinition="user"
-                                    forId={source}
-                                    static="TOTAL"
-                                    disableExternalChecks={true}
-                                    properties={props.userLoadProperties}
-                                    waitAndMerge={true}
-                                  >
-                                    {content}
-                                  </ItemProvider>
-                                </ModuleProvider>
-                              );
-                            } else {
-                              return content;
-                            }
                           }}
                         </ReaderMany>
                       </ItemProvider>
