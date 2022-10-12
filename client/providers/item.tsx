@@ -352,7 +352,7 @@ export interface IActionSearchOptions extends IActionCleanOptions {
   /**
    * The properties to be used to search with
    * you have access to three other special properties
-   * that only exist within search mode "search", "created_by" and "since"
+   * that only exist within search mode "search", "created_by", "until" and "since"
    */
   searchByProperties: Array<string | IPropertyCoreProps>;
   searchByIncludes?: { [include: string]: string[] };
@@ -367,6 +367,7 @@ export interface IActionSearchOptions extends IActionCleanOptions {
    * over the since property that exists within the search mode
    */
   since?: string;
+  until?: string;
   parentedBy?: {
     item: string,
 
@@ -3197,7 +3198,11 @@ export class ActualItemProvider extends
     const waitingForLoad = this.props.forId && !this.state.loaded && !this.props.avoidLoading;
     if (waitingForLoad) {
       console.warn(
-        "Attempted to submit so fast that the value was not yet loaded in memory, this is not an error, just means the app is sluggish",
+        "Attempted to submit so fast that the value was not yet loaded in memory, this is not an error, " +
+        "if this was an user triggered action, then the app is sluggish, if otherwise you submit manually eg. an automatic action " +
+        "that triggers faster than a human can begin to react then it's not a problem, overall the app was loading a value for " +
+        this.props.itemDefinitionInstance.getName() + " and the submit happened before such NEW value could be loaded, if your submit " +
+        "is tied to a condition it could have been resolved with the old data if it held a partial value",
       );
       await this.lastLoadValuePromise;
     }
@@ -3764,6 +3769,8 @@ export class ActualItemProvider extends
       throw new Error("searchByProperties includes created by yet in the options an override was included as " + options.createdBy);
     } else if (options.searchByProperties.includes("since") && options.since) {
       throw new Error("searchByProperties includes created by yet in the options an override was included as " + options.createdBy);
+    } else if (options.searchByProperties.includes("until") && options.until) {
+      throw new Error("searchByProperties includes until yet in the options an override was included as " + options.until);
     }
 
     if (options.cachePolicy !== "none" && options.cachePolicy) {
@@ -4024,13 +4031,14 @@ export class ActualItemProvider extends
       trackedProperty: options.trackedProperty || null,
       createdBy: options.createdBy || null,
       since: options.since || null,
-      orderBy: options.orderBy || (options.useSearchEngine ? {} :{
+      until: options.until || null,
+      orderBy: options.orderBy || {
         created_at: {
           priority: 0,
           nulls: "last",
           direction: "desc",
         }
-      }),
+      },
       types,
       traditional: !!options.traditional,
       token: this.props.tokenData.token,
@@ -4519,9 +4527,11 @@ export const ItemProvider = React.forwardRef<ActualItemProvider, IItemProviderPr
                               let valueFor: ItemDefinition;
                               if (props.itemDefinition) {
                                 if (typeof props.itemDefinition === "string") {
-                                  valueFor =
-                                    data.mod.getParentRoot().registry[props.itemDefinition] as ItemDefinition ||
-                                    data.mod.getItemDefinitionFor(props.itemDefinition.split("/"));
+                                  if (props.itemDefinition.startsWith("MOD_") && props.itemDefinition.includes("IDEF")) {
+                                    valueFor = data.mod.getParentRoot().registry[props.itemDefinition] as ItemDefinition;
+                                  } else {
+                                    valueFor = data.mod.getItemDefinitionFor(props.itemDefinition.split("/"));
+                                  }
                                 } else {
                                   valueFor = props.itemDefinition;
                                 }
@@ -4653,9 +4663,11 @@ export function NoStateItemProvider(props: INoStateItemProviderProps) {
           }
           let valueFor: ItemDefinition;
           if (props.itemDefinition) {
-            valueFor =
-              data.mod.getParentRoot().registry[props.itemDefinition] as ItemDefinition ||
-              data.mod.getItemDefinitionFor(props.itemDefinition.split("/"));
+            if (props.itemDefinition.startsWith("MOD_") && props.itemDefinition.includes("IDEF")) {
+              valueFor = data.mod.getParentRoot().registry[props.itemDefinition] as ItemDefinition;
+            } else {
+              valueFor = data.mod.getItemDefinitionFor(props.itemDefinition.split("/"))
+            }
           } else {
             valueFor = data.mod.getPropExtensionItemDefinition();
           }

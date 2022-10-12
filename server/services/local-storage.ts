@@ -37,6 +37,11 @@ export class LocalStorageService extends StorageProvider<null> {
     return ServiceProviderType.NONE;
   }
 
+  public download(at: string): ReadStream {
+    const rs = fs.createReadStream(at);
+    return rs;
+  }
+
   public async upload(at: string, readStream: ReadStream): Promise<void> {
     const remote = at;
     const targetPath = remote.split("/");

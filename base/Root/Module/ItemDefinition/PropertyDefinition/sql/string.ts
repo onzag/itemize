@@ -119,10 +119,18 @@ export function stringSQLSearch(arg: ISQLSearchInfo): boolean {
   // now we see if we have an argument for it
   if (typeof arg.args[inName] !== "undefined" && arg.args[inName] !== null) {
     const tagCompareCheck = arg.args[inName] as string[];
-    arg.whereBuilder.andWhere(
-      JSON.stringify(arg.prefix + arg.id) + " = ANY(ARRAY[" + tagCompareCheck.map(() => "?").join(",") + "]::TEXT[])",
-      tagCompareCheck,
-    );
+
+    if (tagCompareCheck.length === 1) {
+      arg.whereBuilder.andWhereColumn(
+        arg.prefix + arg.id,
+        tagCompareCheck[0],
+      );
+    } else {
+      arg.whereBuilder.andWhere(
+        JSON.stringify(arg.prefix + arg.id) + " = ANY(ARRAY[" + tagCompareCheck.map(() => "?").join(",") + "]::TEXT[])",
+        tagCompareCheck,
+      );
+    }
 
     return true;
   }

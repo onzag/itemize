@@ -335,6 +335,7 @@ export default class PropertyEntryReference
       traditional: true,
       offset: 0,
       limit: !loadAll ? 6 : (limit || 50),
+      until: null,
       language: this.props.language,
       versionFilter: filterByLanguage ? this.props.language : null,
       waitAndMerge: true,

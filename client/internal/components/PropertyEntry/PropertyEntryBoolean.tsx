@@ -49,7 +49,7 @@ export default class PropertyEntryBoolean extends React.Component<
     this.onRestoreHijacked = this.onRestoreHijacked.bind(this);
     this.enableUserSetErrors = this.enableUserSetErrors.bind(this);
 
-    this.state = {
+    this.state = {
       showUserSetErrors: false,
     }
   }

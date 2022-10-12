@@ -36,8 +36,8 @@ export function imageSrcSetRetriever(
     fileData.type.indexOf("image/svg") !== 0
   ) {
     // now we get the sizes either from the provided value or from the image sizes retriever
-    const sizes = imageSizes || imageSizeRetriever(fileData, property);
-  
+    const sizes = imageSizes || imageSizeRetriever(fileData);
+
     // now we get the metadata hopefully, we have some metadata as it's the norm for images
     const fileMetadata = fileData.metadata || "";
     // so the metadata form is WxH;name,name,name
@@ -45,8 +45,8 @@ export function imageSrcSetRetriever(
     const metadataDimensions = fileMetadata.split(";")[0].split("x");
     // for the sizes we go to the other side
     const metadataSizes = fileMetadata.split(";")[1];
-    // and we need to get the list as an array, by default null
-    let metadataSizeListArray: string[] = null;
+    // and we need to get the list as an array
+    let metadataSizeListArray: string[] = [];
     // but if we have some data those are our supported sizes
     // when the file was created, this allows to change our dimensions
     // specifications and not break anything regarding the file
@@ -57,6 +57,9 @@ export function imageSrcSetRetriever(
     // now we get the metadata width and height
     const metadataWidth = parseInt(metadataDimensions[0]) || null;
     const metadataHeight = parseInt(metadataDimensions[1]) || null;
+    const metadataRatio = (metadataWidth && metadataHeight) ? (
+      metadataWidth / metadataHeight
+    ) : null;
 
     // and this is our srcset as we have calculated it
     let srcset: string[] = [];
@@ -80,7 +83,7 @@ export function imageSrcSetRetriever(
 
         // so if we have a list and the name doesn't appear in the size list
         // this means that by the time the image was created this size was unsupported
-        if (metadataSizeListArray && !metadataSizeListArray.includes(name)) {
+        if (!metadataSizeListArray.includes(name)) {
           return;
         }
 
@@ -94,15 +97,15 @@ export function imageSrcSetRetriever(
           // it is added here and the width specified
           srcset.push(sizes[name] + " " + width + "w");
 
-        // however if the width was not specified but rather the height
-        // we need to do a conversion to get the width
-        } else if (metadataWidth && metadataHeight) {
+          // however if the width was not specified but rather the height
+          // we need to do a conversion to get the width
+        } else if (metadataRatio) {
           // for that we get the height
           const height = parseInt(widthXHeight.split("x")[1]);
           // and if we have it
           if (!isNaN(height)) {
             // we calculate via the ratio what would the expected width be
-            const calculatedWidth = Math.ceil((metadataWidth / metadataHeight) * height);
+            const calculatedWidth = Math.ceil(metadataRatio * height);
             // and as such we have gotten our width for such size
             srcset.push(sizes[name] + " " + calculatedWidth + "w");
           }
@@ -116,6 +119,11 @@ export function imageSrcSetRetriever(
     const smallDimensionW = parseInt(smallDimension.trim().split("x")[0]);
     if (!isNaN(smallDimensionW)) {
       srcset.push(sizes.imageSmallSizeURL + " " + smallDimensionW + "w");
+    } else if (metadataRatio) {
+      const smallDimensionH = parseInt(smallDimension.trim().split("x")[1]);
+      if (!isNaN(smallDimensionH)) {
+        srcset.push(sizes.imageSmallSizeURL + " " + Math.ceil(smallDimensionH*metadataRatio) + "w");
+      }
     }
 
     // the medium dimension
@@ -123,22 +131,41 @@ export function imageSrcSetRetriever(
     const mediumDimensionW = parseInt(mediumDimension.trim().split("x")[0]);
     if (!isNaN(mediumDimensionW)) {
       srcset.push(sizes.imageMediumSizeURL + " " + mediumDimensionW + "w");
+    } else if (metadataRatio) {
+      const mediumDimensionH = parseInt(mediumDimension.trim().split("x")[1]);
+      if (!isNaN(mediumDimensionH)) {
+        srcset.push(sizes.imageSmallSizeURL + " " + Math.ceil(mediumDimensionH*metadataRatio) + "w");
+      }
     }
 
     // and the large dimension
     const largeDimension = property.getSpecialProperty("largeDimension") as string;
     const largeDimensionW = parseInt(largeDimension.trim().split("x")[0]);
+    let largeDimensionUsedW: number;
     if (!isNaN(largeDimensionW)) {
+      largeDimensionUsedW = largeDimensionW;
       srcset.push(sizes.imageLargeSizeURL + " " + largeDimensionW + "w");
+    } else if (metadataRatio) {
+      const largeDimensionH = parseInt(largeDimension.trim().split("x")[1]);
+      if (!isNaN(largeDimensionH)) {
+        largeDimensionUsedW = Math.ceil(largeDimensionH*metadataRatio);
+        srcset.push(sizes.imageSmallSizeURL + " " + largeDimensionUsedW + "w");
+      }
     }
 
     // and now if we have the metadata width (we should)
     // we can add it to our standard url size
     if (metadataWidth) {
       srcset.push(sizes.imageStandardSizeURL + " " + metadataWidth + "w");
+    // unknown standard image size we don't know what is the width
+    // and height because it wasn't specified in the metadata
+    // we are going 100px bigger than the large
+    } else if (largeDimensionUsedW) {
+      srcset.push(sizes.imageStandardSizeURL + " " + (largeDimensionUsedW + 100) + "w");
     }
 
-    // we return such scrset
+    // we return such scrset, it may not be available
+    // if it couldn't have been calculated
     return srcset.join(", ");
   } else {
     // otherwise if an svg or whatnot we can return
@@ -169,8 +196,7 @@ export interface IImageSizes {
  */
 export function imageSizeRetriever(
   fileData: IGQLFile,
-  property?: PropertyDefinition,
-): IImageSizes  {
+): IImageSizes {
   // the final value by default is just the url itself
   const finalValue = {
     imageMediumSizeURL: fileData && fileData.url,
@@ -178,6 +204,8 @@ export function imageSizeRetriever(
     imageLargeSizeURL: fileData && fileData.url,
     imageStandardSizeURL: fileData && fileData.url,
   }
+
+  const dimensions = fileData && fileData.metadata && fileData.metadata.split(";")[1];
 
   // now we need to check if it's one of those file types
   // that truly do not have image sizes
@@ -199,7 +227,7 @@ export function imageSizeRetriever(
     // now we need to remove the . section from the filename to get a file without a extension
     const fileNameDotSplitted = fileName.split(".");
     // we remove such extension from the end
-    const removedExtension = fileNameDotSplitted.pop();
+    fileNameDotSplitted.pop();
     // now we join to get a recovered version
     const recoveredFileName = fileNameDotSplitted.join(".");
     // however if this means we got nothing as a name, we recover as the filename
@@ -208,33 +236,26 @@ export function imageSizeRetriever(
       recoveredFileName === "" ?
         fileName :
         recoveredFileName;
-    
+
     // now we can start making the medium, small and large file sizes in jpeg
     finalValue.imageMediumSizeURL = baseURL + "/medium_" + fileNameWithoutExtension + ".jpg" + addedQS;
     finalValue.imageSmallSizeURL = baseURL + "/small_" + fileNameWithoutExtension + ".jpg" + addedQS;
     finalValue.imageLargeSizeURL = baseURL + "/large_" + fileNameWithoutExtension + ".jpg" + addedQS;
 
-    // if we have a property we can get the other special dimensions
-    if (property) {
-      const dimensions = property.getSpecialProperty("dimensions") as string;
-      // the same logic applies
-      if (dimensions) {
-        dimensions.split(";").forEach((dimension) => {
-          const name = dimension.trim().split(" ")[0];
-          finalValue[name] = baseURL + "/" + name + "_" + fileNameWithoutExtension + ".jpg" + addedQS;
-        });
-      }
-    }
-  } else if (property) {
-    // and this is the case for other special properties but in this case
-    // the url doesn't really change as it's either a blob or a svg file
-    const dimensions = property.getSpecialProperty("dimensions") as string;
+    // the same logic applies
     if (dimensions) {
-      dimensions.split(";").forEach((dimension) => {
-        const name = dimension.trim().split(" ")[0];
-        finalValue[name] = fileData && fileData.url;
+      dimensions.split(",").forEach((dimension) => {
+        const name = dimension.trim();
+        finalValue[name] = baseURL + "/" + name + "_" + fileNameWithoutExtension + ".jpg" + addedQS;
       });
     }
+  } else if (dimensions) {
+    // and this is the case for other special properties but in this case
+    // the url doesn't really change as it's either a blob or a svg file
+    dimensions.split(",").forEach((dimension) => {
+      const name = dimension.trim();
+      finalValue[name] = fileData && fileData.url;
+    });
   }
 
   // now we are done
@@ -312,7 +333,7 @@ export class DelayDisplay extends React.PureComponent<DelayDisplayProps, DelayDi
       });
     }, this.props.duration);
   }
-  componentWillUnmount() {
+  componentWillUnmount() {
     clearTimeout(this.timer);
   }
   render() {

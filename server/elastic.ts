@@ -195,7 +195,7 @@ export class ItemizeElasticClient {
   private langAnalyzers: ILangAnalyzers;
   private serverData: any;
   private lastFailedWaitMultiplied: number = 0;
-  private runningConsistencyCheckOn: {[key: string]: Promise<void>} = {};
+  private runningConsistencyCheckOn: { [key: string]: Promise<void> } = {};
 
   private serverDataPromise: Promise<void>;
   private serverDataPromiseResolve: () => void;
@@ -249,7 +249,7 @@ export class ItemizeElasticClient {
     // first we check wether we should resolve the server data promise
     // that comes when our first server data has arrived
     const shouldResolvePrmomise = !this.serverData;
-    
+
     if (!this.serverData || !equals(this.serverData, serverData)) {
       this.serverData = serverData;
       this.rootSchema = getElasticSchemaForRoot(this.root, this.serverData);
@@ -431,6 +431,7 @@ export class ItemizeElasticClient {
       index: "status",
       doc: value,
       doc_as_upsert: true,
+      refresh: "wait_for",
     });
   }
 
@@ -1201,7 +1202,25 @@ export class ItemizeElasticClient {
 
       const baseIndexPrefixLen = baseIndexPrefix.length;
       const missingFromResults = arrayOfIds.filter((id) => {
-        return !comparativeResults.hits.hits.some((hit) => hit._id === id);
+        return !comparativeResults.hits.hits.some((hit) => {
+          const isSameId = hit._id === id;
+
+          if (!isSameId) {
+            return false;
+          }
+
+          let language = hit._index.substring(baseIndexPrefixLen);
+          if (language === "none") {
+            language = null;
+          }
+          const objInfo = resultObj[hit._id];
+          const isSameLanguage = objInfo.language === language;
+
+          // exists with the same id and the same language
+          // so it is in the right index, otherwise
+          // it is considered missing
+          return isSameLanguage;
+        });
       });
       const notMissingButOutdated: string[] = [];
 
@@ -1218,7 +1237,10 @@ export class ItemizeElasticClient {
       // now we loop over our results
       comparativeResults.hits.hits.forEach((hit) => {
         const objectInfo = resultObj[hit._id];
-        const language = hit._index.substring(baseIndexPrefixLen);
+        let language = hit._index.substring(baseIndexPrefixLen);
+        if (language === "none") {
+          language = null;
+        }
         const lasModifiedStr = hit.fields.last_modified[0];
 
         // lack of last modified means it's a corrupt record
@@ -1625,6 +1647,8 @@ export class ItemizeElasticClient {
         }
       },
       allow_no_indices: true,
+      // not allowed to have wait_for here
+      refresh: true,
     });
   }
 
@@ -1677,6 +1701,7 @@ export class ItemizeElasticClient {
       await this.elasticClient.delete({
         id: givenID,
         index: indexNameIdef,
+        refresh: "wait_for",
       });
     } catch (err) {
       // if index_not_found or not_found isn't the case
@@ -1819,10 +1844,14 @@ export class ItemizeElasticClient {
       index: indexName,
       doc: elasticFormIdef,
       doc_as_upsert: true,
+      refresh: "wait_for" as any,
     };
 
     try {
       try {
+        if (process.env.NODE_ENV === "development") {
+          console.log(JSON.stringify(updateAction, null, 2));
+        }
         await this.elasticClient.update(updateAction);
       } catch (err) {
         if (err.meta.statusCode === 404) {
@@ -2318,6 +2347,12 @@ export class ElasticQueryBuilder {
 
   public setSize(size: number) {
     this.request.size = size;
+  }
+
+  public setFrom(from: number) {
+    if (from !== 0) {
+      this.request.from = from;
+    }
   }
 
   public setHighlightsOn(fields: string[]) {

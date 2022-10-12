@@ -48,6 +48,16 @@ export default class StorageProvider<T> extends ServiceProvider<T> {
   }
 
   /**
+   * This function is necessary for downloading a file
+   * 
+   * @param at the remote file to download
+   * @override
+   */
+  public download(at: string): ReadStream {
+    return null;
+  }
+
+  /**
    * This function is executed once a folder
    * removal is requested
    * 

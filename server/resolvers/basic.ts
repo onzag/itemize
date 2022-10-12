@@ -303,6 +303,22 @@ export function retrieveSince(args: IGQLArgs): string {
   return null;
 }
 
+export function retrieveUntil(args: IGQLArgs): string {
+  if (args.until) {
+    const date = new Date(args.since as string);
+    if (date instanceof Date && !isNaN(date.getTime())) {
+      return date.toISOString();
+    } else {
+      throw new EndpointError({
+        message: "Could not parse until value " + args.until,
+        code: ENDPOINT_ERRORS.UNSPECIFIED,
+      });
+    }
+  }
+  return null;
+}
+
+
 export function checkLimiters(args: IGQLArgs, idefOrMod: Module | ItemDefinition) {
   const mod = idefOrMod instanceof Module ? idefOrMod : idefOrMod.getParentModule();
   const modLimiters = mod.getRequestLimiters();

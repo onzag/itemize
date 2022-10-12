@@ -1170,10 +1170,16 @@ export const SEARCH_RECORDS_CONTAINER_GQL = GraphQLObjectType && new GraphQLObje
       type: GraphQLNonNull(GraphQLInt),
     },
     limit: {
-      type: GraphQLNonNull(GraphQLInt)
+      type: GraphQLNonNull(GraphQLInt),
     },
     offset: {
-      type: GraphQLNonNull(GraphQLInt)
+      type: GraphQLNonNull(GraphQLInt),
+    },
+    earliest_created_at: {
+      type: GraphQLString,
+    },
+    oldest_created_at: {
+      type: GraphQLString,
     },
   },
 });

@@ -90,7 +90,7 @@ import { jwtVerify } from "./token";
 import { ISensitiveConfigRawJSONDataType } from "../config";
 import { IServerSideTokenDataType } from "./resolvers/basic";
 import { ItemizeRedisClient } from "./redis";
-import { findLastRecordLastModifiedDate } from "./resolvers/actions/search";
+import { findLastRecordDate } from "./resolvers/actions/search";
 import { CustomRoleGranterEnvironment, CustomRoleManager, ICustomRoleType } from "./resolvers/roles";
 import { convertSQLValueToGQLValueForItemDefinition } from "../base/Root/Module/ItemDefinition/sql";
 import { ItemizeRawDB } from "./raw-db";
@@ -1499,7 +1499,7 @@ export class Listener {
           createdRecords,
           deletedRecords,
           modifiedRecords,
-          newLastModified: findLastRecordLastModifiedDate(createdRecords, deletedRecords, modifiedRecords),
+          newLastModified: findLastRecordDate("max", "last_modified", createdRecords, deletedRecords, modifiedRecords),
         };
         CAN_LOG_DEBUG && logger.debug(
           {
@@ -1804,7 +1804,7 @@ export class Listener {
           createdRecords,
           deletedRecords,
           modifiedRecords,
-          newLastModified: findLastRecordLastModifiedDate(createdRecords, deletedRecords, modifiedRecords),
+          newLastModified: findLastRecordDate("max", "last_modified", createdRecords, deletedRecords, modifiedRecords),
         };
         CAN_LOG_DEBUG && logger.debug(
           {
@@ -2073,7 +2073,7 @@ export class Listener {
           createdRecords,
           modifiedRecords,
           deletedRecords,
-          newLastModified: findLastRecordLastModifiedDate(createdRecords, modifiedRecords, deletedRecords),
+          newLastModified: findLastRecordDate("max", "last_modified", createdRecords, modifiedRecords, deletedRecords),
         };
         CAN_LOG_DEBUG && logger.debug(
           {
@@ -2305,7 +2305,7 @@ export class Listener {
           deletedRecords,
           lostRecords: [],
           newRecords: [],
-          newLastModified: findLastRecordLastModifiedDate(createdRecords, modifiedRecords, deletedRecords),
+          newLastModified: findLastRecordDate("max", "last_modified", createdRecords, modifiedRecords, deletedRecords),
         };
         CAN_LOG_DEBUG && logger.debug(
           {

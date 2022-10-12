@@ -10,7 +10,7 @@
 import ItemDefinition from "../../../base/Root/Module/ItemDefinition";
 import PropertyDefinition from "../../../base/Root/Module/ItemDefinition/PropertyDefinition";
 import { ISQLTableRowValue } from "../../../base/Root/sql";
-import { renderTemplate } from "../../../client/internal/text";
+import { renderTemplate, sanitize } from "../../../client/internal/text";
 import type { IGQLValue } from "../../../gql-querier";
 import { jwtSign } from "../../token";
 import { IUnsubscribeUserTokenDataType } from "../../user/rest";
@@ -18,6 +18,20 @@ import { ServiceProvider, ServiceProviderType } from "..";
 import { NODE_ENV } from "../../environment";
 import { PropertyDefinitionSupportedFilesType } from "../../../base/Root/Module/ItemDefinition/PropertyDefinition/types/files";
 import { IOTriggerActions, ITriggerRegistry } from "../../resolvers/triggers";
+import path from "path";
+import { DOMWindow, getContainerIdFromMappers } from "../../../util";
+import { UNSPECIFIED_OWNER } from "../../../constants";
+import { languages } from "../../../imported-resources";
+import uuid from "uuid";
+import uuidv5 from "uuid/v5";
+import type { Cache } from "../../cache";
+import Include from "../../../base/Root/Module/ItemDefinition/Include";
+
+/**
+ * This is the mail namespace, and it's used to convert the mail
+ * uuids into simple uuids
+ */
+const MAIL_NAMESPACE = "ee6ce529-24f8-155b-3dd0-9b5bd377820d";
 
 export interface IMailResolverInfo {
   target: string;
@@ -49,13 +63,21 @@ export interface IUnsubscribeURL {
  */
 export interface ISendEmailData {
   /**
+   * the universal unique identifier for this email
+   * 
+   * allows for reply tracking
+   */
+  id?: string;
+  /**
    * This is the from line in the shape of
    * username <name@domain.com> that wants to specify
    * as the user
    */
   from: string;
   /**
-   * The sender, original sender, if the email was forwarded
+   * The sender, original sender's email, if the email was forwarded
+   * 
+   * you may use this field to set the reply-to header
    */
   fromForwarded?: string;
   /**
@@ -77,8 +99,11 @@ export interface ISendEmailData {
   html?: string;
   /**
    * Array of attachments to be added
+   * 
+   * These attachments must contain some form of read
+   * stream in order for them to work properly
    */
-  attachments?: File[];
+  attachments?: PropertyDefinitionSupportedFilesType;
   /**
    * no reply email
    */
@@ -98,6 +123,10 @@ export interface ISendEmailData {
   unsubscribeURLs?: {
     [email: string]: IUnsubscribeURL;
   };
+  /**
+   * The message that it was a reply for
+   */
+  replyOf?: ISQLTableRowValue;
 }
 
 /**
@@ -105,14 +134,75 @@ export interface ISendEmailData {
  * received
  */
 export interface IReceiveEmailData {
+  /**
+   * A custom id for the email received that should be unique
+   * for this email
+   * 
+   * if you don't provide one, a random one will be generated for you
+   */
+  id?: string;
+  /**
+   * Who sent the email
+   */
   from: string;
+  /**
+   * The username of the person who sent the email
+   */
   fromUsername?: string;
-  to: string;
+  /**
+   * Who is expected to receive the email, these should be
+   * abitrary emails, if the email is detected to be a local email
+   * it will be resolved into that user given the user has external emails
+   * enabled
+   */
+  to: string[];
+  /**
+   * The subject of the email
+   */
   subject: string;
+  /**
+   * The html content
+   */
   html: string;
-  attachments: File[];
+  /**
+   * The language the email is written in, please provide one if known
+   * as the emails need to be indexed in a specific supported language
+   */
+  language?: string;
+  /**
+   * Arbitrary metadata
+   * 
+   * should be a parseble json object
+   */
+  metadata?: any;
 
+  /**
+   * These attachments "MUST" contain some form
+   * of read stream in the source in order for it to work
+   * properly
+   */
+  attachments: PropertyDefinitionSupportedFilesType;
+  /**
+   * The content id map that maps the ids in the cid:xxxx form
+   * to the id of the attachment
+   */
+  contentIdMap?: { [key: string]: string };
+
+  /**
+   * Whether to consider the email spam
+   */
   spam?: boolean;
+
+  /**
+   * The id of the message that is supposed to be parented to by each user
+   * 
+   * you should return the message id that it is supposed to be the parent of this
+   * message which means that this message was replied to as a thread
+   */
+  replyOfResolver?: (
+    user: ISQLTableRowValue,
+    isSender: boolean,
+  ) => Promise<ISQLTableRowValue>;
 }
 
 const symbols = "+,|-?<>=!";
@@ -133,6 +223,8 @@ export default class MailProvider<T> extends ServiceProvider<T> {
    * the storage item definition
    */
   private storageIdef: ItemDefinition;
+  private extraProperties: PropertyDefinition[];
+  private extraIncludes: Include[];
 
   /**
    * Sets the item definition that is in charge of the storage of the
@@ -146,13 +238,112 @@ export default class MailProvider<T> extends ServiceProvider<T> {
    * 
    * @param idef the item definition to use for storage
    */
-  private setMessageStorageItemDefinition(idef: ItemDefinition) {
-    // TODO check that is valid for the shape necessary
+  public setMessageStorageItemDefinition(idef: ItemDefinition) {
+    const properties = idef.getAllPropertyDefinitionsAndExtensions();
+
+    const expectedProperties = [
+      {
+        id: "uuid",
+        type: "string",
+      },
+      {
+        id: "target",
+        type: "taglist",
+        subtype: "arbitrary-tags",
+      },
+      {
+        id: "source",
+        type: "string",
+      },
+      {
+        id: "source_username",
+        type: "string",
+      },
+      {
+        id: "is_sender",
+        type: "boolean",
+      },
+      {
+        id: "is_receiver",
+        type: "boolean",
+      },
+      {
+        id: "read",
+        type: "boolean",
+      },
+      {
+        id: "spam",
+        type: "boolean",
+      },
+      {
+        id: "subject",
+        type: "text",
+      },
+      {
+        id: "content",
+        type: "text",
+      },
+      {
+        id: "cid_attachments",
+        type: "files",
+      },
+      {
+        id: "attachments",
+        type: "files",
+      },
+      {
+        id: "tip",
+        type: "boolean",
+      },
+      {
+        id: "metadata",
+        type: "string",
+      },
+    ];
+
+    expectedProperties.forEach((p) => {
+      const found = !!properties.find(
+        (p2) => p.id === p2.getId() && p.type === p2.getType() && (p.subtype ? p2.getSubtype() === p.subtype : true)
+      );
+
+      if (!found) {
+        throw new Error("Missing required property for mail provider " + p.id + " with type " + p.type);
+      }
+    });
+
+    this.extraProperties = properties.filter((p2) => {
+      const found = !!expectedProperties.find(
+        (p) => p.id === p2.getId() && p.type === p2.getType() && (p.subtype ? p2.getSubtype() === p.subtype : true)
+      );
+
+      return !found;
+    });
+
+
+    this.extraIncludes = idef.getAllIncludes();
+
     this.storageIdef = idef;
   }
 
+  public getExtraArgs() {
+    const args: any = {};
+
+    this.extraProperties.forEach((p) => {
+      args[p.getId()] = p.getCurrentValue(null, null);
+    });
+
+    this.extraIncludes.forEach((i) => {
+      args[i.getQualifiedExclusionStateIdentifier()] = i.getExclusionState(null, null);
+      i.getSinkingProperties().forEach((sp) => {
+        args[i.getPrefixedQualifiedIdentifier() + sp.getId()] = sp.getCurrentValue(null, null);
+      });
+    });
+
+    return args;
+  }
+
   public escapeUserName(name: string) {
-    Array.from(name).map((v) => symbols.includes(v) ? " " : v).join("");
+    return Array.from(name).map((v) => symbols.includes(v) ? " " : v).join("");
   }
 
   /**
@@ -701,23 +892,24 @@ export default class MailProvider<T> extends ServiceProvider<T> {
    * the service provider that extended the raw mail provider should
    * be able to trigger this function when specified, this function will
    * handle the mail configuration then and perform unsubscription tasks
+   * 
+   * NOTE this method can only be called in an extended instance and not
+   * in the global context because it uses the cache, do not receive your emails
+   * in the global context
+   * 
    * @param data the email data received, make sure to fill this information
    * properly
    */
-  public async onExternalEmailRecieved(data: IReceiveEmailData) {
-    const targetUserHandle = data.to.split("@")[0];
-    const rawDB = this.isInstanceGlobal() ? this.globalRawDB : this.localAppData.rawDB;
-
-    const userIdef = (
-      this.isInstanceGlobal() ?
-        this.globalRoot.registry["users/user"] :
-        this.localAppData.root.registry["users/user"]
-    ) as ItemDefinition;
+  public async onExternalEmailReceived(data: IReceiveEmailData) {
+    const userIdef = this.localAppData.root.registry["users/user"] as ItemDefinition;
 
     // we need this to be able to receive external emails
     const hasEmail = userIdef.hasPropertyDefinitionFor("email", false);
     const hasEvalidated = userIdef.hasPropertyDefinitionFor("e_validated", false);
     const hasEExternal = userIdef.hasPropertyDefinitionFor("e_external", false);
+
+    const uuidToUse = data.id ? data.id : (uuid.v4().replace(/-/g, "") + "@" + this.appConfig.mailDomain);
+    const idBase = uuidv5(uuidToUse, MAIL_NAMESPACE);
 
     // if somehow user has no email or emails cannot be validated
     // we cannot allow external emails to be received
@@ -725,87 +917,171 @@ export default class MailProvider<T> extends ServiceProvider<T> {
       return;
     }
 
-    // if this is an unsubscribe email action
-    if (targetUserHandle === "unsubscribe") {
-      // let's find what we are unsubscribing for
-      const unsubscribePropertyId = data.subject || "";
-      const hasUnsubscribeProperty = userIdef.hasPropertyDefinitionFor(unsubscribePropertyId, false);
+    // we may check for a potential sender that has used their email externally
+    // in order to reply
+    const potentialSender = (await this.localAppData.rawDB.performRawDBSelect(
+      userIdef,
+      (b) => {
+        b.selectAll().whereBuilder.andWhereColumn("email", data.from).andWhereColumn("e_validated", true);
+        b.limit(1);
+      }
+    ))[0] || null;
 
-      if (!hasUnsubscribeProperty) {
-        return;
+    const metadataStr = data.metadata ? JSON.stringify(data.metadata) : null;
+
+    // now let's try to find all the users that we are trying to send to
+    const allTargetUserHandles = data.to.map((h) => h.split("@"))
+    const isAnUnsubscribeSoloEmail = allTargetUserHandles.every((e) => e[0] === "unsubscribe" && e[1] === this.appConfig.mailDomain);
+    const allTargetUserHandlesFilteredForLocalDomain = allTargetUserHandles.filter((v) => v[1] === this.appConfig.mailDomain).map((v) => v[0]);
+    const allTargets = hasEExternal && !isAnUnsubscribeSoloEmail ? await this.localAppData.rawDB.performRawDBSelect(
+      userIdef,
+      (b) => {
+        b.selectAll().whereBuilder.andWhere(
+          "\"username\" = ANY(ARRAY[" + allTargetUserHandlesFilteredForLocalDomain.map(() => "?").join(",") + "]::TEXT[])",
+          allTargetUserHandlesFilteredForLocalDomain,
+        ).andWhereColumn("e_external", true);
+      }
+    ) : null;
+
+    // and let's convert it
+    const to: string[] = allTargetUserHandles.map((h) => {
+      if (h[1] !== this.appConfig.mailDomain) {
+        return h[0] + "@" + h[1];
+      }
+      if (!allTargets) {
+        return UNSPECIFIED_OWNER;
       }
 
-      const unsubscribeProperty = userIdef.getPropertyDefinitionFor(unsubscribePropertyId, false);
-      if (unsubscribeProperty.getPropertyDefinitionDescription().json !== "boolean") {
-        return;
+      const userInQuestion = allTargets.find((u) => u.username === h[0]);
+      if (!userInQuestion) {
+        return UNSPECIFIED_OWNER;
       }
 
-      // get the user in question that suits the given email
-      const users = await rawDB.performRawDBSelect(
-        userIdef,
-        (b) => {
-          b.select("id", unsubscribePropertyId).whereBuilder.andWhereColumn("email", data.from).andWhereColumn("e_validated", true);
-          b.limit(1);
-        }
+      return userInQuestion.id;
+    });
+    const from = potentialSender ? potentialSender.id : data.from;
+    // the username will be dynamic from the property of the source
+    const fromUsername = potentialSender ? null : data.fromUsername;
+
+    // now we got the rendered email
+    const renderedMail = this.renderMessageFromMail(data.html, data.contentIdMap, data.attachments);
+
+    const storedMessages: ISQLTableRowValue[] = [];
+
+    const specifiedLanguage = data.language ? languages[data.language.split("-")[0]] : null;
+    const specifiedLanguageCode = specifiedLanguage && specifiedLanguage.code;
+    const specifiedDictionary =
+      specifiedLanguageCode ?
+        (
+          this.localAppData.databaseConfig.dictionaries[data.language] ||
+          this.localAppData.databaseConfig.dictionaries[specifiedLanguageCode] ||
+          this.localAppData.databaseConfig.dictionaries["*"]
+        ) : null;
+
+    if (potentialSender && potentialSender.e_validated && this.storageIdef && !isAnUnsubscribeSoloEmail) {
+      // store email in senders outbox, the email may be invalid and not have been received by
+      // anyone if no such user exists, but we are storing it anyway
+      const senderContainerId = getContainerIdFromMappers(
+        this.appConfig,
+        potentialSender.app_country,
+      );
+      const replyOf = data.replyOfResolver && await data.replyOfResolver(
+        potentialSender,
+        true,
       );
 
-      const user = users[0];
-
-      if (!user || !user[unsubscribePropertyId]) {
-        return;
+      let parent: any = null;
+      if (replyOf && replyOf.created_by === potentialSender.id) {
+        // this message is not the tip of the given conversation anymore
+        if (replyOf.tip) {
+          await this.localAppData.cache.requestUpdateSimple(
+            this.storageIdef,
+            replyOf.id,
+            replyOf.version || null,
+            {
+              tip: false,
+            },
+            "en",
+            "simple",
+            replyOf,
+          );
+        }
+        parent = {
+          id: replyOf.id,
+          type: this.storageIdef.getQualifiedPathName(),
+          version: replyOf.version || null,
+        };
       }
 
-      // and unsubscribe from such property
-      await rawDB.performRawDBUpdate(
-        userIdef,
-        user.id,
+      storedMessages.push(await this.localAppData.cache.requestCreation(
+        this.storageIdef,
+        idBase + "+" + potentialSender.id,
         null,
         {
-          itemTableUpdate: {
-            [unsubscribePropertyId]: false,
-          },
+          uuid: uuidToUse,
+          target: to,
+          source: from,
+          source_username: fromUsername,
+          is_sender: true,
+          is_receiver: false,
+          read: true,
+          spam: false,
+          subject: data.subject,
+          content: renderedMail.html,
+          cid_attachments: renderedMail.cidAttachments,
+          attachments: renderedMail.attachments,
+          metadata: metadataStr,
+          ...this.getExtraArgs(),
         },
-      );
-    } else {
-      // we may check for a potential sender that has used their email externally
-      // in order to reply
-      const potentialSender = (await rawDB.performRawDBSelect(
-        userIdef,
-        (b) => {
-          b.selectAll().whereBuilder.andWhereColumn("email", data.from).andWhereColumn("e_validated", true);
-          b.limit(1);
-        }
-      ))[0] || null;
+        potentialSender.id,
+        specifiedLanguage || potentialSender.app_language,
+        specifiedDictionary ||
+        this.localAppData.databaseConfig.dictionaries[potentialSender.app_language] ||
+        this.localAppData.databaseConfig.dictionaries["*"],
+        senderContainerId,
+        parent,
+        null,
+      ));
+    }
 
-      if (potentialSender && potentialSender.e_validated && this.storageIdef) {
-        // TODO
-        // store email in senders outbox, the email may be invalid and not have been received by
-        // anyone if no such user exists, but we are storing it anyway
-      }
+    const bounces: string[] = [];
+    for (const targetUserHandle of allTargetUserHandles) {
+      // if this is an unsubscribe email action
+      if (targetUserHandle[0] === "unsubscribe" && targetUserHandle[1] === this.appConfig.mailDomain) {
+        // let's find what we are unsubscribing for
+        const unsubscribePropertyId = data.subject || "";
+        const hasUnsubscribeProperty = userIdef.hasPropertyDefinitionFor(unsubscribePropertyId, false);
 
-      if (hasEExternal) {
-        // now let's grab the user that received such email
-        const users = await rawDB.performRawDBSelect(
-          userIdef,
-          (b) => {
-            b.selectAll().whereBuilder.andWhereColumn("username", targetUserHandle);
-            b.limit(1);
-          }
-        );
-
-        // here
-        const user = users[0];
-        // no user we are done and we disregard such email
-        if (!user) {
+        if (!hasUnsubscribeProperty) {
           return;
         }
 
-        // otherwise let's see if we should receive such email
-        const shouldReceive = user.e_external;
+        const unsubscribeProperty = userIdef.getPropertyDefinitionFor(unsubscribePropertyId, false);
+        if (unsubscribeProperty.getPropertyDefinitionDescription().json !== "boolean") {
+          return;
+        }
 
-        // if the user is marked with e_external as false, then that means they don't
-        // want to receive external email
-        if (!shouldReceive) {
+        if (!potentialSender || !potentialSender[unsubscribePropertyId]) {
+          return;
+        }
+
+        // and unsubscribe from such property
+        await this.localAppData.rawDB.performRawDBUpdate(
+          userIdef,
+          potentialSender.id,
+          null,
+          {
+            itemTableUpdate: {
+              [unsubscribePropertyId]: false,
+            },
+          },
+        );
+      } else if (targetUserHandle[1] === this.appConfig.mailDomain) {
+        // here
+        const user = allTargets && allTargets.find((u) => u.username === targetUserHandle[0]);
+        // no user we are done and we disregard such email
+        if (!user) {
+          bounces.push(targetUserHandle[0] + "@" + targetUserHandle[1]);
           return;
         }
 
@@ -821,20 +1097,104 @@ export default class MailProvider<T> extends ServiceProvider<T> {
           return;
         }
 
-        // TODO
         // attach a new message for it in the idef
         if (this.storageIdef) {
           const isSpam = shouldReceiveAllowed === "SPAM";
+          const targetContainerId = getContainerIdFromMappers(
+            this.appConfig,
+            user.app_country,
+          );
 
-          // we have a known sender that was using their own
-          // email to contact users inside but they have their own
-          // email inside that is validated in that sense
-          // we will store it as that sender and do not leak the sender's actual
-          // email to the receiver
-          if (potentialSender) {
-            // TODO use the internal user's information
+          const replyOf = data.replyOfResolver && await data.replyOfResolver(
+            user,
+            false,
+          );
+
+          let parent: any = null;
+          if (replyOf) {
+            // this message is not the tip of the given conversation anymore
+            if (replyOf.tip) {
+              await this.localAppData.cache.requestUpdateSimple(
+                this.storageIdef,
+                replyOf.id,
+                replyOf.version || null,
+                {
+                  tip: false,
+                },
+                "en",
+                "simple",
+                replyOf,
+              );
+            }
+            parent = {
+              id: replyOf.id,
+              type: this.storageIdef.getQualifiedPathName(),
+              version: replyOf.version || null,
+            };
+          }
+
+          // if the message has already been stored in another run
+          // the reason is that the stream can likely only be consumed
+          // once and we wanted to release it as soon as possible, copying
+          // between storage, specially if it's the same storage is likely
+          // to be more beneficial and rather quicker
+          if (storedMessages.length) {
+            // more efficiency to copy in the same container
+            let bestMatchStoredMessage = storedMessages.find((m) => m.container_id === targetContainerId);
+            if (!bestMatchStoredMessage) {
+              // just pick the first one to copy
+              bestMatchStoredMessage = storedMessages[0];
+            }
+
+            // this should be effective, very effective
+            storedMessages.push(await this.localAppData.cache.requestCopy(
+              this.storageIdef,
+              bestMatchStoredMessage.id,
+              bestMatchStoredMessage.version,
+              idBase + "+" + user.id,
+              null,
+              targetContainerId,
+              user.id,
+              parent,
+              {
+                is_sender: false,
+                is_receiver: true,
+                read: false,
+                spam: isSpam,
+              },
+              bestMatchStoredMessage,
+            ));
           } else {
-            // use external information
+            // the first time creating the message and consuming the streams
+            storedMessages.push(await this.localAppData.cache.requestCreation(
+              this.storageIdef,
+              idBase + "+" + user.id,
+              null,
+              {
+                uuid: uuidToUse,
+                target: to,
+                source: from,
+                source_username: fromUsername,
+                is_sender: false,
+                is_receiver: true,
+                read: false,
+                spam: isSpam,
+                subject: data.subject,
+                content: renderedMail.html,
+                cid_attachments: renderedMail.cidAttachments,
+                attachments: renderedMail.attachments,
+                metadata: metadataStr,
+                ...this.getExtraArgs(),
+              },
+              user.id,
+              specifiedLanguageCode || user.app_language,
+              specifiedDictionary ||
+              this.localAppData.databaseConfig.dictionaries[user.app_language] ||
+              this.localAppData.databaseConfig.dictionaries["*"],
+              targetContainerId,
+              parent,
+              null,
+            ));
           }
         }
 
@@ -848,7 +1208,12 @@ export default class MailProvider<T> extends ServiceProvider<T> {
           data.spam || shouldReceiveAllowed === "SPAM",
         );
       }
-    }
+
+      // inform of emails that bounced
+      if (bounces.length) {
+        await this.onExternalEmailBounced(bounces, potentialSender, data);
+      }
+    };
   }
 
   /**
@@ -874,6 +1239,35 @@ export default class MailProvider<T> extends ServiceProvider<T> {
     return "ACCEPT";
   }
 
+  public async allowUserToSendEmailToItemType(user: ISQLTableRowValue, target: ItemDefinition): Promise<boolean> {
+    return false;
+  }
+
+  public async allowUserToSendEmailToItem(user: ISQLTableRowValue, target: ISQLTableRowValue, targetType: ItemDefinition): Promise<"SPAM" | "REJECT" | "ACCEPT"> {
+    return "REJECT";
+  }
+
+  /**
+   * @override
+   * @param user 
+   * @param target 
+   * @param targetType 
+   */
+  public async resolveUsersForEmailToItem(user: ISQLTableRowValue, target: ISQLTableRowValue, targetType: ItemDefinition): Promise<ISQLTableRowValue[]> {
+    return [];
+  }
+
+  /**
+   * @override
+   * An email was externally received but no proper receiver could be found for such users, the bounces
+   * are very specific to the 
+   * @param internalSender the user that sent the message (or null) if it couldn't find one
+   * @param data the external email itself
+   */
+  public async onExternalEmailBounced(bounces: string[], internalSender: ISQLTableRowValue, data: IReceiveEmailData) {
+
+  }
+
   /**
    * @override
    * An user received an email from an external source to their internal email, eg. from dude@gmail.com to girl@mysite.com
@@ -886,8 +1280,7 @@ export default class MailProvider<T> extends ServiceProvider<T> {
    * whereas this spam variable is affected by that as well as by allowUserToReceiveExternalEmail
    */
   public async onUserReceivedExternalEmail(user: ISQLTableRowValue, internalSender: ISQLTableRowValue, data: IReceiveEmailData, spam: boolean) {
-    const root = this.isInstanceGlobal() ? this.globalRoot : this.localAppData.root;
-    const userIdef = root.registry["users/user"] as ItemDefinition;
+    const userIdef = this.localAppData.root.registry["users/user"] as ItemDefinition;
 
     const hasEnotifications = userIdef.hasPropertyDefinitionFor("e_notifications", false);
     const hasEvalidated = userIdef.hasPropertyDefinitionFor("e_validated", false);
@@ -934,7 +1327,7 @@ export default class MailProvider<T> extends ServiceProvider<T> {
       // treat it the same as an internal message
       const senderInternalEmail = internalSender.e_external ? internalSender.username + "@" + this.appConfig.mailDomain : null;
       this.sendEmail({
-        from: this.escapeUserName(internalSender.real_name || internalSender.actual_name || internalSender.name || internalSender.username) +
+        from: this.escapeUserName(this.getSenderUsername(internalSender)) +
           (senderInternalEmail ? " <" + senderInternalEmail + ">" : " <notifications@" + this.appConfig.mailDomain + ">"),
         noReply: !senderInternalEmail,
         to: user.email,
@@ -952,6 +1345,66 @@ export default class MailProvider<T> extends ServiceProvider<T> {
     }
   }
 
+  /**
+   * Given the external email this will convert it into the expected sql row value to be created
+   * @param html 
+   * @param contentIdMap 
+   * @param attachments 
+   * @returns 
+   */
+  public renderMessageFromMail(html: string, contentIdMap: { [key: string]: string }, attachments: PropertyDefinitionSupportedFilesType) {
+    let finalAttachments = attachments ? [...attachments] : [];
+    const potentialCidAttachments: PropertyDefinitionSupportedFilesType = [];
+
+    if (contentIdMap) {
+      const contentIdValues = Object.keys(contentIdMap).map((v) => contentIdMap[v]);
+      finalAttachments = finalAttachments.filter((a) => {
+        const isContentId = contentIdValues.includes(a.id);
+        if (isContentId) {
+          potentialCidAttachments.push(a);
+        }
+        return !isContentId;
+      })
+    }
+
+    const cidAttachments: PropertyDefinitionSupportedFilesType = [];
+
+    if (!attachments || !contentIdMap || !html || Object.keys(contentIdMap).length === 0 || attachments.length === 0) {
+      return {
+        html,
+        attachments: finalAttachments.length === 0 ? null : finalAttachments,
+        cidAttachments: null,
+      }
+    }
+
+    const cheapdiv = DOMWindow.document.createElement("div");
+    cheapdiv.innerHTML = html;
+    cheapdiv.querySelectorAll("img").forEach((img) => {
+      if (img.src.startsWith("cid:")) {
+        const cidSrc = img.src.replace("cid:", "").trim();
+        img.removeAttribute("src");
+
+        const fileSrcId = contentIdMap[cidSrc];
+        img.dataset.srcId = fileSrcId;
+        const fileInQuestion = potentialCidAttachments.find((f) => f.id === fileSrcId);
+        cidAttachments.push(fileInQuestion);
+      }
+    });
+
+    return {
+      html: cheapdiv.innerHTML,
+      attachments: finalAttachments.length === 0 ? null : finalAttachments,
+      cidAttachments,
+    }
+  }
+
+  /**
+   * Given a message from the database it will provide the resulting
+   * html with all links resolved to be sent by email as well as the attachment
+   * list to be appended
+   * @param message 
+   * @returns 
+   */
   public renderMessageForMail(message: ISQLTableRowValue) {
     const actualProperty = this.storageIdef.getPropertyDefinitionFor("content", false);
     const mediaProperty = actualProperty.getSpecialProperty("mediaProperty");
@@ -983,8 +1436,41 @@ export default class MailProvider<T> extends ServiceProvider<T> {
       currentFiles = null;
     }
 
-    // calling the render template function
-    const html = renderTemplate(
+    let attachments: PropertyDefinitionSupportedFilesType;
+    try {
+      attachments = mediaProperty ? JSON.parse(message["attachments"]) : null;
+    } catch {
+      attachments = null;
+    }
+
+    if (attachments) {
+      attachments = attachments.map((v) => {
+        const location = path.join(
+          NODE_ENV === "production" ? this.appConfig.productionHostname : this.appConfig.developmentHostname,
+          this.storageIdef.getQualifiedPathName(),
+          message.id + "." + (message.version || ""),
+          "attachments",
+          v.id,
+          v.url,
+        );
+
+        return {
+          ...v,
+          src: new Promise((resolve) => {
+            resolve({
+              createReadStream: () => {
+                return this.localAppData.storage[message.container_id].download(location);
+              }
+            })
+          }),
+        }
+      });
+    }
+
+    // calling the sanitize function
+    // it solves the urls too and because we are using
+    // forceFullURLs they should work as cdn
+    const html = sanitize(
       {
         cacheFiles: false,
         config: this.appConfig,
@@ -1020,10 +1506,12 @@ export default class MailProvider<T> extends ServiceProvider<T> {
         supportedTables,
       },
       message.content,
-      {},
     );
 
-    return html;
+    return {
+      html,
+      attachments
+    };
   }
 
   /**
@@ -1033,7 +1521,7 @@ export default class MailProvider<T> extends ServiceProvider<T> {
    * by default the message is assumed to have the right shape for the storage idef definition and will
    * be used to render a message clone and send it to the targets real email
    */
-  public async onUserReceivedInternalEmail(user: ISQLTableRowValue, sender: ISQLTableRowValue, message: ISQLTableRowValue, spam: boolean) {
+  public async onUserReceivedInternalEmail(user: ISQLTableRowValue, sender: ISQLTableRowValue, message: ISQLTableRowValue, proxyObject: ItemDefinition, spam: boolean) {
     const root = this.isInstanceGlobal() ? this.globalRoot : this.localAppData.root;
     const userIdef = root.registry["users/user"] as ItemDefinition;
 
@@ -1041,7 +1529,7 @@ export default class MailProvider<T> extends ServiceProvider<T> {
     const hasEvalidated = userIdef.hasPropertyDefinitionFor("e_validated", false);
     const hasEExternal = userIdef.hasPropertyDefinitionFor("e_external", false);
 
-    if (!hasEnotifications || !hasEvalidated || spam || !user.e_notifications || !user.e_validated) {
+    if (!hasEnotifications || !hasEvalidated || spam || !user.e_notifications || !user.e_validated || !user.email) {
       return;
     }
 
@@ -1063,6 +1551,8 @@ export default class MailProvider<T> extends ServiceProvider<T> {
 
     const senderInternalEmail = hasEExternal && sender.e_external ? sender.username + "@" + this.appConfig.mailDomain : null;
 
+    const renderedData = this.renderMessageForMail(message);
+
     this.sendEmail({
       from:
         this.escapeUserName(this.getSenderUsername(sender)) +
@@ -1070,7 +1560,8 @@ export default class MailProvider<T> extends ServiceProvider<T> {
       noReply: !senderInternalEmail,
       to: user.email,
       subject: message.subject,
-      html: this.renderMessageForMail(message),
+      html: renderedData.html,
+      attachments: renderedData.attachments,
       unsubscribeMailto: "mailto:unsubscribe@" + hostname + "?subject=e_notifications&body=e_notifications",
       unsubscribeURLs: {
         [user.email]: {
@@ -1079,6 +1570,75 @@ export default class MailProvider<T> extends ServiceProvider<T> {
         },
       }
     });
+  }
+
+  private async forwardMessages(message: ISQLTableRowValue, user: ISQLTableRowValue, containerID: string, isSpam: boolean, cache: Cache) {
+    let parent: any = null;
+    if (message.parent_id) {
+      const expectedParentIdForUser = message.parent_id.split("+")[0] + "+" + user.id;
+
+      const replyOfForUser = await cache.requestValue(
+        this.storageIdef,
+        expectedParentIdForUser,
+        null,
+      );
+
+      if (!replyOfForUser) {
+        const replyOfSelf = await cache.requestValue(
+          this.storageIdef,
+          message.parent_id,
+          message.parent_version || null,
+          {
+            useMemoryCache: true,
+          }
+        );
+        // chain is broken for some reason
+        if (!replyOfSelf) {
+          // chain has broken
+        } else {
+          // forward that message too
+          await this.forwardMessages(replyOfSelf, user, containerID, isSpam, cache);
+        }
+      } else {
+        // matching reply found, this will be connected
+        if (replyOfForUser.tip) {
+          await cache.requestUpdateSimple(
+            this.storageIdef,
+            replyOfForUser.id,
+            null,
+            {
+              tip: false,
+            },
+            "en",
+            "simple",
+            replyOfForUser,
+          );
+        }
+        parent = {
+          id: replyOfForUser.id,
+          version: null,
+          type: this.storageIdef.getQualifiedPathName(),
+        }
+      }
+    }
+
+    await cache.requestCopy(
+      this.storageIdef,
+      message.id,
+      message.version || null,
+      message.id.split("+")[0] + "+" + user.id,
+      null,
+      containerID,
+      user.id,
+      parent,
+      {
+        tip: false,
+        spam: isSpam,
+        read: false,
+        is_sender: message.source === user.id,
+        is_receiver: message.targets.includes(user.id),
+      },
+    );
   }
 
   /**
@@ -1111,46 +1671,137 @@ export default class MailProvider<T> extends ServiceProvider<T> {
             // then you should have somewhere for them to reply to
             if (arg.action === IOTriggerActions.CREATE) {
               const sender = arg.requestedUpdateCreatedBy;
+
+              if (arg.requestedUpdate.source !== arg.requestedUpdateCreatedBy) {
+                arg.forbid(
+                  "Cannot create a message with someone else as source",
+                );
+              }
+
               const targets = arg.requestedUpdate.target as Array<string>;
 
               const senderObj = await arg.appData.cache.requestValue("users/user", sender, null, { useMemoryCache: true });
+
+              if (sender !== arg.requestedUpdate.source) {
+                arg.forbid(
+                  "Cannot create a message with the sender not being the creator",
+                );
+              }
+
+              if (!arg.requestedUpdate.is_sender) {
+                arg.forbid(
+                  "Cannot create a message where the sender is not the sender, is_sender is false",
+                );
+              }
+
+              const replyOf = (arg.requestedUpdateParent.id && await arg.appData.cache.requestValue(
+                this.storageIdef,
+                arg.requestedUpdateParent.id,
+                arg.requestedUpdateParent.version,
+                {
+                  useMemoryCache: true,
+                }
+              )) || null;
+
+              if (replyOf && replyOf.created_by !== sender) {
+                arg.forbid(
+                  "You cannot parent to target a message you don't own, that is the reply to",
+                );
+              }
 
               targets.forEach((t) => {
                 const tSplitted = t.split("@");
                 const targetIsPotentiallyExternal = !!tSplitted[1];
                 const targetPotentialExtenalDomain = targetIsPotentiallyExternal && tSplitted[1].trim();
+                const targetIsUsingInternalDomain = targetIsPotentiallyExternal && tSplitted[1].trim() === this.appConfig.mailDomain;
 
                 // aka is external
                 if (targetPotentialExtenalDomain !== this.appConfig.mailDomain && !senderObj.e_external) {
-                  return arg.forbid(
+                  arg.forbid(
                     "Cannot send external emails if user has no external email enabled",
                   );
+                } else if (targetIsUsingInternalDomain) {
+                  arg.forbid(
+                    "Cannot send external emails using an external domain to an internal user, please use the user id instead",
+                  );
+                }
+
+                if (tSplitted.length === 1) {
+                  const tObjSplitted = t.split("$");
+                  if (tObjSplitted.length === 2) {
+                    const type = tObjSplitted[1];
+                    const itemDef = arg.appData.root.registry[type];
+
+                    if (!itemDef || !(itemDef instanceof ItemDefinition) || itemDef.getQualifiedPathName() !== type) {
+                      arg.forbid(
+                        "Cannot send email to an unknown object target type " + type
+                      );
+                    }
+
+                    if (!this.allowUserToSendEmailToItemType(senderObj, itemDef as ItemDefinition)) {
+                      arg.forbid(
+                        "Cannot send email to target type " + type
+                      );
+                    }
+                  }
                 }
               });
+
+              const baseIdToUse = uuid.v4().replace(/-/g, "");
+              const uuidToUse = baseIdToUse + "@" + this.appConfig.mailDomain;
+              const idToUse = uuidv5(uuidToUse, MAIL_NAMESPACE).replace(/-/g, "") + "+" + arg.requestedUpdateCreatedBy;
+
+              arg.setForId(idToUse);
+
+              return {
+                ...arg.requestedUpdate,
+                uuid: uuidToUse,
+              };
             }
 
             // these triggers are all when an user manually created these
             // and not when it was manually attached, say by external
-            let renderedMessage: string = null;
             if (arg.action === IOTriggerActions.CREATED) {
               // in this case an user has created a brand new message inside
               // the mail component that is used for storage, and we shall now
               // send them to external sources or copy them to the given targets
               const sender = arg.requestedUpdateCreatedBy;
               const targets = arg.requestedUpdate.target as Array<string>;
+              const externalTargets: string[] = [];
+
+              let replyOf = (arg.requestedUpdateParent.id && await arg.appData.cache.requestValue(
+                this.storageIdef,
+                arg.requestedUpdateParent.id,
+                arg.requestedUpdateParent.version,
+                {
+                  useMemoryCache: true,
+                }
+              )) || null;
+
+              // the reply is not the tip anymore for this tree
+              if (replyOf) {
+                // this reply is
+                replyOf = await arg.appData.cache.requestUpdateSimple(
+                  this.storageIdef,
+                  replyOf.sender_mail_id,
+                  null,
+                  {
+                    tip: false,
+                  },
+                  "en",
+                  "simple",
+                  replyOf,
+                );
+              }
 
               if (targets && Array.isArray(targets) && targets.length) {
                 const senderObj = await arg.appData.cache.requestValue("users/user", sender, null, { useMemoryCache: true });
 
                 await Promise.all(targets.map(async (t, index) => {
                   const tSplitted = t.split("@");
-                  const targetIsPotentiallyExternal = !!tSplitted[1];
-                  const targetPotentialExtenalDomain = targetIsPotentiallyExternal && tSplitted[1].trim();
 
-                  let internalTargetUser: ISQLTableRowValue = null;
-                  const isInternalButUsesEmail = targetPotentialExtenalDomain === this.appConfig.mailDomain;
-                  const isInternalWithId = tSplitted.length === 1;
-                  const isInternal = isInternalButUsesEmail || isInternalWithId;
+                  let internalTarget: ISQLTableRowValue = null;
+                  const isInternal = tSplitted.length === 1;
 
                   const makesNoSense = tSplitted.length > 2;
                   const isRepeat = targets.indexOf(t) !== index;
@@ -1160,25 +1811,31 @@ export default class MailProvider<T> extends ServiceProvider<T> {
                     return;
                   }
 
-                  if (isInternalButUsesEmail) {
-                    const users = await arg.appData.rawDB.performRawDBSelect(
-                      "users/user",
-                      (b) => {
-                        b.selectAll().whereBuilder.andWhereColumn("username", tSplitted[0].trim());
-                        b.limit(1);
-                      }
-                    );
-                    internalTargetUser = users[0] || null;
-                  } else if (isInternalWithId) {
-                    internalTargetUser = await arg.appData.cache.requestValue("users/user", t, null, { useMemoryCache: true });
+                  let internalId: string;
+                  let internalType: string;
+                  let internalIdef: ItemDefinition;
+
+                  if (isInternal) {
+                    const typeSplitted = t.split("$");
+                    internalId = typeSplitted[0];
+                    internalType = typeSplitted[1] || "MOD_users__IDEF_user";
+
+                    if (internalId === UNSPECIFIED_OWNER && internalType === "MOD_users__IDEF_user") {
+                      return;
+                    }
+
+                    internalIdef = arg.appData.registry[internalType] as ItemDefinition;
+                    internalTarget = await arg.appData.cache.requestValue(internalType, internalId, null, { useMemoryCache: true });
                   }
 
-                  // sending to a non-existant user, let's cancel right away
-                  if (isInternal && !internalTargetUser) {
+                  // sending to a non-existant user or object, let's cancel right away
+                  if (isInternal && !internalTarget) {
                     return;
                   }
 
-                  const allowsSend = await this.allowUserToSendEmail(senderObj, isInternal ? internalTargetUser : t);
+                  const allowsSend = !internalIdef || internalIdef.getQualifiedPathName() === "MOD_users__IDEF_user" ?
+                    await this.allowUserToSendEmail(senderObj, isInternal ? internalTarget : t) :
+                    await this.allowUserToSendEmailToItem(senderObj, internalTarget, internalIdef);
 
                   if (allowsSend === "REJECT") {
                     return;
@@ -1187,45 +1844,121 @@ export default class MailProvider<T> extends ServiceProvider<T> {
                   const isSpam = allowsSend === "SPAM";
 
                   if (isInternal) {
-                    // let's make a copy of our current message and send it to the relevant
-                    // user, this should pop up straight away
-                    const sentEmail = await arg.appData.cache.requestCopy(
-                      this.storageIdef,
-                      arg.id,
-                      arg.version,
-                      arg.id + "_" + (arg.version || "") + "_" + index,
-                      null,
-                      null,
-                      internalTargetUser.id,
-                      null,
-                      {
-                        spam: isSpam,
-                        read: false,
-                        is_sender: false,
-                        is_receiver: true,
-                      },
-                      arg.newValueSQL,
+                    const resolvedUsers = internalIdef.getQualifiedPathName() === "MOD_users__IDEF_user" ? (
+                      [internalTarget]
+                    ) : (
+                      await this.resolveUsersForEmailToItem(senderObj, internalTarget, internalIdef)
                     );
 
-                    await this.onUserReceivedInternalEmail(
-                      internalTargetUser,
-                      senderObj,
-                      sentEmail,
-                      isSpam,
-                    );
+                    await Promise.all(resolvedUsers.map(async (targetUser) => {
+                      // sending a message to oneself, not allowed
+                      // instead because the user will be marked as sender
+                      // and receiver it will automatically be saved in the inbox
+                      if (targetUser.id === senderObj.id) {
+                        // in the case of objects, oneself will simply not resolve
+                        // it could be possible here to mark the message as inbox too
+                        return;
+                      }
+
+                      // let's make a copy of our current message and send it to the relevant
+                      // user, this should pop up straight away
+                      const userContainerId = getContainerIdFromMappers(
+                        this.appConfig,
+                        targetUser.app_country,
+                      );
+
+                      // so the user replied to some specific message
+                      // that such user has in memory, but each user has their
+                      // own ids for their own message that is a copy
+                      let replyBasedParent: any = null;
+                      // so if we set a reply of something we got to check that such message
+                      // we are replying to was actually sent by that user we are targeting
+                      if (replyOf) {
+                        const idOfReplyForThatUser = replyOf.id.split("+")[0] + "+" + targetUser.id;
+                        // we need to check for the existance of the message in the inbox
+                        // of the user in question
+                        const replyOfForThatUser = await arg.appData.cache.requestValue(
+                          this.storageIdef,
+                          idOfReplyForThatUser,
+                          null,
+                        );
+
+                        if (!replyOfForThatUser) {
+                          // user does not have that message that is being replied for
+                          // they should all be forwarded
+                          await this.forwardMessages(
+                            replyOf,
+                            targetUser,
+                            userContainerId,
+                            isSpam,
+                            arg.appData.cache,
+                          );
+                        } else {
+                          // the old reply is not the tip of the conversation anymore
+                          await arg.appData.cache.requestUpdateSimple(
+                            this.storageIdef,
+                            idOfReplyForThatUser,
+                            null,
+                            {
+                              tip: false,
+                            },
+                            "en",
+                            "simple",
+                            replyOfForThatUser,
+                          );
+                          replyBasedParent = {
+                            id: replyOfForThatUser.id,
+                            version: null,
+                            type: this.storageIdef.getQualifiedPathName(),
+                          };
+                        }
+                      }
+
+                      const sentEmail = await arg.appData.cache.requestCopy(
+                        this.storageIdef,
+                        arg.id,
+                        arg.version,
+                        arg.id.split("+")[0] + "+" + targetUser.id,
+                        null,
+                        userContainerId,
+                        targetUser.id,
+                        replyBasedParent,
+                        {
+                          spam: isSpam,
+                          read: false,
+                          is_sender: false,
+                          is_receiver: true,
+                        },
+                        arg.newValueSQL,
+                      );
+
+                      await this.onUserReceivedInternalEmail(
+                        targetUser,
+                        senderObj,
+                        sentEmail,
+                        internalIdef.getQualifiedPathName() === "MOD_users__IDEF_user" ? null : internalIdef,
+                        isSpam,
+                      );
+                    }));
                   } else {
-                    // we need to render the message as if it was a template and send it to the external source
-                    // let's avoid doing it twice
-                    renderedMessage = renderedMessage || this.renderMessageForMail(arg.newValueSQL);
-                    const senderInternalEmail = senderObj.username + "@" + this.appConfig.mailDomain;
-                    await this.sendEmail({
-                      from: this.escapeUserName(this.getSenderUsername(senderObj)) + " <" + senderInternalEmail + ">",
-                      to: t,
-                      subject: arg.newValueSQL.subject,
-                      html: renderedMessage,
-                    });
+                    externalTargets.push(t);
                   }
                 }));
+
+                if (externalTargets.length) {
+                  // we need to render the message as if it was a template and send it to the external source
+                  // let's avoid doing it twice
+                  const renderedMessage = this.renderMessageForMail(arg.newValueSQL);
+                  const senderInternalEmail = senderObj.username + "@" + this.appConfig.mailDomain;
+                  await this.sendEmail({
+                    from: this.escapeUserName(this.getSenderUsername(senderObj)) + " <" + senderInternalEmail + ">",
+                    to: externalTargets,
+                    subject: arg.newValueSQL.subject,
+                    html: renderedMessage.html,
+                    attachments: renderedMessage.attachments,
+                    replyOf: replyOf,
+                  });
+                }
               }
             }
 

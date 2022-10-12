@@ -50,7 +50,7 @@ const typeValue: IPropertyDefinitionSupportedType<PropertyDefinitionSupportedTag
   elastic: getStandardElasticForWithNullField && getStandardElasticForWithNullField("keyword"),
   sqlSelect: standardSQLSelect,
   sqlIn: taglistSQLIn,
-  sqlOut: standardSQLOutFn.bind(null, []),
+  sqlOut: standardSQLOutFn && standardSQLOutFn.bind(null, []),
   sqlElasticIn: standardSQLElasticInFn,
   sqlSearch: taglistSQLSearch,
   elasticSearch: tagListElasticSearch,

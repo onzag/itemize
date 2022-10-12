@@ -416,7 +416,7 @@ export default class PropertyEntryFile
       i18nInvalidReason = i18nData.error[invalidReason];
     }
 
-    const imageSizes = isSupportedImage ? imageSizeRetriever(currentValue, this.props.property) : null;
+    const imageSizes = isSupportedImage ? imageSizeRetriever(currentValue) : null;
     const imageSrcSet = isSupportedImage ? imageSrcSetRetriever(currentValue, this.props.property, imageSizes) : null;
 
     const isExpectingImages = !!this.props.property.getSpecialProperty("imageUploader");

@@ -321,7 +321,7 @@ export class Avatar extends React.PureComponent<IAvatarProps> {
 
     // and now we get the image sources from the image size retriever, only the standard
     // sources as we pass no property definition to it
-    const imageSources = imageSizeRetriever(this.props.profilePictureValue, null);
+    const imageSources = imageSizeRetriever(this.props.profilePictureValue);
 
     // so which source to use depends, for size large the large image, otherwise the small
     // yes even for medium

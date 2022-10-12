@@ -60,7 +60,22 @@ export interface ISubmitActionerInfoArgType {
  * but the children itself
  */
 interface ISubmitActionerProps {
-  children: (arg: ISubmitActionerInfoArgType) => React.ReactNode;
+  /**
+   * function to execute once when the execution reason
+   * is true, if no execution reason is specified, it executes
+   * immediately
+   * 
+   * check executeIf in order to setup conditional execution
+   */
+  execute?: (arg: ISubmitActionerInfoArgType) => void;
+  /**
+   * A boolean to specify whether it would execute, it will execute
+   * if it is set to true
+   * 
+   * if the value is undefined the execution will trigger
+   */
+  executeIf?: boolean;
+  children?: (arg: ISubmitActionerInfoArgType) => React.ReactNode;
 }
 
 /**
@@ -76,14 +91,28 @@ interface IActualSubmitActionerProps extends ISubmitActionerProps {
  * able to perform conditional rendering and avoid useless updates
  */
 class ActualSubmitActioner extends React.Component<IActualSubmitActionerProps> {
+  private hasExecuted: boolean = false;
+  public componentDidMount() {
+    if (this.props.execute && (typeof this.props.executeIf === "undefined" || this.props.executeIf)) {
+      this.props.execute(this.getArg());
+      this.hasExecuted = true;
+    }
+  }
+  public componentDidUpdate(): void {
+    if (!this.hasExecuted && this.props.execute && (typeof this.props.executeIf === "undefined" || this.props.executeIf)) {
+      this.props.execute(this.getArg());
+      this.hasExecuted = true;
+    }
+  }
   public shouldComponentUpdate(nextProps: IActualSubmitActionerProps) {
     return nextProps.children !== this.props.children ||
+      nextProps.executeIf !== this.props.executeIf ||
       nextProps.itemContext.submitError !== this.props.itemContext.submitError ||
       nextProps.itemContext.submitting !== this.props.itemContext.submitting ||
       nextProps.itemContext.submitted !== this.props.itemContext.submitted;
   }
-  public render() {
-    return this.props.children({
+  public getArg() {
+    return ({
       submitError: this.props.itemContext.submitError,
       submitting: this.props.itemContext.submitting,
       submitted: this.props.itemContext.submitted,
@@ -92,6 +121,9 @@ class ActualSubmitActioner extends React.Component<IActualSubmitActionerProps> {
       dismissSubmitted: this.props.itemContext.dismissSubmitted,
       clean: this.props.itemContext.clean,
     });
+  }
+  public render() {
+    return this.props.children ? this.props.children(this.getArg()) : null;
   }
 }
 

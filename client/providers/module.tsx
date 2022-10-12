@@ -15,14 +15,14 @@ export const ModuleContext = React.createContext<IModuleContextType>(null);
 
 interface IModuleProviderProps {
   children: any;
-  module: string;
+  module: string | Module;
   doNotRestoreItemContext?: boolean;
 }
 
 interface IActualModuleProviderProps {
   children: any;
   root: Root;
-  mod: string;
+  mod: string | Module;
   remoteListener: RemoteListener;
 }
 
@@ -40,7 +40,9 @@ class ActualModuleProvider extends React.Component<IActualModuleProviderProps, {
   public mountOrUpdateModuleForTesting() {
     if (process.env.NODE_ENV === "development") {
       const current = window.TESTING.mountedModules.find(m => m.instanceUUID === this.internalUUID);
-      const id = this.props.root.getModuleFor(this.props.mod.split("/")).getQualifiedPathName();
+      const id = typeof this.props.mod === "string" ?
+        this.props.root.registry[this.props.mod].getQualifiedPathName() :
+        this.props.mod.getQualifiedPathName();
       if (current) {
         current.module = id;
         current.updateTime = (new Date()).toISOString();
@@ -78,10 +80,14 @@ class ActualModuleProvider extends React.Component<IActualModuleProviderProps, {
     }
   }
   public render() {
+    const mod = typeof this.props.mod === "string" ? this.props.root.registry[this.props.mod] as Module : this.props.mod;
+    if (!(mod instanceof Module)) {
+      throw new Error("Could not find module " + this.props.mod);
+    }
     return (
       <ModuleContext.Provider
         value={{
-          mod: this.props.root.getModuleFor(this.props.mod.split("/")),
+          mod: mod,
           remoteListener: this.props.remoteListener,
         }}
       >

@@ -61,7 +61,7 @@ const typeValue: IPropertyDefinitionSupportedType<PropertyDefinitionSupportedFil
   elastic: getStandardElasticFor && getStandardElasticFor("keyword", "null", null, true),
   sqlSelect: standardSQLSelect,
   sqlIn: stardardSQLInWithJSONStringifyFn,
-  sqlOut: standardSQLOutWithJSONParseFn.bind(null, fakefile),
+  sqlOut: standardSQLOutWithJSONParseFn && standardSQLOutWithJSONParseFn.bind(null, fakefile),
   sqlElasticIn: standardSQLElasticInFn,
   sqlSearch: () => {
     throw new Error("Attempted to search within a file");

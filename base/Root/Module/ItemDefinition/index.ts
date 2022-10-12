@@ -1202,7 +1202,7 @@ export default class ItemDefinition {
       // This is a case where a collision might exist and the local takes priority
       // it is rare that this would run anyway
       return this.parentModule.getAllPropExtensions()
-        .filter((p) => p.getId() !== "search" && p.getId() !== "created_by" && p.getId() !== "since")
+        .filter((p) => p.getId() !== "search" && p.getId() !== "created_by" && p.getId() !== "since" && p.getId() !== "until")
         .concat(this.getAllPropertyDefinitions());
     }
     return this.parentModule.getAllPropExtensions().concat(this.getAllPropertyDefinitions());

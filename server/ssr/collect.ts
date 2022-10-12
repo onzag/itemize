@@ -24,6 +24,8 @@ import { searchItemDefinition, searchModule } from "../resolvers/actions/search"
 import { EndpointError } from "../../base/errors";
 import { deepMerge } from "../../gql-util";
 
+function noop() {};
+
 const fsAsync = fs.promises;
 
 interface IBaseCollectionResult {
@@ -441,6 +443,7 @@ export class Collector {
         itemDefinition: idef,
         createdBy: args.createdBy || null,
         since: args.since || null,
+        until: args.until || null,
         orderBy: args.orderBy || {
           created_at: {
             priority: 0,
@@ -782,6 +785,8 @@ export class Collector {
               forbiddenSignatureReason = "[FORBIDDEN_BY_MOD_TRIGGER]";
             },
             customId: null,
+            setForId: noop,
+            setVersion: noop,
           });
         }
 
@@ -817,6 +822,8 @@ export class Collector {
               forbiddenSignatureReason = "[FORBIDDEN_BY_IDEF_TRIGGER]";
             },
             customId: null,
+            setForId: noop,
+            setVersion: noop,
           });
         }
       }

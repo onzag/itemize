@@ -89,6 +89,14 @@ export function buildSearchModeItemDefinition(
       hidden: true,
       searchable: false,
     });
+    newItemDef.properties.push({
+      id: "until",
+      type: "datetime",
+      nullable: true,
+      i18nData: null,
+      hidden: true,
+      searchable: false,
+    });
 
     // now we go over the includes, aka the items
     newItemDef.includes = newItemDef.includes && newItemDef.includes.map((i) => {

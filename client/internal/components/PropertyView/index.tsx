@@ -21,6 +21,7 @@ import ItemDefinition from "../../../../base/Root/Module/ItemDefinition";
 import Include from "../../../../base/Root/Module/ItemDefinition/Include";
 import PropertyViewText from "./PropertyViewText";
 import PropertyViewFile from "./PropertyViewFile";
+import PropertyViewFiles from "./PropertyViewFiles";
 import { IConfigRawJSONDataType } from "../../../../config";
 import { ConfigContext } from "../../providers/config-provider";
 import { PropertyViewBoolean } from "./PropertyViewBoolean";
@@ -350,9 +351,13 @@ const handlerRegistry:
     handler: PropertyViewFile,
     includeConfig: true,
   },
+  files: {
+    renderer: "PropertyViewFiles",
+    handler: PropertyViewFiles,
+    includeConfig: true,
+  },
 
   // TODO
-  files: null,
   unit: null,
   payment: null,
   taglist: null,
@@ -438,6 +443,11 @@ export default function PropertyView(
 
   // First get the handler by the type
   let registryEntry: IRendererWholeHandlerType = handlerRegistry[type];
+
+  if (!registryEntry) {
+    throw new Error("View cannot handle type " + type + " as there is no viewer asigned to it");
+  }
+
   if (subtype === null && registryEntry.defaultSubhandler) {
     registryEntry = registryEntry.defaultSubhandler;
   } else if (subtype && registryEntry.subhandler && registryEntry.subhandler[subtype]) {

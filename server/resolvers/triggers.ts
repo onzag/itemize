@@ -131,6 +131,14 @@ export interface IOTriggerArgType {
    * Causes the request to be forbidden
    */
   forbid: (message: string, customCode?: string) => void;
+  /**
+   * Changes the id that will be used in a CREATE event
+   */
+  setForId: (id: string) => void;
+  /**
+   * Changes the version that will be used in a CREATE event
+   */
+  setVersion: (version: string) => void;
 }
 
 export interface ISearchTriggerArgType {

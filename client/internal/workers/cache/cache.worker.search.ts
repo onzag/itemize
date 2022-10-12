@@ -71,11 +71,11 @@ export async function search(
   returnSourceResults: boolean,
 ): Promise<
   {
-    filteredRecords: IGQLSearchRecord[],
-    sourceResults: ICacheMatchType[],
+    filteredRecords: IGQLSearchRecord[];
+    sourceResults: ICacheMatchType[];
+    count: number;
   }
 > {
-
   let sourceResults: ICacheMatchType[] = returnSourceResults ? [] : null;
 
   // so now we get the new records with a promise where we read a bunch of stuff
@@ -194,10 +194,22 @@ export async function search(
     });
   });
 
+  let filteredRecords = newSearchRecords.map((r) => r.searchRecord);
+  const count = filteredRecords.length;
+
+  if (searchArgs.offset !== 0 || filteredRecords.length > searchArgs.limit) {
+    // apply limit and offset
+    filteredRecords = filteredRecords.slice(
+      searchArgs.offset as number || 0,
+      (searchArgs.offset as number || 0) + (searchArgs.limit as number || 0)
+    );
+  }
+
   // and now we can send only the 
   return {
-    filteredRecords: newSearchRecords.map((r) => r.searchRecord),
+    filteredRecords,
     sourceResults,
+    count,
   };
 }
 

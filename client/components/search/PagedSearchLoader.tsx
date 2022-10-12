@@ -53,6 +53,23 @@ interface IPagedSearchLoaderProps {
    * And a children that will use the arg for conditional rendering of the pagination element
    */
   children: (arg: IPagedSearchLoaderArg) => React.ReactNode;
+  /**
+   * Whether to disable the external checks for the item definition
+   * results provider props
+   */
+  disableExternalChecks?: boolean;
+  /**
+   * The static state for the children item definition, TOTAL for
+   * basically not even asking for feedback (useful when the search was traditional)
+   * or NO_LISTENING for just not getting updates but asking for feedback
+   * 
+   * by default searches do not listen and use total as they act like static
+   * results
+   * 
+   * Note that if the search was done using a listen policy the item will update anyway
+   * this is why total is the better option
+   */
+  static?: "TOTAL" | "NO_LISTENING";
 }
 
 interface IPagedSearchLoaderState {
@@ -132,6 +149,8 @@ export class PagedSearchLoader extends React.Component<IPagedSearchLoaderProps, 
         currentPage={actualP}
         cleanOnDismount={this.props.cleanOnDismount}
         onSearchDataChange={this.onSearchDataChange.bind(null, actualP, setState)}
+        static={this.props.static}
+        disableExternalChecks={this.props.disableExternalChecks}
       >
         {(arg) => {
           return this.props.children({

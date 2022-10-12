@@ -1928,17 +1928,6 @@ export class MaterialUISlateWrapper extends React.PureComponent<IMaterialUISlate
         </>
       );
     }
-
-    // now we build the rich text editor itself
-    return (
-      <>
-        {toolbar}
-
-        {fileLoadErrorDialog}
-        {imageInput}
-        {fileInput}
-      </>
-    );
   }
 }
 

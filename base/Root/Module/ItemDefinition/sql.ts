@@ -694,11 +694,7 @@ export function buildElasticQueryForItemDefinition(
     });
   }
 
-  const orderByRule: any[] = [
-    {
-      _score: "desc",
-    }
-  ];
+  const orderByRule: any[] = [];
   if (orderBy) {
     const orderBySorted = Object.keys(orderBy).map((orderByProperty: string) => {
       return {
@@ -744,6 +740,9 @@ export function buildElasticQueryForItemDefinition(
       }
     });
   }
+  orderByRule.push({
+    _score: "desc",
+  });
 
   elasticQueryBuilder.sortBy(orderByRule);
 

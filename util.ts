@@ -20,6 +20,7 @@ import convert from "convert-units";
 import { countries, currencies } from "./imported-resources";
 import type { IAppDataType } from "./server";
 import prettyBytes from "pretty-bytes";
+import type { IConfigRawJSONDataType } from "./config";
 
 export const Moment = MomentDef;
 export const JSDOM = JSDOMDef;
@@ -755,6 +756,26 @@ export function createRealFileValue(
   }
 
   return value;
+}
+
+/**
+ * Provides the container id for a given matching region
+ * @param config 
+ * @param country 
+ * @returns 
+ */
+export function getContainerIdFromMappers(config: IConfigRawJSONDataType, country: string) {
+  let containerId: string
+  Object.keys(config.containersRegionMappers).forEach((mapper) => {
+    if (mapper.split(";").includes(country)) {
+      containerId = config.containersRegionMappers[mapper];
+    }
+  });
+  if (!containerId) {
+    containerId = config.containersRegionMappers["*"];
+  }
+
+  return containerId;
 }
 
 

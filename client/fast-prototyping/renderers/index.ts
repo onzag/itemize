@@ -15,6 +15,7 @@ import PropertyEntrySelectRenderer from "./PropertyEntry/PropertyEntrySelect";
 import PropertyEntryTextRenderer from "./PropertyEntry/PropertyEntryText";
 import PropertyEntryDateTimeRenderer from "./PropertyEntry/PropertyEntryDateTime";
 import PropertyEntryPaymentRenderer from "./PropertyEntry/PropertyEntryPayment";
+import PropertyEntryTagListRenderer from "./PropertyEntry/PropertyEntryTagList";
 
 import PropertyViewBooleanRenderer from "./PropertyView/PropertyViewBoolean";
 import PropertyViewSimpleRenderer from "./PropertyView/PropertyViewSimple";
@@ -24,6 +25,7 @@ import PropertyViewDateTimeRenderer from "./PropertyView/PropertyViewDateTime";
 import PropertyViewLocationRenderer from "./PropertyView/PropertyViewLocation";
 import PropertyViewCurrencyRenderer from "./PropertyView/PropertyViewCurrency";
 import PropertyEntryReferenceRenderer from "./PropertyEntry/PropertyEntryReference";
+import PropertyViewFilesRenderer from "./PropertyView/PropertyViewFiles";
 
 export const rendererContext: IRendererContext = {
   PropertyEntryField: PropertyEntryFieldRenderer,
@@ -36,12 +38,14 @@ export const rendererContext: IRendererContext = {
   PropertyEntryText: PropertyEntryTextRenderer,
   PropertyEntryDateTime: PropertyEntryDateTimeRenderer,
   PropertyEntryPayment: PropertyEntryPaymentRenderer,
+  PropertyEntryTagList: PropertyEntryTagListRenderer,
 
   PropertyViewBoolean: PropertyViewBooleanRenderer,
   PropertyViewSimple: PropertyViewSimpleRenderer,
   PropertyViewText: PropertyViewTextRenderer,
   PropertyViewDateTime: PropertyViewDateTimeRenderer,
   PropertyViewFile: PropertyViewFileRenderer,
+  PropertyViewFiles: PropertyViewFilesRenderer,
   PropertyViewLocation: PropertyViewLocationRenderer,
   PropertyViewCurrency: PropertyViewCurrencyRenderer,
 }

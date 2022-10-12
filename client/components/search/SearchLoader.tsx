@@ -123,6 +123,14 @@ export interface ISearchLoaderArg {
    */
   hasPrevPage: boolean;
   /**
+   * the limit used during the search action
+   */
+  limit: number;
+  /**
+   * The offset used during the search action
+   */
+  offset: number;
+  /**
    * An error that occured during the get list execution to fetch
    * the search results of a given page
    */
@@ -574,8 +582,6 @@ class ActualSearchLoader extends React.Component<IActualSearchLoaderProps, IActu
 
     // and now we need to request
     const uncachedResults: IGQLSearchRecord[] = [];
-    const uncachedResultsToIndex: number[] = [];
-
     const newSearchResultsFromTheRecords = [...currentSearchResultsFromTheRecords];
 
     // first we try to request our indexeddb worker cache and memory cache, one by one
@@ -597,7 +603,6 @@ class ActualSearchLoader extends React.Component<IActualSearchLoaderProps, IActu
       // also if we need to produce new results for uncached we can't use cache
       if (willProduceNewHighlights || !CacheWorkerInstance.isSupported) {
         uncachedResults.push(searchRecord);
-        uncachedResultsToIndex.push(index);
         return null;
       } else {
         // otherwise let's try to get it
@@ -617,7 +622,6 @@ class ActualSearchLoader extends React.Component<IActualSearchLoaderProps, IActu
         if (!cachedResult || cachedResult.value.last_modified !== searchRecord.last_modified) {
           // then it's uncached
           uncachedResults.push(searchRecord);
-          uncachedResultsToIndex.push(index);
           return null;
         }
 
@@ -784,19 +788,21 @@ class ActualSearchLoader extends React.Component<IActualSearchLoaderProps, IActu
         }
 
         // and we loop into them
-        (gqlValue.data[getListQueryName].results as IGQLValue[]).forEach((value, index) => {
-          // get these basic details for each one of these results
-          const forId = uncachedResults[index].id;
-          const forVersion = uncachedResults[index].version;
-          const forType = uncachedResults[index].type;
+        (gqlValue.data[getListQueryName].results as IGQLValue[]).forEach((value) => {
+          const indexOfSearchResultInUncached = uncachedResults.findIndex((v) => value.id === v.id);
 
-          loadedNewSearchResultsFromTheRecords[uncachedResultsToIndex[index]] = value;
+          // somehow received a record that wasn't asked for
+          if (indexOfSearchResultInUncached === -1) {
+            return;
+          }
+
+          loadedNewSearchResultsFromTheRecords[indexOfSearchResultInUncached] = value;
 
           finalState.currentSearchResultsFromTheRecords = loadedNewSearchResultsFromTheRecords;
 
           // and now the item definition that we are referring to from the registry
           const itemDefintionInQuestion = this.props.itemDefinitionInstance.getParentModule()
-            .getParentRoot().registry[forType] as ItemDefinition;
+            .getParentRoot().registry[value.type as string] as ItemDefinition;
 
           // the value that we are applying (which can be null) we make a copy of it
           let valueToApply = value ? {
@@ -806,8 +812,8 @@ class ActualSearchLoader extends React.Component<IActualSearchLoaderProps, IActu
           // if there's no value
           if (!valueToApply) {
             // we clean the thing and trigger the listeners
-            itemDefintionInQuestion.cleanValueFor(forId, forVersion);
-            itemDefintionInQuestion.triggerListeners("load", forId, forVersion);
+            itemDefintionInQuestion.cleanValueFor(valueToApply.id as string, valueToApply.version as string || null);
+            itemDefintionInQuestion.triggerListeners("load", valueToApply.id as string, valueToApply.version as string || null);
           } else {
             // otherwise we will see, first the search fields we used
             let mergedQueryFields = this.props.searchFields;
@@ -844,7 +850,7 @@ class ActualSearchLoader extends React.Component<IActualSearchLoaderProps, IActu
             );
 
             // and trigger the listeners for change
-            itemDefintionInQuestion.triggerListeners("load", forId, forVersion);
+            itemDefintionInQuestion.triggerListeners("load", valueToApply.id as string, valueToApply.version as string || null);
           }
         });
 
@@ -934,7 +940,13 @@ class ActualSearchLoader extends React.Component<IActualSearchLoaderProps, IActu
                   properties: this.props.searchRequestedProperties,
                   includes: this.props.searchRequestedIncludes,
                   includePolicies: this.props.includePolicies,
-                  cleanOnDismount: this.props.cleanOnDismount,
+                  // let the function for ensure cleanup to take care of
+                  // cleaning the records, cleaning here caused an error
+                  // where after these unmounted we couldn't re-render
+                  // them even if we were paginating, so the search loader
+                  // should be the one in charge of cleaning, not the item
+                  // itself
+                  // cleanOnDismount: this.props.cleanOnDismount,
                   static: this.props.static || "TOTAL",
                   longTermCaching: this.props.searchShouldCache,
                   disableExternalChecks: this.props.disableExternalChecks,
@@ -959,6 +971,8 @@ class ActualSearchLoader extends React.Component<IActualSearchLoaderProps, IActu
             searchId: this.props.searchId,
             isLoadingSearchResults: this.state.currentlySearching.length !== 0,
             searching: this.props.searching,
+            limit: this.props.searchLimit,
+            offset: this.props.searchOffset,
           })
         }
       </SearchItemValueContext.Provider>

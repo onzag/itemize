@@ -92,11 +92,6 @@ export interface ISearchMatchType {
    */
   lastModified: string;
   /**
-   * The limit we limited ourselves to, the list can however
-   * be larger than the limit as it might grow by events
-   */
-  limit: number;
-  /**
    * the count that is set by the server when it retrieved
    * it's tried to be kept in sync
    */
@@ -1051,6 +1046,7 @@ export default class CacheWorker {
     getListRequestedFields: IGQLRequestFields,
     cachePolicy: "by-owner" | "by-parent" | "by-owner-and-parent" | "by-property",
     trackedProperty: string,
+    maxLimit: number,
     maxGetListResultsAtOnce: number,
     returnSources: boolean,
     redoSearch: boolean,
@@ -1093,16 +1089,14 @@ export default class CacheWorker {
     // we were asked for
     let lastModified: string;
     let dataMightBeStale = false;
-    let limitToSetInDb: number;
 
     try {
       // now we request indexed db for a result
       const dbValue: ISearchMatchType = redoSearch ? null : await this.db.get(SEARCHES_TABLE_NAME, storeKeyName);
       // if the database is not offering anything or the limit is less than
       // it is supposed to be, this means that we have grown the cache size, but yet
-      // the cache remains constrained by the older size, this only truly matters if
-      // the new limit is larger than the old limit, otherwise it's fine
-      if (!dbValue || dbValue.limit < searchArgs.limit) {
+      // the cache remains constrained by the older size
+      if (!dbValue) {
         // we need to remove the specifics of the search
         // as we are caching everything to the given criteria
         // and then using client side to filter
@@ -1116,7 +1110,7 @@ export default class CacheWorker {
               priority: 0,
             },
           },
-          limit: searchArgs.limit,
+          limit: maxLimit,
           offset: 0,
         };
 
@@ -1147,6 +1141,7 @@ export default class CacheWorker {
               last_modified: {},
             },
             last_modified: {},
+            oldest_created_at: {},
             limit: {},
             offset: {},
             count: {},
@@ -1154,14 +1149,14 @@ export default class CacheWorker {
         });
 
         // so we get the server value
-        const serverValue = await gqlQuery(query);
+        const firstServerValue = await gqlQuery(query);
 
         // if we get an error from the server, return the
         // server value and let it be handled
-        if (serverValue.errors) {
+        if (firstServerValue.errors) {
           // return it
           return {
-            gqlValue: serverValue,
+            gqlValue: firstServerValue,
             dataMightBeStale: false,
             lastModified: null,
             sourceRecords: null,
@@ -1172,10 +1167,59 @@ export default class CacheWorker {
         // now these are the results that we need to process
         // from the search query, the IGQLSearchRecord that we
         // need to process
-        resultsToProcess = serverValue.data[searchQueryName].records as IGQLSearchRecord[];
-        lastModified = serverValue.data[searchQueryName].last_modified as string;
-        limitToSetInDb = searchArgs.limit as number;
-        resultsCount = serverValue.data[searchQueryName].count as number;
+        resultsToProcess = firstServerValue.data[searchQueryName].records as IGQLSearchRecord[];
+        lastModified = firstServerValue.data[searchQueryName].last_modified as string;
+        let lastModifiedNano = !lastModified ? null : new NanoSecondComposedDate(lastModified);
+        resultsCount = firstServerValue.data[searchQueryName].count as number;
+
+        let oldestCreatedAt = firstServerValue.data[searchQueryName].oldest_created_at as string;
+
+        // there are still more results to process and we need more batches
+        while (resultsCount > resultsToProcess.length) {
+          // now let's try to get these batches
+          actualArgsToUseInGQLSearch.until = oldestCreatedAt;
+          const query = buildGqlQuery({
+            name: searchQueryName,
+            args: actualArgsToUseInGQLSearch,
+            fields: {
+              records: {
+                id: {},
+                version: {},
+                type: {},
+                last_modified: {},
+              },
+              last_modified: {},
+              oldest_created_at: {},
+              limit: {},
+              offset: {},
+            },
+          });
+
+          const serverValueOfBatch = await gqlQuery(query);
+
+          if (serverValueOfBatch.errors) {
+            // return it
+            return {
+              gqlValue: serverValueOfBatch,
+              dataMightBeStale: false,
+              lastModified: null,
+              sourceRecords: null,
+              sourceResults: null,
+            };
+          }
+
+          const resultsToProcessOfBatch = firstServerValue.data[searchQueryName].records as IGQLSearchRecord[];
+          const lastModifiedOfBatch = firstServerValue.data[searchQueryName].last_modified as string;
+          const lastModifiedOfBatchNano = lastModifiedOfBatch ? new NanoSecondComposedDate(lastModifiedOfBatch) : null;
+
+          resultsToProcess = resultsToProcess.concat(resultsToProcessOfBatch);
+          if (lastModifiedOfBatchNano && (!lastModifiedNano || lastModifiedNano.lessThan(lastModifiedOfBatchNano))) {
+            lastModified = lastModifiedOfBatch;
+            lastModifiedNano = lastModifiedOfBatchNano;
+          }
+        }
+
+        // now we have loaded all the results that we were expecting and our data should not really be stale
       } else {
         // otherwise our results to process are the same ones we got
         // from the database, but do we need to process them for real?
@@ -1183,7 +1227,6 @@ export default class CacheWorker {
         resultsToProcess = dbValue.value;
         lastModified = dbValue.lastModified;
         dataMightBeStale = true;
-        limitToSetInDb = dbValue.limit;
         resultsCount = dbValue.count;
 
         // if the fields are contained within what the database has loaded
@@ -1208,13 +1251,9 @@ export default class CacheWorker {
                 [searchQueryName]: {
                   records,
                   last_modified: lastModified,
-                  // we return the true limit, because records might grow over the limit
-                  limit: (records.length < searchArgs.limit ? searchArgs.limit : records.length) as number,
-                  offset: 0,
-
-                  // this used to be the count given from the count event but this count is only regarding the count of
-                  // all the elements during the search, which may not be right during a filtering situation
-                  count: records.length,
+                  limit: searchArgs.limit as number,
+                  offset: searchArgs.offset as number,
+                  count: searchResponse.count,
                 },
               },
             };
@@ -1270,7 +1309,6 @@ export default class CacheWorker {
       fields: getListRequestedFields,
       allResultsPreloaded: false,
       lastModified,
-      limit: limitToSetInDb,
       count: resultsCount,
     }, storeKeyName);
 
@@ -1470,12 +1508,9 @@ export default class CacheWorker {
           [searchQueryName]: {
             last_modified: lastModified,
             records,
-            limit: (records.length < searchArgs.limit ? searchArgs.limit : records.length) as number,
-            offset: 0,
-
-            // this used to be the count given from the count event but this count is only regarding the count of
-            // all the elements during the search, which may not be right during a filtering situation
-            count: records.length,
+            limit: searchArgs.limit as number,
+            offset: searchArgs.offset as number,
+            count: searchResponse.count,
           },
         },
       };

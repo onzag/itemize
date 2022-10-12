@@ -32,6 +32,8 @@ import Root from "../../../base/Root";
 import { CustomRoleGranterEnvironment, CustomRoleManager } from "../roles";
 import { CAN_LOG_DEBUG } from "../../environment";
 
+function noop() { }
+
 export async function editItemDefinition(
   appData: IAppDataType,
   resolverArgs: IGraphQLIdefResolverArgs,
@@ -330,6 +332,8 @@ export async function editItemDefinition(
           },
           forbid: defaultTriggerForbiddenFunction,
           customId: null,
+          setForId: noop,
+          setVersion: noop,
         });
         // and if we have a new value
         if (newValueAccordingToModule) {
@@ -375,6 +379,8 @@ export async function editItemDefinition(
           },
           forbid: defaultTriggerForbiddenFunction,
           customId: null,
+          setForId: noop,
+          setVersion: noop,
         });
         // and make it the new value if such trigger was registered
         if (newValueAccordingToIdef) {
@@ -459,6 +465,8 @@ export async function editItemDefinition(
         },
         forbid: defaultTriggerInvalidForbiddenFunction,
         customId: null,
+        setForId: noop,
+        setVersion: noop,
       });
     }
     // same with the item definition
@@ -496,6 +504,8 @@ export async function editItemDefinition(
         },
         forbid: defaultTriggerInvalidForbiddenFunction,
         customId: null,
+        setForId: noop,
+        setVersion: noop,
       });
     }
 

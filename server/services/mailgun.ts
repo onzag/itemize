@@ -1,11 +1,16 @@
-import Mailgun from "mailgun-js";
 import MailProvider, { ISendEmailData } from "./base/MailProvider";
 import type { Router } from "express";
 import { ServiceProviderType } from ".";
 import { NODE_ENV, INSTANCE_MODE } from "../environment";
+import express from "express";
+import busboy from "busboy";
 
-export class MailgunService extends MailProvider<Mailgun.ConstructorParams> {
-  private mailgun: Mailgun.Mailgun;
+interface IMailgunConfig {
+  apiKey: string;
+  endpoint: string;
+}
+
+export class MailgunService extends MailProvider<IMailgunConfig> {
   private cantReceiveEmail: boolean = false;
 
   public static getType() {
@@ -13,144 +18,148 @@ export class MailgunService extends MailProvider<Mailgun.ConstructorParams> {
   }
 
   public async initialize(): Promise<void> {
-    this.mailgun = new Mailgun(this.config);
+    this.setMessageStorageItemDefinition(
+      this.isInstanceGlobal() ?
+      this.globalRoot.registry["mail/mail"] :
+      this.localAppData.registry["mail/mail"]
+    );
+    
+    // const allRoutes = await this.mailgun.get("/routes", {
+    //   skip: 0,
+    //   limit: 100,
+    // });
 
-    const allRoutes = await this.mailgun.get("/routes", {
-      skip: 0,
-      limit: 100,
-    });
+    // const hostname = NODE_ENV === "development" ?
+    //   this.appConfig.developmentHostname : this.appConfig.productionHostname;
 
-    const hostname = NODE_ENV === "development" ?
-      this.appConfig.developmentHostname : this.appConfig.productionHostname;
+    // const customID = "MAILGUN_ITEMIZE_TRIGGER_" + hostname;
 
-    const customID = "MAILGUN_ITEMIZE_TRIGGER_" + hostname;
+    // if (allRoutes && allRoutes.items) {
+    //   const ourRoute = allRoutes.items.find((r: any) => r.description === customID);
+    //   if (!ourRoute) {
+    //     await (new Promise<void>((resolve) => {
+    //       this.mailgun.post(
+    //         "/routes",
+    //         {
+    //           priority: 0,
+    //           description: customID,
+    //           expression: `match_recipient(".*@${this.appConfig.mailDomain}")`,
+    //           action: `store(notify=${JSON.stringify("https://" + hostname + "/rest/service/mailgun/callback")})` 
+    //         }, (error, body) => {
+    //           if (error) {
+    //             this.logError(
+    //               {
+    //                 className: "MailgunService",
+    //                 methodName: "initialize",
+    //                 message: "Could not add the mailgun callback; receiving emails is not possible",
+    //                 serious: true,
+    //                 data: {
+    //                   message: error.message,
+    //                   statusCode: error.statusCode,
+    //                 },
+    //               }
+    //             );
+    //             this.cantReceiveEmail = true;
+    //           } else {
+    //             // TODO
+    //           }
 
-    if (allRoutes && allRoutes.items) {
-      const ourRoute = allRoutes.items.find((r: any) => r.description === customID);
-      if (!ourRoute) {
-        await (new Promise<void>((resolve) => {
-          this.mailgun.post(
-            "/routes",
-            {
-              priority: 0,
-              description: customID,
-              expression: `match_recipient(".*@${this.appConfig.mailDomain}")`,
-              action: `store(notify=${JSON.stringify("https://" + hostname + "/rest/service/mailgun/callback")})`
-            }, (error, body) => {
-              if (error) {
-                this.logError(
-                  {
-                    className: "MailgunService",
-                    methodName: "initialize",
-                    message: "Could not add the mailgun callback; receiving emails is not possible",
-                    serious: true,
-                    data: {
-                      message: error.message,
-                      statusCode: error.statusCode,
-                    },
-                  }
-                );
-                this.cantReceiveEmail = true;
-              } else {
-                // TODO
-              }
-
-              resolve();
-            });
-        }));
-      }
-    }
+    //           resolve();
+    //         });
+    //     }));
+    //   }
+    // }
   }
 
   public async sendEmail(data: ISendEmailData) {
-    const isSingleEmail = typeof data.to === "string" || data.to.length === 1;
-    if (this.cantReceiveEmail && data.unsubscribeMailto && !isSingleEmail) {
-      // inefficient method of handling list unsubscribe, basically since
-      // it cannot handle the list since there's no webhook it will send
-      // the list unsubscribe url instead but in order to do that
-      // it can only use single emails as every email got to be different
-      // as the mailto protocol is not supposed and it got to send
-      // the special url
-      await Promise.all((data.to as string[]).map((email) => {
-        return this.sendEmail({
-          ...data,
-          to: email,
-        });
-      }));
-      return;
-    }
+    // const isSingleEmail = typeof data.to === "string" || data.to.length === 1;
+    // if (this.cantReceiveEmail && data.unsubscribeMailto && !isSingleEmail) {
+    //   // inefficient method of handling list unsubscribe, basically since
+    //   // it cannot handle the list since there's no webhook it will send
+    //   // the list unsubscribe url instead but in order to do that
+    //   // it can only use single emails as every email got to be different
+    //   // as the mailto protocol is not supposed and it got to send
+    //   // the special url
+    //   await Promise.all((data.to as string[]).map((email) => {
+    //     return this.sendEmail({
+    //       ...data,
+    //       to: email,
+    //     });
+    //   }));
+    //   return;
+    // }
 
-    // construct the mailgun payload
-    const dataToSend: Mailgun.messages.SendData = {
-      from: data.from,
-      to: data.to,
-      html: data.html,
-      text: data.text,
-      subject: data.subject,
-    };
+    // // construct the mailgun payload
+    // const dataToSend: Mailgun.messages.SendData = {
+    //   from: data.from,
+    //   to: data.to,
+    //   html: data.html,
+    //   text: data.text,
+    //   subject: data.subject,
+    // };
 
-    // setup the unsubscribe header if we have a mailto header
-    // that is the default
-    let unsubscribeHeader = data.unsubscribeMailto ? (
-      this.cantReceiveEmail ? "" : "<" + data.unsubscribeMailto + ">"
-    ) : null;
+    // // setup the unsubscribe header if we have a mailto header
+    // // that is the default
+    // let unsubscribeHeader = data.unsubscribeMailto ? (
+    //   this.cantReceiveEmail ? "" : "<" + data.unsubscribeMailto + ">"
+    // ) : null;
 
-    // if we have a single email, we can add the http protocol one
-    if (isSingleEmail && data.unsubscribeMailto) {
-      // for that we pick the email
-      const emailInQuestion = Array.isArray(data.to) ? data.to[0] : data.to;
-      // and try and find the given unsubscribe url
-      if (data.unsubscribeURLs[emailInQuestion]) {
-        // add a comma if necessary
-        if (unsubscribeHeader) {
-          unsubscribeHeader += ", ";
-        }
-        // and add the url
-        unsubscribeHeader += "<" + data.unsubscribeURLs[emailInQuestion].noRedirected + ">";
-      }
-    }
+    // // if we have a single email, we can add the http protocol one
+    // if (isSingleEmail && data.unsubscribeMailto) {
+    //   // for that we pick the email
+    //   const emailInQuestion = Array.isArray(data.to) ? data.to[0] : data.to;
+    //   // and try and find the given unsubscribe url
+    //   if (data.unsubscribeURLs[emailInQuestion]) {
+    //     // add a comma if necessary
+    //     if (unsubscribeHeader) {
+    //       unsubscribeHeader += ", ";
+    //     }
+    //     // and add the url
+    //     unsubscribeHeader += "<" + data.unsubscribeURLs[emailInQuestion].noRedirected + ">";
+    //   }
+    // }
 
-    // if we managed to build an unsubscribe header, then let's send it
-    if (unsubscribeHeader) {
-      dataToSend["h:List-Unsubscribe"] = unsubscribeHeader;
-    }
+    // // if we managed to build an unsubscribe header, then let's send it
+    // if (unsubscribeHeader) {
+    //   dataToSend["h:List-Unsubscribe"] = unsubscribeHeader;
+    // }
 
-    // and now we send it
-    await this.mailgun.messages().send(dataToSend);
+    // // and now we send it
+    // await this.mailgun.messages().send(dataToSend);
   }
 
-  public getRunCycleTime() {
-    if (
-      !this.cantReceiveEmail &&
-      NODE_ENV === "development" &&
-      INSTANCE_MODE === "ABSOLUTE"
-    ) {
-      // because we are most likely running for localhost
-      // as we are in a development environment we have no
-      // access to the webhook so we will fallback
-      // to polling, this method wouldn't be nice on
-      // a production environment with many extended
-      // instances
-      // we are going to run the checking function
-      // every 5 seconds
-      return 5000;
-    }
+  // public getRunCycleTime() {
+  //   if (
+  //     !this.cantReceiveEmail &&
+  //     NODE_ENV === "development" &&
+  //     INSTANCE_MODE === "ABSOLUTE"
+  //   ) {
+  //     // because we are most likely running for localhost
+  //     // as we are in a development environment we have no
+  //     // access to the webhook so we will fallback
+  //     // to polling, this method wouldn't be nice on
+  //     // a production environment with many extended
+  //     // instances
+  //     // we are going to run the checking function
+  //     // every 5 seconds
+  //     return 5000;
+  //   }
 
-    return null;
-  }
+  //   return null;
+  // }
 
-  public run() {
-    if (NODE_ENV === "development" && INSTANCE_MODE === "ABSOLUTE") {
-      this.checkForNewMail();
-    }
-  }
+  // public run() {
+  //   if (NODE_ENV === "development" && INSTANCE_MODE === "ABSOLUTE") {
+  //     this.checkForNewMail();
+  //   }
+  // }
 
-  public checkForNewMail() {
-    if (this.cantReceiveEmail) {
-      return;
-    }
-    // TODO
-  }
+  // public checkForNewMail() {
+  //   if (this.cantReceiveEmail) {
+  //     return;
+  //   }
+  //   // TODO
+  // }
 
   public async getRouter(): Promise<Router> {
     if (this.cantReceiveEmail) {
@@ -165,14 +174,45 @@ export class MailgunService extends MailProvider<Mailgun.ConstructorParams> {
       return;
     }
     const router = this.expressRouter();
+    router.use(express.urlencoded({
+      extended: true,
+    }));
     router.post(
       "/mailgun/callback",
       (req, res) => {
-        // TODO validate webhook, get the email
-        this.checkForNewMail();
+        if (req.body && req.body.token) {
+          console.log(req.body);
+        console.log(req.headers);
+        console.log(req.query);
+          res.status(200).end();
+        } else {
+          const bb = busboy({ headers: req.headers });
+          bb.on('file', (name, file, info) => {
+            const { filename, encoding, mimeType } = info;
+            console.log(
+              `File [${name}]: filename: %j, encoding: %j, mimeType: %j`,
+              filename,
+              encoding,
+              mimeType
+            );
+            file.on('data', (data) => {
+              console.log(`File [${name}] got ${data.length} bytes`);
+            }).on('close', () => {
+              console.log(`File [${name}] done`);
+            });
+          });
+          bb.on('field', (name, val, info) => {
+            console.log(`Field [${name}]: value: %j`, val);
+          });
+          bb.on('close', () => {
+            console.log('Done parsing form!');
+            res.status(200).end();
+          });
+          req.pipe(bb);
+        }
       }
     );
 
-    return null;
+    return router;
   }
 }

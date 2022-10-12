@@ -126,6 +126,7 @@ export function getPropertyListForSearchMode(properties: Array<string | IPropert
       propertyId === "search" ||
       propertyId === "created_by" ||
       propertyId === "since" ||
+      propertyId === "until" ||
       (!searchVariantSpecified && standardCounterpart.isPropertyInSearchModeOnly(propertyId))
     ) {
       result.push(propertyId);
@@ -1234,6 +1235,7 @@ interface ISearchQueryArg {
   orderBy: IOrderByRuleType;
   createdBy: string;
   since: string;
+  until: string;
   parentedBy: {
     itemDefinition: ItemDefinition,
     id: string,
@@ -1294,6 +1296,10 @@ export function getSearchArgsFor(
 
   if (arg.since) {
     searchArgs.since = arg.since;
+  }
+
+  if (arg.until) {
+    searchArgs.until = arg.until;
   }
 
   if (arg.types) {
@@ -1440,8 +1446,6 @@ export async function runSearchQueryFor(
   ) {
     if (arg.traditional) {
       throw new Error("Cache policy is set yet search mode is traditional");
-    } else if (arg.offset !== 0) {
-      throw new Error("Cache policy is set yet the offset is not 0");
     } else if ((arg.cachePolicy === "by-owner" || arg.cachePolicy === "by-owner-and-parent") && !arg.createdBy || arg.createdBy === UNSPECIFIED_OWNER) {
       throw new Error("Cache policy is by-owner yet there's no creator specified");
     } else if ((arg.cachePolicy === "by-parent" || arg.cachePolicy === "by-owner-and-parent") && (!arg.parentedBy || !arg.parentedBy.id)) {
@@ -1461,6 +1465,7 @@ export async function runSearchQueryFor(
       arg.fields,
       arg.cachePolicy,
       arg.trackedProperty,
+      standardCounterpartModule.getMaxSearchRecords(),
       standardCounterpartModule.getMaxSearchResults(),
       !!arg.cacheStoreMetadataMismatchAction,
       false,
@@ -1540,6 +1545,7 @@ export async function runSearchQueryFor(
           arg.fields,
           arg.cachePolicy,
           arg.trackedProperty,
+          standardCounterpartModule.getMaxSearchRecords(),
           standardCounterpartModule.getMaxSearchResults(),
           false,
           redoSearch,

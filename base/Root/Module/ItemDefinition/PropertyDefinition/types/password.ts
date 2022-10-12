@@ -27,7 +27,7 @@ const typeValue: IPropertyDefinitionSupportedType<PropertyDefinitionSupportedPas
   elastic: null,
   sqlSelect: standardSQLSelect,
   sqlIn: passwordSQLIn,
-  sqlOut: standardSQLOutFn.bind(null, null),
+  sqlOut: standardSQLOutFn && standardSQLOutFn.bind(null, null),
   sqlElasticIn: passwordSQLElasticIn,
   sqlSearch: passwordSQLSearch,
   // not supported, it must be performed against the database

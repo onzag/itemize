@@ -53,7 +53,7 @@ const typeValue: IPropertyDefinitionSupportedType<PropertyDefinitionSupportedYea
   elastic: getStandardElasticFor && getStandardElasticFor("short", -1),
   sqlSelect: standardSQLSelect,
   sqlIn: standardSQLInFn,
-  sqlOut: standardSQLOutFn.bind(null, 0),
+  sqlOut: standardSQLOutFn && standardSQLOutFn.bind(null, 0),
   sqlElasticIn: standardSQLElasticInFn,
   sqlSearch: standardSQLSearchFnExactAndRange,
   elasticSearch: standardElasticSearchFnExactAndRange && standardElasticSearchFnExactAndRange.bind(null, -1),

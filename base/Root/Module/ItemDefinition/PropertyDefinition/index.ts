@@ -881,7 +881,7 @@ export default class PropertyDefinition {
   private stateSuperEnforcedValue: {
     [slotId: string]: {
       value: PropertyDefinitionSupportedType,
-      owner: any,
+      owners: any[],
     },
   };
   /**
@@ -1528,22 +1528,33 @@ export default class PropertyDefinition {
     }
 
     const mergedID = id + "." + (version || "");
+    const actualOwner = owner || null;
 
     if (
       this.stateSuperEnforcedValue[mergedID]
     ) {
+      // setting super enforceds with the same value as one established
+      // it is okay and acceptable now
+      if (this.stateSuperEnforcedValue[mergedID].value === value) {
+        this.stateSuperEnforcedValue[mergedID].owners.push(actualOwner);
+        return;
+      }
+
+      // otherwise the value is not the same and we are overriding
+      // on top of another
       console.warn(
         "Setting super enforced value at " +
         JSON.stringify(value) +
         " on top of another " +
         JSON.stringify(this.stateSuperEnforcedValue[mergedID].value) +
-        " at " + this.getId() + " on slot " + mergedID);
+        " at " + this.getId() + " on slot " + mergedID
+      );
     }
 
     this.stateSuperEnforcedValue[mergedID] = {
       value,
-      owner,
-    };
+      owners: [actualOwner],
+    }
 
     // clean cached values
     const mergedIDWithoutExternal1 = mergedID + ".t";
@@ -1583,7 +1594,17 @@ export default class PropertyDefinition {
 
     // owner is specified and it's not equal so
     // it is not removed
-    if (owner && deletedValue.owner !== owner) {
+    const actualOwner = owner || null;
+    const ownerExistsInxex = deletedValue.owners.findIndex((o) => o === actualOwner);
+    if (ownerExistsInxex !== -1) {
+      deletedValue.owners.splice(ownerExistsInxex, 1);
+    } else {
+      return;
+    }
+
+    // it still has owners assigned to this
+    // super enforced value so we do not update
+    if (deletedValue.owners.length !== 0) {
       return;
     }
 

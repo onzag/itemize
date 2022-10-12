@@ -534,11 +534,7 @@ export function buildSQLQueryForModule(
     });
   }
 
-  const orderByRule: any[] = [
-    {
-      _score: "desc",
-    }
-  ];
+  const orderByRule: any[] = [];
   if (orderBy) {
     const orderBySorted = Object.keys(orderBy).map((orderByProperty: string) => {
       return {
@@ -584,6 +580,12 @@ export function buildSQLQueryForModule(
       }
     });
   }
+
+  orderByRule.push(
+    {
+      _score: "desc",
+    }
+  );
 
   elasticQueryBuilder.sortBy(orderByRule);
 

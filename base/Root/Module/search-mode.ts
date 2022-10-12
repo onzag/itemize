@@ -86,6 +86,14 @@ export function buildSearchModeModule(
       hidden: true,
       searchable: false,
     });
+    newModule.propExtensions.push({
+      id: "until",
+      type: "datetime",
+      nullable: true,
+      i18nData: null,
+      hidden: true,
+      searchable: false,
+    });
   }
 
   // if we have children in this module, which should be the case

@@ -299,6 +299,43 @@ function processOneFileAndItsSameIDReplacement(
     ...newVersionWithoutSrc,
     url: curatedFileName,
   };
+
+  // now we check if it's an image
+  const isImage = FILE_SUPPORTED_IMAGE_TYPES.includes(value.type);
+  // and we check if we are going to process such image
+  const needsImageProcessing = isImage && !value.type.startsWith("image/svg");
+
+  // let's check the image metadata
+  if (isImage && needsImageProcessing) {
+    const expectedMetadataDimensions = (
+      propertyDefinition.getSpecialProperty("dimensions") as string || ""
+    ).split(";").map((v) => v.split(" ")[0].trim()).join(",");
+
+    // no metadata... this isn't good
+    if (!value.metadata) {
+      // we cannot calculate width and height but at least
+      // we can add the missing dimensions that will be added and are missing
+      // so that source sets work, kinda
+      value.metadata = ";" + expectedMetadataDimensions + ";";
+    } else {
+      const metadataSplitted = value.metadata.split(";");
+      // the dimensions are stored in the 0 index
+      // the sizes are stored in the 1 index
+      // extra arbitrary info comes later
+      if (metadataSplitted[1] !== expectedMetadataDimensions) {
+        // repair metadata dimensions
+        // this can happen when for example the server
+        // and the client don't match, or when
+        // handling emails
+        metadataSplitted[0] = metadataSplitted[0] || "";
+        metadataSplitted[1] = expectedMetadataDimensions;
+        metadataSplitted[2] = metadataSplitted[2] || "";
+        // ensure they are not undefined just in case
+        value.metadata = metadataSplitted.join(";");
+      }
+    }
+  }
+
   const valueWithStream = {
     ...newVersion,
     url: curatedFileName,
@@ -337,7 +374,7 @@ function processOneFileAndItsSameIDReplacement(
         domain,
         valueWithStream,
         propertyDefinition,
-      )
+      );
     }
   }
 }
@@ -385,10 +422,19 @@ async function addFileFor(
   propertyDefinition: PropertyDefinition,
 ): Promise<void> {
   // first we get the createReadStream function from the source gql file
-  const { createReadStream } = await value.src;
+  let stream: ReadStream = null;
 
-  // we get it
-  const stream: ReadStream = createReadStream();
+  if (value.src instanceof Promise) {
+    const { createReadStream } = await value.src;
+    // we get it
+    stream = createReadStream();
+  } else if (value.src instanceof ReadStream) {
+    stream = value.src;
+  } else {
+    throw new Error(
+      "Passed a blob/buffer to the file source, the server side only supports streams for " + value.name,
+    );
+  }
   // now we check if it's an image
   const isImage = FILE_SUPPORTED_IMAGE_TYPES.includes(value.type);
   // and we check if we are going to process such image

@@ -1152,6 +1152,29 @@ export class Cache {
         lastModified: null,
       };
 
+      if (this.elastic) {
+        const language = itemDefinition.getSearchEngineMainLanguageFromRow(sqlValue);
+        try {
+          await this.elastic.createDocument(selfTable, language, sqlValue.id, sqlValue.version, sqlValue);
+        } catch (err) {
+          logger.error(
+            {
+              className: "Cache",
+              methodName: "requestCreation (detached)",
+              message: "Could not update value to elastic",
+              serious: true,
+              err,
+              data: {
+                selfTable,
+                moduleTable,
+                forId,
+                version,
+              },
+            }
+          );
+        }
+      }
+
       CAN_LOG_DEBUG && logger.debug(
         {
           className: "Cache",
@@ -1185,31 +1208,6 @@ export class Cache {
         "new",
       );
     })();
-
-    if (this.elastic) {
-      (async () => {
-        const language = itemDefinition.getSearchEngineMainLanguageFromRow(sqlValue);
-        try {
-          await this.elastic.createDocument(selfTable, language, sqlValue.id, sqlValue.version, sqlValue);
-        } catch (err) {
-          logger.error(
-            {
-              className: "Cache",
-              methodName: "requestCreation (detached)",
-              message: "Could not update value to elastic",
-              serious: true,
-              err,
-              data: {
-                selfTable,
-                moduleTable,
-                forId,
-                version,
-              },
-            }
-          );
-        }
-      })();
-    }
 
     // Execute side effects of modification according
     // to the given side effected types
@@ -1276,7 +1274,7 @@ export class Cache {
    * @param item the item to copy from
    * @param id the id to copy from
    * @param version the version to copy from
-   * @param targetId the target id to copy at
+   * @param targetId the target id to copy at (or null to create one)
    * @param targetVersion the target version to copy at
    * @param targetContainerId the target container id to use (if not specified will use the same)
    * @param targetCreatedBy the target creator to use (if not specified will use the same)
@@ -1317,9 +1315,6 @@ export class Cache {
     const allModuleFilesLocation = `${this.domain}/${itemDefinition.getParentModule().getQualifiedPathName()}/${id}.${version || ""}`;
     const allItemFilesLocation = `${this.domain}/${itemDefinition.getQualifiedPathName()}/${id}.${version || ""}`;
 
-    const targetModuleFilesLocation = `${this.domain}/${itemDefinition.getParentModule().getQualifiedPathName()}/${targetId}.${targetVersion || ""}`;
-    const targetItemFilesLocation = `${this.domain}/${itemDefinition.getQualifiedPathName()}/${targetId}.${targetVersion || ""}`;
-
     const currentContainerId = valueToStore.container_id;
     const currentStorageClient = this.storageClients[currentContainerId];
     const targetStorageClient = this.storageClients[targetContainerId || currentContainerId];
@@ -1329,19 +1324,11 @@ export class Cache {
 
     let storedModuleFiles = false;
     let storedIdefFiles = false;
+    let targetModuleFilesLocation: string;
+    let targetItemFilesLocation: string;
 
     try {
-      if (hasModuleFiles) {
-        await currentStorageClient.copyFolder(allModuleFilesLocation, targetModuleFilesLocation, targetStorageClient);
-        storedModuleFiles = true;
-      }
-
-      if (hasIdefFiles) {
-        await currentStorageClient.copyFolder(allItemFilesLocation, targetItemFilesLocation, targetStorageClient);
-        storedIdefFiles = true;
-      }
-
-      return await this.requestCreation(
+      const value = await this.requestCreation(
         itemDefinition,
         targetId,
         targetVersion,
@@ -1358,6 +1345,21 @@ export class Cache {
         null,
         options,
       );
+
+      targetModuleFilesLocation = `${this.domain}/${itemDefinition.getParentModule().getQualifiedPathName()}/${value.id}.${value.version || ""}`;
+      targetItemFilesLocation = `${this.domain}/${itemDefinition.getQualifiedPathName()}/${value.id}.${value.version || ""}`;
+
+      if (hasModuleFiles) {
+        await currentStorageClient.copyFolder(allModuleFilesLocation, targetModuleFilesLocation, targetStorageClient);
+        storedModuleFiles = true;
+      }
+
+      if (hasIdefFiles) {
+        await currentStorageClient.copyFolder(allItemFilesLocation, targetItemFilesLocation, targetStorageClient);
+        storedIdefFiles = true;
+      }
+
+      return value;
     } catch (err) {
       if (storedModuleFiles) {
         (async () => {
@@ -1906,15 +1908,15 @@ export class Cache {
           insertQueryBuilder.onConflict("UPDATE", (setBlder) => {
             setBlder.setColumn(
               "transaction_time", [
-                "NOW()",
-                [],
-              ],
+              "NOW()",
+              [],
+            ],
             );
             setBlder.setColumn(
               "status", [
-                "EXCLUDED.\"status\"",
-                [],
-              ],
+              "EXCLUDED.\"status\"",
+              [],
+            ],
             );
           });
 
@@ -2004,6 +2006,31 @@ export class Cache {
         },
       );
       await this.forceCacheInto(selfTable, id, version, sqlValue);
+
+      if (this.elastic) {
+        const language = itemDefinition.getSearchEngineMainLanguageFromRow(sqlValue);
+        const originalLanguage = itemDefinition.getSearchEngineMainLanguageFromRow(currentSQLValue);
+        try {
+          await this.elastic.updateDocument(selfTable, originalLanguage, language, sqlValue.id, sqlValue.version, sqlValue);
+        } catch (err) {
+          logger.error(
+            {
+              className: "Cache",
+              methodName: "requestUpdate",
+              message: "Could not update value to elastic",
+              serious: true,
+              err,
+              data: {
+                selfTable,
+                moduleTable,
+                id,
+                version,
+              },
+            }
+          );
+        }
+      }
+
       const changeEvent: IChangedFeedbackEvent = {
         itemDefinition: selfTable,
         id,
@@ -2054,32 +2081,6 @@ export class Cache {
         "modified",
       );
     })();
-
-    if (this.elastic) {
-      (async () => {
-        const language = itemDefinition.getSearchEngineMainLanguageFromRow(sqlValue);
-        const originalLanguage = itemDefinition.getSearchEngineMainLanguageFromRow(currentSQLValue);
-        try {
-          await this.elastic.updateDocument(selfTable, originalLanguage, language, sqlValue.id, sqlValue.version, sqlValue);
-        } catch (err) {
-          logger.error(
-            {
-              className: "Cache",
-              methodName: "requestUpdate",
-              message: "Could not update value to elastic",
-              serious: true,
-              err,
-              data: {
-                selfTable,
-                moduleTable,
-                id,
-                version,
-              },
-            }
-          );
-        }
-      })();
-    }
 
     // Execute side effects of modification according
     // to the given side effected types
@@ -2459,6 +2460,22 @@ export class Cache {
       // got to cascade and delete all the children, this method should be able to execute after
       this.deletePossibleChildrenOf(itemDefinition, id, record.version);
 
+      if (this.elastic) {
+        try {
+          const language = itemDefinition.getSearchEngineMainLanguageFromRow(row);
+          await this.elastic.deleteDocument(itemDefinition, language, record.id, record.version);
+        } catch (err) {
+          logger.error(
+            {
+              className: "Cache",
+              methodName: "requestDelete",
+              message: "Could not delete the value in elasticsearch",
+              err,
+            }
+          );
+        }
+      }
+
       const propertyMap: IPropertyMapElement[] = [];
       trackedProperties.forEach((pId) => {
         const currentValue = row[pId] || null;
@@ -2499,22 +2516,6 @@ export class Cache {
             err,
           }
         );
-      }
-
-      if (this.elastic) {
-        try {
-          const language = itemDefinition.getSearchEngineMainLanguageFromRow(row);
-          await this.elastic.deleteDocument(itemDefinition, language, record.id, record.version);
-        } catch (err) {
-          logger.error(
-            {
-              className: "Cache",
-              methodName: "requestDelete",
-              message: "Could not delete the value in elasticsearch",
-              err,
-            }
-          );
-        }
       }
     }
 

@@ -22,7 +22,9 @@ import { IPropertyViewLocationRendererProps } from "../internal/components/Prope
 import { IPropertyViewCurrencyRendererProps } from "../internal/components/PropertyView/PropertyViewCurrency";
 import { IPropertyEntryReferenceRendererProps } from "../internal/components/PropertyEntry/PropertyEntryReference";
 import { IPropertyEntryPaymentRendererProps } from "../internal/components/PropertyEntry/PropertyEntryPayment";
+import { IPropertyEntryTagListRendererProps } from "../internal/components/PropertyEntry/PropertyEntryTagList";
 import { IPropertyEntryFilesRendererProps } from "../internal/components/PropertyEntry/PropertyEntryFiles";
+import { IPropertyViewFilesRendererProps } from "../internal/components/PropertyView/PropertyViewFiles";
 
 /**
  * The renderer context we do expect for defining how are things to be renderered,
@@ -129,6 +131,12 @@ export interface IRendererContext {
    * so forth
    */
   PropertyEntryPayment?: React.ComponentType<IPropertyEntryPaymentRendererProps>;
+  /**
+   * The taglist renderer which is used to render arbitrary tags, unlike
+   * the property entry select which is used for standard tags which specific values
+   * this one is arbitrary
+   */
+  PropertyEntryTagList?: React.ComponentType<IPropertyEntryTagListRendererProps>;
 
   /**
    * The boolean renderer used to render, well, booleans; since booleans are either
@@ -156,6 +164,12 @@ export interface IRendererContext {
    * used for files
    */
   PropertyViewFile?: React.ComponentType<IPropertyViewFileRendererProps>;
+  /**
+   * The file renderer is used only for files, as simple as that
+   * 
+   * Do not use the onChange function to update, use onSetFile instead
+   */
+   PropertyViewFiles?: React.ComponentType<IPropertyViewFilesRendererProps>;
   /**
    * Allows to view location, very useful and similar to the entry but simpler,
    * this renderer can be used as a realtime location renderer

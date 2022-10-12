@@ -282,7 +282,7 @@ export default class PropertyEntryFile
     }
   ): PropertyDefinitionSupportedFileTypeWithInfo {
     const isSupportedImage = FILE_SUPPORTED_IMAGE_TYPES.includes(v.type);
-    const imageSizes = isSupportedImage ? imageSizeRetriever(v, this.props.property) : null;
+    const imageSizes = isSupportedImage ? imageSizeRetriever(v) : null;
     const imageSrcSet = isSupportedImage ? imageSrcSetRetriever(v, this.props.property, imageSizes) : null;
     const prettySize = prettyBytes(v.size);
     const extension = mimeTypeToExtension(v.type);

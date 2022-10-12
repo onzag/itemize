@@ -17,6 +17,7 @@ import PropertyEntrySelect from "./PropertyEntrySelect";
 import PropertyEntryField from "./PropertyEntryField";
 import PropertyEntryFile from "./PropertyEntryFile";
 import PropertyEntryPayment from "./PropertyEntryPayment";
+import PropertyEntryTagList from "./PropertyEntryTagList";
 import { LocaleContext } from "../../providers/locale-provider";
 import { Ii18NType } from "../../../../base/Root";
 import {
@@ -584,13 +585,10 @@ const handlerRegistry:
     renderer: "PropertyEntryPayment",
     handler: PropertyEntryPayment,
   },
-  // unecessary to specify as the property entry select
-  // will automatically handle the taglist because
-  // it always has values into it
-  // TODO now it is necessary as the arbitrary tags is now
-  // into play
-  taglist: null,
-
+  taglist: {
+    renderer: "PropertyEntryTagList",
+    handler: PropertyEntryTagList,
+  },
   files: {
     // and file uses its own renderer as well
     renderer: "PropertyEntryFiles",
@@ -685,6 +683,10 @@ export default class PropertyEntry extends
     let registryEntry: IRendererWholeHandlerType = this.props.property.hasSpecificValidValues() ?
       selectHandler :
       handlerRegistry[type];
+
+    if (!registryEntry) {
+      throw new Error("Entry cannot handle type " + type + " as there is no entry asigned to it");
+    }
 
     // so now we check for subtype handling, if we got no subtype
     // at all, we check if we have a default subhandler

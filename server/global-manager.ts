@@ -20,7 +20,7 @@ import {
 } from "../config";
 import PropertyDefinition from "../base/Root/Module/ItemDefinition/PropertyDefinition";
 import uuid from "uuid";
-import Include from "../base/Root/Module/ItemDefinition/Include";
+import Include, { IncludeExclusionState } from "../base/Root/Module/ItemDefinition/Include";
 import { SEOGenerator } from "./seo/generator";
 import { IRedisEvent } from "../base/remote-protocol";
 import { ServiceProvider } from "./services";
@@ -324,6 +324,41 @@ export class GlobalManager {
           } else {
             Object.assign(sqlIdefData, sqlInValue);
           }
+        }
+      });
+
+      // add includes that need to be set in their default values
+      const includes = userIdef.getAllIncludes();
+      includes.forEach((i) => {
+        // grab sinking properties
+        const sinkingProperties = i.getSinkingPropertiesIds();
+        // get the state
+        const value = i.getStateNoExternalChecking(null, null, sinkingProperties);
+        // set it in the idef data
+        sqlIdefData[i.getPrefixedQualifiedIdentifier()] = value.exclusionState;
+
+        // if it's not excluded we are ready to add more info
+        if (value.exclusionState !== IncludeExclusionState.EXCLUDED) {
+          // using the sinking properties we get the value
+          sinkingProperties.forEach((id) => {
+            const valueInState = value.itemState.properties.find((p) => p.propertyId === id);
+            const propDef = i.getSinkingPropertyFor(id);
+
+            const sqlInValue: ISQLTableRowValue = propDef
+              .getPropertyDefinitionDescription()
+              .sqlIn({
+                dictionary: "english",
+                language: "en",
+                id,
+                itemDefinition: userIdef,
+                prefix: i.getPrefixedQualifiedIdentifier(),
+                property: propDef,
+                serverData: this.serverData,
+                value: valueInState.value,
+              });
+
+            Object.assign(sqlIdefData, sqlInValue);
+          })
         }
       });
 

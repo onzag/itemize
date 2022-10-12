@@ -15,6 +15,7 @@ import {
   checkLimiters,
   defaultTriggerForbiddenFunction,
   checkUserCanSearch,
+  retrieveUntil,
 } from "../basic";
 import ItemDefinition, { ItemDefinitionIOActions } from "../../../base/Root/Module/ItemDefinition";
 import { buildElasticQueryForModule, buildSQLQueryForModule } from "../../../base/Root/Module/sql";
@@ -41,16 +42,18 @@ import type { SelectBuilder } from "../../../database/SelectBuilder";
 import type { ElasticQueryBuilder } from "../../elastic";
 import type { IElasticHighlightRecordInfo } from "../../../base/Root/Module/ItemDefinition/PropertyDefinition/types";
 
-export function findLastRecordLastModifiedDate(...records: IGQLSearchRecord[][]): string {
-  const recordsRespectiveNanoSecondAccuracyArray = records.flat().map((r) => new NanoSecondComposedDate(r.last_modified));
+export function findLastRecordDate(comp: "min" | "max", p: string, ...records: ISQLTableRowValue[][]): string {
+  const recordsRespectiveNanoSecondAccuracyArray = records.flat().map((r) => new NanoSecondComposedDate(r[p]));
   if (recordsRespectiveNanoSecondAccuracyArray.length === 0) {
     return null;
   }
   const maxDate = recordsRespectiveNanoSecondAccuracyArray.reduce((prev, cur) => {
-    return prev.greaterThan(cur) ? prev : cur;
+    return prev.greaterThan(cur) ? (comp === "max" ? prev : cur) : (comp === "max" ? cur : prev);
   });
   return maxDate.original;
 }
+
+function noop() { };
 
 export function searchModuleTraditional(
   appData: IAppDataType,
@@ -81,17 +84,10 @@ export async function searchModule(
       message: mod.getQualifiedPathName() + " does not support search engine searches",
       code: ENDPOINT_ERRORS.UNSPECIFIED,
     });
-  } else if (usesElastic && resolverArgs.args.offset !== 0) {
-    // this is a limitation of elasticsearch that it doesn't allow for pagination
-    // with more than 10000 hits, and this is something we cannot ensure
-    // as a result we disable the whole thing
-    throw new EndpointError({
-      message: "Using the search engine does not support non-zero offsets",
-      code: ENDPOINT_ERRORS.UNSPECIFIED,
-    });
   }
 
   const since = retrieveSince(resolverArgs.args);
+  const until = retrieveUntil(resolverArgs.args);
   checkLimit(resolverArgs.args.limit as number, mod, traditional);
   checkLimiters(resolverArgs.args, mod);
 
@@ -211,7 +207,7 @@ export async function searchModule(
     );
   }
 
-  let sqlFieldsToRequest: string[] = ["id", "version", "type", "last_modified"];
+  let sqlFieldsToRequest: string[] = ["id", "version", "type", "last_modified", "created_at"];
   let requestedFields: any = null;
   const generalFields = resolverArgs.fields;
   if (traditional) {
@@ -258,6 +254,9 @@ export async function searchModule(
     if (!sqlFieldsToRequest.includes("blocked_at")) {
       sqlFieldsToRequest.push("blocked_at");
     }
+    if (!sqlFieldsToRequest.includes("created_at")) {
+      sqlFieldsToRequest.push("created_at");
+    }
   }
 
   let elasticQuery: ElasticQueryBuilder;
@@ -289,11 +288,28 @@ export async function searchModule(
       });
     }
 
-    if (since) {
+    if (since && !until) {
       elasticQuery.must({
         range: {
           created_at: {
             gte: since,
+          }
+        }
+      });
+    } else if (until && !since) {
+      elasticQuery.must({
+        range: {
+          created_at: {
+            lt: until,
+          }
+        }
+      });
+    } else if (until && since) {
+      elasticQuery.must({
+        range: {
+          created_at: {
+            gte: since,
+            lt: until,
           }
         }
       });
@@ -334,6 +350,10 @@ export async function searchModule(
 
     if (since) {
       queryModel.whereBuilder.andWhereColumn("created_at", ">=", since);
+    }
+
+    if (until) {
+      queryModel.whereBuilder.andWhereColumn("created_at", "<", until);
     }
 
     if (typeof resolverArgs.args.version_filter !== "undefined") {
@@ -412,7 +432,13 @@ export async function searchModule(
       elasticQuery.setHighlightsOn(highlightKeys);
     }
 
-    const requestBaseResult = (generalFields.results || generalFields.records);
+    const requestBaseResult = (
+      generalFields.results ||
+      generalFields.records ||
+      generalFields.last_modified ||
+      generalFields.earliest_created_at ||
+      generalFields.oldest_created_at
+    );
     const requestCount = generalFields.count;
 
     // we have the count from here anyway
@@ -465,7 +491,13 @@ export async function searchModule(
     queryModel.limit(limit).offset(offset);
 
     // return using the base result, and only using the id
-    const requestBaseResult = (generalFields.results || generalFields.records);
+    const requestBaseResult = (
+      generalFields.results ||
+      generalFields.records ||
+      generalFields.last_modified ||
+      generalFields.earliest_created_at ||
+      generalFields.oldest_created_at
+    );
     baseResult = requestBaseResult ?
       (await appData.databaseConnection.queryRows(queryModel)).map(convertVersionsIntoNullsWhenNecessary) as IGQLSearchRecord[] :
       [];
@@ -541,6 +573,8 @@ export async function searchModule(
                 },
                 forbid: defaultTriggerForbiddenFunction,
                 customId: null,
+                setForId: noop,
+                setVersion: noop,
               });
             }
 
@@ -573,6 +607,8 @@ export async function searchModule(
                 },
                 forbid: defaultTriggerForbiddenFunction,
                 customId: null,
+                setForId: noop,
+                setVersion: noop,
               });
             }
           }
@@ -603,7 +639,7 @@ export async function searchModule(
       // for that we need to know, anyway, it doesn't really hurt the search functionality
       // just that when it asks for feedback it will realize the mismatch and try to update
       // if a newer record was created and then deleted
-      last_modified: findLastRecordLastModifiedDate(baseResult as IGQLSearchRecord[]),
+      last_modified: generalFields.last_modified ? findLastRecordDate("max", "last_modified", baseResult) : null,
       limit,
       offset,
       count,
@@ -620,8 +656,11 @@ export async function searchModule(
     return finalResult;
   } else {
     const finalResult: IGQLSearchRecordsContainer = {
+      // again these records may hold more stuff than it is required from then
       records: baseResult as IGQLSearchRecord[],
-      last_modified: findLastRecordLastModifiedDate(baseResult as IGQLSearchRecord[]),
+      last_modified: generalFields.last_modified ? findLastRecordDate("max", "last_modified", baseResult) : null,
+      earliest_created_at: generalFields.earliest_created_at ? findLastRecordDate("min", "created_at", baseResult) : null,
+      oldest_created_at: generalFields.oldest_created_at ? findLastRecordDate("max", "created_at", baseResult) : null,
       limit,
       offset,
       count,
@@ -660,14 +699,6 @@ export async function searchItemDefinition(
       message: resolverItemDefinition.getQualifiedPathName() + " does not support search engine searches",
       code: ENDPOINT_ERRORS.UNSPECIFIED,
     });
-  } else if (usesElastic && resolverArgs.args.offset !== 0) {
-    // this is a limitation of elasticsearch that it doesn't allow for pagination
-    // with more than 10000 hits, and this is something we cannot ensure
-    // as a result we disable the whole thing
-    throw new EndpointError({
-      message: "Using the search engine does not support non-zero offsets",
-      code: ENDPOINT_ERRORS.UNSPECIFIED,
-    });
   }
 
   let pooledRoot: Root;
@@ -700,6 +731,7 @@ export async function searchItemDefinition(
     );
 
     const since = retrieveSince(resolverArgs.args);
+    const until = retrieveUntil(resolverArgs.args);
     checkLimit(resolverArgs.args.limit as number, itemDefinition, traditional);
     checkLimiters(resolverArgs.args, itemDefinition);
 
@@ -801,7 +833,7 @@ export async function searchItemDefinition(
     const moduleTable = mod.getQualifiedPathName();
     const selfTable = itemDefinition.getQualifiedPathName();
 
-    let sqlFieldsToRequest: string[] = ["id", "version", "type", "last_modified"];
+    let sqlFieldsToRequest: string[] = ["id", "version", "type", "last_modified", "created_at"];
     let requestedFields: any = null;
     const generalFields = resolverArgs.fields;
     if (traditional) {
@@ -877,6 +909,9 @@ export async function searchItemDefinition(
       if (!sqlFieldsToRequest.includes("blocked_at")) {
         sqlFieldsToRequest.push("blocked_at");
       }
+      if (!sqlFieldsToRequest.includes("created_at")) {
+        sqlFieldsToRequest.push("created_at");
+      }
 
       await itemDefinition.checkRoleAccessFor(
         ItemDefinitionIOActions.READ,
@@ -908,11 +943,28 @@ export async function searchItemDefinition(
         });
       }
 
-      if (since) {
+      if (since && !until) {
         elasticQuery.must({
           range: {
             created_at: {
               gte: since,
+            }
+          }
+        });
+      } else if (until && !since) {
+        elasticQuery.must({
+          range: {
+            created_at: {
+              lt: until,
+            }
+          }
+        });
+      } else if (until && since) {
+        elasticQuery.must({
+          range: {
+            created_at: {
+              gte: since,
+              lt: until,
             }
           }
         });
@@ -951,6 +1003,10 @@ export async function searchItemDefinition(
 
       if (since) {
         queryModel.whereBuilder.andWhereColumn("created_at", ">=", since);
+      }
+
+      if (until) {
+        queryModel.whereBuilder.andWhereColumn("created_at", "<", until);
       }
 
       if (typeof resolverArgs.args.version_filter !== "undefined") {
@@ -1023,6 +1079,7 @@ export async function searchItemDefinition(
       );
 
       elasticQuery.setSourceIncludes(sqlFieldsToRequest);
+      elasticQuery.setFrom(offset);
       elasticQuery.setSize(limit);
 
       let highlightKeys: string[] = null;
@@ -1031,7 +1088,14 @@ export async function searchItemDefinition(
         elasticQuery.setHighlightsOn(highlightKeys);
       }
 
-      const requestBaseResult = (generalFields.results || generalFields.records);
+      // need the records for any of these
+      const requestBaseResult = (
+        generalFields.results ||
+        generalFields.records ||
+        generalFields.oldest_created_at ||
+        generalFields.earliest_created_at ||
+        generalFields.last_modified
+      );
       const requestCount = generalFields.count;
 
       // we have the count from here anyway
@@ -1083,7 +1147,13 @@ export async function searchItemDefinition(
       queryModel.limit(limit).offset(offset);
 
       // return using the base result, and only using the id
-      const requestBaseResult = (generalFields.results || generalFields.records);
+      const requestBaseResult = (
+        generalFields.results ||
+        generalFields.records ||
+        generalFields.last_modified ||
+        generalFields.earliest_created_at ||
+        generalFields.oldest_created_at
+      );
       baseResult = requestBaseResult ?
         (await appData.databaseConnection.queryRows(queryModel)).map(convertVersionsIntoNullsWhenNecessary) as IGQLSearchRecord[] :
         [];
@@ -1158,6 +1228,8 @@ export async function searchItemDefinition(
                   },
                   forbid: defaultTriggerForbiddenFunction,
                   customId: null,
+                  setForId: noop,
+                  setVersion: noop,
                 });
               }
 
@@ -1190,6 +1262,8 @@ export async function searchItemDefinition(
                   },
                   forbid: defaultTriggerForbiddenFunction,
                   customId: null,
+                  setForId: noop,
+                  setVersion: noop,
                 });
               }
             }
@@ -1214,7 +1288,7 @@ export async function searchItemDefinition(
             return toReturnToUser;
           })
         ),
-        last_modified: findLastRecordLastModifiedDate(baseResult as IGQLSearchRecord[]),
+        last_modified: generalFields.last_modified ? findLastRecordDate("max", "last_modified", baseResult) : null,
         limit,
         offset,
         count,
@@ -1233,8 +1307,12 @@ export async function searchItemDefinition(
       return finalResult;
     } else {
       const finalResult: IGQLSearchRecordsContainer = {
+        // these records don't match the shape perfectly, they may hold more stuff, such as created_at
+        // but they should work just fine
         records: baseResult as IGQLSearchRecord[],
-        last_modified: findLastRecordLastModifiedDate(baseResult as IGQLSearchRecord[]),
+        last_modified: generalFields.last_modified ? findLastRecordDate("max", "last_modified", baseResult) : null,
+        earliest_created_at: generalFields.earliest_created_at ? findLastRecordDate("min", "created_at", baseResult) : null,
+        oldest_created_at: generalFields.oldest_created_at ? findLastRecordDate("max", "created_at", baseResult) : null,
         limit,
         offset,
         count,

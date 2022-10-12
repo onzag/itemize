@@ -31,6 +31,8 @@ import { CAN_LOG_DEBUG } from "../../environment";
 import type { IElasticHighlightReply, IElasticHighlightRecordInfo } from "../../../base/Root/Module/ItemDefinition/PropertyDefinition/types";
 import { buildElasticQueryForModule } from "../../../base/Root/Module/sql";
 
+function noop() { };
+
 export async function getItemDefinition(
   appData: IAppDataType,
   resolverArgs: IGraphQLIdefResolverArgs,
@@ -227,6 +229,8 @@ export async function getItemDefinition(
         },
         forbid: defaultTriggerForbiddenFunction,
         customId: null,
+        setForId: noop,
+        setVersion: noop,
       });
     }
 
@@ -259,6 +263,8 @@ export async function getItemDefinition(
         },
         forbid: defaultTriggerForbiddenFunction,
         customId: null,
+        setForId: noop,
+        setVersion: noop,
       });
     }
   }
@@ -514,6 +520,8 @@ export async function getItemDefinitionList(
             },
             forbid: defaultTriggerForbiddenFunction,
             customId: null,
+            setForId: noop,
+            setVersion: noop,
           });
         }
 
@@ -546,6 +554,8 @@ export async function getItemDefinitionList(
             },
             forbid: defaultTriggerForbiddenFunction,
             customId: null,
+            setForId: noop,
+            setVersion: noop,
           });
         }
       }
@@ -788,6 +798,8 @@ export async function getModuleList(
             },
             forbid: defaultTriggerForbiddenFunction,
             customId: null,
+            setForId: noop,
+            setVersion: noop,
           });
         }
 
@@ -820,6 +832,8 @@ export async function getModuleList(
             },
             forbid: defaultTriggerForbiddenFunction,
             customId: null,
+            setForId: noop,
+            setVersion: noop,
           });
         }
       }

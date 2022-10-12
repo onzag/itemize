@@ -12,7 +12,7 @@ import { CONNECTOR_SQL_COLUMN_ID_FK_NAME, CONNECTOR_SQL_COLUMN_VERSION_FK_NAME, 
 import Root from "../base/Root";
 import { logger } from "./logger";
 import { ItemizeRedisClient } from "./redis";
-import { findLastRecordLastModifiedDate } from "./resolvers/actions/search";
+import { findLastRecordDate } from "./resolvers/actions/search";
 import ItemDefinition from "../base/Root/Module/ItemDefinition";
 import { convertVersionsIntoNullsWhenNecessary } from "./version-null-value";
 import Module from "../base/Root/Module";
@@ -851,7 +851,9 @@ export class ItemizeRawDB {
       // grab the event
       const ownedEvent = collectedOwned[mergedIndexIdentifier];
       // we set our last modified date now from the records
-      ownedEvent.newLastModified = findLastRecordLastModifiedDate(
+      ownedEvent.newLastModified = findLastRecordDate(
+        "max",
+        "last_modified",
         ownedEvent.newRecords,
         ownedEvent.modifiedRecords,
         ownedEvent.lostRecords,
@@ -875,7 +877,9 @@ export class ItemizeRawDB {
       // grab the event
       const parentedEvent = collectedParented[mergedIndexIdentifier];
       // we set our last modified date now from the records
-      parentedEvent.newLastModified = findLastRecordLastModifiedDate(
+      parentedEvent.newLastModified = findLastRecordDate(
+        "max",
+        "last_modified",
         parentedEvent.newRecords,
         parentedEvent.modifiedRecords,
         parentedEvent.lostRecords,
@@ -899,7 +903,9 @@ export class ItemizeRawDB {
       // grab the event
       const ownedParentedEvent = collectedOwnedParented[mergedIndexIdentifier];
       // we set our last modified date now from the records
-      ownedParentedEvent.newLastModified = findLastRecordLastModifiedDate(
+      ownedParentedEvent.newLastModified = findLastRecordDate(
+        "max",
+        "last_modified",
         ownedParentedEvent.newRecords,
         ownedParentedEvent.modifiedRecords,
         ownedParentedEvent.lostRecords,
@@ -923,7 +929,9 @@ export class ItemizeRawDB {
       // grab the event
       const propertyEvent = collectedProperty[mergedIndexIdentifier];
       // we set our last modified date now from the records
-      propertyEvent.newLastModified = findLastRecordLastModifiedDate(
+      propertyEvent.newLastModified = findLastRecordDate(
+        "max",
+        "last_modified",
         propertyEvent.newRecords,
         propertyEvent.modifiedRecords,
         propertyEvent.lostRecords,

@@ -5,6 +5,7 @@
  */
 
 import { PagedSearchLoader, IPagedSearchLoaderArg } from "../../components/search/PagedSearchLoader";
+import { TotalPagedSearchLoader } from "../../components/search/TotalPagedSearchLoader";
 import React from "react";
 import Snackbar from "./snackbar";
 import Pagination from '@mui/material/Pagination';
@@ -31,6 +32,31 @@ interface ISearchLoaderWithPaginationProps {
    */
   cleanOnDismount?: boolean;
   /**
+   * whether to use the total paged search loader
+   */
+  total?: boolean;
+  /**
+   * Whether to disable the external checks for the item definition
+   * results provider props
+   */
+  disableExternalChecks?: boolean;
+  /**
+   * The static state for the children item definition, TOTAL for
+   * basically not even asking for feedback (useful when the search was traditional)
+   * or NO_LISTENING for just not getting updates but asking for feedback
+   * 
+   * by default searches do not listen and use total as they act like static
+   * results
+   * 
+   * Note that if the search was done using a listen policy the item will update anyway
+   * this is why total is the better option
+   */
+  static?: "TOTAL" | "NO_LISTENING";
+  /**
+   * When the total has gone out of bounds
+   */
+  onTotalOutOfBounds?: (newLimit: number, newOffset: number) => void;
+  /**
    * The children that recieves the arguments
    */
   children: (arg: IPagedSearchLoaderArg, pagination: React.ReactNode, noResults: boolean) => React.ReactNode;
@@ -41,23 +67,32 @@ interface ISearchLoaderWithPaginationProps {
  * already handlers to update the navigation page, it uses the LocationStateReader in order to keep its
  * page so it means that it builds history in it
  * 
- * TODO support searchId to keep navigation in sync
- * 
  * @param props the search loader props
  */
 export function SearchLoaderWithPagination(props: ISearchLoaderWithPaginationProps) {
+  if (props.total && !props.onTotalOutOfBounds) {
+    throw new Error("The search loader uses total but has no callback for when it is out of bounds in onTotalOutOfBounds is missing");
+  }
+  const ElementToUse = props.total ? TotalPagedSearchLoader : PagedSearchLoader;
   return (
-    <PagedSearchLoader pageSize={props.pageSize} cleanOnDismount={props.cleanOnDismount} localState={props.localState}>
+    <ElementToUse
+      pageSize={props.pageSize}
+      cleanOnDismount={props.cleanOnDismount}
+      localState={props.localState}
+      onOutOfBounds={props.onTotalOutOfBounds}
+      static={props.static}
+      disableExternalChecks={props.disableExternalChecks}
+    >
       {(arg) => {
         const handlePageChange = (e: React.ChangeEvent, value: number) => {
           arg.goToPage(value - 1);
         }
         const pagination = (
           arg.pageCount === 0 ?
-          null :
-          <Pagination count={arg.pageCount} color="primary" page={arg.currentPage + 1} onChange={handlePageChange}/>
+            null :
+            <Pagination count={arg.pageCount} color="primary" page={arg.currentPage + 1} onChange={handlePageChange} />
         );
-        // TODO add the search results to say when there's an acutal search and say when there are no results
+
         return (
           <>
             {props.children(arg, pagination, !!(arg.searchId && arg.pageCount === 0))}
@@ -71,6 +106,6 @@ export function SearchLoaderWithPagination(props: ISearchLoaderWithPaginationPro
           </>
         );
       }}
-    </PagedSearchLoader>
+    </ElementToUse>
   )
 }

@@ -42,6 +42,8 @@ import {
   CAN_LOG_DEBUG,
 } from "../../environment";
 
+function noop() {};
+
 export async function addItemDefinition(
   appData: IAppDataType,
   resolverArgs: IGraphQLIdefResolverArgs,
@@ -361,6 +363,8 @@ export async function addItemDefinition(
 
     let itemDefinitionSpecificArgs: IGQLArgs = null;
     let extraArgs: IGQLArgs = null;
+    let forId: string = null;
+    let forVersion: string = undefined;
     // if we got any of them convert
     if (
       itemDefinitionTrigger || moduleTrigger
@@ -412,6 +416,13 @@ export async function addItemDefinition(
           },
           forbid: defaultTriggerForbiddenFunction,
           customId,
+          setForId: (id: string) => {
+            validateCustomId(id);
+            forId = id;
+          },
+          setVersion: (version: string) => {
+            forVersion = version;
+          }
         });
         // and if we have a new value
         if (newValueAccordingToModule) {
@@ -457,6 +468,13 @@ export async function addItemDefinition(
           },
           forbid: defaultTriggerForbiddenFunction,
           customId,
+          setForId: (id: string) => {
+            validateCustomId(id);
+            forId = id;
+          },
+          setVersion: (version: string) => {
+            forVersion = version;
+          }
         });
         // and make it the new value if such trigger was registered
         if (newValueAccordingToIdef) {
@@ -473,8 +491,8 @@ export async function addItemDefinition(
     // are valid and do not create strange data structures
     const value = await appData.cache.requestCreation(
       itemDefinition,
-      resolverArgs.args.for_id || null,
-      resolverArgs.args.version || null,
+      forId || resolverArgs.args.for_id || null,
+      typeof forVersion !== "undefined" ? forVersion : (resolverArgs.args.version || null),
       gqlValueToConvert,
       finalOwner,
       resolverArgs.args.language,
@@ -541,6 +559,8 @@ export async function addItemDefinition(
         },
         forbid: defaultTriggerInvalidForbiddenFunction,
         customId: null,
+        setForId: noop,
+        setVersion: noop,
       });
     }
     if (itemDefinitionTrigger) {
@@ -576,6 +596,8 @@ export async function addItemDefinition(
         },
         forbid: defaultTriggerInvalidForbiddenFunction,
         customId: null,
+        setForId: noop,
+        setVersion: noop,
       });
     }
 

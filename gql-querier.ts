@@ -11,6 +11,7 @@ import { EndpointErrorType } from "./base/errors";
 import { ENDPOINT_ERRORS, MAX_FILES_PER_REQUEST } from "./constants";
 import equals from "deep-equal";
 import { requestFieldsAreContained } from "./gql-util";
+import type { ReadStream } from "fs";
 
 /**
  * Search results as they are provided
@@ -42,11 +43,13 @@ export interface IGQLSearchRecord {
  * when it returns a bunch of records
  */
 export interface IGQLSearchRecordsContainer {
-  records: IGQLSearchRecord[],
-  last_modified: string,
-  count: number,
-  limit: number,
-  offset: number,
+  records: IGQLSearchRecord[];
+  last_modified: string;
+  count: number;
+  limit: number;
+  offset: number;
+  earliest_created_at: string;
+  oldest_created_at: string;
 }
 
 /**
@@ -98,7 +101,7 @@ export interface IGQLFile {
   /**
    * A source, either a File, Blob or a read stream
    */
-  src?: File | Blob | Promise<any>;
+  src?: File | Blob | ReadStream | Promise<{createReadStream: () => ReadStream}>;
 }
 
 /**

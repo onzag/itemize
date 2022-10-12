@@ -49,7 +49,8 @@ export function buildSearchModeConditionalRuleSet(
       newRuleAsProperty.property !== "&this" &&
       newRuleAsProperty.property !== "search" &&
       newRuleAsProperty.property !== "created_by" &&
-      newRuleAsProperty.property !== "since"
+      newRuleAsProperty.property !== "since" &&
+      newRuleAsProperty.property !== "until"
     ) {
       // we ge the converted rule set id from the given property
       const converted = getConversionRulesetId(otherKnownProperties[
