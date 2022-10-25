@@ -18,6 +18,7 @@ export function taglistSQLIn(arg: ISQLInInfo): ISQLTableRowValue {
   }
 
   const valueArray = (arg.value as Array<any>).map((v) => "?").join(",");
+
   // as simple as this
   return {
     [arg.prefix + arg.id]: [

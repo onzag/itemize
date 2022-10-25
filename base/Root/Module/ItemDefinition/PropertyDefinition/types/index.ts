@@ -82,8 +82,17 @@ export interface ISQLArgInfo extends IArgInfo {
 
 export interface ISQLInInfo extends ISQLArgInfo {
   value: PropertyDefinitionSupportedType;
-  dictionary: string;
-  language: string;
+
+  /**
+   * When the dictionary and the language are passed
+   * as a sql table row value they will
+   * find a property that is used for the language
+   * in it, this is more useful when it's used
+   * in conjuction with copying as it needs to inherit
+   * the specific language that was used in that row
+   */
+  dictionary: string | ISQLTableRowValue;
+  language: string | ISQLTableRowValue;
 }
 
 export interface ISQLOutInfo extends ISQLArgInfo {
@@ -544,7 +553,7 @@ export type PropertyDefinitionSupportedType =
   PropertyDefinitionSupportedTimeType |
   PropertyDefinitionSupportedYearType |
   IPropertyDefinitionSupportedLocationType |
-  PropertyDefinitionSupportedFileType |
+  PropertyDefinitionSupportedFileType |
   PropertyDefinitionSupportedFilesType |
   IPropertyDefinitionSupportedPaymentType |
   PropertyDefinitionSupportedTagListType;

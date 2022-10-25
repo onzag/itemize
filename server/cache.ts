@@ -816,6 +816,14 @@ export class Cache {
 
     const isSQLType = !!value.MODULE_ID;
 
+    const gqlValue = isSQLType ? (
+      convertSQLValueToGQLValueForItemDefinition(
+        this.serverData,
+        itemDefinition,
+        value,
+      )
+    ) : value;
+
     const propertyMap: IPropertyMapElement[] = [];
     itemDefinition.getAllPropertyDefinitionsAndExtensions().forEach((pDef) => {
       if (pDef.isTracked()) {
@@ -828,13 +836,6 @@ export class Cache {
     });
 
     if (!options.ignorePreSideEffects) {
-      const gqlValue = isSQLType ? (
-        convertSQLValueToGQLValueForItemDefinition(
-          this.serverData,
-          itemDefinition,
-          value,
-        )
-      ) : value;
       const preSideEffected = itemDefinition.getAllSideEffectedProperties(true);
       // looop into them
       await Promise.all(preSideEffected.map(async (preSideEffectedProperty) => {
@@ -880,77 +881,32 @@ export class Cache {
 
     // now we extract the SQL information for both item definition table
     // and the module table, this value is database ready
-    let sqlModData: IManyValueType;
-    let sqlIdefData: IManyValueType;
-    let consumeModStreams: ConsumeStreamsFnType;
-    let consumeIdefStreams: ConsumeStreamsFnType;
-
-    if (isSQLType) {
-      sqlModData = {};
-      sqlIdefData = {};
-
-      // these properties cannot be used from the given row value
-      const forbiddenCopyProperties = [
-        "id",
-        "version",
-        "container_id",
-        "last_modified",
-        "created_by",
-        "parent_id",
-        "parent_type",
-        "parent_version",
-        CONNECTOR_SQL_COLUMN_VERSION_FK_NAME,
-        CONNECTOR_SQL_COLUMN_ID_FK_NAME,
-      ];
-
-      // now we get the reserved and put it in the module data
-      Object.keys(RESERVED_BASE_PROPERTIES).forEach((p) => {
-        if (forbiddenCopyProperties.includes(p)) {
-          return;
-        }
-        sqlModData[p] = value[p];
-      });
-
-      // and now we add whatever is for the prop extensions
-      itemDefinition.getParentModule().getAllPropExtensions().forEach((p) => {
-        sqlModData[p.getId()] = value[p.getId()];
-      });
-
-      // now we can take whatever is left in the value that was not added
-      // to the module table and is not a forbidden properties into the idef information
-      Object.keys(value).forEach((p) => {
-        if (typeof sqlModData[p] === "undefined" && !forbiddenCopyProperties.includes(p)) {
-          sqlIdefData[p] = value[p];
-        }
-      });
-    } else {
-      // now we extract the SQL information for both item definition table
-      // and the module table, this value is database ready
-      const sqlIdefDataComposed: ISQLStreamComposedTableRowValue = convertGQLValueToSQLValueForItemDefinition(
-        this.serverData,
-        itemDefinition,
-        value,
-        null,
-        containerExists ? this.storageClients[containerId] : null,
-        this.domain,
-        language,
-        dictionary,
-      );
-      const sqlModDataComposed: ISQLStreamComposedTableRowValue = convertGQLValueToSQLValueForModule(
-        this.serverData,
-        itemDefinition.getParentModule(),
-        value,
-        null,
-        containerExists ? this.storageClients[containerId] : null,
-        this.domain,
-        language,
-        dictionary,
-      );
-      sqlModData = sqlModDataComposed.value;
-      sqlIdefData = sqlIdefDataComposed.value;
-      consumeModStreams = sqlModDataComposed.consumeStreams;
-      consumeIdefStreams = sqlIdefDataComposed.consumeStreams;
-    }
+    const sqlIdefDataComposed: ISQLStreamComposedTableRowValue = convertGQLValueToSQLValueForItemDefinition(
+      this.serverData,
+      itemDefinition,
+      gqlValue, // when this is a SQL type it gets converted into the gql type so it can be processed here
+      null,
+      containerExists ? this.storageClients[containerId] : null,
+      this.domain,
+      // if this is a copy that is passing a SQL value and not specifying a language
+      // then use what is found in the sql row and copy it
+      language ? language : (isSQLType ? value as ISQLTableRowValue : null),
+      dictionary ? dictionary : (isSQLType ? value as ISQLTableRowValue : null),
+    );
+    const sqlModDataComposed: ISQLStreamComposedTableRowValue = convertGQLValueToSQLValueForModule(
+      this.serverData,
+      itemDefinition.getParentModule(),
+      gqlValue, // when this is a SQL type it gets converted into the gql type so it can be processed here
+      null,
+      containerExists ? this.storageClients[containerId] : null,
+      this.domain,
+      language ? language : (isSQLType ? value as ISQLTableRowValue : null),
+      dictionary ? dictionary : (isSQLType ? value as ISQLTableRowValue : null),
+    );
+    const sqlModData = sqlModDataComposed.value;
+    const sqlIdefData = sqlIdefDataComposed.value;
+    const consumeModStreams = sqlModDataComposed.consumeStreams;
+    const consumeIdefStreams = sqlIdefDataComposed.consumeStreams;
 
     // this data is added every time when creating
     sqlModData.type = itemDefinition.getQualifiedPathName();
@@ -1537,6 +1493,26 @@ export class Cache {
 
     const selfTable = itemDefinition.getQualifiedPathName();
     const moduleTable = itemDefinition.getParentModule().getQualifiedPathName();
+
+    if (!id) {
+      const err = new Error("Requested an update with an invalid id");
+      logger.error(
+        {
+          className: "Cache",
+          methodName: "requestUpdate",
+          message: "Requested an update with a missing id",
+          serious: true,
+          err,
+          data: {
+            selfTable,
+            moduleTable,
+            id,
+            version,
+          },
+        }
+      );
+      throw err;
+    }
 
     const propertyMap: IPropertyMapElement[] = [];
     itemDefinition.getAllPropertyDefinitionsAndExtensions().forEach((pDef) => {

@@ -15,6 +15,7 @@ import { capitalize } from "../../../util";
 import Module from "../../../base/Root/Module";
 import ItemDefinition from "../../../base/Root/Module/ItemDefinition";
 import Include from "../../../base/Root/Module/ItemDefinition/Include";
+import RootRetriever from "../root/RootRetriever";
 
 /**
  * For a given object target, it will loop until it gets a match for the given key
@@ -61,6 +62,10 @@ export interface II18nReadProps {
    * if nothing found in this last context, an error is thrown
    */
   id: string;
+  /**
+   * A context to override the current pass a registry key
+   */
+  context?: string;
   /**
    * A property id to use as context
    */
@@ -270,7 +275,7 @@ function i18nReadInternal(
       i18nValue = localeReplacerToArray(i18nValue as string, ...props.args).map((output, index) => {
         if (typeof output === "string") {
           return (
-            <span key={index} style={{whiteSpace: "pre-wrap"}}>
+            <span key={index} style={{ whiteSpace: "pre-wrap" }}>
               {output}
             </span>
           );
@@ -320,7 +325,7 @@ export class I18nReadInternalOptimized extends React.PureComponent<I18nReadInter
   public render() {
     if (!this.props.id) {
       return this.props.children ? this.props.children("MISSING ID") : "MISSING ID";
-    }
+    };
 
     return i18nReadInternal(
       this.props.localeContext,
@@ -340,6 +345,38 @@ export class I18nReadInternalOptimized extends React.PureComponent<I18nReadInter
  * @returns a react node
  */
 export default function I18nRead(props: II18nReadProps) {
+  if (props.context) {
+    return (
+      <LocaleContext.Consumer>
+        {
+          (localeContext) => (
+            <RootRetriever>
+              {
+                (root) => {
+                  const rootV = root.root;
+                  const itemDefOrModule = rootV.registry[props.context];
+
+                  const idef = itemDefOrModule instanceof ItemDefinition ? itemDefOrModule : null;
+                  const mod: Module = idef ? idef.getParentModule() : itemDefOrModule as Module;
+
+                  return (
+                    <I18nReadInternalOptimized
+                      {...props}
+                      localeContext={localeContext}
+                      mod={mod}
+                      idef={idef}
+                      include={null}
+                    />
+                  );
+                }
+              }
+            </RootRetriever>
+          )
+        }
+      </LocaleContext.Consumer>
+    )
+  }
+
   return (
     <LocaleContext.Consumer>
       {

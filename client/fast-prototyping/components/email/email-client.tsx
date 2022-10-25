@@ -26,7 +26,9 @@ import Entry from "../../../components/property/Entry";
 import I18nRead from "../../../components/localization/I18nRead";
 
 import ReplyIcon from "@mui/icons-material/Reply";
+import ReplyAllIcon from "@mui/icons-material/ReplyAll";
 import ReportIcon from "@mui/icons-material/Report";
+import ForwardIcon from '@mui/icons-material/ForwardToInbox';
 import HealthAndSafetyIcon from "@mui/icons-material/HealthAndSafety";
 import Snackbar from "../snackbar";
 import Fab from "@mui/material/Fab";
@@ -81,6 +83,7 @@ const style = {
   email: {
     fontSize: "0.75rem",
     fontWeight: 300,
+    display: "inline",
   },
   subject: {
     fontSize: "2rem",
@@ -129,6 +132,9 @@ const style = {
     alignItems: "center",
     justifyContent: "center",
   },
+  userReceiverBox: {
+
+  },
   avatarOverlayer: {
     "&:not(:first-of-type)": {
       marginLeft: "-30px",
@@ -148,7 +154,7 @@ export interface ISwitcherComponentProps {
 
 interface IBasicEmailClientProps {
   userAvatarElement: React.ReactNode;
-  userUsernameElement: React.ReactNode;
+  userUsernameElement: (sender: boolean) => React.ReactNode;
   userLoadProperties: string[];
 }
 
@@ -161,10 +167,14 @@ interface IEmailClientProps extends IBasicEmailClientProps {
   emailNewUrl: string;
 }
 
-interface IEmailReaderProps extends IBasicEmailClientProps {
+interface IEmailReaderProps extends IBasicEmailClientProps, IEmailSenderPropsBase {
   id: string;
   contentWrapper?: (content: React.ReactNode) => React.ReactNode;
   replyUrlResolver: (replyOf: string) => string;
+  replyAllUrlResolver: (replyOf: string) => string;
+  forwardUrlResolver: (replyOf: string) => string;
+  emailUrlResolver: (id: string) => string;
+  replying?: "reply-all" | "reply" | "forward";
 }
 
 export function DefaultSwitcherComponent(props: ISwitcherComponentProps) {
@@ -194,6 +204,7 @@ interface IEmailSenderPropsBase {
 }
 
 interface IEmailSenderProps extends IEmailSenderPropsBase {
+  subjectPrefill?: string;
   targetPrefill?: string[];
   replyOf?: string;
   emailUrlResolver: (id: string) => string;
@@ -281,7 +292,7 @@ function ActualMailSender(props: IActualMailSenderProps) {
         return (
           <Chip
             label={
-              <strong><I18nRead id="me" capitalize={true} /></strong>
+              <strong><I18nRead id="me" capitalize={true} context="mail/mail" /></strong>
             }
             sx={style.chip}
             color="default"
@@ -298,6 +309,7 @@ function ActualMailSender(props: IActualMailSenderProps) {
           forId={id}
           properties={isUser ? props.userNameProperties : props.objectsNameResolver[type]}
           disableExternalChecks={true}
+          static="TOTAL"
         >
           <ItemLoader>
             {(arg) => {
@@ -346,6 +358,20 @@ function ActualMailSender(props: IActualMailSenderProps) {
     }
   }, [props.objectsNameResolver, props.objectsInvalidLabel, props.userNameProperties, props.userInvalidLabel])
 
+  const prefills: IPropertySetterProps[] = [];
+  if (props.targetPrefill) {
+    prefills.push({
+      id: "target",
+      value: props.targetPrefill,
+    });
+  }
+  if (props.subjectPrefill) {
+    prefills.push({
+      id: "subject",
+      value: props.subjectPrefill,
+    });
+  }
+
   return (
     <ModuleProvider module="mail">
       <ItemProvider
@@ -380,12 +406,7 @@ function ActualMailSender(props: IActualMailSenderProps) {
             value: false,
           },
         ]}
-        prefills={props.targetPrefill ? [
-          {
-            id: "target",
-            value: props.targetPrefill,
-          }
-        ] : null}
+        prefills={prefills}
       >
         <Entry
           id="target"
@@ -393,10 +414,11 @@ function ActualMailSender(props: IActualMailSenderProps) {
             chipRenderer,
             onValueInputted,
             fetchSuggestions: props.onFetchSuggestions,
+            enterWithSpace: true,
           }}
         />
-        <Entry id="subject" />
-        <Entry id="content" />
+        <Entry id="subject" autoFocus={!props.subjectPrefill}/>
+        <Entry id="content" autoFocus={!!props.subjectPrefill}/>
         <Entry id="attachments" />
 
         <Reader id="target">
@@ -539,9 +561,10 @@ export function EmailReader(props: IEmailReaderProps) {
           "subject",
         ]}
         cleanOnDismount={true}
+        static="TOTAL"
       >
-        <ReaderMany data={["parent_id", "source", "source_username", "read", "spam"]}>
-          {(parentId: string, source: string, sourceUsername: string, read: boolean, spam: boolean) => {
+        <ReaderMany data={["parent_id", "source", "source_username", "read", "spam", "target"]}>
+          {(parentId: string, source: string, sourceUsername: string, read: boolean, spam: boolean, target: string[]) => {
             // read is false, this means it should be executed since it's not null
             // it will ensure that it is null
             const submitRead = (
@@ -576,7 +599,7 @@ export function EmailReader(props: IEmailReaderProps) {
             } else {
               useUser = true;
               avatar = props.userAvatarElement;
-              username = props.userUsernameElement;
+              username = props.userUsernameElement(true);
             }
 
             let userContent = (
@@ -587,9 +610,28 @@ export function EmailReader(props: IEmailReaderProps) {
                 <Box sx={style.userInfoBox}>
                   <Box sx={style.username}>
                     {username}
+
+                    {relevantEmail ? <Box sx={style.email}>
+                      {" " + relevantEmail}
+                    </Box> : null}
                   </Box>
-                  <Box sx={style.email}>
-                    {relevantEmail}
+
+                  <Box sx={style.userReceiverBox}>
+                    <EmailAccum
+                      avatarAccum={[]}
+                      usernameAccum={[]}
+                      isSources={false}
+                      sourceOrTargetToConsume={0}
+                      sourceOrTargets={target}
+                      sourceOrTargetsUsernames={null}
+                      userAvatarElement={null}
+                      userLoadProperties={props.userLoadProperties}
+                      userUsernameElement={props.userUsernameElement}
+                    >
+                      {(avatars, usernames) => (
+                        <I18nRead id="wrote_to" args={[usernames]} context="mail/mail" />
+                      )}
+                    </EmailAccum>
                   </Box>
                 </Box>
               </Box>
@@ -666,6 +708,28 @@ export function EmailReader(props: IEmailReaderProps) {
                         )}
                       </I18nRead>
                     </Link>
+                    <Link to={props.replyAllUrlResolver(props.id)}>
+                      <I18nRead id="reply_all">
+                        {(i18nReplyAll: string) => (
+                          <IconButton
+                            title={i18nReplyAll}
+                          >
+                            <ReplyAllIcon />
+                          </IconButton>
+                        )}
+                      </I18nRead>
+                    </Link>
+                    <Link to={props.forwardUrlResolver(props.id)}>
+                      <I18nRead id="forward">
+                        {(i18nForward: string) => (
+                          <IconButton
+                            title={i18nForward}
+                          >
+                            <ForwardIcon />
+                          </IconButton>
+                        )}
+                      </I18nRead>
+                    </Link>
                   </Box>
                 </Typography>
 
@@ -692,6 +756,104 @@ export function EmailReader(props: IEmailReaderProps) {
               </>
             );
 
+            if (props.replying) {
+              const senderArgs = {
+                emailUrlResolver: props.emailUrlResolver,
+                userInvalidLabel: props.userInvalidLabel,
+                userNameProperties: props.userNameProperties,
+                objectsInvalidLabel: props.objectsInvalidLabel,
+                objectsNameResolver: props.objectsNameResolver,
+                replyOf: props.id,
+              }
+              const replyObject = props.replying === "forward" ? (
+                <ItemLoader>
+                  {(state) => {
+                    return (state.loaded ? (
+                      <I18nRead id="no_subject" context="mail/mail">
+                        {(i18nNoSubject: string) => (
+                          <Reader id="subject">
+                            {(subject: string) => (
+                              <I18nRead id="re_f" context="mail/mail" args={[subject || i18nNoSubject]}>
+                                {(i18nReF: string) => (
+                                  <EmailSender
+                                    {...senderArgs}
+                                    subjectPrefill={i18nReF}
+                                  />
+                                )}
+                              </I18nRead>
+                            )}
+                          </Reader>
+                        )}
+                      </I18nRead>
+                    ) : null);
+                  }}
+                </ItemLoader>
+              ) : (
+                <UserDataRetriever>
+                  {(userData) => (
+                    <ItemLoader>
+                      {(state) => {
+                        return (state.loaded ? (
+                          <I18nRead id="no_subject" context="mail/mail">
+                            {(i18nNoSubject: string) => (
+                              <Reader id="subject">
+                                {(subject: string) => (
+                                  <I18nRead id="re" context="mail/mail" args={[subject || i18nNoSubject]}>
+                                    {(i18nRe: string) => (
+                                      <ReaderMany data={["source", "target"]}>
+                                        {(source: string, target: string[]) => {
+                                          // we only treat as a basic reply when the sender
+                                          // is not ourselves, the reason is that imagine we press reply
+                                          // in a message thread and we are simply sending a message to ourselves
+                                          // instead of extending the previous message, as done in other clients
+                                          if (source !== userData.id && props.replying === "reply") {
+                                            return (
+                                              <EmailSender
+                                                {...senderArgs}
+                                                targetPrefill={[source]}
+                                                subjectPrefill={i18nRe}
+                                              />
+                                            );
+                                          }
+
+                                          // remove repeating and self
+                                          const allTargets = target.concat([source]).filter((t, index, arr) => arr.indexOf(t) === index && t !== userData.id);
+
+                                          // we got nothing as a result, we must be sending a message to ourselves
+                                          // this is the fallback so that even with a simple reply it still works
+                                          if (allTargets.length === 0) {
+                                            allTargets.push(userData.id);
+                                          }
+
+                                          return (
+                                            <EmailSender
+                                              {...senderArgs}
+                                              targetPrefill={allTargets}
+                                              subjectPrefill={i18nRe}
+                                            />
+                                          )
+                                        }}
+                                      </ReaderMany>
+                                    )}
+                                  </I18nRead>
+                                )}
+                              </Reader>
+                            )}
+                          </I18nRead>
+                        ) : null);
+                      }}
+                    </ItemLoader>
+                  )}
+                </UserDataRetriever>
+              )
+              content = (
+                <>
+                  {content}
+                  {replyObject}
+                </>
+              );
+            }
+
             if (props.contentWrapper) {
               content = props.contentWrapper(content);
             }
@@ -701,6 +863,7 @@ export function EmailReader(props: IEmailReaderProps) {
                 {parentId ? (
                   <EmailReader
                     {...props}
+                    replying={null}
                     id={parentId}
                   />
                 ) : null}
@@ -846,23 +1009,22 @@ const settersCriteria = {
   "OUTBOX": outbox,
 }
 
-interface IEmailMenuItemProps {
-  id: string;
+interface IEmailAccumProps {
+  isSources: boolean;
   sourceOrTargetToConsume: number;
   sourceOrTargets: string[];
   sourceOrTargetsUsernames: string[];
   userAvatarElement: React.ReactNode;
-  userUsernameElement: React.ReactNode;
-  isUnread: boolean;
-  subject: string;
+  userUsernameElement: (sender: boolean) => React.ReactNode;
   userLoadProperties: string[];
-  emailUrlResolver: (id: string) => string;
 
   avatarAccum: React.ReactNode[];
   usernameAccum: React.ReactNode[];
+
+  children: (avatars: React.ReactNode[], usernames: React.ReactNode) => React.ReactNode;
 }
 
-function EmailMenuItem(props: IEmailMenuItemProps) {
+function EmailAccum(props: IEmailAccumProps) {
   const sourceOrTarget = props.sourceOrTargets && props.sourceOrTargets[props.sourceOrTargetToConsume];
   const sourceOrTargetUsername = props.sourceOrTargetsUsernames && props.sourceOrTargetsUsernames[props.sourceOrTargetToConsume];
 
@@ -899,7 +1061,7 @@ function EmailMenuItem(props: IEmailMenuItemProps) {
           properties={props.userLoadProperties}
           waitAndMerge={true}
         >
-          {props.userUsernameElement}
+          {props.userUsernameElement(props.isSources)}
         </ItemProvider>
       </ModuleProvider>
     );
@@ -907,7 +1069,7 @@ function EmailMenuItem(props: IEmailMenuItemProps) {
 
   if (props.sourceOrTargets && props.sourceOrTargets[props.sourceOrTargetToConsume + 1]) {
     return (
-      <EmailMenuItem
+      <EmailAccum
         {...props}
         sourceOrTargetToConsume={props.sourceOrTargetToConsume + 1}
 
@@ -922,32 +1084,69 @@ function EmailMenuItem(props: IEmailMenuItemProps) {
       finalUsernameText = usernames;
     } else if (usernames.length === 2) {
       finalUsernameText = (
-        <I18nRead id="and_two" args={usernames} />
+        <I18nRead id="and_two" args={usernames} context="mail/mail" />
       );
     } else if (usernames.length === 3) {
       finalUsernameText = (
-        <I18nRead id="and_three" args={usernames} />
+        <I18nRead id="and_three" args={usernames} context="mail/mail" />
       );
     } else {
       finalUsernameText = (
-        <I18nRead id="and_more" args={usernames.concat([usernames.length])} />
+        <I18nRead id="and_more" args={usernames.concat([usernames.length])} context="mail/mail" />
       );
-    } 
+    }
     return (
-      <Link to={props.emailUrlResolver(props.id)}>
-        <ListItemButton sx={props.isUnread ? style.unread : style.read}>
-          <ListItemAvatar sx={style.avatarBox}>
-            {props.avatarAccum.concat([avatar])}
-          </ListItemAvatar>
-
-          <ListItemText
-            primary={props.subject}
-            secondary={finalUsernameText}
-          />
-        </ListItemButton>
-      </Link>
+      props.children(
+        props.avatarAccum.concat([avatar]),
+        finalUsernameText,
+      ) as any
     );
   }
+}
+
+interface IEmailMenuItemProps {
+  isSources: boolean;
+  sourceOrTargets: string[];
+  sourceOrTargetsUsernames: string[];
+  userAvatarElement: React.ReactNode;
+  userUsernameElement: (sender: boolean) => React.ReactNode;
+  userLoadProperties: string[];
+  id: string;
+  emailUrlResolver: (id: string) => string;
+  isUnread: boolean;
+  subject: string;
+}
+
+function EmailMenuItem(props: IEmailMenuItemProps) {
+  return (
+    <Link to={props.emailUrlResolver(props.id)}>
+      <ListItemButton sx={props.isUnread ? style.unread : style.read}>
+        <EmailAccum
+          sourceOrTargetToConsume={0}
+          sourceOrTargets={props.sourceOrTargets}
+          sourceOrTargetsUsernames={props.sourceOrTargetsUsernames}
+          isSources={props.isSources}
+          avatarAccum={[]}
+          userAvatarElement={props.userAvatarElement}
+          userUsernameElement={props.userUsernameElement}
+          userLoadProperties={props.userLoadProperties}
+          usernameAccum={[]}
+        >
+          {(avatars, usernames) => (
+            <>
+              <ListItemAvatar sx={style.avatarBox}>
+                {avatars}
+              </ListItemAvatar>
+              <ListItemText
+                primary={props.subject}
+                secondary={usernames}
+              />
+            </>
+          )}
+        </EmailAccum>
+      </ListItemButton>
+    </Link>
+  );
 }
 
 export function EmailClient(props: IEmailClientProps) {
@@ -1026,17 +1225,15 @@ export function EmailClient(props: IEmailClientProps) {
                             return (
                               <EmailMenuItem
                                 isUnread={isUnread}
-                                avatarAccum={[]}
                                 emailUrlResolver={props.emailUrlResolver}
                                 id={id}
-                                sourceOrTargetToConsume={0}
+                                isSources={props.location !== "OUTBOX"}
                                 sourceOrTargets={props.location === "OUTBOX" ? target : (source ? [source] : null)}
                                 sourceOrTargetsUsernames={props.location === "OUTBOX" ? null : (sourceUsername ? [sourceUsername] : null)}
                                 subject={subject}
                                 userAvatarElement={props.userAvatarElement}
                                 userLoadProperties={props.userLoadProperties}
                                 userUsernameElement={props.userUsernameElement}
-                                usernameAccum={[]}
                               />
                             );
                           }}

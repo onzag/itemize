@@ -11,8 +11,8 @@ export class FakeMailService extends MailProvider<null> {
     this.setMessageStorageItemDefinition(
       (
         this.isInstanceGlobal() ?
-        this.globalRoot.registry["mail/mail"] :
-        this.localAppData.root.registry["mail/mail"]
+        this.globalRoot.registry[this.appConfig.mailStorage] :
+        this.localAppData.root.registry[this.appConfig.mailStorage]
       ) as ItemDefinition
     );
   }

@@ -123,7 +123,7 @@ export function checkConditionalRuleSet(
       if (!valueToCheckAgainstPropertyDefinition) {
         throw new CheckUpError(
           "Conditional rule set value invalid, cannot find property, " +
-            (valueToCheckAgainst as IPropertyDefinitionReferredPropertyValue).property,
+          (valueToCheckAgainst as IPropertyDefinitionReferredPropertyValue).property,
           traceback.newTraceToBit("value").newTraceToBit("property"),
         );
       }
@@ -152,7 +152,7 @@ export function checkConditionalRuleSet(
       if (invalidReason) {
         throw new CheckUpError(
           "Conditional rule set value invalid, reason " +
-            rawDataAsProperty.property + ": " + invalidReason,
+          rawDataAsProperty.property + ": " + invalidReason,
           traceback.newTraceToBit("value").newTraceToBit("exactValue"),
         );
       }
@@ -185,7 +185,7 @@ export function checkItemDefinition(
     // so we throw an error if so
     throw new CheckUpError(
       "Definition name '" + rawData.name +
-        "' starts with underscore, and that's invalid",
+      "' starts with underscore, and that's invalid",
       actualTraceback.newTraceToBit("name"),
     );
   }
@@ -428,7 +428,7 @@ export function checkItemDefinition(
         if (policyName.startsWith("_")) {
           throw new CheckUpError(
             "Policy rule '" + policyName +
-              "' starts with underscore, and that's invalid",
+            "' starts with underscore, and that's invalid",
             actualTraceback.newTraceToBit("policies").newTraceToBit(policyType).newTraceToBit(policyName),
           );
         }
@@ -443,7 +443,7 @@ export function checkItemDefinition(
         if (policyValue.roles.includes(OWNER_METAROLE)) {
           throw new CheckUpError(
             "Policy rule '" + policyName +
-              "' includes a &OWNER role, and this is not allowed",
+            "' includes a &OWNER role, and this is not allowed",
             actualTraceback
               .newTraceToBit("policies")
               .newTraceToBit(policyType)
@@ -464,7 +464,7 @@ export function checkItemDefinition(
           if (!moduleForPolicy) {
             throw new CheckUpError(
               "Policy rule '" + policyName +
-                "' contains an invalid module that cannot be found '" + policyValue.module + "'",
+              "' contains an invalid module that cannot be found '" + policyValue.module + "'",
               actualTraceback
                 .newTraceToBit("policies")
                 .newTraceToBit(policyType)
@@ -479,7 +479,7 @@ export function checkItemDefinition(
             if (!itemDefinitionForPolicy) {
               throw new CheckUpError(
                 "Policy rule '" + policyName +
-                  "' contains an invalid item definition that cannot be found '" + policyValue.itemDefinition + "'",
+                "' contains an invalid item definition that cannot be found '" + policyValue.itemDefinition + "'",
                 actualTraceback
                   .newTraceToBit("policies")
                   .newTraceToBit(policyType)
@@ -493,7 +493,7 @@ export function checkItemDefinition(
           // specified this is bad input
           throw new CheckUpError(
             "Policy rule '" + policyName +
-              "' contains an item definition but does not specify the module",
+            "' contains an item definition but does not specify the module",
             actualTraceback
               .newTraceToBit("policies")
               .newTraceToBit(policyType)
@@ -511,7 +511,7 @@ export function checkItemDefinition(
           if (itemDefinitionForPolicy) {
             propertyRaw = ItemDefinition.getPropertyDefinitionRawFor(
               itemDefinitionForPolicy, moduleForPolicy, propertyId, true);
-          } else {
+          } else {
             propertyRaw = Module.getPropExtensionRawFor(moduleForPolicy, propertyId);
           }
 
@@ -520,8 +520,8 @@ export function checkItemDefinition(
             // we throw the error for the missing property
             throw new CheckUpError(
               "Policy rule '" + policyName +
-                "' contains an invalid property that cannot be found '" + propertyId +
-                "' in '" + itemDefinitionForPolicy.name + "'",
+              "' contains an invalid property that cannot be found '" + propertyId +
+              "' in '" + itemDefinitionForPolicy.name + "'",
               actualTraceback
                 .newTraceToBit("policies")
                 .newTraceToBit(policyType)
@@ -543,15 +543,15 @@ export function checkItemDefinition(
             if (itemDefinitionForPolicy) {
               propertyRaw = ItemDefinition.getPropertyDefinitionRawFor(
                 itemDefinitionForPolicy, moduleForPolicy, propertyId, true);
-            } else {
+            } else {
               propertyRaw = Module.getPropExtensionRawFor(moduleForPolicy, propertyId);
             }
             // and if we don't find the property we throw the error
             if (propertyRaw === null) {
               throw new CheckUpError(
                 "Policy rule '" + policyName +
-                  "' contains an invalid property that cannot be found '" + propertyId +
-                  "' in '" + itemDefinitionForPolicy.name + "'",
+                "' contains an invalid property that cannot be found '" + propertyId +
+                "' in '" + itemDefinitionForPolicy.name + "'",
                 actualTraceback
                   .newTraceToBit("policies")
                   .newTraceToBit(policyType)
@@ -576,11 +576,11 @@ export function checkItemDefinition(
             if (itemDefinitionForPolicy) {
               includeRaw = itemDefinitionForPolicy.includes &&
                 itemDefinitionForPolicy.includes.find((i) => i.id === includeId);
-            } else {
+            } else {
               throw new CheckUpError(
                 "Policy rule '" + policyName +
-                  "' has set itself as an external module-only rule" +
-                  " but it requests for applying includes '" + includeId + "'",
+                "' has set itself as an external module-only rule" +
+                " but it requests for applying includes '" + includeId + "'",
                 actualTraceback
                   .newTraceToBit("policies")
                   .newTraceToBit(policyType)
@@ -595,7 +595,7 @@ export function checkItemDefinition(
               // we throw the error
               throw new CheckUpError(
                 "Policy rule '" + policyName +
-                  "' contains an invalid item id that cannot be found '" + includeId + "'",
+                "' contains an invalid item id that cannot be found '" + includeId + "'",
                 actualTraceback
                   .newTraceToBit("policies")
                   .newTraceToBit(policyType)
@@ -614,8 +614,8 @@ export function checkItemDefinition(
   // that are item definitions that are children of this
   if (rawData.childDefinitions) {
     rawData
-    .childDefinitions.forEach((cd) =>
-      checkItemDefinition(rawRootData, cd, parentModule, actualTraceback));
+      .childDefinitions.forEach((cd) =>
+        checkItemDefinition(rawRootData, cd, parentModule, actualTraceback));
   }
 
   // and also includes, if they exist
@@ -631,7 +631,7 @@ export function checkItemDefinition(
     rawData.properties
       .forEach((p, index) =>
         checkPropertyDefinition(p, rawData, parentModule,
-         actualTraceback.newTraceToBit("properties").newTraceToBit(index)));
+          actualTraceback.newTraceToBit("properties").newTraceToBit(index)));
   }
 }
 
@@ -654,7 +654,7 @@ export function checkInclude(
   traceback: Traceback,
 ) {
   // if we have an include in the id pool already with the same id
-  if (idPool.includes(rawData.id)) {
+  if (idPool.includes(rawData.id)) {
     // then this is a checkup error as it is repeated
     throw new CheckUpError(
       "Duplicate id in the same item definition",
@@ -696,7 +696,7 @@ export function checkInclude(
   if (sharedProperties.length) {
     throw new CheckUpError(
       "predefined and enforced properties collision on " +
-        sharedProperties.join(","),
+      sharedProperties.join(","),
       traceback,
     );
   }
@@ -710,7 +710,7 @@ export function checkInclude(
   if (sharedProperties2.length) {
     throw new CheckUpError(
       "sink in properties and enforced properties collision on " +
-        sharedProperties2.join(","),
+      sharedProperties2.join(","),
       traceback,
     );
   }
@@ -938,7 +938,7 @@ export function checkPropertyDefinition(
   const propertyIsSearchable = propertyDefintionTypeStandard.searchable;
   const itemSupportsExactAndRange =
     propertyDefintionTypeStandard.searchInterface ===
-      PropertyDefinitionSearchInterfacesType.EXACT_AND_RANGE;
+    PropertyDefinitionSearchInterfacesType.EXACT_AND_RANGE;
 
   // if we have a search level but the item is not searchable throw an error
   if (typeof rawData.searchable !== "undefined" && !propertyIsSearchable) {
@@ -948,7 +948,7 @@ export function checkPropertyDefinition(
       traceback.newTraceToBit("searchable"),
     );
 
-  // if we don't support exact an range but somehow ranged was disabled throw an error
+    // if we don't support exact an range but somehow ranged was disabled throw an error
   } else if (!itemSupportsExactAndRange && rawData.disableRangedSearch) {
     throw new CheckUpError(
       "Type '" + rawData.type + "' does not support disableRangedSearch " +
@@ -956,7 +956,7 @@ export function checkPropertyDefinition(
       traceback.newTraceToBit("disableRangedSearch"),
     );
 
-  // also when it is not searchable
+    // also when it is not searchable
   } else if (rawData.disableRangedSearch && !propertyIsSearchable) {
     throw new CheckUpError(
       "Type '" + rawData.type + "' does not support disableRangedSearch " +
@@ -964,7 +964,7 @@ export function checkPropertyDefinition(
       traceback.newTraceToBit("disableRangedSearch"),
     );
 
-  // this is contradictory
+    // this is contradictory
   } else if (typeof rawData.searchable !== "undefined" && !rawData.searchable && rawData.disableRangedSearch) {
     throw new CheckUpError(
       "Type '" + rawData.type + "' cannot disable ranged search if search is disabled",
@@ -1017,7 +1017,7 @@ export function checkPropertyDefinition(
     propertyDefintionTypeStandard.requiresValues &&
     (
       typeof propertyDefintionTypeStandard.requiresValues === "boolean" ||
-      propertyDefintionTypeStandard.requiresValues.includes(rawData.subtype || null)
+      propertyDefintionTypeStandard.requiresValues.includes(rawData.subtype || null)
     ) &&
     (!rawData.values || rawData.values.length === 0)
   ) {
@@ -1297,7 +1297,7 @@ export function checkI18nCustomConsistency(
             );
           }
         });
-      } 
+      }
     });
 
     // now if we are in the special user item definition
@@ -1393,7 +1393,7 @@ export function checkModule(
         rawData,
         specificPropExtTraceback,
       );
-   });
+    });
   }
 
   // if we have children
@@ -1535,7 +1535,7 @@ export function checkUserItem(
         actualTraceback.newTraceToBit("properties"),
       );
     }
-    
+
     // now we get the value
     const actualPV = rawData.properties[actualPVIndex];
 
@@ -1554,7 +1554,7 @@ export function checkUserItem(
           actualTraceback.newTraceToBit("properties").newTraceToBit(actualPVIndex),
         );
       }
-      
+
       // now we need to get what is the expected value we are supposed to
       // get if this doesn't match, so we check, for functions
       // that is the return value, it means it's invalid
@@ -1643,45 +1643,149 @@ export function checkRoot(
 
     if (config.mailStorage) {
       let elementInQuestion: IRootRawJSONDataType | IModuleRawJSONDataType | IItemDefinitionRawJSONDataType = rawData;
+      let parentModule: IModuleRawJSONDataType = null;
       let tracebackInQuestion = traceback;
+      let tracebackOfMod = null;
       const pathConsume = config.mailStorage.split("/").map((v) => v.trim()).filter((v) => !!v);
       while (pathConsume.length) {
         const elementToConsume = pathConsume.shift();
         const elementInQuestionIndex: number = elementInQuestion.children.findIndex((v) => v.name === elementToConsume);
-        
+
         if (elementInQuestionIndex === -1) {
           throw new Error(
             "Could not find mail storage location for " + config.mailStorage,
           );
         }
+        parentModule = elementInQuestion as IModuleRawJSONDataType;
         elementInQuestion = elementInQuestion.children[elementInQuestionIndex];
+        tracebackOfMod = tracebackInQuestion;
         tracebackInQuestion = tracebackInQuestion.newTraceToBit("children").newTraceToBit(elementInQuestionIndex);
-        tracebackInQuestion.setupPointers(elementInQuestion.location, elementInQuestion.raw);
+        tracebackInQuestion.newTraceToLocation(elementInQuestion.location)
+        tracebackInQuestion.setupPointers(elementInQuestion.pointers, elementInQuestion.raw);
       }
 
       const item = elementInQuestion as any as IItemDefinitionRawJSONDataType;
-      if (item.type !== "item") {
+      if (item.type !== "item" || parentModule.type !== "module") {
         throw new Error(
           "Could not find an item at storage location for " + config.mailStorage,
         );
       }
 
-      checkMailItem(item, tracebackInQuestion);
+      checkMailItem(parentModule, item, tracebackOfMod, tracebackInQuestion);
     }
   }
 }
 
 function checkMailItem(
+  mod: IModuleRawJSONDataType,
   rawData: IItemDefinitionRawJSONDataType,
+  modTraceback: Traceback,
   traceback: Traceback,
 ) {
-  // no need to setup pointers because they were already setup by the loop
-  if (!rawData.properties) {
-    throw new CheckUpError(
-      "Mail Item should include properties",
-      traceback,
-    );
-  }
+  const properties = rawData.properties;
+  const extensions = mod.propExtensions;
 
-  // TODO
+  const expectedProperties = [
+    {
+      id: "uuid",
+      type: "string",
+    },
+    {
+      id: "target",
+      type: "taglist",
+      subtype: "arbitrary-tags",
+    },
+    {
+      id: "source",
+      type: "string",
+    },
+    {
+      id: "source_username",
+      type: "string",
+    },
+    {
+      id: "is_sender",
+      type: "boolean",
+    },
+    {
+      id: "is_receiver",
+      type: "boolean",
+    },
+    {
+      id: "read",
+      type: "boolean",
+    },
+    {
+      id: "spam",
+      type: "boolean",
+    },
+    {
+      id: "subject",
+      type: "text",
+    },
+    {
+      id: "content",
+      type: "text",
+    },
+    {
+      id: "cid_attachments",
+      type: "files",
+    },
+    {
+      id: "attachments",
+      type: "files",
+    },
+    {
+      id: "tip",
+      type: "boolean",
+    },
+    {
+      id: "metadata",
+      type: "string",
+    },
+  ];
+
+  expectedProperties.forEach((p) => {
+    const foundInIdefIndex = properties ? properties.findIndex((p2) => p.id === p2.id) : -1;
+    const foundInModIndex = extensions ? extensions.findIndex((p2) => p.id === p2.id) : -1;
+
+    if (foundInIdefIndex === -1 && foundInModIndex === -1) {
+      throw new CheckUpError(
+        "Missing required property for mail provider " + p.id + " with type " + p.type,
+        traceback,
+      );
+    }
+
+    let specificTraceback: Traceback = null;
+    let value: IPropertyDefinitionRawJSONDataType = null;
+
+    if (foundInIdefIndex !== -1) {
+      specificTraceback = traceback.newTraceToBit("properties").newTraceToBit(foundInIdefIndex);
+      value = rawData.properties[foundInIdefIndex];
+    } else {
+      specificTraceback = modTraceback.newTraceToLocation(mod.propExtLocation);
+      specificTraceback.setupPointers(mod.propExtPointers, mod.propExtRaw);
+      specificTraceback = specificTraceback.newTraceToBit("properties").newTraceToBit(foundInModIndex);
+      value = mod.propExtensions[foundInModIndex];
+    }
+
+    if (value.type !== p.type) {
+      throw new CheckUpError(
+        "Invalid property type for mail provider " + p.id + " should be type " + p.type,
+        specificTraceback.newTraceToBit("type"),
+      );
+    } else if (p.subtype && value.subtype !== p.subtype) {
+      if (value.subtype) {
+        throw new CheckUpError(
+          "Invalid property type for mail provider " + p.id + " should be subtype " + p.subtype,
+          specificTraceback.newTraceToBit("subtype"),
+        );
+      } else {
+        throw new CheckUpError(
+          "Invalid property type for mail provider " + p.id + " should be subtype " + p.subtype,
+          specificTraceback,
+        );
+      }
+    }
+  });
 }

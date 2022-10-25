@@ -593,8 +593,8 @@ export interface IItemContextType extends IBasicFns {
   dismissDeleted: () => void;
   dismissSearchError: () => void;
   dismissSearchResults: () => void;
-  downloadState: (specificProperties?: string[], specificIncludes?: {[id: string]: string[]}) => Promise<Blob>,
-  loadStateFromFile: (f: Blob | File, specificProperties?: string[], specificIncludes?: {[id: string]: string[]}) => Promise<void>,
+  downloadState: (specificProperties?: string[], specificIncludes?: { [id: string]: string[] }) => Promise<Blob>,
+  loadStateFromFile: (f: Blob | File, specificProperties?: string[], specificIncludes?: { [id: string]: string[] }) => Promise<void>,
 
   // the remote listener
   remoteListener: RemoteListener;
@@ -953,6 +953,21 @@ export class ActualItemProvider extends
   // timing
   private repairCorruptionTimeout: NodeJS.Timeout = null;
 
+  private static getItemStateStatic(props: IActualItemProviderProps) {
+    return props.itemDefinitionInstance.getStateNoExternalChecking(
+      props.forId || null,
+      props.forVersion || null,
+      !props.disableExternalChecks,
+      props.itemDefinitionInstance.isInSearchMode() ?
+        getPropertyListForSearchMode(
+          props.properties || [],
+          props.itemDefinitionInstance.getStandardCounterpart()
+        ) : props.properties || [],
+      props.includes || {},
+      !props.includePolicies,
+    );
+  }
+
   // sometimes when doing some updates when you change the item
   // definition to another item definition (strange but ok)
   // the state between the item and the expected state will
@@ -973,18 +988,7 @@ export class ActualItemProvider extends
     ) {
       // note how we pass the optimization flags
       return {
-        itemState: props.itemDefinitionInstance.getStateNoExternalChecking(
-          props.forId || null,
-          props.forVersion || null,
-          !props.disableExternalChecks,
-          props.itemDefinitionInstance.isInSearchMode() ?
-            getPropertyListForSearchMode(
-              props.properties || [],
-              props.itemDefinitionInstance.getStandardCounterpart()
-            ) : props.properties || [],
-          props.includes || {},
-          !props.includePolicies,
-        ),
+        itemState: ActualItemProvider.getItemStateStatic(props),
       };
     }
     return null;
@@ -1126,18 +1130,7 @@ export class ActualItemProvider extends
     return {
       // same we get the initial state, without checking it externally and passing
       // all the optimization flags
-      itemState: props.itemDefinitionInstance.getStateNoExternalChecking(
-        props.forId || null,
-        props.forVersion || null,
-        !props.disableExternalChecks,
-        props.itemDefinitionInstance.isInSearchMode() ?
-          getPropertyListForSearchMode(
-            props.properties || [],
-            props.itemDefinitionInstance.getStandardCounterpart()
-          ) : props.properties || [],
-        props.includes || {},
-        !props.includePolicies,
-      ),
+      itemState: ActualItemProvider.getItemStateStatic(props),
       // and we pass all this state
       isBlocked: false,
       isBlockedButDataIsAccessible: false,
@@ -1335,7 +1328,7 @@ export class ActualItemProvider extends
       if (
         !(window as any)[MEMCACHED_SEARCH_DESTRUCTION_MARKERS_LOCATION][qualifiedName]
           .find((m: [string, string, [string, string, string], [string, string]]) =>
-            m[0] === type && equals(m[1], owner, { strict: true }) && equals(m[2], parent, { strict: true }) && equals(m[3], property, {strict: true}))
+            m[0] === type && equals(m[1], owner, { strict: true }) && equals(m[2], parent, { strict: true }) && equals(m[3], property, { strict: true }))
       ) {
         changed = true;
         (window as any)[MEMCACHED_SEARCH_DESTRUCTION_MARKERS_LOCATION][qualifiedName].push([type, owner, parent, property]);
@@ -1785,18 +1778,7 @@ export class ActualItemProvider extends
       // we set the value given we have changed the forId with the new optimization flags
       if (!this.isUnmounted) {
         this.setState({
-          itemState: this.props.itemDefinitionInstance.getStateNoExternalChecking(
-            this.props.forId || null,
-            this.props.forVersion || null,
-            !this.props.disableExternalChecks,
-            this.props.itemDefinitionInstance.isInSearchMode() ?
-              getPropertyListForSearchMode(
-                this.props.properties || [],
-                this.props.itemDefinitionInstance.getStandardCounterpart()
-              ) : this.props.properties || [],
-            this.props.includes || {},
-            !this.props.includePolicies,
-          ),
+          itemState: this.getItemState(),
         });
       }
 
@@ -1940,6 +1922,9 @@ export class ActualItemProvider extends
 
     this.setState(searchState);
   }
+  private getItemState(props = this.props) {
+    return ActualItemProvider.getItemStateStatic(props);
+  }
   public async changeListener(repairCorruption?: boolean) {
     if (this.isUnmounted) {
       return;
@@ -2021,18 +2006,7 @@ export class ActualItemProvider extends
 
     // we basically just upgrade the state
     this.setState({
-      itemState: this.props.itemDefinitionInstance.getStateNoExternalChecking(
-        this.props.forId || null,
-        this.props.forVersion || null,
-        !this.props.disableExternalChecks,
-        this.props.itemDefinitionInstance.isInSearchMode() ?
-          getPropertyListForSearchMode(
-            this.props.properties || [],
-            this.props.itemDefinitionInstance.getStandardCounterpart()
-          ) : this.props.properties || [],
-        this.props.includes || {},
-        !this.props.includePolicies,
-      ),
+      itemState: this.getItemState(),
       // also search might do this, and it's true anyway
       notFound: isNotFound,
     });
@@ -2109,7 +2083,7 @@ export class ActualItemProvider extends
       loaded: true,
     });
   }
-  public async loadStateFromFile(state: File | Blob, specificProperties?: string[], specificIncludes?: {[includeId: string]: string[]}) {
+  public async loadStateFromFile(state: File | Blob, specificProperties?: string[], specificIncludes?: { [includeId: string]: string[] }) {
     await this.props.itemDefinitionInstance.applyStateFromPackage(
       this.props.forId || null,
       this.props.forVersion || null,
@@ -2123,7 +2097,7 @@ export class ActualItemProvider extends
       this.props.forVersion || null,
     );
   }
-  public async downloadState(specificProperties?: string[], specificIncludes?: {[includeId: string]: string[]}): Promise<Blob> {
+  public async downloadState(specificProperties?: string[], specificIncludes?: { [includeId: string]: string[] }): Promise<Blob> {
     if (!this.lastLoadValuePromiseIsResolved) {
       await this.lastLoadValuePromise;
     }
@@ -2156,18 +2130,7 @@ export class ActualItemProvider extends
           this.changeListener,
         );
         this.setState({
-          itemState: this.props.itemDefinitionInstance.getStateNoExternalChecking(
-            this.props.forId || null,
-            this.props.forVersion || null,
-            !this.props.disableExternalChecks,
-            this.props.itemDefinitionInstance.isInSearchMode() ?
-              getPropertyListForSearchMode(
-                this.props.properties || [],
-                this.props.itemDefinitionInstance.getStandardCounterpart()
-              ) : this.props.properties || [],
-            this.props.includes || {},
-            !this.props.includePolicies,
-          ),
+          itemState: this.getItemState(),
         }, () => {
           this.props.onStateLoadedFromStore && this.props.onStateLoadedFromStore(storedState, {
             submit: this.submit,
@@ -2404,9 +2367,13 @@ export class ActualItemProvider extends
       );
 
       // and then we trigger the change listener for all the instances
+      // we don't trigger our own listener
       this.props.itemDefinitionInstance.triggerListeners(
-        "change", forId, forVersion,
+        "change", forId, forVersion, this.changeListener,
       );
+
+      // we will do it by hand instead, once we set loaded to true
+
       // and if we have an externally checked property we do the external check
       // we need to ensure that our current item definition instance hasn't changed
       // its for id and for version while we were loading
@@ -2453,11 +2420,14 @@ export class ActualItemProvider extends
 
     // return immediately
     if (shouldNotUpdateState) {
+      this.lastLoadValuePromiseIsResolved = true;
+      this.lastLoadValuePromiseResolve();
+
       const result = {
         value: value.value,
         error: value.error,
       };
-      this.props.onLoad && this.props.onLoad(result)
+      this.props.onLoad && this.props.onLoad(result);
       return result;
     }
 
@@ -2473,11 +2443,13 @@ export class ActualItemProvider extends
         isBlockedButDataIsAccessible: false,
         notFound: false,
         loading: false,
+        itemState: this.getItemState(),
       });
       // otherwise if there's no value, it means the item is not found
     } else if (!value.value) {
       // we mark it as so, it is not found
       !this.isUnmounted && this.setState({
+        itemState: this.getItemState(),
         loadError: null,
         notFound: true,
         isBlocked: false,
@@ -2488,6 +2460,7 @@ export class ActualItemProvider extends
     } else if (value.value) {
       // otherwise if we have a value, we check all these options
       !this.isUnmounted && this.setState({
+        itemState: this.getItemState(),
         loadError: null,
         notFound: false,
         isBlocked: !!value.value.blocked_at,
@@ -3610,18 +3583,7 @@ export class ActualItemProvider extends
       );
       const searchState = this.props.location.state[this.props.loadSearchFromNavigation].searchState;
       this.setState({
-        itemState: this.props.itemDefinitionInstance.getStateNoExternalChecking(
-          this.props.forId || null,
-          this.props.forVersion || null,
-          !this.props.disableExternalChecks,
-          this.props.itemDefinitionInstance.isInSearchMode() ?
-            getPropertyListForSearchMode(
-              this.props.properties || [],
-              this.props.itemDefinitionInstance.getStandardCounterpart()
-            ) : this.props.properties || [],
-          this.props.includes || {},
-          !this.props.includePolicies,
-        ),
+        itemState: this.getItemState(),
         ...searchState,
         searchWasRestored: true,
       });

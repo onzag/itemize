@@ -1659,7 +1659,7 @@ export default class MailProvider<T> extends ServiceProvider<T> {
         spam: isSpam,
         read: false,
         is_sender: message.source === user.id,
-        is_receiver: message.targets.includes(user.id),
+        is_receiver: message.target.includes(user.id),
       },
     );
   }
@@ -1802,12 +1802,12 @@ export default class MailProvider<T> extends ServiceProvider<T> {
               )) || null;
 
               // the reply is not the tip anymore for this tree
-              if (replyOf) {
+              if (replyOf && replyOf.tip) {
                 // this reply is
                 replyOf = await arg.appData.cache.requestUpdateSimple(
                   this.storageIdef,
-                  replyOf.sender_mail_id,
-                  null,
+                  replyOf.id,
+                  replyOf.version || null,
                   {
                     tip: false,
                   },
@@ -1817,12 +1817,17 @@ export default class MailProvider<T> extends ServiceProvider<T> {
                 );
               }
 
+              // now we got to loop in the targets if we got some
               if (targets && Array.isArray(targets) && targets.length) {
+                // let's get the senders
                 const senderObj = await arg.appData.cache.requestValue("users/user", sender, null, { useMemoryCache: true });
 
+                // and let's begin the loop
                 await Promise.all(targets.map(async (t, index) => {
+                  // first split it via the @ in order to get it
                   const tSplitted = t.split("@");
 
+                  // for internal elements
                   let internalTarget: ISQLTableRowValue = null;
                   const isInternal = tSplitted.length === 1;
 
@@ -1834,20 +1839,37 @@ export default class MailProvider<T> extends ServiceProvider<T> {
                     return;
                   }
 
+
+                  // now let's get the internal information, for an internal
+                  // target, these include target users and elements
                   let internalId: string;
                   let internalType: string;
                   let internalIdef: ItemDefinition;
 
+                  // now if we got an internal
                   if (isInternal) {
+                    // the type comes after the $ symbol, which is invalid for an id
+                    // so we can use it as a separator
                     const typeSplitted = t.split("$");
                     internalId = typeSplitted[0];
                     internalType = typeSplitted[1] || "MOD_users__IDEF_user";
 
+                    // if it's unspecified owner and it's user
+                    // we stop
                     if (internalId === UNSPECIFIED_OWNER && internalType === "MOD_users__IDEF_user") {
                       return;
                     }
 
-                    internalIdef = arg.appData.registry[internalType] as ItemDefinition;
+                    internalIdef = arg.appData.root.registry[internalType] as ItemDefinition;
+
+                    // no clue what this is
+                    if (!internalIdef || !(internalIdef instanceof ItemDefinition)) {
+                      return;
+                    }
+
+                    // otherwise we get it
+                    // the value that is expected for such target
+                    // as requested from the cache
                     internalTarget = await arg.appData.cache.requestValue(internalType, internalId, null, { useMemoryCache: true });
                   }
 
@@ -1856,16 +1878,21 @@ export default class MailProvider<T> extends ServiceProvider<T> {
                     return;
                   }
 
+                  // now let's check whether we can send this
+                  // by calling the function
                   const allowsSend = !internalIdef || internalIdef.getQualifiedPathName() === "MOD_users__IDEF_user" ?
                     await this.allowUserToSendEmail(senderObj, isInternal ? internalTarget : t) :
                     await this.allowUserToSendEmailToItem(senderObj, internalTarget, internalIdef);
 
+                  // this one is a reject
                   if (allowsSend === "REJECT") {
                     return;
                   }
 
+                  // whether it is to be marked as SPAM
                   const isSpam = allowsSend === "SPAM";
 
+                  // now for internal we got to do internal resolving
                   if (isInternal) {
                     const resolvedUsers = internalIdef.getQualifiedPathName() === "MOD_users__IDEF_user" ? (
                       [internalTarget]
@@ -1873,6 +1900,7 @@ export default class MailProvider<T> extends ServiceProvider<T> {
                       await this.resolveUsersForEmailToItem(senderObj, internalTarget, internalIdef)
                     );
 
+                    // and now we loop our resolved users
                     await Promise.all(resolvedUsers.map(async (targetUser) => {
                       // sending a message to oneself, not allowed
                       // instead because the user will be marked as sender
@@ -1937,6 +1965,7 @@ export default class MailProvider<T> extends ServiceProvider<T> {
                         }
                       }
 
+                      // now we can copy it
                       const sentEmail = await arg.appData.cache.requestCopy(
                         this.storageIdef,
                         arg.id,
@@ -1955,6 +1984,7 @@ export default class MailProvider<T> extends ServiceProvider<T> {
                         arg.newValueSQL,
                       );
 
+                      // and let's do the callback
                       await this.onUserReceivedInternalEmail(
                         targetUser,
                         senderObj,

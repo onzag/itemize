@@ -87,14 +87,28 @@ function fakeInnerText(ele: Node): string {
  * @returns a partial row value
  */
 export function textSQLIn(arg: ISQLInInfo) {
+  let language: string;
+  if (typeof arg.language === "string" || !arg.language) {
+    language = (arg.language || null) as string;
+  } else {
+    language = arg[arg.prefix + arg.id + "_LANGUAGE"] || null;
+  }
+
+  let dictionary: string;
+  if (typeof arg.dictionary === "string" || !arg.language) {
+    dictionary = (arg.dictionary || null) as string;
+  } else {
+    dictionary = arg[arg.prefix + arg.id + "_DICTIONARY"] || null;
+  }
+
   // for null
   if (arg.value === null) {
     return {
       [arg.prefix + arg.id]: null,
       [arg.prefix + arg.id + "_PLAIN"]: null,
       [arg.prefix + arg.id + "_VECTOR"]: null,
-      [arg.prefix + arg.id + "_LANGUAGE"]: arg.language,
-      [arg.prefix + arg.id + "_DICTIONARY"]: arg.dictionary,
+      [arg.prefix + arg.id + "_LANGUAGE"]: language,
+      [arg.prefix + arg.id + "_DICTIONARY"]: dictionary,
     };
   }
 
@@ -127,12 +141,12 @@ export function textSQLIn(arg: ISQLInInfo) {
   return {
     [arg.prefix + arg.id]: purifiedText,
     [arg.prefix + arg.id + "_PLAIN"]: arg.property.isRichText() ? escapedText : null,
-    [arg.prefix + arg.id + "_LANGUAGE"]: arg.language,
-    [arg.prefix + arg.id + "_DICTIONARY"]: arg.dictionary,
+    [arg.prefix + arg.id + "_LANGUAGE"]: language || null,
+    [arg.prefix + arg.id + "_DICTIONARY"]: dictionary || null,
     [arg.prefix + arg.id + "_VECTOR"]: [
       "to_tsvector(?, ?)",
       [
-        arg.dictionary,
+        dictionary || null,
         escapedText,
       ],
     ],

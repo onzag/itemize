@@ -590,8 +590,8 @@ export function convertGQLValueToSQLValueForProperty(
   oldData: IGQLValue,
   uploadsClient: StorageProvider<any>,
   domain: string,
-  language: string,
-  dictionary: string,
+  language: string | ISQLTableRowValue,
+  dictionary: string | ISQLTableRowValue,
 ): ISQLStreamComposedTableRowValue {
   // and this is the value of the property, again, properties
   // are not prefixed, they are either in their own object

@@ -221,8 +221,8 @@ export function convertGQLValueToSQLValueForInclude(
   oldData: IGQLValue,
   uploadsClient: StorageProvider<any>,
   domain: string,
-  language: string,
-  dictionary: string,
+  language: string | ISQLTableRowValue,
+  dictionary: string | ISQLTableRowValue,
   partialFields?: any,
 ): ISQLStreamComposedTableRowValue {
   // the exclusion state in the graphql information should be included in

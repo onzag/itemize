@@ -6,17 +6,11 @@
  */
 
 import { IPropertyEntryTagListRendererProps } from "../../../internal/components/PropertyEntry/PropertyEntryTagList";
-import React, { useCallback, useMemo, useRef, useState } from "react";
-import { capitalize } from "../../../components/localization";
+import React, { useCallback, useRef, useState } from "react";
 import Alert from '@mui/material/Alert';
 import Typography from "@mui/material/Typography";
 import FormControl from "@mui/material/FormControl";
 import RestoreIcon from "@mui/icons-material/Restore";
-import FormLabel from "@mui/material/FormLabel";
-import FormControlLabel from "@mui/material/FormControlLabel";
-import RadioGroup from "@mui/material/RadioGroup";
-import Radio from "@mui/material/Radio";
-import Switch from "@mui/material/Switch";
 import Box from "@mui/material/Box";
 import { RestoreIconButton } from "./general";
 import FilledInput from "@mui/material/FilledInput";
@@ -213,6 +207,11 @@ function PropertyEntryTagListRenderer(props: IPropertyEntryTagListRendererProps)
   }, []);
   const handleBlur = useCallback(async () => {
     const inputValueTrimmed = inputValue.trim();
+
+    if (inputValueTrimmed === "") {
+      return;
+    }
+
     setInputValue("");
 
     if (props.args.onValueInputted) {
@@ -228,7 +227,7 @@ function PropertyEntryTagListRenderer(props: IPropertyEntryTagListRendererProps)
   }, [inputValue, props.currentValue, props.args]);
   const handleKeyDown = useCallback(async (e: React.KeyboardEvent<HTMLInputElement>) => {
     const inputValueTrimmed = inputValue.trim();
-    if (e.key === "Enter" && inputValueTrimmed) {
+    if ((e.key === "Enter" || (props.args.enterWithSpace && e.key === " ")) && inputValueTrimmed) {
       setInputValue("");
 
       if (props.args.onValueInputted) {

@@ -248,8 +248,8 @@ export function convertGQLValueToSQLValueForModule(
   oldData: IGQLValue,
   uploadsClient: StorageProvider<any>,
   domain: string,
-  language: string,
-  dictionary: string,
+  language: string | ISQLTableRowValue,
+  dictionary: string | ISQLTableRowValue,
   partialFields?: IGQLRequestFields | IGQLArgs | IGQLValue,
 ): ISQLStreamComposedTableRowValue {
   // first we create the row value
