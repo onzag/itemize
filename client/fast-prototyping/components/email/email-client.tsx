@@ -222,7 +222,8 @@ interface IActualMailSenderProps extends IEmailSenderProps {
 
 function ActualMailSender(props: IActualMailSenderProps) {
   const onValueInputted = useCallback(async (v: string) => {
-    const splitted = v.split("@");
+    const trimmed = v.trim();
+    const splitted = trimmed.split("@");
     const username = splitted[0];
     const domain = splitted[1] || props.mailDomain;
 
@@ -260,7 +261,7 @@ function ActualMailSender(props: IActualMailSenderProps) {
         return results.records[0].id;
       }
     } else {
-      return v;
+      return trimmed;
     }
   }, [props.mailDomain, props.userNameProperties, props.userIdef, props.token]);
   const chipRenderer = useCallback((v: string) => {
@@ -553,7 +554,6 @@ export function EmailReader(props: IEmailReaderProps) {
           "spam",
           "read",
           "source",
-          "source_username",
           "target",
           "content",
           "attachments",
@@ -563,8 +563,8 @@ export function EmailReader(props: IEmailReaderProps) {
         cleanOnDismount={true}
         static="TOTAL"
       >
-        <ReaderMany data={["parent_id", "source", "source_username", "read", "spam", "target"]}>
-          {(parentId: string, source: string, sourceUsername: string, read: boolean, spam: boolean, target: string[]) => {
+        <ReaderMany data={["parent_id", "source", "read", "spam", "target"]}>
+          {(parentId: string, source: string, read: boolean, spam: boolean, target: string[]) => {
             // read is false, this means it should be executed since it's not null
             // it will ensure that it is null
             const submitRead = (
@@ -590,7 +590,9 @@ export function EmailReader(props: IEmailReaderProps) {
             if (!source) {
               avatar = <Avatar>?</Avatar>;
             } else if (source.includes("@")) {
-              const letterToUse = (sourceUsername ? sourceUsername[0] : source[0]).toUpperCase();
+              const splitted = source.split("<");
+              const sourceUsername = splitted.length === 2 ? splitted[0].trim() : null;
+              const letterToUse = splitted[0].toUpperCase();
               avatar = <Avatar>{letterToUse}</Avatar>;
               username = sourceUsername || source;
               if (username !== source) {
@@ -623,7 +625,6 @@ export function EmailReader(props: IEmailReaderProps) {
                       isSources={false}
                       sourceOrTargetToConsume={0}
                       sourceOrTargets={target}
-                      sourceOrTargetsUsernames={null}
                       userAvatarElement={null}
                       userLoadProperties={props.userLoadProperties}
                       userUsernameElement={props.userUsernameElement}
@@ -1013,7 +1014,6 @@ interface IEmailAccumProps {
   isSources: boolean;
   sourceOrTargetToConsume: number;
   sourceOrTargets: string[];
-  sourceOrTargetsUsernames: string[];
   userAvatarElement: React.ReactNode;
   userUsernameElement: (sender: boolean) => React.ReactNode;
   userLoadProperties: string[];
@@ -1026,7 +1026,7 @@ interface IEmailAccumProps {
 
 function EmailAccum(props: IEmailAccumProps) {
   const sourceOrTarget = props.sourceOrTargets && props.sourceOrTargets[props.sourceOrTargetToConsume];
-  const sourceOrTargetUsername = props.sourceOrTargetsUsernames && props.sourceOrTargetsUsernames[props.sourceOrTargetToConsume];
+  const sourceOrTargetUsername = sourceOrTarget && sourceOrTarget.split("<")[0].trim();
 
   let avatar: React.ReactNode = null;
   let username: React.ReactNode = null;
@@ -1107,7 +1107,6 @@ function EmailAccum(props: IEmailAccumProps) {
 interface IEmailMenuItemProps {
   isSources: boolean;
   sourceOrTargets: string[];
-  sourceOrTargetsUsernames: string[];
   userAvatarElement: React.ReactNode;
   userUsernameElement: (sender: boolean) => React.ReactNode;
   userLoadProperties: string[];
@@ -1124,7 +1123,6 @@ function EmailMenuItem(props: IEmailMenuItemProps) {
         <EmailAccum
           sourceOrTargetToConsume={0}
           sourceOrTargets={props.sourceOrTargets}
-          sourceOrTargetsUsernames={props.sourceOrTargetsUsernames}
           isSources={props.isSources}
           avatarAccum={[]}
           userAvatarElement={props.userAvatarElement}
@@ -1187,7 +1185,6 @@ export function EmailClient(props: IEmailClientProps) {
                 "subject",
                 "source",
                 "target",
-                "source_username",
               ],
               searchByProperties: [
                 "is_sender",
@@ -1218,8 +1215,8 @@ export function EmailClient(props: IEmailClientProps) {
                   <List>
                     {arg.searchRecords.map((v) => (
                       <ItemProvider {...v.providerProps}>
-                        <ReaderMany data={["id", "source", "source_username", "subject", "read", "target"]}>
-                          {(id: string, source: string, sourceUsername: string, subject: string, read: boolean, target: string[]) => {
+                        <ReaderMany data={["id", "source", "subject", "read", "target"]}>
+                          {(id: string, source: string, subject: string, read: boolean, target: string[]) => {
                             const isUnread = (props.location === "INBOX" || props.location === "INBOX_SPAM" || props.location === "INBOX_UNREAD") && !read;
 
                             return (
@@ -1229,7 +1226,6 @@ export function EmailClient(props: IEmailClientProps) {
                                 id={id}
                                 isSources={props.location !== "OUTBOX"}
                                 sourceOrTargets={props.location === "OUTBOX" ? target : (source ? [source] : null)}
-                                sourceOrTargetsUsernames={props.location === "OUTBOX" ? null : (sourceUsername ? [sourceUsername] : null)}
                                 subject={subject}
                                 userAvatarElement={props.userAvatarElement}
                                 userLoadProperties={props.userLoadProperties}

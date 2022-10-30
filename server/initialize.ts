@@ -161,6 +161,8 @@ export function initializeApp(appData: IAppDataType, custom: IServerCustomizatio
   });
 
   // now weadd the graphql endpoint
+  // TODO dispose of graphql, it's inefficient
+  // alternative protocol can be implemented using form data
   app.use(
     "/graphql",
     graphqlUploadExpress({

@@ -1696,11 +1696,16 @@ function checkMailItem(
       subtype: "arbitrary-tags",
     },
     {
-      id: "source",
-      type: "string",
+      id: "timestamp",
+      type: "datetime",
     },
     {
-      id: "source_username",
+      id: "references",
+      type: "taglist",
+      subtype: "arbitrary-tags",
+    },
+    {
+      id: "source",
       type: "string",
     },
     {

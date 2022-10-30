@@ -12,6 +12,8 @@ privacy_policy_url = privacy-policy/$LANGUAGE.html
 contact = contact
 contact_url = contact/$LANGUAGE.html
 
+error.EMAIL_TOO_LARGE = Email has too many/large files
+
 social = join us at
 facebook_url = https://facebook.com
 instagram_url = https://instagram.com
@@ -37,6 +39,8 @@ privacy_policy_url = privacy-policy/$LANGUAGE.html
 
 contact = contacto
 contact_url = contact/$LANGUAGE.html
+
+error.EMAIL_TOO_LARGE = El correo tiene demasiados archivos o son demasiado grandes
 
 social = únase a la comunidad
 facebook_url = https://facebook.com

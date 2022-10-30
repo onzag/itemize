@@ -6,6 +6,7 @@
 
 import { Stream } from "stream";
 import FormDataNode from "form-data";
+// TODO remove to go back to just using plain http and https
 import fetchNode from "node-fetch";
 import { EndpointErrorType } from "./base/errors";
 import { ENDPOINT_ERRORS, MAX_FILES_PER_REQUEST } from "./constants";
@@ -905,7 +906,7 @@ export async function gqlQuery(query: GQLQuery, options?: {
         body: formData as any,
       } as any);
       reply = await value.json();
-    } else {
+    } else {
       reply = await oldXMLHttpRequest(host, formData as any, query);
     }
   } catch (err) {

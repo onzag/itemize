@@ -164,6 +164,9 @@ process.on('warning', (warningInfo) => {
   logger.error({
     message: warningInfo.message,
     err: warningInfo,
+    data: {
+      warning: true,
+    },
     serious: true,
   });
 });
@@ -172,16 +175,9 @@ process.on('uncaughtException', async (err) => {
   logger.error({
     message: err.message,
     err,
+    data: {
+      uncaught: true,
+    },
     serious: true,
   });
-
-  // give it time to save but it should die
-  await wait(1000);
-  process.exit(1);
 });
-
-const wait = (time: number) => {
-  return new Promise((resolve) => {
-    setTimeout(resolve, time);
-  });
-};

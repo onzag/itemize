@@ -52,8 +52,8 @@ export class ServiceProvider<T> {
   public localAppData: IAppDataType;
 
   public instanceName: string;
-  public globalInstance: boolean;
-  public localInstance: boolean;
+  public globalInstance: boolean = false;
+  public localInstance: boolean = false;
 
   constructor(
     config: T,

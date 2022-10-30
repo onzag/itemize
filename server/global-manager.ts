@@ -601,6 +601,13 @@ export class GlobalManager {
       this.currencyFactorsProvider.execute();
     }
 
+    if (
+      this.mailProvider &&
+      GLOBAL_MANAGER_MODE === "ABSOLUTE"
+    ) {
+      this.mailProvider.execute();
+    }
+
     // hijack the seo generator and do our own executions
     if (this.seoGenerator && (GLOBAL_MANAGER_MODE === "ABSOLUTE" || GLOBAL_MANAGER_MODE === "SITEMAPS")) {
       (async () => {

@@ -89,16 +89,27 @@ export function stringSQLSearch(arg: ISQLSearchInfo): boolean {
   // first we analyze and get the search name
   const searchName = PropertyDefinitionSearchInterfacesPrefixes.SEARCH + arg.prefix + arg.id;
   const inName = PropertyDefinitionSearchInterfacesPrefixes.IN + arg.prefix + arg.id;
+  const isNonCaseSensitive = arg.property.isNonCaseSensitiveUnique();
 
   // now we see if we have an argument for it
   if (typeof arg.args[searchName] !== "undefined" && arg.args[searchName] !== null) {
     // and we check it...
     if (exactStringSearchSubtypes.includes(arg.property.getSubtype())) {
-      arg.whereBuilder.andWhereColumn(
-        arg.prefix + arg.id,
-        (arg.args[searchName] as string),
-      );
+      if (isNonCaseSensitive) {
+        arg.whereBuilder.andWhere(
+          "LOWER(" + JSON.stringify(arg.prefix + arg.id) + ") = ?",
+          [
+            (arg.args[searchName] as string).toLowerCase(),
+          ],
+        );
+      } else {
+        arg.whereBuilder.andWhereColumn(
+          arg.prefix + arg.id,
+          (arg.args[searchName] as string),
+        );
+      }
     } else {
+      // already case insensitive
       arg.whereBuilder.andWhere(
         JSON.stringify(arg.prefix + arg.id) + " ILIKE ? ESCAPE ?",
         [
@@ -121,14 +132,27 @@ export function stringSQLSearch(arg: ISQLSearchInfo): boolean {
     const tagCompareCheck = arg.args[inName] as string[];
 
     if (tagCompareCheck.length === 1) {
-      arg.whereBuilder.andWhereColumn(
-        arg.prefix + arg.id,
-        tagCompareCheck[0],
-      );
+      if (isNonCaseSensitive) {
+        arg.whereBuilder.andWhere(
+          "LOWER(" + JSON.stringify(arg.prefix + arg.id) + ") = ?",
+          [
+            tagCompareCheck[0].toLowerCase(),
+          ],
+        );
+      } else {
+        arg.whereBuilder.andWhereColumn(
+          arg.prefix + arg.id,
+          tagCompareCheck[0],
+        );
+      }
     } else {
+      let colToMatch = JSON.stringify(arg.prefix + arg.id);
+      if (isNonCaseSensitive) {
+        colToMatch = "LOWER(" + colToMatch + ")";
+      }
       arg.whereBuilder.andWhere(
-        JSON.stringify(arg.prefix + arg.id) + " = ANY(ARRAY[" + tagCompareCheck.map(() => "?").join(",") + "]::TEXT[])",
-        tagCompareCheck,
+        colToMatch + " = ANY(ARRAY[" + tagCompareCheck.map(() => "?").join(",") + "]::TEXT[])",
+        tagCompareCheck.map((v) => isNonCaseSensitive ? v.toLowerCase() : v),
       );
     }
 

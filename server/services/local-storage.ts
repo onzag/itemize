@@ -38,7 +38,7 @@ export class LocalStorageService extends StorageProvider<null> {
   }
 
   public download(at: string): ReadStream {
-    const rs = fs.createReadStream(at);
+    const rs = fs.createReadStream(path.join("uploads", at));
     return rs;
   }
 

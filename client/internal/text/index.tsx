@@ -291,7 +291,6 @@ export function sanitize(
 }
 
 const imageStyles = {
-  position: "relative",
   width: "100%",
   display: "flex",
   alignItems: "center",
@@ -299,26 +298,22 @@ const imageStyles = {
 };
 
 const imageContainerStyles = {
-  position: "relative",
   width: "100%",
   maxWidth: "700px",
 };
 
 const imagePadStyles = {
-  position: "relative",
   width: "100%",
+  paddingBottom: "0px",
 }
 
 const imgStyles = {
-  position: "absolute",
-  top: 0,
-  left: 0,
   width: "100%",
 };
 
-function applyStyle(element: HTMLElement, style: any) {
+function applyStyle(element: HTMLElement, style: any, override: boolean) {
   Object.keys(style).forEach((k) => {
-    if (element.style[k]) {
+    if (!override && element.style[k]) {
       return;
     }
 
@@ -466,16 +461,16 @@ export function postprocess(
             const imagePad = node.parentElement;
             const img = node;
 
-            applyStyle(imagePad, imagePadStyles);
-            applyStyle(imageContainer, imageContainerStyles);
-            applyStyle(img, imgStyles);
+            applyStyle(imagePad, imagePadStyles, true);
+            applyStyle(imageContainer, imageContainerStyles, false);
+            applyStyle(img, imgStyles, false);
 
             const styleSet = image.getAttribute("style");
 
             const newImage = DOMWindow.document.createElement("div");
             newImage.appendChild(imageContainer);
             newImage.setAttribute("style", styleSet);
-            applyStyle(newImage, imageStyles);
+            applyStyle(newImage, imageStyles, false);
 
             // remove the link object to the image because email clients
             // don't like it

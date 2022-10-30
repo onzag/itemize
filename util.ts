@@ -261,6 +261,18 @@ export function escapeStringRegexp(str: string) {
   return str.replace(matchOperatorsRe, "\\$&");
 }
 
+export function escapeHtml(str: string) {
+  if (!str) {
+    return "";
+  }
+  return str
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;")
+    .replace(/'/g, "&#039;");
+}
+
 /**
  * @ignore
  */
@@ -697,7 +709,7 @@ export function createLocationValue(txt: string, atxt: string, lat?: number, lng
     txt,
     lat: lat || 0,
     lng: lng || 0,
-    id: id || "CUSTOM-" + (lat || 0) + "." + (lng || 0),
+    id: id || "CUSTOM-" + (lat || 0) + "." + (lng || 0),
   };
 }
 
@@ -823,7 +835,7 @@ export function convertCurrencyValue(
   }
 
   const currencyFactors = appData.cache.getServerData().CURRENCY_FACTORS;
-  
+
   // convert from the original value to a normalized value in the given standardized currency
   const factor: number = currencyFactors[value.currency];
   const normalized = factor * value.value;
@@ -841,7 +853,7 @@ export function convertCurrencyValue(
 
   const precision = currencies[code].decimals;
   if (decimalCount >= precision) {
-    reversed = Math.round(reversed * (10**precision)) / (10**precision);
+    reversed = Math.round(reversed * (10 ** precision)) / (10 ** precision);
   }
 
   return {

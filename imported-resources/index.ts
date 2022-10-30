@@ -94,3 +94,16 @@ export const arrLanguages: ILanguageType[] = Object.keys(languages).map((code) =
   }
   return 0;
 });
+
+export function isRTL(language: string) {
+  if (!language) { 
+    return false;
+  }
+  return language.startsWith("ar") ||
+    language.startsWith("he") ||
+    language.startsWith("fa") ||
+    language.startsWith("ku") ||
+    language.startsWith("pa") ||
+    language.startsWith("sd") ||
+    language.startsWith("ur");
+}

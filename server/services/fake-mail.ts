@@ -1,5 +1,5 @@
 import type ItemDefinition from "../../base/Root/Module/ItemDefinition";
-import express, { Router } from "express";
+import { Router } from "express";
 import { ServiceProviderType } from ".";
 import MailProvider, { ISendEmailData } from "./base/MailProvider";
 
