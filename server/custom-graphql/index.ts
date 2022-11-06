@@ -8,7 +8,7 @@ import { IGQLQueryFieldsDefinitionType, IGQLFieldsDefinitionType } from "../../b
 import TOKEN_OBJECT from "./graphql-token-object";
 import { EndpointError } from "../../base/errors";
 import { jwtSign } from "../token";
-import { ENDPOINT_ERRORS, GUEST_METAROLE } from "../../constants";
+import { ENDPOINT_ERRORS, GUEST_METAROLE, JWT_KEY } from "../../constants";
 import { IServerSideTokenDataType } from "../../server/resolvers/basic";
 
 /**
@@ -166,7 +166,7 @@ export function buildCustomTokenQueries(
         }
 
         // now we can provide and sign the token
-        const token = await jwtSign(dataToSign, appData.sensitiveConfig.jwtKey, options);
+        const token = await jwtSign(dataToSign, await appData.registry.getJWTSecretFor(JWT_KEY), options);
 
         // returning it
         return {

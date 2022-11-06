@@ -1,7 +1,7 @@
 import { IAppDataType } from "..";
 import { logger } from "../logger";
 import { Router } from "express";
-import { ENDPOINT_ERRORS, CONNECTOR_SQL_COLUMN_ID_FK_NAME } from "../../constants";
+import { ENDPOINT_ERRORS, CONNECTOR_SQL_COLUMN_ID_FK_NAME, SECONDARY_JWT_KEY, JWT_KEY } from "../../constants";
 import { jwtVerify, jwtSign } from "../token";
 import { ISQLTableRowValue } from "../../base/Root/sql";
 import bcyrpt from "bcrypt";
@@ -40,7 +40,7 @@ export function userRestServices(appData: IAppDataType) {
     let decoded: IValidateUserTokenDataType;
     try {
       // we attempt to decode it
-      decoded = await jwtVerify(token as string, appData.sensitiveConfig.secondaryJwtKey);
+      decoded = await jwtVerify(token as string, await appData.registry.getJWTSecretFor(SECONDARY_JWT_KEY));
     } catch (err) {
       res.redirect("/en/?err=" + ENDPOINT_ERRORS.INVALID_CREDENTIALS);
       return;
@@ -188,7 +188,7 @@ export function userRestServices(appData: IAppDataType) {
     let tokenData: IServerSideTokenDataType;
     if (token) {
       try {
-        tokenData = await jwtVerify(token, appData.sensitiveConfig.jwtKey);
+        tokenData = await jwtVerify(token, await appData.registry.getJWTSecretFor(JWT_KEY));
         if (tokenData.custom && !tokenData.isRealUser) {
           res.redirect(`/en/?err=${ENDPOINT_ERRORS.UNSPECIFIED}`);
           logger.error(
@@ -250,7 +250,7 @@ export function userRestServices(appData: IAppDataType) {
           id: user.id,
           role: user.role,
           sessionId: user.session_id || 0,
-        }, appData.sensitiveConfig.jwtKey);
+        }, await appData.registry.getJWTSecretFor(JWT_KEY));
       } catch (err) {
         if (req.query.noredirect) {
           res.status(400).end(JSON.stringify({
@@ -349,7 +349,7 @@ export function userRestServices(appData: IAppDataType) {
     if (token) {
       // we try
       try {
-        tokenData = await jwtVerify(token, appData.sensitiveConfig.secondaryJwtKey);
+        tokenData = await jwtVerify(token, await appData.registry.getJWTSecretFor(SECONDARY_JWT_KEY));
         // check the shape of the token
         if (
           !tokenData.unsubscribeUserId ||

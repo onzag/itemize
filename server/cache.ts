@@ -9,7 +9,7 @@
 
 import {
   CONNECTOR_SQL_COLUMN_ID_FK_NAME, CONNECTOR_SQL_COLUMN_VERSION_FK_NAME,
-  UNSPECIFIED_OWNER, ENDPOINT_ERRORS, INCLUDE_PREFIX, EXCLUSION_STATE_SUFFIX, DELETED_REGISTRY_IDENTIFIER, CACHED_CURRENCY_RESPONSE, SERVER_DATA_IDENTIFIER, RESERVED_BASE_PROPERTIES, TRACKERS_REGISTRY_IDENTIFIER
+  UNSPECIFIED_OWNER, ENDPOINT_ERRORS, INCLUDE_PREFIX, EXCLUSION_STATE_SUFFIX, DELETED_REGISTRY_IDENTIFIER, CACHED_CURRENCY_RESPONSE, SERVER_DATA_IDENTIFIER, RESERVED_BASE_PROPERTIES, TRACKERS_REGISTRY_IDENTIFIER, JWT_KEY
 } from "../constants";
 import { ISQLTableRowValue, ISQLStreamComposedTableRowValue, ConsumeStreamsFnType } from "../base/Root/sql";
 import { IGQLSearchRecord, IGQLArgs, IGQLValue } from "../gql-querier";
@@ -800,6 +800,9 @@ export class Cache {
     options: {
       ignorePreSideEffects?: boolean;
       ignoreSideEffects?: boolean;
+      ignoreAlreadyExists?: boolean;
+      ifAlreadyExistsReturn?: "null" | "current";
+      ifAlreadyExistsCall?: (v: ISQLTableRowValue) => void;
     } = {},
   ): Promise<ISQLTableRowValue> {
     const selfTable = itemDefinition.getQualifiedPathName();
@@ -935,11 +938,20 @@ export class Cache {
       const currentValue = await this.requestValue(
         itemDefinition,
         forId,
-        version,
+        version || null,
       );
 
       // if there's one it's a forbidden action
       if (currentValue) {
+        if (options.ignoreAlreadyExists) {
+          if (options.ifAlreadyExistsCall) {
+            options.ifAlreadyExistsCall(currentValue);
+          }
+          if (options.ifAlreadyExistsReturn === "current") {
+            return currentValue;
+          }
+          return null;
+        }
         throw new EndpointError({
           message: "You can't override an existant value by requesting creation on top of it",
           code: ENDPOINT_ERRORS.FORBIDDEN,
@@ -1256,6 +1268,9 @@ export class Cache {
     options: {
       ignorePreSideEffects?: boolean;
       ignoreSideEffects?: boolean;
+      ignoreAlreadyExists?: boolean;
+      ifAlreadyExistsReturn?: "null" | "current";
+      ifAlreadyExistsCall?: (v: ISQLTableRowValue) => void;
     } = {},
   ): Promise<ISQLTableRowValue> {
     const itemDefinition = typeof item === "string" ?
@@ -2857,7 +2872,7 @@ export class Cache {
       id: user.id,
       role: user.role,
       sessionId: user.session_id || 0,
-    }, this.sensitiveConfig.jwtKey);
+    }, await this.appData.registry.getJWTSecretFor(JWT_KEY));
   }
 
   /**

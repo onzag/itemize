@@ -11,31 +11,7 @@ export class ElasticLocationService extends UserLocalizationProvider<null> {
     fallback: IUserLocalizationType,
   ): Promise<IUserLocalizationType> {
     try {
-      const response = await this.localAppData.elastic.elasticClient.ingest.simulate({
-        pipeline: {
-          processors: [
-            {
-              geoip: {
-                field: "ip",
-              } as any,
-            },
-          ],
-        },
-        docs: [
-          {
-            _source: {
-              ip: ip,
-            }
-          }
-        ]
-      });
-      const doc =
-        response.docs &&
-        response.docs[0] &&
-        response.docs[0].doc &&
-        response.docs[0].doc._source &&
-        response.docs[0].doc._source.geoip;
-        
+      const doc = await this.localAppData.elastic.guessGeoIpFor(ip);
       if (!doc || !doc.country_iso_code) {
         return fallback;
       }

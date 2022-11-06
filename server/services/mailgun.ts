@@ -1,13 +1,20 @@
 import MailProvider, { ISendEmailData } from "./base/MailProvider";
 import type { Router } from "express";
 import { ServiceProviderType } from ".";
-import { NODE_ENV, INSTANCE_MODE } from "../environment";
+import { NODE_ENV, INSTANCE_MODE, GLOBAL_MANAGER_MODE } from "../environment";
 import express from "express";
 import busboy from "busboy";
 import type ItemDefinition from "../../base/Root/Module/ItemDefinition";
 import type { ReadStream } from "fs";
 import FormDataNode from "form-data";
 import { httpRequest } from "../request";
+import { jwtVerify } from "../token";
+import crypto from "crypto";
+import uuid from "uuid";
+import os from "os";
+import path from "path";
+import fs from "fs";
+import { IPropertyDefinitionSupportedSingleFilesType } from "../../base/Root/Module/ItemDefinition/PropertyDefinition/types/files";
 
 interface IMailgunConfig {
   apiKey: string;
@@ -28,8 +35,21 @@ interface IMailgunRoutesResponse {
   total_count: number;
 }
 
+interface IMailgunTmpFile {
+  fieldName: string;
+  filename: string;
+  encoding: string;
+  mimeType: string;
+  fileSize: number;
+  tmpLocation: string;
+}
+
+interface IMailgunTmpFileMap {
+  [key: string]: IMailgunTmpFile;
+}
+
 const MAILGUN_PRIORITY = 10;
-const MAILGUN_LAST_TIMESTAMP = "MAILGUN_LAST_TIMESTAMP_TEST79";
+const MAILGUN_LAST_TIMESTAMP = "MAILGUN_LAST_TIMESTAMP_TEST80";
 
 export class MailgunService extends MailProvider<IMailgunConfig> {
   private host: string;
@@ -65,16 +85,18 @@ export class MailgunService extends MailProvider<IMailgunConfig> {
     this.userHeader = "Basic " + Buffer.from("api:" + this.config.apiKey).toString('base64');
 
     this.usesDevelopmentReceive = (
-      NODE_ENV === "development" &&
       INSTANCE_MODE === "ABSOLUTE"
     );
 
     if (this.isInstanceGlobal()) {
-      await this.setupMailgun();
+      // await this.setupMailgun();
     }
   }
 
   private async setupMailgun() {
+    // ran just so that it creates a key if it does not exist
+    await this.localAppData.registry.createJWTSecretFor("MAILGUN_JWT_KEY");
+
     const allRoutes = (await httpRequest<IMailgunRoutesResponse>(
       {
         host: this.host,
@@ -87,9 +109,17 @@ export class MailgunService extends MailProvider<IMailgunConfig> {
       }
     )).data;
 
+    if (this.usesDevelopmentReceive) {
+      this.logInfo({
+        message: "Setting up mailgun for receiving emails using the fallback development mode, will use polling",
+        className: "MailgunService",
+        methodName: "setupMailgun",
+      });
+    }
+
     const expression = `match_recipient(".*@${this.appConfig.mailDomain}")`;
-    const notifyURL = JSON.stringify(`https://${NODE_ENV === "development" ? this.appConfig.developmentHostname : this.appConfig.productionHostname}/rest/service/mailgun/callback`);
-    const action = "store(notify=" + notifyURL + ")"
+    const forwardURL = JSON.stringify(`https://${NODE_ENV === "development" ? this.appConfig.developmentHostname : this.appConfig.productionHostname}/rest/service/mailgun/callback`);
+    const action = this.usesDevelopmentReceive ? "store()" : "forward(" + forwardURL + ")";
 
     const existingRoute = allRoutes.items.find((r) => (
       r.priority === MAILGUN_PRIORITY &&
@@ -209,7 +239,7 @@ export class MailgunService extends MailProvider<IMailgunConfig> {
       // for that we pick the email
       const emailInQuestion = Array.isArray(data.to) ? data.to[0] : data.to;
       // and try and find the given unsubscribe url
-      if (data.unsubscribeURLs[emailInQuestion]) {
+      if (data.unsubscribeURLs && data.unsubscribeURLs[emailInQuestion]) {
         // add a comma if necessary
         if (unsubscribeHeader) {
           unsubscribeHeader += ", ";
@@ -278,6 +308,8 @@ export class MailgunService extends MailProvider<IMailgunConfig> {
   }
 
   public getRunCycleTime() {
+    return null;
+
     if (this.usesDevelopmentReceive && !this.isInstanceGlobal()) {
       // because we are most likely running for localhost
       // as we are in a development environment we have no
@@ -332,23 +364,31 @@ export class MailgunService extends MailProvider<IMailgunConfig> {
       })).data;
 
       // due to a bug in mailgun API, we need to compare this again
-      const totalItems = (messages.items || [])
-      let actualItems = totalItems.filter((v: any) => v.timestamp >= checkTimeToUse);
+      const totalItems = (messages.items || []);
+      let rejected: number = 0;
+      // the timestamp often does not match and needs to be rechecked
+      let actualItems = totalItems.filter((v: any) => {
+        const approved = v.timestamp >= checkTimeToUse;
+        if (!approved) {
+          rejected++;
+        }
+
+        return approved;
+      });
       if (collected) {
         actualItems = actualItems.concat(collected);
       }
-
-      // TODO guess language using elastic https://www.elastic.co/guide/en/machine-learning/7.17/ml-lang-ident.html
 
       if (!actualItems.length) {
         this.logInfo({
           className: "MailgunService",
           methodName: "checkForNewMail",
-          message: "Did not receive any messages",
+          message: "Did not receive any messages " + rejected + " rejected",
           data: {
             lastRunCheckTime,
             checkTimeToUse,
             tomorrow,
+            rejected,
           }
         });
       } else {
@@ -359,11 +399,12 @@ export class MailgunService extends MailProvider<IMailgunConfig> {
         this.logInfo({
           className: "MailgunService",
           methodName: "checkForNewMail",
-          message: "Received " + actualItems.length + " messages",
+          message: "Received " + actualItems.length + " messages " + rejected + " rejected",
           data: {
             lastRunCheckTime,
             checkTimeToUse,
             tomorrow,
+            rejected,
             // messages: totalItems,
           }
         });
@@ -390,72 +431,14 @@ export class MailgunService extends MailProvider<IMailgunConfig> {
             })).data;
 
             const from = messageData.From;
-            const toUsers = messageData.To.split(",").map((v: string) => v.trim());
-            const idSource = this.parseRFC2822(messageData["Message-Id"])[0];
-            const id = idSource ? idSource.address : null;
+            const toUsers = messageData.To.split(",");
 
             // not correct
             if (!from || toUsers.length === 0) {
               continue;
             }
 
-            // they come as <ref1@domain.com> <ref2@domain.com> which is not comma separated, so we split, remove empties in case
-            // and use the address of each as the references in the mail provider expects an array of references
-            let references = messageData.References ?
-              this.parseRFC2822(messageData.References.split(" ").filter((v: string) => !!v)).map((v) => v.address) :
-              [];
-
-            const attachments = (messageData.attachments && messageData.attachments.map((a: any) => {
-              return this.createFileFromURL(
-                a.url,
-                a.name,
-                a.size,
-                a["content-type"],
-                {
-                  httpHeaders: {
-                    Authorization: this.userHeader,
-                  },
-                }
-              )
-            })) || null;
-
-            const contentIdMap: any = {};
-
-            if (messageData["content-id-map"] && messageData.attachments) {
-              Object.keys(messageData["content-id-map"]).forEach((k) => {
-                const valueUrl = messageData["content-id-map"][k].url;
-                const attachmentIndex = messageData.attachments.findIndex((v: any) => v.url === valueUrl);
-                if (attachmentIndex !== -1) {
-                  const attachment = attachments[attachmentIndex];
-                  const keyCleaned = k.startsWith("<") ? k.trim().substring(1, k.length - 1).trim() : k;
-                  contentIdMap[keyCleaned] = attachment.id;
-                }
-              });
-            }
-
-            try {
-              await this.onExternalEmailReceived({
-                from,
-                html: messageData["body-html"],
-                references,
-                id,
-                subject: messageData.subject,
-                to: toUsers,
-                attachments,
-                contentIdMap,
-              });
-            } catch (err) {
-              this.logError({
-                className: "MailgunService",
-                methodName: "checkForNewMail",
-                message: "Could not receive one email",
-                err,
-                data: {
-                  message: messageData,
-                },
-                serious: true,
-              });
-            }
+            await this.processMessageFrom(messageData);
           }
         }
       }
@@ -470,6 +453,203 @@ export class MailgunService extends MailProvider<IMailgunConfig> {
     }
   }
 
+  public async processMessageFrom(messageData: any, files?: IMailgunTmpFileMap) {
+    const from = messageData.From;
+    const toUsers = messageData.To.split(",").map((v: string) => v.trim());
+    const idSource = this.parseRFC2822(messageData["Message-Id"])[0];
+    const id = idSource ? idSource.address : null;
+
+    // not correct
+    if (!from || toUsers.length === 0) {
+      return;
+    }
+
+    // the reply of
+    const replyOfRfc = messageData["In-Reply-To"] ?
+      this.parseRFC2822(messageData["In-Reply-To"])[0] :
+      null;
+    const replyOf = (replyOfRfc && replyOfRfc.address) || null;
+
+    // they come as <ref1@domain.com> <ref2@domain.com> which is not comma separated, so we split, remove empties in case
+    // and use the address of each as the references in the mail provider expects an array of references
+    const references = messageData.References ?
+      this.parseRFC2822(messageData.References.split(" ").filter((v: string) => !!v)).map((v) => v.address) :
+      [];
+
+    // because this function handles both stored messages and
+    // forwarded we got to figure out how to get each, first this object
+    // is to track forwarded messages ids to the new ids that will be used
+    // for itemize when creating a file
+    const fileForwardedIdToAttachmentId: { [k: string]: string } = {};
+    const attachments: IPropertyDefinitionSupportedSingleFilesType[] = (files ? (
+      // here you can see
+      Object.keys(files).map((streamFilename) => {
+        // the stream file name is just the temporary file identifier that was used
+        // just some random id
+        const file = files[streamFilename];
+        // we feed it as the id for the local file but even that is not what will be used
+        // as id can be anything unique from the file to generate another uuid from
+        const value = this.createFileFromLocalFile(
+          streamFilename,
+          // feed the location name size, etc...
+          file.tmpLocation,
+          file.filename,
+          file.fileSize,
+          file.mimeType,
+        );
+        // now we can get the field name, to the id of the file
+        // the field name is what was used when posting the file and not the real file
+        // name
+        fileForwardedIdToAttachmentId[file.fieldName] = value.id;
+        return value;
+      })
+
+      // in the case of stored messages attachments are different
+    ) : (messageData.attachments && messageData.attachments.map((a: any) => {
+      // they reside at an url, so we got to create a file from that url
+      // when saving it will be downloaded from that url
+      return this.createFileFromURL(
+        a.url,
+        a.name,
+        a.size,
+        a["content-type"],
+        {
+          httpHeaders: {
+            Authorization: this.userHeader,
+          },
+        }
+      )
+    }))) || null;
+
+    // now for content ids for dynamic content
+    const contentIdMap: any = {};
+
+    if (messageData["content-id-map"] && attachments && attachments.length) {
+      // this is what forwarding receives, now we need to convert it to an id somehow
+      if (typeof messageData["content-id-map"] === "string") {
+        let contentIdMapParsed: any = null;
+        try {
+          // example "{\"<f_l8ofnnuq0>\":\"attachment-1\"}"
+          contentIdMapParsed = JSON.parse(messageData["content-id-map"])
+        } catch {
+          // could not parse json
+        }
+
+        if (contentIdMapParsed) {
+          Object.keys(contentIdMapParsed).forEach((k) => {
+            // we need to get the filed name for example "attachment-1"
+            const valueFieldName = contentIdMapParsed[k];
+            // and now we need to get the new id that the file was matched to
+            // because the file will use its own uuid when being created
+            const valueFileId = fileForwardedIdToAttachmentId[valueFieldName];
+            // if we get one, and we should
+            if (valueFileId) {
+              // let's find that file
+              const attachment = attachments.find((a) => a.id === valueFileId);
+              // remove the < from the potential <f_l8ofnnuq0> so you have f_l8ofnnuq0 only
+              // so cid:f_l8ofnnuq0 can be matched
+              const keyCleaned = k.startsWith("<") ? k.trim().substring(1, k.length - 1).trim() : k;
+              // now we add it to our new map as it should
+              // be with the id of the file
+              contentIdMap[keyCleaned] = attachment.id;
+            }
+          });
+        }
+      } else {
+        // stored messages receive this, they get an object, with content-type, name, size, and url
+        Object.keys(messageData["content-id-map"]).forEach((k) => {
+          // for that we got to get the url from the content id map
+          const valueUrl = messageData["content-id-map"][k].url;
+          // and find the attachment that holds that url from the attachments list
+          // that was provided in the stored message
+          const attachmentIndex = messageData.attachments.findIndex((v: any) => v.url === valueUrl);
+          // if it's found
+          if (attachmentIndex !== -1) {
+            // grab the attachment and clear
+            const attachment = attachments[attachmentIndex];
+            const keyCleaned = k.startsWith("<") ? k.trim().substring(1, k.length - 1).trim() : k;
+            contentIdMap[keyCleaned] = attachment.id;
+          }
+        });
+      }
+    }
+
+    // let's figure the language because mailgun does not
+    let language: string = null;
+    if (this.localAppData.elastic) {
+      try {
+        const langData = await this.localAppData.elastic.guessLanguageFor(messageData["body-plain"]);
+        if (langData && langData.predicted_value) {
+          language = langData.predicted_value;
+        }
+      } catch (err) {
+        this.logError({
+          className: "MailgunService",
+          methodName: "processMessageFrom",
+          message: "Could not use elastic for language analysis",
+          err,
+          data: {
+            message: messageData,
+          },
+        });
+      }
+    }
+
+    const date = messageData["Date"] ? new Date(messageData["Date"]) : null;
+    let timestamp: string = null;
+    if (date && date.toString() !== "Invalid Date") {
+      // this shall work for specifying the time when
+      // it was actually created
+      timestamp = date.toISOString();
+    }
+
+    try {
+      await this.onExternalEmailReceived({
+        from,
+        html: messageData["body-html"],
+        references,
+        id,
+        subject: messageData.subject,
+        to: toUsers,
+        attachments,
+        contentIdMap,
+        language,
+        timestamp,
+        replyOf,
+      });
+    } catch (err) {
+      this.logError({
+        className: "MailgunService",
+        methodName: "processMessageFrom",
+        message: "Could not receive one email",
+        err,
+        data: {
+          message: messageData,
+        },
+        serious: true,
+      });
+    }
+  }
+
+  public cleanup(folder: string) {
+    fs.rmdir(folder, (err) => {
+      if (err) {
+        if (err.code !== "ENOENT") {
+          this.logError({
+            className: "MailgunService",
+            methodName: "cleanup",
+            message: "Could not clean up orphan folder",
+            err,
+            orphan: true,
+            data: {
+              folder,
+            }
+          });
+        }
+      }
+    });
+  }
+
   public async getRouter(): Promise<Router> {
     // this is specific to production, while the endpoint exists
     // in development
@@ -477,42 +657,254 @@ export class MailgunService extends MailProvider<IMailgunConfig> {
     router.use(express.urlencoded({
       extended: true,
     }));
-    // TODO global is going to say this
-    // router.get(
-    //   "/mailgun/tick"
-    // )
+    // ticks mailgun to check messages
+    // not really used as the functionaly was changed to use forwarding
+    // since forwarding takes less load on mailgun
+    router.get(
+      "/mailgun/tick",
+      async (req, res) => {
+        const token = req.query.token as string;
+        if (!token || typeof token !== "string") {
+          res.status(400).end("Needs a token");
+        }
+
+        try {
+          await jwtVerify(token, await this.localAppData.registry.getJWTSecretFor("MAILGUN_JWT_KEY"));
+        } catch {
+          res.status(403).end("Could not verify token");
+          return;
+        }
+
+        res.status(200).end("Queued email check");
+
+        try {
+          await this.checkForNewMail();
+        } catch (err) {
+        }
+      }
+    );
     router.post(
       "/mailgun/callback",
-      (req, res) => {
-        if (req.body && req.body.token) {
-          console.log(req.body);
-          console.log(req.headers);
-          console.log(req.query);
-          res.status(200).end();
-        } else {
-          const bb = busboy({ headers: req.headers });
-          bb.on('file', (name, file, info) => {
-            const { filename, encoding, mimeType } = info;
-            console.log(
-              `File [${name}]: filename: %j, encoding: %j, mimeType: %j`,
-              filename,
-              encoding,
-              mimeType
-            );
-            file.on('data', (data) => {
-              console.log(`File [${name}] got ${data.length} bytes`);
-            }).on('close', () => {
-              console.log(`File [${name}] done`);
+      async (req, res) => {
+        //crypto.createHmac("sha256", MAILGUN_KEY).update(timestamp + token).digest("hex") === signature
+        if (req.headers["content-type"]) {
+          const isURLEncoded = req.headers["content-type"].startsWith("application/x-www-form-urlencoded");
+          const isFormData = req.headers["content-type"].startsWith("multipart/form-data");
+
+          if (isURLEncoded) {
+            const token = req.body.token;
+            const signature = req.body.signature;
+            const timestamp = req.body.timestamp;
+
+            const isValid = crypto.createHmac("sha256", this.config.apiKey).update(timestamp + token).digest("hex") === signature;
+
+            if (!isValid) {
+              res.status(403).end();
+            } else {
+              try {
+                await this.processMessageFrom(req.body);
+                res.status(200).end();
+              } catch (err) {
+                res.status(500).end("Error while processing message");
+              }
+            }
+          } else if (isFormData) {
+            const data: any = {};
+            const pathLocation = path.join(os.tmpdir(), uuid.v4().replace(/-/g, ""));
+            const files: IMailgunTmpFileMap = {};
+
+            try {
+              await fs.promises.mkdir(pathLocation);
+            } catch (err) {
+              this.logError({
+                message: "Could not create temporary file location",
+                className: "MailgunService",
+                err,
+                endpoint: "/mailgun/callback",
+                serious: true,
+              });
+              res.status(500).end("Could not create temporary file location");
+              return;
+            }
+
+            let hasResponded: boolean = false;
+            let hasCleaned: boolean = false;
+
+            const bb = busboy({ headers: req.headers });
+            bb.on('file', (name, file, info) => {
+              const { filename, encoding, mimeType } = info;
+              let fileSize: number = 0;
+
+              const streamFilename = uuid.v4().replace(/-/g, "");
+              const tmpLocation = path.join(pathLocation, streamFilename);
+
+              let outStream: fs.WriteStream;
+              try {
+                outStream = fs.createWriteStream(
+                  tmpLocation,
+                );
+              } catch (err) {
+                this.logError({
+                  message: "Could not create output stream",
+                  className: "MailgunService",
+                  err,
+                  endpoint: "/mailgun/callback",
+                  serious: true,
+                });
+
+                if (!hasResponded) {
+                  hasResponded = true;
+                  res.status(500).end("Could not create write stream");
+                  !hasCleaned && this.cleanup(pathLocation);
+                  hasCleaned = true;
+                }
+
+                throw err;
+              }
+              file.on("data", (chunk) => {
+                fileSize += chunk.length;
+              }).pipe(outStream);
+
+              outStream.on('error', (err) => {
+                if (!hasResponded) {
+                  hasResponded = true;
+                  this.logError({
+                    message: "Could not write stream",
+                    className: "MailgunService",
+                    endpoint: "/mailgun/callback",
+                    err,
+                    serious: true,
+                  });
+                  res.status(500).end("Could not write stream");
+                  !hasCleaned && this.cleanup(pathLocation);
+                  hasCleaned = true;
+                }
+              });
+
+              file.on("error", (err) => {
+                if (!hasResponded) {
+                  hasResponded = true;
+                  this.logError({
+                    message: "Could not read stream",
+                    className: "MailgunService",
+                    endpoint: "/mailgun/callback",
+                    err,
+                    serious: true,
+                  });
+                  res.status(500).end("Could not read stream");
+                  this.cleanup(pathLocation);
+                }
+              }).on("close", () => {
+                files[streamFilename] = {
+                  fieldName: name,
+                  filename,
+                  encoding,
+                  mimeType,
+                  fileSize,
+                  tmpLocation,
+                };
+              });
             });
-          });
-          bb.on('field', (name, val, info) => {
-            console.log(`Field [${name}]: value: %j`, val);
-          });
-          bb.on('close', () => {
-            console.log('Done parsing form!');
-            res.status(200).end();
-          });
-          req.pipe(bb);
+            bb.on('field', (name, val) => {
+              data[name] = val;
+            });
+            bb.on('error', () => {
+              if (!hasResponded) {
+                hasResponded = true;
+                this.logError({
+                  message: "Reading bus error",
+                  className: "MailgunService",
+                  endpoint: "/mailgun/callback",
+                  serious: true,
+                });
+                res.status(500).end("Reading bus error");
+                !hasCleaned && this.cleanup(pathLocation);
+                hasCleaned = true;
+              }
+            });
+            bb.on('partsLimit', () => {
+              if (!hasResponded) {
+                hasResponded = true;
+                this.logError({
+                  message: "Parts limit",
+                  className: "MailgunService",
+                  endpoint: "/mailgun/callback",
+                  serious: true,
+                });
+                res.status(400).end("Parts limit");
+                !hasCleaned && this.cleanup(pathLocation);
+                hasCleaned = true;
+              }
+            });
+            bb.on('filesLimit', () => {
+              if (!hasResponded) {
+                hasResponded = true;
+                this.logError({
+                  message: "Files limit",
+                  className: "MailgunService",
+                  endpoint: "/mailgun/callback",
+                  serious: true,
+                });
+                res.status(400).end("Files limit");
+                !hasCleaned && this.cleanup(pathLocation);
+                hasCleaned = true;
+              }
+            });
+            bb.on('fieldsLimit', () => {
+              if (!hasResponded) {
+                hasResponded = true;
+                this.logError({
+                  message: "Fields limit",
+                  className: "MailgunService",
+                  endpoint: "/mailgun/callback",
+                  serious: true,
+                });
+                res.status(400).end("Fields limit");
+                !hasCleaned && this.cleanup(pathLocation);
+                hasCleaned = true;
+              }
+            });
+            bb.on('close', async () => {
+              const token = data.token;
+              const signature = data.signature;
+              const timestamp = data.timestamp;
+
+              const isValid = crypto.createHmac("sha256", this.config.apiKey).update(timestamp + token).digest("hex") === signature;
+
+              if (!isValid) {
+                if (!hasResponded) {
+                  hasResponded = true;
+                  res.status(403).end();
+                }
+                !hasCleaned && this.cleanup(pathLocation);
+                hasCleaned = true;
+                return;
+              }
+
+              try {
+                await this.processMessageFrom(data, files);
+              } catch (err) {
+                if (!hasResponded) {
+                  hasResponded = true;
+                  res.status(500).end("Error while processing message");
+                }
+              }
+
+              if (!hasResponded) {
+                hasResponded = true;
+                res.status(200).end();
+              }
+
+              // delete files after they have been consumed
+              !hasCleaned && this.cleanup(pathLocation);
+              hasCleaned = true;
+            });
+            req.pipe(bb);
+          } else {
+            res.status(400).end();
+          }
+        } else {
+          res.status(400).end();
         }
       }
     );

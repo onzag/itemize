@@ -149,12 +149,28 @@ export function standardSQLSelect(arg: ISQLArgInfo): string[] {
 }
 
 /**
+ * @ignore
+ */
+const dateTypes = ["date", "datetime", "time"];
+
+/**
  * The standard sql in function that specifies how a property inputs its value
  * into a table
  * @param arg the in arg
  * @returns the partial row value
  */
 export function standardSQLInFn(arg: ISQLInInfo): ISQLTableRowValue {
+  // special case for non-standard now as a value
+  // for the field
+  if (
+    arg.value === "now" &&
+    dateTypes.includes(arg.property.getType())
+  ) {
+    return {
+      [arg.prefix + arg.id]: ["NOW()", []],
+    }
+  }
+
   if (typeof arg.value === "number") {
     let maxDecimalCount = arg.property.getMaxDecimalCount();
     if (maxDecimalCount > MAX_DECIMAL_COUNT) {

@@ -94,7 +94,7 @@ export class ServiceProvider<T> {
   }
 
   public logDebug<T>(data: IItemizeLoggingStructure<T>) {
-    CAN_LOG_DEBUG && logger && logger.info(data);
+    CAN_LOG_DEBUG && logger && logger.debug(data);
   }
 
   public logError<T>(data: IItemizeLoggingErrorStructure<T>) {

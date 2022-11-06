@@ -6,7 +6,7 @@ import { RobotsTest } from "./robots";
 import { GraphqlTest } from "./graphql";
 import { DatabaseTest } from "./database";
 import { RedisTest } from "./redis";
-import { CONNECTOR_SQL_COLUMN_ID_FK_NAME, CONNECTOR_SQL_COLUMN_VERSION_FK_NAME } from "../../constants";
+import { CONNECTOR_SQL_COLUMN_ID_FK_NAME, CONNECTOR_SQL_COLUMN_VERSION_FK_NAME, JWT_KEY, REGISTRY_IDENTIFIER } from "../../constants";
 import { jwtSign } from "../../server/token";
 import { TokenTest } from "./token";
 import { convertVersionsIntoNullsWhenNecessary } from "../../server/version-null-value";
@@ -71,13 +71,21 @@ export class ServerTest extends Test {
       ),
     );
 
+    const jwtKey = JSON.parse((await this.databaseConnection.queryFirst(
+      `SELECT "value" FROM ${JSON.stringify(REGISTRY_IDENTIFIER)} WHERE "pkey" = $1 AND "skey" = $2`,
+      [
+        JWT_KEY,
+        "",
+      ]
+    )).value);
+
     const testToken = await jwtSign(
       {
         id: testUser.id,
         role: testUser.role,
         sessionId: testUser.session_id || 0,
       },
-      this.testingInfo.sensitiveConfig.jwtKey,
+      jwtKey,
     );
 
     const malformedTestToken = await jwtSign(
@@ -86,7 +94,7 @@ export class ServerTest extends Test {
         role: testUser.role,
         sessionId: (testUser.session_id || 0).toString(),
       },
-      this.testingInfo.sensitiveConfig.jwtKey,
+      jwtKey,
     );
 
     const invalidSessionIdTestToken = await jwtSign(
@@ -95,7 +103,7 @@ export class ServerTest extends Test {
         role: testUser.role,
         sessionId: (testUser.session_id || 0) + 1,
       },
-      this.testingInfo.sensitiveConfig.jwtKey,
+      jwtKey,
     );
 
     const allRoles = this.testingInfo.config.roles;
@@ -106,7 +114,7 @@ export class ServerTest extends Test {
         role: rolesWithoutSelf[0] || "MADE_UP_ROLE",
         sessionId: testUser.session_id || 0,
       },
-      this.testingInfo.sensitiveConfig.jwtKey,
+      jwtKey,
     );
 
     const invalidSignatureTestToken = await jwtSign(

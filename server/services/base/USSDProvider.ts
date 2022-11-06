@@ -10,7 +10,7 @@
 import { IUSSDAction, IUSSDChunk } from "../../../ussd";
 import { ServiceProvider, ServiceProviderType } from "..";
 import { ssrGenerator } from "../../ssr/generator";
-import { CONNECTOR_SQL_COLUMN_ID_FK_NAME } from "../../../constants";
+import { CONNECTOR_SQL_COLUMN_ID_FK_NAME, JWT_KEY } from "../../../constants";
 import type ItemDefinition from "../../../base/Root/Module/ItemDefinition";
 import { jwtSign } from "../../token";
 
@@ -110,7 +110,7 @@ export default class USSDProvider<T> extends ServiceProvider<T> {
       id: userWithThatPhone[CONNECTOR_SQL_COLUMN_ID_FK_NAME],
       role: userWithThatPhone.role,
       sessionId: userWithThatPhone.session_id || 0,
-    }, this.localAppData.sensitiveConfig.jwtKey) : null;
+    }, await this.localAppData.registry.getJWTSecretFor(JWT_KEY)) : null;
 
     const chunk = (await ssrGenerator(
       this.localAppData,

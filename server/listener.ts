@@ -83,7 +83,7 @@ import { convertVersionsIntoNullsWhenNecessary } from "./version-null-value";
 import { logger } from "./logger";
 import {
   SERVER_DATA_IDENTIFIER, SERVER_USER_KICK_IDENTIFIER,
-  UNSPECIFIED_OWNER, MAX_REMOTE_LISTENERS_PER_SOCKET, GUEST_METAROLE, CURRENCY_FACTORS_IDENTIFIER, DELETED_REGISTRY_IDENTIFIER, TRACKERS_REGISTRY_IDENTIFIER
+  UNSPECIFIED_OWNER, MAX_REMOTE_LISTENERS_PER_SOCKET, GUEST_METAROLE, CURRENCY_FACTORS_IDENTIFIER, DELETED_REGISTRY_IDENTIFIER, TRACKERS_REGISTRY_IDENTIFIER, JWT_KEY
 } from "../constants";
 import Ajv from "ajv";
 import { jwtVerify } from "./token";
@@ -95,6 +95,7 @@ import { CustomRoleGranterEnvironment, CustomRoleManager, ICustomRoleType } from
 import { convertSQLValueToGQLValueForItemDefinition } from "../base/Root/Module/ItemDefinition/sql";
 import { ItemizeRawDB } from "./raw-db";
 import { CAN_LOG_DEBUG, INSTANCE_GROUP_ID, INSTANCE_MODE } from "./environment";
+import { RegistryService } from "./services/registry";
 
 const ajv = new Ajv();
 
@@ -181,6 +182,7 @@ export class Listener {
   private rawDB: ItemizeRawDB;
   private cache: Cache;
   private sensitiveConfig: ISensitiveConfigRawJSONDataType;
+  private registry: RegistryService;
   private server: Server;
   private customRoles: ICustomRoleType[];
 
@@ -190,6 +192,7 @@ export class Listener {
     redisGlobalPub: ItemizeRedisClient,
     redisLocalSub: ItemizeRedisClient,
     redisLocalPub: ItemizeRedisClient,
+    registry: RegistryService,
     root: Root,
     cache: Cache,
     rawDB: ItemizeRawDB,
@@ -207,6 +210,7 @@ export class Listener {
     this.rawDB = rawDB;
     this.sensitiveConfig = sensitiveConfig;
     this.customRoles = customRoles;
+    this.registry = registry;
 
     this.cache.setListener(this);
 
@@ -404,7 +408,7 @@ export class Listener {
     let result: IServerSideTokenDataType;
     if (request.token) {
       try {
-        result = await jwtVerify<IServerSideTokenDataType>(request.token, this.sensitiveConfig.jwtKey);
+        result = await jwtVerify<IServerSideTokenDataType>(request.token, await this.registry.getJWTSecretFor(JWT_KEY));
         invalid = (
           typeof result.id !== "string" ||
           typeof result.role !== "string" ||

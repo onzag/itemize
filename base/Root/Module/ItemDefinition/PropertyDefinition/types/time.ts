@@ -90,6 +90,8 @@ const typeValue: IPropertyDefinitionSupportedType<PropertyDefinitionSupportedTim
   validate: (d: PropertyDefinitionSupportedDateType) => {
     if (d === "Invalid Date") {
       return PropertyInvalidReason.INVALID_VALUE;
+    } else if (d === "now") {
+      return null;
     }
 
     const dateForm = Moment(d, TIME_FORMAT);

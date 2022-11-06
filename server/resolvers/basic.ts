@@ -8,6 +8,7 @@ import {
   RESERVED_BASE_PROPERTIES,
   INCLUDE_PREFIX,
   EXCLUSION_STATE_SUFFIX,
+  JWT_KEY,
 } from "../../constants";
 import { EndpointError } from "../../base/errors";
 import ItemDefinition, { IItemStateType } from "../../base/Root/Module/ItemDefinition";
@@ -92,7 +93,7 @@ export async function validateTokenAndGetData(appData: IAppDataType, token: stri
   } else {
     let throwErr = false;
     try {
-      result = await jwtVerify<IServerSideTokenDataType>(token, appData.sensitiveConfig.jwtKey);
+      result = await jwtVerify<IServerSideTokenDataType>(token, await appData.registry.getJWTSecretFor(JWT_KEY));
       if (!result.custom || result.isRealUser) {
         throwErr = (
           typeof result.id !== "string" ||

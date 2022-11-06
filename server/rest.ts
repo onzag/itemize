@@ -12,7 +12,7 @@ import { serverSideIndexChecker } from "../base/Root/Module/ItemDefinition/Prope
 import PropertyDefinition from "../base/Root/Module/ItemDefinition/PropertyDefinition";
 import ItemDefinition from "../base/Root/Module/ItemDefinition";
 import bodyParser from "body-parser";
-import { PROTECTED_RESOURCES, ENDPOINT_ERRORS, PING_DATA_IDENTIFIER, PING_STATUS_IDENTIFIER } from "../constants";
+import { PROTECTED_RESOURCES, ENDPOINT_ERRORS, PING_DATA_IDENTIFIER, PING_STATUS_IDENTIFIER, JWT_KEY } from "../constants";
 import { getMode } from "./mode";
 import { ENVIRONMENT_DETAILS } from "./environment";
 import { jwtVerify } from "./token";
@@ -363,7 +363,7 @@ export default function restServices(appData: IAppDataType) {
     let result: IServerSideTokenDataType;
     let forbidden: boolean = false;
     try {
-      result = await jwtVerify<IServerSideTokenDataType>(token, appData.sensitiveConfig.jwtKey);
+      result = await jwtVerify<IServerSideTokenDataType>(token, await appData.registry.getJWTSecretFor(JWT_KEY));
       forbidden = (
         typeof result.id !== "string" ||
         typeof result.sessionId !== "number" ||

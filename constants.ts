@@ -1558,3 +1558,13 @@ export const LOGS_IDENTIFIER = "LOGS";
  * for currency conversion in redis
  */
 export const CACHED_CURRENCY_RESPONSE = "CACHED_CURRENCY_RESPONSE";
+
+/**
+ * Key for the registry where the jwt key is stored
+ */
+export const JWT_KEY = "JWT_KEY";
+
+/**
+ * Key for the registry where the secondary jwt key is stored
+ */
+export const SECONDARY_JWT_KEY = "SECONDARY_JWT_KEY";

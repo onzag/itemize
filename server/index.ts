@@ -635,6 +635,11 @@ export async function initializeServer(
         redisPub,
         redisLocalSub,
         redisLocalPub,
+        // the registry and the root are only used
+        // in direct communication with the client
+        // so we are going to be cheap here
+        // and dont let it be
+        null,
         null,
         cache,
         null,
@@ -1021,6 +1026,7 @@ export async function initializeServer(
       redisPub,
       redisLocalSub,
       redisLocalPub,
+      registry,
       root,
       cache,
       rawDB,

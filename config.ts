@@ -272,17 +272,6 @@ export interface ISensitiveConfigRawJSONDataType {
    */
   seoContainerID: string;
   /**
-   * a json web token key to use, itemize uses JWT and as such it can be trusted
-   * to call other external APIs
-   */
-  jwtKey: string;
-  /**
-   * A secondary json web token key to use, for tasks where these tokens might be
-   * used on less secure third party tasks and are not used in more critical tasks
-   * eg. for email services
-   */
-  secondaryJwtKey: string;
-  /**
    * A development key, allows to use development files in its full form on the production
    * interface
    */
@@ -398,12 +387,6 @@ export const rawSensitiveConfigSchema = {
       type: ["object", "null"],
       additionalProperties: {},
     },
-    jwtKey: {
-      type: "string",
-    },
-    secondaryJwtKey: {
-      type: "string",
-    },
     devKey: {
       type: "string",
     },
@@ -456,8 +439,6 @@ export const rawSensitiveConfigSchema = {
     "logging",
     "defaultContainerID",
     "seoContainerID",
-    "jwtKey",
-    "secondaryJwtKey",
     "devKey",
   ],
 };

@@ -6,6 +6,8 @@ import {
   CONNECTOR_SQL_COLUMN_ID_FK_NAME,
   CONNECTOR_SQL_COLUMN_VERSION_FK_NAME,
   ENDPOINT_ERRORS,
+  JWT_KEY,
+  SECONDARY_JWT_KEY,
 } from "../../constants";
 import { jwtVerify, jwtSign } from "../token";
 import { EndpointError } from "../../base/errors";
@@ -100,7 +102,7 @@ export const customUserQueries = (appData: IAppDataType): IGQLQueryFieldsDefinit
           let decoded: IServerSideTokenDataType = null;
           try {
             // we attempt to decode it
-            decoded = await jwtVerify<IServerSideTokenDataType>(args.token, appData.sensitiveConfig.jwtKey);
+            decoded = await jwtVerify<IServerSideTokenDataType>(args.token, await appData.registry.getJWTSecretFor(JWT_KEY));
           } catch (err) {
             throw new EndpointError({
               message: "Token is invalid",
@@ -336,7 +338,7 @@ export const customUserQueries = (appData: IAppDataType): IGQLQueryFieldsDefinit
               id: resultUser.id,
               role: resultUser.role,
               sessionId: resultUser.session_id || 0,
-            }, appData.sensitiveConfig.jwtKey));
+            }, await appData.registry.getJWTSecretFor(JWT_KEY)));
             // and we return the information back to the user
             return {
               ...resultUser,
@@ -406,7 +408,7 @@ export const customUserQueries = (appData: IAppDataType): IGQLQueryFieldsDefinit
         let decoded: IValidateUserTokenDataType;
         try {
           // we attempt to decode it
-          decoded = await jwtVerify(token, appData.sensitiveConfig.secondaryJwtKey);
+          decoded = await jwtVerify(token, await appData.registry.getJWTSecretFor(SECONDARY_JWT_KEY));
         } catch (err) {
           throw new EndpointError({
             message: "Invalid Token",
@@ -587,7 +589,7 @@ export const customUserQueries = (appData: IAppDataType): IGQLQueryFieldsDefinit
         let decoded: IServerSideTokenDataType;
         try {
           // we attempt to decode it
-          decoded = await jwtVerify<IServerSideTokenDataType>(args.token, appData.sensitiveConfig.jwtKey);
+          decoded = await jwtVerify<IServerSideTokenDataType>(args.token, await appData.registry.getJWTSecretFor(SECONDARY_JWT_KEY));
         } catch (err) {
           throw new EndpointError({
             message: "Token is invalid",
@@ -756,7 +758,7 @@ export const customUserQueries = (appData: IAppDataType): IGQLQueryFieldsDefinit
             validateUserRandomId: randomId,
             validateType: args.type,
             validateValue: isMail ? resultUser.email : resultUser.phone,
-          }, appData.sensitiveConfig.secondaryJwtKey);
+          }, await appData.registry.getJWTSecretFor(SECONDARY_JWT_KEY));
         } catch (err) {
           logger.error(
             {
@@ -1051,7 +1053,7 @@ export const customUserQueries = (appData: IAppDataType): IGQLQueryFieldsDefinit
           resetToken = await jwtSign({
             resetPasswordUserId: userId,
             resetPasswordRandomId: randomId,
-          }, appData.sensitiveConfig.secondaryJwtKey);
+          }, await appData.registry.getJWTSecretFor(SECONDARY_JWT_KEY));
         } catch (err) {
           logger.error(
             {
@@ -1194,7 +1196,7 @@ export const customUserQueries = (appData: IAppDataType): IGQLQueryFieldsDefinit
           let decoded: RecoverPasswordTokenType = null;
           try {
             // we attempt to decode it
-            decoded = await jwtVerify<RecoverPasswordTokenType>(args.token, appData.sensitiveConfig.secondaryJwtKey);
+            decoded = await jwtVerify<RecoverPasswordTokenType>(args.token, await appData.registry.getJWTSecretFor(SECONDARY_JWT_KEY));
           } catch (err) {
             throw new EndpointError({
               message: "Reset token is invalid",

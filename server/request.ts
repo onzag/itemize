@@ -15,6 +15,7 @@ interface IHTTPRequestInfo {
   headers?: any;
   dontProcessResponse?: boolean;
   processAsJSON?: boolean;
+  returnNonOk?: boolean;
 }
 
 interface IHTTPResponse<T> {
@@ -79,7 +80,11 @@ export function httpRequest<T>(data: IHTTPRequestInfo): Promise<IHTTPResponse<T>
       request.on("response", (resp) => {
         if (data.dontProcessResponse) {
           resolve({ response: resp, data: null });
-        } else if (resp.statusCode === 200 || resp.statusCode === 0) {
+        } else if (!CAN_LOG_DEBUG && !data.returnNonOk && resp.statusCode && (resp.statusCode < 200 || resp.statusCode >= 300)) {
+          const err = new Error("Request failed, server responsed with status: " + resp.statusCode);
+          !hasFiredError && reject(err);
+          hasFiredError = true;
+        } else {
           let dataProcessed = "";
           resp.on("data", (chunk) => {
             dataProcessed += chunk;
@@ -89,26 +94,37 @@ export function httpRequest<T>(data: IHTTPRequestInfo): Promise<IHTTPResponse<T>
             hasFiredError = true;
           });
           resp.on("end", () => {
+            let valueToRespondWith: any = dataProcessed;
             if (
               data.processAsJSON ||
               resp.headers["content-type"].startsWith("application/json")
             ) {
               try {
-                const jsonValue = JSON.parse(dataProcessed);
-                resolve({ response: resp, data: jsonValue });
+                valueToRespondWith = JSON.parse(dataProcessed);
               } catch {
                 const err = new Error("Could not parse JSON from response");
                 !hasFiredError && reject(err);
                 hasFiredError = true;
+                return;
               }
+            }
+
+            if (CAN_LOG_DEBUG) {
+              logger.debug({
+                message: "HTTP request resolved",
+                data: valueToRespondWith,
+                functionName: "httpRequest",
+              });
+            }
+
+            if (data.returnNonOk || (resp.statusCode >= 200 && resp.statusCode < 300) || !resp.statusCode) {
+              resolve({ response: resp, data: valueToRespondWith });
             } else {
-              resolve({ response: resp, data: dataProcessed as any });
+              const err = new Error("Request failed, server responsed with status: " + resp.statusCode);
+              !hasFiredError && reject(err);
+              hasFiredError = true;
             }
           });
-        } else {
-          const err = new Error("Request failed, server responsed with status: " + resp.statusCode);
-          !hasFiredError && reject(err);
-          hasFiredError = true;
         }
       });
 

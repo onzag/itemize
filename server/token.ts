@@ -54,6 +54,41 @@ export async function jwtVerify<T>(
 }
 
 /**
+ * Verify and decode a key using two keys
+ * @param token the token in question
+ * @param secretOrPublicKey the key
+ * @param secretOrPublicKeyAlt the alternative key (or null)
+ * @param options verify options
+ */
+ export async function jwtVerifyWithAlt<T>(
+  token: string,
+  secretOrPublicKey: jwt.Secret,
+  secretOrPublicKeyAlt: jwt.Secret,
+  options?: jwt.VerifyOptions,
+): Promise<T> {
+  return new Promise<T>((resolve, reject) => {
+    jwt.verify(token, secretOrPublicKey, options, (err: Error, decoded: any) => {
+      if (err) {
+        if (secretOrPublicKeyAlt) {
+          jwt.verify(token, secretOrPublicKeyAlt, options, (err2: Error, decoded2: any) => {
+            if (err2) {
+              reject(err2);
+            } else {
+              resolve(decoded2);
+            }
+          });
+        } else {
+          reject(err);
+        }
+      } else {
+        resolve(decoded);
+      }
+    });
+  });
+}
+
+
+/**
  * Decode a JWT token and does not verify whether it's valid
  * @param token the token in question
  * @param options the options

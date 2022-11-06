@@ -20,7 +20,7 @@ import type { IPropertyDefinitionSupportedSingleFilesType, PropertyDefinitionSup
 import { IOTriggerActions, ITriggerRegistry } from "../../resolvers/triggers";
 import path from "path";
 import { DOMWindow, escapeHtml, formatDateTime, getContainerIdFromMappers } from "../../../util";
-import { UNSPECIFIED_OWNER } from "../../../constants";
+import { SECONDARY_JWT_KEY, UNSPECIFIED_OWNER } from "../../../constants";
 import { isRTL, languages } from "../../../imported-resources";
 import uuid from "uuid";
 import uuidv5 from "uuid/v5";
@@ -31,7 +31,6 @@ import addressRFC2822, { IRFC2822Data } from "address-rfc2822";
 import { httpRequest } from "../../request";
 import fs, { ReadStream } from "fs";
 import os from "os";
-const fsAsync = fs.promises;
 
 /**
  * This is the mail namespace, and it's used to convert the mail
@@ -161,7 +160,10 @@ export interface IReceiveEmailData {
   id?: string;
 
   /**
-   * The mail references header
+   * The mail references header, without any of the rfc stuff
+   * for example <stuff@cat.com> and <stuff2@cat.com>
+   * should be an array of
+   * ["stuff@cat.com", "stuff2.cat.com"]
    */
   references?: string[];
 
@@ -221,6 +223,12 @@ export interface IReceiveEmailData {
    * Whether to consider the email spam
    */
   spam?: boolean;
+
+  /**
+   * The In-Reply-To target that was used, without any of the
+   * rfc stuff, for example, "mail@cat.com"
+   */
+  replyOf?: string;
 }
 
 const symbols = "+,|-?<>=!";
@@ -299,6 +307,29 @@ export default class MailProvider<T> extends ServiceProvider<T> {
         }
       }),
     }
+  }
+
+  public createFileFromLocalFile(
+    id: string,
+    filepath: string,
+    name: string,
+    size: number,
+    type: string,
+    extraArgs?: {
+      widthXHeight?: [number, number],
+    },
+  ): IPropertyDefinitionSupportedSingleFilesType {
+    const basicFile: IPropertyDefinitionSupportedSingleFilesType = {
+      id: "FILE" + uuidv5(id, MAIL_NAMESPACE).replace(/-/g, ""),
+      name: name || "untitled",
+      url: (name || "untitled").replace(/\s/g, "_").replace(/\-/g, "_").replace(/[^A-Za-z0-9_\.]/g, "x"),
+      size,
+      type,
+      metadata: extraArgs && extraArgs.widthXHeight ? extraArgs.widthXHeight.join("x") : "",
+      src: fs.createReadStream(filepath),
+    }
+
+    return basicFile;
   }
 
   public async createFileFromReadStream(
@@ -945,7 +976,7 @@ export default class MailProvider<T> extends ServiceProvider<T> {
           unsubscribeProperty: arg.subscribeProperty,
         }
         // and make up the url based on that
-        const token = await jwtSign(tokenData, this.appSensitiveConfig.secondaryJwtKey);
+        const token = await jwtSign(tokenData, await this.localAppData.registry.getJWTSecretFor(SECONDARY_JWT_KEY));
         const url = "https://" + hostname + "/rest/user/unsubscribe?userid=" + encodeURIComponent(userData.id) + "&token=" + encodeURIComponent(token);
         // create the url
         unsubscribeURLs[email] = {
@@ -1095,6 +1126,7 @@ export default class MailProvider<T> extends ServiceProvider<T> {
     }
 
     const idBase = uuidv5(uuidToUse, MAIL_NAMESPACE).replace(/-/g, "");
+    const replyOfIdBase = data.replyOf ? uuidv5(data.replyOf, MAIL_NAMESPACE).replace(/-/g, "") : null;
 
     // if somehow user has no email or emails cannot be validated
     // we cannot allow external emails to be received
@@ -1167,15 +1199,15 @@ export default class MailProvider<T> extends ServiceProvider<T> {
         this.appConfig,
         potentialSender.app_country,
       );
-      const replyOf = await this.onEmailReceivedReplyResolver(
-        idBase + "+" + potentialSender.id,
+      const replyOf = replyOfIdBase ? await this.onEmailReceivedReplyResolver(
+        replyOfIdBase + "+" + potentialSender.id,
         data,
         potentialSender,
         true,
-      );
+      ) : null;
 
       let parent: any = null;
-      if (replyOf && replyOf.created_by === potentialSender.id) {
+      if (replyOf) {
         // this message is not the tip of the given conversation anymore
         if (replyOf.tip) {
           await this.localAppData.cache.requestUpdateSimple(
@@ -1214,6 +1246,8 @@ export default class MailProvider<T> extends ServiceProvider<T> {
           cid_attachments: renderedMail.cidAttachments,
           attachments: renderedMail.attachments,
           metadata: metadataStr,
+          // the timestamp will be overriden by optional args if specified
+          timestamp: "now",
           ...optionalArgs,
           ...this.getExtraArgs(),
         },
@@ -1225,6 +1259,12 @@ export default class MailProvider<T> extends ServiceProvider<T> {
         senderContainerId,
         parent,
         null,
+        {
+          ignoreAlreadyExists: true,
+          // ensure we populate the stored messages
+          // even if it's already existant
+          ifAlreadyExistsReturn: "current",
+        },
       ));
     }
 
@@ -1293,12 +1333,12 @@ export default class MailProvider<T> extends ServiceProvider<T> {
             user.app_country,
           );
 
-          const replyOf = await this.onEmailReceivedReplyResolver(
-            idBase + "+" + user.id,
+          const replyOf = replyOfIdBase ? await this.onEmailReceivedReplyResolver(
+            replyOfIdBase + "+" + user.id,
             data,
             user,
             false,
-          );
+          ) : null;
 
           let parent: any = null;
           if (replyOf) {
@@ -1354,7 +1394,15 @@ export default class MailProvider<T> extends ServiceProvider<T> {
                 spam: isSpam,
               },
               bestMatchStoredMessage,
-            )
+              {
+                // by default this will return null if it already exists
+                ignoreAlreadyExists: true,
+                // but we want to store it anyway so if it already exists we store
+                ifAlreadyExistsCall(v) {
+                  storedMessages.push(v);
+                },
+              },
+            );
           } else {
             // the first time creating the message and consuming the streams
             messageForUser = await this.localAppData.cache.requestCreation(
@@ -1385,51 +1433,74 @@ export default class MailProvider<T> extends ServiceProvider<T> {
               targetContainerId,
               parent,
               null,
+              {
+                ignoreAlreadyExists: true,
+                ifAlreadyExistsCall(v) {
+                  storedMessages.push(v);
+                },
+              },
             );
           }
 
-          storedMessages.push(messageForUser);
+          // only if the message does not exist
+          // in the system we add it
+          if (messageForUser) {
+            storedMessages.push(messageForUser);
 
-          if (isSpam) {
-            externalReceivesSpam.push(user);
-          } else {
-            externalReceives.push(user);
+            if (isSpam) {
+              externalReceivesSpam.push(user);
+            } else {
+              externalReceives.push(user);
+            }
           }
         }
       }
 
-      if (externalReceives.length) {
-        // same here if the sender exists the default function
-        // will not leak the sender's email and use its own
-        // external email or otherwise notifications
-        await this.onUsersReceivedExternalEmail(
-          externalReceives,
-          potentialSender,
-          // pick one
-          storedMessages[0],
-          data,
-          false,
-        );
-      }
-
-      if (externalReceivesSpam.length) {
-        // same here if the sender exists the default function
-        // will not leak the sender's email and use its own
-        // external email or otherwise notifications
-        await this.onUsersReceivedExternalEmail(
-          externalReceives,
-          potentialSender,
-          // pick one
-          storedMessages[0],
-          data,
-          true,
-        );
-      }
-
-      // inform of emails that bounced
-      if (bounces.length) {
-        await this.onExternalEmailBounced(bounces, potentialSender, data);
-      }
+      (async () => {
+        try {
+          if (externalReceives.length) {
+            // same here if the sender exists the default function
+            // will not leak the sender's email and use its own
+            // external email or otherwise notifications
+            await this.onUsersReceivedExternalEmail(
+              externalReceives,
+              potentialSender,
+              // pick one
+              storedMessages[0],
+              data,
+              false,
+            );
+          }
+    
+          if (externalReceivesSpam.length) {
+            // same here if the sender exists the default function
+            // will not leak the sender's email and use its own
+            // external email or otherwise notifications
+            await this.onUsersReceivedExternalEmail(
+              externalReceives,
+              potentialSender,
+              // pick one
+              storedMessages[0],
+              data,
+              true,
+            );
+          }
+    
+          // inform of emails that bounced
+          if (bounces.length) {
+            await this.onExternalEmailBounced(bounces, potentialSender, data);
+          }
+        } catch (err) {
+          this.logError({
+            className: "MailProvider",
+            message: "Could not perform notification and bouncing actions",
+            err,
+            data,
+            serious: true,
+            methodName: "onExternalEmailReceived"
+          })
+        }
+      })();
     };
   }
 
@@ -1587,20 +1658,6 @@ export default class MailProvider<T> extends ServiceProvider<T> {
    */
   public renderMessageFromMail(html: string, contentIdMap: { [key: string]: string }, attachments: PropertyDefinitionSupportedFilesType) {
     let finalAttachments = attachments ? [...attachments] : [];
-    const potentialCidAttachments: PropertyDefinitionSupportedFilesType = [];
-
-    if (contentIdMap) {
-      const contentIdValues = Object.keys(contentIdMap).map((v) => contentIdMap[v]);
-      finalAttachments = finalAttachments.filter((a) => {
-        const isContentId = contentIdValues.includes(a.id);
-        if (isContentId) {
-          potentialCidAttachments.push(a);
-        }
-        return !isContentId;
-      })
-    }
-
-    const cidAttachments: PropertyDefinitionSupportedFilesType = [];
 
     if (!attachments || !contentIdMap || !html || Object.keys(contentIdMap).length === 0 || attachments.length === 0) {
       return {
@@ -1609,6 +1666,9 @@ export default class MailProvider<T> extends ServiceProvider<T> {
         cidAttachments: null,
       }
     }
+
+
+    const cidAttachments: PropertyDefinitionSupportedFilesType = [];
 
     const cheapdiv = DOMWindow.document.createElement("div");
     cheapdiv.innerHTML = html;
@@ -1619,8 +1679,14 @@ export default class MailProvider<T> extends ServiceProvider<T> {
 
         const fileSrcId = contentIdMap[cidSrc];
         img.dataset.srcId = fileSrcId;
-        const fileInQuestion = potentialCidAttachments.find((f) => f.id === fileSrcId);
-        cidAttachments.push(fileInQuestion);
+        const fileInQuestionIndex = finalAttachments.findIndex((f) => f.id === fileSrcId);
+
+        // add it to cid remove it from attachments
+        // if found of course
+        if (fileInQuestionIndex !== -1) {
+          cidAttachments.push(finalAttachments[fileInQuestionIndex]);
+          finalAttachments.splice(fileInQuestionIndex, 1);
+        }
       }
     });
 
@@ -2289,6 +2355,7 @@ export default class MailProvider<T> extends ServiceProvider<T> {
                 uuid: uuidToUse,
                 references,
                 target: targets,
+                timestamp: "now",
               };
             }
 

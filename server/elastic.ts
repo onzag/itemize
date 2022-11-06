@@ -2098,6 +2098,95 @@ export class ItemizeElasticClient {
 
     return "OK";
   }
+
+  public async guessGeoIpFor(ip: string): Promise<{
+    continent_name?: string,
+    region_iso_code?: string,
+    city_name?: string,
+    country_iso_code?: string,
+    country_name?: string,
+    region_name?: string,
+    location?: {
+      lon: number,
+      lat: number,
+    },
+  }> {
+    const response = await this.elasticClient.ingest.simulate({
+      pipeline: {
+        processors: [
+          {
+            geoip: {
+              field: "ip",
+            } as any,
+          },
+        ],
+      },
+      docs: [
+        {
+          _source: {
+            ip: ip,
+          }
+        }
+      ]
+    });
+
+    const doc =
+      response.docs &&
+      response.docs[0] &&
+      response.docs[0].doc &&
+      response.docs[0].doc._source &&
+      response.docs[0].doc._source.geoip;
+
+    return doc || null;
+  }
+
+  public async guessLanguageFor(text: string): Promise<{
+    prediction_score: string,
+    model_id: string,
+    prediction_probability: string,
+    predicted_value: string
+  }> {
+    if (!text || text.length < 10) {
+      return null;
+    }
+
+    const srcToUse = text.length > 300 ? text.substring(0, 300) : text;
+
+    const response = await this.elasticClient.ingest.simulate({
+      pipeline: {
+        processors: [
+          {
+            inference: {
+              model_id: "lang_ident_model_1"
+            }
+          } as any
+        ],
+      },
+      docs: [
+        {
+          _source: {
+            text: srcToUse,
+          }
+        }
+      ]
+    });
+
+    const doc =
+      response.docs &&
+      response.docs[0] &&
+      response.docs[0].doc &&
+      response.docs[0].doc._source &&
+      response.docs[0].doc._source.ml &&
+      response.docs[0].doc._source.ml.inference;
+
+    // can happen for cases eg. when adding symbols and nothing of content
+    // for a language to be interpreted from
+    if (!doc || doc.predicted_value === "zxx") {
+      return null;
+    }
+
+    return doc;
+  }
 }
 
 type SubBuilderFn = (sb: ElasticQueryBuilder) => void;
