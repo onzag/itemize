@@ -68,6 +68,16 @@ export interface IConfigRawJSONDataType {
    */
   fontUrl: string;
   /**
+   * For resources that are to be cached in the service worker
+   * in addition of the standard ones
+   */
+  cachedResources: string[];
+  /**
+   * For resources that are to be cached in the service worker
+   * that are external
+   */
+  cachedExtUrls: string[];
+  /**
    * The font name to use
    */
   fontName: string;
@@ -595,6 +605,18 @@ export const rawConfigSchema = {
         type: "string",
       },
     },
+    cachedExtUrls: {
+      type: "array",
+      items: {
+        type: "string",
+      },
+    },
+    cachedResources: {
+      type: "array",
+      items: {
+        type: "string",
+      },
+    },
     fontName: {
       type: "string",
     },
@@ -683,7 +705,9 @@ export const rawConfigSchema = {
     "rtlLanguages",
     "roles",
     "fontUrl",
+    "cachedResources",
     "cacheableExtHostnames",
+    "cachedExtUrls",
     "fontName",
     "manifest",
     "fallbackCountryCode",

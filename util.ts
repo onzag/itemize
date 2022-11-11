@@ -551,7 +551,11 @@ export function fileURLAbsoluter(
     return null;
   }
 
-  if (file.url.indexOf("blob:") === 0) {
+  if (
+    file.url.indexOf("blob:") === 0 ||
+    file.url.indexOf("http:") === 0 ||
+    file.url.indexOf("https:") === 0
+  ) {
     return file;
   }
 

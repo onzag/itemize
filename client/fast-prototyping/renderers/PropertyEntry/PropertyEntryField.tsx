@@ -710,7 +710,7 @@ class PropertyEntryFieldRenderer
         }}
         inputProps={inputProps}
         disabled={this.props.disabled}
-        variant="filled"
+        variant={this.props.args.fieldVariant || "filled"}
         {...appliedTextFieldProps}
       />
     );

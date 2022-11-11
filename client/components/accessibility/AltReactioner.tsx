@@ -281,14 +281,14 @@ function triggerBasedOn(code: string, shiftKey: boolean, callbackIfmatch: () => 
       const expectNextGroup = ALT_REGISTRY.isJumpingThroughGroups ? (selected ? selected.getTabGroup() : undefined) : undefined;
 
       // make sure that there are tabbable components not to enter an infinite loop
-      if (!ALT_REGISTRY.awaitingKeycodes.some((e) => e.isTabbale() && !e.isUsedInFlow() && e.isCorrectMatchForTabGroup(expectNextGroup))) {
+      if (!ALT_REGISTRY.awaitingKeycodes.some((e) => e.isTabbable() && !e.isUsedInFlow() && e.isCorrectMatchForTabGroup(expectNextGroup))) {
         // break it and stop it now
         callbackIfmatch();
         return;
       }
 
       let nextElement = ALT_REGISTRY.awaitingKeycodes[nextIndex];
-      while (!nextElement.isTabbale() || nextElement.isUsedInFlow() || !nextElement.isCorrectMatchForTabGroup(expectNextGroup)) {
+      while (!nextElement.isTabbable() || nextElement.isUsedInFlow() || !nextElement.isCorrectMatchForTabGroup(expectNextGroup)) {
         nextIndex = ((nextIndex + len + (!shiftKey ? 1 : -1))) % len;
         nextElement = ALT_REGISTRY.awaitingKeycodes[nextIndex];
       }
@@ -308,7 +308,7 @@ function triggerBasedOn(code: string, shiftKey: boolean, callbackIfmatch: () => 
         // let's check if we are already focused in one of the elements that are relevant
         // so we can go directly to the next one
         const alreadyFocusedAtIndex =
-          ALT_REGISTRY.isDisplayingActions.findIndex((e) => e.isTabbale() && !e.isUsedInFlow() && e.getElement() === document.activeElement);
+          ALT_REGISTRY.isDisplayingActions.findIndex((e) => e.isTabbable() && !e.isUsedInFlow() && e.getElement() === document.activeElement);
 
         if (alreadyFocusedAtIndex !== -1) {
           nextIndex = ((alreadyFocusedAtIndex + len + (!shiftKey ? 1 : -1))) % len;
@@ -329,14 +329,14 @@ function triggerBasedOn(code: string, shiftKey: boolean, callbackIfmatch: () => 
       const expectNextGroup = ALT_REGISTRY.isJumpingThroughGroups ? (selected ? selected.getTabGroup() : undefined) : undefined;
 
       // make sure that there are tabbable components not to enter an infinite loop
-      if (!ALT_REGISTRY.isDisplayingActions.some((e) => e.isTabbale() && !e.isUsedInFlow() && e.isCorrectMatchForTabGroup(expectNextGroup))) {
+      if (!ALT_REGISTRY.isDisplayingActions.some((e) => e.isTabbable() && !e.isUsedInFlow() && e.isCorrectMatchForTabGroup(expectNextGroup))) {
         // break it and stop it now
         callbackIfmatch();
         return;
       }
 
       let nextElement = ALT_REGISTRY.isDisplayingActions[nextIndex];
-      while (!nextElement.isTabbale() || nextElement.isUsedInFlow() || !nextElement.isCorrectMatchForTabGroup(expectNextGroup)) {
+      while (!nextElement.isTabbable() || nextElement.isUsedInFlow() || !nextElement.isCorrectMatchForTabGroup(expectNextGroup)) {
         nextIndex = ((nextIndex + len + (!shiftKey ? 1 : -1))) % len;
         nextElement = ALT_REGISTRY.isDisplayingActions[nextIndex];
       }
@@ -356,7 +356,7 @@ function triggerBasedOn(code: string, shiftKey: boolean, callbackIfmatch: () => 
         // let's check if we are already focused in one of the elements that are relevant
         // so we can go directly to the next one
         const alreadyFocusedAtIndex =
-          ALT_REGISTRY.activeFlow.findIndex((e) => e.isTabbale() && e.getElement() === document.activeElement);
+          ALT_REGISTRY.activeFlow.findIndex((e) => e.isTabbable() && e.getElement() === document.activeElement);
 
         if (alreadyFocusedAtIndex !== -1) {
           nextIndex = ((alreadyFocusedAtIndex + len + (!shiftKey ? 1 : -1))) % len;
@@ -377,14 +377,14 @@ function triggerBasedOn(code: string, shiftKey: boolean, callbackIfmatch: () => 
       const expectNextGroup = ALT_REGISTRY.isJumpingThroughGroups ? (selected ? selected.getTabGroup() : undefined) : undefined;
 
       // make sure that there are tabbable components not to enter an infinite loop
-      if (!ALT_REGISTRY.activeFlow.some((e) => e.isTabbale() && e.isCorrectMatchForTabGroup(expectNextGroup))) {
+      if (!ALT_REGISTRY.activeFlow.some((e) => e.isTabbable() && e.isCorrectMatchForTabGroup(expectNextGroup))) {
         // break it and stop it now
         callbackIfmatch();
         return;
       }
 
       let nextElement = ALT_REGISTRY.activeFlow[nextIndex];
-      while (!nextElement.isTabbale() || !nextElement.isCorrectMatchForTabGroup(expectNextGroup)) {
+      while (!nextElement.isTabbable() || !nextElement.isCorrectMatchForTabGroup(expectNextGroup)) {
         nextIndex = ((nextIndex + len + (!shiftKey ? 1 : -1))) % len;
         nextElement = ALT_REGISTRY.activeFlow[nextIndex];
       }
@@ -467,7 +467,9 @@ function triggerBasedOn(code: string, shiftKey: boolean, callbackIfmatch: () => 
 
   // one or zero matches
   if (matches.length <= 1) {
-    const isTabNavigatingCurrent = !!ALT_REGISTRY.isDisplayingActions.find((v) => v.getElement() === document.activeElement);
+    const isTabNavigatingCurrent =
+      ALT_REGISTRY.isDisplayingActions &&
+      !!ALT_REGISTRY.isDisplayingActions.find((v) => v.getElement() === document.activeElement);
     hideAll();
     matches.forEach((m) => m.trigger(isTabNavigatingCurrent));
   } else {
@@ -594,6 +596,20 @@ if (typeof document !== "undefined") {
   });
 }
 
+function isHidden(element: HTMLElement): boolean {
+  const computedStyle = getComputedStyle(element);
+
+  if (computedStyle.display === "none" || computedStyle.visibility === "hidden") {
+    return true;
+  }
+
+  if (!element.parentElement) {
+    return false;
+  }
+
+  return isHidden(element.parentElement);
+}
+
 export class ActualAltBase<P extends IAltBaseProps, S> extends React.PureComponent<P, S> {
   public containerRef: React.RefObject<HTMLElement>;
 
@@ -619,7 +635,7 @@ export class ActualAltBase<P extends IAltBaseProps, S> extends React.PureCompone
     }
   }
 
-  public isTabbale() {
+  public isTabbable() {
     return typeof this.props.tabbable === "boolean" ? this.props.tabbable : true;
   }
 
@@ -628,7 +644,19 @@ export class ActualAltBase<P extends IAltBaseProps, S> extends React.PureCompone
   }
 
   public isDisabled() {
-    return this.props.disabled || false;
+    // if the element is display none or visibility hidden
+    // then it's considered disabled
+    const element = this.getElement();
+
+    if (!element) {
+      return true;
+    }
+
+    if (this.props.disabled) {
+      return true;
+    }
+
+    return isHidden(element);
   }
 
   public isElementInView() {
@@ -667,7 +695,20 @@ export class ActualAltBase<P extends IAltBaseProps, S> extends React.PureCompone
     }
 
     const isRtL = document.querySelector("html").dir === "rtl";
+
+    // we are missing, it must be because we are dismounting
+    if (!this.getElement()) {
+      return false;
+    }
+
     const selfClientRect = this.getElement().getBoundingClientRect();
+
+    // other is missing we are before
+    // it must be because it's dismounting
+    if (!other.getElement()) {
+      return true;
+    }
+
     const otherClientRect = other.getElement().getBoundingClientRect();
 
     // check if there's a vertical intersection which can make them be considered to be in the same

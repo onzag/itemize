@@ -15,18 +15,19 @@ import { deepRendererArgsComparer } from "../general-fn";
  * @param internalValue the internal value, a moment object
  * @param actualValue the actual value, a json string
  */
-function getValue(internalValue: any, actualValue: string, type: string) {
+function getValue(isReady: boolean, internalValue: any, actualValue: string, type: string) {
   // internal value has priority, that's why it's there
   if (internalValue) {
     return internalValue;
   } else if (actualValue) {
-    let dbFormat = DATETIME_FORMAT;
     if (type === "date") {
-      dbFormat = DATE_FORMAT;
+      return Moment(actualValue, DATE_FORMAT);
     } else if (type === "time") {
-      dbFormat = TIME_FORMAT;
+      return Moment(actualValue, TIME_FORMAT);
+    } else {
+      // must use utc because this runs on first go
+      return isReady ? Moment(actualValue, DATETIME_FORMAT) : Moment.utc(actualValue, DATETIME_FORMAT);
     }
-    return Moment(actualValue, dbFormat);
   }
   return null;
 }
@@ -65,6 +66,7 @@ export default class PropertyEntryDateTime extends
     // this way then
     this.state = {
       value: getValue(
+        false,
         props.state.internalValue,
         props.state.value as PropertyDefinitionSupportedDateType,
         props.property.getType(),
@@ -100,6 +102,16 @@ export default class PropertyEntryDateTime extends
   public enableUserSetErrors() {
     this.setState({
       showUserSetErrors: true,
+    });
+  }
+  public componentDidMount() {
+    this.setState({
+      value: getValue(
+        false,
+        this.props.state.internalValue,
+        this.props.state.value as PropertyDefinitionSupportedDateType,
+        this.props.property.getType(),
+      ),
     });
   }
   public componentDidUpdate(prevProps: IPropertyEntryHandlerProps<PropertyDefinitionSupportedDateType, IPropertyEntryDateTimeRendererProps>) {

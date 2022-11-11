@@ -5,7 +5,7 @@
  */
 
 import React from "react";
-import { useTheme } from "@mui/material/styles";
+import { SxProps, Theme, useTheme } from "@mui/material/styles";
 import I18nRead from "../../components/localization/I18nRead";
 import { default as MDialog } from "@mui/material/Dialog";
 import AppBar from "@mui/material/AppBar";
@@ -84,6 +84,31 @@ interface IDialogProps {
    * The dialog class name
    */
   className?: string;
+  /**
+   * The aria labelled by id
+   * remember to give the id to an element in the title or content
+   * or set useLabelledByInTitleId
+   */
+  labelledBy?: string;
+  /**
+   * Whatever was passed to labelledBy will become the id of the title
+   */
+  useLabelledByInTitleId?: boolean;
+  /**
+   * The aria described by id
+   * remember to give the id to an element in the title or content
+   */
+  describedBy?: string;
+  /**
+   * sx for the dialog
+   */
+  sx?: SxProps<Theme>;
+  titleSx?: SxProps<Theme>;
+  paperSx?: SxProps<Theme>;
+  appbarSx?: SxProps<Theme>;
+  toolbarSx?: SxProps<Theme>;
+  dialogContentSx?: SxProps<Theme>;
+  dialogActionsSx?: SxProps<Theme>;
 }
 
 /**
@@ -95,13 +120,20 @@ function Dialog(props: IDialogProps) {
       open={props.open}
       onClose={props.onClose}
       fullScreen={props.fullScreen}
+      className={props.className}
       scroll="paper"
       TransitionProps={{
         onEntered: props.onOpen,
         onEntering: props.onOpening,
       }}
+      sx={props.sx}
+      PaperProps={{
+        sx: props.paperSx,
+        "aria-labelledby": props.labelledBy,
+        "aria-describedby": props.describedBy,
+      }}
     >
-      <AppBar sx={dialogStyles.appbar}>
+      {props.title ? <AppBar sx={props.appbarSx ? props.appbarSx : dialogStyles.appbar}>
         <Toolbar>
           <I18nRead id="close">
             {(i18nClose: string) => (
@@ -114,15 +146,20 @@ function Dialog(props: IDialogProps) {
               </IconButton>
             )}
           </I18nRead>
-          <Typography variant="h6" color="inherit" sx={dialogStyles.title}>
+          <Typography
+            variant="h6"
+            color="inherit"
+            sx={props.titleSx ? props.titleSx : dialogStyles.title}
+            id={props.useLabelledByInTitleId ? props.labelledBy : null}
+          >
             {props.title}
           </Typography>
         </Toolbar>
-      </AppBar>
-      {props.children ? <DialogContent sx={dialogStyles.content}>
+      </AppBar> : null}
+      {props.children ? <DialogContent sx={props.dialogContentSx ? props.dialogContentSx : dialogStyles.content}>
         {props.children}
       </DialogContent> : null}
-      {props.buttons ? <DialogActions sx={dialogStyles.actions}>
+      {props.buttons ? <DialogActions sx={props.dialogActionsSx ? props.dialogActionsSx : dialogStyles.actions}>
         {props.buttons}
       </DialogActions> : null}
     </MDialog>

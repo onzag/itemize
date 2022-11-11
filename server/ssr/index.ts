@@ -4,6 +4,12 @@
  * @module
  */
 
+import type Root from "../../base/Root";
+import type { ILangLocalesType } from "../../base/Root";
+import type { ICollectorType } from "../../client";
+import type { ISSRContextType } from "../../client/internal/providers/ssr-provider";
+import type { IConfigRawJSONDataType } from "../../config";
+
 /**
  * This is what a SSR rule is and specifies
  * how a page is to be rendered
@@ -40,4 +46,23 @@ export interface ISSRRule {
    * The mode the user is going with
    */
   mode: "development" | "production";
+}
+
+export interface ISSRServerModeInfo {
+  collector?: ICollectorType;
+  config: IConfigRawJSONDataType,
+  ssrContext: ISSRContextType;
+  clientDetails: {
+    lang: string;
+    currency: string;
+    country: string;
+    guessedData: string;
+  };
+  langLocales: ILangLocalesType;
+  root: Root;
+  originalUrl: string;
+  redirectTo: (path: string) => void;
+  userLocalizationService: any;
+  ip: string;
+  appliedRule: ISSRRule;
 }

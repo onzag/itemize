@@ -145,7 +145,7 @@ export function Buttons(props: ButtonsProps) {
                     groupPosition={-100}
                   >
                     <Button color="inherit" variant="outlined" onClick={openLoginDialog} sx={buttonsStyles.loginButton}>
-                      <I18nRead id="login" />
+                      <I18nRead id="login" context="users/user"/>
                     </Button>
                   </AltBadgeReactioner>
                   {

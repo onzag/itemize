@@ -1690,6 +1690,10 @@ export default class MailProvider<T> extends ServiceProvider<T> {
       }
     });
 
+    cheapdiv.querySelectorAll("blockquote").forEach((blockquote) => {
+      blockquote.removeAttribute("style");
+    });
+
     return {
       html: cheapdiv.innerHTML,
       attachments: finalAttachments.length === 0 ? null : finalAttachments,
@@ -1709,10 +1713,11 @@ export default class MailProvider<T> extends ServiceProvider<T> {
    */
   public async renderMessageFormatForward(
     parentMessage: ISQLTableRowValue,
+    lang: string,
     size: number,
   ): Promise<IEmailRenderedMessage> {
     if (size >= (this.getSizeLimit() - 1000)) {
-      const htmlValue = await this.formatForward("", parentMessage, true);
+      const htmlValue = await this.formatForward("", lang, parentMessage, true);
       return {
         attachments: null,
         cidMap: null,
@@ -1726,7 +1731,7 @@ export default class MailProvider<T> extends ServiceProvider<T> {
 
     // strange missing value
     if (!forwardValue) {
-      const htmlValue = await this.formatForward("ERROR", parentMessage, true);
+      const htmlValue = await this.formatForward("ERROR", lang, parentMessage, true);
       return {
         attachments: null,
         cidMap: null,
@@ -1735,10 +1740,10 @@ export default class MailProvider<T> extends ServiceProvider<T> {
       };
     }
 
-    const renderedMessage = await this.renderMessageForMail(forwardValue);
+    const renderedMessage = await this.renderMessageForMail(forwardValue, lang);
 
     if (renderedMessage.predictedSize + size > this.getSizeLimit()) {
-      const htmlValue = await this.formatForward("", forwardValue, true);
+      const htmlValue = await this.formatForward("", lang, forwardValue, true);
       return {
         attachments: null,
         cidMap: null,
@@ -1747,7 +1752,7 @@ export default class MailProvider<T> extends ServiceProvider<T> {
       };
     }
 
-    const htmlValue = await this.formatForward(renderedMessage.html, forwardValue, false);
+    const htmlValue = await this.formatForward(renderedMessage.html, lang, forwardValue, false);
     return {
       attachments: renderedMessage.attachments,
       cidMap: renderedMessage.cidMap,
@@ -1770,7 +1775,9 @@ export default class MailProvider<T> extends ServiceProvider<T> {
    */
   public async renderMessageForMail(
     message: ISQLTableRowValue,
+    lang?: string,
     internalForwardOptions?: {
+      lang?: string,
       subjectReplace: string,
       from: string,
       fromProxy?: string,
@@ -1800,8 +1807,10 @@ export default class MailProvider<T> extends ServiceProvider<T> {
     const supportsCustomStyles = actualProperty.getSpecialProperty("supportsCustomStyles");
     const supportsTemplating = actualProperty.getSpecialProperty("supportsTemplating");
 
-    const language = message["subject_LANGUAGE"] || message["content_LANGUAGE"];
-    const dir = isRTL(language) ? "rtl" : "ltr";
+    const messageLanguage = message["subject_LANGUAGE"] || message["content_LANGUAGE"];
+    const dir = isRTL(messageLanguage) ? "rtl" : "ltr";
+    const userLanguage = lang || messageLanguage;
+    const userDir = isRTL(userLanguage) ? "rtl" : "ltr";
 
     let cidAttachments: PropertyDefinitionSupportedFilesType = [];
     try {
@@ -1824,18 +1833,21 @@ export default class MailProvider<T> extends ServiceProvider<T> {
     // when we are forwarding message as form of notification to users
     if (internalForwardOptions) {
       htmlStart += (
-        `<div>${escapeHtml(this.getForwardFromIndicator(language) + internalForwardOptions.from)}</div>` +
-        `<div>${escapeHtml(this.getForwardSubjectIndicator(language) + message.subject)}</div>`
+        `<div dir="${userDir}">` +
+        `<div>${escapeHtml(this.getForwardFromIndicator(userLanguage) + internalForwardOptions.from)}</div>` +
+        `<div>${escapeHtml(this.getForwardSubjectIndicator(userLanguage) + message.subject)}</div>`
       );
 
       if (internalForwardOptions.fromProxy) {
-        htmlStart += `<div>${escapeHtml(this.getForwardProxyIndicator(language) + internalForwardOptions.fromProxy)}</div>`
+        htmlStart += `<div>${escapeHtml(this.getForwardProxyIndicator(userLanguage) + internalForwardOptions.fromProxy)}</div>`
       }
 
-      const urlForEmail = this.getForwardViewAtURL(language, message);
-      htmlStart += `<div>${escapeHtml(this.getForwardViewAtIndicator(language))}<a href="${escapeHtml(urlForEmail)}">${escapeHtml(urlForEmail)}</a></div>`;
+      const urlForEmail = this.getForwardViewAtURL(userLanguage, message);
+      htmlStart += `<div>${escapeHtml(this.getForwardViewAtIndicator(userLanguage))}<a href="${escapeHtml(urlForEmail)}">${escapeHtml(urlForEmail)}</a></div>`;
+      htmlStart += "</div>";
 
-      htmlStart += "<div>";
+      // now the message comes here
+      htmlStart += `<div dir="${dir}">`;
     }
 
     // calling the sanitize function
@@ -1932,6 +1944,7 @@ export default class MailProvider<T> extends ServiceProvider<T> {
       const forwardMessageAdded = await
         this.renderMessageFormatForward(
           message,
+          lang,
           predictedSizeBase + predictedSizeStart + predictedSizeEnd + predictedSizeSubject + predictedSizeFiles,
         );
       htmlBase += forwardMessageAdded.html;
@@ -2004,7 +2017,7 @@ export default class MailProvider<T> extends ServiceProvider<T> {
     await Promise.all(Object.keys(sortedUsers).map(async (language) => {
       const users = sortedUsers[language];
 
-      const renderedData = await this.renderMessageForMail(message, {
+      const renderedData = await this.renderMessageForMail(message, language, {
         from: username,
         fromProxy: proxyname,
         subjectReplace: this.getForwardSubjectReplace(
@@ -2673,13 +2686,13 @@ export default class MailProvider<T> extends ServiceProvider<T> {
    * @param isBreak whether this message actually can't fit due to size limitations (do not try to render much the thread is broken)
    * @returns 
    */
-  public async formatForward(html: string, message: ISQLTableRowValue, isBreak: boolean) {
-    const lang = message["subject_LANGUAGE"] || message["content_LANGUAGE"];
+  public async formatForward(html: string, lang: string, message: ISQLTableRowValue, isBreak: boolean) {
+    const actualLang = lang || message["subject_LANGUAGE"] || message["content_LANGUAGE"];
 
     // if it's a break we set the break header and shall be done
     if (isBreak) {
       return (
-        `<div class="quote"><div class="attr">${escapeHtml(this.getBreakHeader(lang))}</div></div>`
+        `<div class="quote"><div class="attr">${escapeHtml(this.getBreakHeader(actualLang))}</div></div>`
       );
     }
 
@@ -2687,7 +2700,7 @@ export default class MailProvider<T> extends ServiceProvider<T> {
     // from: User <user@email.com>
     // from: User
     // from: <user@email.com>
-    let from: string = escapeHtml(this.getForwardFromIndicator(lang));
+    let from: string = escapeHtml(this.getForwardFromIndicator(actualLang));
     if (message.source) {
       const source = await this.resolveTarget(message.source);
       if (source) {
@@ -2698,7 +2711,7 @@ export default class MailProvider<T> extends ServiceProvider<T> {
           from += ` <a href="mailto:${escapeHtml(source.email)}">&lt;${escapeHtml(source.email)}&gt;</a>`
         }
       } else {
-        from += escapeHtml(this.getForwardDeletedIndicator(lang));
+        from += escapeHtml(this.getForwardDeletedIndicator(actualLang));
       }
     }
 

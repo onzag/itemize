@@ -8,7 +8,7 @@ import { IAppDataType } from "..";
 import { logger } from "../logger";
 import React from "react";
 import express from "express";
-import { ISSRRule } from ".";
+import { ISSRRule, ISSRServerModeInfo } from ".";
 import { GUEST_METAROLE, CURRENCY_FACTORS_IDENTIFIER } from "../../constants";
 import { getCookie } from "../mode";
 import { ISSRContextType } from "../../client/internal/providers/ssr-provider";
@@ -133,10 +133,11 @@ export async function ssrGenerator(
     // the service worker in the client utilize in order to build the app from scratch, for most users
     // they'll never hit SSR they'll recieve only this fast memoized option meant for the same buildnumber
     // and they'll get it mainly from the service worker, they won't even bother with the server
+    const languageToUse = language && config.supportedLanguages.includes(language) ? language : null;
     appliedRule = {
       noSSR: true,
-      language: null,
-      rtl: false,
+      language: languageToUse,
+      rtl: languageToUse && config.rtlLanguages.includes(languageToUse),
       languages: config.supportedLanguages,
       forUser: null,
       mode,
@@ -268,9 +269,11 @@ export async function ssrGenerator(
     newHTML = newHTML.replace(/\$SSRDIR/g, usedDir);
 
     // and now the href lang tags
-    langHrefLangTags = appliedRule.languages.map((language: string) => {
-      return `<link rel="alternate" href="https://${info.req.get("host")}${info.req.originalUrl.replace(appliedRule.language, language)}" hreflang="${language}">`
-    }).join("");
+    if (appliedRule.language) {
+      langHrefLangTags = appliedRule.languages.map((language: string) => {
+        return `<link rel="alternate" href="https://${info.req.get("host")}${info.req.originalUrl.replace(appliedRule.language, language)}" hreflang="${language}">`
+      }).join("");
+    }
   }
 
   // this flags marks whether we can use etags
@@ -363,7 +366,7 @@ export async function ssrGenerator(
         ip = XFF[0];
       }
 
-      const serverModeOptions = {
+      const serverModeOptions: ISSRServerModeInfo = {
         collector: appData.ssrConfig.collector,
         config: appData.config,
         ssrContext: ssr,
@@ -379,6 +382,7 @@ export async function ssrGenerator(
         redirectTo: redirectTo,
         ip,
         userLocalizationService: appData.userLocalizationService,
+        appliedRule,
       };
       const options = {
         appWrapper: isUSSD ? appData.ssrConfig.ussdConfig.appWrapper : appData.ssrConfig.appWrapper,

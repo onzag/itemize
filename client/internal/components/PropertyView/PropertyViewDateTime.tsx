@@ -35,15 +35,29 @@ export interface IPropertyViewDateTimeRendererProps extends IPropertyViewRendere
   defaultFormattedValue: string;
 }
 
+interface IPropertyViewDateTimeState {
+  isReady: boolean;
+}
+
 /**
  * The property view date time handler class
  */
-export class PropertyViewDateTime extends React.Component<IPropertyViewHandlerProps<IPropertyViewDateTimeRendererProps>> {
+export class PropertyViewDateTime extends React.Component<IPropertyViewHandlerProps<IPropertyViewDateTimeRendererProps>, IPropertyViewDateTimeState> {
   constructor(props: IPropertyViewHandlerProps<IPropertyViewDateTimeRendererProps>) {
     super(props);
+
+    this.state = {
+      isReady: false,
+    }
+  }
+  public componentDidMount() {
+    this.setState({
+      isReady: true,
+    });
   }
   public shouldComponentUpdate(
     nextProps: IPropertyViewHandlerProps<IPropertyViewDateTimeRendererProps>,
+    nextState: IPropertyViewDateTimeState,
   ) {
     // This is optimized to only update for the thing it uses
     return this.props.useAppliedValue !== nextProps.useAppliedValue ||
@@ -54,6 +68,7 @@ export class PropertyViewDateTime extends React.Component<IPropertyViewHandlerPr
       nextProps.capitalize !== this.props.capitalize ||
       !!this.props.rtl !== !!nextProps.rtl ||
       this.props.language !== nextProps.language ||
+      this.state.isReady !== nextState.isReady ||
       !deepRendererArgsComparer(this.props.rendererArgs, nextProps.rendererArgs);
   }
   public render() {
@@ -74,7 +89,14 @@ export class PropertyViewDateTime extends React.Component<IPropertyViewHandlerPr
     let momentValue: Moment.Moment = null;
     const valueToUse: string = (this.props.useAppliedValue ? this.props.state.stateAppliedValue : this.props.state.value) as string;
     if (valueToUse && valueToUse !== "Invalid Date") {
-      momentValue = Moment(valueToUse, dbFormat);
+      if (this.state.isReady) {
+        // when we are ready we can be sure we are in client side
+        // and we can use the same timezone as the browser/machine
+        momentValue = Moment(valueToUse, dbFormat);
+      } else {
+        // otherwise force UTC
+        momentValue = Moment.utc(valueToUse, dbFormat);
+      }
       if (!momentValue.isValid()) {
         momentValue = null;
       }

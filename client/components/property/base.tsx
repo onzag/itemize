@@ -121,6 +121,10 @@ export interface IPropertyEntryProps<RendererPropsType> extends IPropertyBaseWit
   };
   /**
    * whether to cache files when running the url absoluter
+   * 
+   * this uses the service worker mechanism, it will not affect
+   * files that have been cached internally using long term
+   * caching
    */
   cacheFiles?: boolean;
   /**

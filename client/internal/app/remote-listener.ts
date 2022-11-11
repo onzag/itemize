@@ -330,7 +330,10 @@ export class RemoteListener {
     this.setupTime = (new Date()).getTime();
 
     // setup the io to the client
-    this.socket = io(`${location.protocol}//${location.host}`);
+    this.socket = io(`${location.protocol}//${location.host}`, {
+      // Disable long polling should result in better performance for the load balancer
+      transports: ["websocket"],
+    });
     this.socket.on("connect", this.onConnect);
     this.socket.on("disconnect", this.onDisconnect);
     this.socket.on(KICKED_EVENT, this.onKicked);

@@ -70,6 +70,18 @@ export async function standardConfigSetup(
         defaultValue: ["fonts.googleapis.com", "fonts.gstatic.com"],
       },
       {
+        variableName: "cachedResources",
+        type: "strarray",
+        message: "A list of resources that will be cached by default by the service worker",
+        defaultValue: [],
+      },
+      {
+        variableName: "cachedExtUrls",
+        type: "strarray",
+        message: "A list of external urls that will be cached by default by the service worker",
+        defaultValue: [],
+      },
+      {
         variableName: "manifest",
         type: "config",
         message: "Manifest configuration for the web manifest",

@@ -248,7 +248,7 @@ class PropertyEntrySelectRenderer
           onBlur={this.props.enableUserSetErrors}
           displayEmpty={true}
           disabled={this.props.disabled}
-          variant="filled"
+          variant={this.props.args.fieldVariant || "filled"}
           sx={style.selectRoot}
           input={
             <FilledInput
@@ -320,7 +320,7 @@ class PropertyEntrySelectRenderer
             null
         }
         <FormControl
-          variant="filled"
+          variant={this.props.args.fieldVariant || "filled"}
           sx={style.entry}
         >
           {this.props.label ? <InputLabel

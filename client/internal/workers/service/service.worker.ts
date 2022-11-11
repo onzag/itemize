@@ -30,6 +30,8 @@ const urlsToCache = [
   isDevelopment ? "/rest/resource/cache-worker.development.js" : "/rest/resource/cache-worker.production.js",
   isDevelopment ? "/rest/resource/cache-worker.injector.development.js" : "/rest/resource/cache-worker.injector.production.js",
   config.fontUrl,
+  ...config.cachedResources.map((r) => "/rest/resource/" + r),
+  ...config.cachedExtUrls,
 ];
 let CACHE_NAME = "ITEMIZEV" + buildnumber;
 

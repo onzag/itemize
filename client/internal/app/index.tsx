@@ -343,8 +343,12 @@ export default class App extends React.Component<IAppProps, IAppState> {
     // And we set the language
     document.cookie = "lang=" + locale + ";expires=" + COOKIE_EXPIRATION_DATE + ";path=/" + cookieEnd;
 
+    const isRtl = this.props.config.rtlLanguages.includes(locale);
+
     // now we set the html lang in locale
     document.body.parentElement.lang = locale;
+    document.body.parentElement.dir = isRtl ? "rtl" : "ltr";
+
     // we also update the manifest
     (document.head.querySelector("[rel='manifest']") as HTMLLinkElement).href =
       "/rest/resource/manifest." + locale + ".json";

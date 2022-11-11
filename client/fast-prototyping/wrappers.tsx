@@ -6,7 +6,7 @@
  */
 
 import React, { useEffect } from "react";
-import { createTheme } from "@mui/material/styles";
+import { createTheme, Theme } from "@mui/material/styles";
 import { ILocaleContextType } from "../internal/providers/locale-provider";
 import Moment from "moment";
 import AdapterMoment from '@mui/lab/AdapterMoment';
@@ -14,8 +14,10 @@ import { IConfigRawJSONDataType } from "../../config";
 import { ThemeProvider } from "@mui/material/styles";
 import CssBaseline from "@mui/material/CssBaseline";
 import LocalizationProvider from '@mui/lab/LocalizationProvider';
-import { CacheProvider } from "@emotion/react";
+import { CacheProvider, EmotionCache } from "@emotion/react";
 import createCache from '@emotion/cache';
+import rtlPlugin from 'stylis-plugin-rtl';
+import { prefixer } from 'stylis';
 
 export const ReuseCacheContextEmotionIsAMess = React.createContext(false);
 
@@ -37,8 +39,34 @@ function SSRSheetsRemover(props: { children: React.ReactNode }) {
   return props.children as any;
 }
 
-export function createEmotionCache() {
-  return createCache({ key: 'css' });
+let cachedRtlCache: EmotionCache;
+let cachedLtrCache: EmotionCache;
+
+export function createEmotionCache(isRtl: boolean, useDoubleCache: boolean) {
+  if (useDoubleCache) {
+    if (cachedRtlCache && isRtl) {
+      return cachedRtlCache;
+    } else if (cachedLtrCache && !isRtl) {
+      return cachedLtrCache;
+    }
+  }
+
+  const newCache = isRtl ? createCache({
+    key: "css_rtl",
+    stylisPlugins: [prefixer, rtlPlugin],
+  }) : createCache({
+    key: "css",
+  });
+
+  if (useDoubleCache) {
+    if (isRtl) {
+      cachedRtlCache = newCache;
+    } else {
+      cachedLtrCache = newCache;
+    }
+  }
+
+  return newCache;
 }
 
 /**
@@ -51,53 +79,20 @@ export function createEmotionCache() {
  * @param config the configuration that is being used, this is the same as the config.json
  */
 export function appWrapper(app: React.ReactElement, config: IConfigRawJSONDataType) {
-  // we create the material ui theme
-  const theme = createTheme({
-    typography: {
-      fontFamily: "'" + config.fontName + "', sans-serif",
-      fontWeightLight: 300,
-      fontWeightRegular: 400,
-      fontWeightMedium: 500,
-    }
-  });
-
   // this is what our base app used to be before
   // very simple and it worked
   const baseApp = (
-    <ThemeProvider theme={theme}>
+    <>
       <CssBaseline />
       <SSRSheetsRemover>
         {app}
       </SSRSheetsRemover>
-    </ThemeProvider>
-  );
-
-  // this is what it has to do now with the introduction
-  // of a dreaded emotion cache that is a total mess
-  return (
-    <ReuseCacheContextEmotionIsAMess.Consumer>
-      {(shouldReuse: boolean) => {
-        // the cache is already defined for the server
-        // context in the collector, so it's not necessary
-        // to create a new one, because emotion is so smart
-        // it doesn't export its context so I can't read it
-        // and must deal with a hack
-        if (shouldReuse) {
-          return baseApp;
-        } else {
-          const cache = createEmotionCache();
-          // client side basically or when
-          // we don't use a styles collector
-          return (
-            <CacheProvider value={cache}>
-              {baseApp}
-            </CacheProvider>
-          );
-        }
-      }}
-    </ReuseCacheContextEmotionIsAMess.Consumer>
+    </>
   );
 }
+
+let cachedLTRTheme: Theme;
+let cachedRTLTheme: Theme;
 
 /**
  * The main wrapper stays under the app and it's a dynamic component that will be requested
@@ -117,11 +112,66 @@ export function mainWrapper(
 ) {
   const languageDeregionalized = localeContext.language.includes("-") ?
     localeContext.language.split("-")[0] : localeContext.language;
+
+  const isRtl = config.rtlLanguages.includes(localeContext.language);
+
+  let theme: Theme;
+
+  if (isRtl && cachedRTLTheme) {
+    theme = cachedRTLTheme;
+  } else if (!isRtl && cachedLTRTheme) {
+    theme = cachedLTRTheme;
+  } else {
+    theme = createTheme({
+      direction: isRtl ? "rtl" : "ltr",
+      typography: {
+        fontFamily: "'" + config.fontName + "', sans-serif",
+        fontWeightLight: 300,
+        fontWeightRegular: 400,
+        fontWeightMedium: 500,
+      }
+    });
+
+    if (isRtl) {
+      cachedRTLTheme = theme;
+    } else {
+      cachedLTRTheme = theme;
+    }
+  }
+
+  const baseApp = (
+    <ThemeProvider theme={theme}>
+      <LocalizationProvider
+        dateAdapter={AdapterMoment}
+        locale={languageDeregionalized}
+        libInstance={Moment}
+      >{mainComponent}</LocalizationProvider>
+    </ThemeProvider>
+  );
+
+  // this is what it has to do now with the introduction
+  // of a dreaded emotion cache that is a total mess
   return (
-    <LocalizationProvider
-      dateAdapter={AdapterMoment}
-      locale={languageDeregionalized}
-      libInstance={Moment}
-    >{mainComponent}</LocalizationProvider>
-  )
+    <ReuseCacheContextEmotionIsAMess.Consumer>
+      {(shouldReuse: boolean) => {
+        // the cache is already defined for the server
+        // context in the collector, so it's not necessary
+        // to create a new one, because emotion is so smart
+        // it doesn't export its context so I can't read it
+        // and must deal with a hack
+        if (shouldReuse) {
+          return baseApp;
+        } else {
+          const cache = createEmotionCache(isRtl, true);
+          // client side basically or when
+          // we don't use a styles collector
+          return (
+            <CacheProvider value={cache}>
+              {baseApp}
+            </CacheProvider>
+          );
+        }
+      }}
+    </ReuseCacheContextEmotionIsAMess.Consumer>
+  );
 }

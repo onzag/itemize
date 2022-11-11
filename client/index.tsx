@@ -24,6 +24,7 @@ import PropertyDefinition from "../base/Root/Module/ItemDefinition/PropertyDefin
 import ItemDefinition from "../base/Root/Module/ItemDefinition";
 import Module from "../base/Root/Module";
 import { IGlobalTestingType, setupTesting } from "./internal/testing";
+import type { ISSRServerModeInfo } from "../server/ssr";
 
 /**
  * when cookies expire
@@ -148,7 +149,7 @@ export interface ICollectorType {
    * @returns a node and an id for the collection action in order to retrieve
    * the collection results
    */
-  collect: (app: React.ReactElement) => {
+  collect: (app: React.ReactElement, serverModeInfo: ISSRServerModeInfo) => {
     node: React.ReactNode,
     id: string,
   },
@@ -233,23 +234,7 @@ export async function initializeItemizeApp(
       config: IConfigRawJSONDataType,
       localeContext: ILocaleContextType,
     ) => React.ReactElement;
-    serverMode?: {
-      collector?: ICollectorType;
-      config: IConfigRawJSONDataType,
-      ssrContext: ISSRContextType;
-      clientDetails: {
-        lang: string;
-        currency: string;
-        country: string;
-        guessedData: string;
-      };
-      langLocales: ILangLocalesType;
-      root: Root;
-      originalUrl: string;
-      redirectTo: (path: string) => void;
-      userLocalizationService: any;
-      ip: string;
-    }
+    serverMode?: ISSRServerModeInfo;
   }
 ) {
   // so let's check if we are in server mode
@@ -541,7 +526,7 @@ export async function initializeItemizeApp(
       window.LANG = lang;
       window.INITIAL_CURRENCY_FACTORS = currencyFactors;
       if (CacheWorkerInstance.isSupported) {
-        CacheWorkerInstance.instance.proxyRoot(initialRoot);
+        CacheWorkerInstance.instance.proxyRoot(initialRoot, config);
       }
     }
 
@@ -617,7 +602,7 @@ export async function initializeItemizeApp(
 
     if (serverMode) {
       if (serverMode.collector) {
-        return serverMode.collector.collect(actualApp);
+        return serverMode.collector.collect(actualApp, serverMode);
       }
       // needs to be wrapped in the router itself
       return {

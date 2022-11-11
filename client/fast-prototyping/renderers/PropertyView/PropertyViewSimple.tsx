@@ -6,7 +6,7 @@
  */
 
 import { IPropertyViewSimpleRendererProps } from "../../../internal/components/PropertyView/PropertyViewSimple";
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { capitalize } from "../../../../util";
 import moment from "moment";
 
@@ -23,9 +23,18 @@ import moment from "moment";
  * @returns a react element
  */
 export default function PropertyViewSimpleRenderer(props: IPropertyViewSimpleRendererProps) {
+  const [isReady, setReady] = useState(false);
+  useEffect(() => {
+    setReady(true);
+  }, []);
+
   let value: React.ReactNode;
   if (props.args.dateFormat) {
-    value = props.currentValue ? moment(props.currentValue).format(props.args.dateFormat) : props.currentValue;
+    if (!isReady) {
+      value = props.currentValue ? moment.utc(props.currentValue).format(props.args.dateFormat) : props.currentValue;
+    } else {
+      value = props.currentValue ? moment(props.currentValue).format(props.args.dateFormat) : props.currentValue;
+    }
   } else {
     value = props.capitalize ? capitalize(props.currentValue) : props.currentValue;
   }

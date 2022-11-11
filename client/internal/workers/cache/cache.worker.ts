@@ -14,13 +14,17 @@ import { openDB, DBSchema, IDBPDatabase } from "idb";
 import { requestFieldsAreContained, deepMerge } from "../../../../gql-util";
 import {
   IGQLSearchRecord, buildGqlQuery, gqlQuery, GQLEnum,
-  IGQLValue, IGQLRequestFields, IGQLArgs, IGQLEndpointValue
+  IGQLValue, IGQLRequestFields, IGQLArgs, IGQLEndpointValue, IGQLFile
 } from "../../../../gql-querier";
 import { PREFIX_GET, ENDPOINT_ERRORS } from "../../../../constants";
 import { EndpointErrorType } from "../../../../base/errors";
 import { search } from "./cache.worker.search";
 import Root, { IRootRawJSONDataType } from "../../../../base/Root";
 import { NanoSecondComposedDate } from "../../../../nanodate";
+import type ItemDefinition from "../../../../base/Root/Module/ItemDefinition";
+import type PropertyDefinition from "../../../../base/Root/Module/ItemDefinition/PropertyDefinition";
+import type Include from "../../../../base/Root/Module/ItemDefinition/Include";
+import type { IConfigRawJSONDataType } from "../../../../config";
 
 /**
  * A cache match for a standard query, basically
@@ -174,7 +178,10 @@ export default class CacheWorker {
   /**
    * The comlink proxied root class
    */
-  private rootProxy: Root;
+  private root: Root;
+  private config: IConfigRawJSONDataType;
+  private objectURLPool: { [fileId: string]: string } = {};
+  private objectURLIdVersionFiles: {[mergedId: string]: string[]} = {};
 
   /**
    * Whether currently the cache is blocked from
@@ -425,6 +432,187 @@ export default class CacheWorker {
     return true;
   }
 
+  private _fileURLAbsoluter(
+    file: IGQLFile,
+    itemDef: ItemDefinition,
+    include: Include,
+    property: PropertyDefinition,
+    containerId: string,
+    id: string,
+    version: string,
+  ) {
+    // this is taken from fileURLAbsoluter
+    // not imported here in order to make it more efficient  
+    if (
+      file.url.indexOf("blob:") === 0 ||
+      file.url.indexOf("http:") === 0 ||
+      file.url.indexOf("https:") === 0
+    ) {
+      return file.url;
+    }
+
+    const domain = process.env.NODE_ENV === "development" ? this.config.developmentHostname : this.config.productionHostname;
+
+    let prefix: string = this.config.containersHostnamePrefixes[containerId];
+
+    if (!prefix) {
+      return null;
+    }
+
+    // if it doesn't end in / this means we need to add it
+    if (prefix[prefix.length - 1] !== "/") {
+      prefix += "/";
+    }
+    // and now we add the domain /mysite.com/ where all the data shall be stored for
+    // that container
+    prefix += domain + "/";
+    // if it doesn't start with /, which means it's not a local url but its own domain eg. container.com/KEY/mysite.com/
+    // we want to add https to it
+    if (prefix.indexOf("/") !== 0) {
+      prefix = "https://" + prefix;
+    }
+
+    return (
+      prefix +
+      (
+        property.isExtension() ?
+          itemDef.getParentModule().getQualifiedPathName() :
+          itemDef.getQualifiedPathName()
+      ) + "/" +
+      id + "." + (version || "") + "/" +
+      (include ? include.getId() + "/" : "") +
+      property.getId() + "/" +
+      file.id + "/" + file.url
+    );
+  }
+
+  private async obtainOneFile(
+    file: IGQLFile,
+    itemDef: ItemDefinition,
+    include: Include,
+    property: PropertyDefinition,
+    containerId: string,
+    id: string,
+    version: string,
+  ) {
+    if (file.src) {
+      return;
+    }
+
+    const finalUrl: string = this._fileURLAbsoluter(file, itemDef, include, property, containerId, id, version);
+    if (!finalUrl) {
+      return;
+    }
+
+    // assigning the file to the blob and setting it into the source
+    const blob = await (await fetch(finalUrl)).blob();
+    file.src = blob;
+  }
+
+  private async processFilesAt(
+    partialValue: IGQLValue,
+    itemDef: ItemDefinition,
+    include: Include,
+    property: PropertyDefinition,
+    containerId: string,
+    id: string,
+    version: string,
+  ) {
+    const idLocation = include ? include.getPrefixedQualifiedIdentifier() + property.getId() : property.getId();
+    if (
+      (
+        property.getType() !== "file" &&
+        property.getType() !== "files"
+      ) || !partialValue.DATA || !partialValue.DATA[idLocation]
+    ) {
+      return;
+    }
+
+    const value = partialValue.DATA[idLocation];
+
+    if (Array.isArray(value)) {
+      await Promise.all(value.map((v) => this.obtainOneFile(v as any, itemDef, include, property, containerId, id, version)))
+    } else {
+      await this.obtainOneFile(value as any, itemDef, include, property, containerId, id, version);
+    }
+  }
+
+  private getFileId(
+    file: IGQLFile,
+    itemDef: ItemDefinition,
+    include: Include,
+    property: PropertyDefinition,
+    id: string,
+    version: string,
+  ) {
+    // just some fancy id to ensure uniqueness
+    const fileId = file.id + "." + 
+      itemDef.getQualifiedPathName() + "." +
+      (include ? include.getQualifiedIdentifier() : "") + "." +
+      property.getId() + "." + id + "." + (version || "");
+
+    return fileId;
+  }
+
+  private fixOneFile(
+    file: IGQLFile,
+    itemDef: ItemDefinition,
+    include: Include,
+    property: PropertyDefinition,
+    id: string,
+    version: string,
+  ) {
+    if (!file.src) {
+      return;
+    }
+
+    const fileId = this.getFileId(file, itemDef, include, property, id, version);
+
+    if (!this.objectURLPool[fileId]) {
+      this.objectURLPool[fileId] = URL.createObjectURL(file.src as Blob);
+
+      const mergedId = itemDef.getQualifiedPathName() + "." + id + "." + (version || "");
+      if (!this.objectURLIdVersionFiles[mergedId]) {
+        this.objectURLIdVersionFiles[mergedId] = [fileId];
+      } else {
+        this.objectURLIdVersionFiles[mergedId].push(fileId);
+      }
+    }
+
+    file.url = this.objectURLPool[fileId];
+  }
+
+  private fixFilesURLAt(
+    partialValue: IGQLValue,
+    itemDef: ItemDefinition,
+    include: Include,
+    property: PropertyDefinition,
+    id: string,
+    version: string,
+  ) {
+    if (!partialValue) {
+      return;
+    }
+
+    const idLocation = include ? include.getPrefixedQualifiedIdentifier() + property.getId() : property.getId();
+    if (
+      (
+        property.getType() !== "file" &&
+        property.getType() !== "files"
+      ) || !partialValue.DATA || !partialValue.DATA[idLocation]
+    ) {
+      return;
+    }
+
+    const value = partialValue.DATA[idLocation];
+
+    if (Array.isArray(value)) {
+      value.forEach((v) => this.fixOneFile(v as any, itemDef, include, property, id, version));
+    } else {
+      this.fixOneFile(value as any, itemDef, include, property, id, version);
+    }
+  }
+
   /**
    * sets a cache value, all of it, using a query name, should
    * be a get query, the id of the item definition and the
@@ -454,6 +642,30 @@ export default class CacheWorker {
     if (!this.db) {
       console.warn("Could not retrieve IndexedDB");
       // what gives, we return
+      return false;
+    }
+
+    // we need to resolve potential files
+    // to be stored in our cached value as the source
+    const type = queryName.replace(PREFIX_GET, "");
+    const idef = this.root.registry[type] as ItemDefinition;
+
+    const containerId = partialValue && partialValue.container_id as string;
+
+    try {
+      if (containerId && partialValue) {
+        await Promise.all(idef.getAllPropertyDefinitionsAndExtensions().map(async (p) => {
+          await this.processFilesAt(partialValue, idef, null, p, containerId, id, version);
+        }));
+
+        await Promise.all(idef.getAllIncludes().map(async (i) => {
+          await Promise.all(i.getSinkingProperties().map(async (sp) => {
+            await this.processFilesAt(partialValue, idef, i, sp, containerId, id, version);
+          }));
+        }));
+      }
+    } catch (err) {
+      console.warn(err);
       return false;
     }
 
@@ -502,6 +714,20 @@ export default class CacheWorker {
 
     // now we can see the identifier of our query
     const queryIdentifier = `${queryName}.${id}.${(version || "")}`;
+
+    // Revoking potential old files url that have been created
+    const type = queryName.replace(PREFIX_GET, "");
+    const mergedId = type + "." + id + "." + (version || "");
+
+    // if we have urls for such blobs in the map
+    if (this.objectURLIdVersionFiles[mergedId]) {
+      // loop through them and delete them from the pool
+      this.objectURLIdVersionFiles[mergedId].forEach((fileId) => {
+        URL.revokeObjectURL(this.objectURLPool[fileId]);
+        delete this.objectURLPool[fileId];
+      });
+      delete this.objectURLIdVersionFiles[mergedId];
+    }
 
     // and now we try this
     try {
@@ -862,6 +1088,24 @@ export default class CacheWorker {
           // if (requestedFields) {
           //   console.log("RETURNING FROM CACHE", queryName, id, version, requestedFields, idbValue);
           // }
+
+          // we need to resolve potential files
+          // to be stored in our cached value as the source
+          const type = queryName.replace(PREFIX_GET, "");
+          const idef = this.root.registry[type] as ItemDefinition;
+
+          if (idbValue.value) {
+            idef.getAllPropertyDefinitionsAndExtensions().forEach((p) => {
+              this.fixFilesURLAt(idbValue.value, idef, null, p, id, version);
+            });
+
+            idef.getAllIncludes().forEach((i) => {
+              i.getSinkingProperties().forEach((sp) => {
+                this.fixFilesURLAt(idbValue.value, idef, i, sp, id, version);
+              });
+            });
+          }
+
           return idbValue;
         }
       }
@@ -1243,7 +1487,7 @@ export default class CacheWorker {
           // function
 
           try {
-            const searchResponse = await search(this.rootProxy, this.db, resultsToProcess, searchArgs, returnSources);
+            const searchResponse = await search(this.root, this.db, resultsToProcess, searchArgs, returnSources);
             const records = searchResponse.filteredRecords;
             const sourceResults = searchResponse.sourceResults;
             const gqlValue: IGQLEndpointValue = {
@@ -1410,6 +1654,14 @@ export default class CacheWorker {
       // and execute it
       const gqlValue = await gqlQuery(
         listQuery,
+        // let's not do that, this thing batches
+        // because requests are big
+        // {
+        //   // should allow to merge all the
+        //   // current batches into one request
+        //   merge: true,
+        //   mergeMS: 10,
+        // }
       );
 
       // return the value, whatever it is, null, error, etc..
@@ -1500,7 +1752,7 @@ export default class CacheWorker {
 
       // Now we need to filter the search results in order to return what is
       // appropiate using the actualCurrentSearchValue
-      const searchResponse = await search(this.rootProxy, this.db, actualCurrentSearchValue.value, searchArgs, returnSources);
+      const searchResponse = await search(this.root, this.db, actualCurrentSearchValue.value, searchArgs, returnSources);
       const records = searchResponse.filteredRecords;
       const sourceResults = searchResponse.sourceResults;
       const gqlValue: IGQLEndpointValue = {
@@ -1566,8 +1818,9 @@ export default class CacheWorker {
     }
   }
 
-  public async proxyRoot(rootProxy: IRootRawJSONDataType) {
-    this.rootProxy = new Root(rootProxy);
+  public async proxyRoot(rootProxy: IRootRawJSONDataType, config: IConfigRawJSONDataType) {
+    this.root = new Root(rootProxy);
+    this.config = config;
   }
 
   public async setBlockedCallback(callback: (state: boolean) => void) {

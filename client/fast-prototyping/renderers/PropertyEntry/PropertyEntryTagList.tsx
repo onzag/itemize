@@ -359,7 +359,7 @@ function PropertyEntryTagListRenderer(props: IPropertyEntryTagListRendererProps)
         fullWidth={true}
         onClick={focus}
         disabled={props.disabled}
-        variant="filled"
+        variant={this.props.args.fieldVariant || "filled"}
       >
         <InputLabel
           htmlFor={props.propertyId}

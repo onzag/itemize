@@ -761,8 +761,19 @@ export interface IItemProviderProps {
   /**
    * loads the state from the cache worker if a
    * stored value is found
+   * 
+   * This plays with
+   * onStateLoadedFromStore from this same provider
+   * onStateStored from this same provider
+   * storeStateOnChange from this same provider
+   * storeStateIfCantConnect from submit action
+   * and clearStoredStateIfConnected from submit action
    */
   loadStateFromCache?: boolean;
+  /**
+   * stores the state whenever the state changes
+   */
+  storeStateOnChange?: boolean;
   /**
    * marks the item for destruction as the user logs out
    */
@@ -813,16 +824,26 @@ export interface IItemProviderProps {
    * state changes for whatever reason use with care as
    * it makes the execution slower
    */
-  onStateChange?: (state: IItemStateType) => void;
+  onStateChange?: (state: IItemStateType, prevState: IItemStateType) => void;
   /**
    * On state changes but from the store that is loaded
    * from a cache worker
    */
   onStateLoadedFromStore?: (state: IItemStateType, fns: IBasicFns) => void;
+  /**
+   * Runs when the state was stored for whatever reason
+   */
+  onStateStored?: (state: IItemStateType) => void;
+  /**
+   * Runs when the state was attempted to store but failed to store
+   */
+  onStateStoreFailed?: (state: IItemStateType) => void;
 
   /**
    * Mainly for internal use and set by the record on its own
    * set the highlights for this element
+   * 
+   * the highlights are passed by the search provider
    */
   highlights?: IElasticHighlightSingleRecordInfo;
 }
@@ -952,6 +973,11 @@ export class ActualItemProvider extends
   // repair certain edge cases of data corruption due to event
   // timing
   private repairCorruptionTimeout: NodeJS.Timeout = null;
+
+  // used by store state on change in order to put
+  // timeouts on top of each other and not run one
+  // every time something changes
+  private storeStateTimeout: NodeJS.Timeout = null;
 
   private static getItemStateStatic(props: IActualItemProviderProps) {
     return props.itemDefinitionInstance.getStateNoExternalChecking(
@@ -1854,8 +1880,40 @@ export class ActualItemProvider extends
     }
 
     // expensive but necessary
-    if (this.props.onStateChange && !equals(this.state.itemState, prevState.itemState, { strict: true })) {
-      this.props.onStateChange(this.state.itemState);
+    if (
+      (
+        this.props.onStateChange ||
+        (
+          this.props.storeStateOnChange &&
+          CacheWorkerInstance.isSupported
+        )
+      ) &&
+      !equals(this.state.itemState, prevState.itemState, { strict: true })
+    ) {
+      this.props.onStateChange && this.props.onStateChange(this.state.itemState, prevState.itemState);
+
+      if (this.props.storeStateOnChange) {
+        clearTimeout(this.storeStateTimeout);
+        this.storeStateTimeout = setTimeout(this.storeStateDelayed, 600);
+      }
+    }
+  }
+
+  private async storeStateDelayed() {
+    if (this.props.storeStateOnChange) {
+      const serializable = ItemDefinition.getSerializableState(this.state.itemState);
+      const storedState = await CacheWorkerInstance.instance.storeState(
+        this.props.itemDefinitionQualifiedName,
+        this.props.forId || null,
+        this.props.forVersion || null,
+        serializable,
+      );
+
+      if (storedState) {
+        this.props.onStateStored && this.props.onStateStored(this.state.itemState);
+      } else {
+        this.props.onStateStoreFailed && this.props.onStateStoreFailed(this.state.itemState);
+      }
     }
   }
 
@@ -3473,6 +3531,13 @@ export class ActualItemProvider extends
           this.props.forVersion || null,
           serializable,
         );
+
+        // inform potential callbacks
+        if (storedState) {
+          this.props.onStateStored && this.props.onStateStored(state);
+        } else {
+          this.props.onStateStoreFailed && this.props.onStateStoreFailed(state);
+        }
       }
 
       if (!this.isUnmounted) {

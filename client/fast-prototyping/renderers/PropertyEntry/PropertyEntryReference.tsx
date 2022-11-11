@@ -453,7 +453,7 @@ class PropertyEntryReferenceRenderer
           }}
           inputProps={inputProps}
           disabled={this.props.disabled}
-          variant="filled"
+          variant={this.props.args.fieldVariant || "filled"}
           {...appliedTextFieldProps}
         />
         {this.props.args.hideError ? null : <Box sx={style.errorMessage}>

@@ -10,6 +10,7 @@ import { ICollectorType } from "../../client";
 import { ReuseCacheContextEmotionIsAMess, createEmotionCache } from "./wrappers";
 import { CacheProvider } from "@emotion/react";
 import createEmotionServer from '@emotion/server/create-instance';
+import type { ISSRServerModeInfo } from "../../server/ssr";
 
 /**
  * Temporarily stores the result of the collection
@@ -25,9 +26,10 @@ export const styleCollector: ICollectorType = {
    * the collection function
    * @param app the itemize app
    */
-  collect(app: React.ReactElement) {
+  collect(app: React.ReactElement, serverModeInfo: ISSRServerModeInfo) {
+    const isRtl = serverModeInfo.appliedRule.rtl;
     const id = uuid.v4();
-    const cache = createEmotionCache();
+    const cache = createEmotionCache(isRtl, false);
     const { extractCriticalToChunks, constructStyleTagsFromChunks } = createEmotionServer(cache);
     STYLE_COLLECTION[id] = {
       extractCriticalToChunks,

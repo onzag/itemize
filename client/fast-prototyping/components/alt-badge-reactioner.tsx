@@ -1,5 +1,6 @@
 import { SxProps, Theme } from "@mui/material";
 import Badge from "@mui/material/Badge";
+import AppLanguageRetriever from "../../components/localization/AppLanguageRetriever";
 import React, { useCallback, useState } from "react";
 import AltReactioner from "../../components/accessibility/AltReactioner";
 
@@ -153,22 +154,30 @@ export function AltBadgeReactioner(
 
     // the data attributes are for debugging purposes
     return (
-      <Badge
-        badgeContent={content.toUpperCase()}
-        color={(props.colorSchema || "default") === "default" ? "primary" : "default"}
-        data-priority={props.priority || 0}
-        data-group-position={props.groupPosition}
-        sx={
-          [
-            (props.colorSchema || "default") === "default" ? style.badgeFastKey : style.badgeFastKey2,
-            props.useTransform ? style.transformed : null,
-            props.fullWidth ? style.fullWidth : null,
-            displayed ? null : style.hidden,
-          ].concat(Array.isArray(props.sx) ? props.sx as any : [props.sx] as any)
-        }
-      >
-        {displayed ? (props.altBadgedChildren || props.children) : props.children}
-      </Badge>
+      <AppLanguageRetriever>
+        {(lang) => (
+          <Badge
+            badgeContent={content.toUpperCase()}
+            color={(props.colorSchema || "default") === "default" ? "primary" : "default"}
+            data-priority={props.priority || 0}
+            data-group-position={props.groupPosition}
+            sx={
+              [
+                (props.colorSchema || "default") === "default" ? style.badgeFastKey : style.badgeFastKey2,
+                props.useTransform ? style.transformed : null,
+                props.fullWidth ? style.fullWidth : null,
+                displayed ? null : style.hidden,
+              ].concat(Array.isArray(props.sx) ? props.sx as any : [props.sx] as any)
+            }
+            anchorOrigin={{
+              vertical: "top",
+              horizontal: lang.rtl ? "left" : "right",
+            }}
+          >
+            {displayed ? (props.altBadgedChildren || props.children) : props.children}
+          </Badge>
+        )}
+      </AppLanguageRetriever>
     );
   }
 

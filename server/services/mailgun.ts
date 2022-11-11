@@ -89,13 +89,13 @@ export class MailgunService extends MailProvider<IMailgunConfig> {
     );
 
     if (this.isInstanceGlobal()) {
-      // await this.setupMailgun();
+      await this.setupMailgun();
     }
   }
 
   private async setupMailgun() {
     // ran just so that it creates a key if it does not exist
-    await this.localAppData.registry.createJWTSecretFor("MAILGUN_JWT_KEY");
+    await this.registry.createJWTSecretFor("MAILGUN_JWT_KEY");
 
     const allRoutes = (await httpRequest<IMailgunRoutesResponse>(
       {
@@ -215,7 +215,8 @@ export class MailgunService extends MailProvider<IMailgunConfig> {
     }
 
     if (data.fromForwarded) {
-      formData.append("h:Reply-To", data.fromForwarded);
+      const fromForwardedCleaned = data.fromForwarded.includes("<") ? data.fromForwarded : "<" + data.fromForwarded + ">";
+      formData.append("h:Reply-To", fromForwardedCleaned);
     }
 
     if (data.id) {
@@ -225,7 +226,7 @@ export class MailgunService extends MailProvider<IMailgunConfig> {
     if (data.replyOf) {
       const messageId = data.replyOf.uuid;
       formData.append("h:In-Reply-To", "<" + messageId + ">");
-      formData.append("h:References", (data.replyOf.references || []).concat([messageId]).map((r: string) => "<" + r + ">"));
+      formData.append("h:References", (data.replyOf.references || []).concat([messageId]).map((r: string) => "<" + r + ">").join(" "));
     }
 
     // setup the unsubscribe header if we have a mailto header
@@ -308,8 +309,6 @@ export class MailgunService extends MailProvider<IMailgunConfig> {
   }
 
   public getRunCycleTime() {
-    return null;
-
     if (this.usesDevelopmentReceive && !this.isInstanceGlobal()) {
       // because we are most likely running for localhost
       // as we are in a development environment we have no
@@ -318,8 +317,8 @@ export class MailgunService extends MailProvider<IMailgunConfig> {
       // a production environment with many extended
       // instances
       // we are going to run the checking function
-      // every 5 seconds
-      return 5000;
+      // every 30 seconds
+      return 30000;
     }
 
     return null;
