@@ -192,11 +192,14 @@ export function AltBadgeReactioner(
     // the data attributes are for debugging purposes
     return (
       <Badge
-        badgeContent={content.toUpperCase()}
+        badgeContent={
+          <span aria-hidden={true} style={{display: "contents"}}>
+            {content.toUpperCase()}
+          </span>
+        }
         color={(props.colorSchema || "default") === "default" ? "primary" : "default"}
         data-priority={props.priority || 0}
         data-group-position={props.groupPosition}
-        aria-hidden={true}
         sx={
           [
             (props.colorSchema || "default") === "default" ?
