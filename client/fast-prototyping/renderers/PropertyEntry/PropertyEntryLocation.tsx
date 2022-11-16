@@ -139,37 +139,6 @@ export const style = {
     alignItems: "center",
     justifyContent: "space-between",
   },
-  fieldInput: (isInvalid: boolean, disabled: boolean) => {
-    if (isInvalid) {
-      return {
-        "width": "100%",
-        // this is the colur when the field is out of focus
-        "&::before": {
-          borderBottomColor: "#e57373",
-        },
-        // the color that pops up when the field is in focus
-        "&::after": {
-          borderBottomColor: "#f44336",
-        },
-        // during the hover event
-        "&:hover::before": {
-          borderBottomColor: disabled ? "rgba(0,0,0,0.42)" : "#f44336",
-        },
-      };
-    }
-    return {
-      "width": "100%",
-      "&::before": {
-        borderBottomColor: "rgba(0,0,0,0.42)",
-      },
-      "&::after": {
-        borderBottomColor: "#3f51b5",
-      },
-      "&:hover::before": {
-        borderBottomColor: "#3f51b5",
-      },
-    };
-  },
   autosuggestContainer: {
     position: "relative",
     display: "block",
@@ -457,6 +426,9 @@ class PropertyEntryLocationRenderer extends
           </IconButton>
         </InputAdornment>
       ) : null,
+      inputProps: {
+        "aria-describedby": this.props.description ? this.props.uniqueId + "_desc" : null,
+      },
     };
 
     // and add the text field props from the autosuggest
@@ -538,24 +510,16 @@ class PropertyEntryLocationRenderer extends
 
     const isInvalid = shouldShowInvalid(this.props);
 
-    // the description as alert arg possibility
-    const descriptionAsAlert = this.props.args["descriptionAsAlert"];
-    return (
-      <Box sx={style.container}>
-        {
-          this.props.description && descriptionAsAlert ?
-            <Alert severity="info" sx={style.description} role="note">
-              {this.props.description}
-            </Alert> :
-            null
-        }
-        {
-          this.props.description && !descriptionAsAlert ?
-            <Typography variant="caption" sx={style.description}>
-              {this.props.description}
-            </Typography> :
-            null
-        }
+    if (isInvalid) {
+      appliedInputProps.inputProps["aria-invalid"] = true;
+
+      if (!this.props.args.hideError) {
+        appliedInputProps.inputProps["aria-errormessage"] = this.props.uniqueId + "_error";
+      }
+    }
+
+    const fieldMap = (
+      <>
         {!this.props.args.disableMapAndSearch ?
           <Box sx={style.locationAlternativeTextHeader}>
             {
@@ -586,42 +550,80 @@ class PropertyEntryLocationRenderer extends
             </Box> :
             null
         }
-        <TextField
-          fullWidth={true}
-          type="text"
-          onKeyPress={this.onKeyPress}
-          sx={style.entry}
-          label={this.props.label}
-          onChange={this.onSearchQueryChange}
-          onBlur={this.props.enableUserSetErrors}
-          placeholder={this.props.placeholder}
-          value={this.props.searchQuery}
-          InputProps={{
-            sx: style.fieldInput(isInvalid, this.props.disabled),
-            classes: {
-              focused: "focused",
-            },
-            disabled: this.props.disabled,
-            ...appliedInputProps,
-          }}
-          InputLabelProps={{
-            sx: style.label(isInvalid),
-            classes: {
-              focused: "focused",
-            },
-          }}
-          disabled={this.props.disabled}
-          variant="filled"
-          {...appliedTextFieldProps}
-        />
-        {this.props.args.hideError ? null : <Box sx={style.errorMessage}>
-          {this.props.currentInvalidReason}
-          {
-            !this.props.currentInvalidReason && this.props.activeSearchResults && this.props.activeSearchResults.length === 0 ?
-              this.props.noResultsLabel :
-              null
-          }
-        </Box>}
+      </>
+    );
+
+    const fieldComponent = (
+      <TextField
+        fullWidth={true}
+        type="text"
+        onKeyPress={this.onKeyPress}
+        sx={style.entry}
+        label={this.props.label}
+        onChange={this.onSearchQueryChange}
+        onBlur={this.props.enableUserSetErrors}
+        placeholder={this.props.placeholder}
+        value={this.props.searchQuery}
+        error={isInvalid}
+        InputProps={{
+          fullWidth: true,
+          classes: {
+            focused: "focused",
+          },
+          disabled: this.props.disabled,
+          ...appliedInputProps,
+        }}
+        InputLabelProps={{
+          sx: style.label(isInvalid),
+          classes: {
+            focused: "focused",
+          },
+        }}
+        disabled={this.props.disabled}
+        variant="filled"
+        {...appliedTextFieldProps}
+      />
+    );
+
+    // the description as alert arg possibility
+    const descriptionAsAlert = this.props.args["descriptionAsAlert"];
+
+    let descriptionObject: React.ReactNode = null;
+    if (this.props.description) {
+      descriptionObject = descriptionAsAlert ? (
+        <Alert severity="info" sx={style.description} role="note" id={this.props.uniqueId + "_desc"}>
+          {this.props.description}
+        </Alert>
+      ) : (
+        <Typography variant="caption" sx={style.description} id={this.props.uniqueId + "_desc"}>
+          {this.props.description}
+        </Typography>
+      );
+    }
+
+    const error = (
+      this.props.args.hideError ? null : <Box sx={style.errorMessage} id={this.props.uniqueId + "_error"}>
+        {this.props.currentInvalidReason}
+      </Box>
+    );
+
+    let inner: React.ReactNode;
+    if (this.props.args.useCustomFieldRender) {
+      inner = this.props.args.useCustomFieldRender(descriptionObject, fieldMap, fieldComponent, error, this.props.disabled);
+    } else {
+      inner = (
+        <>
+          {descriptionObject}
+          {fieldMap}
+          {fieldComponent}
+          {error}
+        </>
+      )
+    }
+
+    return (
+      <Box sx={style.container}>
+        {inner}
       </Box>
     );
   }
@@ -687,10 +689,10 @@ class PropertyEntryLocationRenderer extends
                   {part.text}
                 </span>
               ) : (
-                  <strong key={index} style={{ fontWeight: 300 }}>
-                    {part.text}
-                  </strong>
-                ),
+                <strong key={index} style={{ fontWeight: 300 }}>
+                  {part.text}
+                </strong>
+              ),
             )}
           </Box>
           <Box sx={style.autosuggestMenuItemSubText}>

@@ -8,7 +8,7 @@
  */
 
 import React, { ForwardedRef } from "react";
-import { showRelevant } from "./AltScroller";
+import { showRelevant as showScrollerRelevant, hideAll as hideAllScroller, scrollCurrent } from "./AltScroller";
 import { AltPriorityShifterContext } from "./AltPriorityShifter"
 
 export interface IAltBaseProps {
@@ -16,6 +16,13 @@ export interface IAltBaseProps {
    * The wrapping component to use, by default it will use a div
    */
   component?: string;
+  /**
+   * Props to pass to the component
+   */
+  componentProps?: any;
+  /**
+   * A class name to use in such component
+   */
   className?: string;
   /**
   * whether it is currently disabled
@@ -49,13 +56,34 @@ export interface IAltBaseProps {
    * it will match the next element that holds a tabgroup
    */
   tabGroup?: string;
+  /**
+   * Sone elements may unmount and not get called, eg. if some other element
+   * caused it to unmount, the alt may remain in a triggered state without
+   * realizing nothing anymore is visible
+   * 
+   * very useful for dialogs for example that may get closed by outside actions
+   */
+  hideAllIfUnmount?: boolean;
+  /**
+   * plays with hideAllIfUnmount to trigger an action whenever it's unmounted
+   */
+  triggerAltIfUnmountAndAltActive?: boolean;
+  /**
+   * Normally this is unnecessary to set, basically whenever the element is focused
+   * all other element quick actions are not allowed to execute
+   * 
+   * however this does not apply if tab isn't pressed
+   * 
+   * this is basically the default for input fields and textareas
+   */
+  blocksQuickActionsWhileFocused?: boolean;
 }
 
 export interface IAltReactionerProps extends IAltBaseProps {
   /**
    * The children that is to be rendered inside
    */
-  children: (displayed: boolean) => React.ReactNode;
+  children: (displayed: boolean, blocked: boolean) => React.ReactNode;
   /**
    * a css selector to choose the component that is relevant that the
    * user is supposed to interact with, by default it will simply pick the element itself
@@ -104,10 +132,24 @@ export interface IAltReactionerProps extends IAltBaseProps {
    */
   onAmbiguousReaction: (isExpected: boolean, id: number, plusCount: number) => void;
   onAmbiguousClear: () => void;
+
+  /**
+   * Triggers when alt has been triggered
+   * 
+   * note that this triggers before the state changes to displayed
+   */
+  onDisplay?: () => void;
+  /**
+   * Triggers when hidden
+   * 
+   * note that this triggers befoe the state changes to hidden
+   */
+  onHide?: () => void;
 }
 
 interface IActualAltReactionerState {
   displayed: boolean;
+  blocked: boolean;
 }
 
 const ALT_REGISTRY: {
@@ -118,6 +160,7 @@ const ALT_REGISTRY: {
   actions: {
     [reactionKey: string]: ActualAltReactioner[];
   },
+  isBlocked: boolean;
   isDisplayingActions: ActualAltReactioner[];
   displayedActionsFocusIndex: number;
   displayedActionsPriority: number;
@@ -132,6 +175,7 @@ const ALT_REGISTRY: {
   activeFlowFocusIndex: -1,
   activeFlowPriority: null,
   actions: {},
+  isBlocked: false,
   isDisplayingActions: null,
   displayedActionsFocusIndex: -1,
   displayedActionsPriority: null,
@@ -142,7 +186,14 @@ const ALT_REGISTRY: {
   isJumpingThroughGroups: false,
 };
 
-function hideAll(butKeycodes: ActualAltReactioner[] = []) {
+export function hideAll(butKeycodes: ActualAltReactioner[] = []) {
+  // hide the scroller too
+  if (butKeycodes.length === 0) {
+    hideAllScroller();
+  }
+
+  ALT_REGISTRY.isBlocked = false;
+
   Object.keys(ALT_REGISTRY.actions).forEach((reactionKey) => {
     ALT_REGISTRY.actions[reactionKey].forEach((v) => {
       if (!butKeycodes.includes(v)) {
@@ -206,7 +257,7 @@ function calculatePriorityOfDisplayElements(calcActiveFlow?: boolean): number {
   return priorityToUse;
 }
 
-function showDisplayElements(priorityToUse: number) {
+export function calculateDisplayElements(priorityToUse: number, doNotShowHide: boolean) {
   const actionResults: {
     [reactionKey: string]: ActualAltReactioner[]
   } = {};
@@ -218,7 +269,7 @@ function showDisplayElements(priorityToUse: number) {
         } else {
           actionResults[reactionKey].push(v);
         }
-      } else if (v.isDisplayed()) {
+      } else if (!doNotShowHide && v.isDisplayed()) {
         v.hide();
       }
     });
@@ -237,12 +288,18 @@ function showDisplayElements(priorityToUse: number) {
         v.triggerAmbiguousClear();
       }
 
-      v.display();
+      !doNotShowHide && v.display();
       displayElements.push(v);
     });
   });
 
   displayElements.sort((a, b) => a.isBefore(b) ? -1 : 1);
+
+  return displayElements;
+}
+
+export function showDisplayElements(priorityToUse: number) {
+  const displayElements = calculateDisplayElements(priorityToUse, false);
 
   if (!displayElements.length) {
     ALT_REGISTRY.isDisplayingActions = null;
@@ -257,6 +314,8 @@ function showDisplayElements(priorityToUse: number) {
     ALT_REGISTRY.awaitingKeycodes = null;
     ALT_REGISTRY.awaitingKeycodesFocusIndex = -1;
   }
+
+  showScrollerRelevant();
 }
 
 function triggerBasedOn(code: string, shiftKey: boolean, callbackIfmatch: () => void, forceHidden?: boolean) {
@@ -281,14 +340,20 @@ function triggerBasedOn(code: string, shiftKey: boolean, callbackIfmatch: () => 
       const expectNextGroup = ALT_REGISTRY.isJumpingThroughGroups ? (selected ? selected.getTabGroup() : undefined) : undefined;
 
       // make sure that there are tabbable components not to enter an infinite loop
-      if (!ALT_REGISTRY.awaitingKeycodes.some((e) => e.isTabbable() && !e.isUsedInFlow() && e.isCorrectMatchForTabGroup(expectNextGroup))) {
+      if (!ALT_REGISTRY.awaitingKeycodes.some((e) =>
+        e.isTabbable() &&
+        e.isCorrectMatchForTabGroup(expectNextGroup))
+      ) {
         // break it and stop it now
         callbackIfmatch();
         return;
       }
 
       let nextElement = ALT_REGISTRY.awaitingKeycodes[nextIndex];
-      while (!nextElement.isTabbable() || nextElement.isUsedInFlow() || !nextElement.isCorrectMatchForTabGroup(expectNextGroup)) {
+      while (
+        !nextElement.isTabbable() ||
+        !nextElement.isCorrectMatchForTabGroup(expectNextGroup)
+      ) {
         nextIndex = ((nextIndex + len + (!shiftKey ? 1 : -1))) % len;
         nextElement = ALT_REGISTRY.awaitingKeycodes[nextIndex];
       }
@@ -298,17 +363,31 @@ function triggerBasedOn(code: string, shiftKey: boolean, callbackIfmatch: () => 
       if (!nextElement.isElementInView()) {
         nextElement.getElement().scrollIntoView({ behavior: "smooth" });
       }
+
+      if (document.activeElement !== nextElement.getElement()) {
+        console.warn("Failed to focus on next element, is it missing tab-index?", nextElement.getElement());
+      }
+      ALT_REGISTRY.isBlocked = nextElement.isBlocking();
+      ALT_REGISTRY.awaitingKeycodes.forEach((e) => e.setBlocked(ALT_REGISTRY.isBlocked));
       ALT_REGISTRY.awaitingKeycodesFocusIndex = nextIndex;
       ALT_REGISTRY.lastFocusedActionSignatures[ALT_REGISTRY.displayedActionsPriority] = nextElement.getSignature();
     } else if (ALT_REGISTRY.isDisplayingActions) {
       const len = ALT_REGISTRY.isDisplayingActions.length;
       let nextIndex = ((ALT_REGISTRY.displayedActionsFocusIndex + len + (!shiftKey ? 1 : -1))) % len;
 
+      // we may be in the alt mode but we have no actions outside of flow as such, we are going to forcefully
+      // tab in the flow
+      const hasNoActionsOutsideFlow = ALT_REGISTRY.isDisplayingActions.every((e) => e.isUsedInFlow());
+
       if (ALT_REGISTRY.displayedActionsFocusIndex === -1) {
         // let's check if we are already focused in one of the elements that are relevant
         // so we can go directly to the next one
         const alreadyFocusedAtIndex =
-          ALT_REGISTRY.isDisplayingActions.findIndex((e) => e.isTabbable() && !e.isUsedInFlow() && e.getElement() === document.activeElement);
+          ALT_REGISTRY.isDisplayingActions.findIndex((e) =>
+            e.isTabbable() &&
+            (hasNoActionsOutsideFlow ? true : !e.isUsedInFlow()) &&
+            e.getElement() === document.activeElement
+          );
 
         if (alreadyFocusedAtIndex !== -1) {
           nextIndex = ((alreadyFocusedAtIndex + len + (!shiftKey ? 1 : -1))) % len;
@@ -329,14 +408,22 @@ function triggerBasedOn(code: string, shiftKey: boolean, callbackIfmatch: () => 
       const expectNextGroup = ALT_REGISTRY.isJumpingThroughGroups ? (selected ? selected.getTabGroup() : undefined) : undefined;
 
       // make sure that there are tabbable components not to enter an infinite loop
-      if (!ALT_REGISTRY.isDisplayingActions.some((e) => e.isTabbable() && !e.isUsedInFlow() && e.isCorrectMatchForTabGroup(expectNextGroup))) {
+      if (!ALT_REGISTRY.isDisplayingActions.some((e) =>
+        e.isTabbable() &&
+        (hasNoActionsOutsideFlow ? true : !e.isUsedInFlow()) &&
+        e.isCorrectMatchForTabGroup(expectNextGroup)
+      )) {
         // break it and stop it now
         callbackIfmatch();
         return;
       }
 
       let nextElement = ALT_REGISTRY.isDisplayingActions[nextIndex];
-      while (!nextElement.isTabbable() || nextElement.isUsedInFlow() || !nextElement.isCorrectMatchForTabGroup(expectNextGroup)) {
+      while (
+        !nextElement.isTabbable() ||
+        (hasNoActionsOutsideFlow ? false : nextElement.isUsedInFlow()) ||
+        !nextElement.isCorrectMatchForTabGroup(expectNextGroup)
+      ) {
         nextIndex = ((nextIndex + len + (!shiftKey ? 1 : -1))) % len;
         nextElement = ALT_REGISTRY.isDisplayingActions[nextIndex];
       }
@@ -346,6 +433,13 @@ function triggerBasedOn(code: string, shiftKey: boolean, callbackIfmatch: () => 
       if (!nextElement.isElementInView()) {
         nextElement.getElement().scrollIntoView({ behavior: "smooth" });
       }
+
+      if (document.activeElement !== nextElement.getElement()) {
+        console.warn("Failed to focus on next element, is it missing tab-index?", nextElement.getElement());
+      }
+
+      ALT_REGISTRY.isBlocked = nextElement.isBlocking();
+      ALT_REGISTRY.isDisplayingActions.forEach((e) => e.setBlocked(ALT_REGISTRY.isBlocked));
       ALT_REGISTRY.displayedActionsFocusIndex = nextIndex;
       ALT_REGISTRY.lastFocusedActionSignatures[ALT_REGISTRY.displayedActionsPriority] = nextElement.getSignature();
     } else if (ALT_REGISTRY.activeFlow) {
@@ -394,11 +488,29 @@ function triggerBasedOn(code: string, shiftKey: boolean, callbackIfmatch: () => 
       if (!nextElement.isElementInView()) {
         nextElement.getElement().scrollIntoView({ behavior: "smooth" });
       }
+
+      if (document.activeElement !== nextElement.getElement()) {
+        console.warn("Failed to focus on next element, is it missing tab-index?", nextElement.getElement());
+      }
+
+      // now we set the blocking status of whatever is now the active element
+      // flow cannot be blocked because flow is not displaying anything
+      ALT_REGISTRY.isBlocked = false;
+      ALT_REGISTRY.activeFlow.forEach((e) => (e as any).setBlocked && (e as any).setBlocked(ALT_REGISTRY.isBlocked));
+
       ALT_REGISTRY.activeFlowFocusIndex = nextIndex;
       ALT_REGISTRY.lastFocusedFlowSignatures[ALT_REGISTRY.activeFlowPriority] = nextElement.getSignature();
     }
 
     callbackIfmatch();
+    return;
+  }
+
+  if (ALT_REGISTRY.isBlocked && code !== "escape") {
+    // no match, it's blocked
+    // tab, and other events are still allowed to flow
+    // escape is also allowed to flow here, that's because
+    // there may be an action linked to escape
     return;
   }
 
@@ -424,7 +536,6 @@ function triggerBasedOn(code: string, shiftKey: boolean, callbackIfmatch: () => 
     });
 
     callbackIfmatch();
-    showRelevant();
     return;
   }
 
@@ -441,7 +552,7 @@ function triggerBasedOn(code: string, shiftKey: boolean, callbackIfmatch: () => 
     }
   }
 
-  let value = ALT_REGISTRY.awaitingKeycodes ?
+  const value = ALT_REGISTRY.awaitingKeycodes ?
     // can be nan if not a number but who minds that
     ALT_REGISTRY.awaitingKeycodes[parseInt(code) - 1] :
     ALT_REGISTRY.actions[code];
@@ -472,6 +583,13 @@ function triggerBasedOn(code: string, shiftKey: boolean, callbackIfmatch: () => 
       !!ALT_REGISTRY.isDisplayingActions.find((v) => v.getElement() === document.activeElement);
     hideAll();
     matches.forEach((m) => m.trigger(isTabNavigatingCurrent));
+
+    // zero matches and the code was for the escape key
+    // then we will force escaping this stuff
+    if (matches.length === 0 && code === "escape") {
+      hideAll();
+      document.activeElement && (document.activeElement as HTMLElement).blur && (document.activeElement as HTMLElement).blur();
+    }
   } else {
     matches.sort((a, b) => a.isBefore(b) ? -1 : 1);
     hideAll(matches);
@@ -481,7 +599,6 @@ function triggerBasedOn(code: string, shiftKey: boolean, callbackIfmatch: () => 
       const plusCount = Math.floor(index / 9);
       m.triggerAmbiguous(false, ambigousId, plusCount);
     });
-    showRelevant();
   }
 }
 
@@ -492,7 +609,37 @@ const arrows = [
   "arrowdown",
 ];
 
+export function toggleAlt() {
+  if (ALT_REGISTRY.isDisplayingActions && !ALT_REGISTRY.isBlocked) {
+    // pressing alt again
+    hideAll();
+    calculateActiveFlow();
+  } else if (ALT_REGISTRY.isBlocked) {
+    // unblock the registry after pressing alt again
+    ALT_REGISTRY.isBlocked = false;
+    ALT_REGISTRY.isDisplayingActions && ALT_REGISTRY.isDisplayingActions.forEach((e) => e.setBlocked(false));
+    ALT_REGISTRY.activeFlow && ALT_REGISTRY.activeFlow.forEach((e) => (e as any).setBlocked && (e as any).setBlocked(false));
+    ALT_REGISTRY.awaitingKeycodes && ALT_REGISTRY.awaitingKeycodes.forEach((e) => (e as any).setBlocked && (e as any).setBlocked(false));
+  } else {
+    // pressing alt with nothing displayed
+    const activeFlowPriority = calculateActiveFlow();
+    const displayElementsPriority = calculatePriorityOfDisplayElements();
+
+    showDisplayElements(activeFlowPriority > displayElementsPriority ? activeFlowPriority : displayElementsPriority);
+  }
+}
+
 if (typeof document !== "undefined") {
+  // this is a keycode that was consumed by the alt actioner
+  // during the keydown event, if the keycode was not consumed
+  // eg. the alt actioner was not active
+  // then it's not populated
+
+  // the keycode gets cleaned during keyup
+  let keyCodeConsumed: string = null;
+  let keyConsumed: string = null;
+  let previousKeyupWasControl: boolean = false;
+
   window.addEventListener("focus", () => {
     hideAll();
   });
@@ -504,11 +651,32 @@ if (typeof document !== "undefined") {
   document.addEventListener("keyup", (e) => {
     if (e.key === "AltGraph") {
       ALT_REGISTRY.isJumpingThroughGroups = false;
-      return;
+      // fallback with control, but unlike alt it will not be able
+      // to directly trigger, because there are many shortcuts with control
+      // we need to ensure it was not consumed by the alt actioner to make
+      // it dissapear last so it can act as a toggle
+    } else if (
+      e.key === "Control" &&
+      keyConsumed !== "Control" &&
+      // prevent last shortcuts such as ctrl+c and ctrl+v from
+      // triggering the alt
+      !previousKeyupWasControl
+    ) {
+      toggleAlt();
     }
+
+    if (e.ctrlKey) {
+      previousKeyupWasControl = true;
+    } else {
+      previousKeyupWasControl = false;
+    }
+
+    keyConsumed = null;
+    keyCodeConsumed = null;
   });
   document.addEventListener("keydown", (e) => {
     // some special events don't have this
+    // eg. autocomplete
     if (!e.code) {
       return;
     }
@@ -540,18 +708,11 @@ if (typeof document !== "undefined") {
     }
 
     if (isPureAltKey || isTab || isEscape) {
-      if (isPureAltKey) {
-        if (ALT_REGISTRY.isDisplayingActions) {
-          // pressing alt again
-          hideAll();
-          calculateActiveFlow();
-        } else {
-          // pressing alt with nothing displayed
-          const activeFlowPriority = calculateActiveFlow();
-          const displayElementsPriority = calculatePriorityOfDisplayElements();
+      keyCodeConsumed = e.code;
+      keyConsumed = e.key;
 
-          showDisplayElements(activeFlowPriority > displayElementsPriority ? activeFlowPriority : displayElementsPriority);
-        }
+      if (isPureAltKey) {
+        toggleAlt();
       } else if (isTab || isEscape) {
         const activeFlowPriority = calculateActiveFlow();
 
@@ -569,22 +730,36 @@ if (typeof document !== "undefined") {
               return;
             } else {
               showDisplayElements(displayElementsPriority);
-              // make also the sroll visible
-              showRelevant();
             }
           }
         }
-        
+
         triggerBasedOn(keyCode, e.shiftKey, () => {
           e.stopPropagation();
           e.preventDefault();
         });
       }
     } else if (!isArrow && (isAltKey || ALT_REGISTRY.isDisplayingActions)) {
+      keyCodeConsumed = e.code;
+      keyConsumed = e.key;
+
       // if a match is found we want to prevent the default action
       triggerBasedOn(keyCode, e.shiftKey, () => {
         e.stopPropagation();
         e.preventDefault();
+      });
+
+      // alt+arrows not to work because it's used for
+      // history navigation
+    } else if (isArrow && !isAltKey) {
+      keyCodeConsumed = e.code;
+      keyConsumed = e.key;
+
+      const dir = keyCode.replace("arrow", "");
+
+      scrollCurrent(dir as any, () => {
+        e.preventDefault();
+        e.stopPropagation();
       });
     }
   });
@@ -621,6 +796,20 @@ export class ActualAltBase<P extends IAltBaseProps, S> extends React.PureCompone
 
   public getTabGroup() {
     return this.props.tabGroup || null;
+  }
+
+  public isBlocking() {
+    if (this.props.blocksQuickActionsWhileFocused) {
+      return true;
+    }
+
+    const element = this.getElement();
+
+    if (!element) {
+      return false;
+    }
+
+    return element.tagName === "INPUT" || element.tagName === "TEXTAREA";
   }
 
   public isCorrectMatchForTabGroup(v: string) {
@@ -788,13 +977,52 @@ export class ActualAltBase<P extends IAltBaseProps, S> extends React.PureCompone
       </Element>
     );
   }
-  
+
   componentDidMount() {
     this.register();
   }
 
   componentWillUnmount() {
     this.unregister();
+
+    const isDisplayingActions = ALT_REGISTRY.isDisplayingActions && ALT_REGISTRY.isDisplayingActions.length;
+    const isTabNavigatingCurrent = ALT_REGISTRY.isDisplayingActions &&
+      !!ALT_REGISTRY.isDisplayingActions.find((v) => v.getElement() === document.activeElement);
+
+    if (this.props.hideAllIfUnmount || this.props.triggerAltIfUnmountAndAltActive) {
+      hideAll();
+    }
+
+    // give it some time, just in case
+    setTimeout(() => {
+      // this occurs for example if something dismounts and then
+      // some element autofocus back when it was before
+      // or it is asked by the reactioner to do so and focus
+      // where it used to be
+
+      // so let's get the priority we are now
+      const expectedPriority = calculatePriorityOfDisplayElements(true);
+
+      // if we are meant to trigger the display anyway
+      if (this.props.triggerAltIfUnmountAndAltActive && isDisplayingActions) {
+        // then we do so and we get what we are displaying
+        showDisplayElements(expectedPriority);
+
+        // something else must have focused an element that is part of our flow
+        // or whatnot, for example, an autofocused element, this was not us
+        const somethingAlreadyActive = ALT_REGISTRY.isDisplayingActions.find((a) => a.getElement() === document.activeElement);
+        if (somethingAlreadyActive) {
+          // must check if it's a blocking input
+          ALT_REGISTRY.isBlocked = somethingAlreadyActive.isBlocking();
+          ALT_REGISTRY.isDisplayingActions.forEach((e) => e.setBlocked(ALT_REGISTRY.isBlocked));
+        } else if (isTabNavigatingCurrent) {
+          // because we were tab navigating before we want to tab navigate
+          // the new cycle too and ensure something is selected
+          // in this case we do so because we were tab navigating before
+          triggerBasedOn("tab", false, () => { });
+        }
+      }
+    }, 100);
   }
 }
 
@@ -804,6 +1032,7 @@ export class ActualAltReactioner extends ActualAltBase<IAltReactionerProps, IAct
 
     this.state = {
       displayed: false,
+      blocked: false,
     }
 
     this.triggerAltCycle = this.triggerAltCycle.bind(this);
@@ -811,6 +1040,12 @@ export class ActualAltReactioner extends ActualAltBase<IAltReactionerProps, IAct
 
   public isUsedInFlow() {
     return !!this.props.useInFlow;
+  }
+
+  public setBlocked(blocked: boolean) {
+    this.setState({
+      blocked,
+    })
   }
 
   public getElement() {
@@ -832,6 +1067,11 @@ export class ActualAltReactioner extends ActualAltBase<IAltReactionerProps, IAct
       const element = this.props.selector ?
         elementRootSelect.querySelector(this.props.selector) as HTMLElement :
         elementRootSelect.childNodes[0] as HTMLElement;
+
+      if (!element) {
+        console.warn("Could not retrieve element for reactioner for reaction key " + this.props.reactionKey);
+      }
+
       return element;
     }
   }
@@ -896,7 +1136,11 @@ export class ActualAltReactioner extends ActualAltBase<IAltReactionerProps, IAct
       ALT_REGISTRY.isDisplayingActions.push(this);
       ALT_REGISTRY.isDisplayingActions.sort((a, b) => a.isBefore(b) ? -1 : 1);
       ALT_REGISTRY.displayedActionsFocusIndex = ALT_REGISTRY.isDisplayingActions.findIndex((e) => e === currentFocused);
-      this.display();
+
+      if (!this.isDisabled()) {
+        this.display();
+        this.setBlocked(ALT_REGISTRY.isBlocked);
+      }
     }
   }
 
@@ -907,7 +1151,12 @@ export class ActualAltReactioner extends ActualAltBase<IAltReactionerProps, IAct
       });
     }
 
-    if (this.props.reactionKey !== prevProps.reactionKey) {
+    if (
+      this.props.reactionKey !== prevProps.reactionKey ||
+      this.props.disabled !== prevProps.disabled ||
+      this.props.priority !== prevProps.priority ||
+      this.props.useInFlow !== prevProps.useInFlow
+    ) {
       this.unregister(prevProps);
       this.register();
     }
@@ -924,6 +1173,7 @@ export class ActualAltReactioner extends ActualAltBase<IAltReactionerProps, IAct
 
   public display() {
     if (!this.state.displayed) {
+      this.props.onDisplay && this.props.onDisplay();
       this.setState({
         displayed: true,
       });
@@ -931,9 +1181,11 @@ export class ActualAltReactioner extends ActualAltBase<IAltReactionerProps, IAct
   }
 
   public hide() {
-    if (this.state.displayed) {
+    if (this.state.displayed || this.state.blocked) {
+      this.props.onHide && this.props.onHide();
       this.setState({
         displayed: false,
+        blocked: false,
       });
     }
   }
@@ -952,12 +1204,24 @@ export class ActualAltReactioner extends ActualAltBase<IAltReactionerProps, IAct
 
   public triggerAltCycle(isTabNavigatingCurrent: boolean) {
     showDisplayElements(calculatePriorityOfDisplayElements(true));
-    if (isTabNavigatingCurrent) {
+    // something else must have focused an element that is part of our flow
+    // or whatnot, for example, an autofocused element
+    const somethingAlreadyActive =
+      ALT_REGISTRY.isDisplayingActions &&
+      ALT_REGISTRY.isDisplayingActions.find((a) => a.getElement() === document.activeElement);
+
+    if (
+      somethingAlreadyActive
+    ) {
+      // must check if it's a blocking input
+      ALT_REGISTRY.isBlocked = somethingAlreadyActive.isBlocking();
+      ALT_REGISTRY.isDisplayingActions.forEach((e) => e.setBlocked(ALT_REGISTRY.isBlocked));
+      // otherwise if we are not we can go ahead and trigger tab
+    } else if (isTabNavigatingCurrent) {
       // because we were tab navigating before we want to tab navigate
       // the new cycle too and ensure something is selected
       triggerBasedOn("tab", false, () => { });
     }
-    showRelevant();
   }
 
   public trigger(isTabNavigatingCurrent: boolean) {
@@ -981,7 +1245,7 @@ export class ActualAltReactioner extends ActualAltBase<IAltReactionerProps, IAct
     const Element = (this.props.component || "div") as any;
     return (
       <Element style={{ display: "contents" }} className={this.props.className} ref={this.containerRef}>
-        {this.props.children(this.state.displayed)}
+        {this.props.children(this.state.displayed, this.state.blocked)}
       </Element>
     );
   }

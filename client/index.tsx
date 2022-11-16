@@ -499,6 +499,7 @@ export async function initializeItemizeApp(
 
   if (!serverMode) {
     document.body.parentElement.lang = initialLang;
+    document.body.parentElement.dir = config.rtlLanguages.includes(initialLang) ? "rtl" : "ltr";
     (document.head.querySelector("[rel='manifest']") as HTMLLinkElement).href =
       "/rest/resource/manifest." + initialLang + ".json";
   }

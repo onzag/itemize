@@ -102,37 +102,6 @@ export const style = {
     alignItems: "center",
     justifyContent: "space-between",
   },
-  fieldInput: (props: IPropertyEntryReferenceRendererProps) => {
-    if (shouldShowInvalid(props)) {
-      return {
-        "width": "100%",
-        // this is the colur when the field is out of focus
-        "&::before": {
-          borderBottomColor: "#e57373",
-        },
-        // the color that pops up when the field is in focus
-        "&::after": {
-          borderBottomColor: "#f44336",
-        },
-        // during the hover event
-        "&:hover::before": {
-          borderBottomColor: props.disabled ? "rgba(0,0,0,0.42)" : "#f44336",
-        },
-      };
-    }
-    return {
-      "width": "100%",
-      "&::before": {
-        borderBottomColor: "rgba(0,0,0,0.42)",
-      },
-      "&::after": {
-        borderBottomColor: "#3f51b5",
-      },
-      "&:hover::before": {
-        borderBottomColor: "#3f51b5",
-      },
-    };
-  },
   unitDialog: {
     minWidth: "400px",
   },
@@ -320,7 +289,7 @@ class PropertyEntryReferenceRenderer
    */
   public onKeyDown(e: React.KeyboardEvent<HTMLInputElement>) {
     if (this.props.args.onEnter && e.keyCode === 13) {
-      this.props.args.onEnter();      
+      this.props.args.onEnter();
     }
   }
 
@@ -334,7 +303,10 @@ class PropertyEntryReferenceRenderer
     // these are the inputProps of the small input
     const inputProps = {
       inputMode,
+      "aria-describedby": this.props.description ? this.props.uniqueId + "_desc" : null,
     };
+
+    const isInvalid = shouldShowInvalid(this.props);
 
     // these are the TextField props that are applied
     let appliedTextFieldProps: any = {};
@@ -345,10 +317,18 @@ class PropertyEntryReferenceRenderer
       },
     };
 
+    if (isInvalid) {
+      inputProps["aria-invalid"] = true;
+
+      if (!this.props.args.hideError) {
+        inputProps["aria-errormessage"] = this.props.uniqueId + "_error";
+      }
+    }
+
     // if there are textFieldProps
     if (textFieldProps) {
       // we need to extract the ref setting
-      const { inputRef = () => {return; } , ref, ...other } = textFieldProps;
+      const { inputRef = () => { return; }, ref, ...other } = textFieldProps;
       // set all the other properties as applied to the TextField
       appliedTextFieldProps = other;
 
@@ -376,7 +356,7 @@ class PropertyEntryReferenceRenderer
     if (this.props.canRestore) {
       let icon: React.ReactNode;
       if (this.props.currentAppliedValue) {
-        icon = <RestoreIcon/>
+        icon = <RestoreIcon />
       } else {
         icon = <ClearIcon />
       }
@@ -408,25 +388,8 @@ class PropertyEntryReferenceRenderer
       );
     }
 
-    const descriptionAsAlert = this.props.args["descriptionAsAlert"];
-    // return the complex overengineered component in all its glory
-    return (
-      <Box sx={style.container}>
-        {
-          this.props.description && descriptionAsAlert ?
-          <Alert severity="info" sx={style.description} role="note">
-            {this.props.description}
-          </Alert> :
-          null
-        }
-        {
-          this.props.description && !descriptionAsAlert ?
-          <Typography variant="caption" sx={style.description}>
-            {this.props.description}
-          </Typography> :
-          null
-        }
-        <TextField
+    const fieldComponent = (
+      <TextField
           fullWidth={true}
           type="text"
           sx={style.entry}
@@ -436,8 +399,9 @@ class PropertyEntryReferenceRenderer
           onChange={this.onChangeByHTMLEvent}
           onBlur={this.props.enableUserSetErrors}
           onKeyDown={this.onKeyDown}
+          error={isInvalid}
           InputProps={{
-            sx: style.fieldInput,
+            fullWidth: true,
             classes: {
               focused: "focused",
             },
@@ -456,9 +420,46 @@ class PropertyEntryReferenceRenderer
           variant={this.props.args.fieldVariant || "filled"}
           {...appliedTextFieldProps}
         />
-        {this.props.args.hideError ? null : <Box sx={style.errorMessage}>
-          {this.props.currentInvalidReason}
-        </Box>}
+    );
+
+    const descriptionAsAlert = this.props.args["descriptionAsAlert"];
+
+    let descriptionObject: React.ReactNode = null;
+    if (this.props.description) {
+      descriptionObject = descriptionAsAlert ? (
+        <Alert severity="info" sx={style.description} role="note" id={this.props.uniqueId + "_desc"}>
+          {this.props.description}
+        </Alert>
+      ) : (
+        <Typography variant="caption" sx={style.description} id={this.props.uniqueId + "_desc"}>
+          {this.props.description}
+        </Typography>
+      );
+    }
+
+    const error = (
+      this.props.args.hideError ? null : <Box sx={style.errorMessage} id={this.props.uniqueId + "_error"}>
+        {this.props.currentInvalidReason}
+      </Box>
+    );
+
+    let inner: React.ReactNode;
+    if (this.props.args.useCustomFieldRender) {
+      inner = this.props.args.useCustomFieldRender(descriptionObject, null, fieldComponent, error, this.props.disabled);
+    } else {
+      inner = (
+        <>
+          {descriptionObject}
+          {fieldComponent}
+          {error}
+        </>
+      )
+    }
+
+    // return the complex overengineered component in all its glory
+    return (
+      <Box sx={style.container}>
+        {inner}
       </Box>
     );
   }
@@ -537,7 +538,7 @@ class PropertyEntryReferenceRenderer
    * When the suggestion fetch is triggered
    * @param arg the arg
    */
-  public onSuggestionsFetchRequested(arg: {value: string, reason: string}) {
+  public onSuggestionsFetchRequested(arg: { value: string, reason: string }) {
     if (arg.reason !== "input-focused") {
       this.props.onChangeSearch(arg.value, this.props.args.preventIds, this.props.args.preventEqualityWithProperties);
     }
@@ -581,6 +582,7 @@ class PropertyEntryReferenceRenderer
         currentInternalValue={this.props.currentInternalValue}
         currentInvalidReason={this.props.currentInvalidReason}
         rtl={this.props.rtl}
+        uniqueId={this.props.uniqueId}
         propertyId={this.props.propertyId}
         placeholder={this.props.placeholder}
         args={this.props.args}

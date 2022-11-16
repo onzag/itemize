@@ -29,6 +29,10 @@ interface ICountryPickerProps {
    */
   usePhoneCode?: boolean;
   /**
+   * whether it is disabled
+   */
+  disabled?: boolean;
+  /**
    * Whether null is a valid value
    */
   allowUnspecified?: boolean;
@@ -48,6 +52,23 @@ interface ICountryPickerProps {
    * default
    */
   currentCode?: string;
+
+  /**
+   * used for aria reasons
+   */
+  labelledBy?: string;
+  /**
+   * used for aria reasons
+   */
+  describedBy?: string;
+  /**
+   * used for aria reasons
+   */
+  label?: string;
+  /**
+   * used for aria reasons
+   */
+  description?: string;
 }
 
 /**
@@ -154,7 +175,7 @@ export class CountryPicker extends React.PureComponent<ICountryPickerProps, ICou
                 selected={ac.code === currentCountry.code}
                 onClick={this.handleCountryChange.bind(this, countryData.changeCountryTo, ac.code)}
               >
-                {ac.emoji} {capitalize(ac.native)}
+                {ac.emoji + " " + capitalize(ac.native) + (this.props.usePhoneCode ? `(+${ac.phone})` : "")}
               </MenuItem>
             ))}
           </Menu> : null;
@@ -165,6 +186,13 @@ export class CountryPicker extends React.PureComponent<ICountryPickerProps, ICou
                 color="inherit"
                 startIcon={currentCountry.emoji}
                 onClick={this.handleButtonSelectClick}
+                disabled={this.props.disabled}
+                aria-label={typeof this.props.label !== "undefined" ? this.props.label : (
+                  this.props.usePhoneCode ? null : currentCountry.native
+                )}
+                aria-description={this.props.description}
+                aria-labelledby={this.props.labelledBy}
+                aria-describedby={this.props.describedBy}
               >
                 {
                   this.props.usePhoneCode && currentCountry.phone ?

@@ -129,6 +129,7 @@ export default class PropertyEntryBoolean extends React.Component<
     const RendererElement = this.props.renderer;
     const rendererArgs: IPropertyEntryBooleanRendererProps = {
       propertyId: this.props.property.getId(),
+      uniqueId: this.props.itemDefinition.getQualifiedPathName() + "_" + this.props.property.getId() + "_" + this.props.forId + "_" + this.props.forVersion,
   
       args: this.props.rendererArgs,
       rtl: this.props.rtl,

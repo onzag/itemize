@@ -160,11 +160,6 @@ export interface IPropertyDefinitionRawJSONDataType {
    */
   searchHidden?: boolean;
   /**
-   * html style autocomplete, mainly used for browser level
-   * autocompletition
-   */
-  htmlAutocomplete?: string;
-  /**
    * default value
    */
   default?: PropertyDefinitionSupportedType;
@@ -2171,15 +2166,6 @@ export default class PropertyDefinition {
    */
   public getSpecificValidValues() {
     return this.rawData.values;
-  }
-
-  /**
-   * Provides the html level as defined as autocomplete="" in the html tag
-   * attribute, this is mainly for usability
-   * @returns a string or null
-   */
-  public getHTMLAutocomplete() {
-    return this.rawData.htmlAutocomplete || null;
   }
 
   /**

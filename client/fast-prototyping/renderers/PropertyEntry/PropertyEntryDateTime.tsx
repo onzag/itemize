@@ -58,37 +58,6 @@ export const style = {
       color: invalid ? "#f44336" : "#3f51b5",
     },
   }),
-  fieldInput: (invalid: boolean, disabled: boolean) => {
-    if (invalid) {
-      return {
-        "width": "100%",
-        // this is the colur when the field is out of focus
-        "&::before": {
-          borderBottomColor: "#e57373",
-        },
-        // the color that pops up when the field is in focus
-        "&::after": {
-          borderBottomColor: "#f44336",
-        },
-        // during the hover event
-        "&:hover::before": {
-          borderBottomColor: disabled ? "rgba(0,0,0,0.42)" : "#f44336",
-        },
-      };
-    }
-    return {
-      "width": "100%",
-      "&::before": {
-        borderBottomColor: "rgba(0,0,0,0.42)",
-      },
-      "&::after": {
-        borderBottomColor: "#3f51b5",
-      },
-      "&:hover::before": {
-        borderBottomColor: "#3f51b5",
-      },
-    };
-  },
 };
 
 function renderInput(origProps: TextFieldProps) {
@@ -98,7 +67,20 @@ function renderInput(origProps: TextFieldProps) {
       props.onBlur && props.onBlur(e as any);
     }
 
-    return <TextField {...props} {...origProps} onBlur={onBlur} />
+    // merge input props, original takes priority
+    let inputProps = origProps.inputProps;
+    if (props.inputProps) {
+      if (inputProps) {
+        inputProps = {
+          ...props.inputProps,
+          ...origProps.inputProps,
+        }
+      } else {
+        inputProps = props.inputProps;
+      }
+    }
+
+    return <TextField {...props} {...origProps} onBlur={onBlur} inputProps={inputProps} />
   }
 }
 
@@ -121,42 +103,24 @@ function PropertyEntryDateTimeRenderer(props: IPropertyEntryDateTimeRendererProp
   // setting up the component
   let component = null;
   const invalid = shouldShowInvalid(props);
+
+  const appliedInputProps: any = {
+    fullWidth: true,
+    onBlur: props.enableUserSetErrors,
+    inputProps: {
+      "aria-describedby": props.description ? props.uniqueId + "_desc" : null,
+    },
+  };
+
+  if (invalid) {
+    appliedInputProps["aria-invalid"] = true;
+
+    if (!props.args.hideError) {
+      appliedInputProps.inputProps["aria-errormessage"] = props.uniqueId + "_error";
+    }
+  }
+
   if (props.type === "date") {
-    // let's extract the locale format from moment for a long date
-    // const basicProps = {
-    //   autoOk: true,
-    //   cancelLabel: props.i18nCancel,
-    //   okLabel: props.i18nOk,
-    //   label: props.label,
-    //   placeholder: props.placeholder,
-    //   format: props.dateTimeFormat,
-    //   className: props.classes.entry,
-    //   fullWidth: true,
-    //   value: props.momentValue,
-    //   onChange: props.onChangeByMoment,
-    //   onBlur: props.enableUserSetErrors,
-    //   error: false,
-    //   helperText: null as string,
-    //   disabled: props.disabled,
-
-    //   renderInput: renderInput({
-    //     fullWidth: true,
-
-    //   }),
-
-    //   InputLabelProps={
-    //     classes: {
-    //       root: props.classes.label,
-    //       focused: "focused",
-    //     },
-    //   },
-
-    //   shouldDisableDate: props.args.shouldDisableDate,
-    //   about: props.args.about,
-    //   disablePast: props.args.disablePast,
-    //   disableFuture: props.args.disableFuture,
-    // };
-
     component = (
       <StyledDatePicker
         cancelText={props.i18nCancel}
@@ -166,15 +130,13 @@ function PropertyEntryDateTimeRenderer(props: IPropertyEntryDateTimeRendererProp
         value={props.momentValue}
         onChange={props.onChangeByMoment}
         InputProps={{
-          sx: style.fieldInput(invalid, props.disabled),
+          fullWidth: true,
+          error: invalid,
           classes: {
             focused: "focused",
           },
         }}
-        renderInput={renderInput({
-          fullWidth: true,
-          onBlur: props.enableUserSetErrors,
-        })}
+        renderInput={renderInput(appliedInputProps)}
         disabled={props.disabled}
         shouldDisableDate={props.args.shouldDisableDate}
         disablePast={props.args.disablePast}
@@ -182,40 +144,6 @@ function PropertyEntryDateTimeRenderer(props: IPropertyEntryDateTimeRendererProp
       />
     );
   } else if (props.type === "datetime") {
-    // let's use the long format with the time format
-    // const basicProps = {
-    //   autoOk: true,
-    //   ampm: props.dateTimeFormat.includes("A"),
-    //   cancelLabel: props.i18nCancel,
-    //   okLabel: props.i18nOk,
-    //   label: props.label,
-    //   placeholder: props.placeholder,
-    //   inputVariant: "filled" as "filled",
-    //   format: props.dateTimeFormat,
-    //   className: props.classes.entry,
-    //   fullWidth: true,
-    //   value: props.momentValue,
-    //   onChange: props.onChangeByMoment,
-    //   onBlur: props.enableUserSetErrors,
-    //   error: false,
-    //   helperText: null as string,
-    //   disabled: props.disabled,
-    //   InputProps: {
-    //     classes: {
-    //       root: props.classes.fieldInput,
-    //       focused: "focused",
-    //     },
-    //   },
-    //   InputLabelProps: {
-    //     classes: {
-    //       root: props.classes.label,
-    //       focused: "focused",
-    //     },
-    //   },
-    //   renderInput,
-    // };
-
-
     const isAMPM = props.dateTimeFormat.includes("A");
     component = (
       <StyledDateTimePicker
@@ -228,15 +156,13 @@ function PropertyEntryDateTimeRenderer(props: IPropertyEntryDateTimeRendererProp
         value={props.momentValue}
         onChange={props.onChangeByMoment}
         InputProps={{
-          sx: style.fieldInput(invalid, props.disabled),
+          fullWidth: true,
+          error: invalid,
           classes: {
             focused: "focused",
           },
         }}
-        renderInput={renderInput({
-          fullWidth: true,
-          onBlur: props.enableUserSetErrors,
-        })}
+        renderInput={renderInput(appliedInputProps)}
         disabled={props.disabled}
         shouldDisableDate={props.args.shouldDisableDate}
         disablePast={props.args.disablePast}
@@ -244,38 +170,6 @@ function PropertyEntryDateTimeRenderer(props: IPropertyEntryDateTimeRendererProp
       />
     );
   } else {
-    // and the time only
-    // const basicProps = {
-    //   autoOk: true,
-    //   ampm: props.dateTimeFormat.includes("A"),
-    //   cancelLabel: props.i18nCancel,
-    //   okLabel: props.i18nOk,
-    //   label: props.label,
-    //   placeholder: props.placeholder,
-    //   inputVariant: "filled" as "filled",
-    //   format: props.dateTimeFormat,
-    //   className: props.classes.entry,
-    //   fullWidth: true,
-    //   value: props.momentValue,
-    //   onChange: props.onChangeByMoment,
-    //   onBlur: props.enableUserSetErrors,
-    //   error: false,
-    //   helperText: null as string,
-    //   disabled: props.disabled,
-    //   InputProps: {
-    //     classes: {
-    //       root: props.classes.fieldInput,
-    //       focused: "focused",
-    //     },
-    //   },
-    //   InputLabelProps: {
-    //     classes: {
-    //       root: props.classes.label,
-    //       focused: "focused",
-    //     },
-    //   },
-    // };
-
     const isAMPM = props.dateTimeFormat.includes("A")
     component = (
       <StyledTimePicker
@@ -288,42 +182,56 @@ function PropertyEntryDateTimeRenderer(props: IPropertyEntryDateTimeRendererProp
         value={props.momentValue}
         onChange={props.onChangeByMoment}
         InputProps={{
-          sx: style.fieldInput(invalid, props.disabled),
+          fullWidth: true,
+          error: invalid,
           classes: {
             focused: "focused",
           },
         }}
-        renderInput={renderInput({
-          fullWidth: true,
-          onBlur: props.enableUserSetErrors,
-        })}
+        renderInput={renderInput(appliedInputProps)}
         disabled={props.disabled}
       />
     );
   }
 
   const descriptionAsAlert = props.args["descriptionAsAlert"];
+
+  let descriptionObject: React.ReactNode = null;
+  if (props.description) {
+    descriptionObject = descriptionAsAlert ? (
+      <Alert severity="info" sx={style.description} role="note" id={props.uniqueId + "_desc"}>
+        {props.description}
+      </Alert>
+    ) : (
+      <Typography variant="caption" sx={style.description} id={props.uniqueId + "_desc"}>
+        {props.description}
+      </Typography>
+    );
+  }
+
+  const error = (
+    props.args.hideError ? null : <Box sx={style.errorMessage} id={props.uniqueId + "_error"}>
+      {props.currentInvalidReason}
+    </Box>
+  );
+
+  let inner: React.ReactNode;
+  if (props.args.useCustomFieldRender) {
+    inner = props.args.useCustomFieldRender(descriptionObject, null, component, error, props.disabled);
+  } else {
+    inner = (
+      <>
+        {descriptionObject}
+        {component}
+        {error}
+      </>
+    )
+  }
+
   // return it
   return (
     <Box sx={style.container}>
-      {
-        props.description && descriptionAsAlert ?
-          <Alert severity="info" sx={style.description} role="note">
-            {props.description}
-          </Alert> :
-          null
-      }
-      {
-        props.description && !descriptionAsAlert ?
-          <Typography variant="caption"  sx={style.description}>
-            {props.description}
-          </Typography> :
-          null
-      }
-      {component}
-      {props.args.hideError ? null : <Box sx={style.errorMessage}>
-        {props.currentInvalidReason}
-      </Box>}
+      {inner}
     </Box>
   );
 };

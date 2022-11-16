@@ -86,6 +86,12 @@ export interface II18nReadProps {
    */
   args?: any[];
   /**
+   * used to wrap the content bits that are not part of the args
+   * since the args can be anything and they can be wrapped react components
+   * or strings, this will affect anything that is not the args if set
+   */
+  argsContentBitsWrapper?: (text: string) => React.ReactNode;
+  /**
    * Dangerous!... whether the content represents html instead of a plain string
    * does not mix well with args if the output generated is a react node that
    * does not serialize
@@ -265,7 +271,10 @@ function i18nReadInternal(
   // if we are passing arguments to replace the {0} {1} etc... numbers
   if (props.args) {
     // we have two options, these are for basic types, which is faster and returns a string
-    if (props.args.every((a) => typeof a === "string" || typeof a === "number" || a === null || typeof a === "undefined")) {
+    if (
+      !props.argsContentBitsWrapper &&
+      props.args.every((a) => typeof a === "string" || typeof a === "number" || a === null || typeof a === "undefined")
+    ) {
       // the standard locale replacer
       i18nValue = localeReplacer(i18nValue as string, ...props.args);
     } else {
@@ -273,16 +282,20 @@ function i18nReadInternal(
       // and returns an array of react nodes, this all depends on the args that the user
       // is passing
       i18nValue = localeReplacerToArray(i18nValue as string, ...props.args).map((output, index) => {
+        // eg 0 2 4 all odd numbers are content bits
+        const isContentBit = index % 2 === 0;
+        const outputNode = isContentBit && props.argsContentBitsWrapper ? props.argsContentBitsWrapper(output) : output;
+
         if (typeof output === "string") {
           return (
             <span key={index} style={{ whiteSpace: "pre-wrap" }}>
-              {output}
+              {outputNode}
             </span>
           );
         }
         return (
           <React.Fragment key={index}>
-            {output}
+            {outputNode}
           </React.Fragment>
         );
       });

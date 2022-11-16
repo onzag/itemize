@@ -58,60 +58,19 @@ export const style = {
       },
     }
   },
-  fieldInput: (isInvalid: boolean, disabled: boolean) => {
-    if (isInvalid) {
-      return {
-        "width": "100%",
-        // this is the colur when the field is out of focus
-        "&::before": {
-          borderBottomColor: "#e57373",
-        },
-        // the color that pops up when the field is in focus
-        "&::after": {
-          borderBottomColor: "#f44336",
-        },
-        // during the hover event
-        "&:hover::before": {
-          borderBottomColor: disabled ? "rgba(0,0,0,0.42)" : "#f44336",
-        },
-        "display": "flex",
-        "alignItems": "center",
-        "flexWrap": "wrap",
-        "paddingBottom": "10px",
-        "paddingTop": "20px",
-        "paddingLeft": "12px",
-        "& > input": {
-          flex: "1 0 auto",
-          width: "200px",
-          padding: "10px 0",
-          marginBottom: "-10px",
-        },
-      };
-    }
-    return {
-      "width": "100%",
-      "&::before": {
-        borderBottomColor: "rgba(0,0,0,0.42)",
-      },
-      "&::after": {
-        borderBottomColor: "#3f51b5",
-      },
-      "&:hover::before": {
-        borderBottomColor: "#3f51b5",
-      },
-      "display": "flex",
-      "alignItems": "center",
-      "flexWrap": "wrap",
-      "paddingBottom": "10px",
-      "paddingTop": "20px",
-      "paddingLeft": "12px",
-      "& > input": {
-        flex: "1 0 auto",
-        width: "200px",
-        padding: "10px 0",
-        marginBottom: "-10px",
-      },
-    };
+  fieldInput: {
+    "display": "flex",
+    "alignItems": "center",
+    "flexWrap": "wrap",
+    "paddingBottom": "10px",
+    "paddingTop": "20px",
+    "paddingLeft": "12px",
+    "& > input": {
+      flex: "1 0 auto",
+      width: "200px",
+      padding: "10px 0",
+      marginBottom: "-10px",
+    },
   },
   autosuggestContainer: {
     position: "relative",
@@ -171,6 +130,11 @@ export const style = {
   autosuggestMenuItemSubText: {
     fontSize: "0.75rem",
     lineHeight: "0.75rem",
+  },
+  errorMessage: {
+    color: "#f44336",
+    height: "1.3rem",
+    fontSize: "0.85rem",
   },
 };
 
@@ -354,12 +318,26 @@ function PropertyEntryTagListRenderer(props: IPropertyEntryTagListRendererProps)
       </InputAdornment>
     ) : null;
 
+    const appliedInputProps: any = {
+      inputProps: {
+        "aria-describedby": props.description ? props.uniqueId + "_desc" : null,
+      },
+    };
+
+    if (!props.currentValid) {
+      appliedInputProps.inputProps["aria-invalid"] = true;
+
+      if (!props.args.hideError) {
+        appliedInputProps["aria-errormessage"] = props.currentInvalidReason;
+      }
+    }
+
     return (
       <FormControl
         fullWidth={true}
         onClick={focus}
         disabled={props.disabled}
-        variant={this.props.args.fieldVariant || "filled"}
+        variant={props.args.fieldVariant || "filled"}
       >
         <InputLabel
           htmlFor={props.propertyId}
@@ -373,7 +351,8 @@ function PropertyEntryTagListRenderer(props: IPropertyEntryTagListRendererProps)
 
         <FilledInput
           // typescript on it again, refuses to take this object
-          sx={style.fieldInput(!props.currentValid, props.disabled) as any}
+          sx={style.fieldInput}
+          error={!props.currentValid}
           id={props.propertyId}
           value={inputValue}
           onChange={updateValue}
@@ -386,6 +365,7 @@ function PropertyEntryTagListRenderer(props: IPropertyEntryTagListRendererProps)
           startAdornment={chips}
           onBlur={handleBlur}
           {...inputProps}
+          {...appliedInputProps}
         />
       </FormControl>
     )
@@ -455,15 +435,41 @@ function PropertyEntryTagListRenderer(props: IPropertyEntryTagListRendererProps)
     object = renderBody();
   }
 
+  let descriptionObject: React.ReactNode = null;
+  if (props.description) {
+    descriptionObject = descriptionAsAlert ? (
+      <Alert severity="info" sx={style.description} role="note" id={props.uniqueId + "_desc"}>
+        {props.description}
+      </Alert>
+    ) : (
+      <Typography variant="caption" sx={style.description} id={props.uniqueId + "_desc"}>
+        {props.description}
+      </Typography>
+    );
+  }
+
+  const error = (
+    props.args.hideError ? null : <Box sx={style.errorMessage} id={props.uniqueId + "_error"}>
+      {props.currentInvalidReason}
+    </Box>
+  );
+
+  let inner: React.ReactNode;
+  if (props.args.useCustomFieldRender) {
+    inner = props.args.useCustomFieldRender(descriptionObject, null, object, error, props.disabled);
+  } else {
+    inner = (
+      <>
+        {descriptionObject}
+        {object}
+        {error}
+      </>
+    )
+  }
+
   return (
     <Box sx={style.container}>
-      {props.description && descriptionAsAlert ? <Alert severity="info" sx={style.description} role="note">
-        {props.description}
-      </Alert> : null}
-      {props.description && !descriptionAsAlert ? <Typography variant="caption" sx={style.description}>
-        {props.description}
-      </Typography> : null}
-      {object}
+      {inner}
     </Box>
   );
 };

@@ -91,7 +91,7 @@ interface IDialogProps {
    */
   labelledBy?: string;
   /**
-   * Whatever was passed to labelledBy will become the id of the title
+   * Whatever
    */
   useLabelledByInTitleId?: boolean;
   /**
@@ -146,12 +146,7 @@ function Dialog(props: IDialogProps) {
               </IconButton>
             )}
           </I18nRead>
-          <Typography
-            variant="h6"
-            color="inherit"
-            sx={props.titleSx ? props.titleSx : dialogStyles.title}
-            id={props.useLabelledByInTitleId ? props.labelledBy : null}
-          >
+          <Typography variant="h6" color="inherit" sx={props.titleSx ? props.titleSx : dialogStyles.title}>
             {props.title}
           </Typography>
         </Toolbar>

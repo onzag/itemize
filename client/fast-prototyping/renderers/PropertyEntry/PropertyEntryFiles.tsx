@@ -158,120 +158,152 @@ function PropertyEntryFilesRenderer(props: IPropertyEntryFilesRendererProps) {
 
   const isInvalid = shouldShowInvalid(props);
 
+  const fieldLabel = (
+    props.label ? <FormLabel
+      aria-label={props.label}
+      sx={style.label(isInvalid)}
+      classes={{
+        focused: "focused",
+      }}
+    >
+      {capitalize(props.label)}
+      {icon ? <RestoreIconButton
+        sx={style.icon}
+        onClick={props.canRestore ? props.onRestore : null}
+      >{icon}</RestoreIconButton> : null}
+    </FormLabel> : null
+  );
+
+  const fieldComponent = (
+    <Dropzone
+      onDropAccepted={onDrop.bind(null, props.enableUserSetErrors, props.onPushFiles)}
+      onDropRejected={onDrop.bind(null, props.enableUserSetErrors, props.onPushFiles)}
+      maxSize={MAX_FILE_SIZE}
+      accept={props.accept === "*" ? null : props.accept}
+      multiple={true}
+      ref={dropzoneRef}
+      disabled={props.disabled}
+    >
+      {({
+        getRootProps,
+        getInputProps,
+        isDragActive,
+        isDragAccept,
+        isDragReject,
+      }) => {
+        const { ref, ...rootProps } = getRootProps();
+
+        const files = props.currentValueWithInfo.map((value) => {
+          const mainFileClassName = "file" +
+            (value.rejected ? " rejected" : "");
+          return (
+            <div
+              className={mainFileClassName}
+              onClick={value.openFile}
+              key={value.id}
+            >
+              <div className="file-container">
+                {
+                  value.isSupportedImage ? (
+                    <img
+                      srcSet={value.imageSrcSet}
+                      sizes="100px"
+                      src={value.url}
+                      className="thumbnail"
+                    />
+                  ) : (
+                    <div className="file-icon">
+                      <span className="file-extension">{
+                        value.extension
+                      }</span>
+                    </div>
+                  )
+                }
+                <p className="file-name">{value.name}</p>
+                <p className="file-size">{
+                  value.prettySize
+                }</p>
+                {value.rejected ? <Box component="p" sx={style.fileRejectedDescription}>
+                  {value.rejectedReason}
+                </Box> : null}
+              </div>
+              <IconButton
+                onClick={(e) => {
+                  e.stopPropagation();
+                  value.removeFile();
+                }}
+                sx={style.fileDeleteButton}
+                size="large">
+                <Close />
+              </IconButton>
+            </div>
+          );
+        });
+
+        const dragInfo = !files.length ? (
+          <Box
+            sx={style.paperPlaceholder(isDragAccept, isDragReject)}
+          >
+            <p>{isDragActive ? capitalize(props.genericActivePlaceholder) : capitalize(props.placeholder)}</p>
+            <NoteAddIcon sx={style.paperIconAdd} />
+          </Box>
+        ) : null;
+
+        return (
+          <>
+            <Paper
+              {...rootProps}
+              sx={style.paper}
+            >
+              <input {...getInputProps()} />
+              {files}
+              {dragInfo}
+            </Paper>
+          </>
+        );
+      }}
+    </Dropzone>
+  );
+
   // return the component itself
   const descriptionAsAlert = props.args["descriptionAsAlert"];
+
+  let descriptionObject: React.ReactNode = null;
+  if (this.props.description) {
+    descriptionObject = descriptionAsAlert ? (
+      <Alert severity="info" sx={style.description} role="note" id={this.props.uniqueId + "_desc"}>
+        {this.props.description}
+      </Alert>
+    ) : (
+      <Typography variant="caption" sx={style.description} id={this.props.uniqueId + "_desc"}>
+        {this.props.description}
+      </Typography>
+    );
+  }
+
+  const error = (
+    this.props.args.hideError ? null : <Box sx={style.errorMessage} id={this.props.uniqueId + "_error"}>
+      {this.props.currentInvalidReason}
+    </Box>
+  );
+
+  let inner: React.ReactNode;
+  if (this.props.args.useCustomFieldRender) {
+    inner = this.props.args.useCustomFieldRender(descriptionObject, fieldLabel, fieldComponent, error, this.props.disabled);
+  } else {
+    inner = (
+      <>
+        {descriptionObject}
+        {fieldLabel}
+        {fieldComponent}
+        {error}
+      </>
+    )
+  }
+
   return (
     <Box sx={style.container}>
-      {props.description && descriptionAsAlert ? <Alert severity="info" sx={style.description} role="note">
-        {props.description}
-      </Alert> : null}
-      {props.description && !descriptionAsAlert ? <Typography variant="caption" sx={style.description}>
-        {props.description}
-      </Typography> : null}
-      {props.label ? <FormLabel
-        aria-label={props.label}
-        sx={style.label(isInvalid)}
-        classes={{
-          focused: "focused",
-        }}
-      >
-        {capitalize(props.label)}
-        {icon ? <RestoreIconButton
-          sx={style.icon}
-          onClick={props.canRestore ? props.onRestore : null}
-        >{icon}</RestoreIconButton> : null}
-      </FormLabel> : null}
-      <Dropzone
-        onDropAccepted={onDrop.bind(null, props.enableUserSetErrors, props.onPushFiles)}
-        onDropRejected={onDrop.bind(null, props.enableUserSetErrors, props.onPushFiles)}
-        maxSize={MAX_FILE_SIZE}
-        accept={props.accept === "*" ? null : props.accept}
-        multiple={true}
-        ref={dropzoneRef}
-        disabled={props.disabled}
-      >
-        {({
-          getRootProps,
-          getInputProps,
-          isDragActive,
-          isDragAccept,
-          isDragReject,
-        }) => {
-          const { ref, ...rootProps } = getRootProps();
-
-          const files = props.currentValueWithInfo.map((value) => {
-            const mainFileClassName = "file" +
-              (value.rejected ? " rejected" : "");
-            return (
-              <div
-                className={mainFileClassName}
-                onClick={value.openFile}
-                key={value.id}
-              >
-                <div className="file-container">
-                  {
-                    value.isSupportedImage ? (
-                      <img
-                        srcSet={value.imageSrcSet}
-                        sizes="100px"
-                        src={value.url}
-                        className="thumbnail"
-                      />
-                    ) : (
-                      <div className="file-icon">
-                        <span className="file-extension">{
-                          value.extension
-                        }</span>
-                      </div>
-                    )
-                  }
-                  <p className="file-name">{value.name}</p>
-                  <p className="file-size">{
-                    value.prettySize
-                  }</p>
-                  {value.rejected ? <Box component="p" sx={style.fileRejectedDescription}>
-                    {value.rejectedReason}
-                  </Box> : null}
-                </div>
-                <IconButton
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    value.removeFile();
-                  }}
-                  sx={style.fileDeleteButton}
-                  size="large">
-                  <Close />
-                </IconButton>
-              </div>
-            );
-          });
-
-          const dragInfo = !files.length ? (
-            <Box
-              sx={style.paperPlaceholder(isDragAccept, isDragReject)}
-            >
-              <p>{isDragActive ? capitalize(props.genericActivePlaceholder) : capitalize(props.placeholder)}</p>
-              <NoteAddIcon sx={style.paperIconAdd} />
-            </Box>
-          ) : null;
-
-          return (
-            <>
-              <Paper
-                {...rootProps}
-                sx={style.paper}
-              >
-                <input {...getInputProps()} />
-                {files}
-                {dragInfo}
-              </Paper>
-            </>
-          );
-        }}
-      </Dropzone>
-      {props.args.hideError ? null : <Box sx={style.errorMessage}>
-        {props.currentInvalidReason}
-      </Box>}
+      {inner}
     </Box>
   );
 };

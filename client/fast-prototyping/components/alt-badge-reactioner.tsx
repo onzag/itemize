@@ -1,6 +1,5 @@
 import { SxProps, Theme } from "@mui/material";
 import Badge from "@mui/material/Badge";
-import AppLanguageRetriever from "../../components/localization/AppLanguageRetriever";
 import React, { useCallback, useState } from "react";
 import AltReactioner from "../../components/accessibility/AltReactioner";
 
@@ -19,6 +18,20 @@ const style = {
       borderColor: "#f9a825 !important",
     },
   },
+  badgeFastKeyFlow: {
+    "& .MuiBadge-badge": {
+      backgroundColor: "#e1f5fe !important",
+      color: "#212121 !important",
+      borderColor: "#f9a825 !important",
+    },
+  },
+  badgeFastKey2Flow: {
+    "& .MuiBadge-badge": {
+      backgroundColor: "#212121 !important",
+      color: "#e1f5fe !important",
+      borderColor: "#f9a825 !important",
+    },
+  },
   transformed: {
     "& .MuiBadge-badge": {
       transform: "translateY(0px)",
@@ -32,9 +45,12 @@ const style = {
       display: "none",
     }
   },
+  blocked: {
+    "& .MuiBadge-badge": {
+      opacity: 0.5,
+    }
+  },
 }
-
-type VoidFn = (element: HTMLElement, triggerAltCycle: () => void) => void;
 
 interface IAltBadgeReactionerProps {
   /**
@@ -129,6 +145,27 @@ interface IAltBadgeReactionerProps {
    * it will match the next element that holds a tabgroup
    */
   tabGroup?: string;
+  /**
+   * Sone elements may unmount and not get called, eg. if some other element
+   * caused it to unmount, the alt may remain in a triggered state without
+   * realizing nothing anymore is visible
+   * 
+   * very useful for dialogs for example that may get closed by outside actions
+   */
+  hideAllIfUnmount?: boolean;
+  /**
+   * plays with hideAllIfUnmount to trigger an action whenever it's unmounted
+   */
+  triggerAltIfUnmountAndAltActive?: boolean;
+  /**
+   * Normally this is unnecessary to set, basically whenever the element is focused
+   * all other element quick actions are not allowed to execute
+   * 
+   * however this does not apply if tab isn't pressed
+   * 
+   * this is basically the default for input fields and textareas
+   */
+  blocksQuickActionsWhileFocused?: boolean;
 }
 
 export function AltBadgeReactioner(
@@ -141,7 +178,7 @@ export function AltBadgeReactioner(
   }, []);
 
   const reactionerProps = { ...props } as any;
-  reactionerProps.children = (displayed: boolean) => {
+  reactionerProps.children = (displayed: boolean, blocked: boolean) => {
     let content = props.label || props.reactionKey;
 
     if (ambigousIdPlusCount) {
@@ -154,30 +191,30 @@ export function AltBadgeReactioner(
 
     // the data attributes are for debugging purposes
     return (
-      <AppLanguageRetriever>
-        {(lang) => (
-          <Badge
-            badgeContent={content.toUpperCase()}
-            color={(props.colorSchema || "default") === "default" ? "primary" : "default"}
-            data-priority={props.priority || 0}
-            data-group-position={props.groupPosition}
-            sx={
-              [
-                (props.colorSchema || "default") === "default" ? style.badgeFastKey : style.badgeFastKey2,
-                props.useTransform ? style.transformed : null,
-                props.fullWidth ? style.fullWidth : null,
-                displayed ? null : style.hidden,
-              ].concat(Array.isArray(props.sx) ? props.sx as any : [props.sx] as any)
-            }
-            anchorOrigin={{
-              vertical: "top",
-              horizontal: lang.rtl ? "left" : "right",
-            }}
-          >
-            {displayed ? (props.altBadgedChildren || props.children) : props.children}
-          </Badge>
-        )}
-      </AppLanguageRetriever>
+      <Badge
+        badgeContent={content.toUpperCase()}
+        color={(props.colorSchema || "default") === "default" ? "primary" : "default"}
+        data-priority={props.priority || 0}
+        data-group-position={props.groupPosition}
+        aria-hidden={true}
+        sx={
+          [
+            (props.colorSchema || "default") === "default" ?
+              (props.useInFlow ? style.badgeFastKeyFlow : style.badgeFastKey) :
+              (props.useInFlow ? style.badgeFastKey2Flow : style.badgeFastKey2),
+            props.useTransform ? style.transformed : null,
+            props.fullWidth ? style.fullWidth : null,
+            displayed ? null : style.hidden,
+            blocked ? style.blocked : null,
+          ].concat(Array.isArray(props.sx) ? props.sx as any : [props.sx] as any)
+        }
+        anchorOrigin={{
+          vertical: "top",
+          horizontal: "right",
+        }}
+      >
+        {displayed ? (props.altBadgedChildren || props.children) : props.children}
+      </Badge>
     );
   }
 

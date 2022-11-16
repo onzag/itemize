@@ -845,6 +845,16 @@ interface ISlateEditorProps {
    */
   currentLoadError: string;
   /**
+   * Used to set aria values for people who use screen readers
+   * 
+   * affects both aria-invalid and aria-errormessage
+   */
+  currentGeneralError?: string;
+  /**
+   * affects aria-describedby
+   */
+  currentDescribedBy?: string;
+  /**
    * Dismiss the current load error
    */
   dismissCurrentLoadError: () => void;
@@ -4556,6 +4566,9 @@ export class SlateEditor extends React.Component<ISlateEditorProps, ISlateEditor
           readOnly={this.props.disabled}
           disabled={this.props.disabled}
           style={{ scrollMarginTop: this.props.scrollMarginTop }}
+          aria-invalid={!!this.props.currentGeneralError}
+          aria-errormessage={this.props.currentGeneralError}
+          aria-describedby={this.props.currentDescribedBy}
         />
       </CurrentElementProvider>
     );

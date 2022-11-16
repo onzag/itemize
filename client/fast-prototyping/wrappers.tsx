@@ -52,7 +52,7 @@ export function createEmotionCache(isRtl: boolean, useDoubleCache: boolean) {
   }
 
   const newCache = isRtl ? createCache({
-    key: "css_rtl",
+    key: "cssrtl",
     stylisPlugins: [prefixer, rtlPlugin],
   }) : createCache({
     key: "css",
@@ -89,6 +89,8 @@ export function appWrapper(app: React.ReactElement, config: IConfigRawJSONDataTy
       </SSRSheetsRemover>
     </>
   );
+
+  return baseApp;
 }
 
 let cachedLTRTheme: Theme;

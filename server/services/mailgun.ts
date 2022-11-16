@@ -211,7 +211,7 @@ export class MailgunService extends MailProvider<IMailgunConfig> {
     }
 
     if (data.text) {
-      formData.append("text", data.html);
+      formData.append("text", data.text);
     }
 
     if (data.fromForwarded) {

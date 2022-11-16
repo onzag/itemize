@@ -36,6 +36,22 @@ interface ICurrencyPickerProps {
    * default
    */
   currentCode?: string;
+  /**
+   * used for aria reasons
+   */
+  labelledBy?: string;
+  /**
+   * used for aria reasons
+   */
+  describedBy?: string;
+  /**
+   * used for aria reasons
+   */
+  label?: string;
+  /**
+   * used for aria reasons
+   */
+  description?: string;
 }
 
 /**
@@ -119,6 +135,10 @@ export class CurrencyPicker extends React.Component<ICurrencyPickerProps, ICurre
                 color="inherit"
                 startIcon={<b>{currentCurrency.symbol}</b>}
                 onClick={this.handleButtonSelectClick}
+                aria-label={typeof this.props.label !== "undefined" ? this.props.label : currentCurrency.name}
+                aria-description={this.props.description}
+                aria-labelledby={this.props.labelledBy}
+                aria-describedby={this.props.describedBy}
               >
                 {
                   (this.props.useCode ? currentCurrency.code : currentCurrency.name) +

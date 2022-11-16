@@ -19,6 +19,14 @@ import Button from "@mui/material/Button";
  */
 interface ILanguagePickerProps {
   /**
+   * an alternative end icon
+   */
+  endIcon?: React.ReactNode;
+  /**
+   * an alternative start icon
+   */
+  startIcon?: React.ReactNode;
+  /**
    * The class name
    */
   className?: string;
@@ -65,6 +73,22 @@ interface ILanguagePickerProps {
    * it should be visible when the standard is visible
    */
   shrinkingDisplayShrunkClassName?: string;
+  /**
+   * used for aria reasons
+   */
+   labelledBy?: string;
+   /**
+    * used for aria reasons
+    */
+   describedBy?: string;
+   /**
+    * used for aria reasons
+    */
+   label?: string;
+   /**
+    * used for aria reasons
+    */
+   description?: string;
 }
 
 /**
@@ -189,8 +213,13 @@ export class LanguagePicker extends React.Component<ILanguagePickerProps, ILangu
               <Button
                 classes={{ root: this.props.className }}
                 color="inherit"
-                startIcon={<TranslateIcon />}
+                startIcon={typeof this.props.startIcon !== "undefined" ? this.props.startIcon : <TranslateIcon />}
+                endIcon={this.props.endIcon}
                 onClick={this.handleButtonSelectClick}
+                aria-label={typeof this.props.label !== "undefined" ? this.props.label : currentLanguage.name}
+                aria-description={this.props.description}
+                aria-labelledby={this.props.labelledBy}
+                aria-describedby={this.props.describedBy}
               >
                 {
                   !this.props.shrinkingDisplay ?

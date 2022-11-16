@@ -132,7 +132,7 @@ function PropertyEntryBooleanRenderer(props: IPropertyEntryBooleanRendererProps)
           {props.label}{icon ? <RestoreIconButton
             sx={style.icon}
             onClick={props.canRestore && props.currentAppliedValue ? props.onRestore : null}
-            >{icon}</RestoreIconButton> : null}
+          >{icon}</RestoreIconButton> : null}
         </FormLabel> : null}
         <RadioGroup
           value={JSON.stringify(props.currentValue)}
@@ -158,6 +158,7 @@ function PropertyEntryBooleanRenderer(props: IPropertyEntryBooleanRendererProps)
       <FormControl sx={style.entry}>
         <FormControlLabel
           aria-label={props.label}
+          aria-describedby={props.description ? props.uniqueId + "_desc" : null}
           componentsProps={{
             typography: {
               sx: style.label,
@@ -179,15 +180,35 @@ function PropertyEntryBooleanRenderer(props: IPropertyEntryBooleanRendererProps)
       </FormControl>
     )
   }
+
+  let descriptionObject: React.ReactNode = null;
+  if (props.description) {
+    descriptionObject = descriptionAsAlert ? (
+      <Alert severity="info" sx={style.description} role="note" id={props.uniqueId + "_desc"}>
+        {props.description}
+      </Alert>
+    ) : (
+      <Typography variant="caption" sx={style.description} id={props.uniqueId + "_desc"}>
+        {props.description}
+      </Typography>
+    );
+  }
+
+  let inner: React.ReactNode;
+  if (props.args.useCustomFieldRender) {
+    inner = props.args.useCustomFieldRender(descriptionObject, null, internalContent, null, props.disabled);
+  } else {
+    inner = (
+      <>
+        {descriptionObject}
+        {internalContent}
+      </>
+    )
+  }
+
   return (
     <Box sx={style.container}>
-      {props.description && descriptionAsAlert ? <Alert severity="info" sx={style.description} role="note">
-        {props.description}
-      </Alert> : null}
-      {internalContent}
-      {props.description && !descriptionAsAlert ? <Typography variant="caption" sx={style.description}>
-        {props.description}
-      </Typography> : null}
+      {inner}
     </Box>
   );
 };

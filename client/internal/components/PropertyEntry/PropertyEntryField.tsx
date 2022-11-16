@@ -113,11 +113,6 @@ export interface IPropertyEntryFieldRendererProps extends IPropertyEntryRenderer
    * These are the subtypes
    */
   subtype?: "email" | "identifier" | "locale" | "comprehensive-locale" | "language" | "country" | "currency" | "plain" | string;
-  /**
-   * The html autocomplete value is a property that comes in the schema to define how it is
-   * to be html autocompleted
-   */
-  htmlAutocomplete?: string;
 
   /**
    * Whether the type is a numeric type, INTEGER or FLOAT apply
@@ -797,6 +792,7 @@ export default class PropertyEntryField
     const RendererElement = this.props.renderer;
     const rendererArgs = {
       propertyId: this.props.property.getId(),
+      uniqueId: this.props.itemDefinition.getQualifiedPathName() + "_" + this.props.property.getId() + "_" + this.props.forId + "_" + this.props.forVersion,
 
       args: this.props.rendererArgs,
       rtl: this.props.rtl,
@@ -805,7 +801,6 @@ export default class PropertyEntryField
       description: i18nDescription,
       type: type as any,
       subtype: subtype as any,
-      htmlAutocomplete: this.props.property.getHTMLAutocomplete(),
       icon: this.props.icon,
 
       currentAppliedValue: this.props.state.stateAppliedValue as any,

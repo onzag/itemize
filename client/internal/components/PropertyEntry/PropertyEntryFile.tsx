@@ -463,6 +463,8 @@ export default class PropertyEntryFile
     const RendererElement = this.props.renderer;
     const rendererArgs: IPropertyEntryFileRendererProps = {
       propertyId: this.props.property.getId(),
+      uniqueId: this.props.itemDefinition.getQualifiedPathName() + "_" + this.props.property.getId() + "_" + this.props.forId + "_" + this.props.forVersion,
+
       maxFileSize: MAX_FILE_SIZE,
 
       args: this.props.rendererArgs,

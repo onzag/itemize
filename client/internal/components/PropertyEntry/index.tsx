@@ -48,6 +48,12 @@ export interface IPropertyEntryRendererProps<ValueType> extends IRendererProps {
   propertyId: string;
 
   /**
+   * an unique id for this property
+   * with the id and the version they are related to
+   */
+  uniqueId: string;
+
+  /**
    * label of the property, every property should have a label unless it's hidden
    * this is locale specific
    */

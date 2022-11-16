@@ -1115,8 +1115,8 @@ export const customUserQueries = (appData: IAppDataType): IGQLQueryFieldsDefinit
           const subject = capitalize(i18nData.custom.forgot_password_title);
 
           await appData.mailService.sendTemplateEmail({
-            fromUsername: i18nData.custom.validate_account_user,
-            fromEmailHandle: i18nData.custom.validate_account_email_user,
+            fromUsername: i18nData.custom.forgot_password_user,
+            fromEmailHandle: i18nData.custom.forgot_password_email_user,
             id: templateIdToUse,
             version: languageToUse,
             itemDefinition: fragmentIdef,

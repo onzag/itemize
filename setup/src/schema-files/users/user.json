@@ -6,8 +6,7 @@
             "type": "string",
             "subtype": "identifier",
             "unique": true,
-            "nonCaseSensitiveUnique": true,
-            "htmlAutocomplete": "username"
+            "nonCaseSensitiveUnique": true
         },
         {
             "id": "app_language",
@@ -120,7 +119,6 @@
         {
             "id": "password",
             "type": "password",
-            "htmlAutocomplete": "current-password",
             "disableRetrieval": true,
             "readRoleAccess": [],
             "editRoleAccess": "$CONFIG:if(config.roles.includes('ADMIN')){return ['ADMIN', '&OWNER']}else{return ['&OWNER']}"

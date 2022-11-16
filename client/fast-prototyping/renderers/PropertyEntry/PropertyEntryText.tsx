@@ -84,9 +84,9 @@ export const style = {
     };
 
     if (richText) {
-      Object.assign(base, style.labelSingleLine);    
+      Object.assign(base, style.labelSingleLine);
     } else {
-      Object.assign(base, style.labelNoToolbar); 
+      Object.assign(base, style.labelNoToolbar);
     }
 
     return base;
@@ -107,7 +107,7 @@ export const style = {
     height: "5rem",
     padding: "1rem 0 0 0",
   },
-  
+
   rawTextArea: {
     width: "100%",
     border: "none",
@@ -176,10 +176,10 @@ class PropertyEntryTextRenderer extends React.PureComponent<IPropertyEntryTextRe
     // extending element wrappers
     let elementWrappers = materialUIElementWrappers;
     if (this.props.args.elementWrappers) {
-      elementWrappers = {...elementWrappers};
+      elementWrappers = { ...elementWrappers };
       Object.keys(this.props.args.elementWrappers).forEach((k) => {
         if (elementWrappers[k]) {
-          elementWrappers[k] = {...elementWrappers[k]};
+          elementWrappers[k] = { ...elementWrappers[k] };
           Object.keys(this.props.args.elementWrappers[k]).forEach((k2) => {
             elementWrappers[k][k2] = this.props.args.elementWrappers[k][k2];
           });
@@ -207,6 +207,8 @@ class PropertyEntryTextRenderer extends React.PureComponent<IPropertyEntryTextRe
         rootContext={this.props.args.context || null}
         currentValid={this.props.currentValid}
         currentLoadError={this.props.lastLoadedFileError}
+        currentGeneralError={!this.props.args.hideError ? this.props.uniqueId + "_error" : null}
+        currentDescribedBy={this.props.description ? this.props.uniqueId + "_desc" : null}
         dismissCurrentLoadError={this.props.dismissLastLoadedFileError}
         Wrapper={this.props.args.Wrapper || MaterialUISlateWrapper}
         elementWrappers={elementWrappers as any}
@@ -236,40 +238,60 @@ class PropertyEntryTextRenderer extends React.PureComponent<IPropertyEntryTextRe
       return editor;
     }
 
-    // we return the component, note how we set the thing to focused
     const isInvalid = shouldShowInvalid(this.props);
+
+    const fieldLabel = (
+      this.props.label ? <InputLabel
+        htmlFor={this.props.propertyId}
+        sx={style.label(isInvalid, this.props.isRichText)}
+        classes={{
+          focused: "focused",
+        }}
+        focused={this.state.focused}
+      >
+        {capitalize(this.props.label)}{iconComponent}
+      </InputLabel> : null
+    );
+
+    let descriptionObject: React.ReactNode = null;
+    if (this.props.description) {
+      descriptionObject = descriptionAsAlert ? (
+        <Alert severity="info" sx={style.description} role="note" id={this.props.uniqueId + "_desc"}>
+          {this.props.description}
+        </Alert>
+      ) : (
+        <Typography variant="caption" sx={style.description} id={this.props.uniqueId + "_desc"}>
+          {this.props.description}
+        </Typography>
+      );
+    }
+
+    const error = (
+      this.props.args.hideError ? null : <Box sx={style.errorMessage} id={this.props.uniqueId + "_error"}>
+        {this.props.currentInvalidReason}
+      </Box>
+    );
+
+    let inner: React.ReactNode;
+    if (this.props.args.useCustomFieldRender) {
+      inner = this.props.args.useCustomFieldRender(descriptionObject, fieldLabel, editor, error, this.props.disabled);
+    } else {
+      inner = (
+        <>
+          {descriptionObject}
+          <div>
+            {fieldLabel}
+            {editor}
+          </div>
+          {error}
+        </>
+      )
+    }
+
+    // we return the component, note how we set the thing to focused
     return (
       <Box sx={style.container}>
-        {
-          this.props.description && descriptionAsAlert ?  
-            <Alert severity="info" sx={style.description} role="note">
-              {this.props.description}
-            </Alert> :
-            null
-        }
-        {
-          this.props.description && !descriptionAsAlert ?
-            <Typography variant="caption" sx={style.description}>
-              {this.props.description}
-            </Typography> :
-            null
-        }
-        <div>
-          {this.props.label ? <InputLabel
-            htmlFor={this.props.propertyId}
-            sx={style.label(isInvalid, this.props.isRichText)}
-            classes={{
-              focused: "focused",
-            }}
-            focused={this.state.focused}
-          >
-            {capitalize(this.props.label)}{iconComponent}
-          </InputLabel> : null}
-          {editor}
-        </div>
-        {this.props.args.hideError ? null : <Box sx={style.errorMessage}>
-          {this.props.currentInvalidReason}
-        </Box>}
+        {inner}
       </Box>
     );
   }

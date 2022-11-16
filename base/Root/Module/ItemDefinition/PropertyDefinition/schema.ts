@@ -102,9 +102,6 @@ export default {
     nullable: {
       type: "boolean",
     },
-    htmlAutocomplete: {
-      type: "string",
-    },
     default: {},
     searchDefault: {},
     defaultIf: {

@@ -28,6 +28,20 @@ interface IAltScrollerProps {
   onResize?: () => void;
 
   /**
+   * Triggers when alt has been triggered
+   * 
+   * note that this triggers before the state changes to displayed
+   */
+  onDisplay?: () => void;
+
+  /**
+   * Triggers when hidden
+   * 
+   * note that this triggers befoe the state changes to hidden
+   */
+  onHide?: () => void;
+
+  /**
    * Pass as children in order to build the UI of choice
    */
   children: (isScrolling: boolean, scrollDirections?: { up: boolean; left: boolean; right: boolean; down: boolean }) => React.ReactNode;
@@ -43,33 +57,60 @@ interface IActualAltScrollerState {
 
 const ALT_SREGISTRY: ActualAltScroller[] = [];
 
-let ALT_SREGISTRY_IS_IN_DISPLAY_LAST = false;
-
-function hideAll() {
+export function hideAll() {
   ALT_SREGISTRY.forEach((v) => {
     v.disableScrolling();
   });
-
-  ALT_SREGISTRY_IS_IN_DISPLAY_LAST = false;
 }
 
-function scrollCurrent(dir: "up" | "left" | "right" | "down", cb?: () => void) {
+function isScrollIgnore(element: HTMLElement): boolean {
+  if (element.dataset && element.dataset.scrollIgnore) {
+    return true;
+  }
+
+  if (!element.parentElement) {
+    return false;
+  }
+
+  return isScrollIgnore(element.parentElement);
+}
+
+export function scrollCurrent(dir: "up" | "left" | "right" | "down", cb?: () => void) {
+  // ensure that the active element is not meant to consume the
+  // action, aka they ignore scrolling events because
+  // they are meant to consume them
+  if (document.activeElement && document.activeElement instanceof HTMLElement) {
+    if (
+      document.activeElement.tagName === "INPUT" ||
+      document.activeElement.tagName === "TEXTAREA" ||
+      isScrollIgnore(document.activeElement)
+    ) {
+      return;
+    }
+  }
+
+  // see if one is active
+  let scrolled = false;
   ALT_SREGISTRY.forEach((v) => {
     if (v.isScrolling()) {
       v.scroll(dir);
+      scrolled = true;
       cb();
     }
   });
+
+  // force the hidden current to scroll
+  if (!scrolled) {
+    const current = getRelevant();
+
+    if (current) {
+      current.scroll(dir);
+      cb();
+    }
+  }
 }
 
-const converts = {
-  ArrowUp: "up",
-  ArrowDown: "down",
-  ArrowLeft: "left",
-  ArrowRight: "right",
-}
-
-export function showRelevant() {
+export function getRelevant() {
   // first lets find the potential max priority
   let scrollerToTrigger: ActualAltScroller = null as any;
   ALT_SREGISTRY.forEach((v) => {
@@ -78,11 +119,16 @@ export function showRelevant() {
     }
   });
 
+  return scrollerToTrigger;
+}
+
+export function showRelevant() {
+  // first lets find the potential max priority
+  const scrollerToTrigger: ActualAltScroller = getRelevant()
+
   if (scrollerToTrigger) {
     scrollerToTrigger.enableScrolling();
   }
-
-  ALT_SREGISTRY_IS_IN_DISPLAY_LAST = true;
 }
 
 function recalculatePotentialScrolls(resize: boolean) {
@@ -97,48 +143,8 @@ function recalculatePotentialScrolls(resize: boolean) {
 }
 
 if (typeof document !== "undefined") {
-  window.addEventListener("focus", () => {
-    hideAll();
-  });
-  document.addEventListener("visibilitychange", () => {
-    if (document.visibilityState === "hidden") {
-      hideAll();
-    }
-  });
-  document.addEventListener("keydown", (e) => {
-    // ignore these two
-    if (e.key === "Shift" || e.key === "Tab" || e.key === "AltGraph") {
-      return;
-    }
-
-    const dir = converts[e.key];
-    const isAltKey = e.altKey;
-
-    const isPureAltKey = isAltKey && e.key.toLowerCase() === "alt";
-
-    if (isPureAltKey) {
-      if (ALT_SREGISTRY_IS_IN_DISPLAY_LAST) {
-        hideAll();
-      } else {
-        showRelevant();
-      }
-    } else if ((isAltKey || ALT_SREGISTRY_IS_IN_DISPLAY_LAST) && dir) {
-      // if a match is found we want to prevent the default action
-      scrollCurrent(dir, () => {
-        e.preventDefault();
-      });
-    } else {
-      hideAll();
-    }
-  });
   window.addEventListener("resize", () => {
     recalculatePotentialScrolls(true);
-  });
-  window.addEventListener("mousedown", () => {
-    hideAll();
-  });
-  window.addEventListener("touchstart", () => {
-    hideAll();
   });
   window.addEventListener("scroll", () => {
     recalculatePotentialScrolls(false);
@@ -173,8 +179,18 @@ export class ActualAltScroller extends React.PureComponent<IAltScrollerProps, IA
     const allTheWayToTheBottom = element.scrollTop + element.offsetHeight >= element.scrollHeight;
     const allTheWayToTheTop = element.scrollTop <= 0;
 
-    const allTheWayToTheLeft = element.scrollLeft <= 0;
-    const allTheWayToTheRight = element.scrollLeft + element.offsetWidth >= element.scrollWidth;
+    const computedStyleIsRTL = getComputedStyle(element).direction === "rtl";
+
+    // can be a negative number in the case that we are using rtl
+    const allTheWayToTheLeftPoint = computedStyleIsRTL ?
+      element.offsetWidth - element.scrollWidth :
+      0;
+    const allTheWayToTheRightPoint = computedStyleIsRTL ?
+      0 :
+      element.scrollWidth - element.offsetWidth;
+
+    const allTheWayToTheLeft = element.scrollLeft <= allTheWayToTheLeftPoint;
+    const allTheWayToTheRight = element.scrollLeft >= allTheWayToTheRightPoint;
 
     this.setState({
       isScrolling: true,
@@ -213,10 +229,12 @@ export class ActualAltScroller extends React.PureComponent<IAltScrollerProps, IA
   }
 
   public enableScrolling() {
+    this.props.onDisplay && this.props.onDisplay();
     this.recalculateScrolls();
   }
 
   public disableScrolling() {
+    this.props.onHide && this.props.onHide()
     this.setState({
       isScrolling: false,
     });

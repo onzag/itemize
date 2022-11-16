@@ -45,14 +45,54 @@ const style = {
     borderRadius: "0 0 50% 50%",
   },
   left: {
-    top: "2rem",
-    left: 0,
-    borderRadius: "50% 0 0 50%",
+    'html[dir="ltr"] &': {
+      top: "2rem",
+      left: 0,
+      borderRadius: "50% 0 0 50%",
+    },
+    // flip: false,
+
+    'html[dir="rtl"] &': {
+      top: "2rem",
+      right: 0,
+      borderRadius: "0 50% 50% 0",
+    },
   },
   right: {
-    top: "2rem",
-    right: 0,
-    borderRadius: "0 50% 50% 0",
+    'html[dir="ltr"] &': {
+      top: "2rem",
+      right: 0,
+      borderRadius: "0 50% 50% 0",
+    },
+    // flip: false,
+
+    // emotion refuses to accept the flip: false and the weird noplip comment too so I must force it somehow to honor it
+    // so this is the total opposite direction for the arrow but it gotta be done this way
+    // because emotion doesn't work correctly
+    'html[dir="rtl"] &': {
+      top: "2rem",
+      left: 0,
+      borderRadius: "50% 0 0 50%",
+    },
+  },
+  leftNoTB: {
+    'html[dir="ltr"] &': {
+      left: "2rem",
+    },
+    // flip: false,
+
+    'html[dir="rtl"] &': {
+      right: "2rem",
+    },
+  },
+  rightNoTB: {
+    'html[dir="ltr"] &': {
+      right: "2rem",
+    },
+    // flip: false,
+    'html[dir="rtl"] &': {
+      left: "2rem",
+    },
   },
   middle: {
     top: "2rem",
@@ -120,23 +160,20 @@ export function AltSectionScroller(
   const [fixedPos, setPos] = useState<[number, number]>(null);
 
   const updateDynamicPos = useCallback(() => {
-    // we wait because react may not have things ready yet on mount
-    setTimeout(() => {
-      if (scrollerRef.current) {
-        let element = scrollerRef.current.getScrollableComponent();
+    if (scrollerRef.current) {
+      let element = scrollerRef.current.getScrollableComponent();
 
-        const boundingRect = element.getBoundingClientRect();
-    
-        let centerX = boundingRect.x + boundingRect.width / 2;
-        let centerY = boundingRect.y + boundingRect.height / 2;
-  
-        if (props.dyamicFixedCalculator) {
-          [centerX, centerY] = props.dyamicFixedCalculator(element, centerX, centerY)
-        }
-  
-        setPos([centerX, centerY]);
+      const boundingRect = element.getBoundingClientRect();
+
+      let centerX = boundingRect.x + boundingRect.width / 2;
+      let centerY = boundingRect.y + boundingRect.height / 2;
+
+      if (props.dyamicFixedCalculator) {
+        [centerX, centerY] = props.dyamicFixedCalculator(element, centerX, centerY)
       }
-    }, 70);
+
+      setPos([centerX, centerY]);
+    }
   }, [scrollerRef]);
 
   useEffect(() => {
@@ -156,6 +193,7 @@ export function AltSectionScroller(
   return (
     <AltScroller
       {...props}
+      onDisplay={updateDynamicPos}
       ref={scrollerRef}
     >
       {(scrolling, direction) => {
@@ -217,6 +255,7 @@ export function AltSectionScroller(
               sx={[
                 style.overlay,
                 style.left,
+                !direction.up && !direction.down ? style.leftNoTB : null,
               ]}
             >
               <ArrowBackIcon sx={direction.left ? style.available : null} />
@@ -226,6 +265,7 @@ export function AltSectionScroller(
               sx={[
                 style.overlay,
                 style.right,
+                !direction.up && !direction.down ? style.rightNoTB : null,
               ]}
             >
               <ArrowForwardIcon sx={direction.right ? style.available : null} />

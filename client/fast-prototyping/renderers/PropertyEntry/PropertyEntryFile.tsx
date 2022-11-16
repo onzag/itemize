@@ -177,137 +177,167 @@ function PropertyEntryFileRenderer(props: IPropertyEntryFileRendererProps) {
 
   const isInvalid = shouldShowInvalid(props);
 
+  const fieldLabel = props.label ? <FormLabel
+    aria-label={props.label}
+    sx={style.label(isInvalid)}
+    classes={{
+      focused: "focused",
+    }}
+  >
+    {capitalize(props.label)}
+    {icon ? <IconButton
+      tabIndex={-1}
+      sx={style.icon}
+      onClick={props.canRestore ? props.onRestore : null}
+      size="large">{icon}</IconButton> : null}
+  </FormLabel> : null;
+
+  const fieldComponent = (
+    <Dropzone
+      onDropAccepted={onDrop.bind(null, props.enableUserSetErrors, props.onSetFile)}
+      onDropRejected={onDrop.bind(null, props.enableUserSetErrors, props.onSetFile)}
+      maxSize={MAX_FILE_SIZE}
+      accept={props.accept === "*" ? null : props.accept}
+      multiple={false}
+      noClick={!!props.currentValue}
+      ref={dropzoneRef}
+      disabled={props.disabled}
+    >
+      {({
+        getRootProps,
+        getInputProps,
+        isDragActive,
+        isDragAccept,
+        isDragReject,
+      }) => {
+        const { ref, ...rootProps } = getRootProps();
+
+        let displayContent = null;
+        if (props.currentValue) {
+          const mainFileClassName = "file" +
+            (props.rejected ? " rejected" : "");
+          displayContent = (
+            <Box
+              className={mainFileClassName}
+              onClick={props.openFile}
+            >
+              <div className="file-container">
+                {
+                  props.isSupportedImage ? (
+                    <img
+                      srcSet={props.imageSrcSet}
+                      sizes="100px"
+                      src={props.currentValue.url}
+                      className="thumbnail"
+                    />
+                  ) : (
+                    <div className="file-icon">
+                      <span className="file-extension">{
+                        props.extension
+                      }</span>
+                    </div>
+                  )
+                }
+                <p className="file-name">{props.currentValue.name}</p>
+                <p className="file-size">{
+                  props.prettySize
+                }</p>
+                {props.rejected ? <Box sx={style.fileRejectedDescription} component="p">
+                  {props.rejectedReason}
+                </Box> : null}
+              </div>
+            </Box>
+          )
+        } else {
+          displayContent = (
+            <Box
+              sx={style.paperPlaceholder(isDragAccept, isDragReject)}
+            >
+              <p>{isDragActive ? capitalize(props.genericActivePlaceholder) : capitalize(props.placeholder)}</p>
+              <NoteAddIcon sx={style.paperIconAdd} />
+            </Box>
+          )
+        }
+
+        return (
+          <>
+            <Paper
+              {...rootProps}
+              sx={style.paper}
+            >
+              <input {...(getInputProps() as any)} />
+              {displayContent}
+              <Box
+                sx={style.buttonContainer}
+              >
+                <Button
+                  sx={style.button}
+                  variant="contained"
+                  color="error"
+                  aria-label={props.genericDeleteLabel}
+                  onClick={manuallyRemove.bind(null, props.enableUserSetErrors, props.onRemoveFile)}
+                >
+                  {props.genericDeleteLabel}
+                  <RemoveCircleOutlineIcon sx={style.buttonIcon} />
+                </Button>
+                <Button
+                  sx={style.button}
+                  variant="contained"
+                  color="primary"
+                  aria-label={props.genericSelectLabel}
+                  onClick={manuallyTriggerUpload.bind(null, props.enableUserSetErrors, dropzoneRef)}
+                >
+                  {
+                    props.genericSelectLabel
+                  }
+                  <CloudUploadIcon sx={style.buttonIcon} />
+                </Button>
+              </Box>
+            </Paper>
+          </>
+        );
+      }}
+    </Dropzone>
+  );
+
   const descriptionAsAlert = props.args["descriptionAsAlert"];
+
+  let descriptionObject: React.ReactNode = null;
+  if (this.props.description) {
+    descriptionObject = descriptionAsAlert ? (
+      <Alert severity="info" sx={style.description} role="note" id={this.props.uniqueId + "_desc"}>
+        {this.props.description}
+      </Alert>
+    ) : (
+      <Typography variant="caption" sx={style.description} id={this.props.uniqueId + "_desc"}>
+        {this.props.description}
+      </Typography>
+    );
+  }
+
+  const error = (
+    this.props.args.hideError ? null : <Box sx={style.errorMessage} id={this.props.uniqueId + "_error"}>
+      {this.props.currentInvalidReason}
+    </Box>
+  );
+
+  let inner: React.ReactNode;
+  if (this.props.args.useCustomFieldRender) {
+    inner = this.props.args.useCustomFieldRender(descriptionObject, fieldLabel, fieldComponent, error, this.props.disabled);
+  } else {
+    inner = (
+      <>
+        {descriptionObject}
+        {fieldLabel}
+        {fieldComponent}
+        {error}
+      </>
+    )
+  }
+
   return (
     <Box sx={style.container}>
-      {props.description && descriptionAsAlert ? <Alert severity="info" sx={style.description} role="note">
-        {props.description}
-      </Alert> : null}
-      {props.description && !descriptionAsAlert ? <Typography variant="caption" sx={style.description}>
-        {props.description}
-      </Typography> : null}
-      {props.label ? <FormLabel
-        aria-label={props.label}
-        sx={style.label(isInvalid)}
-        classes={{
-          focused: "focused",
-        }}
-      >
-        {capitalize(props.label)}
-        {icon ? <IconButton
-          tabIndex={-1}
-          sx={style.icon}
-          onClick={props.canRestore ? props.onRestore : null}
-          size="large">{icon}</IconButton> : null}
-      </FormLabel> : null}
-      <Dropzone
-        onDropAccepted={onDrop.bind(null, props.enableUserSetErrors, props.onSetFile)}
-        onDropRejected={onDrop.bind(null, props.enableUserSetErrors, props.onSetFile)}
-        maxSize={MAX_FILE_SIZE}
-        accept={props.accept === "*" ? null : props.accept}
-        multiple={false}
-        noClick={!!props.currentValue}
-        ref={dropzoneRef}
-        disabled={props.disabled}
-      >
-        {({
-          getRootProps,
-          getInputProps,
-          isDragActive,
-          isDragAccept,
-          isDragReject,
-        }) => {
-          const { ref, ...rootProps } = getRootProps();
-
-          let displayContent = null;
-          if (props.currentValue) {
-            const mainFileClassName = "file" +
-              (props.rejected ? " rejected" : "");
-            displayContent = (
-              <Box
-                className={mainFileClassName}
-                onClick={props.openFile}
-              >
-                <div className="file-container">
-                  {
-                    props.isSupportedImage ? (
-                      <img
-                        srcSet={props.imageSrcSet}
-                        sizes="100px"
-                        src={props.currentValue.url}
-                        className="thumbnail"
-                      />
-                    ) : (
-                      <div className="file-icon">
-                        <span className="file-extension">{
-                          props.extension
-                        }</span>
-                      </div>
-                    )
-                  }
-                  <p className="file-name">{props.currentValue.name}</p>
-                  <p className="file-size">{
-                    props.prettySize
-                  }</p>
-                  {props.rejected ? <Box sx={style.fileRejectedDescription} component="p">
-                    {props.rejectedReason}
-                  </Box> : null}
-                </div>
-              </Box>
-            )
-          } else {
-            displayContent = (
-              <Box
-                sx={style.paperPlaceholder(isDragAccept, isDragReject)}
-              >
-                <p>{isDragActive ? capitalize(props.genericActivePlaceholder) : capitalize(props.placeholder)}</p>
-                <NoteAddIcon sx={style.paperIconAdd} />
-              </Box>
-            )
-          }
-
-          return (
-            <>
-              <Paper
-                {...rootProps}
-                sx={style.paper}
-              >
-                <input {...(getInputProps() as any)} />
-                {displayContent}
-                <Box
-                  sx={style.buttonContainer}
-                >
-                  <Button
-                    sx={style.button}
-                    variant="contained"
-                    color="error"
-                    aria-label={props.genericDeleteLabel}
-                    onClick={manuallyRemove.bind(null, props.enableUserSetErrors, props.onRemoveFile)}
-                  >
-                    {props.genericDeleteLabel}
-                    <RemoveCircleOutlineIcon sx={style.buttonIcon} />
-                  </Button>
-                  <Button
-                    sx={style.button}
-                    variant="contained"
-                    color="primary"
-                    aria-label={props.genericSelectLabel}
-                    onClick={manuallyTriggerUpload.bind(null, props.enableUserSetErrors, dropzoneRef)}
-                  >
-                    {
-                      props.genericSelectLabel
-                    }
-                    <CloudUploadIcon sx={style.buttonIcon} />
-                  </Button>
-                </Box>
-              </Paper>
-            </>
-          );
-        }}
-      </Dropzone>
-      {props.args.hideError ? null : <Box sx={style.errorMessage}>
-        {props.currentInvalidReason}
-      </Box>}
+      {inner}
     </Box>
   );
 };

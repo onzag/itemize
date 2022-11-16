@@ -72,37 +72,6 @@ export const style = {
       color: isInvalid ? "#f44336" : "#3f51b5",
     },
   }),
-  fieldInput: (isInvalid: boolean, disabled: boolean) => {
-    if (isInvalid) {
-      return {
-        "width": "100%",
-        // this is the colur when the field is out of focus
-        "&::before": {
-          borderBottomColor: "#e57373",
-        },
-        // the color that pops up when the field is in focus
-        "&::after": {
-          borderBottomColor: "#f44336",
-        },
-        // during the hover event
-        "&:hover::before": {
-          borderBottomColor: disabled ? "rgba(0,0,0,0.42)" : "#f44336",
-        },
-      };
-    }
-    return {
-      "width": "100%",
-      "&::before": {
-        borderBottomColor: "rgba(0,0,0,0.42)",
-      },
-      "&::after": {
-        borderBottomColor: "#3f51b5",
-      },
-      "&:hover::before": {
-        borderBottomColor: "#3f51b5",
-      },
-    };
-  },
   selectRoot: {
     display: "flex",
     alignItems: "center",
@@ -166,6 +135,18 @@ class PropertyEntrySelectRenderer
 
     const isInvalid = shouldShowInvalid(this.props);
 
+    const appliedInputProps: any = {
+      "aria-describedby": this.props.description ? this.props.uniqueId + "_desc" : null,
+    };
+
+    if (isInvalid) {
+      appliedInputProps.inputProps["aria-invalid"] = true;
+
+      if (!this.props.args.hideError) {
+        appliedInputProps.inputProps["aria-errormessage"] = this.props.uniqueId + "_error";
+      }
+    }
+
     const restoreAction = icon && this.props.canRestore && this.props.currentAppliedValue ? this.props.onRestore : null;
     const addornment = icon ? (
       <InputAdornment position="end">
@@ -186,7 +167,7 @@ class PropertyEntrySelectRenderer
           multiple={true}
           value={(this.props.currentValue || []) as any[]}
           onChange={this.onChange}
-          input={<FilledInput fullWidth={true} />}
+          input={<FilledInput fullWidth={true} {...appliedInputProps} />}
           renderValue={(selected: any[]) => {
             return (
               <Box sx={style.chips}>
@@ -256,10 +237,11 @@ class PropertyEntrySelectRenderer
               placeholder={this.props.placeholder}
               endAdornment={addornment}
               fullWidth={true}
-              sx={style.fieldInput(isInvalid, this.props.disabled)}
+              error={isInvalid}
               classes={{
                 focused: "focused",
               }}
+              {...appliedInputProps}
             />
           }
         >
@@ -302,42 +284,62 @@ class PropertyEntrySelectRenderer
       );
     }
 
+    const fieldComponent = (
+      <FormControl
+        variant={this.props.args.fieldVariant || "filled"}
+        sx={style.entry}
+      >
+        {this.props.label ? <InputLabel
+          htmlFor={this.props.propertyId}
+          sx={style.label(isInvalid)}
+          classes={{
+            focused: "focused",
+          }}
+          shrink={this.props.isNullable ? true : undefined}
+        >
+          {this.props.label}
+        </InputLabel> : null}
+        {selectElement}
+      </FormControl>
+    );
+
     const descriptionAsAlert = this.props.args["descriptionAsAlert"];
+
+    let descriptionObject: React.ReactNode = null;
+    if (this.props.description) {
+      descriptionObject = descriptionAsAlert ? (
+        <Alert severity="info" sx={style.description} role="note" id={this.props.uniqueId + "_desc"}>
+          {this.props.description}
+        </Alert>
+      ) : (
+        <Typography variant="caption" sx={style.description} id={this.props.uniqueId + "_desc"}>
+          {this.props.description}
+        </Typography>
+      );
+    }
+
+    const error = (
+      this.props.args.hideError ? null : <Box sx={style.errorMessage} id={this.props.uniqueId + "_error"}>
+        {this.props.currentInvalidReason}
+      </Box>
+    );
+
+    let inner: React.ReactNode;
+    if (this.props.args.useCustomFieldRender) {
+      inner = this.props.args.useCustomFieldRender(descriptionObject, null, fieldComponent, error, this.props.disabled);
+    } else {
+      inner = (
+        <>
+          {descriptionObject}
+          {fieldComponent}
+          {error}
+        </>
+      )
+    }
+
     return (
       <Box sx={style.container}>
-        {
-          this.props.description && descriptionAsAlert ?
-            <Alert severity="info" sx={style.description} role="note">
-              {this.props.description}
-            </Alert> :
-            null
-        }
-        {
-          this.props.description && !descriptionAsAlert ?
-            <Typography variant="caption" sx={style.description}>
-              {this.props.description}
-            </Typography> :
-            null
-        }
-        <FormControl
-          variant={this.props.args.fieldVariant || "filled"}
-          sx={style.entry}
-        >
-          {this.props.label ? <InputLabel
-            htmlFor={this.props.propertyId}
-            sx={style.label(isInvalid)}
-            classes={{
-              focused: "focused",
-            }}
-            shrink={this.props.isNullable ? true : undefined}
-          >
-            {this.props.label}
-          </InputLabel> : null}
-          {selectElement}
-        </FormControl>
-        {this.props.args.hideError ? null : <Box sx={style.errorMessage}>
-          {this.props.currentInvalidReason}
-        </Box>}
+        {inner}
       </Box>
     );
   }

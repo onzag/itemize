@@ -140,6 +140,7 @@ function PropertyEntryPaymentRenderer(props: IPropertyEntryPaymentRendererProps)
   if (props.currentValue !== null) {
     const typePaymentSelector = props.allowedTypes.length !== 1 ? (
       <PropertyEntrySelectRenderer
+        uniqueId={props.uniqueId + "_type"}
         values={props.allowedTypes}
         canRestore={false}
         currentAppliedValue={props.currentAppliedValue && props.currentAppliedValue.type}
@@ -168,6 +169,7 @@ function PropertyEntryPaymentRenderer(props: IPropertyEntryPaymentRendererProps)
 
     const statusPaymentSelector = props.allowedStatuses.length ? (
       <PropertyEntrySelectRenderer
+        uniqueId={props.uniqueId + "_status"}
         values={props.allowedStatuses}
         canRestore={false}
         currentAppliedValue={props.currentAppliedValue && props.currentAppliedValue.status}
@@ -196,6 +198,7 @@ function PropertyEntryPaymentRenderer(props: IPropertyEntryPaymentRendererProps)
 
     const amountEntry = (
       <PropertyEntryFieldRenderer
+        uniqueId={props.uniqueId + "_amount"}
         label={props.i18nPayment.amount}
         placeholder={props.i18nPayment.amount}
         args={{}}
@@ -237,18 +240,20 @@ function PropertyEntryPaymentRenderer(props: IPropertyEntryPaymentRendererProps)
     );
   }
 
+  // TODO custom field renderer
+
   return (
     <Box sx={style.container}>
       {
         props.description && descriptionAsAlert ?
-          <Alert severity="info" sx={style.description} role="note">
+          <Alert severity="info" sx={style.description} role="note" id={this.props.uniqueId + "_desc"}>
             {props.description}
           </Alert> :
           null
       }
       {
         props.description && !descriptionAsAlert ?
-          <Typography variant="caption" sx={style.description}>
+          <Typography variant="caption" sx={style.description} id={this.props.uniqueId + "_desc"}>
             {props.description}
           </Typography> :
           null
@@ -263,7 +268,7 @@ function PropertyEntryPaymentRenderer(props: IPropertyEntryPaymentRendererProps)
         </Box> : null}
         {internalContent}
       </div>
-      {props.args.hideError ? null : <Box sx={style.errorMessage}>
+      {props.args.hideError ? null : <Box sx={style.errorMessage} id={this.props.uniqueId + "_error"} role="alert">
         {props.currentInvalidReason}
       </Box>}
     </Box>

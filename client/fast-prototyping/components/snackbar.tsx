@@ -77,6 +77,11 @@ export default class Snackbar extends React.PureComponent<ISnackbarProps> {
   constructor(props: ISnackbarProps) {
     super(props);
   }
+  public componentWillUnmount(): void {
+    if (this.props.open) {
+      this.props.onClose();
+    }
+  }
   public render() {
     let message: React.ReactNode;
     const autoHideDuration = this.props.severity === "success" ? 3000 : null;

@@ -5,7 +5,7 @@
 
 import React from "react";
 import { IPropertyEntryFieldRendererProps } from "../../../internal/components/PropertyEntry/PropertyEntryField";
-import { useTheme } from "@mui/material/styles";
+import { styled, useTheme } from "@mui/material/styles";
 import IconButton from "@mui/material/IconButton";
 import Alert from '@mui/material/Alert';
 import Typography from "@mui/material/Typography";
@@ -105,36 +105,17 @@ export const style = {
     alignItems: "center",
     justifyContent: "space-between",
   },
-  fieldInput: (isInvalid: boolean, disabled: boolean) => {
-    if (isInvalid) {
+  fieldInput: (phone: boolean) => {
+    if (phone) {
       return {
-        "width": "100%",
-        // this is the colur when the field is out of focus
-        "&::before": {
-          borderBottomColor: "#e57373",
-        },
-        // the color that pops up when the field is in focus
-        "&::after": {
-          borderBottomColor: "#f44336",
-        },
-        // during the hover event
-        "&:hover::before": {
-          borderBottomColor: disabled ? "rgba(0,0,0,0.42)" : "#f44336",
-        },
-      };
+        "& fieldset": {
+          borderTopLeftRadius: 0,
+          borderBottomLeftRadius: 0,
+        }
+      }
     }
-    return {
-      "width": "100%",
-      "&::before": {
-        borderBottomColor: "rgba(0,0,0,0.42)",
-      },
-      "&::after": {
-        borderBottomColor: "#3f51b5",
-      },
-      "&:hover::before": {
-        borderBottomColor: "#3f51b5",
-      },
-    };
+
+    return {};
   },
   unitDialog: {
     minWidth: "400px",
@@ -146,8 +127,31 @@ export const style = {
   fieldForPhone: {
     width: "100%",
     display: "flex",
-  }
+  },
+  countryPicker: {
+    backgroundColor: "#ccc",
+    borderTopRightRadius: "0px !important",
+    borderBottomRightRadius: "0px !important",
+    paddingLeft: "24px !important",
+    fontWeight: 500,
+
+    "&:hover": {
+      backgroundColor: "#bbb",
+    },
+
+    "&:active": {
+      backgroundColor: "#aaa",
+    },
+
+    "&:disabled": {
+      backgroundColor: "#ddd",
+      color: "rgba(0,0,0,0.5)",
+      cursor: "default",
+    },
+  },
 };
+
+const StyledCountryPicker = styled(CountryPicker)(style.countryPicker);
 
 /**
  * The state for the entry renderer
@@ -480,6 +484,7 @@ class PropertyEntryFieldRenderer
       return (
         <PropertyEntrySelectRenderer
           args={this.props.args}
+          uniqueId={this.props.uniqueId}
           autoFocus={this.props.autoFocus}
           canRestore={this.props.canRestore}
           currentAppliedValue={this.props.currentAppliedValue as any}
@@ -533,7 +538,11 @@ class PropertyEntryFieldRenderer
     // these are the inputProps of the small input
     const inputProps = {
       inputMode,
-      autoComplete: this.props.htmlAutocomplete,
+      autoComplete: this.props.args.htmlAutocomplete || (
+        this.props.type === "password" ? "current-password" : this.props.uniqueId
+      ),
+      id: this.props.uniqueId,
+      "aria-describedby": this.props.description ? this.props.uniqueId + "_desc" : null,
     };
 
     // these are the TextField props that are applied
@@ -546,6 +555,14 @@ class PropertyEntryFieldRenderer
     };
 
     const isInvalid = shouldShowInvalid(this.props);
+
+    if (isInvalid) {
+      inputProps["aria-invalid"] = true;
+
+      if (!this.props.args.hideError) {
+        inputProps["aria-errormessage"] = this.props.uniqueId + "_error";
+      }
+    }
 
     // if the type is a password
     if (this.props.type === "password") {
@@ -678,13 +695,14 @@ class PropertyEntryFieldRenderer
       }
 
       if (valueToUse) {
-        valueToUse = valueToUse.replace("+" + currentCountryUsed.phone, "0");
+        valueToUse = valueToUse.replace("+" + currentCountryUsed.phone, "");
       }
     }
 
     const textField = (
       <TextField
         fullWidth={true}
+        error={isInvalid}
         type={this.state.visible ? "text" : "password"}
         sx={style.entry}
         label={this.props.label}
@@ -694,10 +712,11 @@ class PropertyEntryFieldRenderer
         onKeyDown={this.onKeyDown}
         onBlur={this.props.enableUserSetErrors}
         InputProps={{
-          sx: style.fieldInput(isInvalid, this.props.disabled),
+          sx: style.fieldInput(this.props.subtype === "phone"),
           classes: {
             focused: "focused",
           },
+          fullWidth: true,
           disabled: this.props.disabled,
           ...appliedInputProps,
           ...this.props.args.inputProps,
@@ -717,41 +736,72 @@ class PropertyEntryFieldRenderer
 
     let fieldComponent = textField;
     if (this.props.subtype === "phone") {
-      fieldComponent = (
+      const standardCountryPicker = (
+        <StyledCountryPicker
+          currentCode={currentCountryUsed.code}
+          handleCountryChange={this.onPhoneCountryChange}
+          usePhoneCode={true}
+          disabled={this.props.disabled}
+          describedBy={this.props.uniqueId}
+          label={null}
+        />
+      );
+      fieldComponent = this.props.args.useCustomCountryCodePicker ? (
         <Box sx={style.fieldForPhone}>
-          <CountryPicker
-            currentCode={currentCountryUsed.code}
-            handleCountryChange={this.onPhoneCountryChange}
-            usePhoneCode={true}
-          />
+          {this.props.args.useCustomCountryCodePicker(
+            textField,
+            standardCountryPicker,
+            this.props.disabled,
+            currentCountryUsed,
+            this.onPhoneCountryChange,
+          )}
+        </Box>
+      ) : (
+        <Box sx={style.fieldForPhone}>
+          {standardCountryPicker}
           {textField}
         </Box>
       )
     }
 
     const descriptionAsAlert = this.props.args["descriptionAsAlert"];
+
+    let descriptionObject: React.ReactNode = null;
+    if (this.props.description) {
+      descriptionObject = descriptionAsAlert ? (
+        <Alert severity="info" sx={style.description} role="note" id={this.props.uniqueId + "_desc"}>
+          {this.props.description}
+        </Alert>
+      ) : (
+        <Typography variant="caption" sx={style.description} id={this.props.uniqueId + "_desc"}>
+          {this.props.description}
+        </Typography>
+      );
+    }
+  
+    const error = (
+      this.props.args.hideError ? null : <Box sx={style.errorMessage} id={this.props.uniqueId + "_error"}>
+        {this.props.currentInvalidReason}
+      </Box>
+    );
+  
+    let inner: React.ReactNode;
+    if (this.props.args.useCustomFieldRender) {
+      inner = this.props.args.useCustomFieldRender(descriptionObject, null, fieldComponent, error, this.props.disabled);
+    } else {
+      inner = (
+        <>
+          {descriptionObject}
+          {fieldComponent}
+          {error}
+        </>
+      )
+    }
+
     // return the complex overengineered component in all its glory
     return (
       <Box sx={style.container}>
-        {
-          this.props.description && descriptionAsAlert ?
-            <Alert severity="info" sx={style.description} role="note">
-              {this.props.description}
-            </Alert> :
-            null
-        }
-        {
-          this.props.description && !descriptionAsAlert ?
-            <Typography variant="caption" sx={style.description}>
-              {this.props.description}
-            </Typography> :
-            null
-        }
-        {fieldComponent}
-        {this.props.args.hideError ? null : <Box sx={style.errorMessage}>
-          {this.props.currentInvalidReason}
-        </Box>}
-
+        {inner}
         {unitDialog}
         {currencyDialog}
       </Box>
