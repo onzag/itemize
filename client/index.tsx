@@ -413,7 +413,7 @@ export async function initializeItemizeApp(
     // to import the locale moment data, we need to expose it to the global
     (window as any).moment = Moment;
 
-    let isExpectedToReload = true;
+    let isExpectedToReload = false;
     try {
       const response = await fetch("/rest/buildnumber?current=" + window.BUILD_NUMBER);
       if (response.status === 200 || response.status === 205) {
@@ -427,7 +427,7 @@ export async function initializeItemizeApp(
           // refer to the setupVersion function in the cache for realization how
           // the object store in indexed db updates, since indexed db databases
           // are versioned, we don't need to worry
-          isExpectedToReload = false;
+          isExpectedToReload = true;
           // while for most of the cases this reload is unceccesary there is a reason
           // it's safer, if the index.html file has changed (say due to google analytics)
           // changes and whatnot, it also trigger that, the build number is coded in the
@@ -439,7 +439,7 @@ export async function initializeItemizeApp(
 
     }
 
-    if (!isExpectedToReload) {
+    if (isExpectedToReload) {
       const loadingCss = `
       .loader {
         position: fixed;

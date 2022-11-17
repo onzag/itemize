@@ -313,7 +313,7 @@ function loadValues(
       searchWillProduceNewHighlights: false,
       searchCanProduceHighlights: false,
     };
-    !isConstruct && context.setState(newState as any);
+    !isConstruct && context && context.setState(newState as any);
     return newState;
   }
 
@@ -333,7 +333,7 @@ function loadValues(
       searchWillProduceNewHighlights: false,
       searchCanProduceHighlights: false,
     };
-    !isConstruct && context.setState(newState as any);
+    !isConstruct && context && context.setState(newState as any);
     return newState;
   }
 
@@ -370,7 +370,7 @@ function loadValues(
       context.loadSearchResults();
     }
 
-    !isConstruct && context.setState(newState as any);
+    !isConstruct && context && context.setState(newState as any);
     return newState;
   }
 

@@ -90,7 +90,17 @@ export async function ssrGenerator(
   // now we get the config, and the language, from the original path, rememebr this generator runs
   // on an express router
   const config = appData.config;
-  const language = info.mode === "html" ? info.req.originalUrl.split("/")[1] : info.url.split("/")[1];
+  let language = info.mode === "html" ?
+    info.req.originalUrl.split("/")[1] :
+    info.url.split("/")[1];
+
+  if (language.includes("?")) {
+    language = language.split("?")[0];
+  }
+
+  if (language.includes("#")) {
+    language = language.split("#")[0];
+  }
 
   // and we need to figure out the SSR rule for this path, for that we got to calculate it
   let appliedRule: ISSRRule;
@@ -301,7 +311,7 @@ export async function ssrGenerator(
     newHTML = newHTML.replace(/\$SSRAPP/g, "");
     newHTML = newHTML.replace(/\"\$SSR\"/g, "null");
     newHTML = newHTML.replace(/\"\$CONFIG\"/g, JSON.stringify(config));
-    newHTML = newHTML.replace(/\<SSRHEAD\>\s*\<\/SSRHEAD\>|\<SSRHEAD\/\>|\<SSRHEAD\>/ig, langHrefLangTags);
+    newHTML = newHTML.replace(/\<SSRHEAD\>\s*\<\/SSRHEAD\>|\<SSRHEAD\/\>|\<SSRHEAD\>/ig, langHrefLangTags || "");
   } else {
     // otherwise with the SSR
     const ssr: ISSRContextType = {
@@ -556,7 +566,7 @@ export async function ssrGenerator(
         newHTML = newHTML.replace(/\"\$CONFIG\"/g, JSON.stringify(config));
 
         // but we need the SSR head which includes our hreflang tags
-        let finalSSRHead: string = langHrefLangTags;
+        let finalSSRHead: string = langHrefLangTags || "";
         if (serverAppData.id) {
           // and also our collected data
           finalSSRHead += appData.ssrConfig.collector.retrieve(serverAppData.id, staticMarkup);
@@ -599,7 +609,7 @@ export async function ssrGenerator(
       newHTML = newHTML.replace(/\$SSRAPP/g, "");
       newHTML = newHTML.replace(/\"\$SSR\"/g, "null");
       newHTML = newHTML.replace(/\"\$CONFIG\"/g, JSON.stringify(config));
-      newHTML = newHTML.replace(/\<SSRHEAD\>\s*\<\/SSRHEAD\>|\<SSRHEAD\/\>|\<SSRHEAD\>/ig, langHrefLangTags);
+      newHTML = newHTML.replace(/\<SSRHEAD\>\s*\<\/SSRHEAD\>|\<SSRHEAD\/\>|\<SSRHEAD\>/ig, langHrefLangTags || "");
 
       // cannot set etag or cache headers because the rendering failed
       // this is why we end abruptly here

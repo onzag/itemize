@@ -53,9 +53,5 @@ export default function PropertyViewSimpleRenderer(props: IPropertyViewSimpleRen
     );
   }
 
-  return (
-    <span>
-      {value}
-    </span>
-  )
+  return (<>{value}</>);
 }

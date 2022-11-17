@@ -6,7 +6,7 @@ interface IAltTextProps extends IAltBaseProps {
   /**
    * The children that should be read
    */
-  children: React.ReactChild;
+  children: React.ReactNode;
 
   /**
    * aria-label
@@ -16,7 +16,7 @@ interface IAltTextProps extends IAltBaseProps {
   /**
    * aria-description
    */
-  description: string;
+  description?: string;
 
   /**
    * aria-labelledby

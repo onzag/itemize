@@ -972,7 +972,7 @@ export class ActualAltBase<P extends IAltBaseProps, S> extends React.PureCompone
   public render() {
     const Element = (this.props.component || "div") as any;
     return (
-      <Element ref={this.containerRef} tabIndex={0} className={this.props.className}>
+      <Element ref={this.containerRef} tabIndex={0} className={this.props.className} {...this.props.componentProps}>
         {this.props.children}
       </Element>
     );
@@ -1244,7 +1244,7 @@ export class ActualAltReactioner extends ActualAltBase<IAltReactionerProps, IAct
   public render() {
     const Element = (this.props.component || "div") as any;
     return (
-      <Element style={{ display: "contents" }} className={this.props.className} ref={this.containerRef}>
+      <Element style={{ display: "contents" }} className={this.props.className} ref={this.containerRef} {...this.props.componentProps}>
         {this.props.children(this.state.displayed, this.state.blocked)}
       </Element>
     );
