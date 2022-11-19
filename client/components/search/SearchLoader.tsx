@@ -8,7 +8,7 @@
 import React from "react";
 import { ItemContext, SearchItemValueContext, IItemProviderProps } from "../../providers/item";
 import equals from "deep-equal";
-import ItemDefinition, { IItemDefinitionGQLValueType, IItemSearchStateHighlightArgsType } from "../../../base/Root/Module/ItemDefinition";
+import ItemDefinition, { IItemDefinitionGQLValueType } from "../../../base/Root/Module/ItemDefinition";
 import { PREFIX_GET_LIST, PREFIX_GET } from "../../../constants";
 import CacheWorkerInstance from "../../internal/workers/cache";
 import { requestFieldsAreContained, deepMerge } from "../../../gql-util";
@@ -177,7 +177,7 @@ export interface ISearchLoaderProps {
    * Whether to disable the external checks for the item definition
    * results provider props
    */
-  disableExternalChecks?: boolean;
+  enableExternalChecks?: boolean;
   /**
    * Prevents the loading of the search results use this
    * if you have no data to load and just want the records
@@ -1025,7 +1025,7 @@ class ActualSearchLoader extends React.Component<IActualSearchLoaderProps, IActu
                   // cleanOnDismount: this.props.cleanOnDismount,
                   static: this.props.static || "TOTAL",
                   longTermCaching: this.props.searchShouldCache,
-                  disableExternalChecks: this.props.disableExternalChecks,
+                  enableExternalChecks: this.props.enableExternalChecks,
                   highlights,
                 },
                 itemDefinition,

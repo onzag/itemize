@@ -268,7 +268,6 @@ export function Articles() {
 																		itemDefinition="user"
 																		forId={createdBy}
 																		static="TOTAL"
-																		disableExternalChecks={true}
 																		properties={[
 																			"username",
 																			"profile_picture",

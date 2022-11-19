@@ -33,7 +33,7 @@ const instance = supportsCacheWorker ? wrap<CacheWorker>(new Worker(url)) : null
 
 // and wrap it into some information
 const CacheWorkerInstance = {
-  isSupported: supportsCacheWorker,
+  isSupported: !!supportsCacheWorker,
   instance,
   getProxy: (obj: unknown) => {
     return proxy(obj);

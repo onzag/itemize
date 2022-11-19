@@ -12,6 +12,7 @@ import I18nReadError from "../../components/localization/I18nReadError";
 import { default as MUISnackbar } from "@mui/material/Snackbar";
 import IconButton from "@mui/material/IconButton";
 import CloseIcon from "@mui/icons-material/Close";
+import { AltBadgeReactioner } from "./alt-badge-reactioner";
 
 /**
  * the snackbar styles
@@ -68,6 +69,14 @@ interface ISnackbarProps {
    * fits here, such as "dismissSuccess", "dismissError", etc...
    */
   onClose: () => void;
+  /**
+   * no close button
+   */
+  noClose?: boolean;
+  /**
+   * will not auto hide
+   */
+  noAutoHide?: boolean;
 }
 
 /**
@@ -84,12 +93,30 @@ export default class Snackbar extends React.PureComponent<ISnackbarProps> {
   }
   public render() {
     let message: React.ReactNode;
-    const autoHideDuration = this.props.severity === "success" ? 3000 : null;
+    const autoHideDuration = this.props.noAutoHide ? null : 3000;
 
     if (typeof this.props.i18nDisplay === "string") {
-      message = <I18nRead id={this.props.i18nDisplay} capitalize={true}/>;
+      message = <I18nRead id={this.props.i18nDisplay} capitalize={true} />;
     } else if (this.props.i18nDisplay) {
-      message = <I18nReadError error={this.props.i18nDisplay} capitalize={true}/>;
+      message = <I18nReadError error={this.props.i18nDisplay} capitalize={true} />;
+    }
+
+    let closeButton: React.ReactNode = null;
+
+    if (!this.props.noClose) {
+      closeButton = (
+        <I18nRead id="close">
+          {(i18nClose: string) => (
+            <IconButton
+              aria-label={i18nClose}
+              color="inherit"
+              onClick={this.props.onClose}
+              size="large">
+              <CloseIcon />
+            </IconButton>
+          )}
+        </I18nRead>
+      );
     }
 
     return (
@@ -110,19 +137,7 @@ export default class Snackbar extends React.PureComponent<ISnackbarProps> {
             {message}
           </span>
         }
-        action={
-          <I18nRead id="close">
-            {(i18nClose: string) => (
-              <IconButton
-                aria-label={i18nClose}
-                color="inherit"
-                onClick={this.props.onClose}
-                size="large">
-                <CloseIcon/>
-              </IconButton>
-            )}
-          </I18nRead>
-        }
+        action={closeButton}
       />
     );
   }

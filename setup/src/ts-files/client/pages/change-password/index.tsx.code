@@ -52,7 +52,6 @@ export function ChangePassword(props: WithStyles<typeof changePasswordStyles>) {
 							]}
 							forId={userData.id}
 							includePolicies={true}
-							disableExternalChecks={true}
 							avoidLoading={true}
 						>
 							<I18nRead id="change_password" capitalize={true}>

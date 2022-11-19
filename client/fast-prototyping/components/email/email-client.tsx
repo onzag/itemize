@@ -309,7 +309,6 @@ function ActualMailSender(props: IActualMailSenderProps) {
           itemDefinition={type}
           forId={id}
           properties={isUser ? props.userNameProperties : props.objectsNameResolver[type]}
-          disableExternalChecks={true}
           static="TOTAL"
         >
           <ItemLoader>
@@ -499,7 +498,6 @@ export function EmailSender(props: IEmailSenderProps) {
                             itemDefinition="user"
                             forId={userData.id}
                             properties={["e_external"]}
-                            disableExternalChecks={true}
                           >
                             <Reader id="e_external">
                               {(hasEExternal: boolean) => (
@@ -645,7 +643,6 @@ export function EmailReader(props: IEmailReaderProps) {
                     itemDefinition="user"
                     forId={source}
                     static="TOTAL"
-                    disableExternalChecks={true}
                     properties={props.userLoadProperties}
                     waitAndMerge={true}
                   >
@@ -1043,7 +1040,6 @@ function EmailAccum(props: IEmailAccumProps) {
           itemDefinition="user"
           forId={sourceOrTarget}
           static="TOTAL"
-          disableExternalChecks={true}
           properties={props.userLoadProperties}
           waitAndMerge={true}
         >
@@ -1057,7 +1053,6 @@ function EmailAccum(props: IEmailAccumProps) {
           itemDefinition="user"
           forId={sourceOrTarget}
           static="TOTAL"
-          disableExternalChecks={true}
           properties={props.userLoadProperties}
           waitAndMerge={true}
         >

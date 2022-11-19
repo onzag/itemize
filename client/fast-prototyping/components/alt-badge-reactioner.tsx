@@ -140,11 +140,9 @@ interface IAltBadgeReactionerProps {
    */
   useInFlow?: boolean;
   /**
-   * When using alt+gr tab and shift alt+gr tab it will move quickly between
-   * elements of the same tabgroup, if using with an element without a tabgroup
-   * it will match the next element that holds a tabgroup
+   * When using alt+gr tab it will anchor to the next available anchor
    */
-  tabGroup?: string;
+  tabAnchor?: boolean;
   /**
    * Sone elements may unmount and not get called, eg. if some other element
    * caused it to unmount, the alt may remain in a triggered state without

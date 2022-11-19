@@ -65,9 +65,16 @@ export interface ICachedSearchResult {
    */
   lastModified: string;
   /**
-   * The source records that were used in the search
+   * The source records that were used in the search, aka all the records that
+   * were searched for in the search, not just the matching ones that were
+   * requested, this list may be very large
    */
   sourceRecords: IGQLSearchRecord[];
+  /**
+   * The source results that were used in the search, if requested, this
+   * is basically the source records themselves but containing all the fields
+   * and matching data that was available
+   */
   sourceResults: ICacheMatchType[];
 }
 
@@ -143,6 +150,86 @@ export interface ICacheDB extends DBSchema {
   }
 }
 
+const objectURLPool: { [fileId: string]: string } = {};
+const objectURLIdVersionFiles: {[mergedId: string]: string[]} = {};
+
+function getFileId(
+  file: IGQLFile,
+  itemDef: ItemDefinition,
+  include: Include,
+  property: PropertyDefinition,
+  id: string,
+  version: string,
+) {
+  // just some fancy id to ensure uniqueness
+  const fileId = file.id + "." + 
+    itemDef.getQualifiedPathName() + "." +
+    (include ? include.getQualifiedIdentifier() : "") + "." +
+    property.getId() + "." + id + "." + (version || "");
+
+  return fileId;
+}
+
+function fixOneFile(
+  file: IGQLFile,
+  itemDef: ItemDefinition,
+  include: Include,
+  property: PropertyDefinition,
+  id: string,
+  version: string,
+) {
+  if (!file.src) {
+    return;
+  }
+
+  const fileId = getFileId(file, itemDef, include, property, id, version);
+
+  if (!objectURLPool[fileId]) {
+    objectURLPool[fileId] = URL.createObjectURL(file.src as Blob);
+
+    const mergedId = itemDef.getQualifiedPathName() + "." + id + "." + (version || "");
+    if (!objectURLIdVersionFiles[mergedId]) {
+      objectURLIdVersionFiles[mergedId] = [fileId];
+    } else {
+      objectURLIdVersionFiles[mergedId].push(fileId);
+    }
+  }
+
+  file.url = objectURLPool[fileId];
+  delete file.src;
+}
+
+export function fixFilesURLAt(
+  partialValue: IGQLValue,
+  itemDef: ItemDefinition,
+  include: Include,
+  property: PropertyDefinition,
+  id: string,
+  version: string,
+) {
+  if (!partialValue) {
+    return;
+  }
+
+  const idLocation = include ? include.getPrefixedQualifiedIdentifier() + property.getId() : property.getId();
+  if (
+    (
+      property.getType() !== "file" &&
+      property.getType() !== "files"
+    ) || !partialValue.DATA || !partialValue.DATA[idLocation]
+  ) {
+    return;
+  }
+
+  const value = partialValue.DATA[idLocation];
+
+  if (Array.isArray(value)) {
+    value.forEach((v) => fixOneFile(v as any, itemDef, include, property, id, version));
+  } else {
+    fixOneFile(value as any, itemDef, include, property, id, version);
+  }
+}
+
 // Name of the cache in the indexed db database
 export const CACHE_NAME = "ITEMIZE_CACHE";
 // Name of the table
@@ -180,8 +267,6 @@ export default class CacheWorker {
    */
   private root: Root;
   private config: IConfigRawJSONDataType;
-  private objectURLPool: { [fileId: string]: string } = {};
-  private objectURLIdVersionFiles: {[mergedId: string]: string[]} = {};
 
   /**
    * Whether currently the cache is blocked from
@@ -537,82 +622,6 @@ export default class CacheWorker {
     }
   }
 
-  private getFileId(
-    file: IGQLFile,
-    itemDef: ItemDefinition,
-    include: Include,
-    property: PropertyDefinition,
-    id: string,
-    version: string,
-  ) {
-    // just some fancy id to ensure uniqueness
-    const fileId = file.id + "." + 
-      itemDef.getQualifiedPathName() + "." +
-      (include ? include.getQualifiedIdentifier() : "") + "." +
-      property.getId() + "." + id + "." + (version || "");
-
-    return fileId;
-  }
-
-  private fixOneFile(
-    file: IGQLFile,
-    itemDef: ItemDefinition,
-    include: Include,
-    property: PropertyDefinition,
-    id: string,
-    version: string,
-  ) {
-    if (!file.src) {
-      return;
-    }
-
-    const fileId = this.getFileId(file, itemDef, include, property, id, version);
-
-    if (!this.objectURLPool[fileId]) {
-      this.objectURLPool[fileId] = URL.createObjectURL(file.src as Blob);
-
-      const mergedId = itemDef.getQualifiedPathName() + "." + id + "." + (version || "");
-      if (!this.objectURLIdVersionFiles[mergedId]) {
-        this.objectURLIdVersionFiles[mergedId] = [fileId];
-      } else {
-        this.objectURLIdVersionFiles[mergedId].push(fileId);
-      }
-    }
-
-    file.url = this.objectURLPool[fileId];
-  }
-
-  private fixFilesURLAt(
-    partialValue: IGQLValue,
-    itemDef: ItemDefinition,
-    include: Include,
-    property: PropertyDefinition,
-    id: string,
-    version: string,
-  ) {
-    if (!partialValue) {
-      return;
-    }
-
-    const idLocation = include ? include.getPrefixedQualifiedIdentifier() + property.getId() : property.getId();
-    if (
-      (
-        property.getType() !== "file" &&
-        property.getType() !== "files"
-      ) || !partialValue.DATA || !partialValue.DATA[idLocation]
-    ) {
-      return;
-    }
-
-    const value = partialValue.DATA[idLocation];
-
-    if (Array.isArray(value)) {
-      value.forEach((v) => this.fixOneFile(v as any, itemDef, include, property, id, version));
-    } else {
-      this.fixOneFile(value as any, itemDef, include, property, id, version);
-    }
-  }
-
   /**
    * sets a cache value, all of it, using a query name, should
    * be a get query, the id of the item definition and the
@@ -720,13 +729,13 @@ export default class CacheWorker {
     const mergedId = type + "." + id + "." + (version || "");
 
     // if we have urls for such blobs in the map
-    if (this.objectURLIdVersionFiles[mergedId]) {
+    if (objectURLIdVersionFiles[mergedId]) {
       // loop through them and delete them from the pool
-      this.objectURLIdVersionFiles[mergedId].forEach((fileId) => {
-        URL.revokeObjectURL(this.objectURLPool[fileId]);
-        delete this.objectURLPool[fileId];
+      objectURLIdVersionFiles[mergedId].forEach((fileId) => {
+        URL.revokeObjectURL(objectURLPool[fileId]);
+        delete objectURLPool[fileId];
       });
-      delete this.objectURLIdVersionFiles[mergedId];
+      delete objectURLIdVersionFiles[mergedId];
     }
 
     // and now we try this
@@ -1020,6 +1029,8 @@ export default class CacheWorker {
           true,
         );
       }
+
+      return false;
     } else {
       // otherwise there's a current value with the same time signature
       // and we can merge it
@@ -1096,12 +1107,12 @@ export default class CacheWorker {
 
           if (idbValue.value) {
             idef.getAllPropertyDefinitionsAndExtensions().forEach((p) => {
-              this.fixFilesURLAt(idbValue.value, idef, null, p, id, version);
+              fixFilesURLAt(idbValue.value, idef, null, p, id, version);
             });
 
             idef.getAllIncludes().forEach((i) => {
               i.getSinkingProperties().forEach((sp) => {
-                this.fixFilesURLAt(idbValue.value, idef, i, sp, id, version);
+                fixFilesURLAt(idbValue.value, idef, i, sp, id, version);
               });
             });
           }
@@ -1289,6 +1300,7 @@ export default class CacheWorker {
     getListLangArg: string,
     getListRequestedFields: IGQLRequestFields,
     cachePolicy: "by-owner" | "by-parent" | "by-owner-and-parent" | "by-property",
+    cacheNoLimitOffset: boolean,
     trackedProperty: string,
     maxLimit: number,
     maxGetListResultsAtOnce: number,
@@ -1487,13 +1499,15 @@ export default class CacheWorker {
           // function
 
           try {
-            const searchResponse = await search(this.root, this.db, resultsToProcess, searchArgs, returnSources);
+            const searchResponse = await search(this.root, this.db, resultsToProcess, searchArgs, returnSources, cacheNoLimitOffset);
             const records = searchResponse.filteredRecords;
+            const results = searchResponse.filteredResults;
             const sourceResults = searchResponse.sourceResults;
             const gqlValue: IGQLEndpointValue = {
               data: {
                 [searchQueryName]: {
                   records,
+                  results,
                   last_modified: lastModified,
                   limit: searchArgs.limit as number,
                   offset: searchArgs.offset as number,
@@ -1752,7 +1766,8 @@ export default class CacheWorker {
 
       // Now we need to filter the search results in order to return what is
       // appropiate using the actualCurrentSearchValue
-      const searchResponse = await search(this.root, this.db, actualCurrentSearchValue.value, searchArgs, returnSources);
+      const searchResponse = await search(this.root, this.db, actualCurrentSearchValue.value, searchArgs, returnSources, cacheNoLimitOffset);
+      const results = searchResponse.filteredResults;
       const records = searchResponse.filteredRecords;
       const sourceResults = searchResponse.sourceResults;
       const gqlValue: IGQLEndpointValue = {
@@ -1760,6 +1775,7 @@ export default class CacheWorker {
           [searchQueryName]: {
             last_modified: lastModified,
             records,
+            results,
             limit: searchArgs.limit as number,
             offset: searchArgs.offset as number,
             count: searchResponse.count,

@@ -48,7 +48,7 @@ interface ITotalPagedSearchLoaderProps {
    * Whether to disable the external checks for the item definition
    * results provider props
    */
-  disableExternalChecks?: boolean;
+  enableExternalChecks?: boolean;
   /**
    * Prevents the loading of the search results use this
    * if you have no data to load and just want the records
@@ -251,7 +251,7 @@ class ActualTotalPagedSearchLoader extends React.PureComponent<IActualTotalPaged
         cleanOnDismount={this.props.cleanOnDismount}
         onSearchDataChange={this.onSearchDataChange.bind(null, actualP)}
         static={this.props.static}
-        disableExternalChecks={this.props.disableExternalChecks}
+        enableExternalChecks={this.props.enableExternalChecks}
       >
         {(arg) => {
           return this.props.children({

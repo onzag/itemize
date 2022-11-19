@@ -15,7 +15,7 @@ export interface IAltBaseProps {
   /**
    * The wrapping component to use, by default it will use a div
    */
-  component?: string;
+  component?: any;
   /**
    * Props to pass to the component
    */
@@ -52,10 +52,9 @@ export interface IAltBaseProps {
   tabbable?: boolean;
   /**
    * When using alt+gr tab and shift alt+gr tab it will move quickly between
-   * elements of the same tabgroup, if using with an element without a tabgroup
-   * it will match the next element that holds a tabgroup
+   * anchors
    */
-  tabGroup?: string;
+  tabAnchor?: boolean;
   /**
    * Sone elements may unmount and not get called, eg. if some other element
    * caused it to unmount, the alt may remain in a triggered state without
@@ -77,6 +76,11 @@ export interface IAltBaseProps {
    * this is basically the default for input fields and textareas
    */
   blocksQuickActionsWhileFocused?: boolean;
+
+  /**
+   * whether it is used in flow
+   */
+  useInFlow?: boolean;
 }
 
 export interface IAltReactionerProps extends IAltBaseProps {
@@ -153,37 +157,33 @@ interface IActualAltReactionerState {
 }
 
 const ALT_REGISTRY: {
-  flow: ActualAltBase<any, any>[];
+  all: ActualAltBase<any, any>[];
   activeFlow: ActualAltBase<any, any>[];
   activeFlowFocusIndex: number;
   activeFlowPriority: number;
-  actions: {
-    [reactionKey: string]: ActualAltReactioner[];
-  },
   isBlocked: boolean;
-  isDisplayingActions: ActualAltReactioner[];
-  displayedActionsFocusIndex: number;
-  displayedActionsPriority: number;
-  awaitingKeycodes: ActualAltReactioner[];
-  awaitingKeycodesFocusIndex: number;
-  lastFocusedActionSignatures: { [priorityKey: number]: string };
+  isDisplayingLayereds: ActualAltBase<any, any>[];
+  displayedLayeredFocusIndex: number;
+  displayedLayeredPriority: number;
+  awaitingLayerKeycodes: ActualAltReactioner[];
+  awaitingLayerKeycodesFocusIndex: number;
+  lastFocusedLayerSignatures: { [priorityKey: number]: string };
   lastFocusedFlowSignatures: { [priorityKey: number]: string };
-  isJumpingThroughGroups: boolean;
+  isJumpingThroughAnchors: boolean;
 } = {
-  flow: [],
+  all: [],
   activeFlow: null,
   activeFlowFocusIndex: -1,
   activeFlowPriority: null,
-  actions: {},
   isBlocked: false,
-  isDisplayingActions: null,
-  displayedActionsFocusIndex: -1,
-  displayedActionsPriority: null,
-  awaitingKeycodes: null,
-  awaitingKeycodesFocusIndex: -1,
-  lastFocusedActionSignatures: {},
+  isDisplayingLayereds: null,
+  displayedLayeredFocusIndex: -1,
+  displayedLayeredPriority: null,
+  awaitingLayerKeycodes: null,
+  awaitingLayerKeycodesFocusIndex: -1,
+  lastFocusedLayerSignatures: {},
   lastFocusedFlowSignatures: {},
-  isJumpingThroughGroups: false,
+  isJumpingThroughAnchors: false,
 };
 
 export function hideAll(butKeycodes: ActualAltReactioner[] = []) {
@@ -194,43 +194,41 @@ export function hideAll(butKeycodes: ActualAltReactioner[] = []) {
 
   ALT_REGISTRY.isBlocked = false;
 
-  Object.keys(ALT_REGISTRY.actions).forEach((reactionKey) => {
-    ALT_REGISTRY.actions[reactionKey].forEach((v) => {
-      if (!butKeycodes.includes(v)) {
-        v.hide();
-      }
-    });
+  ALT_REGISTRY.all.forEach((element) => {
+    if (element instanceof ActualAltReactioner && !butKeycodes.includes(element)) {
+      element.hide();
+    }
   });
 
-  ALT_REGISTRY.awaitingKeycodes && ALT_REGISTRY.awaitingKeycodes.forEach((v) => {
+  ALT_REGISTRY.awaitingLayerKeycodes && ALT_REGISTRY.awaitingLayerKeycodes.forEach((v) => {
     v.triggerAmbiguousClear();
   });
 
   // clear everything we don't enter keycodes mode
   if (!butKeycodes.length) {
-    ALT_REGISTRY.isDisplayingActions = null;
-    ALT_REGISTRY.displayedActionsFocusIndex = -1;
-    ALT_REGISTRY.awaitingKeycodes = null;
-    ALT_REGISTRY.awaitingKeycodesFocusIndex = -1;
-    ALT_REGISTRY.displayedActionsPriority = null;
+    ALT_REGISTRY.isDisplayingLayereds = null;
+    ALT_REGISTRY.displayedLayeredFocusIndex = -1;
+    ALT_REGISTRY.awaitingLayerKeycodes = null;
+    ALT_REGISTRY.awaitingLayerKeycodesFocusIndex = -1;
+    ALT_REGISTRY.displayedLayeredPriority = null;
   } else {
     // enter keycodes mode
-    ALT_REGISTRY.awaitingKeycodes = butKeycodes;
-    ALT_REGISTRY.awaitingKeycodesFocusIndex = -1;
+    ALT_REGISTRY.awaitingLayerKeycodes = butKeycodes;
+    ALT_REGISTRY.awaitingLayerKeycodesFocusIndex = -1;
   }
 }
 
 function calculateActiveFlow(): number {
   let priorityToUse = Number.MIN_SAFE_INTEGER;
-  ALT_REGISTRY.flow.forEach((v) => {
-    if (!v.isDisabled() && v.getPriority() > priorityToUse) {
+  ALT_REGISTRY.all.forEach((v) => {
+    if (!v.isDisabled() && v.getPriority() > priorityToUse && v.isUsedInFlow()) {
       priorityToUse = v.getPriority();
     }
   });
 
   const flowResults: ActualAltBase<any, any>[] = [];
-  ALT_REGISTRY.flow.forEach((v) => {
-    if (!v.isDisabled() && v.getPriority() === priorityToUse) {
+  ALT_REGISTRY.all.forEach((v) => {
+    if (!v.isDisabled() && v.getPriority() === priorityToUse && v.isUsedInFlow()) {
       flowResults.push(v);
     }
   });
@@ -244,38 +242,47 @@ function calculateActiveFlow(): number {
   return priorityToUse;
 }
 
-function calculatePriorityOfDisplayElements(calcActiveFlow?: boolean): number {
+function calculatePriorityOfLayereds(calcActiveFlow?: boolean): number {
   let priorityToUse = calcActiveFlow ? calculateActiveFlow() : Number.MIN_SAFE_INTEGER;
-  Object.keys(ALT_REGISTRY.actions).forEach((reactionKey) => {
-    ALT_REGISTRY.actions[reactionKey].forEach((v) => {
-      if (!v.isDisabled() && v.getPriority() > priorityToUse) {
-        priorityToUse = v.getPriority();
-      }
-    });
+  ALT_REGISTRY.all.forEach((v) => {
+    if (!v.isDisabled() && v.getPriority() > priorityToUse && !v.isUsedInFlow()) {
+      priorityToUse = v.getPriority();
+    }
   });
 
   return priorityToUse;
 }
 
-export function calculateDisplayElements(priorityToUse: number, doNotShowHide: boolean) {
+export function calculateLayereds(priorityToUse: number, doNotShowHide: boolean) {
   const actionResults: {
     [reactionKey: string]: ActualAltReactioner[]
   } = {};
-  Object.keys(ALT_REGISTRY.actions).forEach((reactionKey) => {
-    ALT_REGISTRY.actions[reactionKey].forEach((v) => {
+
+  const layereds: Array<ActualAltBase<any, any>> = [];
+
+  ALT_REGISTRY.all.forEach((v) => {
+    if (v instanceof ActualAltReactioner) {
       if (!v.isDisabled() && v.getPriority() === priorityToUse) {
-        if (!actionResults[reactionKey]) {
-          actionResults[reactionKey] = [v];
+        if (v instanceof ActualAltReactioner) {
+          const reactionKey = v.getReactionKey();
+          if (!actionResults[reactionKey]) {
+            actionResults[reactionKey] = [v];
+          } else {
+            actionResults[reactionKey].push(v);
+          }
         } else {
-          actionResults[reactionKey].push(v);
+          layereds.push(v);
         }
-      } else if (!doNotShowHide && v.isDisplayed()) {
+      } else if (v instanceof ActualAltReactioner && !doNotShowHide && v.isDisplayed()) {
         v.hide();
       }
-    });
+    } else if (!v.isUsedInFlow() && !v.isDisabled() && v.getPriority() === priorityToUse) {
+      layereds.push(v);
+    } else if (v instanceof ActualAltReactioner && !doNotShowHide && v.isDisplayed()) {
+      v.hide();
+    }
   });
 
-  const displayElements: ActualAltReactioner[] = [];
   Object.keys(actionResults).forEach((reactionKey) => {
     actionResults[reactionKey].sort((a, b) => a.isBefore(b) ? -1 : 1);
     actionResults[reactionKey].forEach((v, index, arr) => {
@@ -289,46 +296,46 @@ export function calculateDisplayElements(priorityToUse: number, doNotShowHide: b
       }
 
       !doNotShowHide && v.display();
-      displayElements.push(v);
+      layereds.push(v);
     });
   });
 
-  displayElements.sort((a, b) => a.isBefore(b) ? -1 : 1);
+  layereds.sort((a, b) => a.isBefore(b) ? -1 : 1);
 
-  return displayElements;
+  return layereds;
 }
 
-export function showDisplayElements(priorityToUse: number) {
-  const displayElements = calculateDisplayElements(priorityToUse, false);
+export function showLayereds(priorityToUse: number) {
+  const displayElements = calculateLayereds(priorityToUse, false);
 
   if (!displayElements.length) {
-    ALT_REGISTRY.isDisplayingActions = null;
-    ALT_REGISTRY.displayedActionsPriority = null;
-    ALT_REGISTRY.displayedActionsFocusIndex = -1;
-    ALT_REGISTRY.awaitingKeycodes = null;
-    ALT_REGISTRY.awaitingKeycodesFocusIndex = -1;
+    ALT_REGISTRY.isDisplayingLayereds = null;
+    ALT_REGISTRY.displayedLayeredPriority = null;
+    ALT_REGISTRY.displayedLayeredFocusIndex = -1;
+    ALT_REGISTRY.awaitingLayerKeycodes = null;
+    ALT_REGISTRY.awaitingLayerKeycodesFocusIndex = -1;
   } else {
-    ALT_REGISTRY.isDisplayingActions = displayElements;
-    ALT_REGISTRY.displayedActionsPriority = priorityToUse;
-    ALT_REGISTRY.displayedActionsFocusIndex = displayElements.findIndex((e) => e.getElement() === document.activeElement);
-    ALT_REGISTRY.awaitingKeycodes = null;
-    ALT_REGISTRY.awaitingKeycodesFocusIndex = -1;
+    ALT_REGISTRY.isDisplayingLayereds = displayElements;
+    ALT_REGISTRY.displayedLayeredPriority = priorityToUse;
+    ALT_REGISTRY.displayedLayeredFocusIndex = displayElements.findIndex((e) => e.getElement() === document.activeElement);
+    ALT_REGISTRY.awaitingLayerKeycodes = null;
+    ALT_REGISTRY.awaitingLayerKeycodesFocusIndex = -1;
   }
 
   showScrollerRelevant();
 }
 
-function triggerBasedOn(code: string, shiftKey: boolean, callbackIfmatch: () => void, forceHidden?: boolean) {
+function triggerBasedOn(code: string, shiftKey: boolean, callbackIfmatch: () => void) {
   if (code === "shift") {
     return;
   } else if (code === "tab") {
-    if (ALT_REGISTRY.awaitingKeycodes) {
-      const len = ALT_REGISTRY.awaitingKeycodes.length;
-      let nextIndex = ((ALT_REGISTRY.awaitingKeycodesFocusIndex + len + (!shiftKey ? 1 : -1))) % len;
+    if (ALT_REGISTRY.awaitingLayerKeycodes) {
+      const len = ALT_REGISTRY.awaitingLayerKeycodes.length;
+      let nextIndex = ((ALT_REGISTRY.awaitingLayerKeycodesFocusIndex + len + (!shiftKey ? 1 : -1))) % len;
 
-      if (ALT_REGISTRY.awaitingKeycodesFocusIndex === -1) {
+      if (ALT_REGISTRY.awaitingLayerKeycodesFocusIndex === -1) {
         const potentialNextIndex =
-          ALT_REGISTRY.awaitingKeycodes.findIndex((e) => e.getSignature() === ALT_REGISTRY.lastFocusedActionSignatures[ALT_REGISTRY.displayedActionsPriority]);
+          ALT_REGISTRY.awaitingLayerKeycodes.findIndex((e) => e.getSignature() === ALT_REGISTRY.lastFocusedLayerSignatures[ALT_REGISTRY.displayedLayeredPriority]);
         if (potentialNextIndex !== -1) {
           nextIndex = potentialNextIndex;
         } else {
@@ -336,26 +343,24 @@ function triggerBasedOn(code: string, shiftKey: boolean, callbackIfmatch: () => 
         }
       }
 
-      const selected = ALT_REGISTRY.awaitingKeycodes[ALT_REGISTRY.awaitingKeycodesFocusIndex];
-      const expectNextGroup = ALT_REGISTRY.isJumpingThroughGroups ? (selected ? selected.getTabGroup() : undefined) : undefined;
-
       // make sure that there are tabbable components not to enter an infinite loop
-      if (!ALT_REGISTRY.awaitingKeycodes.some((e) =>
-        e.isTabbable() &&
-        e.isCorrectMatchForTabGroup(expectNextGroup))
-      ) {
+      if (!ALT_REGISTRY.awaitingLayerKeycodes.some((e) => e.isTabbable())) {
         // break it and stop it now
         callbackIfmatch();
         return;
       }
 
-      let nextElement = ALT_REGISTRY.awaitingKeycodes[nextIndex];
+      const expectNextToBeAnchor =
+        ALT_REGISTRY.isJumpingThroughAnchors &&
+        ALT_REGISTRY.awaitingLayerKeycodes.some((e) => e.isTabbable() && e.isTabAnchor());
+
+      let nextElement = ALT_REGISTRY.awaitingLayerKeycodes[nextIndex];
       while (
         !nextElement.isTabbable() ||
-        !nextElement.isCorrectMatchForTabGroup(expectNextGroup)
+        (expectNextToBeAnchor ? !nextElement.isTabAnchor() : false)
       ) {
         nextIndex = ((nextIndex + len + (!shiftKey ? 1 : -1))) % len;
-        nextElement = ALT_REGISTRY.awaitingKeycodes[nextIndex];
+        nextElement = ALT_REGISTRY.awaitingLayerKeycodes[nextIndex];
       }
       // the index should be fine now and pointing to the next tabbable component
 
@@ -368,22 +373,22 @@ function triggerBasedOn(code: string, shiftKey: boolean, callbackIfmatch: () => 
         console.warn("Failed to focus on next element, is it missing tab-index?", nextElement.getElement());
       }
       ALT_REGISTRY.isBlocked = nextElement.isBlocking();
-      ALT_REGISTRY.awaitingKeycodes.forEach((e) => e.setBlocked(ALT_REGISTRY.isBlocked));
-      ALT_REGISTRY.awaitingKeycodesFocusIndex = nextIndex;
-      ALT_REGISTRY.lastFocusedActionSignatures[ALT_REGISTRY.displayedActionsPriority] = nextElement.getSignature();
-    } else if (ALT_REGISTRY.isDisplayingActions) {
-      const len = ALT_REGISTRY.isDisplayingActions.length;
-      let nextIndex = ((ALT_REGISTRY.displayedActionsFocusIndex + len + (!shiftKey ? 1 : -1))) % len;
+      ALT_REGISTRY.awaitingLayerKeycodes.forEach((e) => e.setBlocked(ALT_REGISTRY.isBlocked));
+      ALT_REGISTRY.awaitingLayerKeycodesFocusIndex = nextIndex;
+      ALT_REGISTRY.lastFocusedLayerSignatures[ALT_REGISTRY.displayedLayeredPriority] = nextElement.getSignature();
+    } else if (ALT_REGISTRY.isDisplayingLayereds) {
+      const len = ALT_REGISTRY.isDisplayingLayereds.length;
+      let nextIndex = ((ALT_REGISTRY.displayedLayeredFocusIndex + len + (!shiftKey ? 1 : -1))) % len;
 
       // we may be in the alt mode but we have no actions outside of flow as such, we are going to forcefully
       // tab in the flow
-      const hasNoActionsOutsideFlow = ALT_REGISTRY.isDisplayingActions.every((e) => e.isUsedInFlow());
+      const hasNoActionsOutsideFlow = ALT_REGISTRY.isDisplayingLayereds.every((e) => e.isUsedInFlow());
 
-      if (ALT_REGISTRY.displayedActionsFocusIndex === -1) {
+      if (ALT_REGISTRY.displayedLayeredFocusIndex === -1) {
         // let's check if we are already focused in one of the elements that are relevant
         // so we can go directly to the next one
         const alreadyFocusedAtIndex =
-          ALT_REGISTRY.isDisplayingActions.findIndex((e) =>
+          ALT_REGISTRY.isDisplayingLayereds.findIndex((e) =>
             e.isTabbable() &&
             (hasNoActionsOutsideFlow ? true : !e.isUsedInFlow()) &&
             e.getElement() === document.activeElement
@@ -395,7 +400,7 @@ function triggerBasedOn(code: string, shiftKey: boolean, callbackIfmatch: () => 
           // this is for first time focus or when we have pressed tab and none of the potential elements
           // are active in our list
           const potentialNextIndex =
-            ALT_REGISTRY.isDisplayingActions.findIndex((e) => e.getSignature() === ALT_REGISTRY.lastFocusedActionSignatures[ALT_REGISTRY.displayedActionsPriority]);
+            ALT_REGISTRY.isDisplayingLayereds.findIndex((e) => e.getSignature() === ALT_REGISTRY.lastFocusedLayerSignatures[ALT_REGISTRY.displayedLayeredPriority]);
           if (potentialNextIndex !== -1) {
             nextIndex = potentialNextIndex;
           } else {
@@ -404,28 +409,32 @@ function triggerBasedOn(code: string, shiftKey: boolean, callbackIfmatch: () => 
         }
       }
 
-      const selected = ALT_REGISTRY.isDisplayingActions[ALT_REGISTRY.displayedActionsFocusIndex];
-      const expectNextGroup = ALT_REGISTRY.isJumpingThroughGroups ? (selected ? selected.getTabGroup() : undefined) : undefined;
-
       // make sure that there are tabbable components not to enter an infinite loop
-      if (!ALT_REGISTRY.isDisplayingActions.some((e) =>
+      if (!ALT_REGISTRY.isDisplayingLayereds.some((e) =>
         e.isTabbable() &&
-        (hasNoActionsOutsideFlow ? true : !e.isUsedInFlow()) &&
-        e.isCorrectMatchForTabGroup(expectNextGroup)
+        (hasNoActionsOutsideFlow ? true : !e.isUsedInFlow())
       )) {
         // break it and stop it now
         callbackIfmatch();
         return;
       }
 
-      let nextElement = ALT_REGISTRY.isDisplayingActions[nextIndex];
+      const expectNextToBeAnchor =
+        ALT_REGISTRY.isJumpingThroughAnchors &&
+        ALT_REGISTRY.isDisplayingLayereds.some((e) =>
+          e.isTabbable() &&
+          e.isTabAnchor() &&
+          (hasNoActionsOutsideFlow ? true : !e.isUsedInFlow())
+        );
+
+      let nextElement = ALT_REGISTRY.isDisplayingLayereds[nextIndex];
       while (
         !nextElement.isTabbable() ||
         (hasNoActionsOutsideFlow ? false : nextElement.isUsedInFlow()) ||
-        !nextElement.isCorrectMatchForTabGroup(expectNextGroup)
+        (expectNextToBeAnchor ? !nextElement.isTabAnchor() : false)
       ) {
         nextIndex = ((nextIndex + len + (!shiftKey ? 1 : -1))) % len;
-        nextElement = ALT_REGISTRY.isDisplayingActions[nextIndex];
+        nextElement = ALT_REGISTRY.isDisplayingLayereds[nextIndex];
       }
       // the index should be fine now and pointing to the next tabbable component
 
@@ -439,9 +448,9 @@ function triggerBasedOn(code: string, shiftKey: boolean, callbackIfmatch: () => 
       }
 
       ALT_REGISTRY.isBlocked = nextElement.isBlocking();
-      ALT_REGISTRY.isDisplayingActions.forEach((e) => e.setBlocked(ALT_REGISTRY.isBlocked));
-      ALT_REGISTRY.displayedActionsFocusIndex = nextIndex;
-      ALT_REGISTRY.lastFocusedActionSignatures[ALT_REGISTRY.displayedActionsPriority] = nextElement.getSignature();
+      ALT_REGISTRY.isDisplayingLayereds.forEach((e) => e.setBlocked(ALT_REGISTRY.isBlocked));
+      ALT_REGISTRY.displayedLayeredFocusIndex = nextIndex;
+      ALT_REGISTRY.lastFocusedLayerSignatures[ALT_REGISTRY.displayedLayeredPriority] = nextElement.getSignature();
     } else if (ALT_REGISTRY.activeFlow) {
       const len = ALT_REGISTRY.activeFlow.length;
       let nextIndex = ((ALT_REGISTRY.activeFlowFocusIndex + len + (!shiftKey ? 1 : -1))) % len;
@@ -467,18 +476,22 @@ function triggerBasedOn(code: string, shiftKey: boolean, callbackIfmatch: () => 
         }
       }
 
-      const selected = ALT_REGISTRY.activeFlow[ALT_REGISTRY.activeFlowFocusIndex];
-      const expectNextGroup = ALT_REGISTRY.isJumpingThroughGroups ? (selected ? selected.getTabGroup() : undefined) : undefined;
-
       // make sure that there are tabbable components not to enter an infinite loop
-      if (!ALT_REGISTRY.activeFlow.some((e) => e.isTabbable() && e.isCorrectMatchForTabGroup(expectNextGroup))) {
+      if (!ALT_REGISTRY.activeFlow.some((e) => e.isTabbable())) {
         // break it and stop it now
         callbackIfmatch();
         return;
       }
 
+      const expectNextToBeAnchor =
+        ALT_REGISTRY.isJumpingThroughAnchors &&
+        ALT_REGISTRY.activeFlow.some((e) => e.isTabbable() && e.isTabAnchor());
+
       let nextElement = ALT_REGISTRY.activeFlow[nextIndex];
-      while (!nextElement.isTabbable() || !nextElement.isCorrectMatchForTabGroup(expectNextGroup)) {
+      while (
+        !nextElement.isTabbable() ||
+        (expectNextToBeAnchor ? !nextElement.isTabAnchor() : false)
+      ) {
         nextIndex = ((nextIndex + len + (!shiftKey ? 1 : -1))) % len;
         nextElement = ALT_REGISTRY.activeFlow[nextIndex];
       }
@@ -496,7 +509,7 @@ function triggerBasedOn(code: string, shiftKey: boolean, callbackIfmatch: () => 
       // now we set the blocking status of whatever is now the active element
       // flow cannot be blocked because flow is not displaying anything
       ALT_REGISTRY.isBlocked = false;
-      ALT_REGISTRY.activeFlow.forEach((e) => (e as any).setBlocked && (e as any).setBlocked(ALT_REGISTRY.isBlocked));
+      ALT_REGISTRY.activeFlow.forEach((e) => e.setBlocked(ALT_REGISTRY.isBlocked));
 
       ALT_REGISTRY.activeFlowFocusIndex = nextIndex;
       ALT_REGISTRY.lastFocusedFlowSignatures[ALT_REGISTRY.activeFlowPriority] = nextElement.getSignature();
@@ -518,17 +531,17 @@ function triggerBasedOn(code: string, shiftKey: boolean, callbackIfmatch: () => 
   // this occurs if there are just too many options available
   // so that the shortcut is overflown
   if (
-    ALT_REGISTRY.awaitingKeycodes &&
+    ALT_REGISTRY.awaitingLayerKeycodes &&
     code === "+" &&
-    ALT_REGISTRY.awaitingKeycodes.length > 9
+    ALT_REGISTRY.awaitingLayerKeycodes.length > 9
   ) {
-    const cancelledKeycodes = ALT_REGISTRY.awaitingKeycodes.splice(0, 9);
+    const cancelledKeycodes = ALT_REGISTRY.awaitingLayerKeycodes.splice(0, 9);
     cancelledKeycodes.forEach((k) => {
       k.hide();
       k.triggerAmbiguousClear();
     });
 
-    ALT_REGISTRY.awaitingKeycodes.forEach((v, index) => {
+    ALT_REGISTRY.awaitingLayerKeycodes.forEach((v, index) => {
       let ambigousId = index % 9;
       ambigousId++;
       const plusCount = Math.floor(index / 9);
@@ -543,8 +556,12 @@ function triggerBasedOn(code: string, shiftKey: boolean, callbackIfmatch: () => 
     code === "enter" ||
     code === " "
   ) {
-    const relatedActiveElement = ALT_REGISTRY.isDisplayingActions.find((v) => v.getElement() === document.activeElement);
-    if (relatedActiveElement && relatedActiveElement.props.action !== "focus") {
+    const relatedActiveElement = ALT_REGISTRY.isDisplayingLayereds.find((v) => v.getElement() === document.activeElement);
+    if (
+      relatedActiveElement &&
+      relatedActiveElement instanceof ActualAltReactioner &&
+      relatedActiveElement.props.action !== "focus"
+    ) {
       callbackIfmatch();
       hideAll();
       relatedActiveElement.trigger(true);
@@ -552,24 +569,15 @@ function triggerBasedOn(code: string, shiftKey: boolean, callbackIfmatch: () => 
     }
   }
 
-  const value = ALT_REGISTRY.awaitingKeycodes ?
-    // can be nan if not a number but who minds that
-    ALT_REGISTRY.awaitingKeycodes[parseInt(code) - 1] :
-    ALT_REGISTRY.actions[code];
-
-  const matches: ActualAltReactioner[] = []
-  if (value) {
-    if (Array.isArray(value)) {
-      value.forEach((k) => {
-        if (k.getPriority() === ALT_REGISTRY.displayedActionsPriority && (k.isDisplayed() || forceHidden)) {
-          matches.push(k);
-        }
-      });
-    } else {
-      if (value.getPriority() === ALT_REGISTRY.displayedActionsPriority && (value.isDisplayed() || forceHidden)) {
-        matches.push(value);
-      }
+  let matches: ActualAltReactioner[] = []
+  if (ALT_REGISTRY.awaitingLayerKeycodes) {
+    const value = ALT_REGISTRY.awaitingLayerKeycodes[parseInt(code) - 1];
+    if (value) {
+      matches.push(value);
     }
+  } else if (ALT_REGISTRY.isDisplayingLayereds) {
+    matches = ALT_REGISTRY.isDisplayingLayereds
+      .filter((v) => (v as ActualAltReactioner).getReactionKey && (v as ActualAltReactioner).getReactionKey() === code) as any;
   }
 
   if (matches.length) {
@@ -579,8 +587,8 @@ function triggerBasedOn(code: string, shiftKey: boolean, callbackIfmatch: () => 
   // one or zero matches
   if (matches.length <= 1) {
     const isTabNavigatingCurrent =
-      ALT_REGISTRY.isDisplayingActions &&
-      !!ALT_REGISTRY.isDisplayingActions.find((v) => v.getElement() === document.activeElement);
+      ALT_REGISTRY.isDisplayingLayereds &&
+      !!ALT_REGISTRY.isDisplayingLayereds.find((v) => v.getElement() === document.activeElement);
     hideAll();
     matches.forEach((m) => m.trigger(isTabNavigatingCurrent));
 
@@ -610,22 +618,22 @@ const arrows = [
 ];
 
 export function toggleAlt() {
-  if (ALT_REGISTRY.isDisplayingActions && !ALT_REGISTRY.isBlocked) {
+  if (ALT_REGISTRY.isDisplayingLayereds && !ALT_REGISTRY.isBlocked) {
     // pressing alt again
     hideAll();
     calculateActiveFlow();
   } else if (ALT_REGISTRY.isBlocked) {
     // unblock the registry after pressing alt again
     ALT_REGISTRY.isBlocked = false;
-    ALT_REGISTRY.isDisplayingActions && ALT_REGISTRY.isDisplayingActions.forEach((e) => e.setBlocked(false));
+    ALT_REGISTRY.isDisplayingLayereds && ALT_REGISTRY.isDisplayingLayereds.forEach((e) => e.setBlocked(false));
     ALT_REGISTRY.activeFlow && ALT_REGISTRY.activeFlow.forEach((e) => (e as any).setBlocked && (e as any).setBlocked(false));
-    ALT_REGISTRY.awaitingKeycodes && ALT_REGISTRY.awaitingKeycodes.forEach((e) => (e as any).setBlocked && (e as any).setBlocked(false));
+    ALT_REGISTRY.awaitingLayerKeycodes && ALT_REGISTRY.awaitingLayerKeycodes.forEach((e) => (e as any).setBlocked && (e as any).setBlocked(false));
   } else {
     // pressing alt with nothing displayed
     const activeFlowPriority = calculateActiveFlow();
-    const displayElementsPriority = calculatePriorityOfDisplayElements();
+    const displayElementsPriority = calculatePriorityOfLayereds();
 
-    showDisplayElements(activeFlowPriority > displayElementsPriority ? activeFlowPriority : displayElementsPriority);
+    showLayereds(activeFlowPriority > displayElementsPriority ? activeFlowPriority : displayElementsPriority);
   }
 }
 
@@ -650,7 +658,7 @@ if (typeof document !== "undefined") {
   });
   document.addEventListener("keyup", (e) => {
     if (e.key === "AltGraph") {
-      ALT_REGISTRY.isJumpingThroughGroups = false;
+      ALT_REGISTRY.isJumpingThroughAnchors = false;
       // fallback with control, but unlike alt it will not be able
       // to directly trigger, because there are many shortcuts with control
       // we need to ensure it was not consumed by the alt actioner to make
@@ -682,7 +690,7 @@ if (typeof document !== "undefined") {
     }
 
     if (e.key === "AltGraph") {
-      ALT_REGISTRY.isJumpingThroughGroups = true;
+      ALT_REGISTRY.isJumpingThroughAnchors = true;
       return;
     }
 
@@ -698,7 +706,6 @@ if (typeof document !== "undefined") {
     const isArrow = arrows.includes(keyCode);
     const isAltKey = e.altKey;
     const isTab = keyCode === "tab";
-    const isEscape = keyCode === "escape";
 
     const isPureAltKey = isAltKey && keyCode === "alt";
 
@@ -707,30 +714,21 @@ if (typeof document !== "undefined") {
       e.preventDefault();
     }
 
-    if (isPureAltKey || isTab || isEscape) {
+    if (isPureAltKey || isTab) {
       keyCodeConsumed = e.code;
       keyConsumed = e.key;
 
       if (isPureAltKey) {
         toggleAlt();
-      } else if (isTab || isEscape) {
+      } else if (isTab) {
         const activeFlowPriority = calculateActiveFlow();
 
-        if (!ALT_REGISTRY.isDisplayingActions) {
+        if (!ALT_REGISTRY.isDisplayingLayereds) {
           // pressing tab with nothing displayed
-          const displayElementsPriority = calculatePriorityOfDisplayElements();
+          const displayElementsPriority = calculatePriorityOfLayereds();
 
           if (displayElementsPriority > activeFlowPriority) {
-            if (isEscape) {
-              // don't display just trigger force
-              triggerBasedOn(keyCode, e.shiftKey, () => {
-                e.stopPropagation();
-                e.preventDefault();
-              }, true);
-              return;
-            } else {
-              showDisplayElements(displayElementsPriority);
-            }
+            showLayereds(displayElementsPriority);
           }
         }
 
@@ -739,7 +737,7 @@ if (typeof document !== "undefined") {
           e.preventDefault();
         });
       }
-    } else if (!isArrow && (isAltKey || ALT_REGISTRY.isDisplayingActions)) {
+    } else if (!isArrow && (isAltKey || ALT_REGISTRY.isDisplayingLayereds)) {
       keyCodeConsumed = e.code;
       keyConsumed = e.key;
 
@@ -794,8 +792,12 @@ export class ActualAltBase<P extends IAltBaseProps, S> extends React.PureCompone
     this.containerRef = React.createRef<HTMLElement>();
   }
 
-  public getTabGroup() {
-    return this.props.tabGroup || null;
+  public isUsedInFlow() {
+    return !!this.props.useInFlow;
+  }
+
+  public isTabAnchor() {
+    return this.props.tabAnchor;
   }
 
   public isBlocking() {
@@ -812,15 +814,21 @@ export class ActualAltBase<P extends IAltBaseProps, S> extends React.PureCompone
     return element.tagName === "INPUT" || element.tagName === "TEXTAREA";
   }
 
-  public isCorrectMatchForTabGroup(v: string) {
-    // no tab group to match for, everything matches
-    if (typeof v === "undefined") {
-      return true;
-    } else if (v === null) {
-      // the expected match is for anything that has a tab group
-      return !!this.getTabGroup();
-    } else {
-      return this.getTabGroup() === v;
+  /**
+   * when another alt is blocking this triggers
+   */
+  public setBlocked(v: boolean) {
+
+  }
+
+  public componentDidUpdate(prevProps: IAltBaseProps) {
+    if (
+      this.props.disabled !== prevProps.disabled ||
+      this.props.priority !== prevProps.priority ||
+      this.props.useInFlow !== prevProps.useInFlow
+    ) {
+      this.unregister(prevProps);
+      this.register();
     }
   }
 
@@ -923,11 +931,12 @@ export class ActualAltBase<P extends IAltBaseProps, S> extends React.PureCompone
   }
 
   public register(props: IAltBaseProps = this.props) {
-    if (!ALT_REGISTRY.flow.find((e) => e === this)) {
-      ALT_REGISTRY.flow.push(this);
+    if (!ALT_REGISTRY.all.find((e) => e === this)) {
+      ALT_REGISTRY.all.push(this);
     }
 
     if (
+      props.useInFlow &&
       ALT_REGISTRY.activeFlow &&
       ALT_REGISTRY.activeFlowPriority === (props.priority || 0) &&
       !ALT_REGISTRY.activeFlow.includes(this)
@@ -936,16 +945,37 @@ export class ActualAltBase<P extends IAltBaseProps, S> extends React.PureCompone
       ALT_REGISTRY.activeFlow.push(this);
       ALT_REGISTRY.activeFlow.sort((a, b) => a.isBefore(b) ? -1 : 1);
       ALT_REGISTRY.activeFlowFocusIndex = ALT_REGISTRY.activeFlow.findIndex((e) => e === currentFocused);
+
+      return true;
+    } else if (
+      !props.useInFlow &&
+      ALT_REGISTRY.isDisplayingLayereds &&
+      ALT_REGISTRY.displayedLayeredPriority === (props.priority || 0) &&
+      !ALT_REGISTRY.isDisplayingLayereds.includes(this)
+    ) {
+      const currentFocused = ALT_REGISTRY.isDisplayingLayereds[ALT_REGISTRY.displayedLayeredFocusIndex];
+      ALT_REGISTRY.isDisplayingLayereds.push(this);
+      ALT_REGISTRY.isDisplayingLayereds.sort((a, b) => a.isBefore(b) ? -1 : 1);
+      ALT_REGISTRY.displayedLayeredFocusIndex = ALT_REGISTRY.isDisplayingLayereds.findIndex((e) => e === currentFocused);
+
+      if (!ALT_REGISTRY.awaitingLayerKeycodes) {
+        calculateLayereds(ALT_REGISTRY.displayedLayeredPriority, false);
+      }
+
+      return true;
     }
+
+    return false;
   }
 
   public unregister(props: IAltBaseProps = this.props) {
-    const index = ALT_REGISTRY.flow.findIndex((e) => e === this);
+    const index = ALT_REGISTRY.all.findIndex((e) => e === this);
     if (index !== -1) {
-      ALT_REGISTRY.flow.splice(index, 1);
+      ALT_REGISTRY.all.splice(index, 1);
     }
 
     if (
+      props.useInFlow &&
       ALT_REGISTRY.activeFlow &&
       ALT_REGISTRY.activeFlowPriority === (props.priority || 0) &&
       ALT_REGISTRY.activeFlow.includes(this)
@@ -956,6 +986,29 @@ export class ActualAltBase<P extends IAltBaseProps, S> extends React.PureCompone
         ALT_REGISTRY.activeFlow.splice(index, 1);
       }
       ALT_REGISTRY.activeFlowFocusIndex = ALT_REGISTRY.activeFlow.findIndex((e) => e === currentFocused);
+    } else if (
+      !props.useInFlow &&
+      ALT_REGISTRY.isDisplayingLayereds &&
+      ALT_REGISTRY.displayedLayeredPriority === (props.priority || 0) &&
+      ALT_REGISTRY.isDisplayingLayereds.includes(this)
+    ) {
+      const currentFocused = ALT_REGISTRY.isDisplayingLayereds[ALT_REGISTRY.displayedLayeredFocusIndex];
+      ALT_REGISTRY.isDisplayingLayereds.findIndex((e) => e === this);
+      if (index !== -1) {
+        ALT_REGISTRY.isDisplayingLayereds.splice(index, 1);
+      }
+      ALT_REGISTRY.displayedLayeredFocusIndex = ALT_REGISTRY.isDisplayingLayereds.findIndex((e) => e === currentFocused);
+    }
+
+    if (ALT_REGISTRY.awaitingLayerKeycodes) {
+      const index3 = ALT_REGISTRY.awaitingLayerKeycodes.findIndex((e) => e === (this as any));
+      if (index3 !== -1) {
+        // this can be undefined because of -1
+        const currentSelectedElem = ALT_REGISTRY.awaitingLayerKeycodes[ALT_REGISTRY.awaitingLayerKeycodesFocusIndex];
+        ALT_REGISTRY.awaitingLayerKeycodes.splice(index3, 1);
+        // but we are okay with that because that will give a -1 back here
+        ALT_REGISTRY.awaitingLayerKeycodesFocusIndex = ALT_REGISTRY.awaitingLayerKeycodes.findIndex((e) => e === currentSelectedElem);
+      }
     }
   }
 
@@ -985,9 +1038,9 @@ export class ActualAltBase<P extends IAltBaseProps, S> extends React.PureCompone
   componentWillUnmount() {
     this.unregister();
 
-    const isDisplayingActions = ALT_REGISTRY.isDisplayingActions && ALT_REGISTRY.isDisplayingActions.length;
-    const isTabNavigatingCurrent = ALT_REGISTRY.isDisplayingActions &&
-      !!ALT_REGISTRY.isDisplayingActions.find((v) => v.getElement() === document.activeElement);
+    const isDisplayingLayereds = ALT_REGISTRY.isDisplayingLayereds && ALT_REGISTRY.isDisplayingLayereds.length;
+    const isTabNavigatingCurrent = ALT_REGISTRY.isDisplayingLayereds &&
+      !!ALT_REGISTRY.isDisplayingLayereds.find((v) => v.getElement() === document.activeElement);
 
     if (this.props.hideAllIfUnmount || this.props.triggerAltIfUnmountAndAltActive) {
       hideAll();
@@ -1001,20 +1054,20 @@ export class ActualAltBase<P extends IAltBaseProps, S> extends React.PureCompone
       // where it used to be
 
       // so let's get the priority we are now
-      const expectedPriority = calculatePriorityOfDisplayElements(true);
+      const expectedPriority = calculatePriorityOfLayereds(true);
 
       // if we are meant to trigger the display anyway
-      if (this.props.triggerAltIfUnmountAndAltActive && isDisplayingActions) {
+      if (this.props.triggerAltIfUnmountAndAltActive && isDisplayingLayereds) {
         // then we do so and we get what we are displaying
-        showDisplayElements(expectedPriority);
+        showLayereds(expectedPriority);
 
         // something else must have focused an element that is part of our flow
         // or whatnot, for example, an autofocused element, this was not us
-        const somethingAlreadyActive = ALT_REGISTRY.isDisplayingActions.find((a) => a.getElement() === document.activeElement);
+        const somethingAlreadyActive = ALT_REGISTRY.isDisplayingLayereds.find((a) => a.getElement() === document.activeElement);
         if (somethingAlreadyActive) {
           // must check if it's a blocking input
           ALT_REGISTRY.isBlocked = somethingAlreadyActive.isBlocking();
-          ALT_REGISTRY.isDisplayingActions.forEach((e) => e.setBlocked(ALT_REGISTRY.isBlocked));
+          ALT_REGISTRY.isDisplayingLayereds.forEach((e) => e.setBlocked(ALT_REGISTRY.isBlocked));
         } else if (isTabNavigatingCurrent) {
           // because we were tab navigating before we want to tab navigate
           // the new cycle too and ensure something is selected
@@ -1038,14 +1091,14 @@ export class ActualAltReactioner extends ActualAltBase<IAltReactionerProps, IAct
     this.triggerAltCycle = this.triggerAltCycle.bind(this);
   }
 
-  public isUsedInFlow() {
-    return !!this.props.useInFlow;
-  }
-
   public setBlocked(blocked: boolean) {
     this.setState({
       blocked,
     })
+  }
+
+  public getReactionKey() {
+    return this.props.reactionKey;
   }
 
   public getElement() {
@@ -1076,89 +1129,13 @@ export class ActualAltReactioner extends ActualAltBase<IAltReactionerProps, IAct
     }
   }
 
-  public unregister(props: IAltReactionerProps = this.props) {
-    if (props.useInFlow) {
-      super.unregister(props);
-    }
-
-    if (ALT_REGISTRY.actions[props.reactionKey]) {
-      const index = ALT_REGISTRY.actions[props.reactionKey].findIndex((e) => e === this);
-      if (index !== -1) {
-        ALT_REGISTRY.actions[props.reactionKey].splice(index, 1);
-      }
-    }
-
-    // HANDLE DISSAPEARING ELEMENTS IN THE MIDDLE OF THE ACTION
-    // THIS SHOULDNT HAPPEN BUT CAN HAPPEN IF MISDESIGNED
-    // WHICH CAN CAUSE AN ISSUE WHEN THE REACTIONER TRIES TO FOCUS
-    // THINGS THAT DONT EXIST
-    if (ALT_REGISTRY.isDisplayingActions) {
-      const index2 = ALT_REGISTRY.isDisplayingActions.findIndex((e) => e === this);
-      if (index2 !== -1) {
-        // this can be undefined because of -1
-        const currentSelectedElem = ALT_REGISTRY.isDisplayingActions[ALT_REGISTRY.displayedActionsFocusIndex];
-        ALT_REGISTRY.isDisplayingActions.splice(index2, 1);
-        // but we are okay with that because that will give a -1 back here
-        ALT_REGISTRY.displayedActionsFocusIndex = ALT_REGISTRY.isDisplayingActions.findIndex((e) => e === currentSelectedElem);
-      }
-    }
-
-    if (ALT_REGISTRY.awaitingKeycodes) {
-      const index3 = ALT_REGISTRY.awaitingKeycodes.findIndex((e) => e === this);
-      if (index3 !== -1) {
-        // this can be undefined because of -1
-        const currentSelectedElem = ALT_REGISTRY.awaitingKeycodes[ALT_REGISTRY.awaitingKeycodesFocusIndex];
-        ALT_REGISTRY.awaitingKeycodes.splice(index3, 1);
-        // but we are okay with that because that will give a -1 back here
-        ALT_REGISTRY.awaitingKeycodesFocusIndex = ALT_REGISTRY.awaitingKeycodes.findIndex((e) => e === currentSelectedElem);
-      }
-    }
-  }
-
-  public register(props: IAltReactionerProps = this.props) {
-    if (props.useInFlow) {
-      super.register(props);
-    }
-
-    if (!ALT_REGISTRY.actions[props.reactionKey]) {
-      ALT_REGISTRY.actions[props.reactionKey] = [this];
-    } else if (!ALT_REGISTRY.actions[props.reactionKey].includes(this)) {
-      ALT_REGISTRY.actions[props.reactionKey].push(this);
-    }
-
-    if (
-      ALT_REGISTRY.isDisplayingActions &&
-      !ALT_REGISTRY.awaitingKeycodes &&
-      ALT_REGISTRY.displayedActionsPriority === (props.priority || 0) &&
-      !ALT_REGISTRY.isDisplayingActions.includes(this)
-    ) {
-      const currentFocused = ALT_REGISTRY.isDisplayingActions[ALT_REGISTRY.displayedActionsFocusIndex];
-      ALT_REGISTRY.isDisplayingActions.push(this);
-      ALT_REGISTRY.isDisplayingActions.sort((a, b) => a.isBefore(b) ? -1 : 1);
-      ALT_REGISTRY.displayedActionsFocusIndex = ALT_REGISTRY.isDisplayingActions.findIndex((e) => e === currentFocused);
-
-      if (!this.isDisabled()) {
-        this.display();
-        this.setBlocked(ALT_REGISTRY.isBlocked);
-      }
-    }
-  }
-
   componentDidUpdate(prevProps: IAltReactionerProps) {
+    super.componentDidUpdate(prevProps);
+
     if (this.state.displayed && this.props.disabled) {
       this.setState({
         displayed: false,
       });
-    }
-
-    if (
-      this.props.reactionKey !== prevProps.reactionKey ||
-      this.props.disabled !== prevProps.disabled ||
-      this.props.priority !== prevProps.priority ||
-      this.props.useInFlow !== prevProps.useInFlow
-    ) {
-      this.unregister(prevProps);
-      this.register();
     }
   }
 
@@ -1203,19 +1180,19 @@ export class ActualAltReactioner extends ActualAltBase<IAltReactionerProps, IAct
   }
 
   public triggerAltCycle(isTabNavigatingCurrent: boolean) {
-    showDisplayElements(calculatePriorityOfDisplayElements(true));
+    showLayereds(calculatePriorityOfLayereds(true));
     // something else must have focused an element that is part of our flow
     // or whatnot, for example, an autofocused element
     const somethingAlreadyActive =
-      ALT_REGISTRY.isDisplayingActions &&
-      ALT_REGISTRY.isDisplayingActions.find((a) => a.getElement() === document.activeElement);
+      ALT_REGISTRY.isDisplayingLayereds &&
+      ALT_REGISTRY.isDisplayingLayereds.find((a) => a.getElement() === document.activeElement);
 
     if (
       somethingAlreadyActive
     ) {
       // must check if it's a blocking input
       ALT_REGISTRY.isBlocked = somethingAlreadyActive.isBlocking();
-      ALT_REGISTRY.isDisplayingActions.forEach((e) => e.setBlocked(ALT_REGISTRY.isBlocked));
+      ALT_REGISTRY.isDisplayingLayereds.forEach((e) => e.setBlocked(ALT_REGISTRY.isBlocked));
       // otherwise if we are not we can go ahead and trigger tab
     } else if (isTabNavigatingCurrent) {
       // because we were tab navigating before we want to tab navigate

@@ -73,7 +73,6 @@ export function RecoverDialog(props: IRecoverDialogProps) {
 	return (
 		<ItemProvider
 			itemDefinition="user"
-			disableExternalChecks={true}
 			properties={["email", "phone"]}
 		>
 			<Reader id="phone">

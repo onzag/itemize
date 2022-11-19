@@ -39,7 +39,7 @@ interface ISearchLoaderWithPaginationProps {
    * Whether to disable the external checks for the item definition
    * results provider props
    */
-  disableExternalChecks?: boolean;
+  enableExternalChecks?: boolean;
   /**
    * The static state for the children item definition, TOTAL for
    * basically not even asking for feedback (useful when the search was traditional)
@@ -81,7 +81,7 @@ export function SearchLoaderWithPagination(props: ISearchLoaderWithPaginationPro
       localState={props.localState}
       onOutOfBounds={props.onTotalOutOfBounds}
       static={props.static}
-      disableExternalChecks={props.disableExternalChecks}
+      enableExternalChecks={props.enableExternalChecks}
     >
       {(arg) => {
         const handlePageChange = (e: React.ChangeEvent, value: number) => {

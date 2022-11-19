@@ -3,9 +3,9 @@
  * @module
  */
 
-import { IGQLArgs, IGQLSearchRecord } from "../../../../gql-querier";
+import { IGQLArgs, IGQLSearchRecord, IGQLValue } from "../../../../gql-querier";
 import { IDBPDatabase } from "idb";
-import { ICacheDB, ICacheMatchType, QUERIES_TABLE_NAME } from "./cache.worker";
+import { fixFilesURLAt, ICacheDB, ICacheMatchType, QUERIES_TABLE_NAME } from "./cache.worker";
 import { PREFIX_GET, IOrderByRuleType } from "../../../../constants";
 import Root from "../../../../base/Root";
 import ItemDefinition from "../../../../base/Root/Module/ItemDefinition";
@@ -69,9 +69,11 @@ export async function search(
   searchRecords: IGQLSearchRecord[],
   searchArgs: IGQLArgs,
   returnSourceResults: boolean,
+  noLimitOffset: boolean,
 ): Promise<
   {
     filteredRecords: IGQLSearchRecord[];
+    filteredResults: IGQLValue[];
     sourceResults: ICacheMatchType[];
     count: number;
   }
@@ -87,7 +89,9 @@ export async function search(
         const queryIdentifier = `${PREFIX_GET}${result.type}.${result.id}.${result.version || ""}`;
         const value = await db.get(QUERIES_TABLE_NAME, queryIdentifier);
 
-        if (returnSourceResults) sourceResults[index] = value;
+        if (returnSourceResults) {
+          sourceResults[index] = value
+        };
 
         // so no value, this is odd as this is considered data corruption because before coming
         // here all search records must have been ensured
@@ -117,7 +121,7 @@ export async function search(
   )).filter((r) => !!r);
 
   // so now we got to order by
-  const orderBy: IOrderByRuleType = gqlArgClearup(searchArgs.order_by as IOrderByRuleType) || {};
+  const orderBy: IOrderByRuleType = gqlArgClearup(searchArgs.order_by as IOrderByRuleType) || {};
   const orderBySorted = Object.keys(orderBy).map((orderByProperty: string) => {
     return {
       property: orderByProperty,
@@ -134,8 +138,8 @@ export async function search(
       newSearchRecords = newSearchRecords.sort((a, b) => {
         // remember if there's no value.DATA or the item is null or whatever
         // it would have never gotten here
-        const aValue = a.value.DATA[sortRule.property];
-        const bValue = b.value.DATA[sortRule.property];
+        const aValue = a.searchResult.DATA[sortRule.property];
+        const bValue = b.searchResult.DATA[sortRule.property];
 
         // however the value itself can be null
         if (aValue === bValue) {
@@ -164,8 +168,8 @@ export async function search(
     newSearchRecords = newSearchRecords.sort((a, b) => {
       // remember if there's no value.DATA or the item is null or whatever
       // it would have never gotten here
-      const aValue = a.value.DATA[sortRule.property];
-      const bValue = b.value.DATA[sortRule.property];
+      const aValue = (a.searchResult as any).DATA[sortRule.property];
+      const bValue = (b.searchResult as any).DATA[sortRule.property];
 
       // we need our registry
       const itemDefinition = rootProxy.registry[a.searchRecord.type] as ItemDefinition;
@@ -195,9 +199,10 @@ export async function search(
   });
 
   let filteredRecords = newSearchRecords.map((r) => r.searchRecord);
+  let filteredResults = newSearchRecords.map((r) => r.searchResult);
   const count = filteredRecords.length;
 
-  if (searchArgs.offset !== 0 || filteredRecords.length > searchArgs.limit) {
+  if (!noLimitOffset && (searchArgs.offset !== 0 || filteredRecords.length > searchArgs.limit)) {
     // apply limit and offset
     filteredRecords = filteredRecords.slice(
       searchArgs.offset as number || 0,
@@ -209,6 +214,7 @@ export async function search(
   return {
     filteredRecords,
     sourceResults,
+    filteredResults,
     count,
   };
 }
@@ -222,13 +228,13 @@ interface IGQLSearchRecordChecked {
    */
   shouldBeIncluded: boolean;
   /**
-   * The value of the record (aka its searchResult)
-   */
-  value: any;
-  /**
    * The search record itself
    */
   searchRecord: IGQLSearchRecord;
+  /**
+   * The search result
+   */
+  searchResult: IGQLValue;
 }
 
 /**
@@ -242,16 +248,31 @@ interface IGQLSearchRecordChecked {
 async function checkOne(
   rootProxy: Root,
   searchRecord: IGQLSearchRecord,
-  value: any,
+  value: IGQLValue,
   searchArgs: any,
 ): Promise<IGQLSearchRecordChecked> {
   // so by default we included
   let shouldBeIncluded = true;
 
+  // we will always process the files, regardless on whether is included or not because
+  // we may be returning the source results
+  const idef = rootProxy.registry[(value as any).type] as ItemDefinition;
+  if (idef && (value as any).id) {
+    idef.getAllPropertyDefinitionsAndExtensions().forEach((p) => {
+      fixFilesURLAt(value, idef, null, p, (value as any).id, (value as any).version || null);
+    });
+  
+    idef.getAllIncludes().forEach((i) => {
+      i.getSinkingProperties().forEach((sp) => {
+        fixFilesURLAt(value, idef, i, sp, (value as any).id, (value as any).version || null);
+      });
+    });
+  }
+
   // if there is no value, aka the item has been deleted
   if (!value) {
     shouldBeIncluded = false;
-  // if there is no DATA aka the item is blocked
+    // if there is no DATA aka the item is blocked
   } else if (!value.DATA) {
     shouldBeIncluded = false;
   } else if (searchArgs.types && !searchArgs.types.includes(searchRecord.type)) {
@@ -289,7 +310,7 @@ async function checkOne(
         // if we don't expect anything then this is basically true
         if (typeof expectedIncludeExclusionState === "undefined") {
           return true;
-        // if we don't spect any state, but rather an specific one, and it doesn't match we return null
+          // if we don't spect any state, but rather an specific one, and it doesn't match we return null
         } else if (
           expectedIncludeExclusionState !== "ANY" &&
           appliedIncludeExclusionState !== expectedIncludeExclusionState
@@ -322,7 +343,7 @@ async function checkOne(
   }
   return {
     shouldBeIncluded,
-    value,
     searchRecord,
+    searchResult: value,
   };
 }

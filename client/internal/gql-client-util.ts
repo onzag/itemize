@@ -578,7 +578,7 @@ function getQueryArgsFor(
  * @param fields the fields, unflattened we are working with
  * @param cacheStore whether we should cache store the output
  */
-function storeAndCombineStorageValuesFor(
+async function storeAndCombineStorageValuesFor(
   itemDefinition: ItemDefinition,
   id: string,
   version: string,
@@ -588,6 +588,7 @@ function storeAndCombineStorageValuesFor(
 ) {
   let mergedValue: IGQLValue = value;
   let mergedFields: IGQLRequestFields = fields;
+  let cached: boolean = false;
 
   // The combining only happens if the value is found
   if (value) {
@@ -620,7 +621,7 @@ function storeAndCombineStorageValuesFor(
 
   const qualifiedName = itemDefinition.getQualifiedPathName();
 
-  if (cacheStore) {
+  if (cacheStore && CacheWorkerInstance.isSupported) {
     // in the case of delete, we just cache nulls also
     // the same applies in the case of get and a not found
     // was the output
@@ -628,7 +629,7 @@ function storeAndCombineStorageValuesFor(
       // we are here guaranteed that if we have retrieved something from
       // the server in an unique value way it is not a module and it's not
       // a search mode
-      CacheWorkerInstance.instance.setCachedValue(
+      cached = await CacheWorkerInstance.instance.setCachedValue(
         PREFIX_GET + qualifiedName,
         id,
         version || null,
@@ -636,7 +637,7 @@ function storeAndCombineStorageValuesFor(
         null,
       );
     } else {
-      CacheWorkerInstance.instance.mergeCachedValue(
+      cached = await CacheWorkerInstance.instance.mergeCachedValue(
         PREFIX_GET + qualifiedName, id, version, value, mergedFields);
     }
   }
@@ -644,6 +645,7 @@ function storeAndCombineStorageValuesFor(
   return {
     value: mergedValue,
     fields: mergedFields,
+    cached,
   }
 }
 
@@ -837,7 +839,7 @@ export async function runGetQueryFor(
   const value = (gqlValue.data && gqlValue.data[queryName]) || null;
 
   if (!error) {
-    const mergedResults = storeAndCombineStorageValuesFor(
+    const mergedResults = await storeAndCombineStorageValuesFor(
       arg.itemDefinition,
       arg.id,
       arg.version || null,
@@ -849,7 +851,7 @@ export async function runGetQueryFor(
       error,
       value: mergedResults.value,
       memoryCached: false,
-      cached: false,
+      cached: mergedResults.cached,
       getQueryFields: mergedResults.fields,
     }
   } else if (error.code === ENDPOINT_ERRORS.CANT_CONNECT) {
@@ -1073,7 +1075,7 @@ export async function runAddQueryFor(
   const value = (gqlValue.data && gqlValue.data[queryName]) || null;
 
   if (!error) {
-    const mergedResults = storeAndCombineStorageValuesFor(
+    const mergedResults = await storeAndCombineStorageValuesFor(
       arg.itemDefinition,
       value.id as string,
       (value.version as string) || null,
@@ -1187,7 +1189,7 @@ export async function runEditQueryFor(
   const value = (gqlValue.data && gqlValue.data[queryName]) || null;
 
   if (!error) {
-    const mergedResults = storeAndCombineStorageValuesFor(
+    const mergedResults = await storeAndCombineStorageValuesFor(
       arg.itemDefinition,
       arg.id,
       arg.version || null,
@@ -1253,8 +1255,10 @@ interface ISearchQueryArg {
 }
 
 interface IRunSearchQueryArg extends ISearchQueryArg {
-  cachePolicy: "by-owner" | "by-parent" | "by-owner-and-parent" | "by-property" | "none",
-  cacheStoreMetadata?: any,
+  cachePolicy: "by-owner" | "by-parent" | "by-owner-and-parent" | "by-property" | "none";
+  cacheNoLimitOffset?: boolean;
+  cacheDoNotFallback?: boolean;
+  cacheStoreMetadata?: any;
   cacheStoreMetadataMismatchAction?: ISearchCacheMetadataMismatchAction;
   trackedProperty?: string;
   waitAndMerge?: boolean;
@@ -1267,14 +1271,15 @@ interface IRunSearchQuerySearchOptions {
 }
 
 interface IRunSearchQueryResult {
-  error: EndpointErrorType,
-  results?: IGQLValue[],
-  records: IGQLSearchRecord[],
-  count: number,
-  limit: number,
-  offset: number,
-  lastModified: string,
-  highlights: IElasticHighlightRecordInfo,
+  error: EndpointErrorType;
+  results?: IGQLValue[];
+  records: IGQLSearchRecord[];
+  count: number;
+  limit: number;
+  offset: number;
+  lastModified: string;
+  highlights: IElasticHighlightRecordInfo;
+  cached: boolean;
 }
 
 export function getSearchArgsFor(
@@ -1420,8 +1425,8 @@ export async function runSearchQueryFor(
   const standardCounterpart = arg.itemDefinition.getStandardCounterpart();
   const standardCounterpartModule = standardCounterpart.getParentModule();
   const standardCounterpartQualifiedName = (standardCounterpart.isExtensionsInstance() ?
-      standardCounterpart.getParentModule().getQualifiedPathName() :
-      standardCounterpart.getQualifiedPathName());
+    standardCounterpart.getParentModule().getQualifiedPathName() :
+    standardCounterpart.getQualifiedPathName());
 
   const queryName = (arg.traditional ? PREFIX_TRADITIONAL_SEARCH : PREFIX_SEARCH) + standardCounterpartQualifiedName;
 
@@ -1432,6 +1437,12 @@ export async function runSearchQueryFor(
   let lastModified: string = null;
 
   let gqlValue: IGQLEndpointValue;
+  let cached: boolean = false;
+  let usesCacheWorker: boolean = (
+    // will use cache worker
+    arg.cachePolicy !== "none" &&
+    CacheWorkerInstance.isSupported
+  );
   // if we are in a search with
   // a cache policy then we should be able
   // to run the search within the worker as
@@ -1440,13 +1451,8 @@ export async function runSearchQueryFor(
   // for that we would totally relegate the search functionality
   // and even requesting the server to the cache worker, it will take
   // as much time as it is necessary
-  if (
-    arg.cachePolicy !== "none" &&
-    CacheWorkerInstance.isSupported
-  ) {
-    if (arg.traditional) {
-      throw new Error("Cache policy is set yet search mode is traditional");
-    } else if ((arg.cachePolicy === "by-owner" || arg.cachePolicy === "by-owner-and-parent") && !arg.createdBy || arg.createdBy === UNSPECIFIED_OWNER) {
+  if (usesCacheWorker) {
+    if ((arg.cachePolicy === "by-owner" || arg.cachePolicy === "by-owner-and-parent") && !arg.createdBy || arg.createdBy === UNSPECIFIED_OWNER) {
       throw new Error("Cache policy is by-owner yet there's no creator specified");
     } else if ((arg.cachePolicy === "by-parent" || arg.cachePolicy === "by-owner-and-parent") && (!arg.parentedBy || !arg.parentedBy.id)) {
       throw new Error("Cache policy is by-parent yet there's no parent specified with a specific id");
@@ -1456,14 +1462,20 @@ export async function runSearchQueryFor(
       throw new Error("Cache policy is by-property yet there's no tracked property set");
     }
 
+    // let's assume we succeed for now and flip the value
+    // if we happen to fail down the line
+    cached = true;
+    const queryNameForCacheWorker = PREFIX_SEARCH + standardCounterpartQualifiedName;
+
     let cacheWorkerGivenSearchValue = await CacheWorkerInstance.instance.runCachedSearch(
-      queryName,
+      queryNameForCacheWorker,
       searchArgs,
       PREFIX_GET_LIST + standardCounterpartQualifiedName,
       arg.token,
       arg.language.split("-")[0],
       arg.fields,
-      arg.cachePolicy,
+      arg.cachePolicy as any,
+      arg.cacheNoLimitOffset,
       arg.trackedProperty,
       standardCounterpartModule.getMaxSearchRecords(),
       standardCounterpartModule.getMaxSearchResults(),
@@ -1472,151 +1484,190 @@ export async function runSearchQueryFor(
       false,
     );
 
-    // we are now going to check for metadata used in
-    // the search, by default there's no mismatch
-    // and metadata is not written
-    let metadataWasMismatch: boolean = false;
-    let shouldWriteMetadata: boolean = false;
+    // failed to retrieve indexed db, something happened
+    if (!cacheWorkerGivenSearchValue) {
+      cached = false;
+      usesCacheWorker = false;
+    } else {
+      // we are now going to check for metadata used in
+      // the search, by default there's no mismatch
+      // and metadata is not written
+      let metadataWasMismatch: boolean = false;
+      let shouldWriteMetadata: boolean = false;
 
-    // now if we have a mismatch rule
-    if (
-      arg.cacheStoreMetadataMismatchAction &&
-      !cacheWorkerGivenSearchValue.gqlValue.errors
-    ) {
-      // let's get our current metadata
-      const currentMetadata = await CacheWorkerInstance.instance.readSearchMetadata(
-        queryName,
-        searchArgs,
-        arg.cachePolicy,
-        arg.trackedProperty,
-        arg.createdBy,
-        arg.parentedBy.itemDefinition.getQualifiedPathName(),
-        arg.parentedBy.id,
-        arg.parentedBy.version || null,
-      );
+      // now if we have a mismatch rule
+      if (
+        arg.cacheStoreMetadataMismatchAction &&
+        !cacheWorkerGivenSearchValue.gqlValue.errors
+      ) {
+        // let's get our current metadata
+        const currentMetadata = await CacheWorkerInstance.instance.readSearchMetadata(
+          queryNameForCacheWorker,
+          searchArgs,
+          arg.cachePolicy as any,
+          arg.trackedProperty,
+          arg.createdBy,
+          arg.parentedBy.itemDefinition.getQualifiedPathName(),
+          arg.parentedBy.id,
+          arg.parentedBy.version || null,
+        );
 
-      // we can specify these actions
-      let redoSearch: boolean = false;
-      let refetchAllRecords: boolean = false;
-      let refetchSpecificRecords: IGQLSearchRecord[] = null;
+        // we can specify these actions
+        let redoSearch: boolean = false;
+        let refetchAllRecords: boolean = false;
+        let refetchSpecificRecords: IGQLSearchRecord[] = null;
 
-      // if we have a value there and it differs
-      if (currentMetadata && !equals(currentMetadata.value, arg.cacheStoreMetadata, { strict: true })) {
-        metadataWasMismatch = true;
+        // if we have a value there and it differs
+        if (currentMetadata && !equals(currentMetadata.value, arg.cacheStoreMetadata, { strict: true })) {
+          // it was mismatched
+          metadataWasMismatch = true;
 
-        if (arg.cacheStoreMetadataMismatchAction.action === "REDO_SEARCH") {
-          redoSearch = true;
-          refetchAllRecords = true;
-        } else {
-          refetchAllRecords = false;
-          refetchSpecificRecords = cacheWorkerGivenSearchValue.sourceResults.filter((r) => {
-            return checkMismatchCondition(
-              arg.cacheStoreMetadataMismatchAction.recordsRefetchCondition,
-              r,
-              currentMetadata,
-              arg.cacheStoreMetadata,
-            );
-          }).map((r, index) => {
-            return cacheWorkerGivenSearchValue.sourceRecords[index];
-          });
+          // so what action we have here, redo search
+          if (arg.cacheStoreMetadataMismatchAction.action === "REDO_SEARCH") {
+            // we will do that
+            redoSearch = true;
+            refetchAllRecords = true;
+          } else if (arg.cacheStoreMetadataMismatchAction.action === "REFETCH_RECORDS") {
+            // otherwise it must be refetch records, and we need to know which records
+            refetchAllRecords = false;
+            refetchSpecificRecords = cacheWorkerGivenSearchValue.sourceResults.filter((r) => {
+              // and for that we will filter from the source results
+              return checkMismatchCondition(
+                arg.cacheStoreMetadataMismatchAction.recordsRefetchCondition,
+                r,
+                currentMetadata,
+                arg.cacheStoreMetadata,
+              );
+            }).map((r, index) => {
+              // and we get the records from that based on the index
+              return cacheWorkerGivenSearchValue.sourceRecords[index];
+            });
+          }
+
+          // and now whether to rewrite the metadata
+          if (
+            arg.cacheStoreMetadataMismatchAction.rewrite === "IF_CONDITION_SUCCEEDS" &&
+            (redoSearch || refetchAllRecords || refetchSpecificRecords.length)
+          ) {
+            shouldWriteMetadata = true;
+          } else if (arg.cacheStoreMetadataMismatchAction.rewrite === "ALWAYS") {
+            // otherwise it must be ALWAYS
+            shouldWriteMetadata = true;
+          }
+        } else if (!currentMetadata) {
+          // it's missing so of course it doesn't match
+          metadataWasMismatch = true;
+          shouldWriteMetadata = true;
         }
 
-        if (
-          arg.cacheStoreMetadataMismatchAction.rewrite === "IF_CONDITION_SUCCEEDS" &&
-          (redoSearch || refetchAllRecords || refetchSpecificRecords.length)
-        ) {
-          shouldWriteMetadata = true;
-        } else {
-          shouldWriteMetadata = true;
+        if (redoSearch || refetchAllRecords || (refetchSpecificRecords && refetchSpecificRecords.length)) {
+          // and now we pass to the cache worker again
+          cacheWorkerGivenSearchValue = await CacheWorkerInstance.instance.runCachedSearch(
+            queryNameForCacheWorker,
+            searchArgs,
+            PREFIX_GET_LIST + standardCounterpartQualifiedName,
+            arg.token,
+            arg.language.split("-")[0],
+            arg.fields,
+            arg.cachePolicy as any,
+            arg.cacheNoLimitOffset,
+            arg.trackedProperty,
+            standardCounterpartModule.getMaxSearchRecords(),
+            standardCounterpartModule.getMaxSearchResults(),
+            false,
+            redoSearch,
+            refetchSpecificRecords || refetchAllRecords,
+          );
         }
-      } else if (!currentMetadata) {
-        // it's missing so of course it doesn't match
-        metadataWasMismatch = true;
-        shouldWriteMetadata = true;
       }
 
-      if (redoSearch || refetchAllRecords || (refetchSpecificRecords && refetchSpecificRecords.length)) {
-        cacheWorkerGivenSearchValue = await CacheWorkerInstance.instance.runCachedSearch(
-          queryName,
+      if (
+        arg.cacheStoreMetadata &&
+        cacheWorkerGivenSearchValue &&
+        !cacheWorkerGivenSearchValue.gqlValue.errors &&
+        metadataWasMismatch &&
+        shouldWriteMetadata
+      ) {
+        await CacheWorkerInstance.instance.writeSearchMetadata(
+          queryNameForCacheWorker,
           searchArgs,
-          PREFIX_GET_LIST + standardCounterpartQualifiedName,
-          arg.token,
-          arg.language.split("-")[0],
-          arg.fields,
-          arg.cachePolicy,
+          arg.cachePolicy as any,
           arg.trackedProperty,
-          standardCounterpartModule.getMaxSearchRecords(),
-          standardCounterpartModule.getMaxSearchResults(),
-          false,
-          redoSearch,
-          refetchSpecificRecords || refetchAllRecords,
+          arg.createdBy,
+          arg.parentedBy.itemDefinition.getQualifiedPathName(),
+          arg.parentedBy.id,
+          arg.parentedBy.version || null,
+          arg.cacheStoreMetadata,
         );
       }
-    }
 
-    if (
-      arg.cacheStoreMetadata &&
-      !cacheWorkerGivenSearchValue.gqlValue.errors &&
-      metadataWasMismatch &&
-      shouldWriteMetadata
-    ) {
-      await CacheWorkerInstance.instance.writeSearchMetadata(
-        queryName,
-        searchArgs,
-        arg.cachePolicy,
-        arg.trackedProperty,
-        arg.createdBy,
-        arg.parentedBy.itemDefinition.getQualifiedPathName(),
-        arg.parentedBy.id,
-        arg.parentedBy.version || null,
-        arg.cacheStoreMetadata,
-      );
-    }
+      if (!cacheWorkerGivenSearchValue) {
+        cached = false;
+        usesCacheWorker = false;
+      } else {
+        // cached depends on whether we got no errors
+        // errors indicate it didn't cache
+        cached = !cacheWorkerGivenSearchValue.gqlValue.errors;
 
-    // last record date of the given record
-    // might be null, if no records
-    lastModified = cacheWorkerGivenSearchValue.lastModified;
+        // last record date of the given record
+        // might be null, if no records
+        lastModified = cacheWorkerGivenSearchValue.lastModified;
 
-    // note that this value doesn't contain the count, it contains
-    // the limit and the offset but not the count that is because
-    // the count is considered irrelevant for these cache values
-    gqlValue = cacheWorkerGivenSearchValue.gqlValue;
-    if (gqlValue && gqlValue.data) {
-      if (cacheWorkerGivenSearchValue.dataMightBeStale && !searchOptions.preventCacheStaleFeeback) {
-        if (arg.cachePolicy === "by-owner") {
-          searchOptions.remoteListener.requestOwnedSearchFeedbackFor({
-            qualifiedPathName: standardCounterpartQualifiedName,
-            createdBy: arg.createdBy,
-            lastModified: cacheWorkerGivenSearchValue.lastModified,
-          });
-        } else if (arg.cachePolicy === "by-owner-and-parent") {
-          searchOptions.remoteListener.requestOwnedParentedSearchFeedbackFor({
-            createdBy: arg.createdBy,
-            qualifiedPathName: standardCounterpartQualifiedName,
-            parentType: arg.parentedBy.itemDefinition.getQualifiedPathName(),
-            parentId: arg.parentedBy.id,
-            parentVersion: arg.parentedBy.version || null,
-            lastModified: cacheWorkerGivenSearchValue.lastModified,
-          });
-        } else if (arg.cachePolicy === "by-property") {
-          searchOptions.remoteListener.requestPropertySearchFeedbackFor({
-            qualifiedPathName: standardCounterpartQualifiedName,
-            propertyId: arg.trackedProperty,
-            propertyValue: searchArgs["SEARCH_" + arg.trackedProperty] as string,
-            lastModified: cacheWorkerGivenSearchValue.lastModified,
-          });
-        } else {
-          searchOptions.remoteListener.requestParentedSearchFeedbackFor({
-            qualifiedPathName: standardCounterpartQualifiedName,
-            parentType: arg.parentedBy.itemDefinition.getQualifiedPathName(),
-            parentId: arg.parentedBy.id,
-            parentVersion: arg.parentedBy.version || null,
-            lastModified: cacheWorkerGivenSearchValue.lastModified,
-          });
+        // note that this value doesn't contain the count, it contains
+        // the limit and the offset but not the count that is because
+        // the count is considered irrelevant for these cache values
+        gqlValue = cacheWorkerGivenSearchValue.gqlValue;
+        // example the original search was traditional but the worker
+        // cannot use that we need to patch
+        if (queryNameForCacheWorker !== queryName && gqlValue && gqlValue.data) {
+          gqlValue.data[queryName] = gqlValue.data[queryNameForCacheWorker];
+          delete gqlValue.data[queryNameForCacheWorker];
+        }
+
+        if (gqlValue && gqlValue.data) {
+          if (cacheWorkerGivenSearchValue.dataMightBeStale && !searchOptions.preventCacheStaleFeeback) {
+            if (arg.cachePolicy === "by-owner") {
+              searchOptions.remoteListener.requestOwnedSearchFeedbackFor({
+                qualifiedPathName: standardCounterpartQualifiedName,
+                createdBy: arg.createdBy,
+                lastModified: cacheWorkerGivenSearchValue.lastModified,
+              });
+            } else if (arg.cachePolicy === "by-owner-and-parent") {
+              searchOptions.remoteListener.requestOwnedParentedSearchFeedbackFor({
+                createdBy: arg.createdBy,
+                qualifiedPathName: standardCounterpartQualifiedName,
+                parentType: arg.parentedBy.itemDefinition.getQualifiedPathName(),
+                parentId: arg.parentedBy.id,
+                parentVersion: arg.parentedBy.version || null,
+                lastModified: cacheWorkerGivenSearchValue.lastModified,
+              });
+            } else if (arg.cachePolicy === "by-property") {
+              searchOptions.remoteListener.requestPropertySearchFeedbackFor({
+                qualifiedPathName: standardCounterpartQualifiedName,
+                propertyId: arg.trackedProperty,
+                propertyValue: searchArgs["SEARCH_" + arg.trackedProperty] as string,
+                lastModified: cacheWorkerGivenSearchValue.lastModified,
+              });
+            } else {
+              searchOptions.remoteListener.requestParentedSearchFeedbackFor({
+                qualifiedPathName: standardCounterpartQualifiedName,
+                parentType: arg.parentedBy.itemDefinition.getQualifiedPathName(),
+                parentId: arg.parentedBy.id,
+                parentVersion: arg.parentedBy.version || null,
+                lastModified: cacheWorkerGivenSearchValue.lastModified,
+              });
+            }
+          }
         }
       }
     }
-  } else if (!arg.traditional) {
+  }
+
+  // not using cache worker despite cache policy not being none
+  // and being asked not to fallback, must be unsupported
+  if (!usesCacheWorker && arg.cachePolicy !== "none" && arg.cacheDoNotFallback) {
+    gqlValue = null;
+  } else if (!arg.traditional && !usesCacheWorker) {
     const query = buildGqlQuery({
       name: queryName,
       args: searchArgs,
@@ -1645,7 +1696,7 @@ export async function runSearchQueryFor(
     if (data) {
       lastModified = data.last_modified as string;
     }
-  } else {
+  } else if (!usesCacheWorker) {
     const query = buildGqlQuery({
       name: queryName,
       args: searchArgs,
@@ -1672,7 +1723,7 @@ export async function runSearchQueryFor(
     }
   }
 
-  const data = gqlValue.data && gqlValue.data[queryName];
+  const data = gqlValue && gqlValue.data && gqlValue.data[queryName];
   let limit: number = (data && data.limit as number);
   let offset: number = (data && data.offset as number);
   let count: number = (data && data.count as number);
@@ -1708,7 +1759,10 @@ export async function runSearchQueryFor(
     error = gqlValue.errors[0].extensions;
   }
 
-  if (!arg.traditional) {
+  // the cache worker is actually always returning
+  // search results regardless of what method was
+  // used
+  if (!arg.traditional && !usesCacheWorker) {
     const records: IGQLSearchRecord[] = (
       data && data.records
     ) as IGQLSearchRecord[] || null;
@@ -1722,16 +1776,19 @@ export async function runSearchQueryFor(
       count,
       lastModified,
       highlights,
+      cached,
     };
   } else {
-    const records: IGQLSearchRecord[] = (
+    // we may get records anyway eg. when using cache worker
+    // if not we need to rebuild them from the results
+    const records: IGQLSearchRecord[] = data.records ? (data.records as IGQLSearchRecord[]) : ((
       data && (data.results as IGQLValue[]).map((v) => ({
         type: v.type,
         version: v.version || null,
         id: v.id || null,
         last_modified: v.last_modified || null
       }))
-    ) as IGQLSearchRecord[] || null;
+    ) as IGQLSearchRecord[] || null);
 
     return {
       error,
@@ -1742,6 +1799,7 @@ export async function runSearchQueryFor(
       count,
       lastModified,
       highlights,
+      cached,
     };
   }
 }

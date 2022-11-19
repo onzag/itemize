@@ -131,11 +131,13 @@ export interface IBasicActionResponse {
 
 export interface IActionResponseWithValue extends IBasicActionResponse {
   value: any;
+  cached: boolean;
 }
 
 export interface ILoadCompletedPayload extends IActionResponseWithValue {
   forId: string;
   forVersion: string;
+  cached: boolean;
 }
 
 /**
@@ -159,6 +161,7 @@ export interface IActionResponseWithSearchResults extends IBasicActionResponse {
   count: number;
   limit: number;
   offset: number;
+  cached: boolean;
 }
 
 export type PolicyPathType = [string, string, string];
@@ -397,6 +400,16 @@ export interface IActionSearchOptions extends IActionCleanOptions {
    * any possibility of SSR since it can't be performed in the server side
    */
   cachePolicy?: "by-owner" | "by-parent" | "by-owner-and-parent" | "by-property" | "none";
+  /**
+   * refuse to fallback if no cache worker support or if cache fails for some reason
+   * not recommended to use this anywhere unless for syncing
+   */
+  cacheDoNotFallback?: boolean;
+  /**
+   * if set searches that have been executed with the cache worker will not have a limit nor offset
+   * applied to them
+   */
+  cacheNoLimitOffset?: boolean;
   trackedProperty?: string;
   cacheMetadata?: any;
   cacheMetadataMismatchAction?: ISearchCacheMetadataMismatchAction;
@@ -668,7 +681,7 @@ export interface IItemProviderProps {
    * external check is unecessary; note that disabling external checks has no effect
    * if the item definition has no externally checked properties
    */
-  disableExternalChecks?: boolean;
+  enableExternalChecks?: boolean;
   /**
    * automatic search triggers an automatic search when the item mounts
    * or it detects a change in the properties, this basically triggers
@@ -793,6 +806,10 @@ export interface IItemProviderProps {
    */
   injectParentContext?: boolean;
   /**
+   * Triggers if it will search for whatever reason
+   */
+  onWillSearch?: () => void;
+  /**
    * callback triggers on search with the response
    */
   onSearch?: (data: IActionResponseWithSearchResults) => void;
@@ -811,6 +828,10 @@ export interface IItemProviderProps {
    * Callback triggers on submit
    */
   onSubmit?: (data: IActionResponseWithId) => void;
+  /**
+   * Triggers if it will load for whatever reason
+   */
+  onWillLoad?: () => void;
   /**
    * Callback triggers on load
    */
@@ -846,6 +867,17 @@ export interface IItemProviderProps {
    * the highlights are passed by the search provider
    */
   highlights?: IElasticHighlightSingleRecordInfo;
+
+  /**
+   * disables getting the state from the memory cache the state must
+   * always be retrieved from the indexed cache or from network
+   */
+  doNotUseMemoryCache?: boolean;
+
+  /**
+   * disables using indexed as cache
+   */
+  doNotUseCache?: boolean;
 }
 
 // This represents the actual provider that does the job, it takes on some extra properties
@@ -983,7 +1015,7 @@ export class ActualItemProvider extends
     return props.itemDefinitionInstance.getStateNoExternalChecking(
       props.forId || null,
       props.forVersion || null,
-      !props.disableExternalChecks,
+      props.enableExternalChecks,
       props.itemDefinitionInstance.isInSearchMode() ?
         getPropertyListForSearchMode(
           props.properties || [],
@@ -1406,7 +1438,7 @@ export class ActualItemProvider extends
     this.mountCbFns.forEach((c) => c());
 
     // now we retrieve the externally checked value
-    if (this.props.containsExternallyCheckedProperty && !this.props.disableExternalChecks) {
+    if (this.props.containsExternallyCheckedProperty && this.props.enableExternalChecks) {
       this.setStateToCurrentValueWithExternalChecking(null);
     }
 
@@ -1809,7 +1841,7 @@ export class ActualItemProvider extends
       }
 
       // and run the external check
-      if (this.props.containsExternallyCheckedProperty && !this.props.disableExternalChecks) {
+      if (this.props.containsExternallyCheckedProperty && this.props.enableExternalChecks) {
         this.setStateToCurrentValueWithExternalChecking(null);
       }
     }
@@ -2074,7 +2106,7 @@ export class ActualItemProvider extends
    * This listener triggers on load and the search
    * loader triggers it
    */
-  public loadListener() {
+  public async loadListener() {
     if (this.isUnmounted) {
       return;
     } else if (!this.isCMounted) {
@@ -2083,6 +2115,8 @@ export class ActualItemProvider extends
       }
       return;
     }
+
+    this.props.onWillLoad && this.props.onWillLoad();
 
     // the item must update all its fields and its internal state
     // as the search did an apply to it
@@ -2101,10 +2135,7 @@ export class ActualItemProvider extends
       forId, forVersion,
     );
     if (appliedGQLValue) {
-      const completedValue: IActionResponseWithValue = {
-        value: appliedGQLValue.rawValue,
-        error: null,
-      }
+      let cached: boolean = false;
       // we need to cache what we have been just specified
       if (
         CacheWorkerInstance.isSupported &&
@@ -2112,7 +2143,7 @@ export class ActualItemProvider extends
       ) {
         const qualifiedName = this.props.itemDefinitionInstance.getQualifiedPathName();
         if (appliedGQLValue.rawValue) {
-          CacheWorkerInstance.instance.mergeCachedValue(
+          cached = await CacheWorkerInstance.instance.mergeCachedValue(
             PREFIX_GET + qualifiedName,
             forId,
             forVersion || null,
@@ -2120,7 +2151,7 @@ export class ActualItemProvider extends
             appliedGQLValue.requestFields,
           );
         } else {
-          CacheWorkerInstance.instance.setCachedValue(
+          cached = await CacheWorkerInstance.instance.setCachedValue(
             PREFIX_GET + qualifiedName,
             forId,
             forVersion || null,
@@ -2128,6 +2159,12 @@ export class ActualItemProvider extends
             null,
           );
         }
+      }
+
+      const completedValue = {
+        value: appliedGQLValue.rawValue,
+        error: null as any,
+        cached,
       }
 
       this.props.onLoad && this.props.onLoad(completedValue);
@@ -2227,6 +2264,8 @@ export class ActualItemProvider extends
       return null;
     }
 
+    this.props.onWillLoad && this.props.onWillLoad();
+
     // We get the request fields that we are going to use
     // in order to load the value, we use the optimizers
     // so as to request only what is necessary for it to be populated
@@ -2252,6 +2291,7 @@ export class ActualItemProvider extends
     // released yet the value
     if (
       !denyCaches &&
+      !this.props.doNotUseMemoryCache &&
       this.props.searchContext &&
       this.props.searchContext.currentlySearching.find(
         (s) =>
@@ -2288,6 +2328,7 @@ export class ActualItemProvider extends
     let denyMemoryCache: boolean = false;
     if (
       !denyCaches &&
+      !this.props.doNotUseMemoryCache &&
       this.props.longTermCachingMetadata &&
       CacheWorkerInstance.isSupported
     ) {
@@ -2306,7 +2347,7 @@ export class ActualItemProvider extends
       }
     }
 
-    if (!denyCaches && !denyMemoryCache) {
+    if (!denyCaches && !denyMemoryCache && !this.props.doNotUseMemoryCache) {
       // Prevent loading at all if value currently available and memoryCached
       const appliedGQLValue = this.props.itemDefinitionInstance.getGQLAppliedValue(
         forId, forVersion,
@@ -2318,12 +2359,7 @@ export class ActualItemProvider extends
         if (window.TESTING && process.env.NODE_ENV === "development") {
           this.mountOrUpdateIdefForTesting(true);
         }
-        const completedValue = this.loadValueCompleted({
-          value: appliedGQLValue.rawValue,
-          error: null,
-          forId,
-          forVersion,
-        });
+
         if (this.props.static !== "TOTAL") {
           this.props.remoteListener.requestFeedbackFor({
             itemDefinition: this.props.itemDefinitionInstance.getQualifiedPathName(),
@@ -2335,29 +2371,42 @@ export class ActualItemProvider extends
         // (eg. when there is a search context)
         // and another item without a search context attempts to load the value this will
         // make it so that when we are exiting the search context it caches
+        let cached: boolean = false;
         if (
           CacheWorkerInstance.isSupported &&
           this.props.longTermCaching &&
           !this.props.searchContext
         ) {
           if (appliedGQLValue.rawValue) {
-            CacheWorkerInstance.instance.mergeCachedValue(
-              PREFIX_GET + qualifiedName,
-              forId,
-              forVersion || null,
-              appliedGQLValue.rawValue,
-              appliedGQLValue.requestFields,
-            );
+            try {
+              cached = await CacheWorkerInstance.instance.mergeCachedValue(
+                PREFIX_GET + qualifiedName,
+                forId,
+                forVersion || null,
+                appliedGQLValue.rawValue,
+                appliedGQLValue.requestFields,
+              );
+            } catch { }
           } else {
-            CacheWorkerInstance.instance.setCachedValue(
-              PREFIX_GET + qualifiedName,
-              forId,
-              forVersion || null,
-              null,
-              null,
-            );
+            try {
+              cached = await CacheWorkerInstance.instance.setCachedValue(
+                PREFIX_GET + qualifiedName,
+                forId,
+                forVersion || null,
+                null,
+                null,
+              );
+            } catch { }
           }
         }
+
+        const completedValue = this.loadValueCompleted({
+          value: appliedGQLValue.rawValue,
+          error: null,
+          forId,
+          forVersion,
+          cached,
+        });
 
         this.props.onLoad && this.props.onLoad(completedValue);
         return completedValue;
@@ -2399,7 +2448,7 @@ export class ActualItemProvider extends
       args: {},
       fields: requestFields,
       returnMemoryCachedValues: false,
-      returnWorkerCachedValues: !denyCaches,
+      returnWorkerCachedValues: !denyCaches && !this.props.doNotUseCache,
       itemDefinition: this.props.itemDefinitionInstance,
       id: forId,
       version: forVersion,
@@ -2437,7 +2486,7 @@ export class ActualItemProvider extends
       // its for id and for version while we were loading
       if (
         containsExternallyCheckedProperty &&
-        !this.props.disableExternalChecks &&
+        this.props.enableExternalChecks &&
         forId === this.lastLoadingForId &&
         forVersion === this.lastLoadingForVersion
       ) {
@@ -2464,6 +2513,7 @@ export class ActualItemProvider extends
       error,
       forId,
       forVersion,
+      cached,
     });
   }
   public loadValueCompleted(value: ILoadCompletedPayload): IActionResponseWithValue {
@@ -2484,6 +2534,7 @@ export class ActualItemProvider extends
       const result = {
         value: value.value,
         error: value.error,
+        cached: value.cached,
       };
       this.props.onLoad && this.props.onLoad(result);
       return result;
@@ -2535,6 +2586,7 @@ export class ActualItemProvider extends
     const result = {
       value: value.value,
       error: value.error,
+      cached: value.cached,
     };
     this.props.onLoad && this.props.onLoad(result);
     return result;
@@ -2579,7 +2631,7 @@ export class ActualItemProvider extends
       this.props.forVersion || null,
     );
 
-    if (this.props.containsExternallyCheckedProperty && !this.props.disableExternalChecks) {
+    if (this.props.containsExternallyCheckedProperty && this.props.enableExternalChecks) {
       // so we build an id for this change, for that we simply use
       // the date
       const currentUpdateId = (new Date()).getTime();
@@ -2739,7 +2791,7 @@ export class ActualItemProvider extends
       "change", this.props.forId || null, this.props.forVersion || null);
 
     // note how externally checked properties might be affected for this
-    if (this.props.containsExternallyCheckedProperty && !this.props.disableExternalChecks) {
+    if (this.props.containsExternallyCheckedProperty && this.props.enableExternalChecks) {
       const currentUpdateId = (new Date()).getTime();
       this.lastUpdateId = currentUpdateId;
 
@@ -2917,11 +2969,13 @@ export class ActualItemProvider extends
         offset: null,
         count: null,
         error: emulatedError,
+        cached: false,
       };
     } else {
       return {
         value: null,
         error: emulatedError,
+        cached: false,
       };
     }
   }
@@ -3851,17 +3905,9 @@ export class ActualItemProvider extends
       }
       this.cleanWithProps(this.props, options, "fail");
       const result = this.giveEmulatedInvalidError("searchError", false, true) as IActionResponseWithSearchResults;
+      this.props.onWillSearch && this.props.onWillSearch();
       this.props.onSearch && this.props.onSearch(result);
       return result;;
-    }
-
-    if (
-      options.cachePolicy !== "none" &&
-      typeof options.cachePolicy !== "undefined" &&
-      options.cachePolicy !== null &&
-      options.traditional
-    ) {
-      throw new Error("A cache policy cannot be set with a traditional search");
     }
 
     // now we check the cache policy by owner
@@ -3911,6 +3957,8 @@ export class ActualItemProvider extends
         );
       }
     }
+
+    this.props.onWillSearch && this.props.onWillSearch();
 
     // the args of the item definition depend on the search mode, hence we use
     // our current item definition instance to get the arguments we want to load
@@ -4050,11 +4098,14 @@ export class ActualItemProvider extends
       error,
       lastModified,
       highlights,
+      cached,
     } = await runSearchQueryFor({
       args: argumentsForQuery,
       fields: requestedSearchFields,
       itemDefinition: this.props.itemDefinitionInstance,
       cachePolicy: options.cachePolicy || "none",
+      cacheDoNotFallback: options.cacheDoNotFallback,
+      cacheNoLimitOffset: options.cacheNoLimitOffset,
       trackedProperty: options.trackedProperty || null,
       createdBy: options.createdBy || null,
       since: options.since || null,
@@ -4288,6 +4339,7 @@ export class ActualItemProvider extends
       limit,
       offset,
       error,
+      cached,
     };
     this.props.onSearch && this.props.onSearch(result);
     return result;
@@ -4457,6 +4509,11 @@ export class ActualItemProvider extends
       return (
         <ItemProvider {...newProps} />
       );
+    }
+
+    // nothing to render
+    if (!this.props.children) {
+      return null;
     }
 
     return (

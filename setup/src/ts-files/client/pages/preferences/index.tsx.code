@@ -62,7 +62,6 @@ export function Preferences() {
 							properties={properties}
 							forId={userData.id}
 							includePolicies={false}
-							disableExternalChecks={true}
 							longTermCaching={true}
 							markForDestructionOnLogout={true}
 							cleanOnDismount={{

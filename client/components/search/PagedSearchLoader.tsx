@@ -57,7 +57,7 @@ interface IPagedSearchLoaderProps {
    * Whether to disable the external checks for the item definition
    * results provider props
    */
-  disableExternalChecks?: boolean;
+  enableExternalChecks?: boolean;
   /**
    * The static state for the children item definition, TOTAL for
    * basically not even asking for feedback (useful when the search was traditional)
@@ -150,7 +150,7 @@ export class PagedSearchLoader extends React.Component<IPagedSearchLoaderProps, 
         cleanOnDismount={this.props.cleanOnDismount}
         onSearchDataChange={this.onSearchDataChange.bind(null, actualP, setState)}
         static={this.props.static}
-        disableExternalChecks={this.props.disableExternalChecks}
+        enableExternalChecks={this.props.enableExternalChecks}
       >
         {(arg) => {
           return this.props.children({

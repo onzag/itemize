@@ -90,7 +90,6 @@ export function LoginDialog(props: ILoginDialogProps) {
 	return (
 		<ItemProvider
 			itemDefinition="user"
-			disableExternalChecks={true}
 			properties={["username", "password"]}
 		>
 			<LogActioner>

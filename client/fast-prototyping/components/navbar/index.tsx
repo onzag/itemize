@@ -162,7 +162,6 @@ export function Navbar(props: INavbarProps) {
         <ItemProvider
           itemDefinition="user"
           forId={user.id}
-          disableExternalChecks={true}
           properties={props.avatarContextProperties}
           longTermCaching={true}
           markForDestructionOnLogout={true}

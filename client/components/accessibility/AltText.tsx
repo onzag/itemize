@@ -4,6 +4,10 @@ import { AltPriorityShifterContext } from "./AltPriorityShifter"
 
 interface IAltTextProps extends IAltBaseProps {
   /**
+   * whether it is used in flow, for text the default is true
+   */
+  useInFlow?: boolean;
+  /**
    * The children that should be read
    */
   children: React.ReactNode;
@@ -46,6 +50,7 @@ const AltText = React.forwardRef((props: IAltTextProps, ref: ForwardedRef<Actual
 
         return (
           <ActualAltBase
+            useInFlow={true}
             {...props}
             componentProps={args}
             priority={(props.priority || 0) + v.amount}
