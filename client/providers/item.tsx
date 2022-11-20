@@ -132,18 +132,18 @@ export interface IBasicActionResponse {
 export interface IActionResponseWithValue extends IBasicActionResponse {
   value: any;
   cached: boolean;
+  id: string;
+  version: string;
 }
 
 export interface ILoadCompletedPayload extends IActionResponseWithValue {
-  forId: string;
-  forVersion: string;
   cached: boolean;
 }
 
 /**
  * A response given by submit and delete
  */
-export interface IActionResponseWithId extends IBasicActionResponse {
+export interface IActionSubmitResponse extends IBasicActionResponse {
   id: string;
   version: string;
   storedState: boolean;
@@ -277,7 +277,7 @@ export interface IActionCleanOptions {
   cleanStateOnAny?: boolean;
 }
 
-type ActionSubmitOptionCb = (lastResponse: IActionResponseWithId) => Partial<IActionSubmitOptions>;
+type ActionSubmitOptionCb = (lastResponse: IActionSubmitResponse) => Partial<IActionSubmitOptions>;
 
 /**
  * The options for submitting,
@@ -467,7 +467,7 @@ export interface IBasicFns {
   reload: (denyCache?: boolean) => Promise<IActionResponseWithValue>;
   // submits the current information, when there's no id, this triggers an
   // add action, with an id however this trigger edition
-  submit: (options: IActionSubmitOptions) => Promise<IActionResponseWithId>;
+  submit: (options: IActionSubmitOptions) => Promise<IActionSubmitResponse>;
   // straightwforward, deletes
   delete: () => Promise<IBasicActionResponse>;
   // cleans performs the cleanup of properties and policies
@@ -827,7 +827,7 @@ export interface IItemProviderProps {
   /**
    * Callback triggers on submit
    */
-  onSubmit?: (data: IActionResponseWithId) => void;
+  onSubmit?: (data: IActionSubmitResponse) => void;
   /**
    * Triggers if it will load for whatever reason
    */
@@ -1242,7 +1242,7 @@ export class ActualItemProvider extends
   private submitBlockPromises: Array<Promise<any>> = [];
 
   // the list of submit block promises
-  private activeSubmitPromise: Promise<IActionResponseWithId> = null;
+  private activeSubmitPromise: Promise<IActionSubmitResponse> = null;
   private activeSubmitPromiseAwaiter: string = null;
 
   // sometimes reload calls can come in batches due to triggering actions
@@ -2165,6 +2165,8 @@ export class ActualItemProvider extends
         value: appliedGQLValue.rawValue,
         error: null as any,
         cached,
+        id: forId,
+        version: forVersion,
       }
 
       this.props.onLoad && this.props.onLoad(completedValue);
@@ -2403,9 +2405,9 @@ export class ActualItemProvider extends
         const completedValue = this.loadValueCompleted({
           value: appliedGQLValue.rawValue,
           error: null,
-          forId,
-          forVersion,
           cached,
+          id: forId,
+          version: forVersion,
         });
 
         this.props.onLoad && this.props.onLoad(completedValue);
@@ -2511,9 +2513,9 @@ export class ActualItemProvider extends
     return this.loadValueCompleted({
       value,
       error,
-      forId,
-      forVersion,
       cached,
+      id: forId,
+      version: forVersion,
     });
   }
   public loadValueCompleted(value: ILoadCompletedPayload): IActionResponseWithValue {
@@ -2523,8 +2525,8 @@ export class ActualItemProvider extends
     // for version very rapidly
     const shouldNotUpdateState =
       this.isUnmounted ||
-      value.forId !== this.lastLoadingForId ||
-      value.forVersion !== this.lastLoadingForVersion;
+      value.id !== this.lastLoadingForId ||
+      value.version !== this.lastLoadingForVersion;
 
     // return immediately
     if (shouldNotUpdateState) {
@@ -2535,6 +2537,8 @@ export class ActualItemProvider extends
         value: value.value,
         error: value.error,
         cached: value.cached,
+        id: value.id,
+        version: value.version,
       };
       this.props.onLoad && this.props.onLoad(result);
       return result;
@@ -2587,6 +2591,8 @@ export class ActualItemProvider extends
       value: value.value,
       error: value.error,
       cached: value.cached,
+      id: value.id,
+      version: value.version,
     };
     this.props.onLoad && this.props.onLoad(result);
     return result;
@@ -2932,7 +2938,7 @@ export class ActualItemProvider extends
     stateApplied: string,
     withId: boolean,
     withSearchResults: boolean,
-  ): IActionResponseWithId | IActionResponseWithValue | IActionResponseWithSearchResults {
+  ): IActionSubmitResponse | IActionResponseWithValue | IActionResponseWithSearchResults {
 
     if (isDevelopment) {
       console.warn(
@@ -2976,6 +2982,8 @@ export class ActualItemProvider extends
         value: null,
         error: emulatedError,
         cached: false,
+        id: null,
+        version: null,
       };
     }
   }
@@ -3271,7 +3279,7 @@ export class ActualItemProvider extends
     }
     return triggeredUpdate;
   }
-  public async submit(originalOptions: IActionSubmitOptions): Promise<IActionResponseWithId> {
+  public async submit(originalOptions: IActionSubmitOptions): Promise<IActionSubmitResponse> {
     if ((originalOptions.blockUntil || originalOptions.blockReason) && !originalOptions.blockStatus) {
       throw new Error("blockUntil nor blockReason can be set if blockStatus is not true");
     }
@@ -3350,7 +3358,7 @@ export class ActualItemProvider extends
       }
       this.cleanWithProps(this.props, options, "fail");
 
-      const returnValue = this.giveEmulatedInvalidError("submitError", true, false) as IActionResponseWithId;;
+      const returnValue = this.giveEmulatedInvalidError("submitError", true, false) as IActionSubmitResponse;;
       this.activeSubmitPromise = null;
       activeSubmitPromiseResolve(returnValue);
 

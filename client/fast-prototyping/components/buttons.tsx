@@ -6,7 +6,7 @@
  */
 
 import React, { useState } from "react";
-import { IActionSubmitOptions, IActionResponseWithId, IActionSearchOptions, IActionDeleteOptions, IBasicActionResponse } from "../../providers/item";
+import { IActionSubmitOptions, IActionSubmitResponse, IActionSearchOptions, IActionDeleteOptions, IBasicActionResponse } from "../../providers/item";
 import { ProgressingElement } from "./util";
 import SubmitActioner from "../../components/item/SubmitActioner";
 import { goBack, localizedRedirectTo } from "../../components/navigation";
@@ -20,7 +20,7 @@ import type { SxProps } from "@mui/material";
 /**
  * A redirect function called on the success event
  */
-type RedirectCallbackFn = (status: IActionResponseWithId) => string;
+type RedirectCallbackFn = (status: IActionSubmitResponse) => string;
 
 /**
  * The generic options for every button
@@ -96,7 +96,7 @@ interface ISubmitButtonProps extends IGenericButtonProps {
    * A function that triggers when it has submitted and gives the state of the
    * submit action
    */
-  onSubmit?: (status: IActionResponseWithId) => Promise<void>;
+  onSubmit?: (status: IActionSubmitResponse) => Promise<void>;
 }
 
 /**

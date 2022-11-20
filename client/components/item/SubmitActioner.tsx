@@ -11,7 +11,7 @@ import React from "react";
 import { EndpointErrorType } from "../../../base/errors";
 import {
   ItemContext,
-  IActionResponseWithId,
+  IActionSubmitResponse,
   IItemContextType,
   IActionSubmitOptions,
   IActionCleanOptions,
@@ -48,7 +48,7 @@ export interface ISubmitActionerInfoArgType {
    * actual performs the submit, this function is a mirror from the
    * item definition provider one
    */
-  submit: (options: IActionSubmitOptions) => Promise<IActionResponseWithId>;
+  submit: (options: IActionSubmitOptions) => Promise<IActionSubmitResponse>;
   /**
    * clean function, also a mirror from the item definition one
    */
