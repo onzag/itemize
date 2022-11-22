@@ -20,6 +20,8 @@ import { ITable } from "../../../internal/text/serializer/types/table";
 import { ITitle } from "../../../internal/text/serializer/types/title";
 import { IImage } from "../../../internal/text/serializer/types/image";
 import { AltBadgeReactioner } from "../alt-badge-reactioner";
+import AddIcon from '@mui/icons-material/Add';
+import RemoveIcon from '@mui/icons-material/Remove';
 
 const styles = {
   linkTemplateOptionsBox: {
@@ -44,7 +46,12 @@ const styles = {
   },
   fixedWidthInput: {
     width: 200,
-  }
+  },
+  iconAddRemove: {
+    position: "absolute",
+    right: 0,
+    fontSize: "15px",
+  },
 }
 
 /**
@@ -319,7 +326,10 @@ function TdAndTh(props: IMaterialUIWrapperElementProps) {
                 title={props.i18nRichInfo.formatAddTdLabel}
                 onClick={props.helpers.insertTableColumn}
                 size="large">
-                <ViewWeekIcon />
+                <>
+                  <ViewWeekIcon />
+                  <AddIcon sx={styles.iconAddRemove}/>
+                </>
               </IconButton>
             </AltBadgeReactioner>
             <AltBadgeReactioner
@@ -332,7 +342,42 @@ function TdAndTh(props: IMaterialUIWrapperElementProps) {
                 title={props.i18nRichInfo.formatAddTrLabel}
                 onClick={props.helpers.insertTableRow}
                 size="large">
-                <TableRowsIcon />
+                <>
+                  <TableRowsIcon />
+                  <AddIcon sx={styles.iconAddRemove}/>
+                </>
+              </IconButton>
+            </AltBadgeReactioner>
+            <AltBadgeReactioner
+              reactionKey="c"
+              priority={1}
+              selector="button"
+            >
+              <IconButton
+                tabIndex={-1}
+                title={props.i18nRichInfo.formatDelTdLabel}
+                onClick={props.helpers.deleteTableColumn}
+                size="large">
+                <>
+                  <ViewWeekIcon />
+                  <RemoveIcon sx={styles.iconAddRemove} />
+                </>
+              </IconButton>
+            </AltBadgeReactioner>
+            <AltBadgeReactioner
+              reactionKey="r"
+              priority={1}
+              selector="button"
+            >
+              <IconButton
+                tabIndex={-1}
+                title={props.i18nRichInfo.formatAddTrLabel}
+                onClick={props.helpers.deleteTableRow}
+                size="large">
+                <>
+                  <TableRowsIcon />
+                  <RemoveIcon sx={styles.iconAddRemove}/>
+                </>
               </IconButton>
             </AltBadgeReactioner>
             <AltBadgeReactioner

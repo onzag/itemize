@@ -538,7 +538,9 @@ export function postprocess(
 
         // data-src
         if (absolutedFile) {
-          node.setAttribute("src", absolutedFile.url);
+          node.setAttribute("href", absolutedFile.url);
+        } else {
+          node.removeAttribute("href");
         }
 
         // contenteditable
@@ -546,6 +548,7 @@ export function postprocess(
         // class
         node.className = "file";
       } else {
+        node.removeAttribute("href");
         // node.parentElement && node.parentElement.removeChild(node);
       }
     } else {
@@ -553,7 +556,10 @@ export function postprocess(
     }
   }
 
-  if (node.tagName === "A" && (node.hasAttribute("href") || node.hasAttribute("data-href")) && !node.classList.contains("image")) {
+  if (
+    node.tagName === "A" &&
+    (node.hasAttribute("href") || node.hasAttribute("data-href")
+  ) && !node.classList.contains("image") && !node.classList.contains("file")) {
     if (!options.supportsLinks) {
       node.removeAttribute("href");
       node.removeAttribute("data-href");

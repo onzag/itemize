@@ -11,7 +11,7 @@ import React from "react";
  * Represents the props for the given element
  */
 interface IReactifiedElementWithHoverAndActiveProps extends React.DetailedHTMLProps<React.HTMLAttributes<HTMLElement>, HTMLElement> {
-  Tag: string;
+  Component: any;
   styleHover: React.CSSProperties;
   styleActive: React.CSSProperties;
 }
@@ -29,6 +29,7 @@ interface IReactifiedElementWithHoverAndActiveState {
  * in order to render with the given props
  */
 export class ReactifiedElementWithHoverAndActive extends React.PureComponent<IReactifiedElementWithHoverAndActiveProps, IReactifiedElementWithHoverAndActiveState> {
+  private refElement: React.RefObject<any> = React.createRef();
   constructor(props: IReactifiedElementWithHoverAndActiveProps) {
     super(props);
 
@@ -75,16 +76,20 @@ export class ReactifiedElementWithHoverAndActive extends React.PureComponent<IRe
     originalFn && originalFn(e);
   }
 
+  public getElement() {
+    return this.refElement.current;
+  }
+
   public render() {
     // first we pick the tag
-    const Tag = this.props.Tag;
+    const Component = this.props.Component;
 
     // now we build the props
     const standardProps = {
       ...this.props,
     };
     // delete what is non-standard
-    delete standardProps.Tag;
+    delete standardProps.Component;
     delete standardProps.styleHover;
     delete standardProps.styleActive;
 
@@ -115,6 +120,6 @@ export class ReactifiedElementWithHoverAndActive extends React.PureComponent<IRe
     }
 
     // and set up the element
-    return <Tag {...standardProps} />;
+    return <Component {...standardProps} ref={this.refElement}/>;
   }
 }

@@ -204,6 +204,9 @@ const style = {
     flex: "1 1 auto",
     height: "100%",
   },
+  fullWidth: {
+    width: "100%",
+  },
 };
 
 type RichElementFn = () => RichElement;
@@ -431,6 +434,12 @@ export interface IMaterialUISlateWrapperProps extends ISlateEditorWrapperBasePro
    */
   wrapperTextEditorClassName?: string;
   wrapperTextEditorSx?: SxProps;
+
+  /**
+   * Add a class name to the toolbar in the wrapper
+   */
+  toolbarClassName?: string;
+  toolbarSx?: SxProps;
   /**
    * A function to define custom extra children
    */
@@ -963,13 +972,14 @@ function TemplateHTML(props: RichTextEditorToolbarElementProps) {
 
   let templateHTMLAmount = 0;
 
-  const currentSelectedSuperBlockElement = this.state.currentSelectedSuperBlockElements &&
-    this.state.currentSelectedSuperBlockElements[
-    this.state.currentSelectedSuperBlockElements.length - 1
+  const currentSelectedSuperBlockElement = props.state.currentSelectedSuperBlockElements &&
+    props.state.currentSelectedSuperBlockElements[
+    props.state.currentSelectedSuperBlockElements.length - 1
     ];
 
   if (
-    currentSelectedSuperBlockElement
+    currentSelectedSuperBlockElement &&
+    props.state.currentSelectedTopmostSuperBlockContext
   ) {
     Object.keys(props.state.currentSelectedTopmostSuperBlockContext.properties).forEach((key) => {
       const property = props.state.currentSelectedTopmostSuperBlockContext.properties[key];
@@ -1167,6 +1177,8 @@ const toolbarFastKeyRegistry: Record<SlateEditorWrapperCustomToolbarIdentifiedEl
   hdivider: null,
 }
 
+const StyledToolbar = styled(Toolbar)(style.toolbar);
+
 /**
  * This is the function component that represents the toolbar for the wrapper
  * @param props the entire rich text editor toolbar props with all the added functions
@@ -1324,12 +1336,12 @@ class RichTextEditorToolbar extends React.Component<RichTextEditorToolbarProps, 
           this.appBarHeader = obj as any;
         }}
       >
-        <Toolbar sx={style.toolbar}>
+        <StyledToolbar sx={this.props.toolbarSx} className={this.props.toolbarClassName}>
           {toolbarFormMapped}
           {customChildren}
           <Box sx={style.moreOptionsSpacer} />
           {drawerButton}
-        </Toolbar>
+        </StyledToolbar>
       </AppBar>
     );
 
@@ -1392,6 +1404,8 @@ interface IStyledEditor {
 const StyledEditor = styled("div", {
   shouldForwardProp: (p) => p !== "currentValid" && p !== "isRichText",
 })<IStyledEditor>(({ currentValid, isRichText }) => style.editor(!currentValid, isRichText));
+
+const StyledDisjointedEditorContainer = styled("div")(style.fullWidth);
 
 /**
  * This represents the unwrapped class that is used for the wrapper, it is not
@@ -1628,7 +1642,7 @@ export class MaterialUISlateWrapper extends React.PureComponent<IMaterialUISlate
       (
         this.props.state.currentSelectedSuperBlockElementAnchors &&
         this.props.state.currentSelectedSuperBlockElementAnchors[
-          this.props.state.currentSelectedSuperBlockElementAnchors.length - 1
+        this.props.state.currentSelectedSuperBlockElementAnchors.length - 1
         ]
       );
     // trigger a click
@@ -1649,7 +1663,7 @@ export class MaterialUISlateWrapper extends React.PureComponent<IMaterialUISlate
       (
         this.props.state.currentSelectedSuperBlockElementAnchors &&
         this.props.state.currentSelectedSuperBlockElementAnchors[
-          this.props.state.currentSelectedSuperBlockElementAnchors.length - 1
+        this.props.state.currentSelectedSuperBlockElementAnchors.length - 1
         ]
       );
     // trigger a click
@@ -1838,7 +1852,7 @@ export class MaterialUISlateWrapper extends React.PureComponent<IMaterialUISlate
     let box: React.ReactNode = null;
     if (this.props.disjointedMode) {
       box = (
-        <Box className={this.props.wrapperClassName} sx={this.props.wrapperSx} ref={this.editorRef}>
+        <StyledDisjointedEditorContainer className={this.props.wrapperClassName} sx={this.props.wrapperSx} ref={this.editorRef}>
           <Box className={
             "rich-text " +
             (this.props.wrapperTextEditorClassName ? " " + this.props.wrapperTextEditorClassName : "") +
@@ -1847,7 +1861,7 @@ export class MaterialUISlateWrapper extends React.PureComponent<IMaterialUISlate
             {this.props.children}
           </Box>
           {extraChildren}
-        </Box>
+        </StyledDisjointedEditorContainer>
       );
     } else {
       box = (

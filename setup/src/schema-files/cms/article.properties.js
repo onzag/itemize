@@ -11,6 +11,13 @@ custom.more_news = more news
 custom.updated_at = updated {0}
 custom.by = by {0}
 
+properties.title.label = title
+properties.title.search.label = title
+properties.title.placeholder = the title of the article
+properties.title.search.placeholder = search within the title
+properties.title.error.NOT_NULLABLE = the title must be set
+properties.title.error.TOO_LARGE = the title is too long
+
 properties.summary.label = summary
 properties.summary.placeholder = write a short summary about the article
 properties.summary.error.TOO_LARGE = summary is too long
@@ -41,6 +48,13 @@ custom.news = noticias
 custom.more_news = más noticias
 custom.updated_at = actualizada {0}
 custom.by = {0}
+
+properties.title.label = título
+properties.title.search.label = título
+properties.title.placeholder = el título del artículo
+properties.title.search.placeholder = buscar entre el título
+properties.title.error.NOT_NULLABLE = debe tener un título
+properties.title.error.TOO_LARGE = el título es demasiado large
 
 properties.summary.label = sumario
 properties.summary.placeholder = escriba un sumario corto sobre el artículo

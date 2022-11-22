@@ -398,9 +398,11 @@ export function registerTableElements(registry: ISerializationRegistryType) {
     specialRules,
   ) => {
     const childrenCount = table.children.length;
+    let maxColumnCount: number = 0;
     for (let i = 0; i < childrenCount; i++) {
       const tbodyElement = table.children[i];
       tbodyElement.children.forEach((row, i2) => {
+        maxColumnCount = row.children.length > maxColumnCount ? row.children.length : maxColumnCount;
         row.children.forEach((column, i3) => {
           const shouldBeColumnTag = tbodyElement.type === "thead" ? "th" : "td";
 
@@ -409,6 +411,19 @@ export function registerTableElements(registry: ISerializationRegistryType) {
             secondaryExecution && secondaryExecution.updateNodeAt([...path, i, i2, i3], { type: shouldBeColumnTag });
           }
         });
+      });
+    }
+
+    // inconsistent count of rows and columns
+    for (let i = 0; i < childrenCount; i++) {
+      const tbodyElement = table.children[i];
+      tbodyElement.children.forEach((row, i2) => {
+        const shouldBeColumnTag = tbodyElement.type === "thead" ? "th" : "td";
+        if (row.children.length !== maxColumnCount) {
+          const newNode: ITd | ITh = { type: shouldBeColumnTag, children: [STANDARD_PARAGRAPH()] };
+          primaryExecution.insertNodeAt([...path, i, i2], newNode , row.children.length);
+          secondaryExecution && secondaryExecution.insertNodeAt([...path, i, i2], newNode, row.children.length);
+        }
       });
     }
   }

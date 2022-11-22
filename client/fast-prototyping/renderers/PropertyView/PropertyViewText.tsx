@@ -12,11 +12,12 @@ import {
 import React from "react";
 import { DOMWindow } from "../../../../util";
 import equals from "deep-equal";
-import { deserialize, renderTemplateDynamically } from "../../../internal/text";
+import { renderTemplateDynamically } from "../../../internal/text";
 import type { TemplateArgs } from "../../../internal/text/serializer/template-args";
 import type { IImage } from "../../../internal/text/serializer/types/image";
-import { deserializeElementBase } from "../../../internal/text/serializer/base";
-import { STANDARD_TEXT_NODE } from "../../../internal/text/serializer/types/text";
+import { deserialize } from "../../../internal/text/serializer";
+import { IText, STANDARD_TEXT_NODE } from "../../../internal/text/serializer/types/text";
+import type { RichElement } from "../../../internal/text/serializer";
 
 /**
  * The current intersection observer
@@ -149,7 +150,9 @@ interface IPropertyViewRichTextViewerProps {
   children?: string;
   className?: string;
   Node?: any;
-  onImageSelect?: (arg: IImage, e: MouseEvent) => void;
+  onCustom?: (arg: RichElement | IText, props: any, expectedExtraProps: {Tag: string, styleActive?: any, styleHover?: any, defaultReturn: () => void}) => React.ReactNode;
+  onCustomAttributesFor?: (arg: RichElement | IText) => any;
+  onCustomWrap?: (arg: RichElement | IText, elementAsNode: React.ReactNode) => React.ReactNode;
 }
 
 /**
@@ -278,39 +281,39 @@ export class PropertyViewRichTextViewer extends React.Component<IPropertyViewRic
         lazyloaderExecute(img);
       }
 
-      if (this.props.onImageSelect) {
-        let targetEvent: HTMLElement = img;
-        let standalone = true;
-        if (
-          img.parentElement &&
-          img.parentElement.parentElement &&
-          img.parentElement.parentElement.parentElement &&
-          img.parentElement.parentElement.parentElement.classList.contains("image")
-        ) {
-          targetEvent = img.parentElement.parentElement.parentElement;
-          standalone = false;
-        }
+      // if (this.props.onImageSelect) {
+      //   let targetEvent: HTMLElement = img;
+      //   let standalone = true;
+      //   if (
+      //     img.parentElement &&
+      //     img.parentElement.parentElement &&
+      //     img.parentElement.parentElement.parentElement &&
+      //     img.parentElement.parentElement.parentElement.classList.contains("image")
+      //   ) {
+      //     targetEvent = img.parentElement.parentElement.parentElement;
+      //     standalone = false;
+      //   }
 
-        const base = deserializeElementBase(targetEvent);
+      //   const base = deserializeElementBase(targetEvent);
 
-        const imgInfo: IImage = {
-          ...base,
-          type: "image",
-          alt: img.getAttribute("alt") || null,
-          src: img.getAttribute("src") || img.dataset.src,
-          srcId: img.dataset.srcId,
-          srcSet: img.getAttribute("srcset") || img.dataset.srcset || null,
-          sizes: img.getAttribute("sizes") || img.dataset.sizes || null,
-          width: parseInt(img.dataset.srcWidth) || null,
-          height: parseInt(img.dataset.srcHeight) || null,
-          standalone,
-          children: [STANDARD_TEXT_NODE()]
-        };
+      //   const imgInfo: IImage = {
+      //     ...base,
+      //     type: "image",
+      //     alt: img.getAttribute("alt") || null,
+      //     src: img.getAttribute("src") || img.dataset.src,
+      //     srcId: img.dataset.srcId,
+      //     srcSet: img.getAttribute("srcset") || img.dataset.srcset || null,
+      //     sizes: img.getAttribute("sizes") || img.dataset.sizes || null,
+      //     width: parseInt(img.dataset.srcWidth) || null,
+      //     height: parseInt(img.dataset.srcHeight) || null,
+      //     standalone,
+      //     children: [STANDARD_TEXT_NODE()]
+      //   };
 
-        targetEvent.addEventListener("click", (e: MouseEvent) => {
-          this.props.onImageSelect(imgInfo, e);
-        });
-      }
+      //   targetEvent.addEventListener("click", (e: MouseEvent) => {
+      //     this.props.onImageSelect(imgInfo, e);
+      //   });
+      // }
     });
 
     // the same can be said about iframe
@@ -391,10 +394,16 @@ export class TemplatedPropertyViewRichTextRenderer extends React.Component<
     );
   }
   public render() {
-    const deserializedValue = deserialize(this.props.children);
+    const deserializedValue = deserialize(this.props.children, null, { dontNormalize: true });
     const Node = this.props.Node;
     return <Node className={"rich-text" + (this.props.className ? " " + this.props.className : "")}>
-      {renderTemplateDynamically(deserializedValue, this.props.templateArgs, { onImageSelect: this.props.onImageSelect })}
+      {renderTemplateDynamically(
+        deserializedValue,
+        this.props.templateArgs, {
+          onCustom: this.props.onCustom,
+          onCustomAttributesFor: this.props.onCustomAttributesFor,
+          onCustomWrap: this.props.onCustomWrap,
+        })}
     </Node>;
   }
 }
@@ -423,20 +432,22 @@ export default function PropertyViewTextRenderer(props: IPropertyViewTextRendere
   const Node: any = props.args.Node ? props.args.Node : ((props.isRichText || props.subtype === "plain") ? "div" : "span");
 
   if (props.isRichText) {
-    if (props.args.makeTemplate) {
+    if (props.args.makeTemplate || props.args.makeAccessible) {
       return (
         <TemplatedPropertyViewRichTextRenderer
           className={props.args.className}
           templateArgs={props.args.templateArgs}
           Node={Node}
-          onImageSelect={props.args.onImageSelect}
+          onCustom={props.args.onCustom}
+          onCustomAttributesFor={props.args.onCustomAttributesFor}
+          onCustomWrap={props.args.onCustomWrap}
         >
           {props.currentValue}
         </TemplatedPropertyViewRichTextRenderer>
       );
     } else {
       return (
-        <PropertyViewRichTextViewer className={props.args.className} Node={Node} onImageSelect={props.args.onImageSelect}>
+        <PropertyViewRichTextViewer className={props.args.className} Node={Node}>
           {props.currentValue}
         </PropertyViewRichTextViewer>
       );

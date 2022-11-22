@@ -95,10 +95,10 @@ const REQUIRED_RESOURCES = [
 /**
  * Required resources which require localization in some form
  */
-const REQUIRED_LOCALIZED_RESOURCES = [
-  "privacy-policy/$.html",
-  "terms-and-conditions/$.html",
-  "contact/$.html",
+const REQUIRED_LOCALIZED_RESOURCES: string[] = [
+  // "privacy-policy/$.html",
+  // "terms-and-conditions/$.html",
+  // "contact/$.html",
 ];
 
 /**

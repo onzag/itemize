@@ -1,9 +1,5 @@
 [
     {
-        "id": "title",
-        "type": "text"
-    },
-    {
         "id": "content",
         "type": "text",
         "subtype": "html",

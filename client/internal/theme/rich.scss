@@ -36,12 +36,12 @@ $superblock-highlight-color: #33691e;
     }
   }
 
-  a {
+  a, .link {
     color: $general-highlight-color;
     cursor: pointer;
   }
 
-  a.inactive {
+  a.inactive, .link.inactive {
     cursor: auto;
 
     &:hover {

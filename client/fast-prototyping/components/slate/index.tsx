@@ -469,6 +469,8 @@ export interface IHelperFunctions {
   insertTable: (tableType: string) => void;
   insertTableColumn: () => void;
   insertTableRow: () => void;
+  deleteTableColumn: () => void;
+  deleteTableRow: () => void;
   toggleTable: (element: "thead" | "tfoot") => void;
   canToggleTable: (element: "thead" | "tfoot") => boolean;
 
@@ -1311,6 +1313,8 @@ export class SlateEditor extends React.Component<ISlateEditorProps, ISlateEditor
     this.onBlurredChange = this.onBlurredChange.bind(this);
     this.onKeyDown = this.onKeyDown.bind(this);
 
+    this.deleteTableColumn = this.deleteTableColumn.bind(this);
+    this.deleteTableRow = this.deleteTableRow.bind(this);
     this.selectPath = this.selectPath.bind(this);
     this.movePaths = this.movePaths.bind(this);
     this.focus = this.focus.bind(this);
@@ -3250,7 +3254,12 @@ export class SlateEditor extends React.Component<ISlateEditorProps, ISlateEditor
             }
 
             const insertPoint = [...tableAnchor, theadOrTbodyOrTFootIndex, rowIndex, actualTargetIndex];
+
+            // only allow to normalize at our last insert
+            // otherwise the normalizer will get crazy
+            this.preventNormalize = rowIndex !== theadOrTbodyOrTfoot.children.length - 1;
             Transforms.insertNodes(this.editor, column, { at: insertPoint });
+            this.preventNormalize = false;
           });
         });
 
@@ -3269,6 +3278,53 @@ export class SlateEditor extends React.Component<ISlateEditorProps, ISlateEditor
             offset: 0,
             path: targetColumnAnchor,
           },
+        });
+      }
+    } catch {
+
+    }
+  }
+
+  public deleteTableColumn() {
+    if (!this.state.currentSelectedSuperBlockElements) {
+      return;
+    }
+
+    const currentColumnIndex = this.state.currentSelectedSuperBlockElements &&
+      findLastIndex(this.state.currentSelectedSuperBlockElements, (e) => e.type === "td" || e.type === "th");
+
+    if (currentColumnIndex === -1) {
+      return;
+    }
+
+    const currentColumn = this.state.currentSelectedSuperBlockElements[currentColumnIndex];
+    const currentColumnAnchor = this.state.currentSelectedSuperBlockElementAnchors[currentColumnIndex];
+
+    // this is the index we are removing in each row
+    const targetIndex = currentColumnAnchor[currentColumnAnchor.length - 1];
+
+    const tableAnchor = [...currentColumnAnchor];
+    // tr
+    tableAnchor.pop();
+    // thead or tbody
+    tableAnchor.pop();
+    // table
+    tableAnchor.pop();
+
+    try {
+      const tableElement = this.getNodeAt(tableAnchor) as RichElement;
+
+      if (tableElement.type === "table") {
+        tableElement.children.forEach((theadOrTbodyOrTfoot, theadOrTbodyOrTFootIndex) => {
+          theadOrTbodyOrTfoot.children.forEach((row, rowIndex) => {
+            const deletePoint = [...tableAnchor, theadOrTbodyOrTFootIndex, rowIndex, targetIndex];
+
+            // only allow to normalize at our last insert
+            // otherwise the normalizer will get crazy
+            this.preventNormalize = rowIndex !== theadOrTbodyOrTfoot.children.length - 1;
+            Transforms.delete(this.editor, { at: deletePoint });
+            this.preventNormalize = false;
+          });
         });
       }
     } catch {
@@ -3485,6 +3541,25 @@ export class SlateEditor extends React.Component<ISlateEditorProps, ISlateEditor
           path: targetRowAnchorFirstText,
         },
       });
+    }
+  }
+
+  public deleteTableRow() {
+    if (!this.state.currentSelectedSuperBlockElements) {
+      return;
+    }
+
+    const currentRowIndex = this.state.currentSelectedSuperBlockElements &&
+      findLastIndex(this.state.currentSelectedSuperBlockElements, (e) => e.type === "tr");
+
+    if (currentRowIndex === -1) {
+      return;
+    }
+
+    try {
+      Transforms.delete(this.editor, { at: this.state.currentSelectedSuperBlockElementAnchors[currentRowIndex] });
+    } catch {
+
     }
   }
 
@@ -4508,6 +4583,8 @@ export class SlateEditor extends React.Component<ISlateEditorProps, ISlateEditor
       setUIHandler: this.setUIHandler,
       setUIHandlerArg: this.setUIHandlerArg,
       insertElement: this.insertElement,
+      deleteTableColumn: this.deleteTableColumn,
+      deleteTableRow: this.deleteTableRow,
 
       hardBlur: this.hardBlur,
       softBlur: this.softBlur,

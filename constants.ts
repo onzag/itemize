@@ -429,6 +429,9 @@ export const LOCALE_I18N = [
   "format_add_tr",
   "format_add_td",
   "format_add_th",
+  "format_del_tr",
+  "format_del_td",
+  "format_del_th",
   "format_add_tfoot",
 
   // extra rich element information

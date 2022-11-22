@@ -44,7 +44,36 @@ interface IDeserializeRegistryType {
 }
 
 export interface IReactifyExtraOptions {
-  onImageSelect?: (arg: IImage, e: MouseEvent) => void;
+  /**
+   * use this to return any extra attributes that should
+   * be applied towards an element
+   * 
+   * Does not have an effect to UI Handled elements that are
+   * handled
+   * 
+   * return an object or null
+   */
+  onCustomAttributesFor?: (element: RichElement | IText) => any;
+
+  /**
+   * use this to modify how the element renders
+   * 
+   * Does not have an effect to UI Handled elements that are
+   * handled
+   * 
+   * return null for not handling anything an using the default
+   */
+  onCustom?: (
+    element: RichElement | IText,
+    props: any,
+    info: {styleActive?: any, styleHover?: any, Tag: string, defaultReturn: () => React.ReactNode},
+  ) => React.ReactNode;
+
+  /**
+   * Allows to wrap an element with features of the choosing
+   * return the elementAsNode itself or a new node to replace it
+   */
+  onCustomWrap?: (element: RichElement | IText, elementAsNode: React.ReactNode) => React.ReactNode;
 }
 
 /**
@@ -834,7 +863,9 @@ export function deserialize(html: string | Node[], comparer?: IRootLevelDocument
   };
 
   // normalize it
-  normalize(newDocument, specialRules || null);
+  if (!specialRules || !specialRules.dontNormalize) {
+    normalize(newDocument, specialRules || null);
+  }
 
   // return it
   return newDocument;
@@ -844,7 +875,7 @@ export function normalize(
   doc: IRootLevelDocument,
   specialRules?: ISpecialRules,
 ): IRootLevelDocument {
-  if (!doc.rich) {
+  if (!doc.rich || (specialRules && specialRules.dontNormalize)) {
     return doc;
   }
   return normalizeElement(doc as any, [], doc, null, specialRules || null) as any;
@@ -869,6 +900,10 @@ interface ISpecialRules {
    * This should be the root context
    */
   useContextRulesOf?: ITemplateArgContextDefinition;
+  /**
+   * avoid normalization altogether
+   */
+  dontNormalize?: boolean;
 }
 
 const standardExecFn: (root: IRootLevelDocument) => ICustomExecution = (root) => ({
@@ -1167,6 +1202,10 @@ function isIgnoredNode(path: number[], specialRules: ISpecialRules) {
     return false;
   }
 
+  if (specialRules && specialRules.dontNormalize) {
+    return true;
+  }
+
   return specialRules.ignoreNodesAt.some((ignorePath) => {
     // the same exact node with the same memory address
     return ignorePath.every((v, index) => path[index] === v);
@@ -1223,6 +1262,10 @@ export function normalizeElement(
   customExecution?: ICustomExecution,
   specialRules?: ISpecialRules,
 ) {
+  if (specialRules && specialRules.dontNormalize) {
+    return;
+  }
+
   const primaryExecution = customExecution || standardExecFn(root);
 
   let executionRoot = root;

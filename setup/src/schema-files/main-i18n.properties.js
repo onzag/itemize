@@ -50,6 +50,9 @@ format_add_tfoot = add table footer
 format_add_tr = add table row
 format_add_td = add table column
 format_add_th = add table column
+format_del_tr = remove table row
+format_del_td = remove table column
+format_del_th = remove table column
 
 rich_name = name
 rich_alt = alt
@@ -253,6 +256,9 @@ format_add_tfoot = add table footer
 format_add_tr = add table row
 format_add_td = add table column
 format_add_th = add table column
+format_del_tr = remove table row
+format_del_td = remove table column
+format_del_th = remove table column
 
 rich_name = nimi
 rich_alt = alt
@@ -456,6 +462,9 @@ format_add_tfoot = add table footer
 format_add_tr = add table row
 format_add_td = add table column
 format_add_th = add table column
+format_del_tr = remove table row
+format_del_td = remove table column
+format_del_th = remove table column
 
 rich_name = name
 rich_alt = alt
@@ -659,6 +668,10 @@ format_add_tfoot = add table footer
 format_add_tr = add table row
 format_add_td = add table column
 format_add_th = add table column
+format_del_tr = remove table row
+format_del_td = remove table column
+format_del_th = remove table column
+
 rich_name = name
 rich_alt = alt
 rich_sizes = sizes
@@ -861,6 +874,9 @@ format_add_tfoot = agregar pie de tabla
 format_add_tr = agregar fila
 format_add_td = agregar columna
 format_add_th = agregar columna
+format_del_tr = eliminar fila
+format_del_td = eliminar columna
+format_del_th = eliminar columna
 
 rich_name = nombre
 rich_alt = alt
@@ -1064,6 +1080,9 @@ format_add_tfoot = add table footer
 format_add_tr = add table row
 format_add_td = add table column
 format_add_th = add table column
+format_del_tr = remove table row
+format_del_td = remove table column
+format_del_th = remove table column
 
 rich_name = name
 rich_alt = alt

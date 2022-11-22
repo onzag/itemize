@@ -194,12 +194,33 @@ export function registerText(registry: ISerializationRegistryType) {
       newCustomProps.children = arg.element.text;
     }
 
+    if (arg.extraOptions && arg.extraOptions.onCustomAttributesFor) {
+      const extraProps = arg.extraOptions.onCustomAttributesFor(arg.element);
+      if (extraProps) {
+        Object.keys(extraProps).forEach((attr) => {
+          newCustomProps[attr] = extraProps[attr];
+        });
+      }
+    }
+
     // we return directly, no use of base because this is a text node
     // itself, the reactification does it in a single level
     // because text editor would like it so
-    return (
-      <span {...newCustomProps} />
-    );
+    let toRender: React.ReactNode;
+
+    if (arg.extraOptions && arg.extraOptions.onCustom) {
+      toRender = arg.extraOptions.onCustom(arg.element, newCustomProps, {Tag: "span", defaultReturn: () => (<span {...newCustomProps}/>)});
+    } else {
+      toRender = (
+        <span {...newCustomProps} />
+      );
+    }
+
+    if (arg.extraOptions && arg.extraOptions.onCustomWrap) {
+      return arg.extraOptions.onCustomWrap(arg.element, toRender);
+    }
+
+    return toRender;
   }
 
   // add to the registry itself

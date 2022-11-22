@@ -57,6 +57,9 @@ export interface IPropertyEntryI18nRichTextInfo {
   formatAddTrLabel: string;
   formatAddTdLabel: string;
   formatAddThLabel: string;
+  formatDelTrLabel: string;
+  formatDelTdLabel: string;
+  formatDelThLabel: string;
   formatAddCustomLabel: string;
   formatSetStyleLabel: string;
   formatSetHoverStyleLabel: string;
@@ -979,6 +982,9 @@ export default class PropertyEntryText
         formatAddTrLabel: i18nInLanguage.format_add_tr,
         formatAddThLabel: i18nInLanguage.format_add_th,
         formatAddTheadLabel: i18nInLanguage.format_add_thead,
+        formatDelTrLabel: i18nInLanguage.format_del_tr,
+        formatDelThLabel: i18nInLanguage.format_del_th,
+        formatDelTdLabel: i18nInLanguage.format_del_td,
 
         name: i18nInLanguage.rich_name,
         alt: i18nInLanguage.rich_alt,

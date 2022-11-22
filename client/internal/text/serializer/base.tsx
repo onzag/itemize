@@ -779,35 +779,63 @@ export function reactifyElementBase(
     finalProps.children = wrapChildren(finalProps.children);
   }
 
+  if (arg.extraOptions && arg.extraOptions.onCustomAttributesFor) {
+    const extraProps = arg.extraOptions.onCustomAttributesFor(base as any);
+    if (extraProps) {
+      Object.keys(extraProps).forEach((attr) => {
+        finalProps[attr] = extraProps[attr];
+      });
+    }
+  }
+
   return (
     <React.Fragment key={arg.key}>
       {
         retrieveElementActionsForReact(base, currentTemplateArgs, currentTemplateRootArgs, (events) => {
-          // if we have these templating options
-          if (base.styleActive || base.styleHover) {
-            // then we fetch them
-            const styleActive = convertStyleStringToReactObject(base.styleActive);
-            const styleHover = convertStyleStringToReactObject(base.styleHover);
-
-            // due to a bug in typescript I have to do it this way
-            const propsForThis: any = {
-              ...finalProps,
-              ...events,
-              Tag,
-              styleActive,
-              styleHover,
+          const defaultReturn = (pstyleActive?: any, pstyleHover?: any) => {
+            if (base.styleActive || base.styleHover) {
+              // then we fetch them
+              const styleActive = pstyleActive || convertStyleStringToReactObject(base.styleActive);
+              const styleHover = pstyleHover || convertStyleStringToReactObject(base.styleHover);
+  
+              // due to a bug in typescript I have to do it this way
+              const propsForThis: any = {
+                ...finalProps,
+                ...events,
+                Component: Tag,
+                styleActive,
+                styleHover,
+              };
+  
+              // and now we return with the dynamic component
+              return (
+                <ReactifiedElementWithHoverAndActive {...propsForThis} />
+              );
+            } else {
+              return (<Tag {...finalProps} {...events} />);
             };
-
-            // and now we return with the dynamic component
-            return (
-              <ReactifiedElementWithHoverAndActive {...propsForThis} />
-            );
           }
 
-          // otherwise we return based on the simple tag
-          return (
-            <Tag {...finalProps} {...events} />
-          );
+          let toRender: React.ReactNode;
+          if (arg.extraOptions && arg.extraOptions.onCustom) {
+            // then we fetch them
+            const styleActive = base.styleActive ? convertStyleStringToReactObject(base.styleActive) : null;
+            const styleHover = base.styleHover ? convertStyleStringToReactObject(base.styleHover) : null;
+
+            toRender = arg.extraOptions.onCustom(
+              base as any,
+              {...finalProps, ...events},
+              {Tag, styleActive, styleHover, defaultReturn: defaultReturn.bind(null, styleActive, styleHover)},
+            );
+          } else {
+            toRender = defaultReturn();
+          }
+
+          if (arg.extraOptions && arg.extraOptions.onCustomWrap) {
+            return arg.extraOptions.onCustomWrap(base as any, toRender);
+          } else {
+            return toRender;
+          }
         })
       }
     </React.Fragment>

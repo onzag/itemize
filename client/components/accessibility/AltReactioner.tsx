@@ -21,6 +21,11 @@ export interface IAltBaseProps {
    */
   componentProps?: any;
   /**
+   * how to get the element from the component
+   * use this as a string
+   */
+  componentGetElementFn?: string;
+  /**
    * A class name to use in such component
    */
   className?: string;
@@ -876,6 +881,10 @@ export class ActualAltBase<P extends IAltBaseProps, S> extends React.PureCompone
       return null as HTMLElement;
     }
 
+    if (this.props.componentGetElementFn) {
+      return (this.containerRef.current as any)[this.props.componentGetElementFn]() as HTMLElement;
+    }
+
     return this.containerRef.current as HTMLElement;
   }
 
@@ -1025,7 +1034,12 @@ export class ActualAltBase<P extends IAltBaseProps, S> extends React.PureCompone
   public render() {
     const Element = (this.props.component || "div") as any;
     return (
-      <Element ref={this.containerRef} tabIndex={0} className={this.props.className} {...this.props.componentProps}>
+      <Element
+        ref={this.containerRef}
+        tabIndex={0}
+        className={this.props.className}
+        {...this.props.componentProps}
+      >
         {this.props.children}
       </Element>
     );

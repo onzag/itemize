@@ -221,7 +221,6 @@ function SingleFragment(props: ISingleFragmentProps) {
 					<ItemProvider
 						itemDefinition="fragment"
 						properties={[
-							"title",
 							"content",
 							"attachments",
 						]}
@@ -240,7 +239,6 @@ function SingleFragment(props: ISingleFragmentProps) {
 									/>
 								</Box>
 
-								<Entry id="title" />
 								<Entry
 									id="content"
 									rendererArgs={{
@@ -254,7 +252,6 @@ function SingleFragment(props: ISingleFragmentProps) {
 									buttonColor="primary"
 									options={{
 										properties: [
-											"title",
 											"content",
 											"attachments",
 										],

@@ -2,6 +2,10 @@
     "type": "item",
     "properties": [
         {
+            "id": "title",
+            "type": "text"
+        },
+        {
             "id": "locale",
             "type": "string",
             "subtype": "comprehensive-locale"
