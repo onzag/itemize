@@ -13,6 +13,7 @@ import prettyBytes from "pretty-bytes";
 import { localeReplacer, mimeTypeToExtension, capitalize, checkFileInAccepts, processAccepts, fileURLAbsoluter } from "../../../../util";
 import { imageSrcSetRetriever, imageSizeRetriever, IImageSizes } from "../../../components/util";
 import { deepRendererArgsComparer } from "../general-fn";
+import PropertyDefinition from "../../../../base/Root/Module/ItemDefinition/PropertyDefinition";
 
 interface IOnSetDataInfo {
   extraMetadata?: string,
@@ -205,9 +206,9 @@ export default class PropertyEntryFile
   }
   public componentWillUnmount() {
     // revoke urls on unmount
-    // Object.keys(this.ownedObjectURLPool).forEach((id: string) => {
-    //   URL.revokeObjectURL(this.ownedObjectURLPool[id]);
-    // });
+    Object.keys(this.ownedObjectURLPool).forEach((id: string) => {
+      URL.revokeObjectURL(this.ownedObjectURLPool[id]);
+    });
   }
 
   /**
@@ -314,17 +315,17 @@ export default class PropertyEntryFile
   public onSetFile(file: File, info: IOnSetDataInfo = {}) {
     // when a drop is accepted, let's check, if it's a single file
     const id = "FILE" + uuid.v4().replace(/-/g, "");
-    const objectURL = URL.createObjectURL(file);
-    this.ownedObjectURLPool[id] = objectURL;
-    const value: PropertyDefinitionSupportedFileType = {
-      name: file.name,
-      type: file.type,
+    const value: PropertyDefinitionSupportedFileType = PropertyDefinition.createFileForProperty(
       id,
-      url: objectURL,
-      size: file.size,
-      src: file,
-      metadata: null,
-    };
+      file.name,
+      null,
+      file,
+    );
+    // we are creating another one that belongs only to this file
+    // that way when we insert anything we don't re-download anything
+    // aka the user updates something and the object url isn't revoked
+    // in favour of the new url because we overwrite
+    this.ownedObjectURLPool[id] = URL.createObjectURL(file);
 
     if (info.extraMetadata) {
       value.metadata = ";;" + info.extraMetadata;

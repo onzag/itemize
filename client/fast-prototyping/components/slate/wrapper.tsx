@@ -1177,7 +1177,9 @@ const toolbarFastKeyRegistry: Record<SlateEditorWrapperCustomToolbarIdentifiedEl
   hdivider: null,
 }
 
-const StyledToolbar = styled(Toolbar)(style.toolbar);
+// Typescript being shit as usual, have to force it as any because
+// something random that rejects the style
+const StyledToolbar = styled(Toolbar)(style.toolbar as any);
 
 /**
  * This is the function component that represents the toolbar for the wrapper

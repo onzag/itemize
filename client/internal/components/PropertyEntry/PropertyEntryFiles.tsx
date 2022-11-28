@@ -14,6 +14,7 @@ import prettyBytes from "pretty-bytes";
 import { localeReplacer, mimeTypeToExtension, capitalize, checkFileInAccepts, processAccepts, fileURLAbsoluter } from "../../../../util";
 import { imageSrcSetRetriever, imageSizeRetriever, IImageSizes } from "../../../components/util";
 import { deepRendererArgsComparer } from "../general-fn";
+import PropertyDefinition from "../../../../base/Root/Module/ItemDefinition/PropertyDefinition";
 
 interface IOnSetDataInfo {
   extraMetadata?: string,
@@ -218,9 +219,9 @@ export default class PropertyEntryFile
 
   public componentWillUnmount() {
     // now revoking happens at base level once the items are cleaned or released
-    // Object.keys(this.ownedObjectURLPool).forEach((id: string) => {
-    //   URL.revokeObjectURL(this.ownedObjectURLPool[id]);
-    // });
+    Object.keys(this.ownedObjectURLPool).forEach((id: string) => {
+      URL.revokeObjectURL(this.ownedObjectURLPool[id]);
+    });
   }
 
   private getIdOfLastValue() {
@@ -460,21 +461,18 @@ export default class PropertyEntryFile
     const id = "FILE" + uuid.v4().replace(/-/g, "");
     const objectURL = URL.createObjectURL(file);
     this.ownedObjectURLPool[id] = objectURL;
-    const value: PropertyDefinitionSupportedFileType = {
-      name: file.name,
-      type: file.type,
+    const value: PropertyDefinitionSupportedFileType = PropertyDefinition.createFileForProperty(
       id,
-      url: objectURL,
-      size: file.size,
-      src: file,
-      metadata: null,
-    };
+      file.name,
+      null,
+      file,
+    );
 
     if (info.extraMetadata) {
       value.metadata = ";;" + info.extraMetadata;
     }
 
-    const isExpectingImages = !!this.props.property.getSpecialProperty("imageUploader") || info.expectImage;
+    const isExpectingImages = !!this.props.property.getSpecialProperty("imageUploader") || info.expectImage;
 
     if (isExpectingImages || value.type.startsWith("image")) {
       const promise = new Promise<PropertyDefinitionSupportedFileType>((resolve) => {

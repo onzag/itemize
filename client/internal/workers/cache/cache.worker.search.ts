@@ -168,8 +168,8 @@ export async function search(
     newSearchRecords = newSearchRecords.sort((a, b) => {
       // remember if there's no value.DATA or the item is null or whatever
       // it would have never gotten here
-      const aValue = (a.searchResult as any).DATA[sortRule.property];
-      const bValue = (b.searchResult as any).DATA[sortRule.property];
+      const aValue = (a.searchResult as any).DATA[sortRule.property] as any;
+      const bValue = (b.searchResult as any).DATA[sortRule.property] as any;
 
       // we need our registry
       const itemDefinition = rootProxy.registry[a.searchRecord.type] as ItemDefinition;
@@ -259,12 +259,12 @@ async function checkOne(
   const idef = rootProxy.registry[(value as any).type] as ItemDefinition;
   if (idef && (value as any).id) {
     idef.getAllPropertyDefinitionsAndExtensions().forEach((p) => {
-      fixFilesURLAt(value, idef, null, p, (value as any).id, (value as any).version || null);
+      fixFilesURLAt(value, idef, null, p);
     });
   
     idef.getAllIncludes().forEach((i) => {
       i.getSinkingProperties().forEach((sp) => {
-        fixFilesURLAt(value, idef, i, sp, (value as any).id, (value as any).version || null);
+        fixFilesURLAt(value, idef, i, sp);
       });
     });
   }

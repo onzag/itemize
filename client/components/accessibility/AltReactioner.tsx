@@ -103,9 +103,11 @@ export interface IAltReactionerProps extends IAltBaseProps {
    * how many times to go up in the parent node before selecting, rather than selecting
    * the current element
    * 
+   * if it's a string it will use closest
+   * 
    * requires not be a text type and have a reactionKey
    */
-  selectorGoUp?: number;
+  selectorGoUp?: number | string;
   /**
    * The key to be used that will trigger the specific action,
    * please use keycodes in lowercase, they need to be lowercase
@@ -642,6 +644,8 @@ export function toggleAlt() {
   }
 }
 
+const rawSymbols = "+-.,;(){}=?!#%&";
+
 if (typeof document !== "undefined") {
   // this is a keycode that was consumed by the alt actioner
   // during the keydown event, if the keycode was not consumed
@@ -707,7 +711,12 @@ if (typeof document !== "undefined") {
       keyCode = "alt";
     } else if (keyCode.startsWith("shift")) {
       keyCode = "shift";
+    } else if (
+      rawSymbols.includes(e.key)
+    ) {
+      keyCode = e.key;
     }
+
     const isArrow = arrows.includes(keyCode);
     const isAltKey = e.altKey;
     const isTab = keyCode === "tab";
@@ -760,10 +769,12 @@ if (typeof document !== "undefined") {
 
       const dir = keyCode.replace("arrow", "");
 
-      scrollCurrent(dir as any, () => {
-        e.preventDefault();
-        e.stopPropagation();
-      });
+      if (!e.defaultPrevented) {
+        scrollCurrent(dir as any, () => {
+          e.preventDefault();
+          e.stopPropagation();
+        });
+      }
     }
   });
   window.addEventListener("mousedown", () => {
@@ -1122,9 +1133,13 @@ export class ActualAltReactioner extends ActualAltBase<IAltReactionerProps, IAct
 
     let elementRootSelect = this.containerRef.current as HTMLElement;
 
-    if (this.props.selectorGoUp) {
-      for (let i = 0; i < this.props.selectorGoUp; i++) {
-        elementRootSelect = elementRootSelect.parentNode as HTMLElement;
+    if (typeof this.props.selectorGoUp !== "undefined") {
+      if (typeof this.props.selectorGoUp === "number") {
+        for (let i = 0; i < this.props.selectorGoUp; i++) {
+          elementRootSelect = elementRootSelect.parentNode as HTMLElement;
+        }
+      } else {
+        elementRootSelect = elementRootSelect.closest(this.props.selectorGoUp);
       }
     }
 

@@ -54,7 +54,7 @@ interface FragmentLoaderProps {
   /**
    * sx props for the container
    */
-  sx: SxProps<Theme>;
+  sx?: SxProps<Theme>;
   /**
    * The roles that are allowed to edit this
    */

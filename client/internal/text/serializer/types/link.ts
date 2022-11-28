@@ -7,6 +7,7 @@
 
 import { deserializeChildrenForNode, IReactifyArg, ISerializationRegistryType } from "..";
 import { IAttrs, serializeElementBase, deserializeElementBase, IElementBase, reactifyElementBase } from "../base";
+import { NonRootInheritable } from "../template-args";
 import { IText, STANDARD_TEXT_NODE } from "./text";
 
 /**
@@ -107,8 +108,23 @@ export function registerLink(registry: ISerializationRegistryType) {
     }
 
     if (arg.asTemplate && arg.element.thref && arg.active) {
-      const href = arg.templateArgs[arg.element.thref] || arg.templateRootArgs[arg.element.thref];
-      (newCustomProps as any).href = href;
+      let href = arg.templateArgs.properties[arg.element.thref];
+
+      if (href instanceof NonRootInheritable) {
+        href = href.value;
+      } else if (!href) {
+        href = arg.templateRootArgs.properties[arg.element.thref];
+
+        if (href instanceof NonRootInheritable) {
+          href = null;
+        }
+      }
+
+      // could be matching a context but this is non-important
+      // as only template args are in play here
+      if (typeof href === "string") {
+        (newCustomProps as any).href = href;
+      }
     }
 
     // now we can do a call to the reactify

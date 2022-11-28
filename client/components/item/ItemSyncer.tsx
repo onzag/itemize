@@ -99,9 +99,11 @@ export default function ItemSyncer(props: IItemSyncerProps) {
       const reason = e.cached ? ", not cached" : ", error";
       console.log("Could not sync " + props.type +  " from " + props.id + " with id " + id + " and version " + version + reason);
 
+      console.log(e);
+
       // failed to cache
       props.handle && props.handle.onFailedSync(e.error);
-      props.onFailedSync(e.error);
+      props.onFailedSync && props.onFailedSync(e.error);
     }
 
     if (props.allowFallback || (!e.error && e.cached)) {

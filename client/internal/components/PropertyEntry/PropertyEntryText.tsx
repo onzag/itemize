@@ -526,9 +526,15 @@ export default class PropertyEntryText
       // we need to recover the blob url because it has been cleaned up
       // when it was deemed unnecessary
       if (fileCacheValue.src) {
-        fileCacheValue.url = URL.createObjectURL(fileCacheValue.src as Blob);
+        newValue.push(PropertyDefinition.createFileForProperty(
+          fileCacheValue.id,
+          fileCacheValue.name,
+          fileCacheValue.metadata,
+          fileCacheValue.src as any,
+        ));
+      } else {
+        newValue.push(fileCacheValue);
       }
-      newValue.push(fileCacheValue);
 
       if (!this.activeDataURIs[fileId]) {
         (async () => {
@@ -678,22 +684,16 @@ export default class PropertyEntryText
       });
       return null;
     }
-
-    // now we need a temporary url
-    const tempURL = URL.createObjectURL(file);
     // our random id for the file
     const id = "FILE" + uuid.v4().replace(/-/g, "");
 
     // and this is our file, no metadata yet
-    const addedFile: IPropertyDefinitionSupportedSingleFilesType = {
-      name: file.name,
-      type: file.type,
+    const addedFile: IPropertyDefinitionSupportedSingleFilesType = PropertyDefinition.createFileForProperty(
       id,
-      url: tempURL,
-      size: file.size,
-      src: file,
-      metadata: null,
-    };
+      file.name,
+      null,
+      file,
+    );
 
     // this is the default final value
     let finalValue: IInsertedFileInformationType = {
@@ -731,12 +731,12 @@ export default class PropertyEntryText
             lastLoadedFileError: "image_uploader_invalid_type",
           });
           // revoke the url
-          URL.revokeObjectURL(tempURL);
+          PropertyDefinition.revokeFileForProperty(addedFile);
           // and resolve to null
           resolve(null);
         }
         // and this is assigned the url of the image
-        img.src = tempURL;
+        img.src = addedFile.url;
       });
 
       // if our final value is null

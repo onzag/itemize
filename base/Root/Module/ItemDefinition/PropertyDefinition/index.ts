@@ -29,7 +29,8 @@ import equals from "deep-equal";
 import { IGQLFile } from "../../../../../gql-querier";
 import Include from "../Include";
 import { ICustomRoleManager } from "../../../../Root";
-import { PropertyDefinitionSupportedFilesType } from "./types/files";
+import type { PropertyDefinitionSupportedFilesType } from "./types/files";
+import type { PropertyDefinitionSupportedFileType } from "./types/file";
 
 /**
  * These are the main errors a property is able to give
@@ -483,6 +484,23 @@ export default class PropertyDefinition {
 
   // this static is required to be set in order to check for indexes
   public static indexChecker: PropertyDefinitionCheckerFunctionType = clientSideIndexChecker;
+
+  public static createFileForProperty(id: string, name: string, metadata: string, src: Blob): PropertyDefinitionSupportedFileType {
+    const url = URL.createObjectURL(src);
+    return {
+      name,
+      id,
+      metadata,
+      size: src.size,
+      type: src.type,
+      url,
+      src,
+    }
+  }
+
+  public static revokeFileForProperty(file: PropertyDefinitionSupportedFileType) {
+    URL.revokeObjectURL(file.url);
+  }
 
   /**
    * A static method that provides the policy prefix for a given policy name and type
@@ -1857,7 +1875,7 @@ export default class PropertyDefinition {
             (previousValue as IGQLFile).url.startsWith("blob:") &&
             (!actualValue || (actualValue as IGQLFile).url !== (previousValue as IGQLFile).url)
           ) {
-            URL.revokeObjectURL((previousValue as IGQLFile).url);
+            PropertyDefinition.revokeFileForProperty(previousValue as IGQLFile);
           }
         } else {
           (previousValue as IGQLFile[]).forEach((p) => {
@@ -1866,7 +1884,7 @@ export default class PropertyDefinition {
             }
             const shouldRevoke = actualValue ? !(actualValue as IGQLFile[]).find((v) => v.url === p.url) : true;
             if (shouldRevoke) {
-              URL.revokeObjectURL(p.url);
+              PropertyDefinition.revokeFileForProperty(p);
             }
           });
         }
@@ -1904,11 +1922,11 @@ export default class PropertyDefinition {
       if (actualValue) {
         if (this.getType() === "file") {
           if ((actualValue as IGQLFile).url.startsWith("blob:")) {
-            URL.revokeObjectURL((actualValue as IGQLFile).url);
+            PropertyDefinition.revokeFileForProperty(actualValue as IGQLFile);
           }
         } else {
           (actualValue as IGQLFile[]).forEach((p) => {
-            p.url.startsWith("blob:") && URL.revokeObjectURL(p.url);
+            p.url.startsWith("blob:") && PropertyDefinition.revokeFileForProperty(p)
           });
         }
       }

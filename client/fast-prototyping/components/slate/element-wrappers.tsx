@@ -548,7 +548,7 @@ export const materialUIElementWrappers: ISlateEditorElementWrappers = {
                       action="focus"
                       fullWidth={true}
                     >
-                      <FormControl>
+                      <FormControl fullWidth={true}>
                         <InputLabel
                           htmlFor="slate-wrapper-template-entry-id"
                           shrink={true}
@@ -559,11 +559,13 @@ export const materialUIElementWrappers: ISlateEditorElementWrappers = {
                           value={(props.element as ILink).thref || ""}
                           onChange={updateElementTHref}
                           displayEmpty={true}
+                          fullWidth={true}
                           sx={styles.whiteBackgroundInput}
                           input={
                             <FilledInput
                               id="slate-wrapper-template-entry-id"
                               placeholder={props.i18nRichInfo.setLink.templatedPlaceholder}
+                              fullWidth={true}
                             />
                           }
                         >

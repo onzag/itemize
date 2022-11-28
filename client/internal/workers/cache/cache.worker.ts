@@ -150,52 +150,14 @@ export interface ICacheDB extends DBSchema {
   }
 }
 
-const objectURLPool: { [fileId: string]: string } = {};
-const objectURLIdVersionFiles: {[mergedId: string]: string[]} = {};
-
-function getFileId(
-  file: IGQLFile,
-  itemDef: ItemDefinition,
-  include: Include,
-  property: PropertyDefinition,
-  id: string,
-  version: string,
-) {
-  // just some fancy id to ensure uniqueness
-  const fileId = file.id + "." + 
-    itemDef.getQualifiedPathName() + "." +
-    (include ? include.getQualifiedIdentifier() : "") + "." +
-    property.getId() + "." + id + "." + (version || "");
-
-  return fileId;
-}
-
 function fixOneFile(
   file: IGQLFile,
-  itemDef: ItemDefinition,
-  include: Include,
-  property: PropertyDefinition,
-  id: string,
-  version: string,
 ) {
   if (!file.src) {
     return;
   }
 
-  const fileId = getFileId(file, itemDef, include, property, id, version);
-
-  if (!objectURLPool[fileId]) {
-    objectURLPool[fileId] = URL.createObjectURL(file.src as Blob);
-
-    const mergedId = itemDef.getQualifiedPathName() + "." + id + "." + (version || "");
-    if (!objectURLIdVersionFiles[mergedId]) {
-      objectURLIdVersionFiles[mergedId] = [fileId];
-    } else {
-      objectURLIdVersionFiles[mergedId].push(fileId);
-    }
-  }
-
-  file.url = objectURLPool[fileId];
+  file.url = URL.createObjectURL(file.src as Blob);
   delete file.src;
 }
 
@@ -204,8 +166,6 @@ export function fixFilesURLAt(
   itemDef: ItemDefinition,
   include: Include,
   property: PropertyDefinition,
-  id: string,
-  version: string,
 ) {
   if (!partialValue) {
     return;
@@ -224,9 +184,9 @@ export function fixFilesURLAt(
   const value = partialValue.DATA[idLocation];
 
   if (Array.isArray(value)) {
-    value.forEach((v) => fixOneFile(v as any, itemDef, include, property, id, version));
+    value.forEach((v) => fixOneFile(v as any));
   } else {
-    fixOneFile(value as any, itemDef, include, property, id, version);
+    fixOneFile(value as any);
   }
 }
 
@@ -724,20 +684,6 @@ export default class CacheWorker {
     // now we can see the identifier of our query
     const queryIdentifier = `${queryName}.${id}.${(version || "")}`;
 
-    // Revoking potential old files url that have been created
-    const type = queryName.replace(PREFIX_GET, "");
-    const mergedId = type + "." + id + "." + (version || "");
-
-    // if we have urls for such blobs in the map
-    if (objectURLIdVersionFiles[mergedId]) {
-      // loop through them and delete them from the pool
-      objectURLIdVersionFiles[mergedId].forEach((fileId) => {
-        URL.revokeObjectURL(objectURLPool[fileId]);
-        delete objectURLPool[fileId];
-      });
-      delete objectURLIdVersionFiles[mergedId];
-    }
-
     // and now we try this
     try {
       await this.db.delete(QUERIES_TABLE_NAME, queryIdentifier);
@@ -1107,12 +1053,12 @@ export default class CacheWorker {
 
           if (idbValue.value) {
             idef.getAllPropertyDefinitionsAndExtensions().forEach((p) => {
-              fixFilesURLAt(idbValue.value, idef, null, p, id, version);
+              fixFilesURLAt(idbValue.value, idef, null, p);
             });
 
             idef.getAllIncludes().forEach((i) => {
               i.getSinkingProperties().forEach((sp) => {
-                fixFilesURLAt(idbValue.value, idef, i, sp, id, version);
+                fixFilesURLAt(idbValue.value, idef, i, sp);
               });
             });
           }

@@ -79,11 +79,18 @@ export function useHandleMechanism(
     setSynced && setSynced(isDepedantsSync());
   }, [setSynced]);
 
+  const handleFailedSync = useCallback(() => {
+    if (handle) {
+      handle.onFailedSync();
+    }
+    onFailedSync && onFailedSync();
+  }, [setSynced]);
+
   const ownHandle = useMemo<IBaseSyncerHandle>(() => {
     return ({
       onMount: handleMount,
       onDismount: handleDismount,
-      onFailedSync: onFailedSync,
+      onFailedSync: handleFailedSync,
       setSync: handleSetSync,
     });
   }, [onFailedSync, handleMount, handleDismount, handleSetSync]);

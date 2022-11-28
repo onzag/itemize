@@ -508,7 +508,7 @@ function accessibilityEnabledCustomTextProcesser(
  *   altReactionerCustomProps: (element) => {
  *     if (element.type === "link") {
  *       return {
- *         sx: {verticalAlign: "middle"}
+ *         sx: {verticalAlign: "baseline"}
  *       }
  *     }
  *     return null;

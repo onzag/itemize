@@ -2,11 +2,7 @@ import type { RichElement, IRootLevelDocument } from ".";
 import { IUIHandlerProps } from "./base";
 
 
-/**
- * Interface to define context wrappers during a dynamic render
- */
-export interface ITemplateArgsProperties {
-  [name: string]:
+type TemplateArgProperty =
   // internal context
   TemplateArgs |
   // mutating context or array
@@ -27,6 +23,12 @@ export interface ITemplateArgsProperties {
   boolean |
   // eh?
   number;
+
+/**
+ * Interface to define context wrappers during a dynamic render
+ */
+export interface ITemplateArgsProperties {
+  [name: string]: TemplateArgProperty | NonRootInheritable;
 }
 
 /**
@@ -34,7 +36,7 @@ export interface ITemplateArgsProperties {
  * in the case of setting mutating context it should be used as eg.
  * 
  * new TemplateArgs({
- *   name: "jonh",
+ *   name: new NonRootInheritable("jonh"),
  *   person: true,
  *   myMutatingContext: new MutatingTemplateArgs(
  *     (children) => {
@@ -65,7 +67,7 @@ export interface ITemplateArgsProperties {
  * and for iterable
  * 
  * new TemplateArgs({
- *   name: "jonh",
+ *   name: new NonRootInheritable("jonh"),
  *   person: true,
  *   myMutatingContext: new MutatingTemplateArgs(
  *     (children) => {
@@ -96,7 +98,7 @@ export interface ITemplateArgsProperties {
  * it's possible to double wrap on iterables
  * 
  * new TemplateArgs({
- *   name: "jonh",
+ *   name: new NonRootInheritable("jonh"),
  *   person: true,
  *   myMutatingContext: new MutatingTemplateArgs(
  *     (children) => {
@@ -127,6 +129,16 @@ export interface ITemplateArgsProperties {
 export type TemplateArgMutatingWrapperFn = (children: (newContext: TemplateArgs, key?: string | number) => React.ReactNode) => React.ReactNode;
 
 /**
+ * Makes a value non root inheritable
+ */
+export class NonRootInheritable {
+  public value: TemplateArgProperty;
+  constructor(value: TemplateArgProperty) {
+    this.value = value;
+  }
+}
+
+/**
  * Allows to define a context wrapper argument for the standard context
  * that is given this can only be used during the render dynamic
  * it is not valid for the render static
@@ -134,7 +146,6 @@ export type TemplateArgMutatingWrapperFn = (children: (newContext: TemplateArgs,
 export class TemplateArgs {
   public properties: ITemplateArgsProperties;
   public wrapper: (n: React.ReactNode) => React.ReactNode;
-  public isNonRootInheritable: boolean = false;
 
   constructor(properties: ITemplateArgsProperties) {
     this.properties = properties;
@@ -144,10 +155,6 @@ export class TemplateArgs {
     this.wrapper = w;
     return this;
   }
-
-  public nonRootInheritable() {
-    this.isNonRootInheritable = true;
-  }
 }
 
 /**
@@ -155,13 +162,8 @@ export class TemplateArgs {
  */
 export class MutatingTemplateArgs {
   public mutatingWrapper: TemplateArgMutatingWrapperFn;
-  public isNonRootInheritable: boolean = false;
   constructor(mutatingWrapper: TemplateArgMutatingWrapperFn) {
     this.mutatingWrapper = mutatingWrapper;
-  }
-
-  public nonRootInheritable() {
-    this.isNonRootInheritable = true;
   }
 }
 
@@ -172,13 +174,8 @@ export type TemplateArgFunctionalWrapperFn = (children: (fn: Function) => React.
  */
 export class MutatingFunctionArg {
   public mutatingFunctionWrapper: TemplateArgFunctionalWrapperFn;
-  public isNonRootInheritable: boolean = false;
   constructor(mutatingFunctionWrapper: TemplateArgFunctionalWrapperFn) {
     this.mutatingFunctionWrapper = mutatingFunctionWrapper;
-  }
-
-  public nonRootInheritable() {
-    this.isNonRootInheritable = true;
   }
 }
 
@@ -294,11 +291,11 @@ export interface ITemplateArgContextDefinition extends IBaseTemplateArg {
   loopable?: boolean;
   properties: {
     [key: string]: ITemplateArgContextDefinition |
-      ITemplateArgUIHandlerDefinition |
-      ITemplateArgTextDefinition |
-      ITemplateArgLinkDefinition |
-      ITemplateArgHTMLDefinition |
-      ITemplateArgFunctionDefinition |
-      ITemplateArgBooleanDefinition
+    ITemplateArgUIHandlerDefinition |
+    ITemplateArgTextDefinition |
+    ITemplateArgLinkDefinition |
+    ITemplateArgHTMLDefinition |
+    ITemplateArgFunctionDefinition |
+    ITemplateArgBooleanDefinition
   };
 }

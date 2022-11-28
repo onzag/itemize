@@ -73,8 +73,10 @@ interface IAltBadgeReactionerProps {
   /**
    * how many times to go up in the parent node before selecting, rather than selecting
    * the current element
+   * 
+   * if it's a string it will use closest
    */
-  selectorGoUp?: number;
+  selectorGoUp?: number | string;
   /**
    * The key to be used that will trigger the specific action, same rules use lowecase
    * values only for keycodes and do not use the arrow keycodes

@@ -11,7 +11,7 @@ import { DOMWindow } from "../../../../util";
 import { IReactifyArg, ISerializationRegistryType, RichElement } from ".";
 import { IText } from "./types/text";
 import { ReactifiedElementWithHoverAndActive } from "./dynamic-component";
-import { MutatingFunctionArg, MutatingTemplateArgs, TemplateArgs } from "./template-args";
+import { MutatingFunctionArg, MutatingTemplateArgs, NonRootInheritable, TemplateArgs } from "./template-args";
 
 export interface IUIHandlerEvents {
   onClick?: any;
@@ -226,7 +226,18 @@ export function retrieveElementActionsForReact(
   Object.keys(eventReactifyTranslations).forEach((key) => {
     const value = base[key];
     if (value) {
-      const contextValue = (context && context.properties[value]) || (rootContext && rootContext.properties[value]);
+      let contextValue = context && context.properties[value];
+
+      if (contextValue instanceof NonRootInheritable) {
+        contextValue = contextValue.value;
+      } else if (!contextValue) {
+        contextValue = rootContext && rootContext.properties[value];
+  
+        if (contextValue instanceof NonRootInheritable) {
+          contextValue = null;
+        }
+      }
+
       if (contextValue) {
         const translation = eventReactifyTranslations[key];
         if (contextValue instanceof MutatingFunctionArg) {
@@ -444,8 +455,13 @@ export function reactifyElementBase(
       // and change it accordingly, this change should be
       newTemplateArgs = (newTemplateArgs.properties[base.context] || null) as any;
       if (!(newTemplateArgs instanceof TemplateArgs) || !(newTemplateArgs instanceof MutatingTemplateArgs)) {
-        throw new Error("When changing to context " + base.context + " could not find an actual template args context");
+        console.warn("When changing to context " + base.context + " could not find an actual template args context");
       }
+    }
+
+    // can't render a thing
+    if (!newTemplateArgs) {
+      return null;
     }
 
     // then we got to use the foreach context if we have one
@@ -575,11 +591,19 @@ export function reactifyElementBase(
 
     // and we find the given handler, either from the current context
     // or the root context
-    const Handler: any = (
+    let Handler: any = (
       currentTemplateArgs && currentTemplateArgs.properties[base.uiHandler]
-    ) || (
-      currentTemplateRootArgs && currentTemplateRootArgs.properties[base.uiHandler]
     );
+
+    if (Handler instanceof NonRootInheritable) {
+      Handler = Handler.value;
+    } else if (!Handler) {
+      Handler = currentTemplateRootArgs && currentTemplateRootArgs.properties[base.uiHandler];
+
+      if (Handler instanceof NonRootInheritable) {
+        Handler = null;
+      }
+    }
 
     // if we have it, we use it
     if (Handler) {
@@ -598,14 +622,14 @@ export function reactifyElementBase(
           key: index,
           extraOptions: arg.extraOptions,
         };
-  
+
         // and then we call the reactify
         if ((c as IText).text) {
           return registry.REACTIFY.text(specificChildTemplateOptions);
         } else if (registry.SERIALIZE[(c as RichElement).type]) {
           return registry.REACTIFY[(c as RichElement).type](specificChildTemplateOptions);
         }
-  
+
         // ohteriwse null
         return null;
       }) : children;
@@ -692,11 +716,20 @@ export function reactifyElementBase(
     // we remove the children if we have them
     delete finalProps.children;
 
-    const value = (
+    let value = (
       currentTemplateArgs && currentTemplateArgs.properties[base.html]
-    ) || (
-        currentTemplateRootArgs && currentTemplateRootArgs.properties[base.html]
-      );
+    );
+
+    if (value instanceof NonRootInheritable) {
+      value = value.value;
+    } else if (!value) {
+      value = currentTemplateRootArgs && currentTemplateRootArgs.properties[base.html];
+
+      if (value instanceof NonRootInheritable) {
+        value = null;
+      }
+    }
+
     if (value) {
       if (typeof value === "string") {
         // and define the dangerously set inner html
@@ -712,11 +745,19 @@ export function reactifyElementBase(
     // we remove the children if we have them
     delete finalProps.children;
     // and define the text content
-    const value = (
+    let value = (
       currentTemplateArgs && currentTemplateArgs.properties[base.textContent]
-    ) || (
-        currentTemplateRootArgs && currentTemplateRootArgs.properties[base.textContent]
-      );
+    );
+
+    if (value instanceof NonRootInheritable) {
+      value = value.value;
+    } else if (!value) {
+      value = currentTemplateRootArgs && currentTemplateRootArgs.properties[base.textContent];
+
+      if (value instanceof NonRootInheritable) {
+        value = null;
+      }
+    }
 
     if (typeof value === "string") {
       finalProps.children = value;
@@ -797,7 +838,7 @@ export function reactifyElementBase(
               // then we fetch them
               const styleActive = pstyleActive || convertStyleStringToReactObject(base.styleActive);
               const styleHover = pstyleHover || convertStyleStringToReactObject(base.styleHover);
-  
+
               // due to a bug in typescript I have to do it this way
               const propsForThis: any = {
                 ...finalProps,
@@ -806,7 +847,7 @@ export function reactifyElementBase(
                 styleActive,
                 styleHover,
               };
-  
+
               // and now we return with the dynamic component
               return (
                 <ReactifiedElementWithHoverAndActive {...propsForThis} />
@@ -824,8 +865,8 @@ export function reactifyElementBase(
 
             toRender = arg.extraOptions.onCustom(
               base as any,
-              {...finalProps, ...events},
-              {Tag, styleActive, styleHover, defaultReturn: defaultReturn.bind(null, styleActive, styleHover)},
+              { ...finalProps, ...events },
+              { Tag, styleActive, styleHover, defaultReturn: defaultReturn.bind(null, styleActive, styleHover) },
             );
           } else {
             toRender = defaultReturn();
