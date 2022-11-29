@@ -156,7 +156,19 @@ export interface IPropertyEntryI18nRichTextInfo {
 
   richUIHandlerElement: {
     [key: string]: string;
-  }
+  };
+  richTables: {
+    [key: string]: string;
+  };
+  richContainers: {
+    [key: string]: string;
+  };
+  richClasses: {
+    [key: string]: string;
+  };
+  richCustoms: {
+    [key: string]: string;
+  };
 }
 
 /**
@@ -1063,6 +1075,10 @@ export default class PropertyEntryText
         },
 
         richUIHandlerElement: i18nRoot.rich_ui_handler_element || {},
+        richClasses: i18nRoot.rich_classes || {},
+        richContainers: i18nRoot.rich_containers || {},
+        richCustoms: i18nRoot.rich_customs || {},
+        richTables: i18nRoot.rich_tables || {},
       } : null,
 
       i18nGenericError: i18nInLanguage.generic_error,

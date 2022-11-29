@@ -4430,12 +4430,11 @@ export class SlateEditor extends React.Component<ISlateEditorProps, ISlateEditor
         value: c,
         label: (
           this.props.rootI18n &&
-          this.props.rootI18n.custom &&
-          this.props.rootI18n.custom[i18nLocation] &&
+          this.props.rootI18n[i18nLocation] &&
           (
             // both the default and by replacing
-            this.props.rootI18n.custom[i18nLocation][c] ||
-            this.props.rootI18n.custom[i18nLocation][c.replace(/-/g, "_")]
+            this.props.rootI18n[i18nLocation][c] ||
+            this.props.rootI18n[i18nLocation][c.replace(/-/g, "_")]
           )
         ) || c
         // and if we find nothing we use the value itself
@@ -4605,10 +4604,10 @@ export class SlateEditor extends React.Component<ISlateEditorProps, ISlateEditor
     }
 
     // we get these from the available filtering functions
-    const availableCustoms = this.availableFilteringFunction("supportsCustom", "allCustom", "supportedCustoms", "custom");
-    const availableRichClasses = this.availableFilteringFunction("supportsRichClasses", "allRichClasses", "supportedRichClasses", "rich");
-    const availableContainers = this.availableFilteringFunction("supportsContainers", "allContainers", "supportedContainers", "containers");
-    const availableTables = this.availableFilteringFunction("supportsTables", "allTables", "supportedTables", "tables");
+    const availableCustoms = this.availableFilteringFunction("supportsCustom", "allCustom", "supportedCustoms", "rich_customs");
+    const availableRichClasses = this.availableFilteringFunction("supportsRichClasses", "allRichClasses", "supportedRichClasses", "rich_classes");
+    const availableContainers = this.availableFilteringFunction("supportsContainers", "allContainers", "supportedContainers", "rich_containers");
+    const availableTables = this.availableFilteringFunction("supportsTables", "allTables", "supportedTables", "rich_tables");
 
     // and extend based on the features
     const newFeatureSupport: IAccessibleFeatureSupportOptions = {
