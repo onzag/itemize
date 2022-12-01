@@ -148,6 +148,7 @@ function AccessibleImage(props: IAccessibleImageProps) {
             Component: props.Tag,
             styleActive: props.styleActive,
             styleHover: props.styleHover,
+            ["aria-label"]: props.image.alt,
           }}
           priority={props.priority}
         >
@@ -184,7 +185,10 @@ function AccessibleImage(props: IAccessibleImageProps) {
     return (
       <AltText
         component={Tag}
-        componentProps={newProps}
+        componentProps={{
+          ...newProps,
+          ["aria-label"]: props.image.alt,
+        }}
         priority={props.priority}
       >
         {props.children}

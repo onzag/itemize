@@ -21,8 +21,11 @@ import {
   INCLUDE_PREFIX,
 } from "../../../../../../constants";
 import { PropertyDefinitionSearchInterfacesPrefixes, PropertyDefinitionSearchInterfacesType } from "../search-interfaces";
-import { textSQL, textSQLIn, textSqlRedoDictionaryIndex, textSQLSearch,
-  textSQLStrSearch, textSQLBtreeIndexable, textSQLOrderBy, textElasticSearch, textElastic, textElasticStrSearch, textElasticIn } from "../sql/text";
+import {
+  textSQL, textSQLIn, textSqlRedoDictionaryIndex, textSQLSearch,
+  textSQLStrSearch, textSQLBtreeIndexable, textSQLOrderBy, textElasticSearch,
+  textElastic, textElasticStrSearch, textElasticIn
+} from "../sql/text";
 
 /**
  * The text is described by a string

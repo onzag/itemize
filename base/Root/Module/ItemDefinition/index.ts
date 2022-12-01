@@ -928,7 +928,7 @@ export default class ItemDefinition {
           this.policyPropertyDefinitions[policyType][policyName] =
             policyValue.properties.map(
               (propertyId: string) => {
-                return itemDefinition.getPropertyDefinitionFor(propertyId, true).getNewInstance();
+                return itemDefinition.getPropertyDefinitionFor(propertyId, true).getNewInstance().markAsPolicy(policyType, policyName);
               },
             );
         });

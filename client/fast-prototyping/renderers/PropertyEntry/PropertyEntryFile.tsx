@@ -303,27 +303,27 @@ function PropertyEntryFileRenderer(props: IPropertyEntryFileRendererProps) {
   const descriptionAsAlert = props.args["descriptionAsAlert"];
 
   let descriptionObject: React.ReactNode = null;
-  if (this.props.description) {
+  if (props.description) {
     descriptionObject = descriptionAsAlert ? (
-      <Alert severity="info" sx={style.description} role="note" id={this.props.uniqueId + "_desc"}>
-        {this.props.description}
+      <Alert severity="info" sx={style.description} role="note" id={props.uniqueId + "_desc"}>
+        {props.description}
       </Alert>
     ) : (
-      <Typography variant="caption" sx={style.description} id={this.props.uniqueId + "_desc"}>
-        {this.props.description}
+      <Typography variant="caption" sx={style.description} id={props.uniqueId + "_desc"}>
+        {props.description}
       </Typography>
     );
   }
 
   const error = (
-    this.props.args.hideError ? null : <Box sx={style.errorMessage} id={this.props.uniqueId + "_error"}>
-      {this.props.currentInvalidReason}
+    props.args.hideError ? null : <Box sx={style.errorMessage} id={props.uniqueId + "_error"}>
+      {props.currentInvalidReason}
     </Box>
   );
 
   let inner: React.ReactNode;
-  if (this.props.args.useCustomFieldRender) {
-    inner = this.props.args.useCustomFieldRender(descriptionObject, fieldLabel, fieldComponent, error, this.props.disabled);
+  if (props.args.useCustomFieldRender) {
+    inner = props.args.useCustomFieldRender(descriptionObject, fieldLabel, fieldComponent, error, props.disabled);
   } else {
     inner = (
       <>

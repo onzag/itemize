@@ -933,9 +933,9 @@ export default class PropertyEntryText
     const RendererElement = this.props.renderer;
     const rendererArgs: IPropertyEntryTextRendererProps = {
       propertyId: this.props.property.getId(),
-      uniqueId: this.props.itemDefinition.getQualifiedPathName() + "_" + this.props.property.getId() + "_" + this.props.forId + "_" + this.props.forVersion,
+      uniqueId: this.props.property.getUniqueIdentifier(this.props.forId, this.props.forVersion),
 
-      args: this.props.rendererArgs,
+      args: this.props.rendererArgs || {},
       rtl: this.props.rtl,
       label: i18nLabel,
       placeholder: i18nPlaceholder,

@@ -7,7 +7,7 @@
  * @module
  */
 
-import React from "react";
+import React, { useEffect, useRef } from "react";
 import { IPropertyEntrySelectRendererProps } from "../../../internal/components/PropertyEntry/PropertyEntrySelect";
 import Alert from '@mui/material/Alert';
 import Typography from "@mui/material/Typography";
@@ -16,6 +16,8 @@ import RestoreIcon from "@mui/icons-material/Restore";
 import InputAdornment from "@mui/material/InputAdornment";
 import Select, { SelectChangeEvent } from "@mui/material/Select";
 import FilledInput from "@mui/material/FilledInput";
+import OutlinedInput from "@mui/material/OutlinedInput";
+import Input from "@mui/material/Input";
 import Chip from "@mui/material/Chip";
 import MenuItem from "@mui/material/MenuItem";
 import Divider from "@mui/material/Divider";
@@ -24,6 +26,7 @@ import ListItemText from "@mui/material/ListItemText";
 import { ListItemIcon } from "@mui/material";
 import Box from "@mui/system/Box";
 import { RestoreIconButton } from "./general";
+import ExpandMoreOutlinedIcon from '@mui/icons-material/ExpandMoreOutlined';
 
 /**
  * A simple helper function that says when it should show invalid
@@ -32,6 +35,27 @@ import { RestoreIconButton } from "./general";
  */
 function shouldShowInvalid(props: IPropertyEntrySelectRendererProps) {
   return !props.currentValid;
+}
+
+function ForcefulRepairOfAriaLabelledByDueToMaterialUIBugNotWorking(props: any) {
+  const ref = useRef<any>();
+
+  useEffect(() => {
+    // force the aria labelledby to be set to what it is intended to be set
+    // material ui is jank
+    const element = ref.current.querySelector("div[role]");
+    const id = element.id;
+    element.setAttribute("aria-labelledby", (props["aria-labelledby"] || "") + " " + id);
+    if (props["aria-describedby"]) {
+      element.setAttribute("aria-describedby", props["aria-describedby"]);
+    } else {
+      element.removeAttribute("aria-describedby");
+    }
+  }, [props]);
+
+  return (
+    <Select {...props} ref={ref} Form/>
+  );
 }
 
 /**
@@ -135,16 +159,37 @@ class PropertyEntrySelectRenderer
 
     const isInvalid = shouldShowInvalid(this.props);
 
+    let idToUse = this.props.uniqueId;
+    if (this.props.args.selectProps && this.props.args.selectProps.id) {
+      idToUse = this.props.args.selectProps.id;
+    }
+
+    const appliedSelectProps: any = {
+      "aria-labelledby": idToUse+ "_label",
+      "aria-describedby": this.props.description ? idToUse+ "_desc" : null,
+    }
+
     const appliedInputProps: any = {
-      "aria-describedby": this.props.description ? this.props.uniqueId + "_desc" : null,
+      "aria-labelledby": idToUse+ "_label",
+      "aria-describedby": this.props.description ? idToUse+ "_desc" : null,
     };
 
     if (isInvalid) {
       appliedInputProps.inputProps["aria-invalid"] = true;
+      appliedSelectProps["aria-invalid"] = true;
 
       if (!this.props.args.hideError) {
-        appliedInputProps.inputProps["aria-errormessage"] = this.props.uniqueId + "_error";
+        appliedInputProps.inputProps["aria-errormessage"] = idToUse + "_error";
+        appliedSelectProps["aria-errormessage"] = idToUse + "_error";
       }
+    }
+
+    let InputToUse = FilledInput;
+
+    if (this.props.args.fieldVariant === "standard") {
+      InputToUse = Input;
+    } else if (this.props.args.fieldVariant === "outlined") {
+      InputToUse = OutlinedInput;
     }
 
     const restoreAction = icon && this.props.canRestore && this.props.currentAppliedValue ? this.props.onRestore : null;
@@ -162,12 +207,13 @@ class PropertyEntrySelectRenderer
     let selectElement: React.ReactNode = null;
     if (this.props.isList) {
       selectElement = (
-        <Select
+        <ForcefulRepairOfAriaLabelledByDueToMaterialUIBugNotWorking
+          id={idToUse}
           sx={style.selectRoot}
           multiple={true}
           value={(this.props.currentValue || []) as any[]}
           onChange={this.onChange}
-          input={<FilledInput fullWidth={true} {...appliedInputProps} />}
+          input={<InputToUse label={this.props.label} fullWidth={true} {...appliedInputProps} {...this.props.args.inputProps}/>}
           renderValue={(selected: any[]) => {
             return (
               <Box sx={style.chips}>
@@ -185,6 +231,9 @@ class PropertyEntrySelectRenderer
               </Box>
             );
           }}
+          // due to a bug in material ui I am forced to force a label despite html for being there
+          {...appliedSelectProps}
+          {...this.props.args.selectProps}
         >
           {
             // render the valid values that we display and choose
@@ -209,7 +258,7 @@ class PropertyEntrySelectRenderer
               return <MenuItem key={vv.value} value={vv.value}>{addr}{content}</MenuItem>;
             })
           }
-        </Select>
+        </ForcefulRepairOfAriaLabelledByDueToMaterialUIBugNotWorking>
       );
     } else {
       let anyContent: React.ReactNode;
@@ -223,7 +272,8 @@ class PropertyEntrySelectRenderer
         }
       }
       selectElement = (
-        <Select
+        <ForcefulRepairOfAriaLabelledByDueToMaterialUIBugNotWorking
+          id={idToUse}
           value={this.props.currentValue || ""}
           onChange={this.onChange}
           onBlur={this.props.enableUserSetErrors}
@@ -232,8 +282,9 @@ class PropertyEntrySelectRenderer
           variant={this.props.args.fieldVariant || "filled"}
           sx={style.selectRoot}
           input={
-            <FilledInput
-              id={this.props.propertyId}
+            <InputToUse
+              variant="filled"
+              label={this.props.label}
               placeholder={this.props.placeholder}
               endAdornment={addornment}
               fullWidth={true}
@@ -242,8 +293,13 @@ class PropertyEntrySelectRenderer
                 focused: "focused",
               }}
               {...appliedInputProps}
+              {...this.props.args.inputProps}
             />
           }
+          IconComponent={ExpandMoreOutlinedIcon}
+          // due to a bug in material ui I am forced to force a label despite html for being there
+          {...appliedSelectProps}
+          {...this.props.args.selectProps}
         >
           <MenuItem
             selected={false}
@@ -280,7 +336,7 @@ class PropertyEntrySelectRenderer
               return <MenuItem key={vv.value} value={vv.value}>{addr}{content}</MenuItem>;
             })
           }
-        </Select>
+        </ForcefulRepairOfAriaLabelledByDueToMaterialUIBugNotWorking>
       );
     }
 
@@ -290,7 +346,9 @@ class PropertyEntrySelectRenderer
         sx={style.entry}
       >
         {this.props.label ? <InputLabel
-          htmlFor={this.props.propertyId}
+          id={idToUse + "_label"}
+          // htmlFor={idToUse}
+          htmlFor="undefined"
           sx={style.label(isInvalid)}
           classes={{
             focused: "focused",

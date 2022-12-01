@@ -484,6 +484,8 @@ export default class PropertyDefinition {
 
   // this static is required to be set in order to check for indexes
   public static indexChecker: PropertyDefinitionCheckerFunctionType = clientSideIndexChecker;
+  private policyType: string;
+  private policyName: string;
 
   public static createFileForProperty(id: string, name: string, metadata: string, src: Blob): PropertyDefinitionSupportedFileType {
     const url = URL.createObjectURL(src);
@@ -2084,6 +2086,59 @@ export default class PropertyDefinition {
   public getNewInstance() {
     return new PropertyDefinition(this.rawData, this.parentModule,
       this.parentItemDefinition, this.propertyIsExtension, this);
+  }
+
+  /**
+   * Marks a property definition as a policy type
+   * @param policyType edit, delete, create
+   * @param policyName the policy name
+   */
+  public markAsPolicy(policyType: string, policyName: string) {
+    this.policyType = policyType;
+    this.policyName = policyName;
+
+    return this;
+  }
+
+  /**
+   * if this is a property definition that belongs to a policy
+   * this will return the policy type
+   * @returns the policy type
+   */
+  public getPolicyType() {
+    return this.policyType || null;
+  }
+
+  /**
+   * if this is a property definition that belongs to a policy
+   * this will return the policy name
+   * @returns the policy name
+   */
+  public getPolicyName() {
+    return this.policyName || null;
+  }
+
+  /**
+   * Specifies whether the property definition belongs to a policy
+   * @returns a boolean
+   */
+  public isPolicyPropertyDefinition() {
+    return !!this.policyType;
+  }
+
+  /**
+   * Provides an unique identifier for a given id version combo
+   * for this given property
+   * @returns a string
+   */
+  public getUniqueIdentifier(id: string, version: string) {
+    return (
+      (this.isExtension() ? this.parentModule.getQualifiedPathName() : this.parentItemDefinition.getQualifiedPathName()) + "_" +
+      this.getId() + "_" +
+      (this.isPolicyPropertyDefinition() ? (this.policyType + "_" + this.policyName + "_") : "") +
+      id + "_" +
+      version
+    )
   }
 
   /**

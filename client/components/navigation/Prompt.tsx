@@ -1,5 +1,6 @@
 /**
  * A navigation prompt that prompts if a condition evaluates to true
+ * as the navigation tries to change location
  *
  * @module
  */
@@ -261,8 +262,8 @@ export default class Prompt extends React.PureComponent<PromptProps, PromptState
         onDiscard={this.discardDialog}
         args={this.props.dialogArgs}
         confirming={this.props.confirmationCallbackConfirming || false}
-        confirmationCallbackError={this.props.confirmationCallbackError || null}
-        confirmationCallbackErrorClean={this.props.confirmationCallbackCleanError || (() => null)}
+        confirmationCallbackError={this.props.confirmationCallbackError || null}
+        confirmationCallbackErrorClean={this.props.confirmationCallbackCleanError || (() => null)}
       />
     </React.Fragment>
   }

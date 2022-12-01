@@ -480,11 +480,13 @@ class PropertyEntryFieldRenderer
   }
 
   public render() {
+    let idToUse = (this.props.args.inputProps && this.props.args.inputProps.id) || this.props.uniqueId;
+
     if (this.props.subtype === "country" || this.props.subtype === "language" || this.props.subtype === "currency") {
       return (
         <PropertyEntrySelectRenderer
           args={this.props.args}
-          uniqueId={this.props.uniqueId}
+          uniqueId={idToUse}
           autoFocus={this.props.autoFocus}
           canRestore={this.props.canRestore}
           currentAppliedValue={this.props.currentAppliedValue as any}
@@ -541,8 +543,8 @@ class PropertyEntryFieldRenderer
       autoComplete: this.props.args.htmlAutocomplete || (
         this.props.type === "password" ? "current-password" : this.props.uniqueId
       ),
-      id: this.props.uniqueId,
-      "aria-describedby": this.props.description ? this.props.uniqueId + "_desc" : null,
+      id: idToUse,
+      "aria-describedby": this.props.description ? idToUse + "_desc" : null,
     };
 
     // these are the TextField props that are applied
@@ -560,7 +562,7 @@ class PropertyEntryFieldRenderer
       inputProps["aria-invalid"] = true;
 
       if (!this.props.args.hideError) {
-        inputProps["aria-errormessage"] = this.props.uniqueId + "_error";
+        inputProps["aria-errormessage"] = idToUse + "_error";
       }
     }
 
@@ -726,6 +728,7 @@ class PropertyEntryFieldRenderer
           classes: {
             focused: "focused",
           },
+          htmlFor: idToUse,
         }}
         inputProps={inputProps}
         disabled={this.props.disabled}
@@ -742,7 +745,7 @@ class PropertyEntryFieldRenderer
           handleCountryChange={this.onPhoneCountryChange}
           usePhoneCode={true}
           disabled={this.props.disabled}
-          describedBy={this.props.uniqueId}
+          describedBy={idToUse}
           label={null}
         />
       );
@@ -769,18 +772,18 @@ class PropertyEntryFieldRenderer
     let descriptionObject: React.ReactNode = null;
     if (this.props.description) {
       descriptionObject = descriptionAsAlert ? (
-        <Alert severity="info" sx={style.description} role="note" id={this.props.uniqueId + "_desc"}>
+        <Alert severity="info" sx={style.description} role="note" id={idToUse + "_desc"}>
           {this.props.description}
         </Alert>
       ) : (
-        <Typography variant="caption" sx={style.description} id={this.props.uniqueId + "_desc"}>
+        <Typography variant="caption" sx={style.description} id={idToUse + "_desc"}>
           {this.props.description}
         </Typography>
       );
     }
   
     const error = (
-      this.props.args.hideError ? null : <Box sx={style.errorMessage} id={this.props.uniqueId + "_error"}>
+      this.props.args.hideError ? null : <Box sx={style.errorMessage} id={idToUse + "_error"}>
         {this.props.currentInvalidReason}
       </Box>
     );

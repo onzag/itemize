@@ -1,6 +1,6 @@
 /**
  * Allows for the prompt of a dialog to request for confirmation of non-submitted
- * data from item definitions
+ * data from item definitions as the navigation tries to change location
  * 
  * @module
  */
