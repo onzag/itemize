@@ -100,8 +100,8 @@ function PropertyEntryBooleanRenderer(props: IPropertyEntryBooleanRendererProps)
     if (props.currentAppliedValue !== null) {
       icon = <RestoreIcon />
     }
-  } else if (props.icon) {
-    icon = props.icon;
+  } else if (props.args.icon) {
+    icon = props.args.icon;
   }
 
   let internalContent: React.ReactNode = null;

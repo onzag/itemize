@@ -210,8 +210,8 @@ export default class PropertyEntryFile
       this.props.hideLabel !== nextProps.hideLabel ||
       !!this.props.ignoreErrors !== !!nextProps.ignoreErrors ||
       nextProps.language !== this.props.language ||
+      nextProps.languageOverride !== this.props.languageOverride ||
       nextProps.i18n !== this.props.i18n ||
-      nextProps.icon !== this.props.icon ||
       nextProps.renderer !== this.props.renderer ||
       !equals(this.state, nextState, { strict: true }) ||
       !deepRendererArgsComparer(this.props.rendererArgs, nextProps.rendererArgs);
@@ -671,7 +671,8 @@ export default class PropertyEntryFile
       label: i18nLabel,
       placeholder: i18nPlaceholder,
       description: i18nDescription,
-      icon: this.props.icon,
+      language: this.props.language,
+      languageOverride: this.props.languageOverride,
 
       currentAppliedValue: this.props.state.stateAppliedValue as PropertyDefinitionSupportedFilesType,
       currentValue: this.props.state.value as PropertyDefinitionSupportedFilesType,

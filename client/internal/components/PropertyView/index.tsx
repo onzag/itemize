@@ -312,11 +312,7 @@ const handlerRegistry:
   text: {
     renderer: "PropertyViewText",
     handler: PropertyViewText,
-    includeConfig: true,
-    defaultSubhandler: {
-      renderer: "PropertyViewSimple",
-      handler: PropertyViewSimple,
-    }
+    includeConfig: true
   },
   currency: {
     renderer: "PropertyViewCurrency",

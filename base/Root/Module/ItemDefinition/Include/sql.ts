@@ -23,8 +23,9 @@ import { IGQLValue, IGQLArgs } from "../../../../../gql-querier";
 import StorageProvider from "../../../../../server/services/base/StorageProvider";
 import { WhereBuilder } from "../../../../../database/WhereBuilder";
 import type { ElasticQueryBuilder } from "../../../../../server/elastic";
+import type { IAppDataType } from "../../../../../server";
 
-export function getElasticSchemaForInclude(itemDefinition: ItemDefinition, include: Include, serverData: any): IElasticIndexDefinitionType {
+export function getElasticSchemaForInclude(itemDefinition: ItemDefinition, include: Include, serverData: any, appData: IAppDataType): IElasticIndexDefinitionType {
   // the exclusion state needs to be stored in the table bit
   // so we basically need to get a prefix for this item definition
   // this is usually INCLUDE_ the include prefix, and the id of the include
@@ -51,6 +52,7 @@ export function getElasticSchemaForInclude(itemDefinition: ItemDefinition, inclu
       include,
       sinkingProperty,
       serverData,
+      appData,
     );
 
     Object.assign(
@@ -124,6 +126,7 @@ export function getSQLTableDefinitionForInclude(itemDefinition: ItemDefinition, 
  */
 export function convertSQLValueToGQLValueForInclude(
   serverData: any,
+  appData: IAppDataType,
   itemDefinition: ItemDefinition, 
   include: Include,
   row: ISQLTableRowValue,
@@ -149,6 +152,7 @@ export function convertSQLValueToGQLValueForInclude(
       gqlParentResult,
       convertSQLValueToGQLValueForProperty(
         serverData,
+        appData,
         itemDefinition,
         include,
         sinkingProperty,
@@ -167,6 +171,7 @@ export function convertSQLValueToGQLValueForInclude(
 
 export function convertSQLValueToElasticSQLValueForInclude(
   serverData: any,
+  appData: IAppDataType,
   itemDefinition: ItemDefinition, 
   include: Include,
   row: ISQLTableRowValue,
@@ -181,6 +186,7 @@ export function convertSQLValueToElasticSQLValueForInclude(
       result,
       convertSQLValueToElasticSQLValueForProperty(
         serverData,
+        appData,
         itemDefinition,
         include,
         sinkingProperty,
@@ -215,6 +221,7 @@ export function convertSQLValueToElasticSQLValueForInclude(
  */
 export function convertGQLValueToSQLValueForInclude(
   serverData: any,
+  appData: IAppDataType,
   itemDefinition: ItemDefinition,
   include: Include,
   data: IGQLArgs,
@@ -254,6 +261,7 @@ export function convertGQLValueToSQLValueForInclude(
         // to be prefixed with what we are giving, in this case ITEM_wheel_
         const addedFieldsByProperty = convertGQLValueToSQLValueForProperty(
           serverData,
+          appData,
           itemDefinition.getParentModule(),
           itemDefinition,
           include,
@@ -293,6 +301,7 @@ export function convertGQLValueToSQLValueForInclude(
  */
 export function buildSQLQueryForInclude(
   serverData: any,
+  appData: IAppDataType,
   itemDefinition: ItemDefinition,
   include: Include,
   args: IGQLArgs,
@@ -327,6 +336,7 @@ export function buildSQLQueryForInclude(
           }
           buildSQLQueryForProperty(
             serverData,
+            appData,
             itemDefinition,
             include,
             pd,
@@ -358,6 +368,7 @@ export function buildSQLQueryForInclude(
  */
  export function buildElasticQueryForInclude(
   serverData: any,
+  appData: IAppDataType,
   itemDefinition: ItemDefinition,
   include: Include,
   args: IGQLArgs,
@@ -396,6 +407,7 @@ export function buildSQLQueryForInclude(
           }
           buildElasticQueryForProperty(
             serverData,
+            appData,
             itemDefinition,
             include,
             pd,

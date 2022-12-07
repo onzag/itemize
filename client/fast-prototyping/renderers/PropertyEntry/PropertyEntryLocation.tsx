@@ -454,8 +454,8 @@ class PropertyEntryLocationRenderer extends
       } else {
         icon = <ClearIcon />
       }
-    } else if (this.props.icon) {
-      icon = this.props.icon;
+    } else if (this.props.args.icon) {
+      icon = this.props.args.icon;
     }
 
     // and now we can build the map

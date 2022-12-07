@@ -299,7 +299,7 @@ export async function addItemDefinition(
         role: tokenData.role,
         gqlArgValue: resolverArgs.args,
         gqlFlattenedRequestedFiels: requestedFields,
-        cache: appData.cache,
+        appData,
         parentModule,
         parentType: resolverArgs.args.parent_type,
         parentId: resolverArgs.args.parent_id,
@@ -520,6 +520,7 @@ export async function addItemDefinition(
     // pass the requestedFields anyway
     const gqlValue = convertSQLValueToGQLValueForItemDefinition(
       appData.cache.getServerData(),
+      appData,
       itemDefinition,
       value,
     );

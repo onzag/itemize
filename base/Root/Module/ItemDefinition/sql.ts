@@ -45,11 +45,13 @@ import { WhereBuilder } from "../../../../database/WhereBuilder";
 import { OrderByBuilder } from "../../../../database/OrderByBuilder";
 import type { ElasticQueryBuilder } from "../../../../server/elastic";
 import { IElasticHighlightReply } from "./PropertyDefinition/types";
+import type { IAppDataType } from "../../../../server";
 
 export function getElasticSchemaForItemDefinition(
   itemDefinition: ItemDefinition,
   moduleIndexSchema: IElasticIndexDefinitionType,
   serverData: any,
+  appData: IAppDataType,
 ) {
   const qualifiedName = itemDefinition.getQualifiedPathName();
   const resultSchema: IElasticSchemaDefinitionType = {
@@ -60,7 +62,7 @@ export function getElasticSchemaForItemDefinition(
   }
 
   itemDefinition.getAllPropertyDefinitions().forEach((pd) => {
-    const result = getElasticSchemaForProperty(itemDefinition, null, pd, serverData);
+    const result = getElasticSchemaForProperty(itemDefinition, null, pd, serverData, appData);
     Object.assign(
       resultSchema[qualifiedName].properties,
       result.properties,
@@ -76,7 +78,7 @@ export function getElasticSchemaForItemDefinition(
 
   // now we loop over the child items
   itemDefinition.getAllIncludes().forEach((i) => {
-    const result = getElasticSchemaForInclude(itemDefinition, i, serverData);
+    const result = getElasticSchemaForInclude(itemDefinition, i, serverData, appData);
     Object.assign(
       resultSchema[qualifiedName].properties,
       result.properties,
@@ -171,6 +173,7 @@ export function getSQLTableDefinitionForItemDefinition(itemDefinition: ItemDefin
           prefix: "",
           property,
           itemDefinition: null,
+          appData: null,
         });
         if (columnsToAddLimiter) {
           columnsToAddLimiter.forEach((columnName: string, index: number) => {
@@ -198,6 +201,7 @@ export function getSQLTableDefinitionForItemDefinition(itemDefinition: ItemDefin
           prefix: "",
           property,
           itemDefinition: null,
+          appData: null,
         });
         if (columnsToAddLimiter) {
           columnsToAddLimiter.forEach((columnName: string, index: number) => {
@@ -255,6 +259,7 @@ export function getSQLTablesSchemaForItemDefinition(itemDefinition: ItemDefiniti
  */
 export function convertSQLValueToGQLValueForItemDefinition(
   serverData: any,
+  appData: IAppDataType,
   itemDefinition: ItemDefinition,
   row: ISQLTableRowValue,
   graphqlFields?: IGQLRequestFields,
@@ -283,7 +288,7 @@ export function convertSQLValueToGQLValueForItemDefinition(
   ).forEach((pd) => {
     Object.assign(
       result,
-      convertSQLValueToGQLValueForProperty(serverData, itemDefinition, null, pd, row),
+      convertSQLValueToGQLValueForProperty(serverData, appData, itemDefinition, null, pd, row),
     );
   });
 
@@ -295,6 +300,7 @@ export function convertSQLValueToGQLValueForItemDefinition(
       result,
       convertSQLValueToGQLValueForInclude(
         serverData,
+        appData,
         itemDefinition,
         include,
         row,
@@ -308,6 +314,7 @@ export function convertSQLValueToGQLValueForItemDefinition(
 
 export function convertSQLValueToElasticSQLValueForItemDefinition(
   serverData: any,
+  appData: IAppDataType,
   itemDefinition: ItemDefinition,
   row: ISQLTableRowValue,
 ): IGQLValue {
@@ -328,7 +335,7 @@ export function convertSQLValueToElasticSQLValueForItemDefinition(
   ).forEach((pd) => {
     Object.assign(
       result,
-      convertSQLValueToElasticSQLValueForProperty(serverData, itemDefinition, null, pd, row),
+      convertSQLValueToElasticSQLValueForProperty(serverData, appData, itemDefinition, null, pd, row),
     );
   });
 
@@ -338,6 +345,7 @@ export function convertSQLValueToElasticSQLValueForItemDefinition(
       result,
       convertSQLValueToElasticSQLValueForInclude(
         serverData,
+        appData,
         itemDefinition,
         include,
         row,
@@ -369,6 +377,7 @@ export function convertSQLValueToElasticSQLValueForItemDefinition(
  */
 export function convertGQLValueToSQLValueForItemDefinition(
   serverData: any,
+  appData: IAppDataType,
   itemDefinition: ItemDefinition,
   data: IGQLArgs,
   oldData: IGQLValue,
@@ -391,6 +400,7 @@ export function convertGQLValueToSQLValueForItemDefinition(
     ) {
       const addedFieldsByProperty = convertGQLValueToSQLValueForProperty(
         serverData,
+        appData,
         itemDefinition.getParentModule(),
         itemDefinition,
         null,
@@ -422,6 +432,7 @@ export function convertGQLValueToSQLValueForItemDefinition(
       const innerPartialFields = !partialFields ? null : partialFields[includeNameInPartialFields];
       const addedFieldsByInclude = convertGQLValueToSQLValueForInclude(
         serverData,
+        appData,
         itemDefinition,
         include,
         data,
@@ -463,6 +474,7 @@ export function convertGQLValueToSQLValueForItemDefinition(
  */
 export function buildSQLQueryForItemDefinition(
   serverData: any,
+  appData: IAppDataType,
   itemDefinition: ItemDefinition,
   args: IGQLArgs,
   whereBuilder: WhereBuilder,
@@ -485,6 +497,7 @@ export function buildSQLQueryForItemDefinition(
     const isOrderedByIt = !!(orderBy && orderBy[pd.getId()]);
     const wasSearchedBy = buildSQLQueryForProperty(
       serverData,
+      appData,
       itemDefinition,
       null,
       pd,
@@ -506,6 +519,7 @@ export function buildSQLQueryForItemDefinition(
   itemDefinition.getAllIncludes().forEach((include) => {
     buildSQLQueryForInclude(
       serverData,
+      appData,
       itemDefinition,
       include,
       args,
@@ -527,6 +541,7 @@ export function buildSQLQueryForItemDefinition(
         builder.orWhere((orBuilder) => {
           const wasStrSearchedBy = buildSQLStrSearchQueryForProperty(
             serverData,
+            appData,
             itemDefinition,
             null,
             pd,
@@ -580,6 +595,7 @@ export function buildSQLQueryForItemDefinition(
 
       buildSQLOrderByForProperty(
         serverData,
+        appData,
         itemDefinition,
         null,
         pd,
@@ -610,6 +626,7 @@ export function buildSQLQueryForItemDefinition(
  */
 export function buildElasticQueryForItemDefinition(
   serverData: any,
+  appData: IAppDataType,
   itemDefinition: ItemDefinition,
   args: IGQLArgs,
   elasticQueryBuilder: ElasticQueryBuilder,
@@ -631,6 +648,7 @@ export function buildElasticQueryForItemDefinition(
     const isOrderedByIt = !!(orderBy && orderBy[pd.getId()]);
     const wasSearchedBy = buildElasticQueryForProperty(
       serverData,
+      appData,
       itemDefinition,
       null,
       pd,
@@ -651,6 +669,7 @@ export function buildElasticQueryForItemDefinition(
     // TODO add includes in highlights
     buildElasticQueryForInclude(
       serverData,
+      appData,
       itemDefinition,
       include,
       args,
@@ -672,6 +691,7 @@ export function buildElasticQueryForItemDefinition(
         builder.should((orBuilder) => {
           const wasStrSearchedBy = buildElasticStrSearchQueryForProperty(
             serverData,
+            appData,
             itemDefinition,
             null,
             pd,
@@ -726,6 +746,7 @@ export function buildElasticQueryForItemDefinition(
 
       const orderRule = buildElasticOrderByForProperty(
         serverData,
+        appData,
         itemDefinition,
         null,
         pd,

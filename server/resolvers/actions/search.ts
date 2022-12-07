@@ -243,6 +243,7 @@ export async function searchModule(
           prefix: "",
           property: propDef,
           serverData: appData.cache.getServerData(),
+          appData,
         });
         sqlFieldsToRequest = sqlFieldsToRequest.concat(sqlSelectFields);
       }
@@ -414,6 +415,7 @@ export async function searchModule(
   if (usesElastic) {
     const rHighReply = buildElasticQueryForModule(
       appData.cache.getServerData(),
+      appData,
       mod,
       resolverArgs.args,
       elasticQuery,
@@ -474,6 +476,7 @@ export async function searchModule(
     // now we build the sql query for the module
     const addedSearchRaw = buildSQLQueryForModule(
       appData.cache.getServerData(),
+      appData,
       mod,
       resolverArgs.args,
       queryModel.whereBuilder,
@@ -522,6 +525,7 @@ export async function searchModule(
         baseResult.map(async (r) => {
           const valueToProvide = await filterAndPrepareGQLValue(
             appData.cache.getServerData(),
+            appData,
             r,
             requestedFields,
             tokenData.role,
@@ -540,6 +544,7 @@ export async function searchModule(
           if (moduleTrigger || itemDefinitionTrigger) {
             const currentWholeValueAsGQL = convertSQLValueToGQLValueForItemDefinition(
               appData.cache.getServerData(),
+              appData,
               itemDefinition,
               r,
             );
@@ -876,6 +881,7 @@ export async function searchItemDefinition(
                 property: propDef,
                 serverData: appData.cache.getServerData(),
                 include,
+                appData,
               });
               sqlFieldsToRequest = sqlFieldsToRequest.concat(sqlSelectFields);
             });
@@ -894,6 +900,7 @@ export async function searchItemDefinition(
               prefix: "",
               property: propDef,
               serverData: appData.cache.getServerData(),
+              appData,
             });
             sqlFieldsToRequest = sqlFieldsToRequest.concat(...sqlSelectFields);
           }
@@ -1069,6 +1076,7 @@ export async function searchItemDefinition(
     if (usesElastic) {
       const rHighReply = buildElasticQueryForItemDefinition(
         appData.cache.getServerData(),
+        appData,
         itemDefinition,
         resolverArgs.args,
         elasticQuery,
@@ -1130,6 +1138,7 @@ export async function searchItemDefinition(
     } else {
       const addedSearchRaw = buildSQLQueryForItemDefinition(
         appData.cache.getServerData(),
+        appData,
         itemDefinition,
         resolverArgs.args,
         queryModel.whereBuilder,
@@ -1178,6 +1187,7 @@ export async function searchItemDefinition(
           baseResult.map(async (r) => {
             const valueToProvide = await filterAndPrepareGQLValue(
               appData.cache.getServerData(),
+              appData,
               r,
               requestedFields,
               tokenData.role,
@@ -1195,6 +1205,7 @@ export async function searchItemDefinition(
             if (moduleTrigger || itemDefinitionTrigger) {
               const currentWholeValueAsGQL = convertSQLValueToGQLValueForItemDefinition(
                 appData.cache.getServerData(),
+                appData,
                 itemDefinition,
                 r,
               );

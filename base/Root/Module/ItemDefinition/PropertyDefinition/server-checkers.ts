@@ -77,6 +77,7 @@ export async function serverSideIndexChecker(
     prefix: include ? include.getPrefixedQualifiedIdentifier() : "",
     property,
     whereBuilder: query.whereBuilder,
+    appData,
   });
 
 

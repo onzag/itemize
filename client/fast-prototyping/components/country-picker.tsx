@@ -10,12 +10,17 @@ import MenuItem from "@mui/material/MenuItem";
 import React from "react";
 import { capitalize } from "../../components/localization";
 import AppCountryRetriever from "../../components/localization/AppCountryRetriever";
-import { LocaleContext } from "../../internal/providers/locale-provider";
+import { ChangeCountryToFn, LocaleContext } from "../../internal/providers/locale-provider";
+import Snackbar from "./snackbar";
 
 /**
  * The props of the countrypicker
  */
 interface ICountryPickerProps {
+  /**
+   * an alternative end icon
+   */
+   endIcon?: React.ReactNode;
   /**
    * A classname to wrap it on
    */
@@ -46,7 +51,7 @@ interface ICountryPickerProps {
    * which changes the application country, this allows
    * you to control custom properties using Setters
    */
-  handleCountryChange?: (code: string, appChangeCountryTo: (code: string) => void) => void;
+  handleCountryChange?: (code: string, appChangeCountryTo: ChangeCountryToFn) => void;
   /**
    * handle the current code yourself rather than using the application's
    * default
@@ -110,7 +115,7 @@ export class CountryPicker extends React.PureComponent<ICountryPickerProps, ICou
       anchorEl: null,
     });
   }
-  public handleCountryChange(changeCountryToFn: (code: string) => void, code: string) {
+  public handleCountryChange(changeCountryToFn: ChangeCountryToFn, code: string) {
     this.setState({
       anchorEl: null,
     });
@@ -145,10 +150,10 @@ export class CountryPicker extends React.PureComponent<ICountryPickerProps, ICou
           if (typeof this.props.currentCode !== "undefined") {
             currentCountry = countryData.availableCountries.find((c) => c.code === this.props.currentCode) || null;
           }
-          if (currentCountry === null) {
+          if (!currentCountry) {
             currentCountry = {
               capital: null,
-              code: null,
+              code: this.props.currentCode || null,
               continent: null,
               currency: null,
               emoji: null,
@@ -156,8 +161,8 @@ export class CountryPicker extends React.PureComponent<ICountryPickerProps, ICou
               languages: null,
               latitude: null,
               longitude: null,
-              name: this.props.unspecifiedLabel,
-              native: this.props.unspecifiedLabel,
+              name:  this.props.currentCode || this.props.unspecifiedLabel,
+              native: this.props.currentCode || this.props.unspecifiedLabel,
               phone: null,
             }
           }
@@ -185,6 +190,7 @@ export class CountryPicker extends React.PureComponent<ICountryPickerProps, ICou
                 classes={{ root: this.props.className }}
                 color="inherit"
                 startIcon={currentCountry.emoji}
+                endIcon={this.props.endIcon}
                 onClick={this.handleButtonSelectClick}
                 disabled={this.props.disabled}
                 aria-label={typeof this.props.label !== "undefined" ? this.props.label : (
@@ -200,6 +206,13 @@ export class CountryPicker extends React.PureComponent<ICountryPickerProps, ICou
                     (this.props.useCode && currentCountry.code ? currentCountry.code : currentCountry.native)}
               </Button>
               {menu}
+              <Snackbar
+                open={!!countryData.error}
+                i18nDisplay={countryData.error}
+                id="currency-picker-error"
+                onClose={countryData.dismissError}
+                severity="error"
+              />
             </React.Fragment>
           );
         }}

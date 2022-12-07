@@ -7,13 +7,14 @@ import React from "react";
 import { IPropertyEntryHandlerProps, IPropertyEntryRendererProps } from ".";
 import equals from "deep-equal";
 import uuid from "uuid";
-import { DOMPurify, checkFileInAccepts, processAccepts, localeReplacer } from "../../../../util";
+import { checkFileInAccepts, processAccepts, localeReplacer } from "../../../../util";
 import { IPropertyDefinitionSupportedSingleFilesType, PropertyDefinitionSupportedFilesType } from "../../../../base/Root/Module/ItemDefinition/PropertyDefinition/types/files";
 import PropertyDefinition from "../../../../base/Root/Module/ItemDefinition/PropertyDefinition";
 import { FILE_SUPPORTED_IMAGE_TYPES, MAX_FILE_SIZE } from "../../../../constants";
 import prettyBytes from "pretty-bytes";
 import { IFeatureSupportOptions, sanitize } from "../../../internal/text";
 import { deepRendererArgsComparer } from "../general-fn";
+import type { IPropertyDefinitionSupportedTextType } from "../../../../base/Root/Module/ItemDefinition/PropertyDefinition/types/text";
 
 /**
  * Information about the file that has just been inserted
@@ -175,7 +176,18 @@ export interface IPropertyEntryI18nRichTextInfo {
  * The entry text renderer props that every renderer is going to get
  * in order to render text
  */
-export interface IPropertyEntryTextRendererProps extends IPropertyEntryRendererProps<string> {
+export interface IPropertyEntryTextRendererProps extends IPropertyEntryRendererProps<IPropertyDefinitionSupportedTextType> {
+  /**
+   * A safe sanitized and processed value to use
+   * with the text type
+   */
+  currentValueText: string;
+
+  /**
+   * The language used, or null, if no language found
+   */
+  currentValueLang: string;
+
   /**
    * For rich text contains the information about
    * building the standard toolbar that is expected
@@ -283,7 +295,7 @@ interface IPropertyEntryTextState {
  * The property entry text handler class
  */
 export default class PropertyEntryText
-  extends React.Component<IPropertyEntryHandlerProps<string, IPropertyEntryTextRendererProps>, IPropertyEntryTextState> {
+  extends React.Component<IPropertyEntryHandlerProps<IPropertyDefinitionSupportedTextType, IPropertyEntryTextRendererProps>, IPropertyEntryTextState> {
 
   /**
    * We hold and cache our media property
@@ -318,7 +330,7 @@ export default class PropertyEntryText
     [id: string]: string;
   }
 
-  constructor(props: IPropertyEntryHandlerProps<string, IPropertyEntryTextRendererProps>) {
+  constructor(props: IPropertyEntryHandlerProps<IPropertyDefinitionSupportedTextType, IPropertyEntryTextRendererProps>) {
     super(props);
 
     this.state = {
@@ -369,7 +381,7 @@ export default class PropertyEntryText
    * Called during initial setup
    * @param props the props we are using
    */
-  public cacheMediaPropertyInProps(props: IPropertyEntryHandlerProps<string, IPropertyEntryTextRendererProps>) {
+  public cacheMediaPropertyInProps(props: IPropertyEntryHandlerProps<IPropertyDefinitionSupportedTextType, IPropertyEntryTextRendererProps>) {
     // we get the media property name
     const mediaPropertyName = props.property.getSpecialProperty("mediaProperty") as string;
     // so if we have such as a media property
@@ -445,7 +457,7 @@ export default class PropertyEntryText
     }
   }
 
-  public componentDidUpdate(prevProps: IPropertyEntryHandlerProps<string, IPropertyEntryTextRendererProps>) {
+  public componentDidUpdate(prevProps: IPropertyEntryHandlerProps<IPropertyDefinitionSupportedTextType, IPropertyEntryTextRendererProps>) {
     const relatedPropertyName = this.props.property.getSpecialProperty("mediaProperty") as string;
     if (
       relatedPropertyName &&
@@ -466,7 +478,7 @@ export default class PropertyEntryText
    * @param value the value
    * @param internalValue the internal value
    */
-  public onChangeHijacked(value: string, internalValue: any) {
+  public onChangeHijacked(value: IPropertyDefinitionSupportedTextType, internalValue: any) {
     // so first we try to read the html content in this fast and dirty way
     const dataSrcIdRegex = /data\-src\-id\=\"([A-Za-z0-9_-]+)\"/g;
     // this array for the ids we find
@@ -474,7 +486,7 @@ export default class PropertyEntryText
     // and now we build a match loop
     let match: RegExpExecArray;
     do {
-      match = dataSrcIdRegex.exec(value);
+      match = dataSrcIdRegex.exec(value.value);
       if (match) {
         const id = match[1];
         idsGathered.push(id);
@@ -783,7 +795,7 @@ export default class PropertyEntryText
   }
 
   public shouldComponentUpdate(
-    nextProps: IPropertyEntryHandlerProps<string, IPropertyEntryTextRendererProps>,
+    nextProps: IPropertyEntryHandlerProps<IPropertyDefinitionSupportedTextType, IPropertyEntryTextRendererProps>,
     nextState: IPropertyEntryTextState,
   ) {
     if (nextProps.property !== this.props.property) {
@@ -804,8 +816,8 @@ export default class PropertyEntryText
       this.props.hideLabel !== nextProps.hideLabel ||
       !!this.props.ignoreErrors !== !!nextProps.ignoreErrors ||
       nextProps.language !== this.props.language ||
+      nextProps.languageOverride !== this.props.languageOverride ||
       nextProps.i18n !== this.props.i18n ||
-      nextProps.icon !== this.props.icon ||
       nextProps.renderer !== this.props.renderer ||
       !deepRendererArgsComparer(this.props.rendererArgs, nextProps.rendererArgs);
   }
@@ -868,14 +880,16 @@ export default class PropertyEntryText
       }
     }
 
-    let currentValue = this.props.state.value as string;
+    const currentValue = this.props.state.value as IPropertyDefinitionSupportedTextType;
+    let currentValueText = (currentValue && currentValue.value) || null;
+    const currentValueLang = (currentValue && currentValue.language) || null;
     // we only want to purify values that haven't been manually set by the user, other
     // than that we can trust the value, it'd be a waste
     if (isRichText && currentValue && !this.props.state.stateValueHasBeenManuallySet) {
       const currentFiles: PropertyDefinitionSupportedFilesType = this.cachedMediaProperty &&
         this.cachedMediaProperty.getCurrentValue(this.props.forId || null, this.props.forVersion || null) as PropertyDefinitionSupportedFilesType;
 
-      currentValue = sanitize(
+        currentValueText = sanitize(
         {
           cacheFiles: this.props.cacheFiles,
           config: this.props.config,
@@ -888,7 +902,7 @@ export default class PropertyEntryText
           mediaProperty: this.cachedMediaProperty,
         },
         features,
-        currentValue,
+        currentValueText,
       );
     }
 
@@ -940,14 +954,18 @@ export default class PropertyEntryText
       label: i18nLabel,
       placeholder: i18nPlaceholder,
       description: i18nDescription,
-      icon: this.props.icon,
+      language: this.props.language,
+      languageOverride: this.props.languageOverride,
 
-      currentAppliedValue: this.props.state.stateAppliedValue as string,
+      currentAppliedValue: this.props.state.stateAppliedValue as IPropertyDefinitionSupportedTextType,
       currentValue,
       currentValid: !isCurrentlyShownAsInvalid && !this.props.forceInvalid,
       currentInvalidReason: i18nInvalidReason,
       currentInternalValue: this.props.state.internalValue,
       canRestore: this.props.state.value !== this.props.state.stateAppliedValue,
+
+      currentValueText,
+      currentValueLang,
 
       disabled:
         typeof this.props.disabled !== "undefined" && this.props.disabled !== null ?

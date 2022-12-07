@@ -88,8 +88,8 @@ function PropertyEntryPaymentRenderer(props: IPropertyEntryPaymentRendererProps)
     if (props.currentAppliedValue !== null) {
       icon = <RestoreIcon />
     }
-  } else if (props.icon) {
-    icon = props.icon;
+  } else if (props.args.icon) {
+    icon = props.args.icon;
   }
 
   const iconComponent = icon ? (
@@ -154,7 +154,6 @@ function PropertyEntryPaymentRenderer(props: IPropertyEntryPaymentRendererProps)
         placeholder={props.i18nPayment.type}
         args={{}}
         label={props.i18nPayment.type}
-        icon={null}
         disabled={props.disabled}
         autoFocus={props.autoFocus}
         onChange={props.onTypeChange}
@@ -164,6 +163,8 @@ function PropertyEntryPaymentRenderer(props: IPropertyEntryPaymentRendererProps)
         isNullable={false}
         isNumeric={false}
         isList={false}
+        language={props.language}
+        languageOverride={props.languageOverride}
       />
     ) : null;
 
@@ -183,7 +184,6 @@ function PropertyEntryPaymentRenderer(props: IPropertyEntryPaymentRendererProps)
         placeholder={props.i18nPayment.status}
         args={{}}
         label={props.i18nPayment.status}
-        icon={null}
         disabled={props.disabled}
         autoFocus={props.autoFocus}
         onChange={props.onStatusChange}
@@ -193,6 +193,8 @@ function PropertyEntryPaymentRenderer(props: IPropertyEntryPaymentRendererProps)
         isNullable={false}
         isNumeric={false}
         isList={false}
+        language={props.language}
+        languageOverride={props.languageOverride}
       />
     ) : null;
 
@@ -228,6 +230,8 @@ function PropertyEntryPaymentRenderer(props: IPropertyEntryPaymentRendererProps)
         currencyFormat={props.currencyFormat}
         currencyI18n={props.currencyI18n}
         onChangeCurrency={props.onCurrencyChange}
+        language={props.language}
+        languageOverride={props.languageOverride}
       />
     );
 

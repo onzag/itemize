@@ -1241,8 +1241,14 @@ export default class MailProvider<T> extends ServiceProvider<T> {
           is_receiver: false,
           read: true,
           spam: false,
-          subject: data.subject,
-          content: renderedMail.html,
+          subject: {
+            value: data.subject,
+            language: specifiedLanguage || potentialSender.app_language,
+          },
+          content: {
+            value: renderedMail.html,
+            language: specifiedLanguage || potentialSender.app_language,
+          },
           cid_attachments: renderedMail.cidAttachments,
           attachments: renderedMail.attachments,
           metadata: metadataStr,
@@ -1417,8 +1423,14 @@ export default class MailProvider<T> extends ServiceProvider<T> {
                 is_receiver: true,
                 read: false,
                 spam: isSpam,
-                subject: data.subject,
-                content: renderedMail.html,
+                subject: {
+                  value: data.subject,
+                  language: specifiedLanguageCode || user.app_language,
+                },
+                content: {
+                  value: renderedMail.html,
+                  language: specifiedLanguageCode || user.app_language,
+                },
                 cid_attachments: renderedMail.cidAttachments,
                 attachments: renderedMail.attachments,
                 metadata: metadataStr,

@@ -372,8 +372,8 @@ export default class PropertyEntryField
       this.props.hideLabel !== nextProps.hideLabel ||
       !!this.props.ignoreErrors !== !!nextProps.ignoreErrors ||
       nextProps.language !== this.props.language ||
+      nextProps.languageOverride !== this.props.languageOverride ||
       nextProps.i18n !== this.props.i18n ||
-      nextProps.icon !== this.props.icon ||
       nextProps.renderer !== this.props.renderer ||
       !deepRendererArgsComparer(this.props.rendererArgs, nextProps.rendererArgs);
   }
@@ -801,7 +801,8 @@ export default class PropertyEntryField
       description: i18nDescription,
       type: type as any,
       subtype: subtype as any,
-      icon: this.props.icon,
+      language: this.props.language,
+      languageOverride: this.props.languageOverride,
 
       currentAppliedValue: this.props.state.stateAppliedValue as any,
       currentValue: this.props.state.value as any,

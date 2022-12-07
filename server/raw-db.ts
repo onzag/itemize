@@ -32,6 +32,7 @@ import type PropertyDefinition from "../base/Root/Module/ItemDefinition/Property
 import type Include from "../base/Root/Module/ItemDefinition/Include";
 import { ItemizeElasticClient } from "./elastic";
 import { InsertBuilder } from "../database/InsertBuilder";
+import type { IAppDataType } from "../server";
 
 type RedoDictionariesFnPropertyBased = (language: string, dictionary: string, property: string) => void;
 type RedoDictionariesFnPropertyIncludeBased = (language: string, dictionary: string, include: string, property: string) => void;
@@ -144,7 +145,13 @@ export class ItemizeRawDB {
    * 
    * @returns an object which contains the total or partial values of the row to be inserted or updated
    */
-  public processGQLValue(item: ItemDefinition | string, value: any, serverData: any, dictionary: string, partialFields?: any): {
+  public processGQLValue(
+    item: ItemDefinition | string,
+    value: any,
+    appData: IAppDataType,
+    dictionary: string,
+    partialFields?: any,
+  ): {
     modSQL: ISQLTableRowValue
     itemSQL: ISQLTableRowValue
   } {
@@ -152,7 +159,8 @@ export class ItemizeRawDB {
     const mod = itemDefinition.getParentModule();
 
     const modSQL = convertGQLValueToSQLValueForModule(
-      serverData,
+      appData.cache.getServerData(),
+      appData,
       mod,
       value,
       null,
@@ -163,7 +171,8 @@ export class ItemizeRawDB {
     ).value;
 
     const itemSQL = convertGQLValueToSQLValueForItemDefinition(
-      serverData,
+      appData.cache.getServerData(),
+      appData,
       itemDefinition,
       value,
       null,

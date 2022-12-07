@@ -171,8 +171,8 @@ function PropertyEntryFileRenderer(props: IPropertyEntryFileRendererProps) {
     } else {
       icon = <ClearIcon />
     }
-  } else if (props.icon) {
-    icon = props.icon;
+  } else if (props.args.icon) {
+    icon = props.args.icon;
   }
 
   const isInvalid = shouldShowInvalid(props);

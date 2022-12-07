@@ -704,6 +704,7 @@ export class Collector {
         tokenData: this.appliedRule.forUser,
         value: rowValue ? convertSQLValueToGQLValueForItemDefinition(
           this.appData.cache.getServerData(),
+          this.appData,
           idef,
           rowValue,
         ) : null,
@@ -731,6 +732,7 @@ export class Collector {
       // we build the value for the given role with the given fields
       const value = rowValue === null ? null : await filterAndPrepareGQLValue(
         this.appData.cache.getServerData(),
+        this.appData,
         rowValue,
         fields,
         this.appliedRule.forUser.role,

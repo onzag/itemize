@@ -105,7 +105,7 @@ const typeValue: IPropertyDefinitionSupportedType<PropertyDefinitionSupportedTag
 
     return valueA.every((v) => valueB.includes(v)) && valueB.every((v) => valueA.includes(v));
   },
-  nullableDefault: [],
+  isNull: (v) => !v || !v.length,
   validate: (s: PropertyDefinitionSupportedTagListType, p: IPropertyDefinitionRawJSONDataType) => {
     if (p.subtype !== "arbitrary-tags") {
       if (!s.every((v) => {

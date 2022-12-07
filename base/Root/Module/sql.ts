@@ -31,8 +31,9 @@ import { WhereBuilder } from "../../../database/WhereBuilder";
 import { OrderByBuilder } from "../../../database/OrderByBuilder";
 import type { ElasticQueryBuilder } from "../../../server/elastic";
 import { IElasticHighlightReply } from "./ItemDefinition/PropertyDefinition/types";
+import type { IAppDataType } from "../../../server";
 
-export function getElasticSchemaForModule(mod: Module, serverData: any): IElasticSchemaDefinitionType {
+export function getElasticSchemaForModule(mod: Module, serverData: any, appData: IAppDataType): IElasticSchemaDefinitionType {
   const resultSchema: IElasticSchemaDefinitionType = {};
 
   const moduleSchema = {
@@ -41,7 +42,7 @@ export function getElasticSchemaForModule(mod: Module, serverData: any): IElasti
   };
 
   mod.getAllPropExtensions().forEach((pd) => {
-    const result = getElasticSchemaForProperty(null, null, pd, serverData);
+    const result = getElasticSchemaForProperty(null, null, pd, serverData, appData);
     Object.assign(
       moduleSchema.properties,
       result.properties,
@@ -59,7 +60,7 @@ export function getElasticSchemaForModule(mod: Module, serverData: any): IElasti
     // first with child modules
     Object.assign(
       resultSchema,
-      getElasticSchemaForModule(cModule, serverData),
+      getElasticSchemaForModule(cModule, serverData, appData),
     );
   });
 
@@ -67,7 +68,7 @@ export function getElasticSchemaForModule(mod: Module, serverData: any): IElasti
   mod.getAllChildItemDefinitions().forEach((cIdef) => {
     Object.assign(
       resultSchema,
-      getElasticSchemaForItemDefinition(cIdef, moduleSchema, serverData),
+      getElasticSchemaForItemDefinition(cIdef, moduleSchema, serverData, appData),
     );
   });
 
@@ -152,6 +153,7 @@ export function getSQLTableDefinitionForModule(mod: Module): ISQLTableDefinition
         // and the columns that are expected to be added to the combined index
         const columnsToAddLimiter = property.getPropertyDefinitionDescription().sqlBtreeIndexable({
           serverData: null,
+          appData: null,
           id: propertyId,
           prefix: "",
           property,
@@ -174,6 +176,7 @@ export function getSQLTableDefinitionForModule(mod: Module): ISQLTableDefinition
         const property = mod.getPropExtensionFor(propertyId);
         const columnsToAddLimiter = property.getPropertyDefinitionDescription().sqlBtreeIndexable({
           serverData: null,
+          appData: null,
           id: propertyId,
           prefix: "",
           property,
@@ -243,6 +246,7 @@ export function getSQLTablesSchemaForModule(mod: Module): ISQLSchemaDefinitionTy
  */
 export function convertGQLValueToSQLValueForModule(
   serverData: any,
+  appData: IAppDataType,
   mod: Module,
   data: IGQLArgs,
   oldData: IGQLValue,
@@ -265,6 +269,7 @@ export function convertGQLValueToSQLValueForModule(
     ) {
       const addedFieldsByProperty = convertGQLValueToSQLValueForProperty(
         serverData,
+        appData,
         mod,
         null,
         null,
@@ -309,6 +314,7 @@ export function convertGQLValueToSQLValueForModule(
  */
 export function convertSQLValueToGQLValueForModule(
   serverData: any,
+  appData: IAppDataType,
   mod: Module,
   row: ISQLTableRowValue,
   graphqlFields: IGQLRequestFields,
@@ -331,7 +337,7 @@ export function convertSQLValueToGQLValueForModule(
   ).forEach((pd) => {
     Object.assign(
       result,
-      convertSQLValueToGQLValueForProperty(serverData, null, null, pd, row),
+      convertSQLValueToGQLValueForProperty(serverData, appData, null, null, pd, row),
     );
   });
 
@@ -340,6 +346,7 @@ export function convertSQLValueToGQLValueForModule(
 
 export function convertSQLValueToElasticSQLValueForModule(
   serverData: any,
+  appData: IAppDataType,
   mod: Module,
   row: ISQLTableRowValue,
 ) {
@@ -359,7 +366,7 @@ export function convertSQLValueToElasticSQLValueForModule(
   mod.getAllPropExtensions().forEach((pd) => {
     Object.assign(
       result,
-      convertSQLValueToElasticSQLValueForProperty(serverData, null, null, pd, row),
+      convertSQLValueToElasticSQLValueForProperty(serverData, appData, null, null, pd, row),
     );
   });
 
@@ -381,6 +388,7 @@ export function convertSQLValueToElasticSQLValueForModule(
  */
 export function buildSQLQueryForModule(
   serverData: any,
+  appData: IAppDataType,
   mod: Module,
   args: IGQLArgs,
   whereBuilder: WhereBuilder,
@@ -400,7 +408,7 @@ export function buildSQLQueryForModule(
     }
 
     const isOrderedByIt = !!(orderBy && orderBy[pd.getId()]);
-    const wasSearchedBy = buildSQLQueryForProperty(serverData, null, null, pd, args, whereBuilder, language, dictionary, isOrderedByIt);
+    const wasSearchedBy = buildSQLQueryForProperty(serverData, appData, null, null, pd, args, whereBuilder, language, dictionary, isOrderedByIt);
     if (wasSearchedBy) {
       if (Array.isArray(wasSearchedBy)) {
         addedSelectFields.push(wasSearchedBy);
@@ -418,7 +426,7 @@ export function buildSQLQueryForModule(
         const isOrderedByIt = !!(orderBy && orderBy[pd.getId()]);
         builder.orWhere((orBuilder) => {
           const wasStrSearchedBy = buildSQLStrSearchQueryForProperty(
-            serverData, null, null, pd, args, search, orBuilder, language, dictionary, isOrderedByIt,
+            serverData, appData, null, null, pd, args, search, orBuilder, language, dictionary, isOrderedByIt,
           );
           if (wasStrSearchedBy) {
             if (Array.isArray(wasStrSearchedBy)) {
@@ -460,6 +468,7 @@ export function buildSQLQueryForModule(
 
       buildSQLOrderByForProperty(
         serverData,
+        appData,
         null,
         null,
         pd,
@@ -489,6 +498,7 @@ export function buildSQLQueryForModule(
  */
  export function buildElasticQueryForModule(
   serverData: any,
+  appData: IAppDataType,
   mod: Module,
   args: IGQLArgs,
   elasticQueryBuilder: ElasticQueryBuilder,
@@ -507,7 +517,7 @@ export function buildSQLQueryForModule(
     }
 
     const isOrderedByIt = !!(orderBy && orderBy[pd.getId()]);
-    const wasSearchedBy = buildElasticQueryForProperty(serverData, null, null, pd, args, elasticQueryBuilder, language, dictionary, isOrderedByIt);
+    const wasSearchedBy = buildElasticQueryForProperty(serverData, appData, null, null, pd, args, elasticQueryBuilder, language, dictionary, isOrderedByIt);
     if (wasSearchedBy) {
       includedInSearchProperties.push(pd.getId());
       Object.assign(finalHighlights, wasSearchedBy);
@@ -523,7 +533,7 @@ export function buildSQLQueryForModule(
         const isOrderedByIt = !!(orderBy && orderBy[pd.getId()]);
         builder.should((orBuilder) => {
           const wasStrSearchedBy = buildElasticStrSearchQueryForProperty(
-            serverData, null, null, pd, args, search, orBuilder, language, dictionary, isOrderedByIt,
+            serverData, appData, null, null, pd, args, search, orBuilder, language, dictionary, isOrderedByIt,
           );
           if (wasStrSearchedBy) {
             includedInStrSearchProperties.push(pd.getId());
@@ -566,6 +576,7 @@ export function buildSQLQueryForModule(
 
       const orderRule = buildElasticOrderByForProperty(
         serverData,
+        appData,
         null,
         null,
         pd,

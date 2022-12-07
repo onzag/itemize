@@ -658,6 +658,7 @@ export class Listener {
         root: this.root,
         value: value ? convertSQLValueToGQLValueForItemDefinition(
           this.cache.getServerData(),
+          null,
           itemDefinition,
           value,
         ) : value,
@@ -2412,6 +2413,7 @@ export class Listener {
         root: this.root,
         value: value ? convertSQLValueToGQLValueForItemDefinition(
           this.cache.getServerData(),
+          null,
           itemDefinition,
           value,
         ) : value,

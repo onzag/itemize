@@ -76,10 +76,6 @@ export interface IPropertyEntryProps<RendererPropsType> extends IPropertyBaseWit
    */
   showAsInvalid?: boolean;
   /**
-   * An icon to display alognside
-   */
-  icon?: React.ReactNode;
-  /**
    * Whether to hide the description that is hidden in language data
    */
   hideDescription?: boolean;
@@ -135,6 +131,12 @@ export interface IPropertyEntryProps<RendererPropsType> extends IPropertyBaseWit
    * Will display even if it's hidden
    */
   displayHidden?: boolean;
+
+  /**
+   * Used for the text type allows to override the language
+   * of a property for a new value
+   */
+  languageOverride?: string;
 }
 
 /**
@@ -482,7 +484,6 @@ export function EntryViewReadSet(
                           onRestore={onRestore}
                           forceInvalid={props.showAsInvalid}
                           containerId={containerId}
-                          icon={props.icon}
                           forId={itemContextualValue.forId}
                           forVersion={itemContextualValue.forVersion}
                           poked={isPoked}
@@ -500,6 +501,7 @@ export function EntryViewReadSet(
                           cacheFiles={props.cacheFiles}
                           disabled={props.disabled}
                           displayHidden={props.displayHidden}
+                          languageOverride={props.languageOverride}
                         />
                       );
                     } else {

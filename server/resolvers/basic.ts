@@ -281,6 +281,7 @@ export async function validateParentingRules(
       },
       value: convertSQLValueToGQLValueForItemDefinition(
         appData.cache.getServerData(),
+        appData,
         parentingItemDefinition,
         result,
       ),
@@ -702,6 +703,7 @@ export interface IFilteredAndPreparedValueType {
  */
 export async function filterAndPrepareGQLValue(
   serverData: any,
+  appData: IAppDataType,
   value: ISQLTableRowValue,
   requestedFields: IGQLRequestFields,
   role: string,
@@ -717,6 +719,7 @@ export async function filterAndPrepareGQLValue(
     // to process what was requested
     valueOfTheItem = convertSQLValueToGQLValueForItemDefinition(
       serverData,
+      appData,
       parentModuleOrIdef,
       value,
       requestedFields,
@@ -725,6 +728,7 @@ export async function filterAndPrepareGQLValue(
     // same for modules
     valueOfTheItem = convertSQLValueToGQLValueForModule(
       serverData,
+      appData,
       parentModuleOrIdef,
       value,
       requestedFields,
@@ -996,7 +1000,7 @@ export async function runPolicyCheck(
     role: string,
     gqlArgValue: IGQLValue,
     gqlFlattenedRequestedFiels: any,
-    cache: Cache,
+    appData: IAppDataType,
     preValidation?: (content: ISQLTableRowValue) => void | ISQLTableRowValue,
     parentModule?: string,
     parentType?: string,
@@ -1012,7 +1016,7 @@ export async function runPolicyCheck(
   let parentSelectQueryValue: ISQLTableRowValue = null;
   if (arg.policyTypes.includes("read") || arg.policyTypes.includes("delete") || arg.policyTypes.includes("edit")) {
     try {
-      selectQueryValue = await arg.cache.requestValue(arg.itemDefinition, arg.id, arg.version);
+      selectQueryValue = await arg.appData.cache.requestValue(arg.itemDefinition, arg.id, arg.version);
     } catch (err) {
       logger.error(
         {
@@ -1032,7 +1036,7 @@ export async function runPolicyCheck(
   }
   if (arg.policyTypes.includes("parent")) {
     try {
-      parentSelectQueryValue = await arg.cache.requestValue(
+      parentSelectQueryValue = await arg.appData.cache.requestValue(
         arg.parentType, arg.parentId, arg.parentVersion,
       );
     } catch (err) {
@@ -1186,8 +1190,9 @@ export async function runPolicyCheck(
           prefix: "",
           row: policyType === "parent" ? parentSelectQueryValue : selectQueryValue,
           property,
-          serverData: arg.cache.getServerData(),
+          serverData: arg.appData.cache.getServerData(),
           itemDefinition: arg.itemDefinition,
+          appData: arg.appData,
         });
 
         if (!policyMatches) {

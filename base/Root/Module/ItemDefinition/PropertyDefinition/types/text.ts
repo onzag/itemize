@@ -7,8 +7,8 @@
 import {
   IPropertyDefinitionSupportedType,
 } from "../types";
-import { GraphQLString } from "graphql";
-import { standardSQLOutFn, standardSQLEqualFn, standardSQLSelect } from "../sql";
+import { GraphQLNonNull, GraphQLString } from "graphql";
+import { standardSQLEqualFn } from "../sql";
 import {
   standardSQLSSCacheEqualFn, standardLocalEqual,
 } from "../local-sql";
@@ -24,20 +24,53 @@ import { PropertyDefinitionSearchInterfacesPrefixes, PropertyDefinitionSearchInt
 import {
   textSQL, textSQLIn, textSqlRedoDictionaryIndex, textSQLSearch,
   textSQLStrSearch, textSQLBtreeIndexable, textSQLOrderBy, textElasticSearch,
-  textElastic, textElasticStrSearch, textElasticIn
+  textElastic, textElasticStrSearch, textElasticIn, textSQLOut, textSQLSelect,
 } from "../sql/text";
 
 /**
  * The text is described by a string
  */
-export type PropertyDefinitionSupportedTextType = string;
+export interface IPropertyDefinitionSupportedTextType {
+  /**
+   * The text itself
+   */
+  value: string;
+
+  /**
+   * The language it has been processed with or meant to be
+   * processed with
+   */
+  language: string;
+};
 
 /**
  * The type describes how the text type behaves in the app, this includes rich text
  */
-const typeValue: IPropertyDefinitionSupportedType<PropertyDefinitionSupportedTextType> = {
-  gql: GraphQLString,
-  nullableDefault: "",
+const typeValue: IPropertyDefinitionSupportedType<IPropertyDefinitionSupportedTextType> = {
+  gql: "PROPERTY_TYPE__Text",
+  gqlFields: {
+    value: {
+      type: GraphQLString,
+    },
+    language: {
+      type: GraphQLString,
+    },
+  },
+  ownLanguageProperty: "language",
+  isNull: (v) => {
+    if (!v) {
+      return true;
+    }
+
+    return !v.value;
+  },
+  getNullValue: (v) => {
+    return ({
+      language: null,
+      ...v,
+      value: null,
+    });
+  },
   supportedSubtypes: ["html", "plain"],
   specialProperties: [
     {
@@ -141,10 +174,10 @@ const typeValue: IPropertyDefinitionSupportedType<PropertyDefinitionSupportedTex
   ],
   elastic: textElastic,
   sql: textSQL,
-  sqlSelect: standardSQLSelect,
+  sqlSelect: textSQLSelect,
   sqlIn: textSQLIn,
   sqlRedoDictionaryIndex: textSqlRedoDictionaryIndex,
-  sqlOut: standardSQLOutFn && standardSQLOutFn.bind(null, "?"),
+  sqlOut: textSQLOut,
   sqlElasticIn: textElasticIn,
   sqlSearch: textSQLSearch,
   elasticSearch: textElasticSearch,
@@ -175,20 +208,20 @@ const typeValue: IPropertyDefinitionSupportedType<PropertyDefinitionSupportedTex
         return false;
       }
 
-      if (propertyValue === null) {
+      if (propertyValue === null || propertyValue.text === null) {
         return false;
       }
 
       // this is the FTS in the client side, it's not good, it's not meant
       // to be good, but it gets the job done
-      return propertyValue.includes(searchMatch);
+      return propertyValue.text.includes(searchMatch);
     } else if (usefulArgs[searchName] === null) {
       const propertyValue = arg.include ? arg.gqlValue.DATA[arg.include.getId()][arg.id] : arg.gqlValue.DATA[arg.id];
       if (typeof propertyValue === "undefined") {
         console.warn("Attempted to local search by the property " + arg.id + " but could not find it in the local given value");
         return false;
       }
-      return propertyValue === null;
+      return propertyValue === null || propertyValue.text === null;
     }
 
     return true;
@@ -206,6 +239,10 @@ const typeValue: IPropertyDefinitionSupportedType<PropertyDefinitionSupportedTex
     if (arg.search) {
       const propertyValue = arg.include ? arg.gqlValue.DATA[arg.include.getId()][arg.id] : arg.gqlValue.DATA[arg.id];
 
+      if (!propertyValue || !propertyValue.text) {
+        return false;
+      }
+
       // this is the simple FTS that you get in the client
       return propertyValue.includes(arg.search);
     }
@@ -222,9 +259,19 @@ const typeValue: IPropertyDefinitionSupportedType<PropertyDefinitionSupportedTex
   },
 
   // validates the text, texts don't support json value
-  validate: (s: PropertyDefinitionSupportedTextType) => {
-    if (typeof s !== "string") {
+  validate: (s: IPropertyDefinitionSupportedTextType) => {
+    if (typeof s.value !== "string") {
       return PropertyInvalidReason.INVALID_VALUE;
+    }
+
+    if (s.language) {
+      if (
+        typeof s.language !== "string" ||
+        s.language.toLowerCase() !== s.language ||
+        s.language.length !== 2
+      ) {
+        return PropertyInvalidReason.INVALID_VALUE;
+      }
     }
 
     return null;

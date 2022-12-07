@@ -74,7 +74,7 @@ export async function deleteItemDefinition(
       role: tokenData.role,
       gqlArgValue: resolverArgs.args,
       gqlFlattenedRequestedFiels: null,
-      cache: appData.cache,
+      appData,
       // this functions runs before the policy has been checked
       // and we do it for being efficient, because we can run
       // both of these checks with a single SQL query, and the policy
@@ -133,6 +133,7 @@ export async function deleteItemDefinition(
 
   const currentWholeValueAsGQL: IGQLValue = convertSQLValueToGQLValueForItemDefinition(
     appData.cache.getServerData(),
+    appData,
     itemDefinition,
     wholeSqlStoredValue,
   );

@@ -138,6 +138,7 @@ class PropertyEntryTextRenderer extends React.PureComponent<IPropertyEntryTextRe
     // basic functions
     this.onFocus = this.onFocus.bind(this);
     this.onBlur = this.onBlur.bind(this);
+    this.onChange = this.onChange.bind(this);
   }
   public onFocus() {
     this.setState({
@@ -150,6 +151,17 @@ class PropertyEntryTextRenderer extends React.PureComponent<IPropertyEntryTextRe
       focused: false,
     });
   }
+  public onChange(value: string, internalValue: any) {
+    this.props.onChange({
+      value,
+      // by default the language is unspecified and when submitted
+      // it will use whatever the language override is or whatever
+      // the language is set as to be, so it will inherit that
+      // but if a language is specified it will use that
+      // instead
+      language: this.props.languageOverride || null,
+    }, internalValue);
+  }
   public render() {
     // the icon as usual
     let icon: React.ReactNode;
@@ -159,8 +171,8 @@ class PropertyEntryTextRenderer extends React.PureComponent<IPropertyEntryTextRe
       } else {
         icon = <ClearIcon />
       }
-    } else if (this.props.icon) {
-      icon = this.props.icon;
+    } else if (this.props.args.icon) {
+      icon = this.props.args.icon;
     }
     const iconComponent = icon ? (
       <RestoreIconButton
@@ -193,10 +205,10 @@ class PropertyEntryTextRenderer extends React.PureComponent<IPropertyEntryTextRe
       <SlateEditor
         id={this.props.propertyId}
         features={this.props.args.features ? { ...this.props.features, ...this.props.args.features } : this.props.features}
-        value={this.props.currentValue}
+        value={this.props.currentValueText}
         autoFocus={this.props.autoFocus}
         currentValue={this.props.currentInternalValue}
-        onChange={this.props.onChange}
+        onChange={this.onChange}
         onInsertFile={this.props.onInsertFile}
         onInsertFileFromURL={this.props.onInsertFileFromURL}
         onCheckFileExists={this.props.onCheckFileExists}
@@ -232,6 +244,7 @@ class PropertyEntryTextRenderer extends React.PureComponent<IPropertyEntryTextRe
           }
         }
         scrollMarginTop={this.props.args.scrollMarginTop}
+        lang={this.props.currentValueLang}
       />
 
     if (this.props.args.disjointedMode) {

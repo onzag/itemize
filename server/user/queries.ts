@@ -195,6 +195,7 @@ export const customUserQueries = (appData: IAppDataType): IGQLQueryFieldsDefinit
                   value: args.username as string,
                   property: usernameProperty,
                   whereBuilder: internalOrQueryBuilder,
+                  appData,
                 })
               }
             );
@@ -219,6 +220,7 @@ export const customUserQueries = (appData: IAppDataType): IGQLQueryFieldsDefinit
                       value: args.username as string,
                       property: usernameProperty,
                       whereBuilder: internalUsernameWhereBuilder,
+                      appData,
                     });
                   }).andWhere((internalEvalidatedWhereBuilder) => {
                     eValidatedPropertyDescription.sqlEqual({
@@ -231,6 +233,7 @@ export const customUserQueries = (appData: IAppDataType): IGQLQueryFieldsDefinit
                       value: true,
                       property: eValidatedProperty,
                       whereBuilder: internalEvalidatedWhereBuilder,
+                      appData,
                     });
                   })
                 }
@@ -257,6 +260,7 @@ export const customUserQueries = (appData: IAppDataType): IGQLQueryFieldsDefinit
                       value: phoneNumberIntValue,
                       property: phoneProperty,
                       whereBuilder: internalUsernameWhereBuilder,
+                      appData,
                     });
                   }).andWhere((internalPvalidatedWhereBuilder) => {
                     pValidatedPropertyDescription.sqlEqual({
@@ -269,6 +273,7 @@ export const customUserQueries = (appData: IAppDataType): IGQLQueryFieldsDefinit
                       value: true,
                       property: pValidatedProperty,
                       whereBuilder: internalPvalidatedWhereBuilder,
+                      appData,
                     });
                   })
                 }
@@ -287,6 +292,7 @@ export const customUserQueries = (appData: IAppDataType): IGQLQueryFieldsDefinit
               value: args.password as string,
               property: passwordProperty,
               whereBuilder: internalPasswordWhereBuilder,
+              appData,
             })
           });
 
@@ -945,6 +951,7 @@ export const customUserQueries = (appData: IAppDataType): IGQLQueryFieldsDefinit
               include: null,
               value: args.email,
               property: emailProperty,
+              appData,
             })
           }).andWhere((evalidatedWhereBuilder) => {
             eValidatedPropertyDescription.sqlEqual({
@@ -957,6 +964,7 @@ export const customUserQueries = (appData: IAppDataType): IGQLQueryFieldsDefinit
               include: null,
               value: true,
               property: eValidatedProperty,
+              appData,
             })
           });
         } else {
@@ -971,6 +979,7 @@ export const customUserQueries = (appData: IAppDataType): IGQLQueryFieldsDefinit
               include: null,
               value: args.phone,
               property: phoneProperty,
+              appData,
             })
           }).andWhere((pvalidatedWhereBuilder) => {
             pValidatedPropertyDescription.sqlEqual({
@@ -983,6 +992,7 @@ export const customUserQueries = (appData: IAppDataType): IGQLQueryFieldsDefinit
               include: null,
               value: true,
               property: pValidatedProperty,
+              appData,
             })
           });
         }
@@ -1259,6 +1269,7 @@ export const customUserQueries = (appData: IAppDataType): IGQLQueryFieldsDefinit
                 include: null,
                 value: args.email,
                 property: emailProperty,
+                appData,
               })
             }).andWhere((evalidatedWhereBuilder) => {
               eValidatedPropertyDescription.sqlEqual({
@@ -1271,6 +1282,7 @@ export const customUserQueries = (appData: IAppDataType): IGQLQueryFieldsDefinit
                 include: null,
                 value: true,
                 property: eValidatedProperty,
+                appData,
               })
             });
           } else {
@@ -1285,6 +1297,7 @@ export const customUserQueries = (appData: IAppDataType): IGQLQueryFieldsDefinit
                 include: null,
                 value: args.phone,
                 property: phoneProperty,
+                appData,
               })
             }).andWhere((pvalidatedWhereBuilder) => {
               pValidatedPropertyDescription.sqlEqual({
@@ -1297,6 +1310,7 @@ export const customUserQueries = (appData: IAppDataType): IGQLQueryFieldsDefinit
                 include: null,
                 value: true,
                 property: pValidatedProperty,
+                appData,
               })
             });
           }

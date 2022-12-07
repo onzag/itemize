@@ -8,14 +8,20 @@
 import Button from "@mui/material/Button";
 import Menu from "@mui/material/Menu";
 import MenuItem from "@mui/material/MenuItem";
+import { ChangeCurrencyToFn } from "../../../client/internal/providers/locale-provider";
 import React from "react";
 import { capitalize } from "../../components/localization";
 import AppCurrencyRetriever from "../../components/localization/AppCurrencyRetriever";
+import Snackbar from "./snackbar";
 
 /**
  * The currency picker props
  */
 interface ICurrencyPickerProps {
+  /**
+   * an alternative end icon
+   */
+   endIcon?: React.ReactNode;
   /**
    * The class name for the currency picker
    */
@@ -30,7 +36,7 @@ interface ICurrencyPickerProps {
    * which changes the application currency, this allows
    * you to control custom properties using Setters
    */
-  handleCurrencyChange?: (code: string, appChangeCurrencyTo: (code: string) => void) => void;
+  handleCurrencyChange?: (code: string, appChangeCurrencyTo: ChangeCurrencyToFn) => void;
   /**
    * handle the current code yourself rather than using the application's
    * default
@@ -89,7 +95,7 @@ export class CurrencyPicker extends React.Component<ICurrencyPickerProps, ICurre
       anchorEl: null,
     });
   }
-  public handleCurrencyChange(changeCurrencyToFn: (code: string) => void, code: string) {
+  public handleCurrencyChange(changeCurrencyToFn: ChangeCurrencyToFn, code: string) {
     this.setState({
       anchorEl: null,
     });
@@ -107,9 +113,6 @@ export class CurrencyPicker extends React.Component<ICurrencyPickerProps, ICurre
           if (this.props.currentCode) {
             currentCurrency = currencyData.availableCurrencies.find((c) => c.code === this.props.currentCode);
           }
-          if (currentCurrency === null) {
-            return null;
-          }
 
           const menu = this.state.anchorEl ? <Menu
             anchorEl={this.state.anchorEl}
@@ -121,31 +124,43 @@ export class CurrencyPicker extends React.Component<ICurrencyPickerProps, ICurre
             {currencyData.availableCurrencies.map((ac) => (
               <MenuItem
                 key={ac.code}
-                selected={ac.code === currentCurrency.code}
+                selected={currentCurrency ? ac.code === currentCurrency.code : false}
                 onClick={this.handleCurrencyChange.bind(this, currencyData.changeCurrencyTo, ac.code)}
               >
                 <b>{(ac.symbol || ac.code) + " (" + ac.code + ")"}</b>&nbsp;-&nbsp;{capitalize(ac.name)}
               </MenuItem>
             ))}
           </Menu> : null;
+
+          const code = (currentCurrency ? currentCurrency.name : (this.props.currentCode || "???"));
+          const name = (currentCurrency ? currentCurrency.code : (this.props.currentCode || "???"));
+
           return (
             <React.Fragment>
               <Button
                 classes={{ root: this.props.className }}
                 color="inherit"
-                startIcon={<b>{currentCurrency.symbol}</b>}
+                startIcon={<b>{currentCurrency ? currentCurrency.symbol : "?"}</b>}
+                endIcon={this.props.endIcon}
                 onClick={this.handleButtonSelectClick}
-                aria-label={typeof this.props.label !== "undefined" ? this.props.label : currentCurrency.name}
+                aria-label={typeof this.props.label !== "undefined" ? this.props.label : name}
                 aria-description={this.props.description}
                 aria-labelledby={this.props.labelledBy}
                 aria-describedby={this.props.describedBy}
               >
                 {
-                  (this.props.useCode ? currentCurrency.code : currentCurrency.name) +
-                  (this.props.useCode ? "" : " " + currentCurrency.code)
+                  (this.props.useCode ? code : name) +
+                  (this.props.useCode ? "" : " " + code)
                 }
               </Button>
               {menu}
+              <Snackbar
+                open={!!currencyData.error}
+                i18nDisplay={currencyData.error}
+                id="currency-picker-error"
+                onClose={currencyData.dismissError}
+                severity="error"
+              />
             </React.Fragment>
           );
         }}

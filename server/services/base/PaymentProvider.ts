@@ -605,6 +605,7 @@ export default class PaymentProvider<T> extends ServiceProvider<T> {
       row: value,
       serverData: this.localAppData.cache.getServerData(),
       include,
+      appData: this.localAppData,
     });
 
     return {

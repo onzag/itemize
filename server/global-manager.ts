@@ -316,6 +316,7 @@ export class GlobalManager {
               prefix: "",
               property: p,
               serverData: this.serverData,
+              appData: null,
               value,
             });
 
@@ -354,6 +355,7 @@ export class GlobalManager {
                 prefix: i.getPrefixedQualifiedIdentifier(),
                 property: propDef,
                 serverData: this.serverData,
+                appData: null,
                 value: valueInState.value,
               });
 
@@ -1078,7 +1080,8 @@ export class GlobalManager {
       const mantenienceRule = p.pdef
         .getPropertyDefinitionDescription()
         .sqlMantenience({
-          serverData: null,
+          serverData: this.serverData,
+          appData: null,
           id: p.pdef.getId(),
           prefix: p.include ? p.include.getPrefixedQualifiedIdentifier() : "",
           property: p.pdef,

@@ -282,8 +282,8 @@ function PropertyEntryTagListRenderer(props: IPropertyEntryTagListRendererProps)
       if (props.currentAppliedValue !== null) {
         icon = <RestoreIcon />
       }
-    } else if (props.icon) {
-      icon = props.icon;
+    } else if (props.args.icon) {
+      icon = props.args.icon;
     }
 
     const chips = (

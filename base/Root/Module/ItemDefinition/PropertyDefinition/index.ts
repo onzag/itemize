@@ -565,15 +565,15 @@ export default class PropertyDefinition {
     value: PropertyDefinitionSupportedType,
     checkAgainstValues: boolean,
   ): PropertyInvalidReason {
-    // Check for nulls
-    if (propertyDefinitionRaw.nullable && value === null) {
-      return null;
-    } else if (!propertyDefinitionRaw.nullable && value === null) {
-      return PropertyInvalidReason.NOT_NULLABLE;
-    }
-
     // we get the definition and run basic checks
     const definition = supportedTypesStandard[propertyDefinitionRaw.type];
+
+    // Check for nulls
+    if (propertyDefinitionRaw.nullable && (definition.isNull ? definition.isNull(value) : value === null)) {
+      return null;
+    } else if (!propertyDefinitionRaw.nullable && (definition.isNull ? definition.isNull(value) : value === null)) {
+      return PropertyInvalidReason.NOT_NULLABLE;
+    }
 
     if (checkAgainstValues && propertyDefinitionRaw.values) {
       // Check against the values if allowed
@@ -1493,8 +1493,8 @@ export default class PropertyDefinition {
     // let's get the definition
     const definition = supportedTypesStandard[this.rawData.type];
     // find whether there is a nullable value and if it matches
-    const actualValue = equals(definition.nullableDefault, value, { strict: true }) ?
-      null : value;
+    const actualValue = !(value instanceof PropertyDefinition) ? (definition.isNull && definition.isNull(value) ?
+      ((definition.getNullValue && definition.getNullValue(value)) || null) : value) : value;
 
     if (actualValue !== null && !(actualValue instanceof PropertyDefinition)) {
       // we run some very basic validations, if this is a number and you put in
@@ -1530,8 +1530,8 @@ export default class PropertyDefinition {
     // let's get the definition
     const definition = supportedTypesStandard[this.rawData.type];
     // find whether there is a nullable value and if it matches
-    const actualValue = equals(definition.nullableDefault, value, { strict: true }) ?
-      null : value;
+    const actualValue = definition.isNull && definition.isNull(value) ?
+      ((definition.getNullValue && definition.getNullValue(value)) || null) : value;
 
     if (actualValue !== null && !(actualValue instanceof PropertyDefinition)) {
       // we run some very basic validations, if this is a number and you put in
@@ -1661,8 +1661,8 @@ export default class PropertyDefinition {
     // let's get the definition
     const definition = supportedTypesStandard[this.rawData.type];
     // find whether there is a nullable value and if it matches
-    const actualValue = equals(definition.nullableDefault, value, { strict: true }) ?
-      null : value;
+    const actualValue = !(value instanceof PropertyDefinition) ? (definition.isNull && definition.isNull(value) ?
+    ((definition.getNullValue && definition.getNullValue(value)) || null) : value) : value;
 
     if (actualValue !== null && !(actualValue instanceof PropertyDefinition)) {
       // we run some very basic validations, if this is a number and you put in
@@ -1702,8 +1702,8 @@ export default class PropertyDefinition {
     // let's get the definition
     const definition = supportedTypesStandard[this.rawData.type];
     // find whether there is a nullable value and if it matches
-    const newActualValue = definition.nullableDefault === newValue ?
-      null : newValue;
+    const newActualValue = definition.isNull && definition.isNull(newValue) ?
+      ((definition.getNullValue && definition.getNullValue(newValue)) || null) : newValue;
 
     if (newActualValue !== null) {
       // we run some very basic validations, if this is a number and you put in

@@ -21,7 +21,7 @@ export type PropertyDefinitionSupportedPasswordType = string;
  */
 const typeValue: IPropertyDefinitionSupportedType<PropertyDefinitionSupportedPasswordType> = {
   gql: GraphQLString,
-  nullableDefault: "",
+  isNull: (v) => !v,
   sql: getStandardSQLFnFor && getStandardSQLFnFor("TEXT", "pgcrypto"),
   // not stored at all does not create an index
   elastic: null,

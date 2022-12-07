@@ -519,9 +519,10 @@ class PropertyEntryFieldRenderer
           currentInternalValue={this.props.currentInternalValue}
           currentInvalidReason={this.props.currentInvalidReason}
           description={this.props.description}
-          icon={this.props.icon}
           label={this.props.label}
           placeholder={this.props.placeholder}
+          language={this.props.language}
+          languageOverride={this.props.languageOverride}
         />
       )
     }
@@ -656,14 +657,14 @@ class PropertyEntryFieldRenderer
           </IconButton>
         </InputAdornment>
       );
-    } else if (this.props.icon) {
+    } else if (this.props.args.icon) {
       // set it at the end
       appliedInputProps.endAdornment = (
         <InputAdornment position="end" sx={style.standardAddornment(isInvalid)}>
           <RestoreIconButton
             sx={style.iconButton}
           >
-            {this.props.icon}
+            {this.props.args.icon}
           </RestoreIconButton>
         </InputAdornment>
       );

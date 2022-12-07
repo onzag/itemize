@@ -66,7 +66,7 @@ export async function getItemDefinition(
       role: tokenData.role,
       gqlArgValue: resolverArgs.args,
       gqlFlattenedRequestedFiels: requestedFields,
-      cache: appData.cache,
+      appData,
       preValidation: (content: ISQLTableRowValue) => {
         // if there is no content, we force the entire policy check not to
         // be performed and return null
@@ -91,6 +91,7 @@ export async function getItemDefinition(
 
   const currentWholeValueAsGQL = selectQueryValue ? convertSQLValueToGQLValueForItemDefinition(
     appData.cache.getServerData(),
+    appData,
     itemDefinition,
     selectQueryValue,
   ) : null;
@@ -178,6 +179,7 @@ export async function getItemDefinition(
 
   const valueToProvide = await filterAndPrepareGQLValue(
     appData.cache.getServerData(),
+    appData,
     selectQueryValue,
     requestedFields,
     tokenData.role,
@@ -385,6 +387,7 @@ export async function getItemDefinitionList(
     resultQuery.should((q) => {
       rHighReply = buildElasticQueryForItemDefinition(
         appData.cache.getServerData(),
+        appData,
         itemDefinition,
         resolverArgs.args,
         q,
@@ -442,6 +445,7 @@ export async function getItemDefinitionList(
       );
       const currentWholeValueAsGQL = convertSQLValueToGQLValueForItemDefinition(
         appData.cache.getServerData(),
+        appData,
         itemDefinition,
         value,
       );
@@ -479,6 +483,7 @@ export async function getItemDefinitionList(
 
       const valueToProvide = await filterAndPrepareGQLValue(
         appData.cache.getServerData(),
+        appData,
         value,
         requestedFields,
         tokenData.role,
@@ -662,6 +667,7 @@ export async function getModuleList(
     resultQuery.should((q) => {
       rHighReply = buildElasticQueryForModule(
         appData.cache.getServerData(),
+        appData,
         mod,
         resolverArgs.args,
         q,
@@ -715,6 +721,7 @@ export async function getModuleList(
 
       const currentWholeValueAsGQL = convertSQLValueToGQLValueForItemDefinition(
         appData.cache.getServerData(),
+        appData,
         itemDefinition,
         value,
       );
@@ -757,6 +764,7 @@ export async function getModuleList(
 
       const valueToProvide = await filterAndPrepareGQLValue(
         appData.cache.getServerData(),
+        appData,
         value,
         requestedFields,
         tokenData.role,

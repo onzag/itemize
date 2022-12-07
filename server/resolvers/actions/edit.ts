@@ -101,7 +101,7 @@ export async function editItemDefinition(
         role: tokenData.role,
         gqlArgValue: resolverArgs.args,
         gqlFlattenedRequestedFiels: requestedFields,
-        cache: appData.cache,
+        appData,
         preValidation: (content: ISQLTableRowValue) => {
           // if we don't get an user id this means that there's no owner, this is bad input
           if (!content) {
@@ -139,6 +139,7 @@ export async function editItemDefinition(
     // note how we don't pass the requested fields because we want it all
     const currentWholeValueAsGQL = convertSQLValueToGQLValueForItemDefinition(
       appData.cache.getServerData(),
+      appData,
       itemDefinition,
       wholeSqlStoredValue,
     );
@@ -427,6 +428,7 @@ export async function editItemDefinition(
     // convert it using the requested fields for that, and ignoring everything else
     const gqlValue = convertSQLValueToGQLValueForItemDefinition(
       appData.cache.getServerData(),
+      appData,
       itemDefinition,
       sqlValue,
     );

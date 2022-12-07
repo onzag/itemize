@@ -822,6 +822,7 @@ export class Cache {
     const gqlValue = isSQLType ? (
       convertSQLValueToGQLValueForItemDefinition(
         this.serverData,
+        this.appData,
         itemDefinition,
         value,
       )
@@ -886,6 +887,7 @@ export class Cache {
     // and the module table, this value is database ready
     const sqlIdefDataComposed: ISQLStreamComposedTableRowValue = convertGQLValueToSQLValueForItemDefinition(
       this.serverData,
+      this.appData,
       itemDefinition,
       gqlValue, // when this is a SQL type it gets converted into the gql type so it can be processed here
       null,
@@ -898,6 +900,7 @@ export class Cache {
     );
     const sqlModDataComposed: ISQLStreamComposedTableRowValue = convertGQLValueToSQLValueForModule(
       this.serverData,
+      this.appData,
       itemDefinition.getParentModule(),
       gqlValue, // when this is a SQL type it gets converted into the gql type so it can be processed here
       null,
@@ -1190,6 +1193,7 @@ export class Cache {
         // now we can get this new value
         const newValue = convertSQLValueToGQLValueForProperty(
           this.getServerData(),
+          this.appData,
           itemDefinition,
           sideEffectedProperty.include,
           sideEffectedProperty.property,
@@ -1428,6 +1432,7 @@ export class Cache {
     const currentValue = currentRawValueSQL || await this.requestValue(itemDefinition, id, version);
     const currentValueAsGQL = convertSQLValueToGQLValueForItemDefinition(
       this.serverData,
+      this.appData,
       itemDefinition,
       currentValue,
     );
@@ -1570,6 +1575,7 @@ export class Cache {
 
         const originalValue = convertSQLValueToGQLValueForProperty(
           this.getServerData(),
+          this.appData,
           itemDefinition,
           preSideEffectedProperty.include,
           preSideEffectedProperty.property,
@@ -1626,6 +1632,7 @@ export class Cache {
     // we don't want things to be defaulted in the query
     const sqlIdefDataComposed = convertGQLValueToSQLValueForItemDefinition(
       this.serverData,
+      this.appData,
       itemDefinition,
       update,
       currentValue,
@@ -1637,6 +1644,7 @@ export class Cache {
     );
     const sqlModDataComposed = convertGQLValueToSQLValueForModule(
       this.serverData,
+      this.appData,
       itemDefinition.getParentModule(),
       update,
       currentValue,
@@ -2086,6 +2094,7 @@ export class Cache {
         // now we can get this new value
         const newValue = convertSQLValueToGQLValueForProperty(
           this.getServerData(),
+          this.appData,
           itemDefinition,
           sideEffectedProperty.include,
           sideEffectedProperty.property,
@@ -2095,6 +2104,7 @@ export class Cache {
         // get the original value
         const originalValue = convertSQLValueToGQLValueForProperty(
           this.getServerData(),
+          this.appData,
           itemDefinition,
           sideEffectedProperty.include,
           sideEffectedProperty.property,
@@ -2779,6 +2789,7 @@ export class Cache {
               // now we can get this new value
               const originalValue = convertSQLValueToGQLValueForProperty(
                 this.getServerData(),
+                this.appData,
                 itemDefinition,
                 sideEffectedProperty.include,
                 sideEffectedProperty.property,

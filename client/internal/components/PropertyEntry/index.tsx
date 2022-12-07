@@ -68,10 +68,6 @@ export interface IPropertyEntryRendererProps<ValueType> extends IRendererProps {
    * this is locale specific; the description might not be passed if specified by the UI
    */
   description?: string;
-  /**
-   * Icon are an UI defined property for an icon to use during the view, handle as you wish
-   */
-  icon?: React.ReactNode;
 
   /**
    * The currently applied value that is in sync with the server side
@@ -136,6 +132,20 @@ export interface IPropertyEntryRendererProps<ValueType> extends IRendererProps {
    * when doing this
    */
   onRestore: () => void;
+
+  /**
+   * The current language being used by the client overall in the app
+   */
+  language: string;
+
+  /**
+   * An optional language used mainly for the text type to override
+   * own language properties that currently only text supports that
+   * 
+   * It may be possible for the editor to set its own text language
+   * value if it has its own
+   */
+  languageOverride?: string;
 }
 
 /**
@@ -275,12 +285,6 @@ export interface IPropertyEntryMainHandlerProps<ValueType, RendererPropsType> {
    */
   autoFocus?: boolean;
   /**
-   * An optional icon
-   * 
-   * Developer Provided check base.tsx
-   */
-  icon?: React.ReactNode;
-  /**
    * Whether to ignore errors, this means that it will
    * always show as valid, however forceInvalid is more
    * powerful that this
@@ -331,6 +335,14 @@ export interface IPropertyEntryMainHandlerProps<ValueType, RendererPropsType> {
    * Will display even if it's hidden
    */
   displayHidden?: boolean;
+  /**
+   * An optional language used mainly for the text type to override
+   * own language properties that currently only text supports that
+   * 
+   * It may be possible for the editor to set its own text language
+   * value if it has its own
+   */
+  languageOverride?: string;
 }
 
 /**
@@ -411,6 +423,14 @@ export interface IPropertyEntryHandlerProps<ValueType, RendererPropsType> extend
    * Calculated, Standard Handler Only
    */
   rendererArgs: any;
+  /**
+   * An optional language used mainly for the text type to override
+   * own language properties that currently only text supports that
+   * 
+   * It may be possible for the editor to set its own text language
+   * value if it has its own
+   */
+  languageOverride?: string;
 }
 
 /**

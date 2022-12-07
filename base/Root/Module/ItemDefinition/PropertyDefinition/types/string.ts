@@ -168,7 +168,7 @@ const typeValue: IPropertyDefinitionSupportedType<PropertyDefinitionSupportedStr
   },
   localEqual: standardLocalEqual,
 
-  nullableDefault: "",
+  isNull: (v) => !v,
   supportedSubtypes: [
     "email",
     "phone",

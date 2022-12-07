@@ -7,7 +7,7 @@
 import React from "react";
 import { IPropertyViewHandlerProps, IPropertyViewRendererProps } from ".";
 import equals from "deep-equal";
-import { PropertyDefinitionSupportedTextType } from "../../../../base/Root/Module/ItemDefinition/PropertyDefinition/types/text";
+import { IPropertyDefinitionSupportedTextType } from "../../../../base/Root/Module/ItemDefinition/PropertyDefinition/types/text";
 import { PropertyDefinitionSupportedFilesType } from "../../../../base/Root/Module/ItemDefinition/PropertyDefinition/types/files";
 import { sanitize } from "../../../internal/text";
 import { deepRendererArgsComparer } from "../general-fn";
@@ -18,7 +18,18 @@ import { applyHighlights } from "./highlights";
  * note that this renderer is only used for html and plain, but not for the default
  * null subtype
  */
-export interface IPropertyViewTextRendererProps extends IPropertyViewRendererProps<PropertyDefinitionSupportedTextType> {
+export interface IPropertyViewTextRendererProps extends IPropertyViewRendererProps<IPropertyDefinitionSupportedTextType> {
+  /**
+   * A safe sanitized and processed value to use
+   * with the text type
+   */
+  currentValueText: string;
+
+  /**
+   * The language used, or null, if no language found
+   */
+  currentValueLang: string;
+
   /**
    * Whether it is rich text, as in its subtype is html
    */
@@ -52,11 +63,13 @@ export default class PropertyViewText extends React.Component<IPropertyViewHandl
       !deepRendererArgsComparer(this.props.rendererArgs, nextProps.rendererArgs);
   }
   public render() {
-    let currentValue = (
+    const currentValue = (
       this.props.useAppliedValue ?
         this.props.state.stateAppliedValue :
         this.props.state.value
-    ) as string;
+    ) as IPropertyDefinitionSupportedTextType;
+    let currentValueText: string = (currentValue && currentValue.value) || null;
+    let currentValueLang: string = (currentValue && currentValue.language) || null;
 
     const isRichText = this.props.property.isRichText();
 
@@ -81,7 +94,7 @@ export default class PropertyViewText extends React.Component<IPropertyViewHandl
     const supportsCustomStyles = this.props.property.getSpecialProperty("supportsCustomStyles");
     const supportsTemplating = this.props.property.getSpecialProperty("supportsTemplating");
 
-    if (isRichText && currentValue !== null) {
+    if (isRichText && currentValueText !== null) {
       const mediaProperty = mediaPropertyId && this.props.itemDefinition.getPropertyDefinitionFor(mediaPropertyId, true);
       const currentFiles = mediaProperty &&
         (
@@ -90,7 +103,7 @@ export default class PropertyViewText extends React.Component<IPropertyViewHandl
             mediaProperty.getCurrentValue(this.props.forId || null, this.props.forVersion || null) as PropertyDefinitionSupportedFilesType
         );
 
-      currentValue = sanitize(
+      currentValueText = sanitize(
         {
           cacheFiles: this.props.cacheFiles,
           config: this.props.config,
@@ -124,12 +137,12 @@ export default class PropertyViewText extends React.Component<IPropertyViewHandl
           supportsTables,
           supportedTables,
         },
-        currentValue,
+        currentValueText,
       );
     }
 
     const appliedHighlightsInfo = applyHighlights(
-      currentValue,
+      currentValueText,
       this.props.highlights,
     );
 
@@ -137,7 +150,9 @@ export default class PropertyViewText extends React.Component<IPropertyViewHandl
     const rendererArgs: IPropertyViewTextRendererProps = {
       args: this.props.rendererArgs,
       rtl: this.props.rtl,
-      currentValue: appliedHighlightsInfo.applied ? appliedHighlightsInfo.value : currentValue,
+      currentValue,
+      currentValueText: appliedHighlightsInfo.applied ? appliedHighlightsInfo.value : currentValueText,
+      currentValueLang: currentValueLang,
       isRichText: this.props.property.isRichText() || appliedHighlightsInfo.applied,
       subtype: this.props.property.getSubtype() as any,
     };

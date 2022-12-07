@@ -17,7 +17,7 @@ import integer, { PropertyDefinitionSupportedIntegerType } from "./integer";
 import currency, { IPropertyDefinitionSupportedCurrencyType } from "./currency";
 import unit, { IPropertyDefinitionSupportedUnitType } from "./unit";
 import password, { PropertyDefinitionSupportedPasswordType } from "./password";
-import text, { PropertyDefinitionSupportedTextType } from "./text";
+import text, { IPropertyDefinitionSupportedTextType } from "./text";
 import date, { PropertyDefinitionSupportedDateType } from "./date";
 import datetime, { PropertyDefinitionSupportedDateTimeType } from "./datetime";
 import time, { PropertyDefinitionSupportedTimeType } from "./time";
@@ -78,6 +78,7 @@ export interface ISQLRedoDictionaryBasedIndex extends IArgInfo {
 
 export interface ISQLArgInfo extends IArgInfo {
   serverData: any;
+  appData: IAppDataType;
 }
 
 export interface ISQLInInfo extends ISQLArgInfo {
@@ -236,6 +237,11 @@ export interface IPropertyDefinitionSupportedType<T> {
    * supported subtypes of the type
    */
   supportedSubtypes?: string[];
+
+  /**
+   * whether it has an own language property
+   */
+  ownLanguageProperty?: string;
 
   /**
    * graphql type, either a output type or a string, when it's a string
@@ -407,10 +413,15 @@ export interface IPropertyDefinitionSupportedType<T> {
    sqlPreSideEffect?: (arg: ISQLSideEffectType<T>) => boolean | string | Promise<boolean | string>;
 
   /**
-   * represents an item that would mark for null
-   * by default it is null itself
+   * Use this function to
+   * establish when a field will be considered null
    */
-  nullableDefault?: any;
+  isNull?: (value: T) => boolean;
+
+  /**
+   * use to establish the value for null, by default it is null
+   */
+  getNullValue?: (value: T) => T;
 
   /**
    * this is a validation function that checks whether the value
@@ -547,7 +558,7 @@ export type PropertyDefinitionSupportedType =
   IPropertyDefinitionSupportedUnitType |
   PropertyDefinitionSupportedStringType |
   PropertyDefinitionSupportedPasswordType |
-  PropertyDefinitionSupportedTextType |
+  IPropertyDefinitionSupportedTextType |
   PropertyDefinitionSupportedDateType |
   PropertyDefinitionSupportedDateTimeType |
   PropertyDefinitionSupportedTimeType |

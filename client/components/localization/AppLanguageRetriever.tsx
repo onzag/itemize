@@ -4,8 +4,9 @@
  * @module
  */
 
-import React from "react";
-import { LocaleContext } from "../../internal/providers/locale-provider";
+import type { EndpointErrorType } from "../../../base/errors";
+import React, { useCallback, useState } from "react";
+import { ChangeLanguageToFn, LocaleContext } from "../../internal/providers/locale-provider";
 
 /**
  * How the language is formed
@@ -15,15 +16,49 @@ interface IFnAppLanguageRetrieverLanguageFormType {
   name: string;
 }
 
+interface IActualAppLanguageRetrieverProps {
+  currentLanguage: IFnAppLanguageRetrieverLanguageFormType;
+  availableLanguages: IFnAppLanguageRetrieverLanguageFormType[];
+  rtl: boolean;
+  changeLanguageTo: ChangeLanguageToFn;
+}
+
+interface IActualAppLanguageRetrieverPropsWithFn extends IActualAppLanguageRetrieverProps {
+  children: FnAppLanguageRetrieverType;
+}
+
+export interface ILanguageRetrieverArg extends IActualAppLanguageRetrieverProps {
+  error: EndpointErrorType;
+  dismissError?: () => void;
+}
+
 /**
  * The function that the retriever calls
  */
-type FnAppLanguageRetrieverType = (arg: {
-  currentLanguage: IFnAppLanguageRetrieverLanguageFormType,
-  availableLanguages: IFnAppLanguageRetrieverLanguageFormType[],
-  rtl: boolean,
-  changeLanguageTo: (code: string) => void,
-}) => React.ReactNode;
+type FnAppLanguageRetrieverType = (arg: ILanguageRetrieverArg) => React.ReactNode;
+
+function ActualAppLanguageRetriever(props: IActualAppLanguageRetrieverPropsWithFn) {
+  const [error, setError] = useState<EndpointErrorType>(null);
+
+  const dismissError = useCallback(() => {
+    setError(null);
+  }, []);
+
+  const changeLanguageTo = useCallback<ChangeLanguageToFn>(async (...args) => {
+    const err = await props.changeLanguageTo(...args);
+    setError(err);
+    return err;
+  }, [props.changeLanguageTo])
+
+  return props.children({
+    currentLanguage: props.currentLanguage,
+    availableLanguages: props.availableLanguages,
+    rtl: props.rtl,
+    changeLanguageTo,
+    error,
+    dismissError,
+  }) as any;
+}
 
 /**
  * Allows to read the current language as well as to change it from
@@ -50,12 +85,20 @@ export default function AppLanguageRetriever(props: {
               name: localeContext.langLocales[code].name,
             });
           });
-          return props.children({
+
+          const nProps = {
             currentLanguage,
             availableLanguages,
             rtl: localeContext.rtl,
-            changeLanguageTo: localeContext.updating ? () => null : localeContext.changeLanguageTo,
-          });
+            changeLanguageTo: localeContext.updating ? () => null as any : localeContext.changeLanguageTo,
+            children: props.children
+          };
+
+          return (
+            <ActualAppLanguageRetriever
+              {...nProps}
+            />
+          )
         }
       }
     </LocaleContext.Consumer>

@@ -6,33 +6,52 @@
 import React from "react";
 import { Ii18NType, ILangLocalesType } from "../../../base/Root";
 import equals from "deep-equal";
+import { EndpointErrorType } from "../../../base/errors";
+
+/**
+ * to change the lanaguage to a new code
+ * @param code the new language code
+ * @param avoidUpdatingUser avoid updating the user (if logged in)
+ * @returns a void promise, this promise is fullfilled once the language
+ * has been changed successfully and as such the app has updated
+ */
+export type ChangeLanguageToFn = (code: string, avoidUpdatingUser?: boolean) => Promise<EndpointErrorType>;
+
+/**
+ * To change the currency to a new code
+ * @param code a code which represents a valid supported currency from the currency list
+ * @param avoidUpdatingUser avoid updating the user (if logged in)
+ */
+export type ChangeCurrencyToFn = (code: string, avoidUpdatingUser?: boolean) => Promise<EndpointErrorType>;
+
+/**
+ * To change the country to a new code
+ * @param code a code which represents a valid supported country from the country list
+ * @param avoidUpdatingCountry avoids updating the country itself, use this if you are only wanting
+ * to know the predicted outcome of the language and currency
+ * @param avoidChangingLanguageAndCurrency avoids triggering an automatic change to the language and currency
+ * based on the country
+ * @param avoidUpdatingUser avoid updating the user (if logged in)
+ * @param onPotentialChangesFoundFor provides information regarding the country that was changed regarding potential changes
+ * does not trigger if not found
+ * @returns a void promise, this is basically for the same reason of changeLanguageTo
+ */
+export type ChangeCountryToFn = (
+  code: string,
+  avoidUpdatingCountry?: boolean,
+  avoidChangingLanguageAndCurrency?: boolean,
+  avoidUpdatingUser?: boolean,
+  onPotentialChangesFoundFor?: (languageCode: string, currencyCode: string) => void,
+) => Promise<EndpointErrorType>;
 
 /**
  * This is the locale type, which contains the locale
  * information for using in the application
  */
 export interface ILocaleContextType {
-  /**
-   * to change the lanaguage to a new code
-   * @param code the new language code
-   * @param avoidUpdatingUser avoid updating the user (if logged in)
-   * @returns a void promise, this promise is fullfilled once the language
-   * has been changed successfully and as such the app has updated
-   */
-  changeLanguageTo: (code: string, avoidUpdatingUser?: boolean) => Promise<void>;
-  /**
-   * To change the currency to a new code
-   * @param code a code which represents a valid supported currency from the currency list
-   * @param avoidUpdatingUser avoid updating the user (if logged in)
-   */
-  changeCurrencyTo: (code: string, avoidUpdatingUser?: boolean) => void;
-  /**
-   * To change the country to a new code
-   * @param code a code which represents a valid supported country from the country list
-   * @param avoidUpdatingUser avoid updating the user (if logged in)
-   * @returns a void promise, this is basically for the same reason of changeLanguageTo
-   */
-  changeCountryTo: (code: string, avoidChangingLanguageAndCurrency?: boolean, avoidUpdatingUser?: boolean) => Promise<void>;
+  changeLanguageTo: ChangeLanguageToFn;
+  changeCurrencyTo: ChangeCurrencyToFn;
+  changeCountryTo: ChangeCountryToFn;
   /**
    * The current language code
    */
@@ -95,7 +114,7 @@ export class LocaleProvider extends React.Component<ILocaleProviderProps> {
       nextProps.value.country !== this.props.value.country ||
       nextProps.value.currency !== this.props.value.currency ||
       nextProps.value.currencyFactors !== this.props.value.currencyFactors ||
-      nextProps.value.rtl !==this.props.value.rtl ||
+      nextProps.value.rtl !== this.props.value.rtl ||
       nextProps.value.updating !== this.props.value.updating ||
       !equals(nextProps.value.i18n, this.props.value.i18n, { strict: true });
   }

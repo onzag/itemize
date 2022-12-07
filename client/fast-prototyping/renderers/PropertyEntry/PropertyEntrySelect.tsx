@@ -146,8 +146,8 @@ class PropertyEntrySelectRenderer
       if (this.props.currentAppliedValue) {
         icon = <RestoreIcon />
       }
-    } else if (this.props.icon) {
-      icon = this.props.icon;
+    } else if (this.props.args.icon) {
+      icon = this.props.args.icon;
     }
 
     const allowedOptions = this.props.args.allowedOptions;

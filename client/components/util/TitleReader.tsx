@@ -14,12 +14,22 @@ interface ActualTitleReaderProps {
 }
 
 export class ActualTitleReader extends React.Component<ActualTitleReaderProps, {}> {
+  /**
+   * Sometimes when rendering the title setter will mount and change the title
+   * before the reader has the time to register
+   */
+  private lastRenderedFor: string;
+
   constructor(props: ActualTitleReaderProps) {
     super(props);
   }
   public componentDidMount() {
     // we add these global listener to it that do a force update
     ActualTitleSetter.changedListeners.set(this, this.forceUpdate.bind(this));
+
+    if (this.lastRenderedFor !== document.title) {
+      this.forceUpdate();
+    }
   }
   public componentWillUnmount() {
     // then we delete this
@@ -33,6 +43,8 @@ export class ActualTitleReader extends React.Component<ActualTitleReaderProps, {
       // be a ssr title set
       return this.props.ssrTitle;
     }
+    
+    this.lastRenderedFor = document.title;
 
     // gives priority to the document title on the force update
     return document.title;

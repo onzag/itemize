@@ -153,6 +153,7 @@ interface IPropertyViewRichTextViewerProps {
   onCustom?: (arg: RichElement | IText, props: any, expectedExtraProps: {Tag: string, styleActive?: any, styleHover?: any, defaultReturn: () => void}) => React.ReactNode;
   onCustomAttributesFor?: (arg: RichElement | IText) => any;
   onCustomWrap?: (arg: RichElement | IText, elementAsNode: React.ReactNode) => React.ReactNode;
+  lang: string;
 }
 
 /**
@@ -366,6 +367,7 @@ export class PropertyViewRichTextViewer extends React.Component<IPropertyViewRic
     return (
       <Node
         className={"rich-text" + (this.props.className ? " " + this.props.className : "")}
+        lang={this.props.lang}
         ref={this.divref}
         dangerouslySetInnerHTML={{ __html: this.state.html }}
       />
@@ -390,13 +392,14 @@ export class TemplatedPropertyViewRichTextRenderer extends React.Component<
   public shouldComponentUpdate(nextProps: ITemplatedPropertyViewRichTextRendererProps) {
     return (
       nextProps.children !== this.props.children ||
+      nextProps.lang !== this.props.lang ||
       !equals(nextProps.templateArgs, this.props.templateArgs, { strict: true })
     );
   }
   public render() {
     const deserializedValue = deserialize(this.props.children, null, { dontNormalize: true });
     const Node = this.props.Node;
-    return <Node className={"rich-text" + (this.props.className ? " " + this.props.className : "")}>
+    return <Node className={"rich-text" + (this.props.className ? " " + this.props.className : "")} lang={this.props.lang}>
       {renderTemplateDynamically(
         deserializedValue,
         this.props.templateArgs, {
@@ -441,27 +444,28 @@ export default function PropertyViewTextRenderer(props: IPropertyViewTextRendere
           onCustom={props.args.onCustom}
           onCustomAttributesFor={props.args.onCustomAttributesFor}
           onCustomWrap={props.args.onCustomWrap}
+          lang={props.currentValueLang}
         >
-          {props.currentValue}
+          {props.currentValueText}
         </TemplatedPropertyViewRichTextRenderer>
       );
     } else {
       return (
-        <PropertyViewRichTextViewer className={props.args.className} Node={Node}>
-          {props.currentValue}
+        <PropertyViewRichTextViewer className={props.args.className} Node={Node} lang={props.currentValueLang}>
+          {props.currentValueText}
         </PropertyViewRichTextViewer>
       );
     }
   } else if (props.subtype === "plain") {
     return (
       <Node className={"plain-text" + (props.args.className ? " " + props.args.className : "")}>
-        {props.currentValue}
+        {props.currentValueText}
       </Node>
     );
   }
   return (
-    <Node>
-      {props.currentValue}
+    <Node lang={props.currentValueLang}>
+      {props.currentValueText}
     </Node>
   )
 }

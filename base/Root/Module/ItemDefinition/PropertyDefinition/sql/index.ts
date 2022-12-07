@@ -25,6 +25,7 @@ import StorageProvider from "../../../../../../server/services/base/StorageProvi
 import { WhereBuilder } from "../../../../../../database/WhereBuilder";
 import { OrderByBuilder } from "../../../../../../database/OrderByBuilder";
 import type { ElasticQueryBuilder } from "../../../../../../server/elastic";
+import type { IAppDataType } from "../../../../../../server";
 
 /**
  * Provides the sql function that defines the schema that is used to build
@@ -465,6 +466,7 @@ export function getSQLTableDefinitionForProperty(
     include,
     // server data unavailable
     serverData: null,
+    appData: null,
   });
 }
 
@@ -473,6 +475,7 @@ export function getElasticSchemaForProperty(
   include: Include,
   propertyDefinition: PropertyDefinition,
   serverData: any,
+  appData: IAppDataType,
 ): IElasticIndexDefinitionType {
   const elasticFn = propertyDefinition.getPropertyDefinitionDescription().elastic;
   if (elasticFn) {
@@ -483,6 +486,7 @@ export function getElasticSchemaForProperty(
       itemDefinition,
       include,
       serverData,
+      appData,
     });
   }
 
@@ -503,6 +507,7 @@ export function getElasticSchemaForProperty(
  */
 export function convertSQLValueToGQLValueForProperty(
   serverData: any,
+  appData: IAppDataType,
   itemDefinition: ItemDefinition,
   include: Include,
   propertyDefinition: PropertyDefinition,
@@ -534,6 +539,7 @@ export function convertSQLValueToGQLValueForProperty(
     include,
     property: propertyDefinition,
     id: propertyDefinition.getId(),
+    appData,
   });
 
   // we check for null coersion, while this shouldn't really
@@ -562,6 +568,7 @@ export function convertSQLValueToGQLValueForProperty(
 
 export function convertSQLValueToElasticSQLValueForProperty(
   serverData: any,
+  appData: IAppDataType,
   itemDefinition: ItemDefinition,
   include: Include,
   propertyDefinition: PropertyDefinition,
@@ -576,6 +583,7 @@ export function convertSQLValueToElasticSQLValueForProperty(
     include,
     property: propertyDefinition,
     id: propertyDefinition.getId(),
+    appData,
   });
   return value;
 }
@@ -598,6 +606,7 @@ export function convertSQLValueToElasticSQLValueForProperty(
  */
 export function convertGQLValueToSQLValueForProperty(
   serverData: any,
+  appData: IAppDataType,
   mod: Module,
   itemDefinition: ItemDefinition,
   include: Include,
@@ -673,6 +682,7 @@ export function convertGQLValueToSQLValueForProperty(
       value: gqlPropertyValue,
       prefix: include ? include.getPrefixedQualifiedIdentifier() : "",
       serverData,
+      appData,
       itemDefinition,
       include,
       property: propertyDefinition,
@@ -698,6 +708,7 @@ export function convertGQLValueToSQLValueForProperty(
  */
 export function buildSQLQueryForProperty(
   serverData: any,
+  appData: IAppDataType,
   itemDefinition: ItemDefinition,
   include: Include,
   propertyDefinition: PropertyDefinition,
@@ -719,6 +730,7 @@ export function buildSQLQueryForProperty(
     dictionary,
     isOrderedByIt,
     property: propertyDefinition,
+    appData,
   });
 }
 
@@ -736,6 +748,7 @@ export function buildSQLQueryForProperty(
  */
 export function buildElasticQueryForProperty(
   serverData: any,
+  appData: IAppDataType,
   itemDefinition: ItemDefinition,
   include: Include,
   propertyDefinition: PropertyDefinition,
@@ -759,6 +772,7 @@ export function buildElasticQueryForProperty(
       isOrderedByIt,
       property: propertyDefinition,
       boost: propertyDefinition.getSearchBoost(),
+      appData,
     });
   }
 
@@ -780,6 +794,7 @@ export function buildElasticQueryForProperty(
  */
 export function buildSQLStrSearchQueryForProperty(
   serverData: any,
+  appData: IAppDataType,
   itemDefinition: ItemDefinition,
   include: Include,
   propertyDefinition: PropertyDefinition,
@@ -803,6 +818,7 @@ export function buildSQLStrSearchQueryForProperty(
       dictionary,
       isOrderedByIt,
       property: propertyDefinition,
+      appData,
     });
   }
 
@@ -824,6 +840,7 @@ export function buildSQLStrSearchQueryForProperty(
  */
 export function buildElasticStrSearchQueryForProperty(
   serverData: any,
+  appData: IAppDataType,
   itemDefinition: ItemDefinition,
   include: Include,
   propertyDefinition: PropertyDefinition,
@@ -848,6 +865,7 @@ export function buildElasticStrSearchQueryForProperty(
       isOrderedByIt,
       property: propertyDefinition,
       boost: propertyDefinition.getSearchBoost(),
+      appData,
     });
   }
 
@@ -882,6 +900,7 @@ const actualNulls = {
  */
 export function buildSQLOrderByForProperty(
   serverData: any,
+  appData: IAppDataType,
   itemDefinition: ItemDefinition,
   include: Include,
   propertyDefinition: PropertyDefinition,
@@ -909,6 +928,7 @@ export function buildSQLOrderByForProperty(
       wasIncludedInSearch,
       wasIncludedInStrSearch,
       args,
+      appData,
     });
 
     // if we have a result at all
@@ -935,6 +955,7 @@ export function buildSQLOrderByForProperty(
  */
 export function buildElasticOrderByForProperty(
   serverData: any,
+  appData: IAppDataType,
   itemDefinition: ItemDefinition,
   include: Include,
   propertyDefinition: PropertyDefinition,
@@ -961,6 +982,7 @@ export function buildElasticOrderByForProperty(
       wasIncludedInSearch,
       wasIncludedInStrSearch,
       args,
+      appData,
     });
 
     return result || null;
@@ -998,6 +1020,7 @@ export function buildSQLOrderByForInternalRequiredProperty(
     wasIncludedInSearch: null,
     wasIncludedInStrSearch: null,
     serverData: null,
+    appData: null,
     args,
   });
 
@@ -1038,6 +1061,7 @@ export function buildElasticOrderByForInternalRequiredProperty(
     wasIncludedInSearch: null,
     wasIncludedInStrSearch: null,
     serverData: null,
+    appData: null,
     args,
   });
 

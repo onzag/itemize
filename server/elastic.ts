@@ -252,7 +252,7 @@ export class ItemizeElasticClient {
 
     if (!this.serverData || !equals(this.serverData, serverData)) {
       this.serverData = serverData;
-      this.rootSchema = getElasticSchemaForRoot(this.root, this.serverData);
+      this.rootSchema = getElasticSchemaForRoot(this.root, this.serverData, null);
     }
 
     if (shouldResolvePrmomise) {
@@ -1328,6 +1328,7 @@ export class ItemizeElasticClient {
 
           const convertedSQL = convertSQLValueToElasticSQLValueForItemDefinition(
             this.serverData,
+            null,
             idef,
             knownValue,
           );
@@ -1832,6 +1833,7 @@ export class ItemizeElasticClient {
     const mergedId = id + "." + (version || "");
     const elasticFormIdef = convertSQLValueToElasticSQLValueForItemDefinition(
       this.serverData,
+      null,
       idef,
       newValue,
     );

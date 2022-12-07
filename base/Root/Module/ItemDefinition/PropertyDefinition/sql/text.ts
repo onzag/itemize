@@ -7,6 +7,7 @@
 import { ISQLArgInfo, ISQLInInfo, ISQLSearchInfo, ISQLOrderByInfo, ISQLStrSearchInfo, ISQLRedoDictionaryBasedIndex, IElasticSearchInfo, IArgInfo, ISQLOutInfo, IElasticStrSearchInfo } from "../types";
 import { PropertyDefinitionSearchInterfacesPrefixes } from "../search-interfaces";
 import { DOMWindow, DOMPurify } from "../../../../../../util";
+import type { IPropertyDefinitionSupportedTextType } from "../types/text";
 
 /**
  * Provides the sql form for the text type
@@ -38,6 +39,13 @@ export function textSQL(arg: ISQLArgInfo) {
   };
 }
 
+export function textSQLSelect(arg: ISQLArgInfo) {
+  return [
+    arg.prefix + arg.id,
+    arg.prefix + arg.id + "_LANGUAGE",
+  ];
+}
+
 export function textElastic(arg: ISQLArgInfo) {
   const isRichText = arg.property.isRichText();
 
@@ -46,6 +54,9 @@ export function textElastic(arg: ISQLArgInfo) {
       properties: {
         [arg.prefix + arg.id]: {
           enabled: false,
+        },
+        [arg.prefix + arg.id + "_LANGUAGE"]: {
+          type: "text",
         },
         [arg.prefix + arg.id + "_PLAIN"]: {
           type: "text",
@@ -63,7 +74,10 @@ export function textElastic(arg: ISQLArgInfo) {
         },
         [arg.prefix + arg.id + "_NULL"]: {
           type: "boolean",
-        }
+        },
+        [arg.prefix + arg.id + "_LANGUAGE"]: {
+          type: "text",
+        },
       }
     }
   }
@@ -81,24 +95,57 @@ function fakeInnerText(ele: Node): string {
   return Array.from(ele.childNodes).map(fakeInnerText).filter((v) => v !== "").join(" ");
 }
 
+export function textSQLOut(arg: ISQLOutInfo): IPropertyDefinitionSupportedTextType {
+  const value = arg.row[arg.prefix + arg.id];
+  const language = arg.row[arg.prefix + arg.id + "_LANGUAGE"] ||
+    (arg.appData && arg.appData.config.fallbackLanguage.split("-")[0]) ||
+    "en";
+
+  if (
+    (
+      typeof value === "undefined" ||
+      value === null
+    ) && !arg.property.isNullable()
+  ) {
+    const def = arg.property.getDefaultValue();
+    if (def !== null) {
+      return def as IPropertyDefinitionSupportedTextType;
+    }
+    return {
+      value: "?",
+      language,
+    }
+  }
+
+  return {
+    value,
+    language,
+  }
+}
+
 /**
  * Provides the sql in functionality for the text type
  * @param arg the sql in arg info
  * @returns a partial row value
  */
 export function textSQLIn(arg: ISQLInInfo) {
-  let language: string;
-  if (typeof arg.language === "string" || !arg.language) {
-    language = (arg.language || null) as string;
-  } else {
-    language = arg[arg.prefix + arg.id + "_LANGUAGE"] || null;
-  }
-
   let dictionary: string;
   if (typeof arg.dictionary === "string" || !arg.language) {
     dictionary = (arg.dictionary || null) as string;
   } else {
     dictionary = arg[arg.prefix + arg.id + "_DICTIONARY"] || null;
+  }
+
+  let language: string;
+  if ((arg.value as IPropertyDefinitionSupportedTextType) && (arg.value as IPropertyDefinitionSupportedTextType).language) {
+    language = (arg.value as IPropertyDefinitionSupportedTextType).language || null;
+    dictionary = arg.appData ? (arg.appData.databaseConfig.dictionaries[language] ||
+      arg.appData.databaseConfig.dictionaries["*"] ||
+      null) : null;
+  } else if (typeof arg.language === "string" || !arg.language) {
+    language = (arg.language || null) as string;
+  } else {
+    language = arg[arg.prefix + arg.id + "_LANGUAGE"] || null;
   }
 
   // for null
@@ -113,18 +160,18 @@ export function textSQLIn(arg: ISQLInInfo) {
   }
 
   // otherwise let's check these
-  let escapedText = arg.value as string;
-  let purifiedText = arg.value as string;
+  let escapedText = (arg.value && (arg.value as IPropertyDefinitionSupportedTextType).value) as string;
+  let purifiedText = (arg.value && (arg.value as IPropertyDefinitionSupportedTextType).value) as string;
   // if we have rich text we need to escape and sanitize
-  if (arg.property.isRichText()) {
+  if (arg.property.isRichText() && purifiedText) {
     // for that we use our dom window
     const dummyElement = DOMWindow.document.createElement("div");
-    dummyElement.innerHTML = arg.value.toString();
+    dummyElement.innerHTML = purifiedText;
     // the escaped text is used to build the FTS index and as such is necessary
     escapedText = fakeInnerText(dummyElement);
 
     // and we escape it, and now 
-    purifiedText = DOMPurify.sanitize(arg.value.toString(), {
+    purifiedText = DOMPurify.sanitize(purifiedText, {
       // we allow iframes
       ADD_TAGS: ["iframe"],
       // we allow these attributes to be set
@@ -257,11 +304,13 @@ export function textElasticIn(arg: ISQLOutInfo) {
     return {
       [arg.prefix + arg.id]: arg.row[arg.prefix + arg.id],
       [arg.prefix + arg.id + "_PLAIN"]: arg.row[arg.prefix + arg.id + "_PLAIN"],
+      [arg.prefix + arg.id + "_LANGUAGE"]: arg.row[arg.prefix + arg.id + "_LANGUAGE"],
       [arg.prefix + arg.id + "_NULL"]: !arg.row[arg.prefix + arg.id],
     };
   } else {
     return {
       [arg.prefix + arg.id]: arg.row[arg.prefix + arg.id],
+      [arg.prefix + arg.id + "_LANGUAGE"]: arg.row[arg.prefix + arg.id + "_LANGUAGE"],
       [arg.prefix + arg.id + "_NULL"]: !arg.row[arg.prefix + arg.id],
     };
   }

@@ -21,6 +21,8 @@ import { IConfigRawJSONDataType } from "../../../config";
 import equals from "deep-equal";
 import { ILocaleContextType, LocaleProvider } from "../providers/locale-provider";
 import { IDataContextType, DataProvider } from "../providers/appdata-provider";
+import type { EndpointErrorType } from "../../../base/errors";
+import { ENDPOINT_ERRORS } from "../../../constants";
 
 /**
  * Just a variable for whether is development
@@ -261,7 +263,7 @@ export default class App extends React.Component<IAppProps, IAppState> {
    * @param propertyId the property id we are updating
    * @param value the value
    */
-  public async updateUserProperty(propertyId: string, value: string) {
+  public async updateUserProperty(propertyId: string, value: string): Promise<EndpointErrorType> {
     // we check that there's an user logged in
     if (this.tokenState && this.tokenState.id) {
       // simple log message
@@ -309,6 +311,10 @@ export default class App extends React.Component<IAppProps, IAppState> {
           // can listen to changes for it
           userItemDefinition.triggerListeners("change", this.tokenState.id, null);
         }
+
+        return null;
+      } else if (result && result.error) {
+        return result.error;
       }
     }
   }
@@ -360,7 +366,9 @@ export default class App extends React.Component<IAppProps, IAppState> {
 
     // and now if we don't avoid updating the user
     if (!avoidUpdatingUser) {
-      this.updateUserProperty("app_language", locale);
+      return this.updateUserProperty("app_language", locale);
+    } else {
+      return null;
     }
   }
 
@@ -369,7 +377,7 @@ export default class App extends React.Component<IAppProps, IAppState> {
    * @param locale the two letter or language-region code for the locale
    * @param avoidUpdatingUser whether to avoid updating the user
    */
-  public async changeLanguageTo(locale: string, avoidUpdatingUser?: boolean) {
+  public async changeLanguageTo(locale: string, avoidUpdatingUser?: boolean): Promise<EndpointErrorType> {
     console.log("changing language to", locale);
     // if it's updating, this shouldn't have happened
     if (this.state.localeIsUpdating) {
@@ -394,14 +402,13 @@ export default class App extends React.Component<IAppProps, IAppState> {
 
     // if it's the same, then we do not care, the url language is the real language
     if (localeToSet === urlLanguage) {
-      return;
+      return null;
     }
 
     // if the language is currently loaded in memory, just set it as it is
     // we don't need to fetch anything
     if (this.props.root.getI18nDataFor(localeToSet)) {
-      this.finallySetLocaleDataFor(localeToSet, avoidUpdatingUser);
-      return;
+      return this.finallySetLocaleDataFor(localeToSet, avoidUpdatingUser);
     }
 
     // otherwise we send the state, this state is part of the context
@@ -426,20 +433,24 @@ export default class App extends React.Component<IAppProps, IAppState> {
         localeIsUpdating: false,
         localeIsUpdatingFrom: null,
       });
-      return;
+      return {
+        code: ENDPOINT_ERRORS.CANT_CONNECT,
+        message: "Could not connect to fetch the resources or received invalid code",
+      };
     }
 
     // Now we patch the root
     this.props.root.mergeWithI18n(newData);
 
-    // set the locale data
-    this.finallySetLocaleDataFor(localeToSet, avoidUpdatingUser);
+    const err = await this.finallySetLocaleDataFor(localeToSet, avoidUpdatingUser);
 
     // and fix the state
     this.setState({
       localeIsUpdating: false,
       localeIsUpdatingFrom: null,
     });
+
+    return err;
   }
 
   /**
@@ -450,7 +461,13 @@ export default class App extends React.Component<IAppProps, IAppState> {
    * @param avoidChangingLanguageAndCurrency avoids changing the language and the currency
    * @param avoidUpdatingUser avoids updating the user
    */
-  public async changeCountryTo(code: string, avoidChangingLanguageAndCurrency?: boolean, avoidUpdatingUser?: boolean) {
+  public async changeCountryTo(
+    code: string,
+    avoidUpdatingCountry?: boolean,
+    avoidChangingLanguageAndCurrency?: boolean,
+    avoidUpdatingUser?: boolean,
+    onPotentialChangesFoundFor?: (languageCode: string, currencyCode: string) => void,
+  ): Promise<EndpointErrorType> {
     console.log("changing country to", code);
     // Codes should be uppercase, but well, let's get wiggle room for error
     let codeToSet = code.toUpperCase();
@@ -464,27 +481,36 @@ export default class App extends React.Component<IAppProps, IAppState> {
       console.warn("Attempted to set country to unavailable " + code + ", defaulted to " + codeToSet);
     }
 
-    let cookieEnd = ";domain=" + location.hostname;
-    if (location.hostname !== "localhost") {
-      cookieEnd = ";secure=true";
-    }
-
     // Now we set the country in local storage
-    document.cookie = "country=" + codeToSet + ";expires=" + COOKIE_EXPIRATION_DATE + ";path=/" + cookieEnd;
     if (!avoidUpdatingUser) {
-      this.updateUserProperty("app_country", codeToSet);
+      const err = await this.updateUserProperty("app_country", codeToSet);
+      if (err) {
+        return err;
+      }
     }
 
-    // and update the state
-    this.setState({
-      specifiedCountry: codeToSet,
-    });
+    // and update the state if that's so desired
+    if (!avoidUpdatingCountry) {
+      let cookieEnd = ";domain=" + location.hostname;
+      if (location.hostname !== "localhost") {
+        cookieEnd = ";secure=true";
+      }
+      document.cookie = "country=" + codeToSet + ";expires=" + COOKIE_EXPIRATION_DATE + ";path=/" + cookieEnd;
+      this.setState({
+        specifiedCountry: codeToSet,
+      });
+    }
 
-    if (!avoidChangingLanguageAndCurrency) {
+    if ((!avoidChangingLanguageAndCurrency && countryData) || (countryData && onPotentialChangesFoundFor)) {
       // Now we also change the currency, we default to euros in
       // case there's no currency defined
-      const currencyUsedThere = countryData.currency || "EUR";
-      this.changeCurrencyTo(currencyUsedThere, avoidUpdatingUser);
+      let currencyUsedThere = countryData.currency || "EUR";
+
+      if (!currencies[currencyUsedThere]) {
+        // Otherwise we go for the default, this is unlikely to happen
+        // because all currencies are in the currency list
+        currencyUsedThere = "EUR";
+      }
 
       // So now we need to get what is relevant, the languages, we check
       // what languages are spokes in the region, now because we have some places
@@ -506,11 +532,27 @@ export default class App extends React.Component<IAppProps, IAppState> {
       // We check for both, giving the regionalized priority
       // as you can notice, this language might not be available,
       // in that case the app will default to the default language
-      if (this.hasLocaleDataFor(languageSpokenThereRegionalized)) {
-        await this.changeLanguageTo(languageSpokenThereRegionalized, avoidUpdatingUser);
-      } else {
-        await this.changeLanguageTo(languageSpokenThereNonRegionalized, avoidUpdatingUser);
+      let languageToSetFor = this.hasLocaleDataFor(languageSpokenThereRegionalized) ?
+        languageSpokenThereRegionalized : languageSpokenThereNonRegionalized;
+
+      if (!this.hasLocaleDataFor(languageToSetFor)) {
+        languageToSetFor = this.props.config.fallbackLanguage;
       }
+
+      onPotentialChangesFoundFor && onPotentialChangesFoundFor(languageToSetFor, currencyUsedThere);
+
+      if (!avoidChangingLanguageAndCurrency) {
+        const err = await this.changeCurrencyTo(currencyUsedThere, avoidUpdatingUser);
+        if (err) {
+          return err;
+        }
+
+        return this.changeLanguageTo(languageToSetFor, avoidUpdatingUser);
+      }
+
+      return null;
+    } else {
+      return null;
     }
   }
 
@@ -520,7 +562,7 @@ export default class App extends React.Component<IAppProps, IAppState> {
    * @param code the three letter uppercase code of the currency
    * @param avoidUpdatingUser whether to avoid updating the user
    */
-  public changeCurrencyTo(code: string, avoidUpdatingUser?: boolean) {
+  public async changeCurrencyTo(code: string, avoidUpdatingUser?: boolean): Promise<EndpointErrorType> {
     console.log("changing currency to", code);
 
     // We still uppercase it anyway
@@ -542,13 +584,18 @@ export default class App extends React.Component<IAppProps, IAppState> {
     // We set the currency in local storage
     document.cookie = "currency=" + codeToSet + ";expires=" + COOKIE_EXPIRATION_DATE + ";path=/" + cookieEnd;
     if (!avoidUpdatingUser) {
-      this.updateUserProperty("app_currency", codeToSet);
+      const err = this.updateUserProperty("app_currency", codeToSet);
+      if (err) {
+        return err;
+      }
     }
 
     // and set the state
     this.setState({
       specifiedCurrency: codeToSet,
     });
+
+    return null;
   }
 
   /**

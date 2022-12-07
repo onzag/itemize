@@ -343,6 +343,7 @@ export function FragmentLoader(props: FragmentLoaderProps) {
                         properties: basicProperties,
                         submitForId: idVersion.id,
                         submitForVersion: props.version,
+                        languageOverride: idVersion.version,
                       };
 
                       if (props.onBeforeSubmit) {

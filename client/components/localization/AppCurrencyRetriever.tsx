@@ -4,18 +4,52 @@
  * @module
  */
 
-import React from "react";
+import type { EndpointErrorType } from "../../../base/errors";
+import React, { useCallback, useState } from "react";
 import { ICurrencyType, currencies, arrCurrencies } from "../../../imported-resources";
-import { LocaleContext } from "../../internal/providers/locale-provider";
+import { LocaleContext, ChangeCurrencyToFn } from "../../internal/providers/locale-provider";
+
+interface IActualAppCurrencyRetrieverProps {
+  currentCurrency: ICurrencyType;
+  availableCurrencies: ICurrencyType[];
+  changeCurrencyTo: ChangeCurrencyToFn;
+}
+
+interface IActualAppCurrencyRetrieverPropsWithFn extends IActualAppCurrencyRetrieverProps {
+  children: FnAppCurrencyRetrieverType;
+}
+
+export interface ICurrencyRetrieverArg extends IActualAppCurrencyRetrieverProps {
+  error: EndpointErrorType;
+  dismissError?: () => void;
+}
 
 /**
- * This is the function for the arg retriever
+ * The function that the retriever calls
  */
-type FnAppCurrencyRetrieverType = (arg: {
-  currentCurrency: ICurrencyType,
-  availableCurrencies: ICurrencyType[],
-  changeCurrencyTo: (code: string) => void,
-}) => React.ReactNode;
+type FnAppCurrencyRetrieverType = (arg: ICurrencyRetrieverArg) => React.ReactNode;
+
+function ActualAppCurrencyRetriever(props: IActualAppCurrencyRetrieverPropsWithFn) {
+  const [error, setError] = useState<EndpointErrorType>(null);
+
+  const dismissError = useCallback(() => {
+    setError(null);
+  }, []);
+
+  const changeCurrencyTo = useCallback<ChangeCurrencyToFn>(async (...args) => {
+    const err = await props.changeCurrencyTo(...args);
+    setError(err);
+    return err;
+  }, [props.changeCurrencyTo])
+
+  return props.children({
+    currentCurrency: props.currentCurrency,
+    availableCurrencies: props.availableCurrencies,
+    changeCurrencyTo,
+    error,
+    dismissError,
+  }) as any;
+}
 
 /**
  * Provides the current currency in the application context and allows
@@ -30,11 +64,16 @@ export default function AppCurrencyRetriever(props: {
     <LocaleContext.Consumer>
       {
         (localeContext) => {
-          return props.children({
+          const nProps = {
             currentCurrency: currencies[localeContext.currency.toUpperCase()],
             availableCurrencies: arrCurrencies,
-            changeCurrencyTo: localeContext.updating ? () => null : localeContext.changeCurrencyTo,
-          });
+            changeCurrencyTo: localeContext.updating ? () => null as any : localeContext.changeCurrencyTo,
+            children: props.children,
+          };
+
+          return (
+            <ActualAppCurrencyRetriever {...nProps}/>
+          );
         }
       }
     </LocaleContext.Consumer>

@@ -375,14 +375,14 @@ class PropertyEntryReferenceRenderer
           </IconButton>
         </InputAdornment>
       );
-    } else if (this.props.icon) {
+    } else if (this.props.args.icon) {
       // set it at the end
       appliedInputProps.endAdornment = (
         <InputAdornment position="end" sx={style.standardAddornment(shouldShowInvalid(this.props))}>
           <RestoreIconButton
             sx={style.iconButton}
           >
-            {this.props.icon}
+            {this.props.args.icon}
           </RestoreIconButton>
         </InputAdornment>
       );
@@ -587,7 +587,6 @@ class PropertyEntryReferenceRenderer
         placeholder={this.props.placeholder}
         args={this.props.args}
         label={this.props.label}
-        icon={this.props.icon}
         disabled={this.props.disabled}
         autoFocus={this.props.autoFocus}
         onChange={this.onChangeBySelect}
@@ -597,6 +596,8 @@ class PropertyEntryReferenceRenderer
         isNullable={this.props.isNullable}
         isNumeric={false}
         isList={false}
+        language={this.props.language}
+        languageOverride={this.props.languageOverride}
       />
     );
   }

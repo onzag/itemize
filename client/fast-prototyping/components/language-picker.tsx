@@ -7,12 +7,13 @@
 import React from "react";
 import { capitalize } from "../../components/localization";
 import AppLanguageRetriever from "../../components/localization/AppLanguageRetriever";
-import { LocaleContext } from "../../internal/providers/locale-provider";
+import { ChangeLanguageToFn, LocaleContext } from "../../internal/providers/locale-provider";
 import { arrLanguages } from "../../../imported-resources";
 import TranslateIcon from "@mui/icons-material/Translate";
 import Menu from "@mui/material/Menu";
 import MenuItem from "@mui/material/MenuItem";
 import Button from "@mui/material/Button";
+import Snackbar from "./snackbar";
 
 /**
  * The props of the language picker, a bit different from other pickers
@@ -48,7 +49,7 @@ interface ILanguagePickerProps {
    * which changes the application language, this allows
    * you to control custom properties using Setters
    */
-  handleLanguageChange?: (code: string, appChangeLanguageTo: (code: string) => void) => void;
+  handleLanguageChange?: (code: string, appChangeLanguageTo: ChangeLanguageToFn) => void;
   /**
    * handle the current code yourself rather than using the application's
    * default
@@ -126,7 +127,7 @@ export class LanguagePicker extends React.Component<ILanguagePickerProps, ILangu
       anchorEl: null,
     });
   }
-  public handleLanguageChange(changeLanguageToFn: (code: string) => void, code: string) {
+  public handleLanguageChange(changeLanguageToFn: ChangeLanguageToFn, code: string) {
     this.setState({
       anchorEl: null,
     });
@@ -172,10 +173,10 @@ export class LanguagePicker extends React.Component<ILanguagePickerProps, ILangu
               currentLanguage = languageData.availableLanguages.find((l) => l.code === this.props.currentCode) || null;
             }
           }
-          if (currentLanguage === null) {
+          if (!currentLanguage) {
             currentLanguage = {
               code: null,
-              name: this.props.unspecifiedLabel,
+              name: this.props.currentCode || this.props.unspecifiedLabel,
             }
           }
 
@@ -231,6 +232,13 @@ export class LanguagePicker extends React.Component<ILanguagePickerProps, ILangu
                 }
               </Button>
               {menu}
+              <Snackbar
+                open={!!languageData.error}
+                i18nDisplay={languageData.error}
+                id="language-picker-error"
+                onClose={languageData.dismissError}
+                severity="error"
+              />
             </React.Fragment>
           );
         }}

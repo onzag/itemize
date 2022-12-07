@@ -26,10 +26,18 @@ interface NeedsSubmitPromptProps {
    */
   includes?: string[];
   /**
+   * another boolean to active the submit if it's active
+   */
+  other?: boolean;
+  /**
    * the options to trigger a submit from the same
    * prompt dialog
    */
   confirmationSubmitOptions: IActionSubmitOptions;
+  /**
+   * called when submit was confirmed and it's about to submit
+   */
+  onConfirmationSubmit?: (defaultAction: () => Promise<EndpointErrorType>) => Promise<EndpointErrorType>;
   /**
    * The message to show before unload, not truly supported
    * in most browsers but nonetheless available
@@ -57,11 +65,15 @@ export default class NeedsSubmitPrompt extends React.PureComponent<NeedsSubmitPr
    * @returns a promise for an error (or null)
    */
   public async confirmationCallback(actioner: ISubmitActionerInfoArgType): Promise<EndpointErrorType> {
-    const response: IActionSubmitResponse = await actioner.submit(this.props.confirmationSubmitOptions);
-    if (response.error) {
-      return response.error;
+    if (this.props.onConfirmationSubmit) {
+      return this.props.onConfirmationSubmit(actioner.submit.bind(null, this.props.confirmationSubmitOptions));
+    } else {
+      const response: IActionSubmitResponse = await actioner.submit(this.props.confirmationSubmitOptions);
+      if (response.error) {
+        return response.error;
+      }
+      return null;
     }
-    return null;
   }
 
   /**
@@ -102,13 +114,16 @@ export default class NeedsSubmitPrompt extends React.PureComponent<NeedsSubmitPr
     // return null, it'll be equivalent
     if (
       noProperties &&
-      noIncludes
+      noIncludes &&
+      !this.props.other
     ) {
       return null;
     }
 
     // otherwise if no includes
-    if (noIncludes) {
+    if (noIncludes && noProperties) {
+      return this.buildPrompt(this.props.other);
+    } else if (noIncludes) {
       // we now use our differing properties retriever with the main properties
       // and as such, we can pass the condition as the differing properties argument
       // if there are differing properties the condition will evaluate to true
@@ -116,7 +131,7 @@ export default class NeedsSubmitPrompt extends React.PureComponent<NeedsSubmitPr
       return (
         <DifferingPropertiesRetriever mainProperties={this.props.properties}>
           {(differingProperties) => (
-            this.buildPrompt(!!(differingProperties && differingProperties.length))
+            this.buildPrompt(!!(differingProperties && differingProperties.length) || this.props.other)
           )}
         </DifferingPropertiesRetriever>
       );
@@ -125,7 +140,7 @@ export default class NeedsSubmitPrompt extends React.PureComponent<NeedsSubmitPr
       return (
         <DifferingIncludesRetriever mainIncludes={this.props.includes}>
           {(differingIncludes) => (
-            this.buildPrompt(!!(differingIncludes && differingIncludes.length))
+            this.buildPrompt(!!(differingIncludes && differingIncludes.length) || this.props.other)
           )}
         </DifferingIncludesRetriever>
       );
@@ -138,7 +153,8 @@ export default class NeedsSubmitPrompt extends React.PureComponent<NeedsSubmitPr
             {(differingIncludes) => (
               this.buildPrompt(
                 !!(differingIncludes && differingIncludes.length) ||
-                !!(differingProperties && differingProperties.length)
+                !!(differingProperties && differingProperties.length) ||
+                this.props.other
               )
             )}
           </DifferingIncludesRetriever>
