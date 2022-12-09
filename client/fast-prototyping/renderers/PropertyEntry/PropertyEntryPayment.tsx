@@ -200,6 +200,8 @@ function PropertyEntryPaymentRenderer(props: IPropertyEntryPaymentRendererProps)
 
     const amountEntry = (
       <PropertyEntryFieldRenderer
+        currentValueLang={null}
+        onChangeTextLanguage={() => null as any}
         uniqueId={props.uniqueId + "_amount"}
         label={props.i18nPayment.amount}
         placeholder={props.i18nPayment.amount}

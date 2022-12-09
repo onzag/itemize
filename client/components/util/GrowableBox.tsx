@@ -35,7 +35,12 @@ export default function GrowableBox(props: IGrowableBoxProps) {
 
   return (
     <Element
-      style={{height, transition: props.transitionOverride || "height 0.3s ease", overflow: "hidden", width: props.fullWidth ? "100%" : null}}
+      style={{
+        height,
+        transition: props.transitionOverride || "height 0.3s ease",
+        overflow: "visible clip",
+        width: props.fullWidth ? "100%" : null
+      }}
       {...props.componentProps}
       ref={elementRef}
     >

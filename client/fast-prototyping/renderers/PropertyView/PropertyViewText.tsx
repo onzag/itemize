@@ -424,9 +424,9 @@ export class TemplatedPropertyViewRichTextRenderer extends React.Component<
  * @returns a react element
  */
 export default function PropertyViewTextRenderer(props: IPropertyViewTextRendererProps) {
-  if (props.args.nullNode && props.currentValue === null) {
+  if (props.args.nullNode && (props.currentValue === null || props.currentValue.value === null)) {
     return props.args.nullNode;
-  } else if (props.args.NullComponent && props.currentValue === null) {
+  } else if (props.args.NullComponent && (props.currentValue === null || props.currentValue.value === null)) {
     const NullComponent = props.args.NullComponent;
     const nullArgs = props.args.nullComponentArgs;
     return <NullComponent {...nullArgs} />;

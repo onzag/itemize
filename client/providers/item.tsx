@@ -2682,7 +2682,7 @@ export class ActualItemProvider extends
     if (this.state.loading) {
       return;
     }
-
+    
     property.restoreValueFor(
       this.props.forId || null,
       this.props.forVersion || null,

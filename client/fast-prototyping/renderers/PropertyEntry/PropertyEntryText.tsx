@@ -203,7 +203,7 @@ class PropertyEntryTextRenderer extends React.PureComponent<IPropertyEntryTextRe
 
     const editor =
       <SlateEditor
-        id={this.props.propertyId}
+        id={this.props.uniqueId}
         features={this.props.args.features ? { ...this.props.features, ...this.props.args.features } : this.props.features}
         value={this.props.currentValueText}
         autoFocus={this.props.autoFocus}

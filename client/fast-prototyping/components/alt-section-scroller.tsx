@@ -160,7 +160,7 @@ export function AltSectionScroller(
   const [fixedPos, setPos] = useState<[number, number]>(null);
 
   const updateDynamicPos = useCallback(() => {
-    if (scrollerRef.current) {
+    if (scrollerRef.current && props.positioning === "dynamic-fixed") {
       let element = scrollerRef.current.getScrollableComponent();
 
       const boundingRect = element.getBoundingClientRect();
@@ -174,7 +174,7 @@ export function AltSectionScroller(
 
       setPos([centerX, centerY]);
     }
-  }, [scrollerRef]);
+  }, [scrollerRef, props.positioning]);
 
   useEffect(() => {
     if (props.positioning === "dynamic-fixed") {

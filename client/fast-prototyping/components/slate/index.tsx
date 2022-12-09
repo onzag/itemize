@@ -1082,7 +1082,6 @@ export class SlateEditor extends React.Component<ISlateEditorProps, ISlateEditor
     // if we did not our state would basically be immutable
     // as it would restore from the prop on each render cycle
     if (state.synced) {
-
       // now if we have an internal value that is given via the props
       // this means that this is the internal value that refers to the value
       // itself
@@ -1153,7 +1152,6 @@ export class SlateEditor extends React.Component<ISlateEditorProps, ISlateEditor
         // match with the current, note that the signature will match with parsed values
         // as it uses a namespaced uuid that will give the same value for the same string
         if (!state.currentValue || newcurrentValue.id !== state.currentValue.id) {
-
           // then we do the same and set the new internal value
           // and clear all the anchors
           return {
@@ -4682,6 +4680,11 @@ export class SlateEditor extends React.Component<ISlateEditorProps, ISlateEditor
     // wrapping based on the root context
     if (this.props.rootContext && this.props.rootContext.editorArgs && this.props.rootContext.editorArgs.wrapper) {
       children = this.props.rootContext.editorArgs.wrapper(children);
+    }
+
+    // https://github.com/ianstormtaylor/slate/pull/4540
+    if (this.state.currentValue.children !== this.editor.children) {
+      this.editor.children = this.state.currentValue.children;
     }
 
     // now we can return

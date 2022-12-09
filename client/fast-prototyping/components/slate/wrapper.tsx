@@ -138,41 +138,60 @@ const style = {
     display: "flex",
     flexDirection: "column",
   },
-  editor: (shouldShowInvalidEditor: boolean, isRichText: boolean) => {
-    return {
+  editor: (shouldShowInvalidEditor: boolean, isRichText: boolean, variant: "filled" | "outlined") => {
+    const filledVariant = variant === "filled" ? (
+      {
+        // this is the colour when the field is out of focus
+        "&::before": {
+          left: 0,
+          right: 0,
+          bottom: 0,
+          content: "'\\00a0'",
+          position: "absolute",
+          transition: "border-bottom-color 200ms cubic-bezier(0.4, 0, 0.2, 1) 0ms",
+          borderBottom: "1px solid " +
+            (shouldShowInvalidEditor ? "#e57373" : "rgba(0,0,0,0.42)"),
+          pointerEvents: "none",
+        },
+        // the color that pops up when the field is in focus
+        "&::after": {
+          left: 0,
+          bottom: 0,
+          right: 0,
+          content: "''",
+          position: "absolute",
+          transform: "scaleX(0)",
+          transition: "transform 200ms cubic-bezier(0.0, 0, 0.2, 1) 0ms",
+          borderBottom: "2px solid " +
+            (shouldShowInvalidEditor ? "#f44336" : "#3f51b5"),
+          pointerEvents: "none",
+        },
+        // during the hover event
+        "&.focused::after": {
+          transform: "none",
+        },
+      }
+    ) : {};
+
+    return Object.assign(filledVariant, {
       "flex": "1 1 100%",
       "position": "relative" as "relative",
       "padding": isRichText ? "1rem" : "0 1rem 1rem 1rem",
-      // this is the colur when the field is out of focus
-      "&::before": {
-        left: 0,
-        right: 0,
-        bottom: 0,
-        content: "'\\00a0'",
-        position: "absolute",
-        transition: "border-bottom-color 200ms cubic-bezier(0.4, 0, 0.2, 1) 0ms",
-        borderBottom: "1px solid " +
-          (shouldShowInvalidEditor ? "#e57373" : "rgba(0,0,0,0.42)"),
-        pointerEvents: "none",
+    });
+  },
+  outlineContainer: (focused: boolean, invalid: boolean) => {
+    const mainColor = invalid ? "#d32f2f" : (focused ? "#1976d2" : "rgb(192, 192, 192)");
+    return ({
+      position: "relative",
+      border: "solid 1px",
+      borderColor: mainColor,
+      boxShadow: focused ? `0px 0px 0px 1px ${mainColor}` : null,
+      borderRadius: "6px",
+      overflow: "hidden",
+      "&:hover": {
+        borderColor: invalid ? "#d32f2f" : (focused ? "#1976d2" : "rgba(0,0,0,0.87)"),
       },
-      // the color that pops up when the field is in focus
-      "&::after": {
-        left: 0,
-        bottom: 0,
-        right: 0,
-        content: "''",
-        position: "absolute",
-        transform: "scaleX(0)",
-        transition: "transform 200ms cubic-bezier(0.0, 0, 0.2, 1) 0ms",
-        borderBottom: "2px solid " +
-          (shouldShowInvalidEditor ? "#f44336" : "#3f51b5"),
-        pointerEvents: "none",
-      },
-      // during the hover event
-      "&.focused::after": {
-        transform: "none",
-      },
-    };
+    });
   },
   toolbar: {
     flexWrap: "wrap",
@@ -391,6 +410,10 @@ export type SlateEditorWrapperCustomToolbarElement =
  * when the editor is created with the wrapper itself
  */
 export interface IMaterialUISlateWrapperProps extends ISlateEditorWrapperBaseProps {
+  /**
+   * The wrapper variant
+   */
+  variant?: "filled" | "outlined";
   /**
    * A generic error message
    */
@@ -1399,13 +1422,20 @@ export interface MaterialUISlateWrapperState {
 
 const StyledEditorContainer = styled("div")(style.editorContainer);
 
+// typescript is totally garbage and refuses to work with this totally valid
+// definition everything must be anied
+const StyledEditorOutlinedContainer = (styled("div", {
+  shouldForwardProp: (p) => p !== "focused" && p !== "invalid",
+}) as any)((typescriptAnyAlwaysAny: any) => style.outlineContainer(typescriptAnyAlwaysAny.focused, typescriptAnyAlwaysAny.invalid)) as any;
+
 interface IStyledEditor {
   currentValid: boolean;
   isRichText: boolean;
+  variant: "filled" | "outlined";
 }
 const StyledEditor = styled("div", {
-  shouldForwardProp: (p) => p !== "currentValid" && p !== "isRichText",
-})<IStyledEditor>(({ currentValid, isRichText }) => style.editor(!currentValid, isRichText));
+  shouldForwardProp: (p) => p !== "currentValid" && p !== "isRichText" && p !== "variant",
+})<IStyledEditor>(({ currentValid, isRichText, variant }) => style.editor(!currentValid, isRichText, variant));
 
 const StyledDisjointedEditorContainer = styled("div")(style.fullWidth);
 
@@ -1701,8 +1731,6 @@ export class MaterialUISlateWrapper extends React.PureComponent<IMaterialUISlate
       return;
     }
 
-    // TODO FIX
-
     if (this.originalSelectionArea) {
       this.props.helpers.focusAt(this.originalSelectionArea);
     } else if (this.originalSelectionPath) {
@@ -1878,6 +1906,7 @@ export class MaterialUISlateWrapper extends React.PureComponent<IMaterialUISlate
             currentValid={this.props.state.currentValid}
             isRichText={this.props.state.isRichText}
             sx={this.props.wrapperTextEditorSx}
+            variant={this.props.variant || "filled"}
           >
             {this.props.children}
           </StyledEditor>
@@ -1931,7 +1960,7 @@ export class MaterialUISlateWrapper extends React.PureComponent<IMaterialUISlate
         </>
       );
     } else {
-      return (
+      const toReturn = (
         <>
           {toolbar}
           <StyledEditorContainer sx={this.props.wrapperSx} className={this.props.wrapperClassName}>
@@ -1943,6 +1972,16 @@ export class MaterialUISlateWrapper extends React.PureComponent<IMaterialUISlate
           {fileInput}
         </>
       );
+
+      if (this.props.variant === "outlined") {
+        return (
+          <StyledEditorOutlinedContainer focused={this.props.state.focused} invalid={!this.props.state.currentValid}>
+            {toReturn}
+          </StyledEditorOutlinedContainer>
+        );
+      }
+
+      return toReturn;
     }
   }
 }

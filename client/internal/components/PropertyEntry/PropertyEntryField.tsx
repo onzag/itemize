@@ -13,6 +13,7 @@ import { ICurrencyType, currencies, arrCurrencies, ICountryType, arrCountries, I
 import convert from "convert-units";
 import { IPropertyDefinitionSupportedUnitType } from "../../../../base/Root/Module/ItemDefinition/PropertyDefinition/types/unit";
 import { deepRendererArgsComparer } from "../general-fn";
+import { IPropertyDefinitionSupportedTextType } from "../../../../base/Root/Module/ItemDefinition/PropertyDefinition/types/text";
 
 /**
  * An enum which is useful for numeric types
@@ -123,12 +124,25 @@ export interface IPropertyEntryFieldRendererProps extends IPropertyEntryRenderer
    * instead of any of the internal value or the current value
    */
   currentTextualValue: string;
+
+  /**
+   * When using a text type that has language information this specifies
+   * what language is believed to be in use by the field
+   */
+  currentValueLang: string;
+
   /**
    * Use this function instead of the onChange function, just pass
    * the textual value that the user input, the handler will be in charge
    * of knowing what value to apply to the actual item definition
    */
   onChangeByTextualValue: (textualValue: string) => void;
+
+  /**
+   * Text types when rendered by the field have a language property that specify
+   * the language that the field is using, use this to change such language
+   */
+  onChangeTextLanguage: (code: string) => void;
 
   /**
    * The country we are currently using, only avaliable if subtype is phone, country or language
@@ -231,7 +245,7 @@ export interface IPropertyEntryFieldRendererProps extends IPropertyEntryRenderer
 /**
  * These are all the values the field can work with
  */
-type ValueType = string | number | IPropertyDefinitionSupportedCurrencyType | IPropertyDefinitionSupportedUnitType;
+type ValueType = string | number | IPropertyDefinitionSupportedCurrencyType | IPropertyDefinitionSupportedUnitType | IPropertyDefinitionSupportedTextType;
 
 interface IPropertyEntryFieldState {
   showUserSetErrors: boolean;
@@ -242,8 +256,8 @@ interface IPropertyEntryFieldState {
  */
 export default class PropertyEntryField
   extends React.Component<
-  IPropertyEntryHandlerProps<ValueType, IPropertyEntryFieldRendererProps>,
-  IPropertyEntryFieldState
+    IPropertyEntryHandlerProps<ValueType, IPropertyEntryFieldRendererProps>,
+    IPropertyEntryFieldState
   > {
 
   constructor(props: IPropertyEntryHandlerProps<ValueType, IPropertyEntryFieldRendererProps>) {
@@ -253,6 +267,7 @@ export default class PropertyEntryField
     this.unitToNode = this.unitToNode.bind(this);
     this.onChangeUnit = this.onChangeUnit.bind(this);
     this.onChangeCurrency = this.onChangeCurrency.bind(this);
+    this.onChangeTextLanguage = this.onChangeTextLanguage.bind(this);
 
     this.getCurrentCurrency = this.getCurrentCurrency.bind(this);
     this.getCurrentUnit = this.getCurrentUnit.bind(this);
@@ -428,6 +443,23 @@ export default class PropertyEntryField
   }
 
   /**
+   * Change the language code, only works for text types
+   * @param code the language code
+   */
+  public onChangeTextLanguage(code: string) {
+    const currentTextValue = this.props.state.value as IPropertyDefinitionSupportedTextType;
+
+    this.props.onChange(
+      {
+        value: null,
+        ...currentTextValue,
+        language: code,
+      },
+      null,
+    );
+  }
+
+  /**
    * Change the currency code
    * @param code the code
    */
@@ -525,7 +557,18 @@ export default class PropertyEntryField
     // if it's not a number
     if (numericType === NumericType.NAN) {
       // easy, we just change
-      this.props.onChange(textualValue, null);
+      if (type === "text") {
+        const currentLanguage = (
+          this.props.state.value &&
+          (this.props.state.value as IPropertyDefinitionSupportedTextType).language
+        ) || null;
+        this.props.onChange({
+          value: textualValue,
+          language: currentLanguage,
+        }, null);
+      } else {
+        this.props.onChange(textualValue, null);
+      }
       return;
     }
 
@@ -766,14 +809,25 @@ export default class PropertyEntryField
       };
     }
 
-    let currentTextualValue: string = (type === "unit" || type === "currency") && this.props.state.internalValue ?
+    let currentValueLang: string = null;
+
+    if (type === "text" && this.props.state.value) {
+      currentValueLang = (this.props.state.value as any).language || null;
+    }
+
+    let currentTextualValue: string = (type === "unit" || type === "currency" || type === "text") && this.props.state.internalValue ?
       this.props.state.internalValue.value : this.props.state.internalValue;
 
     if (!currentTextualValue) {
-      currentTextualValue = (type === "unit" || type === "currency") && this.props.state.value ?
-        (this.props.state.value as any).value.toString() : (
-          this.props.state.value && this.props.state.value.toString()
-        );
+      if (type === "text") {
+        currentTextualValue = this.props.state.value ?
+          (this.props.state.value as any).value : "";
+      } else {
+        currentTextualValue = (type === "unit" || type === "currency") && this.props.state.value ?
+          (this.props.state.value as any).value.toString() : (
+            this.props.state.value && this.props.state.value.toString()
+          );
+      }
     }
 
     if (!currentTextualValue) {
@@ -810,18 +864,20 @@ export default class PropertyEntryField
       currentInvalidReason: i18nInvalidReason,
       currentInternalValue: this.props.state.internalValue,
       currentTextualValue,
+      currentValueLang,
       canRestore: this.props.state.value !== this.props.state.stateAppliedValue,
 
       disabled:
         typeof this.props.disabled !== "undefined" && this.props.disabled !== null ?
-        this.props.disabled :
-        this.props.state.enforced,
+          this.props.disabled :
+          this.props.state.enforced,
 
       autoFocus: this.props.autoFocus || false,
 
       onChange: this.props.onChange,
       onChangeByTextualValue: this.onChangeByTextualValue,
       onChangeCurrency: this.onChangeCurrency,
+      onChangeTextLanguage: this.onChangeTextLanguage,
       onRestore: this.props.onRestore,
 
       defaultCountry,

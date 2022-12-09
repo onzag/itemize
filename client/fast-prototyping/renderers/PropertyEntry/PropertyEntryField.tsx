@@ -441,7 +441,25 @@ class PropertyEntryFieldRenderer
       }
     }
 
-    this.props.onChangeByTextualValue(value);
+    if (this.props.type === "text") {
+      if (this.props.currentAppliedValue && value === (this.props.currentAppliedValue as any).value) {
+        this.props.onChange(this.props.currentAppliedValue as any, null);
+      } else if (this.props.currentValueLang !== this.props.languageOverride) {
+        this.props.onChange({
+          value,
+          language: this.props.languageOverride,
+        } as any, null);
+      } else if (this.props.currentValueLang) {
+        this.props.onChange({
+          value,
+          language: null,
+        } as any, null);
+      } else {
+        this.props.onChangeByTextualValue(value);
+      }
+    } else {
+      this.props.onChangeByTextualValue(value);
+    }
   }
 
   public openDialog() {
@@ -546,6 +564,7 @@ class PropertyEntryFieldRenderer
       ),
       id: idToUse,
       "aria-describedby": this.props.description ? idToUse + "_desc" : null,
+      lang: this.props.currentValueLang,
     };
 
     // these are the TextField props that are applied
@@ -665,6 +684,18 @@ class PropertyEntryFieldRenderer
             sx={style.iconButton}
           >
             {this.props.args.icon}
+          </RestoreIconButton>
+        </InputAdornment>
+      );
+    }
+
+    if (this.props.args.startIcon) {
+      appliedInputProps.startAdornment = (
+        <InputAdornment position="start" sx={style.smallAddornment(isInvalid)}>
+          <RestoreIconButton
+            sx={style.iconButton}
+          >
+            {this.props.args.startIcon}
           </RestoreIconButton>
         </InputAdornment>
       );
