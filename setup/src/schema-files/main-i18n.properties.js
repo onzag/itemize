@@ -138,6 +138,8 @@ add_template_html_submit = submit
 
 no_results = no results
 result_out_of = result {0} out of {1}
+results = {0} results
+results_singular = 1 result
 
 callout_exclude_warning = warning!... this will mark your item as incomplete
 
@@ -344,6 +346,8 @@ add_template_html_submit = submit
 
 no_results = no results
 result_out_of = result {0} out of {1}
+results = {0} results
+results_singular = 1 result
 
 callout_exclude_warning = warning!... this will mark your item as incomplete
 
@@ -550,6 +554,8 @@ add_template_html_submit = submit
 
 no_results = no results
 result_out_of = result {0} out of {1}
+results = {0} results
+results_singular = 1 result
 
 callout_exclude_warning = warning!... this will mark your item as incomplete
 
@@ -756,6 +762,8 @@ add_template_html_submit = submit
 
 no_results = no results
 result_out_of = result {0} out of {1}
+results = {0} results
+results_singular = 1 result
 
 callout_exclude_warning = Warnung!... dies wird ihren Artikel als unvollständig markieren
 
@@ -962,6 +970,8 @@ add_template_html_submit = insertar
 
 no_results = no se encontraron resultados
 result_out_of = resultado {0} de {1}
+results = {0} resultados
+results_singular = 1 resultado
 
 callout_exclude_warning = atención!... esto marcará su item como incompleto
 
@@ -1168,6 +1178,8 @@ add_template_html_submit = submit
 
 no_results = no results
 result_out_of = result {0} out of {1}
+results = {0} results
+results_singular = 1 result
 
 callout_exclude_warning = تحذير !... هذا سيميز مادتك على أنها غير مكتملة
 

@@ -543,6 +543,8 @@ export const LOCALE_I18N = [
   // for search utilites
   "no_results",
   "result_out_of",
+  "results",
+  "results_singular",
 
   // for item definition too
   "callout_exclude_warning",

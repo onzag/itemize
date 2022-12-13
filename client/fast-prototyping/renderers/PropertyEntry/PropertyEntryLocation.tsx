@@ -19,7 +19,6 @@ import Typography from "@mui/material/Typography";
 import RestoreIcon from "@mui/icons-material/Restore";
 import ClearIcon from "@mui/icons-material/Clear";
 import SearchIcon from "@mui/icons-material/Search";
-import SwapHorizIcon from "@mui/icons-material/SwapHoriz";
 import InputAdornment from "@mui/material/InputAdornment";
 import TextField from "@mui/material/TextField";
 import Paper from "@mui/material/Paper";
@@ -104,10 +103,8 @@ export const style = {
   },
   icon: {
     color: "#424242",
-    marginRight: "0.5rem",
-    display: "inline-flex",
-    alignItems: "center",
-    justifyContent: "center",
+    position: "absolute",
+    right: "16px",
   },
   iconButton: {
     "backgroundColor": "#2196f3",
@@ -116,16 +113,8 @@ export const style = {
       backgroundColor: "#1976d2",
     },
   },
-  textButton: {
-    border: "solid 1px rgba(0,0,0,0.1)",
-    display: "flex",
-    minWidth: "50px",
-    height: "50px",
-    padding: "0 10px",
-    margin: "0",
-    alignItems: "center",
-    justifyContent: "center",
-    borderRadius: "5px",
+  iconButtonOriginal: {
+    color: "#424242",
   },
   label: (isInvalid: boolean) => ({
     "color": isInvalid ? "#f44336" : "rgb(66, 66, 66)",
@@ -187,38 +176,100 @@ export const style = {
   autosuggestMenuItem: {
     height: "auto",
     // material ui v5 messy engine decides to override my styles
-    paddingTop: "4px !important",
-    paddingBottom: "8px !important",
+    paddingTop: "8px !important",
+    paddingBottom: "16px !important",
   },
   autosuggestMenuItemMainText: {
     fontSize: "1rem",
     lineHeight: "1rem",
   },
   autosuggestMenuItemSubText: {
-    fontSize: "0.75rem",
-    lineHeight: "0.75rem",
+    fontSize: "0.9rem",
+    lineHeight: "0.9rem",
   },
   locationAlternativeTextHeader: {
     height: "3rem",
-    fontSize: "0.75rem",
     display: "flex",
     alignItems: "center",
-    justifyContent: "center",
+    justifyContent: "flex-start",
     borderTop: "solid 1px #ccc",
+    borderLeft: "solid 1px #ccc",
+    borderRight: "solid 1px #ccc",
+    borderRadius: "4px 4px 0 0",
+    padding: "0 16px",
+    fontSize: "0.9rem",
   },
   locationPlaceholder: {
     opacity: 0.5,
     fontWeight: 300,
   },
+  locationMapBase: {
+    marginBottom: "24px",
+    display: "flex",
+    flexDirection: "row",
+  },
   locationMapContainer: {
+    flex: "1 1 50%",
+  },
+  locationMapMenuContainer: {
+    flex: "1 1 50%",
+    border: "solid 1px #ccc",
+    padding: "1rem",
+    overflowY: "auto",
+    overflowX: "hidden",
+    height: "200px",
+    backgroundColor: "white",
+  },
+  locationMapMenuContainerDropdownMode: {
+    width: "50%",
+    position: "absolute",
+    height: "auto",
+    zIndex: 1000,
+  },
+  locationMapCard: {
+    padding: "0.5rem 1rem",
+    marginBottom: "1rem",
+    width: "100%",
+    border: "solid 1px #ccc",
+    borderRadius: "4px",
+    cursor: "pointer",
 
+    "&:hover": {
+      border: "solid 1px rgba(0, 0, 0, 0.87)",
+    },
+
+    "&:focus, &:active": {
+      backgroundColor: "rgba(0,0,0,0.03)",
+    },
+  },
+  locationMapCardSelected: {
+    cursor: "default",
+    color: "#fff",
+    backgroundColor: "#005CE6",
+    border: "solid 1px #005CE6",
+
+    "&:hover": {
+      border: "solid 1px #005CE6",
+    },
+
+    "&:focus, &:active": {
+      backgroundColor: "#005CE6",
+    },
+  },
+  locationMapCardTitle: {
+    fontSize: "1rem",
+  },
+  locationMapCardSubTitle: {
+    fontSize: "0.9rem",
+    fontWeight: 300,
   },
   resultListLabel: {
     fontWeight: 300,
-    borderLeft: "solid 1px #ccc",
-    paddingLeft: "0.5rem",
-    marginLeft: "0.5rem",
+    padding: "0 1rem 1rem 1rem",
   },
+  smallAddornment: (isInvalid: boolean) => ({
+    color: isInvalid ? "#f44336" : "#424242",
+  }),
 };
 
 /**
@@ -249,6 +300,8 @@ class PropertyEntryLocationRenderer extends
    */
   private preventNextSearchQueryChange: boolean = false;
 
+  private cmapRef = React.createRef<any>();
+
   /**
    * The contructor for the location entry renderer
    * @param props the props
@@ -278,6 +331,25 @@ class PropertyEntryLocationRenderer extends
     });
     if (this.props.autoFocus && this.inputRef) {
       this.inputRef.focus();
+    }
+  }
+
+  public componentDidUpdate(prevProps: Readonly<IPropertyEntryLocationRendererProps>): void {
+    if (
+      this.cmapRef.current &&
+      (
+        prevProps.activeSearchResults && !this.props.activeSearchResults ||
+        this.props.activeSearchResults && !prevProps.activeSearchResults
+      )
+    ) {
+      // force map remount due to buggy ui
+      this.setState({
+        readyToMap: false,
+      }, () => {
+        this.setState({
+          readyToMap: true,
+        });
+      })
     }
   }
 
@@ -368,6 +440,8 @@ class PropertyEntryLocationRenderer extends
    * @param textFieldProps the text field props given by react autosuggest
    */
   public renderBody(textFieldProps?: any) {
+    let idToUse = (this.props.args.InputProps && this.props.args.InputProps.id) || this.props.uniqueId;
+
     // the viewport zoom can be either an arbitrary number or MEDIUM, SMALL, and LARGE which
     // should be translated to an arbitrary number for you and the library you support
     // for the purposes of leaflet and react-leaflet we have these translations or otherwise
@@ -382,10 +456,6 @@ class PropertyEntryLocationRenderer extends
     let appliedTextFieldProps: any = {
       sx: style.entry,
     };
-    // the icon we will use for the seach, yes we use two
-    // one for the initial search and another for swapping
-    let iconSearch: React.ReactNode;
-    let onClickFn: () => void = null;
 
     // so if we have active search results, these are automatically
     // given by the handler
@@ -396,38 +466,31 @@ class PropertyEntryLocationRenderer extends
       if (this.props.nextSearchResultCircular) {
         // then the function for click changes via the search result to the next search result
         // circular, and the false means that it should indeed change the viewport
-        onClickFn = this.props.onChangeBySearchResult.bind(null, this.props.nextSearchResultCircular, false);
+        // onClickFn = this.props.onChangeBySearchResult.bind(null, this.props.nextSearchResultCircular, false);
         // and the icon is the swap icon
-        iconSearch = <SwapHorizIcon />;
+        // iconSearch = <SwapHorizIcon />;
         // it would be possible to have a next, prev button as there is prevSearchResultCircular as well
-      } else {
-        // otherwise if we just have one search result, then the icon is the same
-        // but the click does nothing
-        iconSearch = <SearchIcon />;
       }
-    } else {
-      // otherwise if there's no active search the button
-      // will trigger a search, it will also mantain the viewport
-      onClickFn = this.props.onSearch.bind(null, false);
-      iconSearch = <SearchIcon />;
     }
+
+    const searchButtonWrapper = this.props.args.searchButtonWrapper || ((n: any) => n);
 
     // now we can build these props
     let appliedInputProps: any = {
-      endAdornment: !this.props.args.disableMapAndSearch ? (
+      endAdornment: !this.props.args.disableMapAndSearch && !this.props.currentValue && this.props.searchQuery ? (
         <InputAdornment position="end">
-          <IconButton
-            tabIndex={-1}
+          {searchButtonWrapper(<IconButton
             disabled={this.props.disabled}
             sx={style.iconButton}
-            onClick={onClickFn}
-            size="large">
-            {iconSearch}
-          </IconButton>
+            onClick={this.props.onSearch.bind(null, false)}
+            size="large"
+          >
+            <SearchIcon />
+          </IconButton>)}
         </InputAdornment>
       ) : null,
       inputProps: {
-        "aria-describedby": this.props.description ? this.props.uniqueId + "_desc" : null,
+        "aria-describedby": this.props.description ? idToUse + "_desc" : null,
       },
     };
 
@@ -468,6 +531,7 @@ class PropertyEntryLocationRenderer extends
         viewport={viewport}
         onViewportChanged={this.props.onViewportChange}
         onClick={this.setLocationManually}
+        ref={this.cmapRef}
       >
         <ConfigContext.Consumer>
           {(config) => {
@@ -496,7 +560,7 @@ class PropertyEntryLocationRenderer extends
           this.props.currentValue.lat, this.props.currentValue.lng,
         ]} /> : null}
         {!this.props.disabled && this.props.activeSearchResults ? this.props.activeSearchResults
-          .filter((result) => this.props.currentValue.id !== result.id)
+          .filter((result) => !this.props.currentValue || (this.props.currentValue.id !== result.id))
           .map((result) => (
             <CMarker
               opacity={0.5}
@@ -514,7 +578,7 @@ class PropertyEntryLocationRenderer extends
       appliedInputProps.inputProps["aria-invalid"] = true;
 
       if (!this.props.args.hideError) {
-        appliedInputProps.inputProps["aria-errormessage"] = this.props.uniqueId + "_error";
+        appliedInputProps.inputProps["aria-errormessage"] = idToUse + "_error";
       }
     }
 
@@ -536,22 +600,82 @@ class PropertyEntryLocationRenderer extends
                 </Box>
               )
             }
-            {
-              this.props.resultOutOfLabel ?
-                <Box component="i" sx={style.resultListLabel}>{this.props.resultOutOfLabel}</Box> :
-                null
-            }
           </Box> : null
         }
         {
           !this.props.args.disableMapAndSearch ?
-            <Box sx={style.locationMapContainer}>
-              {map}
+            <Box sx={style.locationMapBase}>
+              {this.props.activeSearchResults && this.props.args.searchDropdownMode ? (
+                <Box sx={style.locationMapMenuContainer} />
+              ) : null}
+              {this.props.activeSearchResults ? <Box
+                sx={
+                  this.props.args.searchDropdownMode ?
+                    [style.locationMapMenuContainer, style.locationMapMenuContainerDropdownMode] :
+                    style.locationMapMenuContainer
+                }
+                role="listbox"
+                aria-labelledby={idToUse + "_listboxlabel"}
+              >
+                <Box sx={style.resultListLabel} id={idToUse + "_listboxlabel"}>
+                  {this.props.resultLabel}
+                </Box>
+                {this.props.activeSearchResults.map((r) => {
+                  const card = (
+                    <Box
+                      key={r.id}
+                      sx={
+                        r.id === (this.props.currentValue && this.props.currentValue.id) ?
+                          [style.locationMapCard, style.locationMapCardSelected] :
+                          style.locationMapCard
+                      }
+                      role="button"
+                      aria-describedby={r.id + "_desc"}
+                      aria-labelledby={r.id + "_label"}
+                      tabIndex={0}
+                      onClick={this.props.onChangeBySearchResult.bind(null, r, false)}
+                    >
+                      <Box sx={style.locationMapCardTitle} id={r.id + "_label"}>
+                        {r.txt}
+                      </Box>
+                      <Box sx={style.locationMapCardSubTitle} id={r.id + "_desc"}>
+                        {r.atxt}
+                      </Box>
+                    </Box>
+                  );
+
+                  if (this.props.args.searchCardWrapper) {
+                    return (
+                      <React.Fragment key={r.id}>
+                        {this.props.args.searchCardWrapper(r, card)}
+                      </React.Fragment>
+                    );
+                  }
+
+                  return card;
+                })}
+              </Box> : null}
+              <Box sx={style.locationMapContainer}>
+                {map}
+              </Box>
             </Box> :
             null
         }
       </>
     );
+
+
+    if (this.props.args.startIcon) {
+      appliedInputProps.startAdornment = (
+        <InputAdornment position="start" sx={style.smallAddornment(isInvalid)}>
+          <RestoreIconButton
+            sx={style.iconButtonOriginal}
+          >
+            {this.props.args.startIcon}
+          </RestoreIconButton>
+        </InputAdornment>
+      );
+    }
 
     const fieldComponent = (
       <TextField
@@ -572,6 +696,7 @@ class PropertyEntryLocationRenderer extends
           },
           disabled: this.props.disabled,
           ...appliedInputProps,
+          ...this.props.args.InputProps,
         }}
         InputLabelProps={{
           sx: style.label(isInvalid),
@@ -580,7 +705,7 @@ class PropertyEntryLocationRenderer extends
           },
         }}
         disabled={this.props.disabled}
-        variant="filled"
+        variant={this.props.args.fieldVariant || "filled"}
         {...appliedTextFieldProps}
       />
     );
@@ -591,18 +716,18 @@ class PropertyEntryLocationRenderer extends
     let descriptionObject: React.ReactNode = null;
     if (this.props.description) {
       descriptionObject = descriptionAsAlert ? (
-        <Alert severity="info" sx={style.description} role="note" id={this.props.uniqueId + "_desc"}>
+        <Alert severity="info" sx={style.description} role="note" id={idToUse + "_desc"}>
           {this.props.description}
         </Alert>
       ) : (
-        <Typography variant="caption" sx={style.description} id={this.props.uniqueId + "_desc"}>
+        <Typography variant="caption" sx={style.description} id={idToUse + "_desc"}>
           {this.props.description}
         </Typography>
       );
     }
 
     const error = (
-      this.props.args.hideError ? null : <Box sx={style.errorMessage} id={this.props.uniqueId + "_error"}>
+      this.props.args.hideError ? null : <Box sx={style.errorMessage} id={idToUse + "_error"}>
         {this.props.currentInvalidReason}
       </Box>
     );
@@ -737,7 +862,7 @@ class PropertyEntryLocationRenderer extends
         getSuggestionValue={this.getSuggestionValue}
         onSuggestionsFetchRequested={this.onSuggestionsFetchRequested}
         onSuggestionsClearRequested={this.props.clearSuggestions}
-        suggestions={this.props.searchSuggestions}
+        suggestions={this.props.activeSearchResults ? [] : this.props.searchSuggestions}
         theme={rsTheme}
         inputProps={{
           value: this.props.searchQuery,

@@ -86,6 +86,16 @@ export interface IAltBaseProps {
    * whether it is used in flow
    */
   useInFlow?: boolean;
+
+  /**
+   * Once this element is focused it will go into an uncontrolled state
+   * on the next tab forwards or backwards and control will only be regained once
+   * an element that is part of either the active flow, active layer, or awaiting key codes
+   * for example, let's say you have an embbed youtube video in its own iframe, you can wrap the video
+   * on a div that is AltText that is uncontrolled, with an aria-label of youtube video, once that element
+   * is focused, the alt is set in an uncontrolled state, and it will stop deciding what's next tabbed
+   */
+  uncontrolled?: boolean;
 }
 
 export interface IAltReactionerProps extends IAltBaseProps {
@@ -177,6 +187,7 @@ const ALT_REGISTRY: {
   lastFocusedLayerSignatures: { [priorityKey: number]: string };
   lastFocusedFlowSignatures: { [priorityKey: number]: string };
   isJumpingThroughAnchors: boolean;
+  uncontrolled: boolean;
 } = {
   all: [],
   activeFlow: null,
@@ -191,6 +202,7 @@ const ALT_REGISTRY: {
   lastFocusedLayerSignatures: {},
   lastFocusedFlowSignatures: {},
   isJumpingThroughAnchors: false,
+  uncontrolled: false,
 };
 
 export function hideAll(butKeycodes: ActualAltReactioner[] = []) {
@@ -218,10 +230,12 @@ export function hideAll(butKeycodes: ActualAltReactioner[] = []) {
     ALT_REGISTRY.awaitingLayerKeycodes = null;
     ALT_REGISTRY.awaitingLayerKeycodesFocusIndex = -1;
     ALT_REGISTRY.displayedLayeredPriority = null;
+    ALT_REGISTRY.uncontrolled = false;
   } else {
     // enter keycodes mode
     ALT_REGISTRY.awaitingLayerKeycodes = butKeycodes;
     ALT_REGISTRY.awaitingLayerKeycodesFocusIndex = -1;
+    ALT_REGISTRY.uncontrolled = false;
   }
 }
 
@@ -383,6 +397,7 @@ function triggerBasedOn(code: string, shiftKey: boolean, callbackIfmatch: () => 
       ALT_REGISTRY.awaitingLayerKeycodes.forEach((e) => e.setBlocked(ALT_REGISTRY.isBlocked));
       ALT_REGISTRY.awaitingLayerKeycodesFocusIndex = nextIndex;
       ALT_REGISTRY.lastFocusedLayerSignatures[ALT_REGISTRY.displayedLayeredPriority] = nextElement.getSignature();
+      ALT_REGISTRY.uncontrolled = nextElement.isUncontrolled();
     } else if (ALT_REGISTRY.isDisplayingLayereds) {
       const len = ALT_REGISTRY.isDisplayingLayereds.length;
       let nextIndex = ((ALT_REGISTRY.displayedLayeredFocusIndex + len + (!shiftKey ? 1 : -1))) % len;
@@ -458,6 +473,7 @@ function triggerBasedOn(code: string, shiftKey: boolean, callbackIfmatch: () => 
       ALT_REGISTRY.isDisplayingLayereds.forEach((e) => e.setBlocked(ALT_REGISTRY.isBlocked));
       ALT_REGISTRY.displayedLayeredFocusIndex = nextIndex;
       ALT_REGISTRY.lastFocusedLayerSignatures[ALT_REGISTRY.displayedLayeredPriority] = nextElement.getSignature();
+      ALT_REGISTRY.uncontrolled = nextElement.isUncontrolled();
     } else if (ALT_REGISTRY.activeFlow) {
       const len = ALT_REGISTRY.activeFlow.length;
       let nextIndex = ((ALT_REGISTRY.activeFlowFocusIndex + len + (!shiftKey ? 1 : -1))) % len;
@@ -520,6 +536,7 @@ function triggerBasedOn(code: string, shiftKey: boolean, callbackIfmatch: () => 
 
       ALT_REGISTRY.activeFlowFocusIndex = nextIndex;
       ALT_REGISTRY.lastFocusedFlowSignatures[ALT_REGISTRY.activeFlowPriority] = nextElement.getSignature();
+      ALT_REGISTRY.uncontrolled = nextElement.isUncontrolled();
     }
 
     callbackIfmatch();
@@ -660,6 +677,11 @@ if (typeof document !== "undefined") {
   window.addEventListener("focus", () => {
     hideAll();
   });
+
+  document.addEventListener('focus', () => {
+    console.log(document.activeElement);
+  });
+
   document.addEventListener("visibilitychange", () => {
     if (document.visibilityState === "hidden") {
       hideAll();
@@ -692,6 +714,10 @@ if (typeof document !== "undefined") {
     keyCodeConsumed = null;
   });
   document.addEventListener("keydown", (e) => {
+    // uncontrolled
+    if (ALT_REGISTRY.uncontrolled) {
+      return;
+    }
     // some special events don't have this
     // eg. autocomplete
     if (!e.code) {
@@ -1040,6 +1066,10 @@ export class ActualAltBase<P extends IAltBaseProps, S> extends React.PureCompone
   public blur() {
     const element = this.getElement();
     (element as HTMLElement).blur();
+  }
+
+  public isUncontrolled() {
+    return !!this.props.uncontrolled;
   }
 
   public render() {

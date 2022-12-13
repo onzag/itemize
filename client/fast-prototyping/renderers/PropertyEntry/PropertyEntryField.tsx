@@ -498,7 +498,7 @@ class PropertyEntryFieldRenderer
   }
 
   public render() {
-    let idToUse = (this.props.args.inputProps && this.props.args.inputProps.id) || this.props.uniqueId;
+    let idToUse = (this.props.args.InputProps && this.props.args.InputProps.id) || this.props.uniqueId;
 
     if (this.props.subtype === "country" || this.props.subtype === "language" || this.props.subtype === "currency") {
       return (
@@ -753,7 +753,7 @@ class PropertyEntryFieldRenderer
           fullWidth: true,
           disabled: this.props.disabled,
           ...appliedInputProps,
-          ...this.props.args.inputProps,
+          ...this.props.args.InputProps,
         }}
         InputLabelProps={{
           sx: style.label(isInvalid),

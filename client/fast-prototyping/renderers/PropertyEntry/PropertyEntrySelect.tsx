@@ -213,7 +213,7 @@ class PropertyEntrySelectRenderer
           multiple={true}
           value={(this.props.currentValue || []) as any[]}
           onChange={this.onChange}
-          input={<InputToUse label={this.props.label} fullWidth={true} {...appliedInputProps} {...this.props.args.inputProps}/>}
+          input={<InputToUse label={this.props.label} fullWidth={true} {...appliedInputProps} {...this.props.args.InputProps}/>}
           renderValue={(selected: any[]) => {
             return (
               <Box sx={style.chips}>
@@ -293,7 +293,7 @@ class PropertyEntrySelectRenderer
                 focused: "focused",
               }}
               {...appliedInputProps}
-              {...this.props.args.inputProps}
+              {...this.props.args.InputProps}
             />
           }
           IconComponent={ExpandMoreOutlinedIcon}

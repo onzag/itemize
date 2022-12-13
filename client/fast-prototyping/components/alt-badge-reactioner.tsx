@@ -166,6 +166,16 @@ interface IAltBadgeReactionerProps {
    * this is basically the default for input fields and textareas
    */
   blocksQuickActionsWhileFocused?: boolean;
+
+  /**
+   * Triggers when it enters keycodes mode for an expected target
+   */
+  onEnterKeyCodes?: () => void;
+
+  /**
+   * Triggers when keycodes mode is cleared
+   */
+  onExitKeyCodes?: () => void;
 }
 
 export function AltBadgeReactioner(
@@ -175,7 +185,15 @@ export function AltBadgeReactioner(
 
   const onAmbiguousReaction = useCallback((expected: boolean, id: number, plusCount: number) => {
     setAmbiguousIdPlusCount([expected, id, plusCount]);
-  }, []);
+    if (!expected) {
+      props.onEnterKeyCodes && props.onEnterKeyCodes();
+    }
+  }, [props.onEnterKeyCodes]);
+
+  const onAmbiguousClear = useCallback(() => {
+    setAmbiguousIdPlusCount(null);
+    props.onExitKeyCodes && props.onExitKeyCodes();
+  }, [props.onExitKeyCodes]);
 
   const reactionerProps = { ...props } as any;
   reactionerProps.children = (displayed: boolean, blocked: boolean) => {
@@ -225,7 +243,7 @@ export function AltBadgeReactioner(
     <AltReactioner
       {...reactionerProps}
       onAmbiguousReaction={onAmbiguousReaction}
-      onAmbiguousClear={setAmbiguousIdPlusCount.bind(null, null)}
+      onAmbiguousClear={onAmbiguousClear}
     />
   );
 }

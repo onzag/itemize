@@ -151,6 +151,10 @@ export interface IPropertyEntryLocationRendererProps extends IPropertyEntryRende
    * say something like, "result 1 out of 29"; in the user's language
    */
   resultOutOfLabel: string;
+  /**
+   * The current localized label for the total amount of results
+   */
+  resultLabel: string;
 
   /**
    * The current viewport
@@ -732,6 +736,14 @@ export default class PropertyEntryLocation
       );
     } 
 
+    let resultLabel: string = null;
+    if (this.state.searchResults !== null && this.state.searchResults.length) {
+      resultLabel = localeReplacer(
+        capitalize(this.props.i18n[this.props.language][this.state.searchResults.length === 1 ? "results_singular" : "results"]),
+        this.state.searchResults.length,
+      );
+    } 
+
     // get the invalid reason if any
     const invalidReason = this.props.state.invalidReason;
     const isCurrentlyShownAsInvalid = !this.props.ignoreErrors &&
@@ -778,6 +790,7 @@ export default class PropertyEntryLocation
       label: i18nLabel,
       noResultsLabel,
       resultOutOfLabel,
+      resultLabel,
       placeholder: i18nPlaceholder,
       description: i18nDescription,
       language: this.props.language,

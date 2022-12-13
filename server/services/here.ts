@@ -37,7 +37,8 @@ export class HereMapsService extends LocationSearchProvider<IHereMapsConfig> {
       txt: overwriteTxt || suggestion.title,
       id: this.makeIdOutOf(suggestion.position[0], suggestion.position[1]),
       // NOTE adding tf=plain makes plain text results, but this works pretty well
-      atxt: suggestion.vicinity ? suggestion.vicinity.replace(/\<br\/\>/g, wordSeparator + " ") : null,
+      // the word separator should be used by default now
+      atxt: suggestion.vicinity ? suggestion.vicinity.replace(/\<br\/\>/g, " ") : null,
     };
   }
   public requestGeocodeFor(

@@ -75,6 +75,11 @@ export const style = {
     justifyContent: "center",
     borderRadius: "5px",
   },
+  labelContainer: {
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "center",
+  },
   label: (isInvalid: boolean, richText: boolean) => {
     const base = {
       "color": isInvalid ? "#f44336" : "rgb(66, 66, 66)",
@@ -82,12 +87,6 @@ export const style = {
         color: isInvalid ? "#f44336" : "#3f51b5",
       },
     };
-
-    if (richText) {
-      Object.assign(base, style.labelSingleLine);
-    } else {
-      Object.assign(base, style.labelNoToolbar);
-    }
 
     return base;
   },
@@ -107,7 +106,6 @@ export const style = {
     height: "5rem",
     padding: "1rem 0 0 0",
   },
-
   rawTextArea: {
     width: "100%",
     border: "none",
@@ -183,6 +181,14 @@ class PropertyEntryTextRenderer extends React.PureComponent<IPropertyEntryTextRe
       </RestoreIconButton>
     ) : null;
 
+    const startIconComponent = this.props.args.startIcon ? (
+      <RestoreIconButton
+        sx={style.icon}
+      >
+        {this.props.args.startIcon}
+      </RestoreIconButton>
+    ) : null;
+
     const descriptionAsAlert = this.props.args["descriptionAsAlert"];
 
     // extending element wrappers
@@ -254,16 +260,26 @@ class PropertyEntryTextRenderer extends React.PureComponent<IPropertyEntryTextRe
     const isInvalid = shouldShowInvalid(this.props);
 
     const fieldLabel = (
-      this.props.label ? <InputLabel
-        htmlFor={this.props.propertyId}
-        sx={style.label(isInvalid, this.props.isRichText)}
-        classes={{
-          focused: "focused",
-        }}
-        focused={this.state.focused}
+      this.props.label ? <Box
+        sx={this.props.isRichText ? style.labelSingleLine : style.labelNoToolbar}
       >
-        {capitalize(this.props.label)}{iconComponent}
-      </InputLabel> : null
+        <Box
+          sx={style.labelContainer}
+        >
+          {startIconComponent}
+          <InputLabel
+            htmlFor={this.props.uniqueId}
+            sx={style.label(isInvalid, this.props.isRichText)}
+            classes={{
+              focused: "focused",
+            }}
+            focused={this.state.focused}
+          >
+            {capitalize(this.props.label)}
+          </InputLabel>
+        </Box>
+        {iconComponent}
+      </Box> : null
     );
 
     let descriptionObject: React.ReactNode = null;

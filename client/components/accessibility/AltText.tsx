@@ -2,7 +2,7 @@ import React, { ForwardedRef } from "react";
 import { IAltBaseProps, ActualAltBase } from "./AltReactioner";
 import { AltPriorityShifterContext } from "./AltPriorityShifter"
 
-interface IAltTextProps extends IAltBaseProps {
+export interface IAltTextProps extends IAltBaseProps {
   /**
    * whether it is used in flow, for text the default is true
    */

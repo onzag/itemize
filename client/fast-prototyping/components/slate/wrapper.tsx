@@ -184,10 +184,10 @@ const style = {
     return ({
       position: "relative",
       border: "solid 1px",
+      width: "100%",
       borderColor: mainColor,
       boxShadow: focused ? `0px 0px 0px 1px ${mainColor}` : null,
       borderRadius: "6px",
-      overflow: "hidden",
       "&:hover": {
         borderColor: invalid ? "#d32f2f" : (focused ? "#1976d2" : "rgba(0,0,0,0.87)"),
       },
@@ -475,6 +475,7 @@ export interface IMaterialUISlateWrapperProps extends ISlateEditorWrapperBasePro
   reactionerGroupPosition?: number;
   reactionerKey?: string;
   reactionerDisabled?: boolean;
+  reactionerUseInFlow?: boolean;
 }
 
 /**
@@ -1923,6 +1924,7 @@ export class MaterialUISlateWrapper extends React.PureComponent<IMaterialUISlate
           reactionKey={this.props.state.currentSelectedElement ? "escape" : (this.props.reactionerKey || "t")}
           label={this.props.state.currentSelectedElement ? "esc" : null}
           tabbable={!this.props.state.currentSelectedElement}
+          useInFlow={this.props.reactionerUseInFlow}
           action="focus"
           selector="div[contenteditable]"
           groupPosition={this.props.reactionerGroupPosition}
@@ -1934,7 +1936,7 @@ export class MaterialUISlateWrapper extends React.PureComponent<IMaterialUISlate
       );
 
       // according to the priority
-      if (this.props.reactionerPriority >= 2) {
+      if (this.props.reactionerPriority !== 0) {
         toolbar = (
           <AltPriorityShifter amount={this.props.reactionerPriority}>
             {toolbar}
