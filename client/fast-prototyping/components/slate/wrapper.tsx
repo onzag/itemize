@@ -1920,7 +1920,7 @@ export class MaterialUISlateWrapper extends React.PureComponent<IMaterialUISlate
     if (typeof this.props.reactionerPriority === "number") {
       box = (
         <AltBadgeReactioner
-          priority={this.props.reactionerPriority}
+          priority={this.props.state.currentSelectedElement ? "ALWAYS_ON_TOP_KEEP_FLOW" : this.props.reactionerPriority}
           reactionKey={this.props.state.currentSelectedElement ? "escape" : (this.props.reactionerKey || "t")}
           label={this.props.state.currentSelectedElement ? "esc" : null}
           tabbable={!this.props.state.currentSelectedElement}

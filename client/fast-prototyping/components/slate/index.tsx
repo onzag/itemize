@@ -1274,6 +1274,8 @@ export class SlateEditor extends React.Component<ISlateEditorProps, ISlateEditor
     // with react of course ;)
     this.editor = withReact(withHistory(rawEditor));
 
+    this.forceFocus = this.forceFocus.bind(this);
+
     // setting up the functions to override
     // the defaults
     this.normalizeNode = this.normalizeNode.bind(this);
@@ -4627,6 +4629,31 @@ export class SlateEditor extends React.Component<ISlateEditorProps, ISlateEditor
     return newFeatureSupport;
   }
 
+  public forceFocus() {
+    setTimeout(() => {
+      if (!this.state.focused) {
+        const path: Path = [];
+        let current: any = this.editor.children && this.editor.children[0];
+        while (current) {
+          path.push(0);
+          current = current.children && current.children[0];
+        }
+        // bug in slate sometimes it just rejects to focus
+        // when using tab, specifically shift+tab
+        this.focusAt({
+          anchor: {
+            offset: 0,
+            path,
+          },
+          focus: {
+            offset: 0,
+            path,
+          },
+        });
+      }
+    }, 20);
+  }
+
   /**
    * Render function
    */
@@ -4648,6 +4675,7 @@ export class SlateEditor extends React.Component<ISlateEditorProps, ISlateEditor
           readOnly={this.props.disabled}
           disabled={this.props.disabled}
           style={{ scrollMarginTop: this.props.scrollMarginTop }}
+          onFocus={this.forceFocus}
           aria-invalid={!!this.props.currentGeneralError}
           aria-errormessage={this.props.currentGeneralError}
           aria-describedby={this.props.currentDescribedBy}

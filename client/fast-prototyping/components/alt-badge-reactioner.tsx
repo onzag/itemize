@@ -108,8 +108,14 @@ interface IAltBadgeReactionerProps {
    * used only when a certain element is focused, when such element is focused the alt reactioners
    * may have priority 1, and none of the priority 0 elements will display, of course, this is only
    * usable if you use it in conjuction with disabled
+   * 
+   * ALWAYS_ON_TOP makes it so that the element's priority is the same as the maximum one available
+   * so it's technically visible on all priorities
+   * 
+   * ALWAYS_ON_TOP_KEEP_FLOW makes it so that the element priority is the same as the maximum one available
+   * but for elements that are as useInFlow pressing tab on it will figure the next available flow element
    */
-  priority?: number;
+  priority?: number | "ALWAYS_ON_TOP" | "ALWAYS_ON_TOP_KEEP_FLOW";
   /**
    * A positioning within the group used to specify what part of a scrolling box this belongs to
    * for example -1 is often to be used with fixed navbar, 0 with the body content and 100 with footers
@@ -168,6 +174,16 @@ interface IAltBadgeReactionerProps {
   blocksQuickActionsWhileFocused?: boolean;
 
   /**
+   * Once this element is focused it will go into an uncontrolled state
+   * on the next tab forwards or backwards and control will only be regained once
+   * an element that is part of either the active flow, active layer, or awaiting key codes
+   * for example, let's say you have an embbed youtube video in its own iframe, you can wrap the video
+   * on a div that is AltText that is uncontrolled, with an aria-label of youtube video, once that element
+   * is focused, the alt is set in an uncontrolled state, and it will stop deciding what's next tabbed
+   */
+  uncontrolled?: boolean;
+
+  /**
    * Triggers when it enters keycodes mode for an expected target
    */
   onEnterKeyCodes?: () => void;
@@ -211,7 +227,7 @@ export function AltBadgeReactioner(
     return (
       <Badge
         badgeContent={
-          <span aria-hidden={true} style={{display: "contents"}}>
+          <span aria-hidden={true} style={{ display: "contents" }}>
             {content.toUpperCase()}
           </span>
         }

@@ -490,7 +490,9 @@ class PropertyEntryLocationRenderer extends
         </InputAdornment>
       ) : null,
       inputProps: {
-        "aria-describedby": this.props.description ? idToUse + "_desc" : null,
+        "aria-describedby":
+          (this.props.currentValue && this.props.currentValue.atxt ? idToUse + "_atxt" : "") +
+          (this.props.description ? " " + idToUse + "_desc" : ""),
       },
     };
 
@@ -526,7 +528,7 @@ class PropertyEntryLocationRenderer extends
     // maps that are only available in the client side
     // the onViewportChange handler function is fairly compatible
     // with react-leaftlet
-    const map = this.state.readyToMap && !this.props.args.disableMapAndSearch ? (
+    let map = this.state.readyToMap && !this.props.args.disableMapAndSearch ? (
       <CMap
         viewport={viewport}
         onViewportChanged={this.props.onViewportChange}
@@ -572,6 +574,10 @@ class PropertyEntryLocationRenderer extends
       </CMap>
     ) : null;
 
+    if (map && this.props.args.mapWrapper) {
+      map = this.props.args.mapWrapper(map);
+    }
+
     const isInvalid = shouldShowInvalid(this.props);
 
     if (isInvalid) {
@@ -585,7 +591,7 @@ class PropertyEntryLocationRenderer extends
     const fieldMap = (
       <>
         {!this.props.args.disableMapAndSearch ?
-          <Box sx={style.locationAlternativeTextHeader}>
+          <Box sx={style.locationAlternativeTextHeader} id={idToUse + "_atxt"}>
             {
               icon ? <RestoreIconButton
                 sx={style.icon}

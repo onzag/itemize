@@ -196,8 +196,8 @@ export function AltSectionScroller(
       onDisplay={updateDynamicPos}
       ref={scrollerRef}
     >
-      {(scrolling, direction) => {
-        if (!scrolling) {
+      {(scrolling, blocked, direction) => {
+        if (!scrolling || blocked) {
           return null;
         }
 

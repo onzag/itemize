@@ -8,7 +8,7 @@
  */
 
 import React, { ForwardedRef } from "react";
-import { showRelevant as showScrollerRelevant, hideAll as hideAllScroller, scrollCurrent } from "./AltScroller";
+import { showRelevant as showScrollerRelevant, hideAll as hideAllScroller, scrollCurrent, setScrollerBlockStatus } from "./AltScroller";
 import { AltPriorityShifterContext } from "./AltPriorityShifter"
 
 export interface IAltBaseProps {
@@ -38,8 +38,14 @@ export interface IAltBaseProps {
    * used only when a certain element is focused, when such element is focused the alt reactioners
    * may have priority 1, and none of the priority 0 elements will display, of course, this is only
    * usable if you use it in conjuction with disabled
+   * 
+   * ALWAYS_ON_TOP makes it so that the element's priority is the same as the maximum one available
+   * so it's technically visible on all priorities
+   * 
+   * ALWAYS_ON_TOP_KEEP_FLOW makes it so that the element priority is the same as the maximum one available
+   * but for elements that are as useInFlow pressing tab on it will figure the next available flow element
    */
-  priority?: number;
+  priority?: number | "ALWAYS_ON_TOP" | "ALWAYS_ON_TOP_KEEP_FLOW";
   /**
    * A positioning within the group used to specify what part of a scrolling box this belongs to
    * for example -1 is often to be used with fixed navbar, 0 with the body content and 100 with footers
@@ -241,15 +247,47 @@ export function hideAll(butKeycodes: ActualAltReactioner[] = []) {
 
 function calculateActiveFlow(): number {
   let priorityToUse = Number.MIN_SAFE_INTEGER;
+  let priorityToInform = priorityToUse;
+
+  let hasAlwaysOnTop: boolean = false;
+  let hasAlwaysOnTopWKeep: boolean = false;
   ALT_REGISTRY.all.forEach((v) => {
-    if (!v.isDisabled() && v.getPriority() > priorityToUse && v.isUsedInFlow()) {
-      priorityToUse = v.getPriority();
+    if (!v.isDisabled()) {
+      hasAlwaysOnTop = v.getPriority() === "ALWAYS_ON_TOP";
+      hasAlwaysOnTopWKeep = v.getPriority() === "ALWAYS_ON_TOP_KEEP_FLOW";
+    }
+  });
+
+  ALT_REGISTRY.all.forEach((v) => {
+    if (
+      !v.isDisabled() &&
+      typeof v.getPriority() === "number" &&
+      v.getPriority() > priorityToUse
+    ) {
+      // if it has an always on top the maximum priority is its priority
+      // regardless of whether something is in flow or not
+      // for the keep_flow one then it will use whatever the priority on flow
+      // is being used
+      if (hasAlwaysOnTop || v.isUsedInFlow()) {
+        priorityToUse = v.getPriority() as number;
+        priorityToInform = priorityToUse;
+
+      // when we keep we still use the priority that may still be lower
+      // but we will inform the correct priority that we have established as always on top
+      // the reason is that we keep the flow that is under this, we keep our flow
+      } else if (hasAlwaysOnTopWKeep) {
+        priorityToInform = v.getPriority() as number;
+      }
     }
   });
 
   const flowResults: ActualAltBase<any, any>[] = [];
   ALT_REGISTRY.all.forEach((v) => {
-    if (!v.isDisabled() && v.getPriority() === priorityToUse && v.isUsedInFlow()) {
+    if (
+      !v.isDisabled() &&
+      (v.getPriority() === priorityToUse || v.getPriority() === "ALWAYS_ON_TOP" || v.getPriority() === "ALWAYS_ON_TOP_KEEP_FLOW") &&
+      v.isUsedInFlow()
+    ) {
       flowResults.push(v);
     }
   });
@@ -260,14 +298,14 @@ function calculateActiveFlow(): number {
   ALT_REGISTRY.activeFlowFocusIndex = flowResults.findIndex((e) => e.getElement() === document.activeElement);
   ALT_REGISTRY.activeFlowPriority = priorityToUse;
 
-  return priorityToUse;
+  return priorityToInform;
 }
 
 function calculatePriorityOfLayereds(calcActiveFlow?: boolean): number {
   let priorityToUse = calcActiveFlow ? calculateActiveFlow() : Number.MIN_SAFE_INTEGER;
   ALT_REGISTRY.all.forEach((v) => {
-    if (!v.isDisabled() && v.getPriority() > priorityToUse && !v.isUsedInFlow()) {
-      priorityToUse = v.getPriority();
+    if (!v.isDisabled() && typeof v.getPriority() === "number" && v.getPriority() > priorityToUse && !v.isUsedInFlow()) {
+      priorityToUse = v.getPriority() as number;
     }
   });
 
@@ -283,7 +321,10 @@ export function calculateLayereds(priorityToUse: number, doNotShowHide: boolean)
 
   ALT_REGISTRY.all.forEach((v) => {
     if (v instanceof ActualAltReactioner) {
-      if (!v.isDisabled() && v.getPriority() === priorityToUse) {
+      if (
+        !v.isDisabled() &&
+        (v.getPriority() === priorityToUse || v.getPriority() === "ALWAYS_ON_TOP" || v.getPriority() === "ALWAYS_ON_TOP_KEEP_FLOW")
+      ) {
         if (v instanceof ActualAltReactioner) {
           const reactionKey = v.getReactionKey();
           if (!actionResults[reactionKey]) {
@@ -297,7 +338,11 @@ export function calculateLayereds(priorityToUse: number, doNotShowHide: boolean)
       } else if (v instanceof ActualAltReactioner && !doNotShowHide && v.isDisplayed()) {
         v.hide();
       }
-    } else if (!v.isUsedInFlow() && !v.isDisabled() && v.getPriority() === priorityToUse) {
+    } else if (
+      !v.isUsedInFlow() &&
+      !v.isDisabled() &&
+      (v.getPriority() === priorityToUse || v.getPriority() === "ALWAYS_ON_TOP" || v.getPriority() === "ALWAYS_ON_TOP_KEEP_FLOW")
+    ) {
       layereds.push(v);
     } else if (v instanceof ActualAltReactioner && !doNotShowHide && v.isDisplayed()) {
       v.hide();
@@ -533,12 +578,12 @@ function triggerBasedOn(code: string, shiftKey: boolean, callbackIfmatch: () => 
       // flow cannot be blocked because flow is not displaying anything
       ALT_REGISTRY.isBlocked = false;
       ALT_REGISTRY.activeFlow.forEach((e) => e.setBlocked(ALT_REGISTRY.isBlocked));
-
       ALT_REGISTRY.activeFlowFocusIndex = nextIndex;
       ALT_REGISTRY.lastFocusedFlowSignatures[ALT_REGISTRY.activeFlowPriority] = nextElement.getSignature();
       ALT_REGISTRY.uncontrolled = nextElement.isUncontrolled();
     }
 
+    setScrollerBlockStatus(ALT_REGISTRY.isBlocked || ALT_REGISTRY.uncontrolled);
     callbackIfmatch();
     return;
   }
@@ -602,6 +647,17 @@ function triggerBasedOn(code: string, shiftKey: boolean, callbackIfmatch: () => 
   } else if (ALT_REGISTRY.isDisplayingLayereds) {
     matches = ALT_REGISTRY.isDisplayingLayereds
       .filter((v) => (v as ActualAltReactioner).getReactionKey && (v as ActualAltReactioner).getReactionKey() === code) as any;
+  } else if (code === "escape") {
+    let priorityToUse = Number.MIN_SAFE_INTEGER;
+    ALT_REGISTRY.all.forEach((v) => {
+      if (!v.isDisabled() && typeof v.getPriority() === "number" && v.getPriority() > priorityToUse) {
+        priorityToUse = v.getPriority() as number;
+      }
+    });
+    matches = ALT_REGISTRY.all.filter(
+      (v) => (
+        v.getPriority() === priorityToUse || v.getPriority() === "ALWAYS_ON_TOP" || v.getPriority() === "ALWAYS_ON_TOP_KEEP_FLOW"
+      ) && (v as ActualAltReactioner).getReactionKey && (v as ActualAltReactioner).getReactionKey() === code) as any;
   }
 
   if (matches.length) {
@@ -652,12 +708,16 @@ export function toggleAlt() {
     ALT_REGISTRY.isDisplayingLayereds && ALT_REGISTRY.isDisplayingLayereds.forEach((e) => e.setBlocked(false));
     ALT_REGISTRY.activeFlow && ALT_REGISTRY.activeFlow.forEach((e) => (e as any).setBlocked && (e as any).setBlocked(false));
     ALT_REGISTRY.awaitingLayerKeycodes && ALT_REGISTRY.awaitingLayerKeycodes.forEach((e) => (e as any).setBlocked && (e as any).setBlocked(false));
+    setScrollerBlockStatus(ALT_REGISTRY.uncontrolled);
   } else {
     // pressing alt with nothing displayed
     const activeFlowPriority = calculateActiveFlow();
     const displayElementsPriority = calculatePriorityOfLayereds();
 
     showLayereds(activeFlowPriority > displayElementsPriority ? activeFlowPriority : displayElementsPriority);
+
+    const activeLayered = ALT_REGISTRY.isDisplayingLayereds && ALT_REGISTRY.isDisplayingLayereds[ALT_REGISTRY.displayedLayeredFocusIndex];
+    setScrollerBlockStatus((activeLayered ? activeLayered.isBlocking() : false) || ALT_REGISTRY.uncontrolled);
   }
 }
 
@@ -679,8 +739,13 @@ if (typeof document !== "undefined") {
   });
 
   document.addEventListener('focus', () => {
-    console.log(document.activeElement);
-  });
+    if (ALT_REGISTRY.uncontrolled) {
+      const match = ALT_REGISTRY.all.find((e) => e.getElement() === document.activeElement);
+      if (match) {
+        ALT_REGISTRY.uncontrolled = match.isUncontrolled();
+      }
+    }
+  }, true);
 
   document.addEventListener("visibilitychange", () => {
     if (document.visibilityState === "hidden") {
@@ -714,10 +779,6 @@ if (typeof document !== "undefined") {
     keyCodeConsumed = null;
   });
   document.addEventListener("keydown", (e) => {
-    // uncontrolled
-    if (ALT_REGISTRY.uncontrolled) {
-      return;
-    }
     // some special events don't have this
     // eg. autocomplete
     if (!e.code) {
@@ -746,6 +807,12 @@ if (typeof document !== "undefined") {
     const isArrow = arrows.includes(keyCode);
     const isAltKey = e.altKey;
     const isTab = keyCode === "tab";
+    const isEscape = keyCode === "escape";
+
+    // uncontrolled
+    if (ALT_REGISTRY.uncontrolled && (isTab || isArrow)) {
+      return;
+    }
 
     const isPureAltKey = isAltKey && keyCode === "alt";
 
@@ -777,7 +844,7 @@ if (typeof document !== "undefined") {
           e.preventDefault();
         });
       }
-    } else if (!isArrow && (isAltKey || ALT_REGISTRY.isDisplayingLayereds)) {
+    } else if (!isArrow && (isAltKey || ALT_REGISTRY.isDisplayingLayereds || isEscape)) {
       keyCodeConsumed = e.code;
       keyConsumed = e.key;
 
@@ -853,7 +920,7 @@ export class ActualAltBase<P extends IAltBaseProps, S> extends React.PureCompone
       return false;
     }
 
-    return element.tagName === "INPUT" || element.tagName === "TEXTAREA";
+    return element.tagName === "INPUT" || element.tagName === "TEXTAREA" || element.isContentEditable;
   }
 
   /**
@@ -878,7 +945,7 @@ export class ActualAltBase<P extends IAltBaseProps, S> extends React.PureCompone
     return typeof this.props.tabbable === "boolean" ? this.props.tabbable : true;
   }
 
-  public getPriority() {
+  public getPriority(): number | "ALWAYS_ON_TOP" | "ALWAYS_ON_TOP_KEEP_FLOW" {
     return this.props.priority || 0;
   }
 
@@ -1123,6 +1190,7 @@ export class ActualAltBase<P extends IAltBaseProps, S> extends React.PureCompone
           // must check if it's a blocking input
           ALT_REGISTRY.isBlocked = somethingAlreadyActive.isBlocking();
           ALT_REGISTRY.isDisplayingLayereds.forEach((e) => e.setBlocked(ALT_REGISTRY.isBlocked));
+          setScrollerBlockStatus(ALT_REGISTRY.isBlocked || ALT_REGISTRY.uncontrolled);
         } else if (isTabNavigatingCurrent) {
           // because we were tab navigating before we want to tab navigate
           // the new cycle too and ensure something is selected
@@ -1252,6 +1320,7 @@ export class ActualAltReactioner extends ActualAltBase<IAltReactionerProps, IAct
       // must check if it's a blocking input
       ALT_REGISTRY.isBlocked = somethingAlreadyActive.isBlocking();
       ALT_REGISTRY.isDisplayingLayereds.forEach((e) => e.setBlocked(ALT_REGISTRY.isBlocked));
+      setScrollerBlockStatus(ALT_REGISTRY.isBlocked || ALT_REGISTRY.uncontrolled);
       // otherwise if we are not we can go ahead and trigger tab
     } else if (isTabNavigatingCurrent) {
       // because we were tab navigating before we want to tab navigate
@@ -1270,6 +1339,8 @@ export class ActualAltReactioner extends ActualAltBase<IAltReactionerProps, IAct
       (element as HTMLElement).click();
     } else if (this.props.action === "focus") {
       (element as HTMLElement).focus();
+
+      ALT_REGISTRY.uncontrolled = this.isUncontrolled();
     }
 
     if (this.props.triggerAltAfterAction) {
@@ -1294,7 +1365,7 @@ const AltReactioner = React.forwardRef((props: IAltReactionerProps, ref: Forward
         return (
           <ActualAltReactioner
             {...props}
-            priority={(props.priority || 0) + v.amount}
+            priority={typeof props.priority === "string" ? props.priority : (props.priority || 0) + v.amount}
             groupPosition={(props.groupPosition || 0) + v.groupPositionAmount}
             disabled={props.disabled || v.disable}
             ref={ref}

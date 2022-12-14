@@ -44,10 +44,11 @@ interface IAltScrollerProps {
   /**
    * Pass as children in order to build the UI of choice
    */
-  children: (isScrolling: boolean, scrollDirections?: { up: boolean; left: boolean; right: boolean; down: boolean }) => React.ReactNode;
+  children: (isScrolling: boolean, isBlocking: boolean, scrollDirections?: { up: boolean; left: boolean; right: boolean; down: boolean }) => React.ReactNode;
 }
 
 interface IActualAltScrollerState {
+  isBlocked: boolean;
   isScrolling: boolean;
   canScrollTop: boolean;
   canScrollLeft: boolean;
@@ -75,6 +76,14 @@ function isScrollIgnore(element: HTMLElement): boolean {
   return isScrollIgnore(element.parentElement);
 }
 
+export function setScrollerBlockStatus(status: boolean) {
+  ALT_SREGISTRY.forEach((v) => {
+    if (v.isScrolling()) {
+      v.setBlocked(status);
+    }
+  });
+}
+
 export function scrollCurrent(dir: "up" | "left" | "right" | "down", cb?: () => void) {
   // ensure that the active element is not meant to consume the
   // action, aka they ignore scrolling events because
@@ -83,6 +92,7 @@ export function scrollCurrent(dir: "up" | "left" | "right" | "down", cb?: () => 
     if (
       document.activeElement.tagName === "INPUT" ||
       document.activeElement.tagName === "TEXTAREA" ||
+      document.activeElement.isContentEditable ||
       isScrollIgnore(document.activeElement)
     ) {
       return;
@@ -157,6 +167,7 @@ export class ActualAltScroller extends React.PureComponent<IAltScrollerProps, IA
     super(props);
 
     this.state = {
+      isBlocked: false,
       canScrollTop: false,
       canScrollBottom: false,
       canScrollLeft: false,
@@ -237,6 +248,7 @@ export class ActualAltScroller extends React.PureComponent<IAltScrollerProps, IA
     this.props.onHide && this.props.onHide()
     this.setState({
       isScrolling: false,
+      isBlocked: false,
     });
   }
 
@@ -258,6 +270,14 @@ export class ActualAltScroller extends React.PureComponent<IAltScrollerProps, IA
 
   public isScrolling() {
     return this.state.isScrolling;
+  }
+
+  public setBlocked(blocked: boolean) {
+    if (this.state.isBlocked !== blocked) {
+      this.setState({
+        isBlocked: blocked,
+      });
+    }
   }
 
   public scroll(dir: "up" | "down" | "left" | "right") {
@@ -284,6 +304,7 @@ export class ActualAltScroller extends React.PureComponent<IAltScrollerProps, IA
         {
           this.props.children(
             this.state.isScrolling,
+            this.state.isBlocked,
             // typescript being funny again
             (this.state.isScrolling ? {
               up: this.state.canScrollTop,
