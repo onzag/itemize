@@ -8,7 +8,7 @@
 import { EndpointErrorType } from "../../../base/errors";
 import React from "react";
 import { redirectTo } from ".";
-import {Prompt as RouterPrompt} from "react-router-dom";
+import { Prompt as RouterPrompt } from "react-router-dom";
 import { Location } from "history";
 
 /**
@@ -59,6 +59,18 @@ interface PromptProps {
    * when this is true the prompt triggers
    */
   when: boolean;
+  /**
+   * ignores any change when it detects a language change
+   * note that this is not capable of determining if other stuff changes
+   * it simply denies language changes
+   */
+  ignoreSimpleLanguageChange?: boolean;
+
+  /**
+   * detect a change yourself in the location
+   * return true to accept it as a change
+   */
+  customChange?: (location: Location) => boolean;
   /**
    * The message to use for before unload
    * not supported in most browsers
@@ -139,13 +151,26 @@ export default class Prompt extends React.PureComponent<PromptProps, PromptState
   public handleRouterPromptNavigationStep(location: Location) {
     // if the dialog is not opened already
     if (!this.state.dialogOpened) {
+      let willBlock = true;
+      if (this.props.customChange) {
+        willBlock = this.props.customChange(location);
+      } else if (this.props.ignoreSimpleLanguageChange) {
+        const languageSrc = window.location.pathname.split("/")[1];
+        const languageTarget = location.pathname.split("/")[1];
+
+        const urlIsSameWithoutLanguageConsidered = window.location.pathname.replace(languageSrc, languageTarget) === location.pathname;
+        willBlock = !urlIsSameWithoutLanguageConsidered;
+      }
+
       // open it
-      this.setState({
-        dialogOpened: true,
-        dialogOpenedFor: location,
-      });
-      // and block the navigation
-      return false;
+      if (willBlock) {
+        this.setState({
+          dialogOpened: true,
+          dialogOpenedFor: location,
+        });
+        // and block the navigation
+        return false;
+      }
     }
     // don't block the navigation, proceed
     return true;

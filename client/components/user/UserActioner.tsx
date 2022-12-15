@@ -9,7 +9,7 @@
  * @module
  */
 
-import React from "react";
+import React, { useContext } from "react";
 import { TokenContext } from "../../internal/providers/token-provider";
 import { EndpointErrorType } from "../../../base/errors";
 import { gqlQuery, buildGqlQuery } from "../../../gql-querier";
@@ -507,21 +507,9 @@ class ActualUserActioner extends React.Component<IActualUserActionerProps, IActu
  * @returns a react element
  */
 export default function UserActioner(props: IUserActionerProps) {
+  const tokenContext = useContext(TokenContext);
+  const itemContext = useContext(ItemContext);
+
   // we need the token context to get the currently logge user token
-  return (
-    <TokenContext.Consumer>
-      {
-        (tokenContext) => (
-          <ItemContext.Consumer>
-            {
-              // as well as an item definition context to read our password and email fields
-              (itemContext) => {
-                return <ActualUserActioner {...props} token={tokenContext.token} userContext={itemContext} />
-              }
-            }
-          </ItemContext.Consumer>
-        )
-      }
-    </TokenContext.Consumer>
-  );
+  return <ActualUserActioner {...props} token={tokenContext.token} userContext={itemContext} />;
 }

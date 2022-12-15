@@ -4,7 +4,7 @@
  * @module
  */
 
-import React from "react";
+import React, { useContext } from "react";
 import { DataContext } from "../../internal/providers/appdata-provider";
 import Root from "../../../base/Root";
 
@@ -35,4 +35,12 @@ export default function RootRetriever(props: IRootRetrieverProps) {
       }
     </DataContext.Consumer>
   );
+}
+
+export function useRootRetriever() {
+  const value = useContext(DataContext);
+
+  return {
+    root: value.value
+  };
 }

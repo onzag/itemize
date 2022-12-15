@@ -5,7 +5,7 @@
  */
 
 import type { EndpointErrorType } from "../../../base/errors";
-import React, { useCallback, useState } from "react";
+import React, { useCallback, useContext, useState } from "react";
 import { ICurrencyType, currencies, arrCurrencies } from "../../../imported-resources";
 import { LocaleContext, ChangeCurrencyToFn } from "../../internal/providers/locale-provider";
 
@@ -78,4 +78,14 @@ export default function AppCurrencyRetriever(props: {
       }
     </LocaleContext.Consumer>
   );
+}
+
+export function useAppCurrencyRetriever() {
+  const localeContext = useContext(LocaleContext);
+
+  return {
+    currentCurrency: currencies[localeContext.currency.toUpperCase()],
+    availableCurrencies: arrCurrencies,
+    changeCurrencyTo: localeContext.updating ? () => null as any : localeContext.changeCurrencyTo,
+  };
 }

@@ -1677,6 +1677,7 @@ export default class ItemDefinition {
    * it has been updated somewhere else, we use this to avoid overriding, note that the value must also
    * not be equal, as in, it must differs; otherwise the value is applied, and manually set will go back
    * to false as it's been used applyValue on it, it's been set now by the computer
+   * @param forceApply will always apply and not perform the signature check
    * @returns a boolean on whether the action was performed, sometimes the value will not be applied
    * because there already exists a better one already stored for the same last modified value which contains
    * more fields
@@ -1688,13 +1689,14 @@ export default class ItemDefinition {
     excludeExtensions: boolean,
     requestFields: IGQLRequestFields,
     doNotApplyValueInPropertyIfPropertyHasBeenManuallySet: boolean,
+    forceApply?: boolean,
   ): boolean {
     // first we flatten the value if necessary
     const flattenedValue = value === null ? value : (typeof value.DATA !== "undefined" ? flattenRawGQLValueOrFields(value) : value);
     const mergedID = id + "." + (version || "");
 
     // we already have a value for that
-    if (this.stateHasAppliedValueTo[mergedID]) {
+    if (!forceApply && this.stateHasAppliedValueTo[mergedID]) {
       if (this.stateGQLAppliedValue[mergedID].flattenedValue === null && value === null) {
         const currentRequestFields = this.stateGQLAppliedValue[mergedID].requestFields;
         if (!requestFieldsAreContained(requestFields, currentRequestFields)) {
@@ -1795,6 +1797,9 @@ export default class ItemDefinition {
         excludeExtensions,
         entireValue.requestFields,
         false,
+        // must force apply because otherwise the last modified signature
+        // check may not allow it to restore
+        true,
       );
     } else {
       this.cleanValueFor(id, version, excludeExtensions, true);

@@ -5,7 +5,7 @@
  */
 
 import type { EndpointErrorType } from "../../../base/errors";
-import React, { useCallback, useState } from "react";
+import React, { useCallback, useContext, useState } from "react";
 import { ChangeLanguageToFn, LocaleContext } from "../../internal/providers/locale-provider";
 
 /**
@@ -103,4 +103,27 @@ export default function AppLanguageRetriever(props: {
       }
     </LocaleContext.Consumer>
   );
+}
+
+export function useAppLanguageRetriever() {
+  const localeContext = useContext(LocaleContext);
+
+  const currentLanguage: IFnAppLanguageRetrieverLanguageFormType = {
+    code: localeContext.language,
+    name: localeContext.langLocales[localeContext.language].name,
+  };
+  const availableLanguages: IFnAppLanguageRetrieverLanguageFormType[] = [];
+  Object.keys(localeContext.langLocales).forEach((code) => {
+    availableLanguages.push({
+      code,
+      name: localeContext.langLocales[code].name,
+    });
+  });
+
+  return {
+    currentLanguage,
+    availableLanguages,
+    rtl: localeContext.rtl,
+    changeLanguageTo: localeContext.updating ? () => null as any : localeContext.changeLanguageTo,
+  };
 }

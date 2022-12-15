@@ -5,7 +5,7 @@
  */
 
 import type { EndpointErrorType } from "../../../base/errors";
-import React, { useCallback, useState } from "react";
+import React, { useCallback, useContext, useState } from "react";
 import { ICountryType, countries, arrCountries } from "../../../imported-resources";
 import { LocaleContext, ChangeCountryToFn } from "../../internal/providers/locale-provider";
 
@@ -90,4 +90,27 @@ export default function AppCountryRetriever(props: {
       }
     </LocaleContext.Consumer>
   );
+}
+
+export function useAppCountryRetriever() {
+  const localeContext = useContext(LocaleContext);
+
+  return {
+    currentCountry: countries[localeContext.country.toUpperCase()] || {
+      name: "?",
+      native: "?",
+      code: "?",
+      phone: "?",
+      continent: "?",
+      capital: "?",
+      languages: [],
+      emoji: "?",
+      emojiU: "?",
+      currency: "USD",
+      longitude: 0,
+      latitude: 0,
+    },
+    availableCountries: arrCountries,
+    changeCountryTo: localeContext.updating ? () => null as any : localeContext.changeCountryTo,
+  };
 }

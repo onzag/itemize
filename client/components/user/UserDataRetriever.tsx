@@ -4,7 +4,7 @@
  * @module
  */
 
-import React from "react";
+import React, { useContext } from "react";
 import { TokenContext } from "../../internal/providers/token-provider";
 
 /**
@@ -43,4 +43,13 @@ export default function UserDataRetriever(props: IUserDataRetrieverProps) {
       }
     </TokenContext.Consumer>
   );
+}
+
+export function useUserDataRetriever() {
+  const value = useContext(TokenContext);
+
+  return {
+    id: value.id,
+    role: value.role,
+  };
 }

@@ -8,8 +8,6 @@ import React from "react";
 import Root, { IRootRawJSONDataType, ILangLocalesType } from "../../../base/Root";
 import { importScript, COOKIE_EXPIRATION_DATE } from "../..";
 import Moment from "moment";
-import { Route } from "react-router-dom";
-import { history } from "../..";
 import { countries, currencies } from "../../../imported-resources";
 import { TokenProvider, IActualTokenProviderState } from "../providers/token-provider";
 import { RemoteListener } from "./remote-listener";
@@ -46,6 +44,10 @@ interface IAppProps {
    * This is the root we are using
    */
   root: Root;
+  /**
+   * The intial language we are expected to use
+   */
+  initialLang: string;
   /**
    * The intial currency we are expected to use, as the actual
    * currency might be changed either by user action or when
@@ -104,6 +106,10 @@ interface IAppState {
    */
   specifiedCurrency: string;
   /**
+   * The actual current language
+   */
+  specifiedLang: string;
+  /**
    * The actual curent currency factors
    */
   specifiedCurrencyFactors: {
@@ -113,10 +119,6 @@ interface IAppState {
    * Whether the locale is currently updating
    */
   localeIsUpdating: boolean;
-  /**
-   * What is it updating from
-   */
-  localeIsUpdatingFrom: string;
   /**
    * whether the upddate is currently blocked,
    * happens when an update is triggered but another older version
@@ -156,9 +158,9 @@ export default class App extends React.Component<IAppProps, IAppState> {
     this.state = {
       specifiedCountry: props.initialCountry,
       specifiedCurrency: props.initialCurrency,
+      specifiedLang: props.initialLang,
       specifiedCurrencyFactors: props.initialCurrencyFactors,
       localeIsUpdating: false,
-      localeIsUpdatingFrom: null,
       updateIsBlocked: false,
     };
 
@@ -176,10 +178,10 @@ export default class App extends React.Component<IAppProps, IAppState> {
     this.changeLanguageTo = this.changeLanguageTo.bind(this);
     this.changeCountryTo = this.changeCountryTo.bind(this);
     this.changeCurrencyTo = this.changeCurrencyTo.bind(this);
-    this.renderAppWithLocaleContext = this.renderAppWithLocaleContext.bind(this);
     this.setTokenState = this.setTokenState.bind(this);
     this.updateUserProperty = this.updateUserProperty.bind(this);
     this.updateCurrencyFactorsIfNecessary = this.updateCurrencyFactorsIfNecessary.bind(this);
+    this.confirmUrlLanguage = this.confirmUrlLanguage.bind(this);
 
     // a sad hack to know if we are in the client side to initialize this
     // remote listener
@@ -362,7 +364,13 @@ export default class App extends React.Component<IAppProps, IAppState> {
     // We set it to the url
     pathNameSplitted[1] = locale;
     const newPathName = pathNameSplitted.join("/");
-    history.push(newPathName + window.location.search);
+    if (window.history) {
+      window.history.replaceState(window.history.state, "", newPathName + window.location.search);
+    }
+
+    this.setState({
+      specifiedLang: locale,
+    });
 
     // and now if we don't avoid updating the user
     if (!avoidUpdatingUser) {
@@ -414,7 +422,6 @@ export default class App extends React.Component<IAppProps, IAppState> {
     // otherwise we send the state, this state is part of the context
     this.setState({
       localeIsUpdating: true,
-      localeIsUpdatingFrom: urlLanguage,
     });
 
     // and we fetch the new data, as relevant, mostly the build, and the moment to patch
@@ -431,7 +438,6 @@ export default class App extends React.Component<IAppProps, IAppState> {
     } catch {
       this.setState({
         localeIsUpdating: false,
-        localeIsUpdatingFrom: null,
       });
       return {
         code: ENDPOINT_ERRORS.CANT_CONNECT,
@@ -447,7 +453,6 @@ export default class App extends React.Component<IAppProps, IAppState> {
     // and fix the state
     this.setState({
       localeIsUpdating: false,
-      localeIsUpdatingFrom: null,
     });
 
     return err;
@@ -556,6 +561,22 @@ export default class App extends React.Component<IAppProps, IAppState> {
     }
   }
 
+  public confirmUrlLanguage() {
+    const pathNameSplitted = window.location.pathname.split("/");
+    const urlLanguage = pathNameSplitted[1];
+    if (urlLanguage && this.state.specifiedLang !== urlLanguage) {
+      pathNameSplitted[1] = this.state.specifiedLang;
+      const newPathName = pathNameSplitted.join("/");
+      if (window.history) {
+        window.history.replaceState(window.history.state, "", newPathName + window.location.search);
+      }
+    }
+  }
+
+  public componentDidMount(): void {
+    window.addEventListener("popstate", this.confirmUrlLanguage);
+  }
+
   /**
    * Changes the currency to a given currency code
    * given its 3 letter uppercase code
@@ -599,67 +620,6 @@ export default class App extends React.Component<IAppProps, IAppState> {
   }
 
   /**
-   * Renders the application with the locale context data
-   * @param routerProps the url match from the router, contains the url language
-   * @returns the application in the right locale context
-   */
-  public renderAppWithLocaleContext(routerProps: any) {
-    // typescript being really annoying
-    const { match } = routerProps;
-    // Now the match.params.lang is actually a quite unreliable way to check for the current language
-    // in use during updates, there's a reason, the url changes triggering a react update before the
-    // language data has been loaded, this makes the app feel quite responsive and it's important, but
-    // if the rest of the app thinks the new language is the right language
-    // before having the new language completely loaded a crash is going to happen, hence, we remain onto
-    // the old language until the new language data is truly loaded
-    const currentActualLanguage = this.state.localeIsUpdating ? this.state.localeIsUpdatingFrom : match.params.lang;
-
-    const rtl = this.props.langLocales[currentActualLanguage].rtl;
-
-    // now we populate the locale context which is used all over the app
-    const localeContextValue: ILocaleContextType = {
-      changeLanguageTo: this.changeLanguageTo,
-      changeCountryTo: this.changeCountryTo,
-      changeCurrencyTo: this.changeCurrencyTo,
-
-      language: currentActualLanguage,
-      rtl,
-      country: this.state.specifiedCountry,
-      currency: this.state.specifiedCurrency,
-      currencyFactors: this.state.specifiedCurrencyFactors,
-
-      updating: this.state.localeIsUpdating,
-
-      langLocales: this.props.langLocales,
-      i18n: this.props.root.getI18nData(),
-    };
-
-    // Now we return the app with its given locale context
-    // the Material ui pickers depends on the locale too from
-    // the match, so we pass that as well, we use the deregionalized
-    // version nevertheless,
-    // note how we include the devtools if we are in development mode
-    // such a code is stripped if it's production
-    return (
-      <LocaleProvider value={localeContextValue}>
-        <TokenProvider localeContext={localeContextValue} onProviderStateSet={this.setTokenState}>
-          <div id="main" dir={rtl ? "rtl" : "ltr"}>
-            {
-              this.props.mainWrapper ?
-                this.props.mainWrapper(
-                  this.props.mainComponent,
-                  this.props.config,
-                  localeContextValue,
-                ) :
-                this.props.mainComponent
-            }
-          </div>
-        </TokenProvider>
-      </LocaleProvider>
-    );
-  }
-
-  /**
    * The render function
    */
   public render() {
@@ -671,15 +631,46 @@ export default class App extends React.Component<IAppProps, IAppState> {
       updateIsBlocked: this.state.updateIsBlocked,
     };
 
+    const rtl = this.props.langLocales[this.state.specifiedLang].rtl;
+
+    // now we populate the locale context which is used all over the app
+    const localeContextValue: ILocaleContextType = {
+      changeLanguageTo: this.changeLanguageTo,
+      changeCountryTo: this.changeCountryTo,
+      changeCurrencyTo: this.changeCurrencyTo,
+
+      language: this.state.specifiedLang,
+      rtl,
+      country: this.state.specifiedCountry,
+      currency: this.state.specifiedCurrency,
+      currencyFactors: this.state.specifiedCurrencyFactors,
+
+      updating: this.state.localeIsUpdating,
+
+      langLocales: this.props.langLocales,
+      i18n: this.props.root.getI18nData(),
+    };
+
     // Now we return that with the JSS provider, material ui theme provider,
     // our data context, and then pass the react router route, note that the
     // router itself is the parent
     return (
       <DataProvider value={dataContextValue}>
-        <Route
-          path="/:lang/"
-          component={this.renderAppWithLocaleContext}
-        />
+        <LocaleProvider value={localeContextValue}>
+          <TokenProvider localeContext={localeContextValue} onProviderStateSet={this.setTokenState}>
+            <div id="main" dir={rtl ? "rtl" : "ltr"}>
+              {
+                this.props.mainWrapper ?
+                  this.props.mainWrapper(
+                    this.props.mainComponent,
+                    this.props.config,
+                    localeContextValue,
+                  ) :
+                  this.props.mainComponent
+              }
+            </div>
+          </TokenProvider>
+        </LocaleProvider>
       </DataProvider>
     );
   }

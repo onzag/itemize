@@ -31,6 +31,7 @@ import Include from "../Include";
 import { ICustomRoleManager } from "../../../../Root";
 import type { PropertyDefinitionSupportedFilesType } from "./types/files";
 import type { PropertyDefinitionSupportedFileType } from "./types/file";
+import type { IPropertyDefinitionSupportedTextType } from "./types/text";
 
 /**
  * These are the main errors a property is able to give
@@ -763,18 +764,23 @@ export default class PropertyDefinition {
       // we make the count
       let count: number;
       // and check if its rich text
+      const isText = propertyDefinitionRaw.type === "text";
       const isRichText = propertyDefinitionRaw.type === "text" && propertyDefinitionRaw.subtype === "html";
       // if it's an array, we use the array length
       if (Array.isArray(value)) {
         count = value.length;
       } else if (!isRichText) {
         // if it's not rich text we just count the characters
-        count = value.toString().length;
+        if (isText) {
+          count = (value as IPropertyDefinitionSupportedTextType).value.toString().length;
+        } else {
+          count = value.toString().length;
+        }
       } else {
         // special check for large values in raw mode
         // should be a large enough value to avoid this
         // and avoid being spammed with empty tags
-        if (value.toString().length > MAX_RAW_TEXT_LENGTH) {
+        if ((value as IPropertyDefinitionSupportedTextType).value.toString().length > MAX_RAW_TEXT_LENGTH) {
           return PropertyInvalidReason.TOO_LARGE;
         }
 
@@ -2048,7 +2054,7 @@ export default class PropertyDefinition {
    */
   public async isValidValue(
     id: string,
-    version: string,
+    version: string, 
     value: PropertyDefinitionSupportedType,
   ): Promise<PropertyInvalidReason | string> {
     // first we just run the standard without external checking, note how we are

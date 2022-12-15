@@ -447,7 +447,7 @@ class PropertyEntryFieldRenderer
       } else if (this.props.currentValueLang !== this.props.languageOverride) {
         this.props.onChange({
           value,
-          language: this.props.languageOverride,
+          language: this.props.languageOverride || null,
         } as any, null);
       } else if (this.props.currentValueLang) {
         this.props.onChange({

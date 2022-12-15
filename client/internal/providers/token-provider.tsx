@@ -428,7 +428,7 @@ class ActualTokenProvider extends React.Component<IActualTokenProviderProps, IAc
               localeUserData.app_country !== cachedData.app_country &&
               this.props.localeContext.country !== localeUserData.app_country
             ) {
-              this.props.localeContext.changeCountryTo(localeUserData.app_country as string, true, true);
+              this.props.localeContext.changeCountryTo(localeUserData.app_country as string, false, true, true);
             }
             if (
               localeUserData.app_language !== cachedData.app_language &&

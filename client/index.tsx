@@ -293,7 +293,9 @@ export async function initializeItemizeApp(
     // is initialized
     const newPathName = pathNameSplitted.join("/");
     if (!serverMode) {
-      history.replace(newPathName + window.location.search);
+      if (window.history) {
+        window.history.replaceState(window.history.state, "", newPathName + window.location.search);
+      }
     } else {
       // in server mode this does contain the query string as it uses the original url
       serverMode.redirectTo(newPathName);
@@ -390,7 +392,7 @@ export async function initializeItemizeApp(
       const newPathName = pathNameSplitted.join("/");
 
       if (!serverMode) {
-        history.replace(newPathName + window.location.search);
+        window.history.replaceState(window.history.state, "", newPathName + window.location.search);
       } else {
         // do the redirect
         serverMode.redirectTo(newPathName);
@@ -543,6 +545,7 @@ export async function initializeItemizeApp(
       langLocales={serverMode ? serverMode.langLocales : window.LANG}
       config={config}
 
+      initialLang={initialLang}
       initialCurrency={initialCurrency}
       initialCountry={initialCountry}
       initialCurrencyFactors={serverMode ?
