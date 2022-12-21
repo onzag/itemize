@@ -43,11 +43,11 @@ const LOAD_TIME = (new Date()).getTime();
  * in order to render its value
  */
 export default class PropertyViewReference
-  extends React.Component<IPropertyViewHandlerProps<IPropertyViewSimpleRendererProps>, IPropertyViewReferenceState> {
+  extends React.Component<IPropertyViewHandlerProps<string, IPropertyViewSimpleRendererProps>, IPropertyViewReferenceState> {
 
   private currentlyFindingValueFor: [string, string];
 
-  constructor(props: IPropertyViewHandlerProps<IPropertyViewSimpleRendererProps>) {
+  constructor(props: IPropertyViewHandlerProps<string, IPropertyViewSimpleRendererProps>) {
     super(props);
 
     /**
@@ -66,7 +66,7 @@ export default class PropertyViewReference
 
   public componentDidMount() {
     // first we ge the current value
-    const value = (this.props.useAppliedValue ? this.props.state.stateAppliedValue : this.props.state.value) as number;
+    const value = (this.props.useAppliedValue ? this.props.state.stateAppliedValue : this.props.state.value) as string;
     // also the internal value, which is assigned by an entry,
     // but the internal value is only relevant if we are not
     // using the applied value 
@@ -97,7 +97,7 @@ export default class PropertyViewReference
    * @returns an array where 0 is the item definition that is target, 1 is the property definition
    * we are using for display
    */
-  public static getSpecialData(props: IPropertyViewHandlerProps<IPropertyViewSimpleRendererProps>): [ItemDefinition, PropertyDefinition] {
+  public static getSpecialData(props: IPropertyViewHandlerProps<string, IPropertyViewSimpleRendererProps>): [ItemDefinition, PropertyDefinition] {
     const modPath = props.property.getSpecialProperty("referencedModule") as string;
     if (!modPath) {
       throw new Error(
@@ -167,7 +167,7 @@ export default class PropertyViewReference
   }
 
   public static async getDerivedServerSideStateFromProps(
-    props: IPropertyViewHandlerProps<IPropertyViewSimpleRendererProps>,
+    props: IPropertyViewHandlerProps<string, IPropertyViewSimpleRendererProps>,
     state: IPropertyViewReferenceState,
   ): Promise<Partial<IPropertyViewReferenceState>> {
     const id = props.useAppliedValue ? props.state.stateAppliedValue as string : props.state.value as string;
@@ -300,7 +300,7 @@ export default class PropertyViewReference
   }
 
   public componentDidUpdate(
-    prevProps: IPropertyViewHandlerProps<IPropertyViewSimpleRendererProps>,
+    prevProps: IPropertyViewHandlerProps<string, IPropertyViewSimpleRendererProps>,
   ) {
     // we need to know if we are filtering by language
     const filterByLanguage = this.props.property.getSpecialProperty("referencedFilterByLanguage") as boolean;
@@ -341,7 +341,7 @@ export default class PropertyViewReference
   }
 
   public shouldComponentUpdate(
-    nextProps: IPropertyViewHandlerProps<IPropertyViewSimpleRendererProps>,
+    nextProps: IPropertyViewHandlerProps<string, IPropertyViewSimpleRendererProps>,
     nextState: IPropertyViewReferenceState
   ) {
     // This is optimized to only update for the thing it uses

@@ -7,7 +7,7 @@
 
 import { IPropertyViewProps, EntryViewReadSet } from "./base";
 import { IPropertyViewRendererProps } from "../../internal/components/PropertyView";
-import { PropertyDefinitionSupportedBooleanType } from "../../../base/Root/Module/ItemDefinition/PropertyDefinition/types/boolean";
+import { PropertyDefinitionSupportedType } from "../../../base/Root/Module/ItemDefinition/PropertyDefinition/types";
 
 /**
  * Creates an view for a given property id
@@ -17,6 +17,6 @@ import { PropertyDefinitionSupportedBooleanType } from "../../../base/Root/Modul
  * @param props the props for the view
  * @returns a react component
  */
-export default function View(props: IPropertyViewProps<IPropertyViewRendererProps<PropertyDefinitionSupportedBooleanType>>) {
+export default function View(props: IPropertyViewProps<IPropertyViewRendererProps<PropertyDefinitionSupportedType>>) {
   return EntryViewReadSet(props as any, "view");
 }

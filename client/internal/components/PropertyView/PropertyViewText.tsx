@@ -6,7 +6,6 @@
 
 import React from "react";
 import { IPropertyViewHandlerProps, IPropertyViewRendererProps } from ".";
-import equals from "deep-equal";
 import { IPropertyDefinitionSupportedTextType } from "../../../../base/Root/Module/ItemDefinition/PropertyDefinition/types/text";
 import { PropertyDefinitionSupportedFilesType } from "../../../../base/Root/Module/ItemDefinition/PropertyDefinition/types/files";
 import { sanitize } from "../../../internal/text";
@@ -43,12 +42,12 @@ export interface IPropertyViewTextRendererProps extends IPropertyViewRendererPro
 /**
  * The property view text class
  */
-export default class PropertyViewText extends React.Component<IPropertyViewHandlerProps<IPropertyViewTextRendererProps>> {
-  constructor(props: IPropertyViewHandlerProps<IPropertyViewTextRendererProps>) {
+export default class PropertyViewText extends React.Component<IPropertyViewHandlerProps<IPropertyDefinitionSupportedTextType, IPropertyViewTextRendererProps>> {
+  constructor(props: IPropertyViewHandlerProps<IPropertyDefinitionSupportedTextType, IPropertyViewTextRendererProps>) {
     super(props);
   }
   public shouldComponentUpdate(
-    nextProps: IPropertyViewHandlerProps<IPropertyViewTextRendererProps>,
+    nextProps: IPropertyViewHandlerProps<IPropertyDefinitionSupportedTextType, IPropertyViewTextRendererProps>,
   ) {
     // This is optimized to only update for the thing it uses
     return this.props.useAppliedValue !== nextProps.useAppliedValue ||

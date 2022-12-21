@@ -154,7 +154,7 @@ export interface IPropertyEntryRendererProps<ValueType> extends IRendererProps {
  * anything, an optional renderer and rendererArgs can be passed to modify where
  * the values are distributed
  */
-export interface IPropertyEntryMainHandlerProps<ValueType, RendererPropsType> {
+export interface IPropertyEntryMainHandlerProps<ValueType extends PropertyDefinitionSupportedType, RendererPropsType> {
   // AUTOMATICALLY PROVIDED BY THE base.tsx BEING CALCULATED
   /**
    * The item definition in question, either a standard, search mode, extended, or some
@@ -201,7 +201,7 @@ export interface IPropertyEntryMainHandlerProps<ValueType, RendererPropsType> {
    * Automatically Provided check base.tsx
    * filtered for this specific property from the item-definition.tsx context state value
    */
-  state: IPropertyDefinitionState;
+  state: IPropertyDefinitionState<ValueType>;
   /**
    * The on change event, this is similar to the property.setCurrentValue but takes cares of things
    * like slotting and does the necessary calls to the UI in order to keep the UI updated with these
@@ -350,7 +350,7 @@ export interface IPropertyEntryMainHandlerProps<ValueType, RendererPropsType> {
  * these do not need to be passed to the main handler, the main handler passes to the smaller
  * handlers, they receive all the main handler props and these
  */
-export interface IPropertyEntryHandlerProps<ValueType, RendererPropsType> extends IPropertyEntryMainHandlerProps<ValueType, RendererPropsType> {
+export interface IPropertyEntryHandlerProps<ValueType extends PropertyDefinitionSupportedType, RendererPropsType> extends IPropertyEntryMainHandlerProps<ValueType, RendererPropsType> {
   /**
    * Config is a conditional include that will pass the config to the handler
    * 

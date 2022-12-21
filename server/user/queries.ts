@@ -595,7 +595,7 @@ export const customUserQueries = (appData: IAppDataType): IGQLQueryFieldsDefinit
         let decoded: IServerSideTokenDataType;
         try {
           // we attempt to decode it
-          decoded = await jwtVerify<IServerSideTokenDataType>(args.token, await appData.registry.getJWTSecretFor(SECONDARY_JWT_KEY));
+          decoded = await jwtVerify<IServerSideTokenDataType>(args.token, await appData.registry.getJWTSecretFor(JWT_KEY));
         } catch (err) {
           throw new EndpointError({
             message: "Token is invalid",

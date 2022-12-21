@@ -5,35 +5,35 @@ import AltReactioner from "../../components/accessibility/AltReactioner";
 
 const style = {
   badgeFastKey: {
-    "& .MuiBadge-badge": {
+    "& > .MuiBadge-badge": {
       backgroundColor: "#fffde7 !important",
       color: "#212121 !important",
       borderColor: "#f9a825 !important",
     },
   },
   badgeFastKey2: {
-    "& .MuiBadge-badge": {
+    "& > .MuiBadge-badge": {
       backgroundColor: "#212121 !important",
       color: "#fffde7 !important",
       borderColor: "#f9a825 !important",
     },
   },
   badgeFastKeyFlow: {
-    "& .MuiBadge-badge": {
+    "& > .MuiBadge-badge": {
       backgroundColor: "#e1f5fe !important",
       color: "#212121 !important",
       borderColor: "#f9a825 !important",
     },
   },
   badgeFastKey2Flow: {
-    "& .MuiBadge-badge": {
+    "& > .MuiBadge-badge": {
       backgroundColor: "#212121 !important",
       color: "#e1f5fe !important",
       borderColor: "#f9a825 !important",
     },
   },
   transformed: {
-    "& .MuiBadge-badge": {
+    "& > .MuiBadge-badge": {
       transform: "translateY(0px)",
     }
   },
@@ -41,12 +41,12 @@ const style = {
     width: "100%",
   },
   hidden: {
-    "& .MuiBadge-badge": {
+    "& > .MuiBadge-badge": {
       display: "none",
     }
   },
   blocked: {
-    "& .MuiBadge-badge": {
+    "& > .MuiBadge-badge": {
       opacity: 0.5,
     }
   },

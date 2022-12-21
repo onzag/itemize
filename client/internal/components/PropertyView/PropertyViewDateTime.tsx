@@ -42,8 +42,8 @@ interface IPropertyViewDateTimeState {
 /**
  * The property view date time handler class
  */
-export class PropertyViewDateTime extends React.Component<IPropertyViewHandlerProps<IPropertyViewDateTimeRendererProps>, IPropertyViewDateTimeState> {
-  constructor(props: IPropertyViewHandlerProps<IPropertyViewDateTimeRendererProps>) {
+export class PropertyViewDateTime extends React.Component<IPropertyViewHandlerProps<string, IPropertyViewDateTimeRendererProps>, IPropertyViewDateTimeState> {
+  constructor(props: IPropertyViewHandlerProps<string, IPropertyViewDateTimeRendererProps>) {
     super(props);
 
     this.state = {
@@ -56,7 +56,7 @@ export class PropertyViewDateTime extends React.Component<IPropertyViewHandlerPr
     });
   }
   public shouldComponentUpdate(
-    nextProps: IPropertyViewHandlerProps<IPropertyViewDateTimeRendererProps>,
+    nextProps: IPropertyViewHandlerProps<string, IPropertyViewDateTimeRendererProps>,
     nextState: IPropertyViewDateTimeState,
   ) {
     // This is optimized to only update for the thing it uses

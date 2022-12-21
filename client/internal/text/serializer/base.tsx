@@ -459,11 +459,6 @@ export function reactifyElementBase(
       }
     }
 
-    // can't render a thing
-    if (!newTemplateArgs) {
-      return null;
-    }
-
     // then we got to use the foreach context if we have one
     if (base.forEach) {
       const renderEachBasedOnContext = (resolvedContext: TemplateArgs): React.ReactNode => {

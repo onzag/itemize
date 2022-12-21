@@ -464,8 +464,8 @@ export default function PropertyViewTextRenderer(props: IPropertyViewTextRendere
     );
   }
   return (
-    <Node lang={props.currentValueLang}>
+    <Node lang={props.currentValueLang} className={props.args.className}>
       {props.currentValueText}
     </Node>
-  )
+  );
 }

@@ -72,7 +72,7 @@ function getSearchStateOf(state: IActualItemProviderState): IItemSearchStateType
   };
 }
 
-function getPropertyForSetter(setter: IPropertySetterProps, itemDefinition: ItemDefinition) {
+function getPropertyForSetter(setter: IPropertySetterProps<PropertyDefinitionSupportedType>, itemDefinition: ItemDefinition) {
   let actualId: string = setter.id;
   if (setter.searchVariant) {
     actualId = PropertyDefinitionSearchInterfacesPrefixes[setter.searchVariant.toUpperCase().replace("-", "_")] + setter.id;
@@ -724,13 +724,13 @@ export interface IItemProviderProps {
    * Setters for setting values for the properties within the item definition
    * itself, useful not to depend on mounting at time
    */
-  setters?: IPropertySetterProps[];
+  setters?: IPropertySetterProps<PropertyDefinitionSupportedType>[];
   /**
    * Similar to setters but the values are just prefilled and as such are not
    * readonly, prefills only get executed during the initial mount
    * of the component
    */
-  prefills?: IPropertySetterProps[];
+  prefills?: IPropertySetterProps<PropertyDefinitionSupportedType>[];
   /**
    * only downloads and includes the properties specified in the list
    * in the state
@@ -2929,7 +2929,7 @@ export class ActualItemProvider extends
     return options.policies.every((pKeys) => {
       const [policyType, policyName, propertyId] = pKeys;
       const propertyInPolicy = this.state.itemState.policies[policyType][policyName]
-        .find((p: IPropertyDefinitionState) => p.propertyId === propertyId);
+        .find((p: IPropertyDefinitionState<PropertyDefinitionSupportedType>) => p.propertyId === propertyId);
       return propertyInPolicy.valid;
     });
   }

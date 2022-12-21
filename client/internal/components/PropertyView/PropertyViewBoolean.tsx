@@ -29,12 +29,12 @@ export interface IPropertyViewBooleanRendererProps extends IPropertyViewRenderer
 /**
  * The property view boolean handler
  */
-export class PropertyViewBoolean extends React.Component<IPropertyViewHandlerProps<IPropertyViewBooleanRendererProps>> {
-  constructor(props: IPropertyViewHandlerProps<IPropertyViewBooleanRendererProps>) {
+export class PropertyViewBoolean extends React.Component<IPropertyViewHandlerProps<boolean, IPropertyViewBooleanRendererProps>> {
+  constructor(props: IPropertyViewHandlerProps<boolean, IPropertyViewBooleanRendererProps>) {
     super(props);
   }
   public shouldComponentUpdate(
-    nextProps: IPropertyViewHandlerProps<IPropertyViewBooleanRendererProps>,
+    nextProps: IPropertyViewHandlerProps<boolean, IPropertyViewBooleanRendererProps>,
   ) {
     // This is optimized to only update for the thing it uses
     return this.props.useAppliedValue !== nextProps.useAppliedValue ||

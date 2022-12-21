@@ -54,7 +54,7 @@ function ForcefulRepairOfAriaLabelledByDueToMaterialUIBugNotWorking(props: any) 
   }, [props]);
 
   return (
-    <Select {...props} ref={ref} Form/>
+    <Select {...props} ref={ref}/>
   );
 }
 

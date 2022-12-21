@@ -205,12 +205,18 @@ function mergeIOTriggers(
   }
 
   const mergedTrigger: IOTriggerType = async (arg) => {
-    const originalUpdateResult = await triggerA(arg);
-    if (originalUpdateResult) {
-      return await triggerB({
+    const triggerAResult = await triggerA(arg);
+    if (triggerAResult) {
+      const triggerBResult = await triggerB({
         ...arg,
-        requestedUpdate: originalUpdateResult,
+        requestedUpdate: triggerAResult,
       });
+
+      if (triggerBResult) {
+        return triggerBResult;
+      }
+
+      return triggerAResult;
     } else {
       return await triggerB(arg);
     }

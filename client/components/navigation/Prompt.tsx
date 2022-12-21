@@ -63,8 +63,12 @@ interface PromptProps {
    * ignores any change when it detects a language change
    * note that this is not capable of determining if other stuff changes
    * it simply denies language changes
+   * 
+   * write your current location without language eg, if /en/location/this
+   * pass /location/this the trailing / is very important and it shall not end
+   * in / in order for a correct comparison to be performed
    */
-  ignoreSimpleLanguageChange?: boolean;
+  ignoreSimpleLanguageChangeFrom?: string;
 
   /**
    * detect a change yourself in the location
@@ -154,11 +158,16 @@ export default class Prompt extends React.PureComponent<PromptProps, PromptState
       let willBlock = true;
       if (this.props.customChange) {
         willBlock = this.props.customChange(location);
-      } else if (this.props.ignoreSimpleLanguageChange) {
-        const languageSrc = window.location.pathname.split("/")[1];
-        const languageTarget = location.pathname.split("/")[1];
+      } else if (this.props.ignoreSimpleLanguageChangeFrom) {
+        const splitted = location.pathname.split("/");
+        splitted.shift();
+        splitted.shift();
 
-        const urlIsSameWithoutLanguageConsidered = window.location.pathname.replace(languageSrc, languageTarget) === location.pathname;
+        while (splitted[splitted.length - 1] === "") {
+          splitted.pop();
+        }
+
+        const urlIsSameWithoutLanguageConsidered = (splitted.join("/") + location.search) === this.props.ignoreSimpleLanguageChangeFrom;
         willBlock = !urlIsSameWithoutLanguageConsidered;
       }
 

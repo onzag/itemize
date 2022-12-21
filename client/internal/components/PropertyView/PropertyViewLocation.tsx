@@ -66,10 +66,10 @@ export function isCenterBasicallyEquals(one: [number, number], two: [number, num
  * The property view location handler class
  */
 export class PropertyViewLocation extends React.Component<
-  IPropertyViewHandlerProps<IPropertyViewLocationRendererProps>,
+  IPropertyViewHandlerProps<IPropertyDefinitionSupportedLocationType, IPropertyViewLocationRendererProps>,
   IPropertyViewLocationRendererState
 > {
-  constructor(props: IPropertyViewHandlerProps<IPropertyViewLocationRendererProps>) {
+  constructor(props: IPropertyViewHandlerProps<IPropertyDefinitionSupportedLocationType, IPropertyViewLocationRendererProps>) {
     super(props);
 
     const value = (
@@ -92,7 +92,7 @@ export class PropertyViewLocation extends React.Component<
     this.onResetViewportCenter = this.onResetViewportCenter.bind(this);
   }
   public componentDidUpdate(
-    prevProps: IPropertyViewHandlerProps<IPropertyViewLocationRendererProps>,
+    prevProps: IPropertyViewHandlerProps<IPropertyDefinitionSupportedLocationType, IPropertyViewLocationRendererProps>,
   ) {
     const oldValue = (
       prevProps.useAppliedValue ?
@@ -146,7 +146,7 @@ export class PropertyViewLocation extends React.Component<
     }
   }
   public shouldComponentUpdate(
-    nextProps: IPropertyViewHandlerProps<IPropertyViewLocationRendererProps>,
+    nextProps: IPropertyViewHandlerProps<IPropertyDefinitionSupportedLocationType, IPropertyViewLocationRendererProps>,
     nextState: IPropertyViewLocationRendererState,
   ) {
     // This is optimized to only update for the thing it uses

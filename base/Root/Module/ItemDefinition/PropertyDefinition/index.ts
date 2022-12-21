@@ -278,7 +278,7 @@ export interface IPropertyDefinitionInvalidRuleDataType {
 /**
  * This is the state you receive from a property once you request it
  */
-export interface IPropertyDefinitionState {
+export interface IPropertyDefinitionState<T extends PropertyDefinitionSupportedType> {
   /**
    * whether this value was user set
    */
@@ -307,7 +307,7 @@ export interface IPropertyDefinitionState {
    * the value that the property currently has, it can be different from state
    * values because 
    */
-  value: PropertyDefinitionSupportedType;
+  value: T;
   /**
    * an internal value that can be used for state management
    * usually used only by react in order to keep its internal state, internal
@@ -329,7 +329,7 @@ export interface IPropertyDefinitionState {
    * function and it might differ from the state value as the user modifies it, this is
    * the original value
    */
-  stateAppliedValue: PropertyDefinitionSupportedType;
+  stateAppliedValue: T;
   /**
    * whether the state value has been modified by any external force, either programatically
    * or not, this will usually be true for any value other than null, usually becomes true
@@ -942,10 +942,10 @@ export default class PropertyDefinition {
 
   private canCacheState: boolean;
   public stateLastCached: {
-    [slotId: string]: IPropertyDefinitionState;
+    [slotId: string]: IPropertyDefinitionState<PropertyDefinitionSupportedType>;
   };
   public stateLastCachedWithExternal: {
-    [slotId: string]: IPropertyDefinitionState;
+    [slotId: string]: IPropertyDefinitionState<PropertyDefinitionSupportedType>;
   }
 
   /**
@@ -1033,9 +1033,9 @@ export default class PropertyDefinition {
    * @returns an object that specifies whether the value is enforced, and the value itself if true
    * the value can be null
    */
-  public getEnforcedValue(id: string, version: string): {
+  public getEnforcedValue<T extends PropertyDefinitionSupportedType>(id: string, version: string): {
     enforced: boolean;
-    value?: PropertyDefinitionSupportedType;
+    value?: T;
   } {
     const mergedID = id + "." + (version || "");
     // first we check if there is any possibility
@@ -1080,7 +1080,7 @@ export default class PropertyDefinition {
         // we return the value that was set to be
         return {
           enforced: true,
-          value: enforcedValue,
+          value: enforcedValue as T,
         };
       }
     }
@@ -1179,9 +1179,9 @@ export default class PropertyDefinition {
    * @param verson the slot version
    * @returns the current value
    */
-  public getCurrentValue(id: string, version: string): PropertyDefinitionSupportedType {
+  public getCurrentValue<T extends PropertyDefinitionSupportedType>(id: string, version: string): T {
     // first we check for a possible enforced value
-    const possibleEnforcedValue = this.getEnforcedValue(id, version);
+    const possibleEnforcedValue = this.getEnforcedValue<T>(id, version);
 
     // if we have one
     if (possibleEnforcedValue.enforced) {
@@ -1216,11 +1216,11 @@ export default class PropertyDefinition {
         }
       }
 
-      return typeof defaultValue === "undefined" ? null : defaultValue;
+      return (typeof defaultValue === "undefined" ? null : defaultValue) as T;
     }
 
     // if nothing apply we return the state value or null
-    return nullIfUndefined(this.stateValue[mergedID]);
+    return nullIfUndefined(this.stateValue[mergedID] as T);
   }
 
   /**
@@ -1229,12 +1229,12 @@ export default class PropertyDefinition {
    * @param version the version
    * @returns the applied value
    */
-  public getAppliedValue(
+  public getAppliedValue<T extends PropertyDefinitionSupportedType>(
     id: string,
     version: string,
-  ) {
+  ): T {
     const mergedID = id + "." + (version || "");
-    return nullIfUndefined(this.stateAppliedValue[mergedID]);
+    return nullIfUndefined<T>(this.stateAppliedValue[mergedID] as T);
   }
 
   /**
@@ -1245,28 +1245,28 @@ export default class PropertyDefinition {
    * @param version the slot version
    * @returns the current value state
    */
-  public getStateNoExternalChecking(
+  public getStateNoExternalChecking<T extends PropertyDefinitionSupportedType>(
     id: string,
     version: string,
     emulateExternalChecking?: boolean,
-  ): IPropertyDefinitionState {
+  ): IPropertyDefinitionState<T> {
     const mergedID = id + "." + (version || "");
     const mergedIDWithoutExternal = id + "." + (version || "") + "." + (emulateExternalChecking ? "t" : "f");
     if (
       this.canCacheState &&
       this.stateLastCached[mergedIDWithoutExternal]
     ) {
-      return this.stateLastCached[mergedIDWithoutExternal];
+      return this.stateLastCached[mergedIDWithoutExternal] as IPropertyDefinitionState<T>;
     }
 
-    const possibleEnforcedValue = this.getEnforcedValue(id, version);
+    const possibleEnforcedValue = this.getEnforcedValue<T>(id, version);
 
     if (possibleEnforcedValue.enforced) {
       const possibleInvalidEnforcedReason = this.isValidValueNoExternalChecking(
         id, version, possibleEnforcedValue.value, emulateExternalChecking,
       );
       // we return the value that was set to be
-      const stateValue: IPropertyDefinitionState = {
+      const stateValue: IPropertyDefinitionState<T> = {
         userSet: false,
         enforced: true,
         default: false,
@@ -1290,7 +1290,7 @@ export default class PropertyDefinition {
     // make if hidden if null if hidden is set to true
     // note nulls set this way are always valid
     if (this.rawData.nullIfHidden && this.isCurrentlyHidden(id, version)) {
-      const stateValue: IPropertyDefinitionState = {
+      const stateValue: IPropertyDefinitionState<T> = {
         userSet: false,
         enforced: true,
         default: false,
@@ -1311,9 +1311,9 @@ export default class PropertyDefinition {
       return stateValue;
     }
 
-    const value = this.getCurrentValue(id, version);
+    const value = this.getCurrentValue<T>(id, version);
     const invalidReason = this.isValidValueNoExternalChecking(id, version, value, emulateExternalChecking);
-    const stateValue: IPropertyDefinitionState = {
+    const stateValue: IPropertyDefinitionState<T> = {
       userSet: this.stateValueModified[mergedID] || false,
       enforced: false,
       default: !this.stateValueModified[mergedID],
@@ -1341,11 +1341,11 @@ export default class PropertyDefinition {
    * @param version the version
    * @returns a promise for the current value state
    */
-  public async getState(id: string, version: string): Promise<IPropertyDefinitionState> {
+  public async getState<T extends PropertyDefinitionSupportedType>(id: string, version: string): Promise<IPropertyDefinitionState<T>> {
 
     const mergedID = id + "." + (version || "");
     if (this.canCacheState && this.stateLastCachedWithExternal[mergedID]) {
-      return this.stateLastCachedWithExternal[mergedID];
+      return this.stateLastCachedWithExternal[mergedID] as any;
     }
 
     // containsAnExternallyCheckedProperty
@@ -1355,7 +1355,7 @@ export default class PropertyDefinition {
       this.canCacheState &&
       (this.stateLastCached[mergedID + ".f"] || this.stateLastCached[mergedID + ".t"])
     ) {
-      return (this.stateLastCached[mergedID + ".f"] || this.stateLastCached[mergedID + ".t"]);
+      return (this.stateLastCached[mergedID + ".f"] || this.stateLastCached[mergedID + ".t"]) as any;
     }
 
     // noticed how it is possible that the enforced value changes
@@ -1368,24 +1368,24 @@ export default class PropertyDefinition {
     // value that we checked by the is valid value function
     let possibleEnforcedValue: {
       enforced: boolean,
-      value?: PropertyDefinitionSupportedType,
+      value?: T,
     } = null;
     // and here we will store what comes later
     let nextPossibleEnforcedValue: {
       enforced: boolean,
-      value?: PropertyDefinitionSupportedType,
+      value?: T,
     } = null;
 
     // and we enter a loop here
     do {
       // we pick either what was our next or we get a new value for our current
-      possibleEnforcedValue = nextPossibleEnforcedValue || this.getEnforcedValue(id, version);
+      possibleEnforcedValue = nextPossibleEnforcedValue || this.getEnforcedValue<T>(id, version);
       // and if it's enforced
       if (possibleEnforcedValue.enforced) {
         // we do the async check
         possibleInvalidEnforcedReason = await this.isValidValue(id, version, possibleEnforcedValue.value);
         // and then we get our next value
-        nextPossibleEnforcedValue = this.getEnforcedValue(id, version);
+        nextPossibleEnforcedValue = this.getEnforcedValue<T>(id, version);
       }
 
       // we will loop if there's a next value as in, it was enforced as well
@@ -1398,7 +1398,7 @@ export default class PropertyDefinition {
 
     if (possibleEnforcedValue.enforced) {
       // we return the value that was set to be
-      const stateValue: IPropertyDefinitionState = {
+      const stateValue: IPropertyDefinitionState<T> = {
         userSet: false,
         enforced: true,
         default: false,
@@ -1422,7 +1422,7 @@ export default class PropertyDefinition {
     // make if hidden if null if hidden is set to true
     // note nulls set this way are always valid
     if (this.rawData.nullIfHidden && this.isCurrentlyHidden(id, version)) {
-      const stateValue: IPropertyDefinitionState = {
+      const stateValue: IPropertyDefinitionState<T> = {
         userSet: false,
         enforced: true,
         default: false,
@@ -1446,21 +1446,21 @@ export default class PropertyDefinition {
     let invalidReason: string = null;
 
     // we do the same as in our enforced
-    let currentValue: PropertyDefinitionSupportedType;
+    let currentValue: T;
     // and here we will store what comes later
-    let nextValue: PropertyDefinitionSupportedType;
+    let nextValue: T;
 
     do {
-      currentValue = typeof nextValue === "undefined" ? this.getCurrentValue(id, version) : nextValue;
+      currentValue = typeof nextValue === "undefined" ? this.getCurrentValue<T>(id, version) : nextValue;
       invalidReason = await this.isValidValue(id, version, currentValue);
-      nextValue = this.getCurrentValue(id, version);
+      nextValue = this.getCurrentValue<T>(id, version);
       // we will loop if there's a next value as in, it was enforced as well
       // and if something changed during the event
     } while (
       nextValue !== currentValue
     );
 
-    const stateValue: IPropertyDefinitionState = {
+    const stateValue: IPropertyDefinitionState<T> = {
       userSet: this.stateValueModified[mergedID] || false,
       enforced: false,
       default: !this.stateValueModified[mergedID],

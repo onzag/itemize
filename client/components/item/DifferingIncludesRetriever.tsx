@@ -15,7 +15,7 @@ import equals from "deep-equal";
  * The differing include info is the argument that is
  * passed to specify each include that has differed, where
  */
-interface IDifferingIncludeInfo {
+export interface IDifferingIncludeInfo {
   /**
    * this is the id of the include
    */

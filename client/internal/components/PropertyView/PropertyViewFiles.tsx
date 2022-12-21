@@ -52,15 +52,15 @@ export interface IPropertyViewFilesRendererProps extends IPropertyViewRendererPr
 
 export default class PropertyViewFile
   extends React.Component<
-    IPropertyViewHandlerProps<IPropertyViewFilesRendererProps>
+    IPropertyViewHandlerProps<PropertyDefinitionSupportedFilesType, IPropertyViewFilesRendererProps>
   > {
-  constructor(props: IPropertyViewHandlerProps<IPropertyViewFilesRendererProps>) {
+  constructor(props: IPropertyViewHandlerProps<PropertyDefinitionSupportedFilesType, IPropertyViewFilesRendererProps>) {
     super(props);
 
     this.openFile = this.openFile.bind(this);
   }
   public shouldComponentUpdate(
-    nextProps: IPropertyViewHandlerProps<IPropertyViewFilesRendererProps>,
+    nextProps: IPropertyViewHandlerProps<PropertyDefinitionSupportedFilesType, IPropertyViewFilesRendererProps>,
   ) {
     // This is optimized to only update for the thing it uses
     return this.props.useAppliedValue !== nextProps.useAppliedValue ||

@@ -32,12 +32,12 @@ export interface IPropertyViewSimpleRendererProps extends IPropertyViewRendererP
 /**
  * The property view simple class
  */
-export class PropertyViewSimple extends React.Component<IPropertyViewHandlerProps<IPropertyViewSimpleRendererProps>> {
-  constructor(props: IPropertyViewHandlerProps<IPropertyViewSimpleRendererProps>) {
+export class PropertyViewSimple extends React.Component<IPropertyViewHandlerProps<any, IPropertyViewSimpleRendererProps>> {
+  constructor(props: IPropertyViewHandlerProps<any, IPropertyViewSimpleRendererProps>) {
     super(props);
   }
   public shouldComponentUpdate(
-    nextProps: IPropertyViewHandlerProps<IPropertyViewSimpleRendererProps>,
+    nextProps: IPropertyViewHandlerProps<any, IPropertyViewSimpleRendererProps>,
   ) {
     // This is optimized to only update for the thing it uses
     return this.props.useAppliedValue !== nextProps.useAppliedValue ||

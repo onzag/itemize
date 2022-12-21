@@ -8,7 +8,7 @@
 import React from "react";
 import SubmitActioner, { ISubmitActionerInfoArgType } from "../item/SubmitActioner";
 import DifferingPropertiesRetriever from "../item/DifferingPropertiesRetriever";
-import DifferingIncludesRetriever from "../item/DifferingIncludesRetriever";
+import DifferingIncludesRetriever, { IDifferingIncludeInfo } from "../item/DifferingIncludesRetriever";
 import Prompt, { PromptDialogComponent } from "./Prompt";
 import { IActionSubmitOptions, IActionSubmitResponse } from "../../providers/item";
 import { EndpointErrorType } from "../../../base/errors";
@@ -38,13 +38,22 @@ interface NeedsSubmitPromptProps {
   /**
    * called when submit was confirmed and it's about to submit
    */
-  onConfirmationSubmit?: (defaultAction: () => Promise<EndpointErrorType>) => Promise<EndpointErrorType>;
+  onConfirmationSubmit?: (
+    defaultAction: () => Promise<EndpointErrorType>,
+    actioner: ISubmitActionerInfoArgType,
+    differingProperties: string[],
+    differingIncludes: IDifferingIncludeInfo[],
+  ) => Promise<EndpointErrorType>;
   /**
    * ignores any change when it detects a language change
    * note that this is not capable of determining if other stuff changes
    * it simply denies language changes
+   * 
+   * write your current location without language eg, if /en/location/this
+   * pass /location/this the trailing / is very important and it shall not end
+   * in / in order for a correct comparison to be performed
    */
-  ignoreSimpleLanguageChange?: boolean;
+  ignoreSimpleLanguageChangeFrom?: string;
 
   /**
    * detect a change yourself in the location
@@ -73,12 +82,27 @@ interface NeedsSubmitPromptProps {
  * was not completed as changes are unsaved
  */
 export default class NeedsSubmitPrompt extends React.PureComponent<NeedsSubmitPromptProps> {
+  private promptRef = React.createRef<Prompt>();
+
+  constructor(props: NeedsSubmitPromptProps) {
+    super(props);
+
+    // typical annoyance of javascript
+    this.discardDialog = this.discardDialog.bind(this);
+  }
+
   /**
    * Performs the actioner callback that the Prompt component expects
    * @param actioner the submit actioner arg
    * @returns a promise for an error (or null)
    */
-  public async confirmationCallback(when: boolean, whenOther: boolean, actioner: ISubmitActionerInfoArgType): Promise<EndpointErrorType> {
+  public async confirmationCallback(
+    differingProperties: string[],
+    differingIncludes: IDifferingIncludeInfo[],
+    when: boolean,
+    whenOther: boolean,
+    actioner: ISubmitActionerInfoArgType,
+  ): Promise<EndpointErrorType> {
     const defaultAction = async () => {
       const response: IActionSubmitResponse = await actioner.submit(this.props.confirmationSubmitOptions);
       if (response.error) {
@@ -89,9 +113,9 @@ export default class NeedsSubmitPrompt extends React.PureComponent<NeedsSubmitPr
     }
     if (this.props.onConfirmationSubmit) {
       if (when) {
-        return this.props.onConfirmationSubmit(defaultAction);
+        return this.props.onConfirmationSubmit(defaultAction, actioner, differingProperties, differingIncludes);
       }
-      return this.props.onConfirmationSubmit(() => null);
+      return this.props.onConfirmationSubmit(() => null, actioner, differingProperties, differingIncludes);
     }
 
     return defaultAction();
@@ -103,18 +127,19 @@ export default class NeedsSubmitPrompt extends React.PureComponent<NeedsSubmitPr
    * @param when the condition of the prompt
    * @returns a react component
    */
-  public buildPrompt(when: boolean, whenOther: boolean) {
+  public buildPrompt(differingProperties: string[], differingIncludes: IDifferingIncludeInfo[], when: boolean, whenOther: boolean) {
     return (
       <SubmitActioner>
         {(actioner) => (
           <Prompt
-            when={when || whenOther}
+            ref={this.promptRef}
+            when={!!(when || whenOther)}
             beforeUnloadMessage={this.props.beforeUnloadMessage}
-            ignoreSimpleLanguageChange={this.props.ignoreSimpleLanguageChange}
+            ignoreSimpleLanguageChangeFrom={this.props.ignoreSimpleLanguageChangeFrom}
             customChange={this.props.customChange}
             Dialog={this.props.Dialog}
             dialogArgs={this.props.dialogArgs}
-            confirmationCallback={this.confirmationCallback.bind(this, when, whenOther, actioner)}
+            confirmationCallback={this.confirmationCallback.bind(this, differingProperties, differingIncludes, when, whenOther, actioner)}
             confirmationCallbackError={actioner.submitError}
             confirmationCallbackConfirming={actioner.submitting}
             confirmationCallbackCleanError={actioner.dismissError}
@@ -123,6 +148,13 @@ export default class NeedsSubmitPrompt extends React.PureComponent<NeedsSubmitPr
         }
       </SubmitActioner>
     )
+  }
+
+  /**
+   * Closes the dialog manually and performs the prompt execution that is expected
+   */
+  public discardDialog() {
+    this.promptRef.current && this.promptRef.current.discardDialog();
   }
 
   /**
@@ -145,7 +177,7 @@ export default class NeedsSubmitPrompt extends React.PureComponent<NeedsSubmitPr
 
     // otherwise if no includes
     if (noIncludes && noProperties) {
-      return this.buildPrompt(false, this.props.other);
+      return this.buildPrompt(null, null, false, this.props.other);
     } else if (noIncludes) {
       // we now use our differing properties retriever with the main properties
       // and as such, we can pass the condition as the differing properties argument
@@ -154,7 +186,7 @@ export default class NeedsSubmitPrompt extends React.PureComponent<NeedsSubmitPr
       return (
         <DifferingPropertiesRetriever mainProperties={this.props.properties}>
           {(differingProperties) => (
-            this.buildPrompt(!!(differingProperties && differingProperties.length), this.props.other)
+            this.buildPrompt(differingProperties, null, !!(differingProperties && differingProperties.length), this.props.other)
           )}
         </DifferingPropertiesRetriever>
       );
@@ -163,7 +195,7 @@ export default class NeedsSubmitPrompt extends React.PureComponent<NeedsSubmitPr
       return (
         <DifferingIncludesRetriever mainIncludes={this.props.includes}>
           {(differingIncludes) => (
-            this.buildPrompt(!!(differingIncludes && differingIncludes.length), this.props.other)
+            this.buildPrompt(null, differingIncludes, !!(differingIncludes && differingIncludes.length), this.props.other)
           )}
         </DifferingIncludesRetriever>
       );
@@ -175,6 +207,8 @@ export default class NeedsSubmitPrompt extends React.PureComponent<NeedsSubmitPr
           <DifferingIncludesRetriever mainIncludes={this.props.includes}>
             {(differingIncludes) => (
               this.buildPrompt(
+                differingProperties,
+                differingIncludes,
                 !!(differingIncludes && differingIncludes.length) ||
                 !!(differingProperties && differingProperties.length),
                 this.props.other

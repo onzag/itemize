@@ -833,7 +833,7 @@ export class Cache {
       if (pDef.isTracked()) {
         propertyMap.push({
           id: pDef.getId(),
-          newValue: value[pDef.getId()] || null,
+          newValue: typeof value[pDef.getId()] === "undefined" ? pDef.getId() : null,
           originalValue: null,
         });
       }
@@ -1537,10 +1537,10 @@ export class Cache {
     const propertyMap: IPropertyMapElement[] = [];
     itemDefinition.getAllPropertyDefinitionsAndExtensions().forEach((pDef) => {
       if (pDef.isTracked()) {
-        const currentValue = currentSQLValue[pDef.getId()] || null;
+        const currentValue = typeof currentSQLValue[pDef.getId()] === "undefined" ? null : currentSQLValue[pDef.getId()] ;
         propertyMap.push({
           id: pDef.getId(),
-          newValue: (update[pDef.getId()] as string) || currentValue,
+          newValue: typeof update[pDef.getId()] as string === "undefined" ? currentValue : update[pDef.getId()],
           originalValue: currentValue,
         });
       }

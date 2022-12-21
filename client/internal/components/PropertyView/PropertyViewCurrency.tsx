@@ -56,12 +56,12 @@ export interface IPropertyViewCurrencyRendererProps extends IPropertyViewRendere
   convertedCurrency: ICurrencyType;
 }
 
-export class PropertyViewCurrency extends React.Component<IPropertyViewHandlerProps<IPropertyViewCurrencyRendererProps>> {
-  constructor(props: IPropertyViewHandlerProps<IPropertyViewCurrencyRendererProps>) {
+export class PropertyViewCurrency extends React.Component<IPropertyViewHandlerProps<IPropertyDefinitionSupportedCurrencyType, IPropertyViewCurrencyRendererProps>> {
+  constructor(props: IPropertyViewHandlerProps<IPropertyDefinitionSupportedCurrencyType, IPropertyViewCurrencyRendererProps>) {
     super(props);
   }
   public shouldComponentUpdate(
-    nextProps: IPropertyViewHandlerProps<IPropertyViewCurrencyRendererProps>,
+    nextProps: IPropertyViewHandlerProps<IPropertyDefinitionSupportedCurrencyType, IPropertyViewCurrencyRendererProps>,
   ) {
     // This is optimized to only update for the thing it uses
     return this.props.useAppliedValue !== nextProps.useAppliedValue ||

@@ -4,11 +4,11 @@ import Reader from "./Reader";
 import React from "react";
 import equals from "deep-equal";
 
-interface IPropertyReadOneProp extends Omit<IPropertyReadProps, 'children'> {
+interface IPropertyReadOneProp<T extends PropertyDefinitionSupportedType> extends Omit<IPropertyReadProps<T>, 'children'> {
 }
 
 interface IReaderManyProps {
-  data: Array<IPropertyReadOneProp | string>;
+  data: Array<IPropertyReadOneProp<PropertyDefinitionSupportedType> | string>;
   useAppliedValue?: boolean;
   children?: (...values: PropertyDefinitionSupportedType[]) => React.ReactNode;
 }
@@ -48,7 +48,7 @@ class ReaderManyInternal extends React.Component<IReaderManyInternalProps> {
       return this.props.children(...this.props.accumulated);
     }
 
-    let current: IPropertyReadOneProp = this.props.data[0] as IPropertyReadOneProp;
+    let current: IPropertyReadOneProp<any> = this.props.data[0] as IPropertyReadOneProp<any>;
     if (typeof current === "string") {
       current = {
         id: current,

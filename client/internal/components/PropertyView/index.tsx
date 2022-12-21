@@ -37,7 +37,7 @@ import { TokenContext, ITokenContextType } from "../../../../client/internal/pro
  * 
  * Expect these to be extended
  */
-export interface IPropertyViewRendererProps<ValueType> extends IRendererProps {
+export interface IPropertyViewRendererProps<ValueType extends PropertyDefinitionSupportedType> extends IRendererProps {
   /**
    * The current value to be displayed
    */
@@ -48,7 +48,7 @@ export interface IPropertyViewRendererProps<ValueType> extends IRendererProps {
  * This is what the main handler recieves and every handler that works
  * under it will receive as well
  */
-export interface IPropertyViewMainHandlerProps<RendererPropsType> {
+export interface IPropertyViewMainHandlerProps<ValueType extends PropertyDefinitionSupportedType, RendererPropsType> {
   /**
    * A current container id where the things are currently stored
    * this value can be null for new items as it only expresses where things
@@ -107,7 +107,7 @@ export interface IPropertyViewMainHandlerProps<RendererPropsType> {
    * Automatically Provided check base.tsx
    * filtered for this specific property from the item-definition.tsx context state value
    */
-  state: IPropertyDefinitionState;
+  state: IPropertyDefinitionState<ValueType>;
   /**
    * Use applied value rather than the actual
    * value
@@ -149,7 +149,8 @@ export interface IPropertyViewMainHandlerProps<RendererPropsType> {
  * Views handlers that are standard will receive these props that actually
  * include these attributes added to the main ones
  */
-export interface IPropertyViewHandlerProps<RendererPropsType> extends IPropertyViewMainHandlerProps<RendererPropsType> {
+export interface IPropertyViewHandlerProps<ValueType extends PropertyDefinitionSupportedType, RendererPropsType>
+  extends IPropertyViewMainHandlerProps<ValueType, RendererPropsType> {
   /**
    * Config is a conditional include that will pass the config to the handler
    * 
@@ -248,7 +249,7 @@ interface IRendererHandlerType {
    * note how the handler uses the IPropertyViewHandlerProps so that
    * it should consume the interface before us
    */
-  handler: React.ComponentType<IPropertyViewHandlerProps<IPropertyViewRendererProps<PropertyDefinitionSupportedType>>>,
+  handler: React.ComponentType<IPropertyViewHandlerProps<PropertyDefinitionSupportedType, IPropertyViewRendererProps<PropertyDefinitionSupportedType>>>,
 
   /**
    * Whether the handler should include the conditional configuration
@@ -428,7 +429,7 @@ export function RawBasePropertyView(props: {
 
 
 export default function PropertyView(
-  props: IPropertyViewMainHandlerProps<IPropertyViewRendererProps<PropertyDefinitionSupportedType>>,
+  props: IPropertyViewMainHandlerProps<PropertyDefinitionSupportedType, IPropertyViewRendererProps<PropertyDefinitionSupportedType>>,
 ) {
   if (props.state.hidden && !props.displayHidden) {
     return null;

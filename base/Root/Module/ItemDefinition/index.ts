@@ -34,7 +34,7 @@ import { countries } from "../../../../imported-resources";
 import Root, { ICustomRoleManager, IRequestLimitersType } from "../../../Root";
 import { transferrableToBlob, blobToTransferrable, fileURLAbsoluter } from "../../../../util";
 import type { IConfigRawJSONDataType } from "../../../../config";
-import type { IElasticHighlightRecordInfo } from "./PropertyDefinition/types";
+import type { IElasticHighlightRecordInfo, PropertyDefinitionSupportedType } from "./PropertyDefinition/types";
 
 export interface IItemSearchStateHighlightType {
   [pId: string]: string[];
@@ -369,7 +369,7 @@ export interface IItemDefinitionRawJSONDataType {
  * Represents the state of policies for a given type
  */
 export interface IPolicyStateType {
-  [policyName: string]: IPropertyDefinitionState[];
+  [policyName: string]: IPropertyDefinitionState<PropertyDefinitionSupportedType>[];
 }
 
 /**
@@ -405,7 +405,7 @@ export interface IItemStateType {
   /**
    * All the states of the properties included
    */
-  properties: IPropertyDefinitionState[];
+  properties: IPropertyDefinitionState<PropertyDefinitionSupportedType>[];
   /**
    * All the policies state
    */
@@ -534,7 +534,7 @@ function recoverBlobFiles(
 }
 
 async function resolveFiles(
-  p: IPropertyDefinitionState,
+  p: IPropertyDefinitionState<PropertyDefinitionSupportedType>,
   include: string,
   originalState: IItemStateType,
   root: Root,

@@ -170,7 +170,7 @@ class ActualPokeActioner extends React.Component<IActualPokeActionerProps> {
       if (!policyTypeSpace) {
         return false;
       }
-      const policyState = policyTypeSpace[ppath[1]] as IPropertyDefinitionState[];
+      const policyState = policyTypeSpace[ppath[1]] as IPropertyDefinitionState<any>[];
       if (!policyState || !policyState.length) {
         return false;
       }

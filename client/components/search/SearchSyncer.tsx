@@ -1,11 +1,11 @@
-import React, { useRef, useCallback, useEffect, useState } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import type { EndpointErrorType } from "../../../base/errors";
 import type { IGQLValue } from "../../../gql-querier";
-import CacheWorkerInstance from "../../internal/workers/cache";
 import { IActionResponseWithSearchResults, IActionSearchOptions, ItemProvider } from "../../providers/item";
 import { ModuleProvider } from "../../providers/module";
 import { IBaseSyncerHandle, useHandleMechanism } from "../util/BaseSyncer";
 import { IPropertySetterProps } from "../property/base";
+import { PropertyDefinitionSupportedType } from "../../../base/Root/Module/ItemDefinition/PropertyDefinition/types";
 
 interface ISearchSyncerProps {
   id: string;
@@ -33,7 +33,7 @@ interface ISearchSyncerProps {
  * Setters for setting values for the properties within the item definition
  * itself, useful not to depend on mounting at time
  */
-  setters?: IPropertySetterProps[];
+  setters?: IPropertySetterProps<PropertyDefinitionSupportedType>[];
   /**
    * for the item provider
    * only downloads and includes the properties specified in the list

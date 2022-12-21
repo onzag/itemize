@@ -44,6 +44,7 @@ import { TokenContext } from "../../../internal/providers/token-provider";
 import { UNSPECIFIED_OWNER } from "../../../../constants";
 import type { ITagListSuggestion } from "../../renderers/PropertyEntry/PropertyEntryTagList";
 import Setter from "../../../components/property/Setter";
+import { PropertyDefinitionSupportedType } from "../../../../base/Root/Module/ItemDefinition/PropertyDefinition/types";
 
 const style = {
   flex: {
@@ -358,7 +359,7 @@ function ActualMailSender(props: IActualMailSenderProps) {
     }
   }, [props.objectsNameResolver, props.objectsInvalidLabel, props.userNameProperties, props.userInvalidLabel])
 
-  const prefills: IPropertySetterProps[] = [];
+  const prefills: IPropertySetterProps<PropertyDefinitionSupportedType>[] = [];
   if (props.targetPrefill) {
     prefills.push({
       id: "target",
