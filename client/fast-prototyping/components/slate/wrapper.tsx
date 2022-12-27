@@ -176,7 +176,7 @@ const style = {
     return Object.assign(filledVariant, {
       "flex": "1 1 100%",
       "position": "relative" as "relative",
-      "padding": isRichText ? "1rem" : "0 1rem 1rem 1rem",
+      "padding": isRichText || variant === "outlined" ? "1rem" : "0 1rem 1rem 1rem",
     });
   },
   outlineContainer: (focused: boolean, invalid: boolean) => {
@@ -566,7 +566,7 @@ function elementFastKeyReturn(
       groupPosition={-1}
       label={fastKey === "escape" ? "esc" : null}
       tabbable={fastKey !== "escape"}
-      useTransform={useStyleTransform}
+      useTransform={useStyleTransform ? "close" : null}
       triggerAltAfterAction={useTriggerAltAfterAction}
       selector="button"
     >
@@ -1921,8 +1921,11 @@ export class MaterialUISlateWrapper extends React.PureComponent<IMaterialUISlate
       box = (
         <AltBadgeReactioner
           priority={this.props.state.currentSelectedElement ? "ALWAYS_ON_TOP_KEEP_FLOW" : this.props.reactionerPriority}
-          reactionKey={this.props.state.currentSelectedElement ? "escape" : (this.props.reactionerKey || "t")}
-          label={this.props.state.currentSelectedElement ? "esc" : null}
+          reactionKey={
+            this.props.state.isRichText &&
+            this.props.state.currentSelectedElement ? "escape" : (this.props.reactionerKey || "t")}
+          label={this.props.state.isRichText &&
+            this.props.state.currentSelectedElement ? "esc" : null}
           tabbable={!this.props.state.currentSelectedElement}
           useInFlow={this.props.reactionerUseInFlow}
           action="focus"

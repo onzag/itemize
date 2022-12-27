@@ -6,7 +6,7 @@
  * @module
  */
 
-import React from "react";
+import React, { useContext } from "react";
 import { EndpointErrorType } from "../../../base/errors";
 import { LocaleContext, ILocaleContextType } from "../../internal/providers/locale-provider";
 import { DataContext } from "../../internal/providers/appdata-provider";
@@ -24,7 +24,7 @@ const isDevelopment = process.env.NODE_ENV === "development";
 /**
  * the error props that the error displayer needs to take
  */
-export interface II18nReadErrorProps {
+export interface II18nReadErrorOptions {
   /**
    * The error on itself, most itemize errors are of this type
    * so they can be displayed by passing it here
@@ -34,6 +34,13 @@ export interface II18nReadErrorProps {
    * Whether the error message should be capitalized
    */
   capitalize?: boolean;
+}
+
+
+/**
+ * the error props that the error displayer needs to take
+ */
+export interface II18nReadErrorProps extends II18nReadErrorOptions {
   /**
    * the children that passes the value to the consumer
    */
@@ -102,7 +109,7 @@ function i18nReadErrorInternal(
       console.warn("failed to display error due to includeIdItemDefPath", freeError);
       return null;
     }
-  // otherwise if we have this itemDefPath we would use that one instead
+    // otherwise if we have this itemDefPath we would use that one instead
   } else if (freeError.itemDefPath) {
     try {
       itemDef = mod.getItemDefinitionFor(freeError.itemDefPath);
@@ -161,7 +168,7 @@ function i18nReadErrorInternal(
     // and return accordingly
     return props.children ? props.children(i18nErrorValue) : i18nErrorValue;
 
-  // now for the case of polices
+    // now for the case of polices
   } else if (freeError.policyType) {
     // we just get the info from the itemDef
     const i18nData = itemDef.getI18nDataFor(localeContext.language);
@@ -231,14 +238,14 @@ export default function I18nReadError(props: II18nReadErrorProps) {
           // so that the data context is unecessary
           if (!freeError.modulePath) {
             return (
-              <I18nReadErrorInternalOptimized {...props} root={null} localeContext={localeData}/>
+              <I18nReadErrorInternalOptimized {...props} root={null} localeContext={localeData} />
             );
           }
           return (
             <DataContext.Consumer>
               {
                 (data) => (
-                  <I18nReadErrorInternalOptimized {...props} root={data.value} localeContext={localeData}/>
+                  <I18nReadErrorInternalOptimized {...props} root={data.value} localeContext={localeData} />
                 )
               }
             </DataContext.Consumer>
@@ -246,5 +253,25 @@ export default function I18nReadError(props: II18nReadErrorProps) {
         }
       }
     </LocaleContext.Consumer>
+  );
+}
+
+/**
+ * The i18n read error as a react hook
+ * @param options 
+ * @returns 
+ */
+export function useI18nReadError(options: II18nReadErrorOptions): React.ReactNode {
+  const localeContext = useContext(LocaleContext);
+  const data = useContext(DataContext);
+
+  if (options.error === null) {
+    return null;
+  };
+
+  return i18nReadErrorInternal(
+    localeContext,
+    data.value,
+    options,
   );
 }

@@ -32,9 +32,25 @@ const style = {
       borderColor: "#f9a825 !important",
     },
   },
-  transformed: {
+  transform_close: {
     "& > .MuiBadge-badge": {
       transform: "translateY(0px)",
+    }
+  },
+  transform_absolute: {
+    position: "absolute",
+    bottom: "50%",
+    width: 0,
+    height: 0,
+    left: "50%",
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "center",
+
+    "& > .MuiBadge-badge": {
+      transform: "none",
+      position: "relative",
+      height: "40px",
     }
   },
   fullWidth: {
@@ -56,7 +72,7 @@ interface IAltBadgeReactionerProps {
   /**
    * The children that is to be rendered inside
    */
-  children: React.ReactNode;
+  children?: React.ReactNode;
   /**
    * An alternative children to use when it's showing the selection
    */
@@ -124,7 +140,7 @@ interface IAltBadgeReactionerProps {
   /**
    * For stylistic purposes, uses a transform to keep the badge closer to the element
    */
-  useTransform?: boolean;
+  useTransform?: "close" | "absolute";
   /**
    * full width for the badge
    */
@@ -239,7 +255,7 @@ export function AltBadgeReactioner(
             (props.colorSchema || "default") === "default" ?
               (props.useInFlow ? style.badgeFastKeyFlow : style.badgeFastKey) :
               (props.useInFlow ? style.badgeFastKey2Flow : style.badgeFastKey2),
-            props.useTransform ? style.transformed : null,
+            props.useTransform ? style["transform_" + props.useTransform] : null,
             props.fullWidth ? style.fullWidth : null,
             displayed ? null : style.hidden,
             blocked ? style.blocked : null,

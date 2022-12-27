@@ -1275,6 +1275,7 @@ export class SlateEditor extends React.Component<ISlateEditorProps, ISlateEditor
     this.editor = withReact(withHistory(rawEditor));
 
     this.forceFocus = this.forceFocus.bind(this);
+    this.forceBlur = this.forceBlur.bind(this);
 
     // setting up the functions to override
     // the defaults
@@ -4650,6 +4651,24 @@ export class SlateEditor extends React.Component<ISlateEditorProps, ISlateEditor
             path,
           },
         });
+
+        // More bugs in slate still may reject to focus because slate
+        // can be very buggy
+        setTimeout(() => {
+          if (!this.state.focused) {
+            this.onFocusedChange(path, this.editor.children);
+          }
+        }, 20);
+      }
+    }, 20);
+  }
+
+  public forceBlur() {
+    // bug in slate sometimes it will not blur and just rejects to blur
+    // when another element has been blurred
+    setTimeout(() => {
+      if (this.state.focused) {
+        this.onBlurredChange(this.editor.children);
       }
     }, 20);
   }
@@ -4676,6 +4695,7 @@ export class SlateEditor extends React.Component<ISlateEditorProps, ISlateEditor
           disabled={this.props.disabled}
           style={{ scrollMarginTop: this.props.scrollMarginTop }}
           onFocus={this.forceFocus}
+          onBlur={this.forceBlur}
           aria-invalid={!!this.props.currentGeneralError}
           aria-errormessage={this.props.currentGeneralError}
           aria-describedby={this.props.currentDescribedBy}

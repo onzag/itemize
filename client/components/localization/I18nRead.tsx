@@ -5,7 +5,7 @@
  * @module
  */
 
-import React from "react";
+import React, { useContext } from "react";
 import { LocaleContext, ILocaleContextType } from "../../internal/providers/locale-provider";
 import { ItemContext } from "../../providers/item";
 import { localeReplacerToArray, localeReplacer } from "../../../util";
@@ -37,10 +37,7 @@ function loopForKeyAtTarget(target: any, keySplitted: string[]) {
   return result;
 }
 
-/**
- * The read props which takes the following data
- */
-export interface II18nReadProps {
+export interface I18nReadOptions {
   /**
    * The id to read, very context dependent
    * 
@@ -102,14 +99,20 @@ export interface II18nReadProps {
    */
   htmlWrappingTag?: string;
   /**
+   * Whether to capitalize the output
+   */
+  capitalize?: boolean;
+}
+
+/**
+ * The read props which takes the following data
+ */
+export interface II18nReadProps extends I18nReadOptions {
+  /**
    * The actually value is passed in this function, if required
    * otherwise it's just rendered
    */
   children?: (value: React.ReactNode) => React.ReactNode;
-  /**
-   * Whether to capitalize the output
-   */
-  capitalize?: boolean;
 }
 
 /**
@@ -422,5 +425,29 @@ export default function I18nRead(props: II18nReadProps) {
         )
       }
     </LocaleContext.Consumer>
+  );
+}
+
+/**
+ * The i18n read as a react hook
+ * @param options 
+ * @returns 
+ */
+export function useI18nRead(options: I18nReadOptions): React.ReactNode {
+  const localeContext = useContext(LocaleContext);
+  const moduleContextualValue = useContext(ModuleContext);
+  const itemContextualValue = useContext(ItemContext);
+  const includeContext = useContext(IncludeContext);
+
+  if (!options.id) {
+    return "MISSING ID";
+  };
+
+  return i18nReadInternal(
+    localeContext,
+    moduleContextualValue && moduleContextualValue.mod,
+    itemContextualValue && itemContextualValue.idef,
+    includeContext && includeContext.include,
+    options,
   );
 }
