@@ -5,7 +5,7 @@
  * @module
  */
 
-import React from "react";
+import React, { ForwardedRef } from "react";
 import {
   Link as RouterLink,
   LinkProps,
@@ -75,7 +75,7 @@ const customComponents = {
  * language if the location is absolute
  * @param props the LinkProps
  */
-export default function Link(props: ICustomLinkProps) {
+const Link = React.forwardRef((props: ICustomLinkProps, ref: ForwardedRef<HTMLAnchorElement>) => {
   // first we need to use the location
   const locationCur = useLocation();
   // and now let's ge thte current locale from our location
@@ -112,5 +112,7 @@ export default function Link(props: ICustomLinkProps) {
   }
 
   // call the link with the new props and the on click event
-  return <RouterLink {...newProps} onClick={linkOnClick.bind(null, props)}/>;
-}
+  return <RouterLink {...newProps} onClick={linkOnClick.bind(null, props)} ref={ref}/>;
+})
+
+export default Link;

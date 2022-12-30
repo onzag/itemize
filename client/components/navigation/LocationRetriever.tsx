@@ -9,3 +9,8 @@ export default function LocationRetriever(props: ILocationRetrieverProps) {
   const location = useLocation();
   return props.children(location);
 }
+
+export function useLocationRetriever() {
+  const location = useLocation();
+  return location;
+}
