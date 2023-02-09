@@ -25,6 +25,7 @@ import { IPropertyEntryPaymentRendererProps } from "../internal/components/Prope
 import { IPropertyEntryTagListRendererProps } from "../internal/components/PropertyEntry/PropertyEntryTagList";
 import { IPropertyEntryFilesRendererProps } from "../internal/components/PropertyEntry/PropertyEntryFiles";
 import { IPropertyViewFilesRendererProps } from "../internal/components/PropertyView/PropertyViewFiles";
+import { IPropertyViewPaymentRendererProps } from "../internal/components/PropertyView/PropertyViewPayment";
 
 /**
  * The renderer context we do expect for defining how are things to be renderered,
@@ -182,6 +183,11 @@ export interface IRendererContext {
    * for conversions is relevant
    */
   PropertyViewCurrency?: React.ComponentType<IPropertyViewCurrencyRendererProps>;
+  /**
+   * Renders a payment element, a payment element is a complex element so the renderer
+   * may offer variation via its args
+   */
+  PropertyViewPayment?: React.ComponentType<IPropertyViewPaymentRendererProps>;
 }
 
 /**

@@ -26,6 +26,7 @@ import PropertyViewLocationRenderer from "./PropertyView/PropertyViewLocation";
 import PropertyViewCurrencyRenderer from "./PropertyView/PropertyViewCurrency";
 import PropertyEntryReferenceRenderer from "./PropertyEntry/PropertyEntryReference";
 import PropertyViewFilesRenderer from "./PropertyView/PropertyViewFiles";
+import PropertyViewPaymentRenderer from "./PropertyView/PropertyViewPayment";
 
 export const rendererContext: IRendererContext = {
   PropertyEntryField: PropertyEntryFieldRenderer,
@@ -48,4 +49,5 @@ export const rendererContext: IRendererContext = {
   PropertyViewFiles: PropertyViewFilesRenderer,
   PropertyViewLocation: PropertyViewLocationRenderer,
   PropertyViewCurrency: PropertyViewCurrencyRenderer,
+  PropertyViewPayment: PropertyViewPaymentRenderer,
 }

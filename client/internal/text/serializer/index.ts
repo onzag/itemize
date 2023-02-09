@@ -66,7 +66,14 @@ export interface IReactifyExtraOptions {
   onCustom?: (
     element: RichElement | IText,
     props: any,
-    info: {styleActive?: any, styleHover?: any, Tag: string, defaultReturn: () => React.ReactNode},
+    info: {
+      styleActive?: any,
+      styleHover?: any,
+      Tag: string,
+      defaultReturn: () => React.ReactNode,
+      parent: RichElement | IRootLevelDocument,
+      tree: IRootLevelDocument,
+    },
   ) => React.ReactNode;
 
   /**
@@ -129,6 +136,16 @@ export interface IReactifyArg<T> {
    * Some extra options for utilities
    */
   extraOptions?: IReactifyExtraOptions;
+  /**
+   * The parent for this element
+   * or null if no parent is known
+   */
+  parent: RichElement | IRootLevelDocument;
+  /**
+   * The tree this element comes from
+   * or null if no tree is available
+   */
+  tree: IRootLevelDocument;
 }
 
 /**

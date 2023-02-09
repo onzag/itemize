@@ -36,12 +36,14 @@ $superblock-highlight-color: #33691e;
     }
   }
 
-  a, .link {
+  a,
+  .link {
     color: $general-highlight-color;
     cursor: pointer;
   }
 
-  a.inactive, .link.inactive {
+  a.inactive,
+  .link.inactive {
     cursor: auto;
 
     &:hover {
@@ -56,14 +58,15 @@ $superblock-highlight-color: #33691e;
 
     &:hover {
       box-shadow: 0 0 0 1px $template-item-color;
-  
+
       &.selected {
         box-shadow: 0 0 0 1px $template-item-highlight-color;
       }
     }
   }
 
-  .container, .custom {
+  .container,
+  .custom {
     position: relative;
   }
 
@@ -71,7 +74,10 @@ $superblock-highlight-color: #33691e;
     overflow: hidden;
   }
 
-  p, li, blockquote, strong {
+  p,
+  li,
+  blockquote,
+  strong {
     text-align: justify;
   }
 
@@ -89,7 +95,13 @@ $superblock-highlight-color: #33691e;
     list-style: none;
 
     li {
-      padding-left: 0;
+      html[dir="rtl"] & {
+        padding-right: 0;
+      }
+
+      html[dir="ltr"] & {
+        padding-left: 0;
+      }
     }
 
     li::before {
@@ -97,20 +109,34 @@ $superblock-highlight-color: #33691e;
       color: $list-item-color;
       display: inline-block;
       width: 1rem;
-      margin-left: 1rem;
-      margin-right: 0.5rem;
       position: absolute;
+
+      html[dir="rtl"] & {
+        margin-right: 1rem;
+        margin-left: 0.5rem;
+      }
+
+      html[dir="ltr"] & {
+        margin-left: 1rem;
+        margin-right: 0.5rem;
+      }
     }
 
-    li > * {
-      padding-left: 2.5rem;
+    li>* {
+      html[dir="rtl"] & {
+        padding-right: 2.5rem;
+      }
+
+      html[dir="ltr"] & {
+        padding-left: 2.5rem;
+      }
     }
 
-    li > ul > li::before {
+    li>ul>li::before {
       content: "\25AA";
     }
 
-    li > ul > li > ul > li::before {
+    li>ul>li>ul>li::before {
       content: "\2023";
     }
   }
@@ -120,7 +146,13 @@ $superblock-highlight-color: #33691e;
     counter-reset: item-count;
 
     li {
-      padding-left: 0;
+      html[dir="rtl"] & {
+        padding-right: 0;
+      }
+
+      html[dir="ltr"] & {
+        padding-left: 0;
+      }
     }
 
     li {
@@ -132,14 +164,29 @@ $superblock-highlight-color: #33691e;
       color: $list-item-color;
       display: inline-block;
       width: 2em;
-      margin-right: 0.5rem;
-      text-align: right;
-      direction: rtl;
       position: absolute;
+
+      html[dir="rtl"] & {
+        margin-left: 0.5rem;
+        text-align: left;
+        direction: ltr;
+      }
+
+      html[dir="ltr"] & {
+        margin-right: 0.5rem;
+        text-align: right;
+        direction: rtl;
+      }
     }
 
-    li > * {
-      padding-left: 2.5rem;
+    li>* {
+      html[dir="rtl"] & {
+        padding-right: 2.5rem;
+      }
+
+      html[dir="ltr"] & {
+        padding-left: 2.5rem;
+      }
     }
   }
 
@@ -148,30 +195,57 @@ $superblock-highlight-color: #33691e;
     margin: 1rem auto;
     font-style: italic;
     color: $quote-text-color;
-    padding: 1.2rem 30px 1.2rem 50px;
-    border-left: 8px solid $quote-highlight-color;
     line-height: 1.6;
     position: relative;
     background: $quote-background-color;
+
+    html[dir="rtl"] & {
+      padding: 1.2rem 50px 1.2rem 30px;
+      border-right: 8px solid $quote-highlight-color;
+    }
+
+    html[dir="ltr"] & {
+      padding: 1.2rem 30px 1.2rem 50px;
+      border-left: 8px solid $quote-highlight-color;
+    }
   }
-  
-  blockquote::before{
+
+  blockquote::before {
     font-family: Arial;
     content: "\201C";
     color: $quote-highlight-color;
     font-size: 4rem;
     position: absolute;
-    left: 10px;
     top: -10px;
+
+    html[dir="rtl"] & {
+      right: 10px;
+    }
+
+    html[dir="ltr"] & {
+      left: 10px;
+    }
   }
-  
-  blockquote::after{
+
+  blockquote::after {
     content: '';
   }
 
-  h1, h2, h3, h4, h5, h6 {
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6 {
     font-weight: 300;
-    text-align: left;
+
+    html[dir="rtl"] & {
+      text-align: right;
+    }
+
+    html[dir="ltr"] & {
+      text-align: left;
+    }
   }
 
   h1 {
@@ -204,16 +278,16 @@ $superblock-highlight-color: #33691e;
     display: flex;
     align-items: center;
     justify-content: center;
-  
+
     .image-container {
       position: relative;
       width: 100%;
       max-width: 700px;
-  
+
       .image-pad {
         position: relative;
         width: 100%;
-  
+
         img {
           position: absolute;
           top: 0;
@@ -233,14 +307,14 @@ $superblock-highlight-color: #33691e;
   img.selected {
     box-shadow: 0 0 5px $general-highlight-color, 0 0 5px $general-highlight-color, 0 0 5px $general-highlight-color;
   }
-  
+
   .video {
     position: relative;
     width: 100%;
     display: flex;
     align-items: center;
     justify-content: center;
-  
+
     .video-container {
       width: 100%;
       max-width: 700px;
@@ -261,7 +335,7 @@ $superblock-highlight-color: #33691e;
         background-size: contain;
         background-image: url("data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNTEycHgiIGhlaWdodD0iNTEycHgiIHZpZXdCb3g9IjAgMCA1MTIgNTEyIiB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciPjxwYXRoIGQ9Ik0xMzMsNDQwYTM1LjM3LDM1LjM3LDAsMCwxLTE3LjUtNC42N2MtMTItNi44LTE5LjQ2LTIwLTE5LjQ2LTM0LjMzVjExMWMwLTE0LjM3LDcuNDYtMjcuNTMsMTkuNDYtMzQuMzNhMzUuMTMsMzUuMTMsMCwwLDEsMzUuNzcuNDVMMzk5LjEyLDIyNS40OGEzNiwzNiwwLDAsMSwwLDYxTDE1MS4yMyw0MzQuODhBMzUuNSwzNS41LDAsMCwxLDEzMyw0NDBaIi8+PC9zdmc+Cg==");
       }
-  
+
       iframe {
         position: absolute;
         top: 0;
@@ -298,6 +372,7 @@ $superblock-highlight-color: #33691e;
   display: inline-flex;
   align-items: center;
   justify-content: center;
+  flex-direction: column;
   user-select: none;
   font-size: 85px;
 
@@ -321,8 +396,7 @@ $superblock-highlight-color: #33691e;
       display: block;
       object-fit: contain;
       border-radius: 3px;
-      filter: drop-shadow(0px 0px 1px rgba(0,0,0,.3))
-              drop-shadow(0px 0px 10px rgba(0,0,0,.3));
+      filter: drop-shadow(0px 0px 1px rgba(0, 0, 0, .3)) drop-shadow(0px 0px 10px rgba(0, 0, 0, .3));
     }
 
     .file-icon {
@@ -375,31 +449,38 @@ $superblock-highlight-color: #33691e;
   &.rejected {
     .file-container {
       .thumbnail {
-        filter: drop-shadow(0px 0px 1px #e57373)
-                drop-shadow(0px 0px 10px #e57373);
+        filter: drop-shadow(0px 0px 1px #e57373) drop-shadow(0px 0px 10px #e57373);
       }
-      .file-size, .file-name, .file-icon .file-extension {
+
+      .file-size,
+      .file-name,
+      .file-icon .file-extension {
         color: #e57373;
       }
     }
+
     &:hover {
       .file-container {
         .thumbnail {
-          filter: drop-shadow(0px 0px 1px #f44336)
-                  drop-shadow(0px 0px 10px #f44336);
+          filter: drop-shadow(0px 0px 1px #f44336) drop-shadow(0px 0px 10px #f44336);
         }
-        .file-size, .file-name, .file-icon .file-extension {
+
+        .file-size,
+        .file-name,
+        .file-icon .file-extension {
           color: #f44336;
         }
       }
     }
   }
 
-  &.selected {
+  &.selected,
+  &:focus {
     .file-container {
-      .thumbnail, .file-icon {
-        filter: drop-shadow(0px 0px 1px $general-highlight-color)
-                drop-shadow(0px 0px 10px $general-highlight-color);
+
+      .thumbnail,
+      .file-icon {
+        filter: drop-shadow(0px 0px 1px $general-highlight-color) drop-shadow(0px 0px 10px $general-highlight-color);
       }
     }
   }

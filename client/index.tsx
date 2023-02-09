@@ -249,7 +249,8 @@ export async function initializeItemizeApp(
   // so /en/whatever /fi/whatever, determine the language
   // there should be an url language set
   const pathNameSplitted = serverMode ? serverMode.originalUrl.split("/") : window.location.pathname.split("/");
-  let urlLanguage = pathNameSplitted[1];
+  const urlLanguage = pathNameSplitted[1];
+  let expectedLanguageToUse = urlLanguage;
 
   // The stored locale data takes priority over everything
   // The stored locale data has been set manually when fiddling
@@ -287,15 +288,16 @@ export async function initializeItemizeApp(
     // we are going to reuse the splitted path name array we created
     pathNameSplitted[1] = storedLang;
     // update the variables
-    urlLanguage = storedLang;
+    expectedLanguageToUse = storedLang;
     // and we are going to replace the history object that we will feed react
     // this will make it so that our url gets setup even before react
     // is initialized
     const newPathName = pathNameSplitted.join("/");
     if (!serverMode) {
-      if (window.history) {
-        window.history.replaceState(window.history.state, "", newPathName + window.location.search);
-      }
+      history.replace(newPathName + history.location.search, history.location.state);
+      // if (window.history) {
+      //   window.history.replaceState(window.history.state, "", newPathName + window.location.search);
+      // }
     } else {
       // in server mode this does contain the query string as it uses the original url
       serverMode.redirectTo(newPathName);
@@ -385,14 +387,15 @@ export async function initializeItemizeApp(
     // able to handle the different languages, but hey, maybe the user
     // wrote the link manually, note that is is basically a first try
     // not only there was no stored language data, but no url data
-    if (!urlLanguage) {
+    if (!expectedLanguageToUse) {
       // and set the url language to the guessed values
-      urlLanguage = guessedLang;
+      expectedLanguageToUse = guessedLang;
       pathNameSplitted[1] = guessedLang;
       const newPathName = pathNameSplitted.join("/");
 
       if (!serverMode) {
-        window.history.replaceState(window.history.state, "", newPathName + window.location.search);
+        history.replace(newPathName + history.location.search, history.location.state);
+        // window.history.replaceState(window.history.state, "", newPathName + window.location.search);
       } else {
         // do the redirect
         serverMode.redirectTo(newPathName);
@@ -405,7 +408,7 @@ export async function initializeItemizeApp(
 
   // let's try now to set the initial locale, the initial language
   // is always the url language
-  const initialLang = urlLanguage;
+  const initialLang = expectedLanguageToUse;
   const initialCurrency = storedCurrency || guessedCurrency;
   const initialCountry = storedCountry || guessedCountry;
 

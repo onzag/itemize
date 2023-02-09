@@ -7,8 +7,7 @@
 
 import React, { useCallback, useEffect, useRef, useState } from "react";
 import { setHistoryQSState, setHistoryState } from ".";
-import { Location } from "history";
-import { withRouter } from "react-router-dom";
+import { useLocation } from "react-router-dom";
 
 /**
  * The props for the location state reader
@@ -42,18 +41,13 @@ interface ILocationStateReaderProps<S> {
 }
 
 /**
- * The props with the location
- */
-interface ILocationStateReaderPropsWithLocation<S> extends ILocationStateReaderProps<S> {
-  location: Location;
-}
-
-/**
  * The location state reader component
  * @param props the props
  * @returns a react component
  */
-function LocationStateReader<S>(props: ILocationStateReaderPropsWithLocation<S>) {
+export default function LocationStateReader<S>(props: ILocationStateReaderProps<S>) {
+  const location = useLocation();
+
   // keeps the internal state when using delayed updates
   const [internalState, setInternalState] = useState<{
     state: S,
@@ -102,9 +96,9 @@ function LocationStateReader<S>(props: ILocationStateReaderPropsWithLocation<S>)
         if (internalState) {
           // set it
           if (props.stateIsInQueryString) {
-            setHistoryQSState(props.location, internalState.state, internalState.replace);
+            setHistoryQSState(location, internalState.state, internalState.replace);
           } else {
-            setHistoryState(props.location, internalState.state, internalState.replace);
+            setHistoryState(location, internalState.state, internalState.replace);
           }
         }
 
@@ -115,12 +109,14 @@ function LocationStateReader<S>(props: ILocationStateReaderPropsWithLocation<S>)
         syncRefCb.current = null;
       }, typeof props.delayedUpdates === "number" ? props.delayedUpdates : 600);
     }
-  }, [internalState, props.delayedUpdates, props.stateIsInQueryString, props.location, syncRef, syncRefCb]);
+  }, [
+    internalState,
+  ]);
 
   // so if we are in our query string
   if (props.stateIsInQueryString) {
     // we need to parse that query string
-    const searchParams = new URLSearchParams(props.location.search);
+    const searchParams = new URLSearchParams(location.search);
     // now we can get the value
     const statefulValue = !internalState ? {} : internalState.state;
     // and add the default props if they are missing or otherwise read from the search params
@@ -133,40 +129,34 @@ function LocationStateReader<S>(props: ILocationStateReaderPropsWithLocation<S>)
     // and call from here, note how we use the setHistoryQSState function here
     return props.children(
       statefulValue as S,
-      props.delayedUpdates ? setHistoryStateDelayed : setHistoryQSState.bind(null, props.location),
+      props.delayedUpdates ? setHistoryStateDelayed : setHistoryQSState.bind(null, location),
       !internalState,
       runWhenSynced,
-    )
+    ) as any; // typescript bugs
   } else {
     // if there's no state
-    if (!props.location.state) {
+    if (!location.state) {
       // we just return the default state
       return props.children(
         props.defaultState,
-        props.delayedUpdates ? setHistoryStateDelayed : setHistoryState.bind(null, props.location),
+        props.delayedUpdates ? setHistoryStateDelayed : setHistoryState.bind(null, location),
         !internalState,
         runWhenSynced,
-      );
+      ) as any; // typescript bugs
     }
 
     // otherwise equally we merge the states
     const statefulValue = {};
     Object.keys(props.defaultState).forEach((key) => {
-      statefulValue[key] = typeof props.location.state[key] !== "undefined" ? props.location.state[key] : props.defaultState[key];
+      statefulValue[key] = typeof location.state[key] !== "undefined" ? location.state[key] : props.defaultState[key];
     });
 
     // and call it
     return props.children(
       statefulValue as S,
-      setHistoryState.bind(null, props.location),
+      setHistoryState.bind(null, location),
       !internalState,
       runWhenSynced,
-    );
+    ) as any; // typescript bugs
   }
 }
-
-// buggy typescript forces me to do it this way
-function FakeLocationStateReader<S>(props: ILocationStateReaderProps<S>) {
-  return null as any;
-}
-export default withRouter(LocationStateReader as any) as any as typeof FakeLocationStateReader;

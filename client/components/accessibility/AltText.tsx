@@ -54,7 +54,6 @@ const AltText = React.forwardRef((props: IAltTextProps, ref: ForwardedRef<Actual
             {...props}
             componentProps={args}
             priority={typeof props.priority === "string" ? props.priority : (props.priority || 0) + v.amount}
-            groupPosition={(props.groupPosition || 0) + v.groupPositionAmount}
             disabled={props.disabled || v.disable}
             ref={ref} />
         );

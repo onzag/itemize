@@ -7,10 +7,10 @@
 import {
   IPropertyDefinitionSupportedType,
 } from "../types";
-import { GraphQLNonNull, GraphQLString } from "graphql";
+import { GraphQLString } from "graphql";
 import { standardSQLEqualFn } from "../sql";
 import {
-  standardSQLSSCacheEqualFn, standardLocalEqual,
+  standardSQLSSCacheEqualFn,
 } from "../local-sql";
 import { PropertyInvalidReason } from "../../PropertyDefinition";
 import {
@@ -58,11 +58,11 @@ const typeValue: IPropertyDefinitionSupportedType<IPropertyDefinitionSupportedTe
   },
   ownLanguageProperty: "language",
   isNull: (v) => {
-    if (!v) {
+    if (v === null) {
       return true;
     }
 
-    return !v.value;
+    return v.value === null;
   },
   getNullValue: (v) => {
     return ({
@@ -251,7 +251,18 @@ const typeValue: IPropertyDefinitionSupportedType<IPropertyDefinitionSupportedTe
   },
   sqlEqual: standardSQLEqualFn,
   sqlSSCacheEqual: standardSQLSSCacheEqualFn,
-  localEqual: standardLocalEqual,
+  localEqual: (arg) => {
+    const isANull = arg.a === null || arg.a.value === null;
+    const isBNull = arg.b === null || arg.b.value === null;
+
+    if (isANull && isBNull) {
+      return true;
+    } else if (isANull || isBNull) {
+      return false;
+    }
+
+    return arg.a.value === arg.b.value;
+  },
   sqlOrderBy: textSQLOrderBy,
   localOrderBy: () => {
     // can't sort due to ranking limitations

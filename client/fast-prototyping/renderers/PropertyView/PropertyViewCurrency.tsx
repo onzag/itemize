@@ -6,6 +6,7 @@
 
 import { IPropertyViewCurrencyRendererProps } from "../../../internal/components/PropertyView/PropertyViewCurrency";
 import React from "react";
+import Box from "@mui/material/Box";
 
 /**
  * The property view currency renderer itself
@@ -26,30 +27,37 @@ import React from "react";
  */
 export default function PropertyViewCurrencyRenderer(props: IPropertyViewCurrencyRendererProps) {
   const rootClassName = props.args.className || null;
+  const rootSx = props.args.rootSx || null;
   const valueClassName = props.args.convertedValueClassName || null;
+  const valueSx = props.args.convertedValueSx || null;
   const symbolClassName = props.args.convertedSymbolClassName || null;
+  const symbolSx = props.args.convertedSymbolSx || null;
   const convertedClassName = props.args.convertedClassName || null;
+  const convertedSx = props.args.convertedSx || null;
   const originalClassName = props.args.originalClassName || null;
   const originalValueClassName = props.args.originalValueClassName || null;
   const originalSymbolClassName = props.args.originalSymbolClassName || null;
+  const originalSx = props.args.originalSx || null;
+  const originalValueSx = props.args.originalValueSx || null;
+  const originalSymbolSx = props.args.originalSymbolSx || null;
 
   if (props.currentValue === null && props.args.nullNode) {
     return (
-      <span className={rootClassName}>
+      <Box component="span" className={rootClassName} sx={rootSx}>
         {props.args.nullNode}
-      </span>
+      </Box>
     );
   } else if (props.currentValue === null && props.args.NullComponent) {
     const NullComponent = props.args.NullComponent;
     const nullArgs = props.args.nullComponentArgs;
     return (
-      <span className={rootClassName}>
+      <Box component="span" className={rootClassName} sx={rootSx}>
         <NullComponent {...nullArgs} />
-      </span>
+      </Box>
     );
   } else if (props.currentValue === null) {
     return (
-      <span className={rootClassName} />
+      <Box component="span" className={rootClassName} sx={rootSx} />
     );
   }
 
@@ -58,45 +66,45 @@ export default function PropertyViewCurrencyRenderer(props: IPropertyViewCurrenc
 
   if (props.format === "$N") {
     return (
-      <span className={rootClassName}>
-        <span className={convertedClassName}>
-          <span className={symbolClassName}>
+      <Box component="span" className={rootClassName} sx={rootSx}>
+        <Box component="span" className={convertedClassName} sx={convertedSx}>
+          <Box component="span" className={symbolClassName} sx={symbolSx}>
             {mainCurrency.symbol}
-          </span>
-          <span className={valueClassName}>
+          </Box>
+          <Box component="span" className={valueClassName} sx={valueSx}>
             {mainStrValue}
-          </span>
-        </span>
-        {!props.args.hideOriginalIfConverted && props.convertedCurrency ? <span className={originalClassName}>
-          <span className={originalSymbolClassName}>
+          </Box>
+        </Box>
+        {!props.args.hideOriginalIfConverted && props.convertedCurrency ? <Box component="span" className={originalClassName} sx={originalSx}>
+          <Box component="span" className={originalSymbolClassName} sx={originalSymbolSx}>
             {props.originalCurrency.symbol}
-          </span>
-          <span className={originalValueClassName}>
+          </Box>
+          <Box component="span" className={originalValueClassName} sx={originalValueSx}>
             {props.originalStrValue}
-          </span>
-        </span> : null}
-      </span>
+          </Box>
+        </Box> : null}
+      </Box>
     );
   }
 
   return (
-    <span className={rootClassName}>
-      <span className={convertedClassName}>
-        <span className={valueClassName}>
+    <Box component="span" className={rootClassName} sx={rootSx}>
+      <Box component="span" className={convertedClassName} sx={convertedSx}>
+        <Box component="span" className={valueClassName} sx={valueSx}>
           {mainStrValue}
-        </span>
-        <span className={symbolClassName}>
+        </Box>
+        <Box component="span" className={symbolClassName} sx={symbolSx}>
           {mainCurrency.symbol}
-        </span>
-      </span>
-      {!props.args.hideOriginalIfConverted && props.convertedCurrency ? <span className={originalClassName}>
-        <span className={originalValueClassName}>
+        </Box>
+      </Box>
+      {!props.args.hideOriginalIfConverted && props.convertedCurrency ? <Box component="span" className={originalClassName} sx={originalSx}>
+        <Box component="span" className={originalValueClassName} sx={originalValueSx}>
           {props.originalStrValue}
-        </span>
-        <span className={originalSymbolClassName}>
+        </Box>
+        <Box component="span" className={originalSymbolClassName} sx={originalSymbolSx}>
           {props.originalCurrency.symbol}
-        </span>
-      </span> : null}
-    </span>
+        </Box>
+      </Box> : null}
+    </Box>
   );
 }

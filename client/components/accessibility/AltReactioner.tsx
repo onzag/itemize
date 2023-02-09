@@ -47,11 +47,6 @@ export interface IAltBaseProps {
    */
   priority?: number | "ALWAYS_ON_TOP" | "ALWAYS_ON_TOP_KEEP_FLOW";
   /**
-   * A positioning within the group used to specify what part of a scrolling box this belongs to
-   * for example -1 is often to be used with fixed navbar, 0 with the body content and 100 with footers
-   */
-  groupPosition?: number;
-  /**
    * will trigger a new input reaction after it has been completed
    */
   triggerAltAfterAction?: boolean;
@@ -102,7 +97,25 @@ export interface IAltBaseProps {
    * is focused, the alt is set in an uncontrolled state, and it will stop deciding what's next tabbed
    */
   uncontrolled?: boolean;
+
+  /**
+   * When an element is about to be focused what element to focus, by default it will
+   * focus the element that it is tracking, but you may change this behaviour
+   *
+   * precise focus, comes from direct actions like a reaction key
+   * above, comes from standard tabbing
+   * below, comes from reverse tabbing
+   * 
+   * this action also gets used to trigger the click action
+   *  
+   * @param how precise, above or below
+   * @param element the element which focus will be attempted by default
+   * @returns the element to focus
+   */
+  onFocusAttempt?: (how: "precise" | "above" | "below", e: HTMLElement) => HTMLElement;
 }
+
+type CustomActionFn = (e: HTMLElement) => void;
 
 export interface IAltReactionerProps extends IAltBaseProps {
   /**
@@ -113,8 +126,10 @@ export interface IAltReactionerProps extends IAltBaseProps {
    * a css selector to choose the component that is relevant that the
    * user is supposed to interact with, by default it will simply pick the element itself
    * as its first child node
+   * 
+   * if provided an array it will try until one matches
    */
-  selector?: string;
+  selector?: string | string[];
   /**
    * how many times to go up in the parent node before selecting, rather than selecting
    * the current element
@@ -211,6 +226,8 @@ const ALT_REGISTRY: {
   uncontrolled: false,
 };
 
+// (window as any).ALT_REGISTRY = ALT_REGISTRY;
+
 export function hideAll(butKeycodes: ActualAltReactioner[] = []) {
   // hide the scroller too
   if (butKeycodes.length === 0) {
@@ -272,9 +289,9 @@ function calculateActiveFlow(): number {
         priorityToUse = v.getPriority() as number;
         priorityToInform = priorityToUse;
 
-      // when we keep we still use the priority that may still be lower
-      // but we will inform the correct priority that we have established as always on top
-      // the reason is that we keep the flow that is under this, we keep our flow
+        // when we keep we still use the priority that may still be lower
+        // but we will inform the correct priority that we have established as always on top
+        // the reason is that we keep the flow that is under this, we keep our flow
       } else if (hasAlwaysOnTopWKeep) {
         priorityToInform = v.getPriority() as number;
       }
@@ -430,12 +447,9 @@ function triggerBasedOn(code: string, shiftKey: boolean, callbackIfmatch: () => 
       }
       // the index should be fine now and pointing to the next tabbable component
 
-      nextElement.focus();
-      if (!nextElement.isElementInView()) {
-        nextElement.getElement().scrollIntoView({ behavior: "smooth" });
-      }
+      nextElement.focus(shiftKey ? "below" : "above");
 
-      if (document.activeElement !== nextElement.getElement()) {
+      if (!nextElement.isUncontrolled() && document.activeElement !== nextElement.getElement()) {
         console.warn("Failed to focus on next element, is it missing tab-index?", nextElement.getElement());
       }
       ALT_REGISTRY.isBlocked = nextElement.isBlocking();
@@ -504,13 +518,9 @@ function triggerBasedOn(code: string, shiftKey: boolean, callbackIfmatch: () => 
         nextElement = ALT_REGISTRY.isDisplayingLayereds[nextIndex];
       }
       // the index should be fine now and pointing to the next tabbable component
+      nextElement.focus(shiftKey ? "below" : "above");
 
-      nextElement.focus();
-      if (!nextElement.isElementInView()) {
-        nextElement.getElement().scrollIntoView({ behavior: "smooth" });
-      }
-
-      if (document.activeElement !== nextElement.getElement()) {
+      if (!nextElement.isUncontrolled() && document.activeElement !== nextElement.getElement()) {
         console.warn("Failed to focus on next element, is it missing tab-index?", nextElement.getElement());
       }
 
@@ -564,13 +574,9 @@ function triggerBasedOn(code: string, shiftKey: boolean, callbackIfmatch: () => 
         nextElement = ALT_REGISTRY.activeFlow[nextIndex];
       }
       // the index should be fine now and pointing to the next tabbable component
+      nextElement.focus(shiftKey ? "below" : "above");
 
-      nextElement.focus();
-      if (!nextElement.isElementInView()) {
-        nextElement.getElement().scrollIntoView({ behavior: "smooth" });
-      }
-
-      if (document.activeElement !== nextElement.getElement()) {
+      if (!nextElement.isUncontrolled() && document.activeElement !== nextElement.getElement()) {
         console.warn("Failed to focus on next element, is it missing tab-index?", nextElement.getElement());
       }
 
@@ -584,7 +590,9 @@ function triggerBasedOn(code: string, shiftKey: boolean, callbackIfmatch: () => 
     }
 
     setScrollerBlockStatus(ALT_REGISTRY.isBlocked || ALT_REGISTRY.uncontrolled);
-    callbackIfmatch();
+    if (!ALT_REGISTRY.uncontrolled) {
+      callbackIfmatch();
+    }
     return;
   }
 
@@ -732,7 +740,7 @@ if (typeof document !== "undefined") {
   // the keycode gets cleaned during keyup
   let keyCodeConsumed: string = null;
   let keyConsumed: string = null;
-  let previousKeyupWasControl: boolean = false;
+  let previousKeyupWasControlComposite: boolean = false;
 
   window.addEventListener("focus", () => {
     hideAll();
@@ -764,15 +772,18 @@ if (typeof document !== "undefined") {
       keyConsumed !== "Control" &&
       // prevent last shortcuts such as ctrl+c and ctrl+v from
       // triggering the alt
-      !previousKeyupWasControl
+      !previousKeyupWasControlComposite
     ) {
       toggleAlt();
     }
 
-    if (e.ctrlKey) {
-      previousKeyupWasControl = true;
+    // we don't want to match control itself
+    const isAComposedControlKey = e.ctrlKey && e.key !== "Control";
+
+    if (isAComposedControlKey) {
+      previousKeyupWasControlComposite = true;
     } else {
-      previousKeyupWasControl = false;
+      previousKeyupWasControlComposite = false;
     }
 
     keyConsumed = null;
@@ -892,6 +903,20 @@ function isHidden(element: HTMLElement): boolean {
   return isHidden(element.parentElement);
 }
 
+function isInView(element: HTMLElement): boolean {
+  if (!element) {
+    return false;
+  }
+
+  const bounding = element.getBoundingClientRect();
+  return (
+    bounding.top >= 0 &&
+    bounding.left >= 0 &&
+    bounding.right <= (window.innerWidth || document.documentElement.clientWidth) &&
+    bounding.bottom <= (window.innerHeight || document.documentElement.clientHeight)
+  );
+}
+
 export class ActualAltBase<P extends IAltBaseProps, S> extends React.PureComponent<P, S> {
   public containerRef: React.RefObject<HTMLElement>;
 
@@ -965,21 +990,6 @@ export class ActualAltBase<P extends IAltBaseProps, S> extends React.PureCompone
     return isHidden(element);
   }
 
-  public isElementInView() {
-    const element = this.getElement();
-    if (!element) {
-      return false;
-    }
-
-    const bounding = element.getBoundingClientRect();
-    return (
-      bounding.top >= 0 &&
-      bounding.left >= 0 &&
-      bounding.right <= (window.innerWidth || document.documentElement.clientWidth) &&
-      bounding.bottom <= (window.innerHeight || document.documentElement.clientHeight)
-    );
-  }
-
   public getElement() {
     if (!this.containerRef.current) {
       return null as HTMLElement;
@@ -992,34 +1002,113 @@ export class ActualAltBase<P extends IAltBaseProps, S> extends React.PureCompone
     return this.containerRef.current as HTMLElement;
   }
 
-  public getPosition() {
-    return this.props.groupPosition || 0;
+  /**
+   * Gets the tree ancestry starting from the container that is parented by
+   * the root and ending with the current
+   * [parent A] [parent B] [element]
+   * @returns 
+   */
+  public getTreeAncestry() {
+    let current = this.getElement();
+
+    if (!current) {
+      return [];
+    }
+
+    const matchingGroupsAncestors: HTMLElement[] = [current];
+    current = current.parentElement;
+    while (current) {
+      if (
+        current.dataset.altGroup ||
+        current.tagName === "TD" ||
+        current.tagName === "UL" ||
+        current.tagName === "OL" ||
+        current.tagName === "TH"
+      ) {
+        matchingGroupsAncestors.push(current);
+      }
+
+      current = current.parentElement;
+    }
+    return matchingGroupsAncestors.reverse();
   }
 
   public isBefore(other: ActualAltBase<any, any>) {
-    const otherPosition = other.getPosition();
-    const selfPosition = this.getPosition();
+    const treeAncestrySelf = this.getTreeAncestry();
+    const treeAncestryOther = other.getTreeAncestry();
 
-    if (otherPosition !== selfPosition) {
-      return otherPosition > selfPosition;
+    // we are missing, it must be because we are dismounting
+    // other is missing we are before
+    // it must be because it's dismounting
+    if (!treeAncestrySelf.length || !treeAncestryOther.length) {
+      return false;
+    }
+
+    // we are finding an element in common in the tree, because this is a tree
+    // the index should match, we are looking for the first match
+    // were they are both the same at the same level
+    let elementInCommonIndex = -1;
+
+    // we start by pushing forwards from the largest element to the smallest as we have matches
+    // until we no longer get a match, this is our element in common that parents both making the siblings
+    // the comparison point
+    // eg.
+    // <div0 data-alt-group>
+    //   <div1 data-alt-group>
+    //     <p>title</p>
+    //     <div2 data-alt-group>
+    //       <p>text</p>
+    //     </div2>
+    //   </div1>
+    // </div0>
+    // for title its ancestry will be div0, div1, p
+    // for text its ancestry will be div0, div1, div2, text
+    // this algorithm will start by checking div0, matches, div1, matches, p/div2 no match and stop there
+    // so our comparison point is the p and div2, making <p>title</p> be compared against <div2...
+    // for our is before check
+    let elementInCommonIndexTest = 0;
+    while (
+      treeAncestrySelf[elementInCommonIndexTest] &&
+      treeAncestryOther[elementInCommonIndexTest] &&
+      treeAncestrySelf[elementInCommonIndexTest] === treeAncestryOther[elementInCommonIndexTest]
+    ) {
+      elementInCommonIndex = elementInCommonIndexTest;
+      elementInCommonIndexTest++;
+    }
+
+    // we will compare with siblings that are parented by the same group
+    // if no parent is found then use the lowermost element since they are considered siblings
+    const comparisonSelf: HTMLElement = elementInCommonIndex === -1 ?
+      treeAncestrySelf[0] :
+      treeAncestrySelf[elementInCommonIndex + 1];
+    const comparisonOther: HTMLElement = elementInCommonIndex === -1 ?
+      treeAncestryOther[0] :
+      treeAncestryOther[elementInCommonIndex + 1];
+
+    // can only truly happen if they are equal
+    if (!comparisonSelf || !comparisonOther) {
+      console.warn("Could not determine a comparison between two elements in alt reactioner, are they the same?");
+      return false;
+    }
+
+    if (
+      (comparisonSelf.dataset.altGroup === "START" && comparisonOther.dataset.altGroup !== "START") ||
+      (comparisonSelf.dataset.altGroup !== "END" && comparisonOther.dataset.altGroup === "END")
+    ) {
+      return true;
+    }
+
+    if (
+      (comparisonSelf.dataset.altGroup === "END" && comparisonOther.dataset.altGroup !== "END") ||
+      (comparisonSelf.dataset.altGroup !== "START" && comparisonOther.dataset.altGroup === "START")
+    ) {
+      return false;
     }
 
     const isRtL = document.querySelector("html").dir === "rtl";
 
-    // we are missing, it must be because we are dismounting
-    if (!this.getElement()) {
-      return false;
-    }
-
-    const selfClientRect = this.getElement().getBoundingClientRect();
-
-    // other is missing we are before
-    // it must be because it's dismounting
-    if (!other.getElement()) {
-      return true;
-    }
-
-    const otherClientRect = other.getElement().getBoundingClientRect();
+    const selfClientRect = comparisonSelf.getBoundingClientRect();
+    const otherClientRect = comparisonOther.getBoundingClientRect();
 
     // check if there's a vertical intersection which can make them be considered to be in the same
     // line overall, in this intersection we exclude the tips
@@ -1038,8 +1127,7 @@ export class ActualAltBase<P extends IAltBaseProps, S> extends React.PureCompone
 
   public getSignature() {
     return (
-      (this.props.priority || 0).toString() + "." +
-      (this.props.groupPosition || 0).toString()
+      (this.props.priority || 0).toString()
     );
   }
 
@@ -1125,9 +1213,23 @@ export class ActualAltBase<P extends IAltBaseProps, S> extends React.PureCompone
     }
   }
 
-  public focus() {
-    const element = this.getElement();
+  public focus(how: "precise" | "above" | "below") {
+    // uncontrolled elements cannot focus and are not themselves focuseable
+    if (this.isUncontrolled()) {
+      return;
+    }
+
+    let element = this.getElement();
+
+    if (this.props.onFocusAttempt) {
+      element = this.props.onFocusAttempt(how, element);
+    }
+
     (element as HTMLElement).focus();
+
+    if (!isInView(element) && element) {
+      element.scrollIntoView({ behavior: "smooth" });
+    }
   }
 
   public blur() {
@@ -1144,8 +1246,10 @@ export class ActualAltBase<P extends IAltBaseProps, S> extends React.PureCompone
     return (
       <Element
         ref={this.containerRef}
-        tabIndex={0}
+        tabIndex={this.props.uncontrolled ? -1 : 0}
         className={this.props.className}
+        data-alt-reactioner={true}
+        data-priority={this.props.priority || 0}
         {...this.props.componentProps}
       >
         {this.props.children}
@@ -1244,9 +1348,21 @@ export class ActualAltReactioner extends ActualAltBase<IAltReactionerProps, IAct
     if (this.props.selectorGoUp && !this.props.selector) {
       return elementRootSelect;
     } else {
-      const element = this.props.selector ?
-        elementRootSelect.querySelector(this.props.selector) as HTMLElement :
-        elementRootSelect.childNodes[0] as HTMLElement;
+      let element: HTMLElement = null;
+      // use the array until we find a match
+      if (Array.isArray(this.props.selector)) {
+        this.props.selector.forEach((selector) => {
+          if (element) {
+            return;
+          }
+
+          element = elementRootSelect.querySelector(selector) as HTMLElement;
+        });
+      } else {
+        element = this.props.selector ?
+          elementRootSelect.querySelector(this.props.selector) as HTMLElement :
+          elementRootSelect.childNodes[0] as HTMLElement;
+      }
 
       if (!element) {
         console.warn("Could not retrieve element for reactioner for reaction key " + this.props.reactionKey);
@@ -1270,8 +1386,7 @@ export class ActualAltReactioner extends ActualAltBase<IAltReactionerProps, IAct
     return (
       (this.props.priority || 0).toString() + "." +
       (this.props.action || "click").toString() + "." +
-      this.props.reactionKey.toString() + "." +
-      (this.props.groupPosition || 0).toString()
+      this.props.reactionKey.toString()
     );
   }
 
@@ -1330,8 +1445,18 @@ export class ActualAltReactioner extends ActualAltBase<IAltReactionerProps, IAct
   }
 
   public trigger(isTabNavigatingCurrent: boolean) {
-    const element = this.getElement();
+    let element = this.getElement();
     if (!element) {
+      console.warn("Did not receive an element from the selector during trigger, check your selector options");
+      return;
+    }
+
+    if (this.props.onFocusAttempt) {
+      element = this.props.onFocusAttempt("precise", element);
+    }
+
+    if (!element) {
+      console.warn("Did not receive an element from the selector during onFocusAttempt, check your onFocusAttempt function");
       return;
     }
 
@@ -1339,6 +1464,10 @@ export class ActualAltReactioner extends ActualAltBase<IAltReactionerProps, IAct
       (element as HTMLElement).click();
     } else if (this.props.action === "focus") {
       (element as HTMLElement).focus();
+
+      if (!isInView(element)) {
+        element.scrollIntoView({behavior: "smooth"});
+      }
 
       ALT_REGISTRY.uncontrolled = this.isUncontrolled();
     }
@@ -1351,7 +1480,14 @@ export class ActualAltReactioner extends ActualAltBase<IAltReactionerProps, IAct
   public render() {
     const Element = (this.props.component || "div") as any;
     return (
-      <Element style={{ display: "contents" }} className={this.props.className} ref={this.containerRef} {...this.props.componentProps}>
+      <Element
+        style={{ display: "contents" }}
+        className={this.props.className}
+        ref={this.containerRef}
+        data-alt-reactioner={true}
+        data-priority={this.props.priority || 0}
+        {...this.props.componentProps}
+      >
         {this.props.children(this.state.displayed, this.state.blocked)}
       </Element>
     );
@@ -1366,7 +1502,6 @@ const AltReactioner = React.forwardRef((props: IAltReactionerProps, ref: Forward
           <ActualAltReactioner
             {...props}
             priority={typeof props.priority === "string" ? props.priority : (props.priority || 0) + v.amount}
-            groupPosition={(props.groupPosition || 0) + v.groupPositionAmount}
             disabled={props.disabled || v.disable}
             ref={ref}
           />

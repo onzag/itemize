@@ -65,7 +65,7 @@ export function isCenterBasicallyEquals(one: [number, number], two: [number, num
 /**
  * The property view location handler class
  */
-export class PropertyViewLocation extends React.Component<
+export default class PropertyViewLocation extends React.Component<
   IPropertyViewHandlerProps<IPropertyDefinitionSupportedLocationType, IPropertyViewLocationRendererProps>,
   IPropertyViewLocationRendererState
 > {

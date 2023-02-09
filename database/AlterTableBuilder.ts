@@ -122,9 +122,9 @@ export class AlterTableBuilder extends QueryBuilder {
           c.type + (c.notNull ? " NOT NULL" : "") + (c.defaultTo ? " DEFAULT " + c.defaultTo : "");
     } else if (this.action === "ALTER COLUMN") {
       return startBit +
-        this.action + " " +  + " SET TYPE " + this.columnRule.type + "," +
-        this.action + " " + quotedColumn + (this.columnRule.notNull ? " SET " : " DROP ") + "NOT NULL," +
-        this.action + " " + quotedColumn + (this.columnRule.defaultTo ? " SET DEFAULT " + this.columnRule.defaultTo : "DROP DEFAULT");
+        this.action + " " + quotedColumn + " TYPE " + this.columnRule.type + ", " +
+        this.action + " " + quotedColumn + (this.columnRule.notNull ? " SET " : " DROP ") + "NOT NULL, " +
+        this.action + " " + quotedColumn + (this.columnRule.defaultTo ? " SET DEFAULT " + this.columnRule.defaultTo : " DROP DEFAULT");
     }
   }
 }

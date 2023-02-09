@@ -447,6 +447,7 @@ export interface IMaterialUISlateWrapperProps extends ISlateEditorWrapperBasePro
    * The disjointed mode
    */
   disjointedMode?: boolean;
+  disjointedModeKeepToolbar?: boolean;
   /**
    * Add a class name to the entire wrapper
    */
@@ -472,7 +473,6 @@ export interface IMaterialUISlateWrapperProps extends ISlateEditorWrapperBasePro
    * For generating an alt badge reactioner
    */
   reactionerPriority?: number;
-  reactionerGroupPosition?: number;
   reactionerKey?: string;
   reactionerDisabled?: boolean;
   reactionerUseInFlow?: boolean;
@@ -563,7 +563,6 @@ function elementFastKeyReturn(
       priority={priority}
       disabled={disabled || !props.state.currentSelectedElement}
       altBadgedChildren={altBadgedChildren}
-      groupPosition={-1}
       label={fastKey === "escape" ? "esc" : null}
       tabbable={fastKey !== "escape"}
       useTransform={useStyleTransform ? "close" : null}
@@ -1248,7 +1247,7 @@ class RichTextEditorToolbar extends React.Component<RichTextEditorToolbarProps, 
       return null;
     }
 
-    if (this.props.disjointedMode && !this.props.state.currentSelectedElement) {
+    if (this.props.disjointedMode && !this.props.disjointedModeKeepToolbar && !this.props.state.currentSelectedElement) {
       return null;
     }
 
@@ -1361,6 +1360,7 @@ class RichTextEditorToolbar extends React.Component<RichTextEditorToolbarProps, 
         ref={(obj) => {
           this.appBarHeader = obj as any;
         }}
+        data-alt-group={true}
       >
         <StyledToolbar sx={this.props.toolbarSx} className={this.props.toolbarClassName}>
           {toolbarFormMapped}
@@ -1887,7 +1887,9 @@ export class MaterialUISlateWrapper extends React.PureComponent<IMaterialUISlate
           <Box className={
             "rich-text " +
             (this.props.wrapperTextEditorClassName ? " " + this.props.wrapperTextEditorClassName : "") +
-            (this.props.state.focused ? " focused" : "")
+            (this.props.state.focused ? " focused" : "") +
+            (this.props.state.currentValid ? " valid" : " invalid") +
+            (this.props.disabled ? " disabled" : " enabled")
           } sx={this.props.wrapperTextEditorSx}>
             {this.props.children}
           </Box>
@@ -1902,6 +1904,8 @@ export class MaterialUISlateWrapper extends React.PureComponent<IMaterialUISlate
             className={
               "rich-text" +
               (this.props.state.focused ? " focused" : "") +
+              (this.props.state.currentValid ? " valid" : " invalid") +
+              (this.props.disabled ? " disabled" : " enabled") +
               (this.props.wrapperTextEditorClassName ? " " + this.props.wrapperTextEditorClassName : "")
             }
             currentValid={this.props.state.currentValid}
@@ -1930,9 +1934,9 @@ export class MaterialUISlateWrapper extends React.PureComponent<IMaterialUISlate
           useInFlow={this.props.reactionerUseInFlow}
           action="focus"
           selector="div[contenteditable]"
-          groupPosition={this.props.reactionerGroupPosition}
           disabled={this.props.reactionerDisabled}
           fullWidth={true}
+          sx={{display: "block"}}
         >
           {box}
         </AltBadgeReactioner>

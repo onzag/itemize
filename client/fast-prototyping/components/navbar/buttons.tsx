@@ -142,7 +142,6 @@ export function Buttons(props: ButtonsProps) {
                     reactionKey="l"
                     component="span"
                     selector="button"
-                    groupPosition={-100}
                   >
                     <Button color="inherit" variant="outlined" onClick={openLoginDialog} sx={buttonsStyles.loginButton}>
                       <I18nRead id="login" context="users/user"/>
@@ -182,7 +181,6 @@ export function Buttons(props: ButtonsProps) {
                     reactionKey="p"
                     component="span"
                     selector="a"
-                    groupPosition={-100}
                   >
                     <Avatar
                       {...props.avatarProps}

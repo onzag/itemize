@@ -60,6 +60,13 @@ function findLastIndex(arr: any[], fn: (ele: any) => boolean) {
   return -1;
 }
 
+// for some reason despite there being a single class and with certainty
+// when the focusAt function gets called the onFocus function gets executed with
+// the previous values for the instance in a way that makes zero sense
+// some optimization things are going on from the browser
+// This only occurs in Chrome.... so it is related to chrome
+let preventNextFocus = false;
+
 /**
  * Combine both interfaces
  */
@@ -741,6 +748,10 @@ export interface ISlateEditorElementWrappers {
  * the main component which will pass them to the wrapper
  */
 export interface ISlateEditorWrapperBaseProps {
+  /**
+   * Whether it is disabled
+   */
+  disabled: boolean;
   /**
    * This is the slate editor current state
    * that is passed to the wrapper in order
@@ -2705,6 +2716,10 @@ export class SlateEditor extends React.Component<ISlateEditorProps, ISlateEditor
         element: element as any,
         asTemplate: false,
         customProps,
+
+        // we don't care as we are not using the onCustom function
+        parent: null,
+        tree: null,
       }) as any;
 
       const contextSwichContext = this.getContextFor(element as any, "final", true);
@@ -2782,6 +2797,11 @@ export class SlateEditor extends React.Component<ISlateEditorProps, ISlateEditor
       element: leaf as any,
       asTemplate: false,
       customProps: { ...attributes, children },
+
+      // we don't care as we are not using the onCustom function
+      // this will prevent normalization but that's fine
+      parent: null,
+      tree: null,
     }) as any;
   }
 
@@ -2997,6 +3017,11 @@ export class SlateEditor extends React.Component<ISlateEditorProps, ISlateEditor
    * @returns a void promise once it's done
    */
   public async focusAt(at: Range | Path): Promise<void> {
+    preventNextFocus = true;
+    setTimeout(() => {
+      preventNextFocus = false;
+    }, 300);
+
     if (Range.isRange(at)) {
       return new Promise((r) => {
         setTimeout(() => {
@@ -4630,37 +4655,46 @@ export class SlateEditor extends React.Component<ISlateEditorProps, ISlateEditor
     return newFeatureSupport;
   }
 
-  public forceFocus() {
-    setTimeout(() => {
-      if (!this.state.focused) {
-        const path: Path = [];
-        let current: any = this.editor.children && this.editor.children[0];
-        while (current) {
-          path.push(0);
-          current = current.children && current.children[0];
-        }
-        // bug in slate sometimes it just rejects to focus
-        // when using tab, specifically shift+tab
-        this.focusAt({
-          anchor: {
-            offset: 0,
-            path,
-          },
-          focus: {
-            offset: 0,
-            path,
-          },
-        });
-
-        // More bugs in slate still may reject to focus because slate
-        // can be very buggy
-        setTimeout(() => {
-          if (!this.state.focused) {
-            this.onFocusedChange(path, this.editor.children);
+  public forceFocus(e: React.FocusEvent) {
+    // with this condition we avoid it applying with children
+    // that are nested, such as internal textareas
+    if (
+      !preventNextFocus &&
+      e.target &&
+      (e.target as HTMLDivElement).dataset &&
+      (e.target as HTMLDivElement).dataset.slateEditor === "true"
+    ) {
+      setTimeout(() => {
+        if (!this.state.focused) {
+          const path: Path = [];
+          let current: any = this.editor.children && this.editor.children[0];
+          while (current) {
+            path.push(0);
+            current = current.children && current.children[0];
           }
-        }, 20);
-      }
-    }, 20);
+          // bug in slate sometimes it just rejects to focus
+          // when using tab, specifically shift+tab
+          this.focusAt({
+            anchor: {
+              offset: 0,
+              path,
+            },
+            focus: {
+              offset: 0,
+              path,
+            },
+          });
+  
+          // More bugs in slate still may reject to focus because slate
+          // can be very buggy
+          setTimeout(() => {
+            if (!this.state.focused) {
+              this.onFocusedChange(path, this.editor.children);
+            }
+          }, 20);
+        }
+      }, 20);
+    }
   }
 
   public forceBlur() {
@@ -4714,6 +4748,7 @@ export class SlateEditor extends React.Component<ISlateEditorProps, ISlateEditor
       children = (
         <Wrapper
           {...this.props.wrapperArgs}
+          disabled={this.props.disabled}
           state={this.state}
           helpers={this.getHelpers()}
           featureSupport={this.getFeatureSupport()}

@@ -4,9 +4,29 @@
  * @module
  */
 
+import Paper from "@mui/material/Paper";
 import React from "react";
 import { IPropertyViewFilesRendererProps } from "../../../internal/components/PropertyView/PropertyViewFiles";
 import PropertyViewFileRenderer from "./PropertyViewFile";
+
+const styles = {
+  paper: {
+    backgroundColor: "#fff",
+    width: "100%",
+    minHeight: "200px",
+    height: "auto",
+    alignItems: "center",
+    justifyContent: "center",
+    display: "flex",
+    position: "relative",
+    padding: "20px 20px 20px 20px",
+    flexWrap: "wrap",
+    boxShadow: "none",
+    border: "solid 1px #ccc",
+    rowGap: "20px",
+    columnGap: "20px",
+  } as any,
+}
 
 /**
  * The property view file renderer will show a file, and if it's an image
@@ -27,10 +47,10 @@ export default class PropertyViewFilesRenderer extends React.Component<IProperty
       return null;
     }
 
-    return (
+    const files = (
       <>
-        {this.props.currentValueWithInfo.map((v) => {
-          return (
+        {this.props.currentValueWithInfo.map((v, index) => {
+          const fileRendered = (
             <PropertyViewFileRenderer
               key={v.file.id}
               args={this.props.args}
@@ -42,9 +62,28 @@ export default class PropertyViewFilesRenderer extends React.Component<IProperty
               prettySize={v.prettySize}
               rtl={this.props.rtl}
             />
-          )
+          );
+          if (this.props.args.fileWrapper) {
+            return (
+              <React.Fragment key={v.file.id}>
+                {this.props.args.fileWrapper(fileRendered, v.file, index)}
+              </React.Fragment>
+            );
+          }
+
+          return fileRendered;
         })}
       </>
+    );
+
+    if (this.props.args.doNotContain) {
+      return files;
+    }
+
+    return (
+      <Paper sx={styles.paper}>
+        {files}
+      </Paper>
     );
   }
 }

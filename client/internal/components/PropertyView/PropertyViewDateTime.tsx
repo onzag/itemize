@@ -42,7 +42,7 @@ interface IPropertyViewDateTimeState {
 /**
  * The property view date time handler class
  */
-export class PropertyViewDateTime extends React.Component<IPropertyViewHandlerProps<string, IPropertyViewDateTimeRendererProps>, IPropertyViewDateTimeState> {
+export default class PropertyViewDateTime extends React.Component<IPropertyViewHandlerProps<string, IPropertyViewDateTimeRendererProps>, IPropertyViewDateTimeState> {
   constructor(props: IPropertyViewHandlerProps<string, IPropertyViewDateTimeRendererProps>) {
     super(props);
 

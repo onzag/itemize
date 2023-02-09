@@ -101,7 +101,7 @@ class ActualTotalPagedSearchLoader extends React.PureComponent<IActualTotalPaged
     if (hasNextPage || hasNextTotal) {
       if (!hasNextPage && this.props.limit !== null) {
         this.isOutOfBounds = true;
-        this.props.onOutOfBounds(this.props.limit + this.props.offset, this.props.offset);
+        this.props.onOutOfBounds(this.props.limit, this.props.offset + this.props.limit);
       }
 
       // current page is 0 indexed whereas the qs parameter is 1 indexed for user understanding
@@ -115,7 +115,7 @@ class ActualTotalPagedSearchLoader extends React.PureComponent<IActualTotalPaged
     if (hasPrevPage || hasPrevTotal) {
       if (!hasPrevPage && this.props.limit !== null) {
         this.isOutOfBounds = true;
-        this.props.onOutOfBounds(this.props.limit - this.props.offset, this.props.offset);
+        this.props.onOutOfBounds(this.props.limit, this.props.limit - this.props.offset);
       }
 
       // current page is 0 indexed whereas the qs parameter is 1 indexed for user understanding
@@ -213,7 +213,7 @@ class ActualTotalPagedSearchLoader extends React.PureComponent<IActualTotalPaged
     }
 
     if (this.props.offset) {
-      const totalChunks = (this.props.limit || 0) / (this.props.offset / 0);
+      const totalChunks = (this.props.offset || 0) / (this.props.limit / 0);
 
       if (!Number.isInteger(totalChunks)) {
         throw new Error(
@@ -274,6 +274,35 @@ class ActualTotalPagedSearchLoader extends React.PureComponent<IActualTotalPaged
  * The page search loader component allows for creating pagination UI elements rather
  * simply, it extends the standard search loader for this, it uses the navigation in order
  * to store its page number so that searches are kept consistent
+ * 
+ * When you do an automatic search ensure that:
+ * 
+ * the offset is divisible by the limit
+ * the offset is divisible by the page size
+ * 
+ * however the purpose is that this loader tells you which numbers to use for the limit and offset
+ * in the automatic search and all you need to provide is the page size for example
+ * 
+ * offset = 0
+ * limit = 20
+ * pageSize = 5
+ * 
+ * and let's say there is a total of 53 results this will result in
+ * 
+ * 1. A chunk of 0-20 records (or even the entire data if traditional) being loaded
+ * 2. 1-4 pages being loaded
+ * 3. 11 pages being considered total
+ * 
+ * When selecting the 5th page out of 11, the loader will request you to change the offset to 20 while
+ * keeping the limit still at 20
+ * 
+ * 1. The chunk of 20-40 is now loaded
+ * 2. 5-8 pages are loaded
+ * 
+ * And when selecting page 9 and so on it changes the chunk constantly
+ * 
+ * note that the total paged loader is not well suited for realtime results due to its chunked nature
+ * as you move among the pages the data may sort itself out of order
  */
 export class TotalPagedSearchLoader extends React.PureComponent<ITotalPagedSearchLoaderProps, ITotalPagedSearchLoaderState> {
   constructor(props: ITotalPagedSearchLoaderProps) {

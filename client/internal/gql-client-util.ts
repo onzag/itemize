@@ -1781,7 +1781,7 @@ export async function runSearchQueryFor(
   } else {
     // we may get records anyway eg. when using cache worker
     // if not we need to rebuild them from the results
-    const records: IGQLSearchRecord[] = data.records ? (data.records as IGQLSearchRecord[]) : ((
+    const records: IGQLSearchRecord[] = data && data.records ? (data.records as IGQLSearchRecord[]) : ((
       data && (data.results as IGQLValue[]).map((v) => ({
         type: v.type,
         version: v.version || null,

@@ -192,7 +192,8 @@ export default class PropertyViewFileRenderer extends React.Component<IPropertyV
       }
       return null;
     }
-    if (this.props.isSupportedImage) {
+
+    if (this.props.isSupportedImage && this.props.args.useFullImage) {
       const imageClassName: string = this.props.args.imageClassName;
       const imageSizes: string = this.props.args.imageSizes || "70vw";
 
@@ -216,13 +217,13 @@ export default class PropertyViewFileRenderer extends React.Component<IPropertyV
       if (this.props.args.disableImageLinking) {
         return img;
 
-      // in this case the link is there but invisible
-      // this might be preferrable for SEO purposes
+        // in this case the link is there but invisible
+        // this might be preferrable for SEO purposes
       } else if (this.props.args.hideImageLink) {
         return (
           <>
             {img}
-            <a href={this.props.currentValue.url} style={{display: "none"}}/>
+            <a href={this.props.currentValue.url} style={{ display: "none" }} />
           </>
         );
       }
@@ -233,12 +234,34 @@ export default class PropertyViewFileRenderer extends React.Component<IPropertyV
         </a>
       );
     }
+
     return (
-      <span className="file" onClick={this.props.openFile}>
+      <span
+        className="file"
+        onClick={this.props.openFile}
+        tabIndex={0}
+        role="button"
+        aria-labelledby={`${this.props.currentValue.id}_name ${this.props.currentValue.id}_ext ${this.props.currentValue.id}_size`}
+        onKeyDown={openFileManually.bind(null, this.props.openFile)}
+      >
         <span className="file-container">
-          <span className="file-icon">
-            <span className="file-extension">{this.props.extension}</span>
-          </span>
+          {
+            this.props.isSupportedImage ? (
+              <img
+                srcSet={this.props.imageSrcSet}
+                sizes="100px"
+                src={this.props.currentValue.url}
+                className="thumbnail"
+                alt={this.props.currentValue.name}
+              />
+            ) : (
+              <span className="file-icon">
+                <span className="file-extension" id={this.props.currentValue.id + "_ext"}>{
+                  this.props.extension
+                }</span>
+              </span>
+            )
+          }
           <span className="file-name">{this.props.currentValue.name}</span>
           <span className="file-size">{this.props.prettySize}</span>
         </span>
@@ -246,3 +269,11 @@ export default class PropertyViewFileRenderer extends React.Component<IPropertyV
     );
   }
 }
+
+function openFileManually(openFile: any, e: React.KeyboardEvent) {
+  if (e.code === "Enter" || e.code === "Space") {
+    e.stopPropagation();
+    e.preventDefault();
+    openFile();
+  }
+};

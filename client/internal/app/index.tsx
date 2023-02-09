@@ -21,6 +21,7 @@ import { ILocaleContextType, LocaleProvider } from "../providers/locale-provider
 import { IDataContextType, DataProvider } from "../providers/appdata-provider";
 import type { EndpointErrorType } from "../../../base/errors";
 import { ENDPOINT_ERRORS } from "../../../constants";
+import { history } from "../..";
 
 /**
  * Just a variable for whether is development
@@ -364,9 +365,10 @@ export default class App extends React.Component<IAppProps, IAppState> {
     // We set it to the url
     pathNameSplitted[1] = locale;
     const newPathName = pathNameSplitted.join("/");
-    if (window.history) {
-      window.history.replaceState(window.history.state, "", newPathName + window.location.search);
-    }
+    history.replace(newPathName + history.location.search, history.location.state);
+    // if (window.history) {
+    //   history.replaceState(window.history.state, "", newPathName + window.location.search);
+    // }
 
     this.setState({
       specifiedLang: locale,
@@ -567,9 +569,10 @@ export default class App extends React.Component<IAppProps, IAppState> {
     if (urlLanguage && this.state.specifiedLang !== urlLanguage) {
       pathNameSplitted[1] = this.state.specifiedLang;
       const newPathName = pathNameSplitted.join("/");
-      if (window.history) {
-        window.history.replaceState(window.history.state, "", newPathName + window.location.search);
-      }
+      history.replace(newPathName + history.location.search, history.location.state);
+      // if (window.history) {
+      //   window.history.replaceState(window.history.state, "", newPathName + window.location.search);
+      // }
     }
   }
 

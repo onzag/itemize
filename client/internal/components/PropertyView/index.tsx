@@ -24,10 +24,11 @@ import PropertyViewFile from "./PropertyViewFile";
 import PropertyViewFiles from "./PropertyViewFiles";
 import { IConfigRawJSONDataType } from "../../../../config";
 import { ConfigContext } from "../../providers/config-provider";
-import { PropertyViewBoolean } from "./PropertyViewBoolean";
-import { PropertyViewDateTime } from "./PropertyViewDateTime";
-import { PropertyViewLocation } from "./PropertyViewLocation";
-import { PropertyViewCurrency } from "./PropertyViewCurrency";
+import PropertyViewBoolean from "./PropertyViewBoolean";
+import PropertyViewDateTime from "./PropertyViewDateTime";
+import PropertyViewLocation from "./PropertyViewLocation";
+import PropertyViewCurrency from "./PropertyViewCurrency";
+import PropertyViewPayment from "./PropertyViewPayment";
 import PropertyViewReference from "./PropertyViewReference";
 import { ISSRContextType, SSRContext } from "../../../../client/internal/providers/ssr-provider";
 import { TokenContext, ITokenContextType } from "../../../../client/internal/providers/token-provider";
@@ -353,10 +354,13 @@ const handlerRegistry:
     handler: PropertyViewFiles,
     includeConfig: true,
   },
+  payment: {
+    renderer: "PropertyViewPayment",
+    handler: PropertyViewPayment,
+  },
 
   // TODO
   unit: null,
-  payment: null,
   taglist: null,
 };
 

@@ -27,11 +27,9 @@ import { convertGQLValueToSQLValueForModule } from "../base/Root/Module/sql";
 import { convertGQLValueToSQLValueForItemDefinition } from "../base/Root/Module/ItemDefinition/sql";
 import uuid from "uuid";
 import uuidv5 from "uuid/v5";
-import { DeleteBuilder } from "../database/DeleteBuilder";
 import type PropertyDefinition from "../base/Root/Module/ItemDefinition/PropertyDefinition";
 import type Include from "../base/Root/Module/ItemDefinition/Include";
 import { ItemizeElasticClient } from "./elastic";
-import { InsertBuilder } from "../database/InsertBuilder";
 import type { IAppDataType } from "../server";
 
 type RedoDictionariesFnPropertyBased = (language: string, dictionary: string, property: string) => void;
@@ -1281,6 +1279,14 @@ export class ItemizeRawDB {
       this.root.registry[itemDefinitionOrModule] :
       itemDefinitionOrModule;
 
+    if (!itemDefinitionOrModuleInstance) {
+      if (typeof itemDefinitionOrModule === "string") {
+        throw new Error(itemDefinitionOrModule + " does not exist, as it was used while querying");
+      } else {
+        throw new Error("Recieved undefined/null while querying");
+      }
+    }
+
     const builder = new SelectBuilder();
 
     if (itemDefinitionOrModuleInstance instanceof ItemDefinition && !preventJoin) {
@@ -1382,6 +1388,19 @@ export class ItemizeRawDB {
     }
 
     const itemDefinition = item instanceof ItemDefinition ? item : this.root.registry[item] as ItemDefinition;
+
+    if (!itemDefinition || !(item instanceof Module)) {
+      if (typeof item === "string" && !itemDefinition) {
+        throw new Error(item + " does not exist, as it was used while batch updating");
+      } else if (item instanceof Module) {
+        throw new Error("Received an module for doing a batch update");
+      } else if (!item) {
+        throw new Error("Recieved undefined/null for batch update");
+      } else {
+        throw new Error("Recieved unknown object for batch update");
+      }
+    }
+
     const mod = itemDefinition.getParentModule();
 
     const moduleTable = mod.getQualifiedPathName();
@@ -1791,6 +1810,19 @@ export class ItemizeRawDB {
     }
 
     const mod = moduleToUpdate instanceof Module ? moduleToUpdate : this.root.registry[moduleToUpdate] as Module;
+
+    if (!moduleToUpdate || !(mod instanceof Module)) {
+      if (typeof mod === "string" && !moduleToUpdate) {
+        throw new Error(mod + " does not exist, as it was used while batch updating");
+      } else if (mod instanceof ItemDefinition) {
+        throw new Error("Received an item for doing a batch update");
+      } else if (!mod) {
+        throw new Error("Recieved undefined/null for batch module update");
+      } else {
+        throw new Error("Recieved unknown object for batch module update");
+      }
+    }
+
     const moduleTable = mod.getQualifiedPathName();
 
     // we are going to check that no tracked properties exist in the item, otherwise the update can't be done

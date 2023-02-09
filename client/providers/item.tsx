@@ -17,7 +17,7 @@ import {
 } from "../../constants";
 import { IGQLSearchRecord, IGQLValue, IGQLRequestFields, ProgresserFn } from "../../gql-querier";
 import { requestFieldsAreContained } from "../../gql-util";
-import { EndpointErrorType } from "../../base/errors";
+import { EndpointError, EndpointErrorType } from "../../base/errors";
 import equals from "deep-equal";
 import { ModuleContext } from "./module";
 import CacheWorkerInstance from "../internal/workers/cache";
@@ -706,6 +706,11 @@ export interface IItemProviderProps {
    */
   automaticSearchIsOnlyInitial?: boolean;
   /**
+   * Makes automatic search only happen if the object doesn't currently hold
+   * a search state
+   */
+  automaticSearchIsOnlyFallback?: boolean;
+  /**
    * Make the automatic search refresh immediately
    * not compatible with automaticSearchIsOnlyInitial
    * usually the automatic search will stack refreshes for 300ms
@@ -1042,11 +1047,51 @@ export class ActualItemProvider extends
     // this needs to run fast, as it's already pretty resource intensive
     if (
       props.itemDefinitionQualifiedName !== state.itemState.itemDefQualifiedName ||
-      (props.forId || null) !== (state.itemState.forId || null)
+      (props.forId || null) !== (state.itemState.forId || null) ||
+      (props.forVersion || null) !== (state.itemState.forVersion || null)
     ) {
-      // note how we pass the optimization flags
+      // for example when we didn't update right away the search state
+      // when we changed slot this would cause old records to render
+      // in the search loader
+      let searchState: IItemSearchStateType = {
+        searchError: null,
+        searching: false,
+        searchResults: null,
+        searchRecords: null,
+        searchLimit: null,
+        searchOffset: null,
+        searchCount: null,
+        searchId: null,
+        searchOwner: null,
+        searchLastModified: null,
+        searchParent: null,
+        searchCacheUsesProperty: null,
+        searchShouldCache: false,
+        searchFields: null,
+        searchRequestedIncludes: {},
+        searchRequestedProperties: [],
+        searchEngineEnabled: false,
+        searchEngineEnabledLang: null,
+        searchEngineHighlightArgs: null,
+        searchHighlights: {},
+      };
+      const searchStateComplex = props.itemDefinitionInstance.getSearchState(
+        props.forId || null, props.forVersion || null,
+      );
+      if (searchStateComplex) {
+        searchState = searchStateComplex.searchState;
+
+        const state = searchStateComplex.state;
+        props.itemDefinitionInstance.applyState(
+          props.forId || null,
+          props.forVersion || null,
+          state,
+        );
+      }
+
       return {
         itemState: ActualItemProvider.getItemStateStatic(props),
+        ...searchState,
       };
     }
     return null;
@@ -1297,12 +1342,13 @@ export class ActualItemProvider extends
     this.releaseCleanupBlock = this.releaseCleanupBlock.bind(this);
     this.loadStateFromFile = this.loadStateFromFile.bind(this);
     this.downloadState = this.downloadState.bind(this);
+    this.onConnectStatusChange = this.onConnectStatusChange.bind(this);
 
     // first we setup the listeners, this includes the on change listener that would make
     // the entire app respond to actions, otherwise the fields might as well be disabled
     // we do this here to avoid useless callback changes as the listeners are not ready
-    this.installSetters(props, true);
-    this.installPrefills(props, true);
+    this.installSetters(props);
+    this.installPrefills(props);
 
     if (typeof document !== "undefined") {
       this.setupListeners();
@@ -1397,11 +1443,11 @@ export class ActualItemProvider extends
       localStorage.setItem(SEARCH_DESTRUCTION_MARKERS_LOCATION, JSON.stringify((window as any)[MEMCACHED_SEARCH_DESTRUCTION_MARKERS_LOCATION]));
     }
   }
-  public installSetters(props: IActualItemProviderProps = this.props, doNotCleanSearchState: boolean = false) {
+  public installSetters(props: IActualItemProviderProps = this.props) {
     if (props.setters) {
       props.setters.forEach((setter) => {
         const property = getPropertyForSetter(setter, props.itemDefinitionInstance);
-        this.onPropertyEnforce(property, setter.value, props.forId || null, props.forVersion || null, true, doNotCleanSearchState);
+        this.onPropertyEnforce(property, setter.value, props.forId || null, props.forVersion || null, true);
       });
     }
   }
@@ -1413,7 +1459,7 @@ export class ActualItemProvider extends
       });
     }
   }
-  public installPrefills(props: IActualItemProviderProps = this.props, doNotCleanSearchState: boolean = false) {
+  public installPrefills(props: IActualItemProviderProps = this.props) {
     if (props.prefills) {
       props.prefills.forEach((prefill) => {
         const property = getPropertyForSetter(prefill, props.itemDefinitionInstance);
@@ -1424,7 +1470,7 @@ export class ActualItemProvider extends
           null,
         );
       });
-      !doNotCleanSearchState && props.itemDefinitionInstance.cleanSearchState(props.forId || null, props.forVersion || null);
+      // !doNotCleanSearchState && props.itemDefinitionInstance.cleanSearchState(props.forId || null, props.forVersion || null);
       props.itemDefinitionInstance.triggerListeners(
         "change",
         props.forId || null,
@@ -1432,10 +1478,27 @@ export class ActualItemProvider extends
       );
     }
   }
+
+  public onConnectStatusChange() {
+    const isConnected = !this.props.remoteListener.isOffline();
+    if (isConnected) {
+      if (this.state.loadError && this.state.loadError.code === ENDPOINT_ERRORS.CANT_CONNECT) {
+        this.loadValue();
+      }
+      if (
+        this.state.searchError &&
+        this.state.searchError.code === ENDPOINT_ERRORS.CANT_CONNECT
+      ) {
+        this.search(this.lastOptionsUsedForSearch);
+      }
+    }
+  }
+
   // so now we have mounted, what do we do at the start
   public async componentDidMount() {
     this.isCMounted = true;
     this.mountCbFns.forEach((c) => c());
+    this.props.remoteListener.addConnectStatusListener(this.onConnectStatusChange);
 
     // now we retrieve the externally checked value
     if (this.props.containsExternallyCheckedProperty && this.props.enableExternalChecks) {
@@ -1486,8 +1549,12 @@ export class ActualItemProvider extends
       }
     }
 
-    if (this.props.onSearchStateLoaded) {
-      this.props.onSearchStateLoaded(getSearchStateOf(this.state));
+    if (this.props.onSearchStateLoaded || this.props.onSearchStateChange) {
+      const searchState = getSearchStateOf(this.state);
+      if (searchState.searchId) {
+        this.props.onSearchStateLoaded && this.props.onSearchStateLoaded(searchState);
+        this.props.onSearchStateChange && this.props.onSearchStateChange(searchState);
+      }
     }
 
     if (this.props.markForDestructionOnLogout) {
@@ -1653,6 +1720,7 @@ export class ActualItemProvider extends
       !!nextProps.static !== !!this.props.static ||
       !!nextProps.includePolicies !== !!this.props.includePolicies ||
       !!nextProps.automaticSearchIsOnlyInitial !== !!this.props.automaticSearchIsOnlyInitial ||
+      !!nextProps.automaticSearchIsOnlyFallback !== !!this.props.automaticSearchIsOnlyFallback ||
       !equals(nextProps.automaticSearch, this.props.automaticSearch, { strict: true }) ||
       !equals(nextProps.longTermCachingMetadata, this.props.longTermCachingMetadata, { strict: true }) ||
       !equals(nextProps.setters, this.props.setters, { strict: true }) ||
@@ -1664,6 +1732,7 @@ export class ActualItemProvider extends
     prevProps: IActualItemProviderProps,
     prevState: IActualItemProviderState,
   ) {
+    let searchIdFromLocation: string = null;
     if (
       prevProps.location &&
       this.props.location &&
@@ -1679,7 +1748,7 @@ export class ActualItemProvider extends
         this.props.location.state[this.props.loadSearchFromNavigation].searchId
       ) || null)
     ) {
-      this.loadSearch();
+      searchIdFromLocation = this.loadSearch();
     }
 
     if (
@@ -1869,9 +1938,25 @@ export class ActualItemProvider extends
       await this.loadStoredState();
     }
 
+    // no search id for example if the slot changed during
+    // an update of forId and forVersion and as a result
+    // the search is empty in this slot
+    if (!this.state.searchId) {
+      this.removePossibleSearchListeners(prevProps, prevState);
+    }
+
+    // need to first determine if the search was generated from a change
+    // from getDerived and something was loaded from it
+    // get derived will trigger in these circumstances
+    const getDerivedTriggeredASearchChange = itemDefinitionWasUpdated || uniqueIDChanged;
+
     if (
+      // location did not handle it
+      !searchIdFromLocation &&
       // if the automatic search is not setup to just initial
       !this.props.automaticSearchIsOnlyInitial &&
+      // if automatic search is only fallback there must not be an active search id as well
+      (this.props.automaticSearchIsOnlyFallback ? !this.state.searchId : true) &&
       // if there was previously an automatic search
       (
         (
@@ -1885,7 +1970,12 @@ export class ActualItemProvider extends
             itemDefinitionWasUpdated ||
             didSomethingThatInvalidatedSetters ||
             didSomethingThatInvalidatedPrefills ||
-            prevProps.tokenData.token !== this.props.tokenData.token
+            prevProps.tokenData.token !== this.props.tokenData.token ||
+
+            // no search id for example if the slot changed during
+            // an update of forId and forVersion and as a result
+            // the search is empty in this slot
+            (getDerivedTriggeredASearchChange && this.state.searchId === null)
           )
         ) ||
         (!prevProps.automaticSearch && this.props.automaticSearch)
@@ -1898,10 +1988,25 @@ export class ActualItemProvider extends
       }
       // maybe there's no new automatic search
       if (this.props.automaticSearch) {
-        this.search(this.props.automaticSearch);
+        // always perform the search even if there's a state
+        if (this.props.automaticSearchForce || this.state.searchId === null) {
+          this.search(this.props.automaticSearch);
+        } else {
+          // so knowing that let's check wether it loaded a search state that is currently active
+          // well it must be because this.state.searchId must be something right now
+          // so now we can assume getDerived loaded something into the search
+          if (getDerivedTriggeredASearchChange) {
+            this.props.onSearchStateLoaded && this.props.onSearchStateLoaded(getSearchStateOf(this.state));
+          } else {
+            // otherwise we automatically search
+            this.search(this.props.automaticSearch);
+          }
+        }
       } else {
         this.dismissSearchResults();
       }
+    } else if (getDerivedTriggeredASearchChange && this.state.searchId) {
+      this.props.onSearchStateLoaded && this.props.onSearchStateLoaded(getSearchStateOf(this.state));
     }
 
     // this is a different instance, we consider it dismounted
@@ -2095,7 +2200,7 @@ export class ActualItemProvider extends
     }
 
     // we basically just upgrade the state
-    this.setState({
+    !this.isUnmounted && this.setState({
       itemState: this.getItemState(),
       // also search might do this, and it's true anyway
       notFound: isNotFound,
@@ -2682,12 +2787,12 @@ export class ActualItemProvider extends
     if (this.state.loading) {
       return;
     }
-    
+
     property.restoreValueFor(
       this.props.forId || null,
       this.props.forVersion || null,
     );
-    this.props.itemDefinitionInstance.cleanSearchState(this.props.forId || null, this.props.forVersion || null);
+    // this.props.itemDefinitionInstance.cleanSearchState(this.props.forId || null, this.props.forVersion || null);
     this.onPropertyChangeOrRestoreFinal();
   }
   public async onPropertyChange(
@@ -2708,7 +2813,7 @@ export class ActualItemProvider extends
       value,
       internalValue,
     );
-    this.props.itemDefinitionInstance.cleanSearchState(this.props.forId || null, this.props.forVersion || null);
+    // this.props.itemDefinitionInstance.cleanSearchState(this.props.forId || null, this.props.forVersion || null);
     this.onPropertyChangeOrRestoreFinal();
   }
   public onPropertyEnforceOrClearFinal(
@@ -2736,13 +2841,13 @@ export class ActualItemProvider extends
     givenForId: string,
     givenForVersion: string,
     internal?: boolean,
-    doNotCleanSearchState?: boolean,
+    // doNotCleanSearchState?: boolean,
   ) {
     // this function is basically run by the setter
     // since they might be out of sync that's why the id is passed
     // the setter enforces values
     property.setSuperEnforced(givenForId || null, givenForVersion || null, value, this);
-    !doNotCleanSearchState && this.props.itemDefinitionInstance.cleanSearchState(this.props.forId || null, this.props.forVersion || null);
+    // !doNotCleanSearchState && this.props.itemDefinitionInstance.cleanSearchState(this.props.forId || null, this.props.forVersion || null);
     this.onPropertyEnforceOrClearFinal(givenForId, givenForVersion, internal);
   }
   public onPropertyClearEnforce(
@@ -2753,7 +2858,7 @@ export class ActualItemProvider extends
   ) {
     // same but removes the enforcement
     property.clearSuperEnforced(givenForId || null, givenForVersion || null, this);
-    this.props.itemDefinitionInstance.cleanSearchState(this.props.forId || null, this.props.forVersion || null);
+    // this.props.itemDefinitionInstance.cleanSearchState(this.props.forId || null, this.props.forVersion || null);
     this.onPropertyEnforceOrClearFinal(givenForId, givenForVersion, internal);
   }
   public runDismountOn(props: IActualItemProviderProps = this.props) {
@@ -2782,6 +2887,7 @@ export class ActualItemProvider extends
     this.unSetupListeners();
     this.removeSetters();
     this.runDismountOn();
+    this.props.remoteListener.removeConnectStatusListener(this.onConnectStatusChange);
 
     if (window.TESTING && process.env.NODE_ENV === "development") {
       const mountItem = window.TESTING.mountedItems.find(m => m.instanceUUID === this.internalUUID);
@@ -4154,6 +4260,7 @@ export class ActualItemProvider extends
     }
 
     const searchId = uuid.v4();
+
     if (error) {
       const searchState = {
         searchError: error,

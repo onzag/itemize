@@ -47,19 +47,19 @@ export type PropertyDefinitionSupportedTypeName =
   "string" |          // A simple string, comparable, and stored as a string
   "password" |        // A password, stored as a hash, ensure to disable retrieval
   "text" |            // Represented as an object, non comparable,
-                      // stored as text and object and it should be able to do
-                      // full text search, it's an object due to image support
-                      // images are stored separatedly which includes where in
-                      // the text location they are.
+  // stored as text and object and it should be able to do
+  // full text search, it's an object due to image support
+  // images are stored separatedly which includes where in
+  // the text location they are.
   "year" |            // Represented as a number, comparable, stored as number
   "date" |            // Represented as a date, comparable, stored as a date
   "datetime" |        // Represented as a date, comparable, stored as a date
   "time" |            // Represented as a date, comparable, stored as a date
   "location" |        // Represented as an object, non comparable, stored
-                      // as two values
+  // as two values
   "file" |            // Represents a single url
   "files" |           // Represented as a list of urls, non comparable,
-                      // stored as a list of urls
+  // stored as a list of urls
   "payment" |
   "taglist";
 
@@ -410,7 +410,7 @@ export interface IPropertyDefinitionSupportedType<T> {
    * Because of the nature of the pre side effecct it is unable to run
    * on delete as it's too expensive because of deletition cascading
    */
-   sqlPreSideEffect?: (arg: ISQLSideEffectType<T>) => boolean | string | Promise<boolean | string>;
+  sqlPreSideEffect?: (arg: ISQLSideEffectType<T>) => boolean | string | Promise<boolean | string>;
 
   /**
    * Use this function to
@@ -497,7 +497,7 @@ export interface IPropertyDefinitionSupportedType<T> {
  * how they are supposed to be managed
  */
 export type PropertyDefinitionSupportedTypesStandardType =
-Record<PropertyDefinitionSupportedTypeName, IPropertyDefinitionSupportedType<PropertyDefinitionSupportedType>>;
+  Record<PropertyDefinitionSupportedTypeName, IPropertyDefinitionSupportedType<PropertyDefinitionSupportedType>>;
 
 /**
  * The standard definition and registry of all types in itemize
@@ -529,11 +529,11 @@ Object.keys(supportedTypesStandard).forEach((propDefKey) => {
   // if it's not searchable, but we provide requests for search i18n data
   if (!propDef.searchable &&
     (propDef.i18n.searchBase || propDef.i18n.searchOptional ||
-    propDef.i18n.searchRange || propDef.i18n.searchRangeOptional)) {
-      throw new Error("Invalid propdef with search data for non-searchable > " +
-        propDefKey);
+      propDef.i18n.searchRange || propDef.i18n.searchRangeOptional)) {
+    throw new Error("Invalid propdef with search data for non-searchable > " +
+      propDefKey);
 
-  // if it's searchable, but we provide no requests for search i18n data
+    // if it's searchable, but we provide no requests for search i18n data
   } else if (propDef.searchable) {
     if (!propDef.i18n.searchBase || !propDef.i18n.searchOptional) {
       throw new Error("Invalid propdef lacking search data while searchable > " +

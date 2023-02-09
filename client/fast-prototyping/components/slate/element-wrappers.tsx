@@ -77,6 +77,13 @@ export interface IMaterialUIWrapperElementProps extends ISlateEditorWrapperEleme
    * The whole of the i18n rich information that is given by default
    */
   i18nRichInfo: IPropertyEntryI18nRichTextInfo;
+
+  /**
+   * The priority to use in accessibility
+   * try to keep it in line with the wrappers
+   * usually a value of 1
+   */
+  usePriority?: number;
 }
 
 function getVideoURL(v: IVideo) {
@@ -171,7 +178,7 @@ function TextWrapper(props: IMaterialUIWrapperElementProps) {
       dropdown={
         <AltBadgeReactioner
           reactionKey="t"
-          priority={1}
+          priority={typeof props.usePriority === "number" ? props.usePriority : 1}
           selector="div[tabindex]"
           action="focus"
           fullWidth={true}
@@ -273,7 +280,7 @@ function TdAndTh(props: IMaterialUIWrapperElementProps) {
             {props.featureSupport.availableTables.length ? (
               <AltBadgeReactioner
                 reactionKey="t"
-                priority={1}
+                priority={typeof props.usePriority === "number" ? props.usePriority : 1}
                 selector="div[tabindex]"
                 action="focus"
               >
@@ -318,7 +325,7 @@ function TdAndTh(props: IMaterialUIWrapperElementProps) {
             ) : null}
             <AltBadgeReactioner
               reactionKey="c"
-              priority={1}
+              priority={typeof props.usePriority === "number" ? props.usePriority : 1}
               selector="button"
             >
               <IconButton
@@ -334,7 +341,7 @@ function TdAndTh(props: IMaterialUIWrapperElementProps) {
             </AltBadgeReactioner>
             <AltBadgeReactioner
               reactionKey="r"
-              priority={1}
+              priority={typeof props.usePriority === "number" ? props.usePriority : 1}
               selector="button"
             >
               <IconButton
@@ -350,7 +357,7 @@ function TdAndTh(props: IMaterialUIWrapperElementProps) {
             </AltBadgeReactioner>
             <AltBadgeReactioner
               reactionKey="c"
-              priority={1}
+              priority={typeof props.usePriority === "number" ? props.usePriority : 1}
               selector="button"
             >
               <IconButton
@@ -366,7 +373,7 @@ function TdAndTh(props: IMaterialUIWrapperElementProps) {
             </AltBadgeReactioner>
             <AltBadgeReactioner
               reactionKey="r"
-              priority={1}
+              priority={typeof props.usePriority === "number" ? props.usePriority : 1}
               selector="button"
             >
               <IconButton
@@ -382,7 +389,7 @@ function TdAndTh(props: IMaterialUIWrapperElementProps) {
             </AltBadgeReactioner>
             <AltBadgeReactioner
               reactionKey="h"
-              priority={1}
+              priority={typeof props.usePriority === "number" ? props.usePriority : 1}
               selector="button"
             >
               <IconButton
@@ -398,7 +405,7 @@ function TdAndTh(props: IMaterialUIWrapperElementProps) {
             </AltBadgeReactioner>
             <AltBadgeReactioner
               reactionKey="f"
-              priority={1}
+              priority={typeof props.usePriority === "number" ? props.usePriority : 1}
               selector="button"
             >
               <IconButton
@@ -516,7 +523,7 @@ export const materialUIElementWrappers: ISlateEditorElementWrappers = {
             <>
               <AltBadgeReactioner
                 reactionKey="h"
-                priority={1}
+                priority={typeof props.usePriority === "number" ? props.usePriority : 1}
                 selector="input"
                 action="focus"
                 disabled={!!(props.element as ILink).thref}
@@ -543,7 +550,7 @@ export const materialUIElementWrappers: ISlateEditorElementWrappers = {
                     <Box sx={styles.linkTemplateOptionsText}>{props.i18nRichInfo.setLink.templated}</Box>
                     <AltBadgeReactioner
                       reactionKey="t"
-                      priority={1}
+                      priority={typeof props.usePriority === "number" ? props.usePriority : 1}
                       selector="div[tabindex]"
                       action="focus"
                       fullWidth={true}
@@ -617,7 +624,7 @@ export const materialUIElementWrappers: ISlateEditorElementWrappers = {
           dropdown={
             <AltBadgeReactioner
               reactionKey="u"
-              priority={1}
+              priority={typeof props.usePriority === "number" ? props.usePriority : 1}
               selector="input"
               action="focus"
               fullWidth={true}
@@ -661,7 +668,7 @@ export const materialUIElementWrappers: ISlateEditorElementWrappers = {
           dropdown={
             <AltBadgeReactioner
               reactionKey="a"
-              priority={1}
+              priority={typeof props.usePriority === "number" ? props.usePriority : 1}
               selector="input"
               action="focus"
               fullWidth={true}
@@ -702,7 +709,7 @@ export const materialUIElementWrappers: ISlateEditorElementWrappers = {
           dropdown={
             <AltBadgeReactioner
               reactionKey="t"
-              priority={1}
+              priority={typeof props.usePriority === "number" ? props.usePriority : 1}
               selector="div[tabindex]"
               action="focus"
               fullWidth={true}
@@ -776,7 +783,7 @@ export const materialUIElementWrappers: ISlateEditorElementWrappers = {
           dropdown={
             <AltBadgeReactioner
               reactionKey="t"
-              priority={1}
+              priority={typeof props.usePriority === "number" ? props.usePriority : 1}
               selector="div[tabindex]"
               action="focus"
               fullWidth={true}

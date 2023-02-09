@@ -232,7 +232,7 @@ export function retrieveElementActionsForReact(
         contextValue = contextValue.value;
       } else if (!contextValue) {
         contextValue = rootContext && rootContext.properties[value];
-  
+
         if (contextValue instanceof NonRootInheritable) {
           contextValue = null;
         }
@@ -492,6 +492,8 @@ export function reactifyElementBase(
               templateRootArgs: currentTemplateRootArgs,
               templateIgnoreContextualChanges: true,
               extraOptions: arg.extraOptions,
+              parent: arg.parent,
+              tree: arg.tree,
             }
           );
         }
@@ -561,6 +563,8 @@ export function reactifyElementBase(
             templateRootArgs: currentTemplateRootArgs,
             templateIgnoreContextualChanges: true,
             extraOptions: arg.extraOptions,
+            parent: arg.parent,
+            tree: arg.tree,
           }
         );
       })
@@ -616,6 +620,8 @@ export function reactifyElementBase(
           templateRootArgs: currentTemplateRootArgs,
           key: index,
           extraOptions: arg.extraOptions,
+          parent: base as RichElement,
+          tree: arg.tree,
         };
 
         // and then we call the reactify
@@ -780,6 +786,8 @@ export function reactifyElementBase(
               templateRootArgs: currentTemplateRootArgs,
               key: index,
               extraOptions: arg.extraOptions,
+              parent: base as RichElement,
+              tree: arg.tree,
             };
 
             // and then we call the reactify
@@ -861,7 +869,14 @@ export function reactifyElementBase(
             toRender = arg.extraOptions.onCustom(
               base as any,
               { ...finalProps, ...events },
-              { Tag, styleActive, styleHover, defaultReturn: defaultReturn.bind(null, styleActive, styleHover) },
+              {
+                Tag,
+                styleActive,
+                styleHover,
+                defaultReturn: defaultReturn.bind(null, styleActive, styleHover),
+                parent: arg.parent,
+                tree: arg.tree,
+              },
             );
           } else {
             toRender = defaultReturn();

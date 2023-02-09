@@ -9,6 +9,7 @@ interface IPlainContentEditableProps {
   readOnly?: boolean;
   children: string;
   autoFocus?: boolean;
+  lang?: string;
 }
 
 export default class PlainContentEditable extends React.Component<IPlainContentEditableProps> {
@@ -71,6 +72,7 @@ export default class PlainContentEditable extends React.Component<IPlainContentE
         onBlur={this.onBlur}
         contentEditable={!this.props.readOnly}
         suppressContentEditableWarning={true}
+        lang={this.props.lang}
       >{this.props.children}</Element>
     )
   }

@@ -713,9 +713,10 @@ export function countSize(root: IRootLevelDocument | RichElement | IText): numbe
  * Counts the words of the document
  * @param root 
  */
+const spaceRegex = /^\s+$/;
 export function countWords(root: IRootLevelDocument | RichElement | IText): number {
   if (typeof (root as IText).text === "string") {
-    return (root as IText).text.split(" ").filter((v) => v !== "").length;
+    return (root as IText).text.split(" ").filter((v) => v !== "" && !spaceRegex.test(v)).length;
   }
   const counts = (root as IRootLevelDocument).children.map(countWords);
   if (counts.length === 0) {
@@ -1007,7 +1008,7 @@ export function renderTemplateDynamically(
     <>
       {
         document.children.map((c, index) => {
-          return SERIALIZATION_REGISTRY.REACTIFY[c.type]({
+          return SERIALIZATION_REGISTRY.REACTIFY[c.type || "text"]({
             asTemplate: true,
             active: true,
             element: c,
@@ -1015,6 +1016,8 @@ export function renderTemplateDynamically(
             templateArgs: args,
             selected: false,
             extraOptions: options,
+            parent: document,
+            tree: document,
           });
         })
       }

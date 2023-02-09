@@ -246,6 +246,10 @@ function i18nReadInternal(
       errMessage += "; in item definition context for " +
         idef.getName();
 
+      if (mod) {
+        errMessage += "; in mod context for " + mod.getName();
+      }
+
       // add the policies if any
       if (props.policyType && props.policyName) {
         errMessage += "; in policy " + props.policyType + " " + props.policyName;
@@ -264,7 +268,11 @@ function i18nReadInternal(
       }
     }
     // throw the error
-    throw new Error(errMessage);
+    if (typeof window !== "undefined") {
+      console.error(errMessage);
+    }
+
+    i18nValue = "???";
   }
 
   if (props.capitalize) {

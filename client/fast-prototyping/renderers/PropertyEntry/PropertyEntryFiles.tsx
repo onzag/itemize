@@ -6,7 +6,7 @@
 import { IPropertyEntryFilesRendererProps } from "../../../internal/components/PropertyEntry/PropertyEntryFiles";
 import { MAX_FILE_SIZE } from "../../../../constants";
 import Dropzone, { DropzoneRef } from "react-dropzone";
-import React from "react";
+import React, { useCallback } from "react";
 import { capitalize } from "../../../components/localization";
 import IconButton from "@mui/material/IconButton";
 import Alert from '@mui/material/Alert';
@@ -19,6 +19,7 @@ import NoteAddIcon from "@mui/icons-material/NoteAdd"
 import { Close } from "@mui/icons-material";
 import Box from "@mui/material/Box";
 import { RestoreIconButton } from "./general";
+import { Button } from "@mui/material";
 
 /**
  * A simple helper function that says when it should show invalid
@@ -65,9 +66,7 @@ export const style = {
     },
   }),
   fileDeleteButton: {
-    top: "-25px",
-    right: 0,
-    position: "absolute",
+
   },
   fileRejectedDescription: {
     width: "100%",
@@ -78,7 +77,7 @@ export const style = {
   },
   paper: {
     marginTop: "5px",
-    backgroundColor: "rgba(0, 0, 0, 0.09)",
+    backgroundColor: "#fff",
     width: "100%",
     minHeight: "200px",
     height: "auto",
@@ -87,10 +86,31 @@ export const style = {
     display: "flex",
     cursor: "pointer",
     position: "relative",
-    padding: "20px 20px calc(2.5rem + 20px) 20px",
+    padding: "20px 20px 20px 20px",
     flexWrap: "wrap",
+    boxShadow: "none",
+    border: "solid 1px #ccc",
+    rowGap: "20px",
+    columnGap: "20px",
+
+    "&:hover": {
+      borderColor: "rgba(0,0,0,0.87)",
+      outline: "none",
+    },
+
+    "&:focus, &.focused": {
+      borderColor: "#1976d2",
+      boxShadow: "0px 0px 0px 1px #1976d2",
+      outline: "none",
+    },
+  } as any,
+  paperAccepting: {
+    borderColor: "#42a5f5 !important",
   },
-  paperPlaceholder: (accepting: boolean, rejecting: boolean) => ({
+  paperRejecting: {
+    borderColor: "#f44336 !important",
+  },
+  paperPlaceholder: {
     flexGrow: 2,
     display: "block",
     textAlign: "center",
@@ -98,13 +118,9 @@ export const style = {
     userSelect: "none",
     color: "rgb(117, 117, 117)",
     borderRadius: "25px",
-    border: "dotted 2px #ccc",
     padding: "25px 0",
     margin: "0 25px",
-    borderColor: !accepting && !rejecting ? (null) : (
-      accepting ? "#42a5f5" : "#f44336"
-    ),
-  }),
+  },
   paperIconAdd: {
     opacity: 0.1,
     fontSize: "100px",
@@ -136,6 +152,14 @@ function onDrop(enableUserSetErrors: () => void, onPushFiles: (files: File[]) =>
   onPushFiles(files.map((f) => typeof f.file !== "undefined" ? f.file : f));
 }
 
+function openFileManually(openFile: any, e: React.KeyboardEvent) {
+  if (e.code === "Enter" || e.code === "Space") {
+    e.stopPropagation();
+    e.preventDefault();
+    openFile();
+  }
+};
+
 /**
  * The property entry file renderer, allows to set and upload a single file in its
  * form, support both images and standard files
@@ -144,6 +168,12 @@ function onDrop(enableUserSetErrors: () => void, onPushFiles: (files: File[]) =>
  */
 function PropertyEntryFilesRenderer(props: IPropertyEntryFilesRendererProps) {
   const dropzoneRef = React.useRef<DropzoneRef>();
+
+  const keyboardTriggerUpload = useCallback((e: React.KeyboardEvent) => {
+    if (e.code === "Enter" || e.code === "Space") {
+      dropzoneRef.current && dropzoneRef.current.open();
+    }
+  }, []);
 
   let icon: React.ReactNode;
   if (props.canRestore) {
@@ -193,14 +223,40 @@ function PropertyEntryFilesRenderer(props: IPropertyEntryFilesRendererProps) {
       }) => {
         const { ref, ...rootProps } = getRootProps();
 
-        const files = props.currentValueWithInfo.map((value) => {
+        const files = props.currentValueWithInfo.map((value, index) => {
           const mainFileClassName = "file" +
             (value.rejected ? " rejected" : "");
-          return (
+
+          let fileDeleteButton = (
+            <IconButton
+              onClick={(e) => {
+                e.stopPropagation();
+                value.removeFile();
+              }}
+              sx={style.fileDeleteButton}
+              size="large"
+              title={props.genericDeleteLabel}
+              color="error"
+            >
+              <Close />
+            </IconButton>
+          );
+
+          if (props.args.fileDeleteButtonWrapper) {
+            fileDeleteButton = props.args.fileDeleteButtonWrapper(fileDeleteButton, value, index);
+          }
+
+          let file = (
             <div
               className={mainFileClassName}
               onClick={value.openFile}
               key={value.id}
+              tabIndex={0}
+              role="button"
+              aria-invalid={!!value.rejected}
+              aria-labelledby={`${value.id}_name ${value.id}_ext ${value.id}_size`}
+              aria-describedby={value.rejected ? value.id + "_err" : null}
+              onKeyDown={openFileManually.bind(null, value.openFile)}
             >
               <div className="file-container">
                 {
@@ -210,57 +266,66 @@ function PropertyEntryFilesRenderer(props: IPropertyEntryFilesRendererProps) {
                       sizes="100px"
                       src={value.url}
                       className="thumbnail"
+                      alt={value.name}
                     />
                   ) : (
                     <div className="file-icon">
-                      <span className="file-extension">{
+                      <span className="file-extension" id={value.id + "_ext"}>{
                         value.extension
                       }</span>
                     </div>
                   )
                 }
-                <p className="file-name">{value.name}</p>
-                <p className="file-size">{
+                <p className="file-name" id={value.id + "_name"}>{value.name}</p>
+                <p className="file-size" id={value.id + "_size"}>{
                   value.prettySize
                 }</p>
-                {value.rejected ? <Box component="p" sx={style.fileRejectedDescription}>
+                {value.rejected ? <Box component="p" sx={style.fileRejectedDescription} id={value.id + "_err"}>
                   {value.rejectedReason}
                 </Box> : null}
               </div>
-              <IconButton
-                onClick={(e) => {
-                  e.stopPropagation();
-                  value.removeFile();
-                }}
-                sx={style.fileDeleteButton}
-                size="large">
-                <Close />
-              </IconButton>
+              {fileDeleteButton}
             </div>
           );
+
+          if (props.args.fileWrapper) {
+            file = (
+              <React.Fragment key={value.id}>
+                {props.args.fileWrapper(file, value, index)}
+              </React.Fragment>
+            );
+          }
+
+          return file;
         });
 
         const dragInfo = !files.length ? (
           <Box
-            sx={style.paperPlaceholder(isDragAccept, isDragReject)}
+            sx={style.paperPlaceholder}
           >
             <p>{isDragActive ? capitalize(props.genericActivePlaceholder) : capitalize(props.placeholder)}</p>
             <NoteAddIcon sx={style.paperIconAdd} />
           </Box>
         ) : null;
 
-        return (
-          <>
-            <Paper
-              {...rootProps}
-              sx={style.paper}
-            >
-              <input {...getInputProps()} />
-              {files}
-              {dragInfo}
-            </Paper>
-          </>
+        const paper = (
+          <Paper
+            {...rootProps}
+            sx={isDragAccept || isDragReject ? [style.paper, isDragAccept ? style.paperAccepting : style.paperRejecting] : style.paper}
+            className="files-entry"
+            aria-invalid={isInvalid}
+            aria-errormessage={isInvalid ? props.uniqueId + "_error" : null}
+            aria-label={props.label}
+            aria-describedby={props.uniqueId + "_desc"}
+            onKeyDown={keyboardTriggerUpload}
+          >
+            <input {...getInputProps()} />
+            {files}
+            {dragInfo}
+          </Paper>
         );
+
+        return paper;
       }}
     </Dropzone>
   );

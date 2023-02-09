@@ -305,6 +305,7 @@ export function cacheableQSLoader(url: string, recheck?: boolean) {
  */
 interface DelayDisplayProps {
   duration: number;
+  waitNode?: React.ReactNode;
 }
 
 /**
@@ -340,6 +341,7 @@ export class DelayDisplay extends React.PureComponent<DelayDisplayProps, DelayDi
     if (this.state.shown) {
       return this.props.children;
     }
-    return null;
+
+    return this.props.waitNode || null;
   }
 }

@@ -2448,7 +2448,7 @@ export class ElasticQueryBuilder {
 
   public setHighlightsOn(fields: string[]) {
     if (fields && fields.length) {
-      this.request.highlight = {
+      this.request.highlight = this.request.highlight || {
         fields: {},
       }
 

@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useCallback, useEffect, useState } from "react";
 
 import SetVar from "./SetVar";
 import equals from "deep-equal";
@@ -48,4 +48,24 @@ export default class ReadVar extends React.PureComponent<IReadVarProps> {
     this.lastRenderRoundValue = SetVar.VAR_REGISTRY[this.props.id];
     return this.props.children(this.lastRenderRoundValue);
   }
+}
+
+export function useReadVar(id: string) {
+  const [value, setValue] = useState(null as any);
+
+  const onTickled = useCallback(() => {
+    setValue(SetVar.VAR_REGISTRY[id]);
+  }, [id]);
+
+  useEffect(() => {
+    SetVar.addListener(id, onTickled);
+
+    return () => {
+      SetVar.removeListener(id, onTickled);
+    }
+  }, [id, onTickled]);
+
+  // we don't use the value even when we use it, so it basically
+  // forces an update from the setState
+  return SetVar.VAR_REGISTRY[id];
 }

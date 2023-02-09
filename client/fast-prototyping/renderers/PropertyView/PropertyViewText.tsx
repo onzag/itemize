@@ -15,7 +15,7 @@ import equals from "deep-equal";
 import { renderTemplateDynamically } from "../../../internal/text";
 import type { TemplateArgs } from "../../../internal/text/serializer/template-args";
 import type { IImage } from "../../../internal/text/serializer/types/image";
-import { deserialize } from "../../../internal/text/serializer";
+import { deserialize, IRootLevelDocument } from "../../../internal/text/serializer";
 import { IText, STANDARD_TEXT_NODE } from "../../../internal/text/serializer/types/text";
 import type { RichElement } from "../../../internal/text/serializer";
 
@@ -150,7 +150,18 @@ interface IPropertyViewRichTextViewerProps {
   children?: string;
   className?: string;
   Node?: any;
-  onCustom?: (arg: RichElement | IText, props: any, expectedExtraProps: {Tag: string, styleActive?: any, styleHover?: any, defaultReturn: () => void}) => React.ReactNode;
+  onCustom?: (
+    arg: RichElement | IText,
+    props: any,
+    info: {
+      Tag: string,
+      styleActive?: any,
+      styleHover?: any,
+      defaultReturn: () => void,
+      parent: RichElement | IRootLevelDocument,
+      tree: IRootLevelDocument,
+    }
+  ) => React.ReactNode;
   onCustomAttributesFor?: (arg: RichElement | IText) => any;
   onCustomWrap?: (arg: RichElement | IText, elementAsNode: React.ReactNode) => React.ReactNode;
   lang: string;
@@ -458,7 +469,7 @@ export default function PropertyViewTextRenderer(props: IPropertyViewTextRendere
     }
   } else if (props.subtype === "plain") {
     return (
-      <Node className={"plain-text" + (props.args.className ? " " + props.args.className : "")}>
+      <Node className={"plain-text" + (props.args.className ? " " + props.args.className : "")} lang={props.currentValueLang}>
         {props.currentValueText}
       </Node>
     );

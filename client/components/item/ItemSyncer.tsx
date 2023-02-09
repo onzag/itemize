@@ -4,7 +4,7 @@ import type { IGQLValue } from "../../../gql-querier";
 import CacheWorkerInstance from "../../internal/workers/cache";
 import { IActionResponseWithValue, ItemProvider } from "../../providers/item";
 import { ModuleProvider } from "../../providers/module";
-import { IBaseSyncerHandle, useHandleMechanism } from "../util/BaseSyncer";
+import { IBaseSyncerHandle, IBaseSyncerHandleMechanism, useHandleMechanism } from "../util/BaseSyncer";
 
 
 interface IItemSyncerProps {
@@ -18,14 +18,6 @@ interface IItemSyncerProps {
   mod: string;
   properties: string[];
   loadUnversionedFallback?: boolean;
-  setSync?: (state: boolean) => void;
-  /**
-   * An error may be available if one produced it
-   * another reason for a failed sync could be that
-   * no storage engine is available at all
-   */
-  onFailedSync?: (err?: EndpointErrorType) => void;
-  onEachLoad?: (id: string, version: string, value: IGQLValue) => void;
 
   /**
    * allows fallbacks, when the item cannot be loaded because there's no way
@@ -36,7 +28,7 @@ interface IItemSyncerProps {
 
   /**
    * Normally children are not rendered unless the values are ready, use this in order
-   * to render with non-ready values, when that happens values will be null, fallback false
+   * to render with non-ready values, when that happens values will be null
    */
   alwaysRenderChildren?: boolean;
 
@@ -55,62 +47,61 @@ interface IItemSyncerProps {
    * of the loaded values, you get things raw in order to improve
    * efficiency
    */
-  children?: (value: IGQLValue, handle: IBaseSyncerHandle, info: { notReady: boolean, fallback: boolean, id: string, version: string }) => React.ReactNode;
-  handle?: IBaseSyncerHandle;
+  children?: (values: ILoadedValue[], handle: IBaseSyncerHandleMechanism) => React.ReactNode;
+  parentHandle?: IBaseSyncerHandle;
+  disabled?: boolean;
 }
+
+export interface ILoadedValue {
+  value: IGQLValue,
+  cached: boolean,
+  loaded: boolean,
+  id: string,
+  version: string,
+  fallback: boolean,
+};
 
 /**
  * @param props 
  * @returns 
  */
 export default function ItemSyncer(props: IItemSyncerProps) {
-  const syncList = useRef([] as string[]);
-  const [depsSynced, setDepsSynced] = useState(true);
-  const [loaded, setLoaded] = useState({} as { [key: string]: { value: IGQLValue, cached: boolean, loaded: boolean, id: string, version: string } });
+  // what is loaded
+  const [loaded, setLoaded] = useState({} as { [key: string]: ILoadedValue });
+  const [failed, setFailed] = useState(null as EndpointErrorType);
 
+  // get the handle mechanism
+  const handleMechanism = useHandleMechanism(
+    props.id,
+    props.parentHandle,
+    props.allowFallback,
+
+    // for this to be considered synced every element has to be loaded
+    Object.keys(loaded).every((k) => loaded[k].loaded && loaded[k].cached),
+    !!failed,
+    failed,
+  );
+
+  // the ids we are supposed to load for
   const idsDeduplicated = useMemo(() => {
     return props.ids.filter((v, index) => props.ids.indexOf(v) === index);
   }, [props.ids]);
-
-  // updates the synced state according to whether everything is loaded
-  const updateSynced = useCallback(() => {
-    const isSync = depsSynced && idsDeduplicated.every((v) => {
-      const id = typeof v === "string" ? v : v.id;
-      const version = typeof v === "string" ? null : (v.version || null);
-      const key = id + "." + (version || "");
-      return syncList.current.includes(key);
-    });
-
-    props.setSync && props.setSync(isSync);
-    props.handle && props.handle.setSync(props.id, isSync);
-  }, [idsDeduplicated, props.setSync, depsSynced, syncList, props.handle, props.id]);
 
   // when one item loads of all of them
   const onLoadedOne = useCallback((id: string, version: string, e: IActionResponseWithValue) => {
     if (!e.error && e.cached) {
       // can't use e.value.id because it could be null and we would get stuck
-      const key = id + "." + (version || "");
-      syncList.current.push(key);
-
-      console.log("Synced " + props.type +  " from " + props.id + " with id " + id + " and version " + version);
-
-      updateSynced();
+      console.log("Synced " + props.type + " from " + props.id + " with id " + id + " and version " + version);
     } else {
       const reason = e.cached ? ", not cached" : ", error";
-      console.log("Could not sync " + props.type +  " from " + props.id + " with id " + id + " and version " + version + reason);
-
+      console.log("Could not sync " + props.type + " from " + props.id + " with id " + id + " and version " + version + reason);
       console.log(e);
-
-      // failed to cache
-      props.handle && props.handle.onFailedSync(e.error);
-      props.onFailedSync && props.onFailedSync(e.error);
     }
 
-    if (props.allowFallback || (!e.error && e.cached)) {
-      if (props.onEachLoad) {
-        props.onEachLoad(id, version, e.value);
-      }
-
+    // if we allowed fallback it means we did not use the cache worker
+    // for syncing so it will not be cached
+    if (!e.error && (props.allowFallback || e.cached)) {
+      // and update this state
       const newLoaded = {
         ...loaded,
       }
@@ -120,46 +111,51 @@ export default function ItemSyncer(props: IItemSyncerProps) {
         cached: e.cached,
         value: e.value,
         loaded: true,
+        fallback: !e.cached,
       }
       setLoaded(newLoaded);
+    } else {
+      setFailed(e.error);
     }
-  }, [syncList, props.onEachLoad, props.handle, props.onFailedSync, updateSynced]);
+  }, [loaded]);
 
   // when one of them is set to load
   const onWillLoadOne = useCallback((id: string, version: string) => {
     const key = id + "." + (version || "");
-    syncList.current = syncList.current.filter((v) => v !== key);
-
     const newLoaded = {
       ...loaded,
     }
-    newLoaded[id] = {
+    newLoaded[key] = {
       id: id,
       version: version,
       cached: false,
       value: null,
-      loaded: true,
+      loaded: false,
+      fallback: false,
     }
     setLoaded(newLoaded);
-
-    updateSynced();
-  }, [props.setSync, idsDeduplicated, props.handle, depsSynced, updateSynced]);
-
-  // update whenever the ids change, or the dependencies change
-  useEffect(() => {
-    updateSynced();
-  }, [idsDeduplicated, depsSynced]);
-
-  // get the handle mechanism
-  const handleMechanism = useHandleMechanism(props.id, props.handle, props.allowFallback, props.onFailedSync, setDepsSynced);
+  }, [loaded]);
 
   if (!handleMechanism.ready) {
+    if (props.alwaysRenderChildren) {
+      return (
+        <>
+          {null}
+          {props.children ? (
+            props.children(
+              [],
+              handleMechanism,
+            )
+          ) : null}
+        </>
+      )
+    }
     return null;
   }
 
   return (
     <>
-      <ModuleProvider module={props.mod}>
+      {props.disabled ? null : <ModuleProvider module={props.mod}>
         {
           idsDeduplicated.map((f) => {
             const id = typeof f === "string" ? f : f.id;
@@ -183,25 +179,13 @@ export default function ItemSyncer(props: IItemSyncerProps) {
             );
           })
         }
-      </ModuleProvider>
-      {props.children && (
-        <>
-          {Object.keys(loaded).forEach((id) => {
-            const value = loaded[id];
-
-            if (props.alwaysRenderChildren || value.loaded) {
-              // note that id and version are not guaranteed, and value can be null
-              // we are potentially using unversioned fallback
-              return <React.Fragment key={id}>{props.children(value.value, handleMechanism.handle, {
-                fallback: !value.cached,
-                notReady: !value.loaded,
-                id: value.id,
-                version: value.version,
-              })}</React.Fragment>;
-            }
-          })}
-        </>
-      )}
+      </ModuleProvider>}
+      {props.children ? (
+        props.children(
+          Object.keys(loaded).filter((v) => loaded[v].loaded).map((v) => loaded[v]),
+          handleMechanism,
+        )
+      ) : null}
     </>
   );
 }

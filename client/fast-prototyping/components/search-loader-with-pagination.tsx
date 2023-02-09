@@ -6,9 +6,10 @@
 
 import { PagedSearchLoader, IPagedSearchLoaderArg } from "../../components/search/PagedSearchLoader";
 import { TotalPagedSearchLoader } from "../../components/search/TotalPagedSearchLoader";
-import React from "react";
-import Snackbar from "./snackbar";
+import React, { useCallback } from "react";
 import Pagination from '@mui/material/Pagination';
+import { PaginationItem } from "@mui/material";
+import { AltBadgeReactioner } from "./alt-badge-reactioner";
 
 
 /**
@@ -60,6 +61,27 @@ interface ISearchLoaderWithPaginationProps {
    * The children that recieves the arguments
    */
   children: (arg: IPagedSearchLoaderArg, pagination: React.ReactNode, noResults: boolean) => React.ReactNode;
+
+  paginationVariant?: "text" | "outlined";
+
+  /**
+   * make accessible with the alt badge reactioner
+   */
+  accessible?: boolean;
+
+  accessiblePriority?: number;
+  accessibleUseInFlow?: boolean;
+  accessibleStartRectionKey?: string;
+  accessiblePageReactionKey?: string;
+  accessibleEndReactionKey?: string;
+}
+
+function defaultRenderItem(x: any) {
+  return (
+    <PaginationItem
+      {...x}
+    />
+  )
 }
 
 /**
@@ -74,6 +96,42 @@ export function SearchLoaderWithPagination(props: ISearchLoaderWithPaginationPro
     throw new Error("The search loader uses total but has no callback for when it is out of bounds in onTotalOutOfBounds is missing");
   }
   const ElementToUse = props.total ? TotalPagedSearchLoader : PagedSearchLoader;
+
+  const renderItemFn = useCallback((x: any) => {
+    if (!props.accessible) {
+      return defaultRenderItem(x);
+    }
+    return (
+      <AltBadgeReactioner
+        reactionKey={
+          x.type === "page" || x.type === "start-ellipsis" || x.type === "end-ellipsis" ? (
+            props.accessiblePageReactionKey || "p"
+          ) : (
+            x.type === "first" || x.type === "previous" ? (
+              props.accessibleStartRectionKey || "f"
+            ) : (
+              props.accessibleEndReactionKey || "l"
+            )
+          )}
+        action="click"
+        selector="button"
+        priority={props.accessiblePriority}
+        disabled={x.disabled}
+        useInFlow={props.accessibleUseInFlow}
+      >
+        {defaultRenderItem(x)}
+      </AltBadgeReactioner>
+    )
+  }, [
+    props.accessible,
+    props.accessiblePageReactionKey,
+    props.accessiblePageReactionKey,
+    props.accessibleStartRectionKey,
+    props.accessiblePriority,
+    props.accessibleEndReactionKey,
+    props.accessibleUseInFlow,
+  ]);
+
   return (
     <ElementToUse
       pageSize={props.pageSize}
@@ -90,20 +148,17 @@ export function SearchLoaderWithPagination(props: ISearchLoaderWithPaginationPro
         const pagination = (
           arg.pageCount === 0 ?
             null :
-            <Pagination count={arg.pageCount} color="primary" page={arg.currentPage + 1} onChange={handlePageChange} />
+            <Pagination
+              count={arg.pageCount}
+              color="primary"
+              page={arg.currentPage + 1}
+              onChange={handlePageChange}
+              variant={props.paginationVariant}
+              renderItem={renderItemFn}/>
         );
 
         return (
-          <>
-            {props.children(arg, pagination, !!(arg.searchId && arg.pageCount === 0))}
-            <Snackbar
-              id={props.id}
-              i18nDisplay={arg.error}
-              open={!!arg.error}
-              onClose={arg.dismissError}
-              severity="error"
-            />
-          </>
+          props.children(arg, pagination, !!(arg.searchId && arg.pageCount === 0))
         );
       }}
     </ElementToUse>

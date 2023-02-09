@@ -399,8 +399,8 @@ export async function searchModule(
         customData: tokenData.customData,
       },
       usesElastic,
-      elasticQueryBuilder: elasticQuery,
-      whereBuilder: queryModel.whereBuilder,
+      elasticQueryBuilder: elasticQuery || null,
+      whereBuilder: queryModel ? queryModel.whereBuilder : null,
       forbid: defaultTriggerForbiddenFunction,
     });
   }
@@ -522,7 +522,23 @@ export async function searchModule(
   if (traditional) {
     const finalResult: IGQLSearchResultsContainer = {
       results: await Promise.all(
-        baseResult.map(async (r) => {
+        baseResult.filter((r) => {
+          const itemDefinition = appData.root.registry[r.type] as ItemDefinition;
+
+          if (!itemDefinition) {
+            logger.error({
+              message: "Found corruption of database in record of invalid type during module search",
+              data: {
+                id: r.id,
+                type: r.type,
+                mod: mod.getName(),
+              },
+            });
+            return false;
+          }
+
+          return true;
+        }).map(async (r) => {
           const valueToProvide = await filterAndPrepareGQLValue(
             appData.cache.getServerData(),
             appData,
@@ -535,8 +551,9 @@ export async function searchModule(
             mod,
           );
 
-          const itemDefinition = appData.root.registry[r.type] as ItemDefinition;
           const pathOfThisModule = mod.getPath().join("/");
+
+          const itemDefinition = appData.root.registry[r.type] as ItemDefinition;
           const pathOfThisIdef = itemDefinition.getPath().join("/");
           const moduleTrigger = appData.triggers.module.io[pathOfThisModule];
           const itemDefinitionTrigger = appData.triggers.item.io[pathOfThisIdef]

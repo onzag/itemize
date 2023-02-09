@@ -1,23 +1,27 @@
 /**
- * Contains the property view currency handler
+ * Contains the boolean handler
  * @module
  */
 
 import React from "react";
-import { IPropertyViewHandlerProps, IPropertyViewRendererProps } from ".";
+import { IPropertyViewRendererProps, IPropertyViewHandlerProps } from ".";
+import { IPropertyDefinitionSupportedPaymentType } from "../../../../base/Root/Module/ItemDefinition/PropertyDefinition/types/payment";
 import { ICurrencyType, currencies } from "../../../../imported-resources";
-import { IPropertyDefinitionSupportedCurrencyType } from "../../../../base/Root/Module/ItemDefinition/PropertyDefinition/types/currency";
 import { deepRendererArgsComparer } from "../general-fn";
 
 /**
- * The property view currency renderer props
+ * Props that every boolean renderer is going to get
  */
-export interface IPropertyViewCurrencyRendererProps extends IPropertyViewRendererProps<IPropertyDefinitionSupportedCurrencyType> {
+export interface IPropertyViewPaymentRendererProps extends IPropertyViewRendererProps<IPropertyDefinitionSupportedPaymentType> {
   /**
-   * The format which is used for the currency given the user's language
-   * $N means symbol first, number last N$ means the opposite
+   * The current type of the payment as expected to be visualized for the user
    */
-  format: "$N" | "N$",
+  currentTypeStrValue: string;
+  /**
+   * The current status of the payment as expected to be visualized for the user
+   */
+  currentStatusStrValue: string;
+  currencyFormat: "$N" | "N$";
   /**
    * The original value, as a number, might be null
    * if the value itself is null
@@ -55,12 +59,19 @@ export interface IPropertyViewCurrencyRendererProps extends IPropertyViewRendere
   convertedCurrency: ICurrencyType;
 }
 
-export default class PropertyViewCurrency extends React.Component<IPropertyViewHandlerProps<IPropertyDefinitionSupportedCurrencyType, IPropertyViewCurrencyRendererProps>> {
-  constructor(props: IPropertyViewHandlerProps<IPropertyDefinitionSupportedCurrencyType, IPropertyViewCurrencyRendererProps>) {
+/**
+ * The property View boolean handler
+ */
+export default class PropertyViewPayment extends React.Component<
+  IPropertyViewHandlerProps<IPropertyDefinitionSupportedPaymentType, IPropertyViewPaymentRendererProps>
+> {
+
+  constructor(props: IPropertyViewHandlerProps<IPropertyDefinitionSupportedPaymentType, IPropertyViewPaymentRendererProps>) {
     super(props);
   }
+
   public shouldComponentUpdate(
-    nextProps: IPropertyViewHandlerProps<IPropertyDefinitionSupportedCurrencyType, IPropertyViewCurrencyRendererProps>,
+    nextProps: IPropertyViewHandlerProps<IPropertyDefinitionSupportedPaymentType, IPropertyViewPaymentRendererProps>,
   ) {
     // This is optimized to only update for the thing it uses
     return this.props.useAppliedValue !== nextProps.useAppliedValue ||
@@ -74,15 +85,17 @@ export default class PropertyViewCurrency extends React.Component<IPropertyViewH
       !deepRendererArgsComparer(this.props.rendererArgs, nextProps.rendererArgs);
   }
   public render() {
+    const i18nInLanguage = this.props.i18n[this.props.language];
+
     // we get the value that we will be using
     const value = (
       this.props.useAppliedValue ?
       this.props.state.stateAppliedValue :
       this.props.state.value
-    ) as IPropertyDefinitionSupportedCurrencyType;
+    ) as IPropertyDefinitionSupportedPaymentType;
 
     // and the original value numeric
-    const originalValue: number = value && value.value;
+    const originalValue: number = value && value.amount;
     const originalCurrencyCode = value && value.currency;
 
     // and now for these
@@ -122,20 +135,25 @@ export default class PropertyViewCurrency extends React.Component<IPropertyViewH
       }
     }
 
+    const currentTypeStrValue = (value && i18nInLanguage.payment[value.type.replace("-", "_")]) || null;
+    const currentStatusStrValue = (value && i18nInLanguage.payment[value.status.toLowerCase()]) || null;
+
     const RendererElement = this.props.renderer;
-    const rendererArgs: IPropertyViewCurrencyRendererProps = {
-      args: this.props.rendererArgs,
+    const rendererArgs: IPropertyViewPaymentRendererProps = {
+      args: this.props.rendererArgs || {},
       rtl: this.props.rtl,
-      originalCurrency,
-      originalStrValue,
-      originalValue,
+      currentTypeStrValue,
+      currentStatusStrValue,
+      currentValue: value,
       convertedCurrency,
       convertedStrValue,
       convertedValue,
-      format: this.props.i18n[this.props.language].currency_format as any,
-      currentValue: value,
+      currencyFormat: this.props.i18n[this.props.language].currency_format as any,
+      originalCurrency,
+      originalStrValue,
+      originalValue,
     };
 
-    return <RendererElement {...rendererArgs}/>
+    return <RendererElement {...rendererArgs} />;
   }
 }

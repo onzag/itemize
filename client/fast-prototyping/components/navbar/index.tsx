@@ -177,7 +177,6 @@ export function Navbar(props: INavbarProps) {
                           reactionKey="m"
                           component="span"
                           selector="button"
-                          groupPosition={-100}
                         >
                           <IconButton
                             edge="start"

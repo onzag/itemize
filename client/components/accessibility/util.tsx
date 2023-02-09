@@ -1,11 +1,13 @@
 import { countWords } from "../../internal/text";
-import { RichElement } from "../../internal/text/serializer";
+import { IRootLevelDocument, RichElement } from "../../internal/text/serializer";
 import { ReactifiedElementWithHoverAndActive } from "../../internal/text/serializer/dynamic-component";
 import { IFile } from "../../internal/text/serializer/types/file";
 import { IImage } from "../../internal/text/serializer/types/image";
 import React, { useCallback } from "react";
-import AltAutomaticGroup from "./AltAutomaticGroup";
 import AltText from "./AltText";
+import AltGroup from "./AltGroup";
+import { IText } from "../../internal/text/serializer/types/text";
+import { ILink } from "../../internal/text/serializer/types/link";
 
 export function onKeyDown(e: React.KeyboardEvent) {
   if (e.code === "Enter" || e.code === "Space") {
@@ -21,6 +23,7 @@ export interface IAltReactionerComponentProps {
   useInFlow: boolean;
   children: React.ReactNode;
   priority: number;
+  uncontrolled?: boolean;
 }
 
 export type AltReactionerComponentType = React.ComponentType<IAltReactionerComponentProps>;
@@ -331,10 +334,10 @@ interface IAccessibleFns {
   linkReactionKey?: string;
 
   /**
-   * Treat it as the group position of the entire text, but
-   * bear in mind that it may consume a lot of positions
+   * The reaction key to use for videos, all videos
+   * get a shared reaction key and are enumerated
    */
-  baseGroupPosition?: number;
+  videoReactionKey?: string;
 
   /**
    * The priority to use with the groups and elements, everything
@@ -359,15 +362,47 @@ interface IAccessibleFns {
 
 function accessibilityEnabledCustomTextProcesser(
   fns: IAccessibleFns,
-  element: RichElement,
+  element: RichElement | IText,
   props: any,
-  info: { Tag: string, styleActive?: any, styleHover?: any, defaultReturn: () => React.ReactNode },
+  info: {
+    Tag: string,
+    styleActive?: any,
+    styleHover?: any,
+    defaultReturn: () => React.ReactNode,
+    parent: RichElement | IRootLevelDocument,
+    tree: IRootLevelDocument,
+  },
 ) {
   if (
     (
-      element.type === "paragraph" ||
-      element.type === "title" ||
-      element.type === "quote"
+      (element as RichElement).type === "paragraph" ||
+      (element as RichElement).type === "title" ||
+      (element as RichElement).type === "quote" ||
+
+      // CORRUPTED ELEEMNTS
+      // orphaned inline
+      (
+        (element as RichElement).type === "inline" &&
+        info.parent.type !== "paragraph"
+      ) ||
+
+      // orphaned text that does not follow other criteria
+      (
+        (element as IText).text &&
+        // we expect text here
+        info.parent.type !== "paragraph" &&
+        info.parent.type !== "inline" &&
+        info.parent.type !== "link" &&
+        info.parent.type !== "quote" &&
+        info.parent.type !== "title" &&
+
+        // what? but okay
+        info.parent.type !== "image" &&
+        info.parent.type !== "file" &&
+        info.parent.type !== "void-block" &&
+        info.parent.type !== "void-superblock" &&
+        info.parent.type !== "void-inline"
+      )
     ) &&
     countWords(element) !== 0
   ) {
@@ -400,8 +435,16 @@ function accessibilityEnabledCustomTextProcesser(
   }
 
   if (
-    element.type === "link"
+    (element as RichElement).type === "link"
   ) {
+    // an empty link
+    if (
+      (element as ILink).children[0].text === "" &&
+      (element as ILink).children.length === 1
+    ) {
+      return info.defaultReturn();
+    }
+
     return (
       <AccessibleLink
         {...props}
@@ -411,7 +454,7 @@ function accessibilityEnabledCustomTextProcesser(
         onOpenInternalLink={fns.onOpenInternalLink || null}
         reactionKey={fns.linkReactionKey || "l"}
         AltReactionerComponent={fns.AltReactionerComponent}
-        altReactionerExtraProps={fns.altReactionerCustomProps && fns.altReactionerCustomProps(element)}
+        altReactionerExtraProps={fns.altReactionerCustomProps && fns.altReactionerCustomProps(element as RichElement)}
         priority={fns.priority}
       />
     );
@@ -419,30 +462,22 @@ function accessibilityEnabledCustomTextProcesser(
 
   // container types need to be wrapped
   if (
-    element.type === "td" ||
-    element.type === "container" ||
-    element.type === "custom" ||
-    element.type === "th"
+    (element as RichElement).type === "container" ||
+    (element as RichElement).type === "custom"
   ) {
-    const component = (
-      element.type === "container" ||
-      element.type === "custom"
-    ) ? "div" : element.type
     return (
-      <AltAutomaticGroup
-        priority={fns.priority}
-        baseGroupPosition={fns.baseGroupPosition}
-        useNextSiblingStrategy={true}
-        component={component}
+      <AltGroup
+        component={info.Tag}
+        componentProps={props}
       >
         {info.defaultReturn()}
-      </AltAutomaticGroup>
+      </AltGroup>
     );
   }
 
   // clickable types
   if (
-    element.type === "image"
+    (element as RichElement).type === "image"
   ) {
     return (
       <AccessibleImage
@@ -453,13 +488,13 @@ function accessibilityEnabledCustomTextProcesser(
         onImageClick={fns.onImageClick || null}
         reactionKey={fns.linkReactionKey || "l"}
         AltReactionerComponent={fns.AltReactionerComponent}
-        altReactionerExtraProps={fns.altReactionerCustomProps && fns.altReactionerCustomProps(element)}
+        altReactionerExtraProps={fns.altReactionerCustomProps && fns.altReactionerCustomProps((element as RichElement))}
         priority={fns.priority}
       />
     );
   }
 
-  if (element.type === "file") {
+  if ((element as RichElement).type === "file") {
     return (
       <AccessibleFile
         {...props}
@@ -470,10 +505,22 @@ function accessibilityEnabledCustomTextProcesser(
         onFileClick={fns.onFileClick || null}
         reactionKey={fns.linkReactionKey || "f"}
         AltReactionerComponent={fns.AltReactionerComponent}
-        altReactionerExtraProps={fns.altReactionerCustomProps && fns.altReactionerCustomProps(element)}
+        altReactionerExtraProps={fns.altReactionerCustomProps && fns.altReactionerCustomProps((element as RichElement))}
         priority={fns.priority}
       />
     );
+  }
+
+  if ((element as RichElement).type === "video") {
+    return (
+      <AltText
+        component="div"
+        priority={fns.priority}
+        uncontrolled={true}
+      >
+        {info.defaultReturn()}
+      </AltText>
+    )
   }
 
   return info.defaultReturn();

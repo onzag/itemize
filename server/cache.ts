@@ -833,7 +833,7 @@ export class Cache {
       if (pDef.isTracked()) {
         propertyMap.push({
           id: pDef.getId(),
-          newValue: typeof value[pDef.getId()] === "undefined" ? pDef.getId() : null,
+          newValue: typeof value[pDef.getId()] === "undefined" ? null : value[pDef.getId()],
           originalValue: null,
         });
       }

@@ -3,7 +3,7 @@ import type { EndpointErrorType } from "../../../base/errors";
 import type { IGQLValue } from "../../../gql-querier";
 import { IActionResponseWithSearchResults, IActionSearchOptions, ItemProvider } from "../../providers/item";
 import { ModuleProvider } from "../../providers/module";
-import { IBaseSyncerHandle, useHandleMechanism } from "../util/BaseSyncer";
+import { IBaseSyncerHandle, IBaseSyncerHandleMechanism, useHandleMechanism } from "../util/BaseSyncer";
 import { IPropertySetterProps } from "../property/base";
 import { PropertyDefinitionSupportedType } from "../../../base/Root/Module/ItemDefinition/PropertyDefinition/types";
 
@@ -63,9 +63,7 @@ interface ISearchSyncerProps {
    * will trigger, the fallback flag will be set to true
    */
   allowTraditionalFallback?: boolean;
-  handle?: IBaseSyncerHandle;
-  setSync?: (state: boolean) => void;
-  onFailedSync?: (err: EndpointErrorType) => void;
+  parentHandle?: IBaseSyncerHandle;
   onBulkLoad?: (values: IGQLValue[]) => void;
 
   /**
@@ -79,23 +77,29 @@ interface ISearchSyncerProps {
    * as true this means that they were not actually cached and these values are just fallback
    * which is a good sign not to keep chaining providers as they will all not sync
    */
-  children?: (values: IGQLValue[], handle: IBaseSyncerHandle, info: {fallback: boolean, notReady: boolean}) => React.ReactNode;
+  children?: (values: IGQLValue[], handle: IBaseSyncerHandleMechanism, info: {fallback: boolean}) => React.ReactNode;
 }
 
 // buggy typescript I must return any because it's buggy
 export default function SearchSyncer(props: ISearchSyncerProps): any {
-  const [depsSynced, setDepsSynced] = useState(true);
   const [selfSynced, setSelfSynced] = useState(true);
+  const [failed, setFailed] = useState(null as EndpointErrorType);
   const [selfSearchResults, setSelfSearchResults] = useState(null as IGQLValue[]);
   const [selfUsedFallback, setSelfUsedFallback] = useState(false);
-  const handleMechanism = useHandleMechanism(props.id, props.handle, props.allowTraditionalFallback, props.onFailedSync, setDepsSynced);
 
-  useEffect(() => {
-    props.setSync && props.setSync(depsSynced && selfSynced);
-    props.handle && props.handle.setSync(props.id, depsSynced && selfSynced);
-  }, [props.setSync, depsSynced, selfSynced]);
+  const handleMechanism = useHandleMechanism(
+    props.id,
+    props.parentHandle,
+    props.allowTraditionalFallback,
+
+    selfUsedFallback ? false : selfSynced,
+    selfUsedFallback ? true : !!failed,
+    failed,
+  );
 
   const onWillSearch = useCallback(() => {
+    setSelfSearchResults(null);
+    setSelfUsedFallback(false);
     setSelfSynced(false);
   }, []);
 
@@ -110,8 +114,9 @@ export default function SearchSyncer(props: ISearchSyncerProps): any {
       console.log("Could not sync " + (props.type || props.mod) +  " from " + props.id + " with " + data.count + " results," + reason);
     }
 
-    // if we allow or we are synced
-    if (props.allowTraditionalFallback || (!data.error && data.cached)) {
+    if (data.error) {
+      setFailed(data.error);
+    } else if (props.allowTraditionalFallback || data.cached) {
       // grab the results and send them
       const results = data.results;
       props.onBulkLoad && props.onBulkLoad(results);
@@ -122,18 +127,18 @@ export default function SearchSyncer(props: ISearchSyncerProps): any {
     }
   }, [props.allowTraditionalFallback, props.onBulkLoad]);
 
-  if (!props.search.cachePolicy) {
+  if (props.search && !props.search.cachePolicy) {
     throw new Error("You should use a cache policy for the search syncer, set cachePolicy in the automatic search options");
   }
 
-  if (!props.search.cacheDoNotFallback) {
+  if (props.search && !props.search.cacheDoNotFallback) {
     throw new Error("The cache search syncer needs to be in non-fallback mode " +
-    " set cacheDoNotFallback in the automatic search options, use forceTraditionalFallback to force a fallback");
+    " set cacheDoNotFallback in the automatic search options, use allowTraditionalFallback to force a fallback");
   }
 
   let searchArgs = props.search;
 
-  if (props.allowTraditionalFallback) {
+  if (props.allowTraditionalFallback && searchArgs) {
     searchArgs = {
       ...searchArgs,
       traditional: true,
@@ -143,14 +148,19 @@ export default function SearchSyncer(props: ISearchSyncerProps): any {
 
   if (!handleMechanism.ready) {
     if (props.alwaysRenderChildren && props.children) {
-      return props.children([], handleMechanism.handle, {fallback: false, notReady: true});
+      return (
+        <>
+          {null}
+          {props.children([], handleMechanism, {fallback: false})}
+        </>
+      );
     }
     return null;
   }
 
   let children: React.ReactNode = null;
   if ((selfSearchResults || props.alwaysRenderChildren) && props.children) {
-    children = props.children(selfSearchResults || [], handleMechanism.handle, {fallback: selfUsedFallback, notReady: !selfSearchResults})
+    children = props.children(selfSearchResults || [], handleMechanism, {fallback: selfUsedFallback});
   }
 
   return (
@@ -159,10 +169,11 @@ export default function SearchSyncer(props: ISearchSyncerProps): any {
         <ItemProvider
           itemDefinition={props.type}
           searchCounterpart={true}
+          forId={props.id}
           setters={props.setters}
           properties={props.properties}
           includes={props.includes}
-          automaticSearch={props.search}
+          automaticSearch={searchArgs}
           automaticSearchInstant={true}
           automaticSearchForce={true}
           automaticSearchNoGraceTime={true}
@@ -172,5 +183,5 @@ export default function SearchSyncer(props: ISearchSyncerProps): any {
       </ModuleProvider>
       {children}
     </>
-  )
+  );
 }

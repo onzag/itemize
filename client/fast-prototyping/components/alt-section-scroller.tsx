@@ -123,7 +123,7 @@ interface IAltSectionScrollerProps {
   dyamicFixedCalculator?: (element: HTMLElement, centerX: number, centerY: number) => [number, number];
   /**
    * a css selector to choose the component that is relevant that the
-   * user is supposed to interact with, by default it will simply pick the first child node
+   * user is supposed to interact with, by default it will simply pick the first parent
    */
   parentSelector?: string;
   /**

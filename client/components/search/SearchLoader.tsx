@@ -233,6 +233,8 @@ interface IActualSearchLoaderProps extends ISearchLoaderProps {
   searchEngineEnabledLang: string;
   searchEngineHighlightArgs: { [key: string]: string };
   searchHighlights: IElasticHighlightRecordInfo;
+  searchError: EndpointErrorType;
+  searchErrorDismiss: () => void;
 }
 
 /**
@@ -283,6 +285,26 @@ function willProduceNewHighlights(props: IActualSearchLoaderProps, currentSearch
   }
 
   return willItProduceNewHighlights;
+}
+
+function loadSearchResults(props: IActualSearchLoaderProps) {
+  const root = props.itemDefinitionInstance.getParentModule().getParentRoot();
+  props.searchResults.forEach((sr) => {
+    const itemDefintionInQuestion = root.registry[sr.type as string] as ItemDefinition;
+    // we apply the value, whatever we have gotten this will affect all the instances
+    // that use the same value
+    itemDefintionInQuestion.applyValue(
+      sr.id as string,
+      sr.version as string,
+      sr,
+      false,
+      props.searchFields,
+      true,
+    );
+
+    // and then we trigger the change listener for all the instances
+    itemDefintionInQuestion.triggerListeners("load", sr.id as string, sr.version as string);
+  });
 }
 
 function loadValues(
@@ -366,9 +388,7 @@ function loadValues(
       searchWillProduceNewHighlights: false,
       searchCanProduceHighlights: false,
     };
-    if (isConstruct) {
-      context.loadSearchResults();
-    }
+    loadSearchResults(props);
 
     !isConstruct && context && context.setState(newState as any);
     return newState;
@@ -387,7 +407,7 @@ function loadValues(
       props.itemDefinitionInstance.getParentModule()
         .getParentRoot().registry[searchRecord.type] as ItemDefinition;
 
-    // check if it's in memory cache, in such a case the value will have already loaded
+    // check if it's in memory cache, in such a case the value will have already loaded(
     // as the item definition would have applied it initially, as in it would have loaded
     // already and it can be pretty much ignored
     const appliedGQLValue = itemDefintionInQuestion.getGQLAppliedValue(searchRecord.id, searchRecord.version);
@@ -542,7 +562,7 @@ class ActualSearchLoader extends React.Component<IActualSearchLoaderProps, IActu
         this.ensureCleanupOfOldSearchResults(prevProps, this.state.currentSearchRecords);
       }
       if (this.props.searchResults) {
-        this.loadSearchResults();
+        loadSearchResults(this.props);
       }
 
       // if we have this function we call it
@@ -581,25 +601,6 @@ class ActualSearchLoader extends React.Component<IActualSearchLoaderProps, IActu
     }
     this.setState({
       error: null,
-    });
-  }
-  public loadSearchResults() {
-    const root = this.props.itemDefinitionInstance.getParentModule().getParentRoot();
-    this.props.searchResults.forEach((sr) => {
-      const itemDefintionInQuestion = root.registry[sr.type as string] as ItemDefinition;
-      // we apply the value, whatever we have gotten this will affect all the instances
-      // that use the same value
-      itemDefintionInQuestion.applyValue(
-        sr.id as string,
-        sr.version as string,
-        sr,
-        false,
-        this.props.searchFields,
-        true,
-      );
-
-      // and then we trigger the change listener for all the instances
-      itemDefintionInQuestion.triggerListeners("load", sr.id as string, sr.version as string);
     });
   }
 
@@ -1041,8 +1042,8 @@ class ActualSearchLoader extends React.Component<IActualSearchLoaderProps, IActu
             totalCount,
             hasNextPage: this.props.currentPage < pageCount - 1,
             hasPrevPage: this.props.currentPage !== 0,
-            error: this.state.error,
-            dismissError: this.dismissError,
+            error: this.props.searchError || this.state.error,
+            dismissError: this.props.searchError ? this.props.searchErrorDismiss : this.dismissError,
             refreshPage: this.refreshPageNoCb,
             searchId: this.props.searchId,
             isLoadingSearchResults: this.state.currentlySearching.length !== 0,
@@ -1089,6 +1090,8 @@ export default function SearchLoader(props: ISearchLoaderProps) {
                       searchEngineEnabled={itemContext.searchEngineEnabled}
                       searchEngineEnabledLang={itemContext.searchEngineEnabledLang}
                       searchEngineHighlightArgs={itemContext.searchEngineHighlightArgs}
+                      searchError={itemContext.searchError}
+                      searchErrorDismiss={itemContext.dismissSearchError}
                       searchHighlights={itemContext.searchHighlights}
                       searchFields={itemContext.searchFields}
                       searching={itemContext.searching}

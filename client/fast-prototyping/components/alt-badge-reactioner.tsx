@@ -82,6 +82,10 @@ interface IAltBadgeReactionerProps {
    */
   component?: string;
   /**
+   * The badge component to use
+   */
+  badgeComponent?: string;
+  /**
    * a css selector to choose the component that is relevant that the
    * user is supposed to interact with, by default it will simply pick the first child node
    */
@@ -132,11 +136,6 @@ interface IAltBadgeReactionerProps {
    * but for elements that are as useInFlow pressing tab on it will figure the next available flow element
    */
   priority?: number | "ALWAYS_ON_TOP" | "ALWAYS_ON_TOP_KEEP_FLOW";
-  /**
-   * A positioning within the group used to specify what part of a scrolling box this belongs to
-   * for example -1 is often to be used with fixed navbar, 0 with the body content and 100 with footers
-   */
-  groupPosition?: number;
   /**
    * For stylistic purposes, uses a transform to keep the badge closer to the element
    */
@@ -248,8 +247,6 @@ export function AltBadgeReactioner(
           </span>
         }
         color={(props.colorSchema || "default") === "default" ? "primary" : "default"}
-        data-priority={props.priority || 0}
-        data-group-position={props.groupPosition}
         sx={
           [
             (props.colorSchema || "default") === "default" ?
@@ -265,6 +262,7 @@ export function AltBadgeReactioner(
           vertical: "top",
           horizontal: "right",
         }}
+        component={props.badgeComponent as any}
       >
         {displayed ? (props.altBadgedChildren || props.children) : props.children}
       </Badge>

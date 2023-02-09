@@ -9,7 +9,7 @@
  */
 
 import React from "react";
-import { IReactifyArg, ISerializationRegistryType } from "..";
+import { allowsText, IReactifyArg, ISerializationRegistryType } from "..";
 import { convertStyleStringToReactObject } from "../base";
 
 /**
@@ -24,6 +24,8 @@ export const STANDARD_TEXT_NODE = (text?: string): IText => {
     text: text || "",
   }
 };
+
+const spaceRegex = /^\s+$/;
 
 /**
  * The function that registers and adds the text node in the given
@@ -163,6 +165,15 @@ export function registerText(registry: ISerializationRegistryType) {
       key: arg.key,
     };
 
+    // delete unwanted spaces from bad normalization
+    if (
+      arg.parent &&
+      !allowsText(arg.parent) &&
+      spaceRegex.test(arg.element.text)
+    ) {
+      return null;
+    }
+
     // we change the style as required
     if (arg.element.bold) {
       newCustomProps.style = {
@@ -209,7 +220,12 @@ export function registerText(registry: ISerializationRegistryType) {
     let toRender: React.ReactNode;
 
     if (arg.extraOptions && arg.extraOptions.onCustom) {
-      toRender = arg.extraOptions.onCustom(arg.element, newCustomProps, {Tag: "span", defaultReturn: () => (<span {...newCustomProps}/>)});
+      toRender = arg.extraOptions.onCustom(arg.element, newCustomProps, {
+        Tag: "span",
+        defaultReturn: () => (<span {...newCustomProps} />),
+        parent: arg.parent,
+        tree: arg.tree,
+      });
     } else {
       toRender = (
         <span {...newCustomProps} />
@@ -220,7 +236,11 @@ export function registerText(registry: ISerializationRegistryType) {
       return arg.extraOptions.onCustomWrap(arg.element, toRender);
     }
 
-    return toRender;
+    return (
+      <React.Fragment key={arg.key}>
+        {toRender}
+      </React.Fragment>
+    );
   }
 
   // add to the registry itself
