@@ -259,6 +259,13 @@ export interface IToolbarPrescenseElement {
    */
   onClick?: (defaultAction: () => RichElement, e: React.MouseEvent<HTMLElement>) => void;
   /**
+   * Handle refocus attempts during the click event
+   * @param defaultAction 
+   * @param e 
+   * @returns 
+   */
+  refocusHandler?: (defaultAction: () => void, e: React.MouseEvent<HTMLElement>) => void;
+  /**
    * Manually specify whether it's disabled
    * if not specified it will check whether an element
    * can be inserted as it assumes it's about the insertion
@@ -568,6 +575,7 @@ function elementFastKeyReturn(
       useTransform={useStyleTransform ? "close" : null}
       triggerAltAfterAction={useTriggerAltAfterAction}
       selector="button"
+      onTabOutTrigger="escape"
     >
       {element}
     </AltBadgeReactioner>
@@ -1075,7 +1083,11 @@ function ToolbarExtra(props: IToolbarExtraProps) {
   const basicProps = {
     tabIndex: -1,
     onClick: (e: React.MouseEvent<HTMLButtonElement>) => {
-      props.helpers.focus();
+      if (props.extra.refocusHandler) {
+        props.extra.refocusHandler(props.helpers.focus, e);
+      } else {
+        props.helpers.focus();
+      }
       props.extra.onClick ? props.extra.onClick(defaultAction, e) : defaultAction();
     }
   }

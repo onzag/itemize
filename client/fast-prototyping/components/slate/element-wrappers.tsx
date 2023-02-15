@@ -182,6 +182,7 @@ function TextWrapper(props: IMaterialUIWrapperElementProps) {
           selector="div[tabindex]"
           action="focus"
           fullWidth={true}
+          onTabOutTrigger="escape"
         >
           <FormControl fullWidth={true}>
             <InputLabel
@@ -283,6 +284,7 @@ function TdAndTh(props: IMaterialUIWrapperElementProps) {
                 priority={typeof props.usePriority === "number" ? props.usePriority : 1}
                 selector="div[tabindex]"
                 action="focus"
+                onTabOutTrigger="escape"
               >
                 <FormControl>
                   <InputLabel
@@ -327,6 +329,7 @@ function TdAndTh(props: IMaterialUIWrapperElementProps) {
               reactionKey="c"
               priority={typeof props.usePriority === "number" ? props.usePriority : 1}
               selector="button"
+              onTabOutTrigger="escape"
             >
               <IconButton
                 tabIndex={-1}
@@ -343,6 +346,7 @@ function TdAndTh(props: IMaterialUIWrapperElementProps) {
               reactionKey="r"
               priority={typeof props.usePriority === "number" ? props.usePriority : 1}
               selector="button"
+              onTabOutTrigger="escape"
             >
               <IconButton
                 tabIndex={-1}
@@ -359,6 +363,7 @@ function TdAndTh(props: IMaterialUIWrapperElementProps) {
               reactionKey="c"
               priority={typeof props.usePriority === "number" ? props.usePriority : 1}
               selector="button"
+              onTabOutTrigger="escape"
             >
               <IconButton
                 tabIndex={-1}
@@ -375,6 +380,7 @@ function TdAndTh(props: IMaterialUIWrapperElementProps) {
               reactionKey="r"
               priority={typeof props.usePriority === "number" ? props.usePriority : 1}
               selector="button"
+              onTabOutTrigger="escape"
             >
               <IconButton
                 tabIndex={-1}
@@ -391,6 +397,7 @@ function TdAndTh(props: IMaterialUIWrapperElementProps) {
               reactionKey="h"
               priority={typeof props.usePriority === "number" ? props.usePriority : 1}
               selector="button"
+              onTabOutTrigger="escape"
             >
               <IconButton
                 tabIndex={-1}
@@ -407,6 +414,7 @@ function TdAndTh(props: IMaterialUIWrapperElementProps) {
               reactionKey="f"
               priority={typeof props.usePriority === "number" ? props.usePriority : 1}
               selector="button"
+              onTabOutTrigger="escape"
             >
               <IconButton
                 tabIndex={-1}
@@ -528,6 +536,7 @@ export const materialUIElementWrappers: ISlateEditorElementWrappers = {
                 action="focus"
                 disabled={!!(props.element as ILink).thref}
                 fullWidth={true}
+                onTabOutTrigger="escape"
               >
                 <TextField
                   value={elementHref}
@@ -554,6 +563,7 @@ export const materialUIElementWrappers: ISlateEditorElementWrappers = {
                       selector="div[tabindex]"
                       action="focus"
                       fullWidth={true}
+                      onTabOutTrigger="escape"
                     >
                       <FormControl fullWidth={true}>
                         <InputLabel
@@ -628,6 +638,7 @@ export const materialUIElementWrappers: ISlateEditorElementWrappers = {
               selector="input"
               action="focus"
               fullWidth={true}
+              onTabOutTrigger="escape"
             >
               <TextField
                 value={value}
@@ -672,6 +683,7 @@ export const materialUIElementWrappers: ISlateEditorElementWrappers = {
               selector="input"
               action="focus"
               fullWidth={true}
+              onTabOutTrigger="escape"
             >
               <TextField
                 value={alt}
@@ -713,6 +725,7 @@ export const materialUIElementWrappers: ISlateEditorElementWrappers = {
               selector="div[tabindex]"
               action="focus"
               fullWidth={true}
+              onTabOutTrigger="escape"
             >
               <FormControl fullWidth={true}>
                 <InputLabel
@@ -787,6 +800,7 @@ export const materialUIElementWrappers: ISlateEditorElementWrappers = {
               selector="div[tabindex]"
               action="focus"
               fullWidth={true}
+              onTabOutTrigger="escape"
             >
               <FormControl fullWidth={true}>
                 <InputLabel

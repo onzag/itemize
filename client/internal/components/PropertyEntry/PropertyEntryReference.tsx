@@ -1,3 +1,5 @@
+// TODO GET RID OF REFERENCE
+
 import React from "react";
 import equals from "deep-equal";
 import { IPropertyEntryHandlerProps, IPropertyEntryRendererProps } from ".";
@@ -732,6 +734,7 @@ export default class PropertyEntryReference
       this.props.altPlaceholder !== nextProps.altPlaceholder ||
       this.props.altLabel !== nextProps.altLabel ||
       this.props.hideLabel !== nextProps.hideLabel ||
+      this.props.hidePlaceholder !== nextProps.hidePlaceholder ||
       !!this.props.ignoreErrors !== !!nextProps.ignoreErrors ||
       nextProps.language !== this.props.language ||
       nextProps.languageOverride !== this.props.languageOverride ||

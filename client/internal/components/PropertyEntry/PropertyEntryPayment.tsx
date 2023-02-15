@@ -230,6 +230,7 @@ export default class PropertyEntryPayment extends React.Component<
       this.props.altPlaceholder !== nextProps.altPlaceholder ||
       this.props.altLabel !== nextProps.altLabel ||
       this.props.hideLabel !== nextProps.hideLabel ||
+      this.props.hidePlaceholder !== nextProps.hidePlaceholder ||
       !!this.props.ignoreErrors !== !!nextProps.ignoreErrors ||
       nextProps.language !== this.props.language ||
       nextProps.languageOverride !== this.props.languageOverride ||
@@ -246,7 +247,7 @@ export default class PropertyEntryPayment extends React.Component<
     const i18nData = this.props.property.getI18nDataFor(this.props.language);
     const i18nLabel = this.props.hideLabel ? null : (typeof this.props.altLabel !== "undefined" ? this.props.altLabel : (i18nData && i18nData.label));
     const i18nDescription = this.props.hideDescription ? null : (typeof this.props.altDescription !== "undefined" ? this.props.altDescription : (i18nData && i18nData.description));
-    const i18nPlaceholder = this.props.altPlaceholder || (i18nData && i18nData.placeholder);
+    const i18nPlaceholder = this.props.hidePlaceholder ? null : (this.props.altPlaceholder || (i18nData && i18nData.placeholder));
 
     const i18nInLanguage = this.props.i18n[this.props.language];
 

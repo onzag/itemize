@@ -189,6 +189,12 @@ interface IAltBadgeReactionerProps {
   blocksQuickActionsWhileFocused?: boolean;
 
   /**
+   * When an element is tabbed but it is not part of the current flow but it kept its focus while being in another
+   * layer, use this to select which reaction key would you like to trigger from the current active flow
+   */
+  onTabOutTrigger?: string;
+
+  /**
    * Once this element is focused it will go into an uncontrolled state
    * on the next tab forwards or backwards and control will only be regained once
    * an element that is part of either the active flow, active layer, or awaiting key codes

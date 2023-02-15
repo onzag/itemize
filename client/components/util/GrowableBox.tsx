@@ -16,9 +16,18 @@ interface IGrowableBoxProps {
 
 export default function GrowableBox(props: IGrowableBoxProps) {
   const [height, setHeight] = useState(0);
+  const [crop, setCrop] = useState(false);
+
   const elementRef = useRef<any>();
+  const isUnmounted = useRef(false);
 
   const Element = props.component || "div";
+
+  useEffect(() => {
+    return () => {
+      isUnmounted.current = true;
+    }
+  }, []);
 
   useEffect(() => {
     if (props.open) {
@@ -27,8 +36,15 @@ export default function GrowableBox(props: IGrowableBoxProps) {
         element = element[props.getElementFn]();
       }
       const finalHeight = element.scrollHeight;
+      setCrop(true);
       setHeight(finalHeight);
+      setTimeout(() => {
+        if (!isUnmounted.current) {
+          setCrop(false);
+        }
+      }, 300);
     } else {
+      setCrop(false);
       setHeight(0);
     }
   }, [props.open, props.children]);
@@ -38,7 +54,7 @@ export default function GrowableBox(props: IGrowableBoxProps) {
       style={{
         height,
         transition: props.transitionOverride || "height 0.3s ease",
-        overflow: "visible clip",
+        overflow: height === 0 || crop ? "visible clip" : null,
         width: props.fullWidth ? "100%" : null
       }}
       {...props.componentProps}

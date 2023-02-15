@@ -241,6 +241,8 @@ export function getFieldsAndArgs(
     requestFields[p] = {};
   });
 
+  let nothingToUpdate = true;
+
   if (options.includeFields) {
     if (options.properties && options.properties.length) {
       options.properties.forEach((pId) => {
@@ -297,6 +299,8 @@ export function getFieldsAndArgs(
             return;
           }
         }
+
+        nothingToUpdate = false;
         argumentsForQuery[pd.getId()] = currentValue;
 
         if (pdDescr.gqlAddFileToFields) {
@@ -336,6 +340,7 @@ export function getFieldsAndArgs(
         }
 
         // we add it to the data, and we add it to the arguments
+        nothingToUpdate = false;
         argumentsForQuery[qualifiedId] = {};
 
         const requiredSinkingProperties = options.includesForArgs[iId];
@@ -380,13 +385,14 @@ export function getFieldsAndArgs(
     if (options.policiesForArgs && options.propertiesForArgs.length) {
       options.policiesForArgs.forEach((policyPath) => {
         const policy = options.itemDefinitionInstance.getPropertyDefinitionForPolicy(...policyPath);
+        nothingToUpdate = false;
         argumentsForQuery[options.itemDefinitionInstance.getQualifiedPolicyIdentifier(...policyPath)] =
           policy.getCurrentValue(options.forId || null, options.forVersion || null);
       });
     }
   }
 
-  return { requestFields, argumentsForQuery, argumentsFoundFilePaths };
+  return { requestFields, argumentsForQuery, argumentsFoundFilePaths, nothingToUpdate };
 }
 
 /**

@@ -65,7 +65,35 @@ function findLastIndex(arr: any[], fn: (ele: any) => boolean) {
 // the previous values for the instance in a way that makes zero sense
 // some optimization things are going on from the browser
 // This only occurs in Chrome.... so it is related to chrome
-let preventNextFocus = false;
+// let preventNextFocus = false;
+
+// function preventFocus() {
+//   preventNextFocus = true;
+//   setTimeout(() => {
+//     preventNextFocus = false;
+//   }, 300);
+// }
+
+// Slate is buggy regarding shift+tab
+// remove when shift+tab is fixed
+const EDITOR_POOL = new Map<HTMLElement, SlateEditor>();
+
+function onShiftTab() {
+  setTimeout(() => {
+    const editorElement = EDITOR_POOL.get(document.activeElement as any);
+    if (editorElement) {
+      editorElement.forceFocus();
+    }
+  }, 70);
+}
+
+if (document) {
+  document.addEventListener("keydown", (e) => {
+    if (e.key === "Tab" && e.shiftKey) {
+      onShiftTab();
+    }
+  });
+}
 
 /**
  * Combine both interfaces
@@ -1081,6 +1109,8 @@ export class SlateEditor extends React.Component<ISlateEditorProps, ISlateEditor
   private originalInsertData: any;
   private isUnmounted: boolean;
 
+  private editableRef: React.RefObject<HTMLDivElement> = React.createRef();
+
   /**
    * The standard derived state function is used in order to set the state in an effective way
    * it is used because the behaviour of this editor is rather complex
@@ -1368,6 +1398,8 @@ export class SlateEditor extends React.Component<ISlateEditorProps, ISlateEditor
     this.setAction = this.setAction.bind(this);
     this.insertElement = this.insertElement.bind(this);
     this.getState = this.getState.bind(this);
+    this.setUIHandler = this.setUIHandler.bind(this);
+    this.setUIHandlerArg = this.setUIHandlerArg.bind(this);
 
     this.availableFilteringFunction = this.availableFilteringFunction.bind(this);
     this.calculateAnchors = this.calculateAnchors.bind(this);
@@ -2829,11 +2861,13 @@ export class SlateEditor extends React.Component<ISlateEditorProps, ISlateEditor
 
     // and if the new value is not the same as the old children of the document
     // as these values are immutable and we just override them
-    if (newValue !== this.state.currentValue.children as any) {
-      // we update, the reason the value might be equal is because the change
-      // triggers for changes in the selection
-      this.setValue(newValue);
-    }
+    // NOW it matters as slate did a weird update where it changes the immutable
+    // state because now the state is mutable
+    //if (newValue !== this.state.currentValue.children as any) {
+    // we update, the reason the value might be equal is because the change
+    // triggers for changes in the selection
+    this.setValue(newValue);
+    //}
   }
 
   /**
@@ -3006,6 +3040,7 @@ export class SlateEditor extends React.Component<ISlateEditorProps, ISlateEditor
    * A helper function to call react focus back into the editor
    */
   public focus() {
+    //preventFocus();
     // now we need to refocus
     ReactEditor.focus(this.editor);
   }
@@ -3017,10 +3052,7 @@ export class SlateEditor extends React.Component<ISlateEditorProps, ISlateEditor
    * @returns a void promise once it's done
    */
   public async focusAt(at: Range | Path): Promise<void> {
-    preventNextFocus = true;
-    setTimeout(() => {
-      preventNextFocus = false;
-    }, 300);
+    //preventFocus();
 
     if (Range.isRange(at)) {
       return new Promise((r) => {
@@ -3913,6 +3945,9 @@ export class SlateEditor extends React.Component<ISlateEditorProps, ISlateEditor
       Transforms.insertNodes(this.editor, videoNode);
     }
 
+    // related to the buggy mess slate has become
+    this.onChange(this.editor.children);
+
     // return the status
     return data.status;
   };
@@ -3961,6 +3996,9 @@ export class SlateEditor extends React.Component<ISlateEditorProps, ISlateEditor
       }
     } catch (err) {
     }
+
+    // related to the buggy mess slate has become
+    this.onChange(this.editor.children);
   };
 
   /**
@@ -3994,6 +4032,9 @@ export class SlateEditor extends React.Component<ISlateEditorProps, ISlateEditor
     } else {
       Transforms.insertNodes(this.editor, containerNode);
     }
+
+    // related to the buggy mess slate has become
+    this.onChange(this.editor.children);
   };
 
   /**
@@ -4027,6 +4068,9 @@ export class SlateEditor extends React.Component<ISlateEditorProps, ISlateEditor
     } else {
       Transforms.insertNodes(this.editor, customNode);
     }
+
+    // related to the buggy mess slate has become
+    this.onChange(this.editor.children);
   };
 
   /**
@@ -4054,6 +4098,9 @@ export class SlateEditor extends React.Component<ISlateEditorProps, ISlateEditor
         );
       }
     }
+
+    // related to the buggy mess slate has become
+    this.onChange(this.editor.children);
   };
 
   /**
@@ -4083,6 +4130,9 @@ export class SlateEditor extends React.Component<ISlateEditorProps, ISlateEditor
         );
       }
     }
+
+    // related to the buggy mess slate has become
+    this.onChange(this.editor.children);
   };
 
   /**
@@ -4148,6 +4198,9 @@ export class SlateEditor extends React.Component<ISlateEditorProps, ISlateEditor
         at: this.state.currentSelectedInlineElementAnchor,
       });
     }
+
+    // related to the buggy mess slate has become
+    this.onChange(this.editor.children);
 
     return validState;
   }
@@ -4216,6 +4269,9 @@ export class SlateEditor extends React.Component<ISlateEditorProps, ISlateEditor
       });
     }
 
+    // related to the buggy mess slate has become
+    this.onChange(this.editor.children);
+
     // we have succeeded
     return validState;
   };
@@ -4228,6 +4284,9 @@ export class SlateEditor extends React.Component<ISlateEditorProps, ISlateEditor
    */
   public set(args: any, anchor: Path) {
     Transforms.setNodes(this.editor, args, { at: anchor });
+
+    // related to the buggy mess slate has become
+    this.onChange(this.editor.children);
   };
 
   /**
@@ -4239,6 +4298,9 @@ export class SlateEditor extends React.Component<ISlateEditorProps, ISlateEditor
     Transforms.setNodes(this.editor, {
       style,
     }, { at: anchor });
+
+    // related to the buggy mess slate has become
+    this.onChange(this.editor.children);
   };
 
   /**
@@ -4250,6 +4312,9 @@ export class SlateEditor extends React.Component<ISlateEditorProps, ISlateEditor
     Transforms.setNodes(this.editor, {
       styleHover: style,
     }, { at: anchor });
+
+    // related to the buggy mess slate has become
+    this.onChange(this.editor.children);
   };
 
   /**
@@ -4261,6 +4326,9 @@ export class SlateEditor extends React.Component<ISlateEditorProps, ISlateEditor
     Transforms.setNodes(this.editor, {
       styleActive: style,
     }, { at: anchor });
+
+    // related to the buggy mess slate has become
+    this.onChange(this.editor.children);
   };
 
   /**
@@ -4272,6 +4340,9 @@ export class SlateEditor extends React.Component<ISlateEditorProps, ISlateEditor
     Transforms.setNodes(this.editor, {
       richClassList: classes,
     }, { at: anchor });
+
+    // related to the buggy mess slate has become
+    this.onChange(this.editor.children);
   };
 
   /**
@@ -4289,6 +4360,9 @@ export class SlateEditor extends React.Component<ISlateEditorProps, ISlateEditor
     Transforms.setNodes(this.editor, {
       [key]: value,
     }, { at: anchor });
+
+    // related to the buggy mess slate has become
+    this.onChange(this.editor.children);
   }
 
   /**
@@ -4308,6 +4382,9 @@ export class SlateEditor extends React.Component<ISlateEditorProps, ISlateEditor
       uiHandler: value,
       uiHandlerArgs: args,
     }, { at: anchor });
+
+    // related to the buggy mess slate has become
+    this.onChange(this.editor.children);
   }
 
   /**
@@ -4329,6 +4406,9 @@ export class SlateEditor extends React.Component<ISlateEditorProps, ISlateEditor
     Transforms.setNodes(this.editor, {
       uiHandlerArgs: newValue,
     }, { at: anchor });
+
+    // related to the buggy mess slate has become
+    this.onChange(this.editor.children);
   }
 
   /**
@@ -4510,6 +4590,9 @@ export class SlateEditor extends React.Component<ISlateEditorProps, ISlateEditor
     if (this.props.autoFocus) {
       ReactEditor.focus(this.editor);
     }
+
+    const editableHTMLElement = this.editableRef.current.childNodes[0] as HTMLDivElement;
+    EDITOR_POOL.set(editableHTMLElement, this);
   }
 
   public componentDidUpdate(prevProps: Readonly<ISlateEditorProps>, prevState: Readonly<ISlateEditorState>, snapshot?: any): void {
@@ -4548,6 +4631,9 @@ export class SlateEditor extends React.Component<ISlateEditorProps, ISlateEditor
     // from being called on an unmounted component
     this.isUnmounted = true;
     ReactEditor.deselect(this.editor);
+
+    const editableHTMLElement = this.editableRef.current.childNodes[0] as HTMLDivElement;
+    EDITOR_POOL.delete(editableHTMLElement);
   }
 
   /**
@@ -4655,46 +4741,44 @@ export class SlateEditor extends React.Component<ISlateEditorProps, ISlateEditor
     return newFeatureSupport;
   }
 
-  public forceFocus(e: React.FocusEvent) {
+  public forceFocus() {
     // with this condition we avoid it applying with children
     // that are nested, such as internal textareas
-    if (
-      !preventNextFocus &&
-      e.target &&
-      (e.target as HTMLDivElement).dataset &&
-      (e.target as HTMLDivElement).dataset.slateEditor === "true"
-    ) {
+    // if (
+    //   //!preventNextFocus &&
+    //   e.target &&
+    //   (e.target as HTMLDivElement).dataset &&
+    //   (e.target as HTMLDivElement).dataset.slateEditor === "true"
+    // ) {
+    if (!this.state.focused) {
+      const path: Path = [];
+      let current: any = this.editor.children && this.editor.children[0];
+      while (current) {
+        path.push(0);
+        current = current.children && current.children[0];
+      }
+      // bug in slate sometimes it just rejects to focus
+      // when using tab, specifically shift+tab
+      this.focusAt({
+        anchor: {
+          offset: 0,
+          path,
+        },
+        focus: {
+          offset: 0,
+          path,
+        },
+      });
+
+      // More bugs in slate still may reject to focus because slate
+      // can be very buggy
       setTimeout(() => {
         if (!this.state.focused) {
-          const path: Path = [];
-          let current: any = this.editor.children && this.editor.children[0];
-          while (current) {
-            path.push(0);
-            current = current.children && current.children[0];
-          }
-          // bug in slate sometimes it just rejects to focus
-          // when using tab, specifically shift+tab
-          this.focusAt({
-            anchor: {
-              offset: 0,
-              path,
-            },
-            focus: {
-              offset: 0,
-              path,
-            },
-          });
-  
-          // More bugs in slate still may reject to focus because slate
-          // can be very buggy
-          setTimeout(() => {
-            if (!this.state.focused) {
-              this.onFocusedChange(path, this.editor.children);
-            }
-          }, 20);
+          this.onFocusedChange(path, this.editor.children);
         }
       }, 20);
     }
+    // }
   }
 
   public forceBlur() {
@@ -4718,22 +4802,25 @@ export class SlateEditor extends React.Component<ISlateEditorProps, ISlateEditor
         superblocks={this.state.currentSelectedSuperBlockElements || []}
         inline={this.state.currentSelectedInlineElement}
       >
-        <Editable
-          id={this.props.id}
-          lang={this.props.lang}
-          onKeyDown={this.onKeyDown}
-          renderElement={this.renderElement}
-          renderLeaf={this.renderText}
-          placeholder={this.props.placeholder}
-          readOnly={this.props.disabled}
-          disabled={this.props.disabled}
-          style={{ scrollMarginTop: this.props.scrollMarginTop }}
-          onFocus={this.forceFocus}
-          onBlur={this.forceBlur}
-          aria-invalid={!!this.props.currentGeneralError}
-          aria-errormessage={this.props.currentGeneralError}
-          aria-describedby={this.props.currentDescribedBy}
-        />
+        <div ref={this.editableRef} style={{ display: "contents" }} data-slate-bug="true">
+          <Editable
+            id={this.props.id}
+            lang={this.props.lang}
+            onKeyDown={this.onKeyDown}
+            renderElement={this.renderElement}
+            renderLeaf={this.renderText}
+            placeholder={this.props.placeholder}
+            readOnly={this.props.disabled}
+            disabled={this.props.disabled}
+            style={{ scrollMarginTop: this.props.scrollMarginTop }}
+            // onFocus={this.forceFocus}
+            onBlur={this.forceBlur}
+            // onClick={preventFocus}
+            aria-invalid={!!this.props.currentGeneralError}
+            aria-errormessage={this.props.currentGeneralError}
+            aria-describedby={this.props.currentDescribedBy}
+          />
+        </div>
       </CurrentElementProvider>
     );
 

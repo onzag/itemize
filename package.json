@@ -1,6 +1,6 @@
 {
   "name": "@onzag/itemize",
-  "version": "0.0.213",
+  "version": "0.0.214",
   "description": "Itemize",
   "bin": {
     "itemize": "index.js"
@@ -89,9 +89,9 @@
     "redis": "^3.1.1",
     "regenerator-runtime": "^0.13.7",
     "sharp": "^0.23.4",
-    "slate": "^0.87.0",
+    "slate": "^0.90.0",
     "slate-history": "^0.86.0",
-    "slate-react": "^0.87.0",
+    "slate-react": "^0.90.0",
     "socket.io": "^2.4.1",
     "socket.io-client": "^2.4.0",
     "source-map-support": "^0.5.19",

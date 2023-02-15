@@ -99,6 +99,12 @@ export interface IAltBaseProps {
   uncontrolled?: boolean;
 
   /**
+   * When an element is tabbed but it is not part of the current flow but it kept its focus while being in another
+   * layer, use this to select which reaction key would you like to trigger from the current active flow
+   */
+  onTabOutTrigger?: string;
+
+  /**
    * When an element is about to be focused what element to focus, by default it will
    * focus the element that it is tracking, but you may change this behaviour
    *
@@ -112,7 +118,7 @@ export interface IAltBaseProps {
    * @param element the element which focus will be attempted by default
    * @returns the element to focus
    */
-  onFocusAttempt?: (how: "precise" | "above" | "below", e: HTMLElement) => HTMLElement;
+  //onFocusAttempt?: (how: "precise" | "above" | "below", e: HTMLElement) => HTMLElement;
 }
 
 type CustomActionFn = (e: HTMLElement) => void;
@@ -448,6 +454,9 @@ function triggerBasedOn(code: string, shiftKey: boolean, callbackIfmatch: () => 
       // the index should be fine now and pointing to the next tabbable component
 
       nextElement.focus(shiftKey ? "below" : "above");
+      if (nextElement.isUncontrolled() && process.env.NODE_ENV === "development") {
+        console.log("Entered uncontrolled mode");
+      }
 
       if (!nextElement.isUncontrolled() && document.activeElement !== nextElement.getElement()) {
         console.warn("Failed to focus on next element, is it missing tab-index?", nextElement.getElement());
@@ -519,6 +528,9 @@ function triggerBasedOn(code: string, shiftKey: boolean, callbackIfmatch: () => 
       }
       // the index should be fine now and pointing to the next tabbable component
       nextElement.focus(shiftKey ? "below" : "above");
+      if (nextElement.isUncontrolled() && process.env.NODE_ENV === "development") {
+        console.log("Entered uncontrolled mode");
+      }
 
       if (!nextElement.isUncontrolled() && document.activeElement !== nextElement.getElement()) {
         console.warn("Failed to focus on next element, is it missing tab-index?", nextElement.getElement());
@@ -532,24 +544,42 @@ function triggerBasedOn(code: string, shiftKey: boolean, callbackIfmatch: () => 
     } else if (ALT_REGISTRY.activeFlow) {
       const len = ALT_REGISTRY.activeFlow.length;
       let nextIndex = ((ALT_REGISTRY.activeFlowFocusIndex + len + (!shiftKey ? 1 : -1))) % len;
+      let resolvedWithAllStrategy = false;
 
       if (ALT_REGISTRY.activeFlowFocusIndex === -1) {
-        // let's check if we are already focused in one of the elements that are relevant
-        // so we can go directly to the next one
-        const alreadyFocusedAtIndex =
-          ALT_REGISTRY.activeFlow.findIndex((e) => e.isTabbable() && e.getElement() === document.activeElement);
+        const alreadyFocusedAtAll = ALT_REGISTRY.all.find((e) => e.getElement() === document.activeElement);
+        if (alreadyFocusedAtAll && alreadyFocusedAtAll.onTaboutFindElementWithReactionKey()) {
+          const keyToFind = alreadyFocusedAtAll.onTaboutFindElementWithReactionKey();
 
-        if (alreadyFocusedAtIndex !== -1) {
-          nextIndex = ((alreadyFocusedAtIndex + len + (!shiftKey ? 1 : -1))) % len;
-        } else {
-          // this is for first time focus or when we have pressed tab and none of the potential elements
-          // are active in our list
           const potentialNextIndex =
-            ALT_REGISTRY.activeFlow.findIndex((e) => e.getSignature() === ALT_REGISTRY.lastFocusedFlowSignatures[ALT_REGISTRY.activeFlowPriority]);
+            ALT_REGISTRY.activeFlow.findIndex((e) =>
+              (e as ActualAltReactioner).getReactionKey && (e as ActualAltReactioner).getReactionKey() === keyToFind
+            );
+
           if (potentialNextIndex !== -1) {
             nextIndex = potentialNextIndex;
+            resolvedWithAllStrategy = true;
+          }
+        }
+
+        if (!resolvedWithAllStrategy) {
+          // let's check if we are already focused in one of the elements that are relevant
+          // so we can go directly to the next one
+          const alreadyFocusedAtIndex =
+            ALT_REGISTRY.activeFlow.findIndex((e) => e.isTabbable() && e.getElement() === document.activeElement);
+
+          if (alreadyFocusedAtIndex !== -1) {
+            nextIndex = ((alreadyFocusedAtIndex + len + (!shiftKey ? 1 : -1))) % len;
           } else {
-            nextIndex = 0;
+            // this is for first time focus or when we have pressed tab and none of the potential elements
+            // are active in our list
+            const potentialNextIndex =
+              ALT_REGISTRY.activeFlow.findIndex((e) => e.getSignature() === ALT_REGISTRY.lastFocusedFlowSignatures[ALT_REGISTRY.activeFlowPriority]);
+            if (potentialNextIndex !== -1) {
+              nextIndex = potentialNextIndex;
+            } else {
+              nextIndex = 0;
+            }
           }
         }
       }
@@ -561,20 +591,26 @@ function triggerBasedOn(code: string, shiftKey: boolean, callbackIfmatch: () => 
         return;
       }
 
-      const expectNextToBeAnchor =
-        ALT_REGISTRY.isJumpingThroughAnchors &&
-        ALT_REGISTRY.activeFlow.some((e) => e.isTabbable() && e.isTabAnchor());
-
       let nextElement = ALT_REGISTRY.activeFlow[nextIndex];
-      while (
-        !nextElement.isTabbable() ||
-        (expectNextToBeAnchor ? !nextElement.isTabAnchor() : false)
-      ) {
-        nextIndex = ((nextIndex + len + (!shiftKey ? 1 : -1))) % len;
-        nextElement = ALT_REGISTRY.activeFlow[nextIndex];
+      if (!resolvedWithAllStrategy) {
+        const expectNextToBeAnchor =
+          ALT_REGISTRY.isJumpingThroughAnchors &&
+          ALT_REGISTRY.activeFlow.some((e) => e.isTabbable() && e.isTabAnchor());
+
+        while (
+          !nextElement.isTabbable() ||
+          (expectNextToBeAnchor ? !nextElement.isTabAnchor() : false)
+        ) {
+          nextIndex = ((nextIndex + len + (!shiftKey ? 1 : -1))) % len;
+          nextElement = ALT_REGISTRY.activeFlow[nextIndex];
+        }
       }
+
       // the index should be fine now and pointing to the next tabbable component
-      nextElement.focus(shiftKey ? "below" : "above");
+      nextElement.focus(resolvedWithAllStrategy ? "precise" : (shiftKey ? "below" : "above"));
+      if (nextElement.isUncontrolled() && process.env.NODE_ENV === "development") {
+        console.log("Entered uncontrolled mode");
+      }
 
       if (!nextElement.isUncontrolled() && document.activeElement !== nextElement.getElement()) {
         console.warn("Failed to focus on next element, is it missing tab-index?", nextElement.getElement());
@@ -1221,15 +1257,19 @@ export class ActualAltBase<P extends IAltBaseProps, S> extends React.PureCompone
 
     let element = this.getElement();
 
-    if (this.props.onFocusAttempt) {
-      element = this.props.onFocusAttempt(how, element);
-    }
+    // if (this.props.onFocusAttempt) {
+    //   element = this.props.onFocusAttempt(how, element);
+    // }
 
     (element as HTMLElement).focus();
 
     if (!isInView(element) && element) {
       element.scrollIntoView({ behavior: "smooth" });
     }
+  }
+
+  public onTaboutFindElementWithReactionKey() {
+    return this.props.onTabOutTrigger || null;
   }
 
   public blur() {
@@ -1433,7 +1473,9 @@ export class ActualAltReactioner extends ActualAltBase<IAltReactionerProps, IAct
       somethingAlreadyActive
     ) {
       // must check if it's a blocking input
-      ALT_REGISTRY.isBlocked = somethingAlreadyActive.isBlocking();
+      // not anymore because a triggered alt cycle must consider itself to override
+      // blocking inputs, it's as if I have pressed alt
+      ALT_REGISTRY.isBlocked = false;// somethingAlreadyActive.isBlocking();
       ALT_REGISTRY.isDisplayingLayereds.forEach((e) => e.setBlocked(ALT_REGISTRY.isBlocked));
       setScrollerBlockStatus(ALT_REGISTRY.isBlocked || ALT_REGISTRY.uncontrolled);
       // otherwise if we are not we can go ahead and trigger tab
@@ -1451,14 +1493,14 @@ export class ActualAltReactioner extends ActualAltBase<IAltReactionerProps, IAct
       return;
     }
 
-    if (this.props.onFocusAttempt) {
-      element = this.props.onFocusAttempt("precise", element);
-    }
+    // if (this.props.onFocusAttempt) {
+    //   element = this.props.onFocusAttempt("precise", element);
+    // }
 
-    if (!element) {
-      console.warn("Did not receive an element from the selector during onFocusAttempt, check your onFocusAttempt function");
-      return;
-    }
+    // if (!element) {
+    //   console.warn("Did not receive an element from the selector during onFocusAttempt, check your onFocusAttempt function");
+    //   return;
+    // }
 
     if (!this.props.action || this.props.action === "click") {
       (element as HTMLElement).click();
@@ -1466,14 +1508,17 @@ export class ActualAltReactioner extends ActualAltBase<IAltReactionerProps, IAct
       (element as HTMLElement).focus();
 
       if (!isInView(element)) {
-        element.scrollIntoView({behavior: "smooth"});
+        element.scrollIntoView({ behavior: "smooth" });
       }
 
       ALT_REGISTRY.uncontrolled = this.isUncontrolled();
     }
 
     if (this.props.triggerAltAfterAction) {
-      this.triggerAltCycle(isTabNavigatingCurrent);
+      setTimeout(() => {
+        // due to react being slow better to put it in a timeout
+        this.triggerAltCycle(isTabNavigatingCurrent);
+      }, 50);
     }
   }
 

@@ -325,6 +325,12 @@ export interface IActionSubmitOptions extends IActionCleanOptions {
    * in case you want that behaviour
    */
   pileSubmit?: boolean | ActionSubmitOptionCb;
+
+  /**
+   * Prevent nothing to update errors
+   * from being errors
+   */
+  preventNothingToUpdateError?: boolean;
   storeStateIfCantConnect?: boolean;
   clearStoredStateIfConnected?: boolean;
 }
@@ -3042,20 +3048,22 @@ export class ActualItemProvider extends
 
   public giveEmulatedInvalidError(
     stateApplied: string,
-    withId: boolean,
+    withIdVersion: boolean | [string, string],
     withSearchResults: boolean,
+    errMessageOverride?: string,
+    errorOverride?: string,
   ): IActionSubmitResponse | IActionResponseWithValue | IActionResponseWithSearchResults {
 
     if (isDevelopment) {
       console.warn(
-        "Action refused due to invalid partial/total state at",
+        errMessageOverride ? "Action refused due to:" + errMessageOverride : "Action refused due to invalid partial/total state at",
         this.props.itemDefinitionInstance.getStateNoExternalChecking(this.props.forId || null, this.props.forVersion || null),
       );
     }
 
     const emulatedError: EndpointErrorType = {
-      message: "Submit refused due to invalid information in form fields",
-      code: ENDPOINT_ERRORS.INVALID_DATA_SUBMIT_REFUSED,
+      message: errMessageOverride || "Submit refused due to invalid information in form fields",
+      code: errorOverride || ENDPOINT_ERRORS.INVALID_DATA_SUBMIT_REFUSED,
     };
     if (!this.isUnmounted) {
       this.setState({
@@ -3063,10 +3071,10 @@ export class ActualItemProvider extends
       } as any);
     }
 
-    if (withId) {
+    if (withIdVersion) {
       return {
-        id: null,
-        version: null,
+        id: typeof withIdVersion !== "boolean" ? withIdVersion[0] : null,
+        version: typeof withIdVersion !== "boolean" ? withIdVersion[1] : null,
         error: emulatedError,
         storedState: false,
         deletedState: false,
@@ -3455,6 +3463,13 @@ export class ActualItemProvider extends
       policies: options.policies || [],
     }
 
+    const submitForId = typeof options.submitForId !== "undefined" ? options.submitForId : this.props.forId;
+    const submitForVersion = typeof options.submitForVersion !== "undefined" ? options.submitForVersion : this.props.forVersion;
+
+    const determinedActionIsEdit = options.action ?
+      options.action === "edit" :
+      (submitForId && submitForId === (this.props.forId || null) && !this.state.notFound);
+
     // if it's invalid let's return the emulated error
     if (!isValid) {
       if (!this.isUnmounted) {
@@ -3464,7 +3479,11 @@ export class ActualItemProvider extends
       }
       this.cleanWithProps(this.props, options, "fail");
 
-      const returnValue = this.giveEmulatedInvalidError("submitError", true, false) as IActionSubmitResponse;;
+      const returnValue = this.giveEmulatedInvalidError(
+        "submitError",
+        determinedActionIsEdit ? [submitForId || null, submitForVersion || null] : true,
+        false,
+      ) as IActionSubmitResponse;
       this.activeSubmitPromise = null;
       activeSubmitPromiseResolve(returnValue);
 
@@ -3510,6 +3529,7 @@ export class ActualItemProvider extends
       requestFields,
       argumentsForQuery,
       argumentsFoundFilePaths,
+      nothingToUpdate,
     } = getFieldsAndArgs({
       includeArgs: true,
       includeFields: true,
@@ -3533,12 +3553,37 @@ export class ActualItemProvider extends
       },
     });
 
-    const submitForId = typeof options.submitForId !== "undefined" ? options.submitForId : this.props.forId;
-    const submitForVersion = typeof options.submitForVersion !== "undefined" ? options.submitForVersion : this.props.forVersion;
+    if (nothingToUpdate) {
+      if (options.preventNothingToUpdateError) {
+        this.cleanWithProps(this.props, options, "success");
+        this.activeSubmitPromise = null;
+        const returnValue: IActionSubmitResponse = {
+          id: determinedActionIsEdit ? (submitForId || null) : null,
+          version: determinedActionIsEdit ? (submitForVersion || null) : null,
+          error: null,
+          storedState: false,
+          deletedState: false,
+          cancelled: false,
+        }
+        activeSubmitPromiseResolve();
+        return returnValue;
+      }
 
-    const determinedActionIsEdit = options.action ?
-      options.action === "edit" :
-      (submitForId && submitForId === (this.props.forId || null) && !this.state.notFound)
+      this.cleanWithProps(this.props, options, "fail");
+
+      const returnValue = this.giveEmulatedInvalidError(
+        "submitError",
+        determinedActionIsEdit ? [submitForId || null, submitForVersion || null] : true,
+        false,
+        "Nothing to update",
+        ENDPOINT_ERRORS.NOTHING_TO_UPDATE,
+      ) as IActionSubmitResponse;
+      this.activeSubmitPromise = null;
+      activeSubmitPromiseResolve(returnValue);
+
+      // if it's not poked already, let's poke it
+      return returnValue;
+    }
 
     if (options.parentedBy && (
       !options.parentedByAddOnly || (options.parentedByAddOnly && !determinedActionIsEdit)

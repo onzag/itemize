@@ -273,6 +273,12 @@ export interface IPropertyEntryMainHandlerProps<ValueType extends PropertyDefini
    */
   hideLabel?: boolean;
   /**
+   * Hides the placeholder in the renderer
+   * 
+   * Developer Provided check base.tsx
+   */
+  hidePlaceholder?: boolean;
+  /**
    * Pass an alternative placeholder to the renderer
    * 
    * Developer Provided check base.tsx

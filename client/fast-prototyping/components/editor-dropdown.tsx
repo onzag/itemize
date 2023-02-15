@@ -17,6 +17,9 @@ const styles = {
     backgroundColor: "rgba(240, 240, 240, 0.9)",
     border: "solid 1px #ccc",
     width: "300px",
+    display: "flex",
+    flexDirection: "column",
+    rowGap: "10px",
   },
   dropdownSizable: {
     padding: "0.5rem 1rem",
@@ -59,6 +62,10 @@ interface IEditorDropdown {
    * wether it is open
    */
   isOpen: boolean;
+  /**
+   * What zIndex to use when popping up
+   */
+  zIndex?: number;
   /**
    * the contents of the dropdown itself
    */
@@ -147,6 +154,57 @@ interface IEditorDropdown {
    * where to place the portal, by default the html body
    */
   portalElement?: HTMLElement;
+
+  /**
+   * By default whether the element that represents the menu overflows the window is calculated
+   * using the following formula
+   * 
+   * 1. calculate the top position relative to the entire document top + document.body.parentElement.scrollTop
+   * 2. use the document.body.parentElement.scrollHeight to know how much space we have left and substract that top
+   *   2.1 we remove currentoverflow because in case we already have added overflow spacer to add for that space
+   * 3. compare that number to the height
+   * 4. returns by how many pixes it overflows, negative numbers or zero means no overflow, otherwise it overflows and a spacer needs to be built
+   * @param element 
+   * @returns by how many pixels it overflows
+   */
+  portalElementOverflowCalculator?: (top: number, height: number) => number;
+
+  /**
+   * To generate a spacer that will be attached to the body
+   * 
+   * because of the way the standard itemize app is generated where #app and #main are of effective height of 100%
+   * this formula uses document.body.parentElement.scrollHeight - window.innerHeight + overflow +25 for the height
+   * rather than using the overflow specific value
+   * 
+   * @param overflow 
+   * @returns 
+   */
+  portalElementOverflowSpacerHeightCalculator?: (overflow: number) => number;
+
+  /**
+   * To generate a spacer that will be attached to the body
+   * 
+   * @param height 
+   * @returns 
+   */
+  portalElementOverflowSpacerGenerator?: (height: number, ref: React.RefObject<HTMLElement>) => React.ReactNode;
+}
+
+function defaultPortalElementOverflowCalculator(top: number, height: number): number {
+  const reference = document.body.parentElement;
+  const positionTopOverall = top + reference.scrollTop;
+  const availableHeight = reference.scrollHeight;
+  const spaceRemaining = availableHeight - positionTopOverall;
+  return height - spaceRemaining;
+}
+
+function defaultPortalElementOverflowSpacerHeightCalculator(overflow: number) {
+  const reference = document.body.parentElement;
+  return reference.scrollHeight - window.innerHeight + overflow;
+}
+
+function defaultPortalElementOverflowSpacerGenerator(height: number, ref: React.RefObject<HTMLElement>) {
+  return (<div ref={ref as any} style={{ height, backgroundColor: "#eee" }}></div>)
 }
 
 function isInDropdownOrWrapper(
@@ -171,7 +229,58 @@ function isInDropdownOrWrapper(
 export function EditorDropdown(props: IEditorDropdown) {
   const boxRef = useRef<HTMLElement>();
   const dropdownRef = useRef<HTMLElement>();
+  // cannot rely in react state for this because the state does not represent the reality of the component
+  // in the DOM
+  const overflowElement = useRef<HTMLElement>();
   const [pos, setPos] = useState<[number, number, number]>(null);
+
+  const [overflowSpacerHeight, setOverflowSpacerHeight] = useState(0);
+  const [currentOverflow, setCurrentOverflow] = useState(0);
+  const congruentTimer = useRef(null as NodeJS.Timer);
+
+  const recalculateOverflow = useCallback((top, height) => {
+    // overflow is only recalculated only if it does not have a height of zero
+    if (!overflowElement.current || !overflowElement.current.offsetHeight) {
+      const newOverflow = props.portalElementOverflowCalculator ?
+        props.portalElementOverflowCalculator(top, height) :
+        defaultPortalElementOverflowCalculator(top, height);
+
+      if (newOverflow > 0) {
+        const newHeight = (
+          props.portalElementOverflowSpacerHeightCalculator ?
+            props.portalElementOverflowSpacerHeightCalculator(newOverflow) :
+            defaultPortalElementOverflowSpacerHeightCalculator(newOverflow)
+        ) + 25;
+        setOverflowSpacerHeight(newHeight);
+        setCurrentOverflow(newOverflow);
+      } else {
+        setOverflowSpacerHeight(0);
+        setCurrentOverflow(0);
+      }
+    }
+  }, [props.portalElementOverflowCalculator, props.portalElementOverflowSpacerHeightCalculator]);
+
+  const congruentTimerExec = useCallback(() => {
+    if (dropdownRef.current && overflowElement.current) {
+      const clientRect = dropdownRef.current.getBoundingClientRect();
+      const currentHeight = clientRect.height;
+      const currentTop = clientRect.top;
+
+      const moreOverflow = props.portalElementOverflowCalculator ?
+        props.portalElementOverflowCalculator(currentTop, currentHeight) :
+        defaultPortalElementOverflowCalculator(currentTop, currentHeight);
+
+      if (moreOverflow > 0) {
+        const newOverflow = currentOverflow + moreOverflow;
+        setCurrentOverflow(newOverflow);
+
+        const overflowElementHeight = overflowElement.current.offsetHeight;
+        const newHeight = overflowElementHeight + moreOverflow + 25;
+
+        setOverflowSpacerHeight(newHeight);
+      }
+    }
+  }, [currentOverflow]);
 
   const updatePos = useCallback(() => {
     if (!boxRef.current) {
@@ -218,7 +327,13 @@ export function EditorDropdown(props: IEditorDropdown) {
     const top = lowermostNodeClientRect.top + lowermostNodeClientRect.height;
 
     setPos([top, left, right]);
-  }, []);
+
+    if (dropdownRef.current) {
+      const height = dropdownRef.current.getBoundingClientRect().height;
+
+      recalculateOverflow(top, height);
+    }
+  }, [recalculateOverflow]);
 
   const callCloseable = useCallback((e: MouseEvent) => {
     if (props.closeable) {
@@ -249,6 +364,7 @@ export function EditorDropdown(props: IEditorDropdown) {
   useEffect(() => {
     if (props.isOpen) {
       updatePos();
+      congruentTimer.current = setInterval(congruentTimerExec, 1000);
 
       window.addEventListener("SLATE_DRAWER_OPEN", posMassTrigger);
       window.addEventListener("keyup", updatePos);
@@ -268,18 +384,24 @@ export function EditorDropdown(props: IEditorDropdown) {
         window.removeEventListener("scroll", updatePos, true);
         window.removeEventListener("mousedown", callCloseable);
         window.removeEventListener("touchstart", callCloseable);
+        clearInterval(congruentTimer.current);
       }
+    } else {
+      setCurrentOverflow(0);
+      setOverflowSpacerHeight(0);
     }
-  }, [props.isOpen]);
+  }, [props.isOpen, updatePos, updatePosDelayed, posMassTrigger, callCloseable, congruentTimerExec]);
+
 
   const sx = [props.dropdownSizable ? styles.dropdownSizable : styles.dropdown];
 
   let portal: React.ReactNode = null;
+  let overflowPortal: React.ReactNode = null;
 
   if (props.isOpen) {
     const style: any = pos ?
-      { position: "fixed", top: pos[0], left: pos[1], right: pos[2] } :
-      { position: "fixed", top: 0, left: 0, visibility: "hidden" };
+      { position: "fixed", top: pos[0], left: pos[1], right: pos[2], zIndex: typeof props.zIndex !== "undefined" ? props.zIndex : 500 } :
+      { position: "fixed", top: 0, left: 0, visibility: "hidden", zIndex: typeof props.zIndex !== "undefined" ? props.zIndex : 500 };
 
     let elementInsidePortal = (
       <Box
@@ -311,6 +433,12 @@ export function EditorDropdown(props: IEditorDropdown) {
       elementInsidePortal,
       props.portalElement || document.body,
     );
+
+    overflowPortal = ReactDOM.createPortal((
+      props.portalElementOverflowSpacerGenerator ?
+        props.portalElementOverflowSpacerGenerator(overflowSpacerHeight, overflowElement) :
+        defaultPortalElementOverflowSpacerGenerator(overflowSpacerHeight, overflowElement)
+    ), props.portalElement || document.body);
   }
 
   return (
@@ -324,6 +452,7 @@ export function EditorDropdown(props: IEditorDropdown) {
         {props.children}
       </Box>
       {portal}
+      {overflowPortal}
     </>
   );
 }
