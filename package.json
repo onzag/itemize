@@ -88,7 +88,7 @@
     "read": "^1.0.7",
     "redis": "^3.1.1",
     "regenerator-runtime": "^0.13.7",
-    "sharp": "^0.23.4",
+    "sharp": "^0.30.5",
     "slate": "^0.90.0",
     "slate-history": "^0.86.0",
     "slate-react": "^0.90.0",
