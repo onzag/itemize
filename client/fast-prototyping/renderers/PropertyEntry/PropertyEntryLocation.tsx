@@ -513,7 +513,7 @@ class PropertyEntryLocationRenderer extends
     // or otherwise use the provided icon as the user
     // asked
     let icon: React.ReactNode;
-    if (this.props.canRestore) {
+    if (this.props.canRestore && !this.props.args.disableRestore) {
       if (this.props.currentAppliedValue) {
         icon = <RestoreIcon />
       } else {
@@ -595,7 +595,7 @@ class PropertyEntryLocationRenderer extends
             {
               icon ? <RestoreIconButton
                 sx={style.icon}
-                onClick={this.props.canRestore ? this.props.onRestore : null}
+                onClick={this.props.canRestore && !this.props.args.disableRestore ? this.props.onRestore : null}
               >{icon}</RestoreIconButton> : null
             }
             {

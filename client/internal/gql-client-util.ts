@@ -1513,9 +1513,9 @@ export async function runSearchQueryFor(
           arg.cachePolicy as any,
           arg.trackedProperty,
           arg.createdBy,
-          arg.parentedBy.itemDefinition.getQualifiedPathName(),
-          arg.parentedBy.id,
-          arg.parentedBy.version || null,
+          arg.parentedBy ? arg.parentedBy.itemDefinition.getQualifiedPathName() : null,
+          arg.parentedBy ? arg.parentedBy.id : null,
+          arg.parentedBy ? arg.parentedBy.version || null : null,
         );
 
         // we can specify these actions
@@ -1600,9 +1600,9 @@ export async function runSearchQueryFor(
           arg.cachePolicy as any,
           arg.trackedProperty,
           arg.createdBy,
-          arg.parentedBy.itemDefinition.getQualifiedPathName(),
-          arg.parentedBy.id,
-          arg.parentedBy.version || null,
+          arg.parentedBy ? arg.parentedBy.itemDefinition.getQualifiedPathName() : null,
+          arg.parentedBy ? arg.parentedBy.id : null,
+          arg.parentedBy ? arg.parentedBy.version || null : null,
           arg.cacheStoreMetadata,
         );
       }

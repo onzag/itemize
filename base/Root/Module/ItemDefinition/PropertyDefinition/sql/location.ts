@@ -116,6 +116,46 @@ export function locationSQLIn(arg: ISQLInInfo) {
   }
 
   const value = arg.value as IPropertyDefinitionSupportedLocationType;
+
+  // javascript undefined problem forces me to do this double check because it will not
+  // trigger an error if the data is corrupted because javascript is javascript and will
+  // do anything in its might to succeed even with corrupted data because javascript
+  if (value !== null) {
+    if (typeof value === "undefined") {
+      throw new Error("Invalid location for SQL IN in must not be undefined in " + arg.property.getId());
+    }
+
+    if (
+      typeof value.id !== "string"
+    ) {
+      throw new Error("Invalid location for SQL IN in " + JSON.stringify(arg.value) + " not valid id property");
+    }
+
+    if (
+      typeof value.lat !== "number"
+    ) {
+      throw new Error("Invalid location for SQL IN in " + JSON.stringify(arg.value) + " not valid lat property");
+    }
+
+    if (
+      typeof value.lng !== "number"
+    ) {
+      throw new Error("Invalid location for SQL IN in " + JSON.stringify(arg.value) + " not valid lng property");
+    }
+
+    if (
+      typeof value.txt !== "string"
+    ) {
+      throw new Error("Invalid location for SQL IN in " + JSON.stringify(arg.value) + " not valid txt property");
+    }
+
+    if (
+      typeof value.atxt !== "string"
+    ) {
+      throw new Error("Invalid location for SQL IN in " + JSON.stringify(arg.value) + " not valid atxt property");
+    }
+  }
+
   return {
     [arg.prefix + arg.id + "_GEO"]: ["ST_SetSRID(ST_MakePoint(?, ?), 4326)", [value.lng, value.lat]],
     [arg.prefix + arg.id + "_ID"]: value.id,

@@ -8,6 +8,7 @@ import FormControl from "@mui/material/FormControl";
 import Select from "@mui/material/Select";
 import InputLabel from "@mui/material/InputLabel";
 import FilledInput from "@mui/material/FilledInput";
+import OutlinedInput from "@mui/material/OutlinedInput";
 import MenuItem from "@mui/material/MenuItem";
 import Box from "@mui/material/Box";
 import type { IVideo } from "../../../internal/text/serializer/types/video";
@@ -84,6 +85,11 @@ export interface IMaterialUIWrapperElementProps extends ISlateEditorWrapperEleme
    * usually a value of 1
    */
   usePriority?: number;
+
+  /**
+   * The input variant for elements
+   */
+  inputVariant?: "filled" | "outlined" | "standard";
 }
 
 function getVideoURL(v: IVideo) {
@@ -171,6 +177,8 @@ function TextWrapper(props: IMaterialUIWrapperElementProps) {
     setTextOptions(textPropertiesToUse);
   }, [props.element, props.isSelected]);
 
+  const InputToUse = props.inputVariant === "outlined" ? OutlinedInput : FilledInput;
+
   return (
     <EditorDropdown
       componentWrapper="span"
@@ -196,9 +204,10 @@ function TextWrapper(props: IMaterialUIWrapperElementProps) {
               onChange={updateTextContent}
               sx={styles.whiteBackgroundInput}
               input={
-                <FilledInput
+                <InputToUse
                   id="slate-wrapper-template-entry-id"
                   placeholder={props.i18nRichInfo.addTemplateText.placeholder}
+                  label={props.i18nRichInfo.addTemplateText.placeholder}
                   fullWidth={true}
                 />
               }
@@ -266,6 +275,8 @@ function TdAndTh(props: IMaterialUIWrapperElementProps) {
     return props.children;
   }
 
+  const InputToUse = props.inputVariant === "outlined" ? OutlinedInput : FilledInput;
+
   // because of dom nesting we will just put a fake component to the side
   // and a fake element so we don't nest a td in the table
   return (
@@ -299,9 +310,10 @@ function TdAndTh(props: IMaterialUIWrapperElementProps) {
                     displayEmpty={true}
                     sx={[styles.whiteBackgroundInput, styles.fixedWidthInput]}
                     input={
-                      <FilledInput
+                      <InputToUse
                         id="slate-wrapper-table-entry-id"
                         placeholder={props.i18nRichInfo.type}
+                        label={props.i18nRichInfo.type}
                       />
                     }
                   >
@@ -523,6 +535,8 @@ export const materialUIElementWrappers: ISlateEditorElementWrappers = {
         setLinkOptions(linkPropertiesToUse);
       }, [props.element, props.isSelected]);
 
+      const InputToUse = props.inputVariant === "outlined" ? OutlinedInput : FilledInput;
+
       return (
         <EditorDropdown
           componentWrapper="span"
@@ -551,6 +565,7 @@ export const materialUIElementWrappers: ISlateEditorElementWrappers = {
                   fullWidth={true}
                   tabIndex={-1}
                   sx={!(props.element as ILink).thref ? styles.whiteBackgroundInput : null}
+                  variant={props.inputVariant}
                 />
               </AltBadgeReactioner>
               {
@@ -579,9 +594,10 @@ export const materialUIElementWrappers: ISlateEditorElementWrappers = {
                           fullWidth={true}
                           sx={styles.whiteBackgroundInput}
                           input={
-                            <FilledInput
+                            <InputToUse
                               id="slate-wrapper-template-entry-id"
                               placeholder={props.i18nRichInfo.setLink.templatedPlaceholder}
+                              label={props.i18nRichInfo.setLink.templatedPlaceholder}
                               fullWidth={true}
                             />
                           }
@@ -647,6 +663,7 @@ export const materialUIElementWrappers: ISlateEditorElementWrappers = {
                 placeholder={props.i18nRichInfo.loadVideo.placeholder}
                 fullWidth={true}
                 sx={styles.whiteBackgroundInput}
+                variant={props.inputVariant}
                 tabIndex={-1}
               />
             </AltBadgeReactioner>
@@ -692,6 +709,7 @@ export const materialUIElementWrappers: ISlateEditorElementWrappers = {
                 placeholder={props.i18nRichInfo.alt}
                 fullWidth={true}
                 sx={styles.whiteBackgroundInput}
+                variant={props.inputVariant}
                 tabIndex={-1}
               />
             </AltBadgeReactioner>
@@ -713,6 +731,8 @@ export const materialUIElementWrappers: ISlateEditorElementWrappers = {
           titleType: e.target.value || null,
         } as any, path);
       }, []);
+
+      const InputToUse = props.inputVariant === "outlined" ? OutlinedInput : FilledInput;
 
       return (
         <EditorDropdown
@@ -740,9 +760,10 @@ export const materialUIElementWrappers: ISlateEditorElementWrappers = {
                   displayEmpty={true}
                   sx={styles.whiteBackgroundInput}
                   input={
-                    <FilledInput
+                    <InputToUse
                       id="slate-wrapper-title-entry-id"
                       placeholder={props.i18nRichInfo.type}
+                      label={props.i18nRichInfo.type}
                       fullWidth={true}
                     />
                   }
@@ -789,6 +810,8 @@ export const materialUIElementWrappers: ISlateEditorElementWrappers = {
         return props.children;
       }
 
+      const InputToUse = props.inputVariant === "outlined" ? OutlinedInput : FilledInput;
+
       return (
         <EditorDropdown
           componentWrapper="span"
@@ -815,9 +838,10 @@ export const materialUIElementWrappers: ISlateEditorElementWrappers = {
                   displayEmpty={true}
                   sx={styles.whiteBackgroundInput}
                   input={
-                    <FilledInput
+                    <InputToUse
                       id="slate-wrapper-container-entry-id"
                       placeholder={props.i18nRichInfo.type}
+                      label={props.i18nRichInfo.type}
                       fullWidth={true}
                     />
                   }

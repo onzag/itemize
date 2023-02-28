@@ -105,7 +105,8 @@ export default function ItemSyncer(props: IItemSyncerProps) {
       const newLoaded = {
         ...loaded,
       }
-      newLoaded[id] = {
+      const key = id + "." + (version || "");
+      newLoaded[key] = {
         id: id,
         version: version,
         cached: e.cached,

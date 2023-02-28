@@ -87,7 +87,7 @@ function onShiftTab() {
   }, 70);
 }
 
-if (document) {
+if (typeof document !== "undefined") {
   document.addEventListener("keydown", (e) => {
     if (e.key === "Tab" && e.shiftKey) {
       onShiftTab();
@@ -2473,7 +2473,10 @@ export class SlateEditor extends React.Component<ISlateEditorProps, ISlateEditor
    * @param v the value to set
    */
   public setValue(v: any) {
-    if (this.isUnmounted) {
+    // for some reason slate keeps triggering
+    // a value change when it's disabled
+    // because slate can be buggy
+    if (this.isUnmounted || this.props.disabled) {
       return;
     }
 

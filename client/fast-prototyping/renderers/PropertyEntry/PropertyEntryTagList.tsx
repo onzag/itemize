@@ -278,7 +278,7 @@ function PropertyEntryTagListRenderer(props: IPropertyEntryTagListRendererProps)
 
   const renderBody = useCallback((inputProps?: any) => {
     let icon: React.ReactNode = null;
-    if (props.canRestore) {
+    if (props.canRestore && !props.args.disableRestore) {
       if (props.currentAppliedValue !== null) {
         icon = <RestoreIcon />
       }
@@ -306,7 +306,7 @@ function PropertyEntryTagListRenderer(props: IPropertyEntryTagListRendererProps)
       })
     )
 
-    const restoreAction = icon && props.canRestore && props.currentAppliedValue ? props.onRestore : null;
+    const restoreAction = icon && props.canRestore && !props.args.disableRestore && props.currentAppliedValue ? props.onRestore : null;
     const addornment = icon ? (
       <InputAdornment position="end">
         <RestoreIconButton
@@ -378,7 +378,7 @@ function PropertyEntryTagListRenderer(props: IPropertyEntryTagListRendererProps)
     handleBlur,
     props.disabled,
     props.placeholder,
-    props.canRestore,
+    props.canRestore && !props.args.disableRestore,
     props.currentAppliedValue,
     props.currentValue,
     props.onRestore,

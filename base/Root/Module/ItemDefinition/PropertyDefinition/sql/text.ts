@@ -129,6 +129,30 @@ export function textSQLOut(arg: ISQLOutInfo): IPropertyDefinitionSupportedTextTy
  * @returns a partial row value
  */
 export function textSQLIn(arg: ISQLInInfo) {
+
+  // javascript undefined problem forces me to do this double check because it will not
+  // trigger an error if the data is corrupted because javascript is javascript and will
+  // do anything in its might to succeed even with corrupted data because javascript
+  if (arg.value !== null) {
+    if (typeof arg.value === "undefined") {
+      throw new Error("Invalid text for SQL IN in must not be undefined in " + arg.property.getId());
+    }
+
+    if (
+      typeof (arg.value as IPropertyDefinitionSupportedTextType).language !== "string" &&
+      (arg.value as IPropertyDefinitionSupportedTextType).language !== null
+    ) {
+      throw new Error("Invalid text for SQL IN in " + JSON.stringify(arg.value) + " not valid language property");
+    }
+
+    if (
+      typeof (arg.value as IPropertyDefinitionSupportedTextType).value !== "string" &&
+      (arg.value as IPropertyDefinitionSupportedTextType).value !== null
+    ) {
+      throw new Error("Invalid text for SQL IN in " + JSON.stringify(arg.value) + " not valid value property");
+    }
+  }
+
   let dictionary: string;
   if (typeof arg.dictionary === "string" || !arg.language) {
     dictionary = (arg.dictionary || null) as string;

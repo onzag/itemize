@@ -9,7 +9,7 @@
  */
 
 import { IPropertyEntryI18nRichTextInfo } from "../../../internal/components/PropertyEntry/PropertyEntryText";
-import React from "react";
+import React, { useCallback, useEffect } from "react";
 import { IHelperFunctions, ISlateEditorInternalStateType, ISlateEditorWrapperBaseProps } from ".";
 import AttachFileIcon from "@mui/icons-material/AttachFile";
 import VideoLibraryIcon from "@mui/icons-material/VideoLibrary";
@@ -265,6 +265,12 @@ export interface IToolbarPrescenseElement {
    * @returns 
    */
   refocusHandler?: (defaultAction: () => void, e: React.MouseEvent<HTMLElement>) => void;
+  /**
+   * Trigger on any keydown event
+   * @param e 
+   * @returns 
+   */
+  onAnyKeyDown?: (e: KeyboardEvent) => void;
   /**
    * Manually specify whether it's disabled
    * if not specified it will check whether an element
@@ -1074,11 +1080,23 @@ interface IToolbarExtraProps extends RichTextEditorToolbarElementProps {
 
 function ToolbarExtra(props: IToolbarExtraProps) {
   const elementReference = typeof props.extra.element === "function" ? props.extra.element() : props.extra.element;
-  const defaultAction = () => {
+  const defaultAction = useCallback(() => {
     const element = typeof props.extra.element === "function" ? props.extra.element() : props.extra.element;
     props.helpers.insertElement(element);
     return element;
-  }
+  }, [props.extra.element, props.helpers.insertElement]);
+
+  useEffect(() => {
+    if (props.extra.onAnyKeyDown) {
+      document.body.addEventListener("keydown", props.extra.onAnyKeyDown);
+
+      return () => {
+        document.body.removeEventListener("keydown", props.extra.onAnyKeyDown);
+      }
+    }
+
+    return;
+  }, [props.extra.onAnyKeyDown])
 
   const basicProps = {
     tabIndex: -1,
@@ -1936,7 +1954,7 @@ export class MaterialUISlateWrapper extends React.PureComponent<IMaterialUISlate
     if (typeof this.props.reactionerPriority === "number") {
       box = (
         <AltBadgeReactioner
-          priority={this.props.state.currentSelectedElement ? "ALWAYS_ON_TOP_KEEP_FLOW" : this.props.reactionerPriority}
+          priority={this.props.state.currentSelectedElement && !this.state.drawerOpen ? "ALWAYS_ON_TOP_KEEP_FLOW" : this.props.reactionerPriority}
           reactionKey={
             this.props.state.isRichText &&
             this.props.state.currentSelectedElement ? "escape" : (this.props.reactionerKey || "t")}

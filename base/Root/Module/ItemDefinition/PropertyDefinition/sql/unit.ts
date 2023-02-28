@@ -84,6 +84,40 @@ export function unitSQLIn(arg: ISQLInInfo) {
       [arg.prefix + arg.id + "_NORMALIZED_UNIT"]: null,
     };
   }
+
+  // javascript undefined problem forces me to do this double check because it will not
+  // trigger an error if the data is corrupted because javascript is javascript and will
+  // do anything in its might to succeed even with corrupted data because javascript
+  if (arg.value !== null) {
+    if (typeof arg.value === "undefined") {
+      throw new Error("Invalid unit for SQL IN in must not be undefined in " + arg.property.getId());
+    }
+
+    if (
+      typeof (arg.value as IPropertyDefinitionSupportedUnitType).normalizedUnit !== "string"
+    ) {
+      throw new Error("Invalid unit for SQL IN in " + JSON.stringify(arg.value) + " not valid normalizedUnit property");
+    }
+
+    if (
+      typeof (arg.value as IPropertyDefinitionSupportedUnitType).normalizedValue !== "number"
+    ) {
+      throw new Error("Invalid unit for SQL IN in " + JSON.stringify(arg.value) + " not valid normalizedValue property");
+    }
+
+    if (
+      typeof (arg.value as IPropertyDefinitionSupportedUnitType).value !== "number"
+    ) {
+      throw new Error("Invalid unit for SQL IN in " + JSON.stringify(arg.value) + " not valid value property");
+    }
+
+    if (
+      typeof (arg.value as IPropertyDefinitionSupportedUnitType).unit !== "string"
+    ) {
+      throw new Error("Invalid unit for SQL IN in " + JSON.stringify(arg.value) + " not valid unit property");
+    }
+  }
+
   const value = arg.value as IPropertyDefinitionSupportedUnitType;
   let roundedValue = value.value;
   let roundedNormValue = value.normalizedValue;

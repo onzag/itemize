@@ -172,6 +172,10 @@ export function standardSQLInFn(arg: ISQLInInfo): ISQLTableRowValue {
     }
   }
 
+  if (typeof arg.value === "undefined") {
+    throw new Error("Invalid value SQL IN in must not be undefined in " + arg.property.getId());
+  }
+
   if (typeof arg.value === "number") {
     let maxDecimalCount = arg.property.getMaxDecimalCount();
     if (maxDecimalCount > MAX_DECIMAL_COUNT) {
@@ -197,6 +201,9 @@ export function standardSQLInFn(arg: ISQLInInfo): ISQLTableRowValue {
  * @returns the partial row value
  */
 export function stardardSQLInWithJSONStringifyFn(arg: ISQLInInfo): ISQLTableRowValue {
+  if (typeof arg.value === "undefined") {
+    throw new Error("Invalid value SQL IN in must not be undefined in " + arg.property.getId());
+  }
   if (arg.value === null) {
     return {
       [arg.prefix + arg.id]: null,

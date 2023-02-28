@@ -142,7 +142,7 @@ class PropertyEntrySelectRenderer
   public render() {
     // build the icon
     let icon: React.ReactNode = null;
-    if (this.props.canRestore) {
+    if (this.props.canRestore && !this.props.args.disableRestore) {
       if (this.props.currentAppliedValue) {
         icon = <RestoreIcon />
       }
@@ -192,7 +192,10 @@ class PropertyEntrySelectRenderer
       InputToUse = OutlinedInput;
     }
 
-    const restoreAction = icon && this.props.canRestore && this.props.currentAppliedValue ? this.props.onRestore : null;
+    const restoreAction = icon &&
+      this.props.canRestore &&
+      !this.props.args.disableRestore &&
+      this.props.currentAppliedValue ? this.props.onRestore : null;
     const addornment = icon ? (
       <InputAdornment position="end">
         <RestoreIconButton

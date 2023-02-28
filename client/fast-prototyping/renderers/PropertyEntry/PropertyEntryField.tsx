@@ -506,7 +506,7 @@ class PropertyEntryFieldRenderer
           args={this.props.args}
           uniqueId={idToUse}
           autoFocus={this.props.autoFocus}
-          canRestore={this.props.canRestore}
+          canRestore={this.props.canRestore && !this.props.args.disableRestore}
           currentAppliedValue={this.props.currentAppliedValue as any}
           currentI18nValue={this.props.currentTextualValue}
           currentValid={this.props.currentValid}
@@ -654,7 +654,7 @@ class PropertyEntryFieldRenderer
           </IconButton>
         </InputAdornment>
       );
-    } else if (this.props.canRestore) {
+    } else if (this.props.canRestore && !this.props.args.disableRestore) {
       let icon: React.ReactNode;
       if (this.props.currentAppliedValue) {
         icon = <RestoreIcon />

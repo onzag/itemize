@@ -13,6 +13,9 @@ import bcyrpt from "bcrypt";
  * @eturns a partial row
  */
 export function passwordSQLIn(arg: ISQLInInfo) {
+  if (typeof arg.value === "undefined") {
+    throw new Error("Invalid password for SQL IN in must not be undefined in " + arg.property.getId());
+  }
   if (arg.value === null) {
     return {
       [arg.prefix + arg.id]: null,

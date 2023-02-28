@@ -15,7 +15,7 @@ const styles = {
   dropdown: {
     padding: "0.5rem 1rem",
     backgroundColor: "rgba(240, 240, 240, 0.9)",
-    border: "solid 1px #ccc",
+    border: "solid 1px #707070",
     width: "300px",
     display: "flex",
     flexDirection: "column",
@@ -318,8 +318,9 @@ export function EditorDropdown(props: IEditorDropdown) {
 
     let left: number = null;
     let right: number = null;
-    if (leftMostPosition > (window.innerWidth / 2)) {
-      right = window.innerWidth - rightMostPosition;
+    const widthToCompareAgainst = document.body.parentElement.getBoundingClientRect().width;
+    if (leftMostPosition > (widthToCompareAgainst / 2)) {
+      right = widthToCompareAgainst - rightMostPosition;
     } else {
       left = leftMostPosition;
     }

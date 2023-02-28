@@ -96,7 +96,7 @@ function PropertyEntryBooleanRenderer(props: IPropertyEntryBooleanRendererProps)
   const descriptionAsAlert = props.args["descriptionAsAlert"];
 
   let icon: React.ReactNode = null;
-  if (props.canRestore) {
+  if (props.canRestore && !props.args.disableRestore) {
     if (props.currentAppliedValue !== null) {
       icon = <RestoreIcon />
     }
@@ -131,7 +131,7 @@ function PropertyEntryBooleanRenderer(props: IPropertyEntryBooleanRendererProps)
         >
           {props.label}{icon ? <RestoreIconButton
             sx={style.icon}
-            onClick={props.canRestore && props.currentAppliedValue ? props.onRestore : null}
+            onClick={props.canRestore && !props.args.disableRestore && props.currentAppliedValue ? props.onRestore : null}
           >{icon}</RestoreIconButton> : null}
         </FormLabel> : null}
         <RadioGroup
@@ -175,7 +175,7 @@ function PropertyEntryBooleanRenderer(props: IPropertyEntryBooleanRendererProps)
         />
         {icon ? <RestoreIconButton
           sx={style.icon}
-          onClick={props.canRestore ? props.onRestore : null}
+          onClick={props.canRestore && !props.args.disableRestore ? props.onRestore : null}
         >{icon}</RestoreIconButton> : null}
       </FormControl>
     )

@@ -141,6 +141,11 @@ export interface IPropertyEntryProps<RendererPropsType> extends IPropertyBaseWit
    * of a property for a new value
    */
   languageOverride?: string;
+
+  /**
+   * Suppress hidden warning
+   */
+  suppressWarnings?: boolean;
 }
 
 /**
@@ -390,7 +395,7 @@ export function EntryViewReadSet(
       return props.children(gqlValue as any, null);
     }
 
-    if (process.env.NODE_ENV === "development") {
+    if (process.env.NODE_ENV === "development" && !props.suppressWarnings) {
       console.warn(
         "Possibly unwanted behaviour, you used a Reader on property " +
         property.getId() +
@@ -412,7 +417,8 @@ export function EntryViewReadSet(
       if (
         !props.displayHidden &&
         propertyState.hidden &&
-        process.env.NODE_ENV === "development"
+        process.env.NODE_ENV === "development"  &&
+        !props.suppressWarnings
       ) {
         console.warn(
           "You used a View on property " +
@@ -468,7 +474,7 @@ export function EntryViewReadSet(
       }
     }
 
-    if (process.env.NODE_ENV === "development") {
+    if (process.env.NODE_ENV === "development"  && !props.suppressWarnings) {
       console.warn(
         "Possibly unwanted behaviour, you used a View on property " +
         property.getId() +
@@ -485,7 +491,7 @@ export function EntryViewReadSet(
     // property has no state it must be hidden
     // or somehow not accessible eg. it has been optimized for
     if (!propertyState) {
-      if (process.env.NODE_ENV === "development") {
+      if (process.env.NODE_ENV === "development" && !props.suppressWarnings) {
         console.warn(
           "Possibly unwanted behaviour, you used a Entry on property " +
           property.getId() +
@@ -499,7 +505,8 @@ export function EntryViewReadSet(
     if (
       !props.displayHidden &&
       propertyState.hidden &&
-      process.env.NODE_ENV === "development"
+      process.env.NODE_ENV === "development" &&
+      !props.suppressWarnings
     ) {
       console.warn(
         "Possibly unwanted behaviour, you used a Entry on property " +

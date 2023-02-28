@@ -17,6 +17,7 @@ interface IGrowableBoxProps {
 export default function GrowableBox(props: IGrowableBoxProps) {
   const [height, setHeight] = useState(0);
   const [crop, setCrop] = useState(false);
+  const [noTransition, setNoTransition] = useState(true);
 
   const elementRef = useRef<any>();
   const isUnmounted = useRef(false);
@@ -24,6 +25,12 @@ export default function GrowableBox(props: IGrowableBoxProps) {
   const Element = props.component || "div";
 
   useEffect(() => {
+    setTimeout(() => {
+      if (!isUnmounted.current) {
+        setNoTransition(false);
+      }
+    }, 300);
+
     return () => {
       isUnmounted.current = true;
     }
@@ -53,7 +60,7 @@ export default function GrowableBox(props: IGrowableBoxProps) {
     <Element
       style={{
         height,
-        transition: props.transitionOverride || "height 0.3s ease",
+        transition: noTransition ? null : (props.transitionOverride || "height 0.3s ease"),
         overflow: height === 0 || crop ? "visible clip" : null,
         width: props.fullWidth ? "100%" : null
       }}

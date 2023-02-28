@@ -9,7 +9,7 @@ import { IPropertyDefinitionSupportedCurrencyType } from "../types/currency";
 import { CURRENCY_FACTORS_IDENTIFIER } from "../../../../../../constants";
 import { PropertyDefinitionSearchInterfacesPrefixes } from "../search-interfaces";
 import { IGQLArgs } from "../../../../../../gql-querier";
-import { currencies } from "../../../../../../imported-resources";
+import { arrCurrencies, currencies } from "../../../../../../imported-resources";
 
 /**
  * the sql function that setups the fields for currency
@@ -79,6 +79,28 @@ export function currencySQLIn(arg: ISQLInInfo) {
       [arg.prefix + arg.id + "_CURRENCY"]: null,
       [arg.prefix + arg.id + "_NORMALIZED_VALUE"]: null,
     };
+  }
+
+  // javascript undefined problem forces me to do this double check because it will not
+  // trigger an error if the data is corrupted because javascript is javascript and will
+  // do anything in its might to succeed even with corrupted data because javascript
+  if (value !== null) {
+    if (typeof value === "undefined") {
+      throw new Error("Invalid payment for SQL IN in must not be undefined in " + arg.property.getId());
+    }
+    
+    if (
+      typeof value.value !== "number"
+    ) {
+      throw new Error("Invalid currency for SQL IN in " + JSON.stringify(arg.value) + " not valid value property");
+    }
+
+    if (
+      typeof value.currency !== "string" ||
+      !arrCurrencies.find((c) => c.code !== value.currency)
+    ) {
+      throw new Error("Invalid currency for SQL IN in " + JSON.stringify(arg.value) + " not valid currency property");
+    }
   }
 
   // otherwise we need to get the conversion information from the server data

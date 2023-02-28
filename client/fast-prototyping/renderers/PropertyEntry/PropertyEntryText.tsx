@@ -163,7 +163,7 @@ class PropertyEntryTextRenderer extends React.PureComponent<IPropertyEntryTextRe
   public render() {
     // the icon as usual
     let icon: React.ReactNode;
-    if (this.props.canRestore) {
+    if (this.props.canRestore && !this.props.args.disableRestore) {
       if (this.props.currentAppliedValue) {
         icon = <RestoreIcon />
       } else {
@@ -175,7 +175,7 @@ class PropertyEntryTextRenderer extends React.PureComponent<IPropertyEntryTextRe
     const iconComponent = icon ? (
       <RestoreIconButton
         sx={style.icon}
-        onClick={this.props.canRestore ? this.props.onRestore : null}
+        onClick={this.props.canRestore && !this.props.args.disableRestore ? this.props.onRestore : null}
       >
         {icon}
       </RestoreIconButton>

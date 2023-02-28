@@ -165,7 +165,7 @@ function PropertyEntryFileRenderer(props: IPropertyEntryFileRendererProps) {
   const dropzoneRef = React.useRef<DropzoneRef>();
 
   let icon: React.ReactNode;
-  if (props.canRestore) {
+  if (props.canRestore && !props.args.disableRestore) {
     if (props.currentAppliedValue) {
       icon = <RestoreIcon />
     } else {
@@ -188,7 +188,7 @@ function PropertyEntryFileRenderer(props: IPropertyEntryFileRendererProps) {
     {icon ? <IconButton
       tabIndex={-1}
       sx={style.icon}
-      onClick={props.canRestore ? props.onRestore : null}
+      onClick={props.canRestore && !props.args.disableRestore ? props.onRestore : null}
       size="large">{icon}</IconButton> : null}
   </FormLabel> : null;
 

@@ -213,6 +213,8 @@ interface IAltBadgeReactionerProps {
    * Triggers when keycodes mode is cleared
    */
   onExitKeyCodes?: () => void;
+  anchorOriginHorizontal?: "left" | "right";
+  anchorOriginVertical?: "top" | "bottom";
 }
 
 export function AltBadgeReactioner(
@@ -265,8 +267,8 @@ export function AltBadgeReactioner(
           ].concat(Array.isArray(props.sx) ? props.sx as any : [props.sx] as any)
         }
         anchorOrigin={{
-          vertical: "top",
-          horizontal: "right",
+          vertical: props.anchorOriginVertical || "top",
+          horizontal: props.anchorOriginHorizontal || "right",
         }}
         component={props.badgeComponent as any}
       >

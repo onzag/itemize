@@ -5,10 +5,10 @@
  */
 
 import { ISQLArgInfo, ISQLInInfo, ISQLOutInfo, ISQLSearchInfo, ISQLBtreeIndexableInfo, ISQLEqualInfo, ISQLSSCacheEqualInfo, ISQLSideEffectType, IElasticSearchInfo, IArgInfo } from "../types";
-import { IPropertyDefinitionSupportedPaymentType, PaymentStatusType } from "../types/payment";
+import { IPropertyDefinitionSupportedPaymentType, paymentStatusesArr, PaymentStatusType, paymentTypesArr } from "../types/payment";
 import { PropertyDefinitionSearchInterfacesPrefixes } from "../search-interfaces";
 import { IPropertyDefinitionSupportedCurrencyType } from "../types/currency";
-import { currencies } from "../../../../../../imported-resources";
+import { arrCurrencies, currencies } from "../../../../../../imported-resources";
 
 // based on the payment provider status to event
 // need to clone it because of circular dependencies
@@ -110,6 +110,54 @@ export function paymentSQLIn(arg: ISQLInInfo) {
       [arg.prefix + arg.id + "_METADATA"]: null,
       [arg.prefix + arg.id + "_RO_METADATA"]: null,
     };
+  }
+
+  // javascript undefined problem forces me to do this double check because it will not
+  // trigger an error if the data is corrupted because javascript is javascript and will
+  // do anything in its might to succeed even with corrupted data because javascript
+  if (value !== null) {
+    if (typeof value === "undefined") {
+      throw new Error("Invalid payment for SQL IN in must not be undefined in " + arg.property.getId());
+    }
+    
+    if (
+      typeof value.amount !== "number"
+    ) {
+      throw new Error("Invalid payment for SQL IN in " + JSON.stringify(arg.value) + " not valid amount property");
+    }
+
+    if (
+      typeof value.currency !== "string" ||
+      !arrCurrencies.find((c) => c.code !== value.currency)
+    ) {
+      throw new Error("Invalid payment for SQL IN in " + JSON.stringify(arg.value) + " not valid currency property");
+    }
+
+    if (
+      value.metadata &&
+      value.metadata !== "string"
+    ) {
+      throw new Error("Invalid payment for SQL IN in " + JSON.stringify(arg.value) + " not valid metadata property");
+    }
+
+    if (
+      value.rometadata &&
+      value.rometadata !== "string"
+    ) {
+      throw new Error("Invalid payment for SQL IN in " + JSON.stringify(arg.value) + " not valid rometadata property");
+    }
+
+    if (
+      !paymentStatusesArr.includes(value.status)
+    ) {
+      throw new Error("Invalid payment for SQL IN in " + JSON.stringify(arg.value) + " not valid status property");
+    }
+
+    if (
+      !paymentTypesArr.includes(value.type)
+    ) {
+      throw new Error("Invalid payment for SQL IN in " + JSON.stringify(arg.value) + " not valid type property");
+    }
   }
 
   let roundedAmount = value.amount;

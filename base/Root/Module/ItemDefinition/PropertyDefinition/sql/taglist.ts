@@ -17,6 +17,13 @@ export function taglistSQLIn(arg: ISQLInInfo): ISQLTableRowValue {
     }; 
   }
 
+  // javascript undefined problem forces me to do this double check because it will not
+  // trigger an error if the data is corrupted because javascript is javascript and will
+  // do anything in its might to succeed even with corrupted data because javascript
+  if (!Array.isArray(arg.value) || (arg.value as Array<any>).some((v) => typeof v !== "string")) {
+    throw new Error("Invalid string array for SQL IN in " + JSON.stringify(arg.value) + " not valid string array");
+  }
+
   const valueArray = (arg.value as Array<any>).map((v) => "?").join(",");
 
   // as simple as this

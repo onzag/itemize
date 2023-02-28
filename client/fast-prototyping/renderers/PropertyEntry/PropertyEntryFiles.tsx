@@ -176,7 +176,7 @@ function PropertyEntryFilesRenderer(props: IPropertyEntryFilesRendererProps) {
   }, []);
 
   let icon: React.ReactNode;
-  if (props.canRestore) {
+  if (props.canRestore && !props.args.disableRestore) {
     if (props.currentAppliedValue) {
       icon = <RestoreIcon />
     } else {
@@ -199,7 +199,7 @@ function PropertyEntryFilesRenderer(props: IPropertyEntryFilesRendererProps) {
       {capitalize(props.label)}
       {icon ? <RestoreIconButton
         sx={style.icon}
-        onClick={props.canRestore ? props.onRestore : null}
+        onClick={props.canRestore && !props.args.disableRestore ? props.onRestore : null}
       >{icon}</RestoreIconButton> : null}
     </FormLabel> : null
   );

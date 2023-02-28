@@ -2227,8 +2227,6 @@ export class ActualItemProvider extends
       return;
     }
 
-    this.props.onWillLoad && this.props.onWillLoad();
-
     // the item must update all its fields and its internal state
     // as the search did an apply to it
     this.changeListener();
@@ -2238,6 +2236,8 @@ export class ActualItemProvider extends
     if (this.state.loaded) {
       return;
     }
+
+    this.props.onWillLoad && this.props.onWillLoad();
 
     const forId = this.props.forId || null;
     const forVersion = this.props.forVersion || null;
@@ -2377,8 +2377,6 @@ export class ActualItemProvider extends
       return null;
     }
 
-    this.props.onWillLoad && this.props.onWillLoad();
-
     // We get the request fields that we are going to use
     // in order to load the value, we use the optimizers
     // so as to request only what is necessary for it to be populated
@@ -2423,6 +2421,8 @@ export class ActualItemProvider extends
       }
       return null;
     }
+
+    this.props.onWillLoad && this.props.onWillLoad();
 
     // we wil reuse the old promise in case
     // there's an overlapping value being loaded
@@ -3553,7 +3553,7 @@ export class ActualItemProvider extends
       },
     });
 
-    if (nothingToUpdate) {
+    if (nothingToUpdate && determinedActionIsEdit) {
       if (options.preventNothingToUpdateError) {
         this.cleanWithProps(this.props, options, "success");
         this.activeSubmitPromise = null;

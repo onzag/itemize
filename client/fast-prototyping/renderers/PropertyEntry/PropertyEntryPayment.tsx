@@ -84,7 +84,7 @@ function PropertyEntryPaymentRenderer(props: IPropertyEntryPaymentRendererProps)
   const onlyStatus = props.args["onlyStatus"];
 
   let icon: React.ReactNode = null;
-  if (props.canRestore) {
+  if (props.canRestore && props.args.disableRestore) {
     if (props.currentAppliedValue !== null) {
       icon = <RestoreIcon />
     }
@@ -95,7 +95,7 @@ function PropertyEntryPaymentRenderer(props: IPropertyEntryPaymentRendererProps)
   const iconComponent = icon ? (
     <RestoreIconButton
       sx={style.icon}
-      onClick={props.canRestore ? props.onRestore : null}
+      onClick={props.canRestore && props.args.disableRestore ? props.onRestore : null}
     >
       {icon}
     </RestoreIconButton>

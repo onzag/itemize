@@ -7,7 +7,7 @@
  * @module
  */
 
-import React from "react";
+import React, { useContext } from "react";
 import { EndpointErrorType } from "../../../base/errors";
 import {
   ItemContext,
@@ -145,4 +145,22 @@ export default function SubmitActioner(props: ISubmitActionerProps) {
       )
     }</ItemContext.Consumer>
   );
+}
+
+/**
+ * Hook version for the submit actioner
+ * @returns the submit actioner information
+ */
+export function useSubmitActioner(): ISubmitActionerInfoArgType {
+  const itemContext = useContext(ItemContext);
+
+  return ({
+    submitError: itemContext.submitError,
+    submitting: itemContext.submitting,
+    submitted: itemContext.submitted,
+    submit: itemContext.submit,
+    dismissError: itemContext.dismissSubmitError,
+    dismissSubmitted: itemContext.dismissSubmitted,
+    clean: itemContext.clean,
+  });
 }

@@ -55,6 +55,10 @@ interface ISnackbarProps {
    */
   i18nDisplay: EndpointErrorType | string;
   /**
+   * Context only useful for string types for display
+   */
+  i18nContext?: string;
+  /**
    * The severity of the snackbar, which affects the color
    */
   severity: "primary" | "secondary" | "success" | "error";
@@ -96,7 +100,7 @@ export default class Snackbar extends React.PureComponent<ISnackbarProps> {
     const autoHideDuration = this.props.noAutoHide ? null : 3000;
 
     if (typeof this.props.i18nDisplay === "string") {
-      message = <I18nRead id={this.props.i18nDisplay} capitalize={true} />;
+      message = <I18nRead id={this.props.i18nDisplay} capitalize={true} context={this.props.i18nContext}/>;
     } else if (this.props.i18nDisplay) {
       message = <I18nReadError error={this.props.i18nDisplay} capitalize={true} />;
     }
