@@ -613,7 +613,15 @@ export interface IItemContextType extends IBasicFns {
   dismissSearchError: () => void;
   dismissSearchResults: () => void;
   downloadState: (specificProperties?: string[], specificIncludes?: { [id: string]: string[] }) => Promise<Blob>,
+  downloadStateAt: (id: string, version?: string, specificProperties?: string[], specificIncludes?: { [id: string]: string[] }) => Promise<Blob>,
   loadStateFromFile: (f: Blob | File, specificProperties?: string[], specificIncludes?: { [id: string]: string[] }) => Promise<void>,
+  loadStateFromFileAt: (
+    f: Blob | File,
+    id: string,
+    version?: string,
+    specificProperties?: string[],
+    specificIncludes?: { [id: string]: string[] },
+  ) => Promise<void>,
 
   // the remote listener
   remoteListener: RemoteListener;
@@ -1347,7 +1355,9 @@ export class ActualItemProvider extends
     this.blockCleanup = this.blockCleanup.bind(this);
     this.releaseCleanupBlock = this.releaseCleanupBlock.bind(this);
     this.loadStateFromFile = this.loadStateFromFile.bind(this);
+    this.loadStateFromFileAt = this.loadStateFromFileAt.bind(this);
     this.downloadState = this.downloadState.bind(this);
+    this.downloadStateAt = this.downloadStateAt.bind(this);
     this.onConnectStatusChange = this.onConnectStatusChange.bind(this);
 
     // first we setup the listeners, this includes the on change listener that would make
@@ -2292,26 +2302,43 @@ export class ActualItemProvider extends
     });
   }
   public async loadStateFromFile(state: File | Blob, specificProperties?: string[], specificIncludes?: { [includeId: string]: string[] }) {
+    this.loadStateFromFileAt(state, this.props.forId || null, this.props.forVersion || null, specificProperties, specificIncludes);
+  }
+  public async loadStateFromFileAt(
+    state: File | Blob,
+    id: string,
+    version?: string,
+    specificProperties?: string[],
+    specificIncludes?: { [includeId: string]: string[] },
+  ) {
     await this.props.itemDefinitionInstance.applyStateFromPackage(
-      this.props.forId || null,
-      this.props.forVersion || null,
+      id || null,
+      version || null,
       state,
       specificProperties,
       specificIncludes,
     );
     this.props.itemDefinitionInstance.triggerListeners(
       "change",
-      this.props.forId || null,
-      this.props.forVersion || null,
+      id || null,
+      version || null,
     );
   }
   public async downloadState(specificProperties?: string[], specificIncludes?: { [includeId: string]: string[] }): Promise<Blob> {
+    return this.downloadStateAt(this.props.forId || null, this.props.forVersion || null, specificProperties, specificIncludes)
+  }
+  public async downloadStateAt(
+    id: string,
+    version: string,
+    specificProperties?: string[],
+    specificIncludes?: { [includeId: string]: string[] },
+  ): Promise<Blob> {
     if (!this.lastLoadValuePromiseIsResolved) {
       await this.lastLoadValuePromise;
     }
     return this.props.itemDefinitionInstance.getStatePackage(
-      this.props.forId || null,
-      this.props.forVersion || null,
+      id || null,
+      version || null,
       specificProperties,
       specificIncludes,
       true,
@@ -4739,7 +4766,9 @@ export class ActualItemProvider extends
           injectSubmitBlockPromise: this.injectSubmitBlockPromise,
           injectedParentContext: this.props.injectedParentContext,
           downloadState: this.downloadState,
+          downloadStateAt: this.downloadStateAt,
           loadStateFromFile: this.loadStateFromFile,
+          loadStateFromFileAt: this.loadStateFromFileAt,
         }}
       >
         {this.props.children}

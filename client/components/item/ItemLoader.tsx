@@ -52,12 +52,29 @@ export interface IItemLoaderInfoArgType {
    * Allows to download the current state of the item, including
    * its files and download them
    */
-  downloadState: (specificProperties?: string[], specificIncludes?: {[id: string]: string[]}) => Promise<Blob>;
+  downloadState: (specificProperties?: string[], specificIncludes?: { [id: string]: string[] }) => Promise<Blob>;
+  /**
+   * Allows to download the current state of the item, including
+   * its files and download them
+   */
+  downloadStateAt: (id: string, version?: string, specificProperties?: string[], specificIncludes?: { [id: string]: string[] }) => Promise<Blob>;
   /**
    * Allows to load the state from a file that has previously
    * been downloaded and packaged
    */
-  loadStateFromFile: (f: Blob | File, specificProperties?: string[], specificIncludes?: {[id: string]: string[]}) => Promise<void>;
+  loadStateFromFile: (f: Blob | File, specificProperties?: string[], specificIncludes?: { [id: string]: string[] }) => Promise<void>;
+  /**
+   * Allows to load the state from a file that has previously
+   * been downloaded and packaged
+   * This function loads it at a specific id and version slot
+   */
+  loadStateFromFileAt: (
+    f: Blob | File,
+    id: string,
+    version: string,
+    specificProperties?: string[],
+    specificIncludes?: { [id: string]: string[] },
+  ) => Promise<void>;
 }
 
 /**
@@ -85,7 +102,7 @@ class ActualItemLoader extends React.Component<IActualItemLoaderProps> {
       nextProps.children !== this.props.children ||
       nextProps.itemContext.blocked !== this.props.itemContext.blocked ||
       nextProps.itemContext.blockedButDataAccessible !==
-        this.props.itemContext.blockedButDataAccessible ||
+      this.props.itemContext.blockedButDataAccessible ||
       nextProps.itemContext.notFound !== this.props.itemContext.notFound ||
       nextProps.itemContext.loading !== this.props.itemContext.loading ||
       nextProps.itemContext.loaded !== this.props.itemContext.loaded;
@@ -101,7 +118,9 @@ class ActualItemLoader extends React.Component<IActualItemLoaderProps> {
         error: this.props.itemContext.loadError,
         reload: this.props.itemContext.reload,
         downloadState: this.props.itemContext.downloadState,
+        downloadStateAt: this.props.itemContext.downloadStateAt,
         loadStateFromFile: this.props.itemContext.loadStateFromFile,
+        loadStateFromFileAt: this.props.itemContext.loadStateFromFileAt,
       },
     );
   }
@@ -117,7 +136,7 @@ export default function ItemLoader(props: IItemLoaderProps) {
   return (
     <ItemContext.Consumer>{
       (itemContext) => (
-        <ActualItemLoader {...props} itemContext={itemContext}/>
+        <ActualItemLoader {...props} itemContext={itemContext} />
       )
     }</ItemContext.Consumer>
   );
