@@ -17,6 +17,10 @@ import ResourceLoader from "./ResourceLoader";
  */
 interface IHTMLResourceLoaderProps extends Omit<IResourceLoaderProps, "children"> {
   /**
+   * Includes the token in the header for usage in validation as token
+   */
+  includeToken?: boolean;
+  /**
    * an optional wrapper component string, eg, "div", "span", etc...
    */
   wrapper?: string;

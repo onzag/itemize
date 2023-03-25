@@ -8,10 +8,10 @@
 
 import { ISQLTableRowValue } from "../base/Root/sql";
 import { CHANGED_FEEDBACK_EVENT, generateOwnedParentedSearchMergedIndexIdentifier, generateOwnedSearchMergedIndexIdentifier, generateParentedSearchMergedIndexIdentifier, generatePropertySearchMergedIndexIdentifier, IChangedFeedbackEvent, IOwnedParentedSearchRecordsEvent, IOwnedSearchRecordsEvent, IParentedSearchRecordsEvent, IPropertySearchRecordsEvent, IRedisEvent, OWNED_PARENTED_SEARCH_RECORDS_EVENT, OWNED_SEARCH_RECORDS_EVENT, PARENTED_SEARCH_RECORDS_EVENT, PROPERTY_SEARCH_RECORDS_EVENT } from "../base/remote-protocol";
-import { CONNECTOR_SQL_COLUMN_ID_FK_NAME, CONNECTOR_SQL_COLUMN_VERSION_FK_NAME, DELETED_REGISTRY_IDENTIFIER, TRACKERS_REGISTRY_IDENTIFIER, UNSPECIFIED_OWNER } from "../constants";
+import { CACHED_SELECTS_LOCATION_GLOBAL, CONNECTOR_SQL_COLUMN_ID_FK_NAME, CONNECTOR_SQL_COLUMN_VERSION_FK_NAME, DELETED_REGISTRY_IDENTIFIER, TRACKERS_REGISTRY_IDENTIFIER, UNSPECIFIED_OWNER } from "../constants";
 import Root from "../base/Root";
 import { logger } from "./logger";
-import { ItemizeRedisClient } from "./redis";
+import type { ItemizeRedisClient } from "./redis";
 import { findLastRecordDate } from "./resolvers/actions/search";
 import ItemDefinition from "../base/Root/Module/ItemDefinition";
 import { convertVersionsIntoNullsWhenNecessary } from "./version-null-value";
@@ -31,6 +31,7 @@ import type PropertyDefinition from "../base/Root/Module/ItemDefinition/Property
 import type Include from "../base/Root/Module/ItemDefinition/Include";
 import { ItemizeElasticClient } from "./elastic";
 import type { IAppDataType } from "../server";
+import { GLOBAL_MANAGER_MODE, INSTANCE_MODE } from "./environment";
 
 type RedoDictionariesFnPropertyBased = (language: string, dictionary: string, property: string) => void;
 type RedoDictionariesFnPropertyIncludeBased = (language: string, dictionary: string, include: string, property: string) => void;
@@ -39,6 +40,12 @@ type RedoDictionariesFn = RedoDictionariesFnPropertyBased | RedoDictionariesFnPr
 const NAMESPACE = "23ab4609-af49-4cdf-921b-4700adb284f3";
 export function makeIdOutOf(str: string) {
   return uuidv5(str, NAMESPACE).replace(/-/g, "");
+}
+
+async function wait(ms: number) {
+  return new Promise((r) => {
+    setTimeout(r, ms);
+  });
 }
 
 /**
@@ -55,11 +62,26 @@ const invalidManualUpdate = ["id", "version", "type", "created_by", "last_modifi
  */
 export class ItemizeRawDB {
   private redisPub: ItemizeRedisClient;
+  private redisSub: ItemizeRedisClient;
+  private redisGlobal: ItemizeRedisClient;
+
   private root: Root;
   private elastic: ItemizeElasticClient;
 
   private transacting: boolean;
   private transactingQueue: Function[] = [];
+
+  private cachedSelects: {
+    [prefixedUniqueID: string]: {
+      uniqueID: string,
+      itemDefinitionOrModule: ItemDefinition | Module | string,
+      selecter: (builder: SelectBuilder) => void,
+      preventJoin: boolean,
+      updateInterval: number,
+      intervalObject: NodeJS.Timer,
+      expiresAt: number,
+    }
+  } = {};
 
   public databaseConnection: DatabaseConnection;
 
@@ -69,8 +91,23 @@ export class ItemizeRawDB {
    * @param databaseConnection a connection to the database
    * @param root the root instance
    */
-  constructor(redisPub: ItemizeRedisClient, databaseConnection: DatabaseConnection, root: Root) {
+  constructor(
+    redisGlobal: ItemizeRedisClient,
+    redisPub: ItemizeRedisClient,
+    redisSub: ItemizeRedisClient,
+    databaseConnection: DatabaseConnection,
+    root: Root,
+  ) {
     this.redisPub = redisPub;
+    this.redisSub = redisSub;
+    this.redisGlobal = redisGlobal;
+
+    this.handleIncomingMessage = this.handleIncomingMessage.bind(this);
+
+    if (this.redisSub) {
+      this.redisSub.redisClient.on("message", this.handleIncomingMessage)
+    }
+
     this.databaseConnection = databaseConnection;
     this.root = root;
   }
@@ -91,7 +128,7 @@ export class ItemizeRawDB {
    */
   public startTransaction<T>(fn: (transactingRawDB: ItemizeRawDB) => Promise<T>): Promise<T> {
     return this.databaseConnection.startTransaction(async (transactingClient) => {
-      const newRawDB = new ItemizeRawDB(this.redisPub, transactingClient, this.root);
+      const newRawDB = new ItemizeRawDB(this.redisGlobal, this.redisPub, this.redisSub, transactingClient, this.root);
       newRawDB.transacting = true;
 
       const resolvedPromiseToReturn = await fn(newRawDB);
@@ -1340,6 +1377,303 @@ export class ItemizeRawDB {
       "(" + builder.compile() + ")",
       builder.getBindings(),
     ];
+  }
+
+  /**
+   * Note this is a slow method, better suited to use and forget
+   * 
+   * Creates a cached raw db select operation that executes
+   * in the given interval
+   * 
+   * The reason for this is calculation of resources that are expensive and we would like to resolve only every so often
+   * for example let's say we want to count the number of users but not be quite accurate
+   * 
+   * For example let's say we add the following function in our global manager when we initialize the server
+   * 
+   * initializeServer({...}, {...}, {globalManagerInitialServerDataFunction: (manager) => {
+   *   manager.rawDB.createGloballyCachedRawDBSelect("NUMBER_OF_USERS", "users/user", (b) => b.select("COUNT(*)"), true);
+   * }})
+   * 
+   * And then in and endpoint you may create in the router in order to get that information for the rows selected you may
+   * 
+   * appData.rawDB.retrieveGloballyCachedRawDBSelect("NUMBER_OF_USERS")
+   * 
+   * will yield the cached result exactly as it would do a raw db select
+   * 
+   * NOTE this method is slow, because of the way it has to function to ensure that the cached raw db select is created
+   * and mantained by whichever instance created it first, it will send a message over the global network and then wait
+   * to see if anything else is handling the same request with the same unique id, if there is, it will not create anything,
+   * use doNotProbe if you want to create it regardless which will considerably speed it up
+   */
+  public async createGloballyCachedRawDBSelect(
+    uniqueID: string,
+    itemDefinitionOrModule: ItemDefinition | Module | string,
+    selecter: (builder: SelectBuilder) => void,
+    preventJoin?: boolean,
+    options?: { updateInterval?: number, doNotProbe?: boolean, expire?: number },
+  ): Promise<void> {
+    // already exists, overwriting behaviour
+    if (this.cachedSelects[uniqueID]) {
+      this.cachedSelects[uniqueID].itemDefinitionOrModule = itemDefinitionOrModule;
+      this.cachedSelects[uniqueID].preventJoin = preventJoin;
+      this.cachedSelects[uniqueID].selecter = selecter;
+      this.cachedSelects[uniqueID].updateInterval = options ? (options.updateInterval || null) : null;
+      this.cachedSelects[uniqueID].expiresAt = options && options.expire ? ((new Date()).getTime()) + options.expire : null;
+    } else {
+      const subscribeLocation = CACHED_SELECTS_LOCATION_GLOBAL + "." + uniqueID;
+      if (!options.doNotProbe) {
+        // now we need to check if there's anything handling this request already
+        // for that we need to subscribe to the probe of this temporarily
+        const subscribeProbeLocation = "PROBE." + subscribeLocation;
+        const timeout = 5000;
+
+        this.redisSub.redisClient.subscribe(subscribeProbeLocation);
+
+        const handled = await new Promise<boolean>((resolve) => {
+          // the message handler
+          const messageHandler = (channel: string, message: string) => {
+            // received a correct probe we were waiting for
+            if (channel === subscribeProbeLocation) {
+              this.redisSub.redisClient.removeListener("message", messageHandler);
+              resolve(true);
+              return;
+            }
+          }
+
+          // add the probe expecter
+          this.redisSub.redisClient.on("message", messageHandler);
+
+          // wait for the timeout to see if we get any response in the timeframe
+          setTimeout(() => {
+            this.redisSub.redisClient.removeListener("message", messageHandler);
+            resolve(false);
+          }, timeout);
+        });
+
+        // it is already handled so it will not be added
+        // here
+        if (handled) {
+          return;
+        }
+      }
+
+      // otherwise we register it with this instance
+      this.cachedSelects[uniqueID] = {
+        updateInterval: options ? (options.updateInterval || null) : null,
+        selecter,
+        preventJoin,
+        itemDefinitionOrModule,
+        intervalObject: null,
+        uniqueID,
+        expiresAt: options && options.expire ? ((new Date()).getTime()) + options.expire : null,
+      }
+
+      // and now we subscribe to listening to the events requesting to update
+      // this cached select
+      this.redisSub.redisClient.subscribe(subscribeLocation);
+
+      // and we also update
+      await this._updateCachedSelect(uniqueID, true);
+
+      // and we are done
+      return;
+    }
+  }
+
+  /**
+   * This is the function that handles the execution of the cached raw db select storage in global
+   * redis
+   * @param uniqueID 
+   * @param throwErrors 
+   * @returns 
+   */
+  private async _updateCachedSelect(uniqueID: string, throwErrors?: boolean): Promise<ISQLTableRowValue[]> {
+    if (!this.cachedSelects[uniqueID]) {
+      logger.error({
+        methodName: "_updateCachedSelect",
+        className: "ItemizeRawDB",
+        message: "Could not execute update query for " + uniqueID + " as it doesn't exist",
+      });
+      return;
+    }
+
+    try {
+      const value = await this.performRawDBSelect(
+        this.cachedSelects[uniqueID].itemDefinitionOrModule,
+        this.cachedSelects[uniqueID].selecter,
+        this.cachedSelects[uniqueID].preventJoin,
+      );
+
+      await this.redisGlobal.hset(CACHED_SELECTS_LOCATION_GLOBAL, uniqueID, JSON.stringify(value));
+
+      if (this.cachedSelects[uniqueID].expiresAt) {
+        const now = (new Date()).getTime();
+        if (now >= this.cachedSelects[uniqueID].expiresAt) {
+          await this.deleteGloballyCachedRawDBSelect(uniqueID);
+          return value;
+        }
+      }
+
+      if (this.cachedSelects[uniqueID].updateInterval) {
+        this.cachedSelects[uniqueID].intervalObject =
+          setTimeout(this._updateCachedSelect.bind(this, uniqueID), this.cachedSelects[uniqueID].updateInterval);
+      }
+
+      return value;
+    } catch (err) {
+      logger.error({
+        methodName: "_updateCachedSelect",
+        className: "ItemizeRawDB",
+        serious: true,
+        message: "Could not execute update query for " + uniqueID,
+        err: err,
+      });
+
+      if (throwErrors) {
+        throw err;
+      }
+    }
+  }
+
+  /**
+   * Retrieves the raw db select that has been globally cached, given its unique id it will
+   * provide the select results from that query
+   * @param uniqueID 
+   * @param options 
+   * @returns 
+   */
+  public async retrieveGloballyCachedRawDBSelect(uniqueID: string, options?: { returnNullOnError?: boolean }): Promise<ISQLTableRowValue[]> {
+    try {
+      const valueRaw: string = await this.redisGlobal.hget(CACHED_SELECTS_LOCATION_GLOBAL, uniqueID);
+      if (!valueRaw) {
+        // it may be expired or have been removed from the cache for some reason
+        // let's ping it just in case
+        (async () => {
+          try {
+            await this.executeGloballyCachedRawDBSelect(uniqueID);
+          } catch (err) {
+          }
+        });
+        return null;
+      }
+      const valueParsed = JSON.parse(valueRaw);
+      return valueParsed
+    } catch (err) {
+      logger.error({
+        methodName: "_retrieveCachedSelect",
+        className: "ItemizeRawDB",
+        serious: true,
+        message: "Could not execute retrieve query for " + uniqueID,
+        err: err,
+      });
+
+      if (options.returnNullOnError) {
+        return null;
+      }
+
+      throw err;
+    }
+  }
+
+  /**
+   * Executes a globally cached raw db select in order to keep it updated
+   * in the cache
+   * @param uniqueID 
+   * @returns 
+   */
+  public async executeGloballyCachedRawDBSelect(uniqueID: string): Promise<void> {
+    const event: IRedisEvent = {
+      mergedIndexIdentifier: null,
+      source: "global",
+      serverInstanceGroupId: null,
+      type: CACHED_SELECTS_LOCATION_GLOBAL,
+      data: {
+        uniqueID,
+      },
+    }
+    return new Promise((resolve, reject) => {
+      this.redisPub.redisClient.publish(CACHED_SELECTS_LOCATION_GLOBAL + "." + uniqueID, JSON.stringify(event), (err) => {
+        if (err) {
+          logger.error({
+            methodName: "executeGloballyCachedRawDBSelect",
+            className: "ItemizeRawDB",
+            serious: true,
+            message: "Could not send message to execute query for " + uniqueID,
+            err: err,
+          });
+          reject(err);
+          return;
+        }
+
+        resolve();
+      });
+    })
+  }
+
+  public async deleteGloballyCachedRawDBSelect(uniqueID: string) {
+    if (this.cachedSelects[uniqueID]) {
+      clearTimeout(this.cachedSelects[uniqueID].updateInterval);
+
+      delete this.cachedSelects[uniqueID];
+
+      try {
+        await this.redisGlobal.hdel(CACHED_SELECTS_LOCATION_GLOBAL, uniqueID);
+        this.redisSub.redisClient.unsubscribe(CACHED_SELECTS_LOCATION_GLOBAL + "." + uniqueID);
+      } catch (err) {
+        // we are okay with this passing since no errors should occur it is simply taking space
+        logger.error({
+          className: "ItemizeRawDB",
+          methodName: "_deleteCachedRawDBSelect",
+          message: "Attempted to delete cached raw db select for " + uniqueID +
+            " but it failed at redis level",
+          serious: true,
+        });
+      }
+
+    } else {
+      logger.error({
+        className: "ItemizeRawDB",
+        methodName: "_deleteCachedRawDBSelect",
+        message: "Attempted to delete cached raw db select for " + uniqueID +
+          " but this instance does not own or contain it",
+      });
+    }
+  }
+
+  private async handleIncomingMessage(channel: string, message: string) {
+    try {
+      const event: IRedisEvent = JSON.parse(message);
+      if (event.source !== "global") {
+        return;
+      }
+
+      if (event.type === CACHED_SELECTS_LOCATION_GLOBAL) {
+        const uniqueID = event.data.uniqueID as string;
+
+        // it is a probe and it doesn't actually want the data
+        // it is checking whether there is something already handling this
+        // unique id
+        if (event.data.probe) {
+          // tell it that it is actually being handled by echoing the message in the probe channel
+          this.redisPub.redisClient.publish("PROBE." + CACHED_SELECTS_LOCATION_GLOBAL + "." + uniqueID, message)
+          return;
+        }
+
+        this._updateCachedSelect(uniqueID);
+      }
+    } catch (err) {
+      logger.error({
+        className: "ItemizeRawDB",
+        methodName: "handleIncomingMessage",
+        message: "Received an invalid incoming message",
+        data: {
+          channel,
+          message,
+        },
+        err,
+        serious: true,
+      });
+    }
   }
 
   /**

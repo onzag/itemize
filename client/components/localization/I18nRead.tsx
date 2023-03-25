@@ -102,6 +102,11 @@ export interface I18nReadOptions {
    * Whether to capitalize the output
    */
   capitalize?: boolean;
+
+  /**
+   * Override for the whitespace style property
+   */
+  whiteSpace?: string;
 }
 
 /**
@@ -299,7 +304,7 @@ function i18nReadInternal(
 
         if (typeof output === "string") {
           return (
-            <span key={index} style={{ whiteSpace: "pre-wrap" }}>
+            <span key={index} style={{ whiteSpace: (props.whiteSpace as any) || "pre-wrap" }}>
               {outputNode}
             </span>
           );

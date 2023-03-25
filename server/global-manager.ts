@@ -48,32 +48,40 @@ const wait = (time: number) => {
   });
 };
 
+/**
+ * This function is to be executed during intialization of the global manager
+ * in server data mode, in order for you, the developer to setup server
+ * data and other resources
+ */
+export type InitialExecutionServerDataFn = (manager: GlobalManager) => Promise<void> | void;
+
 export class GlobalManager {
-  private root: Root;
-  private buildnumber: string;
+  public root: Root;
+  public buildnumber: string;
   private databaseConnection: DatabaseConnection;
-  private rawDB: ItemizeRawDB;
-  private elastic: ItemizeElasticClient;
-  private globalCache: ItemizeRedisClient;
-  private redisPub: ItemizeRedisClient;
-  private redisSub: ItemizeRedisClient;
+  public rawDB: ItemizeRawDB;
+  public elastic: ItemizeElasticClient;
+  public globalCache: ItemizeRedisClient;
+  public redisPub: ItemizeRedisClient;
+  public redisSub: ItemizeRedisClient;
   private idefNeedsMantenience: ItemDefinition[];
   private modNeedsMantenience: Module[];
-  private serverData: IServerDataType;
+  public serverData: IServerDataType;
   private serverDataLastUpdated: number;
   private seoGenLastUpdated: number;
   private elasticCleanupLastExecuted: number;
   private blocksReleaseLastExecuted: number;
   private currencyFactorsProvider: CurrencyFactorsProvider<any>;
-  private sensitiveConfig: ISensitiveConfigRawJSONDataType;
-  private mailProvider: MailProvider<any>;
-  private config: IConfigRawJSONDataType;
+  public sensitiveConfig: ISensitiveConfigRawJSONDataType;
+  public mailProvider: MailProvider<any>;
+  public config: IConfigRawJSONDataType;
   private seoGenerator: SEOGenerator;
   private customServices: {
     [name: string]: ServiceProvider<any>;
   };
-  private registry: RegistryService;
-  private phoneProvider: PhoneProvider<any>;
+  public registry: RegistryService;
+  public phoneProvider: PhoneProvider<any>;
+  private initialExecutionServerDataFn: InitialExecutionServerDataFn;
 
   constructor(
     buildnumber: string,
@@ -89,7 +97,8 @@ export class GlobalManager {
     currencyFactorsProvider: CurrencyFactorsProvider<any>,
     mailProvider: MailProvider<any>,
     phoneProvider: PhoneProvider<any>,
-    registry: RegistryService
+    registry: RegistryService,
+    initialExecutionServerDataFn: InitialExecutionServerDataFn,
   ) {
     this.buildnumber = buildnumber;
     this.root = root;
@@ -107,6 +116,7 @@ export class GlobalManager {
     this.mailProvider = mailProvider;
     this.phoneProvider = phoneProvider;
     this.elastic = elastic;
+    this.initialExecutionServerDataFn = initialExecutionServerDataFn;
 
     this.currencyFactorsProvider = currencyFactorsProvider;
 
@@ -530,6 +540,20 @@ export class GlobalManager {
       await this.releaseBlocksFor(subm);
     }
   }
+  public async executeInitialServerDataFunction() {
+    try {
+      this.initialExecutionServerDataFn && await this.initialExecutionServerDataFn(this);
+    } catch (err) {
+      logger.error(
+        {
+          className: "GlobalManager",
+          methodName: "executeServerDataFunction",
+          message: "Failed to execute server provided initial execution in server data mode functionality",
+          err,
+        }
+      );
+    }
+  }
   public async releaseBlocks() {
     while (true) {
       this.blocksReleaseLastExecuted = new Date().getTime();
@@ -593,6 +617,7 @@ export class GlobalManager {
 
     if (GLOBAL_MANAGER_MODE === "ABSOLUTE" || GLOBAL_MANAGER_MODE === "SERVER_DATA") {
       this.releaseBlocks();
+      this.executeInitialServerDataFunction();
     }
 
     // currency factors shoudn't really have its own execution but who knows

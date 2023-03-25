@@ -35,6 +35,7 @@ import Root, { ICustomRoleManager, IRequestLimitersType } from "../../../Root";
 import { transferrableToBlob, blobToTransferrable, fileURLAbsoluter } from "../../../../util";
 import type { IConfigRawJSONDataType } from "../../../../config";
 import type { IElasticHighlightRecordInfo, PropertyDefinitionSupportedType } from "./PropertyDefinition/types";
+import type { IActionSearchOptions } from "../../../../client/providers/item";
 
 export interface IItemSearchStateHighlightType {
   [pId: string]: string[];
@@ -57,6 +58,8 @@ export interface IItemSearchStateType {
   searchOwner: string;
   searchLastModified: string;
   searchParent: [string, string, string];
+  searchListenPolicy: "by-owner" | "by-parent" | "by-owner-and-parent" | "by-property" | "none";
+  searchCachePolicy: "by-owner" | "by-parent" | "by-owner-and-parent" | "by-property" | "none";
   searchShouldCache: boolean;
   searchCacheUsesProperty: [string, string];
   searchRequestedProperties: string[];
@@ -68,6 +71,7 @@ export interface IItemSearchStateType {
   searchEngineHighlightArgs: IItemSearchStateHighlightArgsType;
   // similar to results, obtained from traditional search
   searchHighlights: IElasticHighlightRecordInfo;
+  searchOriginalOptions: IActionSearchOptions;
 };
 
 export interface ICompoundSearchStateType {

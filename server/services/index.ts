@@ -139,7 +139,7 @@ export class ServiceProvider<T> {
     this.globalRedisPub = globalPub;
     this.globalRedisSub = globalSub;
     this.globalRoot = root;
-    this.globalRawDB = new ItemizeRawDB(globalPub, this.globalDatabaseConnection, this.globalRoot);
+    this.globalRawDB = new ItemizeRawDB(globalClient, globalPub, globalSub, this.globalDatabaseConnection, this.globalRoot);
     this.globalCustomServices = globalCustomServices;
     this.globalMailProvider = globalMailProvider;
     this.globalPhoneProvider = globalPhoneProvider;

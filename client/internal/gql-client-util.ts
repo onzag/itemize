@@ -20,7 +20,7 @@ import {
   UNSPECIFIED_OWNER,
   INCLUDE_PREFIX,
 } from "../../constants";
-import ItemDefinition from "../../base/Root/Module/ItemDefinition";
+import ItemDefinition, { IItemStateType } from "../../base/Root/Module/ItemDefinition";
 import { IGQLValue, IGQLRequestFields, IGQLArgs, buildGqlQuery, gqlQuery, buildGqlMutation, IGQLEndpointValue, IGQLSearchRecord, GQLEnum, IGQLFile, ProgresserFn, GQLQuery } from "../../gql-querier";
 import { deepMerge, requestFieldsAreContained } from "../../gql-util";
 import CacheWorkerInstance from "./workers/cache";
@@ -179,9 +179,21 @@ export function getFieldsAndArgs(
     itemDefinitionInstance: ItemDefinition;
     forId: string;
     forVersion: string;
+
+    /**
+     * When using unite fields with applied value where
+     * you are expected to be submitting for another target
+     * that is not this self, for example when copying id1 into id2
+     * the forId will be id1 and the submitForId will be id2
+     * 
+     * otherwise it will use the same
+     */
+    submitForId?: string;
+    submitForVersion?: string;
     uniteFieldsWithAppliedValue?: boolean;
     propertyOverrides?: IPropertyOverride[];
     includeOverrides?: IIncludeOverride[];
+    stateOverride?: IItemStateType;
     block?: {
       status: boolean;
       reason: string;
@@ -206,7 +218,10 @@ export function getFieldsAndArgs(
   // don't match because during an edit event there might be side effects, this will ensure
   // values remain updated with whatever is used even in the cache
   if (options.uniteFieldsWithAppliedValue) {
-    const appliedValue = options.itemDefinitionInstance.getGQLAppliedValue(options.forId, options.forVersion);
+    const appliedValue = options.itemDefinitionInstance.getGQLAppliedValue(
+      typeof options.submitForId !== "undefined" ? options.submitForId : options.forId,
+      typeof options.submitForVersion !== "undefined" ? options.submitForVersion : options.forVersion
+    );
     if (appliedValue && appliedValue.requestFields) {
       // Horrible hardest bug ever here, fixed by this, we need to make a clone
       // because we modify this variable in place, where appliedValue is never supposed
@@ -281,7 +296,24 @@ export function getFieldsAndArgs(
     if (options.propertiesForArgs && options.propertiesForArgs.length) {
       options.propertiesForArgs.forEach((pId) => {
         const pd = options.itemDefinitionInstance.getPropertyDefinitionFor(pId, true);
-        const currentOverride = options.propertyOverrides && options.propertyOverrides.find((o) => o.id === pId);
+
+        let currentOverride = options.propertyOverrides && options.propertyOverrides.find((o) => o.id === pId);
+        if (!currentOverride && options.stateOverride && options.stateOverride.properties) {
+          const value = options.stateOverride.properties.find((p) => p.propertyId === pId);
+          if (value) {
+            currentOverride = {
+              id: pId,
+              value: typeof value.value === "undefined" ? value.stateValue : value.value,
+            }
+          }
+        }
+
+        // javascript being a mess loving to not fail when it should fail
+        // so we have to make it fail by force
+        if (currentOverride && typeof currentOverride.value === "undefined") {
+          throw new Error("Invalid override value at " + currentOverride.id + " set to undefined");
+        }
+
         const currentValue = currentOverride ? currentOverride.value : pd.getCurrentValue(options.forId || null, options.forVersion || null);
         const pdDescr = pd.getPropertyDefinitionDescription();
         if (options.differingPropertiesOnlyForArgs) {
@@ -311,7 +343,23 @@ export function getFieldsAndArgs(
     if (options.includesForArgs) {
       Object.keys(options.includesForArgs).forEach((iId) => {
         const include = options.itemDefinitionInstance.getIncludeFor(iId);
-        const currentOverride = options.includeOverrides && options.includeOverrides.find((o) => o.id === iId);
+
+        let currentOverride = options.includeOverrides && options.includeOverrides.find((o) => o.id === iId);
+        if (!currentOverride && options.stateOverride && options.stateOverride.includes) {
+          const value = options.stateOverride.includes.find((p) => p.includeId === iId);
+          if (value) {
+            currentOverride = {
+              id: iId,
+              exclusionState: value.exclusionState,
+              overrides: value.itemState.properties.map((p) => (
+                {
+                  id: p.propertyId,
+                  value: typeof p.value === "undefined" ? p.stateValue : p.value,
+                }
+              ))
+            }
+          }
+        }
 
         // and now we get the qualified identifier that grapqhl expects
         const qualifiedId = include.getQualifiedIdentifier();
@@ -351,6 +399,13 @@ export function getFieldsAndArgs(
           const sp = include.getSinkingPropertyFor(spId);
 
           const currentPropertyOverride = currentOverride && currentOverride.overrides && currentOverride.overrides.find((o) => o.id === sp.getId());
+
+          // javascript being a mess loving to not fail when it should fail
+          // so we have to make it fail by force
+          if (currentPropertyOverride && typeof currentPropertyOverride.value === "undefined") {
+            throw new Error("Invalid override value at " + currentPropertyOverride.id + " set to undefined");
+          }
+
           const currentValue = currentPropertyOverride ? currentPropertyOverride.value : sp.getCurrentValue(
             options.forId || null, options.forVersion || null);
           const spDescr = sp.getPropertyDefinitionDescription();
@@ -1021,6 +1076,87 @@ export function getAddQueryFor(
   return query;
 }
 
+function preserveSingleBlobFileAt(
+  unpreserved: IGQLFile,
+  sources: IGQLFile[],
+) {
+  // somehow already has a source
+  if (unpreserved.src) {
+    return;
+  }
+
+  // a relative from the source
+  const fromSource = sources.find((f) => f.id === unpreserved.id);
+
+  // the source has a source
+  // we are now preserving such value
+  if (fromSource && fromSource.src) {
+    unpreserved.src = fromSource.src;
+  }
+}
+
+function preserveBlobFilesAt(
+  include: Include,
+  property: PropertyDefinition,
+  args: IGQLArgs,
+  unpreservedValue: IGQLValue,
+) {
+  const idLocation = include ? include.getId() : property.getId();
+  const idLocationLevel2 = include ? property.getId() : null;
+  if (
+    property.getType() !== "file" &&
+    property.getType() !== "files"
+  ) {
+    return;
+  }
+
+  if (!args || !args[idLocation] || !unpreservedValue || !unpreservedValue.DATA || !unpreservedValue.DATA[idLocation]) {
+    return;
+  }
+
+  if (!idLocationLevel2 ? false : (!args[idLocation][idLocationLevel2] || !unpreservedValue[idLocation][idLocationLevel2])) {
+    return;
+  }
+
+  let propertyValue = args[idLocation];
+  let unpreservedPropertyValue = unpreservedValue.DATA[idLocation];
+  if (idLocationLevel2) {
+    propertyValue = propertyValue[idLocationLevel2];
+    unpreservedPropertyValue = unpreservedPropertyValue[idLocationLevel2];
+  }
+
+  if (Array.isArray(propertyValue)) {
+    unpreservedPropertyValue.forEach((v: any) => preserveSingleBlobFileAt(v, propertyValue as any));
+  } else {
+    preserveSingleBlobFileAt(unpreservedPropertyValue, [propertyValue as any])
+  }
+}
+
+/**
+ * This function is used to restore blobs and files that were
+ * pushed in arguments but then were replaced by a given url and location
+ * by the server
+ * 
+ * @param idef 
+ * @param args 
+ * @param unpreservedValue 
+ */
+function preserveBlobFilesInValue(
+  idef: ItemDefinition,
+  args: IGQLArgs,
+  unpreservedValue: IGQLValue,
+) {
+  idef.getAllPropertyDefinitionsAndExtensions().forEach(async (p) => {
+    preserveBlobFilesAt(null, p, args, unpreservedValue);
+  })
+
+  idef.getAllIncludes().forEach(async (i) => {
+    i.getSinkingProperties().forEach(async (sp) => {
+      preserveBlobFilesAt(i, sp, args, unpreservedValue);
+    });
+  });
+}
+
 /**
  * Runs an add query for a given item definition
  * @param arg the arg information
@@ -1079,6 +1215,7 @@ export async function runAddQueryFor(
   }
 
   const value = (gqlValue.data && gqlValue.data[queryName]) || null;
+  preserveBlobFilesInValue(arg.itemDefinition, arg.args, value);
 
   if (!error) {
     const mergedResults = await storeAndCombineStorageValuesFor(
@@ -1193,6 +1330,7 @@ export async function runEditQueryFor(
   }
 
   const value = (gqlValue.data && gqlValue.data[queryName]) || null;
+  preserveBlobFilesInValue(arg.itemDefinition, arg.args, value);
 
   if (!error) {
     const mergedResults = await storeAndCombineStorageValuesFor(

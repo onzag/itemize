@@ -6,7 +6,7 @@
  * @module
  */
 
-import React from "react";
+import React, { useContext, useMemo } from "react";
 import {
   ItemContext,
   IItemContextType,
@@ -71,3 +71,15 @@ export default function IdVersionRetriever(props: IIdVersionRetrieverProps) {
     }</ItemContext.Consumer>
   );
 }
+
+export function useIdVersionRetriever() {
+  const itemContext = useContext(ItemContext);
+
+  return useMemo(() => ({
+    id: itemContext.forId,
+    version: itemContext.forVersion,
+  }), [
+    itemContext.forId,
+    itemContext.forVersion,
+  ]);
+};

@@ -223,24 +223,24 @@ function PropertyEntryFileRenderer(props: IPropertyEntryFileRendererProps) {
             >
               <div className="file-container">
                 {
-                  props.isSupportedImage ? (
+                  (props.rejected ? props.isRejectedSupportedImage : props.isSupportedImage) ? (
                     <img
-                      srcSet={props.imageSrcSet}
+                      srcSet={props.rejected ? null : props.imageSrcSet}
                       sizes="100px"
-                      src={props.currentValue.url}
+                      src={props.rejected ? props.rejectedValue.url : props.currentValue.url}
                       className="thumbnail"
                     />
                   ) : (
                     <div className="file-icon">
                       <span className="file-extension">{
-                        props.extension
+                        props.rejected ? props.rejectedExtension : props.extension
                       }</span>
                     </div>
                   )
                 }
-                <p className="file-name">{props.currentValue.name}</p>
+                <p className="file-name">{props.rejected ? props.rejectedValue.name : props.currentValue.name}</p>
                 <p className="file-size">{
-                  props.prettySize
+                  props.rejected ? props.rejectedPrettySize : props.prettySize
                 }</p>
                 {props.rejected ? <Box sx={style.fileRejectedDescription} component="p">
                   {props.rejectedReason}

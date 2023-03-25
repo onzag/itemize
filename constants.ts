@@ -1573,3 +1573,8 @@ export const JWT_KEY = "JWT_KEY";
  * Key for the registry where the secondary jwt key is stored
  */
 export const SECONDARY_JWT_KEY = "SECONDARY_JWT_KEY";
+
+/**
+ * Location for cached selects in the global
+ */
+export const CACHED_SELECTS_LOCATION_GLOBAL = "CACHED_SELECTS";

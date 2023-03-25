@@ -6,7 +6,7 @@
 
 import { ISQLTableRowValue } from "../../base/Root/sql";
 import { IGQLRequestFields, IGQLSearchRecord, IGQLSearchResultsContainer, IGQLValue } from "../../gql-querier";
-import ItemDefinition, { ItemDefinitionIOActions } from "../../base/Root/Module/ItemDefinition";
+import ItemDefinition, { IItemSearchStateType, ItemDefinitionIOActions } from "../../base/Root/Module/ItemDefinition";
 import { filterAndPrepareGQLValue } from "../resolvers/basic";
 import { IAppDataType } from "../../server";
 import { logger } from "../logger";
@@ -526,7 +526,7 @@ export class Collector {
         highlights = {};
       }
 
-      const searchState = {
+      const searchState: IItemSearchStateType = {
         searchError: null as any,
         searching: false,
         searchResults: rs.results,
@@ -546,6 +546,9 @@ export class Collector {
         searchLastModified: rs.last_modified,
         searchEngineEnabled: !!args.useSearchEngine,
         searchEngineEnabledLang: typeof args.useSearchEngine === "string" ? args.useSearchEngine : null,
+        searchCachePolicy: args.cachePolicy || "none",
+        searchListenPolicy: args.listenPolicy || args.cachePolicy || "none",
+        searchOriginalOptions: args,
 
         // we don't need because they are traditional
         searchEngineHighlightArgs: null as any,

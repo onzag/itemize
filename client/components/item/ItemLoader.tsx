@@ -6,7 +6,7 @@
  * @module
  */
 
-import React from "react";
+import React, { useContext, useMemo } from "react";
 import { EndpointErrorType } from "../../../base/errors";
 import {
   ItemContext,
@@ -140,4 +140,34 @@ export default function ItemLoader(props: IItemLoaderProps) {
       )
     }</ItemContext.Consumer>
   );
+}
+
+export function useItemLoader(): IItemLoaderInfoArgType {
+  const itemContext = useContext(ItemContext);
+
+  return useMemo(() => ({
+    loaded: itemContext.loaded,
+    loading: itemContext.loading,
+    notFound: itemContext.notFound,
+    blocked: itemContext.blocked,
+    hasBlockedAccess: itemContext.blockedButDataAccessible,
+    error: itemContext.loadError,
+    reload: itemContext.reload,
+    downloadState: itemContext.downloadState,
+    downloadStateAt: itemContext.downloadStateAt,
+    loadStateFromFile: itemContext.loadStateFromFile,
+    loadStateFromFileAt: itemContext.loadStateFromFileAt,
+  }), [
+    itemContext.loaded,
+    itemContext.loading,
+    itemContext.notFound,
+    itemContext.blocked,
+    itemContext.blockedButDataAccessible,
+    itemContext.loadError,
+    itemContext.reload,
+    itemContext.downloadState,
+    itemContext.downloadStateAt,
+    itemContext.loadStateFromFile,
+    itemContext.loadStateFromFileAt,
+  ]);
 }

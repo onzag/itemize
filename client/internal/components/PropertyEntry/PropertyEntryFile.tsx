@@ -75,6 +75,22 @@ export interface IPropertyEntryFileRendererProps extends IPropertyEntryRendererP
    */
   rejectedReason: string;
   /**
+   * The last value that was rejected
+   */
+  rejectedValue: PropertyDefinitionSupportedFileType;
+  /**
+   * The extension of the rejected value
+   */
+  rejectedExtension: string;
+  /**
+   * the pretty size of the rejected value
+   */
+  rejectedPrettySize: string;
+  /**
+   * Whether the rejected is a supported image
+   */
+  isRejectedSupportedImage: boolean;
+  /**
    * A source set for the image type that exists if isSupportedImage is true
    */
   imageSrcSet: string;
@@ -142,8 +158,8 @@ interface IPropertyEntryFileState {
  */
 export default class PropertyEntryFile
   extends React.Component<
-  IPropertyEntryHandlerProps<PropertyDefinitionSupportedFileType, IPropertyEntryFileRendererProps>,
-  IPropertyEntryFileState
+    IPropertyEntryHandlerProps<PropertyDefinitionSupportedFileType, IPropertyEntryFileRendererProps>,
+    IPropertyEntryFileState
   > {
 
   /**
@@ -213,13 +229,11 @@ export default class PropertyEntryFile
   }
 
   /**
-   * Provides the current value, either the actual value
-   * or the rejected value
+   * Provides the current value
    * @returns a PropertyDefinitionSupportedFileType
    */
   private getCurrentValue() {
-    let currentValue = this.state.rejectedValue ||
-      this.props.state.value as PropertyDefinitionSupportedFileType;
+    let currentValue = this.props.state.value as PropertyDefinitionSupportedFileType;
 
     if (
       currentValue &&
@@ -283,7 +297,7 @@ export default class PropertyEntryFile
     value: PropertyDefinitionSupportedFileType,
   ) {
     const accept = processAccepts(
-      acceptOverride || this.props.property.getSpecialProperty("accept") as string,
+      acceptOverride || this.props.property.getSpecialProperty("accept") as string,
       isExpectingImages,
     );
 
@@ -396,6 +410,7 @@ export default class PropertyEntryFile
   }
   public render() {
     const currentValue = this.getCurrentValue();
+    const rejectedValue = this.state.rejectedValue;
 
     // getting the basic data
     const i18nData = this.props.property.getI18nDataFor(this.props.language);
@@ -405,6 +420,9 @@ export default class PropertyEntryFile
     const isSupportedImage = !currentValue ?
       false :
       FILE_SUPPORTED_IMAGE_TYPES.includes(currentValue.type);
+    const isRejectedSupportedImage = !rejectedValue ?
+      false :
+      FILE_SUPPORTED_IMAGE_TYPES.includes(rejectedValue.type);
 
     // get the invalid reason if any
     const invalidReason = this.props.state.invalidReason;
@@ -447,11 +465,12 @@ export default class PropertyEntryFile
     genericSelectLabel = capitalize(genericSelectLabel);
 
     const prettySize = currentValue && prettyBytes(currentValue.size);
+    const rejectedPrettySize = rejectedValue && prettyBytes(rejectedValue.size);
     const extension = currentValue && mimeTypeToExtension(currentValue.type);
+    const rejectedExtension = rejectedValue && mimeTypeToExtension(rejectedValue.type);
 
     const stateValue = (this.props.state.value as PropertyDefinitionSupportedFileType);
     const extraMetadata: string = (stateValue && stateValue.metadata && stateValue.metadata.split(";")[3]) || null;
-
 
     let rejectedReason = this.state.rejectedReason ? this.props.i18n[this.props.language][this.state.rejectedReason] : null;
     if (
@@ -506,6 +525,10 @@ export default class PropertyEntryFile
 
       rejected: !!this.state.rejectedReason,
       rejectedReason,
+      rejectedValue,
+      rejectedPrettySize,
+      rejectedExtension,
+      isRejectedSupportedImage,
 
       isSupportedImage,
       imageSrcSet,

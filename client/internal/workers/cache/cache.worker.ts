@@ -26,6 +26,12 @@ import type PropertyDefinition from "../../../../base/Root/Module/ItemDefinition
 import type Include from "../../../../base/Root/Module/ItemDefinition/Include";
 import type { IConfigRawJSONDataType } from "../../../../config";
 
+async function wait(n: number) {
+  return new Promise((r) => {
+    setTimeout(r, n);
+  })
+}
+
 /**
  * A cache match for a standard query, basically
  * contains the value it got with the fields it requested
@@ -550,7 +556,29 @@ export default class CacheWorker {
     }
 
     // assigning the file to the blob and setting it into the source
-    const blob = await (await fetch(finalUrl)).blob();
+
+    // STRANGE BUG where the blob fails to be received due to very nonsensical
+    // behaviour, sometimes the stream just fail to be retrieved resulting in a size
+    // 0 blob, reject such blobs until one real blob is received
+    let size = 0;
+    let time = (new Date()).getTime();
+    let blob: Blob = null;
+    while (size === 0) {
+      blob = await (await fetch(finalUrl)).blob();
+      size = blob.size;
+      if (size === 0) {
+        const timePassed = (new Date()).getTime() - time;
+        // 10 seconds have passed and it couldn't get it
+        if (timePassed >= 10000) {
+          console.warn("Failed to receive proper blob information from url " + finalUrl + " received empty blob, gave up");
+          return;
+        }
+
+        // wait 500 ms for next try
+        console.warn("Failed to receive proper blob information from url " + finalUrl + " received empty blob, trying again");
+        await wait(500);
+      }
+    }
     file.src = blob;
   }
 
@@ -563,17 +591,27 @@ export default class CacheWorker {
     id: string,
     version: string,
   ) {
-    const idLocation = include ? include.getPrefixedQualifiedIdentifier() + property.getId() : property.getId();
+    const idLocation = include ? include.getId() : property.getId();
+    const idLocationLevel2 = include ? property.getId() : null;
     if (
-      (
-        property.getType() !== "file" &&
-        property.getType() !== "files"
-      ) || !partialValue.DATA || !partialValue.DATA[idLocation]
+      property.getType() !== "file" &&
+      property.getType() !== "files"
     ) {
       return;
     }
 
-    const value = partialValue.DATA[idLocation];
+    if (!partialValue || !partialValue.DATA || !partialValue.DATA[idLocation]) {
+      return;
+    }
+
+    if (!idLocationLevel2 ? false : !partialValue[idLocation][idLocationLevel2]) {
+      return;
+    }
+
+    let value = partialValue.DATA[idLocation];
+    if (idLocationLevel2) {
+      value = value[idLocationLevel2];
+    }
 
     if (Array.isArray(value)) {
       await Promise.all(value.map((v) => this.obtainOneFile(v as any, itemDef, include, property, containerId, id, version)))

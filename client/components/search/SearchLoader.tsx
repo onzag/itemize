@@ -199,7 +199,7 @@ export interface ISearchLoaderProps {
   /**
    * Triggers when the search data changes, as in a new search id
    */
-  onSearchDataChange?: (searchId: string, wasRestored: boolean) =>  void;
+  onSearchDataChange?: (searchId: string, wasRestored: "NO" | "FROM_LOCATION" | "FROM_STATE") =>  void;
 }
 
 /**
@@ -223,7 +223,7 @@ interface IActualSearchLoaderProps extends ISearchLoaderProps {
   remoteListener: RemoteListener;
   searchId: string;
   searching: boolean;
-  searchWasRestored: boolean;
+  searchWasRestored: "NO" | "FROM_LOCATION" | "FROM_STATE";
   searchOwner: string;
   searchShouldCache: boolean;
   searchFields: IGQLRequestFields;

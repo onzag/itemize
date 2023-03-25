@@ -9,16 +9,21 @@
  */
 
 import type Root from "../../../base/Root";
-import React from "react";
+import React, { useContext } from "react";
 import { ISSRContextType, SSRContext } from "../../internal/providers/ssr-provider";
-import RootRetriever from "../root/RootRetriever";
+import { useRootRetriever } from "../root/RootRetriever";
 import type { IAppDataType } from "../../../server";
 import type { IResourceCollectionResult } from "../../../server/ssr/collect";
+import { TokenContext } from "../../internal/providers/token-provider";
 
 /**
  * The props for the html resource loader
  */
 export interface IResourceLoaderProps {
+  /**
+   * Includes the token in the header for usage in validation as token
+   */
+  includeToken?: boolean;
   /**
    * the source path as a string, by default it is /rest/resource/
    */
@@ -38,7 +43,7 @@ export interface IResourceLoaderProps {
   /**
    * To define how the data is to be used
    */
-  children: (data: string, loading: boolean, failed: boolean) => React.ReactNode;
+  children: (data: any, loading: boolean, failed: boolean) => React.ReactNode;
   /**
    * sw cacheable flag, defaults to true
    */
@@ -61,6 +66,10 @@ export interface IResourceLoaderProps {
    * screen does not blink
    */
   keepContentDuringLoading?: boolean;
+  /**
+   * Type to load
+   */
+  type: "text" | "json" | "binary-blob" | "binary-arraybuffer";
 }
 
 /**
@@ -70,6 +79,7 @@ export interface IResourceLoaderProps {
 interface IActualResourceLoaderProps extends IResourceLoaderProps {
   ssrContext: ISSRContextType;
   root: Root;
+  token: string;
 }
 
 /**
@@ -190,12 +200,17 @@ class ActualResourceLoader
       const loadURL = actualSrc;
 
       // we run this request in order to cache, even when it's not really used
+      const headers: any = {
+        "sw-cacheable": typeof this.props.swCacheable ? JSON.stringify(this.props.swCacheable) : "true",
+        "sw-network-first": typeof this.props.swNetworkFirst ? JSON.stringify(this.props.swNetworkFirst) : "false",
+        "sw-recheck": typeof this.props.swRecheck ? JSON.stringify(this.props.swRecheck) : "false",
+      };
+
+      if (this.props.includeToken) {
+        headers.token = this.props.token;
+      }
       fetch(loadURL, {
-        headers: {
-          "sw-cacheable": typeof this.props.swCacheable ? JSON.stringify(this.props.swCacheable) : "true",
-          "sw-network-first": typeof this.props.swNetworkFirst ? JSON.stringify(this.props.swNetworkFirst) : "false",
-          "sw-recheck": typeof this.props.swRecheck ? JSON.stringify(this.props.swRecheck) : "false",
-        },
+        headers,
       });
       // return
       return;
@@ -254,7 +269,11 @@ class ActualResourceLoader
       }
 
       // now we can read our text content
-      const content = await fetchResponse.text();
+      const content = this.props.type === "text" ? await fetchResponse.text() : (
+        this.props.type === "binary-blob" ? await fetchResponse.blob() : (
+          this.props.type === "binary-arraybuffer" ? await fetchResponse.arrayBuffer() : await fetchResponse.json()
+        )
+      );
       // and we can stop the timer for wait for loading
       clearTimeout(waitTimeoutForLoading);
       // and finally set our state with our new shiny html
@@ -296,15 +315,18 @@ class ActualResourceLoader
  * @returns an react component that wraps this html content
  */
 export default function ResourceLoader(props: IResourceLoaderProps) {
+  const root = useRootRetriever();
+  const ssrContext = useContext(SSRContext);
+  if (props.includeToken) {
+    return (
+      <TokenContext.Consumer>
+        {(tokenInfo) => (
+          <ActualResourceLoader {...props} ssrContext={ssrContext} root={root.root} token={tokenInfo.token} />
+        )}
+      </TokenContext.Consumer>
+    )
+  }
   return (
-    <RootRetriever>
-      {(root) => (
-        <SSRContext.Consumer>
-          {(value) => (
-            <ActualResourceLoader {...props} ssrContext={value} root={root.root} />
-          )}
-        </SSRContext.Consumer>
-      )}
-    </RootRetriever>
-  )
+    <ActualResourceLoader {...props} ssrContext={ssrContext} root={root.root} token={null} />
+  );
 }

@@ -22,7 +22,7 @@ import { ITriggerRegistry, mergeTriggerRegistries } from "./resolvers/triggers";
 import { customUserTriggers } from "./user/triggers";
 
 import build from "../dbbuilder";
-import { GlobalManager } from "./global-manager";
+import { GlobalManager, InitialExecutionServerDataFn } from "./global-manager";
 import { IRendererContext } from "../client/providers/renderer";
 import { ILocaleContextType } from "../client/internal/providers/locale-provider";
 import { ICollectorType } from "../client";
@@ -247,6 +247,8 @@ export interface IServerCustomizationDataType {
   customTriggers?: ITriggerRegistry;
   customRoles?: ICustomRoleType[];
   callback?: (appData: IAppDataType) => void | Promise<void>;
+
+  globalManagerInitialServerDataFunction?: InitialExecutionServerDataFn,
 }
 
 export async function getStorageProviders(
@@ -693,7 +695,10 @@ export async function initializeServer(
     );
     const databaseConnection = new DatabaseConnection(dbConnectionConfig);
     const rawDB = new ItemizeRawDB(
+      redisGlobalClient,
       redisPub,
+      redisSub,
+
       databaseConnection,
       root,
     );
@@ -829,6 +834,7 @@ export async function initializeServer(
         mailService,
         phoneService,
         registry,
+        custom.globalManagerInitialServerDataFunction,
       );
 
       if (serviceCustom && serviceCustom.customServices) {

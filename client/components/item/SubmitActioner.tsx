@@ -7,7 +7,7 @@
  * @module
  */
 
-import React, { useContext } from "react";
+import React, { useContext, useMemo } from "react";
 import { EndpointErrorType } from "../../../base/errors";
 import {
   ItemContext,
@@ -154,13 +154,23 @@ export default function SubmitActioner(props: ISubmitActionerProps) {
 export function useSubmitActioner(): ISubmitActionerInfoArgType {
   const itemContext = useContext(ItemContext);
 
-  return ({
-    submitError: itemContext.submitError,
-    submitting: itemContext.submitting,
-    submitted: itemContext.submitted,
-    submit: itemContext.submit,
-    dismissError: itemContext.dismissSubmitError,
-    dismissSubmitted: itemContext.dismissSubmitted,
-    clean: itemContext.clean,
-  });
+  return useMemo(() => {
+    return ({
+      submitError: itemContext.submitError,
+      submitting: itemContext.submitting,
+      submitted: itemContext.submitted,
+      submit: itemContext.submit,
+      dismissError: itemContext.dismissSubmitError,
+      dismissSubmitted: itemContext.dismissSubmitted,
+      clean: itemContext.clean,
+    });
+  }, [
+    itemContext.submitError,
+    itemContext.submitting,
+    itemContext.submitted,
+    itemContext.submit,
+    itemContext.dismissSubmitError,
+    itemContext.dismissSubmitted,
+    itemContext.clean,
+  ]); 
 }

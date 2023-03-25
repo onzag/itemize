@@ -35,6 +35,7 @@ import { setHistoryState } from "../components/navigation";
 import LocationRetriever from "../components/navigation/LocationRetriever";
 import { Location } from "history";
 import type { ICacheMetadataMatchType } from "../internal/workers/cache/cache.worker";
+import { blobToTransferrable } from "../../util";
 
 const isDevelopment = process.env.NODE_ENV === "development";
 
@@ -69,6 +70,9 @@ function getSearchStateOf(state: IActualItemProviderState): IItemSearchStateType
     searchEngineEnabledLang: state.searchEngineEnabledLang,
     searchEngineHighlightArgs: state.searchEngineHighlightArgs,
     searchHighlights: state.searchHighlights,
+    searchCachePolicy: state.searchCachePolicy,
+    searchListenPolicy: state.searchListenPolicy,
+    searchOriginalOptions: state.searchOriginalOptions,
   };
 }
 
@@ -312,6 +316,7 @@ export interface IActionSubmitOptions extends IActionCleanOptions {
    */
   submitForItem?: string;
   inBehalfOf?: string;
+  stateOverride?: Blob | IItemStateType;
   propertyOverrides?: IPropertyOverride[];
   includeOverrides?: IIncludeOverride[];
   languageOverride?: string;
@@ -544,7 +549,7 @@ export interface IItemContextType extends IBasicFns {
   // a search id for the obtained results whether error
   // or success
   searchId: string;
-  searchWasRestored: boolean;
+  searchWasRestored: "NO" | "FROM_LOCATION" | "FROM_STATE";
   // a search owner, or null, for the createdBy argument
   searchOwner: string;
   searchLastModified: string;
@@ -929,7 +934,7 @@ interface IActualItemProviderProps extends IItemProviderProps {
 // This is the state of such, it's basically a copy of the
 // context, so refer to that, the context is avobe
 interface IActualItemProviderState extends IItemSearchStateType {
-  searchWasRestored: boolean;
+  searchWasRestored: "NO" | "FROM_STATE" | "FROM_LOCATION";
   itemState: IItemStateType;
   isBlocked: boolean;
   isBlockedButDataIsAccessible: boolean;
@@ -1062,7 +1067,13 @@ export class ActualItemProvider extends
     if (
       props.itemDefinitionQualifiedName !== state.itemState.itemDefQualifiedName ||
       (props.forId || null) !== (state.itemState.forId || null) ||
-      (props.forVersion || null) !== (state.itemState.forVersion || null)
+      (props.forVersion || null) !== (state.itemState.forVersion || null) ||
+      (
+        props.location &&
+        props.location.state &&
+        props.location.state[props.loadSearchFromNavigation] &&
+        props.location.state[props.loadSearchFromNavigation].searchId !== state.searchId
+      )
     ) {
       // for example when we didn't update right away the search state
       // when we changed slot this would cause old records to render
@@ -1087,25 +1098,50 @@ export class ActualItemProvider extends
         searchEngineEnabled: false,
         searchEngineEnabledLang: null,
         searchEngineHighlightArgs: null,
+        searchCachePolicy: "none",
+        searchListenPolicy: "none",
         searchHighlights: {},
+        searchOriginalOptions: null,
       };
-      const searchStateComplex = props.itemDefinitionInstance.getSearchState(
-        props.forId || null, props.forVersion || null,
-      );
-      if (searchStateComplex) {
-        searchState = searchStateComplex.searchState;
 
-        const state = searchStateComplex.state;
+      let searchWasRestored = "NO";
+      if (
+        props.location &&
+        props.location.state &&
+        props.location.state[props.loadSearchFromNavigation] &&
+        props.location.state[props.loadSearchFromNavigation].searchId !== state.searchId
+      ) {
+        const searchIdefState = props.location.state[props.loadSearchFromNavigation].searchIdefState;
         props.itemDefinitionInstance.applyState(
           props.forId || null,
           props.forVersion || null,
-          state,
+          searchIdefState,
         );
+        searchState = props.location.state[props.loadSearchFromNavigation].searchState;
+        searchWasRestored = "FROM_LOCATION";
+      } else {
+        const searchStateComplex = props.itemDefinitionInstance.getSearchState(
+          props.forId || null, props.forVersion || null,
+        );
+  
+        if (searchStateComplex) {
+          searchState = searchStateComplex.searchState;
+  
+          const state = searchStateComplex.state;
+          props.itemDefinitionInstance.applyState(
+            props.forId || null,
+            props.forVersion || null,
+            state,
+          );
+
+          searchWasRestored = "FROM_STATE";
+        }
       }
 
       return {
         itemState: ActualItemProvider.getItemStateStatic(props),
         ...searchState,
+        searchWasRestored: searchWasRestored as any,
       };
     }
     return null;
@@ -1207,6 +1243,7 @@ export class ActualItemProvider extends
       isNotFound = memoryLoadedAndValid && appliedGQLValue.rawValue === null;
     }
 
+    let searchWasRestored: "NO" | "FROM_STATE" | "FROM_LOCATION" = "NO";
     let searchState: IItemSearchStateType = {
       searchError: null,
       searching: false,
@@ -1228,6 +1265,9 @@ export class ActualItemProvider extends
       searchEngineEnabledLang: null,
       searchEngineHighlightArgs: null,
       searchHighlights: {},
+      searchCachePolicy: "none",
+      searchListenPolicy: "none",
+      searchOriginalOptions: null,
     };
     const searchStateComplex = props.itemDefinitionInstance.getSearchState(
       props.forId || null, props.forVersion || null,
@@ -1241,6 +1281,8 @@ export class ActualItemProvider extends
         props.forVersion || null,
         state,
       );
+
+      searchWasRestored = "FROM_STATE";
     }
 
     // so the initial setup
@@ -1271,7 +1313,7 @@ export class ActualItemProvider extends
       deleted: false,
 
       ...searchState,
-      searchWasRestored: true,
+      searchWasRestored,
 
       pokedElements: {
         properties: [],
@@ -1290,10 +1332,6 @@ export class ActualItemProvider extends
   // kitt returns after kitten, which might give an error if they
   // come out of order, so only the last state is relevant
   private lastUpdateId: number;
-  // here we store the last options we used during a search
-  // event this is just to that when the reload is executed these
-  // options are used
-  private lastOptionsUsedForSearch: IActionSearchOptions;
   // this is the id used for block cleaning
   private blockIdClean: string;
 
@@ -1344,7 +1382,6 @@ export class ActualItemProvider extends
     this.poke = this.poke.bind(this);
     this.unpoke = this.unpoke.bind(this);
     this.search = this.search.bind(this);
-    this.loadSearch = this.loadSearch.bind(this);
     this.dismissSearchError = this.dismissSearchError.bind(this);
     this.dismissSearchResults = this.dismissSearchResults.bind(this);
     this.onSearchReload = this.onSearchReload.bind(this);
@@ -1505,7 +1542,7 @@ export class ActualItemProvider extends
         this.state.searchError &&
         this.state.searchError.code === ENDPOINT_ERRORS.CANT_CONNECT
       ) {
-        this.search(this.lastOptionsUsedForSearch);
+        this.search(this.state.searchOriginalOptions);
       }
     }
   }
@@ -1521,13 +1558,6 @@ export class ActualItemProvider extends
       this.setStateToCurrentValueWithExternalChecking(null);
     }
 
-    // this used to be done in the constructor, but it just happens
-    // that it won't work with SSR
-    let searchIdLoadedFromLocation: string = null;
-    if (this.props.loadSearchFromNavigation) {
-      searchIdLoadedFromLocation = this.loadSearch();
-    }
-
     if (this.props.automaticSearch) {
       // the search listener might have triggered during the mount callback,
       // which means this function won't see the new state and won't trigger
@@ -1537,33 +1567,31 @@ export class ActualItemProvider extends
 
       if (
         // no search id at all, not in the state, not on the changed listener, nowhere
-        (!searchIdToCheckAgainst && !searchIdLoadedFromLocation) ||
+        (!searchIdToCheckAgainst) ||
         // search is forced and we didn't load from location
-        (this.props.automaticSearchForce && !searchIdLoadedFromLocation)
+        (this.props.automaticSearchForce && this.state.searchWasRestored !== "FROM_LOCATION")
       ) {
         // this variable that is passed into the search is used to set the initial
         // state in case it needs to be saved in the history
         this.initialAutomaticNextSearch = true;
         this.search(this.props.automaticSearch);
-      } else {
-        // when we have a search that was done during SSR and was not stored
-        // somewhere in our stuff, we don't want to request feedback
-        // when we just loaded the app because then it makes no sense
-        // as the information should be up to date
-        const shouldRequestFeedback = this.state.searchId === "SSR_SEARCH" && !this.props.automaticSearchNoGraceTime ? (
-          (new Date()).getTime() - LOAD_TIME > SSR_GRACE_TIME
-        ) : true;
-
-        this.searchListenersSetup(
-          this.props.automaticSearch,
-          this.state.searchLastModified,
-          this.state.searchOwner,
-          this.state.searchParent,
-          this.state.searchCacheUsesProperty,
-          shouldRequestFeedback,
-        );
       }
     }
+
+    const currentSearch = this.state;
+
+    // when we have a search that was done during SSR and was not stored
+    // somewherue in our stuff, we don't want to request feedback
+    // when we jst loaded the app because then it makes no sense
+    // as the information should be up to date
+    const shouldRequestFeedback = currentSearch.searchId === "SSR_SEARCH" && !this.props.automaticSearchNoGraceTime ? (
+      (new Date()).getTime() - LOAD_TIME > SSR_GRACE_TIME
+    ) : true;
+
+    this.searchListenersSetup(
+      currentSearch,
+      shouldRequestFeedback,
+    );
 
     if (this.props.onSearchStateLoaded || this.props.onSearchStateChange) {
       const searchState = getSearchStateOf(this.state);
@@ -1748,33 +1776,17 @@ export class ActualItemProvider extends
     prevProps: IActualItemProviderProps,
     prevState: IActualItemProviderState,
   ) {
-    let searchIdFromLocation: string = null;
-    if (
-      prevProps.location &&
-      this.props.location &&
-      prevProps.location !== this.props.location &&
-      ((
-        prevProps.location.state &&
-        prevProps.location.state[prevProps.loadSearchFromNavigation] &&
-        prevProps.location.state[prevProps.loadSearchFromNavigation].searchId
-      ) || null) !==
-      ((
-        this.props.location.state &&
-        this.props.location.state[this.props.loadSearchFromNavigation] &&
-        this.props.location.state[this.props.loadSearchFromNavigation].searchId
-      ) || null)
-    ) {
-      searchIdFromLocation = this.loadSearch();
-    }
+    let currentSearch: IItemSearchStateType = this.state;
+    let prevSearchState: IItemSearchStateType = prevState;
 
     if (
       this.props.onSearchStateChange
     ) {
-      const currentState = getSearchStateOf(this.state);
-      const prevSearchState = getSearchStateOf(prevState);
+      const currentStateCleaned = getSearchStateOf(currentSearch as any);
+      const prevSearchStateCleaned = getSearchStateOf(prevSearchState as any);
 
-      if (!equals(currentState, prevSearchState, { strict: true })) {
-        this.props.onSearchStateChange(currentState);
+      if (!equals(currentStateCleaned, prevSearchStateCleaned, { strict: true })) {
+        this.props.onSearchStateChange(currentStateCleaned);
       }
     }
 
@@ -1957,18 +1969,39 @@ export class ActualItemProvider extends
     // no search id for example if the slot changed during
     // an update of forId and forVersion and as a result
     // the search is empty in this slot
-    if (!this.state.searchId) {
-      this.removePossibleSearchListeners(prevProps, prevState);
+    if (!currentSearch.searchId || currentSearch.searchId !== prevSearchState.searchId) {
+      if (!currentSearch.searchId) {
+        this.removePossibleSearchListeners(prevProps, prevState);
+      } else {
+        // check for differences that demand a refreshment
+        const ownerChanged = currentSearch.searchOwner !== prevSearchState.searchOwner;
+        const parentChanged = !equals(currentSearch.searchParent, prevSearchState.searchParent, { strict: true});
+        const propertyChanged = !equals(currentSearch.searchCacheUsesProperty, prevSearchState.searchCacheUsesProperty, { strict: true});
+
+        if (ownerChanged || parentChanged || propertyChanged) {
+          this.removePossibleSearchListeners(prevProps, prevState);
+          // only request feedback if this was a loaded state that came from the state
+          this.searchListenersSetup(currentSearch, this.state.searchWasRestored === "FROM_STATE");
+        }
+      }
     }
 
-    // need to first determine if the search was generated from a change
-    // from getDerived and something was loaded from it
-    // get derived will trigger in these circumstances
-    const getDerivedTriggeredASearchChange = itemDefinitionWasUpdated || uniqueIDChanged;
+    // when get derived made it so that it loaded a new search state because
+    // we have a new item definition slot id or anything
+    // and we need to invalidate those search results that we got
+    const getDerivedTriggeredASearchChange = this.state.searchWasRestored !== "NO" && (
+      itemDefinitionWasUpdated || uniqueIDChanged ||
+      (
+        (
+          this.props.location &&
+          this.props.location.state &&
+          this.props.location.state[this.props.loadSearchFromNavigation] &&
+          this.props.location.state[this.props.loadSearchFromNavigation].searchId !== prevSearchState.searchId
+        )
+      )
+    )
 
     if (
-      // location did not handle it
-      !searchIdFromLocation &&
       // if the automatic search is not setup to just initial
       !this.props.automaticSearchIsOnlyInitial &&
       // if automatic search is only fallback there must not be an active search id as well
@@ -1991,17 +2024,12 @@ export class ActualItemProvider extends
             // no search id for example if the slot changed during
             // an update of forId and forVersion and as a result
             // the search is empty in this slot
-            (getDerivedTriggeredASearchChange && this.state.searchId === null)
+            this.state.searchId === null
           )
         ) ||
         (!prevProps.automaticSearch && this.props.automaticSearch)
-      )
+      ) && !this.state.searching
     ) {
-      // we might have a listener in an old item definition
-      // so we need to get rid of it
-      if (itemDefinitionWasUpdated) {
-        this.removePossibleSearchListeners(prevProps, prevState);
-      }
       // maybe there's no new automatic search
       if (this.props.automaticSearch) {
         // always perform the search even if there's a state
@@ -2109,6 +2137,9 @@ export class ActualItemProvider extends
       searchEngineEnabledLang: null,
       searchEngineHighlightArgs: null,
       searchHighlights: {},
+      searchCachePolicy: "none",
+      searchListenPolicy: "none",
+      searchOriginalOptions: null,
     };
 
     const searchStateComplex = this.props.itemDefinitionInstance.getSearchState(
@@ -3546,11 +3577,18 @@ export class ActualItemProvider extends
       root.registry[options.submitForItem] as ItemDefinition :
       this.props.itemDefinitionInstance;
 
-    const itemDefinitionToRetrieveDataFrom = this.props.itemDefinitionInstance;
+    if (!itemDefinitionToSubmitFor) {
+      throw new Error("Could not determine the item definition to submit for, " + options.submitForItem);
+    }
 
     // now we are going to build our query
     // also we make a check later on for the policies
     // if necessary
+    const unpackedStateOverride: IItemStateType = options.stateOverride ? (
+      options.stateOverride instanceof Blob ?
+        await blobToTransferrable(options.stateOverride) as IItemStateType :
+        options.stateOverride
+    ) : null;
 
     const {
       requestFields,
@@ -3563,16 +3601,19 @@ export class ActualItemProvider extends
       uniteFieldsWithAppliedValue: true,
       differingPropertiesOnlyForArgs: options.differingOnly,
       differingIncludesOnlyForArgs: options.differingOnly,
-      includes: this.props.includes || {},
-      properties: this.props.properties || [],
+      includes: itemDefinitionToSubmitFor !== this.props.itemDefinitionInstance ? {} : (this.props.includes || {}),
+      properties: itemDefinitionToSubmitFor !== this.props.itemDefinitionInstance ? [] : (this.props.properties || []),
       includesForArgs: options.includes || {},
       propertiesForArgs: options.properties,
       policiesForArgs: options.policies || [],
-      itemDefinitionInstance: itemDefinitionToRetrieveDataFrom,
+      itemDefinitionInstance: itemDefinitionToSubmitFor,
       forId: this.props.forId || null,
       forVersion: this.props.forVersion || null,
+      submitForId: submitForId,
+      submitForVersion: submitForVersion,
       propertyOverrides: options.propertyOverrides,
       includeOverrides: options.includeOverrides,
+      stateOverride: unpackedStateOverride,
       block: {
         status: options.blockStatus || null,
         reason: options.blockReason || null,
@@ -3648,7 +3689,7 @@ export class ActualItemProvider extends
         // if we are submitting to edit to a different target to our own
         // basically copying during an edit action we need to do the same we do
         // in creating new values via copying
-        const appliedValue = itemDefinitionToRetrieveDataFrom.getGQLAppliedValue(
+        const appliedValue = this.props.itemDefinitionInstance.getGQLAppliedValue(
           this.props.forId || null,
           this.props.forVersion || null,
         );
@@ -3664,7 +3705,7 @@ export class ActualItemProvider extends
             argumentsForQuery,
             argumentsFoundFilePaths,
             originalContainerIdOfContent,
-            itemDefinitionToRetrieveDataFrom,
+            this.props.itemDefinitionInstance,
             this.props.config,
             this.props.forId || null,
             this.props.forVersion || null,
@@ -3706,7 +3747,7 @@ export class ActualItemProvider extends
       // another of another kind, either new with undefined id or
       // a different version, we need to ensure all the files
       // are going to be there nicely and copied
-      const appliedValue = itemDefinitionToRetrieveDataFrom.getGQLAppliedValue(
+      const appliedValue = this.props.itemDefinitionInstance.getGQLAppliedValue(
         this.props.forId || null,
         this.props.forVersion || null,
       );
@@ -3722,7 +3763,7 @@ export class ActualItemProvider extends
           argumentsForQuery,
           argumentsFoundFilePaths,
           originalContainerIdOfContent,
-          itemDefinitionToRetrieveDataFrom,
+          this.props.itemDefinitionInstance,
           this.props.config,
           this.props.forId || null,
           this.props.forVersion || null,
@@ -3759,7 +3800,7 @@ export class ActualItemProvider extends
         error.code === ENDPOINT_ERRORS.CANT_CONNECT &&
         CacheWorkerInstance.isSupported
       ) {
-        const state = itemDefinitionToRetrieveDataFrom.getStateNoExternalChecking(
+        const state = this.props.itemDefinitionInstance.getStateNoExternalChecking(
           this.props.forId || null,
           this.props.forVersion || null,
         );
@@ -3860,55 +3901,17 @@ export class ActualItemProvider extends
     return result;
   }
 
-  /**
-   * Loads the search from the location
-   * @returns the search id that it managed to collect
-   */
-  public loadSearch(): string {
-    if (this.isUnmounted) {
+  private searchListenersSetup(
+    state: IItemSearchStateType,
+    requestFeedbackToo?: boolean
+  ) {
+    if (!state.searchId) {
       return;
     }
 
-    const searchId = (
-      this.props.location.state &&
-      this.props.location.state[this.props.loadSearchFromNavigation] &&
-      this.props.location.state[this.props.loadSearchFromNavigation].searchId
-    ) || null;
-
-    if (searchId === this.state.searchId) {
-      return null;
-    }
-
-    if (searchId) {
-      const searchIdefState = this.props.location.state[this.props.loadSearchFromNavigation].searchIdefState;
-      this.props.itemDefinitionInstance.applyState(
-        this.props.forId || null,
-        this.props.forVersion || null,
-        searchIdefState,
-      );
-      const searchState = this.props.location.state[this.props.loadSearchFromNavigation].searchState;
-      this.setState({
-        itemState: this.getItemState(),
-        ...searchState,
-        searchWasRestored: true,
-      });
-    }
-
-    return searchId;
-  }
-  private async searchListenersSetup(
-    options: IActionSearchOptions,
-    lastModified: string,
-    createdBy: string,
-    parentedBy: [string, string, string],
-    property: [string, string],
-    requestFeedbackToo?: boolean
-  ) {
-    const listenPolicy = options.listenPolicy || options.cachePolicy || "none";
-
-    if (listenPolicy === "none") {
+    if (state.searchListenPolicy === "none") {
       if (requestFeedbackToo) {
-        this.searchFeedback(options, lastModified, createdBy, parentedBy, property);
+        this.searchFeedback(state);
       }
 
       return;
@@ -3919,103 +3922,103 @@ export class ActualItemProvider extends
     const standardCounterpartQualifiedName = (standardCounterpart.isExtensionsInstance() ?
       standardCounterpart.getParentModule().getQualifiedPathName() :
       standardCounterpart.getQualifiedPathName());
-    if (listenPolicy === "by-owner") {
+    if (state.searchListenPolicy === "by-owner") {
       this.props.remoteListener.addOwnedSearchListenerFor(
         standardCounterpartQualifiedName,
-        createdBy,
-        lastModified,
+        state.searchOwner,
+        state.searchLastModified,
         this.onSearchReload,
-        (options.cachePolicy || "none") !== "none",
+        state.searchCachePolicy !== "none",
       );
-    } else if (listenPolicy === "by-parent") {
+    } else if (state.searchListenPolicy === "by-parent") {
       this.props.remoteListener.addParentedSearchListenerFor(
         standardCounterpartQualifiedName,
-        parentedBy[0],//.itemDefinition.getQualifiedPathName(),
-        parentedBy[1],//.id,
-        parentedBy[2] || null,
-        lastModified,
+        state.searchParent[0],//.itemDefinition.getQualifiedPathName(),
+        state.searchParent[1],//.id,
+        state.searchParent[2] || null,
+        state.searchLastModified,
         this.onSearchReload,
-        (options.cachePolicy || "none") !== "none"
+        state.searchCachePolicy !== "none"
       );
-    } else if (listenPolicy === "by-owner-and-parent") {
+    } else if (state.searchListenPolicy === "by-owner-and-parent") {
       this.props.remoteListener.addOwnedParentedSearchListenerFor(
         standardCounterpartQualifiedName,
-        createdBy,
-        parentedBy[0],
-        parentedBy[1],
-        parentedBy[2] || null,
-        lastModified,
+        state.searchOwner,
+        state.searchParent[0],//.itemDefinition.getQualifiedPathName(),
+        state.searchParent[1],//.id,
+        state.searchParent[2] || null,
+        state.searchLastModified,
         this.onSearchReload,
-        (options.cachePolicy || "none") !== "none"
+        state.searchCachePolicy !== "none"
       );
-    } else if (listenPolicy === "by-property") {
+    } else if (state.searchListenPolicy === "by-property") {
       this.props.remoteListener.addPropertySearchListenerFor(
         standardCounterpartQualifiedName,
-        property[0],
-        property[1],
-        lastModified,
+        state.searchCacheUsesProperty[0],
+        state.searchCacheUsesProperty[1],
+        state.searchLastModified,
         this.onSearchReload,
-        (options.cachePolicy || "none") !== "none"
+        state.searchCachePolicy !== "none"
       );
     }
 
     if (requestFeedbackToo) {
-      this.searchFeedback(options, lastModified, createdBy, parentedBy, property);
+      this.searchFeedback(state);
     }
-
-    this.lastOptionsUsedForSearch = options;
   }
-  private async searchFeedback(
-    options: IActionSearchOptions,
-    lastModified: string,
-    createdBy: string,
-    parentedBy: [string, string, string],
-    property: [string, string],
+  private searchFeedback(
+    state: IItemSearchStateType,
   ) {
-    if (options.cachePolicy === "none") {
-      return;
-    }
-
     const standardCounterpart = this.props.itemDefinitionInstance.getStandardCounterpart();
     const standardCounterpartQualifiedName = (standardCounterpart.isExtensionsInstance() ?
       standardCounterpart.getParentModule().getQualifiedPathName() :
       standardCounterpart.getQualifiedPathName());
 
-    if (options.cachePolicy === "by-owner") {
+    if (state.searchListenPolicy === "by-owner" || state.searchCachePolicy === "by-owner") {
       this.props.remoteListener.requestOwnedSearchFeedbackFor({
         qualifiedPathName: standardCounterpartQualifiedName,
-        createdBy: createdBy,
-        lastModified: lastModified,
+        createdBy: state.searchOwner,
+        lastModified: state.searchLastModified,
       });
-    } else if (options.cachePolicy === "by-owner-and-parent") {
+    }
+
+    if (state.searchListenPolicy === "by-owner-and-parent" || state.searchCachePolicy === "by-owner-and-parent") {
       this.props.remoteListener.requestOwnedParentedSearchFeedbackFor({
-        createdBy: createdBy,
+        createdBy: state.searchOwner,
         qualifiedPathName: standardCounterpartQualifiedName,
-        parentType: parentedBy[0],
-        parentId: parentedBy[1],
-        parentVersion: parentedBy[2],
-        lastModified: lastModified,
+        parentType: state.searchParent[0],
+        parentId: state.searchParent[1],
+        parentVersion: state.searchParent[2],
+        lastModified: state.searchLastModified,
       });
-    } else if (options.cachePolicy === "by-parent") {
+    }
+
+    if (state.searchListenPolicy === "by-parent" || state.searchCachePolicy === "by-parent") {
       this.props.remoteListener.requestParentedSearchFeedbackFor({
         qualifiedPathName: standardCounterpartQualifiedName,
-        parentType: parentedBy[0],
-        parentId: parentedBy[1],
-        parentVersion: parentedBy[2],
-        lastModified: lastModified,
+        parentType: state.searchParent[0],
+        parentId: state.searchParent[1],
+        parentVersion: state.searchParent[2],
+        lastModified: state.searchLastModified,
       });
-    } else if (options.cachePolicy === "by-property") {
+    }
+
+    if (state.searchListenPolicy === "by-property" || state.searchCachePolicy === "by-property") {
       this.props.remoteListener.requestPropertySearchFeedbackFor({
         qualifiedPathName: standardCounterpartQualifiedName,
-        propertyId: property[0],
-        propertyValue: property[1],
-        lastModified: lastModified,
+        propertyId: state.searchCacheUsesProperty[0],
+        propertyValue: state.searchCacheUsesProperty[1],
+        lastModified: state.searchLastModified,
       });
     }
   }
   public async search(
     options: IActionSearchOptions,
   ): Promise<IActionResponseWithSearchResults> {
+    if (!options) {
+      return;
+    }
+
     // had issues with pollution as other functions
     // were calling search and passing a second argument
     // causing initial automatic to be true
@@ -4219,9 +4222,6 @@ export class ActualItemProvider extends
       this.removePossibleSearchListeners();
     }
 
-    // we save the last options used for our last search
-    this.lastOptionsUsedForSearch = options;
-
     // and then set the state to searching
     if (!this.isUnmounted) {
       this.setState({
@@ -4321,16 +4321,6 @@ export class ActualItemProvider extends
       preventCacheStaleFeeback: preventSearchFeedbackOnPossibleStaleData,
     });
 
-    if (!error && listenPolicy !== "none") {
-      this.searchListenersSetup(
-        options,
-        lastModified,
-        options.createdBy || null,
-        searchParent,
-        searchCacheUsesProperty,
-      );
-    }
-
     const searchId = uuid.v4();
 
     if (error) {
@@ -4355,6 +4345,9 @@ export class ActualItemProvider extends
         searchEngineEnabled: !!options.useSearchEngine,
         searchEngineEnabledLang: typeof options.useSearchEngine === "string" ? options.useSearchEngine : null,
         searchEngineHighlightArgs: null as any,
+        searchCachePolicy: options.cachePolicy || "none",
+        searchListenPolicy: options.listenPolicy || options.cachePolicy || "none",
+        searchOriginalOptions: options,
       };
 
       // this would be a wasted instruction otherwise as it'd be reversed
@@ -4375,7 +4368,7 @@ export class ActualItemProvider extends
       if (!this.isUnmounted) {
         this.setState({
           ...searchState,
-          searchWasRestored: false,
+          searchWasRestored: "NO",
           pokedElements,
         }, () => {
           if (options.storeResultsInNavigation) {
@@ -4454,7 +4447,14 @@ export class ActualItemProvider extends
         searchEngineEnabled: !!options.useSearchEngine,
         searchEngineEnabledLang: typeof options.useSearchEngine === "string" ? options.useSearchEngine : null,
         searchEngineHighlightArgs: highlightArgs,
+        searchCachePolicy: options.cachePolicy || "none",
+        searchListenPolicy: options.listenPolicy || options.cachePolicy || "none",
+        searchOriginalOptions: options,
       };
+
+      this.searchListenersSetup(
+        searchState,
+      );
 
       // this would be a wasted instruction otherwise as it'd be reversed
       if (
@@ -4474,7 +4474,7 @@ export class ActualItemProvider extends
       if (!this.isUnmounted) {
         this.setState({
           ...searchState,
-          searchWasRestored: false,
+          searchWasRestored: "NO",
           pokedElements,
         }, () => {
           if (options.storeResultsInNavigation) {
@@ -4591,7 +4591,7 @@ export class ActualItemProvider extends
     // feedback as we already got feedback
     this.preventSearchFeedbackOnPossibleStaleData = true;
     this.reloadNextSearch = true;
-    await this.search(this.lastOptionsUsedForSearch);
+    await this.search(this.state.searchOriginalOptions);
 
     // now that the search is done, any records in cache would have updated
     // in the case of cachePolicy usages, and now we can trigger updates
@@ -4610,7 +4610,7 @@ export class ActualItemProvider extends
     state: IActualItemProviderState = this.state,
   ) {
     if (props.itemDefinitionInstance.isInSearchMode()) {
-      const standardCounterpart = this.props.itemDefinitionInstance.getStandardCounterpart();
+      const standardCounterpart = props.itemDefinitionInstance.getStandardCounterpart();
       const standardCounterpartQualifiedName = (standardCounterpart.isExtensionsInstance() ?
         standardCounterpart.getParentModule().getQualifiedPathName() :
         standardCounterpart.getQualifiedPathName());

@@ -210,6 +210,7 @@ export const style = {
   },
   locationMapContainer: {
     flex: "1 1 50%",
+    height: "200px",
   },
   locationMapMenuContainer: {
     flex: "1 1 50%",
