@@ -217,8 +217,9 @@ class PropertyEntryTextRenderer extends React.PureComponent<IPropertyEntryTextRe
         onChange={this.onChange}
         onInsertFile={this.props.onInsertFile}
         onInsertFileFromURL={this.props.onInsertFileFromURL}
-        onCheckFileExists={this.props.onCheckFileExists}
-        onRetrieveDataURI={this.props.onRetrieveDataURI}
+        onRetrieveFile={this.props.onRetrieveFile}
+        onRetrieveImage={this.props.onRetrieveImage}
+        // onRetrieveDataURI={this.props.onRetrieveDataURI}
         isRichText={this.props.isRichText}
         onFocus={this.onFocus}
         onBlur={this.onBlur}

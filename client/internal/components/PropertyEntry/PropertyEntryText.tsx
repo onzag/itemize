@@ -7,7 +7,7 @@ import React from "react";
 import { IPropertyEntryHandlerProps, IPropertyEntryRendererProps } from ".";
 import equals from "deep-equal";
 import uuid from "uuid";
-import { checkFileInAccepts, processAccepts, localeReplacer } from "../../../../util";
+import { checkFileInAccepts, processAccepts, localeReplacer, fileURLAbsoluter } from "../../../../util";
 import { IPropertyDefinitionSupportedSingleFilesType, PropertyDefinitionSupportedFilesType } from "../../../../base/Root/Module/ItemDefinition/PropertyDefinition/types/files";
 import PropertyDefinition from "../../../../base/Root/Module/ItemDefinition/PropertyDefinition";
 import { FILE_SUPPORTED_IMAGE_TYPES, MAX_FILE_SIZE } from "../../../../constants";
@@ -15,6 +15,7 @@ import prettyBytes from "pretty-bytes";
 import { IFeatureSupportOptions, sanitize } from "../../../internal/text";
 import { deepRendererArgsComparer } from "../general-fn";
 import type { IPropertyDefinitionSupportedTextType } from "../../../../base/Root/Module/ItemDefinition/PropertyDefinition/types/text";
+import { imageSrcSetRetriever } from "../../../components/util";
 
 /**
  * Information about the file that has just been inserted
@@ -271,13 +272,20 @@ export interface IPropertyEntryTextRendererProps extends IPropertyEntryRendererP
   onRetrieveFile: (fileId: string) => IPropertyDefinitionSupportedSingleFilesType;
 
   /**
+   * Given an id returns the given file as an image with its given source set
+   * @param fileId the file id
+   * @returns the single file
+   */
+  onRetrieveImage: (fileId: String) => {file: IPropertyDefinitionSupportedSingleFilesType, srcset: string};
+
+  /**
    * Given a blob URL that doesn't have a remote server located storage
    * provides a data URI for the file, this is used for copying; as you will
    * need DATA URIs for blob urls
    * @param fileId the file id
    * @returns a data uri or null
    */
-  onRetrieveDataURI: (fileId: string) => string;
+  //onRetrieveDataURI: (fileId: string) => string;
 }
 
 /**
@@ -326,9 +334,9 @@ export default class PropertyEntryText
   /**
    * Contains a list of active data uris for the blob elements
    */
-  private activeDataURIs: {
-    [id: string]: string;
-  }
+  // private activeDataURIs: {
+  //   [id: string]: string;
+  // }
 
   constructor(props: IPropertyEntryHandlerProps<IPropertyDefinitionSupportedTextType, IPropertyEntryTextRendererProps>) {
     super(props);
@@ -339,13 +347,14 @@ export default class PropertyEntryText
     }
 
     this.internalFileCache = {};
-    this.activeDataURIs = {};
+    // this.activeDataURIs = {};
 
     this.onInsertFile = this.onInsertFile.bind(this);
     this.onInsertFileFromURL = this.onInsertFileFromURL.bind(this);
     this.onCheckFileExists = this.onCheckFileExists.bind(this);
     this.onRetrieveFile = this.onRetrieveFile.bind(this);
-    this.onRetrieveDataURI = this.onRetrieveDataURI.bind(this);
+    this.onRetrieveImage = this.onRetrieveImage.bind(this);
+    //this.onRetrieveDataURI = this.onRetrieveDataURI.bind(this);
     this.onRestoreHijacked = this.onRestoreHijacked.bind(this);
     this.onChangeHijacked = this.onChangeHijacked.bind(this);
     this.dismissLastLoadedFileError = this.dismissLastLoadedFileError.bind(this);
@@ -374,7 +383,7 @@ export default class PropertyEntryText
     //   }
     // });
 
-    this.activeDataURIs = {};
+    // this.activeDataURIs = {};
   }
 
   /**
@@ -424,26 +433,26 @@ export default class PropertyEntryText
         currentValue.forEach((v) => {
           this.internalFileCache[v.id] = v;
 
-          if (v.url.startsWith("blob:")) {
-            processedDataURIS.push(v.id);
-            
-            if (!this.activeDataURIs[v.id]) {
-              (async () => {
-                if (v.src) {
-                  this.activeDataURIs[v.id] = await this.readBlobAsDataUrl(v.src as any);
-                } else {
-                  this.activeDataURIs[v.id] = await this.readUrlAsDataUrl(v.url);
-                }
-              })();
-            }
-          }
+          // if (v.url.startsWith("blob:")) {
+          //   processedDataURIS.push(v.id);
+
+          // if (!this.activeDataURIs[v.id]) {
+          //   (async () => {
+          //     if (v.src) {
+          //       this.activeDataURIs[v.id] = await this.readBlobAsDataUrl(v.src as any);
+          //     } else {
+          //       this.activeDataURIs[v.id] = await this.readUrlAsDataUrl(v.url);
+          //     }
+          //   })();
+          // }
+          //}
         });
 
-        Object.keys(this.activeDataURIs).forEach((fileId) => {
-          if (!processedDataURIS.includes(fileId)) {
-            delete this.activeDataURIs[fileId];
-          }
-        });
+        // Object.keys(this.activeDataURIs).forEach((fileId) => {
+        //   if (!processedDataURIS.includes(fileId)) {
+        //     delete this.activeDataURIs[fileId];
+        //   }
+        // });
       }
     }
   }
@@ -560,15 +569,15 @@ export default class PropertyEntryText
         newValue.push(fileCacheValue);
       }
 
-      if (!this.activeDataURIs[fileId]) {
-        (async () => {
-          if (fileCacheValue.url.startsWith("blob:")) {
-            this.activeDataURIs[fileId] = fileCacheValue.src ?
-              await this.readBlobAsDataUrl(fileCacheValue.src as any) :
-              await this.readUrlAsDataUrl(fileCacheValue.url);
-          }
-        })();
-      }
+      // if (!this.activeDataURIs[fileId]) {
+      //   (async () => {
+      //     if (fileCacheValue.url.startsWith("blob:")) {
+      //       this.activeDataURIs[fileId] = fileCacheValue.src ?
+      //         await this.readBlobAsDataUrl(fileCacheValue.src as any) :
+      //         await this.readUrlAsDataUrl(fileCacheValue.url);
+      //     }
+      //   })();
+      // }
 
       relatedProperty.setCurrentValue(this.props.forId || null, this.props.forVersion || null, newValue, null);
       this.props.itemDefinition.triggerListeners("change", this.props.forId || null, this.props.forVersion || null);
@@ -586,7 +595,7 @@ export default class PropertyEntryText
     const currentValue =
       relatedProperty.getCurrentValue(this.props.forId || null, this.props.forVersion || null) as PropertyDefinitionSupportedFilesType;
 
-    delete this.activeDataURIs[fileId];
+    // dlete this.activeDataURIs[fileId];
 
     // delete files but we don't get rid off them from the cache
     if (currentValue && currentValue.find(v => v.id === fileId)) {
@@ -605,12 +614,45 @@ export default class PropertyEntryText
     const currentValue =
       this.cachedMediaProperty.getCurrentValue(this.props.forId || null, this.props.forVersion || null) as PropertyDefinitionSupportedFilesType;
 
-    return currentValue && currentValue.find((v) => v.id === fileId);
+    const value = currentValue && currentValue.find((v) => v.id === fileId);
+
+    if (value) {
+      const domain = process.env.NODE_ENV === "production" ? this.props.config.productionHostname : this.props.config.developmentHostname;
+      return fileURLAbsoluter(
+        domain,
+        this.props.config.containersHostnamePrefixes,
+        value,
+        this.props.itemDefinition,
+        this.props.forId,
+        this.props.forVersion,
+        this.props.containerId,
+        this.props.include,
+        this.cachedMediaProperty,
+        this.props.cacheFiles,
+      );
+    }
+
+    return value;
   }
 
-  public onRetrieveDataURI(fileId: string) {
-    return this.activeDataURIs[fileId] || null;
+  public onRetrieveImage(fileId: string): {file: IPropertyDefinitionSupportedSingleFilesType, srcset: string} {
+    const value = this.onRetrieveFile(fileId);
+
+    if (!value) {
+      return null;
+    }
+
+    const srcset = imageSrcSetRetriever(
+      value,
+      this.cachedMediaProperty,
+    );
+
+    return ({file: value, srcset});
   }
+
+  // public onRetrieveDataURI(fileId: string) {
+  //   return this.activeDataURIs[fileId] || null;
+  // }
 
   /**
    * Inserts an image but instead of using a file as a source it uses
@@ -638,16 +680,11 @@ export default class PropertyEntryText
       return null;
     }
 
-    let overrideURL: string;
-    if (!url.startsWith("blob:")) {
-      overrideURL = url;
-    }
-
     // there, it will work
     // now this is a funny thing since the data uri might
     // be a remote URL as well, depends on what we used to load
     // from
-    return this.onInsertFile(blob, isExpectingImage, overrideURL);
+    return this.onInsertFile(blob, isExpectingImage);
   }
 
   public async readBlobAsDataUrl(blob: Blob): Promise<string> {
@@ -684,7 +721,6 @@ export default class PropertyEntryText
   public async onInsertFile(
     file: File,
     isExpectingImage?: boolean,
-    overrideDataURI?: string,
   ): Promise<IInsertedFileInformationType> {
     // So now if we are expecting image we check against images
     if (isExpectingImage && !checkFileInAccepts(file.type, this.cachedMediaPropertyAcceptsImages)) {
@@ -782,9 +818,9 @@ export default class PropertyEntryText
     // add this to the cache
     this.internalFileCache[id] = addedFile;
     // we don't await for this, if it fails, it fails
-    (async () => {
-      this.activeDataURIs[id] = overrideDataURI || (await this.readBlobAsDataUrl(file));
-    })();
+    // (async () => {
+    //   this.activeDataURIs[id] = overrideDataURI || (await this.readBlobAsDataUrl(file));
+    // })();
 
     // and now we can set the value for the cached media property
     this.cachedMediaProperty.setCurrentValue(this.props.forId || null, this.props.forVersion || null, newValue, null);
@@ -890,7 +926,7 @@ export default class PropertyEntryText
       const currentFiles: PropertyDefinitionSupportedFilesType = this.cachedMediaProperty &&
         this.cachedMediaProperty.getCurrentValue(this.props.forId || null, this.props.forVersion || null) as PropertyDefinitionSupportedFilesType;
 
-        currentValueText = sanitize(
+      currentValueText = sanitize(
         {
           cacheFiles: this.props.cacheFiles,
           config: this.props.config,
@@ -970,8 +1006,8 @@ export default class PropertyEntryText
 
       disabled:
         typeof this.props.disabled !== "undefined" && this.props.disabled !== null ?
-        this.props.disabled :
-        this.props.state.enforced,
+          this.props.disabled :
+          this.props.state.enforced,
 
       autoFocus: this.props.autoFocus || false,
 
@@ -1116,7 +1152,8 @@ export default class PropertyEntryText
       onInsertFileFromURL: this.onInsertFileFromURL,
       onCheckFileExists: this.onCheckFileExists,
       onRetrieveFile: this.onRetrieveFile,
-      onRetrieveDataURI: this.onRetrieveDataURI,
+      onRetrieveImage: this.onRetrieveImage,
+      // onRetrieveDataURI: this.onRetrieveDataURI,
 
       enableUserSetErrors: this.enableUserSetErrors,
     };
