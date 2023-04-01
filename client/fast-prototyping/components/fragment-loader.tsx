@@ -5,15 +5,9 @@
  * @module
  */
 
-import View from "../../components/property/View";
-import Entry from "../../components/property/Entry";
-import React, { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import UserDataRetriever from "../../components/user/UserDataRetriever";
-import SubmitActioner from "../../components/item/SubmitActioner";
+import React from "react";
 import Snackbar from "../components/snackbar";
 import ReactDOM from "react-dom";
-import IdVersionRetriever from "../../components/item/IdVersionRetriever";
-import { IActionSubmitOptions, IActionSubmitResponse } from "../../providers/item";
 import CloseIcon from "@mui/icons-material/Close";
 import IconButton from "@mui/material/IconButton";
 import SaveIcon from "@mui/icons-material/Save";
@@ -21,7 +15,6 @@ import EditIcon from "@mui/icons-material/Edit";
 import DownloadIcon from "@mui/icons-material/Download";
 import UploadIcon from "@mui/icons-material/Upload";
 import { styled, SxProps, Theme } from '@mui/material/styles';
-import ItemLoader from "../../components/item/ItemLoader";
 import { ItemLoader as FItemLoader } from "../components/item-loader";
 import Box from "@mui/material/Box";
 import Fragment, { IFragmentProps } from "../../components/util/Fragment";

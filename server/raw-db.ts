@@ -1723,11 +1723,11 @@ export class ItemizeRawDB {
 
     const itemDefinition = item instanceof ItemDefinition ? item : this.root.registry[item] as ItemDefinition;
 
-    if (!itemDefinition || !(item instanceof Module)) {
+    if (!itemDefinition || !(itemDefinition instanceof ItemDefinition)) {
       if (typeof item === "string" && !itemDefinition) {
         throw new Error(item + " does not exist, as it was used while batch updating");
       } else if (item instanceof Module) {
-        throw new Error("Received an module for doing a batch update");
+        throw new Error("Received an module for doing a batch update " + item.getQualifiedPathName());
       } else if (!item) {
         throw new Error("Recieved undefined/null for batch update");
       } else {
@@ -2145,11 +2145,11 @@ export class ItemizeRawDB {
 
     const mod = moduleToUpdate instanceof Module ? moduleToUpdate : this.root.registry[moduleToUpdate] as Module;
 
-    if (!moduleToUpdate || !(mod instanceof Module)) {
+    if (!moduleToUpdate || !(moduleToUpdate instanceof Module)) {
       if (typeof mod === "string" && !moduleToUpdate) {
         throw new Error(mod + " does not exist, as it was used while batch updating");
-      } else if (mod instanceof ItemDefinition) {
-        throw new Error("Received an item for doing a batch update");
+      } else if (moduleToUpdate instanceof ItemDefinition) {
+        throw new Error("Received an item for doing a batch update " + moduleToUpdate.getQualifiedPathName());
       } else if (!mod) {
         throw new Error("Recieved undefined/null for batch module update");
       } else {
@@ -2342,7 +2342,7 @@ export class ItemizeRawDB {
       {
         ...updater,
         whereCriteriaSelector: (arg) => {
-          arg.andWhereColumn("id", id).andWhereColumn("version", version)
+          arg.andWhereColumn("id", id).andWhereColumn("version", version || "")
         },
       }
     ))[0] || null;

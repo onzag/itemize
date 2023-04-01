@@ -7,6 +7,7 @@ import equals from "deep-equal";
 import Root, { ICustomRoleManagerRoleStatus } from "../../base/Root";
 import { DatabaseConnection } from "../../database";
 import { ItemizeRawDB } from "../../server/raw-db";
+import { logger } from "../logger";
 
 export enum CustomRoleGranterEnvironment {
   CREATION = "CREATION",
@@ -83,7 +84,27 @@ export class CustomRoleManager {
         errorMessage: null,
       }
     } else {
-      this.granteds[role.role] = result;
+      if (
+        typeof result !== "object" ||
+        typeof result.granted !== "boolean" ||
+        (result.errorCode !== null && typeof result.errorCode !== "string") ||
+        (result.errorMessage !== null && typeof result.errorMessage !== "string")
+      ) {
+        logger.error({
+          message: "Invalid result received from attempting to grant a role, will be casted to boolean",
+          data: {
+            role: role.role,
+            result,
+          }
+        });
+        this.granteds[role.role] = {
+          granted: !!result,
+          errorCode: null,
+          errorMessage: null,
+        };
+      } else {
+        this.granteds[role.role] = result;
+      }
     }
     
     return this.granteds[role.role];

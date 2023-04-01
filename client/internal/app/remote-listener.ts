@@ -537,7 +537,11 @@ export class RemoteListener {
         // handle it stills by reloading twice
       }
       // trigger the listeners
-      this.appUpdatedListeners.forEach((l) => l());
+      // Javascript is totally stupid and so it will crash because the event of calling the callback will modify the array
+      // and you would think that the forEach will manage to loop but the loop crashes because apparently it works
+      // just like a for loop where you grab the index (and then what's the point of foreach) when the event is called because
+      // Javascript is like that so I must make a copy of the array because JavaScript
+      this.appUpdatedListeners.slice().forEach((l) => l());
     }
   }
 
@@ -1507,7 +1511,11 @@ export class RemoteListener {
       // now we trigger the callbacks that should re-perform the cached
       // search, and since all records should have been added, the new search
       // should show the new results
-      ownedListener.callbacks.forEach((c) => c({
+      // Javascript is totally stupid and so it will crash because the event of calling the callback will modify the array
+      // and you would think that the forEach will manage to loop but the loop crashes because apparently it works
+      // just like a for loop where you grab the index (and then what's the point of foreach) when the event is called because
+      // Javascript is like that so I must make a copy of the array because JavaScript
+      ownedListener.callbacks.slice().forEach((c) => c({
         newRecords: event.newRecords,
         lostRecords: event.lostRecords,
         modifiedRecords: event.modifiedRecords,
@@ -1564,13 +1572,19 @@ export class RemoteListener {
       // now we trigger the callbacks that should re-perform the cached
       // search, and since all records should have been added, the new search
       // should show the new results
-      parentedListener.callbacks.forEach((c) => c({
-        newRecords: event.newRecords,
-        lostRecords: event.lostRecords,
-        modifiedRecords: event.modifiedRecords,
-        deletedRecords: event.deletedRecords,
-        createdRecords: event.createdRecords,
-      }));
+      // Javascript is totally stupid and so it will crash because the event of calling the callback will modify the array
+      // and you would think that the forEach will manage to loop but the loop crashes because apparently it works
+      // just like a for loop where you grab the index (and then what's the point of foreach) when the event is called because
+      // Javascript is like that so I must make a copy of the array because JavaScript
+      parentedListener.callbacks.slice().forEach((c) =>
+        c({
+          newRecords: event.newRecords,
+          lostRecords: event.lostRecords,
+          modifiedRecords: event.modifiedRecords,
+          deletedRecords: event.deletedRecords,
+          createdRecords: event.createdRecords,
+        })
+      );
     }
   }
 
@@ -1615,7 +1629,11 @@ export class RemoteListener {
       // now we trigger the callbacks that should re-perform the cached
       // search, and since all records should have been added, the new search
       // should show the new results
-      propertyListener.callbacks.forEach((c) => c({
+      // Javascript is totally stupid and so it will crash because the event of calling the callback will modify the array
+      // and you would think that the forEach will manage to loop but the loop crashes because apparently it works
+      // just like a for loop where you grab the index (and then what's the point of foreach) when the event is called because
+      // Javascript is like that so I must make a copy of the array because JavaScript
+      propertyListener.callbacks.slice().forEach((c) => c({
         newRecords: event.newRecords,
         lostRecords: event.lostRecords,
         modifiedRecords: event.modifiedRecords,
@@ -1672,7 +1690,11 @@ export class RemoteListener {
       // now we trigger the callbacks that should re-perform the cached
       // search, and since all records should have been added, the new search
       // should show the new results
-      ownedParentedListener.callbacks.forEach((c) => c({
+      // Javascript is totally stupid and so it will crash because the event of calling the callback will modify the array
+      // and you would think that the forEach will manage to loop but the loop crashes because apparently it works
+      // just like a for loop where you grab the index (and then what's the point of foreach) when the event is called because
+      // Javascript is like that so I must make a copy of the array because JavaScript
+      ownedParentedListener.callbacks.slice().forEach((c) => c({
         newRecords: event.newRecords,
         lostRecords: event.lostRecords,
         modifiedRecords: event.modifiedRecords,
@@ -1760,7 +1782,11 @@ export class RemoteListener {
       this.isReady = true;
     }
 
-    this.connectionListeners.forEach((l) => l());
+    // Javascript is totally stupid and so it will crash because the event of calling the callback will modify the array
+    // and you would think that the forEach will manage to loop but the loop crashes because apparently it works
+    // just like a for loop where you grab the index (and then what's the point of foreach) when the event is called because
+    // Javascript is like that so I must make a copy of the array because JavaScript
+    this.connectionListeners.slice().forEach((l) => l());
   }
 
   /**
@@ -1859,6 +1885,11 @@ export class RemoteListener {
   private onDisconnect() {
     this.offline = true;
     this.isReady = false;
-    this.connectionListeners.forEach((l) => l());
+
+    // Javascript is totally stupid and so it will crash because the event of calling the callback will modify the array
+      // and you would think that the forEach will manage to loop but the loop crashes because apparently it works
+      // just like a for loop where you grab the index (and then what's the point of foreach) when the event is called because
+      // Javascript is like that so I must make a copy of the array because JavaScript
+    this.connectionListeners.slice().forEach((l) => l());
   }
 }

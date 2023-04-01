@@ -3,6 +3,7 @@
  * @module
  */
 
+import { CONNECTOR_SQL_COLUMN_VERSION_FK_NAME } from "../constants";
 import { ConditionalBuilder, ConditionalBuilderFn, IManyValueType, ValueType } from "./base";
 import { SelectBuilder } from "./SelectBuilder";
 
@@ -108,7 +109,12 @@ export class WhereBuilder extends ConditionalBuilder {
    * @returns itself
    */
   public andWhereColumn(column: string, valueOrComparator: ValueType, valueToCompare?: ValueType) {
-    const value = valueToCompare || valueOrComparator;
+    let value = valueToCompare || valueOrComparator;
+
+    if (value === null && (column === "version" || column === CONNECTOR_SQL_COLUMN_VERSION_FK_NAME || column === "parent_version")) {
+      value === ""
+    }
+
     const comparator = typeof valueToCompare !== "undefined" ? valueOrComparator : "=";
     if (Array.isArray(value)) {
       const rule = JSON.stringify(column) + " " + comparator + " " + value[0];
@@ -133,6 +139,11 @@ export class WhereBuilder extends ConditionalBuilder {
    */
   public orWhereColumn(column: string, valueOrComparator: ValueType, valueToCompare?: ValueType) {
     const value = valueToCompare || valueOrComparator;
+
+    if (value === null && (column === "version" || column === CONNECTOR_SQL_COLUMN_VERSION_FK_NAME || column === "parent_version")) {
+      value === ""
+    }
+
     const comparator = typeof valueToCompare !== "undefined" ? valueOrComparator : "=";
     if (Array.isArray(value)) {
       const rule = JSON.stringify(column) + " " + comparator + " " + value[0];

@@ -135,14 +135,14 @@ export function paymentSQLIn(arg: ISQLInInfo) {
 
     if (
       value.metadata &&
-      value.metadata !== "string"
+      typeof value.metadata !== "string"
     ) {
       throw new Error("Invalid payment for SQL IN in " + JSON.stringify(arg.value) + " not valid metadata property");
     }
 
     if (
       value.rometadata &&
-      value.rometadata !== "string"
+      typeof value.rometadata !== "string"
     ) {
       throw new Error("Invalid payment for SQL IN in " + JSON.stringify(arg.value) + " not valid rometadata property");
     }

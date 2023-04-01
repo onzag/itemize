@@ -520,6 +520,9 @@ export interface IItemContextType extends IBasicFns {
   loading: boolean;
   // whether it loaded, sucesfully
   loaded: boolean;
+  // whether it is currently holding a state that was loaded
+  // of any kind
+  holdsRemoteState: boolean;
   // an error that came during submitting
   submitError: EndpointErrorType;
   // whether it is currently submitting
@@ -4169,7 +4172,9 @@ export class ActualItemProvider extends
       trackedPropertyVal = argumentsForQuery["SEARCH_" + trackedPropertyDef.getId()];
 
       if (!trackedPropertyVal) {
-        throw new Error("trackedProperty value is null or empty string, this is not allowed as a trackeable value");
+        throw new Error(
+          "trackedProperty value for " + trackedPropertyDef.getId() + " is null or empty string, this is not allowed as a trackeable value"
+        );
       }
 
       searchCacheUsesProperty = [trackedPropertyDef.getId(), trackedPropertyVal];
@@ -4719,6 +4724,7 @@ export class ActualItemProvider extends
           loadError: this.state.loadError,
           loading: this.state.loading,
           loaded: this.state.loaded,
+          holdsRemoteState: !!this.state.itemState.gqlOriginalFlattenedValue,
           submitError: this.state.submitError,
           submitting: this.state.submitting,
           submitted: this.state.submitted,

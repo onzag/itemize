@@ -1921,10 +1921,11 @@ export class ItemizeElasticClient {
   ) {
     const idefOrMod = typeof itemDefinitionOrModule === "string" ? this.root.registry[itemDefinitionOrModule] : itemDefinitionOrModule;
     let indexToUse: string;
-    if (types && idefOrMod instanceof Module) {
+    if (idefOrMod instanceof Module) {
       // these types should have been checked by the search function already
       // and so we can assume they are safe
-      indexToUse = types.map((t) => {
+      let typesToReadFrom = types || idefOrMod.getAllChildItemDefinitions();
+      indexToUse = typesToReadFrom.map((t) => {
         const v = typeof t === "string" ? this.root.registry[t] as ItemDefinition : t;
         if (!v.isSearchEngineEnabled()) {
           return null;
@@ -1933,10 +1934,6 @@ export class ItemizeElasticClient {
       }).filter((v) => v).join(",");
     } else if (idefOrMod instanceof ItemDefinition) {
       indexToUse = idefOrMod.getQualifiedPathName().toLowerCase() + "_" + (language || "*");
-    } else if (language) {
-      indexToUse = idefOrMod.getQualifiedPathName().toLowerCase() + "_*_" + language;
-    } else {
-      indexToUse = idefOrMod.getQualifiedPathName().toLowerCase() + "_*";
     }
 
     const builder = new ElasticQueryBuilder({

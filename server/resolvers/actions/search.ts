@@ -371,13 +371,15 @@ export async function searchModule(
         .andWhereColumn("parent_type", resolverArgs.args.parent_type);
     }
 
+    // in order to resolve a bug where orphaned old items were resolved
+    // that have been deleted from the schema (but remain in the database) we must therefore
+    // filter for the current types every time
+    const typesToResolveFor = resolverArgs.args.types || mod.getAllChildItemDefinitions().map((f) => f.getQualifiedPathName());
     // if we filter by type
-    if (resolverArgs.args.types) {
-      queryModel.whereBuilder.andWhere(
-        `"type" = ANY(ARRAY[${resolverArgs.args.types.map(() => "?").join(",")}]::TEXT[])`,
-        resolverArgs.args.types,
-      );
-    }
+    queryModel.whereBuilder.andWhere(
+      `"type" = ANY(ARRAY[${typesToResolveFor.map(() => "?").join(",")}]::TEXT[])`,
+      typesToResolveFor,
+    );
   }
 
   const pathOfThisModule = mod.getPath().join("/");

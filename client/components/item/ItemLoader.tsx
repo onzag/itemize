@@ -21,8 +21,21 @@ import {
 export interface IItemLoaderInfoArgType {
   /**
    * Whether it is ready and loaded
+   * 
+   * Note that using this value for UI purposes may backfire
+   * as loaded will turn into false whenever it attempts to load again (eg to synchronize)
+   * it's better to check `holdsRemoteState` for that as that will be only false
+   * if there is no useful data to display
    */
   loaded: boolean;
+  /**
+   * Whether it holds a remote state, whether up to date or not
+   * this is the preferrable choice over "loading" when preparing
+   * the UI if the value is required, as loading will be true even
+   * as it is synchronizing whereas holdsRemoteState will only be false
+   * if there is no useful information to populate with (even if it's outdated)
+   */
+  holdsRemoteState: boolean;
   /**
    * Whether is currently loading, from memory, cache, etc...
    */
@@ -116,6 +129,7 @@ class ActualItemLoader extends React.Component<IActualItemLoaderProps> {
         blocked: this.props.itemContext.blocked,
         hasBlockedAccess: this.props.itemContext.blockedButDataAccessible,
         error: this.props.itemContext.loadError,
+        holdsRemoteState: this.props.itemContext.holdsRemoteState,
         reload: this.props.itemContext.reload,
         downloadState: this.props.itemContext.downloadState,
         downloadStateAt: this.props.itemContext.downloadStateAt,
@@ -151,6 +165,7 @@ export function useItemLoader(): IItemLoaderInfoArgType {
     notFound: itemContext.notFound,
     blocked: itemContext.blocked,
     hasBlockedAccess: itemContext.blockedButDataAccessible,
+    holdsRemoteState: itemContext.holdsRemoteState,
     error: itemContext.loadError,
     reload: itemContext.reload,
     downloadState: itemContext.downloadState,
@@ -164,6 +179,7 @@ export function useItemLoader(): IItemLoaderInfoArgType {
     itemContext.blocked,
     itemContext.blockedButDataAccessible,
     itemContext.loadError,
+    itemContext.holdsRemoteState,
     itemContext.reload,
     itemContext.downloadState,
     itemContext.downloadStateAt,

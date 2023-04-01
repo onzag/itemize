@@ -242,7 +242,7 @@ export default class PropertyEntryFile
    * or the rejected value
    * @returns a PropertyDefinitionSupportedFileType
    */
-  private getCurrentValue() {
+  private getCurrentValue(doNotAbsolute: boolean) {
     const currentValue: PropertyDefinitionSupportedFilesType = (
       this.props.state.value as PropertyDefinitionSupportedFilesType || []
     ).map((v) => {
@@ -252,7 +252,7 @@ export default class PropertyEntryFile
             ...v,
             url: this.ownedObjectURLPool[v.id],
           };
-        } else {
+        } else if (!doNotAbsolute) {
           const domain = process.env.NODE_ENV === "production" ? this.props.config.productionHostname : this.props.config.developmentHostname;
           return fileURLAbsoluter(
             domain,
@@ -313,7 +313,7 @@ export default class PropertyEntryFile
   }
 
   private getCurrentValueWithInfo() {
-    const baseElements = this.getCurrentValue().map((v, index) => {
+    const baseElements = this.getCurrentValue(false).map((v, index) => {
       return this.getValueWithInfoFromSpecific(v, {
         givenIndex: index,
       });
@@ -364,7 +364,7 @@ export default class PropertyEntryFile
   }
 
   public onUpdateExtraMetadataAt(index: number, extraMetadata: string) {
-    const value = this.getCurrentValue();
+    const value = this.getCurrentValue(true);
     const currentValue = value[index];
     if (!currentValue) {
       return;
@@ -399,7 +399,7 @@ export default class PropertyEntryFile
     // now we can commit all at once
     // once they have loaded all avoding triggering
     // an entry driven change per file
-    let newFilesValue = this.getCurrentValue();
+    let newFilesValue = this.getCurrentValue(true);
     newFilesValue = newFilesValue.concat(arrAwaited);
 
     this.props.onChange(
@@ -446,7 +446,7 @@ export default class PropertyEntryFile
 
       return false;
     } else if (!avoidChanges) {
-      const newFilesValue = this.getCurrentValue();
+      const newFilesValue = this.getCurrentValue(true);
       newFilesValue.push(value);
 
       this.props.onChange(
@@ -575,7 +575,7 @@ export default class PropertyEntryFile
     }
   }
   public onRemoveFileAt(index: number) {
-    const newFilesValue = this.getCurrentValue();
+    const newFilesValue = this.getCurrentValue(true);
     newFilesValue.splice(index, 1);
     if (newFilesValue.length === 0) {
       this.props.onChange(
