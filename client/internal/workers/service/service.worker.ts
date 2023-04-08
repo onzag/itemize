@@ -8,13 +8,17 @@
 import "regenerator-runtime/runtime";
 import { IConfigRawJSONDataType } from "../../../../config";
 
-declare var CONFIG: string;
-declare var BUILDNUMBER: string;
+// this is a hack the variables are injected during
+// execution of the service worker
+declare var $CONFIG: string;
+declare var $BUILDNUMBER: string;
 
 const isDevelopment = process.env.NODE_ENV === "development";
-// parsing and stringifying is more efficient
-const config: IConfigRawJSONDataType = JSON.parse(CONFIG);
-const buildnumber: string = (BUILDNUMBER).trim();
+
+// they are replaced here, and not during the build process
+// because that can lead to inconsistency in buildnumbers
+const config: IConfigRawJSONDataType = JSON.parse($CONFIG);
+const buildnumber = $BUILDNUMBER;
 
 const urlsToCache = [
   "/?noredirect=true",

@@ -16,9 +16,6 @@ const WorkerInjectorGeneratorPlugin = require("worker-injector-generator-plugin"
 const isDevelopment = process.env.NODE_ENV === "development";
 const mode = isDevelopment ? "development" : "production";
 
-const config = fs.readFileSync("./config/index.json", "utf-8");
-const buildnumber = fs.readFileSync("./dist/buildnumber", "utf-8");
-
 const plugins = [
   // minifying CSS
   new MiniCssExtractPlugin({
@@ -29,12 +26,6 @@ const plugins = [
   // ignore locales and moment locales files in the build, they are imported
   // dinamically and take too much space otherwise
   new webpack.IgnorePlugin(/^\\.\\/locale$/, /moment$/),
-
-  // define the variable config for injecting the configuration
-  new webpack.DefinePlugin({
-    CONFIG: JSON.stringify(config),
-    BUILDNUMBER: JSON.stringify(buildnumber),
-  }),
   
   // define itemize config to be injected
   new webpack.DefinePlugin({

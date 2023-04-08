@@ -1515,6 +1515,11 @@ export const PROTECTED_RESOURCES = [
   "/build.development.js",
 ]
 
+export const REPROCESSED_RESOURCES = [
+  "/service-worker.production.js",
+  "/service-worker.development.js",
+];
+
 /**
  * An identifier for the server data
  */

@@ -722,6 +722,9 @@ export default class CacheWorker {
     // now we can see the identifier of our query
     const queryIdentifier = `${queryName}.${id}.${(version || "")}`;
 
+    // useful information
+    console.log("Deleting query for " + queryIdentifier);
+
     // and now we try this
     try {
       await this.db.delete(QUERIES_TABLE_NAME, queryIdentifier);
@@ -942,6 +945,9 @@ export default class CacheWorker {
         return false;
       }
 
+      // useful information
+      console.log("Deleting search query for " + storeKeyName);
+
       // and now we loop on all the records and delete them
       // as well
       await Promise.all(
@@ -955,7 +961,7 @@ export default class CacheWorker {
       );
 
       // and now we can delete the search itself
-      await this.db.delete(QUERIES_TABLE_NAME, storeKeyName);
+      await this.db.delete(SEARCHES_TABLE_NAME, storeKeyName);
     } catch (err) {
       console.warn(err);
       return false;

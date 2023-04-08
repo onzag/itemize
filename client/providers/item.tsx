@@ -1448,6 +1448,7 @@ export class ActualItemProvider extends
       const forId = this.props.forId;
       const forVersion = this.props.forVersion || null;
 
+      // the destruction marker simply follows the criteria [id, version] identified by its qualifiedName
       (window as any)[MEMCACHED_DESTRUCTION_MARKERS_LOCATION] =
         (window as any)[MEMCACHED_DESTRUCTION_MARKERS_LOCATION] ||
         JSON.parse(localStorage.getItem(DESTRUCTION_MARKERS_LOCATION) || "{}");
@@ -4142,7 +4143,7 @@ export class ActualItemProvider extends
       if (options.markForDestructionOnLogout && (options.cachePolicy === "by-parent" || options.cachePolicy === "by-owner-and-parent")) {
         this.markSearchForDestruction(
           options.cachePolicy,
-          this.props.itemDefinitionInstance.getQualifiedPathName(),
+          standardCounterpart.getQualifiedPathName(),
           options.createdBy || null,
           searchParent,
           null,
@@ -4193,7 +4194,7 @@ export class ActualItemProvider extends
       if (options.markForDestructionOnLogout) {
         this.markSearchForDestruction(
           options.cachePolicy,
-          this.props.itemDefinitionInstance.getQualifiedPathName(),
+          standardCounterpart.getQualifiedPathName(),
           options.createdBy,
           null,
           null,
@@ -4215,7 +4216,7 @@ export class ActualItemProvider extends
       if (options.markForDestructionOnLogout) {
         this.markSearchForDestruction(
           options.cachePolicy,
-          this.props.itemDefinitionInstance.getQualifiedPathName(),
+          standardCounterpart.getQualifiedPathName(),
           null,
           null,
           searchCacheUsesProperty,

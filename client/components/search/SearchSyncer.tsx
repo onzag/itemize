@@ -97,6 +97,17 @@ export default function SearchSyncer(props: ISearchSyncerProps): any {
     failed,
   );
 
+  // ensure that there are no search results
+  // when no search is available
+  // results may linger as it syncs
+  // causing trouble
+  useEffect(() => {
+    if (!props.search) {
+      setSelfSearchResults(null);
+      setSelfUsedFallback(false);
+    }
+  }, [props.search]);
+
   const onWillSearch = useCallback(() => {
     setSelfSearchResults(null);
     setSelfUsedFallback(false);
@@ -138,11 +149,25 @@ export default function SearchSyncer(props: ISearchSyncerProps): any {
 
   let searchArgs = props.search;
 
+  let modified = false;
   if (props.allowTraditionalFallback && searchArgs) {
     searchArgs = {
       ...searchArgs,
       traditional: true,
       cacheDoNotFallback: false,
+    }
+    modified = true;
+  }
+
+  if (searchArgs && typeof searchArgs.markForDestructionOnLogout === "undefined") {
+    if (modified) {
+      searchArgs.markForDestructionOnLogout = true;
+    } else {
+      searchArgs = {
+        ...searchArgs,
+        markForDestructionOnLogout: true,
+      }
+      modified = true;
     }
   }
 
@@ -158,9 +183,15 @@ export default function SearchSyncer(props: ISearchSyncerProps): any {
     return null;
   }
 
+  // prevent search results from passing and lingering if no search is available
   let children: React.ReactNode = null;
-  if ((selfSearchResults || props.alwaysRenderChildren) && props.children) {
-    children = props.children(selfSearchResults || [], handleMechanism, {fallback: selfUsedFallback});
+  let actualSelfSearchResults = selfSearchResults;
+  if (!props.search) {
+    actualSelfSearchResults = null;
+  }
+
+  if ((actualSelfSearchResults || props.alwaysRenderChildren) && props.children) {
+    children = props.children(actualSelfSearchResults || [], handleMechanism, {fallback: selfUsedFallback});
   }
 
   return (

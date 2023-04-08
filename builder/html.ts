@@ -64,10 +64,7 @@ export async function buildHTML(rawConfig: IBuilderBasicConfigType) {
     await fsAsync.readFile(path.join("node_modules", "@onzag", "itemize", "client", "internal", "index.html"), "utf8");
 
   // we need to make a build number
-  baseHTML = replaceHTMLKeys(baseHTML, {
-    ...rawConfig.standard,
-    BUILD_NUMBER: rawConfig.buildnumber.toString(),
-  }, "");
+  baseHTML = replaceHTMLKeys(baseHTML, rawConfig.standard, "");
 
   // and we minify the html
   baseHTML = htmlMinifier.minify(
@@ -85,6 +82,6 @@ export async function buildHTML(rawConfig: IBuilderBasicConfigType) {
 
   // emit the html file
   const fileName = path.join("dist", "data", "index.html");
-  console.log("emiting " + colors.green(fileName), "BUILD_NUMBER:", colors.yellow(rawConfig.buildnumber.toString()));
+  console.log("emiting " + colors.green(fileName));
   await fsAsync.writeFile(fileName, baseHTML);
 }

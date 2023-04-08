@@ -12,11 +12,12 @@ import { serverSideIndexChecker } from "../base/Root/Module/ItemDefinition/Prope
 import PropertyDefinition from "../base/Root/Module/ItemDefinition/PropertyDefinition";
 import ItemDefinition from "../base/Root/Module/ItemDefinition";
 import bodyParser from "body-parser";
-import { PROTECTED_RESOURCES, ENDPOINT_ERRORS, PING_DATA_IDENTIFIER, PING_STATUS_IDENTIFIER, JWT_KEY } from "../constants";
+import { PROTECTED_RESOURCES, ENDPOINT_ERRORS, PING_DATA_IDENTIFIER, PING_STATUS_IDENTIFIER, JWT_KEY, REPROCESSED_RESOURCES } from "../constants";
 import { getMode } from "./mode";
 import { ENVIRONMENT_DETAILS } from "./environment";
 import { jwtVerify } from "./token";
 import { IServerSideTokenDataType } from "./resolvers/basic";
+import fs from "fs";
 
 /**
  * this function contains and build all the rest services
@@ -339,6 +340,22 @@ export default function restServices(appData: IAppDataType) {
   });
 
   // add the static resources
+  const reprocessedCache = {};
+  REPROCESSED_RESOURCES.forEach((rr) => {
+    const fileLocation = path.resolve(path.join("dist", "data", rr));
+    
+    // yes we are using sync, we need to stop the execution anyway
+    // until this is processed
+    const fileData = fs.readFileSync(fileLocation, "utf-8");
+
+    const processedFileData = fileData
+      .replace(/\$CONFIG/g, JSON.stringify(JSON.stringify(appData.config)))
+      .replace(/\$BUILDNUMBER/g, JSON.stringify(appData.buildnumber));
+
+    // store it in memory
+    reprocessedCache[rr] = processedFileData;
+  });
+
   router.use("/resource", (req, res, next) => {
     const isProtectedResource = PROTECTED_RESOURCES.includes(req.path);
     if (isProtectedResource) {
@@ -347,6 +364,13 @@ export default function restServices(appData: IAppDataType) {
         res.status(403).end("Forbidden you need a devkey to access this resource");
       }
     }
+
+    const isReprocessedResource = REPROCESSED_RESOURCES.includes(req.path);
+    
+    if (isReprocessedResource) {
+      return res.status(200).end(reprocessedCache[req.path]);
+    }
+
     return express.static(path.resolve(path.join("dist", "data")))(req, res, next);
   });
 

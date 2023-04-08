@@ -2145,12 +2145,13 @@ export class ItemizeRawDB {
 
     const mod = moduleToUpdate instanceof Module ? moduleToUpdate : this.root.registry[moduleToUpdate] as Module;
 
-    if (!moduleToUpdate || !(moduleToUpdate instanceof Module)) {
-      if (typeof mod === "string" && !moduleToUpdate) {
+    if (!mod || !(mod instanceof Module)) {
+      if (typeof moduleToUpdate === "string" && !mod) {
         throw new Error(mod + " does not exist, as it was used while batch updating");
-      } else if (moduleToUpdate instanceof ItemDefinition) {
-        throw new Error("Received an item for doing a batch update " + moduleToUpdate.getQualifiedPathName());
-      } else if (!mod) {
+      } else if (mod instanceof ItemDefinition) {
+        // typescript bug
+        throw new Error("Received an item for doing a batch update " + (mod as any).getQualifiedPathName());
+      } else if (!moduleToUpdate) {
         throw new Error("Recieved undefined/null for batch module update");
       } else {
         throw new Error("Recieved unknown object for batch module update");
