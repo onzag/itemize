@@ -368,7 +368,10 @@ export default function restServices(appData: IAppDataType) {
     const isReprocessedResource = REPROCESSED_RESOURCES.includes(req.path);
     
     if (isReprocessedResource) {
-      return res.status(200).end(reprocessedCache[req.path]);
+      res.writeHead(200, {
+        "Content-Type": "application/javascript"
+      }).end(reprocessedCache[req.path]);
+      return;
     }
 
     return express.static(path.resolve(path.join("dist", "data")))(req, res, next);
@@ -525,5 +528,5 @@ export default function restServices(appData: IAppDataType) {
   });
 
   // return the router
-  return router;
+  return { router, reprocessedCache };
 }

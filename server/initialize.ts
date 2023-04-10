@@ -124,7 +124,9 @@ export function initializeApp(appData: IAppDataType, custom: IServerCustomizatio
   routers.forEach((r) => {
     app.use("/rest/service", r);
   });
-  app.use("/rest", restServices(appData));
+
+  const { router, reprocessedCache } = restServices(appData);
+  app.use("/rest", router);
 
   const customUserQueriesProcessed = customUserQueries(appData);
   appData.customUserTokenQuery = customUserQueriesProcessed.token.resolve;
@@ -184,9 +186,21 @@ export function initializeApp(appData: IAppDataType, custom: IServerCustomizatio
 
   // service worker setup
   app.get("/sw.development.js", (req, res) => {
+    if (reprocessedCache["/service-worker.development.js"]) {
+      res.writeHead(200, {
+        "Content-Type": "application/javascript"
+      }).end(reprocessedCache["/service-worker.development.js"]);
+      return;
+    }
     res.sendFile(path.resolve(path.join("dist", "data", "service-worker.development.js")));
   });
   app.get("/sw.production.js", (req, res) => {
+    if (reprocessedCache["/service-worker.production.js"]) {
+      res.writeHead(200, {
+        "Content-Type": "application/javascript"
+      }).end(reprocessedCache["/service-worker.production.js"]);
+      return;
+    }
     res.sendFile(path.resolve(path.join("dist", "data", "service-worker.production.js")));
   });
 
