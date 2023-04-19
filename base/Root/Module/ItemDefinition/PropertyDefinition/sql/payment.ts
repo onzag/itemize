@@ -119,7 +119,7 @@ export function paymentSQLIn(arg: ISQLInInfo) {
     if (typeof value === "undefined") {
       throw new Error("Invalid payment for SQL IN in must not be undefined in " + arg.property.getId());
     }
-    
+
     if (
       typeof value.amount !== "number"
     ) {
@@ -269,15 +269,23 @@ export function paymentSQLSearch(arg: ISQLSearchInfo) {
   }
 
   // if we have a from search
+  let alreadyUsedTo = false;
   if (typeof arg.args[fromName] !== "undefined" && arg.args[fromName] !== null) {
     const fromArg = arg.args[fromName] as any as IPropertyDefinitionSupportedCurrencyType;
-    arg.whereBuilder.andWhereColumn(argPrefixPlusId + "_AMOUNT", ">=", fromArg.value);
-    arg.whereBuilder.andWhereColumn(argPrefixPlusId + "_CURRENCY", fromArg.currency);
+    const toArg = arg.args[toName] as any as IPropertyDefinitionSupportedCurrencyType;
+    if (toArg && fromArg.currency === toArg.currency && fromArg.value === toArg.value) {
+      alreadyUsedTo = true;
+      arg.whereBuilder.andWhereColumn(argPrefixPlusId + "_CURRENCY", fromArg.currency);
+      arg.whereBuilder.andWhereColumn(argPrefixPlusId + "_AMOUNT", fromArg.value);
+    } else {
+      arg.whereBuilder.andWhereColumn(argPrefixPlusId + "_AMOUNT", ">=", fromArg.value);
+      arg.whereBuilder.andWhereColumn(argPrefixPlusId + "_CURRENCY", fromArg.currency);
+    }
     searchedByIt = true;
   }
 
   // same here as we did with from, but with the to
-  if (typeof arg.args[toName] !== "undefined" && arg.args[toName] !== null) {
+  if (!alreadyUsedTo && typeof arg.args[toName] !== "undefined" && arg.args[toName] !== null) {
     const toArg = arg.args[toName] as any as IPropertyDefinitionSupportedCurrencyType;
     arg.whereBuilder.andWhereColumn(argPrefixPlusId + "_AMOUNT", "<=", toArg.value);
     arg.whereBuilder.andWhereColumn(argPrefixPlusId + "_CURRENCY", toArg.currency);
@@ -350,44 +358,57 @@ export function paymentElasticSearch(arg: IElasticSearchInfo) {
   const hasFromDefined = typeof arg.args[fromName] !== "undefined" && arg.args[fromName] !== null;
 
   if (hasToDefined || hasFromDefined) {
-    const rule: any = {};
-    let currencyToUse: string = null;
-    let currencyToUse2: string = null;
-    if (hasFromDefined) {
-      const fromArg = arg.args[fromName] as any as IPropertyDefinitionSupportedCurrencyType;
-      rule.gte = fromArg.value;
-      currencyToUse = fromArg.currency;
-    }
-    if (hasToDefined) {
-      const toArg = arg.args[toName] as any as IPropertyDefinitionSupportedCurrencyType;
-      rule.lte = toArg.value;
-      if (!currencyToUse) {
-        currencyToUse = toArg.currency;
-      } else {
-        currencyToUse2 = toArg.currency;
+    const fromArg = arg.args[fromName] as any as IPropertyDefinitionSupportedCurrencyType;
+    const toArg = arg.args[toName] as any as IPropertyDefinitionSupportedCurrencyType;
+    if (fromArg.value === toArg.value && fromArg.currency === toArg.currency) {
+      mustRule.bool = {
+        must: [
+          {
+            term: {
+              [argPrefixPlusId + "_AMOUNT"]: fromArg.value,
+              [argPrefixPlusId + "_CURRENCY"]: fromArg.currency,
+            }
+          }
+        ]
+      };
+    } else {
+      const rule: any = {};
+      let currencyToUse: string = null;
+      let currencyToUse2: string = null;
+      if (hasFromDefined) {
+        rule.gte = fromArg.value;
+        currencyToUse = fromArg.currency;
       }
-    }
-
-    if (!mustRule.bool) {
-      mustRule.bool = {};
-    }
-
-    if (!mustRule.bool.must) {
-      mustRule.bool.must = [];
-    }
-
-    mustRule.bool.must.push(
-      {
-        range: {
-          [arg.prefix + arg.id + "_AMOUNT"]: rule,
-        },
-        term: {
-          // should fail this is weird
-          // payments are not allowed to be requested on different currencies nor stored as such
-          [arg.prefix + arg.id + "_CURRENCY"]: currencyToUse2 && currencyToUse !== currencyToUse2 ? "" : currencyToUse,
+      if (hasToDefined) {
+        rule.lte = toArg.value;
+        if (!currencyToUse) {
+          currencyToUse = toArg.currency;
+        } else {
+          currencyToUse2 = toArg.currency;
         }
       }
-    );
+
+      if (!mustRule.bool) {
+        mustRule.bool = {};
+      }
+
+      if (!mustRule.bool.must) {
+        mustRule.bool.must = [];
+      }
+
+      mustRule.bool.must.push(
+        {
+          range: {
+            [arg.prefix + arg.id + "_AMOUNT"]: rule,
+          },
+          term: {
+            // should fail this is weird
+            // payments are not allowed to be requested on different currencies nor stored as such
+            [arg.prefix + arg.id + "_CURRENCY"]: currencyToUse2 && currencyToUse !== currencyToUse2 ? "" : currencyToUse,
+          }
+        }
+      );
+    }
 
     searchedByIt = true;
   }

@@ -1857,6 +1857,23 @@ export default class ItemDefinition {
   }
 
   /**
+   * Specifies whether a block id exists with the given criteria
+   * @param id 
+   * @param version 
+   * @param blockId 
+   * @returns 
+   */
+  public hasBlockCleanFor(id: string, version: string, blockId: string): boolean {
+    const mergedID = id + "." + (version || "");
+    
+    if (!this.cleansBlocked[mergedID]) {
+      return false;
+    }
+    
+    return this.cleansBlocked[mergedID].includes(blockId);
+  }
+
+  /**
    * Removes the blockage of the clean
    *
    * @param id the id

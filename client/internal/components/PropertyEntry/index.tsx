@@ -12,7 +12,6 @@ import PropertyEntryBoolean from "./PropertyEntryBoolean";
 import PropertyEntryText from "./PropertyEntryText";
 import PropertyEntryDateTime from "./PropertyEntryDateTime";
 import PropertyEntryLocation from "./PropertyEntryLocation";
-import PropertyEntryReference from "./PropertyEntryReference";
 import PropertyEntrySelect from "./PropertyEntrySelect";
 import PropertyEntryField from "./PropertyEntryField";
 import PropertyEntryFile from "./PropertyEntryFile";
@@ -319,16 +318,6 @@ export interface IPropertyEntryMainHandlerProps<ValueType extends PropertyDefini
    */
   prefillWith?: PropertyDefinitionSupportedType;
   /**
-   * A value used for the reference type in order
-   * to apply to the filtering set that is used
-   * in the reference
-   * 
-   * Developer provided check base.tsx
-   */
-  referenceFilteringSet?: {
-    [key: string]: PropertyDefinitionSupportedType;
-  };
-  /**
    * A value specified to cache url files as they are loaded
    * via the url
    */
@@ -514,26 +503,6 @@ const handlerRegistry:
     // The standard field handles string, as it's just a texfield
     renderer: "PropertyEntryField",
     handler: PropertyEntryField,
-    subhandler: {
-      // for the subtype reference we use another whole
-      // different handler
-      reference: {
-        renderer: "PropertyEntryReference",
-        handler: PropertyEntryReference,
-        // references need the token and SSR in order
-        // to fetch values and assign itself
-        // values
-        includeTokenDataAndSSR: true,
-      },
-      ["reference-tracked"]: {
-        renderer: "PropertyEntryReference",
-        handler: PropertyEntryReference,
-        // references need the token and SSR in order
-        // to fetch values and assign itself
-        // values
-        includeTokenDataAndSSR: true,
-      }
-    },
   },
   integer: {
     // The standard field also handles integers, as it's written in the same form

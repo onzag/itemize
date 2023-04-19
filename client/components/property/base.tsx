@@ -113,13 +113,6 @@ export interface IPropertyEntryProps<RendererPropsType> extends IPropertyBaseWit
    */
   prefillWith?: PropertyDefinitionSupportedType;
   /**
-   * Used only for the referenced type, to add to
-   * the reference filtering set options
-   */
-  referenceFilteringSet?: {
-    [key: string]: PropertyDefinitionSupportedType;
-  };
-  /**
    * whether to cache files when running the url absoluter
    * 
    * this uses the service worker mechanism, it will not affect
@@ -595,7 +588,6 @@ export function EntryViewReadSet(
         ignoreErrors={props.ignoreErrors}
         autoFocus={props.autoFocus}
         prefillWith={props.prefillWith}
-        referenceFilteringSet={props.referenceFilteringSet}
         cacheFiles={props.cacheFiles}
         disabled={props.disabled}
         displayHidden={props.displayHidden}

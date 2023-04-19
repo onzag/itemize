@@ -56,11 +56,18 @@ export function standardLocalSearchExactAndRange(arg: ILocalSearchInfo) {
       conditions.push(propertyValue === usefulArgs[exactName]);
     }
 
+    // if from and to are equal we will try to do an exact search
+    let alreadyUsedTo = false;
     if (typeof usefulArgs[fromName] !== "undefined" && usefulArgs[fromName] !== null) {
-      conditions.push(propertyValue >= usefulArgs[fromName]);
+      if (usefulArgs[toName] === usefulArgs[fromName]) {
+        alreadyUsedTo = true;
+        conditions.push(propertyValue === usefulArgs[fromName]);
+      } else {
+        conditions.push(propertyValue >= usefulArgs[fromName]);
+      }
     }
 
-    if (typeof usefulArgs[toName] !== "undefined" && usefulArgs[toName] !== null) {
+    if (!alreadyUsedTo && typeof usefulArgs[toName] !== "undefined" && usefulArgs[toName] !== null) {
       conditions.push(propertyValue <= usefulArgs[toName]);
     }
 

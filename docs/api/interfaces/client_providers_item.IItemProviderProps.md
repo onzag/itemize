@@ -23,7 +23,7 @@
 - [injectParentContext](client_providers_item.IItemProviderProps.md#injectparentcontext)
 - [itemDefinition](client_providers_item.IItemProviderProps.md#itemdefinition)
 - [loadSearchFromNavigation](client_providers_item.IItemProviderProps.md#loadsearchfromnavigation)
-- [loadStateFromCache](client_providers_item.IItemProviderProps.md#loadstatefromcache)
+- [loadStoredState](client_providers_item.IItemProviderProps.md#loadStoredState)
 - [loadUnversionedFallback](client_providers_item.IItemProviderProps.md#loadunversionedfallback)
 - [longTermCaching](client_providers_item.IItemProviderProps.md#longtermcaching)
 - [longTermCachingMetadata](client_providers_item.IItemProviderProps.md#longtermcachingmetadata)
@@ -259,9 +259,9 @@ storeResultsInNavigation and the same identifier
 
 ___
 
-### loadStateFromCache
+### loadStoredState
 
-• `Optional` **loadStateFromCache**: `boolean`
+• `Optional` **loadStoredState**: `boolean`
 
 loads the state from the cache worker if a
 stored value is found

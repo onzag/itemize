@@ -15,7 +15,6 @@ import PropertyViewLocationUSSDRenderer from "./PropertyView/PropertyViewLocatio
 
 export const rendererContext: IRendererContext = {
   PropertyEntryField: null,
-  PropertyEntryReference: null,
   PropertyEntryFile: null,
   PropertyEntryBoolean: null,
   PropertyEntryLocation: null, 

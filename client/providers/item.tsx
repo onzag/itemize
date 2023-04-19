@@ -17,7 +17,7 @@ import {
 } from "../../constants";
 import { IGQLSearchRecord, IGQLValue, IGQLRequestFields, ProgresserFn } from "../../gql-querier";
 import { requestFieldsAreContained } from "../../gql-util";
-import { EndpointError, EndpointErrorType } from "../../base/errors";
+import { EndpointErrorType } from "../../base/errors";
 import equals from "deep-equal";
 import { ModuleContext } from "./module";
 import CacheWorkerInstance from "../internal/workers/cache";
@@ -25,7 +25,7 @@ import { IRemoteListenerRecordsCallbackArg, RemoteListener } from "../internal/a
 import uuid from "uuid";
 import {
   getFieldsAndArgs, runGetQueryFor, runDeleteQueryFor, runEditQueryFor, runAddQueryFor, runSearchQueryFor, IIncludeOverride,
-  IPropertyOverride, ICacheMetadataMismatchAction, ISearchCacheMetadataMismatchAction, reprocessQueryArgumentsForFiles, getPropertyListForSearchMode
+  IPropertyOverride, ICacheMetadataMismatchAction, ISearchCacheMetadataMismatchAction, reprocessQueryArgumentsForFiles, getPropertyListForSearchMode, SearchCacheMetadataMismatchActionFn
 } from "../internal/gql-client-util";
 import { IPropertyCoreProps, IPropertySetterProps } from "../components/property/base";
 import { PropertyDefinitionSearchInterfacesPrefixes } from "../../base/Root/Module/ItemDefinition/PropertyDefinition/search-interfaces";
@@ -88,41 +88,49 @@ function getPropertyForSetter(setter: IPropertySetterProps<PropertyDefinitionSup
 }
 
 function isSearchUnequal(searchA: IActionSearchOptions, searchB: IActionSearchOptions) {
+  let searchANoFn = searchA;
+  let searchBNoFn = searchB;
   if (
     searchA &&
-    searchA.cacheMetadataMismatchAction &&
-    searchA.cacheMetadataMismatchAction.recordsRefetchCondition &&
-    searchA.cacheMetadataMismatchAction.recordsRefetchCondition.custom &&
-    searchB &&
-    searchB.cacheMetadataMismatchAction &&
-    searchB.cacheMetadataMismatchAction.recordsRefetchCondition &&
-    searchB.cacheMetadataMismatchAction.recordsRefetchCondition.custom
+    searchA.cacheMetadataMismatchAction
   ) {
-    const searchANoFn = {
-      ...searchA,
-      cacheMetadataMismatchAction: {
-        ...searchA.cacheMetadataMismatchAction,
-        recordsRefetchCondition: {
-          ...searchA.cacheMetadataMismatchAction.recordsRefetchCondition,
-          custom: null as any,
+    if (typeof searchA.cacheMetadataMismatchAction === "function") {
+      searchANoFn = {...searchA, cacheMetadataMismatchAction: null as any};
+    } else {
+      searchANoFn = {
+        ...searchA,
+        cacheMetadataMismatchAction: {
+          ...searchA.cacheMetadataMismatchAction,
+          recordsRefetchCondition: {
+            ...searchA.cacheMetadataMismatchAction.recordsRefetchCondition,
+            custom: null as any,
+          }
         }
       }
     }
-    const searchBNoFn = {
-      ...searchA,
-      cacheMetadataMismatchAction: {
-        ...searchA.cacheMetadataMismatchAction,
-        recordsRefetchCondition: {
-          ...searchA.cacheMetadataMismatchAction.recordsRefetchCondition,
-          custom: null as any,
-        }
-      }
-    }
-
-    return !equals(searchANoFn, searchBNoFn);
   }
 
-  return !equals(searchA, searchB);
+  if (
+    searchB &&
+    searchB.cacheMetadataMismatchAction
+  ) {
+    if (typeof searchB.cacheMetadataMismatchAction === "function") {
+      searchBNoFn = {...searchB, cacheMetadataMismatchAction: null as any};
+    } else {
+      searchBNoFn = {
+        ...searchB,
+        cacheMetadataMismatchAction: {
+          ...searchB.cacheMetadataMismatchAction,
+          recordsRefetchCondition: {
+            ...searchB.cacheMetadataMismatchAction.recordsRefetchCondition,
+            custom: null as any,
+          }
+        }
+      }
+    }
+  }
+
+  return !equals(searchANoFn, searchBNoFn, { strict: true });
 }
 
 /**
@@ -170,6 +178,9 @@ export interface IActionResponseWithSearchResults extends IBasicActionResponse {
 
 export type PolicyPathType = [string, string, string];
 
+/**
+ * The clean options offered during execution
+ */
 export interface IActionCleanOptions {
   /**
    * Cleans the value of a policy back to null
@@ -184,99 +195,156 @@ export interface IActionCleanOptions {
    */
   policiesToCleanOnFailure?: PolicyPathType[];
   /**
-   * Restores the value of a property back to its applied value
-   * or null if it doesn't have such
+   * Restores the value of a property back to its applied value after the action is completed and SUCCEEDS
+   * as in the value that was retrieved from the server (or null if no value is loaded)
+   * 
+   * This is useful to keep unmodified states during adding, editing or even deleted
+   * the value that is restored is the last value loaded, and since the action occurs
+   * after the action is performed it will apply to that value
    */
   propertiesToRestoreOnSuccess?: string[];
   /**
-   * Restores the value of a property back to its applied value
-   * or null if it doesn't have such
+   * Restores the value of a property back to its applied value after the action is completed
+   * as in the value that was retrieved from the server (or null if no value is loaded)
+   * 
+   * This is useful to keep unmodified states during adding, editing or even deleted
+   * the value that is restored is the last value loaded, and since the action occurs
+   * after the action is performed it will apply to that value
    */
   propertiesToRestoreOnAny?: string[];
   /**
-   * Restores the value of a property back to its applied value
-   * or null if it doesn't have such
+   * Restores the value of a property back to its applied value after the action is completed and FAILED
+   * as in the value that was retrieved from the server (or null if no value is loaded)
+   * 
+   * This is useful to keep unmodified states during adding, editing or even deleted
+   * the value that is restored is the last value loaded, and since the action occurs
+   * after the action is performed it will apply to that value
    */
   propertiesToRestoreOnFailure?: string[];
   /**
-   * Restores the value of an include back to its applied value
-   * or null if it doesn't have such
+   * Restores the value of an include and all its sinking properties back to its applied value after the action is completed and SUCCEEDS
+   * as in the value that was retrieved from the server (or null if no value is loaded)
+   * 
+   * This is useful to keep unmodified states during adding, editing or even deleted
+   * the value that is restored is the last value loaded, and since the action occurs
+   * after the action is performed it will apply to that value
    */
   includesToRestoreOnSuccess?: string[];
   /**
-   * Restores the value of an include back to its applied value
-   * or null if it doesn't have such
+   * Restores the value of an include and all its sinking properties back to its applied value after the action is completed
+   * as in the value that was retrieved from the server (or null if no value is loaded)
+   * 
+   * This is useful to keep unmodified states during adding, editing or even deleted
+   * the value that is restored is the last value loaded, and since the action occurs
+   * after the action is performed it will apply to that value
    */
   includesToRestoreOnAny?: string[];
   /**
-   * Restores the value of an include back to its applied value
-   * or null if it doesn't have such
+   * Restores the value of an include and all its sinking properties back to its applied value after the action is completed and FAILED
+   * as in the value that was retrieved from the server (or null if no value is loaded)
+   * 
+   * This is useful to keep unmodified states during adding, editing or even deleted
+   * the value that is restored is the last value loaded, and since the action occurs
+   * after the action is performed it will apply to that value
    */
   includesToRestoreOnFailure?: string[];
   /**
-   * Makes all properties unpoked (invalid won't show)
+   * After the action is completed and it SUCCEEDS all the properties and includes will be unpoked
+   * 
+   * When a property is considered poked its error state shows, as it's usually hidden until the user has "poked it"
+   * for example in the case of a password when the password is empty the property is invalid, but it only shows
+   * that error after the user has interacted with it, hence the combination of restoring and unpoking, will clear a field
+   * and make it not show an error
    */
   unpokeAfterSuccess?: boolean;
   /**
-   * Makes all properties unpoked (invalid won't show)
+   * After the action is completed all the properties and includes will be unpoked
+   * 
+   * When a property is considered poked its error state shows, as it's usually hidden until the user has "poked it"
+   * for example in the case of a password when the password is empty the property is invalid, but it only shows
+   * that error after the user has interacted with it, hence the combination of restoring and unpoking, will clear a field
+   * and make it not show an error
    */
   unpokeAfterAny?: boolean;
   /**
-   * Makes all properties unpoked (invalid won't show)
+   * After the action is completed and it FAILED all the properties and includes will be unpoked
+   * 
+   * When a property is considered poked its error state shows, as it's usually hidden until the user has "poked it"
+   * for example in the case of a password when the password is empty the property is invalid, but it only shows
+   * that error after the user has interacted with it, hence the combination of restoring and unpoking, will clear a field
+   * and make it not show an error
    */
   unpokeAfterFailure?: boolean;
   /**
-   * cleans the search results
+   * cleans the search results when the action is completed and it SUCCEEDS
+   * 
+   * The search results were retrieved using automatic search or the search actioner, this allows to clean them
+   * once the action is completed
    */
   cleanSearchResultsOnSuccess?: boolean;
   /**
-   * cleans the search results
+   * cleans the search results when the action is completed
+   * 
+   * The search results were retrieved using automatic search or the search actioner, this allows to clean them
+   * once the action is completed
    */
   cleanSearchResultsOnAny?: boolean;
   /**
-   * cleans the search results
+   * cleans the search results when the action is completed and it FAILED
+   * 
+   * The search results were retrieved using automatic search or the search actioner, this allows to clean them
+   * once the action is completed
    */
   cleanSearchResultsOnFailure?: boolean;
   /**
-   * Restores the state on success back to its applied value
-   * this will be a clean if no applied value exists
+   * Restores the state on success back to its applied value (all the properties and all the states) once the
+   * given action, completes and SUCCEEDS
    */
   restoreStateOnSuccess?: boolean;
   /**
-   * Restores the state on success back to its applied value
-   * this will be a clean if no applied value exists
+   * Restores the state on success back to its applied value (all the properties and all the states) once the
+   * given action completes
    */
   restoreStateOnAny?: boolean;
   /**
-   * Restores the state on success back to its applied value
-   * this will be a clean if no applied value exists
+   * Restores the state on success back to its applied value (all the properties and all the states) once the
+   * given action, completes and FAILED
    */
   restoreStateOnFailure?: boolean;
   /**
+   * Cleans the state back to all nulls on success, and destroys the current
+   * applied value from the server, it wipes the data and clear memory
+   * 
    * Warning, clean state on success might not clean anything
-   * if the cleaning is blocked from happening, this is because
-   * other item provider is expecting to use the same value
-   * always use propertiesToRestoreOn* in order to strip critical
-   * data (eg. passwords) clean state is used for a memory relief
-   * and itemize might decide that it's better not to provide it
+   * if the cleaning is blocked from happening by other providers that are using the same data; this is because
+   * cleaning state releases all the memory and its applied value and it's basically used as such; to discard a value
+   * but it's not possible to release the state for an applied value if other item provider is accessing such
+   * state at the same time, always use propertiesToRestoreOn* when it's simply about restoring the value
+   * back to empty or what they used to be as it may otherwise do nothing, cleaning IS NOT RELIABLE
    */
   cleanStateOnSuccess?: boolean;
   /**
-   * Warning, clean state on success might not clean anything
-   * if the cleaning is blocked from happening, this is because
-   * other item provider is expecting to use the same value
-   * always use propertiesToRestoreOn* in order to strip critical
-   * data (eg. passwords) clean state is used for a memory relief
-   * and itemize might decide that it's better not to provide it
+   * Cleans the state back to all nulls on failure, and destroys the current
+   * applied value from the server, it wipes the data and clear memory
+   * 
+   * Warning, clean state on failure might not clean anything
+   * if the cleaning is blocked from happening by other providers that are using the same data; this is because
+   * cleaning state releases all the memory and its applied value and it's basically used as such; to discard a value
+   * but it's not possible to release the state for an applied value if other item provider is accessing such
+   * state at the same time, always use propertiesToRestoreOn* when it's simply about restoring the value
+   * back to empty or what they used to be as it may otherwise do nothing, cleaning IS NOT RELIABLE
    */
   cleanStateOnFailure?: boolean;
   /**
-   * Warning, clean state on success might not clean anything
-   * if the cleaning is blocked from happening, this is because
-   * other item provider is expecting to use the same value
-   * always use propertiesToRestoreOn* in order to strip critical
-   * data (eg. passwords) clean state is used for a memory relief
-   * and itemize might decide that it's better not to provide it
+   * Cleans the state back to all nulls, and destroys the current
+   * applied value from the server, it wipes the data and clear memory
+   * 
+   * Warning, clean state might not clean anything
+   * if the cleaning is blocked from happening by other providers that are using the same data; this is because
+   * cleaning state releases all the memory and its applied value and it's basically used as such; to discard a value
+   * but it's not possible to release the state for an applied value if other item provider is accessing such
+   * state at the same time, always use propertiesToRestoreOn* when it's simply about restoring the value
+   * back to empty or what they used to be as it may otherwise do nothing, cleaning IS NOT RELIABLE
    */
   cleanStateOnAny?: boolean;
 }
@@ -284,70 +352,224 @@ export interface IActionCleanOptions {
 type ActionSubmitOptionCb = (lastResponse: IActionSubmitResponse) => Partial<IActionSubmitOptions>;
 
 /**
- * The options for submitting,
- * aka edit, aka add
+ * The options for submitting, ediitng, adding, etc...
  */
 export interface IActionSubmitOptions extends IActionCleanOptions {
+  /**
+   * Specifies the list of properties that are going to be sumbitted to the server
+   */
   properties: string[];
+  /**
+   * From the given list of properties and includes given, only submit whatever is determined
+   * to be different from the current applied value
+   */
   differingOnly?: boolean;
+  /**
+   * The list of includes and their properties that are to be submitted
+   */
   includes?: { [include: string]: string[] };
+  /**
+   * The list of policies to submit
+   */
   policies?: PolicyPathType[];
+  /**
+   * a function to run before sumbit that you may use to cancel the execution
+   * @returns a boolean that represents whether the action should continue or not
+   */
   beforeSubmit?: () => boolean | Promise<boolean>;
+  /**
+   * A parent to apply to the action, when adding this will cause the parent to be set
+   * when editing this will cause a reparent where the node is moved between parents
+   * 
+   * Check parentedByAddOnly when the submit is used in conjuction with both add/editing
+   * because reparenting may be not desired
+   */
   parentedBy?: {
+    /**
+     * The item that will become the parent, use the path or qualified path name
+     * for example "users/user" or "MOD_users__IDEF_user" are both valid
+     */
     item: string,
+    /**
+     * The id of the parent, it should be defined
+     */
     id: string,
+    /**
+     * the version of the parent
+     */
     version?: string,
   };
   /**
-   * Prevents a reparent from being triggered by triggering
-   * parented by only if it's determined that the action to use
-   * will be of add type
+   * Prevents a reparent, as it will only allow the add action (whether inferred or determined) this means
+   * that parenting is only executed during the adding
+   * 
+   * A reparent exists whenever the parent is specified (even if it's the same parent) so this option is useful
+   * to prevent errors of repareting to the same parent (which the server will complain about)
    */
   parentedByAddOnly?: boolean;
+  /**
+   * The action to do, normally it's inferred, if the item is not found then the action will be add
+   * if the item exists and holds an applied value it will be editing, use this to make it determined
+   */
   action?: "add" | "edit";
+  /**
+   * Sets a block status for use of admistrators and moderators to block the access of this data to other
+   * users, setting it to true makes it blocked, the user must have blocking rights
+   */
   blockStatus?: boolean;
+  /**
+   * Applies a timer to the block status, this should be a date in the corrent date format, it should be created
+   * using the createDateTimeValue function to get the correct format
+   */
   blockUntil?: string;
+  /**
+   * The reason for a blocking, this reason can be accessed by owners of the item
+   */
   blockReason?: string;
+  /**
+   * Submit for an specific id, instead of the id in question that the item represents
+   * this is useful for example, for copying data between items, by submitting to a different
+   * id a copy would be generated
+   * 
+   * Using `null` as the value here is also useful as this will generate a brand new item for
+   * the same data, copying to a new slot, if the id is supposed to be specific
+   */
   submitForId?: string;
+  /**
+   * Same as submitForId but instead specifies the version
+   */
   submitForVersion?: string;
   /**
    * Advanced, allows to submit for an alternate item rather than the current
-   * one
+   * one, use the path format or the qualified path format for this
    */
   submitForItem?: string;
+  /**
+   * An user id to execute this action in behalf of, user should have the rights to execute
+   * actions in behalf of someone else, when this occurs, the owner will be the user id that is
+   * given here, and not the person that executes the action
+   */
   inBehalfOf?: string;
+  /**
+   * A state override to submit, every item in itemize has a state that represents binary data as the item
+   * state is a transferrable blob, you can use the functions `downloadState` and `downloadStateAt` that the item
+   * provider has, or otherwise using the item loader in order to retrieve this blob, the blob is superior because
+   * the state is fully included, otherwise you can retrieve the state from `onStateChange` and other functions that provide
+   * a state that is used internally, these also work, but it does not hold binary data within it such as images or files
+   */
   stateOverride?: Blob | IItemStateType;
+
+  /**
+   * Override properties at submit time, specify a new value for the property, this is a good and preferrable alternative
+   * for using setters, since setters effect every item provider as they are globally installed but overrides simply override
+   * the request
+   */
   propertyOverrides?: IPropertyOverride[];
+
+  /**
+   * Override includes at submit time, specify a new value for the property, this is a good and preferrable alternative
+   * for using setters, since setters effect every item provider as they are globally installed but overrides simply override
+   * the request
+   */
   includeOverrides?: IIncludeOverride[];
+  /**
+   * Override the language that the submit occurs, the language mechanism of itemize is very complex, but this refer
+   * to the text type; normally the user submits all their information with the language that their application is set at,
+   * this will override that
+   * 
+   * However the language that a given text field has does not just depend on this, every text field has a language attribute,
+   * but by default it will be given a null value at the start and then it will be set later once the value is applied according
+   * to the server criteria (and the server criteria is to use the same language as the user is set)
+   */
   languageOverride?: string;
+  /**
+   * Wait and merge is used so that many requests that happen simultaneously are bundled
+   * this is not very useful for submit requests where they should be more "instant", but exists here nonetheless
+   */
   waitAndMerge?: boolean;
+  /**
+   * Informs about the progress of the submit as a percentage
+   */
   progresser?: ProgresserFn;
   /**
    * if submitting already this will prevent throwing an error and instead
    * will wait until the submit time is free
    * 
-   * pass a function to return a partial for patching the submit action
+   * Pass a function to return a partial for patching the submit action
    * in case you want that behaviour
+   * 
+   * This is useful for example when making a timed submit that will submit each time
+   * the user makes an input and will save to the server, say whenever the user fills a full text field
+   * there will be a delay of 600ms and it will submit, in this situation the user pastes and image, waits; and starts
+   * saving and the user begins typing while it is still saving the last submit, then stops, but the image is so large
+   * that it takes more than the grace time and a new submit is triggered before the last one has finished; in this case pile submit
+   * should be set to true so that no two submits can happen at once, causing an error of simultaneous submits.
+   * 
+   * Instead this function will ensure to wait so that submits are "piled" and only the last one of the last batch is executed
    */
   pileSubmit?: boolean | ActionSubmitOptionCb;
 
   /**
-   * Prevent nothing to update errors
-   * from being errors
+   * Normally when editing if you are submitting nothing or there is nothing that has changed (which is an error from the server's concern)
+   * the client will realize this and refuse to submit, triggering an error, use this so that while the client refuses to submit anyway you
+   * do not get an error but instead get emulated success
    */
   preventNothingToUpdateError?: boolean;
+
+  /**
+   * Useful to create drafts that exist only in the client side, when submitting either adding or editing the connection may not be available
+   * causing a CANT_CONNECT error where internet is not available, in this case the client will try to save the current state in the
+   * indexedDB so that it remains as a draft, you will realize storedState is set to true in the response along the CANT_CONNECT error
+   * also onStateStored will trigger, if this fails storedState will be false and onStateStoreFailed will trigger
+   * 
+   * Check loadStoredState for retrieving this state from the item's provider when loading a value
+   * 
+   * The option clearStoredStateIfConnected tends to be used in conjunction with this one
+   */
   storeStateIfCantConnect?: boolean;
+
+  /**
+   * After a draft has been used, it's likely that you don't need this value anymore as it reflects what the server side holds, so
+   * storeStateIfCantConnect option and clearStoredStateIfConnected tend to be used in conjunction
+   * 
+   * This allows to clear the state from the local database and free the space
+   */
   clearStoredStateIfConnected?: boolean;
 }
 
+/**
+ * Options for deleting
+ */
 export interface IActionDeleteOptions extends IActionCleanOptions {
+  /**
+   * Id to delete for instead of the current one, allows for deleting another item from another slot
+   */
   deleteForId?: string;
+  /**
+   * Version to delete for instead of the current one
+   */
   deleteForVersion?: string;
+  /**
+   * Delete policies to include
+   */
   policies?: PolicyPathType[];
+  /**
+   * A function that executes before the delete gets done, this allows to prevent
+   * or not the deleting action
+   * 
+   * @returns a boolean or a promise with a boolean on whether one should proceed
+   */
   beforeDelete?: () => boolean | Promise<boolean>;
+  /**
+   * Similar to submit this allows to use a progressing as a percentage
+   * in deletes this is mostly useless since it's basically instant
+   */
   progresser?: ProgresserFn;
 }
 
+/**
+ * @ignore
+ */
 export type CacheMetadataGeneratorFn = (record: IGQLSearchRecord) => any;
 
 /**
@@ -355,42 +577,144 @@ export type CacheMetadataGeneratorFn = (record: IGQLSearchRecord) => any;
  */
 export interface IActionSearchOptions extends IActionCleanOptions {
   /**
-   * The properties to be used to request, these have to be part
-   * of your schema
+   * The properties to request from the search that will apply to
+   * each element in the search, these properties will be requested
+   * 
+   * for example if you have users and you want to search and retrieve the username
+   * but you also need the profile_picture, you will put username and profile_picture here
    */
   requestedProperties: string[];
   /**
-   * The requested includes (EXPERIMENTAL)
+   * The requested includes and the sinking properties related to these includes
    */
   requestedIncludes?: { [include: string]: string[] };
   /**
-   * The properties to be used to search with
-   * you have access to three other special properties
-   * that only exist within search mode "search", "created_by", "until" and "since"
+   * The properties to be used to search with, properties to be used in search in the
+   * search mode item (or module) must be searchable and used for search (or search only)
+   * 
+   * This represents an array of strings, normally you may use the standard property id
+   * in here and that will include the default search counterparts ids, however you may be more specific
+   * 
+   * For example, a string type has SEARCH counterpart and IN counterpart, by default the search counterpart
+   * will be used, however you may be more interested in using the IN counterpart for a list
+   * 
+   * In that sense
+   * 
+   * ["username"]
+   * 
+   * Is equivalent to
+   * 
+   * [
+   *   {
+   *     id: "username",
+   *     searchVariant: "search",
+   *   }
+   * ]
+   * 
+   * And
+   * 
+   * [
+   *   {
+   *     id: "username",
+   *     searchVariant: "in",
+   *   }
+   * ]
+   * 
+   * Will allow to use in type taglist search using that counterpart
+   * 
+   * type         default variants [optional variants]
+   * =============================
+   * boolean      exact
+   * currency     from, to (disableRangedSearch=false) exact (disableRangedSearch=true)
+   * date         from, to (disableRangedSearch=false) exact (disableRangedSearch=true)
+   * datetime     from, to (disableRangedSearch=false) exact (disableRangedSearch=true)
+   * file
+   * files
+   * integer      from, to (disableRangedSearch=false) exact (disableRangedSearch=true)
+   * location     location, radius
+   * number       from, to (disableRangedSearch=false) exact (disableRangedSearch=true)
+   * password
+   * payment      from, to, payment-status, payment-type (disableRangedSearch=false) exact, payment-status, payment-type (disableRangedSearch=true)
+   * string       search, [in]
+   * taglist      search
+   * text         search
+   * time         from, to (disableRangedSearch=false) exact (disableRangedSearch=true)
+   * unit         from, to (disableRangedSearch=false) exact (disableRangedSearch=true)
+   * year         from, to (disableRangedSearch=false) exact (disableRangedSearch=true)
    */
   searchByProperties: Array<string | IPropertyCoreProps>;
+  /**
+   * The includes to be used to search with
+   */
   searchByIncludes?: { [include: string]: string[] };
+  /**
+   * Order by rule to be used by the database
+   * 
+   * By default they will be sorted by creation date (recommended)
+   * 
+   * {
+   *   order: {
+   *     priority: 0, // smaller numbers are higher priority
+   *     direction: "asc",
+   *     nulls: "last",
+   *   },
+   *   name: {
+   *     priority: 1,
+   *     direction: "asc",
+   *     nulls: "first",
+   *   },
+   * }
+   * 
+   * in this case the property "order" which may be a number will be used first
+   * to sort, and later the property for the username will be used for sorting
+   */
   orderBy?: IOrderByRuleType;
   /**
-   * By whom it was created, note that this option takes priority
-   * over the created_by property that exists within the search mode
+   * By whom it was created, this allows to limit the results that are by a specific
+   * creator, this is very useful for example to ensure security policies are met
+   * as the server may refuse to serve some information unless the creator is provided
+   * 
+   * Note that every search mode item definition has a created_by property
+   * this however takes priority and will override that
    */
   createdBy?: string;
   /**
-   * The since attribute, note that this option takes priority
+   * The since attribute, will only retrieve items limited to that date
+   * use the createDateTimeValue format in order to specify this value
+   * 
+   * note that this option takes priority
    * over the since property that exists within the search mode
    */
   since?: string;
+  /**
+   * Similar to since but to limit until when the results are received
+   * use the function createDateTimeValue to specify this value
+   * 
+   * note that this option takes priority
+   * over the since property that exists within the search mode
+   */
   until?: string;
-  parentedBy?: {
-    item: string,
 
+  /**
+   * The parent of the item (another item) this is important to specify in some
+   * security scenarios as a given user may only have contextual access to specific
+   * items given a parent
+   */
+  parentedBy?: {
+    /**
+     * The qualified path of the item or a path for example
+     * users/user or MOD_users__IDEF_user
+     */
+    item: string,
     /**
      * Parented by a specific element with an specific id
      * otherwise it is used for simple filtering
      * will not work to use with a cache policy as the id needs to be specified
      */
     id?: string,
+    /**
+     * The version for the given id that is wanted
+     */
     version?: string,
   };
 
@@ -409,6 +733,13 @@ export interface IActionSearchOptions extends IActionCleanOptions {
   /**
    * The cache policy to perform the search, using a cache policy will disable
    * any possibility of SSR since it can't be performed in the server side
+   * 
+   * none                 default, does not use a search cache
+   * by-owner             will cause to download everything with the given createdBy attribute, and it will be stored in the local database
+   * by-parent            will use the parent rather than the owner
+   * by-owner-and-parent  will use both the owner and the parent and download everything related to this
+   * by-property          will use a trackable property in order to cache, note that the property needs to be tracked
+   *                      trackedProperty needs to be specified in this case
    */
   cachePolicy?: "by-owner" | "by-parent" | "by-owner-and-parent" | "by-property" | "none";
   /**
@@ -418,16 +749,74 @@ export interface IActionSearchOptions extends IActionCleanOptions {
   cacheDoNotFallback?: boolean;
   /**
    * if set searches that have been executed with the cache worker will not have a limit nor offset
-   * applied to them
+   * applied to them, recommended to use if you want to download everything related to a specific user
+   * but it may take forever due to batching, specially if the user has a lot of data
    */
   cacheNoLimitOffset?: boolean;
+  /**
+   * The tracked property, all tracked properties must be of type exact-value-tracked or exact-identifier-tracked
+   * exact-value-tracked is an arbitrary string value, where an exact-identifier-tracked is used for ids such as user ids
+   * or such where special characters are not allowed
+   */
   trackedProperty?: string;
+  /**
+   * This metadata will be cached alongside the cached value and whenever the value is retrieved from the cache the metadata
+   * is compared against the value here, looking for a potential mismatch, use this for example in the case of permission changes
+   * in soft read rules; some values may be hidden under softReadRoleAccess where they do not trigger an error but are
+   * simply hidden, if the permissions change for some reason (eg user changes role) a new value will not be retrieved simply because
+   * it doesn't know this for example
+   * 
+   * {
+   *   userRoleWhenRetrieved: userData.role,
+   * }
+   * 
+   * will be enough to trigger a cacheMetadataMismatchAction when the role changes in order to attempt to invalidate the cache
+   * due to this and the soft rules
+   */
   cacheMetadata?: any;
-  cacheMetadataMismatchAction?: ISearchCacheMetadataMismatchAction;
+  /**
+   * This function or value is used to perform an action when a metadata mismatch has been detected, and this will
+   * perform further invalidation, even invalidation based on singular attributes
+   */
+  cacheMetadataMismatchAction?: SearchCacheMetadataMismatchActionFn | ISearchCacheMetadataMismatchAction;
+  /**
+   * The listening policy will keep the values up to date based on the criteria given
+   * when used in conjunction with cache policy the values should match
+   * 
+   * none
+   * by-owner             will listen based on the owner of the item
+   * by-parent            will listen based on the parent node
+   * by-owner-and-parent  will listen based on both the owner and the parent
+   * by-property          will use the tracked property to listen realtime values
+   * 
+   * A listen policy is recommended to use with a cache policy (otherwise the value in the db will be static)
+   * but not recommended to use without as it will perform a brand new search every time
+   */
   listenPolicy?: "by-owner" | "by-parent" | "by-owner-and-parent" | "by-property" | "none";
+  /**
+   * Creates a destruction marker so that the value is destroyed during logout
+   * once the user logouts the database is wiped from this search given its criteria
+   * it should therefore have a cache policy
+   */
   markForDestructionOnLogout?: boolean;
+  /**
+   * Normally searches will download a list of records and use these records to retrieve the next
+   * values, so even if the database changes, the value is kept as it was during that one search,
+   * however if the list is small this is rather ineffective, a traditional search will simply download
+   * all the data in a single request without doing lists of records
+   * 
+   * traditional is better for single page views, but worse for paginations
+   */
   traditional?: boolean;
+  /**
+   * The limit for the search in the database level, there's security attached to this
+   * regarding the maximum records you may get, normally this number is smaller for traditional
+   * search
+   */
   limit: number;
+  /**
+   * The offset to use during this search
+   */
   offset: number;
   /**
    * Types to search as, only truly usable on module based search
@@ -446,8 +835,18 @@ export interface IActionSearchOptions extends IActionCleanOptions {
    * null itself will match, or a lack of username
    */
   enableNulls?: boolean;
+  /**
+   * will store the search results in the navigation and location and they
+   * can later be loaded with loadSearchResultsFromNavigation
+   */
   storeResultsInNavigation?: string;
+  /**
+   * uses wait and merge to merge with other searches
+   */
   waitAndMerge?: boolean;
+  /**
+   * Uses a progresses to check the process of the search by a percentage
+   */
   progresser?: ProgresserFn;
   /**
    * Uses the search engine instead of the standard database level query, provides some limitations
@@ -455,38 +854,83 @@ export interface IActionSearchOptions extends IActionCleanOptions {
    * is not feasible
    * 
    * if given a string value it represents the language that it is used, boolean uses all languages
+   * 
+   * The item must be search engine enabled or otherwise this will cause an error
    */
   useSearchEngine?: boolean | string;
 
-  // TODO implement pile search
+  /**
+   * TODO implement pile search
+   */
   pileSearch?: boolean;
 }
 
+/**
+ * Represents the poking mechanism
+ */
 export interface IPokeElementsType {
+  /**
+   * properties that are poked as a list of string
+   */
   properties: string[];
+  /**
+   * includes that are poked with their list of properties
+   */
   includes: { [include: string]: string[] };
+  /**
+   * policies that are poked
+   */
   policies: PolicyPathType[];
 }
 
 export interface IBasicFns {
-  // to remove the poked status
+  /**
+   * Poke elements
+   * @param elements 
+   * @returns 
+   */
   poke: (elements: IPokeElementsType) => void;
+  /**
+   * unpokes all elements
+   * @returns 
+   */
   unpoke: () => void;
-  // makes it so that it reloads the value, the loadValue function
-  // usually is executed on componentDidMount, pass deny cache in order to
-  // do a hard refresh and bypass the cache
+  /**
+   * makes it so that it reloads the value, the loadValue function
+   * usually is executed on componentDidMount, pass deny cache in order to
+   * do a hard refresh and bypass the cache
+   * @param denyCache 
+   * @returns 
+   */
   reload: (denyCache?: boolean) => Promise<IActionResponseWithValue>;
-  // submits the current information, when there's no id, this triggers an
-  // add action, with an id however this trigger edition
+  /**
+   * submits the current information, when there's no id, this triggers an
+   * add action, with an id however this trigger edition
+   * @param options 
+   * @returns a response with the status
+   */
   submit: (options: IActionSubmitOptions) => Promise<IActionSubmitResponse>;
-  // straightwforward, deletes
+  /**
+   * Simply deletes
+   * @returns a response with the status
+   */
   delete: () => Promise<IBasicActionResponse>;
-  // cleans performs the cleanup of properties and policies
+  /**
+   * cleans performs the cleanup of properties and policies
+   * @param options 
+   * @param state 
+   * @param avoidTriggeringUpdate 
+   * @returns 
+   */
   clean: (options: IActionCleanOptions, state: "success" | "fail", avoidTriggeringUpdate?: boolean) => void;
-  // performs a search, note that you should be in the searchMode however
-  // since all items are the same it's totally possible to launch a search
-  // in which case you'll just get a searchError you should be in search
-  // mode because there are no endpoints otherwise
+  /**
+   * performs a search, note that you should be in the searchMode however
+   * since all items are the same it's totally possible to launch a search
+   * in which case you'll just get a searchError you should be in search
+   * mode because there are no endpoints otherwise
+   * @param options 
+   * @returns 
+   */
   search: (options: IActionSearchOptions) => Promise<IActionResponseWithSearchResults>;
 }
 
@@ -494,168 +938,382 @@ export interface IBasicFns {
  * The whole item definition context
  */
 export interface IItemContextType extends IBasicFns {
-  // the item definition in question
+  /**
+   * the item definition in question
+   */
   idef: ItemDefinition;
-  // the state of this item definition that has
-  // been pulled and calculated from this item definition
+  /**
+   * the state of this item definition that has
+   * been pulled and calculated from this item definition
+   */
   state: IItemStateType;
-  // the id of which it was pulled from, this might be
-  // null
+  /**
+   * the id of which it was pulled from, this might be
+   * null
+   */
   forId: string;
-  // the version of which it was pulled from
+  /**
+   * the version of which it was pulled from
+   */
   forVersion: string;
-  // with ids a not found flag might be set if the item
-  // is not found 404
+  /**
+   * with ids a not found flag might be set if the item
+   * is not found 404
+   */
   notFound: boolean;
-  // with ids the item might be blocked as well so this
-  // flag is raised
+  /**
+   * with ids the item might be blocked as well so this
+   * flag is raised
+   */
   blocked: boolean;
-  // if you are a moderator, or have a role that permits it
-  // data might still be available, this comes together with
-  // blocked
+  /**
+   * if you are a moderator, or have a role that permits it
+   * data might still be available, this comes together with
+   * blocked
+   */
   blockedButDataAccessible: boolean;
-  // an error that came during loading
+  /**
+   * an error that came during loading
+   */
   loadError: EndpointErrorType;
-  // whether it is currently loading
+  /**
+   * whether it is currently loading
+   */
   loading: boolean;
-  // whether it loaded, sucesfully
+  /**
+   * whether it loaded, sucesfully
+   */
   loaded: boolean;
-  // whether it is currently holding a state that was loaded
-  // of any kind
+  /**
+   * whether it is currently holding a state that was loaded
+   * of any kind
+   */
   holdsRemoteState: boolean;
-  // an error that came during submitting
+  /**
+   * an error that came during submitting
+   */
   submitError: EndpointErrorType;
-  // whether it is currently submitting
+  /**
+   * whether it is currently submitting
+   */
   submitting: boolean;
-  // whether it has submitted sucesfully, this is a transitory
-  // flag, and should be removed, basically it means the item
-  // is in a success state of submitted
+  /**
+   * whether it has submitted sucesfully, this is a transitory
+   * flag, and should be removed, basically it means the item
+   * is in a success state of submitted
+   */
   submitted: boolean;
-  // an error that came during deleting
+  /**
+   * an error that came during deleting
+   */
   deleteError: EndpointErrorType;
-  // whether it is currently deleting
+  /**
+   * whether it is currently deleting
+   */
   deleting: boolean;
-  // same as submitted, a success flag that says whether the element
-  // was deleted
+  /**
+   * same as submitted, a success flag that says whether the element
+   * was deleted
+   */
   deleted: boolean;
-  // an error that occured during search
+  /**
+   * an error that occured during search
+   */
   searchError: EndpointErrorType;
-  // whether it is currently searching
+  /**
+   * whether it is currently searching
+   */
   searching: boolean;
-  // the obtained search results from the graphql endpoint
-  // just as they come
+  /**
+   * the obtained search results from the graphql endpoint
+   * just as they come
+   */
   searchRecords: IGQLSearchRecord[];
+  /**
+   * The search results (only available if a traditional search was performed)
+   */
   searchResults: IGQLValue[];
+  /**
+   * The limit used in the given search
+   */
   searchLimit: number;
+  /**
+   * The offset used int he given search
+   */
   searchOffset: number;
+  /**
+   * The counted results from the search
+   */
   searchCount: number;
-  // a search id for the obtained results whether error
-  // or success
+  /**
+   * every search gets an unique identifier
+   */
   searchId: string;
+  /**
+   * Whether the search was not truly performed but was instead restored
+   * for example, from the location, or from the state of the app
+   */
   searchWasRestored: "NO" | "FROM_LOCATION" | "FROM_STATE";
-  // a search owner, or null, for the createdBy argument
+  /**
+   * a search owner, or null, for the createdBy argument
+   */
   searchOwner: string;
+  /**
+   * Search last modified as it was retrieved from the server
+   */
   searchLastModified: string;
-  // passed onto the search to tell it if results that are retrieved
-  // and then updated should be cached into the cache using the
-  // long term strategy, this is usually true when cachePolicy is something
+  /**
+   * passed onto the search to tell it if results that are retrieved
+   * and then updated should be cached into the cache using the
+   * long term strategy, this is usually true when cachePolicy is something
+   */
   searchShouldCache: boolean;
-  // the search fields that should be requested according
-  // to the search function
+  /**
+   * the search fields that should be requested according
+   * to the search function
+   */
   searchFields: any;
+  /**
+   * The properties that were requested during the search
+   */
   searchRequestedProperties: string[];
+  /**
+   * The includes that were requested during the search
+   */
   searchRequestedIncludes: { [include: string]: string[] };
+  /**
+   * Whether the search engine was used or not
+   */
   searchEngineEnabled: boolean;
+  /**
+   * The language that was used for the search using the search engine
+   */
   searchEngineEnabledLang: string;
+  /**
+   * The highlight args that were received when using a search engine
+   */
   searchEngineHighlightArgs: IItemSearchStateHighlightArgsType;
+  /**
+   * The highlights given by elasticsearch for the search that apply
+   * to the entire search results
+   */
   searchHighlights: IElasticHighlightRecordInfo;
+  /**
+   * These are the specific highlights ot use within this value
+   * and they will be passed to the renderer in order to show
+   * the highlights
+   */
   highlights: IElasticHighlightSingleRecordInfo;
-  // poked is a flag that is raised to mean to ignore
-  // anything regarding user set statuses and just mark
-  // things as they are, for example, by default many fields
-  // are empty (null) and they are invalid, but in UX wise
-  // it makes no sense to show as invalid immediately
-  // poked makes it so that every field shows its true state
-  // they are poked
+  /**
+   * poked is a flag that is raised to mean to ignore
+   * anything regarding user set statuses and just mark
+   * things as they are, for example, by default many fields
+   * are empty (null) and they are invalid, but in UX wise
+   * it makes no sense to show as invalid immediately
+   * poked makes it so that every field shows its true state
+   * they are poked
+   */
   pokedElements: IPokeElementsType;
-  // this is a listener that basically takes a property, and a new value
-  // and internal value, whatever is down the line is not expected to do
-  // changes directly, but rather call this function, this function will
-  // then update everything under the hood
+  /**
+   * this is a listener that basically takes a property, and a new value
+   * and internal value, whatever is down the line is not expected to do
+   * changes directly, but rather call this function, this function will
+   * then update everything under the hood
+   * @param property 
+   * @param value 
+   * @param internalValue 
+   * @returns 
+   */
   onPropertyChange: (
     property: PropertyDefinition,
     value: PropertyDefinitionSupportedType,
     internalValue: any,
   ) => void;
-  // restores
+  /**
+   * When the property shall be restored this listener shall be called
+   * @param property 
+   * @returns 
+   */
   onPropertyRestore: (
     property: PropertyDefinition,
   ) => void;
-  // this is yet another passed function that does the same as properties
-  // but with exclusion states
+  /**
+   * this is yet another passed function that does the same as properties
+   * but with exclusion states
+   * @param include 
+   * @param state 
+   * @returns 
+   */
   onIncludeSetExclusionState: (
     include: Include,
     state: IncludeExclusionState,
   ) => void;
-  // now this would be used on enforcement, this is used for the setter
-  // the reason it also needs to specify the id is because it might
-  // go out of sync with the item definition
+  /**
+   * now this would be used on enforcement, this is used for the setter
+   * the reason it also needs to specify the id is because it might
+   * go out of sync with the item definition
+   * @param property 
+   * @param value 
+   * @param givenForId 
+   * @param givenForVersion 
+   * @returns 
+   */
   onPropertyEnforce: (
     property: PropertyDefinition,
     value: PropertyDefinitionSupportedType,
     givenForId: string,
     givenForVersion: string,
   ) => void;
+  /**
+   * Clear the enforce that was previously set
+   * @param property 
+   * @param givenForId 
+   * @param givenForVersion 
+   * @returns 
+   */
   onPropertyClearEnforce: (
     property: PropertyDefinition,
     givenForId: string,
     givenForVersion: string,
   ) => void;
 
-  // dismisses of he many errors and flags
+  /**
+   * dismisses the load error
+   * @returns 
+   */
   dismissLoadError: () => void;
+  /**
+   * dismisses the submit error
+   * @returns 
+   */
   dismissSubmitError: () => void;
+  /**
+   * dismisses the submitted state
+   * @returns 
+   */
   dismissSubmitted: () => void;
+  /**
+   * dismisses the delete error
+   * @returns 
+   */
   dismissDeleteError: () => void;
+  /**
+   * dismisses the deleted state
+   * @returns 
+   */
   dismissDeleted: () => void;
+  /**
+   * dismisses the search error
+   * @returns 
+   */
   dismissSearchError: () => void;
+  /**
+   * dismisses the search results
+   * @returns
+   */
   dismissSearchResults: () => void;
-  downloadState: (specificProperties?: string[], specificIncludes?: { [id: string]: string[] }) => Promise<Blob>,
-  downloadStateAt: (id: string, version?: string, specificProperties?: string[], specificIncludes?: { [id: string]: string[] }) => Promise<Blob>,
-  loadStateFromFile: (f: Blob | File, specificProperties?: string[], specificIncludes?: { [id: string]: string[] }) => Promise<void>,
+  /**
+   * downloads the state as a blob (file) of the current item
+   * @param specificProperties 
+   * @param specificIncludes 
+   * @returns 
+   */
+  downloadState: (specificProperties?: string[], specificIncludes?: { [id: string]: string[] }) => Promise<Blob>;
+  /**
+   * Downloads the state as a blob (file) of the current item but at a given id, version combo
+   * @param id 
+   * @param version 
+   * @param specificProperties 
+   * @param specificIncludes 
+   * @returns 
+   */
+  downloadStateAt: (id: string, version?: string, specificProperties?: string[], specificIncludes?: { [id: string]: string[] }) => Promise<Blob>;
+  /**
+   * Loads the state from a given file
+   * @param f 
+   * @param specificProperties 
+   * @param specificIncludes 
+   * @returns 
+   */
+  loadStateFromFile: (f: Blob | File, specificProperties?: string[], specificIncludes?: { [id: string]: string[] }) => Promise<void>;
+  /**
+   * Loads the state for a given file in the current item location at a given slot id and version
+   * @param f 
+   * @param id 
+   * @param version 
+   * @param specificProperties 
+   * @param specificIncludes 
+   * @returns 
+   */
   loadStateFromFileAt: (
     f: Blob | File,
     id: string,
     version?: string,
     specificProperties?: string[],
     specificIncludes?: { [id: string]: string[] },
-  ) => Promise<void>,
+  ) => Promise<void>;
 
-  // the remote listener
+  /**
+   * Simply the remote listener that this item is using to listen
+   * it's always the same accross all items
+   */
   remoteListener: RemoteListener;
 
-  // an injected parent context if available
+  /**
+   * A parent context that has been injected
+   * @deprecated
+   */
   injectedParentContext: IItemContextType;
 
-  // inject a promise that blocks the submit process, this is currently
-  // not used anywhere but was introduced as a means of blocking submitting
-  // when necessary using promises
+  /**
+   * Injects a promise so that the submit cannot resolve until this promise
+   * is resolved
+   * @param arg 
+   * @returns 
+   */
   injectSubmitBlockPromise: (arg: Promise<any>) => void;
 }
 
+/**
+ * Represents the search context that is injected above an item provider in order to block
+ * it from loading itself so it's aware that elements are being searched
+ */
 export interface ISearchItemValueContextType {
+  /**
+   * Records being searched that will eventually have an applied value
+   */
   currentlySearching: IGQLSearchRecord[];
+  /**
+   * Fields that are being searched
+   */
   searchFields: IGQLRequestFields;
+  /**
+   * Records that are overall in the search that is active avobe
+   */
   searchRecords: IGQLSearchRecord[];
 }
 
-// This is the context that will serve it
+/**
+ * The item context represents the context that holds information about
+ * an item, with its value and respective state, all item contexts
+ * are synchronized as the state is held centrally in the item definition
+ */
 export const ItemContext = React.createContext<IItemContextType>(null);
+
+/**
+ * The phaser context is used by the item context phase in order to phase item contexts
+ * through other item contexts, this is the new way that deprecates the injectParentContext mechanism
+ */
 export const ItemContextPhaserContext = React.createContext<{ [slotId: string]: IItemContextType }>({});
+
+/**
+ * The search item value context is what is used to inject the currently being searched context
+ */
 export const SearchItemValueContext = React.createContext<ISearchItemValueContextType>(null);
 
-// Now we pass on the provider, this is what the developer
-// is actually expected to fill
+/**
+ * The props for the item provider
+ */
 export interface IItemProviderProps {
   /**
    * children that will be feed into the context
@@ -809,7 +1467,7 @@ export interface IItemProviderProps {
    * storeStateIfCantConnect from submit action
    * and clearStoredStateIfConnected from submit action
    */
-  loadStateFromCache?: boolean;
+  loadStoredState?: boolean;
   /**
    * stores the state whenever the state changes
    */
@@ -907,30 +1565,54 @@ export interface IItemProviderProps {
   doNotUseCache?: boolean;
 }
 
-// This represents the actual provider that does the job, it takes on some extra properties
-// taken from the contexts that this is expected to run under
+/**
+ * This represents the actual provider that does the job, it takes on some extra properties
+ * taken from the contexts that this is expected to run under
+ */ 
 interface IActualItemProviderProps extends IItemProviderProps {
-  // token data to get the current user id, and role, for requests
+  /**
+   * The token data is retrieved from the token provider and is used for
+   * running the requests
+   */
   tokenData: ITokenContextType;
-  // locale data for, well.... localization, nah it's actually to setup the language
-  // during requests, so that full text search can function
+  /**
+   * locale data for, well.... localization, nah it's actually to setup the language
+   * during requests, so that full text search can function
+   */
   localeData: ILocaleContextType;
-  // the item definition istance that was fetched from the itemDefinition
+  /**
+   * the item definition istance that was fetched from the itemDefinition
+   */
   itemDefinitionInstance: ItemDefinition;
-  // the qualified name of such item definition
+  /**
+   * the qualified name of such item definition
+   */
   itemDefinitionQualifiedName: string;
-  // and whether it contains externally checked properties
+  /**
+   * and whether it contains externally checked properties
+   */
   containsExternallyCheckedProperty: boolean;
-  // the remote listener for listening to changes that occur
-  // server side
+  /**
+   * the remote listener for listening to changes that occur
+   * server side
+   */
   remoteListener: RemoteListener;
-  // the searching context to pull values from
+  /**
+   * the searching context to pull values from
+   */
   searchContext: ISearchItemValueContextType;
-  // injected parent context
+  /**
+   * injected parent context
+   * @deprecated
+   */
   injectedParentContext: IItemContextType;
-  // config
+  /**
+   * config that comes from the config provider
+   */
   config: IConfigRawJSONDataType;
-  // only available when supporting search from navigation
+  /**
+   * only available when supporting search from navigation
+   */
   location?: Location<any>;
 }
 
@@ -1126,10 +1808,10 @@ export class ActualItemProvider extends
         const searchStateComplex = props.itemDefinitionInstance.getSearchState(
           props.forId || null, props.forVersion || null,
         );
-  
+
         if (searchStateComplex) {
           searchState = searchStateComplex.searchState;
-  
+
           const state = searchStateComplex.state;
           props.itemDefinitionInstance.applyState(
             props.forId || null,
@@ -1617,7 +2299,7 @@ export class ActualItemProvider extends
     if (!this.props.avoidLoading) {
       await this.loadValue();
     }
-    if (this.props.loadStateFromCache) {
+    if (this.props.loadStoredState) {
       await this.loadStoredState();
     }
   }
@@ -1965,7 +2647,7 @@ export class ActualItemProvider extends
 
     if (
       uniqueIDChanged &&
-      this.props.loadStateFromCache
+      this.props.loadStoredState
     ) {
       await this.loadStoredState();
     }
@@ -1979,8 +2661,8 @@ export class ActualItemProvider extends
       } else {
         // check for differences that demand a refreshment
         const ownerChanged = currentSearch.searchOwner !== prevSearchState.searchOwner;
-        const parentChanged = !equals(currentSearch.searchParent, prevSearchState.searchParent, { strict: true});
-        const propertyChanged = !equals(currentSearch.searchCacheUsesProperty, prevSearchState.searchCacheUsesProperty, { strict: true});
+        const parentChanged = !equals(currentSearch.searchParent, prevSearchState.searchParent, { strict: true });
+        const propertyChanged = !equals(currentSearch.searchCacheUsesProperty, prevSearchState.searchCacheUsesProperty, { strict: true });
 
         if (ownerChanged || parentChanged || propertyChanged) {
           this.removePossibleSearchListeners(prevProps, prevState);
@@ -3400,7 +4082,21 @@ export class ActualItemProvider extends
       (options.cleanStateOnFailure && state === "fail") ||
       (options.cleanStateOnSuccess && state === "success")
     ) {
+      // cleaning may be blocked but we don't want it to be blocked by us
+      let needsAddBlockCleanAgain = false;
+      if (props.itemDefinitionInstance.hasBlockCleanFor(props.forId || null, props.forVersion || null, this.blockIdClean)) {
+        needsAddBlockCleanAgain = true;
+        props.itemDefinitionInstance.removeBlockCleanFor(props.forId || null, props.forVersion || null, this.blockIdClean);
+      }
+
+      // now we clean
       props.itemDefinitionInstance.cleanValueFor(props.forId || null, props.forVersion || null);
+
+      // and reblock it in case
+      if (needsAddBlockCleanAgain) {
+        props.itemDefinitionInstance.addBlockCleanFor(props.forId || null, props.forVersion || null, this.blockIdClean);
+      }
+
       needsUpdate = true;
     } else if (
       options.restoreStateOnAny ||
@@ -4786,6 +5482,10 @@ export class ActualItemProvider extends
 
 export type ItemProviderType = ActualItemProvider;
 export type ItemProviderRefObject = React.RefObject<ActualItemProvider>;
+
+/**
+ * The item provider component provides the core functionality for the item provider
+ */
 export const ItemProvider = React.forwardRef<ActualItemProvider, IItemProviderProps>((props, ref) => {
   return (
     <ConfigContext.Consumer>
@@ -4905,8 +5605,17 @@ export const ItemProvider = React.forwardRef<ActualItemProvider, IItemProviderPr
   );
 });
 
+/**
+ * Props for a item provider without state
+ */
 interface INoStateItemProviderProps {
+  /**
+   * Item definition in question
+   */
   itemDefinition?: string;
+  /**
+   * Children that will apply the component for
+   */
   children?: React.ReactNode;
 }
 
@@ -4933,6 +5642,14 @@ class ActualNoStateItemProvider extends React.Component<IActualNoStateItemProvid
   }
 }
 
+/**
+ * The no state item provider allows to set an item provider that holds no state
+ * and therefore it is cheaper
+ * 
+ * @deprecated
+ * @param props 
+ * @returns 
+ */
 export function NoStateItemProvider(props: INoStateItemProviderProps) {
   return (
     <ModuleContext.Consumer>
@@ -4986,7 +5703,53 @@ export function ParentItemContextProvider(props: { children: React.ReactNode }) 
   );
 }
 
-export function ItemContextPhase(props: { children: React.ReactNode, slot?: string }) {
+interface IItemContextPhaseProps {
+  /**
+   * The children to phase to
+   */
+  children: React.ReactNode;
+  /**
+   * the slot to store at in order to phase multiple contexts
+   */
+  slot?: string;
+};
+
+/**
+ * Phases the currrent item context until it is later retrieved so it can be used later at another level
+ * for example the following
+ * 
+ * <ItemContextPhase>
+ *   <ItemProvider
+ *     {...}
+ *   >
+ *     <ItemContextRetrieve>
+ *        
+ *     </ItemContextRetrieve>
+ *   </ItemProvider>
+ * </ItemContextPhase>
+ * 
+ * will use the outer context inside the item context retrieve
+ * 
+ * you may use a lot in order to be able to phase multiple contexts
+ * 
+ * <ItemContextPhase slot="slot1">
+ *   <ItemProvider
+ *     {...}
+ *   >
+ *     <ItemContextPhase slot="slot2">
+ *       <ItemContextRetrieve slot="slot1">
+ *        
+ *       </ItemContextRetrieve>
+ *     </ItemContextPhase>
+ *   </ItemProvider>
+ * </ItemContextPhase>
+ * 
+ * In this case both contexts are phased in
+ * 
+ * @param props 
+ * @returns 
+ */
+export function ItemContextPhase(props: IItemContextPhaseProps) {
   return (
     <ItemContextPhaserContext.Consumer>
       {(phaserValue) => (
@@ -5007,7 +5770,14 @@ export function ItemContextPhase(props: { children: React.ReactNode, slot?: stri
   );
 }
 
-export function ItemContextRetrieve(props: { children: React.ReactNode, slot?: string }) {
+/**
+ * This is the item context retrieve and allows to retrieve the context
+ * that was previously phased with ItemContextPhase
+ * 
+ * @param props 
+ * @returns 
+ */
+export function ItemContextRetrieve(props: IItemContextPhaseProps) {
   return (
     <ItemContextPhaserContext.Consumer>
       {(value) => {

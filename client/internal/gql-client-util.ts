@@ -40,28 +40,92 @@ import type { IPropertyCoreProps } from "../../client/components/property/base";
 type cacheMetadataCheckFn = (value: PropertyDefinitionSupportedType | { [property: string]: PropertyDefinitionSupportedType }) => boolean;
 type cacheMetadataComparisonFn = (oldValue: any, newValue: any) => boolean;
 
+/**
+ * Used to compare singular properties in the item
+ */
 export interface ICacheMetadataMismatchConditionRule {
   [propertyOrInclude: string]: cacheMetadataCheckFn;
 }
 
+/**
+ * Represents a condition to use with item data
+ * that is used to invalidate them
+ */
 export interface ICacheMetadataMismatchCondition {
+  /**
+   * This is only relevant for non-blocked and found items
+   * that have been cached into the database, in this case
+   * we can specify a per property rule for fetching new records
+   */
   custom?: ICacheMetadataMismatchConditionRule;
+  /**
+   * The item is blocked, items that are blocked will match
+   * this condition
+   */
   isBlocked?: boolean;
-  isDeleted?: boolean;
+  /**
+   * The item is not found, it has either been deleted or
+   * something has happened to it that the record was missing
+   */
+  isNotFound?: boolean;
+  /**
+   * Matches the condition by a simple metadata comparison
+   * from the old metadata and the new metadata
+   */
   metadataComparison?: cacheMetadataComparisonFn;
 }
 
 export interface ICacheMetadataMismatchAction {
-  action: "REFETCH",
-  rewrite: "IF_CONDITION_SUCCEEDS" | "ALWAYS",
-  condition?: ICacheMetadataMismatchCondition,
+  /**
+   * The action to perform for this singular item
+   * REFETCH will retrieve the record again from the server
+   */
+  action: "REFETCH" | "NONE";
+  /**
+   * Specifies whether the metadata itself should be rewritten
+   * into the cache, ALWAYS is preferrable
+   * 
+   * IF_CONDITION_SUCCEEDS is only useful when it is set to REFETCH_RECORDS
+   */
+  rewrite: "IF_CONDITION_SUCCEEDS" | "ALWAYS" | "NEVER";
+  /**
+   * The condition to use when REFETCH is used
+   */
+  condition?: ICacheMetadataMismatchCondition;
 }
 
+/**
+ * The search action to perform if a mismatch is detected
+ */
 export interface ISearchCacheMetadataMismatchAction {
-  action: "REDO_SEARCH" | "REFETCH_RECORDS",
-  rewrite: "IF_CONDITION_SUCCEEDS" | "ALWAYS",
+  /**
+   * The action to perform for this mismatch
+   * REDO_SEARCH will simply redo all the search
+   * REFETCH_RECORDS will refetch specific records based on the recordsRefetchCondition which should be provided
+   */
+  action: "REDO_SEARCH" | "REFETCH_RECORDS" | "NONE",
+  /**
+   * Specifies whether the metadata itself should be rewritten
+   * into the cache, ALWAYS is preferrable
+   * 
+   * IF_CONDITION_SUCCEEDS is only useful when it is set to REFETCH_RECORDS
+   */
+  rewrite: "IF_CONDITION_SUCCEEDS" | "ALWAYS" | "NEVER",
+  /**
+   * The condition to use when REFETCH_RECORDS is used
+   */
   recordsRefetchCondition?: ICacheMetadataMismatchCondition,
 }
+
+/**
+ * A function to use for the mismatch action
+ */
+export type CacheMetadataMismatchActionFn = (oldMetadata: any, newMetadata: any) => ICacheMetadataMismatchAction;
+
+/**
+ * A function to use for the mismatch action
+ */
+export type SearchCacheMetadataMismatchActionFn = (oldMetadata: any, newMetadata: any) => ISearchCacheMetadataMismatchAction;
 
 export function checkMismatchCondition(
   condition: ICacheMetadataMismatchCondition,
@@ -73,10 +137,10 @@ export function checkMismatchCondition(
     return true;
   }
 
-  const isDeleted = !dbValue.value;
-  const isBlocked = !isDeleted && !dbValue.value.DATA;
+  const isNotFound = !dbValue.value;
+  const isBlocked = !isNotFound && !dbValue.value.DATA;
 
-  if (isDeleted && condition.isDeleted) {
+  if (isNotFound && condition.isNotFound) {
     return true;
   }
 
@@ -88,7 +152,7 @@ export function checkMismatchCondition(
     return true;
   }
 
-  if (!isDeleted && condition.custom) {
+  if (!isNotFound && !isBlocked && condition.custom) {
     return Object.keys(condition.custom).some((propertyOrInclude: string) => {
       let baseValue: any;
       if (EXTERNALLY_ACCESSIBLE_RESERVED_BASE_PROPERTIES.includes(propertyOrInclude)) {
@@ -742,7 +806,7 @@ export async function runGetQueryFor(
     token: string,
     cacheStore: boolean,
     cacheStoreMetadata?: any,
-    cacheStoreMetadataMismatchAction?: ICacheMetadataMismatchAction,
+    cacheStoreMetadataMismatchAction?: CacheMetadataMismatchActionFn | ICacheMetadataMismatchAction,
     waitAndMerge?: boolean,
     progresser?: ProgresserFn,
     currentKnownMetadata?: ICacheMetadataMatchType,
@@ -786,6 +850,7 @@ export async function runGetQueryFor(
     let shouldProcceedWithCache: boolean = true;
     let shouldDestroyValue: boolean = false;
     let metadataWasMismatch: boolean = false;
+    let shouldRewriteMetadata: boolean = false;
     let ruleApplies: boolean = false;
 
     const workerCachedValue: ICacheMatchType = await CacheWorkerInstance.instance.getCachedValue(
@@ -809,11 +874,15 @@ export async function runGetQueryFor(
       metadataWasMismatch = !equals(expectedCacheMetadata, currentCacheMetadata, { strict: true });
 
       if (metadataWasMismatch) {
-        ruleApplies = !arg.cacheStoreMetadataMismatchAction.condition;
+        const actionToPerform: ICacheMetadataMismatchAction = typeof arg.cacheStoreMetadataMismatchAction === "function" ?
+          arg.cacheStoreMetadataMismatchAction(currentCacheMetadata, expectedCacheMetadata) :
+          arg.cacheStoreMetadataMismatchAction;
+
+        ruleApplies = !actionToPerform.condition;
         if (!ruleApplies) {
           if (workerCachedValue) {
             ruleApplies = checkMismatchCondition(
-              arg.cacheStoreMetadataMismatchAction.condition,
+              actionToPerform.condition,
               workerCachedValue,
               currentCacheMetadata,
               expectedCacheMetadata,
@@ -821,8 +890,17 @@ export async function runGetQueryFor(
           }
         }
 
+        if (actionToPerform.rewrite === "ALWAYS") {
+          shouldRewriteMetadata = true;
+        }
+
         if (ruleApplies) {
-          if (arg.cacheStoreMetadataMismatchAction.action === "REFETCH") {
+          if (actionToPerform.rewrite === "IF_CONDITION_SUCCEEDS") {
+            shouldRewriteMetadata = true;
+          }
+          if (actionToPerform.action === "REFETCH") {
+            // we will be refetching so we don't proceed with the cache
+            // instead we destroy the current value
             shouldProcceedWithCache = false;
             shouldDestroyValue = true;
           }
@@ -838,15 +916,7 @@ export async function runGetQueryFor(
       );
     }
 
-    if (
-      metadataWasMismatch &&
-      ((
-        arg.cacheStoreMetadataMismatchAction.rewrite === "ALWAYS"
-      ) || (
-          arg.cacheStoreMetadataMismatchAction.rewrite === "IF_CONDITION_SUCCEEDS" &&
-          ruleApplies
-        ))
-    ) {
+    if (shouldRewriteMetadata) {
       await CacheWorkerInstance.instance.writeMetadata(
         queryName,
         arg.id,
@@ -1403,7 +1473,7 @@ interface IRunSearchQueryArg extends ISearchQueryArg {
   cacheNoLimitOffset?: boolean;
   cacheDoNotFallback?: boolean;
   cacheStoreMetadata?: any;
-  cacheStoreMetadataMismatchAction?: ISearchCacheMetadataMismatchAction;
+  cacheStoreMetadataMismatchAction?: SearchCacheMetadataMismatchActionFn | ISearchCacheMetadataMismatchAction;
   trackedProperty?: string;
   waitAndMerge?: boolean;
   progresser?: ProgresserFn;
@@ -1645,7 +1715,7 @@ export async function runSearchQueryFor(
         !cacheWorkerGivenSearchValue.gqlValue.errors
       ) {
         // let's get our current metadata
-        const currentMetadata = await CacheWorkerInstance.instance.readSearchMetadata(
+        const currentMetadataRaw = await CacheWorkerInstance.instance.readSearchMetadata(
           queryNameForCacheWorker,
           searchArgs,
           arg.cachePolicy as any,
@@ -1656,28 +1726,37 @@ export async function runSearchQueryFor(
           arg.parentedBy ? arg.parentedBy.version || null : null,
         );
 
+        let currentMetadata: any = null;
+        if (currentMetadataRaw && currentMetadataRaw.value) {
+          currentMetadata = currentMetadataRaw.value;
+        }
+
         // we can specify these actions
         let redoSearch: boolean = false;
         let refetchAllRecords: boolean = false;
         let refetchSpecificRecords: IGQLSearchRecord[] = null;
 
         // if we have a value there and it differs
-        if (currentMetadata && !equals(currentMetadata.value, arg.cacheStoreMetadata, { strict: true })) {
+        if (!equals(currentMetadata.value, arg.cacheStoreMetadata, { strict: true })) {
           // it was mismatched
           metadataWasMismatch = true;
 
+          const actionToPerform: ISearchCacheMetadataMismatchAction = typeof arg.cacheStoreMetadataMismatchAction === "function" ?
+            arg.cacheStoreMetadataMismatchAction(currentMetadata.value, arg.cacheStoreMetadata) :
+            arg.cacheStoreMetadataMismatchAction;
+
           // so what action we have here, redo search
-          if (arg.cacheStoreMetadataMismatchAction.action === "REDO_SEARCH") {
+          if (actionToPerform.action === "REDO_SEARCH") {
             // we will do that
             redoSearch = true;
             refetchAllRecords = true;
-          } else if (arg.cacheStoreMetadataMismatchAction.action === "REFETCH_RECORDS") {
+          } else if (actionToPerform.action === "REFETCH_RECORDS") {
             // otherwise it must be refetch records, and we need to know which records
             refetchAllRecords = false;
             refetchSpecificRecords = cacheWorkerGivenSearchValue.sourceResults.filter((r) => {
               // and for that we will filter from the source results
               return checkMismatchCondition(
-                arg.cacheStoreMetadataMismatchAction.recordsRefetchCondition,
+                actionToPerform.recordsRefetchCondition,
                 r,
                 currentMetadata,
                 arg.cacheStoreMetadata,
@@ -1690,18 +1769,14 @@ export async function runSearchQueryFor(
 
           // and now whether to rewrite the metadata
           if (
-            arg.cacheStoreMetadataMismatchAction.rewrite === "IF_CONDITION_SUCCEEDS" &&
+            actionToPerform.rewrite === "IF_CONDITION_SUCCEEDS" &&
             (redoSearch || refetchAllRecords || refetchSpecificRecords.length)
           ) {
             shouldWriteMetadata = true;
-          } else if (arg.cacheStoreMetadataMismatchAction.rewrite === "ALWAYS") {
+          } else if (actionToPerform.rewrite === "ALWAYS") {
             // otherwise it must be ALWAYS
             shouldWriteMetadata = true;
           }
-        } else if (!currentMetadata) {
-          // it's missing so of course it doesn't match
-          metadataWasMismatch = true;
-          shouldWriteMetadata = true;
         }
 
         if (redoSearch || refetchAllRecords || (refetchSpecificRecords && refetchSpecificRecords.length)) {

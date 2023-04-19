@@ -1189,7 +1189,7 @@ async function getI18nPropertyData(
 
   const disableRangedSearch =
     property.disableRangedSearch ||
-    (property.type === "integer" && (property.subtype === "reference" || property.subtype === "reference-tracked")) ||
+    property.type === "integer" ||
     searchIsDisabled;
 
   let expectedProperties = definition.i18n.base

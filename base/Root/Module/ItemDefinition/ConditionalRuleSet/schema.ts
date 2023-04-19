@@ -84,6 +84,10 @@ export default {
           type: "string",
           enum: gates,
         },
+        internalConditionGate: {
+          type: "string",
+          enum: gates,
+        },
         serverFlag: {
           type: "string",
           enum: serverFlags,
@@ -94,7 +98,17 @@ export default {
         // because we can get more comprehensive errors when
         // the condition is instanciated later
         condition: {
-          $ref: "ConditionalRuleSet",
+          oneOf: [
+            {
+              $ref: "ConditionalRuleSet"
+            },
+            {
+              type: "array",
+              items: {
+                $ref: "ConditionalRuleSet"
+              }
+            }
+          ]
         },
       },
       required: ["property", "comparator", "value"],
@@ -115,12 +129,26 @@ export default {
           type: "string",
           enum: gates,
         },
+        internalConditionGate: {
+          type: "string",
+          enum: gates,
+        },
         serverFlag: {
           type: "string",
           enum: serverFlags,
         },
         condition: {
-          $ref: "ConditionalRuleSet",
+          oneOf: [
+            {
+              $ref: "ConditionalRuleSet"
+            },
+            {
+              type: "array",
+              items: {
+                $ref: "ConditionalRuleSet"
+              }
+            }
+          ]
         },
       },
       required: ["component", "isIncluded"],
@@ -130,6 +158,39 @@ export default {
       },
 
       additionalProperties: false,
+    },
+    {
+      properties: {
+        gate: {
+          type: "string",
+          enum: gates,
+        },
+        internalConditionGate: {
+          type: "string",
+          enum: gates,
+        },
+        serverFlag: {
+          type: "string",
+          enum: serverFlags,
+        },
+        condition: {
+          oneOf: [
+            {
+              $ref: "ConditionalRuleSet"
+            },
+            {
+              type: "array",
+              items: {
+                $ref: "ConditionalRuleSet"
+              }
+            }
+          ]
+        },
+      },
+      dependencies: {
+        gate: ["condition"],
+        condition: ["gate"],
+      },
     },
   ],
 };

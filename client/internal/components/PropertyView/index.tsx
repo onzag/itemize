@@ -29,7 +29,6 @@ import PropertyViewDateTime from "./PropertyViewDateTime";
 import PropertyViewLocation from "./PropertyViewLocation";
 import PropertyViewCurrency from "./PropertyViewCurrency";
 import PropertyViewPayment from "./PropertyViewPayment";
-import PropertyViewReference from "./PropertyViewReference";
 import { ISSRContextType, SSRContext } from "../../../../client/internal/providers/ssr-provider";
 import { TokenContext, ITokenContextType } from "../../../../client/internal/providers/token-provider";
 
@@ -286,18 +285,6 @@ const handlerRegistry:
   string: {
     renderer: "PropertyViewSimple",
     handler: PropertyViewSimple,
-    subhandler: {
-      reference: {
-        renderer: "PropertyViewSimple",
-        handler: PropertyViewReference,
-        includeTokenDataAndSSR: true,
-      },
-      ["reference-tracked"]: {
-        renderer: "PropertyViewSimple",
-        handler: PropertyViewReference,
-        includeTokenDataAndSSR: true,
-      }
-    },
   },
   integer: {
     renderer: "PropertyViewSimple",

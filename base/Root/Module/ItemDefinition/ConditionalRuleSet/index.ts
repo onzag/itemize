@@ -49,9 +49,10 @@ export type ConditionalRuleServerFlagType = "CREATE_ONLY" | "EDIT_ONLY" | "SEARC
 /**
  * DATA TYPES (only used by the data item)
  */
-interface IConditionalRuleSetRawJSONDataBaseType {
+export interface IConditionalRuleSetRawJSONDataBaseType {
   gate?: ConditionalRuleGateType;
-  condition?: IConditionalRuleSetRawJSONDataType;
+  condition?: IConditionalRuleSetRawJSONDataType | IConditionalRuleSetRawJSONDataType[];
+  internalConditionGate?: ConditionalRuleGateType;
   serverFlag?: ConditionalRuleServerFlagType;
 }
 
@@ -108,6 +109,7 @@ export interface IConditionalRuleSetRawJSONDataIncludeType
  * both types of conditions combined
  */
 export type IConditionalRuleSetRawJSONDataType =
+  IConditionalRuleSetRawJSONDataBaseType |
   IConditionalRuleSetRawJSONDataPropertyType |
   IConditionalRuleSetRawJSONDataIncludeType;
 
@@ -190,7 +192,7 @@ export default class ConditionalRuleSet {
   /**
    * an internal condition for nested conditions
    */
-  private condition: ConditionalRuleSet;
+  private conditions: ConditionalRuleSet[];
 
   /**
    * Constructor
@@ -212,9 +214,18 @@ export default class ConditionalRuleSet {
   ) {
     // so we setup the initial properties
     this.rawData = rawJSON;
-    this.condition = rawJSON.condition &&
-      new ConditionalRuleSet(rawJSON.condition, parentModule,
-        parentItemDefinition, parentPropertyDefinition, parentInclude);
+    this.conditions = rawJSON.condition ?
+      Array.isArray(rawJSON.condition) ? (
+        rawJSON.condition.map((c) => new ConditionalRuleSet(c, parentModule,
+          parentItemDefinition, parentPropertyDefinition, parentInclude)
+        )
+      ) : (
+        [
+          new ConditionalRuleSet(rawJSON.condition, parentModule,
+            parentItemDefinition, parentPropertyDefinition, parentInclude),
+        ]
+      ) : null;
+
 
     this.parentItemDefinition = parentItemDefinition;
     this.parentModule = parentModule;
@@ -239,6 +250,7 @@ export default class ConditionalRuleSet {
 
     // if this is a property type conditional rule set
     let result: boolean = false;
+    let resolved: boolean = false;
 
     // so now let's check as a property
     const rawDataAsProperty: IConditionalRuleSetRawJSONDataPropertyType =
@@ -246,6 +258,7 @@ export default class ConditionalRuleSet {
 
     // if it's in fact a property type
     if (rawDataAsProperty.property) {
+      resolved = true;
 
       // lets get the property value as for now
       let actualPropertyValue = null;
@@ -293,8 +306,8 @@ export default class ConditionalRuleSet {
 
       // This method swallows the nulls so it's allowed here
       if (rawDataAsProperty.method === "string") {
-        actualPropertyValue = ((actualPropertyValue || "").toString()).toLowerCase();
-        actualComparedValue = ((actualComparedValue || "").toString()).toLowerCase();
+        actualPropertyValue = ((actualPropertyValue || "").toString()).toLowerCase();
+        actualComparedValue = ((actualComparedValue || "").toString()).toLowerCase();
       }
 
       // nulls cannot be compared via these methods so it gives false
@@ -315,7 +328,7 @@ export default class ConditionalRuleSet {
       ) {
         result = false;
 
-      // otherwise using the datetime method
+        // otherwise using the datetime method
       } else if (
         (rawDataAsProperty.method === "date" || rawDataAsProperty.method === "datetime" || rawDataAsProperty.method === "time") &&
         // and we have invalid dates, that's also impossible to compare
@@ -368,11 +381,13 @@ export default class ConditionalRuleSet {
             break;
         }
       }
+    }
+    
     // Otherwise in case it's a component based one
-    } else {
-      const rawDataAsComponent: IConditionalRuleSetRawJSONDataIncludeType =
+    const rawDataAsComponent: IConditionalRuleSetRawJSONDataIncludeType =
         this.rawData as IConditionalRuleSetRawJSONDataIncludeType;
-
+    if (rawDataAsComponent.include) {
+      resolved = true;
       // let's check whether there is an item instance for that
       // component that are active (aka not excluded)
       const hasOneOf = rawDataAsComponent.include[0] === "#" ?
@@ -384,8 +399,14 @@ export default class ConditionalRuleSet {
         (!hasOneOf && !rawDataAsComponent.isIncluded);
     }
 
+    // is not any of the other types
+    // we consider it then to have resulting it to true
+    if (!resolved) {
+      result = true;
+    }
+
     // now we have a result, but we might have a chain, a children condition
-    if (this.condition) {
+    if (this.conditions) {
       if (this.rawData.gate === "and" && !result) {
         return false;
       } else if (this.rawData.gate === "or" && result) {
@@ -393,16 +414,30 @@ export default class ConditionalRuleSet {
       }
 
       // if we do we have to evaluate it
-      const conditionResult = this.condition.evaluate(id, version);
+      const logicToUse = !this.rawData.internalConditionGate || this.rawData.internalConditionGate === "and" ? "every" : (
+        this.rawData.internalConditionGate === "or" ? "some" : null
+      );
+      // basically if it's and it will use every
+      // if it's or it will use some
+      // however if it's xor we need to use custom logic
+      let conditionsResult: boolean;
+      if (logicToUse) {
+        conditionsResult = this.conditions[logicToUse]((c) => c.evaluate(id, version));
+      } else {
+        const evaluationArray = this.conditions.map((c) => c.evaluate(id, version));
+        const truthCount = evaluationArray.filter((v) => v).length;
+        // only one of them is true
+        conditionsResult = truthCount === 1;
+      }
 
       // and use the gate to calculate the proper result
       switch (this.rawData.gate) {
         case "and":
-          return result && conditionResult;
+          return result && conditionsResult;
         case "or":
-          return result || conditionResult;
+          return result || conditionsResult;
         case "xor":
-          return result ? !conditionResult : conditionResult;
+          return result ? !conditionsResult : conditionsResult;
       }
     } else {
       return result;

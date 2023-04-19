@@ -20,7 +20,6 @@ import { IPropertyViewBooleanRendererProps } from "../internal/components/Proper
 import { IPropertyViewDateTimeRendererProps } from "../internal/components/PropertyView/PropertyViewDateTime";
 import { IPropertyViewLocationRendererProps } from "../internal/components/PropertyView/PropertyViewLocation";
 import { IPropertyViewCurrencyRendererProps } from "../internal/components/PropertyView/PropertyViewCurrency";
-import { IPropertyEntryReferenceRendererProps } from "../internal/components/PropertyEntry/PropertyEntryReference";
 import { IPropertyEntryPaymentRendererProps } from "../internal/components/PropertyEntry/PropertyEntryPayment";
 import { IPropertyEntryTagListRendererProps } from "../internal/components/PropertyEntry/PropertyEntryTagList";
 import { IPropertyEntryFilesRendererProps } from "../internal/components/PropertyEntry/PropertyEntryFiles";
@@ -53,22 +52,6 @@ export interface IRendererContext {
    */
   PropertyEntryField?: React.ComponentType<IPropertyEntryFieldRendererProps>;
 
-  /**
-   * The renderer that renders integer/reference, a reference shows itself as
-   * a textual value that represents an id to an item definition, but only the id
-   * where versions are expected to be locales, the reference renderer is used mainly
-   * for autocomplete purposes, eg. user_id can be a reference that references an user id
-   * of the module users, item definition user; and it uses name as display, references
-   * while incredible complex show itself pretty humbly to the renderer, so a renderer
-   * for this should be simpler to implement than a renderer to the Field or Location
-   * 
-   * When creating an entry reference renderer, do not use the onChange or currentValue
-   * instead use currentTextualValue and onSelect via the options that are given, and when
-   * changing the field used the onChangeSearch so you get options you can select,
-   * you can use currentValue to check if anything is currently selected, should be a number
-   * larger than 0
-   */
-  PropertyEntryReference?: React.ComponentType<IPropertyEntryReferenceRendererProps>;
   /**
    * The file renderer is used only for files, as simple as that
    * 

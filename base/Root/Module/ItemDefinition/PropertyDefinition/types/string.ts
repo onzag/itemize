@@ -71,8 +71,6 @@ export const exactStringSearchSubtypes = [
   "exact-value",
   "exact-value-tracked",
   "exact-identifier-tracked",
-  "reference",
-  "reference-tracked",
   // TODO check that JSON works well
   // it's an unchecked subtype
   "json",
@@ -185,10 +183,6 @@ const typeValue: IPropertyDefinitionSupportedType<PropertyDefinitionSupportedStr
 
     const subtype = p.subtype;
 
-    if ((subtype === "reference" || subtype === "reference-tracked") && s === "") {
-      return PropertyInvalidReason.INVALID_SUBTYPE_VALUE;
-    }
-
     if (subtype === "email" && !EMAIL_REGEX.test(s)) {
       return PropertyInvalidReason.INVALID_SUBTYPE_VALUE;
     }
@@ -241,41 +235,6 @@ const typeValue: IPropertyDefinitionSupportedType<PropertyDefinitionSupportedStr
   searchable: true,
   searchInterface: PropertyDefinitionSearchInterfacesType.STRING,
   allowsMinMaxLengthDefined: true,
-
-  specialProperties: [
-    {
-      name: "referencedModule",
-      type: "string",
-      required: ["reference", "reference-tracked"],
-    },
-    {
-      name: "referencedItemDefinition",
-      type: "string",
-      required: ["reference", "reference-tracked"],
-    },
-    {
-      name: "referencedSearchProperty",
-      type: "string",
-      required: ["reference", "reference-tracked"],
-    },
-    {
-      name: "referencedDisplayProperty",
-      type: "string",
-      required: ["reference", "reference-tracked"],
-    },
-    {
-      name: "referencedFilteringPropertySet",
-      type: "property-set",
-    },
-    {
-      name: "referencedFilterByLanguage",
-      type: "boolean",
-    },
-    {
-      name: "referencedFilterByCreatedBySelf",
-      type: "boolean",
-    },
-  ],
 
   // i18n attributes required
   i18n: {

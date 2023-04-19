@@ -184,7 +184,7 @@ export function standardSQLInFn(arg: ISQLInInfo): ISQLTableRowValue {
     const decimalCount = (arg.value.toString().split(".")[1] || "").length;
     if (decimalCount > maxDecimalCount) {
       return {
-        [arg.prefix + arg.id]: Math.round(arg.value * (10**maxDecimalCount)) / (10**maxDecimalCount),
+        [arg.prefix + arg.id]: Math.round(arg.value * (10 ** maxDecimalCount)) / (10 ** maxDecimalCount),
       };
     }
   }
@@ -231,10 +231,10 @@ export function standardSQLOutFn(fallbackNull: any, arg: ISQLOutInfo): any {
     }
     const decimalCount = (value.toString().split(".")[1] || "").length;
     if (decimalCount > maxDecimalCount) {
-      value = Math.round(value * (10**maxDecimalCount)) / (10**maxDecimalCount);
+      value = Math.round(value * (10 ** maxDecimalCount)) / (10 ** maxDecimalCount);
     }
   }
-  
+
   if (
     (
       typeof value === "undefined" ||
@@ -319,12 +319,19 @@ export function standardSQLSearchFnExactAndRange(arg: ISQLSearchInfo) {
     searchedByIt = true;
   }
 
+  // we will try to force an exact search if from and to are equal
+  let alreadyUsedTo = false;
   if (typeof arg.args[fromName] !== "undefined" && arg.args[fromName] !== null) {
-    arg.whereBuilder.andWhereColumn(arg.prefix + arg.id, ">=", arg.args[fromName] as any);
+    if (arg.args[fromName] === arg.args[toName]) {
+      alreadyUsedTo = true;
+      arg.whereBuilder.andWhereColumn(arg.prefix + arg.id, arg.args[fromName] as any);
+    } else {
+      arg.whereBuilder.andWhereColumn(arg.prefix + arg.id, ">=", arg.args[fromName] as any);
+    }
     searchedByIt = true;
   }
 
-  if (typeof arg.args[toName] !== "undefined" && arg.args[toName] !== null) {
+  if (!alreadyUsedTo && typeof arg.args[toName] !== "undefined" && arg.args[toName] !== null) {
     arg.whereBuilder.andWhereColumn(arg.prefix + arg.id, "<=", arg.args[toName] as any);
     searchedByIt = true;
   }
@@ -360,43 +367,50 @@ function internalElasticSeachFn(arg: IElasticSearchInfo, nullFieldValue: string,
   const hasFromDefined = typeof arg.args[fromName] !== "undefined" && arg.args[fromName] !== null;
 
   if (hasToDefined || hasFromDefined) {
-    const rule: any = {};
-    if (hasFromDefined) {
-      rule.gte = arg.args[fromName];
-    }
-    if (hasToDefined) {
-      rule.lte = arg.args[toName];
-    }
-
-    if (!nullStyle) {
-      arg.elasticQueryBuilder.must({
-        bool: {
-          must: [
-            {
-              range: {
-                [arg.prefix + arg.id]: rule,
-              },
-            }
-          ],
-          must_not: [
-            {
-              term: {
-                [arg.prefix + arg.id]: nullFieldValue,
-              }
-            }
-          ],
-          boost: arg.boost,
-        }
-      });
-    } else {
-      arg.elasticQueryBuilder.must({
-        range: {
-          [arg.prefix + arg.id]: rule,
-        },
+    // check if they are equal to prevent using range
+    if (arg.args[fromName] === arg.args[toName]) {
+      arg.elasticQueryBuilder.mustTerm({
+        [arg.prefix + arg.id]: arg.args[fromName] as any,
       }, arg.boost);
-    }
+    } else {
+      const rule: any = {};
+      if (hasFromDefined) {
+        rule.gte = arg.args[fromName];
+      }
+      if (hasToDefined) {
+        rule.lte = arg.args[toName];
+      }
 
-    searchedByIt = true;
+      if (!nullStyle) {
+        arg.elasticQueryBuilder.must({
+          bool: {
+            must: [
+              {
+                range: {
+                  [arg.prefix + arg.id]: rule,
+                },
+              }
+            ],
+            must_not: [
+              {
+                term: {
+                  [arg.prefix + arg.id]: nullFieldValue,
+                }
+              }
+            ],
+            boost: arg.boost,
+          }
+        });
+      } else {
+        arg.elasticQueryBuilder.must({
+          range: {
+            [arg.prefix + arg.id]: rule,
+          },
+        }, arg.boost);
+      }
+
+      searchedByIt = true;
+    }
   }
 
   return searchedByIt ? {} : null;

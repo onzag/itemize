@@ -716,13 +716,13 @@ export default class PropertyDefinition {
     // TOO_SMALL check
     if (
       typeof propertyDefinitionRaw.min !== "undefined" &&
-      valueToCheck < propertyDefinitionRaw.min
+      (valueToCheck as any) < propertyDefinitionRaw.min
     ) {
       return PropertyInvalidReason.TOO_SMALL;
       // TOO_LARGE check
     } else if (
       typeof propertyDefinitionRaw.max !== "undefined" &&
-      valueToCheck > propertyDefinitionRaw.max
+      (valueToCheck as any) > propertyDefinitionRaw.max
     ) {
       return PropertyInvalidReason.TOO_LARGE;
       // TO_SMALL check again but lenght based

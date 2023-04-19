@@ -35,10 +35,10 @@ export function getConversionRulesetId(
  */
 export function buildSearchModeConditionalRuleSet(
   rawData: IConditionalRuleSetRawJSONDataType,
-  otherKnownProperties: {[id: string]: IPropertyDefinitionRawJSONDataType},
+  otherKnownProperties: { [id: string]: IPropertyDefinitionRawJSONDataType },
 ): IConditionalRuleSetRawJSONDataType {
   // we make a copy
-  const newRule = {...rawData};
+  const newRule = { ...rawData };
 
   // if it's a property based rule
   if ((newRule as IConditionalRuleSetRawJSONDataPropertyType).property) {
@@ -85,15 +85,26 @@ export function buildSearchModeConditionalRuleSet(
 
   // if we have a secondary condition
   if (newRule.condition) {
-    // we need to recurse in
-    const newCondition = buildSearchModeConditionalRuleSet(newRule.condition, otherKnownProperties);
-    // if that collapsed
-    if (newCondition === null) {
-      // then this one collapsed too
-      return null;
+    if (!Array.isArray(newRule.condition)) {
+      // we need to recurse in
+      const newCondition = buildSearchModeConditionalRuleSet(newRule.condition, otherKnownProperties);
+      // if that collapsed
+      if (newCondition === null) {
+        // then this one collapsed too
+        return null;
+      }
+      // otherwise we just set the condition
+      newRule.condition = newCondition;
+    } else {
+      const allConditions = newRule.condition.map((v) => buildSearchModeConditionalRuleSet(v, otherKnownProperties));
+
+      // it collapsed
+      if (allConditions.some((v) => !v)) {
+        return null;        
+      }
+
+      newRule.condition = allConditions;
     }
-    // otherwise we just set the condition
-    newRule.condition = newCondition;
   }
   // and return
   return newRule;
