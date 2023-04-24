@@ -191,6 +191,7 @@ export default {
         gate: ["condition"],
         condition: ["gate"],
       },
+      additionalProperties: false,
     },
   ],
 };
