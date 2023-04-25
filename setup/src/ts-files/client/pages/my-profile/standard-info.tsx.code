@@ -126,7 +126,7 @@ const style = {
 	},
 	button: (theme: Theme) => ({
 		padding: 0,
-    	color: theme.palette.grey[800],
+			color: theme.palette.grey[800],
 	}),
 	pickers: {
 		display: "flex",
@@ -165,12 +165,12 @@ function AlertBoxMissing(props: AlertBoxMissingProps) {
 	}, []);
 	return (
 		<Reader id="email">
-			{(email: string, emailState: IPropertyDefinitionState) => {
+			{(email: string, emailState: IPropertyDefinitionState<string>) => {
 				const missesEmail = !(emailState && emailState.stateAppliedValue);
 
 				return (
 					<Reader id="phone">
-						{(phone: string, phoneState: IPropertyDefinitionState) => {
+						{(phone: string, phoneState: IPropertyDefinitionState<string>) => {
 							const missesPhone = !(phone && phoneState.stateAppliedValue);
 							if (missesEmail && missesPhone) {
 								return (
@@ -193,7 +193,7 @@ function AlertBoxMissing(props: AlertBoxMissingProps) {
 
 							return (
 								<Reader id={props.validatedPropertyId}>
-									{(validatedProperty: boolean, validatedPropertyState: IPropertyDefinitionState) => {
+									{(validatedProperty: boolean, validatedPropertyState: IPropertyDefinitionState<boolean>) => {
 										const missesValidation = !(validatedPropertyState && validatedPropertyState.stateAppliedValue);
 										if (missesValidation) {
 											return (
@@ -349,7 +349,7 @@ export function CurrentUserProfileStandardInfo() {
 						)}
 					</I18nReadMany>
 				</Box>
-				<Entry id="username" icon={<AccountCircleIcon />} />
+				<Entry id="username" rendererArgs={{icon: <AccountCircleIcon />}} />
 
 				<Reader id="mode">
 					{(mode: string) => {
@@ -359,7 +359,7 @@ export function CurrentUserProfileStandardInfo() {
 									{(i18nAltLabel: string) => (
 										<Entry
 											id="real_name"
-											icon={<AccountBalanceIcon />}
+											rendererArgs={{icon: <AccountBalanceIcon />}}
 											altLabel={i18nAltLabel}
 											altPlaceholder={i18nAltLabel}
 										/>
@@ -369,7 +369,7 @@ export function CurrentUserProfileStandardInfo() {
 						return (
 							<Entry
 								id="real_name"
-								icon={<AssignmentIndIcon />}
+								rendererArgs={{icon: <AssignmentIndIcon />}}
 							/>
 						);
 					}}
@@ -377,9 +377,9 @@ export function CurrentUserProfileStandardInfo() {
 
 
 				<AlertBoxMissing propertyId="email" validatedPropertyId="e_validated" />
-				<Entry id="email" rendererArgs={{ descriptionAsAlert: true }} icon={<AlernateEmailIcon />} />
+				<Entry id="email" rendererArgs={{ descriptionAsAlert: true, icon: <AlernateEmailIcon /> }} />
 				<AlertBoxMissing propertyId="phone" validatedPropertyId="p_validated" />
-				<Entry id="phone" rendererArgs={{ descriptionAsAlert: true }} icon={<PhoneIphoneIcon />} />
+				<Entry id="phone" rendererArgs={{ descriptionAsAlert: true, icon: <PhoneIphoneIcon /> }} />
 
 				<Reader id="mode">
 					{(mode: string) => {
@@ -391,7 +391,7 @@ export function CurrentUserProfileStandardInfo() {
 											{(i18nAltPlaceholder: string) => (
 												<Entry
 													id="about_me"
-													icon={<DomainIcon />}
+													rendererArgs={{icon: <DomainIcon />}}
 													altLabel={i18nAltLabel}
 													altPlaceholder={i18nAltPlaceholder}
 												/>
@@ -402,7 +402,7 @@ export function CurrentUserProfileStandardInfo() {
 							);
 						}
 
-						return <Entry id="about_me" icon={<DomainIcon />} />;
+						return <Entry id="about_me" rendererArgs={{icon: <DomainIcon />}} />;
 					}}
 				</Reader>
 

@@ -43,7 +43,8 @@ export async function sensitiveConfigSetup(
         variableName: "userLocalization",
         message: "The configuration used by the user localizer, if given, this enables to find the user location in order " +
         "to accurately predict what language such user speaks, it uses the ip in order to do such prediction, itemize by default " +
-        "uses the IPStack provider, so you might refer to https://ipstack.com/product to get a free API key",
+        "uses elasticsearch (so you may leave it null) however without elastic, you may specify data for the IPStack provider, " +
+        "so you might refer to https://ipstack.com/product to get a free API key",
         type: "config",
         defaultValue: null,
         extractData: [
@@ -190,7 +191,7 @@ export async function sensitiveConfigSetup(
       },
       {
         variableName: "logging",
-        message: "The API configuration used for logging, leave it null to log into main database, but this is not recommended for production",
+        message: "The API configuration used for logging, leave it null to log into main database (not recommended) or elastic (recommended)",
         type: "config",
         defaultValue: null,
         extractData: [],
@@ -283,7 +284,16 @@ export async function sensitiveConfigSetup(
         variableName: "devKey",
         message: "a development key that is used to obtain development javascript files in production settings when set as a cookie",
         defaultValue: genToken(16),
-      }
+      },
+      {
+        variableName: "ussd",
+        message: "The API configuration used for USSD protocol for extremely old devices",
+        type: "config",
+        defaultValue: null,
+        extractData: [],
+        preferUnfilled: true,
+        cantRerun: true,
+      },
     ],
   );
 

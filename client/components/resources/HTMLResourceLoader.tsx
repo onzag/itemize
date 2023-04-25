@@ -7,19 +7,13 @@
  */
 
 import React from "react";
-import type { IResourceCollectionResult } from "../../../server/ssr/collect";
-import type { IAppDataType } from "../../../server";
 import type { IResourceLoaderProps } from "./ResourceLoader";
 import ResourceLoader from "./ResourceLoader";
 
 /**
  * The props for the html resource loader
  */
-interface IHTMLResourceLoaderProps extends Omit<IResourceLoaderProps, "children"> {
-  /**
-   * Includes the token in the header for usage in validation as token
-   */
-  includeToken?: boolean;
+interface IHTMLResourceLoaderProps extends Omit<IResourceLoaderProps, "children" | "type"> {
   /**
    * an optional wrapper component string, eg, "div", "span", etc...
    */
@@ -36,35 +30,6 @@ interface IHTMLResourceLoaderProps extends Omit<IResourceLoaderProps, "children"
    * An optional component to render if it fails to load
    */
   failedComponent?: React.ReactNode;
-
-  /**
-   * the source path as a string, by default it is /rest/resource/
-   */
-   path?: string;
-   /**
-    * The server side resolver
-    * TODO this has to do with the generator in order
-    * to realize how this is resolved we need to support resources
-    * in our SSR and request manager
-    */
-   serverSideResolver?: (appData: IAppDataType) => Promise<IResourceCollectionResult>;
-   /**
-    * the source as a string, without the /rest/resource/ part, which is
-    * defined in the path
-    */
-   src: string;
-   /**
-    * sw cacheable flag, defaults to true
-    */
-   swCacheable?: boolean;
-   /**
-    * sw network first flag, defaults to false
-    */
-   swNetworkFirst?: boolean;
-   /**
-    * sw recheck flag, rechecks the content after done, defaults to false
-    */
-   swRecheck?: boolean;
 }
 
 /**
@@ -75,7 +40,7 @@ interface IHTMLResourceLoaderProps extends Omit<IResourceLoaderProps, "children"
  */
 export default function HTMLResourceLoader(props: IHTMLResourceLoaderProps) {
   return (
-    <ResourceLoader {...props}>
+    <ResourceLoader {...props} type="text">
       {(data, loading, failed) => {
         // if we are loading and we have a loading component
         if (loading && props.loadingComponent) {

@@ -4,6 +4,8 @@ To configure itemize isn't the easiest nor the most straightforward process, it 
 
 ## Install the main dependencies
 
+Note as of the time of this writting itemize will only work on NodeJS version 15 as many of the dependencies do not work in later versions.
+
 - NodeJS `https://nodejs.org/en/download/`
 - Docker `https://docs.docker.com/get-docker/`
 
@@ -23,9 +25,13 @@ And get into it
 
 `npm init`
 
-Install the peer dependencies, note that material ui is only used for fast prototyping, and you can get rid of it afterwards by deciding not to use it in your project but it's necessary for proper initialization due to it being a dependency for fast prototyping client components (you'd get an error otherwise)
+Install the peer dependencies; the peer dependencies are required as they are used by itemize during the build process, specifying a version is necessary because older npm versions will simply not install peer dependencies which will cause itemize not to work
 
-`npm install --save react react-dom @types/react @types/react-dom @mui/icons-material @mui/lab @mui/material @mui/styles`
+As a result of npm design the following command should be run.
+
+As for the time of version 0.2xx
+
+`npm install --save react@^17.0.2 react-dom@^17.0.2 @types/react@^17.0.38 @types/react-dom@^17.0.11 @mui/icons-material@^5.3.1 @mui/lab@^5.0.0-alpha.66 @mui/material@^5.3.1 @mui/styles@^5.3.0 @emotion/css@^11.7.1 @emotion/react@^11.7.1 @emotion/server@^11.4.0 @emotion/styled@^11.6.0`
 
 Install itemize
 
@@ -43,7 +49,7 @@ By default you do not need any container storage provider, as it will be simply 
 
 The storage is necessary for SEO and file support,
 
-##### Openstack Object Storage
+##### Default Storage Provider: Openstack Object Storage
 
 Object storage is provided by several providers, and it's the default used in itemize when no provider has been specified it will assume that it is object storage, you can get as many as you want to but try to have them acrross different countries.
 
@@ -58,11 +64,11 @@ Once you get credentials for these buckets you may add them as such:
 {
     "containers": {
         "EUROPE": {
-            "username": "YudxasaPrC",
+            "username": "user",
             "password": "secret",
             "region": "DE",
             "domainId": "default",
-            "domainName": 
+            "domainName": "domain",
         }
     }
 }
@@ -70,15 +76,47 @@ Once you get credentials for these buckets you may add them as such:
 
 You might get many of these containers in order to setup a CDN of kinds, different countries can have different containers where data is stored for such.
 
+You can add as many as you need, but it's only possible to have one local.
+
+#### Logging
+
+By default your logs will go to the main database (no elastic enabled) or with elasticsearch it will log to elasticsearch.
+
+This is why it's recommended to always have elasticsearch on, otherwise the logs will have nowhere to go.
+
+In any case, fallback will always log to file; so some logs (for example connection error logs) will log to files, and logging will resume back to elasticsearch/main database once it's reestablished.
+
+##### Default Logging Provider: Main Database
+
+Not recommended, this occurs when the device does not know where to log, requires no setup and this is simply what will happen if elasticsearch is not available.
+
+##### Default Logging Provider: Elasticsearch
+
+Recommended method, logs are sent to elasticsearch where they can be searched and analyzed with kibana.
+
 #### Mapping
 
+Mapping is what is used to represent and manage locations in a human readable way by default no mapping is available and attempts to use location will end up in errors.
+
+The fast prototyping renderer will use openstreetmaps by default in this case at least for display.
+
+##### Default Mapping Provider: Here Maps
+
 `https://developer.here.com/` For usage in geocoding, geolocation, and autocomplete; the service doesn't need to be paid for initial usage; use it if you have the location type in your schema.
+
+For the activation of just being used in seaches, geolocation and autocomplete it should be done within the `index.sensitive.json`
+
+```json
+"locationSearch": {
+    "apiKey": "cObZ0Os1S-Nn8k18xv_yiJLR3W31v9BcGv1_AKm66ZM"
+},
+```
 
 You can activate here maps, over OSM in the maps visual as well by setting up your `index.sensitive.json` with the following `shared` configuration, replace API_KEY_HERE with your api key.
 
 Note that this is specific to the fast prototyping location entry and view renderer, if using other renderer this will have no effect.
 
-```
+```json
 "shared": {
     "leafletAttribution": "&copy; HERE 2019",
     "leafletUrl": "https://2.base.maps.ls.hereapi.com/maptile/2.1/maptile/newest/normal.day/{z}/{x}/{y}/512/png8?ppi=320&apiKey=API_KEY_HERE"
@@ -87,11 +125,92 @@ Note that this is specific to the fast prototyping location entry and view rende
 
 #### Email
 
+The email service allows you have the capability of using your project to send and receive its own emails; Itemize however does not act as an SMTP server, so a service provider is needed.
+
+By default itemize will simply log the emails being sent to console.
+
+##### Default Email Provider: Mailgun
+
 `https://www.mailgun.com/email-api/` Mailgun email API, for usage to send emails to user as well as validation and recovery, if not available, you might want to consider removing the email and e_validated property and restructuring the app, without mailgun sending validation emails and recovering accounts as well as login with email is not truly possible.
+
+In order to set it up the key is retrieved and placed at `index.sensitive.json` as
+
+```json
+"mail": {
+    "apiKey": "API_KEY",
+    "endpoint": "https://api.eu.mailgun.net/v3"
+}
+```
+
+#### Phone
+
+Similar to emails but to send text messages.
+
+##### Default Phone Provider: ????
+
+Currently it's not enabled and text messages cannot truly be sent
+
+#### User Localizatiom
+
+The user localization provider is used in order to establish the country of user you are getting a visit from which will set initial language, currency and country of origin.
+
+##### Default Localizatiom Provider: Elasticsearch
+
+As long as elasticsearch is available (which should be) this will be used in order to determine the user localization), as this is one of elasticsearch capabilities and comes free of cost; and this will always be the case and no configuration is required.
+
+##### Default Localizatiom Provider: IPStack
+
+Otherwise if elasticsearch is disabled (not recommended), the default is ipstack and it requires configuration.
 
 `https://ipstack.com/` An ipstack api key, this should not cost any money and you shouldn't need to pay until you have more than 10000 users; without an ip stack key user tracking to set up initial language and country is not possible and will use the fallbacks.
 
+And in order to set it up at `index.sensitive.json` should be set with
+
+```json
+"userLocalization": {
+    "apiKey": "API_KEY",
+    "httpsEnabled": false,
+}
+```
+
+#### Currency Support
+
+By default currency support is not enabled and attempting to use currencies will result in an error if no server data for the factors could be established.
+
+With currency support the values of the currency are stored based on a global currency.
+
+##### Default Currency Provider: Currency Layer
+
 `https://currencylayer.com/` A currency layer api key, this should not cost any money until due to the fact that itemize updates the currency factors only every so often, use only if you need/use currency types in your system.
+
+And in order to set it up at `index.sensitive.json` should be set with
+
+```json
+"userLocalization": {
+    "apiKey": "API_KEY",
+    "httpsEnabled": false,
+}
+```
+
+#### Payment Support
+
+By default payments are not enabled and payment objects cannot be resolved, in order to do so a payment provider must be enabled.
+
+A payment provider is however not required for the owner of a payment object that has edit rights to establish this payment or subscription and change its state manually, the payment provider is only needed to do so automatically; for example a card payment that will setup a payment directly into the paid state without the user who triggered such action having the permissions.
+
+##### Default Payment Provider: ?????
+
+Currently there's no way to resolve payments externally.
+
+#### USSD Support
+
+USSD is an acient prototocol to be used in development countries to provide for services, itemize allows to create apps for this sort of protocol.
+
+You may use FAKE_USSD=true in order to test this functionality, note that using FAKE_USSD in production opens up a big hole in the security as this enables a developer interface that acts like a mobile device for interaction with the app.
+
+##### Default USSD Provider: ????
+
+Currently there's no way to 
 
 ### Initial Configuration
 
@@ -117,7 +236,7 @@ Missing resource file: contact/en.html
 
 This is okay, it is just a warning, it is endorsed that you have these resources as part of your bundle, but they are not necessary for the application to work, after all you might decide that you want to handle these as fragments or versioned localized items of their own.
 
-### Start a development environment (optional but necessary if you don't have an external database/redis)
+### Start a development environment (optional but necessary if you don't have an external database/redis/elastic)
 
 `npm run start-dev-environment development`
 
@@ -138,6 +257,14 @@ This will build the database
 `npm run start-dev-server`
 
 This will start the development server locally and listening at localhost:8000
+
+Note that this will start a development server that uses all the configuration available which is not recommended for a development server environment where code is meant to constantly change, a better start consists of
+
+`NO_SSR=true NO_SEO=true FAKE_EMAILS=true FAKE_SMS=true npm run start-dev-server`
+
+And if you are using elasticsearch with tls in your own build (default) you must also include the flag for unathorized tls handshakes.
+
+`NODE_TLS_REJECT_UNAUTHORIZED=0 NO_SSR=true NO_SEO=true FAKE_EMAILS=true FAKE_SMS=true npm run start-dev-server`
 
 ### Access your application
 

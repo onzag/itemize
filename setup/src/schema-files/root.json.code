@@ -3,7 +3,8 @@
 	"children": [
 		"users",
 		"flag",
-		"cms"
+		"cms",
+		"mail"
 	],
 	"i18n": "main-i18n.properties"
 }

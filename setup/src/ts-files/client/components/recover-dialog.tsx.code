@@ -114,7 +114,9 @@ export function RecoverDialog(props: IRecoverDialogProps) {
 															onEntryDrivenChange={actioner.dismissStatefulError}
 															showAsInvalid={!phone && !!actioner.statefulError}
 															hideDescription={true}
-															icon={<AlernateEmailIcon />}
+															rendererArgs={{
+																icon: <AlernateEmailIcon />,
+															}}
 															autoFocus={true}
 															disabled={!!phone}
 														/>
@@ -127,7 +129,9 @@ export function RecoverDialog(props: IRecoverDialogProps) {
 															onEntryDrivenChange={actioner.dismissStatefulError}
 															showAsInvalid={!email && !!actioner.statefulError}
 															hideDescription={true}
-															icon={<PhoneIphoneIcon />}
+															rendererArgs={{
+																icon: <PhoneIphoneIcon />,
+															}}
 															disabled={!!email}
 														/>
 													)}

@@ -1,4 +1,5 @@
-const en = `name = flag
+const en = `[en]
+name = flag
 search_field_label = flag search
 search_field_placeholder = insert relevant flag data
 search_value_too_large = your search is too long, please narrow it down
@@ -35,7 +36,8 @@ properties.reason_text.label = additional information
 properties.reason_text.placeholder = additional information
 properties.reason_text.error.TOO_LARGE = text is too long`;
 
-const es = `name = reporte
+const es = `[es]
+name = reporte
 search_field_label = buscar reporte
 search_field_placeholder = inserte información necesaria sobre el reporte
 search_value_too_large = los atributos de búsqueda son demasiado largos

@@ -39,7 +39,7 @@ const style = {
  * @param props the page props
  * @returns a react element
  */
-export function ChangePassword(props: WithStyles<typeof changePasswordStyles>) {
+export function ChangePassword() {
 	return (
 		<UserDataRetriever>
 			{(userData) => {

@@ -128,7 +128,9 @@ export function SignupDialog(props: ISignupDialogProps) {
 										id="username"
 										onEntryDrivenChange={actioner.dismissError}
 										showAsInvalid={!!actioner.error}
-										icon={<AccountCircleIcon/>}
+										rendererArgs={{
+											icon: <AccountCircleIcon/>,
+										}}
 										autoFocus={true}
 									/>
 									<Entry id="password" onEntryDrivenChange={actioner.dismissError} showAsInvalid={!!actioner.error} />

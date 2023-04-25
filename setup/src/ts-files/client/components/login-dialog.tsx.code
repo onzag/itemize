@@ -124,7 +124,9 @@ export function LoginDialog(props: ILoginDialogProps) {
 														ignoreErrors={true}
 														altLabel={i18nAltLabel}
 														altPlaceholder={i18nAltPlaceholder}
-														icon={<AccountCircleIcon />}
+														rendererArgs={{
+															icon: <AccountCircleIcon />,
+														}}
 														autoFocus={true}
 													/>
 												)}

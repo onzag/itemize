@@ -88,12 +88,12 @@ export function Preferences() {
 							<ItemLoader>
 								<Container maxWidth="md" sx={style.container}>
 									<Paper sx={style.paper}>
-										<Entry id="e_notifications" icon={<NotificationsIcon />} />
-										<Entry id="p_notifications" icon={<PhoneIphoneIcon />} />
-										<Entry id="e_newsletter" icon={<MenuBookIcon />} />
-										<Entry id="consent" icon={<SecurityIcon />} />
-
-										<Entry id="address" icon={<PersonPinIcon />} rendererArgs={{ descriptionAsAlert: true }} />
+										<Entry id="e_notifications" rendererArgs={{icon: <NotificationsIcon />}} />
+										<Entry id="p_notifications" rendererArgs={{icon: <PhoneIphoneIcon />}} />
+										<Entry id="e_newsletter" rendererArgs={{icon: <MenuBookIcon />}} />
+										<Entry id="consent" rendererArgs={{icon: <SecurityIcon />}} />
+										
+										<Entry id="address" rendererArgs={{ descriptionAsAlert: true, icon: <PersonPinIcon/> }} />
 
 										<Divider />
 

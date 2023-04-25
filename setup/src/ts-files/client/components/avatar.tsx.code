@@ -97,13 +97,13 @@ export function Avatar(props: IAvatarProps) {
 
 											return (
 												<Reader id="email">
-													{(email: string, emailState: IPropertyDefinitionState) => (
+													{(email: string, emailState: IPropertyDefinitionState<string>) => (
 														<Reader id="e_validated">
-															{(eValidated: boolean, eValidatedState: IPropertyDefinitionState) => (
+															{(eValidated: boolean, eValidatedState: IPropertyDefinitionState<boolean>) => (
 																<Reader id="phone">
-																	{(phone: string, phoneState: IPropertyDefinitionState) => (
+																	{(phone: string, phoneState: IPropertyDefinitionState<string>) => (
 																		<Reader id="p_validated">
-																			{(pValidated: boolean, pValidatedState: IPropertyDefinitionState) => {
+																			{(pValidated: boolean, pValidatedState: IPropertyDefinitionState<boolean>) => {
 																				// now we check for these warnings
 																				const hasWarningForMissingEmailAndPhone =
 																					!(emailState && emailState.stateAppliedValue) &&

@@ -1,0 +1,162 @@
+{
+    "type": "item",
+    "properties": [
+        {
+            "id": "uuid",
+            "type": "string",
+            "hidden": true,
+            "nullable": true,
+            "editRoleAccess": [],
+            "createRoleAccess": []
+        },
+        {
+            "id": "references",
+            "type": "taglist",
+            "subtype": "arbitrary-tags",
+            "editRoleAccess": [],
+            "createRoleAccess": [],
+            "hidden": true,
+            "nullable": true
+        },
+        {
+            "id": "timestamp",
+            "type": "datetime",
+            "editRoleAccess": [],
+            "createRoleAccess": [],
+            "hidden": true,
+            "nullable": true,
+            "coerceNullsIntoDefault": true,
+            "default": "now"
+        },
+        {
+            "id": "target",
+            "type": "taglist",
+            "subtype": "arbitrary-tags",
+            "editRoleAccess": [],
+            "maxLength": 50
+        },
+        {
+            "id": "source",
+            "type": "string",
+            "subtype": "exact-value",
+            "hidden": true,
+            "editRoleAccess": []
+        },
+        {
+            "id": "is_sender",
+            "type": "boolean",
+            "hidden": true,
+            "default": true,
+            "editRoleAccess": []
+        },
+        {
+            "id": "is_receiver",
+            "type": "boolean",
+            "hidden": true,
+            "default": false,
+            "editRoleAccess": []
+        },
+        {
+            "id": "read",
+            "type": "boolean",
+            "hidden": true,
+            "default": true,
+            "editRoleAccess": ["&OWNER"]
+        },
+        {
+            "id": "spam",
+            "type": "boolean",
+            "hidden": true,
+            "default": false,
+            "editRoleAccess": ["&OWNER"]
+        },
+        {
+            "id": "subject",
+            "type": "text",
+            "nullable": true,
+            "maxLength": 255,
+            "editRoleAccess": []
+        },
+        {
+            "id": "content",
+            "type": "text",
+            "subtype": "html",
+            "nullable": true,
+            "specialProperties": {
+                "mediaProperty": "cid_attachments",
+                "supportsImages": true,
+                "supportsVideos": false,
+                "supportsFiles": false,
+                "supportsContainers": true,
+                "supportedContainers": [],
+                "supportsCustom": true,
+                "supportsExternalLinks": true,
+                "supportsLinks": true,
+                "supportsQuote": true,
+                "supportsRichClasses": false,
+                "supportsTitle": true,
+                "supportsCustomStyles": true,
+                "supportsTemplating": false,
+                "supportsTables": true,
+                "supportsLists": true
+            },
+            "editRoleAccess": []
+        },
+        {
+            "id": "cid_attachments",
+            "type": "files",
+            "specialProperties": {
+                "smallDimension": "320x",
+                "mediumDimension": "640x",
+                "largeDimension": "1024x"
+            },
+            "hidden": true,
+            "nullable": true,
+            "maxLength": 50,
+            "editRoleAccess": []
+        },
+        {
+            "id": "attachments",
+            "type": "files",
+            "specialProperties": {
+                "smallDimension": "320x",
+                "mediumDimension": "640x",
+                "largeDimension": "1024x"
+            },
+            "nullable": true,
+            "maxLength": 50,
+            "editRoleAccess": []
+        },
+        {
+            "id": "tip",
+            "type": "boolean",
+            "hidden": true,
+            "nullable": true,
+            "default": true,
+            "coerceNullsIntoDefault": true,
+            "createRoleAccess": [],
+            "editRoleAccess": []
+        },
+        {
+            "id": "metadata",
+            "type": "string",
+            "subtype": "json",
+            "hidden": true,
+            "nullable": true,
+            "createRoleAccess": [],
+            "editRoleAccess": [],
+            "readRoleAccess": []
+        }
+    ],
+    "editRoleAccess": ["&OWNER"],
+    "parentingRoleAccess": ["&OWNER"],
+    "readRoleAccess": ["&OWNER"],
+    "searchEngineEnabled": true,
+    "searchEngineMainLangProperty": "subject",
+    "canBeParentedBy": [
+        {
+            "module": "mail",
+            "item": "mail"
+        }
+    ]
+}

@@ -1,0 +1,145 @@
+import React from "react";
+import Alert from '@mui/material/Alert';
+import BrokenImageIcon from "@mui/icons-material/BrokenImage";
+import AddAPhotoIcon from "@mui/icons-material/AddAPhoto";
+import { IPropertyEntryFileRendererProps } from "@onzag/itemize/client/internal/components/PropertyEntry/PropertyEntryFile";
+import Dropzone, { DropzoneRef } from "react-dropzone";
+import { MAX_FILE_SIZE } from "@onzag/itemize/constants";
+import Box from "@mui/material/Box";
+import { styled } from "@mui/material/styles";
+
+const style = {
+	hoverAddBackdrop: {
+		"cursor": "pointer",
+		"opacity": 0,
+		"width": "100%",
+		"height": "100%",
+		"backgroundColor": "black",
+		"color": "white",
+		"position": "absolute" as "absolute",
+		"top": 0,
+		"right": 0,
+		"left": 0,
+		"bottom": 0,
+		"alignItems": "flex-start",
+		"justifyContent": "flex-start",
+		"padding": "2rem",
+		"display": "flex",
+		"zIndex": 1,
+		"transition": "opacity 0.3s ease-in-out",
+		"&:hover, &.visible": {
+			opacity: 0.25,
+		},
+	},
+	bannerContainer: {
+		position: "relative",
+		display: "flex",
+		alignItems: "center",
+		justifyContent: "center",
+		flexDirection: "column",
+		width: "100%",
+		height: "100%",
+		zIndex: 0,
+		marginBottom: "-8rem",
+	},
+	bannerImageContainer: {
+		position: "absolute",
+		top: 0,
+		left: 0,
+		right: 0,
+		bottom: 0,
+	},
+	bannerImage: {
+		position: "absolute",
+		top: 0,
+		left: 0,
+		right: 0,
+		bottom: 0,
+		width: "100%",
+		height: "100%",
+		objectFit: "cover",
+	},
+	borderBox: {
+	},
+	uploadError: {
+		marginTop: "1rem",
+	},
+};
+
+/**
+ * When we drop the file, it takes a callback
+ * @param onSetFile the onSetFile function of the renderer, it's bind here
+ * @param files the files that have dropped by the react dropzone utility
+ */
+function onDrop(onSetFile: (file: File) => void, files: any[]) {
+	// we only set one file
+	onSetFile(typeof files[0].file !== "undefined" ? files[0].file : files[0]);
+}
+
+const StyledImg = styled("img")(style.bannerImage as any);
+
+/**
+ * A fully custom renderer for the avatar component for usage with file types
+ * so it can be passed as a custom renderer via the entry, eg...
+ * <Entry id="profile_picture" renderer={AvatarRenderer}/> rather
+ * than using the default
+ */
+export function BannerRenderer(props: IPropertyEntryFileRendererProps) {
+	const dropzoneRef = React.useRef<DropzoneRef>();
+
+	return (
+		<Box sx={style.bannerContainer}>
+			<Dropzone
+				onDropAccepted={onDrop.bind(null, props.onSetFile)}
+				onDropRejected={onDrop.bind(null, props.onSetFile)}
+				maxSize={MAX_FILE_SIZE}
+				accept={props.accept}
+				multiple={false}
+				noClick={false}
+				ref={dropzoneRef}
+				disabled={props.disabled}
+			>
+				{({
+					getRootProps,
+					getInputProps,
+					isDragAccept,
+					isDragReject,
+				}) => {
+					const { ref, ...rootProps } = getRootProps();
+					return (
+						<>
+							<div {...(rootProps as any)}>
+								<input {...(getInputProps() as any)} />
+								<Box sx={style.bannerImageContainer}>
+									{
+										props.currentValue ? <StyledImg
+											srcSet={props.imageSrcSet}
+											src={props.currentValue.url}
+											sizes="70vw"
+										/> : <Box sx={[style.borderBox, style.bannerImageContainer]}>
+											<StyledImg src={props.args.defaultImageSrc} sx={style.bannerImage} />
+										</Box>
+									}
+									<Box
+										className={isDragAccept || isDragReject ? "visible" : null}
+										sx={style.hoverAddBackdrop}
+									>
+										{isDragReject ? <BrokenImageIcon fontSize="large" /> : <AddAPhotoIcon fontSize="large" />}
+									</Box>
+								</Box>
+							</div>
+						</>
+					);
+				}}
+			</Dropzone>
+			{
+				(
+					props.currentInvalidReason ||
+					props.rejectedReason
+				) ?
+					<Alert sx={style.uploadError} severity="error" role="note">
+						{props.currentInvalidReason || props.rejectedReason}
+					</Alert> : null}
+		</Box>
+	);
+};
