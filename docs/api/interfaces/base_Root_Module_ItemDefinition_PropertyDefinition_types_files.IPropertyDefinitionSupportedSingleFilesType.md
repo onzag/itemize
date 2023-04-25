@@ -36,7 +36,7 @@ an unique id
 
 #### Defined in
 
-[gql-querier.ts:80](https://github.com/onzag/itemize/blob/5c2808d3/gql-querier.ts#L80)
+[gql-querier.ts:85](https://github.com/onzag/itemize/blob/f2db74a5/gql-querier.ts#L85)
 
 ___
 
@@ -56,7 +56,7 @@ dimensions, large, small and medium do not count
 
 #### Defined in
 
-[gql-querier.ts:96](https://github.com/onzag/itemize/blob/5c2808d3/gql-querier.ts#L96)
+[gql-querier.ts:101](https://github.com/onzag/itemize/blob/f2db74a5/gql-querier.ts#L101)
 
 ___
 
@@ -72,7 +72,7 @@ the name of the file
 
 #### Defined in
 
-[gql-querier.ts:72](https://github.com/onzag/itemize/blob/5c2808d3/gql-querier.ts#L72)
+[gql-querier.ts:77](https://github.com/onzag/itemize/blob/f2db74a5/gql-querier.ts#L77)
 
 ___
 
@@ -88,13 +88,13 @@ The size of the file in bytes
 
 #### Defined in
 
-[gql-querier.ts:88](https://github.com/onzag/itemize/blob/5c2808d3/gql-querier.ts#L88)
+[gql-querier.ts:93](https://github.com/onzag/itemize/blob/f2db74a5/gql-querier.ts#L93)
 
 ___
 
 ### src
 
-• `Optional` **src**: `Promise`<`any`\> \| `File` \| `Blob`
+• `Optional` **src**: `Blob` \| `ReadStream` \| `File` \| `Promise`<{ `createReadStream`: () => `ReadStream`  }\>
 
 A source, either a File, Blob or a read stream
 
@@ -104,7 +104,7 @@ A source, either a File, Blob or a read stream
 
 #### Defined in
 
-[gql-querier.ts:100](https://github.com/onzag/itemize/blob/5c2808d3/gql-querier.ts#L100)
+[gql-querier.ts:105](https://github.com/onzag/itemize/blob/f2db74a5/gql-querier.ts#L105)
 
 ___
 
@@ -120,7 +120,7 @@ The mime type
 
 #### Defined in
 
-[gql-querier.ts:76](https://github.com/onzag/itemize/blob/5c2808d3/gql-querier.ts#L76)
+[gql-querier.ts:81](https://github.com/onzag/itemize/blob/f2db74a5/gql-querier.ts#L81)
 
 ___
 
@@ -136,4 +136,4 @@ the url where it is stored
 
 #### Defined in
 
-[gql-querier.ts:84](https://github.com/onzag/itemize/blob/5c2808d3/gql-querier.ts#L84)
+[gql-querier.ts:89](https://github.com/onzag/itemize/blob/f2db74a5/gql-querier.ts#L89)

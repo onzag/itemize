@@ -20,13 +20,13 @@ for the paragraph element
 
 ### STANDARD\_PARAGRAPH
 
-▸ **STANDARD_PARAGRAPH**(`text?`): [`IParagraph`](../interfaces/client_internal_text_serializer_types_paragraph.IParagraph.md)
+▸ **STANDARD_PARAGRAPH**(`textOrInline?`): [`IParagraph`](../interfaces/client_internal_text_serializer_types_paragraph.IParagraph.md)
 
 #### Parameters
 
 | Name | Type |
 | :------ | :------ |
-| `text?` | `string` \| [`IText`](../interfaces/client_internal_text_serializer_types_text.IText.md) |
+| `textOrInline?` | `string` \| [`RichElement`](client_internal_text_serializer.md#richelement) \| [`IText`](../interfaces/client_internal_text_serializer_types_text.IText.md) |
 
 #### Returns
 
@@ -34,7 +34,7 @@ for the paragraph element
 
 #### Defined in
 
-[client/internal/text/serializer/types/paragraph.ts:15](https://github.com/onzag/itemize/blob/5c2808d3/client/internal/text/serializer/types/paragraph.ts#L15)
+[client/internal/text/serializer/types/paragraph.ts:15](https://github.com/onzag/itemize/blob/f2db74a5/client/internal/text/serializer/types/paragraph.ts#L15)
 
 ___
 
@@ -57,4 +57,4 @@ registry
 
 #### Defined in
 
-[client/internal/text/serializer/types/paragraph.ts:36](https://github.com/onzag/itemize/blob/5c2808d3/client/internal/text/serializer/types/paragraph.ts#L36)
+[client/internal/text/serializer/types/paragraph.ts:41](https://github.com/onzag/itemize/blob/f2db74a5/client/internal/text/serializer/types/paragraph.ts#L41)

@@ -10,7 +10,7 @@ null subtype
 
 ## Hierarchy
 
-- [`IPropertyViewRendererProps`](client_internal_components_PropertyView.IPropertyViewRendererProps.md)<[`PropertyDefinitionSupportedTextType`](../modules/base_Root_Module_ItemDefinition_PropertyDefinition_types_text.md#propertydefinitionsupportedtexttype)\>
+- [`IPropertyViewRendererProps`](client_internal_components_PropertyView.IPropertyViewRendererProps.md)<[`IPropertyDefinitionSupportedTextType`](base_Root_Module_ItemDefinition_PropertyDefinition_types_text.IPropertyDefinitionSupportedTextType.md)\>
 
   ↳ **`IPropertyViewTextRendererProps`**
 
@@ -20,6 +20,8 @@ null subtype
 
 - [args](client_internal_components_PropertyView_PropertyViewText.IPropertyViewTextRendererProps.md#args)
 - [currentValue](client_internal_components_PropertyView_PropertyViewText.IPropertyViewTextRendererProps.md#currentvalue)
+- [currentValueLang](client_internal_components_PropertyView_PropertyViewText.IPropertyViewTextRendererProps.md#currentvaluelang)
+- [currentValueText](client_internal_components_PropertyView_PropertyViewText.IPropertyViewTextRendererProps.md#currentvaluetext)
 - [isRichText](client_internal_components_PropertyView_PropertyViewText.IPropertyViewTextRendererProps.md#isrichtext)
 - [rtl](client_internal_components_PropertyView_PropertyViewText.IPropertyViewTextRendererProps.md#rtl)
 - [subtype](client_internal_components_PropertyView_PropertyViewText.IPropertyViewTextRendererProps.md#subtype)
@@ -42,13 +44,13 @@ The renderer args
 
 #### Defined in
 
-[client/internal/renderer.ts:19](https://github.com/onzag/itemize/blob/5c2808d3/client/internal/renderer.ts#L19)
+[client/internal/renderer.ts:19](https://github.com/onzag/itemize/blob/f2db74a5/client/internal/renderer.ts#L19)
 
 ___
 
 ### currentValue
 
-• **currentValue**: `string`
+• **currentValue**: [`IPropertyDefinitionSupportedTextType`](base_Root_Module_ItemDefinition_PropertyDefinition_types_text.IPropertyDefinitionSupportedTextType.md)
 
 The current value to be displayed
 
@@ -58,7 +60,32 @@ The current value to be displayed
 
 #### Defined in
 
-[client/internal/components/PropertyView/index.tsx:43](https://github.com/onzag/itemize/blob/5c2808d3/client/internal/components/PropertyView/index.tsx#L43)
+[client/internal/components/PropertyView/index.tsx:44](https://github.com/onzag/itemize/blob/f2db74a5/client/internal/components/PropertyView/index.tsx#L44)
+
+___
+
+### currentValueLang
+
+• **currentValueLang**: `string`
+
+The language used, or null, if no language found
+
+#### Defined in
+
+[client/internal/components/PropertyView/PropertyViewText.tsx:30](https://github.com/onzag/itemize/blob/f2db74a5/client/internal/components/PropertyView/PropertyViewText.tsx#L30)
+
+___
+
+### currentValueText
+
+• **currentValueText**: `string`
+
+A safe sanitized and processed value to use
+with the text type
+
+#### Defined in
+
+[client/internal/components/PropertyView/PropertyViewText.tsx:25](https://github.com/onzag/itemize/blob/f2db74a5/client/internal/components/PropertyView/PropertyViewText.tsx#L25)
 
 ___
 
@@ -70,7 +97,7 @@ Whether it is rich text, as in its subtype is html
 
 #### Defined in
 
-[client/internal/components/PropertyView/PropertyViewText.tsx:24](https://github.com/onzag/itemize/blob/5c2808d3/client/internal/components/PropertyView/PropertyViewText.tsx#L24)
+[client/internal/components/PropertyView/PropertyViewText.tsx:35](https://github.com/onzag/itemize/blob/f2db74a5/client/internal/components/PropertyView/PropertyViewText.tsx#L35)
 
 ___
 
@@ -86,7 +113,7 @@ Whether it is in rtl mode for a rtl language
 
 #### Defined in
 
-[client/internal/renderer.ts:15](https://github.com/onzag/itemize/blob/5c2808d3/client/internal/renderer.ts#L15)
+[client/internal/renderer.ts:15](https://github.com/onzag/itemize/blob/f2db74a5/client/internal/renderer.ts#L15)
 
 ___
 
@@ -98,4 +125,4 @@ Whether it is type html or plain
 
 #### Defined in
 
-[client/internal/components/PropertyView/PropertyViewText.tsx:28](https://github.com/onzag/itemize/blob/5c2808d3/client/internal/components/PropertyView/PropertyViewText.tsx#L28)
+[client/internal/components/PropertyView/PropertyViewText.tsx:39](https://github.com/onzag/itemize/blob/f2db74a5/client/internal/components/PropertyView/PropertyViewText.tsx#L39)

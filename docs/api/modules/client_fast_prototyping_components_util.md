@@ -36,4 +36,4 @@ a react component
 
 #### Defined in
 
-[client/fast-prototyping/components/util.tsx:78](https://github.com/onzag/itemize/blob/5c2808d3/client/fast-prototyping/components/util.tsx#L78)
+[client/fast-prototyping/components/util.tsx:78](https://github.com/onzag/itemize/blob/f2db74a5/client/fast-prototyping/components/util.tsx#L78)

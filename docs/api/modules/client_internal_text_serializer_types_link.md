@@ -36,4 +36,4 @@ registry
 
 #### Defined in
 
-[client/internal/text/serializer/types/link.ts:17](https://github.com/onzag/itemize/blob/5c2808d3/client/internal/text/serializer/types/link.ts#L17)
+[client/internal/text/serializer/types/link.ts:18](https://github.com/onzag/itemize/blob/f2db74a5/client/internal/text/serializer/types/link.ts#L18)

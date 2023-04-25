@@ -34,6 +34,7 @@ definition, this includes all extended properties
 | `options` | `Object` | - |
 | `options.excludeBase` | `boolean` | whether to exclude the base properties, like created_at, etc.. |
 | `options.includePolicy` | `string` \| `string`[] | whether to include the policies in the result, this is a string that specifies the policy type that is to be included, eg "edit", "delete", "read" and "parent" |
+| `options.onlyTextFilters` | `boolean` | - |
 | `options.optionalForm` | `boolean` | makes all the parameters optional, that is nullable |
 | `options.propertiesAsInput` | `boolean` | if the properties should be in input form |
 | `options.retrievalMode` | `boolean` | whether it is in retrieval mode |
@@ -46,7 +47,7 @@ a fields definition object that represents the whole item definition as it was s
 
 #### Defined in
 
-[base/Root/Module/ItemDefinition/gql.ts:50](https://github.com/onzag/itemize/blob/5c2808d3/base/Root/Module/ItemDefinition/gql.ts#L50)
+[base/Root/Module/ItemDefinition/gql.ts:51](https://github.com/onzag/itemize/blob/f2db74a5/base/Root/Module/ItemDefinition/gql.ts#L51)
 
 ___
 
@@ -74,7 +75,7 @@ a partial graphql fields definition that only contains the policies
 
 #### Defined in
 
-[base/Root/Module/ItemDefinition/gql.ts:127](https://github.com/onzag/itemize/blob/5c2808d3/base/Root/Module/ItemDefinition/gql.ts#L127)
+[base/Root/Module/ItemDefinition/gql.ts:135](https://github.com/onzag/itemize/blob/f2db74a5/base/Root/Module/ItemDefinition/gql.ts#L135)
 
 ___
 
@@ -101,7 +102,7 @@ the mutation fields for the mutation object to do ADD, EDIT and DELETE
 
 #### Defined in
 
-[base/Root/Module/ItemDefinition/gql.ts:440](https://github.com/onzag/itemize/blob/5c2808d3/base/Root/Module/ItemDefinition/gql.ts#L440)
+[base/Root/Module/ItemDefinition/gql.ts:474](https://github.com/onzag/itemize/blob/f2db74a5/base/Root/Module/ItemDefinition/gql.ts#L474)
 
 ___
 
@@ -127,7 +128,7 @@ the fields for the main query object to do GET, GET_LIST and SEARCH
 
 #### Defined in
 
-[base/Root/Module/ItemDefinition/gql.ts:294](https://github.com/onzag/itemize/blob/5c2808d3/base/Root/Module/ItemDefinition/gql.ts#L294)
+[base/Root/Module/ItemDefinition/gql.ts:305](https://github.com/onzag/itemize/blob/f2db74a5/base/Root/Module/ItemDefinition/gql.ts#L305)
 
 ___
 
@@ -154,7 +155,7 @@ the same as it's flattened
 
 #### Defined in
 
-[base/Root/Module/ItemDefinition/gql.ts:194](https://github.com/onzag/itemize/blob/5c2808d3/base/Root/Module/ItemDefinition/gql.ts#L194)
+[base/Root/Module/ItemDefinition/gql.ts:207](https://github.com/onzag/itemize/blob/f2db74a5/base/Root/Module/ItemDefinition/gql.ts#L207)
 
 ___
 
@@ -180,4 +181,4 @@ the same as it's cached once it's first retrieved
 
 #### Defined in
 
-[base/Root/Module/ItemDefinition/gql.ts:161](https://github.com/onzag/itemize/blob/5c2808d3/base/Root/Module/ItemDefinition/gql.ts#L161)
+[base/Root/Module/ItemDefinition/gql.ts:169](https://github.com/onzag/itemize/blob/f2db74a5/base/Root/Module/ItemDefinition/gql.ts#L169)

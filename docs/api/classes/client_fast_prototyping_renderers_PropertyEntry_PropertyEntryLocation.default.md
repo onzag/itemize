@@ -24,6 +24,7 @@ Supported args:
 
 ### Properties
 
+- [cmapRef](client_fast_prototyping_renderers_PropertyEntry_PropertyEntryLocation.default.md#cmapref)
 - [context](client_fast_prototyping_renderers_PropertyEntry_PropertyEntryLocation.default.md#context)
 - [inputRef](client_fast_prototyping_renderers_PropertyEntry_PropertyEntryLocation.default.md#inputref)
 - [preventNextSearchQueryChange](client_fast_prototyping_renderers_PropertyEntry_PropertyEntryLocation.default.md#preventnextsearchquerychange)
@@ -79,9 +80,19 @@ React.Component&lt;IPropertyEntryLocationRendererProps, IPropertyEntryLocationRe
 
 #### Defined in
 
-[client/fast-prototyping/renderers/PropertyEntry/PropertyEntryLocation.tsx:287](https://github.com/onzag/itemize/blob/5c2808d3/client/fast-prototyping/renderers/PropertyEntry/PropertyEntryLocation.tsx#L287)
+[client/fast-prototyping/renderers/PropertyEntry/PropertyEntryLocation.tsx:310](https://github.com/onzag/itemize/blob/f2db74a5/client/fast-prototyping/renderers/PropertyEntry/PropertyEntryLocation.tsx#L310)
 
 ## Properties
+
+### cmapRef
+
+• `Private` **cmapRef**: `RefObject`<`any`\>
+
+#### Defined in
+
+[client/fast-prototyping/renderers/PropertyEntry/PropertyEntryLocation.tsx:304](https://github.com/onzag/itemize/blob/f2db74a5/client/fast-prototyping/renderers/PropertyEntry/PropertyEntryLocation.tsx#L304)
+
+___
 
 ### context
 
@@ -119,7 +130,7 @@ The input ref for the location
 
 #### Defined in
 
-[client/fast-prototyping/renderers/PropertyEntry/PropertyEntryLocation.tsx:275](https://github.com/onzag/itemize/blob/5c2808d3/client/fast-prototyping/renderers/PropertyEntry/PropertyEntryLocation.tsx#L275)
+[client/fast-prototyping/renderers/PropertyEntry/PropertyEntryLocation.tsx:296](https://github.com/onzag/itemize/blob/f2db74a5/client/fast-prototyping/renderers/PropertyEntry/PropertyEntryLocation.tsx#L296)
 
 ___
 
@@ -133,7 +144,7 @@ at the same time one suggestion is clicked
 
 #### Defined in
 
-[client/fast-prototyping/renderers/PropertyEntry/PropertyEntryLocation.tsx:281](https://github.com/onzag/itemize/blob/5c2808d3/client/fast-prototyping/renderers/PropertyEntry/PropertyEntryLocation.tsx#L281)
+[client/fast-prototyping/renderers/PropertyEntry/PropertyEntryLocation.tsx:302](https://github.com/onzag/itemize/blob/f2db74a5/client/fast-prototyping/renderers/PropertyEntry/PropertyEntryLocation.tsx#L302)
 
 ___
 
@@ -376,37 +387,31 @@ React.Component.componentDidMount
 
 #### Defined in
 
-[client/fast-prototyping/renderers/PropertyEntry/PropertyEntryLocation.tsx:305](https://github.com/onzag/itemize/blob/5c2808d3/client/fast-prototyping/renderers/PropertyEntry/PropertyEntryLocation.tsx#L305)
+[client/fast-prototyping/renderers/PropertyEntry/PropertyEntryLocation.tsx:328](https://github.com/onzag/itemize/blob/f2db74a5/client/fast-prototyping/renderers/PropertyEntry/PropertyEntryLocation.tsx#L328)
 
 ___
 
 ### componentDidUpdate
 
-▸ `Optional` **componentDidUpdate**(`prevProps`, `prevState`, `snapshot?`): `void`
-
-Called immediately after updating occurs. Not called for the initial render.
-
-The snapshot is only present if getSnapshotBeforeUpdate is present and returns non-null.
+▸ **componentDidUpdate**(`prevProps`): `void`
 
 #### Parameters
 
 | Name | Type |
 | :------ | :------ |
 | `prevProps` | `Readonly`<[`IPropertyEntryLocationRendererProps`](../interfaces/client_internal_components_PropertyEntry_PropertyEntryLocation.IPropertyEntryLocationRendererProps.md)\> |
-| `prevState` | `Readonly`<`IPropertyEntryLocationRendererState`\> |
-| `snapshot?` | `any` |
 
 #### Returns
 
 `void`
 
-#### Inherited from
+#### Overrides
 
 React.Component.componentDidUpdate
 
 #### Defined in
 
-node_modules/@types/react/index.d.ts:688
+[client/fast-prototyping/renderers/PropertyEntry/PropertyEntryLocation.tsx:338](https://github.com/onzag/itemize/blob/f2db74a5/client/fast-prototyping/renderers/PropertyEntry/PropertyEntryLocation.tsx#L338)
 
 ___
 
@@ -617,7 +622,7 @@ basically the title of the suggestion
 
 #### Defined in
 
-[client/fast-prototyping/renderers/PropertyEntry/PropertyEntryLocation.tsx:635](https://github.com/onzag/itemize/blob/5c2808d3/client/fast-prototyping/renderers/PropertyEntry/PropertyEntryLocation.tsx#L635)
+[client/fast-prototyping/renderers/PropertyEntry/PropertyEntryLocation.tsx:769](https://github.com/onzag/itemize/blob/f2db74a5/client/fast-prototyping/renderers/PropertyEntry/PropertyEntryLocation.tsx#L769)
 
 ___
 
@@ -639,7 +644,7 @@ Triggers when we have clicked a suggestion
 
 #### Defined in
 
-[client/fast-prototyping/renderers/PropertyEntry/PropertyEntryLocation.tsx:357](https://github.com/onzag/itemize/blob/5c2808d3/client/fast-prototyping/renderers/PropertyEntry/PropertyEntryLocation.tsx#L357)
+[client/fast-prototyping/renderers/PropertyEntry/PropertyEntryLocation.tsx:399](https://github.com/onzag/itemize/blob/f2db74a5/client/fast-prototyping/renderers/PropertyEntry/PropertyEntryLocation.tsx#L399)
 
 ___
 
@@ -661,7 +666,7 @@ Triggers on the keypress in the search field
 
 #### Defined in
 
-[client/fast-prototyping/renderers/PropertyEntry/PropertyEntryLocation.tsx:340](https://github.com/onzag/itemize/blob/5c2808d3/client/fast-prototyping/renderers/PropertyEntry/PropertyEntryLocation.tsx#L340)
+[client/fast-prototyping/renderers/PropertyEntry/PropertyEntryLocation.tsx:382](https://github.com/onzag/itemize/blob/f2db74a5/client/fast-prototyping/renderers/PropertyEntry/PropertyEntryLocation.tsx#L382)
 
 ___
 
@@ -684,7 +689,7 @@ and not a suggestion is selected
 
 #### Defined in
 
-[client/fast-prototyping/renderers/PropertyEntry/PropertyEntryLocation.tsx:373](https://github.com/onzag/itemize/blob/5c2808d3/client/fast-prototyping/renderers/PropertyEntry/PropertyEntryLocation.tsx#L373)
+[client/fast-prototyping/renderers/PropertyEntry/PropertyEntryLocation.tsx:415](https://github.com/onzag/itemize/blob/f2db74a5/client/fast-prototyping/renderers/PropertyEntry/PropertyEntryLocation.tsx#L415)
 
 ___
 
@@ -707,7 +712,7 @@ react autosuggest manually decides when it needs to load suggestions
 
 #### Defined in
 
-[client/fast-prototyping/renderers/PropertyEntry/PropertyEntryLocation.tsx:392](https://github.com/onzag/itemize/blob/5c2808d3/client/fast-prototyping/renderers/PropertyEntry/PropertyEntryLocation.tsx#L392)
+[client/fast-prototyping/renderers/PropertyEntry/PropertyEntryLocation.tsx:434](https://github.com/onzag/itemize/blob/f2db74a5/client/fast-prototyping/renderers/PropertyEntry/PropertyEntryLocation.tsx#L434)
 
 ___
 
@@ -727,7 +732,7 @@ React.Component.render
 
 #### Defined in
 
-[client/fast-prototyping/renderers/PropertyEntry/PropertyEntryLocation.tsx:707](https://github.com/onzag/itemize/blob/5c2808d3/client/fast-prototyping/renderers/PropertyEntry/PropertyEntryLocation.tsx#L707)
+[client/fast-prototyping/renderers/PropertyEntry/PropertyEntryLocation.tsx:841](https://github.com/onzag/itemize/blob/f2db74a5/client/fast-prototyping/renderers/PropertyEntry/PropertyEntryLocation.tsx#L841)
 
 ___
 
@@ -751,7 +756,7 @@ a react element
 
 #### Defined in
 
-[client/fast-prototyping/renderers/PropertyEntry/PropertyEntryLocation.tsx:647](https://github.com/onzag/itemize/blob/5c2808d3/client/fast-prototyping/renderers/PropertyEntry/PropertyEntryLocation.tsx#L647)
+[client/fast-prototyping/renderers/PropertyEntry/PropertyEntryLocation.tsx:781](https://github.com/onzag/itemize/blob/f2db74a5/client/fast-prototyping/renderers/PropertyEntry/PropertyEntryLocation.tsx#L781)
 
 ___
 
@@ -775,7 +780,7 @@ is supposed to be rendered
 
 #### Defined in
 
-[client/fast-prototyping/renderers/PropertyEntry/PropertyEntryLocation.tsx:667](https://github.com/onzag/itemize/blob/5c2808d3/client/fast-prototyping/renderers/PropertyEntry/PropertyEntryLocation.tsx#L667)
+[client/fast-prototyping/renderers/PropertyEntry/PropertyEntryLocation.tsx:801](https://github.com/onzag/itemize/blob/f2db74a5/client/fast-prototyping/renderers/PropertyEntry/PropertyEntryLocation.tsx#L801)
 
 ___
 
@@ -797,7 +802,7 @@ Renders the suggestion body
 
 #### Defined in
 
-[client/fast-prototyping/renderers/PropertyEntry/PropertyEntryLocation.tsx:401](https://github.com/onzag/itemize/blob/5c2808d3/client/fast-prototyping/renderers/PropertyEntry/PropertyEntryLocation.tsx#L401)
+[client/fast-prototyping/renderers/PropertyEntry/PropertyEntryLocation.tsx:443](https://github.com/onzag/itemize/blob/f2db74a5/client/fast-prototyping/renderers/PropertyEntry/PropertyEntryLocation.tsx#L443)
 
 ___
 
@@ -820,7 +825,7 @@ itself
 
 #### Defined in
 
-[client/fast-prototyping/renderers/PropertyEntry/PropertyEntryLocation.tsx:321](https://github.com/onzag/itemize/blob/5c2808d3/client/fast-prototyping/renderers/PropertyEntry/PropertyEntryLocation.tsx#L321)
+[client/fast-prototyping/renderers/PropertyEntry/PropertyEntryLocation.tsx:363](https://github.com/onzag/itemize/blob/f2db74a5/client/fast-prototyping/renderers/PropertyEntry/PropertyEntryLocation.tsx#L363)
 
 ___
 

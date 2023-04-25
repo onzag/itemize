@@ -23,10 +23,12 @@ a given deserialized rich element and document into a react element
 - [element](client_internal_text_serializer.IReactifyArg.md#element)
 - [extraOptions](client_internal_text_serializer.IReactifyArg.md#extraoptions)
 - [key](client_internal_text_serializer.IReactifyArg.md#key)
+- [parent](client_internal_text_serializer.IReactifyArg.md#parent)
 - [selected](client_internal_text_serializer.IReactifyArg.md#selected)
 - [templateArgs](client_internal_text_serializer.IReactifyArg.md#templateargs)
 - [templateIgnoreContextualChanges](client_internal_text_serializer.IReactifyArg.md#templateignorecontextualchanges)
 - [templateRootArgs](client_internal_text_serializer.IReactifyArg.md#templaterootargs)
+- [tree](client_internal_text_serializer.IReactifyArg.md#tree)
 
 ## Properties
 
@@ -40,7 +42,7 @@ usage
 
 #### Defined in
 
-[client/internal/text/serializer/index.ts:59](https://github.com/onzag/itemize/blob/5c2808d3/client/internal/text/serializer/index.ts#L59)
+[client/internal/text/serializer/index.ts:100](https://github.com/onzag/itemize/blob/f2db74a5/client/internal/text/serializer/index.ts#L100)
 
 ___
 
@@ -52,7 +54,7 @@ Render the element as a template, rather than as a simple single level component
 
 #### Defined in
 
-[client/internal/text/serializer/index.ts:74](https://github.com/onzag/itemize/blob/5c2808d3/client/internal/text/serializer/index.ts#L74)
+[client/internal/text/serializer/index.ts:115](https://github.com/onzag/itemize/blob/f2db74a5/client/internal/text/serializer/index.ts#L115)
 
 ___
 
@@ -65,7 +67,7 @@ is bound, you can pass children via these props
 
 #### Defined in
 
-[client/internal/text/serializer/index.ts:70](https://github.com/onzag/itemize/blob/5c2808d3/client/internal/text/serializer/index.ts#L70)
+[client/internal/text/serializer/index.ts:111](https://github.com/onzag/itemize/blob/f2db74a5/client/internal/text/serializer/index.ts#L111)
 
 ___
 
@@ -77,7 +79,7 @@ This is the element that must be converted
 
 #### Defined in
 
-[client/internal/text/serializer/index.ts:53](https://github.com/onzag/itemize/blob/5c2808d3/client/internal/text/serializer/index.ts#L53)
+[client/internal/text/serializer/index.ts:94](https://github.com/onzag/itemize/blob/f2db74a5/client/internal/text/serializer/index.ts#L94)
 
 ___
 
@@ -89,7 +91,7 @@ Some extra options for utilities
 
 #### Defined in
 
-[client/internal/text/serializer/index.ts:97](https://github.com/onzag/itemize/blob/5c2808d3/client/internal/text/serializer/index.ts#L97)
+[client/internal/text/serializer/index.ts:138](https://github.com/onzag/itemize/blob/f2db74a5/client/internal/text/serializer/index.ts#L138)
 
 ___
 
@@ -101,7 +103,20 @@ A key to use in the react component
 
 #### Defined in
 
-[client/internal/text/serializer/index.ts:93](https://github.com/onzag/itemize/blob/5c2808d3/client/internal/text/serializer/index.ts#L93)
+[client/internal/text/serializer/index.ts:134](https://github.com/onzag/itemize/blob/f2db74a5/client/internal/text/serializer/index.ts#L134)
+
+___
+
+### parent
+
+• **parent**: [`RichElement`](../modules/client_internal_text_serializer.md#richelement) \| [`IRootLevelDocument`](client_internal_text_serializer.IRootLevelDocument.md)
+
+The parent for this element
+or null if no parent is known
+
+#### Defined in
+
+[client/internal/text/serializer/index.ts:143](https://github.com/onzag/itemize/blob/f2db74a5/client/internal/text/serializer/index.ts#L143)
 
 ___
 
@@ -115,7 +130,7 @@ to the reactification
 
 #### Defined in
 
-[client/internal/text/serializer/index.ts:65](https://github.com/onzag/itemize/blob/5c2808d3/client/internal/text/serializer/index.ts#L65)
+[client/internal/text/serializer/index.ts:106](https://github.com/onzag/itemize/blob/f2db74a5/client/internal/text/serializer/index.ts#L106)
 
 ___
 
@@ -127,7 +142,7 @@ The template arguments to be used that represent the current context
 
 #### Defined in
 
-[client/internal/text/serializer/index.ts:78](https://github.com/onzag/itemize/blob/5c2808d3/client/internal/text/serializer/index.ts#L78)
+[client/internal/text/serializer/index.ts:119](https://github.com/onzag/itemize/blob/f2db74a5/client/internal/text/serializer/index.ts#L119)
 
 ___
 
@@ -140,7 +155,7 @@ attributes of a base context
 
 #### Defined in
 
-[client/internal/text/serializer/index.ts:89](https://github.com/onzag/itemize/blob/5c2808d3/client/internal/text/serializer/index.ts#L89)
+[client/internal/text/serializer/index.ts:130](https://github.com/onzag/itemize/blob/f2db74a5/client/internal/text/serializer/index.ts#L130)
 
 ___
 
@@ -154,4 +169,17 @@ as such they are overwritten when matching  the tree
 
 #### Defined in
 
-[client/internal/text/serializer/index.ts:84](https://github.com/onzag/itemize/blob/5c2808d3/client/internal/text/serializer/index.ts#L84)
+[client/internal/text/serializer/index.ts:125](https://github.com/onzag/itemize/blob/f2db74a5/client/internal/text/serializer/index.ts#L125)
+
+___
+
+### tree
+
+• **tree**: [`IRootLevelDocument`](client_internal_text_serializer.IRootLevelDocument.md)
+
+The tree this element comes from
+or null if no tree is available
+
+#### Defined in
+
+[client/internal/text/serializer/index.ts:148](https://github.com/onzag/itemize/blob/f2db74a5/client/internal/text/serializer/index.ts#L148)

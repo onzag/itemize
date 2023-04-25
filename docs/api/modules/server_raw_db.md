@@ -34,4 +34,4 @@ clusters
 
 #### Defined in
 
-[server/raw-db.ts:39](https://github.com/onzag/itemize/blob/5c2808d3/server/raw-db.ts#L39)
+[server/raw-db.ts:41](https://github.com/onzag/itemize/blob/f2db74a5/server/raw-db.ts#L41)

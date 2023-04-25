@@ -8,7 +8,7 @@ The property view location handler
 
 ### Classes
 
-- [PropertyViewLocation](../classes/client_internal_components_PropertyView_PropertyViewLocation.PropertyViewLocation.md)
+- [default](../classes/client_internal_components_PropertyView_PropertyViewLocation.default.md)
 
 ### Interfaces
 
@@ -42,4 +42,4 @@ a boolean on whether it is for all intents and purposes an equal location
 
 #### Defined in
 
-[client/internal/components/PropertyView/PropertyViewLocation.tsx:54](https://github.com/onzag/itemize/blob/5c2808d3/client/internal/components/PropertyView/PropertyViewLocation.tsx#L54)
+[client/internal/components/PropertyView/PropertyViewLocation.tsx:54](https://github.com/onzag/itemize/blob/f2db74a5/client/internal/components/PropertyView/PropertyViewLocation.tsx#L54)

@@ -41,7 +41,7 @@ The renderer args
 
 #### Defined in
 
-[client/internal/renderer.ts:19](https://github.com/onzag/itemize/blob/5c2808d3/client/internal/renderer.ts#L19)
+[client/internal/renderer.ts:19](https://github.com/onzag/itemize/blob/f2db74a5/client/internal/renderer.ts#L19)
 
 ___
 
@@ -57,7 +57,7 @@ The current value to be displayed
 
 #### Defined in
 
-[client/internal/components/PropertyView/index.tsx:43](https://github.com/onzag/itemize/blob/5c2808d3/client/internal/components/PropertyView/index.tsx#L43)
+[client/internal/components/PropertyView/index.tsx:44](https://github.com/onzag/itemize/blob/f2db74a5/client/internal/components/PropertyView/index.tsx#L44)
 
 ___
 
@@ -69,7 +69,7 @@ No in the user language
 
 #### Defined in
 
-[client/internal/components/PropertyView/PropertyViewBoolean.tsx:22](https://github.com/onzag/itemize/blob/5c2808d3/client/internal/components/PropertyView/PropertyViewBoolean.tsx#L22)
+[client/internal/components/PropertyView/PropertyViewBoolean.tsx:22](https://github.com/onzag/itemize/blob/f2db74a5/client/internal/components/PropertyView/PropertyViewBoolean.tsx#L22)
 
 ___
 
@@ -81,7 +81,7 @@ unspecified in the user language
 
 #### Defined in
 
-[client/internal/components/PropertyView/PropertyViewBoolean.tsx:26](https://github.com/onzag/itemize/blob/5c2808d3/client/internal/components/PropertyView/PropertyViewBoolean.tsx#L26)
+[client/internal/components/PropertyView/PropertyViewBoolean.tsx:26](https://github.com/onzag/itemize/blob/f2db74a5/client/internal/components/PropertyView/PropertyViewBoolean.tsx#L26)
 
 ___
 
@@ -93,7 +93,7 @@ Yes, in the user language
 
 #### Defined in
 
-[client/internal/components/PropertyView/PropertyViewBoolean.tsx:18](https://github.com/onzag/itemize/blob/5c2808d3/client/internal/components/PropertyView/PropertyViewBoolean.tsx#L18)
+[client/internal/components/PropertyView/PropertyViewBoolean.tsx:18](https://github.com/onzag/itemize/blob/f2db74a5/client/internal/components/PropertyView/PropertyViewBoolean.tsx#L18)
 
 ___
 
@@ -109,4 +109,4 @@ Whether it is in rtl mode for a rtl language
 
 #### Defined in
 
-[client/internal/renderer.ts:15](https://github.com/onzag/itemize/blob/5c2808d3/client/internal/renderer.ts#L15)
+[client/internal/renderer.ts:15](https://github.com/onzag/itemize/blob/f2db74a5/client/internal/renderer.ts#L15)

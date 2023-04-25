@@ -23,7 +23,7 @@
 
 #### Defined in
 
-[base/Root/Module/ItemDefinition/PropertyDefinition/types/index.ts:148](https://github.com/onzag/itemize/blob/5c2808d3/base/Root/Module/ItemDefinition/PropertyDefinition/types/index.ts#L148)
+[base/Root/Module/ItemDefinition/PropertyDefinition/types/index.ts:202](https://github.com/onzag/itemize/blob/f2db74a5/base/Root/Module/ItemDefinition/PropertyDefinition/types/index.ts#L202)
 
 ___
 
@@ -33,7 +33,7 @@ ___
 
 #### Defined in
 
-[base/Root/Module/ItemDefinition/PropertyDefinition/types/index.ts:150](https://github.com/onzag/itemize/blob/5c2808d3/base/Root/Module/ItemDefinition/PropertyDefinition/types/index.ts#L150)
+[base/Root/Module/ItemDefinition/PropertyDefinition/types/index.ts:204](https://github.com/onzag/itemize/blob/f2db74a5/base/Root/Module/ItemDefinition/PropertyDefinition/types/index.ts#L204)
 
 ___
 
@@ -43,7 +43,7 @@ ___
 
 #### Defined in
 
-[base/Root/Module/ItemDefinition/PropertyDefinition/types/index.ts:151](https://github.com/onzag/itemize/blob/5c2808d3/base/Root/Module/ItemDefinition/PropertyDefinition/types/index.ts#L151)
+[base/Root/Module/ItemDefinition/PropertyDefinition/types/index.ts:205](https://github.com/onzag/itemize/blob/f2db74a5/base/Root/Module/ItemDefinition/PropertyDefinition/types/index.ts#L205)
 
 ___
 
@@ -53,7 +53,7 @@ ___
 
 #### Defined in
 
-[base/Root/Module/ItemDefinition/PropertyDefinition/types/index.ts:149](https://github.com/onzag/itemize/blob/5c2808d3/base/Root/Module/ItemDefinition/PropertyDefinition/types/index.ts#L149)
+[base/Root/Module/ItemDefinition/PropertyDefinition/types/index.ts:203](https://github.com/onzag/itemize/blob/f2db74a5/base/Root/Module/ItemDefinition/PropertyDefinition/types/index.ts#L203)
 
 ___
 
@@ -63,7 +63,7 @@ ___
 
 #### Defined in
 
-[base/Root/Module/ItemDefinition/PropertyDefinition/types/index.ts:153](https://github.com/onzag/itemize/blob/5c2808d3/base/Root/Module/ItemDefinition/PropertyDefinition/types/index.ts#L153)
+[base/Root/Module/ItemDefinition/PropertyDefinition/types/index.ts:207](https://github.com/onzag/itemize/blob/f2db74a5/base/Root/Module/ItemDefinition/PropertyDefinition/types/index.ts#L207)
 
 ___
 
@@ -73,4 +73,4 @@ ___
 
 #### Defined in
 
-[base/Root/Module/ItemDefinition/PropertyDefinition/types/index.ts:152](https://github.com/onzag/itemize/blob/5c2808d3/base/Root/Module/ItemDefinition/PropertyDefinition/types/index.ts#L152)
+[base/Root/Module/ItemDefinition/PropertyDefinition/types/index.ts:206](https://github.com/onzag/itemize/blob/f2db74a5/base/Root/Module/ItemDefinition/PropertyDefinition/types/index.ts#L206)

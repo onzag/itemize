@@ -33,6 +33,10 @@ https://gist.githubusercontent.com/piraveen/fafd0d984b2236e809d03a0e306c8a4d/raw
 - [currencies](imported_resources.md#currencies)
 - [languages](imported_resources.md#languages)
 
+### Functions
+
+- [isRTL](imported_resources.md#isrtl)
+
 ## Variables
 
 ### arrCountries
@@ -41,7 +45,7 @@ https://gist.githubusercontent.com/piraveen/fafd0d984b2236e809d03a0e306c8a4d/raw
 
 #### Defined in
 
-[imported-resources/index.ts:71](https://github.com/onzag/itemize/blob/5c2808d3/imported-resources/index.ts#L71)
+[imported-resources/index.ts:70](https://github.com/onzag/itemize/blob/f2db74a5/imported-resources/index.ts#L70)
 
 ___
 
@@ -51,7 +55,7 @@ ___
 
 #### Defined in
 
-[imported-resources/index.ts:80](https://github.com/onzag/itemize/blob/5c2808d3/imported-resources/index.ts#L80)
+[imported-resources/index.ts:79](https://github.com/onzag/itemize/blob/f2db74a5/imported-resources/index.ts#L79)
 
 ___
 
@@ -61,7 +65,7 @@ ___
 
 #### Defined in
 
-[imported-resources/index.ts:89](https://github.com/onzag/itemize/blob/5c2808d3/imported-resources/index.ts#L89)
+[imported-resources/index.ts:88](https://github.com/onzag/itemize/blob/f2db74a5/imported-resources/index.ts#L88)
 
 ___
 
@@ -71,7 +75,7 @@ ___
 
 #### Defined in
 
-[imported-resources/index.ts:68](https://github.com/onzag/itemize/blob/5c2808d3/imported-resources/index.ts#L68)
+[imported-resources/index.ts:67](https://github.com/onzag/itemize/blob/f2db74a5/imported-resources/index.ts#L67)
 
 ___
 
@@ -81,7 +85,7 @@ ___
 
 #### Defined in
 
-[imported-resources/index.ts:69](https://github.com/onzag/itemize/blob/5c2808d3/imported-resources/index.ts#L69)
+[imported-resources/index.ts:68](https://github.com/onzag/itemize/blob/f2db74a5/imported-resources/index.ts#L68)
 
 ___
 
@@ -91,4 +95,24 @@ ___
 
 #### Defined in
 
-[imported-resources/index.ts:70](https://github.com/onzag/itemize/blob/5c2808d3/imported-resources/index.ts#L70)
+[imported-resources/index.ts:69](https://github.com/onzag/itemize/blob/f2db74a5/imported-resources/index.ts#L69)
+
+## Functions
+
+### isRTL
+
+▸ **isRTL**(`language`): `boolean`
+
+#### Parameters
+
+| Name | Type |
+| :------ | :------ |
+| `language` | `string` |
+
+#### Returns
+
+`boolean`
+
+#### Defined in
+
+[imported-resources/index.ts:98](https://github.com/onzag/itemize/blob/f2db74a5/imported-resources/index.ts#L98)

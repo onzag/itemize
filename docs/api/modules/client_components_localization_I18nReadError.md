@@ -14,11 +14,13 @@ of context
 
 ### Interfaces
 
+- [II18nReadErrorOptions](../interfaces/client_components_localization_I18nReadError.II18nReadErrorOptions.md)
 - [II18nReadErrorProps](../interfaces/client_components_localization_I18nReadError.II18nReadErrorProps.md)
 
 ### Functions
 
 - [default](client_components_localization_I18nReadError.md#default)
+- [useI18nReadError](client_components_localization_I18nReadError.md#usei18nreaderror)
 
 ## Functions
 
@@ -38,4 +40,26 @@ of context
 
 #### Defined in
 
-[client/components/localization/I18nReadError.tsx:211](https://github.com/onzag/itemize/blob/5c2808d3/client/components/localization/I18nReadError.tsx#L211)
+[client/components/localization/I18nReadError.tsx:218](https://github.com/onzag/itemize/blob/f2db74a5/client/components/localization/I18nReadError.tsx#L218)
+
+___
+
+### useI18nReadError
+
+▸ **useI18nReadError**(`options`): `React.ReactNode`
+
+The i18n read error as a react hook
+
+#### Parameters
+
+| Name | Type |
+| :------ | :------ |
+| `options` | [`II18nReadErrorOptions`](../interfaces/client_components_localization_I18nReadError.II18nReadErrorOptions.md) |
+
+#### Returns
+
+`React.ReactNode`
+
+#### Defined in
+
+[client/components/localization/I18nReadError.tsx:264](https://github.com/onzag/itemize/blob/f2db74a5/client/components/localization/I18nReadError.tsx#L264)

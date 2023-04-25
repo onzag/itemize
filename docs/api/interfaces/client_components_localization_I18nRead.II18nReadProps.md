@@ -6,21 +6,30 @@
 
 The read props which takes the following data
 
+## Hierarchy
+
+- [`I18nReadOptions`](client_components_localization_I18nRead.I18nReadOptions.md)
+
+  ↳ **`II18nReadProps`**
+
 ## Table of contents
 
 ### Properties
 
 - [args](client_components_localization_I18nRead.II18nReadProps.md#args)
 - [capitalize](client_components_localization_I18nRead.II18nReadProps.md#capitalize)
+- [context](client_components_localization_I18nRead.II18nReadProps.md#context)
 - [html](client_components_localization_I18nRead.II18nReadProps.md#html)
 - [htmlWrappingTag](client_components_localization_I18nRead.II18nReadProps.md#htmlwrappingtag)
 - [id](client_components_localization_I18nRead.II18nReadProps.md#id)
 - [policyName](client_components_localization_I18nRead.II18nReadProps.md#policyname)
 - [policyType](client_components_localization_I18nRead.II18nReadProps.md#policytype)
 - [propertyId](client_components_localization_I18nRead.II18nReadProps.md#propertyid)
+- [whiteSpace](client_components_localization_I18nRead.II18nReadProps.md#whitespace)
 
 ### Methods
 
+- [argsContentBitsWrapper](client_components_localization_I18nRead.II18nReadProps.md#argscontentbitswrapper)
 - [children](client_components_localization_I18nRead.II18nReadProps.md#children)
 
 ## Properties
@@ -34,9 +43,13 @@ these can be plain string, for simple replacement or literal react
 objects, using react objects will produce a react node as output
 rather than a string
 
+#### Inherited from
+
+[I18nReadOptions](client_components_localization_I18nRead.I18nReadOptions.md).[args](client_components_localization_I18nRead.I18nReadOptions.md#args)
+
 #### Defined in
 
-[client/components/localization/I18nRead.tsx:82](https://github.com/onzag/itemize/blob/5c2808d3/client/components/localization/I18nRead.tsx#L82)
+[client/components/localization/I18nRead.tsx:84](https://github.com/onzag/itemize/blob/f2db74a5/client/components/localization/I18nRead.tsx#L84)
 
 ___
 
@@ -46,9 +59,29 @@ ___
 
 Whether to capitalize the output
 
+#### Inherited from
+
+[I18nReadOptions](client_components_localization_I18nRead.I18nReadOptions.md).[capitalize](client_components_localization_I18nRead.I18nReadOptions.md#capitalize)
+
 #### Defined in
 
-[client/components/localization/I18nRead.tsx:101](https://github.com/onzag/itemize/blob/5c2808d3/client/components/localization/I18nRead.tsx#L101)
+[client/components/localization/I18nRead.tsx:104](https://github.com/onzag/itemize/blob/f2db74a5/client/components/localization/I18nRead.tsx#L104)
+
+___
+
+### context
+
+• `Optional` **context**: `string`
+
+A context to override the current pass a registry key
+
+#### Inherited from
+
+[I18nReadOptions](client_components_localization_I18nRead.I18nReadOptions.md).[context](client_components_localization_I18nRead.I18nReadOptions.md#context)
+
+#### Defined in
+
+[client/components/localization/I18nRead.tsx:65](https://github.com/onzag/itemize/blob/f2db74a5/client/components/localization/I18nRead.tsx#L65)
 
 ___
 
@@ -60,9 +93,13 @@ Dangerous!... whether the content represents html instead of a plain string
 does not mix well with args if the output generated is a react node that
 does not serialize
 
+#### Inherited from
+
+[I18nReadOptions](client_components_localization_I18nRead.I18nReadOptions.md).[html](client_components_localization_I18nRead.I18nReadOptions.md#html)
+
 #### Defined in
 
-[client/components/localization/I18nRead.tsx:88](https://github.com/onzag/itemize/blob/5c2808d3/client/components/localization/I18nRead.tsx#L88)
+[client/components/localization/I18nRead.tsx:96](https://github.com/onzag/itemize/blob/f2db74a5/client/components/localization/I18nRead.tsx#L96)
 
 ___
 
@@ -72,9 +109,13 @@ ___
 
 The wrapping tag for using in the html mode, by default is a div
 
+#### Inherited from
+
+[I18nReadOptions](client_components_localization_I18nRead.I18nReadOptions.md).[htmlWrappingTag](client_components_localization_I18nRead.I18nReadOptions.md#htmlwrappingtag)
+
 #### Defined in
 
-[client/components/localization/I18nRead.tsx:92](https://github.com/onzag/itemize/blob/5c2808d3/client/components/localization/I18nRead.tsx#L92)
+[client/components/localization/I18nRead.tsx:100](https://github.com/onzag/itemize/blob/f2db74a5/client/components/localization/I18nRead.tsx#L100)
 
 ___
 
@@ -101,9 +142,13 @@ as item definition, if nothing found (or no module context) it will go to the ne
 the root context is the last, and reads from the base root properties or the main i18n data properties
 if nothing found in this last context, an error is thrown
 
+#### Inherited from
+
+[I18nReadOptions](client_components_localization_I18nRead.I18nReadOptions.md).[id](client_components_localization_I18nRead.I18nReadOptions.md#id)
+
 #### Defined in
 
-[client/components/localization/I18nRead.tsx:63](https://github.com/onzag/itemize/blob/5c2808d3/client/components/localization/I18nRead.tsx#L63)
+[client/components/localization/I18nRead.tsx:61](https://github.com/onzag/itemize/blob/f2db74a5/client/components/localization/I18nRead.tsx#L61)
 
 ___
 
@@ -113,9 +158,13 @@ ___
 
 A policy name to use as context, must go along policy type
 
+#### Inherited from
+
+[I18nReadOptions](client_components_localization_I18nRead.I18nReadOptions.md).[policyName](client_components_localization_I18nRead.I18nReadOptions.md#policyname)
+
 #### Defined in
 
-[client/components/localization/I18nRead.tsx:75](https://github.com/onzag/itemize/blob/5c2808d3/client/components/localization/I18nRead.tsx#L75)
+[client/components/localization/I18nRead.tsx:77](https://github.com/onzag/itemize/blob/f2db74a5/client/components/localization/I18nRead.tsx#L77)
 
 ___
 
@@ -125,9 +174,13 @@ ___
 
 A policy type to use as context, must go along policy name
 
+#### Inherited from
+
+[I18nReadOptions](client_components_localization_I18nRead.I18nReadOptions.md).[policyType](client_components_localization_I18nRead.I18nReadOptions.md#policytype)
+
 #### Defined in
 
-[client/components/localization/I18nRead.tsx:71](https://github.com/onzag/itemize/blob/5c2808d3/client/components/localization/I18nRead.tsx#L71)
+[client/components/localization/I18nRead.tsx:73](https://github.com/onzag/itemize/blob/f2db74a5/client/components/localization/I18nRead.tsx#L73)
 
 ___
 
@@ -137,11 +190,59 @@ ___
 
 A property id to use as context
 
+#### Inherited from
+
+[I18nReadOptions](client_components_localization_I18nRead.I18nReadOptions.md).[propertyId](client_components_localization_I18nRead.I18nReadOptions.md#propertyid)
+
 #### Defined in
 
-[client/components/localization/I18nRead.tsx:67](https://github.com/onzag/itemize/blob/5c2808d3/client/components/localization/I18nRead.tsx#L67)
+[client/components/localization/I18nRead.tsx:69](https://github.com/onzag/itemize/blob/f2db74a5/client/components/localization/I18nRead.tsx#L69)
+
+___
+
+### whiteSpace
+
+• `Optional` **whiteSpace**: `string`
+
+Override for the whitespace style property
+
+#### Inherited from
+
+[I18nReadOptions](client_components_localization_I18nRead.I18nReadOptions.md).[whiteSpace](client_components_localization_I18nRead.I18nReadOptions.md#whitespace)
+
+#### Defined in
+
+[client/components/localization/I18nRead.tsx:109](https://github.com/onzag/itemize/blob/f2db74a5/client/components/localization/I18nRead.tsx#L109)
 
 ## Methods
+
+### argsContentBitsWrapper
+
+▸ `Optional` **argsContentBitsWrapper**(`text`): `ReactNode`
+
+used to wrap the content bits that are not part of the args
+since the args can be anything and they can be wrapped react components
+or strings, this will affect anything that is not the args if set
+
+#### Parameters
+
+| Name | Type |
+| :------ | :------ |
+| `text` | `string` |
+
+#### Returns
+
+`ReactNode`
+
+#### Inherited from
+
+[I18nReadOptions](client_components_localization_I18nRead.I18nReadOptions.md).[argsContentBitsWrapper](client_components_localization_I18nRead.I18nReadOptions.md#argscontentbitswrapper)
+
+#### Defined in
+
+[client/components/localization/I18nRead.tsx:90](https://github.com/onzag/itemize/blob/f2db74a5/client/components/localization/I18nRead.tsx#L90)
+
+___
 
 ### children
 
@@ -162,4 +263,4 @@ otherwise it's just rendered
 
 #### Defined in
 
-[client/components/localization/I18nRead.tsx:97](https://github.com/onzag/itemize/blob/5c2808d3/client/components/localization/I18nRead.tsx#L97)
+[client/components/localization/I18nRead.tsx:120](https://github.com/onzag/itemize/blob/f2db74a5/client/components/localization/I18nRead.tsx#L120)

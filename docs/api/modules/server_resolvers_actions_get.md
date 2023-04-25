@@ -33,7 +33,7 @@
 
 #### Defined in
 
-[server/resolvers/actions/get.ts:38](https://github.com/onzag/itemize/blob/5c2808d3/server/resolvers/actions/get.ts#L38)
+[server/resolvers/actions/get.ts:36](https://github.com/onzag/itemize/blob/f2db74a5/server/resolvers/actions/get.ts#L36)
 
 ___
 
@@ -53,13 +53,13 @@ ___
 
 #### Defined in
 
-[server/resolvers/actions/get.ts:724](https://github.com/onzag/itemize/blob/5c2808d3/server/resolvers/actions/get.ts#L724)
+[server/resolvers/actions/get.ts:883](https://github.com/onzag/itemize/blob/f2db74a5/server/resolvers/actions/get.ts#L883)
 
 ___
 
 ### getItemDefinitionList
 
-▸ **getItemDefinitionList**(`appData`, `resolverArgs`, `itemDefinition`): `Promise`<{ `results`: `any`[] = finalValues }\>
+▸ **getItemDefinitionList**(`appData`, `resolverArgs`, `itemDefinition`): `Promise`<{ `highlights`: `string` ; `results`: `any`[] = finalValues }\>
 
 #### Parameters
 
@@ -71,11 +71,11 @@ ___
 
 #### Returns
 
-`Promise`<{ `results`: `any`[] = finalValues }\>
+`Promise`<{ `highlights`: `string` ; `results`: `any`[] = finalValues }\>
 
 #### Defined in
 
-[server/resolvers/actions/get.ts:288](https://github.com/onzag/itemize/blob/5c2808d3/server/resolvers/actions/get.ts#L288)
+[server/resolvers/actions/get.ts:301](https://github.com/onzag/itemize/blob/f2db74a5/server/resolvers/actions/get.ts#L301)
 
 ___
 
@@ -95,13 +95,13 @@ ___
 
 #### Defined in
 
-[server/resolvers/actions/get.ts:728](https://github.com/onzag/itemize/blob/5c2808d3/server/resolvers/actions/get.ts#L728)
+[server/resolvers/actions/get.ts:887](https://github.com/onzag/itemize/blob/f2db74a5/server/resolvers/actions/get.ts#L887)
 
 ___
 
 ### getModuleList
 
-▸ **getModuleList**(`appData`, `resolverArgs`, `mod`): `Promise`<{ `results`: `any`[] = finalValues }\>
+▸ **getModuleList**(`appData`, `resolverArgs`, `mod`): `Promise`<{ `highlights`: `string` ; `results`: `any`[] = finalValues }\>
 
 #### Parameters
 
@@ -113,11 +113,11 @@ ___
 
 #### Returns
 
-`Promise`<{ `results`: `any`[] = finalValues }\>
+`Promise`<{ `highlights`: `string` ; `results`: `any`[] = finalValues }\>
 
 #### Defined in
 
-[server/resolvers/actions/get.ts:517](https://github.com/onzag/itemize/blob/5c2808d3/server/resolvers/actions/get.ts#L517)
+[server/resolvers/actions/get.ts:603](https://github.com/onzag/itemize/blob/f2db74a5/server/resolvers/actions/get.ts#L603)
 
 ___
 
@@ -137,4 +137,4 @@ ___
 
 #### Defined in
 
-[server/resolvers/actions/get.ts:732](https://github.com/onzag/itemize/blob/5c2808d3/server/resolvers/actions/get.ts#L732)
+[server/resolvers/actions/get.ts:891](https://github.com/onzag/itemize/blob/f2db74a5/server/resolvers/actions/get.ts#L891)

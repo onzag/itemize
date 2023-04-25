@@ -28,7 +28,7 @@ The fields that can be requested for that value
 
 #### Defined in
 
-[client/internal/workers/cache/cache.worker.ts:41](https://github.com/onzag/itemize/blob/5c2808d3/client/internal/workers/cache/cache.worker.ts#L41)
+[client/internal/workers/cache/cache.worker.ts:51](https://github.com/onzag/itemize/blob/f2db74a5/client/internal/workers/cache/cache.worker.ts#L51)
 
 ___
 
@@ -40,4 +40,4 @@ The value of the match
 
 #### Defined in
 
-[client/internal/workers/cache/cache.worker.ts:37](https://github.com/onzag/itemize/blob/5c2808d3/client/internal/workers/cache/cache.worker.ts#L37)
+[client/internal/workers/cache/cache.worker.ts:47](https://github.com/onzag/itemize/blob/f2db74a5/client/internal/workers/cache/cache.worker.ts#L47)

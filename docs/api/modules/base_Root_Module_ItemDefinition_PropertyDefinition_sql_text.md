@@ -8,15 +8,111 @@ Provides the sql functions for use with the text type
 
 ### Functions
 
+- [textElastic](base_Root_Module_ItemDefinition_PropertyDefinition_sql_text.md#textelastic)
+- [textElasticIn](base_Root_Module_ItemDefinition_PropertyDefinition_sql_text.md#textelasticin)
+- [textElasticSearch](base_Root_Module_ItemDefinition_PropertyDefinition_sql_text.md#textelasticsearch)
+- [textElasticStrSearch](base_Root_Module_ItemDefinition_PropertyDefinition_sql_text.md#textelasticstrsearch)
 - [textSQL](base_Root_Module_ItemDefinition_PropertyDefinition_sql_text.md#textsql)
 - [textSQLBtreeIndexable](base_Root_Module_ItemDefinition_PropertyDefinition_sql_text.md#textsqlbtreeindexable)
 - [textSQLIn](base_Root_Module_ItemDefinition_PropertyDefinition_sql_text.md#textsqlin)
 - [textSQLOrderBy](base_Root_Module_ItemDefinition_PropertyDefinition_sql_text.md#textsqlorderby)
+- [textSQLOut](base_Root_Module_ItemDefinition_PropertyDefinition_sql_text.md#textsqlout)
 - [textSQLSearch](base_Root_Module_ItemDefinition_PropertyDefinition_sql_text.md#textsqlsearch)
+- [textSQLSelect](base_Root_Module_ItemDefinition_PropertyDefinition_sql_text.md#textsqlselect)
 - [textSQLStrSearch](base_Root_Module_ItemDefinition_PropertyDefinition_sql_text.md#textsqlstrsearch)
 - [textSqlRedoDictionaryIndex](base_Root_Module_ItemDefinition_PropertyDefinition_sql_text.md#textsqlredodictionaryindex)
 
 ## Functions
+
+### textElastic
+
+▸ **textElastic**(`arg`): `Object`
+
+#### Parameters
+
+| Name | Type |
+| :------ | :------ |
+| `arg` | [`ISQLArgInfo`](../interfaces/base_Root_Module_ItemDefinition_PropertyDefinition_types.ISQLArgInfo.md) |
+
+#### Returns
+
+`Object`
+
+| Name | Type |
+| :------ | :------ |
+| `properties` | `Object` |
+
+#### Defined in
+
+[base/Root/Module/ItemDefinition/PropertyDefinition/sql/text.ts:49](https://github.com/onzag/itemize/blob/f2db74a5/base/Root/Module/ItemDefinition/PropertyDefinition/sql/text.ts#L49)
+
+___
+
+### textElasticIn
+
+▸ **textElasticIn**(`arg`): `Object`
+
+#### Parameters
+
+| Name | Type |
+| :------ | :------ |
+| `arg` | [`ISQLOutInfo`](../interfaces/base_Root_Module_ItemDefinition_PropertyDefinition_types.ISQLOutInfo.md) |
+
+#### Returns
+
+`Object`
+
+#### Defined in
+
+[base/Root/Module/ItemDefinition/PropertyDefinition/sql/text.ts:325](https://github.com/onzag/itemize/blob/f2db74a5/base/Root/Module/ItemDefinition/PropertyDefinition/sql/text.ts#L325)
+
+___
+
+### textElasticSearch
+
+▸ **textElasticSearch**(`arg`): `Object`
+
+Provides the text sql search functionality
+
+#### Parameters
+
+| Name | Type | Description |
+| :------ | :------ | :------ |
+| `arg` | [`IElasticSearchInfo`](../interfaces/base_Root_Module_ItemDefinition_PropertyDefinition_types.IElasticSearchInfo.md) | the sql search arg info |
+
+#### Returns
+
+`Object`
+
+a boolean on whether it was searched by it, and a complementary column order by in case it needs it
+
+#### Defined in
+
+[base/Root/Module/ItemDefinition/PropertyDefinition/sql/text.ts:294](https://github.com/onzag/itemize/blob/f2db74a5/base/Root/Module/ItemDefinition/PropertyDefinition/sql/text.ts#L294)
+
+___
+
+### textElasticStrSearch
+
+▸ **textElasticStrSearch**(`arg`): `Object`
+
+Provides the text FTS str sql search functionality
+
+#### Parameters
+
+| Name | Type |
+| :------ | :------ |
+| `arg` | [`IElasticStrSearchInfo`](../interfaces/base_Root_Module_ItemDefinition_PropertyDefinition_types.IElasticStrSearchInfo.md) |
+
+#### Returns
+
+`Object`
+
+#### Defined in
+
+[base/Root/Module/ItemDefinition/PropertyDefinition/sql/text.ts:376](https://github.com/onzag/itemize/blob/f2db74a5/base/Root/Module/ItemDefinition/PropertyDefinition/sql/text.ts#L376)
+
+___
 
 ### textSQL
 
@@ -38,7 +134,7 @@ a partial row definition
 
 #### Defined in
 
-[base/Root/Module/ItemDefinition/PropertyDefinition/sql/text.ts:16](https://github.com/onzag/itemize/blob/5c2808d3/base/Root/Module/ItemDefinition/PropertyDefinition/sql/text.ts#L16)
+[base/Root/Module/ItemDefinition/PropertyDefinition/sql/text.ts:17](https://github.com/onzag/itemize/blob/f2db74a5/base/Root/Module/ItemDefinition/PropertyDefinition/sql/text.ts#L17)
 
 ___
 
@@ -54,7 +150,7 @@ Provides the btree indexable function for text type
 
 #### Defined in
 
-[base/Root/Module/ItemDefinition/PropertyDefinition/sql/text.ts:216](https://github.com/onzag/itemize/blob/5c2808d3/base/Root/Module/ItemDefinition/PropertyDefinition/sql/text.ts#L216)
+[base/Root/Module/ItemDefinition/PropertyDefinition/sql/text.ts:409](https://github.com/onzag/itemize/blob/f2db74a5/base/Root/Module/ItemDefinition/PropertyDefinition/sql/text.ts#L409)
 
 ___
 
@@ -78,7 +174,7 @@ a partial row value
 
 #### Defined in
 
-[base/Root/Module/ItemDefinition/PropertyDefinition/sql/text.ts:55](https://github.com/onzag/itemize/blob/5c2808d3/base/Root/Module/ItemDefinition/PropertyDefinition/sql/text.ts#L55)
+[base/Root/Module/ItemDefinition/PropertyDefinition/sql/text.ts:131](https://github.com/onzag/itemize/blob/f2db74a5/base/Root/Module/ItemDefinition/PropertyDefinition/sql/text.ts#L131)
 
 ___
 
@@ -102,7 +198,27 @@ the order by rule string array (or null) if not possible to order
 
 #### Defined in
 
-[base/Root/Module/ItemDefinition/PropertyDefinition/sql/text.ts:202](https://github.com/onzag/itemize/blob/5c2808d3/base/Root/Module/ItemDefinition/PropertyDefinition/sql/text.ts#L202)
+[base/Root/Module/ItemDefinition/PropertyDefinition/sql/text.ts:395](https://github.com/onzag/itemize/blob/f2db74a5/base/Root/Module/ItemDefinition/PropertyDefinition/sql/text.ts#L395)
+
+___
+
+### textSQLOut
+
+▸ **textSQLOut**(`arg`): [`IPropertyDefinitionSupportedTextType`](../interfaces/base_Root_Module_ItemDefinition_PropertyDefinition_types_text.IPropertyDefinitionSupportedTextType.md)
+
+#### Parameters
+
+| Name | Type |
+| :------ | :------ |
+| `arg` | [`ISQLOutInfo`](../interfaces/base_Root_Module_ItemDefinition_PropertyDefinition_types.ISQLOutInfo.md) |
+
+#### Returns
+
+[`IPropertyDefinitionSupportedTextType`](../interfaces/base_Root_Module_ItemDefinition_PropertyDefinition_types_text.IPropertyDefinitionSupportedTextType.md)
+
+#### Defined in
+
+[base/Root/Module/ItemDefinition/PropertyDefinition/sql/text.ts:98](https://github.com/onzag/itemize/blob/f2db74a5/base/Root/Module/ItemDefinition/PropertyDefinition/sql/text.ts#L98)
 
 ___
 
@@ -126,7 +242,27 @@ a boolean on whether it was searched by it, and a complementary column order by 
 
 #### Defined in
 
-[base/Root/Module/ItemDefinition/PropertyDefinition/sql/text.ts:129](https://github.com/onzag/itemize/blob/5c2808d3/base/Root/Module/ItemDefinition/PropertyDefinition/sql/text.ts#L129)
+[base/Root/Module/ItemDefinition/PropertyDefinition/sql/text.ts:251](https://github.com/onzag/itemize/blob/f2db74a5/base/Root/Module/ItemDefinition/PropertyDefinition/sql/text.ts#L251)
+
+___
+
+### textSQLSelect
+
+▸ **textSQLSelect**(`arg`): `string`[]
+
+#### Parameters
+
+| Name | Type |
+| :------ | :------ |
+| `arg` | [`ISQLArgInfo`](../interfaces/base_Root_Module_ItemDefinition_PropertyDefinition_types.ISQLArgInfo.md) |
+
+#### Returns
+
+`string`[]
+
+#### Defined in
+
+[base/Root/Module/ItemDefinition/PropertyDefinition/sql/text.ts:42](https://github.com/onzag/itemize/blob/f2db74a5/base/Root/Module/ItemDefinition/PropertyDefinition/sql/text.ts#L42)
 
 ___
 
@@ -150,7 +286,7 @@ a boolean on whether it was searched by it, and a complementary column order by 
 
 #### Defined in
 
-[base/Root/Module/ItemDefinition/PropertyDefinition/sql/text.ts:172](https://github.com/onzag/itemize/blob/5c2808d3/base/Root/Module/ItemDefinition/PropertyDefinition/sql/text.ts#L172)
+[base/Root/Module/ItemDefinition/PropertyDefinition/sql/text.ts:348](https://github.com/onzag/itemize/blob/f2db74a5/base/Root/Module/ItemDefinition/PropertyDefinition/sql/text.ts#L348)
 
 ___
 
@@ -174,4 +310,4 @@ a partial row value
 
 #### Defined in
 
-[base/Root/Module/ItemDefinition/PropertyDefinition/sql/text.ts:111](https://github.com/onzag/itemize/blob/5c2808d3/base/Root/Module/ItemDefinition/PropertyDefinition/sql/text.ts#L111)
+[base/Root/Module/ItemDefinition/PropertyDefinition/sql/text.ts:232](https://github.com/onzag/itemize/blob/f2db74a5/base/Root/Module/ItemDefinition/PropertyDefinition/sql/text.ts#L232)

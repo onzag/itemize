@@ -9,15 +9,27 @@ to be able to perform searches of them in the database
 
 ### Functions
 
+- [buildElasticOrderByForInternalRequiredProperty](base_Root_Module_ItemDefinition_PropertyDefinition_sql.md#buildelasticorderbyforinternalrequiredproperty)
+- [buildElasticOrderByForProperty](base_Root_Module_ItemDefinition_PropertyDefinition_sql.md#buildelasticorderbyforproperty)
+- [buildElasticQueryForProperty](base_Root_Module_ItemDefinition_PropertyDefinition_sql.md#buildelasticqueryforproperty)
+- [buildElasticStrSearchQueryForProperty](base_Root_Module_ItemDefinition_PropertyDefinition_sql.md#buildelasticstrsearchqueryforproperty)
 - [buildSQLOrderByForInternalRequiredProperty](base_Root_Module_ItemDefinition_PropertyDefinition_sql.md#buildsqlorderbyforinternalrequiredproperty)
 - [buildSQLOrderByForProperty](base_Root_Module_ItemDefinition_PropertyDefinition_sql.md#buildsqlorderbyforproperty)
 - [buildSQLQueryForProperty](base_Root_Module_ItemDefinition_PropertyDefinition_sql.md#buildsqlqueryforproperty)
 - [buildSQLStrSearchQueryForProperty](base_Root_Module_ItemDefinition_PropertyDefinition_sql.md#buildsqlstrsearchqueryforproperty)
 - [convertGQLValueToSQLValueForProperty](base_Root_Module_ItemDefinition_PropertyDefinition_sql.md#convertgqlvaluetosqlvalueforproperty)
+- [convertSQLValueToElasticSQLValueForProperty](base_Root_Module_ItemDefinition_PropertyDefinition_sql.md#convertsqlvaluetoelasticsqlvalueforproperty)
 - [convertSQLValueToGQLValueForProperty](base_Root_Module_ItemDefinition_PropertyDefinition_sql.md#convertsqlvaluetogqlvalueforproperty)
+- [getElasticSchemaForProperty](base_Root_Module_ItemDefinition_PropertyDefinition_sql.md#getelasticschemaforproperty)
 - [getSQLTableDefinitionForProperty](base_Root_Module_ItemDefinition_PropertyDefinition_sql.md#getsqltabledefinitionforproperty)
+- [getStandardElasticFor](base_Root_Module_ItemDefinition_PropertyDefinition_sql.md#getstandardelasticfor)
+- [getStandardElasticForWithNullField](base_Root_Module_ItemDefinition_PropertyDefinition_sql.md#getstandardelasticforwithnullfield)
 - [getStandardSQLFnFor](base_Root_Module_ItemDefinition_PropertyDefinition_sql.md#getstandardsqlfnfor)
+- [standardElasticOrderBy](base_Root_Module_ItemDefinition_PropertyDefinition_sql.md#standardelasticorderby)
+- [standardElasticSearchFnExactAndRange](base_Root_Module_ItemDefinition_PropertyDefinition_sql.md#standardelasticsearchfnexactandrange)
+- [standardElasticSearchFnWithNullFieldExactAndRange](base_Root_Module_ItemDefinition_PropertyDefinition_sql.md#standardelasticsearchfnwithnullfieldexactandrange)
 - [standardSQLBtreeIndexable](base_Root_Module_ItemDefinition_PropertyDefinition_sql.md#standardsqlbtreeindexable)
+- [standardSQLElasticInFn](base_Root_Module_ItemDefinition_PropertyDefinition_sql.md#standardsqlelasticinfn)
 - [standardSQLEqualFn](base_Root_Module_ItemDefinition_PropertyDefinition_sql.md#standardsqlequalfn)
 - [standardSQLInFn](base_Root_Module_ItemDefinition_PropertyDefinition_sql.md#standardsqlinfn)
 - [standardSQLOrderBy](base_Root_Module_ItemDefinition_PropertyDefinition_sql.md#standardsqlorderby)
@@ -29,9 +41,9 @@ to be able to perform searches of them in the database
 
 ## Functions
 
-### buildSQLOrderByForInternalRequiredProperty
+### buildElasticOrderByForInternalRequiredProperty
 
-▸ **buildSQLOrderByForInternalRequiredProperty**(`itemDefinition`, `which`, `orderByBuilder`, `direction`, `nulls`): `void`
+▸ **buildElasticOrderByForInternalRequiredProperty**(`itemDefinition`, `which`, `args`, `direction`, `nulls`): `Object`
 
 Builds the order by functionality for the internal properties, such as
 created_at, edited_at, etc...
@@ -42,6 +54,130 @@ created_at, edited_at, etc...
 | :------ | :------ | :------ |
 | `itemDefinition` | [`default`](../classes/base_Root_Module_ItemDefinition.default.md) | the item definition |
 | `which` | `string` | basically the column name |
+| `args` | [`IGQLArgs`](../interfaces/gql_querier.IGQLArgs.md) | - |
+| `direction` | ``"asc"`` \| ``"desc"`` | the direction of the order by rule |
+| `nulls` | ``"first"`` \| ``"last"`` | whether nulls are first or last |
+
+#### Returns
+
+`Object`
+
+#### Defined in
+
+[base/Root/Module/ItemDefinition/PropertyDefinition/sql/index.ts:1066](https://github.com/onzag/itemize/blob/f2db74a5/base/Root/Module/ItemDefinition/PropertyDefinition/sql/index.ts#L1066)
+
+___
+
+### buildElasticOrderByForProperty
+
+▸ **buildElasticOrderByForProperty**(`serverData`, `appData`, `itemDefinition`, `include`, `propertyDefinition`, `args`, `direction`, `nulls`, `wasIncludedInSearch`, `wasIncludedInStrSearch`): `any`
+
+Builds an order by query for a given property
+
+#### Parameters
+
+| Name | Type | Description |
+| :------ | :------ | :------ |
+| `serverData` | `any` | the server data that is being used |
+| `appData` | [`IAppDataType`](../interfaces/server.IAppDataType.md) | - |
+| `itemDefinition` | [`default`](../classes/base_Root_Module_ItemDefinition.default.md) | the item definition in question |
+| `include` | [`default`](../classes/base_Root_Module_ItemDefinition_Include.default.md) | the include (or null) |
+| `propertyDefinition` | [`default`](../classes/base_Root_Module_ItemDefinition_PropertyDefinition.default.md) | the property in question |
+| `args` | [`IGQLArgs`](../interfaces/gql_querier.IGQLArgs.md) | - |
+| `direction` | ``"asc"`` \| ``"desc"`` | the direction to be accounted for |
+| `nulls` | ``"first"`` \| ``"last"`` | the nulls (first or last) |
+| `wasIncludedInSearch` | `boolean` | whether this property was included in search |
+| `wasIncludedInStrSearch` | `boolean` | whether this property was included in the str FTS search |
+
+#### Returns
+
+`any`
+
+#### Defined in
+
+[base/Root/Module/ItemDefinition/PropertyDefinition/sql/index.ts:977](https://github.com/onzag/itemize/blob/f2db74a5/base/Root/Module/ItemDefinition/PropertyDefinition/sql/index.ts#L977)
+
+___
+
+### buildElasticQueryForProperty
+
+▸ **buildElasticQueryForProperty**(`serverData`, `appData`, `itemDefinition`, `include`, `propertyDefinition`, `args`, `elasticQueryBuilder`, `language`, `dictionary`, `isOrderedByIt`): [`IElasticHighlightReply`](../interfaces/base_Root_Module_ItemDefinition_PropertyDefinition_types.IElasticHighlightReply.md)
+
+Builds a sql search query from a given property definition, the data
+coming from the search module, a sql prefix to use
+
+#### Parameters
+
+| Name | Type | Description |
+| :------ | :------ | :------ |
+| `serverData` | `any` | the server data |
+| `appData` | [`IAppDataType`](../interfaces/server.IAppDataType.md) | - |
+| `itemDefinition` | [`default`](../classes/base_Root_Module_ItemDefinition.default.md) | the item definition that contains the property |
+| `include` | [`default`](../classes/base_Root_Module_ItemDefinition_Include.default.md) | the include within the item definition, or null |
+| `propertyDefinition` | [`default`](../classes/base_Root_Module_ItemDefinition_PropertyDefinition.default.md) | the property definition in question |
+| `args` | [`IGQLArgs`](../interfaces/gql_querier.IGQLArgs.md) | the args coming from the search module in such format |
+| `elasticQueryBuilder` | [`ElasticQueryBuilder`](../classes/server_elastic.ElasticQueryBuilder.md) | the elastic building instance |
+| `language` | `string` | - |
+| `dictionary` | `string` | the dictionary that is being used |
+| `isOrderedByIt` | `boolean` | whether there will be a subsequent order by request |
+
+#### Returns
+
+[`IElasticHighlightReply`](../interfaces/base_Root_Module_ItemDefinition_PropertyDefinition_types.IElasticHighlightReply.md)
+
+#### Defined in
+
+[base/Root/Module/ItemDefinition/PropertyDefinition/sql/index.ts:770](https://github.com/onzag/itemize/blob/f2db74a5/base/Root/Module/ItemDefinition/PropertyDefinition/sql/index.ts#L770)
+
+___
+
+### buildElasticStrSearchQueryForProperty
+
+▸ **buildElasticStrSearchQueryForProperty**(`serverData`, `appData`, `itemDefinition`, `include`, `propertyDefinition`, `args`, `search`, `elasticQueryBuilder`, `language`, `dictionary`, `isOrderedByIt`): [`IElasticHighlightReply`](../interfaces/base_Root_Module_ItemDefinition_PropertyDefinition_types.IElasticHighlightReply.md)
+
+Builds a sql str FTS search query from a given property definition, the data
+coming from the search module, a sql prefix to use, and the builder
+
+#### Parameters
+
+| Name | Type | Description |
+| :------ | :------ | :------ |
+| `serverData` | `any` | the server data |
+| `appData` | [`IAppDataType`](../interfaces/server.IAppDataType.md) | - |
+| `itemDefinition` | [`default`](../classes/base_Root_Module_ItemDefinition.default.md) | the item definition that contains the property |
+| `include` | [`default`](../classes/base_Root_Module_ItemDefinition_Include.default.md) | the include within the item definition, or null |
+| `propertyDefinition` | [`default`](../classes/base_Root_Module_ItemDefinition_PropertyDefinition.default.md) | the property definition in question |
+| `args` | [`IGQLArgs`](../interfaces/gql_querier.IGQLArgs.md) | the args coming from the search module in such format |
+| `search` | `string` | the search string that is being used |
+| `elasticQueryBuilder` | [`ElasticQueryBuilder`](../classes/server_elastic.ElasticQueryBuilder.md) | the building instance |
+| `language` | `string` | - |
+| `dictionary` | `string` | the dictionary that is being used |
+| `isOrderedByIt` | `boolean` | whether there will be a subsequent order by request |
+
+#### Returns
+
+[`IElasticHighlightReply`](../interfaces/base_Root_Module_ItemDefinition_PropertyDefinition_types.IElasticHighlightReply.md)
+
+#### Defined in
+
+[base/Root/Module/ItemDefinition/PropertyDefinition/sql/index.ts:862](https://github.com/onzag/itemize/blob/f2db74a5/base/Root/Module/ItemDefinition/PropertyDefinition/sql/index.ts#L862)
+
+___
+
+### buildSQLOrderByForInternalRequiredProperty
+
+▸ **buildSQLOrderByForInternalRequiredProperty**(`itemDefinition`, `which`, `args`, `orderByBuilder`, `direction`, `nulls`): `void`
+
+Builds the order by functionality for the internal properties, such as
+created_at, edited_at, etc...
+
+#### Parameters
+
+| Name | Type | Description |
+| :------ | :------ | :------ |
+| `itemDefinition` | [`default`](../classes/base_Root_Module_ItemDefinition.default.md) | the item definition |
+| `which` | `string` | basically the column name |
+| `args` | [`IGQLArgs`](../interfaces/gql_querier.IGQLArgs.md) | - |
 | `orderByBuilder` | [`OrderByBuilder`](../classes/database_OrderByBuilder.OrderByBuilder.md) | the order by builder |
 | `direction` | ``"asc"`` \| ``"desc"`` | the direction of the order by rule |
 | `nulls` | ``"first"`` \| ``"last"`` | whether nulls are first or last |
@@ -52,13 +188,13 @@ created_at, edited_at, etc...
 
 #### Defined in
 
-[base/Root/Module/ItemDefinition/PropertyDefinition/sql/index.ts:559](https://github.com/onzag/itemize/blob/5c2808d3/base/Root/Module/ItemDefinition/PropertyDefinition/sql/index.ts#L559)
+[base/Root/Module/ItemDefinition/PropertyDefinition/sql/index.ts:1024](https://github.com/onzag/itemize/blob/f2db74a5/base/Root/Module/ItemDefinition/PropertyDefinition/sql/index.ts#L1024)
 
 ___
 
 ### buildSQLOrderByForProperty
 
-▸ **buildSQLOrderByForProperty**(`serverData`, `itemDefinition`, `include`, `propertyDefinition`, `orderByBuilder`, `direction`, `nulls`, `wasIncludedInSearch`, `wasIncludedInStrSearch`): `void`
+▸ **buildSQLOrderByForProperty**(`serverData`, `appData`, `itemDefinition`, `include`, `propertyDefinition`, `args`, `orderByBuilder`, `direction`, `nulls`, `wasIncludedInSearch`, `wasIncludedInStrSearch`): `void`
 
 Builds an order by query for a given property
 
@@ -67,9 +203,11 @@ Builds an order by query for a given property
 | Name | Type | Description |
 | :------ | :------ | :------ |
 | `serverData` | `any` | the server data that is being used |
+| `appData` | [`IAppDataType`](../interfaces/server.IAppDataType.md) | - |
 | `itemDefinition` | [`default`](../classes/base_Root_Module_ItemDefinition.default.md) | the item definition in question |
 | `include` | [`default`](../classes/base_Root_Module_ItemDefinition_Include.default.md) | the include (or null) |
 | `propertyDefinition` | [`default`](../classes/base_Root_Module_ItemDefinition_PropertyDefinition.default.md) | the property in question |
+| `args` | [`IGQLArgs`](../interfaces/gql_querier.IGQLArgs.md) | - |
 | `orderByBuilder` | [`OrderByBuilder`](../classes/database_OrderByBuilder.OrderByBuilder.md) | the order by builder that is currently building the query |
 | `direction` | ``"asc"`` \| ``"desc"`` | the direction to be accounted for |
 | `nulls` | ``"first"`` \| ``"last"`` | the nulls (first or last) |
@@ -82,13 +220,13 @@ Builds an order by query for a given property
 
 #### Defined in
 
-[base/Root/Module/ItemDefinition/PropertyDefinition/sql/index.ts:510](https://github.com/onzag/itemize/blob/5c2808d3/base/Root/Module/ItemDefinition/PropertyDefinition/sql/index.ts#L510)
+[base/Root/Module/ItemDefinition/PropertyDefinition/sql/index.ts:922](https://github.com/onzag/itemize/blob/f2db74a5/base/Root/Module/ItemDefinition/PropertyDefinition/sql/index.ts#L922)
 
 ___
 
 ### buildSQLQueryForProperty
 
-▸ **buildSQLQueryForProperty**(`serverData`, `itemDefinition`, `include`, `propertyDefinition`, `args`, `whereBuilder`, `dictionary`, `isOrderedByIt`): `boolean` \| [`string`, `any`[]]
+▸ **buildSQLQueryForProperty**(`serverData`, `appData`, `itemDefinition`, `include`, `propertyDefinition`, `args`, `whereBuilder`, `language`, `dictionary`, `isOrderedByIt`): `boolean` \| [`string`, `any`[]]
 
 Builds a sql search query from a given property definition, the data
 coming from the search module, a sql prefix to use
@@ -98,11 +236,13 @@ coming from the search module, a sql prefix to use
 | Name | Type | Description |
 | :------ | :------ | :------ |
 | `serverData` | `any` | the server data |
+| `appData` | [`IAppDataType`](../interfaces/server.IAppDataType.md) | - |
 | `itemDefinition` | [`default`](../classes/base_Root_Module_ItemDefinition.default.md) | the item definition that contains the property |
 | `include` | [`default`](../classes/base_Root_Module_ItemDefinition_Include.default.md) | the include within the item definition, or null |
 | `propertyDefinition` | [`default`](../classes/base_Root_Module_ItemDefinition_PropertyDefinition.default.md) | the property definition in question |
 | `args` | [`IGQLArgs`](../interfaces/gql_querier.IGQLArgs.md) | the args coming from the search module in such format |
 | `whereBuilder` | [`WhereBuilder`](../classes/database_WhereBuilder.WhereBuilder.md) | the where building instance |
+| `language` | `string` | - |
 | `dictionary` | `string` | the dictionary that is being used |
 | `isOrderedByIt` | `boolean` | whether there will be a subsequent order by request |
 
@@ -112,13 +252,13 @@ coming from the search module, a sql prefix to use
 
 #### Defined in
 
-[base/Root/Module/ItemDefinition/PropertyDefinition/sql/index.ts:419](https://github.com/onzag/itemize/blob/5c2808d3/base/Root/Module/ItemDefinition/PropertyDefinition/sql/index.ts#L419)
+[base/Root/Module/ItemDefinition/PropertyDefinition/sql/index.ts:730](https://github.com/onzag/itemize/blob/f2db74a5/base/Root/Module/ItemDefinition/PropertyDefinition/sql/index.ts#L730)
 
 ___
 
 ### buildSQLStrSearchQueryForProperty
 
-▸ **buildSQLStrSearchQueryForProperty**(`serverData`, `itemDefinition`, `include`, `propertyDefinition`, `args`, `search`, `whereBuilder`, `dictionary`, `isOrderedByIt`): `boolean` \| [`string`, `any`[]]
+▸ **buildSQLStrSearchQueryForProperty**(`serverData`, `appData`, `itemDefinition`, `include`, `propertyDefinition`, `args`, `search`, `whereBuilder`, `language`, `dictionary`, `isOrderedByIt`): `boolean` \| [`string`, `any`[]]
 
 Builds a sql str FTS search query from a given property definition, the data
 coming from the search module, a sql prefix to use, and the builder
@@ -128,12 +268,14 @@ coming from the search module, a sql prefix to use, and the builder
 | Name | Type | Description |
 | :------ | :------ | :------ |
 | `serverData` | `any` | the server data |
+| `appData` | [`IAppDataType`](../interfaces/server.IAppDataType.md) | - |
 | `itemDefinition` | [`default`](../classes/base_Root_Module_ItemDefinition.default.md) | the item definition that contains the property |
 | `include` | [`default`](../classes/base_Root_Module_ItemDefinition_Include.default.md) | the include within the item definition, or null |
 | `propertyDefinition` | [`default`](../classes/base_Root_Module_ItemDefinition_PropertyDefinition.default.md) | the property definition in question |
 | `args` | [`IGQLArgs`](../interfaces/gql_querier.IGQLArgs.md) | the args coming from the search module in such format |
 | `search` | `string` | the search string that is being used |
 | `whereBuilder` | [`WhereBuilder`](../classes/database_WhereBuilder.WhereBuilder.md) | the where building instance |
+| `language` | `string` | - |
 | `dictionary` | `string` | the dictionary that is being used |
 | `isOrderedByIt` | `boolean` | whether there will be a subsequent order by request |
 
@@ -143,13 +285,13 @@ coming from the search module, a sql prefix to use, and the builder
 
 #### Defined in
 
-[base/Root/Module/ItemDefinition/PropertyDefinition/sql/index.ts:456](https://github.com/onzag/itemize/blob/5c2808d3/base/Root/Module/ItemDefinition/PropertyDefinition/sql/index.ts#L456)
+[base/Root/Module/ItemDefinition/PropertyDefinition/sql/index.ts:816](https://github.com/onzag/itemize/blob/f2db74a5/base/Root/Module/ItemDefinition/PropertyDefinition/sql/index.ts#L816)
 
 ___
 
 ### convertGQLValueToSQLValueForProperty
 
-▸ **convertGQLValueToSQLValueForProperty**(`serverData`, `mod`, `itemDefinition`, `include`, `propertyDefinition`, `data`, `oldData`, `uploadsClient`, `domain`, `dictionary`): [`ISQLStreamComposedTableRowValue`](../interfaces/base_Root_sql.ISQLStreamComposedTableRowValue.md)
+▸ **convertGQLValueToSQLValueForProperty**(`serverData`, `appData`, `mod`, `itemDefinition`, `include`, `propertyDefinition`, `data`, `oldData`, `uploadsClient`, `domain`, `language`, `dictionary`): [`ISQLStreamComposedTableRowValue`](../interfaces/base_Root_sql.ISQLStreamComposedTableRowValue.md)
 
 Converts a graphql value into a sql value, that is graphql data into row
 data to be immediately added to the database as it is
@@ -159,6 +301,7 @@ data to be immediately added to the database as it is
 | Name | Type | Description |
 | :------ | :------ | :------ |
 | `serverData` | `any` | the server data |
+| `appData` | [`IAppDataType`](../interfaces/server.IAppDataType.md) | - |
 | `mod` | [`default`](../classes/base_Root_Module.default.md) | the module |
 | `itemDefinition` | [`default`](../classes/base_Root_Module_ItemDefinition.default.md) | the item definition that contains the property |
 | `include` | [`default`](../classes/base_Root_Module_ItemDefinition_Include.default.md) | the include within the item definition, or null |
@@ -167,7 +310,8 @@ data to be immediately added to the database as it is
 | `oldData` | [`IGQLValue`](../interfaces/gql_querier.IGQLValue.md) | the old graphql data |
 | `uploadsClient` | [`default`](../classes/server_services_base_StorageProvider.default.md)<`any`\> | - |
 | `domain` | `string` | - |
-| `dictionary` | `string` | the dictionary to use in full text search mode |
+| `language` | `string` \| [`ISQLTableRowValue`](../interfaces/base_Root_sql.ISQLTableRowValue.md) | - |
+| `dictionary` | `string` \| [`ISQLTableRowValue`](../interfaces/base_Root_sql.ISQLTableRowValue.md) | the dictionary to use in full text search mode |
 
 #### Returns
 
@@ -178,13 +322,38 @@ included in it
 
 #### Defined in
 
-[base/Root/Module/ItemDefinition/PropertyDefinition/sql/index.ts:321](https://github.com/onzag/itemize/blob/5c2808d3/base/Root/Module/ItemDefinition/PropertyDefinition/sql/index.ts#L321)
+[base/Root/Module/ItemDefinition/PropertyDefinition/sql/index.ts:628](https://github.com/onzag/itemize/blob/f2db74a5/base/Root/Module/ItemDefinition/PropertyDefinition/sql/index.ts#L628)
+
+___
+
+### convertSQLValueToElasticSQLValueForProperty
+
+▸ **convertSQLValueToElasticSQLValueForProperty**(`serverData`, `appData`, `itemDefinition`, `include`, `propertyDefinition`, `row`): [`IGQLValue`](../interfaces/gql_querier.IGQLValue.md)
+
+#### Parameters
+
+| Name | Type |
+| :------ | :------ |
+| `serverData` | `any` |
+| `appData` | [`IAppDataType`](../interfaces/server.IAppDataType.md) |
+| `itemDefinition` | [`default`](../classes/base_Root_Module_ItemDefinition.default.md) |
+| `include` | [`default`](../classes/base_Root_Module_ItemDefinition_Include.default.md) |
+| `propertyDefinition` | [`default`](../classes/base_Root_Module_ItemDefinition_PropertyDefinition.default.md) |
+| `row` | [`ISQLTableRowValue`](../interfaces/base_Root_sql.ISQLTableRowValue.md) |
+
+#### Returns
+
+[`IGQLValue`](../interfaces/gql_querier.IGQLValue.md)
+
+#### Defined in
+
+[base/Root/Module/ItemDefinition/PropertyDefinition/sql/index.ts:590](https://github.com/onzag/itemize/blob/f2db74a5/base/Root/Module/ItemDefinition/PropertyDefinition/sql/index.ts#L590)
 
 ___
 
 ### convertSQLValueToGQLValueForProperty
 
-▸ **convertSQLValueToGQLValueForProperty**(`serverData`, `itemDefinition`, `include`, `propertyDefinition`, `row`): [`IGQLValue`](../interfaces/gql_querier.IGQLValue.md)
+▸ **convertSQLValueToGQLValueForProperty**(`serverData`, `appData`, `itemDefinition`, `include`, `propertyDefinition`, `row`): [`IGQLValue`](../interfaces/gql_querier.IGQLValue.md)
 
 Takes row data information that is in the SQL form and converts
 it into a graphql form, only for this specific property
@@ -194,6 +363,7 @@ it into a graphql form, only for this specific property
 | Name | Type | Description |
 | :------ | :------ | :------ |
 | `serverData` | `any` | the server data |
+| `appData` | [`IAppDataType`](../interfaces/server.IAppDataType.md) | - |
 | `itemDefinition` | [`default`](../classes/base_Root_Module_ItemDefinition.default.md) | the item definition that contains the property |
 | `include` | [`default`](../classes/base_Root_Module_ItemDefinition_Include.default.md) | the include within the item definition, or null |
 | `propertyDefinition` | [`default`](../classes/base_Root_Module_ItemDefinition_PropertyDefinition.default.md) | the property definition in question |
@@ -207,7 +377,31 @@ the graphql value for the property
 
 #### Defined in
 
-[base/Root/Module/ItemDefinition/PropertyDefinition/sql/index.ts:246](https://github.com/onzag/itemize/blob/5c2808d3/base/Root/Module/ItemDefinition/PropertyDefinition/sql/index.ts#L246)
+[base/Root/Module/ItemDefinition/PropertyDefinition/sql/index.ts:529](https://github.com/onzag/itemize/blob/f2db74a5/base/Root/Module/ItemDefinition/PropertyDefinition/sql/index.ts#L529)
+
+___
+
+### getElasticSchemaForProperty
+
+▸ **getElasticSchemaForProperty**(`itemDefinition`, `include`, `propertyDefinition`, `serverData`, `appData`): [`IElasticIndexDefinitionType`](../interfaces/base_Root_sql.IElasticIndexDefinitionType.md)
+
+#### Parameters
+
+| Name | Type |
+| :------ | :------ |
+| `itemDefinition` | [`default`](../classes/base_Root_Module_ItemDefinition.default.md) |
+| `include` | [`default`](../classes/base_Root_Module_ItemDefinition_Include.default.md) |
+| `propertyDefinition` | [`default`](../classes/base_Root_Module_ItemDefinition_PropertyDefinition.default.md) |
+| `serverData` | `any` |
+| `appData` | [`IAppDataType`](../interfaces/server.IAppDataType.md) |
+
+#### Returns
+
+[`IElasticIndexDefinitionType`](../interfaces/base_Root_sql.IElasticIndexDefinitionType.md)
+
+#### Defined in
+
+[base/Root/Module/ItemDefinition/PropertyDefinition/sql/index.ts:494](https://github.com/onzag/itemize/blob/f2db74a5/base/Root/Module/ItemDefinition/PropertyDefinition/sql/index.ts#L494)
 
 ___
 
@@ -234,7 +428,76 @@ the partial sql table definition for the property
 
 #### Defined in
 
-[base/Root/Module/ItemDefinition/PropertyDefinition/sql/index.ts:217](https://github.com/onzag/itemize/blob/5c2808d3/base/Root/Module/ItemDefinition/PropertyDefinition/sql/index.ts#L217)
+[base/Root/Module/ItemDefinition/PropertyDefinition/sql/index.ts:474](https://github.com/onzag/itemize/blob/f2db74a5/base/Root/Module/ItemDefinition/PropertyDefinition/sql/index.ts#L474)
+
+___
+
+### getStandardElasticFor
+
+▸ **getStandardElasticFor**(`type`, `nullValue`, `format?`, `disabled?`): (`arg`: [`IArgInfo`](../interfaces/base_Root_Module_ItemDefinition_PropertyDefinition_types.IArgInfo.md)) => [`IElasticIndexDefinitionType`](../interfaces/base_Root_sql.IElasticIndexDefinitionType.md)
+
+#### Parameters
+
+| Name | Type |
+| :------ | :------ |
+| `type` | `string` |
+| `nullValue` | `any` |
+| `format?` | `string` |
+| `disabled?` | `boolean` |
+
+#### Returns
+
+`fn`
+
+▸ (`arg`): [`IElasticIndexDefinitionType`](../interfaces/base_Root_sql.IElasticIndexDefinitionType.md)
+
+##### Parameters
+
+| Name | Type |
+| :------ | :------ |
+| `arg` | [`IArgInfo`](../interfaces/base_Root_Module_ItemDefinition_PropertyDefinition_types.IArgInfo.md) |
+
+##### Returns
+
+[`IElasticIndexDefinitionType`](../interfaces/base_Root_sql.IElasticIndexDefinitionType.md)
+
+#### Defined in
+
+[base/Root/Module/ItemDefinition/PropertyDefinition/sql/index.ts:66](https://github.com/onzag/itemize/blob/f2db74a5/base/Root/Module/ItemDefinition/PropertyDefinition/sql/index.ts#L66)
+
+___
+
+### getStandardElasticForWithNullField
+
+▸ **getStandardElasticForWithNullField**(`type`, `format?`, `disabled?`): (`arg`: [`IArgInfo`](../interfaces/base_Root_Module_ItemDefinition_PropertyDefinition_types.IArgInfo.md)) => [`IElasticIndexDefinitionType`](../interfaces/base_Root_sql.IElasticIndexDefinitionType.md)
+
+#### Parameters
+
+| Name | Type |
+| :------ | :------ |
+| `type` | `string` |
+| `format?` | `string` |
+| `disabled?` | `boolean` |
+
+#### Returns
+
+`fn`
+
+▸ (`arg`): [`IElasticIndexDefinitionType`](../interfaces/base_Root_sql.IElasticIndexDefinitionType.md)
+
+##### Parameters
+
+| Name | Type |
+| :------ | :------ |
+| `arg` | [`IArgInfo`](../interfaces/base_Root_Module_ItemDefinition_PropertyDefinition_types.IArgInfo.md) |
+
+##### Returns
+
+[`IElasticIndexDefinitionType`](../interfaces/base_Root_sql.IElasticIndexDefinitionType.md)
+
+#### Defined in
+
+[base/Root/Module/ItemDefinition/PropertyDefinition/sql/index.ts:97](https://github.com/onzag/itemize/blob/f2db74a5/base/Root/Module/ItemDefinition/PropertyDefinition/sql/index.ts#L97)
 
 ___
 
@@ -278,7 +541,71 @@ a function that returns the partial table definition object with the given type
 
 #### Defined in
 
-[base/Root/Module/ItemDefinition/PropertyDefinition/sql/index.ts:36](https://github.com/onzag/itemize/blob/5c2808d3/base/Root/Module/ItemDefinition/PropertyDefinition/sql/index.ts#L36)
+[base/Root/Module/ItemDefinition/PropertyDefinition/sql/index.ts:38](https://github.com/onzag/itemize/blob/f2db74a5/base/Root/Module/ItemDefinition/PropertyDefinition/sql/index.ts#L38)
+
+___
+
+### standardElasticOrderBy
+
+▸ **standardElasticOrderBy**(`arg`): `Object`
+
+#### Parameters
+
+| Name | Type |
+| :------ | :------ |
+| `arg` | [`ISQLOrderByInfo`](../interfaces/base_Root_Module_ItemDefinition_PropertyDefinition_types.ISQLOrderByInfo.md) |
+
+#### Returns
+
+`Object`
+
+#### Defined in
+
+[base/Root/Module/ItemDefinition/PropertyDefinition/sql/index.ts:133](https://github.com/onzag/itemize/blob/f2db74a5/base/Root/Module/ItemDefinition/PropertyDefinition/sql/index.ts#L133)
+
+___
+
+### standardElasticSearchFnExactAndRange
+
+▸ **standardElasticSearchFnExactAndRange**(`nullFieldValue`, `arg`): `Object`
+
+You must ensure no overlap in ranged search, if they are availbe in order
+for this function to be useful, it will not pluck them out
+
+#### Parameters
+
+| Name | Type |
+| :------ | :------ |
+| `nullFieldValue` | `string` |
+| `arg` | [`IElasticSearchInfo`](../interfaces/base_Root_Module_ItemDefinition_PropertyDefinition_types.IElasticSearchInfo.md) |
+
+#### Returns
+
+`Object`
+
+#### Defined in
+
+[base/Root/Module/ItemDefinition/PropertyDefinition/sql/index.ts:426](https://github.com/onzag/itemize/blob/f2db74a5/base/Root/Module/ItemDefinition/PropertyDefinition/sql/index.ts#L426)
+
+___
+
+### standardElasticSearchFnWithNullFieldExactAndRange
+
+▸ **standardElasticSearchFnWithNullFieldExactAndRange**(`arg`): `Object`
+
+#### Parameters
+
+| Name | Type |
+| :------ | :------ |
+| `arg` | [`IElasticSearchInfo`](../interfaces/base_Root_Module_ItemDefinition_PropertyDefinition_types.IElasticSearchInfo.md) |
+
+#### Returns
+
+`Object`
+
+#### Defined in
+
+[base/Root/Module/ItemDefinition/PropertyDefinition/sql/index.ts:430](https://github.com/onzag/itemize/blob/f2db74a5/base/Root/Module/ItemDefinition/PropertyDefinition/sql/index.ts#L430)
 
 ___
 
@@ -302,7 +629,32 @@ an array of the columns to index
 
 #### Defined in
 
-[base/Root/Module/ItemDefinition/PropertyDefinition/sql/index.ts:205](https://github.com/onzag/itemize/blob/5c2808d3/base/Root/Module/ItemDefinition/PropertyDefinition/sql/index.ts#L205)
+[base/Root/Module/ItemDefinition/PropertyDefinition/sql/index.ts:462](https://github.com/onzag/itemize/blob/f2db74a5/base/Root/Module/ItemDefinition/PropertyDefinition/sql/index.ts#L462)
+
+___
+
+### standardSQLElasticInFn
+
+▸ **standardSQLElasticInFn**(`arg`): `any`
+
+The standard sql elastic out that converts to the elastic
+stored form
+
+#### Parameters
+
+| Name | Type | Description |
+| :------ | :------ | :------ |
+| `arg` | [`ISQLOutInfo`](../interfaces/base_Root_Module_ItemDefinition_PropertyDefinition_types.ISQLOutInfo.md) | the out arg info |
+
+#### Returns
+
+`any`
+
+the property value out
+
+#### Defined in
+
+[base/Root/Module/ItemDefinition/PropertyDefinition/sql/index.ts:265](https://github.com/onzag/itemize/blob/f2db74a5/base/Root/Module/ItemDefinition/PropertyDefinition/sql/index.ts#L265)
 
 ___
 
@@ -327,7 +679,7 @@ for where many
 
 #### Defined in
 
-[base/Root/Module/ItemDefinition/PropertyDefinition/sql/index.ts:183](https://github.com/onzag/itemize/blob/5c2808d3/base/Root/Module/ItemDefinition/PropertyDefinition/sql/index.ts#L183)
+[base/Root/Module/ItemDefinition/PropertyDefinition/sql/index.ts:440](https://github.com/onzag/itemize/blob/f2db74a5/base/Root/Module/ItemDefinition/PropertyDefinition/sql/index.ts#L440)
 
 ___
 
@@ -352,7 +704,7 @@ the partial row value
 
 #### Defined in
 
-[base/Root/Module/ItemDefinition/PropertyDefinition/sql/index.ts:92](https://github.com/onzag/itemize/blob/5c2808d3/base/Root/Module/ItemDefinition/PropertyDefinition/sql/index.ts#L92)
+[base/Root/Module/ItemDefinition/PropertyDefinition/sql/index.ts:163](https://github.com/onzag/itemize/blob/f2db74a5/base/Root/Module/ItemDefinition/PropertyDefinition/sql/index.ts#L163)
 
 ___
 
@@ -376,13 +728,13 @@ an array of string with the order by
 
 #### Defined in
 
-[base/Root/Module/ItemDefinition/PropertyDefinition/sql/index.ts:69](https://github.com/onzag/itemize/blob/5c2808d3/base/Root/Module/ItemDefinition/PropertyDefinition/sql/index.ts#L69)
+[base/Root/Module/ItemDefinition/PropertyDefinition/sql/index.ts:129](https://github.com/onzag/itemize/blob/f2db74a5/base/Root/Module/ItemDefinition/PropertyDefinition/sql/index.ts#L129)
 
 ___
 
 ### standardSQLOutFn
 
-▸ **standardSQLOutFn**(`arg`): `any`
+▸ **standardSQLOutFn**(`fallbackNull`, `arg`): `any`
 
 The standard sql out function that defines
 how a value for a property is extracted from a given
@@ -392,6 +744,7 @@ row
 
 | Name | Type | Description |
 | :------ | :------ | :------ |
+| `fallbackNull` | `any` | - |
 | `arg` | [`ISQLOutInfo`](../interfaces/base_Root_Module_ItemDefinition_PropertyDefinition_types.ISQLOutInfo.md) | the out arg info |
 
 #### Returns
@@ -402,13 +755,13 @@ the property value out
 
 #### Defined in
 
-[base/Root/Module/ItemDefinition/PropertyDefinition/sql/index.ts:123](https://github.com/onzag/itemize/blob/5c2808d3/base/Root/Module/ItemDefinition/PropertyDefinition/sql/index.ts#L123)
+[base/Root/Module/ItemDefinition/PropertyDefinition/sql/index.ts:224](https://github.com/onzag/itemize/blob/f2db74a5/base/Root/Module/ItemDefinition/PropertyDefinition/sql/index.ts#L224)
 
 ___
 
 ### standardSQLOutWithJSONParseFn
 
-▸ **standardSQLOutWithJSONParseFn**(`arg`): `any`
+▸ **standardSQLOutWithJSONParseFn**(`fallbackNull`, `arg`): `any`
 
 The standard sql out function that deserializes values
 as they are expected to be stored serialized
@@ -417,6 +770,7 @@ as they are expected to be stored serialized
 
 | Name | Type | Description |
 | :------ | :------ | :------ |
+| `fallbackNull` | `any` | - |
 | `arg` | [`ISQLOutInfo`](../interfaces/base_Root_Module_ItemDefinition_PropertyDefinition_types.ISQLOutInfo.md) | the sql out info arg |
 
 #### Returns
@@ -427,7 +781,7 @@ the supported type json parsed
 
 #### Defined in
 
-[base/Root/Module/ItemDefinition/PropertyDefinition/sql/index.ts:133](https://github.com/onzag/itemize/blob/5c2808d3/base/Root/Module/ItemDefinition/PropertyDefinition/sql/index.ts#L133)
+[base/Root/Module/ItemDefinition/PropertyDefinition/sql/index.ts:277](https://github.com/onzag/itemize/blob/f2db74a5/base/Root/Module/ItemDefinition/PropertyDefinition/sql/index.ts#L277)
 
 ___
 
@@ -451,7 +805,7 @@ a boolean on whether it was searched by it
 
 #### Defined in
 
-[base/Root/Module/ItemDefinition/PropertyDefinition/sql/index.ts:150](https://github.com/onzag/itemize/blob/5c2808d3/base/Root/Module/ItemDefinition/PropertyDefinition/sql/index.ts#L150)
+[base/Root/Module/ItemDefinition/PropertyDefinition/sql/index.ts:308](https://github.com/onzag/itemize/blob/f2db74a5/base/Root/Module/ItemDefinition/PropertyDefinition/sql/index.ts#L308)
 
 ___
 
@@ -476,7 +830,7 @@ the rows to select
 
 #### Defined in
 
-[base/Root/Module/ItemDefinition/PropertyDefinition/sql/index.ts:79](https://github.com/onzag/itemize/blob/5c2808d3/base/Root/Module/ItemDefinition/PropertyDefinition/sql/index.ts#L79)
+[base/Root/Module/ItemDefinition/PropertyDefinition/sql/index.ts:145](https://github.com/onzag/itemize/blob/f2db74a5/base/Root/Module/ItemDefinition/PropertyDefinition/sql/index.ts#L145)
 
 ___
 
@@ -501,4 +855,4 @@ the partial row value
 
 #### Defined in
 
-[base/Root/Module/ItemDefinition/PropertyDefinition/sql/index.ts:105](https://github.com/onzag/itemize/blob/5c2808d3/base/Root/Module/ItemDefinition/PropertyDefinition/sql/index.ts#L105)
+[base/Root/Module/ItemDefinition/PropertyDefinition/sql/index.ts:203](https://github.com/onzag/itemize/blob/f2db74a5/base/Root/Module/ItemDefinition/PropertyDefinition/sql/index.ts#L203)

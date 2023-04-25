@@ -21,27 +21,11 @@ for such
 - [availableContainers](client_fast_prototyping_components_slate.IAccessibleFeatureSupportOptions.md#availablecontainers)
 - [availableCustoms](client_fast_prototyping_components_slate.IAccessibleFeatureSupportOptions.md#availablecustoms)
 - [availableRichClasses](client_fast_prototyping_components_slate.IAccessibleFeatureSupportOptions.md#availablerichclasses)
-- [canInsertAnyElement](client_fast_prototyping_components_slate.IAccessibleFeatureSupportOptions.md#caninsertanyelement)
-- [canInsertContainer](client_fast_prototyping_components_slate.IAccessibleFeatureSupportOptions.md#caninsertcontainer)
-- [canInsertCustom](client_fast_prototyping_components_slate.IAccessibleFeatureSupportOptions.md#caninsertcustom)
-- [canInsertFile](client_fast_prototyping_components_slate.IAccessibleFeatureSupportOptions.md#caninsertfile)
-- [canInsertImage](client_fast_prototyping_components_slate.IAccessibleFeatureSupportOptions.md#caninsertimage)
-- [canInsertLink](client_fast_prototyping_components_slate.IAccessibleFeatureSupportOptions.md#caninsertlink)
-- [canInsertList](client_fast_prototyping_components_slate.IAccessibleFeatureSupportOptions.md#caninsertlist)
-- [canInsertQuote](client_fast_prototyping_components_slate.IAccessibleFeatureSupportOptions.md#caninsertquote)
-- [canInsertRichClass](client_fast_prototyping_components_slate.IAccessibleFeatureSupportOptions.md#caninsertrichclass)
-- [canInsertTitle](client_fast_prototyping_components_slate.IAccessibleFeatureSupportOptions.md#caninserttitle)
-- [canInsertVideo](client_fast_prototyping_components_slate.IAccessibleFeatureSupportOptions.md#caninsertvideo)
-- [canSetActionFunction](client_fast_prototyping_components_slate.IAccessibleFeatureSupportOptions.md#cansetactionfunction)
-- [canSetActiveStyle](client_fast_prototyping_components_slate.IAccessibleFeatureSupportOptions.md#cansetactivestyle)
-- [canSetDynamicHref](client_fast_prototyping_components_slate.IAccessibleFeatureSupportOptions.md#cansetdynamichref)
-- [canSetHoverStyle](client_fast_prototyping_components_slate.IAccessibleFeatureSupportOptions.md#cansethoverstyle)
-- [canSetLoop](client_fast_prototyping_components_slate.IAccessibleFeatureSupportOptions.md#cansetloop)
-- [canSetStyle](client_fast_prototyping_components_slate.IAccessibleFeatureSupportOptions.md#cansetstyle)
-- [canSetUIHandler](client_fast_prototyping_components_slate.IAccessibleFeatureSupportOptions.md#cansetuihandler)
+- [availableTables](client_fast_prototyping_components_slate.IAccessibleFeatureSupportOptions.md#availabletables)
 - [supportedContainers](client_fast_prototyping_components_slate.IAccessibleFeatureSupportOptions.md#supportedcontainers)
 - [supportedCustoms](client_fast_prototyping_components_slate.IAccessibleFeatureSupportOptions.md#supportedcustoms)
 - [supportedRichClasses](client_fast_prototyping_components_slate.IAccessibleFeatureSupportOptions.md#supportedrichclasses)
+- [supportedTables](client_fast_prototyping_components_slate.IAccessibleFeatureSupportOptions.md#supportedtables)
 - [supportsContainers](client_fast_prototyping_components_slate.IAccessibleFeatureSupportOptions.md#supportscontainers)
 - [supportsCustom](client_fast_prototyping_components_slate.IAccessibleFeatureSupportOptions.md#supportscustom)
 - [supportsCustomStyles](client_fast_prototyping_components_slate.IAccessibleFeatureSupportOptions.md#supportscustomstyles)
@@ -54,6 +38,7 @@ for such
 - [supportsLists](client_fast_prototyping_components_slate.IAccessibleFeatureSupportOptions.md#supportslists)
 - [supportsQuote](client_fast_prototyping_components_slate.IAccessibleFeatureSupportOptions.md#supportsquote)
 - [supportsRichClasses](client_fast_prototyping_components_slate.IAccessibleFeatureSupportOptions.md#supportsrichclasses)
+- [supportsTables](client_fast_prototyping_components_slate.IAccessibleFeatureSupportOptions.md#supportstables)
 - [supportsTemplating](client_fast_prototyping_components_slate.IAccessibleFeatureSupportOptions.md#supportstemplating)
 - [supportsTitle](client_fast_prototyping_components_slate.IAccessibleFeatureSupportOptions.md#supportstitle)
 - [supportsVideos](client_fast_prototyping_components_slate.IAccessibleFeatureSupportOptions.md#supportsvideos)
@@ -68,7 +53,7 @@ The classes that are available for the containers
 
 #### Defined in
 
-[client/fast-prototyping/components/slate/index.tsx:541](https://github.com/onzag/itemize/blob/5c2808d3/client/fast-prototyping/components/slate/index.tsx#L541)
+[client/fast-prototyping/components/slate/index.tsx:329](https://github.com/onzag/itemize/blob/f2db74a5/client/fast-prototyping/components/slate/index.tsx#L329)
 
 ___
 
@@ -80,7 +65,7 @@ The customs that are available
 
 #### Defined in
 
-[client/fast-prototyping/components/slate/index.tsx:537](https://github.com/onzag/itemize/blob/5c2808d3/client/fast-prototyping/components/slate/index.tsx#L537)
+[client/fast-prototyping/components/slate/index.tsx:325](https://github.com/onzag/itemize/blob/f2db74a5/client/fast-prototyping/components/slate/index.tsx#L325)
 
 ___
 
@@ -93,231 +78,19 @@ non prefixed
 
 #### Defined in
 
-[client/fast-prototyping/components/slate/index.tsx:533](https://github.com/onzag/itemize/blob/5c2808d3/client/fast-prototyping/components/slate/index.tsx#L533)
+[client/fast-prototyping/components/slate/index.tsx:321](https://github.com/onzag/itemize/blob/f2db74a5/client/fast-prototyping/components/slate/index.tsx#L321)
 
 ___
 
-### canInsertAnyElement
+### availableTables
 
-• **canInsertAnyElement**: `boolean`
+• **availableTables**: `IAvailableElementCSSClassName`[]
 
-Able to insert any custom element from
-custom toolbar
-
-#### Defined in
-
-[client/fast-prototyping/components/slate/index.tsx:527](https://github.com/onzag/itemize/blob/5c2808d3/client/fast-prototyping/components/slate/index.tsx#L527)
-
-___
-
-### canInsertContainer
-
-• **canInsertContainer**: `boolean`
-
-Whether a container can be inserted at the given location
+The classes that are available for the containers
 
 #### Defined in
 
-[client/fast-prototyping/components/slate/index.tsx:465](https://github.com/onzag/itemize/blob/5c2808d3/client/fast-prototyping/components/slate/index.tsx#L465)
-
-___
-
-### canInsertCustom
-
-• **canInsertCustom**: `boolean`
-
-Whether a custom element can be inserted at the given
-location
-
-#### Defined in
-
-[client/fast-prototyping/components/slate/index.tsx:474](https://github.com/onzag/itemize/blob/5c2808d3/client/fast-prototyping/components/slate/index.tsx#L474)
-
-___
-
-### canInsertFile
-
-• **canInsertFile**: `boolean`
-
-Whether a file can be inserted at the given location
-
-#### Defined in
-
-[client/fast-prototyping/components/slate/index.tsx:457](https://github.com/onzag/itemize/blob/5c2808d3/client/fast-prototyping/components/slate/index.tsx#L457)
-
-___
-
-### canInsertImage
-
-• **canInsertImage**: `boolean`
-
-Whether an image can be inserted at the given location
-
-#### Defined in
-
-[client/fast-prototyping/components/slate/index.tsx:449](https://github.com/onzag/itemize/blob/5c2808d3/client/fast-prototyping/components/slate/index.tsx#L449)
-
-___
-
-### canInsertLink
-
-• **canInsertLink**: `boolean`
-
-Whether a link can be inserted at the given location
-
-#### Defined in
-
-[client/fast-prototyping/components/slate/index.tsx:461](https://github.com/onzag/itemize/blob/5c2808d3/client/fast-prototyping/components/slate/index.tsx#L461)
-
-___
-
-### canInsertList
-
-• **canInsertList**: `boolean`
-
-Whether a list can be inserted at the given location
-
-#### Defined in
-
-[client/fast-prototyping/components/slate/index.tsx:469](https://github.com/onzag/itemize/blob/5c2808d3/client/fast-prototyping/components/slate/index.tsx#L469)
-
-___
-
-### canInsertQuote
-
-• **canInsertQuote**: `boolean`
-
-Whether a quote can be inserted at the given location
-
-#### Defined in
-
-[client/fast-prototyping/components/slate/index.tsx:478](https://github.com/onzag/itemize/blob/5c2808d3/client/fast-prototyping/components/slate/index.tsx#L478)
-
-___
-
-### canInsertRichClass
-
-• **canInsertRichClass**: `boolean`
-
-Whether a rich class element can be inserted at the given location
-
-#### Defined in
-
-[client/fast-prototyping/components/slate/index.tsx:486](https://github.com/onzag/itemize/blob/5c2808d3/client/fast-prototyping/components/slate/index.tsx#L486)
-
-___
-
-### canInsertTitle
-
-• **canInsertTitle**: `boolean`
-
-Whether a title element can be inserted at the given location
-
-#### Defined in
-
-[client/fast-prototyping/components/slate/index.tsx:482](https://github.com/onzag/itemize/blob/5c2808d3/client/fast-prototyping/components/slate/index.tsx#L482)
-
-___
-
-### canInsertVideo
-
-• **canInsertVideo**: `boolean`
-
-Whether a video can be inserted at the given location
-
-#### Defined in
-
-[client/fast-prototyping/components/slate/index.tsx:453](https://github.com/onzag/itemize/blob/5c2808d3/client/fast-prototyping/components/slate/index.tsx#L453)
-
-___
-
-### canSetActionFunction
-
-• **canSetActionFunction**: `boolean`
-
-Whether an action function can be set on the given element
-normally true if templating is true
-
-#### Defined in
-
-[client/fast-prototyping/components/slate/index.tsx:517](https://github.com/onzag/itemize/blob/5c2808d3/client/fast-prototyping/components/slate/index.tsx#L517)
-
-___
-
-### canSetActiveStyle
-
-• **canSetActiveStyle**: `boolean`
-
-Whether the active style can be set
-normally true if templating is true
-
-#### Defined in
-
-[client/fast-prototyping/components/slate/index.tsx:502](https://github.com/onzag/itemize/blob/5c2808d3/client/fast-prototyping/components/slate/index.tsx#L502)
-
-___
-
-### canSetDynamicHref
-
-• **canSetDynamicHref**: `boolean`
-
-Whether the dynamic href can be set for links
-normally true if templating is true
-
-#### Defined in
-
-[client/fast-prototyping/components/slate/index.tsx:507](https://github.com/onzag/itemize/blob/5c2808d3/client/fast-prototyping/components/slate/index.tsx#L507)
-
-___
-
-### canSetHoverStyle
-
-• **canSetHoverStyle**: `boolean`
-
-Whether we can set the hover style
-normally true if templating is true
-
-#### Defined in
-
-[client/fast-prototyping/components/slate/index.tsx:497](https://github.com/onzag/itemize/blob/5c2808d3/client/fast-prototyping/components/slate/index.tsx#L497)
-
-___
-
-### canSetLoop
-
-• **canSetLoop**: `boolean`
-
-Whether a loop can be established
-normally true if templating is true
-
-#### Defined in
-
-[client/fast-prototyping/components/slate/index.tsx:522](https://github.com/onzag/itemize/blob/5c2808d3/client/fast-prototyping/components/slate/index.tsx#L522)
-
-___
-
-### canSetStyle
-
-• **canSetStyle**: `boolean`
-
-Whether the style of the current element can be set
-
-#### Defined in
-
-[client/fast-prototyping/components/slate/index.tsx:491](https://github.com/onzag/itemize/blob/5c2808d3/client/fast-prototyping/components/slate/index.tsx#L491)
-
-___
-
-### canSetUIHandler
-
-• **canSetUIHandler**: `boolean`
-
-Whether an UI handler can be set on the given element
-normally true if templating is true
-
-#### Defined in
-
-[client/fast-prototyping/components/slate/index.tsx:512](https://github.com/onzag/itemize/blob/5c2808d3/client/fast-prototyping/components/slate/index.tsx#L512)
+[client/fast-prototyping/components/slate/index.tsx:333](https://github.com/onzag/itemize/blob/f2db74a5/client/fast-prototyping/components/slate/index.tsx#L333)
 
 ___
 
@@ -335,7 +108,7 @@ not affect the base container
 
 #### Defined in
 
-[client/internal/text/index.tsx:231](https://github.com/onzag/itemize/blob/5c2808d3/client/internal/text/index.tsx#L231)
+[client/internal/text/index.tsx:254](https://github.com/onzag/itemize/blob/f2db74a5/client/internal/text/index.tsx#L254)
 
 ___
 
@@ -351,7 +124,7 @@ the supported custom elements
 
 #### Defined in
 
-[client/internal/text/index.tsx:221](https://github.com/onzag/itemize/blob/5c2808d3/client/internal/text/index.tsx#L221)
+[client/internal/text/index.tsx:244](https://github.com/onzag/itemize/blob/f2db74a5/client/internal/text/index.tsx#L244)
 
 ___
 
@@ -368,7 +141,23 @@ if all supported
 
 #### Defined in
 
-[client/internal/text/index.tsx:240](https://github.com/onzag/itemize/blob/5c2808d3/client/internal/text/index.tsx#L240)
+[client/internal/text/index.tsx:271](https://github.com/onzag/itemize/blob/f2db74a5/client/internal/text/index.tsx#L271)
+
+___
+
+### supportedTables
+
+• **supportedTables**: `string`[]
+
+The list of supported tables
+
+#### Inherited from
+
+[IFeatureSupportOptions](client_internal_text.IFeatureSupportOptions.md).[supportedTables](client_internal_text.IFeatureSupportOptions.md#supportedtables)
+
+#### Defined in
+
+[client/internal/text/index.tsx:262](https://github.com/onzag/itemize/blob/f2db74a5/client/internal/text/index.tsx#L262)
 
 ___
 
@@ -384,7 +173,7 @@ whether we support containers
 
 #### Defined in
 
-[client/internal/text/index.tsx:225](https://github.com/onzag/itemize/blob/5c2808d3/client/internal/text/index.tsx#L225)
+[client/internal/text/index.tsx:248](https://github.com/onzag/itemize/blob/f2db74a5/client/internal/text/index.tsx#L248)
 
 ___
 
@@ -400,7 +189,7 @@ Whether we support customs
 
 #### Defined in
 
-[client/internal/text/index.tsx:217](https://github.com/onzag/itemize/blob/5c2808d3/client/internal/text/index.tsx#L217)
+[client/internal/text/index.tsx:240](https://github.com/onzag/itemize/blob/f2db74a5/client/internal/text/index.tsx#L240)
 
 ___
 
@@ -417,7 +206,7 @@ are acceptable
 
 #### Defined in
 
-[client/internal/text/index.tsx:208](https://github.com/onzag/itemize/blob/5c2808d3/client/internal/text/index.tsx#L208)
+[client/internal/text/index.tsx:231](https://github.com/onzag/itemize/blob/f2db74a5/client/internal/text/index.tsx#L231)
 
 ___
 
@@ -434,7 +223,7 @@ protocol outside the current page are acceptable
 
 #### Defined in
 
-[client/internal/text/index.tsx:191](https://github.com/onzag/itemize/blob/5c2808d3/client/internal/text/index.tsx#L191)
+[client/internal/text/index.tsx:214](https://github.com/onzag/itemize/blob/f2db74a5/client/internal/text/index.tsx#L214)
 
 ___
 
@@ -450,7 +239,7 @@ Whether files are supporeted
 
 #### Defined in
 
-[client/internal/text/index.tsx:176](https://github.com/onzag/itemize/blob/5c2808d3/client/internal/text/index.tsx#L176)
+[client/internal/text/index.tsx:199](https://github.com/onzag/itemize/blob/f2db74a5/client/internal/text/index.tsx#L199)
 
 ___
 
@@ -468,7 +257,7 @@ it doesn't support files, or when viewing
 
 #### Defined in
 
-[client/internal/text/index.tsx:182](https://github.com/onzag/itemize/blob/5c2808d3/client/internal/text/index.tsx#L182)
+[client/internal/text/index.tsx:205](https://github.com/onzag/itemize/blob/f2db74a5/client/internal/text/index.tsx#L205)
 
 ___
 
@@ -484,7 +273,7 @@ Whether it supports images
 
 #### Defined in
 
-[client/internal/text/index.tsx:162](https://github.com/onzag/itemize/blob/5c2808d3/client/internal/text/index.tsx#L162)
+[client/internal/text/index.tsx:185](https://github.com/onzag/itemize/blob/f2db74a5/client/internal/text/index.tsx#L185)
 
 ___
 
@@ -502,7 +291,7 @@ it doesn't support images, or when viewing
 
 #### Defined in
 
-[client/internal/text/index.tsx:168](https://github.com/onzag/itemize/blob/5c2808d3/client/internal/text/index.tsx#L168)
+[client/internal/text/index.tsx:191](https://github.com/onzag/itemize/blob/f2db74a5/client/internal/text/index.tsx#L191)
 
 ___
 
@@ -518,7 +307,7 @@ Whether links are acceptable
 
 #### Defined in
 
-[client/internal/text/index.tsx:186](https://github.com/onzag/itemize/blob/5c2808d3/client/internal/text/index.tsx#L186)
+[client/internal/text/index.tsx:209](https://github.com/onzag/itemize/blob/f2db74a5/client/internal/text/index.tsx#L209)
 
 ___
 
@@ -534,7 +323,7 @@ Whether lists are acceptable, ul, ol etc...
 
 #### Defined in
 
-[client/internal/text/index.tsx:195](https://github.com/onzag/itemize/blob/5c2808d3/client/internal/text/index.tsx#L195)
+[client/internal/text/index.tsx:218](https://github.com/onzag/itemize/blob/f2db74a5/client/internal/text/index.tsx#L218)
 
 ___
 
@@ -550,7 +339,7 @@ Whether quotes are acceptable
 
 #### Defined in
 
-[client/internal/text/index.tsx:199](https://github.com/onzag/itemize/blob/5c2808d3/client/internal/text/index.tsx#L199)
+[client/internal/text/index.tsx:222](https://github.com/onzag/itemize/blob/f2db74a5/client/internal/text/index.tsx#L222)
 
 ___
 
@@ -566,7 +355,23 @@ whether rich classes are supported
 
 #### Defined in
 
-[client/internal/text/index.tsx:235](https://github.com/onzag/itemize/blob/5c2808d3/client/internal/text/index.tsx#L235)
+[client/internal/text/index.tsx:266](https://github.com/onzag/itemize/blob/f2db74a5/client/internal/text/index.tsx#L266)
+
+___
+
+### supportsTables
+
+• **supportsTables**: `boolean`
+
+Whether tables are supported
+
+#### Inherited from
+
+[IFeatureSupportOptions](client_internal_text.IFeatureSupportOptions.md).[supportsTables](client_internal_text.IFeatureSupportOptions.md#supportstables)
+
+#### Defined in
+
+[client/internal/text/index.tsx:258](https://github.com/onzag/itemize/blob/f2db74a5/client/internal/text/index.tsx#L258)
 
 ___
 
@@ -582,7 +387,7 @@ Whether templating is supported
 
 #### Defined in
 
-[client/internal/text/index.tsx:212](https://github.com/onzag/itemize/blob/5c2808d3/client/internal/text/index.tsx#L212)
+[client/internal/text/index.tsx:235](https://github.com/onzag/itemize/blob/f2db74a5/client/internal/text/index.tsx#L235)
 
 ___
 
@@ -598,7 +403,7 @@ Whether titles are acceptable
 
 #### Defined in
 
-[client/internal/text/index.tsx:203](https://github.com/onzag/itemize/blob/5c2808d3/client/internal/text/index.tsx#L203)
+[client/internal/text/index.tsx:226](https://github.com/onzag/itemize/blob/f2db74a5/client/internal/text/index.tsx#L226)
 
 ___
 
@@ -614,4 +419,4 @@ Whether it supports videos
 
 #### Defined in
 
-[client/internal/text/index.tsx:172](https://github.com/onzag/itemize/blob/5c2808d3/client/internal/text/index.tsx#L172)
+[client/internal/text/index.tsx:195](https://github.com/onzag/itemize/blob/f2db74a5/client/internal/text/index.tsx#L195)

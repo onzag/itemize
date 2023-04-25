@@ -15,6 +15,7 @@ conditional rendering
 ### Functions
 
 - [default](client_components_item_ItemLoader.md#default)
+- [useItemLoader](client_components_item_ItemLoader.md#useitemloader)
 
 ## Functions
 
@@ -39,4 +40,18 @@ is specified as that requires loading
 
 #### Defined in
 
-[client/components/item/ItemLoader.tsx:116](https://github.com/onzag/itemize/blob/5c2808d3/client/components/item/ItemLoader.tsx#L116)
+[client/components/item/ItemLoader.tsx:149](https://github.com/onzag/itemize/blob/f2db74a5/client/components/item/ItemLoader.tsx#L149)
+
+___
+
+### useItemLoader
+
+▸ **useItemLoader**(): [`IItemLoaderInfoArgType`](../interfaces/client_components_item_ItemLoader.IItemLoaderInfoArgType.md)
+
+#### Returns
+
+[`IItemLoaderInfoArgType`](../interfaces/client_components_item_ItemLoader.IItemLoaderInfoArgType.md)
+
+#### Defined in
+
+[client/components/item/ItemLoader.tsx:159](https://github.com/onzag/itemize/blob/f2db74a5/client/components/item/ItemLoader.tsx#L159)

@@ -21,7 +21,7 @@ This is the invalid rule once compiled
 
 #### Defined in
 
-[base/Root/Module/ItemDefinition/PropertyDefinition/index.ts:273](https://github.com/onzag/itemize/blob/5c2808d3/base/Root/Module/ItemDefinition/PropertyDefinition/index.ts#L273)
+[base/Root/Module/ItemDefinition/PropertyDefinition/index.ts:274](https://github.com/onzag/itemize/blob/f2db74a5/base/Root/Module/ItemDefinition/PropertyDefinition/index.ts#L274)
 
 ___
 
@@ -31,4 +31,4 @@ ___
 
 #### Defined in
 
-[base/Root/Module/ItemDefinition/PropertyDefinition/index.ts:274](https://github.com/onzag/itemize/blob/5c2808d3/base/Root/Module/ItemDefinition/PropertyDefinition/index.ts#L274)
+[base/Root/Module/ItemDefinition/PropertyDefinition/index.ts:275](https://github.com/onzag/itemize/blob/f2db74a5/base/Root/Module/ItemDefinition/PropertyDefinition/index.ts#L275)

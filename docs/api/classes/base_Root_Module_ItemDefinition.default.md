@@ -32,7 +32,7 @@ which basically compounds all how this is defined
 - [rawData](base_Root_Module_ItemDefinition.default.md#rawdata)
 - [stateGQLAppliedValue](base_Root_Module_ItemDefinition.default.md#stategqlappliedvalue)
 - [stateHasAppliedValueTo](base_Root_Module_ItemDefinition.default.md#statehasappliedvalueto)
-- [stateInternal](base_Root_Module_ItemDefinition.default.md#stateinternal)
+- [stateSearch](base_Root_Module_ItemDefinition.default.md#statesearch)
 
 ### Methods
 
@@ -51,7 +51,7 @@ which basically compounds all how this is defined
 - [checkRoleCanCustomId](base_Root_Module_ItemDefinition.default.md#checkrolecancustomid)
 - [checkRoleCanReadOwner](base_Root_Module_ItemDefinition.default.md#checkrolecanreadowner)
 - [checkRoleCanVersion](base_Root_Module_ItemDefinition.default.md#checkrolecanversion)
-- [cleanInternalState](base_Root_Module_ItemDefinition.default.md#cleaninternalstate)
+- [cleanSearchState](base_Root_Module_ItemDefinition.default.md#cleansearchstate)
 - [cleanState](base_Root_Module_ItemDefinition.default.md#cleanstate)
 - [cleanValueFor](base_Root_Module_ItemDefinition.default.md#cleanvaluefor)
 - [containsAnExternallyCheckedProperty](base_Root_Module_ItemDefinition.default.md#containsanexternallycheckedproperty)
@@ -71,7 +71,6 @@ which basically compounds all how this is defined
 - [getI18nDataFor](base_Root_Module_ItemDefinition.default.md#geti18ndatafor)
 - [getImportedChildDefinitions](base_Root_Module_ItemDefinition.default.md#getimportedchilddefinitions)
 - [getIncludeFor](base_Root_Module_ItemDefinition.default.md#getincludefor)
-- [getInternalState](base_Root_Module_ItemDefinition.default.md#getinternalstate)
 - [getItemDefinitionRawFor](base_Root_Module_ItemDefinition.default.md#getitemdefinitionrawfor)
 - [getModuleName](base_Root_Module_ItemDefinition.default.md#getmodulename)
 - [getModuleTableName](base_Root_Module_ItemDefinition.default.md#getmoduletablename)
@@ -97,7 +96,11 @@ which basically compounds all how this is defined
 - [getRolesWithModerationAccess](base_Root_Module_ItemDefinition.default.md#getroleswithmoderationaccess)
 - [getRolesWithReadOwnerAccess](base_Root_Module_ItemDefinition.default.md#getroleswithreadowneraccess)
 - [getRolesWithSearchAccess](base_Root_Module_ItemDefinition.default.md#getroleswithsearchaccess)
+- [getSearchEngineDynamicMainLanguageColumn](base_Root_Module_ItemDefinition.default.md#getsearchenginedynamicmainlanguagecolumn)
+- [getSearchEngineFallbackLanguage](base_Root_Module_ItemDefinition.default.md#getsearchenginefallbacklanguage)
+- [getSearchEngineMainLanguageFromRow](base_Root_Module_ItemDefinition.default.md#getsearchenginemainlanguagefromrow)
 - [getSearchModeCounterpart](base_Root_Module_ItemDefinition.default.md#getsearchmodecounterpart)
+- [getSearchState](base_Root_Module_ItemDefinition.default.md#getsearchstate)
 - [getStandardCounterpart](base_Root_Module_ItemDefinition.default.md#getstandardcounterpart)
 - [getState](base_Root_Module_ItemDefinition.default.md#getstate)
 - [getStateNoExternalChecking](base_Root_Module_ItemDefinition.default.md#getstatenoexternalchecking)
@@ -106,6 +109,7 @@ which basically compounds all how this is defined
 - [hasAnActiveIncludeInstanceOfId](base_Root_Module_ItemDefinition.default.md#hasanactiveincludeinstanceofid)
 - [hasAppliedValueTo](base_Root_Module_ItemDefinition.default.md#hasappliedvalueto)
 - [hasAtLeastOneActiveInstanceOf](base_Root_Module_ItemDefinition.default.md#hasatleastoneactiveinstanceof)
+- [hasBlockCleanFor](base_Root_Module_ItemDefinition.default.md#hasblockcleanfor)
 - [hasIncludeFor](base_Root_Module_ItemDefinition.default.md#hasincludefor)
 - [hasItemDefinitionFor](base_Root_Module_ItemDefinition.default.md#hasitemdefinitionfor)
 - [hasParentItemDefinition](base_Root_Module_ItemDefinition.default.md#hasparentitemdefinition)
@@ -116,6 +120,8 @@ which basically compounds all how this is defined
 - [isOwnerObjectId](base_Root_Module_ItemDefinition.default.md#isownerobjectid)
 - [isPropertyInSearchModeOnly](base_Root_Module_ItemDefinition.default.md#ispropertyinsearchmodeonly)
 - [isReparentingEnabled](base_Root_Module_ItemDefinition.default.md#isreparentingenabled)
+- [isSearchEngineDynamicMainLanguageColumnInModule](base_Root_Module_ItemDefinition.default.md#issearchenginedynamicmainlanguagecolumninmodule)
+- [isSearchEngineEnabled](base_Root_Module_ItemDefinition.default.md#issearchengineenabled)
 - [isSearchable](base_Root_Module_ItemDefinition.default.md#issearchable)
 - [isValidVersion](base_Root_Module_ItemDefinition.default.md#isvalidversion)
 - [isVersioned](base_Root_Module_ItemDefinition.default.md#isversioned)
@@ -125,7 +131,7 @@ which basically compounds all how this is defined
 - [removeListener](base_Root_Module_ItemDefinition.default.md#removelistener)
 - [restoreValueFor](base_Root_Module_ItemDefinition.default.md#restorevaluefor)
 - [setAsExtensionsInstance](base_Root_Module_ItemDefinition.default.md#setasextensionsinstance)
-- [setInternalState](base_Root_Module_ItemDefinition.default.md#setinternalstate)
+- [setSearchState](base_Root_Module_ItemDefinition.default.md#setsearchstate)
 - [toJSON](base_Root_Module_ItemDefinition.default.md#tojson)
 - [triggerListeners](base_Root_Module_ItemDefinition.default.md#triggerlisteners)
 - [getItemDefinitionRawFor](base_Root_Module_ItemDefinition.default.md#getitemdefinitionrawfor)
@@ -152,7 +158,7 @@ Build a new ItemDefinition instance
 
 #### Defined in
 
-[base/Root/Module/ItemDefinition/index.ts:745](https://github.com/onzag/itemize/blob/5c2808d3/base/Root/Module/ItemDefinition/index.ts#L745)
+[base/Root/Module/ItemDefinition/index.ts:826](https://github.com/onzag/itemize/blob/f2db74a5/base/Root/Module/ItemDefinition/index.ts#L826)
 
 ## Properties
 
@@ -164,7 +170,7 @@ A cached graphql object
 
 #### Defined in
 
-[base/Root/Module/ItemDefinition/index.ts:645](https://github.com/onzag/itemize/blob/5c2808d3/base/Root/Module/ItemDefinition/index.ts#L645)
+[base/Root/Module/ItemDefinition/index.ts:726](https://github.com/onzag/itemize/blob/f2db74a5/base/Root/Module/ItemDefinition/index.ts#L726)
 
 ___
 
@@ -176,7 +182,7 @@ A cached graphql query object
 
 #### Defined in
 
-[base/Root/Module/ItemDefinition/index.ts:650](https://github.com/onzag/itemize/blob/5c2808d3/base/Root/Module/ItemDefinition/index.ts#L650)
+[base/Root/Module/ItemDefinition/index.ts:731](https://github.com/onzag/itemize/blob/f2db74a5/base/Root/Module/ItemDefinition/index.ts#L731)
 
 ___
 
@@ -188,7 +194,7 @@ The child definitions the item definition contains
 
 #### Defined in
 
-[base/Root/Module/ItemDefinition/index.ts:659](https://github.com/onzag/itemize/blob/5c2808d3/base/Root/Module/ItemDefinition/index.ts#L659)
+[base/Root/Module/ItemDefinition/index.ts:740](https://github.com/onzag/itemize/blob/f2db74a5/base/Root/Module/ItemDefinition/index.ts#L740)
 
 ___
 
@@ -204,7 +210,7 @@ The cleans being blocked and by whom
 
 #### Defined in
 
-[base/Root/Module/ItemDefinition/index.ts:734](https://github.com/onzag/itemize/blob/5c2808d3/base/Root/Module/ItemDefinition/index.ts#L734)
+[base/Root/Module/ItemDefinition/index.ts:815](https://github.com/onzag/itemize/blob/f2db74a5/base/Root/Module/ItemDefinition/index.ts#L815)
 
 ___
 
@@ -218,7 +224,7 @@ the prop extensions and is generated in the module
 
 #### Defined in
 
-[base/Root/Module/ItemDefinition/index.ts:696](https://github.com/onzag/itemize/blob/5c2808d3/base/Root/Module/ItemDefinition/index.ts#L696)
+[base/Root/Module/ItemDefinition/index.ts:777](https://github.com/onzag/itemize/blob/f2db74a5/base/Root/Module/ItemDefinition/index.ts#L777)
 
 ___
 
@@ -232,7 +238,7 @@ compiled form
 
 #### Defined in
 
-[base/Root/Module/ItemDefinition/index.ts:665](https://github.com/onzag/itemize/blob/5c2808d3/base/Root/Module/ItemDefinition/index.ts#L665)
+[base/Root/Module/ItemDefinition/index.ts:746](https://github.com/onzag/itemize/blob/f2db74a5/base/Root/Module/ItemDefinition/index.ts#L746)
 
 ___
 
@@ -244,7 +250,7 @@ The include instances compiled from the raw data
 
 #### Defined in
 
-[base/Root/Module/ItemDefinition/index.ts:655](https://github.com/onzag/itemize/blob/5c2808d3/base/Root/Module/ItemDefinition/index.ts#L655)
+[base/Root/Module/ItemDefinition/index.ts:736](https://github.com/onzag/itemize/blob/f2db74a5/base/Root/Module/ItemDefinition/index.ts#L736)
 
 ___
 
@@ -257,7 +263,7 @@ doesn't trigger twice and creates a forever loop
 
 #### Defined in
 
-[base/Root/Module/ItemDefinition/index.ts:711](https://github.com/onzag/itemize/blob/5c2808d3/base/Root/Module/ItemDefinition/index.ts#L711)
+[base/Root/Module/ItemDefinition/index.ts:792](https://github.com/onzag/itemize/blob/f2db74a5/base/Root/Module/ItemDefinition/index.ts#L792)
 
 ___
 
@@ -274,7 +280,7 @@ the item definition, usually added for UI level functionality
 
 #### Defined in
 
-[base/Root/Module/ItemDefinition/index.ts:702](https://github.com/onzag/itemize/blob/5c2808d3/base/Root/Module/ItemDefinition/index.ts#L702)
+[base/Root/Module/ItemDefinition/index.ts:783](https://github.com/onzag/itemize/blob/f2db74a5/base/Root/Module/ItemDefinition/index.ts#L783)
 
 ___
 
@@ -288,7 +294,7 @@ the tree, this is the tree instance it came from
 
 #### Defined in
 
-[base/Root/Module/ItemDefinition/index.ts:690](https://github.com/onzag/itemize/blob/5c2808d3/base/Root/Module/ItemDefinition/index.ts#L690)
+[base/Root/Module/ItemDefinition/index.ts:771](https://github.com/onzag/itemize/blob/f2db74a5/base/Root/Module/ItemDefinition/index.ts#L771)
 
 ___
 
@@ -300,7 +306,7 @@ A parent item definition or null
 
 #### Defined in
 
-[base/Root/Module/ItemDefinition/index.ts:684](https://github.com/onzag/itemize/blob/5c2808d3/base/Root/Module/ItemDefinition/index.ts#L684)
+[base/Root/Module/ItemDefinition/index.ts:765](https://github.com/onzag/itemize/blob/f2db74a5/base/Root/Module/ItemDefinition/index.ts#L765)
 
 ___
 
@@ -312,7 +318,7 @@ The parent module
 
 #### Defined in
 
-[base/Root/Module/ItemDefinition/index.ts:680](https://github.com/onzag/itemize/blob/5c2808d3/base/Root/Module/ItemDefinition/index.ts#L680)
+[base/Root/Module/ItemDefinition/index.ts:761](https://github.com/onzag/itemize/blob/f2db74a5/base/Root/Module/ItemDefinition/index.ts#L761)
 
 ___
 
@@ -324,7 +330,7 @@ All the policies within the item definition
 
 #### Defined in
 
-[base/Root/Module/ItemDefinition/index.ts:676](https://github.com/onzag/itemize/blob/5c2808d3/base/Root/Module/ItemDefinition/index.ts#L676)
+[base/Root/Module/ItemDefinition/index.ts:757](https://github.com/onzag/itemize/blob/f2db74a5/base/Root/Module/ItemDefinition/index.ts#L757)
 
 ___
 
@@ -336,7 +342,7 @@ All the properties within the item definition
 
 #### Defined in
 
-[base/Root/Module/ItemDefinition/index.ts:672](https://github.com/onzag/itemize/blob/5c2808d3/base/Root/Module/ItemDefinition/index.ts#L672)
+[base/Root/Module/ItemDefinition/index.ts:753](https://github.com/onzag/itemize/blob/f2db74a5/base/Root/Module/ItemDefinition/index.ts#L753)
 
 ___
 
@@ -349,7 +355,7 @@ compiled
 
 #### Defined in
 
-[base/Root/Module/ItemDefinition/index.ts:640](https://github.com/onzag/itemize/blob/5c2808d3/base/Root/Module/ItemDefinition/index.ts#L640)
+[base/Root/Module/ItemDefinition/index.ts:721](https://github.com/onzag/itemize/blob/f2db74a5/base/Root/Module/ItemDefinition/index.ts#L721)
 
 ___
 
@@ -365,7 +371,7 @@ Contains the information about the specific applied value to an slot
 
 #### Defined in
 
-[base/Root/Module/ItemDefinition/index.ts:722](https://github.com/onzag/itemize/blob/5c2808d3/base/Root/Module/ItemDefinition/index.ts#L722)
+[base/Root/Module/ItemDefinition/index.ts:803](https://github.com/onzag/itemize/blob/f2db74a5/base/Root/Module/ItemDefinition/index.ts#L803)
 
 ___
 
@@ -381,13 +387,13 @@ Containst state information about applied values to slots
 
 #### Defined in
 
-[base/Root/Module/ItemDefinition/index.ts:716](https://github.com/onzag/itemize/blob/5c2808d3/base/Root/Module/ItemDefinition/index.ts#L716)
+[base/Root/Module/ItemDefinition/index.ts:797](https://github.com/onzag/itemize/blob/f2db74a5/base/Root/Module/ItemDefinition/index.ts#L797)
 
 ___
 
-### stateInternal
+### stateSearch
 
-• `Private` **stateInternal**: `Object`
+• `Private` **stateSearch**: `Object`
 
 The internal state
 
@@ -397,7 +403,7 @@ The internal state
 
 #### Defined in
 
-[base/Root/Module/ItemDefinition/index.ts:728](https://github.com/onzag/itemize/blob/5c2808d3/base/Root/Module/ItemDefinition/index.ts#L728)
+[base/Root/Module/ItemDefinition/index.ts:809](https://github.com/onzag/itemize/blob/f2db74a5/base/Root/Module/ItemDefinition/index.ts#L809)
 
 ## Methods
 
@@ -426,7 +432,7 @@ value so please avoid cleaning it
 
 #### Defined in
 
-[base/Root/Module/ItemDefinition/index.ts:1763](https://github.com/onzag/itemize/blob/5c2808d3/base/Root/Module/ItemDefinition/index.ts#L1763)
+[base/Root/Module/ItemDefinition/index.ts:1849](https://github.com/onzag/itemize/blob/f2db74a5/base/Root/Module/ItemDefinition/index.ts#L1849)
 
 ___
 
@@ -451,7 +457,7 @@ Adds a listener for an string event and id
 
 #### Defined in
 
-[base/Root/Module/ItemDefinition/index.ts:2775](https://github.com/onzag/itemize/blob/5c2808d3/base/Root/Module/ItemDefinition/index.ts#L2775)
+[base/Root/Module/ItemDefinition/index.ts:2878](https://github.com/onzag/itemize/blob/f2db74a5/base/Root/Module/ItemDefinition/index.ts#L2878)
 
 ___
 
@@ -479,7 +485,7 @@ read role access
 
 #### Defined in
 
-[base/Root/Module/ItemDefinition/index.ts:2058](https://github.com/onzag/itemize/blob/5c2808d3/base/Root/Module/ItemDefinition/index.ts#L2058)
+[base/Root/Module/ItemDefinition/index.ts:2161](https://github.com/onzag/itemize/blob/f2db74a5/base/Root/Module/ItemDefinition/index.ts#L2161)
 
 ___
 
@@ -503,7 +509,7 @@ ___
 
 #### Defined in
 
-[base/Root/Module/ItemDefinition/index.ts:1535](https://github.com/onzag/itemize/blob/5c2808d3/base/Root/Module/ItemDefinition/index.ts#L1535)
+[base/Root/Module/ItemDefinition/index.ts:1616](https://github.com/onzag/itemize/blob/f2db74a5/base/Root/Module/ItemDefinition/index.ts#L1616)
 
 ___
 
@@ -517,7 +523,7 @@ ___
 | :------ | :------ |
 | `id` | `string` |
 | `version` | `string` |
-| `state` | `File` \| `Blob` |
+| `state` | `Blob` \| `File` |
 | `specificProperties?` | `string`[] |
 | `specificIncludes?` | `Object` |
 
@@ -527,13 +533,13 @@ ___
 
 #### Defined in
 
-[base/Root/Module/ItemDefinition/index.ts:1579](https://github.com/onzag/itemize/blob/5c2808d3/base/Root/Module/ItemDefinition/index.ts#L1579)
+[base/Root/Module/ItemDefinition/index.ts:1660](https://github.com/onzag/itemize/blob/f2db74a5/base/Root/Module/ItemDefinition/index.ts#L1660)
 
 ___
 
 ### applyValue
 
-▸ **applyValue**(`id`, `version`, `value`, `excludeExtensions`, `requestFields`, `doNotApplyValueInPropertyIfPropertyHasBeenManuallySet`): `boolean`
+▸ **applyValue**(`id`, `version`, `value`, `excludeExtensions`, `requestFields`, `doNotApplyValueInPropertyIfPropertyHasBeenManuallySet`, `forceApply?`): `boolean`
 
 Applies a value from graphql to the item definition state
 
@@ -547,6 +553,7 @@ Applies a value from graphql to the item definition state
 | `excludeExtensions` | `boolean` | whether to exclude the extensions for applying the value |
 | `requestFields` | [`IGQLRequestFields`](../interfaces/gql_querier.IGQLRequestFields.md) | the fields that were used to request this data (can be null) but be careful this might be used for catching |
 | `doNotApplyValueInPropertyIfPropertyHasBeenManuallySet` | `boolean` | to avoid hot updating values when the user is modifying them and an apply value has been called because it has been updated somewhere else, we use this to avoid overriding, note that the value must also not be equal, as in, it must differs; otherwise the value is applied, and manually set will go back to false as it's been used applyValue on it, it's been set now by the computer |
+| `forceApply?` | `boolean` | will always apply and not perform the signature check |
 
 #### Returns
 
@@ -558,7 +565,7 @@ more fields
 
 #### Defined in
 
-[base/Root/Module/ItemDefinition/index.ts:1607](https://github.com/onzag/itemize/blob/5c2808d3/base/Root/Module/ItemDefinition/index.ts#L1607)
+[base/Root/Module/ItemDefinition/index.ts:1689](https://github.com/onzag/itemize/blob/f2db74a5/base/Root/Module/ItemDefinition/index.ts#L1689)
 
 ___
 
@@ -584,7 +591,7 @@ Returns the FLATTENED fields for the graphql request
 
 #### Defined in
 
-[base/Root/Module/ItemDefinition/index.ts:1992](https://github.com/onzag/itemize/blob/5c2808d3/base/Root/Module/ItemDefinition/index.ts#L1992)
+[base/Root/Module/ItemDefinition/index.ts:2095](https://github.com/onzag/itemize/blob/f2db74a5/base/Root/Module/ItemDefinition/index.ts#L2095)
 
 ___
 
@@ -610,7 +617,7 @@ a boolean on whether the item definition is an allowed parent
 
 #### Defined in
 
-[base/Root/Module/ItemDefinition/index.ts:2505](https://github.com/onzag/itemize/blob/5c2808d3/base/Root/Module/ItemDefinition/index.ts#L2505)
+[base/Root/Module/ItemDefinition/index.ts:2608](https://github.com/onzag/itemize/blob/f2db74a5/base/Root/Module/ItemDefinition/index.ts#L2608)
 
 ___
 
@@ -641,7 +648,7 @@ a boolean on whether the user is allowed
 
 #### Defined in
 
-[base/Root/Module/ItemDefinition/index.ts:2146](https://github.com/onzag/itemize/blob/5c2808d3/base/Root/Module/ItemDefinition/index.ts#L2146)
+[base/Root/Module/ItemDefinition/index.ts:2249](https://github.com/onzag/itemize/blob/f2db74a5/base/Root/Module/ItemDefinition/index.ts#L2249)
 
 ___
 
@@ -665,7 +672,7 @@ ___
 
 #### Defined in
 
-[base/Root/Module/ItemDefinition/index.ts:2100](https://github.com/onzag/itemize/blob/5c2808d3/base/Root/Module/ItemDefinition/index.ts#L2100)
+[base/Root/Module/ItemDefinition/index.ts:2203](https://github.com/onzag/itemize/blob/f2db74a5/base/Root/Module/ItemDefinition/index.ts#L2203)
 
 ___
 
@@ -694,7 +701,7 @@ a boolean on whether parenting is allowed
 
 #### Defined in
 
-[base/Root/Module/ItemDefinition/index.ts:2553](https://github.com/onzag/itemize/blob/5c2808d3/base/Root/Module/ItemDefinition/index.ts#L2553)
+[base/Root/Module/ItemDefinition/index.ts:2656](https://github.com/onzag/itemize/blob/f2db74a5/base/Root/Module/ItemDefinition/index.ts#L2656)
 
 ___
 
@@ -723,7 +730,7 @@ a boolean on whether the user is allowed
 
 #### Defined in
 
-[base/Root/Module/ItemDefinition/index.ts:2255](https://github.com/onzag/itemize/blob/5c2808d3/base/Root/Module/ItemDefinition/index.ts#L2255)
+[base/Root/Module/ItemDefinition/index.ts:2358](https://github.com/onzag/itemize/blob/f2db74a5/base/Root/Module/ItemDefinition/index.ts#L2358)
 
 ___
 
@@ -747,7 +754,7 @@ Checks whether a given role can provide a custom id
 
 #### Defined in
 
-[base/Root/Module/ItemDefinition/index.ts:2396](https://github.com/onzag/itemize/blob/5c2808d3/base/Root/Module/ItemDefinition/index.ts#L2396)
+[base/Root/Module/ItemDefinition/index.ts:2499](https://github.com/onzag/itemize/blob/f2db74a5/base/Root/Module/ItemDefinition/index.ts#L2499)
 
 ___
 
@@ -773,7 +780,7 @@ Checks whether a given role can read the owner of a given item
 
 #### Defined in
 
-[base/Root/Module/ItemDefinition/index.ts:2434](https://github.com/onzag/itemize/blob/5c2808d3/base/Root/Module/ItemDefinition/index.ts#L2434)
+[base/Root/Module/ItemDefinition/index.ts:2537](https://github.com/onzag/itemize/blob/f2db74a5/base/Root/Module/ItemDefinition/index.ts#L2537)
 
 ___
 
@@ -799,13 +806,13 @@ Checks whether a given role can version an item resources
 
 #### Defined in
 
-[base/Root/Module/ItemDefinition/index.ts:2333](https://github.com/onzag/itemize/blob/5c2808d3/base/Root/Module/ItemDefinition/index.ts#L2333)
+[base/Root/Module/ItemDefinition/index.ts:2436](https://github.com/onzag/itemize/blob/f2db74a5/base/Root/Module/ItemDefinition/index.ts#L2436)
 
 ___
 
-### cleanInternalState
+### cleanSearchState
 
-▸ **cleanInternalState**(`id`, `version`): `void`
+▸ **cleanSearchState**(`id`, `version`): `void`
 
 Clears the internal state
 
@@ -822,7 +829,7 @@ Clears the internal state
 
 #### Defined in
 
-[base/Root/Module/ItemDefinition/index.ts:1871](https://github.com/onzag/itemize/blob/5c2808d3/base/Root/Module/ItemDefinition/index.ts#L1871)
+[base/Root/Module/ItemDefinition/index.ts:1974](https://github.com/onzag/itemize/blob/f2db74a5/base/Root/Module/ItemDefinition/index.ts#L1974)
 
 ___
 
@@ -842,7 +849,7 @@ ___
 
 #### Defined in
 
-[base/Root/Module/ItemDefinition/index.ts:795](https://github.com/onzag/itemize/blob/5c2808d3/base/Root/Module/ItemDefinition/index.ts#L795)
+[base/Root/Module/ItemDefinition/index.ts:876](https://github.com/onzag/itemize/blob/f2db74a5/base/Root/Module/ItemDefinition/index.ts#L876)
 
 ___
 
@@ -872,7 +879,7 @@ because the cleaning was blocked from performing
 
 #### Defined in
 
-[base/Root/Module/ItemDefinition/index.ts:1802](https://github.com/onzag/itemize/blob/5c2808d3/base/Root/Module/ItemDefinition/index.ts#L1802)
+[base/Root/Module/ItemDefinition/index.ts:1905](https://github.com/onzag/itemize/blob/f2db74a5/base/Root/Module/ItemDefinition/index.ts#L1905)
 
 ___
 
@@ -899,7 +906,7 @@ a boolean
 
 #### Defined in
 
-[base/Root/Module/ItemDefinition/index.ts:2654](https://github.com/onzag/itemize/blob/5c2808d3/base/Root/Module/ItemDefinition/index.ts#L2654)
+[base/Root/Module/ItemDefinition/index.ts:2757](https://github.com/onzag/itemize/blob/f2db74a5/base/Root/Module/ItemDefinition/index.ts#L2757)
 
 ___
 
@@ -925,7 +932,7 @@ a boolean value
 
 #### Defined in
 
-[base/Root/Module/ItemDefinition/index.ts:2743](https://github.com/onzag/itemize/blob/5c2808d3/base/Root/Module/ItemDefinition/index.ts#L2743)
+[base/Root/Module/ItemDefinition/index.ts:2846](https://github.com/onzag/itemize/blob/f2db74a5/base/Root/Module/ItemDefinition/index.ts#L2846)
 
 ___
 
@@ -945,7 +952,7 @@ the whole absolute path from the root
 
 #### Defined in
 
-[base/Root/Module/ItemDefinition/index.ts:2631](https://github.com/onzag/itemize/blob/5c2808d3/base/Root/Module/ItemDefinition/index.ts#L2631)
+[base/Root/Module/ItemDefinition/index.ts:2734](https://github.com/onzag/itemize/blob/f2db74a5/base/Root/Module/ItemDefinition/index.ts#L2734)
 
 ___
 
@@ -963,7 +970,7 @@ an include array
 
 #### Defined in
 
-[base/Root/Module/ItemDefinition/index.ts:1138](https://github.com/onzag/itemize/blob/5c2808d3/base/Root/Module/ItemDefinition/index.ts#L1138)
+[base/Root/Module/ItemDefinition/index.ts:1219](https://github.com/onzag/itemize/blob/f2db74a5/base/Root/Module/ItemDefinition/index.ts#L1219)
 
 ___
 
@@ -982,7 +989,7 @@ a property definiton array
 
 #### Defined in
 
-[base/Root/Module/ItemDefinition/index.ts:1114](https://github.com/onzag/itemize/blob/5c2808d3/base/Root/Module/ItemDefinition/index.ts#L1114)
+[base/Root/Module/ItemDefinition/index.ts:1195](https://github.com/onzag/itemize/blob/f2db74a5/base/Root/Module/ItemDefinition/index.ts#L1195)
 
 ___
 
@@ -1001,7 +1008,7 @@ a property definition array
 
 #### Defined in
 
-[base/Root/Module/ItemDefinition/index.ts:1123](https://github.com/onzag/itemize/blob/5c2808d3/base/Root/Module/ItemDefinition/index.ts#L1123)
+[base/Root/Module/ItemDefinition/index.ts:1204](https://github.com/onzag/itemize/blob/f2db74a5/base/Root/Module/ItemDefinition/index.ts#L1204)
 
 ___
 
@@ -1023,7 +1030,7 @@ Provides all the properties that hold a side effect into them
 
 #### Defined in
 
-[base/Root/Module/ItemDefinition/index.ts:2904](https://github.com/onzag/itemize/blob/5c2808d3/base/Root/Module/ItemDefinition/index.ts#L2904)
+[base/Root/Module/ItemDefinition/index.ts:3079](https://github.com/onzag/itemize/blob/f2db74a5/base/Root/Module/ItemDefinition/index.ts#L3079)
 
 ___
 
@@ -1050,7 +1057,7 @@ a string, will return UNSPECIFIED_OWNER if it cannot find anything
 
 #### Defined in
 
-[base/Root/Module/ItemDefinition/index.ts:1735](https://github.com/onzag/itemize/blob/5c2808d3/base/Root/Module/ItemDefinition/index.ts#L1735)
+[base/Root/Module/ItemDefinition/index.ts:1821](https://github.com/onzag/itemize/blob/f2db74a5/base/Root/Module/ItemDefinition/index.ts#L1821)
 
 ___
 
@@ -1075,7 +1082,7 @@ an array of string or null (if no applying includes)
 
 #### Defined in
 
-[base/Root/Module/ItemDefinition/index.ts:2754](https://github.com/onzag/itemize/blob/5c2808d3/base/Root/Module/ItemDefinition/index.ts#L2754)
+[base/Root/Module/ItemDefinition/index.ts:2857](https://github.com/onzag/itemize/blob/f2db74a5/base/Root/Module/ItemDefinition/index.ts#L2857)
 
 ___
 
@@ -1100,7 +1107,7 @@ an array of string or null (if no applying properties)
 
 #### Defined in
 
-[base/Root/Module/ItemDefinition/index.ts:2731](https://github.com/onzag/itemize/blob/5c2808d3/base/Root/Module/ItemDefinition/index.ts#L2731)
+[base/Root/Module/ItemDefinition/index.ts:2834](https://github.com/onzag/itemize/blob/f2db74a5/base/Root/Module/ItemDefinition/index.ts#L2834)
 
 ___
 
@@ -1119,7 +1126,7 @@ an array of item definitions
 
 #### Defined in
 
-[base/Root/Module/ItemDefinition/index.ts:1312](https://github.com/onzag/itemize/blob/5c2808d3/base/Root/Module/ItemDefinition/index.ts#L1312)
+[base/Root/Module/ItemDefinition/index.ts:1393](https://github.com/onzag/itemize/blob/f2db74a5/base/Root/Module/ItemDefinition/index.ts#L1393)
 
 ___
 
@@ -1138,7 +1145,7 @@ an array of item definitions
 
 #### Defined in
 
-[base/Root/Module/ItemDefinition/index.ts:1321](https://github.com/onzag/itemize/blob/5c2808d3/base/Root/Module/ItemDefinition/index.ts#L1321)
+[base/Root/Module/ItemDefinition/index.ts:1402](https://github.com/onzag/itemize/blob/f2db74a5/base/Root/Module/ItemDefinition/index.ts#L1402)
 
 ___
 
@@ -1165,7 +1172,7 @@ an item definition, will throw an error if not found
 
 #### Defined in
 
-[base/Root/Module/ItemDefinition/index.ts:1019](https://github.com/onzag/itemize/blob/5c2808d3/base/Root/Module/ItemDefinition/index.ts#L1019)
+[base/Root/Module/ItemDefinition/index.ts:1100](https://github.com/onzag/itemize/blob/f2db74a5/base/Root/Module/ItemDefinition/index.ts#L1100)
 
 ___
 
@@ -1190,7 +1197,7 @@ the applied value structure
 
 #### Defined in
 
-[base/Root/Module/ItemDefinition/index.ts:1882](https://github.com/onzag/itemize/blob/5c2808d3/base/Root/Module/ItemDefinition/index.ts#L1882)
+[base/Root/Module/ItemDefinition/index.ts:1985](https://github.com/onzag/itemize/blob/f2db74a5/base/Root/Module/ItemDefinition/index.ts#L1985)
 
 ___
 
@@ -1214,7 +1221,7 @@ an object or null (if locale not valid)
 
 #### Defined in
 
-[base/Root/Module/ItemDefinition/index.ts:1353](https://github.com/onzag/itemize/blob/5c2808d3/base/Root/Module/ItemDefinition/index.ts#L1353)
+[base/Root/Module/ItemDefinition/index.ts:1434](https://github.com/onzag/itemize/blob/f2db74a5/base/Root/Module/ItemDefinition/index.ts#L1434)
 
 ___
 
@@ -1232,7 +1239,7 @@ an array of item definitions
 
 #### Defined in
 
-[base/Root/Module/ItemDefinition/index.ts:1333](https://github.com/onzag/itemize/blob/5c2808d3/base/Root/Module/ItemDefinition/index.ts#L1333)
+[base/Root/Module/ItemDefinition/index.ts:1414](https://github.com/onzag/itemize/blob/f2db74a5/base/Root/Module/ItemDefinition/index.ts#L1414)
 
 ___
 
@@ -1257,30 +1264,7 @@ the include if any, would throw an error if not found
 
 #### Defined in
 
-[base/Root/Module/ItemDefinition/index.ts:1075](https://github.com/onzag/itemize/blob/5c2808d3/base/Root/Module/ItemDefinition/index.ts#L1075)
-
-___
-
-### getInternalState
-
-▸ **getInternalState**(`id`, `version`): `any`
-
-Provides the internal state of the current state
-
-#### Parameters
-
-| Name | Type |
-| :------ | :------ |
-| `id` | `string` |
-| `version` | `string` |
-
-#### Returns
-
-`any`
-
-#### Defined in
-
-[base/Root/Module/ItemDefinition/index.ts:1850](https://github.com/onzag/itemize/blob/5c2808d3/base/Root/Module/ItemDefinition/index.ts#L1850)
+[base/Root/Module/ItemDefinition/index.ts:1156](https://github.com/onzag/itemize/blob/f2db74a5/base/Root/Module/ItemDefinition/index.ts#L1156)
 
 ___
 
@@ -1307,7 +1291,7 @@ a raw item definition
 
 #### Defined in
 
-[base/Root/Module/ItemDefinition/index.ts:1090](https://github.com/onzag/itemize/blob/5c2808d3/base/Root/Module/ItemDefinition/index.ts#L1090)
+[base/Root/Module/ItemDefinition/index.ts:1171](https://github.com/onzag/itemize/blob/f2db74a5/base/Root/Module/ItemDefinition/index.ts#L1171)
 
 ___
 
@@ -1325,7 +1309,7 @@ a string
 
 #### Defined in
 
-[base/Root/Module/ItemDefinition/index.ts:974](https://github.com/onzag/itemize/blob/5c2808d3/base/Root/Module/ItemDefinition/index.ts#L974)
+[base/Root/Module/ItemDefinition/index.ts:1055](https://github.com/onzag/itemize/blob/f2db74a5/base/Root/Module/ItemDefinition/index.ts#L1055)
 
 ___
 
@@ -1342,7 +1326,7 @@ table that is used for the module
 
 #### Defined in
 
-[base/Root/Module/ItemDefinition/index.ts:2695](https://github.com/onzag/itemize/blob/5c2808d3/base/Root/Module/ItemDefinition/index.ts#L2695)
+[base/Root/Module/ItemDefinition/index.ts:2798](https://github.com/onzag/itemize/blob/f2db74a5/base/Root/Module/ItemDefinition/index.ts#L2798)
 
 ___
 
@@ -1360,7 +1344,7 @@ the name as a string
 
 #### Defined in
 
-[base/Root/Module/ItemDefinition/index.ts:966](https://github.com/onzag/itemize/blob/5c2808d3/base/Root/Module/ItemDefinition/index.ts#L966)
+[base/Root/Module/ItemDefinition/index.ts:1047](https://github.com/onzag/itemize/blob/f2db74a5/base/Root/Module/ItemDefinition/index.ts#L1047)
 
 ___
 
@@ -1381,7 +1365,7 @@ a new ItemDefiniton instance
 
 #### Defined in
 
-[base/Root/Module/ItemDefinition/index.ts:1344](https://github.com/onzag/itemize/blob/5c2808d3/base/Root/Module/ItemDefinition/index.ts#L1344)
+[base/Root/Module/ItemDefinition/index.ts:1425](https://github.com/onzag/itemize/blob/f2db74a5/base/Root/Module/ItemDefinition/index.ts#L1425)
 
 ___
 
@@ -1399,7 +1383,7 @@ an item definition or throws an error if no such a thing
 
 #### Defined in
 
-[base/Root/Module/ItemDefinition/index.ts:1299](https://github.com/onzag/itemize/blob/5c2808d3/base/Root/Module/ItemDefinition/index.ts#L1299)
+[base/Root/Module/ItemDefinition/index.ts:1380](https://github.com/onzag/itemize/blob/f2db74a5/base/Root/Module/ItemDefinition/index.ts#L1380)
 
 ___
 
@@ -1417,7 +1401,7 @@ a module instance
 
 #### Defined in
 
-[base/Root/Module/ItemDefinition/index.ts:1283](https://github.com/onzag/itemize/blob/5c2808d3/base/Root/Module/ItemDefinition/index.ts#L1283)
+[base/Root/Module/ItemDefinition/index.ts:1364](https://github.com/onzag/itemize/blob/f2db74a5/base/Root/Module/ItemDefinition/index.ts#L1364)
 
 ___
 
@@ -1431,7 +1415,7 @@ ___
 
 #### Defined in
 
-[base/Root/Module/ItemDefinition/index.ts:2494](https://github.com/onzag/itemize/blob/5c2808d3/base/Root/Module/ItemDefinition/index.ts#L2494)
+[base/Root/Module/ItemDefinition/index.ts:2597](https://github.com/onzag/itemize/blob/f2db74a5/base/Root/Module/ItemDefinition/index.ts#L2597)
 
 ___
 
@@ -1445,7 +1429,7 @@ ___
 
 #### Defined in
 
-[base/Root/Module/ItemDefinition/index.ts:2490](https://github.com/onzag/itemize/blob/5c2808d3/base/Root/Module/ItemDefinition/index.ts#L2490)
+[base/Root/Module/ItemDefinition/index.ts:2593](https://github.com/onzag/itemize/blob/f2db74a5/base/Root/Module/ItemDefinition/index.ts#L2593)
 
 ___
 
@@ -1459,7 +1443,7 @@ ___
 
 #### Defined in
 
-[base/Root/Module/ItemDefinition/index.ts:2486](https://github.com/onzag/itemize/blob/5c2808d3/base/Root/Module/ItemDefinition/index.ts#L2486)
+[base/Root/Module/ItemDefinition/index.ts:2589](https://github.com/onzag/itemize/blob/f2db74a5/base/Root/Module/ItemDefinition/index.ts#L2589)
 
 ___
 
@@ -1480,7 +1464,7 @@ the path concatenated all the way to the module path to the root
 
 #### Defined in
 
-[base/Root/Module/ItemDefinition/index.ts:2614](https://github.com/onzag/itemize/blob/5c2808d3/base/Root/Module/ItemDefinition/index.ts#L2614)
+[base/Root/Module/ItemDefinition/index.ts:2717](https://github.com/onzag/itemize/blob/f2db74a5/base/Root/Module/ItemDefinition/index.ts#L2717)
 
 ___
 
@@ -1504,7 +1488,7 @@ an array with strings of policy names
 
 #### Defined in
 
-[base/Root/Module/ItemDefinition/index.ts:2704](https://github.com/onzag/itemize/blob/5c2808d3/base/Root/Module/ItemDefinition/index.ts#L2704)
+[base/Root/Module/ItemDefinition/index.ts:2807](https://github.com/onzag/itemize/blob/f2db74a5/base/Root/Module/ItemDefinition/index.ts#L2807)
 
 ___
 
@@ -1531,7 +1515,7 @@ an array of properties
 
 #### Defined in
 
-[base/Root/Module/ItemDefinition/index.ts:2719](https://github.com/onzag/itemize/blob/5c2808d3/base/Root/Module/ItemDefinition/index.ts#L2719)
+[base/Root/Module/ItemDefinition/index.ts:2822](https://github.com/onzag/itemize/blob/f2db74a5/base/Root/Module/ItemDefinition/index.ts#L2822)
 
 ___
 
@@ -1557,7 +1541,7 @@ a property definition or throws an error if not found
 
 #### Defined in
 
-[base/Root/Module/ItemDefinition/index.ts:1165](https://github.com/onzag/itemize/blob/5c2808d3/base/Root/Module/ItemDefinition/index.ts#L1165)
+[base/Root/Module/ItemDefinition/index.ts:1246](https://github.com/onzag/itemize/blob/f2db74a5/base/Root/Module/ItemDefinition/index.ts#L1246)
 
 ___
 
@@ -1585,7 +1569,7 @@ a property definition or throws an error if not found
 
 #### Defined in
 
-[base/Root/Module/ItemDefinition/index.ts:1201](https://github.com/onzag/itemize/blob/5c2808d3/base/Root/Module/ItemDefinition/index.ts#L1201)
+[base/Root/Module/ItemDefinition/index.ts:1282](https://github.com/onzag/itemize/blob/f2db74a5/base/Root/Module/ItemDefinition/index.ts#L1282)
 
 ___
 
@@ -1605,7 +1589,7 @@ the very useful qualified path name
 
 #### Defined in
 
-[base/Root/Module/ItemDefinition/index.ts:2676](https://github.com/onzag/itemize/blob/5c2808d3/base/Root/Module/ItemDefinition/index.ts#L2676)
+[base/Root/Module/ItemDefinition/index.ts:2779](https://github.com/onzag/itemize/blob/f2db74a5/base/Root/Module/ItemDefinition/index.ts#L2779)
 
 ___
 
@@ -1631,7 +1615,7 @@ a property definition or throws an error if not found
 
 #### Defined in
 
-[base/Root/Module/ItemDefinition/index.ts:1226](https://github.com/onzag/itemize/blob/5c2808d3/base/Root/Module/ItemDefinition/index.ts#L1226)
+[base/Root/Module/ItemDefinition/index.ts:1307](https://github.com/onzag/itemize/blob/f2db74a5/base/Root/Module/ItemDefinition/index.ts#L1307)
 
 ___
 
@@ -1649,7 +1633,7 @@ the request limiters object or null
 
 #### Defined in
 
-[base/Root/Module/ItemDefinition/index.ts:871](https://github.com/onzag/itemize/blob/5c2808d3/base/Root/Module/ItemDefinition/index.ts#L871)
+[base/Root/Module/ItemDefinition/index.ts:952](https://github.com/onzag/itemize/blob/f2db74a5/base/Root/Module/ItemDefinition/index.ts#L952)
 
 ___
 
@@ -1665,7 +1649,7 @@ Provides the roles that are allowed custom ids
 
 #### Defined in
 
-[base/Root/Module/ItemDefinition/index.ts:2384](https://github.com/onzag/itemize/blob/5c2808d3/base/Root/Module/ItemDefinition/index.ts#L2384)
+[base/Root/Module/ItemDefinition/index.ts:2487](https://github.com/onzag/itemize/blob/f2db74a5/base/Root/Module/ItemDefinition/index.ts#L2487)
 
 ___
 
@@ -1690,7 +1674,7 @@ an array of string
 
 #### Defined in
 
-[base/Root/Module/ItemDefinition/index.ts:2764](https://github.com/onzag/itemize/blob/5c2808d3/base/Root/Module/ItemDefinition/index.ts#L2764)
+[base/Root/Module/ItemDefinition/index.ts:2867](https://github.com/onzag/itemize/blob/f2db74a5/base/Root/Module/ItemDefinition/index.ts#L2867)
 
 ___
 
@@ -1706,7 +1690,7 @@ Provides the roles that are allowed versioning
 
 #### Defined in
 
-[base/Root/Module/ItemDefinition/index.ts:2319](https://github.com/onzag/itemize/blob/5c2808d3/base/Root/Module/ItemDefinition/index.ts#L2319)
+[base/Root/Module/ItemDefinition/index.ts:2422](https://github.com/onzag/itemize/blob/f2db74a5/base/Root/Module/ItemDefinition/index.ts#L2422)
 
 ___
 
@@ -1731,7 +1715,7 @@ action based on the rules that were set
 
 #### Defined in
 
-[base/Root/Module/ItemDefinition/index.ts:1957](https://github.com/onzag/itemize/blob/5c2808d3/base/Root/Module/ItemDefinition/index.ts#L1957)
+[base/Root/Module/ItemDefinition/index.ts:2060](https://github.com/onzag/itemize/blob/f2db74a5/base/Root/Module/ItemDefinition/index.ts#L2060)
 
 ___
 
@@ -1749,7 +1733,7 @@ given its module rule
 
 #### Defined in
 
-[base/Root/Module/ItemDefinition/index.ts:1981](https://github.com/onzag/itemize/blob/5c2808d3/base/Root/Module/ItemDefinition/index.ts#L1981)
+[base/Root/Module/ItemDefinition/index.ts:2084](https://github.com/onzag/itemize/blob/f2db74a5/base/Root/Module/ItemDefinition/index.ts#L2084)
 
 ___
 
@@ -1766,7 +1750,7 @@ creator of the item itself
 
 #### Defined in
 
-[base/Root/Module/ItemDefinition/index.ts:1944](https://github.com/onzag/itemize/blob/5c2808d3/base/Root/Module/ItemDefinition/index.ts#L1944)
+[base/Root/Module/ItemDefinition/index.ts:2047](https://github.com/onzag/itemize/blob/f2db74a5/base/Root/Module/ItemDefinition/index.ts#L2047)
 
 ___
 
@@ -1784,7 +1768,67 @@ access if not overwritten by this
 
 #### Defined in
 
-[base/Root/Module/ItemDefinition/index.ts:1932](https://github.com/onzag/itemize/blob/5c2808d3/base/Root/Module/ItemDefinition/index.ts#L1932)
+[base/Root/Module/ItemDefinition/index.ts:2035](https://github.com/onzag/itemize/blob/f2db74a5/base/Root/Module/ItemDefinition/index.ts#L2035)
+
+___
+
+### getSearchEngineDynamicMainLanguageColumn
+
+▸ **getSearchEngineDynamicMainLanguageColumn**(): `string`
+
+If it was provided gives the search engine main
+language to use as it was stored in the columns
+
+#### Returns
+
+`string`
+
+the sql text column name that contains the language to index the whole
+
+#### Defined in
+
+[base/Root/Module/ItemDefinition/index.ts:3056](https://github.com/onzag/itemize/blob/f2db74a5/base/Root/Module/ItemDefinition/index.ts#L3056)
+
+___
+
+### getSearchEngineFallbackLanguage
+
+▸ **getSearchEngineFallbackLanguage**(): `string`
+
+If was provided gives the search engine main
+language to use to define the search
+
+#### Returns
+
+`string`
+
+a 2 iso string
+
+#### Defined in
+
+[base/Root/Module/ItemDefinition/index.ts:3029](https://github.com/onzag/itemize/blob/f2db74a5/base/Root/Module/ItemDefinition/index.ts#L3029)
+
+___
+
+### getSearchEngineMainLanguageFromRow
+
+▸ **getSearchEngineMainLanguageFromRow**(`rowValue`): `string`
+
+Solves the main language from the row
+
+#### Parameters
+
+| Name | Type |
+| :------ | :------ |
+| `rowValue` | `any` |
+
+#### Returns
+
+`string`
+
+#### Defined in
+
+[base/Root/Module/ItemDefinition/index.ts:3007](https://github.com/onzag/itemize/blob/f2db74a5/base/Root/Module/ItemDefinition/index.ts#L3007)
 
 ___
 
@@ -1804,7 +1848,30 @@ in the search mode counterpart
 
 #### Defined in
 
-[base/Root/Module/ItemDefinition/index.ts:1894](https://github.com/onzag/itemize/blob/5c2808d3/base/Root/Module/ItemDefinition/index.ts#L1894)
+[base/Root/Module/ItemDefinition/index.ts:1997](https://github.com/onzag/itemize/blob/f2db74a5/base/Root/Module/ItemDefinition/index.ts#L1997)
+
+___
+
+### getSearchState
+
+▸ **getSearchState**(`id`, `version`): [`ICompoundSearchStateType`](../interfaces/base_Root_Module_ItemDefinition.ICompoundSearchStateType.md)
+
+Provides the internal state of the current state
+
+#### Parameters
+
+| Name | Type |
+| :------ | :------ |
+| `id` | `string` |
+| `version` | `string` |
+
+#### Returns
+
+[`ICompoundSearchStateType`](../interfaces/base_Root_Module_ItemDefinition.ICompoundSearchStateType.md)
+
+#### Defined in
+
+[base/Root/Module/ItemDefinition/index.ts:1953](https://github.com/onzag/itemize/blob/f2db74a5/base/Root/Module/ItemDefinition/index.ts#L1953)
 
 ___
 
@@ -1824,7 +1891,7 @@ in the standard mode counterpart
 
 #### Defined in
 
-[base/Root/Module/ItemDefinition/index.ts:1909](https://github.com/onzag/itemize/blob/5c2808d3/base/Root/Module/ItemDefinition/index.ts#L1909)
+[base/Root/Module/ItemDefinition/index.ts:2012](https://github.com/onzag/itemize/blob/f2db74a5/base/Root/Module/ItemDefinition/index.ts#L2012)
 
 ___
 
@@ -1856,7 +1923,7 @@ a promise for the item definition state
 
 #### Defined in
 
-[base/Root/Module/ItemDefinition/index.ts:1481](https://github.com/onzag/itemize/blob/5c2808d3/base/Root/Module/ItemDefinition/index.ts#L1481)
+[base/Root/Module/ItemDefinition/index.ts:1562](https://github.com/onzag/itemize/blob/f2db74a5/base/Root/Module/ItemDefinition/index.ts#L1562)
 
 ___
 
@@ -1888,7 +1955,7 @@ in order to get cached previously checked results
 
 #### Defined in
 
-[base/Root/Module/ItemDefinition/index.ts:1410](https://github.com/onzag/itemize/blob/5c2808d3/base/Root/Module/ItemDefinition/index.ts#L1410)
+[base/Root/Module/ItemDefinition/index.ts:1491](https://github.com/onzag/itemize/blob/f2db74a5/base/Root/Module/ItemDefinition/index.ts#L1491)
 
 ___
 
@@ -1915,7 +1982,7 @@ state of the item definition
 
 #### Defined in
 
-[base/Root/Module/ItemDefinition/index.ts:1371](https://github.com/onzag/itemize/blob/5c2808d3/base/Root/Module/ItemDefinition/index.ts#L1371)
+[base/Root/Module/ItemDefinition/index.ts:1452](https://github.com/onzag/itemize/blob/f2db74a5/base/Root/Module/ItemDefinition/index.ts#L1452)
 
 ___
 
@@ -1932,7 +1999,7 @@ of the table that is used in the database
 
 #### Defined in
 
-[base/Root/Module/ItemDefinition/index.ts:2687](https://github.com/onzag/itemize/blob/5c2808d3/base/Root/Module/ItemDefinition/index.ts#L2687)
+[base/Root/Module/ItemDefinition/index.ts:2790](https://github.com/onzag/itemize/blob/f2db74a5/base/Root/Module/ItemDefinition/index.ts#L2790)
 
 ___
 
@@ -1959,7 +2026,7 @@ a boolean on whether it does
 
 #### Defined in
 
-[base/Root/Module/ItemDefinition/index.ts:1268](https://github.com/onzag/itemize/blob/5c2808d3/base/Root/Module/ItemDefinition/index.ts#L1268)
+[base/Root/Module/ItemDefinition/index.ts:1349](https://github.com/onzag/itemize/blob/f2db74a5/base/Root/Module/ItemDefinition/index.ts#L1349)
 
 ___
 
@@ -1985,7 +2052,7 @@ a boolean on whether it does or not
 
 #### Defined in
 
-[base/Root/Module/ItemDefinition/index.ts:1840](https://github.com/onzag/itemize/blob/5c2808d3/base/Root/Module/ItemDefinition/index.ts#L1840)
+[base/Root/Module/ItemDefinition/index.ts:1943](https://github.com/onzag/itemize/blob/f2db74a5/base/Root/Module/ItemDefinition/index.ts#L1943)
 
 ___
 
@@ -2014,7 +2081,31 @@ a boolean
 
 #### Defined in
 
-[base/Root/Module/ItemDefinition/index.ts:1244](https://github.com/onzag/itemize/blob/5c2808d3/base/Root/Module/ItemDefinition/index.ts#L1244)
+[base/Root/Module/ItemDefinition/index.ts:1325](https://github.com/onzag/itemize/blob/f2db74a5/base/Root/Module/ItemDefinition/index.ts#L1325)
+
+___
+
+### hasBlockCleanFor
+
+▸ **hasBlockCleanFor**(`id`, `version`, `blockId`): `boolean`
+
+Specifies whether a block id exists with the given criteria
+
+#### Parameters
+
+| Name | Type |
+| :------ | :------ |
+| `id` | `string` |
+| `version` | `string` |
+| `blockId` | `string` |
+
+#### Returns
+
+`boolean`
+
+#### Defined in
+
+[base/Root/Module/ItemDefinition/index.ts:1866](https://github.com/onzag/itemize/blob/f2db74a5/base/Root/Module/ItemDefinition/index.ts#L1866)
 
 ___
 
@@ -2039,7 +2130,7 @@ a boolean on whether it has such include
 
 #### Defined in
 
-[base/Root/Module/ItemDefinition/index.ts:1065](https://github.com/onzag/itemize/blob/5c2808d3/base/Root/Module/ItemDefinition/index.ts#L1065)
+[base/Root/Module/ItemDefinition/index.ts:1146](https://github.com/onzag/itemize/blob/f2db74a5/base/Root/Module/ItemDefinition/index.ts#L1146)
 
 ___
 
@@ -2064,7 +2155,7 @@ a boolean on whether it does or not
 
 #### Defined in
 
-[base/Root/Module/ItemDefinition/index.ts:984](https://github.com/onzag/itemize/blob/5c2808d3/base/Root/Module/ItemDefinition/index.ts#L984)
+[base/Root/Module/ItemDefinition/index.ts:1065](https://github.com/onzag/itemize/blob/f2db74a5/base/Root/Module/ItemDefinition/index.ts#L1065)
 
 ___
 
@@ -2082,7 +2173,7 @@ Tells whether it has a parent item definition
 
 #### Defined in
 
-[base/Root/Module/ItemDefinition/index.ts:1291](https://github.com/onzag/itemize/blob/5c2808d3/base/Root/Module/ItemDefinition/index.ts#L1291)
+[base/Root/Module/ItemDefinition/index.ts:1372](https://github.com/onzag/itemize/blob/f2db74a5/base/Root/Module/ItemDefinition/index.ts#L1372)
 
 ___
 
@@ -2107,7 +2198,7 @@ a boolean
 
 #### Defined in
 
-[base/Root/Module/ItemDefinition/index.ts:1148](https://github.com/onzag/itemize/blob/5c2808d3/base/Root/Module/ItemDefinition/index.ts#L1148)
+[base/Root/Module/ItemDefinition/index.ts:1229](https://github.com/onzag/itemize/blob/f2db74a5/base/Root/Module/ItemDefinition/index.ts#L1229)
 
 ___
 
@@ -2125,7 +2216,7 @@ Root class executes this function recursively
 
 #### Defined in
 
-[base/Root/Module/ItemDefinition/index.ts:813](https://github.com/onzag/itemize/blob/5c2808d3/base/Root/Module/ItemDefinition/index.ts#L813)
+[base/Root/Module/ItemDefinition/index.ts:894](https://github.com/onzag/itemize/blob/f2db74a5/base/Root/Module/ItemDefinition/index.ts#L894)
 
 ___
 
@@ -2144,7 +2235,7 @@ a boolean
 
 #### Defined in
 
-[base/Root/Module/ItemDefinition/index.ts:887](https://github.com/onzag/itemize/blob/5c2808d3/base/Root/Module/ItemDefinition/index.ts#L887)
+[base/Root/Module/ItemDefinition/index.ts:968](https://github.com/onzag/itemize/blob/f2db74a5/base/Root/Module/ItemDefinition/index.ts#L968)
 
 ___
 
@@ -2163,7 +2254,7 @@ a boolean on whether it is in search mode
 
 #### Defined in
 
-[base/Root/Module/ItemDefinition/index.ts:1923](https://github.com/onzag/itemize/blob/5c2808d3/base/Root/Module/ItemDefinition/index.ts#L1923)
+[base/Root/Module/ItemDefinition/index.ts:2026](https://github.com/onzag/itemize/blob/f2db74a5/base/Root/Module/ItemDefinition/index.ts#L2026)
 
 ___
 
@@ -2183,7 +2274,7 @@ a boolean
 
 #### Defined in
 
-[base/Root/Module/ItemDefinition/index.ts:2897](https://github.com/onzag/itemize/blob/5c2808d3/base/Root/Module/ItemDefinition/index.ts#L2897)
+[base/Root/Module/ItemDefinition/index.ts:3072](https://github.com/onzag/itemize/blob/f2db74a5/base/Root/Module/ItemDefinition/index.ts#L3072)
 
 ___
 
@@ -2208,7 +2299,7 @@ a boolean
 
 #### Defined in
 
-[base/Root/Module/ItemDefinition/index.ts:1185](https://github.com/onzag/itemize/blob/5c2808d3/base/Root/Module/ItemDefinition/index.ts#L1185)
+[base/Root/Module/ItemDefinition/index.ts:1266](https://github.com/onzag/itemize/blob/f2db74a5/base/Root/Module/ItemDefinition/index.ts#L1266)
 
 ___
 
@@ -2226,7 +2317,42 @@ a boolean
 
 #### Defined in
 
-[base/Root/Module/ItemDefinition/index.ts:2482](https://github.com/onzag/itemize/blob/5c2808d3/base/Root/Module/ItemDefinition/index.ts#L2482)
+[base/Root/Module/ItemDefinition/index.ts:2585](https://github.com/onzag/itemize/blob/f2db74a5/base/Root/Module/ItemDefinition/index.ts#L2585)
+
+___
+
+### isSearchEngineDynamicMainLanguageColumnInModule
+
+▸ **isSearchEngineDynamicMainLanguageColumnInModule**(): `boolean`
+
+Tells wether the search engine dynamic main language column
+is from a property or a prop extension
+
+#### Returns
+
+`boolean`
+
+#### Defined in
+
+[base/Root/Module/ItemDefinition/index.ts:3041](https://github.com/onzag/itemize/blob/f2db74a5/base/Root/Module/ItemDefinition/index.ts#L3041)
+
+___
+
+### isSearchEngineEnabled
+
+▸ **isSearchEngineEnabled**(): `boolean`
+
+Wether the item is search engine enabled
+
+#### Returns
+
+`boolean`
+
+a boolean
+
+#### Defined in
+
+[base/Root/Module/ItemDefinition/index.ts:2998](https://github.com/onzag/itemize/blob/f2db74a5/base/Root/Module/ItemDefinition/index.ts#L2998)
 
 ___
 
@@ -2245,7 +2371,7 @@ a boolean
 
 #### Defined in
 
-[base/Root/Module/ItemDefinition/index.ts:2884](https://github.com/onzag/itemize/blob/5c2808d3/base/Root/Module/ItemDefinition/index.ts#L2884)
+[base/Root/Module/ItemDefinition/index.ts:2987](https://github.com/onzag/itemize/blob/f2db74a5/base/Root/Module/ItemDefinition/index.ts#L2987)
 
 ___
 
@@ -2270,7 +2396,7 @@ a boolean on whether it's a valid version
 
 #### Defined in
 
-[base/Root/Module/ItemDefinition/index.ts:905](https://github.com/onzag/itemize/blob/5c2808d3/base/Root/Module/ItemDefinition/index.ts#L905)
+[base/Root/Module/ItemDefinition/index.ts:986](https://github.com/onzag/itemize/blob/f2db74a5/base/Root/Module/ItemDefinition/index.ts#L986)
 
 ___
 
@@ -2286,7 +2412,7 @@ Tells whether this item definition is versioned
 
 #### Defined in
 
-[base/Root/Module/ItemDefinition/index.ts:894](https://github.com/onzag/itemize/blob/5c2808d3/base/Root/Module/ItemDefinition/index.ts#L894)
+[base/Root/Module/ItemDefinition/index.ts:975](https://github.com/onzag/itemize/blob/f2db74a5/base/Root/Module/ItemDefinition/index.ts#L975)
 
 ___
 
@@ -2311,7 +2437,7 @@ the state is not lost
 
 #### Defined in
 
-[base/Root/Module/ItemDefinition/index.ts:2847](https://github.com/onzag/itemize/blob/5c2808d3/base/Root/Module/ItemDefinition/index.ts#L2847)
+[base/Root/Module/ItemDefinition/index.ts:2950](https://github.com/onzag/itemize/blob/f2db74a5/base/Root/Module/ItemDefinition/index.ts#L2950)
 
 ___
 
@@ -2329,7 +2455,7 @@ a boolean on whether parenting is enforced
 
 #### Defined in
 
-[base/Root/Module/ItemDefinition/index.ts:2474](https://github.com/onzag/itemize/blob/5c2808d3/base/Root/Module/ItemDefinition/index.ts#L2474)
+[base/Root/Module/ItemDefinition/index.ts:2577](https://github.com/onzag/itemize/blob/f2db74a5/base/Root/Module/ItemDefinition/index.ts#L2577)
 
 ___
 
@@ -2353,7 +2479,7 @@ Removes the blockage of the clean
 
 #### Defined in
 
-[base/Root/Module/ItemDefinition/index.ts:1780](https://github.com/onzag/itemize/blob/5c2808d3/base/Root/Module/ItemDefinition/index.ts#L1780)
+[base/Root/Module/ItemDefinition/index.ts:1883](https://github.com/onzag/itemize/blob/f2db74a5/base/Root/Module/ItemDefinition/index.ts#L1883)
 
 ___
 
@@ -2378,7 +2504,7 @@ Removes a listener
 
 #### Defined in
 
-[base/Root/Module/ItemDefinition/index.ts:2791](https://github.com/onzag/itemize/blob/5c2808d3/base/Root/Module/ItemDefinition/index.ts#L2791)
+[base/Root/Module/ItemDefinition/index.ts:2894](https://github.com/onzag/itemize/blob/f2db74a5/base/Root/Module/ItemDefinition/index.ts#L2894)
 
 ___
 
@@ -2402,7 +2528,7 @@ Restores an applied value to the last applied value
 
 #### Defined in
 
-[base/Root/Module/ItemDefinition/index.ts:1706](https://github.com/onzag/itemize/blob/5c2808d3/base/Root/Module/ItemDefinition/index.ts#L1706)
+[base/Root/Module/ItemDefinition/index.ts:1789](https://github.com/onzag/itemize/blob/f2db74a5/base/Root/Module/ItemDefinition/index.ts#L1789)
 
 ___
 
@@ -2418,13 +2544,13 @@ Flags this item definition into an extensions instance
 
 #### Defined in
 
-[base/Root/Module/ItemDefinition/index.ts:878](https://github.com/onzag/itemize/blob/5c2808d3/base/Root/Module/ItemDefinition/index.ts#L878)
+[base/Root/Module/ItemDefinition/index.ts:959](https://github.com/onzag/itemize/blob/f2db74a5/base/Root/Module/ItemDefinition/index.ts#L959)
 
 ___
 
-### setInternalState
+### setSearchState
 
-▸ **setInternalState**(`id`, `version`, `value`): `void`
+▸ **setSearchState**(`id`, `version`, `value`): `void`
 
 Sets the internal state with a given value
 
@@ -2434,7 +2560,7 @@ Sets the internal state with a given value
 | :------ | :------ |
 | `id` | `string` |
 | `version` | `string` |
-| `value` | `any` |
+| `value` | [`ICompoundSearchStateType`](../interfaces/base_Root_Module_ItemDefinition.ICompoundSearchStateType.md) |
 
 #### Returns
 
@@ -2442,7 +2568,7 @@ Sets the internal state with a given value
 
 #### Defined in
 
-[base/Root/Module/ItemDefinition/index.ts:1861](https://github.com/onzag/itemize/blob/5c2808d3/base/Root/Module/ItemDefinition/index.ts#L1861)
+[base/Root/Module/ItemDefinition/index.ts:1964](https://github.com/onzag/itemize/blob/f2db74a5/base/Root/Module/ItemDefinition/index.ts#L1964)
 
 ___
 
@@ -2461,7 +2587,7 @@ the json form
 
 #### Defined in
 
-[base/Root/Module/ItemDefinition/index.ts:2603](https://github.com/onzag/itemize/blob/5c2808d3/base/Root/Module/ItemDefinition/index.ts#L2603)
+[base/Root/Module/ItemDefinition/index.ts:2706](https://github.com/onzag/itemize/blob/f2db74a5/base/Root/Module/ItemDefinition/index.ts#L2706)
 
 ___
 
@@ -2489,7 +2615,7 @@ their states are correlated
 
 #### Defined in
 
-[base/Root/Module/ItemDefinition/index.ts:2813](https://github.com/onzag/itemize/blob/5c2808d3/base/Root/Module/ItemDefinition/index.ts#L2813)
+[base/Root/Module/ItemDefinition/index.ts:2916](https://github.com/onzag/itemize/blob/f2db74a5/base/Root/Module/ItemDefinition/index.ts#L2916)
 
 ___
 
@@ -2518,7 +2644,7 @@ a raw item definition if found, or null
 
 #### Defined in
 
-[base/Root/Module/ItemDefinition/index.ts:506](https://github.com/onzag/itemize/blob/5c2808d3/base/Root/Module/ItemDefinition/index.ts#L506)
+[base/Root/Module/ItemDefinition/index.ts:587](https://github.com/onzag/itemize/blob/f2db74a5/base/Root/Module/ItemDefinition/index.ts#L587)
 
 ___
 
@@ -2547,7 +2673,7 @@ a raw property definition if found, or null
 
 #### Defined in
 
-[base/Root/Module/ItemDefinition/index.ts:556](https://github.com/onzag/itemize/blob/5c2808d3/base/Root/Module/ItemDefinition/index.ts#L556)
+[base/Root/Module/ItemDefinition/index.ts:637](https://github.com/onzag/itemize/blob/f2db74a5/base/Root/Module/ItemDefinition/index.ts#L637)
 
 ___
 
@@ -2570,7 +2696,7 @@ serialized, the serialized state removes possible useless data
 
 #### Defined in
 
-[base/Root/Module/ItemDefinition/index.ts:581](https://github.com/onzag/itemize/blob/5c2808d3/base/Root/Module/ItemDefinition/index.ts#L581)
+[base/Root/Module/ItemDefinition/index.ts:662](https://github.com/onzag/itemize/blob/f2db74a5/base/Root/Module/ItemDefinition/index.ts#L662)
 
 ___
 
@@ -2595,4 +2721,4 @@ serialized, the serialized state removes possible useless data
 
 #### Defined in
 
-[base/Root/Module/ItemDefinition/index.ts:620](https://github.com/onzag/itemize/blob/5c2808d3/base/Root/Module/ItemDefinition/index.ts#L620)
+[base/Root/Module/ItemDefinition/index.ts:701](https://github.com/onzag/itemize/blob/f2db74a5/base/Root/Module/ItemDefinition/index.ts#L701)

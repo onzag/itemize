@@ -26,7 +26,7 @@ Whether the text is in bold
 
 #### Defined in
 
-[client/internal/text/serializer/types/text.tsx:315](https://github.com/onzag/itemize/blob/5c2808d3/client/internal/text/serializer/types/text.tsx#L315)
+[client/internal/text/serializer/types/text.tsx:267](https://github.com/onzag/itemize/blob/f2db74a5/client/internal/text/serializer/types/text.tsx#L267)
 
 ___
 
@@ -38,7 +38,7 @@ Whether the text is in italic
 
 #### Defined in
 
-[client/internal/text/serializer/types/text.tsx:319](https://github.com/onzag/itemize/blob/5c2808d3/client/internal/text/serializer/types/text.tsx#L319)
+[client/internal/text/serializer/types/text.tsx:271](https://github.com/onzag/itemize/blob/f2db74a5/client/internal/text/serializer/types/text.tsx#L271)
 
 ___
 
@@ -50,7 +50,7 @@ customized style
 
 #### Defined in
 
-[client/internal/text/serializer/types/text.tsx:327](https://github.com/onzag/itemize/blob/5c2808d3/client/internal/text/serializer/types/text.tsx#L327)
+[client/internal/text/serializer/types/text.tsx:279](https://github.com/onzag/itemize/blob/f2db74a5/client/internal/text/serializer/types/text.tsx#L279)
 
 ___
 
@@ -62,7 +62,7 @@ Represents the text content
 
 #### Defined in
 
-[client/internal/text/serializer/types/text.tsx:311](https://github.com/onzag/itemize/blob/5c2808d3/client/internal/text/serializer/types/text.tsx#L311)
+[client/internal/text/serializer/types/text.tsx:263](https://github.com/onzag/itemize/blob/f2db74a5/client/internal/text/serializer/types/text.tsx#L263)
 
 ___
 
@@ -74,4 +74,4 @@ Whether the text is underline
 
 #### Defined in
 
-[client/internal/text/serializer/types/text.tsx:323](https://github.com/onzag/itemize/blob/5c2808d3/client/internal/text/serializer/types/text.tsx#L323)
+[client/internal/text/serializer/types/text.tsx:275](https://github.com/onzag/itemize/blob/f2db74a5/client/internal/text/serializer/types/text.tsx#L275)

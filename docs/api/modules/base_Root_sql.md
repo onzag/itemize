@@ -9,6 +9,8 @@ database for the itemize project should be described
 
 ### Interfaces
 
+- [IElasticIndexDefinitionType](../interfaces/base_Root_sql.IElasticIndexDefinitionType.md)
+- [IElasticSchemaDefinitionType](../interfaces/base_Root_sql.IElasticSchemaDefinitionType.md)
 - [ISQLColumnDefinitionType](../interfaces/base_Root_sql.ISQLColumnDefinitionType.md)
 - [ISQLSchemaDefinitionType](../interfaces/base_Root_sql.ISQLSchemaDefinitionType.md)
 - [ISQLStreamComposedTableRowValue](../interfaces/base_Root_sql.ISQLStreamComposedTableRowValue.md)
@@ -22,6 +24,7 @@ database for the itemize project should be described
 
 ### Functions
 
+- [getElasticSchemaForRoot](base_Root_sql.md#getelasticschemaforroot)
 - [getSQLTablesSchemaForRoot](base_Root_sql.md#getsqltablesschemaforroot)
 
 ## Type aliases
@@ -46,9 +49,31 @@ database for the itemize project should be described
 
 #### Defined in
 
-[base/Root/sql.ts:111](https://github.com/onzag/itemize/blob/5c2808d3/base/Root/sql.ts#L111)
+[base/Root/sql.ts:128](https://github.com/onzag/itemize/blob/f2db74a5/base/Root/sql.ts#L128)
 
 ## Functions
+
+### getElasticSchemaForRoot
+
+▸ **getElasticSchemaForRoot**(`root`, `serverData`, `appData`): [`IElasticSchemaDefinitionType`](../interfaces/base_Root_sql.IElasticSchemaDefinitionType.md)
+
+#### Parameters
+
+| Name | Type |
+| :------ | :------ |
+| `root` | [`default`](../classes/base_Root.default.md) |
+| `serverData` | `any` |
+| `appData` | [`IAppDataType`](../interfaces/server.IAppDataType.md) |
+
+#### Returns
+
+[`IElasticSchemaDefinitionType`](../interfaces/base_Root_sql.IElasticSchemaDefinitionType.md)
+
+#### Defined in
+
+[base/Root/sql.ts:138](https://github.com/onzag/itemize/blob/f2db74a5/base/Root/sql.ts#L138)
+
+___
 
 ### getSQLTablesSchemaForRoot
 
@@ -72,4 +97,4 @@ a total database schema
 
 #### Defined in
 
-[base/Root/sql.ts:128](https://github.com/onzag/itemize/blob/5c2808d3/base/Root/sql.ts#L128)
+[base/Root/sql.ts:156](https://github.com/onzag/itemize/blob/f2db74a5/base/Root/sql.ts#L156)

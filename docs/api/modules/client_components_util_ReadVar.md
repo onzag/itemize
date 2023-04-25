@@ -7,3 +7,27 @@
 ### Classes
 
 - [default](../classes/client_components_util_ReadVar.default.md)
+
+### Functions
+
+- [useReadVar](client_components_util_ReadVar.md#usereadvar)
+
+## Functions
+
+### useReadVar
+
+▸ **useReadVar**(`id`): `any`
+
+#### Parameters
+
+| Name | Type |
+| :------ | :------ |
+| `id` | `string` |
+
+#### Returns
+
+`any`
+
+#### Defined in
+
+[client/components/util/ReadVar.tsx:53](https://github.com/onzag/itemize/blob/f2db74a5/client/components/util/ReadVar.tsx#L53)

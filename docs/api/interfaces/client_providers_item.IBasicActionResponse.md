@@ -13,7 +13,7 @@ loadValue
 
   ↳ [`IActionResponseWithValue`](client_providers_item.IActionResponseWithValue.md)
 
-  ↳ [`IActionResponseWithId`](client_providers_item.IActionResponseWithId.md)
+  ↳ [`IActionSubmitResponse`](client_providers_item.IActionSubmitResponse.md)
 
   ↳ [`IActionResponseWithSearchResults`](client_providers_item.IActionResponseWithSearchResults.md)
 
@@ -31,4 +31,4 @@ loadValue
 
 #### Defined in
 
-[client/providers/item.tsx:152](https://github.com/onzag/itemize/blob/5c2808d3/client/providers/item.tsx#L152)
+[client/providers/item.tsx:141](https://github.com/onzag/itemize/blob/f2db74a5/client/providers/item.tsx#L141)

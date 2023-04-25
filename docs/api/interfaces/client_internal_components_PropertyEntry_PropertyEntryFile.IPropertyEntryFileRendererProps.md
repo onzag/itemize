@@ -36,19 +36,25 @@ required to display as text-specs.md specifies
 - [genericActivePlaceholder](client_internal_components_PropertyEntry_PropertyEntryFile.IPropertyEntryFileRendererProps.md#genericactiveplaceholder)
 - [genericDeleteLabel](client_internal_components_PropertyEntry_PropertyEntryFile.IPropertyEntryFileRendererProps.md#genericdeletelabel)
 - [genericSelectLabel](client_internal_components_PropertyEntry_PropertyEntryFile.IPropertyEntryFileRendererProps.md#genericselectlabel)
-- [icon](client_internal_components_PropertyEntry_PropertyEntryFile.IPropertyEntryFileRendererProps.md#icon)
 - [imageSizes](client_internal_components_PropertyEntry_PropertyEntryFile.IPropertyEntryFileRendererProps.md#imagesizes)
 - [imageSrcSet](client_internal_components_PropertyEntry_PropertyEntryFile.IPropertyEntryFileRendererProps.md#imagesrcset)
 - [isExpectingImages](client_internal_components_PropertyEntry_PropertyEntryFile.IPropertyEntryFileRendererProps.md#isexpectingimages)
+- [isRejectedSupportedImage](client_internal_components_PropertyEntry_PropertyEntryFile.IPropertyEntryFileRendererProps.md#isrejectedsupportedimage)
 - [isSupportedImage](client_internal_components_PropertyEntry_PropertyEntryFile.IPropertyEntryFileRendererProps.md#issupportedimage)
 - [label](client_internal_components_PropertyEntry_PropertyEntryFile.IPropertyEntryFileRendererProps.md#label)
+- [language](client_internal_components_PropertyEntry_PropertyEntryFile.IPropertyEntryFileRendererProps.md#language)
+- [languageOverride](client_internal_components_PropertyEntry_PropertyEntryFile.IPropertyEntryFileRendererProps.md#languageoverride)
 - [maxFileSize](client_internal_components_PropertyEntry_PropertyEntryFile.IPropertyEntryFileRendererProps.md#maxfilesize)
 - [placeholder](client_internal_components_PropertyEntry_PropertyEntryFile.IPropertyEntryFileRendererProps.md#placeholder)
 - [prettySize](client_internal_components_PropertyEntry_PropertyEntryFile.IPropertyEntryFileRendererProps.md#prettysize)
 - [propertyId](client_internal_components_PropertyEntry_PropertyEntryFile.IPropertyEntryFileRendererProps.md#propertyid)
 - [rejected](client_internal_components_PropertyEntry_PropertyEntryFile.IPropertyEntryFileRendererProps.md#rejected)
+- [rejectedExtension](client_internal_components_PropertyEntry_PropertyEntryFile.IPropertyEntryFileRendererProps.md#rejectedextension)
+- [rejectedPrettySize](client_internal_components_PropertyEntry_PropertyEntryFile.IPropertyEntryFileRendererProps.md#rejectedprettysize)
 - [rejectedReason](client_internal_components_PropertyEntry_PropertyEntryFile.IPropertyEntryFileRendererProps.md#rejectedreason)
+- [rejectedValue](client_internal_components_PropertyEntry_PropertyEntryFile.IPropertyEntryFileRendererProps.md#rejectedvalue)
 - [rtl](client_internal_components_PropertyEntry_PropertyEntryFile.IPropertyEntryFileRendererProps.md#rtl)
+- [uniqueId](client_internal_components_PropertyEntry_PropertyEntryFile.IPropertyEntryFileRendererProps.md#uniqueid)
 
 ### Methods
 
@@ -70,7 +76,7 @@ The accept string, use it in your input type
 
 #### Defined in
 
-[client/internal/components/PropertyEntry/PropertyEntryFile.tsx:34](https://github.com/onzag/itemize/blob/5c2808d3/client/internal/components/PropertyEntry/PropertyEntryFile.tsx#L34)
+[client/internal/components/PropertyEntry/PropertyEntryFile.tsx:35](https://github.com/onzag/itemize/blob/f2db74a5/client/internal/components/PropertyEntry/PropertyEntryFile.tsx#L35)
 
 ___
 
@@ -90,7 +96,7 @@ The renderer args
 
 #### Defined in
 
-[client/internal/renderer.ts:19](https://github.com/onzag/itemize/blob/5c2808d3/client/internal/renderer.ts#L19)
+[client/internal/renderer.ts:19](https://github.com/onzag/itemize/blob/f2db74a5/client/internal/renderer.ts#L19)
 
 ___
 
@@ -106,7 +112,7 @@ Whether the entry should autofocus
 
 #### Defined in
 
-[client/internal/components/PropertyEntry/index.tsx:105](https://github.com/onzag/itemize/blob/5c2808d3/client/internal/components/PropertyEntry/index.tsx#L105)
+[client/internal/components/PropertyEntry/index.tsx:107](https://github.com/onzag/itemize/blob/f2db74a5/client/internal/components/PropertyEntry/index.tsx#L107)
 
 ___
 
@@ -123,7 +129,7 @@ current value, this check is exceptional as it uses the local equal function
 
 #### Defined in
 
-[client/internal/components/PropertyEntry/index.tsx:77](https://github.com/onzag/itemize/blob/5c2808d3/client/internal/components/PropertyEntry/index.tsx#L77)
+[client/internal/components/PropertyEntry/index.tsx:79](https://github.com/onzag/itemize/blob/f2db74a5/client/internal/components/PropertyEntry/index.tsx#L79)
 
 ___
 
@@ -139,7 +145,7 @@ The currently applied value that is in sync with the server side
 
 #### Defined in
 
-[client/internal/components/PropertyEntry/index.tsx:72](https://github.com/onzag/itemize/blob/5c2808d3/client/internal/components/PropertyEntry/index.tsx#L72)
+[client/internal/components/PropertyEntry/index.tsx:74](https://github.com/onzag/itemize/blob/f2db74a5/client/internal/components/PropertyEntry/index.tsx#L74)
 
 ___
 
@@ -155,7 +161,7 @@ The current internal value, if any given
 
 #### Defined in
 
-[client/internal/components/PropertyEntry/index.tsx:100](https://github.com/onzag/itemize/blob/5c2808d3/client/internal/components/PropertyEntry/index.tsx#L100)
+[client/internal/components/PropertyEntry/index.tsx:102](https://github.com/onzag/itemize/blob/f2db74a5/client/internal/components/PropertyEntry/index.tsx#L102)
 
 ___
 
@@ -175,7 +181,7 @@ of a flag
 
 #### Defined in
 
-[client/internal/components/PropertyEntry/index.tsx:96](https://github.com/onzag/itemize/blob/5c2808d3/client/internal/components/PropertyEntry/index.tsx#L96)
+[client/internal/components/PropertyEntry/index.tsx:98](https://github.com/onzag/itemize/blob/f2db74a5/client/internal/components/PropertyEntry/index.tsx#L98)
 
 ___
 
@@ -194,7 +200,7 @@ a value for this play a role as well
 
 #### Defined in
 
-[client/internal/components/PropertyEntry/index.tsx:88](https://github.com/onzag/itemize/blob/5c2808d3/client/internal/components/PropertyEntry/index.tsx#L88)
+[client/internal/components/PropertyEntry/index.tsx:90](https://github.com/onzag/itemize/blob/f2db74a5/client/internal/components/PropertyEntry/index.tsx#L90)
 
 ___
 
@@ -210,7 +216,7 @@ The current value
 
 #### Defined in
 
-[client/internal/components/PropertyEntry/index.tsx:81](https://github.com/onzag/itemize/blob/5c2808d3/client/internal/components/PropertyEntry/index.tsx#L81)
+[client/internal/components/PropertyEntry/index.tsx:83](https://github.com/onzag/itemize/blob/f2db74a5/client/internal/components/PropertyEntry/index.tsx#L83)
 
 ___
 
@@ -227,7 +233,7 @@ this is locale specific; the description might not be passed if specified by the
 
 #### Defined in
 
-[client/internal/components/PropertyEntry/index.tsx:63](https://github.com/onzag/itemize/blob/5c2808d3/client/internal/components/PropertyEntry/index.tsx#L63)
+[client/internal/components/PropertyEntry/index.tsx:69](https://github.com/onzag/itemize/blob/f2db74a5/client/internal/components/PropertyEntry/index.tsx#L69)
 
 ___
 
@@ -245,7 +251,7 @@ and attempts are futile to modify
 
 #### Defined in
 
-[client/internal/components/PropertyEntry/index.tsx:111](https://github.com/onzag/itemize/blob/5c2808d3/client/internal/components/PropertyEntry/index.tsx#L111)
+[client/internal/components/PropertyEntry/index.tsx:113](https://github.com/onzag/itemize/blob/f2db74a5/client/internal/components/PropertyEntry/index.tsx#L113)
 
 ___
 
@@ -258,7 +264,7 @@ used for display purposes
 
 #### Defined in
 
-[client/internal/components/PropertyEntry/PropertyEntryFile.tsx:92](https://github.com/onzag/itemize/blob/5c2808d3/client/internal/components/PropertyEntry/PropertyEntryFile.tsx#L92)
+[client/internal/components/PropertyEntry/PropertyEntryFile.tsx:109](https://github.com/onzag/itemize/blob/f2db74a5/client/internal/components/PropertyEntry/PropertyEntryFile.tsx#L109)
 
 ___
 
@@ -270,7 +276,7 @@ The extra metadata that is provided
 
 #### Defined in
 
-[client/internal/components/PropertyEntry/PropertyEntryFile.tsx:96](https://github.com/onzag/itemize/blob/5c2808d3/client/internal/components/PropertyEntry/PropertyEntryFile.tsx#L96)
+[client/internal/components/PropertyEntry/PropertyEntryFile.tsx:113](https://github.com/onzag/itemize/blob/f2db74a5/client/internal/components/PropertyEntry/PropertyEntryFile.tsx#L113)
 
 ___
 
@@ -283,7 +289,7 @@ it'll contains something on the drop files here
 
 #### Defined in
 
-[client/internal/components/PropertyEntry/PropertyEntryFile.tsx:48](https://github.com/onzag/itemize/blob/5c2808d3/client/internal/components/PropertyEntry/PropertyEntryFile.tsx#L48)
+[client/internal/components/PropertyEntry/PropertyEntryFile.tsx:49](https://github.com/onzag/itemize/blob/f2db74a5/client/internal/components/PropertyEntry/PropertyEntryFile.tsx#L49)
 
 ___
 
@@ -296,7 +302,7 @@ deleted
 
 #### Defined in
 
-[client/internal/components/PropertyEntry/PropertyEntryFile.tsx:53](https://github.com/onzag/itemize/blob/5c2808d3/client/internal/components/PropertyEntry/PropertyEntryFile.tsx#L53)
+[client/internal/components/PropertyEntry/PropertyEntryFile.tsx:54](https://github.com/onzag/itemize/blob/f2db74a5/client/internal/components/PropertyEntry/PropertyEntryFile.tsx#L54)
 
 ___
 
@@ -309,23 +315,7 @@ selected
 
 #### Defined in
 
-[client/internal/components/PropertyEntry/PropertyEntryFile.tsx:58](https://github.com/onzag/itemize/blob/5c2808d3/client/internal/components/PropertyEntry/PropertyEntryFile.tsx#L58)
-
-___
-
-### icon
-
-• `Optional` **icon**: `ReactNode`
-
-Icon are an UI defined property for an icon to use during the view, handle as you wish
-
-#### Inherited from
-
-[IPropertyEntryRendererProps](client_internal_components_PropertyEntry.IPropertyEntryRendererProps.md).[icon](client_internal_components_PropertyEntry.IPropertyEntryRendererProps.md#icon)
-
-#### Defined in
-
-[client/internal/components/PropertyEntry/index.tsx:67](https://github.com/onzag/itemize/blob/5c2808d3/client/internal/components/PropertyEntry/index.tsx#L67)
+[client/internal/components/PropertyEntry/PropertyEntryFile.tsx:59](https://github.com/onzag/itemize/blob/f2db74a5/client/internal/components/PropertyEntry/PropertyEntryFile.tsx#L59)
 
 ___
 
@@ -337,7 +327,7 @@ The image sizes that exist if isSupportedImage is true for the current value
 
 #### Defined in
 
-[client/internal/components/PropertyEntry/PropertyEntryFile.tsx:83](https://github.com/onzag/itemize/blob/5c2808d3/client/internal/components/PropertyEntry/PropertyEntryFile.tsx#L83)
+[client/internal/components/PropertyEntry/PropertyEntryFile.tsx:100](https://github.com/onzag/itemize/blob/f2db74a5/client/internal/components/PropertyEntry/PropertyEntryFile.tsx#L100)
 
 ___
 
@@ -349,7 +339,7 @@ A source set for the image type that exists if isSupportedImage is true
 
 #### Defined in
 
-[client/internal/components/PropertyEntry/PropertyEntryFile.tsx:79](https://github.com/onzag/itemize/blob/5c2808d3/client/internal/components/PropertyEntry/PropertyEntryFile.tsx#L79)
+[client/internal/components/PropertyEntry/PropertyEntryFile.tsx:96](https://github.com/onzag/itemize/blob/f2db74a5/client/internal/components/PropertyEntry/PropertyEntryFile.tsx#L96)
 
 ___
 
@@ -362,7 +352,19 @@ to accept
 
 #### Defined in
 
-[client/internal/components/PropertyEntry/PropertyEntryFile.tsx:43](https://github.com/onzag/itemize/blob/5c2808d3/client/internal/components/PropertyEntry/PropertyEntryFile.tsx#L43)
+[client/internal/components/PropertyEntry/PropertyEntryFile.tsx:44](https://github.com/onzag/itemize/blob/f2db74a5/client/internal/components/PropertyEntry/PropertyEntryFile.tsx#L44)
+
+___
+
+### isRejectedSupportedImage
+
+• **isRejectedSupportedImage**: `boolean`
+
+Whether the rejected is a supported image
+
+#### Defined in
+
+[client/internal/components/PropertyEntry/PropertyEntryFile.tsx:92](https://github.com/onzag/itemize/blob/f2db74a5/client/internal/components/PropertyEntry/PropertyEntryFile.tsx#L92)
 
 ___
 
@@ -377,7 +379,7 @@ even if the file could have been any type
 
 #### Defined in
 
-[client/internal/components/PropertyEntry/PropertyEntryFile.tsx:65](https://github.com/onzag/itemize/blob/5c2808d3/client/internal/components/PropertyEntry/PropertyEntryFile.tsx#L65)
+[client/internal/components/PropertyEntry/PropertyEntryFile.tsx:66](https://github.com/onzag/itemize/blob/f2db74a5/client/internal/components/PropertyEntry/PropertyEntryFile.tsx#L66)
 
 ___
 
@@ -394,7 +396,43 @@ this is locale specific
 
 #### Defined in
 
-[client/internal/components/PropertyEntry/index.tsx:53](https://github.com/onzag/itemize/blob/5c2808d3/client/internal/components/PropertyEntry/index.tsx#L53)
+[client/internal/components/PropertyEntry/index.tsx:59](https://github.com/onzag/itemize/blob/f2db74a5/client/internal/components/PropertyEntry/index.tsx#L59)
+
+___
+
+### language
+
+• **language**: `string`
+
+The current language being used by the client overall in the app
+
+#### Inherited from
+
+[IPropertyEntryRendererProps](client_internal_components_PropertyEntry.IPropertyEntryRendererProps.md).[language](client_internal_components_PropertyEntry.IPropertyEntryRendererProps.md#language)
+
+#### Defined in
+
+[client/internal/components/PropertyEntry/index.tsx:138](https://github.com/onzag/itemize/blob/f2db74a5/client/internal/components/PropertyEntry/index.tsx#L138)
+
+___
+
+### languageOverride
+
+• `Optional` **languageOverride**: `string`
+
+An optional language used mainly for the text type to override
+own language properties that currently only text supports that
+
+It may be possible for the editor to set its own text language
+value if it has its own
+
+#### Inherited from
+
+[IPropertyEntryRendererProps](client_internal_components_PropertyEntry.IPropertyEntryRendererProps.md).[languageOverride](client_internal_components_PropertyEntry.IPropertyEntryRendererProps.md#languageoverride)
+
+#### Defined in
+
+[client/internal/components/PropertyEntry/index.tsx:147](https://github.com/onzag/itemize/blob/f2db74a5/client/internal/components/PropertyEntry/index.tsx#L147)
 
 ___
 
@@ -406,7 +444,7 @@ The max file size
 
 #### Defined in
 
-[client/internal/components/PropertyEntry/PropertyEntryFile.tsx:38](https://github.com/onzag/itemize/blob/5c2808d3/client/internal/components/PropertyEntry/PropertyEntryFile.tsx#L38)
+[client/internal/components/PropertyEntry/PropertyEntryFile.tsx:39](https://github.com/onzag/itemize/blob/f2db74a5/client/internal/components/PropertyEntry/PropertyEntryFile.tsx#L39)
 
 ___
 
@@ -423,7 +461,7 @@ this is locale specific
 
 #### Defined in
 
-[client/internal/components/PropertyEntry/index.tsx:58](https://github.com/onzag/itemize/blob/5c2808d3/client/internal/components/PropertyEntry/index.tsx#L58)
+[client/internal/components/PropertyEntry/index.tsx:64](https://github.com/onzag/itemize/blob/f2db74a5/client/internal/components/PropertyEntry/index.tsx#L64)
 
 ___
 
@@ -435,7 +473,7 @@ A human readable form of the current size of the file, or null if no file
 
 #### Defined in
 
-[client/internal/components/PropertyEntry/PropertyEntryFile.tsx:87](https://github.com/onzag/itemize/blob/5c2808d3/client/internal/components/PropertyEntry/PropertyEntryFile.tsx#L87)
+[client/internal/components/PropertyEntry/PropertyEntryFile.tsx:104](https://github.com/onzag/itemize/blob/f2db74a5/client/internal/components/PropertyEntry/PropertyEntryFile.tsx#L104)
 
 ___
 
@@ -451,7 +489,7 @@ The property id in question
 
 #### Defined in
 
-[client/internal/components/PropertyEntry/index.tsx:47](https://github.com/onzag/itemize/blob/5c2808d3/client/internal/components/PropertyEntry/index.tsx#L47)
+[client/internal/components/PropertyEntry/index.tsx:47](https://github.com/onzag/itemize/blob/f2db74a5/client/internal/components/PropertyEntry/index.tsx#L47)
 
 ___
 
@@ -465,7 +503,31 @@ or whatnot, when rejected is true, the true property has a value of null
 
 #### Defined in
 
-[client/internal/components/PropertyEntry/PropertyEntryFile.tsx:71](https://github.com/onzag/itemize/blob/5c2808d3/client/internal/components/PropertyEntry/PropertyEntryFile.tsx#L71)
+[client/internal/components/PropertyEntry/PropertyEntryFile.tsx:72](https://github.com/onzag/itemize/blob/f2db74a5/client/internal/components/PropertyEntry/PropertyEntryFile.tsx#L72)
+
+___
+
+### rejectedExtension
+
+• **rejectedExtension**: `string`
+
+The extension of the rejected value
+
+#### Defined in
+
+[client/internal/components/PropertyEntry/PropertyEntryFile.tsx:84](https://github.com/onzag/itemize/blob/f2db74a5/client/internal/components/PropertyEntry/PropertyEntryFile.tsx#L84)
+
+___
+
+### rejectedPrettySize
+
+• **rejectedPrettySize**: `string`
+
+the pretty size of the rejected value
+
+#### Defined in
+
+[client/internal/components/PropertyEntry/PropertyEntryFile.tsx:88](https://github.com/onzag/itemize/blob/f2db74a5/client/internal/components/PropertyEntry/PropertyEntryFile.tsx#L88)
 
 ___
 
@@ -477,7 +539,19 @@ A localized reason on why the rejected status is active
 
 #### Defined in
 
-[client/internal/components/PropertyEntry/PropertyEntryFile.tsx:75](https://github.com/onzag/itemize/blob/5c2808d3/client/internal/components/PropertyEntry/PropertyEntryFile.tsx#L75)
+[client/internal/components/PropertyEntry/PropertyEntryFile.tsx:76](https://github.com/onzag/itemize/blob/f2db74a5/client/internal/components/PropertyEntry/PropertyEntryFile.tsx#L76)
+
+___
+
+### rejectedValue
+
+• **rejectedValue**: [`IGQLFile`](gql_querier.IGQLFile.md)
+
+The last value that was rejected
+
+#### Defined in
+
+[client/internal/components/PropertyEntry/PropertyEntryFile.tsx:80](https://github.com/onzag/itemize/blob/f2db74a5/client/internal/components/PropertyEntry/PropertyEntryFile.tsx#L80)
 
 ___
 
@@ -493,7 +567,24 @@ Whether it is in rtl mode for a rtl language
 
 #### Defined in
 
-[client/internal/renderer.ts:15](https://github.com/onzag/itemize/blob/5c2808d3/client/internal/renderer.ts#L15)
+[client/internal/renderer.ts:15](https://github.com/onzag/itemize/blob/f2db74a5/client/internal/renderer.ts#L15)
+
+___
+
+### uniqueId
+
+• **uniqueId**: `string`
+
+an unique id for this property
+with the id and the version they are related to
+
+#### Inherited from
+
+[IPropertyEntryRendererProps](client_internal_components_PropertyEntry.IPropertyEntryRendererProps.md).[uniqueId](client_internal_components_PropertyEntry.IPropertyEntryRendererProps.md#uniqueid)
+
+#### Defined in
+
+[client/internal/components/PropertyEntry/index.tsx:53](https://github.com/onzag/itemize/blob/f2db74a5/client/internal/components/PropertyEntry/index.tsx#L53)
 
 ## Methods
 
@@ -515,7 +606,7 @@ currentInvalidReason gets populated even if the field is not poked
 
 #### Defined in
 
-[client/internal/components/PropertyEntry/index.tsx:118](https://github.com/onzag/itemize/blob/5c2808d3/client/internal/components/PropertyEntry/index.tsx#L118)
+[client/internal/components/PropertyEntry/index.tsx:120](https://github.com/onzag/itemize/blob/f2db74a5/client/internal/components/PropertyEntry/index.tsx#L120)
 
 ___
 
@@ -545,7 +636,7 @@ caution is advised which one to use
 
 #### Defined in
 
-[client/internal/components/PropertyEntry/index.tsx:126](https://github.com/onzag/itemize/blob/5c2808d3/client/internal/components/PropertyEntry/index.tsx#L126)
+[client/internal/components/PropertyEntry/index.tsx:128](https://github.com/onzag/itemize/blob/f2db74a5/client/internal/components/PropertyEntry/index.tsx#L128)
 
 ___
 
@@ -561,7 +652,7 @@ A function to clear the file
 
 #### Defined in
 
-[client/internal/components/PropertyEntry/PropertyEntryFile.tsx:113](https://github.com/onzag/itemize/blob/5c2808d3/client/internal/components/PropertyEntry/PropertyEntryFile.tsx#L113)
+[client/internal/components/PropertyEntry/PropertyEntryFile.tsx:130](https://github.com/onzag/itemize/blob/f2db74a5/client/internal/components/PropertyEntry/PropertyEntryFile.tsx#L130)
 
 ___
 
@@ -582,7 +673,7 @@ when doing this
 
 #### Defined in
 
-[client/internal/components/PropertyEntry/index.tsx:131](https://github.com/onzag/itemize/blob/5c2808d3/client/internal/components/PropertyEntry/index.tsx#L131)
+[client/internal/components/PropertyEntry/index.tsx:133](https://github.com/onzag/itemize/blob/f2db74a5/client/internal/components/PropertyEntry/index.tsx#L133)
 
 ___
 
@@ -610,7 +701,7 @@ an image it will ensure to give it metadata
 
 #### Defined in
 
-[client/internal/components/PropertyEntry/PropertyEntryFile.tsx:105](https://github.com/onzag/itemize/blob/5c2808d3/client/internal/components/PropertyEntry/PropertyEntryFile.tsx#L105)
+[client/internal/components/PropertyEntry/PropertyEntryFile.tsx:122](https://github.com/onzag/itemize/blob/f2db74a5/client/internal/components/PropertyEntry/PropertyEntryFile.tsx#L122)
 
 ___
 
@@ -632,7 +723,7 @@ Allows to update and set the extra metadata that is contained within the file
 
 #### Defined in
 
-[client/internal/components/PropertyEntry/PropertyEntryFile.tsx:109](https://github.com/onzag/itemize/blob/5c2808d3/client/internal/components/PropertyEntry/PropertyEntryFile.tsx#L109)
+[client/internal/components/PropertyEntry/PropertyEntryFile.tsx:126](https://github.com/onzag/itemize/blob/f2db74a5/client/internal/components/PropertyEntry/PropertyEntryFile.tsx#L126)
 
 ___
 
@@ -648,4 +739,4 @@ A function to open the current file
 
 #### Defined in
 
-[client/internal/components/PropertyEntry/PropertyEntryFile.tsx:117](https://github.com/onzag/itemize/blob/5c2808d3/client/internal/components/PropertyEntry/PropertyEntryFile.tsx#L117)
+[client/internal/components/PropertyEntry/PropertyEntryFile.tsx:134](https://github.com/onzag/itemize/blob/f2db74a5/client/internal/components/PropertyEntry/PropertyEntryFile.tsx#L134)

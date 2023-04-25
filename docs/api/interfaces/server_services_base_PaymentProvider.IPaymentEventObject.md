@@ -49,7 +49,7 @@ This is the event type that was triggered
 
 #### Defined in
 
-[server/services/base/PaymentProvider.ts:170](https://github.com/onzag/itemize/blob/5c2808d3/server/services/base/PaymentProvider.ts#L170)
+[server/services/base/PaymentProvider.ts:170](https://github.com/onzag/itemize/blob/f2db74a5/server/services/base/PaymentProvider.ts#L170)
 
 ___
 
@@ -65,7 +65,7 @@ The id of the row where the payment is contained
 
 #### Defined in
 
-[server/services/base/PaymentProvider.ts:88](https://github.com/onzag/itemize/blob/5c2808d3/server/services/base/PaymentProvider.ts#L88)
+[server/services/base/PaymentProvider.ts:88](https://github.com/onzag/itemize/blob/f2db74a5/server/services/base/PaymentProvider.ts#L88)
 
 ___
 
@@ -81,7 +81,7 @@ If the payment is part of a include, which include is it
 
 #### Defined in
 
-[server/services/base/PaymentProvider.ts:80](https://github.com/onzag/itemize/blob/5c2808d3/server/services/base/PaymentProvider.ts#L80)
+[server/services/base/PaymentProvider.ts:80](https://github.com/onzag/itemize/blob/f2db74a5/server/services/base/PaymentProvider.ts#L80)
 
 ___
 
@@ -97,7 +97,7 @@ The item that contains this payment
 
 #### Defined in
 
-[server/services/base/PaymentProvider.ts:76](https://github.com/onzag/itemize/blob/5c2808d3/server/services/base/PaymentProvider.ts#L76)
+[server/services/base/PaymentProvider.ts:76](https://github.com/onzag/itemize/blob/f2db74a5/server/services/base/PaymentProvider.ts#L76)
 
 ___
 
@@ -113,7 +113,7 @@ The module where this payment is contained at
 
 #### Defined in
 
-[server/services/base/PaymentProvider.ts:72](https://github.com/onzag/itemize/blob/5c2808d3/server/services/base/PaymentProvider.ts#L72)
+[server/services/base/PaymentProvider.ts:72](https://github.com/onzag/itemize/blob/f2db74a5/server/services/base/PaymentProvider.ts#L72)
 
 ___
 
@@ -130,7 +130,7 @@ had occurred
 
 #### Defined in
 
-[server/services/base/PaymentProvider.ts:138](https://github.com/onzag/itemize/blob/5c2808d3/server/services/base/PaymentProvider.ts#L138)
+[server/services/base/PaymentProvider.ts:138](https://github.com/onzag/itemize/blob/f2db74a5/server/services/base/PaymentProvider.ts#L138)
 
 ___
 
@@ -148,7 +148,7 @@ this will be null if it was created
 
 #### Defined in
 
-[server/services/base/PaymentProvider.ts:104](https://github.com/onzag/itemize/blob/5c2808d3/server/services/base/PaymentProvider.ts#L104)
+[server/services/base/PaymentProvider.ts:104](https://github.com/onzag/itemize/blob/f2db74a5/server/services/base/PaymentProvider.ts#L104)
 
 ___
 
@@ -166,7 +166,7 @@ this will be null if it was created
 
 #### Defined in
 
-[server/services/base/PaymentProvider.ts:110](https://github.com/onzag/itemize/blob/5c2808d3/server/services/base/PaymentProvider.ts#L110)
+[server/services/base/PaymentProvider.ts:110](https://github.com/onzag/itemize/blob/f2db74a5/server/services/base/PaymentProvider.ts#L110)
 
 ___
 
@@ -184,7 +184,7 @@ this will be null if it was created
 
 #### Defined in
 
-[server/services/base/PaymentProvider.ts:98](https://github.com/onzag/itemize/blob/5c2808d3/server/services/base/PaymentProvider.ts#L98)
+[server/services/base/PaymentProvider.ts:98](https://github.com/onzag/itemize/blob/f2db74a5/server/services/base/PaymentProvider.ts#L98)
 
 ___
 
@@ -196,7 +196,7 @@ And this is the new payment object as it is right now
 
 #### Defined in
 
-[server/services/base/PaymentProvider.ts:174](https://github.com/onzag/itemize/blob/5c2808d3/server/services/base/PaymentProvider.ts#L174)
+[server/services/base/PaymentProvider.ts:174](https://github.com/onzag/itemize/blob/f2db74a5/server/services/base/PaymentProvider.ts#L174)
 
 ___
 
@@ -212,7 +212,7 @@ The payment property itself
 
 #### Defined in
 
-[server/services/base/PaymentProvider.ts:84](https://github.com/onzag/itemize/blob/5c2808d3/server/services/base/PaymentProvider.ts#L84)
+[server/services/base/PaymentProvider.ts:84](https://github.com/onzag/itemize/blob/f2db74a5/server/services/base/PaymentProvider.ts#L84)
 
 ___
 
@@ -230,7 +230,7 @@ thing
 
 #### Defined in
 
-[server/services/base/PaymentProvider.ts:158](https://github.com/onzag/itemize/blob/5c2808d3/server/services/base/PaymentProvider.ts#L158)
+[server/services/base/PaymentProvider.ts:158](https://github.com/onzag/itemize/blob/f2db74a5/server/services/base/PaymentProvider.ts#L158)
 
 ___
 
@@ -247,7 +247,7 @@ the database
 
 #### Defined in
 
-[server/services/base/PaymentProvider.ts:115](https://github.com/onzag/itemize/blob/5c2808d3/server/services/base/PaymentProvider.ts#L115)
+[server/services/base/PaymentProvider.ts:115](https://github.com/onzag/itemize/blob/f2db74a5/server/services/base/PaymentProvider.ts#L115)
 
 ___
 
@@ -263,7 +263,7 @@ The version of the row where the payment is contained
 
 #### Defined in
 
-[server/services/base/PaymentProvider.ts:92](https://github.com/onzag/itemize/blob/5c2808d3/server/services/base/PaymentProvider.ts#L92)
+[server/services/base/PaymentProvider.ts:92](https://github.com/onzag/itemize/blob/f2db74a5/server/services/base/PaymentProvider.ts#L92)
 
 ## Methods
 
@@ -283,7 +283,7 @@ Provides the current up to date hidden metadata
 
 #### Defined in
 
-[server/services/base/PaymentProvider.ts:142](https://github.com/onzag/itemize/blob/5c2808d3/server/services/base/PaymentProvider.ts#L142)
+[server/services/base/PaymentProvider.ts:142](https://github.com/onzag/itemize/blob/f2db74a5/server/services/base/PaymentProvider.ts#L142)
 
 ___
 
@@ -311,7 +311,7 @@ crash if it's invalid json
 
 #### Defined in
 
-[server/services/base/PaymentProvider.ts:152](https://github.com/onzag/itemize/blob/5c2808d3/server/services/base/PaymentProvider.ts#L152)
+[server/services/base/PaymentProvider.ts:152](https://github.com/onzag/itemize/blob/f2db74a5/server/services/base/PaymentProvider.ts#L152)
 
 ___
 
@@ -337,4 +337,4 @@ Sets the hidden metadata value
 
 #### Defined in
 
-[server/services/base/PaymentProvider.ts:146](https://github.com/onzag/itemize/blob/5c2808d3/server/services/base/PaymentProvider.ts#L146)
+[server/services/base/PaymentProvider.ts:146](https://github.com/onzag/itemize/blob/f2db74a5/server/services/base/PaymentProvider.ts#L146)

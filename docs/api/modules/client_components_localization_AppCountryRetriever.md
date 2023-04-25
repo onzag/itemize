@@ -6,9 +6,14 @@ Simply provides the current country of the application context
 
 ## Table of contents
 
+### Interfaces
+
+- [ICountryRetrieverArg](../interfaces/client_components_localization_AppCountryRetriever.ICountryRetrieverArg.md)
+
 ### Functions
 
 - [default](client_components_localization_AppCountryRetriever.md#default)
+- [useAppCountryRetriever](client_components_localization_AppCountryRetriever.md#useappcountryretriever)
 
 ## Functions
 
@@ -33,4 +38,24 @@ a react node
 
 #### Defined in
 
-[client/components/localization/AppCountryRetriever.tsx:25](https://github.com/onzag/itemize/blob/5c2808d3/client/components/localization/AppCountryRetriever.tsx#L25)
+[client/components/localization/AppCountryRetriever.tsx:59](https://github.com/onzag/itemize/blob/f2db74a5/client/components/localization/AppCountryRetriever.tsx#L59)
+
+___
+
+### useAppCountryRetriever
+
+▸ **useAppCountryRetriever**(): `Object`
+
+#### Returns
+
+`Object`
+
+| Name | Type |
+| :------ | :------ |
+| `availableCountries` | [`ICountryType`](../interfaces/imported_resources.ICountryType.md)[] |
+| `changeCountryTo` | () => `any` \| [`ChangeCountryToFn`](client_internal_providers_locale_provider.md#changecountrytofn) |
+| `currentCountry` | [`ICountryType`](../interfaces/imported_resources.ICountryType.md) |
+
+#### Defined in
+
+[client/components/localization/AppCountryRetriever.tsx:95](https://github.com/onzag/itemize/blob/f2db74a5/client/components/localization/AppCountryRetriever.tsx#L95)

@@ -8,7 +8,7 @@ The property entry text handler class
 
 ## Hierarchy
 
-- `Component`<[`IPropertyEntryHandlerProps`](../interfaces/client_internal_components_PropertyEntry.IPropertyEntryHandlerProps.md)<`string`, [`IPropertyEntryTextRendererProps`](../interfaces/client_internal_components_PropertyEntry_PropertyEntryText.IPropertyEntryTextRendererProps.md)\>, `IPropertyEntryTextState`\>
+- `Component`<[`IPropertyEntryHandlerProps`](../interfaces/client_internal_components_PropertyEntry.IPropertyEntryHandlerProps.md)<[`IPropertyDefinitionSupportedTextType`](../interfaces/base_Root_Module_ItemDefinition_PropertyDefinition_types_text.IPropertyDefinitionSupportedTextType.md), [`IPropertyEntryTextRendererProps`](../interfaces/client_internal_components_PropertyEntry_PropertyEntryText.IPropertyEntryTextRendererProps.md)\>, `IPropertyEntryTextState`\>
 
   ↳ **`default`**
 
@@ -20,7 +20,6 @@ The property entry text handler class
 
 ### Properties
 
-- [activeDataURIs](client_internal_components_PropertyEntry_PropertyEntryText.default.md#activedatauris)
 - [cachedMediaProperty](client_internal_components_PropertyEntry_PropertyEntryText.default.md#cachedmediaproperty)
 - [cachedMediaPropertyAcceptsFiles](client_internal_components_PropertyEntry_PropertyEntryText.default.md#cachedmediapropertyacceptsfiles)
 - [cachedMediaPropertyAcceptsImages](client_internal_components_PropertyEntry_PropertyEntryText.default.md#cachedmediapropertyacceptsimages)
@@ -56,8 +55,8 @@ The property entry text handler class
 - [onRemoveFile](client_internal_components_PropertyEntry_PropertyEntryText.default.md#onremovefile)
 - [onRestoreHijacked](client_internal_components_PropertyEntry_PropertyEntryText.default.md#onrestorehijacked)
 - [onRestoreLostFile](client_internal_components_PropertyEntry_PropertyEntryText.default.md#onrestorelostfile)
-- [onRetrieveDataURI](client_internal_components_PropertyEntry_PropertyEntryText.default.md#onretrievedatauri)
 - [onRetrieveFile](client_internal_components_PropertyEntry_PropertyEntryText.default.md#onretrievefile)
+- [onRetrieveImage](client_internal_components_PropertyEntry_PropertyEntryText.default.md#onretrieveimage)
 - [readBlobAsDataUrl](client_internal_components_PropertyEntry_PropertyEntryText.default.md#readblobasdataurl)
 - [readUrlAsDataUrl](client_internal_components_PropertyEntry_PropertyEntryText.default.md#readurlasdataurl)
 - [render](client_internal_components_PropertyEntry_PropertyEntryText.default.md#render)
@@ -70,37 +69,23 @@ The property entry text handler class
 
 • **new default**(`props`)
 
+Contains a list of active data uris for the blob elements
+
 #### Parameters
 
 | Name | Type |
 | :------ | :------ |
-| `props` | [`IPropertyEntryHandlerProps`](../interfaces/client_internal_components_PropertyEntry.IPropertyEntryHandlerProps.md)<`string`, [`IPropertyEntryTextRendererProps`](../interfaces/client_internal_components_PropertyEntry_PropertyEntryText.IPropertyEntryTextRendererProps.md)\> |
+| `props` | [`IPropertyEntryHandlerProps`](../interfaces/client_internal_components_PropertyEntry.IPropertyEntryHandlerProps.md)<[`IPropertyDefinitionSupportedTextType`](../interfaces/base_Root_Module_ItemDefinition_PropertyDefinition_types_text.IPropertyDefinitionSupportedTextType.md), [`IPropertyEntryTextRendererProps`](../interfaces/client_internal_components_PropertyEntry_PropertyEntryText.IPropertyEntryTextRendererProps.md)\> |
 
 #### Overrides
 
-React.Component&lt;IPropertyEntryHandlerProps&lt;string, IPropertyEntryTextRendererProps\&gt;, IPropertyEntryTextState\&gt;.constructor
+React.Component&lt;IPropertyEntryHandlerProps&lt;IPropertyDefinitionSupportedTextType, IPropertyEntryTextRendererProps\&gt;, IPropertyEntryTextState\&gt;.constructor
 
 #### Defined in
 
-[client/internal/components/PropertyEntry/PropertyEntryText.tsx:292](https://github.com/onzag/itemize/blob/5c2808d3/client/internal/components/PropertyEntry/PropertyEntryText.tsx#L292)
+[client/internal/components/PropertyEntry/PropertyEntryText.tsx:341](https://github.com/onzag/itemize/blob/f2db74a5/client/internal/components/PropertyEntry/PropertyEntryText.tsx#L341)
 
 ## Properties
-
-### activeDataURIs
-
-• `Private` **activeDataURIs**: `Object`
-
-Contains a list of active data uris for the blob elements
-
-#### Index signature
-
-▪ [id: `string`]: `string`
-
-#### Defined in
-
-[client/internal/components/PropertyEntry/PropertyEntryText.tsx:288](https://github.com/onzag/itemize/blob/5c2808d3/client/internal/components/PropertyEntry/PropertyEntryText.tsx#L288)
-
-___
 
 ### cachedMediaProperty
 
@@ -110,7 +95,7 @@ We hold and cache our media property
 
 #### Defined in
 
-[client/internal/components/PropertyEntry/PropertyEntryText.tsx:262](https://github.com/onzag/itemize/blob/5c2808d3/client/internal/components/PropertyEntry/PropertyEntryText.tsx#L262)
+[client/internal/components/PropertyEntry/PropertyEntryText.tsx:311](https://github.com/onzag/itemize/blob/f2db74a5/client/internal/components/PropertyEntry/PropertyEntryText.tsx#L311)
 
 ___
 
@@ -122,7 +107,7 @@ We hold and cache our accepts for the media property
 
 #### Defined in
 
-[client/internal/components/PropertyEntry/PropertyEntryText.tsx:266](https://github.com/onzag/itemize/blob/5c2808d3/client/internal/components/PropertyEntry/PropertyEntryText.tsx#L266)
+[client/internal/components/PropertyEntry/PropertyEntryText.tsx:315](https://github.com/onzag/itemize/blob/f2db74a5/client/internal/components/PropertyEntry/PropertyEntryText.tsx#L315)
 
 ___
 
@@ -134,7 +119,7 @@ We hold and cache our accpets for the images in the media property
 
 #### Defined in
 
-[client/internal/components/PropertyEntry/PropertyEntryText.tsx:270](https://github.com/onzag/itemize/blob/5c2808d3/client/internal/components/PropertyEntry/PropertyEntryText.tsx#L270)
+[client/internal/components/PropertyEntry/PropertyEntryText.tsx:319](https://github.com/onzag/itemize/blob/f2db74a5/client/internal/components/PropertyEntry/PropertyEntryText.tsx#L319)
 
 ___
 
@@ -184,13 +169,13 @@ so avoid having two entry at the same time
 
 #### Defined in
 
-[client/internal/components/PropertyEntry/PropertyEntryText.tsx:281](https://github.com/onzag/itemize/blob/5c2808d3/client/internal/components/PropertyEntry/PropertyEntryText.tsx#L281)
+[client/internal/components/PropertyEntry/PropertyEntryText.tsx:330](https://github.com/onzag/itemize/blob/f2db74a5/client/internal/components/PropertyEntry/PropertyEntryText.tsx#L330)
 
 ___
 
 ### props
 
-• `Readonly` **props**: `Readonly`<[`IPropertyEntryHandlerProps`](../interfaces/client_internal_components_PropertyEntry.IPropertyEntryHandlerProps.md)<`string`, [`IPropertyEntryTextRendererProps`](../interfaces/client_internal_components_PropertyEntry_PropertyEntryText.IPropertyEntryTextRendererProps.md)\>\> & `Readonly`<{ `children?`: `ReactNode`  }\>
+• `Readonly` **props**: `Readonly`<[`IPropertyEntryHandlerProps`](../interfaces/client_internal_components_PropertyEntry.IPropertyEntryHandlerProps.md)<[`IPropertyDefinitionSupportedTextType`](../interfaces/base_Root_Module_ItemDefinition_PropertyDefinition_types_text.IPropertyDefinitionSupportedTextType.md), [`IPropertyEntryTextRendererProps`](../interfaces/client_internal_components_PropertyEntry_PropertyEntryText.IPropertyEntryTextRendererProps.md)\>\> & `Readonly`<{ `children?`: `ReactNode`  }\>
 
 #### Inherited from
 
@@ -327,7 +312,7 @@ prevents this from being invoked.
 
 | Name | Type |
 | :------ | :------ |
-| `nextProps` | `Readonly`<[`IPropertyEntryHandlerProps`](../interfaces/client_internal_components_PropertyEntry.IPropertyEntryHandlerProps.md)<`string`, [`IPropertyEntryTextRendererProps`](../interfaces/client_internal_components_PropertyEntry_PropertyEntryText.IPropertyEntryTextRendererProps.md)\>\> |
+| `nextProps` | `Readonly`<[`IPropertyEntryHandlerProps`](../interfaces/client_internal_components_PropertyEntry.IPropertyEntryHandlerProps.md)<[`IPropertyDefinitionSupportedTextType`](../interfaces/base_Root_Module_ItemDefinition_PropertyDefinition_types_text.IPropertyDefinitionSupportedTextType.md), [`IPropertyEntryTextRendererProps`](../interfaces/client_internal_components_PropertyEntry_PropertyEntryText.IPropertyEntryTextRendererProps.md)\>\> |
 | `nextContext` | `any` |
 
 #### Returns
@@ -367,7 +352,7 @@ prevents this from being invoked.
 
 | Name | Type |
 | :------ | :------ |
-| `nextProps` | `Readonly`<[`IPropertyEntryHandlerProps`](../interfaces/client_internal_components_PropertyEntry.IPropertyEntryHandlerProps.md)<`string`, [`IPropertyEntryTextRendererProps`](../interfaces/client_internal_components_PropertyEntry_PropertyEntryText.IPropertyEntryTextRendererProps.md)\>\> |
+| `nextProps` | `Readonly`<[`IPropertyEntryHandlerProps`](../interfaces/client_internal_components_PropertyEntry.IPropertyEntryHandlerProps.md)<[`IPropertyDefinitionSupportedTextType`](../interfaces/base_Root_Module_ItemDefinition_PropertyDefinition_types_text.IPropertyDefinitionSupportedTextType.md), [`IPropertyEntryTextRendererProps`](../interfaces/client_internal_components_PropertyEntry_PropertyEntryText.IPropertyEntryTextRendererProps.md)\>\> |
 | `nextState` | `Readonly`<`IPropertyEntryTextState`\> |
 | `nextContext` | `any` |
 
@@ -397,7 +382,7 @@ Ran during mount of updates, caches the files that are in the media property
 
 #### Defined in
 
-[client/internal/components/PropertyEntry/PropertyEntryText.tsx:369](https://github.com/onzag/itemize/blob/5c2808d3/client/internal/components/PropertyEntry/PropertyEntryText.tsx#L369)
+[client/internal/components/PropertyEntry/PropertyEntryText.tsx:419](https://github.com/onzag/itemize/blob/f2db74a5/client/internal/components/PropertyEntry/PropertyEntryText.tsx#L419)
 
 ___
 
@@ -411,7 +396,7 @@ Called during initial setup
 
 | Name | Type | Description |
 | :------ | :------ | :------ |
-| `props` | [`IPropertyEntryHandlerProps`](../interfaces/client_internal_components_PropertyEntry.IPropertyEntryHandlerProps.md)<`string`, [`IPropertyEntryTextRendererProps`](../interfaces/client_internal_components_PropertyEntry_PropertyEntryText.IPropertyEntryTextRendererProps.md)\> | the props we are using |
+| `props` | [`IPropertyEntryHandlerProps`](../interfaces/client_internal_components_PropertyEntry.IPropertyEntryHandlerProps.md)<[`IPropertyDefinitionSupportedTextType`](../interfaces/base_Root_Module_ItemDefinition_PropertyDefinition_types_text.IPropertyDefinitionSupportedTextType.md), [`IPropertyEntryTextRendererProps`](../interfaces/client_internal_components_PropertyEntry_PropertyEntryText.IPropertyEntryTextRendererProps.md)\> | the props we are using |
 
 #### Returns
 
@@ -419,7 +404,7 @@ Called during initial setup
 
 #### Defined in
 
-[client/internal/components/PropertyEntry/PropertyEntryText.tsx:343](https://github.com/onzag/itemize/blob/5c2808d3/client/internal/components/PropertyEntry/PropertyEntryText.tsx#L343)
+[client/internal/components/PropertyEntry/PropertyEntryText.tsx:393](https://github.com/onzag/itemize/blob/f2db74a5/client/internal/components/PropertyEntry/PropertyEntryText.tsx#L393)
 
 ___
 
@@ -465,7 +450,7 @@ React.Component.componentDidMount
 
 #### Defined in
 
-[client/internal/components/PropertyEntry/PropertyEntryText.tsx:410](https://github.com/onzag/itemize/blob/5c2808d3/client/internal/components/PropertyEntry/PropertyEntryText.tsx#L410)
+[client/internal/components/PropertyEntry/PropertyEntryText.tsx:460](https://github.com/onzag/itemize/blob/f2db74a5/client/internal/components/PropertyEntry/PropertyEntryText.tsx#L460)
 
 ___
 
@@ -477,7 +462,7 @@ ___
 
 | Name | Type |
 | :------ | :------ |
-| `prevProps` | [`IPropertyEntryHandlerProps`](../interfaces/client_internal_components_PropertyEntry.IPropertyEntryHandlerProps.md)<`string`, [`IPropertyEntryTextRendererProps`](../interfaces/client_internal_components_PropertyEntry_PropertyEntryText.IPropertyEntryTextRendererProps.md)\> |
+| `prevProps` | [`IPropertyEntryHandlerProps`](../interfaces/client_internal_components_PropertyEntry.IPropertyEntryHandlerProps.md)<[`IPropertyDefinitionSupportedTextType`](../interfaces/base_Root_Module_ItemDefinition_PropertyDefinition_types_text.IPropertyDefinitionSupportedTextType.md), [`IPropertyEntryTextRendererProps`](../interfaces/client_internal_components_PropertyEntry_PropertyEntryText.IPropertyEntryTextRendererProps.md)\> |
 
 #### Returns
 
@@ -489,7 +474,7 @@ React.Component.componentDidUpdate
 
 #### Defined in
 
-[client/internal/components/PropertyEntry/PropertyEntryText.tsx:419](https://github.com/onzag/itemize/blob/5c2808d3/client/internal/components/PropertyEntry/PropertyEntryText.tsx#L419)
+[client/internal/components/PropertyEntry/PropertyEntryText.tsx:469](https://github.com/onzag/itemize/blob/f2db74a5/client/internal/components/PropertyEntry/PropertyEntryText.tsx#L469)
 
 ___
 
@@ -546,7 +531,7 @@ prevents this from being invoked.
 
 | Name | Type |
 | :------ | :------ |
-| `nextProps` | `Readonly`<[`IPropertyEntryHandlerProps`](../interfaces/client_internal_components_PropertyEntry.IPropertyEntryHandlerProps.md)<`string`, [`IPropertyEntryTextRendererProps`](../interfaces/client_internal_components_PropertyEntry_PropertyEntryText.IPropertyEntryTextRendererProps.md)\>\> |
+| `nextProps` | `Readonly`<[`IPropertyEntryHandlerProps`](../interfaces/client_internal_components_PropertyEntry.IPropertyEntryHandlerProps.md)<[`IPropertyDefinitionSupportedTextType`](../interfaces/base_Root_Module_ItemDefinition_PropertyDefinition_types_text.IPropertyDefinitionSupportedTextType.md), [`IPropertyEntryTextRendererProps`](../interfaces/client_internal_components_PropertyEntry_PropertyEntryText.IPropertyEntryTextRendererProps.md)\>\> |
 | `nextContext` | `any` |
 
 #### Returns
@@ -577,7 +562,7 @@ React.Component.componentWillUnmount
 
 #### Defined in
 
-[client/internal/components/PropertyEntry/PropertyEntryText.tsx:328](https://github.com/onzag/itemize/blob/5c2808d3/client/internal/components/PropertyEntry/PropertyEntryText.tsx#L328)
+[client/internal/components/PropertyEntry/PropertyEntryText.tsx:378](https://github.com/onzag/itemize/blob/f2db74a5/client/internal/components/PropertyEntry/PropertyEntryText.tsx#L378)
 
 ___
 
@@ -602,7 +587,7 @@ prevents this from being invoked.
 
 | Name | Type |
 | :------ | :------ |
-| `nextProps` | `Readonly`<[`IPropertyEntryHandlerProps`](../interfaces/client_internal_components_PropertyEntry.IPropertyEntryHandlerProps.md)<`string`, [`IPropertyEntryTextRendererProps`](../interfaces/client_internal_components_PropertyEntry_PropertyEntryText.IPropertyEntryTextRendererProps.md)\>\> |
+| `nextProps` | `Readonly`<[`IPropertyEntryHandlerProps`](../interfaces/client_internal_components_PropertyEntry.IPropertyEntryHandlerProps.md)<[`IPropertyDefinitionSupportedTextType`](../interfaces/base_Root_Module_ItemDefinition_PropertyDefinition_types_text.IPropertyDefinitionSupportedTextType.md), [`IPropertyEntryTextRendererProps`](../interfaces/client_internal_components_PropertyEntry_PropertyEntryText.IPropertyEntryTextRendererProps.md)\>\> |
 | `nextState` | `Readonly`<`IPropertyEntryTextState`\> |
 | `nextContext` | `any` |
 
@@ -630,7 +615,7 @@ ___
 
 #### Defined in
 
-[client/internal/components/PropertyEntry/PropertyEntryText.tsx:322](https://github.com/onzag/itemize/blob/5c2808d3/client/internal/components/PropertyEntry/PropertyEntryText.tsx#L322)
+[client/internal/components/PropertyEntry/PropertyEntryText.tsx:372](https://github.com/onzag/itemize/blob/f2db74a5/client/internal/components/PropertyEntry/PropertyEntryText.tsx#L372)
 
 ___
 
@@ -644,7 +629,7 @@ ___
 
 #### Defined in
 
-[client/internal/components/PropertyEntry/PropertyEntryText.tsx:316](https://github.com/onzag/itemize/blob/5c2808d3/client/internal/components/PropertyEntry/PropertyEntryText.tsx#L316)
+[client/internal/components/PropertyEntry/PropertyEntryText.tsx:366](https://github.com/onzag/itemize/blob/f2db74a5/client/internal/components/PropertyEntry/PropertyEntryText.tsx#L366)
 
 ___
 
@@ -687,7 +672,7 @@ lifecycle events from running.
 
 | Name | Type |
 | :------ | :------ |
-| `prevProps` | `Readonly`<[`IPropertyEntryHandlerProps`](../interfaces/client_internal_components_PropertyEntry.IPropertyEntryHandlerProps.md)<`string`, [`IPropertyEntryTextRendererProps`](../interfaces/client_internal_components_PropertyEntry_PropertyEntryText.IPropertyEntryTextRendererProps.md)\>\> |
+| `prevProps` | `Readonly`<[`IPropertyEntryHandlerProps`](../interfaces/client_internal_components_PropertyEntry.IPropertyEntryHandlerProps.md)<[`IPropertyDefinitionSupportedTextType`](../interfaces/base_Root_Module_ItemDefinition_PropertyDefinition_types_text.IPropertyDefinitionSupportedTextType.md), [`IPropertyEntryTextRendererProps`](../interfaces/client_internal_components_PropertyEntry_PropertyEntryText.IPropertyEntryTextRendererProps.md)\>\> |
 | `prevState` | `Readonly`<`IPropertyEntryTextState`\> |
 
 #### Returns
@@ -718,7 +703,7 @@ so it makes sense
 
 | Name | Type | Description |
 | :------ | :------ | :------ |
-| `value` | `string` | the value |
+| `value` | [`IPropertyDefinitionSupportedTextType`](../interfaces/base_Root_Module_ItemDefinition_PropertyDefinition_types_text.IPropertyDefinitionSupportedTextType.md) | the value |
 | `internalValue` | `any` | the internal value |
 
 #### Returns
@@ -727,7 +712,7 @@ so it makes sense
 
 #### Defined in
 
-[client/internal/components/PropertyEntry/PropertyEntryText.tsx:440](https://github.com/onzag/itemize/blob/5c2808d3/client/internal/components/PropertyEntry/PropertyEntryText.tsx#L440)
+[client/internal/components/PropertyEntry/PropertyEntryText.tsx:490](https://github.com/onzag/itemize/blob/f2db74a5/client/internal/components/PropertyEntry/PropertyEntryText.tsx#L490)
 
 ___
 
@@ -747,13 +732,13 @@ ___
 
 #### Defined in
 
-[client/internal/components/PropertyEntry/PropertyEntryText.tsx:553](https://github.com/onzag/itemize/blob/5c2808d3/client/internal/components/PropertyEntry/PropertyEntryText.tsx#L553)
+[client/internal/components/PropertyEntry/PropertyEntryText.tsx:609](https://github.com/onzag/itemize/blob/f2db74a5/client/internal/components/PropertyEntry/PropertyEntryText.tsx#L609)
 
 ___
 
 ### onInsertFile
 
-▸ **onInsertFile**(`file`, `isExpectingImage?`, `overrideDataURI?`): `Promise`<[`IInsertedFileInformationType`](../interfaces/client_internal_components_PropertyEntry_PropertyEntryText.IInsertedFileInformationType.md)\>
+▸ **onInsertFile**(`file`, `isExpectingImage?`): `Promise`<[`IInsertedFileInformationType`](../interfaces/client_internal_components_PropertyEntry_PropertyEntryText.IInsertedFileInformationType.md)\>
 
 Inserts a file in the media property
 
@@ -763,7 +748,6 @@ Inserts a file in the media property
 | :------ | :------ | :------ |
 | `file` | `File` | the file to insert |
 | `isExpectingImage?` | `boolean` | whether the errors and check given will be for image types |
-| `overrideDataURI?` | `string` | - |
 
 #### Returns
 
@@ -771,7 +755,7 @@ Inserts a file in the media property
 
 #### Defined in
 
-[client/internal/components/PropertyEntry/PropertyEntryText.tsx:637](https://github.com/onzag/itemize/blob/5c2808d3/client/internal/components/PropertyEntry/PropertyEntryText.tsx#L637)
+[client/internal/components/PropertyEntry/PropertyEntryText.tsx:721](https://github.com/onzag/itemize/blob/f2db74a5/client/internal/components/PropertyEntry/PropertyEntryText.tsx#L721)
 
 ___
 
@@ -796,7 +780,7 @@ an url, note that this will read and append the file from there
 
 #### Defined in
 
-[client/internal/components/PropertyEntry/PropertyEntryText.tsx:575](https://github.com/onzag/itemize/blob/5c2808d3/client/internal/components/PropertyEntry/PropertyEntryText.tsx#L575)
+[client/internal/components/PropertyEntry/PropertyEntryText.tsx:664](https://github.com/onzag/itemize/blob/f2db74a5/client/internal/components/PropertyEntry/PropertyEntryText.tsx#L664)
 
 ___
 
@@ -819,7 +803,7 @@ it remains however in the cache itself
 
 #### Defined in
 
-[client/internal/components/PropertyEntry/PropertyEntryText.tsx:536](https://github.com/onzag/itemize/blob/5c2808d3/client/internal/components/PropertyEntry/PropertyEntryText.tsx#L536)
+[client/internal/components/PropertyEntry/PropertyEntryText.tsx:592](https://github.com/onzag/itemize/blob/f2db74a5/client/internal/components/PropertyEntry/PropertyEntryText.tsx#L592)
 
 ___
 
@@ -837,7 +821,7 @@ restoration, but also restore its related media property
 
 #### Defined in
 
-[client/internal/components/PropertyEntry/PropertyEntryText.tsx:483](https://github.com/onzag/itemize/blob/5c2808d3/client/internal/components/PropertyEntry/PropertyEntryText.tsx#L483)
+[client/internal/components/PropertyEntry/PropertyEntryText.tsx:533](https://github.com/onzag/itemize/blob/f2db74a5/client/internal/components/PropertyEntry/PropertyEntryText.tsx#L533)
 
 ___
 
@@ -860,33 +844,13 @@ such as done by an undo ctrl+z event
 
 #### Defined in
 
-[client/internal/components/PropertyEntry/PropertyEntryText.tsx:497](https://github.com/onzag/itemize/blob/5c2808d3/client/internal/components/PropertyEntry/PropertyEntryText.tsx#L497)
-
-___
-
-### onRetrieveDataURI
-
-▸ **onRetrieveDataURI**(`fileId`): `string`
-
-#### Parameters
-
-| Name | Type |
-| :------ | :------ |
-| `fileId` | `string` |
-
-#### Returns
-
-`string`
-
-#### Defined in
-
-[client/internal/components/PropertyEntry/PropertyEntryText.tsx:564](https://github.com/onzag/itemize/blob/5c2808d3/client/internal/components/PropertyEntry/PropertyEntryText.tsx#L564)
+[client/internal/components/PropertyEntry/PropertyEntryText.tsx:547](https://github.com/onzag/itemize/blob/f2db74a5/client/internal/components/PropertyEntry/PropertyEntryText.tsx#L547)
 
 ___
 
 ### onRetrieveFile
 
-▸ **onRetrieveFile**(`fileId`): [`IPropertyDefinitionSupportedSingleFilesType`](../interfaces/base_Root_Module_ItemDefinition_PropertyDefinition_types_files.IPropertyDefinitionSupportedSingleFilesType.md)
+▸ **onRetrieveFile**(`fileId`): [`IGQLFile`](../interfaces/gql_querier.IGQLFile.md)
 
 #### Parameters
 
@@ -896,11 +860,36 @@ ___
 
 #### Returns
 
-[`IPropertyDefinitionSupportedSingleFilesType`](../interfaces/base_Root_Module_ItemDefinition_PropertyDefinition_types_files.IPropertyDefinitionSupportedSingleFilesType.md)
+[`IGQLFile`](../interfaces/gql_querier.IGQLFile.md)
 
 #### Defined in
 
-[client/internal/components/PropertyEntry/PropertyEntryText.tsx:557](https://github.com/onzag/itemize/blob/5c2808d3/client/internal/components/PropertyEntry/PropertyEntryText.tsx#L557)
+[client/internal/components/PropertyEntry/PropertyEntryText.tsx:613](https://github.com/onzag/itemize/blob/f2db74a5/client/internal/components/PropertyEntry/PropertyEntryText.tsx#L613)
+
+___
+
+### onRetrieveImage
+
+▸ **onRetrieveImage**(`fileId`): `Object`
+
+#### Parameters
+
+| Name | Type |
+| :------ | :------ |
+| `fileId` | `string` |
+
+#### Returns
+
+`Object`
+
+| Name | Type |
+| :------ | :------ |
+| `file` | [`IPropertyDefinitionSupportedSingleFilesType`](../interfaces/base_Root_Module_ItemDefinition_PropertyDefinition_types_files.IPropertyDefinitionSupportedSingleFilesType.md) |
+| `srcset` | `string` |
+
+#### Defined in
+
+[client/internal/components/PropertyEntry/PropertyEntryText.tsx:638](https://github.com/onzag/itemize/blob/f2db74a5/client/internal/components/PropertyEntry/PropertyEntryText.tsx#L638)
 
 ___
 
@@ -920,7 +909,7 @@ ___
 
 #### Defined in
 
-[client/internal/components/PropertyEntry/PropertyEntryText.tsx:606](https://github.com/onzag/itemize/blob/5c2808d3/client/internal/components/PropertyEntry/PropertyEntryText.tsx#L606)
+[client/internal/components/PropertyEntry/PropertyEntryText.tsx:690](https://github.com/onzag/itemize/blob/f2db74a5/client/internal/components/PropertyEntry/PropertyEntryText.tsx#L690)
 
 ___
 
@@ -940,7 +929,7 @@ ___
 
 #### Defined in
 
-[client/internal/components/PropertyEntry/PropertyEntryText.tsx:623](https://github.com/onzag/itemize/blob/5c2808d3/client/internal/components/PropertyEntry/PropertyEntryText.tsx#L623)
+[client/internal/components/PropertyEntry/PropertyEntryText.tsx:707](https://github.com/onzag/itemize/blob/f2db74a5/client/internal/components/PropertyEntry/PropertyEntryText.tsx#L707)
 
 ___
 
@@ -958,7 +947,7 @@ React.Component.render
 
 #### Defined in
 
-[client/internal/components/PropertyEntry/PropertyEntryText.tsx:784](https://github.com/onzag/itemize/blob/5c2808d3/client/internal/components/PropertyEntry/PropertyEntryText.tsx#L784)
+[client/internal/components/PropertyEntry/PropertyEntryText.tsx:862](https://github.com/onzag/itemize/blob/f2db74a5/client/internal/components/PropertyEntry/PropertyEntryText.tsx#L862)
 
 ___
 
@@ -976,7 +965,7 @@ ___
 
 | Name | Type |
 | :------ | :------ |
-| `state` | `IPropertyEntryTextState` \| (`prevState`: `Readonly`<`IPropertyEntryTextState`\>, `props`: `Readonly`<[`IPropertyEntryHandlerProps`](../interfaces/client_internal_components_PropertyEntry.IPropertyEntryHandlerProps.md)<`string`, [`IPropertyEntryTextRendererProps`](../interfaces/client_internal_components_PropertyEntry_PropertyEntryText.IPropertyEntryTextRendererProps.md)\>\>) => `IPropertyEntryTextState` \| `Pick`<`IPropertyEntryTextState`, `K`\> \| `Pick`<`IPropertyEntryTextState`, `K`\> |
+| `state` | `IPropertyEntryTextState` \| (`prevState`: `Readonly`<`IPropertyEntryTextState`\>, `props`: `Readonly`<[`IPropertyEntryHandlerProps`](../interfaces/client_internal_components_PropertyEntry.IPropertyEntryHandlerProps.md)<[`IPropertyDefinitionSupportedTextType`](../interfaces/base_Root_Module_ItemDefinition_PropertyDefinition_types_text.IPropertyDefinitionSupportedTextType.md), [`IPropertyEntryTextRendererProps`](../interfaces/client_internal_components_PropertyEntry_PropertyEntryText.IPropertyEntryTextRendererProps.md)\>\>) => `IPropertyEntryTextState` \| `Pick`<`IPropertyEntryTextState`, `K`\> \| `Pick`<`IPropertyEntryTextState`, `K`\> |
 | `callback?` | () => `void` |
 
 #### Returns
@@ -1001,7 +990,7 @@ ___
 
 | Name | Type |
 | :------ | :------ |
-| `nextProps` | [`IPropertyEntryHandlerProps`](../interfaces/client_internal_components_PropertyEntry.IPropertyEntryHandlerProps.md)<`string`, [`IPropertyEntryTextRendererProps`](../interfaces/client_internal_components_PropertyEntry_PropertyEntryText.IPropertyEntryTextRendererProps.md)\> |
+| `nextProps` | [`IPropertyEntryHandlerProps`](../interfaces/client_internal_components_PropertyEntry.IPropertyEntryHandlerProps.md)<[`IPropertyDefinitionSupportedTextType`](../interfaces/base_Root_Module_ItemDefinition_PropertyDefinition_types_text.IPropertyDefinitionSupportedTextType.md), [`IPropertyEntryTextRendererProps`](../interfaces/client_internal_components_PropertyEntry_PropertyEntryText.IPropertyEntryTextRendererProps.md)\> |
 | `nextState` | `IPropertyEntryTextState` |
 
 #### Returns
@@ -1014,4 +1003,4 @@ React.Component.shouldComponentUpdate
 
 #### Defined in
 
-[client/internal/components/PropertyEntry/PropertyEntryText.tsx:756](https://github.com/onzag/itemize/blob/5c2808d3/client/internal/components/PropertyEntry/PropertyEntryText.tsx#L756)
+[client/internal/components/PropertyEntry/PropertyEntryText.tsx:833](https://github.com/onzag/itemize/blob/f2db74a5/client/internal/components/PropertyEntry/PropertyEntryText.tsx#L833)

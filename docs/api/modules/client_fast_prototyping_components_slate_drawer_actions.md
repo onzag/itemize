@@ -24,7 +24,7 @@ based on the context
 
 | Name | Type | Description |
 | :------ | :------ | :------ |
-| `props` | [`IWrapperContainerProps`](../interfaces/client_fast_prototyping_components_slate_wrapper.IWrapperContainerProps.md) | the whole material ui slate wrapper with styles props from the drawer itself |
+| `props` | [`IDrawerContainerProps`](../interfaces/client_fast_prototyping_components_slate_wrapper.IDrawerContainerProps.md) | the whole material ui slate wrapper with styles props from the drawer itself |
 
 #### Returns
 
@@ -32,4 +32,4 @@ based on the context
 
 #### Defined in
 
-[client/fast-prototyping/components/slate/drawer/actions.tsx:258](https://github.com/onzag/itemize/blob/5c2808d3/client/fast-prototyping/components/slate/drawer/actions.tsx#L258)
+[client/fast-prototyping/components/slate/drawer/actions.tsx:270](https://github.com/onzag/itemize/blob/f2db74a5/client/fast-prototyping/components/slate/drawer/actions.tsx#L270)

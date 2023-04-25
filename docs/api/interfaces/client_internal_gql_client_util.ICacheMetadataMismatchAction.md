@@ -16,11 +16,14 @@
 
 ### action
 
-• **action**: ``"REFETCH"``
+• **action**: ``"REFETCH"`` \| ``"NONE"``
+
+The action to perform for this singular item
+REFETCH will retrieve the record again from the server
 
 #### Defined in
 
-[client/internal/gql-client-util.ts:52](https://github.com/onzag/itemize/blob/5c2808d3/client/internal/gql-client-util.ts#L52)
+[client/internal/gql-client-util.ts:83](https://github.com/onzag/itemize/blob/f2db74a5/client/internal/gql-client-util.ts#L83)
 
 ___
 
@@ -28,16 +31,23 @@ ___
 
 • `Optional` **condition**: [`ICacheMetadataMismatchCondition`](client_internal_gql_client_util.ICacheMetadataMismatchCondition.md)
 
+The condition to use when REFETCH is used
+
 #### Defined in
 
-[client/internal/gql-client-util.ts:54](https://github.com/onzag/itemize/blob/5c2808d3/client/internal/gql-client-util.ts#L54)
+[client/internal/gql-client-util.ts:94](https://github.com/onzag/itemize/blob/f2db74a5/client/internal/gql-client-util.ts#L94)
 
 ___
 
 ### rewrite
 
-• **rewrite**: ``"IF_CONDITION_SUCCEEDS"`` \| ``"ALWAYS"``
+• **rewrite**: ``"IF_CONDITION_SUCCEEDS"`` \| ``"ALWAYS"`` \| ``"NEVER"``
+
+Specifies whether the metadata itself should be rewritten
+into the cache, ALWAYS is preferrable
+
+IF_CONDITION_SUCCEEDS is only useful when it is set to REFETCH_RECORDS
 
 #### Defined in
 
-[client/internal/gql-client-util.ts:53](https://github.com/onzag/itemize/blob/5c2808d3/client/internal/gql-client-util.ts#L53)
+[client/internal/gql-client-util.ts:90](https://github.com/onzag/itemize/blob/f2db74a5/client/internal/gql-client-util.ts#L90)

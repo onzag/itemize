@@ -46,7 +46,7 @@ areact element
 
 #### Defined in
 
-[client/internal/components/PropertyView/index.tsx:358](https://github.com/onzag/itemize/blob/5c2808d3/client/internal/components/PropertyView/index.tsx#L358)
+[client/internal/components/PropertyView/index.tsx:363](https://github.com/onzag/itemize/blob/f2db74a5/client/internal/components/PropertyView/index.tsx#L363)
 
 ___
 
@@ -58,7 +58,7 @@ ___
 
 | Name | Type |
 | :------ | :------ |
-| `props` | [`IPropertyViewMainHandlerProps`](../interfaces/client_internal_components_PropertyView.IPropertyViewMainHandlerProps.md)<[`IPropertyViewRendererProps`](../interfaces/client_internal_components_PropertyView.IPropertyViewRendererProps.md)<[`PropertyDefinitionSupportedType`](base_Root_Module_ItemDefinition_PropertyDefinition_types.md#propertydefinitionsupportedtype)\>\> |
+| `props` | [`IPropertyViewMainHandlerProps`](../interfaces/client_internal_components_PropertyView.IPropertyViewMainHandlerProps.md)<[`PropertyDefinitionSupportedType`](base_Root_Module_ItemDefinition_PropertyDefinition_types.md#propertydefinitionsupportedtype), [`IPropertyViewRendererProps`](../interfaces/client_internal_components_PropertyView.IPropertyViewRendererProps.md)<[`PropertyDefinitionSupportedType`](base_Root_Module_ItemDefinition_PropertyDefinition_types.md#propertydefinitionsupportedtype)\>\> |
 
 #### Returns
 
@@ -66,4 +66,4 @@ ___
 
 #### Defined in
 
-[client/internal/components/PropertyView/index.tsx:416](https://github.com/onzag/itemize/blob/5c2808d3/client/internal/components/PropertyView/index.tsx#L416)
+[client/internal/components/PropertyView/index.tsx:422](https://github.com/onzag/itemize/blob/f2db74a5/client/internal/components/PropertyView/index.tsx#L422)

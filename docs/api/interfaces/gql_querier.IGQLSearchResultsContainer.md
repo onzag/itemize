@@ -12,6 +12,7 @@ of traditional searches rather than records based search
 ### Properties
 
 - [count](gql_querier.IGQLSearchResultsContainer.md#count)
+- [highlights](gql_querier.IGQLSearchResultsContainer.md#highlights)
 - [last\_modified](gql_querier.IGQLSearchResultsContainer.md#last_modified)
 - [limit](gql_querier.IGQLSearchResultsContainer.md#limit)
 - [offset](gql_querier.IGQLSearchResultsContainer.md#offset)
@@ -25,7 +26,17 @@ of traditional searches rather than records based search
 
 #### Defined in
 
-[gql-querier.ts:58](https://github.com/onzag/itemize/blob/5c2808d3/gql-querier.ts#L58)
+[gql-querier.ts:62](https://github.com/onzag/itemize/blob/f2db74a5/gql-querier.ts#L62)
+
+___
+
+### highlights
+
+• **highlights**: `string`
+
+#### Defined in
+
+[gql-querier.ts:66](https://github.com/onzag/itemize/blob/f2db74a5/gql-querier.ts#L66)
 
 ___
 
@@ -35,7 +46,7 @@ ___
 
 #### Defined in
 
-[gql-querier.ts:61](https://github.com/onzag/itemize/blob/5c2808d3/gql-querier.ts#L61)
+[gql-querier.ts:65](https://github.com/onzag/itemize/blob/f2db74a5/gql-querier.ts#L65)
 
 ___
 
@@ -45,7 +56,7 @@ ___
 
 #### Defined in
 
-[gql-querier.ts:59](https://github.com/onzag/itemize/blob/5c2808d3/gql-querier.ts#L59)
+[gql-querier.ts:63](https://github.com/onzag/itemize/blob/f2db74a5/gql-querier.ts#L63)
 
 ___
 
@@ -55,7 +66,7 @@ ___
 
 #### Defined in
 
-[gql-querier.ts:60](https://github.com/onzag/itemize/blob/5c2808d3/gql-querier.ts#L60)
+[gql-querier.ts:64](https://github.com/onzag/itemize/blob/f2db74a5/gql-querier.ts#L64)
 
 ___
 
@@ -65,4 +76,4 @@ ___
 
 #### Defined in
 
-[gql-querier.ts:57](https://github.com/onzag/itemize/blob/5c2808d3/gql-querier.ts#L57)
+[gql-querier.ts:61](https://github.com/onzag/itemize/blob/f2db74a5/gql-querier.ts#L61)

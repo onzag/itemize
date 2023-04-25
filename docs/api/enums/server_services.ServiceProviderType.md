@@ -21,7 +21,7 @@
 
 #### Defined in
 
-[server/services/index.ts:26](https://github.com/onzag/itemize/blob/5c2808d3/server/services/index.ts#L26)
+[server/services/index.ts:24](https://github.com/onzag/itemize/blob/f2db74a5/server/services/index.ts#L24)
 
 ___
 
@@ -31,7 +31,7 @@ ___
 
 #### Defined in
 
-[server/services/index.ts:28](https://github.com/onzag/itemize/blob/5c2808d3/server/services/index.ts#L28)
+[server/services/index.ts:26](https://github.com/onzag/itemize/blob/f2db74a5/server/services/index.ts#L26)
 
 ___
 
@@ -41,7 +41,7 @@ ___
 
 #### Defined in
 
-[server/services/index.ts:27](https://github.com/onzag/itemize/blob/5c2808d3/server/services/index.ts#L27)
+[server/services/index.ts:25](https://github.com/onzag/itemize/blob/f2db74a5/server/services/index.ts#L25)
 
 ___
 
@@ -51,4 +51,4 @@ ___
 
 #### Defined in
 
-[server/services/index.ts:29](https://github.com/onzag/itemize/blob/5c2808d3/server/services/index.ts#L29)
+[server/services/index.ts:27](https://github.com/onzag/itemize/blob/f2db74a5/server/services/index.ts#L27)

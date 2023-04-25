@@ -18,6 +18,8 @@
 
   ↳ [`default`](server_services_base_LocationSearchProvider.default.md)
 
+  ↳ [`default`](server_services_base_LoggingProvider.default.md)
+
   ↳ [`default`](server_services_base_MailProvider.default.md)
 
   ↳ [`default`](server_services_base_PaymentProvider.default.md)
@@ -25,6 +27,8 @@
   ↳ [`default`](server_services_base_PhoneProvider.default.md)
 
   ↳ [`default`](server_services_base_StorageProvider.default.md)
+
+  ↳ [`default`](server_services_base_USSDProvider.default.md)
 
   ↳ [`default`](server_services_base_UserLocalizationProvider.default.md)
 
@@ -39,6 +43,8 @@
 ### Properties
 
 - [appConfig](server_services.ServiceProvider.md#appconfig)
+- [appDbConfig](server_services.ServiceProvider.md#appdbconfig)
+- [appRedisConfig](server_services.ServiceProvider.md#appredisconfig)
 - [appSensitiveConfig](server_services.ServiceProvider.md#appsensitiveconfig)
 - [config](server_services.ServiceProvider.md#config)
 - [globalCustomServices](server_services.ServiceProvider.md#globalcustomservices)
@@ -87,7 +93,7 @@
 
 ### constructor
 
-• **new ServiceProvider**<`T`\>(`config`, `registry`, `appConfig`, `appSensitiveConfig`)
+• **new ServiceProvider**<`T`\>(`config`, `registry`, `configs`)
 
 #### Type parameters
 
@@ -101,12 +107,15 @@
 | :------ | :------ |
 | `config` | `T` |
 | `registry` | [`RegistryService`](server_services_registry.RegistryService.md) |
-| `appConfig` | [`IConfigRawJSONDataType`](../interfaces/config.IConfigRawJSONDataType.md) |
-| `appSensitiveConfig` | [`ISensitiveConfigRawJSONDataType`](../interfaces/config.ISensitiveConfigRawJSONDataType.md) |
+| `configs` | `Object` |
+| `configs.config` | [`IConfigRawJSONDataType`](../interfaces/config.IConfigRawJSONDataType.md) |
+| `configs.dbConfig` | [`IDBConfigRawJSONDataType`](../interfaces/config.IDBConfigRawJSONDataType.md) |
+| `configs.redisConfig` | [`IRedisConfigRawJSONDataType`](../interfaces/config.IRedisConfigRawJSONDataType.md) |
+| `configs.sensitiveConfig` | [`ISensitiveConfigRawJSONDataType`](../interfaces/config.ISensitiveConfigRawJSONDataType.md) |
 
 #### Defined in
 
-[server/services/index.ts:58](https://github.com/onzag/itemize/blob/5c2808d3/server/services/index.ts#L58)
+[server/services/index.ts:58](https://github.com/onzag/itemize/blob/f2db74a5/server/services/index.ts#L58)
 
 ## Properties
 
@@ -116,7 +125,27 @@
 
 #### Defined in
 
-[server/services/index.ts:37](https://github.com/onzag/itemize/blob/5c2808d3/server/services/index.ts#L37)
+[server/services/index.ts:35](https://github.com/onzag/itemize/blob/f2db74a5/server/services/index.ts#L35)
+
+___
+
+### appDbConfig
+
+• **appDbConfig**: [`IDBConfigRawJSONDataType`](../interfaces/config.IDBConfigRawJSONDataType.md)
+
+#### Defined in
+
+[server/services/index.ts:37](https://github.com/onzag/itemize/blob/f2db74a5/server/services/index.ts#L37)
+
+___
+
+### appRedisConfig
+
+• **appRedisConfig**: [`IRedisConfigRawJSONDataType`](../interfaces/config.IRedisConfigRawJSONDataType.md)
+
+#### Defined in
+
+[server/services/index.ts:38](https://github.com/onzag/itemize/blob/f2db74a5/server/services/index.ts#L38)
 
 ___
 
@@ -126,7 +155,7 @@ ___
 
 #### Defined in
 
-[server/services/index.ts:38](https://github.com/onzag/itemize/blob/5c2808d3/server/services/index.ts#L38)
+[server/services/index.ts:36](https://github.com/onzag/itemize/blob/f2db74a5/server/services/index.ts#L36)
 
 ___
 
@@ -136,7 +165,7 @@ ___
 
 #### Defined in
 
-[server/services/index.ts:35](https://github.com/onzag/itemize/blob/5c2808d3/server/services/index.ts#L35)
+[server/services/index.ts:33](https://github.com/onzag/itemize/blob/f2db74a5/server/services/index.ts#L33)
 
 ___
 
@@ -150,7 +179,7 @@ ___
 
 #### Defined in
 
-[server/services/index.ts:48](https://github.com/onzag/itemize/blob/5c2808d3/server/services/index.ts#L48)
+[server/services/index.ts:48](https://github.com/onzag/itemize/blob/f2db74a5/server/services/index.ts#L48)
 
 ___
 
@@ -160,17 +189,17 @@ ___
 
 #### Defined in
 
-[server/services/index.ts:40](https://github.com/onzag/itemize/blob/5c2808d3/server/services/index.ts#L40)
+[server/services/index.ts:40](https://github.com/onzag/itemize/blob/f2db74a5/server/services/index.ts#L40)
 
 ___
 
 ### globalInstance
 
-• **globalInstance**: `boolean`
+• **globalInstance**: `boolean` = `false`
 
 #### Defined in
 
-[server/services/index.ts:55](https://github.com/onzag/itemize/blob/5c2808d3/server/services/index.ts#L55)
+[server/services/index.ts:55](https://github.com/onzag/itemize/blob/f2db74a5/server/services/index.ts#L55)
 
 ___
 
@@ -180,7 +209,7 @@ ___
 
 #### Defined in
 
-[server/services/index.ts:46](https://github.com/onzag/itemize/blob/5c2808d3/server/services/index.ts#L46)
+[server/services/index.ts:46](https://github.com/onzag/itemize/blob/f2db74a5/server/services/index.ts#L46)
 
 ___
 
@@ -190,7 +219,7 @@ ___
 
 #### Defined in
 
-[server/services/index.ts:47](https://github.com/onzag/itemize/blob/5c2808d3/server/services/index.ts#L47)
+[server/services/index.ts:47](https://github.com/onzag/itemize/blob/f2db74a5/server/services/index.ts#L47)
 
 ___
 
@@ -200,7 +229,7 @@ ___
 
 #### Defined in
 
-[server/services/index.ts:44](https://github.com/onzag/itemize/blob/5c2808d3/server/services/index.ts#L44)
+[server/services/index.ts:44](https://github.com/onzag/itemize/blob/f2db74a5/server/services/index.ts#L44)
 
 ___
 
@@ -210,7 +239,7 @@ ___
 
 #### Defined in
 
-[server/services/index.ts:43](https://github.com/onzag/itemize/blob/5c2808d3/server/services/index.ts#L43)
+[server/services/index.ts:43](https://github.com/onzag/itemize/blob/f2db74a5/server/services/index.ts#L43)
 
 ___
 
@@ -220,7 +249,7 @@ ___
 
 #### Defined in
 
-[server/services/index.ts:41](https://github.com/onzag/itemize/blob/5c2808d3/server/services/index.ts#L41)
+[server/services/index.ts:41](https://github.com/onzag/itemize/blob/f2db74a5/server/services/index.ts#L41)
 
 ___
 
@@ -230,7 +259,7 @@ ___
 
 #### Defined in
 
-[server/services/index.ts:42](https://github.com/onzag/itemize/blob/5c2808d3/server/services/index.ts#L42)
+[server/services/index.ts:42](https://github.com/onzag/itemize/blob/f2db74a5/server/services/index.ts#L42)
 
 ___
 
@@ -240,7 +269,7 @@ ___
 
 #### Defined in
 
-[server/services/index.ts:45](https://github.com/onzag/itemize/blob/5c2808d3/server/services/index.ts#L45)
+[server/services/index.ts:45](https://github.com/onzag/itemize/blob/f2db74a5/server/services/index.ts#L45)
 
 ___
 
@@ -250,7 +279,7 @@ ___
 
 #### Defined in
 
-[server/services/index.ts:54](https://github.com/onzag/itemize/blob/5c2808d3/server/services/index.ts#L54)
+[server/services/index.ts:54](https://github.com/onzag/itemize/blob/f2db74a5/server/services/index.ts#L54)
 
 ___
 
@@ -260,7 +289,7 @@ ___
 
 #### Defined in
 
-[server/services/index.ts:33](https://github.com/onzag/itemize/blob/5c2808d3/server/services/index.ts#L33)
+[server/services/index.ts:31](https://github.com/onzag/itemize/blob/f2db74a5/server/services/index.ts#L31)
 
 ___
 
@@ -270,17 +299,17 @@ ___
 
 #### Defined in
 
-[server/services/index.ts:52](https://github.com/onzag/itemize/blob/5c2808d3/server/services/index.ts#L52)
+[server/services/index.ts:52](https://github.com/onzag/itemize/blob/f2db74a5/server/services/index.ts#L52)
 
 ___
 
 ### localInstance
 
-• **localInstance**: `boolean`
+• **localInstance**: `boolean` = `false`
 
 #### Defined in
 
-[server/services/index.ts:56](https://github.com/onzag/itemize/blob/5c2808d3/server/services/index.ts#L56)
+[server/services/index.ts:56](https://github.com/onzag/itemize/blob/f2db74a5/server/services/index.ts#L56)
 
 ___
 
@@ -290,7 +319,7 @@ ___
 
 #### Defined in
 
-[server/services/index.ts:36](https://github.com/onzag/itemize/blob/5c2808d3/server/services/index.ts#L36)
+[server/services/index.ts:34](https://github.com/onzag/itemize/blob/f2db74a5/server/services/index.ts#L34)
 
 ## Methods
 
@@ -307,7 +336,7 @@ it will do the run function and then re-run as specified
 
 #### Defined in
 
-[server/services/index.ts:164](https://github.com/onzag/itemize/blob/5c2808d3/server/services/index.ts#L164)
+[server/services/index.ts:170](https://github.com/onzag/itemize/blob/f2db74a5/server/services/index.ts#L170)
 
 ___
 
@@ -327,7 +356,7 @@ ___
 
 #### Defined in
 
-[server/services/index.ts:110](https://github.com/onzag/itemize/blob/5c2808d3/server/services/index.ts#L110)
+[server/services/index.ts:116](https://github.com/onzag/itemize/blob/f2db74a5/server/services/index.ts#L116)
 
 ___
 
@@ -341,7 +370,7 @@ ___
 
 #### Defined in
 
-[server/services/index.ts:74](https://github.com/onzag/itemize/blob/5c2808d3/server/services/index.ts#L74)
+[server/services/index.ts:80](https://github.com/onzag/itemize/blob/f2db74a5/server/services/index.ts#L80)
 
 ___
 
@@ -375,7 +404,7 @@ The router gets attached to /rest/service
 
 #### Defined in
 
-[server/services/index.ts:251](https://github.com/onzag/itemize/blob/5c2808d3/server/services/index.ts#L251)
+[server/services/index.ts:266](https://github.com/onzag/itemize/blob/f2db74a5/server/services/index.ts#L266)
 
 ___
 
@@ -394,7 +423,7 @@ should run over again
 
 #### Defined in
 
-[server/services/index.ts:224](https://github.com/onzag/itemize/blob/5c2808d3/server/services/index.ts#L224)
+[server/services/index.ts:239](https://github.com/onzag/itemize/blob/f2db74a5/server/services/index.ts#L239)
 
 ___
 
@@ -413,7 +442,7 @@ so that they trigger just as normal trigger will do
 
 #### Defined in
 
-[server/services/index.ts:278](https://github.com/onzag/itemize/blob/5c2808d3/server/services/index.ts#L278)
+[server/services/index.ts:293](https://github.com/onzag/itemize/blob/f2db74a5/server/services/index.ts#L293)
 
 ___
 
@@ -436,7 +465,7 @@ this function executes
 
 #### Defined in
 
-[server/services/index.ts:215](https://github.com/onzag/itemize/blob/5c2808d3/server/services/index.ts#L215)
+[server/services/index.ts:230](https://github.com/onzag/itemize/blob/f2db74a5/server/services/index.ts#L230)
 
 ___
 
@@ -450,7 +479,7 @@ ___
 
 #### Defined in
 
-[server/services/index.ts:78](https://github.com/onzag/itemize/blob/5c2808d3/server/services/index.ts#L78)
+[server/services/index.ts:84](https://github.com/onzag/itemize/blob/f2db74a5/server/services/index.ts#L84)
 
 ___
 
@@ -464,20 +493,25 @@ ___
 
 #### Defined in
 
-[server/services/index.ts:82](https://github.com/onzag/itemize/blob/5c2808d3/server/services/index.ts#L82)
+[server/services/index.ts:88](https://github.com/onzag/itemize/blob/f2db74a5/server/services/index.ts#L88)
 
 ___
 
 ### logDebug
 
-▸ **logDebug**(`str`, `extra?`): `void`
+▸ **logDebug**<`T`\>(`data`): `void`
+
+#### Type parameters
+
+| Name |
+| :------ |
+| `T` |
 
 #### Parameters
 
 | Name | Type |
 | :------ | :------ |
-| `str` | `string` |
-| `extra?` | `any` |
+| `data` | [`IItemizeLoggingStructure`](../interfaces/server_logger.IItemizeLoggingStructure.md)<`T`\> |
 
 #### Returns
 
@@ -485,20 +519,25 @@ ___
 
 #### Defined in
 
-[server/services/index.ts:90](https://github.com/onzag/itemize/blob/5c2808d3/server/services/index.ts#L90)
+[server/services/index.ts:96](https://github.com/onzag/itemize/blob/f2db74a5/server/services/index.ts#L96)
 
 ___
 
 ### logError
 
-▸ **logError**(`str`, `extra?`): `void`
+▸ **logError**<`T`\>(`data`): `void`
+
+#### Type parameters
+
+| Name |
+| :------ |
+| `T` |
 
 #### Parameters
 
 | Name | Type |
 | :------ | :------ |
-| `str` | `string` |
-| `extra?` | `any` |
+| `data` | [`IItemizeLoggingErrorStructure`](../interfaces/server_logger.IItemizeLoggingErrorStructure.md)<`T`\> |
 
 #### Returns
 
@@ -506,20 +545,25 @@ ___
 
 #### Defined in
 
-[server/services/index.ts:94](https://github.com/onzag/itemize/blob/5c2808d3/server/services/index.ts#L94)
+[server/services/index.ts:100](https://github.com/onzag/itemize/blob/f2db74a5/server/services/index.ts#L100)
 
 ___
 
 ### logInfo
 
-▸ **logInfo**(`str`, `extra?`): `void`
+▸ **logInfo**<`T`\>(`data`): `void`
+
+#### Type parameters
+
+| Name |
+| :------ |
+| `T` |
 
 #### Parameters
 
 | Name | Type |
 | :------ | :------ |
-| `str` | `string` |
-| `extra?` | `any` |
+| `data` | [`IItemizeLoggingStructure`](../interfaces/server_logger.IItemizeLoggingStructure.md)<`T`\> |
 
 #### Returns
 
@@ -527,7 +571,7 @@ ___
 
 #### Defined in
 
-[server/services/index.ts:86](https://github.com/onzag/itemize/blob/5c2808d3/server/services/index.ts#L86)
+[server/services/index.ts:92](https://github.com/onzag/itemize/blob/f2db74a5/server/services/index.ts#L92)
 
 ___
 
@@ -545,7 +589,7 @@ Executes some code
 
 #### Defined in
 
-[server/services/index.ts:232](https://github.com/onzag/itemize/blob/5c2808d3/server/services/index.ts#L232)
+[server/services/index.ts:247](https://github.com/onzag/itemize/blob/f2db74a5/server/services/index.ts#L247)
 
 ___
 
@@ -565,7 +609,7 @@ ___
 
 #### Defined in
 
-[server/services/index.ts:70](https://github.com/onzag/itemize/blob/5c2808d3/server/services/index.ts#L70)
+[server/services/index.ts:76](https://github.com/onzag/itemize/blob/f2db74a5/server/services/index.ts#L76)
 
 ___
 
@@ -592,7 +636,7 @@ ___
 
 #### Defined in
 
-[server/services/index.ts:118](https://github.com/onzag/itemize/blob/5c2808d3/server/services/index.ts#L118)
+[server/services/index.ts:124](https://github.com/onzag/itemize/blob/f2db74a5/server/services/index.ts#L124)
 
 ___
 
@@ -612,7 +656,7 @@ ___
 
 #### Defined in
 
-[server/services/index.ts:142](https://github.com/onzag/itemize/blob/5c2808d3/server/services/index.ts#L142)
+[server/services/index.ts:148](https://github.com/onzag/itemize/blob/f2db74a5/server/services/index.ts#L148)
 
 ___
 
@@ -632,7 +676,7 @@ ___
 
 #### Defined in
 
-[server/services/index.ts:114](https://github.com/onzag/itemize/blob/5c2808d3/server/services/index.ts#L114)
+[server/services/index.ts:120](https://github.com/onzag/itemize/blob/f2db74a5/server/services/index.ts#L120)
 
 ___
 
@@ -664,7 +708,7 @@ the router gets attached to /rest/service
 
 #### Defined in
 
-[server/services/index.ts:268](https://github.com/onzag/itemize/blob/5c2808d3/server/services/index.ts#L268)
+[server/services/index.ts:283](https://github.com/onzag/itemize/blob/f2db74a5/server/services/index.ts#L283)
 
 ___
 
@@ -685,7 +729,7 @@ This gets attached if a class is used rather than per instance
 
 #### Defined in
 
-[server/services/index.ts:290](https://github.com/onzag/itemize/blob/5c2808d3/server/services/index.ts#L290)
+[server/services/index.ts:305](https://github.com/onzag/itemize/blob/f2db74a5/server/services/index.ts#L305)
 
 ___
 
@@ -707,20 +751,25 @@ it will instead have access to the global resources
 
 #### Defined in
 
-[server/services/index.ts:156](https://github.com/onzag/itemize/blob/5c2808d3/server/services/index.ts#L156)
+[server/services/index.ts:162](https://github.com/onzag/itemize/blob/f2db74a5/server/services/index.ts#L162)
 
 ___
 
 ### logDebug
 
-▸ `Static` **logDebug**(`str`, `extra?`): `void`
+▸ `Static` **logDebug**<`T`\>(`data`): `void`
+
+#### Type parameters
+
+| Name |
+| :------ |
+| `T` |
 
 #### Parameters
 
 | Name | Type |
 | :------ | :------ |
-| `str` | `string` |
-| `extra?` | `any` |
+| `data` | [`IItemizeLoggingStructure`](../interfaces/server_logger.IItemizeLoggingStructure.md)<`T`\> |
 
 #### Returns
 
@@ -728,20 +777,25 @@ ___
 
 #### Defined in
 
-[server/services/index.ts:102](https://github.com/onzag/itemize/blob/5c2808d3/server/services/index.ts#L102)
+[server/services/index.ts:108](https://github.com/onzag/itemize/blob/f2db74a5/server/services/index.ts#L108)
 
 ___
 
 ### logError
 
-▸ `Static` **logError**(`str`, `extra?`): `void`
+▸ `Static` **logError**<`T`\>(`data`): `void`
+
+#### Type parameters
+
+| Name |
+| :------ |
+| `T` |
 
 #### Parameters
 
 | Name | Type |
 | :------ | :------ |
-| `str` | `string` |
-| `extra?` | `any` |
+| `data` | [`IItemizeLoggingErrorStructure`](../interfaces/server_logger.IItemizeLoggingErrorStructure.md)<`T`\> |
 
 #### Returns
 
@@ -749,20 +803,25 @@ ___
 
 #### Defined in
 
-[server/services/index.ts:106](https://github.com/onzag/itemize/blob/5c2808d3/server/services/index.ts#L106)
+[server/services/index.ts:112](https://github.com/onzag/itemize/blob/f2db74a5/server/services/index.ts#L112)
 
 ___
 
 ### logInfo
 
-▸ `Static` **logInfo**(`str`, `extra?`): `void`
+▸ `Static` **logInfo**<`T`\>(`data`): `void`
+
+#### Type parameters
+
+| Name |
+| :------ |
+| `T` |
 
 #### Parameters
 
 | Name | Type |
 | :------ | :------ |
-| `str` | `string` |
-| `extra?` | `any` |
+| `data` | [`IItemizeLoggingStructure`](../interfaces/server_logger.IItemizeLoggingStructure.md)<`T`\> |
 
 #### Returns
 
@@ -770,4 +829,4 @@ ___
 
 #### Defined in
 
-[server/services/index.ts:98](https://github.com/onzag/itemize/blob/5c2808d3/server/services/index.ts#L98)
+[server/services/index.ts:104](https://github.com/onzag/itemize/blob/f2db74a5/server/services/index.ts#L104)

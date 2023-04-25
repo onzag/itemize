@@ -591,7 +591,7 @@ React.PureComponent.render
 
 #### Defined in
 
-[client/fast-prototyping/components/avatar.tsx:313](https://github.com/onzag/itemize/blob/5c2808d3/client/fast-prototyping/components/avatar.tsx#L313)
+[client/fast-prototyping/components/avatar.tsx:313](https://github.com/onzag/itemize/blob/f2db74a5/client/fast-prototyping/components/avatar.tsx#L313)
 
 ___
 

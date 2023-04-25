@@ -4,6 +4,8 @@
 
 [client/internal/gql-client-util](../modules/client_internal_gql_client_util.md).ISearchCacheMetadataMismatchAction
 
+The search action to perform if a mismatch is detected
+
 ## Table of contents
 
 ### Properties
@@ -16,11 +18,15 @@
 
 ### action
 
-• **action**: ``"REDO_SEARCH"`` \| ``"REFETCH_RECORDS"``
+• **action**: ``"NONE"`` \| ``"REDO_SEARCH"`` \| ``"REFETCH_RECORDS"``
+
+The action to perform for this mismatch
+REDO_SEARCH will simply redo all the search
+REFETCH_RECORDS will refetch specific records based on the recordsRefetchCondition which should be provided
 
 #### Defined in
 
-[client/internal/gql-client-util.ts:58](https://github.com/onzag/itemize/blob/5c2808d3/client/internal/gql-client-util.ts#L58)
+[client/internal/gql-client-util.ts:106](https://github.com/onzag/itemize/blob/f2db74a5/client/internal/gql-client-util.ts#L106)
 
 ___
 
@@ -28,16 +34,23 @@ ___
 
 • `Optional` **recordsRefetchCondition**: [`ICacheMetadataMismatchCondition`](client_internal_gql_client_util.ICacheMetadataMismatchCondition.md)
 
+The condition to use when REFETCH_RECORDS is used
+
 #### Defined in
 
-[client/internal/gql-client-util.ts:60](https://github.com/onzag/itemize/blob/5c2808d3/client/internal/gql-client-util.ts#L60)
+[client/internal/gql-client-util.ts:117](https://github.com/onzag/itemize/blob/f2db74a5/client/internal/gql-client-util.ts#L117)
 
 ___
 
 ### rewrite
 
-• **rewrite**: ``"IF_CONDITION_SUCCEEDS"`` \| ``"ALWAYS"``
+• **rewrite**: ``"IF_CONDITION_SUCCEEDS"`` \| ``"ALWAYS"`` \| ``"NEVER"``
+
+Specifies whether the metadata itself should be rewritten
+into the cache, ALWAYS is preferrable
+
+IF_CONDITION_SUCCEEDS is only useful when it is set to REFETCH_RECORDS
 
 #### Defined in
 
-[client/internal/gql-client-util.ts:59](https://github.com/onzag/itemize/blob/5c2808d3/client/internal/gql-client-util.ts#L59)
+[client/internal/gql-client-util.ts:113](https://github.com/onzag/itemize/blob/f2db74a5/client/internal/gql-client-util.ts#L113)

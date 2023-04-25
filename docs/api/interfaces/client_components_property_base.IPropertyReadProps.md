@@ -1,14 +1,20 @@
 [@onzag/itemize](../README.md) / [Modules](../modules.md) / [client/components/property/base](../modules/client_components_property_base.md) / IPropertyReadProps
 
-# Interface: IPropertyReadProps
+# Interface: IPropertyReadProps<T\>
 
 [client/components/property/base](../modules/client_components_property_base.md).IPropertyReadProps
 
 The reader props
 
+## Type parameters
+
+| Name | Type |
+| :------ | :------ |
+| `T` | extends [`PropertyDefinitionSupportedType`](../modules/base_Root_Module_ItemDefinition_PropertyDefinition_types.md#propertydefinitionsupportedtype) |
+
 ## Hierarchy
 
-- [`IPropertyBaseProps`](client_components_property_base.IPropertyBaseProps.md)
+- [`IPropertyReadPropsWOChildren`](client_components_property_base.IPropertyReadPropsWOChildren.md)
 
   ↳ **`IPropertyReadProps`**
 
@@ -35,9 +41,13 @@ The reader props
 
 whether to cache files when running the url absoluter
 
+#### Inherited from
+
+[IPropertyReadPropsWOChildren](client_components_property_base.IPropertyReadPropsWOChildren.md).[cacheFiles](client_components_property_base.IPropertyReadPropsWOChildren.md#cachefiles)
+
 #### Defined in
 
-[client/components/property/base.tsx:163](https://github.com/onzag/itemize/blob/5c2808d3/client/components/property/base.tsx#L163)
+[client/components/property/base.tsx:168](https://github.com/onzag/itemize/blob/f2db74a5/client/components/property/base.tsx#L168)
 
 ___
 
@@ -50,11 +60,11 @@ provider
 
 #### Inherited from
 
-[IPropertyBaseProps](client_components_property_base.IPropertyBaseProps.md).[id](client_components_property_base.IPropertyBaseProps.md#id)
+[IPropertyReadPropsWOChildren](client_components_property_base.IPropertyReadPropsWOChildren.md).[id](client_components_property_base.IPropertyReadPropsWOChildren.md#id)
 
 #### Defined in
 
-[client/components/property/base.tsx:28](https://github.com/onzag/itemize/blob/5c2808d3/client/components/property/base.tsx#L28)
+[client/components/property/base.tsx:28](https://github.com/onzag/itemize/blob/f2db74a5/client/components/property/base.tsx#L28)
 
 ___
 
@@ -66,11 +76,11 @@ the policy name, should be provided with a policy type
 
 #### Inherited from
 
-[IPropertyBaseProps](client_components_property_base.IPropertyBaseProps.md).[policyName](client_components_property_base.IPropertyBaseProps.md#policyname)
+[IPropertyReadPropsWOChildren](client_components_property_base.IPropertyReadPropsWOChildren.md).[policyName](client_components_property_base.IPropertyReadPropsWOChildren.md#policyname)
 
 #### Defined in
 
-[client/components/property/base.tsx:47](https://github.com/onzag/itemize/blob/5c2808d3/client/components/property/base.tsx#L47)
+[client/components/property/base.tsx:47](https://github.com/onzag/itemize/blob/f2db74a5/client/components/property/base.tsx#L47)
 
 ___
 
@@ -82,11 +92,11 @@ the policy type, should be provided with a policy name
 
 #### Inherited from
 
-[IPropertyBaseProps](client_components_property_base.IPropertyBaseProps.md).[policyType](client_components_property_base.IPropertyBaseProps.md#policytype)
+[IPropertyReadPropsWOChildren](client_components_property_base.IPropertyReadPropsWOChildren.md).[policyType](client_components_property_base.IPropertyReadPropsWOChildren.md#policytype)
 
 #### Defined in
 
-[client/components/property/base.tsx:43](https://github.com/onzag/itemize/blob/5c2808d3/client/components/property/base.tsx#L43)
+[client/components/property/base.tsx:43](https://github.com/onzag/itemize/blob/f2db74a5/client/components/property/base.tsx#L43)
 
 ___
 
@@ -99,11 +109,11 @@ only truly available in search mode
 
 #### Inherited from
 
-[IPropertyBaseProps](client_components_property_base.IPropertyBaseProps.md).[searchVariant](client_components_property_base.IPropertyBaseProps.md#searchvariant)
+[IPropertyReadPropsWOChildren](client_components_property_base.IPropertyReadPropsWOChildren.md).[searchVariant](client_components_property_base.IPropertyReadPropsWOChildren.md#searchvariant)
 
 #### Defined in
 
-[client/components/property/base.tsx:33](https://github.com/onzag/itemize/blob/5c2808d3/client/components/property/base.tsx#L33)
+[client/components/property/base.tsx:33](https://github.com/onzag/itemize/blob/f2db74a5/client/components/property/base.tsx#L33)
 
 ___
 
@@ -115,9 +125,13 @@ whether to use the applied value rather than the
 actual current value the applied value is synced
 with the server
 
+#### Inherited from
+
+[IPropertyReadPropsWOChildren](client_components_property_base.IPropertyReadPropsWOChildren.md).[useAppliedValue](client_components_property_base.IPropertyReadPropsWOChildren.md#useappliedvalue)
+
 #### Defined in
 
-[client/components/property/base.tsx:159](https://github.com/onzag/itemize/blob/5c2808d3/client/components/property/base.tsx#L159)
+[client/components/property/base.tsx:164](https://github.com/onzag/itemize/blob/f2db74a5/client/components/property/base.tsx#L164)
 
 ## Methods
 
@@ -131,8 +145,8 @@ The reader callback
 
 | Name | Type |
 | :------ | :------ |
-| `value` | [`PropertyDefinitionSupportedType`](../modules/base_Root_Module_ItemDefinition_PropertyDefinition_types.md#propertydefinitionsupportedtype) |
-| `state` | [`IPropertyDefinitionState`](base_Root_Module_ItemDefinition_PropertyDefinition.IPropertyDefinitionState.md) |
+| `value` | `T` |
+| `state` | [`IPropertyDefinitionState`](base_Root_Module_ItemDefinition_PropertyDefinition.IPropertyDefinitionState.md)<`T`\> |
 
 #### Returns
 
@@ -140,4 +154,4 @@ The reader callback
 
 #### Defined in
 
-[client/components/property/base.tsx:153](https://github.com/onzag/itemize/blob/5c2808d3/client/components/property/base.tsx#L153)
+[client/components/property/base.tsx:179](https://github.com/onzag/itemize/blob/f2db74a5/client/components/property/base.tsx#L179)

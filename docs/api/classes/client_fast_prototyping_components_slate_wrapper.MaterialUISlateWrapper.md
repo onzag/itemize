@@ -9,7 +9,7 @@ the exported one because it needs to be withStyles for stylization
 
 ## Hierarchy
 
-- `PureComponent`<[`MaterialUISlateWrapperWithStyles`](../interfaces/client_fast_prototyping_components_slate_wrapper.MaterialUISlateWrapperWithStyles.md), [`MaterialUISlateWrapperState`](../interfaces/client_fast_prototyping_components_slate_wrapper.MaterialUISlateWrapperState.md)\>
+- `PureComponent`<[`IMaterialUISlateWrapperProps`](../interfaces/client_fast_prototyping_components_slate_wrapper.IMaterialUISlateWrapperProps.md), [`MaterialUISlateWrapperState`](../interfaces/client_fast_prototyping_components_slate_wrapper.MaterialUISlateWrapperState.md)\>
 
   ↳ **`MaterialUISlateWrapper`**
 
@@ -21,8 +21,9 @@ the exported one because it needs to be withStyles for stylization
 
 ### Properties
 
-- [accumulatedFastKeyCombo](client_fast_prototyping_components_slate_wrapper.MaterialUISlateWrapper.md#accumulatedfastkeycombo)
+- [DrawerContainerRef](client_fast_prototyping_components_slate_wrapper.MaterialUISlateWrapper.md#drawercontainerref)
 - [context](client_fast_prototyping_components_slate_wrapper.MaterialUISlateWrapper.md#context)
+- [editorRef](client_fast_prototyping_components_slate_wrapper.MaterialUISlateWrapper.md#editorref)
 - [inputFileRef](client_fast_prototyping_components_slate_wrapper.MaterialUISlateWrapper.md#inputfileref)
 - [inputImageRef](client_fast_prototyping_components_slate_wrapper.MaterialUISlateWrapper.md#inputimageref)
 - [isUnmounted](client_fast_prototyping_components_slate_wrapper.MaterialUISlateWrapper.md#isunmounted)
@@ -33,7 +34,6 @@ the exported one because it needs to be withStyles for stylization
 - [refs](client_fast_prototyping_components_slate_wrapper.MaterialUISlateWrapper.md#refs)
 - [state](client_fast_prototyping_components_slate_wrapper.MaterialUISlateWrapper.md#state)
 - [toolbarRef](client_fast_prototyping_components_slate_wrapper.MaterialUISlateWrapper.md#toolbarref)
-- [wrapperContainerRef](client_fast_prototyping_components_slate_wrapper.MaterialUISlateWrapper.md#wrappercontainerref)
 - [contextType](client_fast_prototyping_components_slate_wrapper.MaterialUISlateWrapper.md#contexttype)
 
 ### Methods
@@ -41,12 +41,6 @@ the exported one because it needs to be withStyles for stylization
 - [UNSAFE\_componentWillMount](client_fast_prototyping_components_slate_wrapper.MaterialUISlateWrapper.md#unsafe_componentwillmount)
 - [UNSAFE\_componentWillReceiveProps](client_fast_prototyping_components_slate_wrapper.MaterialUISlateWrapper.md#unsafe_componentwillreceiveprops)
 - [UNSAFE\_componentWillUpdate](client_fast_prototyping_components_slate_wrapper.MaterialUISlateWrapper.md#unsafe_componentwillupdate)
-- [acceptLink](client_fast_prototyping_components_slate_wrapper.MaterialUISlateWrapper.md#acceptlink)
-- [acceptVideo](client_fast_prototyping_components_slate_wrapper.MaterialUISlateWrapper.md#acceptvideo)
-- [closeDialogLink](client_fast_prototyping_components_slate_wrapper.MaterialUISlateWrapper.md#closedialoglink)
-- [closeDialogTemplateHTML](client_fast_prototyping_components_slate_wrapper.MaterialUISlateWrapper.md#closedialogtemplatehtml)
-- [closeDialogTemplateText](client_fast_prototyping_components_slate_wrapper.MaterialUISlateWrapper.md#closedialogtemplatetext)
-- [closeDialogVideo](client_fast_prototyping_components_slate_wrapper.MaterialUISlateWrapper.md#closedialogvideo)
 - [componentDidCatch](client_fast_prototyping_components_slate_wrapper.MaterialUISlateWrapper.md#componentdidcatch)
 - [componentDidMount](client_fast_prototyping_components_slate_wrapper.MaterialUISlateWrapper.md#componentdidmount)
 - [componentDidUpdate](client_fast_prototyping_components_slate_wrapper.MaterialUISlateWrapper.md#componentdidupdate)
@@ -56,11 +50,8 @@ the exported one because it needs to be withStyles for stylization
 - [componentWillUpdate](client_fast_prototyping_components_slate_wrapper.MaterialUISlateWrapper.md#componentwillupdate)
 - [forceUpdate](client_fast_prototyping_components_slate_wrapper.MaterialUISlateWrapper.md#forceupdate)
 - [getSnapshotBeforeUpdate](client_fast_prototyping_components_slate_wrapper.MaterialUISlateWrapper.md#getsnapshotbeforeupdate)
-- [insertContainer](client_fast_prototyping_components_slate_wrapper.MaterialUISlateWrapper.md#insertcontainer)
-- [insertTemplateHTML](client_fast_prototyping_components_slate_wrapper.MaterialUISlateWrapper.md#inserttemplatehtml)
-- [insertTemplateText](client_fast_prototyping_components_slate_wrapper.MaterialUISlateWrapper.md#inserttemplatetext)
-- [isParentedBySlateOrUnblurred](client_fast_prototyping_components_slate_wrapper.MaterialUISlateWrapper.md#isparentedbyslateorunblurred)
-- [keyDownListener](client_fast_prototyping_components_slate_wrapper.MaterialUISlateWrapper.md#keydownlistener)
+- [isInEditor](client_fast_prototyping_components_slate_wrapper.MaterialUISlateWrapper.md#isineditor)
+- [isUnblurred](client_fast_prototyping_components_slate_wrapper.MaterialUISlateWrapper.md#isunblurred)
 - [keyUpListener](client_fast_prototyping_components_slate_wrapper.MaterialUISlateWrapper.md#keyuplistener)
 - [onFileEventedReFocus](client_fast_prototyping_components_slate_wrapper.MaterialUISlateWrapper.md#onfileeventedrefocus)
 - [onFileLoad](client_fast_prototyping_components_slate_wrapper.MaterialUISlateWrapper.md#onfileload)
@@ -70,18 +61,12 @@ the exported one because it needs to be withStyles for stylization
 - [render](client_fast_prototyping_components_slate_wrapper.MaterialUISlateWrapper.md#render)
 - [requestFile](client_fast_prototyping_components_slate_wrapper.MaterialUISlateWrapper.md#requestfile)
 - [requestImage](client_fast_prototyping_components_slate_wrapper.MaterialUISlateWrapper.md#requestimage)
-- [requestLink](client_fast_prototyping_components_slate_wrapper.MaterialUISlateWrapper.md#requestlink)
-- [requestTemplateHTML](client_fast_prototyping_components_slate_wrapper.MaterialUISlateWrapper.md#requesttemplatehtml)
-- [requestTemplateText](client_fast_prototyping_components_slate_wrapper.MaterialUISlateWrapper.md#requesttemplatetext)
-- [requestVideo](client_fast_prototyping_components_slate_wrapper.MaterialUISlateWrapper.md#requestvideo)
-- [scrollDrawer](client_fast_prototyping_components_slate_wrapper.MaterialUISlateWrapper.md#scrolldrawer)
 - [selectiveHardBlur](client_fast_prototyping_components_slate_wrapper.MaterialUISlateWrapper.md#selectivehardblur)
 - [setState](client_fast_prototyping_components_slate_wrapper.MaterialUISlateWrapper.md#setstate)
+- [setToolbarState](client_fast_prototyping_components_slate_wrapper.MaterialUISlateWrapper.md#settoolbarstate)
 - [shouldComponentUpdate](client_fast_prototyping_components_slate_wrapper.MaterialUISlateWrapper.md#shouldcomponentupdate)
 - [shouldHaveDrawer](client_fast_prototyping_components_slate_wrapper.MaterialUISlateWrapper.md#shouldhavedrawer)
 - [toggleDrawer](client_fast_prototyping_components_slate_wrapper.MaterialUISlateWrapper.md#toggledrawer)
-- [visibilityListener](client_fast_prototyping_components_slate_wrapper.MaterialUISlateWrapper.md#visibilitylistener)
-- [windowfocusListener](client_fast_prototyping_components_slate_wrapper.MaterialUISlateWrapper.md#windowfocuslistener)
 
 ## Constructors
 
@@ -95,27 +80,27 @@ Constructs a new material ui based wrapper for the slate editor
 
 | Name | Type | Description |
 | :------ | :------ | :------ |
-| `props` | [`MaterialUISlateWrapperWithStyles`](../interfaces/client_fast_prototyping_components_slate_wrapper.MaterialUISlateWrapperWithStyles.md) | the base properties that every wrapper gets extended for this specific wrapper |
+| `props` | [`IMaterialUISlateWrapperProps`](../interfaces/client_fast_prototyping_components_slate_wrapper.IMaterialUISlateWrapperProps.md) | the base properties that every wrapper gets extended for this specific wrapper |
 
 #### Overrides
 
-React.PureComponent&lt;MaterialUISlateWrapperWithStyles, MaterialUISlateWrapperState\&gt;.constructor
+React.PureComponent&lt;IMaterialUISlateWrapperProps, MaterialUISlateWrapperState\&gt;.constructor
 
 #### Defined in
 
-[client/fast-prototyping/components/slate/wrapper.tsx:1502](https://github.com/onzag/itemize/blob/5c2808d3/client/fast-prototyping/components/slate/wrapper.tsx#L1502)
+[client/fast-prototyping/components/slate/wrapper.tsx:1529](https://github.com/onzag/itemize/blob/f2db74a5/client/fast-prototyping/components/slate/wrapper.tsx#L1529)
 
 ## Properties
 
-### accumulatedFastKeyCombo
+### DrawerContainerRef
 
-• `Private` **accumulatedFastKeyCombo**: `string`
+• `Private` **DrawerContainerRef**: `RefObject`<`DrawerContainer`\>
 
-The accumulated fast key combo
+A ref to the container
 
 #### Defined in
 
-[client/fast-prototyping/components/slate/wrapper.tsx:1494](https://github.com/onzag/itemize/blob/5c2808d3/client/fast-prototyping/components/slate/wrapper.tsx#L1494)
+[client/fast-prototyping/components/slate/wrapper.tsx:1491](https://github.com/onzag/itemize/blob/f2db74a5/client/fast-prototyping/components/slate/wrapper.tsx#L1491)
 
 ___
 
@@ -147,6 +132,18 @@ node_modules/@types/react/index.d.ts:479
 
 ___
 
+### editorRef
+
+• `Private` **editorRef**: `RefObject`<`HTMLDivElement`\>
+
+a ref to the editor
+
+#### Defined in
+
+[client/fast-prototyping/components/slate/wrapper.tsx:1496](https://github.com/onzag/itemize/blob/f2db74a5/client/fast-prototyping/components/slate/wrapper.tsx#L1496)
+
+___
+
 ### inputFileRef
 
 • `Private` **inputFileRef**: `RefObject`<`HTMLInputElement`\>
@@ -155,7 +152,7 @@ The ref object for the input object for any file input
 
 #### Defined in
 
-[client/fast-prototyping/components/slate/wrapper.tsx:1459](https://github.com/onzag/itemize/blob/5c2808d3/client/fast-prototyping/components/slate/wrapper.tsx#L1459)
+[client/fast-prototyping/components/slate/wrapper.tsx:1486](https://github.com/onzag/itemize/blob/f2db74a5/client/fast-prototyping/components/slate/wrapper.tsx#L1486)
 
 ___
 
@@ -167,7 +164,7 @@ The ref object for the input object for image input
 
 #### Defined in
 
-[client/fast-prototyping/components/slate/wrapper.tsx:1454](https://github.com/onzag/itemize/blob/5c2808d3/client/fast-prototyping/components/slate/wrapper.tsx#L1454)
+[client/fast-prototyping/components/slate/wrapper.tsx:1481](https://github.com/onzag/itemize/blob/f2db74a5/client/fast-prototyping/components/slate/wrapper.tsx#L1481)
 
 ___
 
@@ -177,13 +174,13 @@ ___
 
 #### Defined in
 
-[client/fast-prototyping/components/slate/wrapper.tsx:1496](https://github.com/onzag/itemize/blob/5c2808d3/client/fast-prototyping/components/slate/wrapper.tsx#L1496)
+[client/fast-prototyping/components/slate/wrapper.tsx:1523](https://github.com/onzag/itemize/blob/f2db74a5/client/fast-prototyping/components/slate/wrapper.tsx#L1523)
 
 ___
 
 ### originalSelectionArea
 
-• `Private` **originalSelectionArea**: `Range`
+• `Private` **originalSelectionArea**: `BaseRange`
 
 This is the range that was in place before losing focus, it is used because
 when opening some dialog, the insertion or change needs to happen at a given
@@ -191,7 +188,7 @@ selection range, but that is lost when losing focus, so we need to remember it
 
 #### Defined in
 
-[client/fast-prototyping/components/slate/wrapper.tsx:1476](https://github.com/onzag/itemize/blob/5c2808d3/client/fast-prototyping/components/slate/wrapper.tsx#L1476)
+[client/fast-prototyping/components/slate/wrapper.tsx:1508](https://github.com/onzag/itemize/blob/f2db74a5/client/fast-prototyping/components/slate/wrapper.tsx#L1508)
 
 ___
 
@@ -204,13 +201,13 @@ because we were workign in the range
 
 #### Defined in
 
-[client/fast-prototyping/components/slate/wrapper.tsx:1481](https://github.com/onzag/itemize/blob/5c2808d3/client/fast-prototyping/components/slate/wrapper.tsx#L1481)
+[client/fast-prototyping/components/slate/wrapper.tsx:1513](https://github.com/onzag/itemize/blob/f2db74a5/client/fast-prototyping/components/slate/wrapper.tsx#L1513)
 
 ___
 
 ### props
 
-• `Readonly` **props**: `Readonly`<[`MaterialUISlateWrapperWithStyles`](../interfaces/client_fast_prototyping_components_slate_wrapper.MaterialUISlateWrapperWithStyles.md)\> & `Readonly`<{ `children?`: `ReactNode`  }\>
+• `Readonly` **props**: `Readonly`<[`IMaterialUISlateWrapperProps`](../interfaces/client_fast_prototyping_components_slate_wrapper.IMaterialUISlateWrapperProps.md)\> & `Readonly`<{ `children?`: `ReactNode`  }\>
 
 #### Inherited from
 
@@ -233,7 +230,7 @@ and the change event might not even trigger
 
 #### Defined in
 
-[client/fast-prototyping/components/slate/wrapper.tsx:1489](https://github.com/onzag/itemize/blob/5c2808d3/client/fast-prototyping/components/slate/wrapper.tsx#L1489)
+[client/fast-prototyping/components/slate/wrapper.tsx:1521](https://github.com/onzag/itemize/blob/f2db74a5/client/fast-prototyping/components/slate/wrapper.tsx#L1521)
 
 ___
 
@@ -280,19 +277,7 @@ A ref for the toolbar
 
 #### Defined in
 
-[client/fast-prototyping/components/slate/wrapper.tsx:1469](https://github.com/onzag/itemize/blob/5c2808d3/client/fast-prototyping/components/slate/wrapper.tsx#L1469)
-
-___
-
-### wrapperContainerRef
-
-• `Private` **wrapperContainerRef**: `RefObject`<`WrapperContainer`\>
-
-A ref to the container
-
-#### Defined in
-
-[client/fast-prototyping/components/slate/wrapper.tsx:1464](https://github.com/onzag/itemize/blob/5c2808d3/client/fast-prototyping/components/slate/wrapper.tsx#L1464)
+[client/fast-prototyping/components/slate/wrapper.tsx:1501](https://github.com/onzag/itemize/blob/f2db74a5/client/fast-prototyping/components/slate/wrapper.tsx#L1501)
 
 ___
 
@@ -386,7 +371,7 @@ prevents this from being invoked.
 
 | Name | Type |
 | :------ | :------ |
-| `nextProps` | `Readonly`<[`MaterialUISlateWrapperWithStyles`](../interfaces/client_fast_prototyping_components_slate_wrapper.MaterialUISlateWrapperWithStyles.md)\> |
+| `nextProps` | `Readonly`<[`IMaterialUISlateWrapperProps`](../interfaces/client_fast_prototyping_components_slate_wrapper.IMaterialUISlateWrapperProps.md)\> |
 | `nextContext` | `any` |
 
 #### Returns
@@ -426,7 +411,7 @@ prevents this from being invoked.
 
 | Name | Type |
 | :------ | :------ |
-| `nextProps` | `Readonly`<[`MaterialUISlateWrapperWithStyles`](../interfaces/client_fast_prototyping_components_slate_wrapper.MaterialUISlateWrapperWithStyles.md)\> |
+| `nextProps` | `Readonly`<[`IMaterialUISlateWrapperProps`](../interfaces/client_fast_prototyping_components_slate_wrapper.IMaterialUISlateWrapperProps.md)\> |
 | `nextState` | `Readonly`<[`MaterialUISlateWrapperState`](../interfaces/client_fast_prototyping_components_slate_wrapper.MaterialUISlateWrapperState.md)\> |
 | `nextContext` | `any` |
 
@@ -441,121 +426,6 @@ React.PureComponent.UNSAFE\_componentWillUpdate
 #### Defined in
 
 node_modules/@types/react/index.d.ts:777
-
-___
-
-### acceptLink
-
-▸ **acceptLink**(`linkURL`, `linkTValue`): `boolean`
-
-This function gets executed before the dialog for the video
-closes in order to accept the video url
-
-#### Parameters
-
-| Name | Type |
-| :------ | :------ |
-| `linkURL` | `string` |
-| `linkTValue` | `string` |
-
-#### Returns
-
-`boolean`
-
-a boolean on whether the insertion succeeded
-
-#### Defined in
-
-[client/fast-prototyping/components/slate/wrapper.tsx:2005](https://github.com/onzag/itemize/blob/5c2808d3/client/fast-prototyping/components/slate/wrapper.tsx#L2005)
-
-___
-
-### acceptVideo
-
-▸ **acceptVideo**(`videoURL`): `boolean`
-
-This function gets executed before the dialog for the video
-closes in order to accept the video url
-
-#### Parameters
-
-| Name | Type | Description |
-| :------ | :------ | :------ |
-| `videoURL` | `string` | the video url in question |
-
-#### Returns
-
-`boolean`
-
-a boolean on whether the insertion succeeded
-
-#### Defined in
-
-[client/fast-prototyping/components/slate/wrapper.tsx:1992](https://github.com/onzag/itemize/blob/5c2808d3/client/fast-prototyping/components/slate/wrapper.tsx#L1992)
-
-___
-
-### closeDialogLink
-
-▸ **closeDialogLink**(): `void`
-
-Closes the dialog for the link input
-
-#### Returns
-
-`void`
-
-#### Defined in
-
-[client/fast-prototyping/components/slate/wrapper.tsx:1942](https://github.com/onzag/itemize/blob/5c2808d3/client/fast-prototyping/components/slate/wrapper.tsx#L1942)
-
-___
-
-### closeDialogTemplateHTML
-
-▸ **closeDialogTemplateHTML**(): `void`
-
-Closes the dialog for the template html input
-
-#### Returns
-
-`void`
-
-#### Defined in
-
-[client/fast-prototyping/components/slate/wrapper.tsx:1968](https://github.com/onzag/itemize/blob/5c2808d3/client/fast-prototyping/components/slate/wrapper.tsx#L1968)
-
-___
-
-### closeDialogTemplateText
-
-▸ **closeDialogTemplateText**(): `void`
-
-Closes the dialog for the template text input
-
-#### Returns
-
-`void`
-
-#### Defined in
-
-[client/fast-prototyping/components/slate/wrapper.tsx:1955](https://github.com/onzag/itemize/blob/5c2808d3/client/fast-prototyping/components/slate/wrapper.tsx#L1955)
-
-___
-
-### closeDialogVideo
-
-▸ **closeDialogVideo**(): `void`
-
-Closes the dialog for the video input
-
-#### Returns
-
-`void`
-
-#### Defined in
-
-[client/fast-prototyping/components/slate/wrapper.tsx:1929](https://github.com/onzag/itemize/blob/5c2808d3/client/fast-prototyping/components/slate/wrapper.tsx#L1929)
 
 ___
 
@@ -603,7 +473,7 @@ React.PureComponent.componentDidMount
 
 #### Defined in
 
-[client/fast-prototyping/components/slate/wrapper.tsx:1575](https://github.com/onzag/itemize/blob/5c2808d3/client/fast-prototyping/components/slate/wrapper.tsx#L1575)
+[client/fast-prototyping/components/slate/wrapper.tsx:1581](https://github.com/onzag/itemize/blob/f2db74a5/client/fast-prototyping/components/slate/wrapper.tsx#L1581)
 
 ___
 
@@ -619,7 +489,7 @@ The snapshot is only present if getSnapshotBeforeUpdate is present and returns n
 
 | Name | Type |
 | :------ | :------ |
-| `prevProps` | `Readonly`<[`MaterialUISlateWrapperWithStyles`](../interfaces/client_fast_prototyping_components_slate_wrapper.MaterialUISlateWrapperWithStyles.md)\> |
+| `prevProps` | `Readonly`<[`IMaterialUISlateWrapperProps`](../interfaces/client_fast_prototyping_components_slate_wrapper.IMaterialUISlateWrapperProps.md)\> |
 | `prevState` | `Readonly`<[`MaterialUISlateWrapperState`](../interfaces/client_fast_prototyping_components_slate_wrapper.MaterialUISlateWrapperState.md)\> |
 | `snapshot?` | `any` |
 
@@ -690,7 +560,7 @@ prevents this from being invoked.
 
 | Name | Type |
 | :------ | :------ |
-| `nextProps` | `Readonly`<[`MaterialUISlateWrapperWithStyles`](../interfaces/client_fast_prototyping_components_slate_wrapper.MaterialUISlateWrapperWithStyles.md)\> |
+| `nextProps` | `Readonly`<[`IMaterialUISlateWrapperProps`](../interfaces/client_fast_prototyping_components_slate_wrapper.IMaterialUISlateWrapperProps.md)\> |
 | `nextContext` | `any` |
 
 #### Returns
@@ -721,7 +591,7 @@ React.PureComponent.componentWillUnmount
 
 #### Defined in
 
-[client/fast-prototyping/components/slate/wrapper.tsx:1609](https://github.com/onzag/itemize/blob/5c2808d3/client/fast-prototyping/components/slate/wrapper.tsx#L1609)
+[client/fast-prototyping/components/slate/wrapper.tsx:1612](https://github.com/onzag/itemize/blob/f2db74a5/client/fast-prototyping/components/slate/wrapper.tsx#L1612)
 
 ___
 
@@ -746,7 +616,7 @@ prevents this from being invoked.
 
 | Name | Type |
 | :------ | :------ |
-| `nextProps` | `Readonly`<[`MaterialUISlateWrapperWithStyles`](../interfaces/client_fast_prototyping_components_slate_wrapper.MaterialUISlateWrapperWithStyles.md)\> |
+| `nextProps` | `Readonly`<[`IMaterialUISlateWrapperProps`](../interfaces/client_fast_prototyping_components_slate_wrapper.IMaterialUISlateWrapperProps.md)\> |
 | `nextState` | `Readonly`<[`MaterialUISlateWrapperState`](../interfaces/client_fast_prototyping_components_slate_wrapper.MaterialUISlateWrapperState.md)\> |
 | `nextContext` | `any` |
 
@@ -803,7 +673,7 @@ lifecycle events from running.
 
 | Name | Type |
 | :------ | :------ |
-| `prevProps` | `Readonly`<[`MaterialUISlateWrapperWithStyles`](../interfaces/client_fast_prototyping_components_slate_wrapper.MaterialUISlateWrapperWithStyles.md)\> |
+| `prevProps` | `Readonly`<[`IMaterialUISlateWrapperProps`](../interfaces/client_fast_prototyping_components_slate_wrapper.IMaterialUISlateWrapperProps.md)\> |
 | `prevState` | `Readonly`<[`MaterialUISlateWrapperState`](../interfaces/client_fast_prototyping_components_slate_wrapper.MaterialUISlateWrapperState.md)\> |
 
 #### Returns
@@ -820,73 +690,9 @@ node_modules/@types/react/index.d.ts:682
 
 ___
 
-### insertContainer
+### isInEditor
 
-▸ **insertContainer**(): `void`
-
-Inserts a container, a basic one in place
-
-#### Returns
-
-`void`
-
-#### Defined in
-
-[client/fast-prototyping/components/slate/wrapper.tsx:1981](https://github.com/onzag/itemize/blob/5c2808d3/client/fast-prototyping/components/slate/wrapper.tsx#L1981)
-
-___
-
-### insertTemplateHTML
-
-▸ **insertTemplateHTML**(`label`, `value`): `void`
-
-Inserts a template html in the last location that was
-selected
-
-#### Parameters
-
-| Name | Type | Description |
-| :------ | :------ | :------ |
-| `label` | `string` | the label that will be shown |
-| `value` | `string` | the value off the context to be taken to replace |
-
-#### Returns
-
-`void`
-
-#### Defined in
-
-[client/fast-prototyping/components/slate/wrapper.tsx:2031](https://github.com/onzag/itemize/blob/5c2808d3/client/fast-prototyping/components/slate/wrapper.tsx#L2031)
-
-___
-
-### insertTemplateText
-
-▸ **insertTemplateText**(`label`, `value`): `void`
-
-Inserts a template text bit in the last location that was
-selected
-
-#### Parameters
-
-| Name | Type | Description |
-| :------ | :------ | :------ |
-| `label` | `string` | the label that will be shown |
-| `value` | `string` | the value off the context to be taken to replace |
-
-#### Returns
-
-`void`
-
-#### Defined in
-
-[client/fast-prototyping/components/slate/wrapper.tsx:2018](https://github.com/onzag/itemize/blob/5c2808d3/client/fast-prototyping/components/slate/wrapper.tsx#L2018)
-
-___
-
-### isParentedBySlateOrUnblurred
-
-▸ **isParentedBySlateOrUnblurred**(`ele`): `boolean`
+▸ **isInEditor**(`ele`): `boolean`
 
 #### Parameters
 
@@ -900,27 +706,27 @@ ___
 
 #### Defined in
 
-[client/fast-prototyping/components/slate/wrapper.tsx:1735](https://github.com/onzag/itemize/blob/5c2808d3/client/fast-prototyping/components/slate/wrapper.tsx#L1735)
+[client/fast-prototyping/components/slate/wrapper.tsx:1659](https://github.com/onzag/itemize/blob/f2db74a5/client/fast-prototyping/components/slate/wrapper.tsx#L1659)
 
 ___
 
-### keyDownListener
+### isUnblurred
 
-▸ **keyDownListener**(`e`): `void`
+▸ **isUnblurred**(`ele`): `boolean`
 
 #### Parameters
 
 | Name | Type |
 | :------ | :------ |
-| `e` | `KeyboardEvent` |
+| `ele` | `HTMLElement` |
 
 #### Returns
 
-`void`
+`boolean`
 
 #### Defined in
 
-[client/fast-prototyping/components/slate/wrapper.tsx:1619](https://github.com/onzag/itemize/blob/5c2808d3/client/fast-prototyping/components/slate/wrapper.tsx#L1619)
+[client/fast-prototyping/components/slate/wrapper.tsx:1643](https://github.com/onzag/itemize/blob/f2db74a5/client/fast-prototyping/components/slate/wrapper.tsx#L1643)
 
 ___
 
@@ -940,7 +746,7 @@ ___
 
 #### Defined in
 
-[client/fast-prototyping/components/slate/wrapper.tsx:1679](https://github.com/onzag/itemize/blob/5c2808d3/client/fast-prototyping/components/slate/wrapper.tsx#L1679)
+[client/fast-prototyping/components/slate/wrapper.tsx:1619](https://github.com/onzag/itemize/blob/f2db74a5/client/fast-prototyping/components/slate/wrapper.tsx#L1619)
 
 ___
 
@@ -957,7 +763,7 @@ dialog that is native for the file upload
 
 #### Defined in
 
-[client/fast-prototyping/components/slate/wrapper.tsx:1856](https://github.com/onzag/itemize/blob/5c2808d3/client/fast-prototyping/components/slate/wrapper.tsx#L1856)
+[client/fast-prototyping/components/slate/wrapper.tsx:1776](https://github.com/onzag/itemize/blob/f2db74a5/client/fast-prototyping/components/slate/wrapper.tsx#L1776)
 
 ___
 
@@ -981,7 +787,7 @@ reading
 
 #### Defined in
 
-[client/fast-prototyping/components/slate/wrapper.tsx:2064](https://github.com/onzag/itemize/blob/5c2808d3/client/fast-prototyping/components/slate/wrapper.tsx#L2064)
+[client/fast-prototyping/components/slate/wrapper.tsx:1820](https://github.com/onzag/itemize/blob/f2db74a5/client/fast-prototyping/components/slate/wrapper.tsx#L1820)
 
 ___
 
@@ -1001,7 +807,7 @@ ___
 
 #### Defined in
 
-[client/fast-prototyping/components/slate/wrapper.tsx:1564](https://github.com/onzag/itemize/blob/5c2808d3/client/fast-prototyping/components/slate/wrapper.tsx#L1564)
+[client/fast-prototyping/components/slate/wrapper.tsx:1570](https://github.com/onzag/itemize/blob/f2db74a5/client/fast-prototyping/components/slate/wrapper.tsx#L1570)
 
 ___
 
@@ -1025,7 +831,7 @@ reading
 
 #### Defined in
 
-[client/fast-prototyping/components/slate/wrapper.tsx:2044](https://github.com/onzag/itemize/blob/5c2808d3/client/fast-prototyping/components/slate/wrapper.tsx#L2044)
+[client/fast-prototyping/components/slate/wrapper.tsx:1799](https://github.com/onzag/itemize/blob/f2db74a5/client/fast-prototyping/components/slate/wrapper.tsx#L1799)
 
 ___
 
@@ -1042,7 +848,7 @@ mainly used by dialogs once they haave closed
 
 #### Defined in
 
-[client/fast-prototyping/components/slate/wrapper.tsx:1840](https://github.com/onzag/itemize/blob/5c2808d3/client/fast-prototyping/components/slate/wrapper.tsx#L1840)
+[client/fast-prototyping/components/slate/wrapper.tsx:1760](https://github.com/onzag/itemize/blob/f2db74a5/client/fast-prototyping/components/slate/wrapper.tsx#L1760)
 
 ___
 
@@ -1062,7 +868,7 @@ React.PureComponent.render
 
 #### Defined in
 
-[client/fast-prototyping/components/slate/wrapper.tsx:2081](https://github.com/onzag/itemize/blob/5c2808d3/client/fast-prototyping/components/slate/wrapper.tsx#L2081)
+[client/fast-prototyping/components/slate/wrapper.tsx:1838](https://github.com/onzag/itemize/blob/f2db74a5/client/fast-prototyping/components/slate/wrapper.tsx#L1838)
 
 ___
 
@@ -1079,7 +885,7 @@ via this file upload dialog
 
 #### Defined in
 
-[client/fast-prototyping/components/slate/wrapper.tsx:1790](https://github.com/onzag/itemize/blob/5c2808d3/client/fast-prototyping/components/slate/wrapper.tsx#L1790)
+[client/fast-prototyping/components/slate/wrapper.tsx:1719](https://github.com/onzag/itemize/blob/f2db74a5/client/fast-prototyping/components/slate/wrapper.tsx#L1719)
 
 ___
 
@@ -1096,98 +902,7 @@ via this file upload dialog
 
 #### Defined in
 
-[client/fast-prototyping/components/slate/wrapper.tsx:1772](https://github.com/onzag/itemize/blob/5c2808d3/client/fast-prototyping/components/slate/wrapper.tsx#L1772)
-
-___
-
-### requestLink
-
-▸ **requestLink**(): `void`
-
-Triggers the state change to open the html based dialog for
-requesting insertion of a link or template link if available
-
-#### Returns
-
-`void`
-
-#### Defined in
-
-[client/fast-prototyping/components/slate/wrapper.tsx:1913](https://github.com/onzag/itemize/blob/5c2808d3/client/fast-prototyping/components/slate/wrapper.tsx#L1913)
-
-___
-
-### requestTemplateHTML
-
-▸ **requestTemplateHTML**(): `void`
-
-Triggers the state change to open the html based dialog for
-requesting insertion of a template html bit
-
-#### Returns
-
-`void`
-
-#### Defined in
-
-[client/fast-prototyping/components/slate/wrapper.tsx:1899](https://github.com/onzag/itemize/blob/5c2808d3/client/fast-prototyping/components/slate/wrapper.tsx#L1899)
-
-___
-
-### requestTemplateText
-
-▸ **requestTemplateText**(): `void`
-
-Triggers the state change to open the html based dialog for
-requesting insertion of a template text bit
-
-#### Returns
-
-`void`
-
-#### Defined in
-
-[client/fast-prototyping/components/slate/wrapper.tsx:1885](https://github.com/onzag/itemize/blob/5c2808d3/client/fast-prototyping/components/slate/wrapper.tsx#L1885)
-
-___
-
-### requestVideo
-
-▸ **requestVideo**(): `void`
-
-Triggers the state change to open the html based dialog for
-requesting a video
-
-#### Returns
-
-`void`
-
-#### Defined in
-
-[client/fast-prototyping/components/slate/wrapper.tsx:1871](https://github.com/onzag/itemize/blob/5c2808d3/client/fast-prototyping/components/slate/wrapper.tsx#L1871)
-
-___
-
-### scrollDrawer
-
-▸ **scrollDrawer**(`direction`): `void`
-
-Scrolls the drawer in a given direction, used for accessibility purposes
-only truly valid in disjointed mode
-
-#### Parameters
-
-| Name | Type |
-| :------ | :------ |
-| `direction` | ``"up"`` \| ``"down"`` |
-
-#### Returns
-
-`void`
-
-#### Defined in
-
-[client/fast-prototyping/components/slate/wrapper.tsx:1825](https://github.com/onzag/itemize/blob/5c2808d3/client/fast-prototyping/components/slate/wrapper.tsx#L1825)
+[client/fast-prototyping/components/slate/wrapper.tsx:1698](https://github.com/onzag/itemize/blob/f2db74a5/client/fast-prototyping/components/slate/wrapper.tsx#L1698)
 
 ___
 
@@ -1207,7 +922,7 @@ ___
 
 #### Defined in
 
-[client/fast-prototyping/components/slate/wrapper.tsx:1699](https://github.com/onzag/itemize/blob/5c2808d3/client/fast-prototyping/components/slate/wrapper.tsx#L1699)
+[client/fast-prototyping/components/slate/wrapper.tsx:1625](https://github.com/onzag/itemize/blob/f2db74a5/client/fast-prototyping/components/slate/wrapper.tsx#L1625)
 
 ___
 
@@ -1225,7 +940,7 @@ ___
 
 | Name | Type |
 | :------ | :------ |
-| `state` | [`MaterialUISlateWrapperState`](../interfaces/client_fast_prototyping_components_slate_wrapper.MaterialUISlateWrapperState.md) \| (`prevState`: `Readonly`<[`MaterialUISlateWrapperState`](../interfaces/client_fast_prototyping_components_slate_wrapper.MaterialUISlateWrapperState.md)\>, `props`: `Readonly`<[`MaterialUISlateWrapperWithStyles`](../interfaces/client_fast_prototyping_components_slate_wrapper.MaterialUISlateWrapperWithStyles.md)\>) => [`MaterialUISlateWrapperState`](../interfaces/client_fast_prototyping_components_slate_wrapper.MaterialUISlateWrapperState.md) \| `Pick`<[`MaterialUISlateWrapperState`](../interfaces/client_fast_prototyping_components_slate_wrapper.MaterialUISlateWrapperState.md), `K`\> \| `Pick`<[`MaterialUISlateWrapperState`](../interfaces/client_fast_prototyping_components_slate_wrapper.MaterialUISlateWrapperState.md), `K`\> |
+| `state` | [`MaterialUISlateWrapperState`](../interfaces/client_fast_prototyping_components_slate_wrapper.MaterialUISlateWrapperState.md) \| (`prevState`: `Readonly`<[`MaterialUISlateWrapperState`](../interfaces/client_fast_prototyping_components_slate_wrapper.MaterialUISlateWrapperState.md)\>, `props`: `Readonly`<[`IMaterialUISlateWrapperProps`](../interfaces/client_fast_prototyping_components_slate_wrapper.IMaterialUISlateWrapperProps.md)\>) => [`MaterialUISlateWrapperState`](../interfaces/client_fast_prototyping_components_slate_wrapper.MaterialUISlateWrapperState.md) \| `Pick`<[`MaterialUISlateWrapperState`](../interfaces/client_fast_prototyping_components_slate_wrapper.MaterialUISlateWrapperState.md), `K`\> \| `Pick`<[`MaterialUISlateWrapperState`](../interfaces/client_fast_prototyping_components_slate_wrapper.MaterialUISlateWrapperState.md), `K`\> |
 | `callback?` | () => `void` |
 
 #### Returns
@@ -1239,6 +954,26 @@ React.PureComponent.setState
 #### Defined in
 
 node_modules/@types/react/index.d.ts:491
+
+___
+
+### setToolbarState
+
+▸ **setToolbarState**(`state`): `void`
+
+#### Parameters
+
+| Name | Type |
+| :------ | :------ |
+| `state` | `string` |
+
+#### Returns
+
+`void`
+
+#### Defined in
+
+[client/fast-prototyping/components/slate/wrapper.tsx:1787](https://github.com/onzag/itemize/blob/f2db74a5/client/fast-prototyping/components/slate/wrapper.tsx#L1787)
 
 ___
 
@@ -1259,7 +994,7 @@ and `componentDidUpdate` will not be called.
 
 | Name | Type |
 | :------ | :------ |
-| `nextProps` | `Readonly`<[`MaterialUISlateWrapperWithStyles`](../interfaces/client_fast_prototyping_components_slate_wrapper.MaterialUISlateWrapperWithStyles.md)\> |
+| `nextProps` | `Readonly`<[`IMaterialUISlateWrapperProps`](../interfaces/client_fast_prototyping_components_slate_wrapper.IMaterialUISlateWrapperProps.md)\> |
 | `nextState` | `Readonly`<[`MaterialUISlateWrapperState`](../interfaces/client_fast_prototyping_components_slate_wrapper.MaterialUISlateWrapperState.md)\> |
 | `nextContext` | `any` |
 
@@ -1291,7 +1026,7 @@ a boolean on this fact
 
 #### Defined in
 
-[client/fast-prototyping/components/slate/wrapper.tsx:1751](https://github.com/onzag/itemize/blob/5c2808d3/client/fast-prototyping/components/slate/wrapper.tsx#L1751)
+[client/fast-prototyping/components/slate/wrapper.tsx:1677](https://github.com/onzag/itemize/blob/f2db74a5/client/fast-prototyping/components/slate/wrapper.tsx#L1677)
 
 ___
 
@@ -1307,32 +1042,4 @@ Opens/closes the drawer
 
 #### Defined in
 
-[client/fast-prototyping/components/slate/wrapper.tsx:1807](https://github.com/onzag/itemize/blob/5c2808d3/client/fast-prototyping/components/slate/wrapper.tsx#L1807)
-
-___
-
-### visibilityListener
-
-▸ **visibilityListener**(): `void`
-
-#### Returns
-
-`void`
-
-#### Defined in
-
-[client/fast-prototyping/components/slate/wrapper.tsx:1719](https://github.com/onzag/itemize/blob/5c2808d3/client/fast-prototyping/components/slate/wrapper.tsx#L1719)
-
-___
-
-### windowfocusListener
-
-▸ **windowfocusListener**(): `void`
-
-#### Returns
-
-`void`
-
-#### Defined in
-
-[client/fast-prototyping/components/slate/wrapper.tsx:1728](https://github.com/onzag/itemize/blob/5c2808d3/client/fast-prototyping/components/slate/wrapper.tsx#L1728)
+[client/fast-prototyping/components/slate/wrapper.tsx:1739](https://github.com/onzag/itemize/blob/f2db74a5/client/fast-prototyping/components/slate/wrapper.tsx#L1739)

@@ -14,6 +14,7 @@
 
 ### Properties
 
+- [appData](base_Root_Module_ItemDefinition_PropertyDefinition_types.ISQLOutInfo.md#appdata)
 - [id](base_Root_Module_ItemDefinition_PropertyDefinition_types.ISQLOutInfo.md#id)
 - [include](base_Root_Module_ItemDefinition_PropertyDefinition_types.ISQLOutInfo.md#include)
 - [itemDefinition](base_Root_Module_ItemDefinition_PropertyDefinition_types.ISQLOutInfo.md#itemdefinition)
@@ -23,6 +24,20 @@
 - [serverData](base_Root_Module_ItemDefinition_PropertyDefinition_types.ISQLOutInfo.md#serverdata)
 
 ## Properties
+
+### appData
+
+• **appData**: [`IAppDataType`](server.IAppDataType.md)
+
+#### Inherited from
+
+[ISQLArgInfo](base_Root_Module_ItemDefinition_PropertyDefinition_types.ISQLArgInfo.md).[appData](base_Root_Module_ItemDefinition_PropertyDefinition_types.ISQLArgInfo.md#appdata)
+
+#### Defined in
+
+[base/Root/Module/ItemDefinition/PropertyDefinition/types/index.ts:81](https://github.com/onzag/itemize/blob/f2db74a5/base/Root/Module/ItemDefinition/PropertyDefinition/types/index.ts#L81)
+
+___
 
 ### id
 
@@ -34,7 +49,7 @@
 
 #### Defined in
 
-[base/Root/Module/ItemDefinition/PropertyDefinition/types/index.ts:66](https://github.com/onzag/itemize/blob/5c2808d3/base/Root/Module/ItemDefinition/PropertyDefinition/types/index.ts#L66)
+[base/Root/Module/ItemDefinition/PropertyDefinition/types/index.ts:67](https://github.com/onzag/itemize/blob/f2db74a5/base/Root/Module/ItemDefinition/PropertyDefinition/types/index.ts#L67)
 
 ___
 
@@ -48,7 +63,7 @@ ___
 
 #### Defined in
 
-[base/Root/Module/ItemDefinition/PropertyDefinition/types/index.ts:70](https://github.com/onzag/itemize/blob/5c2808d3/base/Root/Module/ItemDefinition/PropertyDefinition/types/index.ts#L70)
+[base/Root/Module/ItemDefinition/PropertyDefinition/types/index.ts:71](https://github.com/onzag/itemize/blob/f2db74a5/base/Root/Module/ItemDefinition/PropertyDefinition/types/index.ts#L71)
 
 ___
 
@@ -62,7 +77,7 @@ ___
 
 #### Defined in
 
-[base/Root/Module/ItemDefinition/PropertyDefinition/types/index.ts:69](https://github.com/onzag/itemize/blob/5c2808d3/base/Root/Module/ItemDefinition/PropertyDefinition/types/index.ts#L69)
+[base/Root/Module/ItemDefinition/PropertyDefinition/types/index.ts:70](https://github.com/onzag/itemize/blob/f2db74a5/base/Root/Module/ItemDefinition/PropertyDefinition/types/index.ts#L70)
 
 ___
 
@@ -76,7 +91,7 @@ ___
 
 #### Defined in
 
-[base/Root/Module/ItemDefinition/PropertyDefinition/types/index.ts:67](https://github.com/onzag/itemize/blob/5c2808d3/base/Root/Module/ItemDefinition/PropertyDefinition/types/index.ts#L67)
+[base/Root/Module/ItemDefinition/PropertyDefinition/types/index.ts:68](https://github.com/onzag/itemize/blob/f2db74a5/base/Root/Module/ItemDefinition/PropertyDefinition/types/index.ts#L68)
 
 ___
 
@@ -90,7 +105,7 @@ ___
 
 #### Defined in
 
-[base/Root/Module/ItemDefinition/PropertyDefinition/types/index.ts:68](https://github.com/onzag/itemize/blob/5c2808d3/base/Root/Module/ItemDefinition/PropertyDefinition/types/index.ts#L68)
+[base/Root/Module/ItemDefinition/PropertyDefinition/types/index.ts:69](https://github.com/onzag/itemize/blob/f2db74a5/base/Root/Module/ItemDefinition/PropertyDefinition/types/index.ts#L69)
 
 ___
 
@@ -100,7 +115,7 @@ ___
 
 #### Defined in
 
-[base/Root/Module/ItemDefinition/PropertyDefinition/types/index.ts:87](https://github.com/onzag/itemize/blob/5c2808d3/base/Root/Module/ItemDefinition/PropertyDefinition/types/index.ts#L87)
+[base/Root/Module/ItemDefinition/PropertyDefinition/types/index.ts:100](https://github.com/onzag/itemize/blob/f2db74a5/base/Root/Module/ItemDefinition/PropertyDefinition/types/index.ts#L100)
 
 ___
 
@@ -114,4 +129,4 @@ ___
 
 #### Defined in
 
-[base/Root/Module/ItemDefinition/PropertyDefinition/types/index.ts:78](https://github.com/onzag/itemize/blob/5c2808d3/base/Root/Module/ItemDefinition/PropertyDefinition/types/index.ts#L78)
+[base/Root/Module/ItemDefinition/PropertyDefinition/types/index.ts:80](https://github.com/onzag/itemize/blob/f2db74a5/base/Root/Module/ItemDefinition/PropertyDefinition/types/index.ts#L80)

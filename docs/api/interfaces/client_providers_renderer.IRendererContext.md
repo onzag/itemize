@@ -20,14 +20,16 @@ its own fast prototyping renderers
 - [PropertyEntryFiles](client_providers_renderer.IRendererContext.md#propertyentryfiles)
 - [PropertyEntryLocation](client_providers_renderer.IRendererContext.md#propertyentrylocation)
 - [PropertyEntryPayment](client_providers_renderer.IRendererContext.md#propertyentrypayment)
-- [PropertyEntryReference](client_providers_renderer.IRendererContext.md#propertyentryreference)
 - [PropertyEntrySelect](client_providers_renderer.IRendererContext.md#propertyentryselect)
+- [PropertyEntryTagList](client_providers_renderer.IRendererContext.md#propertyentrytaglist)
 - [PropertyEntryText](client_providers_renderer.IRendererContext.md#propertyentrytext)
 - [PropertyViewBoolean](client_providers_renderer.IRendererContext.md#propertyviewboolean)
 - [PropertyViewCurrency](client_providers_renderer.IRendererContext.md#propertyviewcurrency)
 - [PropertyViewDateTime](client_providers_renderer.IRendererContext.md#propertyviewdatetime)
 - [PropertyViewFile](client_providers_renderer.IRendererContext.md#propertyviewfile)
+- [PropertyViewFiles](client_providers_renderer.IRendererContext.md#propertyviewfiles)
 - [PropertyViewLocation](client_providers_renderer.IRendererContext.md#propertyviewlocation)
+- [PropertyViewPayment](client_providers_renderer.IRendererContext.md#propertyviewpayment)
 - [PropertyViewSimple](client_providers_renderer.IRendererContext.md#propertyviewsimple)
 - [PropertyViewText](client_providers_renderer.IRendererContext.md#propertyviewtext)
 
@@ -43,7 +45,7 @@ marked as incomplete
 
 #### Defined in
 
-[client/providers/renderer.tsx:38](https://github.com/onzag/itemize/blob/5c2808d3/client/providers/renderer.tsx#L38)
+[client/providers/renderer.tsx:40](https://github.com/onzag/itemize/blob/f2db74a5/client/providers/renderer.tsx#L40)
 
 ___
 
@@ -55,7 +57,7 @@ The property entry boolean renderer, non-special
 
 #### Defined in
 
-[client/providers/renderer.tsx:84](https://github.com/onzag/itemize/blob/5c2808d3/client/providers/renderer.tsx#L84)
+[client/providers/renderer.tsx:70](https://github.com/onzag/itemize/blob/f2db74a5/client/providers/renderer.tsx#L70)
 
 ___
 
@@ -68,7 +70,7 @@ the given format
 
 #### Defined in
 
-[client/providers/renderer.tsx:123](https://github.com/onzag/itemize/blob/5c2808d3/client/providers/renderer.tsx#L123)
+[client/providers/renderer.tsx:109](https://github.com/onzag/itemize/blob/f2db74a5/client/providers/renderer.tsx#L109)
 
 ___
 
@@ -88,7 +90,7 @@ its own handler logic
 
 #### Defined in
 
-[client/providers/renderer.tsx:51](https://github.com/onzag/itemize/blob/5c2808d3/client/providers/renderer.tsx#L51)
+[client/providers/renderer.tsx:53](https://github.com/onzag/itemize/blob/f2db74a5/client/providers/renderer.tsx#L53)
 
 ___
 
@@ -102,7 +104,7 @@ Do not use the onChange function to update, use onSetFile instead
 
 #### Defined in
 
-[client/providers/renderer.tsx:74](https://github.com/onzag/itemize/blob/5c2808d3/client/providers/renderer.tsx#L74)
+[client/providers/renderer.tsx:60](https://github.com/onzag/itemize/blob/f2db74a5/client/providers/renderer.tsx#L60)
 
 ___
 
@@ -116,7 +118,7 @@ Do not use the onChange function to update, use onSetFile instead
 
 #### Defined in
 
-[client/providers/renderer.tsx:80](https://github.com/onzag/itemize/blob/5c2808d3/client/providers/renderer.tsx#L80)
+[client/providers/renderer.tsx:66](https://github.com/onzag/itemize/blob/f2db74a5/client/providers/renderer.tsx#L66)
 
 ___
 
@@ -132,7 +134,7 @@ using the default service as it is programmed in the server side
 
 #### Defined in
 
-[client/providers/renderer.tsx:92](https://github.com/onzag/itemize/blob/5c2808d3/client/providers/renderer.tsx#L92)
+[client/providers/renderer.tsx:78](https://github.com/onzag/itemize/blob/f2db74a5/client/providers/renderer.tsx#L78)
 
 ___
 
@@ -148,31 +150,7 @@ so forth
 
 #### Defined in
 
-[client/providers/renderer.tsx:131](https://github.com/onzag/itemize/blob/5c2808d3/client/providers/renderer.tsx#L131)
-
-___
-
-### PropertyEntryReference
-
-• `Optional` **PropertyEntryReference**: `ComponentType`<[`IPropertyEntryReferenceRendererProps`](client_internal_components_PropertyEntry_PropertyEntryReference.IPropertyEntryReferenceRendererProps.md)\>
-
-The renderer that renders integer/reference, a reference shows itself as
-a textual value that represents an id to an item definition, but only the id
-where versions are expected to be locales, the reference renderer is used mainly
-for autocomplete purposes, eg. user_id can be a reference that references an user id
-of the module users, item definition user; and it uses name as display, references
-while incredible complex show itself pretty humbly to the renderer, so a renderer
-for this should be simpler to implement than a renderer to the Field or Location
-
-When creating an entry reference renderer, do not use the onChange or currentValue
-instead use currentTextualValue and onSelect via the options that are given, and when
-changing the field used the onChangeSearch so you get options you can select,
-you can use currentValue to check if anything is currently selected, should be a number
-larger than 0
-
-#### Defined in
-
-[client/providers/renderer.tsx:68](https://github.com/onzag/itemize/blob/5c2808d3/client/providers/renderer.tsx#L68)
+[client/providers/renderer.tsx:117](https://github.com/onzag/itemize/blob/f2db74a5/client/providers/renderer.tsx#L117)
 
 ___
 
@@ -185,7 +163,21 @@ it is, supports both texual and numerical types, otherwise works as standard
 
 #### Defined in
 
-[client/providers/renderer.tsx:97](https://github.com/onzag/itemize/blob/5c2808d3/client/providers/renderer.tsx#L97)
+[client/providers/renderer.tsx:83](https://github.com/onzag/itemize/blob/f2db74a5/client/providers/renderer.tsx#L83)
+
+___
+
+### PropertyEntryTagList
+
+• `Optional` **PropertyEntryTagList**: `ComponentType`<[`IPropertyEntryTagListRendererProps`](client_internal_components_PropertyEntry_PropertyEntryTagList.IPropertyEntryTagListRendererProps.md)\>
+
+The taglist renderer which is used to render arbitrary tags, unlike
+the property entry select which is used for standard tags which specific values
+this one is arbitrary
+
+#### Defined in
+
+[client/providers/renderer.tsx:123](https://github.com/onzag/itemize/blob/f2db74a5/client/providers/renderer.tsx#L123)
 
 ___
 
@@ -214,7 +206,7 @@ HTML in the render function of your renderer
 
 #### Defined in
 
-[client/providers/renderer.tsx:118](https://github.com/onzag/itemize/blob/5c2808d3/client/providers/renderer.tsx#L118)
+[client/providers/renderer.tsx:104](https://github.com/onzag/itemize/blob/f2db74a5/client/providers/renderer.tsx#L104)
 
 ___
 
@@ -227,7 +219,7 @@ true or false, we expect a diverging rendering
 
 #### Defined in
 
-[client/providers/renderer.tsx:137](https://github.com/onzag/itemize/blob/5c2808d3/client/providers/renderer.tsx#L137)
+[client/providers/renderer.tsx:129](https://github.com/onzag/itemize/blob/f2db74a5/client/providers/renderer.tsx#L129)
 
 ___
 
@@ -242,7 +234,7 @@ for conversions is relevant
 
 #### Defined in
 
-[client/providers/renderer.tsx:170](https://github.com/onzag/itemize/blob/5c2808d3/client/providers/renderer.tsx#L170)
+[client/providers/renderer.tsx:168](https://github.com/onzag/itemize/blob/f2db74a5/client/providers/renderer.tsx#L168)
 
 ___
 
@@ -254,7 +246,7 @@ The date time renderer
 
 #### Defined in
 
-[client/providers/renderer.tsx:152](https://github.com/onzag/itemize/blob/5c2808d3/client/providers/renderer.tsx#L152)
+[client/providers/renderer.tsx:144](https://github.com/onzag/itemize/blob/f2db74a5/client/providers/renderer.tsx#L144)
 
 ___
 
@@ -268,7 +260,21 @@ used for files
 
 #### Defined in
 
-[client/providers/renderer.tsx:158](https://github.com/onzag/itemize/blob/5c2808d3/client/providers/renderer.tsx#L158)
+[client/providers/renderer.tsx:150](https://github.com/onzag/itemize/blob/f2db74a5/client/providers/renderer.tsx#L150)
+
+___
+
+### PropertyViewFiles
+
+• `Optional` **PropertyViewFiles**: `ComponentType`<[`IPropertyViewFilesRendererProps`](client_internal_components_PropertyView_PropertyViewFiles.IPropertyViewFilesRendererProps.md)\>
+
+The file renderer is used only for files, as simple as that
+
+Do not use the onChange function to update, use onSetFile instead
+
+#### Defined in
+
+[client/providers/renderer.tsx:156](https://github.com/onzag/itemize/blob/f2db74a5/client/providers/renderer.tsx#L156)
 
 ___
 
@@ -281,7 +287,20 @@ this renderer can be used as a realtime location renderer
 
 #### Defined in
 
-[client/providers/renderer.tsx:163](https://github.com/onzag/itemize/blob/5c2808d3/client/providers/renderer.tsx#L163)
+[client/providers/renderer.tsx:161](https://github.com/onzag/itemize/blob/f2db74a5/client/providers/renderer.tsx#L161)
+
+___
+
+### PropertyViewPayment
+
+• `Optional` **PropertyViewPayment**: `ComponentType`<[`IPropertyViewPaymentRendererProps`](client_internal_components_PropertyView_PropertyViewPayment.IPropertyViewPaymentRendererProps.md)\>
+
+Renders a payment element, a payment element is a complex element so the renderer
+may offer variation via its args
+
+#### Defined in
+
+[client/providers/renderer.tsx:173](https://github.com/onzag/itemize/blob/f2db74a5/client/providers/renderer.tsx#L173)
 
 ___
 
@@ -295,7 +314,7 @@ these values can be null
 
 #### Defined in
 
-[client/providers/renderer.tsx:143](https://github.com/onzag/itemize/blob/5c2808d3/client/providers/renderer.tsx#L143)
+[client/providers/renderer.tsx:135](https://github.com/onzag/itemize/blob/f2db74a5/client/providers/renderer.tsx#L135)
 
 ___
 
@@ -308,4 +327,4 @@ on html rich text mode can be complex
 
 #### Defined in
 
-[client/providers/renderer.tsx:148](https://github.com/onzag/itemize/blob/5c2808d3/client/providers/renderer.tsx#L148)
+[client/providers/renderer.tsx:140](https://github.com/onzag/itemize/blob/f2db74a5/client/providers/renderer.tsx#L140)

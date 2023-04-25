@@ -6,6 +6,12 @@
 
 the error props that the error displayer needs to take
 
+## Hierarchy
+
+- [`II18nReadErrorOptions`](client_components_localization_I18nReadError.II18nReadErrorOptions.md)
+
+  ↳ **`II18nReadErrorProps`**
+
 ## Table of contents
 
 ### Properties
@@ -25,9 +31,13 @@ the error props that the error displayer needs to take
 
 Whether the error message should be capitalized
 
+#### Inherited from
+
+[II18nReadErrorOptions](client_components_localization_I18nReadError.II18nReadErrorOptions.md).[capitalize](client_components_localization_I18nReadError.II18nReadErrorOptions.md#capitalize)
+
 #### Defined in
 
-[client/components/localization/I18nReadError.tsx:36](https://github.com/onzag/itemize/blob/5c2808d3/client/components/localization/I18nReadError.tsx#L36)
+[client/components/localization/I18nReadError.tsx:36](https://github.com/onzag/itemize/blob/f2db74a5/client/components/localization/I18nReadError.tsx#L36)
 
 ___
 
@@ -38,9 +48,13 @@ ___
 The error on itself, most itemize errors are of this type
 so they can be displayed by passing it here
 
+#### Inherited from
+
+[II18nReadErrorOptions](client_components_localization_I18nReadError.II18nReadErrorOptions.md).[error](client_components_localization_I18nReadError.II18nReadErrorOptions.md#error)
+
 #### Defined in
 
-[client/components/localization/I18nReadError.tsx:32](https://github.com/onzag/itemize/blob/5c2808d3/client/components/localization/I18nReadError.tsx#L32)
+[client/components/localization/I18nReadError.tsx:32](https://github.com/onzag/itemize/blob/f2db74a5/client/components/localization/I18nReadError.tsx#L32)
 
 ## Methods
 
@@ -62,4 +76,4 @@ the children that passes the value to the consumer
 
 #### Defined in
 
-[client/components/localization/I18nReadError.tsx:40](https://github.com/onzag/itemize/blob/5c2808d3/client/components/localization/I18nReadError.tsx#L40)
+[client/components/localization/I18nReadError.tsx:47](https://github.com/onzag/itemize/blob/f2db74a5/client/components/localization/I18nReadError.tsx#L47)

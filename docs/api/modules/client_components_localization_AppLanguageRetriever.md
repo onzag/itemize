@@ -6,9 +6,14 @@ Simply provides the current language
 
 ## Table of contents
 
+### Interfaces
+
+- [ILanguageRetrieverArg](../interfaces/client_components_localization_AppLanguageRetriever.ILanguageRetrieverArg.md)
+
 ### Functions
 
 - [default](client_components_localization_AppLanguageRetriever.md#default)
+- [useAppLanguageRetriever](client_components_localization_AppLanguageRetriever.md#useapplanguageretriever)
 
 ## Functions
 
@@ -35,4 +40,25 @@ a react node
 
 #### Defined in
 
-[client/components/localization/AppLanguageRetriever.tsx:35](https://github.com/onzag/itemize/blob/5c2808d3/client/components/localization/AppLanguageRetriever.tsx#L35)
+[client/components/localization/AppLanguageRetriever.tsx:70](https://github.com/onzag/itemize/blob/f2db74a5/client/components/localization/AppLanguageRetriever.tsx#L70)
+
+___
+
+### useAppLanguageRetriever
+
+▸ **useAppLanguageRetriever**(): `Object`
+
+#### Returns
+
+`Object`
+
+| Name | Type |
+| :------ | :------ |
+| `availableLanguages` | `IFnAppLanguageRetrieverLanguageFormType`[] |
+| `changeLanguageTo` | () => `any` \| [`ChangeLanguageToFn`](client_internal_providers_locale_provider.md#changelanguagetofn) |
+| `currentLanguage` | `IFnAppLanguageRetrieverLanguageFormType` |
+| `rtl` | `boolean` |
+
+#### Defined in
+
+[client/components/localization/AppLanguageRetriever.tsx:108](https://github.com/onzag/itemize/blob/f2db74a5/client/components/localization/AppLanguageRetriever.tsx#L108)

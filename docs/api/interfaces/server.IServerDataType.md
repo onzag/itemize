@@ -8,9 +8,20 @@
 
 ### Properties
 
+- [BUILDNUMBER](server.IServerDataType.md#buildnumber)
 - [CURRENCY\_FACTORS](server.IServerDataType.md#currency_factors)
 
 ## Properties
+
+### BUILDNUMBER
+
+• **BUILDNUMBER**: `string`
+
+#### Defined in
+
+[server/index.ts:216](https://github.com/onzag/itemize/blob/f2db74a5/server/index.ts#L216)
+
+___
 
 ### CURRENCY\_FACTORS
 
@@ -22,4 +33,4 @@
 
 #### Defined in
 
-[server/index.ts:163](https://github.com/onzag/itemize/blob/5c2808d3/server/index.ts#L163)
+[server/index.ts:217](https://github.com/onzag/itemize/blob/f2db74a5/server/index.ts#L217)

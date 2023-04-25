@@ -25,7 +25,7 @@ of type select
 
 #### Defined in
 
-[client/fast-prototyping/components/slate/wrapper.tsx:280](https://github.com/onzag/itemize/blob/5c2808d3/client/fast-prototyping/components/slate/wrapper.tsx#L280)
+[client/fast-prototyping/components/slate/wrapper.tsx:320](https://github.com/onzag/itemize/blob/f2db74a5/client/fast-prototyping/components/slate/wrapper.tsx#L320)
 
 ___
 
@@ -35,7 +35,7 @@ ___
 
 #### Defined in
 
-[client/fast-prototyping/components/slate/wrapper.tsx:279](https://github.com/onzag/itemize/blob/5c2808d3/client/fast-prototyping/components/slate/wrapper.tsx#L279)
+[client/fast-prototyping/components/slate/wrapper.tsx:319](https://github.com/onzag/itemize/blob/f2db74a5/client/fast-prototyping/components/slate/wrapper.tsx#L319)
 
 ___
 
@@ -45,7 +45,7 @@ ___
 
 #### Defined in
 
-[client/fast-prototyping/components/slate/wrapper.tsx:289](https://github.com/onzag/itemize/blob/5c2808d3/client/fast-prototyping/components/slate/wrapper.tsx#L289)
+[client/fast-prototyping/components/slate/wrapper.tsx:329](https://github.com/onzag/itemize/blob/f2db74a5/client/fast-prototyping/components/slate/wrapper.tsx#L329)
 
 ___
 
@@ -60,7 +60,7 @@ eg. the i18nRead element
 
 #### Defined in
 
-[client/fast-prototyping/components/slate/wrapper.tsx:288](https://github.com/onzag/itemize/blob/5c2808d3/client/fast-prototyping/components/slate/wrapper.tsx#L288)
+[client/fast-prototyping/components/slate/wrapper.tsx:328](https://github.com/onzag/itemize/blob/f2db74a5/client/fast-prototyping/components/slate/wrapper.tsx#L328)
 
 ___
 
@@ -70,4 +70,4 @@ ___
 
 #### Defined in
 
-[client/fast-prototyping/components/slate/wrapper.tsx:278](https://github.com/onzag/itemize/blob/5c2808d3/client/fast-prototyping/components/slate/wrapper.tsx#L278)
+[client/fast-prototyping/components/slate/wrapper.tsx:318](https://github.com/onzag/itemize/blob/f2db74a5/client/fast-prototyping/components/slate/wrapper.tsx#L318)

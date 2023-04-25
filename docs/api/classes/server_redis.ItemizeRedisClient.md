@@ -22,6 +22,12 @@ eg. if it loses connection, so it avoids queueing
 - [expire](server_redis.ItemizeRedisClient.md#expire)
 - [flushall](server_redis.ItemizeRedisClient.md#flushall)
 - [get](server_redis.ItemizeRedisClient.md#get)
+- [hdel](server_redis.ItemizeRedisClient.md#hdel)
+- [hexists](server_redis.ItemizeRedisClient.md#hexists)
+- [hget](server_redis.ItemizeRedisClient.md#hget)
+- [hgetall](server_redis.ItemizeRedisClient.md#hgetall)
+- [hset](server_redis.ItemizeRedisClient.md#hset)
+- [isConnected](server_redis.ItemizeRedisClient.md#isconnected)
 - [isReconnecting](server_redis.ItemizeRedisClient.md#isreconnecting)
 - [name](server_redis.ItemizeRedisClient.md#name)
 - [redisClient](server_redis.ItemizeRedisClient.md#redisclient)
@@ -49,7 +55,7 @@ Construct a new itemize redis client
 
 #### Defined in
 
-[server/redis.ts:35](https://github.com/onzag/itemize/blob/5c2808d3/server/redis.ts#L35)
+[server/redis.ts:41](https://github.com/onzag/itemize/blob/f2db74a5/server/redis.ts#L41)
 
 ## Properties
 
@@ -73,7 +79,7 @@ Construct a new itemize redis client
 
 #### Defined in
 
-[server/redis.ts:25](https://github.com/onzag/itemize/blob/5c2808d3/server/redis.ts#L25)
+[server/redis.ts:29](https://github.com/onzag/itemize/blob/f2db74a5/server/redis.ts#L29)
 
 ___
 
@@ -97,7 +103,7 @@ ___
 
 #### Defined in
 
-[server/redis.ts:28](https://github.com/onzag/itemize/blob/5c2808d3/server/redis.ts#L28)
+[server/redis.ts:33](https://github.com/onzag/itemize/blob/f2db74a5/server/redis.ts#L33)
 
 ___
 
@@ -122,7 +128,7 @@ ___
 
 #### Defined in
 
-[server/redis.ts:27](https://github.com/onzag/itemize/blob/5c2808d3/server/redis.ts#L27)
+[server/redis.ts:32](https://github.com/onzag/itemize/blob/f2db74a5/server/redis.ts#L32)
 
 ___
 
@@ -140,7 +146,7 @@ ___
 
 #### Defined in
 
-[server/redis.ts:26](https://github.com/onzag/itemize/blob/5c2808d3/server/redis.ts#L26)
+[server/redis.ts:31](https://github.com/onzag/itemize/blob/f2db74a5/server/redis.ts#L31)
 
 ___
 
@@ -164,7 +170,142 @@ ___
 
 #### Defined in
 
-[server/redis.ts:23](https://github.com/onzag/itemize/blob/5c2808d3/server/redis.ts#L23)
+[server/redis.ts:24](https://github.com/onzag/itemize/blob/f2db74a5/server/redis.ts#L24)
+
+___
+
+### hdel
+
+• **hdel**: (`tkey`: `string`, `key`: `string`) => `Promise`<`void`\>
+
+#### Type declaration
+
+▸ (`tkey`, `key`): `Promise`<`void`\>
+
+##### Parameters
+
+| Name | Type |
+| :------ | :------ |
+| `tkey` | `string` |
+| `key` | `string` |
+
+##### Returns
+
+`Promise`<`void`\>
+
+#### Defined in
+
+[server/redis.ts:30](https://github.com/onzag/itemize/blob/f2db74a5/server/redis.ts#L30)
+
+___
+
+### hexists
+
+• **hexists**: (`tkey`: `string`, `key`: `string`) => `Promise`<`number`\>
+
+#### Type declaration
+
+▸ (`tkey`, `key`): `Promise`<`number`\>
+
+##### Parameters
+
+| Name | Type |
+| :------ | :------ |
+| `tkey` | `string` |
+| `key` | `string` |
+
+##### Returns
+
+`Promise`<`number`\>
+
+#### Defined in
+
+[server/redis.ts:34](https://github.com/onzag/itemize/blob/f2db74a5/server/redis.ts#L34)
+
+___
+
+### hget
+
+• **hget**: (`tkey`: `string`, `key`: `string`) => `Promise`<`string`\>
+
+#### Type declaration
+
+▸ (`tkey`, `key`): `Promise`<`string`\>
+
+##### Parameters
+
+| Name | Type |
+| :------ | :------ |
+| `tkey` | `string` |
+| `key` | `string` |
+
+##### Returns
+
+`Promise`<`string`\>
+
+#### Defined in
+
+[server/redis.ts:25](https://github.com/onzag/itemize/blob/f2db74a5/server/redis.ts#L25)
+
+___
+
+### hgetall
+
+• **hgetall**: (`tkey`: `string`) => `Promise`<{ [k: string]: `string`;  }\>
+
+#### Type declaration
+
+▸ (`tkey`): `Promise`<{ [k: string]: `string`;  }\>
+
+##### Parameters
+
+| Name | Type |
+| :------ | :------ |
+| `tkey` | `string` |
+
+##### Returns
+
+`Promise`<{ [k: string]: `string`;  }\>
+
+#### Defined in
+
+[server/redis.ts:26](https://github.com/onzag/itemize/blob/f2db74a5/server/redis.ts#L26)
+
+___
+
+### hset
+
+• **hset**: (`tkey`: `string`, `key`: `string`, `value`: `string`) => `Promise`<`void`\>
+
+#### Type declaration
+
+▸ (`tkey`, `key`, `value`): `Promise`<`void`\>
+
+##### Parameters
+
+| Name | Type |
+| :------ | :------ |
+| `tkey` | `string` |
+| `key` | `string` |
+| `value` | `string` |
+
+##### Returns
+
+`Promise`<`void`\>
+
+#### Defined in
+
+[server/redis.ts:28](https://github.com/onzag/itemize/blob/f2db74a5/server/redis.ts#L28)
+
+___
+
+### isConnected
+
+• `Private` **isConnected**: `boolean` = `false`
+
+#### Defined in
+
+[server/redis.ts:20](https://github.com/onzag/itemize/blob/f2db74a5/server/redis.ts#L20)
 
 ___
 
@@ -174,7 +315,7 @@ ___
 
 #### Defined in
 
-[server/redis.ts:19](https://github.com/onzag/itemize/blob/5c2808d3/server/redis.ts#L19)
+[server/redis.ts:19](https://github.com/onzag/itemize/blob/f2db74a5/server/redis.ts#L19)
 
 ___
 
@@ -184,7 +325,7 @@ ___
 
 #### Defined in
 
-[server/redis.ts:21](https://github.com/onzag/itemize/blob/5c2808d3/server/redis.ts#L21)
+[server/redis.ts:22](https://github.com/onzag/itemize/blob/f2db74a5/server/redis.ts#L22)
 
 ___
 
@@ -194,7 +335,7 @@ ___
 
 #### Defined in
 
-[server/redis.ts:22](https://github.com/onzag/itemize/blob/5c2808d3/server/redis.ts#L22)
+[server/redis.ts:23](https://github.com/onzag/itemize/blob/f2db74a5/server/redis.ts#L23)
 
 ___
 
@@ -219,7 +360,7 @@ ___
 
 #### Defined in
 
-[server/redis.ts:24](https://github.com/onzag/itemize/blob/5c2808d3/server/redis.ts#L24)
+[server/redis.ts:27](https://github.com/onzag/itemize/blob/f2db74a5/server/redis.ts#L27)
 
 ## Methods
 
@@ -255,7 +396,7 @@ Just wrap the standard promise function so that it won't execute when redis is d
 
 #### Defined in
 
-[server/redis.ts:124](https://github.com/onzag/itemize/blob/5c2808d3/server/redis.ts#L124)
+[server/redis.ts:153](https://github.com/onzag/itemize/blob/f2db74a5/server/redis.ts#L153)
 
 ___
 
@@ -280,4 +421,4 @@ to take on connections
 
 #### Defined in
 
-[server/redis.ts:56](https://github.com/onzag/itemize/blob/5c2808d3/server/redis.ts#L56)
+[server/redis.ts:67](https://github.com/onzag/itemize/blob/f2db74a5/server/redis.ts#L67)

@@ -14,7 +14,7 @@ This provides the rest endpoints for the itemize app
 
 ### default
 
-▸ **default**(`appData`): `Router`
+▸ **default**(`appData`): `Object`
 
 this function contains and build all the rest services
 by returning a router that holds them inside the
@@ -28,8 +28,13 @@ by returning a router that holds them inside the
 
 #### Returns
 
-`Router`
+`Object`
+
+| Name | Type |
+| :------ | :------ |
+| `reprocessedCache` | `Object` |
+| `router` | `Router` |
 
 #### Defined in
 
-[server/rest.ts:24](https://github.com/onzag/itemize/blob/5c2808d3/server/rest.ts#L24)
+[server/rest.ts:28](https://github.com/onzag/itemize/blob/f2db74a5/server/rest.ts#L28)

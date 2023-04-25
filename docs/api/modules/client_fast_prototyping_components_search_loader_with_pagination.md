@@ -20,8 +20,6 @@ Has a search loader section and provides its own pagination component that is to
 already handlers to update the navigation page, it uses the LocationStateReader in order to keep its
 page so it means that it builds history in it
 
-TODO support searchId to keep navigation in sync
-
 #### Parameters
 
 | Name | Type | Description |
@@ -34,4 +32,4 @@ TODO support searchId to keep navigation in sync
 
 #### Defined in
 
-[client/fast-prototyping/components/search-loader-with-pagination.tsx:48](https://github.com/onzag/itemize/blob/5c2808d3/client/fast-prototyping/components/search-loader-with-pagination.tsx#L48)
+[client/fast-prototyping/components/search-loader-with-pagination.tsx:94](https://github.com/onzag/itemize/blob/f2db74a5/client/fast-prototyping/components/search-loader-with-pagination.tsx#L94)

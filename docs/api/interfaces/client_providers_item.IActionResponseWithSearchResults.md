@@ -16,6 +16,7 @@ A response given by search
 
 ### Properties
 
+- [cached](client_providers_item.IActionResponseWithSearchResults.md#cached)
 - [count](client_providers_item.IActionResponseWithSearchResults.md#count)
 - [error](client_providers_item.IActionResponseWithSearchResults.md#error)
 - [limit](client_providers_item.IActionResponseWithSearchResults.md#limit)
@@ -26,13 +27,23 @@ A response given by search
 
 ## Properties
 
+### cached
+
+• **cached**: `boolean`
+
+#### Defined in
+
+[client/providers/item.tsx:176](https://github.com/onzag/itemize/blob/f2db74a5/client/providers/item.tsx#L176)
+
+___
+
 ### count
 
 • **count**: `number`
 
 #### Defined in
 
-[client/providers/item.tsx:182](https://github.com/onzag/itemize/blob/5c2808d3/client/providers/item.tsx#L182)
+[client/providers/item.tsx:173](https://github.com/onzag/itemize/blob/f2db74a5/client/providers/item.tsx#L173)
 
 ___
 
@@ -46,7 +57,7 @@ ___
 
 #### Defined in
 
-[client/providers/item.tsx:152](https://github.com/onzag/itemize/blob/5c2808d3/client/providers/item.tsx#L152)
+[client/providers/item.tsx:141](https://github.com/onzag/itemize/blob/f2db74a5/client/providers/item.tsx#L141)
 
 ___
 
@@ -56,7 +67,7 @@ ___
 
 #### Defined in
 
-[client/providers/item.tsx:183](https://github.com/onzag/itemize/blob/5c2808d3/client/providers/item.tsx#L183)
+[client/providers/item.tsx:174](https://github.com/onzag/itemize/blob/f2db74a5/client/providers/item.tsx#L174)
 
 ___
 
@@ -66,7 +77,7 @@ ___
 
 #### Defined in
 
-[client/providers/item.tsx:184](https://github.com/onzag/itemize/blob/5c2808d3/client/providers/item.tsx#L184)
+[client/providers/item.tsx:175](https://github.com/onzag/itemize/blob/f2db74a5/client/providers/item.tsx#L175)
 
 ___
 
@@ -76,7 +87,7 @@ ___
 
 #### Defined in
 
-[client/providers/item.tsx:180](https://github.com/onzag/itemize/blob/5c2808d3/client/providers/item.tsx#L180)
+[client/providers/item.tsx:171](https://github.com/onzag/itemize/blob/f2db74a5/client/providers/item.tsx#L171)
 
 ___
 
@@ -86,7 +97,7 @@ ___
 
 #### Defined in
 
-[client/providers/item.tsx:181](https://github.com/onzag/itemize/blob/5c2808d3/client/providers/item.tsx#L181)
+[client/providers/item.tsx:172](https://github.com/onzag/itemize/blob/f2db74a5/client/providers/item.tsx#L172)
 
 ___
 
@@ -96,4 +107,4 @@ ___
 
 #### Defined in
 
-[client/providers/item.tsx:179](https://github.com/onzag/itemize/blob/5c2808d3/client/providers/item.tsx#L179)
+[client/providers/item.tsx:170](https://github.com/onzag/itemize/blob/f2db74a5/client/providers/item.tsx#L170)

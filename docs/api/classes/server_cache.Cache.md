@@ -20,6 +20,7 @@ all the servers
 - [appData](server_cache.Cache.md#appdata)
 - [databaseConnection](server_cache.Cache.md#databaseconnection)
 - [domain](server_cache.Cache.md#domain)
+- [elastic](server_cache.Cache.md#elastic)
 - [listener](server_cache.Cache.md#listener)
 - [memoryCache](server_cache.Cache.md#memorycache)
 - [redisClient](server_cache.Cache.md#redisclient)
@@ -58,7 +59,7 @@ all the servers
 
 ### constructor
 
-• **new Cache**(`redisClient`, `databaseConnection`, `sensitiveConfig`, `storageClients`, `domain`, `root`, `initialServerData`)
+• **new Cache**(`redisClient`, `databaseConnection`, `elastic`, `sensitiveConfig`, `storageClients`, `domain`, `root`, `initialServerData`)
 
 Builds a new cache instance, before the cache is ready
 it needs to be able to access the listener as well, but due
@@ -71,6 +72,7 @@ it is instantiaded by te listener at the same time
 | :------ | :------ | :------ |
 | `redisClient` | [`ItemizeRedisClient`](server_redis.ItemizeRedisClient.md) | the redis client that is used for storing values |
 | `databaseConnection` | [`DatabaseConnection`](database.DatabaseConnection.md) | - |
+| `elastic` | [`ItemizeElasticClient`](server_elastic.ItemizeElasticClient.md) | - |
 | `sensitiveConfig` | [`ISensitiveConfigRawJSONDataType`](../interfaces/config.ISensitiveConfigRawJSONDataType.md) | - |
 | `storageClients` | [`IStorageProvidersObject`](../interfaces/server_services_base_StorageProvider.IStorageProvidersObject.md) | - |
 | `domain` | `string` | - |
@@ -79,7 +81,7 @@ it is instantiaded by te listener at the same time
 
 #### Defined in
 
-[server/cache.ts:80](https://github.com/onzag/itemize/blob/5c2808d3/server/cache.ts#L80)
+[server/cache.ts:86](https://github.com/onzag/itemize/blob/f2db74a5/server/cache.ts#L86)
 
 ## Properties
 
@@ -89,7 +91,7 @@ it is instantiaded by te listener at the same time
 
 #### Defined in
 
-[server/cache.ts:69](https://github.com/onzag/itemize/blob/5c2808d3/server/cache.ts#L69)
+[server/cache.ts:75](https://github.com/onzag/itemize/blob/f2db74a5/server/cache.ts#L75)
 
 ___
 
@@ -99,7 +101,7 @@ ___
 
 #### Defined in
 
-[server/cache.ts:57](https://github.com/onzag/itemize/blob/5c2808d3/server/cache.ts#L57)
+[server/cache.ts:62](https://github.com/onzag/itemize/blob/f2db74a5/server/cache.ts#L62)
 
 ___
 
@@ -109,7 +111,17 @@ ___
 
 #### Defined in
 
-[server/cache.ts:58](https://github.com/onzag/itemize/blob/5c2808d3/server/cache.ts#L58)
+[server/cache.ts:64](https://github.com/onzag/itemize/blob/f2db74a5/server/cache.ts#L64)
+
+___
+
+### elastic
+
+• `Private` **elastic**: [`ItemizeElasticClient`](server_elastic.ItemizeElasticClient.md)
+
+#### Defined in
+
+[server/cache.ts:63](https://github.com/onzag/itemize/blob/f2db74a5/server/cache.ts#L63)
 
 ___
 
@@ -119,7 +131,7 @@ ___
 
 #### Defined in
 
-[server/cache.ts:62](https://github.com/onzag/itemize/blob/5c2808d3/server/cache.ts#L62)
+[server/cache.ts:68](https://github.com/onzag/itemize/blob/f2db74a5/server/cache.ts#L68)
 
 ___
 
@@ -133,7 +145,7 @@ ___
 
 #### Defined in
 
-[server/cache.ts:64](https://github.com/onzag/itemize/blob/5c2808d3/server/cache.ts#L64)
+[server/cache.ts:70](https://github.com/onzag/itemize/blob/f2db74a5/server/cache.ts#L70)
 
 ___
 
@@ -143,7 +155,7 @@ ___
 
 #### Defined in
 
-[server/cache.ts:56](https://github.com/onzag/itemize/blob/5c2808d3/server/cache.ts#L56)
+[server/cache.ts:61](https://github.com/onzag/itemize/blob/f2db74a5/server/cache.ts#L61)
 
 ___
 
@@ -153,7 +165,7 @@ ___
 
 #### Defined in
 
-[server/cache.ts:60](https://github.com/onzag/itemize/blob/5c2808d3/server/cache.ts#L60)
+[server/cache.ts:66](https://github.com/onzag/itemize/blob/f2db74a5/server/cache.ts#L66)
 
 ___
 
@@ -163,7 +175,7 @@ ___
 
 #### Defined in
 
-[server/cache.ts:63](https://github.com/onzag/itemize/blob/5c2808d3/server/cache.ts#L63)
+[server/cache.ts:69](https://github.com/onzag/itemize/blob/f2db74a5/server/cache.ts#L69)
 
 ___
 
@@ -173,7 +185,7 @@ ___
 
 #### Defined in
 
-[server/cache.ts:61](https://github.com/onzag/itemize/blob/5c2808d3/server/cache.ts#L61)
+[server/cache.ts:67](https://github.com/onzag/itemize/blob/f2db74a5/server/cache.ts#L67)
 
 ___
 
@@ -183,7 +195,7 @@ ___
 
 #### Defined in
 
-[server/cache.ts:59](https://github.com/onzag/itemize/blob/5c2808d3/server/cache.ts#L59)
+[server/cache.ts:65](https://github.com/onzag/itemize/blob/f2db74a5/server/cache.ts#L65)
 
 ## Methods
 
@@ -210,7 +222,7 @@ a simple boolean
 
 #### Defined in
 
-[server/cache.ts:1477](https://github.com/onzag/itemize/blob/5c2808d3/server/cache.ts#L1477)
+[server/cache.ts:2161](https://github.com/onzag/itemize/blob/f2db74a5/server/cache.ts#L2161)
 
 ___
 
@@ -236,7 +248,7 @@ a list of modules
 
 #### Defined in
 
-[server/cache.ts:1493](https://github.com/onzag/itemize/blob/5c2808d3/server/cache.ts#L1493)
+[server/cache.ts:2177](https://github.com/onzag/itemize/blob/f2db74a5/server/cache.ts#L2177)
 
 ___
 
@@ -261,7 +273,7 @@ item definition value
 
 #### Defined in
 
-[server/cache.ts:1523](https://github.com/onzag/itemize/blob/5c2808d3/server/cache.ts#L1523)
+[server/cache.ts:2207](https://github.com/onzag/itemize/blob/f2db74a5/server/cache.ts#L2207)
 
 ___
 
@@ -286,7 +298,7 @@ forces a cached value for a given item definition table in an id and version
 
 #### Defined in
 
-[server/cache.ts:193](https://github.com/onzag/itemize/blob/5c2808d3/server/cache.ts#L193)
+[server/cache.ts:226](https://github.com/onzag/itemize/blob/f2db74a5/server/cache.ts#L226)
 
 ___
 
@@ -316,7 +328,7 @@ a promise with the value
 
 #### Defined in
 
-[server/cache.ts:113](https://github.com/onzag/itemize/blob/5c2808d3/server/cache.ts#L113)
+[server/cache.ts:125](https://github.com/onzag/itemize/blob/f2db74a5/server/cache.ts#L125)
 
 ___
 
@@ -332,7 +344,7 @@ Provides the current server data
 
 #### Defined in
 
-[server/cache.ts:2165](https://github.com/onzag/itemize/blob/5c2808d3/server/cache.ts#L2165)
+[server/cache.ts:3019](https://github.com/onzag/itemize/blob/f2db74a5/server/cache.ts#L3019)
 
 ___
 
@@ -360,7 +372,7 @@ a void promise when done
 
 #### Defined in
 
-[server/cache.ts:2189](https://github.com/onzag/itemize/blob/5c2808d3/server/cache.ts#L2189)
+[server/cache.ts:3048](https://github.com/onzag/itemize/blob/f2db74a5/server/cache.ts#L3048)
 
 ___
 
@@ -386,7 +398,7 @@ manually fetched
 
 #### Defined in
 
-[server/cache.ts:2257](https://github.com/onzag/itemize/blob/5c2808d3/server/cache.ts#L2257)
+[server/cache.ts:3117](https://github.com/onzag/itemize/blob/f2db74a5/server/cache.ts#L3117)
 
 ___
 
@@ -408,7 +420,7 @@ This function is called once new server data was informed by a redis event
 
 #### Defined in
 
-[server/cache.ts:2173](https://github.com/onzag/itemize/blob/5c2808d3/server/cache.ts#L2173)
+[server/cache.ts:3027](https://github.com/onzag/itemize/blob/f2db74a5/server/cache.ts#L3027)
 
 ___
 
@@ -430,13 +442,13 @@ Resets the expiration clock of a given identifier
 
 #### Defined in
 
-[server/cache.ts:172](https://github.com/onzag/itemize/blob/5c2808d3/server/cache.ts#L172)
+[server/cache.ts:197](https://github.com/onzag/itemize/blob/f2db74a5/server/cache.ts#L197)
 
 ___
 
 ### requestCopy
 
-▸ **requestCopy**(`item`, `id`, `version`, `targetId`, `targetVersion`, `targetContainerId?`, `targetCreatedBy?`, `targetParent?`, `currentRawValueSQL?`, `options?`): `Promise`<[`ISQLTableRowValue`](../interfaces/base_Root_sql.ISQLTableRowValue.md)\>
+▸ **requestCopy**(`item`, `id`, `version`, `targetId`, `targetVersion`, `targetContainerId?`, `targetCreatedBy?`, `targetParent?`, `targetOverrides?`, `currentRawValueSQL?`, `options?`): `Promise`<[`ISQLTableRowValue`](../interfaces/base_Root_sql.ISQLTableRowValue.md)\>
 
 Given an item that needs to be copied it will create a new copy for it
 with all its files and everything
@@ -448,7 +460,7 @@ with all its files and everything
 | `item` | `string` \| [`default`](base_Root_Module_ItemDefinition.default.md) | the item to copy from |
 | `id` | `string` | the id to copy from |
 | `version` | `string` | the version to copy from |
-| `targetId` | `string` | the target id to copy at |
+| `targetId` | `string` | the target id to copy at (or null to create one) |
 | `targetVersion` | `string` | the target version to copy at |
 | `targetContainerId?` | `string` | the target container id to use (if not specified will use the same) |
 | `targetCreatedBy?` | `string` | the target creator to use (if not specified will use the same) |
@@ -456,10 +468,14 @@ with all its files and everything
 | `targetParent.id` | `string` | - |
 | `targetParent.type` | `string` | - |
 | `targetParent.version` | `string` | - |
+| `targetOverrides?` | [`ISQLTableRowValue`](../interfaces/base_Root_sql.ISQLTableRowValue.md) | - |
 | `currentRawValueSQL?` | [`ISQLTableRowValue`](../interfaces/base_Root_sql.ISQLTableRowValue.md) | the current known value for this source item (if not specified will find it) |
 | `options` | `Object` | some options for side effects as this calls the request creation function |
+| `options.ifAlreadyExistsReturn?` | ``"null"`` \| ``"current"`` | - |
+| `options.ignoreAlreadyExists?` | `boolean` | - |
 | `options.ignorePreSideEffects?` | `boolean` | - |
 | `options.ignoreSideEffects?` | `boolean` | - |
+| `options.ifAlreadyExistsCall?` | (`v`: [`ISQLTableRowValue`](../interfaces/base_Root_sql.ISQLTableRowValue.md)) => `void` | - |
 
 #### Returns
 
@@ -467,13 +483,13 @@ with all its files and everything
 
 #### Defined in
 
-[server/cache.ts:773](https://github.com/onzag/itemize/blob/5c2808d3/server/cache.ts#L773)
+[server/cache.ts:1257](https://github.com/onzag/itemize/blob/f2db74a5/server/cache.ts#L1257)
 
 ___
 
 ### requestCreation
 
-▸ **requestCreation**(`itemDefinition`, `forId`, `version`, `value`, `createdBy`, `dictionary`, `containerId`, `parent`, `listenerUUID`, `options?`): `Promise`<[`ISQLTableRowValue`](../interfaces/base_Root_sql.ISQLTableRowValue.md)\>
+▸ **requestCreation**(`itemDefinition`, `forId`, `version`, `value`, `createdBy`, `language`, `dictionary`, `containerId`, `parent`, `listenerUUID`, `options?`): `Promise`<[`ISQLTableRowValue`](../interfaces/base_Root_sql.ISQLTableRowValue.md)\>
 
 Request the creation of a new item definition value for an specific item definition
 
@@ -486,6 +502,7 @@ Request the creation of a new item definition value for an specific item definit
 | `version` | `string` | an optional (or null) version for the item definition |
 | `value` | [`IGQLValue`](../interfaces/gql_querier.IGQLValue.md) \| [`ISQLTableRowValue`](../interfaces/base_Root_sql.ISQLTableRowValue.md) \| [`IGQLArgs`](../interfaces/gql_querier.IGQLArgs.md) | the value to create, the value can be partial |
 | `createdBy` | `string` | the creator of this item, it can be null, in which case the creator would be left unspecified |
+| `language` | `string` | - |
 | `dictionary` | `string` | the dictionary to use, this can be left null as well when no text field is present but it is recommended to be set, represents a postgresql dictionary for building text indexes |
 | `containerId` | `string` | - |
 | `parent` | `Object` | the parent of this item, can be left null, note that no checks for parenting are done it will just execute |
@@ -494,8 +511,11 @@ Request the creation of a new item definition value for an specific item definit
 | `parent.version` | `string` | the parent version |
 | `listenerUUID` | `string` | the listener uuid |
 | `options` | `Object` | - |
+| `options.ifAlreadyExistsReturn?` | ``"null"`` \| ``"current"`` | - |
+| `options.ignoreAlreadyExists?` | `boolean` | - |
 | `options.ignorePreSideEffects?` | `boolean` | - |
 | `options.ignoreSideEffects?` | `boolean` | - |
+| `options.ifAlreadyExistsCall?` | (`v`: [`ISQLTableRowValue`](../interfaces/base_Root_sql.ISQLTableRowValue.md)) => `void` | - |
 
 #### Returns
 
@@ -505,7 +525,7 @@ a total sql combined row value that can be converted into grapqhl
 
 #### Defined in
 
-[server/cache.ts:348](https://github.com/onzag/itemize/blob/5c2808d3/server/cache.ts#L348)
+[server/cache.ts:785](https://github.com/onzag/itemize/blob/f2db74a5/server/cache.ts#L785)
 
 ___
 
@@ -534,7 +554,7 @@ Request the deletition of an item definition value
 
 #### Defined in
 
-[server/cache.ts:1629](https://github.com/onzag/itemize/blob/5c2808d3/server/cache.ts#L1629)
+[server/cache.ts:2321](https://github.com/onzag/itemize/blob/f2db74a5/server/cache.ts#L2321)
 
 ___
 
@@ -559,7 +579,7 @@ a list of whole sql combined table row values
 
 #### Defined in
 
-[server/cache.ts:2154](https://github.com/onzag/itemize/blob/5c2808d3/server/cache.ts#L2154)
+[server/cache.ts:3008](https://github.com/onzag/itemize/blob/f2db74a5/server/cache.ts#L3008)
 
 ___
 
@@ -585,13 +605,13 @@ these tokens for redirected logins
 
 #### Defined in
 
-[server/cache.ts:2024](https://github.com/onzag/itemize/blob/5c2808d3/server/cache.ts#L2024)
+[server/cache.ts:2866](https://github.com/onzag/itemize/blob/f2db74a5/server/cache.ts#L2866)
 
 ___
 
 ### requestUpdate
 
-▸ **requestUpdate**(`item`, `id`, `version`, `update`, `currentSQLValue`, `currentValue`, `editedBy`, `dictionary`, `containerId`, `listenerUUID`, `reparent`, `blocking`, `options?`): `Promise`<[`ISQLTableRowValue`](../interfaces/base_Root_sql.ISQLTableRowValue.md)\>
+▸ **requestUpdate**(`item`, `id`, `version`, `update`, `currentSQLValue`, `currentValue`, `editedBy`, `language`, `dictionary`, `containerId`, `listenerUUID`, `reparent`, `blocking`, `options?`): `Promise`<[`ISQLTableRowValue`](../interfaces/base_Root_sql.ISQLTableRowValue.md)\>
 
 Requests an update for an item definition where new values are set for this existent item
 definition value, these are taken as instructions and no checks are done on it
@@ -607,6 +627,7 @@ definition value, these are taken as instructions and no checks are done on it
 | `currentSQLValue` | [`ISQLTableRowValue`](../interfaces/base_Root_sql.ISQLTableRowValue.md) | the same value but as the raw row |
 | `currentValue` | [`IGQLValue`](../interfaces/gql_querier.IGQLValue.md) | a current value as graphql, the current value can be requested from the cache itself, and then converted into graphql, but this is expensive, while for the edit process this is done anyway because of checks, if you are running this manually you might not need to pass these the reason current value are necessary is in order to perform a diffing operation and remove orphan files if your update process doesn't leave orphan files, as in you are not updating any file field, you can pass null to the current value |
 | `editedBy` | `string` | the editor id, this causes the edited_at and edited_by field to change, however you can pass null to this value in order to mark it as computer edited rather than edited by an user |
+| `language` | `string` | - |
 | `dictionary` | `string` | the dictionary to use, just like the current value this is only relevant if you are updating full text search enabled fields, if that is not the case, you can pass null to the dictionary, but be careful |
 | `containerId` | `string` | the container id where this item is stored, please when using update ensure to select the same container that the item is already created otherwise this will break the uploads and make them unreachable if you are passing no uploads it's safe to leave as null |
 | `listenerUUID` | `string` | the listener uuid, from the listener, this ensures that the executor of this action doesn't get a notification, you can pass null for this if this is a computer operation and let every listener to be informed while it doesn't hurt to keep listenerUUID as null, it is expensive to send messages when they will be of no use the listener uuid ensures only those that needs updates will get them |
@@ -630,13 +651,13 @@ a total combined table row value that can be converted into graphql
 
 #### Defined in
 
-[server/cache.ts:973](https://github.com/onzag/itemize/blob/5c2808d3/server/cache.ts#L973)
+[server/cache.ts:1485](https://github.com/onzag/itemize/blob/f2db74a5/server/cache.ts#L1485)
 
 ___
 
 ### requestUpdateSimple
 
-▸ **requestUpdateSimple**(`item`, `id`, `version`, `update`, `dictionary`, `currentRawValueSQL?`, `options?`): `Promise`<[`ISQLTableRowValue`](../interfaces/base_Root_sql.ISQLTableRowValue.md)\>
+▸ **requestUpdateSimple**(`item`, `id`, `version`, `update`, `language`, `dictionary`, `currentRawValueSQL?`, `options?`): `Promise`<[`ISQLTableRowValue`](../interfaces/base_Root_sql.ISQLTableRowValue.md)\>
 
 Requests an update for an item definition in a simple way
 this might have more overhead than the normal request update
@@ -649,6 +670,7 @@ this might have more overhead than the normal request update
 | `id` | `string` |
 | `version` | `string` |
 | `update` | [`IGQLArgs`](../interfaces/gql_querier.IGQLArgs.md) |
+| `language` | `string` |
 | `dictionary` | `string` |
 | `currentRawValueSQL?` | [`ISQLTableRowValue`](../interfaces/base_Root_sql.ISQLTableRowValue.md) |
 | `options?` | `Object` |
@@ -661,7 +683,7 @@ this might have more overhead than the normal request update
 
 #### Defined in
 
-[server/cache.ts:906](https://github.com/onzag/itemize/blob/5c2808d3/server/cache.ts#L906)
+[server/cache.ts:1415](https://github.com/onzag/itemize/blob/f2db74a5/server/cache.ts#L1415)
 
 ___
 
@@ -690,7 +712,7 @@ a whole sql value that can be converted into graphql if necessary
 
 #### Defined in
 
-[server/cache.ts:2058](https://github.com/onzag/itemize/blob/5c2808d3/server/cache.ts#L2058)
+[server/cache.ts:2900](https://github.com/onzag/itemize/blob/f2db74a5/server/cache.ts#L2900)
 
 ___
 
@@ -713,7 +735,7 @@ where this app is contained
 
 #### Defined in
 
-[server/cache.ts:2266](https://github.com/onzag/itemize/blob/5c2808d3/server/cache.ts#L2266)
+[server/cache.ts:3126](https://github.com/onzag/itemize/blob/f2db74a5/server/cache.ts#L3126)
 
 ___
 
@@ -738,7 +760,7 @@ comes from redis
 
 #### Defined in
 
-[server/cache.ts:104](https://github.com/onzag/itemize/blob/5c2808d3/server/cache.ts#L104)
+[server/cache.ts:116](https://github.com/onzag/itemize/blob/f2db74a5/server/cache.ts#L116)
 
 ___
 
@@ -759,13 +781,13 @@ ___
 
 #### Defined in
 
-[server/cache.ts:150](https://github.com/onzag/itemize/blob/5c2808d3/server/cache.ts#L150)
+[server/cache.ts:170](https://github.com/onzag/itemize/blob/f2db74a5/server/cache.ts#L170)
 
 ___
 
 ### triggerSearchListenersFor
 
-▸ **triggerSearchListenersFor**(`itemDefinition`, `createdBy`, `parent`, `record`, `location`, `doNotTriggerOwnedEventsBecauseItsReparent?`): `void`
+▸ **triggerSearchListenersFor**(`itemDefinition`, `createdBy`, `newParent`, `originalParent`, `propertyMap`, `record`, `location`): `void`
 
 #### Parameters
 
@@ -773,13 +795,17 @@ ___
 | :------ | :------ |
 | `itemDefinition` | [`default`](base_Root_Module_ItemDefinition.default.md) |
 | `createdBy` | `string` |
-| `parent` | `Object` |
-| `parent.id` | `string` |
-| `parent.type` | `string` |
-| `parent.version` | `string` |
+| `newParent` | `Object` |
+| `newParent.id` | `string` |
+| `newParent.type` | `string` |
+| `newParent.version` | `string` |
+| `originalParent` | `Object` |
+| `originalParent.id` | `string` |
+| `originalParent.type` | `string` |
+| `originalParent.version` | `string` |
+| `propertyMap` | `IPropertyMapElement`[] |
 | `record` | [`IGQLSearchRecord`](../interfaces/gql_querier.IGQLSearchRecord.md) |
-| `location` | ``"modified"`` \| ``"new"`` \| ``"lost"`` |
-| `doNotTriggerOwnedEventsBecauseItsReparent?` | `boolean` |
+| `location` | ``"modified"`` \| ``"deleted"`` \| ``"new"`` |
 
 #### Returns
 
@@ -787,7 +813,7 @@ ___
 
 #### Defined in
 
-[server/cache.ts:210](https://github.com/onzag/itemize/blob/5c2808d3/server/cache.ts#L210)
+[server/cache.ts:243](https://github.com/onzag/itemize/blob/f2db74a5/server/cache.ts#L243)
 
 ___
 
@@ -805,4 +831,4 @@ the cache is wiped by the cluster manager which handles the cache
 
 #### Defined in
 
-[server/cache.ts:2237](https://github.com/onzag/itemize/blob/5c2808d3/server/cache.ts#L2237)
+[server/cache.ts:3097](https://github.com/onzag/itemize/blob/f2db74a5/server/cache.ts#L3097)

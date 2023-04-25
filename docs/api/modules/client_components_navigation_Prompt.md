@@ -3,6 +3,7 @@
 # Module: client/components/navigation/Prompt
 
 A navigation prompt that prompts if a condition evaluates to true
+as the navigation tries to change location
 
 ## Table of contents
 
@@ -26,4 +27,4 @@ it needs to consume such component
 
 #### Defined in
 
-[client/components/navigation/Prompt.tsx:18](https://github.com/onzag/itemize/blob/5c2808d3/client/components/navigation/Prompt.tsx#L18)
+[client/components/navigation/Prompt.tsx:19](https://github.com/onzag/itemize/blob/f2db74a5/client/components/navigation/Prompt.tsx#L19)

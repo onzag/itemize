@@ -25,7 +25,7 @@ with the itemize application in the fast prototyping mode
 
 #### Defined in
 
-[client/fast-prototyping/wrappers.tsx:20](https://github.com/onzag/itemize/blob/5c2808d3/client/fast-prototyping/wrappers.tsx#L20)
+[client/fast-prototyping/wrappers.tsx:22](https://github.com/onzag/itemize/blob/f2db74a5/client/fast-prototyping/wrappers.tsx#L22)
 
 ## Functions
 
@@ -51,13 +51,20 @@ For fast prototyping we use material ui, and as such we pass those providers her
 
 #### Defined in
 
-[client/fast-prototyping/wrappers.tsx:53](https://github.com/onzag/itemize/blob/5c2808d3/client/fast-prototyping/wrappers.tsx#L53)
+[client/fast-prototyping/wrappers.tsx:81](https://github.com/onzag/itemize/blob/f2db74a5/client/fast-prototyping/wrappers.tsx#L81)
 
 ___
 
 ### createEmotionCache
 
-▸ **createEmotionCache**(): `EmotionCache`
+▸ **createEmotionCache**(`isRtl`, `useDoubleCache`): `EmotionCache`
+
+#### Parameters
+
+| Name | Type |
+| :------ | :------ |
+| `isRtl` | `boolean` |
+| `useDoubleCache` | `boolean` |
 
 #### Returns
 
@@ -65,7 +72,7 @@ ___
 
 #### Defined in
 
-[client/fast-prototyping/wrappers.tsx:40](https://github.com/onzag/itemize/blob/5c2808d3/client/fast-prototyping/wrappers.tsx#L40)
+[client/fast-prototyping/wrappers.tsx:45](https://github.com/onzag/itemize/blob/f2db74a5/client/fast-prototyping/wrappers.tsx#L45)
 
 ___
 
@@ -93,4 +100,4 @@ need to change according to locale
 
 #### Defined in
 
-[client/fast-prototyping/wrappers.tsx:113](https://github.com/onzag/itemize/blob/5c2808d3/client/fast-prototyping/wrappers.tsx#L113)
+[client/fast-prototyping/wrappers.tsx:110](https://github.com/onzag/itemize/blob/f2db74a5/client/fast-prototyping/wrappers.tsx#L110)

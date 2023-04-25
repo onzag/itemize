@@ -24,6 +24,7 @@
 - [filterAndPrepareGQLValue](server_resolvers_basic.md#filterandpreparegqlvalue)
 - [getDictionary](server_resolvers_basic.md#getdictionary)
 - [retrieveSince](server_resolvers_basic.md#retrievesince)
+- [retrieveUntil](server_resolvers_basic.md#retrieveuntil)
 - [runPolicyCheck](server_resolvers_basic.md#runpolicycheck)
 - [serverSideCheckItemDefinitionAgainst](server_resolvers_basic.md#serversidecheckitemdefinitionagainst)
 - [splitArgsInGraphqlQuery](server_resolvers_basic.md#splitargsingraphqlquery)
@@ -55,7 +56,7 @@ by the graphql resolver
 
 #### Defined in
 
-[server/resolvers/basic.ts:517](https://github.com/onzag/itemize/blob/5c2808d3/server/resolvers/basic.ts#L517)
+[server/resolvers/basic.ts:517](https://github.com/onzag/itemize/blob/f2db74a5/server/resolvers/basic.ts#L517)
 
 ___
 
@@ -80,7 +81,7 @@ defintion allows
 
 #### Defined in
 
-[server/resolvers/basic.ts:469](https://github.com/onzag/itemize/blob/5c2808d3/server/resolvers/basic.ts#L469)
+[server/resolvers/basic.ts:476](https://github.com/onzag/itemize/blob/f2db74a5/server/resolvers/basic.ts#L476)
 
 ___
 
@@ -101,7 +102,7 @@ ___
 
 #### Defined in
 
-[server/resolvers/basic.ts:317](https://github.com/onzag/itemize/blob/5c2808d3/server/resolvers/basic.ts#L317)
+[server/resolvers/basic.ts:324](https://github.com/onzag/itemize/blob/f2db74a5/server/resolvers/basic.ts#L324)
 
 ___
 
@@ -122,7 +123,7 @@ ___
 
 #### Defined in
 
-[server/resolvers/basic.ts:483](https://github.com/onzag/itemize/blob/5c2808d3/server/resolvers/basic.ts#L483)
+[server/resolvers/basic.ts:487](https://github.com/onzag/itemize/blob/f2db74a5/server/resolvers/basic.ts#L487)
 
 ___
 
@@ -146,7 +147,7 @@ this function checks and throws an error if there's such a thing
 
 #### Defined in
 
-[server/resolvers/basic.ts:962](https://github.com/onzag/itemize/blob/5c2808d3/server/resolvers/basic.ts#L962)
+[server/resolvers/basic.ts:924](https://github.com/onzag/itemize/blob/f2db74a5/server/resolvers/basic.ts#L924)
 
 ___
 
@@ -171,7 +172,7 @@ as it was requested
 
 #### Defined in
 
-[server/resolvers/basic.ts:548](https://github.com/onzag/itemize/blob/5c2808d3/server/resolvers/basic.ts#L548)
+[server/resolvers/basic.ts:544](https://github.com/onzag/itemize/blob/f2db74a5/server/resolvers/basic.ts#L544)
 
 ___
 
@@ -192,7 +193,7 @@ ___
 
 #### Defined in
 
-[server/resolvers/basic.ts:666](https://github.com/onzag/itemize/blob/5c2808d3/server/resolvers/basic.ts#L666)
+[server/resolvers/basic.ts:659](https://github.com/onzag/itemize/blob/f2db74a5/server/resolvers/basic.ts#L659)
 
 ___
 
@@ -213,7 +214,7 @@ ___
 
 #### Defined in
 
-[server/resolvers/basic.ts:50](https://github.com/onzag/itemize/blob/5c2808d3/server/resolvers/basic.ts#L50)
+[server/resolvers/basic.ts:45](https://github.com/onzag/itemize/blob/f2db74a5/server/resolvers/basic.ts#L45)
 
 ___
 
@@ -234,7 +235,7 @@ ___
 
 #### Defined in
 
-[server/resolvers/basic.ts:61](https://github.com/onzag/itemize/blob/5c2808d3/server/resolvers/basic.ts#L61)
+[server/resolvers/basic.ts:56](https://github.com/onzag/itemize/blob/f2db74a5/server/resolvers/basic.ts#L56)
 
 ___
 
@@ -248,13 +249,13 @@ ___
 
 #### Defined in
 
-[server/resolvers/basic.ts:57](https://github.com/onzag/itemize/blob/5c2808d3/server/resolvers/basic.ts#L57)
+[server/resolvers/basic.ts:52](https://github.com/onzag/itemize/blob/f2db74a5/server/resolvers/basic.ts#L52)
 
 ___
 
 ### filterAndPrepareGQLValue
 
-▸ **filterAndPrepareGQLValue**(`serverData`, `value`, `requestedFields`, `role`, `userId`, `ownerUserId`, `rolesManager`, `parentModuleOrIdef`): `Promise`<[`IFilteredAndPreparedValueType`](../interfaces/server_resolvers_basic.IFilteredAndPreparedValueType.md)\>
+▸ **filterAndPrepareGQLValue**(`serverData`, `appData`, `value`, `requestedFields`, `role`, `userId`, `ownerUserId`, `rolesManager`, `parentModuleOrIdef`): `Promise`<[`IFilteredAndPreparedValueType`](../interfaces/server_resolvers_basic.IFilteredAndPreparedValueType.md)\>
 
 Filters and prepares a graphql value for output to the rest endpoint
 given the value that has given by the server, the requested fields
@@ -267,6 +268,7 @@ the form comes with the DATA and the externalized fields
 | Name | Type | Description |
 | :------ | :------ | :------ |
 | `serverData` | `any` | - |
+| `appData` | [`IAppDataType`](../interfaces/server.IAppDataType.md) | - |
 | `value` | [`ISQLTableRowValue`](../interfaces/base_Root_sql.ISQLTableRowValue.md) | the value gotten from the sql database |
 | `requestedFields` | [`IGQLRequestFields`](../interfaces/gql_querier.IGQLRequestFields.md) | the requested fields, flattened |
 | `role` | `string` | the role of the user requesting the data |
@@ -281,7 +283,7 @@ the form comes with the DATA and the externalized fields
 
 #### Defined in
 
-[server/resolvers/basic.ts:711](https://github.com/onzag/itemize/blob/5c2808d3/server/resolvers/basic.ts#L711)
+[server/resolvers/basic.ts:704](https://github.com/onzag/itemize/blob/f2db74a5/server/resolvers/basic.ts#L704)
 
 ___
 
@@ -305,7 +307,7 @@ and the language of choice
 
 #### Defined in
 
-[server/resolvers/basic.ts:580](https://github.com/onzag/itemize/blob/5c2808d3/server/resolvers/basic.ts#L580)
+[server/resolvers/basic.ts:576](https://github.com/onzag/itemize/blob/f2db74a5/server/resolvers/basic.ts#L576)
 
 ___
 
@@ -325,7 +327,27 @@ ___
 
 #### Defined in
 
-[server/resolvers/basic.ts:302](https://github.com/onzag/itemize/blob/5c2808d3/server/resolvers/basic.ts#L302)
+[server/resolvers/basic.ts:293](https://github.com/onzag/itemize/blob/f2db74a5/server/resolvers/basic.ts#L293)
+
+___
+
+### retrieveUntil
+
+▸ **retrieveUntil**(`args`): `string`
+
+#### Parameters
+
+| Name | Type |
+| :------ | :------ |
+| `args` | [`IGQLArgs`](../interfaces/gql_querier.IGQLArgs.md) |
+
+#### Returns
+
+`string`
+
+#### Defined in
+
+[server/resolvers/basic.ts:308](https://github.com/onzag/itemize/blob/f2db74a5/server/resolvers/basic.ts#L308)
 
 ___
 
@@ -340,7 +362,7 @@ Runs a policy check on the requested information
 | Name | Type | Description |
 | :------ | :------ | :------ |
 | `arg` | `Object` | - |
-| `arg.cache` | [`Cache`](../classes/server_cache.Cache.md) | the cache instance |
+| `arg.appData` | [`IAppDataType`](../interfaces/server.IAppDataType.md) | - |
 | `arg.gqlArgValue` | [`IGQLValue`](../interfaces/gql_querier.IGQLValue.md) | the arg value given in the arguments from graphql, where the info should be in qualified path names for the policies |
 | `arg.gqlFlattenedRequestedFiels` | `any` | the flattened request fields that have been requested to read |
 | `arg.id` | `string` | the id of that item definition on the database |
@@ -361,7 +383,7 @@ Runs a policy check on the requested information
 
 #### Defined in
 
-[server/resolvers/basic.ts:1039](https://github.com/onzag/itemize/blob/5c2808d3/server/resolvers/basic.ts#L1039)
+[server/resolvers/basic.ts:994](https://github.com/onzag/itemize/blob/f2db74a5/server/resolvers/basic.ts#L994)
 
 ___
 
@@ -392,7 +414,7 @@ you should run itemDefinition.applyValue(gqlArgValue);
 
 #### Defined in
 
-[server/resolvers/basic.ts:811](https://github.com/onzag/itemize/blob/5c2808d3/server/resolvers/basic.ts#L811)
+[server/resolvers/basic.ts:803](https://github.com/onzag/itemize/blob/f2db74a5/server/resolvers/basic.ts#L803)
 
 ___
 
@@ -417,7 +439,7 @@ that are used within the query
 
 #### Defined in
 
-[server/resolvers/basic.ts:993](https://github.com/onzag/itemize/blob/5c2808d3/server/resolvers/basic.ts#L993)
+[server/resolvers/basic.ts:952](https://github.com/onzag/itemize/blob/f2db74a5/server/resolvers/basic.ts#L952)
 
 ___
 
@@ -441,7 +463,7 @@ to store data in
 
 #### Defined in
 
-[server/resolvers/basic.ts:594](https://github.com/onzag/itemize/blob/5c2808d3/server/resolvers/basic.ts#L594)
+[server/resolvers/basic.ts:587](https://github.com/onzag/itemize/blob/f2db74a5/server/resolvers/basic.ts#L587)
 
 ___
 
@@ -461,7 +483,7 @@ ___
 
 #### Defined in
 
-[server/resolvers/basic.ts:73](https://github.com/onzag/itemize/blob/5c2808d3/server/resolvers/basic.ts#L73)
+[server/resolvers/basic.ts:71](https://github.com/onzag/itemize/blob/f2db74a5/server/resolvers/basic.ts#L71)
 
 ___
 
@@ -493,7 +515,7 @@ in question that wants to be created
 
 #### Defined in
 
-[server/resolvers/basic.ts:139](https://github.com/onzag/itemize/blob/5c2808d3/server/resolvers/basic.ts#L139)
+[server/resolvers/basic.ts:130](https://github.com/onzag/itemize/blob/f2db74a5/server/resolvers/basic.ts#L130)
 
 ___
 
@@ -517,7 +539,7 @@ for use in the system
 
 #### Defined in
 
-[server/resolvers/basic.ts:87](https://github.com/onzag/itemize/blob/5c2808d3/server/resolvers/basic.ts#L87)
+[server/resolvers/basic.ts:85](https://github.com/onzag/itemize/blob/f2db74a5/server/resolvers/basic.ts#L85)
 
 ___
 
@@ -541,4 +563,4 @@ by the rules of the session id, user is removed, or invalid credentials
 
 #### Defined in
 
-[server/resolvers/basic.ts:617](https://github.com/onzag/itemize/blob/5c2808d3/server/resolvers/basic.ts#L617)
+[server/resolvers/basic.ts:610](https://github.com/onzag/itemize/blob/f2db74a5/server/resolvers/basic.ts#L610)

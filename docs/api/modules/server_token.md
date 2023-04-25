@@ -15,6 +15,7 @@ can be able to communicate with an itemize server easily
 - [jwtDecode](server_token.md#jwtdecode)
 - [jwtSign](server_token.md#jwtsign)
 - [jwtVerify](server_token.md#jwtverify)
+- [jwtVerifyWithAlt](server_token.md#jwtverifywithalt)
 
 ## Functions
 
@@ -43,7 +44,7 @@ Decode a JWT token and does not verify whether it's valid
 
 #### Defined in
 
-[server/token.ts:61](https://github.com/onzag/itemize/blob/5c2808d3/server/token.ts#L61)
+[server/token.ts:96](https://github.com/onzag/itemize/blob/f2db74a5/server/token.ts#L96)
 
 ___
 
@@ -67,7 +68,7 @@ Sign a payload
 
 #### Defined in
 
-[server/token.ts:18](https://github.com/onzag/itemize/blob/5c2808d3/server/token.ts#L18)
+[server/token.ts:18](https://github.com/onzag/itemize/blob/f2db74a5/server/token.ts#L18)
 
 ___
 
@@ -97,4 +98,35 @@ Verify and decode a key
 
 #### Defined in
 
-[server/token.ts:40](https://github.com/onzag/itemize/blob/5c2808d3/server/token.ts#L40)
+[server/token.ts:40](https://github.com/onzag/itemize/blob/f2db74a5/server/token.ts#L40)
+
+___
+
+### jwtVerifyWithAlt
+
+▸ **jwtVerifyWithAlt**<`T`\>(`token`, `secretOrPublicKey`, `secretOrPublicKeyAlt`, `options?`): `Promise`<`T`\>
+
+Verify and decode a key using two keys
+
+#### Type parameters
+
+| Name |
+| :------ |
+| `T` |
+
+#### Parameters
+
+| Name | Type | Description |
+| :------ | :------ | :------ |
+| `token` | `string` | the token in question |
+| `secretOrPublicKey` | `Secret` | the key |
+| `secretOrPublicKeyAlt` | `Secret` | the alternative key (or null) |
+| `options?` | `VerifyOptions` | verify options |
+
+#### Returns
+
+`Promise`<`T`\>
+
+#### Defined in
+
+[server/token.ts:63](https://github.com/onzag/itemize/blob/f2db74a5/server/token.ts#L63)

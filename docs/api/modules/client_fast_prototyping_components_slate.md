@@ -16,8 +16,8 @@ even if it can also be used in a standalone way
 
 - [IAccessibleFeatureSupportOptions](../interfaces/client_fast_prototyping_components_slate.IAccessibleFeatureSupportOptions.md)
 - [IHelperFunctions](../interfaces/client_fast_prototyping_components_slate.IHelperFunctions.md)
-- [ISlateEditorStateType](../interfaces/client_fast_prototyping_components_slate.ISlateEditorStateType.md)
+- [ISlateEditorElementWrappers](../interfaces/client_fast_prototyping_components_slate.ISlateEditorElementWrappers.md)
+- [ISlateEditorInternalStateType](../interfaces/client_fast_prototyping_components_slate.ISlateEditorInternalStateType.md)
 - [ISlateEditorWrapperBaseProps](../interfaces/client_fast_prototyping_components_slate.ISlateEditorWrapperBaseProps.md)
+- [ISlateEditorWrapperElementProps](../interfaces/client_fast_prototyping_components_slate.ISlateEditorWrapperElementProps.md)
 - [ISlateTemplateUIHandlerProps](../interfaces/client_fast_prototyping_components_slate.ISlateTemplateUIHandlerProps.md)
-- [ITemplateArg](../interfaces/client_fast_prototyping_components_slate.ITemplateArg.md)
-- [ITemplateArgsContext](../interfaces/client_fast_prototyping_components_slate.ITemplateArgsContext.md)

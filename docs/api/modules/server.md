@@ -34,13 +34,13 @@ of the server side of things
 
 #### Defined in
 
-[server/index.ts:97](https://github.com/onzag/itemize/blob/5c2808d3/server/index.ts#L97)
+[server/index.ts:147](https://github.com/onzag/itemize/blob/f2db74a5/server/index.ts#L147)
 
 ## Functions
 
 ### getStorageProviders
 
-▸ **getStorageProviders**(`config`, `sensitiveConfig`, `storageServiceProviders`, `registry`): `Promise`<{ `classesUsed`: [`IServiceProviderClassType`](../interfaces/server_services.IServiceProviderClassType.md)<`any`\>[] ; `cloudClients`: [`IStorageProvidersObject`](../interfaces/server_services_base_StorageProvider.IStorageProvidersObject.md) ; `instancesUsed`: [`default`](../classes/server_services_base_StorageProvider.default.md)<`any`\>[]  }\>
+▸ **getStorageProviders**(`config`, `sensitiveConfig`, `dbConfig`, `redisConfig`, `storageServiceProviders`, `registry`): `Promise`<{ `classesUsed`: [`IServiceProviderClassType`](../interfaces/server_services.IServiceProviderClassType.md)<`any`\>[] ; `cloudClients`: [`IStorageProvidersObject`](../interfaces/server_services_base_StorageProvider.IStorageProvidersObject.md) ; `instancesUsed`: [`default`](../classes/server_services_base_StorageProvider.default.md)<`any`\>[]  }\>
 
 #### Parameters
 
@@ -48,6 +48,8 @@ of the server side of things
 | :------ | :------ |
 | `config` | [`IConfigRawJSONDataType`](../interfaces/config.IConfigRawJSONDataType.md) |
 | `sensitiveConfig` | [`ISensitiveConfigRawJSONDataType`](../interfaces/config.ISensitiveConfigRawJSONDataType.md) |
+| `dbConfig` | [`IDBConfigRawJSONDataType`](../interfaces/config.IDBConfigRawJSONDataType.md) |
+| `redisConfig` | [`IRedisConfigRawJSONDataType`](../interfaces/config.IRedisConfigRawJSONDataType.md) |
 | `storageServiceProviders` | [`IStorageProviders`](../interfaces/server.IStorageProviders.md) |
 | `registry` | [`RegistryService`](../classes/server_services_registry.RegistryService.md) |
 
@@ -57,7 +59,7 @@ of the server side of things
 
 #### Defined in
 
-[server/index.ts:196](https://github.com/onzag/itemize/blob/5c2808d3/server/index.ts#L196)
+[server/index.ts:254](https://github.com/onzag/itemize/blob/f2db74a5/server/index.ts#L254)
 
 ___
 
@@ -81,4 +83,4 @@ Initializes the itemize server with its custom configuration
 
 #### Defined in
 
-[server/index.ts:286](https://github.com/onzag/itemize/blob/5c2808d3/server/index.ts#L286)
+[server/index.ts:361](https://github.com/onzag/itemize/blob/f2db74a5/server/index.ts#L361)

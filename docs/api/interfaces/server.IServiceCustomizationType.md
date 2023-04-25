@@ -11,11 +11,13 @@
 - [currencyFactorsProvider](server.IServiceCustomizationType.md#currencyfactorsprovider)
 - [customServices](server.IServiceCustomizationType.md#customservices)
 - [locationSearchProvider](server.IServiceCustomizationType.md#locationsearchprovider)
+- [loggingServiceProvider](server.IServiceCustomizationType.md#loggingserviceprovider)
 - [mailServiceProvider](server.IServiceCustomizationType.md#mailserviceprovider)
 - [paymentProvider](server.IServiceCustomizationType.md#paymentprovider)
 - [phoneServiceProvider](server.IServiceCustomizationType.md#phoneserviceprovider)
 - [storageServiceProviders](server.IServiceCustomizationType.md#storageserviceproviders)
 - [userLocalizationProvider](server.IServiceCustomizationType.md#userlocalizationprovider)
+- [ussdServiceProvider](server.IServiceCustomizationType.md#ussdserviceprovider)
 
 ## Properties
 
@@ -25,7 +27,7 @@
 
 #### Defined in
 
-[server/index.ts:177](https://github.com/onzag/itemize/blob/5c2808d3/server/index.ts#L177)
+[server/index.ts:232](https://github.com/onzag/itemize/blob/f2db74a5/server/index.ts#L232)
 
 ___
 
@@ -39,7 +41,7 @@ ___
 
 #### Defined in
 
-[server/index.ts:180](https://github.com/onzag/itemize/blob/5c2808d3/server/index.ts#L180)
+[server/index.ts:236](https://github.com/onzag/itemize/blob/f2db74a5/server/index.ts#L236)
 
 ___
 
@@ -49,7 +51,17 @@ ___
 
 #### Defined in
 
-[server/index.ts:178](https://github.com/onzag/itemize/blob/5c2808d3/server/index.ts#L178)
+[server/index.ts:233](https://github.com/onzag/itemize/blob/f2db74a5/server/index.ts#L233)
+
+___
+
+### loggingServiceProvider
+
+• `Optional` **loggingServiceProvider**: [`IServiceProviderClassType`](server_services.IServiceProviderClassType.md)<`any`\>
+
+#### Defined in
+
+[server/index.ts:235](https://github.com/onzag/itemize/blob/f2db74a5/server/index.ts#L235)
 
 ___
 
@@ -59,7 +71,7 @@ ___
 
 #### Defined in
 
-[server/index.ts:174](https://github.com/onzag/itemize/blob/5c2808d3/server/index.ts#L174)
+[server/index.ts:228](https://github.com/onzag/itemize/blob/f2db74a5/server/index.ts#L228)
 
 ___
 
@@ -69,7 +81,7 @@ ___
 
 #### Defined in
 
-[server/index.ts:179](https://github.com/onzag/itemize/blob/5c2808d3/server/index.ts#L179)
+[server/index.ts:234](https://github.com/onzag/itemize/blob/f2db74a5/server/index.ts#L234)
 
 ___
 
@@ -79,7 +91,7 @@ ___
 
 #### Defined in
 
-[server/index.ts:175](https://github.com/onzag/itemize/blob/5c2808d3/server/index.ts#L175)
+[server/index.ts:229](https://github.com/onzag/itemize/blob/f2db74a5/server/index.ts#L229)
 
 ___
 
@@ -89,7 +101,7 @@ ___
 
 #### Defined in
 
-[server/index.ts:173](https://github.com/onzag/itemize/blob/5c2808d3/server/index.ts#L173)
+[server/index.ts:227](https://github.com/onzag/itemize/blob/f2db74a5/server/index.ts#L227)
 
 ___
 
@@ -99,4 +111,14 @@ ___
 
 #### Defined in
 
-[server/index.ts:176](https://github.com/onzag/itemize/blob/5c2808d3/server/index.ts#L176)
+[server/index.ts:231](https://github.com/onzag/itemize/blob/f2db74a5/server/index.ts#L231)
+
+___
+
+### ussdServiceProvider
+
+• `Optional` **ussdServiceProvider**: [`IServiceProviderClassType`](server_services.IServiceProviderClassType.md)<`any`\>
+
+#### Defined in
+
+[server/index.ts:230](https://github.com/onzag/itemize/blob/f2db74a5/server/index.ts#L230)

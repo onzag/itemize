@@ -13,12 +13,27 @@ Actions should only display by the end of the chunk
 
 ### Properties
 
+- [inputValueLabel](ussd.IUSSDAction.md#inputvaluelabel)
 - [label](ussd.IUSSDAction.md#label)
-- [onFailGoToURL](ussd.IUSSDAction.md#onfailgotourl)
-- [onInputReceivedExecute](ussd.IUSSDAction.md#oninputreceivedexecute)
-- [onSuccessGoToURL](ussd.IUSSDAction.md#onsuccessgotourl)
+- [requestInputValue](ussd.IUSSDAction.md#requestinputvalue)
+
+### Methods
+
+- [onInputReceived](ussd.IUSSDAction.md#oninputreceived)
 
 ## Properties
+
+### inputValueLabel
+
+• **inputValueLabel**: `string`
+
+The label for such value
+
+#### Defined in
+
+[ussd/index.ts:25](https://github.com/onzag/itemize/blob/f2db74a5/ussd/index.ts#L25)
+
+___
 
 ### label
 
@@ -28,50 +43,40 @@ Represents the label of the given action
 
 #### Defined in
 
-[ussd/index.ts:13](https://github.com/onzag/itemize/blob/5c2808d3/ussd/index.ts#L13)
+[ussd/index.ts:15](https://github.com/onzag/itemize/blob/f2db74a5/ussd/index.ts#L15)
 
 ___
 
-### onFailGoToURL
+### requestInputValue
 
-• **onFailGoToURL**: `string`[]
+• **requestInputValue**: `boolean`
 
-It's arrays in order to be able to build
-these dinamically
-"%value" represents the value given by USSD and should be URL encoded
-"%error" represents the received error from the graphql request and should be stringified as JSON and URL encoded
+Whether to request input value
 
 #### Defined in
 
-[ussd/index.ts:38](https://github.com/onzag/itemize/blob/5c2808d3/ussd/index.ts#L38)
+[ussd/index.ts:20](https://github.com/onzag/itemize/blob/f2db74a5/ussd/index.ts#L20)
 
-___
+## Methods
 
-### onInputReceivedExecute
+### onInputReceived
 
-• **onInputReceivedExecute**: `string`[]
+▸ **onInputReceived**(`appData`, `value`): `string` \| `void` \| `Promise`<`string` \| `void`\>
 
-It's arrays in order to be able to build
-these dinamically, this represents a graphql request body
+When an input is received this function is executed
+if a string is returned it will redirect
 
-"%value" represents the value and should be stringified as JSON
+#### Parameters
 
-#### Defined in
+| Name | Type |
+| :------ | :------ |
+| `appData` | [`IAppDataType`](server.IAppDataType.md) |
+| `value` | `string` |
 
-[ussd/index.ts:21](https://github.com/onzag/itemize/blob/5c2808d3/ussd/index.ts#L21)
+#### Returns
 
-___
-
-### onSuccessGoToURL
-
-• **onSuccessGoToURL**: `string`[]
-
-It's arrays in order to be able to build
-these dinamically
-"%value" represents the given by USSD and should be URL encoded
-"%id" represents the received id from the graphql request and should be URL encoded
-"%version" represents the received version from the graphql request and should be URL encoded
+`string` \| `void` \| `Promise`<`string` \| `void`\>
 
 #### Defined in
 
-[ussd/index.ts:30](https://github.com/onzag/itemize/blob/5c2808d3/ussd/index.ts#L30)
+[ussd/index.ts:31](https://github.com/onzag/itemize/blob/f2db74a5/ussd/index.ts#L31)

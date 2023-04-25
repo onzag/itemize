@@ -591,7 +591,7 @@ React.Component.render
 
 #### Defined in
 
-[client/components/util/DescriptionSetter.tsx:26](https://github.com/onzag/itemize/blob/5c2808d3/client/components/util/DescriptionSetter.tsx#L26)
+[client/components/util/DescriptionSetter.tsx:26](https://github.com/onzag/itemize/blob/f2db74a5/client/components/util/DescriptionSetter.tsx#L26)
 
 ___
 

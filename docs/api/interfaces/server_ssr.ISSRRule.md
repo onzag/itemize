@@ -14,6 +14,7 @@ how a page is to be rendered
 - [forUser](server_ssr.ISSRRule.md#foruser)
 - [language](server_ssr.ISSRRule.md#language)
 - [languages](server_ssr.ISSRRule.md#languages)
+- [mode](server_ssr.ISSRRule.md#mode)
 - [noSSR](server_ssr.ISSRRule.md#nossr)
 - [rtl](server_ssr.ISSRRule.md#rtl)
 
@@ -36,7 +37,7 @@ The user we are rendering for
 
 #### Defined in
 
-[server/ssr/index.ts:29](https://github.com/onzag/itemize/blob/5c2808d3/server/ssr/index.ts#L29)
+[server/ssr/index.ts:35](https://github.com/onzag/itemize/blob/f2db74a5/server/ssr/index.ts#L35)
 
 ___
 
@@ -48,7 +49,7 @@ The language that the rule is rendering at
 
 #### Defined in
 
-[server/ssr/index.ts:15](https://github.com/onzag/itemize/blob/5c2808d3/server/ssr/index.ts#L15)
+[server/ssr/index.ts:21](https://github.com/onzag/itemize/blob/f2db74a5/server/ssr/index.ts#L21)
 
 ___
 
@@ -61,7 +62,19 @@ the href langs
 
 #### Defined in
 
-[server/ssr/index.ts:20](https://github.com/onzag/itemize/blob/5c2808d3/server/ssr/index.ts#L20)
+[server/ssr/index.ts:26](https://github.com/onzag/itemize/blob/f2db74a5/server/ssr/index.ts#L26)
+
+___
+
+### mode
+
+• **mode**: ``"production"`` \| ``"development"``
+
+The mode the user is going with
+
+#### Defined in
+
+[server/ssr/index.ts:48](https://github.com/onzag/itemize/blob/f2db74a5/server/ssr/index.ts#L48)
 
 ___
 
@@ -73,7 +86,7 @@ Whether we will simply not use SSR at all
 
 #### Defined in
 
-[server/ssr/index.ts:38](https://github.com/onzag/itemize/blob/5c2808d3/server/ssr/index.ts#L38)
+[server/ssr/index.ts:44](https://github.com/onzag/itemize/blob/f2db74a5/server/ssr/index.ts#L44)
 
 ___
 
@@ -86,4 +99,4 @@ can be accounted for in the HTML
 
 #### Defined in
 
-[server/ssr/index.ts:25](https://github.com/onzag/itemize/blob/5c2808d3/server/ssr/index.ts#L25)
+[server/ssr/index.ts:31](https://github.com/onzag/itemize/blob/f2db74a5/server/ssr/index.ts#L31)

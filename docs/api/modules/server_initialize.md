@@ -34,4 +34,4 @@ Initializes the server application with its configuration
 
 #### Defined in
 
-[server/initialize.ts:110](https://github.com/onzag/itemize/blob/5c2808d3/server/initialize.ts#L110)
+[server/initialize.ts:108](https://github.com/onzag/itemize/blob/f2db74a5/server/initialize.ts#L108)

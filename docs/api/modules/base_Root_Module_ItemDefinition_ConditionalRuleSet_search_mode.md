@@ -37,7 +37,7 @@ a raw conditional rule set that is the search mode form of this ruleset
 
 #### Defined in
 
-[base/Root/Module/ItemDefinition/ConditionalRuleSet/search-mode.ts:36](https://github.com/onzag/itemize/blob/5c2808d3/base/Root/Module/ItemDefinition/ConditionalRuleSet/search-mode.ts#L36)
+[base/Root/Module/ItemDefinition/ConditionalRuleSet/search-mode.ts:36](https://github.com/onzag/itemize/blob/f2db74a5/base/Root/Module/ItemDefinition/ConditionalRuleSet/search-mode.ts#L36)
 
 ___
 
@@ -61,4 +61,4 @@ ignores TO and RADIUS
 
 #### Defined in
 
-[base/Root/Module/ItemDefinition/ConditionalRuleSet/search-mode.ts:19](https://github.com/onzag/itemize/blob/5c2808d3/base/Root/Module/ItemDefinition/ConditionalRuleSet/search-mode.ts#L19)
+[base/Root/Module/ItemDefinition/ConditionalRuleSet/search-mode.ts:19](https://github.com/onzag/itemize/blob/f2db74a5/base/Root/Module/ItemDefinition/ConditionalRuleSet/search-mode.ts#L19)

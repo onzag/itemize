@@ -8,7 +8,7 @@ Contains the handler for the boolean type
 
 ### Classes
 
-- [PropertyViewBoolean](../classes/client_internal_components_PropertyView_PropertyViewBoolean.PropertyViewBoolean.md)
+- [default](../classes/client_internal_components_PropertyView_PropertyViewBoolean.default.md)
 
 ### Interfaces
 

@@ -36,7 +36,7 @@ new merged request fields
 
 #### Defined in
 
-[gql-util.ts:61](https://github.com/onzag/itemize/blob/5c2808d3/gql-util.ts#L61)
+[gql-util.ts:61](https://github.com/onzag/itemize/blob/f2db74a5/gql-util.ts#L61)
 
 ___
 
@@ -59,7 +59,7 @@ into the flattened form without the DATA but all data free
 
 #### Defined in
 
-[gql-util.ts:100](https://github.com/onzag/itemize/blob/5c2808d3/gql-util.ts#L100)
+[gql-util.ts:100](https://github.com/onzag/itemize/blob/f2db74a5/gql-util.ts#L100)
 
 ___
 
@@ -85,4 +85,4 @@ a boolean
 
 #### Defined in
 
-[gql-util.ts:17](https://github.com/onzag/itemize/blob/5c2808d3/gql-util.ts#L17)
+[gql-util.ts:17](https://github.com/onzag/itemize/blob/f2db74a5/gql-util.ts#L17)

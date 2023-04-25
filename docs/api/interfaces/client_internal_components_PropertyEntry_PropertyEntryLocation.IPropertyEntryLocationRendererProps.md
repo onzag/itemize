@@ -28,8 +28,9 @@ is too complex for it and this handler will handle internal states for you
 - [currentValue](client_internal_components_PropertyEntry_PropertyEntryLocation.IPropertyEntryLocationRendererProps.md#currentvalue)
 - [description](client_internal_components_PropertyEntry_PropertyEntryLocation.IPropertyEntryLocationRendererProps.md#description)
 - [disabled](client_internal_components_PropertyEntry_PropertyEntryLocation.IPropertyEntryLocationRendererProps.md#disabled)
-- [icon](client_internal_components_PropertyEntry_PropertyEntryLocation.IPropertyEntryLocationRendererProps.md#icon)
 - [label](client_internal_components_PropertyEntry_PropertyEntryLocation.IPropertyEntryLocationRendererProps.md#label)
+- [language](client_internal_components_PropertyEntry_PropertyEntryLocation.IPropertyEntryLocationRendererProps.md#language)
+- [languageOverride](client_internal_components_PropertyEntry_PropertyEntryLocation.IPropertyEntryLocationRendererProps.md#languageoverride)
 - [nextSearchResult](client_internal_components_PropertyEntry_PropertyEntryLocation.IPropertyEntryLocationRendererProps.md#nextsearchresult)
 - [nextSearchResultCircular](client_internal_components_PropertyEntry_PropertyEntryLocation.IPropertyEntryLocationRendererProps.md#nextsearchresultcircular)
 - [noResultsLabel](client_internal_components_PropertyEntry_PropertyEntryLocation.IPropertyEntryLocationRendererProps.md#noresultslabel)
@@ -37,10 +38,12 @@ is too complex for it and this handler will handle internal states for you
 - [prevSearchResult](client_internal_components_PropertyEntry_PropertyEntryLocation.IPropertyEntryLocationRendererProps.md#prevsearchresult)
 - [prevSearchResultCircular](client_internal_components_PropertyEntry_PropertyEntryLocation.IPropertyEntryLocationRendererProps.md#prevsearchresultcircular)
 - [propertyId](client_internal_components_PropertyEntry_PropertyEntryLocation.IPropertyEntryLocationRendererProps.md#propertyid)
+- [resultLabel](client_internal_components_PropertyEntry_PropertyEntryLocation.IPropertyEntryLocationRendererProps.md#resultlabel)
 - [resultOutOfLabel](client_internal_components_PropertyEntry_PropertyEntryLocation.IPropertyEntryLocationRendererProps.md#resultoutoflabel)
 - [rtl](client_internal_components_PropertyEntry_PropertyEntryLocation.IPropertyEntryLocationRendererProps.md#rtl)
 - [searchQuery](client_internal_components_PropertyEntry_PropertyEntryLocation.IPropertyEntryLocationRendererProps.md#searchquery)
 - [searchSuggestions](client_internal_components_PropertyEntry_PropertyEntryLocation.IPropertyEntryLocationRendererProps.md#searchsuggestions)
+- [uniqueId](client_internal_components_PropertyEntry_PropertyEntryLocation.IPropertyEntryLocationRendererProps.md#uniqueid)
 - [viewport](client_internal_components_PropertyEntry_PropertyEntryLocation.IPropertyEntryLocationRendererProps.md#viewport)
 
 ### Methods
@@ -68,7 +71,7 @@ is not taking place, the value is null
 
 #### Defined in
 
-[client/internal/components/PropertyEntry/PropertyEntryLocation.tsx:167](https://github.com/onzag/itemize/blob/5c2808d3/client/internal/components/PropertyEntry/PropertyEntryLocation.tsx#L167)
+[client/internal/components/PropertyEntry/PropertyEntryLocation.tsx:171](https://github.com/onzag/itemize/blob/f2db74a5/client/internal/components/PropertyEntry/PropertyEntryLocation.tsx#L171)
 
 ___
 
@@ -88,7 +91,7 @@ The renderer args
 
 #### Defined in
 
-[client/internal/renderer.ts:19](https://github.com/onzag/itemize/blob/5c2808d3/client/internal/renderer.ts#L19)
+[client/internal/renderer.ts:19](https://github.com/onzag/itemize/blob/f2db74a5/client/internal/renderer.ts#L19)
 
 ___
 
@@ -104,7 +107,7 @@ Whether the entry should autofocus
 
 #### Defined in
 
-[client/internal/components/PropertyEntry/index.tsx:105](https://github.com/onzag/itemize/blob/5c2808d3/client/internal/components/PropertyEntry/index.tsx#L105)
+[client/internal/components/PropertyEntry/index.tsx:107](https://github.com/onzag/itemize/blob/f2db74a5/client/internal/components/PropertyEntry/index.tsx#L107)
 
 ___
 
@@ -121,7 +124,7 @@ current value, this check is exceptional as it uses the local equal function
 
 #### Defined in
 
-[client/internal/components/PropertyEntry/index.tsx:77](https://github.com/onzag/itemize/blob/5c2808d3/client/internal/components/PropertyEntry/index.tsx#L77)
+[client/internal/components/PropertyEntry/index.tsx:79](https://github.com/onzag/itemize/blob/f2db74a5/client/internal/components/PropertyEntry/index.tsx#L79)
 
 ___
 
@@ -137,7 +140,7 @@ The currently applied value that is in sync with the server side
 
 #### Defined in
 
-[client/internal/components/PropertyEntry/index.tsx:72](https://github.com/onzag/itemize/blob/5c2808d3/client/internal/components/PropertyEntry/index.tsx#L72)
+[client/internal/components/PropertyEntry/index.tsx:74](https://github.com/onzag/itemize/blob/f2db74a5/client/internal/components/PropertyEntry/index.tsx#L74)
 
 ___
 
@@ -153,7 +156,7 @@ The current internal value, if any given
 
 #### Defined in
 
-[client/internal/components/PropertyEntry/index.tsx:100](https://github.com/onzag/itemize/blob/5c2808d3/client/internal/components/PropertyEntry/index.tsx#L100)
+[client/internal/components/PropertyEntry/index.tsx:102](https://github.com/onzag/itemize/blob/f2db74a5/client/internal/components/PropertyEntry/index.tsx#L102)
 
 ___
 
@@ -173,7 +176,7 @@ of a flag
 
 #### Defined in
 
-[client/internal/components/PropertyEntry/index.tsx:96](https://github.com/onzag/itemize/blob/5c2808d3/client/internal/components/PropertyEntry/index.tsx#L96)
+[client/internal/components/PropertyEntry/index.tsx:98](https://github.com/onzag/itemize/blob/f2db74a5/client/internal/components/PropertyEntry/index.tsx#L98)
 
 ___
 
@@ -192,7 +195,7 @@ a value for this play a role as well
 
 #### Defined in
 
-[client/internal/components/PropertyEntry/index.tsx:88](https://github.com/onzag/itemize/blob/5c2808d3/client/internal/components/PropertyEntry/index.tsx#L88)
+[client/internal/components/PropertyEntry/index.tsx:90](https://github.com/onzag/itemize/blob/f2db74a5/client/internal/components/PropertyEntry/index.tsx#L90)
 
 ___
 
@@ -208,7 +211,7 @@ The current value
 
 #### Defined in
 
-[client/internal/components/PropertyEntry/index.tsx:81](https://github.com/onzag/itemize/blob/5c2808d3/client/internal/components/PropertyEntry/index.tsx#L81)
+[client/internal/components/PropertyEntry/index.tsx:83](https://github.com/onzag/itemize/blob/f2db74a5/client/internal/components/PropertyEntry/index.tsx#L83)
 
 ___
 
@@ -225,7 +228,7 @@ this is locale specific; the description might not be passed if specified by the
 
 #### Defined in
 
-[client/internal/components/PropertyEntry/index.tsx:63](https://github.com/onzag/itemize/blob/5c2808d3/client/internal/components/PropertyEntry/index.tsx#L63)
+[client/internal/components/PropertyEntry/index.tsx:69](https://github.com/onzag/itemize/blob/f2db74a5/client/internal/components/PropertyEntry/index.tsx#L69)
 
 ___
 
@@ -243,23 +246,7 @@ and attempts are futile to modify
 
 #### Defined in
 
-[client/internal/components/PropertyEntry/index.tsx:111](https://github.com/onzag/itemize/blob/5c2808d3/client/internal/components/PropertyEntry/index.tsx#L111)
-
-___
-
-### icon
-
-• `Optional` **icon**: `ReactNode`
-
-Icon are an UI defined property for an icon to use during the view, handle as you wish
-
-#### Inherited from
-
-[IPropertyEntryRendererProps](client_internal_components_PropertyEntry.IPropertyEntryRendererProps.md).[icon](client_internal_components_PropertyEntry.IPropertyEntryRendererProps.md#icon)
-
-#### Defined in
-
-[client/internal/components/PropertyEntry/index.tsx:67](https://github.com/onzag/itemize/blob/5c2808d3/client/internal/components/PropertyEntry/index.tsx#L67)
+[client/internal/components/PropertyEntry/index.tsx:113](https://github.com/onzag/itemize/blob/f2db74a5/client/internal/components/PropertyEntry/index.tsx#L113)
 
 ___
 
@@ -276,7 +263,43 @@ this is locale specific
 
 #### Defined in
 
-[client/internal/components/PropertyEntry/index.tsx:53](https://github.com/onzag/itemize/blob/5c2808d3/client/internal/components/PropertyEntry/index.tsx#L53)
+[client/internal/components/PropertyEntry/index.tsx:59](https://github.com/onzag/itemize/blob/f2db74a5/client/internal/components/PropertyEntry/index.tsx#L59)
+
+___
+
+### language
+
+• **language**: `string`
+
+The current language being used by the client overall in the app
+
+#### Inherited from
+
+[IPropertyEntryRendererProps](client_internal_components_PropertyEntry.IPropertyEntryRendererProps.md).[language](client_internal_components_PropertyEntry.IPropertyEntryRendererProps.md#language)
+
+#### Defined in
+
+[client/internal/components/PropertyEntry/index.tsx:138](https://github.com/onzag/itemize/blob/f2db74a5/client/internal/components/PropertyEntry/index.tsx#L138)
+
+___
+
+### languageOverride
+
+• `Optional` **languageOverride**: `string`
+
+An optional language used mainly for the text type to override
+own language properties that currently only text supports that
+
+It may be possible for the editor to set its own text language
+value if it has its own
+
+#### Inherited from
+
+[IPropertyEntryRendererProps](client_internal_components_PropertyEntry.IPropertyEntryRendererProps.md).[languageOverride](client_internal_components_PropertyEntry.IPropertyEntryRendererProps.md#languageoverride)
+
+#### Defined in
+
+[client/internal/components/PropertyEntry/index.tsx:147](https://github.com/onzag/itemize/blob/f2db74a5/client/internal/components/PropertyEntry/index.tsx#L147)
 
 ___
 
@@ -289,7 +312,7 @@ null if no next
 
 #### Defined in
 
-[client/internal/components/PropertyEntry/PropertyEntryLocation.tsx:172](https://github.com/onzag/itemize/blob/5c2808d3/client/internal/components/PropertyEntry/PropertyEntryLocation.tsx#L172)
+[client/internal/components/PropertyEntry/PropertyEntryLocation.tsx:176](https://github.com/onzag/itemize/blob/f2db74a5/client/internal/components/PropertyEntry/PropertyEntryLocation.tsx#L176)
 
 ___
 
@@ -302,7 +325,7 @@ loop back to the first one; null if search results is empty
 
 #### Defined in
 
-[client/internal/components/PropertyEntry/PropertyEntryLocation.tsx:177](https://github.com/onzag/itemize/blob/5c2808d3/client/internal/components/PropertyEntry/PropertyEntryLocation.tsx#L177)
+[client/internal/components/PropertyEntry/PropertyEntryLocation.tsx:181](https://github.com/onzag/itemize/blob/f2db74a5/client/internal/components/PropertyEntry/PropertyEntryLocation.tsx#L181)
 
 ___
 
@@ -314,7 +337,7 @@ A label to show when the search yielded no results
 
 #### Defined in
 
-[client/internal/components/PropertyEntry/PropertyEntryLocation.tsx:148](https://github.com/onzag/itemize/blob/5c2808d3/client/internal/components/PropertyEntry/PropertyEntryLocation.tsx#L148)
+[client/internal/components/PropertyEntry/PropertyEntryLocation.tsx:148](https://github.com/onzag/itemize/blob/f2db74a5/client/internal/components/PropertyEntry/PropertyEntryLocation.tsx#L148)
 
 ___
 
@@ -331,7 +354,7 @@ this is locale specific
 
 #### Defined in
 
-[client/internal/components/PropertyEntry/index.tsx:58](https://github.com/onzag/itemize/blob/5c2808d3/client/internal/components/PropertyEntry/index.tsx#L58)
+[client/internal/components/PropertyEntry/index.tsx:64](https://github.com/onzag/itemize/blob/f2db74a5/client/internal/components/PropertyEntry/index.tsx#L64)
 
 ___
 
@@ -344,7 +367,7 @@ null if no prev
 
 #### Defined in
 
-[client/internal/components/PropertyEntry/PropertyEntryLocation.tsx:182](https://github.com/onzag/itemize/blob/5c2808d3/client/internal/components/PropertyEntry/PropertyEntryLocation.tsx#L182)
+[client/internal/components/PropertyEntry/PropertyEntryLocation.tsx:186](https://github.com/onzag/itemize/blob/f2db74a5/client/internal/components/PropertyEntry/PropertyEntryLocation.tsx#L186)
 
 ___
 
@@ -357,7 +380,7 @@ loop back to the first one; null if search results is empty
 
 #### Defined in
 
-[client/internal/components/PropertyEntry/PropertyEntryLocation.tsx:187](https://github.com/onzag/itemize/blob/5c2808d3/client/internal/components/PropertyEntry/PropertyEntryLocation.tsx#L187)
+[client/internal/components/PropertyEntry/PropertyEntryLocation.tsx:191](https://github.com/onzag/itemize/blob/f2db74a5/client/internal/components/PropertyEntry/PropertyEntryLocation.tsx#L191)
 
 ___
 
@@ -373,7 +396,19 @@ The property id in question
 
 #### Defined in
 
-[client/internal/components/PropertyEntry/index.tsx:47](https://github.com/onzag/itemize/blob/5c2808d3/client/internal/components/PropertyEntry/index.tsx#L47)
+[client/internal/components/PropertyEntry/index.tsx:47](https://github.com/onzag/itemize/blob/f2db74a5/client/internal/components/PropertyEntry/index.tsx#L47)
+
+___
+
+### resultLabel
+
+• **resultLabel**: `string`
+
+The current localized label for the total amount of results
+
+#### Defined in
+
+[client/internal/components/PropertyEntry/PropertyEntryLocation.tsx:157](https://github.com/onzag/itemize/blob/f2db74a5/client/internal/components/PropertyEntry/PropertyEntryLocation.tsx#L157)
 
 ___
 
@@ -386,7 +421,7 @@ say something like, "result 1 out of 29"; in the user's language
 
 #### Defined in
 
-[client/internal/components/PropertyEntry/PropertyEntryLocation.tsx:153](https://github.com/onzag/itemize/blob/5c2808d3/client/internal/components/PropertyEntry/PropertyEntryLocation.tsx#L153)
+[client/internal/components/PropertyEntry/PropertyEntryLocation.tsx:153](https://github.com/onzag/itemize/blob/f2db74a5/client/internal/components/PropertyEntry/PropertyEntryLocation.tsx#L153)
 
 ___
 
@@ -402,7 +437,7 @@ Whether it is in rtl mode for a rtl language
 
 #### Defined in
 
-[client/internal/renderer.ts:15](https://github.com/onzag/itemize/blob/5c2808d3/client/internal/renderer.ts#L15)
+[client/internal/renderer.ts:15](https://github.com/onzag/itemize/blob/f2db74a5/client/internal/renderer.ts#L15)
 
 ___
 
@@ -416,7 +451,7 @@ field, ignore currentValue
 
 #### Defined in
 
-[client/internal/components/PropertyEntry/PropertyEntryLocation.tsx:193](https://github.com/onzag/itemize/blob/5c2808d3/client/internal/components/PropertyEntry/PropertyEntryLocation.tsx#L193)
+[client/internal/components/PropertyEntry/PropertyEntryLocation.tsx:197](https://github.com/onzag/itemize/blob/f2db74a5/client/internal/components/PropertyEntry/PropertyEntryLocation.tsx#L197)
 
 ___
 
@@ -428,7 +463,24 @@ The current search suggestions, an array and always an array
 
 #### Defined in
 
-[client/internal/components/PropertyEntry/PropertyEntryLocation.tsx:162](https://github.com/onzag/itemize/blob/5c2808d3/client/internal/components/PropertyEntry/PropertyEntryLocation.tsx#L162)
+[client/internal/components/PropertyEntry/PropertyEntryLocation.tsx:166](https://github.com/onzag/itemize/blob/f2db74a5/client/internal/components/PropertyEntry/PropertyEntryLocation.tsx#L166)
+
+___
+
+### uniqueId
+
+• **uniqueId**: `string`
+
+an unique id for this property
+with the id and the version they are related to
+
+#### Inherited from
+
+[IPropertyEntryRendererProps](client_internal_components_PropertyEntry.IPropertyEntryRendererProps.md).[uniqueId](client_internal_components_PropertyEntry.IPropertyEntryRendererProps.md#uniqueid)
+
+#### Defined in
+
+[client/internal/components/PropertyEntry/index.tsx:53](https://github.com/onzag/itemize/blob/f2db74a5/client/internal/components/PropertyEntry/index.tsx#L53)
 
 ___
 
@@ -440,7 +492,7 @@ The current viewport
 
 #### Defined in
 
-[client/internal/components/PropertyEntry/PropertyEntryLocation.tsx:158](https://github.com/onzag/itemize/blob/5c2808d3/client/internal/components/PropertyEntry/PropertyEntryLocation.tsx#L158)
+[client/internal/components/PropertyEntry/PropertyEntryLocation.tsx:162](https://github.com/onzag/itemize/blob/f2db74a5/client/internal/components/PropertyEntry/PropertyEntryLocation.tsx#L162)
 
 ## Methods
 
@@ -456,7 +508,7 @@ Clear all the suggestions
 
 #### Defined in
 
-[client/internal/components/PropertyEntry/PropertyEntryLocation.tsx:121](https://github.com/onzag/itemize/blob/5c2808d3/client/internal/components/PropertyEntry/PropertyEntryLocation.tsx#L121)
+[client/internal/components/PropertyEntry/PropertyEntryLocation.tsx:121](https://github.com/onzag/itemize/blob/f2db74a5/client/internal/components/PropertyEntry/PropertyEntryLocation.tsx#L121)
 
 ___
 
@@ -472,7 +524,7 @@ Clear all the suggestions
 
 #### Defined in
 
-[client/internal/components/PropertyEntry/PropertyEntryLocation.tsx:116](https://github.com/onzag/itemize/blob/5c2808d3/client/internal/components/PropertyEntry/PropertyEntryLocation.tsx#L116)
+[client/internal/components/PropertyEntry/PropertyEntryLocation.tsx:116](https://github.com/onzag/itemize/blob/f2db74a5/client/internal/components/PropertyEntry/PropertyEntryLocation.tsx#L116)
 
 ___
 
@@ -494,7 +546,7 @@ currentInvalidReason gets populated even if the field is not poked
 
 #### Defined in
 
-[client/internal/components/PropertyEntry/index.tsx:118](https://github.com/onzag/itemize/blob/5c2808d3/client/internal/components/PropertyEntry/index.tsx#L118)
+[client/internal/components/PropertyEntry/index.tsx:120](https://github.com/onzag/itemize/blob/f2db74a5/client/internal/components/PropertyEntry/index.tsx#L120)
 
 ___
 
@@ -524,7 +576,7 @@ caution is advised which one to use
 
 #### Defined in
 
-[client/internal/components/PropertyEntry/index.tsx:126](https://github.com/onzag/itemize/blob/5c2808d3/client/internal/components/PropertyEntry/index.tsx#L126)
+[client/internal/components/PropertyEntry/index.tsx:128](https://github.com/onzag/itemize/blob/f2db74a5/client/internal/components/PropertyEntry/index.tsx#L128)
 
 ___
 
@@ -547,7 +599,7 @@ Picks a search result and assigns it as the current value
 
 #### Defined in
 
-[client/internal/components/PropertyEntry/PropertyEntryLocation.tsx:93](https://github.com/onzag/itemize/blob/5c2808d3/client/internal/components/PropertyEntry/PropertyEntryLocation.tsx#L93)
+[client/internal/components/PropertyEntry/PropertyEntryLocation.tsx:93](https://github.com/onzag/itemize/blob/f2db74a5/client/internal/components/PropertyEntry/PropertyEntryLocation.tsx#L93)
 
 ___
 
@@ -573,7 +625,7 @@ as that will update the list of search results and marked locations
 
 #### Defined in
 
-[client/internal/components/PropertyEntry/PropertyEntryLocation.tsx:108](https://github.com/onzag/itemize/blob/5c2808d3/client/internal/components/PropertyEntry/PropertyEntryLocation.tsx#L108)
+[client/internal/components/PropertyEntry/PropertyEntryLocation.tsx:108](https://github.com/onzag/itemize/blob/f2db74a5/client/internal/components/PropertyEntry/PropertyEntryLocation.tsx#L108)
 
 ___
 
@@ -598,7 +650,7 @@ incomplete picks
 
 #### Defined in
 
-[client/internal/components/PropertyEntry/PropertyEntryLocation.tsx:140](https://github.com/onzag/itemize/blob/5c2808d3/client/internal/components/PropertyEntry/PropertyEntryLocation.tsx#L140)
+[client/internal/components/PropertyEntry/PropertyEntryLocation.tsx:140](https://github.com/onzag/itemize/blob/f2db74a5/client/internal/components/PropertyEntry/PropertyEntryLocation.tsx#L140)
 
 ___
 
@@ -619,7 +671,7 @@ when doing this
 
 #### Defined in
 
-[client/internal/components/PropertyEntry/index.tsx:131](https://github.com/onzag/itemize/blob/5c2808d3/client/internal/components/PropertyEntry/index.tsx#L131)
+[client/internal/components/PropertyEntry/index.tsx:133](https://github.com/onzag/itemize/blob/f2db74a5/client/internal/components/PropertyEntry/index.tsx#L133)
 
 ___
 
@@ -645,7 +697,7 @@ a promise with the results
 
 #### Defined in
 
-[client/internal/components/PropertyEntry/PropertyEntryLocation.tsx:82](https://github.com/onzag/itemize/blob/5c2808d3/client/internal/components/PropertyEntry/PropertyEntryLocation.tsx#L82)
+[client/internal/components/PropertyEntry/PropertyEntryLocation.tsx:82](https://github.com/onzag/itemize/blob/f2db74a5/client/internal/components/PropertyEntry/PropertyEntryLocation.tsx#L82)
 
 ___
 
@@ -668,7 +720,7 @@ Trigger when the search query changes
 
 #### Defined in
 
-[client/internal/components/PropertyEntry/PropertyEntryLocation.tsx:69](https://github.com/onzag/itemize/blob/5c2808d3/client/internal/components/PropertyEntry/PropertyEntryLocation.tsx#L69)
+[client/internal/components/PropertyEntry/PropertyEntryLocation.tsx:69](https://github.com/onzag/itemize/blob/f2db74a5/client/internal/components/PropertyEntry/PropertyEntryLocation.tsx#L69)
 
 ___
 
@@ -690,4 +742,4 @@ Trigger when the viewport changes, so a new viewport is provided
 
 #### Defined in
 
-[client/internal/components/PropertyEntry/PropertyEntryLocation.tsx:60](https://github.com/onzag/itemize/blob/5c2808d3/client/internal/components/PropertyEntry/PropertyEntryLocation.tsx#L60)
+[client/internal/components/PropertyEntry/PropertyEntryLocation.tsx:60](https://github.com/onzag/itemize/blob/f2db74a5/client/internal/components/PropertyEntry/PropertyEntryLocation.tsx#L60)

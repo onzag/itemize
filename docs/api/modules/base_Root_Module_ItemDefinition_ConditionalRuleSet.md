@@ -15,6 +15,7 @@ Related files are schema.ts and checkers.ts for the build process
 
 ### Interfaces
 
+- [IConditionalRuleSetRawJSONDataBaseType](../interfaces/base_Root_Module_ItemDefinition_ConditionalRuleSet.IConditionalRuleSetRawJSONDataBaseType.md)
 - [IConditionalRuleSetRawJSONDataIncludeType](../interfaces/base_Root_Module_ItemDefinition_ConditionalRuleSet.IConditionalRuleSetRawJSONDataIncludeType.md)
 - [IConditionalRuleSetRawJSONDataPropertyType](../interfaces/base_Root_Module_ItemDefinition_ConditionalRuleSet.IConditionalRuleSetRawJSONDataPropertyType.md)
 
@@ -35,7 +36,7 @@ Types for the conditions
 
 #### Defined in
 
-[base/Root/Module/ItemDefinition/ConditionalRuleSet/index.ts:38](https://github.com/onzag/itemize/blob/5c2808d3/base/Root/Module/ItemDefinition/ConditionalRuleSet/index.ts#L38)
+[base/Root/Module/ItemDefinition/ConditionalRuleSet/index.ts:38](https://github.com/onzag/itemize/blob/f2db74a5/base/Root/Module/ItemDefinition/ConditionalRuleSet/index.ts#L38)
 
 ___
 
@@ -47,7 +48,7 @@ Types for the gates that are available
 
 #### Defined in
 
-[base/Root/Module/ItemDefinition/ConditionalRuleSet/index.ts:43](https://github.com/onzag/itemize/blob/5c2808d3/base/Root/Module/ItemDefinition/ConditionalRuleSet/index.ts#L43)
+[base/Root/Module/ItemDefinition/ConditionalRuleSet/index.ts:43](https://github.com/onzag/itemize/blob/f2db74a5/base/Root/Module/ItemDefinition/ConditionalRuleSet/index.ts#L43)
 
 ___
 
@@ -59,16 +60,16 @@ Server flags available for the conditional rule set
 
 #### Defined in
 
-[base/Root/Module/ItemDefinition/ConditionalRuleSet/index.ts:47](https://github.com/onzag/itemize/blob/5c2808d3/base/Root/Module/ItemDefinition/ConditionalRuleSet/index.ts#L47)
+[base/Root/Module/ItemDefinition/ConditionalRuleSet/index.ts:47](https://github.com/onzag/itemize/blob/f2db74a5/base/Root/Module/ItemDefinition/ConditionalRuleSet/index.ts#L47)
 
 ___
 
 ### IConditionalRuleSetRawJSONDataType
 
-Ƭ **IConditionalRuleSetRawJSONDataType**: [`IConditionalRuleSetRawJSONDataPropertyType`](../interfaces/base_Root_Module_ItemDefinition_ConditionalRuleSet.IConditionalRuleSetRawJSONDataPropertyType.md) \| [`IConditionalRuleSetRawJSONDataIncludeType`](../interfaces/base_Root_Module_ItemDefinition_ConditionalRuleSet.IConditionalRuleSetRawJSONDataIncludeType.md)
+Ƭ **IConditionalRuleSetRawJSONDataType**: [`IConditionalRuleSetRawJSONDataBaseType`](../interfaces/base_Root_Module_ItemDefinition_ConditionalRuleSet.IConditionalRuleSetRawJSONDataBaseType.md) \| [`IConditionalRuleSetRawJSONDataPropertyType`](../interfaces/base_Root_Module_ItemDefinition_ConditionalRuleSet.IConditionalRuleSetRawJSONDataPropertyType.md) \| [`IConditionalRuleSetRawJSONDataIncludeType`](../interfaces/base_Root_Module_ItemDefinition_ConditionalRuleSet.IConditionalRuleSetRawJSONDataIncludeType.md)
 
 both types of conditions combined
 
 #### Defined in
 
-[base/Root/Module/ItemDefinition/ConditionalRuleSet/index.ts:110](https://github.com/onzag/itemize/blob/5c2808d3/base/Root/Module/ItemDefinition/ConditionalRuleSet/index.ts#L110)
+[base/Root/Module/ItemDefinition/ConditionalRuleSet/index.ts:111](https://github.com/onzag/itemize/blob/f2db74a5/base/Root/Module/ItemDefinition/ConditionalRuleSet/index.ts#L111)

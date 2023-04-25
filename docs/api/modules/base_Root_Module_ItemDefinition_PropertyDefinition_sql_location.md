@@ -8,8 +8,12 @@ This file contains the sql functionality to be used with the location type
 
 ### Functions
 
+- [locationElastic](base_Root_Module_ItemDefinition_PropertyDefinition_sql_location.md#locationelastic)
+- [locationElasticOrderBy](base_Root_Module_ItemDefinition_PropertyDefinition_sql_location.md#locationelasticorderby)
+- [locationElasticSearch](base_Root_Module_ItemDefinition_PropertyDefinition_sql_location.md#locationelasticsearch)
 - [locationSQL](base_Root_Module_ItemDefinition_PropertyDefinition_sql_location.md#locationsql)
 - [locationSQLBtreeIndexable](base_Root_Module_ItemDefinition_PropertyDefinition_sql_location.md#locationsqlbtreeindexable)
+- [locationSQLElasticIn](base_Root_Module_ItemDefinition_PropertyDefinition_sql_location.md#locationsqlelasticin)
 - [locationSQLEqual](base_Root_Module_ItemDefinition_PropertyDefinition_sql_location.md#locationsqlequal)
 - [locationSQLIn](base_Root_Module_ItemDefinition_PropertyDefinition_sql_location.md#locationsqlin)
 - [locationSQLOrderBy](base_Root_Module_ItemDefinition_PropertyDefinition_sql_location.md#locationsqlorderby)
@@ -19,6 +23,74 @@ This file contains the sql functionality to be used with the location type
 - [locationSQLSelect](base_Root_Module_ItemDefinition_PropertyDefinition_sql_location.md#locationsqlselect)
 
 ## Functions
+
+### locationElastic
+
+▸ **locationElastic**(`arg`): `Object`
+
+#### Parameters
+
+| Name | Type |
+| :------ | :------ |
+| `arg` | [`ISQLArgInfo`](../interfaces/base_Root_Module_ItemDefinition_PropertyDefinition_types.ISQLArgInfo.md) |
+
+#### Returns
+
+`Object`
+
+| Name | Type |
+| :------ | :------ |
+| `properties` | `Object` |
+
+#### Defined in
+
+[base/Root/Module/ItemDefinition/PropertyDefinition/sql/location.ts:58](https://github.com/onzag/itemize/blob/f2db74a5/base/Root/Module/ItemDefinition/PropertyDefinition/sql/location.ts#L58)
+
+___
+
+### locationElasticOrderBy
+
+▸ **locationElasticOrderBy**(`arg`): `Object`
+
+Provides the functionality on how to order by
+
+#### Parameters
+
+| Name | Type | Description |
+| :------ | :------ | :------ |
+| `arg` | [`ISQLOrderByInfo`](../interfaces/base_Root_Module_ItemDefinition_PropertyDefinition_types.ISQLOrderByInfo.md) | the order by rule info |
+
+#### Returns
+
+`Object`
+
+the order by rule string array
+
+#### Defined in
+
+[base/Root/Module/ItemDefinition/PropertyDefinition/sql/location.ts:327](https://github.com/onzag/itemize/blob/f2db74a5/base/Root/Module/ItemDefinition/PropertyDefinition/sql/location.ts#L327)
+
+___
+
+### locationElasticSearch
+
+▸ **locationElasticSearch**(`arg`): `Object`
+
+#### Parameters
+
+| Name | Type |
+| :------ | :------ |
+| `arg` | [`IElasticSearchInfo`](../interfaces/base_Root_Module_ItemDefinition_PropertyDefinition_types.IElasticSearchInfo.md) |
+
+#### Returns
+
+`Object`
+
+#### Defined in
+
+[base/Root/Module/ItemDefinition/PropertyDefinition/sql/location.ts:267](https://github.com/onzag/itemize/blob/f2db74a5/base/Root/Module/ItemDefinition/PropertyDefinition/sql/location.ts#L267)
+
+___
 
 ### locationSQL
 
@@ -40,7 +112,7 @@ a partial row definition
 
 #### Defined in
 
-[base/Root/Module/ItemDefinition/PropertyDefinition/sql/location.ts:19](https://github.com/onzag/itemize/blob/5c2808d3/base/Root/Module/ItemDefinition/PropertyDefinition/sql/location.ts#L19)
+[base/Root/Module/ItemDefinition/PropertyDefinition/sql/location.ts:21](https://github.com/onzag/itemize/blob/f2db74a5/base/Root/Module/ItemDefinition/PropertyDefinition/sql/location.ts#L21)
 
 ___
 
@@ -56,7 +128,27 @@ Provides the btree indexable functionality
 
 #### Defined in
 
-[base/Root/Module/ItemDefinition/PropertyDefinition/sql/location.ts:210](https://github.com/onzag/itemize/blob/5c2808d3/base/Root/Module/ItemDefinition/PropertyDefinition/sql/location.ts#L210)
+[base/Root/Module/ItemDefinition/PropertyDefinition/sql/location.ts:376](https://github.com/onzag/itemize/blob/f2db74a5/base/Root/Module/ItemDefinition/PropertyDefinition/sql/location.ts#L376)
+
+___
+
+### locationSQLElasticIn
+
+▸ **locationSQLElasticIn**(`arg`): `Object`
+
+#### Parameters
+
+| Name | Type |
+| :------ | :------ |
+| `arg` | [`ISQLOutInfo`](../interfaces/base_Root_Module_ItemDefinition_PropertyDefinition_types.ISQLOutInfo.md) |
+
+#### Returns
+
+`Object`
+
+#### Defined in
+
+[base/Root/Module/ItemDefinition/PropertyDefinition/sql/location.ts:198](https://github.com/onzag/itemize/blob/f2db74a5/base/Root/Module/ItemDefinition/PropertyDefinition/sql/location.ts#L198)
 
 ___
 
@@ -80,7 +172,7 @@ a partial row match
 
 #### Defined in
 
-[base/Root/Module/ItemDefinition/PropertyDefinition/sql/location.ts:187](https://github.com/onzag/itemize/blob/5c2808d3/base/Root/Module/ItemDefinition/PropertyDefinition/sql/location.ts#L187)
+[base/Root/Module/ItemDefinition/PropertyDefinition/sql/location.ts:353](https://github.com/onzag/itemize/blob/f2db74a5/base/Root/Module/ItemDefinition/PropertyDefinition/sql/location.ts#L353)
 
 ___
 
@@ -105,7 +197,7 @@ a partial row
 
 #### Defined in
 
-[base/Root/Module/ItemDefinition/PropertyDefinition/sql/location.ts:76](https://github.com/onzag/itemize/blob/5c2808d3/base/Root/Module/ItemDefinition/PropertyDefinition/sql/location.ts#L76)
+[base/Root/Module/ItemDefinition/PropertyDefinition/sql/location.ts:106](https://github.com/onzag/itemize/blob/f2db74a5/base/Root/Module/ItemDefinition/PropertyDefinition/sql/location.ts#L106)
 
 ___
 
@@ -129,7 +221,7 @@ the order by rule string array
 
 #### Defined in
 
-[base/Root/Module/ItemDefinition/PropertyDefinition/sql/location.ts:175](https://github.com/onzag/itemize/blob/5c2808d3/base/Root/Module/ItemDefinition/PropertyDefinition/sql/location.ts#L175)
+[base/Root/Module/ItemDefinition/PropertyDefinition/sql/location.ts:315](https://github.com/onzag/itemize/blob/f2db74a5/base/Root/Module/ItemDefinition/PropertyDefinition/sql/location.ts#L315)
 
 ___
 
@@ -154,7 +246,7 @@ a property definition supported location type, or null
 
 #### Defined in
 
-[base/Root/Module/ItemDefinition/PropertyDefinition/sql/location.ts:105](https://github.com/onzag/itemize/blob/5c2808d3/base/Root/Module/ItemDefinition/PropertyDefinition/sql/location.ts#L105)
+[base/Root/Module/ItemDefinition/PropertyDefinition/sql/location.ts:175](https://github.com/onzag/itemize/blob/f2db74a5/base/Root/Module/ItemDefinition/PropertyDefinition/sql/location.ts#L175)
 
 ___
 
@@ -178,7 +270,7 @@ a boolean
 
 #### Defined in
 
-[base/Root/Module/ItemDefinition/PropertyDefinition/sql/location.ts:200](https://github.com/onzag/itemize/blob/5c2808d3/base/Root/Module/ItemDefinition/PropertyDefinition/sql/location.ts#L200)
+[base/Root/Module/ItemDefinition/PropertyDefinition/sql/location.ts:366](https://github.com/onzag/itemize/blob/f2db74a5/base/Root/Module/ItemDefinition/PropertyDefinition/sql/location.ts#L366)
 
 ___
 
@@ -202,7 +294,7 @@ a boolean on whether it was searched by it, or an order by rule (also when it wa
 
 #### Defined in
 
-[base/Root/Module/ItemDefinition/PropertyDefinition/sql/location.ts:124](https://github.com/onzag/itemize/blob/5c2808d3/base/Root/Module/ItemDefinition/PropertyDefinition/sql/location.ts#L124)
+[base/Root/Module/ItemDefinition/PropertyDefinition/sql/location.ts:221](https://github.com/onzag/itemize/blob/f2db74a5/base/Root/Module/ItemDefinition/PropertyDefinition/sql/location.ts#L221)
 
 ___
 
@@ -224,4 +316,4 @@ provides the SQL select form for the location type
 
 #### Defined in
 
-[base/Root/Module/ItemDefinition/PropertyDefinition/sql/location.ts:60](https://github.com/onzag/itemize/blob/5c2808d3/base/Root/Module/ItemDefinition/PropertyDefinition/sql/location.ts#L60)
+[base/Root/Module/ItemDefinition/PropertyDefinition/sql/location.ts:90](https://github.com/onzag/itemize/blob/f2db74a5/base/Root/Module/ItemDefinition/PropertyDefinition/sql/location.ts#L90)

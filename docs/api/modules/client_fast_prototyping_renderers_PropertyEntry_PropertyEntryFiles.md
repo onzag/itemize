@@ -52,9 +52,6 @@ the styles for the file entry
 | `errorMessage.fontSize` | `string` |
 | `errorMessage.height` | `string` |
 | `fileDeleteButton` | `Object` |
-| `fileDeleteButton.position` | `string` |
-| `fileDeleteButton.right` | `number` |
-| `fileDeleteButton.top` | `string` |
 | `fileRejectedDescription` | `Object` |
 | `fileRejectedDescription.fontSize` | `string` |
 | `fileRejectedDescription.overflow` | `string` |
@@ -64,27 +61,28 @@ the styles for the file entry
 | `icon` | `Object` |
 | `icon.color` | `string` |
 | `label` | (`isInvalid`: `boolean`) => { `&.focused`: { `color`: `string`  } ; `alignItems`: `string` = "center"; `color`: `string` ; `display`: `string` = "flex"; `justifyContent`: `string` = "space-between"; `width`: `string` = "100%" } |
-| `paper` | `Object` |
-| `paper.alignItems` | `string` |
-| `paper.backgroundColor` | `string` |
-| `paper.cursor` | `string` |
-| `paper.display` | `string` |
-| `paper.flexWrap` | `string` |
-| `paper.height` | `string` |
-| `paper.justifyContent` | `string` |
-| `paper.marginTop` | `string` |
-| `paper.minHeight` | `string` |
-| `paper.padding` | `string` |
-| `paper.position` | `string` |
-| `paper.width` | `string` |
+| `paper` | `any` |
+| `paperAccepting` | `Object` |
+| `paperAccepting.borderColor` | `string` |
 | `paperIconAdd` | `Object` |
 | `paperIconAdd.fontSize` | `string` |
 | `paperIconAdd.opacity` | `number` |
-| `paperPlaceholder` | (`accepting`: `boolean`, `rejecting`: `boolean`) => { `border`: `string` = "dotted 2px #ccc"; `borderColor`: `string` ; `borderRadius`: `string` = "25px"; `color`: `string` = "rgb(117, 117, 117)"; `display`: `string` = "block"; `flexGrow`: `number` = 2; `fontSize`: `string` = "1rem"; `margin`: `string` = "0 25px"; `padding`: `string` = "25px 0"; `textAlign`: `string` = "center"; `userSelect`: `string` = "none" } |
+| `paperPlaceholder` | `Object` |
+| `paperPlaceholder.borderRadius` | `string` |
+| `paperPlaceholder.color` | `string` |
+| `paperPlaceholder.display` | `string` |
+| `paperPlaceholder.flexGrow` | `number` |
+| `paperPlaceholder.fontSize` | `string` |
+| `paperPlaceholder.margin` | `string` |
+| `paperPlaceholder.padding` | `string` |
+| `paperPlaceholder.textAlign` | `string` |
+| `paperPlaceholder.userSelect` | `string` |
+| `paperRejecting` | `Object` |
+| `paperRejecting.borderColor` | `string` |
 
 #### Defined in
 
-[client/fast-prototyping/renderers/PropertyEntry/PropertyEntryFiles.tsx:35](https://github.com/onzag/itemize/blob/5c2808d3/client/fast-prototyping/renderers/PropertyEntry/PropertyEntryFiles.tsx#L35)
+[client/fast-prototyping/renderers/PropertyEntry/PropertyEntryFiles.tsx:36](https://github.com/onzag/itemize/blob/f2db74a5/client/fast-prototyping/renderers/PropertyEntry/PropertyEntryFiles.tsx#L36)
 
 ## Functions
 
@@ -109,4 +107,4 @@ a react element
 
 #### Defined in
 
-[client/fast-prototyping/renderers/PropertyEntry/PropertyEntryFiles.tsx:145](https://github.com/onzag/itemize/blob/5c2808d3/client/fast-prototyping/renderers/PropertyEntry/PropertyEntryFiles.tsx#L145)
+[client/fast-prototyping/renderers/PropertyEntry/PropertyEntryFiles.tsx:169](https://github.com/onzag/itemize/blob/f2db74a5/client/fast-prototyping/renderers/PropertyEntry/PropertyEntryFiles.tsx#L169)

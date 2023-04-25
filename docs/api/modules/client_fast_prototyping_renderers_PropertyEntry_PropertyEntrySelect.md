@@ -48,7 +48,6 @@ The styles for the select
 | `errorMessage.color` | `string` |
 | `errorMessage.fontSize` | `string` |
 | `errorMessage.height` | `string` |
-| `fieldInput` | (`isInvalid`: `boolean`, `disabled`: `boolean`) => { `&::after`: { `borderBottomColor`: `string` = "#f44336" } ; `&::before`: { `borderBottomColor`: `string` = "#e57373" } ; `&:hover::before`: { `borderBottomColor`: `string`  } ; `width`: `string` = "100%" } |
 | `icon` | `Object` |
 | `icon.color` | `string` |
 | `label` | (`isInvalid`: `boolean`) => { `&.focused`: { `color`: `string`  } ; `color`: `string`  } |
@@ -58,4 +57,4 @@ The styles for the select
 
 #### Defined in
 
-[client/fast-prototyping/renderers/PropertyEntry/PropertyEntrySelect.tsx:40](https://github.com/onzag/itemize/blob/5c2808d3/client/fast-prototyping/renderers/PropertyEntry/PropertyEntrySelect.tsx#L40)
+[client/fast-prototyping/renderers/PropertyEntry/PropertyEntrySelect.tsx:64](https://github.com/onzag/itemize/blob/f2db74a5/client/fast-prototyping/renderers/PropertyEntry/PropertyEntrySelect.tsx#L64)

@@ -8,7 +8,7 @@ Contains the property view currency handler
 
 ### Classes
 
-- [PropertyViewCurrency](../classes/client_internal_components_PropertyView_PropertyViewCurrency.PropertyViewCurrency.md)
+- [default](../classes/client_internal_components_PropertyView_PropertyViewCurrency.default.md)
 
 ### Interfaces
 

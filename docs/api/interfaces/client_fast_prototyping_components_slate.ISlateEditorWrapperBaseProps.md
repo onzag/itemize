@@ -16,7 +16,7 @@ the main component which will pass them to the wrapper
 
 - **`ISlateEditorWrapperBaseProps`**
 
-  ↳ [`MaterialUISlateWrapperWithStyles`](client_fast_prototyping_components_slate_wrapper.MaterialUISlateWrapperWithStyles.md)
+  ↳ [`IMaterialUISlateWrapperProps`](client_fast_prototyping_components_slate_wrapper.IMaterialUISlateWrapperProps.md)
 
 ## Table of contents
 
@@ -24,6 +24,7 @@ the main component which will pass them to the wrapper
 
 - [children](client_fast_prototyping_components_slate.ISlateEditorWrapperBaseProps.md#children)
 - [currentLoadError](client_fast_prototyping_components_slate.ISlateEditorWrapperBaseProps.md#currentloaderror)
+- [disabled](client_fast_prototyping_components_slate.ISlateEditorWrapperBaseProps.md#disabled)
 - [featureSupport](client_fast_prototyping_components_slate.ISlateEditorWrapperBaseProps.md#featuresupport)
 - [helpers](client_fast_prototyping_components_slate.ISlateEditorWrapperBaseProps.md#helpers)
 - [state](client_fast_prototyping_components_slate.ISlateEditorWrapperBaseProps.md#state)
@@ -45,7 +46,7 @@ where it is expected to be used
 
 #### Defined in
 
-[client/fast-prototyping/components/slate/index.tsx:1028](https://github.com/onzag/itemize/blob/5c2808d3/client/fast-prototyping/components/slate/index.tsx#L1028)
+[client/fast-prototyping/components/slate/index.tsx:807](https://github.com/onzag/itemize/blob/f2db74a5/client/fast-prototyping/components/slate/index.tsx#L807)
 
 ___
 
@@ -61,7 +62,19 @@ indeed provide this as a prop for the render
 
 #### Defined in
 
-[client/fast-prototyping/components/slate/index.tsx:1036](https://github.com/onzag/itemize/blob/5c2808d3/client/fast-prototyping/components/slate/index.tsx#L1036)
+[client/fast-prototyping/components/slate/index.tsx:815](https://github.com/onzag/itemize/blob/f2db74a5/client/fast-prototyping/components/slate/index.tsx#L815)
+
+___
+
+### disabled
+
+• **disabled**: `boolean`
+
+Whether it is disabled
+
+#### Defined in
+
+[client/fast-prototyping/components/slate/index.tsx:783](https://github.com/onzag/itemize/blob/f2db74a5/client/fast-prototyping/components/slate/index.tsx#L783)
 
 ___
 
@@ -75,7 +88,7 @@ and whatnot from it
 
 #### Defined in
 
-[client/fast-prototyping/components/slate/index.tsx:1016](https://github.com/onzag/itemize/blob/5c2808d3/client/fast-prototyping/components/slate/index.tsx#L1016)
+[client/fast-prototyping/components/slate/index.tsx:795](https://github.com/onzag/itemize/blob/f2db74a5/client/fast-prototyping/components/slate/index.tsx#L795)
 
 ___
 
@@ -88,13 +101,13 @@ and modify nodes
 
 #### Defined in
 
-[client/fast-prototyping/components/slate/index.tsx:1021](https://github.com/onzag/itemize/blob/5c2808d3/client/fast-prototyping/components/slate/index.tsx#L1021)
+[client/fast-prototyping/components/slate/index.tsx:800](https://github.com/onzag/itemize/blob/f2db74a5/client/fast-prototyping/components/slate/index.tsx#L800)
 
 ___
 
 ### state
 
-• **state**: [`ISlateEditorStateType`](client_fast_prototyping_components_slate.ISlateEditorStateType.md)
+• **state**: [`ISlateEditorInternalStateType`](client_fast_prototyping_components_slate.ISlateEditorInternalStateType.md)
 
 This is the slate editor current state
 that is passed to the wrapper in order
@@ -102,7 +115,7 @@ so it can get state information
 
 #### Defined in
 
-[client/fast-prototyping/components/slate/index.tsx:1010](https://github.com/onzag/itemize/blob/5c2808d3/client/fast-prototyping/components/slate/index.tsx#L1010)
+[client/fast-prototyping/components/slate/index.tsx:789](https://github.com/onzag/itemize/blob/f2db74a5/client/fast-prototyping/components/slate/index.tsx#L789)
 
 ## Methods
 
@@ -119,4 +132,4 @@ as the currentLoadError
 
 #### Defined in
 
-[client/fast-prototyping/components/slate/index.tsx:1041](https://github.com/onzag/itemize/blob/5c2808d3/client/fast-prototyping/components/slate/index.tsx#L1041)
+[client/fast-prototyping/components/slate/index.tsx:820](https://github.com/onzag/itemize/blob/f2db74a5/client/fast-prototyping/components/slate/index.tsx#L820)

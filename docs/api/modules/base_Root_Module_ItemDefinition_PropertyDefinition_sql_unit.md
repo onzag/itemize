@@ -8,8 +8,12 @@ This file provides the sql functionality for the unit type
 
 ### Functions
 
+- [unitElastic](base_Root_Module_ItemDefinition_PropertyDefinition_sql_unit.md#unitelastic)
+- [unitElasticOrderBy](base_Root_Module_ItemDefinition_PropertyDefinition_sql_unit.md#unitelasticorderby)
+- [unitElasticSearch](base_Root_Module_ItemDefinition_PropertyDefinition_sql_unit.md#unitelasticsearch)
 - [unitSQL](base_Root_Module_ItemDefinition_PropertyDefinition_sql_unit.md#unitsql)
 - [unitSQLBtreeIndexable](base_Root_Module_ItemDefinition_PropertyDefinition_sql_unit.md#unitsqlbtreeindexable)
+- [unitSQLElasticIn](base_Root_Module_ItemDefinition_PropertyDefinition_sql_unit.md#unitsqlelasticin)
 - [unitSQLEqual](base_Root_Module_ItemDefinition_PropertyDefinition_sql_unit.md#unitsqlequal)
 - [unitSQLIn](base_Root_Module_ItemDefinition_PropertyDefinition_sql_unit.md#unitsqlin)
 - [unitSQLOrderBy](base_Root_Module_ItemDefinition_PropertyDefinition_sql_unit.md#unitsqlorderby)
@@ -19,6 +23,78 @@ This file provides the sql functionality for the unit type
 - [unitSQLSelect](base_Root_Module_ItemDefinition_PropertyDefinition_sql_unit.md#unitsqlselect)
 
 ## Functions
+
+### unitElastic
+
+▸ **unitElastic**(`arg`): `Object`
+
+#### Parameters
+
+| Name | Type |
+| :------ | :------ |
+| `arg` | [`ISQLArgInfo`](../interfaces/base_Root_Module_ItemDefinition_PropertyDefinition_types.ISQLArgInfo.md) |
+
+#### Returns
+
+`Object`
+
+| Name | Type |
+| :------ | :------ |
+| `properties` | `Object` |
+
+#### Defined in
+
+[base/Root/Module/ItemDefinition/PropertyDefinition/sql/unit.ts:37](https://github.com/onzag/itemize/blob/f2db74a5/base/Root/Module/ItemDefinition/PropertyDefinition/sql/unit.ts#L37)
+
+___
+
+### unitElasticOrderBy
+
+▸ **unitElasticOrderBy**(`arg`): `Object`
+
+Specifies how units are to be ordered by
+
+#### Parameters
+
+| Name | Type | Description |
+| :------ | :------ | :------ |
+| `arg` | [`ISQLOrderByInfo`](../interfaces/base_Root_Module_ItemDefinition_PropertyDefinition_types.ISQLOrderByInfo.md) | the sql order by info arg |
+
+#### Returns
+
+`Object`
+
+the three string order by rule
+
+#### Defined in
+
+[base/Root/Module/ItemDefinition/PropertyDefinition/sql/unit.ts:315](https://github.com/onzag/itemize/blob/f2db74a5/base/Root/Module/ItemDefinition/PropertyDefinition/sql/unit.ts#L315)
+
+___
+
+### unitElasticSearch
+
+▸ **unitElasticSearch**(`arg`): `Object`
+
+The standard function that build queries for the property
+
+#### Parameters
+
+| Name | Type | Description |
+| :------ | :------ | :------ |
+| `arg` | [`IElasticSearchInfo`](../interfaces/base_Root_Module_ItemDefinition_PropertyDefinition_types.IElasticSearchInfo.md) | the search info arg |
+
+#### Returns
+
+`Object`
+
+a boolean on whether it was searched by it
+
+#### Defined in
+
+[base/Root/Module/ItemDefinition/PropertyDefinition/sql/unit.ts:239](https://github.com/onzag/itemize/blob/f2db74a5/base/Root/Module/ItemDefinition/PropertyDefinition/sql/unit.ts#L239)
+
+___
 
 ### unitSQL
 
@@ -40,7 +116,7 @@ a patial row definition
 
 #### Defined in
 
-[base/Root/Module/ItemDefinition/PropertyDefinition/sql/unit.ts:17](https://github.com/onzag/itemize/blob/5c2808d3/base/Root/Module/ItemDefinition/PropertyDefinition/sql/unit.ts#L17)
+[base/Root/Module/ItemDefinition/PropertyDefinition/sql/unit.ts:20](https://github.com/onzag/itemize/blob/f2db74a5/base/Root/Module/ItemDefinition/PropertyDefinition/sql/unit.ts#L20)
 
 ___
 
@@ -64,7 +140,31 @@ the rows to be btree indexed
 
 #### Defined in
 
-[base/Root/Module/ItemDefinition/PropertyDefinition/sql/unit.ts:140](https://github.com/onzag/itemize/blob/5c2808d3/base/Root/Module/ItemDefinition/PropertyDefinition/sql/unit.ts#L140)
+[base/Root/Module/ItemDefinition/PropertyDefinition/sql/unit.ts:327](https://github.com/onzag/itemize/blob/f2db74a5/base/Root/Module/ItemDefinition/PropertyDefinition/sql/unit.ts#L327)
+
+___
+
+### unitSQLElasticIn
+
+▸ **unitSQLElasticIn**(`arg`): `Object`
+
+Specifies how units are to be outputted from a raw row
+
+#### Parameters
+
+| Name | Type | Description |
+| :------ | :------ | :------ |
+| `arg` | [`ISQLOutInfo`](../interfaces/base_Root_Module_ItemDefinition_PropertyDefinition_types.ISQLOutInfo.md) | the sql out arg info |
+
+#### Returns
+
+`Object`
+
+a supported unit type (or null)
+
+#### Defined in
+
+[base/Root/Module/ItemDefinition/PropertyDefinition/sql/unit.ts:187](https://github.com/onzag/itemize/blob/f2db74a5/base/Root/Module/ItemDefinition/PropertyDefinition/sql/unit.ts#L187)
 
 ___
 
@@ -88,7 +188,7 @@ a partial row comparison
 
 #### Defined in
 
-[base/Root/Module/ItemDefinition/PropertyDefinition/sql/unit.ts:149](https://github.com/onzag/itemize/blob/5c2808d3/base/Root/Module/ItemDefinition/PropertyDefinition/sql/unit.ts#L149)
+[base/Root/Module/ItemDefinition/PropertyDefinition/sql/unit.ts:336](https://github.com/onzag/itemize/blob/f2db74a5/base/Root/Module/ItemDefinition/PropertyDefinition/sql/unit.ts#L336)
 
 ___
 
@@ -112,7 +212,7 @@ a partial row value
 
 #### Defined in
 
-[base/Root/Module/ItemDefinition/PropertyDefinition/sql/unit.ts:52](https://github.com/onzag/itemize/blob/5c2808d3/base/Root/Module/ItemDefinition/PropertyDefinition/sql/unit.ts#L52)
+[base/Root/Module/ItemDefinition/PropertyDefinition/sql/unit.ts:78](https://github.com/onzag/itemize/blob/f2db74a5/base/Root/Module/ItemDefinition/PropertyDefinition/sql/unit.ts#L78)
 
 ___
 
@@ -136,7 +236,7 @@ the three string order by rule
 
 #### Defined in
 
-[base/Root/Module/ItemDefinition/PropertyDefinition/sql/unit.ts:131](https://github.com/onzag/itemize/blob/5c2808d3/base/Root/Module/ItemDefinition/PropertyDefinition/sql/unit.ts#L131)
+[base/Root/Module/ItemDefinition/PropertyDefinition/sql/unit.ts:306](https://github.com/onzag/itemize/blob/f2db74a5/base/Root/Module/ItemDefinition/PropertyDefinition/sql/unit.ts#L306)
 
 ___
 
@@ -160,7 +260,7 @@ a supported unit type (or null)
 
 #### Defined in
 
-[base/Root/Module/ItemDefinition/PropertyDefinition/sql/unit.ts:75](https://github.com/onzag/itemize/blob/5c2808d3/base/Root/Module/ItemDefinition/PropertyDefinition/sql/unit.ts#L75)
+[base/Root/Module/ItemDefinition/PropertyDefinition/sql/unit.ts:153](https://github.com/onzag/itemize/blob/f2db74a5/base/Root/Module/ItemDefinition/PropertyDefinition/sql/unit.ts#L153)
 
 ___
 
@@ -184,7 +284,7 @@ a boolean on whether the equality succeed or not
 
 #### Defined in
 
-[base/Root/Module/ItemDefinition/PropertyDefinition/sql/unit.ts:159](https://github.com/onzag/itemize/blob/5c2808d3/base/Root/Module/ItemDefinition/PropertyDefinition/sql/unit.ts#L159)
+[base/Root/Module/ItemDefinition/PropertyDefinition/sql/unit.ts:346](https://github.com/onzag/itemize/blob/f2db74a5/base/Root/Module/ItemDefinition/PropertyDefinition/sql/unit.ts#L346)
 
 ___
 
@@ -208,7 +308,7 @@ a boolean on whether it was searched by it
 
 #### Defined in
 
-[base/Root/Module/ItemDefinition/PropertyDefinition/sql/unit.ts:93](https://github.com/onzag/itemize/blob/5c2808d3/base/Root/Module/ItemDefinition/PropertyDefinition/sql/unit.ts#L93)
+[base/Root/Module/ItemDefinition/PropertyDefinition/sql/unit.ts:201](https://github.com/onzag/itemize/blob/f2db74a5/base/Root/Module/ItemDefinition/PropertyDefinition/sql/unit.ts#L201)
 
 ___
 
@@ -230,4 +330,4 @@ the selection function for unit based elements
 
 #### Defined in
 
-[base/Root/Module/ItemDefinition/PropertyDefinition/sql/unit.ts:38](https://github.com/onzag/itemize/blob/5c2808d3/base/Root/Module/ItemDefinition/PropertyDefinition/sql/unit.ts#L38)
+[base/Root/Module/ItemDefinition/PropertyDefinition/sql/unit.ts:64](https://github.com/onzag/itemize/blob/f2db74a5/base/Root/Module/ItemDefinition/PropertyDefinition/sql/unit.ts#L64)

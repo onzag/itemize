@@ -15,6 +15,7 @@
 - [extraArgs](server_resolvers_triggers.IOTriggerArgType.md#extraargs)
 - [id](server_resolvers_triggers.IOTriggerArgType.md#id)
 - [itemDefinition](server_resolvers_triggers.IOTriggerArgType.md#itemdefinition)
+- [language](server_resolvers_triggers.IOTriggerArgType.md#language)
 - [module](server_resolvers_triggers.IOTriggerArgType.md#module)
 - [newValue](server_resolvers_triggers.IOTriggerArgType.md#newvalue)
 - [newValueBlocked](server_resolvers_triggers.IOTriggerArgType.md#newvalueblocked)
@@ -33,6 +34,8 @@
 ### Methods
 
 - [forbid](server_resolvers_triggers.IOTriggerArgType.md#forbid)
+- [setForId](server_resolvers_triggers.IOTriggerArgType.md#setforid)
+- [setVersion](server_resolvers_triggers.IOTriggerArgType.md#setversion)
 
 ## Properties
 
@@ -44,7 +47,7 @@ The action being ran
 
 #### Defined in
 
-[server/resolvers/triggers.ts:100](https://github.com/onzag/itemize/blob/5c2808d3/server/resolvers/triggers.ts#L100)
+[server/resolvers/triggers.ts:105](https://github.com/onzag/itemize/blob/f2db74a5/server/resolvers/triggers.ts#L105)
 
 ___
 
@@ -56,7 +59,7 @@ App data of the entire application
 
 #### Defined in
 
-[server/resolvers/triggers.ts:26](https://github.com/onzag/itemize/blob/5c2808d3/server/resolvers/triggers.ts#L26)
+[server/resolvers/triggers.ts:31](https://github.com/onzag/itemize/blob/f2db74a5/server/resolvers/triggers.ts#L31)
 
 ___
 
@@ -70,7 +73,7 @@ to use during a custom id event
 
 #### Defined in
 
-[server/resolvers/triggers.ts:124](https://github.com/onzag/itemize/blob/5c2808d3/server/resolvers/triggers.ts#L124)
+[server/resolvers/triggers.ts:129](https://github.com/onzag/itemize/blob/f2db74a5/server/resolvers/triggers.ts#L129)
 
 ___
 
@@ -82,7 +85,7 @@ The dictionary that was obtained from the language
 
 #### Defined in
 
-[server/resolvers/triggers.ts:22](https://github.com/onzag/itemize/blob/5c2808d3/server/resolvers/triggers.ts#L22)
+[server/resolvers/triggers.ts:27](https://github.com/onzag/itemize/blob/f2db74a5/server/resolvers/triggers.ts#L27)
 
 ___
 
@@ -94,7 +97,7 @@ Arguments that are not part of the patch that were passed to graphql
 
 #### Defined in
 
-[server/resolvers/triggers.ts:88](https://github.com/onzag/itemize/blob/5c2808d3/server/resolvers/triggers.ts#L88)
+[server/resolvers/triggers.ts:93](https://github.com/onzag/itemize/blob/f2db74a5/server/resolvers/triggers.ts#L93)
 
 ___
 
@@ -107,7 +110,7 @@ CREATE, but it is set for CREATED and others
 
 #### Defined in
 
-[server/resolvers/triggers.ts:105](https://github.com/onzag/itemize/blob/5c2808d3/server/resolvers/triggers.ts#L105)
+[server/resolvers/triggers.ts:110](https://github.com/onzag/itemize/blob/f2db74a5/server/resolvers/triggers.ts#L110)
 
 ___
 
@@ -119,7 +122,19 @@ the item definition in question
 
 #### Defined in
 
-[server/resolvers/triggers.ts:92](https://github.com/onzag/itemize/blob/5c2808d3/server/resolvers/triggers.ts#L92)
+[server/resolvers/triggers.ts:97](https://github.com/onzag/itemize/blob/f2db74a5/server/resolvers/triggers.ts#L97)
+
+___
+
+### language
+
+• **language**: `string`
+
+The language that was used
+
+#### Defined in
+
+[server/resolvers/triggers.ts:23](https://github.com/onzag/itemize/blob/f2db74a5/server/resolvers/triggers.ts#L23)
 
 ___
 
@@ -131,7 +146,7 @@ The module in question
 
 #### Defined in
 
-[server/resolvers/triggers.ts:96](https://github.com/onzag/itemize/blob/5c2808d3/server/resolvers/triggers.ts#L96)
+[server/resolvers/triggers.ts:101](https://github.com/onzag/itemize/blob/f2db74a5/server/resolvers/triggers.ts#L101)
 
 ___
 
@@ -144,7 +159,7 @@ on done requests
 
 #### Defined in
 
-[server/resolvers/triggers.ts:43](https://github.com/onzag/itemize/blob/5c2808d3/server/resolvers/triggers.ts#L43)
+[server/resolvers/triggers.ts:48](https://github.com/onzag/itemize/blob/f2db74a5/server/resolvers/triggers.ts#L48)
 
 ___
 
@@ -156,7 +171,7 @@ whether the new value is blocked
 
 #### Defined in
 
-[server/resolvers/triggers.ts:51](https://github.com/onzag/itemize/blob/5c2808d3/server/resolvers/triggers.ts#L51)
+[server/resolvers/triggers.ts:56](https://github.com/onzag/itemize/blob/f2db74a5/server/resolvers/triggers.ts#L56)
 
 ___
 
@@ -168,7 +183,7 @@ The new value when sql is done
 
 #### Defined in
 
-[server/resolvers/triggers.ts:47](https://github.com/onzag/itemize/blob/5c2808d3/server/resolvers/triggers.ts#L47)
+[server/resolvers/triggers.ts:52](https://github.com/onzag/itemize/blob/f2db74a5/server/resolvers/triggers.ts#L52)
 
 ___
 
@@ -180,7 +195,7 @@ the current value that the database is hosting
 
 #### Defined in
 
-[server/resolvers/triggers.ts:30](https://github.com/onzag/itemize/blob/5c2808d3/server/resolvers/triggers.ts#L30)
+[server/resolvers/triggers.ts:35](https://github.com/onzag/itemize/blob/f2db74a5/server/resolvers/triggers.ts#L35)
 
 ___
 
@@ -192,7 +207,7 @@ whether the original value is blocked
 
 #### Defined in
 
-[server/resolvers/triggers.ts:38](https://github.com/onzag/itemize/blob/5c2808d3/server/resolvers/triggers.ts#L38)
+[server/resolvers/triggers.ts:43](https://github.com/onzag/itemize/blob/f2db74a5/server/resolvers/triggers.ts#L43)
 
 ___
 
@@ -204,7 +219,7 @@ The original value in sql form
 
 #### Defined in
 
-[server/resolvers/triggers.ts:34](https://github.com/onzag/itemize/blob/5c2808d3/server/resolvers/triggers.ts#L34)
+[server/resolvers/triggers.ts:39](https://github.com/onzag/itemize/blob/f2db74a5/server/resolvers/triggers.ts#L39)
 
 ___
 
@@ -217,7 +232,7 @@ value
 
 #### Defined in
 
-[server/resolvers/triggers.ts:56](https://github.com/onzag/itemize/blob/5c2808d3/server/resolvers/triggers.ts#L56)
+[server/resolvers/triggers.ts:61](https://github.com/onzag/itemize/blob/f2db74a5/server/resolvers/triggers.ts#L61)
 
 ___
 
@@ -232,7 +247,7 @@ might differ from the current user if create in behalf is active
 
 #### Defined in
 
-[server/resolvers/triggers.ts:63](https://github.com/onzag/itemize/blob/5c2808d3/server/resolvers/triggers.ts#L63)
+[server/resolvers/triggers.ts:68](https://github.com/onzag/itemize/blob/f2db74a5/server/resolvers/triggers.ts#L68)
 
 ___
 
@@ -255,7 +270,7 @@ might differ from the current user if create in behalf is active
 
 #### Defined in
 
-[server/resolvers/triggers.ts:70](https://github.com/onzag/itemize/blob/5c2808d3/server/resolvers/triggers.ts#L70)
+[server/resolvers/triggers.ts:75](https://github.com/onzag/itemize/blob/f2db74a5/server/resolvers/triggers.ts#L75)
 
 ___
 
@@ -268,7 +283,7 @@ to blocked
 
 #### Defined in
 
-[server/resolvers/triggers.ts:79](https://github.com/onzag/itemize/blob/5c2808d3/server/resolvers/triggers.ts#L79)
+[server/resolvers/triggers.ts:84](https://github.com/onzag/itemize/blob/f2db74a5/server/resolvers/triggers.ts#L84)
 
 ___
 
@@ -281,7 +296,7 @@ to blocked
 
 #### Defined in
 
-[server/resolvers/triggers.ts:84](https://github.com/onzag/itemize/blob/5c2808d3/server/resolvers/triggers.ts#L84)
+[server/resolvers/triggers.ts:89](https://github.com/onzag/itemize/blob/f2db74a5/server/resolvers/triggers.ts#L89)
 
 ___
 
@@ -301,7 +316,7 @@ The user we are working with
 
 #### Defined in
 
-[server/resolvers/triggers.ts:114](https://github.com/onzag/itemize/blob/5c2808d3/server/resolvers/triggers.ts#L114)
+[server/resolvers/triggers.ts:119](https://github.com/onzag/itemize/blob/f2db74a5/server/resolvers/triggers.ts#L119)
 
 ___
 
@@ -314,7 +329,7 @@ CREATE, but it is set for CREATED and others
 
 #### Defined in
 
-[server/resolvers/triggers.ts:110](https://github.com/onzag/itemize/blob/5c2808d3/server/resolvers/triggers.ts#L110)
+[server/resolvers/triggers.ts:115](https://github.com/onzag/itemize/blob/f2db74a5/server/resolvers/triggers.ts#L115)
 
 ## Methods
 
@@ -337,4 +352,48 @@ Causes the request to be forbidden
 
 #### Defined in
 
-[server/resolvers/triggers.ts:128](https://github.com/onzag/itemize/blob/5c2808d3/server/resolvers/triggers.ts#L128)
+[server/resolvers/triggers.ts:133](https://github.com/onzag/itemize/blob/f2db74a5/server/resolvers/triggers.ts#L133)
+
+___
+
+### setForId
+
+▸ **setForId**(`id`): `void`
+
+Changes the id that will be used in a CREATE event
+
+#### Parameters
+
+| Name | Type |
+| :------ | :------ |
+| `id` | `string` |
+
+#### Returns
+
+`void`
+
+#### Defined in
+
+[server/resolvers/triggers.ts:137](https://github.com/onzag/itemize/blob/f2db74a5/server/resolvers/triggers.ts#L137)
+
+___
+
+### setVersion
+
+▸ **setVersion**(`version`): `void`
+
+Changes the version that will be used in a CREATE event
+
+#### Parameters
+
+| Name | Type |
+| :------ | :------ |
+| `version` | `string` |
+
+#### Returns
+
+`void`
+
+#### Defined in
+
+[server/resolvers/triggers.ts:141](https://github.com/onzag/itemize/blob/f2db74a5/server/resolvers/triggers.ts#L141)

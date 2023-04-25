@@ -49,7 +49,7 @@ Error.constructor
 
 #### Defined in
 
-[client/internal/workers/cache/cache.worker.search.ts:46](https://github.com/onzag/itemize/blob/5c2808d3/client/internal/workers/cache/cache.worker.search.ts#L46)
+[client/internal/workers/cache/cache.worker.search.ts:46](https://github.com/onzag/itemize/blob/f2db74a5/client/internal/workers/cache/cache.worker.search.ts#L46)
 
 ## Properties
 

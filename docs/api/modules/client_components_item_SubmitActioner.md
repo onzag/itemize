@@ -16,6 +16,7 @@ for displaying errors and trigger actions after success or failure
 ### Functions
 
 - [default](client_components_item_SubmitActioner.md#default)
+- [useSubmitActioner](client_components_item_SubmitActioner.md#usesubmitactioner)
 
 ## Functions
 
@@ -43,4 +44,22 @@ a react component
 
 #### Defined in
 
-[client/components/item/SubmitActioner.tsx:108](https://github.com/onzag/itemize/blob/5c2808d3/client/components/item/SubmitActioner.tsx#L108)
+[client/components/item/SubmitActioner.tsx:140](https://github.com/onzag/itemize/blob/f2db74a5/client/components/item/SubmitActioner.tsx#L140)
+
+___
+
+### useSubmitActioner
+
+▸ **useSubmitActioner**(): [`ISubmitActionerInfoArgType`](../interfaces/client_components_item_SubmitActioner.ISubmitActionerInfoArgType.md)
+
+Hook version for the submit actioner
+
+#### Returns
+
+[`ISubmitActionerInfoArgType`](../interfaces/client_components_item_SubmitActioner.ISubmitActionerInfoArgType.md)
+
+the submit actioner information
+
+#### Defined in
+
+[client/components/item/SubmitActioner.tsx:154](https://github.com/onzag/itemize/blob/f2db74a5/client/components/item/SubmitActioner.tsx#L154)

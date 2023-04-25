@@ -36,7 +36,7 @@ The unregister version of [IOwnedParentedSearchRegisterRequest](base_remote_prot
 
 #### Defined in
 
-[base/remote-protocol.ts:439](https://github.com/onzag/itemize/blob/5c2808d3/base/remote-protocol.ts#L439)
+[base/remote-protocol.ts:489](https://github.com/onzag/itemize/blob/f2db74a5/base/remote-protocol.ts#L489)
 
 ___
 
@@ -50,7 +50,7 @@ ___
 
 #### Defined in
 
-[base/remote-protocol.ts:466](https://github.com/onzag/itemize/blob/5c2808d3/base/remote-protocol.ts#L466)
+[base/remote-protocol.ts:547](https://github.com/onzag/itemize/blob/f2db74a5/base/remote-protocol.ts#L547)
 
 ___
 
@@ -64,7 +64,7 @@ ___
 
 #### Defined in
 
-[base/remote-protocol.ts:465](https://github.com/onzag/itemize/blob/5c2808d3/base/remote-protocol.ts#L465)
+[base/remote-protocol.ts:546](https://github.com/onzag/itemize/blob/f2db74a5/base/remote-protocol.ts#L546)
 
 ___
 
@@ -78,7 +78,7 @@ ___
 
 #### Defined in
 
-[base/remote-protocol.ts:467](https://github.com/onzag/itemize/blob/5c2808d3/base/remote-protocol.ts#L467)
+[base/remote-protocol.ts:548](https://github.com/onzag/itemize/blob/f2db74a5/base/remote-protocol.ts#L548)
 
 ___
 
@@ -92,4 +92,4 @@ ___
 
 #### Defined in
 
-[base/remote-protocol.ts:428](https://github.com/onzag/itemize/blob/5c2808d3/base/remote-protocol.ts#L428)
+[base/remote-protocol.ts:478](https://github.com/onzag/itemize/blob/f2db74a5/base/remote-protocol.ts#L478)

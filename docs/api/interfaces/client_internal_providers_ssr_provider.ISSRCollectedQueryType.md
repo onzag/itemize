@@ -26,7 +26,7 @@ The fields we collected for
 
 #### Defined in
 
-[client/internal/providers/ssr-provider.tsx:32](https://github.com/onzag/itemize/blob/5c2808d3/client/internal/providers/ssr-provider.tsx#L32)
+[client/internal/providers/ssr-provider.tsx:33](https://github.com/onzag/itemize/blob/f2db74a5/client/internal/providers/ssr-provider.tsx#L33)
 
 ___
 
@@ -38,7 +38,7 @@ The id
 
 #### Defined in
 
-[client/internal/providers/ssr-provider.tsx:20](https://github.com/onzag/itemize/blob/5c2808d3/client/internal/providers/ssr-provider.tsx#L20)
+[client/internal/providers/ssr-provider.tsx:21](https://github.com/onzag/itemize/blob/f2db74a5/client/internal/providers/ssr-provider.tsx#L21)
 
 ___
 
@@ -50,7 +50,7 @@ The item defintion qualified name
 
 #### Defined in
 
-[client/internal/providers/ssr-provider.tsx:16](https://github.com/onzag/itemize/blob/5c2808d3/client/internal/providers/ssr-provider.tsx#L16)
+[client/internal/providers/ssr-provider.tsx:17](https://github.com/onzag/itemize/blob/f2db74a5/client/internal/providers/ssr-provider.tsx#L17)
 
 ___
 
@@ -62,7 +62,7 @@ The value that is collected
 
 #### Defined in
 
-[client/internal/providers/ssr-provider.tsx:28](https://github.com/onzag/itemize/blob/5c2808d3/client/internal/providers/ssr-provider.tsx#L28)
+[client/internal/providers/ssr-provider.tsx:29](https://github.com/onzag/itemize/blob/f2db74a5/client/internal/providers/ssr-provider.tsx#L29)
 
 ___
 
@@ -74,4 +74,4 @@ The version or null
 
 #### Defined in
 
-[client/internal/providers/ssr-provider.tsx:24](https://github.com/onzag/itemize/blob/5c2808d3/client/internal/providers/ssr-provider.tsx#L24)
+[client/internal/providers/ssr-provider.tsx:25](https://github.com/onzag/itemize/blob/f2db74a5/client/internal/providers/ssr-provider.tsx#L25)

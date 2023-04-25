@@ -19,6 +19,7 @@
 ### Properties
 
 - [context](client_components_util_TitleReader.ActualTitleReader.md#context)
+- [lastRenderedFor](client_components_util_TitleReader.ActualTitleReader.md#lastrenderedfor)
 - [props](client_components_util_TitleReader.ActualTitleReader.md#props)
 - [refs](client_components_util_TitleReader.ActualTitleReader.md#refs)
 - [state](client_components_util_TitleReader.ActualTitleReader.md#state)
@@ -60,7 +61,7 @@ React.Component&lt;ActualTitleReaderProps, {}\&gt;.constructor
 
 #### Defined in
 
-[client/components/util/TitleReader.tsx:17](https://github.com/onzag/itemize/blob/5c2808d3/client/components/util/TitleReader.tsx#L17)
+[client/components/util/TitleReader.tsx:23](https://github.com/onzag/itemize/blob/f2db74a5/client/components/util/TitleReader.tsx#L23)
 
 ## Properties
 
@@ -89,6 +90,19 @@ React.Component.context
 #### Defined in
 
 node_modules/@types/react/index.d.ts:479
+
+___
+
+### lastRenderedFor
+
+• `Private` **lastRenderedFor**: `string`
+
+Sometimes when rendering the title setter will mount and change the title
+before the reader has the time to register
+
+#### Defined in
+
+[client/components/util/TitleReader.tsx:21](https://github.com/onzag/itemize/blob/f2db74a5/client/components/util/TitleReader.tsx#L21)
 
 ___
 
@@ -331,7 +345,7 @@ React.Component.componentDidMount
 
 #### Defined in
 
-[client/components/util/TitleReader.tsx:20](https://github.com/onzag/itemize/blob/5c2808d3/client/components/util/TitleReader.tsx#L20)
+[client/components/util/TitleReader.tsx:26](https://github.com/onzag/itemize/blob/f2db74a5/client/components/util/TitleReader.tsx#L26)
 
 ___
 
@@ -449,7 +463,7 @@ React.Component.componentWillUnmount
 
 #### Defined in
 
-[client/components/util/TitleReader.tsx:24](https://github.com/onzag/itemize/blob/5c2808d3/client/components/util/TitleReader.tsx#L24)
+[client/components/util/TitleReader.tsx:34](https://github.com/onzag/itemize/blob/f2db74a5/client/components/util/TitleReader.tsx#L34)
 
 ___
 
@@ -562,7 +576,7 @@ React.Component.render
 
 #### Defined in
 
-[client/components/util/TitleReader.tsx:28](https://github.com/onzag/itemize/blob/5c2808d3/client/components/util/TitleReader.tsx#L28)
+[client/components/util/TitleReader.tsx:38](https://github.com/onzag/itemize/blob/f2db74a5/client/components/util/TitleReader.tsx#L38)
 
 ___
 

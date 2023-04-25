@@ -21,6 +21,8 @@ check [IParentedSearchRegisterRequest](base_remote_protocol.IParentedSearchRegis
 
 ### Properties
 
+- [createdRecords](base_remote_protocol.IParentedSearchRecordsEvent.md#createdrecords)
+- [deletedRecords](base_remote_protocol.IParentedSearchRecordsEvent.md#deletedrecords)
 - [lostRecords](base_remote_protocol.IParentedSearchRecordsEvent.md#lostrecords)
 - [modifiedRecords](base_remote_protocol.IParentedSearchRecordsEvent.md#modifiedrecords)
 - [newLastModified](base_remote_protocol.IParentedSearchRecordsEvent.md#newlastmodified)
@@ -31,6 +33,34 @@ check [IParentedSearchRegisterRequest](base_remote_protocol.IParentedSearchRegis
 - [qualifiedPathName](base_remote_protocol.IParentedSearchRecordsEvent.md#qualifiedpathname)
 
 ## Properties
+
+### createdRecords
+
+• **createdRecords**: [`IGQLSearchRecord`](gql_querier.IGQLSearchRecord.md)[]
+
+#### Inherited from
+
+IBaseSearchRecordsEvent.createdRecords
+
+#### Defined in
+
+[base/remote-protocol.ts:112](https://github.com/onzag/itemize/blob/f2db74a5/base/remote-protocol.ts#L112)
+
+___
+
+### deletedRecords
+
+• **deletedRecords**: [`IGQLSearchRecord`](gql_querier.IGQLSearchRecord.md)[]
+
+#### Inherited from
+
+IBaseSearchRecordsEvent.deletedRecords
+
+#### Defined in
+
+[base/remote-protocol.ts:117](https://github.com/onzag/itemize/blob/f2db74a5/base/remote-protocol.ts#L117)
+
+___
 
 ### lostRecords
 
@@ -44,7 +74,7 @@ IBaseSearchRecordsEvent.lostRecords
 
 #### Defined in
 
-[base/remote-protocol.ts:115](https://github.com/onzag/itemize/blob/5c2808d3/base/remote-protocol.ts#L115)
+[base/remote-protocol.ts:116](https://github.com/onzag/itemize/blob/f2db74a5/base/remote-protocol.ts#L116)
 
 ___
 
@@ -60,7 +90,7 @@ IBaseSearchRecordsEvent.modifiedRecords
 
 #### Defined in
 
-[base/remote-protocol.ts:119](https://github.com/onzag/itemize/blob/5c2808d3/base/remote-protocol.ts#L119)
+[base/remote-protocol.ts:121](https://github.com/onzag/itemize/blob/f2db74a5/base/remote-protocol.ts#L121)
 
 ___
 
@@ -76,7 +106,7 @@ IBaseSearchRecordsEvent.newLastModified
 
 #### Defined in
 
-[base/remote-protocol.ts:123](https://github.com/onzag/itemize/blob/5c2808d3/base/remote-protocol.ts#L123)
+[base/remote-protocol.ts:125](https://github.com/onzag/itemize/blob/f2db74a5/base/remote-protocol.ts#L125)
 
 ___
 
@@ -92,7 +122,7 @@ IBaseSearchRecordsEvent.newRecords
 
 #### Defined in
 
-[base/remote-protocol.ts:111](https://github.com/onzag/itemize/blob/5c2808d3/base/remote-protocol.ts#L111)
+[base/remote-protocol.ts:111](https://github.com/onzag/itemize/blob/f2db74a5/base/remote-protocol.ts#L111)
 
 ___
 
@@ -102,7 +132,7 @@ ___
 
 #### Defined in
 
-[base/remote-protocol.ts:150](https://github.com/onzag/itemize/blob/5c2808d3/base/remote-protocol.ts#L150)
+[base/remote-protocol.ts:152](https://github.com/onzag/itemize/blob/f2db74a5/base/remote-protocol.ts#L152)
 
 ___
 
@@ -112,7 +142,7 @@ ___
 
 #### Defined in
 
-[base/remote-protocol.ts:149](https://github.com/onzag/itemize/blob/5c2808d3/base/remote-protocol.ts#L149)
+[base/remote-protocol.ts:151](https://github.com/onzag/itemize/blob/f2db74a5/base/remote-protocol.ts#L151)
 
 ___
 
@@ -122,7 +152,7 @@ ___
 
 #### Defined in
 
-[base/remote-protocol.ts:151](https://github.com/onzag/itemize/blob/5c2808d3/base/remote-protocol.ts#L151)
+[base/remote-protocol.ts:153](https://github.com/onzag/itemize/blob/f2db74a5/base/remote-protocol.ts#L153)
 
 ___
 
@@ -138,4 +168,4 @@ IBaseSearchRecordsEvent.qualifiedPathName
 
 #### Defined in
 
-[base/remote-protocol.ts:107](https://github.com/onzag/itemize/blob/5c2808d3/base/remote-protocol.ts#L107)
+[base/remote-protocol.ts:107](https://github.com/onzag/itemize/blob/f2db74a5/base/remote-protocol.ts#L107)

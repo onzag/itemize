@@ -23,6 +23,8 @@
 - [PROTECTED\_USERNAMES](constants.IItemizeConstantsConfig.md#protected_usernames)
 - [SERVER\_BLOCK\_UNTIL\_REFRESH\_TIME](constants.IItemizeConstantsConfig.md#server_block_until_refresh_time)
 - [SERVER\_DATA\_MIN\_UPDATE\_TIME](constants.IItemizeConstantsConfig.md#server_data_min_update_time)
+- [SERVER\_ELASTIC\_CONSISTENCY\_CHECK\_TIME](constants.IItemizeConstantsConfig.md#server_elastic_consistency_check_time)
+- [SERVER\_ELASTIC\_PING\_INTERVAL\_TIME](constants.IItemizeConstantsConfig.md#server_elastic_ping_interval_time)
 - [SERVER\_MAPPING\_TIME](constants.IItemizeConstantsConfig.md#server_mapping_time)
 
 ## Properties
@@ -35,7 +37,7 @@ The supported mime types for images
 
 #### Defined in
 
-[constants.ts:77](https://github.com/onzag/itemize/blob/5c2808d3/constants.ts#L77)
+[constants.ts:77](https://github.com/onzag/itemize/blob/f2db74a5/constants.ts#L77)
 
 ___
 
@@ -47,7 +49,7 @@ The maximum size of a given graphql query in bytes
 
 #### Defined in
 
-[constants.ts:57](https://github.com/onzag/itemize/blob/5c2808d3/constants.ts#L57)
+[constants.ts:57](https://github.com/onzag/itemize/blob/f2db74a5/constants.ts#L57)
 
 ___
 
@@ -60,7 +62,7 @@ top amount of files in a property
 
 #### Defined in
 
-[constants.ts:47](https://github.com/onzag/itemize/blob/5c2808d3/constants.ts#L47)
+[constants.ts:47](https://github.com/onzag/itemize/blob/f2db74a5/constants.ts#L47)
 
 ___
 
@@ -74,7 +76,7 @@ the max file size and this number to specify a size limit
 
 #### Defined in
 
-[constants.ts:53](https://github.com/onzag/itemize/blob/5c2808d3/constants.ts#L53)
+[constants.ts:53](https://github.com/onzag/itemize/blob/f2db74a5/constants.ts#L53)
 
 ___
 
@@ -87,7 +89,7 @@ your nginx config is in line with this number, this should be a byte number
 
 #### Defined in
 
-[constants.ts:42](https://github.com/onzag/itemize/blob/5c2808d3/constants.ts#L42)
+[constants.ts:42](https://github.com/onzag/itemize/blob/f2db74a5/constants.ts#L42)
 
 ___
 
@@ -101,7 +103,7 @@ this check is expensive so checking twice is not good
 
 #### Defined in
 
-[constants.ts:37](https://github.com/onzag/itemize/blob/5c2808d3/constants.ts#L37)
+[constants.ts:37](https://github.com/onzag/itemize/blob/f2db74a5/constants.ts#L37)
 
 ___
 
@@ -115,7 +117,7 @@ these are used for realtime updates
 
 #### Defined in
 
-[constants.ts:104](https://github.com/onzag/itemize/blob/5c2808d3/constants.ts#L104)
+[constants.ts:118](https://github.com/onzag/itemize/blob/f2db74a5/constants.ts#L118)
 
 ___
 
@@ -128,7 +130,7 @@ have that is build for the search mode
 
 #### Defined in
 
-[constants.ts:73](https://github.com/onzag/itemize/blob/5c2808d3/constants.ts#L73)
+[constants.ts:73](https://github.com/onzag/itemize/blob/f2db74a5/constants.ts#L73)
 
 ___
 
@@ -141,7 +143,7 @@ children can retrieve at once in a given search query
 
 #### Defined in
 
-[constants.ts:68](https://github.com/onzag/itemize/blob/5c2808d3/constants.ts#L68)
+[constants.ts:68](https://github.com/onzag/itemize/blob/f2db74a5/constants.ts#L68)
 
 ___
 
@@ -155,7 +157,7 @@ this also affects the get list command
 
 #### Defined in
 
-[constants.ts:63](https://github.com/onzag/itemize/blob/5c2808d3/constants.ts#L63)
+[constants.ts:63](https://github.com/onzag/itemize/blob/f2db74a5/constants.ts#L63)
 
 ___
 
@@ -167,7 +169,7 @@ Defines how many characters a string type might have
 
 #### Defined in
 
-[constants.ts:31](https://github.com/onzag/itemize/blob/5c2808d3/constants.ts#L31)
+[constants.ts:31](https://github.com/onzag/itemize/blob/f2db74a5/constants.ts#L31)
 
 ___
 
@@ -179,7 +181,7 @@ The maximum supported year
 
 #### Defined in
 
-[constants.ts:27](https://github.com/onzag/itemize/blob/5c2808d3/constants.ts#L27)
+[constants.ts:27](https://github.com/onzag/itemize/blob/f2db74a5/constants.ts#L27)
 
 ___
 
@@ -197,7 +199,7 @@ to specify it
 
 #### Defined in
 
-[constants.ts:114](https://github.com/onzag/itemize/blob/5c2808d3/constants.ts#L114)
+[constants.ts:128](https://github.com/onzag/itemize/blob/f2db74a5/constants.ts#L128)
 
 ___
 
@@ -212,7 +214,7 @@ this is a millisecond amount
 
 #### Defined in
 
-[constants.ts:98](https://github.com/onzag/itemize/blob/5c2808d3/constants.ts#L98)
+[constants.ts:98](https://github.com/onzag/itemize/blob/f2db74a5/constants.ts#L98)
 
 ___
 
@@ -228,7 +230,37 @@ this is a millisecond amount
 
 #### Defined in
 
-[constants.ts:85](https://github.com/onzag/itemize/blob/5c2808d3/constants.ts#L85)
+[constants.ts:85](https://github.com/onzag/itemize/blob/f2db74a5/constants.ts#L85)
+
+___
+
+### SERVER\_ELASTIC\_CONSISTENCY\_CHECK\_TIME
+
+• `Optional` **SERVER\_ELASTIC\_CONSISTENCY\_CHECK\_TIME**: `number`
+
+The time it takes for elasticsearch (if available)
+to be cleaned the old records that are not expected to be retrieved
+this has to do with the since limiter that may exist within
+indexes
+
+#### Defined in
+
+[constants.ts:105](https://github.com/onzag/itemize/blob/f2db74a5/constants.ts#L105)
+
+___
+
+### SERVER\_ELASTIC\_PING\_INTERVAL\_TIME
+
+• `Optional` **SERVER\_ELASTIC\_PING\_INTERVAL\_TIME**: `number`
+
+The time it takes for elasticsearch (if available)
+to run the pings that send information about the state of the server
+by default this sends the status of the machine, CPU, memory usage, every
+10 seconds, aka 10000ms
+
+#### Defined in
+
+[constants.ts:112](https://github.com/onzag/itemize/blob/f2db74a5/constants.ts#L112)
 
 ___
 
@@ -242,4 +274,4 @@ this is a millisecond amount
 
 #### Defined in
 
-[constants.ts:91](https://github.com/onzag/itemize/blob/5c2808d3/constants.ts#L91)
+[constants.ts:91](https://github.com/onzag/itemize/blob/f2db74a5/constants.ts#L91)

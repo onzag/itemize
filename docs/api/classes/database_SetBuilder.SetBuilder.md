@@ -19,6 +19,8 @@
 ### Properties
 
 - [expressions](database_SetBuilder.SetBuilder.md#expressions)
+- [hasUnknownAffectedColumnExpression](database_SetBuilder.SetBuilder.md#hasunknownaffectedcolumnexpression)
+- [knownAffectedColumns](database_SetBuilder.SetBuilder.md#knownaffectedcolumns)
 
 ### Methods
 
@@ -51,7 +53,7 @@ Builds a new set builder
 
 #### Defined in
 
-[database/SetBuilder.ts:21](https://github.com/onzag/itemize/blob/5c2808d3/database/SetBuilder.ts#L21)
+[database/SetBuilder.ts:23](https://github.com/onzag/itemize/blob/f2db74a5/database/SetBuilder.ts#L23)
 
 ## Properties
 
@@ -63,7 +65,27 @@ What we are setting as expressions
 
 #### Defined in
 
-[database/SetBuilder.ts:16](https://github.com/onzag/itemize/blob/5c2808d3/database/SetBuilder.ts#L16)
+[database/SetBuilder.ts:16](https://github.com/onzag/itemize/blob/f2db74a5/database/SetBuilder.ts#L16)
+
+___
+
+### hasUnknownAffectedColumnExpression
+
+• **hasUnknownAffectedColumnExpression**: `boolean` = `false`
+
+#### Defined in
+
+[database/SetBuilder.ts:18](https://github.com/onzag/itemize/blob/f2db74a5/database/SetBuilder.ts#L18)
+
+___
+
+### knownAffectedColumns
+
+• **knownAffectedColumns**: [`string`, `string`][] = `[]`
+
+#### Defined in
+
+[database/SetBuilder.ts:17](https://github.com/onzag/itemize/blob/f2db74a5/database/SetBuilder.ts#L17)
 
 ## Methods
 
@@ -89,7 +111,7 @@ Adds a binding source to the binding source list in order
 
 #### Defined in
 
-[database/base.ts:69](https://github.com/onzag/itemize/blob/5c2808d3/database/base.ts#L69)
+[database/base.ts:69](https://github.com/onzag/itemize/blob/f2db74a5/database/base.ts#L69)
 
 ___
 
@@ -115,7 +137,7 @@ Adds many binding sources to the bindings sources list
 
 #### Defined in
 
-[database/base.ts:77](https://github.com/onzag/itemize/blob/5c2808d3/database/base.ts#L77)
+[database/base.ts:77](https://github.com/onzag/itemize/blob/f2db74a5/database/base.ts#L77)
 
 ___
 
@@ -133,7 +155,7 @@ itself
 
 #### Defined in
 
-[database/SetBuilder.ts:97](https://github.com/onzag/itemize/blob/5c2808d3/database/SetBuilder.ts#L97)
+[database/SetBuilder.ts:115](https://github.com/onzag/itemize/blob/f2db74a5/database/SetBuilder.ts#L115)
 
 ___
 
@@ -153,7 +175,7 @@ Removes all binding sources
 
 #### Defined in
 
-[database/base.ts:105](https://github.com/onzag/itemize/blob/5c2808d3/database/base.ts#L105)
+[database/base.ts:105](https://github.com/onzag/itemize/blob/f2db74a5/database/base.ts#L105)
 
 ___
 
@@ -175,7 +197,7 @@ a string that represents the compiled result
 
 #### Defined in
 
-[database/SetBuilder.ts:86](https://github.com/onzag/itemize/blob/5c2808d3/database/SetBuilder.ts#L86)
+[database/SetBuilder.ts:104](https://github.com/onzag/itemize/blob/f2db74a5/database/SetBuilder.ts#L104)
 
 ___
 
@@ -198,7 +220,7 @@ a list of basic bindings
 
 #### Defined in
 
-[database/base.ts:168](https://github.com/onzag/itemize/blob/5c2808d3/database/base.ts#L168)
+[database/base.ts:168](https://github.com/onzag/itemize/blob/f2db74a5/database/base.ts#L168)
 
 ___
 
@@ -218,13 +240,13 @@ Removes the last added biding source and returns it
 
 #### Defined in
 
-[database/base.ts:112](https://github.com/onzag/itemize/blob/5c2808d3/database/base.ts#L112)
+[database/base.ts:112](https://github.com/onzag/itemize/blob/f2db74a5/database/base.ts#L112)
 
 ___
 
 ### set
 
-▸ **set**(`expression`, `bindings?`): [`SetBuilder`](database_SetBuilder.SetBuilder.md)
+▸ **set**(`expression`, `bindings?`, `affectedColumn?`): [`SetBuilder`](database_SetBuilder.SetBuilder.md)
 
 sets based on an expression
 
@@ -234,6 +256,7 @@ sets based on an expression
 | :------ | :------ | :------ |
 | `expression` | `string` | the expression to use |
 | `bindings?` | [`BasicBindingType`](../modules/database_base.md#basicbindingtype)[] | - |
+| `affectedColumn?` | `string` \| [`string`, `string`] | - |
 
 #### Returns
 
@@ -243,7 +266,7 @@ itself
 
 #### Defined in
 
-[database/SetBuilder.ts:76](https://github.com/onzag/itemize/blob/5c2808d3/database/SetBuilder.ts#L76)
+[database/SetBuilder.ts:83](https://github.com/onzag/itemize/blob/f2db74a5/database/SetBuilder.ts#L83)
 
 ___
 
@@ -268,7 +291,7 @@ itself
 
 #### Defined in
 
-[database/SetBuilder.ts:44](https://github.com/onzag/itemize/blob/5c2808d3/database/SetBuilder.ts#L44)
+[database/SetBuilder.ts:46](https://github.com/onzag/itemize/blob/f2db74a5/database/SetBuilder.ts#L46)
 
 ___
 
@@ -294,7 +317,7 @@ itself
 
 #### Defined in
 
-[database/SetBuilder.ts:55](https://github.com/onzag/itemize/blob/5c2808d3/database/SetBuilder.ts#L55)
+[database/SetBuilder.ts:57](https://github.com/onzag/itemize/blob/f2db74a5/database/SetBuilder.ts#L57)
 
 ___
 
@@ -318,7 +341,7 @@ itself
 
 #### Defined in
 
-[database/SetBuilder.ts:30](https://github.com/onzag/itemize/blob/5c2808d3/database/SetBuilder.ts#L30)
+[database/SetBuilder.ts:32](https://github.com/onzag/itemize/blob/f2db74a5/database/SetBuilder.ts#L32)
 
 ___
 
@@ -345,7 +368,7 @@ list
 
 #### Defined in
 
-[database/base.ts:89](https://github.com/onzag/itemize/blob/5c2808d3/database/base.ts#L89)
+[database/base.ts:89](https://github.com/onzag/itemize/blob/f2db74a5/database/base.ts#L89)
 
 ___
 
@@ -372,7 +395,7 @@ list
 
 #### Defined in
 
-[database/base.ts:98](https://github.com/onzag/itemize/blob/5c2808d3/database/base.ts#L98)
+[database/base.ts:98](https://github.com/onzag/itemize/blob/f2db74a5/database/base.ts#L98)
 
 ___
 
@@ -394,4 +417,4 @@ a sql builder result with the bindings and the query itself
 
 #### Defined in
 
-[database/base.ts:129](https://github.com/onzag/itemize/blob/5c2808d3/database/base.ts#L129)
+[database/base.ts:129](https://github.com/onzag/itemize/blob/f2db74a5/database/base.ts#L129)

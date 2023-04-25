@@ -13,11 +13,13 @@ item definition, module, or even the root context
 
 ### Interfaces
 
+- [I18nReadOptions](../interfaces/client_components_localization_I18nRead.I18nReadOptions.md)
 - [II18nReadProps](../interfaces/client_components_localization_I18nRead.II18nReadProps.md)
 
 ### Functions
 
 - [default](client_components_localization_I18nRead.md#default)
+- [useI18nRead](client_components_localization_I18nRead.md#usei18nread)
 
 ## Functions
 
@@ -42,4 +44,26 @@ a react node
 
 #### Defined in
 
-[client/components/localization/I18nRead.tsx:342](https://github.com/onzag/itemize/blob/5c2808d3/client/components/localization/I18nRead.tsx#L342)
+[client/components/localization/I18nRead.tsx:376](https://github.com/onzag/itemize/blob/f2db74a5/client/components/localization/I18nRead.tsx#L376)
+
+___
+
+### useI18nRead
+
+▸ **useI18nRead**(`options`): `React.ReactNode`
+
+The i18n read as a react hook
+
+#### Parameters
+
+| Name | Type |
+| :------ | :------ |
+| `options` | [`I18nReadOptions`](../interfaces/client_components_localization_I18nRead.I18nReadOptions.md) |
+
+#### Returns
+
+`React.ReactNode`
+
+#### Defined in
+
+[client/components/localization/I18nRead.tsx:449](https://github.com/onzag/itemize/blob/f2db74a5/client/components/localization/I18nRead.tsx#L449)

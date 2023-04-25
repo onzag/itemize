@@ -38,4 +38,4 @@ registry
 
 #### Defined in
 
-[client/internal/text/serializer/types/list.ts:20](https://github.com/onzag/itemize/blob/5c2808d3/client/internal/text/serializer/types/list.ts#L20)
+[client/internal/text/serializer/types/list.ts:21](https://github.com/onzag/itemize/blob/f2db74a5/client/internal/text/serializer/types/list.ts#L21)

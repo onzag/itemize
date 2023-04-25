@@ -23,7 +23,7 @@ that define an entry point in the query for it to be a graphql query
 
 #### Defined in
 
-[base/Root/gql.ts:82](https://github.com/onzag/itemize/blob/5c2808d3/base/Root/gql.ts#L82)
+[base/Root/gql.ts:80](https://github.com/onzag/itemize/blob/f2db74a5/base/Root/gql.ts#L80)
 
 ___
 
@@ -33,7 +33,7 @@ ___
 
 #### Defined in
 
-[base/Root/gql.ts:83](https://github.com/onzag/itemize/blob/5c2808d3/base/Root/gql.ts#L83)
+[base/Root/gql.ts:81](https://github.com/onzag/itemize/blob/f2db74a5/base/Root/gql.ts#L81)
 
 ___
 
@@ -43,4 +43,4 @@ ___
 
 #### Defined in
 
-[base/Root/gql.ts:81](https://github.com/onzag/itemize/blob/5c2808d3/base/Root/gql.ts#L81)
+[base/Root/gql.ts:79](https://github.com/onzag/itemize/blob/f2db74a5/base/Root/gql.ts#L79)

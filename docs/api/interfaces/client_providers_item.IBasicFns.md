@@ -28,6 +28,8 @@
 
 ▸ **clean**(`options`, `state`, `avoidTriggeringUpdate?`): `void`
 
+cleans performs the cleanup of properties and policies
+
 #### Parameters
 
 | Name | Type |
@@ -42,7 +44,7 @@
 
 #### Defined in
 
-[client/providers/item.tsx:450](https://github.com/onzag/itemize/blob/5c2808d3/client/providers/item.tsx#L450)
+[client/providers/item.tsx:925](https://github.com/onzag/itemize/blob/f2db74a5/client/providers/item.tsx#L925)
 
 ___
 
@@ -50,19 +52,25 @@ ___
 
 ▸ **delete**(): `Promise`<[`IBasicActionResponse`](client_providers_item.IBasicActionResponse.md)\>
 
+Simply deletes
+
 #### Returns
 
 `Promise`<[`IBasicActionResponse`](client_providers_item.IBasicActionResponse.md)\>
 
+a response with the status
+
 #### Defined in
 
-[client/providers/item.tsx:448](https://github.com/onzag/itemize/blob/5c2808d3/client/providers/item.tsx#L448)
+[client/providers/item.tsx:917](https://github.com/onzag/itemize/blob/f2db74a5/client/providers/item.tsx#L917)
 
 ___
 
 ### poke
 
 ▸ **poke**(`elements`): `void`
+
+Poke elements
 
 #### Parameters
 
@@ -76,13 +84,17 @@ ___
 
 #### Defined in
 
-[client/providers/item.tsx:438](https://github.com/onzag/itemize/blob/5c2808d3/client/providers/item.tsx#L438)
+[client/providers/item.tsx:892](https://github.com/onzag/itemize/blob/f2db74a5/client/providers/item.tsx#L892)
 
 ___
 
 ### reload
 
 ▸ **reload**(`denyCache?`): `Promise`<[`IActionResponseWithValue`](client_providers_item.IActionResponseWithValue.md)\>
+
+makes it so that it reloads the value, the loadValue function
+usually is executed on componentDidMount, pass deny cache in order to
+do a hard refresh and bypass the cache
 
 #### Parameters
 
@@ -96,13 +108,18 @@ ___
 
 #### Defined in
 
-[client/providers/item.tsx:443](https://github.com/onzag/itemize/blob/5c2808d3/client/providers/item.tsx#L443)
+[client/providers/item.tsx:905](https://github.com/onzag/itemize/blob/f2db74a5/client/providers/item.tsx#L905)
 
 ___
 
 ### search
 
 ▸ **search**(`options`): `Promise`<[`IActionResponseWithSearchResults`](client_providers_item.IActionResponseWithSearchResults.md)\>
+
+performs a search, note that you should be in the searchMode however
+since all items are the same it's totally possible to launch a search
+in which case you'll just get a searchError you should be in search
+mode because there are no endpoints otherwise
 
 #### Parameters
 
@@ -116,13 +133,16 @@ ___
 
 #### Defined in
 
-[client/providers/item.tsx:455](https://github.com/onzag/itemize/blob/5c2808d3/client/providers/item.tsx#L455)
+[client/providers/item.tsx:934](https://github.com/onzag/itemize/blob/f2db74a5/client/providers/item.tsx#L934)
 
 ___
 
 ### submit
 
-▸ **submit**(`options`): `Promise`<[`IActionResponseWithId`](client_providers_item.IActionResponseWithId.md)\>
+▸ **submit**(`options`): `Promise`<[`IActionSubmitResponse`](client_providers_item.IActionSubmitResponse.md)\>
+
+submits the current information, when there's no id, this triggers an
+add action, with an id however this trigger edition
 
 #### Parameters
 
@@ -132,11 +152,13 @@ ___
 
 #### Returns
 
-`Promise`<[`IActionResponseWithId`](client_providers_item.IActionResponseWithId.md)\>
+`Promise`<[`IActionSubmitResponse`](client_providers_item.IActionSubmitResponse.md)\>
+
+a response with the status
 
 #### Defined in
 
-[client/providers/item.tsx:446](https://github.com/onzag/itemize/blob/5c2808d3/client/providers/item.tsx#L446)
+[client/providers/item.tsx:912](https://github.com/onzag/itemize/blob/f2db74a5/client/providers/item.tsx#L912)
 
 ___
 
@@ -144,10 +166,12 @@ ___
 
 ▸ **unpoke**(): `void`
 
+unpokes all elements
+
 #### Returns
 
 `void`
 
 #### Defined in
 
-[client/providers/item.tsx:439](https://github.com/onzag/itemize/blob/5c2808d3/client/providers/item.tsx#L439)
+[client/providers/item.tsx:897](https://github.com/onzag/itemize/blob/f2db74a5/client/providers/item.tsx#L897)

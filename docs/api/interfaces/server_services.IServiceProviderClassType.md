@@ -26,7 +26,7 @@
 
 ### constructor
 
-• **new IServiceProviderClassType**(`config`, `registry`, `appConfig`, `appSensitiveConfig`)
+• **new IServiceProviderClassType**(`config`, `registry`, `configs`)
 
 #### Parameters
 
@@ -34,12 +34,15 @@
 | :------ | :------ |
 | `config` | `T` |
 | `registry` | [`RegistryService`](../classes/server_services_registry.RegistryService.md) |
-| `appConfig` | [`IConfigRawJSONDataType`](config.IConfigRawJSONDataType.md) |
-| `appSensitiveConfig` | [`ISensitiveConfigRawJSONDataType`](config.ISensitiveConfigRawJSONDataType.md) |
+| `configs` | `Object` |
+| `configs.config` | [`IConfigRawJSONDataType`](config.IConfigRawJSONDataType.md) |
+| `configs.dbConfig` | [`IDBConfigRawJSONDataType`](config.IDBConfigRawJSONDataType.md) |
+| `configs.redisConfig` | [`IRedisConfigRawJSONDataType`](config.IRedisConfigRawJSONDataType.md) |
+| `configs.sensitiveConfig` | [`ISensitiveConfigRawJSONDataType`](config.ISensitiveConfigRawJSONDataType.md) |
 
 #### Defined in
 
-[server/services/index.ts:296](https://github.com/onzag/itemize/blob/5c2808d3/server/services/index.ts#L296)
+[server/services/index.ts:311](https://github.com/onzag/itemize/blob/f2db74a5/server/services/index.ts#L311)
 
 ## Methods
 
@@ -59,7 +62,7 @@
 
 #### Defined in
 
-[server/services/index.ts:302](https://github.com/onzag/itemize/blob/5c2808d3/server/services/index.ts#L302)
+[server/services/index.ts:321](https://github.com/onzag/itemize/blob/f2db74a5/server/services/index.ts#L321)
 
 ___
 
@@ -73,7 +76,7 @@ ___
 
 #### Defined in
 
-[server/services/index.ts:303](https://github.com/onzag/itemize/blob/5c2808d3/server/services/index.ts#L303)
+[server/services/index.ts:322](https://github.com/onzag/itemize/blob/f2db74a5/server/services/index.ts#L322)
 
 ___
 
@@ -87,4 +90,4 @@ ___
 
 #### Defined in
 
-[server/services/index.ts:304](https://github.com/onzag/itemize/blob/5c2808d3/server/services/index.ts#L304)
+[server/services/index.ts:323](https://github.com/onzag/itemize/blob/f2db74a5/server/services/index.ts#L323)

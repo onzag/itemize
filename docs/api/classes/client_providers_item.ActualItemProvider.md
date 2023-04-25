@@ -35,7 +35,6 @@ Here it is, the mighty
 - [lastLoadValuePromiseResolve](client_providers_item.ActualItemProvider.md#lastloadvaluepromiseresolve)
 - [lastLoadingForId](client_providers_item.ActualItemProvider.md#lastloadingforid)
 - [lastLoadingForVersion](client_providers_item.ActualItemProvider.md#lastloadingforversion)
-- [lastOptionsUsedForSearch](client_providers_item.ActualItemProvider.md#lastoptionsusedforsearch)
 - [lastUpdateId](client_providers_item.ActualItemProvider.md#lastupdateid)
 - [mountCbFns](client_providers_item.ActualItemProvider.md#mountcbfns)
 - [preventSearchFeedbackOnPossibleStaleData](client_providers_item.ActualItemProvider.md#preventsearchfeedbackonpossiblestaledata)
@@ -45,6 +44,7 @@ Here it is, the mighty
 - [reloadNextSearch](client_providers_item.ActualItemProvider.md#reloadnextsearch)
 - [repairCorruptionTimeout](client_providers_item.ActualItemProvider.md#repaircorruptiontimeout)
 - [state](client_providers_item.ActualItemProvider.md#state)
+- [storeStateTimeout](client_providers_item.ActualItemProvider.md#storestatetimeout)
 - [submitBlockPromises](client_providers_item.ActualItemProvider.md#submitblockpromises)
 - [updateTimeout](client_providers_item.ActualItemProvider.md#updatetimeout)
 - [contextType](client_providers_item.ActualItemProvider.md#contexttype)
@@ -54,7 +54,6 @@ Here it is, the mighty
 - [UNSAFE\_componentWillMount](client_providers_item.ActualItemProvider.md#unsafe_componentwillmount)
 - [UNSAFE\_componentWillReceiveProps](client_providers_item.ActualItemProvider.md#unsafe_componentwillreceiveprops)
 - [UNSAFE\_componentWillUpdate](client_providers_item.ActualItemProvider.md#unsafe_componentwillupdate)
-- [beforeSSRRender](client_providers_item.ActualItemProvider.md#beforessrrender)
 - [blockCleanup](client_providers_item.ActualItemProvider.md#blockcleanup)
 - [changeListener](client_providers_item.ActualItemProvider.md#changelistener)
 - [changeSearchListener](client_providers_item.ActualItemProvider.md#changesearchlistener)
@@ -77,21 +76,24 @@ Here it is, the mighty
 - [dismissSubmitError](client_providers_item.ActualItemProvider.md#dismisssubmiterror)
 - [dismissSubmitted](client_providers_item.ActualItemProvider.md#dismisssubmitted)
 - [downloadState](client_providers_item.ActualItemProvider.md#downloadstate)
+- [downloadStateAt](client_providers_item.ActualItemProvider.md#downloadstateat)
 - [forceUpdate](client_providers_item.ActualItemProvider.md#forceupdate)
+- [getItemState](client_providers_item.ActualItemProvider.md#getitemstate)
 - [getSnapshotBeforeUpdate](client_providers_item.ActualItemProvider.md#getsnapshotbeforeupdate)
 - [giveEmulatedInvalidError](client_providers_item.ActualItemProvider.md#giveemulatedinvaliderror)
 - [injectSubmitBlockPromise](client_providers_item.ActualItemProvider.md#injectsubmitblockpromise)
 - [installPrefills](client_providers_item.ActualItemProvider.md#installprefills)
 - [installSetters](client_providers_item.ActualItemProvider.md#installsetters)
 - [loadListener](client_providers_item.ActualItemProvider.md#loadlistener)
-- [loadSearch](client_providers_item.ActualItemProvider.md#loadsearch)
 - [loadStateFromFile](client_providers_item.ActualItemProvider.md#loadstatefromfile)
+- [loadStateFromFileAt](client_providers_item.ActualItemProvider.md#loadstatefromfileat)
 - [loadStoredState](client_providers_item.ActualItemProvider.md#loadstoredstate)
 - [loadValue](client_providers_item.ActualItemProvider.md#loadvalue)
 - [loadValueCompleted](client_providers_item.ActualItemProvider.md#loadvaluecompleted)
 - [markForDestruction](client_providers_item.ActualItemProvider.md#markfordestruction)
 - [markSearchForDestruction](client_providers_item.ActualItemProvider.md#marksearchfordestruction)
 - [mountOrUpdateIdefForTesting](client_providers_item.ActualItemProvider.md#mountorupdateideffortesting)
+- [onConnectStatusChange](client_providers_item.ActualItemProvider.md#onconnectstatuschange)
 - [onIncludeSetExclusionState](client_providers_item.ActualItemProvider.md#onincludesetexclusionstate)
 - [onPropertyChange](client_providers_item.ActualItemProvider.md#onpropertychange)
 - [onPropertyChangeOrRestoreFinal](client_providers_item.ActualItemProvider.md#onpropertychangeorrestorefinal)
@@ -114,11 +116,13 @@ Here it is, the mighty
 - [setStateToCurrentValueWithExternalChecking](client_providers_item.ActualItemProvider.md#setstatetocurrentvaluewithexternalchecking)
 - [setupListeners](client_providers_item.ActualItemProvider.md#setuplisteners)
 - [shouldComponentUpdate](client_providers_item.ActualItemProvider.md#shouldcomponentupdate)
+- [storeStateDelayed](client_providers_item.ActualItemProvider.md#storestatedelayed)
 - [submit](client_providers_item.ActualItemProvider.md#submit)
 - [unSetupListeners](client_providers_item.ActualItemProvider.md#unsetuplisteners)
 - [unpoke](client_providers_item.ActualItemProvider.md#unpoke)
 - [getDerivedServerSideStateFromProps](client_providers_item.ActualItemProvider.md#getderivedserversidestatefromprops)
 - [getDerivedStateFromProps](client_providers_item.ActualItemProvider.md#getderivedstatefromprops)
+- [getItemStateStatic](client_providers_item.ActualItemProvider.md#getitemstatestatic)
 - [setupInitialState](client_providers_item.ActualItemProvider.md#setupinitialstate)
 
 ## Constructors
@@ -139,17 +143,17 @@ React.Component&lt;IActualItemProviderProps, IActualItemProviderState\&gt;.const
 
 #### Defined in
 
-[client/providers/item.tsx:1150](https://github.com/onzag/itemize/blob/5c2808d3/client/providers/item.tsx#L1150)
+[client/providers/item.tsx:2034](https://github.com/onzag/itemize/blob/f2db74a5/client/providers/item.tsx#L2034)
 
 ## Properties
 
 ### activeSubmitPromise
 
-• `Private` **activeSubmitPromise**: `Promise`<[`IActionResponseWithId`](../interfaces/client_providers_item.IActionResponseWithId.md)\> = `null`
+• `Private` **activeSubmitPromise**: `Promise`<[`IActionSubmitResponse`](../interfaces/client_providers_item.IActionSubmitResponse.md)\> = `null`
 
 #### Defined in
 
-[client/providers/item.tsx:1143](https://github.com/onzag/itemize/blob/5c2808d3/client/providers/item.tsx#L1143)
+[client/providers/item.tsx:2027](https://github.com/onzag/itemize/blob/f2db74a5/client/providers/item.tsx#L2027)
 
 ___
 
@@ -159,7 +163,7 @@ ___
 
 #### Defined in
 
-[client/providers/item.tsx:1144](https://github.com/onzag/itemize/blob/5c2808d3/client/providers/item.tsx#L1144)
+[client/providers/item.tsx:2028](https://github.com/onzag/itemize/blob/f2db74a5/client/providers/item.tsx#L2028)
 
 ___
 
@@ -169,7 +173,7 @@ ___
 
 #### Defined in
 
-[client/providers/item.tsx:938](https://github.com/onzag/itemize/blob/5c2808d3/client/providers/item.tsx#L938)
+[client/providers/item.tsx:1712](https://github.com/onzag/itemize/blob/f2db74a5/client/providers/item.tsx#L1712)
 
 ___
 
@@ -179,7 +183,7 @@ ___
 
 #### Defined in
 
-[client/providers/item.tsx:1137](https://github.com/onzag/itemize/blob/5c2808d3/client/providers/item.tsx#L1137)
+[client/providers/item.tsx:2021](https://github.com/onzag/itemize/blob/f2db74a5/client/providers/item.tsx#L2021)
 
 ___
 
@@ -200,7 +204,7 @@ search id was changed and for what, and trigger automatic search
 
 #### Defined in
 
-[client/providers/item.tsx:891](https://github.com/onzag/itemize/blob/5c2808d3/client/providers/item.tsx#L891)
+[client/providers/item.tsx:1665](https://github.com/onzag/itemize/blob/f2db74a5/client/providers/item.tsx#L1665)
 
 ___
 
@@ -238,7 +242,7 @@ ___
 
 #### Defined in
 
-[client/providers/item.tsx:895](https://github.com/onzag/itemize/blob/5c2808d3/client/providers/item.tsx#L895)
+[client/providers/item.tsx:1669](https://github.com/onzag/itemize/blob/f2db74a5/client/providers/item.tsx#L1669)
 
 ___
 
@@ -248,7 +252,7 @@ ___
 
 #### Defined in
 
-[client/providers/item.tsx:871](https://github.com/onzag/itemize/blob/5c2808d3/client/providers/item.tsx#L871)
+[client/providers/item.tsx:1645](https://github.com/onzag/itemize/blob/f2db74a5/client/providers/item.tsx#L1645)
 
 ___
 
@@ -258,7 +262,7 @@ ___
 
 #### Defined in
 
-[client/providers/item.tsx:876](https://github.com/onzag/itemize/blob/5c2808d3/client/providers/item.tsx#L876)
+[client/providers/item.tsx:1650](https://github.com/onzag/itemize/blob/f2db74a5/client/providers/item.tsx#L1650)
 
 ___
 
@@ -268,7 +272,7 @@ ___
 
 #### Defined in
 
-[client/providers/item.tsx:875](https://github.com/onzag/itemize/blob/5c2808d3/client/providers/item.tsx#L875)
+[client/providers/item.tsx:1649](https://github.com/onzag/itemize/blob/f2db74a5/client/providers/item.tsx#L1649)
 
 ___
 
@@ -284,7 +288,7 @@ event
 
 #### Defined in
 
-[client/providers/item.tsx:934](https://github.com/onzag/itemize/blob/5c2808d3/client/providers/item.tsx#L934)
+[client/providers/item.tsx:1708](https://github.com/onzag/itemize/blob/f2db74a5/client/providers/item.tsx#L1708)
 
 ___
 
@@ -294,7 +298,7 @@ ___
 
 #### Defined in
 
-[client/providers/item.tsx:935](https://github.com/onzag/itemize/blob/5c2808d3/client/providers/item.tsx#L935)
+[client/providers/item.tsx:1709](https://github.com/onzag/itemize/blob/f2db74a5/client/providers/item.tsx#L1709)
 
 ___
 
@@ -312,7 +316,7 @@ ___
 
 #### Defined in
 
-[client/providers/item.tsx:936](https://github.com/onzag/itemize/blob/5c2808d3/client/providers/item.tsx#L936)
+[client/providers/item.tsx:1710](https://github.com/onzag/itemize/blob/f2db74a5/client/providers/item.tsx#L1710)
 
 ___
 
@@ -327,7 +331,7 @@ value and not overwrite if we have changed such value hot
 
 #### Defined in
 
-[client/providers/item.tsx:924](https://github.com/onzag/itemize/blob/5c2808d3/client/providers/item.tsx#L924)
+[client/providers/item.tsx:1698](https://github.com/onzag/itemize/blob/f2db74a5/client/providers/item.tsx#L1698)
 
 ___
 
@@ -337,17 +341,7 @@ ___
 
 #### Defined in
 
-[client/providers/item.tsx:925](https://github.com/onzag/itemize/blob/5c2808d3/client/providers/item.tsx#L925)
-
-___
-
-### lastOptionsUsedForSearch
-
-• `Private` **lastOptionsUsedForSearch**: [`IActionSearchOptions`](../interfaces/client_providers_item.IActionSearchOptions.md)
-
-#### Defined in
-
-[client/providers/item.tsx:1135](https://github.com/onzag/itemize/blob/5c2808d3/client/providers/item.tsx#L1135)
+[client/providers/item.tsx:1699](https://github.com/onzag/itemize/blob/f2db74a5/client/providers/item.tsx#L1699)
 
 ___
 
@@ -357,7 +351,7 @@ ___
 
 #### Defined in
 
-[client/providers/item.tsx:1131](https://github.com/onzag/itemize/blob/5c2808d3/client/providers/item.tsx#L1131)
+[client/providers/item.tsx:2019](https://github.com/onzag/itemize/blob/f2db74a5/client/providers/item.tsx#L2019)
 
 ___
 
@@ -373,7 +367,7 @@ a change event while this instance is mounting, during cleanup
 
 #### Defined in
 
-[client/providers/item.tsx:884](https://github.com/onzag/itemize/blob/5c2808d3/client/providers/item.tsx#L884)
+[client/providers/item.tsx:1658](https://github.com/onzag/itemize/blob/f2db74a5/client/providers/item.tsx#L1658)
 
 ___
 
@@ -401,7 +395,7 @@ is not requested
 
 #### Defined in
 
-[client/providers/item.tsx:916](https://github.com/onzag/itemize/blob/5c2808d3/client/providers/item.tsx#L916)
+[client/providers/item.tsx:1690](https://github.com/onzag/itemize/blob/f2db74a5/client/providers/item.tsx#L1690)
 
 ___
 
@@ -446,7 +440,7 @@ ___
 
 #### Defined in
 
-[client/providers/item.tsx:1148](https://github.com/onzag/itemize/blob/5c2808d3/client/providers/item.tsx#L1148)
+[client/providers/item.tsx:2032](https://github.com/onzag/itemize/blob/f2db74a5/client/providers/item.tsx#L2032)
 
 ___
 
@@ -456,7 +450,7 @@ ___
 
 #### Defined in
 
-[client/providers/item.tsx:896](https://github.com/onzag/itemize/blob/5c2808d3/client/providers/item.tsx#L896)
+[client/providers/item.tsx:1670](https://github.com/onzag/itemize/blob/f2db74a5/client/providers/item.tsx#L1670)
 
 ___
 
@@ -466,7 +460,7 @@ ___
 
 #### Defined in
 
-[client/providers/item.tsx:942](https://github.com/onzag/itemize/blob/5c2808d3/client/providers/item.tsx#L942)
+[client/providers/item.tsx:1716](https://github.com/onzag/itemize/blob/f2db74a5/client/providers/item.tsx#L1716)
 
 ___
 
@@ -484,13 +478,23 @@ node_modules/@types/react/index.d.ts:505
 
 ___
 
+### storeStateTimeout
+
+• `Private` **storeStateTimeout**: `Timeout` = `null`
+
+#### Defined in
+
+[client/providers/item.tsx:1721](https://github.com/onzag/itemize/blob/f2db74a5/client/providers/item.tsx#L1721)
+
+___
+
 ### submitBlockPromises
 
 • `Private` **submitBlockPromises**: `Promise`<`any`\>[] = `[]`
 
 #### Defined in
 
-[client/providers/item.tsx:1140](https://github.com/onzag/itemize/blob/5c2808d3/client/providers/item.tsx#L1140)
+[client/providers/item.tsx:2024](https://github.com/onzag/itemize/blob/f2db74a5/client/providers/item.tsx#L2024)
 
 ___
 
@@ -500,7 +504,7 @@ ___
 
 #### Defined in
 
-[client/providers/item.tsx:1126](https://github.com/onzag/itemize/blob/5c2808d3/client/providers/item.tsx#L1126)
+[client/providers/item.tsx:2014](https://github.com/onzag/itemize/blob/f2db74a5/client/providers/item.tsx#L2014)
 
 ___
 
@@ -652,20 +656,6 @@ node_modules/@types/react/index.d.ts:777
 
 ___
 
-### beforeSSRRender
-
-▸ **beforeSSRRender**(): `Promise`<`void`\>
-
-#### Returns
-
-`Promise`<`void`\>
-
-#### Defined in
-
-[client/providers/item.tsx:4195](https://github.com/onzag/itemize/blob/5c2808d3/client/providers/item.tsx#L4195)
-
-___
-
 ### blockCleanup
 
 ▸ **blockCleanup**(`props?`): `void`
@@ -682,7 +672,7 @@ ___
 
 #### Defined in
 
-[client/providers/item.tsx:1222](https://github.com/onzag/itemize/blob/5c2808d3/client/providers/item.tsx#L1222)
+[client/providers/item.tsx:2108](https://github.com/onzag/itemize/blob/f2db74a5/client/providers/item.tsx#L2108)
 
 ___
 
@@ -702,7 +692,7 @@ ___
 
 #### Defined in
 
-[client/providers/item.tsx:1876](https://github.com/onzag/itemize/blob/5c2808d3/client/providers/item.tsx#L1876)
+[client/providers/item.tsx:2856](https://github.com/onzag/itemize/blob/f2db74a5/client/providers/item.tsx#L2856)
 
 ___
 
@@ -716,7 +706,7 @@ ___
 
 #### Defined in
 
-[client/providers/item.tsx:1835](https://github.com/onzag/itemize/blob/5c2808d3/client/providers/item.tsx#L1835)
+[client/providers/item.tsx:2804](https://github.com/onzag/itemize/blob/f2db74a5/client/providers/item.tsx#L2804)
 
 ___
 
@@ -742,7 +732,7 @@ ___
 
 #### Defined in
 
-[client/providers/item.tsx:2654](https://github.com/onzag/itemize/blob/5c2808d3/client/providers/item.tsx#L2654)
+[client/providers/item.tsx:3667](https://github.com/onzag/itemize/blob/f2db74a5/client/providers/item.tsx#L3667)
 
 ___
 
@@ -764,7 +754,7 @@ ___
 
 #### Defined in
 
-[client/providers/item.tsx:2952](https://github.com/onzag/itemize/blob/5c2808d3/client/providers/item.tsx#L2952)
+[client/providers/item.tsx:3971](https://github.com/onzag/itemize/blob/f2db74a5/client/providers/item.tsx#L3971)
 
 ___
 
@@ -787,7 +777,7 @@ ___
 
 #### Defined in
 
-[client/providers/item.tsx:2964](https://github.com/onzag/itemize/blob/5c2808d3/client/providers/item.tsx#L2964)
+[client/providers/item.tsx:3983](https://github.com/onzag/itemize/blob/f2db74a5/client/providers/item.tsx#L3983)
 
 ___
 
@@ -833,7 +823,7 @@ React.Component.componentDidMount
 
 #### Defined in
 
-[client/providers/item.tsx:1333](https://github.com/onzag/itemize/blob/5c2808d3/client/providers/item.tsx#L1333)
+[client/providers/item.tsx:2237](https://github.com/onzag/itemize/blob/f2db74a5/client/providers/item.tsx#L2237)
 
 ___
 
@@ -858,7 +848,7 @@ React.Component.componentDidUpdate
 
 #### Defined in
 
-[client/providers/item.tsx:1550](https://github.com/onzag/itemize/blob/5c2808d3/client/providers/item.tsx#L1550)
+[client/providers/item.tsx:2461](https://github.com/onzag/itemize/blob/f2db74a5/client/providers/item.tsx#L2461)
 
 ___
 
@@ -946,7 +936,7 @@ React.Component.componentWillUnmount
 
 #### Defined in
 
-[client/providers/item.tsx:2622](https://github.com/onzag/itemize/blob/5c2808d3/client/providers/item.tsx#L2622)
+[client/providers/item.tsx:3634](https://github.com/onzag/itemize/blob/f2db74a5/client/providers/item.tsx#L3634)
 
 ___
 
@@ -1005,7 +995,7 @@ ___
 
 #### Defined in
 
-[client/providers/item.tsx:2829](https://github.com/onzag/itemize/blob/5c2808d3/client/providers/item.tsx#L2829)
+[client/providers/item.tsx:3848](https://github.com/onzag/itemize/blob/f2db74a5/client/providers/item.tsx#L3848)
 
 ___
 
@@ -1019,7 +1009,7 @@ ___
 
 #### Defined in
 
-[client/providers/item.tsx:4066](https://github.com/onzag/itemize/blob/5c2808d3/client/providers/item.tsx#L4066)
+[client/providers/item.tsx:5244](https://github.com/onzag/itemize/blob/f2db74a5/client/providers/item.tsx#L5244)
 
 ___
 
@@ -1033,7 +1023,7 @@ ___
 
 #### Defined in
 
-[client/providers/item.tsx:4090](https://github.com/onzag/itemize/blob/5c2808d3/client/providers/item.tsx#L4090)
+[client/providers/item.tsx:5268](https://github.com/onzag/itemize/blob/f2db74a5/client/providers/item.tsx#L5268)
 
 ___
 
@@ -1047,7 +1037,7 @@ ___
 
 #### Defined in
 
-[client/providers/item.tsx:4058](https://github.com/onzag/itemize/blob/5c2808d3/client/providers/item.tsx#L4058)
+[client/providers/item.tsx:5236](https://github.com/onzag/itemize/blob/f2db74a5/client/providers/item.tsx#L5236)
 
 ___
 
@@ -1061,7 +1051,7 @@ ___
 
 #### Defined in
 
-[client/providers/item.tsx:4098](https://github.com/onzag/itemize/blob/5c2808d3/client/providers/item.tsx#L4098)
+[client/providers/item.tsx:5276](https://github.com/onzag/itemize/blob/f2db74a5/client/providers/item.tsx#L5276)
 
 ___
 
@@ -1075,7 +1065,7 @@ ___
 
 #### Defined in
 
-[client/providers/item.tsx:4158](https://github.com/onzag/itemize/blob/5c2808d3/client/providers/item.tsx#L4158)
+[client/providers/item.tsx:5348](https://github.com/onzag/itemize/blob/f2db74a5/client/providers/item.tsx#L5348)
 
 ___
 
@@ -1089,7 +1079,7 @@ ___
 
 #### Defined in
 
-[client/providers/item.tsx:4074](https://github.com/onzag/itemize/blob/5c2808d3/client/providers/item.tsx#L4074)
+[client/providers/item.tsx:5252](https://github.com/onzag/itemize/blob/f2db74a5/client/providers/item.tsx#L5252)
 
 ___
 
@@ -1103,7 +1093,7 @@ ___
 
 #### Defined in
 
-[client/providers/item.tsx:4082](https://github.com/onzag/itemize/blob/5c2808d3/client/providers/item.tsx#L4082)
+[client/providers/item.tsx:5260](https://github.com/onzag/itemize/blob/f2db74a5/client/providers/item.tsx#L5260)
 
 ___
 
@@ -1124,7 +1114,30 @@ ___
 
 #### Defined in
 
-[client/providers/item.tsx:2059](https://github.com/onzag/itemize/blob/5c2808d3/client/providers/item.tsx#L2059)
+[client/providers/item.tsx:3044](https://github.com/onzag/itemize/blob/f2db74a5/client/providers/item.tsx#L3044)
+
+___
+
+### downloadStateAt
+
+▸ **downloadStateAt**(`id`, `version`, `specificProperties?`, `specificIncludes?`): `Promise`<`Blob`\>
+
+#### Parameters
+
+| Name | Type |
+| :------ | :------ |
+| `id` | `string` |
+| `version` | `string` |
+| `specificProperties?` | `string`[] |
+| `specificIncludes?` | `Object` |
+
+#### Returns
+
+`Promise`<`Blob`\>
+
+#### Defined in
+
+[client/providers/item.tsx:3047](https://github.com/onzag/itemize/blob/f2db74a5/client/providers/item.tsx#L3047)
 
 ___
 
@@ -1149,6 +1162,26 @@ React.Component.forceUpdate
 #### Defined in
 
 node_modules/@types/react/index.d.ts:496
+
+___
+
+### getItemState
+
+▸ `Private` **getItemState**(`props?`): [`IItemStateType`](../interfaces/base_Root_Module_ItemDefinition.IItemStateType.md)
+
+#### Parameters
+
+| Name | Type |
+| :------ | :------ |
+| `props` | `Readonly`<`IActualItemProviderProps`\> & `Readonly`<{ `children?`: `ReactNode`  }\> |
+
+#### Returns
+
+[`IItemStateType`](../interfaces/base_Root_Module_ItemDefinition.IItemStateType.md)
+
+#### Defined in
+
+[client/providers/item.tsx:2853](https://github.com/onzag/itemize/blob/f2db74a5/client/providers/item.tsx#L2853)
 
 ___
 
@@ -1186,23 +1219,25 @@ ___
 
 ### giveEmulatedInvalidError
 
-▸ **giveEmulatedInvalidError**(`stateApplied`, `withId`, `withSearchResults`): [`IActionResponseWithId`](../interfaces/client_providers_item.IActionResponseWithId.md) \| [`IActionResponseWithSearchResults`](../interfaces/client_providers_item.IActionResponseWithSearchResults.md) \| [`IActionResponseWithValue`](../interfaces/client_providers_item.IActionResponseWithValue.md)
+▸ **giveEmulatedInvalidError**(`stateApplied`, `withIdVersion`, `withSearchResults`, `errMessageOverride?`, `errorOverride?`): [`IActionSubmitResponse`](../interfaces/client_providers_item.IActionSubmitResponse.md) \| [`IActionResponseWithSearchResults`](../interfaces/client_providers_item.IActionResponseWithSearchResults.md) \| [`IActionResponseWithValue`](../interfaces/client_providers_item.IActionResponseWithValue.md)
 
 #### Parameters
 
 | Name | Type |
 | :------ | :------ |
 | `stateApplied` | `string` |
-| `withId` | `boolean` |
+| `withIdVersion` | `boolean` \| [`string`, `string`] |
 | `withSearchResults` | `boolean` |
+| `errMessageOverride?` | `string` |
+| `errorOverride?` | `string` |
 
 #### Returns
 
-[`IActionResponseWithId`](../interfaces/client_providers_item.IActionResponseWithId.md) \| [`IActionResponseWithSearchResults`](../interfaces/client_providers_item.IActionResponseWithSearchResults.md) \| [`IActionResponseWithValue`](../interfaces/client_providers_item.IActionResponseWithValue.md)
+[`IActionSubmitResponse`](../interfaces/client_providers_item.IActionSubmitResponse.md) \| [`IActionResponseWithSearchResults`](../interfaces/client_providers_item.IActionResponseWithSearchResults.md) \| [`IActionResponseWithValue`](../interfaces/client_providers_item.IActionResponseWithValue.md)
 
 #### Defined in
 
-[client/providers/item.tsx:2780](https://github.com/onzag/itemize/blob/5c2808d3/client/providers/item.tsx#L2780)
+[client/providers/item.tsx:3793](https://github.com/onzag/itemize/blob/f2db74a5/client/providers/item.tsx#L3793)
 
 ___
 
@@ -1222,7 +1257,7 @@ ___
 
 #### Defined in
 
-[client/providers/item.tsx:1238](https://github.com/onzag/itemize/blob/5c2808d3/client/providers/item.tsx#L1238)
+[client/providers/item.tsx:2124](https://github.com/onzag/itemize/blob/f2db74a5/client/providers/item.tsx#L2124)
 
 ___
 
@@ -1242,7 +1277,7 @@ ___
 
 #### Defined in
 
-[client/providers/item.tsx:1313](https://github.com/onzag/itemize/blob/5c2808d3/client/providers/item.tsx#L1313)
+[client/providers/item.tsx:2201](https://github.com/onzag/itemize/blob/f2db74a5/client/providers/item.tsx#L2201)
 
 ___
 
@@ -1262,42 +1297,24 @@ ___
 
 #### Defined in
 
-[client/providers/item.tsx:1297](https://github.com/onzag/itemize/blob/5c2808d3/client/providers/item.tsx#L1297)
+[client/providers/item.tsx:2185](https://github.com/onzag/itemize/blob/f2db74a5/client/providers/item.tsx#L2185)
 
 ___
 
 ### loadListener
 
-▸ **loadListener**(): `void`
+▸ **loadListener**(): `Promise`<`void`\>
 
 This listener triggers on load and the search
 loader triggers it
 
 #### Returns
 
-`void`
+`Promise`<`void`\>
 
 #### Defined in
 
-[client/providers/item.tsx:1978](https://github.com/onzag/itemize/blob/5c2808d3/client/providers/item.tsx#L1978)
-
-___
-
-### loadSearch
-
-▸ **loadSearch**(): `string`
-
-Loads the search from the location
-
-#### Returns
-
-`string`
-
-the search id that it managed to collect
-
-#### Defined in
-
-[client/providers/item.tsx:3517](https://github.com/onzag/itemize/blob/5c2808d3/client/providers/item.tsx#L3517)
+[client/providers/item.tsx:2947](https://github.com/onzag/itemize/blob/f2db74a5/client/providers/item.tsx#L2947)
 
 ___
 
@@ -1309,7 +1326,7 @@ ___
 
 | Name | Type |
 | :------ | :------ |
-| `state` | `File` \| `Blob` |
+| `state` | `Blob` \| `File` |
 | `specificProperties?` | `string`[] |
 | `specificIncludes?` | `Object` |
 
@@ -1319,7 +1336,31 @@ ___
 
 #### Defined in
 
-[client/providers/item.tsx:2045](https://github.com/onzag/itemize/blob/5c2808d3/client/providers/item.tsx#L2045)
+[client/providers/item.tsx:3021](https://github.com/onzag/itemize/blob/f2db74a5/client/providers/item.tsx#L3021)
+
+___
+
+### loadStateFromFileAt
+
+▸ **loadStateFromFileAt**(`state`, `id`, `version?`, `specificProperties?`, `specificIncludes?`): `Promise`<`void`\>
+
+#### Parameters
+
+| Name | Type |
+| :------ | :------ |
+| `state` | `Blob` \| `File` |
+| `id` | `string` |
+| `version?` | `string` |
+| `specificProperties?` | `string`[] |
+| `specificIncludes?` | `Object` |
+
+#### Returns
+
+`Promise`<`void`\>
+
+#### Defined in
+
+[client/providers/item.tsx:3024](https://github.com/onzag/itemize/blob/f2db74a5/client/providers/item.tsx#L3024)
 
 ___
 
@@ -1333,7 +1374,7 @@ ___
 
 #### Defined in
 
-[client/providers/item.tsx:2071](https://github.com/onzag/itemize/blob/5c2808d3/client/providers/item.tsx#L2071)
+[client/providers/item.tsx:3064](https://github.com/onzag/itemize/blob/f2db74a5/client/providers/item.tsx#L3064)
 
 ___
 
@@ -1353,7 +1394,7 @@ ___
 
 #### Defined in
 
-[client/providers/item.tsx:2118](https://github.com/onzag/itemize/blob/5c2808d3/client/providers/item.tsx#L2118)
+[client/providers/item.tsx:3100](https://github.com/onzag/itemize/blob/f2db74a5/client/providers/item.tsx#L3100)
 
 ___
 
@@ -1373,7 +1414,7 @@ ___
 
 #### Defined in
 
-[client/providers/item.tsx:2377](https://github.com/onzag/itemize/blob/5c2808d3/client/providers/item.tsx#L2377)
+[client/providers/item.tsx:3376](https://github.com/onzag/itemize/blob/f2db74a5/client/providers/item.tsx#L3376)
 
 ___
 
@@ -1387,22 +1428,23 @@ ___
 
 #### Defined in
 
-[client/providers/item.tsx:1241](https://github.com/onzag/itemize/blob/5c2808d3/client/providers/item.tsx#L1241)
+[client/providers/item.tsx:2127](https://github.com/onzag/itemize/blob/f2db74a5/client/providers/item.tsx#L2127)
 
 ___
 
 ### markSearchForDestruction
 
-▸ **markSearchForDestruction**(`type`, `qualifiedName`, `owner`, `parent`): `void`
+▸ **markSearchForDestruction**(`type`, `qualifiedName`, `owner`, `parent`, `property`): `void`
 
 #### Parameters
 
 | Name | Type |
 | :------ | :------ |
-| `type` | ``"by-owner"`` \| ``"by-parent"`` \| ``"by-owner-and-parent"`` |
+| `type` | ``"by-owner"`` \| ``"by-parent"`` \| ``"by-owner-and-parent"`` \| ``"by-property"`` |
 | `qualifiedName` | `string` |
 | `owner` | `string` |
 | `parent` | [`string`, `string`, `string`] |
+| `property` | [`string`, `string`] |
 
 #### Returns
 
@@ -1410,7 +1452,7 @@ ___
 
 #### Defined in
 
-[client/providers/item.tsx:1267](https://github.com/onzag/itemize/blob/5c2808d3/client/providers/item.tsx#L1267)
+[client/providers/item.tsx:2154](https://github.com/onzag/itemize/blob/f2db74a5/client/providers/item.tsx#L2154)
 
 ___
 
@@ -1430,7 +1472,21 @@ ___
 
 #### Defined in
 
-[client/providers/item.tsx:1398](https://github.com/onzag/itemize/blob/5c2808d3/client/providers/item.tsx#L1398)
+[client/providers/item.tsx:2307](https://github.com/onzag/itemize/blob/f2db74a5/client/providers/item.tsx#L2307)
+
+___
+
+### onConnectStatusChange
+
+▸ **onConnectStatusChange**(): `void`
+
+#### Returns
+
+`void`
+
+#### Defined in
+
+[client/providers/item.tsx:2221](https://github.com/onzag/itemize/blob/f2db74a5/client/providers/item.tsx#L2221)
 
 ___
 
@@ -1451,7 +1507,7 @@ ___
 
 #### Defined in
 
-[client/providers/item.tsx:2636](https://github.com/onzag/itemize/blob/5c2808d3/client/providers/item.tsx#L2636)
+[client/providers/item.tsx:3649](https://github.com/onzag/itemize/blob/f2db74a5/client/providers/item.tsx#L3649)
 
 ___
 
@@ -1473,7 +1529,7 @@ ___
 
 #### Defined in
 
-[client/providers/item.tsx:2537](https://github.com/onzag/itemize/blob/5c2808d3/client/providers/item.tsx#L2537)
+[client/providers/item.tsx:3548](https://github.com/onzag/itemize/blob/f2db74a5/client/providers/item.tsx#L3548)
 
 ___
 
@@ -1487,7 +1543,7 @@ ___
 
 #### Defined in
 
-[client/providers/item.tsx:2476](https://github.com/onzag/itemize/blob/5c2808d3/client/providers/item.tsx#L2476)
+[client/providers/item.tsx:3487](https://github.com/onzag/itemize/blob/f2db74a5/client/providers/item.tsx#L3487)
 
 ___
 
@@ -1510,7 +1566,7 @@ ___
 
 #### Defined in
 
-[client/providers/item.tsx:2591](https://github.com/onzag/itemize/blob/5c2808d3/client/providers/item.tsx#L2591)
+[client/providers/item.tsx:3603](https://github.com/onzag/itemize/blob/f2db74a5/client/providers/item.tsx#L3603)
 
 ___
 
@@ -1534,7 +1590,7 @@ ___
 
 #### Defined in
 
-[client/providers/item.tsx:2577](https://github.com/onzag/itemize/blob/5c2808d3/client/providers/item.tsx#L2577)
+[client/providers/item.tsx:3588](https://github.com/onzag/itemize/blob/f2db74a5/client/providers/item.tsx#L3588)
 
 ___
 
@@ -1556,7 +1612,7 @@ ___
 
 #### Defined in
 
-[client/providers/item.tsx:2558](https://github.com/onzag/itemize/blob/5c2808d3/client/providers/item.tsx#L2558)
+[client/providers/item.tsx:3569](https://github.com/onzag/itemize/blob/f2db74a5/client/providers/item.tsx#L3569)
 
 ___
 
@@ -1576,13 +1632,13 @@ ___
 
 #### Defined in
 
-[client/providers/item.tsx:2523](https://github.com/onzag/itemize/blob/5c2808d3/client/providers/item.tsx#L2523)
+[client/providers/item.tsx:3534](https://github.com/onzag/itemize/blob/f2db74a5/client/providers/item.tsx#L3534)
 
 ___
 
 ### onSearchReload
 
-▸ **onSearchReload**(`arg`): `void`
+▸ **onSearchReload**(`arg`): `Promise`<`void`\>
 
 #### Parameters
 
@@ -1592,11 +1648,11 @@ ___
 
 #### Returns
 
-`void`
+`Promise`<`void`\>
 
 #### Defined in
 
-[client/providers/item.tsx:4106](https://github.com/onzag/itemize/blob/5c2808d3/client/providers/item.tsx#L4106)
+[client/providers/item.tsx:5284](https://github.com/onzag/itemize/blob/f2db74a5/client/providers/item.tsx#L5284)
 
 ___
 
@@ -1616,7 +1672,7 @@ ___
 
 #### Defined in
 
-[client/providers/item.tsx:4174](https://github.com/onzag/itemize/blob/5c2808d3/client/providers/item.tsx#L4174)
+[client/providers/item.tsx:5364](https://github.com/onzag/itemize/blob/f2db74a5/client/providers/item.tsx#L5364)
 
 ___
 
@@ -1636,7 +1692,7 @@ ___
 
 #### Defined in
 
-[client/providers/item.tsx:1230](https://github.com/onzag/itemize/blob/5c2808d3/client/providers/item.tsx#L1230)
+[client/providers/item.tsx:2116](https://github.com/onzag/itemize/blob/f2db74a5/client/providers/item.tsx#L2116)
 
 ___
 
@@ -1650,7 +1706,7 @@ ___
 
 #### Defined in
 
-[client/providers/item.tsx:1818](https://github.com/onzag/itemize/blob/5c2808d3/client/providers/item.tsx#L1818)
+[client/providers/item.tsx:2787](https://github.com/onzag/itemize/blob/f2db74a5/client/providers/item.tsx#L2787)
 
 ___
 
@@ -1671,7 +1727,7 @@ ___
 
 #### Defined in
 
-[client/providers/item.tsx:4120](https://github.com/onzag/itemize/blob/5c2808d3/client/providers/item.tsx#L4120)
+[client/providers/item.tsx:5310](https://github.com/onzag/itemize/blob/f2db74a5/client/providers/item.tsx#L5310)
 
 ___
 
@@ -1691,7 +1747,7 @@ ___
 
 #### Defined in
 
-[client/providers/item.tsx:1305](https://github.com/onzag/itemize/blob/5c2808d3/client/providers/item.tsx#L1305)
+[client/providers/item.tsx:2193](https://github.com/onzag/itemize/blob/f2db74a5/client/providers/item.tsx#L2193)
 
 ___
 
@@ -1709,7 +1765,7 @@ React.Component.render
 
 #### Defined in
 
-[client/providers/item.tsx:4225](https://github.com/onzag/itemize/blob/5c2808d3/client/providers/item.tsx#L4225)
+[client/providers/item.tsx:5385](https://github.com/onzag/itemize/blob/f2db74a5/client/providers/item.tsx#L5385)
 
 ___
 
@@ -1729,7 +1785,7 @@ ___
 
 #### Defined in
 
-[client/providers/item.tsx:2602](https://github.com/onzag/itemize/blob/5c2808d3/client/providers/item.tsx#L2602)
+[client/providers/item.tsx:3614](https://github.com/onzag/itemize/blob/f2db74a5/client/providers/item.tsx#L3614)
 
 ___
 
@@ -1749,54 +1805,48 @@ ___
 
 #### Defined in
 
-[client/providers/item.tsx:3659](https://github.com/onzag/itemize/blob/5c2808d3/client/providers/item.tsx#L3659)
+[client/providers/item.tsx:4715](https://github.com/onzag/itemize/blob/f2db74a5/client/providers/item.tsx#L4715)
 
 ___
 
 ### searchFeedback
 
-▸ `Private` **searchFeedback**(`options`, `lastModified`, `createdBy`, `parentedBy`): `Promise`<`void`\>
+▸ `Private` **searchFeedback**(`state`): `void`
 
 #### Parameters
 
 | Name | Type |
 | :------ | :------ |
-| `options` | [`IActionSearchOptions`](../interfaces/client_providers_item.IActionSearchOptions.md) |
-| `lastModified` | `string` |
-| `createdBy` | `string` |
-| `parentedBy` | [`string`, `string`, `string`] |
+| `state` | [`IItemSearchStateType`](../interfaces/base_Root_Module_ItemDefinition.IItemSearchStateType.md) |
 
 #### Returns
 
-`Promise`<`void`\>
+`void`
 
 #### Defined in
 
-[client/providers/item.tsx:3619](https://github.com/onzag/itemize/blob/5c2808d3/client/providers/item.tsx#L3619)
+[client/providers/item.tsx:4669](https://github.com/onzag/itemize/blob/f2db74a5/client/providers/item.tsx#L4669)
 
 ___
 
 ### searchListenersSetup
 
-▸ `Private` **searchListenersSetup**(`options`, `lastModified`, `createdBy`, `parentedBy`, `requestFeedbackToo?`): `Promise`<`void`\>
+▸ `Private` **searchListenersSetup**(`state`, `requestFeedbackToo?`): `void`
 
 #### Parameters
 
 | Name | Type |
 | :------ | :------ |
-| `options` | [`IActionSearchOptions`](../interfaces/client_providers_item.IActionSearchOptions.md) |
-| `lastModified` | `string` |
-| `createdBy` | `string` |
-| `parentedBy` | [`string`, `string`, `string`] |
+| `state` | [`IItemSearchStateType`](../interfaces/base_Root_Module_ItemDefinition.IItemSearchStateType.md) |
 | `requestFeedbackToo?` | `boolean` |
 
 #### Returns
 
-`Promise`<`void`\>
+`void`
 
 #### Defined in
 
-[client/providers/item.tsx:3560](https://github.com/onzag/itemize/blob/5c2808d3/client/providers/item.tsx#L3560)
+[client/providers/item.tsx:4604](https://github.com/onzag/itemize/blob/f2db74a5/client/providers/item.tsx#L4604)
 
 ___
 
@@ -1847,7 +1897,7 @@ ___
 
 #### Defined in
 
-[client/providers/item.tsx:2444](https://github.com/onzag/itemize/blob/5c2808d3/client/providers/item.tsx#L2444)
+[client/providers/item.tsx:3455](https://github.com/onzag/itemize/blob/f2db74a5/client/providers/item.tsx#L3455)
 
 ___
 
@@ -1861,7 +1911,7 @@ ___
 
 #### Defined in
 
-[client/providers/item.tsx:1441](https://github.com/onzag/itemize/blob/5c2808d3/client/providers/item.tsx#L1441)
+[client/providers/item.tsx:2350](https://github.com/onzag/itemize/blob/f2db74a5/client/providers/item.tsx#L2350)
 
 ___
 
@@ -1886,13 +1936,27 @@ React.Component.shouldComponentUpdate
 
 #### Defined in
 
-[client/providers/item.tsx:1516](https://github.com/onzag/itemize/blob/5c2808d3/client/providers/item.tsx#L1516)
+[client/providers/item.tsx:2425](https://github.com/onzag/itemize/blob/f2db74a5/client/providers/item.tsx#L2425)
+
+___
+
+### storeStateDelayed
+
+▸ `Private` **storeStateDelayed**(): `Promise`<`void`\>
+
+#### Returns
+
+`Promise`<`void`\>
+
+#### Defined in
+
+[client/providers/item.tsx:2769](https://github.com/onzag/itemize/blob/f2db74a5/client/providers/item.tsx#L2769)
 
 ___
 
 ### submit
 
-▸ **submit**(`originalOptions`): `Promise`<[`IActionResponseWithId`](../interfaces/client_providers_item.IActionResponseWithId.md)\>
+▸ **submit**(`originalOptions`): `Promise`<[`IActionSubmitResponse`](../interfaces/client_providers_item.IActionSubmitResponse.md)\>
 
 #### Parameters
 
@@ -1902,11 +1966,11 @@ ___
 
 #### Returns
 
-`Promise`<[`IActionResponseWithId`](../interfaces/client_providers_item.IActionResponseWithId.md)\>
+`Promise`<[`IActionSubmitResponse`](../interfaces/client_providers_item.IActionSubmitResponse.md)\>
 
 #### Defined in
 
-[client/providers/item.tsx:3121](https://github.com/onzag/itemize/blob/5c2808d3/client/providers/item.tsx#L3121)
+[client/providers/item.tsx:4154](https://github.com/onzag/itemize/blob/f2db74a5/client/providers/item.tsx#L4154)
 
 ___
 
@@ -1920,7 +1984,7 @@ ___
 
 #### Defined in
 
-[client/providers/item.tsx:1483](https://github.com/onzag/itemize/blob/5c2808d3/client/providers/item.tsx#L1483)
+[client/providers/item.tsx:2392](https://github.com/onzag/itemize/blob/f2db74a5/client/providers/item.tsx#L2392)
 
 ___
 
@@ -1934,7 +1998,7 @@ ___
 
 #### Defined in
 
-[client/providers/item.tsx:4183](https://github.com/onzag/itemize/blob/5c2808d3/client/providers/item.tsx#L4183)
+[client/providers/item.tsx:5373](https://github.com/onzag/itemize/blob/f2db74a5/client/providers/item.tsx#L5373)
 
 ___
 
@@ -1955,7 +2019,7 @@ ___
 
 #### Defined in
 
-[client/providers/item.tsx:981](https://github.com/onzag/itemize/blob/5c2808d3/client/providers/item.tsx#L981)
+[client/providers/item.tsx:1835](https://github.com/onzag/itemize/blob/f2db74a5/client/providers/item.tsx#L1835)
 
 ___
 
@@ -1976,7 +2040,27 @@ ___
 
 #### Defined in
 
-[client/providers/item.tsx:949](https://github.com/onzag/itemize/blob/5c2808d3/client/providers/item.tsx#L949)
+[client/providers/item.tsx:1743](https://github.com/onzag/itemize/blob/f2db74a5/client/providers/item.tsx#L1743)
+
+___
+
+### getItemStateStatic
+
+▸ `Static` `Private` **getItemStateStatic**(`props`): [`IItemStateType`](../interfaces/base_Root_Module_ItemDefinition.IItemStateType.md)
+
+#### Parameters
+
+| Name | Type |
+| :------ | :------ |
+| `props` | `IActualItemProviderProps` |
+
+#### Returns
+
+[`IItemStateType`](../interfaces/base_Root_Module_ItemDefinition.IItemStateType.md)
+
+#### Defined in
+
+[client/providers/item.tsx:1723](https://github.com/onzag/itemize/blob/f2db74a5/client/providers/item.tsx#L1723)
 
 ___
 
@@ -1996,4 +2080,4 @@ ___
 
 #### Defined in
 
-[client/providers/item.tsx:1011](https://github.com/onzag/itemize/blob/5c2808d3/client/providers/item.tsx#L1011)
+[client/providers/item.tsx:1899](https://github.com/onzag/itemize/blob/f2db74a5/client/providers/item.tsx#L1899)

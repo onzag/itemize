@@ -21,6 +21,7 @@ https://github.com/jaydenseric/graphql-multipart-request-spec
 - [processedQueries](gql_querier.GQLQuery.md#processedqueries)
 - [progressers](gql_querier.GQLQuery.md#progressers)
 - [type](gql_querier.GQLQuery.md#type)
+- [unprocessedQueries](gql_querier.GQLQuery.md#unprocessedqueries)
 
 ### Methods
 
@@ -31,6 +32,9 @@ https://github.com/jaydenseric/graphql-multipart-request-spec
 - [getMainQueryArguments](gql_querier.GQLQuery.md#getmainqueryarguments)
 - [getMap](gql_querier.GQLQuery.md#getmap)
 - [getOperations](gql_querier.GQLQuery.md#getoperations)
+- [getQueries](gql_querier.GQLQuery.md#getqueries)
+- [getQueryByIndex](gql_querier.GQLQuery.md#getquerybyindex)
+- [getServerSideQueryByIndex](gql_querier.GQLQuery.md#getserversidequerybyindex)
 - [getVariables](gql_querier.GQLQuery.md#getvariables)
 - [informProgress](gql_querier.GQLQuery.md#informprogress)
 - [informReply](gql_querier.GQLQuery.md#informreply)
@@ -55,7 +59,7 @@ Build a graphql query
 
 #### Defined in
 
-[gql-querier.ts:192](https://github.com/onzag/itemize/blob/5c2808d3/gql-querier.ts#L192)
+[gql-querier.ts:198](https://github.com/onzag/itemize/blob/f2db74a5/gql-querier.ts#L198)
 
 ## Properties
 
@@ -67,7 +71,7 @@ Files that have been found that are unprocessed
 
 #### Defined in
 
-[gql-querier.ts:177](https://github.com/onzag/itemize/blob/5c2808d3/gql-querier.ts#L177)
+[gql-querier.ts:183](https://github.com/onzag/itemize/blob/f2db74a5/gql-querier.ts#L183)
 
 ___
 
@@ -79,7 +83,7 @@ list of listeners
 
 #### Defined in
 
-[gql-querier.ts:181](https://github.com/onzag/itemize/blob/5c2808d3/gql-querier.ts#L181)
+[gql-querier.ts:187](https://github.com/onzag/itemize/blob/f2db74a5/gql-querier.ts#L187)
 
 ___
 
@@ -91,7 +95,7 @@ All the processed queries from the query list
 
 #### Defined in
 
-[gql-querier.ts:169](https://github.com/onzag/itemize/blob/5c2808d3/gql-querier.ts#L169)
+[gql-querier.ts:174](https://github.com/onzag/itemize/blob/f2db74a5/gql-querier.ts#L174)
 
 ___
 
@@ -103,7 +107,7 @@ list of progress listeners
 
 #### Defined in
 
-[gql-querier.ts:185](https://github.com/onzag/itemize/blob/5c2808d3/gql-querier.ts#L185)
+[gql-querier.ts:191](https://github.com/onzag/itemize/blob/f2db74a5/gql-querier.ts#L191)
 
 ___
 
@@ -115,7 +119,17 @@ The type of this query
 
 #### Defined in
 
-[gql-querier.ts:173](https://github.com/onzag/itemize/blob/5c2808d3/gql-querier.ts#L173)
+[gql-querier.ts:179](https://github.com/onzag/itemize/blob/f2db74a5/gql-querier.ts#L179)
+
+___
+
+### unprocessedQueries
+
+• `Private` **unprocessedQueries**: [`IGQLQueryObj`](../interfaces/gql_querier.IGQLQueryObj.md)[]
+
+#### Defined in
+
+[gql-querier.ts:175](https://github.com/onzag/itemize/blob/f2db74a5/gql-querier.ts#L175)
 
 ## Methods
 
@@ -137,7 +151,7 @@ add a listener for when a reply is informed
 
 #### Defined in
 
-[gql-querier.ts:341](https://github.com/onzag/itemize/blob/5c2808d3/gql-querier.ts#L341)
+[gql-querier.ts:370](https://github.com/onzag/itemize/blob/f2db74a5/gql-querier.ts#L370)
 
 ___
 
@@ -157,7 +171,7 @@ ___
 
 #### Defined in
 
-[gql-querier.ts:334](https://github.com/onzag/itemize/blob/5c2808d3/gql-querier.ts#L334)
+[gql-querier.ts:350](https://github.com/onzag/itemize/blob/f2db74a5/gql-querier.ts#L350)
 
 ___
 
@@ -183,7 +197,7 @@ new processed args
 
 #### Defined in
 
-[gql-querier.ts:405](https://github.com/onzag/itemize/blob/5c2808d3/gql-querier.ts#L405)
+[gql-querier.ts:451](https://github.com/onzag/itemize/blob/f2db74a5/gql-querier.ts#L451)
 
 ___
 
@@ -199,7 +213,7 @@ Provides all the attached files
 
 #### Defined in
 
-[gql-querier.ts:371](https://github.com/onzag/itemize/blob/5c2808d3/gql-querier.ts#L371)
+[gql-querier.ts:417](https://github.com/onzag/itemize/blob/f2db74a5/gql-querier.ts#L417)
 
 ___
 
@@ -216,7 +230,7 @@ how the main query is expected to recieve those arguments
 
 #### Defined in
 
-[gql-querier.ts:390](https://github.com/onzag/itemize/blob/5c2808d3/gql-querier.ts#L390)
+[gql-querier.ts:436](https://github.com/onzag/itemize/blob/f2db74a5/gql-querier.ts#L436)
 
 ___
 
@@ -233,7 +247,7 @@ file form that will map the variables to the form data
 
 #### Defined in
 
-[gql-querier.ts:360](https://github.com/onzag/itemize/blob/5c2808d3/gql-querier.ts#L360)
+[gql-querier.ts:406](https://github.com/onzag/itemize/blob/f2db74a5/gql-querier.ts#L406)
 
 ___
 
@@ -256,7 +270,74 @@ the formdata for the operations
 
 #### Defined in
 
-[gql-querier.ts:349](https://github.com/onzag/itemize/blob/5c2808d3/gql-querier.ts#L349)
+[gql-querier.ts:395](https://github.com/onzag/itemize/blob/f2db74a5/gql-querier.ts#L395)
+
+___
+
+### getQueries
+
+▸ **getQueries**(`unprocessed?`): [`IGQLQueryObj`](../interfaces/gql_querier.IGQLQueryObj.md)[]
+
+#### Parameters
+
+| Name | Type |
+| :------ | :------ |
+| `unprocessed?` | `boolean` |
+
+#### Returns
+
+[`IGQLQueryObj`](../interfaces/gql_querier.IGQLQueryObj.md)[]
+
+#### Defined in
+
+[gql-querier.ts:354](https://github.com/onzag/itemize/blob/f2db74a5/gql-querier.ts#L354)
+
+___
+
+### getQueryByIndex
+
+▸ **getQueryByIndex**(`index`, `unprocessed?`): [`IGQLQueryObj`](../interfaces/gql_querier.IGQLQueryObj.md)
+
+Provides a processed query given an index
+
+#### Parameters
+
+| Name | Type |
+| :------ | :------ |
+| `index` | `number` |
+| `unprocessed?` | `boolean` |
+
+#### Returns
+
+[`IGQLQueryObj`](../interfaces/gql_querier.IGQLQueryObj.md)
+
+#### Defined in
+
+[gql-querier.ts:363](https://github.com/onzag/itemize/blob/f2db74a5/gql-querier.ts#L363)
+
+___
+
+### getServerSideQueryByIndex
+
+▸ **getServerSideQueryByIndex**(`index`): [`IGQLQueryObj`](../interfaces/gql_querier.IGQLQueryObj.md)
+
+Unlike providing a standard query object this provides
+a version of the query the server side would recieve once it is
+parsed, rather than a client side version
+
+#### Parameters
+
+| Name | Type |
+| :------ | :------ |
+| `index` | `number` |
+
+#### Returns
+
+[`IGQLQueryObj`](../interfaces/gql_querier.IGQLQueryObj.md)
+
+#### Defined in
+
+[gql-querier.ts:381](https://github.com/onzag/itemize/blob/f2db74a5/gql-querier.ts#L381)
 
 ___
 
@@ -273,7 +354,7 @@ spec that will map to the operations
 
 #### Defined in
 
-[gql-querier.ts:379](https://github.com/onzag/itemize/blob/5c2808d3/gql-querier.ts#L379)
+[gql-querier.ts:425](https://github.com/onzag/itemize/blob/f2db74a5/gql-querier.ts#L425)
 
 ___
 
@@ -293,7 +374,7 @@ ___
 
 #### Defined in
 
-[gql-querier.ts:330](https://github.com/onzag/itemize/blob/5c2808d3/gql-querier.ts#L330)
+[gql-querier.ts:346](https://github.com/onzag/itemize/blob/f2db74a5/gql-querier.ts#L346)
 
 ___
 
@@ -315,7 +396,7 @@ inform a reply to the query in case this has event listeners to that
 
 #### Defined in
 
-[gql-querier.ts:326](https://github.com/onzag/itemize/blob/5c2808d3/gql-querier.ts#L326)
+[gql-querier.ts:342](https://github.com/onzag/itemize/blob/f2db74a5/gql-querier.ts#L342)
 
 ___
 
@@ -337,7 +418,7 @@ Check whether it's mergable
 
 #### Defined in
 
-[gql-querier.ts:217](https://github.com/onzag/itemize/blob/5c2808d3/gql-querier.ts#L217)
+[gql-querier.ts:224](https://github.com/onzag/itemize/blob/f2db74a5/gql-querier.ts#L224)
 
 ___
 
@@ -358,7 +439,7 @@ ___
 
 #### Defined in
 
-[gql-querier.ts:247](https://github.com/onzag/itemize/blob/5c2808d3/gql-querier.ts#L247)
+[gql-querier.ts:254](https://github.com/onzag/itemize/blob/f2db74a5/gql-querier.ts#L254)
 
 ___
 
@@ -382,4 +463,4 @@ a list of aliases to remap the results from to the given name
 
 #### Defined in
 
-[gql-querier.ts:267](https://github.com/onzag/itemize/blob/5c2808d3/gql-querier.ts#L267)
+[gql-querier.ts:274](https://github.com/onzag/itemize/blob/f2db74a5/gql-querier.ts#L274)

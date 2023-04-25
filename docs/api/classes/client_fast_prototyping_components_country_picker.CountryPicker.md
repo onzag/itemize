@@ -72,7 +72,7 @@ React.PureComponent&lt;ICountryPickerProps, ICountryPickerState\&gt;.constructor
 
 #### Defined in
 
-[client/fast-prototyping/components/country-picker.tsx:71](https://github.com/onzag/itemize/blob/5c2808d3/client/fast-prototyping/components/country-picker.tsx#L71)
+[client/fast-prototyping/components/country-picker.tsx:97](https://github.com/onzag/itemize/blob/f2db74a5/client/fast-prototyping/components/country-picker.tsx#L97)
 
 ## Properties
 
@@ -581,7 +581,7 @@ ___
 
 #### Defined in
 
-[client/fast-prototyping/components/country-picker.tsx:82](https://github.com/onzag/itemize/blob/5c2808d3/client/fast-prototyping/components/country-picker.tsx#L82)
+[client/fast-prototyping/components/country-picker.tsx:108](https://github.com/onzag/itemize/blob/f2db74a5/client/fast-prototyping/components/country-picker.tsx#L108)
 
 ___
 
@@ -593,7 +593,7 @@ ___
 
 | Name | Type |
 | :------ | :------ |
-| `changeCountryToFn` | (`code`: `string`) => `void` |
+| `changeCountryToFn` | [`ChangeCountryToFn`](../modules/client_internal_providers_locale_provider.md#changecountrytofn) |
 | `code` | `string` |
 
 #### Returns
@@ -602,7 +602,7 @@ ___
 
 #### Defined in
 
-[client/fast-prototyping/components/country-picker.tsx:92](https://github.com/onzag/itemize/blob/5c2808d3/client/fast-prototyping/components/country-picker.tsx#L92)
+[client/fast-prototyping/components/country-picker.tsx:118](https://github.com/onzag/itemize/blob/f2db74a5/client/fast-prototyping/components/country-picker.tsx#L118)
 
 ___
 
@@ -616,7 +616,7 @@ ___
 
 #### Defined in
 
-[client/fast-prototyping/components/country-picker.tsx:87](https://github.com/onzag/itemize/blob/5c2808d3/client/fast-prototyping/components/country-picker.tsx#L87)
+[client/fast-prototyping/components/country-picker.tsx:113](https://github.com/onzag/itemize/blob/f2db74a5/client/fast-prototyping/components/country-picker.tsx#L113)
 
 ___
 
@@ -634,7 +634,7 @@ React.PureComponent.render
 
 #### Defined in
 
-[client/fast-prototyping/components/country-picker.tsx:102](https://github.com/onzag/itemize/blob/5c2808d3/client/fast-prototyping/components/country-picker.tsx#L102)
+[client/fast-prototyping/components/country-picker.tsx:128](https://github.com/onzag/itemize/blob/f2db74a5/client/fast-prototyping/components/country-picker.tsx#L128)
 
 ___
 

@@ -45,13 +45,13 @@ a query string url with the service worker query string parameters
 
 #### Defined in
 
-[client/components/util/index.tsx:252](https://github.com/onzag/itemize/blob/5c2808d3/client/components/util/index.tsx#L252)
+[client/components/util/index.tsx:273](https://github.com/onzag/itemize/blob/f2db74a5/client/components/util/index.tsx#L273)
 
 ___
 
 ### imageSizeRetriever
 
-▸ **imageSizeRetriever**(`fileData`, `property?`): [`IImageSizes`](../interfaces/client_components_util.IImageSizes.md)
+▸ **imageSizeRetriever**(`fileData`): [`IImageSizes`](../interfaces/client_components_util.IImageSizes.md)
 
 Gets all the available image sizes for a given file
 
@@ -60,7 +60,6 @@ Gets all the available image sizes for a given file
 | Name | Type | Description |
 | :------ | :------ | :------ |
 | `fileData` | [`IGQLFile`](../interfaces/gql_querier.IGQLFile.md) | the file data |
-| `property?` | [`default`](../classes/base_Root_Module_ItemDefinition_PropertyDefinition.default.md) | if not passed only returns the default image sizes, medium, small, large and the standard one custom sizes can be used and it needs access to the property in order to know these urls |
 
 #### Returns
 
@@ -68,7 +67,7 @@ Gets all the available image sizes for a given file
 
 #### Defined in
 
-[client/components/util/index.tsx:170](https://github.com/onzag/itemize/blob/5c2808d3/client/components/util/index.tsx#L170)
+[client/components/util/index.tsx:197](https://github.com/onzag/itemize/blob/f2db74a5/client/components/util/index.tsx#L197)
 
 ___
 
@@ -97,4 +96,4 @@ local files are supported
 
 #### Defined in
 
-[client/components/util/index.tsx:25](https://github.com/onzag/itemize/blob/5c2808d3/client/components/util/index.tsx#L25)
+[client/components/util/index.tsx:25](https://github.com/onzag/itemize/blob/f2db74a5/client/components/util/index.tsx#L25)

@@ -26,4 +26,4 @@
 
 #### Defined in
 
-[server/user/mutations.ts:3](https://github.com/onzag/itemize/blob/5c2808d3/server/user/mutations.ts#L3)
+[server/user/mutations.ts:3](https://github.com/onzag/itemize/blob/f2db74a5/server/user/mutations.ts#L3)

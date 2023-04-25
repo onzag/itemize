@@ -15,22 +15,20 @@ that does a lot of the heavy lifting
 
 ### ssrGenerator
 
-▸ **ssrGenerator**(`req`, `res`, `html`, `appData`, `mode`): `Promise`<`void`\>
+▸ **ssrGenerator**(`appData`, `mode`, `info`): `Promise`<`void` \| [`IUSSDChunk`](../interfaces/ussd.IUSSDChunk.md)\>
 
 #### Parameters
 
 | Name | Type |
 | :------ | :------ |
-| `req` | `Request`<`ParamsDictionary`, `any`, `any`, `ParsedQs`, `Record`<`string`, `any`\>\> |
-| `res` | `Response`<`any`, `Record`<`string`, `any`\>\> |
-| `html` | `string` |
 | `appData` | [`IAppDataType`](../interfaces/server.IAppDataType.md) |
-| `mode` | ``"development"`` \| ``"production"`` |
+| `mode` | ``"production"`` \| ``"development"`` |
+| `info` | `ISSRGeneratorHTMLResponse` \| `ISSRGeneratorUSSDResponse` |
 
 #### Returns
 
-`Promise`<`void`\>
+`Promise`<`void` \| [`IUSSDChunk`](../interfaces/ussd.IUSSDChunk.md)\>
 
 #### Defined in
 
-[server/ssr/generator.tsx:34](https://github.com/onzag/itemize/blob/5c2808d3/server/ssr/generator.tsx#L34)
+[server/ssr/generator.tsx:49](https://github.com/onzag/itemize/blob/f2db74a5/server/ssr/generator.tsx#L49)

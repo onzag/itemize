@@ -25,7 +25,7 @@ booleans
 
 #### Defined in
 
-[client/fast-prototyping/components/slate/wrapper.tsx:321](https://github.com/onzag/itemize/blob/5c2808d3/client/fast-prototyping/components/slate/wrapper.tsx#L321)
+[client/fast-prototyping/components/slate/wrapper.tsx:361](https://github.com/onzag/itemize/blob/f2db74a5/client/fast-prototyping/components/slate/wrapper.tsx#L361)
 
 ___
 
@@ -35,7 +35,7 @@ ___
 
 #### Defined in
 
-[client/fast-prototyping/components/slate/wrapper.tsx:320](https://github.com/onzag/itemize/blob/5c2808d3/client/fast-prototyping/components/slate/wrapper.tsx#L320)
+[client/fast-prototyping/components/slate/wrapper.tsx:360](https://github.com/onzag/itemize/blob/f2db74a5/client/fast-prototyping/components/slate/wrapper.tsx#L360)
 
 ___
 
@@ -45,4 +45,4 @@ ___
 
 #### Defined in
 
-[client/fast-prototyping/components/slate/wrapper.tsx:319](https://github.com/onzag/itemize/blob/5c2808d3/client/fast-prototyping/components/slate/wrapper.tsx#L319)
+[client/fast-prototyping/components/slate/wrapper.tsx:359](https://github.com/onzag/itemize/blob/f2db74a5/client/fast-prototyping/components/slate/wrapper.tsx#L359)

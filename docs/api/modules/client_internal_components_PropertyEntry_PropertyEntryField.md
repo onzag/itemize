@@ -42,4 +42,4 @@ Provides the numeric type of a given type
 
 #### Defined in
 
-[client/internal/components/PropertyEntry/PropertyEntryField.tsx:39](https://github.com/onzag/itemize/blob/5c2808d3/client/internal/components/PropertyEntry/PropertyEntryField.tsx#L39)
+[client/internal/components/PropertyEntry/PropertyEntryField.tsx:40](https://github.com/onzag/itemize/blob/f2db74a5/client/internal/components/PropertyEntry/PropertyEntryField.tsx#L40)

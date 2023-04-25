@@ -63,7 +63,7 @@ React.Component&lt;IPropertySetterBaseProps, {}\&gt;.constructor
 
 #### Defined in
 
-[client/internal/components/PropertySetter/index.tsx:53](https://github.com/onzag/itemize/blob/5c2808d3/client/internal/components/PropertySetter/index.tsx#L53)
+[client/internal/components/PropertySetter/index.tsx:53](https://github.com/onzag/itemize/blob/f2db74a5/client/internal/components/PropertySetter/index.tsx#L53)
 
 ## Properties
 
@@ -334,7 +334,7 @@ React.Component.componentDidMount
 
 #### Defined in
 
-[client/internal/components/PropertySetter/index.tsx:56](https://github.com/onzag/itemize/blob/5c2808d3/client/internal/components/PropertySetter/index.tsx#L56)
+[client/internal/components/PropertySetter/index.tsx:56](https://github.com/onzag/itemize/blob/f2db74a5/client/internal/components/PropertySetter/index.tsx#L56)
 
 ___
 
@@ -358,7 +358,7 @@ React.Component.componentDidUpdate
 
 #### Defined in
 
-[client/internal/components/PropertySetter/index.tsx:65](https://github.com/onzag/itemize/blob/5c2808d3/client/internal/components/PropertySetter/index.tsx#L65)
+[client/internal/components/PropertySetter/index.tsx:65](https://github.com/onzag/itemize/blob/f2db74a5/client/internal/components/PropertySetter/index.tsx#L65)
 
 ___
 
@@ -446,7 +446,7 @@ React.Component.componentWillUnmount
 
 #### Defined in
 
-[client/internal/components/PropertySetter/index.tsx:91](https://github.com/onzag/itemize/blob/5c2808d3/client/internal/components/PropertySetter/index.tsx#L91)
+[client/internal/components/PropertySetter/index.tsx:91](https://github.com/onzag/itemize/blob/f2db74a5/client/internal/components/PropertySetter/index.tsx#L91)
 
 ___
 
@@ -559,7 +559,7 @@ React.Component.render
 
 #### Defined in
 
-[client/internal/components/PropertySetter/index.tsx:95](https://github.com/onzag/itemize/blob/5c2808d3/client/internal/components/PropertySetter/index.tsx#L95)
+[client/internal/components/PropertySetter/index.tsx:95](https://github.com/onzag/itemize/blob/f2db74a5/client/internal/components/PropertySetter/index.tsx#L95)
 
 ___
 

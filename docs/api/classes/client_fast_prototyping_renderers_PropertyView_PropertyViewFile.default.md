@@ -81,7 +81,7 @@ React.Component&lt;IPropertyViewFileRendererProps, IPropertyViewFileRendererStat
 
 #### Defined in
 
-[client/fast-prototyping/renderers/PropertyView/PropertyViewFile.tsx:54](https://github.com/onzag/itemize/blob/5c2808d3/client/fast-prototyping/renderers/PropertyView/PropertyViewFile.tsx#L54)
+[client/fast-prototyping/renderers/PropertyView/PropertyViewFile.tsx:54](https://github.com/onzag/itemize/blob/f2db74a5/client/fast-prototyping/renderers/PropertyView/PropertyViewFile.tsx#L54)
 
 ## Properties
 
@@ -121,7 +121,7 @@ Intersection observer to see when the element pops into view, if necessary
 
 #### Defined in
 
-[client/fast-prototyping/renderers/PropertyView/PropertyViewFile.tsx:48](https://github.com/onzag/itemize/blob/5c2808d3/client/fast-prototyping/renderers/PropertyView/PropertyViewFile.tsx#L48)
+[client/fast-prototyping/renderers/PropertyView/PropertyViewFile.tsx:48](https://github.com/onzag/itemize/blob/f2db74a5/client/fast-prototyping/renderers/PropertyView/PropertyViewFile.tsx#L48)
 
 ___
 
@@ -133,7 +133,7 @@ whether the scroll event is actually attached
 
 #### Defined in
 
-[client/fast-prototyping/renderers/PropertyView/PropertyViewFile.tsx:40](https://github.com/onzag/itemize/blob/5c2808d3/client/fast-prototyping/renderers/PropertyView/PropertyViewFile.tsx#L40)
+[client/fast-prototyping/renderers/PropertyView/PropertyViewFile.tsx:40](https://github.com/onzag/itemize/blob/f2db74a5/client/fast-prototyping/renderers/PropertyView/PropertyViewFile.tsx#L40)
 
 ___
 
@@ -159,7 +159,7 @@ The image reference
 
 #### Defined in
 
-[client/fast-prototyping/renderers/PropertyView/PropertyViewFile.tsx:44](https://github.com/onzag/itemize/blob/5c2808d3/client/fast-prototyping/renderers/PropertyView/PropertyViewFile.tsx#L44)
+[client/fast-prototyping/renderers/PropertyView/PropertyViewFile.tsx:44](https://github.com/onzag/itemize/blob/f2db74a5/client/fast-prototyping/renderers/PropertyView/PropertyViewFile.tsx#L44)
 
 ___
 
@@ -359,7 +359,7 @@ lazyloading
 
 #### Defined in
 
-[client/fast-prototyping/renderers/PropertyView/PropertyViewFile.tsx:71](https://github.com/onzag/itemize/blob/5c2808d3/client/fast-prototyping/renderers/PropertyView/PropertyViewFile.tsx#L71)
+[client/fast-prototyping/renderers/PropertyView/PropertyViewFile.tsx:71](https://github.com/onzag/itemize/blob/f2db74a5/client/fast-prototyping/renderers/PropertyView/PropertyViewFile.tsx#L71)
 
 ___
 
@@ -375,7 +375,7 @@ Old school way to check if an element is in view
 
 #### Defined in
 
-[client/fast-prototyping/renderers/PropertyView/PropertyViewFile.tsx:93](https://github.com/onzag/itemize/blob/5c2808d3/client/fast-prototyping/renderers/PropertyView/PropertyViewFile.tsx#L93)
+[client/fast-prototyping/renderers/PropertyView/PropertyViewFile.tsx:93](https://github.com/onzag/itemize/blob/f2db74a5/client/fast-prototyping/renderers/PropertyView/PropertyViewFile.tsx#L93)
 
 ___
 
@@ -423,7 +423,7 @@ React.Component.componentDidMount
 
 #### Defined in
 
-[client/fast-prototyping/renderers/PropertyView/PropertyViewFile.tsx:151](https://github.com/onzag/itemize/blob/5c2808d3/client/fast-prototyping/renderers/PropertyView/PropertyViewFile.tsx#L151)
+[client/fast-prototyping/renderers/PropertyView/PropertyViewFile.tsx:151](https://github.com/onzag/itemize/blob/f2db74a5/client/fast-prototyping/renderers/PropertyView/PropertyViewFile.tsx#L151)
 
 ___
 
@@ -447,7 +447,7 @@ React.Component.componentDidUpdate
 
 #### Defined in
 
-[client/fast-prototyping/renderers/PropertyView/PropertyViewFile.tsx:170](https://github.com/onzag/itemize/blob/5c2808d3/client/fast-prototyping/renderers/PropertyView/PropertyViewFile.tsx#L170)
+[client/fast-prototyping/renderers/PropertyView/PropertyViewFile.tsx:170](https://github.com/onzag/itemize/blob/f2db74a5/client/fast-prototyping/renderers/PropertyView/PropertyViewFile.tsx#L170)
 
 ___
 
@@ -535,7 +535,7 @@ React.Component.componentWillUnmount
 
 #### Defined in
 
-[client/fast-prototyping/renderers/PropertyView/PropertyViewFile.tsx:180](https://github.com/onzag/itemize/blob/5c2808d3/client/fast-prototyping/renderers/PropertyView/PropertyViewFile.tsx#L180)
+[client/fast-prototyping/renderers/PropertyView/PropertyViewFile.tsx:180](https://github.com/onzag/itemize/blob/f2db74a5/client/fast-prototyping/renderers/PropertyView/PropertyViewFile.tsx#L180)
 
 ___
 
@@ -647,7 +647,7 @@ it might have never been triggered
 
 #### Defined in
 
-[client/fast-prototyping/renderers/PropertyView/PropertyViewFile.tsx:142](https://github.com/onzag/itemize/blob/5c2808d3/client/fast-prototyping/renderers/PropertyView/PropertyViewFile.tsx#L142)
+[client/fast-prototyping/renderers/PropertyView/PropertyViewFile.tsx:142](https://github.com/onzag/itemize/blob/f2db74a5/client/fast-prototyping/renderers/PropertyView/PropertyViewFile.tsx#L142)
 
 ___
 
@@ -663,7 +663,7 @@ Removes the attached scroll event for lazyloading
 
 #### Defined in
 
-[client/fast-prototyping/renderers/PropertyView/PropertyViewFile.tsx:83](https://github.com/onzag/itemize/blob/5c2808d3/client/fast-prototyping/renderers/PropertyView/PropertyViewFile.tsx#L83)
+[client/fast-prototyping/renderers/PropertyView/PropertyViewFile.tsx:83](https://github.com/onzag/itemize/blob/f2db74a5/client/fast-prototyping/renderers/PropertyView/PropertyViewFile.tsx#L83)
 
 ___
 
@@ -681,7 +681,7 @@ React.Component.render
 
 #### Defined in
 
-[client/fast-prototyping/renderers/PropertyView/PropertyViewFile.tsx:184](https://github.com/onzag/itemize/blob/5c2808d3/client/fast-prototyping/renderers/PropertyView/PropertyViewFile.tsx#L184)
+[client/fast-prototyping/renderers/PropertyView/PropertyViewFile.tsx:184](https://github.com/onzag/itemize/blob/f2db74a5/client/fast-prototyping/renderers/PropertyView/PropertyViewFile.tsx#L184)
 
 ___
 
@@ -728,7 +728,7 @@ Intersection observer way to check if the image is in view
 
 #### Defined in
 
-[client/fast-prototyping/renderers/PropertyView/PropertyViewFile.tsx:114](https://github.com/onzag/itemize/blob/5c2808d3/client/fast-prototyping/renderers/PropertyView/PropertyViewFile.tsx#L114)
+[client/fast-prototyping/renderers/PropertyView/PropertyViewFile.tsx:114](https://github.com/onzag/itemize/blob/f2db74a5/client/fast-prototyping/renderers/PropertyView/PropertyViewFile.tsx#L114)
 
 ___
 

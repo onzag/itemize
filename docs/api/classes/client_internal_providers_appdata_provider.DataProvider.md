@@ -591,7 +591,7 @@ React.Component.render
 
 #### Defined in
 
-[client/internal/providers/appdata-provider.tsx:56](https://github.com/onzag/itemize/blob/5c2808d3/client/internal/providers/appdata-provider.tsx#L56)
+[client/internal/providers/appdata-provider.tsx:56](https://github.com/onzag/itemize/blob/f2db74a5/client/internal/providers/appdata-provider.tsx#L56)
 
 ___
 
@@ -646,4 +646,4 @@ React.Component.shouldComponentUpdate
 
 #### Defined in
 
-[client/internal/providers/appdata-provider.tsx:50](https://github.com/onzag/itemize/blob/5c2808d3/client/internal/providers/appdata-provider.tsx#L50)
+[client/internal/providers/appdata-provider.tsx:50](https://github.com/onzag/itemize/blob/f2db74a5/client/internal/providers/appdata-provider.tsx#L50)

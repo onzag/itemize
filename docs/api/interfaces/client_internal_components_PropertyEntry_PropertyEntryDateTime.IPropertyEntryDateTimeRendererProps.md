@@ -27,13 +27,15 @@
 - [disabled](client_internal_components_PropertyEntry_PropertyEntryDateTime.IPropertyEntryDateTimeRendererProps.md#disabled)
 - [i18nCancel](client_internal_components_PropertyEntry_PropertyEntryDateTime.IPropertyEntryDateTimeRendererProps.md#i18ncancel)
 - [i18nOk](client_internal_components_PropertyEntry_PropertyEntryDateTime.IPropertyEntryDateTimeRendererProps.md#i18nok)
-- [icon](client_internal_components_PropertyEntry_PropertyEntryDateTime.IPropertyEntryDateTimeRendererProps.md#icon)
 - [label](client_internal_components_PropertyEntry_PropertyEntryDateTime.IPropertyEntryDateTimeRendererProps.md#label)
+- [language](client_internal_components_PropertyEntry_PropertyEntryDateTime.IPropertyEntryDateTimeRendererProps.md#language)
+- [languageOverride](client_internal_components_PropertyEntry_PropertyEntryDateTime.IPropertyEntryDateTimeRendererProps.md#languageoverride)
 - [momentValue](client_internal_components_PropertyEntry_PropertyEntryDateTime.IPropertyEntryDateTimeRendererProps.md#momentvalue)
 - [placeholder](client_internal_components_PropertyEntry_PropertyEntryDateTime.IPropertyEntryDateTimeRendererProps.md#placeholder)
 - [propertyId](client_internal_components_PropertyEntry_PropertyEntryDateTime.IPropertyEntryDateTimeRendererProps.md#propertyid)
 - [rtl](client_internal_components_PropertyEntry_PropertyEntryDateTime.IPropertyEntryDateTimeRendererProps.md#rtl)
 - [type](client_internal_components_PropertyEntry_PropertyEntryDateTime.IPropertyEntryDateTimeRendererProps.md#type)
+- [uniqueId](client_internal_components_PropertyEntry_PropertyEntryDateTime.IPropertyEntryDateTimeRendererProps.md#uniqueid)
 
 ### Methods
 
@@ -60,7 +62,7 @@ The renderer args
 
 #### Defined in
 
-[client/internal/renderer.ts:19](https://github.com/onzag/itemize/blob/5c2808d3/client/internal/renderer.ts#L19)
+[client/internal/renderer.ts:19](https://github.com/onzag/itemize/blob/f2db74a5/client/internal/renderer.ts#L19)
 
 ___
 
@@ -76,7 +78,7 @@ Whether the entry should autofocus
 
 #### Defined in
 
-[client/internal/components/PropertyEntry/index.tsx:105](https://github.com/onzag/itemize/blob/5c2808d3/client/internal/components/PropertyEntry/index.tsx#L105)
+[client/internal/components/PropertyEntry/index.tsx:107](https://github.com/onzag/itemize/blob/f2db74a5/client/internal/components/PropertyEntry/index.tsx#L107)
 
 ___
 
@@ -93,7 +95,7 @@ current value, this check is exceptional as it uses the local equal function
 
 #### Defined in
 
-[client/internal/components/PropertyEntry/index.tsx:77](https://github.com/onzag/itemize/blob/5c2808d3/client/internal/components/PropertyEntry/index.tsx#L77)
+[client/internal/components/PropertyEntry/index.tsx:79](https://github.com/onzag/itemize/blob/f2db74a5/client/internal/components/PropertyEntry/index.tsx#L79)
 
 ___
 
@@ -109,7 +111,7 @@ The currently applied value that is in sync with the server side
 
 #### Defined in
 
-[client/internal/components/PropertyEntry/index.tsx:72](https://github.com/onzag/itemize/blob/5c2808d3/client/internal/components/PropertyEntry/index.tsx#L72)
+[client/internal/components/PropertyEntry/index.tsx:74](https://github.com/onzag/itemize/blob/f2db74a5/client/internal/components/PropertyEntry/index.tsx#L74)
 
 ___
 
@@ -125,7 +127,7 @@ The current internal value, if any given
 
 #### Defined in
 
-[client/internal/components/PropertyEntry/index.tsx:100](https://github.com/onzag/itemize/blob/5c2808d3/client/internal/components/PropertyEntry/index.tsx#L100)
+[client/internal/components/PropertyEntry/index.tsx:102](https://github.com/onzag/itemize/blob/f2db74a5/client/internal/components/PropertyEntry/index.tsx#L102)
 
 ___
 
@@ -145,7 +147,7 @@ of a flag
 
 #### Defined in
 
-[client/internal/components/PropertyEntry/index.tsx:96](https://github.com/onzag/itemize/blob/5c2808d3/client/internal/components/PropertyEntry/index.tsx#L96)
+[client/internal/components/PropertyEntry/index.tsx:98](https://github.com/onzag/itemize/blob/f2db74a5/client/internal/components/PropertyEntry/index.tsx#L98)
 
 ___
 
@@ -164,7 +166,7 @@ a value for this play a role as well
 
 #### Defined in
 
-[client/internal/components/PropertyEntry/index.tsx:88](https://github.com/onzag/itemize/blob/5c2808d3/client/internal/components/PropertyEntry/index.tsx#L88)
+[client/internal/components/PropertyEntry/index.tsx:90](https://github.com/onzag/itemize/blob/f2db74a5/client/internal/components/PropertyEntry/index.tsx#L90)
 
 ___
 
@@ -180,7 +182,7 @@ The current value
 
 #### Defined in
 
-[client/internal/components/PropertyEntry/index.tsx:81](https://github.com/onzag/itemize/blob/5c2808d3/client/internal/components/PropertyEntry/index.tsx#L81)
+[client/internal/components/PropertyEntry/index.tsx:83](https://github.com/onzag/itemize/blob/f2db74a5/client/internal/components/PropertyEntry/index.tsx#L83)
 
 ___
 
@@ -190,7 +192,7 @@ ___
 
 #### Defined in
 
-[client/internal/components/PropertyEntry/PropertyEntryDateTime.tsx:51](https://github.com/onzag/itemize/blob/5c2808d3/client/internal/components/PropertyEntry/PropertyEntryDateTime.tsx#L51)
+[client/internal/components/PropertyEntry/PropertyEntryDateTime.tsx:52](https://github.com/onzag/itemize/blob/f2db74a5/client/internal/components/PropertyEntry/PropertyEntryDateTime.tsx#L52)
 
 ___
 
@@ -207,7 +209,7 @@ this is locale specific; the description might not be passed if specified by the
 
 #### Defined in
 
-[client/internal/components/PropertyEntry/index.tsx:63](https://github.com/onzag/itemize/blob/5c2808d3/client/internal/components/PropertyEntry/index.tsx#L63)
+[client/internal/components/PropertyEntry/index.tsx:69](https://github.com/onzag/itemize/blob/f2db74a5/client/internal/components/PropertyEntry/index.tsx#L69)
 
 ___
 
@@ -225,7 +227,7 @@ and attempts are futile to modify
 
 #### Defined in
 
-[client/internal/components/PropertyEntry/index.tsx:111](https://github.com/onzag/itemize/blob/5c2808d3/client/internal/components/PropertyEntry/index.tsx#L111)
+[client/internal/components/PropertyEntry/index.tsx:113](https://github.com/onzag/itemize/blob/f2db74a5/client/internal/components/PropertyEntry/index.tsx#L113)
 
 ___
 
@@ -235,7 +237,7 @@ ___
 
 #### Defined in
 
-[client/internal/components/PropertyEntry/PropertyEntryDateTime.tsx:48](https://github.com/onzag/itemize/blob/5c2808d3/client/internal/components/PropertyEntry/PropertyEntryDateTime.tsx#L48)
+[client/internal/components/PropertyEntry/PropertyEntryDateTime.tsx:49](https://github.com/onzag/itemize/blob/f2db74a5/client/internal/components/PropertyEntry/PropertyEntryDateTime.tsx#L49)
 
 ___
 
@@ -245,23 +247,7 @@ ___
 
 #### Defined in
 
-[client/internal/components/PropertyEntry/PropertyEntryDateTime.tsx:49](https://github.com/onzag/itemize/blob/5c2808d3/client/internal/components/PropertyEntry/PropertyEntryDateTime.tsx#L49)
-
-___
-
-### icon
-
-• `Optional` **icon**: `ReactNode`
-
-Icon are an UI defined property for an icon to use during the view, handle as you wish
-
-#### Inherited from
-
-[IPropertyEntryRendererProps](client_internal_components_PropertyEntry.IPropertyEntryRendererProps.md).[icon](client_internal_components_PropertyEntry.IPropertyEntryRendererProps.md#icon)
-
-#### Defined in
-
-[client/internal/components/PropertyEntry/index.tsx:67](https://github.com/onzag/itemize/blob/5c2808d3/client/internal/components/PropertyEntry/index.tsx#L67)
+[client/internal/components/PropertyEntry/PropertyEntryDateTime.tsx:50](https://github.com/onzag/itemize/blob/f2db74a5/client/internal/components/PropertyEntry/PropertyEntryDateTime.tsx#L50)
 
 ___
 
@@ -278,7 +264,43 @@ this is locale specific
 
 #### Defined in
 
-[client/internal/components/PropertyEntry/index.tsx:53](https://github.com/onzag/itemize/blob/5c2808d3/client/internal/components/PropertyEntry/index.tsx#L53)
+[client/internal/components/PropertyEntry/index.tsx:59](https://github.com/onzag/itemize/blob/f2db74a5/client/internal/components/PropertyEntry/index.tsx#L59)
+
+___
+
+### language
+
+• **language**: `string`
+
+The current language being used by the client overall in the app
+
+#### Inherited from
+
+[IPropertyEntryRendererProps](client_internal_components_PropertyEntry.IPropertyEntryRendererProps.md).[language](client_internal_components_PropertyEntry.IPropertyEntryRendererProps.md#language)
+
+#### Defined in
+
+[client/internal/components/PropertyEntry/index.tsx:138](https://github.com/onzag/itemize/blob/f2db74a5/client/internal/components/PropertyEntry/index.tsx#L138)
+
+___
+
+### languageOverride
+
+• `Optional` **languageOverride**: `string`
+
+An optional language used mainly for the text type to override
+own language properties that currently only text supports that
+
+It may be possible for the editor to set its own text language
+value if it has its own
+
+#### Inherited from
+
+[IPropertyEntryRendererProps](client_internal_components_PropertyEntry.IPropertyEntryRendererProps.md).[languageOverride](client_internal_components_PropertyEntry.IPropertyEntryRendererProps.md#languageoverride)
+
+#### Defined in
+
+[client/internal/components/PropertyEntry/index.tsx:147](https://github.com/onzag/itemize/blob/f2db74a5/client/internal/components/PropertyEntry/index.tsx#L147)
 
 ___
 
@@ -288,7 +310,7 @@ ___
 
 #### Defined in
 
-[client/internal/components/PropertyEntry/PropertyEntryDateTime.tsx:47](https://github.com/onzag/itemize/blob/5c2808d3/client/internal/components/PropertyEntry/PropertyEntryDateTime.tsx#L47)
+[client/internal/components/PropertyEntry/PropertyEntryDateTime.tsx:48](https://github.com/onzag/itemize/blob/f2db74a5/client/internal/components/PropertyEntry/PropertyEntryDateTime.tsx#L48)
 
 ___
 
@@ -305,7 +327,7 @@ this is locale specific
 
 #### Defined in
 
-[client/internal/components/PropertyEntry/index.tsx:58](https://github.com/onzag/itemize/blob/5c2808d3/client/internal/components/PropertyEntry/index.tsx#L58)
+[client/internal/components/PropertyEntry/index.tsx:64](https://github.com/onzag/itemize/blob/f2db74a5/client/internal/components/PropertyEntry/index.tsx#L64)
 
 ___
 
@@ -321,7 +343,7 @@ The property id in question
 
 #### Defined in
 
-[client/internal/components/PropertyEntry/index.tsx:47](https://github.com/onzag/itemize/blob/5c2808d3/client/internal/components/PropertyEntry/index.tsx#L47)
+[client/internal/components/PropertyEntry/index.tsx:47](https://github.com/onzag/itemize/blob/f2db74a5/client/internal/components/PropertyEntry/index.tsx#L47)
 
 ___
 
@@ -337,7 +359,7 @@ Whether it is in rtl mode for a rtl language
 
 #### Defined in
 
-[client/internal/renderer.ts:15](https://github.com/onzag/itemize/blob/5c2808d3/client/internal/renderer.ts#L15)
+[client/internal/renderer.ts:15](https://github.com/onzag/itemize/blob/f2db74a5/client/internal/renderer.ts#L15)
 
 ___
 
@@ -347,7 +369,24 @@ ___
 
 #### Defined in
 
-[client/internal/components/PropertyEntry/PropertyEntryDateTime.tsx:46](https://github.com/onzag/itemize/blob/5c2808d3/client/internal/components/PropertyEntry/PropertyEntryDateTime.tsx#L46)
+[client/internal/components/PropertyEntry/PropertyEntryDateTime.tsx:47](https://github.com/onzag/itemize/blob/f2db74a5/client/internal/components/PropertyEntry/PropertyEntryDateTime.tsx#L47)
+
+___
+
+### uniqueId
+
+• **uniqueId**: `string`
+
+an unique id for this property
+with the id and the version they are related to
+
+#### Inherited from
+
+[IPropertyEntryRendererProps](client_internal_components_PropertyEntry.IPropertyEntryRendererProps.md).[uniqueId](client_internal_components_PropertyEntry.IPropertyEntryRendererProps.md#uniqueid)
+
+#### Defined in
+
+[client/internal/components/PropertyEntry/index.tsx:53](https://github.com/onzag/itemize/blob/f2db74a5/client/internal/components/PropertyEntry/index.tsx#L53)
 
 ## Methods
 
@@ -369,7 +408,7 @@ currentInvalidReason gets populated even if the field is not poked
 
 #### Defined in
 
-[client/internal/components/PropertyEntry/index.tsx:118](https://github.com/onzag/itemize/blob/5c2808d3/client/internal/components/PropertyEntry/index.tsx#L118)
+[client/internal/components/PropertyEntry/index.tsx:120](https://github.com/onzag/itemize/blob/f2db74a5/client/internal/components/PropertyEntry/index.tsx#L120)
 
 ___
 
@@ -399,7 +438,7 @@ caution is advised which one to use
 
 #### Defined in
 
-[client/internal/components/PropertyEntry/index.tsx:126](https://github.com/onzag/itemize/blob/5c2808d3/client/internal/components/PropertyEntry/index.tsx#L126)
+[client/internal/components/PropertyEntry/index.tsx:128](https://github.com/onzag/itemize/blob/f2db74a5/client/internal/components/PropertyEntry/index.tsx#L128)
 
 ___
 
@@ -419,7 +458,7 @@ ___
 
 #### Defined in
 
-[client/internal/components/PropertyEntry/PropertyEntryDateTime.tsx:50](https://github.com/onzag/itemize/blob/5c2808d3/client/internal/components/PropertyEntry/PropertyEntryDateTime.tsx#L50)
+[client/internal/components/PropertyEntry/PropertyEntryDateTime.tsx:51](https://github.com/onzag/itemize/blob/f2db74a5/client/internal/components/PropertyEntry/PropertyEntryDateTime.tsx#L51)
 
 ___
 
@@ -440,4 +479,4 @@ when doing this
 
 #### Defined in
 
-[client/internal/components/PropertyEntry/index.tsx:131](https://github.com/onzag/itemize/blob/5c2808d3/client/internal/components/PropertyEntry/index.tsx#L131)
+[client/internal/components/PropertyEntry/index.tsx:133](https://github.com/onzag/itemize/blob/f2db74a5/client/internal/components/PropertyEntry/index.tsx#L133)

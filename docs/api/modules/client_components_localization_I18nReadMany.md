@@ -35,7 +35,7 @@ when such a function returns a react node
 
 #### Defined in
 
-[client/components/localization/I18nReadMany.tsx:91](https://github.com/onzag/itemize/blob/5c2808d3/client/components/localization/I18nReadMany.tsx#L91)
+[client/components/localization/I18nReadMany.tsx:91](https://github.com/onzag/itemize/blob/f2db74a5/client/components/localization/I18nReadMany.tsx#L91)
 
 ___
 
@@ -64,4 +64,4 @@ on itself
 
 #### Defined in
 
-[client/components/localization/I18nReadMany.tsx:47](https://github.com/onzag/itemize/blob/5c2808d3/client/components/localization/I18nReadMany.tsx#L47)
+[client/components/localization/I18nReadMany.tsx:47](https://github.com/onzag/itemize/blob/f2db74a5/client/components/localization/I18nReadMany.tsx#L47)

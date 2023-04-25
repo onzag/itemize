@@ -23,6 +23,7 @@
 - [redisGlobalSub](server_listener.Listener.md#redisglobalsub)
 - [redisLocalPub](server_listener.Listener.md#redislocalpub)
 - [redisLocalSub](server_listener.Listener.md#redislocalsub)
+- [registry](server_listener.Listener.md#registry)
 - [root](server_listener.Listener.md#root)
 - [sensitiveConfig](server_listener.Listener.md#sensitiveconfig)
 - [server](server_listener.Listener.md#server)
@@ -49,6 +50,9 @@
 - [parentedSearchFeedback](server_listener.Listener.md#parentedsearchfeedback)
 - [parentedSearchRegister](server_listener.Listener.md#parentedsearchregister)
 - [parentedSearchUnregister](server_listener.Listener.md#parentedsearchunregister)
+- [propertySearchFeedback](server_listener.Listener.md#propertysearchfeedback)
+- [propertySearchRegister](server_listener.Listener.md#propertysearchregister)
+- [propertySearchUnregister](server_listener.Listener.md#propertysearchunregister)
 - [register](server_listener.Listener.md#register)
 - [registerSS](server_listener.Listener.md#registerss)
 - [removeListener](server_listener.Listener.md#removelistener)
@@ -61,6 +65,7 @@
 - [triggerOwnedParentedSearchListeners](server_listener.Listener.md#triggerownedparentedsearchlisteners)
 - [triggerOwnedSearchListeners](server_listener.Listener.md#triggerownedsearchlisteners)
 - [triggerParentedSearchListeners](server_listener.Listener.md#triggerparentedsearchlisteners)
+- [triggerPropertySearchListeners](server_listener.Listener.md#triggerpropertysearchlisteners)
 - [unregister](server_listener.Listener.md#unregister)
 - [unregisterSS](server_listener.Listener.md#unregisterss)
 
@@ -68,7 +73,7 @@
 
 ### constructor
 
-• **new Listener**(`buildnumber`, `redisGlobalSub`, `redisGlobalPub`, `redisLocalSub`, `redisLocalPub`, `root`, `cache`, `rawDB`, `server`, `customRoles`, `sensitiveConfig`)
+• **new Listener**(`buildnumber`, `redisGlobalSub`, `redisGlobalPub`, `redisLocalSub`, `redisLocalPub`, `registry`, `root`, `cache`, `rawDB`, `server`, `customRoles`, `sensitiveConfig`)
 
 #### Parameters
 
@@ -79,6 +84,7 @@
 | `redisGlobalPub` | [`ItemizeRedisClient`](server_redis.ItemizeRedisClient.md) |
 | `redisLocalSub` | [`ItemizeRedisClient`](server_redis.ItemizeRedisClient.md) |
 | `redisLocalPub` | [`ItemizeRedisClient`](server_redis.ItemizeRedisClient.md) |
+| `registry` | [`RegistryService`](server_services_registry.RegistryService.md) |
 | `root` | [`default`](base_Root.default.md) |
 | `cache` | [`Cache`](server_cache.Cache.md) |
 | `rawDB` | [`ItemizeRawDB`](server_raw_db.ItemizeRawDB.md) |
@@ -88,7 +94,7 @@
 
 #### Defined in
 
-[server/listener.ts:173](https://github.com/onzag/itemize/blob/5c2808d3/server/listener.ts#L173)
+[server/listener.ts:189](https://github.com/onzag/itemize/blob/f2db74a5/server/listener.ts#L189)
 
 ## Properties
 
@@ -98,7 +104,7 @@
 
 #### Defined in
 
-[server/listener.ts:165](https://github.com/onzag/itemize/blob/5c2808d3/server/listener.ts#L165)
+[server/listener.ts:180](https://github.com/onzag/itemize/blob/f2db74a5/server/listener.ts#L180)
 
 ___
 
@@ -108,7 +114,7 @@ ___
 
 #### Defined in
 
-[server/listener.ts:168](https://github.com/onzag/itemize/blob/5c2808d3/server/listener.ts#L168)
+[server/listener.ts:183](https://github.com/onzag/itemize/blob/f2db74a5/server/listener.ts#L183)
 
 ___
 
@@ -118,7 +124,7 @@ ___
 
 #### Defined in
 
-[server/listener.ts:171](https://github.com/onzag/itemize/blob/5c2808d3/server/listener.ts#L171)
+[server/listener.ts:187](https://github.com/onzag/itemize/blob/f2db74a5/server/listener.ts#L187)
 
 ___
 
@@ -128,7 +134,7 @@ ___
 
 #### Defined in
 
-[server/listener.ts:156](https://github.com/onzag/itemize/blob/5c2808d3/server/listener.ts#L156)
+[server/listener.ts:171](https://github.com/onzag/itemize/blob/f2db74a5/server/listener.ts#L171)
 
 ___
 
@@ -138,7 +144,7 @@ ___
 
 #### Defined in
 
-[server/listener.ts:158](https://github.com/onzag/itemize/blob/5c2808d3/server/listener.ts#L158)
+[server/listener.ts:173](https://github.com/onzag/itemize/blob/f2db74a5/server/listener.ts#L173)
 
 ___
 
@@ -148,7 +154,7 @@ ___
 
 #### Defined in
 
-[server/listener.ts:159](https://github.com/onzag/itemize/blob/5c2808d3/server/listener.ts#L159)
+[server/listener.ts:174](https://github.com/onzag/itemize/blob/f2db74a5/server/listener.ts#L174)
 
 ___
 
@@ -158,7 +164,7 @@ ___
 
 #### Defined in
 
-[server/listener.ts:167](https://github.com/onzag/itemize/blob/5c2808d3/server/listener.ts#L167)
+[server/listener.ts:182](https://github.com/onzag/itemize/blob/f2db74a5/server/listener.ts#L182)
 
 ___
 
@@ -168,7 +174,7 @@ ___
 
 #### Defined in
 
-[server/listener.ts:162](https://github.com/onzag/itemize/blob/5c2808d3/server/listener.ts#L162)
+[server/listener.ts:177](https://github.com/onzag/itemize/blob/f2db74a5/server/listener.ts#L177)
 
 ___
 
@@ -178,7 +184,7 @@ ___
 
 #### Defined in
 
-[server/listener.ts:161](https://github.com/onzag/itemize/blob/5c2808d3/server/listener.ts#L161)
+[server/listener.ts:176](https://github.com/onzag/itemize/blob/f2db74a5/server/listener.ts#L176)
 
 ___
 
@@ -188,7 +194,7 @@ ___
 
 #### Defined in
 
-[server/listener.ts:164](https://github.com/onzag/itemize/blob/5c2808d3/server/listener.ts#L164)
+[server/listener.ts:179](https://github.com/onzag/itemize/blob/f2db74a5/server/listener.ts#L179)
 
 ___
 
@@ -198,7 +204,17 @@ ___
 
 #### Defined in
 
-[server/listener.ts:163](https://github.com/onzag/itemize/blob/5c2808d3/server/listener.ts#L163)
+[server/listener.ts:178](https://github.com/onzag/itemize/blob/f2db74a5/server/listener.ts#L178)
+
+___
+
+### registry
+
+• `Private` **registry**: [`RegistryService`](server_services_registry.RegistryService.md)
+
+#### Defined in
+
+[server/listener.ts:185](https://github.com/onzag/itemize/blob/f2db74a5/server/listener.ts#L185)
 
 ___
 
@@ -208,7 +224,7 @@ ___
 
 #### Defined in
 
-[server/listener.ts:166](https://github.com/onzag/itemize/blob/5c2808d3/server/listener.ts#L166)
+[server/listener.ts:181](https://github.com/onzag/itemize/blob/f2db74a5/server/listener.ts#L181)
 
 ___
 
@@ -218,7 +234,7 @@ ___
 
 #### Defined in
 
-[server/listener.ts:169](https://github.com/onzag/itemize/blob/5c2808d3/server/listener.ts#L169)
+[server/listener.ts:184](https://github.com/onzag/itemize/blob/f2db74a5/server/listener.ts#L184)
 
 ___
 
@@ -228,7 +244,7 @@ ___
 
 #### Defined in
 
-[server/listener.ts:170](https://github.com/onzag/itemize/blob/5c2808d3/server/listener.ts#L170)
+[server/listener.ts:186](https://github.com/onzag/itemize/blob/f2db74a5/server/listener.ts#L186)
 
 ## Methods
 
@@ -248,7 +264,7 @@ ___
 
 #### Defined in
 
-[server/listener.ts:294](https://github.com/onzag/itemize/blob/5c2808d3/server/listener.ts#L294)
+[server/listener.ts:321](https://github.com/onzag/itemize/blob/f2db74a5/server/listener.ts#L321)
 
 ___
 
@@ -262,7 +278,7 @@ ___
 
 #### Defined in
 
-[server/listener.ts:223](https://github.com/onzag/itemize/blob/5c2808d3/server/listener.ts#L223)
+[server/listener.ts:241](https://github.com/onzag/itemize/blob/f2db74a5/server/listener.ts#L241)
 
 ___
 
@@ -284,7 +300,7 @@ ___
 
 #### Defined in
 
-[server/listener.ts:304](https://github.com/onzag/itemize/blob/5c2808d3/server/listener.ts#L304)
+[server/listener.ts:331](https://github.com/onzag/itemize/blob/f2db74a5/server/listener.ts#L331)
 
 ___
 
@@ -305,7 +321,7 @@ ___
 
 #### Defined in
 
-[server/listener.ts:1562](https://github.com/onzag/itemize/blob/5c2808d3/server/listener.ts#L1562)
+[server/listener.ts:2341](https://github.com/onzag/itemize/blob/f2db74a5/server/listener.ts#L2341)
 
 ___
 
@@ -326,7 +342,7 @@ ___
 
 #### Defined in
 
-[server/listener.ts:1970](https://github.com/onzag/itemize/blob/5c2808d3/server/listener.ts#L1970)
+[server/listener.ts:2911](https://github.com/onzag/itemize/blob/f2db74a5/server/listener.ts#L2911)
 
 ___
 
@@ -347,7 +363,7 @@ ___
 
 #### Defined in
 
-[server/listener.ts:359](https://github.com/onzag/itemize/blob/5c2808d3/server/listener.ts#L359)
+[server/listener.ts:386](https://github.com/onzag/itemize/blob/f2db74a5/server/listener.ts#L386)
 
 ___
 
@@ -361,7 +377,7 @@ ___
 
 #### Defined in
 
-[server/listener.ts:2146](https://github.com/onzag/itemize/blob/5c2808d3/server/listener.ts#L2146)
+[server/listener.ts:3139](https://github.com/onzag/itemize/blob/f2db74a5/server/listener.ts#L3139)
 
 ___
 
@@ -381,7 +397,7 @@ ___
 
 #### Defined in
 
-[server/listener.ts:344](https://github.com/onzag/itemize/blob/5c2808d3/server/listener.ts#L344)
+[server/listener.ts:371](https://github.com/onzag/itemize/blob/f2db74a5/server/listener.ts#L371)
 
 ___
 
@@ -402,7 +418,7 @@ ___
 
 #### Defined in
 
-[server/listener.ts:2068](https://github.com/onzag/itemize/blob/5c2808d3/server/listener.ts#L2068)
+[server/listener.ts:3039](https://github.com/onzag/itemize/blob/f2db74a5/server/listener.ts#L3039)
 
 ___
 
@@ -416,7 +432,7 @@ ___
 
 #### Defined in
 
-[server/listener.ts:2122](https://github.com/onzag/itemize/blob/5c2808d3/server/listener.ts#L2122)
+[server/listener.ts:3111](https://github.com/onzag/itemize/blob/f2db74a5/server/listener.ts#L3111)
 
 ___
 
@@ -436,7 +452,7 @@ ___
 
 #### Defined in
 
-[server/listener.ts:333](https://github.com/onzag/itemize/blob/5c2808d3/server/listener.ts#L333)
+[server/listener.ts:360](https://github.com/onzag/itemize/blob/f2db74a5/server/listener.ts#L360)
 
 ___
 
@@ -457,7 +473,7 @@ ___
 
 #### Defined in
 
-[server/listener.ts:1356](https://github.com/onzag/itemize/blob/5c2808d3/server/listener.ts#L1356)
+[server/listener.ts:2109](https://github.com/onzag/itemize/blob/f2db74a5/server/listener.ts#L2109)
 
 ___
 
@@ -478,7 +494,7 @@ ___
 
 #### Defined in
 
-[server/listener.ts:851](https://github.com/onzag/itemize/blob/5c2808d3/server/listener.ts#L851)
+[server/listener.ts:1179](https://github.com/onzag/itemize/blob/f2db74a5/server/listener.ts#L1179)
 
 ___
 
@@ -499,7 +515,7 @@ ___
 
 #### Defined in
 
-[server/listener.ts:1838](https://github.com/onzag/itemize/blob/5c2808d3/server/listener.ts#L1838)
+[server/listener.ts:2720](https://github.com/onzag/itemize/blob/f2db74a5/server/listener.ts#L2720)
 
 ___
 
@@ -520,7 +536,7 @@ ___
 
 #### Defined in
 
-[server/listener.ts:961](https://github.com/onzag/itemize/blob/5c2808d3/server/listener.ts#L961)
+[server/listener.ts:1317](https://github.com/onzag/itemize/blob/f2db74a5/server/listener.ts#L1317)
 
 ___
 
@@ -541,7 +557,7 @@ ___
 
 #### Defined in
 
-[server/listener.ts:636](https://github.com/onzag/itemize/blob/5c2808d3/server/listener.ts#L636)
+[server/listener.ts:733](https://github.com/onzag/itemize/blob/f2db74a5/server/listener.ts#L733)
 
 ___
 
@@ -562,7 +578,7 @@ ___
 
 #### Defined in
 
-[server/listener.ts:1776](https://github.com/onzag/itemize/blob/5c2808d3/server/listener.ts#L1776)
+[server/listener.ts:2603](https://github.com/onzag/itemize/blob/f2db74a5/server/listener.ts#L2603)
 
 ___
 
@@ -583,7 +599,7 @@ ___
 
 #### Defined in
 
-[server/listener.ts:1153](https://github.com/onzag/itemize/blob/5c2808d3/server/listener.ts#L1153)
+[server/listener.ts:1840](https://github.com/onzag/itemize/blob/f2db74a5/server/listener.ts#L1840)
 
 ___
 
@@ -604,7 +620,7 @@ ___
 
 #### Defined in
 
-[server/listener.ts:741](https://github.com/onzag/itemize/blob/5c2808d3/server/listener.ts#L741)
+[server/listener.ts:1041](https://github.com/onzag/itemize/blob/f2db74a5/server/listener.ts#L1041)
 
 ___
 
@@ -625,7 +641,70 @@ ___
 
 #### Defined in
 
-[server/listener.ts:1806](https://github.com/onzag/itemize/blob/5c2808d3/server/listener.ts#L1806)
+[server/listener.ts:2680](https://github.com/onzag/itemize/blob/f2db74a5/server/listener.ts#L2680)
+
+___
+
+### propertySearchFeedback
+
+▸ **propertySearchFeedback**(`socket`, `request`): `Promise`<`void`\>
+
+#### Parameters
+
+| Name | Type |
+| :------ | :------ |
+| `socket` | `Socket` |
+| `request` | [`IPropertySearchFeedbackRequest`](../interfaces/base_remote_protocol.IPropertySearchFeedbackRequest.md) |
+
+#### Returns
+
+`Promise`<`void`\>
+
+#### Defined in
+
+[server/listener.ts:1535](https://github.com/onzag/itemize/blob/f2db74a5/server/listener.ts#L1535)
+
+___
+
+### propertySearchRegister
+
+▸ **propertySearchRegister**(`socket`, `request`): `Promise`<`void`\>
+
+#### Parameters
+
+| Name | Type |
+| :------ | :------ |
+| `socket` | `Socket` |
+| `request` | [`IPropertySearchRegisterRequest`](../interfaces/base_remote_protocol.IPropertySearchRegisterRequest.md) |
+
+#### Returns
+
+`Promise`<`void`\>
+
+#### Defined in
+
+[server/listener.ts:866](https://github.com/onzag/itemize/blob/f2db74a5/server/listener.ts#L866)
+
+___
+
+### propertySearchUnregister
+
+▸ **propertySearchUnregister**(`socket`, `request`): `void`
+
+#### Parameters
+
+| Name | Type |
+| :------ | :------ |
+| `socket` | `Socket` |
+| `request` | [`IPropertySearchUnregisterRequest`](../interfaces/base_remote_protocol.IPropertySearchUnregisterRequest.md) |
+
+#### Returns
+
+`void`
+
+#### Defined in
+
+[server/listener.ts:2641](https://github.com/onzag/itemize/blob/f2db74a5/server/listener.ts#L2641)
 
 ___
 
@@ -646,7 +725,7 @@ ___
 
 #### Defined in
 
-[server/listener.ts:509](https://github.com/onzag/itemize/blob/5c2808d3/server/listener.ts#L509)
+[server/listener.ts:574](https://github.com/onzag/itemize/blob/f2db74a5/server/listener.ts#L574)
 
 ___
 
@@ -666,7 +745,7 @@ ___
 
 #### Defined in
 
-[server/listener.ts:466](https://github.com/onzag/itemize/blob/5c2808d3/server/listener.ts#L466)
+[server/listener.ts:511](https://github.com/onzag/itemize/blob/f2db74a5/server/listener.ts#L511)
 
 ___
 
@@ -687,7 +766,7 @@ ___
 
 #### Defined in
 
-[server/listener.ts:1713](https://github.com/onzag/itemize/blob/5c2808d3/server/listener.ts#L1713)
+[server/listener.ts:2528](https://github.com/onzag/itemize/blob/f2db74a5/server/listener.ts#L2528)
 
 ___
 
@@ -707,7 +786,7 @@ ___
 
 #### Defined in
 
-[server/listener.ts:1700](https://github.com/onzag/itemize/blob/5c2808d3/server/listener.ts#L1700)
+[server/listener.ts:2511](https://github.com/onzag/itemize/blob/f2db74a5/server/listener.ts#L2511)
 
 ___
 
@@ -727,7 +806,7 @@ ___
 
 #### Defined in
 
-[server/listener.ts:2095](https://github.com/onzag/itemize/blob/5c2808d3/server/listener.ts#L2095)
+[server/listener.ts:3076](https://github.com/onzag/itemize/blob/f2db74a5/server/listener.ts#L3076)
 
 ___
 
@@ -741,7 +820,7 @@ ___
 
 #### Defined in
 
-[server/listener.ts:226](https://github.com/onzag/itemize/blob/5c2808d3/server/listener.ts#L226)
+[server/listener.ts:244](https://github.com/onzag/itemize/blob/f2db74a5/server/listener.ts#L244)
 
 ___
 
@@ -761,7 +840,7 @@ ___
 
 #### Defined in
 
-[server/listener.ts:318](https://github.com/onzag/itemize/blob/5c2808d3/server/listener.ts#L318)
+[server/listener.ts:345](https://github.com/onzag/itemize/blob/f2db74a5/server/listener.ts#L345)
 
 ___
 
@@ -775,7 +854,7 @@ ___
 
 #### Defined in
 
-[server/listener.ts:242](https://github.com/onzag/itemize/blob/5c2808d3/server/listener.ts#L242)
+[server/listener.ts:260](https://github.com/onzag/itemize/blob/f2db74a5/server/listener.ts#L260)
 
 ___
 
@@ -797,7 +876,7 @@ ___
 
 #### Defined in
 
-[server/listener.ts:1871](https://github.com/onzag/itemize/blob/5c2808d3/server/listener.ts#L1871)
+[server/listener.ts:2761](https://github.com/onzag/itemize/blob/f2db74a5/server/listener.ts#L2761)
 
 ___
 
@@ -818,7 +897,7 @@ ___
 
 #### Defined in
 
-[server/listener.ts:1945](https://github.com/onzag/itemize/blob/5c2808d3/server/listener.ts#L1945)
+[server/listener.ts:2880](https://github.com/onzag/itemize/blob/f2db74a5/server/listener.ts#L2880)
 
 ___
 
@@ -839,7 +918,7 @@ ___
 
 #### Defined in
 
-[server/listener.ts:1899](https://github.com/onzag/itemize/blob/5c2808d3/server/listener.ts#L1899)
+[server/listener.ts:2793](https://github.com/onzag/itemize/blob/f2db74a5/server/listener.ts#L2793)
 
 ___
 
@@ -860,7 +939,28 @@ ___
 
 #### Defined in
 
-[server/listener.ts:1921](https://github.com/onzag/itemize/blob/5c2808d3/server/listener.ts#L1921)
+[server/listener.ts:2850](https://github.com/onzag/itemize/blob/f2db74a5/server/listener.ts#L2850)
+
+___
+
+### triggerPropertySearchListeners
+
+▸ **triggerPropertySearchListeners**(`event`, `listenerUUID`): `void`
+
+#### Parameters
+
+| Name | Type |
+| :------ | :------ |
+| `event` | [`IPropertySearchRecordsEvent`](../interfaces/base_remote_protocol.IPropertySearchRecordsEvent.md) |
+| `listenerUUID` | `string` |
+
+#### Returns
+
+`void`
+
+#### Defined in
+
+[server/listener.ts:2821](https://github.com/onzag/itemize/blob/f2db74a5/server/listener.ts#L2821)
 
 ___
 
@@ -881,7 +981,7 @@ ___
 
 #### Defined in
 
-[server/listener.ts:1745](https://github.com/onzag/itemize/blob/5c2808d3/server/listener.ts#L1745)
+[server/listener.ts:2564](https://github.com/onzag/itemize/blob/f2db74a5/server/listener.ts#L2564)
 
 ___
 
@@ -903,4 +1003,4 @@ This method only reasonable gets called by the CLUSTER_MANAGER or in absolute mo
 
 #### Defined in
 
-[server/listener.ts:1732](https://github.com/onzag/itemize/blob/5c2808d3/server/listener.ts#L1732)
+[server/listener.ts:2551](https://github.com/onzag/itemize/blob/f2db74a5/server/listener.ts#L2551)

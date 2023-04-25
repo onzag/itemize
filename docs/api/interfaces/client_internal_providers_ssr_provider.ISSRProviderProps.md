@@ -21,7 +21,7 @@ The ssr provider props that creates the context
 
 #### Defined in
 
-[client/internal/providers/ssr-provider.tsx:102](https://github.com/onzag/itemize/blob/5c2808d3/client/internal/providers/ssr-provider.tsx#L102)
+[client/internal/providers/ssr-provider.tsx:129](https://github.com/onzag/itemize/blob/f2db74a5/client/internal/providers/ssr-provider.tsx#L129)
 
 ___
 
@@ -31,4 +31,4 @@ ___
 
 #### Defined in
 
-[client/internal/providers/ssr-provider.tsx:103](https://github.com/onzag/itemize/blob/5c2808d3/client/internal/providers/ssr-provider.tsx#L103)
+[client/internal/providers/ssr-provider.tsx:130](https://github.com/onzag/itemize/blob/f2db74a5/client/internal/providers/ssr-provider.tsx#L130)

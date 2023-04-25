@@ -46,12 +46,12 @@ such as the router
 - [componentWillReceiveProps](client_internal_app.default.md#componentwillreceiveprops)
 - [componentWillUnmount](client_internal_app.default.md#componentwillunmount)
 - [componentWillUpdate](client_internal_app.default.md#componentwillupdate)
+- [confirmUrlLanguage](client_internal_app.default.md#confirmurllanguage)
 - [finallySetLocaleDataFor](client_internal_app.default.md#finallysetlocaledatafor)
 - [forceUpdate](client_internal_app.default.md#forceupdate)
 - [getSnapshotBeforeUpdate](client_internal_app.default.md#getsnapshotbeforeupdate)
 - [hasLocaleDataFor](client_internal_app.default.md#haslocaledatafor)
 - [render](client_internal_app.default.md#render)
-- [renderAppWithLocaleContext](client_internal_app.default.md#renderappwithlocalecontext)
 - [setBlockedCallbackState](client_internal_app.default.md#setblockedcallbackstate)
 - [setState](client_internal_app.default.md#setstate)
 - [setTokenState](client_internal_app.default.md#settokenstate)
@@ -79,7 +79,7 @@ React.Component&lt;IAppProps, IAppState\&gt;.constructor
 
 #### Defined in
 
-[client/internal/app/index.tsx:150](https://github.com/onzag/itemize/blob/5c2808d3/client/internal/app/index.tsx#L150)
+[client/internal/app/index.tsx:155](https://github.com/onzag/itemize/blob/f2db74a5/client/internal/app/index.tsx#L155)
 
 ## Properties
 
@@ -156,7 +156,7 @@ as well as buildnumbers, currency factors changed info, etc...
 
 #### Defined in
 
-[client/internal/app/index.tsx:144](https://github.com/onzag/itemize/blob/5c2808d3/client/internal/app/index.tsx#L144)
+[client/internal/app/index.tsx:149](https://github.com/onzag/itemize/blob/f2db74a5/client/internal/app/index.tsx#L149)
 
 ___
 
@@ -184,7 +184,7 @@ as well as the update functions need token provider
 
 #### Defined in
 
-[client/internal/app/index.tsx:138](https://github.com/onzag/itemize/blob/5c2808d3/client/internal/app/index.tsx#L138)
+[client/internal/app/index.tsx:143](https://github.com/onzag/itemize/blob/f2db74a5/client/internal/app/index.tsx#L143)
 
 ___
 
@@ -338,7 +338,7 @@ ___
 
 ### changeCountryTo
 
-▸ **changeCountryTo**(`code`, `avoidChangingLanguageAndCurrency?`, `avoidUpdatingUser?`): `Promise`<`void`\>
+▸ **changeCountryTo**(`code`, `avoidUpdatingCountry?`, `avoidChangingLanguageAndCurrency?`, `avoidUpdatingUser?`, `onPotentialChangesFoundFor?`): `Promise`<[`EndpointErrorType`](../modules/base_errors.md#endpointerrortype)\>
 
 changes the country given a specific country code
 changing the country will trigger an automatic change
@@ -349,22 +349,24 @@ of currency and language
 | Name | Type | Description |
 | :------ | :------ | :------ |
 | `code` | `string` | the two letter uppercase code for the country |
+| `avoidUpdatingCountry?` | `boolean` | - |
 | `avoidChangingLanguageAndCurrency?` | `boolean` | avoids changing the language and the currency |
 | `avoidUpdatingUser?` | `boolean` | avoids updating the user |
+| `onPotentialChangesFoundFor?` | (`languageCode`: `string`, `currencyCode`: `string`) => `void` | - |
 
 #### Returns
 
-`Promise`<`void`\>
+`Promise`<[`EndpointErrorType`](../modules/base_errors.md#endpointerrortype)\>
 
 #### Defined in
 
-[client/internal/app/index.tsx:449](https://github.com/onzag/itemize/blob/5c2808d3/client/internal/app/index.tsx#L449)
+[client/internal/app/index.tsx:471](https://github.com/onzag/itemize/blob/f2db74a5/client/internal/app/index.tsx#L471)
 
 ___
 
 ### changeCurrencyTo
 
-▸ **changeCurrencyTo**(`code`, `avoidUpdatingUser?`): `void`
+▸ **changeCurrencyTo**(`code`, `avoidUpdatingUser?`): `Promise`<[`EndpointErrorType`](../modules/base_errors.md#endpointerrortype)\>
 
 Changes the currency to a given currency code
 given its 3 letter uppercase code
@@ -378,17 +380,17 @@ given its 3 letter uppercase code
 
 #### Returns
 
-`void`
+`Promise`<[`EndpointErrorType`](../modules/base_errors.md#endpointerrortype)\>
 
 #### Defined in
 
-[client/internal/app/index.tsx:519](https://github.com/onzag/itemize/blob/5c2808d3/client/internal/app/index.tsx#L519)
+[client/internal/app/index.tsx:589](https://github.com/onzag/itemize/blob/f2db74a5/client/internal/app/index.tsx#L589)
 
 ___
 
 ### changeLanguageTo
 
-▸ **changeLanguageTo**(`locale`, `avoidUpdatingUser?`): `Promise`<`void`\>
+▸ **changeLanguageTo**(`locale`, `avoidUpdatingUser?`): `Promise`<[`EndpointErrorType`](../modules/base_errors.md#endpointerrortype)\>
 
 Changes the language for the one specified by that locale
 
@@ -401,11 +403,11 @@ Changes the language for the one specified by that locale
 
 #### Returns
 
-`Promise`<`void`\>
+`Promise`<[`EndpointErrorType`](../modules/base_errors.md#endpointerrortype)\>
 
 #### Defined in
 
-[client/internal/app/index.tsx:368](https://github.com/onzag/itemize/blob/5c2808d3/client/internal/app/index.tsx#L368)
+[client/internal/app/index.tsx:390](https://github.com/onzag/itemize/blob/f2db74a5/client/internal/app/index.tsx#L390)
 
 ___
 
@@ -439,21 +441,19 @@ ___
 
 ### componentDidMount
 
-▸ `Optional` **componentDidMount**(): `void`
-
-Called immediately after a component is mounted. Setting state here will trigger re-rendering.
+▸ **componentDidMount**(): `void`
 
 #### Returns
 
 `void`
 
-#### Inherited from
+#### Overrides
 
 React.Component.componentDidMount
 
 #### Defined in
 
-node_modules/@types/react/index.d.ts:625
+[client/internal/app/index.tsx:579](https://github.com/onzag/itemize/blob/f2db74a5/client/internal/app/index.tsx#L579)
 
 ___
 
@@ -617,9 +617,23 @@ node_modules/@types/react/index.d.ts:762
 
 ___
 
+### confirmUrlLanguage
+
+▸ **confirmUrlLanguage**(): `void`
+
+#### Returns
+
+`void`
+
+#### Defined in
+
+[client/internal/app/index.tsx:566](https://github.com/onzag/itemize/blob/f2db74a5/client/internal/app/index.tsx#L566)
+
+___
+
 ### finallySetLocaleDataFor
 
-▸ **finallySetLocaleDataFor**(`locale`, `avoidUpdatingUser`): `void`
+▸ **finallySetLocaleDataFor**(`locale`, `avoidUpdatingUser`): `Promise`<[`EndpointErrorType`](../modules/base_errors.md#endpointerrortype)\>
 
 Performs the final steps to set the locale data for a given application
 after all the respective locale infomation required has been loaded, this
@@ -634,11 +648,11 @@ includes changing the url
 
 #### Returns
 
-`void`
+`Promise`<[`EndpointErrorType`](../modules/base_errors.md#endpointerrortype)\>
 
 #### Defined in
 
-[client/internal/app/index.tsx:331](https://github.com/onzag/itemize/blob/5c2808d3/client/internal/app/index.tsx#L331)
+[client/internal/app/index.tsx:340](https://github.com/onzag/itemize/blob/f2db74a5/client/internal/app/index.tsx#L340)
 
 ___
 
@@ -716,7 +730,7 @@ Checks whether there is a locale data for a given language
 
 #### Defined in
 
-[client/internal/app/index.tsx:320](https://github.com/onzag/itemize/blob/5c2808d3/client/internal/app/index.tsx#L320)
+[client/internal/app/index.tsx:329](https://github.com/onzag/itemize/blob/f2db74a5/client/internal/app/index.tsx#L329)
 
 ___
 
@@ -736,31 +750,7 @@ React.Component.render
 
 #### Defined in
 
-[client/internal/app/index.tsx:614](https://github.com/onzag/itemize/blob/5c2808d3/client/internal/app/index.tsx#L614)
-
-___
-
-### renderAppWithLocaleContext
-
-▸ **renderAppWithLocaleContext**(`routerProps`): `Element`
-
-Renders the application with the locale context data
-
-#### Parameters
-
-| Name | Type | Description |
-| :------ | :------ | :------ |
-| `routerProps` | `any` | the url match from the router, contains the url language |
-
-#### Returns
-
-`Element`
-
-the application in the right locale context
-
-#### Defined in
-
-[client/internal/app/index.tsx:555](https://github.com/onzag/itemize/blob/5c2808d3/client/internal/app/index.tsx#L555)
+[client/internal/app/index.tsx:628](https://github.com/onzag/itemize/blob/f2db74a5/client/internal/app/index.tsx#L628)
 
 ___
 
@@ -784,7 +774,7 @@ of the app is blocked from update as it can't access indexeddb
 
 #### Defined in
 
-[client/internal/app/index.tsx:228](https://github.com/onzag/itemize/blob/5c2808d3/client/internal/app/index.tsx#L228)
+[client/internal/app/index.tsx:233](https://github.com/onzag/itemize/blob/f2db74a5/client/internal/app/index.tsx#L233)
 
 ___
 
@@ -840,7 +830,7 @@ provider state is needed here, it's streamed here once it's ready, as well as on
 
 #### Defined in
 
-[client/internal/app/index.tsx:243](https://github.com/onzag/itemize/blob/5c2808d3/client/internal/app/index.tsx#L243)
+[client/internal/app/index.tsx:248](https://github.com/onzag/itemize/blob/f2db74a5/client/internal/app/index.tsx#L248)
 
 ___
 
@@ -897,13 +887,13 @@ Currency factors is also service worked so it should work offline
 
 #### Defined in
 
-[client/internal/app/index.tsx:205](https://github.com/onzag/itemize/blob/5c2808d3/client/internal/app/index.tsx#L205)
+[client/internal/app/index.tsx:210](https://github.com/onzag/itemize/blob/f2db74a5/client/internal/app/index.tsx#L210)
 
 ___
 
 ### updateUserProperty
 
-▸ **updateUserProperty**(`propertyId`, `value`): `Promise`<`void`\>
+▸ **updateUserProperty**(`propertyId`, `value`): `Promise`<[`EndpointErrorType`](../modules/base_errors.md#endpointerrortype)\>
 
 updates an user property from the property list of user properties
 and it performs a graphql request to do such
@@ -919,8 +909,8 @@ in practique this is used to update app_language, app_currency and app_country
 
 #### Returns
 
-`Promise`<`void`\>
+`Promise`<[`EndpointErrorType`](../modules/base_errors.md#endpointerrortype)\>
 
 #### Defined in
 
-[client/internal/app/index.tsx:264](https://github.com/onzag/itemize/blob/5c2808d3/client/internal/app/index.tsx#L264)
+[client/internal/app/index.tsx:269](https://github.com/onzag/itemize/blob/f2db74a5/client/internal/app/index.tsx#L269)

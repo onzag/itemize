@@ -8,7 +8,7 @@ The property view text class
 
 ## Hierarchy
 
-- `Component`<[`IPropertyViewHandlerProps`](../interfaces/client_internal_components_PropertyView.IPropertyViewHandlerProps.md)<[`IPropertyViewTextRendererProps`](../interfaces/client_internal_components_PropertyView_PropertyViewText.IPropertyViewTextRendererProps.md)\>\>
+- `Component`<[`IPropertyViewHandlerProps`](../interfaces/client_internal_components_PropertyView.IPropertyViewHandlerProps.md)<[`IPropertyDefinitionSupportedTextType`](../interfaces/base_Root_Module_ItemDefinition_PropertyDefinition_types_text.IPropertyDefinitionSupportedTextType.md), [`IPropertyViewTextRendererProps`](../interfaces/client_internal_components_PropertyView_PropertyViewText.IPropertyViewTextRendererProps.md)\>\>
 
   ↳ **`default`**
 
@@ -54,15 +54,15 @@ The property view text class
 
 | Name | Type |
 | :------ | :------ |
-| `props` | [`IPropertyViewHandlerProps`](../interfaces/client_internal_components_PropertyView.IPropertyViewHandlerProps.md)<[`IPropertyViewTextRendererProps`](../interfaces/client_internal_components_PropertyView_PropertyViewText.IPropertyViewTextRendererProps.md)\> |
+| `props` | [`IPropertyViewHandlerProps`](../interfaces/client_internal_components_PropertyView.IPropertyViewHandlerProps.md)<[`IPropertyDefinitionSupportedTextType`](../interfaces/base_Root_Module_ItemDefinition_PropertyDefinition_types_text.IPropertyDefinitionSupportedTextType.md), [`IPropertyViewTextRendererProps`](../interfaces/client_internal_components_PropertyView_PropertyViewText.IPropertyViewTextRendererProps.md)\> |
 
 #### Overrides
 
-React.Component&lt;IPropertyViewHandlerProps&lt;IPropertyViewTextRendererProps\&gt;\&gt;.constructor
+React.Component&lt;IPropertyViewHandlerProps&lt;IPropertyDefinitionSupportedTextType, IPropertyViewTextRendererProps\&gt;\&gt;.constructor
 
 #### Defined in
 
-[client/internal/components/PropertyView/PropertyViewText.tsx:35](https://github.com/onzag/itemize/blob/5c2808d3/client/internal/components/PropertyView/PropertyViewText.tsx#L35)
+[client/internal/components/PropertyView/PropertyViewText.tsx:46](https://github.com/onzag/itemize/blob/f2db74a5/client/internal/components/PropertyView/PropertyViewText.tsx#L46)
 
 ## Properties
 
@@ -96,7 +96,7 @@ ___
 
 ### props
 
-• `Readonly` **props**: `Readonly`<[`IPropertyViewHandlerProps`](../interfaces/client_internal_components_PropertyView.IPropertyViewHandlerProps.md)<[`IPropertyViewTextRendererProps`](../interfaces/client_internal_components_PropertyView_PropertyViewText.IPropertyViewTextRendererProps.md)\>\> & `Readonly`<{ `children?`: `ReactNode`  }\>
+• `Readonly` **props**: `Readonly`<[`IPropertyViewHandlerProps`](../interfaces/client_internal_components_PropertyView.IPropertyViewHandlerProps.md)<[`IPropertyDefinitionSupportedTextType`](../interfaces/base_Root_Module_ItemDefinition_PropertyDefinition_types_text.IPropertyDefinitionSupportedTextType.md), [`IPropertyViewTextRendererProps`](../interfaces/client_internal_components_PropertyView_PropertyViewText.IPropertyViewTextRendererProps.md)\>\> & `Readonly`<{ `children?`: `ReactNode`  }\>
 
 #### Inherited from
 
@@ -233,7 +233,7 @@ prevents this from being invoked.
 
 | Name | Type |
 | :------ | :------ |
-| `nextProps` | `Readonly`<[`IPropertyViewHandlerProps`](../interfaces/client_internal_components_PropertyView.IPropertyViewHandlerProps.md)<[`IPropertyViewTextRendererProps`](../interfaces/client_internal_components_PropertyView_PropertyViewText.IPropertyViewTextRendererProps.md)\>\> |
+| `nextProps` | `Readonly`<[`IPropertyViewHandlerProps`](../interfaces/client_internal_components_PropertyView.IPropertyViewHandlerProps.md)<[`IPropertyDefinitionSupportedTextType`](../interfaces/base_Root_Module_ItemDefinition_PropertyDefinition_types_text.IPropertyDefinitionSupportedTextType.md), [`IPropertyViewTextRendererProps`](../interfaces/client_internal_components_PropertyView_PropertyViewText.IPropertyViewTextRendererProps.md)\>\> |
 | `nextContext` | `any` |
 
 #### Returns
@@ -273,7 +273,7 @@ prevents this from being invoked.
 
 | Name | Type |
 | :------ | :------ |
-| `nextProps` | `Readonly`<[`IPropertyViewHandlerProps`](../interfaces/client_internal_components_PropertyView.IPropertyViewHandlerProps.md)<[`IPropertyViewTextRendererProps`](../interfaces/client_internal_components_PropertyView_PropertyViewText.IPropertyViewTextRendererProps.md)\>\> |
+| `nextProps` | `Readonly`<[`IPropertyViewHandlerProps`](../interfaces/client_internal_components_PropertyView.IPropertyViewHandlerProps.md)<[`IPropertyDefinitionSupportedTextType`](../interfaces/base_Root_Module_ItemDefinition_PropertyDefinition_types_text.IPropertyDefinitionSupportedTextType.md), [`IPropertyViewTextRendererProps`](../interfaces/client_internal_components_PropertyView_PropertyViewText.IPropertyViewTextRendererProps.md)\>\> |
 | `nextState` | `Readonly`<{}\> |
 | `nextContext` | `any` |
 
@@ -351,7 +351,7 @@ The snapshot is only present if getSnapshotBeforeUpdate is present and returns n
 
 | Name | Type |
 | :------ | :------ |
-| `prevProps` | `Readonly`<[`IPropertyViewHandlerProps`](../interfaces/client_internal_components_PropertyView.IPropertyViewHandlerProps.md)<[`IPropertyViewTextRendererProps`](../interfaces/client_internal_components_PropertyView_PropertyViewText.IPropertyViewTextRendererProps.md)\>\> |
+| `prevProps` | `Readonly`<[`IPropertyViewHandlerProps`](../interfaces/client_internal_components_PropertyView.IPropertyViewHandlerProps.md)<[`IPropertyDefinitionSupportedTextType`](../interfaces/base_Root_Module_ItemDefinition_PropertyDefinition_types_text.IPropertyDefinitionSupportedTextType.md), [`IPropertyViewTextRendererProps`](../interfaces/client_internal_components_PropertyView_PropertyViewText.IPropertyViewTextRendererProps.md)\>\> |
 | `prevState` | `Readonly`<{}\> |
 | `snapshot?` | `any` |
 
@@ -422,7 +422,7 @@ prevents this from being invoked.
 
 | Name | Type |
 | :------ | :------ |
-| `nextProps` | `Readonly`<[`IPropertyViewHandlerProps`](../interfaces/client_internal_components_PropertyView.IPropertyViewHandlerProps.md)<[`IPropertyViewTextRendererProps`](../interfaces/client_internal_components_PropertyView_PropertyViewText.IPropertyViewTextRendererProps.md)\>\> |
+| `nextProps` | `Readonly`<[`IPropertyViewHandlerProps`](../interfaces/client_internal_components_PropertyView.IPropertyViewHandlerProps.md)<[`IPropertyDefinitionSupportedTextType`](../interfaces/base_Root_Module_ItemDefinition_PropertyDefinition_types_text.IPropertyDefinitionSupportedTextType.md), [`IPropertyViewTextRendererProps`](../interfaces/client_internal_components_PropertyView_PropertyViewText.IPropertyViewTextRendererProps.md)\>\> |
 | `nextContext` | `any` |
 
 #### Returns
@@ -481,7 +481,7 @@ prevents this from being invoked.
 
 | Name | Type |
 | :------ | :------ |
-| `nextProps` | `Readonly`<[`IPropertyViewHandlerProps`](../interfaces/client_internal_components_PropertyView.IPropertyViewHandlerProps.md)<[`IPropertyViewTextRendererProps`](../interfaces/client_internal_components_PropertyView_PropertyViewText.IPropertyViewTextRendererProps.md)\>\> |
+| `nextProps` | `Readonly`<[`IPropertyViewHandlerProps`](../interfaces/client_internal_components_PropertyView.IPropertyViewHandlerProps.md)<[`IPropertyDefinitionSupportedTextType`](../interfaces/base_Root_Module_ItemDefinition_PropertyDefinition_types_text.IPropertyDefinitionSupportedTextType.md), [`IPropertyViewTextRendererProps`](../interfaces/client_internal_components_PropertyView_PropertyViewText.IPropertyViewTextRendererProps.md)\>\> |
 | `nextState` | `Readonly`<{}\> |
 | `nextContext` | `any` |
 
@@ -538,7 +538,7 @@ lifecycle events from running.
 
 | Name | Type |
 | :------ | :------ |
-| `prevProps` | `Readonly`<[`IPropertyViewHandlerProps`](../interfaces/client_internal_components_PropertyView.IPropertyViewHandlerProps.md)<[`IPropertyViewTextRendererProps`](../interfaces/client_internal_components_PropertyView_PropertyViewText.IPropertyViewTextRendererProps.md)\>\> |
+| `prevProps` | `Readonly`<[`IPropertyViewHandlerProps`](../interfaces/client_internal_components_PropertyView.IPropertyViewHandlerProps.md)<[`IPropertyDefinitionSupportedTextType`](../interfaces/base_Root_Module_ItemDefinition_PropertyDefinition_types_text.IPropertyDefinitionSupportedTextType.md), [`IPropertyViewTextRendererProps`](../interfaces/client_internal_components_PropertyView_PropertyViewText.IPropertyViewTextRendererProps.md)\>\> |
 | `prevState` | `Readonly`<{}\> |
 
 #### Returns
@@ -569,7 +569,7 @@ React.Component.render
 
 #### Defined in
 
-[client/internal/components/PropertyView/PropertyViewText.tsx:52](https://github.com/onzag/itemize/blob/5c2808d3/client/internal/components/PropertyView/PropertyViewText.tsx#L52)
+[client/internal/components/PropertyView/PropertyViewText.tsx:64](https://github.com/onzag/itemize/blob/f2db74a5/client/internal/components/PropertyView/PropertyViewText.tsx#L64)
 
 ___
 
@@ -587,7 +587,7 @@ ___
 
 | Name | Type |
 | :------ | :------ |
-| `state` | {} \| (`prevState`: `Readonly`<{}\>, `props`: `Readonly`<[`IPropertyViewHandlerProps`](../interfaces/client_internal_components_PropertyView.IPropertyViewHandlerProps.md)<[`IPropertyViewTextRendererProps`](../interfaces/client_internal_components_PropertyView_PropertyViewText.IPropertyViewTextRendererProps.md)\>\>) => {} \| `Pick`<{}, `K`\> \| `Pick`<{}, `K`\> |
+| `state` | {} \| (`prevState`: `Readonly`<{}\>, `props`: `Readonly`<[`IPropertyViewHandlerProps`](../interfaces/client_internal_components_PropertyView.IPropertyViewHandlerProps.md)<[`IPropertyDefinitionSupportedTextType`](../interfaces/base_Root_Module_ItemDefinition_PropertyDefinition_types_text.IPropertyDefinitionSupportedTextType.md), [`IPropertyViewTextRendererProps`](../interfaces/client_internal_components_PropertyView_PropertyViewText.IPropertyViewTextRendererProps.md)\>\>) => {} \| `Pick`<{}, `K`\> \| `Pick`<{}, `K`\> |
 | `callback?` | () => `void` |
 
 #### Returns
@@ -612,7 +612,7 @@ ___
 
 | Name | Type |
 | :------ | :------ |
-| `nextProps` | [`IPropertyViewHandlerProps`](../interfaces/client_internal_components_PropertyView.IPropertyViewHandlerProps.md)<[`IPropertyViewTextRendererProps`](../interfaces/client_internal_components_PropertyView_PropertyViewText.IPropertyViewTextRendererProps.md)\> |
+| `nextProps` | [`IPropertyViewHandlerProps`](../interfaces/client_internal_components_PropertyView.IPropertyViewHandlerProps.md)<[`IPropertyDefinitionSupportedTextType`](../interfaces/base_Root_Module_ItemDefinition_PropertyDefinition_types_text.IPropertyDefinitionSupportedTextType.md), [`IPropertyViewTextRendererProps`](../interfaces/client_internal_components_PropertyView_PropertyViewText.IPropertyViewTextRendererProps.md)\> |
 
 #### Returns
 
@@ -624,4 +624,4 @@ React.Component.shouldComponentUpdate
 
 #### Defined in
 
-[client/internal/components/PropertyView/PropertyViewText.tsx:38](https://github.com/onzag/itemize/blob/5c2808d3/client/internal/components/PropertyView/PropertyViewText.tsx#L38)
+[client/internal/components/PropertyView/PropertyViewText.tsx:49](https://github.com/onzag/itemize/blob/f2db74a5/client/internal/components/PropertyView/PropertyViewText.tsx#L49)

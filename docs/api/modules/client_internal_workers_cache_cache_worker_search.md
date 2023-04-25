@@ -18,7 +18,7 @@ Contains the filtering and ordering function to perform actual searches
 
 ### search
 
-▸ **search**(`rootProxy`, `db`, `searchRecords`, `searchArgs`, `returnSourceResults`): `Promise`<{ `filteredRecords`: [`IGQLSearchRecord`](../interfaces/gql_querier.IGQLSearchRecord.md)[] ; `sourceResults`: [`ICacheMatchType`](../interfaces/client_internal_workers_cache_cache_worker.ICacheMatchType.md)[]  }\>
+▸ **search**(`rootProxy`, `db`, `searchRecords`, `searchArgs`, `returnSourceResults`, `noLimitOffset`): `Promise`<{ `count`: `number` ; `filteredRecords`: [`IGQLSearchRecord`](../interfaces/gql_querier.IGQLSearchRecord.md)[] ; `filteredResults`: [`IGQLValue`](../interfaces/gql_querier.IGQLValue.md)[] ; `sourceResults`: [`ICacheMatchType`](../interfaces/client_internal_workers_cache_cache_worker.ICacheMatchType.md)[]  }\>
 
 Given a bunch of search records it will perform
 the ordering and filtering of such records to return
@@ -34,11 +34,12 @@ cache, this is a heavy process
 | `searchRecords` | [`IGQLSearchRecord`](../interfaces/gql_querier.IGQLSearchRecord.md)[] | the search records we got |
 | `searchArgs` | [`IGQLArgs`](../interfaces/gql_querier.IGQLArgs.md) | the search arguments (that would be sent to the server) an we need to emulate for |
 | `returnSourceResults` | `boolean` | - |
+| `noLimitOffset` | `boolean` | - |
 
 #### Returns
 
-`Promise`<{ `filteredRecords`: [`IGQLSearchRecord`](../interfaces/gql_querier.IGQLSearchRecord.md)[] ; `sourceResults`: [`ICacheMatchType`](../interfaces/client_internal_workers_cache_cache_worker.ICacheMatchType.md)[]  }\>
+`Promise`<{ `count`: `number` ; `filteredRecords`: [`IGQLSearchRecord`](../interfaces/gql_querier.IGQLSearchRecord.md)[] ; `filteredResults`: [`IGQLValue`](../interfaces/gql_querier.IGQLValue.md)[] ; `sourceResults`: [`ICacheMatchType`](../interfaces/client_internal_workers_cache_cache_worker.ICacheMatchType.md)[]  }\>
 
 #### Defined in
 
-[client/internal/workers/cache/cache.worker.search.ts:66](https://github.com/onzag/itemize/blob/5c2808d3/client/internal/workers/cache/cache.worker.search.ts#L66)
+[client/internal/workers/cache/cache.worker.search.ts:66](https://github.com/onzag/itemize/blob/f2db74a5/client/internal/workers/cache/cache.worker.search.ts#L66)

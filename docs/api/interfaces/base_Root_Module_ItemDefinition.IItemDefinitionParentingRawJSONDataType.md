@@ -22,7 +22,7 @@ canBeParentedBy this is the shape it comes as
 
 #### Defined in
 
-[base/Root/Module/ItemDefinition/index.ts:87](https://github.com/onzag/itemize/blob/5c2808d3/base/Root/Module/ItemDefinition/index.ts#L87)
+[base/Root/Module/ItemDefinition/index.ts:132](https://github.com/onzag/itemize/blob/f2db74a5/base/Root/Module/ItemDefinition/index.ts#L132)
 
 ___
 
@@ -32,4 +32,4 @@ ___
 
 #### Defined in
 
-[base/Root/Module/ItemDefinition/index.ts:86](https://github.com/onzag/itemize/blob/5c2808d3/base/Root/Module/ItemDefinition/index.ts#L86)
+[base/Root/Module/ItemDefinition/index.ts:131](https://github.com/onzag/itemize/blob/f2db74a5/base/Root/Module/ItemDefinition/index.ts#L131)

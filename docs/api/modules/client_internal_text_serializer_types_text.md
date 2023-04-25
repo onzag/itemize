@@ -40,7 +40,7 @@ for a void text node
 
 #### Defined in
 
-[client/internal/text/serializer/types/text.tsx:19](https://github.com/onzag/itemize/blob/5c2808d3/client/internal/text/serializer/types/text.tsx#L19)
+[client/internal/text/serializer/types/text.tsx:19](https://github.com/onzag/itemize/blob/f2db74a5/client/internal/text/serializer/types/text.tsx#L19)
 
 ___
 
@@ -63,4 +63,4 @@ registry
 
 #### Defined in
 
-[client/internal/text/serializer/types/text.tsx:33](https://github.com/onzag/itemize/blob/5c2808d3/client/internal/text/serializer/types/text.tsx#L33)
+[client/internal/text/serializer/types/text.tsx:35](https://github.com/onzag/itemize/blob/f2db74a5/client/internal/text/serializer/types/text.tsx#L35)

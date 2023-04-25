@@ -19,7 +19,7 @@ as well as an id
 
 ### collect
 
-▸ **collect**(`app`): `Object`
+▸ **collect**(`app`, `serverModeInfo`): `Object`
 
 This is the collection function
 
@@ -28,6 +28,7 @@ This is the collection function
 | Name | Type | Description |
 | :------ | :------ | :------ |
 | `app` | `ReactElement`<`any`, `string` \| `JSXElementConstructor`<`any`\>\> | the app itself that is fed to the collector |
+| `serverModeInfo` | [`ISSRServerModeInfo`](server_ssr.ISSRServerModeInfo.md) | - |
 
 #### Returns
 
@@ -43,7 +44,7 @@ the collection results
 
 #### Defined in
 
-[client/index.tsx:151](https://github.com/onzag/itemize/blob/5c2808d3/client/index.tsx#L151)
+[client/index.tsx:152](https://github.com/onzag/itemize/blob/f2db74a5/client/index.tsx#L152)
 
 ___
 
@@ -68,4 +69,4 @@ a string, this string is added as the value of the <SSRHEAD> to the index.html t
 
 #### Defined in
 
-[client/index.tsx:161](https://github.com/onzag/itemize/blob/5c2808d3/client/index.tsx#L161)
+[client/index.tsx:162](https://github.com/onzag/itemize/blob/f2db74a5/client/index.tsx#L162)

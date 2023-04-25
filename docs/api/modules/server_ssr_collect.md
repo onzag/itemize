@@ -13,4 +13,6 @@ tree has asked to collect for
 
 ### Interfaces
 
-- [ICollectionResult](../interfaces/server_ssr_collect.ICollectionResult.md)
+- [IQueryCollectionResult](../interfaces/server_ssr_collect.IQueryCollectionResult.md)
+- [IResourceCollectionResult](../interfaces/server_ssr_collect.IResourceCollectionResult.md)
+- [ISearchCollectionResult](../interfaces/server_ssr_collect.ISearchCollectionResult.md)

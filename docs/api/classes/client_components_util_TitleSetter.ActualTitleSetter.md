@@ -66,7 +66,7 @@ React.Component&lt;ITitleSetterProps, {}\&gt;.constructor
 
 #### Defined in
 
-[client/components/util/TitleSetter.tsx:37](https://github.com/onzag/itemize/blob/5c2808d3/client/components/util/TitleSetter.tsx#L37)
+[client/components/util/TitleSetter.tsx:37](https://github.com/onzag/itemize/blob/f2db74a5/client/components/util/TitleSetter.tsx#L37)
 
 ## Properties
 
@@ -155,7 +155,7 @@ Stores title readers to inform them of changes
 
 #### Defined in
 
-[client/components/util/TitleSetter.tsx:35](https://github.com/onzag/itemize/blob/5c2808d3/client/components/util/TitleSetter.tsx#L35)
+[client/components/util/TitleSetter.tsx:35](https://github.com/onzag/itemize/blob/f2db74a5/client/components/util/TitleSetter.tsx#L35)
 
 ___
 
@@ -349,7 +349,7 @@ React.Component.componentDidMount
 
 #### Defined in
 
-[client/components/util/TitleSetter.tsx:40](https://github.com/onzag/itemize/blob/5c2808d3/client/components/util/TitleSetter.tsx#L40)
+[client/components/util/TitleSetter.tsx:40](https://github.com/onzag/itemize/blob/f2db74a5/client/components/util/TitleSetter.tsx#L40)
 
 ___
 
@@ -373,7 +373,7 @@ React.Component.componentDidUpdate
 
 #### Defined in
 
-[client/components/util/TitleSetter.tsx:54](https://github.com/onzag/itemize/blob/5c2808d3/client/components/util/TitleSetter.tsx#L54)
+[client/components/util/TitleSetter.tsx:54](https://github.com/onzag/itemize/blob/f2db74a5/client/components/util/TitleSetter.tsx#L54)
 
 ___
 
@@ -461,7 +461,7 @@ React.Component.componentWillUnmount
 
 #### Defined in
 
-[client/components/util/TitleSetter.tsx:61](https://github.com/onzag/itemize/blob/5c2808d3/client/components/util/TitleSetter.tsx#L61)
+[client/components/util/TitleSetter.tsx:61](https://github.com/onzag/itemize/blob/f2db74a5/client/components/util/TitleSetter.tsx#L61)
 
 ___
 
@@ -574,7 +574,7 @@ React.Component.render
 
 #### Defined in
 
-[client/components/util/TitleSetter.tsx:65](https://github.com/onzag/itemize/blob/5c2808d3/client/components/util/TitleSetter.tsx#L65)
+[client/components/util/TitleSetter.tsx:65](https://github.com/onzag/itemize/blob/f2db74a5/client/components/util/TitleSetter.tsx#L65)
 
 ___
 

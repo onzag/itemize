@@ -10,6 +10,7 @@ The ssr provider file
 
 - [ISSRCollectedQueryType](../interfaces/client_internal_providers_ssr_provider.ISSRCollectedQueryType.md)
 - [ISSRCollectedResourcesType](../interfaces/client_internal_providers_ssr_provider.ISSRCollectedResourcesType.md)
+- [ISSRCollectedSearchType](../interfaces/client_internal_providers_ssr_provider.ISSRCollectedSearchType.md)
 - [ISSRContextType](../interfaces/client_internal_providers_ssr_provider.ISSRContextType.md)
 - [ISSRProviderProps](../interfaces/client_internal_providers_ssr_provider.ISSRProviderProps.md)
 
@@ -31,7 +32,7 @@ The ssr context passes the context value all the way to all the components
 
 #### Defined in
 
-[client/internal/providers/ssr-provider.tsx:96](https://github.com/onzag/itemize/blob/5c2808d3/client/internal/providers/ssr-provider.tsx#L96)
+[client/internal/providers/ssr-provider.tsx:123](https://github.com/onzag/itemize/blob/f2db74a5/client/internal/providers/ssr-provider.tsx#L123)
 
 ## Functions
 
@@ -59,4 +60,4 @@ This should sit on top of the itemize app
 
 #### Defined in
 
-[client/internal/providers/ssr-provider.tsx:117](https://github.com/onzag/itemize/blob/5c2808d3/client/internal/providers/ssr-provider.tsx#L117)
+[client/internal/providers/ssr-provider.tsx:144](https://github.com/onzag/itemize/blob/f2db74a5/client/internal/providers/ssr-provider.tsx#L144)

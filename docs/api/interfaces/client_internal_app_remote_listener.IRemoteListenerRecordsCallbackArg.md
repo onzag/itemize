@@ -11,11 +11,33 @@ by the callback
 
 ### Properties
 
+- [createdRecords](client_internal_app_remote_listener.IRemoteListenerRecordsCallbackArg.md#createdrecords)
+- [deletedRecords](client_internal_app_remote_listener.IRemoteListenerRecordsCallbackArg.md#deletedrecords)
 - [lostRecords](client_internal_app_remote_listener.IRemoteListenerRecordsCallbackArg.md#lostrecords)
 - [modifiedRecords](client_internal_app_remote_listener.IRemoteListenerRecordsCallbackArg.md#modifiedrecords)
 - [newRecords](client_internal_app_remote_listener.IRemoteListenerRecordsCallbackArg.md#newrecords)
 
 ## Properties
+
+### createdRecords
+
+• **createdRecords**: [`IGQLSearchRecord`](gql_querier.IGQLSearchRecord.md)[]
+
+#### Defined in
+
+[client/internal/app/remote-listener.ts:75](https://github.com/onzag/itemize/blob/f2db74a5/client/internal/app/remote-listener.ts#L75)
+
+___
+
+### deletedRecords
+
+• **deletedRecords**: [`IGQLSearchRecord`](gql_querier.IGQLSearchRecord.md)[]
+
+#### Defined in
+
+[client/internal/app/remote-listener.ts:76](https://github.com/onzag/itemize/blob/f2db74a5/client/internal/app/remote-listener.ts#L76)
+
+___
 
 ### lostRecords
 
@@ -23,7 +45,7 @@ by the callback
 
 #### Defined in
 
-[client/internal/app/remote-listener.ts:66](https://github.com/onzag/itemize/blob/5c2808d3/client/internal/app/remote-listener.ts#L66)
+[client/internal/app/remote-listener.ts:74](https://github.com/onzag/itemize/blob/f2db74a5/client/internal/app/remote-listener.ts#L74)
 
 ___
 
@@ -33,7 +55,7 @@ ___
 
 #### Defined in
 
-[client/internal/app/remote-listener.ts:65](https://github.com/onzag/itemize/blob/5c2808d3/client/internal/app/remote-listener.ts#L65)
+[client/internal/app/remote-listener.ts:73](https://github.com/onzag/itemize/blob/f2db74a5/client/internal/app/remote-listener.ts#L73)
 
 ___
 
@@ -43,4 +65,4 @@ ___
 
 #### Defined in
 
-[client/internal/app/remote-listener.ts:64](https://github.com/onzag/itemize/blob/5c2808d3/client/internal/app/remote-listener.ts#L64)
+[client/internal/app/remote-listener.ts:72](https://github.com/onzag/itemize/blob/f2db74a5/client/internal/app/remote-listener.ts#L72)

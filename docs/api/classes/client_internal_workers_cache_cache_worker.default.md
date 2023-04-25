@@ -20,21 +20,25 @@ it's a standard worker as it needs to access indexed db
 ### Properties
 
 - [blockedCallback](client_internal_workers_cache_cache_worker.default.md#blockedcallback)
+- [config](client_internal_workers_cache_cache_worker.default.md#config)
 - [db](client_internal_workers_cache_cache_worker.default.md#db)
 - [isCurrentlyBlocked](client_internal_workers_cache_cache_worker.default.md#iscurrentlyblocked)
 - [resolved](client_internal_workers_cache_cache_worker.default.md#resolved)
-- [rootProxy](client_internal_workers_cache_cache_worker.default.md#rootproxy)
+- [root](client_internal_workers_cache_cache_worker.default.md#root)
 - [versionHasBeenSet](client_internal_workers_cache_cache_worker.default.md#versionhasbeenset)
 - [waitForSetupPromise](client_internal_workers_cache_cache_worker.default.md#waitforsetuppromise)
 - [waitForSetupPromiseResolve](client_internal_workers_cache_cache_worker.default.md#waitforsetuppromiseresolve)
 
 ### Methods
 
+- [\_fileURLAbsoluter](client_internal_workers_cache_cache_worker.default.md#_fileurlabsoluter)
 - [deleteCachedSearch](client_internal_workers_cache_cache_worker.default.md#deletecachedsearch)
 - [deleteCachedValue](client_internal_workers_cache_cache_worker.default.md#deletecachedvalue)
 - [deleteState](client_internal_workers_cache_cache_worker.default.md#deletestate)
 - [getCachedValue](client_internal_workers_cache_cache_worker.default.md#getcachedvalue)
 - [mergeCachedValue](client_internal_workers_cache_cache_worker.default.md#mergecachedvalue)
+- [obtainOneFile](client_internal_workers_cache_cache_worker.default.md#obtainonefile)
+- [processFilesAt](client_internal_workers_cache_cache_worker.default.md#processfilesat)
 - [proxyRoot](client_internal_workers_cache_cache_worker.default.md#proxyroot)
 - [readMetadata](client_internal_workers_cache_cache_worker.default.md#readmetadata)
 - [readSearchMetadata](client_internal_workers_cache_cache_worker.default.md#readsearchmetadata)
@@ -58,7 +62,7 @@ Constructs a new cache worker
 
 #### Defined in
 
-[client/internal/workers/cache/cache.worker.ts:214](https://github.com/onzag/itemize/blob/5c2808d3/client/internal/workers/cache/cache.worker.ts#L214)
+[client/internal/workers/cache/cache.worker.ts:267](https://github.com/onzag/itemize/blob/f2db74a5/client/internal/workers/cache/cache.worker.ts#L267)
 
 ## Properties
 
@@ -84,7 +88,17 @@ a function to call once the blocked changes state
 
 #### Defined in
 
-[client/internal/workers/cache/cache.worker.ts:193](https://github.com/onzag/itemize/blob/5c2808d3/client/internal/workers/cache/cache.worker.ts#L193)
+[client/internal/workers/cache/cache.worker.ts:246](https://github.com/onzag/itemize/blob/f2db74a5/client/internal/workers/cache/cache.worker.ts#L246)
+
+___
+
+### config
+
+• `Private` **config**: [`IConfigRawJSONDataType`](../interfaces/config.IConfigRawJSONDataType.md)
+
+#### Defined in
+
+[client/internal/workers/cache/cache.worker.ts:235](https://github.com/onzag/itemize/blob/f2db74a5/client/internal/workers/cache/cache.worker.ts#L235)
 
 ___
 
@@ -98,7 +112,7 @@ to perform any action
 
 #### Defined in
 
-[client/internal/workers/cache/cache.worker.ts:169](https://github.com/onzag/itemize/blob/5c2808d3/client/internal/workers/cache/cache.worker.ts#L169)
+[client/internal/workers/cache/cache.worker.ts:221](https://github.com/onzag/itemize/blob/f2db74a5/client/internal/workers/cache/cache.worker.ts#L221)
 
 ___
 
@@ -111,7 +125,7 @@ releasing
 
 #### Defined in
 
-[client/internal/workers/cache/cache.worker.ts:188](https://github.com/onzag/itemize/blob/5c2808d3/client/internal/workers/cache/cache.worker.ts#L188)
+[client/internal/workers/cache/cache.worker.ts:241](https://github.com/onzag/itemize/blob/f2db74a5/client/internal/workers/cache/cache.worker.ts#L241)
 
 ___
 
@@ -123,19 +137,19 @@ Whether the promise has been resolved as a boolean
 
 #### Defined in
 
-[client/internal/workers/cache/cache.worker.ts:209](https://github.com/onzag/itemize/blob/5c2808d3/client/internal/workers/cache/cache.worker.ts#L209)
+[client/internal/workers/cache/cache.worker.ts:262](https://github.com/onzag/itemize/blob/f2db74a5/client/internal/workers/cache/cache.worker.ts#L262)
 
 ___
 
-### rootProxy
+### root
 
-• `Private` **rootProxy**: [`default`](base_Root.default.md)
+• `Private` **root**: [`default`](base_Root.default.md)
 
 The comlink proxied root class
 
 #### Defined in
 
-[client/internal/workers/cache/cache.worker.ts:182](https://github.com/onzag/itemize/blob/5c2808d3/client/internal/workers/cache/cache.worker.ts#L182)
+[client/internal/workers/cache/cache.worker.ts:234](https://github.com/onzag/itemize/blob/f2db74a5/client/internal/workers/cache/cache.worker.ts#L234)
 
 ___
 
@@ -151,7 +165,7 @@ when they need the cache, so it simply ignores next calls
 
 #### Defined in
 
-[client/internal/workers/cache/cache.worker.ts:177](https://github.com/onzag/itemize/blob/5c2808d3/client/internal/workers/cache/cache.worker.ts#L177)
+[client/internal/workers/cache/cache.worker.ts:229](https://github.com/onzag/itemize/blob/f2db74a5/client/internal/workers/cache/cache.worker.ts#L229)
 
 ___
 
@@ -165,7 +179,7 @@ or it failed
 
 #### Defined in
 
-[client/internal/workers/cache/cache.worker.ts:200](https://github.com/onzag/itemize/blob/5c2808d3/client/internal/workers/cache/cache.worker.ts#L200)
+[client/internal/workers/cache/cache.worker.ts:253](https://github.com/onzag/itemize/blob/f2db74a5/client/internal/workers/cache/cache.worker.ts#L253)
 
 ___
 
@@ -186,13 +200,39 @@ been set
 
 #### Defined in
 
-[client/internal/workers/cache/cache.worker.ts:205](https://github.com/onzag/itemize/blob/5c2808d3/client/internal/workers/cache/cache.worker.ts#L205)
+[client/internal/workers/cache/cache.worker.ts:258](https://github.com/onzag/itemize/blob/f2db74a5/client/internal/workers/cache/cache.worker.ts#L258)
 
 ## Methods
 
+### \_fileURLAbsoluter
+
+▸ `Private` **_fileURLAbsoluter**(`file`, `itemDef`, `include`, `property`, `containerId`, `id`, `version`): `string`
+
+#### Parameters
+
+| Name | Type |
+| :------ | :------ |
+| `file` | [`IGQLFile`](../interfaces/gql_querier.IGQLFile.md) |
+| `itemDef` | [`default`](base_Root_Module_ItemDefinition.default.md) |
+| `include` | [`default`](base_Root_Module_ItemDefinition_Include.default.md) |
+| `property` | [`default`](base_Root_Module_ItemDefinition_PropertyDefinition.default.md) |
+| `containerId` | `string` |
+| `id` | `string` |
+| `version` | `string` |
+
+#### Returns
+
+`string`
+
+#### Defined in
+
+[client/internal/workers/cache/cache.worker.ts:486](https://github.com/onzag/itemize/blob/f2db74a5/client/internal/workers/cache/cache.worker.ts#L486)
+
+___
+
 ### deleteCachedSearch
 
-▸ **deleteCachedSearch**(`queryName`, `type`, `owner`, `parent`): `Promise`<`boolean`\>
+▸ **deleteCachedSearch**(`queryName`, `type`, `owner`, `parent`, `property`): `Promise`<`boolean`\>
 
 Deletes a cached search and all the referent values that are related to it
 
@@ -201,9 +241,10 @@ Deletes a cached search and all the referent values that are related to it
 | Name | Type | Description |
 | :------ | :------ | :------ |
 | `queryName` | `string` | the query name for that cached search |
-| `type` | ``"by-owner"`` \| ``"by-parent"`` \| ``"by-owner-and-parent"`` | the type of the search |
+| `type` | ``"by-owner"`` \| ``"by-parent"`` \| ``"by-owner-and-parent"`` \| ``"by-property"`` | the type of the search |
 | `owner` | `string` | - |
 | `parent` | [`string`, `string`, `string`] | - |
+| `property` | [`string`, `string`] | - |
 
 #### Returns
 
@@ -211,7 +252,7 @@ Deletes a cached search and all the referent values that are related to it
 
 #### Defined in
 
-[client/internal/workers/cache/cache.worker.ts:666](https://github.com/onzag/itemize/blob/5c2808d3/client/internal/workers/cache/cache.worker.ts#L666)
+[client/internal/workers/cache/cache.worker.ts:910](https://github.com/onzag/itemize/blob/f2db74a5/client/internal/workers/cache/cache.worker.ts#L910)
 
 ___
 
@@ -237,7 +278,7 @@ a boolean whether we succeed or not
 
 #### Defined in
 
-[client/internal/workers/cache/cache.worker.ts:487](https://github.com/onzag/itemize/blob/5c2808d3/client/internal/workers/cache/cache.worker.ts#L487)
+[client/internal/workers/cache/cache.worker.ts:705](https://github.com/onzag/itemize/blob/f2db74a5/client/internal/workers/cache/cache.worker.ts#L705)
 
 ___
 
@@ -259,7 +300,7 @@ ___
 
 #### Defined in
 
-[client/internal/workers/cache/cache.worker.ts:400](https://github.com/onzag/itemize/blob/5c2808d3/client/internal/workers/cache/cache.worker.ts#L400)
+[client/internal/workers/cache/cache.worker.ts:455](https://github.com/onzag/itemize/blob/f2db74a5/client/internal/workers/cache/cache.worker.ts#L455)
 
 ___
 
@@ -286,7 +327,7 @@ if it doesn't match all the requested fields
 
 #### Defined in
 
-[client/internal/workers/cache/cache.worker.ts:803](https://github.com/onzag/itemize/blob/5c2808d3/client/internal/workers/cache/cache.worker.ts#L803)
+[client/internal/workers/cache/cache.worker.ts:1057](https://github.com/onzag/itemize/blob/f2db74a5/client/internal/workers/cache/cache.worker.ts#L1057)
 
 ___
 
@@ -315,19 +356,25 @@ if the signature of time is equal
 
 #### Defined in
 
-[client/internal/workers/cache/cache.worker.ts:732](https://github.com/onzag/itemize/blob/5c2808d3/client/internal/workers/cache/cache.worker.ts#L732)
+[client/internal/workers/cache/cache.worker.ts:984](https://github.com/onzag/itemize/blob/f2db74a5/client/internal/workers/cache/cache.worker.ts#L984)
 
 ___
 
-### proxyRoot
+### obtainOneFile
 
-▸ **proxyRoot**(`rootProxy`): `Promise`<`void`\>
+▸ `Private` **obtainOneFile**(`file`, `itemDef`, `include`, `property`, `containerId`, `id`, `version`): `Promise`<`void`\>
 
 #### Parameters
 
 | Name | Type |
 | :------ | :------ |
-| `rootProxy` | [`IRootRawJSONDataType`](../interfaces/base_Root.IRootRawJSONDataType.md) |
+| `file` | [`IGQLFile`](../interfaces/gql_querier.IGQLFile.md) |
+| `itemDef` | [`default`](base_Root_Module_ItemDefinition.default.md) |
+| `include` | [`default`](base_Root_Module_ItemDefinition_Include.default.md) |
+| `property` | [`default`](base_Root_Module_ItemDefinition_PropertyDefinition.default.md) |
+| `containerId` | `string` |
+| `id` | `string` |
+| `version` | `string` |
 
 #### Returns
 
@@ -335,7 +382,54 @@ ___
 
 #### Defined in
 
-[client/internal/workers/cache/cache.worker.ts:1479](https://github.com/onzag/itemize/blob/5c2808d3/client/internal/workers/cache/cache.worker.ts#L1479)
+[client/internal/workers/cache/cache.worker.ts:540](https://github.com/onzag/itemize/blob/f2db74a5/client/internal/workers/cache/cache.worker.ts#L540)
+
+___
+
+### processFilesAt
+
+▸ `Private` **processFilesAt**(`partialValue`, `itemDef`, `include`, `property`, `containerId`, `id`, `version`): `Promise`<`void`\>
+
+#### Parameters
+
+| Name | Type |
+| :------ | :------ |
+| `partialValue` | [`IGQLValue`](../interfaces/gql_querier.IGQLValue.md) |
+| `itemDef` | [`default`](base_Root_Module_ItemDefinition.default.md) |
+| `include` | [`default`](base_Root_Module_ItemDefinition_Include.default.md) |
+| `property` | [`default`](base_Root_Module_ItemDefinition_PropertyDefinition.default.md) |
+| `containerId` | `string` |
+| `id` | `string` |
+| `version` | `string` |
+
+#### Returns
+
+`Promise`<`void`\>
+
+#### Defined in
+
+[client/internal/workers/cache/cache.worker.ts:585](https://github.com/onzag/itemize/blob/f2db74a5/client/internal/workers/cache/cache.worker.ts#L585)
+
+___
+
+### proxyRoot
+
+▸ **proxyRoot**(`rootProxy`, `config`): `Promise`<`void`\>
+
+#### Parameters
+
+| Name | Type |
+| :------ | :------ |
+| `rootProxy` | [`IRootRawJSONDataType`](../interfaces/base_Root.IRootRawJSONDataType.md) |
+| `config` | [`IConfigRawJSONDataType`](../interfaces/config.IConfigRawJSONDataType.md) |
+
+#### Returns
+
+`Promise`<`void`\>
+
+#### Defined in
+
+[client/internal/workers/cache/cache.worker.ts:1827](https://github.com/onzag/itemize/blob/f2db74a5/client/internal/workers/cache/cache.worker.ts#L1827)
 
 ___
 
@@ -357,20 +451,22 @@ ___
 
 #### Defined in
 
-[client/internal/workers/cache/cache.worker.ts:634](https://github.com/onzag/itemize/blob/5c2808d3/client/internal/workers/cache/cache.worker.ts#L634)
+[client/internal/workers/cache/cache.worker.ts:877](https://github.com/onzag/itemize/blob/f2db74a5/client/internal/workers/cache/cache.worker.ts#L877)
 
 ___
 
 ### readSearchMetadata
 
-▸ **readSearchMetadata**(`queryName`, `cachePolicy`, `createdByIfKnown`, `parentTypeIfKnown`, `parentIdIfKnown`, `parentVersionIfKnown`): `Promise`<[`ICacheMetadataMatchType`](../interfaces/client_internal_workers_cache_cache_worker.ICacheMetadataMatchType.md)\>
+▸ **readSearchMetadata**(`queryName`, `searchArgs`, `cachePolicy`, `trackedProperty`, `createdByIfKnown`, `parentTypeIfKnown`, `parentIdIfKnown`, `parentVersionIfKnown`): `Promise`<[`ICacheMetadataMatchType`](../interfaces/client_internal_workers_cache_cache_worker.ICacheMetadataMatchType.md)\>
 
 #### Parameters
 
 | Name | Type |
 | :------ | :------ |
 | `queryName` | `string` |
-| `cachePolicy` | ``"by-owner"`` \| ``"by-parent"`` \| ``"by-owner-and-parent"`` |
+| `searchArgs` | [`IGQLArgs`](../interfaces/gql_querier.IGQLArgs.md) |
+| `cachePolicy` | ``"by-owner"`` \| ``"by-parent"`` \| ``"by-owner-and-parent"`` \| ``"by-property"`` |
+| `trackedProperty` | `string` |
 | `createdByIfKnown` | `string` |
 | `parentTypeIfKnown` | `string` |
 | `parentIdIfKnown` | `string` |
@@ -382,7 +478,7 @@ ___
 
 #### Defined in
 
-[client/internal/workers/cache/cache.worker.ts:597](https://github.com/onzag/itemize/blob/5c2808d3/client/internal/workers/cache/cache.worker.ts#L597)
+[client/internal/workers/cache/cache.worker.ts:830](https://github.com/onzag/itemize/blob/f2db74a5/client/internal/workers/cache/cache.worker.ts#L830)
 
 ___
 
@@ -404,13 +500,13 @@ ___
 
 #### Defined in
 
-[client/internal/workers/cache/cache.worker.ts:372](https://github.com/onzag/itemize/blob/5c2808d3/client/internal/workers/cache/cache.worker.ts#L372)
+[client/internal/workers/cache/cache.worker.ts:426](https://github.com/onzag/itemize/blob/f2db74a5/client/internal/workers/cache/cache.worker.ts#L426)
 
 ___
 
 ### runCachedSearch
 
-▸ **runCachedSearch**(`searchQueryName`, `searchArgs`, `getListQueryName`, `getListTokenArg`, `getListLangArg`, `getListRequestedFields`, `cachePolicy`, `maxGetListResultsAtOnce`, `returnSources`, `redoSearch`, `redoRecords`): `Promise`<[`ICachedSearchResult`](../interfaces/client_internal_workers_cache_cache_worker.ICachedSearchResult.md)\>
+▸ **runCachedSearch**(`searchQueryName`, `searchArgs`, `getListQueryName`, `getListTokenArg`, `getListLangArg`, `getListRequestedFields`, `cachePolicy`, `cacheNoLimitOffset`, `trackedProperty`, `maxLimit`, `maxGetListResultsAtOnce`, `returnSources`, `redoSearch`, `redoRecords`): `Promise`<[`ICachedSearchResult`](../interfaces/client_internal_workers_cache_cache_worker.ICachedSearchResult.md)\>
 
 Runs a search in the cache inside indexeddb rather than using
 the server
@@ -425,7 +521,10 @@ the server
 | `getListTokenArg` | `string` | the get list token |
 | `getListLangArg` | `string` | the get list arg |
 | `getListRequestedFields` | [`IGQLRequestFields`](../interfaces/gql_querier.IGQLRequestFields.md) | the requested fields for the get list process |
-| `cachePolicy` | ``"by-owner"`` \| ``"by-parent"`` \| ``"by-owner-and-parent"`` | the cache policy used |
+| `cachePolicy` | ``"by-owner"`` \| ``"by-parent"`` \| ``"by-owner-and-parent"`` \| ``"by-property"`` | the cache policy used |
+| `cacheNoLimitOffset` | `boolean` | - |
+| `trackedProperty` | `string` | - |
+| `maxLimit` | `number` | - |
 | `maxGetListResultsAtOnce` | `number` | how many results at once you can get for the batching for when preloading every record in the list in the client side |
 | `returnSources` | `boolean` | - |
 | `redoSearch` | `boolean` | - |
@@ -437,7 +536,7 @@ the server
 
 #### Defined in
 
-[client/internal/workers/cache/cache.worker.ts:1004](https://github.com/onzag/itemize/blob/5c2808d3/client/internal/workers/cache/cache.worker.ts#L1004)
+[client/internal/workers/cache/cache.worker.ts:1285](https://github.com/onzag/itemize/blob/f2db74a5/client/internal/workers/cache/cache.worker.ts#L1285)
 
 ___
 
@@ -457,7 +556,7 @@ ___
 
 #### Defined in
 
-[client/internal/workers/cache/cache.worker.ts:1483](https://github.com/onzag/itemize/blob/5c2808d3/client/internal/workers/cache/cache.worker.ts#L1483)
+[client/internal/workers/cache/cache.worker.ts:1832](https://github.com/onzag/itemize/blob/f2db74a5/client/internal/workers/cache/cache.worker.ts#L1832)
 
 ___
 
@@ -486,7 +585,7 @@ value that was retrieved, this value can be a partial value
 
 #### Defined in
 
-[client/internal/workers/cache/cache.worker.ts:441](https://github.com/onzag/itemize/blob/5c2808d3/client/internal/workers/cache/cache.worker.ts#L441)
+[client/internal/workers/cache/cache.worker.ts:634](https://github.com/onzag/itemize/blob/f2db74a5/client/internal/workers/cache/cache.worker.ts#L634)
 
 ___
 
@@ -508,7 +607,7 @@ This actually setups the worker
 
 #### Defined in
 
-[client/internal/workers/cache/cache.worker.ts:238](https://github.com/onzag/itemize/blob/5c2808d3/client/internal/workers/cache/cache.worker.ts#L238)
+[client/internal/workers/cache/cache.worker.ts:291](https://github.com/onzag/itemize/blob/f2db74a5/client/internal/workers/cache/cache.worker.ts#L291)
 
 ___
 
@@ -531,13 +630,13 @@ ___
 
 #### Defined in
 
-[client/internal/workers/cache/cache.worker.ts:341](https://github.com/onzag/itemize/blob/5c2808d3/client/internal/workers/cache/cache.worker.ts#L341)
+[client/internal/workers/cache/cache.worker.ts:394](https://github.com/onzag/itemize/blob/f2db74a5/client/internal/workers/cache/cache.worker.ts#L394)
 
 ___
 
 ### updateRecordsOnCachedSearch
 
-▸ **updateRecordsOnCachedSearch**(`searchQueryName`, `createdByIfKnown`, `parentTypeIfKnown`, `parentIdIfKnown`, `parentVersionIfKnown`, `newRecords`, `modifiedRecords`, `lostRecords`, `newLastModified`, `cachePolicy`): `Promise`<`boolean`\>
+▸ **updateRecordsOnCachedSearch**(`searchQueryName`, `createdByIfKnown`, `parentTypeIfKnown`, `parentIdIfKnown`, `parentVersionIfKnown`, `trackedProperty`, `cachePropertyValue`, `newRecords`, `createdRecords`, `modifiedRecords`, `lostRecords`, `deletedRecords`, `newLastModified`, `cachePolicy`): `Promise`<`boolean`\>
 
 Updates a cached search records list by pushing a new record
 to the list in front
@@ -551,11 +650,15 @@ to the list in front
 | `parentTypeIfKnown` | `string` | the parent type (user for by-parent) |
 | `parentIdIfKnown` | `string` | the parent id (user for by-parent) |
 | `parentVersionIfKnown` | `string` | the parent version, or null (user for by-parent) |
+| `trackedProperty` | `string` | - |
+| `cachePropertyValue` | `string` | - |
 | `newRecords` | [`IGQLSearchRecord`](../interfaces/gql_querier.IGQLSearchRecord.md)[] | the new records to be added |
+| `createdRecords` | [`IGQLSearchRecord`](../interfaces/gql_querier.IGQLSearchRecord.md)[] | - |
 | `modifiedRecords` | [`IGQLSearchRecord`](../interfaces/gql_querier.IGQLSearchRecord.md)[] | - |
 | `lostRecords` | [`IGQLSearchRecord`](../interfaces/gql_querier.IGQLSearchRecord.md)[] | - |
+| `deletedRecords` | [`IGQLSearchRecord`](../interfaces/gql_querier.IGQLSearchRecord.md)[] | - |
 | `newLastModified` | `string` | - |
-| `cachePolicy` | ``"by-owner"`` \| ``"by-parent"`` \| ``"by-owner-and-parent"`` | the cache policy that we are working with |
+| `cachePolicy` | ``"by-owner"`` \| ``"by-parent"`` \| ``"by-owner-and-parent"`` \| ``"by-property"`` | the cache policy that we are working with |
 
 #### Returns
 
@@ -563,7 +666,7 @@ to the list in front
 
 #### Defined in
 
-[client/internal/workers/cache/cache.worker.ts:864](https://github.com/onzag/itemize/blob/5c2808d3/client/internal/workers/cache/cache.worker.ts#L864)
+[client/internal/workers/cache/cache.worker.ts:1137](https://github.com/onzag/itemize/blob/f2db74a5/client/internal/workers/cache/cache.worker.ts#L1137)
 
 ___
 
@@ -586,20 +689,22 @@ ___
 
 #### Defined in
 
-[client/internal/workers/cache/cache.worker.ts:563](https://github.com/onzag/itemize/blob/5c2808d3/client/internal/workers/cache/cache.worker.ts#L563)
+[client/internal/workers/cache/cache.worker.ts:795](https://github.com/onzag/itemize/blob/f2db74a5/client/internal/workers/cache/cache.worker.ts#L795)
 
 ___
 
 ### writeSearchMetadata
 
-▸ **writeSearchMetadata**(`queryName`, `cachePolicy`, `createdByIfKnown`, `parentTypeIfKnown`, `parentIdIfKnown`, `parentVersionIfKnown`, `metadata`): `Promise`<`boolean`\>
+▸ **writeSearchMetadata**(`queryName`, `searchArgs`, `cachePolicy`, `trackedProperty`, `createdByIfKnown`, `parentTypeIfKnown`, `parentIdIfKnown`, `parentVersionIfKnown`, `metadata`): `Promise`<`boolean`\>
 
 #### Parameters
 
 | Name | Type |
 | :------ | :------ |
 | `queryName` | `string` |
-| `cachePolicy` | ``"by-owner"`` \| ``"by-parent"`` \| ``"by-owner-and-parent"`` |
+| `searchArgs` | [`IGQLArgs`](../interfaces/gql_querier.IGQLArgs.md) |
+| `cachePolicy` | ``"by-owner"`` \| ``"by-parent"`` \| ``"by-owner-and-parent"`` \| ``"by-property"`` |
+| `trackedProperty` | `string` |
 | `createdByIfKnown` | `string` |
 | `parentTypeIfKnown` | `string` |
 | `parentIdIfKnown` | `string` |
@@ -612,4 +717,4 @@ ___
 
 #### Defined in
 
-[client/internal/workers/cache/cache.worker.ts:518](https://github.com/onzag/itemize/blob/5c2808d3/client/internal/workers/cache/cache.worker.ts#L518)
+[client/internal/workers/cache/cache.worker.ts:740](https://github.com/onzag/itemize/blob/f2db74a5/client/internal/workers/cache/cache.worker.ts#L740)

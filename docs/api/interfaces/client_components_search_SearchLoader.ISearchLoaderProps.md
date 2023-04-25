@@ -13,7 +13,7 @@ The loader props themselves
 - [avoidLoadingSearchResults](client_components_search_SearchLoader.ISearchLoaderProps.md#avoidloadingsearchresults)
 - [cleanOnDismount](client_components_search_SearchLoader.ISearchLoaderProps.md#cleanondismount)
 - [currentPage](client_components_search_SearchLoader.ISearchLoaderProps.md#currentpage)
-- [disableExternalChecks](client_components_search_SearchLoader.ISearchLoaderProps.md#disableexternalchecks)
+- [enableExternalChecks](client_components_search_SearchLoader.ISearchLoaderProps.md#enableexternalchecks)
 - [includePolicies](client_components_search_SearchLoader.ISearchLoaderProps.md#includepolicies)
 - [pageSize](client_components_search_SearchLoader.ISearchLoaderProps.md#pagesize)
 - [static](client_components_search_SearchLoader.ISearchLoaderProps.md#static)
@@ -35,7 +35,7 @@ off a search
 
 #### Defined in
 
-[client/components/search/SearchLoader.tsx:173](https://github.com/onzag/itemize/blob/5c2808d3/client/components/search/SearchLoader.tsx#L173)
+[client/components/search/SearchLoader.tsx:186](https://github.com/onzag/itemize/blob/f2db74a5/client/components/search/SearchLoader.tsx#L186)
 
 ___
 
@@ -47,7 +47,7 @@ Whether the resulting search results should clean on dismount
 
 #### Defined in
 
-[client/components/search/SearchLoader.tsx:162](https://github.com/onzag/itemize/blob/5c2808d3/client/components/search/SearchLoader.tsx#L162)
+[client/components/search/SearchLoader.tsx:175](https://github.com/onzag/itemize/blob/f2db74a5/client/components/search/SearchLoader.tsx#L175)
 
 ___
 
@@ -59,20 +59,20 @@ The current page we are in
 
 #### Defined in
 
-[client/components/search/SearchLoader.tsx:149](https://github.com/onzag/itemize/blob/5c2808d3/client/components/search/SearchLoader.tsx#L149)
+[client/components/search/SearchLoader.tsx:162](https://github.com/onzag/itemize/blob/f2db74a5/client/components/search/SearchLoader.tsx#L162)
 
 ___
 
-### disableExternalChecks
+### enableExternalChecks
 
-• `Optional` **disableExternalChecks**: `boolean`
+• `Optional` **enableExternalChecks**: `boolean`
 
 Whether to disable the external checks for the item definition
 results provider props
 
 #### Defined in
 
-[client/components/search/SearchLoader.tsx:167](https://github.com/onzag/itemize/blob/5c2808d3/client/components/search/SearchLoader.tsx#L167)
+[client/components/search/SearchLoader.tsx:180](https://github.com/onzag/itemize/blob/f2db74a5/client/components/search/SearchLoader.tsx#L180)
 
 ___
 
@@ -85,7 +85,7 @@ item definition loader props
 
 #### Defined in
 
-[client/components/search/SearchLoader.tsx:158](https://github.com/onzag/itemize/blob/5c2808d3/client/components/search/SearchLoader.tsx#L158)
+[client/components/search/SearchLoader.tsx:171](https://github.com/onzag/itemize/blob/f2db74a5/client/components/search/SearchLoader.tsx#L171)
 
 ___
 
@@ -99,7 +99,7 @@ at once
 
 #### Defined in
 
-[client/components/search/SearchLoader.tsx:145](https://github.com/onzag/itemize/blob/5c2808d3/client/components/search/SearchLoader.tsx#L145)
+[client/components/search/SearchLoader.tsx:158](https://github.com/onzag/itemize/blob/f2db74a5/client/components/search/SearchLoader.tsx#L158)
 
 ___
 
@@ -111,9 +111,15 @@ The static state for the children item definition, TOTAL for
 basically not even asking for feedback (useful when the search was traditional)
 or NO_LISTENING for just not getting updates but asking for feedback
 
+by default searches do not listen and use total as they act like static
+results
+
+Note that if the search was done using a listen policy the item will update anyway
+this is why total is the better option
+
 #### Defined in
 
-[client/components/search/SearchLoader.tsx:179](https://github.com/onzag/itemize/blob/5c2808d3/client/components/search/SearchLoader.tsx#L179)
+[client/components/search/SearchLoader.tsx:198](https://github.com/onzag/itemize/blob/f2db74a5/client/components/search/SearchLoader.tsx#L198)
 
 ## Methods
 
@@ -135,33 +141,27 @@ The children function which specifies how to retrieve these results
 
 #### Defined in
 
-[client/components/search/SearchLoader.tsx:153](https://github.com/onzag/itemize/blob/5c2808d3/client/components/search/SearchLoader.tsx#L153)
+[client/components/search/SearchLoader.tsx:166](https://github.com/onzag/itemize/blob/f2db74a5/client/components/search/SearchLoader.tsx#L166)
 
 ___
 
 ### onSearchDataChange
 
-▸ `Optional` **onSearchDataChange**(`searchId`, `wasRestored`): `number` \| `void`
+▸ `Optional` **onSearchDataChange**(`searchId`, `wasRestored`): `void`
 
 Triggers when the search data changes, as in a new search id
-
-Your page might be in page 6 and then the user requests new data
-which means you should go back to page 0, this allows to do just that
-by returning a number you can ask for a different page than the one
-specified by currentPage, remember to update the prop currentPage
-after this fact, so avoid weirdness
 
 #### Parameters
 
 | Name | Type |
 | :------ | :------ |
 | `searchId` | `string` |
-| `wasRestored` | `boolean` |
+| `wasRestored` | ``"NO"`` \| ``"FROM_LOCATION"`` \| ``"FROM_STATE"`` |
 
 #### Returns
 
-`number` \| `void`
+`void`
 
 #### Defined in
 
-[client/components/search/SearchLoader.tsx:189](https://github.com/onzag/itemize/blob/5c2808d3/client/components/search/SearchLoader.tsx#L189)
+[client/components/search/SearchLoader.tsx:202](https://github.com/onzag/itemize/blob/f2db74a5/client/components/search/SearchLoader.tsx#L202)

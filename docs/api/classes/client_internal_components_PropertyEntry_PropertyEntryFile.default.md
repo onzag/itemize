@@ -67,13 +67,13 @@ This is the property entry file class
 #### Overrides
 
 React.Component&lt;
-  IPropertyEntryHandlerProps&lt;PropertyDefinitionSupportedFileType, IPropertyEntryFileRendererProps\&gt;,
-  IPropertyEntryFileState
+    IPropertyEntryHandlerProps&lt;PropertyDefinitionSupportedFileType, IPropertyEntryFileRendererProps\&gt;,
+    IPropertyEntryFileState
   \&gt;.constructor
 
 #### Defined in
 
-[client/internal/components/PropertyEntry/PropertyEntryFile.tsx:163](https://github.com/onzag/itemize/blob/5c2808d3/client/internal/components/PropertyEntry/PropertyEntryFile.tsx#L163)
+[client/internal/components/PropertyEntry/PropertyEntryFile.tsx:180](https://github.com/onzag/itemize/blob/f2db74a5/client/internal/components/PropertyEntry/PropertyEntryFile.tsx#L180)
 
 ## Properties
 
@@ -127,7 +127,7 @@ points to a file
 
 #### Defined in
 
-[client/internal/components/PropertyEntry/PropertyEntryFile.tsx:161](https://github.com/onzag/itemize/blob/5c2808d3/client/internal/components/PropertyEntry/PropertyEntryFile.tsx#L161)
+[client/internal/components/PropertyEntry/PropertyEntryFile.tsx:178](https://github.com/onzag/itemize/blob/f2db74a5/client/internal/components/PropertyEntry/PropertyEntryFile.tsx#L178)
 
 ___
 
@@ -346,7 +346,7 @@ ___
 
 #### Defined in
 
-[client/internal/components/PropertyEntry/PropertyEntryFile.tsx:278](https://github.com/onzag/itemize/blob/5c2808d3/client/internal/components/PropertyEntry/PropertyEntryFile.tsx#L278)
+[client/internal/components/PropertyEntry/PropertyEntryFile.tsx:294](https://github.com/onzag/itemize/blob/f2db74a5/client/internal/components/PropertyEntry/PropertyEntryFile.tsx#L294)
 
 ___
 
@@ -512,7 +512,7 @@ React.Component.componentWillUnmount
 
 #### Defined in
 
-[client/internal/components/PropertyEntry/PropertyEntryFile.tsx:206](https://github.com/onzag/itemize/blob/5c2808d3/client/internal/components/PropertyEntry/PropertyEntryFile.tsx#L206)
+[client/internal/components/PropertyEntry/PropertyEntryFile.tsx:224](https://github.com/onzag/itemize/blob/f2db74a5/client/internal/components/PropertyEntry/PropertyEntryFile.tsx#L224)
 
 ___
 
@@ -565,7 +565,7 @@ ___
 
 #### Defined in
 
-[client/internal/components/PropertyEntry/PropertyEntryFile.tsx:390](https://github.com/onzag/itemize/blob/5c2808d3/client/internal/components/PropertyEntry/PropertyEntryFile.tsx#L390)
+[client/internal/components/PropertyEntry/PropertyEntryFile.tsx:406](https://github.com/onzag/itemize/blob/f2db74a5/client/internal/components/PropertyEntry/PropertyEntryFile.tsx#L406)
 
 ___
 
@@ -597,8 +597,7 @@ ___
 
 ▸ `Private` **getCurrentValue**(): [`IGQLFile`](../interfaces/gql_querier.IGQLFile.md)
 
-Provides the current value, either the actual value
-or the rejected value
+Provides the current value
 
 #### Returns
 
@@ -608,7 +607,7 @@ a PropertyDefinitionSupportedFileType
 
 #### Defined in
 
-[client/internal/components/PropertyEntry/PropertyEntryFile.tsx:218](https://github.com/onzag/itemize/blob/5c2808d3/client/internal/components/PropertyEntry/PropertyEntryFile.tsx#L218)
+[client/internal/components/PropertyEntry/PropertyEntryFile.tsx:235](https://github.com/onzag/itemize/blob/f2db74a5/client/internal/components/PropertyEntry/PropertyEntryFile.tsx#L235)
 
 ___
 
@@ -654,7 +653,7 @@ ___
 
 #### Defined in
 
-[client/internal/components/PropertyEntry/PropertyEntryFile.tsx:384](https://github.com/onzag/itemize/blob/5c2808d3/client/internal/components/PropertyEntry/PropertyEntryFile.tsx#L384)
+[client/internal/components/PropertyEntry/PropertyEntryFile.tsx:400](https://github.com/onzag/itemize/blob/f2db74a5/client/internal/components/PropertyEntry/PropertyEntryFile.tsx#L400)
 
 ___
 
@@ -675,7 +674,7 @@ ___
 
 #### Defined in
 
-[client/internal/components/PropertyEntry/PropertyEntryFile.tsx:314](https://github.com/onzag/itemize/blob/5c2808d3/client/internal/components/PropertyEntry/PropertyEntryFile.tsx#L314)
+[client/internal/components/PropertyEntry/PropertyEntryFile.tsx:330](https://github.com/onzag/itemize/blob/f2db74a5/client/internal/components/PropertyEntry/PropertyEntryFile.tsx#L330)
 
 ___
 
@@ -695,7 +694,7 @@ ___
 
 #### Defined in
 
-[client/internal/components/PropertyEntry/PropertyEntryFile.tsx:256](https://github.com/onzag/itemize/blob/5c2808d3/client/internal/components/PropertyEntry/PropertyEntryFile.tsx#L256)
+[client/internal/components/PropertyEntry/PropertyEntryFile.tsx:272](https://github.com/onzag/itemize/blob/f2db74a5/client/internal/components/PropertyEntry/PropertyEntryFile.tsx#L272)
 
 ___
 
@@ -709,7 +708,7 @@ ___
 
 #### Defined in
 
-[client/internal/components/PropertyEntry/PropertyEntryFile.tsx:251](https://github.com/onzag/itemize/blob/5c2808d3/client/internal/components/PropertyEntry/PropertyEntryFile.tsx#L251)
+[client/internal/components/PropertyEntry/PropertyEntryFile.tsx:267](https://github.com/onzag/itemize/blob/f2db74a5/client/internal/components/PropertyEntry/PropertyEntryFile.tsx#L267)
 
 ___
 
@@ -727,7 +726,7 @@ React.Component.render
 
 #### Defined in
 
-[client/internal/components/PropertyEntry/PropertyEntryFile.tsx:395](https://github.com/onzag/itemize/blob/5c2808d3/client/internal/components/PropertyEntry/PropertyEntryFile.tsx#L395)
+[client/internal/components/PropertyEntry/PropertyEntryFile.tsx:411](https://github.com/onzag/itemize/blob/f2db74a5/client/internal/components/PropertyEntry/PropertyEntryFile.tsx#L411)
 
 ___
 
@@ -783,4 +782,4 @@ React.Component.shouldComponentUpdate
 
 #### Defined in
 
-[client/internal/components/PropertyEntry/PropertyEntryFile.tsx:182](https://github.com/onzag/itemize/blob/5c2808d3/client/internal/components/PropertyEntry/PropertyEntryFile.tsx#L182)
+[client/internal/components/PropertyEntry/PropertyEntryFile.tsx:199](https://github.com/onzag/itemize/blob/f2db74a5/client/internal/components/PropertyEntry/PropertyEntryFile.tsx#L199)

@@ -7,32 +7,36 @@ obtained via the browser history api or the query string
 
 ## Table of contents
 
-### Properties
+### Functions
 
 - [default](client_components_navigation_LocationStateReader.md#default)
 
-## Properties
+## Functions
 
 ### default
 
-• **default**: <S\>(`props`: `ILocationStateReaderProps`<`S`\>) => `any`
+▸ **default**<`S`\>(`props`): `any`
 
-#### Type declaration
+The location state reader component
 
-▸ <`S`\>(`props`): `any`
-
-##### Type parameters
+#### Type parameters
 
 | Name |
 | :------ |
 | `S` |
 
-##### Parameters
+#### Parameters
 
-| Name | Type |
-| :------ | :------ |
-| `props` | `ILocationStateReaderProps`<`S`\> |
+| Name | Type | Description |
+| :------ | :------ | :------ |
+| `props` | `ILocationStateReaderProps`<`S`\> | the props |
 
-##### Returns
+#### Returns
 
 `any`
+
+a react component
+
+#### Defined in
+
+[client/components/navigation/LocationStateReader.tsx:48](https://github.com/onzag/itemize/blob/f2db74a5/client/components/navigation/LocationStateReader.tsx#L48)

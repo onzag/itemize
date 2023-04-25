@@ -29,7 +29,7 @@ to be rechecked an update
 
 #### Defined in
 
-[client/internal/workers/cache/cache.worker.ts:58](https://github.com/onzag/itemize/blob/5c2808d3/client/internal/workers/cache/cache.worker.ts#L58)
+[client/internal/workers/cache/cache.worker.ts:68](https://github.com/onzag/itemize/blob/f2db74a5/client/internal/workers/cache/cache.worker.ts#L68)
 
 ___
 
@@ -41,7 +41,7 @@ The graphql value that it emulates from the server side
 
 #### Defined in
 
-[client/internal/workers/cache/cache.worker.ts:53](https://github.com/onzag/itemize/blob/5c2808d3/client/internal/workers/cache/cache.worker.ts#L53)
+[client/internal/workers/cache/cache.worker.ts:63](https://github.com/onzag/itemize/blob/f2db74a5/client/internal/workers/cache/cache.worker.ts#L63)
 
 ___
 
@@ -53,7 +53,7 @@ When was this last search modified
 
 #### Defined in
 
-[client/internal/workers/cache/cache.worker.ts:62](https://github.com/onzag/itemize/blob/5c2808d3/client/internal/workers/cache/cache.worker.ts#L62)
+[client/internal/workers/cache/cache.worker.ts:72](https://github.com/onzag/itemize/blob/f2db74a5/client/internal/workers/cache/cache.worker.ts#L72)
 
 ___
 
@@ -61,11 +61,13 @@ ___
 
 • **sourceRecords**: [`IGQLSearchRecord`](gql_querier.IGQLSearchRecord.md)[]
 
-The source records that were used in the search
+The source records that were used in the search, aka all the records that
+were searched for in the search, not just the matching ones that were
+requested, this list may be very large
 
 #### Defined in
 
-[client/internal/workers/cache/cache.worker.ts:66](https://github.com/onzag/itemize/blob/5c2808d3/client/internal/workers/cache/cache.worker.ts#L66)
+[client/internal/workers/cache/cache.worker.ts:78](https://github.com/onzag/itemize/blob/f2db74a5/client/internal/workers/cache/cache.worker.ts#L78)
 
 ___
 
@@ -73,6 +75,10 @@ ___
 
 • **sourceResults**: [`ICacheMatchType`](client_internal_workers_cache_cache_worker.ICacheMatchType.md)[]
 
+The source results that were used in the search, if requested, this
+is basically the source records themselves but containing all the fields
+and matching data that was available
+
 #### Defined in
 
-[client/internal/workers/cache/cache.worker.ts:67](https://github.com/onzag/itemize/blob/5c2808d3/client/internal/workers/cache/cache.worker.ts#L67)
+[client/internal/workers/cache/cache.worker.ts:84](https://github.com/onzag/itemize/blob/f2db74a5/client/internal/workers/cache/cache.worker.ts#L84)

@@ -33,7 +33,7 @@ item definition and alternative property that is used during searches
 
 #### Defined in
 
-[base/Root/Module/ItemDefinition/PropertyDefinition/search-mode.ts:118](https://github.com/onzag/itemize/blob/5c2808d3/base/Root/Module/ItemDefinition/PropertyDefinition/search-mode.ts#L118)
+[base/Root/Module/ItemDefinition/PropertyDefinition/search-mode.ts:118](https://github.com/onzag/itemize/blob/f2db74a5/base/Root/Module/ItemDefinition/PropertyDefinition/search-mode.ts#L118)
 
 ___
 
@@ -59,7 +59,7 @@ an array of property definitions
 
 #### Defined in
 
-[base/Root/Module/ItemDefinition/PropertyDefinition/search-mode.ts:256](https://github.com/onzag/itemize/blob/5c2808d3/base/Root/Module/ItemDefinition/PropertyDefinition/search-mode.ts#L256)
+[base/Root/Module/ItemDefinition/PropertyDefinition/search-mode.ts:256](https://github.com/onzag/itemize/blob/f2db74a5/base/Root/Module/ItemDefinition/PropertyDefinition/search-mode.ts#L256)
 
 ___
 
@@ -84,4 +84,4 @@ an array of string for the ids in search mode for the property
 
 #### Defined in
 
-[base/Root/Module/ItemDefinition/PropertyDefinition/search-mode.ts:27](https://github.com/onzag/itemize/blob/5c2808d3/base/Root/Module/ItemDefinition/PropertyDefinition/search-mode.ts#L27)
+[base/Root/Module/ItemDefinition/PropertyDefinition/search-mode.ts:27](https://github.com/onzag/itemize/blob/f2db74a5/base/Root/Module/ItemDefinition/PropertyDefinition/search-mode.ts#L27)

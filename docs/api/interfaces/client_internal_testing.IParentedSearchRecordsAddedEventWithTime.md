@@ -14,6 +14,8 @@
 
 ### Properties
 
+- [createdRecords](client_internal_testing.IParentedSearchRecordsAddedEventWithTime.md#createdrecords)
+- [deletedRecords](client_internal_testing.IParentedSearchRecordsAddedEventWithTime.md#deletedrecords)
 - [lostRecords](client_internal_testing.IParentedSearchRecordsAddedEventWithTime.md#lostrecords)
 - [modifiedRecords](client_internal_testing.IParentedSearchRecordsAddedEventWithTime.md#modifiedrecords)
 - [newLastModified](client_internal_testing.IParentedSearchRecordsAddedEventWithTime.md#newlastmodified)
@@ -25,6 +27,34 @@
 - [time](client_internal_testing.IParentedSearchRecordsAddedEventWithTime.md#time)
 
 ## Properties
+
+### createdRecords
+
+• **createdRecords**: [`IGQLSearchRecord`](gql_querier.IGQLSearchRecord.md)[]
+
+#### Inherited from
+
+[IParentedSearchRecordsEvent](base_remote_protocol.IParentedSearchRecordsEvent.md).[createdRecords](base_remote_protocol.IParentedSearchRecordsEvent.md#createdrecords)
+
+#### Defined in
+
+[base/remote-protocol.ts:112](https://github.com/onzag/itemize/blob/f2db74a5/base/remote-protocol.ts#L112)
+
+___
+
+### deletedRecords
+
+• **deletedRecords**: [`IGQLSearchRecord`](gql_querier.IGQLSearchRecord.md)[]
+
+#### Inherited from
+
+[IParentedSearchRecordsEvent](base_remote_protocol.IParentedSearchRecordsEvent.md).[deletedRecords](base_remote_protocol.IParentedSearchRecordsEvent.md#deletedrecords)
+
+#### Defined in
+
+[base/remote-protocol.ts:117](https://github.com/onzag/itemize/blob/f2db74a5/base/remote-protocol.ts#L117)
+
+___
 
 ### lostRecords
 
@@ -38,7 +68,7 @@ the records that have been deleted
 
 #### Defined in
 
-[base/remote-protocol.ts:115](https://github.com/onzag/itemize/blob/5c2808d3/base/remote-protocol.ts#L115)
+[base/remote-protocol.ts:116](https://github.com/onzag/itemize/blob/f2db74a5/base/remote-protocol.ts#L116)
 
 ___
 
@@ -54,7 +84,7 @@ the records that have been modified
 
 #### Defined in
 
-[base/remote-protocol.ts:119](https://github.com/onzag/itemize/blob/5c2808d3/base/remote-protocol.ts#L119)
+[base/remote-protocol.ts:121](https://github.com/onzag/itemize/blob/f2db74a5/base/remote-protocol.ts#L121)
 
 ___
 
@@ -70,7 +100,7 @@ the new last record search result
 
 #### Defined in
 
-[base/remote-protocol.ts:123](https://github.com/onzag/itemize/blob/5c2808d3/base/remote-protocol.ts#L123)
+[base/remote-protocol.ts:125](https://github.com/onzag/itemize/blob/f2db74a5/base/remote-protocol.ts#L125)
 
 ___
 
@@ -86,7 +116,7 @@ the new records that have been added
 
 #### Defined in
 
-[base/remote-protocol.ts:111](https://github.com/onzag/itemize/blob/5c2808d3/base/remote-protocol.ts#L111)
+[base/remote-protocol.ts:111](https://github.com/onzag/itemize/blob/f2db74a5/base/remote-protocol.ts#L111)
 
 ___
 
@@ -100,7 +130,7 @@ ___
 
 #### Defined in
 
-[base/remote-protocol.ts:150](https://github.com/onzag/itemize/blob/5c2808d3/base/remote-protocol.ts#L150)
+[base/remote-protocol.ts:152](https://github.com/onzag/itemize/blob/f2db74a5/base/remote-protocol.ts#L152)
 
 ___
 
@@ -114,7 +144,7 @@ ___
 
 #### Defined in
 
-[base/remote-protocol.ts:149](https://github.com/onzag/itemize/blob/5c2808d3/base/remote-protocol.ts#L149)
+[base/remote-protocol.ts:151](https://github.com/onzag/itemize/blob/f2db74a5/base/remote-protocol.ts#L151)
 
 ___
 
@@ -128,7 +158,7 @@ ___
 
 #### Defined in
 
-[base/remote-protocol.ts:151](https://github.com/onzag/itemize/blob/5c2808d3/base/remote-protocol.ts#L151)
+[base/remote-protocol.ts:153](https://github.com/onzag/itemize/blob/f2db74a5/base/remote-protocol.ts#L153)
 
 ___
 
@@ -144,7 +174,7 @@ the qualified path name or type of the either module or item definition
 
 #### Defined in
 
-[base/remote-protocol.ts:107](https://github.com/onzag/itemize/blob/5c2808d3/base/remote-protocol.ts#L107)
+[base/remote-protocol.ts:107](https://github.com/onzag/itemize/blob/f2db74a5/base/remote-protocol.ts#L107)
 
 ___
 
@@ -154,4 +184,4 @@ ___
 
 #### Defined in
 
-[client/internal/testing.ts:111](https://github.com/onzag/itemize/blob/5c2808d3/client/internal/testing.ts#L111)
+[client/internal/testing.ts:111](https://github.com/onzag/itemize/blob/f2db74a5/client/internal/testing.ts#L111)

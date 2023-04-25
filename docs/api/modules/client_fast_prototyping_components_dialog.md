@@ -31,7 +31,7 @@ The dialog itself, non-responsive and rather generic
 
 #### Defined in
 
-[client/fast-prototyping/components/dialog.tsx:92](https://github.com/onzag/itemize/blob/5c2808d3/client/fast-prototyping/components/dialog.tsx#L92)
+[client/fast-prototyping/components/dialog.tsx:117](https://github.com/onzag/itemize/blob/f2db74a5/client/fast-prototyping/components/dialog.tsx#L117)
 
 ___
 
@@ -55,4 +55,4 @@ takes all the other props
 
 #### Defined in
 
-[client/fast-prototyping/components/dialog.tsx:137](https://github.com/onzag/itemize/blob/5c2808d3/client/fast-prototyping/components/dialog.tsx#L137)
+[client/fast-prototyping/components/dialog.tsx:169](https://github.com/onzag/itemize/blob/f2db74a5/client/fast-prototyping/components/dialog.tsx#L169)

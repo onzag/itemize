@@ -6,7 +6,7 @@
 
 ## Hierarchy
 
-- `Component`<[`IPropertyViewHandlerProps`](../interfaces/client_internal_components_PropertyView.IPropertyViewHandlerProps.md)<[`IPropertyViewFileRendererProps`](../interfaces/client_internal_components_PropertyView_PropertyViewFile.IPropertyViewFileRendererProps.md)\>\>
+- `Component`<[`IPropertyViewHandlerProps`](../interfaces/client_internal_components_PropertyView.IPropertyViewHandlerProps.md)<[`PropertyDefinitionSupportedFileType`](../modules/base_Root_Module_ItemDefinition_PropertyDefinition_types_file.md#propertydefinitionsupportedfiletype), [`IPropertyViewFileRendererProps`](../interfaces/client_internal_components_PropertyView_PropertyViewFile.IPropertyViewFileRendererProps.md)\>\>
 
   ↳ **`default`**
 
@@ -53,17 +53,17 @@
 
 | Name | Type |
 | :------ | :------ |
-| `props` | [`IPropertyViewHandlerProps`](../interfaces/client_internal_components_PropertyView.IPropertyViewHandlerProps.md)<[`IPropertyViewFileRendererProps`](../interfaces/client_internal_components_PropertyView_PropertyViewFile.IPropertyViewFileRendererProps.md)\> |
+| `props` | [`IPropertyViewHandlerProps`](../interfaces/client_internal_components_PropertyView.IPropertyViewHandlerProps.md)<[`IGQLFile`](../interfaces/gql_querier.IGQLFile.md), [`IPropertyViewFileRendererProps`](../interfaces/client_internal_components_PropertyView_PropertyViewFile.IPropertyViewFileRendererProps.md)\> |
 
 #### Overrides
 
 React.Component&lt;
-  IPropertyViewHandlerProps&lt;IPropertyViewFileRendererProps\&gt;
+  IPropertyViewHandlerProps&lt;PropertyDefinitionSupportedFileType, IPropertyViewFileRendererProps\&gt;
 \&gt;.constructor
 
 #### Defined in
 
-[client/internal/components/PropertyView/PropertyViewFile.tsx:48](https://github.com/onzag/itemize/blob/5c2808d3/client/internal/components/PropertyView/PropertyViewFile.tsx#L48)
+[client/internal/components/PropertyView/PropertyViewFile.tsx:48](https://github.com/onzag/itemize/blob/f2db74a5/client/internal/components/PropertyView/PropertyViewFile.tsx#L48)
 
 ## Properties
 
@@ -97,7 +97,7 @@ ___
 
 ### props
 
-• `Readonly` **props**: `Readonly`<[`IPropertyViewHandlerProps`](../interfaces/client_internal_components_PropertyView.IPropertyViewHandlerProps.md)<[`IPropertyViewFileRendererProps`](../interfaces/client_internal_components_PropertyView_PropertyViewFile.IPropertyViewFileRendererProps.md)\>\> & `Readonly`<{ `children?`: `ReactNode`  }\>
+• `Readonly` **props**: `Readonly`<[`IPropertyViewHandlerProps`](../interfaces/client_internal_components_PropertyView.IPropertyViewHandlerProps.md)<[`IGQLFile`](../interfaces/gql_querier.IGQLFile.md), [`IPropertyViewFileRendererProps`](../interfaces/client_internal_components_PropertyView_PropertyViewFile.IPropertyViewFileRendererProps.md)\>\> & `Readonly`<{ `children?`: `ReactNode`  }\>
 
 #### Inherited from
 
@@ -234,7 +234,7 @@ prevents this from being invoked.
 
 | Name | Type |
 | :------ | :------ |
-| `nextProps` | `Readonly`<[`IPropertyViewHandlerProps`](../interfaces/client_internal_components_PropertyView.IPropertyViewHandlerProps.md)<[`IPropertyViewFileRendererProps`](../interfaces/client_internal_components_PropertyView_PropertyViewFile.IPropertyViewFileRendererProps.md)\>\> |
+| `nextProps` | `Readonly`<[`IPropertyViewHandlerProps`](../interfaces/client_internal_components_PropertyView.IPropertyViewHandlerProps.md)<[`IGQLFile`](../interfaces/gql_querier.IGQLFile.md), [`IPropertyViewFileRendererProps`](../interfaces/client_internal_components_PropertyView_PropertyViewFile.IPropertyViewFileRendererProps.md)\>\> |
 | `nextContext` | `any` |
 
 #### Returns
@@ -274,7 +274,7 @@ prevents this from being invoked.
 
 | Name | Type |
 | :------ | :------ |
-| `nextProps` | `Readonly`<[`IPropertyViewHandlerProps`](../interfaces/client_internal_components_PropertyView.IPropertyViewHandlerProps.md)<[`IPropertyViewFileRendererProps`](../interfaces/client_internal_components_PropertyView_PropertyViewFile.IPropertyViewFileRendererProps.md)\>\> |
+| `nextProps` | `Readonly`<[`IPropertyViewHandlerProps`](../interfaces/client_internal_components_PropertyView.IPropertyViewHandlerProps.md)<[`IGQLFile`](../interfaces/gql_querier.IGQLFile.md), [`IPropertyViewFileRendererProps`](../interfaces/client_internal_components_PropertyView_PropertyViewFile.IPropertyViewFileRendererProps.md)\>\> |
 | `nextState` | `Readonly`<{}\> |
 | `nextContext` | `any` |
 
@@ -352,7 +352,7 @@ The snapshot is only present if getSnapshotBeforeUpdate is present and returns n
 
 | Name | Type |
 | :------ | :------ |
-| `prevProps` | `Readonly`<[`IPropertyViewHandlerProps`](../interfaces/client_internal_components_PropertyView.IPropertyViewHandlerProps.md)<[`IPropertyViewFileRendererProps`](../interfaces/client_internal_components_PropertyView_PropertyViewFile.IPropertyViewFileRendererProps.md)\>\> |
+| `prevProps` | `Readonly`<[`IPropertyViewHandlerProps`](../interfaces/client_internal_components_PropertyView.IPropertyViewHandlerProps.md)<[`IGQLFile`](../interfaces/gql_querier.IGQLFile.md), [`IPropertyViewFileRendererProps`](../interfaces/client_internal_components_PropertyView_PropertyViewFile.IPropertyViewFileRendererProps.md)\>\> |
 | `prevState` | `Readonly`<{}\> |
 | `snapshot?` | `any` |
 
@@ -423,7 +423,7 @@ prevents this from being invoked.
 
 | Name | Type |
 | :------ | :------ |
-| `nextProps` | `Readonly`<[`IPropertyViewHandlerProps`](../interfaces/client_internal_components_PropertyView.IPropertyViewHandlerProps.md)<[`IPropertyViewFileRendererProps`](../interfaces/client_internal_components_PropertyView_PropertyViewFile.IPropertyViewFileRendererProps.md)\>\> |
+| `nextProps` | `Readonly`<[`IPropertyViewHandlerProps`](../interfaces/client_internal_components_PropertyView.IPropertyViewHandlerProps.md)<[`IGQLFile`](../interfaces/gql_querier.IGQLFile.md), [`IPropertyViewFileRendererProps`](../interfaces/client_internal_components_PropertyView_PropertyViewFile.IPropertyViewFileRendererProps.md)\>\> |
 | `nextContext` | `any` |
 
 #### Returns
@@ -482,7 +482,7 @@ prevents this from being invoked.
 
 | Name | Type |
 | :------ | :------ |
-| `nextProps` | `Readonly`<[`IPropertyViewHandlerProps`](../interfaces/client_internal_components_PropertyView.IPropertyViewHandlerProps.md)<[`IPropertyViewFileRendererProps`](../interfaces/client_internal_components_PropertyView_PropertyViewFile.IPropertyViewFileRendererProps.md)\>\> |
+| `nextProps` | `Readonly`<[`IPropertyViewHandlerProps`](../interfaces/client_internal_components_PropertyView.IPropertyViewHandlerProps.md)<[`IGQLFile`](../interfaces/gql_querier.IGQLFile.md), [`IPropertyViewFileRendererProps`](../interfaces/client_internal_components_PropertyView_PropertyViewFile.IPropertyViewFileRendererProps.md)\>\> |
 | `nextState` | `Readonly`<{}\> |
 | `nextContext` | `any` |
 
@@ -539,7 +539,7 @@ lifecycle events from running.
 
 | Name | Type |
 | :------ | :------ |
-| `prevProps` | `Readonly`<[`IPropertyViewHandlerProps`](../interfaces/client_internal_components_PropertyView.IPropertyViewHandlerProps.md)<[`IPropertyViewFileRendererProps`](../interfaces/client_internal_components_PropertyView_PropertyViewFile.IPropertyViewFileRendererProps.md)\>\> |
+| `prevProps` | `Readonly`<[`IPropertyViewHandlerProps`](../interfaces/client_internal_components_PropertyView.IPropertyViewHandlerProps.md)<[`IGQLFile`](../interfaces/gql_querier.IGQLFile.md), [`IPropertyViewFileRendererProps`](../interfaces/client_internal_components_PropertyView_PropertyViewFile.IPropertyViewFileRendererProps.md)\>\> |
 | `prevState` | `Readonly`<{}\> |
 
 #### Returns
@@ -566,7 +566,7 @@ ___
 
 #### Defined in
 
-[client/internal/components/PropertyView/PropertyViewFile.tsx:67](https://github.com/onzag/itemize/blob/5c2808d3/client/internal/components/PropertyView/PropertyViewFile.tsx#L67)
+[client/internal/components/PropertyView/PropertyViewFile.tsx:67](https://github.com/onzag/itemize/blob/f2db74a5/client/internal/components/PropertyView/PropertyViewFile.tsx#L67)
 
 ___
 
@@ -584,7 +584,7 @@ React.Component.render
 
 #### Defined in
 
-[client/internal/components/PropertyView/PropertyViewFile.tsx:75](https://github.com/onzag/itemize/blob/5c2808d3/client/internal/components/PropertyView/PropertyViewFile.tsx#L75)
+[client/internal/components/PropertyView/PropertyViewFile.tsx:75](https://github.com/onzag/itemize/blob/f2db74a5/client/internal/components/PropertyView/PropertyViewFile.tsx#L75)
 
 ___
 
@@ -602,7 +602,7 @@ ___
 
 | Name | Type |
 | :------ | :------ |
-| `state` | {} \| (`prevState`: `Readonly`<{}\>, `props`: `Readonly`<[`IPropertyViewHandlerProps`](../interfaces/client_internal_components_PropertyView.IPropertyViewHandlerProps.md)<[`IPropertyViewFileRendererProps`](../interfaces/client_internal_components_PropertyView_PropertyViewFile.IPropertyViewFileRendererProps.md)\>\>) => {} \| `Pick`<{}, `K`\> \| `Pick`<{}, `K`\> |
+| `state` | {} \| (`prevState`: `Readonly`<{}\>, `props`: `Readonly`<[`IPropertyViewHandlerProps`](../interfaces/client_internal_components_PropertyView.IPropertyViewHandlerProps.md)<[`IGQLFile`](../interfaces/gql_querier.IGQLFile.md), [`IPropertyViewFileRendererProps`](../interfaces/client_internal_components_PropertyView_PropertyViewFile.IPropertyViewFileRendererProps.md)\>\>) => {} \| `Pick`<{}, `K`\> \| `Pick`<{}, `K`\> |
 | `callback?` | () => `void` |
 
 #### Returns
@@ -627,7 +627,7 @@ ___
 
 | Name | Type |
 | :------ | :------ |
-| `nextProps` | [`IPropertyViewHandlerProps`](../interfaces/client_internal_components_PropertyView.IPropertyViewHandlerProps.md)<[`IPropertyViewFileRendererProps`](../interfaces/client_internal_components_PropertyView_PropertyViewFile.IPropertyViewFileRendererProps.md)\> |
+| `nextProps` | [`IPropertyViewHandlerProps`](../interfaces/client_internal_components_PropertyView.IPropertyViewHandlerProps.md)<[`IGQLFile`](../interfaces/gql_querier.IGQLFile.md), [`IPropertyViewFileRendererProps`](../interfaces/client_internal_components_PropertyView_PropertyViewFile.IPropertyViewFileRendererProps.md)\> |
 
 #### Returns
 
@@ -639,4 +639,4 @@ React.Component.shouldComponentUpdate
 
 #### Defined in
 
-[client/internal/components/PropertyView/PropertyViewFile.tsx:53](https://github.com/onzag/itemize/blob/5c2808d3/client/internal/components/PropertyView/PropertyViewFile.tsx#L53)
+[client/internal/components/PropertyView/PropertyViewFile.tsx:53](https://github.com/onzag/itemize/blob/f2db74a5/client/internal/components/PropertyView/PropertyViewFile.tsx#L53)

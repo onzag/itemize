@@ -22,4 +22,4 @@ style collector for the initialization of the app in the server side
 
 #### Defined in
 
-[client/fast-prototyping/collectors.tsx:23](https://github.com/onzag/itemize/blob/5c2808d3/client/fast-prototyping/collectors.tsx#L23)
+[client/fast-prototyping/collectors.tsx:24](https://github.com/onzag/itemize/blob/f2db74a5/client/fast-prototyping/collectors.tsx#L24)

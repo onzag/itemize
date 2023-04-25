@@ -14,12 +14,14 @@
 
 ### Properties
 
+- [appData](base_Root_Module_ItemDefinition_PropertyDefinition_types.ISQLSearchInfo.md#appdata)
 - [args](base_Root_Module_ItemDefinition_PropertyDefinition_types.ISQLSearchInfo.md#args)
 - [dictionary](base_Root_Module_ItemDefinition_PropertyDefinition_types.ISQLSearchInfo.md#dictionary)
 - [id](base_Root_Module_ItemDefinition_PropertyDefinition_types.ISQLSearchInfo.md#id)
 - [include](base_Root_Module_ItemDefinition_PropertyDefinition_types.ISQLSearchInfo.md#include)
 - [isOrderedByIt](base_Root_Module_ItemDefinition_PropertyDefinition_types.ISQLSearchInfo.md#isorderedbyit)
 - [itemDefinition](base_Root_Module_ItemDefinition_PropertyDefinition_types.ISQLSearchInfo.md#itemdefinition)
+- [language](base_Root_Module_ItemDefinition_PropertyDefinition_types.ISQLSearchInfo.md#language)
 - [prefix](base_Root_Module_ItemDefinition_PropertyDefinition_types.ISQLSearchInfo.md#prefix)
 - [property](base_Root_Module_ItemDefinition_PropertyDefinition_types.ISQLSearchInfo.md#property)
 - [serverData](base_Root_Module_ItemDefinition_PropertyDefinition_types.ISQLSearchInfo.md#serverdata)
@@ -27,13 +29,27 @@
 
 ## Properties
 
+### appData
+
+• **appData**: [`IAppDataType`](server.IAppDataType.md)
+
+#### Inherited from
+
+[ISQLArgInfo](base_Root_Module_ItemDefinition_PropertyDefinition_types.ISQLArgInfo.md).[appData](base_Root_Module_ItemDefinition_PropertyDefinition_types.ISQLArgInfo.md#appdata)
+
+#### Defined in
+
+[base/Root/Module/ItemDefinition/PropertyDefinition/types/index.ts:81](https://github.com/onzag/itemize/blob/f2db74a5/base/Root/Module/ItemDefinition/PropertyDefinition/types/index.ts#L81)
+
+___
+
 ### args
 
 • **args**: [`IGQLArgs`](gql_querier.IGQLArgs.md)
 
 #### Defined in
 
-[base/Root/Module/ItemDefinition/PropertyDefinition/types/index.ts:93](https://github.com/onzag/itemize/blob/5c2808d3/base/Root/Module/ItemDefinition/PropertyDefinition/types/index.ts#L93)
+[base/Root/Module/ItemDefinition/PropertyDefinition/types/index.ts:107](https://github.com/onzag/itemize/blob/f2db74a5/base/Root/Module/ItemDefinition/PropertyDefinition/types/index.ts#L107)
 
 ___
 
@@ -43,7 +59,7 @@ ___
 
 #### Defined in
 
-[base/Root/Module/ItemDefinition/PropertyDefinition/types/index.ts:91](https://github.com/onzag/itemize/blob/5c2808d3/base/Root/Module/ItemDefinition/PropertyDefinition/types/index.ts#L91)
+[base/Root/Module/ItemDefinition/PropertyDefinition/types/index.ts:105](https://github.com/onzag/itemize/blob/f2db74a5/base/Root/Module/ItemDefinition/PropertyDefinition/types/index.ts#L105)
 
 ___
 
@@ -57,7 +73,7 @@ ___
 
 #### Defined in
 
-[base/Root/Module/ItemDefinition/PropertyDefinition/types/index.ts:66](https://github.com/onzag/itemize/blob/5c2808d3/base/Root/Module/ItemDefinition/PropertyDefinition/types/index.ts#L66)
+[base/Root/Module/ItemDefinition/PropertyDefinition/types/index.ts:67](https://github.com/onzag/itemize/blob/f2db74a5/base/Root/Module/ItemDefinition/PropertyDefinition/types/index.ts#L67)
 
 ___
 
@@ -71,7 +87,7 @@ ___
 
 #### Defined in
 
-[base/Root/Module/ItemDefinition/PropertyDefinition/types/index.ts:70](https://github.com/onzag/itemize/blob/5c2808d3/base/Root/Module/ItemDefinition/PropertyDefinition/types/index.ts#L70)
+[base/Root/Module/ItemDefinition/PropertyDefinition/types/index.ts:71](https://github.com/onzag/itemize/blob/f2db74a5/base/Root/Module/ItemDefinition/PropertyDefinition/types/index.ts#L71)
 
 ___
 
@@ -81,7 +97,7 @@ ___
 
 #### Defined in
 
-[base/Root/Module/ItemDefinition/PropertyDefinition/types/index.ts:94](https://github.com/onzag/itemize/blob/5c2808d3/base/Root/Module/ItemDefinition/PropertyDefinition/types/index.ts#L94)
+[base/Root/Module/ItemDefinition/PropertyDefinition/types/index.ts:108](https://github.com/onzag/itemize/blob/f2db74a5/base/Root/Module/ItemDefinition/PropertyDefinition/types/index.ts#L108)
 
 ___
 
@@ -95,7 +111,17 @@ ___
 
 #### Defined in
 
-[base/Root/Module/ItemDefinition/PropertyDefinition/types/index.ts:69](https://github.com/onzag/itemize/blob/5c2808d3/base/Root/Module/ItemDefinition/PropertyDefinition/types/index.ts#L69)
+[base/Root/Module/ItemDefinition/PropertyDefinition/types/index.ts:70](https://github.com/onzag/itemize/blob/f2db74a5/base/Root/Module/ItemDefinition/PropertyDefinition/types/index.ts#L70)
+
+___
+
+### language
+
+• **language**: `string`
+
+#### Defined in
+
+[base/Root/Module/ItemDefinition/PropertyDefinition/types/index.ts:104](https://github.com/onzag/itemize/blob/f2db74a5/base/Root/Module/ItemDefinition/PropertyDefinition/types/index.ts#L104)
 
 ___
 
@@ -109,7 +135,7 @@ ___
 
 #### Defined in
 
-[base/Root/Module/ItemDefinition/PropertyDefinition/types/index.ts:67](https://github.com/onzag/itemize/blob/5c2808d3/base/Root/Module/ItemDefinition/PropertyDefinition/types/index.ts#L67)
+[base/Root/Module/ItemDefinition/PropertyDefinition/types/index.ts:68](https://github.com/onzag/itemize/blob/f2db74a5/base/Root/Module/ItemDefinition/PropertyDefinition/types/index.ts#L68)
 
 ___
 
@@ -123,7 +149,7 @@ ___
 
 #### Defined in
 
-[base/Root/Module/ItemDefinition/PropertyDefinition/types/index.ts:68](https://github.com/onzag/itemize/blob/5c2808d3/base/Root/Module/ItemDefinition/PropertyDefinition/types/index.ts#L68)
+[base/Root/Module/ItemDefinition/PropertyDefinition/types/index.ts:69](https://github.com/onzag/itemize/blob/f2db74a5/base/Root/Module/ItemDefinition/PropertyDefinition/types/index.ts#L69)
 
 ___
 
@@ -137,7 +163,7 @@ ___
 
 #### Defined in
 
-[base/Root/Module/ItemDefinition/PropertyDefinition/types/index.ts:78](https://github.com/onzag/itemize/blob/5c2808d3/base/Root/Module/ItemDefinition/PropertyDefinition/types/index.ts#L78)
+[base/Root/Module/ItemDefinition/PropertyDefinition/types/index.ts:80](https://github.com/onzag/itemize/blob/f2db74a5/base/Root/Module/ItemDefinition/PropertyDefinition/types/index.ts#L80)
 
 ___
 
@@ -147,4 +173,4 @@ ___
 
 #### Defined in
 
-[base/Root/Module/ItemDefinition/PropertyDefinition/types/index.ts:92](https://github.com/onzag/itemize/blob/5c2808d3/base/Root/Module/ItemDefinition/PropertyDefinition/types/index.ts#L92)
+[base/Root/Module/ItemDefinition/PropertyDefinition/types/index.ts:106](https://github.com/onzag/itemize/blob/f2db74a5/base/Root/Module/ItemDefinition/PropertyDefinition/types/index.ts#L106)

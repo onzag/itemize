@@ -31,7 +31,7 @@ Contains the entry for the location type
 
 #### Defined in
 
-[client/fast-prototyping/renderers/PropertyEntry/PropertyEntryLocation.tsx:68](https://github.com/onzag/itemize/blob/5c2808d3/client/fast-prototyping/renderers/PropertyEntry/PropertyEntryLocation.tsx#L68)
+[client/fast-prototyping/renderers/PropertyEntry/PropertyEntryLocation.tsx:67](https://github.com/onzag/itemize/blob/f2db74a5/client/fast-prototyping/renderers/PropertyEntry/PropertyEntryLocation.tsx#L67)
 
 ___
 
@@ -90,18 +90,17 @@ The styles for the location entry
 | `errorMessage.color` | `string` |
 | `errorMessage.fontSize` | `string` |
 | `errorMessage.height` | `string` |
-| `fieldInput` | (`isInvalid`: `boolean`, `disabled`: `boolean`) => { `&::after`: { `borderBottomColor`: `string` = "#f44336" } ; `&::before`: { `borderBottomColor`: `string` = "#e57373" } ; `&:hover::before`: { `borderBottomColor`: `string`  } ; `width`: `string` = "100%" } |
 | `icon` | `Object` |
-| `icon.alignItems` | `string` |
 | `icon.color` | `string` |
-| `icon.display` | `string` |
-| `icon.justifyContent` | `string` |
-| `icon.marginRight` | `string` |
+| `icon.position` | `string` |
+| `icon.right` | `string` |
 | `iconButton` | `Object` |
 | `iconButton.&:hover` | `Object` |
 | `iconButton.&:hover.backgroundColor` | `string` |
 | `iconButton.backgroundColor` | `string` |
 | `iconButton.color` | `string` |
+| `iconButtonOriginal` | `Object` |
+| `iconButtonOriginal.color` | `string` |
 | `label` | (`isInvalid`: `boolean`) => { `&.focused`: { `color`: `string`  } ; `color`: `string`  } |
 | `labelSingleLine` | `Object` |
 | `labelSingleLine.alignItems` | `string` |
@@ -110,31 +109,68 @@ The styles for the location entry
 | `labelSingleLine.width` | `string` |
 | `locationAlternativeTextHeader` | `Object` |
 | `locationAlternativeTextHeader.alignItems` | `string` |
+| `locationAlternativeTextHeader.borderLeft` | `string` |
+| `locationAlternativeTextHeader.borderRadius` | `string` |
+| `locationAlternativeTextHeader.borderRight` | `string` |
 | `locationAlternativeTextHeader.borderTop` | `string` |
 | `locationAlternativeTextHeader.display` | `string` |
 | `locationAlternativeTextHeader.fontSize` | `string` |
 | `locationAlternativeTextHeader.height` | `string` |
 | `locationAlternativeTextHeader.justifyContent` | `string` |
+| `locationAlternativeTextHeader.padding` | `string` |
+| `locationMapBase` | `Object` |
+| `locationMapBase.display` | `string` |
+| `locationMapBase.flexDirection` | `string` |
+| `locationMapBase.marginBottom` | `string` |
+| `locationMapCard` | `Object` |
+| `locationMapCard.&:focus, &:active` | `Object` |
+| `locationMapCard.&:focus, &:active.backgroundColor` | `string` |
+| `locationMapCard.&:hover` | `Object` |
+| `locationMapCard.&:hover.border` | `string` |
+| `locationMapCard.border` | `string` |
+| `locationMapCard.borderRadius` | `string` |
+| `locationMapCard.cursor` | `string` |
+| `locationMapCard.marginBottom` | `string` |
+| `locationMapCard.padding` | `string` |
+| `locationMapCard.width` | `string` |
+| `locationMapCardSelected` | `Object` |
+| `locationMapCardSelected.&:focus, &:active` | `Object` |
+| `locationMapCardSelected.&:focus, &:active.backgroundColor` | `string` |
+| `locationMapCardSelected.&:hover` | `Object` |
+| `locationMapCardSelected.&:hover.border` | `string` |
+| `locationMapCardSelected.backgroundColor` | `string` |
+| `locationMapCardSelected.border` | `string` |
+| `locationMapCardSelected.color` | `string` |
+| `locationMapCardSelected.cursor` | `string` |
+| `locationMapCardSubTitle` | `Object` |
+| `locationMapCardSubTitle.fontSize` | `string` |
+| `locationMapCardSubTitle.fontWeight` | `number` |
+| `locationMapCardTitle` | `Object` |
+| `locationMapCardTitle.fontSize` | `string` |
 | `locationMapContainer` | `Object` |
+| `locationMapContainer.flex` | `string` |
+| `locationMapContainer.height` | `string` |
+| `locationMapMenuContainer` | `Object` |
+| `locationMapMenuContainer.backgroundColor` | `string` |
+| `locationMapMenuContainer.border` | `string` |
+| `locationMapMenuContainer.flex` | `string` |
+| `locationMapMenuContainer.height` | `string` |
+| `locationMapMenuContainer.overflowX` | `string` |
+| `locationMapMenuContainer.overflowY` | `string` |
+| `locationMapMenuContainer.padding` | `string` |
+| `locationMapMenuContainerDropdownMode` | `Object` |
+| `locationMapMenuContainerDropdownMode.height` | `string` |
+| `locationMapMenuContainerDropdownMode.position` | `string` |
+| `locationMapMenuContainerDropdownMode.width` | `string` |
+| `locationMapMenuContainerDropdownMode.zIndex` | `number` |
 | `locationPlaceholder` | `Object` |
 | `locationPlaceholder.fontWeight` | `number` |
 | `locationPlaceholder.opacity` | `number` |
 | `resultListLabel` | `Object` |
-| `resultListLabel.borderLeft` | `string` |
 | `resultListLabel.fontWeight` | `number` |
-| `resultListLabel.marginLeft` | `string` |
-| `resultListLabel.paddingLeft` | `string` |
-| `textButton` | `Object` |
-| `textButton.alignItems` | `string` |
-| `textButton.border` | `string` |
-| `textButton.borderRadius` | `string` |
-| `textButton.display` | `string` |
-| `textButton.height` | `string` |
-| `textButton.justifyContent` | `string` |
-| `textButton.margin` | `string` |
-| `textButton.minWidth` | `string` |
-| `textButton.padding` | `string` |
+| `resultListLabel.padding` | `string` |
+| `smallAddornment` | (`isInvalid`: `boolean`) => { `color`: `string`  } |
 
 #### Defined in
 
-[client/fast-prototyping/renderers/PropertyEntry/PropertyEntryLocation.tsx:86](https://github.com/onzag/itemize/blob/5c2808d3/client/fast-prototyping/renderers/PropertyEntry/PropertyEntryLocation.tsx#L86)
+[client/fast-prototyping/renderers/PropertyEntry/PropertyEntryLocation.tsx:85](https://github.com/onzag/itemize/blob/f2db74a5/client/fast-prototyping/renderers/PropertyEntry/PropertyEntryLocation.tsx#L85)

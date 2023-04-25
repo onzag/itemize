@@ -23,6 +23,7 @@ in order to render with the given props
 
 - [context](client_internal_text_serializer_dynamic_component.ReactifiedElementWithHoverAndActive.md#context)
 - [props](client_internal_text_serializer_dynamic_component.ReactifiedElementWithHoverAndActive.md#props)
+- [refElement](client_internal_text_serializer_dynamic_component.ReactifiedElementWithHoverAndActive.md#refelement)
 - [refs](client_internal_text_serializer_dynamic_component.ReactifiedElementWithHoverAndActive.md#refs)
 - [state](client_internal_text_serializer_dynamic_component.ReactifiedElementWithHoverAndActive.md#state)
 - [contextType](client_internal_text_serializer_dynamic_component.ReactifiedElementWithHoverAndActive.md#contexttype)
@@ -40,6 +41,7 @@ in order to render with the given props
 - [componentWillUnmount](client_internal_text_serializer_dynamic_component.ReactifiedElementWithHoverAndActive.md#componentwillunmount)
 - [componentWillUpdate](client_internal_text_serializer_dynamic_component.ReactifiedElementWithHoverAndActive.md#componentwillupdate)
 - [forceUpdate](client_internal_text_serializer_dynamic_component.ReactifiedElementWithHoverAndActive.md#forceupdate)
+- [getElement](client_internal_text_serializer_dynamic_component.ReactifiedElementWithHoverAndActive.md#getelement)
 - [getSnapshotBeforeUpdate](client_internal_text_serializer_dynamic_component.ReactifiedElementWithHoverAndActive.md#getsnapshotbeforeupdate)
 - [onActiveEnd](client_internal_text_serializer_dynamic_component.ReactifiedElementWithHoverAndActive.md#onactiveend)
 - [onActiveStart](client_internal_text_serializer_dynamic_component.ReactifiedElementWithHoverAndActive.md#onactivestart)
@@ -67,7 +69,7 @@ React.PureComponent&lt;IReactifiedElementWithHoverAndActiveProps, IReactifiedEle
 
 #### Defined in
 
-[client/internal/text/serializer/dynamic-component.tsx:32](https://github.com/onzag/itemize/blob/5c2808d3/client/internal/text/serializer/dynamic-component.tsx#L32)
+[client/internal/text/serializer/dynamic-component.tsx:33](https://github.com/onzag/itemize/blob/f2db74a5/client/internal/text/serializer/dynamic-component.tsx#L33)
 
 ## Properties
 
@@ -110,6 +112,16 @@ React.PureComponent.props
 #### Defined in
 
 node_modules/@types/react/index.d.ts:504
+
+___
+
+### refElement
+
+• `Private` **refElement**: `RefObject`<`any`\>
+
+#### Defined in
+
+[client/internal/text/serializer/dynamic-component.tsx:32](https://github.com/onzag/itemize/blob/f2db74a5/client/internal/text/serializer/dynamic-component.tsx#L32)
 
 ___
 
@@ -528,6 +540,20 @@ node_modules/@types/react/index.d.ts:496
 
 ___
 
+### getElement
+
+▸ **getElement**(): `any`
+
+#### Returns
+
+`any`
+
+#### Defined in
+
+[client/internal/text/serializer/dynamic-component.tsx:79](https://github.com/onzag/itemize/blob/f2db74a5/client/internal/text/serializer/dynamic-component.tsx#L79)
+
+___
+
 ### getSnapshotBeforeUpdate
 
 ▸ `Optional` **getSnapshotBeforeUpdate**(`prevProps`, `prevState`): `any`
@@ -577,7 +603,7 @@ ___
 
 #### Defined in
 
-[client/internal/text/serializer/dynamic-component.tsx:70](https://github.com/onzag/itemize/blob/5c2808d3/client/internal/text/serializer/dynamic-component.tsx#L70)
+[client/internal/text/serializer/dynamic-component.tsx:71](https://github.com/onzag/itemize/blob/f2db74a5/client/internal/text/serializer/dynamic-component.tsx#L71)
 
 ___
 
@@ -598,7 +624,7 @@ ___
 
 #### Defined in
 
-[client/internal/text/serializer/dynamic-component.tsx:62](https://github.com/onzag/itemize/blob/5c2808d3/client/internal/text/serializer/dynamic-component.tsx#L62)
+[client/internal/text/serializer/dynamic-component.tsx:63](https://github.com/onzag/itemize/blob/f2db74a5/client/internal/text/serializer/dynamic-component.tsx#L63)
 
 ___
 
@@ -619,7 +645,7 @@ ___
 
 #### Defined in
 
-[client/internal/text/serializer/dynamic-component.tsx:54](https://github.com/onzag/itemize/blob/5c2808d3/client/internal/text/serializer/dynamic-component.tsx#L54)
+[client/internal/text/serializer/dynamic-component.tsx:55](https://github.com/onzag/itemize/blob/f2db74a5/client/internal/text/serializer/dynamic-component.tsx#L55)
 
 ___
 
@@ -640,7 +666,7 @@ ___
 
 #### Defined in
 
-[client/internal/text/serializer/dynamic-component.tsx:46](https://github.com/onzag/itemize/blob/5c2808d3/client/internal/text/serializer/dynamic-component.tsx#L46)
+[client/internal/text/serializer/dynamic-component.tsx:47](https://github.com/onzag/itemize/blob/f2db74a5/client/internal/text/serializer/dynamic-component.tsx#L47)
 
 ___
 
@@ -658,7 +684,7 @@ React.PureComponent.render
 
 #### Defined in
 
-[client/internal/text/serializer/dynamic-component.tsx:78](https://github.com/onzag/itemize/blob/5c2808d3/client/internal/text/serializer/dynamic-component.tsx#L78)
+[client/internal/text/serializer/dynamic-component.tsx:83](https://github.com/onzag/itemize/blob/f2db74a5/client/internal/text/serializer/dynamic-component.tsx#L83)
 
 ___
 

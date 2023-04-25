@@ -12,9 +12,11 @@ when it returns a bunch of records
 ### Properties
 
 - [count](gql_querier.IGQLSearchRecordsContainer.md#count)
+- [earliest\_created\_at](gql_querier.IGQLSearchRecordsContainer.md#earliest_created_at)
 - [last\_modified](gql_querier.IGQLSearchRecordsContainer.md#last_modified)
 - [limit](gql_querier.IGQLSearchRecordsContainer.md#limit)
 - [offset](gql_querier.IGQLSearchRecordsContainer.md#offset)
+- [oldest\_created\_at](gql_querier.IGQLSearchRecordsContainer.md#oldest_created_at)
 - [records](gql_querier.IGQLSearchRecordsContainer.md#records)
 
 ## Properties
@@ -25,7 +27,17 @@ when it returns a bunch of records
 
 #### Defined in
 
-[gql-querier.ts:47](https://github.com/onzag/itemize/blob/5c2808d3/gql-querier.ts#L47)
+[gql-querier.ts:49](https://github.com/onzag/itemize/blob/f2db74a5/gql-querier.ts#L49)
+
+___
+
+### earliest\_created\_at
+
+• **earliest\_created\_at**: `string`
+
+#### Defined in
+
+[gql-querier.ts:52](https://github.com/onzag/itemize/blob/f2db74a5/gql-querier.ts#L52)
 
 ___
 
@@ -35,7 +47,7 @@ ___
 
 #### Defined in
 
-[gql-querier.ts:46](https://github.com/onzag/itemize/blob/5c2808d3/gql-querier.ts#L46)
+[gql-querier.ts:48](https://github.com/onzag/itemize/blob/f2db74a5/gql-querier.ts#L48)
 
 ___
 
@@ -45,7 +57,7 @@ ___
 
 #### Defined in
 
-[gql-querier.ts:48](https://github.com/onzag/itemize/blob/5c2808d3/gql-querier.ts#L48)
+[gql-querier.ts:50](https://github.com/onzag/itemize/blob/f2db74a5/gql-querier.ts#L50)
 
 ___
 
@@ -55,7 +67,17 @@ ___
 
 #### Defined in
 
-[gql-querier.ts:49](https://github.com/onzag/itemize/blob/5c2808d3/gql-querier.ts#L49)
+[gql-querier.ts:51](https://github.com/onzag/itemize/blob/f2db74a5/gql-querier.ts#L51)
+
+___
+
+### oldest\_created\_at
+
+• **oldest\_created\_at**: `string`
+
+#### Defined in
+
+[gql-querier.ts:53](https://github.com/onzag/itemize/blob/f2db74a5/gql-querier.ts#L53)
 
 ___
 
@@ -65,4 +87,4 @@ ___
 
 #### Defined in
 
-[gql-querier.ts:45](https://github.com/onzag/itemize/blob/5c2808d3/gql-querier.ts#L45)
+[gql-querier.ts:47](https://github.com/onzag/itemize/blob/f2db74a5/gql-querier.ts#L47)

@@ -8,17 +8,24 @@
 
 - [MutatingFunctionArg](../classes/client_internal_text_serializer_template_args.MutatingFunctionArg.md)
 - [MutatingTemplateArgs](../classes/client_internal_text_serializer_template_args.MutatingTemplateArgs.md)
+- [NonRootInheritable](../classes/client_internal_text_serializer_template_args.NonRootInheritable.md)
 - [TemplateArgs](../classes/client_internal_text_serializer_template_args.TemplateArgs.md)
 
 ### Interfaces
 
+- [ITemplateArgBooleanDefinition](../interfaces/client_internal_text_serializer_template_args.ITemplateArgBooleanDefinition.md)
+- [ITemplateArgContextDefinition](../interfaces/client_internal_text_serializer_template_args.ITemplateArgContextDefinition.md)
+- [ITemplateArgFunctionDefinition](../interfaces/client_internal_text_serializer_template_args.ITemplateArgFunctionDefinition.md)
+- [ITemplateArgHTMLDefinition](../interfaces/client_internal_text_serializer_template_args.ITemplateArgHTMLDefinition.md)
+- [ITemplateArgLinkDefinition](../interfaces/client_internal_text_serializer_template_args.ITemplateArgLinkDefinition.md)
+- [ITemplateArgTextDefinition](../interfaces/client_internal_text_serializer_template_args.ITemplateArgTextDefinition.md)
+- [ITemplateArgUIHandlerDefinition](../interfaces/client_internal_text_serializer_template_args.ITemplateArgUIHandlerDefinition.md)
 - [ITemplateArgsProperties](../interfaces/client_internal_text_serializer_template_args.ITemplateArgsProperties.md)
 
 ### Type aliases
 
 - [TemplateArgFunctionalWrapperFn](client_internal_text_serializer_template_args.md#templateargfunctionalwrapperfn)
 - [TemplateArgMutatingWrapperFn](client_internal_text_serializer_template_args.md#templateargmutatingwrapperfn)
-- [TemplateArgStandardWrapperFn](client_internal_text_serializer_template_args.md#templateargstandardwrapperfn)
 
 ## Type aliases
 
@@ -43,7 +50,7 @@
 
 #### Defined in
 
-[client/internal/text/serializer/template-args.ts:117](https://github.com/onzag/itemize/blob/5c2808d3/client/internal/text/serializer/template-args.ts#L117)
+[client/internal/text/serializer/template-args.ts:170](https://github.com/onzag/itemize/blob/f2db74a5/client/internal/text/serializer/template-args.ts#L170)
 
 ___
 
@@ -59,7 +66,9 @@ Provides a function that returns the node that should be children of it
 in the case of setting mutating context it should be used as eg.
 
 new TemplateArgs({
-  myMutatingContext: new DynamicTemplateArgs(
+  name: new NonRootInheritable("jonh"),
+  person: true,
+  myMutatingContext: new MutatingTemplateArgs(
     (children) => {
       return (
         <ContextRetrieverWhatnot>
@@ -69,13 +78,28 @@ new TemplateArgs({
         </ContextRetrieverWhatnot>
       );
     }
+  ),
+  open: () => goTo("/cart"),
+  openMutating: new MutatingFunctionArg(
+    (children, fnKey) => {
+       return (
+          <ContextRetrieverWhatnot>
+            {(contextData) => (
+               // pass the function from a context
+               children(contextData[fnKey])
+            )}
+          </ContextRetrieverWhatnot>
+       )
+    }
   );
 });
 
 and for iterable
 
 new TemplateArgs({
-  myMutatingContext: new DynamicTemplateArgs(
+  name: new NonRootInheritable("jonh"),
+  person: true,
+  myMutatingContext: new MutatingTemplateArgs(
     (children) => {
       return (
         <ContextRetrieverWhatnot>
@@ -86,12 +110,27 @@ new TemplateArgs({
       );
     }
   );
+  open: () => goTo("/cart"),
+  openMutating: new MutatingFunctionArg(
+    (children, fnKey) => {
+       return (
+          <ContextRetrieverWhatnot>
+            {(contextData) => (
+               // pass the function from a context
+               children(contextData[fnKey])
+            )}
+          </ContextRetrieverWhatnot>
+       )
+    }
+  );
 });
 
 it's possible to double wrap on iterables
 
 new TemplateArgs({
-  myMutatingContext: new DynamicTemplateArgs(
+  name: new NonRootInheritable("jonh"),
+  person: true,
+  myMutatingContext: new MutatingTemplateArgs(
     (children) => {
       return (
         <ContextRetrieverWhatnot>
@@ -100,6 +139,19 @@ new TemplateArgs({
           )}
         </ContextRetrieverWhatnot>
       );
+    }
+  ),
+  open: () => goTo("/cart"),
+  openMutating: new MutatingFunctionArg(
+    (children, fnKey) => {
+       return (
+          <ContextRetrieverWhatnot>
+            {(contextData) => (
+               // pass the function from a context
+               children(contextData[fnKey])
+            )}
+          </ContextRetrieverWhatnot>
+       )
     }
   );
 });
@@ -116,31 +168,4 @@ new TemplateArgs({
 
 #### Defined in
 
-[client/internal/text/serializer/template-args.ts:86](https://github.com/onzag/itemize/blob/5c2808d3/client/internal/text/serializer/template-args.ts#L86)
-
-___
-
-### TemplateArgStandardWrapperFn
-
-Ƭ **TemplateArgStandardWrapperFn**: (`n`: `React.ReactNode`) => `React.ReactNode`
-
-#### Type declaration
-
-▸ (`n`): `React.ReactNode`
-
-Just takes a node and should return a node, allows everything within that context
-to be wrapped within this
-
-##### Parameters
-
-| Name | Type |
-| :------ | :------ |
-| `n` | `React.ReactNode` |
-
-##### Returns
-
-`React.ReactNode`
-
-#### Defined in
-
-[client/internal/text/serializer/template-args.ts:34](https://github.com/onzag/itemize/blob/5c2808d3/client/internal/text/serializer/template-args.ts#L34)
+[client/internal/text/serializer/template-args.ts:129](https://github.com/onzag/itemize/blob/f2db74a5/client/internal/text/serializer/template-args.ts#L129)

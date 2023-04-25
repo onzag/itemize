@@ -15,6 +15,7 @@ that is loaded
 ### Functions
 
 - [default](client_components_item_IdVersionRetriever.md#default)
+- [useIdVersionRetriever](client_components_item_IdVersionRetriever.md#useidversionretriever)
 
 ## Functions
 
@@ -40,4 +41,23 @@ a react component
 
 #### Defined in
 
-[client/components/item/IdVersionRetriever.tsx:65](https://github.com/onzag/itemize/blob/5c2808d3/client/components/item/IdVersionRetriever.tsx#L65)
+[client/components/item/IdVersionRetriever.tsx:65](https://github.com/onzag/itemize/blob/f2db74a5/client/components/item/IdVersionRetriever.tsx#L65)
+
+___
+
+### useIdVersionRetriever
+
+▸ **useIdVersionRetriever**(): `Object`
+
+#### Returns
+
+`Object`
+
+| Name | Type |
+| :------ | :------ |
+| `id` | `string` |
+| `version` | `string` |
+
+#### Defined in
+
+[client/components/item/IdVersionRetriever.tsx:75](https://github.com/onzag/itemize/blob/f2db74a5/client/components/item/IdVersionRetriever.tsx#L75)

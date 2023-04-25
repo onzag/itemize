@@ -29,7 +29,7 @@ Simply go back
 
 #### Defined in
 
-[client/components/navigation/index.tsx:148](https://github.com/onzag/itemize/blob/5c2808d3/client/components/navigation/index.tsx#L148)
+[client/components/navigation/index.tsx:148](https://github.com/onzag/itemize/blob/f2db74a5/client/components/navigation/index.tsx#L148)
 
 ___
 
@@ -54,7 +54,7 @@ is respected in the url
 
 #### Defined in
 
-[client/components/navigation/index.tsx:124](https://github.com/onzag/itemize/blob/5c2808d3/client/components/navigation/index.tsx#L124)
+[client/components/navigation/index.tsx:124](https://github.com/onzag/itemize/blob/f2db74a5/client/components/navigation/index.tsx#L124)
 
 ___
 
@@ -78,7 +78,7 @@ A very simple redirect that runs a history push or replace
 
 #### Defined in
 
-[client/components/navigation/index.tsx:109](https://github.com/onzag/itemize/blob/5c2808d3/client/components/navigation/index.tsx#L109)
+[client/components/navigation/index.tsx:109](https://github.com/onzag/itemize/blob/f2db74a5/client/components/navigation/index.tsx#L109)
 
 ___
 
@@ -109,7 +109,7 @@ instead rather than the internal history state
 
 #### Defined in
 
-[client/components/navigation/index.tsx:50](https://github.com/onzag/itemize/blob/5c2808d3/client/components/navigation/index.tsx#L50)
+[client/components/navigation/index.tsx:50](https://github.com/onzag/itemize/blob/f2db74a5/client/components/navigation/index.tsx#L50)
 
 ___
 
@@ -139,4 +139,4 @@ Allows to set the history state to a new state
 
 #### Defined in
 
-[client/components/navigation/index.tsx:17](https://github.com/onzag/itemize/blob/5c2808d3/client/components/navigation/index.tsx#L17)
+[client/components/navigation/index.tsx:17](https://github.com/onzag/itemize/blob/f2db74a5/client/components/navigation/index.tsx#L17)

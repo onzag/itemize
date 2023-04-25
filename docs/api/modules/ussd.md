@@ -17,13 +17,15 @@
 
 ### convertHTMLToUSSDTree
 
-▸ **convertHTMLToUSSDTree**(`node`): [`IUSSDChunk`](../interfaces/ussd.IUSSDChunk.md)
+▸ **convertHTMLToUSSDTree**(`node`, `root`, `lang`): [`IUSSDChunk`](../interfaces/ussd.IUSSDChunk.md)
 
 #### Parameters
 
 | Name | Type |
 | :------ | :------ |
 | `node` | `Node` |
+| `root` | [`default`](../classes/base_Root.default.md) |
+| `lang` | `string` |
 
 #### Returns
 
@@ -31,4 +33,4 @@
 
 #### Defined in
 
-[ussd/index.ts:66](https://github.com/onzag/itemize/blob/5c2808d3/ussd/index.ts#L66)
+[ussd/index.ts:50](https://github.com/onzag/itemize/blob/f2db74a5/ussd/index.ts#L50)

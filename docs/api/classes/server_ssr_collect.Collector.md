@@ -26,6 +26,7 @@ rendering of the app
 
 - [appData](server_ssr_collect.Collector.md#appdata)
 - [appliedRule](server_ssr_collect.Collector.md#appliedrule)
+- [collectionData](server_ssr_collect.Collector.md#collectiondata)
 - [collectionRequestsCbs](server_ssr_collect.Collector.md#collectionrequestscbs)
 - [collectionRequestsRejectedCbs](server_ssr_collect.Collector.md#collectionrequestsrejectedcbs)
 - [collectionStatuses](server_ssr_collect.Collector.md#collectionstatuses)
@@ -62,7 +63,7 @@ Builds a new collector
 
 #### Defined in
 
-[server/ssr/collect.ts:101](https://github.com/onzag/itemize/blob/5c2808d3/server/ssr/collect.ts#L101)
+[server/ssr/collect.ts:150](https://github.com/onzag/itemize/blob/f2db74a5/server/ssr/collect.ts#L150)
 
 ## Properties
 
@@ -75,7 +76,7 @@ this
 
 #### Defined in
 
-[server/ssr/collect.ts:84](https://github.com/onzag/itemize/blob/5c2808d3/server/ssr/collect.ts#L84)
+[server/ssr/collect.ts:133](https://github.com/onzag/itemize/blob/f2db74a5/server/ssr/collect.ts#L133)
 
 ___
 
@@ -87,7 +88,23 @@ The SSR rule that is being used
 
 #### Defined in
 
-[server/ssr/collect.ts:88](https://github.com/onzag/itemize/blob/5c2808d3/server/ssr/collect.ts#L88)
+[server/ssr/collect.ts:137](https://github.com/onzag/itemize/blob/f2db74a5/server/ssr/collect.ts#L137)
+
+___
+
+### collectionData
+
+• `Private` **collectionData**: `Object` = `{}`
+
+All the collection statuses per result
+
+#### Index signature
+
+▪ [mergedID: `string`]: `any`
+
+#### Defined in
+
+[server/ssr/collect.ts:110](https://github.com/onzag/itemize/blob/f2db74a5/server/ssr/collect.ts#L110)
 
 ___
 
@@ -102,11 +119,11 @@ for collection for the same item
 
 #### Index signature
 
-▪ [mergedID: `string`]: () => `void`[]
+▪ [mergedID: `string`]: (`data?`: `any`) => `void`[]
 
 #### Defined in
 
-[server/ssr/collect.ts:70](https://github.com/onzag/itemize/blob/5c2808d3/server/ssr/collect.ts#L70)
+[server/ssr/collect.ts:119](https://github.com/onzag/itemize/blob/f2db74a5/server/ssr/collect.ts#L119)
 
 ___
 
@@ -118,11 +135,11 @@ Same but gives a rejected promise instead
 
 #### Index signature
 
-▪ [mergedID: `string`]: () => `void`[]
+▪ [mergedID: `string`]: (`data?`: `any`) => `void`[]
 
 #### Defined in
 
-[server/ssr/collect.ts:76](https://github.com/onzag/itemize/blob/5c2808d3/server/ssr/collect.ts#L76)
+[server/ssr/collect.ts:125](https://github.com/onzag/itemize/blob/f2db74a5/server/ssr/collect.ts#L125)
 
 ___
 
@@ -138,7 +155,7 @@ All the collection statuses per result
 
 #### Defined in
 
-[server/ssr/collect.ts:61](https://github.com/onzag/itemize/blob/5c2808d3/server/ssr/collect.ts#L61)
+[server/ssr/collect.ts:104](https://github.com/onzag/itemize/blob/f2db74a5/server/ssr/collect.ts#L104)
 
 ___
 
@@ -152,25 +169,25 @@ rule or because of read triggers
 
 #### Defined in
 
-[server/ssr/collect.ts:94](https://github.com/onzag/itemize/blob/5c2808d3/server/ssr/collect.ts#L94)
+[server/ssr/collect.ts:143](https://github.com/onzag/itemize/blob/f2db74a5/server/ssr/collect.ts#L143)
 
 ___
 
 ### results
 
-• `Private` **results**: [`ICollectionResult`](../interfaces/server_ssr_collect.ICollectionResult.md)[] = `[]`
+• `Private` **results**: ([`IQueryCollectionResult`](../interfaces/server_ssr_collect.IQueryCollectionResult.md) \| [`ISearchCollectionResult`](../interfaces/server_ssr_collect.ISearchCollectionResult.md) \| `IInternalResourceCollectionResult`)[] = `[]`
 
 Represents all the collected results
 
 #### Defined in
 
-[server/ssr/collect.ts:57](https://github.com/onzag/itemize/blob/5c2808d3/server/ssr/collect.ts#L57)
+[server/ssr/collect.ts:100](https://github.com/onzag/itemize/blob/f2db74a5/server/ssr/collect.ts#L100)
 
 ## Methods
 
 ### collect
 
-▸ **collect**(`idef`, `id`, `version`): `Promise`<`void`\>
+▸ **collect**(`idef`, `id`, `version`, `requestFields`): `Promise`<`void`\>
 
 This is the actual collection function and it is what is called
 by the beforeSSRRender function in the custom build on the server side
@@ -182,6 +199,7 @@ by the beforeSSRRender function in the custom build on the server side
 | `idef` | [`default`](base_Root_Module_ItemDefinition.default.md) | the item definition in question |
 | `id` | `string` | the id we want |
 | `version` | `string` | the version we want |
+| `requestFields` | [`IGQLRequestFields`](../interfaces/gql_querier.IGQLRequestFields.md) | - |
 
 #### Returns
 
@@ -189,7 +207,7 @@ by the beforeSSRRender function in the custom build on the server side
 
 #### Defined in
 
-[server/ssr/collect.ts:233](https://github.com/onzag/itemize/blob/5c2808d3/server/ssr/collect.ts#L233)
+[server/ssr/collect.ts:615](https://github.com/onzag/itemize/blob/f2db74a5/server/ssr/collect.ts#L615)
 
 ___
 
@@ -202,7 +220,7 @@ ___
 | Name | Type |
 | :------ | :------ |
 | `finalPath` | `string` |
-| `customResolver` | (`appData`: [`IAppDataType`](../interfaces/server.IAppDataType.md)) => `Promise`<`string`\> |
+| `customResolver` | (`appData`: [`IAppDataType`](../interfaces/server.IAppDataType.md)) => `Promise`<[`IResourceCollectionResult`](../interfaces/server_ssr_collect.IResourceCollectionResult.md)\> |
 
 #### Returns
 
@@ -210,7 +228,7 @@ ___
 
 #### Defined in
 
-[server/ssr/collect.ts:180](https://github.com/onzag/itemize/blob/5c2808d3/server/ssr/collect.ts#L180)
+[server/ssr/collect.ts:234](https://github.com/onzag/itemize/blob/f2db74a5/server/ssr/collect.ts#L234)
 
 ___
 
@@ -233,7 +251,7 @@ ___
 
 #### Defined in
 
-[server/ssr/collect.ts:196](https://github.com/onzag/itemize/blob/5c2808d3/server/ssr/collect.ts#L196)
+[server/ssr/collect.ts:355](https://github.com/onzag/itemize/blob/f2db74a5/server/ssr/collect.ts#L355)
 
 ___
 
@@ -251,7 +269,7 @@ constains this forbidden information
 
 #### Defined in
 
-[server/ssr/collect.ts:169](https://github.com/onzag/itemize/blob/5c2808d3/server/ssr/collect.ts#L169)
+[server/ssr/collect.ts:223](https://github.com/onzag/itemize/blob/f2db74a5/server/ssr/collect.ts#L223)
 
 ___
 
@@ -269,7 +287,7 @@ was built at if nothing else is found
 
 #### Defined in
 
-[server/ssr/collect.ts:115](https://github.com/onzag/itemize/blob/5c2808d3/server/ssr/collect.ts#L115)
+[server/ssr/collect.ts:164](https://github.com/onzag/itemize/blob/f2db74a5/server/ssr/collect.ts#L164)
 
 ___
 
@@ -285,39 +303,39 @@ Provides all the resulting queries for use in the client side
 
 #### Defined in
 
-[server/ssr/collect.ts:132](https://github.com/onzag/itemize/blob/5c2808d3/server/ssr/collect.ts#L132)
+[server/ssr/collect.ts:179](https://github.com/onzag/itemize/blob/f2db74a5/server/ssr/collect.ts#L179)
 
 ___
 
 ### getResources
 
-▸ **getResources**(): `void`
+▸ **getResources**(): [`ISSRCollectedResourcesType`](../interfaces/client_internal_providers_ssr_provider.ISSRCollectedResourcesType.md)
 
-TODO
+Provides the map of all the resulting resources that were fetched
 
 #### Returns
 
-`void`
+[`ISSRCollectedResourcesType`](../interfaces/client_internal_providers_ssr_provider.ISSRCollectedResourcesType.md)
 
 #### Defined in
 
-[server/ssr/collect.ts:147](https://github.com/onzag/itemize/blob/5c2808d3/server/ssr/collect.ts#L147)
+[server/ssr/collect.ts:197](https://github.com/onzag/itemize/blob/f2db74a5/server/ssr/collect.ts#L197)
 
 ___
 
 ### getSearches
 
-▸ **getSearches**(): `void`
+▸ **getSearches**(): [`ISSRCollectedSearchType`](../interfaces/client_internal_providers_ssr_provider.ISSRCollectedSearchType.md)[]
 
-TODO
+Provides all the resulting searches for use in the client side
 
 #### Returns
 
-`void`
+[`ISSRCollectedSearchType`](../interfaces/client_internal_providers_ssr_provider.ISSRCollectedSearchType.md)[]
 
 #### Defined in
 
-[server/ssr/collect.ts:140](https://github.com/onzag/itemize/blob/5c2808d3/server/ssr/collect.ts#L140)
+[server/ssr/collect.ts:190](https://github.com/onzag/itemize/blob/f2db74a5/server/ssr/collect.ts#L190)
 
 ___
 
@@ -335,7 +353,7 @@ the mode it was rendered at for it
 
 #### Defined in
 
-[server/ssr/collect.ts:156](https://github.com/onzag/itemize/blob/5c2808d3/server/ssr/collect.ts#L156)
+[server/ssr/collect.ts:210](https://github.com/onzag/itemize/blob/f2db74a5/server/ssr/collect.ts#L210)
 
 ___
 
@@ -351,4 +369,4 @@ Informs whether the collection caught up forbidden resources
 
 #### Defined in
 
-[server/ssr/collect.ts:176](https://github.com/onzag/itemize/blob/5c2808d3/server/ssr/collect.ts#L176)
+[server/ssr/collect.ts:230](https://github.com/onzag/itemize/blob/f2db74a5/server/ssr/collect.ts#L230)

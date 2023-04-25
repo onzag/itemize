@@ -61,7 +61,7 @@ React.PureComponent&lt;ICurrentElementRetrieverProps\&gt;.constructor
 
 #### Defined in
 
-[client/fast-prototyping/components/slate/current-element.tsx:24](https://github.com/onzag/itemize/blob/5c2808d3/client/fast-prototyping/components/slate/current-element.tsx#L24)
+[client/fast-prototyping/components/slate/current-element.tsx:49](https://github.com/onzag/itemize/blob/f2db74a5/client/fast-prototyping/components/slate/current-element.tsx#L49)
 
 ## Properties
 
@@ -500,21 +500,21 @@ ___
 
 ### consume
 
-▸ **consume**(`element`): `any`
+▸ **consume**(`selection`): `Element`
 
 #### Parameters
 
 | Name | Type |
 | :------ | :------ |
-| `element` | [`RichElement`](../modules/client_internal_text_serializer.md#richelement) |
+| `selection` | `ICurrentelementProviderProps` |
 
 #### Returns
 
-`any`
+`Element`
 
 #### Defined in
 
-[client/fast-prototyping/components/slate/current-element.tsx:30](https://github.com/onzag/itemize/blob/5c2808d3/client/fast-prototyping/components/slate/current-element.tsx#L30)
+[client/fast-prototyping/components/slate/current-element.tsx:55](https://github.com/onzag/itemize/blob/f2db74a5/client/fast-prototyping/components/slate/current-element.tsx#L55)
 
 ___
 
@@ -588,7 +588,7 @@ React.PureComponent.render
 
 #### Defined in
 
-[client/fast-prototyping/components/slate/current-element.tsx:34](https://github.com/onzag/itemize/blob/5c2808d3/client/fast-prototyping/components/slate/current-element.tsx#L34)
+[client/fast-prototyping/components/slate/current-element.tsx:85](https://github.com/onzag/itemize/blob/f2db74a5/client/fast-prototyping/components/slate/current-element.tsx#L85)
 
 ___
 

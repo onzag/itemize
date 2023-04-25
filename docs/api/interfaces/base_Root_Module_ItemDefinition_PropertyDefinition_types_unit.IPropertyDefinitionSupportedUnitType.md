@@ -25,7 +25,7 @@ in a normalized unit as specified
 
 #### Defined in
 
-[base/Root/Module/ItemDefinition/PropertyDefinition/types/unit.ts:37](https://github.com/onzag/itemize/blob/5c2808d3/base/Root/Module/ItemDefinition/PropertyDefinition/types/unit.ts#L37)
+[base/Root/Module/ItemDefinition/PropertyDefinition/types/unit.ts:37](https://github.com/onzag/itemize/blob/f2db74a5/base/Root/Module/ItemDefinition/PropertyDefinition/types/unit.ts#L37)
 
 ___
 
@@ -35,7 +35,7 @@ ___
 
 #### Defined in
 
-[base/Root/Module/ItemDefinition/PropertyDefinition/types/unit.ts:36](https://github.com/onzag/itemize/blob/5c2808d3/base/Root/Module/ItemDefinition/PropertyDefinition/types/unit.ts#L36)
+[base/Root/Module/ItemDefinition/PropertyDefinition/types/unit.ts:36](https://github.com/onzag/itemize/blob/f2db74a5/base/Root/Module/ItemDefinition/PropertyDefinition/types/unit.ts#L36)
 
 ___
 
@@ -45,7 +45,7 @@ ___
 
 #### Defined in
 
-[base/Root/Module/ItemDefinition/PropertyDefinition/types/unit.ts:35](https://github.com/onzag/itemize/blob/5c2808d3/base/Root/Module/ItemDefinition/PropertyDefinition/types/unit.ts#L35)
+[base/Root/Module/ItemDefinition/PropertyDefinition/types/unit.ts:35](https://github.com/onzag/itemize/blob/f2db74a5/base/Root/Module/ItemDefinition/PropertyDefinition/types/unit.ts#L35)
 
 ___
 
@@ -55,4 +55,4 @@ ___
 
 #### Defined in
 
-[base/Root/Module/ItemDefinition/PropertyDefinition/types/unit.ts:34](https://github.com/onzag/itemize/blob/5c2808d3/base/Root/Module/ItemDefinition/PropertyDefinition/types/unit.ts#L34)
+[base/Root/Module/ItemDefinition/PropertyDefinition/types/unit.ts:34](https://github.com/onzag/itemize/blob/f2db74a5/base/Root/Module/ItemDefinition/PropertyDefinition/types/unit.ts#L34)

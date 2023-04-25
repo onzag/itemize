@@ -62,7 +62,7 @@ React.PureComponent&lt;ISnackbarProps\&gt;.constructor
 
 #### Defined in
 
-[client/fast-prototyping/components/snackbar.tsx:77](https://github.com/onzag/itemize/blob/5c2808d3/client/fast-prototyping/components/snackbar.tsx#L77)
+[client/fast-prototyping/components/snackbar.tsx:90](https://github.com/onzag/itemize/blob/f2db74a5/client/fast-prototyping/components/snackbar.tsx#L90)
 
 ## Properties
 
@@ -441,22 +441,19 @@ ___
 
 ### componentWillUnmount
 
-▸ `Optional` **componentWillUnmount**(): `void`
-
-Called immediately before a component is destroyed. Perform any necessary cleanup in this method, such as
-cancelled network requests, or cleaning up any DOM elements created in `componentDidMount`.
+▸ **componentWillUnmount**(): `void`
 
 #### Returns
 
 `void`
 
-#### Inherited from
+#### Overrides
 
 React.PureComponent.componentWillUnmount
 
 #### Defined in
 
-node_modules/@types/react/index.d.ts:641
+[client/fast-prototyping/components/snackbar.tsx:93](https://github.com/onzag/itemize/blob/f2db74a5/client/fast-prototyping/components/snackbar.tsx#L93)
 
 ___
 
@@ -569,7 +566,7 @@ React.PureComponent.render
 
 #### Defined in
 
-[client/fast-prototyping/components/snackbar.tsx:80](https://github.com/onzag/itemize/blob/5c2808d3/client/fast-prototyping/components/snackbar.tsx#L80)
+[client/fast-prototyping/components/snackbar.tsx:98](https://github.com/onzag/itemize/blob/f2db74a5/client/fast-prototyping/components/snackbar.tsx#L98)
 
 ___
 

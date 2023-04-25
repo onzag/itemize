@@ -30,7 +30,7 @@ be defined in the json form
 | `definitions` | `Object` |
 | `definitions.ConditionalRuleSet` | `Object` |
 | `definitions.ConditionalRuleSet.$id` | `string` |
-| `definitions.ConditionalRuleSet.oneOf` | ({ `additionalProperties`: `boolean` = false; `dependencies`: { `condition`: `string`[] ; `gate`: `string`[]  } ; `properties`: { `attribute`: { `type`: `string` = "string" } ; `comparator`: { `enum`: `string`[] = comparators; `type`: `string` = "string" } ; `component`: `undefined` ; `condition`: { `$ref`: `string` = "ConditionalRuleSet" } ; `gate`: { `enum`: `string`[] = gates; `type`: `string` = "string" } ; `isIncluded`: `undefined` ; `method`: { `enum`: `string`[] = methods; `type`: `string` = "string" } ; `property`: { `pattern`: `string` = "^[a-z\_]+$\|^&this$"; `type`: `string` = "string" } ; `serverFlag`: { `enum`: `string`[] = serverFlags; `type`: `string` = "string" } ; `value`: { `oneOf`: ({ `additionalProperties`: `boolean` = false; `properties`: { `exactValue`: `undefined` = {}; `property`: { `pattern`: `string` = "^[a-z\_]+$"; `type`: `string` = "string" }  } ; `required`: `string`[]  } \| { `additionalProperties`: `boolean` = false; `properties`: { `exactValue`: {} = {}; `property`: `undefined`  } ; `required`: `string`[]  })[] ; `type`: `string` = "object" } ; `valueAttribute`: { `type`: `string` = "string" }  } ; `required`: `string`[]  } \| { `additionalProperties`: `boolean` = false; `dependencies`: { `condition`: `string`[] ; `gate`: `string`[]  } ; `properties`: { `attribute`: `undefined` ; `comparator`: `undefined` ; `component`: { `type`: `string` = "string" } ; `condition`: { `$ref`: `string` = "ConditionalRuleSet" } ; `gate`: { `enum`: `string`[] = gates; `type`: `string` = "string" } ; `isIncluded`: { `type`: `string` = "boolean" } ; `method`: `undefined` ; `property`: `undefined` ; `serverFlag`: { `enum`: `string`[] = serverFlags; `type`: `string` = "string" } ; `value`: `undefined` ; `valueAttribute`: `undefined`  } ; `required`: `string`[]  })[] |
+| `definitions.ConditionalRuleSet.oneOf` | ({ `additionalProperties`: `boolean` = false; `dependencies`: { `condition`: `string`[] ; `gate`: `string`[]  } ; `properties`: { `attribute`: { `type`: `string` = "string" } ; `comparator`: { `enum`: `string`[] = comparators; `type`: `string` = "string" } ; `component`: `undefined` ; `condition`: { `oneOf`: ({ `$ref`: `string` = "ConditionalRuleSet"; `items`: `undefined` ; `type`: `undefined` = "array" } \| { `$ref`: `undefined` = "ConditionalRuleSet"; `items`: { `$ref`: `string` = "ConditionalRuleSet" } ; `type`: `string` = "array" })[]  } ; `gate`: { `enum`: `string`[] = gates; `type`: `string` = "string" } ; `internalConditionGate`: { `enum`: `string`[] = gates; `type`: `string` = "string" } ; `isIncluded`: `undefined` ; `method`: { `enum`: `string`[] = methods; `type`: `string` = "string" } ; `property`: { `pattern`: `string` = "^[a-z\_]+$\|^&this$"; `type`: `string` = "string" } ; `serverFlag`: { `enum`: `string`[] = serverFlags; `type`: `string` = "string" } ; `value`: { `oneOf`: ({ `additionalProperties`: `boolean` = false; `properties`: { `exactValue`: `undefined` = {}; `property`: { `pattern`: `string` = "^[a-z\_]+$"; `type`: `string` = "string" }  } ; `required`: `string`[]  } \| { `additionalProperties`: `boolean` = false; `properties`: { `exactValue`: {} = {}; `property`: `undefined`  } ; `required`: `string`[]  })[] ; `type`: `string` = "object" } ; `valueAttribute`: { `type`: `string` = "string" }  } ; `required`: `string`[]  } \| { `additionalProperties`: `boolean` = false; `dependencies`: { `condition`: `string`[] ; `gate`: `string`[]  } ; `properties`: { `attribute`: `undefined` ; `comparator`: `undefined` ; `component`: { `type`: `string` = "string" } ; `condition`: { `oneOf`: ({ `$ref`: `string` = "ConditionalRuleSet"; `items`: `undefined` ; `type`: `undefined` = "array" } \| { `$ref`: `undefined` = "ConditionalRuleSet"; `items`: { `$ref`: `string` = "ConditionalRuleSet" } ; `type`: `string` = "array" })[]  } ; `gate`: { `enum`: `string`[] = gates; `type`: `string` = "string" } ; `internalConditionGate`: { `enum`: `string`[] = gates; `type`: `string` = "string" } ; `isIncluded`: { `type`: `string` = "boolean" } ; `method`: `undefined` ; `property`: `undefined` ; `serverFlag`: { `enum`: `string`[] = serverFlags; `type`: `string` = "string" } ; `value`: `undefined` ; `valueAttribute`: `undefined`  } ; `required`: `string`[]  } \| { `additionalProperties`: `boolean` = false; `dependencies`: { `condition`: `string`[] ; `gate`: `string`[]  } ; `properties`: { `attribute`: `undefined` ; `comparator`: `undefined` ; `component`: `undefined` ; `condition`: { `oneOf`: ({ `$ref`: `string` = "ConditionalRuleSet"; `items`: `undefined` ; `type`: `undefined` = "array" } \| { `$ref`: `undefined` = "ConditionalRuleSet"; `items`: { `$ref`: `string` = "ConditionalRuleSet" } ; `type`: `string` = "array" })[]  } ; `gate`: { `enum`: `string`[] = gates; `type`: `string` = "string" } ; `internalConditionGate`: { `enum`: `string`[] = gates; `type`: `string` = "string" } ; `isIncluded`: `undefined` ; `method`: `undefined` ; `property`: `undefined` ; `serverFlag`: { `enum`: `string`[] = serverFlags; `type`: `string` = "string" } ; `value`: `undefined` ; `valueAttribute`: `undefined`  } ; `required`: `undefined`  })[] |
 | `definitions.ConditionalRuleSet.type` | `string` |
 | `properties` | `Object` |
 | `properties.coerceNullsIntoDefault` | `Object` |
@@ -50,6 +50,8 @@ be defined in the json form
 | `properties.defaultIf.items.required` | `string`[] |
 | `properties.defaultIf.items.type` | `string` |
 | `properties.defaultIf.type` | `string` |
+| `properties.description` | `Object` |
+| `properties.description.type` | `string` |
 | `properties.disableRangedSearch` | `Object` |
 | `properties.disableRangedSearch.type` | `string` |
 | `properties.disableRetrieval` | `Object` |
@@ -75,8 +77,6 @@ be defined in the json form
 | `properties.hiddenIf.$ref` | `string` |
 | `properties.hiddenIfEnforced` | `Object` |
 | `properties.hiddenIfEnforced.type` | `string` |
-| `properties.htmlAutocomplete` | `Object` |
-| `properties.htmlAutocomplete.type` | `string` |
 | `properties.i18nData` | `Object` |
 | `properties.i18nData.type` | `string` |
 | `properties.id` | `Object` |
@@ -130,6 +130,8 @@ be defined in the json form
 | `properties.searchDefaultIf.items.required` | `string`[] |
 | `properties.searchDefaultIf.items.type` | `string` |
 | `properties.searchDefaultIf.type` | `string` |
+| `properties.searchEngineBoost` | `Object` |
+| `properties.searchEngineBoost.type` | `string` |
 | `properties.searchHidden` | `Object` |
 | `properties.searchHidden.type` | `string` |
 | `properties.searchHiddenIf` | `Object` |
@@ -191,4 +193,4 @@ for use with property set
 
 #### Defined in
 
-[base/Root/Module/ItemDefinition/PropertyDefinition/schema.ts:14](https://github.com/onzag/itemize/blob/5c2808d3/base/Root/Module/ItemDefinition/PropertyDefinition/schema.ts#L14)
+[base/Root/Module/ItemDefinition/PropertyDefinition/schema.ts:14](https://github.com/onzag/itemize/blob/f2db74a5/base/Root/Module/ItemDefinition/PropertyDefinition/schema.ts#L14)

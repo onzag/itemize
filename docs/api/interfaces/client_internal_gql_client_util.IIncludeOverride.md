@@ -20,7 +20,7 @@
 
 #### Defined in
 
-[client/internal/gql-client-util.ts:111](https://github.com/onzag/itemize/blob/5c2808d3/client/internal/gql-client-util.ts#L111)
+[client/internal/gql-client-util.ts:178](https://github.com/onzag/itemize/blob/f2db74a5/client/internal/gql-client-util.ts#L178)
 
 ___
 
@@ -30,7 +30,7 @@ ___
 
 #### Defined in
 
-[client/internal/gql-client-util.ts:110](https://github.com/onzag/itemize/blob/5c2808d3/client/internal/gql-client-util.ts#L110)
+[client/internal/gql-client-util.ts:177](https://github.com/onzag/itemize/blob/f2db74a5/client/internal/gql-client-util.ts#L177)
 
 ___
 
@@ -40,4 +40,4 @@ ___
 
 #### Defined in
 
-[client/internal/gql-client-util.ts:112](https://github.com/onzag/itemize/blob/5c2808d3/client/internal/gql-client-util.ts#L112)
+[client/internal/gql-client-util.ts:179](https://github.com/onzag/itemize/blob/f2db74a5/client/internal/gql-client-util.ts#L179)

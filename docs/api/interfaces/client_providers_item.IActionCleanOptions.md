@@ -4,6 +4,8 @@
 
 [client/providers/item](../modules/client_providers_item.md).IActionCleanOptions
 
+The clean options offered during execution
+
 ## Hierarchy
 
 - **`IActionCleanOptions`**
@@ -46,11 +48,14 @@
 
 • `Optional` **cleanSearchResultsOnAny**: `boolean`
 
-cleans the search results
+cleans the search results when the action is completed
+
+The search results were retrieved using automatic search or the search actioner, this allows to clean them
+once the action is completed
 
 #### Defined in
 
-[client/providers/item.tsx:251](https://github.com/onzag/itemize/blob/5c2808d3/client/providers/item.tsx#L251)
+[client/providers/item.tsx:291](https://github.com/onzag/itemize/blob/f2db74a5/client/providers/item.tsx#L291)
 
 ___
 
@@ -58,11 +63,14 @@ ___
 
 • `Optional` **cleanSearchResultsOnFailure**: `boolean`
 
-cleans the search results
+cleans the search results when the action is completed and it FAILED
+
+The search results were retrieved using automatic search or the search actioner, this allows to clean them
+once the action is completed
 
 #### Defined in
 
-[client/providers/item.tsx:255](https://github.com/onzag/itemize/blob/5c2808d3/client/providers/item.tsx#L255)
+[client/providers/item.tsx:298](https://github.com/onzag/itemize/blob/f2db74a5/client/providers/item.tsx#L298)
 
 ___
 
@@ -70,11 +78,14 @@ ___
 
 • `Optional` **cleanSearchResultsOnSuccess**: `boolean`
 
-cleans the search results
+cleans the search results when the action is completed and it SUCCEEDS
+
+The search results were retrieved using automatic search or the search actioner, this allows to clean them
+once the action is completed
 
 #### Defined in
 
-[client/providers/item.tsx:247](https://github.com/onzag/itemize/blob/5c2808d3/client/providers/item.tsx#L247)
+[client/providers/item.tsx:284](https://github.com/onzag/itemize/blob/f2db74a5/client/providers/item.tsx#L284)
 
 ___
 
@@ -82,16 +93,19 @@ ___
 
 • `Optional` **cleanStateOnAny**: `boolean`
 
-Warning, clean state on success might not clean anything
-if the cleaning is blocked from happening, this is because
-other item provider is expecting to use the same value
-always use propertiesToRestoreOn* in order to strip critical
-data (eg. passwords) clean state is used for a memory relief
-and itemize might decide that it's better not to provide it
+Cleans the state back to all nulls, and destroys the current
+applied value from the server, it wipes the data and clear memory
+
+Warning, clean state might not clean anything
+if the cleaning is blocked from happening by other providers that are using the same data; this is because
+cleaning state releases all the memory and its applied value and it's basically used as such; to discard a value
+but it's not possible to release the state for an applied value if other item provider is accessing such
+state at the same time, always use propertiesToRestoreOn* when it's simply about restoring the value
+back to empty or what they used to be as it may otherwise do nothing, cleaning IS NOT RELIABLE
 
 #### Defined in
 
-[client/providers/item.tsx:297](https://github.com/onzag/itemize/blob/5c2808d3/client/providers/item.tsx#L297)
+[client/providers/item.tsx:349](https://github.com/onzag/itemize/blob/f2db74a5/client/providers/item.tsx#L349)
 
 ___
 
@@ -99,16 +113,19 @@ ___
 
 • `Optional` **cleanStateOnFailure**: `boolean`
 
-Warning, clean state on success might not clean anything
-if the cleaning is blocked from happening, this is because
-other item provider is expecting to use the same value
-always use propertiesToRestoreOn* in order to strip critical
-data (eg. passwords) clean state is used for a memory relief
-and itemize might decide that it's better not to provide it
+Cleans the state back to all nulls on failure, and destroys the current
+applied value from the server, it wipes the data and clear memory
+
+Warning, clean state on failure might not clean anything
+if the cleaning is blocked from happening by other providers that are using the same data; this is because
+cleaning state releases all the memory and its applied value and it's basically used as such; to discard a value
+but it's not possible to release the state for an applied value if other item provider is accessing such
+state at the same time, always use propertiesToRestoreOn* when it's simply about restoring the value
+back to empty or what they used to be as it may otherwise do nothing, cleaning IS NOT RELIABLE
 
 #### Defined in
 
-[client/providers/item.tsx:288](https://github.com/onzag/itemize/blob/5c2808d3/client/providers/item.tsx#L288)
+[client/providers/item.tsx:337](https://github.com/onzag/itemize/blob/f2db74a5/client/providers/item.tsx#L337)
 
 ___
 
@@ -116,16 +133,19 @@ ___
 
 • `Optional` **cleanStateOnSuccess**: `boolean`
 
+Cleans the state back to all nulls on success, and destroys the current
+applied value from the server, it wipes the data and clear memory
+
 Warning, clean state on success might not clean anything
-if the cleaning is blocked from happening, this is because
-other item provider is expecting to use the same value
-always use propertiesToRestoreOn* in order to strip critical
-data (eg. passwords) clean state is used for a memory relief
-and itemize might decide that it's better not to provide it
+if the cleaning is blocked from happening by other providers that are using the same data; this is because
+cleaning state releases all the memory and its applied value and it's basically used as such; to discard a value
+but it's not possible to release the state for an applied value if other item provider is accessing such
+state at the same time, always use propertiesToRestoreOn* when it's simply about restoring the value
+back to empty or what they used to be as it may otherwise do nothing, cleaning IS NOT RELIABLE
 
 #### Defined in
 
-[client/providers/item.tsx:279](https://github.com/onzag/itemize/blob/5c2808d3/client/providers/item.tsx#L279)
+[client/providers/item.tsx:325](https://github.com/onzag/itemize/blob/f2db74a5/client/providers/item.tsx#L325)
 
 ___
 
@@ -133,12 +153,16 @@ ___
 
 • `Optional` **includesToRestoreOnAny**: `string`[]
 
-Restores the value of an include back to its applied value
-or null if it doesn't have such
+Restores the value of an include and all its sinking properties back to its applied value after the action is completed
+as in the value that was retrieved from the server (or null if no value is loaded)
+
+This is useful to keep unmodified states during adding, editing or even deleted
+the value that is restored is the last value loaded, and since the action occurs
+after the action is performed it will apply to that value
 
 #### Defined in
 
-[client/providers/item.tsx:226](https://github.com/onzag/itemize/blob/5c2808d3/client/providers/item.tsx#L226)
+[client/providers/item.tsx:241](https://github.com/onzag/itemize/blob/f2db74a5/client/providers/item.tsx#L241)
 
 ___
 
@@ -146,12 +170,16 @@ ___
 
 • `Optional` **includesToRestoreOnFailure**: `string`[]
 
-Restores the value of an include back to its applied value
-or null if it doesn't have such
+Restores the value of an include and all its sinking properties back to its applied value after the action is completed and FAILED
+as in the value that was retrieved from the server (or null if no value is loaded)
+
+This is useful to keep unmodified states during adding, editing or even deleted
+the value that is restored is the last value loaded, and since the action occurs
+after the action is performed it will apply to that value
 
 #### Defined in
 
-[client/providers/item.tsx:231](https://github.com/onzag/itemize/blob/5c2808d3/client/providers/item.tsx#L231)
+[client/providers/item.tsx:250](https://github.com/onzag/itemize/blob/f2db74a5/client/providers/item.tsx#L250)
 
 ___
 
@@ -159,12 +187,16 @@ ___
 
 • `Optional` **includesToRestoreOnSuccess**: `string`[]
 
-Restores the value of an include back to its applied value
-or null if it doesn't have such
+Restores the value of an include and all its sinking properties back to its applied value after the action is completed and SUCCEEDS
+as in the value that was retrieved from the server (or null if no value is loaded)
+
+This is useful to keep unmodified states during adding, editing or even deleted
+the value that is restored is the last value loaded, and since the action occurs
+after the action is performed it will apply to that value
 
 #### Defined in
 
-[client/providers/item.tsx:221](https://github.com/onzag/itemize/blob/5c2808d3/client/providers/item.tsx#L221)
+[client/providers/item.tsx:232](https://github.com/onzag/itemize/blob/f2db74a5/client/providers/item.tsx#L232)
 
 ___
 
@@ -176,7 +208,7 @@ Cleans the value of a policy back to null
 
 #### Defined in
 
-[client/providers/item.tsx:197](https://github.com/onzag/itemize/blob/5c2808d3/client/providers/item.tsx#L197)
+[client/providers/item.tsx:192](https://github.com/onzag/itemize/blob/f2db74a5/client/providers/item.tsx#L192)
 
 ___
 
@@ -188,7 +220,7 @@ Cleans the value of a policy back to null
 
 #### Defined in
 
-[client/providers/item.tsx:201](https://github.com/onzag/itemize/blob/5c2808d3/client/providers/item.tsx#L201)
+[client/providers/item.tsx:196](https://github.com/onzag/itemize/blob/f2db74a5/client/providers/item.tsx#L196)
 
 ___
 
@@ -200,7 +232,7 @@ Cleans the value of a policy back to null
 
 #### Defined in
 
-[client/providers/item.tsx:193](https://github.com/onzag/itemize/blob/5c2808d3/client/providers/item.tsx#L193)
+[client/providers/item.tsx:188](https://github.com/onzag/itemize/blob/f2db74a5/client/providers/item.tsx#L188)
 
 ___
 
@@ -208,12 +240,16 @@ ___
 
 • `Optional` **propertiesToRestoreOnAny**: `string`[]
 
-Restores the value of a property back to its applied value
-or null if it doesn't have such
+Restores the value of a property back to its applied value after the action is completed
+as in the value that was retrieved from the server (or null if no value is loaded)
+
+This is useful to keep unmodified states during adding, editing or even deleted
+the value that is restored is the last value loaded, and since the action occurs
+after the action is performed it will apply to that value
 
 #### Defined in
 
-[client/providers/item.tsx:211](https://github.com/onzag/itemize/blob/5c2808d3/client/providers/item.tsx#L211)
+[client/providers/item.tsx:214](https://github.com/onzag/itemize/blob/f2db74a5/client/providers/item.tsx#L214)
 
 ___
 
@@ -221,12 +257,16 @@ ___
 
 • `Optional` **propertiesToRestoreOnFailure**: `string`[]
 
-Restores the value of a property back to its applied value
-or null if it doesn't have such
+Restores the value of a property back to its applied value after the action is completed and FAILED
+as in the value that was retrieved from the server (or null if no value is loaded)
+
+This is useful to keep unmodified states during adding, editing or even deleted
+the value that is restored is the last value loaded, and since the action occurs
+after the action is performed it will apply to that value
 
 #### Defined in
 
-[client/providers/item.tsx:216](https://github.com/onzag/itemize/blob/5c2808d3/client/providers/item.tsx#L216)
+[client/providers/item.tsx:223](https://github.com/onzag/itemize/blob/f2db74a5/client/providers/item.tsx#L223)
 
 ___
 
@@ -234,12 +274,16 @@ ___
 
 • `Optional` **propertiesToRestoreOnSuccess**: `string`[]
 
-Restores the value of a property back to its applied value
-or null if it doesn't have such
+Restores the value of a property back to its applied value after the action is completed and SUCCEEDS
+as in the value that was retrieved from the server (or null if no value is loaded)
+
+This is useful to keep unmodified states during adding, editing or even deleted
+the value that is restored is the last value loaded, and since the action occurs
+after the action is performed it will apply to that value
 
 #### Defined in
 
-[client/providers/item.tsx:206](https://github.com/onzag/itemize/blob/5c2808d3/client/providers/item.tsx#L206)
+[client/providers/item.tsx:205](https://github.com/onzag/itemize/blob/f2db74a5/client/providers/item.tsx#L205)
 
 ___
 
@@ -247,12 +291,12 @@ ___
 
 • `Optional` **restoreStateOnAny**: `boolean`
 
-Restores the state on success back to its applied value
-this will be a clean if no applied value exists
+Restores the state on success back to its applied value (all the properties and all the states) once the
+given action completes
 
 #### Defined in
 
-[client/providers/item.tsx:265](https://github.com/onzag/itemize/blob/5c2808d3/client/providers/item.tsx#L265)
+[client/providers/item.tsx:308](https://github.com/onzag/itemize/blob/f2db74a5/client/providers/item.tsx#L308)
 
 ___
 
@@ -260,12 +304,12 @@ ___
 
 • `Optional` **restoreStateOnFailure**: `boolean`
 
-Restores the state on success back to its applied value
-this will be a clean if no applied value exists
+Restores the state on success back to its applied value (all the properties and all the states) once the
+given action, completes and FAILED
 
 #### Defined in
 
-[client/providers/item.tsx:270](https://github.com/onzag/itemize/blob/5c2808d3/client/providers/item.tsx#L270)
+[client/providers/item.tsx:313](https://github.com/onzag/itemize/blob/f2db74a5/client/providers/item.tsx#L313)
 
 ___
 
@@ -273,12 +317,12 @@ ___
 
 • `Optional` **restoreStateOnSuccess**: `boolean`
 
-Restores the state on success back to its applied value
-this will be a clean if no applied value exists
+Restores the state on success back to its applied value (all the properties and all the states) once the
+given action, completes and SUCCEEDS
 
 #### Defined in
 
-[client/providers/item.tsx:260](https://github.com/onzag/itemize/blob/5c2808d3/client/providers/item.tsx#L260)
+[client/providers/item.tsx:303](https://github.com/onzag/itemize/blob/f2db74a5/client/providers/item.tsx#L303)
 
 ___
 
@@ -286,11 +330,16 @@ ___
 
 • `Optional` **unpokeAfterAny**: `boolean`
 
-Makes all properties unpoked (invalid won't show)
+After the action is completed all the properties and includes will be unpoked
+
+When a property is considered poked its error state shows, as it's usually hidden until the user has "poked it"
+for example in the case of a password when the password is empty the property is invalid, but it only shows
+that error after the user has interacted with it, hence the combination of restoring and unpoking, will clear a field
+and make it not show an error
 
 #### Defined in
 
-[client/providers/item.tsx:239](https://github.com/onzag/itemize/blob/5c2808d3/client/providers/item.tsx#L239)
+[client/providers/item.tsx:268](https://github.com/onzag/itemize/blob/f2db74a5/client/providers/item.tsx#L268)
 
 ___
 
@@ -298,11 +347,16 @@ ___
 
 • `Optional` **unpokeAfterFailure**: `boolean`
 
-Makes all properties unpoked (invalid won't show)
+After the action is completed and it FAILED all the properties and includes will be unpoked
+
+When a property is considered poked its error state shows, as it's usually hidden until the user has "poked it"
+for example in the case of a password when the password is empty the property is invalid, but it only shows
+that error after the user has interacted with it, hence the combination of restoring and unpoking, will clear a field
+and make it not show an error
 
 #### Defined in
 
-[client/providers/item.tsx:243](https://github.com/onzag/itemize/blob/5c2808d3/client/providers/item.tsx#L243)
+[client/providers/item.tsx:277](https://github.com/onzag/itemize/blob/f2db74a5/client/providers/item.tsx#L277)
 
 ___
 
@@ -310,8 +364,13 @@ ___
 
 • `Optional` **unpokeAfterSuccess**: `boolean`
 
-Makes all properties unpoked (invalid won't show)
+After the action is completed and it SUCCEEDS all the properties and includes will be unpoked
+
+When a property is considered poked its error state shows, as it's usually hidden until the user has "poked it"
+for example in the case of a password when the password is empty the property is invalid, but it only shows
+that error after the user has interacted with it, hence the combination of restoring and unpoking, will clear a field
+and make it not show an error
 
 #### Defined in
 
-[client/providers/item.tsx:235](https://github.com/onzag/itemize/blob/5c2808d3/client/providers/item.tsx#L235)
+[client/providers/item.tsx:259](https://github.com/onzag/itemize/blob/f2db74a5/client/providers/item.tsx#L259)

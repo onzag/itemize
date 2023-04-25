@@ -24,8 +24,8 @@ the cache worker can be accessed easily as such
 | :------ | :------ |
 | `getProxy` | (`obj`: `unknown`) => `ProxyMarked` |
 | `instance` | `Remote`<[`default`](../classes/client_internal_workers_cache_cache_worker.default.md)\> |
-| `isSupported` | `any` |
+| `isSupported` | `boolean` |
 
 #### Defined in
 
-[client/internal/workers/cache/index.ts:35](https://github.com/onzag/itemize/blob/5c2808d3/client/internal/workers/cache/index.ts#L35)
+[client/internal/workers/cache/index.ts:35](https://github.com/onzag/itemize/blob/f2db74a5/client/internal/workers/cache/index.ts#L35)

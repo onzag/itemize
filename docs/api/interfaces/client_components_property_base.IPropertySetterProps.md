@@ -1,10 +1,16 @@
 [@onzag/itemize](../README.md) / [Modules](../modules.md) / [client/components/property/base](../modules/client_components_property_base.md) / IPropertySetterProps
 
-# Interface: IPropertySetterProps
+# Interface: IPropertySetterProps<T\>
 
 [client/components/property/base](../modules/client_components_property_base.md).IPropertySetterProps
 
 The setter props
+
+## Type parameters
+
+| Name | Type |
+| :------ | :------ |
+| `T` | extends [`PropertyDefinitionSupportedType`](../modules/base_Root_Module_ItemDefinition_PropertyDefinition_types.md#propertydefinitionsupportedtype) |
 
 ## Hierarchy
 
@@ -37,7 +43,7 @@ provider
 
 #### Defined in
 
-[client/components/property/base.tsx:28](https://github.com/onzag/itemize/blob/5c2808d3/client/components/property/base.tsx#L28)
+[client/components/property/base.tsx:28](https://github.com/onzag/itemize/blob/f2db74a5/client/components/property/base.tsx#L28)
 
 ___
 
@@ -53,7 +59,7 @@ the policy name, should be provided with a policy type
 
 #### Defined in
 
-[client/components/property/base.tsx:47](https://github.com/onzag/itemize/blob/5c2808d3/client/components/property/base.tsx#L47)
+[client/components/property/base.tsx:47](https://github.com/onzag/itemize/blob/f2db74a5/client/components/property/base.tsx#L47)
 
 ___
 
@@ -69,7 +75,7 @@ the policy type, should be provided with a policy name
 
 #### Defined in
 
-[client/components/property/base.tsx:43](https://github.com/onzag/itemize/blob/5c2808d3/client/components/property/base.tsx#L43)
+[client/components/property/base.tsx:43](https://github.com/onzag/itemize/blob/f2db74a5/client/components/property/base.tsx#L43)
 
 ___
 
@@ -86,16 +92,16 @@ only truly available in search mode
 
 #### Defined in
 
-[client/components/property/base.tsx:33](https://github.com/onzag/itemize/blob/5c2808d3/client/components/property/base.tsx#L33)
+[client/components/property/base.tsx:33](https://github.com/onzag/itemize/blob/f2db74a5/client/components/property/base.tsx#L33)
 
 ___
 
 ### value
 
-• **value**: [`PropertyDefinitionSupportedType`](../modules/base_Root_Module_ItemDefinition_PropertyDefinition_types.md#propertydefinitionsupportedtype)
+• **value**: `T`
 
 The value to provide to such property
 
 #### Defined in
 
-[client/components/property/base.tsx:143](https://github.com/onzag/itemize/blob/5c2808d3/client/components/property/base.tsx#L143)
+[client/components/property/base.tsx:151](https://github.com/onzag/itemize/blob/f2db74a5/client/components/property/base.tsx#L151)

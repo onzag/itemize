@@ -10,3 +10,4 @@ it used to be big, but now it has become simple
 ### Interfaces
 
 - [ISSRRule](../interfaces/server_ssr.ISSRRule.md)
+- [ISSRServerModeInfo](../interfaces/server_ssr.ISSRServerModeInfo.md)

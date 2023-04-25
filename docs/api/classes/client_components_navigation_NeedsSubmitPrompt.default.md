@@ -23,6 +23,7 @@ was not completed as changes are unsaved
 ### Properties
 
 - [context](client_components_navigation_NeedsSubmitPrompt.default.md#context)
+- [promptRef](client_components_navigation_NeedsSubmitPrompt.default.md#promptref)
 - [props](client_components_navigation_NeedsSubmitPrompt.default.md#props)
 - [refs](client_components_navigation_NeedsSubmitPrompt.default.md#refs)
 - [state](client_components_navigation_NeedsSubmitPrompt.default.md#state)
@@ -42,6 +43,7 @@ was not completed as changes are unsaved
 - [componentWillUnmount](client_components_navigation_NeedsSubmitPrompt.default.md#componentwillunmount)
 - [componentWillUpdate](client_components_navigation_NeedsSubmitPrompt.default.md#componentwillupdate)
 - [confirmationCallback](client_components_navigation_NeedsSubmitPrompt.default.md#confirmationcallback)
+- [discardDialog](client_components_navigation_NeedsSubmitPrompt.default.md#discarddialog)
 - [forceUpdate](client_components_navigation_NeedsSubmitPrompt.default.md#forceupdate)
 - [getSnapshotBeforeUpdate](client_components_navigation_NeedsSubmitPrompt.default.md#getsnapshotbeforeupdate)
 - [render](client_components_navigation_NeedsSubmitPrompt.default.md#render)
@@ -58,36 +60,15 @@ was not completed as changes are unsaved
 
 | Name | Type |
 | :------ | :------ |
-| `props` | `NeedsSubmitPromptProps` \| `Readonly`<`NeedsSubmitPromptProps`\> |
-
-#### Inherited from
-
-React.PureComponent<NeedsSubmitPromptProps\>.constructor
-
-#### Defined in
-
-node_modules/@types/react/index.d.ts:481
-
-• **new default**(`props`, `context`)
-
-**`deprecated`**
-
-**`see`** https://reactjs.org/docs/legacy-context.html
-
-#### Parameters
-
-| Name | Type |
-| :------ | :------ |
 | `props` | `NeedsSubmitPromptProps` |
-| `context` | `any` |
 
-#### Inherited from
+#### Overrides
 
-React.PureComponent<NeedsSubmitPromptProps\>.constructor
+React.PureComponent&lt;NeedsSubmitPromptProps\&gt;.constructor
 
 #### Defined in
 
-node_modules/@types/react/index.d.ts:486
+[client/components/navigation/NeedsSubmitPrompt.tsx:87](https://github.com/onzag/itemize/blob/f2db74a5/client/components/navigation/NeedsSubmitPrompt.tsx#L87)
 
 ## Properties
 
@@ -116,6 +97,16 @@ React.PureComponent.context
 #### Defined in
 
 node_modules/@types/react/index.d.ts:479
+
+___
+
+### promptRef
+
+• `Private` **promptRef**: `RefObject`<[`default`](client_components_navigation_Prompt.default.md)\>
+
+#### Defined in
+
+[client/components/navigation/NeedsSubmitPrompt.tsx:85](https://github.com/onzag/itemize/blob/f2db74a5/client/components/navigation/NeedsSubmitPrompt.tsx#L85)
 
 ___
 
@@ -318,7 +309,7 @@ ___
 
 ### buildPrompt
 
-▸ **buildPrompt**(`when`): `Element`
+▸ **buildPrompt**(`differingProperties`, `differingIncludes`, `when`, `whenOther`): `Element`
 
 Builds the prompt as defined by the requeriments and by
 feeding the submit actioner into it
@@ -327,7 +318,10 @@ feeding the submit actioner into it
 
 | Name | Type | Description |
 | :------ | :------ | :------ |
+| `differingProperties` | `string`[] | - |
+| `differingIncludes` | [`IDifferingIncludeInfo`](../interfaces/client_components_item_DifferingIncludesRetriever.IDifferingIncludeInfo.md)[] | - |
 | `when` | `boolean` | the condition of the prompt |
+| `whenOther` | `boolean` | - |
 
 #### Returns
 
@@ -337,7 +331,7 @@ a react component
 
 #### Defined in
 
-[client/components/navigation/NeedsSubmitPrompt.tsx:73](https://github.com/onzag/itemize/blob/5c2808d3/client/components/navigation/NeedsSubmitPrompt.tsx#L73)
+[client/components/navigation/NeedsSubmitPrompt.tsx:130](https://github.com/onzag/itemize/blob/f2db74a5/client/components/navigation/NeedsSubmitPrompt.tsx#L130)
 
 ___
 
@@ -551,7 +545,7 @@ ___
 
 ### confirmationCallback
 
-▸ **confirmationCallback**(`actioner`): `Promise`<[`EndpointErrorType`](../modules/base_errors.md#endpointerrortype)\>
+▸ **confirmationCallback**(`differingProperties`, `differingIncludes`, `when`, `whenOther`, `actioner`): `Promise`<[`EndpointErrorType`](../modules/base_errors.md#endpointerrortype)\>
 
 Performs the actioner callback that the Prompt component expects
 
@@ -559,6 +553,10 @@ Performs the actioner callback that the Prompt component expects
 
 | Name | Type | Description |
 | :------ | :------ | :------ |
+| `differingProperties` | `string`[] | - |
+| `differingIncludes` | [`IDifferingIncludeInfo`](../interfaces/client_components_item_DifferingIncludesRetriever.IDifferingIncludeInfo.md)[] | - |
+| `when` | `boolean` | - |
+| `whenOther` | `boolean` | - |
 | `actioner` | [`ISubmitActionerInfoArgType`](../interfaces/client_components_item_SubmitActioner.ISubmitActionerInfoArgType.md) | the submit actioner arg |
 
 #### Returns
@@ -569,7 +567,23 @@ a promise for an error (or null)
 
 #### Defined in
 
-[client/components/navigation/NeedsSubmitPrompt.tsx:59](https://github.com/onzag/itemize/blob/5c2808d3/client/components/navigation/NeedsSubmitPrompt.tsx#L59)
+[client/components/navigation/NeedsSubmitPrompt.tsx:99](https://github.com/onzag/itemize/blob/f2db74a5/client/components/navigation/NeedsSubmitPrompt.tsx#L99)
+
+___
+
+### discardDialog
+
+▸ **discardDialog**(): `void`
+
+Closes the dialog manually and performs the prompt execution that is expected
+
+#### Returns
+
+`void`
+
+#### Defined in
+
+[client/components/navigation/NeedsSubmitPrompt.tsx:156](https://github.com/onzag/itemize/blob/f2db74a5/client/components/navigation/NeedsSubmitPrompt.tsx#L156)
 
 ___
 
@@ -645,7 +659,7 @@ React.PureComponent.render
 
 #### Defined in
 
-[client/components/navigation/NeedsSubmitPrompt.tsx:96](https://github.com/onzag/itemize/blob/5c2808d3/client/components/navigation/NeedsSubmitPrompt.tsx#L96)
+[client/components/navigation/NeedsSubmitPrompt.tsx:163](https://github.com/onzag/itemize/blob/f2db74a5/client/components/navigation/NeedsSubmitPrompt.tsx#L163)
 
 ___
 

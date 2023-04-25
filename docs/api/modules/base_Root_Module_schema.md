@@ -27,6 +27,8 @@ This file contains the schema of the unprocessed form of the module
 | `properties.children.items.type` | `string` |
 | `properties.children.minItems` | `number` |
 | `properties.children.type` | `string` |
+| `properties.description` | `Object` |
+| `properties.description.type` | `string` |
 | `properties.maxSearchRecords` | `Object` |
 | `properties.maxSearchRecords.type` | `string` |
 | `properties.maxSearchResults` | `Object` |
@@ -57,6 +59,8 @@ This file contains the schema of the unprocessed form of the module
 | `properties.requestLimiters.properties.since.type` | `string` |
 | `properties.requestLimiters.required` | `string`[] |
 | `properties.requestLimiters.type` | `string` |
+| `properties.searchEngineEnabled` | `Object` |
+| `properties.searchEngineEnabled.type` | `string` |
 | `properties.searchRoleAccess` | `Object` |
 | `properties.searchRoleAccess.items` | `Object` |
 | `properties.searchRoleAccess.items.type` | `string` |

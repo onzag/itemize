@@ -6,9 +6,14 @@ Simply provides the current currency
 
 ## Table of contents
 
+### Interfaces
+
+- [ICurrencyRetrieverArg](../interfaces/client_components_localization_AppCurrencyRetriever.ICurrencyRetrieverArg.md)
+
 ### Functions
 
 - [default](client_components_localization_AppCurrencyRetriever.md#default)
+- [useAppCurrencyRetriever](client_components_localization_AppCurrencyRetriever.md#useappcurrencyretriever)
 
 ## Functions
 
@@ -34,4 +39,24 @@ a react node
 
 #### Defined in
 
-[client/components/localization/AppCurrencyRetriever.tsx:26](https://github.com/onzag/itemize/blob/5c2808d3/client/components/localization/AppCurrencyRetriever.tsx#L26)
+[client/components/localization/AppCurrencyRetriever.tsx:60](https://github.com/onzag/itemize/blob/f2db74a5/client/components/localization/AppCurrencyRetriever.tsx#L60)
+
+___
+
+### useAppCurrencyRetriever
+
+▸ **useAppCurrencyRetriever**(): `Object`
+
+#### Returns
+
+`Object`
+
+| Name | Type |
+| :------ | :------ |
+| `availableCurrencies` | [`ICurrencyType`](../interfaces/imported_resources.ICurrencyType.md)[] |
+| `changeCurrencyTo` | () => `any` \| [`ChangeCurrencyToFn`](client_internal_providers_locale_provider.md#changecurrencytofn) |
+| `currentCurrency` | [`ICurrencyType`](../interfaces/imported_resources.ICurrencyType.md) |
+
+#### Defined in
+
+[client/components/localization/AppCurrencyRetriever.tsx:83](https://github.com/onzag/itemize/blob/f2db74a5/client/components/localization/AppCurrencyRetriever.tsx#L83)

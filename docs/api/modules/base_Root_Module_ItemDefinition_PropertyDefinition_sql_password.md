@@ -8,12 +8,27 @@ This file contains the password server side sql functionality
 
 ### Functions
 
+- [passwordSQLElasticIn](base_Root_Module_ItemDefinition_PropertyDefinition_sql_password.md#passwordsqlelasticin)
 - [passwordSQLEqual](base_Root_Module_ItemDefinition_PropertyDefinition_sql_password.md#passwordsqlequal)
 - [passwordSQLIn](base_Root_Module_ItemDefinition_PropertyDefinition_sql_password.md#passwordsqlin)
 - [passwordSQLSSEqual](base_Root_Module_ItemDefinition_PropertyDefinition_sql_password.md#passwordsqlssequal)
 - [passwordSQLSearch](base_Root_Module_ItemDefinition_PropertyDefinition_sql_password.md#passwordsqlsearch)
 
 ## Functions
+
+### passwordSQLElasticIn
+
+▸ **passwordSQLElasticIn**(): `any`
+
+#### Returns
+
+`any`
+
+#### Defined in
+
+[base/Root/Module/ItemDefinition/PropertyDefinition/sql/password.ts:86](https://github.com/onzag/itemize/blob/f2db74a5/base/Root/Module/ItemDefinition/PropertyDefinition/sql/password.ts#L86)
+
+___
 
 ### passwordSQLEqual
 
@@ -35,7 +50,7 @@ a raw value
 
 #### Defined in
 
-[base/Root/Module/ItemDefinition/PropertyDefinition/sql/password.ts:31](https://github.com/onzag/itemize/blob/5c2808d3/base/Root/Module/ItemDefinition/PropertyDefinition/sql/password.ts#L31)
+[base/Root/Module/ItemDefinition/PropertyDefinition/sql/password.ts:34](https://github.com/onzag/itemize/blob/f2db74a5/base/Root/Module/ItemDefinition/PropertyDefinition/sql/password.ts#L34)
 
 ___
 
@@ -59,7 +74,7 @@ Specifies how to SQL in the password
 
 #### Defined in
 
-[base/Root/Module/ItemDefinition/PropertyDefinition/sql/password.ts:15](https://github.com/onzag/itemize/blob/5c2808d3/base/Root/Module/ItemDefinition/PropertyDefinition/sql/password.ts#L15)
+[base/Root/Module/ItemDefinition/PropertyDefinition/sql/password.ts:15](https://github.com/onzag/itemize/blob/f2db74a5/base/Root/Module/ItemDefinition/PropertyDefinition/sql/password.ts#L15)
 
 ___
 
@@ -83,7 +98,7 @@ a boolean
 
 #### Defined in
 
-[base/Root/Module/ItemDefinition/PropertyDefinition/sql/password.ts:45](https://github.com/onzag/itemize/blob/5c2808d3/base/Root/Module/ItemDefinition/PropertyDefinition/sql/password.ts#L45)
+[base/Root/Module/ItemDefinition/PropertyDefinition/sql/password.ts:48](https://github.com/onzag/itemize/blob/f2db74a5/base/Root/Module/ItemDefinition/PropertyDefinition/sql/password.ts#L48)
 
 ___
 
@@ -101,4 +116,4 @@ nothing, it just throws an error
 
 #### Defined in
 
-[base/Root/Module/ItemDefinition/PropertyDefinition/sql/password.ts:69](https://github.com/onzag/itemize/blob/5c2808d3/base/Root/Module/ItemDefinition/PropertyDefinition/sql/password.ts#L69)
+[base/Root/Module/ItemDefinition/PropertyDefinition/sql/password.ts:72](https://github.com/onzag/itemize/blob/f2db74a5/base/Root/Module/ItemDefinition/PropertyDefinition/sql/password.ts#L72)

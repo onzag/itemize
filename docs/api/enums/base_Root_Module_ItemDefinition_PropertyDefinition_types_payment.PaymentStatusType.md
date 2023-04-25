@@ -23,7 +23,7 @@
 
 #### Defined in
 
-[base/Root/Module/ItemDefinition/PropertyDefinition/types/payment.ts:29](https://github.com/onzag/itemize/blob/5c2808d3/base/Root/Module/ItemDefinition/PropertyDefinition/types/payment.ts#L29)
+[base/Root/Module/ItemDefinition/PropertyDefinition/types/payment.ts:29](https://github.com/onzag/itemize/blob/f2db74a5/base/Root/Module/ItemDefinition/PropertyDefinition/types/payment.ts#L29)
 
 ___
 
@@ -33,7 +33,7 @@ ___
 
 #### Defined in
 
-[base/Root/Module/ItemDefinition/PropertyDefinition/types/payment.ts:26](https://github.com/onzag/itemize/blob/5c2808d3/base/Root/Module/ItemDefinition/PropertyDefinition/types/payment.ts#L26)
+[base/Root/Module/ItemDefinition/PropertyDefinition/types/payment.ts:26](https://github.com/onzag/itemize/blob/f2db74a5/base/Root/Module/ItemDefinition/PropertyDefinition/types/payment.ts#L26)
 
 ___
 
@@ -43,7 +43,7 @@ ___
 
 #### Defined in
 
-[base/Root/Module/ItemDefinition/PropertyDefinition/types/payment.ts:28](https://github.com/onzag/itemize/blob/5c2808d3/base/Root/Module/ItemDefinition/PropertyDefinition/types/payment.ts#L28)
+[base/Root/Module/ItemDefinition/PropertyDefinition/types/payment.ts:28](https://github.com/onzag/itemize/blob/f2db74a5/base/Root/Module/ItemDefinition/PropertyDefinition/types/payment.ts#L28)
 
 ___
 
@@ -53,7 +53,7 @@ ___
 
 #### Defined in
 
-[base/Root/Module/ItemDefinition/PropertyDefinition/types/payment.ts:25](https://github.com/onzag/itemize/blob/5c2808d3/base/Root/Module/ItemDefinition/PropertyDefinition/types/payment.ts#L25)
+[base/Root/Module/ItemDefinition/PropertyDefinition/types/payment.ts:25](https://github.com/onzag/itemize/blob/f2db74a5/base/Root/Module/ItemDefinition/PropertyDefinition/types/payment.ts#L25)
 
 ___
 
@@ -63,7 +63,7 @@ ___
 
 #### Defined in
 
-[base/Root/Module/ItemDefinition/PropertyDefinition/types/payment.ts:24](https://github.com/onzag/itemize/blob/5c2808d3/base/Root/Module/ItemDefinition/PropertyDefinition/types/payment.ts#L24)
+[base/Root/Module/ItemDefinition/PropertyDefinition/types/payment.ts:24](https://github.com/onzag/itemize/blob/f2db74a5/base/Root/Module/ItemDefinition/PropertyDefinition/types/payment.ts#L24)
 
 ___
 
@@ -73,4 +73,4 @@ ___
 
 #### Defined in
 
-[base/Root/Module/ItemDefinition/PropertyDefinition/types/payment.ts:27](https://github.com/onzag/itemize/blob/5c2808d3/base/Root/Module/ItemDefinition/PropertyDefinition/types/payment.ts#L27)
+[base/Root/Module/ItemDefinition/PropertyDefinition/types/payment.ts:27](https://github.com/onzag/itemize/blob/f2db74a5/base/Root/Module/ItemDefinition/PropertyDefinition/types/payment.ts#L27)

@@ -21,7 +21,7 @@ A sql composed row value
 
 #### Defined in
 
-[base/Root/sql.ts:118](https://github.com/onzag/itemize/blob/5c2808d3/base/Root/sql.ts#L118)
+[base/Root/sql.ts:135](https://github.com/onzag/itemize/blob/f2db74a5/base/Root/sql.ts#L135)
 
 ___
 
@@ -31,4 +31,4 @@ ___
 
 #### Defined in
 
-[base/Root/sql.ts:117](https://github.com/onzag/itemize/blob/5c2808d3/base/Root/sql.ts#L117)
+[base/Root/sql.ts:134](https://github.com/onzag/itemize/blob/f2db74a5/base/Root/sql.ts#L134)

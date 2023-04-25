@@ -38,7 +38,7 @@ Metadata stuff
 
 #### Defined in
 
-[client/internal/workers/cache/cache.worker.ts:141](https://github.com/onzag/itemize/blob/5c2808d3/client/internal/workers/cache/cache.worker.ts#L141)
+[client/internal/workers/cache/cache.worker.ts:153](https://github.com/onzag/itemize/blob/f2db74a5/client/internal/workers/cache/cache.worker.ts#L153)
 
 ___
 
@@ -57,7 +57,7 @@ Contains all the GET queries
 
 #### Defined in
 
-[client/internal/workers/cache/cache.worker.ts:120](https://github.com/onzag/itemize/blob/5c2808d3/client/internal/workers/cache/cache.worker.ts#L120)
+[client/internal/workers/cache/cache.worker.ts:132](https://github.com/onzag/itemize/blob/f2db74a5/client/internal/workers/cache/cache.worker.ts#L132)
 
 ___
 
@@ -76,7 +76,7 @@ Contains all searches, either owned or parented
 
 #### Defined in
 
-[client/internal/workers/cache/cache.worker.ts:127](https://github.com/onzag/itemize/blob/5c2808d3/client/internal/workers/cache/cache.worker.ts#L127)
+[client/internal/workers/cache/cache.worker.ts:139](https://github.com/onzag/itemize/blob/f2db74a5/client/internal/workers/cache/cache.worker.ts#L139)
 
 ___
 
@@ -95,4 +95,4 @@ Contains stored states
 
 #### Defined in
 
-[client/internal/workers/cache/cache.worker.ts:134](https://github.com/onzag/itemize/blob/5c2808d3/client/internal/workers/cache/cache.worker.ts#L134)
+[client/internal/workers/cache/cache.worker.ts:146](https://github.com/onzag/itemize/blob/f2db74a5/client/internal/workers/cache/cache.worker.ts#L146)

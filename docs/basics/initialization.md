@@ -2,6 +2,48 @@
 
 To configure itemize isn't the easiest nor the most straightforward process, it relies on a conjuction of different APIs
 
+## Fast initialization
+
+1. Make a directory
+
+`mkdir myprojekt`
+
+2. And get into it
+
+`cd myprojekt`
+
+3. initialize the project
+
+`npm init`
+
+4. run the command to install the dependencies
+
+`npm install --save react@^17.0.2 react-dom@^17.0.2 @types/react@^17.0.38 @types/react-dom@^17.0.11 @mui/icons-material@^5.3.1 @mui/lab@^5.0.0-alpha.66 @mui/material@^5.3.1 @mui/styles@^5.3.0 @emotion/css@^11.7.1 @emotion/react@^11.7.1 @emotion/server@^11.4.0 @emotion/styled@^11.6.0`
+
+5. Install itemize
+
+`npm install --save @onzag/itemize`
+
+6. Run the setup, and you may want to specify the languages, otherwise you are free to use the defaults for everything
+
+`./node_modules/.bin/itemize setup`
+
+7. Build the project
+
+`npm run build`
+
+8. Start a development environment
+
+`npm run start-dev-environment development`
+
+9. Build the development database
+
+`npm run build-database development`
+
+10. Start a dev server with the basic flags
+
+`NODE_TLS_REJECT_UNAUTHORIZED=0 NO_SSR=true NO_SEO=true FAKE_EMAILS=true FAKE_SMS=true npm run start-dev-server`
+
 ## Install the main dependencies
 
 Note as of the time of this writting itemize will only work on NodeJS version 15 as many of the dependencies do not work in later versions.
@@ -225,16 +267,6 @@ Follow the steps that are requested, there are many of them, more often than not
 `npm run build`
 
 This will run webpack, typescript compiler and the build data process that is necessary.
-
-You might see the warning of
-
-```
-Missing resource file: privacy-policy/en.html
-Missing resource file: terms-and-conditions/en.html
-Missing resource file: contact/en.html
-```
-
-This is okay, it is just a warning, it is endorsed that you have these resources as part of your bundle, but they are not necessary for the application to work, after all you might decide that you want to handle these as fragments or versioned localized items of their own.
 
 ### Start a development environment (optional but necessary if you don't have an external database/redis/elastic)
 

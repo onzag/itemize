@@ -22,6 +22,8 @@ in its children prop
 - [hasNextPage](client_components_search_SearchLoader.ISearchLoaderArg.md#hasnextpage)
 - [hasPrevPage](client_components_search_SearchLoader.ISearchLoaderArg.md#hasprevpage)
 - [isLoadingSearchResults](client_components_search_SearchLoader.ISearchLoaderArg.md#isloadingsearchresults)
+- [limit](client_components_search_SearchLoader.ISearchLoaderArg.md#limit)
+- [offset](client_components_search_SearchLoader.ISearchLoaderArg.md#offset)
 - [pageCount](client_components_search_SearchLoader.ISearchLoaderArg.md#pagecount)
 - [searchId](client_components_search_SearchLoader.ISearchLoaderArg.md#searchid)
 - [searchRecords](client_components_search_SearchLoader.ISearchLoaderArg.md#searchrecords)
@@ -46,7 +48,7 @@ better them to refine the search
 
 #### Defined in
 
-[client/components/search/SearchLoader.tsx:111](https://github.com/onzag/itemize/blob/5c2808d3/client/components/search/SearchLoader.tsx#L111)
+[client/components/search/SearchLoader.tsx:116](https://github.com/onzag/itemize/blob/f2db74a5/client/components/search/SearchLoader.tsx#L116)
 
 ___
 
@@ -59,7 +61,7 @@ the search results of a given page
 
 #### Defined in
 
-[client/components/search/SearchLoader.tsx:124](https://github.com/onzag/itemize/blob/5c2808d3/client/components/search/SearchLoader.tsx#L124)
+[client/components/search/SearchLoader.tsx:137](https://github.com/onzag/itemize/blob/f2db74a5/client/components/search/SearchLoader.tsx#L137)
 
 ___
 
@@ -71,7 +73,7 @@ whether there's a next page from the current selected
 
 #### Defined in
 
-[client/components/search/SearchLoader.tsx:115](https://github.com/onzag/itemize/blob/5c2808d3/client/components/search/SearchLoader.tsx#L115)
+[client/components/search/SearchLoader.tsx:120](https://github.com/onzag/itemize/blob/f2db74a5/client/components/search/SearchLoader.tsx#L120)
 
 ___
 
@@ -83,7 +85,7 @@ Whether there's a previous page from the current selected
 
 #### Defined in
 
-[client/components/search/SearchLoader.tsx:119](https://github.com/onzag/itemize/blob/5c2808d3/client/components/search/SearchLoader.tsx#L119)
+[client/components/search/SearchLoader.tsx:124](https://github.com/onzag/itemize/blob/f2db74a5/client/components/search/SearchLoader.tsx#L124)
 
 ___
 
@@ -100,7 +102,31 @@ traditional search
 
 #### Defined in
 
-[client/components/search/SearchLoader.tsx:87](https://github.com/onzag/itemize/blob/5c2808d3/client/components/search/SearchLoader.tsx#L87)
+[client/components/search/SearchLoader.tsx:92](https://github.com/onzag/itemize/blob/f2db74a5/client/components/search/SearchLoader.tsx#L92)
+
+___
+
+### limit
+
+• **limit**: `number`
+
+the limit used during the search action
+
+#### Defined in
+
+[client/components/search/SearchLoader.tsx:128](https://github.com/onzag/itemize/blob/f2db74a5/client/components/search/SearchLoader.tsx#L128)
+
+___
+
+### offset
+
+• **offset**: `number`
+
+The offset used during the search action
+
+#### Defined in
+
+[client/components/search/SearchLoader.tsx:132](https://github.com/onzag/itemize/blob/f2db74a5/client/components/search/SearchLoader.tsx#L132)
 
 ___
 
@@ -115,7 +141,7 @@ the page count is only has to do with the accessible count of matches
 
 #### Defined in
 
-[client/components/search/SearchLoader.tsx:99](https://github.com/onzag/itemize/blob/5c2808d3/client/components/search/SearchLoader.tsx#L99)
+[client/components/search/SearchLoader.tsx:104](https://github.com/onzag/itemize/blob/f2db74a5/client/components/search/SearchLoader.tsx#L104)
 
 ___
 
@@ -128,7 +154,7 @@ search and this search only
 
 #### Defined in
 
-[client/components/search/SearchLoader.tsx:73](https://github.com/onzag/itemize/blob/5c2808d3/client/components/search/SearchLoader.tsx#L73)
+[client/components/search/SearchLoader.tsx:78](https://github.com/onzag/itemize/blob/f2db74a5/client/components/search/SearchLoader.tsx#L78)
 
 ___
 
@@ -141,7 +167,7 @@ as well as organized, partial information of a search result
 
 #### Defined in
 
-[client/components/search/SearchLoader.tsx:92](https://github.com/onzag/itemize/blob/5c2808d3/client/components/search/SearchLoader.tsx#L92)
+[client/components/search/SearchLoader.tsx:97](https://github.com/onzag/itemize/blob/f2db74a5/client/components/search/SearchLoader.tsx#L97)
 
 ___
 
@@ -154,7 +180,7 @@ parameters in order to retrieve records
 
 #### Defined in
 
-[client/components/search/SearchLoader.tsx:78](https://github.com/onzag/itemize/blob/5c2808d3/client/components/search/SearchLoader.tsx#L78)
+[client/components/search/SearchLoader.tsx:83](https://github.com/onzag/itemize/blob/f2db74a5/client/components/search/SearchLoader.tsx#L83)
 
 ___
 
@@ -167,7 +193,7 @@ in the server side
 
 #### Defined in
 
-[client/components/search/SearchLoader.tsx:104](https://github.com/onzag/itemize/blob/5c2808d3/client/components/search/SearchLoader.tsx#L104)
+[client/components/search/SearchLoader.tsx:109](https://github.com/onzag/itemize/blob/f2db74a5/client/components/search/SearchLoader.tsx#L109)
 
 ## Methods
 
@@ -183,7 +209,7 @@ dismiss the errors
 
 #### Defined in
 
-[client/components/search/SearchLoader.tsx:128](https://github.com/onzag/itemize/blob/5c2808d3/client/components/search/SearchLoader.tsx#L128)
+[client/components/search/SearchLoader.tsx:141](https://github.com/onzag/itemize/blob/f2db74a5/client/components/search/SearchLoader.tsx#L141)
 
 ___
 
@@ -200,4 +226,4 @@ say you got an error, you can ask for a refresh
 
 #### Defined in
 
-[client/components/search/SearchLoader.tsx:133](https://github.com/onzag/itemize/blob/5c2808d3/client/components/search/SearchLoader.tsx#L133)
+[client/components/search/SearchLoader.tsx:146](https://github.com/onzag/itemize/blob/f2db74a5/client/components/search/SearchLoader.tsx#L146)

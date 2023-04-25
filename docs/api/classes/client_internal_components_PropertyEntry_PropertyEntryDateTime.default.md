@@ -65,7 +65,7 @@ React.Component&lt;
 
 #### Defined in
 
-[client/internal/components/PropertyEntry/PropertyEntryDateTime.tsx:59](https://github.com/onzag/itemize/blob/5c2808d3/client/internal/components/PropertyEntry/PropertyEntryDateTime.tsx#L59)
+[client/internal/components/PropertyEntry/PropertyEntryDateTime.tsx:60](https://github.com/onzag/itemize/blob/f2db74a5/client/internal/components/PropertyEntry/PropertyEntryDateTime.tsx#L60)
 
 ## Properties
 
@@ -324,21 +324,19 @@ ___
 
 ### componentDidMount
 
-▸ `Optional` **componentDidMount**(): `void`
-
-Called immediately after a component is mounted. Setting state here will trigger re-rendering.
+▸ **componentDidMount**(): `void`
 
 #### Returns
 
 `void`
 
-#### Inherited from
+#### Overrides
 
 React.Component.componentDidMount
 
 #### Defined in
 
-node_modules/@types/react/index.d.ts:625
+[client/internal/components/PropertyEntry/PropertyEntryDateTime.tsx:108](https://github.com/onzag/itemize/blob/f2db74a5/client/internal/components/PropertyEntry/PropertyEntryDateTime.tsx#L108)
 
 ___
 
@@ -362,7 +360,7 @@ React.Component.componentDidUpdate
 
 #### Defined in
 
-[client/internal/components/PropertyEntry/PropertyEntryDateTime.tsx:105](https://github.com/onzag/itemize/blob/5c2808d3/client/internal/components/PropertyEntry/PropertyEntryDateTime.tsx#L105)
+[client/internal/components/PropertyEntry/PropertyEntryDateTime.tsx:118](https://github.com/onzag/itemize/blob/f2db74a5/client/internal/components/PropertyEntry/PropertyEntryDateTime.tsx#L118)
 
 ___
 
@@ -506,7 +504,7 @@ ___
 
 #### Defined in
 
-[client/internal/components/PropertyEntry/PropertyEntryDateTime.tsx:100](https://github.com/onzag/itemize/blob/5c2808d3/client/internal/components/PropertyEntry/PropertyEntryDateTime.tsx#L100)
+[client/internal/components/PropertyEntry/PropertyEntryDateTime.tsx:103](https://github.com/onzag/itemize/blob/f2db74a5/client/internal/components/PropertyEntry/PropertyEntryDateTime.tsx#L103)
 
 ___
 
@@ -582,7 +580,7 @@ ___
 
 #### Defined in
 
-[client/internal/components/PropertyEntry/PropertyEntryDateTime.tsx:135](https://github.com/onzag/itemize/blob/5c2808d3/client/internal/components/PropertyEntry/PropertyEntryDateTime.tsx#L135)
+[client/internal/components/PropertyEntry/PropertyEntryDateTime.tsx:148](https://github.com/onzag/itemize/blob/f2db74a5/client/internal/components/PropertyEntry/PropertyEntryDateTime.tsx#L148)
 
 ___
 
@@ -600,7 +598,7 @@ React.Component.render
 
 #### Defined in
 
-[client/internal/components/PropertyEntry/PropertyEntryDateTime.tsx:159](https://github.com/onzag/itemize/blob/5c2808d3/client/internal/components/PropertyEntry/PropertyEntryDateTime.tsx#L159)
+[client/internal/components/PropertyEntry/PropertyEntryDateTime.tsx:172](https://github.com/onzag/itemize/blob/f2db74a5/client/internal/components/PropertyEntry/PropertyEntryDateTime.tsx#L172)
 
 ___
 
@@ -656,4 +654,4 @@ React.Component.shouldComponentUpdate
 
 #### Defined in
 
-[client/internal/components/PropertyEntry/PropertyEntryDateTime.tsx:78](https://github.com/onzag/itemize/blob/5c2808d3/client/internal/components/PropertyEntry/PropertyEntryDateTime.tsx#L78)
+[client/internal/components/PropertyEntry/PropertyEntryDateTime.tsx:80](https://github.com/onzag/itemize/blob/f2db74a5/client/internal/components/PropertyEntry/PropertyEntryDateTime.tsx#L80)

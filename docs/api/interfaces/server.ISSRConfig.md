@@ -28,7 +28,7 @@ Specifies the SSR configuration for the multiple pages
 
 #### Defined in
 
-[server/index.ts:110](https://github.com/onzag/itemize/blob/5c2808d3/server/index.ts#L110)
+[server/index.ts:160](https://github.com/onzag/itemize/blob/f2db74a5/server/index.ts#L160)
 
 ___
 
@@ -38,7 +38,7 @@ ___
 
 #### Defined in
 
-[server/index.ts:107](https://github.com/onzag/itemize/blob/5c2808d3/server/index.ts#L107)
+[server/index.ts:157](https://github.com/onzag/itemize/blob/f2db74a5/server/index.ts#L157)
 
 ___
 
@@ -48,7 +48,7 @@ ___
 
 #### Defined in
 
-[server/index.ts:106](https://github.com/onzag/itemize/blob/5c2808d3/server/index.ts#L106)
+[server/index.ts:156](https://github.com/onzag/itemize/blob/f2db74a5/server/index.ts#L156)
 
 ___
 
@@ -60,7 +60,6 @@ ___
 
 | Name | Type |
 | :------ | :------ |
-| `collector?` | [`ICollectorType`](client.ICollectorType.md) |
 | `mainComponent` | `ReactElement`<`any`, `string` \| `JSXElementConstructor`<`any`\>\> |
 | `rendererContext` | [`IRendererContext`](client_providers_renderer.IRendererContext.md) |
 | `appWrapper?` | (`app`: `ReactElement`<`any`, `string` \| `JSXElementConstructor`<`any`\>\>, `config`: [`IConfigRawJSONDataType`](config.IConfigRawJSONDataType.md)) => `ReactElement`<`any`, `string` \| `JSXElementConstructor`<`any`\>\> |
@@ -68,7 +67,7 @@ ___
 
 #### Defined in
 
-[server/index.ts:111](https://github.com/onzag/itemize/blob/5c2808d3/server/index.ts#L111)
+[server/index.ts:161](https://github.com/onzag/itemize/blob/f2db74a5/server/index.ts#L161)
 
 ## Methods
 
@@ -89,7 +88,7 @@ ___
 
 #### Defined in
 
-[server/index.ts:108](https://github.com/onzag/itemize/blob/5c2808d3/server/index.ts#L108)
+[server/index.ts:158](https://github.com/onzag/itemize/blob/f2db74a5/server/index.ts#L158)
 
 ___
 
@@ -111,4 +110,4 @@ ___
 
 #### Defined in
 
-[server/index.ts:109](https://github.com/onzag/itemize/blob/5c2808d3/server/index.ts#L109)
+[server/index.ts:159](https://github.com/onzag/itemize/blob/f2db74a5/server/index.ts#L159)

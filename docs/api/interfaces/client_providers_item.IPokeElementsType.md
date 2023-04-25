@@ -4,6 +4,8 @@
 
 [client/providers/item](../modules/client_providers_item.md).IPokeElementsType
 
+Represents the poking mechanism
+
 ## Table of contents
 
 ### Properties
@@ -18,13 +20,15 @@
 
 • **includes**: `Object`
 
+includes that are poked with their list of properties
+
 #### Index signature
 
 ▪ [include: `string`]: `string`[]
 
 #### Defined in
 
-[client/providers/item.tsx:432](https://github.com/onzag/itemize/blob/5c2808d3/client/providers/item.tsx#L432)
+[client/providers/item.tsx:879](https://github.com/onzag/itemize/blob/f2db74a5/client/providers/item.tsx#L879)
 
 ___
 
@@ -32,9 +36,11 @@ ___
 
 • **policies**: [`PolicyPathType`](../modules/client_providers_item.md#policypathtype)[]
 
+policies that are poked
+
 #### Defined in
 
-[client/providers/item.tsx:433](https://github.com/onzag/itemize/blob/5c2808d3/client/providers/item.tsx#L433)
+[client/providers/item.tsx:883](https://github.com/onzag/itemize/blob/f2db74a5/client/providers/item.tsx#L883)
 
 ___
 
@@ -42,6 +48,8 @@ ___
 
 • **properties**: `string`[]
 
+properties that are poked as a list of string
+
 #### Defined in
 
-[client/providers/item.tsx:431](https://github.com/onzag/itemize/blob/5c2808d3/client/providers/item.tsx#L431)
+[client/providers/item.tsx:875](https://github.com/onzag/itemize/blob/f2db74a5/client/providers/item.tsx#L875)

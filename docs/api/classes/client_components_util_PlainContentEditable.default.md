@@ -64,7 +64,7 @@ React.Component&lt;IPlainContentEditableProps\&gt;.constructor
 
 #### Defined in
 
-[client/components/util/PlainContentEditable.tsx:17](https://github.com/onzag/itemize/blob/5c2808d3/client/components/util/PlainContentEditable.tsx#L17)
+[client/components/util/PlainContentEditable.tsx:18](https://github.com/onzag/itemize/blob/f2db74a5/client/components/util/PlainContentEditable.tsx#L18)
 
 ## Properties
 
@@ -102,7 +102,7 @@ ___
 
 #### Defined in
 
-[client/components/util/PlainContentEditable.tsx:15](https://github.com/onzag/itemize/blob/5c2808d3/client/components/util/PlainContentEditable.tsx#L15)
+[client/components/util/PlainContentEditable.tsx:16](https://github.com/onzag/itemize/blob/f2db74a5/client/components/util/PlainContentEditable.tsx#L16)
 
 ___
 
@@ -345,7 +345,7 @@ React.Component.componentDidMount
 
 #### Defined in
 
-[client/components/util/PlainContentEditable.tsx:37](https://github.com/onzag/itemize/blob/5c2808d3/client/components/util/PlainContentEditable.tsx#L37)
+[client/components/util/PlainContentEditable.tsx:38](https://github.com/onzag/itemize/blob/f2db74a5/client/components/util/PlainContentEditable.tsx#L38)
 
 ___
 
@@ -575,7 +575,7 @@ ___
 
 #### Defined in
 
-[client/components/util/PlainContentEditable.tsx:33](https://github.com/onzag/itemize/blob/5c2808d3/client/components/util/PlainContentEditable.tsx#L33)
+[client/components/util/PlainContentEditable.tsx:34](https://github.com/onzag/itemize/blob/f2db74a5/client/components/util/PlainContentEditable.tsx#L34)
 
 ___
 
@@ -589,7 +589,7 @@ ___
 
 #### Defined in
 
-[client/components/util/PlainContentEditable.tsx:26](https://github.com/onzag/itemize/blob/5c2808d3/client/components/util/PlainContentEditable.tsx#L26)
+[client/components/util/PlainContentEditable.tsx:27](https://github.com/onzag/itemize/blob/f2db74a5/client/components/util/PlainContentEditable.tsx#L27)
 
 ___
 
@@ -603,7 +603,7 @@ ___
 
 #### Defined in
 
-[client/components/util/PlainContentEditable.tsx:29](https://github.com/onzag/itemize/blob/5c2808d3/client/components/util/PlainContentEditable.tsx#L29)
+[client/components/util/PlainContentEditable.tsx:30](https://github.com/onzag/itemize/blob/f2db74a5/client/components/util/PlainContentEditable.tsx#L30)
 
 ___
 
@@ -621,7 +621,7 @@ React.Component.render
 
 #### Defined in
 
-[client/components/util/PlainContentEditable.tsx:61](https://github.com/onzag/itemize/blob/5c2808d3/client/components/util/PlainContentEditable.tsx#L61)
+[client/components/util/PlainContentEditable.tsx:62](https://github.com/onzag/itemize/blob/f2db74a5/client/components/util/PlainContentEditable.tsx#L62)
 
 ___
 
@@ -676,4 +676,4 @@ React.Component.shouldComponentUpdate
 
 #### Defined in
 
-[client/components/util/PlainContentEditable.tsx:42](https://github.com/onzag/itemize/blob/5c2808d3/client/components/util/PlainContentEditable.tsx#L42)
+[client/components/util/PlainContentEditable.tsx:43](https://github.com/onzag/itemize/blob/f2db74a5/client/components/util/PlainContentEditable.tsx#L43)

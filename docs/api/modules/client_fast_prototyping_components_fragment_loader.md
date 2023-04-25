@@ -23,7 +23,7 @@ The item definition loader allows to handle cases of not found, blocked or error
 
 | Name | Type | Description |
 | :------ | :------ | :------ |
-| `props` | `FragmentLoaderProps` | the loader props |
+| `props` | `IFragmentLoaderProps` | the loader props |
 
 #### Returns
 
@@ -33,4 +33,4 @@ a react component
 
 #### Defined in
 
-[client/fast-prototyping/components/fragment-loader.tsx:76](https://github.com/onzag/itemize/blob/5c2808d3/client/fast-prototyping/components/fragment-loader.tsx#L76)
+[client/fast-prototyping/components/fragment-loader.tsx:127](https://github.com/onzag/itemize/blob/f2db74a5/client/fast-prototyping/components/fragment-loader.tsx#L127)

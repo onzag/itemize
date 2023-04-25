@@ -6,7 +6,7 @@
 
 ### Functions
 
-- [findLastRecordLastModifiedDate](server_resolvers_actions_search.md#findlastrecordlastmodifieddate)
+- [findLastRecordDate](server_resolvers_actions_search.md#findlastrecorddate)
 - [searchItemDefinition](server_resolvers_actions_search.md#searchitemdefinition)
 - [searchItemDefinitionFn](server_resolvers_actions_search.md#searchitemdefinitionfn)
 - [searchItemDefinitionTraditional](server_resolvers_actions_search.md#searchitemdefinitiontraditional)
@@ -18,15 +18,17 @@
 
 ## Functions
 
-### findLastRecordLastModifiedDate
+### findLastRecordDate
 
-▸ **findLastRecordLastModifiedDate**(...`records`): `string`
+▸ **findLastRecordDate**(`comp`, `p`, ...`records`): `string`
 
 #### Parameters
 
 | Name | Type |
 | :------ | :------ |
-| `...records` | [`IGQLSearchRecord`](../interfaces/gql_querier.IGQLSearchRecord.md)[][] |
+| `comp` | ``"min"`` \| ``"max"`` |
+| `p` | `string` |
+| `...records` | [`ISQLTableRowValue`](../interfaces/base_Root_sql.ISQLTableRowValue.md)[][] |
 
 #### Returns
 
@@ -34,7 +36,7 @@
 
 #### Defined in
 
-[server/resolvers/actions/search.ts:46](https://github.com/onzag/itemize/blob/5c2808d3/server/resolvers/actions/search.ts#L46)
+[server/resolvers/actions/search.ts:45](https://github.com/onzag/itemize/blob/f2db74a5/server/resolvers/actions/search.ts#L45)
 
 ___
 
@@ -57,7 +59,7 @@ ___
 
 #### Defined in
 
-[server/resolvers/actions/search.ts:487](https://github.com/onzag/itemize/blob/5c2808d3/server/resolvers/actions/search.ts#L487)
+[server/resolvers/actions/search.ts:712](https://github.com/onzag/itemize/blob/f2db74a5/server/resolvers/actions/search.ts#L712)
 
 ___
 
@@ -77,7 +79,7 @@ ___
 
 #### Defined in
 
-[server/resolvers/actions/search.ts:947](https://github.com/onzag/itemize/blob/5c2808d3/server/resolvers/actions/search.ts#L947)
+[server/resolvers/actions/search.ts:1369](https://github.com/onzag/itemize/blob/f2db74a5/server/resolvers/actions/search.ts#L1369)
 
 ___
 
@@ -99,7 +101,7 @@ ___
 
 #### Defined in
 
-[server/resolvers/actions/search.ts:479](https://github.com/onzag/itemize/blob/5c2808d3/server/resolvers/actions/search.ts#L479)
+[server/resolvers/actions/search.ts:704](https://github.com/onzag/itemize/blob/f2db74a5/server/resolvers/actions/search.ts#L704)
 
 ___
 
@@ -119,7 +121,7 @@ ___
 
 #### Defined in
 
-[server/resolvers/actions/search.ts:955](https://github.com/onzag/itemize/blob/5c2808d3/server/resolvers/actions/search.ts#L955)
+[server/resolvers/actions/search.ts:1377](https://github.com/onzag/itemize/blob/f2db74a5/server/resolvers/actions/search.ts#L1377)
 
 ___
 
@@ -142,7 +144,7 @@ ___
 
 #### Defined in
 
-[server/resolvers/actions/search.ts:65](https://github.com/onzag/itemize/blob/5c2808d3/server/resolvers/actions/search.ts#L65)
+[server/resolvers/actions/search.ts:66](https://github.com/onzag/itemize/blob/f2db74a5/server/resolvers/actions/search.ts#L66)
 
 ___
 
@@ -162,7 +164,7 @@ ___
 
 #### Defined in
 
-[server/resolvers/actions/search.ts:951](https://github.com/onzag/itemize/blob/5c2808d3/server/resolvers/actions/search.ts#L951)
+[server/resolvers/actions/search.ts:1373](https://github.com/onzag/itemize/blob/f2db74a5/server/resolvers/actions/search.ts#L1373)
 
 ___
 
@@ -184,7 +186,7 @@ ___
 
 #### Defined in
 
-[server/resolvers/actions/search.ts:57](https://github.com/onzag/itemize/blob/5c2808d3/server/resolvers/actions/search.ts#L57)
+[server/resolvers/actions/search.ts:58](https://github.com/onzag/itemize/blob/f2db74a5/server/resolvers/actions/search.ts#L58)
 
 ___
 
@@ -204,4 +206,4 @@ ___
 
 #### Defined in
 
-[server/resolvers/actions/search.ts:959](https://github.com/onzag/itemize/blob/5c2808d3/server/resolvers/actions/search.ts#L959)
+[server/resolvers/actions/search.ts:1381](https://github.com/onzag/itemize/blob/f2db74a5/server/resolvers/actions/search.ts#L1381)

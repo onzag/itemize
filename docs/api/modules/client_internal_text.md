@@ -21,6 +21,7 @@
 - [SUPPORTED\_HANDLERS](client_internal_text.md#supported_handlers)
 - [SUPPORTED\_TEMPLATE\_EVENTS](client_internal_text.md#supported_template_events)
 - [SUPPORTED\_TEMPLATE\_STYLES](client_internal_text.md#supported_template_styles)
+- [TABLE\_CLASS\_PREFIX](client_internal_text.md#table_class_prefix)
 - [nodesThatRepresentLines](client_internal_text.md#nodesthatrepresentlines)
 
 ### Functions
@@ -51,7 +52,7 @@ this will prevent users from class injection
 
 #### Defined in
 
-[client/internal/text/index.tsx:31](https://github.com/onzag/itemize/blob/5c2808d3/client/internal/text/index.tsx#L31)
+[client/internal/text/index.tsx:31](https://github.com/onzag/itemize/blob/f2db74a5/client/internal/text/index.tsx#L31)
 
 ___
 
@@ -63,7 +64,7 @@ The list of allowed prefixes
 
 #### Defined in
 
-[client/internal/text/index.tsx:45](https://github.com/onzag/itemize/blob/5c2808d3/client/internal/text/index.tsx#L45)
+[client/internal/text/index.tsx:46](https://github.com/onzag/itemize/blob/f2db74a5/client/internal/text/index.tsx#L46)
 
 ___
 
@@ -73,7 +74,7 @@ ___
 
 #### Defined in
 
-[client/internal/text/index.tsx:38](https://github.com/onzag/itemize/blob/5c2808d3/client/internal/text/index.tsx#L38)
+[client/internal/text/index.tsx:38](https://github.com/onzag/itemize/blob/f2db74a5/client/internal/text/index.tsx#L38)
 
 ___
 
@@ -83,7 +84,7 @@ ___
 
 #### Defined in
 
-[client/internal/text/index.tsx:39](https://github.com/onzag/itemize/blob/5c2808d3/client/internal/text/index.tsx#L39)
+[client/internal/text/index.tsx:39](https://github.com/onzag/itemize/blob/f2db74a5/client/internal/text/index.tsx#L39)
 
 ___
 
@@ -93,7 +94,7 @@ ___
 
 #### Defined in
 
-[client/internal/text/index.tsx:40](https://github.com/onzag/itemize/blob/5c2808d3/client/internal/text/index.tsx#L40)
+[client/internal/text/index.tsx:40](https://github.com/onzag/itemize/blob/f2db74a5/client/internal/text/index.tsx#L40)
 
 ___
 
@@ -103,7 +104,7 @@ ___
 
 #### Defined in
 
-[client/internal/text/index.tsx:37](https://github.com/onzag/itemize/blob/5c2808d3/client/internal/text/index.tsx#L37)
+[client/internal/text/index.tsx:37](https://github.com/onzag/itemize/blob/f2db74a5/client/internal/text/index.tsx#L37)
 
 ___
 
@@ -123,7 +124,7 @@ Sanitazation standard configuraton
 
 #### Defined in
 
-[client/internal/text/index.tsx:18](https://github.com/onzag/itemize/blob/5c2808d3/client/internal/text/index.tsx#L18)
+[client/internal/text/index.tsx:18](https://github.com/onzag/itemize/blob/f2db74a5/client/internal/text/index.tsx#L18)
 
 ___
 
@@ -136,7 +137,7 @@ the template args
 
 #### Defined in
 
-[client/internal/text/index.tsx:89](https://github.com/onzag/itemize/blob/5c2808d3/client/internal/text/index.tsx#L89)
+[client/internal/text/index.tsx:90](https://github.com/onzag/itemize/blob/f2db74a5/client/internal/text/index.tsx#L90)
 
 ___
 
@@ -149,7 +150,7 @@ use args
 
 #### Defined in
 
-[client/internal/text/index.tsx:98](https://github.com/onzag/itemize/blob/5c2808d3/client/internal/text/index.tsx#L98)
+[client/internal/text/index.tsx:99](https://github.com/onzag/itemize/blob/f2db74a5/client/internal/text/index.tsx#L99)
 
 ___
 
@@ -162,7 +163,7 @@ exist as data-on-[event]="{{event}}"
 
 #### Defined in
 
-[client/internal/text/index.tsx:53](https://github.com/onzag/itemize/blob/5c2808d3/client/internal/text/index.tsx#L53)
+[client/internal/text/index.tsx:54](https://github.com/onzag/itemize/blob/f2db74a5/client/internal/text/index.tsx#L54)
 
 ___
 
@@ -175,7 +176,17 @@ exist as data-[supportedTemplateStyle]-style="position:absolute;"
 
 #### Defined in
 
-[client/internal/text/index.tsx:80](https://github.com/onzag/itemize/blob/5c2808d3/client/internal/text/index.tsx#L80)
+[client/internal/text/index.tsx:81](https://github.com/onzag/itemize/blob/f2db74a5/client/internal/text/index.tsx#L81)
+
+___
+
+### TABLE\_CLASS\_PREFIX
+
+• **TABLE\_CLASS\_PREFIX**: ``"table-"``
+
+#### Defined in
+
+[client/internal/text/index.tsx:41](https://github.com/onzag/itemize/blob/f2db74a5/client/internal/text/index.tsx#L41)
 
 ___
 
@@ -185,7 +196,7 @@ ___
 
 #### Defined in
 
-[client/internal/text/index.tsx:911](https://github.com/onzag/itemize/blob/5c2808d3/client/internal/text/index.tsx#L911)
+[client/internal/text/index.tsx:1085](https://github.com/onzag/itemize/blob/f2db74a5/client/internal/text/index.tsx#L1085)
 
 ## Functions
 
@@ -208,7 +219,7 @@ compares two text for equivalence
 
 #### Defined in
 
-[client/internal/text/index.tsx:886](https://github.com/onzag/itemize/blob/5c2808d3/client/internal/text/index.tsx#L886)
+[client/internal/text/index.tsx:1060](https://github.com/onzag/itemize/blob/f2db74a5/client/internal/text/index.tsx#L1060)
 
 ___
 
@@ -231,7 +242,7 @@ compares two plain text for equivalence
 
 #### Defined in
 
-[client/internal/text/index.tsx:906](https://github.com/onzag/itemize/blob/5c2808d3/client/internal/text/index.tsx#L906)
+[client/internal/text/index.tsx:1080](https://github.com/onzag/itemize/blob/f2db74a5/client/internal/text/index.tsx#L1080)
 
 ___
 
@@ -251,7 +262,7 @@ ___
 
 #### Defined in
 
-[client/internal/text/index.tsx:937](https://github.com/onzag/itemize/blob/5c2808d3/client/internal/text/index.tsx#L937)
+[client/internal/text/index.tsx:1111](https://github.com/onzag/itemize/blob/f2db74a5/client/internal/text/index.tsx#L1111)
 
 ___
 
@@ -273,7 +284,7 @@ Counts the size of the document
 
 #### Defined in
 
-[client/internal/text/index.tsx:528](https://github.com/onzag/itemize/blob/5c2808d3/client/internal/text/index.tsx#L528)
+[client/internal/text/index.tsx:698](https://github.com/onzag/itemize/blob/f2db74a5/client/internal/text/index.tsx#L698)
 
 ___
 
@@ -295,15 +306,13 @@ Counts the size and words of the document
 
 #### Defined in
 
-[client/internal/text/index.tsx:564](https://github.com/onzag/itemize/blob/5c2808d3/client/internal/text/index.tsx#L564)
+[client/internal/text/index.tsx:735](https://github.com/onzag/itemize/blob/f2db74a5/client/internal/text/index.tsx#L735)
 
 ___
 
 ### countWords
 
 ▸ **countWords**(`root`): `number`
-
-Counts the words of the document
 
 #### Parameters
 
@@ -317,7 +326,7 @@ Counts the words of the document
 
 #### Defined in
 
-[client/internal/text/index.tsx:546](https://github.com/onzag/itemize/blob/5c2808d3/client/internal/text/index.tsx#L546)
+[client/internal/text/index.tsx:717](https://github.com/onzag/itemize/blob/f2db74a5/client/internal/text/index.tsx#L717)
 
 ___
 
@@ -346,7 +355,7 @@ the given content
 
 #### Defined in
 
-[client/internal/text/index.tsx:593](https://github.com/onzag/itemize/blob/5c2808d3/client/internal/text/index.tsx#L593)
+[client/internal/text/index.tsx:764](https://github.com/onzag/itemize/blob/f2db74a5/client/internal/text/index.tsx#L764)
 
 ___
 
@@ -374,13 +383,13 @@ a node
 
 #### Defined in
 
-[client/internal/text/index.tsx:276](https://github.com/onzag/itemize/blob/5c2808d3/client/internal/text/index.tsx#L276)
+[client/internal/text/index.tsx:338](https://github.com/onzag/itemize/blob/f2db74a5/client/internal/text/index.tsx#L338)
 
 ___
 
 ### renderTemplate
 
-▸ **renderTemplate**(`template`, `args`): `string`
+▸ **renderTemplate**(`context`, `featureSupport`, `template`, `args`): `string`
 
 Performs a simple template rendering
 from a string based HTML template based on the text specs
@@ -391,11 +400,6 @@ on a template
 
 It also does not support dynamic styles
 
-If you want the template to render nicely you might want
-to run it before over the sanitize function
-
-eg. renderTemplate(sanitize(...), {...args})
-
 for proper templates with full blown functionality you should
 use the renderTemplateDynamically method
 
@@ -403,6 +407,8 @@ use the renderTemplateDynamically method
 
 | Name | Type | Description |
 | :------ | :------ | :------ |
+| `context` | `IPostProcessingContext` | - |
+| `featureSupport` | [`IFeatureSupportOptions`](../interfaces/client_internal_text.IFeatureSupportOptions.md) | - |
 | `template` | `string` | the template in question |
 | `args` | `any` | the arguments |
 
@@ -412,7 +418,7 @@ use the renderTemplateDynamically method
 
 #### Defined in
 
-[client/internal/text/index.tsx:804](https://github.com/onzag/itemize/blob/5c2808d3/client/internal/text/index.tsx#L804)
+[client/internal/text/index.tsx:972](https://github.com/onzag/itemize/blob/f2db74a5/client/internal/text/index.tsx#L972)
 
 ___
 
@@ -422,6 +428,8 @@ ___
 
 Same as render template but will provide
 the div as a raw HTML result
+
+this function does not sanitize!!!
 
 #### Parameters
 
@@ -436,7 +444,7 @@ the div as a raw HTML result
 
 #### Defined in
 
-[client/internal/text/index.tsx:766](https://github.com/onzag/itemize/blob/5c2808d3/client/internal/text/index.tsx#L766)
+[client/internal/text/index.tsx:939](https://github.com/onzag/itemize/blob/f2db74a5/client/internal/text/index.tsx#L939)
 
 ___
 
@@ -469,7 +477,7 @@ takes a document instead
 
 #### Defined in
 
-[client/internal/text/index.tsx:826](https://github.com/onzag/itemize/blob/5c2808d3/client/internal/text/index.tsx#L826)
+[client/internal/text/index.tsx:998](https://github.com/onzag/itemize/blob/f2db74a5/client/internal/text/index.tsx#L998)
 
 ___
 
@@ -496,7 +504,7 @@ then be passed to the serializer or displayed as it is
 
 #### Defined in
 
-[client/internal/text/index.tsx:251](https://github.com/onzag/itemize/blob/5c2808d3/client/internal/text/index.tsx#L251)
+[client/internal/text/index.tsx:282](https://github.com/onzag/itemize/blob/f2db74a5/client/internal/text/index.tsx#L282)
 
 ___
 
@@ -519,7 +527,7 @@ HTML
 
 #### Defined in
 
-[client/internal/text/index.tsx:507](https://github.com/onzag/itemize/blob/5c2808d3/client/internal/text/index.tsx#L507)
+[client/internal/text/index.tsx:677](https://github.com/onzag/itemize/blob/f2db74a5/client/internal/text/index.tsx#L677)
 
 ___
 
@@ -542,4 +550,4 @@ rather than a bunch of nodes
 
 #### Defined in
 
-[client/internal/text/index.tsx:516](https://github.com/onzag/itemize/blob/5c2808d3/client/internal/text/index.tsx#L516)
+[client/internal/text/index.tsx:686](https://github.com/onzag/itemize/blob/f2db74a5/client/internal/text/index.tsx#L686)

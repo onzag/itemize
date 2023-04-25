@@ -85,7 +85,7 @@ React.Component&lt;
 
 #### Defined in
 
-[client/internal/components/PropertyEntry/PropertyEntryLocation.tsx:243](https://github.com/onzag/itemize/blob/5c2808d3/client/internal/components/PropertyEntry/PropertyEntryLocation.tsx#L243)
+[client/internal/components/PropertyEntry/PropertyEntryLocation.tsx:247](https://github.com/onzag/itemize/blob/f2db74a5/client/internal/components/PropertyEntry/PropertyEntryLocation.tsx#L247)
 
 ## Properties
 
@@ -95,7 +95,7 @@ React.Component&lt;
 
 #### Defined in
 
-[client/internal/components/PropertyEntry/PropertyEntryLocation.tsx:230](https://github.com/onzag/itemize/blob/5c2808d3/client/internal/components/PropertyEntry/PropertyEntryLocation.tsx#L230)
+[client/internal/components/PropertyEntry/PropertyEntryLocation.tsx:234](https://github.com/onzag/itemize/blob/f2db74a5/client/internal/components/PropertyEntry/PropertyEntryLocation.tsx#L234)
 
 ___
 
@@ -133,7 +133,7 @@ ___
 
 #### Defined in
 
-[client/internal/components/PropertyEntry/PropertyEntryLocation.tsx:234](https://github.com/onzag/itemize/blob/5c2808d3/client/internal/components/PropertyEntry/PropertyEntryLocation.tsx#L234)
+[client/internal/components/PropertyEntry/PropertyEntryLocation.tsx:238](https://github.com/onzag/itemize/blob/f2db74a5/client/internal/components/PropertyEntry/PropertyEntryLocation.tsx#L238)
 
 ___
 
@@ -143,7 +143,7 @@ ___
 
 #### Defined in
 
-[client/internal/components/PropertyEntry/PropertyEntryLocation.tsx:231](https://github.com/onzag/itemize/blob/5c2808d3/client/internal/components/PropertyEntry/PropertyEntryLocation.tsx#L231)
+[client/internal/components/PropertyEntry/PropertyEntryLocation.tsx:235](https://github.com/onzag/itemize/blob/f2db74a5/client/internal/components/PropertyEntry/PropertyEntryLocation.tsx#L235)
 
 ___
 
@@ -153,7 +153,7 @@ ___
 
 #### Defined in
 
-[client/internal/components/PropertyEntry/PropertyEntryLocation.tsx:240](https://github.com/onzag/itemize/blob/5c2808d3/client/internal/components/PropertyEntry/PropertyEntryLocation.tsx#L240)
+[client/internal/components/PropertyEntry/PropertyEntryLocation.tsx:244](https://github.com/onzag/itemize/blob/f2db74a5/client/internal/components/PropertyEntry/PropertyEntryLocation.tsx#L244)
 
 ___
 
@@ -163,7 +163,7 @@ ___
 
 #### Defined in
 
-[client/internal/components/PropertyEntry/PropertyEntryLocation.tsx:241](https://github.com/onzag/itemize/blob/5c2808d3/client/internal/components/PropertyEntry/PropertyEntryLocation.tsx#L241)
+[client/internal/components/PropertyEntry/PropertyEntryLocation.tsx:245](https://github.com/onzag/itemize/blob/f2db74a5/client/internal/components/PropertyEntry/PropertyEntryLocation.tsx#L245)
 
 ___
 
@@ -173,7 +173,7 @@ ___
 
 #### Defined in
 
-[client/internal/components/PropertyEntry/PropertyEntryLocation.tsx:236](https://github.com/onzag/itemize/blob/5c2808d3/client/internal/components/PropertyEntry/PropertyEntryLocation.tsx#L236)
+[client/internal/components/PropertyEntry/PropertyEntryLocation.tsx:240](https://github.com/onzag/itemize/blob/f2db74a5/client/internal/components/PropertyEntry/PropertyEntryLocation.tsx#L240)
 
 ___
 
@@ -183,7 +183,7 @@ ___
 
 #### Defined in
 
-[client/internal/components/PropertyEntry/PropertyEntryLocation.tsx:238](https://github.com/onzag/itemize/blob/5c2808d3/client/internal/components/PropertyEntry/PropertyEntryLocation.tsx#L238)
+[client/internal/components/PropertyEntry/PropertyEntryLocation.tsx:242](https://github.com/onzag/itemize/blob/f2db74a5/client/internal/components/PropertyEntry/PropertyEntryLocation.tsx#L242)
 
 ___
 
@@ -228,7 +228,7 @@ ___
 
 #### Defined in
 
-[client/internal/components/PropertyEntry/PropertyEntryLocation.tsx:229](https://github.com/onzag/itemize/blob/5c2808d3/client/internal/components/PropertyEntry/PropertyEntryLocation.tsx#L229)
+[client/internal/components/PropertyEntry/PropertyEntryLocation.tsx:233](https://github.com/onzag/itemize/blob/f2db74a5/client/internal/components/PropertyEntry/PropertyEntryLocation.tsx#L233)
 
 ___
 
@@ -404,7 +404,7 @@ ___
 
 #### Defined in
 
-[client/internal/components/PropertyEntry/PropertyEntryLocation.tsx:627](https://github.com/onzag/itemize/blob/5c2808d3/client/internal/components/PropertyEntry/PropertyEntryLocation.tsx#L627)
+[client/internal/components/PropertyEntry/PropertyEntryLocation.tsx:632](https://github.com/onzag/itemize/blob/f2db74a5/client/internal/components/PropertyEntry/PropertyEntryLocation.tsx#L632)
 
 ___
 
@@ -418,7 +418,7 @@ ___
 
 #### Defined in
 
-[client/internal/components/PropertyEntry/PropertyEntryLocation.tsx:634](https://github.com/onzag/itemize/blob/5c2808d3/client/internal/components/PropertyEntry/PropertyEntryLocation.tsx#L634)
+[client/internal/components/PropertyEntry/PropertyEntryLocation.tsx:639](https://github.com/onzag/itemize/blob/f2db74a5/client/internal/components/PropertyEntry/PropertyEntryLocation.tsx#L639)
 
 ___
 
@@ -490,7 +490,7 @@ React.Component.componentDidUpdate
 
 #### Defined in
 
-[client/internal/components/PropertyEntry/PropertyEntryLocation.tsx:305](https://github.com/onzag/itemize/blob/5c2808d3/client/internal/components/PropertyEntry/PropertyEntryLocation.tsx#L305)
+[client/internal/components/PropertyEntry/PropertyEntryLocation.tsx:310](https://github.com/onzag/itemize/blob/f2db74a5/client/internal/components/PropertyEntry/PropertyEntryLocation.tsx#L310)
 
 ___
 
@@ -634,7 +634,7 @@ ___
 
 #### Defined in
 
-[client/internal/components/PropertyEntry/PropertyEntryLocation.tsx:299](https://github.com/onzag/itemize/blob/5c2808d3/client/internal/components/PropertyEntry/PropertyEntryLocation.tsx#L299)
+[client/internal/components/PropertyEntry/PropertyEntryLocation.tsx:304](https://github.com/onzag/itemize/blob/f2db74a5/client/internal/components/PropertyEntry/PropertyEntryLocation.tsx#L304)
 
 ___
 
@@ -680,7 +680,7 @@ run the geocode for incomplete values
 
 #### Defined in
 
-[client/internal/components/PropertyEntry/PropertyEntryLocation.tsx:644](https://github.com/onzag/itemize/blob/5c2808d3/client/internal/components/PropertyEntry/PropertyEntryLocation.tsx#L644)
+[client/internal/components/PropertyEntry/PropertyEntryLocation.tsx:649](https://github.com/onzag/itemize/blob/f2db74a5/client/internal/components/PropertyEntry/PropertyEntryLocation.tsx#L649)
 
 ___
 
@@ -735,7 +735,7 @@ Fed to the renderer to change by search result
 
 #### Defined in
 
-[client/internal/components/PropertyEntry/PropertyEntryLocation.tsx:590](https://github.com/onzag/itemize/blob/5c2808d3/client/internal/components/PropertyEntry/PropertyEntryLocation.tsx#L590)
+[client/internal/components/PropertyEntry/PropertyEntryLocation.tsx:595](https://github.com/onzag/itemize/blob/f2db74a5/client/internal/components/PropertyEntry/PropertyEntryLocation.tsx#L595)
 
 ___
 
@@ -758,7 +758,7 @@ Fed to the renderer to change by suggestion
 
 #### Defined in
 
-[client/internal/components/PropertyEntry/PropertyEntryLocation.tsx:467](https://github.com/onzag/itemize/blob/5c2808d3/client/internal/components/PropertyEntry/PropertyEntryLocation.tsx#L467)
+[client/internal/components/PropertyEntry/PropertyEntryLocation.tsx:472](https://github.com/onzag/itemize/blob/f2db74a5/client/internal/components/PropertyEntry/PropertyEntryLocation.tsx#L472)
 
 ___
 
@@ -779,7 +779,7 @@ ___
 
 #### Defined in
 
-[client/internal/components/PropertyEntry/PropertyEntryLocation.tsx:670](https://github.com/onzag/itemize/blob/5c2808d3/client/internal/components/PropertyEntry/PropertyEntryLocation.tsx#L670)
+[client/internal/components/PropertyEntry/PropertyEntryLocation.tsx:675](https://github.com/onzag/itemize/blob/f2db74a5/client/internal/components/PropertyEntry/PropertyEntryLocation.tsx#L675)
 
 ___
 
@@ -795,7 +795,7 @@ Hijacking the on restore function
 
 #### Defined in
 
-[client/internal/components/PropertyEntry/PropertyEntryLocation.tsx:342](https://github.com/onzag/itemize/blob/5c2808d3/client/internal/components/PropertyEntry/PropertyEntryLocation.tsx#L342)
+[client/internal/components/PropertyEntry/PropertyEntryLocation.tsx:347](https://github.com/onzag/itemize/blob/f2db74a5/client/internal/components/PropertyEntry/PropertyEntryLocation.tsx#L347)
 
 ___
 
@@ -817,7 +817,7 @@ Fed to the renderer in order to run a search
 
 #### Defined in
 
-[client/internal/components/PropertyEntry/PropertyEntryLocation.tsx:481](https://github.com/onzag/itemize/blob/5c2808d3/client/internal/components/PropertyEntry/PropertyEntryLocation.tsx#L481)
+[client/internal/components/PropertyEntry/PropertyEntryLocation.tsx:486](https://github.com/onzag/itemize/blob/f2db74a5/client/internal/components/PropertyEntry/PropertyEntryLocation.tsx#L486)
 
 ___
 
@@ -841,7 +841,7 @@ function that is fed to the renderer
 
 #### Defined in
 
-[client/internal/components/PropertyEntry/PropertyEntryLocation.tsx:409](https://github.com/onzag/itemize/blob/5c2808d3/client/internal/components/PropertyEntry/PropertyEntryLocation.tsx#L409)
+[client/internal/components/PropertyEntry/PropertyEntryLocation.tsx:414](https://github.com/onzag/itemize/blob/f2db74a5/client/internal/components/PropertyEntry/PropertyEntryLocation.tsx#L414)
 
 ___
 
@@ -864,7 +864,7 @@ Actuall what triggers
 
 #### Defined in
 
-[client/internal/components/PropertyEntry/PropertyEntryLocation.tsx:363](https://github.com/onzag/itemize/blob/5c2808d3/client/internal/components/PropertyEntry/PropertyEntryLocation.tsx#L363)
+[client/internal/components/PropertyEntry/PropertyEntryLocation.tsx:368](https://github.com/onzag/itemize/blob/f2db74a5/client/internal/components/PropertyEntry/PropertyEntryLocation.tsx#L368)
 
 ___
 
@@ -884,7 +884,7 @@ ___
 
 #### Defined in
 
-[client/internal/components/PropertyEntry/PropertyEntryLocation.tsx:349](https://github.com/onzag/itemize/blob/5c2808d3/client/internal/components/PropertyEntry/PropertyEntryLocation.tsx#L349)
+[client/internal/components/PropertyEntry/PropertyEntryLocation.tsx:354](https://github.com/onzag/itemize/blob/f2db74a5/client/internal/components/PropertyEntry/PropertyEntryLocation.tsx#L354)
 
 ___
 
@@ -902,7 +902,7 @@ React.Component.render
 
 #### Defined in
 
-[client/internal/components/PropertyEntry/PropertyEntryLocation.tsx:718](https://github.com/onzag/itemize/blob/5c2808d3/client/internal/components/PropertyEntry/PropertyEntryLocation.tsx#L718)
+[client/internal/components/PropertyEntry/PropertyEntryLocation.tsx:723](https://github.com/onzag/itemize/blob/f2db74a5/client/internal/components/PropertyEntry/PropertyEntryLocation.tsx#L723)
 
 ___
 
@@ -958,4 +958,4 @@ React.Component.shouldComponentUpdate
 
 #### Defined in
 
-[client/internal/components/PropertyEntry/PropertyEntryLocation.tsx:277](https://github.com/onzag/itemize/blob/5c2808d3/client/internal/components/PropertyEntry/PropertyEntryLocation.tsx#L277)
+[client/internal/components/PropertyEntry/PropertyEntryLocation.tsx:281](https://github.com/onzag/itemize/blob/f2db74a5/client/internal/components/PropertyEntry/PropertyEntryLocation.tsx#L281)

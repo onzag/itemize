@@ -29,7 +29,7 @@
 
 #### Defined in
 
-[server/resolvers/actions/delete.ts:33](https://github.com/onzag/itemize/blob/5c2808d3/server/resolvers/actions/delete.ts#L33)
+[server/resolvers/actions/delete.ts:29](https://github.com/onzag/itemize/blob/f2db74a5/server/resolvers/actions/delete.ts#L29)
 
 ___
 
@@ -49,4 +49,4 @@ ___
 
 #### Defined in
 
-[server/resolvers/actions/delete.ts:332](https://github.com/onzag/itemize/blob/5c2808d3/server/resolvers/actions/delete.ts#L332)
+[server/resolvers/actions/delete.ts:359](https://github.com/onzag/itemize/blob/f2db74a5/server/resolvers/actions/delete.ts#L359)

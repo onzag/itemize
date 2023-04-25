@@ -16,7 +16,6 @@ themselves, this is possibly a limited list, and it's always 0 offset
 - [count](client_internal_workers_cache_cache_worker.ISearchMatchType.md#count)
 - [fields](client_internal_workers_cache_cache_worker.ISearchMatchType.md#fields)
 - [lastModified](client_internal_workers_cache_cache_worker.ISearchMatchType.md#lastmodified)
-- [limit](client_internal_workers_cache_cache_worker.ISearchMatchType.md#limit)
 - [value](client_internal_workers_cache_cache_worker.ISearchMatchType.md#value)
 
 ## Properties
@@ -30,7 +29,7 @@ as matched on the cache itself
 
 #### Defined in
 
-[client/internal/workers/cache/cache.worker.ts:89](https://github.com/onzag/itemize/blob/5c2808d3/client/internal/workers/cache/cache.worker.ts#L89)
+[client/internal/workers/cache/cache.worker.ts:106](https://github.com/onzag/itemize/blob/f2db74a5/client/internal/workers/cache/cache.worker.ts#L106)
 
 ___
 
@@ -43,7 +42,7 @@ it's tried to be kept in sync
 
 #### Defined in
 
-[client/internal/workers/cache/cache.worker.ts:103](https://github.com/onzag/itemize/blob/5c2808d3/client/internal/workers/cache/cache.worker.ts#L103)
+[client/internal/workers/cache/cache.worker.ts:115](https://github.com/onzag/itemize/blob/f2db74a5/client/internal/workers/cache/cache.worker.ts#L115)
 
 ___
 
@@ -56,7 +55,7 @@ in each one of these search matches
 
 #### Defined in
 
-[client/internal/workers/cache/cache.worker.ts:80](https://github.com/onzag/itemize/blob/5c2808d3/client/internal/workers/cache/cache.worker.ts#L80)
+[client/internal/workers/cache/cache.worker.ts:97](https://github.com/onzag/itemize/blob/f2db74a5/client/internal/workers/cache/cache.worker.ts#L97)
 
 ___
 
@@ -68,20 +67,7 @@ The last record date of that records list
 
 #### Defined in
 
-[client/internal/workers/cache/cache.worker.ts:93](https://github.com/onzag/itemize/blob/5c2808d3/client/internal/workers/cache/cache.worker.ts#L93)
-
-___
-
-### limit
-
-• **limit**: `number`
-
-The limit we limited ourselves to, the list can however
-be larger than the limit as it might grow by events
-
-#### Defined in
-
-[client/internal/workers/cache/cache.worker.ts:98](https://github.com/onzag/itemize/blob/5c2808d3/client/internal/workers/cache/cache.worker.ts#L98)
+[client/internal/workers/cache/cache.worker.ts:110](https://github.com/onzag/itemize/blob/f2db74a5/client/internal/workers/cache/cache.worker.ts#L110)
 
 ___
 
@@ -93,4 +79,4 @@ The value as a list of search records
 
 #### Defined in
 
-[client/internal/workers/cache/cache.worker.ts:84](https://github.com/onzag/itemize/blob/5c2808d3/client/internal/workers/cache/cache.worker.ts#L84)
+[client/internal/workers/cache/cache.worker.ts:101](https://github.com/onzag/itemize/blob/f2db74a5/client/internal/workers/cache/cache.worker.ts#L101)

@@ -68,7 +68,7 @@ React.Component&lt;ILanguagePickerProps, ILanguagePickerState\&gt;.constructor
 
 #### Defined in
 
-[client/fast-prototyping/components/language-picker.tsx:84](https://github.com/onzag/itemize/blob/5c2808d3/client/fast-prototyping/components/language-picker.tsx#L84)
+[client/fast-prototyping/components/language-picker.tsx:109](https://github.com/onzag/itemize/blob/f2db74a5/client/fast-prototyping/components/language-picker.tsx#L109)
 
 ## Properties
 
@@ -577,7 +577,7 @@ ___
 
 #### Defined in
 
-[client/fast-prototyping/components/language-picker.tsx:95](https://github.com/onzag/itemize/blob/5c2808d3/client/fast-prototyping/components/language-picker.tsx#L95)
+[client/fast-prototyping/components/language-picker.tsx:120](https://github.com/onzag/itemize/blob/f2db74a5/client/fast-prototyping/components/language-picker.tsx#L120)
 
 ___
 
@@ -589,7 +589,7 @@ ___
 
 | Name | Type |
 | :------ | :------ |
-| `changeLanguageToFn` | (`code`: `string`) => `void` |
+| `changeLanguageToFn` | [`ChangeLanguageToFn`](../modules/client_internal_providers_locale_provider.md#changelanguagetofn) |
 | `code` | `string` |
 
 #### Returns
@@ -598,7 +598,7 @@ ___
 
 #### Defined in
 
-[client/fast-prototyping/components/language-picker.tsx:105](https://github.com/onzag/itemize/blob/5c2808d3/client/fast-prototyping/components/language-picker.tsx#L105)
+[client/fast-prototyping/components/language-picker.tsx:130](https://github.com/onzag/itemize/blob/f2db74a5/client/fast-prototyping/components/language-picker.tsx#L130)
 
 ___
 
@@ -612,7 +612,7 @@ ___
 
 #### Defined in
 
-[client/fast-prototyping/components/language-picker.tsx:100](https://github.com/onzag/itemize/blob/5c2808d3/client/fast-prototyping/components/language-picker.tsx#L100)
+[client/fast-prototyping/components/language-picker.tsx:125](https://github.com/onzag/itemize/blob/f2db74a5/client/fast-prototyping/components/language-picker.tsx#L125)
 
 ___
 
@@ -630,7 +630,7 @@ React.Component.render
 
 #### Defined in
 
-[client/fast-prototyping/components/language-picker.tsx:116](https://github.com/onzag/itemize/blob/5c2808d3/client/fast-prototyping/components/language-picker.tsx#L116)
+[client/fast-prototyping/components/language-picker.tsx:141](https://github.com/onzag/itemize/blob/f2db74a5/client/fast-prototyping/components/language-picker.tsx#L141)
 
 ___
 

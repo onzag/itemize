@@ -30,7 +30,7 @@ These are the main errors a property is able to give
 
 #### Defined in
 
-[base/Root/Module/ItemDefinition/PropertyDefinition/index.ts:47](https://github.com/onzag/itemize/blob/5c2808d3/base/Root/Module/ItemDefinition/PropertyDefinition/index.ts#L47)
+[base/Root/Module/ItemDefinition/PropertyDefinition/index.ts:49](https://github.com/onzag/itemize/blob/f2db74a5/base/Root/Module/ItemDefinition/PropertyDefinition/index.ts#L49)
 
 ___
 
@@ -40,7 +40,7 @@ ___
 
 #### Defined in
 
-[base/Root/Module/ItemDefinition/PropertyDefinition/index.ts:45](https://github.com/onzag/itemize/blob/5c2808d3/base/Root/Module/ItemDefinition/PropertyDefinition/index.ts#L45)
+[base/Root/Module/ItemDefinition/PropertyDefinition/index.ts:47](https://github.com/onzag/itemize/blob/f2db74a5/base/Root/Module/ItemDefinition/PropertyDefinition/index.ts#L47)
 
 ___
 
@@ -50,7 +50,7 @@ ___
 
 #### Defined in
 
-[base/Root/Module/ItemDefinition/PropertyDefinition/index.ts:38](https://github.com/onzag/itemize/blob/5c2808d3/base/Root/Module/ItemDefinition/PropertyDefinition/index.ts#L38)
+[base/Root/Module/ItemDefinition/PropertyDefinition/index.ts:40](https://github.com/onzag/itemize/blob/f2db74a5/base/Root/Module/ItemDefinition/PropertyDefinition/index.ts#L40)
 
 ___
 
@@ -60,7 +60,7 @@ ___
 
 #### Defined in
 
-[base/Root/Module/ItemDefinition/PropertyDefinition/index.ts:53](https://github.com/onzag/itemize/blob/5c2808d3/base/Root/Module/ItemDefinition/PropertyDefinition/index.ts#L53)
+[base/Root/Module/ItemDefinition/PropertyDefinition/index.ts:55](https://github.com/onzag/itemize/blob/f2db74a5/base/Root/Module/ItemDefinition/PropertyDefinition/index.ts#L55)
 
 ___
 
@@ -70,7 +70,7 @@ ___
 
 #### Defined in
 
-[base/Root/Module/ItemDefinition/PropertyDefinition/index.ts:43](https://github.com/onzag/itemize/blob/5c2808d3/base/Root/Module/ItemDefinition/PropertyDefinition/index.ts#L43)
+[base/Root/Module/ItemDefinition/PropertyDefinition/index.ts:45](https://github.com/onzag/itemize/blob/f2db74a5/base/Root/Module/ItemDefinition/PropertyDefinition/index.ts#L45)
 
 ___
 
@@ -80,7 +80,7 @@ ___
 
 #### Defined in
 
-[base/Root/Module/ItemDefinition/PropertyDefinition/index.ts:50](https://github.com/onzag/itemize/blob/5c2808d3/base/Root/Module/ItemDefinition/PropertyDefinition/index.ts#L50)
+[base/Root/Module/ItemDefinition/PropertyDefinition/index.ts:52](https://github.com/onzag/itemize/blob/f2db74a5/base/Root/Module/ItemDefinition/PropertyDefinition/index.ts#L52)
 
 ___
 
@@ -90,7 +90,7 @@ ___
 
 #### Defined in
 
-[base/Root/Module/ItemDefinition/PropertyDefinition/index.ts:42](https://github.com/onzag/itemize/blob/5c2808d3/base/Root/Module/ItemDefinition/PropertyDefinition/index.ts#L42)
+[base/Root/Module/ItemDefinition/PropertyDefinition/index.ts:44](https://github.com/onzag/itemize/blob/f2db74a5/base/Root/Module/ItemDefinition/PropertyDefinition/index.ts#L44)
 
 ___
 
@@ -100,7 +100,7 @@ ___
 
 #### Defined in
 
-[base/Root/Module/ItemDefinition/PropertyDefinition/index.ts:39](https://github.com/onzag/itemize/blob/5c2808d3/base/Root/Module/ItemDefinition/PropertyDefinition/index.ts#L39)
+[base/Root/Module/ItemDefinition/PropertyDefinition/index.ts:41](https://github.com/onzag/itemize/blob/f2db74a5/base/Root/Module/ItemDefinition/PropertyDefinition/index.ts#L41)
 
 ___
 
@@ -110,7 +110,7 @@ ___
 
 #### Defined in
 
-[base/Root/Module/ItemDefinition/PropertyDefinition/index.ts:41](https://github.com/onzag/itemize/blob/5c2808d3/base/Root/Module/ItemDefinition/PropertyDefinition/index.ts#L41)
+[base/Root/Module/ItemDefinition/PropertyDefinition/index.ts:43](https://github.com/onzag/itemize/blob/f2db74a5/base/Root/Module/ItemDefinition/PropertyDefinition/index.ts#L43)
 
 ___
 
@@ -120,7 +120,7 @@ ___
 
 #### Defined in
 
-[base/Root/Module/ItemDefinition/PropertyDefinition/index.ts:40](https://github.com/onzag/itemize/blob/5c2808d3/base/Root/Module/ItemDefinition/PropertyDefinition/index.ts#L40)
+[base/Root/Module/ItemDefinition/PropertyDefinition/index.ts:42](https://github.com/onzag/itemize/blob/f2db74a5/base/Root/Module/ItemDefinition/PropertyDefinition/index.ts#L42)
 
 ___
 
@@ -130,4 +130,4 @@ ___
 
 #### Defined in
 
-[base/Root/Module/ItemDefinition/PropertyDefinition/index.ts:48](https://github.com/onzag/itemize/blob/5c2808d3/base/Root/Module/ItemDefinition/PropertyDefinition/index.ts#L48)
+[base/Root/Module/ItemDefinition/PropertyDefinition/index.ts:50](https://github.com/onzag/itemize/blob/f2db74a5/base/Root/Module/ItemDefinition/PropertyDefinition/index.ts#L50)

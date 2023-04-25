@@ -5,7 +5,7 @@
 [base/remote-protocol](../modules/base_remote_protocol.md).IParentedSearchRegisterRequest
 
 The parented search register request adds the parent type and parent id
-check [[IParentedSearchRecordsAddedEvent]]
+check [IParentedSearchRecordsEvent](base_remote_protocol.IParentedSearchRecordsEvent.md)
 
 ## Hierarchy
 
@@ -34,7 +34,7 @@ check [[IParentedSearchRecordsAddedEvent]]
 
 #### Defined in
 
-[base/remote-protocol.ts:361](https://github.com/onzag/itemize/blob/5c2808d3/base/remote-protocol.ts#L361)
+[base/remote-protocol.ts:377](https://github.com/onzag/itemize/blob/f2db74a5/base/remote-protocol.ts#L377)
 
 ___
 
@@ -44,7 +44,7 @@ ___
 
 #### Defined in
 
-[base/remote-protocol.ts:360](https://github.com/onzag/itemize/blob/5c2808d3/base/remote-protocol.ts#L360)
+[base/remote-protocol.ts:376](https://github.com/onzag/itemize/blob/f2db74a5/base/remote-protocol.ts#L376)
 
 ___
 
@@ -54,7 +54,7 @@ ___
 
 #### Defined in
 
-[base/remote-protocol.ts:362](https://github.com/onzag/itemize/blob/5c2808d3/base/remote-protocol.ts#L362)
+[base/remote-protocol.ts:378](https://github.com/onzag/itemize/blob/f2db74a5/base/remote-protocol.ts#L378)
 
 ___
 
@@ -68,4 +68,4 @@ IBaseSearchRegisterRequest.qualifiedPathName
 
 #### Defined in
 
-[base/remote-protocol.ts:311](https://github.com/onzag/itemize/blob/5c2808d3/base/remote-protocol.ts#L311)
+[base/remote-protocol.ts:327](https://github.com/onzag/itemize/blob/f2db74a5/base/remote-protocol.ts#L327)

@@ -9,6 +9,7 @@ Does the very simple job of retrieving the current user data
 ### Functions
 
 - [default](client_components_user_UserDataRetriever.md#default)
+- [useUserDataRetriever](client_components_user_UserDataRetriever.md#useuserdataretriever)
 
 ## Functions
 
@@ -37,4 +38,23 @@ a react element
 
 #### Defined in
 
-[client/components/user/UserDataRetriever.tsx:33](https://github.com/onzag/itemize/blob/5c2808d3/client/components/user/UserDataRetriever.tsx#L33)
+[client/components/user/UserDataRetriever.tsx:33](https://github.com/onzag/itemize/blob/f2db74a5/client/components/user/UserDataRetriever.tsx#L33)
+
+___
+
+### useUserDataRetriever
+
+▸ **useUserDataRetriever**(): `Object`
+
+#### Returns
+
+`Object`
+
+| Name | Type |
+| :------ | :------ |
+| `id` | `string` |
+| `role` | `string` |
+
+#### Defined in
+
+[client/components/user/UserDataRetriever.tsx:48](https://github.com/onzag/itemize/blob/f2db74a5/client/components/user/UserDataRetriever.tsx#L48)

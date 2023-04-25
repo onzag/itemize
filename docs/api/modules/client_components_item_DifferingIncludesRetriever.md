@@ -6,6 +6,10 @@ Contains the DifferingIncludesRetriever class
 
 ## Table of contents
 
+### Interfaces
+
+- [IDifferingIncludeInfo](../interfaces/client_components_item_DifferingIncludesRetriever.IDifferingIncludeInfo.md)
+
 ### Functions
 
 - [default](client_components_item_DifferingIncludesRetriever.md#default)
@@ -32,4 +36,4 @@ a react component
 
 #### Defined in
 
-[client/components/item/DifferingIncludesRetriever.tsx:80](https://github.com/onzag/itemize/blob/5c2808d3/client/components/item/DifferingIncludesRetriever.tsx#L80)
+[client/components/item/DifferingIncludesRetriever.tsx:80](https://github.com/onzag/itemize/blob/f2db74a5/client/components/item/DifferingIncludesRetriever.tsx#L80)

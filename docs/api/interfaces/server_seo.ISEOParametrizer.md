@@ -29,4 +29,4 @@ everything you need
 
 #### Defined in
 
-[server/seo/index.ts:18](https://github.com/onzag/itemize/blob/5c2808d3/server/seo/index.ts#L18)
+[server/seo/index.ts:18](https://github.com/onzag/itemize/blob/f2db74a5/server/seo/index.ts#L18)

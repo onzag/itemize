@@ -43,6 +43,7 @@ will use the same as field
 - [forceUpdate](client_fast_prototyping_renderers_PropertyEntry_PropertyEntryText.default.md#forceupdate)
 - [getSnapshotBeforeUpdate](client_fast_prototyping_renderers_PropertyEntry_PropertyEntryText.default.md#getsnapshotbeforeupdate)
 - [onBlur](client_fast_prototyping_renderers_PropertyEntry_PropertyEntryText.default.md#onblur)
+- [onChange](client_fast_prototyping_renderers_PropertyEntry_PropertyEntryText.default.md#onchange)
 - [onFocus](client_fast_prototyping_renderers_PropertyEntry_PropertyEntryText.default.md#onfocus)
 - [render](client_fast_prototyping_renderers_PropertyEntry_PropertyEntryText.default.md#render)
 - [setState](client_fast_prototyping_renderers_PropertyEntry_PropertyEntryText.default.md#setstate)
@@ -66,7 +67,7 @@ React.PureComponent&lt;IPropertyEntryTextRendererProps, IPropertyEntryTextRender
 
 #### Defined in
 
-[client/fast-prototyping/renderers/PropertyEntry/PropertyEntryText.tsx:130](https://github.com/onzag/itemize/blob/5c2808d3/client/fast-prototyping/renderers/PropertyEntry/PropertyEntryText.tsx#L130)
+[client/fast-prototyping/renderers/PropertyEntry/PropertyEntryText.tsx:129](https://github.com/onzag/itemize/blob/f2db74a5/client/fast-prototyping/renderers/PropertyEntry/PropertyEntryText.tsx#L129)
 
 ## Properties
 
@@ -569,7 +570,28 @@ ___
 
 #### Defined in
 
-[client/fast-prototyping/renderers/PropertyEntry/PropertyEntryText.tsx:146](https://github.com/onzag/itemize/blob/5c2808d3/client/fast-prototyping/renderers/PropertyEntry/PropertyEntryText.tsx#L146)
+[client/fast-prototyping/renderers/PropertyEntry/PropertyEntryText.tsx:146](https://github.com/onzag/itemize/blob/f2db74a5/client/fast-prototyping/renderers/PropertyEntry/PropertyEntryText.tsx#L146)
+
+___
+
+### onChange
+
+▸ **onChange**(`value`, `internalValue`): `void`
+
+#### Parameters
+
+| Name | Type |
+| :------ | :------ |
+| `value` | `string` |
+| `internalValue` | `any` |
+
+#### Returns
+
+`void`
+
+#### Defined in
+
+[client/fast-prototyping/renderers/PropertyEntry/PropertyEntryText.tsx:152](https://github.com/onzag/itemize/blob/f2db74a5/client/fast-prototyping/renderers/PropertyEntry/PropertyEntryText.tsx#L152)
 
 ___
 
@@ -583,7 +605,7 @@ ___
 
 #### Defined in
 
-[client/fast-prototyping/renderers/PropertyEntry/PropertyEntryText.tsx:141](https://github.com/onzag/itemize/blob/5c2808d3/client/fast-prototyping/renderers/PropertyEntry/PropertyEntryText.tsx#L141)
+[client/fast-prototyping/renderers/PropertyEntry/PropertyEntryText.tsx:141](https://github.com/onzag/itemize/blob/f2db74a5/client/fast-prototyping/renderers/PropertyEntry/PropertyEntryText.tsx#L141)
 
 ___
 
@@ -601,7 +623,7 @@ React.PureComponent.render
 
 #### Defined in
 
-[client/fast-prototyping/renderers/PropertyEntry/PropertyEntryText.tsx:152](https://github.com/onzag/itemize/blob/5c2808d3/client/fast-prototyping/renderers/PropertyEntry/PropertyEntryText.tsx#L152)
+[client/fast-prototyping/renderers/PropertyEntry/PropertyEntryText.tsx:163](https://github.com/onzag/itemize/blob/f2db74a5/client/fast-prototyping/renderers/PropertyEntry/PropertyEntryText.tsx#L163)
 
 ___
 

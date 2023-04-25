@@ -27,7 +27,7 @@
 
 #### Defined in
 
-[client/internal/components/IncludeCalloutWarning/index.tsx:58](https://github.com/onzag/itemize/blob/5c2808d3/client/internal/components/IncludeCalloutWarning/index.tsx#L58)
+[client/internal/components/IncludeCalloutWarning/index.tsx:58](https://github.com/onzag/itemize/blob/f2db74a5/client/internal/components/IncludeCalloutWarning/index.tsx#L58)
 
 ___
 
@@ -47,7 +47,7 @@ The renderer args
 
 #### Defined in
 
-[client/internal/renderer.ts:19](https://github.com/onzag/itemize/blob/5c2808d3/client/internal/renderer.ts#L19)
+[client/internal/renderer.ts:19](https://github.com/onzag/itemize/blob/f2db74a5/client/internal/renderer.ts#L19)
 
 ___
 
@@ -63,7 +63,7 @@ Whether it is in rtl mode for a rtl language
 
 #### Defined in
 
-[client/internal/renderer.ts:15](https://github.com/onzag/itemize/blob/5c2808d3/client/internal/renderer.ts#L15)
+[client/internal/renderer.ts:15](https://github.com/onzag/itemize/blob/f2db74a5/client/internal/renderer.ts#L15)
 
 ___
 
@@ -73,4 +73,4 @@ ___
 
 #### Defined in
 
-[client/internal/components/IncludeCalloutWarning/index.tsx:57](https://github.com/onzag/itemize/blob/5c2808d3/client/internal/components/IncludeCalloutWarning/index.tsx#L57)
+[client/internal/components/IncludeCalloutWarning/index.tsx:57](https://github.com/onzag/itemize/blob/f2db74a5/client/internal/components/IncludeCalloutWarning/index.tsx#L57)

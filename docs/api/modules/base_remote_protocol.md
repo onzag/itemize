@@ -29,6 +29,10 @@ that is implemented by the remote listener
 - [IParentedSearchRecordsEvent](../interfaces/base_remote_protocol.IParentedSearchRecordsEvent.md)
 - [IParentedSearchRegisterRequest](../interfaces/base_remote_protocol.IParentedSearchRegisterRequest.md)
 - [IParentedSearchUnregisterRequest](../interfaces/base_remote_protocol.IParentedSearchUnregisterRequest.md)
+- [IPropertySearchFeedbackRequest](../interfaces/base_remote_protocol.IPropertySearchFeedbackRequest.md)
+- [IPropertySearchRecordsEvent](../interfaces/base_remote_protocol.IPropertySearchRecordsEvent.md)
+- [IPropertySearchRegisterRequest](../interfaces/base_remote_protocol.IPropertySearchRegisterRequest.md)
+- [IPropertySearchUnregisterRequest](../interfaces/base_remote_protocol.IPropertySearchUnregisterRequest.md)
 - [IRedisEvent](../interfaces/base_remote_protocol.IRedisEvent.md)
 - [IRegisterRequest](../interfaces/base_remote_protocol.IRegisterRequest.md)
 - [IUnregisterRequest](../interfaces/base_remote_protocol.IUnregisterRequest.md)
@@ -36,7 +40,7 @@ that is implemented by the remote listener
 ### Variables
 
 - [BUILDNUMBER\_EVENT](base_remote_protocol.md#buildnumber_event)
-- [CHANGED\_FEEEDBACK\_EVENT](base_remote_protocol.md#changed_feeedback_event)
+- [CHANGED\_FEEDBACK\_EVENT](base_remote_protocol.md#changed_feedback_event)
 - [CURRENCY\_FACTORS\_UPDATED\_EVENT](base_remote_protocol.md#currency_factors_updated_event)
 - [ERROR\_EVENT](base_remote_protocol.md#error_event)
 - [FEEDBACK\_REQUEST](base_remote_protocol.md#feedback_request)
@@ -63,9 +67,16 @@ that is implemented by the remote listener
 - [PARENTED\_SEARCH\_RECORDS\_EVENT](base_remote_protocol.md#parented_search_records_event)
 - [PARENTED\_SEARCH\_REGISTER\_REQUEST](base_remote_protocol.md#parented_search_register_request)
 - [PARENTED\_SEARCH\_UNREGISTER\_REQUEST](base_remote_protocol.md#parented_search_unregister_request)
+- [PROPERTY\_SEARCH\_FEEDBACK\_REQUEST](base_remote_protocol.md#property_search_feedback_request)
+- [PROPERTY\_SEARCH\_RECORDS\_EVENT](base_remote_protocol.md#property_search_records_event)
+- [PROPERTY\_SEARCH\_REGISTER\_REQUEST](base_remote_protocol.md#property_search_register_request)
+- [PROPERTY\_SEARCH\_UNREGISTER\_REQUEST](base_remote_protocol.md#property_search_unregister_request)
 - [ParentedSearchFeedbackRequestSchema](base_remote_protocol.md#parentedsearchfeedbackrequestschema)
 - [ParentedSearchRegisterRequestSchema](base_remote_protocol.md#parentedsearchregisterrequestschema)
 - [ParentedSearchUnregisterRequestSchema](base_remote_protocol.md#parentedsearchunregisterrequestschema)
+- [PropertySearchFeedbackRequestSchema](base_remote_protocol.md#propertysearchfeedbackrequestschema)
+- [PropertySearchRegisterRequestSchema](base_remote_protocol.md#propertysearchregisterrequestschema)
+- [PropertySearchUnregisterRequestSchema](base_remote_protocol.md#propertysearchunregisterrequestschema)
 - [REGISTER\_REQUEST](base_remote_protocol.md#register_request)
 - [RegisterRequestSchema](base_remote_protocol.md#registerrequestschema)
 - [UNREGISTER\_REQUEST](base_remote_protocol.md#unregister_request)
@@ -77,6 +88,7 @@ that is implemented by the remote listener
 - [generateOwnedParentedSearchMergedIndexIdentifier](base_remote_protocol.md#generateownedparentedsearchmergedindexidentifier)
 - [generateOwnedSearchMergedIndexIdentifier](base_remote_protocol.md#generateownedsearchmergedindexidentifier)
 - [generateParentedSearchMergedIndexIdentifier](base_remote_protocol.md#generateparentedsearchmergedindexidentifier)
+- [generatePropertySearchMergedIndexIdentifier](base_remote_protocol.md#generatepropertysearchmergedindexidentifier)
 
 ## Variables
 
@@ -89,20 +101,20 @@ server to the client once this client has connected
 
 #### Defined in
 
-[base/remote-protocol.ts:19](https://github.com/onzag/itemize/blob/5c2808d3/base/remote-protocol.ts#L19)
+[base/remote-protocol.ts:19](https://github.com/onzag/itemize/blob/f2db74a5/base/remote-protocol.ts#L19)
 
 ___
 
-### CHANGED\_FEEEDBACK\_EVENT
+### CHANGED\_FEEDBACK\_EVENT
 
-• **CHANGED\_FEEEDBACK\_EVENT**: ``"changed"``
+• **CHANGED\_FEEDBACK\_EVENT**: ``"changed"``
 
 Event that comes from the server when something has
 changed or as an answer from a feedback request
 
 #### Defined in
 
-[base/remote-protocol.ts:67](https://github.com/onzag/itemize/blob/5c2808d3/base/remote-protocol.ts#L67)
+[base/remote-protocol.ts:67](https://github.com/onzag/itemize/blob/f2db74a5/base/remote-protocol.ts#L67)
 
 ___
 
@@ -117,7 +129,7 @@ the request to the server in order to ensure that it is cached
 
 #### Defined in
 
-[base/remote-protocol.ts:34](https://github.com/onzag/itemize/blob/5c2808d3/base/remote-protocol.ts#L34)
+[base/remote-protocol.ts:34](https://github.com/onzag/itemize/blob/f2db74a5/base/remote-protocol.ts#L34)
 
 ___
 
@@ -131,7 +143,7 @@ for an error event other than notice invalid requests
 
 #### Defined in
 
-[base/remote-protocol.ts:41](https://github.com/onzag/itemize/blob/5c2808d3/base/remote-protocol.ts#L41)
+[base/remote-protocol.ts:41](https://github.com/onzag/itemize/blob/f2db74a5/base/remote-protocol.ts#L41)
 
 ___
 
@@ -144,7 +156,7 @@ request feedback for a single item definition
 
 #### Defined in
 
-[base/remote-protocol.ts:272](https://github.com/onzag/itemize/blob/5c2808d3/base/remote-protocol.ts#L272)
+[base/remote-protocol.ts:288](https://github.com/onzag/itemize/blob/f2db74a5/base/remote-protocol.ts#L288)
 
 ___
 
@@ -168,7 +180,7 @@ ___
 
 #### Defined in
 
-[base/remote-protocol.ts:283](https://github.com/onzag/itemize/blob/5c2808d3/base/remote-protocol.ts#L283)
+[base/remote-protocol.ts:299](https://github.com/onzag/itemize/blob/f2db74a5/base/remote-protocol.ts#L299)
 
 ___
 
@@ -180,7 +192,7 @@ Identified event comes once the user has been identified properly
 
 #### Defined in
 
-[base/remote-protocol.ts:54](https://github.com/onzag/itemize/blob/5c2808d3/base/remote-protocol.ts#L54)
+[base/remote-protocol.ts:54](https://github.com/onzag/itemize/blob/f2db74a5/base/remote-protocol.ts#L54)
 
 ___
 
@@ -194,7 +206,7 @@ be ignored)
 
 #### Defined in
 
-[base/remote-protocol.ts:173](https://github.com/onzag/itemize/blob/5c2808d3/base/remote-protocol.ts#L173)
+[base/remote-protocol.ts:189](https://github.com/onzag/itemize/blob/f2db74a5/base/remote-protocol.ts#L189)
 
 ___
 
@@ -216,7 +228,7 @@ ___
 
 #### Defined in
 
-[base/remote-protocol.ts:182](https://github.com/onzag/itemize/blob/5c2808d3/base/remote-protocol.ts#L182)
+[base/remote-protocol.ts:198](https://github.com/onzag/itemize/blob/f2db74a5/base/remote-protocol.ts#L198)
 
 ___
 
@@ -230,7 +242,7 @@ logged out, this even also occurs on an invalid identified event
 
 #### Defined in
 
-[base/remote-protocol.ts:61](https://github.com/onzag/itemize/blob/5c2808d3/base/remote-protocol.ts#L61)
+[base/remote-protocol.ts:61](https://github.com/onzag/itemize/blob/f2db74a5/base/remote-protocol.ts#L61)
 
 ___
 
@@ -242,7 +254,7 @@ The feedback version of [PARENTED_SEARCH_REGISTER_REQUEST](base_remote_protocol.
 
 #### Defined in
 
-[base/remote-protocol.ts:624](https://github.com/onzag/itemize/blob/5c2808d3/base/remote-protocol.ts#L624)
+[base/remote-protocol.ts:741](https://github.com/onzag/itemize/blob/f2db74a5/base/remote-protocol.ts#L741)
 
 ___
 
@@ -255,7 +267,7 @@ using those
 
 #### Defined in
 
-[base/remote-protocol.ts:158](https://github.com/onzag/itemize/blob/5c2808d3/base/remote-protocol.ts#L158)
+[base/remote-protocol.ts:160](https://github.com/onzag/itemize/blob/f2db74a5/base/remote-protocol.ts#L160)
 
 ___
 
@@ -268,7 +280,7 @@ cached searches and then request for updates
 
 #### Defined in
 
-[base/remote-protocol.ts:353](https://github.com/onzag/itemize/blob/5c2808d3/base/remote-protocol.ts#L353)
+[base/remote-protocol.ts:369](https://github.com/onzag/itemize/blob/f2db74a5/base/remote-protocol.ts#L369)
 
 ___
 
@@ -280,7 +292,7 @@ The unregister version of [OWNED_PARENTED_SEARCH_REGISTER_REQUEST](base_remote_p
 
 #### Defined in
 
-[base/remote-protocol.ts:496](https://github.com/onzag/itemize/blob/5c2808d3/base/remote-protocol.ts#L496)
+[base/remote-protocol.ts:577](https://github.com/onzag/itemize/blob/f2db74a5/base/remote-protocol.ts#L577)
 
 ___
 
@@ -292,7 +304,7 @@ The feedback version of [PARENTED_SEARCH_REGISTER_REQUEST](base_remote_protocol.
 
 #### Defined in
 
-[base/remote-protocol.ts:553](https://github.com/onzag/itemize/blob/5c2808d3/base/remote-protocol.ts#L553)
+[base/remote-protocol.ts:634](https://github.com/onzag/itemize/blob/f2db74a5/base/remote-protocol.ts#L634)
 
 ___
 
@@ -305,7 +317,7 @@ as a base
 
 #### Defined in
 
-[base/remote-protocol.ts:130](https://github.com/onzag/itemize/blob/5c2808d3/base/remote-protocol.ts#L130)
+[base/remote-protocol.ts:132](https://github.com/onzag/itemize/blob/f2db74a5/base/remote-protocol.ts#L132)
 
 ___
 
@@ -318,7 +330,7 @@ cached searches and then request for updates
 
 #### Defined in
 
-[base/remote-protocol.ts:318](https://github.com/onzag/itemize/blob/5c2808d3/base/remote-protocol.ts#L318)
+[base/remote-protocol.ts:334](https://github.com/onzag/itemize/blob/f2db74a5/base/remote-protocol.ts#L334)
 
 ___
 
@@ -330,7 +342,7 @@ The unregister version of [OWNED_SEARCH_REGISTER_REQUEST](base_remote_protocol.m
 
 #### Defined in
 
-[base/remote-protocol.ts:434](https://github.com/onzag/itemize/blob/5c2808d3/base/remote-protocol.ts#L434)
+[base/remote-protocol.ts:484](https://github.com/onzag/itemize/blob/f2db74a5/base/remote-protocol.ts#L484)
 
 ___
 
@@ -360,7 +372,7 @@ ___
 
 #### Defined in
 
-[base/remote-protocol.ts:631](https://github.com/onzag/itemize/blob/5c2808d3/base/remote-protocol.ts#L631)
+[base/remote-protocol.ts:748](https://github.com/onzag/itemize/blob/f2db74a5/base/remote-protocol.ts#L748)
 
 ___
 
@@ -388,7 +400,7 @@ ___
 
 #### Defined in
 
-[base/remote-protocol.ts:394](https://github.com/onzag/itemize/blob/5c2808d3/base/remote-protocol.ts#L394)
+[base/remote-protocol.ts:410](https://github.com/onzag/itemize/blob/f2db74a5/base/remote-protocol.ts#L410)
 
 ___
 
@@ -416,7 +428,7 @@ ___
 
 #### Defined in
 
-[base/remote-protocol.ts:503](https://github.com/onzag/itemize/blob/5c2808d3/base/remote-protocol.ts#L503)
+[base/remote-protocol.ts:584](https://github.com/onzag/itemize/blob/f2db74a5/base/remote-protocol.ts#L584)
 
 ___
 
@@ -440,7 +452,7 @@ ___
 
 #### Defined in
 
-[base/remote-protocol.ts:561](https://github.com/onzag/itemize/blob/5c2808d3/base/remote-protocol.ts#L561)
+[base/remote-protocol.ts:642](https://github.com/onzag/itemize/blob/f2db74a5/base/remote-protocol.ts#L642)
 
 ___
 
@@ -462,7 +474,7 @@ ___
 
 #### Defined in
 
-[base/remote-protocol.ts:327](https://github.com/onzag/itemize/blob/5c2808d3/base/remote-protocol.ts#L327)
+[base/remote-protocol.ts:343](https://github.com/onzag/itemize/blob/f2db74a5/base/remote-protocol.ts#L343)
 
 ___
 
@@ -484,7 +496,7 @@ ___
 
 #### Defined in
 
-[base/remote-protocol.ts:441](https://github.com/onzag/itemize/blob/5c2808d3/base/remote-protocol.ts#L441)
+[base/remote-protocol.ts:491](https://github.com/onzag/itemize/blob/f2db74a5/base/remote-protocol.ts#L491)
 
 ___
 
@@ -496,7 +508,7 @@ The feedback version of [PARENTED_SEARCH_REGISTER_REQUEST](base_remote_protocol.
 
 #### Defined in
 
-[base/remote-protocol.ts:584](https://github.com/onzag/itemize/blob/5c2808d3/base/remote-protocol.ts#L584)
+[base/remote-protocol.ts:701](https://github.com/onzag/itemize/blob/f2db74a5/base/remote-protocol.ts#L701)
 
 ___
 
@@ -509,7 +521,7 @@ using those
 
 #### Defined in
 
-[base/remote-protocol.ts:143](https://github.com/onzag/itemize/blob/5c2808d3/base/remote-protocol.ts#L143)
+[base/remote-protocol.ts:145](https://github.com/onzag/itemize/blob/f2db74a5/base/remote-protocol.ts#L145)
 
 ___
 
@@ -522,7 +534,7 @@ cached searches and then request for updates
 
 #### Defined in
 
-[base/remote-protocol.ts:347](https://github.com/onzag/itemize/blob/5c2808d3/base/remote-protocol.ts#L347)
+[base/remote-protocol.ts:363](https://github.com/onzag/itemize/blob/f2db74a5/base/remote-protocol.ts#L363)
 
 ___
 
@@ -534,7 +546,56 @@ The unregister version of [PARENTED_SEARCH_REGISTER_REQUEST](base_remote_protoco
 
 #### Defined in
 
-[base/remote-protocol.ts:460](https://github.com/onzag/itemize/blob/5c2808d3/base/remote-protocol.ts#L460)
+[base/remote-protocol.ts:541](https://github.com/onzag/itemize/blob/f2db74a5/base/remote-protocol.ts#L541)
+
+___
+
+### PROPERTY\_SEARCH\_FEEDBACK\_REQUEST
+
+• **PROPERTY\_SEARCH\_FEEDBACK\_REQUEST**: ``"property-search-feedback"``
+
+The feedback version of [PARENTED_SEARCH_REGISTER_REQUEST](base_remote_protocol.md#parented_search_register_request)
+
+#### Defined in
+
+[base/remote-protocol.ts:665](https://github.com/onzag/itemize/blob/f2db74a5/base/remote-protocol.ts#L665)
+
+___
+
+### PROPERTY\_SEARCH\_RECORDS\_EVENT
+
+• **PROPERTY\_SEARCH\_RECORDS\_EVENT**: ``"property-search-records"``
+
+When the records are related to the value of a property
+
+#### Defined in
+
+[base/remote-protocol.ts:171](https://github.com/onzag/itemize/blob/f2db74a5/base/remote-protocol.ts#L171)
+
+___
+
+### PROPERTY\_SEARCH\_REGISTER\_REQUEST
+
+• **PROPERTY\_SEARCH\_REGISTER\_REQUEST**: ``"property-search-register"``
+
+this is necessary for property searches in order to run created by
+cached searches and then request for updates
+
+#### Defined in
+
+[base/remote-protocol.ts:442](https://github.com/onzag/itemize/blob/f2db74a5/base/remote-protocol.ts#L442)
+
+___
+
+### PROPERTY\_SEARCH\_UNREGISTER\_REQUEST
+
+• **PROPERTY\_SEARCH\_UNREGISTER\_REQUEST**: ``"property-search-unregister"``
+
+The unregister version of [PROPERTY_SEARCH_REGISTER_REQUEST](base_remote_protocol.md#property_search_register_request)
+
+#### Defined in
+
+[base/remote-protocol.ts:510](https://github.com/onzag/itemize/blob/f2db74a5/base/remote-protocol.ts#L510)
 
 ___
 
@@ -562,7 +623,7 @@ ___
 
 #### Defined in
 
-[base/remote-protocol.ts:593](https://github.com/onzag/itemize/blob/5c2808d3/base/remote-protocol.ts#L593)
+[base/remote-protocol.ts:710](https://github.com/onzag/itemize/blob/f2db74a5/base/remote-protocol.ts#L710)
 
 ___
 
@@ -588,7 +649,7 @@ ___
 
 #### Defined in
 
-[base/remote-protocol.ts:364](https://github.com/onzag/itemize/blob/5c2808d3/base/remote-protocol.ts#L364)
+[base/remote-protocol.ts:380](https://github.com/onzag/itemize/blob/f2db74a5/base/remote-protocol.ts#L380)
 
 ___
 
@@ -614,7 +675,81 @@ ___
 
 #### Defined in
 
-[base/remote-protocol.ts:469](https://github.com/onzag/itemize/blob/5c2808d3/base/remote-protocol.ts#L469)
+[base/remote-protocol.ts:550](https://github.com/onzag/itemize/blob/f2db74a5/base/remote-protocol.ts#L550)
+
+___
+
+### PropertySearchFeedbackRequestSchema
+
+• **PropertySearchFeedbackRequestSchema**: `Object`
+
+#### Type declaration
+
+| Name | Type |
+| :------ | :------ |
+| `properties` | `Object` |
+| `properties.lastModified` | `Object` |
+| `properties.lastModified.type` | `string`[] |
+| `properties.propertyId` | `Object` |
+| `properties.propertyId.type` | `string` |
+| `properties.propertyValue` | `Object` |
+| `properties.propertyValue.type` | `string` |
+| `properties.qualifiedPathName` | `Object` |
+| `properties.qualifiedPathName.type` | `string` |
+| `required` | `string`[] |
+| `type` | `string` |
+
+#### Defined in
+
+[base/remote-protocol.ts:674](https://github.com/onzag/itemize/blob/f2db74a5/base/remote-protocol.ts#L674)
+
+___
+
+### PropertySearchRegisterRequestSchema
+
+• **PropertySearchRegisterRequestSchema**: `Object`
+
+#### Type declaration
+
+| Name | Type |
+| :------ | :------ |
+| `properties` | `Object` |
+| `properties.propertyId` | `Object` |
+| `properties.propertyId.type` | `string` |
+| `properties.propertyValue` | `Object` |
+| `properties.propertyValue.type` | `string` |
+| `properties.qualifiedPathName` | `Object` |
+| `properties.qualifiedPathName.type` | `string` |
+| `required` | `string`[] |
+| `type` | `string` |
+
+#### Defined in
+
+[base/remote-protocol.ts:452](https://github.com/onzag/itemize/blob/f2db74a5/base/remote-protocol.ts#L452)
+
+___
+
+### PropertySearchUnregisterRequestSchema
+
+• **PropertySearchUnregisterRequestSchema**: `Object`
+
+#### Type declaration
+
+| Name | Type |
+| :------ | :------ |
+| `properties` | `Object` |
+| `properties.propertyId` | `Object` |
+| `properties.propertyId.type` | `string` |
+| `properties.propertyValue` | `Object` |
+| `properties.propertyValue.type` | `string` |
+| `properties.qualifiedPathName` | `Object` |
+| `properties.qualifiedPathName.type` | `string` |
+| `required` | `string`[] |
+| `type` | `string` |
+
+#### Defined in
+
+[base/remote-protocol.ts:518](https://github.com/onzag/itemize/blob/f2db74a5/base/remote-protocol.ts#L518)
 
 ___
 
@@ -627,7 +762,7 @@ a single item definition for updates and changes
 
 #### Defined in
 
-[base/remote-protocol.ts:202](https://github.com/onzag/itemize/blob/5c2808d3/base/remote-protocol.ts#L202)
+[base/remote-protocol.ts:218](https://github.com/onzag/itemize/blob/f2db74a5/base/remote-protocol.ts#L218)
 
 ___
 
@@ -651,7 +786,7 @@ ___
 
 #### Defined in
 
-[base/remote-protocol.ts:214](https://github.com/onzag/itemize/blob/5c2808d3/base/remote-protocol.ts#L214)
+[base/remote-protocol.ts:230](https://github.com/onzag/itemize/blob/f2db74a5/base/remote-protocol.ts#L230)
 
 ___
 
@@ -664,7 +799,7 @@ a single item definition
 
 #### Defined in
 
-[base/remote-protocol.ts:238](https://github.com/onzag/itemize/blob/5c2808d3/base/remote-protocol.ts#L238)
+[base/remote-protocol.ts:254](https://github.com/onzag/itemize/blob/f2db74a5/base/remote-protocol.ts#L254)
 
 ___
 
@@ -688,7 +823,7 @@ ___
 
 #### Defined in
 
-[base/remote-protocol.ts:248](https://github.com/onzag/itemize/blob/5c2808d3/base/remote-protocol.ts#L248)
+[base/remote-protocol.ts:264](https://github.com/onzag/itemize/blob/f2db74a5/base/remote-protocol.ts#L264)
 
 ## Functions
 
@@ -710,7 +845,7 @@ ___
 
 #### Defined in
 
-[base/remote-protocol.ts:674](https://github.com/onzag/itemize/blob/5c2808d3/base/remote-protocol.ts#L674)
+[base/remote-protocol.ts:791](https://github.com/onzag/itemize/blob/f2db74a5/base/remote-protocol.ts#L791)
 
 ___
 
@@ -734,7 +869,7 @@ ___
 
 #### Defined in
 
-[base/remote-protocol.ts:698](https://github.com/onzag/itemize/blob/5c2808d3/base/remote-protocol.ts#L698)
+[base/remote-protocol.ts:823](https://github.com/onzag/itemize/blob/f2db74a5/base/remote-protocol.ts#L823)
 
 ___
 
@@ -755,7 +890,7 @@ ___
 
 #### Defined in
 
-[base/remote-protocol.ts:682](https://github.com/onzag/itemize/blob/5c2808d3/base/remote-protocol.ts#L682)
+[base/remote-protocol.ts:799](https://github.com/onzag/itemize/blob/f2db74a5/base/remote-protocol.ts#L799)
 
 ___
 
@@ -778,4 +913,26 @@ ___
 
 #### Defined in
 
-[base/remote-protocol.ts:689](https://github.com/onzag/itemize/blob/5c2808d3/base/remote-protocol.ts#L689)
+[base/remote-protocol.ts:814](https://github.com/onzag/itemize/blob/f2db74a5/base/remote-protocol.ts#L814)
+
+___
+
+### generatePropertySearchMergedIndexIdentifier
+
+▸ **generatePropertySearchMergedIndexIdentifier**(`idefOrModSearchIsAgainst`, `propertyId`, `propertyValue`): `string`
+
+#### Parameters
+
+| Name | Type |
+| :------ | :------ |
+| `idefOrModSearchIsAgainst` | `string` |
+| `propertyId` | `string` |
+| `propertyValue` | `string` |
+
+#### Returns
+
+`string`
+
+#### Defined in
+
+[base/remote-protocol.ts:806](https://github.com/onzag/itemize/blob/f2db74a5/base/remote-protocol.ts#L806)

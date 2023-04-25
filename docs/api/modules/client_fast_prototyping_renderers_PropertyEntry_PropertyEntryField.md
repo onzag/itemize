@@ -28,6 +28,20 @@ The styles for the field
 | :------ | :------ |
 | `container` | `Object` |
 | `container.width` | `string` |
+| `countryPicker` | `Object` |
+| `countryPicker.&:active` | `Object` |
+| `countryPicker.&:active.backgroundColor` | `string` |
+| `countryPicker.&:disabled` | `Object` |
+| `countryPicker.&:disabled.backgroundColor` | `string` |
+| `countryPicker.&:disabled.color` | `string` |
+| `countryPicker.&:disabled.cursor` | `string` |
+| `countryPicker.&:hover` | `Object` |
+| `countryPicker.&:hover.backgroundColor` | `string` |
+| `countryPicker.backgroundColor` | `string` |
+| `countryPicker.borderBottomRightRadius` | `string` |
+| `countryPicker.borderTopRightRadius` | `string` |
+| `countryPicker.fontWeight` | `number` |
+| `countryPicker.paddingLeft` | `string` |
 | `description` | `Object` |
 | `description.width` | `string` |
 | `entry` | `Object` |
@@ -43,7 +57,7 @@ The styles for the field
 | `fieldForPhone` | `Object` |
 | `fieldForPhone.display` | `string` |
 | `fieldForPhone.width` | `string` |
-| `fieldInput` | (`isInvalid`: `boolean`, `disabled`: `boolean`) => { `&::after`: { `borderBottomColor`: `string` = "#f44336" } ; `&::before`: { `borderBottomColor`: `string` = "#e57373" } ; `&:hover::before`: { `borderBottomColor`: `string`  } ; `width`: `string` = "100%" } |
+| `fieldInput` | (`phone`: `boolean`) => { `& fieldset`: { `borderBottomLeftRadius`: `number` = 0; `borderTopLeftRadius`: `number` = 0 }  } \| { `& fieldset`: `undefined`  } |
 | `iconButton` | `Object` |
 | `iconButton.color` | `string` |
 | `iconButtonPassword` | `Object` |
@@ -81,4 +95,4 @@ The styles for the field
 
 #### Defined in
 
-[client/fast-prototyping/renderers/PropertyEntry/PropertyEntryField.tsx:44](https://github.com/onzag/itemize/blob/5c2808d3/client/fast-prototyping/renderers/PropertyEntry/PropertyEntryField.tsx#L44)
+[client/fast-prototyping/renderers/PropertyEntry/PropertyEntryField.tsx:44](https://github.com/onzag/itemize/blob/f2db74a5/client/fast-prototyping/renderers/PropertyEntry/PropertyEntryField.tsx#L44)

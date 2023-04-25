@@ -19,6 +19,7 @@ The property view simple renderer props
 - [args](client_internal_components_PropertyView_PropertyViewSimple.IPropertyViewSimpleRendererProps.md#args)
 - [capitalize](client_internal_components_PropertyView_PropertyViewSimple.IPropertyViewSimpleRendererProps.md#capitalize)
 - [currentValue](client_internal_components_PropertyView_PropertyViewSimple.IPropertyViewSimpleRendererProps.md#currentvalue)
+- [isRichText](client_internal_components_PropertyView_PropertyViewSimple.IPropertyViewSimpleRendererProps.md#isrichtext)
 - [language](client_internal_components_PropertyView_PropertyViewSimple.IPropertyViewSimpleRendererProps.md#language)
 - [rtl](client_internal_components_PropertyView_PropertyViewSimple.IPropertyViewSimpleRendererProps.md#rtl)
 
@@ -40,7 +41,7 @@ The renderer args
 
 #### Defined in
 
-[client/internal/renderer.ts:19](https://github.com/onzag/itemize/blob/5c2808d3/client/internal/renderer.ts#L19)
+[client/internal/renderer.ts:19](https://github.com/onzag/itemize/blob/f2db74a5/client/internal/renderer.ts#L19)
 
 ___
 
@@ -52,7 +53,7 @@ Whether it should capitalize
 
 #### Defined in
 
-[client/internal/components/PropertyView/PropertyViewSimple.tsx:19](https://github.com/onzag/itemize/blob/5c2808d3/client/internal/components/PropertyView/PropertyViewSimple.tsx#L19)
+[client/internal/components/PropertyView/PropertyViewSimple.tsx:20](https://github.com/onzag/itemize/blob/f2db74a5/client/internal/components/PropertyView/PropertyViewSimple.tsx#L20)
 
 ___
 
@@ -68,7 +69,20 @@ The current value to be displayed
 
 #### Defined in
 
-[client/internal/components/PropertyView/index.tsx:43](https://github.com/onzag/itemize/blob/5c2808d3/client/internal/components/PropertyView/index.tsx#L43)
+[client/internal/components/PropertyView/index.tsx:44](https://github.com/onzag/itemize/blob/f2db74a5/client/internal/components/PropertyView/index.tsx#L44)
+
+___
+
+### isRichText
+
+• **isRichText**: `boolean`
+
+wether it is using rich text, this is not full blown rich text
+and only regards to highlights
+
+#### Defined in
+
+[client/internal/components/PropertyView/PropertyViewSimple.tsx:29](https://github.com/onzag/itemize/blob/f2db74a5/client/internal/components/PropertyView/PropertyViewSimple.tsx#L29)
 
 ___
 
@@ -80,7 +94,7 @@ The language code it's currently using
 
 #### Defined in
 
-[client/internal/components/PropertyView/PropertyViewSimple.tsx:23](https://github.com/onzag/itemize/blob/5c2808d3/client/internal/components/PropertyView/PropertyViewSimple.tsx#L23)
+[client/internal/components/PropertyView/PropertyViewSimple.tsx:24](https://github.com/onzag/itemize/blob/f2db74a5/client/internal/components/PropertyView/PropertyViewSimple.tsx#L24)
 
 ___
 
@@ -96,4 +110,4 @@ Whether it is in rtl mode for a rtl language
 
 #### Defined in
 
-[client/internal/renderer.ts:15](https://github.com/onzag/itemize/blob/5c2808d3/client/internal/renderer.ts#L15)
+[client/internal/renderer.ts:15](https://github.com/onzag/itemize/blob/f2db74a5/client/internal/renderer.ts#L15)

@@ -14,6 +14,7 @@ in a single function single the logic that handles this under the hood is remark
 - [IPropertyCoreProps](../interfaces/client_components_property_base.IPropertyCoreProps.md)
 - [IPropertyEntryProps](../interfaces/client_components_property_base.IPropertyEntryProps.md)
 - [IPropertyReadProps](../interfaces/client_components_property_base.IPropertyReadProps.md)
+- [IPropertyReadPropsWOChildren](../interfaces/client_components_property_base.IPropertyReadPropsWOChildren.md)
 - [IPropertySetterProps](../interfaces/client_components_property_base.IPropertySetterProps.md)
 - [IPropertyViewProps](../interfaces/client_components_property_base.IPropertyViewProps.md)
 
@@ -25,7 +26,7 @@ in a single function single the logic that handles this under the hood is remark
 
 ### EntryViewReadSet
 
-▸ **EntryViewReadSet**(`props`, `type`): `Element`
+▸ **EntryViewReadSet**(`originalProps`, `type`, `use?`): `any`
 
 This is a legit function that takes all the props in order to pipe them
 to the proper handler
@@ -34,15 +35,16 @@ to the proper handler
 
 | Name | Type | Description |
 | :------ | :------ | :------ |
-| `props` | `IPropertyEntryViewReadSetProps`<`any`\> | the props that are passed |
+| `originalProps` | `string` \| `IPropertyEntryViewReadSetProps`<`any`, `any`\> | - |
 | `type` | ``"entry"`` \| ``"view"`` \| ``"read"`` \| ``"set"`` | the type, entry, view, read, or set |
+| `use?` | `boolean` | - |
 
 #### Returns
 
-`Element`
+`any`
 
 a react component
 
 #### Defined in
 
-[client/components/property/base.tsx:203](https://github.com/onzag/itemize/blob/5c2808d3/client/components/property/base.tsx#L203)
+[client/components/property/base.tsx:219](https://github.com/onzag/itemize/blob/f2db74a5/client/components/property/base.tsx#L219)

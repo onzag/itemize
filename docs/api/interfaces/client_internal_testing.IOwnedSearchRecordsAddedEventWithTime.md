@@ -15,6 +15,8 @@
 ### Properties
 
 - [createdBy](client_internal_testing.IOwnedSearchRecordsAddedEventWithTime.md#createdby)
+- [createdRecords](client_internal_testing.IOwnedSearchRecordsAddedEventWithTime.md#createdrecords)
+- [deletedRecords](client_internal_testing.IOwnedSearchRecordsAddedEventWithTime.md#deletedrecords)
 - [lostRecords](client_internal_testing.IOwnedSearchRecordsAddedEventWithTime.md#lostrecords)
 - [modifiedRecords](client_internal_testing.IOwnedSearchRecordsAddedEventWithTime.md#modifiedrecords)
 - [newLastModified](client_internal_testing.IOwnedSearchRecordsAddedEventWithTime.md#newlastmodified)
@@ -34,7 +36,35 @@
 
 #### Defined in
 
-[base/remote-protocol.ts:136](https://github.com/onzag/itemize/blob/5c2808d3/base/remote-protocol.ts#L136)
+[base/remote-protocol.ts:138](https://github.com/onzag/itemize/blob/f2db74a5/base/remote-protocol.ts#L138)
+
+___
+
+### createdRecords
+
+• **createdRecords**: [`IGQLSearchRecord`](gql_querier.IGQLSearchRecord.md)[]
+
+#### Inherited from
+
+[IOwnedSearchRecordsEvent](base_remote_protocol.IOwnedSearchRecordsEvent.md).[createdRecords](base_remote_protocol.IOwnedSearchRecordsEvent.md#createdrecords)
+
+#### Defined in
+
+[base/remote-protocol.ts:112](https://github.com/onzag/itemize/blob/f2db74a5/base/remote-protocol.ts#L112)
+
+___
+
+### deletedRecords
+
+• **deletedRecords**: [`IGQLSearchRecord`](gql_querier.IGQLSearchRecord.md)[]
+
+#### Inherited from
+
+[IOwnedSearchRecordsEvent](base_remote_protocol.IOwnedSearchRecordsEvent.md).[deletedRecords](base_remote_protocol.IOwnedSearchRecordsEvent.md#deletedrecords)
+
+#### Defined in
+
+[base/remote-protocol.ts:117](https://github.com/onzag/itemize/blob/f2db74a5/base/remote-protocol.ts#L117)
 
 ___
 
@@ -50,7 +80,7 @@ the records that have been deleted
 
 #### Defined in
 
-[base/remote-protocol.ts:115](https://github.com/onzag/itemize/blob/5c2808d3/base/remote-protocol.ts#L115)
+[base/remote-protocol.ts:116](https://github.com/onzag/itemize/blob/f2db74a5/base/remote-protocol.ts#L116)
 
 ___
 
@@ -66,7 +96,7 @@ the records that have been modified
 
 #### Defined in
 
-[base/remote-protocol.ts:119](https://github.com/onzag/itemize/blob/5c2808d3/base/remote-protocol.ts#L119)
+[base/remote-protocol.ts:121](https://github.com/onzag/itemize/blob/f2db74a5/base/remote-protocol.ts#L121)
 
 ___
 
@@ -82,7 +112,7 @@ the new last record search result
 
 #### Defined in
 
-[base/remote-protocol.ts:123](https://github.com/onzag/itemize/blob/5c2808d3/base/remote-protocol.ts#L123)
+[base/remote-protocol.ts:125](https://github.com/onzag/itemize/blob/f2db74a5/base/remote-protocol.ts#L125)
 
 ___
 
@@ -98,7 +128,7 @@ the new records that have been added
 
 #### Defined in
 
-[base/remote-protocol.ts:111](https://github.com/onzag/itemize/blob/5c2808d3/base/remote-protocol.ts#L111)
+[base/remote-protocol.ts:111](https://github.com/onzag/itemize/blob/f2db74a5/base/remote-protocol.ts#L111)
 
 ___
 
@@ -114,7 +144,7 @@ the qualified path name or type of the either module or item definition
 
 #### Defined in
 
-[base/remote-protocol.ts:107](https://github.com/onzag/itemize/blob/5c2808d3/base/remote-protocol.ts#L107)
+[base/remote-protocol.ts:107](https://github.com/onzag/itemize/blob/f2db74a5/base/remote-protocol.ts#L107)
 
 ___
 
@@ -124,4 +154,4 @@ ___
 
 #### Defined in
 
-[client/internal/testing.ts:107](https://github.com/onzag/itemize/blob/5c2808d3/client/internal/testing.ts#L107)
+[client/internal/testing.ts:107](https://github.com/onzag/itemize/blob/f2db74a5/client/internal/testing.ts#L107)

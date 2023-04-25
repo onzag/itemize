@@ -40,14 +40,13 @@ The styles for the date time entry
 | `errorMessage.color` | `string` |
 | `errorMessage.fontSize` | `string` |
 | `errorMessage.height` | `string` |
-| `fieldInput` | (`invalid`: `boolean`, `disabled`: `boolean`) => { `&::after`: { `borderBottomColor`: `string` = "#f44336" } ; `&::before`: { `borderBottomColor`: `string` = "#e57373" } ; `&:hover::before`: { `borderBottomColor`: `string`  } ; `width`: `string` = "100%" } |
 | `iconButton` | `Object` |
 | `iconButton.color` | `string` |
 | `label` | (`invalid`: `boolean`) => { `&.focused`: { `color`: `string`  } ; `color`: `string`  } |
 
 #### Defined in
 
-[client/fast-prototyping/renderers/PropertyEntry/PropertyEntryDateTime.tsx:33](https://github.com/onzag/itemize/blob/5c2808d3/client/fast-prototyping/renderers/PropertyEntry/PropertyEntryDateTime.tsx#L33)
+[client/fast-prototyping/renderers/PropertyEntry/PropertyEntryDateTime.tsx:33](https://github.com/onzag/itemize/blob/f2db74a5/client/fast-prototyping/renderers/PropertyEntry/PropertyEntryDateTime.tsx#L33)
 
 ## Functions
 
@@ -75,4 +74,4 @@ a react element
 
 #### Defined in
 
-[client/fast-prototyping/renderers/PropertyEntry/PropertyEntryDateTime.tsx:120](https://github.com/onzag/itemize/blob/5c2808d3/client/fast-prototyping/renderers/PropertyEntry/PropertyEntryDateTime.tsx#L120)
+[client/fast-prototyping/renderers/PropertyEntry/PropertyEntryDateTime.tsx:102](https://github.com/onzag/itemize/blob/f2db74a5/client/fast-prototyping/renderers/PropertyEntry/PropertyEntryDateTime.tsx#L102)

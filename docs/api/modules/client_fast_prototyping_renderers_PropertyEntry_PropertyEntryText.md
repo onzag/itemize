@@ -53,6 +53,10 @@ The styles for the text entry
 | `iconButton.backgroundColor` | `string` |
 | `iconButton.color` | `string` |
 | `label` | (`isInvalid`: `boolean`, `richText`: `boolean`) => { `&.focused`: { `color`: `string`  } ; `color`: `string`  } |
+| `labelContainer` | `Object` |
+| `labelContainer.alignItems` | `string` |
+| `labelContainer.display` | `string` |
+| `labelContainer.justifyContent` | `string` |
 | `labelNoToolbar` | `Object` |
 | `labelNoToolbar.alignItems` | `string` |
 | `labelNoToolbar.display` | `string` |
@@ -89,4 +93,4 @@ The styles for the text entry
 
 #### Defined in
 
-[client/fast-prototyping/renderers/PropertyEntry/PropertyEntryText.tsx:37](https://github.com/onzag/itemize/blob/5c2808d3/client/fast-prototyping/renderers/PropertyEntry/PropertyEntryText.tsx#L37)
+[client/fast-prototyping/renderers/PropertyEntry/PropertyEntryText.tsx:38](https://github.com/onzag/itemize/blob/f2db74a5/client/fast-prototyping/renderers/PropertyEntry/PropertyEntryText.tsx#L38)

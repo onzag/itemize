@@ -8,7 +8,7 @@ The date time view handler
 
 ### Classes
 
-- [PropertyViewDateTime](../classes/client_internal_components_PropertyView_PropertyViewDateTime.PropertyViewDateTime.md)
+- [default](../classes/client_internal_components_PropertyView_PropertyViewDateTime.default.md)
 
 ### Interfaces
 

@@ -42,7 +42,6 @@ for when the file failed to load
 - [forceUpdate](client_fast_prototyping_components_slate_dialogs_file.FileLoadErrorDialog.md#forceupdate)
 - [getSnapshotBeforeUpdate](client_fast_prototyping_components_slate_dialogs_file.FileLoadErrorDialog.md#getsnapshotbeforeupdate)
 - [onClose](client_fast_prototyping_components_slate_dialogs_file.FileLoadErrorDialog.md#onclose)
-- [onOpening](client_fast_prototyping_components_slate_dialogs_file.FileLoadErrorDialog.md#onopening)
 - [render](client_fast_prototyping_components_slate_dialogs_file.FileLoadErrorDialog.md#render)
 - [setState](client_fast_prototyping_components_slate_dialogs_file.FileLoadErrorDialog.md#setstate)
 - [shouldComponentUpdate](client_fast_prototyping_components_slate_dialogs_file.FileLoadErrorDialog.md#shouldcomponentupdate)
@@ -65,7 +64,7 @@ React.PureComponent&lt;IFileLoadErrorDialogProps\&gt;.constructor
 
 #### Defined in
 
-[client/fast-prototyping/components/slate/dialogs/file.tsx:41](https://github.com/onzag/itemize/blob/5c2808d3/client/fast-prototyping/components/slate/dialogs/file.tsx#L41)
+[client/fast-prototyping/components/slate/dialogs/file.tsx:41](https://github.com/onzag/itemize/blob/f2db74a5/client/fast-prototyping/components/slate/dialogs/file.tsx#L41)
 
 ## Properties
 
@@ -568,21 +567,7 @@ ___
 
 #### Defined in
 
-[client/fast-prototyping/components/slate/dialogs/file.tsx:47](https://github.com/onzag/itemize/blob/5c2808d3/client/fast-prototyping/components/slate/dialogs/file.tsx#L47)
-
-___
-
-### onOpening
-
-▸ **onOpening**(): `void`
-
-#### Returns
-
-`void`
-
-#### Defined in
-
-[client/fast-prototyping/components/slate/dialogs/file.tsx:53](https://github.com/onzag/itemize/blob/5c2808d3/client/fast-prototyping/components/slate/dialogs/file.tsx#L53)
+[client/fast-prototyping/components/slate/dialogs/file.tsx:46](https://github.com/onzag/itemize/blob/f2db74a5/client/fast-prototyping/components/slate/dialogs/file.tsx#L46)
 
 ___
 
@@ -602,7 +587,7 @@ React.PureComponent.render
 
 #### Defined in
 
-[client/fast-prototyping/components/slate/dialogs/file.tsx:59](https://github.com/onzag/itemize/blob/5c2808d3/client/fast-prototyping/components/slate/dialogs/file.tsx#L59)
+[client/fast-prototyping/components/slate/dialogs/file.tsx:52](https://github.com/onzag/itemize/blob/f2db74a5/client/fast-prototyping/components/slate/dialogs/file.tsx#L52)
 
 ___
 

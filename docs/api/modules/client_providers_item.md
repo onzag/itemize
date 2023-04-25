@@ -12,12 +12,11 @@
 
 - [IActionCleanOptions](../interfaces/client_providers_item.IActionCleanOptions.md)
 - [IActionDeleteOptions](../interfaces/client_providers_item.IActionDeleteOptions.md)
-- [IActionResponseWithId](../interfaces/client_providers_item.IActionResponseWithId.md)
 - [IActionResponseWithSearchResults](../interfaces/client_providers_item.IActionResponseWithSearchResults.md)
 - [IActionResponseWithValue](../interfaces/client_providers_item.IActionResponseWithValue.md)
 - [IActionSearchOptions](../interfaces/client_providers_item.IActionSearchOptions.md)
 - [IActionSubmitOptions](../interfaces/client_providers_item.IActionSubmitOptions.md)
-- [IActualItemProviderSearchState](../interfaces/client_providers_item.IActualItemProviderSearchState.md)
+- [IActionSubmitResponse](../interfaces/client_providers_item.IActionSubmitResponse.md)
 - [IBasicActionResponse](../interfaces/client_providers_item.IBasicActionResponse.md)
 - [IBasicFns](../interfaces/client_providers_item.IBasicFns.md)
 - [IItemContextType](../interfaces/client_providers_item.IItemContextType.md)
@@ -28,7 +27,6 @@
 
 ### Type aliases
 
-- [CacheMetadataGeneratorFn](client_providers_item.md#cachemetadatageneratorfn)
 - [ItemProviderRefObject](client_providers_item.md#itemproviderrefobject)
 - [ItemProviderType](client_providers_item.md#itemprovidertype)
 - [PolicyPathType](client_providers_item.md#policypathtype)
@@ -49,37 +47,13 @@
 
 ## Type aliases
 
-### CacheMetadataGeneratorFn
-
-Ƭ **CacheMetadataGeneratorFn**: (`record`: [`IGQLSearchRecord`](../interfaces/gql_querier.IGQLSearchRecord.md)) => `any`
-
-#### Type declaration
-
-▸ (`record`): `any`
-
-##### Parameters
-
-| Name | Type |
-| :------ | :------ |
-| `record` | [`IGQLSearchRecord`](../interfaces/gql_querier.IGQLSearchRecord.md) |
-
-##### Returns
-
-`any`
-
-#### Defined in
-
-[client/providers/item.tsx:360](https://github.com/onzag/itemize/blob/5c2808d3/client/providers/item.tsx#L360)
-
-___
-
 ### ItemProviderRefObject
 
 Ƭ **ItemProviderRefObject**: `React.RefObject`<[`ActualItemProvider`](../classes/client_providers_item.ActualItemProvider.md)\>
 
 #### Defined in
 
-[client/providers/item.tsx:4311](https://github.com/onzag/itemize/blob/5c2808d3/client/providers/item.tsx#L4311)
+[client/providers/item.tsx:5484](https://github.com/onzag/itemize/blob/f2db74a5/client/providers/item.tsx#L5484)
 
 ___
 
@@ -89,7 +63,7 @@ ___
 
 #### Defined in
 
-[client/providers/item.tsx:4310](https://github.com/onzag/itemize/blob/5c2808d3/client/providers/item.tsx#L4310)
+[client/providers/item.tsx:5483](https://github.com/onzag/itemize/blob/f2db74a5/client/providers/item.tsx#L5483)
 
 ___
 
@@ -99,7 +73,7 @@ ___
 
 #### Defined in
 
-[client/providers/item.tsx:187](https://github.com/onzag/itemize/blob/5c2808d3/client/providers/item.tsx#L187)
+[client/providers/item.tsx:179](https://github.com/onzag/itemize/blob/f2db74a5/client/providers/item.tsx#L179)
 
 ## Variables
 
@@ -107,9 +81,13 @@ ___
 
 • **ItemContext**: `Context`<[`IItemContextType`](../interfaces/client_providers_item.IItemContextType.md)\>
 
+The item context represents the context that holds information about
+an item, with its value and respective state, all item contexts
+are synchronized as the state is held centrally in the item definition
+
 #### Defined in
 
-[client/providers/item.tsx:601](https://github.com/onzag/itemize/blob/5c2808d3/client/providers/item.tsx#L601)
+[client/providers/item.tsx:1301](https://github.com/onzag/itemize/blob/f2db74a5/client/providers/item.tsx#L1301)
 
 ___
 
@@ -117,9 +95,12 @@ ___
 
 • **ItemContextPhaserContext**: `Context`<{ [slotId: string]: [`IItemContextType`](../interfaces/client_providers_item.IItemContextType.md);  }\>
 
+The phaser context is used by the item context phase in order to phase item contexts
+through other item contexts, this is the new way that deprecates the injectParentContext mechanism
+
 #### Defined in
 
-[client/providers/item.tsx:602](https://github.com/onzag/itemize/blob/5c2808d3/client/providers/item.tsx#L602)
+[client/providers/item.tsx:1307](https://github.com/onzag/itemize/blob/f2db74a5/client/providers/item.tsx#L1307)
 
 ___
 
@@ -127,9 +108,11 @@ ___
 
 • **ItemProvider**: `ForwardRefExoticComponent`<[`IItemProviderProps`](../interfaces/client_providers_item.IItemProviderProps.md) & `RefAttributes`<[`ActualItemProvider`](../classes/client_providers_item.ActualItemProvider.md)\>\>
 
+The item provider component provides the core functionality for the item provider
+
 #### Defined in
 
-[client/providers/item.tsx:4312](https://github.com/onzag/itemize/blob/5c2808d3/client/providers/item.tsx#L4312)
+[client/providers/item.tsx:5489](https://github.com/onzag/itemize/blob/f2db74a5/client/providers/item.tsx#L5489)
 
 ___
 
@@ -137,9 +120,11 @@ ___
 
 • **SearchItemValueContext**: `Context`<[`ISearchItemValueContextType`](../interfaces/client_providers_item.ISearchItemValueContextType.md)\>
 
+The search item value context is what is used to inject the currently being searched context
+
 #### Defined in
 
-[client/providers/item.tsx:603](https://github.com/onzag/itemize/blob/5c2808d3/client/providers/item.tsx#L603)
+[client/providers/item.tsx:1312](https://github.com/onzag/itemize/blob/f2db74a5/client/providers/item.tsx#L1312)
 
 ## Functions
 
@@ -147,13 +132,42 @@ ___
 
 ▸ **ItemContextPhase**(`props`): `Element`
 
+Phases the currrent item context until it is later retrieved so it can be used later at another level
+for example the following
+
+<ItemContextPhase>
+  <ItemProvider
+    {...}
+  >
+    <ItemContextRetrieve>
+
+    </ItemContextRetrieve>
+  </ItemProvider>
+</ItemContextPhase>
+
+will use the outer context inside the item context retrieve
+
+you may use a lot in order to be able to phase multiple contexts
+
+<ItemContextPhase slot="slot1">
+  <ItemProvider
+    {...}
+  >
+    <ItemContextPhase slot="slot2">
+      <ItemContextRetrieve slot="slot1">
+
+      </ItemContextRetrieve>
+    </ItemContextPhase>
+  </ItemProvider>
+</ItemContextPhase>
+
+In this case both contexts are phased in
+
 #### Parameters
 
 | Name | Type |
 | :------ | :------ |
-| `props` | `Object` |
-| `props.children` | `ReactNode` |
-| `props.slot?` | `string` |
+| `props` | `IItemContextPhaseProps` |
 
 #### Returns
 
@@ -161,7 +175,7 @@ ___
 
 #### Defined in
 
-[client/providers/item.tsx:4508](https://github.com/onzag/itemize/blob/5c2808d3/client/providers/item.tsx#L4508)
+[client/providers/item.tsx:5752](https://github.com/onzag/itemize/blob/f2db74a5/client/providers/item.tsx#L5752)
 
 ___
 
@@ -169,13 +183,14 @@ ___
 
 ▸ **ItemContextRetrieve**(`props`): `Element`
 
+This is the item context retrieve and allows to retrieve the context
+that was previously phased with ItemContextPhase
+
 #### Parameters
 
 | Name | Type |
 | :------ | :------ |
-| `props` | `Object` |
-| `props.children` | `ReactNode` |
-| `props.slot?` | `string` |
+| `props` | `IItemContextPhaseProps` |
 
 #### Returns
 
@@ -183,13 +198,18 @@ ___
 
 #### Defined in
 
-[client/providers/item.tsx:4529](https://github.com/onzag/itemize/blob/5c2808d3/client/providers/item.tsx#L4529)
+[client/providers/item.tsx:5780](https://github.com/onzag/itemize/blob/f2db74a5/client/providers/item.tsx#L5780)
 
 ___
 
 ### NoStateItemProvider
 
 ▸ **NoStateItemProvider**(`props`): `Element`
+
+The no state item provider allows to set an item provider that holds no state
+and therefore it is cheaper
+
+**`deprecated`**
 
 #### Parameters
 
@@ -203,7 +223,7 @@ ___
 
 #### Defined in
 
-[client/providers/item.tsx:4457](https://github.com/onzag/itemize/blob/5c2808d3/client/providers/item.tsx#L4457)
+[client/providers/item.tsx:5653](https://github.com/onzag/itemize/blob/f2db74a5/client/providers/item.tsx#L5653)
 
 ___
 
@@ -228,4 +248,4 @@ Provides a previously injected parent context
 
 #### Defined in
 
-[client/providers/item.tsx:4493](https://github.com/onzag/itemize/blob/5c2808d3/client/providers/item.tsx#L4493)
+[client/providers/item.tsx:5691](https://github.com/onzag/itemize/blob/f2db74a5/client/providers/item.tsx#L5691)

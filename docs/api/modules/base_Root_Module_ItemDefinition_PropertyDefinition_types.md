@@ -11,6 +11,12 @@ typescript, this file acts as a registry of sorts
 ### Interfaces
 
 - [IArgInfo](../interfaces/base_Root_Module_ItemDefinition_PropertyDefinition_types.IArgInfo.md)
+- [IElasticHighlighPropertyInfo](../interfaces/base_Root_Module_ItemDefinition_PropertyDefinition_types.IElasticHighlighPropertyInfo.md)
+- [IElasticHighlightRecordInfo](../interfaces/base_Root_Module_ItemDefinition_PropertyDefinition_types.IElasticHighlightRecordInfo.md)
+- [IElasticHighlightReply](../interfaces/base_Root_Module_ItemDefinition_PropertyDefinition_types.IElasticHighlightReply.md)
+- [IElasticHighlightSingleRecordInfo](../interfaces/base_Root_Module_ItemDefinition_PropertyDefinition_types.IElasticHighlightSingleRecordInfo.md)
+- [IElasticSearchInfo](../interfaces/base_Root_Module_ItemDefinition_PropertyDefinition_types.IElasticSearchInfo.md)
+- [IElasticStrSearchInfo](../interfaces/base_Root_Module_ItemDefinition_PropertyDefinition_types.IElasticStrSearchInfo.md)
 - [ILocalEqualInfo](../interfaces/base_Root_Module_ItemDefinition_PropertyDefinition_types.ILocalEqualInfo.md)
 - [ILocalOrderByInfo](../interfaces/base_Root_Module_ItemDefinition_PropertyDefinition_types.ILocalOrderByInfo.md)
 - [ILocalSearchInfo](../interfaces/base_Root_Module_ItemDefinition_PropertyDefinition_types.ILocalSearchInfo.md)
@@ -43,13 +49,13 @@ typescript, this file acts as a registry of sorts
 
 ### PropertyDefinitionSupportedType
 
-Ƭ **PropertyDefinitionSupportedType**: [`PropertyDefinitionSupportedBooleanType`](base_Root_Module_ItemDefinition_PropertyDefinition_types_boolean.md#propertydefinitionsupportedbooleantype) \| [`PropertyDefinitionSupportedIntegerType`](base_Root_Module_ItemDefinition_PropertyDefinition_types_integer.md#propertydefinitionsupportedintegertype) \| [`PropertyDefinitionSupportedNumberType`](base_Root_Module_ItemDefinition_PropertyDefinition_types_number.md#propertydefinitionsupportednumbertype) \| [`IPropertyDefinitionSupportedCurrencyType`](../interfaces/base_Root_Module_ItemDefinition_PropertyDefinition_types_currency.IPropertyDefinitionSupportedCurrencyType.md) \| [`IPropertyDefinitionSupportedUnitType`](../interfaces/base_Root_Module_ItemDefinition_PropertyDefinition_types_unit.IPropertyDefinitionSupportedUnitType.md) \| [`PropertyDefinitionSupportedStringType`](base_Root_Module_ItemDefinition_PropertyDefinition_types_string.md#propertydefinitionsupportedstringtype) \| [`PropertyDefinitionSupportedPasswordType`](base_Root_Module_ItemDefinition_PropertyDefinition_types_password.md#propertydefinitionsupportedpasswordtype) \| [`PropertyDefinitionSupportedTextType`](base_Root_Module_ItemDefinition_PropertyDefinition_types_text.md#propertydefinitionsupportedtexttype) \| [`PropertyDefinitionSupportedDateType`](base_Root_Module_ItemDefinition_PropertyDefinition_types_date.md#propertydefinitionsupporteddatetype) \| [`PropertyDefinitionSupportedDateTimeType`](base_Root_Module_ItemDefinition_PropertyDefinition_types_datetime.md#propertydefinitionsupporteddatetimetype) \| [`PropertyDefinitionSupportedTimeType`](base_Root_Module_ItemDefinition_PropertyDefinition_types_time.md#propertydefinitionsupportedtimetype) \| [`PropertyDefinitionSupportedYearType`](base_Root_Module_ItemDefinition_PropertyDefinition_types_year.md#propertydefinitionsupportedyeartype) \| [`IPropertyDefinitionSupportedLocationType`](../interfaces/base_Root_Module_ItemDefinition_PropertyDefinition_types_location.IPropertyDefinitionSupportedLocationType.md) \| [`PropertyDefinitionSupportedFileType`](base_Root_Module_ItemDefinition_PropertyDefinition_types_file.md#propertydefinitionsupportedfiletype) \| [`PropertyDefinitionSupportedFilesType`](base_Root_Module_ItemDefinition_PropertyDefinition_types_files.md#propertydefinitionsupportedfilestype) \| [`IPropertyDefinitionSupportedPaymentType`](../interfaces/base_Root_Module_ItemDefinition_PropertyDefinition_types_payment.IPropertyDefinitionSupportedPaymentType.md) \| [`PropertyDefinitionSupportedTagListType`](base_Root_Module_ItemDefinition_PropertyDefinition_types_taglist.md#propertydefinitionsupportedtaglisttype)
+Ƭ **PropertyDefinitionSupportedType**: [`PropertyDefinitionSupportedBooleanType`](base_Root_Module_ItemDefinition_PropertyDefinition_types_boolean.md#propertydefinitionsupportedbooleantype) \| [`PropertyDefinitionSupportedIntegerType`](base_Root_Module_ItemDefinition_PropertyDefinition_types_integer.md#propertydefinitionsupportedintegertype) \| [`PropertyDefinitionSupportedNumberType`](base_Root_Module_ItemDefinition_PropertyDefinition_types_number.md#propertydefinitionsupportednumbertype) \| [`IPropertyDefinitionSupportedCurrencyType`](../interfaces/base_Root_Module_ItemDefinition_PropertyDefinition_types_currency.IPropertyDefinitionSupportedCurrencyType.md) \| [`IPropertyDefinitionSupportedUnitType`](../interfaces/base_Root_Module_ItemDefinition_PropertyDefinition_types_unit.IPropertyDefinitionSupportedUnitType.md) \| [`PropertyDefinitionSupportedStringType`](base_Root_Module_ItemDefinition_PropertyDefinition_types_string.md#propertydefinitionsupportedstringtype) \| [`PropertyDefinitionSupportedPasswordType`](base_Root_Module_ItemDefinition_PropertyDefinition_types_password.md#propertydefinitionsupportedpasswordtype) \| [`IPropertyDefinitionSupportedTextType`](../interfaces/base_Root_Module_ItemDefinition_PropertyDefinition_types_text.IPropertyDefinitionSupportedTextType.md) \| [`PropertyDefinitionSupportedDateType`](base_Root_Module_ItemDefinition_PropertyDefinition_types_date.md#propertydefinitionsupporteddatetype) \| [`PropertyDefinitionSupportedDateTimeType`](base_Root_Module_ItemDefinition_PropertyDefinition_types_datetime.md#propertydefinitionsupporteddatetimetype) \| [`PropertyDefinitionSupportedTimeType`](base_Root_Module_ItemDefinition_PropertyDefinition_types_time.md#propertydefinitionsupportedtimetype) \| [`PropertyDefinitionSupportedYearType`](base_Root_Module_ItemDefinition_PropertyDefinition_types_year.md#propertydefinitionsupportedyeartype) \| [`IPropertyDefinitionSupportedLocationType`](../interfaces/base_Root_Module_ItemDefinition_PropertyDefinition_types_location.IPropertyDefinitionSupportedLocationType.md) \| [`PropertyDefinitionSupportedFileType`](base_Root_Module_ItemDefinition_PropertyDefinition_types_file.md#propertydefinitionsupportedfiletype) \| [`PropertyDefinitionSupportedFilesType`](base_Root_Module_ItemDefinition_PropertyDefinition_types_files.md#propertydefinitionsupportedfilestype) \| [`IPropertyDefinitionSupportedPaymentType`](../interfaces/base_Root_Module_ItemDefinition_PropertyDefinition_types_payment.IPropertyDefinitionSupportedPaymentType.md) \| [`PropertyDefinitionSupportedTagListType`](base_Root_Module_ItemDefinition_PropertyDefinition_types_taglist.md#propertydefinitionsupportedtaglisttype)
 
 All the supported types combined
 
 #### Defined in
 
-[base/Root/Module/ItemDefinition/PropertyDefinition/types/index.ts:465](https://github.com/onzag/itemize/blob/5c2808d3/base/Root/Module/ItemDefinition/PropertyDefinition/types/index.ts#L465)
+[base/Root/Module/ItemDefinition/PropertyDefinition/types/index.ts:553](https://github.com/onzag/itemize/blob/f2db74a5/base/Root/Module/ItemDefinition/PropertyDefinition/types/index.ts#L553)
 
 ___
 
@@ -61,7 +67,7 @@ All the supported property types
 
 #### Defined in
 
-[base/Root/Module/ItemDefinition/PropertyDefinition/types/index.ts:40](https://github.com/onzag/itemize/blob/5c2808d3/base/Root/Module/ItemDefinition/PropertyDefinition/types/index.ts#L40)
+[base/Root/Module/ItemDefinition/PropertyDefinition/types/index.ts:41](https://github.com/onzag/itemize/blob/f2db74a5/base/Root/Module/ItemDefinition/PropertyDefinition/types/index.ts#L41)
 
 ___
 
@@ -74,7 +80,7 @@ how they are supposed to be managed
 
 #### Defined in
 
-[base/Root/Module/ItemDefinition/PropertyDefinition/types/index.ts:411](https://github.com/onzag/itemize/blob/5c2808d3/base/Root/Module/ItemDefinition/PropertyDefinition/types/index.ts#L411)
+[base/Root/Module/ItemDefinition/PropertyDefinition/types/index.ts:499](https://github.com/onzag/itemize/blob/f2db74a5/base/Root/Module/ItemDefinition/PropertyDefinition/types/index.ts#L499)
 
 ## Variables
 
@@ -86,4 +92,4 @@ The standard definition and registry of all types in itemize
 
 #### Defined in
 
-[base/Root/Module/ItemDefinition/PropertyDefinition/types/index.ts:417](https://github.com/onzag/itemize/blob/5c2808d3/base/Root/Module/ItemDefinition/PropertyDefinition/types/index.ts#L417)
+[base/Root/Module/ItemDefinition/PropertyDefinition/types/index.ts:505](https://github.com/onzag/itemize/blob/f2db74a5/base/Root/Module/ItemDefinition/PropertyDefinition/types/index.ts#L505)

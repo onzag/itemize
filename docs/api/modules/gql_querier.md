@@ -60,7 +60,7 @@ as the product interfaces for these queries
 
 #### Defined in
 
-[gql-querier.ts:158](https://github.com/onzag/itemize/blob/5c2808d3/gql-querier.ts#L158)
+[gql-querier.ts:163](https://github.com/onzag/itemize/blob/f2db74a5/gql-querier.ts#L163)
 
 ## Functions
 
@@ -84,7 +84,7 @@ a grapqhl query class instance
 
 #### Defined in
 
-[gql-querier.ts:659](https://github.com/onzag/itemize/blob/5c2808d3/gql-querier.ts#L659)
+[gql-querier.ts:740](https://github.com/onzag/itemize/blob/f2db74a5/gql-querier.ts#L740)
 
 ___
 
@@ -108,7 +108,7 @@ a grapqhl query class instance
 
 #### Defined in
 
-[gql-querier.ts:650](https://github.com/onzag/itemize/blob/5c2808d3/gql-querier.ts#L650)
+[gql-querier.ts:731](https://github.com/onzag/itemize/blob/f2db74a5/gql-querier.ts#L731)
 
 ___
 
@@ -137,7 +137,7 @@ a promise for a graphql endpoint value
 
 #### Defined in
 
-[gql-querier.ts:722](https://github.com/onzag/itemize/blob/5c2808d3/gql-querier.ts#L722)
+[gql-querier.ts:803](https://github.com/onzag/itemize/blob/f2db74a5/gql-querier.ts#L803)
 
 ___
 
@@ -159,4 +159,4 @@ ___
 
 #### Defined in
 
-[gql-querier.ts:676](https://github.com/onzag/itemize/blob/5c2808d3/gql-querier.ts#L676)
+[gql-querier.ts:757](https://github.com/onzag/itemize/blob/f2db74a5/gql-querier.ts#L757)

@@ -11,7 +11,6 @@
 - [code](imported_resources.ICurrencyType.md#code)
 - [decimals](imported_resources.ICurrencyType.md#decimals)
 - [name](imported_resources.ICurrencyType.md#name)
-- [rounding](imported_resources.ICurrencyType.md#rounding)
 - [symbol](imported_resources.ICurrencyType.md#symbol)
 
 ## Properties
@@ -22,7 +21,7 @@
 
 #### Defined in
 
-[imported-resources/index.ts:42](https://github.com/onzag/itemize/blob/5c2808d3/imported-resources/index.ts#L42)
+[imported-resources/index.ts:42](https://github.com/onzag/itemize/blob/f2db74a5/imported-resources/index.ts#L42)
 
 ___
 
@@ -32,7 +31,7 @@ ___
 
 #### Defined in
 
-[imported-resources/index.ts:46](https://github.com/onzag/itemize/blob/5c2808d3/imported-resources/index.ts#L46)
+[imported-resources/index.ts:45](https://github.com/onzag/itemize/blob/f2db74a5/imported-resources/index.ts#L45)
 
 ___
 
@@ -42,17 +41,7 @@ ___
 
 #### Defined in
 
-[imported-resources/index.ts:43](https://github.com/onzag/itemize/blob/5c2808d3/imported-resources/index.ts#L43)
-
-___
-
-### rounding
-
-• **rounding**: `number`
-
-#### Defined in
-
-[imported-resources/index.ts:45](https://github.com/onzag/itemize/blob/5c2808d3/imported-resources/index.ts#L45)
+[imported-resources/index.ts:43](https://github.com/onzag/itemize/blob/f2db74a5/imported-resources/index.ts#L43)
 
 ___
 
@@ -62,4 +51,4 @@ ___
 
 #### Defined in
 
-[imported-resources/index.ts:44](https://github.com/onzag/itemize/blob/5c2808d3/imported-resources/index.ts#L44)
+[imported-resources/index.ts:44](https://github.com/onzag/itemize/blob/f2db74a5/imported-resources/index.ts#L44)

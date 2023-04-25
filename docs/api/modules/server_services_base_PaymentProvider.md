@@ -59,7 +59,7 @@ needs to know when the event is done to perform cleanup functions
 
 #### Defined in
 
-[server/services/base/PaymentProvider.ts:185](https://github.com/onzag/itemize/blob/5c2808d3/server/services/base/PaymentProvider.ts#L185)
+[server/services/base/PaymentProvider.ts:185](https://github.com/onzag/itemize/blob/f2db74a5/server/services/base/PaymentProvider.ts#L185)
 
 ## Variables
 
@@ -73,4 +73,4 @@ the events CREATED and DESTROYED, but those are not status changes
 
 #### Defined in
 
-[server/services/base/PaymentProvider.ts:225](https://github.com/onzag/itemize/blob/5c2808d3/server/services/base/PaymentProvider.ts#L225)
+[server/services/base/PaymentProvider.ts:225](https://github.com/onzag/itemize/blob/f2db74a5/server/services/base/PaymentProvider.ts#L225)

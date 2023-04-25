@@ -11,6 +11,9 @@ information for using in the application
 
 ### Properties
 
+- [changeCountryTo](client_internal_providers_locale_provider.ILocaleContextType.md#changecountryto)
+- [changeCurrencyTo](client_internal_providers_locale_provider.ILocaleContextType.md#changecurrencyto)
+- [changeLanguageTo](client_internal_providers_locale_provider.ILocaleContextType.md#changelanguageto)
 - [country](client_internal_providers_locale_provider.ILocaleContextType.md#country)
 - [currency](client_internal_providers_locale_provider.ILocaleContextType.md#currency)
 - [currencyFactors](client_internal_providers_locale_provider.ILocaleContextType.md#currencyfactors)
@@ -20,13 +23,37 @@ information for using in the application
 - [rtl](client_internal_providers_locale_provider.ILocaleContextType.md#rtl)
 - [updating](client_internal_providers_locale_provider.ILocaleContextType.md#updating)
 
-### Methods
-
-- [changeCountryTo](client_internal_providers_locale_provider.ILocaleContextType.md#changecountryto)
-- [changeCurrencyTo](client_internal_providers_locale_provider.ILocaleContextType.md#changecurrencyto)
-- [changeLanguageTo](client_internal_providers_locale_provider.ILocaleContextType.md#changelanguageto)
-
 ## Properties
+
+### changeCountryTo
+
+• **changeCountryTo**: [`ChangeCountryToFn`](../modules/client_internal_providers_locale_provider.md#changecountrytofn)
+
+#### Defined in
+
+[client/internal/providers/locale-provider.tsx:54](https://github.com/onzag/itemize/blob/f2db74a5/client/internal/providers/locale-provider.tsx#L54)
+
+___
+
+### changeCurrencyTo
+
+• **changeCurrencyTo**: [`ChangeCurrencyToFn`](../modules/client_internal_providers_locale_provider.md#changecurrencytofn)
+
+#### Defined in
+
+[client/internal/providers/locale-provider.tsx:53](https://github.com/onzag/itemize/blob/f2db74a5/client/internal/providers/locale-provider.tsx#L53)
+
+___
+
+### changeLanguageTo
+
+• **changeLanguageTo**: [`ChangeLanguageToFn`](../modules/client_internal_providers_locale_provider.md#changelanguagetofn)
+
+#### Defined in
+
+[client/internal/providers/locale-provider.tsx:52](https://github.com/onzag/itemize/blob/f2db74a5/client/internal/providers/locale-provider.tsx#L52)
+
+___
 
 ### country
 
@@ -36,7 +63,7 @@ The current country code
 
 #### Defined in
 
-[client/internal/providers/locale-provider.tsx:57](https://github.com/onzag/itemize/blob/5c2808d3/client/internal/providers/locale-provider.tsx#L57)
+[client/internal/providers/locale-provider.tsx:76](https://github.com/onzag/itemize/blob/f2db74a5/client/internal/providers/locale-provider.tsx#L76)
 
 ___
 
@@ -48,7 +75,7 @@ The current currency code
 
 #### Defined in
 
-[client/internal/providers/locale-provider.tsx:47](https://github.com/onzag/itemize/blob/5c2808d3/client/internal/providers/locale-provider.tsx#L47)
+[client/internal/providers/locale-provider.tsx:66](https://github.com/onzag/itemize/blob/f2db74a5/client/internal/providers/locale-provider.tsx#L66)
 
 ___
 
@@ -64,7 +91,7 @@ The current currency factors
 
 #### Defined in
 
-[client/internal/providers/locale-provider.tsx:51](https://github.com/onzag/itemize/blob/5c2808d3/client/internal/providers/locale-provider.tsx#L51)
+[client/internal/providers/locale-provider.tsx:70](https://github.com/onzag/itemize/blob/f2db74a5/client/internal/providers/locale-provider.tsx#L70)
 
 ___
 
@@ -76,7 +103,7 @@ The root i18n data
 
 #### Defined in
 
-[client/internal/providers/locale-provider.tsx:70](https://github.com/onzag/itemize/blob/5c2808d3/client/internal/providers/locale-provider.tsx#L70)
+[client/internal/providers/locale-provider.tsx:89](https://github.com/onzag/itemize/blob/f2db74a5/client/internal/providers/locale-provider.tsx#L89)
 
 ___
 
@@ -88,7 +115,7 @@ The language locales available, and their given direction
 
 #### Defined in
 
-[client/internal/providers/locale-provider.tsx:66](https://github.com/onzag/itemize/blob/5c2808d3/client/internal/providers/locale-provider.tsx#L66)
+[client/internal/providers/locale-provider.tsx:85](https://github.com/onzag/itemize/blob/f2db74a5/client/internal/providers/locale-provider.tsx#L85)
 
 ___
 
@@ -100,7 +127,7 @@ The current language code
 
 #### Defined in
 
-[client/internal/providers/locale-provider.tsx:39](https://github.com/onzag/itemize/blob/5c2808d3/client/internal/providers/locale-provider.tsx#L39)
+[client/internal/providers/locale-provider.tsx:58](https://github.com/onzag/itemize/blob/f2db74a5/client/internal/providers/locale-provider.tsx#L58)
 
 ___
 
@@ -112,7 +139,7 @@ Whether this current language is rtl
 
 #### Defined in
 
-[client/internal/providers/locale-provider.tsx:43](https://github.com/onzag/itemize/blob/5c2808d3/client/internal/providers/locale-provider.tsx#L43)
+[client/internal/providers/locale-provider.tsx:62](https://github.com/onzag/itemize/blob/f2db74a5/client/internal/providers/locale-provider.tsx#L62)
 
 ___
 
@@ -125,79 +152,4 @@ with updating the language as it has to be refetched
 
 #### Defined in
 
-[client/internal/providers/locale-provider.tsx:62](https://github.com/onzag/itemize/blob/5c2808d3/client/internal/providers/locale-provider.tsx#L62)
-
-## Methods
-
-### changeCountryTo
-
-▸ **changeCountryTo**(`code`, `avoidChangingLanguageAndCurrency?`, `avoidUpdatingUser?`): `Promise`<`void`\>
-
-To change the country to a new code
-
-#### Parameters
-
-| Name | Type | Description |
-| :------ | :------ | :------ |
-| `code` | `string` | a code which represents a valid supported country from the country list |
-| `avoidChangingLanguageAndCurrency?` | `boolean` | - |
-| `avoidUpdatingUser?` | `boolean` | avoid updating the user (if logged in) |
-
-#### Returns
-
-`Promise`<`void`\>
-
-a void promise, this is basically for the same reason of changeLanguageTo
-
-#### Defined in
-
-[client/internal/providers/locale-provider.tsx:35](https://github.com/onzag/itemize/blob/5c2808d3/client/internal/providers/locale-provider.tsx#L35)
-
-___
-
-### changeCurrencyTo
-
-▸ **changeCurrencyTo**(`code`, `avoidUpdatingUser?`): `void`
-
-To change the currency to a new code
-
-#### Parameters
-
-| Name | Type | Description |
-| :------ | :------ | :------ |
-| `code` | `string` | a code which represents a valid supported currency from the currency list |
-| `avoidUpdatingUser?` | `boolean` | avoid updating the user (if logged in) |
-
-#### Returns
-
-`void`
-
-#### Defined in
-
-[client/internal/providers/locale-provider.tsx:28](https://github.com/onzag/itemize/blob/5c2808d3/client/internal/providers/locale-provider.tsx#L28)
-
-___
-
-### changeLanguageTo
-
-▸ **changeLanguageTo**(`code`, `avoidUpdatingUser?`): `Promise`<`void`\>
-
-to change the lanaguage to a new code
-
-#### Parameters
-
-| Name | Type | Description |
-| :------ | :------ | :------ |
-| `code` | `string` | the new language code |
-| `avoidUpdatingUser?` | `boolean` | avoid updating the user (if logged in) |
-
-#### Returns
-
-`Promise`<`void`\>
-
-a void promise, this promise is fullfilled once the language
-has been changed successfully and as such the app has updated
-
-#### Defined in
-
-[client/internal/providers/locale-provider.tsx:22](https://github.com/onzag/itemize/blob/5c2808d3/client/internal/providers/locale-provider.tsx#L22)
+[client/internal/providers/locale-provider.tsx:81](https://github.com/onzag/itemize/blob/f2db74a5/client/internal/providers/locale-provider.tsx#L81)

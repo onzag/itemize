@@ -20,6 +20,7 @@ sanitization or other context
 - [supportedContainers](client_internal_text.IFeatureSupportOptions.md#supportedcontainers)
 - [supportedCustoms](client_internal_text.IFeatureSupportOptions.md#supportedcustoms)
 - [supportedRichClasses](client_internal_text.IFeatureSupportOptions.md#supportedrichclasses)
+- [supportedTables](client_internal_text.IFeatureSupportOptions.md#supportedtables)
 - [supportsContainers](client_internal_text.IFeatureSupportOptions.md#supportscontainers)
 - [supportsCustom](client_internal_text.IFeatureSupportOptions.md#supportscustom)
 - [supportsCustomStyles](client_internal_text.IFeatureSupportOptions.md#supportscustomstyles)
@@ -32,6 +33,7 @@ sanitization or other context
 - [supportsLists](client_internal_text.IFeatureSupportOptions.md#supportslists)
 - [supportsQuote](client_internal_text.IFeatureSupportOptions.md#supportsquote)
 - [supportsRichClasses](client_internal_text.IFeatureSupportOptions.md#supportsrichclasses)
+- [supportsTables](client_internal_text.IFeatureSupportOptions.md#supportstables)
 - [supportsTemplating](client_internal_text.IFeatureSupportOptions.md#supportstemplating)
 - [supportsTitle](client_internal_text.IFeatureSupportOptions.md#supportstitle)
 - [supportsVideos](client_internal_text.IFeatureSupportOptions.md#supportsvideos)
@@ -48,7 +50,7 @@ not affect the base container
 
 #### Defined in
 
-[client/internal/text/index.tsx:231](https://github.com/onzag/itemize/blob/5c2808d3/client/internal/text/index.tsx#L231)
+[client/internal/text/index.tsx:254](https://github.com/onzag/itemize/blob/f2db74a5/client/internal/text/index.tsx#L254)
 
 ___
 
@@ -60,7 +62,7 @@ the supported custom elements
 
 #### Defined in
 
-[client/internal/text/index.tsx:221](https://github.com/onzag/itemize/blob/5c2808d3/client/internal/text/index.tsx#L221)
+[client/internal/text/index.tsx:244](https://github.com/onzag/itemize/blob/f2db74a5/client/internal/text/index.tsx#L244)
 
 ___
 
@@ -73,7 +75,19 @@ if all supported
 
 #### Defined in
 
-[client/internal/text/index.tsx:240](https://github.com/onzag/itemize/blob/5c2808d3/client/internal/text/index.tsx#L240)
+[client/internal/text/index.tsx:271](https://github.com/onzag/itemize/blob/f2db74a5/client/internal/text/index.tsx#L271)
+
+___
+
+### supportedTables
+
+• **supportedTables**: `string`[]
+
+The list of supported tables
+
+#### Defined in
+
+[client/internal/text/index.tsx:262](https://github.com/onzag/itemize/blob/f2db74a5/client/internal/text/index.tsx#L262)
 
 ___
 
@@ -85,7 +99,7 @@ whether we support containers
 
 #### Defined in
 
-[client/internal/text/index.tsx:225](https://github.com/onzag/itemize/blob/5c2808d3/client/internal/text/index.tsx#L225)
+[client/internal/text/index.tsx:248](https://github.com/onzag/itemize/blob/f2db74a5/client/internal/text/index.tsx#L248)
 
 ___
 
@@ -97,7 +111,7 @@ Whether we support customs
 
 #### Defined in
 
-[client/internal/text/index.tsx:217](https://github.com/onzag/itemize/blob/5c2808d3/client/internal/text/index.tsx#L217)
+[client/internal/text/index.tsx:240](https://github.com/onzag/itemize/blob/f2db74a5/client/internal/text/index.tsx#L240)
 
 ___
 
@@ -110,7 +124,7 @@ are acceptable
 
 #### Defined in
 
-[client/internal/text/index.tsx:208](https://github.com/onzag/itemize/blob/5c2808d3/client/internal/text/index.tsx#L208)
+[client/internal/text/index.tsx:231](https://github.com/onzag/itemize/blob/f2db74a5/client/internal/text/index.tsx#L231)
 
 ___
 
@@ -123,7 +137,7 @@ protocol outside the current page are acceptable
 
 #### Defined in
 
-[client/internal/text/index.tsx:191](https://github.com/onzag/itemize/blob/5c2808d3/client/internal/text/index.tsx#L191)
+[client/internal/text/index.tsx:214](https://github.com/onzag/itemize/blob/f2db74a5/client/internal/text/index.tsx#L214)
 
 ___
 
@@ -135,7 +149,7 @@ Whether files are supporeted
 
 #### Defined in
 
-[client/internal/text/index.tsx:176](https://github.com/onzag/itemize/blob/5c2808d3/client/internal/text/index.tsx#L176)
+[client/internal/text/index.tsx:199](https://github.com/onzag/itemize/blob/f2db74a5/client/internal/text/index.tsx#L199)
 
 ___
 
@@ -149,7 +163,7 @@ it doesn't support files, or when viewing
 
 #### Defined in
 
-[client/internal/text/index.tsx:182](https://github.com/onzag/itemize/blob/5c2808d3/client/internal/text/index.tsx#L182)
+[client/internal/text/index.tsx:205](https://github.com/onzag/itemize/blob/f2db74a5/client/internal/text/index.tsx#L205)
 
 ___
 
@@ -161,7 +175,7 @@ Whether it supports images
 
 #### Defined in
 
-[client/internal/text/index.tsx:162](https://github.com/onzag/itemize/blob/5c2808d3/client/internal/text/index.tsx#L162)
+[client/internal/text/index.tsx:185](https://github.com/onzag/itemize/blob/f2db74a5/client/internal/text/index.tsx#L185)
 
 ___
 
@@ -175,7 +189,7 @@ it doesn't support images, or when viewing
 
 #### Defined in
 
-[client/internal/text/index.tsx:168](https://github.com/onzag/itemize/blob/5c2808d3/client/internal/text/index.tsx#L168)
+[client/internal/text/index.tsx:191](https://github.com/onzag/itemize/blob/f2db74a5/client/internal/text/index.tsx#L191)
 
 ___
 
@@ -187,7 +201,7 @@ Whether links are acceptable
 
 #### Defined in
 
-[client/internal/text/index.tsx:186](https://github.com/onzag/itemize/blob/5c2808d3/client/internal/text/index.tsx#L186)
+[client/internal/text/index.tsx:209](https://github.com/onzag/itemize/blob/f2db74a5/client/internal/text/index.tsx#L209)
 
 ___
 
@@ -199,7 +213,7 @@ Whether lists are acceptable, ul, ol etc...
 
 #### Defined in
 
-[client/internal/text/index.tsx:195](https://github.com/onzag/itemize/blob/5c2808d3/client/internal/text/index.tsx#L195)
+[client/internal/text/index.tsx:218](https://github.com/onzag/itemize/blob/f2db74a5/client/internal/text/index.tsx#L218)
 
 ___
 
@@ -211,7 +225,7 @@ Whether quotes are acceptable
 
 #### Defined in
 
-[client/internal/text/index.tsx:199](https://github.com/onzag/itemize/blob/5c2808d3/client/internal/text/index.tsx#L199)
+[client/internal/text/index.tsx:222](https://github.com/onzag/itemize/blob/f2db74a5/client/internal/text/index.tsx#L222)
 
 ___
 
@@ -223,7 +237,19 @@ whether rich classes are supported
 
 #### Defined in
 
-[client/internal/text/index.tsx:235](https://github.com/onzag/itemize/blob/5c2808d3/client/internal/text/index.tsx#L235)
+[client/internal/text/index.tsx:266](https://github.com/onzag/itemize/blob/f2db74a5/client/internal/text/index.tsx#L266)
+
+___
+
+### supportsTables
+
+• **supportsTables**: `boolean`
+
+Whether tables are supported
+
+#### Defined in
+
+[client/internal/text/index.tsx:258](https://github.com/onzag/itemize/blob/f2db74a5/client/internal/text/index.tsx#L258)
 
 ___
 
@@ -235,7 +261,7 @@ Whether templating is supported
 
 #### Defined in
 
-[client/internal/text/index.tsx:212](https://github.com/onzag/itemize/blob/5c2808d3/client/internal/text/index.tsx#L212)
+[client/internal/text/index.tsx:235](https://github.com/onzag/itemize/blob/f2db74a5/client/internal/text/index.tsx#L235)
 
 ___
 
@@ -247,7 +273,7 @@ Whether titles are acceptable
 
 #### Defined in
 
-[client/internal/text/index.tsx:203](https://github.com/onzag/itemize/blob/5c2808d3/client/internal/text/index.tsx#L203)
+[client/internal/text/index.tsx:226](https://github.com/onzag/itemize/blob/f2db74a5/client/internal/text/index.tsx#L226)
 
 ___
 
@@ -259,4 +285,4 @@ Whether it supports videos
 
 #### Defined in
 
-[client/internal/text/index.tsx:172](https://github.com/onzag/itemize/blob/5c2808d3/client/internal/text/index.tsx#L172)
+[client/internal/text/index.tsx:195](https://github.com/onzag/itemize/blob/f2db74a5/client/internal/text/index.tsx#L195)

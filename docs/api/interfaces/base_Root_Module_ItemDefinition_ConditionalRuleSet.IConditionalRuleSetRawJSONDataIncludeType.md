@@ -8,7 +8,7 @@ this represents rules that are built for includes
 
 ## Hierarchy
 
-- `IConditionalRuleSetRawJSONDataBaseType`
+- [`IConditionalRuleSetRawJSONDataBaseType`](base_Root_Module_ItemDefinition_ConditionalRuleSet.IConditionalRuleSetRawJSONDataBaseType.md)
 
   ↳ **`IConditionalRuleSetRawJSONDataIncludeType`**
 
@@ -19,6 +19,7 @@ this represents rules that are built for includes
 - [condition](base_Root_Module_ItemDefinition_ConditionalRuleSet.IConditionalRuleSetRawJSONDataIncludeType.md#condition)
 - [gate](base_Root_Module_ItemDefinition_ConditionalRuleSet.IConditionalRuleSetRawJSONDataIncludeType.md#gate)
 - [include](base_Root_Module_ItemDefinition_ConditionalRuleSet.IConditionalRuleSetRawJSONDataIncludeType.md#include)
+- [internalConditionGate](base_Root_Module_ItemDefinition_ConditionalRuleSet.IConditionalRuleSetRawJSONDataIncludeType.md#internalconditiongate)
 - [isIncluded](base_Root_Module_ItemDefinition_ConditionalRuleSet.IConditionalRuleSetRawJSONDataIncludeType.md#isincluded)
 - [serverFlag](base_Root_Module_ItemDefinition_ConditionalRuleSet.IConditionalRuleSetRawJSONDataIncludeType.md#serverflag)
 
@@ -26,15 +27,15 @@ this represents rules that are built for includes
 
 ### condition
 
-• `Optional` **condition**: [`IConditionalRuleSetRawJSONDataType`](../modules/base_Root_Module_ItemDefinition_ConditionalRuleSet.md#iconditionalrulesetrawjsondatatype)
+• `Optional` **condition**: [`IConditionalRuleSetRawJSONDataType`](../modules/base_Root_Module_ItemDefinition_ConditionalRuleSet.md#iconditionalrulesetrawjsondatatype) \| [`IConditionalRuleSetRawJSONDataType`](../modules/base_Root_Module_ItemDefinition_ConditionalRuleSet.md#iconditionalrulesetrawjsondatatype)[]
 
 #### Inherited from
 
-IConditionalRuleSetRawJSONDataBaseType.condition
+[IConditionalRuleSetRawJSONDataBaseType](base_Root_Module_ItemDefinition_ConditionalRuleSet.IConditionalRuleSetRawJSONDataBaseType.md).[condition](base_Root_Module_ItemDefinition_ConditionalRuleSet.IConditionalRuleSetRawJSONDataBaseType.md#condition)
 
 #### Defined in
 
-[base/Root/Module/ItemDefinition/ConditionalRuleSet/index.ts:54](https://github.com/onzag/itemize/blob/5c2808d3/base/Root/Module/ItemDefinition/ConditionalRuleSet/index.ts#L54)
+[base/Root/Module/ItemDefinition/ConditionalRuleSet/index.ts:54](https://github.com/onzag/itemize/blob/f2db74a5/base/Root/Module/ItemDefinition/ConditionalRuleSet/index.ts#L54)
 
 ___
 
@@ -44,11 +45,11 @@ ___
 
 #### Inherited from
 
-IConditionalRuleSetRawJSONDataBaseType.gate
+[IConditionalRuleSetRawJSONDataBaseType](base_Root_Module_ItemDefinition_ConditionalRuleSet.IConditionalRuleSetRawJSONDataBaseType.md).[gate](base_Root_Module_ItemDefinition_ConditionalRuleSet.IConditionalRuleSetRawJSONDataBaseType.md#gate)
 
 #### Defined in
 
-[base/Root/Module/ItemDefinition/ConditionalRuleSet/index.ts:53](https://github.com/onzag/itemize/blob/5c2808d3/base/Root/Module/ItemDefinition/ConditionalRuleSet/index.ts#L53)
+[base/Root/Module/ItemDefinition/ConditionalRuleSet/index.ts:53](https://github.com/onzag/itemize/blob/f2db74a5/base/Root/Module/ItemDefinition/ConditionalRuleSet/index.ts#L53)
 
 ___
 
@@ -62,7 +63,21 @@ and the name just doesn't include the numeral
 
 #### Defined in
 
-[base/Root/Module/ItemDefinition/ConditionalRuleSet/index.ts:100](https://github.com/onzag/itemize/blob/5c2808d3/base/Root/Module/ItemDefinition/ConditionalRuleSet/index.ts#L100)
+[base/Root/Module/ItemDefinition/ConditionalRuleSet/index.ts:101](https://github.com/onzag/itemize/blob/f2db74a5/base/Root/Module/ItemDefinition/ConditionalRuleSet/index.ts#L101)
+
+___
+
+### internalConditionGate
+
+• `Optional` **internalConditionGate**: [`ConditionalRuleGateType`](../modules/base_Root_Module_ItemDefinition_ConditionalRuleSet.md#conditionalrulegatetype)
+
+#### Inherited from
+
+[IConditionalRuleSetRawJSONDataBaseType](base_Root_Module_ItemDefinition_ConditionalRuleSet.IConditionalRuleSetRawJSONDataBaseType.md).[internalConditionGate](base_Root_Module_ItemDefinition_ConditionalRuleSet.IConditionalRuleSetRawJSONDataBaseType.md#internalconditiongate)
+
+#### Defined in
+
+[base/Root/Module/ItemDefinition/ConditionalRuleSet/index.ts:55](https://github.com/onzag/itemize/blob/f2db74a5/base/Root/Module/ItemDefinition/ConditionalRuleSet/index.ts#L55)
 
 ___
 
@@ -74,7 +89,7 @@ the inclusion state expected for the conditional rule to apply
 
 #### Defined in
 
-[base/Root/Module/ItemDefinition/ConditionalRuleSet/index.ts:104](https://github.com/onzag/itemize/blob/5c2808d3/base/Root/Module/ItemDefinition/ConditionalRuleSet/index.ts#L104)
+[base/Root/Module/ItemDefinition/ConditionalRuleSet/index.ts:105](https://github.com/onzag/itemize/blob/f2db74a5/base/Root/Module/ItemDefinition/ConditionalRuleSet/index.ts#L105)
 
 ___
 
@@ -84,8 +99,8 @@ ___
 
 #### Inherited from
 
-IConditionalRuleSetRawJSONDataBaseType.serverFlag
+[IConditionalRuleSetRawJSONDataBaseType](base_Root_Module_ItemDefinition_ConditionalRuleSet.IConditionalRuleSetRawJSONDataBaseType.md).[serverFlag](base_Root_Module_ItemDefinition_ConditionalRuleSet.IConditionalRuleSetRawJSONDataBaseType.md#serverflag)
 
 #### Defined in
 
-[base/Root/Module/ItemDefinition/ConditionalRuleSet/index.ts:55](https://github.com/onzag/itemize/blob/5c2808d3/base/Root/Module/ItemDefinition/ConditionalRuleSet/index.ts#L55)
+[base/Root/Module/ItemDefinition/ConditionalRuleSet/index.ts:56](https://github.com/onzag/itemize/blob/f2db74a5/base/Root/Module/ItemDefinition/ConditionalRuleSet/index.ts#L56)

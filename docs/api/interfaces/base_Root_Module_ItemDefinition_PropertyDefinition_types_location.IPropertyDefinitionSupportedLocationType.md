@@ -25,7 +25,7 @@ a text description and an alternative text description
 
 #### Defined in
 
-[base/Root/Module/ItemDefinition/PropertyDefinition/types/location.ts:59](https://github.com/onzag/itemize/blob/5c2808d3/base/Root/Module/ItemDefinition/PropertyDefinition/types/location.ts#L59)
+[base/Root/Module/ItemDefinition/PropertyDefinition/types/location.ts:60](https://github.com/onzag/itemize/blob/f2db74a5/base/Root/Module/ItemDefinition/PropertyDefinition/types/location.ts#L60)
 
 ___
 
@@ -35,7 +35,7 @@ ___
 
 #### Defined in
 
-[base/Root/Module/ItemDefinition/PropertyDefinition/types/location.ts:60](https://github.com/onzag/itemize/blob/5c2808d3/base/Root/Module/ItemDefinition/PropertyDefinition/types/location.ts#L60)
+[base/Root/Module/ItemDefinition/PropertyDefinition/types/location.ts:61](https://github.com/onzag/itemize/blob/f2db74a5/base/Root/Module/ItemDefinition/PropertyDefinition/types/location.ts#L61)
 
 ___
 
@@ -45,7 +45,7 @@ ___
 
 #### Defined in
 
-[base/Root/Module/ItemDefinition/PropertyDefinition/types/location.ts:57](https://github.com/onzag/itemize/blob/5c2808d3/base/Root/Module/ItemDefinition/PropertyDefinition/types/location.ts#L57)
+[base/Root/Module/ItemDefinition/PropertyDefinition/types/location.ts:58](https://github.com/onzag/itemize/blob/f2db74a5/base/Root/Module/ItemDefinition/PropertyDefinition/types/location.ts#L58)
 
 ___
 
@@ -55,7 +55,7 @@ ___
 
 #### Defined in
 
-[base/Root/Module/ItemDefinition/PropertyDefinition/types/location.ts:56](https://github.com/onzag/itemize/blob/5c2808d3/base/Root/Module/ItemDefinition/PropertyDefinition/types/location.ts#L56)
+[base/Root/Module/ItemDefinition/PropertyDefinition/types/location.ts:57](https://github.com/onzag/itemize/blob/f2db74a5/base/Root/Module/ItemDefinition/PropertyDefinition/types/location.ts#L57)
 
 ___
 
@@ -65,4 +65,4 @@ ___
 
 #### Defined in
 
-[base/Root/Module/ItemDefinition/PropertyDefinition/types/location.ts:58](https://github.com/onzag/itemize/blob/5c2808d3/base/Root/Module/ItemDefinition/PropertyDefinition/types/location.ts#L58)
+[base/Root/Module/ItemDefinition/PropertyDefinition/types/location.ts:59](https://github.com/onzag/itemize/blob/f2db74a5/base/Root/Module/ItemDefinition/PropertyDefinition/types/location.ts#L59)

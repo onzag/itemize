@@ -23,7 +23,7 @@ This is basically the types themselves
 
 #### Defined in
 
-[base/Root/Module/ItemDefinition/index.ts:76](https://github.com/onzag/itemize/blob/5c2808d3/base/Root/Module/ItemDefinition/index.ts#L76)
+[base/Root/Module/ItemDefinition/index.ts:121](https://github.com/onzag/itemize/blob/f2db74a5/base/Root/Module/ItemDefinition/index.ts#L121)
 
 ___
 
@@ -33,7 +33,7 @@ ___
 
 #### Defined in
 
-[base/Root/Module/ItemDefinition/index.ts:75](https://github.com/onzag/itemize/blob/5c2808d3/base/Root/Module/ItemDefinition/index.ts#L75)
+[base/Root/Module/ItemDefinition/index.ts:120](https://github.com/onzag/itemize/blob/f2db74a5/base/Root/Module/ItemDefinition/index.ts#L120)
 
 ___
 
@@ -43,7 +43,7 @@ ___
 
 #### Defined in
 
-[base/Root/Module/ItemDefinition/index.ts:78](https://github.com/onzag/itemize/blob/5c2808d3/base/Root/Module/ItemDefinition/index.ts#L78)
+[base/Root/Module/ItemDefinition/index.ts:123](https://github.com/onzag/itemize/blob/f2db74a5/base/Root/Module/ItemDefinition/index.ts#L123)
 
 ___
 
@@ -53,4 +53,4 @@ ___
 
 #### Defined in
 
-[base/Root/Module/ItemDefinition/index.ts:77](https://github.com/onzag/itemize/blob/5c2808d3/base/Root/Module/ItemDefinition/index.ts#L77)
+[base/Root/Module/ItemDefinition/index.ts:122](https://github.com/onzag/itemize/blob/f2db74a5/base/Root/Module/ItemDefinition/index.ts#L122)

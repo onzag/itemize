@@ -8,7 +8,7 @@ this is the raw json of a conditional rule set
 
 ## Hierarchy
 
-- `IConditionalRuleSetRawJSONDataBaseType`
+- [`IConditionalRuleSetRawJSONDataBaseType`](base_Root_Module_ItemDefinition_ConditionalRuleSet.IConditionalRuleSetRawJSONDataBaseType.md)
 
   ↳ **`IConditionalRuleSetRawJSONDataPropertyType`**
 
@@ -20,6 +20,7 @@ this is the raw json of a conditional rule set
 - [comparator](base_Root_Module_ItemDefinition_ConditionalRuleSet.IConditionalRuleSetRawJSONDataPropertyType.md#comparator)
 - [condition](base_Root_Module_ItemDefinition_ConditionalRuleSet.IConditionalRuleSetRawJSONDataPropertyType.md#condition)
 - [gate](base_Root_Module_ItemDefinition_ConditionalRuleSet.IConditionalRuleSetRawJSONDataPropertyType.md#gate)
+- [internalConditionGate](base_Root_Module_ItemDefinition_ConditionalRuleSet.IConditionalRuleSetRawJSONDataPropertyType.md#internalconditiongate)
 - [method](base_Root_Module_ItemDefinition_ConditionalRuleSet.IConditionalRuleSetRawJSONDataPropertyType.md#method)
 - [property](base_Root_Module_ItemDefinition_ConditionalRuleSet.IConditionalRuleSetRawJSONDataPropertyType.md#property)
 - [serverFlag](base_Root_Module_ItemDefinition_ConditionalRuleSet.IConditionalRuleSetRawJSONDataPropertyType.md#serverflag)
@@ -36,7 +37,7 @@ the attribute of that property, as some properties are objects
 
 #### Defined in
 
-[base/Root/Module/ItemDefinition/ConditionalRuleSet/index.ts:70](https://github.com/onzag/itemize/blob/5c2808d3/base/Root/Module/ItemDefinition/ConditionalRuleSet/index.ts#L70)
+[base/Root/Module/ItemDefinition/ConditionalRuleSet/index.ts:71](https://github.com/onzag/itemize/blob/f2db74a5/base/Root/Module/ItemDefinition/ConditionalRuleSet/index.ts#L71)
 
 ___
 
@@ -48,21 +49,21 @@ the comparator, equal, greater than, etc...
 
 #### Defined in
 
-[base/Root/Module/ItemDefinition/ConditionalRuleSet/index.ts:78](https://github.com/onzag/itemize/blob/5c2808d3/base/Root/Module/ItemDefinition/ConditionalRuleSet/index.ts#L78)
+[base/Root/Module/ItemDefinition/ConditionalRuleSet/index.ts:79](https://github.com/onzag/itemize/blob/f2db74a5/base/Root/Module/ItemDefinition/ConditionalRuleSet/index.ts#L79)
 
 ___
 
 ### condition
 
-• `Optional` **condition**: [`IConditionalRuleSetRawJSONDataType`](../modules/base_Root_Module_ItemDefinition_ConditionalRuleSet.md#iconditionalrulesetrawjsondatatype)
+• `Optional` **condition**: [`IConditionalRuleSetRawJSONDataType`](../modules/base_Root_Module_ItemDefinition_ConditionalRuleSet.md#iconditionalrulesetrawjsondatatype) \| [`IConditionalRuleSetRawJSONDataType`](../modules/base_Root_Module_ItemDefinition_ConditionalRuleSet.md#iconditionalrulesetrawjsondatatype)[]
 
 #### Inherited from
 
-IConditionalRuleSetRawJSONDataBaseType.condition
+[IConditionalRuleSetRawJSONDataBaseType](base_Root_Module_ItemDefinition_ConditionalRuleSet.IConditionalRuleSetRawJSONDataBaseType.md).[condition](base_Root_Module_ItemDefinition_ConditionalRuleSet.IConditionalRuleSetRawJSONDataBaseType.md#condition)
 
 #### Defined in
 
-[base/Root/Module/ItemDefinition/ConditionalRuleSet/index.ts:54](https://github.com/onzag/itemize/blob/5c2808d3/base/Root/Module/ItemDefinition/ConditionalRuleSet/index.ts#L54)
+[base/Root/Module/ItemDefinition/ConditionalRuleSet/index.ts:54](https://github.com/onzag/itemize/blob/f2db74a5/base/Root/Module/ItemDefinition/ConditionalRuleSet/index.ts#L54)
 
 ___
 
@@ -72,11 +73,25 @@ ___
 
 #### Inherited from
 
-IConditionalRuleSetRawJSONDataBaseType.gate
+[IConditionalRuleSetRawJSONDataBaseType](base_Root_Module_ItemDefinition_ConditionalRuleSet.IConditionalRuleSetRawJSONDataBaseType.md).[gate](base_Root_Module_ItemDefinition_ConditionalRuleSet.IConditionalRuleSetRawJSONDataBaseType.md#gate)
 
 #### Defined in
 
-[base/Root/Module/ItemDefinition/ConditionalRuleSet/index.ts:53](https://github.com/onzag/itemize/blob/5c2808d3/base/Root/Module/ItemDefinition/ConditionalRuleSet/index.ts#L53)
+[base/Root/Module/ItemDefinition/ConditionalRuleSet/index.ts:53](https://github.com/onzag/itemize/blob/f2db74a5/base/Root/Module/ItemDefinition/ConditionalRuleSet/index.ts#L53)
+
+___
+
+### internalConditionGate
+
+• `Optional` **internalConditionGate**: [`ConditionalRuleGateType`](../modules/base_Root_Module_ItemDefinition_ConditionalRuleSet.md#conditionalrulegatetype)
+
+#### Inherited from
+
+[IConditionalRuleSetRawJSONDataBaseType](base_Root_Module_ItemDefinition_ConditionalRuleSet.IConditionalRuleSetRawJSONDataBaseType.md).[internalConditionGate](base_Root_Module_ItemDefinition_ConditionalRuleSet.IConditionalRuleSetRawJSONDataBaseType.md#internalconditiongate)
+
+#### Defined in
+
+[base/Root/Module/ItemDefinition/ConditionalRuleSet/index.ts:55](https://github.com/onzag/itemize/blob/f2db74a5/base/Root/Module/ItemDefinition/ConditionalRuleSet/index.ts#L55)
 
 ___
 
@@ -88,7 +103,7 @@ the method, default, string or datetime (uses Date)
 
 #### Defined in
 
-[base/Root/Module/ItemDefinition/ConditionalRuleSet/index.ts:74](https://github.com/onzag/itemize/blob/5c2808d3/base/Root/Module/ItemDefinition/ConditionalRuleSet/index.ts#L74)
+[base/Root/Module/ItemDefinition/ConditionalRuleSet/index.ts:75](https://github.com/onzag/itemize/blob/f2db74a5/base/Root/Module/ItemDefinition/ConditionalRuleSet/index.ts#L75)
 
 ___
 
@@ -100,7 +115,7 @@ the property to be compared
 
 #### Defined in
 
-[base/Root/Module/ItemDefinition/ConditionalRuleSet/index.ts:66](https://github.com/onzag/itemize/blob/5c2808d3/base/Root/Module/ItemDefinition/ConditionalRuleSet/index.ts#L66)
+[base/Root/Module/ItemDefinition/ConditionalRuleSet/index.ts:67](https://github.com/onzag/itemize/blob/f2db74a5/base/Root/Module/ItemDefinition/ConditionalRuleSet/index.ts#L67)
 
 ___
 
@@ -110,11 +125,11 @@ ___
 
 #### Inherited from
 
-IConditionalRuleSetRawJSONDataBaseType.serverFlag
+[IConditionalRuleSetRawJSONDataBaseType](base_Root_Module_ItemDefinition_ConditionalRuleSet.IConditionalRuleSetRawJSONDataBaseType.md).[serverFlag](base_Root_Module_ItemDefinition_ConditionalRuleSet.IConditionalRuleSetRawJSONDataBaseType.md#serverflag)
 
 #### Defined in
 
-[base/Root/Module/ItemDefinition/ConditionalRuleSet/index.ts:55](https://github.com/onzag/itemize/blob/5c2808d3/base/Root/Module/ItemDefinition/ConditionalRuleSet/index.ts#L55)
+[base/Root/Module/ItemDefinition/ConditionalRuleSet/index.ts:56](https://github.com/onzag/itemize/blob/f2db74a5/base/Root/Module/ItemDefinition/ConditionalRuleSet/index.ts#L56)
 
 ___
 
@@ -126,7 +141,7 @@ the value to be compared against, either a value itself, or alternatively, a pro
 
 #### Defined in
 
-[base/Root/Module/ItemDefinition/ConditionalRuleSet/index.ts:82](https://github.com/onzag/itemize/blob/5c2808d3/base/Root/Module/ItemDefinition/ConditionalRuleSet/index.ts#L82)
+[base/Root/Module/ItemDefinition/ConditionalRuleSet/index.ts:83](https://github.com/onzag/itemize/blob/f2db74a5/base/Root/Module/ItemDefinition/ConditionalRuleSet/index.ts#L83)
 
 ___
 
@@ -139,4 +154,4 @@ with the comparator, rather than the value of itself
 
 #### Defined in
 
-[base/Root/Module/ItemDefinition/ConditionalRuleSet/index.ts:87](https://github.com/onzag/itemize/blob/5c2808d3/base/Root/Module/ItemDefinition/ConditionalRuleSet/index.ts#L87)
+[base/Root/Module/ItemDefinition/ConditionalRuleSet/index.ts:88](https://github.com/onzag/itemize/blob/f2db74a5/base/Root/Module/ItemDefinition/ConditionalRuleSet/index.ts#L88)

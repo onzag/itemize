@@ -68,7 +68,7 @@ React.Component&lt;ICurrencyPickerProps, ICurrencyPickerState\&gt;.constructor
 
 #### Defined in
 
-[client/fast-prototyping/components/currency-picker.tsx:55](https://github.com/onzag/itemize/blob/5c2808d3/client/fast-prototyping/components/currency-picker.tsx#L55)
+[client/fast-prototyping/components/currency-picker.tsx:77](https://github.com/onzag/itemize/blob/f2db74a5/client/fast-prototyping/components/currency-picker.tsx#L77)
 
 ## Properties
 
@@ -577,7 +577,7 @@ ___
 
 #### Defined in
 
-[client/fast-prototyping/components/currency-picker.tsx:66](https://github.com/onzag/itemize/blob/5c2808d3/client/fast-prototyping/components/currency-picker.tsx#L66)
+[client/fast-prototyping/components/currency-picker.tsx:88](https://github.com/onzag/itemize/blob/f2db74a5/client/fast-prototyping/components/currency-picker.tsx#L88)
 
 ___
 
@@ -589,7 +589,7 @@ ___
 
 | Name | Type |
 | :------ | :------ |
-| `changeCurrencyToFn` | (`code`: `string`) => `void` |
+| `changeCurrencyToFn` | [`ChangeCurrencyToFn`](../modules/client_internal_providers_locale_provider.md#changecurrencytofn) |
 | `code` | `string` |
 
 #### Returns
@@ -598,7 +598,7 @@ ___
 
 #### Defined in
 
-[client/fast-prototyping/components/currency-picker.tsx:76](https://github.com/onzag/itemize/blob/5c2808d3/client/fast-prototyping/components/currency-picker.tsx#L76)
+[client/fast-prototyping/components/currency-picker.tsx:98](https://github.com/onzag/itemize/blob/f2db74a5/client/fast-prototyping/components/currency-picker.tsx#L98)
 
 ___
 
@@ -612,7 +612,7 @@ ___
 
 #### Defined in
 
-[client/fast-prototyping/components/currency-picker.tsx:71](https://github.com/onzag/itemize/blob/5c2808d3/client/fast-prototyping/components/currency-picker.tsx#L71)
+[client/fast-prototyping/components/currency-picker.tsx:93](https://github.com/onzag/itemize/blob/f2db74a5/client/fast-prototyping/components/currency-picker.tsx#L93)
 
 ___
 
@@ -630,7 +630,7 @@ React.Component.render
 
 #### Defined in
 
-[client/fast-prototyping/components/currency-picker.tsx:86](https://github.com/onzag/itemize/blob/5c2808d3/client/fast-prototyping/components/currency-picker.tsx#L86)
+[client/fast-prototyping/components/currency-picker.tsx:108](https://github.com/onzag/itemize/blob/f2db74a5/client/fast-prototyping/components/currency-picker.tsx#L108)
 
 ___
 

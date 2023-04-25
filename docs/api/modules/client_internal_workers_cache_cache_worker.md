@@ -29,6 +29,10 @@ emulated searches within it
 - [SEARCHES\_TABLE\_NAME](client_internal_workers_cache_cache_worker.md#searches_table_name)
 - [STATES\_TABLE\_NAME](client_internal_workers_cache_cache_worker.md#states_table_name)
 
+### Functions
+
+- [fixFilesURLAt](client_internal_workers_cache_cache_worker.md#fixfilesurlat)
+
 ## Variables
 
 ### CACHE\_NAME
@@ -37,7 +41,7 @@ emulated searches within it
 
 #### Defined in
 
-[client/internal/workers/cache/cache.worker.ts:148](https://github.com/onzag/itemize/blob/5c2808d3/client/internal/workers/cache/cache.worker.ts#L148)
+[client/internal/workers/cache/cache.worker.ts:200](https://github.com/onzag/itemize/blob/f2db74a5/client/internal/workers/cache/cache.worker.ts#L200)
 
 ___
 
@@ -47,7 +51,7 @@ ___
 
 #### Defined in
 
-[client/internal/workers/cache/cache.worker.ts:153](https://github.com/onzag/itemize/blob/5c2808d3/client/internal/workers/cache/cache.worker.ts#L153)
+[client/internal/workers/cache/cache.worker.ts:205](https://github.com/onzag/itemize/blob/f2db74a5/client/internal/workers/cache/cache.worker.ts#L205)
 
 ___
 
@@ -57,7 +61,7 @@ ___
 
 #### Defined in
 
-[client/internal/workers/cache/cache.worker.ts:150](https://github.com/onzag/itemize/blob/5c2808d3/client/internal/workers/cache/cache.worker.ts#L150)
+[client/internal/workers/cache/cache.worker.ts:202](https://github.com/onzag/itemize/blob/f2db74a5/client/internal/workers/cache/cache.worker.ts#L202)
 
 ___
 
@@ -67,7 +71,7 @@ ___
 
 #### Defined in
 
-[client/internal/workers/cache/cache.worker.ts:151](https://github.com/onzag/itemize/blob/5c2808d3/client/internal/workers/cache/cache.worker.ts#L151)
+[client/internal/workers/cache/cache.worker.ts:203](https://github.com/onzag/itemize/blob/f2db74a5/client/internal/workers/cache/cache.worker.ts#L203)
 
 ___
 
@@ -77,4 +81,27 @@ ___
 
 #### Defined in
 
-[client/internal/workers/cache/cache.worker.ts:152](https://github.com/onzag/itemize/blob/5c2808d3/client/internal/workers/cache/cache.worker.ts#L152)
+[client/internal/workers/cache/cache.worker.ts:204](https://github.com/onzag/itemize/blob/f2db74a5/client/internal/workers/cache/cache.worker.ts#L204)
+
+## Functions
+
+### fixFilesURLAt
+
+▸ **fixFilesURLAt**(`partialValue`, `itemDef`, `include`, `property`): `void`
+
+#### Parameters
+
+| Name | Type |
+| :------ | :------ |
+| `partialValue` | [`IGQLValue`](../interfaces/gql_querier.IGQLValue.md) |
+| `itemDef` | [`default`](../classes/base_Root_Module_ItemDefinition.default.md) |
+| `include` | [`default`](../classes/base_Root_Module_ItemDefinition_Include.default.md) |
+| `property` | [`default`](../classes/base_Root_Module_ItemDefinition_PropertyDefinition.default.md) |
+
+#### Returns
+
+`void`
+
+#### Defined in
+
+[client/internal/workers/cache/cache.worker.ts:170](https://github.com/onzag/itemize/blob/f2db74a5/client/internal/workers/cache/cache.worker.ts#L170)

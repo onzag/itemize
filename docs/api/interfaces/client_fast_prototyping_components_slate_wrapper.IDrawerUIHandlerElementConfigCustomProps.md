@@ -8,7 +8,6 @@
 
 ### Properties
 
-- [fastKeyActive](client_fast_prototyping_components_slate_wrapper.IDrawerUIHandlerElementConfigCustomProps.md#fastkeyactive)
 - [helpers](client_fast_prototyping_components_slate_wrapper.IDrawerUIHandlerElementConfigCustomProps.md#helpers)
 - [state](client_fast_prototyping_components_slate_wrapper.IDrawerUIHandlerElementConfigCustomProps.md#state)
 - [value](client_fast_prototyping_components_slate_wrapper.IDrawerUIHandlerElementConfigCustomProps.md#value)
@@ -20,33 +19,23 @@
 
 ## Properties
 
-### fastKeyActive
-
-• `Optional` **fastKeyActive**: `boolean`
-
-#### Defined in
-
-[client/fast-prototyping/components/slate/wrapper.tsx:330](https://github.com/onzag/itemize/blob/5c2808d3/client/fast-prototyping/components/slate/wrapper.tsx#L330)
-
-___
-
 ### helpers
 
 • **helpers**: [`IHelperFunctions`](client_fast_prototyping_components_slate.IHelperFunctions.md)
 
 #### Defined in
 
-[client/fast-prototyping/components/slate/wrapper.tsx:328](https://github.com/onzag/itemize/blob/5c2808d3/client/fast-prototyping/components/slate/wrapper.tsx#L328)
+[client/fast-prototyping/components/slate/wrapper.tsx:368](https://github.com/onzag/itemize/blob/f2db74a5/client/fast-prototyping/components/slate/wrapper.tsx#L368)
 
 ___
 
 ### state
 
-• **state**: [`ISlateEditorStateType`](client_fast_prototyping_components_slate.ISlateEditorStateType.md)
+• **state**: [`ISlateEditorInternalStateType`](client_fast_prototyping_components_slate.ISlateEditorInternalStateType.md)
 
 #### Defined in
 
-[client/fast-prototyping/components/slate/wrapper.tsx:329](https://github.com/onzag/itemize/blob/5c2808d3/client/fast-prototyping/components/slate/wrapper.tsx#L329)
+[client/fast-prototyping/components/slate/wrapper.tsx:369](https://github.com/onzag/itemize/blob/f2db74a5/client/fast-prototyping/components/slate/wrapper.tsx#L369)
 
 ___
 
@@ -56,7 +45,7 @@ ___
 
 #### Defined in
 
-[client/fast-prototyping/components/slate/wrapper.tsx:325](https://github.com/onzag/itemize/blob/5c2808d3/client/fast-prototyping/components/slate/wrapper.tsx#L325)
+[client/fast-prototyping/components/slate/wrapper.tsx:365](https://github.com/onzag/itemize/blob/f2db74a5/client/fast-prototyping/components/slate/wrapper.tsx#L365)
 
 ## Methods
 
@@ -76,7 +65,7 @@ ___
 
 #### Defined in
 
-[client/fast-prototyping/components/slate/wrapper.tsx:326](https://github.com/onzag/itemize/blob/5c2808d3/client/fast-prototyping/components/slate/wrapper.tsx#L326)
+[client/fast-prototyping/components/slate/wrapper.tsx:366](https://github.com/onzag/itemize/blob/f2db74a5/client/fast-prototyping/components/slate/wrapper.tsx#L366)
 
 ___
 
@@ -96,4 +85,4 @@ ___
 
 #### Defined in
 
-[client/fast-prototyping/components/slate/wrapper.tsx:327](https://github.com/onzag/itemize/blob/5c2808d3/client/fast-prototyping/components/slate/wrapper.tsx#L327)
+[client/fast-prototyping/components/slate/wrapper.tsx:367](https://github.com/onzag/itemize/blob/f2db74a5/client/fast-prototyping/components/slate/wrapper.tsx#L367)

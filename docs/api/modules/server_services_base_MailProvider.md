@@ -15,6 +15,9 @@ be overriden into what is a standard service
 
 ### Interfaces
 
+- [IEmailRenderedMessage](../interfaces/server_services_base_MailProvider.IEmailRenderedMessage.md)
+- [IMailResolverInfo](../interfaces/server_services_base_MailProvider.IMailResolverInfo.md)
+- [IMailResolverResponse](../interfaces/server_services_base_MailProvider.IMailResolverResponse.md)
 - [IReceiveEmailData](../interfaces/server_services_base_MailProvider.IReceiveEmailData.md)
 - [ISendEmailData](../interfaces/server_services_base_MailProvider.ISendEmailData.md)
 - [IUnsubscribeURL](../interfaces/server_services_base_MailProvider.IUnsubscribeURL.md)

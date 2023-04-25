@@ -4,6 +4,26 @@
 
 ## Table of contents
 
-### Classes
+### Functions
 
-- [USSDAction](../classes/client_components_ussd_USSDAction.USSDAction.md)
+- [default](client_components_ussd_USSDAction.md#default)
+
+## Functions
+
+### default
+
+▸ **default**(`props`): `Element`
+
+#### Parameters
+
+| Name | Type |
+| :------ | :------ |
+| `props` | `IUSSDActionProps` |
+
+#### Returns
+
+`Element`
+
+#### Defined in
+
+[client/components/ussd/USSDAction.tsx:83](https://github.com/onzag/itemize/blob/f2db74a5/client/components/ussd/USSDAction.tsx#L83)

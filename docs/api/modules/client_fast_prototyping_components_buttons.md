@@ -32,7 +32,7 @@ usage
 
 #### Defined in
 
-[client/fast-prototyping/components/buttons.tsx:269](https://github.com/onzag/itemize/blob/5c2808d3/client/fast-prototyping/components/buttons.tsx#L269)
+[client/fast-prototyping/components/buttons.tsx:269](https://github.com/onzag/itemize/blob/f2db74a5/client/fast-prototyping/components/buttons.tsx#L269)
 
 ___
 
@@ -52,7 +52,7 @@ ___
 
 #### Defined in
 
-[client/fast-prototyping/components/buttons.tsx:345](https://github.com/onzag/itemize/blob/5c2808d3/client/fast-prototyping/components/buttons.tsx#L345)
+[client/fast-prototyping/components/buttons.tsx:345](https://github.com/onzag/itemize/blob/f2db74a5/client/fast-prototyping/components/buttons.tsx#L345)
 
 ___
 
@@ -81,7 +81,7 @@ a react component
 
 #### Defined in
 
-[client/fast-prototyping/components/buttons.tsx:202](https://github.com/onzag/itemize/blob/5c2808d3/client/fast-prototyping/components/buttons.tsx#L202)
+[client/fast-prototyping/components/buttons.tsx:202](https://github.com/onzag/itemize/blob/f2db74a5/client/fast-prototyping/components/buttons.tsx#L202)
 
 ___
 
@@ -110,4 +110,4 @@ a react component
 
 #### Defined in
 
-[client/fast-prototyping/components/buttons.tsx:113](https://github.com/onzag/itemize/blob/5c2808d3/client/fast-prototyping/components/buttons.tsx#L113)
+[client/fast-prototyping/components/buttons.tsx:113](https://github.com/onzag/itemize/blob/f2db74a5/client/fast-prototyping/components/buttons.tsx#L113)

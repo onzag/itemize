@@ -59,12 +59,12 @@ A json validating schema for the dump configuration
 | `properties.load.required` | `string`[] |
 | `properties.load.type` | `string` |
 | `properties.save` | `Object` |
-| `properties.save.anyOf` | ({ `additionalProperties`: `undefined` ; `type`: `string` = "boolean" } \| { `additionalProperties`: { `anyOf`: ({ `additionalProperties`: `undefined` ; `enum`: `undefined` ; `items`: `undefined` ; `maxItems`: `undefined` = 2; `minItems`: `undefined` = 2; `type`: `string` = "boolean" } \| { `additionalProperties`: `undefined` ; `enum`: `string`[] ; `items`: `undefined` ; `maxItems`: `undefined` = 2; `minItems`: `undefined` = 2; `type`: `undefined` = "object" } \| { `additionalProperties`: `undefined` ; `enum`: `undefined` ; `items`: { `anyOf`: `undefined` ; `type`: `string` = "number" } ; `maxItems`: `undefined` = 2; `minItems`: `undefined` = 2; `type`: `string` = "array" } \| { `additionalProperties`: `undefined` ; `enum`: `undefined` ; `items`: { `anyOf`: { `type`: `string` = "string" }[] ; `type`: `undefined` = "object" } ; `maxItems`: `number` = 2; `minItems`: `number` = 2; `type`: `string` = "array" } \| { `additionalProperties`: { `anyOf`: ({ `enum`: `undefined` ; `items`: `undefined` ; `maxItems`: `undefined` = 2; `minItems`: `undefined` = 2; `type`: `string` = "boolean" } \| { `enum`: `string`[] ; `items`: `undefined` ; `maxItems`: `undefined` = 2; `minItems`: `undefined` = 2; `type`: `undefined` = "object" } \| { `enum`: `undefined` ; `items`: { `anyOf`: `undefined` ; `type`: `string` = "number" } ; `maxItems`: `undefined` = 2; `minItems`: `undefined` = 2; `type`: `string` = "array" } \| { `enum`: `undefined` ; `items`: { `anyOf`: { `type`: `string` = "string" }[] ; `type`: `undefined` = "object" } ; `maxItems`: `number` = 2; `minItems`: `number` = 2; `type`: `string` = "array" })[]  } ; `enum`: `undefined` ; `items`: `undefined` ; `maxItems`: `undefined` = 2; `minItems`: `undefined` = 2; `type`: `string` = "object" })[]  } ; `type`: `string` = "object" })[] |
+| `properties.save.anyOf` | ({ `additionalProperties`: `undefined` ; `type`: `string` = "boolean" } \| { `additionalProperties`: { `anyOf`: ({ `additionalProperties`: `undefined` ; `enum`: `undefined` ; `items`: `undefined` ; `maxItems`: `undefined` = 2; `minItems`: `undefined` = 2; `type`: `string` = "boolean" } \| { `additionalProperties`: `undefined` ; `enum`: `string`[] ; `items`: `undefined` ; `maxItems`: `undefined` = 2; `minItems`: `undefined` = 2; `type`: `undefined` = "array" } \| { `additionalProperties`: `undefined` ; `enum`: `undefined` ; `items`: { `anyOf`: `undefined` ; `type`: `string` = "number" } ; `maxItems`: `undefined` = 2; `minItems`: `undefined` = 2; `type`: `string` = "array" } \| { `additionalProperties`: `undefined` ; `enum`: `undefined` ; `items`: { `anyOf`: { `type`: `string` = "string" }[] ; `type`: `undefined` = "array" } ; `maxItems`: `number` = 2; `minItems`: `number` = 2; `type`: `string` = "array" } \| { `additionalProperties`: { `anyOf`: ({ `enum`: `undefined` ; `items`: `undefined` ; `maxItems`: `undefined` = 2; `minItems`: `undefined` = 2; `type`: `string` = "boolean" } \| { `enum`: `string`[] ; `items`: `undefined` ; `maxItems`: `undefined` = 2; `minItems`: `undefined` = 2; `type`: `undefined` = "array" } \| { `enum`: `undefined` ; `items`: { `anyOf`: `undefined` ; `type`: `string` = "number" } ; `maxItems`: `undefined` = 2; `minItems`: `undefined` = 2; `type`: `string` = "array" } \| { `enum`: `undefined` ; `items`: { `anyOf`: { `type`: `string` = "string" }[] ; `type`: `undefined` = "array" } ; `maxItems`: `number` = 2; `minItems`: `number` = 2; `type`: `string` = "array" })[]  } ; `enum`: `undefined` ; `items`: `undefined` ; `maxItems`: `undefined` = 2; `minItems`: `undefined` = 2; `type`: `string` = "object" })[]  } ; `type`: `string` = "object" })[] |
 | `type` | `string` |
 
 #### Defined in
 
-[config.ts:450](https://github.com/onzag/itemize/blob/5c2808d3/config.ts#L450)
+[config.ts:459](https://github.com/onzag/itemize/blob/f2db74a5/config.ts#L459)
 
 ___
 
@@ -86,6 +86,14 @@ A json validating schema for the standard configuration
 | `properties.cacheableExtHostnames.items` | `Object` |
 | `properties.cacheableExtHostnames.items.type` | `string` |
 | `properties.cacheableExtHostnames.type` | `string` |
+| `properties.cachedExtUrls` | `Object` |
+| `properties.cachedExtUrls.items` | `Object` |
+| `properties.cachedExtUrls.items.type` | `string` |
+| `properties.cachedExtUrls.type` | `string` |
+| `properties.cachedResources` | `Object` |
+| `properties.cachedResources.items` | `Object` |
+| `properties.cachedResources.items.type` | `string` |
+| `properties.cachedResources.type` | `string` |
 | `properties.containersHostnamePrefixes` | `Object` |
 | `properties.containersHostnamePrefixes.additionalProperties` | `Object` |
 | `properties.containersHostnamePrefixes.additionalProperties.type` | `string` |
@@ -100,10 +108,6 @@ A json validating schema for the standard configuration
 | `properties.custom.type` | `string` |
 | `properties.developmentHostname` | `Object` |
 | `properties.developmentHostname.type` | `string` |
-| `properties.dictionaries` | `Object` |
-| `properties.dictionaries.additionalProperties` | `Object` |
-| `properties.dictionaries.additionalProperties.type` | `string` |
-| `properties.dictionaries.type` | `string` |
 | `properties.entry` | `Object` |
 | `properties.entry.type` | `string` |
 | `properties.fallbackCountryCode` | `Object` |
@@ -116,6 +120,10 @@ A json validating schema for the standard configuration
 | `properties.fontName.type` | `string` |
 | `properties.fontUrl` | `Object` |
 | `properties.fontUrl.type` | `string` |
+| `properties.mailDomain` | `Object` |
+| `properties.mailDomain.type` | `string`[] |
+| `properties.mailStorage` | `Object` |
+| `properties.mailStorage.type` | `string`[] |
 | `properties.manifest` | `Object` |
 | `properties.manifest.additionalProperties` | `boolean` |
 | `properties.manifest.properties` | `Object` |
@@ -157,7 +165,7 @@ A json validating schema for the standard configuration
 
 #### Defined in
 
-[config.ts:563](https://github.com/onzag/itemize/blob/5c2808d3/config.ts#L563)
+[config.ts:572](https://github.com/onzag/itemize/blob/f2db74a5/config.ts#L572)
 
 ___
 
@@ -175,6 +183,17 @@ A json validating schema for the database configuration
 | `properties` | `Object` |
 | `properties.database` | `Object` |
 | `properties.database.type` | `string` |
+| `properties.dictionaries` | `Object` |
+| `properties.dictionaries.additionalProperties` | `Object` |
+| `properties.dictionaries.additionalProperties.type` | `string` |
+| `properties.dictionaries.type` | `string` |
+| `properties.elastic` | `Object` |
+| `properties.elastic.additionalProperties` | `Object` |
+| `properties.elastic.type` | `string`[] |
+| `properties.elasticLangAnalyzers` | `Object` |
+| `properties.elasticLangAnalyzers.additionalProperties` | `Object` |
+| `properties.elasticLangAnalyzers.additionalProperties.type` | `string` |
+| `properties.elasticLangAnalyzers.type` | `string`[] |
 | `properties.host` | `Object` |
 | `properties.host.type` | `string` |
 | `properties.password` | `Object` |
@@ -188,7 +207,7 @@ A json validating schema for the database configuration
 
 #### Defined in
 
-[config.ts:704](https://github.com/onzag/itemize/blob/5c2808d3/config.ts#L704)
+[config.ts:728](https://github.com/onzag/itemize/blob/f2db74a5/config.ts#L728)
 
 ___
 
@@ -252,7 +271,7 @@ ___
 
 #### Defined in
 
-[config.ts:786](https://github.com/onzag/itemize/blob/5c2808d3/config.ts#L786)
+[config.ts:829](https://github.com/onzag/itemize/blob/f2db74a5/config.ts#L829)
 
 ___
 
@@ -283,7 +302,7 @@ A json validating schema for the redis config
 
 #### Defined in
 
-[config.ts:736](https://github.com/onzag/itemize/blob/5c2808d3/config.ts#L736)
+[config.ts:779](https://github.com/onzag/itemize/blob/f2db74a5/config.ts#L779)
 
 ___
 
@@ -320,28 +339,23 @@ A JSON validating schema for the sensitive configuration
 | `properties.defaultContainerID.type` | `string` |
 | `properties.devKey` | `Object` |
 | `properties.devKey.type` | `string` |
-| `properties.jwtKey` | `Object` |
-| `properties.jwtKey.type` | `string` |
 | `properties.localContainer` | `Object` |
 | `properties.localContainer.type` | `string` |
 | `properties.locationSearch` | `Object` |
 | `properties.locationSearch.additionalProperties` | `Object` |
 | `properties.locationSearch.type` | `string`[] |
+| `properties.logging` | `Object` |
+| `properties.logging.additionalProperties` | `Object` |
+| `properties.logging.type` | `string`[] |
 | `properties.mail` | `Object` |
 | `properties.mail.additionalProperties` | `Object` |
 | `properties.mail.type` | `string`[] |
-| `properties.mailDomain` | `Object` |
-| `properties.mailDomain.type` | `string`[] |
-| `properties.mailStorage` | `Object` |
-| `properties.mailStorage.type` | `string`[] |
 | `properties.payment` | `Object` |
 | `properties.payment.additionalProperties` | `Object` |
 | `properties.payment.type` | `string`[] |
 | `properties.phone` | `Object` |
 | `properties.phone.additionalProperties` | `Object` |
 | `properties.phone.type` | `string`[] |
-| `properties.secondaryJwtKey` | `Object` |
-| `properties.secondaryJwtKey.type` | `string` |
 | `properties.seoContainerID` | `Object` |
 | `properties.seoContainerID.type` | `string` |
 | `properties.shared` | `Object` |
@@ -350,9 +364,12 @@ A JSON validating schema for the sensitive configuration
 | `properties.userLocalization` | `Object` |
 | `properties.userLocalization.additionalProperties` | `Object` |
 | `properties.userLocalization.type` | `string`[] |
+| `properties.ussd` | `Object` |
+| `properties.ussd.additionalProperties` | `Object` |
+| `properties.ussd.type` | `string`[] |
 | `required` | `string`[] |
 | `type` | `string` |
 
 #### Defined in
 
-[config.ts:350](https://github.com/onzag/itemize/blob/5c2808d3/config.ts#L350)
+[config.ts:365](https://github.com/onzag/itemize/blob/f2db74a5/config.ts#L365)

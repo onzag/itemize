@@ -25,7 +25,7 @@ these general options are the specific options for the generic components
 
 | Name | Type | Description |
 | :------ | :------ | :------ |
-| `props` | [`IWrapperContainerProps`](../interfaces/client_fast_prototyping_components_slate_wrapper.IWrapperContainerProps.md) | all the entire wrapper props |
+| `props` | [`IDrawerContainerProps`](../interfaces/client_fast_prototyping_components_slate_wrapper.IDrawerContainerProps.md) | all the entire wrapper props |
 
 #### Returns
 
@@ -33,4 +33,4 @@ these general options are the specific options for the generic components
 
 #### Defined in
 
-[client/fast-prototyping/components/slate/drawer/general.tsx:1108](https://github.com/onzag/itemize/blob/5c2808d3/client/fast-prototyping/components/slate/drawer/general.tsx#L1108)
+[client/fast-prototyping/components/slate/drawer/general.tsx:25](https://github.com/onzag/itemize/blob/f2db74a5/client/fast-prototyping/components/slate/drawer/general.tsx#L25)

@@ -24,7 +24,7 @@ each and context key for usage in templating
 
 | Name | Type | Description |
 | :------ | :------ | :------ |
-| `props` | [`IWrapperContainerProps`](../interfaces/client_fast_prototyping_components_slate_wrapper.IWrapperContainerProps.md) | the props for the templating which is literally the whole options of the wrapper itself |
+| `props` | [`IDrawerContainerProps`](../interfaces/client_fast_prototyping_components_slate_wrapper.IDrawerContainerProps.md) | the props for the templating which is literally the whole options of the wrapper itself |
 
 #### Returns
 
@@ -32,4 +32,4 @@ each and context key for usage in templating
 
 #### Defined in
 
-[client/fast-prototyping/components/slate/drawer/templating.tsx:228](https://github.com/onzag/itemize/blob/5c2808d3/client/fast-prototyping/components/slate/drawer/templating.tsx#L228)
+[client/fast-prototyping/components/slate/drawer/templating.tsx:228](https://github.com/onzag/itemize/blob/f2db74a5/client/fast-prototyping/components/slate/drawer/templating.tsx#L228)

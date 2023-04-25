@@ -16,8 +16,12 @@ get mantained and the caches get properly invalidated
 
 ### Properties
 
+- [cachedSelects](server_raw_db.ItemizeRawDB.md#cachedselects)
 - [databaseConnection](server_raw_db.ItemizeRawDB.md#databaseconnection)
+- [elastic](server_raw_db.ItemizeRawDB.md#elastic)
+- [redisGlobal](server_raw_db.ItemizeRawDB.md#redisglobal)
 - [redisPub](server_raw_db.ItemizeRawDB.md#redispub)
+- [redisSub](server_raw_db.ItemizeRawDB.md#redissub)
 - [root](server_raw_db.ItemizeRawDB.md#root)
 - [transacting](server_raw_db.ItemizeRawDB.md#transacting)
 - [transactingQueue](server_raw_db.ItemizeRawDB.md#transactingqueue)
@@ -25,11 +29,22 @@ get mantained and the caches get properly invalidated
 ### Methods
 
 - [\_retrieveRawDBSelect](server_raw_db.ItemizeRawDB.md#_retrieverawdbselect)
+- [\_updateCachedSelect](server_raw_db.ItemizeRawDB.md#_updatecachedselect)
+- [checkRowValidityForInformingChanges](server_raw_db.ItemizeRawDB.md#checkrowvalidityforinformingchanges)
+- [createGloballyCachedRawDBSelect](server_raw_db.ItemizeRawDB.md#creategloballycachedrawdbselect)
+- [deleteGloballyCachedRawDBSelect](server_raw_db.ItemizeRawDB.md#deletegloballycachedrawdbselect)
+- [executeGloballyCachedRawDBSelect](server_raw_db.ItemizeRawDB.md#executegloballycachedrawdbselect)
+- [handleIncomingMessage](server_raw_db.ItemizeRawDB.md#handleincomingmessage)
 - [informChangeOnRow](server_raw_db.ItemizeRawDB.md#informchangeonrow)
+- [informChangeOnRowElastic](server_raw_db.ItemizeRawDB.md#informchangeonrowelastic)
 - [informChangeOnRows](server_raw_db.ItemizeRawDB.md#informchangeonrows)
+- [informChangeOnRowsElasticOnly](server_raw_db.ItemizeRawDB.md#informchangeonrowselasticonly)
 - [informRowsHaveBeenAdded](server_raw_db.ItemizeRawDB.md#informrowshavebeenadded)
+- [informRowsHaveBeenAddedElasticOnly](server_raw_db.ItemizeRawDB.md#informrowshavebeenaddedelasticonly)
 - [informRowsHaveBeenDeleted](server_raw_db.ItemizeRawDB.md#informrowshavebeendeleted)
+- [informRowsHaveBeenDeletedElasticOnly](server_raw_db.ItemizeRawDB.md#informrowshavebeendeletedelasticonly)
 - [informRowsHaveBeenModified](server_raw_db.ItemizeRawDB.md#informrowshavebeenmodified)
+- [informRowsHaveBeenModifiedElasticOnly](server_raw_db.ItemizeRawDB.md#informrowshavebeenmodifiedelasticonly)
 - [performBatchRawDBDelete](server_raw_db.ItemizeRawDB.md#performbatchrawdbdelete)
 - [performBatchRawDBUpdate](server_raw_db.ItemizeRawDB.md#performbatchrawdbupdate)
 - [performModuleBatchRawDBUpdate](server_raw_db.ItemizeRawDB.md#performmodulebatchrawdbupdate)
@@ -41,15 +56,18 @@ get mantained and the caches get properly invalidated
 - [provideHashableV5Id](server_raw_db.ItemizeRawDB.md#providehashablev5id)
 - [provideRandomV4Id](server_raw_db.ItemizeRawDB.md#providerandomv4id)
 - [redoDictionariesFn](server_raw_db.ItemizeRawDB.md#redodictionariesfn)
+- [retrieveGloballyCachedRawDBSelect](server_raw_db.ItemizeRawDB.md#retrievegloballycachedrawdbselect)
 - [retrieveRawDBSelect](server_raw_db.ItemizeRawDB.md#retrieverawdbselect)
+- [setupElastic](server_raw_db.ItemizeRawDB.md#setupelastic)
 - [startTransaction](server_raw_db.ItemizeRawDB.md#starttransaction)
 - [storeInDeleteRegistry](server_raw_db.ItemizeRawDB.md#storeindeleteregistry)
+- [updateTrackers](server_raw_db.ItemizeRawDB.md#updatetrackers)
 
 ## Constructors
 
 ### constructor
 
-• **new ItemizeRawDB**(`redisPub`, `databaseConnection`, `root`)
+• **new ItemizeRawDB**(`redisGlobal`, `redisPub`, `redisSub`, `databaseConnection`, `root`)
 
 Builds a new instance of the change informer
 
@@ -57,15 +75,31 @@ Builds a new instance of the change informer
 
 | Name | Type | Description |
 | :------ | :------ | :------ |
+| `redisGlobal` | [`ItemizeRedisClient`](server_redis.ItemizeRedisClient.md) | - |
 | `redisPub` | [`ItemizeRedisClient`](server_redis.ItemizeRedisClient.md) | the redis publish instance |
+| `redisSub` | [`ItemizeRedisClient`](server_redis.ItemizeRedisClient.md) | - |
 | `databaseConnection` | [`DatabaseConnection`](database.DatabaseConnection.md) | a connection to the database |
 | `root` | [`default`](base_Root.default.md) | the root instance |
 
 #### Defined in
 
-[server/raw-db.ts:69](https://github.com/onzag/itemize/blob/5c2808d3/server/raw-db.ts#L69)
+[server/raw-db.ts:94](https://github.com/onzag/itemize/blob/f2db74a5/server/raw-db.ts#L94)
 
 ## Properties
+
+### cachedSelects
+
+• `Private` **cachedSelects**: `Object` = `{}`
+
+#### Index signature
+
+▪ [prefixedUniqueID: `string`]: { `expiresAt`: `number` ; `intervalObject`: `NodeJS.Timer` ; `itemDefinitionOrModule`: [`default`](base_Root_Module_ItemDefinition.default.md) \| [`default`](base_Root_Module.default.md) \| `string` ; `preventJoin`: `boolean` ; `uniqueID`: `string` ; `updateInterval`: `number` ; `selecter`: (`builder`: [`SelectBuilder`](database_SelectBuilder.SelectBuilder.md)) => `void`  }
+
+#### Defined in
+
+[server/raw-db.ts:74](https://github.com/onzag/itemize/blob/f2db74a5/server/raw-db.ts#L74)
+
+___
 
 ### databaseConnection
 
@@ -73,7 +107,27 @@ Builds a new instance of the change informer
 
 #### Defined in
 
-[server/raw-db.ts:61](https://github.com/onzag/itemize/blob/5c2808d3/server/raw-db.ts#L61)
+[server/raw-db.ts:86](https://github.com/onzag/itemize/blob/f2db74a5/server/raw-db.ts#L86)
+
+___
+
+### elastic
+
+• `Private` **elastic**: [`ItemizeElasticClient`](server_elastic.ItemizeElasticClient.md)
+
+#### Defined in
+
+[server/raw-db.ts:69](https://github.com/onzag/itemize/blob/f2db74a5/server/raw-db.ts#L69)
+
+___
+
+### redisGlobal
+
+• `Private` **redisGlobal**: [`ItemizeRedisClient`](server_redis.ItemizeRedisClient.md)
+
+#### Defined in
+
+[server/raw-db.ts:66](https://github.com/onzag/itemize/blob/f2db74a5/server/raw-db.ts#L66)
 
 ___
 
@@ -83,7 +137,17 @@ ___
 
 #### Defined in
 
-[server/raw-db.ts:55](https://github.com/onzag/itemize/blob/5c2808d3/server/raw-db.ts#L55)
+[server/raw-db.ts:64](https://github.com/onzag/itemize/blob/f2db74a5/server/raw-db.ts#L64)
+
+___
+
+### redisSub
+
+• `Private` **redisSub**: [`ItemizeRedisClient`](server_redis.ItemizeRedisClient.md)
+
+#### Defined in
+
+[server/raw-db.ts:65](https://github.com/onzag/itemize/blob/f2db74a5/server/raw-db.ts#L65)
 
 ___
 
@@ -93,7 +157,7 @@ ___
 
 #### Defined in
 
-[server/raw-db.ts:56](https://github.com/onzag/itemize/blob/5c2808d3/server/raw-db.ts#L56)
+[server/raw-db.ts:68](https://github.com/onzag/itemize/blob/f2db74a5/server/raw-db.ts#L68)
 
 ___
 
@@ -103,7 +167,7 @@ ___
 
 #### Defined in
 
-[server/raw-db.ts:58](https://github.com/onzag/itemize/blob/5c2808d3/server/raw-db.ts#L58)
+[server/raw-db.ts:71](https://github.com/onzag/itemize/blob/f2db74a5/server/raw-db.ts#L71)
 
 ___
 
@@ -113,7 +177,7 @@ ___
 
 #### Defined in
 
-[server/raw-db.ts:59](https://github.com/onzag/itemize/blob/5c2808d3/server/raw-db.ts#L59)
+[server/raw-db.ts:72](https://github.com/onzag/itemize/blob/f2db74a5/server/raw-db.ts#L72)
 
 ## Methods
 
@@ -135,13 +199,175 @@ ___
 
 #### Defined in
 
-[server/raw-db.ts:804](https://github.com/onzag/itemize/blob/5c2808d3/server/raw-db.ts#L804)
+[server/raw-db.ts:1310](https://github.com/onzag/itemize/blob/f2db74a5/server/raw-db.ts#L1310)
+
+___
+
+### \_updateCachedSelect
+
+▸ `Private` **_updateCachedSelect**(`uniqueID`, `throwErrors?`): `Promise`<[`ISQLTableRowValue`](../interfaces/base_Root_sql.ISQLTableRowValue.md)[]\>
+
+This is the function that handles the execution of the cached raw db select storage in global
+redis
+
+#### Parameters
+
+| Name | Type |
+| :------ | :------ |
+| `uniqueID` | `string` |
+| `throwErrors?` | `boolean` |
+
+#### Returns
+
+`Promise`<[`ISQLTableRowValue`](../interfaces/base_Root_sql.ISQLTableRowValue.md)[]\>
+
+#### Defined in
+
+[server/raw-db.ts:1490](https://github.com/onzag/itemize/blob/f2db74a5/server/raw-db.ts#L1490)
+
+___
+
+### checkRowValidityForInformingChanges
+
+▸ `Private` **checkRowValidityForInformingChanges**(`row`, `idef`, `doNotCheckTracked?`): `Promise`<`boolean`\>
+
+#### Parameters
+
+| Name | Type |
+| :------ | :------ |
+| `row` | [`ISQLTableRowValue`](../interfaces/base_Root_sql.ISQLTableRowValue.md) |
+| `idef` | [`default`](base_Root_Module_ItemDefinition.default.md) |
+| `doNotCheckTracked?` | `boolean` |
+
+#### Returns
+
+`Promise`<`boolean`\>
+
+#### Defined in
+
+[server/raw-db.ts:264](https://github.com/onzag/itemize/blob/f2db74a5/server/raw-db.ts#L264)
+
+___
+
+### createGloballyCachedRawDBSelect
+
+▸ **createGloballyCachedRawDBSelect**(`uniqueID`, `itemDefinitionOrModule`, `selecter`, `preventJoin?`, `options?`): `Promise`<`void`\>
+
+Note this is a slow method, better suited to use and forget
+
+Creates a cached raw db select operation that executes
+in the given interval
+
+The reason for this is calculation of resources that are expensive and we would like to resolve only every so often
+for example let's say we want to count the number of users but not be quite accurate
+
+For example let's say we add the following function in our global manager when we initialize the server
+
+initializeServer({...}, {...}, {globalManagerInitialServerDataFunction: (manager) => {
+  manager.rawDB.createGloballyCachedRawDBSelect("NUMBER_OF_USERS", "users/user", (b) => b.select("COUNT(*)"), true);
+}})
+
+And then in and endpoint you may create in the router in order to get that information for the rows selected you may
+
+appData.rawDB.retrieveGloballyCachedRawDBSelect("NUMBER_OF_USERS")
+
+will yield the cached result exactly as it would do a raw db select
+
+NOTE this method is slow, because of the way it has to function to ensure that the cached raw db select is created
+and mantained by whichever instance created it first, it will send a message over the global network and then wait
+to see if anything else is handling the same request with the same unique id, if there is, it will not create anything,
+use doNotProbe if you want to create it regardless which will considerably speed it up
+
+#### Parameters
+
+| Name | Type |
+| :------ | :------ |
+| `uniqueID` | `string` |
+| `itemDefinitionOrModule` | `string` \| [`default`](base_Root_Module.default.md) \| [`default`](base_Root_Module_ItemDefinition.default.md) |
+| `selecter` | (`builder`: [`SelectBuilder`](database_SelectBuilder.SelectBuilder.md)) => `void` |
+| `preventJoin?` | `boolean` |
+| `options?` | `Object` |
+| `options.doNotProbe?` | `boolean` |
+| `options.expire?` | `number` |
+| `options.updateInterval?` | `number` |
+
+#### Returns
+
+`Promise`<`void`\>
+
+#### Defined in
+
+[server/raw-db.ts:1408](https://github.com/onzag/itemize/blob/f2db74a5/server/raw-db.ts#L1408)
+
+___
+
+### deleteGloballyCachedRawDBSelect
+
+▸ **deleteGloballyCachedRawDBSelect**(`uniqueID`): `Promise`<`void`\>
+
+#### Parameters
+
+| Name | Type |
+| :------ | :------ |
+| `uniqueID` | `string` |
+
+#### Returns
+
+`Promise`<`void`\>
+
+#### Defined in
+
+[server/raw-db.ts:1613](https://github.com/onzag/itemize/blob/f2db74a5/server/raw-db.ts#L1613)
+
+___
+
+### executeGloballyCachedRawDBSelect
+
+▸ **executeGloballyCachedRawDBSelect**(`uniqueID`): `Promise`<`void`\>
+
+Executes a globally cached raw db select in order to keep it updated
+in the cache
+
+#### Parameters
+
+| Name | Type |
+| :------ | :------ |
+| `uniqueID` | `string` |
+
+#### Returns
+
+`Promise`<`void`\>
+
+#### Defined in
+
+[server/raw-db.ts:1584](https://github.com/onzag/itemize/blob/f2db74a5/server/raw-db.ts#L1584)
+
+___
+
+### handleIncomingMessage
+
+▸ `Private` **handleIncomingMessage**(`channel`, `message`): `Promise`<`void`\>
+
+#### Parameters
+
+| Name | Type |
+| :------ | :------ |
+| `channel` | `string` |
+| `message` | `string` |
+
+#### Returns
+
+`Promise`<`void`\>
+
+#### Defined in
+
+[server/raw-db.ts:1643](https://github.com/onzag/itemize/blob/f2db74a5/server/raw-db.ts#L1643)
 
 ___
 
 ### informChangeOnRow
 
-▸ `Private` **informChangeOnRow**(`row`, `action`, `dataIsComplete`): `Promise`<{ `itemQualifiedPathName`: `any` = row.type; `lastModified`: `any` ; `moduleQualifiedPathName`: `string` = moduleName; `row`: [`ISQLTableRowValue`](../interfaces/base_Root_sql.ISQLTableRowValue.md)  }\>
+▸ `Private` **informChangeOnRow**(`row`, `action`, `elasticLanguageOverride`, `dataIsComplete`): `Promise`<{ `itemQualifiedPathName`: `any` = row.type; `lastModified`: `any` ; `moduleQualifiedPathName`: `string` = moduleName; `row`: [`ISQLTableRowValue`](../interfaces/base_Root_sql.ISQLTableRowValue.md)  }\>
 
 Informs all the caches all the way to the clients of a change in a given
 row
@@ -152,6 +378,7 @@ row
 | :------ | :------ | :------ |
 | `row` | [`ISQLTableRowValue`](../interfaces/base_Root_sql.ISQLTableRowValue.md) | the row to inform a change on |
 | `action` | ``"created"`` \| ``"modified"`` \| ``"deleted"`` | what happened to the row |
+| `elasticLanguageOverride` | `string` | the elastic language override |
 | `dataIsComplete` | `boolean` | whether the row contains complete data |
 
 #### Returns
@@ -160,13 +387,37 @@ row
 
 #### Defined in
 
-[server/raw-db.ts:205](https://github.com/onzag/itemize/blob/5c2808d3/server/raw-db.ts#L205)
+[server/raw-db.ts:396](https://github.com/onzag/itemize/blob/f2db74a5/server/raw-db.ts#L396)
+
+___
+
+### informChangeOnRowElastic
+
+▸ `Private` **informChangeOnRowElastic**(`rowWithOlds`, `action`, `elasticLanguageOverride`, `dataIsComplete`, `hasBeenChecked`): `Promise`<`void`\>
+
+#### Parameters
+
+| Name | Type |
+| :------ | :------ |
+| `rowWithOlds` | [`ISQLTableRowValue`](../interfaces/base_Root_sql.ISQLTableRowValue.md) |
+| `action` | ``"created"`` \| ``"modified"`` \| ``"deleted"`` |
+| `elasticLanguageOverride` | `string` |
+| `dataIsComplete` | `boolean` |
+| `hasBeenChecked` | `boolean` |
+
+#### Returns
+
+`Promise`<`void`\>
+
+#### Defined in
+
+[server/raw-db.ts:291](https://github.com/onzag/itemize/blob/f2db74a5/server/raw-db.ts#L291)
 
 ___
 
 ### informChangeOnRows
 
-▸ `Private` **informChangeOnRows**(`rows`, `action`, `rowDataIsComplete`): `Promise`<`void`\>
+▸ `Private` **informChangeOnRows**(`rows`, `action`, `elasticLanguageOverride`, `rowDataIsComplete`): `Promise`<`void`\>
 
 Actually does the job on informing changes in the rows
 this function calls the changed mechanism and then does
@@ -179,6 +430,7 @@ the clients that are related to those rows
 | :------ | :------ | :------ |
 | `rows` | [`ISQLTableRowValue`](../interfaces/base_Root_sql.ISQLTableRowValue.md)[] | the rows in question |
 | `action` | ``"created"`` \| ``"modified"`` \| ``"deleted"`` | what happened to the rows |
+| `elasticLanguageOverride` | `string` | - |
 | `rowDataIsComplete` | `boolean` | whether the data is complete |
 
 #### Returns
@@ -187,13 +439,36 @@ the clients that are related to those rows
 
 #### Defined in
 
-[server/raw-db.ts:289](https://github.com/onzag/itemize/blob/5c2808d3/server/raw-db.ts#L289)
+[server/raw-db.ts:493](https://github.com/onzag/itemize/blob/f2db74a5/server/raw-db.ts#L493)
+
+___
+
+### informChangeOnRowsElasticOnly
+
+▸ `Private` **informChangeOnRowsElasticOnly**(`rows`, `action`, `elasticLanguageOverride`, `rowDataIsComplete`): `void`
+
+#### Parameters
+
+| Name | Type |
+| :------ | :------ |
+| `rows` | [`ISQLTableRowValue`](../interfaces/base_Root_sql.ISQLTableRowValue.md)[] |
+| `action` | ``"created"`` \| ``"modified"`` \| ``"deleted"`` |
+| `elasticLanguageOverride` | `string` |
+| `rowDataIsComplete` | `boolean` |
+
+#### Returns
+
+`void`
+
+#### Defined in
+
+[server/raw-db.ts:474](https://github.com/onzag/itemize/blob/f2db74a5/server/raw-db.ts#L474)
 
 ___
 
 ### informRowsHaveBeenAdded
 
-▸ **informRowsHaveBeenAdded**(`rows`, `rowDataIsComplete?`): `Promise`<`void`\>
+▸ **informRowsHaveBeenAdded**(`rows`, `elasticLanguageOverride?`, `rowDataIsComplete?`): `Promise`<`void`\>
 
 Informs rows have been added in the database and as such all clients and instances
 need to update its cache, this will affect all the way to each one of the singular clients
@@ -219,6 +494,7 @@ for the database for the value
 | Name | Type | Description |
 | :------ | :------ | :------ |
 | `rows` | [`ISQLTableRowValue`](../interfaces/base_Root_sql.ISQLTableRowValue.md)[] | the rows to inform a change on |
+| `elasticLanguageOverride?` | `string` | the language override, null is a valid value, please provide undefined for unspecified |
 | `rowDataIsComplete?` | `boolean` | whether the rows contain complete data |
 
 #### Returns
@@ -227,7 +503,29 @@ for the database for the value
 
 #### Defined in
 
-[server/raw-db.ts:608](https://github.com/onzag/itemize/blob/5c2808d3/server/raw-db.ts#L608)
+[server/raw-db.ts:1092](https://github.com/onzag/itemize/blob/f2db74a5/server/raw-db.ts#L1092)
+
+___
+
+### informRowsHaveBeenAddedElasticOnly
+
+▸ **informRowsHaveBeenAddedElasticOnly**(`rows`, `elasticLanguageOverride?`, `rowDataIsComplete?`): `Promise`<`void`\>
+
+#### Parameters
+
+| Name | Type |
+| :------ | :------ |
+| `rows` | [`ISQLTableRowValue`](../interfaces/base_Root_sql.ISQLTableRowValue.md)[] |
+| `elasticLanguageOverride?` | `string` |
+| `rowDataIsComplete?` | `boolean` |
+
+#### Returns
+
+`Promise`<`void`\>
+
+#### Defined in
+
+[server/raw-db.ts:1095](https://github.com/onzag/itemize/blob/f2db74a5/server/raw-db.ts#L1095)
 
 ___
 
@@ -264,13 +562,33 @@ last_modified
 
 #### Defined in
 
-[server/raw-db.ts:579](https://github.com/onzag/itemize/blob/5c2808d3/server/raw-db.ts#L579)
+[server/raw-db.ts:1057](https://github.com/onzag/itemize/blob/f2db74a5/server/raw-db.ts#L1057)
+
+___
+
+### informRowsHaveBeenDeletedElasticOnly
+
+▸ **informRowsHaveBeenDeletedElasticOnly**(`rows`): `Promise`<`void`\>
+
+#### Parameters
+
+| Name | Type |
+| :------ | :------ |
+| `rows` | [`ISQLTableRowValue`](../interfaces/base_Root_sql.ISQLTableRowValue.md)[] |
+
+#### Returns
+
+`Promise`<`void`\>
+
+#### Defined in
+
+[server/raw-db.ts:1062](https://github.com/onzag/itemize/blob/f2db74a5/server/raw-db.ts#L1062)
 
 ___
 
 ### informRowsHaveBeenModified
 
-▸ **informRowsHaveBeenModified**(`rows`, `rowDataIsComplete?`): `Promise`<`void`\>
+▸ **informRowsHaveBeenModified**(`rows`, `elasticLanguageOverride?`, `rowDataIsComplete?`): `Promise`<`void`\>
 
 Informs rows have changed in the database and as such all clients and instances
 need to update its cache, this will affect all the way to each one of the singular clients
@@ -301,6 +619,7 @@ for the database for an updated value.
 | Name | Type | Description |
 | :------ | :------ | :------ |
 | `rows` | [`ISQLTableRowValue`](../interfaces/base_Root_sql.ISQLTableRowValue.md)[] | the rows to inform a change on |
+| `elasticLanguageOverride?` | `string` | the language override, null is a valid value, please provide undefined for unspecified |
 | `rowDataIsComplete?` | `boolean` | whether the rows contain complete data |
 
 #### Returns
@@ -309,7 +628,29 @@ for the database for an updated value.
 
 #### Defined in
 
-[server/raw-db.ts:555](https://github.com/onzag/itemize/blob/5c2808d3/server/raw-db.ts#L555)
+[server/raw-db.ts:1030](https://github.com/onzag/itemize/blob/f2db74a5/server/raw-db.ts#L1030)
+
+___
+
+### informRowsHaveBeenModifiedElasticOnly
+
+▸ **informRowsHaveBeenModifiedElasticOnly**(`rows`, `elasticLanguageOverride?`, `rowDataIsComplete?`): `Promise`<`void`\>
+
+#### Parameters
+
+| Name | Type |
+| :------ | :------ |
+| `rows` | [`ISQLTableRowValue`](../interfaces/base_Root_sql.ISQLTableRowValue.md)[] |
+| `elasticLanguageOverride?` | `string` |
+| `rowDataIsComplete?` | `boolean` |
+
+#### Returns
+
+`Promise`<`void`\>
+
+#### Defined in
+
+[server/raw-db.ts:1033](https://github.com/onzag/itemize/blob/f2db74a5/server/raw-db.ts#L1033)
 
 ___
 
@@ -333,7 +674,7 @@ ___
 
 #### Defined in
 
-[server/raw-db.ts:683](https://github.com/onzag/itemize/blob/5c2808d3/server/raw-db.ts#L683)
+[server/raw-db.ts:1172](https://github.com/onzag/itemize/blob/f2db74a5/server/raw-db.ts#L1172)
 
 ___
 
@@ -345,21 +686,20 @@ Performs a raw db update for many rows
 in the database this is a very powerful and quite
 advanced method
 
-TODO returning builder somehow
-TODO allow for optimizations
-
 #### Parameters
 
-| Name | Type |
-| :------ | :------ |
-| `item` | `string` \| [`default`](base_Root_Module_ItemDefinition.default.md) |
-| `updater` | `Object` |
-| `updater.dangerousUseSilentMode?` | `boolean` |
-| `updater.itemTableUpdate?` | [`IManyValueType`](../interfaces/database_base.IManyValueType.md) |
-| `updater.moduleTableUpdate?` | [`IManyValueType`](../interfaces/database_base.IManyValueType.md) |
-| `updater.itemTableUpdater?` | (`arg`: [`SetBuilder`](database_SetBuilder.SetBuilder.md), `redoDictionaries`: `RedoDictionariesFn`) => `void` |
-| `updater.moduleTableUpdater?` | (`arg`: [`SetBuilder`](database_SetBuilder.SetBuilder.md), `redoDictionaries`: `RedoDictionariesFn`) => `void` |
-| `updater.whereCriteriaSelector` | (`arg`: [`WhereBuilder`](database_WhereBuilder.WhereBuilder.md)) => `void` |
+| Name | Type | Description |
+| :------ | :------ | :------ |
+| `item` | `string` \| [`default`](base_Root_Module_ItemDefinition.default.md) |  |
+| `updater` | `Object` |  |
+| `updater.dangerousForceElasticLangUpdateTo?` | `string` | Forces a language update to the given language, will ignore silent mode if provided |
+| `updater.dangerousForceElasticUpdate?` | `boolean` | Will update search indices anyway |
+| `updater.dangerousUseSilentMode?` | `boolean` | Does not inform of updates or anything to the clusters or elastic or anything at all, does not modify the last modified signature |
+| `updater.itemTableUpdate?` | [`IManyValueType`](../interfaces/database_base.IManyValueType.md) | - |
+| `updater.moduleTableUpdate?` | [`IManyValueType`](../interfaces/database_base.IManyValueType.md) | - |
+| `updater.itemTableUpdater?` | (`arg`: [`SetBuilder`](database_SetBuilder.SetBuilder.md), `redoDictionaries`: `RedoDictionariesFn`) => `void` | - |
+| `updater.moduleTableUpdater?` | (`arg`: [`SetBuilder`](database_SetBuilder.SetBuilder.md), `redoDictionaries`: `RedoDictionariesFn`) => `void` | - |
+| `updater.whereCriteriaSelector` | (`arg`: [`WhereBuilder`](database_WhereBuilder.WhereBuilder.md)) => `void` | - |
 
 #### Returns
 
@@ -367,7 +707,7 @@ TODO allow for optimizations
 
 #### Defined in
 
-[server/raw-db.ts:879](https://github.com/onzag/itemize/blob/5c2808d3/server/raw-db.ts#L879)
+[server/raw-db.ts:1687](https://github.com/onzag/itemize/blob/f2db74a5/server/raw-db.ts#L1687)
 
 ___
 
@@ -379,19 +719,18 @@ Performs a raw db update for many rows
 in the database this is a very powerful and quite
 advanced method
 
-TODO returning builder somehow
-TODO allow for optimizations
-
 #### Parameters
 
-| Name | Type |
-| :------ | :------ |
-| `moduleToUpdate` | `string` \| [`default`](base_Root_Module.default.md) |
-| `updater` | `Object` |
-| `updater.dangerousUseSilentMode?` | `boolean` |
-| `updater.moduleTableUpdate?` | [`IManyValueType`](../interfaces/database_base.IManyValueType.md) |
-| `updater.moduleTableUpdater?` | (`arg`: [`SetBuilder`](database_SetBuilder.SetBuilder.md), `redoDictionaries`: `RedoDictionariesFnPropertyBased`) => `void` |
-| `updater.whereCriteriaSelector` | (`arg`: [`WhereBuilder`](database_WhereBuilder.WhereBuilder.md)) => `void` |
+| Name | Type | Description |
+| :------ | :------ | :------ |
+| `moduleToUpdate` | `string` \| [`default`](base_Root_Module.default.md) |  |
+| `updater` | `Object` |  |
+| `updater.dangerousForceElasticLangUpdateTo?` | `string` | Forces a language update to the given language, will ignore silent mode if provided |
+| `updater.dangerousForceElasticUpdate?` | `boolean` | Will update search indices anyway |
+| `updater.dangerousUseSilentMode?` | `boolean` | Does not inform of updates or anything to the clusters or elastic or anything at all, does not modify the last modified signature |
+| `updater.moduleTableUpdate?` | [`IManyValueType`](../interfaces/database_base.IManyValueType.md) | - |
+| `updater.moduleTableUpdater?` | (`arg`: [`SetBuilder`](database_SetBuilder.SetBuilder.md), `redoDictionaries`: `RedoDictionariesFnPropertyBased`) => `void` | - |
+| `updater.whereCriteriaSelector` | (`arg`: [`WhereBuilder`](database_WhereBuilder.WhereBuilder.md)) => `void` | - |
 
 #### Returns
 
@@ -399,7 +738,7 @@ TODO allow for optimizations
 
 #### Defined in
 
-[server/raw-db.ts:1023](https://github.com/onzag/itemize/blob/5c2808d3/server/raw-db.ts#L1023)
+[server/raw-db.ts:2114](https://github.com/onzag/itemize/blob/f2db74a5/server/raw-db.ts#L2114)
 
 ___
 
@@ -423,7 +762,7 @@ ___
 
 #### Defined in
 
-[server/raw-db.ts:669](https://github.com/onzag/itemize/blob/5c2808d3/server/raw-db.ts#L669)
+[server/raw-db.ts:1158](https://github.com/onzag/itemize/blob/f2db74a5/server/raw-db.ts#L1158)
 
 ___
 
@@ -444,12 +783,14 @@ TODO returning builder access in order to modify what to return
 
 #### Parameters
 
-| Name | Type |
-| :------ | :------ |
-| `item` | `string` \| [`default`](base_Root_Module_ItemDefinition.default.md) |
-| `inserter` | `Object` |
-| `inserter.dangerousUseSilentMode?` | `boolean` |
-| `inserter.values` | { `itemTableInsert`: [`IManyValueType`](../interfaces/database_base.IManyValueType.md) ; `moduleTableInsert`: [`IManyValueType`](../interfaces/database_base.IManyValueType.md)  }[] |
+| Name | Type | Description |
+| :------ | :------ | :------ |
+| `item` | `string` \| [`default`](base_Root_Module_ItemDefinition.default.md) |  |
+| `inserter` | `Object` |  |
+| `inserter.dangerousForceElasticLangUpdateTo?` | `string` | Forces a language update to the given language, will ignore silent mode if provided |
+| `inserter.dangerousForceElasticUpdate?` | `boolean` | Will update search indices anyway |
+| `inserter.dangerousUseSilentMode?` | `boolean` | Does not inform of updates or anything to the clusters or elastic or anything at all, does not modify the last modified signature |
+| `inserter.values` | { `itemTableInsert`: [`IManyValueType`](../interfaces/database_base.IManyValueType.md) ; `moduleTableInsert`: [`IManyValueType`](../interfaces/database_base.IManyValueType.md)  }[] | - |
 
 #### Returns
 
@@ -457,7 +798,7 @@ TODO returning builder access in order to modify what to return
 
 #### Defined in
 
-[server/raw-db.ts:713](https://github.com/onzag/itemize/blob/5c2808d3/server/raw-db.ts#L713)
+[server/raw-db.ts:1202](https://github.com/onzag/itemize/blob/f2db74a5/server/raw-db.ts#L1202)
 
 ___
 
@@ -481,7 +822,7 @@ Provides a db query builder for the given item or a module
 
 #### Defined in
 
-[server/raw-db.ts:838](https://github.com/onzag/itemize/blob/5c2808d3/server/raw-db.ts#L838)
+[server/raw-db.ts:1352](https://github.com/onzag/itemize/blob/f2db74a5/server/raw-db.ts#L1352)
 
 ___
 
@@ -492,21 +833,23 @@ ___
 Performs a raw database update, use this method in order to update critical data that could
 lead to race conditions, otherwise stay by updating through the cache
 
-TODO returning builder access
+TODO returning builder access will affect tracked properties
 
 #### Parameters
 
-| Name | Type |
-| :------ | :------ |
-| `item` | `string` \| [`default`](base_Root_Module_ItemDefinition.default.md) |
-| `id` | `string` |
-| `version` | `string` |
-| `updater` | `Object` |
-| `updater.dangerousUseSilentMode?` | `boolean` |
-| `updater.itemTableUpdate?` | [`IManyValueType`](../interfaces/database_base.IManyValueType.md) |
-| `updater.moduleTableUpdate?` | [`IManyValueType`](../interfaces/database_base.IManyValueType.md) |
-| `updater.itemTableUpdater?` | (`arg`: [`SetBuilder`](database_SetBuilder.SetBuilder.md), `redoDictionaries`: `RedoDictionariesFn`) => `void` |
-| `updater.moduleTableUpdater?` | (`arg`: [`SetBuilder`](database_SetBuilder.SetBuilder.md), `redoDictionaries`: `RedoDictionariesFn`) => `void` |
+| Name | Type | Description |
+| :------ | :------ | :------ |
+| `item` | `string` \| [`default`](base_Root_Module_ItemDefinition.default.md) |  |
+| `id` | `string` |  |
+| `version` | `string` |  |
+| `updater` | `Object` |  |
+| `updater.dangerousForceElasticLangUpdateTo?` | `string` | Forces a language update to the given language, will ignore silent mode if provided |
+| `updater.dangerousForceElasticUpdate?` | `boolean` | Will update search indices anyway |
+| `updater.dangerousUseSilentMode?` | `boolean` | Does not inform of updates or anything to the clusters or elastic or anything at all, does not modify the last modified signature |
+| `updater.itemTableUpdate?` | [`IManyValueType`](../interfaces/database_base.IManyValueType.md) | - |
+| `updater.moduleTableUpdate?` | [`IManyValueType`](../interfaces/database_base.IManyValueType.md) | - |
+| `updater.itemTableUpdater?` | (`arg`: [`SetBuilder`](database_SetBuilder.SetBuilder.md), `redoDictionaries`: `RedoDictionariesFn`) => `void` | - |
+| `updater.moduleTableUpdater?` | (`arg`: [`SetBuilder`](database_SetBuilder.SetBuilder.md), `redoDictionaries`: `RedoDictionariesFn`) => `void` | - |
 
 #### Returns
 
@@ -514,13 +857,13 @@ TODO returning builder access
 
 #### Defined in
 
-[server/raw-db.ts:1100](https://github.com/onzag/itemize/blob/5c2808d3/server/raw-db.ts#L1100)
+[server/raw-db.ts:2314](https://github.com/onzag/itemize/blob/f2db74a5/server/raw-db.ts#L2314)
 
 ___
 
 ### processGQLValue
 
-▸ **processGQLValue**(`item`, `value`, `serverData`, `dictionary`, `partialFields?`): `Object`
+▸ **processGQLValue**(`item`, `value`, `appData`, `dictionary`, `partialFields?`): `Object`
 
 Will convert a graphql style value into a full row SQL value in order to execute many value
 types functionality and directly insert values in a safer way
@@ -537,7 +880,7 @@ Raw writes on the database are after all dangerous
 | :------ | :------ | :------ |
 | `item` | `string` \| [`default`](base_Root_Module_ItemDefinition.default.md) | the item definition that you want to convert a value for |
 | `value` | `any` | the vale you want to convert |
-| `serverData` | `any` | server data, required for doing things like currency conversion, you might use null otherwise but it should be readily available in the global environment as well as local, you should never use raw db in local nevertheless |
+| `appData` | [`IAppDataType`](../interfaces/server.IAppDataType.md) | - |
 | `dictionary` | `string` | the dictionary to use |
 | `partialFields?` | `any` | by default it will populate the entire row information that is necessary to fill each one of the required properties (not including the base) so with partial fields you can get partial values which are useful for updates, these are the same as graphql fields |
 
@@ -554,7 +897,7 @@ an object which contains the total or partial values of the row to be inserted o
 
 #### Defined in
 
-[server/raw-db.ts:134](https://github.com/onzag/itemize/blob/5c2808d3/server/raw-db.ts#L134)
+[server/raw-db.ts:183](https://github.com/onzag/itemize/blob/f2db74a5/server/raw-db.ts#L183)
 
 ___
 
@@ -579,7 +922,7 @@ a url safe v5 uuid
 
 #### Defined in
 
-[server/raw-db.ts:109](https://github.com/onzag/itemize/blob/5c2808d3/server/raw-db.ts#L109)
+[server/raw-db.ts:158](https://github.com/onzag/itemize/blob/f2db74a5/server/raw-db.ts#L158)
 
 ___
 
@@ -600,13 +943,13 @@ a url safe v4 uuid
 
 #### Defined in
 
-[server/raw-db.ts:99](https://github.com/onzag/itemize/blob/5c2808d3/server/raw-db.ts#L99)
+[server/raw-db.ts:148](https://github.com/onzag/itemize/blob/f2db74a5/server/raw-db.ts#L148)
 
 ___
 
 ### redoDictionariesFn
 
-▸ `Private` **redoDictionariesFn**(`itemDefinitionOrModule`, `setBuilder`, `dictionary`, `propertyOrInclude`, `property`): `void`
+▸ `Private` **redoDictionariesFn**(`itemDefinitionOrModule`, `setBuilder`, `language`, `dictionary`, `propertyOrInclude`, `property`): `void`
 
 A private helper function to use a item definition
 and a set builder in order to update the dictionaries
@@ -618,6 +961,7 @@ of given properties
 | :------ | :------ |
 | `itemDefinitionOrModule` | [`default`](base_Root_Module.default.md) \| [`default`](base_Root_Module_ItemDefinition.default.md) |
 | `setBuilder` | [`SetBuilder`](database_SetBuilder.SetBuilder.md) |
+| `language` | `string` |
 | `dictionary` | `string` |
 | `propertyOrInclude` | `string` |
 | `property` | `string` |
@@ -628,7 +972,32 @@ of given properties
 
 #### Defined in
 
-[server/raw-db.ts:624](https://github.com/onzag/itemize/blob/5c2808d3/server/raw-db.ts#L624)
+[server/raw-db.ts:1111](https://github.com/onzag/itemize/blob/f2db74a5/server/raw-db.ts#L1111)
+
+___
+
+### retrieveGloballyCachedRawDBSelect
+
+▸ **retrieveGloballyCachedRawDBSelect**(`uniqueID`, `options?`): `Promise`<[`ISQLTableRowValue`](../interfaces/base_Root_sql.ISQLTableRowValue.md)[]\>
+
+Retrieves the raw db select that has been globally cached, given its unique id it will
+provide the select results from that query
+
+#### Parameters
+
+| Name | Type |
+| :------ | :------ |
+| `uniqueID` | `string` |
+| `options?` | `Object` |
+| `options.returnNullOnError?` | `boolean` |
+
+#### Returns
+
+`Promise`<[`ISQLTableRowValue`](../interfaces/base_Root_sql.ISQLTableRowValue.md)[]\>
+
+#### Defined in
+
+[server/raw-db.ts:1545](https://github.com/onzag/itemize/blob/f2db74a5/server/raw-db.ts#L1545)
 
 ___
 
@@ -652,7 +1021,30 @@ Retrieves a raw db select query in order to be used to assign values in updates
 
 #### Defined in
 
-[server/raw-db.ts:855](https://github.com/onzag/itemize/blob/5c2808d3/server/raw-db.ts#L855)
+[server/raw-db.ts:1369](https://github.com/onzag/itemize/blob/f2db74a5/server/raw-db.ts#L1369)
+
+___
+
+### setupElastic
+
+▸ **setupElastic**(`elastic`): `void`
+
+the elastic instance depends on raw db and raw db depends on the
+elastic instance, as such elastic adds itself in here when initialized
+
+#### Parameters
+
+| Name | Type | Description |
+| :------ | :------ | :------ |
+| `elastic` | [`ItemizeElasticClient`](server_elastic.ItemizeElasticClient.md) | the elastic instance |
+
+#### Returns
+
+`void`
+
+#### Defined in
+
+[server/raw-db.ts:120](https://github.com/onzag/itemize/blob/f2db74a5/server/raw-db.ts#L120)
 
 ___
 
@@ -682,13 +1074,13 @@ whatever is returned in the transactional function
 
 #### Defined in
 
-[server/raw-db.ts:80](https://github.com/onzag/itemize/blob/5c2808d3/server/raw-db.ts#L80)
+[server/raw-db.ts:129](https://github.com/onzag/itemize/blob/f2db74a5/server/raw-db.ts#L129)
 
 ___
 
 ### storeInDeleteRegistry
 
-▸ `Private` **storeInDeleteRegistry**(`row`, `moduleName`): `Promise`<`string`\>
+▸ `Private` **storeInDeleteRegistry**(`row`, `moduleName`, `trackedProperties`): `Promise`<`string`\>
 
 Takes a row and stores it in the deleted registry
 
@@ -698,6 +1090,7 @@ Takes a row and stores it in the deleted registry
 | :------ | :------ | :------ |
 | `row` | [`ISQLTableRowValue`](../interfaces/base_Root_sql.ISQLTableRowValue.md) | the row to store |
 | `moduleName` | `string` | the module that it belongs to (based on the type) |
+| `trackedProperties` | `string`[] | - |
 
 #### Returns
 
@@ -707,4 +1100,27 @@ the transaction time
 
 #### Defined in
 
-[server/raw-db.ts:175](https://github.com/onzag/itemize/blob/5c2808d3/server/raw-db.ts#L175)
+[server/raw-db.ts:232](https://github.com/onzag/itemize/blob/f2db74a5/server/raw-db.ts#L232)
+
+___
+
+### updateTrackers
+
+▸ `Private` **updateTrackers**(`transactingDb`, `results`, `potentialAffectedTrackedProperties`, `moduleTable`): `Promise`<`void`\>
+
+#### Parameters
+
+| Name | Type |
+| :------ | :------ |
+| `transactingDb` | [`DatabaseConnection`](database.DatabaseConnection.md) |
+| `results` | [`ISQLTableRowValue`](../interfaces/base_Root_sql.ISQLTableRowValue.md)[] |
+| `potentialAffectedTrackedProperties` | `string`[] |
+| `moduleTable` | `string` |
+
+#### Returns
+
+`Promise`<`void`\>
+
+#### Defined in
+
+[server/raw-db.ts:1970](https://github.com/onzag/itemize/blob/f2db74a5/server/raw-db.ts#L1970)

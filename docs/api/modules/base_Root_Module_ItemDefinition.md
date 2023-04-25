@@ -17,9 +17,13 @@ for items as it defines how they are meant to be conformed, by includes and prop
 
 ### Interfaces
 
+- [ICompoundSearchStateType](../interfaces/base_Root_Module_ItemDefinition.ICompoundSearchStateType.md)
 - [IItemDefinitionGQLValueType](../interfaces/base_Root_Module_ItemDefinition.IItemDefinitionGQLValueType.md)
 - [IItemDefinitionParentingRawJSONDataType](../interfaces/base_Root_Module_ItemDefinition.IItemDefinitionParentingRawJSONDataType.md)
 - [IItemDefinitionRawJSONDataType](../interfaces/base_Root_Module_ItemDefinition.IItemDefinitionRawJSONDataType.md)
+- [IItemSearchStateHighlightArgsType](../interfaces/base_Root_Module_ItemDefinition.IItemSearchStateHighlightArgsType.md)
+- [IItemSearchStateHighlightType](../interfaces/base_Root_Module_ItemDefinition.IItemSearchStateHighlightType.md)
+- [IItemSearchStateType](../interfaces/base_Root_Module_ItemDefinition.IItemSearchStateType.md)
 - [IItemStateType](../interfaces/base_Root_Module_ItemDefinition.IItemStateType.md)
 - [IPoliciesRawJSONDataType](../interfaces/base_Root_Module_ItemDefinition.IPoliciesRawJSONDataType.md)
 - [IPoliciesStateType](../interfaces/base_Root_Module_ItemDefinition.IPoliciesStateType.md)

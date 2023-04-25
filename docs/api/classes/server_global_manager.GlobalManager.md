@@ -13,12 +13,16 @@
 ### Properties
 
 - [blocksReleaseLastExecuted](server_global_manager.GlobalManager.md#blocksreleaselastexecuted)
+- [buildnumber](server_global_manager.GlobalManager.md#buildnumber)
 - [config](server_global_manager.GlobalManager.md#config)
 - [currencyFactorsProvider](server_global_manager.GlobalManager.md#currencyfactorsprovider)
 - [customServices](server_global_manager.GlobalManager.md#customservices)
 - [databaseConnection](server_global_manager.GlobalManager.md#databaseconnection)
+- [elastic](server_global_manager.GlobalManager.md#elastic)
+- [elasticCleanupLastExecuted](server_global_manager.GlobalManager.md#elasticcleanuplastexecuted)
 - [globalCache](server_global_manager.GlobalManager.md#globalcache)
 - [idefNeedsMantenience](server_global_manager.GlobalManager.md#idefneedsmantenience)
+- [initialExecutionServerDataFn](server_global_manager.GlobalManager.md#initialexecutionserverdatafn)
 - [mailProvider](server_global_manager.GlobalManager.md#mailprovider)
 - [modNeedsMantenience](server_global_manager.GlobalManager.md#modneedsmantenience)
 - [phoneProvider](server_global_manager.GlobalManager.md#phoneprovider)
@@ -37,6 +41,7 @@
 
 - [addAdminUserIfMissing](server_global_manager.GlobalManager.md#addadminuserifmissing)
 - [calculateServerData](server_global_manager.GlobalManager.md#calculateserverdata)
+- [executeInitialServerDataFunction](server_global_manager.GlobalManager.md#executeinitialserverdatafunction)
 - [informNewServerData](server_global_manager.GlobalManager.md#informnewserverdata)
 - [initializeServices](server_global_manager.GlobalManager.md#initializeservices)
 - [installGlobalService](server_global_manager.GlobalManager.md#installglobalservice)
@@ -55,15 +60,17 @@
 
 ### constructor
 
-• **new GlobalManager**(`root`, `databaseConnection`, `rawDB`, `globalCache`, `redisPub`, `redisSub`, `config`, `sensitiveConfig`, `currencyFactorsProvider`, `mailProvider`, `phoneProvider`, `registry`)
+• **new GlobalManager**(`buildnumber`, `root`, `databaseConnection`, `rawDB`, `elastic`, `globalCache`, `redisPub`, `redisSub`, `config`, `sensitiveConfig`, `currencyFactorsProvider`, `mailProvider`, `phoneProvider`, `registry`, `initialExecutionServerDataFn`)
 
 #### Parameters
 
 | Name | Type |
 | :------ | :------ |
+| `buildnumber` | `string` |
 | `root` | [`default`](base_Root.default.md) |
 | `databaseConnection` | [`DatabaseConnection`](database.DatabaseConnection.md) |
 | `rawDB` | [`ItemizeRawDB`](server_raw_db.ItemizeRawDB.md) |
+| `elastic` | [`ItemizeElasticClient`](server_elastic.ItemizeElasticClient.md) |
 | `globalCache` | [`ItemizeRedisClient`](server_redis.ItemizeRedisClient.md) |
 | `redisPub` | [`ItemizeRedisClient`](server_redis.ItemizeRedisClient.md) |
 | `redisSub` | [`ItemizeRedisClient`](server_redis.ItemizeRedisClient.md) |
@@ -73,10 +80,11 @@
 | `mailProvider` | [`default`](server_services_base_MailProvider.default.md)<`any`\> |
 | `phoneProvider` | [`default`](server_services_base_PhoneProvider.default.md)<`any`\> |
 | `registry` | [`RegistryService`](server_services_registry.RegistryService.md) |
+| `initialExecutionServerDataFn` | [`InitialExecutionServerDataFn`](../modules/server_global_manager.md#initialexecutionserverdatafn) |
 
 #### Defined in
 
-[server/global-manager.ts:72](https://github.com/onzag/itemize/blob/5c2808d3/server/global-manager.ts#L72)
+[server/global-manager.ts:86](https://github.com/onzag/itemize/blob/f2db74a5/server/global-manager.ts#L86)
 
 ## Properties
 
@@ -86,17 +94,27 @@
 
 #### Defined in
 
-[server/global-manager.ts:60](https://github.com/onzag/itemize/blob/5c2808d3/server/global-manager.ts#L60)
+[server/global-manager.ts:73](https://github.com/onzag/itemize/blob/f2db74a5/server/global-manager.ts#L73)
+
+___
+
+### buildnumber
+
+• **buildnumber**: `string`
+
+#### Defined in
+
+[server/global-manager.ts:60](https://github.com/onzag/itemize/blob/f2db74a5/server/global-manager.ts#L60)
 
 ___
 
 ### config
 
-• `Private` **config**: [`IConfigRawJSONDataType`](../interfaces/config.IConfigRawJSONDataType.md)
+• **config**: [`IConfigRawJSONDataType`](../interfaces/config.IConfigRawJSONDataType.md)
 
 #### Defined in
 
-[server/global-manager.ts:64](https://github.com/onzag/itemize/blob/5c2808d3/server/global-manager.ts#L64)
+[server/global-manager.ts:77](https://github.com/onzag/itemize/blob/f2db74a5/server/global-manager.ts#L77)
 
 ___
 
@@ -106,7 +124,7 @@ ___
 
 #### Defined in
 
-[server/global-manager.ts:61](https://github.com/onzag/itemize/blob/5c2808d3/server/global-manager.ts#L61)
+[server/global-manager.ts:74](https://github.com/onzag/itemize/blob/f2db74a5/server/global-manager.ts#L74)
 
 ___
 
@@ -120,7 +138,7 @@ ___
 
 #### Defined in
 
-[server/global-manager.ts:66](https://github.com/onzag/itemize/blob/5c2808d3/server/global-manager.ts#L66)
+[server/global-manager.ts:79](https://github.com/onzag/itemize/blob/f2db74a5/server/global-manager.ts#L79)
 
 ___
 
@@ -130,17 +148,37 @@ ___
 
 #### Defined in
 
-[server/global-manager.ts:50](https://github.com/onzag/itemize/blob/5c2808d3/server/global-manager.ts#L50)
+[server/global-manager.ts:61](https://github.com/onzag/itemize/blob/f2db74a5/server/global-manager.ts#L61)
+
+___
+
+### elastic
+
+• **elastic**: [`ItemizeElasticClient`](server_elastic.ItemizeElasticClient.md)
+
+#### Defined in
+
+[server/global-manager.ts:63](https://github.com/onzag/itemize/blob/f2db74a5/server/global-manager.ts#L63)
+
+___
+
+### elasticCleanupLastExecuted
+
+• `Private` **elasticCleanupLastExecuted**: `number`
+
+#### Defined in
+
+[server/global-manager.ts:72](https://github.com/onzag/itemize/blob/f2db74a5/server/global-manager.ts#L72)
 
 ___
 
 ### globalCache
 
-• `Private` **globalCache**: [`ItemizeRedisClient`](server_redis.ItemizeRedisClient.md)
+• **globalCache**: [`ItemizeRedisClient`](server_redis.ItemizeRedisClient.md)
 
 #### Defined in
 
-[server/global-manager.ts:52](https://github.com/onzag/itemize/blob/5c2808d3/server/global-manager.ts#L52)
+[server/global-manager.ts:64](https://github.com/onzag/itemize/blob/f2db74a5/server/global-manager.ts#L64)
 
 ___
 
@@ -150,17 +188,27 @@ ___
 
 #### Defined in
 
-[server/global-manager.ts:55](https://github.com/onzag/itemize/blob/5c2808d3/server/global-manager.ts#L55)
+[server/global-manager.ts:67](https://github.com/onzag/itemize/blob/f2db74a5/server/global-manager.ts#L67)
+
+___
+
+### initialExecutionServerDataFn
+
+• `Private` **initialExecutionServerDataFn**: [`InitialExecutionServerDataFn`](../modules/server_global_manager.md#initialexecutionserverdatafn)
+
+#### Defined in
+
+[server/global-manager.ts:84](https://github.com/onzag/itemize/blob/f2db74a5/server/global-manager.ts#L84)
 
 ___
 
 ### mailProvider
 
-• `Private` **mailProvider**: [`default`](server_services_base_MailProvider.default.md)<`any`\>
+• **mailProvider**: [`default`](server_services_base_MailProvider.default.md)<`any`\>
 
 #### Defined in
 
-[server/global-manager.ts:63](https://github.com/onzag/itemize/blob/5c2808d3/server/global-manager.ts#L63)
+[server/global-manager.ts:76](https://github.com/onzag/itemize/blob/f2db74a5/server/global-manager.ts#L76)
 
 ___
 
@@ -170,77 +218,77 @@ ___
 
 #### Defined in
 
-[server/global-manager.ts:56](https://github.com/onzag/itemize/blob/5c2808d3/server/global-manager.ts#L56)
+[server/global-manager.ts:68](https://github.com/onzag/itemize/blob/f2db74a5/server/global-manager.ts#L68)
 
 ___
 
 ### phoneProvider
 
-• `Private` **phoneProvider**: [`default`](server_services_base_PhoneProvider.default.md)<`any`\>
+• **phoneProvider**: [`default`](server_services_base_PhoneProvider.default.md)<`any`\>
 
 #### Defined in
 
-[server/global-manager.ts:70](https://github.com/onzag/itemize/blob/5c2808d3/server/global-manager.ts#L70)
+[server/global-manager.ts:83](https://github.com/onzag/itemize/blob/f2db74a5/server/global-manager.ts#L83)
 
 ___
 
 ### rawDB
 
-• `Private` **rawDB**: [`ItemizeRawDB`](server_raw_db.ItemizeRawDB.md)
+• **rawDB**: [`ItemizeRawDB`](server_raw_db.ItemizeRawDB.md)
 
 #### Defined in
 
-[server/global-manager.ts:51](https://github.com/onzag/itemize/blob/5c2808d3/server/global-manager.ts#L51)
+[server/global-manager.ts:62](https://github.com/onzag/itemize/blob/f2db74a5/server/global-manager.ts#L62)
 
 ___
 
 ### redisPub
 
-• `Private` **redisPub**: [`ItemizeRedisClient`](server_redis.ItemizeRedisClient.md)
+• **redisPub**: [`ItemizeRedisClient`](server_redis.ItemizeRedisClient.md)
 
 #### Defined in
 
-[server/global-manager.ts:53](https://github.com/onzag/itemize/blob/5c2808d3/server/global-manager.ts#L53)
+[server/global-manager.ts:65](https://github.com/onzag/itemize/blob/f2db74a5/server/global-manager.ts#L65)
 
 ___
 
 ### redisSub
 
-• `Private` **redisSub**: [`ItemizeRedisClient`](server_redis.ItemizeRedisClient.md)
+• **redisSub**: [`ItemizeRedisClient`](server_redis.ItemizeRedisClient.md)
 
 #### Defined in
 
-[server/global-manager.ts:54](https://github.com/onzag/itemize/blob/5c2808d3/server/global-manager.ts#L54)
+[server/global-manager.ts:66](https://github.com/onzag/itemize/blob/f2db74a5/server/global-manager.ts#L66)
 
 ___
 
 ### registry
 
-• `Private` **registry**: [`RegistryService`](server_services_registry.RegistryService.md)
+• **registry**: [`RegistryService`](server_services_registry.RegistryService.md)
 
 #### Defined in
 
-[server/global-manager.ts:69](https://github.com/onzag/itemize/blob/5c2808d3/server/global-manager.ts#L69)
+[server/global-manager.ts:82](https://github.com/onzag/itemize/blob/f2db74a5/server/global-manager.ts#L82)
 
 ___
 
 ### root
 
-• `Private` **root**: [`default`](base_Root.default.md)
+• **root**: [`default`](base_Root.default.md)
 
 #### Defined in
 
-[server/global-manager.ts:49](https://github.com/onzag/itemize/blob/5c2808d3/server/global-manager.ts#L49)
+[server/global-manager.ts:59](https://github.com/onzag/itemize/blob/f2db74a5/server/global-manager.ts#L59)
 
 ___
 
 ### sensitiveConfig
 
-• `Private` **sensitiveConfig**: [`ISensitiveConfigRawJSONDataType`](../interfaces/config.ISensitiveConfigRawJSONDataType.md)
+• **sensitiveConfig**: [`ISensitiveConfigRawJSONDataType`](../interfaces/config.ISensitiveConfigRawJSONDataType.md)
 
 #### Defined in
 
-[server/global-manager.ts:62](https://github.com/onzag/itemize/blob/5c2808d3/server/global-manager.ts#L62)
+[server/global-manager.ts:75](https://github.com/onzag/itemize/blob/f2db74a5/server/global-manager.ts#L75)
 
 ___
 
@@ -250,7 +298,7 @@ ___
 
 #### Defined in
 
-[server/global-manager.ts:59](https://github.com/onzag/itemize/blob/5c2808d3/server/global-manager.ts#L59)
+[server/global-manager.ts:71](https://github.com/onzag/itemize/blob/f2db74a5/server/global-manager.ts#L71)
 
 ___
 
@@ -260,17 +308,17 @@ ___
 
 #### Defined in
 
-[server/global-manager.ts:65](https://github.com/onzag/itemize/blob/5c2808d3/server/global-manager.ts#L65)
+[server/global-manager.ts:78](https://github.com/onzag/itemize/blob/f2db74a5/server/global-manager.ts#L78)
 
 ___
 
 ### serverData
 
-• `Private` **serverData**: [`IServerDataType`](../interfaces/server.IServerDataType.md)
+• **serverData**: [`IServerDataType`](../interfaces/server.IServerDataType.md)
 
 #### Defined in
 
-[server/global-manager.ts:57](https://github.com/onzag/itemize/blob/5c2808d3/server/global-manager.ts#L57)
+[server/global-manager.ts:69](https://github.com/onzag/itemize/blob/f2db74a5/server/global-manager.ts#L69)
 
 ___
 
@@ -280,7 +328,7 @@ ___
 
 #### Defined in
 
-[server/global-manager.ts:58](https://github.com/onzag/itemize/blob/5c2808d3/server/global-manager.ts#L58)
+[server/global-manager.ts:70](https://github.com/onzag/itemize/blob/f2db74a5/server/global-manager.ts#L70)
 
 ## Methods
 
@@ -294,7 +342,7 @@ ___
 
 #### Defined in
 
-[server/global-manager.ts:182](https://github.com/onzag/itemize/blob/5c2808d3/server/global-manager.ts#L182)
+[server/global-manager.ts:221](https://github.com/onzag/itemize/blob/f2db74a5/server/global-manager.ts#L221)
 
 ___
 
@@ -308,7 +356,21 @@ ___
 
 #### Defined in
 
-[server/global-manager.ts:795](https://github.com/onzag/itemize/blob/5c2808d3/server/global-manager.ts#L795)
+[server/global-manager.ts:1221](https://github.com/onzag/itemize/blob/f2db74a5/server/global-manager.ts#L1221)
+
+___
+
+### executeInitialServerDataFunction
+
+▸ **executeInitialServerDataFunction**(): `Promise`<`void`\>
+
+#### Returns
+
+`Promise`<`void`\>
+
+#### Defined in
+
+[server/global-manager.ts:543](https://github.com/onzag/itemize/blob/f2db74a5/server/global-manager.ts#L543)
 
 ___
 
@@ -322,7 +384,7 @@ ___
 
 #### Defined in
 
-[server/global-manager.ts:815](https://github.com/onzag/itemize/blob/5c2808d3/server/global-manager.ts#L815)
+[server/global-manager.ts:1248](https://github.com/onzag/itemize/blob/f2db74a5/server/global-manager.ts#L1248)
 
 ___
 
@@ -336,7 +398,7 @@ ___
 
 #### Defined in
 
-[server/global-manager.ts:165](https://github.com/onzag/itemize/blob/5c2808d3/server/global-manager.ts#L165)
+[server/global-manager.ts:202](https://github.com/onzag/itemize/blob/f2db74a5/server/global-manager.ts#L202)
 
 ___
 
@@ -356,7 +418,7 @@ ___
 
 #### Defined in
 
-[server/global-manager.ts:152](https://github.com/onzag/itemize/blob/5c2808d3/server/global-manager.ts#L152)
+[server/global-manager.ts:181](https://github.com/onzag/itemize/blob/f2db74a5/server/global-manager.ts#L181)
 
 ___
 
@@ -376,7 +438,7 @@ ___
 
 #### Defined in
 
-[server/global-manager.ts:368](https://github.com/onzag/itemize/blob/5c2808d3/server/global-manager.ts#L368)
+[server/global-manager.ts:470](https://github.com/onzag/itemize/blob/f2db74a5/server/global-manager.ts#L470)
 
 ___
 
@@ -396,7 +458,7 @@ ___
 
 #### Defined in
 
-[server/global-manager.ts:337](https://github.com/onzag/itemize/blob/5c2808d3/server/global-manager.ts#L337)
+[server/global-manager.ts:431](https://github.com/onzag/itemize/blob/f2db74a5/server/global-manager.ts#L431)
 
 ___
 
@@ -410,7 +472,7 @@ ___
 
 #### Defined in
 
-[server/global-manager.ts:433](https://github.com/onzag/itemize/blob/5c2808d3/server/global-manager.ts#L433)
+[server/global-manager.ts:557](https://github.com/onzag/itemize/blob/f2db74a5/server/global-manager.ts#L557)
 
 ___
 
@@ -430,7 +492,7 @@ ___
 
 #### Defined in
 
-[server/global-manager.ts:411](https://github.com/onzag/itemize/blob/5c2808d3/server/global-manager.ts#L411)
+[server/global-manager.ts:521](https://github.com/onzag/itemize/blob/f2db74a5/server/global-manager.ts#L521)
 
 ___
 
@@ -444,7 +506,7 @@ ___
 
 #### Defined in
 
-[server/global-manager.ts:473](https://github.com/onzag/itemize/blob/5c2808d3/server/global-manager.ts#L473)
+[server/global-manager.ts:611](https://github.com/onzag/itemize/blob/f2db74a5/server/global-manager.ts#L611)
 
 ___
 
@@ -467,7 +529,7 @@ ___
 
 #### Defined in
 
-[server/global-manager.ts:656](https://github.com/onzag/itemize/blob/5c2808d3/server/global-manager.ts#L656)
+[server/global-manager.ts:1081](https://github.com/onzag/itemize/blob/f2db74a5/server/global-manager.ts#L1081)
 
 ___
 
@@ -487,7 +549,7 @@ ___
 
 #### Defined in
 
-[server/global-manager.ts:608](https://github.com/onzag/itemize/blob/5c2808d3/server/global-manager.ts#L608)
+[server/global-manager.ts:1033](https://github.com/onzag/itemize/blob/f2db74a5/server/global-manager.ts#L1033)
 
 ___
 
@@ -507,7 +569,7 @@ ___
 
 #### Defined in
 
-[server/global-manager.ts:585](https://github.com/onzag/itemize/blob/5c2808d3/server/global-manager.ts#L585)
+[server/global-manager.ts:1010](https://github.com/onzag/itemize/blob/f2db74a5/server/global-manager.ts#L1010)
 
 ___
 
@@ -521,7 +583,7 @@ ___
 
 #### Defined in
 
-[server/global-manager.ts:577](https://github.com/onzag/itemize/blob/5c2808d3/server/global-manager.ts#L577)
+[server/global-manager.ts:1002](https://github.com/onzag/itemize/blob/f2db74a5/server/global-manager.ts#L1002)
 
 ___
 
@@ -541,4 +603,4 @@ ___
 
 #### Defined in
 
-[server/global-manager.ts:149](https://github.com/onzag/itemize/blob/5c2808d3/server/global-manager.ts#L149)
+[server/global-manager.ts:178](https://github.com/onzag/itemize/blob/f2db74a5/server/global-manager.ts#L178)

@@ -19,6 +19,8 @@
 ### Properties
 
 - [appConfig](server_services_fake_mail.FakeMailService.md#appconfig)
+- [appDbConfig](server_services_fake_mail.FakeMailService.md#appdbconfig)
+- [appRedisConfig](server_services_fake_mail.FakeMailService.md#appredisconfig)
 - [appSensitiveConfig](server_services_fake_mail.FakeMailService.md#appsensitiveconfig)
 - [config](server_services_fake_mail.FakeMailService.md#config)
 - [globalCustomServices](server_services_fake_mail.FakeMailService.md#globalcustomservices)
@@ -38,24 +40,61 @@
 
 ### Methods
 
+- [allowUserToReceiveExternalEmail](server_services_fake_mail.FakeMailService.md#allowusertoreceiveexternalemail)
+- [allowUserToSendEmail](server_services_fake_mail.FakeMailService.md#allowusertosendemail)
+- [allowUserToSendEmailToItem](server_services_fake_mail.FakeMailService.md#allowusertosendemailtoitem)
+- [allowUserToSendEmailToItemType](server_services_fake_mail.FakeMailService.md#allowusertosendemailtoitemtype)
+- [createFileFromLocalFile](server_services_fake_mail.FakeMailService.md#createfilefromlocalfile)
+- [createFileFromReadStream](server_services_fake_mail.FakeMailService.md#createfilefromreadstream)
+- [createFileFromURL](server_services_fake_mail.FakeMailService.md#createfilefromurl)
+- [escapeUserName](server_services_fake_mail.FakeMailService.md#escapeusername)
 - [execute](server_services_fake_mail.FakeMailService.md#execute)
 - [expressRouter](server_services_fake_mail.FakeMailService.md#expressrouter)
+- [formatForward](server_services_fake_mail.FakeMailService.md#formatforward)
+- [getBreakHeader](server_services_fake_mail.FakeMailService.md#getbreakheader)
+- [getExtraArgs](server_services_fake_mail.FakeMailService.md#getextraargs)
+- [getForwardDateIndicator](server_services_fake_mail.FakeMailService.md#getforwarddateindicator)
+- [getForwardDeletedIndicator](server_services_fake_mail.FakeMailService.md#getforwarddeletedindicator)
+- [getForwardFromIndicator](server_services_fake_mail.FakeMailService.md#getforwardfromindicator)
+- [getForwardMessageHeader](server_services_fake_mail.FakeMailService.md#getforwardmessageheader)
+- [getForwardProxyIndicator](server_services_fake_mail.FakeMailService.md#getforwardproxyindicator)
+- [getForwardSubjectIndicator](server_services_fake_mail.FakeMailService.md#getforwardsubjectindicator)
+- [getForwardSubjectReplace](server_services_fake_mail.FakeMailService.md#getforwardsubjectreplace)
+- [getForwardToIndicator](server_services_fake_mail.FakeMailService.md#getforwardtoindicator)
+- [getForwardViewAtIndicator](server_services_fake_mail.FakeMailService.md#getforwardviewatindicator)
+- [getForwardViewAtURL](server_services_fake_mail.FakeMailService.md#getforwardviewaturl)
 - [getInstanceName](server_services_fake_mail.FakeMailService.md#getinstancename)
+- [getLangHeader](server_services_fake_mail.FakeMailService.md#getlangheader)
+- [getNoReplySubjectPrefix](server_services_fake_mail.FakeMailService.md#getnoreplysubjectprefix)
+- [getNotificationsUsername](server_services_fake_mail.FakeMailService.md#getnotificationsusername)
+- [getObjectName](server_services_fake_mail.FakeMailService.md#getobjectname)
 - [getRouter](server_services_fake_mail.FakeMailService.md#getrouter)
 - [getRunCycleTime](server_services_fake_mail.FakeMailService.md#getruncycletime)
+- [getSizeLimit](server_services_fake_mail.FakeMailService.md#getsizelimit)
 - [getTriggerRegistry](server_services_fake_mail.FakeMailService.md#gettriggerregistry)
+- [getUserName](server_services_fake_mail.FakeMailService.md#getusername)
 - [initialize](server_services_fake_mail.FakeMailService.md#initialize)
 - [isInstanceGlobal](server_services_fake_mail.FakeMailService.md#isinstanceglobal)
 - [isInstanceLocal](server_services_fake_mail.FakeMailService.md#isinstancelocal)
 - [logDebug](server_services_fake_mail.FakeMailService.md#logdebug)
 - [logError](server_services_fake_mail.FakeMailService.md#logerror)
 - [logInfo](server_services_fake_mail.FakeMailService.md#loginfo)
-- [onEmailRecieved](server_services_fake_mail.FakeMailService.md#onemailrecieved)
+- [onEmailReceivedReplyResolver](server_services_fake_mail.FakeMailService.md#onemailreceivedreplyresolver)
+- [onExternalEmailBounced](server_services_fake_mail.FakeMailService.md#onexternalemailbounced)
+- [onExternalEmailReceived](server_services_fake_mail.FakeMailService.md#onexternalemailreceived)
+- [onUsersReceivedExternalEmail](server_services_fake_mail.FakeMailService.md#onusersreceivedexternalemail)
+- [onUsersReceivedInternalEmail](server_services_fake_mail.FakeMailService.md#onusersreceivedinternalemail)
+- [parseRFC2822](server_services_fake_mail.FakeMailService.md#parserfc2822)
+- [renderMessageForMail](server_services_fake_mail.FakeMailService.md#rendermessageformail)
+- [renderMessageFormatForward](server_services_fake_mail.FakeMailService.md#rendermessageformatforward)
+- [renderMessageFromMail](server_services_fake_mail.FakeMailService.md#rendermessagefrommail)
+- [resolveUsersForEmailToItem](server_services_fake_mail.FakeMailService.md#resolveusersforemailtoitem)
 - [run](server_services_fake_mail.FakeMailService.md#run)
 - [sendEmail](server_services_fake_mail.FakeMailService.md#sendemail)
 - [sendTemplateEmail](server_services_fake_mail.FakeMailService.md#sendtemplateemail)
 - [sendUnverifiedTemplateEmail](server_services_fake_mail.FakeMailService.md#sendunverifiedtemplateemail)
 - [setInstanceName](server_services_fake_mail.FakeMailService.md#setinstancename)
+- [setMessageStorageItemDefinition](server_services_fake_mail.FakeMailService.md#setmessagestorageitemdefinition)
 - [setupGlobalResources](server_services_fake_mail.FakeMailService.md#setupglobalresources)
 - [setupLocalResources](server_services_fake_mail.FakeMailService.md#setuplocalresources)
 - [expressRouter](server_services_fake_mail.FakeMailService.md#expressrouter)
@@ -70,7 +109,7 @@
 
 ### constructor
 
-• **new FakeMailService**(`config`, `registry`, `appConfig`, `appSensitiveConfig`)
+• **new FakeMailService**(`config`, `registry`, `configs`)
 
 #### Parameters
 
@@ -78,8 +117,11 @@
 | :------ | :------ |
 | `config` | ``null`` |
 | `registry` | [`RegistryService`](server_services_registry.RegistryService.md) |
-| `appConfig` | [`IConfigRawJSONDataType`](../interfaces/config.IConfigRawJSONDataType.md) |
-| `appSensitiveConfig` | [`ISensitiveConfigRawJSONDataType`](../interfaces/config.ISensitiveConfigRawJSONDataType.md) |
+| `configs` | `Object` |
+| `configs.config` | [`IConfigRawJSONDataType`](../interfaces/config.IConfigRawJSONDataType.md) |
+| `configs.dbConfig` | [`IDBConfigRawJSONDataType`](../interfaces/config.IDBConfigRawJSONDataType.md) |
+| `configs.redisConfig` | [`IRedisConfigRawJSONDataType`](../interfaces/config.IRedisConfigRawJSONDataType.md) |
+| `configs.sensitiveConfig` | [`ISensitiveConfigRawJSONDataType`](../interfaces/config.ISensitiveConfigRawJSONDataType.md) |
 
 #### Inherited from
 
@@ -87,7 +129,7 @@
 
 #### Defined in
 
-[server/services/index.ts:58](https://github.com/onzag/itemize/blob/5c2808d3/server/services/index.ts#L58)
+[server/services/index.ts:58](https://github.com/onzag/itemize/blob/f2db74a5/server/services/index.ts#L58)
 
 ## Properties
 
@@ -101,7 +143,35 @@
 
 #### Defined in
 
-[server/services/index.ts:37](https://github.com/onzag/itemize/blob/5c2808d3/server/services/index.ts#L37)
+[server/services/index.ts:35](https://github.com/onzag/itemize/blob/f2db74a5/server/services/index.ts#L35)
+
+___
+
+### appDbConfig
+
+• **appDbConfig**: [`IDBConfigRawJSONDataType`](../interfaces/config.IDBConfigRawJSONDataType.md)
+
+#### Inherited from
+
+[default](server_services_base_MailProvider.default.md).[appDbConfig](server_services_base_MailProvider.default.md#appdbconfig)
+
+#### Defined in
+
+[server/services/index.ts:37](https://github.com/onzag/itemize/blob/f2db74a5/server/services/index.ts#L37)
+
+___
+
+### appRedisConfig
+
+• **appRedisConfig**: [`IRedisConfigRawJSONDataType`](../interfaces/config.IRedisConfigRawJSONDataType.md)
+
+#### Inherited from
+
+[default](server_services_base_MailProvider.default.md).[appRedisConfig](server_services_base_MailProvider.default.md#appredisconfig)
+
+#### Defined in
+
+[server/services/index.ts:38](https://github.com/onzag/itemize/blob/f2db74a5/server/services/index.ts#L38)
 
 ___
 
@@ -115,7 +185,7 @@ ___
 
 #### Defined in
 
-[server/services/index.ts:38](https://github.com/onzag/itemize/blob/5c2808d3/server/services/index.ts#L38)
+[server/services/index.ts:36](https://github.com/onzag/itemize/blob/f2db74a5/server/services/index.ts#L36)
 
 ___
 
@@ -129,7 +199,7 @@ ___
 
 #### Defined in
 
-[server/services/index.ts:35](https://github.com/onzag/itemize/blob/5c2808d3/server/services/index.ts#L35)
+[server/services/index.ts:33](https://github.com/onzag/itemize/blob/f2db74a5/server/services/index.ts#L33)
 
 ___
 
@@ -147,7 +217,7 @@ ___
 
 #### Defined in
 
-[server/services/index.ts:48](https://github.com/onzag/itemize/blob/5c2808d3/server/services/index.ts#L48)
+[server/services/index.ts:48](https://github.com/onzag/itemize/blob/f2db74a5/server/services/index.ts#L48)
 
 ___
 
@@ -161,13 +231,13 @@ ___
 
 #### Defined in
 
-[server/services/index.ts:40](https://github.com/onzag/itemize/blob/5c2808d3/server/services/index.ts#L40)
+[server/services/index.ts:40](https://github.com/onzag/itemize/blob/f2db74a5/server/services/index.ts#L40)
 
 ___
 
 ### globalInstance
 
-• **globalInstance**: `boolean`
+• **globalInstance**: `boolean` = `false`
 
 #### Inherited from
 
@@ -175,7 +245,7 @@ ___
 
 #### Defined in
 
-[server/services/index.ts:55](https://github.com/onzag/itemize/blob/5c2808d3/server/services/index.ts#L55)
+[server/services/index.ts:55](https://github.com/onzag/itemize/blob/f2db74a5/server/services/index.ts#L55)
 
 ___
 
@@ -189,7 +259,7 @@ ___
 
 #### Defined in
 
-[server/services/index.ts:46](https://github.com/onzag/itemize/blob/5c2808d3/server/services/index.ts#L46)
+[server/services/index.ts:46](https://github.com/onzag/itemize/blob/f2db74a5/server/services/index.ts#L46)
 
 ___
 
@@ -203,7 +273,7 @@ ___
 
 #### Defined in
 
-[server/services/index.ts:47](https://github.com/onzag/itemize/blob/5c2808d3/server/services/index.ts#L47)
+[server/services/index.ts:47](https://github.com/onzag/itemize/blob/f2db74a5/server/services/index.ts#L47)
 
 ___
 
@@ -217,7 +287,7 @@ ___
 
 #### Defined in
 
-[server/services/index.ts:44](https://github.com/onzag/itemize/blob/5c2808d3/server/services/index.ts#L44)
+[server/services/index.ts:44](https://github.com/onzag/itemize/blob/f2db74a5/server/services/index.ts#L44)
 
 ___
 
@@ -231,7 +301,7 @@ ___
 
 #### Defined in
 
-[server/services/index.ts:43](https://github.com/onzag/itemize/blob/5c2808d3/server/services/index.ts#L43)
+[server/services/index.ts:43](https://github.com/onzag/itemize/blob/f2db74a5/server/services/index.ts#L43)
 
 ___
 
@@ -245,7 +315,7 @@ ___
 
 #### Defined in
 
-[server/services/index.ts:41](https://github.com/onzag/itemize/blob/5c2808d3/server/services/index.ts#L41)
+[server/services/index.ts:41](https://github.com/onzag/itemize/blob/f2db74a5/server/services/index.ts#L41)
 
 ___
 
@@ -259,7 +329,7 @@ ___
 
 #### Defined in
 
-[server/services/index.ts:42](https://github.com/onzag/itemize/blob/5c2808d3/server/services/index.ts#L42)
+[server/services/index.ts:42](https://github.com/onzag/itemize/blob/f2db74a5/server/services/index.ts#L42)
 
 ___
 
@@ -273,7 +343,7 @@ ___
 
 #### Defined in
 
-[server/services/index.ts:45](https://github.com/onzag/itemize/blob/5c2808d3/server/services/index.ts#L45)
+[server/services/index.ts:45](https://github.com/onzag/itemize/blob/f2db74a5/server/services/index.ts#L45)
 
 ___
 
@@ -287,7 +357,7 @@ ___
 
 #### Defined in
 
-[server/services/index.ts:54](https://github.com/onzag/itemize/blob/5c2808d3/server/services/index.ts#L54)
+[server/services/index.ts:54](https://github.com/onzag/itemize/blob/f2db74a5/server/services/index.ts#L54)
 
 ___
 
@@ -301,13 +371,13 @@ ___
 
 #### Defined in
 
-[server/services/index.ts:52](https://github.com/onzag/itemize/blob/5c2808d3/server/services/index.ts#L52)
+[server/services/index.ts:52](https://github.com/onzag/itemize/blob/f2db74a5/server/services/index.ts#L52)
 
 ___
 
 ### localInstance
 
-• **localInstance**: `boolean`
+• **localInstance**: `boolean` = `false`
 
 #### Inherited from
 
@@ -315,7 +385,7 @@ ___
 
 #### Defined in
 
-[server/services/index.ts:56](https://github.com/onzag/itemize/blob/5c2808d3/server/services/index.ts#L56)
+[server/services/index.ts:56](https://github.com/onzag/itemize/blob/f2db74a5/server/services/index.ts#L56)
 
 ___
 
@@ -329,9 +399,238 @@ ___
 
 #### Defined in
 
-[server/services/index.ts:36](https://github.com/onzag/itemize/blob/5c2808d3/server/services/index.ts#L36)
+[server/services/index.ts:34](https://github.com/onzag/itemize/blob/f2db74a5/server/services/index.ts#L34)
 
 ## Methods
+
+### allowUserToReceiveExternalEmail
+
+▸ **allowUserToReceiveExternalEmail**(`user`, `internalSender`, `data`): `Promise`<``"SPAM"`` \| ``"REJECT"`` \| ``"ACCEPT"``\>
+
+**`override`** use to filter spam and unwanted emails
+
+#### Parameters
+
+| Name | Type | Description |
+| :------ | :------ | :------ |
+| `user` | [`ISQLTableRowValue`](../interfaces/base_Root_sql.ISQLTableRowValue.md) | the user that is receiving the email |
+| `internalSender` | [`ISQLTableRowValue`](../interfaces/base_Root_sql.ISQLTableRowValue.md) | - |
+| `data` | [`IReceiveEmailData`](../interfaces/server_services_base_MailProvider.IReceiveEmailData.md) | the data that is being received |
+
+#### Returns
+
+`Promise`<``"SPAM"`` \| ``"REJECT"`` \| ``"ACCEPT"``\>
+
+SPAM for when to mark it as spam, REJECT for rejecting the message entirely, ACCEPT for accepting it
+
+#### Inherited from
+
+[default](server_services_base_MailProvider.default.md).[allowUserToReceiveExternalEmail](server_services_base_MailProvider.default.md#allowusertoreceiveexternalemail)
+
+#### Defined in
+
+[server/services/base/MailProvider.ts:1526](https://github.com/onzag/itemize/blob/f2db74a5/server/services/base/MailProvider.ts#L1526)
+
+___
+
+### allowUserToSendEmail
+
+▸ **allowUserToSendEmail**(`user`, `target`): `Promise`<``"SPAM"`` \| ``"REJECT"`` \| ``"ACCEPT"``\>
+
+**`override`** to filter spam and unwanted emails
+triggers when an user is trying to send an email to another, when the target is a sql value
+it means that its using internal solving, as in two users that are in the same system, if the value
+is a plain string, it means it's trying to solve
+
+#### Parameters
+
+| Name | Type |
+| :------ | :------ |
+| `user` | [`ISQLTableRowValue`](../interfaces/base_Root_sql.ISQLTableRowValue.md) |
+| `target` | `string` \| [`ISQLTableRowValue`](../interfaces/base_Root_sql.ISQLTableRowValue.md) |
+
+#### Returns
+
+`Promise`<``"SPAM"`` \| ``"REJECT"`` \| ``"ACCEPT"``\>
+
+SPAM only works for internal usage and the message will be marked as spam for the recepient
+REJECT will not send the message on its entirety, and ACCEPT will send the message
+
+#### Inherited from
+
+[default](server_services_base_MailProvider.default.md).[allowUserToSendEmail](server_services_base_MailProvider.default.md#allowusertosendemail)
+
+#### Defined in
+
+[server/services/base/MailProvider.ts:1538](https://github.com/onzag/itemize/blob/f2db74a5/server/services/base/MailProvider.ts#L1538)
+
+___
+
+### allowUserToSendEmailToItem
+
+▸ **allowUserToSendEmailToItem**(`user`, `target`, `targetType`): `Promise`<``"SPAM"`` \| ``"REJECT"`` \| ``"ACCEPT"``\>
+
+#### Parameters
+
+| Name | Type |
+| :------ | :------ |
+| `user` | [`ISQLTableRowValue`](../interfaces/base_Root_sql.ISQLTableRowValue.md) |
+| `target` | [`ISQLTableRowValue`](../interfaces/base_Root_sql.ISQLTableRowValue.md) |
+| `targetType` | [`default`](base_Root_Module_ItemDefinition.default.md) |
+
+#### Returns
+
+`Promise`<``"SPAM"`` \| ``"REJECT"`` \| ``"ACCEPT"``\>
+
+#### Inherited from
+
+[default](server_services_base_MailProvider.default.md).[allowUserToSendEmailToItem](server_services_base_MailProvider.default.md#allowusertosendemailtoitem)
+
+#### Defined in
+
+[server/services/base/MailProvider.ts:1546](https://github.com/onzag/itemize/blob/f2db74a5/server/services/base/MailProvider.ts#L1546)
+
+___
+
+### allowUserToSendEmailToItemType
+
+▸ **allowUserToSendEmailToItemType**(`user`, `target`): `Promise`<`boolean`\>
+
+#### Parameters
+
+| Name | Type |
+| :------ | :------ |
+| `user` | [`ISQLTableRowValue`](../interfaces/base_Root_sql.ISQLTableRowValue.md) |
+| `target` | [`default`](base_Root_Module_ItemDefinition.default.md) |
+
+#### Returns
+
+`Promise`<`boolean`\>
+
+#### Inherited from
+
+[default](server_services_base_MailProvider.default.md).[allowUserToSendEmailToItemType](server_services_base_MailProvider.default.md#allowusertosendemailtoitemtype)
+
+#### Defined in
+
+[server/services/base/MailProvider.ts:1542](https://github.com/onzag/itemize/blob/f2db74a5/server/services/base/MailProvider.ts#L1542)
+
+___
+
+### createFileFromLocalFile
+
+▸ **createFileFromLocalFile**(`id`, `filepath`, `name`, `size`, `type`, `extraArgs?`): [`IPropertyDefinitionSupportedSingleFilesType`](../interfaces/base_Root_Module_ItemDefinition_PropertyDefinition_types_files.IPropertyDefinitionSupportedSingleFilesType.md)
+
+#### Parameters
+
+| Name | Type |
+| :------ | :------ |
+| `id` | `string` |
+| `filepath` | `string` |
+| `name` | `string` |
+| `size` | `number` |
+| `type` | `string` |
+| `extraArgs?` | `Object` |
+| `extraArgs.widthXHeight?` | [`number`, `number`] |
+
+#### Returns
+
+[`IPropertyDefinitionSupportedSingleFilesType`](../interfaces/base_Root_Module_ItemDefinition_PropertyDefinition_types_files.IPropertyDefinitionSupportedSingleFilesType.md)
+
+#### Inherited from
+
+[default](server_services_base_MailProvider.default.md).[createFileFromLocalFile](server_services_base_MailProvider.default.md#createfilefromlocalfile)
+
+#### Defined in
+
+[server/services/base/MailProvider.ts:312](https://github.com/onzag/itemize/blob/f2db74a5/server/services/base/MailProvider.ts#L312)
+
+___
+
+### createFileFromReadStream
+
+▸ **createFileFromReadStream**(`id`, `stream`, `name`, `size`, `type`, `extraArgs?`): `Promise`<[`IPropertyDefinitionSupportedSingleFilesType`](../interfaces/base_Root_Module_ItemDefinition_PropertyDefinition_types_files.IPropertyDefinitionSupportedSingleFilesType.md)\>
+
+#### Parameters
+
+| Name | Type |
+| :------ | :------ |
+| `id` | `string` |
+| `stream` | `ReadStream` |
+| `name` | `string` |
+| `size` | `number` |
+| `type` | `string` |
+| `extraArgs?` | `Object` |
+| `extraArgs.storeInFileThenReadAgain` | `boolean` |
+| `extraArgs.widthXHeight?` | [`number`, `number`] |
+
+#### Returns
+
+`Promise`<[`IPropertyDefinitionSupportedSingleFilesType`](../interfaces/base_Root_Module_ItemDefinition_PropertyDefinition_types_files.IPropertyDefinitionSupportedSingleFilesType.md)\>
+
+#### Inherited from
+
+[default](server_services_base_MailProvider.default.md).[createFileFromReadStream](server_services_base_MailProvider.default.md#createfilefromreadstream)
+
+#### Defined in
+
+[server/services/base/MailProvider.ts:335](https://github.com/onzag/itemize/blob/f2db74a5/server/services/base/MailProvider.ts#L335)
+
+___
+
+### createFileFromURL
+
+▸ **createFileFromURL**(`url`, `name`, `size`, `type`, `extraArgs?`): [`IPropertyDefinitionSupportedSingleFilesType`](../interfaces/base_Root_Module_ItemDefinition_PropertyDefinition_types_files.IPropertyDefinitionSupportedSingleFilesType.md)
+
+#### Parameters
+
+| Name | Type |
+| :------ | :------ |
+| `url` | `string` |
+| `name` | `string` |
+| `size` | `number` |
+| `type` | `string` |
+| `extraArgs?` | `Object` |
+| `extraArgs.httpHeaders?` | `any` |
+| `extraArgs.widthXHeight?` | [`number`, `number`] |
+
+#### Returns
+
+[`IPropertyDefinitionSupportedSingleFilesType`](../interfaces/base_Root_Module_ItemDefinition_PropertyDefinition_types_files.IPropertyDefinitionSupportedSingleFilesType.md)
+
+#### Inherited from
+
+[default](server_services_base_MailProvider.default.md).[createFileFromURL](server_services_base_MailProvider.default.md#createfilefromurl)
+
+#### Defined in
+
+[server/services/base/MailProvider.ts:272](https://github.com/onzag/itemize/blob/f2db74a5/server/services/base/MailProvider.ts#L272)
+
+___
+
+### escapeUserName
+
+▸ **escapeUserName**(`name`): `string`
+
+#### Parameters
+
+| Name | Type |
+| :------ | :------ |
+| `name` | `string` |
+
+#### Returns
+
+`string`
+
+#### Inherited from
+
+[default](server_services_base_MailProvider.default.md).[escapeUserName](server_services_base_MailProvider.default.md#escapeusername)
+
+#### Defined in
+
+[server/services/base/MailProvider.ts:512](https://github.com/onzag/itemize/blob/f2db74a5/server/services/base/MailProvider.ts#L512)
+
+___
 
 ### execute
 
@@ -350,7 +649,7 @@ it will do the run function and then re-run as specified
 
 #### Defined in
 
-[server/services/index.ts:164](https://github.com/onzag/itemize/blob/5c2808d3/server/services/index.ts#L164)
+[server/services/index.ts:170](https://github.com/onzag/itemize/blob/f2db74a5/server/services/index.ts#L170)
 
 ___
 
@@ -374,7 +673,322 @@ ___
 
 #### Defined in
 
-[server/services/index.ts:110](https://github.com/onzag/itemize/blob/5c2808d3/server/services/index.ts#L110)
+[server/services/index.ts:116](https://github.com/onzag/itemize/blob/f2db74a5/server/services/index.ts#L116)
+
+___
+
+### formatForward
+
+▸ **formatForward**(`html`, `lang`, `message`, `isBreak`): `Promise`<`string`\>
+
+This formats a forwarded message for when it's sent to an external target
+
+#### Parameters
+
+| Name | Type | Description |
+| :------ | :------ | :------ |
+| `html` | `string` | the html of the forwarded message itself |
+| `lang` | `string` | - |
+| `message` | [`ISQLTableRowValue`](../interfaces/base_Root_sql.ISQLTableRowValue.md) | the message object itself |
+| `isBreak` | `boolean` | whether this message actually can't fit due to size limitations (do not try to render much the thread is broken) |
+
+#### Returns
+
+`Promise`<`string`\>
+
+#### Inherited from
+
+[default](server_services_base_MailProvider.default.md).[formatForward](server_services_base_MailProvider.default.md#formatforward)
+
+#### Defined in
+
+[server/services/base/MailProvider.ts:2701](https://github.com/onzag/itemize/blob/f2db74a5/server/services/base/MailProvider.ts#L2701)
+
+___
+
+### getBreakHeader
+
+▸ **getBreakHeader**(`lang`): `string`
+
+#### Parameters
+
+| Name | Type |
+| :------ | :------ |
+| `lang` | `string` |
+
+#### Returns
+
+`string`
+
+#### Inherited from
+
+[default](server_services_base_MailProvider.default.md).[getBreakHeader](server_services_base_MailProvider.default.md#getbreakheader)
+
+#### Defined in
+
+[server/services/base/MailProvider.ts:2826](https://github.com/onzag/itemize/blob/f2db74a5/server/services/base/MailProvider.ts#L2826)
+
+___
+
+### getExtraArgs
+
+▸ **getExtraArgs**(): `any`
+
+#### Returns
+
+`any`
+
+#### Inherited from
+
+[default](server_services_base_MailProvider.default.md).[getExtraArgs](server_services_base_MailProvider.default.md#getextraargs)
+
+#### Defined in
+
+[server/services/base/MailProvider.ts:495](https://github.com/onzag/itemize/blob/f2db74a5/server/services/base/MailProvider.ts#L495)
+
+___
+
+### getForwardDateIndicator
+
+▸ **getForwardDateIndicator**(`lang`): `string`
+
+#### Parameters
+
+| Name | Type |
+| :------ | :------ |
+| `lang` | `string` |
+
+#### Returns
+
+`string`
+
+#### Inherited from
+
+[default](server_services_base_MailProvider.default.md).[getForwardDateIndicator](server_services_base_MailProvider.default.md#getforwarddateindicator)
+
+#### Defined in
+
+[server/services/base/MailProvider.ts:2814](https://github.com/onzag/itemize/blob/f2db74a5/server/services/base/MailProvider.ts#L2814)
+
+___
+
+### getForwardDeletedIndicator
+
+▸ **getForwardDeletedIndicator**(`lang`): `string`
+
+#### Parameters
+
+| Name | Type |
+| :------ | :------ |
+| `lang` | `string` |
+
+#### Returns
+
+`string`
+
+#### Inherited from
+
+[default](server_services_base_MailProvider.default.md).[getForwardDeletedIndicator](server_services_base_MailProvider.default.md#getforwarddeletedindicator)
+
+#### Defined in
+
+[server/services/base/MailProvider.ts:2798](https://github.com/onzag/itemize/blob/f2db74a5/server/services/base/MailProvider.ts#L2798)
+
+___
+
+### getForwardFromIndicator
+
+▸ **getForwardFromIndicator**(`lang`): `string`
+
+#### Parameters
+
+| Name | Type |
+| :------ | :------ |
+| `lang` | `string` |
+
+#### Returns
+
+`string`
+
+#### Inherited from
+
+[default](server_services_base_MailProvider.default.md).[getForwardFromIndicator](server_services_base_MailProvider.default.md#getforwardfromindicator)
+
+#### Defined in
+
+[server/services/base/MailProvider.ts:2802](https://github.com/onzag/itemize/blob/f2db74a5/server/services/base/MailProvider.ts#L2802)
+
+___
+
+### getForwardMessageHeader
+
+▸ **getForwardMessageHeader**(`lang`): `string`
+
+#### Parameters
+
+| Name | Type |
+| :------ | :------ |
+| `lang` | `string` |
+
+#### Returns
+
+`string`
+
+#### Inherited from
+
+[default](server_services_base_MailProvider.default.md).[getForwardMessageHeader](server_services_base_MailProvider.default.md#getforwardmessageheader)
+
+#### Defined in
+
+[server/services/base/MailProvider.ts:2822](https://github.com/onzag/itemize/blob/f2db74a5/server/services/base/MailProvider.ts#L2822)
+
+___
+
+### getForwardProxyIndicator
+
+▸ **getForwardProxyIndicator**(`lang`): `string`
+
+#### Parameters
+
+| Name | Type |
+| :------ | :------ |
+| `lang` | `string` |
+
+#### Returns
+
+`string`
+
+#### Inherited from
+
+[default](server_services_base_MailProvider.default.md).[getForwardProxyIndicator](server_services_base_MailProvider.default.md#getforwardproxyindicator)
+
+#### Defined in
+
+[server/services/base/MailProvider.ts:2806](https://github.com/onzag/itemize/blob/f2db74a5/server/services/base/MailProvider.ts#L2806)
+
+___
+
+### getForwardSubjectIndicator
+
+▸ **getForwardSubjectIndicator**(`lang`): `string`
+
+#### Parameters
+
+| Name | Type |
+| :------ | :------ |
+| `lang` | `string` |
+
+#### Returns
+
+`string`
+
+#### Inherited from
+
+[default](server_services_base_MailProvider.default.md).[getForwardSubjectIndicator](server_services_base_MailProvider.default.md#getforwardsubjectindicator)
+
+#### Defined in
+
+[server/services/base/MailProvider.ts:2818](https://github.com/onzag/itemize/blob/f2db74a5/server/services/base/MailProvider.ts#L2818)
+
+___
+
+### getForwardSubjectReplace
+
+▸ **getForwardSubjectReplace**(`lang`, `username`, `proxyname`, `proxyType`): `string`
+
+#### Parameters
+
+| Name | Type |
+| :------ | :------ |
+| `lang` | `string` |
+| `username` | `string` |
+| `proxyname` | `string` |
+| `proxyType` | `string` |
+
+#### Returns
+
+`string`
+
+#### Inherited from
+
+[default](server_services_base_MailProvider.default.md).[getForwardSubjectReplace](server_services_base_MailProvider.default.md#getforwardsubjectreplace)
+
+#### Defined in
+
+[server/services/base/MailProvider.ts:2781](https://github.com/onzag/itemize/blob/f2db74a5/server/services/base/MailProvider.ts#L2781)
+
+___
+
+### getForwardToIndicator
+
+▸ **getForwardToIndicator**(`lang`): `string`
+
+#### Parameters
+
+| Name | Type |
+| :------ | :------ |
+| `lang` | `string` |
+
+#### Returns
+
+`string`
+
+#### Inherited from
+
+[default](server_services_base_MailProvider.default.md).[getForwardToIndicator](server_services_base_MailProvider.default.md#getforwardtoindicator)
+
+#### Defined in
+
+[server/services/base/MailProvider.ts:2810](https://github.com/onzag/itemize/blob/f2db74a5/server/services/base/MailProvider.ts#L2810)
+
+___
+
+### getForwardViewAtIndicator
+
+▸ **getForwardViewAtIndicator**(`lang`): `string`
+
+#### Parameters
+
+| Name | Type |
+| :------ | :------ |
+| `lang` | `string` |
+
+#### Returns
+
+`string`
+
+#### Inherited from
+
+[default](server_services_base_MailProvider.default.md).[getForwardViewAtIndicator](server_services_base_MailProvider.default.md#getforwardviewatindicator)
+
+#### Defined in
+
+[server/services/base/MailProvider.ts:2794](https://github.com/onzag/itemize/blob/f2db74a5/server/services/base/MailProvider.ts#L2794)
+
+___
+
+### getForwardViewAtURL
+
+▸ **getForwardViewAtURL**(`lang`, `message`): `string`
+
+#### Parameters
+
+| Name | Type |
+| :------ | :------ |
+| `lang` | `string` |
+| `message` | [`ISQLTableRowValue`](../interfaces/base_Root_sql.ISQLTableRowValue.md) |
+
+#### Returns
+
+`string`
+
+#### Inherited from
+
+[default](server_services_base_MailProvider.default.md).[getForwardViewAtURL](server_services_base_MailProvider.default.md#getforwardviewaturl)
+
+#### Defined in
+
+[server/services/base/MailProvider.ts:2789](https://github.com/onzag/itemize/blob/f2db74a5/server/services/base/MailProvider.ts#L2789)
 
 ___
 
@@ -392,13 +1006,115 @@ ___
 
 #### Defined in
 
-[server/services/index.ts:74](https://github.com/onzag/itemize/blob/5c2808d3/server/services/index.ts#L74)
+[server/services/index.ts:80](https://github.com/onzag/itemize/blob/f2db74a5/server/services/index.ts#L80)
+
+___
+
+### getLangHeader
+
+▸ **getLangHeader**(`lang`, `id`, `def`): `string`
+
+#### Parameters
+
+| Name | Type |
+| :------ | :------ |
+| `lang` | `string` |
+| `id` | `string` |
+| `def` | `string` |
+
+#### Returns
+
+`string`
+
+#### Inherited from
+
+[default](server_services_base_MailProvider.default.md).[getLangHeader](server_services_base_MailProvider.default.md#getlangheader)
+
+#### Defined in
+
+[server/services/base/MailProvider.ts:2835](https://github.com/onzag/itemize/blob/f2db74a5/server/services/base/MailProvider.ts#L2835)
+
+___
+
+### getNoReplySubjectPrefix
+
+▸ **getNoReplySubjectPrefix**(`lang`): `string`
+
+#### Parameters
+
+| Name | Type |
+| :------ | :------ |
+| `lang` | `string` |
+
+#### Returns
+
+`string`
+
+#### Inherited from
+
+[default](server_services_base_MailProvider.default.md).[getNoReplySubjectPrefix](server_services_base_MailProvider.default.md#getnoreplysubjectprefix)
+
+#### Defined in
+
+[server/services/base/MailProvider.ts:2777](https://github.com/onzag/itemize/blob/f2db74a5/server/services/base/MailProvider.ts#L2777)
+
+___
+
+### getNotificationsUsername
+
+▸ **getNotificationsUsername**(`lang`): `string`
+
+#### Parameters
+
+| Name | Type |
+| :------ | :------ |
+| `lang` | `string` |
+
+#### Returns
+
+`string`
+
+#### Inherited from
+
+[default](server_services_base_MailProvider.default.md).[getNotificationsUsername](server_services_base_MailProvider.default.md#getnotificationsusername)
+
+#### Defined in
+
+[server/services/base/MailProvider.ts:2785](https://github.com/onzag/itemize/blob/f2db74a5/server/services/base/MailProvider.ts#L2785)
+
+___
+
+### getObjectName
+
+▸ **getObjectName**(`object`): `any`
+
+Provides the name of an object for the user
+
+**`override`**
+
+#### Parameters
+
+| Name | Type |
+| :------ | :------ |
+| `object` | [`ISQLTableRowValue`](../interfaces/base_Root_sql.ISQLTableRowValue.md) |
+
+#### Returns
+
+`any`
+
+#### Inherited from
+
+[default](server_services_base_MailProvider.default.md).[getObjectName](server_services_base_MailProvider.default.md#getobjectname)
+
+#### Defined in
+
+[server/services/base/MailProvider.ts:2139](https://github.com/onzag/itemize/blob/f2db74a5/server/services/base/MailProvider.ts#L2139)
 
 ___
 
 ### getRouter
 
-▸ **getRouter**(`appData`): `Router` \| `Promise`<`Router`\>
+▸ **getRouter**(): `Promise`<`Router`\>
 
 Provides a router endpoint, the router endpoint
 will exist directly under the rest services
@@ -412,25 +1128,17 @@ for the global manager
 
 The router gets attached to /rest/service
 
-**`override`**
-
-#### Parameters
-
-| Name | Type |
-| :------ | :------ |
-| `appData` | [`IAppDataType`](../interfaces/server.IAppDataType.md) |
-
 #### Returns
 
-`Router` \| `Promise`<`Router`\>
+`Promise`<`Router`\>
 
-#### Inherited from
+#### Overrides
 
 [default](server_services_base_MailProvider.default.md).[getRouter](server_services_base_MailProvider.default.md#getrouter)
 
 #### Defined in
 
-[server/services/index.ts:251](https://github.com/onzag/itemize/blob/5c2808d3/server/services/index.ts#L251)
+[server/services/fake-mail.ts:29](https://github.com/onzag/itemize/blob/f2db74a5/server/services/fake-mail.ts#L29)
 
 ___
 
@@ -453,22 +1161,42 @@ should run over again
 
 #### Defined in
 
-[server/services/index.ts:224](https://github.com/onzag/itemize/blob/5c2808d3/server/services/index.ts#L224)
+[server/services/index.ts:239](https://github.com/onzag/itemize/blob/f2db74a5/server/services/index.ts#L239)
 
 ___
 
-### getTriggerRegistry
+### getSizeLimit
 
-▸ **getTriggerRegistry**(): [`ITriggerRegistry`](../interfaces/server_resolvers_triggers.ITriggerRegistry.md) \| `Promise`<[`ITriggerRegistry`](../interfaces/server_resolvers_triggers.ITriggerRegistry.md)\>
+▸ **getSizeLimit**(): `number`
 
-Allows to setup trigger registries via the service
-so that they trigger just as normal trigger will do
+The maximum message size in bytes that you are capable of sending
 
 **`override`**
 
 #### Returns
 
-[`ITriggerRegistry`](../interfaces/server_resolvers_triggers.ITriggerRegistry.md) \| `Promise`<[`ITriggerRegistry`](../interfaces/server_resolvers_triggers.ITriggerRegistry.md)\>
+`number`
+
+#### Inherited from
+
+[default](server_services_base_MailProvider.default.md).[getSizeLimit](server_services_base_MailProvider.default.md#getsizelimit)
+
+#### Defined in
+
+[server/services/base/MailProvider.ts:2847](https://github.com/onzag/itemize/blob/f2db74a5/server/services/base/MailProvider.ts#L2847)
+
+___
+
+### getTriggerRegistry
+
+▸ **getTriggerRegistry**(): [`ITriggerRegistry`](../interfaces/server_resolvers_triggers.ITriggerRegistry.md)
+
+Allows to setup trigger registries via the service
+so that they trigger just as normal trigger will do
+
+#### Returns
+
+[`ITriggerRegistry`](../interfaces/server_resolvers_triggers.ITriggerRegistry.md)
 
 #### Inherited from
 
@@ -476,13 +1204,41 @@ so that they trigger just as normal trigger will do
 
 #### Defined in
 
-[server/services/index.ts:278](https://github.com/onzag/itemize/blob/5c2808d3/server/services/index.ts#L278)
+[server/services/base/MailProvider.ts:2206](https://github.com/onzag/itemize/blob/f2db74a5/server/services/base/MailProvider.ts#L2206)
+
+___
+
+### getUserName
+
+▸ **getUserName**(`user`): `any`
+
+provides the user name for a given user
+
+**`overide`**
+
+#### Parameters
+
+| Name | Type |
+| :------ | :------ |
+| `user` | [`ISQLTableRowValue`](../interfaces/base_Root_sql.ISQLTableRowValue.md) |
+
+#### Returns
+
+`any`
+
+#### Inherited from
+
+[default](server_services_base_MailProvider.default.md).[getUserName](server_services_base_MailProvider.default.md#getusername)
+
+#### Defined in
+
+[server/services/base/MailProvider.ts:2130](https://github.com/onzag/itemize/blob/f2db74a5/server/services/base/MailProvider.ts#L2130)
 
 ___
 
 ### initialize
 
-▸ **initialize**(): `void` \| `Promise`<`void`\>
+▸ **initialize**(): `void`
 
 This function is executed during
 the initialization of the service
@@ -491,19 +1247,17 @@ If your service is a global service you will
 have access to the global resources while
 this function executes
 
-**`override`**
-
 #### Returns
 
-`void` \| `Promise`<`void`\>
+`void`
 
-#### Inherited from
+#### Overrides
 
 [default](server_services_base_MailProvider.default.md).[initialize](server_services_base_MailProvider.default.md#initialize)
 
 #### Defined in
 
-[server/services/index.ts:215](https://github.com/onzag/itemize/blob/5c2808d3/server/services/index.ts#L215)
+[server/services/fake-mail.ts:10](https://github.com/onzag/itemize/blob/f2db74a5/server/services/fake-mail.ts#L10)
 
 ___
 
@@ -521,7 +1275,7 @@ ___
 
 #### Defined in
 
-[server/services/index.ts:78](https://github.com/onzag/itemize/blob/5c2808d3/server/services/index.ts#L78)
+[server/services/index.ts:84](https://github.com/onzag/itemize/blob/f2db74a5/server/services/index.ts#L84)
 
 ___
 
@@ -539,20 +1293,25 @@ ___
 
 #### Defined in
 
-[server/services/index.ts:82](https://github.com/onzag/itemize/blob/5c2808d3/server/services/index.ts#L82)
+[server/services/index.ts:88](https://github.com/onzag/itemize/blob/f2db74a5/server/services/index.ts#L88)
 
 ___
 
 ### logDebug
 
-▸ **logDebug**(`str`, `extra?`): `void`
+▸ **logDebug**<`T`\>(`data`): `void`
+
+#### Type parameters
+
+| Name |
+| :------ |
+| `T` |
 
 #### Parameters
 
 | Name | Type |
 | :------ | :------ |
-| `str` | `string` |
-| `extra?` | `any` |
+| `data` | [`IItemizeLoggingStructure`](../interfaces/server_logger.IItemizeLoggingStructure.md)<`T`\> |
 
 #### Returns
 
@@ -564,20 +1323,25 @@ ___
 
 #### Defined in
 
-[server/services/index.ts:90](https://github.com/onzag/itemize/blob/5c2808d3/server/services/index.ts#L90)
+[server/services/index.ts:96](https://github.com/onzag/itemize/blob/f2db74a5/server/services/index.ts#L96)
 
 ___
 
 ### logError
 
-▸ **logError**(`str`, `extra?`): `void`
+▸ **logError**<`T`\>(`data`): `void`
+
+#### Type parameters
+
+| Name |
+| :------ |
+| `T` |
 
 #### Parameters
 
 | Name | Type |
 | :------ | :------ |
-| `str` | `string` |
-| `extra?` | `any` |
+| `data` | [`IItemizeLoggingErrorStructure`](../interfaces/server_logger.IItemizeLoggingErrorStructure.md)<`T`\> |
 
 #### Returns
 
@@ -589,20 +1353,25 @@ ___
 
 #### Defined in
 
-[server/services/index.ts:94](https://github.com/onzag/itemize/blob/5c2808d3/server/services/index.ts#L94)
+[server/services/index.ts:100](https://github.com/onzag/itemize/blob/f2db74a5/server/services/index.ts#L100)
 
 ___
 
 ### logInfo
 
-▸ **logInfo**(`str`, `extra?`): `void`
+▸ **logInfo**<`T`\>(`data`): `void`
+
+#### Type parameters
+
+| Name |
+| :------ |
+| `T` |
 
 #### Parameters
 
 | Name | Type |
 | :------ | :------ |
-| `str` | `string` |
-| `extra?` | `any` |
+| `data` | [`IItemizeLoggingStructure`](../interfaces/server_logger.IItemizeLoggingStructure.md)<`T`\> |
 
 #### Returns
 
@@ -614,18 +1383,79 @@ ___
 
 #### Defined in
 
-[server/services/index.ts:86](https://github.com/onzag/itemize/blob/5c2808d3/server/services/index.ts#L86)
+[server/services/index.ts:92](https://github.com/onzag/itemize/blob/f2db74a5/server/services/index.ts#L92)
 
 ___
 
-### onEmailRecieved
+### onEmailReceivedReplyResolver
 
-▸ **onEmailRecieved**(`data`): `void`
+▸ **onEmailReceivedReplyResolver**(`calculatedId`, `data`, `user`, `isSender`): `Promise`<[`ISQLTableRowValue`](../interfaces/base_Root_sql.ISQLTableRowValue.md)\>
+
+#### Parameters
+
+| Name | Type |
+| :------ | :------ |
+| `calculatedId` | `string` |
+| `data` | [`IReceiveEmailData`](../interfaces/server_services_base_MailProvider.IReceiveEmailData.md) |
+| `user` | [`ISQLTableRowValue`](../interfaces/base_Root_sql.ISQLTableRowValue.md) |
+| `isSender` | `boolean` |
+
+#### Returns
+
+`Promise`<[`ISQLTableRowValue`](../interfaces/base_Root_sql.ISQLTableRowValue.md)\>
+
+#### Inherited from
+
+[default](server_services_base_MailProvider.default.md).[onEmailReceivedReplyResolver](server_services_base_MailProvider.default.md#onemailreceivedreplyresolver)
+
+#### Defined in
+
+[server/services/base/MailProvider.ts:262](https://github.com/onzag/itemize/blob/f2db74a5/server/services/base/MailProvider.ts#L262)
+
+___
+
+### onExternalEmailBounced
+
+▸ **onExternalEmailBounced**(`bounces`, `internalSender`, `data`): `Promise`<`void`\>
+
+**`override`**
+An email was externally received but no proper receiver could be found for such users, the bounces
+are very specific to the
+
+#### Parameters
+
+| Name | Type | Description |
+| :------ | :------ | :------ |
+| `bounces` | `string`[] | - |
+| `internalSender` | [`ISQLTableRowValue`](../interfaces/base_Root_sql.ISQLTableRowValue.md) | the user that sent the message (or null) if it couldn't find one |
+| `data` | [`IReceiveEmailData`](../interfaces/server_services_base_MailProvider.IReceiveEmailData.md) | the external email itself |
+
+#### Returns
+
+`Promise`<`void`\>
+
+#### Inherited from
+
+[default](server_services_base_MailProvider.default.md).[onExternalEmailBounced](server_services_base_MailProvider.default.md#onexternalemailbounced)
+
+#### Defined in
+
+[server/services/base/MailProvider.ts:1567](https://github.com/onzag/itemize/blob/f2db74a5/server/services/base/MailProvider.ts#L1567)
+
+___
+
+### onExternalEmailReceived
+
+▸ **onExternalEmailReceived**(`data`): `Promise`<`void`\>
 
 This method should get called once an email has been received
 the service provider that extended the raw mail provider should
 be able to trigger this function when specified, this function will
 handle the mail configuration then and perform unsubscription tasks
+
+NOTE this method can only be called in an extended instance and not
+in the global context because it uses the cache, do not receive your emails
+in the global context
 
 #### Parameters
 
@@ -635,15 +1465,241 @@ handle the mail configuration then and perform unsubscription tasks
 
 #### Returns
 
-`void`
+`Promise`<`void`\>
 
 #### Inherited from
 
-[default](server_services_base_MailProvider.default.md).[onEmailRecieved](server_services_base_MailProvider.default.md#onemailrecieved)
+[default](server_services_base_MailProvider.default.md).[onExternalEmailReceived](server_services_base_MailProvider.default.md#onexternalemailreceived)
 
 #### Defined in
 
-[server/services/base/MailProvider.ts:591](https://github.com/onzag/itemize/blob/5c2808d3/server/services/base/MailProvider.ts#L591)
+[server/services/base/MailProvider.ts:1070](https://github.com/onzag/itemize/blob/f2db74a5/server/services/base/MailProvider.ts#L1070)
+
+___
+
+### onUsersReceivedExternalEmail
+
+▸ **onUsersReceivedExternalEmail**(`users`, `internalSender`, `message`, `data`, `spam`): `Promise`<`void`\>
+
+**`override`**
+An user received an email from an external source to their internal email, eg. from dude@gmail.com to girl@mysite.com
+by default this function will send an email notification based on the subscribe e_notifications property
+unless marked as spam
+
+#### Parameters
+
+| Name | Type | Description |
+| :------ | :------ | :------ |
+| `users` | [`ISQLTableRowValue`](../interfaces/base_Root_sql.ISQLTableRowValue.md)[] | - |
+| `internalSender` | [`ISQLTableRowValue`](../interfaces/base_Root_sql.ISQLTableRowValue.md) | the user that sent the message (or null) if it couldn't find one |
+| `message` | [`ISQLTableRowValue`](../interfaces/base_Root_sql.ISQLTableRowValue.md) | - |
+| `data` | [`IReceiveEmailData`](../interfaces/server_services_base_MailProvider.IReceiveEmailData.md) | the external email itself |
+| `spam` | `boolean` | whether it was marked as spam, note that data.spam is whether it was marked by spam by the provider whereas this spam variable is affected by that as well as by allowUserToReceiveExternalEmail |
+
+#### Returns
+
+`Promise`<`void`\>
+
+#### Inherited from
+
+[default](server_services_base_MailProvider.default.md).[onUsersReceivedExternalEmail](server_services_base_MailProvider.default.md#onusersreceivedexternalemail)
+
+#### Defined in
+
+[server/services/base/MailProvider.ts:1582](https://github.com/onzag/itemize/blob/f2db74a5/server/services/base/MailProvider.ts#L1582)
+
+___
+
+### onUsersReceivedInternalEmail
+
+▸ **onUsersReceivedInternalEmail**(`users`, `sender`, `message`, `proxyObject`, `spam`): `Promise`<`void`\>
+
+**`override`**
+An user received an email from one user to another user in the same domain, this is an internal
+message, in this case email addresses may not be explicit
+by default the message is assumed to have the right shape for the storage idef definition and will
+be used to render a message clone and send it to the targets real email
+
+#### Parameters
+
+| Name | Type |
+| :------ | :------ |
+| `users` | [`ISQLTableRowValue`](../interfaces/base_Root_sql.ISQLTableRowValue.md)[] |
+| `sender` | [`ISQLTableRowValue`](../interfaces/base_Root_sql.ISQLTableRowValue.md) |
+| `message` | [`ISQLTableRowValue`](../interfaces/base_Root_sql.ISQLTableRowValue.md) |
+| `proxyObject` | [`ISQLTableRowValue`](../interfaces/base_Root_sql.ISQLTableRowValue.md) |
+| `spam` | `boolean` |
+
+#### Returns
+
+`Promise`<`void`\>
+
+#### Inherited from
+
+[default](server_services_base_MailProvider.default.md).[onUsersReceivedInternalEmail](server_services_base_MailProvider.default.md#onusersreceivedinternalemail)
+
+#### Defined in
+
+[server/services/base/MailProvider.ts:1987](https://github.com/onzag/itemize/blob/f2db74a5/server/services/base/MailProvider.ts#L1987)
+
+___
+
+### parseRFC2822
+
+▸ **parseRFC2822**(`header`): `IRFC2822Data`[]
+
+#### Parameters
+
+| Name | Type |
+| :------ | :------ |
+| `header` | `string` \| `string`[] |
+
+#### Returns
+
+`IRFC2822Data`[]
+
+#### Inherited from
+
+[default](server_services_base_MailProvider.default.md).[parseRFC2822](server_services_base_MailProvider.default.md#parserfc2822)
+
+#### Defined in
+
+[server/services/base/MailProvider.ts:374](https://github.com/onzag/itemize/blob/f2db74a5/server/services/base/MailProvider.ts#L374)
+
+___
+
+### renderMessageForMail
+
+▸ **renderMessageForMail**(`message`, `lang?`, `internalForwardOptions?`): `Promise`<[`IEmailRenderedMessage`](../interfaces/server_services_base_MailProvider.IEmailRenderedMessage.md)\>
+
+Given a message from the database it will provide the resulting
+html with all links resolved to be sent by email as well as the attachment
+list to be appended
+
+it will also resolve forwarded messages based on a reply unless internal forward options
+are specified that will deny such event
+
+#### Parameters
+
+| Name | Type |
+| :------ | :------ |
+| `message` | [`ISQLTableRowValue`](../interfaces/base_Root_sql.ISQLTableRowValue.md) |
+| `lang?` | `string` |
+| `internalForwardOptions?` | `Object` |
+| `internalForwardOptions.from` | `string` |
+| `internalForwardOptions.fromProxy?` | `string` |
+| `internalForwardOptions.lang?` | `string` |
+| `internalForwardOptions.subjectReplace` | `string` |
+
+#### Returns
+
+`Promise`<[`IEmailRenderedMessage`](../interfaces/server_services_base_MailProvider.IEmailRenderedMessage.md)\>
+
+#### Inherited from
+
+[default](server_services_base_MailProvider.default.md).[renderMessageForMail](server_services_base_MailProvider.default.md#rendermessageformail)
+
+#### Defined in
+
+[server/services/base/MailProvider.ts:1788](https://github.com/onzag/itemize/blob/f2db74a5/server/services/base/MailProvider.ts#L1788)
+
+___
+
+### renderMessageFormatForward
+
+▸ **renderMessageFormatForward**(`parentMessage`, `lang`, `size`): `Promise`<[`IEmailRenderedMessage`](../interfaces/server_services_base_MailProvider.IEmailRenderedMessage.md)\>
+
+when the renderMessageForMail is running this function gets called with the given message
+the size that is currently working at, and the replyId aka a parent for this element that is the reply
+so that it can produce forward html inside the html of the email, by default it will call the format forward function
+which can be modified for a different format
+
+**`override`** for a different effect, for example, return nothing {attachments: null, cidMap: null, html: "", predictedSize: 0}
+so that forwarding doesn't cause any modification, override formatForward if what you want to do is to change the format
+
+#### Parameters
+
+| Name | Type |
+| :------ | :------ |
+| `parentMessage` | [`ISQLTableRowValue`](../interfaces/base_Root_sql.ISQLTableRowValue.md) |
+| `lang` | `string` |
+| `size` | `number` |
+
+#### Returns
+
+`Promise`<[`IEmailRenderedMessage`](../interfaces/server_services_base_MailProvider.IEmailRenderedMessage.md)\>
+
+a modified message
+
+#### Inherited from
+
+[default](server_services_base_MailProvider.default.md).[renderMessageFormatForward](server_services_base_MailProvider.default.md#rendermessageformatforward)
+
+#### Defined in
+
+[server/services/base/MailProvider.ts:1726](https://github.com/onzag/itemize/blob/f2db74a5/server/services/base/MailProvider.ts#L1726)
+
+___
+
+### renderMessageFromMail
+
+▸ **renderMessageFromMail**(`html`, `contentIdMap`, `attachments`): `Object`
+
+Given the external email this will convert it into the expected sql row value to be created
+
+#### Parameters
+
+| Name | Type |
+| :------ | :------ |
+| `html` | `string` |
+| `contentIdMap` | `Object` |
+| `attachments` | [`PropertyDefinitionSupportedFilesType`](../modules/base_Root_Module_ItemDefinition_PropertyDefinition_types_files.md#propertydefinitionsupportedfilestype) |
+
+#### Returns
+
+`Object`
+
+| Name | Type |
+| :------ | :------ |
+| `attachments` | [`IPropertyDefinitionSupportedSingleFilesType`](../interfaces/base_Root_Module_ItemDefinition_PropertyDefinition_types_files.IPropertyDefinitionSupportedSingleFilesType.md)[] |
+| `cidAttachments` | [`PropertyDefinitionSupportedFilesType`](../modules/base_Root_Module_ItemDefinition_PropertyDefinition_types_files.md#propertydefinitionsupportedfilestype) |
+| `html` | `string` |
+
+#### Inherited from
+
+[default](server_services_base_MailProvider.default.md).[renderMessageFromMail](server_services_base_MailProvider.default.md#rendermessagefrommail)
+
+#### Defined in
+
+[server/services/base/MailProvider.ts:1671](https://github.com/onzag/itemize/blob/f2db74a5/server/services/base/MailProvider.ts#L1671)
+
+___
+
+### resolveUsersForEmailToItem
+
+▸ **resolveUsersForEmailToItem**(`user`, `target`, `targetType`): `Promise`<[`ISQLTableRowValue`](../interfaces/base_Root_sql.ISQLTableRowValue.md)[]\>
+
+**`override`**
+
+#### Parameters
+
+| Name | Type |
+| :------ | :------ |
+| `user` | [`ISQLTableRowValue`](../interfaces/base_Root_sql.ISQLTableRowValue.md) |
+| `target` | [`ISQLTableRowValue`](../interfaces/base_Root_sql.ISQLTableRowValue.md) |
+| `targetType` | [`default`](base_Root_Module_ItemDefinition.default.md) |
+
+#### Returns
+
+`Promise`<[`ISQLTableRowValue`](../interfaces/base_Root_sql.ISQLTableRowValue.md)[]\>
+
+#### Inherited from
+
+[default](server_services_base_MailProvider.default.md).[resolveUsersForEmailToItem](server_services_base_MailProvider.default.md#resolveusersforemailtoitem)
+
+#### Defined in
+
+[server/services/base/MailProvider.ts:1556](https://github.com/onzag/itemize/blob/f2db74a5/server/services/base/MailProvider.ts#L1556)
 
 ___
 
@@ -665,7 +1721,7 @@ Executes some code
 
 #### Defined in
 
-[server/services/index.ts:232](https://github.com/onzag/itemize/blob/5c2808d3/server/services/index.ts#L232)
+[server/services/index.ts:247](https://github.com/onzag/itemize/blob/f2db74a5/server/services/index.ts#L247)
 
 ___
 
@@ -692,7 +1748,7 @@ needs to send an email
 
 #### Defined in
 
-[server/services/fake-mail.ts:8](https://github.com/onzag/itemize/blob/5c2808d3/server/services/fake-mail.ts#L8)
+[server/services/fake-mail.ts:19](https://github.com/onzag/itemize/blob/f2db74a5/server/services/fake-mail.ts#L19)
 
 ___
 
@@ -736,7 +1792,7 @@ such messages, so this is the best way to send emails
 
 #### Defined in
 
-[server/services/base/MailProvider.ts:332](https://github.com/onzag/itemize/blob/5c2808d3/server/services/base/MailProvider.ts#L332)
+[server/services/base/MailProvider.ts:796](https://github.com/onzag/itemize/blob/f2db74a5/server/services/base/MailProvider.ts#L796)
 
 ___
 
@@ -774,7 +1830,7 @@ will not filter any of these users
 
 #### Defined in
 
-[server/services/base/MailProvider.ts:144](https://github.com/onzag/itemize/blob/5c2808d3/server/services/base/MailProvider.ts#L144)
+[server/services/base/MailProvider.ts:534](https://github.com/onzag/itemize/blob/f2db74a5/server/services/base/MailProvider.ts#L534)
 
 ___
 
@@ -798,7 +1854,36 @@ ___
 
 #### Defined in
 
-[server/services/index.ts:70](https://github.com/onzag/itemize/blob/5c2808d3/server/services/index.ts#L70)
+[server/services/index.ts:76](https://github.com/onzag/itemize/blob/f2db74a5/server/services/index.ts#L76)
+
+___
+
+### setMessageStorageItemDefinition
+
+▸ **setMessageStorageItemDefinition**(`idef`): `void`
+
+Sets the item definition that is in charge of the storage of the
+messages
+the creator will be the target of the message who holds the current username
+for the given email
+
+#### Parameters
+
+| Name | Type | Description |
+| :------ | :------ | :------ |
+| `idef` | [`default`](base_Root_Module_ItemDefinition.default.md) | the item definition to use for storage |
+
+#### Returns
+
+`void`
+
+#### Inherited from
+
+[default](server_services_base_MailProvider.default.md).[setMessageStorageItemDefinition](server_services_base_MailProvider.default.md#setmessagestorageitemdefinition)
+
+#### Defined in
+
+[server/services/base/MailProvider.ts:403](https://github.com/onzag/itemize/blob/f2db74a5/server/services/base/MailProvider.ts#L403)
 
 ___
 
@@ -829,7 +1914,7 @@ ___
 
 #### Defined in
 
-[server/services/index.ts:118](https://github.com/onzag/itemize/blob/5c2808d3/server/services/index.ts#L118)
+[server/services/index.ts:124](https://github.com/onzag/itemize/blob/f2db74a5/server/services/index.ts#L124)
 
 ___
 
@@ -853,7 +1938,7 @@ ___
 
 #### Defined in
 
-[server/services/index.ts:142](https://github.com/onzag/itemize/blob/5c2808d3/server/services/index.ts#L142)
+[server/services/index.ts:148](https://github.com/onzag/itemize/blob/f2db74a5/server/services/index.ts#L148)
 
 ___
 
@@ -877,7 +1962,7 @@ ___
 
 #### Defined in
 
-[server/services/index.ts:114](https://github.com/onzag/itemize/blob/5c2808d3/server/services/index.ts#L114)
+[server/services/index.ts:120](https://github.com/onzag/itemize/blob/f2db74a5/server/services/index.ts#L120)
 
 ___
 
@@ -913,7 +1998,7 @@ the router gets attached to /rest/service
 
 #### Defined in
 
-[server/services/index.ts:268](https://github.com/onzag/itemize/blob/5c2808d3/server/services/index.ts#L268)
+[server/services/index.ts:283](https://github.com/onzag/itemize/blob/f2db74a5/server/services/index.ts#L283)
 
 ___
 
@@ -938,7 +2023,7 @@ This gets attached if a class is used rather than per instance
 
 #### Defined in
 
-[server/services/index.ts:290](https://github.com/onzag/itemize/blob/5c2808d3/server/services/index.ts#L290)
+[server/services/index.ts:305](https://github.com/onzag/itemize/blob/f2db74a5/server/services/index.ts#L305)
 
 ___
 
@@ -962,20 +2047,25 @@ it will instead have access to the global resources
 
 #### Defined in
 
-[server/services/fake-mail.ts:5](https://github.com/onzag/itemize/blob/5c2808d3/server/services/fake-mail.ts#L5)
+[server/services/fake-mail.ts:7](https://github.com/onzag/itemize/blob/f2db74a5/server/services/fake-mail.ts#L7)
 
 ___
 
 ### logDebug
 
-▸ `Static` **logDebug**(`str`, `extra?`): `void`
+▸ `Static` **logDebug**<`T`\>(`data`): `void`
+
+#### Type parameters
+
+| Name |
+| :------ |
+| `T` |
 
 #### Parameters
 
 | Name | Type |
 | :------ | :------ |
-| `str` | `string` |
-| `extra?` | `any` |
+| `data` | [`IItemizeLoggingStructure`](../interfaces/server_logger.IItemizeLoggingStructure.md)<`T`\> |
 
 #### Returns
 
@@ -987,20 +2077,25 @@ ___
 
 #### Defined in
 
-[server/services/index.ts:102](https://github.com/onzag/itemize/blob/5c2808d3/server/services/index.ts#L102)
+[server/services/index.ts:108](https://github.com/onzag/itemize/blob/f2db74a5/server/services/index.ts#L108)
 
 ___
 
 ### logError
 
-▸ `Static` **logError**(`str`, `extra?`): `void`
+▸ `Static` **logError**<`T`\>(`data`): `void`
+
+#### Type parameters
+
+| Name |
+| :------ |
+| `T` |
 
 #### Parameters
 
 | Name | Type |
 | :------ | :------ |
-| `str` | `string` |
-| `extra?` | `any` |
+| `data` | [`IItemizeLoggingErrorStructure`](../interfaces/server_logger.IItemizeLoggingErrorStructure.md)<`T`\> |
 
 #### Returns
 
@@ -1012,20 +2107,25 @@ ___
 
 #### Defined in
 
-[server/services/index.ts:106](https://github.com/onzag/itemize/blob/5c2808d3/server/services/index.ts#L106)
+[server/services/index.ts:112](https://github.com/onzag/itemize/blob/f2db74a5/server/services/index.ts#L112)
 
 ___
 
 ### logInfo
 
-▸ `Static` **logInfo**(`str`, `extra?`): `void`
+▸ `Static` **logInfo**<`T`\>(`data`): `void`
+
+#### Type parameters
+
+| Name |
+| :------ |
+| `T` |
 
 #### Parameters
 
 | Name | Type |
 | :------ | :------ |
-| `str` | `string` |
-| `extra?` | `any` |
+| `data` | [`IItemizeLoggingStructure`](../interfaces/server_logger.IItemizeLoggingStructure.md)<`T`\> |
 
 #### Returns
 
@@ -1037,4 +2137,4 @@ ___
 
 #### Defined in
 
-[server/services/index.ts:98](https://github.com/onzag/itemize/blob/5c2808d3/server/services/index.ts#L98)
+[server/services/index.ts:104](https://github.com/onzag/itemize/blob/f2db74a5/server/services/index.ts#L104)

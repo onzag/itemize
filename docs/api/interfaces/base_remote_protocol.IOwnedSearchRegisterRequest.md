@@ -5,7 +5,7 @@
 [base/remote-protocol](../modules/base_remote_protocol.md).IOwnedSearchRegisterRequest
 
 The owned serach register request to register owned searches by adding a created by field
-check [[IOwnedSearchRecordsAddedEvent]]
+check [IOwnedSearchRecordsEvent](base_remote_protocol.IOwnedSearchRecordsEvent.md)
 
 ## Hierarchy
 
@@ -32,7 +32,7 @@ check [[IOwnedSearchRecordsAddedEvent]]
 
 #### Defined in
 
-[base/remote-protocol.ts:324](https://github.com/onzag/itemize/blob/5c2808d3/base/remote-protocol.ts#L324)
+[base/remote-protocol.ts:340](https://github.com/onzag/itemize/blob/f2db74a5/base/remote-protocol.ts#L340)
 
 ___
 
@@ -46,4 +46,4 @@ IBaseSearchRegisterRequest.qualifiedPathName
 
 #### Defined in
 
-[base/remote-protocol.ts:311](https://github.com/onzag/itemize/blob/5c2808d3/base/remote-protocol.ts#L311)
+[base/remote-protocol.ts:327](https://github.com/onzag/itemize/blob/f2db74a5/base/remote-protocol.ts#L327)
