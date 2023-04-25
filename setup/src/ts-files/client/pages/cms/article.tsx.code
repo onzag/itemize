@@ -11,7 +11,7 @@ import { ItemProvider } from "@onzag/itemize/client/providers/item";
 import Entry from "@onzag/itemize/client/components/property/Entry";
 import SubmitActioner from "@onzag/itemize/client/components/item/SubmitActioner";
 
-import Container from "@mui/material/Container/Container";
+import Container from "@mui/material/Container";
 import Paper from "@mui/material/Paper";
 import Box from "@mui/material/Box";
 import IconButton from "@mui/material/IconButton";

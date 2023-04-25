@@ -83,9 +83,13 @@ export default async function packageSetup(arg: ISetupConfigType): Promise<ISetu
   const currentPackageLockJSON = JSON.parse(await fsAsync.readFile("package-lock.json", "utf-8"));
   let needsReinstall = false;
   const ignoreListPrefix = [
-    "@mui",
+    //"@mui",
+    // tried to ignore it but npm also messes up the imports
+    // npm can't get anything right even once
     "react",
   ];
+  // NPM IS THE MOST STUPID SHIT IN THE WORLD
+  const npmForceRewriteOfPackages = {};
   Object.keys(workingPackageJSON.dependencies).forEach((dependency) => {
     const shallIgnore = ignoreListPrefix.some((p) => dependency.startsWith(p));
     if (shallIgnore) {
@@ -101,17 +105,47 @@ export default async function packageSetup(arg: ISetupConfigType): Promise<ISetu
         needsReinstall = true;
 
         currentPackageLockJSON.dependencies[dependency] = workingPackageJSON.dependencies[dependency];
+        npmForceRewriteOfPackages[dependency] = expectedVersion;
       }
     }
   });
 
+  // why is npm like this why is it such a disgrace?
   if (needsReinstall) {
+    // due to npm being incredibly stupid we need to rewrite the package json just to overwrite the package-lock file
+    // because otherwise it will execute the scripts for installation without consent
+    const newPackageJSONAgainNPMISAMess = JSON.parse(await fsAsync.readFile("package.json", "utf-8"));
+
+    // what a disgrace that npm is
+    Object.keys(npmForceRewriteOfPackages).forEach((v) => {
+      if (newPackageJSONAgainNPMISAMess.dependencies && newPackageJSONAgainNPMISAMess.dependencies[v]) {
+        newPackageJSONAgainNPMISAMess.dependencies[v] = npmForceRewriteOfPackages[v];
+      }
+      if (newPackageJSONAgainNPMISAMess.devDependencies && newPackageJSONAgainNPMISAMess.devDependencies[v]) {
+        newPackageJSONAgainNPMISAMess.devDependencies[v] = npmForceRewriteOfPackages[v];
+      }
+      if (newPackageJSONAgainNPMISAMess.peerDependencies && newPackageJSONAgainNPMISAMess.peerDependencies[v]) {
+        newPackageJSONAgainNPMISAMess.peerDependencies[v] = npmForceRewriteOfPackages[v];
+      }
+    });
+
+    const oldScripts = newPackageJSONAgainNPMISAMess.scripts;
+    delete newPackageJSONAgainNPMISAMess.scripts;
+    console.log("emiting " + colors.green("package.json"));
+    await fsAsync.writeFile("package.json", JSON.stringify(newPackageJSONAgainNPMISAMess, null, 2));
+
     console.log("emiting " + colors.green("package-lock.json"));
     await fsAsync.writeFile("package-lock.json", JSON.stringify(currentPackageLockJSON, null, 2));
-    console.log(colors.yellow("Removing invalid node_modules and reinstalling"));
+    //console.log(colors.yellow("Removing invalid node_modules and reinstalling"));
     // same running exec
-    await execAsync("rm -r ./node_modules");
+    //await execAsync("rm -r ./node_modules");
     await execAsync("npm install");
+
+    // hopefully this will prevent npm doing stupid things
+    // for the nth time
+    newPackageJSONAgainNPMISAMess.scripts = oldScripts;
+    console.log("emiting " + colors.green("package.json"));
+    await fsAsync.writeFile("package.json", JSON.stringify(newPackageJSONAgainNPMISAMess, null, 2));
   }
 
   // return the same arg

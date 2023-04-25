@@ -3,7 +3,7 @@ import React from "react";
 import I18nReadMany from "@onzag/itemize/client/components/localization/I18nReadMany";
 
 import Typography from "@mui/material/Typography";
-import Container from "@mui/material/Container/Container";
+import Container from "@mui/material/Container";
 import Paper from "@mui/material/Paper";
 
 /**

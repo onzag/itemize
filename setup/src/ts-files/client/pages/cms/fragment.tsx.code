@@ -12,7 +12,7 @@ import Entry from "@onzag/itemize/client/components/property/Entry";
 import LocationStateReader from "@onzag/itemize/client/components/navigation/LocationStateReader";
 import SubmitActioner from "@onzag/itemize/client/components/item/SubmitActioner";
 
-import Container from "@mui/material/Container/Container";
+import Container from "@mui/material/Container";
 import Paper from "@mui/material/Paper";
 import Box from "@mui/material/Box";
 import List from "@mui/material/List";

@@ -13,7 +13,7 @@ import SubmitActioner from "@onzag/itemize/client/components/item/SubmitActioner
 
 import Divider from "@mui/material/Divider";
 import PhoneIphoneIcon from "@mui/icons-material/PhoneIphone";
-import Container from "@mui/material/Container/Container";
+import Container from "@mui/material/Container";
 import Paper from "@mui/material/Paper";
 import Box from "@mui/material/Box";
 import DoneOutlineIcon from "@mui/icons-material/DoneOutline";
