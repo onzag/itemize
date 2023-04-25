@@ -9,7 +9,7 @@ export default {
   "@babel/core": "7.14.6",
   "@babel/plugin-proposal-class-properties": "7.14.5",
   "@babel/plugin-transform-regenerator": "7.14.5",
-  "@babel/preset-env": "^7.14.7",
+  "@babel/preset-env": "7.14.7",
   "@babel/preset-react": "7.14.5",
   "@babel/preset-typescript": "7.14.5",
   "babel-core": "6.26.3",

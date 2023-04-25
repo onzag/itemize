@@ -11,6 +11,7 @@ import { execAsync } from "../exec";
 import dependencies from "./dependencies";
 import devDependencies from "./dev-dependencies";
 import scripts from "./scripts";
+import { default as workingPackageJSON } from "./package-lock";
 
 /**
  * modifies the package documentation either by installing stuff or by adding scripts onto it
@@ -26,7 +27,7 @@ export default async function packageSetup(arg: ISetupConfigType): Promise<ISetu
   const dependenciesToInstall: string[] = [];
   // and if we don't find it, then we need to install these
   Object.keys(dependencies).forEach((dependency) => {
-    if (!packageJSON.dependencies || !packageJSON.dependencies[dependency]) {
+    if (!packageJSON.dependencies || !packageJSON.dependencies[dependency] || packageJSON.dependencies[dependency] !== dependencies[dependency]) {
       dependenciesToInstall.push(dependency + "@" + dependencies[dependency]);
     }
   });
@@ -41,7 +42,7 @@ export default async function packageSetup(arg: ISetupConfigType): Promise<ISetu
   // now we do the same with dev dependencies
   const devDependenciesToInstall: string[] = [];
   Object.keys(devDependencies).forEach((devDependency) => {
-    if (!packageJSON.devDependencies || !packageJSON.devDependencies[devDependency]) {
+    if (!packageJSON.devDependencies || !packageJSON.devDependencies[devDependency] || packageJSON.devDependencies[devDependency] !== devDependencies[devDependency]) {
       devDependenciesToInstall.push(devDependency + "@" + devDependencies[devDependency]);
     }
   });
@@ -74,6 +75,43 @@ export default async function packageSetup(arg: ISetupConfigType): Promise<ISetu
     newPackageJSON.scripts = newScripts;
     console.log("emiting " + colors.green("package.json"));
     await fsAsync.writeFile("package.json", JSON.stringify(newPackageJSON, null, 2));
+  }
+
+  // now we have to repair the package-lock.json because npm is really strange on
+  // how it resolves everything causing a dependency hell that is impossible to escape
+  // in short npm is really dumb and does things in a non-repeatable manner
+  const currentPackageLockJSON = JSON.parse(await fsAsync.readFile("package-lock.json", "utf-8"));
+  let needsReinstall = false;
+  const ignoreListPrefix = [
+    "@mui",
+    "react",
+  ];
+  Object.keys(workingPackageJSON.dependencies).forEach((dependency) => {
+    const shallIgnore = ignoreListPrefix.some((p) => dependency.startsWith(p));
+    if (shallIgnore) {
+      return;
+    }
+
+    if (currentPackageLockJSON.dependencies[dependency]) {
+      const currentVersion = currentPackageLockJSON.dependencies[dependency].version;
+      const expectedVersion = workingPackageJSON.dependencies[dependency].version;
+
+      if (currentVersion !== expectedVersion) {
+        console.log(colors.yellow("invalid version resolved by npm for " + dependency + " expected: " + expectedVersion + ", current: " + currentVersion));
+        needsReinstall = true;
+
+        currentPackageLockJSON.dependencies[dependency] = workingPackageJSON.dependencies[dependency];
+      }
+    }
+  });
+
+  if (needsReinstall) {
+    console.log("emiting " + colors.green("package-lock.json"));
+    await fsAsync.writeFile("package-lock.json", JSON.stringify(currentPackageLockJSON, null, 2));
+    console.log(colors.yellow("Removing invalid node_modules and reinstalling"));
+    // same running exec
+    await execAsync("rm -r ./node_modules");
+    await execAsync("npm install");
   }
 
   // return the same arg
