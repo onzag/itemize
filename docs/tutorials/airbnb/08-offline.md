@@ -38,31 +38,29 @@ Now after you refresh your page, it should look like this:
 
 ![Catbnb Service Workers Enabled](./images/catbnb-service-workers-enabled.png)
 
-But something is wrong, there's a placeholder where there should be an image, what happened? didn't we just cache our element, yes we did, we cached the url, and the image source and sourceset is actually pointing to the right URL, but it can't be loaded because the service worker has determined that it is offline.
-
-There's a way to cache the images too, a flag is added either in the headers or query string named `sw-cacheable` and making it equal to `true` however it is up to the handler to perform the caching, so in this case it is added as a property, we go to our View for the image and change it to:
+At the time of writing of this tutorial the images would not be cached when using longTermCaching, this is not true anymore and images are now cached; however te service worker file caching mechanism is still available to be used for caching files purposefully, a flag is added either in the headers or query string named `sw-cacheable` and making it equal to `true` however it is up to the handler to perform the caching, so in this case it is added as a property, we go to our View for the image and change it to:
 
 ```tsx
 <View id="image" cacheFiles={true} />
 ```
 
-Now because we have service workers enabled now, it is not enough to run webpack dev alone; we need to do a full blown build before restarting our server with `npm run build`
-
-Your app will now complain of being outdated as you restart the server, let it update and now check how the image is loaded this time.
+This will cause the following scenario (when loading a file)
 
 ![SW Cacheable Image](./images/sw-cacheable-image.png)
 
-And now kill the server again to simulate offline and refresh, it works, at least that bit does.
-
-And none of this caching will affect the realtime nature of itemize, as the application goes back online, things will be updated, and everything will be kept up to date within it.
+And the file will be cached using the service worker (if not availble) otherwise with longTermCaching it will simply use indexedDB.
 
 ## Cache search results
 
-However we have just cached a single element with a specific id, what about searches, searches are a bit more complicated to cache and honestly only recommended when you really need it, in order to cache searches you need to specify a cache policy at the time you perform a search, currently there are three, `none` which is the default, `by-parent` and `by-owner`.
+However we have just cached a single element with a specific id, what about searches, searches are a bit more complicated to cache and honestly only recommended when you really need it, in order to cache searches you need to specify a cache policy at the time you perform a search, originally were three, `none` which is the default, `by-parent` and `by-owner`; and `by-parent-and-owner` and `by-property` have been added recently.
 
 A `by-parent` cache search policy will cache a search by the parent item, it will download all the items that have a specific parent, and we really need to have access to them, it will put them into indexeddb and it will search from there, as you might imagine caching searches isn't meant for very large lists.
 
 A `by-owner` cache search policy will cache a search by the user that owns such items, doing the same mechanism as by parent.
+
+A `by-parent-and-onwer` is a combined cache policy that will use both parent and owner.
+
+A `by-property` cache search policy will use the specific value of a tracked property, only tracked properties are valid to be used in this and they are subtypes of the string type, `exact-identifier-tracked` and `exact-value-tracked` are available; the property should be provided as an argument in the search and the value that you expect to use; tracked properties are by far the most powerful way to do cached searches.
 
 In the case of our list of units, we want to use a by owner because we are the owner of the items, the list of our units is in a different page from our current at the `UnitList` component, our automatic search should now have a `cachePolicy: "by-owner"` in it.
 
@@ -76,31 +74,11 @@ If you check your application cache, your search should be now on the cache.
 
 Caching a search is heavy work as all the possible results must be cached as well, now one good thing about caching searches is that only the results remain having to keep themselves updated, which means that once they donwnload incremental updates and patches get sent by the server side rather than having to download all over.
 
-So now if we do indeed kill the server and refresh without the server on, we get the same issue as before with the images, and we need to apply the same solution.
-
 ![Catbnb Cached Search](./images/catbnb-cached-search.png)
 
-```tsx
-<View
-    id="image"
-    rendererArgs={
-        {
-            // we do not want to link images with with <a> tags like
-            // the active renderer does by default
-            disableImageLinking: true,
-            // we want the image size to load by 30 viewport width
-            // this is used to choose what image resolution to load
-            // so they load faster, we want tiny images
-            imageSizes: "30vw",
-            imageClassName: props.classes.image,
-        }
-    }
-    // we turn on cache files
-    cacheFiles={true}
-/>
-```
+At the time of writing of this tutorial the images would also not be cached, but again, this isn't the case anymore; the solution of using `cacheFiles={true}` is not necessary anymore, but it's still available.
 
-However same as before we want to ensure that this data is destroyed when we log out, we don't want a malicious agent accessing this data from the cache after the user logged out, the search parameters also allow for such mechanism.
+We want to ensure that this data is destroyed when we log out, we don't want a malicious agent accessing this data from the cache after the user logged out, the search parameters also allow for such mechanism.
 
 So we add `markForDestructionOnLogout: true` to where we just added our cache policy.
 

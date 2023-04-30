@@ -928,9 +928,38 @@ const searchResultTemplateArgs = new TemplateArgs({
         return (
             <Reader id="id">
                 {(id: string) => (
-                    <Link to={`/reserve/${id}`}>
-                        {children(null)}
-                    </Link>
+                    // we will retrieve our old context that sits above this that we have
+                    // previously phased
+                    <ItemContextPhase>
+                        <ItemContextRetrieve slot="original">
+                            <ReaderMany data={["planned_check_in", "planned_check_out"]}>
+                                {(checkIn: string, checkOut: string) => {
+                                    // building the url with the criteria
+                                    let url = `/reserve/${id}`;
+                                    if (checkIn || checkOut) {
+                                        url += "?";
+                                    }
+                                    if (checkIn) {
+                                        url += "checkIn=" + encodeURIComponent(checkIn);
+
+                                        if (checkOut) {
+                                            url += "&";
+                                        }
+                                    }
+
+                                    if (checkOut) {
+                                        url += "checkOut=" + encodeURIComponent(checkOut);
+                                    }
+
+                                    return (
+                                        <Link to={url}>
+                                            {children(null)}
+                                        </Link>
+                                    );
+                                }}
+                            </ReaderMany>
+                        </ItemContextRetrieve>
+                    </ItemContextPhase>
                 )}
             </Reader>
         );
@@ -975,19 +1004,21 @@ const templateArgs = new TemplateArgs({
     // as many times as they are required with the new context that they are in
     search_results: new MutatingTemplateArgs((children) => {
         return (
-            <SearchLoader
-                currentPage={0}
-                pageSize={50}
-                cleanOnDismount={true}
-            >
-                {(loader) => {
-                    return loader.searchRecords.map((r) => (
-                        <ItemProvider {...r.providerProps}>
-                            {children(searchResultTemplateArgs)}
-                        </ItemProvider>
-                    ));
-                }}
-            </SearchLoader>
+            <ItemContextPhase slot="original">
+                <SearchLoader
+                    currentPage={0}
+                    pageSize={50}
+                    cleanOnDismount={true}
+                >
+                    {(loader) => {
+                        return loader.searchRecords.map((r) => (
+                            <ItemProvider {...r.providerProps}>
+                                {children(searchResultTemplateArgs)}
+                            </ItemProvider>
+                        ));
+                    }}
+                </SearchLoader>
+            </ItemContextPhase>
         );
     })
 }).wrappedBy(templateContextWrapper);
@@ -1089,34 +1120,58 @@ And now we can start configuring our fragment loaded header at `frontpage/index.
 import { FragmentLoader } from "@onzag/itemize/client/fast-prototyping/components/fragment-loader";
 ```
 
-And now we can use the fragment loader in the place of our `View` component.
+Also under the element we should set a hook for the state
+
+```tsx
+const [editing, setEditing] = useState(null as string);
+```
+
+And now we can use the fragment loader in the place of our `View` component (this is for the header)
 
 ```tsx
 <FragmentLoader
+    editing={editing === "header"}
+    onEdit={setEditing.bind(null, "header")}
+    onCloseEdit={setEditing.bind(null, null)}
+    properties={[
+        "content",
+        "attachments",
+    ]}
     // only these roles can edit
     roles={["ADMIN"]}
+    downloadName="header"
     // the version that we are aiming to deal with right now
     // this allows the fragment loader to realize if it's dealing with
     // a fallback and add the fragment rather than editing
     // if that's the case
     version={languageData.currentLanguage.code}
     // these are the view args we used in our view same ones
-    viewRendererArgs={{ makeTemplate: true, templateArgs }}
-    entryRendererArgs={{
-        // these are the renderer args that we use in our CMS
-        // the same ones
-        context: FRAGMENTS.HEADER,
-        wrapperArgs: {
-            toolbarExtras: [
-                buttonToolbarPrescence,
-            ],
-            drawerExtras: [
-                ...buttonOptions,
-            ],
-            // the disjointed mode so that the toolbars and wrappers are fixed
-            // rather than the standard mode where it flows with the page
-            disjointedMode: true,
-        },
+    viewProps={{
+        content: {
+            rendererArgs: { makeTemplate: true, templateArgs },
+        }
+    }}
+    entryProps={{
+        content: {
+            rendererArgs: {
+                // these are the renderer args that we use in our CMS
+                // the same ones
+                context: FRAGMENTS.HEADER,
+                disjointedMode: true,
+                wrapperArgs: {
+                    toolbarExtras: [
+                        buttonToolbarPrescence,
+                    ],
+                    drawerExtras: [
+                        ...buttonOptions,
+                    ],
+                    // the disjointed mode so that the toolbars and wrappers are fixed
+                    // rather than the standard mode where it flows with the page
+                    disjointedMode: true,
+                    disjointedModeKeepToolbar: true,
+                },
+            }
+        }
     }}
     onBeforeSubmit={(action, options) => {
         // this means that the fragment loader is adding
@@ -1138,10 +1193,14 @@ And now we can use the fragment loader in the place of our `View` component.
 
         return null;
     }}
-/>
+>
+    {(arg) => (arg.content)}
+</FragmentLoader>
 ```
 
 Now if we go to our frontpage, and we are logged in as admins, we will see the following screen that slightly differs from what an average user would see.
+
+You may do the same with the body `View` simply by replacing and ensuring the previous code to use `"body"` wherever `"header"` was used.
 
 ![Catbnb Fragment Loader](./images/catbnb-fragment-loader.png)
 
