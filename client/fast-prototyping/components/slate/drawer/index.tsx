@@ -22,10 +22,14 @@ import { getInfoFor } from "../../../../internal/text/serializer";
 import { AltBadgeReactioner } from "../../alt-badge-reactioner";
 import { AltSectionScroller } from "../../alt-section-scroller";
 import AltPriorityShifter from "../../../../components/accessibility/AltPriorityShifter";
+import Box from "@mui/material/Box";
 
 const style = {
   tab: {
     minWidth: "auto",
+  },
+  elementTitleContainer: {
+    width: "100%",
   },
   elementTitle: {
     textTransform: "capitalize",
@@ -34,6 +38,30 @@ const style = {
     fontSize: "1rem",
     height: "1rem",
     flex: "0 0 1rem",
+    display: "inline-block",
+  },
+  elementTitleSelected: {
+    color: "#0d47a1",
+  },
+  elementTitleUnselected: {
+    cursor: "pointer",
+
+    "&:hover, &:active": {
+      color: "#2196f3",
+    },
+  },
+  ltronly: {
+    ["html[dir='rtl'] &"]: {
+      display: "none",
+    }
+  },
+  rtlonly: {
+    ["html[dir='ltr'] &"]: {
+      display: "none",
+    }
+  },
+  elementIcon: {
+    fontWeight: 100,
   },
 };
 
@@ -50,7 +78,6 @@ export function WrapperDrawer(props: IDrawerContainerProps) {
 
   useEffect(() => {
     if (!props.drawerOpen) {
-      console.log("EFFECT NULL");
       useAccessibilitySelectedOption(null);
     }
   }, [props.drawerOpen]);
@@ -68,7 +95,7 @@ export function WrapperDrawer(props: IDrawerContainerProps) {
 
   // now we need to build the settings
   let settingsForNode: React.ReactNode = null;
-  let titleForNode: string = null;
+  let titleForNode: React.ReactNode = null;
 
   // and that's done based on the selected node
   if (props.state.currentSelectedElement) {
@@ -93,8 +120,72 @@ export function WrapperDrawer(props: IDrawerContainerProps) {
       props.state.currentSelectedElement,
       props.i18nRichInfo,
     );
+    const selectedNodePath = props.state.currentSelectedElementAnchor;
 
-    titleForNode = selectedNodeInfo.name;
+    const potentialBlockParent = props.state.currentSelectedElement === props.state.currentSelectedInlineElement ?
+      getInfoFor(
+        props.state.currentSelectedBlockElement,
+        props.i18nRichInfo,
+      ) : null;
+
+    const superBlockPaths = (props.state.currentSelectedSuperBlockElements || []).filter((e) => e !== props.state.currentSelectedElement).map((v, index) => {
+      return {
+        info: getInfoFor(v, props.i18nRichInfo),
+        path: props.state.currentSelectedSuperBlockElementAnchors[index],
+      }
+    });
+
+    const entirePath = superBlockPaths;
+
+    if (potentialBlockParent) {
+      entirePath.push({
+        info: potentialBlockParent,
+        path: props.state.currentSelectedBlockElementAnchor,
+      });
+    }
+
+    entirePath.push({
+      info: selectedNodeInfo,
+      path: props.state.currentSelectedElementAnchor,
+    });
+
+    titleForNode = entirePath.map((v, i) => {
+      return (
+        <React.Fragment key={i}>
+          {
+            v.info.isInteractive ? (
+              <>
+                <Typography sx={[style.rtlonly, style.elementTitle, style.elementIcon]} variant="h6">{String.fromCharCode(9094)}</Typography>
+              </>
+            ) : null
+          }
+          <Typography
+            sx={i === entirePath.length - 1 ? [style.elementTitle, style.elementTitleSelected] : [style.elementTitle, style.elementTitleUnselected]}
+            role="button"
+            aria-current={i === entirePath.length - 1}
+            variant="h6"
+            onClick={i === entirePath.length - 1 ? null : props.helpers.selectPath.bind(null, v.path)}
+          >
+            {v.info.name}
+          </Typography>
+          {
+            v.info.isInteractive ? (
+              <>
+                <Typography sx={[style.ltronly, style.elementTitle, style.elementIcon]} variant="h6">{String.fromCharCode(9094)}</Typography>
+              </>
+            ) : null
+          }
+          {
+            i === entirePath.length - 1 ? null : (
+              <>
+                <Typography sx={[style.ltronly, style.elementTitle, style.elementIcon]} variant="h6">{String.fromCharCode(11106)}</Typography>
+                <Typography sx={[style.rtlonly, style.elementTitle, style.elementIcon]} variant="h6">{String.fromCharCode(11106)}</Typography>
+              </>
+            )
+          }
+        </React.Fragment>
+      );
+    });
 
     // and now we can build these settings
     // basically here we are building the divider and then
@@ -116,7 +207,7 @@ export function WrapperDrawer(props: IDrawerContainerProps) {
                   tabbable={false}
                   selector="div"
                 >
-                  <div onClick={useAccessibilitySelectedOption.bind(null, null)}/>
+                  <div onClick={useAccessibilitySelectedOption.bind(null, null)} />
                 </AltBadgeReactioner>
                 <Tabs
                   value={location}
@@ -225,7 +316,9 @@ export function WrapperDrawer(props: IDrawerContainerProps) {
   // now we return
   return (
     <>
-      <Typography sx={style.elementTitle} variant="h6">{titleForNode}</Typography>
+      <Box sx={style.elementTitleContainer}>
+        {titleForNode}
+      </Box>
       {settingsForNode}
       <AltSectionScroller priority={1} positioning="absolute" />
     </>

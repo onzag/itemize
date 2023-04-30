@@ -6,6 +6,7 @@
 
 import React from "react";
 import { IPropertyViewFileRendererProps } from "../../../internal/components/PropertyView/PropertyViewFile";
+import Box from "@mui/material/Box";
 
 // check for whether the current environment supports lazyload standard loading form
 // because of SSR we must check for document
@@ -30,6 +31,7 @@ interface IPropertyViewFileRendererState {
  * - nullComponentArgs: an object to pass as props to the null component
  * - nullNode: a react node to render instead of the default when the value is null
  * - imageClassName: the image class name for the img tag when an image is available
+ * - imageSx: the image sx for the img tag
  * - imageSizes: the image sizes for the sizes attribute for the image, default 70vw
  * - lazyLoad: whether to use lazyloading for images alone
  */
@@ -201,13 +203,15 @@ export default class PropertyViewFileRenderer extends React.Component<IPropertyV
       // but data-src will be there, so SEO should be able to figure this one out
       // also including the a tag should find it out
       const img = (
-        <img
+        <Box
+          component="img"
           ref={this.refImg}
           srcSet={!this.state.loaded ? null : this.props.imageSrcSet}
           sizes={imageSizes}
           data-src={this.props.currentValue.url}
           src={!this.state.loaded ? null : this.props.currentValue.url}
           className={imageClassName}
+          sx={this.props.args.imageSx}
           loading={this.props.args.lazyLoad ? "lazy" : null}
           alt={this.props.currentValue.name}
         />

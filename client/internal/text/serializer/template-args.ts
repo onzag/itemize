@@ -286,16 +286,20 @@ export interface ITemplateArgUIHandlerDefinition extends IBaseTemplateArg {
   editorHandler?: any;
 }
 
+export type TemplateProperty = ITemplateArgContextDefinition |
+  ITemplateArgUIHandlerDefinition |
+  ITemplateArgTextDefinition |
+  ITemplateArgLinkDefinition |
+  ITemplateArgHTMLDefinition |
+  ITemplateArgFunctionDefinition |
+  ITemplateArgBooleanDefinition;
+
+export interface ITemplateProperties {
+  [key: string]: TemplateProperty;
+}
+
 export interface ITemplateArgContextDefinition extends IBaseTemplateArg {
   type: "context";
   loopable?: boolean;
-  properties: {
-    [key: string]: ITemplateArgContextDefinition |
-    ITemplateArgUIHandlerDefinition |
-    ITemplateArgTextDefinition |
-    ITemplateArgLinkDefinition |
-    ITemplateArgHTMLDefinition |
-    ITemplateArgFunctionDefinition |
-    ITemplateArgBooleanDefinition
-  };
+  properties: ITemplateProperties;
 }

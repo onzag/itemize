@@ -570,6 +570,11 @@ function elementFastKeyReturn(
   fastKeyOverride?: string,
 ): any {
   const fastKey = fastKeyOverride || props.fastKey;
+
+  if (!fastKey) {
+    return element;
+  }
+
   return (
     <AltBadgeReactioner
       reactionKey={fastKey}

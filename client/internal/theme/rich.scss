@@ -364,6 +364,10 @@ $superblock-highlight-color: #33691e;
   .container.selected {
     box-shadow: inset 0 0 5px $superblock-highlight-color;
   }
+
+  .container:has(.selected) {
+    box-shadow: inset 0 0 3px $superblock-highlight-color;
+  }
 }
 
 .file {

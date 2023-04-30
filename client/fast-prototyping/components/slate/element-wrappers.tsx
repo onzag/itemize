@@ -102,6 +102,140 @@ function getVideoURL(v: IVideo) {
   }
 }
 
+function HTMLWrapper(props: IMaterialUIWrapperElementProps) {
+  const [htmlOptions, setHTMLOptions] = useState<ITemplateOption[]>([]);
+
+  const updateHTML = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
+    const label = htmlOptions.find((o) => o.value === e.target.value);
+    props.helpers.updateTemplateHTML(typeof label.label === "string" ? label.label : label.label(), e.target.value);
+  }, [htmlOptions]);
+
+  useEffect(() => {
+    if (!props.isSelected) {
+      return;
+    }
+
+    const context = props.helpers.getContextFor(props.element);
+    const rootContext = props.helpers.getRootContext();
+
+    // need to find the templated options that are available
+    // given the current context
+    const htmlPropertiesToUse: ITemplateOption[] = [];
+
+    // now we need to grab the current context, if we have any
+    context && Object.keys(context.properties).forEach((key) => {
+      // grab each property and check the type of it
+      const property = context.properties[key];
+      // if it's not a link
+      if (property.type !== "html") {
+        // continue
+        return;
+      }
+
+      // otherwise we have a property we can use
+      htmlPropertiesToUse.push({
+        value: key,
+        label: property.label || key,
+        primary: context !== rootContext,
+      });
+    });
+
+    if (rootContext && rootContext !== context) {
+      Object.keys(rootContext.properties).forEach((key) => {
+        // grab each property and check the type of it
+        const property = rootContext.properties[key];
+
+        if (property.nonRootInheritable) {
+          return;
+        }
+
+        // if it's not a link
+        if (property.type !== "html") {
+          // continue
+          return;
+        }
+
+        // otherwise we have a property we can use
+        htmlPropertiesToUse.push({
+          value: key,
+          label: property.label || key,
+          primary: false,
+        });
+      });
+    }
+
+    // and the value of such is not in the list
+    if (props.element.html && !htmlPropertiesToUse.some((p) => p.value === props.element.html)) {
+      // we add it
+      htmlPropertiesToUse.push({
+        value: props.element.html,
+        label: (props.element.children[0] as any).text,
+        primary: false,
+      });
+    }
+
+    setHTMLOptions(htmlPropertiesToUse);
+  }, [props.element, props.isSelected]);
+
+  const InputToUse = props.inputVariant === "outlined" ? OutlinedInput : FilledInput;
+
+  return (
+    <EditorDropdown
+      componentWrapper="span"
+      isOpen={props.isSelected}
+      dropdown={
+        <AltBadgeReactioner
+          reactionKey="t"
+          priority={typeof props.usePriority === "number" ? props.usePriority : 1}
+          selector="div[tabindex]"
+          action="focus"
+          fullWidth={true}
+          onTabOutTrigger="escape"
+        >
+          <FormControl fullWidth={true}>
+            <InputLabel
+              htmlFor="slate-wrapper-template-html-id"
+              shrink={true}
+            >
+              {props.i18nRichInfo.addTemplateHTML.label}
+            </InputLabel>
+            <Select
+              value={props.element.html}
+              onChange={updateHTML}
+              sx={styles.whiteBackgroundInput}
+              input={
+                <InputToUse
+                  id="slate-wrapper-template-html-id"
+                  placeholder={props.i18nRichInfo.addTemplateHTML.placeholder}
+                  label={props.i18nRichInfo.addTemplateHTML.placeholder}
+                  fullWidth={true}
+                />
+              }
+            >
+              {
+                // render the valid values that we display and choose
+                htmlOptions.map((vv) => {
+                  // the i18n value from the i18n data
+                  return <MenuItem
+                    data-unblur="true"
+                    key={vv.value}
+                    value={vv.value}
+                    sx={vv.primary ? styles.optionPrimary : null}
+                  >{
+                      typeof vv.label == "string" ? vv.label : vv.label()
+                    }</MenuItem>;
+                })
+              }
+            </Select>
+          </FormControl>
+        </AltBadgeReactioner>
+      }
+    >
+      {props.children}
+    </EditorDropdown>
+  );
+}
+
 function TextWrapper(props: IMaterialUIWrapperElementProps) {
   const [textOptions, setTextOptions] = useState<ITemplateOption[]>([]);
 
@@ -797,6 +931,13 @@ export const materialUIElementWrappers: ISlateEditorElementWrappers = {
       }
 
       return (<TextWrapper {...props} />) as any;
+    },
+    "void-block": (props: IMaterialUIWrapperElementProps) => {
+      if (typeof props.element.html === "undefined") {
+        return props.children;
+      }
+
+      return (<HTMLWrapper {...props} />) as any;
     },
     container: (props: IMaterialUIWrapperElementProps) => {
       const updateContainerType = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {

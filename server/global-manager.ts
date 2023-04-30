@@ -34,7 +34,7 @@ import { IManyValueType } from "../database/base";
 import PhoneProvider from "./services/base/PhoneProvider";
 import { ItemizeRawDB } from "./raw-db";
 import { ItemizeElasticClient } from "./elastic";
-import { GLOBAL_MANAGER_MODE, GLOBAL_MANAGER_SERVICES } from "./environment";
+import { GLOBAL_MANAGER_MODE, GLOBAL_MANAGER_SERVICES, REFRESH_ADMIN_PASSWORD } from "./environment";
 
 interface IMantainProp {
   pdef: PropertyDefinition;
@@ -239,7 +239,7 @@ export class GlobalManager {
       primaryAdminUser = await this.databaseConnection.queryFirst(
         `SELECT ${JSON.stringify(
           CONNECTOR_SQL_COLUMN_ID_FK_NAME
-        )} FROM ${JSON.stringify(selfTable)} WHERE "role"='ADMIN' LIMIT 1`
+        )}, "username" FROM ${JSON.stringify(selfTable)} WHERE "role"='ADMIN' LIMIT 1`
       );
     } catch (err) {
       logger.error(
@@ -426,6 +426,52 @@ export class GlobalManager {
           },
         }
       );
+    } else if (REFRESH_ADMIN_PASSWORD) {
+      logger.info(
+        {
+          className: "GlobalManager",
+          methodName: "addAdminUserIfMissing",
+          message: "Admin user is found but REFRESH_ADMIN_PASSWORD is true, updating",
+        }
+      );
+
+      const username = primaryAdminUser.username;
+      const userId = primaryAdminUser[CONNECTOR_SQL_COLUMN_ID_FK_NAME];
+      const newPassword = uuid.v4().replace(/\-/g, "");
+
+      try {
+        await this.databaseConnection.queryFirst(
+          `UPDATE ${JSON.stringify(selfTable)} SET "password"=crypt($1, gen_salt('bf',10)) WHERE ${JSON.stringify(
+            CONNECTOR_SQL_COLUMN_ID_FK_NAME
+          )} = $2`,
+          [
+            newPassword,
+            userId,
+          ]
+        );
+        logger.info(
+          {
+            className: "GlobalManager",
+            methodName: "addAdminUserIfMissing",
+            message: "Sucessfully modified admin user",
+            data: {
+              username,
+              newPassword,
+            },
+          }
+        );
+      } catch (err) {
+        logger.error(
+          {
+            className: "GlobalManager",
+            methodName: "addAdminUserIfMissing",
+            message: "Database does not appear to be connected",
+            serious: true,
+            err,
+          }
+        );
+      }
+
     }
   }
   private processModule(mod: Module) {

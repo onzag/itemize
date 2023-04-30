@@ -8,7 +8,7 @@ We want to send an email notification to the host when this occurs and to the re
 
 ## Creating the request schema
 
-First we want to create the request schema, that will be used to define the item that specifies how a request to a property is to be generated, we will define such as:
+First we want to create the request schema at `hosting/request.json`, that will be used to define the item that specifies how a request to a property is to be generated, we will define such as:
 
 ```json
 {
@@ -283,7 +283,7 @@ We need now to build the page that will allow us to view the property we want to
 import React from "react";
 
 import { ModuleProvider } from "@onzag/itemize/client/providers/module";
-import { IActionResponseWithId, ItemProvider } from "@onzag/itemize/client/providers/item";
+import { IActionSubmitResponse, ItemProvider } from "@onzag/itemize/client/providers/item";
 import TitleSetter from "@onzag/itemize/client/components/util/TitleSetter";
 import Entry from "@onzag/itemize/client/components/property/Entry";
 import View from "@onzag/itemize/client/components/property/View";
@@ -291,7 +291,9 @@ import { Typography } from "@onzag/itemize/client/fast-prototyping/mui-core";
 import { SubmitButton } from "@onzag/itemize/client/fast-prototyping/components/buttons";
 import SubmitActioner from "@onzag/itemize/client/components/item/SubmitActioner";
 import Snackbar from "@onzag/itemize/client/fast-prototyping/components/snackbar";
-import Reader from "@onzag/itemize/client/components/property/Reader";
+import { TextReader } from "@onzag/itemize/client/components/property/Reader";
+
+import Typography from "@mui/material/Typography";
 
 interface IReserveHostingProps {
     match: {
@@ -306,7 +308,7 @@ interface IReserveHostingProps {
  */
 export function ReserveHosting(props: IReserveHostingProps) {
     const idToReserve = props.match.params.id || null;
-    const newRequestRedirectCallback = (data: IActionResponseWithId) => `/reserve/${idToReserve}/request/${data.id}`;
+    const newRequestRedirectCallback = (data: IActionSubmitResponse) => `/reserve/${idToReserve}/request/${data.id}`;
     return (
         <ModuleProvider module="hosting">
             <ItemProvider
@@ -326,14 +328,15 @@ export function ReserveHosting(props: IReserveHostingProps) {
                 ]}
             >
                 {/* we will use the title property and read it raw and use such
-                property value as the title value for the window */}
-                <Reader id="title">
-                    {(title: string) => (
+                property value as the title value for the window, we use TextReader because the text type is complex
+                even when the Reader will work just fine, this infers the type correctly */}
+                <TextReader id="title">
+                    {(title) => (
                         <TitleSetter>
-                            {title}
+                            {title && title.value}
                         </TitleSetter>
                     )}
-                </Reader>
+                </TextReader>
                 <Typography variant="caption">
                     <View id="unit_type" />
                 </Typography>
@@ -625,7 +628,7 @@ On the same reserve page we want to refactor our `reserve/index.tsx` a little bi
 import React from "react";
 
 import { ModuleProvider } from "@onzag/itemize/client/providers/module";
-import { IActionResponseWithId, ItemProvider } from "@onzag/itemize/client/providers/item";
+import { IActionSubmitResponse, ItemProvider } from "@onzag/itemize/client/providers/item";
 import TitleSetter from "@onzag/itemize/client/components/util/TitleSetter";
 import Entry from "@onzag/itemize/client/components/property/Entry";
 import View from "@onzag/itemize/client/components/property/View";
@@ -633,7 +636,8 @@ import { Typography } from "@onzag/itemize/client/fast-prototyping/mui-core";
 import { SubmitButton } from "@onzag/itemize/client/fast-prototyping/components/buttons";
 import SubmitActioner from "@onzag/itemize/client/components/item/SubmitActioner";
 import Snackbar from "@onzag/itemize/client/fast-prototyping/components/snackbar";
-import Reader from "@onzag/itemize/client/components/property/Reader";
+import Reader, { TextReader } from "@onzag/itemize/client/components/property/Reader";
+import Typography from "@mui/material/Typography";
 
 interface IReserveHostingProps {
     match: {
@@ -650,7 +654,7 @@ interface IReserveHostingProps {
 export function ReserveHosting(props: IReserveHostingProps) {
     const idToReserve = props.match.params.id || null;
     const reservationId = props.match.params.rid || null;
-    const newRequestRedirectCallback = (data: IActionResponseWithId) => `/reserve/${idToReserve}/request/${data.id}`;
+    const newRequestRedirectCallback = (data: IActionSubmitResponse) => `/reserve/${idToReserve}/request/${data.id}`;
     return (
         <ModuleProvider module="hosting">
             <ItemProvider
@@ -671,13 +675,13 @@ export function ReserveHosting(props: IReserveHostingProps) {
             >
                 {/* we will use the title property and read it raw and use such
                 property value as the title value for the window */}
-                <Reader id="title">
-                    {(title: string) => (
+                <TextReader id="title">
+                    {(title) => (
                         <TitleSetter>
-                            {title}
+                            {title && title.value}
                         </TitleSetter>
                     )}
-                </Reader>
+                </TextReader>
                 <Typography variant="caption">
                     <View id="unit_type" />
                 </Typography>
@@ -811,17 +815,22 @@ import { ItemProvider } from "@onzag/itemize/client/providers/item";
 import TitleSetter from "@onzag/itemize/client/components/util/TitleSetter";
 import View from "@onzag/itemize/client/components/property/View";
 import Entry from "@onzag/itemize/client/components/property/Entry";
-import { createStyles, List, ListItem, ListItemText, Typography, withStyles, WithStyles } from "@onzag/itemize/client/fast-prototyping/mui-core";
 import I18nRead from "@onzag/itemize/client/components/localization/I18nRead";
 import UserDataRetriever from "@onzag/itemize/client/components/user/UserDataRetriever";
 import { SearchLoaderWithPagination } from "@onzag/itemize/client/fast-prototyping/components/search-loader-with-pagination";
 import Reader from "@onzag/itemize/client/components/property/Reader";
 import Link from "@onzag/itemize/client/components/navigation/Link";
 
+import List from "@mui/material/List";
+import Typography from "@mui/material/Typography";
+import ListItem from "@mui/material/ListItem";
+import ListItemText from "@mui/material/ListItemText";
+import Box from "@mui/material/Box";
+
 /**
  * Some styles for the list of units
  */
-const hostingStyles = createStyles({
+const hostingStyles = {
     image: {
         width: "30%",
         display: "inline-block",
@@ -842,12 +851,12 @@ const hostingStyles = createStyles({
         alignItems: "center",
         justifyContent: "center",
     },
-});
+};
 
 /**
  * Page to add or edit a hosting unit
  */
-export const Reservations = withStyles(hostingStyles)((props: WithStyles<typeof hostingStyles>) => {
+export function Reservations() {
     return (
         <ModuleProvider module="hosting">
             <UserDataRetriever>
@@ -909,7 +918,7 @@ export const Reservations = withStyles(hostingStyles)((props: WithStyles<typeof 
                                                                 <Typography variant="caption" color="textSecondary">
                                                                     <View id="check_in" />{" "}<View id="check_out" />
                                                                 </Typography>
-                                                                <ListItem className={props.classes.listing}>
+                                                                <ListItem sx={hostingStyles.listing}>
                                                                     <ItemProvider
                                                                         itemDefinition="unit"
                                                                         forId={parentId}
@@ -923,16 +932,17 @@ export const Reservations = withStyles(hostingStyles)((props: WithStyles<typeof 
                                                                             id="image"
                                                                             rendererArgs={
                                                                                 {
+                                                                                    useFullImage: true,
                                                                                     // we do not want to link images with with <a> tags like
                                                                                     // the active renderer does by default
                                                                                     disableImageLinking: true,
                                                                                     imageSizes: "30vw",
-                                                                                    imageClassName: props.classes.image,
+                                                                                    imageSx: hostingStyles.image,
                                                                                 }
                                                                             }
                                                                         />
                                                                         <ListItemText
-                                                                            className={props.classes.listingText}
+                                                                            sx={hostingStyles.listingText}
                                                                             primary={<View id="title" />}
                                                                             secondary={<View id="address" rendererArgs={{ hideMap: true }} />}
                                                                         />
@@ -944,9 +954,9 @@ export const Reservations = withStyles(hostingStyles)((props: WithStyles<typeof 
                                                 </ItemProvider>
                                             ))
                                         }
-                                        <div className={props.classes.paginator}>
+                                        <Box sx={hostingStyles.paginator}>
                                             {pagination}
-                                        </div>
+                                        </Box>
                                     </>
                                 )}
                             </SearchLoaderWithPagination>
@@ -956,7 +966,7 @@ export const Reservations = withStyles(hostingStyles)((props: WithStyles<typeof 
             </UserDataRetriever>
         </ModuleProvider >
     );
-});
+}
 ```
 
 And add the respective route entry to the `app.tsx`
@@ -1136,13 +1146,14 @@ And then replace the rendering function of each item that is in the list with th
 <ItemProvider {...r.providerProps}>
     <Reader id="pending_requests_count">
         {(count: number) => (
-            <Badge color="primary" badgeContent={count || 0}>
+            <Badge color="primary" badgeContent={count || 0}>
                 <Link to={`/hosting/view/${r.id}`}>
-                    <ListItem className={props.classes.listing}>
+                    <ListItem sx={unitListStyles.listing}>
                         <View
                             id="image"
                             rendererArgs={
                                 {
+                                    useFullImage: true,
                                     // we do not want to link images with with <a> tags like
                                     // the active renderer does by default
                                     disableImageLinking: true,
@@ -1150,12 +1161,12 @@ And then replace the rendering function of each item that is in the list with th
                                     // this is used to choose what image resolution to load
                                     // so they load faster, we want tiny images
                                     imageSizes: "30vw",
-                                    imageClassName: props.classes.image,
+                                    imageSx: unitListStyles.image,
                                 }
                             }
                         />
                         <ListItemText
-                            className={props.classes.listingText}
+                            sx={unitListStyles.listingText}
                             primary={<View id="title" />}
                             secondary={<View id="address" rendererArgs={{ hideMap: true }} />}
                         />
@@ -1181,11 +1192,7 @@ We want to now create a page for viewing the listing itself and the requests tha
 /**
  * Some styles for the list of units
  */
-const viewHostingStyles = createStyles({
-    image: {
-        width: "30%",
-        display: "inline-block",
-    },
+const viewHostingStyles = {
     listingText: {
         padding: "0 1rem",
     },
@@ -1196,15 +1203,9 @@ const viewHostingStyles = createStyles({
             backgroundColor: "#eee",
         },
     },
-    paginator: {
-        paddingTop: "1rem",
-        display: "flex",
-        alignItems: "center",
-        justifyContent: "center",
-    },
-});
+};
 
-interface IViewHostingProps extends WithStyles<typeof viewHostingStyles> {
+interface IViewHostingProps {
     match: {
         params: {
             id: string;
@@ -1212,7 +1213,7 @@ interface IViewHostingProps extends WithStyles<typeof viewHostingStyles> {
     };
 }
 
-export const ViewHosting = withStyles(viewHostingStyles)((props: IViewHostingProps) => {
+export function ViewHosting(props: IViewHostingProps) {
     const idToView = props.match.params.id || null;
 
     return (
@@ -1312,16 +1313,16 @@ export const ViewHosting = withStyles(viewHostingStyles)((props: IViewHostingPro
                             arg.searchRecords.map((r) => (
                                 <ItemProvider {...r.providerProps}>
                                     <Link to={`/hosting/view/${idToView}/request/${r.id}`}>
-                                        <ListItem className={props.classes.listing}>
+                                        <ListItem sx={viewHostingStyles.listing}>
 
                                             {/**
-                                         * We will read the creator of this record
-                                         */}
+                                              * We will read the creator of this record
+                                              */}
                                             <Reader id="created_by">
                                                 {(createdBy: string) => (
                                                     // and now we will render the item
                                                     <ListItemText
-                                                        className={props.classes.listingText}
+                                                        sx={viewHostingStyles.listingText}
                                                         primary={
                                                             <ModuleProvider
                                                                 module="users"
@@ -1340,13 +1341,6 @@ export const ViewHosting = withStyles(viewHostingStyles)((props: IViewHostingPro
                                                                     // 70 ms of delay during collection
                                                                     waitAndMerge={true}
                                                                     forId={createdBy}
-
-                                                                    // the user contains an externally checked property (unique index)
-                                                                    // that is the username, and the item provider tries to determine
-                                                                    // if the state is adequate by default, this will cause a network
-                                                                    // request, that is totally unecessary because we don't care whether
-                                                                    // the username is unique or not, we aren't modifying it
-                                                                    disableExternalChecks={true}
                                                                 >
                                                                     <View id="username" />
                                                                 </ItemProvider>
@@ -1370,7 +1364,7 @@ export const ViewHosting = withStyles(viewHostingStyles)((props: IViewHostingPro
             </ItemProvider>
         </ItemProvider>
     );
-});
+}
 ```
 
 And we should then register it into the router itself at the `Hosting` component
@@ -1449,7 +1443,6 @@ export function ApproveDenyRequest(props: IApproveDenyRequestProps) {
                                     "role",
                                 ]}
                                 forId={createdBy}
-                                disableExternalChecks={true}
                             >
                                 <Avatar size="large" hideFlag={true} fullWidth={true} />
                                 <View id="username" />

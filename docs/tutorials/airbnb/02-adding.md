@@ -23,9 +23,7 @@ Note that all the look and feel of itemize is customizable, but we will use the 
 
 ## Add the option to the list
 
-Our repository currently holds the basic fast prototyping material ui in a fast prototyping file named mui-core, and while it contains some icons, it does not contain all the icons, only those used by fast prototyping; so we want to add a new dependency.
-
-`npm install --save @material-ui/icons`
+Our repository currently holds the basic fast prototyping material ui in a fast prototyping file named mui-core, so we will take use of that and will simply use the fast prototyping dependencies we hold.
 
 Now we get to the file named `src/client/app.tsx` and find a variable named `MENU_ENTRIES` and add a new entry, remember to import the respective icon.
 
@@ -70,6 +68,8 @@ Remember this only works because we are developing, and our cache is disabled as
 Your menu should now look like:
 
 ![catbnb new menu](./images/catbnb-new-menu.png)
+
+If it doesn't remember that you should be logged in as this is only available for the roles of `USER` and `ADMIN`, not for `&GUEST`.
 
 Click it!... and then there's nothing, because there's no such page as `/hosting`
 
@@ -185,7 +185,7 @@ export function UnitList() {
                                 {
                                     arg.searchRecords.map((r) => (
                                         <ItemProvider {...r.providerProps}>
-                                            <View id="image"/>
+                                            <View id="image" rendererArgs={{ useFullImage: true }}/>
                                             <View id="title"/>
                                             <View id="address" rendererArgs={{ hideMap: true }} />
                                         </ItemProvider>
@@ -228,12 +228,10 @@ that is because we are using automatic search, and because we have specified to 
 But we need a way, a button to add these housing units properly, let's use a material ui icon button for such thing, in our hosting list file on top of the entry, let's add this.
 
 ```tsx
-import { IconButton } from "@onzag/itemize/client/fast-prototyping/mui-core";
 import Link from "@onzag/itemize/client/components/navigation/Link";
-import AddIcon from '@material-ui/icons/Add';
 ```
 
-And add the button on top on your list
+And add the button on top on your list, remember to resolve the material imports
 
 ```tsx
 <Link to="/hosting/new">
@@ -253,7 +251,7 @@ Now we need to add the page that goes to hosting new we add the new dependencies
 import { SubmitButton } from "@onzag/itemize/client/fast-prototyping/components/buttons";
 import SubmitActioner from "@onzag/itemize/client/components/item/SubmitActioner";
 import Snackbar from "@onzag/itemize/client/fast-prototyping/components/snackbar";
-import { IActionResponseWithId } from "@onzag/itemize/client/providers/item";
+import { IActionSubmitResponse } from "@onzag/itemize/client/providers/item";
 ```
 
 And then create our component for that page
@@ -264,7 +262,7 @@ And then create our component for that page
  * @param data a simplified response from the server on data creation
  * @returns a string that represents the redirect
  */
-const newHostingRedirectCallback = (data: IActionResponseWithId) => `/hosting/edit/${data.id}`;
+const newHostingRedirectCallback = (data: IActionSubmitResponse) => `/hosting/edit/${data.id}`;
 
 /**
  * Page to add a new hosting unit
@@ -352,7 +350,7 @@ export function NewHosting() {
 }
 ```
 
-And of course add it in the router
+And of course add it in the router, in our same file.
 
 ```tsx
 <Route
@@ -374,7 +372,7 @@ And in spanish:
 custom.submit = crear nueva unidad
 ```
 
-Now you should rebuild the data and schemas via `npm run build-data`and also `npm run webpack-dev` refresh your browser add button should take you to the following screen.
+Now you should rebuild the data and schemas via `npm run build-data` and also `npm run webpack-dev` refresh your browser add button should take you to the following screen.
 
 ![Hosting Unit Create Screen](./images/hosting-unit-create-screen.png)
 
@@ -409,6 +407,8 @@ Now you need to restart the server.
 ![Geo Working](./images/geo-working.png)
 
 ![Geo Working 2](./images/geo-working-2.png)
+
+The UI is not great, you may feel free to design a better UI.
 
 ## Add a new property
 

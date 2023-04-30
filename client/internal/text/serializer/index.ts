@@ -512,6 +512,15 @@ export function getParentNodeFor(
   return currentElement;
 }
 
+/**
+ * Provides the context for a given path
+ * @param path the path for the element to give context for
+ * @param level the level the context is wanted, final means the context the element is at currently,
+ * select-context is the context where its own context resides, and select-loop is for loopable contexts
+ * @param rootElement the root document
+ * @param rootContext the root context
+ * @returns a context object or null if no context found or invalid
+ */
 export function getContextFor(
   path: number[],
   level: "final" | "select-context" | "select-loop",
@@ -540,7 +549,7 @@ export function getContextFor(
   const contextChange = (nextElement as IElementBase).context;
   if (contextChange) {
     const nextPotentialContext = nextContext.properties[contextChange];
-    if (nextPotentialContext.type !== "context" || nextPotentialContext.loopable) {
+    if (!nextPotentialContext || nextPotentialContext.type !== "context" || nextPotentialContext.loopable) {
       return null;
     }
     nextContext = nextPotentialContext;
@@ -552,8 +561,8 @@ export function getContextFor(
 
   const eachConextChange = (nextElement as IElementBase).forEach;
   if (eachConextChange) {
-    const nextPotentialContext = nextContext.properties[contextChange];
-    if (nextPotentialContext.type !== "context" || !nextPotentialContext.loopable) {
+    const nextPotentialContext = nextContext.properties[eachConextChange];
+    if (!nextPotentialContext || nextPotentialContext.type !== "context" || !nextPotentialContext.loopable) {
       return null;
     }
     nextContext = nextPotentialContext;
@@ -631,7 +640,17 @@ interface INodeInfo {
    * Whether it represents a text node
    */
   isText: boolean;
+  /**
+   * Specifies whether it is an interactive element
+   */
+  isInteractive: boolean;
 }
+
+const specialTypes = {
+  "void-block": "container",
+  "void-superblock": "container",
+  "void-inline": "inline",
+};
 
 /**
  * Provides the node info of a given node
@@ -648,18 +667,23 @@ export function getInfoFor(
   }
 
   // check for whether is interactive and other options
-  const isInteractive = templatedInteractiveActions.some((attr) => !!node[attr]);
-  const isTemplateStyled = templatedStyledAttributes.some((attr) => !!node[attr]);
+  const isInteractive = templatedInteractiveActions.some((attr) => typeof node[attr] !== "undefined" && node[attr] !== null);
+  const isTemplateStyled = templatedStyledAttributes.some((attr) => typeof node[attr] !== "undefined" && node[attr] !== null);
   const isBasicStyled = !!(node as RichElement).style || ((node as RichElement).richClassList && (node as RichElement).richClassList.length);
-  const isBasicTemplated = templatedAttributes.some((attr) => !!node[attr]);
+  const isBasicTemplated = templatedAttributes.some((attr) => typeof node[attr] !== "undefined" && node[attr] !== null);
   const isTemplate = isInteractive || isTemplateStyled || isBasicTemplated;
 
   // now let's build the name label for the given language
   const foundCustomName = (!(node as RichElement).givenName && (node as RichElement).uiHandler) ?
     i18nData.richUIHandlerElement[(node as RichElement).uiHandler.replace(/-/g, "_")] : null;
   let nameLabel: string = (node as RichElement).givenName ? (node as RichElement).givenName : (
-    foundCustomName || ((node as RichElement).type ? (i18nData[(node as RichElement).type] || (node as RichElement).type) : i18nData.text)
+    foundCustomName || (
+      (node as RichElement).type ?
+        (i18nData[specialTypes[(node as RichElement).type] ? specialTypes[(node as RichElement).type] : (node as RichElement).type.replace(/-/g, "_")] ||
+          (node as RichElement).type) :
+        i18nData.text)
   );
+
   if (!(node as RichElement).givenName && !foundCustomName) {
     if (isBasicStyled || isTemplateStyled) {
       nameLabel = localeReplacer(i18nData.styled, nameLabel);
@@ -675,6 +699,7 @@ export function getInfoFor(
   // and we can return the information now
   return {
     isTemplate,
+    isInteractive,
     name: nameLabel,
     isText: typeof (node as IText).text === "string",
   }
@@ -806,14 +831,32 @@ function serializeElement(element: RichElement) {
   return null;
 }
 
-/**
- * Deserializes a document from the HTML form into a root level document
- * @param html the html in string form or as an array of nodes
- * @param comparer an optional comparer root level document, if it matches the signature
- * it will be efficient and return such comparer instead
- * @returns a root level document
- */
-export function deserialize(html: string | Node[], comparer?: IRootLevelDocument, specialRules?: ISpecialRules) {
+const basicCacheSize = 10;
+const basicCache: Array<{
+  html: string | Node[];
+  data: string;
+  childNodes: Node[];
+}> = [];
+
+function cachedGetDataFromText(html: string | Node[]): { data: string, childNodes: Node[] } {
+  if (!html || (Array.isArray(html) && !html.length)) {
+    return {
+      data: null,
+      childNodes: [],
+    }
+  }
+
+  const cachedIndex = basicCache.findIndex((v) => v.html === html);
+  if (cachedIndex !== -1) {
+    const cached = basicCache[cachedIndex];
+    // move element to the end
+    basicCache.splice(cachedIndex, 1);
+    basicCache.push(cached);
+    return {
+      data: cached.data,
+      childNodes: cached.childNodes,
+    }
+  }
 
   // first we need to build this data into a string
   // this is the html data of the child nodes
@@ -848,12 +891,113 @@ export function deserialize(html: string | Node[], comparer?: IRootLevelDocument
     }
   }
 
+  basicCache.push({
+    html,
+    data,
+    childNodes
+  });
+
+  if (basicCache.length > basicCacheSize) {
+    basicCache.shift();
+  }
+
+  return {
+    data,
+    childNodes,
+  }
+}
+
+/**
+ * Provides the correct uuid for a given text data
+ * @param data 
+ * @returns 
+ */
+export function getUUIDFor(data: string) {
+  const expectedId = !data ? NULL_UUID : uuidv5(data, TEXT_NAMESPACE);
+  return expectedId;
+}
+
+const deserializeCacheSize = 10;
+const deserializeCache: Array<{
+  data: string;
+  doc: IRootLevelDocument;
+  dontNormalize: boolean;
+  useContextRulesOf: ITemplateArgContextDefinition;
+}> = [];
+
+/**
+ * Deserializes a document from the HTML form into a root level document
+ * @param html the html in string form or as an array of nodes
+ * @param comparer an optional comparer root level document, if it matches the signature
+ * it will be efficient and return such comparer instead
+ * @returns a root level document
+ */
+export function deserialize(html: string | Node[], comparer?: IRootLevelDocument, specialRules?: ISpecialRules) {
+  const dontNormalize = specialRules ? (specialRules.dontNormalize || false) : false;
+  const useContextRulesOf = specialRules ? (specialRules.useContextRulesOf || null) : null;
+  const ignoreNodesAt = specialRules ? (specialRules.ignoreNodesAt || null) : null;
+
+  // first we find if we have it in the cache when we use a string
+  // as initial value
+  if (typeof html === "string" && !ignoreNodesAt) {
+    const cachedIndex = deserializeCache
+      .findIndex((v) => v.data === html && v.dontNormalize === dontNormalize && v.useContextRulesOf === useContextRulesOf);
+
+    if (cachedIndex !== -1) {
+      const cached = deserializeCache[cachedIndex];
+      // move element to the end
+      deserializeCache.splice(cachedIndex, 1);
+      deserializeCache.push(cached);
+
+      if (comparer && comparer.id === cached.doc.id) {
+        return comparer;
+      }
+
+      return cached.doc;
+    }
+  }
+
+  const { data, childNodes } = cachedGetDataFromText(html);
+
+  // now if we have nodes we need to check when we convert as a string
+  // it's the same process
+  if (typeof html !== "string" && !ignoreNodesAt) {
+    const cachedIndex = deserializeCache
+      .findIndex((v) => v.data === data && v.dontNormalize === dontNormalize && v.useContextRulesOf === useContextRulesOf);
+
+    if (cachedIndex !== -1) {
+      const cached = deserializeCache[cachedIndex];
+      // move element to the end
+      deserializeCache.splice(cachedIndex, 1);
+      deserializeCache.push(cached);
+
+      if (comparer && comparer.id === cached.doc.id) {
+        return comparer;
+      }
+
+      return cached.doc;
+    }
+  }
+
   // now we can get the expected id, if our data is simply null, then
   // we use the null uuid, otherwise we build an uuid from the data
   const expectedId = data === null ? NULL_UUID : uuidv5(data, TEXT_NAMESPACE);
 
   // if we have a comparer and the comparer matches
   if (comparer && comparer.id === expectedId) {
+    if (!ignoreNodesAt) {
+      deserializeCache.push({
+        data,
+        doc: comparer,
+        dontNormalize,
+        useContextRulesOf,
+      });
+
+      if (deserializeCache.length > deserializeCacheSize) {
+        deserializeCache.shift();
+      }
+    }
+
     // return the comparer
     return comparer;
   }
@@ -880,8 +1024,21 @@ export function deserialize(html: string | Node[], comparer?: IRootLevelDocument
   };
 
   // normalize it
-  if (!specialRules || !specialRules.dontNormalize) {
+  if (!dontNormalize) {
     normalize(newDocument, specialRules || null);
+  }
+
+  if (!ignoreNodesAt) {
+    deserializeCache.push({
+      data,
+      doc: newDocument,
+      dontNormalize,
+      useContextRulesOf,
+    });
+
+    if (deserializeCache.length > deserializeCacheSize) {
+      deserializeCache.shift();
+    }
   }
 
   // return it

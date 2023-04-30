@@ -145,3 +145,9 @@ When creating an app that supports USSD, use the fake ussd mode to create an end
 Use this in development when running a dev environment in order to enable elasticseach to property connect when using certificates, it is used as `NODE_TLS_REJECT_UNAUTHORIZED=0`
 
 If you don't wish to do this you should save your http certificate so that it can connect, however, every dev environment has a different certificate making it painful in practique.
+
+## REFRESH_ADMIN_PASSWORD
+
+Default `false`
+
+If you forget your main admin password with user `admin` you can use this variable to establish a brand new password for it

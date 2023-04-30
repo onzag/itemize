@@ -172,9 +172,14 @@ class PropertyEntrySelectRenderer
     const appliedInputProps: any = {
       "aria-labelledby": idToUse+ "_label",
       "aria-describedby": this.props.description ? idToUse+ "_desc" : null,
+      ...this.props.args.InputProps,
     };
 
     if (isInvalid) {
+      if (!appliedInputProps.inputProps) {
+        appliedInputProps.inputProps = {};
+      }
+
       appliedInputProps.inputProps["aria-invalid"] = true;
       appliedSelectProps["aria-invalid"] = true;
 
@@ -216,7 +221,7 @@ class PropertyEntrySelectRenderer
           multiple={true}
           value={(this.props.currentValue || []) as any[]}
           onChange={this.onChange}
-          input={<InputToUse label={this.props.label} fullWidth={true} {...appliedInputProps} {...this.props.args.InputProps}/>}
+          input={<InputToUse label={this.props.label} fullWidth={true} {...appliedInputProps}/>}
           renderValue={(selected: any[]) => {
             return (
               <Box sx={style.chips}>
@@ -296,7 +301,6 @@ class PropertyEntrySelectRenderer
                 focused: "focused",
               }}
               {...appliedInputProps}
-              {...this.props.args.InputProps}
             />
           }
           IconComponent={ExpandMoreOutlinedIcon}

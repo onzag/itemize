@@ -82,7 +82,8 @@ The next step is to add a description that we can add to the property
         "supportsTitle": true,
         "supportsCustomStyles": false,
         "supportsTemplating": false,
-        "supportsLists": false
+        "supportsLists": false,
+        "supportsTables": false
     }
 }
 ```
@@ -164,25 +165,15 @@ Now we need some special properties to define our booking status first we add a 
 }
 ```
 
-It's a simple boolean that specifies whether the current unit is booked however having the unit booked is not enough, we want to also be able to tell whom has it booked, for that we use the very powerful reference.
+It's a simple boolean that specifies whether the current unit is booked however having the unit booked is not enough, we want to also be able to tell whom has it booked, for that we use a string to refer to this value, we will make it hidden as we don't expect to directly visualize it
 
 ```json
 {
     "id": "booked_by",
     "type": "string",
-    "subtype": "reference",
+    "subtype": "exact-identifier",
+    "hidden": true,
     "nullable": true,
-    "specialProperties": {
-        "referencedModule": "users",
-        "referencedItemDefinition": "user",
-        "referencedSearchProperty": "username",
-        "referencedDisplayProperty": "username",
-        "referencedFilteringPropertySet": {
-            "role": {
-                "exactValue": "USER"
-            }
-        }
-    },
     "readRoleAccess": ["&OWNER"],
     "editRoleAccess": [],
     "searchable": false
@@ -202,10 +193,6 @@ We also add a property about until when the booking takes place
 }
 ```
 
-This last one we will use for this and it's special, for once it's a string but the subtype is reference, reference is one of the most powerful subtypes in itemize, given ids are strings, a reference subtype means that 'this is the id of another item'; and with the special properties we define that the module is going to be users, item is going to be a user, and we want to search and display by username; also we are filtering and only enabling users with the role of USER.
-
-Note that references are not checked, and it's possible to put an arbitrary string value in the booked_by value if the permissions are valid.
-
 Because we don't want our unit owner to be able to put any user they want here, we will make the field readOnly by the owner of the unit, and none else will be able to read it (by default everything is public), also we will disable editing, none can edit this field (we will take care of bookings later).
 
 ## Preparing the Schema
@@ -217,7 +204,9 @@ After adding the module to our root tree as such
   "type": "root",
   "children": [
     "users",
+    "flag",
     "cms",
+    "mail",
     "hosting"
   ],
   "i18n": "main-i18n.properties"
@@ -308,9 +297,6 @@ properties.unit_type.null_value = unspecified
 properties.unit_type.search.null_value = any type
 properties.unit_type.error.NOT_NULLABLE = you must provide an unit type
 
-properties.booked_by.label = booked by
-properties.booked_by.placeholder = booked by
-
 properties.booked_until.label = booked until
 properties.booked_until.placeholder = booked until
 properties.booked_until.error.INVALID_VALUE = invalid date
@@ -368,9 +354,6 @@ properties.unit_type.null_value = sin especifica
 properties.unit_type.search.null_value = cualquiera
 properties.unit_type.error.NOT_NULLABLE = debe específicar el tipo de unidad
 
-properties.booked_by.label = reservado por
-properties.booked_by.placeholder = reservado por
-
 properties.booked_until.label = reservado hasta
 properties.booked_until.placeholder = reservado hasta
 properties.booked_until.error.INVALID_VALUE = fecha inválida
@@ -379,6 +362,8 @@ properties.booked_until.error.INVALID_VALUE = fecha inválida
 ## Update the database
 
 Now that the schema is ready and all the translations are provided for what we currently want to achieve we want to add the support to hold such values in the database, this is a delicate process, granted we are in a development environment so it should be fairly straightforward
+
+`npm run build-data`
 
 `npm run build-database development`
 

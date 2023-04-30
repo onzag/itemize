@@ -52,11 +52,14 @@ import { ModuleProvider } from "@onzag/itemize/client/providers/module";
 import { ItemProvider } from "@onzag/itemize/client/providers/item";
 import Entry from "@onzag/itemize/client/components/property/Entry";
 
-import { ListItem, ListItemText, withStyles, WithStyles } from "@onzag/itemize/client/fast-prototyping/mui-core";
 import { SearchButton } from "@onzag/itemize/client/fast-prototyping/components/buttons";
 import { SearchLoaderWithPagination } from "@onzag/itemize/client/fast-prototyping/components/search-loader-with-pagination";
 import Link from "@onzag/itemize/client/components/navigation/Link";
 import View from "@onzag/itemize/client/components/property/View";
+
+import Box from "@mui/material/Box";
+import ListItem from "@mui/material/ListItem";
+import ListItemText from "@mui/material/ListItemText";
 
 /**
  * The search style
@@ -90,7 +93,7 @@ const searchStyle = {
 /**
  * The search component will allow us to perform searches to the place we want to travel to
  */
-export const Search = withStyles(searchStyle)((props: WithStyles<typeof searchStyle>) => {
+export function Search() {
     return (
         <ModuleProvider module="hosting">
             <ItemProvider
@@ -130,7 +133,7 @@ export const Search = withStyles(searchStyle)((props: WithStyles<typeof searchSt
                     }}
                 />
 
-                <div className={props.classes.container}>
+                <Box sx={searchStyle.container}>
                     <SearchLoaderWithPagination id="search-loader" pageSize={12}>
                         {(arg, pagination, noResults) => (
                             <>
@@ -138,9 +141,10 @@ export const Search = withStyles(searchStyle)((props: WithStyles<typeof searchSt
                                     arg.searchRecords.map((r) => (
                                         <ItemProvider {...r.providerProps}>
                                             <Link to={`/reserve/${r.id}`}>
-                                                <ListItem className={props.classes.listing}>
+                                                <ListItem sx={searchStyle.listing}>
                                                     <View id="image" rendererArgs={
                                                         {
+                                                            useFullImage: true,
                                                             // we do not want to link images with with <a> tags like
                                                             // the active renderer does by default
                                                             disableImageLinking: true,
@@ -148,11 +152,11 @@ export const Search = withStyles(searchStyle)((props: WithStyles<typeof searchSt
                                                             // this is used to choose what image resolution to load
                                                             // so they load faster, we want tiny images
                                                             imageSizes: "30vw",
-                                                            imageClassName: props.classes.image
+                                                            imageSx: searchStyle.image
                                                         }
                                                     } />
                                                     <ListItemText
-                                                        className={props.classes.listingText}
+                                                        sx={searchStyle.listingText}
                                                         primary={<View id="title" />}
                                                         secondary={<View id="address" rendererArgs={{ hideMap: true }} />}
                                                     />
@@ -161,18 +165,18 @@ export const Search = withStyles(searchStyle)((props: WithStyles<typeof searchSt
                                         </ItemProvider>
                                     ))
                                 }
-                                <div className={props.classes.paginator}>
+                                <Box sx={searchStyle.paginator}>
                                     {pagination}
-                                </div>
+                                </Box>
                             </>
                         )}
                     </SearchLoaderWithPagination>
-                </div>
+                </Box>
 
             </ItemProvider>
         </ModuleProvider>
     );
-});
+}
 ```
 
 And we need to add the component here in our `frontpage/index.tsx` right under our `<Hero />` component
@@ -199,9 +203,9 @@ And now you should be able to search by clicking the search button and typing an
 
 ## Memory pollution
 
-You might notice that if (for example) you search a place that holds no properties, and do in fact get 0 results; but then go to the manage units page, your listings are missing as well; this is caused by memory pollution.
+You might notice that if (for example) you search a place that holds no results, and do in fact get 0 results; but then go to the manage units page, your listings are missing as well; this is caused by memory pollution.
 
-Inside of itemize there are no pages, itemize has no notion of the navigation and how our components change from page to page, as a result the previous search and the new search are considered the same, they are part of the same state.
+Itemize has no notion of the navigation and how our components change from page to page, as a result the previous search and the new search are considered the same, they are part of the same state; at the slot id null, version null.
 
 This is because they both hold the same bit in memory, and as such hold the same state; this is one of the things with itemize and the fact the developer needs to manage its memory; itemize simply doesn't know that it hasn't performed the automatic search, it thinks it did because it already holds a state.
 
@@ -294,8 +298,6 @@ However just for testing and to display one of the features of itemize go to our
 // we specify that the creator must be us
 // createdBy: userData.id,
 ```
-
-However if you refresh the page you will notice that it works just fine still, well this is due to `storeResultsInNavigation: "unit-search"`, it is picking your search results from the navigation, you will need to open a new page (remember to keep devtools open not to hit the service worker), and load the page, and you should be met with the error.
 
 ![Search Error](./images/search-error.png)
 

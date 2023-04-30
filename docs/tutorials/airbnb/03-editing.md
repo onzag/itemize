@@ -13,7 +13,7 @@ We want to turn it into something that is more usable first, as this is rather m
 We will need more imports:
 
 ```tsx
-import { List, ListItemText, withStyles, WithStyles, createStyles, ListItem } from "@onzag/itemize/client/fast-prototyping/mui-core";
+import { List, ListItemText, ListItem } from "@onzag/itemize/client/fast-prototyping/mui-core";
 ```
 
 And now we add this to our code
@@ -22,7 +22,7 @@ And now we add this to our code
 /**
  * Some styles for the list of units
  */
-const unitListStyles = createStyles({
+const unitListStyles = {
     image: {
         width: "30%",
         display: "inline-block",
@@ -43,14 +43,10 @@ const unitListStyles = createStyles({
         alignItems: "center",
         justifyContent: "center",
     }
-});
+};
 ```
 
-We should now inject the styles into the `UnitList` component by changing how it is written from a simple function to:
-
-```tsx
-export const UnitList = withStyles(unitListStyles)((props: WithStyles<typeof unitListStyles>) => {
-```
+We should now inject the styles into the `UnitList`
 
 And then we have to modify the display where the `SearchLoaderWithPagination` is encountered and change to something like this:
 
@@ -69,9 +65,10 @@ And then we have to modify the display where the `SearchLoaderWithPagination` is
                     arg.searchRecords.map((r) => (
                         <ItemProvider {...r.providerProps}>
                             <Link to={`/hosting/edit/${r.id}`}>
-                                <ListItem className={props.classes.listing}>
+                                <ListItem sx={unitListStyles.listing}>
                                     <View id="image" rendererArgs={
                                         {
+                                            useFullImage: true,
                                             // we do not want to link images with with <a> tags like
                                             // the active renderer does by default
                                             disableImageLinking: true,
@@ -79,11 +76,11 @@ And then we have to modify the display where the `SearchLoaderWithPagination` is
                                             // this is used to choose what image resolution to load
                                             // so they load faster, we want tiny images
                                             imageSizes: "30vw",
-                                            imageClassName: props.classes.image
+                                            imageSx: unitListStyles.image
                                         }
                                     } />
                                     <ListItemText
-                                        className={props.classes.listingText}
+                                        sx={unitListStyles.listingText}
                                         primary={<View id="title" />}
                                         secondary={<View id="address" rendererArgs={{ hideMap: true }} />}
                                     />
@@ -92,9 +89,9 @@ And then we have to modify the display where the `SearchLoaderWithPagination` is
                         </ItemProvider>
                     ))
                 }
-                <div className={props.classes.paginator}>
+                <Box sx={unitListStyles.paginator}>
                     {pagination}
-                </div>
+                </Box>
             </>
         )}
     </SearchLoaderWithPagination>

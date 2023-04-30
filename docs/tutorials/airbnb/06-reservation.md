@@ -153,7 +153,7 @@ We can indeed pull them off right to our frontpage where we do the search, just 
         }}
     />
 
-    <div className={props.classes.container}>
+    <Box sx={searchStyle.container}>
         <SearchLoaderWithPagination id="search-loader" pageSize={12}>
             {(arg, pagination, noResults) => (
                 <>
@@ -161,11 +161,12 @@ We can indeed pull them off right to our frontpage where we do the search, just 
                         arg.searchRecords.map((r) => (
                             <ItemProvider {...r.providerProps}>
                                 <Link to={`/reserve/${r.id}`}>
-                                    <ListItem className={props.classes.listing}>
+                                    <ListItem sx={searchStyle.listing}>
                                         <View
                                             id="image"
                                             rendererArgs={
                                                 {
+                                                    useFullImage: true,
                                                     // we do not want to link images with with <a> tags like
                                                     // the active renderer does by default
                                                     disableImageLinking: true,
@@ -173,12 +174,12 @@ We can indeed pull them off right to our frontpage where we do the search, just 
                                                     // this is used to choose what image resolution to load
                                                     // so they load faster, we want tiny images
                                                     imageSizes: "30vw",
-                                                    imageClassName: props.classes.image,
+                                                    imageSx: searchStyle.image,
                                                 }
                                             }
                                         />
                                         <ListItemText
-                                            className={props.classes.listingText}
+                                            sx={searchStyle.listingText}
                                             primary={<View id="title" />}
                                             secondary={<View id="address" rendererArgs={{ hideMap: true }} />}
                                         />
@@ -187,13 +188,13 @@ We can indeed pull them off right to our frontpage where we do the search, just 
                             </ItemProvider>
                         ))
                     }
-                    <div className={props.classes.paginator}>
+                    <Box sx={searchStyle.paginator}>
                         {pagination}
-                    </div>
+                    </Box>
                 </>
             )}
         </SearchLoaderWithPagination>
-    </div>
+    </Box>
 </ItemProvider>
 ```
 
@@ -252,14 +253,14 @@ Note however that these search customization attributes are not compatible with 
 
 We have just added the planned check in and out in our main search, which is indeed optional, but now when we click to book we realize that they are not prefilled and we have to fill them again, for that we need to pass these dates there, and to do such we will use a reader at our frontpage and pass it via the url query string.
 
-For that we are going to change our `search.tsx` code where we create the link by replacing where `<div className={props.classes.container}>` is with the following:
+For that we are going to change our `search.tsx` code where we create the link by replacing where `<Box sx={searchStyle.container}>` is with the following:
 
 ```tsx
 <Reader id="planned_check_in">
     {(checkIn: string) => (
         <Reader id="planned_check_out">
             {(checkOut: string) => (
-                <div className={props.classes.container}>
+                <Box sx={searchStyle.container}>
                     <SearchLoaderWithPagination id="search-loader" pageSize={12}>
                         {(arg, pagination, noResults) => (
                             <>
@@ -272,11 +273,12 @@ For that we are going to change our `search.tsx` code where we create the link b
                                                     `/reserve/${r.id}?checkIn=${encodeURIComponent(checkIn)}&checkOut=${encodeURIComponent(checkOut)}` :
                                                     `/reserve/${r.id}`
                                             }>
-                                                <ListItem className={props.classes.listing}>
+                                                <ListItem sx={searchStyle.listing}>
                                                     <View
                                                         id="image"
                                                         rendererArgs={
                                                             {
+                                                                useFullImage: true,
                                                                 // we do not want to link images with with <a> tags like
                                                                 // the active renderer does by default
                                                                 disableImageLinking: true,
@@ -284,12 +286,12 @@ For that we are going to change our `search.tsx` code where we create the link b
                                                                 // this is used to choose what image resolution to load
                                                                 // so they load faster, we want tiny images
                                                                 imageSizes: "30vw",
-                                                                imageClassName: props.classes.image,
+                                                                imageSx: searchStyle.image,
                                                             }
                                                         }
                                                     />
                                                     <ListItemText
-                                                        className={props.classes.listingText}
+                                                        sx={searchStyle.listingText}
                                                         primary={<View id="title" />}
                                                         secondary={<View id="address" rendererArgs={{ hideMap: true }} />}
                                                     />
@@ -298,13 +300,13 @@ For that we are going to change our `search.tsx` code where we create the link b
                                         </ItemProvider>
                                     ))
                                 }
-                                <div className={props.classes.paginator}>
+                                <Box sx={searchStyle.paginator}>
                                     {pagination}
-                                </div>
+                                </Box>
                             </>
                         )}
                     </SearchLoaderWithPagination>
-                </div>
+                </Box>
             )}
         </Reader>
     )}
@@ -659,7 +661,9 @@ export default class BookingService extends ServiceProvider<null> {
         return 1000;
     }
     public run() {
-        this.logInfo("Hello from Booking Service " + this.getInstanceName());
+        this.logInfo({
+            message: "Hello from Booking Service " + this.getInstanceName(),
+        });
     }
 }
 ```

@@ -1556,7 +1556,7 @@ export default class PropertyDefinition {
     ) {
       // setting super enforceds with the same value as one established
       // it is okay and acceptable now
-      if (this.stateSuperEnforcedValue[mergedID].value === value) {
+      if (equals(this.stateSuperEnforcedValue[mergedID].value, value, {strict: true})) {
         this.stateSuperEnforcedValue[mergedID].owners.push(actualOwner);
         return;
       }

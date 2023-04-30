@@ -559,7 +559,7 @@ export function postprocess(
   if (
     node.tagName === "A" &&
     (node.hasAttribute("href") || node.hasAttribute("data-href")
-  ) && !node.classList.contains("image") && !node.classList.contains("file")) {
+    ) && !node.classList.contains("image") && !node.classList.contains("file")) {
     if (!options.supportsLinks) {
       node.removeAttribute("href");
       node.removeAttribute("data-href");
@@ -678,17 +678,51 @@ export function serialize(root: IRootLevelDocument) {
   return oserialize(root);
 }
 
+const serializeStringCacheSize = 10;
+const serializeStringCache: Array<{
+  id: string;
+  value: string;
+}> = [];
+
 /**
  * Serializes but returns the string representation
  * rather than a bunch of nodes
  * @param root 
  */
 export function serializeString(root: IRootLevelDocument): string {
-  const serialized = oserialize(root);
-  if (typeof serialized === "string" || serialized === null) {
-    return serialized as string;
+  const cachedIndex = root.id ? serializeStringCache
+    .findIndex((v) => v.id === root.id) : -1;
+
+  if (cachedIndex !== -1) {
+    const cached = serializeStringCache[cachedIndex];
+    // move element to the end
+    serializeStringCache.splice(cachedIndex, 1);
+    serializeStringCache.push(cached);
+
+    return cached.value;
   }
-  return serialized.map((s) => s.outerHTML).join("");
+
+  const serialized = oserialize(root);
+
+  let value: string;
+  if (typeof serialized === "string" || serialized === null) {
+    value = serialized as string;
+  } else {
+    value = serialized.map((s) => s.outerHTML).join("");
+  }
+
+  if (root.id) {
+    serializeStringCache.push({
+      id: root.id,
+      value,
+    });
+  
+    if (serializeStringCache.length > serializeStringCacheSize) {
+      serializeStringCache.shift();
+    }
+  }
+
+  return value;
 }
 
 /**

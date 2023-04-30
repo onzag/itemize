@@ -21,6 +21,7 @@ export const INSTANCE_UUID =
 export const INSTANCE_CREATION_TIME = new Date();
 export const INSTANCE_LOG_FILE = `logs/info.${INSTANCE_UUID}.log`;
 export const INSTANCE_LOG_ERROR_FILE = `logs/error.${INSTANCE_UUID}.log`;
+export const REFRESH_ADMIN_PASSWORD = process.env.REFRESH_ADMIN_PASSWORD === "true";
 
 if (
   INSTANCE_MODE !== "CLUSTER_MANAGER" &&

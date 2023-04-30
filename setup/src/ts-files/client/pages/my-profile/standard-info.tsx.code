@@ -38,7 +38,6 @@ import Snackbar from "@onzag/itemize/client/fast-prototyping/components/snackbar
 import { SubmitButton } from "@onzag/itemize/client/fast-prototyping/components/buttons";
 import { DialogResponsive } from "@onzag/itemize/client/fast-prototyping/components/dialog";
 import { IPropertyDefinitionState } from "@onzag/itemize/base/Root/Module/ItemDefinition/PropertyDefinition";
-import { BannerRenderer } from "../../renderers/banner";
 import { useState } from "react";
 import { useCallback } from "react";
 
@@ -143,12 +142,6 @@ const style = {
 	errorIconButton: (theme: Theme) => ({
 		color: theme.palette.error.main,
 	}),
-	banner: {
-		width: "100%",
-		height: "30vh",
-		marginBottom: "-10vh",
-		position: "relative",
-	},
 };
 
 interface AlertBoxMissingProps {
@@ -186,7 +179,7 @@ function AlertBoxMissing(props: AlertBoxMissingProps) {
 							if (props.propertyId === "email" ? missesEmail : missesPhone) {
 								return (
 									<Alert severity="error">
-										<I18nRead capitalize={true} id="missing_email_warning_title" />
+										<I18nRead capitalize={true} id={"missing_" + props.propertyId + "_warning_title"} />
 									</Alert>
 								);
 							}
@@ -295,15 +288,6 @@ export function CurrentUserProfileStandardInfo() {
 	return (
 		<Paper sx={style.paper}>
 			<ItemLoader>
-				<Box sx={style.banner}>
-					<Entry
-						id="banner_picture"
-						renderer={BannerRenderer}
-						rendererArgs={{
-							defaultImageSrc: "/rest/resource/banner-empty-2.svg",
-						}}
-					/>
-				</Box>
 				<Entry
 					id="profile_picture"
 					renderer={AvatarRenderer}
@@ -351,65 +335,17 @@ export function CurrentUserProfileStandardInfo() {
 				</Box>
 				<Entry id="username" rendererArgs={{icon: <AccountCircleIcon />}} />
 
-				<Reader id="mode">
-					{(mode: string) => {
-						if (mode === "ORG_OWNER") {
-							return (
-								<I18nRead id="real_name_alt_label">
-									{(i18nAltLabel: string) => (
-										<Entry
-											id="real_name"
-											rendererArgs={{icon: <AccountBalanceIcon />}}
-											altLabel={i18nAltLabel}
-											altPlaceholder={i18nAltLabel}
-										/>
-									)}</I18nRead>);
-						}
-
-						return (
-							<Entry
-								id="real_name"
-								rendererArgs={{icon: <AssignmentIndIcon />}}
-							/>
-						);
-					}}
-				</Reader>
-
-
 				<AlertBoxMissing propertyId="email" validatedPropertyId="e_validated" />
 				<Entry id="email" rendererArgs={{ descriptionAsAlert: true, icon: <AlernateEmailIcon /> }} />
 				<AlertBoxMissing propertyId="phone" validatedPropertyId="p_validated" />
 				<Entry id="phone" rendererArgs={{ descriptionAsAlert: true, icon: <PhoneIphoneIcon /> }} />
 
-				<Reader id="mode">
-					{(mode: string) => {
-						if (mode === "ORG_OWNER") {
-							return (
-								<I18nRead id="about_me_alt_label">
-									{(i18nAltLabel: string) => (
-										<I18nRead id="about_me_alt_placeholder">
-											{(i18nAltPlaceholder: string) => (
-												<Entry
-													id="about_me"
-													rendererArgs={{icon: <DomainIcon />}}
-													altLabel={i18nAltLabel}
-													altPlaceholder={i18nAltPlaceholder}
-												/>
-											)}
-										</I18nRead>
-									)}
-								</I18nRead>
-							);
-						}
-
-						return <Entry id="about_me" rendererArgs={{icon: <DomainIcon />}} />;
-					}}
-				</Reader>
+				<Entry id="about_me" rendererArgs={{icon: <DomainIcon />}} />
 
 				<Divider />
 
 				<Box sx={style.buttonBox}>
-					<DifferingPropertiesRetriever mainProperties={["profile_picture", "banner_picture", "username", "email", "phone", "about_me", "real_name"]}>
+					<DifferingPropertiesRetriever mainProperties={["profile_picture", "username", "email", "phone", "about_me"]}>
 						{(differingProperties) => {
 							const options: IActionSubmitOptions = {
 								properties: differingProperties,
@@ -419,8 +355,7 @@ export function CurrentUserProfileStandardInfo() {
 							if (
 								differingProperties.includes("username") ||
 								differingProperties.includes("email") ||
-								differingProperties.includes("phone") ||
-								differingProperties.includes("real_name")
+								differingProperties.includes("phone")
 							) {
 								options.policies = [["edit", "REQUIRES_PASSWORD_CONFIRMATION", "password"]];
 								options.policiesToCleanOnAny = [["edit", "REQUIRES_PASSWORD_CONFIRMATION", "password"]];

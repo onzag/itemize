@@ -43,8 +43,8 @@ export interface IPropertyViewFileRendererProps extends IPropertyViewRendererPro
 
 export default class PropertyViewFile
   extends React.Component<
-  IPropertyViewHandlerProps<PropertyDefinitionSupportedFileType, IPropertyViewFileRendererProps>
-> {
+    IPropertyViewHandlerProps<PropertyDefinitionSupportedFileType, IPropertyViewFileRendererProps>
+  > {
   constructor(props: IPropertyViewHandlerProps<PropertyDefinitionSupportedFileType, IPropertyViewFileRendererProps>) {
     super(props);
 
@@ -65,19 +65,41 @@ export default class PropertyViewFile
       !deepRendererArgsComparer(this.props.rendererArgs, nextProps.rendererArgs);
   }
   public openFile() {
-    const value = (
+    let value = (
       this.props.useAppliedValue ?
         this.props.state.stateAppliedValue :
         this.props.state.value
-      ) as PropertyDefinitionSupportedFileType;
-    window.open(value.url, value.name);
+    ) as PropertyDefinitionSupportedFileType;
+
+    if (value) {
+      if (
+        value.url.indexOf("blob:") !== 0 &&
+        value.metadata !== "FAKE_FILE"
+      ) {
+        const domain = process.env.NODE_ENV === "production" ? this.props.config.productionHostname : this.props.config.developmentHostname;
+        value = fileURLAbsoluter(
+          domain,
+          this.props.config.containersHostnamePrefixes,
+          value,
+          this.props.itemDefinition,
+          this.props.forId,
+          this.props.forVersion,
+          this.props.containerId,
+          this.props.include,
+          this.props.property,
+          this.props.cacheFiles,
+        );
+      }
+
+      window.open(value.url, value.name);
+    }
   }
   public render() {
     let currentValue = (
       this.props.useAppliedValue ?
         this.props.state.stateAppliedValue :
         this.props.state.value
-      ) as PropertyDefinitionSupportedFileType;
+    ) as PropertyDefinitionSupportedFileType;
 
     const isSupportedImage = currentValue && FILE_SUPPORTED_IMAGE_TYPES.includes(currentValue.type);
 

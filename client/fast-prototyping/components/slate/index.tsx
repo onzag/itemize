@@ -14,7 +14,7 @@ import { withHistory, HistoryEditor } from "slate-history";
 
 import {
   IRootLevelDocument, deserialize, SERIALIZATION_REGISTRY, RichElement, deserializePlain,
-  getContextFor, normalizeElement, getAllowedChildrenTypes, getUIHandlerValueWithKnownContextFor, isInline, isVoid, isSuperBlock, isBlock
+  getContextFor, normalizeElement, getAllowedChildrenTypes, getUIHandlerValueWithKnownContextFor, isInline, isVoid, isSuperBlock, isBlock, getUUIDFor
 } from "../../../internal/text/serializer";
 import {
   CONTAINER_CLASS_PREFIX, countSize, CUSTOM_CLASS_PREFIX,
@@ -49,6 +49,12 @@ declare module 'slate' {
     Text: IText;
   }
 }
+
+/**
+ * Used within contexts with loop emulation to disable the element wrapper to display in all
+ * but the last element
+ */
+const ElementWrapperDisabler = React.createContext(false);
 
 function findLastIndex(arr: any[], fn: (ele: any) => boolean) {
   let currentIndex = arr.length;
@@ -969,7 +975,7 @@ interface ISlateEditorProps {
    * @param fileId 
    * @returns 
    */
-  onRetrieveImage: (fileId: string) => ({file: IPropertyDefinitionSupportedSingleFilesType, srcset: string})
+  onRetrieveImage: (fileId: string) => ({ file: IPropertyDefinitionSupportedSingleFilesType, srcset: string })
   /**
    * Function that should be specified to retrieve data uris from blob urls given
    * a file id
@@ -1201,6 +1207,7 @@ export class SlateEditor extends React.Component<ISlateEditorProps, ISlateEditor
         // match with the current, note that the signature will match with parsed values
         // as it uses a namespaced uuid that will give the same value for the same string
         if (!state.currentValue || newcurrentValue.id !== state.currentValue.id) {
+
           // then we do the same and set the new internal value
           // and clear all the anchors
           return {
@@ -1665,10 +1672,10 @@ export class SlateEditor extends React.Component<ISlateEditorProps, ISlateEditor
       try {
         const blob = await ((await fetch(urlToReadFrom)).blob());
         const dataURI = await this.getDataURI(blob);
-  
+
         // // if it's a blob
         // const isBlob = urlToReadFrom.startsWith("blob:");
-  
+
         // // then we should think about copying it right into the data transfer
         // // since blobs are temporary
         // if (isBlob) {
@@ -1677,10 +1684,10 @@ export class SlateEditor extends React.Component<ISlateEditorProps, ISlateEditor
         //     gatheredFiles[element.srcId] = urlData;
         //   }
         // }
-  
+
         element.src = dataURI;
         delete (element as IImage).srcSet;
-      } catch (err) {}
+      } catch (err) { }
     }
 
     // now we run per each children
@@ -1715,7 +1722,7 @@ export class SlateEditor extends React.Component<ISlateEditorProps, ISlateEditor
       const html = serialize(document) as HTMLElement[];
       const htmlStr = html.map((n) => n.outerHTML).join("");
       const text = serializeString(document);
-      
+
       const textPlain = new Blob([text], { type: 'text/plain' });
       const htmlBody = new Blob([htmlStr], { type: 'text/html' });
       const item = new ClipboardItem({
@@ -2607,17 +2614,15 @@ export class SlateEditor extends React.Component<ISlateEditorProps, ISlateEditor
 
     // build a new document
     const newRootDocument: IRootLevelDocument = {
-      id: uuid.v4(),
+      // we don't know the id yet
+      id: null,
       type: "document",
       rich: this.state.currentValue.rich,
       children: v,
     };
 
-    // and set the state to that
-    this.setState({
-      currentValue: newRootDocument,
-      synced: false,
-    });
+    const serialized = serializeString(newRootDocument);
+    newRootDocument.id = getUUIDFor(serialized);
 
     // we do not update immediately,
     // for that we first clear the update timeout
@@ -2626,26 +2631,42 @@ export class SlateEditor extends React.Component<ISlateEditorProps, ISlateEditor
     // we want to halt such async execution
     clearTimeout(this.updateTimeout);
 
-    // now we can set it
-    this.updateTimeout = setTimeout(() => {
-      if (this.state.currentValue.rich) {
-        // what we do is that we count the characters
-        const count = countSize(this.state.currentValue);
-        // and set it in the last rich text change cheat variable
-        (window as any)[LAST_RICH_TEXT_CHANGE_LENGTH] = count;
-      }
-      // and now we can trigger the on change event
-      this.props.onChange(serializeString(this.state.currentValue), this.state.currentValue);
-      // and now we are going to wait a little bit more
+    const isEqual = (serialized || null) === (this.props.value || null);
+
+    if (isEqual) {
+      // and set the state to that
+      this.setState({
+        currentValue: newRootDocument,
+        synced: true,
+      });
+    } else {
+      this.setState({
+        currentValue: newRootDocument,
+        synced: false,
+      });
+
+      // now we can set it
       this.updateTimeout = setTimeout(() => {
-        // to tell it that it should sync
-        if (!this.isUnmounted) {
-          this.setState({
-            synced: true,
-          });
+        if (this.state.currentValue.rich) {
+          // what we do is that we count the characters
+          const count = countSize(this.state.currentValue);
+          // and set it in the last rich text change cheat variable
+          (window as any)[LAST_RICH_TEXT_CHANGE_LENGTH] = count;
         }
-      }, 30);
-    }, 300);
+
+        // and now we can trigger the on change event
+        this.props.onChange(serializeString(this.state.currentValue), this.state.currentValue);
+        // and now we are going to wait a little bit more
+        this.updateTimeout = setTimeout(() => {
+          // to tell it that it should sync
+          if (!this.isUnmounted) {
+            this.setState({
+              synced: true,
+            });
+          }
+        }, 30);
+      }, 300);
+    }
   }
 
   /**
@@ -2783,10 +2804,27 @@ export class SlateEditor extends React.Component<ISlateEditorProps, ISlateEditor
           // we are going to use the wrapper in each case to change the context
           // which hopefully will change things down the line
           for (let i = 0; i < contextSwichContext.editorArgs.loopEmulation; i++) {
+            const shouldDisableElementWrappers = i !== contextSwichContext.editorArgs.loopEmulation - 1;
             if (contextSwichContext.editorArgs.wrapper) {
-              arr.push(<React.Fragment key={i}>{contextSwichContext.editorArgs.wrapper(toReturn, i)}</React.Fragment>);
+              if (shouldDisableElementWrappers) {
+                arr.push(
+                  <ElementWrapperDisabler.Provider value={true} key={i}>
+                    {contextSwichContext.editorArgs.wrapper(toReturn, i)}
+                  </ElementWrapperDisabler.Provider>
+                );
+              } else {
+                arr.push(<React.Fragment key={i}>{contextSwichContext.editorArgs.wrapper(toReturn, i)}</React.Fragment>);
+              }
             } else {
-              arr.push(<React.Fragment key={i}>{toReturn}</React.Fragment>);
+              if (shouldDisableElementWrappers) {
+                arr.push(
+                  <ElementWrapperDisabler.Provider value={true} key={i}>
+                    {toReturn}
+                  </ElementWrapperDisabler.Provider>
+                );
+              } else {
+                arr.push(<React.Fragment key={i}>{toReturn}</React.Fragment>);
+              }
             }
           }
           toReturn = arr;
@@ -2894,10 +2932,27 @@ export class SlateEditor extends React.Component<ISlateEditorProps, ISlateEditor
       ) {
         const arr: React.ReactNode[] = [];
         for (let i = 0; i < contextSwichContext.editorArgs.loopEmulation; i++) {
+          const shouldDisableElementWrappers = i !== contextSwichContext.editorArgs.loopEmulation - 1;
           if (contextSwichContext.editorArgs.wrapper) {
-            arr.push(<React.Fragment key={i}>{contextSwichContext.editorArgs.wrapper(toReturn, i)}</React.Fragment>);
+            if (shouldDisableElementWrappers) {
+              arr.push(
+                <ElementWrapperDisabler.Provider value={true} key={i}>
+                  {contextSwichContext.editorArgs.wrapper(toReturn, i)}
+                </ElementWrapperDisabler.Provider>
+              );
+            } else {
+              arr.push(<React.Fragment key={i}>{contextSwichContext.editorArgs.wrapper(toReturn, i)}</React.Fragment>);
+            }
           } else {
-            arr.push(<React.Fragment key={i}>{toReturn}</React.Fragment>);
+            if (shouldDisableElementWrappers) {
+              arr.push(
+                <ElementWrapperDisabler.Provider value={true} key={i}>
+                  {toReturn}
+                </ElementWrapperDisabler.Provider>
+              );
+            } else {
+              arr.push(<React.Fragment key={i}>{toReturn}</React.Fragment>);
+            }
           }
         }
         toReturn = arr;
@@ -2924,18 +2979,27 @@ export class SlateEditor extends React.Component<ISlateEditorProps, ISlateEditor
           this.props.elementWrappers.uiHandler &&
           this.props.elementWrappers.uiHandler[element.uiHandler]
         ) || this.props.elementWrappers.components[element.type];
-      return (
-        <ElementWrapper
-          element={element}
-          helpers={this.getHelpers()}
-          primarySelection={isPrimary}
-          isSelected={isSelected}
-          featureSupport={this.getFeatureSupport()}
-          {...this.props.elementWrappersArgs}
-        >
-          {toReturn}
-        </ElementWrapper>
-      );
+
+      if (ElementWrapper) {
+        return (
+          <ElementWrapperDisabler.Consumer>
+            {(disabled) => (
+              disabled ? toReturn : (
+                <ElementWrapper
+                  element={element}
+                  helpers={this.getHelpers()}
+                  primarySelection={isPrimary}
+                  isSelected={isSelected}
+                  featureSupport={this.getFeatureSupport()}
+                  {...this.props.elementWrappersArgs}
+                >
+                  {toReturn}
+                </ElementWrapper>
+              )
+            )}
+          </ElementWrapperDisabler.Consumer>
+        );
+      }
     }
 
     return toReturn;
@@ -3318,7 +3382,7 @@ export class SlateEditor extends React.Component<ISlateEditorProps, ISlateEditor
   public updateTemplateHTML(label: string, value: string) {
     if (this.state.currentSelectedBlockElement) {
       Transforms.setNodes(this.editor, {
-        textContent: value || "",
+        html: value || "",
       }, { at: this.state.currentSelectedBlockElementAnchor });
       Transforms.setNodes(this.editor, {
         text: label || localeReplacer(this.props.rootI18n.rich_template_component, this.props.rootI18n.rich_container),

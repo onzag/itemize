@@ -18,7 +18,7 @@ The implementation of the design falls on you the programmer, many time with hur
 
 ## Fragments to the Rescue
 
-Fragments are not special, they are just a bit of text in a table, just another item and unlike users they do not hold some special meaning to itemize, you could drop them altogether, add more properties to them, whatever you fancy; by definition a fragment is just an item that holds some text that is supposed to be a template or represent a view.
+Fragments are not special, they are just html text templates, just another item and unlike users they do not hold some special meaning to itemize, you could drop them altogether, add more properties to them, whatever you fancy; by definition a fragment is just an item that holds some text that is supposed to be a template or represent a view.
 
 Now as standard they are part of the cms module, and exist within `cms/fragment` where a lot of "fragment like" elements exist, such as articles, or other similar content.
 
@@ -47,7 +47,8 @@ Nice and all, but this header is rather disgraceful, no designer would accept th
     "supportsTitle": true,
     "supportsCustomStyles": true,
     "supportsTemplating": true,
-    "supportsLists": true
+    "supportsLists": true,
+    "supportsTables": true
 }
 ```
 
@@ -94,41 +95,41 @@ const frontpageWrapper = (children: React.ReactNode) => {
 This wrapper function determines an environment for templating purposes in a given context, we want to pass in these providers; now we want to define these properties:
 
 ```tsx
-const frontpageProperties: { [key: string]: ITemplateArg } = {
+const frontpageProperties: ITemplateProperties = {
     check_in_date_entry: {
         label: "Check in date Entry",
         type: "html",
-        htmlDisplay: (<Entry id="planned_check_in" />),
+        editorDisplay: (<Entry id="planned_check_in" />),
     },
     check_out_date_entry: {
         label: "Check out date Entry",
         type: "html",
-        htmlDisplay: (<Entry id="planned_check_out" />),
+        editorDisplay: (<Entry id="planned_check_out" />),
     },
     location_entry: {
         label: "Location Entry",
         type: "html",
-        htmlDisplay: (<Entry id="address" searchVariant="location" rendererArgs={{disableMapAndSearch: true}} />),
+        editorDisplay: (<Entry id="address" searchVariant="location" rendererArgs={{disableMapAndSearch: true}} />),
     },
     search_radius_entry: {
         label: "Search Radius Entry",
         type: "html",
-        htmlDisplay: (<Entry id="address" searchVariant="radius" />),
+        editorDisplay: (<Entry id="address" searchVariant="radius" />),
     },
     unit_type_entry: {
         label: "Unit Type Entry",
         type: "html",
-        htmlDisplay: (<Entry id="unit_type" searchVariant="search" />),
+        editorDisplay: (<Entry id="unit_type" searchVariant="search" />),
     },
     min_price_entry: {
         label: "Min Price Entry",
         type: "html",
-        htmlDisplay: (<Entry id="price" searchVariant="from" />),
+        editorDisplay: (<Entry id="price" searchVariant="from" />),
     },
     max_price_entry: {
         label: "Max Price Entry",
         type: "html",
-        htmlDisplay: (<Entry id="price" searchVariant="to" />),
+        editorDisplay: (<Entry id="price" searchVariant="to" />),
     },
 };
 ```
@@ -140,14 +141,18 @@ These are all for usage within templating, basically we are defining these argum
     "HEADER": {
         type: "context",
         label: "Header",
-        wrapper: frontpageWrapper,
         properties: frontpageProperties,
+        editorArgs: {
+            wrapper: frontpageWrapper,
+        },
     },
     "BODY": {
         type: "context",
         label: "Body",
-        wrapper: frontpageWrapper,
         properties: frontpageProperties,
+        editorArgs: {
+            wrapper: frontpageWrapper,
+        },
     },
 }
 ```
@@ -322,9 +327,16 @@ This is where UI handlers come into play they are defined in text specs to provi
 Luckily our fragments are already templates, so we just need to define an ui handler, so let's create a file in `components/ui-handlers.tsx` and add a new ui handler there.
 
 ```tsx
-import { DrawerConfiguratorElement, ISlateTemplateUIHandlerProps, IToolbarPrescenseElement } from "@onzag/itemize/client/fast-prototyping/components/slate";
-import { Button, ExtensionIcon } from "@onzag/itemize/client/fast-prototyping/mui-core";
-import React from "react";
+import { ISlateTemplateUIHandlerProps } from "@onzag/itemize/client/fast-prototyping/components/slate";
+import { IToolbarPrescenseElement, IDrawerConfiguratorElement } from "@onzag/itemize/client/fast-prototyping/components/slate/wrapper";
+import ExtensionIcon from "@mui/icons-material/Extension";
+import React, { useCallback } from "react";
+import Button from "@mui/material/Button";
+import InputLabel from "@mui/material/InputLabel";
+import FormControl from "@mui/material/FormControl";
+import Select from "@mui/material/Select";
+import MenuItem from "@mui/material/MenuItem";
+import { STANDARD_TEXT_NODE } from "@onzag/itemize/client/internal/text/serializer/types/text";
 
 /**
  * This is the button ui handler itself
@@ -379,8 +391,9 @@ export const button = (props: ISlateTemplateUIHandlerProps) => {
 export const buttonToolbarPrescence: IToolbarPrescenseElement = {
     element: {
         type: "paragraph",
-        containment: "block",
-        children: [],
+        children: [
+            STANDARD_TEXT_NODE(),
+        ],
         uiHandler: "button",
         uiHandlerArgs: {
             type: "contained",
@@ -398,48 +411,91 @@ export const buttonToolbarPrescence: IToolbarPrescenseElement = {
  * these args, if you use other editor other than the fast prototyping this might differ, however
  * we encourage other editors to still support these basic options
  */
-export const buttonOptions: DrawerConfiguratorElement[] = [
+export const buttonOptions: IDrawerConfiguratorElement[] = [
     {
-        uiHandler: "button",
-        arg: "type",
-        input: {
-            type: "select",
-            label: "button type",
-            placeholder: "button type",
-            options: [
-                {
-                    label: "contained",
-                    value: "contained",
-                },
-                {
-                    label: "text",
-                    value: "text",
-                },
-                {
-                    label: "outlined",
-                    value: "outlined",
-                }
-            ],
-        }
+        key: "button-type",
+        Component: (props) => {
+            const value = (props.state.currentSelectedElement.uiHandlerArgs && props.state.currentSelectedElement.uiHandlerArgs["type"]) || "";
+
+            const updateValue = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
+                props.helpers.setUIHandlerArg("type", e.target.value, props.state.currentSelectedElementAnchor);
+            }, [props.state.currentSelectedElementAnchor]);
+
+            if (
+                !props.state.currentSelectedElement ||
+                !props.state.currentSelectedElement.uiHandler ||
+                props.state.currentSelectedElement.uiHandler !== "button"
+            ) {
+                return null;
+            }
+
+            return (
+                <FormControl fullWidth={true}>
+                    <InputLabel
+                        htmlFor="button-type-label"
+                        shrink={true}
+                    >
+                        {props.i18nRichInfo.setLink.templatedLabel}
+                    </InputLabel>
+                    <Select
+                        value={value}
+                        labelId="button-type-label"
+                        onChange={updateValue}
+                        displayEmpty={true}
+                        fullWidth={true}
+                    >
+                        <MenuItem value="" data-unblur="true">
+                            <em>unspecified</em>
+                        </MenuItem>
+                        <MenuItem value="contained" data-unblur="true">contained</MenuItem>
+                        <MenuItem value="text" data-unblur="true">text</MenuItem>
+                        <MenuItem value="outlined" data-unblur="true">outlined</MenuItem>
+                    </Select>
+                </FormControl>
+            )
+        },
     },
     {
-        uiHandler: "button",
-        arg: "color",
-        input: {
-            type: "select",
-            label: "button color",
-            placeholder: "button color",
-            options: [
-                {
-                    label: "primary",
-                    value: "primary",
-                },
-                {
-                    label: "secondary",
-                    value: "secondary",
-                }
-            ],
-        }
+        key: "button-color",
+        Component: (props) => {
+            const value = (props.state.currentSelectedElement.uiHandlerArgs && props.state.currentSelectedElement.uiHandlerArgs["color"]) || "";
+
+            const updateValue = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
+                props.helpers.setUIHandlerArg("color", e.target.value, props.state.currentSelectedElementAnchor);
+            }, [props.state.currentSelectedElementAnchor]);
+
+            if (
+                !props.state.currentSelectedElement ||
+                !props.state.currentSelectedElement.uiHandler ||
+                props.state.currentSelectedElement.uiHandler !== "button"
+            ) {
+                return null;
+            }
+
+            return (
+                <FormControl fullWidth={true}>
+                    <InputLabel
+                        htmlFor="button-color-label"
+                        shrink={true}
+                    >
+                        {props.i18nRichInfo.setLink.templatedLabel}
+                    </InputLabel>
+                    <Select
+                        value={value}
+                        labelId="button-color-label"
+                        onChange={updateValue}
+                        displayEmpty={true}
+                        fullWidth={true}
+                    >
+                        <MenuItem value="" data-unblur="true">
+                            <em>unspecified</em>
+                        </MenuItem>
+                        <MenuItem value="primary" data-unblur="true">primary</MenuItem>
+                        <MenuItem value="secondary" data-unblur="true">secondary</MenuItem>
+                    </Select>
+                </FormControl>
+            )
+        },
     }
 ];
 ```
@@ -453,7 +509,9 @@ Anyway we have just defined the UI handler but we need to add it to our rich tex
     button: {
         label: "Button",
         type: "ui-handler",
-        handler: button,
+        editorHandler: {
+            Component: button,
+        },
     }
 }
 ```
@@ -480,12 +538,14 @@ And if we compile this it will work just fine, with the exception that we cannot
     id="content"
     rendererArgs={{
         context: FRAGMENTS[fragmentId] || null,
-        toolbarExtras: [
-            buttonToolbarPrescence,
-        ],
-        drawerExtras: [
-            ...buttonOptions,
-        ],
+        wrapperArgs: {
+            toolbarExtras: [
+                buttonToolbarPrescence,
+            ],
+            drawerExtras: [
+                ...buttonOptions,
+            ],
+        },
     }}
 />
 ```
@@ -548,108 +608,55 @@ We should now define a new fragment regarding this new page, which will be simil
 
 Now we need to display the search results, and for such a mechanism we should use a loop, one of the features of the templating mechanism of itemize is the capability to create loops, however they as well need to be defined.
 
-In order to create our looping mechanism let's first define the templating mechanism, we will be doing a lot of changes because we want to have all these template args that we first defined to let's refactor our `fragment.tsx` file to be organized the following way:
+In order to create our looping mechanism let's first define the templating mechanism, we will be doing a lot of changes because we want to have all these template args that we first defined to let's refactor our `fragment.tsx` file to be organized firstly by removing `frontpageProperties` and refactoring it the following way:
 
 ```tsx
-import React from "react";
-
-import { ItemProvider } from "@onzag/itemize/client/providers/item";
-import Entry from "@onzag/itemize/client/components/property/Entry";
-import LocationStateReader from "@onzag/itemize/client/components/navigation/LocationStateReader";
-import SubmitActioner from "@onzag/itemize/client/components/item/SubmitActioner";
-
-import {
-    Paper, createStyles, withStyles, WithStyles,
-    Container, Box, List, ListItem, ListItemText,
-    ExtensionIcon, ListItemIcon,
-} from "@onzag/itemize/client/fast-prototyping/mui-core";
-import { SubmitButton } from "@onzag/itemize/client/fast-prototyping/components/buttons";
-import Snackbar from "@onzag/itemize/client/fast-prototyping/components/snackbar";
-import { ITemplateArgsContext, ITemplateArg } from "@onzag/itemize/client/fast-prototyping/components/slate";
-import Route from "@onzag/itemize/client/components/navigation/Route";
-import Link from "@onzag/itemize/client/components/navigation/Link";
-import { LanguagePicker } from "@onzag/itemize/client/fast-prototyping/components/language-picker";
-import { ModuleProvider } from "@onzag/itemize/client/providers/module";
-import { button, buttonOptions, buttonToolbarPrescence } from "../../components/ui-handlers";
-import View from "@onzag/itemize/client/components/property/View";
-import { createCurrencyValue, createFakeFileValue, createLocationValue } from "@onzag/itemize/util";
-
-/**
- * This is going to be the search wrapper that wraps
- * our search based fragments
- * @param children 
- */
-function searchWrapper(children: React.ReactNode) {
-    return (
-        <ModuleProvider module="hosting">
-            <ItemProvider
-                itemDefinition="unit"
-                searchCounterpart={true}
-                properties={[
-                    "address",
-                    "unit_type",
-                    "planned_check_in",
-                    "planned_check_out",
-                    "price",
-                ]}
-            >
-                {children}
-            </ItemProvider>
-        </ModuleProvider>
-    );
-}
-
 /**
  * These are the basic properties that we will have everywhere
  * in our fragments
  */
-const basicFieldsProperties: { [key: string]: ITemplateArg } = {
+const basicProperties: ITemplateProperties = {
     check_in_date_entry: {
         label: "Check in date Entry",
         type: "html",
-        htmlDisplay: (<Entry id="planned_check_in" />),
-        nonRootInheritable: true,
+        editorDisplay: (<Entry id="planned_check_in" />),
     },
     check_out_date_entry: {
         label: "Check out date Entry",
         type: "html",
-        htmlDisplay: (<Entry id="planned_check_out" />),
-        nonRootInheritable: true,
+        editorDisplay: (<Entry id="planned_check_out" />),
     },
     location_entry: {
         label: "Location Entry",
         type: "html",
-        htmlDisplay: (<Entry id="address" searchVariant="location" rendererArgs={{ disableMapAndSearch: true }} />),
-        nonRootInheritable: true,
+        editorDisplay: (<Entry id="address" searchVariant="location" rendererArgs={{ disableMapAndSearch: true }} />),
     },
     search_radius_entry: {
         label: "Search Radius Entry",
         type: "html",
-        htmlDisplay: (<Entry id="address" searchVariant="radius" />),
-        nonRootInheritable: true,
+        editorDisplay: (<Entry id="address" searchVariant="radius" />),
     },
     unit_type_entry: {
         label: "Unit Type Entry",
         type: "html",
-        htmlDisplay: (<Entry id="unit_type" searchVariant="search" />),
-        nonRootInheritable: true,
+        editorDisplay: (<Entry id="unit_type" searchVariant="search" />),
     },
     min_price_entry: {
         label: "Min Price Entry",
         type: "html",
-        htmlDisplay: (<Entry id="price" searchVariant="from" />),
-        nonRootInheritable: true,
+        editorDisplay: (<Entry id="price" searchVariant="from" />),
     },
     max_price_entry: {
         label: "Max Price Entry",
         type: "html",
-        htmlDisplay: (<Entry id="price" searchVariant="to" />),
-        nonRootInheritable: true,
+        editorDisplay: (<Entry id="price" searchVariant="to" />),
     },
     button: {
         label: "Button",
         type: "ui-handler",
-        handler: button,
+        editorHandler: {
+            Component: button,
+        }
     },
 };
 
@@ -657,19 +664,23 @@ const basicFieldsProperties: { [key: string]: ITemplateArg } = {
  * This is the frontpage only specific notice how this one
  * has the go to search page function in it
  */
-const frontpageProperties: { [key: string]: ITemplateArg } = {
-    ...basicFieldsProperties,
+const frontpageProperties: ITemplateProperties = {
+    ...basicProperties,
     go_to_search_page: {
         label: "Go To Search Page",
         type: "function",
     },
 };
+```
 
+And now we may be able to define new properties for the search page that we will later create
+
+```tsx
 /**
  * Now these are for the one where we are searching for a place to reserve
  */
-const reserveSearchProperties: { [key: string]: ITemplateArg | ITemplateArgsContext } = {
-    ...basicFieldsProperties,
+const reserveSearchProperties: ITemplateProperties = {
+    ...basicProperties,
     /**
      * We add the function for the button or whatever to perform the search
      * to actually do such search
@@ -690,60 +701,66 @@ const reserveSearchProperties: { [key: string]: ITemplateArg | ITemplateArgsCont
 
         // we make it loopable and emulate 3 items
         loopable: true,
-        loopEmulation: 3,
+        // editor arrgs that are specific to the fast prototyping slate editor
+        editorArgs: {
+            // emulate 3 loops
+            loopEmulation: 3,
 
-        /**
-         * We want to wrap everything that is inside this context and because
-         * we are loop wrapping we have index emulation
-         * @param n this is basically the node we are wrapping
-         * @param emulatedIndex and this is the index we are emulating, we have 3, so [0, 1, 2] will be our indexes
-         */
-        wrapper: (n, emulatedIndex) => (
-            // we are going to change the context of our item provider
-            <ItemProvider
-                itemDefinition="unit"
-                // using a version in order to ensure they hold different states
-                forVersion={"rich-test-" + emulatedIndex}
-                // we need to use these properties
-                properties={[
-                    "title",
-                    "image",
-                    "address",
-                    "unit_type",
-                    "price",
-                ]}
-                cleanOnDismount={true}
-                // and we are going to set using emulated values
-                // this means that these items will have such values which will allow
-                // for variety
-                setters={[
-                    {
-                        id: "address",
-                        value: createLocationValue("Sample Address " + emulatedIndex, "Sample Address Specification " + emulatedIndex),
-                    },
-                    {
-                        id: "title",
-                        value: ["Sample Title", "Another Title", "Yet another Title"][emulatedIndex],
-                    },
-                    {
-                        id: "image",
-                        // note how we are using this strange url as the source of our file
-                        // we will have to create and put such file as a resource
-                        value: createFakeFileValue("SAMPLE_FILE", "Sample image " + emulatedIndex, "/rest/resource/image/sample.jpg", "image/jpeg"),
-                    },
-                    {
-                        id: "unit_type",
-                        value: ["room", "apartment", "house"][emulatedIndex],
-                    },
-                    {
-                        id: "price",
-                        value: createCurrencyValue(100 * (emulatedIndex + 1), ["EUR", "USD", "CHF"][emulatedIndex]),
-                    }
-                ]}
-            >
-                {n}
-            </ItemProvider>
-        ),
+            loopEmulation: 3,
+            
+            /**
+            * We want to wrap everything that is inside this context and because
+            * we are loop wrapping we have index emulation
+            * @param n this is basically the node we are wrapping
+            * @param emulatedIndex and this is the index we are emulating, we have 3, so [0, 1, 2] will be our indexes
+            */
+            wrapper: (n: React.ReactNode, emulatedIndex: number) => (
+                // we are going to change the context of our item provider
+                <ItemProvider
+                    itemDefinition="unit"
+                    // using a version in order to ensure they hold different states
+                    forVersion={"rich-test-" + emulatedIndex}
+                    // we need to use these properties
+                    properties={[
+                        "title",
+                        "image",
+                        "address",
+                        "unit_type",
+                        "price",
+                    ]}
+                    cleanOnDismount={true}
+                    // and we are going to set using emulated values
+                    // this means that these items will have such values which will allow
+                    // for variety
+                    setters={[
+                        {
+                            id: "address",
+                            value: createLocationValue("Sample Address " + emulatedIndex, "Sample Address Specification " + emulatedIndex),
+                        },
+                        {
+                            id: "title",
+                            value: ["Sample Title", "Another Title", "Yet another Title"][emulatedIndex],
+                        },
+                        {
+                            id: "image",
+                            // note how we are using this strange url as the source of our file
+                            // we will have to create and put such file as a resource
+                            value: createFakeFileValue("SAMPLE_FILE", "Sample image " + emulatedIndex, "/rest/resource/image/sample.jpg", "image/jpeg"),
+                        },
+                        {
+                            id: "unit_type",
+                            value: ["room", "apartment", "house"][emulatedIndex],
+                        },
+                        {
+                            id: "price",
+                            value: createCurrencyValue(100 * (emulatedIndex + 1), ["EUR", "USD", "CHF"][emulatedIndex]),
+                        }
+                    ]}
+                >
+                    {n}
+                </ItemProvider>
+            ),
+        },
 
         // now we can set these properties here
         // this is what we are using for searching
@@ -751,27 +768,27 @@ const reserveSearchProperties: { [key: string]: ITemplateArg | ITemplateArgsCont
             address: {
                 label: "Address",
                 type: "html",
-                htmlDisplay: (<View id="address" rendererArgs={{ hideMap: true }} />),
+                editorDisplay: (<View id="address" rendererArgs={{ hideMap: true }} />),
             },
             title: {
                 label: "Title",
                 type: "html",
-                htmlDisplay: (<View id="title" />),
+                editorDisplay: (<View id="title" />),
             },
             unit_type: {
                 label: "Unit Type",
                 type: "html",
-                htmlDisplay: (<View id="unit_type" />),
+                editorDisplay: (<View id="unit_type" />),
             },
             unit_price: {
                 label: "Price Of Unit",
                 type: "html",
-                htmlDisplay: (<View id="price" />),
+                editorDisplay: (<View id="price" />),
             },
             image: {
                 label: "Image Of Unit",
                 type: "html",
-                htmlDisplay: (<View id="image" rendererArgs={{imageClassName: "element-view", disableImageLinking: true}}/>),
+                editorDisplay: (<View id="image" rendererArgs={{imageClassName: "element-view", disableImageLinking: true}}/>),
             },
             go_to_view_listing: {
                 label: "Go to View Listing Page",
@@ -780,115 +797,21 @@ const reserveSearchProperties: { [key: string]: ITemplateArg | ITemplateArgsCont
         }
     }
 };
+```
 
-/**
- * The most important bit that defines what fragments are available to modify
- * from within the CMS, these use custom keys; and you might add as many of
- * them as you like, they are defined by template args since every fragment
- * is allowed to be a template and can be rendered as such (even if it doesn't have to)
- * in cms/index.propext.json you can find out the content property and what it
- * supports
- */
-const FRAGMENTS: { [key: string]: ITemplateArgsContext } = {
-    /**
-     * In this example you can see the header, the header uses a custom ID
-     * and is loaded in the frontpage by passing it as ID for the fragment
-     * item definition
-     * 
-     * This defines the context, now we are using hardcoded contexts in here
-     * that don't support for multilingual design, because of the labels
-     * we are giving in, which are in english
-     * 
-     * Labels can however also be i18n element types, as react nodes are allowed
-     * so that enables multilingual functionality if required, for the purpose
-     * of this basic CMS simple strings are used
-     */
-    "HEADER": {
-        type: "context",
-        label: "Header",
-        wrapper: searchWrapper,
-        properties: frontpageProperties,
-    },
-    "BODY": {
-        type: "context",
-        label: "Body",
-        wrapper: searchWrapper,
-        properties: frontpageProperties,
-    },
+And now we may add the new fragment into the `FRAGMENTS`
+
+```tsx
+{
     "RESERVE_SEARCH": {
         type: "context",
         label: "Reservation Search Page",
-        wrapper: searchWrapper,
         properties: reserveSearchProperties,
-    },
-    "ACCOUNT_VALIDATION_EMAIL": {
-        type: "context",
-        label: "Account Validation Email",
-        properties: {
-            validate_account_link: {
-                type: "link",
-                label: "Validation Link",
-            },
-            username: {
-                type: "text",
-                label: "Username",
-            },
-        },
-    },
-    "ACCOUNT_RECOVERY_EMAIL": {
-        type: "context",
-        label: "Account Recovery Email",
-        properties: {
-            forgot_password_link: {
-                type: "link",
-                label: "Recovery Link",
-            },
-            username: {
-                type: "text",
-                label: "Username",
-            },
-        },
-    },
-    "NOTIFICATION_EMAIL": {
-        type: "context",
-        label: "Request notification email",
-        properties: {
-            request_notification_requester: {
-                type: "text",
-                label: "Requester",
-            },
-            request_notification_check_in: {
-                type: "text",
-                label: "Check in time",
-            },
-            request_notification_check_out: {
-                type: "text",
-                label: "Check out time",
-            },
-        },
-    },
-    "APPROVAL_EMAIL": {
-        type: "context",
-        label: "Request approval email",
-        properties: {
-            request_notification_host: {
-                type: "text",
-                label: "Host",
-            },
-        },
-    },
-    "DENIAL_EMAIL": {
-        type: "context",
-        label: "Request denial email",
-        properties: {
-            request_notification_host: {
-                type: "text",
-                label: "Host",
-            },
+        editorArgs: {
+            wrapper: frontpageWrapper,
         },
     },
 }
-const ALL_FRAGMENTS = Object.keys(FRAGMENTS);
 ```
 
 This is what the refactor is like without including anything that was under the `ALL_FRAGMENTS` last line, we have now introduced a brand new fragment into the elements named `RESERVE_SEARCH` which represents our search result page, which we haven't defined yet, but we should, but first, let's try to define a new raw resource for our fake file.
