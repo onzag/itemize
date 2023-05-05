@@ -2,6 +2,18 @@
 
 To configure itemize isn't the easiest nor the most straightforward process, it relies on a conjuction of different APIs
 
+## Requeriments
+
+At the time of this writing due to many limitations with incompatible updates itemize requires the following stack:
+
+- NodeJS version 15
+- npm version 6.14.16 (it will not work with newer)
+- Python (tested with 2.7, to build the codebase)
+- Build Essentials (to build the codebase)
+- Docker
+
+Itemize currently only works under a linux system, it was tested under WSL with it not being capable to complete a npm install; while theorethically it should work the same way under WSL in practise the setup proves inconviently complex as many things fail.
+
 ## Fast initialization
 
 1. Make a directory
@@ -43,13 +55,6 @@ To configure itemize isn't the easiest nor the most straightforward process, it 
 10. Start a dev server with the basic flags
 
 `NODE_TLS_REJECT_UNAUTHORIZED=0 NO_SSR=true NO_SEO=true FAKE_EMAILS=true FAKE_SMS=true npm run start-dev-server`
-
-## Install the main dependencies
-
-Note as of the time of this writting itemize will only work on NodeJS version 15 as many of the dependencies do not work in later versions.
-
-- NodeJS `https://nodejs.org/en/download/`
-- Docker `https://docs.docker.com/get-docker/`
 
 ## Create your first project
 

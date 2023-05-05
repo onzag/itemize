@@ -455,27 +455,27 @@ export default function PropertyViewTextRenderer(props: IPropertyViewTextRendere
           onCustom={props.args.onCustom}
           onCustomAttributesFor={props.args.onCustomAttributesFor}
           onCustomWrap={props.args.onCustomWrap}
-          lang={props.currentValueLang}
+          lang={props.args.overrideLanguage || props.currentValueLang}
         >
           {props.currentValueText}
         </TemplatedPropertyViewRichTextRenderer>
       );
     } else {
       return (
-        <PropertyViewRichTextViewer className={props.args.className} Node={Node} lang={props.currentValueLang}>
+        <PropertyViewRichTextViewer className={props.args.className} Node={Node} lang={props.args.overrideLanguage || props.currentValueLang}>
           {props.currentValueText}
         </PropertyViewRichTextViewer>
       );
     }
   } else if (props.subtype === "plain") {
     return (
-      <Node className={"plain-text" + (props.args.className ? " " + props.args.className : "")} lang={props.currentValueLang}>
+      <Node className={"plain-text" + (props.args.className ? " " + props.args.className : "")} lang={props.args.overrideLanguage || props.currentValueLang}>
         {props.currentValueText}
       </Node>
     );
   }
   return (
-    <Node lang={props.currentValueLang} className={props.args.className}>
+    <Node lang={props.args.overrideLanguage || props.currentValueLang} className={props.args.className}>
       {props.currentValueText}
     </Node>
   );

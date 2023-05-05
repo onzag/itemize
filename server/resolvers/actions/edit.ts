@@ -434,8 +434,7 @@ export async function editItemDefinition(
     );
 
     if (moduleTrigger) {
-      // we execute the trigger
-      await moduleTrigger({
+      const args = {
         language: resolverArgs.args.language,
         dictionary,
         appData,
@@ -447,7 +446,7 @@ export async function editItemDefinition(
         requestedUpdate: gqlValueToConvert,
         requestedUpdateToBlock: isToBlock,
         requestedUpdateToUnblock: isToUnblock,
-        requestedUpdateCreatedBy: null,
+        requestedUpdateCreatedBy: null as string,
         requestedUpdateParent: isReparenting ? {
           id: gqlValueToConvert.parent_id as string,
           version: gqlValueToConvert.parent_version as string,
@@ -466,15 +465,33 @@ export async function editItemDefinition(
           customData: tokenData.customData,
         },
         forbid: defaultTriggerInvalidForbiddenFunction,
-        customId: null,
+        customId: null as string,
         setForId: noop,
         setVersion: noop,
-      });
+      };
+      // we execute the trigger
+      await moduleTrigger(args);
+
+      (async () => {
+        try {
+          const detachedArgs = {...args};
+          detachedArgs.action = IOTriggerActions.EDITED_DETACHED;
+          await moduleTrigger(detachedArgs);
+        } catch (err) {
+          logger.error(
+            {
+              functionName: "editItemDefinition",
+              message: "Could not execute the EDITED_DETACHED module trigger",
+              serious: true,
+              err,
+            },
+          );
+        }
+      })();
     }
     // same with the item definition
     if (itemDefinitionTrigger) {
-      // we call the trigger
-      await itemDefinitionTrigger({
+      const args = {
         language: resolverArgs.args.language,
         dictionary,
         appData,
@@ -486,7 +503,7 @@ export async function editItemDefinition(
         requestedUpdate: gqlValueToConvert,
         requestedUpdateToBlock: isToBlock,
         requestedUpdateToUnblock: isToUnblock,
-        requestedUpdateCreatedBy: null,
+        requestedUpdateCreatedBy: null as string,
         requestedUpdateParent: isReparenting ? {
           id: gqlValueToConvert.parent_id as string,
           version: gqlValueToConvert.parent_version as string,
@@ -505,10 +522,29 @@ export async function editItemDefinition(
           customData: tokenData.customData,
         },
         forbid: defaultTriggerInvalidForbiddenFunction,
-        customId: null,
+        customId: null as string,
         setForId: noop,
         setVersion: noop,
-      });
+      };
+      // we call the trigger
+      await itemDefinitionTrigger(args);
+
+      (async () => {
+        try {
+          const detachedArgs = {...args};
+          detachedArgs.action = IOTriggerActions.EDITED_DETACHED;
+          await itemDefinitionTrigger(detachedArgs);
+        } catch (err) {
+          logger.error(
+            {
+              functionName: "editItemDefinition",
+              message: "Could not execute the EDITED_DETACHED item trigger",
+              serious: true,
+              err,
+            },
+          );
+        }
+      })();
     }
 
     const newRolesManagerWithEditedValue = rolesManager.subEnvironment({

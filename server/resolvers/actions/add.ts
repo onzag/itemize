@@ -528,15 +528,15 @@ export async function addItemDefinition(
     if (
       moduleTrigger
     ) {
-      await moduleTrigger({
+      const args = {
         language: resolverArgs.args.language,
         dictionary,
         appData,
         itemDefinition: itemDefinition,
         module: mod,
-        originalValue: null,
-        originalValueSQL: null,
-        originalValueBlocked: null,
+        originalValue: null as any,
+        originalValueSQL: null as any,
+        originalValueBlocked: null as any,
         requestedUpdate: gqlValueToConvert,
         requestedUpdateParent: isNowParenting ? {
           id: gqlValueToConvert.parent_id as string,
@@ -559,21 +559,39 @@ export async function addItemDefinition(
           customData: tokenData.customData,
         },
         forbid: defaultTriggerInvalidForbiddenFunction,
-        customId: null,
+        customId: null as string,
         setForId: noop,
         setVersion: noop,
-      });
+      };
+      await moduleTrigger(args);
+
+      (async () => {
+        try {
+          const detachedArgs = {...args};
+          detachedArgs.action = IOTriggerActions.CREATED_DETACHED;
+          await moduleTrigger(detachedArgs);
+        } catch (err) {
+          logger.error(
+            {
+              functionName: "addItemDefinition",
+              message: "Could not execute the CREATED_DETACHED module trigger",
+              serious: true,
+              err,
+            },
+          );
+        }
+      })();
     }
     if (itemDefinitionTrigger) {
-      await itemDefinitionTrigger({
+      const args = {
         language: resolverArgs.args.language,
         dictionary,
         appData,
         itemDefinition: itemDefinition,
         module: mod,
-        originalValue: null,
-        originalValueSQL: null,
-        originalValueBlocked: null,
+        originalValue: null as any,
+        originalValueSQL: null as any,
+        originalValueBlocked: null as any,
         requestedUpdate: gqlValueToConvert,
         requestedUpdateToBlock: false,
         requestedUpdateToUnblock: false,
@@ -596,10 +614,28 @@ export async function addItemDefinition(
           customData: tokenData.customData,
         },
         forbid: defaultTriggerInvalidForbiddenFunction,
-        customId: null,
+        customId: null as string,
         setForId: noop,
         setVersion: noop,
-      });
+      };
+      await itemDefinitionTrigger(args);
+
+      (async () => {
+        try {
+          const detachedArgs = {...args};
+          detachedArgs.action = IOTriggerActions.CREATED_DETACHED;
+          await itemDefinitionTrigger(detachedArgs);
+        } catch (err) {
+          logger.error(
+            {
+              functionName: "addItemDefinition",
+              message: "Could not execute the CREATED_DETACHED item trigger",
+              serious: true,
+              err,
+            },
+          );
+        }
+      })();
     }
 
     const newRolesManagerWithKnownValue = rolesManager.subEnvironment({

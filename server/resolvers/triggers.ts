@@ -9,10 +9,13 @@ import type { ElasticQueryBuilder } from "../elastic";
 export enum IOTriggerActions {
   CREATE,
   CREATED,
+  CREATED_DETACHED,
   EDIT,
   EDITED,
+  EDITED_DETACHED,
   DELETE,
   DELETED,
+  DELETED_DETACHED,
   READ,
 }
 

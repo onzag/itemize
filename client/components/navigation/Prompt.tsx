@@ -167,7 +167,12 @@ export default class Prompt extends React.PureComponent<PromptProps, PromptState
           splitted.pop();
         }
 
-        const urlIsSameWithoutLanguageConsidered = (splitted.join("/") + location.search) === this.props.ignoreSimpleLanguageChangeFrom;
+        const urlWithoutLanguage = "/" + (splitted.join("/") + location.search);
+        const comparison = this.props.ignoreSimpleLanguageChangeFrom.startsWith("/") ?
+          this.props.ignoreSimpleLanguageChangeFrom : "/" + this.props.ignoreSimpleLanguageChangeFrom;
+
+
+        const urlIsSameWithoutLanguageConsidered = urlWithoutLanguage === comparison;
         willBlock = !urlIsSameWithoutLanguageConsidered;
       }
 

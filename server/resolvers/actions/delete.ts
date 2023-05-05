@@ -273,8 +273,7 @@ export async function deleteItemDefinition(
   );
 
   if (moduleTrigger) {
-    // we execute the trigger
-    await moduleTrigger({
+    const args = {
       language: resolverArgs.args.language,
       dictionary,
       appData,
@@ -283,14 +282,14 @@ export async function deleteItemDefinition(
       originalValue: currentWholeValueAsGQL,
       originalValueSQL: wholeSqlStoredValue,
       originalValueBlocked: !!wholeSqlStoredValue.blocked_at,
-      requestedUpdate: null,
+      requestedUpdate: null as any,
       requestedUpdateToBlock: false,
       requestedUpdateToUnblock: false,
-      requestedUpdateCreatedBy: null,
-      requestedUpdateParent: null,
-      newValue: null,
-      newValueSQL: null,
-      newValueBlocked: null,
+      requestedUpdateCreatedBy: null as string,
+      requestedUpdateParent: null as any,
+      newValue: null as any,
+      newValueSQL: null as any,
+      newValueBlocked: null as any,
       extraArgs: resolverArgs.args,
       action: IOTriggerActions.DELETED,
       id: resolverArgs.args.id as string,
@@ -301,16 +300,34 @@ export async function deleteItemDefinition(
         customData: tokenData.customData,
       },
       forbid: defaultTriggerInvalidForbiddenFunction,
-      customId: null,
+      customId: null as string,
       setForId: noop,
       setVersion: noop,
-    });
+    };
+    // we execute the trigger
+    await moduleTrigger(args);
+
+    (async () => {
+      try {
+        const detachedArgs = {...args};
+        detachedArgs.action = IOTriggerActions.DELETED_DETACHED;
+        await moduleTrigger(detachedArgs);
+      } catch (err) {
+        logger.error(
+          {
+            functionName: "deleteItemDefinition",
+            message: "Could not execute the DELETED_DETACHED module trigger",
+            serious: true,
+            err,
+          },
+        );
+      }
+    })();
   }
 
   // same with the item definition
   if (itemDefinitionTrigger) {
-    // we call the trigger
-    await itemDefinitionTrigger({
+    const args = {
       language: resolverArgs.args.language,
       dictionary,
       appData,
@@ -319,14 +336,14 @@ export async function deleteItemDefinition(
       originalValue: currentWholeValueAsGQL,
       originalValueSQL: wholeSqlStoredValue,
       originalValueBlocked: !!wholeSqlStoredValue.blocked_at,
-      requestedUpdate: null,
+      requestedUpdate: null as any,
       requestedUpdateToBlock: false,
       requestedUpdateToUnblock: false,
-      requestedUpdateCreatedBy: null,
-      requestedUpdateParent: null,
-      newValue: null,
-      newValueSQL: null,
-      newValueBlocked: null,
+      requestedUpdateCreatedBy: null as string,
+      requestedUpdateParent: null as any,
+      newValue: null as any,
+      newValueSQL: null as any,
+      newValueBlocked: null as any,
       extraArgs: resolverArgs.args,
       action: IOTriggerActions.DELETED,
       id: resolverArgs.args.id as string,
@@ -337,10 +354,29 @@ export async function deleteItemDefinition(
         customData: tokenData.customData,
       },
       forbid: defaultTriggerInvalidForbiddenFunction,
-      customId: null,
+      customId: null as string,
       setForId: noop,
       setVersion: noop,
-    });
+    };
+    // we call the trigger
+    await itemDefinitionTrigger(args);
+
+    (async () => {
+      try {
+        const detachedArgs = {...args};
+        detachedArgs.action = IOTriggerActions.DELETED_DETACHED;
+        await itemDefinitionTrigger(detachedArgs);
+      } catch (err) {
+        logger.error(
+          {
+            functionName: "deleteItemDefinition",
+            message: "Could not execute the DELETED_DETACHED item trigger",
+            serious: true,
+            err,
+          },
+        );
+      }
+    })();
   }
 
   CAN_LOG_DEBUG && logger.debug(

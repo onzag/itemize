@@ -33,9 +33,9 @@ import { ItemizeElasticClient } from "./elastic";
 import type { IAppDataType } from "../server";
 import { GLOBAL_MANAGER_MODE, INSTANCE_MODE } from "./environment";
 
-type RedoDictionariesFnPropertyBased = (language: string, dictionary: string, property: string) => void;
-type RedoDictionariesFnPropertyIncludeBased = (language: string, dictionary: string, include: string, property: string) => void;
-type RedoDictionariesFn = RedoDictionariesFnPropertyBased | RedoDictionariesFnPropertyIncludeBased;
+type changeRowLanguageFnPropertyBased = (language: string, dictionary: string, property: string) => void;
+type changeRowLanguageFnPropertyIncludeBased = (language: string, dictionary: string, include: string, property: string) => void;
+type changeRowLanguageFn = changeRowLanguageFnPropertyBased | changeRowLanguageFnPropertyIncludeBased;
 
 const NAMESPACE = "23ab4609-af49-4cdf-921b-4700adb284f3";
 export function makeIdOutOf(str: string) {
@@ -126,13 +126,19 @@ export class ItemizeRawDB {
    * @param fn the transactional function
    * @returns whatever is returned in the transactional function
    */
-  public startTransaction<T>(fn: (transactingRawDB: ItemizeRawDB) => Promise<T>): Promise<T> {
+  public startTransaction<T>(fn: (transactingRawDB: ItemizeRawDB) => Promise<T>, opts: {ensureOrder?: boolean} = {}): Promise<T> {
     return this.databaseConnection.startTransaction(async (transactingClient) => {
       const newRawDB = new ItemizeRawDB(this.redisGlobal, this.redisPub, this.redisSub, transactingClient, this.root);
       newRawDB.transacting = true;
 
       const resolvedPromiseToReturn = await fn(newRawDB);
-      this.transactingQueue.forEach((q) => q());
+      if (opts.ensureOrder) {
+        for (const q of this.transactingQueue) {
+          await q();
+        }
+      } else {
+        await Promise.all(this.transactingQueue.map((q) => q()));
+      }
       return resolvedPromiseToReturn;
     });
   }
@@ -221,6 +227,105 @@ export class ItemizeRawDB {
       modSQL,
       itemSQL,
     };
+  }
+
+  /**
+   * Given incomplete row data this function will complete the row data (if possible)
+   * and return completed array, note that this will likely be out of the order given
+   * as the order in and out is not guaranteed
+   * 
+   * @param rows the rows, they should all have at least, id, version and type defined
+   * @returns the entire row data
+   */
+  public async completeRowData(rows: ISQLTableRowValue[]): Promise<[ISQLTableRowValue[], boolean]> {
+    if (!rows.length) {
+      return [rows, true];
+    }
+
+    const typesOrg: {[type: string]: Array<[string, string]>} = {};
+
+    const invalidRow = rows.some((r) => {
+      return (typeof r.type === "undefined" || typeof r.id === "undefined" || typeof r.version === "undefined");
+    });
+
+    if (invalidRow) {
+      // could not complete row data due to invalid row
+      return [rows, false];
+    }
+
+    // let's reorganize the rows
+    rows.forEach((r) => {
+      if (!typesOrg[r.type]) {
+        typesOrg[r.type] = [];
+      }
+      typesOrg[r.type].push([r.id, r.version || null]);
+    });
+
+    // now let's perform all those selects based on the types we have, we need different selects
+    const selects = await Promise.all(Object.keys(typesOrg).map(async (type) => {
+      // all the ids and versions we are selecting for the given type
+      const idVersions = typesOrg[type];
+      // whether all the versions are null and we are just updating ids
+      const isAllNullVersions = idVersions.every((idVersion) => idVersion[1] === null);
+
+      // now we can perform such select
+      return await this.performRawDBSelect(type, (b) => {
+        const whereBuilder = b.selectAll().whereBuilder;
+
+        // if we are talking about just null versions
+        if (isAllNullVersions) {
+          const allIds = idVersions.map((idVersion) => idVersion[0]);
+          whereBuilder.andWhere("\"id\" = ANY(ARRAY[" + allIds.map(() => "?").join(",") + "]::TEXT[])", allIds);
+          whereBuilder.andWhereColumn("version", "");
+        } else {
+          idVersions.forEach((idVersion) => {
+            whereBuilder.orWhere((subBuilder) => {
+              subBuilder.andWhereColumn("id", idVersion[0]);
+              subBuilder.andWhereColumn("version", idVersion[1]);
+            });
+          });
+        }
+      });
+    }));
+
+    // flatten this
+    const newRowData = selects.flat();
+
+    // something went wrong here too
+    if (newRowData.length !== rows.length) {
+      return [rows, false];
+    }
+
+    let somethingWentWrong = false;
+    const finalRowData = newRowData.map((d) => {
+      if (somethingWentWrong) {
+        // collapse
+        return null;
+      }
+
+      const originalRowData = rows.find((r) => r.id === d.id && (r.version || null) === (d.version || null));
+      if (!originalRowData) {
+        // went wrong this row shouldnt have been returned
+        somethingWentWrong = true;
+        return null;
+      }
+
+      // override what the original row data held
+      // this include OLD_ stuff that is used during events
+      // and trackers and whatnot
+      return {
+        ...newRowData,
+        ...originalRowData,
+      };
+    });
+
+    // something went seriously wrong
+    if (somethingWentWrong) {
+      return [rows, false];
+    }
+
+    // now we are done and we have completed the row data for each row
+    return [finalRowData, true];
   }
 
   /**
@@ -314,6 +419,24 @@ export class ItemizeRawDB {
       });
     }
 
+    if (!dataIsComplete) {
+      const [newRows, newIsComplete] = await this.completeRowData([row]);
+      if (!newIsComplete) {
+        logger && logger.error(
+          {
+            className: "ItemizeRawDB",
+            methodName: "informChangeOnRowElastic",
+            message: "row data could not be completed",
+            data: {
+              row
+            },
+          }
+        );
+        return;
+      }
+      row = newRows[0];
+    }
+
     const idef = (this.root.registry[row.type] as ItemDefinition);
 
     // send to elasticsearch
@@ -334,53 +457,43 @@ export class ItemizeRawDB {
         language = typeof elasticLanguageOverride !== "undefined" ? elasticLanguageOverride : idef.getSearchEngineMainLanguageFromRow(row)
       }
 
+      if (!language) {
+        logger && logger.error(
+          {
+            className: "ItemizeRawDB",
+            methodName: "informChangeOnRowElastic",
+            message: "Could not deterimine the language to execute on",
+            data: {
+              row
+            },
+          }
+        );
+        return;
+      }
+
       if (action === "created") {
-        if (language) {
-          this.elastic.createDocument(
-            idef,
-            language,
-            row.id,
-            row.version || null,
-            dataIsComplete ? row : null,
-          );
-        } else {
-          this.elastic.createDocumentUnknownEverything(
-            idef,
-            row.id,
-            row.version || null,
-          );
-        }
+        await this.elastic.createDocument(
+          idef,
+          language,
+          row.id,
+          row.version || null,
+          row,
+        );
       } else if (action === "deleted") {
-        if (language) {
-          this.elastic.deleteDocument(
-            idef,
-            language,
-            row.id,
-            row.version || null,
-          );
-        } else {
-          this.elastic.deleteDocumentUnknownLanguage(
-            idef,
-            row.id,
-            row.version || null,
-          );
-        }
+        await this.elastic.deleteDocument(
+          idef,
+          language,
+          row.id,
+          row.version || null,
+        );
       } else if (action === "modified") {
-        if (language) {
-          this.elastic.updateDocumentUnknownOriginalLanguage(
-            idef,
-            language,
-            row.id,
-            row.version || null,
-            dataIsComplete ? row : null,
-          );
-        } else {
-          this.elastic.updateDocumentUnknownEverything(
-            idef,
-            row.id,
-            row.version || null,
-          );
-        }
+        await this.elastic.updateDocumentUnknownOriginalLanguage(
+          idef,
+          language,
+          row.id,
+          row.version || null,
+          row,
+        );
       }
     }
   }
@@ -414,7 +527,7 @@ export class ItemizeRawDB {
       return null;
     }
 
-    this.informChangeOnRowElastic(row, action, elasticLanguageOverride, dataIsComplete, true);
+    await this.informChangeOnRowElastic(row, action, elasticLanguageOverride, dataIsComplete, true);
 
     // now let's grab the module qualified name
     const moduleName = idef.getParentModule().getQualifiedPathName();
@@ -471,13 +584,18 @@ export class ItemizeRawDB {
     };
   }
 
-  private informChangeOnRowsElasticOnly(
+  private async informChangeOnRowsElasticOnly(
     rows: ISQLTableRowValue[],
     action: "created" | "deleted" | "modified",
     elasticLanguageOverride: string,
     rowDataIsComplete: boolean,
   ) {
-    rows.forEach((r) => this.informChangeOnRowElastic(r, action, elasticLanguageOverride, rowDataIsComplete, false));
+    const [completedRows, newRowDataIsComplete] = rowDataIsComplete || action === "deleted" ? [rows, rowDataIsComplete] : await this.completeRowData(rows);
+    completedRows.forEach(async (r) => {
+      try {
+        await this.informChangeOnRowElastic(r, action, elasticLanguageOverride, newRowDataIsComplete, false)
+      } catch {}
+    });
   }
 
   /**
@@ -496,8 +614,9 @@ export class ItemizeRawDB {
     elasticLanguageOverride: string,
     rowDataIsComplete: boolean,
   ) {
+    const [completedRows, newRowDataIsComplete] = rowDataIsComplete || action === "deleted" ? [rows, rowDataIsComplete] : await this.completeRowData(rows);
     // first we call to change every single row so that the changed events propagate
-    const processedChanges = (await Promise.all(rows.map((r) => this.informChangeOnRow(r, action, elasticLanguageOverride, rowDataIsComplete)))).filter((r) => r !== null);
+    const processedChanges = (await Promise.all(completedRows.map((r) => this.informChangeOnRow(r, action, elasticLanguageOverride, newRowDataIsComplete)))).filter((r) => r !== null);
 
     // now we can grab where we are putting the records for searches, depending on what occured to these rows
     const recordsLocation = action === "deleted" ? "deletedRecords" : (action === "created" ? "createdRecords" : "modifiedRecords");
@@ -1108,7 +1227,7 @@ export class ItemizeRawDB {
    * @param property 
    * @returns 
    */
-  private redoDictionariesFn(
+  private changeRowLanguageFn(
     itemDefinitionOrModule: ItemDefinition | Module,
     setBuilder: SetBuilder,
     language: string,
@@ -1693,8 +1812,8 @@ export class ItemizeRawDB {
       moduleTableUpdate?: IManyValueType;
       itemTableUpdate?: IManyValueType;
       // you only want to use set in these
-      moduleTableUpdater?: (arg: SetBuilder, redoDictionaries: RedoDictionariesFn) => void;
-      itemTableUpdater?: (arg: SetBuilder, redoDictionaries: RedoDictionariesFn) => void;
+      moduleTableUpdater?: (arg: SetBuilder, changeRowLanguage: changeRowLanguageFn) => void;
+      itemTableUpdater?: (arg: SetBuilder, changeRowLanguage: changeRowLanguageFn) => void;
       /**
        * Does not inform of updates or anything to the clusters
        * or elastic or anything at all, does not modify the last modified
@@ -1767,7 +1886,7 @@ export class ItemizeRawDB {
       updater.moduleTableUpdater &&
         updater.moduleTableUpdater(
           moduleUpdateQuery.setBuilder,
-          this.redoDictionariesFn.bind(this, itemDefinition, moduleUpdateQuery.setBuilder)
+          this.changeRowLanguageFn.bind(this, itemDefinition, moduleUpdateQuery.setBuilder)
         );
 
       moduleUpdateQuery.setBuilder.knownAffectedColumns.forEach((affected) => {
@@ -1847,7 +1966,7 @@ export class ItemizeRawDB {
       updater.itemTableUpdater &&
         updater.itemTableUpdater(
           itemUpdateQuery.setBuilder,
-          this.redoDictionariesFn.bind(this, itemDefinition, itemUpdateQuery.setBuilder),
+          this.changeRowLanguageFn.bind(this, itemDefinition, itemUpdateQuery.setBuilder),
         );
 
       itemUpdateQuery.setBuilder.knownAffectedColumns.forEach((affected) => {
@@ -1960,7 +2079,7 @@ export class ItemizeRawDB {
       if (this.transacting) {
         this.transactingQueue.push(this.informRowsHaveBeenModifiedElasticOnly.bind(this, result, updater.dangerousForceElasticLangUpdateTo, true));
       } else {
-        this.informRowsHaveBeenModifiedElasticOnly(result, updater.dangerousForceElasticLangUpdateTo, true);
+        await this.informRowsHaveBeenModifiedElasticOnly(result, updater.dangerousForceElasticLangUpdateTo, true);
       }
     }
 
@@ -2118,7 +2237,7 @@ export class ItemizeRawDB {
       whereCriteriaSelector: (arg: WhereBuilder) => void;
 
       moduleTableUpdate?: IManyValueType;
-      moduleTableUpdater?: (arg: SetBuilder, redoDictionaries: RedoDictionariesFnPropertyBased) => void;
+      moduleTableUpdater?: (arg: SetBuilder, changeRowLanguage: changeRowLanguageFnPropertyBased) => void;
       /**
        * Does not inform of updates or anything to the clusters
        * or elastic or anything at all, does not modify the last modified
@@ -2201,7 +2320,7 @@ export class ItemizeRawDB {
 
     updater.moduleTableUpdater && updater.moduleTableUpdater(
       moduleUpdateQuery.setBuilder,
-      this.redoDictionariesFn.bind(this, mod, moduleUpdateQuery.setBuilder),
+      this.changeRowLanguageFn.bind(this, mod, moduleUpdateQuery.setBuilder),
     );
 
     moduleUpdateQuery.returningBuilder.returningColumn("id");
@@ -2293,7 +2412,7 @@ export class ItemizeRawDB {
         // otherwise we would corrupt the cache
         this.transactingQueue.push(this.informRowsHaveBeenModifiedElasticOnly.bind(this, result, updater.dangerousForceElasticLangUpdateTo, false));
       } else {
-        this.informRowsHaveBeenModifiedElasticOnly(result, updater.dangerousForceElasticLangUpdateTo, false);
+        await this.informRowsHaveBeenModifiedElasticOnly(result, updater.dangerousForceElasticLangUpdateTo, false);
       }
     }
 
@@ -2319,8 +2438,8 @@ export class ItemizeRawDB {
       moduleTableUpdate?: IManyValueType;
       itemTableUpdate?: IManyValueType;
       // you only want to use set in these, not select not anything
-      moduleTableUpdater?: (arg: SetBuilder, redoDictionaries: RedoDictionariesFn) => void;
-      itemTableUpdater?: (arg: SetBuilder, redoDictionaries: RedoDictionariesFn) => void;
+      moduleTableUpdater?: (arg: SetBuilder, changeRowLanguage: changeRowLanguageFn) => void;
+      itemTableUpdater?: (arg: SetBuilder, changeRowLanguage: changeRowLanguageFn) => void;
       /**
        * Does not inform of updates or anything to the clusters
        * or elastic or anything at all, does not modify the last modified

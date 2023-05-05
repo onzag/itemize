@@ -3800,7 +3800,7 @@ export class ActualItemProvider extends
 
     if (isDevelopment) {
       console.warn(
-        errMessageOverride ? "Action refused due to:" + errMessageOverride : "Action refused due to invalid partial/total state at",
+        errMessageOverride ? "Action refused due to: " + errMessageOverride : "Action refused due to invalid partial/total state at",
         this.props.itemDefinitionInstance.getStateNoExternalChecking(this.props.forId || null, this.props.forVersion || null),
       );
     }

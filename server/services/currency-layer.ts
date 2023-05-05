@@ -37,7 +37,7 @@ export class CurrencyLayerService extends CurrencyFactorsProvider<ICurrencyLayer
               methodName: "requestInfo",
               message: "Requesting fresh info",
             });
-            (this.config.httpsEnabled ? https : http).get(`http://api.currencylayer.com/live?access_key=${this.config.apiKey}`, (resp) => {
+            (this.config.httpsEnabled ? https : http).get(`${this.config.httpsEnabled ? "https" : "http"}://api.currencylayer.com/live?access_key=${this.config.apiKey}`, (resp) => {
               // let's get the response from the stream
               let data = "";
               resp.on("data", (chunk) => {

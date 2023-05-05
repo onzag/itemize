@@ -87,6 +87,7 @@ export default async function packageSetup(arg: ISetupConfigType): Promise<ISetu
     // tried to ignore it but npm also messes up the imports
     // npm can't get anything right even once
     "react",
+    "@onzag",
   ];
   // NPM IS THE MOST STUPID SHIT IN THE WORLD
   const npmForceRewriteOfPackages = {};
