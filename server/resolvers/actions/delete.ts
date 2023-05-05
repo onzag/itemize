@@ -291,7 +291,7 @@ export async function deleteItemDefinition(
       newValueSQL: null as any,
       newValueBlocked: null as any,
       extraArgs: resolverArgs.args,
-      action: IOTriggerActions.DELETED,
+      action: IOTriggerActions.DELETED_SYNC,
       id: resolverArgs.args.id as string,
       version: resolverArgs.args.version as string || null,
       user: {
@@ -310,13 +310,13 @@ export async function deleteItemDefinition(
     (async () => {
       try {
         const detachedArgs = {...args};
-        detachedArgs.action = IOTriggerActions.DELETED_DETACHED;
+        detachedArgs.action = IOTriggerActions.DELETED;
         await moduleTrigger(detachedArgs);
       } catch (err) {
         logger.error(
           {
             functionName: "deleteItemDefinition",
-            message: "Could not execute the DELETED_DETACHED module trigger",
+            message: "Could not execute the DELETED module trigger",
             serious: true,
             err,
           },
@@ -345,7 +345,7 @@ export async function deleteItemDefinition(
       newValueSQL: null as any,
       newValueBlocked: null as any,
       extraArgs: resolverArgs.args,
-      action: IOTriggerActions.DELETED,
+      action: IOTriggerActions.DELETED_SYNC,
       id: resolverArgs.args.id as string,
       version: resolverArgs.args.version as string || null,
       user: {
@@ -364,13 +364,13 @@ export async function deleteItemDefinition(
     (async () => {
       try {
         const detachedArgs = {...args};
-        detachedArgs.action = IOTriggerActions.DELETED_DETACHED;
+        detachedArgs.action = IOTriggerActions.DELETED;
         await itemDefinitionTrigger(detachedArgs);
       } catch (err) {
         logger.error(
           {
             functionName: "deleteItemDefinition",
-            message: "Could not execute the DELETED_DETACHED item trigger",
+            message: "Could not execute the DELETED item trigger",
             serious: true,
             err,
           },

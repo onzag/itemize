@@ -8,14 +8,14 @@ import type { ElasticQueryBuilder } from "../elastic";
 
 export enum IOTriggerActions {
   CREATE,
+  CREATED_SYNC,
   CREATED,
-  CREATED_DETACHED,
   EDIT,
+  EDITED_SYNC,
   EDITED,
-  EDITED_DETACHED,
   DELETE,
+  DELETED_SYNC,
   DELETED,
-  DELETED_DETACHED,
   READ,
 }
 

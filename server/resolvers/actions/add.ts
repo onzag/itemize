@@ -550,7 +550,7 @@ export async function addItemDefinition(
         newValueSQL: value,
         newValueBlocked: false,
         extraArgs,
-        action: IOTriggerActions.CREATED,
+        action: IOTriggerActions.CREATED_SYNC,
         id: value.id,
         version: value.version,
         user: {
@@ -568,13 +568,13 @@ export async function addItemDefinition(
       (async () => {
         try {
           const detachedArgs = {...args};
-          detachedArgs.action = IOTriggerActions.CREATED_DETACHED;
+          detachedArgs.action = IOTriggerActions.CREATED;
           await moduleTrigger(detachedArgs);
         } catch (err) {
           logger.error(
             {
               functionName: "addItemDefinition",
-              message: "Could not execute the CREATED_DETACHED module trigger",
+              message: "Could not execute the CREATED module trigger",
               serious: true,
               err,
             },
@@ -605,7 +605,7 @@ export async function addItemDefinition(
         newValueSQL: value,
         newValueBlocked: false,
         extraArgs,
-        action: IOTriggerActions.CREATED,
+        action: IOTriggerActions.CREATED_SYNC,
         id: value.id,
         version: value.version,
         user: {
@@ -623,13 +623,13 @@ export async function addItemDefinition(
       (async () => {
         try {
           const detachedArgs = {...args};
-          detachedArgs.action = IOTriggerActions.CREATED_DETACHED;
+          detachedArgs.action = IOTriggerActions.CREATED;
           await itemDefinitionTrigger(detachedArgs);
         } catch (err) {
           logger.error(
             {
               functionName: "addItemDefinition",
-              message: "Could not execute the CREATED_DETACHED item trigger",
+              message: "Could not execute the CREATED item trigger",
               serious: true,
               err,
             },

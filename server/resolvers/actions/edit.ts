@@ -456,7 +456,7 @@ export async function editItemDefinition(
         newValueSQL: sqlValue,
         newValueBlocked: !!sqlValue.blocked_at,
         extraArgs,
-        action: IOTriggerActions.EDITED,
+        action: IOTriggerActions.EDITED_SYNC,
         id: resolverArgs.args.id as string,
         version: resolverArgs.args.version as string || null,
         user: {
@@ -475,13 +475,13 @@ export async function editItemDefinition(
       (async () => {
         try {
           const detachedArgs = {...args};
-          detachedArgs.action = IOTriggerActions.EDITED_DETACHED;
+          detachedArgs.action = IOTriggerActions.EDITED;
           await moduleTrigger(detachedArgs);
         } catch (err) {
           logger.error(
             {
               functionName: "editItemDefinition",
-              message: "Could not execute the EDITED_DETACHED module trigger",
+              message: "Could not execute the EDITED module trigger",
               serious: true,
               err,
             },
@@ -513,7 +513,7 @@ export async function editItemDefinition(
         newValueSQL: sqlValue,
         newValueBlocked: !!sqlValue.blocked_at,
         extraArgs,
-        action: IOTriggerActions.EDITED,
+        action: IOTriggerActions.EDITED_SYNC,
         id: resolverArgs.args.id as string,
         version: resolverArgs.args.version as string || null,
         user: {
@@ -532,13 +532,13 @@ export async function editItemDefinition(
       (async () => {
         try {
           const detachedArgs = {...args};
-          detachedArgs.action = IOTriggerActions.EDITED_DETACHED;
+          detachedArgs.action = IOTriggerActions.EDITED;
           await itemDefinitionTrigger(detachedArgs);
         } catch (err) {
           logger.error(
             {
               functionName: "editItemDefinition",
-              message: "Could not execute the EDITED_DETACHED item trigger",
+              message: "Could not execute the EDITED item trigger",
               serious: true,
               err,
             },
