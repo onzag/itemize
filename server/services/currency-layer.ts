@@ -30,7 +30,19 @@ export class CurrencyLayerService extends CurrencyFactorsProvider<ICurrencyLayer
       this.globalRedis.redisClient.get(
         CACHED_CURRENCY_RESPONSE,
         (err, cachedData) => {
-          const parsedCachedData: CurrencyLayerResponse = cachedData && !err && JSON.parse(cachedData);
+          let parsedCachedData: CurrencyLayerResponse;
+          
+          try {
+            parsedCachedData = cachedData && !err && JSON.parse(cachedData);
+          } catch (err) {
+            this.logError({
+              className: "CurrencyLayer",
+              methodName: "requestInfo",
+              message: "Could not parse data from redis",
+              err,
+            });
+          }
+
           if (!parsedCachedData || (new Date()).getTime() - (parsedCachedData.timestamp * 1000) >= 86400000) {
             this.logInfo({
               className: "CurrencyLayer",

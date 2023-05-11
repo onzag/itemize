@@ -246,12 +246,12 @@ export async function runImageConversions(
         })
 
         try {
-          sqlUploadPipeFile(
+          await sqlUploadPipeFile(
             uploadsClient,
             conversionPipelineCloned,
             domain,
             originalImageFilePath,
-          )
+          );
           !hasBeenCRejected && cResolve();
         } catch (err) {
           !hasBeenCRejected && cReject(err);
