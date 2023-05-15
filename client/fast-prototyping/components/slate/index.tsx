@@ -1443,6 +1443,7 @@ export class SlateEditor extends React.Component<ISlateEditorProps, ISlateEditor
   public async findAndInsertFilesFromDataTransfer(data: DataTransfer, element: RichElement): Promise<RichElement> {
     // by default the new element is itself
     let newElement = element;
+    let wasOverwritten = false;
 
     // however we might have these types we need to process
     if (newElement.type === "image" || newElement.type === "file") {
@@ -1472,6 +1473,7 @@ export class SlateEditor extends React.Component<ISlateEditorProps, ISlateEditor
             sizes: "70vw",
           };
           newElement = newImageNode;
+          wasOverwritten = true;
         } else {
           const newFileNode: IFile = {
             ...newElement,
@@ -1487,6 +1489,7 @@ export class SlateEditor extends React.Component<ISlateEditorProps, ISlateEditor
             src: (existantFile as any).url,
           };
           newElement = newFileNode;
+          wasOverwritten = true;
         }
       } else {
         // File belongs to a different editor, cloning the content
@@ -1516,6 +1519,7 @@ export class SlateEditor extends React.Component<ISlateEditorProps, ISlateEditor
               srcSet: null,
             };
             newElement = imageNode;
+            wasOverwritten = true;
           } else {
             const fileNode: IFile = {
               ...newElement,
@@ -1533,16 +1537,19 @@ export class SlateEditor extends React.Component<ISlateEditorProps, ISlateEditor
               srcId: infoFromInsert.result.id,
             };
             newElement = fileNode;
+            wasOverwritten = true;
           }
         } else {
           newElement = null;
+          wasOverwritten = true;
         }
       }
     }
 
     // if we still have the element and it has children
     // we need to process those too
-    if (newElement && newElement.children) {
+    if (newElement && newElement.children && !wasOverwritten) {
+      newElement = {...newElement};
       newElement.children = (
         await Promise.all((newElement.children as any).map(this.findAndInsertFilesFromDataTransfer.bind(this, data)))
       ).filter(e => !!e) as any;
