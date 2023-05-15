@@ -107,7 +107,7 @@ class PropertyViewLocationMap extends React.Component<IPropertyViewLocationRende
       zoom: ZOOMS[this.props.viewport.zoom],
     } : this.props.viewport;
 
-    const map = this.state.readyToMap ? (
+    let map = this.state.readyToMap ? (
       <CMap
         viewport={viewport}
         onViewportChanged={this.props.onViewportChange}
@@ -164,16 +164,33 @@ class PropertyViewLocationMap extends React.Component<IPropertyViewLocationRende
       ) : null;
     }
 
+    if (this.props.args.textHeaderWrapper) {
+      textHeader = this.props.args.textHeaderWrapper(textHeader);
+    }
+
+    if (map && this.props.args.mapWrapper) {
+      map = this.props.args.mapWrapper(map);
+    }
+
     return (
-      <Box className={this.props.args.className} sx={style.container}>
-        <Box className={this.props.args.textHeaderClassName} sx={style.locationTextHeader}>
+      <Box
+        className={this.props.args.className}
+        sx={this.props.args.sx ? [style.container, this.props.args.sx] : style.container}
+      >
+        <Box
+          className={this.props.args.textHeaderClassName}
+          sx={this.props.args.locationTextHeaderSx ? [style.locationTextHeader, this.props.args.locationTextHeaderSx] : style.locationTextHeader}
+        >
           {textHeader}
         </Box>
-        <Box className={this.props.args.mapClassName} sx={style.locationMapContainer}>
+        <Box
+          className={this.props.args.mapClassName}
+          sx={this.props.args.locationMapContainerSx ? [this.props.args.locationMapContainerSx, style.locationMapContainer] : style.locationMapContainer}
+        >
           {map}
         </Box>
       </Box>
-    )
+    );
   }
 }
 

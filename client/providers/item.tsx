@@ -5502,15 +5502,26 @@ export const ItemProvider = React.forwardRef<ActualItemProvider, IItemProviderPr
                           <SearchItemValueContext.Consumer>
                             {(searchContext) => {
                               if (!data) {
+                                console.error("At element with props: ", props);
                                 throw new Error("The ItemProvider must be inside a ModuleProvider context");
                               }
                               let valueFor: ItemDefinition;
                               if (props.itemDefinition) {
                                 if (typeof props.itemDefinition === "string") {
                                   if (props.itemDefinition.startsWith("MOD_") && props.itemDefinition.includes("IDEF")) {
-                                    valueFor = data.mod.getParentRoot().registry[props.itemDefinition] as ItemDefinition;
+                                    try {
+                                      valueFor = data.mod.getParentRoot().registry[props.itemDefinition] as ItemDefinition;
+                                    } catch (err) {
+                                      console.error("At element with props: ", props);
+                                      throw err;
+                                    }
                                   } else {
-                                    valueFor = data.mod.getItemDefinitionFor(props.itemDefinition.split("/"));
+                                    try {
+                                      valueFor = data.mod.getItemDefinitionFor(props.itemDefinition.split("/"));
+                                    } catch (err) {
+                                      console.error("At element with props: ", props);
+                                      throw err;
+                                    }
                                   }
                                 } else {
                                   valueFor = props.itemDefinition;

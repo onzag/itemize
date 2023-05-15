@@ -285,7 +285,7 @@ function calculateActiveFlow(): number {
     if (
       !v.isDisabled() &&
       typeof v.getPriority() === "number" &&
-      v.getPriority() > priorityToUse
+      (v.getPriority() as number) > priorityToUse
     ) {
       // if it has an always on top the maximum priority is its priority
       // regardless of whether something is in flow or not
@@ -327,7 +327,7 @@ function calculateActiveFlow(): number {
 function calculatePriorityOfLayereds(calcActiveFlow?: boolean): number {
   let priorityToUse = calcActiveFlow ? calculateActiveFlow() : Number.MIN_SAFE_INTEGER;
   ALT_REGISTRY.all.forEach((v) => {
-    if (!v.isDisabled() && typeof v.getPriority() === "number" && v.getPriority() > priorityToUse && !v.isUsedInFlow()) {
+    if (!v.isDisabled() && typeof v.getPriority() === "number" && (v.getPriority() as number) > priorityToUse && !v.isUsedInFlow()) {
       priorityToUse = v.getPriority() as number;
     }
   });
@@ -455,7 +455,7 @@ function triggerBasedOn(code: string, shiftKey: boolean, callbackIfmatch: () => 
 
       nextElement.focus(shiftKey ? "below" : "above");
       if (nextElement.isUncontrolled() && process.env.NODE_ENV === "development") {
-        console.log("Entered uncontrolled mode");
+        console.log("Entered uncontrolled mode");//, nextElement);
       }
 
       if (!nextElement.isUncontrolled() && document.activeElement !== nextElement.getElement()) {
@@ -529,7 +529,7 @@ function triggerBasedOn(code: string, shiftKey: boolean, callbackIfmatch: () => 
       // the index should be fine now and pointing to the next tabbable component
       nextElement.focus(shiftKey ? "below" : "above");
       if (nextElement.isUncontrolled() && process.env.NODE_ENV === "development") {
-        console.log("Entered uncontrolled mode");
+        console.log("Entered uncontrolled mode");//, nextElement);
       }
 
       if (!nextElement.isUncontrolled() && document.activeElement !== nextElement.getElement()) {
@@ -609,7 +609,7 @@ function triggerBasedOn(code: string, shiftKey: boolean, callbackIfmatch: () => 
       // the index should be fine now and pointing to the next tabbable component
       nextElement.focus(resolvedWithAllStrategy ? "precise" : (shiftKey ? "below" : "above"));
       if (nextElement.isUncontrolled() && process.env.NODE_ENV === "development") {
-        console.log("Entered uncontrolled mode");
+        console.log("Entered uncontrolled mode");//, nextElement);
       }
 
       if (!nextElement.isUncontrolled() && document.activeElement !== nextElement.getElement()) {
@@ -694,7 +694,7 @@ function triggerBasedOn(code: string, shiftKey: boolean, callbackIfmatch: () => 
   } else if (code === "escape") {
     let priorityToUse = Number.MIN_SAFE_INTEGER;
     ALT_REGISTRY.all.forEach((v) => {
-      if (!v.isDisabled() && typeof v.getPriority() === "number" && v.getPriority() > priorityToUse) {
+      if (!v.isDisabled() && typeof v.getPriority() === "number" && (v.getPriority() as number) > priorityToUse) {
         priorityToUse = v.getPriority() as number;
       }
     });
@@ -787,6 +787,46 @@ if (typeof document !== "undefined") {
       const match = ALT_REGISTRY.all.find((e) => e.getElement() === document.activeElement);
       if (match) {
         ALT_REGISTRY.uncontrolled = match.isUncontrolled();
+
+        if (!ALT_REGISTRY.uncontrolled) {
+          // one should be into active flow
+          if (ALT_REGISTRY.awaitingLayerKeycodesFocusIndex !== -1) {
+            let nextIndex = ALT_REGISTRY.awaitingLayerKeycodesFocusIndex + 1;
+            if (nextIndex >= ALT_REGISTRY.awaitingLayerKeycodes.length) {
+              nextIndex = 0;
+            }
+
+            const nextElement = ALT_REGISTRY.awaitingLayerKeycodes[nextIndex];
+
+            if (nextElement.getElement() !== document.activeElement) {
+              ALT_REGISTRY.awaitingLayerKeycodesFocusIndex = nextIndex;
+              nextElement.focus("precise");
+            }
+          } else if (ALT_REGISTRY.isDisplayingLayereds) {
+            let nextIndex = ALT_REGISTRY.displayedLayeredFocusIndex + 1;
+            if (nextIndex >= ALT_REGISTRY.isDisplayingLayereds.length) {
+              nextIndex = 0;
+            }
+
+            const nextElement = ALT_REGISTRY.isDisplayingLayereds[nextIndex];
+
+            if (nextElement.getElement() !== document.activeElement) {
+              ALT_REGISTRY.displayedLayeredFocusIndex = nextIndex;
+              nextElement.focus("precise");
+            }
+          } else if (ALT_REGISTRY.activeFlowFocusIndex !== -1) {
+            let nextIndex = ALT_REGISTRY.activeFlowFocusIndex + 1;
+            if (nextIndex >= ALT_REGISTRY.activeFlow.length) {
+              nextIndex = 0;
+            }
+            const nextElement = ALT_REGISTRY.activeFlow[nextIndex];
+
+            if (nextElement.getElement() !== document.activeElement) {
+              ALT_REGISTRY.activeFlowFocusIndex = nextIndex;
+              nextElement.focus("precise");
+            }
+          }
+        }
       }
     }
   }, true);
