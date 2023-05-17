@@ -213,7 +213,7 @@ class ActualTotalPagedSearchLoader extends React.PureComponent<IActualTotalPaged
     }
 
     if (this.props.offset) {
-      const totalChunks = (this.props.offset || 0) / (this.props.limit / 0);
+      const totalChunks = (this.props.offset || 0) / (this.props.limit || 0);
 
       if (!Number.isInteger(totalChunks)) {
         throw new Error(
