@@ -177,17 +177,29 @@ export function stringElasticSearch(arg: IElasticSearchInfo) {
     if (value === null) {
       arg.elasticQueryBuilder.mustTerm({
         [arg.prefix + arg.id + "_NULL"]: true,
-      }, arg.boost);
+      }, {
+        boost: arg.boost,
+        groupId: searchName,
+        propertyId: arg.prefix + arg.id,
+      });
       return {};
     } else if (exactStringSearchSubtypes.includes(arg.property.getSubtype())) {
       arg.elasticQueryBuilder.mustTerm({
         [arg.prefix + arg.id]: value,
-      }, arg.boost);
+      }, {
+        boost: arg.boost,
+        groupId: searchName,
+        propertyId: arg.prefix + arg.id,
+      });
       return {};
-    }  else {
+    } else {
       arg.elasticQueryBuilder.mustMatchPhrasePrefix({
         [arg.prefix + arg.id]: value,
-      }, arg.boost);
+      }, {
+        boost: arg.boost,
+        groupId: searchName,
+        propertyId: arg.prefix + arg.id,
+      });
       return {
         [arg.prefix + arg.id]: {
           name: arg.prefix + arg.id,
@@ -203,7 +215,11 @@ export function stringElasticSearch(arg: IElasticSearchInfo) {
     if (exactStringSearchSubtypes.includes(arg.property.getSubtype())) {
       arg.elasticQueryBuilder.mustTerms({
         [arg.prefix + arg.id]: tagCompareCheck
-      }, arg.boost);
+      }, {
+        boost: arg.boost,
+        groupId: inName,
+        propertyId: arg.prefix + arg.id,
+      });
     } else {
       arg.elasticQueryBuilder.must({
         bool: {
@@ -218,6 +234,9 @@ export function stringElasticSearch(arg: IElasticSearchInfo) {
           }),
           boost: arg.boost,
         }
+      }, {
+        groupId: inName,
+        propertyId: arg.prefix + arg.id,
       });
     }
     return {};
@@ -263,12 +282,20 @@ export function stringElasticStrSearch(arg: IElasticStrSearchInfo) {
   if (exactStringSearchSubtypes.includes(arg.property.getSubtype())) {
     arg.elasticQueryBuilder.mustTerm({
       [arg.prefix + arg.id]: arg.search,
-    }, arg.boost);
+    }, {
+      boost: arg.boost,
+      groupId: "STRSEARCH",
+      propertyId: arg.prefix + arg.id,
+    });
     return {};
   } else {
     arg.elasticQueryBuilder.mustMatchPhrasePrefix({
       [arg.prefix + arg.id]: arg.search,
-    }, arg.boost);
+    }, {
+      boost: arg.boost,
+      groupId: "STRSEARCH",
+      propertyId: arg.prefix + arg.id,
+    });
     return {
       [arg.prefix + arg.id]: {
         name: arg.prefix + arg.id,

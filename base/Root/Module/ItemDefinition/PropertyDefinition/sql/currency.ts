@@ -259,12 +259,20 @@ export function currencyElasticSearch(arg: IElasticSearchInfo) {
     arg.elasticQueryBuilder.mustTerm({
       [arg.prefix + arg.id + "_CURRENCY"]: exactArg.currency as string,
       [arg.prefix + arg.id + "_VALUE"]: exactArg.value as number,
-    }, arg.boost);
+    }, {
+      boost: arg.boost,
+      groupId: exactName,
+      propertyId: arg.prefix + arg.id,
+    });
     searchedByIt = true;
   } else if (arg.args[exactName] === null) {
     arg.elasticQueryBuilder.mustTerm({
       [arg.prefix + arg.id + "_CURRENCY"]: "NULL",
-    }, arg.boost);
+    }, {
+      boost: arg.boost,
+      groupId: exactName,
+      propertyId: arg.prefix + arg.id,
+    });
     searchedByIt = true;
   }
 
@@ -305,7 +313,11 @@ export function currencyElasticSearch(arg: IElasticSearchInfo) {
             }
           ]
         }
-      }, arg.boost);
+      }, {
+        boost: arg.boost,
+        groupId: "RANGE_" + arg.prefix + arg.id,
+        propertyId: arg.prefix + arg.id,
+      });
     }
     if (hasToDefined) {
       const toArg = arg.args[toName] as any as IPropertyDefinitionSupportedCurrencyType;
@@ -340,7 +352,11 @@ export function currencyElasticSearch(arg: IElasticSearchInfo) {
             }
           ]
         }
-      }, arg.boost);
+      }, {
+        boost: arg.boost,
+        groupId: "RANGE_" + arg.prefix + arg.id,
+        propertyId: arg.prefix + arg.id,
+      });
     }
 
     searchedByIt = true;

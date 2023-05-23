@@ -144,6 +144,10 @@ export interface ISearchLoaderArg {
    * say you got an error, you can ask for a refresh
    */
   refreshPage: () => void;
+  /**
+   * metadata that was given during the search operation for additional details
+   */
+  metadata: string;
 }
 
 /**
@@ -227,6 +231,7 @@ interface IActualSearchLoaderProps extends ISearchLoaderProps {
   searchOwner: string;
   searchShouldCache: boolean;
   searchFields: IGQLRequestFields;
+  searchMetadata: string;
   searchRequestedProperties: string[];
   searchRequestedIncludes: { [include: string]: string[] };
   searchEngineEnabled: boolean;
@@ -1050,6 +1055,7 @@ class ActualSearchLoader extends React.Component<IActualSearchLoaderProps, IActu
             searching: this.props.searching,
             limit: this.props.searchLimit,
             offset: this.props.searchOffset,
+            metadata: this.props.searchMetadata,
           })
         }
       </SearchItemValueContext.Provider>
@@ -1094,6 +1100,7 @@ export default function SearchLoader(props: ISearchLoaderProps) {
                       searchErrorDismiss={itemContext.dismissSearchError}
                       searchHighlights={itemContext.searchHighlights}
                       searchFields={itemContext.searchFields}
+                      searchMetadata={itemContext.searchMetadata}
                       searching={itemContext.searching}
                       tokenData={tokenData}
                       localeData={localeData}

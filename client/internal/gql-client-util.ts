@@ -1493,6 +1493,7 @@ interface IRunSearchQueryResult {
   offset: number;
   lastModified: string;
   highlights: IElasticHighlightRecordInfo;
+  metadata: string;
   cached: boolean;
 }
 
@@ -1566,6 +1567,7 @@ export function getSearchQueryFor(
       offset: {},
       last_modified: {},
       highlights: {},
+      metadata: {},
     } : {
       records: {
         id: {},
@@ -1577,6 +1579,7 @@ export function getSearchQueryFor(
       limit: {},
       offset: {},
       last_modified: {},
+      metadata: {},
     },
   });
 
@@ -1901,6 +1904,7 @@ export async function runSearchQueryFor(
         limit: {},
         offset: {},
         last_modified: {},
+        metadata: {},
       },
     });
 
@@ -1926,6 +1930,7 @@ export async function runSearchQueryFor(
         offset: {},
         last_modified: {},
         highlights: {},
+        metadata: {},
       },
     });
 
@@ -1957,6 +1962,8 @@ export async function runSearchQueryFor(
   } catch {
     highlights = {};
   }
+
+  const metadata: string = (data.metadata as string);
 
   if (typeof limit === "undefined") {
     limit = null;
@@ -1995,6 +2002,7 @@ export async function runSearchQueryFor(
       count,
       lastModified,
       highlights,
+      metadata,
       cached,
     };
   } else {
@@ -2018,6 +2026,7 @@ export async function runSearchQueryFor(
       count,
       lastModified,
       highlights,
+      metadata,
       cached,
     };
   }

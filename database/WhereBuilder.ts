@@ -6,6 +6,7 @@
 import { CONNECTOR_SQL_COLUMN_VERSION_FK_NAME } from "../constants";
 import { ConditionalBuilder, ConditionalBuilderFn, IManyValueType, ValueType } from "./base";
 import { SelectBuilder } from "./SelectBuilder";
+import type { IPropertyDefinitionSupportedCurrencyType } from "../base/Root/Module/ItemDefinition/PropertyDefinition/types/currency";
 
 /**
  * The where query builder allows to create WHERE statments
@@ -109,13 +110,13 @@ export class WhereBuilder extends ConditionalBuilder {
    * @returns itself
    */
   public andWhereColumn(column: string, valueOrComparator: ValueType, valueToCompare?: ValueType) {
-    let value = valueToCompare || valueOrComparator;
+    let value = typeof valueToCompare !== "undefined" ? valueToCompare : valueOrComparator;
+    const comparator = typeof valueToCompare !== "undefined" ? valueOrComparator : "=";
 
     if (value === null && (column === "version" || column === CONNECTOR_SQL_COLUMN_VERSION_FK_NAME || column === "parent_version")) {
       value === ""
     }
 
-    const comparator = typeof valueToCompare !== "undefined" ? valueOrComparator : "=";
     if (Array.isArray(value)) {
       const rule = JSON.stringify(column) + " " + comparator + " " + value[0];
       return this.condition("AND", null, rule, value[1]);
@@ -218,4 +219,44 @@ export class WhereBuilder extends ConditionalBuilder {
   public orWhere(rule: string | ConditionalBuilderFn<WhereBuilder>, bindings?: Array<string | number>) {
     return this.condition("OR", null, rule, bindings);
   }
+
+  public andWhereBooleanProperty(property: string, valueOrOtherBooleanProperty: boolean | string) {
+    if (valueOrOtherBooleanProperty === null) {
+      return this.andWhereColumnNull(property);
+    }
+    if (typeof valueOrOtherBooleanProperty === "boolean") {
+      return this.andWhereColumn(property, valueOrOtherBooleanProperty);
+    }
+    return this.condition("AND", null, JSON.stringify(property) + " = " + JSON.stringify(valueOrOtherBooleanProperty));
+  }
+
+  public orWhereBooleanProperty(property: string, valueOrOtherBooleanProperty: boolean | string) {
+    if (valueOrOtherBooleanProperty === null) {
+      return this.orWhereColumnNull(property);
+    }
+    if (typeof valueOrOtherBooleanProperty === "boolean") {
+      return this.orWhereColumn(property, valueOrOtherBooleanProperty);
+    }
+    return this.condition("OR", null, JSON.stringify(property) + " = " + JSON.stringify(valueOrOtherBooleanProperty));
+  }
+
+  // TODO all these comparisons
+  // public andWhereCurrencyProperty(
+  //   property: string,
+  //   valueOrComparator: IPropertyDefinitionSupportedCurrencyType | ">" | ">=" | "<" | "<=",
+  //   valueToCompare: IPropertyDefinitionSupportedCurrencyType | string,
+  // ) {
+  //   const value = typeof valueToCompare !== "undefined" ? valueToCompare : valueOrComparator;
+  //   const comparator = typeof valueToCompare !== "undefined" ? valueOrComparator : "=";
+
+  //   if (value === null) {
+  //     return this.andWhereColumnNull(property + "_VALUE");
+  //   }
+  // }
+
+  // public orWhereCurrencyProperty(property: string, value: IPropertyDefinitionSupportedCurrencyType) {
+  //   if (value === null) {
+  //     return this.orWhereColumnNull(property + "_VALUE");
+  //   }
+  // }
 }

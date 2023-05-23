@@ -70,6 +70,7 @@ function getSearchStateOf(state: IActualItemProviderState): IItemSearchStateType
     searchEngineEnabledLang: state.searchEngineEnabledLang,
     searchEngineHighlightArgs: state.searchEngineHighlightArgs,
     searchHighlights: state.searchHighlights,
+    searchMetadata: state.searchMetadata,
     searchCachePolicy: state.searchCachePolicy,
     searchListenPolicy: state.searchListenPolicy,
     searchOriginalOptions: state.searchOriginalOptions,
@@ -1099,6 +1100,10 @@ export interface IItemContextType extends IBasicFns {
    */
   searchHighlights: IElasticHighlightRecordInfo;
   /**
+   * The search metadata received
+   */
+  searchMetadata: string;
+  /**
    * These are the specific highlights ot use within this value
    * and they will be passed to the renderer in order to show
    * the highlights
@@ -1786,6 +1791,7 @@ export class ActualItemProvider extends
         searchCachePolicy: "none",
         searchListenPolicy: "none",
         searchHighlights: {},
+        searchMetadata: null,
         searchOriginalOptions: null,
       };
 
@@ -1950,6 +1956,7 @@ export class ActualItemProvider extends
       searchEngineEnabledLang: null,
       searchEngineHighlightArgs: null,
       searchHighlights: {},
+      searchMetadata: null,
       searchCachePolicy: "none",
       searchListenPolicy: "none",
       searchOriginalOptions: null,
@@ -2823,6 +2830,7 @@ export class ActualItemProvider extends
       searchEngineEnabledLang: null,
       searchEngineHighlightArgs: null,
       searchHighlights: {},
+      searchMetadata: null,
       searchCachePolicy: "none",
       searchListenPolicy: "none",
       searchOriginalOptions: null,
@@ -4986,6 +4994,7 @@ export class ActualItemProvider extends
       error,
       lastModified,
       highlights,
+      metadata,
       cached,
     } = await runSearchQueryFor({
       args: argumentsForQuery,
@@ -5031,6 +5040,7 @@ export class ActualItemProvider extends
         searching: false,
         searchResults: results,
         searchHighlights: highlights,
+        searchMetadata: metadata,
         searchRecords: records,
         searchCount: count,
         searchLimit: limit,
@@ -5133,6 +5143,7 @@ export class ActualItemProvider extends
         searching: false,
         searchResults: results,
         searchHighlights: highlights,
+        searchMetadata: metadata,
         searchRecords: records,
         searchCount: count,
         searchLimit: limit,
@@ -5447,6 +5458,7 @@ export class ActualItemProvider extends
           searchEngineEnabledLang: this.state.searchEngineEnabledLang,
           searchEngineHighlightArgs: this.state.searchEngineHighlightArgs,
           searchHighlights: this.state.searchHighlights,
+          searchMetadata: this.state.searchMetadata,
           highlights: this.props.highlights,
           pokedElements: this.state.pokedElements,
           submit: this.submit,

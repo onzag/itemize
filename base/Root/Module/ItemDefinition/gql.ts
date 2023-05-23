@@ -345,7 +345,7 @@ export function getGQLQueryFieldsForItemDefinition(
         },
         highlights: {
           type: GraphQLString,
-        },
+        }
       },
       description: "An array of results for the result list",
     });
@@ -369,6 +369,9 @@ export function getGQLQueryFieldsForItemDefinition(
           type: GraphQLString,
         },
         highlights: {
+          type: GraphQLString,
+        },
+        metadata: {
           type: GraphQLString,
         },
       },

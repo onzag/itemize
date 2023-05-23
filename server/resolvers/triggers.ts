@@ -1,4 +1,4 @@
-import { IGQLValue, IGQLArgs } from "../../gql-querier";
+import { IGQLValue, IGQLArgs, IGQLSearchRecordsContainer, IGQLSearchResultsContainer } from "../../gql-querier";
 import ItemDefinition from "../../base/Root/Module/ItemDefinition";
 import { IAppDataType } from "..";
 import Module from "../../base/Root/Module";
@@ -17,6 +17,12 @@ export enum IOTriggerActions {
   DELETED_SYNC,
   DELETED,
   READ,
+}
+
+export enum SearchTriggerActions {
+  SEARCH,
+  SEARCHED_SYNC,
+  SEARCHED,
 }
 
 export interface IOTriggerArgType {
@@ -146,6 +152,10 @@ export interface IOTriggerArgType {
 
 export interface ISearchTriggerArgType {
   /**
+   * The action being ran
+   */
+  action: SearchTriggerActions;
+  /**
    * The dictionary that was obtained from the language
    */
   dictionary: string;
@@ -162,7 +172,13 @@ export interface ISearchTriggerArgType {
   usesElastic: boolean;
   whereBuilder: WhereBuilder;
   elasticQueryBuilder: ElasticQueryBuilder;
+  sqlResponse: ISQLTableRowValue[];
+  elasticResponse: any;
+  traditional: boolean;
+  records: IGQLSearchRecordsContainer,
+  results: IGQLSearchResultsContainer,
   forbid: (message: string, customCode?: string) => void;
+  setSearchMetadata: (metadata: string) => void;
 }
 
 export type IOTriggerType = (arg: IOTriggerArgType) => IGQLValue | Promise<IGQLValue> | IGQLArgs | Promise<IGQLArgs>;

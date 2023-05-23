@@ -549,6 +549,7 @@ export class Collector {
         searchCachePolicy: args.cachePolicy || "none",
         searchListenPolicy: args.listenPolicy || args.cachePolicy || "none",
         searchOriginalOptions: args,
+        searchMetadata: rs.metadata,
 
         // we don't need because they are traditional
         searchEngineHighlightArgs: null as any,

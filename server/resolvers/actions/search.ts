@@ -16,6 +16,7 @@ import {
   defaultTriggerForbiddenFunction,
   checkUserCanSearch,
   retrieveUntil,
+  defaultTriggerSearchInvalidForbiddenFunction,
 } from "../basic";
 import ItemDefinition, { ItemDefinitionIOActions } from "../../../base/Root/Module/ItemDefinition";
 import { buildElasticQueryForModule, buildSQLQueryForModule } from "../../../base/Root/Module/sql";
@@ -35,12 +36,13 @@ import { flattenRawGQLValueOrFields } from "../../../gql-util";
 import { NanoSecondComposedDate } from "../../../nanodate";
 import Root from "../../../base/Root";
 import { EndpointError } from "../../../base/errors";
-import { IOTriggerActions } from "../triggers";
+import { IOTriggerActions, ISearchTriggerArgType, SearchTriggerActions } from "../triggers";
 import { CustomRoleGranterEnvironment, CustomRoleManager } from "../roles";
 import { CAN_LOG_DEBUG } from "../../environment";
 import type { SelectBuilder } from "../../../database/SelectBuilder";
 import type { ElasticQueryBuilder } from "../../elastic";
 import type { IElasticHighlightRecordInfo } from "../../../base/Root/Module/ItemDefinition/PropertyDefinition/types";
+import { SearchResponse } from "@elastic/elasticsearch/lib/api/types";
 
 export function findLastRecordDate(comp: "min" | "max", p: string, ...records: ISQLTableRowValue[][]): string {
   const recordsRespectiveNanoSecondAccuracyArray = records.flat().map((r) => new NanoSecondComposedDate(r[p]));
@@ -382,6 +384,15 @@ export async function searchModule(
     );
   }
 
+  let metadata: string = null;
+  const setSearchMetadata = (v: any) => {
+    if (typeof v !== "string") {
+      metadata = JSON.stringify(v);
+    } else {
+      metadata = v;
+    }
+  }
+
   const pathOfThisModule = mod.getPath().join("/");
   const moduleTrigger = appData.triggers.module.search[pathOfThisModule];
 
@@ -401,9 +412,16 @@ export async function searchModule(
         customData: tokenData.customData,
       },
       usesElastic,
+      action: SearchTriggerActions.SEARCH,
       elasticQueryBuilder: elasticQuery || null,
       whereBuilder: queryModel ? queryModel.whereBuilder : null,
+      traditional,
       forbid: defaultTriggerForbiddenFunction,
+      setSearchMetadata,
+      elasticResponse: null,
+      records: null,
+      results: null,
+      sqlResponse: null,
     });
   }
 
@@ -413,6 +431,9 @@ export async function searchModule(
 
   let baseResult: ISQLTableRowValue[] = [];
   let count: number = 0;
+
+  let elasticResponse: SearchResponse = null;
+  let sqlResponse: ISQLTableRowValue[] = null;
 
   if (usesElastic) {
     const rHighReply = buildElasticQueryForModule(
@@ -431,6 +452,7 @@ export async function searchModule(
     elasticQuery.setSize(limit);
 
     let highlightKeys: string[] = null;
+    // set the highlight keys only the columns that will be highlighted
     if (traditional) {
       highlightKeys = Object.keys(rHighReply);
       elasticQuery.setHighlightsOn(highlightKeys);
@@ -447,14 +469,14 @@ export async function searchModule(
 
     // we have the count from here anyway
     if (requestBaseResult) {
-      const result = await appData.elastic.executeQuery(elasticQuery);
+      elasticResponse = await appData.elastic.executeQuery(elasticQuery);
       const highlightsJSON: IElasticHighlightRecordInfo = {};
-      if (typeof result.hits.total === "number") {
-        count = result.hits.total;
+      if (typeof elasticResponse.hits.total === "number") {
+        count = elasticResponse.hits.total;
       } else {
-        count = result.hits.total.value;
+        count = elasticResponse.hits.total.value;
       }
-      baseResult = result.hits.hits.map((r) => {
+      baseResult = elasticResponse.hits.hits.map((r) => {
         highlightsJSON[r._id] = {};
         if (traditional) {
           highlightKeys.forEach((highlightNameOriginal) => {
@@ -668,6 +690,57 @@ export async function searchModule(
       offset,
       count,
       highlights,
+      metadata,
+    }
+
+    if (moduleTrigger) {
+      const args: ISearchTriggerArgType = {
+        language: resolverArgs.args.language,
+        dictionary,
+        appData,
+        module: mod,
+        itemDefinition: null,
+        args: resolverArgs.args,
+        user: {
+          role: tokenData.role,
+          id: tokenData.id,
+          customData: tokenData.customData,
+        },
+        usesElastic,
+        action: SearchTriggerActions.SEARCHED_SYNC,
+        elasticQueryBuilder: null,
+        whereBuilder: null,
+        traditional,
+        forbid: defaultTriggerSearchInvalidForbiddenFunction,
+        setSearchMetadata,
+        elasticResponse,
+        records: null,
+        results: finalResult,
+        sqlResponse,
+      };
+
+      await moduleTrigger(args);
+
+      if (metadata !== finalResult.metadata) {
+        finalResult.metadata = metadata;
+      }
+
+      (async () => {
+        try {
+          const detachedArgs = {...args};
+          detachedArgs.action = SearchTriggerActions.SEARCHED;
+          await moduleTrigger(detachedArgs);
+        } catch (err) {
+          logger.error(
+            {
+              functionName: "searchModule",
+              message: "Could not execute the SEARCHED search trigger",
+              serious: true,
+              err,
+            },
+          );
+        }
+      })();
     }
 
     CAN_LOG_DEBUG && logger.debug(
@@ -688,6 +761,7 @@ export async function searchModule(
       limit,
       offset,
       count,
+      metadata,
     };
 
     CAN_LOG_DEBUG && logger.debug(
@@ -696,6 +770,56 @@ export async function searchModule(
         message: "Succeed with records",
       },
     );
+
+    if (moduleTrigger) {
+      const args: ISearchTriggerArgType = {
+        language: resolverArgs.args.language,
+        dictionary,
+        appData,
+        module: mod,
+        itemDefinition: null,
+        args: resolverArgs.args,
+        user: {
+          role: tokenData.role,
+          id: tokenData.id,
+          customData: tokenData.customData,
+        },
+        usesElastic,
+        action: SearchTriggerActions.SEARCHED_SYNC,
+        elasticQueryBuilder: null,
+        whereBuilder: null,
+        traditional,
+        forbid: defaultTriggerSearchInvalidForbiddenFunction,
+        setSearchMetadata,
+        elasticResponse,
+        records: finalResult,
+        results: null,
+        sqlResponse,
+      };
+
+      await moduleTrigger(args);
+
+      if (metadata !== finalResult.metadata) {
+        finalResult.metadata = metadata;
+      }
+
+      (async () => {
+        try {
+          const detachedArgs = {...args};
+          detachedArgs.action = SearchTriggerActions.SEARCHED;
+          await moduleTrigger(detachedArgs);
+        } catch (err) {
+          logger.error(
+            {
+              functionName: "searchModule",
+              message: "Could not execute the SEARCHED search trigger",
+              serious: true,
+              err,
+            },
+          );
+        }
+      })();
+    }
 
     return finalResult;
   }
@@ -1050,6 +1174,16 @@ export async function searchItemDefinition(
       }
     }
 
+
+    let metadata: string = null;
+    const setSearchMetadata = (v: any) => {
+      if (typeof v !== "string") {
+        metadata = JSON.stringify(v);
+      } else {
+        metadata = v;
+      }
+    }
+
     const pathOfThisModule = mod.getPath().join("/");
     const moduleTrigger = appData.triggers.module.search[pathOfThisModule];
     const pathOfThisIdef = itemDefinition.getAbsolutePath().join("/");
@@ -1058,7 +1192,7 @@ export async function searchItemDefinition(
     const dictionary = getDictionary(appData, resolverArgs.args);
 
     if (moduleTrigger || idefTrigger) {
-      const args = {
+      const args: ISearchTriggerArgType = {
         language: resolverArgs.args.language,
         dictionary,
         appData,
@@ -1070,10 +1204,17 @@ export async function searchItemDefinition(
           id: tokenData.id,
           customData: tokenData.customData,
         },
+        action: SearchTriggerActions.SEARCH,
         usesElastic,
         whereBuilder: queryModel ? queryModel.whereBuilder : null,
         elasticQueryBuilder: elasticQuery || null,
         forbid: defaultTriggerForbiddenFunction,
+        setSearchMetadata,
+        elasticResponse: null,
+        records: null,
+        results: null,
+        sqlResponse: null,
+        traditional,
       };
       if (moduleTrigger) {
         await moduleTrigger(args);
@@ -1091,6 +1232,9 @@ export async function searchItemDefinition(
     let highlights: string = null;
     const limit: number = resolverArgs.args.limit;
     const offset: number = resolverArgs.args.offset;
+
+    let elasticResponse: SearchResponse = null;
+    let sqlResponse: ISQLTableRowValue[] = null;
 
     if (usesElastic) {
       const rHighReply = buildElasticQueryForItemDefinition(
@@ -1127,14 +1271,14 @@ export async function searchItemDefinition(
 
       // we have the count from here anyway
       if (requestBaseResult) {
-        const result = await appData.elastic.executeQuery(elasticQuery);
+        elasticResponse = await appData.elastic.executeQuery(elasticQuery);
         const highlightsJSON: IElasticHighlightRecordInfo = {};
-        if (typeof result.hits.total === "number") {
-          count = result.hits.total;
+        if (typeof elasticResponse.hits.total === "number") {
+          count = elasticResponse.hits.total;
         } else {
-          count = result.hits.total.value;
+          count = elasticResponse.hits.total.value;
         }
-        baseResult = result.hits.hits.map((r) => {
+        baseResult = elasticResponse.hits.hits.map((r) => {
           highlightsJSON[r._id] = {};
           if (traditional) {
             highlightKeys.forEach((highlightNameOriginal) => {
@@ -1185,6 +1329,8 @@ export async function searchItemDefinition(
       baseResult = requestBaseResult ?
         (await appData.databaseConnection.queryRows(queryModel)).map(convertVersionsIntoNullsWhenNecessary) as IGQLSearchRecord[] :
         [];
+
+      sqlResponse = baseResult;
 
       queryModel.clear();
       queryModel.selectExpression(`COUNT(*) AS "count"`);
@@ -1323,6 +1469,67 @@ export async function searchItemDefinition(
         offset,
         count,
         highlights,
+        metadata,
+      }
+
+      if (moduleTrigger || idefTrigger) {
+        const args: ISearchTriggerArgType = {
+          language: resolverArgs.args.language,
+          dictionary,
+          appData,
+          module: mod,
+          itemDefinition: itemDefinition,
+          args: resolverArgs.args,
+          user: {
+            role: tokenData.role,
+            id: tokenData.id,
+            customData: tokenData.customData,
+          },
+          usesElastic,
+          action: SearchTriggerActions.SEARCHED_SYNC,
+          elasticQueryBuilder: null,
+          whereBuilder: null,
+          traditional,
+          forbid: defaultTriggerSearchInvalidForbiddenFunction,
+          setSearchMetadata,
+          elasticResponse,
+          records: null,
+          results: finalResult,
+          sqlResponse,
+        };
+  
+        if (moduleTrigger) {
+          await moduleTrigger(args);
+        }
+        if (idefTrigger) {
+          await idefTrigger(args);
+        }
+  
+        if (metadata !== finalResult.metadata) {
+          finalResult.metadata = metadata;
+        }
+  
+        (async () => {
+          try {
+            const detachedArgs = {...args};
+            detachedArgs.action = SearchTriggerActions.SEARCHED;
+            if (moduleTrigger) {
+              await moduleTrigger(args);
+            }
+            if (idefTrigger) {
+              await idefTrigger(args);
+            }
+          } catch (err) {
+            logger.error(
+              {
+                functionName: "searchModule",
+                message: "Could not execute the SEARCHED search trigger",
+                serious: true,
+                err,
+              },
+            );
+          }
+        })();
       }
 
       CAN_LOG_DEBUG && logger.debug(
@@ -1346,7 +1553,68 @@ export async function searchItemDefinition(
         limit,
         offset,
         count,
+        metadata,
       };
+
+      if (moduleTrigger || idefTrigger) {
+        const args: ISearchTriggerArgType = {
+          language: resolverArgs.args.language,
+          dictionary,
+          appData,
+          module: mod,
+          itemDefinition: itemDefinition,
+          args: resolverArgs.args,
+          user: {
+            role: tokenData.role,
+            id: tokenData.id,
+            customData: tokenData.customData,
+          },
+          usesElastic,
+          action: SearchTriggerActions.SEARCHED_SYNC,
+          elasticQueryBuilder: null,
+          whereBuilder: null,
+          traditional,
+          forbid: defaultTriggerSearchInvalidForbiddenFunction,
+          setSearchMetadata,
+          elasticResponse,
+          records: finalResult,
+          results: null,
+          sqlResponse,
+        };
+  
+        if (moduleTrigger) {
+          await moduleTrigger(args);
+        }
+        if (idefTrigger) {
+          await idefTrigger(args);
+        }
+  
+        if (metadata !== finalResult.metadata) {
+          finalResult.metadata = metadata;
+        }
+  
+        (async () => {
+          try {
+            const detachedArgs = {...args};
+            detachedArgs.action = SearchTriggerActions.SEARCHED;
+            if (moduleTrigger) {
+              await moduleTrigger(args);
+            }
+            if (idefTrigger) {
+              await idefTrigger(args);
+            }
+          } catch (err) {
+            logger.error(
+              {
+                functionName: "searchModule",
+                message: "Could not execute the SEARCHED search trigger",
+                serious: true,
+                err,
+              },
+            );
+          }
+        })();
+      }
 
       CAN_LOG_DEBUG && logger.debug(
         {

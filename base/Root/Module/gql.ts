@@ -246,6 +246,9 @@ export function getGQLQueryFieldsForModule(
         highlights: {
           type: GraphQLString,
         },
+        metadata: {
+          type: GraphQLString,
+        },
       },
       description: "A traditional array of results for the result list with search data",
     });

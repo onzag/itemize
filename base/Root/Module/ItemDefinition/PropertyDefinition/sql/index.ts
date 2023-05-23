@@ -348,17 +348,29 @@ function internalElasticSeachFn(arg: IElasticSearchInfo, nullFieldValue: string,
   if (typeof arg.args[exactName] !== "undefined" && arg.args[exactName] !== null) {
     arg.elasticQueryBuilder.mustTerm({
       [arg.prefix + arg.id]: arg.args[exactName] as any,
-    }, arg.boost);
+    }, {
+      groupId: exactName,
+      boost: arg.boost,
+      propertyId: arg.prefix + arg.id,
+    });
     searchedByIt = true;
   } else if (arg.args[exactName] === null) {
     if (!nullStyle) {
       arg.elasticQueryBuilder.mustTerm({
         [arg.prefix + arg.id]: nullFieldValue,
-      }, arg.boost);
+      }, {
+        groupId: exactName,
+        boost: arg.boost,
+        propertyId: arg.prefix + arg.id,
+      });
     } else {
       arg.elasticQueryBuilder.mustTerm({
         [arg.prefix + arg.id + "_NULL"]: true,
-      }, arg.boost);
+      }, {
+        groupId: exactName,
+        boost: arg.boost,
+        propertyId: arg.prefix + arg.id,
+      });
     }
     searchedByIt = true;
   }
@@ -371,7 +383,11 @@ function internalElasticSeachFn(arg: IElasticSearchInfo, nullFieldValue: string,
     if (arg.args[fromName] === arg.args[toName]) {
       arg.elasticQueryBuilder.mustTerm({
         [arg.prefix + arg.id]: arg.args[fromName] as any,
-      }, arg.boost);
+      }, {
+        groupId: "RANGE_" + arg.prefix + arg.id,
+        boost: arg.boost,
+        propertyId: arg.prefix + arg.id,
+      });
     } else {
       const rule: any = {};
       if (hasFromDefined) {
@@ -400,13 +416,19 @@ function internalElasticSeachFn(arg: IElasticSearchInfo, nullFieldValue: string,
             ],
             boost: arg.boost,
           }
+        }, {
+          groupId: "RANGE_" + arg.prefix + arg.id,
+          propertyId: arg.prefix + arg.id,
         });
       } else {
         arg.elasticQueryBuilder.must({
           range: {
             [arg.prefix + arg.id]: rule,
           },
-        }, arg.boost);
+        }, {
+          groupId: "RANGE_" + arg.prefix + arg.id,
+          propertyId: arg.prefix + arg.id,
+        });
       }
 
       searchedByIt = true;

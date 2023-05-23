@@ -67,6 +67,20 @@ export function defaultTriggerInvalidForbiddenFunction(message: string, customCo
   return;
 }
 
+export function defaultTriggerSearchInvalidForbiddenFunction(message: string, customCode?: string) {
+  logger.error(
+    {
+      functionName: "defaultTriggerInvalidForbiddenFunction",
+      message: "Attempted to forbid on an already allowed action, this means that you attempted to call forbid on SEARCHED",
+      data: {
+        message,
+        customCode,
+      },
+    }
+  );
+  return;
+}
+
 const customIdRegex = /[A-Za-z0-9-_\+\!\#]+/;
 export function validateCustomId(id: string) {
   if (!customIdRegex.test(id)) {

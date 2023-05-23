@@ -301,9 +301,17 @@ export function textElasticSearch(arg: IElasticSearchInfo) {
       [arg.prefix + arg.id + (isRichText ? "_PLAIN" : "")]: arg.args[searchName] as string,
     };
     if (usePhrase) {
-      arg.elasticQueryBuilder.mustMatchPhrasePrefix(matchRule, arg.boost);
+      arg.elasticQueryBuilder.mustMatchPhrasePrefix(matchRule, {
+        boost: arg.boost,
+        groupId: searchName,
+        propertyId: arg.prefix + arg.id,
+      });
     } else {
-      arg.elasticQueryBuilder.mustMatch(matchRule, arg.boost);
+      arg.elasticQueryBuilder.mustMatch(matchRule, {
+        boost: arg.boost,
+        groupId: searchName,
+        propertyId: arg.prefix + arg.id,
+      });
     }
 
     return {
@@ -315,7 +323,11 @@ export function textElasticSearch(arg: IElasticSearchInfo) {
   } else if (arg.args[searchName] === null) {
     arg.elasticQueryBuilder.mustTerm({
       [arg.prefix + arg.id + "_NULL"]: true,
-    }, arg.boost);
+    }, {
+      boost: arg.boost,
+      groupId: searchName,
+      propertyId: arg.prefix + arg.id,
+    });
     return {};
   }
 
@@ -377,7 +389,11 @@ export function textElasticStrSearch(arg: IElasticStrSearchInfo) {
   const isRichText = arg.property.isRichText();
   arg.elasticQueryBuilder && arg.elasticQueryBuilder.mustMatch({
     [arg.prefix + arg.id + (isRichText ? "_PLAIN" : "")]: arg.search,
-  }, arg.boost);
+  }, {
+    boost: arg.boost,
+    groupId: "STRSEARCH",
+    propertyId: arg.prefix + arg.id,
+  });
 
   return {
     [arg.prefix + arg.id + (isRichText ? "_PLAIN" : "")]: {

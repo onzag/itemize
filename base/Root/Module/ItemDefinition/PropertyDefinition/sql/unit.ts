@@ -247,12 +247,20 @@ export function unitElasticSearch(arg: IElasticSearchInfo) {
     arg.elasticQueryBuilder.mustTerm({
       [arg.prefix + arg.id + "_NORMALIZED_UNIT"]: exactAsUnit.normalizedUnit,
       [arg.prefix + arg.id + "_NORMALIZED_VALUE"]: exactAsUnit.normalizedValue,
-    }, arg.boost);
+    }, {
+      boost: arg.boost,
+      groupId: exactName,
+      propertyId: arg.prefix + arg.id,
+    });
     searchedByIt = true;
   } else if (arg.args[exactName] === null) {
     arg.elasticQueryBuilder.mustTerm({
       [arg.prefix + arg.id + "_NORMALIZED_UNIT"]: "",
-    }, arg.boost);
+    }, {
+      boost: arg.boost,
+      groupId: exactName,
+      propertyId: arg.prefix + arg.id,
+    });
     searchedByIt = true;
   }
 
@@ -284,12 +292,19 @@ export function unitElasticSearch(arg: IElasticSearchInfo) {
       term: {
         [arg.prefix + arg.id + "_NORMALIZED_UNIT"]: unitToUse,
       }
-    }, arg.boost);
+    }, {
+      boost: arg.boost,
+      groupId: "RANGE_" + arg.prefix + arg.id,
+      propertyId: arg.prefix + arg.id,
+    });
     // should fail this is weird
     // two different units somehow, comparing grams to liters? or what
     if (unitToUse2 && unitToUse !== unitToUse2) {
       arg.elasticQueryBuilder.mustTerm({
         [arg.prefix + arg.id + "_NORMALIZED_UNIT"]: unitToUse2,
+      }, {
+        groupId: "RANGE_" + arg.prefix + arg.id,
+        propertyId: arg.prefix + arg.id,
       });
     }
     searchedByIt = true;

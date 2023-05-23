@@ -71,7 +71,7 @@ interface ISearchLoaderWithPaginationProps {
 
   accessiblePriority?: number;
   accessibleUseInFlow?: boolean;
-  accessibleStartRectionKey?: string;
+  accessibleStartReactionKey?: string;
   accessiblePageReactionKey?: string;
   accessibleEndReactionKey?: string;
 }
@@ -108,7 +108,7 @@ export function SearchLoaderWithPagination(props: ISearchLoaderWithPaginationPro
             props.accessiblePageReactionKey || "p"
           ) : (
             x.type === "first" || x.type === "previous" ? (
-              props.accessibleStartRectionKey || "f"
+              props.accessibleStartReactionKey || "f"
             ) : (
               props.accessibleEndReactionKey || "l"
             )
@@ -126,7 +126,7 @@ export function SearchLoaderWithPagination(props: ISearchLoaderWithPaginationPro
     props.accessible,
     props.accessiblePageReactionKey,
     props.accessiblePageReactionKey,
-    props.accessibleStartRectionKey,
+    props.accessibleStartReactionKey,
     props.accessiblePriority,
     props.accessibleEndReactionKey,
     props.accessibleUseInFlow,

@@ -271,7 +271,11 @@ export function locationElasticSearch(arg: IElasticSearchInfo) {
   if (arg.args[locationName] === null) {
     arg.elasticQueryBuilder.mustTerm({
       [arg.prefix + arg.id + "_NULL"]: true,
-    }, arg.boost);
+    }, {
+      boost: arg.boost,
+      propertyId: arg.prefix + arg.id,
+      groupId: "LOCATION_RADIUS_" + arg.prefix + arg.id,
+    });
     return {};
   } else if (
     typeof arg.args[locationName] !== "undefined" && arg.args[locationName] !== null &&
@@ -299,6 +303,9 @@ export function locationElasticSearch(arg: IElasticSearchInfo) {
           }
         ]
       }
+    }, {
+      propertyId: arg.prefix + arg.id,
+      groupId: "LOCATION_RADIUS_" + arg.prefix + arg.id,
     });
 
     return {};

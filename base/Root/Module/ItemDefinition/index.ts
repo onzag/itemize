@@ -72,6 +72,8 @@ export interface IItemSearchStateType {
   // similar to results, obtained from traditional search
   searchHighlights: IElasticHighlightRecordInfo;
   searchOriginalOptions: IActionSearchOptions;
+  // new search metadata
+  searchMetadata: string;
 };
 
 export interface ICompoundSearchStateType {

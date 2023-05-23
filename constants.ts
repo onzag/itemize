@@ -1186,6 +1186,9 @@ export const SEARCH_RECORDS_CONTAINER_GQL = GraphQLObjectType && new GraphQLObje
     oldest_created_at: {
       type: GraphQLString,
     },
+    metadata: {
+      type: GraphQLString,
+    },
   },
 });
 

@@ -51,6 +51,7 @@ export interface IGQLSearchRecordsContainer {
   offset: number;
   earliest_created_at: string;
   oldest_created_at: string;
+  metadata: string;
 }
 
 /**
@@ -64,6 +65,7 @@ export interface IGQLSearchResultsContainer {
   offset: number;
   last_modified: string;
   highlights: string;
+  metadata: string;
 }
 
 /**

@@ -79,13 +79,21 @@ export function tagListElasticSearch(arg: IElasticSearchInfo) {
     arg.elasticQueryBuilder.mustTerms({
       [arg.prefix + arg.id]: tagCompareCheck,
       minimum_should_match : tagCompareCheck.length,
-    }, arg.boost);
+    }, {
+      boost: arg.boost,
+      groupId: searchName,
+      propertyId: arg.prefix + arg.id,
+    });
 
     return {};
   } else if (arg.args[searchName] === null) {
     arg.elasticQueryBuilder.mustTerm({
       [arg.prefix + arg.id + "_NULL"]: true,
-    }, arg.boost);
+    }, {
+      boost: arg.boost,
+      groupId: searchName,
+      propertyId: arg.prefix + arg.id,
+    });
     return {};
   }
 
