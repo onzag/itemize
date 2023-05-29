@@ -180,6 +180,10 @@ export interface IIncludeOverride {
 }
 
 export function getPropertyListForSearchMode(properties: Array<string | IPropertyCoreProps>, standardCounterpart: ItemDefinition) {
+  if (!properties) {
+    return [];
+  }
+  
   let result: string[] = [];
   properties.forEach((property) => {
 
@@ -201,6 +205,27 @@ export function getPropertyListForSearchMode(properties: Array<string | IPropert
 
     if (!searchVariantSpecified) {
       result = result.concat(getConversionIds(standardProperty.rawData, true));
+    } else {
+      const id = PropertyDefinitionSearchInterfacesPrefixes[searchVariantSpecified.toUpperCase()] + propertyId;
+      result.push(id);
+    }
+  });
+  return result;
+}
+
+export function getPropertyListDefault(properties: Array<string | IPropertyCoreProps>) {
+  if (!properties) {
+    return [];
+  }
+
+  let result: string[] = [];
+  properties.forEach((property) => {
+
+    const propertyId = typeof property === "string" ? property : property.id;
+    const searchVariantSpecified = typeof property !== "string" ? property.searchVariant : null;
+
+    if (!searchVariantSpecified) {
+      result.push(propertyId);
     } else {
       const id = PropertyDefinitionSearchInterfacesPrefixes[searchVariantSpecified.toUpperCase()] + propertyId;
       result.push(id);
@@ -1963,7 +1988,7 @@ export async function runSearchQueryFor(
     highlights = {};
   }
 
-  const metadata: string = (data.metadata as string);
+  const metadata: string = (data && (data.metadata as string)) || null;
 
   if (typeof limit === "undefined") {
     limit = null;

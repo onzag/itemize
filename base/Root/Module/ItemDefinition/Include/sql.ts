@@ -386,6 +386,8 @@ export function buildSQLQueryForInclude(
     // we tell the connection that is to be the case
     elasticQueryBuilder.mustTerm({
       exclusionStateQualifiedId: IncludeExclusionState.EXCLUDED,
+    }, {
+      groupId: include.getId(),
     });
   } else {
     // otherwise if we are expecting something else like ANY and INCLUDED
@@ -425,6 +427,8 @@ export function buildSQLQueryForInclude(
         // then we add the excluded state to the subquery
         elasticQueryBuilder.shouldTerm({
           exclusionStateQualifiedId: IncludeExclusionState.EXCLUDED,
+        }, {
+          groupId: include.getId(),
         });
       }
     });

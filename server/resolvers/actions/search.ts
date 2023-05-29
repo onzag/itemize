@@ -275,6 +275,8 @@ export async function searchModule(
     );
     elasticQuery.mustTerm({
       blocked_by: "?NULL",
+    }, {
+      groupId: "BLOCKED",
     });
 
     if (created_by) {
@@ -288,6 +290,8 @@ export async function searchModule(
 
       elasticQuery.mustTerm({
         created_by: created_by,
+      }, {
+        groupId: "CREATED_BY",
       });
     }
 
@@ -298,6 +302,8 @@ export async function searchModule(
             gte: since,
           }
         }
+      }, {
+        groupId: "CREATED_AT",
       });
     } else if (until && !since) {
       elasticQuery.must({
@@ -306,6 +312,8 @@ export async function searchModule(
             lt: until,
           }
         }
+      }, {
+        groupId: "CREATED_AT",
       });
     } else if (until && since) {
       elasticQuery.must({
@@ -315,12 +323,16 @@ export async function searchModule(
             lt: until,
           }
         }
+      }, {
+        groupId: "CREATED_AT",
       });
     }
 
     if (typeof resolverArgs.args.version_filter !== "undefined") {
       elasticQuery.mustTerm({
         version: resolverArgs.args.version_filter || null,
+      }, {
+        groupId: "VERSION",
       });
     }
 
@@ -329,10 +341,14 @@ export async function searchModule(
         parent_id: resolverArgs.args.parent_id,
         parent_version: resolverArgs.args.parent_version || null,
         parent_type: resolverArgs.args.parent_type,
+      }, {
+        groupId: "PARENT",
       });
     } else if (resolverArgs.args.parent_type) {
       elasticQuery.mustTerm({
         parent_type: resolverArgs.args.parent_type,
+      }, {
+        groupId: "PARENT",
       });
     }
   } else {
@@ -708,8 +724,8 @@ export async function searchModule(
         },
         usesElastic,
         action: SearchTriggerActions.SEARCHED_SYNC,
-        elasticQueryBuilder: null,
-        whereBuilder: null,
+        whereBuilder: queryModel ? queryModel.whereBuilder : null,
+        elasticQueryBuilder: elasticQuery || null,
         traditional,
         forbid: defaultTriggerSearchInvalidForbiddenFunction,
         setSearchMetadata,
@@ -786,8 +802,8 @@ export async function searchModule(
         },
         usesElastic,
         action: SearchTriggerActions.SEARCHED_SYNC,
-        elasticQueryBuilder: null,
-        whereBuilder: null,
+        whereBuilder: queryModel ? queryModel.whereBuilder : null,
+        elasticQueryBuilder: elasticQuery || null,
         traditional,
         forbid: defaultTriggerSearchInvalidForbiddenFunction,
         setSearchMetadata,
@@ -1085,11 +1101,15 @@ export async function searchItemDefinition(
       );
       elasticQuery.mustTerm({
         blocked_by: "?NULL",
+      }, {
+        groupId: "BLOCKED",
       });
 
       if (created_by) {
         elasticQuery.mustTerm({
           created_by: created_by,
+        }, {
+          groupId: "CREATED_BY",
         });
       }
 
@@ -1100,6 +1120,8 @@ export async function searchItemDefinition(
               gte: since,
             }
           }
+        }, {
+          groupId: "CREATED_AT",
         });
       } else if (until && !since) {
         elasticQuery.must({
@@ -1108,6 +1130,8 @@ export async function searchItemDefinition(
               lt: until,
             }
           }
+        }, {
+          groupId: "CREATED_AT",
         });
       } else if (until && since) {
         elasticQuery.must({
@@ -1117,12 +1141,16 @@ export async function searchItemDefinition(
               lt: until,
             }
           }
+        }, {
+          groupId: "CREATED_AT",
         });
       }
 
       if (typeof resolverArgs.args.version_filter !== "undefined") {
         elasticQuery.mustTerm({
           version: resolverArgs.args.version_filter || null,
+        }, {
+          groupId: "VERSION",
         });
       }
 
@@ -1131,10 +1159,14 @@ export async function searchItemDefinition(
           parent_id: resolverArgs.args.parent_id,
           parent_version: resolverArgs.args.parent_version || null,
           parent_type: resolverArgs.args.parent_type,
+        }, {
+          groupId: "PARENT",
         });
       } else if (resolverArgs.args.parent_type) {
         elasticQuery.mustTerm({
           parent_type: resolverArgs.args.parent_type,
+        }, {
+          groupId: "PARENT",
         });
       }
 
@@ -1487,8 +1519,8 @@ export async function searchItemDefinition(
           },
           usesElastic,
           action: SearchTriggerActions.SEARCHED_SYNC,
-          elasticQueryBuilder: null,
-          whereBuilder: null,
+          whereBuilder: queryModel ? queryModel.whereBuilder : null,
+          elasticQueryBuilder: elasticQuery || null,
           traditional,
           forbid: defaultTriggerSearchInvalidForbiddenFunction,
           setSearchMetadata,
@@ -1571,8 +1603,8 @@ export async function searchItemDefinition(
           },
           usesElastic,
           action: SearchTriggerActions.SEARCHED_SYNC,
-          elasticQueryBuilder: null,
-          whereBuilder: null,
+          whereBuilder: queryModel ? queryModel.whereBuilder : null,
+          elasticQueryBuilder: elasticQuery || null,
           traditional,
           forbid: defaultTriggerSearchInvalidForbiddenFunction,
           setSearchMetadata,

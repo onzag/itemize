@@ -5,6 +5,7 @@ import Module from "../../base/Root/Module";
 import { WhereBuilder } from "../../database/WhereBuilder";
 import { ISQLTableRowValue } from "../../base/Root/sql";
 import type { ElasticQueryBuilder } from "../elastic";
+import type { SearchResponse } from "@elastic/elasticsearch/lib/api/types";
 
 export enum IOTriggerActions {
   CREATE,
@@ -173,7 +174,7 @@ export interface ISearchTriggerArgType {
   whereBuilder: WhereBuilder;
   elasticQueryBuilder: ElasticQueryBuilder;
   sqlResponse: ISQLTableRowValue[];
-  elasticResponse: any;
+  elasticResponse: SearchResponse;
   traditional: boolean;
   records: IGQLSearchRecordsContainer,
   results: IGQLSearchResultsContainer,

@@ -12,7 +12,6 @@ import I18nReadError from "../../components/localization/I18nReadError";
 import { default as MUISnackbar } from "@mui/material/Snackbar";
 import IconButton from "@mui/material/IconButton";
 import CloseIcon from "@mui/icons-material/Close";
-import { AltBadgeReactioner } from "./alt-badge-reactioner";
 
 /**
  * the snackbar styles
@@ -61,7 +60,7 @@ interface ISnackbarProps {
   /**
    * The severity of the snackbar, which affects the color
    */
-  severity: "primary" | "secondary" | "success" | "error";
+  severity: "info" | "warning" | "success" | "error";
   /**
    * Whether it is currently visible, very often actioners will have
    * a property that fits in here nicely, such as "success", "statefulSuccess" or

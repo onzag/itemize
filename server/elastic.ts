@@ -10,14 +10,19 @@ import { convertSQLValueToElasticSQLValueForItemDefinition } from "../base/Root/
 import { DELETED_REGISTRY_IDENTIFIER, SERVER_ELASTIC_PING_INTERVAL_TIME } from "../constants";
 import { CAN_LOG_DEBUG, INSTANCE_UUID } from "./environment";
 import { NanoSecondComposedDate } from "../nanodate";
-import { FieldValue, QueryDslMatchPhraseQuery, QueryDslMatchQuery, QueryDslQueryContainer, QueryDslTermQuery, QueryDslTermsQuery, SearchRequest } from "@elastic/elasticsearch/lib/api/types";
+import { AggregationsAggregationContainer, FieldValue, QueryDslMatchPhraseQuery, QueryDslMatchQuery, QueryDslQueryContainer, QueryDslTermQuery, QueryDslTermsQuery, SearchRequest } from "@elastic/elasticsearch/lib/api/types";
 import { setInterval } from "timers";
 
 interface ElasticRequestOptions {
-  ignoreAllInGroup?: string | string[];
-  ignoreAllInPropertyId?: string | string[];
-  ignoreUniqueId?: string | string[];
-  customizeRequest?: (r: SearchRequest) => SearchRequest;
+  ignoreAllInGroup?: boolean | string | string[];
+  ignoreAllInPropertyId?: boolean | string | string[];
+  ignoreAllInGroupOnlyQuery?: boolean | string | string[];
+  ignoreAllInPropertyIdOnlyQuery?: boolean | string | string[];
+  ignoreAllInGroupOnlyAggs?: boolean | string | string[];
+  ignoreAllInPropertyIdOnlyAggs?: boolean | string | string[];
+  ignoreUniqueId?: boolean | string | string[];
+  onlyAggregations?: boolean;
+  ignoresDoNotApplyToAggregations?: boolean;
 };
 
 export interface IElasticPing<N> {
@@ -2206,19 +2211,37 @@ interface IElasticBasicOptions {
   uniqueId?: string;
 }
 
+export interface IElasticChildrenRule {
+  type: string;
+  builder: ElasticQueryBuilder;
+  q: QueryDslQueryContainer;
+  groupId: string;
+  propertyId: string;
+  uniqueId: string;
+  boost: number;
+  agg: {
+    [aggId: string]: AggregationsAggregationContainer
+  };
+  aggId: string;
+};
+
+function ignoreChecker(c: IElasticChildrenRule, options: ElasticRequestOptions, rule: string, matchRule: string, onlyAggs: boolean, noAggs: boolean): boolean {
+  return (
+    // must have been specified
+    options[rule] &&
+    (onlyAggs ? c.agg : (noAggs ? !c.agg : true)) &&
+    // if it's array check if included within the array
+    (Array.isArray(options[rule]) ? options[rule].includes(c[matchRule]) : (
+      // if it's boolean check that it simply exists
+      // otherwise check the value matches exact
+      options[rule] === true ? !!c[matchRule] : (options[rule] === c[matchRule])
+    ))
+  );
+}
+
 export class ElasticQueryBuilder {
   public request: SearchRequest;
-  private children: Array<
-    {
-      type: string;
-      builder: ElasticQueryBuilder;
-      q: QueryDslQueryContainer;
-      groupId: string;
-      propertyId: string;
-      uniqueId: string;
-      boost: number;
-    }
-  > = [];
+  private children: IElasticChildrenRule[] = [];
 
   constructor(request: SearchRequest) {
     this.request = request;
@@ -2245,49 +2268,76 @@ export class ElasticQueryBuilder {
 
     this.children.forEach((c) => {
       if (
-        (
-          options.ignoreAllInGroup &&
-          (Array.isArray(options.ignoreAllInGroup) ? options.ignoreAllInGroup.includes(c.groupId) : options.ignoreAllInGroup === c.groupId)
-        ) ||
-        (
-          options.ignoreAllInPropertyId &&
-          (Array.isArray(options.ignoreAllInPropertyId) ? options.ignoreAllInPropertyId.includes(c.propertyId) : options.ignoreAllInPropertyId === c.propertyId)
-        ) ||
-        (
-          options.ignoreUniqueId &&
-          (Array.isArray(options.ignoreUniqueId) ? options.ignoreUniqueId.includes(c.uniqueId) : options.ignoreUniqueId === c.uniqueId)
-        )
+        ignoreChecker(c, options, "ignoreAllInGroup", "groupId", false, false) ||
+        ignoreChecker(c, options, "ignoreAllInPropertyId", "propertyId", false, false) ||
+        ignoreChecker(c, options, "ignoreUniqueId", "uniqueId", false, false) ||
+        ignoreChecker(c, options, "ignoreAllInGroupOnlyAggs", "groupId", true, false) ||
+        ignoreChecker(c, options, "ignoreAllInPropertyIdOnlyAggs", "propertyId", true, false) ||
+        ignoreChecker(c, options, "ignoreAllInGroupOnlyQuery", "groupId", false, true) ||
+        ignoreChecker(c, options, "ignoreAllInPropertyIdOnlyQuery", "propertyId", false, true)
       ) {
         return;
       }
 
-      if (!resultRequest.query.bool[c.type]) {
-        resultRequest.query.bool[c.type] = [];
-      }
-
-      if (c.builder) {
-        const cRequest = c.builder.getRequest();
-
-        if (cRequest.query && Object.keys(cRequest.query).length !== 0) {
-          resultRequest.query.bool[c.type].push(cRequest.query);
+      if (c.type !== "agg") {
+        if (!resultRequest.query.bool[c.type]) {
+          resultRequest.query.bool[c.type] = [];
         }
-      } else {
-        let queryToUse = c.q;
-        if (typeof c.boost === "number") {
-          queryToUse = {
-            bool: {
-              must: c.q,
-              boost: c.boost,
+
+        if (c.builder) {
+          const cRequest = c.builder.getRequest(options);
+
+          if (cRequest.query && Object.keys(cRequest.query).length !== 0) {
+            resultRequest.query.bool[c.type].push(cRequest.query);
+          }
+        } else {
+          let queryToUse = c.q;
+          if (typeof c.boost === "number") {
+            queryToUse = {
+              bool: {
+                must: c.q,
+                boost: c.boost,
+              }
             }
           }
+
+          (resultRequest.query.bool[c.type] as QueryDslQueryContainer[]).push(queryToUse);
+        }
+      } else {
+        if (!resultRequest.aggs) {
+          resultRequest.aggs = {};
         }
 
-        (resultRequest.query.bool[c.type] as QueryDslQueryContainer[]).push(queryToUse);
+        if (c.q) {
+          resultRequest.aggs[c.aggId] = {
+            filter: c.q,
+            aggs: c.agg,
+          }
+        } else if (c.builder) {
+          const cRequest = c.builder.getRequest(options.ignoresDoNotApplyToAggregations ? {} : options);
+
+          if (cRequest.query && Object.keys(cRequest.query).length !== 0) {
+            resultRequest.aggs[c.aggId] = {
+              filter: cRequest.query,
+              aggs: c.agg,
+            }
+          } else {
+            Object.keys(c.agg).forEach((k) => {
+              resultRequest.aggs[k] = c.agg[k];
+            });
+          }
+        } else {
+          Object.keys(c.agg).forEach((k) => {
+            resultRequest.aggs[k] = c.agg[k];
+          });
+        }
       }
     });
 
-    if (options.customizeRequest) {
-      resultRequest = options.customizeRequest(resultRequest);
+    if (options.onlyAggregations) {
+      resultRequest.size = 0;
+      resultRequest._source = [];
+      resultRequest.sort = [];
     }
 
     return resultRequest;
@@ -2305,6 +2355,8 @@ export class ElasticQueryBuilder {
         propertyId: options.propertyId || null,
         uniqueId: options.uniqueId || null,
         boost: options.boost,
+        agg: null,
+        aggId: null,
       });
     } else {
       this.children.push({
@@ -2315,6 +2367,8 @@ export class ElasticQueryBuilder {
         propertyId: options.propertyId || null,
         uniqueId: options.uniqueId || null,
         boost: options.boost,
+        agg: null,
+        aggId: null,
       });
     }
 
@@ -2530,9 +2584,127 @@ export class ElasticQueryBuilder {
     }
   }
 
+  public getAllChildrenForGroupId(id: string): IElasticChildrenRule[] {
+    return this.children.filter((r) => r.groupId === id);
+  }
+
+  public getAllChildrenForPropertyId(id: string): IElasticChildrenRule[] {
+    return this.children.filter((r) => r.propertyId === id);
+  }
+
+  public getChildForUniqueId(id: string): IElasticChildrenRule {
+    return this.children.find((r) => r.uniqueId === id) || null;
+  }
+
+  public removeAllChildrenForGroupId(id: string) {
+    this.children = this.children.filter((r) => r.groupId !== id);
+  }
+
+  public removeAllChildrenForPropertyId(id: string) {
+    this.children = this.children.filter((r) => r.propertyId !== id);
+  }
+
+  public removeChildForUniqueId(id: string) {
+    this.children = this.children.filter((r) => r.uniqueId !== id);
+  }
+
+  public getAllChildrenWithPropertyId(options: {but?: string, noAgg?: boolean, noQuery?: boolean} = {}) {
+    return this.children.filter((r) =>
+      !!r.propertyId && (options.but ? r.groupId !== options.but : true) &&
+      (options.noAgg ? !r.agg : true) && (options.noQuery ? !!r.agg : true));
+  }
+
+  public getAllChildrenWithGroupId(options: {but?: string, noAgg?: boolean, noQuery?: boolean} = {}) {
+    return this.children.filter((r) =>
+      !!r.groupId && (options.but ? r.groupId !== options.but : true) &&
+      (options.noAgg ? !r.agg : true) && (options.noQuery ? !!r.agg : true));
+  }
+
+  public getAllChildrenWithUniqueId() {
+    return this.children.filter((r) => !!r.uniqueId);
+  }
+
+  public addChildren(c: IElasticChildrenRule | IElasticChildrenRule[]) {
+    if (Array.isArray(c)) {
+      c.forEach((sb) => this.children.push(sb));
+    } else {
+      this.children.push(c);
+    }
+  }
+
+  public addAggregations(
+    id: string,
+    agg: Record<string, AggregationsAggregationContainer>,
+    filter?: QueryDslQueryContainer | SubBuilderFn,
+    options: IElasticBasicOptions = {},
+  ) {
+    if (!filter || typeof filter !== "function") {
+      this.children.push({
+        agg,
+        boost: null,
+        builder: null,
+        q: filter as QueryDslQueryContainer || null,
+        aggId: id,
+        groupId: options.groupId || null,
+        propertyId: options.propertyId || null,
+        type: "agg",
+        uniqueId: options.uniqueId || null,
+      });
+      return;
+    }
+
+    const builder = new ElasticQueryBuilder({});
+    filter(builder);
+
+    this.children.push({
+      agg,
+      boost: null,
+      builder,
+      q: null,
+      aggId: id,
+      groupId: options.groupId || null,
+      propertyId: options.propertyId || null,
+      type: "agg",
+      uniqueId: options.uniqueId || null,
+    });
+  }
+
+  public addAggregation(
+    id: string,
+    agg: AggregationsAggregationContainer,
+    filter?: QueryDslQueryContainer | SubBuilderFn,
+    options: IElasticBasicOptions = {},
+  ) {
+    return this.addAggregations(id, {
+      [filter ? "result" : id]: agg,
+    }, filter, options);
+  }
+
+  public removeAggregation(id: string) {
+    this.children = this.children.filter((f) => f.agg && f.aggId === id);
+  }
+
+  public removeAggregations() {
+    this.children = this.children.filter((f) => !f.agg);
+  }
+
   public clone(): ElasticQueryBuilder {
-    const r = new ElasticQueryBuilder(this.request);
+    const r = new ElasticQueryBuilder(copy(this.request));
     r.children = [...this.children];
     return r;
   }
+}
+
+function copy(element: any): any {
+  if (typeof element !== 'object') {
+    return element
+  }
+  if (Array.isArray(element)) {
+    return [...element].map(copy)
+  }
+  const copyObj = {};
+  for (const prop in element) {
+    copyObj[prop] = copy(element[prop]);
+  }
+  return copyObj
 }

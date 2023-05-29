@@ -25,7 +25,7 @@ import { IRemoteListenerRecordsCallbackArg, RemoteListener } from "../internal/a
 import uuid from "uuid";
 import {
   getFieldsAndArgs, runGetQueryFor, runDeleteQueryFor, runEditQueryFor, runAddQueryFor, runSearchQueryFor, IIncludeOverride,
-  IPropertyOverride, ICacheMetadataMismatchAction, ISearchCacheMetadataMismatchAction, reprocessQueryArgumentsForFiles, getPropertyListForSearchMode, SearchCacheMetadataMismatchActionFn
+  IPropertyOverride, ICacheMetadataMismatchAction, ISearchCacheMetadataMismatchAction, reprocessQueryArgumentsForFiles, getPropertyListForSearchMode, SearchCacheMetadataMismatchActionFn, getPropertyListDefault
 } from "../internal/gql-client-util";
 import { IPropertyCoreProps, IPropertySetterProps } from "../components/property/base";
 import { PropertyDefinitionSearchInterfacesPrefixes } from "../../base/Root/Module/ItemDefinition/PropertyDefinition/search-interfaces";
@@ -1425,7 +1425,7 @@ export interface IItemProviderProps {
    * only downloads and includes the properties specified in the list
    * in the state
    */
-  properties?: string[];
+  properties?: Array<string | IPropertyCoreProps>;
   /**
    * only includes the items specified in the list in the state
    */
@@ -1734,7 +1734,7 @@ export class ActualItemProvider extends
         getPropertyListForSearchMode(
           props.properties || [],
           props.itemDefinitionInstance.getStandardCounterpart()
-        ) : props.properties || [],
+        ) : getPropertyListDefault(props.properties),
       props.includes || {},
       !props.includePolicies,
     );
@@ -1866,7 +1866,7 @@ export class ActualItemProvider extends
       includeArgs: false,
       includeFields: true,
       includes: props.includes || {},
-      properties: props.properties || [],
+      properties: getPropertyListDefault(props.properties),
       itemDefinitionInstance: props.itemDefinitionInstance,
       forId: id,
       forVersion: version,
@@ -1921,7 +1921,7 @@ export class ActualItemProvider extends
         includeFields: true,
         uniteFieldsWithAppliedValue: true,
         includes: props.includes || {},
-        properties: props.properties || [],
+        properties: getPropertyListDefault(props.properties),
         itemDefinitionInstance: props.itemDefinitionInstance,
         forId: props.forId || null,
         forVersion: props.forVersion || null,
@@ -2910,7 +2910,7 @@ export class ActualItemProvider extends
           includeArgs: false,
           includeFields: true,
           includes: this.props.includes || {},
-          properties: this.props.properties || [],
+          properties: getPropertyListDefault(this.props.properties),
           itemDefinitionInstance: this.props.itemDefinitionInstance,
           forId: this.props.forId,
           forVersion: this.props.forVersion || null,
@@ -3141,7 +3141,7 @@ export class ActualItemProvider extends
       includeFields: true,
       uniteFieldsWithAppliedValue: true,
       includes: this.props.includes || {},
-      properties: this.props.properties || [],
+      properties: getPropertyListDefault(this.props.properties),
       itemDefinitionInstance: this.props.itemDefinitionInstance,
       forId: forId,
       forVersion: forVersion,
@@ -3470,7 +3470,7 @@ export class ActualItemProvider extends
         getPropertyListForSearchMode(
           this.props.properties || [],
           this.props.itemDefinitionInstance.getStandardCounterpart()
-        ) : this.props.properties || [],
+        ) : getPropertyListDefault(this.props.properties),
       this.props.includes || {},
       !this.props.includePolicies,
     );
@@ -4310,7 +4310,7 @@ export class ActualItemProvider extends
       differingPropertiesOnlyForArgs: options.differingOnly,
       differingIncludesOnlyForArgs: options.differingOnly,
       includes: itemDefinitionToSubmitFor !== this.props.itemDefinitionInstance ? {} : (this.props.includes || {}),
-      properties: itemDefinitionToSubmitFor !== this.props.itemDefinitionInstance ? [] : (this.props.properties || []),
+      properties: itemDefinitionToSubmitFor !== this.props.itemDefinitionInstance ? [] : getPropertyListDefault(this.props.properties),
       includesForArgs: options.includes || {},
       propertiesForArgs: options.properties,
       policiesForArgs: options.policies || [],
