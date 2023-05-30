@@ -2251,10 +2251,6 @@ export class ElasticQueryBuilder {
   }
 
   public getRequest(options: ElasticRequestOptions = {}) {
-    if (!this.children.length) {
-      return this.request;
-    }
-
     let resultRequest: SearchRequest = {
       ...this.request,
       query: {
@@ -2264,6 +2260,10 @@ export class ElasticQueryBuilder {
 
     if (!resultRequest.query.bool) {
       resultRequest.query.bool = {};
+    }
+
+    if (!this.children.length) {
+      return resultRequest;
     }
 
     this.children.forEach((c) => {
@@ -2610,7 +2610,7 @@ export class ElasticQueryBuilder {
 
   public getAllChildrenWithPropertyId(options: {but?: string, noAgg?: boolean, noQuery?: boolean} = {}) {
     return this.children.filter((r) =>
-      !!r.propertyId && (options.but ? r.groupId !== options.but : true) &&
+      !!r.propertyId && (options.but ? r.propertyId !== options.but : true) &&
       (options.noAgg ? !r.agg : true) && (options.noQuery ? !!r.agg : true));
   }
 

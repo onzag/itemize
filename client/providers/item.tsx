@@ -88,6 +88,16 @@ function getPropertyForSetter(setter: IPropertySetterProps<PropertyDefinitionSup
   return itemDefinition.getPropertyDefinitionFor(actualId, true);
 }
 
+function resolveCoreProp(value: string | IPropertyCoreProps) {
+  if (typeof value === "string") {
+    return value;
+  } else if (value.searchVariant) {
+    return PropertyDefinitionSearchInterfacesPrefixes[value.searchVariant.toUpperCase().replace("-", "_")] + value.id;
+  }
+
+  return value.id;
+}
+
 function isSearchUnequal(searchA: IActionSearchOptions, searchB: IActionSearchOptions) {
   let searchANoFn = searchA;
   let searchBNoFn = searchB;
@@ -1130,7 +1140,7 @@ export interface IItemContextType extends IBasicFns {
    * @returns 
    */
   onPropertyChange: (
-    property: PropertyDefinition,
+    property: PropertyDefinition | string | IPropertyCoreProps,
     value: PropertyDefinitionSupportedType,
     internalValue: any,
   ) => void;
@@ -1140,7 +1150,7 @@ export interface IItemContextType extends IBasicFns {
    * @returns 
    */
   onPropertyRestore: (
-    property: PropertyDefinition,
+    property: PropertyDefinition | string | IPropertyCoreProps,
   ) => void;
   /**
    * this is yet another passed function that does the same as properties
@@ -1164,7 +1174,7 @@ export interface IItemContextType extends IBasicFns {
    * @returns 
    */
   onPropertyEnforce: (
-    property: PropertyDefinition,
+    property: PropertyDefinition | string | IPropertyCoreProps,
     value: PropertyDefinitionSupportedType,
     givenForId: string,
     givenForVersion: string,
@@ -1177,7 +1187,7 @@ export interface IItemContextType extends IBasicFns {
    * @returns 
    */
   onPropertyClearEnforce: (
-    property: PropertyDefinition,
+    property: PropertyDefinition | string | IPropertyCoreProps,
     givenForId: string,
     givenForVersion: string,
   ) => void;
@@ -3540,13 +3550,16 @@ export class ActualItemProvider extends
     }
   }
   public onPropertyRestore(
-    property: PropertyDefinition,
+    property: PropertyDefinition | string | IPropertyCoreProps,
   ) {
     if (this.state.loading) {
       return;
     }
 
-    property.restoreValueFor(
+    const actualProperty = property instanceof PropertyDefinition ?
+      property : this.props.itemDefinitionInstance.getPropertyDefinitionFor(resolveCoreProp(property), true);
+
+    actualProperty.restoreValueFor(
       this.props.forId || null,
       this.props.forVersion || null,
     );
@@ -3554,7 +3567,7 @@ export class ActualItemProvider extends
     this.onPropertyChangeOrRestoreFinal();
   }
   public async onPropertyChange(
-    property: PropertyDefinition,
+    property: PropertyDefinition | string | IPropertyCoreProps,
     value: PropertyDefinitionSupportedType,
     internalValue: any,
   ) {
@@ -3564,8 +3577,11 @@ export class ActualItemProvider extends
       await this.lastLoadValuePromise;
     }
 
+    const actualProperty = property instanceof PropertyDefinition ?
+      property : this.props.itemDefinitionInstance.getPropertyDefinitionFor(resolveCoreProp(property), true);
+
     // we simply set the current value in the property
-    property.setCurrentValue(
+    actualProperty.setCurrentValue(
       this.props.forId || null,
       this.props.forVersion || null,
       value,
@@ -3594,28 +3610,33 @@ export class ActualItemProvider extends
     }
   }
   public onPropertyEnforce(
-    property: PropertyDefinition,
+    property: PropertyDefinition | string | IPropertyCoreProps,
     value: PropertyDefinitionSupportedType,
     givenForId: string,
     givenForVersion: string,
     internal?: boolean,
     // doNotCleanSearchState?: boolean,
   ) {
+    const actualProperty = property instanceof PropertyDefinition ?
+      property : this.props.itemDefinitionInstance.getPropertyDefinitionFor(resolveCoreProp(property), true);
+
     // this function is basically run by the setter
     // since they might be out of sync that's why the id is passed
     // the setter enforces values
-    property.setSuperEnforced(givenForId || null, givenForVersion || null, value, this);
+    actualProperty.setSuperEnforced(givenForId || null, givenForVersion || null, value, this);
     // !doNotCleanSearchState && this.props.itemDefinitionInstance.cleanSearchState(this.props.forId || null, this.props.forVersion || null);
     this.onPropertyEnforceOrClearFinal(givenForId, givenForVersion, internal);
   }
   public onPropertyClearEnforce(
-    property: PropertyDefinition,
+    property: PropertyDefinition | string | IPropertyCoreProps,
     givenForId: string,
     givenForVersion: string,
     internal?: boolean,
   ) {
+    const actualProperty = property instanceof PropertyDefinition ?
+      property : this.props.itemDefinitionInstance.getPropertyDefinitionFor(resolveCoreProp(property), true);
     // same but removes the enforcement
-    property.clearSuperEnforced(givenForId || null, givenForVersion || null, this);
+    actualProperty.clearSuperEnforced(givenForId || null, givenForVersion || null, this);
     // this.props.itemDefinitionInstance.cleanSearchState(this.props.forId || null, this.props.forVersion || null);
     this.onPropertyEnforceOrClearFinal(givenForId, givenForVersion, internal);
   }

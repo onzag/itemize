@@ -1,6 +1,6 @@
 {
   "name": "@onzag/itemize",
-  "version": "0.0.231",
+  "version": "0.0.233",
   "description": "Itemize",
   "bin": {
     "itemize": "index.js"
