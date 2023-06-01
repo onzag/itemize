@@ -15,7 +15,7 @@ interface IGrowableBoxProps {
 }
 
 export default function GrowableBox(props: IGrowableBoxProps) {
-  const [height, setHeight] = useState(0);
+  const [height, setHeight] = useState(props.open ? null : 0);
   const [crop, setCrop] = useState(false);
   const [noTransition, setNoTransition] = useState(true);
 
@@ -47,14 +47,25 @@ export default function GrowableBox(props: IGrowableBoxProps) {
       setHeight(finalHeight);
       setTimeout(() => {
         if (!isUnmounted.current) {
+          setHeight(null);
           setCrop(false);
         }
       }, 300);
     } else {
-      setCrop(false);
-      setHeight(0);
+      setTimeout(() => {
+        if (!isUnmounted.current) {
+          setCrop(false);
+          setHeight(0);
+        }
+      }, 10);
+      
+      let element = elementRef.current;
+      if (props.getElementFn) {
+        element = element[props.getElementFn]();
+      }
+      setHeight(element.offsetHeight);
     }
-  }, [props.open, props.children]);
+  }, [props.open]);
 
   return (
     <Element

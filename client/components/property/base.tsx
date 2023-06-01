@@ -168,6 +168,10 @@ export interface IPropertyReadPropsWOChildren extends IPropertyBaseProps {
   cacheFiles?: boolean;
 }
 
+/**
+ * @ignore
+ */
+export type ReadSetterCallback<T> = (v: T, internalValue: any) => void;
 
 /**
  * The reader props
@@ -176,7 +180,7 @@ export interface IPropertyReadProps<T extends PropertyDefinitionSupportedType> e
   /**
    * The reader callback
    */
-  children?: (value: T, state: IPropertyDefinitionState<T>) => React.ReactNode;
+  children?: (value: T, state: IPropertyDefinitionState<T>, setter: ReadSetterCallback<T>) => React.ReactNode;
 }
 
 /**
@@ -301,6 +305,8 @@ export function EntryViewReadSet(
     if (propertyState) {
       // we get the property description
       const propertyDescription = property.getPropertyDefinitionDescription();
+      const setter = property ? itemContextualValue.onPropertyChange.bind(null, property) : null;
+
       // to check if we are talking about file, or files
       if (propertyDescription.gqlAddFileToFields) {
         // and if that is the case, now we need to check if it's a
@@ -324,10 +330,10 @@ export function EntryViewReadSet(
           );
 
           if (use) {
-            return [value, propertyState];
+            return [value, propertyState, setter];
           }
 
-          return props.children(value, propertyState);
+          return props.children(value, propertyState, setter);
         } else {
           const value = fileArrayURLAbsoluter(
             domain,
@@ -343,10 +349,10 @@ export function EntryViewReadSet(
           );
 
           if (use) {
-            return [value, propertyState];
+            return [value, propertyState, setter];
           }
 
-          return props.children(value, propertyState);
+          return props.children(value, propertyState, setter);
         }
       }
 
@@ -354,6 +360,7 @@ export function EntryViewReadSet(
         return [
           props.useAppliedValue ? propertyState.stateAppliedValue : propertyState.value,
           propertyState,
+          setter,
         ];
       }
 
@@ -361,6 +368,7 @@ export function EntryViewReadSet(
       return props.children(
         props.useAppliedValue ? propertyState.stateAppliedValue : propertyState.value,
         propertyState,
+        setter,
       );
     }
 
@@ -385,7 +393,7 @@ export function EntryViewReadSet(
         return [gqlValue, null];
       }
 
-      return props.children(gqlValue as any, null);
+      return props.children(gqlValue as any, null, null);
     }
 
     if (process.env.NODE_ENV === "development" && !props.suppressWarnings) {

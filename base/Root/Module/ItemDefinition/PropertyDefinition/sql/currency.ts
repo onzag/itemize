@@ -88,7 +88,7 @@ export function currencySQLIn(arg: ISQLInInfo) {
     if (typeof value === "undefined") {
       throw new Error("Invalid payment for SQL IN in must not be undefined in " + arg.property.getId());
     }
-    
+
     if (
       typeof value.value !== "number"
     ) {
@@ -130,7 +130,7 @@ export function currencySQLIn(arg: ISQLInInfo) {
  * @param arg the argument out info
  * @returns a property definition supported currency type (or null)
  */
- export function currencySQLElasticIn(arg: ISQLOutInfo) {
+export function currencySQLElasticIn(arg: ISQLOutInfo) {
   return {
     [arg.prefix + arg.id + "_VALUE"]: arg.row[arg.prefix + arg.id + "_VALUE"],
     [arg.prefix + arg.id + "_CURRENCY"]: arg.row[arg.prefix + arg.id + "_CURRENCY"],
@@ -296,6 +296,8 @@ export function currencyElasticSearch(arg: IElasticSearchInfo) {
                   gte: normalized,
                 }
               },
+            },
+            {
               bool: {
                 must: [
                   {
@@ -304,13 +306,15 @@ export function currencyElasticSearch(arg: IElasticSearchInfo) {
                         gte: fromArg.value
                       },
                     },
-                    match: {
+                  },
+                  {
+                    term: {
                       [arg.prefix + arg.id + "_CURRENCY"]: fromArg.currency,
                     }
                   }
                 ]
               }
-            }
+            },
           ]
         }
       }, {
@@ -335,6 +339,8 @@ export function currencyElasticSearch(arg: IElasticSearchInfo) {
                   lte: normalized,
                 }
               },
+            },
+            {
               bool: {
                 must: [
                   {
@@ -343,13 +349,15 @@ export function currencyElasticSearch(arg: IElasticSearchInfo) {
                         lte: toArg.value
                       },
                     },
-                    match: {
+                  },
+                  {
+                    term: {
                       [arg.prefix + arg.id + "_CURRENCY"]: toArg.currency,
                     }
                   }
                 ]
               }
-            }
+            },
           ]
         }
       }, {

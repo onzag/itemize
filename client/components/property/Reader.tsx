@@ -7,7 +7,7 @@
 
 import { PropertyDefinitionSupportedType } from "../../../base/Root/Module/ItemDefinition/PropertyDefinition/types";
 import type { IPropertyDefinitionState } from "../../../base/Root/Module/ItemDefinition/PropertyDefinition";
-import { IPropertyReadProps, EntryViewReadSet, IPropertyReadPropsWOChildren } from "./base";
+import { IPropertyReadProps, EntryViewReadSet, IPropertyReadPropsWOChildren, ReadSetterCallback } from "./base";
 import { PropertyDefinitionSupportedStringType } from "../../../base/Root/Module/ItemDefinition/PropertyDefinition/types/string";
 import { PropertyDefinitionSupportedBooleanType } from "../../../base/Root/Module/ItemDefinition/PropertyDefinition/types/boolean";
 import { PropertyDefinitionSupportedIntegerType } from "../../../base/Root/Module/ItemDefinition/PropertyDefinition/types/integer";
@@ -83,7 +83,7 @@ export default function Reader(props: IPropertyReadProps<PropertyDefinitionSuppo
  * @returns 
  */
 export function useReader<T extends PropertyDefinitionSupportedType>(options: IPropertyReadPropsWOChildren) {
-  return EntryViewReadSet(options as any, "read", true) as [T, IPropertyDefinitionState<T>];
+  return EntryViewReadSet(options as any, "read", true) as [T, IPropertyDefinitionState<T>, ReadSetterCallback<T>];
 }
 
 /**
@@ -103,7 +103,12 @@ export function BooleanReader(props: IPropertyReadProps<PropertyDefinitionSuppor
  * @returns 
  */
 export function useBooleanReader(options: IPropertyReadPropsWOChildren | string) {
-  return EntryViewReadSet(options as any, "read", true) as [PropertyDefinitionSupportedBooleanType, IPropertyDefinitionState<PropertyDefinitionSupportedBooleanType>];
+  return EntryViewReadSet(options as any, "read", true) as
+    [
+      PropertyDefinitionSupportedBooleanType,
+      IPropertyDefinitionState<PropertyDefinitionSupportedBooleanType>,
+      ReadSetterCallback<PropertyDefinitionSupportedBooleanType>,
+    ];
 }
 
 /**
@@ -123,7 +128,12 @@ export function IntegerReader(props: IPropertyReadProps<PropertyDefinitionSuppor
  * @returns 
  */
 export function useIntegerReader(options: IPropertyReadPropsWOChildren | string) {
-  return EntryViewReadSet(options as any, "read", true) as [PropertyDefinitionSupportedIntegerType, IPropertyDefinitionState<PropertyDefinitionSupportedIntegerType>];
+  return EntryViewReadSet(options as any, "read", true) as
+    [
+      PropertyDefinitionSupportedIntegerType,
+      IPropertyDefinitionState<PropertyDefinitionSupportedIntegerType>,
+      ReadSetterCallback<PropertyDefinitionSupportedIntegerType>,
+    ];
 }
 
 /**
@@ -143,7 +153,12 @@ export function NumberReader(props: IPropertyReadProps<PropertyDefinitionSupport
  * @returns 
  */
 export function useNumberReader(options: IPropertyReadPropsWOChildren | string) {
-  return EntryViewReadSet(options as any, "read", true) as [PropertyDefinitionSupportedNumberType, IPropertyDefinitionState<PropertyDefinitionSupportedNumberType>];
+  return EntryViewReadSet(options as any, "read", true) as
+    [
+      PropertyDefinitionSupportedNumberType,
+      IPropertyDefinitionState<PropertyDefinitionSupportedNumberType>,
+      ReadSetterCallback<PropertyDefinitionSupportedNumberType>,
+    ];
 }
 
 /**
@@ -163,7 +178,12 @@ export function CurrencyReader(props: IPropertyReadProps<IPropertyDefinitionSupp
  * @returns 
  */
 export function useCurrencyReader(options: IPropertyReadPropsWOChildren | string) {
-  return EntryViewReadSet(options as any, "read", true) as [IPropertyDefinitionSupportedCurrencyType, IPropertyDefinitionState<IPropertyDefinitionSupportedCurrencyType>];
+  return EntryViewReadSet(options as any, "read", true) as
+    [
+      IPropertyDefinitionSupportedCurrencyType,
+      IPropertyDefinitionState<IPropertyDefinitionSupportedCurrencyType>,
+      ReadSetterCallback<IPropertyDefinitionSupportedCurrencyType>,
+    ];
 }
 
 /**
@@ -183,7 +203,12 @@ export function UnitReader(props: IPropertyReadProps<IPropertyDefinitionSupporte
  * @returns 
  */
 export function useUnitReader(options: IPropertyReadPropsWOChildren | string) {
-  return EntryViewReadSet(options as any, "read", true) as [IPropertyDefinitionSupportedUnitType, IPropertyDefinitionState<IPropertyDefinitionSupportedUnitType>];
+  return EntryViewReadSet(options as any, "read", true) as
+    [
+      IPropertyDefinitionSupportedUnitType,
+      IPropertyDefinitionState<IPropertyDefinitionSupportedUnitType>,
+      ReadSetterCallback<IPropertyDefinitionSupportedUnitType>,
+    ];
 }
 
 /**
@@ -203,7 +228,12 @@ export function StringReader(props: IPropertyReadProps<PropertyDefinitionSupport
  * @returns 
  */
 export function useStringReader(options: IPropertyReadPropsWOChildren | string) {
-  return EntryViewReadSet(options as any, "read", true) as [PropertyDefinitionSupportedStringType, IPropertyDefinitionState<PropertyDefinitionSupportedStringType>];
+  return EntryViewReadSet(options as any, "read", true) as
+    [
+      PropertyDefinitionSupportedStringType,
+      IPropertyDefinitionState<PropertyDefinitionSupportedStringType>,
+      ReadSetterCallback<PropertyDefinitionSupportedStringType>,
+    ];
 }
 
 /**
@@ -223,7 +253,12 @@ export function TextReader(props: IPropertyReadProps<IPropertyDefinitionSupporte
  * @returns 
  */
 export function useTextReader(options: IPropertyReadPropsWOChildren | string) {
-  return EntryViewReadSet(options as any, "read", true) as [IPropertyDefinitionSupportedTextType, IPropertyDefinitionState<IPropertyDefinitionSupportedTextType>];
+  return EntryViewReadSet(options as any, "read", true) as
+  [
+    IPropertyDefinitionSupportedTextType,
+    IPropertyDefinitionState<IPropertyDefinitionSupportedTextType>,
+    ReadSetterCallback<IPropertyDefinitionSupportedTextType>,
+  ];
 }
 
 /**
@@ -243,7 +278,12 @@ export function YearReader(props: IPropertyReadProps<PropertyDefinitionSupported
  * @returns 
  */
 export function useYearReader(options: IPropertyReadPropsWOChildren | string) {
-  return EntryViewReadSet(options as any, "read", true) as [PropertyDefinitionSupportedYearType, IPropertyDefinitionState<PropertyDefinitionSupportedYearType>];
+  return EntryViewReadSet(options as any, "read", true) as
+    [
+      PropertyDefinitionSupportedYearType,
+      IPropertyDefinitionState<PropertyDefinitionSupportedYearType>,
+      ReadSetterCallback<PropertyDefinitionSupportedYearType>,
+    ];
 }
 
 /**
@@ -263,7 +303,11 @@ export function DateReader(props: IPropertyReadProps<PropertyDefinitionSupported
  * @returns 
  */
 export function useDateReader(options: IPropertyReadPropsWOChildren | string) {
-  return EntryViewReadSet(options as any, "read", true) as [PropertyDefinitionSupportedDateType, IPropertyDefinitionState<PropertyDefinitionSupportedDateType>];
+  return EntryViewReadSet(options as any, "read", true) as [
+    PropertyDefinitionSupportedDateType,
+    IPropertyDefinitionState<PropertyDefinitionSupportedDateType>,
+    ReadSetterCallback<PropertyDefinitionSupportedDateType>,
+  ];
 }
 
 /**
@@ -283,7 +327,12 @@ export function TimeReader(props: IPropertyReadProps<PropertyDefinitionSupported
  * @returns 
  */
 export function useTimeReader(options: IPropertyReadPropsWOChildren | string) {
-  return EntryViewReadSet(options as any, "read", true) as [PropertyDefinitionSupportedTimeType, IPropertyDefinitionState<PropertyDefinitionSupportedTimeType>];
+  return EntryViewReadSet(options as any, "read", true) as
+  [
+    PropertyDefinitionSupportedTimeType,
+    IPropertyDefinitionState<PropertyDefinitionSupportedTimeType>,
+    ReadSetterCallback<PropertyDefinitionSupportedTimeType>,
+  ];
 }
 
 /**
@@ -303,7 +352,12 @@ export function DatetimeReader(props: IPropertyReadProps<PropertyDefinitionSuppo
  * @returns 
  */
 export function useDatetimeReader(options: IPropertyReadPropsWOChildren | string) {
-  return EntryViewReadSet(options as any, "read", true) as [PropertyDefinitionSupportedDateTimeType, IPropertyDefinitionState<PropertyDefinitionSupportedDateTimeType>];
+  return EntryViewReadSet(options as any, "read", true) as
+    [
+      PropertyDefinitionSupportedDateTimeType,
+      IPropertyDefinitionState<PropertyDefinitionSupportedDateTimeType>,
+      ReadSetterCallback<PropertyDefinitionSupportedDateTimeType>,
+    ];
 }
 
 /**
@@ -323,7 +377,11 @@ export function LocationReader(props: IPropertyReadProps<IPropertyDefinitionSupp
  * @returns 
  */
 export function useLocationReader(options: IPropertyReadPropsWOChildren | string) {
-  return EntryViewReadSet(options as any, "read", true) as [IPropertyDefinitionSupportedLocationType, IPropertyDefinitionState<IPropertyDefinitionSupportedLocationType>];
+  return EntryViewReadSet(options as any, "read", true) as [
+    IPropertyDefinitionSupportedLocationType,
+    IPropertyDefinitionState<IPropertyDefinitionSupportedLocationType>,
+    ReadSetterCallback<IPropertyDefinitionSupportedLocationType>,
+  ];
 }
 
 /**
@@ -343,7 +401,12 @@ export function FileReader(props: IPropertyReadProps<PropertyDefinitionSupported
  * @returns 
  */
 export function useFileReader(options: IPropertyReadPropsWOChildren | string) {
-  return EntryViewReadSet(options as any, "read", true) as [PropertyDefinitionSupportedFileType, IPropertyDefinitionState<PropertyDefinitionSupportedFileType>];
+  return EntryViewReadSet(options as any, "read", true) as
+    [
+      PropertyDefinitionSupportedFileType,
+      IPropertyDefinitionState<PropertyDefinitionSupportedFileType>,
+      ReadSetterCallback<PropertyDefinitionSupportedFileType>,
+    ];
 }
 
 /**
@@ -363,7 +426,12 @@ export function FilesReader(props: IPropertyReadProps<PropertyDefinitionSupporte
  * @returns 
  */
 export function useFilesReader(options: IPropertyReadPropsWOChildren | string) {
-  return EntryViewReadSet(options as any, "read", true) as [PropertyDefinitionSupportedFilesType, IPropertyDefinitionState<PropertyDefinitionSupportedFilesType>];
+  return EntryViewReadSet(options as any, "read", true) as
+    [
+      PropertyDefinitionSupportedFilesType,
+      IPropertyDefinitionState<PropertyDefinitionSupportedFilesType>,
+      ReadSetterCallback<PropertyDefinitionSupportedFilesType>,
+    ];
 }
 
 /**
@@ -383,7 +451,12 @@ export function PaymentReader(props: IPropertyReadProps<IPropertyDefinitionSuppo
  * @returns 
  */
 export function usePaymentReader(options: IPropertyReadPropsWOChildren | string) {
-  return EntryViewReadSet(options as any, "read", true) as [IPropertyDefinitionSupportedPaymentType, IPropertyDefinitionState<IPropertyDefinitionSupportedPaymentType>];
+  return EntryViewReadSet(options as any, "read", true) as
+    [
+      IPropertyDefinitionSupportedPaymentType,
+      IPropertyDefinitionState<IPropertyDefinitionSupportedPaymentType>,
+      ReadSetterCallback<IPropertyDefinitionSupportedPaymentType>,
+    ];
 }
 
 /**
@@ -403,5 +476,10 @@ export function TaglistReader(props: IPropertyReadProps<PropertyDefinitionSuppor
  * @returns 
  */
 export function useTaglistReader(options: IPropertyReadPropsWOChildren | string) {
-  return EntryViewReadSet(options as any, "read", true) as [PropertyDefinitionSupportedTagListType, IPropertyDefinitionState<PropertyDefinitionSupportedTagListType>];
+  return EntryViewReadSet(options as any, "read", true) as
+    [
+      PropertyDefinitionSupportedTagListType,
+      IPropertyDefinitionState<PropertyDefinitionSupportedTagListType>,
+      ReadSetterCallback<PropertyDefinitionSupportedTagListType>,
+    ];
 }
