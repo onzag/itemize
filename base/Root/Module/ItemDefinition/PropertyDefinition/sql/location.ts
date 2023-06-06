@@ -8,10 +8,11 @@ import {
   ISQLArgInfo, ISQLInInfo, ISQLOutInfo, ISQLSearchInfo, ISQLOrderByInfo,
   ISQLEqualInfo, ISQLSSCacheEqualInfo, IElasticSearchInfo, IArgInfo
 } from "../types";
-import { SQL_CONSTRAINT_PREFIX } from "../../../../../../constants";
+import { MAX_DECIMAL_COUNT, SQL_CONSTRAINT_PREFIX } from "../../../../../../constants";
 import { PropertyDefinitionSearchInterfacesPrefixes } from "../search-interfaces";
 import { IPropertyDefinitionSupportedLocationType } from "../types/location";
 import { IPropertyDefinitionSupportedUnitType } from "../types/unit";
+import convert from "convert-units";
 
 /**
  * provides the SQL form for the location type
@@ -235,7 +236,9 @@ export function locationSQLSearch(arg: ISQLSearchInfo): boolean | [string, any[]
     const lng = argAsLocation.lng || 0;
     const lat = argAsLocation.lat || 0;
     const argAsUnit: IPropertyDefinitionSupportedUnitType = arg.args[radiusName] as any;
-    const distance = (argAsUnit.normalizedValue || 0) * 1000;
+
+    const distanceInMeters = parseFloat(convert(argAsUnit.normalizedValue || 0).from(argAsUnit.normalizedUnit as any).to("m").toFixed(MAX_DECIMAL_COUNT));
+    const distance = distanceInMeters || 0;
 
     arg.whereBuilder.andWhere(
       "ST_DWithin(" + JSON.stringify(arg.prefix + arg.id + "_GEO") + ", ST_MakePoint(?,?)::geography, ?)",
@@ -285,7 +288,8 @@ export function locationElasticSearch(arg: IElasticSearchInfo) {
     const lng = argAsLocation.lng || 0;
     const lat = argAsLocation.lat || 0;
     const argAsUnit: IPropertyDefinitionSupportedUnitType = arg.args[radiusName] as any;
-    const distance = (argAsUnit.normalizedValue || 0) * 1000;
+    const distanceInMeters = parseFloat(convert(argAsUnit.normalizedValue || 0).from(argAsUnit.normalizedUnit as any).to("m").toFixed(MAX_DECIMAL_COUNT));
+    const distance = distanceInMeters || 0;
 
     arg.elasticQueryBuilder.must({
       bool: {

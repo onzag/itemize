@@ -199,14 +199,14 @@ export function buildSearchModePaymentProperty(
     newPropDefInvalidIfRule.valueAttribute = "value";
 
     // we need some invalid conditions we are adding to the invalid if set
-    newPropDef.invalidIf = newPropDef.invalidIf || [];
+    newPropDef.invalidIf = newPropDef.invalidIf || [];
     newPropDef.invalidIf.push({
       error: PropertyInvalidReason.FROM_LARGER_THAN_TO,
       if: newPropDefInvalidIfRule,
     });
 
     // now we do the same but in reverse, this time for the second
-    newPropDef2.invalidIf = newPropDef2.invalidIf || [];
+    newPropDef2.invalidIf = newPropDef2.invalidIf || [];
     const newPropDef2InvalidIfRule: IConditionalRuleSetRawJSONDataPropertyType = {
       property: "&this",
       comparator: "less-than",

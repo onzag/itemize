@@ -166,7 +166,7 @@ const typeValue: IPropertyDefinitionSupportedType<IPropertyDefinitionSupportedUn
     return a.value === b.value && a.unit === b.unit;
   },
   supportedSubtypes: UNIT_SUBTYPES,
-  validate: (l: IPropertyDefinitionSupportedUnitType) => {
+  validate: (l: IPropertyDefinitionSupportedUnitType, p) => {
     if (typeof l.value !== "number" ||
       typeof l.unit !== "string" ||
       typeof l.normalizedValue !== "number" ||
@@ -175,6 +175,12 @@ const typeValue: IPropertyDefinitionSupportedType<IPropertyDefinitionSupportedUn
     }
 
     if (isNaN(l.value) || isNaN(l.normalizedValue)) {
+      return PropertyInvalidReason.INVALID_VALUE;
+    }
+
+    // normalized unit should be the same as the specified
+    // in the definition
+    if (l.normalizedUnit !== p.specialProperties["unit"]) {
       return PropertyInvalidReason.INVALID_VALUE;
     }
 

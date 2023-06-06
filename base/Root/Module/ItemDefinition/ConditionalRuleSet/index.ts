@@ -400,9 +400,10 @@ export default class ConditionalRuleSet {
     }
 
     // is not any of the other types
-    // we consider it then to have resulting it to true
+    // we consider it then to have resulting it to false
+    // eg. an empty type or an unknown type
     if (!resolved) {
-      result = true;
+      result = false;
     }
 
     // now we have a result, but we might have a chain, a children condition
