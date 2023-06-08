@@ -191,7 +191,7 @@ function wait(ms: number): Promise<void> {
  * regarding the schemas and whenever they had been last modified
  */
 interface IElasticIndexInformationType {
-  lastConsisencyCheck: string;
+  lastConsistencyCheck: string;
 }
 
 /**
@@ -267,8 +267,69 @@ export class ItemizeElasticClient {
       this.rootSchema = getElasticSchemaForRoot(this.root, this.serverData, null);
     }
 
+    // this is our first server data so we resolve it
+    // so it can continue
     if (shouldResolvePrmomise) {
       this.serverDataPromiseResolve();
+    }
+
+    // if it's not preparing then we should assume
+    // we need to handle this ourselves in this function
+    // and update the runtime indexes that contain
+    // currency information
+    if (!this.prepareInstancePromise) {
+      // this is new server data that was given to us and we should update
+      // the related 
+      // now we can begin qeuing the indexes that we want created
+      const listOfItemDefOnly: string[] = [];
+
+      // first we await for all the modules that we have in root
+      this.root.getAllModules().forEach((rootMod) => {
+        // and now we get all the child item definitions inside that mod
+        rootMod.getAllChildDefinitionsRecursive().forEach((cIdef) => {
+          // add that t the list of all
+          if (cIdef.isSearchEngineEnabled()) {
+            listOfItemDefOnly.push(cIdef.getQualifiedPathName()); 
+          }
+        });
+      });
+
+      const simpleIds = Object.keys(this.rootSchema).filter((key) => listOfItemDefOnly.includes(key));
+
+      // and now we can rebuild those indexes
+      // that have specific runtime properties
+      await Promise.all(simpleIds.map(async (r) => {
+        const shemaInfo = this.rootSchema[r];
+        // we only care about these everything else
+        // is wasted, as runtime properties are the only ones
+        // that can update during runtime
+        if (shemaInfo.runtime) {
+          let attempts = 0;
+          while (attempts <= 3) {
+            attempts++;
+            try {
+              await this._rebuildIndexGroup(r, shemaInfo);
+              break;
+            } catch (err) {
+              await wait(1000);
+
+              logger.error(
+                {
+                  className: "ItemizeElasticClient",
+                  methodName: "informNewServerData",
+                  message: "Could not create or update the runtime index " + r + " after " + attempts + " attempts",
+                  serious: true,
+                  err,
+                  data: {
+                    attempts,
+                    gaveUp: attempts > 3,
+                  }
+                }
+              );
+            }
+          }
+        }
+      }));
     }
   }
 
@@ -350,10 +411,10 @@ export class ItemizeElasticClient {
       // and now we get all the child item definitions inside that mod
       return await Promise.all(
         rootMod.getAllChildDefinitionsRecursive().map(async (cIdef) => {
-          // add that t the list of all
-          listOfAll.push(cIdef.getQualifiedPathName());
           // and if the item itself is search engine enabled
+          listOfAll.push(cIdef.getQualifiedPathName());
           if (cIdef.isSearchEngineEnabled()) {
+            // rebuild it
             await this.rebuildIndexes(cIdef);
           }
         })
@@ -368,7 +429,6 @@ export class ItemizeElasticClient {
    * 
    * this function may fail and throw an error, causing the instance to retry again,
    * and again, and again, until it succeeds
-   * 
    * @ignore
    */
   private async _prepareInstance(): Promise<void> {
@@ -386,7 +446,7 @@ export class ItemizeElasticClient {
       "status",
       {
         properties: {
-          lastConsisencyCheck: {
+          lastConsistencyCheck: {
             type: "date",
           },
         }
@@ -578,7 +638,7 @@ export class ItemizeElasticClient {
     const indexInfo = await this.retrieveIndexStatusInfo(qualifiedName);
 
     const wildcardName = qualifiedName.toLowerCase() + "_*";
-    const currentMapping = await this.retrieveCurrentSchemaDefinition(wildcardName);
+    let currentMapping = await this.retrieveCurrentSchemaDefinition(wildcardName);
     const allIndexNames = currentMapping && Object.keys(currentMapping);
 
     if (!indexInfo) {
@@ -593,7 +653,7 @@ export class ItemizeElasticClient {
       await this.setIndexStatusInfo(
         qualifiedName,
         {
-          lastConsisencyCheck: null,
+          lastConsistencyCheck: null,
         }
       );
 
@@ -610,6 +670,7 @@ export class ItemizeElasticClient {
         await this.elasticClient.indices.delete({
           index: indexNames,
         });
+        currentMapping = null;
       }
     }
 
@@ -641,13 +702,14 @@ export class ItemizeElasticClient {
         await this.setIndexStatusInfo(
           qualifiedName,
           {
-            lastConsisencyCheck: null,
+            lastConsistencyCheck: null,
           }
         );
         const indexNames = allIndexNames.join(",");
         await this.elasticClient.indices.delete({
           index: indexNames,
-        })
+        });
+        currentMapping = null;
       } else if (!compatibilityCheck.general) {
         logger.info(
           {
@@ -995,7 +1057,7 @@ export class ItemizeElasticClient {
         this.rootSchema[qualifiedPathName],
       );
       statusInfo = {
-        lastConsisencyCheck: null,
+        lastConsistencyCheck: null,
       }
     }
 
@@ -1061,11 +1123,11 @@ export class ItemizeElasticClient {
       const documentsDeletedSinceLastRan = await this.rawDB.databaseConnection.queryRows(
         `SELECT "id", "version" FROM ${JSON.stringify(DELETED_REGISTRY_IDENTIFIER)} ` +
         `WHERE "type" = ?` + (
-          statusInfo.lastConsisencyCheck ? ` AND "transaction_time" >= ?` : ""
+          statusInfo.lastConsistencyCheck ? ` AND "transaction_time" >= ?` : ""
         ),
         [
           qualifiedPathName,
-          statusInfo.lastConsisencyCheck,
+          statusInfo.lastConsistencyCheck,
         ].filter((v) => !!v),
         true,
       );
@@ -1100,7 +1162,7 @@ export class ItemizeElasticClient {
 
     // no last consistency check then we gotta retrieve the whole thing because
     // we want whole data this one round
-    const useModuleOnly = statusInfo.lastConsisencyCheck === null ? false : (
+    const useModuleOnly = statusInfo.lastConsistencyCheck === null ? false : (
       // otherwise it depends if we got a language column, it will depend on wether such column
       // is in the module, otherwise we can be free to use module only
       expectedLanguageColumn ? idef.isSearchEngineDynamicMainLanguageColumnInModule() : true
@@ -1110,7 +1172,7 @@ export class ItemizeElasticClient {
     // we only select 100 as limit when doing a initial consistency check
     // that we have never done before because of the reason below in the comment
     // we are getting more data
-    const limit = statusInfo.lastConsisencyCheck === null ? 100 : 1000;
+    const limit = statusInfo.lastConsistencyCheck === null ? 100 : 1000;
     const offset = batchNumber * limit;
     const documentsCreatedOrModifiedSinceLastRan = await this.rawDB.performRawDBSelect(
       useModuleOnly ? idef.getParentModule() : idef,
@@ -1119,7 +1181,7 @@ export class ItemizeElasticClient {
         // consistency before, we will likely have missing data that we need to fill voids for
         // so we rather do just that and select everything rather than expecting
         // holes not to be common
-        if (statusInfo.lastConsisencyCheck === null) {
+        if (statusInfo.lastConsistencyCheck === null) {
           // this is why we were using whole 2 tables
           selecter.selectAll();
         } else {
@@ -1138,8 +1200,8 @@ export class ItemizeElasticClient {
         if (minimumCreatedAt) {
           whereBuilder.andWhereColumn("created_at", ">=", minimumCreatedAt);
         }
-        if (statusInfo.lastConsisencyCheck) {
-          whereBuilder.andWhereColumn("last_modified", ">", statusInfo.lastConsisencyCheck);
+        if (statusInfo.lastConsistencyCheck) {
+          whereBuilder.andWhereColumn("last_modified", ">", statusInfo.lastConsistencyCheck);
         }
 
         // if we only use the module we must ensure we are getting
@@ -1320,7 +1382,7 @@ export class ItemizeElasticClient {
           // and now let's get the value for this row, if the last consistency check is null
           // this means that is cheekily stored in the object info already because
           // we did a strong select with everything
-          const knownValue = statusInfo.lastConsisencyCheck === null ? objectInfo.r : (
+          const knownValue = statusInfo.lastConsistencyCheck === null ? objectInfo.r : (
             await
               this.rawDB.performRawDBSelect(
                 idef,
@@ -1541,7 +1603,7 @@ export class ItemizeElasticClient {
       await this.setIndexStatusInfo(
         qualifiedPathName,
         {
-          lastConsisencyCheck: timeRan.toISOString(),
+          lastConsistencyCheck: timeRan.toISOString(),
         }
       );
     }
@@ -2608,13 +2670,13 @@ export class ElasticQueryBuilder {
     this.children = this.children.filter((r) => r.uniqueId !== id);
   }
 
-  public getAllChildrenWithPropertyId(options: {but?: string, noAgg?: boolean, noQuery?: boolean} = {}) {
+  public getAllChildrenWithPropertyId(options: { but?: string, noAgg?: boolean, noQuery?: boolean } = {}) {
     return this.children.filter((r) =>
       !!r.propertyId && (options.but ? r.propertyId !== options.but : true) &&
       (options.noAgg ? !r.agg : true) && (options.noQuery ? !!r.agg : true));
   }
 
-  public getAllChildrenWithGroupId(options: {but?: string, noAgg?: boolean, noQuery?: boolean} = {}) {
+  public getAllChildrenWithGroupId(options: { but?: string, noAgg?: boolean, noQuery?: boolean } = {}) {
     return this.children.filter((r) =>
       !!r.groupId && (options.but ? r.groupId !== options.but : true) &&
       (options.noAgg ? !r.agg : true) && (options.noQuery ? !!r.agg : true));

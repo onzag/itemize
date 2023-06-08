@@ -180,6 +180,20 @@ export default {
         required: ["value", "if"],
       },
     },
+    searchEnforcedValues: {
+      type: "array",
+      items: {
+        type: "object",
+        properties: {
+          if: {
+            $ref: "ConditionalRuleSet",
+          },
+          value: {},
+        },
+        additionalProperties: false,
+        required: ["value", "if"],
+      },
+    },
     nullIfHidden: {
       type: "boolean",
     },
@@ -187,6 +201,7 @@ export default {
       type: "boolean",
     },
     enforcedValue: {},
+    searchEnforcedValue: {},
     hidden: {
       type: "boolean",
     },

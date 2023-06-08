@@ -326,7 +326,7 @@ export function buildSearchModePropertyDefinitions(
 
   // we do that too with enforced values, same process
   if (newPropDef.enforcedValues) {
-    newPropDef.enforcedValues = newPropDef.enforcedValues.map((ev) => {
+    newPropDef.enforcedValues = (newPropDef.searchEnforcedValues || newPropDef.enforcedValues).map((ev) => {
       return {
         value: ev.value,
         if: buildSearchModeConditionalRuleSet(ev.if, otherKnownProperties),
@@ -335,6 +335,10 @@ export function buildSearchModePropertyDefinitions(
     if (!newPropDef.enforcedValues.length) {
       delete newPropDef.enforcedValues;
     }
+  }
+
+  if (newPropDef.searchEnforcedValue) {
+    newPropDef.enforcedValue = newPropDef.searchEnforcedValue;
   }
 
   if (typeof newPropDef.searchHidden !== "undefined") {

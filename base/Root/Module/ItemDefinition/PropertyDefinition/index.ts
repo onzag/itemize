@@ -190,9 +190,17 @@ export interface IPropertyDefinitionRawJSONDataType {
    */
   enforcedValues?: IPropertyDefinitionRawJSONRuleDataType[];
   /**
+   * enforced values
+   */
+  searchEnforcedValues?: IPropertyDefinitionRawJSONRuleDataType[];
+  /**
    * Single enforced value
    */
   enforcedValue?: PropertyDefinitionSupportedType;
+  /**
+   * Single enforced value
+   */
+  searchEnforcedValue?: PropertyDefinitionSupportedType;
   /**
    * hidden if conditional
    */
