@@ -96,6 +96,7 @@ import { convertSQLValueToGQLValueForItemDefinition } from "../base/Root/Module/
 import { ItemizeRawDB } from "./raw-db";
 import { CAN_LOG_DEBUG, INSTANCE_GROUP_ID, INSTANCE_MODE } from "./environment";
 import { RegistryService } from "./services/registry";
+import { NanoSecondComposedDate } from "../nanodate";
 
 const ajv = new Ajv();
 
@@ -185,6 +186,11 @@ export class Listener {
   private registry: RegistryService;
   private server: Server;
   private customRoles: ICustomRoleType[];
+
+  private awaitingOwnedSearchEvents: {[key: string]: IOwnedSearchRecordsEvent} = {};
+  private awaitingOwnedParentedSearchEvents: {[key: string]: IOwnedParentedSearchRecordsEvent} = {};
+  private awaitingParentedSearchEvents: {[key: string]: IParentedSearchRecordsEvent} = {};
+  private awaitingPropertySearchEvents: {[key: string]: IPropertySearchRecordsEvent} = {};
 
   constructor(
     buildnumber: string,
@@ -2798,25 +2804,39 @@ export class Listener {
       event.qualifiedPathName,
       event.createdBy,
     );
-    const redisEvent: IRedisEvent = {
-      type: OWNED_SEARCH_RECORDS_EVENT,
-      event,
-      listenerUUID,
-      mergedIndexIdentifier,
-      serverInstanceGroupId: INSTANCE_GROUP_ID,
-      source: "global",
-    };
-    CAN_LOG_DEBUG && logger.debug(
-      {
-        className: "Listener",
-        methodName: "triggerOwnedSearchListeners",
-        message: "Triggering redis event",
-        data: {
-          event: redisEvent,
-        }
-      },
-    );
-    this.redisGlobalPub.redisClient.publish(mergedIndexIdentifier, JSON.stringify(redisEvent));
+
+    if (this.awaitingOwnedSearchEvents[mergedIndexIdentifier]) {
+      this.patchAwaitingSearchEvent(this.awaitingOwnedSearchEvents[mergedIndexIdentifier], event);
+      return;
+    }
+
+    this.awaitingOwnedSearchEvents[mergedIndexIdentifier] = event;
+
+    setTimeout(() => {
+      const redisEvent: IRedisEvent = {
+        type: OWNED_SEARCH_RECORDS_EVENT,
+        event: this.awaitingOwnedSearchEvents[mergedIndexIdentifier],
+        listenerUUID,
+        mergedIndexIdentifier,
+        serverInstanceGroupId: INSTANCE_GROUP_ID,
+        source: "global",
+      };
+  
+      delete this.awaitingOwnedSearchEvents[mergedIndexIdentifier];
+      
+      CAN_LOG_DEBUG && logger.debug(
+        {
+          className: "Listener",
+          methodName: "triggerOwnedSearchListeners",
+          message: "Triggering redis event",
+          data: {
+            event: redisEvent,
+          }
+        },
+      );
+  
+      this.redisGlobalPub.redisClient.publish(mergedIndexIdentifier, JSON.stringify(redisEvent));
+    }, 250);
   }
   public triggerPropertySearchListeners(
     event: IPropertySearchRecordsEvent,
@@ -2827,25 +2847,38 @@ export class Listener {
       event.propertyId,
       event.propertyValue,
     );
-    const redisEvent: IRedisEvent = {
-      type: PROPERTY_SEARCH_RECORDS_EVENT,
-      event,
-      listenerUUID,
-      mergedIndexIdentifier,
-      serverInstanceGroupId: INSTANCE_GROUP_ID,
-      source: "global",
-    };
-    CAN_LOG_DEBUG && logger.debug(
-      {
-        className: "Listener",
-        methodName: "triggerPropertySearchListeners",
-        message: "Triggering redis event",
-        data: {
-          event: redisEvent,
-        }
-      },
-    );
-    this.redisGlobalPub.redisClient.publish(mergedIndexIdentifier, JSON.stringify(redisEvent));
+
+    this.awaitingPropertySearchEvents[mergedIndexIdentifier] = event;
+
+    if (this.awaitingPropertySearchEvents[mergedIndexIdentifier]) {
+      this.patchAwaitingSearchEvent(this.awaitingPropertySearchEvents[mergedIndexIdentifier], event);
+      return;
+    }
+
+    setTimeout(() => {
+      const redisEvent: IRedisEvent = {
+        type: PROPERTY_SEARCH_RECORDS_EVENT,
+        event: this.awaitingPropertySearchEvents[mergedIndexIdentifier],
+        listenerUUID,
+        mergedIndexIdentifier,
+        serverInstanceGroupId: INSTANCE_GROUP_ID,
+        source: "global",
+      };
+
+      delete this.awaitingPropertySearchEvents[mergedIndexIdentifier];
+
+      CAN_LOG_DEBUG && logger.debug(
+        {
+          className: "Listener",
+          methodName: "triggerPropertySearchListeners",
+          message: "Triggering redis event",
+          data: {
+            event: redisEvent,
+          }
+        },
+      );
+      this.redisGlobalPub.redisClient.publish(mergedIndexIdentifier, JSON.stringify(redisEvent));
+    }, 250);
   }
   public triggerParentedSearchListeners(
     event: IParentedSearchRecordsEvent,
@@ -2857,25 +2890,38 @@ export class Listener {
       event.parentId,
       event.parentVersion,
     );
-    const redisEvent: IRedisEvent = {
-      event,
-      listenerUUID,
-      mergedIndexIdentifier,
-      type: PARENTED_SEARCH_RECORDS_EVENT,
-      serverInstanceGroupId: INSTANCE_GROUP_ID,
-      source: "global",
+
+    this.awaitingParentedSearchEvents[mergedIndexIdentifier] = event;
+
+    if (this.awaitingParentedSearchEvents[mergedIndexIdentifier]) {
+      this.patchAwaitingSearchEvent(this.awaitingParentedSearchEvents[mergedIndexIdentifier], event);
+      return;
     }
-    CAN_LOG_DEBUG && logger.debug(
-      {
-        className: "Listener",
-        methodName: "triggerParentedSearchListeners",
-        message: "Triggering redis event",
-        data: {
-          event: redisEvent,
+
+    setTimeout(() => {
+      const redisEvent: IRedisEvent = {
+        event: this.awaitingParentedSearchEvents[mergedIndexIdentifier],
+        listenerUUID,
+        mergedIndexIdentifier,
+        type: PARENTED_SEARCH_RECORDS_EVENT,
+        serverInstanceGroupId: INSTANCE_GROUP_ID,
+        source: "global",
+      }
+
+      delete this.awaitingParentedSearchEvents[mergedIndexIdentifier];
+
+      CAN_LOG_DEBUG && logger.debug(
+        {
+          className: "Listener",
+          methodName: "triggerParentedSearchListeners",
+          message: "Triggering redis event",
+          data: {
+            event: redisEvent,
+          },
         },
-      },
-    );
-    this.redisGlobalPub.redisClient.publish(mergedIndexIdentifier, JSON.stringify(redisEvent));
+      );
+      this.redisGlobalPub.redisClient.publish(mergedIndexIdentifier, JSON.stringify(redisEvent));
+    }, 250);
   }
   public triggerOwnedParentedSearchListeners(
     event: IOwnedParentedSearchRecordsEvent,
@@ -2888,25 +2934,83 @@ export class Listener {
       event.parentId,
       event.parentVersion,
     );
-    const redisEvent: IRedisEvent = {
-      event,
-      listenerUUID,
-      mergedIndexIdentifier,
-      type: OWNED_PARENTED_SEARCH_RECORDS_EVENT,
-      serverInstanceGroupId: INSTANCE_GROUP_ID,
-      source: "global",
+
+    this.awaitingOwnedParentedSearchEvents[mergedIndexIdentifier] = event;
+
+    if (this.awaitingOwnedParentedSearchEvents[mergedIndexIdentifier]) {
+      this.patchAwaitingSearchEvent(this.awaitingOwnedParentedSearchEvents[mergedIndexIdentifier], event);
+      return;
     }
-    CAN_LOG_DEBUG && logger.debug(
-      {
-        className: "Listener",
-        methodName: "triggerOwnedParentedSearchListeners",
-        message: "Triggering redis event",
-        data: {
-          event: redisEvent,
+
+    setTimeout(() => {
+      const redisEvent: IRedisEvent = {
+        event: this.awaitingOwnedParentedSearchEvents[mergedIndexIdentifier],
+        listenerUUID,
+        mergedIndexIdentifier,
+        type: OWNED_PARENTED_SEARCH_RECORDS_EVENT,
+        serverInstanceGroupId: INSTANCE_GROUP_ID,
+        source: "global",
+      }
+
+      delete this.awaitingOwnedParentedSearchEvents[mergedIndexIdentifier];
+
+      CAN_LOG_DEBUG && logger.debug(
+        {
+          className: "Listener",
+          methodName: "triggerOwnedParentedSearchListeners",
+          message: "Triggering redis event",
+          data: {
+            event: redisEvent,
+          },
         },
-      },
-    );
-    this.redisGlobalPub.redisClient.publish(mergedIndexIdentifier, JSON.stringify(redisEvent));
+      );
+      this.redisGlobalPub.redisClient.publish(mergedIndexIdentifier, JSON.stringify(redisEvent));
+    }, 250);
+  }
+  private patchAwaitingSearchEvent(
+    src: IOwnedParentedSearchRecordsEvent | IParentedSearchRecordsEvent | IOwnedSearchRecordsEvent | IPropertySearchRecordsEvent,
+    patch: IOwnedParentedSearchRecordsEvent | IParentedSearchRecordsEvent | IOwnedSearchRecordsEvent | IPropertySearchRecordsEvent,
+  ) {
+    // we are going to check and compare all the records
+    const recordsLocList = ["createdRecords", "deletedRecords", "lostRecords", "modifiedRecords", "newRecords"];
+    recordsLocList.forEach((location: string) => {
+      patch[location].forEach((rPatch: IGQLSearchRecord) => {
+        let shouldAdd = true;
+
+        recordsLocList.forEach((location2: string) => {
+          const existantValue: IGQLSearchRecord = src[location2]
+            .find((r2: IGQLSearchRecord) => r2.id === rPatch.id && r2.version === rPatch.version && rPatch.type === r2.type);
+
+          if (existantValue) {
+            const nanodatesrc = new NanoSecondComposedDate(existantValue.last_modified);
+            const nanodatepatch = new NanoSecondComposedDate(rPatch.last_modified);
+
+            if (nanodatepatch.lessThan(nanodatesrc)) {
+              // we do not add since we consider this patch of a record
+              // outdated compared to what is already in the event
+              shouldAdd = false;
+            } else {
+              // we patch and we need to remove the current record
+              // that is older than our patch
+              src[location2] = src[location2]
+                .filter((r2: IGQLSearchRecord) => !(r2.id === rPatch.id && r2.version === rPatch.version && rPatch.type === r2.type));
+            }
+          }
+        });
+
+        if (shouldAdd) {
+          src[location].push(rPatch);
+        }
+      });
+    });
+
+    // we only change the date if such is greater than the one in the source
+    // we are attempting to patch
+    const nanodatesrc = new NanoSecondComposedDate(src.newLastModified);
+    const nanodatepatch = new NanoSecondComposedDate(patch.newLastModified);
+    if (nanodatesrc.lessThan(nanodatepatch)) {
+      src.newLastModified = patch.newLastModified;
+    }
   }
   public async globalRedisListener(
     channel: string,

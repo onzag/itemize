@@ -12,7 +12,7 @@ import { useLocation } from "react-router-dom";
 /**
  * The props for the location state reader
  */
-interface ILocationStateReaderProps<S> {
+export interface ILocationStateReaderOptions<S> {
   /**
    * The default state of the reader
    */
@@ -28,6 +28,12 @@ interface ILocationStateReaderProps<S> {
    * state is kept for the children
    */
   delayedUpdates?: boolean | number;
+}
+
+/**
+ * The props for the location state reader
+ */
+export interface ILocationStateReaderProps<S> extends ILocationStateReaderOptions<S> {
   /**
    * The consumer children, which passes
    * a state and a setState function
@@ -40,12 +46,8 @@ interface ILocationStateReaderProps<S> {
   ) => React.ReactNode;
 }
 
-/**
- * The location state reader component
- * @param props the props
- * @returns a react component
- */
-export default function LocationStateReader<S>(props: ILocationStateReaderProps<S>) {
+export function useLocationStateReader<S>(options: ILocationStateReaderOptions<S>):
+  [S, (state: Partial<S>, replace?: boolean) => void, boolean, (fn: () => void) => void] {
   const location = useLocation();
 
   // keeps the internal state when using delayed updates
@@ -60,7 +62,7 @@ export default function LocationStateReader<S>(props: ILocationStateReaderProps<
 
   // the function to use when a delay is being used
   const setHistoryStateDelayed = useCallback((state: S, replace?: boolean) => {
-    setInternalState({state, replace});
+    setInternalState({ state, replace });
   }, []);
 
   // a function that is passed to the children
@@ -70,7 +72,7 @@ export default function LocationStateReader<S>(props: ILocationStateReaderProps<
     if (!internalState) {
       // call it right away
       fn();
-    // otherwise if there's already something in there
+      // otherwise if there's already something in there
     } else if (syncRefCb.current) {
       // set it to both of them
       const oldFn = syncRefCb.current;
@@ -95,7 +97,7 @@ export default function LocationStateReader<S>(props: ILocationStateReaderProps<
         // if we have a state
         if (internalState) {
           // set it
-          if (props.stateIsInQueryString) {
+          if (options.stateIsInQueryString) {
             setHistoryQSState(location, internalState.state, internalState.replace);
           } else {
             setHistoryState(location, internalState.state, internalState.replace);
@@ -107,56 +109,67 @@ export default function LocationStateReader<S>(props: ILocationStateReaderProps<
         // do the callbacks if any
         syncRefCb.current && syncRefCb.current();
         syncRefCb.current = null;
-      }, typeof props.delayedUpdates === "number" ? props.delayedUpdates : 600);
+      }, typeof options.delayedUpdates === "number" ? options.delayedUpdates : 600);
     }
   }, [
     internalState,
   ]);
 
   // so if we are in our query string
-  if (props.stateIsInQueryString) {
+  if (options.stateIsInQueryString) {
     // we need to parse that query string
     const searchParams = new URLSearchParams(location.search);
     // now we can get the value
     const statefulValue = !internalState ? {} : internalState.state;
     // and add the default props if they are missing or otherwise read from the search params
     if (!internalState) {
-      Object.keys(props.defaultState).forEach((key) => {
-        statefulValue[key] = searchParams.has(key) ? searchParams.get(key) : props.defaultState[key];
+      Object.keys(options.defaultState).forEach((key) => {
+        statefulValue[key] = searchParams.has(key) ? searchParams.get(key) : options.defaultState[key];
       });
     }
 
     // and call from here, note how we use the setHistoryQSState function here
-    return props.children(
+    return [
       statefulValue as S,
-      props.delayedUpdates ? setHistoryStateDelayed : setHistoryQSState.bind(null, location),
+      options.delayedUpdates ? setHistoryStateDelayed : setHistoryQSState.bind(null, location),
       !internalState,
       runWhenSynced,
-    ) as any; // typescript bugs
+    ]
   } else {
     // if there's no state
     if (!location.state) {
       // we just return the default state
-      return props.children(
-        props.defaultState,
-        props.delayedUpdates ? setHistoryStateDelayed : setHistoryState.bind(null, location),
+      return [
+        options.defaultState,
+        options.delayedUpdates ? setHistoryStateDelayed : setHistoryState.bind(null, location),
         !internalState,
         runWhenSynced,
-      ) as any; // typescript bugs
+      ]
     }
 
     // otherwise equally we merge the states
     const statefulValue = {};
-    Object.keys(props.defaultState).forEach((key) => {
-      statefulValue[key] = typeof location.state[key] !== "undefined" ? location.state[key] : props.defaultState[key];
+    Object.keys(options.defaultState).forEach((key) => {
+      statefulValue[key] = typeof location.state[key] !== "undefined" ? location.state[key] : options.defaultState[key];
     });
 
     // and call it
-    return props.children(
+    return [
       statefulValue as S,
       setHistoryState.bind(null, location),
       !internalState,
       runWhenSynced,
-    ) as any; // typescript bugs
+    ];
   }
+}
+
+/**
+ * The location state reader component
+ * @param props the props
+ * @returns a react component
+ */
+export default function LocationStateReader<S>(props: ILocationStateReaderProps<S>) {
+  const info = useLocationStateReader(props);
+
+  return props.children(info[0], info[1], info[2], info[3]) as any;
 }
