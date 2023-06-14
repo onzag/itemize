@@ -1546,10 +1546,10 @@ export async function searchItemDefinition(
             const detachedArgs = {...args};
             detachedArgs.action = SearchTriggerActions.SEARCHED;
             if (moduleTrigger) {
-              await moduleTrigger(args);
+              await moduleTrigger(detachedArgs);
             }
             if (idefTrigger) {
-              await idefTrigger(args);
+              await idefTrigger(detachedArgs);
             }
           } catch (err) {
             logger.error(
