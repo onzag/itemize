@@ -31,7 +31,6 @@ import type PropertyDefinition from "../base/Root/Module/ItemDefinition/Property
 import type Include from "../base/Root/Module/ItemDefinition/Include";
 import { ItemizeElasticClient } from "./elastic";
 import type { IAppDataType } from "../server";
-import { GLOBAL_MANAGER_MODE, INSTANCE_MODE } from "./environment";
 
 type changeRowLanguageFnPropertyBased = (language: string, dictionary: string, property: string) => void;
 type changeRowLanguageFnPropertyIncludeBased = (language: string, dictionary: string, include: string, property: string) => void;
@@ -83,6 +82,15 @@ export class ItemizeRawDB {
     }
   } = {};
 
+  private memCachedSelects: {
+    [uniqueID: string]: {
+      value: ISQLTableRowValue[];
+      waitingPromise: Promise<void>;
+      ready: boolean;
+      err?: Error;
+    },
+  } = {};
+
   public databaseConnection: DatabaseConnection;
 
   /**
@@ -126,7 +134,7 @@ export class ItemizeRawDB {
    * @param fn the transactional function
    * @returns whatever is returned in the transactional function
    */
-  public startTransaction<T>(fn: (transactingRawDB: ItemizeRawDB) => Promise<T>, opts: {ensureOrder?: boolean} = {}): Promise<T> {
+  public startTransaction<T>(fn: (transactingRawDB: ItemizeRawDB) => Promise<T>, opts: { ensureOrder?: boolean } = {}): Promise<T> {
     return this.databaseConnection.startTransaction(async (transactingClient) => {
       const newRawDB = new ItemizeRawDB(this.redisGlobal, this.redisPub, this.redisSub, transactingClient, this.root);
       newRawDB.transacting = true;
@@ -242,7 +250,7 @@ export class ItemizeRawDB {
       return [rows, true];
     }
 
-    const typesOrg: {[type: string]: Array<[string, string]>} = {};
+    const typesOrg: { [type: string]: Array<[string, string]> } = {};
 
     const invalidRow = rows.some((r) => {
       return (typeof r.type === "undefined" || typeof r.id === "undefined" || typeof r.version === "undefined");
@@ -594,7 +602,7 @@ export class ItemizeRawDB {
     completedRows.forEach(async (r) => {
       try {
         await this.informChangeOnRowElastic(r, action, elasticLanguageOverride, newRowDataIsComplete, false)
-      } catch {}
+      } catch { }
     });
   }
 
@@ -1429,7 +1437,9 @@ export class ItemizeRawDB {
   private _retrieveRawDBSelect(
     itemDefinitionOrModule: ItemDefinition | Module | string,
     selecter: (builder: SelectBuilder) => void,
-    preventJoin?: boolean,
+    options: {
+      preventJoin?: boolean,
+    } = {}
   ) {
     const itemDefinitionOrModuleInstance = typeof itemDefinitionOrModule === "string" ?
       this.root.registry[itemDefinitionOrModule] :
@@ -1445,7 +1455,7 @@ export class ItemizeRawDB {
 
     const builder = new SelectBuilder();
 
-    if (itemDefinitionOrModuleInstance instanceof ItemDefinition && !preventJoin) {
+    if (itemDefinitionOrModuleInstance instanceof ItemDefinition && !options.preventJoin) {
       const moduleInQuestion = itemDefinitionOrModuleInstance.getParentModule();
       builder.fromBuilder.from(moduleInQuestion.getQualifiedPathName());
       builder.joinBuilder.join(itemDefinitionOrModuleInstance.getQualifiedPathName(), (ruleBuilder) => {
@@ -1471,11 +1481,70 @@ export class ItemizeRawDB {
   public async performRawDBSelect(
     itemDefinitionOrModule: ItemDefinition | Module | string,
     selecter: (builder: SelectBuilder) => void,
-    preventJoin?: boolean,
+    options: {
+      preventJoin?: boolean,
+      useMemoryCache?: string,
+      useMemoryCacheMs?: number,
+    } = {}
   ): Promise<ISQLTableRowValue[]> {
-    const builder = this._retrieveRawDBSelect(itemDefinitionOrModule, selecter, preventJoin);
+    let waitingPromiseResolve: () => void = null;
+    if (options.useMemoryCache && this.memCachedSelects[options.useMemoryCache]) {
+      if (this.memCachedSelects[options.useMemoryCache].waitingPromise) {
+        await this.memCachedSelects[options.useMemoryCache].waitingPromise;
+      }
 
-    return (await this.databaseConnection.queryRows(builder)).map(convertVersionsIntoNullsWhenNecessary);
+      if (this.memCachedSelects[options.useMemoryCache].err) {
+        throw this.memCachedSelects[options.useMemoryCache].err;
+      }
+
+      return this.memCachedSelects[options.useMemoryCache].value;
+    } else if (options.useMemoryCache) {
+      this.memCachedSelects[options.useMemoryCache] = {
+        ready: false,
+        value: null,
+        waitingPromise: new Promise((r) => {
+          waitingPromiseResolve = r;
+        }),
+        err: null,
+      }
+    }
+
+    const builder = this._retrieveRawDBSelect(itemDefinitionOrModule, selecter, options);
+
+    let value: ISQLTableRowValue[];
+    try {
+      value = (await this.databaseConnection.queryRows(builder)).map(convertVersionsIntoNullsWhenNecessary);
+    } catch (err) {
+      if (options.useMemoryCache) {
+        this.memCachedSelects[options.useMemoryCache].ready = true;
+        this.memCachedSelects[options.useMemoryCache].err = err;
+
+        setTimeout(() => {
+          delete this.memCachedSelects[options.useMemoryCache];
+        }, typeof options.useMemoryCacheMs !== "undefined" ? options.useMemoryCacheMs : 1000);
+
+        if (waitingPromiseResolve) {
+          waitingPromiseResolve();
+        }
+      }
+
+      throw err;
+    }
+
+    if (options.useMemoryCache) {
+      this.memCachedSelects[options.useMemoryCache].ready = true;
+      this.memCachedSelects[options.useMemoryCache].value = value;
+
+      setTimeout(() => {
+        delete this.memCachedSelects[options.useMemoryCache];
+      }, typeof options.useMemoryCacheMs !== "undefined" ? options.useMemoryCacheMs : 1000);
+
+      if (waitingPromiseResolve) {
+        waitingPromiseResolve();
+      }
+    }
+
+    return value;
   }
 
   /**
@@ -1488,9 +1557,11 @@ export class ItemizeRawDB {
   public retrieveRawDBSelect(
     itemDefinitionOrModule: ItemDefinition | Module | string,
     selecter: (builder: SelectBuilder) => void,
-    preventJoin?: boolean,
+    options: {
+      preventJoin?: boolean,
+    } = {}
   ): [string, BasicBindingType[]] {
-    const builder = this._retrieveRawDBSelect(itemDefinitionOrModule, selecter, preventJoin);
+    const builder = this._retrieveRawDBSelect(itemDefinitionOrModule, selecter, options);
 
     return [
       "(" + builder.compile() + ")",
@@ -1620,7 +1691,9 @@ export class ItemizeRawDB {
       const value = await this.performRawDBSelect(
         this.cachedSelects[uniqueID].itemDefinitionOrModule,
         this.cachedSelects[uniqueID].selecter,
-        this.cachedSelects[uniqueID].preventJoin,
+        {
+          preventJoin: this.cachedSelects[uniqueID].preventJoin
+        },
       );
 
       await this.redisGlobal.hset(CACHED_SELECTS_LOCATION_GLOBAL, uniqueID, JSON.stringify(value));

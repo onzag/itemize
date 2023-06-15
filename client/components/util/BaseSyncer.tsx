@@ -174,7 +174,14 @@ export function useHandleMechanism(
       // will only pop when it's stable
       syncedDelayedTimer.current = setTimeout(() => {
         setSelfSyncedDelayed(state);
+        syncedDelayedTimer.current = null;
       }, 100);
+
+    // it's equal but there's likely a timer trying
+    // to change that fact
+    } else if (syncedDelayedTimer.current) {
+      clearTimeout(syncedDelayedTimer.current);
+      syncedDelayedTimer.current = null;
     }
   }, [depsSynced, selfSyncedDelayed, synced]);
 

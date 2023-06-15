@@ -2904,6 +2904,7 @@ export class Cache {
     options?: {
       refresh?: boolean,
       useMemoryCache?: boolean,
+      useMemoryCacheMs?: number,
     },
   ): Promise<ISQLTableRowValue> {
     const refresh = options && options.refresh;
@@ -2936,7 +2937,7 @@ export class Cache {
           this.memoryCache[idefQueryIdentifier] = currentValue;
           setTimeout(() => {
             delete this.memoryCache[idefQueryIdentifier];
-          }, MEMCACHE_EXPIRES_MS);
+          }, typeof options.useMemoryCacheMs !== "undefined" ? options.useMemoryCacheMs : MEMCACHE_EXPIRES_MS);
         }
         return currentValue.value;
       }
@@ -2975,7 +2976,7 @@ export class Cache {
         };
         setTimeout(() => {
           delete this.memoryCache[idefQueryIdentifier];
-        }, MEMCACHE_EXPIRES_MS);
+        }, typeof options.useMemoryCacheMs !== "undefined" ? options.useMemoryCacheMs : MEMCACHE_EXPIRES_MS);
       }
 
       return queryValue;
