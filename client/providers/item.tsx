@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useContext } from "react";
 import { LocaleContext, ILocaleContextType } from "../internal/providers/locale-provider";
 import ItemDefinition, { IItemSearchStateHighlightArgsType, IItemSearchStateType, IItemStateType } from "../../base/Root/Module/ItemDefinition";
 import PropertyDefinition, { IPropertyDefinitionState } from "../../base/Root/Module/ItemDefinition/PropertyDefinition";
@@ -31,7 +31,7 @@ import { IPropertyCoreProps, IPropertySetterProps } from "../components/property
 import { PropertyDefinitionSearchInterfacesPrefixes } from "../../base/Root/Module/ItemDefinition/PropertyDefinition/search-interfaces";
 import { ConfigContext } from "../internal/providers/config-provider";
 import { IConfigRawJSONDataType } from "../../config";
-import { setHistoryState } from "../components/navigation";
+import { setHistoryQSState, setHistoryState } from "../components/navigation";
 import LocationRetriever from "../components/navigation/LocationRetriever";
 import { Location } from "history";
 import type { ICacheMetadataMatchType } from "../internal/workers/cache/cache.worker";
@@ -106,7 +106,7 @@ function isSearchUnequal(searchA: IActionSearchOptions, searchB: IActionSearchOp
     searchA.cacheMetadataMismatchAction
   ) {
     if (typeof searchA.cacheMetadataMismatchAction === "function") {
-      searchANoFn = {...searchA, cacheMetadataMismatchAction: null as any};
+      searchANoFn = { ...searchA, cacheMetadataMismatchAction: null as any };
     } else {
       searchANoFn = {
         ...searchA,
@@ -126,7 +126,7 @@ function isSearchUnequal(searchA: IActionSearchOptions, searchB: IActionSearchOp
     searchB.cacheMetadataMismatchAction
   ) {
     if (typeof searchB.cacheMetadataMismatchAction === "function") {
-      searchBNoFn = {...searchB, cacheMetadataMismatchAction: null as any};
+      searchBNoFn = { ...searchB, cacheMetadataMismatchAction: null as any };
     } else {
       searchBNoFn = {
         ...searchB,
@@ -1432,6 +1432,19 @@ export interface IItemProviderProps {
    */
   prefills?: IPropertySetterProps<PropertyDefinitionSupportedType>[];
   /**
+   * Synchronizes a property based on a query string it behaves like a prefill
+   * (and overrides the prefill) if it finds a value in the query string
+   * and it will keep it updated bsed on that
+   * 
+   * Some properties cannot be qs tracked, such as files, only
+   * values representing serializable objects can be tracked
+   */
+  queryStringSync?: Array<string | IPropertyCoreProps>;
+  /**
+   * When using the query string sync it will replace the current history state
+   */
+  queryStringSyncReplace?: boolean;
+  /**
    * only downloads and includes the properties specified in the list
    * in the state
    */
@@ -1583,7 +1596,7 @@ export interface IItemProviderProps {
 /**
  * This represents the actual provider that does the job, it takes on some extra properties
  * taken from the contexts that this is expected to run under
- */ 
+ */
 interface IActualItemProviderProps extends IItemProviderProps {
   /**
    * The token data is retrieved from the token provider and is used for
@@ -2226,6 +2239,45 @@ export class ActualItemProvider extends
           null,
         );
       });
+    }
+
+    // syncing from the query string in a cheap way
+    if (props.queryStringSync && props.queryStringSync.length) {
+      // grabbing the property to sync in there
+      const propertiesToSync = (
+        props.itemDefinitionInstance.isInSearchMode() ?
+          getPropertyListForSearchMode(
+            props.queryStringSync || [],
+            props.itemDefinitionInstance.getStandardCounterpart()
+          ) : getPropertyListDefault(props.queryStringSync)
+      )
+
+      // using the search params to parse the information there
+      const searchParamsParsed = new URLSearchParams(props.location.search);
+
+      // and now we can sync if we find a value
+      propertiesToSync.forEach((p) => {
+        // check for it
+        const valueInQueryString = searchParamsParsed.get(p);
+        // we got something
+        if (valueInQueryString) {
+          // try to synchornize it
+          try {
+            const valueParsed = JSON.parse(valueInQueryString);
+            const property = props.itemDefinitionInstance.getPropertyDefinitionFor(p, true);
+            property.setCurrentValue(
+              props.forId || null,
+              props.forVersion || null,
+              valueParsed,
+              null,
+            );
+          } catch {
+          }
+        }
+      });
+    }
+
+    if (props.prefills || (props.queryStringSync && props.queryStringSync.length)) {
       // !doNotCleanSearchState && props.itemDefinitionInstance.cleanSearchState(props.forId || null, props.forVersion || null);
       props.itemDefinitionInstance.triggerListeners(
         "change",
@@ -3549,6 +3601,32 @@ export class ActualItemProvider extends
       }
     }
   }
+  private onPropertyChangeOrRestoreQsSync(property: PropertyDefinition) {
+    // syncing from the query string in a cheap way
+    if (this.props.queryStringSync && this.props.queryStringSync.length) {
+      // grabbing the property to sync in there
+      const propertiesToSync = (
+        this.props.itemDefinitionInstance.isInSearchMode() ?
+          getPropertyListForSearchMode(
+            this.props.queryStringSync || [],
+            this.props.itemDefinitionInstance.getStandardCounterpart()
+          ) : getPropertyListDefault(this.props.queryStringSync)
+      )
+
+
+      const idToSync = property.getId()
+      const isToSync = propertiesToSync.find((p) => p === idToSync);
+
+      if (isToSync) {
+        setHistoryQSState(this.props.location, {
+          [idToSync]: JSON.stringify(property.getCurrentValue(
+            this.props.forId || null,
+            this.props.forVersion || null,
+          ))
+        }, this.props.queryStringSyncReplace);
+      }
+    }
+  }
   public onPropertyRestore(
     property: PropertyDefinition | string | IPropertyCoreProps,
   ) {
@@ -3564,6 +3642,7 @@ export class ActualItemProvider extends
       this.props.forVersion || null,
     );
     // this.props.itemDefinitionInstance.cleanSearchState(this.props.forId || null, this.props.forVersion || null);
+    this.onPropertyChangeOrRestoreQsSync(actualProperty);
     this.onPropertyChangeOrRestoreFinal();
   }
   public async onPropertyChange(
@@ -3588,6 +3667,7 @@ export class ActualItemProvider extends
       internalValue,
     );
     // this.props.itemDefinitionInstance.cleanSearchState(this.props.forId || null, this.props.forVersion || null);
+    this.onPropertyChangeOrRestoreQsSync(actualProperty);
     this.onPropertyChangeOrRestoreFinal();
   }
   public onPropertyEnforceOrClearFinal(
@@ -5520,133 +5600,111 @@ export type ItemProviderRefObject = React.RefObject<ActualItemProvider>;
  * The item provider component provides the core functionality for the item provider
  */
 export const ItemProvider = React.forwardRef<ActualItemProvider, IItemProviderProps>((props, ref) => {
-  return (
-    <ConfigContext.Consumer>
-      {(config) => (
-        <LocaleContext.Consumer>
-          {
-            (localeData) => (
-              <TokenContext.Consumer>
-                {
-                  (tokenData) => (
-                    <ModuleContext.Consumer>
-                      {
-                        (data) => (
-                          <SearchItemValueContext.Consumer>
-                            {(searchContext) => {
-                              if (!data) {
-                                console.error("At element with props: ", props);
-                                throw new Error("The ItemProvider must be inside a ModuleProvider context");
-                              }
-                              let valueFor: ItemDefinition;
-                              if (props.itemDefinition) {
-                                if (typeof props.itemDefinition === "string") {
-                                  if (props.itemDefinition.startsWith("MOD_") && props.itemDefinition.includes("IDEF")) {
-                                    try {
-                                      valueFor = data.mod.getParentRoot().registry[props.itemDefinition] as ItemDefinition;
-                                    } catch (err) {
-                                      console.error("At element with props: ", props);
-                                      throw err;
-                                    }
-                                  } else {
-                                    try {
-                                      valueFor = data.mod.getItemDefinitionFor(props.itemDefinition.split("/"));
-                                    } catch (err) {
-                                      console.error("At element with props: ", props);
-                                      throw err;
-                                    }
-                                  }
-                                } else {
-                                  valueFor = props.itemDefinition;
-                                }
-                              } else {
-                                valueFor = data.mod.getPropExtensionItemDefinition();
-                              }
-                              if (props.searchCounterpart) {
-                                valueFor = valueFor.getSearchModeCounterpart();
-                              }
+  const config = useContext(ConfigContext);
+  const localeData = useContext(LocaleContext);
+  const tokenData = useContext(TokenContext);
+  const data = useContext(ModuleContext);
+  const searchContext = useContext(SearchItemValueContext);
 
-                              const actualProps = {
-                                localeData,
-                                tokenData,
-                                itemDefinitionInstance: valueFor,
-                                itemDefinitionQualifiedName: valueFor.getQualifiedPathName(),
-                                containsExternallyCheckedProperty: valueFor.containsAnExternallyCheckedProperty(),
-                                remoteListener: data.remoteListener,
-                                searchContext: searchContext,
-                                config: config,
-                                ...props,
-                              }
+  if (!data) {
+    console.error("At element with props: ", props);
+    throw new Error("The ItemProvider must be inside a ModuleProvider context");
+  }
+  let valueFor: ItemDefinition;
+  if (props.itemDefinition) {
+    if (typeof props.itemDefinition === "string") {
+      if (props.itemDefinition.startsWith("MOD_") && props.itemDefinition.includes("IDEF")) {
+        try {
+          valueFor = data.mod.getParentRoot().registry[props.itemDefinition] as ItemDefinition;
+        } catch (err) {
+          console.error("At element with props: ", props);
+          throw err;
+        }
+      } else {
+        try {
+          valueFor = data.mod.getItemDefinitionFor(props.itemDefinition.split("/"));
+        } catch (err) {
+          console.error("At element with props: ", props);
+          throw err;
+        }
+      }
+    } else {
+      valueFor = props.itemDefinition;
+    }
+  } else {
+    valueFor = data.mod.getPropExtensionItemDefinition();
+  }
+  if (props.searchCounterpart) {
+    valueFor = valueFor.getSearchModeCounterpart();
+  }
 
-                              if (props.injectParentContext) {
-                                if (props.loadSearchFromNavigation) {
-                                  return (
-                                    <LocationRetriever>
-                                      {(location) => (
-                                        <ItemContext.Consumer>{
-                                          (value) => (
-                                            <ActualItemProvider
-                                              {...actualProps}
-                                              injectedParentContext={value}
-                                              location={location}
-                                              ref={ref}
-                                            />
-                                          )
-                                        }</ItemContext.Consumer>
-                                      )}
-                                    </LocationRetriever>
-                                  );
-                                } else {
-                                  return (
-                                    <ItemContext.Consumer>{
-                                      (value) => (
-                                        <ActualItemProvider
-                                          {...actualProps}
-                                          injectedParentContext={value}
-                                          ref={ref}
-                                        />
-                                      )
-                                    }</ItemContext.Consumer>
-                                  );
-                                }
-                              }
+  const actualProps = {
+    localeData,
+    tokenData,
+    itemDefinitionInstance: valueFor,
+    itemDefinitionQualifiedName: valueFor.getQualifiedPathName(),
+    containsExternallyCheckedProperty: valueFor.containsAnExternallyCheckedProperty(),
+    remoteListener: data.remoteListener,
+    searchContext: searchContext,
+    config: config,
+    ...props,
+  }
 
-                              if (props.loadSearchFromNavigation) {
-                                return (
-                                  <LocationRetriever>
-                                    {(location) => (
-                                      <ActualItemProvider
-                                        {...actualProps}
-                                        injectedParentContext={null}
-                                        location={location}
-                                        ref={ref}
-                                      />
-                                    )}
-                                  </LocationRetriever>
-                                );
-                              } else {
-                                return (
-                                  <ActualItemProvider
-                                    {...actualProps}
-                                    injectedParentContext={null}
-                                    ref={ref}
-                                  />
-                                );
-                              }
-                            }}
-                          </SearchItemValueContext.Consumer>
-                        )
-                      }
-                    </ModuleContext.Consumer>
-                  )
-                }
-              </TokenContext.Consumer>
-            )
-          }
-        </LocaleContext.Consumer>
-      )}
-    </ConfigContext.Consumer>
-  );
+  if (props.injectParentContext) {
+    if (props.loadSearchFromNavigation || (props.queryStringSync && props.queryStringSync.length)) {
+      return (
+        <LocationRetriever>
+          {(location) => (
+            <ItemContext.Consumer>{
+              (value) => (
+                <ActualItemProvider
+                  {...actualProps}
+                  injectedParentContext={value}
+                  location={location}
+                  ref={ref}
+                />
+              )
+            }</ItemContext.Consumer>
+          )}
+        </LocationRetriever>
+      );
+    } else {
+      return (
+        <ItemContext.Consumer>{
+          (value) => (
+            <ActualItemProvider
+              {...actualProps}
+              injectedParentContext={value}
+              ref={ref}
+            />
+          )
+        }</ItemContext.Consumer>
+      );
+    }
+  }
+
+  if (props.loadSearchFromNavigation || (props.queryStringSync && props.queryStringSync.length)) {
+    return (
+      <LocationRetriever>
+        {(location) => (
+          <ActualItemProvider
+            {...actualProps}
+            injectedParentContext={null}
+            location={location}
+            ref={ref}
+          />
+        )}
+      </LocationRetriever>
+    );
+  } else {
+    return (
+      <ActualItemProvider
+        {...actualProps}
+        injectedParentContext={null}
+        ref={ref}
+      />
+    );
+  }
 });
 
 /**
