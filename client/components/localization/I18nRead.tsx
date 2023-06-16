@@ -16,6 +16,7 @@ import Module from "../../../base/Root/Module";
 import ItemDefinition from "../../../base/Root/Module/ItemDefinition";
 import Include from "../../../base/Root/Module/ItemDefinition/Include";
 import RootRetriever from "../root/RootRetriever";
+import PropertyDefinition from "../../../base/Root/Module/ItemDefinition/PropertyDefinition";
 
 /**
  * For a given object target, it will loop until it gets a match for the given key
@@ -167,7 +168,16 @@ function i18nReadInternal(
   // so if the include thing failed and we have an item definition context
   if (idef && i18nValue === null) {
     if (props.propertyId) {
-      const property = idef.getPropertyDefinitionFor(props.propertyId, true);
+      let property: PropertyDefinition;
+      if (idef.isInSearchMode()) {
+        try {
+          property = idef.getPropertyDefinitionFor(props.propertyId, true);
+        } catch {
+          property = idef.getStandardCounterpart().getPropertyDefinitionFor(props.propertyId, true);
+        }
+      } else {
+        property = idef.getPropertyDefinitionFor(props.propertyId, true);
+      }
       i18nValue = loopForKeyAtTarget(
         property.getI18nDataFor(localeContext.language),
         idSplitted,
