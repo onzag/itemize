@@ -1490,6 +1490,9 @@ interface ISearchQueryArg {
   token: string;
   language: string;
   versionFilter?: string;
+  versionFilterOut?: string;
+  idsFilter?: string[];
+  idsFilterOut?: string[];
   useSearchEngine?: boolean | string;
 }
 
@@ -1531,8 +1534,20 @@ export function getSearchArgsFor(
     arg.language,
   );
 
-  if (arg.versionFilter) {
-    searchArgs.version_filter = arg.versionFilter;
+  if (typeof arg.versionFilter !== "undefined") {
+    searchArgs.version_filter = arg.versionFilter || null;
+  }
+
+  if (typeof arg.versionFilterOut !== "undefined") {
+    searchArgs.version_filter_out = arg.versionFilterOut || null;
+  }
+
+  if (arg.idsFilter && arg.idsFilter.length) {
+    searchArgs.ids_filter = arg.idsFilter;
+  }
+
+  if (arg.idsFilterOut && arg.idsFilterOut.length) {
+    searchArgs.ids_filter_out = arg.idsFilterOut;
   }
 
   if (arg.createdBy) {

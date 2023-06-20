@@ -330,9 +330,33 @@ export async function searchModule(
 
     if (typeof resolverArgs.args.version_filter !== "undefined") {
       elasticQuery.mustTerm({
-        version: resolverArgs.args.version_filter || null,
+        version: resolverArgs.args.version_filter || "?NULL",
       }, {
         groupId: "VERSION",
+      });
+    }
+
+    if (typeof resolverArgs.args.version_filter_out !== "undefined") {
+      elasticQuery.mustNotTerm({
+        version: resolverArgs.args.version_filter_out || "?NULL",
+      }, {
+        groupId: "VERSION",
+      });
+    }
+
+    if (typeof resolverArgs.args.ids_filter !== "undefined") {
+      elasticQuery.mustTerms({
+        id: resolverArgs.args.ids_filter
+      }, {
+        groupId: "IDS",
+      });
+    }
+
+    if (typeof resolverArgs.args.ids_filter_out !== "undefined") {
+      elasticQuery.mustNotTerms({
+        id: resolverArgs.args.ids_filter_out
+      }, {
+        groupId: "IDS",
       });
     }
 
@@ -377,6 +401,24 @@ export async function searchModule(
 
     if (typeof resolverArgs.args.version_filter !== "undefined") {
       queryModel.whereBuilder.andWhereColumn("version", resolverArgs.args.version_filter || "");
+    }
+
+    if (typeof resolverArgs.args.version_filter_out !== "undefined") {
+      queryModel.whereBuilder.andWhereColumn("version", "!=", resolverArgs.args.version_filter || "");
+    }
+
+    if (typeof resolverArgs.args.ids_filter !== "undefined") {
+      queryModel.whereBuilder.andWhere(
+        `"id" = ANY(ARRAY[${resolverArgs.args.ids_filter.map(() => "?").join(",")}]::TEXT[])`,
+        resolverArgs.args.ids_filter,
+      );
+    }
+
+    if (typeof resolverArgs.args.ids_filter_out !== "undefined") {
+      queryModel.whereBuilder.andWhere(
+        `"id" != ANY(ARRAY[${resolverArgs.args.ids_filter_out.map(() => "?").join(",")}]::TEXT[])`,
+        resolverArgs.args.ids_filter_out,
+      );
     }
 
     if (resolverArgs.args.parent_id && resolverArgs.args.parent_type) {
@@ -1148,9 +1190,33 @@ export async function searchItemDefinition(
 
       if (typeof resolverArgs.args.version_filter !== "undefined") {
         elasticQuery.mustTerm({
-          version: resolverArgs.args.version_filter || null,
+          version: resolverArgs.args.version_filter || "?NULL",
         }, {
           groupId: "VERSION",
+        });
+      }
+
+      if (typeof resolverArgs.args.version_filter_out !== "undefined") {
+        elasticQuery.mustNotTerm({
+          version: resolverArgs.args.version_filter_out || "?NULL",
+        }, {
+          groupId: "VERSION",
+        });
+      }
+  
+      if (typeof resolverArgs.args.ids_filter !== "undefined") {
+        elasticQuery.mustTerms({
+          id: resolverArgs.args.ids_filter
+        }, {
+          groupId: "IDS",
+        });
+      }
+  
+      if (typeof resolverArgs.args.ids_filter_out !== "undefined") {
+        elasticQuery.mustNotTerms({
+          id: resolverArgs.args.ids_filter_out
+        }, {
+          groupId: "IDS",
         });
       }
 
@@ -1193,6 +1259,24 @@ export async function searchItemDefinition(
 
       if (typeof resolverArgs.args.version_filter !== "undefined") {
         queryModel.whereBuilder.andWhereColumn("version", resolverArgs.args.version_filter || "");
+      }
+
+      if (typeof resolverArgs.args.version_filter_out !== "undefined") {
+        queryModel.whereBuilder.andWhereColumn("version", "!=", resolverArgs.args.version_filter || "");
+      }
+  
+      if (typeof resolverArgs.args.ids_filter !== "undefined") {
+        queryModel.whereBuilder.andWhere(
+          `"id" = ANY(ARRAY[${resolverArgs.args.ids_filter.map(() => "?").join(",")}]::TEXT[])`,
+          resolverArgs.args.ids_filter,
+        );
+      }
+  
+      if (typeof resolverArgs.args.ids_filter_out !== "undefined") {
+        queryModel.whereBuilder.andWhere(
+          `"id" != ANY(ARRAY[${resolverArgs.args.ids_filter_out.map(() => "?").join(",")}]::TEXT[])`,
+          resolverArgs.args.ids_filter_out,
+        );
       }
 
       if (resolverArgs.args.parent_id && resolverArgs.args.parent_type) {

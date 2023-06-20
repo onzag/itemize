@@ -202,7 +202,7 @@ export async function search(
   let filteredResults = newSearchRecords.map((r) => r.searchResult);
   const count = filteredRecords.length;
 
-  if (!noLimitOffset && (searchArgs.offset !== 0 || filteredRecords.length > searchArgs.limit)) {
+  if (!noLimitOffset && (searchArgs.offset !== 0 || filteredRecords.length > (searchArgs.limit as number))) {
     // apply limit and offset
     filteredRecords = filteredRecords.slice(
       searchArgs.offset as number || 0,
@@ -276,6 +276,14 @@ async function checkOne(
   } else if (!value.DATA) {
     shouldBeIncluded = false;
   } else if (searchArgs.types && !searchArgs.types.includes(searchRecord.type)) {
+    shouldBeIncluded = false;
+  } else if (typeof searchArgs.version_fiter !== "undefined" && searchRecord.version !== searchArgs.version_filter) {
+    shouldBeIncluded = false;
+  } else if (typeof searchArgs.version_fiter_out !== "undefined" && searchRecord.version === searchArgs.version_fiter_out) {
+    shouldBeIncluded = false;
+  } else if (searchArgs.ids_filter && !searchArgs.ids_filter.includes(searchRecord.id)) {
+    shouldBeIncluded = false;
+  } else if (searchArgs.ids_filter_out && searchArgs.ids_filter_out.includes(searchRecord.id)) {
     shouldBeIncluded = false;
   }
 
