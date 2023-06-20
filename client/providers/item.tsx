@@ -871,6 +871,26 @@ export interface IActionSearchOptions extends IActionCleanOptions {
   useSearchEngine?: boolean | string;
 
   /**
+   * Only allow items of a specific version
+   */
+  versionFilter?: string;
+
+  /**
+   * Blacklist a specific version
+   */
+  versionFilterOut?: string;
+
+  /**
+   * Only allow items of a specific ids
+   */
+  idsFilter?: string[];
+
+  /**
+   * Blacklist ids
+   */
+  idsFilterOut?: string[];
+
+  /**
    * TODO implement pile search
    */
   pileSearch?: boolean;
@@ -5128,6 +5148,10 @@ export class ActualItemProvider extends
       cacheStoreMetadata: options.cacheMetadata,
       cacheStoreMetadataMismatchAction: options.cacheMetadataMismatchAction,
       useSearchEngine: options.useSearchEngine,
+      versionFilter: options.versionFilter,
+      idsFilter: options.idsFilter,
+      idsFilterOut: options.idsFilterOut,
+      versionFilterOut: options.versionFilterOut,
     }, {
       remoteListener: this.props.remoteListener,
       preventCacheStaleFeeback: preventSearchFeedbackOnPossibleStaleData,
