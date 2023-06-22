@@ -11,7 +11,7 @@ import ItemDefinitionSchema from "../base/Root/Module/ItemDefinition/schema";
 import ModuleSchema from "../base/Root/Module/schema";
 import CheckUpError from "./Error";
 import Traceback from "./Traceback";
-import { SpecialPropertyValueSetSchema } from "../base/Root/Module/ItemDefinition/PropertyDefinition/schema";
+import { ConfigValueSetSchema } from "../base/Root/Module/ItemDefinition/PropertyDefinition/schema";
 import "source-map-support/register";
 import { rawSensitiveConfigSchema, rawConfigSchema,
   rawDBConfigSchema, rawRedisConfigSchema, dumpConfigSchema } from "../config";
@@ -41,8 +41,8 @@ export const checkPropertyDefinitionArraySchemaValidate =
     },
   });
 
-export const checkSpecialPropertyValueSetSchemaValidate =
-  ajv.compile(SpecialPropertyValueSetSchema);
+export const checkConfigValueSetSchemaValidate =
+  ajv.compile(ConfigValueSetSchema);
 
 /**
  * Checks a module

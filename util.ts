@@ -766,7 +766,7 @@ export function createRealFileValue(
   };
 
   if (imageMetadataGeneratorInfo) {
-    const dimensions: string = imageMetadataGeneratorInfo.property.getSpecialProperty("dimensions") || "";
+    const dimensions: string = imageMetadataGeneratorInfo.property.getConfigValue("dimensions") || "";
     const dimensionNames = dimensions.split(";").map((d) => d.trim().split(" ")[0]);
     value.metadata = imageMetadataGeneratorInfo.width + "x" + imageMetadataGeneratorInfo.height + ";" + dimensionNames.join(",");
   }

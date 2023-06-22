@@ -415,7 +415,7 @@ Now we should take use of it and add the following to our unit schema:
     "id": "price",
     "type": "currency",
     "nullable": true,
-    "specialProperties": {
+    "config": {
         "preventZero": true
     }
 }

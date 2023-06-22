@@ -308,7 +308,7 @@ function processOneFileAndItsSameIDReplacement(
   // let's check the image metadata
   if (isImage && needsImageProcessing) {
     const expectedMetadataDimensions = (
-      propertyDefinition.getSpecialProperty("dimensions") as string || ""
+      propertyDefinition.getConfigValue("dimensions") as string || ""
     ).split(";").map((v) => v.split(" ")[0].trim()).join(",");
 
     // no metadata... this isn't good

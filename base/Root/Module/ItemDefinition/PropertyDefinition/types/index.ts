@@ -450,7 +450,7 @@ export interface IPropertyDefinitionSupportedType<T> {
   /**
    * special attributes that might be added specific to that type
    */
-  specialProperties?: Array<{
+  configOptions?: Array<{
     name: string;
     type: "number" | "string" | "boolean" | "property-set" | "any" | "array-string" | "array-number" | "array-boolean",
     required?: boolean | Array<string>;

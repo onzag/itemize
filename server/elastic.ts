@@ -1083,7 +1083,7 @@ export class ItemizeElasticClient {
     }
 
     let minimumCreatedAt: string = null;
-    if (maximumLimiter) {
+    if (maximumLimiter && batchNumber === 0) {
       // cannot retrieve anything before this date, we do not need any older records
       const minimumCreatedAtAsDate = new Date(timeRan.getTime() - maximumLimiter);
       minimumCreatedAt = minimumCreatedAtAsDate.toISOString();

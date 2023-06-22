@@ -191,14 +191,14 @@ const typeValue: IPropertyDefinitionSupportedType<IPropertyDefinitionSupportedCu
     let maxValue = MAX_SUPPORTED_REAL;
     let minValue = 0;
     let isZeroPrevented = false;
-    if (p.specialProperties) {
-      if (p.specialProperties.allowNegatives || p.specialProperties.isDebt) {
+    if (p.config) {
+      if (p.config.allowNegatives || p.config.isDebt) {
         minValue = MIN_SUPPORTED_REAL;
       }
-      if (p.specialProperties.isDebt) {
+      if (p.config.isDebt) {
         maxValue = 0;
       }
-      isZeroPrevented = p.specialProperties.preventZero;
+      isZeroPrevented = p.config.preventZero;
     }
 
     if (maxValue === 0 && isZeroPrevented ? l.value >= maxValue : l.value > maxValue) {
@@ -224,7 +224,7 @@ const typeValue: IPropertyDefinitionSupportedType<IPropertyDefinitionSupportedCu
   searchable: true,
   searchInterface: PropertyDefinitionSearchInterfacesType.EXACT_AND_RANGE,
 
-  specialProperties: [
+  configOptions: [
     {
       name: "allowNegatives",
       type: "boolean",

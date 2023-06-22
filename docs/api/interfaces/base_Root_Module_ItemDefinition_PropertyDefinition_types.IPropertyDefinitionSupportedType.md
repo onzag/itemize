@@ -29,7 +29,7 @@ How every supported type behaviour should be described
 - [requiresValues](base_Root_Module_ItemDefinition_PropertyDefinition_types.IPropertyDefinitionSupportedType.md#requiresvalues)
 - [searchInterface](base_Root_Module_ItemDefinition_PropertyDefinition_types.IPropertyDefinitionSupportedType.md#searchinterface)
 - [searchable](base_Root_Module_ItemDefinition_PropertyDefinition_types.IPropertyDefinitionSupportedType.md#searchable)
-- [specialProperties](base_Root_Module_ItemDefinition_PropertyDefinition_types.IPropertyDefinitionSupportedType.md#specialproperties)
+- [config](base_Root_Module_ItemDefinition_PropertyDefinition_types.IPropertyDefinitionSupportedType.md#config)
 - [supportedSubtypes](base_Root_Module_ItemDefinition_PropertyDefinition_types.IPropertyDefinitionSupportedType.md#supportedsubtypes)
 
 ### Methods
@@ -251,9 +251,9 @@ whether it is searchable or not
 
 ___
 
-### specialProperties
+### config
 
-• `Optional` **specialProperties**: { `name`: `string` ; `required?`: `boolean` \| `string`[] ; `type`: ``"string"`` \| ``"number"`` \| ``"boolean"`` \| ``"property-set"`` \| ``"any"`` \| ``"array-string"`` \| ``"array-number"`` \| ``"array-boolean"``  }[]
+• `Optional` **config**: { `name`: `string` ; `required?`: `boolean` \| `string`[] ; `type`: ``"string"`` \| ``"number"`` \| ``"boolean"`` \| ``"property-set"`` \| ``"any"`` \| ``"array-string"`` \| ``"array-number"`` \| ``"array-boolean"``  }[]
 
 special attributes that might be added specific to that type
 

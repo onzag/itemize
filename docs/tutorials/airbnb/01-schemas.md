@@ -68,7 +68,7 @@ The next step is to add a description that we can add to the property
     "id": "description",
     "type": "text",
     "subtype": "html",
-    "specialProperties": {
+    "config": {
         "mediaProperty": "attachments",
         "supportsImages": true,
         "supportsVideos": true,
@@ -94,7 +94,7 @@ Note how we define such as rich text, and define what capabilities the descripti
 {
     "id": "attachments",
     "type": "files",
-    "specialProperties": {
+    "config": {
         "smallDimension": "320x",
         "mediumDimension": "640x",
         "largeDimension": "1024x"
@@ -112,7 +112,7 @@ However a single specific image is also required, notice how the type of the att
 {
     "id": "image",
     "type": "file",
-    "specialProperties": {
+    "config": {
         "imageUploader": true,
         "smallDimension": "128x",
         "mediumDimension": "256x",
@@ -129,7 +129,7 @@ The next thing we need is a way for define address, luckily itemize comes with s
 {
     "id": "address",
     "type": "location",
-    "specialProperties": {
+    "config": {
         "maxSearchRadius": 100,
         "searchRadiusInitialPrefill": 50,
         "searchRadiusUnit": "km",

@@ -8,10 +8,10 @@
 import ConditionalRuleSetSchema from "../ConditionalRuleSet/schema";
 
 /**
- * This represents the special property value
+ * This represents the config property value
  * for use with property set
  */
-export const SpecialPropertyValueSetSchema = {
+export const ConfigValueSetSchema = {
   type: "object",
   additionalProperties: {
     type: "object",
@@ -226,7 +226,7 @@ export default {
     disableRetrieval: {
       type: "boolean",
     },
-    specialProperties: {
+    config: {
       type: "object",
       properties: {},
       additionalProperties: true,

@@ -297,7 +297,7 @@ export function textElasticSearch(arg: IElasticSearchInfo) {
   const isRichText = arg.property.isRichText();
 
   if (typeof arg.args[searchName] !== "undefined" && arg.args[searchName] !== null) {
-    const usePhrase = arg.property.getSpecialProperty("searchUsesMatchPhrase");
+    const usePhrase = arg.property.getConfigValue("searchUsesMatchPhrase");
     const matchRule = {
       [arg.prefix + arg.id + (isRichText ? "_PLAIN" : "")]: arg.args[searchName] as string,
     };

@@ -150,7 +150,7 @@ export async function runImageConversions(
 
   // the properties in question are, smallDimension
   const smallAnalyzed: IImageConversionArguments = singleOptionAnalysis(
-    propDef.getSpecialProperty("smallDimension") as string,
+    propDef.getConfigValue("smallDimension") as string,
     "small",
   ) || {
     name: "small",
@@ -161,7 +161,7 @@ export async function runImageConversions(
 
   // mediumDimension
   const mediumAnalyzed: IImageConversionArguments = singleOptionAnalysis(
-    propDef.getSpecialProperty("mediumDimension") as string,
+    propDef.getConfigValue("mediumDimension") as string,
     "medium",
   ) || {
     name: "medium",
@@ -172,7 +172,7 @@ export async function runImageConversions(
 
   // and largeDimension
   const largeAnalyzed: IImageConversionArguments = singleOptionAnalysis(
-    propDef.getSpecialProperty("largeDimension") as string,
+    propDef.getConfigValue("largeDimension") as string,
     "large",
   ) || {
     name: "large",
@@ -189,7 +189,7 @@ export async function runImageConversions(
   ];
 
   // but we might have more dimensions that are expected other than that
-  const allRemainingSizes = propDef.getSpecialProperty("dimensions") as string;
+  const allRemainingSizes = propDef.getConfigValue("dimensions") as string;
   if (allRemainingSizes) {
     imageConversionOutputs = imageConversionOutputs.concat(manyOptionsAnalysis(allRemainingSizes));
   }

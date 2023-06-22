@@ -310,7 +310,7 @@ export default class PropertyEntryField
 
   public componentDidMount() {
     // we take the initial prefill, which only truly exists for the unit and currency type
-    const initialPrefill = this.props.property.getSpecialProperty("initialPrefill") as number;
+    const initialPrefill = this.props.property.getConfigValue("initialPrefill") as number;
     // and if we have one
     if (
       typeof initialPrefill !== "undefined" &&
@@ -358,10 +358,10 @@ export default class PropertyEntryField
       if (wasImperial !== isImperial) {
         // we change to the new appropiate
         if (!isImperial) {
-          const metricUnit = this.props.property.getSpecialProperty("unit") as string;
+          const metricUnit = this.props.property.getConfigValue("unit") as string;
           this.onChangeUnit(metricUnit);
         } else {
-          const imperialUnit = this.props.property.getSpecialProperty("imperialUnit") as string;
+          const imperialUnit = this.props.property.getConfigValue("imperialUnit") as string;
           this.onChangeUnit(imperialUnit);
         }
       }
@@ -510,8 +510,8 @@ export default class PropertyEntryField
     const prefersImperial = this.props.country.code === "US";
 
     // now we get the imperial and metric unit
-    const imperialUnit = this.props.property.getSpecialProperty("imperialUnit") as string;
-    const standardUnit = this.props.property.getSpecialProperty("unit") as string;
+    const imperialUnit = this.props.property.getConfigValue("imperialUnit") as string;
+    const standardUnit = this.props.property.getConfigValue("unit") as string;
 
     // and we specify what we want to use
     const usedUnit = prefersImperial ? imperialUnit : standardUnit;
@@ -792,7 +792,7 @@ export default class PropertyEntryField
       unitPrimaryImperial = answer[2];
       unitPrefersImperial = answer[3];
 
-      unitIsLockedToPrimaries = this.props.property.getSpecialProperty("lockUnitsToPrimaries") as boolean;
+      unitIsLockedToPrimaries = this.props.property.getConfigValue("lockUnitsToPrimaries") as boolean;
 
       const availableUnits = convert().list(subtype as any);
       unitOptions = unitIsLockedToPrimaries ? null : availableUnits.filter(

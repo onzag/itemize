@@ -219,10 +219,10 @@ in the schema form
 | `definitions.PropertyDefinition.properties.softReadRoleAccess.items` | `Object` |
 | `definitions.PropertyDefinition.properties.softReadRoleAccess.items.type` | `string` |
 | `definitions.PropertyDefinition.properties.softReadRoleAccess.type` | `string` |
-| `definitions.PropertyDefinition.properties.specialProperties` | `Object` |
-| `definitions.PropertyDefinition.properties.specialProperties.additionalProperties` | `boolean` |
-| `definitions.PropertyDefinition.properties.specialProperties.properties` | `Object` |
-| `definitions.PropertyDefinition.properties.specialProperties.type` | `string` |
+| `definitions.PropertyDefinition.properties.config` | `Object` |
+| `definitions.PropertyDefinition.properties.config.additionalProperties` | `boolean` |
+| `definitions.PropertyDefinition.properties.config.properties` | `Object` |
+| `definitions.PropertyDefinition.properties.config.type` | `string` |
 | `definitions.PropertyDefinition.properties.subtype` | `Object` |
 | `definitions.PropertyDefinition.properties.subtype.type` | `string` |
 | `definitions.PropertyDefinition.properties.type` | `Object` |

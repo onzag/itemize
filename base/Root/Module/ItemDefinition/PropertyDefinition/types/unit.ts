@@ -180,7 +180,7 @@ const typeValue: IPropertyDefinitionSupportedType<IPropertyDefinitionSupportedUn
 
     // normalized unit should be the same as the specified
     // in the definition
-    if (l.normalizedUnit !== p.specialProperties["unit"]) {
+    if (l.normalizedUnit !== p.config["unit"]) {
       return PropertyInvalidReason.INVALID_VALUE;
     }
 
@@ -215,7 +215,7 @@ const typeValue: IPropertyDefinitionSupportedType<IPropertyDefinitionSupportedUn
   },
   sqlMantenience: null,
 
-  specialProperties: [
+  configOptions: [
     {
       name: "unit",
       type: "string",

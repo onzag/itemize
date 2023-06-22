@@ -619,7 +619,7 @@ export default class MailProvider<T> extends ServiceProvider<T> {
 
         // now we need the property value
         const propertyId = actualProperty.getId();
-        const mediaProperty = actualProperty.getSpecialProperty("mediaProperty");
+        const mediaProperty = actualProperty.getConfigValue("mediaProperty");
 
         // and we extract it
         if (templateValue && templateValue[propertyId]) {
@@ -631,24 +631,24 @@ export default class MailProvider<T> extends ServiceProvider<T> {
           }
 
           const isRichText = actualProperty.isRichText();
-          const supportsVideos = isRichText && !!actualProperty.getSpecialProperty("supportsVideos");
-          const supportsImages = mediaProperty && !!actualProperty.getSpecialProperty("supportsImages");
-          const supportsFiles = mediaProperty && !!actualProperty.getSpecialProperty("supportsFiles");
-          const supportsContainers = actualProperty.getSpecialProperty("supportsContainers");
-          const supportedContainers = actualProperty.getSpecialProperty("supportedContainers");
-          const supportsTables = actualProperty.getSpecialProperty("supportsTables");
-          const supportedTables = actualProperty.getSpecialProperty("supportedTables");
-          const supportsLists = actualProperty.getSpecialProperty("supportsLists");
-          const supportsCustom = actualProperty.getSpecialProperty("supportsCustom");
-          const supportedCustoms = actualProperty.getSpecialProperty("supportedCustoms");
-          const supportsExternalLinks = actualProperty.getSpecialProperty("supportsExternalLinks");
-          const supportsLinks = actualProperty.getSpecialProperty("supportsLinks");
-          const supportsQuote = actualProperty.getSpecialProperty("supportsQuote");
-          const supportsRichClasses = actualProperty.getSpecialProperty("supportsRichClasses");
-          const supportedRichClasses = actualProperty.getSpecialProperty("supportedRichClasses");
-          const supportsTitle = actualProperty.getSpecialProperty("supportsTitle");
-          const supportsCustomStyles = actualProperty.getSpecialProperty("supportsCustomStyles");
-          const supportsTemplating = actualProperty.getSpecialProperty("supportsTemplating");
+          const supportsVideos = isRichText && !!actualProperty.getConfigValue("supportsVideos");
+          const supportsImages = mediaProperty && !!actualProperty.getConfigValue("supportsImages");
+          const supportsFiles = mediaProperty && !!actualProperty.getConfigValue("supportsFiles");
+          const supportsContainers = actualProperty.getConfigValue("supportsContainers");
+          const supportedContainers = actualProperty.getConfigValue("supportedContainers");
+          const supportsTables = actualProperty.getConfigValue("supportsTables");
+          const supportedTables = actualProperty.getConfigValue("supportedTables");
+          const supportsLists = actualProperty.getConfigValue("supportsLists");
+          const supportsCustom = actualProperty.getConfigValue("supportsCustom");
+          const supportedCustoms = actualProperty.getConfigValue("supportedCustoms");
+          const supportsExternalLinks = actualProperty.getConfigValue("supportsExternalLinks");
+          const supportsLinks = actualProperty.getConfigValue("supportsLinks");
+          const supportsQuote = actualProperty.getConfigValue("supportsQuote");
+          const supportsRichClasses = actualProperty.getConfigValue("supportsRichClasses");
+          const supportedRichClasses = actualProperty.getConfigValue("supportedRichClasses");
+          const supportsTitle = actualProperty.getConfigValue("supportsTitle");
+          const supportsCustomStyles = actualProperty.getConfigValue("supportsCustomStyles");
+          const supportsTemplating = actualProperty.getConfigValue("supportsTemplating");
 
           // calling the render template function
           parsedTemplateValue = renderTemplate(
@@ -1796,28 +1796,28 @@ export default class MailProvider<T> extends ServiceProvider<T> {
     },
   ): Promise<IEmailRenderedMessage> {
     const actualProperty = this.storageIdef.getPropertyDefinitionFor("content", false);
-    const mediaPropertyId = actualProperty.getSpecialProperty("mediaProperty");
+    const mediaPropertyId = actualProperty.getConfigValue("mediaProperty");
     const mediaProperty = mediaPropertyId ? this.storageIdef.getPropertyDefinitionFor(mediaPropertyId, true) : null;
 
     const isRichText = actualProperty.isRichText();
-    const supportsVideos = isRichText && !!actualProperty.getSpecialProperty("supportsVideos");
-    const supportsImages = mediaProperty && !!actualProperty.getSpecialProperty("supportsImages");
-    const supportsFiles = mediaProperty && !!actualProperty.getSpecialProperty("supportsFiles");
-    const supportsContainers = actualProperty.getSpecialProperty("supportsContainers");
-    const supportedContainers = actualProperty.getSpecialProperty("supportedContainers");
-    const supportsTables = actualProperty.getSpecialProperty("supportsTables");
-    const supportedTables = actualProperty.getSpecialProperty("supportedTables");
-    const supportsLists = actualProperty.getSpecialProperty("supportsLists");
-    const supportsCustom = actualProperty.getSpecialProperty("supportsCustom");
-    const supportedCustoms = actualProperty.getSpecialProperty("supportedCustoms");
-    const supportsExternalLinks = actualProperty.getSpecialProperty("supportsExternalLinks");
-    const supportsLinks = actualProperty.getSpecialProperty("supportsLinks");
-    const supportsQuote = actualProperty.getSpecialProperty("supportsQuote");
-    const supportsRichClasses = actualProperty.getSpecialProperty("supportsRichClasses");
-    const supportedRichClasses = actualProperty.getSpecialProperty("supportedRichClasses");
-    const supportsTitle = actualProperty.getSpecialProperty("supportsTitle");
-    const supportsCustomStyles = actualProperty.getSpecialProperty("supportsCustomStyles");
-    const supportsTemplating = actualProperty.getSpecialProperty("supportsTemplating");
+    const supportsVideos = isRichText && !!actualProperty.getConfigValue("supportsVideos");
+    const supportsImages = mediaProperty && !!actualProperty.getConfigValue("supportsImages");
+    const supportsFiles = mediaProperty && !!actualProperty.getConfigValue("supportsFiles");
+    const supportsContainers = actualProperty.getConfigValue("supportsContainers");
+    const supportedContainers = actualProperty.getConfigValue("supportedContainers");
+    const supportsTables = actualProperty.getConfigValue("supportsTables");
+    const supportedTables = actualProperty.getConfigValue("supportedTables");
+    const supportsLists = actualProperty.getConfigValue("supportsLists");
+    const supportsCustom = actualProperty.getConfigValue("supportsCustom");
+    const supportedCustoms = actualProperty.getConfigValue("supportedCustoms");
+    const supportsExternalLinks = actualProperty.getConfigValue("supportsExternalLinks");
+    const supportsLinks = actualProperty.getConfigValue("supportsLinks");
+    const supportsQuote = actualProperty.getConfigValue("supportsQuote");
+    const supportsRichClasses = actualProperty.getConfigValue("supportsRichClasses");
+    const supportedRichClasses = actualProperty.getConfigValue("supportedRichClasses");
+    const supportsTitle = actualProperty.getConfigValue("supportsTitle");
+    const supportsCustomStyles = actualProperty.getConfigValue("supportsCustomStyles");
+    const supportsTemplating = actualProperty.getConfigValue("supportsTemplating");
 
     const messageLanguage = message["subject_LANGUAGE"] || message["content_LANGUAGE"];
     const dir = isRTL(messageLanguage) ? "rtl" : "ltr";

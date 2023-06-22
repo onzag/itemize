@@ -228,10 +228,10 @@ export interface IPropertyDefinitionRawJSONDataType {
    */
   disableRetrieval?: boolean;
   /**
-   * Special properties that are assigned in the type behaviour
+   * Special properties for config that are assigned in the type behaviour
    * description, you set the value here
    */
-  specialProperties?: {
+  config?: {
     [key: string]: any;
   };
   /**
@@ -2322,12 +2322,12 @@ export default class PropertyDefinition {
    * @param name the name of that specifial property
    * @returns the special property value, either a boolean, number or string, or null
    */
-  public getSpecialProperty(name: string) {
-    if (!this.rawData.specialProperties) {
+  public getConfigValue(name: string) {
+    if (!this.rawData.config) {
       return null;
     }
 
-    return typeof this.rawData.specialProperties[name] !== "undefined" ? this.rawData.specialProperties[name] : null;
+    return typeof this.rawData.config[name] !== "undefined" ? this.rawData.config[name] : null;
   }
 
   /**

@@ -185,7 +185,7 @@ const typeValue: IPropertyDefinitionSupportedType<IPropertyDefinitionSupportedLo
   // they are searchable
   searchable: true,
   searchInterface: PropertyDefinitionSearchInterfacesType.LOCATION_RADIUS,
-  specialProperties: [
+  configOptions: [
     {
       name: "maxSearchRadius",
       type: "number",

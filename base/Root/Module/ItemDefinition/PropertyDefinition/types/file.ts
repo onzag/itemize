@@ -31,7 +31,7 @@ const typeValue: IPropertyDefinitionSupportedType<PropertyDefinitionSupportedFil
   gqlList: false,
 
   searchable: false,
-  specialProperties: [
+  configOptions: [
     {
       name: "accept",
       type: "string",

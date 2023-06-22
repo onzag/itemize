@@ -392,7 +392,7 @@ export default class PropertyEntryText
    */
   public cacheMediaPropertyInProps(props: IPropertyEntryHandlerProps<IPropertyDefinitionSupportedTextType, IPropertyEntryTextRendererProps>) {
     // we get the media property name
-    const mediaPropertyName = props.property.getSpecialProperty("mediaProperty") as string;
+    const mediaPropertyName = props.property.getConfigValue("mediaProperty") as string;
     // so if we have such as a media property
     if (mediaPropertyName) {
       // we are going to find and get it
@@ -400,8 +400,8 @@ export default class PropertyEntryText
 
       // process the accepts
       this.cachedMediaPropertyAcceptsFiles = processAccepts(
-        this.cachedMediaProperty.getSpecialProperty("accept") as string,
-        !!this.cachedMediaProperty.getSpecialProperty("imageUploader"),
+        this.cachedMediaProperty.getConfigValue("accept") as string,
+        !!this.cachedMediaProperty.getConfigValue("imageUploader"),
       );
 
       // and then see what images we support from these accepts
@@ -418,7 +418,7 @@ export default class PropertyEntryText
    */
   public cacheCurrentFiles() {
     // so we get the media property
-    const relatedPropertyName = this.props.property.getSpecialProperty("mediaProperty") as string;
+    const relatedPropertyName = this.props.property.getConfigValue("mediaProperty") as string;
     // if we have one
     if (relatedPropertyName) {
       // we will get such media property
@@ -467,7 +467,7 @@ export default class PropertyEntryText
   }
 
   public componentDidUpdate(prevProps: IPropertyEntryHandlerProps<IPropertyDefinitionSupportedTextType, IPropertyEntryTextRendererProps>) {
-    const relatedPropertyName = this.props.property.getSpecialProperty("mediaProperty") as string;
+    const relatedPropertyName = this.props.property.getConfigValue("mediaProperty") as string;
     if (
       relatedPropertyName &&
       prevProps.state.value !== this.props.state.value &&
@@ -506,7 +506,7 @@ export default class PropertyEntryText
     } while (match);
 
     // now we need to find the ones that have been deleted and are currently not loaded
-    const relatedPropertyName = this.props.property.getSpecialProperty("mediaProperty") as string;
+    const relatedPropertyName = this.props.property.getConfigValue("mediaProperty") as string;
     const relatedProperty = this.props.itemDefinition.getPropertyDefinitionFor(relatedPropertyName, true);
     const currentValue =
       relatedProperty.getCurrentValue(this.props.forId || null, this.props.forVersion || null) as PropertyDefinitionSupportedFilesType;
@@ -531,7 +531,7 @@ export default class PropertyEntryText
    * restoration, but also restore its related media property
    */
   public onRestoreHijacked() {
-    const relatedPropertyName = this.props.property.getSpecialProperty("mediaProperty") as string;
+    const relatedPropertyName = this.props.property.getConfigValue("mediaProperty") as string;
     const relatedProperty = this.props.itemDefinition.getPropertyDefinitionFor(relatedPropertyName, true);
 
     relatedProperty.restoreValueFor(this.props.forId || null, this.props.forVersion || null);
@@ -545,7 +545,7 @@ export default class PropertyEntryText
    * @param fileId the file to be restored
    */
   public onRestoreLostFile(fileId: string) {
-    const relatedPropertyName = this.props.property.getSpecialProperty("mediaProperty") as string;
+    const relatedPropertyName = this.props.property.getConfigValue("mediaProperty") as string;
     const relatedProperty = this.props.itemDefinition.getPropertyDefinitionFor(relatedPropertyName, true);
     const currentValue =
       relatedProperty.getCurrentValue(this.props.forId || null, this.props.forVersion || null) as PropertyDefinitionSupportedFilesType;
@@ -590,7 +590,7 @@ export default class PropertyEntryText
    * @param fileId the file id
    */
   public onRemoveFile(fileId: string) {
-    const relatedPropertyName = this.props.property.getSpecialProperty("mediaProperty") as string;
+    const relatedPropertyName = this.props.property.getConfigValue("mediaProperty") as string;
     const relatedProperty = this.props.itemDefinition.getPropertyDefinitionFor(relatedPropertyName, true);
     const currentValue =
       relatedProperty.getCurrentValue(this.props.forId || null, this.props.forVersion || null) as PropertyDefinitionSupportedFilesType;
@@ -773,7 +773,7 @@ export default class PropertyEntryText
         // on load
         img.onload = () => {
           // we build the metadata
-          const dimensions: string = this.props.property.getSpecialProperty("dimensions") || "";
+          const dimensions: string = this.props.property.getConfigValue("dimensions") || "";
           const dimensionNames = dimensions.split(";").map((d) => d.trim().split(" ")[0]);
           addedFile.metadata = img.width + "x" + img.height + ";" + dimensionNames.join(",");
 
@@ -868,30 +868,30 @@ export default class PropertyEntryText
     // get the invalid reason if any
     const isRichText = this.props.property.isRichText();
 
-    const mediaPropertyId = this.props.property.getSpecialProperty("mediaProperty") as string;
+    const mediaPropertyId = this.props.property.getConfigValue("mediaProperty") as string;
     const supportsMedia = !!mediaPropertyId && isRichText;
     const i18nInLanguage = this.props.i18n[this.props.language];
 
     let features: IFeatureSupportOptions = null;
     if (isRichText) {
-      const supportsVideos = isRichText && !!this.props.property.getSpecialProperty("supportsVideos");
-      const supportsImages = supportsMedia && !!this.props.property.getSpecialProperty("supportsImages");
-      const supportsFiles = supportsMedia && !!this.props.property.getSpecialProperty("supportsFiles");
-      const supportsContainers = this.props.property.getSpecialProperty("supportsContainers");
-      const supportedContainers = this.props.property.getSpecialProperty("supportedContainers");
-      const supportsTables = this.props.property.getSpecialProperty("supportsTables");
-      const supportedTables = this.props.property.getSpecialProperty("supportedTables");
-      const supportsLists = this.props.property.getSpecialProperty("supportsLists");
-      const supportsCustom = this.props.property.getSpecialProperty("supportsCustom");
-      const supportedCustoms = this.props.property.getSpecialProperty("supportedCustoms");
-      const supportsExternalLinks = this.props.property.getSpecialProperty("supportsExternalLinks");
-      const supportsLinks = this.props.property.getSpecialProperty("supportsLinks");
-      const supportsQuote = this.props.property.getSpecialProperty("supportsQuote");
-      const supportsRichClasses = this.props.property.getSpecialProperty("supportsRichClasses");
-      const supportedRichClasses = this.props.property.getSpecialProperty("supportedRichClasses");
-      const supportsTitle = this.props.property.getSpecialProperty("supportsTitle");
-      const supportsCustomStyles = this.props.property.getSpecialProperty("supportsCustomStyles");
-      const supportsTemplating = this.props.property.getSpecialProperty("supportsTemplating");
+      const supportsVideos = isRichText && !!this.props.property.getConfigValue("supportsVideos");
+      const supportsImages = supportsMedia && !!this.props.property.getConfigValue("supportsImages");
+      const supportsFiles = supportsMedia && !!this.props.property.getConfigValue("supportsFiles");
+      const supportsContainers = this.props.property.getConfigValue("supportsContainers");
+      const supportedContainers = this.props.property.getConfigValue("supportedContainers");
+      const supportsTables = this.props.property.getConfigValue("supportsTables");
+      const supportedTables = this.props.property.getConfigValue("supportedTables");
+      const supportsLists = this.props.property.getConfigValue("supportsLists");
+      const supportsCustom = this.props.property.getConfigValue("supportsCustom");
+      const supportedCustoms = this.props.property.getConfigValue("supportedCustoms");
+      const supportsExternalLinks = this.props.property.getConfigValue("supportsExternalLinks");
+      const supportsLinks = this.props.property.getConfigValue("supportsLinks");
+      const supportsQuote = this.props.property.getConfigValue("supportsQuote");
+      const supportsRichClasses = this.props.property.getConfigValue("supportsRichClasses");
+      const supportedRichClasses = this.props.property.getConfigValue("supportedRichClasses");
+      const supportsTitle = this.props.property.getConfigValue("supportsTitle");
+      const supportsCustomStyles = this.props.property.getConfigValue("supportsCustomStyles");
+      const supportsTemplating = this.props.property.getConfigValue("supportsTemplating");
 
       features = {
         supportsFiles,

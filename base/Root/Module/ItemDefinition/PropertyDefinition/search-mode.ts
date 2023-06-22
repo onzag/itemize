@@ -543,12 +543,12 @@ export function buildSearchModePropertyDefinitions(
       id: PropertyDefinitionSearchInterfacesPrefixes.RADIUS + newPropDef.id,
       min: 1,
       maxDecimalCount: 2,
-      max: (newPropDef.specialProperties && newPropDef.specialProperties["maxSearchRadius"]) as number || 1000,
-      specialProperties: {
-        unit: (newPropDef.specialProperties && newPropDef.specialProperties["searchRadiusUnit"]) as string || "km",
-        imperialUnit: (newPropDef.specialProperties && newPropDef.specialProperties["searchRadiusImperialUnit"]) as string || "mi",
+      max: (newPropDef.config && newPropDef.config["maxSearchRadius"]) as number || 1000,
+      config: {
+        unit: (newPropDef.config && newPropDef.config["searchRadiusUnit"]) as string || "km",
+        imperialUnit: (newPropDef.config && newPropDef.config["searchRadiusImperialUnit"]) as string || "mi",
         lockUnitsToPrimaries: true,
-        initialPrefill: (newPropDef.specialProperties && newPropDef.specialProperties["searchRadiusInitialPrefill"]) as number || 100,
+        initialPrefill: (newPropDef.config && newPropDef.config["searchRadiusInitialPrefill"]) as number || 100,
       },
       nullable: true,
       invalidIf: [

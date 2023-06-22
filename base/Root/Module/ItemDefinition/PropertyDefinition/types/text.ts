@@ -72,7 +72,7 @@ const typeValue: IPropertyDefinitionSupportedType<IPropertyDefinitionSupportedTe
     });
   },
   supportedSubtypes: ["html", "plain"],
-  specialProperties: [
+  configOptions: [
     {
       name: "mediaProperty",
       type: "string",

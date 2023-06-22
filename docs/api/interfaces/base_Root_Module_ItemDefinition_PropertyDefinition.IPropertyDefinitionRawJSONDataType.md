@@ -45,7 +45,7 @@ this is what a raw property definition looks like
 - [searchOnlyProperty](base_Root_Module_ItemDefinition_PropertyDefinition.IPropertyDefinitionRawJSONDataType.md#searchonlyproperty)
 - [searchable](base_Root_Module_ItemDefinition_PropertyDefinition.IPropertyDefinitionRawJSONDataType.md#searchable)
 - [softReadRoleAccess](base_Root_Module_ItemDefinition_PropertyDefinition.IPropertyDefinitionRawJSONDataType.md#softreadroleaccess)
-- [specialProperties](base_Root_Module_ItemDefinition_PropertyDefinition.IPropertyDefinitionRawJSONDataType.md#specialproperties)
+- [config](base_Root_Module_ItemDefinition_PropertyDefinition.IPropertyDefinitionRawJSONDataType.md#config)
 - [subtype](base_Root_Module_ItemDefinition_PropertyDefinition.IPropertyDefinitionRawJSONDataType.md#subtype)
 - [type](base_Root_Module_ItemDefinition_PropertyDefinition.IPropertyDefinitionRawJSONDataType.md#type)
 - [unique](base_Root_Module_ItemDefinition_PropertyDefinition.IPropertyDefinitionRawJSONDataType.md#unique)
@@ -490,9 +490,9 @@ denying the entire access to the resource
 
 ___
 
-### specialProperties
+### config
 
-• `Optional` **specialProperties**: `Object`
+• `Optional` **config**: `Object`
 
 Special properties that are assigned in the type behaviour
 description, you set the value here

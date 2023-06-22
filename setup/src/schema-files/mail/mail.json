@@ -82,7 +82,7 @@
             "type": "text",
             "subtype": "html",
             "nullable": true,
-            "specialProperties": {
+            "config": {
                 "mediaProperty": "cid_attachments",
                 "supportsImages": true,
                 "supportsVideos": false,
@@ -105,7 +105,7 @@
         {
             "id": "cid_attachments",
             "type": "files",
-            "specialProperties": {
+            "config": {
                 "smallDimension": "320x",
                 "mediumDimension": "640x",
                 "largeDimension": "1024x"
@@ -118,7 +118,7 @@
         {
             "id": "attachments",
             "type": "files",
-            "specialProperties": {
+            "config": {
                 "smallDimension": "320x",
                 "mediumDimension": "640x",
                 "largeDimension": "1024x"

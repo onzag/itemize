@@ -156,10 +156,10 @@ be defined in the json form
 | `properties.softReadRoleAccess.items` | `Object` |
 | `properties.softReadRoleAccess.items.type` | `string` |
 | `properties.softReadRoleAccess.type` | `string` |
-| `properties.specialProperties` | `Object` |
-| `properties.specialProperties.additionalProperties` | `boolean` |
-| `properties.specialProperties.properties` | `Object` |
-| `properties.specialProperties.type` | `string` |
+| `properties.config` | `Object` |
+| `properties.config.additionalProperties` | `boolean` |
+| `properties.config.properties` | `Object` |
+| `properties.config.type` | `string` |
 | `properties.subtype` | `Object` |
 | `properties.subtype.type` | `string` |
 | `properties.type` | `Object` |

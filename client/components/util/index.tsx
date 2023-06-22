@@ -66,7 +66,7 @@ export function imageSrcSetRetriever(
 
     // now we need the special dimensions property that contains all our dimensions
     // with identifiers
-    const dimensions = property.getSpecialProperty("dimensions") as string;
+    const dimensions = property.getConfigValue("dimensions") as string;
 
     // of course if we have such property value
     if (dimensions) {
@@ -115,7 +115,7 @@ export function imageSrcSetRetriever(
 
     // now we get the small dimension, which always should be available
     // for images
-    const smallDimension = property.getSpecialProperty("smallDimension") as string;
+    const smallDimension = property.getConfigValue("smallDimension") as string;
     const smallDimensionW = parseInt(smallDimension.trim().split("x")[0]);
     if (!isNaN(smallDimensionW)) {
       srcset.push(sizes.imageSmallSizeURL + " " + smallDimensionW + "w");
@@ -127,7 +127,7 @@ export function imageSrcSetRetriever(
     }
 
     // the medium dimension
-    const mediumDimension = property.getSpecialProperty("mediumDimension") as string;
+    const mediumDimension = property.getConfigValue("mediumDimension") as string;
     const mediumDimensionW = parseInt(mediumDimension.trim().split("x")[0]);
     if (!isNaN(mediumDimensionW)) {
       srcset.push(sizes.imageMediumSizeURL + " " + mediumDimensionW + "w");
@@ -139,7 +139,7 @@ export function imageSrcSetRetriever(
     }
 
     // and the large dimension
-    const largeDimension = property.getSpecialProperty("largeDimension") as string;
+    const largeDimension = property.getConfigValue("largeDimension") as string;
     const largeDimensionW = parseInt(largeDimension.trim().split("x")[0]);
     let largeDimensionUsedW: number;
     if (!isNaN(largeDimensionW)) {

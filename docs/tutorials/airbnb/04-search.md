@@ -241,7 +241,7 @@ Go to your schema to change the way your search schema interacts at `schema/host
 {
     "id": "address",
     "type": "location",
-    "specialProperties": {
+    "config": {
         "maxSearchRadius": 100,
         "searchRadiusInitialPrefill": 50,
         "searchRadiusUnit": "km",

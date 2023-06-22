@@ -39,7 +39,7 @@ import { IIncludeRawJSONDataType } from "../base/Root/Module/ItemDefinition/Incl
 import { IPropertiesValueMappingDefinitonRawJSONDataType } from "../base/Root/Module/ItemDefinition/PropertiesValueMappingDefiniton";
 import { PropertyDefinitionSearchInterfacesType } from "../base/Root/Module/ItemDefinition/PropertyDefinition/search-interfaces";
 import Module from "../base/Root/Module";
-import { ajvCheck, checkSpecialPropertyValueSetSchemaValidate } from "./schema-checks";
+import { ajvCheck, checkConfigValueSetSchemaValidate } from "./schema-checks";
 import { languages } from "../imported-resources";
 import type { IConfigRawJSONDataType } from "../config";
 
@@ -1075,57 +1075,57 @@ export function checkPropertyDefinition(
   }
 
   // check special properties are set
-  if (propertyDefintionTypeStandard.specialProperties) {
-    propertyDefintionTypeStandard.specialProperties.forEach((property) => {
+  if (propertyDefintionTypeStandard.configOptions) {
+    propertyDefintionTypeStandard.configOptions.forEach((property) => {
       const isRequired = property.required === true || (
         Array.isArray(property.required) && property.required.includes(rawData.subtype || null)
       );
-      if (isRequired && !rawData.specialProperties) {
+      if (isRequired && !rawData.config) {
         throw new CheckUpError(
-          `type '${rawData.type}' requires specialProperties field for '${property.name}'`,
+          `type '${rawData.type}' requires config field for '${property.name}'`,
           traceback,
         );
-      } else if (isRequired && typeof rawData.specialProperties[property.name] === "undefined") {
+      } else if (isRequired && typeof rawData.config[property.name] === "undefined") {
         throw new CheckUpError(
-          `type '${rawData.type}' requires special property '${property.name}'`,
-          traceback.newTraceToBit("specialProperties"),
+          `type '${rawData.type}' requires config field '${property.name}'`,
+          traceback.newTraceToBit("config"),
         );
       } else if (
-        rawData.specialProperties &&
-        rawData.specialProperties[property.name] &&
+        rawData.config &&
+        rawData.config[property.name] &&
         property.type !== "any"
       ) {
         if (
           property.type !== "property-set" &&
           !property.type.startsWith("array-") &&
-          typeof rawData.specialProperties[property.name] !== property.type
+          typeof rawData.config[property.name] !== property.type
         ) {
           throw new CheckUpError(
-            `Invalid type for '${rawData.type}' special property '${property.name}' must be '${property.type}'`,
-            traceback.newTraceToBit("specialProperties").newTraceToBit(property.name),
+            `Invalid type for '${rawData.type}' config field '${property.name}' must be '${property.type}'`,
+            traceback.newTraceToBit("config").newTraceToBit(property.name),
           );
         } else if (property.type.startsWith("array-")) {
           const expectedType = property.type.substr(6);
-          if (!Array.isArray(rawData.specialProperties[property.name])) {
+          if (!Array.isArray(rawData.config[property.name])) {
             throw new CheckUpError(
-              `Invalid type for '${rawData.type}' special property '${property.name}' must be '${property.type}'`,
-              traceback.newTraceToBit("specialProperties").newTraceToBit(property.name),
+              `Invalid type for '${rawData.type}' config field '${property.name}' must be '${property.type}'`,
+              traceback.newTraceToBit("config").newTraceToBit(property.name),
             );
           }
 
-          rawData.specialProperties[property.name].forEach((v: any, index: number) => {
+          rawData.config[property.name].forEach((v: any, index: number) => {
             if (typeof v !== expectedType) {
               throw new CheckUpError(
-                `Invalid type for '${rawData.type}' special property '${property.name}' must be '${property.type}' but one found not to match`,
-                traceback.newTraceToBit("specialProperties").newTraceToBit(property.name).newTraceToBit(index),
+                `Invalid type for '${rawData.type}' config field '${property.name}' must be '${property.type}' but one found not to match`,
+                traceback.newTraceToBit("config").newTraceToBit(property.name).newTraceToBit(index),
               );
             }
           });
         } else if (property.type === "property-set") {
           ajvCheck(
-            checkSpecialPropertyValueSetSchemaValidate,
-            rawData.specialProperties[property.name],
-            traceback.newTraceToBit("specialProperties").newTraceToBit(property.name),
+            checkConfigValueSetSchemaValidate,
+            rawData.config[property.name],
+            traceback.newTraceToBit("config").newTraceToBit(property.name),
           );
         }
       }

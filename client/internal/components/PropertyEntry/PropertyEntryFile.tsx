@@ -297,7 +297,7 @@ export default class PropertyEntryFile
     value: PropertyDefinitionSupportedFileType,
   ) {
     const accept = processAccepts(
-      acceptOverride || this.props.property.getSpecialProperty("accept") as string,
+      acceptOverride || this.props.property.getConfigValue("accept") as string,
       isExpectingImages,
     );
 
@@ -346,12 +346,12 @@ export default class PropertyEntryFile
       value.metadata = ";;" + info.extraMetadata;
     }
 
-    const isExpectingImages = !!this.props.property.getSpecialProperty("imageUploader") || info.expectImage;
+    const isExpectingImages = !!this.props.property.getConfigValue("imageUploader") || info.expectImage;
 
     if (isExpectingImages || value.type.startsWith("image")) {
       const img = new Image();
       img.onload = () => {
-        const dimensions: string = this.props.property.getSpecialProperty("dimensions") || "";
+        const dimensions: string = this.props.property.getConfigValue("dimensions") || "";
         const dimensionNames = dimensions.split(";").map((d) => d.trim().split(" ")[0]);
         value.metadata = img.width + "x" + img.height + ";" + dimensionNames.join(",");
 
@@ -439,9 +439,9 @@ export default class PropertyEntryFile
     const imageSizes = isSupportedImage ? imageSizeRetriever(currentValue) : null;
     const imageSrcSet = isSupportedImage ? imageSrcSetRetriever(currentValue, this.props.property, imageSizes) : null;
 
-    const isExpectingImages = !!this.props.property.getSpecialProperty("imageUploader");
+    const isExpectingImages = !!this.props.property.getConfigValue("imageUploader");
     const accept = processAccepts(
-      this.props.property.getSpecialProperty("accept") as string,
+      this.props.property.getConfigValue("accept") as string,
       isExpectingImages
     );
 

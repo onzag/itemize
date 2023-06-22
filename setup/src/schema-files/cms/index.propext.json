@@ -3,7 +3,7 @@
         "id": "content",
         "type": "text",
         "subtype": "html",
-        "specialProperties": {
+        "config": {
             "mediaProperty": "attachments",
             "supportsImages": true,
             "supportsVideos": true,
@@ -24,7 +24,7 @@
     {
         "id": "attachments",
         "type": "files",
-        "specialProperties": {
+        "config": {
             "smallDimension": "320x",
             "mediumDimension": "640x",
             "largeDimension": "1024x"

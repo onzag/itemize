@@ -19,7 +19,7 @@
         {
             "id": "summary_image",
             "type": "file",
-            "specialProperties": {
+            "config": {
                 "imageUploader": true,
                 "smallDimension": "128x",
                 "mediumDimension": "256x",
