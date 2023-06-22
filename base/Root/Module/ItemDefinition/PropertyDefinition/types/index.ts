@@ -118,8 +118,18 @@ export interface IElasticSearchInfo extends ISQLArgInfo {
 }
 
 export interface IElasticHighlightReply {
-  [highlightName: string]: {
+  /**
+   * The eleasticsearch field that will be highlighted
+   */
+  [fieldName: string]: {
+    /**
+     * The name of the original property that is being highlighted
+     * with its given prefix if it's from an include
+     */
     name: string;
+    /**
+     * Whatever we are matching it against
+     */
     match: string;
   }
 }

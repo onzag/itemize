@@ -399,7 +399,7 @@ export async function getItemDefinitionList(
     });
 
     const highlightKeys = Object.keys(rHighReply);
-    resultQuery.setHighlightsOn(highlightKeys);
+    resultQuery.setHighlightsOn(rHighReply);
 
     const result = await appData.elastic.executeQuery(resultQuery);
     const highlightsJSON: IElasticHighlightRecordInfo = {};
@@ -679,7 +679,7 @@ export async function getModuleList(
     });
 
     const highlightKeys = Object.keys(rHighReply);
-    resultQuery.setHighlightsOn(highlightKeys);
+    resultQuery.setHighlightsOn(rHighReply);
 
     const result = await appData.elastic.executeQuery(resultQuery);
     const highlightsJSON: IElasticHighlightRecordInfo = {};

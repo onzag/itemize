@@ -262,8 +262,13 @@ export async function searchModule(
     }
   }
 
+  const dictionary = getDictionary(appData, resolverArgs.args);
+
   let elasticQuery: ElasticQueryBuilder;
   let queryModel: SelectBuilder;
+
+  const limit: number = resolverArgs.args.limit;
+  const offset: number = resolverArgs.args.offset;
 
   // now we build the search query, the search query only matches an id
   // note how we remove blocked_at
@@ -375,6 +380,26 @@ export async function searchModule(
         groupId: "PARENT",
       });
     }
+
+    const rHighReply = buildElasticQueryForModule(
+      appData.cache.getServerData(),
+      appData,
+      mod,
+      resolverArgs.args,
+      elasticQuery,
+      resolverArgs.args.language,
+      dictionary,
+      resolverArgs.args.search,
+      resolverArgs.args.order_by,
+    );
+
+    elasticQuery.setSourceIncludes(sqlFieldsToRequest);
+    elasticQuery.setSize(limit);
+
+    // set the highlight keys only the columns that will be highlighted
+    if (traditional) {
+      elasticQuery.setHighlightsOn(rHighReply);
+    }
   } else {
     queryModel = appData.databaseConnection.getSelectBuilder();
     queryModel.fromBuilder.from(mod.getQualifiedPathName());
@@ -440,6 +465,26 @@ export async function searchModule(
       `"type" = ANY(ARRAY[${typesToResolveFor.map(() => "?").join(",")}]::TEXT[])`,
       typesToResolveFor,
     );
+
+    // now we build the sql query for the module
+    const addedSearchRaw = buildSQLQueryForModule(
+      appData.cache.getServerData(),
+      appData,
+      mod,
+      resolverArgs.args,
+      queryModel.whereBuilder,
+      queryModel.orderByBuilder,
+      resolverArgs.args.language,
+      dictionary,
+      resolverArgs.args.search,
+      resolverArgs.args.order_by,
+    );
+
+    queryModel.select(...sqlFieldsToRequest);
+    addedSearchRaw.forEach((srApplyArgs) => {
+      queryModel.selectExpression(srApplyArgs[0], srApplyArgs[1]);
+    });
+    queryModel.limit(limit).offset(offset);
   }
 
   let metadata: string = null;
@@ -453,8 +498,6 @@ export async function searchModule(
 
   const pathOfThisModule = mod.getPath().join("/");
   const moduleTrigger = appData.triggers.module.search[pathOfThisModule];
-
-  const dictionary = getDictionary(appData, resolverArgs.args);
 
   if (moduleTrigger) {
     await moduleTrigger({
@@ -483,8 +526,6 @@ export async function searchModule(
     });
   }
 
-  const limit: number = resolverArgs.args.limit;
-  const offset: number = resolverArgs.args.offset;
   let highlights: string = null;
 
   let baseResult: ISQLTableRowValue[] = [];
@@ -494,28 +535,6 @@ export async function searchModule(
   let sqlResponse: ISQLTableRowValue[] = null;
 
   if (usesElastic) {
-    const rHighReply = buildElasticQueryForModule(
-      appData.cache.getServerData(),
-      appData,
-      mod,
-      resolverArgs.args,
-      elasticQuery,
-      resolverArgs.args.language,
-      dictionary,
-      resolverArgs.args.search,
-      resolverArgs.args.order_by,
-    );
-
-    elasticQuery.setSourceIncludes(sqlFieldsToRequest);
-    elasticQuery.setSize(limit);
-
-    let highlightKeys: string[] = null;
-    // set the highlight keys only the columns that will be highlighted
-    if (traditional) {
-      highlightKeys = Object.keys(rHighReply);
-      elasticQuery.setHighlightsOn(highlightKeys);
-    }
-
     const requestBaseResult = (
       generalFields.results ||
       generalFields.records ||
@@ -528,6 +547,8 @@ export async function searchModule(
     // we have the count from here anyway
     if (requestBaseResult) {
       elasticResponse = await appData.elastic.executeQuery(elasticQuery);
+      const highlightInfo = elasticQuery.getHighlightInfo();
+      const highlightKeys = Object.keys(highlightInfo);
       const highlightsJSON: IElasticHighlightRecordInfo = {};
       if (typeof elasticResponse.hits.total === "number") {
         count = elasticResponse.hits.total;
@@ -538,15 +559,20 @@ export async function searchModule(
         highlightsJSON[r._id] = {};
         if (traditional) {
           highlightKeys.forEach((highlightNameOriginal) => {
-            const originalMatch = rHighReply[highlightNameOriginal];
+            const originalMatch = highlightInfo[highlightNameOriginal];
+            // record id, original name of the given property with the prefixed include
             highlightsJSON[r._id][originalMatch.name] = {
+              // the array of highlighted matches
               highlights: (r.highlight && r.highlight[highlightNameOriginal]) || null,
+              // what was originally matched for
               match: originalMatch.match,
             }
           });
         }
         return r._source;
       });
+
+      // setting the highlights
       if (traditional) {
         highlights = JSON.stringify(highlightsJSON);
       }
@@ -555,26 +581,6 @@ export async function searchModule(
       count = result.count;
     }
   } else {
-    // now we build the sql query for the module
-    const addedSearchRaw = buildSQLQueryForModule(
-      appData.cache.getServerData(),
-      appData,
-      mod,
-      resolverArgs.args,
-      queryModel.whereBuilder,
-      queryModel.orderByBuilder,
-      resolverArgs.args.language,
-      dictionary,
-      resolverArgs.args.search,
-      resolverArgs.args.order_by,
-    );
-
-    queryModel.select(...sqlFieldsToRequest);
-    addedSearchRaw.forEach((srApplyArgs) => {
-      queryModel.selectExpression(srApplyArgs[0], srApplyArgs[1]);
-    });
-    queryModel.limit(limit).offset(offset);
-
     // return using the base result, and only using the id
     const requestBaseResult = (
       generalFields.results ||
@@ -785,7 +791,7 @@ export async function searchModule(
 
       (async () => {
         try {
-          const detachedArgs = {...args};
+          const detachedArgs = { ...args };
           detachedArgs.action = SearchTriggerActions.SEARCHED;
           await moduleTrigger(detachedArgs);
         } catch (err) {
@@ -863,7 +869,7 @@ export async function searchModule(
 
       (async () => {
         try {
-          const detachedArgs = {...args};
+          const detachedArgs = { ...args };
           detachedArgs.action = SearchTriggerActions.SEARCHED;
           await moduleTrigger(detachedArgs);
         } catch (err) {
@@ -1135,6 +1141,10 @@ export async function searchItemDefinition(
     let elasticQuery: ElasticQueryBuilder;
     let queryModel: SelectBuilder;
 
+    const dictionary = getDictionary(appData, resolverArgs.args);
+    const limit: number = resolverArgs.args.limit;
+    const offset: number = resolverArgs.args.offset;
+  
     // now we build the search query
     if (usesElastic) {
       elasticQuery = appData.elastic.getSelectBuilder(
@@ -1203,7 +1213,7 @@ export async function searchItemDefinition(
           groupId: "VERSION",
         });
       }
-  
+
       if (typeof resolverArgs.args.ids_filter !== "undefined") {
         elasticQuery.mustTerms({
           id: resolverArgs.args.ids_filter
@@ -1211,7 +1221,7 @@ export async function searchItemDefinition(
           groupId: "IDS",
         });
       }
-  
+
       if (typeof resolverArgs.args.ids_filter_out !== "undefined") {
         elasticQuery.mustNotTerms({
           id: resolverArgs.args.ids_filter_out
@@ -1234,6 +1244,26 @@ export async function searchItemDefinition(
         }, {
           groupId: "PARENT",
         });
+      }
+
+      const rHighReply = buildElasticQueryForItemDefinition(
+        appData.cache.getServerData(),
+        appData,
+        itemDefinition,
+        resolverArgs.args,
+        elasticQuery,
+        resolverArgs.args.language,
+        dictionary,
+        resolverArgs.args.search,
+        resolverArgs.args.order_by,
+      );
+
+      elasticQuery.setSourceIncludes(sqlFieldsToRequest);
+      elasticQuery.setFrom(offset);
+      elasticQuery.setSize(limit);
+
+      if (traditional) {
+        elasticQuery.setHighlightsOn(rHighReply);
       }
 
     } else {
@@ -1264,14 +1294,14 @@ export async function searchItemDefinition(
       if (typeof resolverArgs.args.version_filter_out !== "undefined") {
         queryModel.whereBuilder.andWhereColumn("version", "!=", resolverArgs.args.version_filter || "");
       }
-  
+
       if (typeof resolverArgs.args.ids_filter !== "undefined") {
         queryModel.whereBuilder.andWhere(
           `"id" = ANY(ARRAY[${resolverArgs.args.ids_filter.map(() => "?").join(",")}]::TEXT[])`,
           resolverArgs.args.ids_filter,
         );
       }
-  
+
       if (typeof resolverArgs.args.ids_filter_out !== "undefined") {
         queryModel.whereBuilder.andWhere(
           `"id" != ANY(ARRAY[${resolverArgs.args.ids_filter_out.map(() => "?").join(",")}]::TEXT[])`,
@@ -1288,6 +1318,25 @@ export async function searchItemDefinition(
         queryModel.whereBuilder
           .andWhereColumn("parent_type", resolverArgs.args.parent_type);
       }
+
+      const addedSearchRaw = buildSQLQueryForItemDefinition(
+        appData.cache.getServerData(),
+        appData,
+        itemDefinition,
+        resolverArgs.args,
+        queryModel.whereBuilder,
+        queryModel.orderByBuilder,
+        resolverArgs.args.language,
+        dictionary,
+        resolverArgs.args.search,
+        resolverArgs.args.order_by,
+      );
+
+      queryModel.select(...sqlFieldsToRequest);
+      addedSearchRaw.forEach((srApplyArgs) => {
+        queryModel.selectExpression(srApplyArgs[0], srApplyArgs[1]);
+      });
+      queryModel.limit(limit).offset(offset);
     }
 
 
@@ -1304,8 +1353,6 @@ export async function searchItemDefinition(
     const moduleTrigger = appData.triggers.module.search[pathOfThisModule];
     const pathOfThisIdef = itemDefinition.getAbsolutePath().join("/");
     const idefTrigger = appData.triggers.item.search[pathOfThisIdef];
-
-    const dictionary = getDictionary(appData, resolverArgs.args);
 
     if (moduleTrigger || idefTrigger) {
       const args: ISearchTriggerArgType = {
@@ -1346,35 +1393,11 @@ export async function searchItemDefinition(
     let count: number = 0;
     let baseResult: ISQLTableRowValue[] = [];
     let highlights: string = null;
-    const limit: number = resolverArgs.args.limit;
-    const offset: number = resolverArgs.args.offset;
 
     let elasticResponse: SearchResponse = null;
     let sqlResponse: ISQLTableRowValue[] = null;
 
     if (usesElastic) {
-      const rHighReply = buildElasticQueryForItemDefinition(
-        appData.cache.getServerData(),
-        appData,
-        itemDefinition,
-        resolverArgs.args,
-        elasticQuery,
-        resolverArgs.args.language,
-        dictionary,
-        resolverArgs.args.search,
-        resolverArgs.args.order_by,
-      );
-
-      elasticQuery.setSourceIncludes(sqlFieldsToRequest);
-      elasticQuery.setFrom(offset);
-      elasticQuery.setSize(limit);
-
-      let highlightKeys: string[] = null;
-      if (traditional) {
-        highlightKeys = Object.keys(rHighReply);
-        elasticQuery.setHighlightsOn(highlightKeys);
-      }
-
       // need the records for any of these
       const requestBaseResult = (
         generalFields.results ||
@@ -1389,6 +1412,9 @@ export async function searchItemDefinition(
       if (requestBaseResult) {
         elasticResponse = await appData.elastic.executeQuery(elasticQuery);
         const highlightsJSON: IElasticHighlightRecordInfo = {};
+        const highlightInfo = elasticQuery.getHighlightInfo();
+        const highlightKeys = Object.keys(highlightInfo);
+
         if (typeof elasticResponse.hits.total === "number") {
           count = elasticResponse.hits.total;
         } else {
@@ -1398,7 +1424,7 @@ export async function searchItemDefinition(
           highlightsJSON[r._id] = {};
           if (traditional) {
             highlightKeys.forEach((highlightNameOriginal) => {
-              const originalMatch = rHighReply[highlightNameOriginal];
+              const originalMatch = highlightInfo[highlightNameOriginal];
               highlightsJSON[r._id][originalMatch.name] = {
                 highlights: (r.highlight && r.highlight[highlightNameOriginal]) || null,
                 match: originalMatch.match,
@@ -1415,25 +1441,6 @@ export async function searchItemDefinition(
         count = result.count;
       }
     } else {
-      const addedSearchRaw = buildSQLQueryForItemDefinition(
-        appData.cache.getServerData(),
-        appData,
-        itemDefinition,
-        resolverArgs.args,
-        queryModel.whereBuilder,
-        queryModel.orderByBuilder,
-        resolverArgs.args.language,
-        dictionary,
-        resolverArgs.args.search,
-        resolverArgs.args.order_by,
-      );
-
-      queryModel.select(...sqlFieldsToRequest);
-      addedSearchRaw.forEach((srApplyArgs) => {
-        queryModel.selectExpression(srApplyArgs[0], srApplyArgs[1]);
-      });
-      queryModel.limit(limit).offset(offset);
-
       // return using the base result, and only using the id
       const requestBaseResult = (
         generalFields.results ||
@@ -1613,21 +1620,21 @@ export async function searchItemDefinition(
           results: finalResult,
           sqlResponse,
         };
-  
+
         if (moduleTrigger) {
           await moduleTrigger(args);
         }
         if (idefTrigger) {
           await idefTrigger(args);
         }
-  
+
         if (metadata !== finalResult.metadata) {
           finalResult.metadata = metadata;
         }
-  
+
         (async () => {
           try {
-            const detachedArgs = {...args};
+            const detachedArgs = { ...args };
             detachedArgs.action = SearchTriggerActions.SEARCHED;
             if (moduleTrigger) {
               await moduleTrigger(detachedArgs);
@@ -1697,21 +1704,21 @@ export async function searchItemDefinition(
           results: null,
           sqlResponse,
         };
-  
+
         if (moduleTrigger) {
           await moduleTrigger(args);
         }
         if (idefTrigger) {
           await idefTrigger(args);
         }
-  
+
         if (metadata !== finalResult.metadata) {
           finalResult.metadata = metadata;
         }
-  
+
         (async () => {
           try {
-            const detachedArgs = {...args};
+            const detachedArgs = { ...args };
             detachedArgs.action = SearchTriggerActions.SEARCHED;
             if (moduleTrigger) {
               await moduleTrigger(detachedArgs);

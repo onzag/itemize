@@ -12,6 +12,7 @@ import { CAN_LOG_DEBUG, INSTANCE_UUID } from "./environment";
 import { NanoSecondComposedDate } from "../nanodate";
 import { AggregationsAggregationContainer, FieldValue, QueryDslMatchPhraseQuery, QueryDslMatchQuery, QueryDslQueryContainer, QueryDslTermQuery, QueryDslTermsQuery, SearchRequest } from "@elastic/elasticsearch/lib/api/types";
 import { setInterval } from "timers";
+import type { IElasticHighlightReply } from "../base/Root/Module/ItemDefinition/PropertyDefinition/types";
 
 interface ElasticRequestOptions {
   ignoreAllInGroup?: boolean | string | string[];
@@ -22,6 +23,7 @@ interface ElasticRequestOptions {
   ignoreAllInPropertyIdOnlyAggs?: boolean | string | string[];
   ignoreUniqueId?: boolean | string | string[];
   onlyAggregations?: boolean;
+  noHighlights?: boolean;
   ignoresDoNotApplyToAggregations?: boolean;
 };
 
@@ -2304,6 +2306,7 @@ function ignoreChecker(c: IElasticChildrenRule, options: ElasticRequestOptions, 
 export class ElasticQueryBuilder {
   public request: SearchRequest;
   private children: IElasticChildrenRule[] = [];
+  private highlights: IElasticHighlightReply = {};
 
   constructor(request: SearchRequest) {
     this.request = request;
@@ -2352,6 +2355,15 @@ export class ElasticQueryBuilder {
           if (cRequest.query && Object.keys(cRequest.query).length !== 0) {
             resultRequest.query.bool[c.type].push(cRequest.query);
           }
+
+          if (!options.noHighlights && cRequest.highlight && cRequest.highlight.fields) {
+            resultRequest.highlight = resultRequest.highlight || {
+              fields: {},
+            }
+            Object.keys(cRequest.highlight.fields).forEach((highlightKey) => {
+              resultRequest.highlight.fields[highlightKey] = cRequest.highlight.fields[highlightKey];
+            });
+          }
         } else {
           let queryToUse = c.q;
           if (typeof c.boost === "number") {
@@ -2395,6 +2407,19 @@ export class ElasticQueryBuilder {
         }
       }
     });
+
+    if (!options.noHighlights && this.highlights && Object.keys(this.highlights).length !== 0) {
+      resultRequest.highlight = resultRequest.highlight || {
+        fields: {},
+      }
+      Object.keys(this.highlights).forEach((highlightKey) => {
+        resultRequest.highlight.fields[highlightKey] = {
+          fragment_size: 1,
+          pre_tags: "",
+          post_tags: ""
+        } as any;
+      });
+    }
 
     if (options.onlyAggregations) {
       resultRequest.size = 0;
@@ -2630,20 +2655,42 @@ export class ElasticQueryBuilder {
     }
   }
 
-  public setHighlightsOn(fields: string[]) {
+  public setHighlightsOn(reply: IElasticHighlightReply) {
+    const fields = Object.keys(reply);
     if (fields && fields.length) {
-      this.request.highlight = this.request.highlight || {
-        fields: {},
-      }
-
       fields.forEach((f) => {
-        this.request.highlight.fields[f] = {
-          fragment_size: 1,
-          pre_tags: "",
-          post_tags: ""
-        } as any;
+        this.highlights[f] = reply[f];
       });
     }
+  }
+
+  public getHighlightInfo(options: ElasticRequestOptions = {}) {
+    if (options.noHighlights) {
+      return {};
+    }
+
+    const baseHighlights = {...this.highlights};
+
+    this.children && this.children.forEach((c) => {
+      if (
+        ignoreChecker(c, options, "ignoreAllInGroup", "groupId", false, false) ||
+        ignoreChecker(c, options, "ignoreAllInPropertyId", "propertyId", false, false) ||
+        ignoreChecker(c, options, "ignoreUniqueId", "uniqueId", false, false) ||
+        ignoreChecker(c, options, "ignoreAllInGroupOnlyAggs", "groupId", true, false) ||
+        ignoreChecker(c, options, "ignoreAllInPropertyIdOnlyAggs", "propertyId", true, false) ||
+        ignoreChecker(c, options, "ignoreAllInGroupOnlyQuery", "groupId", false, true) ||
+        ignoreChecker(c, options, "ignoreAllInPropertyIdOnlyQuery", "propertyId", false, true)
+      ) {
+        return;
+      }
+
+      if (!c.agg && c.builder) {
+        const addedHighlights = c.builder.getHighlightInfo(options);
+        Object.assign(baseHighlights, addedHighlights);
+      }
+    });
+  
+    return baseHighlights;
   }
 
   public getAllChildrenForGroupId(id: string): IElasticChildrenRule[] {
@@ -2750,9 +2797,14 @@ export class ElasticQueryBuilder {
     this.children = this.children.filter((f) => !f.agg);
   }
 
+  public removeHighlights() {
+    this.highlights = {};
+  }
+
   public clone(): ElasticQueryBuilder {
     const r = new ElasticQueryBuilder(copy(this.request));
     r.children = [...this.children];
+    r.highlights = this.highlights;
     return r;
   }
 }

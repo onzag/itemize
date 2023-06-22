@@ -252,7 +252,8 @@ export function textSQLSearch(arg: ISQLSearchInfo): boolean | [string, any[]] {
   const searchName = PropertyDefinitionSearchInterfacesPrefixes.SEARCH + arg.prefix + arg.id;
 
   if (typeof arg.args[searchName] !== "undefined" && arg.args[searchName] !== null) {
-    // TODO improve, this only matches exact words
+    // this only matches exact words
+    // for better results you should use the search engine method
     arg.whereBuilder.andWhere(
       JSON.stringify(arg.prefix + arg.id + "_VECTOR") + " @@ plainto_tsquery(" + JSON.stringify(arg.prefix + arg.id + "_DICTIONARY") + ", ?)",
       [
