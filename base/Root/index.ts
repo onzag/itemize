@@ -37,11 +37,6 @@ export interface ILangLocalesType {
   };
 }
 
-// export interface IPropertyRequestLimiter {
-//   id: string;
-//   values?: Array<string | boolean | 
-// }
-
 /**
  * The request limiters that are set in the module
  * to limit the requests and the form of these requests
@@ -53,7 +48,7 @@ export interface IRequestLimitersType {
   since?: number;
   createdBy?: boolean;
   parenting?: boolean;
-  properties?: string[];
+  custom?: string[];
 }
 
 export interface ICustomRoleManagerRoleStatus {
