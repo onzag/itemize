@@ -193,7 +193,14 @@ function wait(ms: number): Promise<void> {
  * regarding the schemas and whenever they had been last modified
  */
 interface IElasticIndexInformationType {
+  /**
+   * last date where the consistency check was ran
+   */
   lastConsistencyCheck: string;
+  /**
+   * signature usually created by the listeners
+   */
+  signature: string;
 }
 
 /**
@@ -291,7 +298,7 @@ export class ItemizeElasticClient {
         rootMod.getAllChildDefinitionsRecursive().forEach((cIdef) => {
           // add that t the list of all
           if (cIdef.isSearchEngineEnabled()) {
-            listOfItemDefOnly.push(cIdef.getQualifiedPathName()); 
+            listOfItemDefOnly.push(cIdef.getQualifiedPathName());
           }
         });
       });
@@ -643,6 +650,11 @@ export class ItemizeElasticClient {
     let currentMapping = await this.retrieveCurrentSchemaDefinition(wildcardName);
     const allIndexNames = currentMapping && Object.keys(currentMapping);
 
+    const idef = this.root.registry[qualifiedName] as ItemDefinition;
+    const signature = {
+      limiters: idef.getSearchLimiters(true),
+    }
+
     if (!indexInfo) {
       logger.info(
         {
@@ -656,6 +668,7 @@ export class ItemizeElasticClient {
         qualifiedName,
         {
           lastConsistencyCheck: null,
+          signature: JSON.stringify(signature),
         }
       );
 
@@ -705,6 +718,7 @@ export class ItemizeElasticClient {
           qualifiedName,
           {
             lastConsistencyCheck: null,
+            signature: JSON.stringify(signature),
           }
         );
         const indexNames = allIndexNames.join(",");
@@ -1053,39 +1067,41 @@ export class ItemizeElasticClient {
     );
 
     let statusInfo = knownStatusInfo || await this.retrieveIndexStatusInfo(qualifiedPathName);
-    if (!statusInfo) {
-      await this._rebuildIndexGroup(
-        qualifiedPathName,
-        this.rootSchema[qualifiedPathName],
-      );
-      statusInfo = {
-        lastConsistencyCheck: null,
+    const limiters = idef.getSearchLimiters(true);
+
+    // check that the status matches the correct signature during the first batch
+    if (batchNumber === 0) {
+      let currentSignature: any = null;
+      try {
+        currentSignature = statusInfo ? JSON.parse(statusInfo.signature) : null;
+      } catch {
+      }
+      const expectedSignature = {
+        limiters,
+      }
+
+      const equalSignature = equals(expectedSignature, currentSignature);
+
+      // it doesn't rebuild it up
+      if (!statusInfo || !equalSignature) {
+        await this._rebuildIndexGroup(
+          qualifiedPathName,
+          this.rootSchema[qualifiedPathName],
+        );
+        statusInfo = {
+          lastConsistencyCheck: null,
+          signature: JSON.stringify(expectedSignature),
+        }
       }
     }
 
     const baseIndexPrefix = qualifiedPathName.toLowerCase() + "_";
     const wildcardIndexName = baseIndexPrefix + "*";
 
-    const limitersModule = parentModuleEnabled && parentModule.getSearchLimiters();
-    const limitersSelf = selfEnabled && idef.getSearchLimiters();
-
-    const sinceModule = (limitersModule && limitersModule.condition === "AND" && limitersModule.since) || null;
-    const sinceSelf = (limitersSelf && limitersModule.condition === "AND" && limitersSelf.since) || null;
-
-    let maximumLimiter: number = null;
-    if (parentModuleEnabled && !selfEnabled) {
-      maximumLimiter = sinceModule;
-    } else if (selfEnabled && !parentModuleEnabled) {
-      maximumLimiter = sinceSelf;
-      // if one of them is null it means no limit
-    } else if (sinceModule !== null && sinceSelf !== null) {
-      maximumLimiter = sinceSelf > sinceModule ? sinceSelf : sinceModule;
-    }
-
     let minimumCreatedAt: string = null;
-    if (maximumLimiter && batchNumber === 0) {
+    if (limiters && limiters.since && batchNumber === 0) {
       // cannot retrieve anything before this date, we do not need any older records
-      const minimumCreatedAtAsDate = new Date(timeRan.getTime() - maximumLimiter);
+      const minimumCreatedAtAsDate = new Date(timeRan.getTime() - limiters.since);
       minimumCreatedAt = minimumCreatedAtAsDate.toISOString();
 
       if (batchNumber === 0) {
@@ -1161,10 +1177,11 @@ export class ItemizeElasticClient {
     }
 
     const expectedLanguageColumn = idef.getSearchEngineDynamicMainLanguageColumn();
+    const limitedColumns = idef.getSearchEngineLimitedColumns(limiters);
 
     // no last consistency check then we gotta retrieve the whole thing because
     // we want whole data this one round
-    const useModuleOnly = statusInfo.lastConsistencyCheck === null ? false : (
+    const useModuleOnly = limitedColumns.idef.length || statusInfo.lastConsistencyCheck === null ? false : (
       // otherwise it depends if we got a language column, it will depend on wether such column
       // is in the module, otherwise we can be free to use module only
       expectedLanguageColumn ? idef.isSearchEngineDynamicMainLanguageColumnInModule() : true
@@ -1187,21 +1204,24 @@ export class ItemizeElasticClient {
           // this is why we were using whole 2 tables
           selecter.selectAll();
         } else {
+          let columnsToSelect: string[] = ["id", "version", "last_modified"];
           if (expectedLanguageColumn) {
-            // otherwise we assume our data isn't corrupted, and just select what
-            // we need making a minimal query
-            selecter.select("id", "version", "last_modified", expectedLanguageColumn);
-          } else {
-            selecter.select("id", "version", "last_modified");
+            columnsToSelect.push(expectedLanguageColumn);
           }
+          if (limitedColumns.idef) {
+            limitedColumns.idef.forEach((p) => columnsToSelect.push(p));
+          }
+          if (limitedColumns.mod) {
+            limitedColumns.mod.forEach((p) => columnsToSelect.push(p));
+          }
+          // otherwise we assume our data isn't corrupted, and just select what
+          // we need making a minimal query
+          selecter.select(...columnsToSelect);
         }
 
         // now we can decide what we select for
         // maybe it is everything, kind of scary
         const whereBuilder = selecter.whereBuilder;
-        if (minimumCreatedAt) {
-          whereBuilder.andWhereColumn("created_at", ">=", minimumCreatedAt);
-        }
         if (statusInfo.lastConsistencyCheck) {
           whereBuilder.andWhereColumn("last_modified", ">", statusInfo.lastConsistencyCheck);
         }
@@ -1218,6 +1238,54 @@ export class ItemizeElasticClient {
         // anything newer than that
         whereBuilder.andWhereColumn("created_at", "<=", timeRan.toISOString());
 
+        // because it's the first time and our index is empty we want to only retrieve
+        // the values that will ultimately populate the elastic index, we don't need to check
+        // for older values that should be deleted because they don't fit the criteria
+        // because that's just unnecessary when there's no data there
+        if (statusInfo.lastConsistencyCheck === null) {
+          if (limiters && limiters.parenting) {
+            whereBuilder.andWhereColumnNotNull("parent_id");
+          }
+
+          // limiting so that it's only for the given values for the properties
+          // of the search limiter
+          if (limiters && limiters.properties) {
+            limiters.properties.forEach((p) => {
+              let valuesToFilterFor = p.values;
+              if (!p.values || !p.values.length) {
+                // can't do anything the values is empty
+                logger.error(
+                  {
+                    className: "ItemizeElasticClient",
+                    methodName: "_runConsistencyCheck",
+                    message: "The values array is empty for a given limiter",
+                    data: {
+                      batchNumber,
+                      limiters,
+                    }
+                  }
+                );
+                valuesToFilterFor = [];
+              }
+
+              whereBuilder.andWhere(
+                JSON.stringify(p.id) + " = ANY(ARRAY[" + valuesToFilterFor.map(() => "?").join(",") + "])",
+                valuesToFilterFor as any,
+              );
+            });
+          }
+        }
+
+        // we always select the minimum created at if we have it
+        // unlike other limiters because we can easily delete older records than this
+        // as we have done before, so they will be of no confict, unlike corrupted records
+        // that did not delete when their value updated outside the limiter scope
+        if (minimumCreatedAt) {
+          whereBuilder.andWhereColumn("created_at", ">=", minimumCreatedAt);
+        }
+
+        // TODO change limit offset to cursor, limit offset is wasteful
+        // it would nevertheless work to keep consistency
         selecter.limit(limit).offset(offset);
         selecter.orderByBuilder.orderByColumn("created_at", "ASC", "FIRST");
       }
@@ -1239,6 +1307,7 @@ export class ItemizeElasticClient {
         },
         language: string,
         lastModified: NanoSecondComposedDate,
+        isSearchLimited: boolean,
       }
     };
 
@@ -1253,6 +1322,7 @@ export class ItemizeElasticClient {
           r: r as any,
           language: idef.getSearchEngineMainLanguageFromRow(r),
           lastModified: new NanoSecondComposedDate(r.last_modified),
+          isSearchLimited: idef.shouldRowBeIncludedInSearchEngine(r, limiters),
         }
       });
 
@@ -1277,26 +1347,48 @@ export class ItemizeElasticClient {
       });
 
       const baseIndexPrefixLen = baseIndexPrefix.length;
-      const missingFromResults = arrayOfIds.filter((id) => {
-        return !comparativeResults.hits.hits.some((hit) => {
-          const isSameId = hit._id === id;
-
-          if (!isSameId) {
-            return false;
+      const missingFromResults: string[] = [];
+      const extraAtResults: string[] = [];
+      arrayOfIds.forEach((id) => {
+        if (resultObj[id].isSearchLimited) {
+          const isThere = (
+            comparativeResults.hits.hits.some((hit) => {
+              return hit._id === id;
+            })
+          )
+          if (isThere) {
+            extraAtResults.push(id);
           }
+        } else {
+          const isMissing = (
+            !comparativeResults.hits.hits.some((hit) => {
+              const isSameId = hit._id === id;
 
-          let language = hit._index.substring(baseIndexPrefixLen);
-          if (language === "none") {
-            language = null;
+              if (!isSameId) {
+                return false;
+              }
+
+              let language = hit._index.substring(baseIndexPrefixLen);
+              if (language === "none") {
+                language = null;
+              }
+              const objInfo = resultObj[hit._id];
+              const isSameLanguage = objInfo.language === language;
+
+              // exists with the same id and the same language
+              // so it is in the right index, otherwise
+              // it is considered missing
+
+              // the old value will be removed by notMissingButOutdated
+              // check for isInTheWrongLanguage for that check that comes just next
+              return isSameLanguage;
+            })
+          );
+
+          if (isMissing) {
+            missingFromResults.push(id);
           }
-          const objInfo = resultObj[hit._id];
-          const isSameLanguage = objInfo.language === language;
-
-          // exists with the same id and the same language
-          // so it is in the right index, otherwise
-          // it is considered missing
-          return isSameLanguage;
-        });
+        }
       });
       const notMissingButOutdated: string[] = [];
 
@@ -1374,6 +1466,15 @@ export class ItemizeElasticClient {
           notMissingButOutdated.push(hit._id);
         }
       });
+
+      // extra documents that shouldn't be there
+      if (extraAtResults.length) {
+        // these are disrespecting the limiters and shouldn't be there anymore to begin with
+        await this.deleteDocumentsUnknownLanguage(
+          idef,
+          extraAtResults,
+        );
+      }
 
       // if we have any of these mising or missing but outdated
       if (missingFromResults.length + notMissingButOutdated.length) {
@@ -1606,6 +1707,9 @@ export class ItemizeElasticClient {
         qualifiedPathName,
         {
           lastConsistencyCheck: timeRan.toISOString(),
+          signature: JSON.stringify({
+            limiters: limiters,
+          })
         }
       );
     }
@@ -1689,7 +1793,7 @@ export class ItemizeElasticClient {
     ids: Array<{
       id: string;
       version: string;
-    }>
+    } | string>,
   ) {
     const idef = typeof itemDefinition === "string" ? this.root.registry[itemDefinition] : itemDefinition;
 
@@ -1699,7 +1803,7 @@ export class ItemizeElasticClient {
 
     const qualifiedNameItem = idef.getQualifiedPathName();
     const indexNameIdef = qualifiedNameItem.toLowerCase() + "_*";
-    const mergedIds = ids.map((r) => r.id + "." + (r.version || ""));
+    const mergedIds = ids.map((r) => typeof r === "string" ? r : r.id + "." + (r.version || ""));
 
     CAN_LOG_DEBUG && logger.debug(
       {
@@ -1863,6 +1967,10 @@ export class ItemizeElasticClient {
    * Updates a document for a given index
    * if the index does not exist the whole operation is ingored and instead
    * a rebuild operation is launched for the given index (which should fetch everything up to date)
+   * 
+   * The execution will not do a thing if
+   * 1. the item itself is not search engine enabled
+   * 2. it's determined that it doesn't pass the specified limiter
    */
   public async updateDocument(
     itemDefinition: string | ItemDefinition,
@@ -1905,6 +2013,27 @@ export class ItemizeElasticClient {
     if (!newValue) {
       return;
     }
+
+    // CHECKING LIMITERS
+    const combinedLimiters = idef.getSearchLimiters(true);
+    const shouldBeIncluded = idef.shouldRowBeIncludedInSearchEngine(newValue, combinedLimiters, true);
+
+    if (!shouldBeIncluded) {
+      // denied to limiters however it could just have been a change
+      // where it is now limited, and we will safely try to remove any potential value
+      // there is for this row, this is a bit crazy because this means that every time the user
+      // creates or updates something and it will not be included in the search engine
+      // because it is request limited, it will launch a delete query, but what other option we have here?
+      // we don't know the current value in elasticsearch!... we can't check if it's there or not without doing
+      // a request, so telling it to delete is just cheaper than checking if it's there and then delete, that's two
+      // request, vs one request to delete
+      await this.deleteDocument(itemDefinition, language, id, version);
+      return;
+    }
+
+    // MUST HAVE PROPERTY VALUES LIMITER CHECK
+    // ONLY INDEX IF THE VALUES ARE CORRECT AS OTHERS ARE NOT SEARCHABLE
+    // TODO
 
     const mergedId = id + "." + (version || "");
     const elasticFormIdef = convertSQLValueToElasticSQLValueForItemDefinition(
@@ -1958,6 +2087,15 @@ export class ItemizeElasticClient {
     }
   }
 
+  /**
+   * 
+   * @param itemDefinition 
+   * @param language 
+   * @param id 
+   * @param version 
+   * @param value 
+   * @returns 
+   */
   public createDocument(
     itemDefinition: string | ItemDefinition,
     language: string,
@@ -2669,7 +2807,7 @@ export class ElasticQueryBuilder {
       return {};
     }
 
-    const baseHighlights = {...this.highlights};
+    const baseHighlights = { ...this.highlights };
 
     this.children && this.children.forEach((c) => {
       if (
@@ -2689,7 +2827,7 @@ export class ElasticQueryBuilder {
         Object.assign(baseHighlights, addedHighlights);
       }
     });
-  
+
     return baseHighlights;
   }
 

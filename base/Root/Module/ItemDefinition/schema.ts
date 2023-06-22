@@ -339,7 +339,9 @@ export default {
                 items: {},
               },
             },
-            required: "id",
+            required: [
+              "id",
+            ],
           }
         },
       },

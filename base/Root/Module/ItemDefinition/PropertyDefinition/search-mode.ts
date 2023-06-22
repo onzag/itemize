@@ -26,6 +26,11 @@ export function getValuesStrategyForLimiters(rawData: IPropertyDefinitionRawJSON
   // we need the description
   const propertyDefinitionDescription = PropertyDefinition.supportedTypesStandard[rawData.type];
 
+  // values not allowed in complex types
+  if (propertyDefinitionDescription.gql) {
+    return null;
+  }
+
   if (
     propertyDefinitionDescription.searchInterface ===
     PropertyDefinitionSearchInterfacesType.EXACT

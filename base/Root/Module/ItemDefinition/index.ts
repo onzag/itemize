@@ -949,10 +949,109 @@ export default class ItemDefinition {
 
   /**
    * Provides the item definition and only the item definition request limiters
+   * @param combinedForWhatsAllowedInSearchEngine it's useful for knowing what is potentially allowed
+   * and exists in the requests limiter potential for both the module and the item
    * @returns the request limiters object or null
    */
-  public getSearchLimiters() {
-    return this.rawData.searchLimiters || null;
+  public getSearchLimiters(combinedForWhatsAllowedInSearchEngine?: boolean): ISearchLimitersType {
+    if (!combinedForWhatsAllowedInSearchEngine) {
+      return this.rawData.searchLimiters || null;
+    } else {
+      const parentModule = this.getParentModule();
+
+      const limitersIdef = this.rawData.searchLimiters || null;
+      const limitersMod = parentModule.getSearchLimiters();
+
+      const cannotEstablishAnyLimit = (
+        !limitersIdef || limitersIdef.condition === "OR" ||
+        (!limitersMod && parentModule.isSearchEngineEnabled()) || limitersMod.condition === "OR"
+      );
+
+      if (cannotEstablishAnyLimit) {
+        return null;
+      }
+
+      let sinceLimiter: number = null;
+      let mustHaveParent: boolean = false;
+      let propertyLimitersSignature: string = null;
+
+      // if we can establish limiters
+      // establish the since limiter if possible
+      sinceLimiter = limitersIdef.since || null;
+
+      // if it's bigger we use the bigger value as the true limiter for our data
+      if (parentModule.isSearchEngineEnabled() && limitersMod && limitersMod.since > sinceLimiter) {
+        sinceLimiter = limitersMod.since;
+      }
+
+      // establish whether it has to have a parent
+      mustHaveParent = limitersIdef.parenting;
+      // if we established we need a parent but the module says it doesn't, then we need the parent too
+      if (mustHaveParent && parentModule.isSearchEngineEnabled() && limitersMod && !limitersMod.parenting) {
+        mustHaveParent = false;
+      }
+
+      // the real limiter are the properties in common with the same values in common
+      let propertyLimiters = limitersIdef.properties ? [...limitersIdef.properties] : [];
+      propertyLimiters = propertyLimiters.map((limiter) => {
+        // well module cannot be searched using search engine
+        // so this is the only limiter
+        if (!parentModule.isSearchEngineEnabled()) {
+          // we cannot search engine limit if there's no values
+          // to limit it for, all it's saying is that all values are allowed
+          if (!limiter.values) {
+            return null;
+          }
+          return limiter;
+        }
+
+        // nothing in common this doesn't limit by properties
+        // all properties are required
+        if (!limitersMod.properties) {
+          return null;
+        }
+
+        const valueInCommon = limitersMod.properties.find((f) => f.id === limiter.id);
+
+        // it's not in the module, so we cannot use as a limiter to our data
+        if (!valueInCommon) {
+          return null;
+        }
+
+        // okay now we can filter by it but by which values, are allowed
+        // we allow all the values we can potentially search for
+
+        // one of them allows all the values, so we cannot limit it at all
+        // in the search engine
+        if (!valueInCommon.values || !limiter.values) {
+          // we cannot search engine limit if there's no values
+          // to limit it for, all it's saying is that all values are allowed
+          return null;
+        } else {
+          // we now need to add every potential value missing
+          const newValue = {
+            ...limiter,
+          };
+
+          valueInCommon.values.forEach((v) => {
+            if (!limiter.values.includes(v)) {
+              limiter.values.push(v);
+            }
+          });
+
+          return newValue;
+        }
+
+      }).filter((v) => v);
+
+      return {
+        condition: "AND",
+        createdBy: true,
+        parenting: mustHaveParent,
+        properties: propertyLimiters,
+        since: sinceLimiter,
+      }
+    }
   }
 
   /**
@@ -1620,7 +1719,7 @@ export default class ItemDefinition {
     version: string,
     state: IItemStateType,
     specificProperties?: string[],
-    specificIncludes?: {[includeId: string]: string[]},
+    specificIncludes?: { [includeId: string]: string[] },
   ) {
     state.properties.forEach((p) => {
       if (specificProperties && !specificProperties.includes(p.propertyId)) {
@@ -1664,7 +1763,7 @@ export default class ItemDefinition {
     version: string,
     state: Blob | File,
     specificProperties?: string[],
-    specificIncludes?: {[includeId: string]: string[]},
+    specificIncludes?: { [includeId: string]: string[] },
   ) {
     const stateObj = await blobToTransferrable(state);
     return this.applyState(id, version, stateObj, specificProperties, specificIncludes);
@@ -1867,11 +1966,11 @@ export default class ItemDefinition {
    */
   public hasBlockCleanFor(id: string, version: string, blockId: string): boolean {
     const mergedID = id + "." + (version || "");
-    
+
     if (!this.cleansBlocked[mergedID]) {
       return false;
     }
-    
+
     return this.cleansBlocked[mergedID].includes(blockId);
   }
 
@@ -3024,6 +3123,42 @@ export default class ItemDefinition {
   }
 
   /**
+   * Check against the limiters BUT NOT against creation date unless specified
+   * @param rowValue 
+   * @param combinedLimiters 
+   * @param checkSinceLimiter
+   * @returns 
+   */
+  public shouldRowBeIncludedInSearchEngine(rowValue: any, combinedLimiters: ISearchLimitersType, checkSinceLimiter?: boolean) {
+    if (!combinedLimiters) {
+      return true;
+    }
+
+    if (combinedLimiters.parenting && !rowValue.parent_id) {
+      return false;
+    }
+
+    if (checkSinceLimiter && combinedLimiters.since) {
+      const minimumCreatedAtAsDate = (new Date((new Date()).getTime() - combinedLimiters.since)).getTime() as number;
+      const selfCreatedAt = (new Date(rowValue.created_at)).getTime();
+
+      if (selfCreatedAt < minimumCreatedAtAsDate) {
+        return false;
+      }
+    }
+
+    if (!combinedLimiters.properties || !combinedLimiters.properties.length) {
+      return true;
+    }
+
+    return combinedLimiters.properties.every((l) => {
+      // the row has the value in the potential value
+      const potentialValues = l.values || [];
+      return potentialValues.includes(rowValue[l.id] || null);
+    });
+  }
+
+  /**
    * If was provided gives the search engine main
    * language to use to define the search
    * @returns a 2 iso string
@@ -3063,6 +3198,29 @@ export default class ItemDefinition {
     }
 
     return null;
+  }
+
+  /**
+   * Specifies which colums are needed to know whether an element should be included or not
+   * @param combinedLimiters 
+   * @returns 
+   */
+  public getSearchEngineLimitedColumns(combinedLimiters: ISearchLimitersType) {
+    if (!combinedLimiters || !combinedLimiters.properties) {
+      return {
+        mod: [] as string[],
+        idef: [] as string[],
+      }
+    }
+
+    return {
+      mod: combinedLimiters.properties.filter((p) => {
+        return this.parentModule.hasPropExtensionFor(p.id);
+      }).map((p) => p.id),
+      idef: combinedLimiters.properties.filter((p) => {
+        return this.hasPropertyDefinitionFor(p.id, false);
+      }).map((p) => p.id),
+    }
   }
 
   /**
