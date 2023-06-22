@@ -90,7 +90,7 @@ export function getSQLTableDefinitionForModule(mod: Module): ISQLTableDefinition
   const initialAddedIndexes: string[] = [];
 
   // so we recieve the limiters from the module itself
-  const limiters = mod.getRequestLimiters();
+  const limiters = mod.getSearchLimiters();
   // now we need to check if we have an AND type limiter, which creates
   // combined indexes
   if (limiters && limiters.condition === "AND") {
@@ -140,21 +140,21 @@ export function getSQLTableDefinitionForModule(mod: Module): ISQLTableDefinition
   });
 
   // now we need to add indexes to custom rules
-  if (limiters && limiters.custom) {
+  if (limiters && limiters.properties) {
     // if we have a powerful AND limiter
     if (limiters.condition === "AND") {
       // we need to offset to the index that we have currently added
       // these might be zero
       let indexCombinedOffset = initialCombinedIndexes.length;
       // now we loop over the rows we plan to index
-      limiters.custom.forEach((propertyId: string) => {
+      limiters.properties.forEach((limiter) => {
         // we get the property
-        const property = mod.getPropExtensionFor(propertyId);
+        const property = mod.getPropExtensionFor(limiter.id);
         // and the columns that are expected to be added to the combined index
         const columnsToAddLimiter = property.getPropertyDefinitionDescription().sqlBtreeIndexable({
           serverData: null,
           appData: null,
-          id: propertyId,
+          id: limiter.id,
           prefix: "",
           property,
           itemDefinition: null,
@@ -172,12 +172,12 @@ export function getSQLTableDefinitionForModule(mod: Module): ISQLTableDefinition
       });
     } else {
       // otherwise if it's an OR we add these custom singular indexes
-      limiters.custom.forEach((propertyId: string) => {
-        const property = mod.getPropExtensionFor(propertyId);
+      limiters.properties.forEach((limiter) => {
+        const property = mod.getPropExtensionFor(limiter.id);
         const columnsToAddLimiter = property.getPropertyDefinitionDescription().sqlBtreeIndexable({
           serverData: null,
           appData: null,
-          id: propertyId,
+          id: limiter.id,
           prefix: "",
           property,
           itemDefinition: null,
@@ -185,7 +185,7 @@ export function getSQLTableDefinitionForModule(mod: Module): ISQLTableDefinition
         if (columnsToAddLimiter) {
           columnsToAddLimiter.forEach((columnName: string, index: number) => {
             resultTableSchema[columnName].index = {
-              id: propertyId + "_CUSTOM_INDEX",
+              id: limiter.id + "_CUSTOM_INDEX",
               type: "btree",
               level: index,
             }

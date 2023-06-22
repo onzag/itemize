@@ -25,7 +25,7 @@ import {
 } from "../../../constants";
 import { GraphQLObjectType } from "graphql";
 import { buildSearchModeModule } from "./search-mode";
-import Root, { ICustomRoleManager, Ii18NType, IRequestLimitersType } from "..";
+import Root, { ICustomRoleManager, Ii18NType, ISearchLimitersType } from "..";
 import { EndpointError } from "../../errors";
 import { IGQLRequestFields, IGQLValue } from "../../../gql-querier";
 
@@ -210,7 +210,7 @@ export interface IModuleRawJSONDataType {
    */
   maxSearchRecords?: number;
   /**
-   * And AND request limiter is a very powerful one as this would ensure
+   * And AND search limiter is a very powerful one as this would ensure
    * the creation of database indexes that will match and speed up these searches
    * createdAt creates a limiter that requests any search to contain created_at
    * createdBy creates a limiter that requests any search to contain created_by
@@ -218,7 +218,7 @@ export interface IModuleRawJSONDataType {
    * required at module level, these are basically args
    * And AND index will ensure to add an ordered btree index to these
    */
-  requestLimiters?: IRequestLimitersType;
+  searchLimiters?: ISearchLimitersType;
 }
 
 /**
@@ -1007,8 +1007,8 @@ export default class Module {
    * Provides the module request limiters
    * @returns the request limiters object or null
    */
-  public getRequestLimiters() {
-    return this.rawData.requestLimiters || null;
+  public getSearchLimiters() {
+    return this.rawData.searchLimiters || null;
   }
 
   /**

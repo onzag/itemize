@@ -17,7 +17,7 @@ import {
 import {
   PropertyDefinitionSearchInterfacesType,
 } from "../base/Root/Module/ItemDefinition/PropertyDefinition/search-interfaces";
-import { IRequestLimitersType, IRootRawJSONDataType } from "../base/Root";
+import { ISearchLimitersType, IRootRawJSONDataType } from "../base/Root";
 import CheckUpError from "./Error";
 import Traceback from "./Traceback";
 import {
@@ -90,7 +90,7 @@ interface IFileModuleDataRawUntreatedJSONDataType {
   searchEngineEnabled?: boolean;
   maxSearchResults?: number;
   maxSearchRecords?: number;
-  requestLimiters?: IRequestLimitersType;
+  searchLimiters?: ISearchLimitersType;
 }
 
 /**
@@ -132,7 +132,7 @@ export interface IFileItemDefinitionUntreatedRawJSONDataType {
   versionIsLanguageAndCountry?: boolean;
   versionIsLanguage?: boolean;
   versionIsCountry?: boolean;
-  requestLimiters?: IRequestLimitersType;
+  searchLimiters?: ISearchLimitersType;
 }
 
 export default async function build() {
@@ -565,8 +565,8 @@ async function buildModule(
     finalValue.maxSearchResults = actualEvaledFileData.maxSearchResults;
   }
 
-  if (actualEvaledFileData.requestLimiters) {
-    finalValue.requestLimiters = actualEvaledFileData.requestLimiters;
+  if (actualEvaledFileData.searchLimiters) {
+    finalValue.searchLimiters = actualEvaledFileData.searchLimiters;
   }
 
   // and return the final value
@@ -778,8 +778,8 @@ async function buildItemDefinition(
     }
   }
 
-  if (actualEvaledFileData.requestLimiters) {
-    finalValue.requestLimiters = actualEvaledFileData.requestLimiters;
+  if (actualEvaledFileData.searchLimiters) {
+    finalValue.searchLimiters = actualEvaledFileData.searchLimiters;
   }
 
   if (!finalValue.includes ||

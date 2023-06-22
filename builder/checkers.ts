@@ -42,6 +42,7 @@ import Module from "../base/Root/Module";
 import { ajvCheck, checkConfigValueSetSchemaValidate } from "./schema-checks";
 import { languages } from "../imported-resources";
 import type { IConfigRawJSONDataType } from "../config";
+import { getValuesStrategyForLimiters } from "../base/Root/Module/ItemDefinition/PropertyDefinition/search-mode";
 
 /**
  * Checks a conditional rule set so that it is valid and contains valid
@@ -306,14 +307,41 @@ export function checkItemDefinition(
   }
 
   // check the request limiters
-  if (rawData.requestLimiters && rawData.requestLimiters.custom) {
-    rawData.requestLimiters.custom.forEach((propertyId, index) => {
-      const propertyRaw = ItemDefinition.getPropertyDefinitionRawFor(rawData, parentModule, propertyId, true);
+  if (rawData.searchLimiters && rawData.searchLimiters.properties) {
+    rawData.searchLimiters.properties.forEach((limiter, index) => {
+      const propertyRaw = ItemDefinition.getPropertyDefinitionRawFor(rawData, parentModule, limiter.id, true);
       if (!propertyRaw) {
         throw new CheckUpError(
           "Could not find property for request limiter",
-          actualTraceback.newTraceToBit("requestLimiters").newTraceToBit("custom").newTraceToBit(index),
+          actualTraceback.newTraceToBit("searchLimiters").newTraceToBit("properties").newTraceToBit(index).newTraceToBit("id"),
         );
+      }
+
+      if (limiter.values) {
+        const strategy = getValuesStrategyForLimiters(propertyRaw);
+
+        if (!strategy) {
+          throw new CheckUpError(
+            "Invalid limiter for item, it cannot have values as they are not supported in this type of property",
+            actualTraceback.newTraceToBit("searchLimiters").newTraceToBit("properties")
+              .newTraceToBit(index).newTraceToBit("values"),
+          );
+        }
+
+        limiter.values.forEach((v, index2) => {
+          const invalidreason = PropertyDefinition.isValidValue(
+            propertyRaw,
+            v,
+            false,
+          );
+          if (invalidreason) {
+            throw new CheckUpError(
+              "Invalid value for item: (" + JSON.stringify(v) + ") " + invalidreason,
+              actualTraceback.newTraceToBit("searchLimiters").newTraceToBit("properties")
+                .newTraceToBit(index).newTraceToBit("values").newTraceToBit(index2),
+            );
+          }
+        });
       }
     });
   }
@@ -1412,14 +1440,41 @@ export function checkModule(
   }
 
   // check the request limiters
-  if (rawData.requestLimiters) {
-    rawData.requestLimiters.custom.forEach((propertyId, index) => {
-      const propertyRaw = Module.getPropExtensionRawFor(rawData, propertyId);
+  if (rawData.searchLimiters) {
+    rawData.searchLimiters.properties.forEach((limiter, index) => {
+      const propertyRaw = Module.getPropExtensionRawFor(rawData, limiter.id);
       if (!propertyRaw) {
         throw new CheckUpError(
           "Could not find prop extension for request limiter",
-          actualTraceback.newTraceToBit("requestLimiters").newTraceToBit("custom").newTraceToBit(index),
+          actualTraceback.newTraceToBit("searchLimiters").newTraceToBit("properties").newTraceToBit(index).newTraceToBit("id"),
         );
+      }
+
+      if (limiter.values) {
+        const strategy = getValuesStrategyForLimiters(propertyRaw);
+
+        if (!strategy) {
+          throw new CheckUpError(
+            "Invalid limiter for item, it cannot have values as they are not supported in this type of property",
+            actualTraceback.newTraceToBit("searchLimiters").newTraceToBit("properties")
+              .newTraceToBit(index).newTraceToBit("values"),
+          );
+        }
+
+        limiter.values.forEach((v, index2) => {
+          const invalidreason = PropertyDefinition.isValidValue(
+            propertyRaw,
+            v,
+            false,
+          );
+          if (invalidreason) {
+            throw new CheckUpError(
+              "Invalid value for item: (" + JSON.stringify(v) + ") " + invalidreason,
+              actualTraceback.newTraceToBit("searchLimiters").newTraceToBit("properties")
+                .newTraceToBit(index).newTraceToBit("values").newTraceToBit(index2),
+            );
+          }
+        });
       }
     });
   }

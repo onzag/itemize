@@ -25,7 +25,7 @@ import { ISQLTableRowValue } from "../../base/Root/sql";
 import { IGQLValue, IGQLSearchRecord, IGQLArgs, IGQLRequestFields } from "../../gql-querier";
 import { PropertyDefinitionSupportedType } from "../../base/Root/Module/ItemDefinition/PropertyDefinition/types";
 import { ISensitiveConfigRawJSONDataType } from "../../config";
-import { getConversionIds } from "../../base/Root/Module/ItemDefinition/PropertyDefinition/search-mode";
+import { getConversionIdsForCheckingAgainstLimiters, getValuesStrategyForLimiters } from "../../base/Root/Module/ItemDefinition/PropertyDefinition/search-mode";
 import { CustomRoleGranterEnvironment, CustomRoleManager } from "./roles";
 
 export interface IServerSideTokenDataType {
@@ -337,8 +337,8 @@ export function retrieveUntil(args: IGQLArgs): string {
 
 export function checkLimiters(args: IGQLArgs, idefOrMod: Module | ItemDefinition) {
   const mod = idefOrMod instanceof Module ? idefOrMod : idefOrMod.getParentModule();
-  const modLimiters = mod.getRequestLimiters();
-  const idefLimiters = idefOrMod instanceof ItemDefinition ? idefOrMod.getRequestLimiters() : null;
+  const modLimiters = mod.getSearchLimiters();
+  const idefLimiters = idefOrMod instanceof ItemDefinition ? idefOrMod.getSearchLimiters() : null;
   if (!modLimiters && !idefLimiters) {
     return;
   }
@@ -351,46 +351,95 @@ export function checkLimiters(args: IGQLArgs, idefOrMod: Module | ItemDefinition
     const isModLimiter = index === 0;
 
     if (limiter) {
-      let allCustomSet: boolean;
-      let someCustomSet: boolean;
+      let allLimitedPropertiesSet: boolean = true;
+      let atLeastOneLimitedPropertyWasSetAndChecked: boolean = false;
       let customError: string;
 
-      if (limiter.custom && limiter.custom.length) {
-        allCustomSet = true;
-        limiter.custom.forEach((v) => {
+      if (limiter.properties && limiter.properties.length) {
+        limiter.properties.forEach((limiter) => {
           const property = idefOrMod instanceof Module ?
-            mod.getPropExtensionFor(v) :
-            idefOrMod.getPropertyDefinitionFor(v, true);
+            mod.getPropExtensionFor(limiter.id) :
+            idefOrMod.getPropertyDefinitionFor(limiter.id, true);
 
-          const expectedConversionIds = getConversionIds(property.rawData);
-          const succeed = expectedConversionIds.every((conversionId: string) => {
-            return typeof args[conversionId] === "undefined";
+          const expectedConversionIds = getConversionIdsForCheckingAgainstLimiters(property.rawData);
+          const succeed = expectedConversionIds.some((conversionIdRule) => {
+            return conversionIdRule.every((id) => {
+              return typeof args[id] === "undefined";
+            });
           });
 
-          // if it succeeded
-          if (succeed) {
-            // we can assume some custom was set
-            someCustomSet = true;
-            // if it did not succeed
-          } else {
+          if (!succeed) {
             // then not all the custom sets succeeded
-            allCustomSet = false;
+            allLimitedPropertiesSet = false;
+
+            const messageRuleBase = expectedConversionIds.map((convesionIdRule) => convesionIdRule.join(", ")).join(" or ");
 
             if (isModLimiter) {
-              customError = "Missing custom request search limiter required by limiter set by " + v + " in module " +
-                mod.getQualifiedPathName() + " requiring of " + expectedConversionIds.join(", ");
+              customError = "Missing custom request search limiter required by limiter set by " + limiter.id + " in module " +
+                mod.getQualifiedPathName() + " requiring of " + messageRuleBase;
             } else {
-              customError = "Missing custom request search limiter required by limiter set by " + v + " in idef " +
-                idefOrMod.getQualifiedPathName() + " requiring of " + expectedConversionIds.join(", ");
+              customError = "Missing custom request search limiter required by limiter set by " + limiter.id + " in idef " +
+                idefOrMod.getQualifiedPathName() + " requiring of " + messageRuleBase;
+            }
+          } else {
+            let succedValues = true;
+
+            // all potential values are OR types
+            if (limiter.values) {
+              const strategies = getValuesStrategyForLimiters(property.rawData);
+
+              // weird why it would be null, well possible if the schema is siomehow corrupted
+              if (strategies !== null) {
+                // check all the strategies to see if at least one succeds
+                // and passes the limiter values checking
+                succedValues = strategies.some((s) => {
+                  const matchingSearchPropertyValue = args[s.searchProperty];
+
+                  // did not succeed because could not check, there's no value
+                  if (typeof matchingSearchPropertyValue === "undefined") {
+                    return false;
+                  }
+
+                  if (s.strategy === "GIVEN_VALUE_SHOULD_BE_CONTAINED_IN_POTENTIAL_VALUES") {
+                    // the value given is included in the list of our valid values
+                    return limiter.values.includes(matchingSearchPropertyValue as any);
+                  } else if (s.strategy === "GIVEN_VALUE_SHOULD_BE_A_SUBSET_OF_POTENTIAL_VALUES") {
+                    if (!Array.isArray(matchingSearchPropertyValue)) {
+                      return false;
+                    }
+                    // every value is included in the limiter so it's a subset
+                    // and therefore it is valid
+                    return matchingSearchPropertyValue.every((v) => limiter.values.includes(v as any));
+                  } else {
+                    return false;
+                  }
+                });
+              } else {
+                // somehow we get no strategies to check
+                // this is weird
+                succedValues = false;
+              }
+            }
+  
+            // if we passed
+            if (succedValues) {
+              atLeastOneLimitedPropertyWasSetAndChecked = true;
+            } else {
+              allLimitedPropertiesSet = false;
+
+              if (isModLimiter) {
+                customError = "The limiter values for " + limiter.id + " in module " +
+                  mod.getQualifiedPathName() + " were not respected";
+              } else {
+                customError = "The limiter values for " + limiter.id + " in idef " +
+                  idefOrMod.getQualifiedPathName() + " were not respected";
+              }
             }
           }
         });
-      } else {
-        allCustomSet = true;
-        someCustomSet = true;
       }
 
-      if (limiter.condition === "AND" && !allCustomSet) {
+      if (limiter.condition === "AND" && !allLimitedPropertiesSet) {
         throw new EndpointError({
           message: customError,
           code: ENDPOINT_ERRORS.UNSPECIFIED,
@@ -460,7 +509,8 @@ export function checkLimiters(args: IGQLArgs, idefOrMod: Module | ItemDefinition
       }
 
       if (limiter.condition === "OR") {
-        const passedCustom = limiter.custom && someCustomSet;
+        // since some limited properties starts at false and set to true if one passes
+        const passedCustom = limiter.properties && (allLimitedPropertiesSet || atLeastOneLimitedPropertyWasSetAndChecked);
         const passedSince = limiter.since && sinceSucceed;
         const passedCreatedBy = limiter.createdBy && createdBySucceed;
         const passedParenting = limiter.parenting && parentingSucceed;

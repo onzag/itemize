@@ -16,6 +16,178 @@ import { IConditionalRuleSetRawJSONDataPropertyType } from "../ConditionalRuleSe
 import { paymentStatusesArr, paymentTypesArr } from "./types/payment";
 import { Ii18NType } from "../../../../Root";
 
+export interface IValueForLimiterRule {
+  searchProperty: string;
+  against: string;
+  strategy: "GIVEN_VALUE_SHOULD_BE_CONTAINED_IN_POTENTIAL_VALUES" | "GIVEN_VALUE_SHOULD_BE_A_SUBSET_OF_POTENTIAL_VALUES";
+}
+
+export function getValuesStrategyForLimiters(rawData: IPropertyDefinitionRawJSONDataType): IValueForLimiterRule[] {
+  // we need the description
+  const propertyDefinitionDescription = PropertyDefinition.supportedTypesStandard[rawData.type];
+
+  if (
+    propertyDefinitionDescription.searchInterface ===
+    PropertyDefinitionSearchInterfacesType.EXACT
+  ) {
+    return [
+      {
+        searchProperty: PropertyDefinitionSearchInterfacesPrefixes.EXACT + rawData.id,
+        strategy: "GIVEN_VALUE_SHOULD_BE_CONTAINED_IN_POTENTIAL_VALUES",
+        against: rawData.id,
+      }
+    ]
+  } else if (
+    propertyDefinitionDescription.searchInterface ===
+    PropertyDefinitionSearchInterfacesType.EXACT_AND_RANGE
+  ) {
+    if (rawData.disableRangedSearch) {
+      return [
+        {
+          searchProperty: PropertyDefinitionSearchInterfacesPrefixes.EXACT + rawData.id,
+          strategy: "GIVEN_VALUE_SHOULD_BE_CONTAINED_IN_POTENTIAL_VALUES",
+          against: rawData.id,
+        }
+      ]
+    } else {
+      return null;
+    }
+  } else if (
+    propertyDefinitionDescription.searchInterface ===
+    PropertyDefinitionSearchInterfacesType.TEXT ||
+    propertyDefinitionDescription.searchInterface ===
+    PropertyDefinitionSearchInterfacesType.TAGS
+  ) {
+    return null;
+  } else if (
+    propertyDefinitionDescription.searchInterface ===
+    PropertyDefinitionSearchInterfacesType.STRING
+  ) {
+    return [
+      {
+        searchProperty: PropertyDefinitionSearchInterfacesPrefixes.SEARCH + rawData.id,
+        strategy: "GIVEN_VALUE_SHOULD_BE_CONTAINED_IN_POTENTIAL_VALUES",
+        against: rawData.id,
+      },
+      {
+        searchProperty: PropertyDefinitionSearchInterfacesPrefixes.IN + rawData.id,
+        strategy: "GIVEN_VALUE_SHOULD_BE_A_SUBSET_OF_POTENTIAL_VALUES",
+        against: rawData.id,
+      }
+    ]
+  } else if (
+    propertyDefinitionDescription.searchInterface ===
+    PropertyDefinitionSearchInterfacesType.LOCATION_RADIUS
+  ) {
+    return null;
+  } else if (
+    propertyDefinitionDescription.searchInterface ===
+    PropertyDefinitionSearchInterfacesType.PAYMENT
+  ) {
+    return null;
+  }
+
+  return null;
+}
+
+/**
+ * Specifies the list of properties that there should be at least
+ * during a limited request for a property that is request limited
+ * 
+ * @param rawData 
+ * @returns 
+ */
+export function getConversionIdsForCheckingAgainstLimiters(
+  rawData: IPropertyDefinitionRawJSONDataType
+): string[][] {
+  // we need the description
+  const propertyDefinitionDescription = PropertyDefinition.supportedTypesStandard[rawData.type];
+  if (
+    !propertyDefinitionDescription.searchable ||
+    (
+      typeof rawData.searchable !== "undefined" &&
+      !rawData.searchable
+    )
+  ) {
+    // return empty array if it's not searchable or search level is disabled
+    return [];
+  }
+
+  // for a search only property it has no conversion ids
+  if (rawData.searchOnlyProperty) {
+    return [[rawData.id]];
+  }
+
+  let ids: string[][] = [];
+  if (
+    propertyDefinitionDescription.searchInterface ===
+    PropertyDefinitionSearchInterfacesType.EXACT
+  ) {
+    ids = [[PropertyDefinitionSearchInterfacesPrefixes.EXACT + rawData.id]];
+  } else if (
+    propertyDefinitionDescription.searchInterface ===
+    PropertyDefinitionSearchInterfacesType.EXACT_AND_RANGE
+  ) {
+    if (rawData.disableRangedSearch) {
+      ids = [[PropertyDefinitionSearchInterfacesPrefixes.EXACT + rawData.id]];
+    } else {
+      ids = [
+        [PropertyDefinitionSearchInterfacesPrefixes.FROM + rawData.id],
+        [PropertyDefinitionSearchInterfacesPrefixes.TO + rawData.id],
+      ];
+    }
+  } else if (
+    propertyDefinitionDescription.searchInterface ===
+    PropertyDefinitionSearchInterfacesType.TEXT ||
+    propertyDefinitionDescription.searchInterface ===
+    PropertyDefinitionSearchInterfacesType.TAGS
+  ) {
+    ids = [[PropertyDefinitionSearchInterfacesPrefixes.SEARCH + rawData.id]];
+  } else if (
+    propertyDefinitionDescription.searchInterface ===
+    PropertyDefinitionSearchInterfacesType.STRING
+  ) {
+    ids = [
+      [PropertyDefinitionSearchInterfacesPrefixes.SEARCH + rawData.id],
+      [PropertyDefinitionSearchInterfacesPrefixes.IN + rawData.id],
+    ];
+  } else if (
+    propertyDefinitionDescription.searchInterface ===
+    PropertyDefinitionSearchInterfacesType.LOCATION_RADIUS
+  ) {
+    ids = [
+      [PropertyDefinitionSearchInterfacesPrefixes.LOCATION + rawData.id, PropertyDefinitionSearchInterfacesPrefixes.RADIUS + rawData.id],
+    ];
+  } else if (
+    propertyDefinitionDescription.searchInterface ===
+    PropertyDefinitionSearchInterfacesType.PAYMENT
+  ) {
+    if (rawData.disableRangedSearch) {
+      ids = [
+        [
+          PropertyDefinitionSearchInterfacesPrefixes.EXACT + rawData.id,
+          PropertyDefinitionSearchInterfacesPrefixes.PAYMENT_STATUS + rawData.id,
+          PropertyDefinitionSearchInterfacesPrefixes.PAYMENT_TYPE + rawData.id
+        ],
+      ];
+    } else {
+      ids = [
+        [
+          PropertyDefinitionSearchInterfacesPrefixes.FROM + rawData.id,
+          PropertyDefinitionSearchInterfacesPrefixes.PAYMENT_STATUS + rawData.id,
+          PropertyDefinitionSearchInterfacesPrefixes.PAYMENT_TYPE + rawData.id
+        ],
+        [
+          PropertyDefinitionSearchInterfacesPrefixes.TO + rawData.id,
+          PropertyDefinitionSearchInterfacesPrefixes.PAYMENT_STATUS + rawData.id,
+          PropertyDefinitionSearchInterfacesPrefixes.PAYMENT_TYPE + rawData.id
+        ],
+      ];
+    }
+  }
+  return ids;
+}
+
 /**
  * Provides all the ids that a property would be referred to in search mode
  * @param rawData the raw property
@@ -79,11 +251,11 @@ export function getConversionIds(
   ) {
     ids = noConflict ? [
       PropertyDefinitionSearchInterfacesPrefixes.SEARCH + rawData.id,
-    ] : 
-    [
-      PropertyDefinitionSearchInterfacesPrefixes.SEARCH + rawData.id,
-      PropertyDefinitionSearchInterfacesPrefixes.IN + rawData.id,
-    ];
+    ] :
+      [
+        PropertyDefinitionSearchInterfacesPrefixes.SEARCH + rawData.id,
+        PropertyDefinitionSearchInterfacesPrefixes.IN + rawData.id,
+      ];
   } else if (
     propertyDefinitionDescription.searchInterface ===
     PropertyDefinitionSearchInterfacesType.LOCATION_RADIUS
@@ -158,7 +330,7 @@ export function buildSearchModePaymentProperty(
   };
   if (newPropDefPaymentType.i18nData) {
     newPropDefPaymentType.i18nData = displaceI18NData(newPropDef.i18nData, ["search", "payment", "type"]);
-  
+
     displaceAndStoreI18NRootFieldsData(rootI8nData, ["any"], newPropDefPaymentType.i18nData, ["null_value"]);
     paymentTypesArr.forEach((t) => {
       displaceAndStoreI18NRootFieldsData(rootI8nData, ["payment", t], newPropDefPaymentType.i18nData, ["values", t]);
@@ -174,11 +346,11 @@ export function buildSearchModePaymentProperty(
     if (newPropDef.i18nData) {
       newPropDef.i18nData = displaceI18NData(newPropDef.i18nData, ["search", "payment", "exact"]);
     }
-  
-  // Otherwise we need the secondary, for the range
+
+    // Otherwise we need the secondary, for the range
   } else {
     // we make a copy of the original
-    newPropDef2 = {...newPropDef};
+    newPropDef2 = { ...newPropDef };
 
     // set the ids, as FROM and TO
     newPropDef.id = PropertyDefinitionSearchInterfacesPrefixes.FROM + newPropDef.id;
@@ -214,7 +386,7 @@ export function buildSearchModePaymentProperty(
         property: newPropDef.id,
       },
     };
-  
+
     newPropDef2InvalidIfRule.attribute = "value";
     newPropDef2InvalidIfRule.valueAttribute = "value";
 
@@ -255,7 +427,7 @@ export function buildSearchModePaymentProperty(
  */
 export function buildSearchModePropertyDefinitions(
   rawData: IPropertyDefinitionRawJSONDataType,
-  otherKnownProperties: {[id: string]: IPropertyDefinitionRawJSONDataType},
+  otherKnownProperties: { [id: string]: IPropertyDefinitionRawJSONDataType },
   rootI8nData: Ii18NType,
 ): IPropertyDefinitionRawJSONDataType[] {
   // so we need the description from the standard
@@ -278,7 +450,7 @@ export function buildSearchModePropertyDefinitions(
   }
 
   // we create the new property definition via copy
-  const newPropDef = {...rawData};
+  const newPropDef = { ...rawData };
   newPropDef.nullable = true;
 
   // Disable search level for any of its children
@@ -383,7 +555,7 @@ export function buildSearchModePropertyDefinitions(
       newPropDef.i18nData = displaceI18NData(newPropDef.i18nData, ["search"]);
     }
 
-  // Now here if we have exact and range
+    // Now here if we have exact and range
   } else if (
     propertyDefinitionDescription.searchInterface ===
     PropertyDefinitionSearchInterfacesType.EXACT_AND_RANGE
@@ -395,10 +567,10 @@ export function buildSearchModePropertyDefinitions(
         newPropDef.i18nData = displaceI18NData(newPropDef.i18nData, ["search"]);
       }
 
-    // Otherwise we need the secondary, for the range
+      // Otherwise we need the secondary, for the range
     } else {
       // we make a copy of the original
-      newPropDef2 = {...newPropDef};
+      newPropDef2 = { ...newPropDef };
       // delete its default, as only the original gets a default
       delete newPropDef2.default;
       delete newPropDef2.defaultIf;
@@ -471,7 +643,7 @@ export function buildSearchModePropertyDefinitions(
       }
     }
 
-  // Full text search is similar to the exact mode, except it uses SEARCH as the handle
+    // Full text search is similar to the exact mode, except it uses SEARCH as the handle
   } else if (
     propertyDefinitionDescription.searchInterface ===
     PropertyDefinitionSearchInterfacesType.TEXT ||
@@ -524,7 +696,7 @@ export function buildSearchModePropertyDefinitions(
       });
     }
 
-  // location radius is fancy
+    // location radius is fancy
   } else if (
     propertyDefinitionDescription.searchInterface ===
     PropertyDefinitionSearchInterfacesType.LOCATION_RADIUS
@@ -656,11 +828,11 @@ function displaceAndStoreI18NRootFieldsData(i18n: any, path: string[], storageI1
  */
 function displaceI18NData(i18n: any, path: string[], callback?: (i18nData: any) => any) {
   // make a copy
-  const newI18n = {...i18n};
+  const newI18n = { ...i18n };
   // for each language we are supporting there
   Object.keys(newI18n).forEach((language) => {
     // we make a copy
-    newI18n[language] = {...newI18n[language]};
+    newI18n[language] = { ...newI18n[language] };
 
     // now we loop inside the path
     let itemInQuestion = newI18n[language];
@@ -669,7 +841,7 @@ function displaceI18NData(i18n: any, path: string[], callback?: (i18nData: any) 
     });
 
     if (callback) {
-      Object.assign(newI18n[language], callback(newI18n[language] || {}))
+      Object.assign(newI18n[language], callback(newI18n[language] || {}))
     }
 
     // we everything from the loop result

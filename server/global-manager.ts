@@ -494,12 +494,12 @@ export class GlobalManager {
       );
       this.modNeedsMantenience.push(mod);
 
-      const requestLimiters = mod.getRequestLimiters();
+      const searchLimiters = mod.getSearchLimiters();
       const sinceLimiter =
-        requestLimiters &&
-        requestLimiters.condition === "AND" &&
-        requestLimiters.since;
-      if (!requestLimiters || !sinceLimiter) {
+        searchLimiters &&
+        searchLimiters.condition === "AND" &&
+        searchLimiters.since;
+      if (!searchLimiters || !sinceLimiter) {
         logger.info(
           {
             className: "GlobalManager",
@@ -545,14 +545,14 @@ export class GlobalManager {
       );
       this.idefNeedsMantenience.push(idef);
 
-      const requestLimiters =
-        idef.getRequestLimiters() ||
-        idef.getParentModule().getRequestLimiters();
+      const searchLimiters =
+        idef.getSearchLimiters() ||
+        idef.getParentModule().getSearchLimiters();
       const sinceLimiter =
-        requestLimiters &&
-        requestLimiters.condition === "AND" &&
-        requestLimiters.since;
-      if (!requestLimiters || !sinceLimiter) {
+        searchLimiters &&
+        searchLimiters.condition === "AND" &&
+        searchLimiters.since;
+      if (!searchLimiters || !sinceLimiter) {
         logger.info(
           {
             className: "GlobalManager",
@@ -1066,7 +1066,7 @@ export class GlobalManager {
         itemDefinition: null,
         include: null,
       }));
-    const limiters = mod.getRequestLimiters();
+    const limiters = mod.getSearchLimiters();
     const since =
       limiters && limiters.condition === "AND" ? limiters.since : null;
     await this.runFor(
@@ -1114,7 +1114,7 @@ export class GlobalManager {
       );
     });
     const limiters =
-      idef.getRequestLimiters() || idef.getParentModule().getRequestLimiters();
+      idef.getSearchLimiters() || idef.getParentModule().getSearchLimiters();
     const since =
       limiters && limiters.condition === "AND" ? limiters.since : null;
     await this.runFor(

@@ -31,7 +31,7 @@ import uuid from "uuid";
 import { flattenRawGQLValueOrFields, requestFieldsAreContained } from "../../../../gql-util";
 import { IGQLValue, IGQLRequestFields, IGQLFile, IGQLSearchRecord } from "../../../../gql-querier";
 import { countries } from "../../../../imported-resources";
-import Root, { ICustomRoleManager, IRequestLimitersType } from "../../../Root";
+import Root, { ICustomRoleManager, ISearchLimitersType } from "../../../Root";
 import { transferrableToBlob, blobToTransferrable, fileURLAbsoluter } from "../../../../util";
 import type { IConfigRawJSONDataType } from "../../../../config";
 import type { IElasticHighlightRecordInfo, PropertyDefinitionSupportedType } from "./PropertyDefinition/types";
@@ -368,7 +368,7 @@ export interface IItemDefinitionRawJSONDataType {
   /**
    * the request limiters
    */
-  requestLimiters?: IRequestLimitersType;
+  searchLimiters?: ISearchLimitersType;
 }
 
 /**
@@ -951,8 +951,8 @@ export default class ItemDefinition {
    * Provides the item definition and only the item definition request limiters
    * @returns the request limiters object or null
    */
-  public getRequestLimiters() {
-    return this.rawData.requestLimiters || null;
+  public getSearchLimiters() {
+    return this.rawData.searchLimiters || null;
   }
 
   /**

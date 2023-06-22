@@ -150,18 +150,18 @@ export function getSQLTableDefinitionForItemDefinition(itemDefinition: ItemDefin
     );
   });
 
-  const limiters = itemDefinition.getRequestLimiters();
+  const limiters = itemDefinition.getSearchLimiters();
   // now we need to add indexes to custom rules
-  if (limiters && limiters.custom) {
+  if (limiters && limiters.properties) {
     // if we have a powerful AND limiter
     if (limiters.condition === "AND") {
       // the combined offset is zero
       let indexCombinedOffset = 0;
 
       // now we loop over the rows we plan to index
-      limiters.custom.forEach((propertyId: string) => {
+      limiters.properties.forEach((limiter) => {
         // we get the property
-        const property = itemDefinition.getPropertyDefinitionFor(propertyId, true);
+        const property = itemDefinition.getPropertyDefinitionFor(limiter.id, true);
         // avoid extensions
         if (property.isExtension()) {
           return;
@@ -169,7 +169,7 @@ export function getSQLTableDefinitionForItemDefinition(itemDefinition: ItemDefin
         // and the columns that are expected to be added to the combined index
         const columnsToAddLimiter = property.getPropertyDefinitionDescription().sqlBtreeIndexable({
           serverData: null,
-          id: propertyId,
+          id: limiter.id,
           prefix: "",
           property,
           itemDefinition: null,
@@ -188,16 +188,16 @@ export function getSQLTableDefinitionForItemDefinition(itemDefinition: ItemDefin
       });
     } else {
       // otherwise if it's an OR we add these custom singular indexes
-      limiters.custom.forEach((propertyId: string) => {
+      limiters.properties.forEach((limiter) => {
         // we get the property
-        const property = itemDefinition.getPropertyDefinitionFor(propertyId, true);
+        const property = itemDefinition.getPropertyDefinitionFor(limiter.id, true);
         // avoid extensions
         if (property.isExtension()) {
           return;
         }
         const columnsToAddLimiter = property.getPropertyDefinitionDescription().sqlBtreeIndexable({
           serverData: null,
-          id: propertyId,
+          id: limiter.id,
           prefix: "",
           property,
           itemDefinition: null,
@@ -206,7 +206,7 @@ export function getSQLTableDefinitionForItemDefinition(itemDefinition: ItemDefin
         if (columnsToAddLimiter) {
           columnsToAddLimiter.forEach((columnName: string, index: number) => {
             resultTableSchema[columnName].index = {
-              id: propertyId + "_CUSTOM_INDEX",
+              id: limiter.id + "_CUSTOM_INDEX",
               type: "btree",
               level: index,
             }

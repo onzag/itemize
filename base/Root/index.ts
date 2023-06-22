@@ -14,6 +14,7 @@ import type { IAppDataType } from "../../server";
 import Module, { IModuleRawJSONDataType } from "./Module";
 import ItemDefinition from "./Module/ItemDefinition";
 import type { IGQLRequestFields } from "../../gql-querier";
+import type { PropertyDefinitionSupportedType } from "./Module/ItemDefinition/PropertyDefinition/types";
 
 /**
  * The standard i18n information for usage
@@ -38,17 +39,26 @@ export interface ILangLocalesType {
 }
 
 /**
+ * The property request limiter limits the properties that can be retrieved
+ * and how
+ */
+export interface IPropertyRequestLimiter {
+  id: string;
+  values?: Array<PropertyDefinitionSupportedType>;
+}
+
+/**
  * The request limiters that are set in the module
  * to limit the requests and the form of these requests
  * the reason these limiters are in the module is because
  * they are also used for optimization and matenience operations
  */
-export interface IRequestLimitersType {
+export interface ISearchLimitersType {
   condition: "AND" | "OR";
   since?: number;
   createdBy?: boolean;
   parenting?: boolean;
-  custom?: string[];
+  properties?: IPropertyRequestLimiter[];
 }
 
 export interface ICustomRoleManagerRoleStatus {

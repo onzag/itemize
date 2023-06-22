@@ -51,7 +51,7 @@ export default {
     maxSearchRecords: {
       type: "number",
     },
-    requestLimiters: {
+    searchLimiters: {
       type: "object",
       properties: {
         condition: {

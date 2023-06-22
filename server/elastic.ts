@@ -1066,8 +1066,8 @@ export class ItemizeElasticClient {
     const baseIndexPrefix = qualifiedPathName.toLowerCase() + "_";
     const wildcardIndexName = baseIndexPrefix + "*";
 
-    const limitersModule = parentModuleEnabled && parentModule.getRequestLimiters();
-    const limitersSelf = selfEnabled && idef.getRequestLimiters();
+    const limitersModule = parentModuleEnabled && parentModule.getSearchLimiters();
+    const limitersSelf = selfEnabled && idef.getSearchLimiters();
 
     const sinceModule = (limitersModule && limitersModule.condition === "AND" && limitersModule.since) || null;
     const sinceSelf = (limitersSelf && limitersModule.condition === "AND" && limitersSelf.since) || null;

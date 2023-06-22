@@ -310,7 +310,7 @@ export default {
     versionIsCountry: {
       type: "boolean",
     },
-    requestLimiters: {
+    searchLimiters: {
       type: "object",
       properties: {
         condition: {
@@ -326,10 +326,20 @@ export default {
         parenting: {
           type: "boolean",
         },
-        custom: {
+        properties: {
           type: "array",
           items: {
-            type: "string",
+            type: "object",
+            properties: {
+              id: {
+                type: "string",
+              },
+              values: {
+                type: "array",
+                items: {},
+              },
+            },
+            required: "id",
           }
         },
       },
