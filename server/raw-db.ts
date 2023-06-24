@@ -31,6 +31,9 @@ import type PropertyDefinition from "../base/Root/Module/ItemDefinition/Property
 import type Include from "../base/Root/Module/ItemDefinition/Include";
 import { ItemizeElasticClient } from "./elastic";
 import type { IAppDataType } from "../server";
+import { DeclareCursorBuilder } from "../database/DeclareCursorBuilder";
+import { CloseCursorBuilder } from "../database/CloseCursorBuilder";
+import { FetchOrMoveFromCursorBuilder } from "../database/FetchOrMoveFromCursorBuilder";
 
 type changeRowLanguageFnPropertyBased = (language: string, dictionary: string, property: string) => void;
 type changeRowLanguageFnPropertyIncludeBased = (language: string, dictionary: string, include: string, property: string) => void;
@@ -1469,6 +1472,119 @@ export class ItemizeRawDB {
     selecter(builder);
 
     return builder;
+  }
+
+  public async declareRawDBCursorSelect(
+    itemDefinitionOrModule: ItemDefinition | Module | string,
+    cursorName: string,
+    selecter: (builder: SelectBuilder) => void,
+    options: {
+      preventJoin?: boolean,
+    } = {}
+  ) {
+    const builder = this._retrieveRawDBSelect(itemDefinitionOrModule, selecter, options);
+    const declare = new DeclareCursorBuilder(cursorName, builder);
+
+    return await this.databaseConnection.query(declare);
+  }
+
+  public async fetchFromRawDBCursor(
+    cursorName: string,
+    fetcher: (builder: FetchOrMoveFromCursorBuilder) => void,
+  ): Promise<ISQLTableRowValue[]> {
+    const builder = new FetchOrMoveFromCursorBuilder("FETCH", cursorName);
+    fetcher(builder);
+    return await this.databaseConnection.queryRows(builder);
+  }
+
+  public async moveFromRawDBCursor(
+    cursorName: string,
+    mover: (builder: FetchOrMoveFromCursorBuilder) => void,
+  ) {
+    const builder = new FetchOrMoveFromCursorBuilder("MOVE", cursorName);
+    mover(builder);
+    return await this.databaseConnection.query(builder);
+  }
+
+  public async closeRawDBCursor(cursorName: string) {
+    return await this.databaseConnection.query(new CloseCursorBuilder(cursorName));
+  }
+
+  public async *performRawDBCursorSelect(
+    itemDefinitionOrModule: ItemDefinition | Module | string,
+    selecter: (builder: SelectBuilder) => void,
+    options: {
+      preventJoin?: boolean,
+      batchSize?: number,
+    } = {}
+  ) {
+    const cursorname = "cursor_" + uuid.v4().replace(/-/g, "");
+    const batchSize = options.batchSize || 100;
+    await this.declareRawDBCursorSelect(
+      itemDefinitionOrModule,
+      cursorname,
+      selecter,
+      options,
+    );
+
+    try {
+      let currentBatch = await this.fetchFromRawDBCursor(cursorname, (b) => {
+        b.forward(batchSize);
+      });
+
+      while (currentBatch.length) {
+        yield currentBatch;
+        currentBatch = await this.fetchFromRawDBCursor(cursorname, (b) => {
+          b.forward(batchSize);
+        });
+      }
+    } catch (err) {
+      try {
+        await this.closeRawDBCursor(cursorname);
+      } catch (err2) {
+        logger.error({
+          methodName: "performRawDBCursorSelect",
+          className: "ItemizeRawDB",
+          message: "Cursor has been orphaned",
+          orphan: true,
+          serious: true,
+          err: err2,
+          data: {
+            cursorname,
+          }
+        });
+      }
+
+      logger.error({
+        methodName: "performRawDBCursorSelect",
+        className: "ItemizeRawDB",
+        message: "Failed to perform cursor select",
+        orphan: true,
+        serious: true,
+        err,
+        data: {
+          cursorname,
+        }
+      });
+
+      throw err;
+    }
+
+    try {
+      await this.closeRawDBCursor(cursorname);
+    } catch (err2) {
+      logger.error({
+        methodName: "performRawDBCursorSelect",
+        className: "ItemizeRawDB",
+        message: "Cursor has been orphaned",
+        orphan: true,
+        serious: true,
+        err: err2,
+        data: {
+          cursorname,
+        }
+      });
+    }
   }
 
   /**

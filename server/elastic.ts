@@ -2031,10 +2031,6 @@ export class ItemizeElasticClient {
       return;
     }
 
-    // MUST HAVE PROPERTY VALUES LIMITER CHECK
-    // ONLY INDEX IF THE VALUES ARE CORRECT AS OTHERS ARE NOT SEARCHABLE
-    // TODO
-
     const mergedId = id + "." + (version || "");
     const elasticFormIdef = convertSQLValueToElasticSQLValueForItemDefinition(
       this.serverData,
