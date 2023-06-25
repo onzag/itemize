@@ -50,6 +50,17 @@ async function wait(ms: number) {
   });
 }
 
+class TransactingQueueError extends Error {
+  public errors: Error[];
+  constructor(message: string, errors: Error[]) {
+    super(message);
+    this.errors = errors;
+
+    // Set the prototype explicitly.
+    Object.setPrototypeOf(this, TransactingQueueError.prototype);
+  }
+}
+
 /**
  * The required properties that every row should have
  * @ignore
@@ -71,6 +82,7 @@ export class ItemizeRawDB {
   private elastic: ItemizeElasticClient;
 
   private transacting: boolean;
+  private transactingUsingSingleClientMode: boolean;
   private transactingQueue: Function[] = [];
 
   private cachedSelects: {
@@ -132,26 +144,73 @@ export class ItemizeRawDB {
     this.elastic = elastic;
   }
 
+  private async consumeTransactingQueue(ensureOrder?: boolean) {
+    // resolve the transacting queue that was generated in the raw db once it resolved
+    const errors: Error[] = [];
+    if (ensureOrder) {
+      for (const q of this.transactingQueue) {
+        try {
+          await q();
+        } catch (err) {
+          errors.push(err);
+        }
+      }
+    } else {
+      // we don't want to kill the transaction queue 
+      await Promise.all(this.transactingQueue.map(async (q) => {
+        try {
+          await q();
+        } catch (err) {
+          errors.push(err);
+        }
+      }));
+    }
+
+    if (errors.length) {
+      throw new TransactingQueueError("Errors ocurred by the end of the transaction", errors);
+    }
+  }
+
   /**
    * Starts a new instance of raw db but in transaction mode
    * @param fn the transactional function
+   * @param opts.ensureOrder will make sure that the order is respected regarding the events
+   * that are fired after the transaction is done, such as informing changes to keep the database realtime
    * @returns whatever is returned in the transactional function
    */
-  public startTransaction<T>(fn: (transactingRawDB: ItemizeRawDB) => Promise<T>, opts: { ensureOrder?: boolean } = {}): Promise<T> {
-    return this.databaseConnection.startTransaction(async (transactingClient) => {
-      const newRawDB = new ItemizeRawDB(this.redisGlobal, this.redisPub, this.redisSub, transactingClient, this.root);
+  public async startTransaction<T>(fn: (transactingRawDB: ItemizeRawDB) => Promise<T>, opts: { ensureOrder?: boolean } = {}): Promise<T> {
+    let newRawDB: ItemizeRawDB;
+    const rs = await this.databaseConnection.startTransaction(async (transactingClient) => {
+      newRawDB = new ItemizeRawDB(this.redisGlobal, this.redisPub, this.redisSub, transactingClient, this.root);
       newRawDB.transacting = true;
-
-      const resolvedPromiseToReturn = await fn(newRawDB);
-      if (opts.ensureOrder) {
-        for (const q of this.transactingQueue) {
-          await q();
-        }
-      } else {
-        await Promise.all(this.transactingQueue.map((q) => q()));
-      }
-      return resolvedPromiseToReturn;
+      return await fn(newRawDB);
     });
+
+    await newRawDB.consumeTransactingQueue(opts.ensureOrder);
+
+    return rs;
+  }
+
+  /**
+   * Starts a new instance of raw db but for a single client
+   * operation, it's useful for cursors and in fact itemize
+   * will reject cursors not started in transactions
+   * 
+   * @param fn the transactional function
+   * @returns whatever is returned in the transactional function
+   */
+  public async startSingleClientOperation<T>(fn: (transactingRawDB: ItemizeRawDB) => Promise<T>, opts: { ensureOrder?: boolean } = {}): Promise<T> {
+    let newRawDB: ItemizeRawDB;
+    const rs = await this.databaseConnection.startSingleClientOperation(async (transactingClient) => {
+      newRawDB = new ItemizeRawDB(this.redisGlobal, this.redisPub, this.redisSub, transactingClient, this.root);
+      newRawDB.transacting = true;
+      newRawDB.transactingUsingSingleClientMode = true;
+      return await fn(newRawDB);
+    });
+
+    await newRawDB.consumeTransactingQueue(opts.ensureOrder);
+
+    return rs;
   }
 
   /**
@@ -1488,10 +1547,51 @@ export class ItemizeRawDB {
     selecter: (builder: SelectBuilder) => void,
     options: {
       preventJoin?: boolean,
+      withHold?: boolean,
+      noScroll?: boolean,
     } = {}
   ) {
+    if (!this.transacting) {
+      const err = new Error("Attempted to declare a raw db cursor when not transacting");
+      logger.error({
+        methodName: "declareRawDBCursorSelect",
+        className: "ItemizeRawDB",
+        message: "Declaring cursors in non-transaction mode is not allowed as it will lead to errors, " +
+          "please either startTransaction or startSingleClientOperation in order to proceed",
+        serious: true,
+        err,
+        data: {
+          cursorName,
+        }
+      });
+      throw err;
+    }
+
+    if (this.transactingUsingSingleClientMode && !options.withHold) {
+      const err = new Error("Attempted to declare raw db cursor WITHOUT HOLD directly into the database");
+      logger.error({
+        methodName: "declareRawDBCursorSelect",
+        className: "ItemizeRawDB",
+        message: "Declaring cursors WITHOUT hold in non-transactions will lead to errors",
+        serious: true,
+        err,
+        data: {
+          cursorName,
+        }
+      });
+      throw err;
+    }
+
     const builder = this._retrieveRawDBSelect(itemDefinitionOrModule, selecter, options);
     const declare = new DeclareCursorBuilder(cursorName, builder);
+
+    if (options.withHold) {
+      declare.withHold();
+    }
+
+    if (options.noScroll) {
+      declare.noScroll();
+    }
 
     return await this.databaseConnection.query(declare);
   }
@@ -1557,6 +1657,7 @@ export class ItemizeRawDB {
     options: {
       preventJoin?: boolean,
       batchSize?: number,
+      withHold?: boolean,
     } = {}
   ): AsyncGenerator<ISQLTableRowValue[], void, boolean | undefined> {
     const cursorname = "cursor_" + uuid.v4().replace(/-/g, "");
@@ -1565,7 +1666,10 @@ export class ItemizeRawDB {
       itemDefinitionOrModule,
       cursorname,
       selecter,
-      options,
+      {
+        ...options,
+        noScroll: true,
+      }
     );
 
     try {

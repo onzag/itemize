@@ -26,7 +26,7 @@ export class FetchOrMoveFromCursorBuilder extends QueryBuilder {
     this.type = type;
     this.name = name;
 
-    this.addBindingSource(this.name);
+    // this.addBindingSource(this.name);
   }
 
   public next() {
@@ -71,15 +71,11 @@ export class FetchOrMoveFromCursorBuilder extends QueryBuilder {
 
   public setDirection(dir: FetchCursorDirection, count: number) {
     if (typeof count === "number") {
-      this.clearBindingSources();
-      this.addBindingSource(count);
-      this.addBindingSource(this.name);
+      this.directionCount = count;
     } else {
-      this.clearBindingSources();
-      this.addBindingSource(this.name);
+      this.directionCount = null;
     }
 
-    this.directionCount = count;
     this.direction = dir;
   }
 
@@ -89,8 +85,8 @@ export class FetchOrMoveFromCursorBuilder extends QueryBuilder {
    */
   public compile(): string {
     if (typeof this.directionCount === "number") {
-      return this.type + " " + this.direction + " ? FROM ?";
+      return this.type + " " + this.direction + " " + this.directionCount + " FROM " + JSON.stringify(this.name);
     }
-    return this.type + " " + this.direction + " FROM ?";
+    return this.type + " " + this.direction + " FROM " + JSON.stringify(this.name);
   }
 }

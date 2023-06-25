@@ -20,7 +20,7 @@ export class CloseCursorBuilder extends QueryBuilder {
 
     this.name = name;
 
-    this.addBindingSource(this.name);
+    // this.addBindingSource(this.name);
   }
 
   /**
@@ -28,6 +28,6 @@ export class CloseCursorBuilder extends QueryBuilder {
    * @returns a string that represents the compiled result
    */
   public compile(): string {
-    return "CLOSE ?";
+    return "CLOSE " + JSON.stringify(this.name);
   }
 }

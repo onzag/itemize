@@ -243,6 +243,46 @@ export class DatabaseConnection {
   }
 
   /**
+   * Starts a single client operation without starting a transaction
+   * so whatever happens here cannot be rolled back nor commited
+   * 
+   * DO NOT USE for changes in the DB because they will be executed immediately
+   * USE for select cursors that are using WITH HOLD as they persist within
+   * a single client
+   * 
+   * @param arg 
+   * @returns 
+   */
+  public async startSingleClientOperation(arg: (transactingClient: DatabaseConnection) => Promise<any>) {
+    // first we fetch a client
+    const client = await this.pool.connect();
+    let result = null;
+
+    // now we build a treansacting client as a new database connection
+    const transactingClient = new DatabaseConnection(null, client, this.pool);
+    if (this.suppressLogs) {
+      transactingClient.suppressLogging();
+    }
+    if (this.forceLogs) {
+      transactingClient.forceLogging();
+    }
+
+    // now we can try this
+    try {
+      result = await arg(transactingClient);
+    } catch (err) {
+      client.release();
+      throw err;
+    }
+
+    // then release such client
+    client.release();
+
+    // and return the result we had given in the start
+    return result;
+  }
+
+  /**
    * Starts a transaction, while handling rollbacks and everything
    * @param arg a function that returns anything and handles the transacting client
    * @returns whatever you returned in your arg function

@@ -13,6 +13,8 @@ import { NanoSecondComposedDate } from "../nanodate";
 import { AggregationsAggregationContainer, FieldValue, QueryDslMatchPhraseQuery, QueryDslMatchQuery, QueryDslQueryContainer, QueryDslTermQuery, QueryDslTermsQuery, SearchRequest } from "@elastic/elasticsearch/lib/api/types";
 import { setInterval } from "timers";
 import type { IElasticHighlightReply } from "../base/Root/Module/ItemDefinition/PropertyDefinition/types";
+import { ISearchLimitersType } from "../base/Root";
+import type { SelectBuilder } from "../database/SelectBuilder";
 
 interface ElasticRequestOptions {
   ignoreAllInGroup?: boolean | string | string[];
@@ -1046,7 +1048,9 @@ export class ItemizeElasticClient {
           await this.runConsistencyCheck(item, force);
         }
       } else if (actualOnElement instanceof ItemDefinition) {
-        await this._runConsistencyCheck(actualOnElement, new Date(), 0, null, {});
+        await this.rawDB.startSingleClientOperation(async (rawDBClient) => {
+          await this._runConsistencyCheck(rawDBClient, actualOnElement, new Date(), 0, null, null, {});
+        });
       }
       pResolve && pResolve();
       delete this.runningConsistencyCheckOn[qPathName];
@@ -1064,654 +1068,738 @@ export class ItemizeElasticClient {
   }
 
   private async _runConsistencyCheck(
+    rawDBClient: ItemizeRawDB,
     idef: ItemDefinition,
     timeRan: Date,
     batchNumber: number,
     knownStatusInfo: IElasticIndexInformationType,
+    knownLimiters: ISearchLimitersType,
     ensuranceCache: any,
   ) {
-    const parentModule = idef.getParentModule();
-    const parentModuleEnabled = parentModule.isSearchEngineEnabled();
+    let cursorIsOpen: boolean = batchNumber !== 0;
+    const cursorName = idef.getQualifiedPathName().toLowerCase() + "_elastic_cursor";
 
-    const selfEnabled = idef.isSearchEngineEnabled();
+    try {
+      const parentModule = idef.getParentModule();
+      const parentModuleEnabled = parentModule.isSearchEngineEnabled();
 
-    if (!selfEnabled) {
-      return;
-    }
+      const selfEnabled = idef.isSearchEngineEnabled();
 
-    const qualifiedPathName = idef.getQualifiedPathName();
-    CAN_LOG_DEBUG && logger.debug(
-      {
-        className: "ItemizeElasticClient",
-        methodName: "_runConsistencyCheck",
-        message: "Index for " + qualifiedPathName + " to be checked for",
-        data: {
-          batchNumber,
-          timeRan,
-        },
+      if (!selfEnabled && !parentModuleEnabled) {
+        return;
       }
-    );
 
-    let statusInfo = knownStatusInfo || await this.retrieveIndexStatusInfo(qualifiedPathName);
-    const limiters = idef.getSearchLimiters(true);
-
-    const baseIndexPrefix = qualifiedPathName.toLowerCase() + "_";
-    const wildcardIndexName = baseIndexPrefix + "*";
-
-    let minimumCreatedAt: string = null;
-    if (limiters && limiters.since && batchNumber === 0) {
-      // cannot retrieve anything before this date, we do not need any older records
-      const minimumCreatedAtAsDate = new Date(timeRan.getTime() - limiters.since);
-      minimumCreatedAt = minimumCreatedAtAsDate.toISOString();
-
-      if (batchNumber === 0) {
-        CAN_LOG_DEBUG && logger.debug(
-          {
-            className: "ItemizeElasticClient",
-            methodName: "_runConsistencyCheck",
-            message: "Removing all documents for " + qualifiedPathName + " older than " + minimumCreatedAt,
-          },
-        );
-
-        await this.elasticClient.deleteByQuery({
-          index: wildcardIndexName,
-          query: {
-            range: {
-              created_at: {
-                lt: minimumCreatedAt,
-              }
-            }
-          },
-          allow_no_indices: true,
-        });
-      }
-    } else if (CAN_LOG_DEBUG && batchNumber === 0) {
-      logger.debug(
+      const qualifiedPathName = idef.getQualifiedPathName();
+      CAN_LOG_DEBUG && logger.debug(
         {
           className: "ItemizeElasticClient",
           methodName: "_runConsistencyCheck",
-          message: "" + qualifiedPathName + " does not have any since limiter",
-        },
-      );
-    }
-
-    if (batchNumber === 0) {
-      // let's first destroy all the documents that should be deleted
-      // and not exist if they happen to do so
-      const documentsDeletedSinceLastRan = await this.rawDB.databaseConnection.queryRows(
-        `SELECT "id", "version" FROM ${JSON.stringify(DELETED_REGISTRY_IDENTIFIER)} ` +
-        `WHERE "type" = ?` + (
-          statusInfo.lastConsistencyCheck ? ` AND "transaction_time" >= ?` : ""
-        ),
-        [
-          qualifiedPathName,
-          statusInfo.lastConsistencyCheck,
-        ].filter((v) => !!v),
-        true,
+          message: "Index for " + qualifiedPathName + " to be checked for",
+          data: {
+            batchNumber,
+            timeRan,
+          },
+        }
       );
 
-      if (documentsDeletedSinceLastRan.length) {
-        CAN_LOG_DEBUG && logger.debug(
+      let statusInfo = knownStatusInfo || await this.retrieveIndexStatusInfo(qualifiedPathName);
+      const limiters = knownLimiters || idef.getSearchLimiters(true);
+
+      const baseIndexPrefix = qualifiedPathName.toLowerCase() + "_";
+      const wildcardIndexName = baseIndexPrefix + "*";
+
+      let minimumCreatedAt: string = null;
+      if (limiters && limiters.since && batchNumber === 0) {
+        // cannot retrieve anything before this date, we do not need any older records
+        const minimumCreatedAtAsDate = new Date(timeRan.getTime() - limiters.since);
+        minimumCreatedAt = minimumCreatedAtAsDate.toISOString();
+
+        if (batchNumber === 0) {
+          CAN_LOG_DEBUG && logger.debug(
+            {
+              className: "ItemizeElasticClient",
+              methodName: "_runConsistencyCheck",
+              message: "Removing all documents for " + qualifiedPathName + " older than " + minimumCreatedAt,
+            },
+          );
+
+          await this.elasticClient.deleteByQuery({
+            index: wildcardIndexName,
+            query: {
+              range: {
+                created_at: {
+                  lt: minimumCreatedAt,
+                }
+              }
+            },
+            allow_no_indices: true,
+          });
+        }
+      } else if (CAN_LOG_DEBUG && batchNumber === 0) {
+        logger.debug(
           {
             className: "ItemizeElasticClient",
             methodName: "_runConsistencyCheck",
-            message: "Removing all documents found (they most likely already have been deleted) for " + qualifiedPathName,
-            data: {
-              documentsDeletedSinceLastRan,
-            },
-          }
-        );
-        await this.deleteDocumentsUnknownLanguage(
-          idef,
-          documentsDeletedSinceLastRan,
-        );
-      } else if (CAN_LOG_DEBUG) {
-        logger.debug(
-          {
-            className: "ItemizeElasticClient",
-            methodName: "runConsistencyCheck",
-            message: "Did not recieve any documents to delete for " + qualifiedPathName,
+            message: "" + qualifiedPathName + " does not have any since limiter",
           },
         );
       }
-    }
 
-    const expectedLanguageColumn = idef.getSearchEngineDynamicMainLanguageColumn();
-    const limitedColumns = idef.getSearchEngineLimitedColumns(limiters);
-
-    // no last consistency check then we gotta retrieve the whole thing because
-    // we want whole data this one round
-    const useModuleOnly = limitedColumns.idef.length || statusInfo.lastConsistencyCheck === null ? false : (
-      // otherwise it depends if we got a language column, it will depend on wether such column
-      // is in the module, otherwise we can be free to use module only
-      expectedLanguageColumn ? idef.isSearchEngineDynamicMainLanguageColumnInModule() : true
-    );
-
-    // now we can do the select
-    // we only select 100 as limit when doing a initial consistency check
-    // that we have never done before because of the reason below in the comment
-    // we are getting more data
-    const limit = statusInfo.lastConsistencyCheck === null ? 100 : 1000;
-    const offset = batchNumber * limit;
-    const documentsCreatedOrModifiedSinceLastRan = await this.rawDB.performRawDBSelect(
-      useModuleOnly ? idef.getParentModule() : idef,
-      (selecter) => {
-        // if our last consistency check is null, this means that we had never ran
-        // consistency before, we will likely have missing data that we need to fill voids for
-        // so we rather do just that and select everything rather than expecting
-        // holes not to be common
-        if (statusInfo.lastConsistencyCheck === null) {
-          // this is why we were using whole 2 tables
-          selecter.selectAll();
-        } else {
-          let columnsToSelect: string[] = ["id", "version", "last_modified"];
-          if (expectedLanguageColumn) {
-            columnsToSelect.push(expectedLanguageColumn);
-          }
-          if (limitedColumns.idef) {
-            limitedColumns.idef.forEach((p) => columnsToSelect.push(p));
-          }
-          if (limitedColumns.mod) {
-            limitedColumns.mod.forEach((p) => columnsToSelect.push(p));
-          }
-          // otherwise we assume our data isn't corrupted, and just select what
-          // we need making a minimal query
-          selecter.select(...columnsToSelect);
-        }
-
-        // now we can decide what we select for
-        // maybe it is everything, kind of scary
-        const whereBuilder = selecter.whereBuilder;
-        if (statusInfo.lastConsistencyCheck) {
-          whereBuilder.andWhereColumn("last_modified", ">", statusInfo.lastConsistencyCheck);
-        }
-
-        // if we only use the module we must ensure we are getting
-        // the right type and not something else entirely
-        if (useModuleOnly) {
-          whereBuilder.andWhereColumn("type", qualifiedPathName);
-        }
-
-        // ensure consistency, because we are pulling in batches we want to ensure we are not checking
-        // stuff that has been suddenly added while we are pulling these batches, but only pull what
-        // hasn't been pulled before, so we use the time we have ran this consistency check at not to pull
-        // anything newer than that
-        whereBuilder.andWhereColumn("created_at", "<=", timeRan.toISOString());
-
-        // because it's the first time and our index is empty we want to only retrieve
-        // the values that will ultimately populate the elastic index, we don't need to check
-        // for older values that should be deleted because they don't fit the criteria
-        // because that's just unnecessary when there's no data there
-        if (statusInfo.lastConsistencyCheck === null) {
-          if (limiters && limiters.parenting) {
-            whereBuilder.andWhereColumnNotNull("parent_id");
-          }
-
-          // limiting so that it's only for the given values for the properties
-          // of the search limiter
-          if (limiters && limiters.properties) {
-            limiters.properties.forEach((p) => {
-              let valuesToFilterFor = p.values;
-              if (!p.values || !p.values.length) {
-                // can't do anything the values is empty
-                logger.error(
-                  {
-                    className: "ItemizeElasticClient",
-                    methodName: "_runConsistencyCheck",
-                    message: "The values array is empty for a given limiter",
-                    data: {
-                      batchNumber,
-                      limiters,
-                    }
-                  }
-                );
-                valuesToFilterFor = [];
-              }
-
-              whereBuilder.andWhere(
-                JSON.stringify(p.id) + " = ANY(ARRAY[" + valuesToFilterFor.map(() => "?").join(",") + "])",
-                valuesToFilterFor as any,
-              );
-            });
-          }
-        }
-
-        // we always select the minimum created at if we have it
-        // unlike other limiters because we can easily delete older records than this
-        // as we have done before, so they will be of no confict, unlike corrupted records
-        // that did not delete when their value updated outside the limiter scope
-        if (minimumCreatedAt) {
-          whereBuilder.andWhereColumn("created_at", ">=", minimumCreatedAt);
-        }
-
-        // TODO change limit offset to cursor, limit offset is wasteful
-        // it would nevertheless work to keep consistency
-        selecter.limit(limit).offset(offset);
-        selecter.orderByBuilder.orderByColumn("created_at", "ASC", "FIRST");
-      }
-    );
-    const hasNextBatch = documentsCreatedOrModifiedSinceLastRan.length === limit;
-    let error: Error = null;
-
-    // cheap interface here
-    /**
-     * @ignore
-     */
-    interface IComparativeResult {
-      [mergedId: string]: {
-        r: {
-          id: string,
-          version: string,
-          last_modified: string,
-          [others: string]: any,
-        },
-        language: string,
-        lastModified: NanoSecondComposedDate,
-        isSearchLimited: boolean,
-      }
-    };
-
-    // now if we got some documents from there
-    // in our SQL information
-    if (documentsCreatedOrModifiedSinceLastRan.length) {
-      // we can now build this helper object
-      const resultObj: IComparativeResult = {};
-      documentsCreatedOrModifiedSinceLastRan.forEach((r) => {
-        const mergedId = r.id + "." + (r.version || "");
-        resultObj[mergedId] = {
-          r: r as any,
-          language: idef.getSearchEngineMainLanguageFromRow(r),
-          lastModified: new NanoSecondComposedDate(r.last_modified),
-          isSearchLimited: !idef.shouldRowBeIncludedInSearchEngine(r, limiters),
-        }
-      });
-
-      // and now the array of ids we got from there
-      // these are merged ids that will match those in elastic
-      const arrayOfIds = Object.keys(resultObj);
-
-      // now we get from all our wildcard indexes
-      const comparativeResults = await this.elasticClient.search({
-        index: wildcardIndexName,
-        query: {
-          terms: {
-            _id: arrayOfIds,
-          }
-        },
-        fields: [
-          "last_modified",
-        ],
-        _source: false,
-        allow_no_indices: true,
-        size: arrayOfIds.length,
-      });
-
-      const baseIndexPrefixLen = baseIndexPrefix.length;
-      const missingFromResults: string[] = [];
-      const extraAtResults: string[] = [];
-      arrayOfIds.forEach((id) => {
-        if (resultObj[id].isSearchLimited) {
-          const isThere = (
-            comparativeResults.hits.hits.some((hit) => {
-              return hit._id === id;
-            })
-          )
-          if (isThere) {
-            extraAtResults.push(id);
-          }
-        } else {
-          const isMissing = (
-            !comparativeResults.hits.hits.some((hit) => {
-              const isSameId = hit._id === id;
-
-              if (!isSameId) {
-                return false;
-              }
-
-              let language = hit._index.substring(baseIndexPrefixLen);
-              if (language === "none") {
-                language = null;
-              }
-              const objInfo = resultObj[hit._id];
-              const isSameLanguage = objInfo.language === language;
-
-              // exists with the same id and the same language
-              // so it is in the right index, otherwise
-              // it is considered missing
-
-              // the old value will be removed by notMissingButOutdated
-              // check for isInTheWrongLanguage for that check that comes just next
-              return isSameLanguage;
-            })
-          );
-
-          if (isMissing) {
-            missingFromResults.push(id);
-          }
-        }
-      });
-      const notMissingButOutdated: string[] = [];
-
-      let bulkOperations: any[][] = [];
-      let bulkOperationCurrentIndex: number = 0;
-      let bulkOperationCurrentIndexSize: number = 0;
-      const bulkOperationMaxSize = 20;
-
-      // we must ensure indexes but we are very lazy and want to avoid ensuring
-      // whatever already exists because it is pointless, we will be doing so shortly
-      // so let's populate the cache for ensurance checking later (if we do)
-      // the ensuranceCache does that
-
-      // now we loop over our results
-      comparativeResults.hits.hits.forEach((hit) => {
-        const objectInfo = resultObj[hit._id];
-        let language = hit._index.substring(baseIndexPrefixLen);
-        if (language === "none") {
-          language = null;
-        }
-        const lasModifiedStr = hit.fields.last_modified[0];
-
-        // lack of last modified means it's a corrupt record
-        const lastModified = !lasModifiedStr ? null : new NanoSecondComposedDate(lasModifiedStr);
-        const corruptRecord = !lastModified || lastModified.isInvalid();
-
-        // this will delete duplicated values simply because one of them will
-        // be in the wrong language by default because they don't occupy the same index
-        // so the language will differ, if both of them are invalid they will also go away
-        // for different reasons
-        const isInTheWrongLanguage = objectInfo.language !== language;
-        const isOutdated = corruptRecord ? true : objectInfo.lastModified.notEqual(lastModified);
-
-        // we basically have confirmed these index exist
-        // so we don't have to later
-        // we are lazy and efficient
-        // check the function later for ensurance and this basically
-        // makes it more efficient
-        ensuranceCache[hit._index] = true;
-
-        // so if it's in the wrong language
-        if (isInTheWrongLanguage) {
-          // it goes away by the bulk operations
-          if (!bulkOperations[bulkOperationCurrentIndex]) {
-            bulkOperations[bulkOperationCurrentIndex] = [];
-            bulkOperationCurrentIndexSize = 0;
-          }
-          bulkOperations[bulkOperationCurrentIndex].push({
-            delete: {
-              _index: hit._index,
-              _id: hit._id,
-            }
-          });
-          bulkOperationCurrentIndexSize++;
-          if (bulkOperationCurrentIndexSize >= bulkOperationMaxSize) {
-            bulkOperationCurrentIndex++;
-          }
-
-          CAN_LOG_DEBUG && logger.debug(
-            {
-              className: "ItemizeElasticClient",
-              methodName: "runConsistencyCheck",
-              message: "Operation for " + qualifiedPathName + " has been added (wrong language)",
-              data: {
-                operation: "delete",
-                index: hit._index,
-                id: hit._id,
-              },
-            }
-          );
-
-        } else if (isOutdated) {
-          // if it's outdated then we add it to this list
-          // where the value will be fetched
-          notMissingButOutdated.push(hit._id);
-        }
-      });
-
-      // extra documents that shouldn't be there
-      if (extraAtResults.length) {
-        // these are disrespecting the limiters and shouldn't be there anymore to begin with
-        await this.deleteDocumentsUnknownLanguage(
-          idef,
-          extraAtResults,
+      if (batchNumber === 0) {
+        // let's first destroy all the documents that should be deleted
+        // and not exist if they happen to do so
+        const documentsDeletedSinceLastRan = await rawDBClient.databaseConnection.queryRows(
+          `SELECT "id", "version" FROM ${JSON.stringify(DELETED_REGISTRY_IDENTIFIER)} ` +
+          `WHERE "type" = ?` + (
+            statusInfo.lastConsistencyCheck ? ` AND "transaction_time" >= ?` : ""
+          ),
+          [
+            qualifiedPathName,
+            statusInfo.lastConsistencyCheck,
+          ].filter((v) => !!v),
+          true,
         );
-      }
 
-      // if we have any of these mising or missing but outdated
-      if (missingFromResults.length + notMissingButOutdated.length) {
-        // we are going to loop over both
-        const operations = (await Promise.all(missingFromResults.concat(notMissingButOutdated).map(async (id) => {
-          // let's get the info we got from our database
-          const objectInfo = resultObj[id];
-          // and now let's get the value for this row, if the last consistency check is null
-          // this means that is cheekily stored in the object info already because
-          // we did a strong select with everything
-          const knownValue = statusInfo.lastConsistencyCheck === null ? objectInfo.r : (
-            await
-              this.rawDB.performRawDBSelect(
-                idef,
-                (s) =>
-                  s.selectAll().whereBuilder
-                    .andWhereColumn("id", objectInfo.r.id).andWhereColumn("version", objectInfo.r.version || "")
-              )
-          )[0];
-
-          // we lost the value while doing our operation
-          // an edge case scenario, that now implies the value has been deleted
-          // during this time, hence we don't do anything, the next check
-          // will take care of that
-          if (!knownValue) {
-            return null;
-          }
-
-          const convertedSQL = convertSQLValueToElasticSQLValueForItemDefinition(
-            this.serverData,
-            null,
-            idef,
-            knownValue,
-          );
-
-          const isOutdated = notMissingButOutdated.includes(id);
-
-          const indexItWillBelongTo = baseIndexPrefix + (objectInfo.language || "none");
-
-          // if it's missing then we gotta be sure the index where it will be added
-          // is there, just in case
-          if (!isOutdated) {
-            // if this doesn't find that our index exists
-            // then it will create it for our later operations
-            await this.ensureIndexInGroup(
-              indexItWillBelongTo,
-              objectInfo.language,
-              this.rootSchema[qualifiedPathName],
-              // here we are passing our ensurance cache
-              // it will be modified by this function so we don't
-              // double ask elastic for the same
-              ensuranceCache,
-            );
-          }
-
+        if (documentsDeletedSinceLastRan.length) {
           CAN_LOG_DEBUG && logger.debug(
             {
               className: "ItemizeElasticClient",
-              methodName: "runConsistencyCheck",
-              message: "Operation for " + qualifiedPathName + " has been added",
+              methodName: "_runConsistencyCheck",
+              message: "Removing all documents found (they most likely already have been deleted) for " + qualifiedPathName,
               data: {
-                operation: isOutdated ? "update" : "create",
-                index: indexItWillBelongTo,
-                id,
+                documentsDeletedSinceLastRan,
               },
             }
           );
-
-          return [
+          await this.deleteDocumentsUnknownLanguage(
+            idef,
+            documentsDeletedSinceLastRan,
+          );
+        } else if (CAN_LOG_DEBUG) {
+          logger.debug(
             {
-              [isOutdated ? "update" : "create"]: {
-                _index: indexItWillBelongTo,
-                _id: id,
-              }
+              className: "ItemizeElasticClient",
+              methodName: "runConsistencyCheck",
+              message: "Did not recieve any documents to delete for " + qualifiedPathName,
             },
-            convertedSQL,
-          ]
-        }))) as any[][];
+          );
+        }
+      }
 
-        operations.forEach((oGroup) => {
-          // edge case operation
-          if (oGroup === null) {
-            return;
+      if (batchNumber === 0) {
+        const expectedLanguageColumn = idef.getSearchEngineDynamicMainLanguageColumn();
+        const limitedColumns = idef.getSearchEngineLimitedColumns(limiters);
+
+        // now we can do the select
+        // we only select 100 as limit when doing a initial consistency check
+        // that we have never done before because of the reason below in the comment
+        // we are getting more data
+        // const limit = statusInfo.lastConsistencyCheck === null ? 100 : 1000;
+        // const offset = batchNumber * limit;
+
+        // no last consistency check then we gotta retrieve the whole thing because
+        // we want whole data this one round
+        const useModuleOnly = limitedColumns.idef.length || statusInfo.lastConsistencyCheck === null ? false : (
+          // otherwise it depends if we got a language column, it will depend on wether such column
+          // is in the module, otherwise we can be free to use module only
+          expectedLanguageColumn ? idef.isSearchEngineDynamicMainLanguageColumnInModule() : true
+        );
+
+        const selectBuilder = (selecter: SelectBuilder) => {
+          // if our last consistency check is null, this means that we had never ran
+          // consistency before, we will likely have missing data that we need to fill voids for
+          // so we rather do just that and select everything rather than expecting
+          // holes not to be common
+          if (statusInfo.lastConsistencyCheck === null) {
+            // this is why we were using whole 2 tables
+            selecter.selectAll();
+          } else {
+            let columnsToSelect: string[] = ["id", "version", "last_modified"];
+            if (expectedLanguageColumn) {
+              columnsToSelect.push(expectedLanguageColumn);
+            }
+            if (limitedColumns.idef) {
+              limitedColumns.idef.forEach((p) => columnsToSelect.push(p));
+            }
+            if (limitedColumns.mod) {
+              limitedColumns.mod.forEach((p) => columnsToSelect.push(p));
+            }
+            // otherwise we assume our data isn't corrupted, and just select what
+            // we need making a minimal query
+            selecter.select(...columnsToSelect);
           }
 
-          if (!bulkOperations[bulkOperationCurrentIndex]) {
-            bulkOperations[bulkOperationCurrentIndex] = [];
-            bulkOperationCurrentIndexSize = 0;
+          // now we can decide what we select for
+          // maybe it is everything, kind of scary
+          const whereBuilder = selecter.whereBuilder;
+          if (statusInfo.lastConsistencyCheck) {
+            whereBuilder.andWhereColumn("last_modified", ">", statusInfo.lastConsistencyCheck);
           }
-          bulkOperations[bulkOperationCurrentIndex].push(oGroup[0], oGroup[1]);
-          bulkOperationCurrentIndexSize++;
-          if (bulkOperationCurrentIndexSize >= bulkOperationMaxSize) {
-            bulkOperationCurrentIndex++;
+
+          // if we only use the module we must ensure we are getting
+          // the right type and not something else entirely
+          if (useModuleOnly) {
+            whereBuilder.andWhereColumn("type", qualifiedPathName);
+          }
+
+          // ensure consistency, because we are pulling in batches we want to ensure we are not checking
+          // stuff that has been suddenly added while we are pulling these batches, but only pull what
+          // hasn't been pulled before, so we use the time we have ran this consistency check at not to pull
+          // anything newer than that
+          whereBuilder.andWhereColumn("created_at", "<=", timeRan.toISOString());
+
+          // because it's the first time and our index is empty we want to only retrieve
+          // the values that will ultimately populate the elastic index, we don't need to check
+          // for older values that should be deleted because they don't fit the criteria
+          // because that's just unnecessary when there's no data there
+          if (statusInfo.lastConsistencyCheck === null) {
+            if (limiters && limiters.parenting) {
+              whereBuilder.andWhereColumnNotNull("parent_id");
+            }
+
+            // limiting so that it's only for the given values for the properties
+            // of the search limiter
+            if (limiters && limiters.properties) {
+              limiters.properties.forEach((p) => {
+                let valuesToFilterFor = p.values;
+                if (!p.values || !p.values.length) {
+                  // can't do anything the values is empty
+                  logger.error(
+                    {
+                      className: "ItemizeElasticClient",
+                      methodName: "_runConsistencyCheck",
+                      message: "The values array is empty for a given limiter",
+                      data: {
+                        batchNumber,
+                        limiters,
+                      }
+                    }
+                  );
+                  valuesToFilterFor = [];
+                }
+
+                whereBuilder.andWhere(
+                  JSON.stringify(p.id) + " = ANY(ARRAY[" + valuesToFilterFor.map(() => "?").join(",") + "])",
+                  valuesToFilterFor as any,
+                );
+              });
+            }
+          }
+
+          // we always select the minimum created at if we have it
+          // unlike other limiters because we can easily delete older records than this
+          // as we have done before, so they will be of no confict, unlike corrupted records
+          // that did not delete when their value updated outside the limiter scope
+          if (minimumCreatedAt) {
+            whereBuilder.andWhereColumn("created_at", ">=", minimumCreatedAt);
+          }
+
+          // it would nevertheless work to keep consistency
+          // limit offset has been removed in favour of cursors
+          // selecter.limit(limit).offset(offset);
+          selecter.orderByBuilder.orderByColumn("created_at", "ASC", "FIRST");
+        }
+
+        try {
+          // declare the cursor
+          await rawDBClient.declareRawDBCursorSelect(
+            useModuleOnly ? idef.getParentModule() : idef,
+            cursorName,
+            selectBuilder,
+            {
+              // important for performance as we are only getting consecutive results
+              noScroll: true,
+              // important because we want to run straight into the db
+              // and hold it there
+              withHold: true,
+            }
+          );
+          cursorIsOpen = true;
+        } catch (err) {
+          // oops
+          logger.error(
+            {
+              className: "ItemizeElasticClient",
+              methodName: "_runConsistencyCheck",
+              message: "Could not declare a pgSQL cursor for " + idef.getQualifiedPathName() + " assuming it's open already",
+              err,
+            }
+          );
+
+          throw err;
+        }
+      }
+
+      const totalExpected = statusInfo.lastConsistencyCheck === null ? 100 : 1000;
+      const documentsCreatedOrModifiedSinceLastRan = await rawDBClient.fetchFromRawDBCursor(cursorName, (f) => {
+        // select forward a number of records
+        f.forward(totalExpected);
+      });
+      const hasNextBatch = documentsCreatedOrModifiedSinceLastRan.length === totalExpected;
+      let error: Error = null;
+
+      // cheap interface here
+      /**
+       * @ignore
+       */
+      interface IComparativeResult {
+        [mergedId: string]: {
+          r: {
+            id: string,
+            version: string,
+            last_modified: string,
+            [others: string]: any,
+          },
+          language: string,
+          lastModified: NanoSecondComposedDate,
+          isSearchLimited: boolean,
+        }
+      };
+
+      // now if we got some documents from there
+      // in our SQL information
+      if (documentsCreatedOrModifiedSinceLastRan.length) {
+        // we can now build this helper object
+        const resultObj: IComparativeResult = {};
+        documentsCreatedOrModifiedSinceLastRan.forEach((r) => {
+          const mergedId = r.id + "." + (r.version || "");
+          resultObj[mergedId] = {
+            r: r as any,
+            language: idef.getSearchEngineMainLanguageFromRow(r),
+            lastModified: new NanoSecondComposedDate(r.last_modified),
+            isSearchLimited: !idef.shouldRowBeIncludedInSearchEngine(r, limiters),
           }
         });
+
+        // and now the array of ids we got from there
+        // these are merged ids that will match those in elastic
+        const arrayOfIds = Object.keys(resultObj);
+
+        // now we get from all our wildcard indexes
+        const comparativeResults = await this.elasticClient.search({
+          index: wildcardIndexName,
+          query: {
+            terms: {
+              _id: arrayOfIds,
+            }
+          },
+          fields: [
+            "last_modified",
+          ],
+          _source: false,
+          allow_no_indices: true,
+          size: arrayOfIds.length,
+        });
+
+        const baseIndexPrefixLen = baseIndexPrefix.length;
+        const missingFromResults: string[] = [];
+        const extraAtResults: string[] = [];
+        arrayOfIds.forEach((id) => {
+          if (resultObj[id].isSearchLimited) {
+            const isThere = (
+              comparativeResults.hits.hits.some((hit) => {
+                return hit._id === id;
+              })
+            )
+            if (isThere) {
+              extraAtResults.push(id);
+            }
+          } else {
+            const isMissing = (
+              !comparativeResults.hits.hits.some((hit) => {
+                const isSameId = hit._id === id;
+
+                if (!isSameId) {
+                  return false;
+                }
+
+                let language = hit._index.substring(baseIndexPrefixLen);
+                if (language === "none") {
+                  language = null;
+                }
+                const objInfo = resultObj[hit._id];
+                const isSameLanguage = objInfo.language === language;
+
+                // exists with the same id and the same language
+                // so it is in the right index, otherwise
+                // it is considered missing
+
+                // the old value will be removed by notMissingButOutdated
+                // check for isInTheWrongLanguage for that check that comes just next
+                return isSameLanguage;
+              })
+            );
+
+            if (isMissing) {
+              missingFromResults.push(id);
+            }
+          }
+        });
+        const notMissingButOutdated: string[] = [];
+
+        let bulkOperations: any[][] = [];
+        let bulkOperationCurrentIndex: number = 0;
+        let bulkOperationCurrentIndexSize: number = 0;
+        const bulkOperationMaxSize = 20;
+
+        // we must ensure indexes but we are very lazy and want to avoid ensuring
+        // whatever already exists because it is pointless, we will be doing so shortly
+        // so let's populate the cache for ensurance checking later (if we do)
+        // the ensuranceCache does that
+
+        // now we loop over our results
+        comparativeResults.hits.hits.forEach((hit) => {
+          const objectInfo = resultObj[hit._id];
+          let language = hit._index.substring(baseIndexPrefixLen);
+          if (language === "none") {
+            language = null;
+          }
+          const lasModifiedStr = hit.fields.last_modified[0];
+
+          // lack of last modified means it's a corrupt record
+          const lastModified = !lasModifiedStr ? null : new NanoSecondComposedDate(lasModifiedStr);
+          const corruptRecord = !lastModified || lastModified.isInvalid();
+
+          // this will delete duplicated values simply because one of them will
+          // be in the wrong language by default because they don't occupy the same index
+          // so the language will differ, if both of them are invalid they will also go away
+          // for different reasons
+          const isInTheWrongLanguage = objectInfo.language !== language;
+          const isOutdated = corruptRecord ? true : objectInfo.lastModified.notEqual(lastModified);
+
+          // we basically have confirmed these index exist
+          // so we don't have to later
+          // we are lazy and efficient
+          // check the function later for ensurance and this basically
+          // makes it more efficient
+          ensuranceCache[hit._index] = true;
+
+          // so if it's in the wrong language
+          if (isInTheWrongLanguage) {
+            // it goes away by the bulk operations
+            if (!bulkOperations[bulkOperationCurrentIndex]) {
+              bulkOperations[bulkOperationCurrentIndex] = [];
+              bulkOperationCurrentIndexSize = 0;
+            }
+            bulkOperations[bulkOperationCurrentIndex].push({
+              delete: {
+                _index: hit._index,
+                _id: hit._id,
+              }
+            });
+            bulkOperationCurrentIndexSize++;
+            if (bulkOperationCurrentIndexSize >= bulkOperationMaxSize) {
+              bulkOperationCurrentIndex++;
+            }
+
+            CAN_LOG_DEBUG && logger.debug(
+              {
+                className: "ItemizeElasticClient",
+                methodName: "_runConsistencyCheck",
+                message: "Operation for " + qualifiedPathName + " has been added (wrong language)",
+                data: {
+                  operation: "delete",
+                  index: hit._index,
+                  id: hit._id,
+                },
+              }
+            );
+
+          } else if (isOutdated) {
+            // if it's outdated then we add it to this list
+            // where the value will be fetched
+            notMissingButOutdated.push(hit._id);
+          }
+        });
+
+        // extra documents that shouldn't be there
+        if (extraAtResults.length) {
+          // these are disrespecting the limiters and shouldn't be there anymore to begin with
+          await this.deleteDocumentsUnknownLanguage(
+            idef,
+            extraAtResults,
+          );
+        }
+
+        // if we have any of these mising or missing but outdated
+        if (missingFromResults.length + notMissingButOutdated.length) {
+          // we are going to loop over both
+          const operations = (await Promise.all(missingFromResults.concat(notMissingButOutdated).map(async (id) => {
+            // let's get the info we got from our database
+            const objectInfo = resultObj[id];
+            // and now let's get the value for this row, if the last consistency check is null
+            // this means that is cheekily stored in the object info already because
+            // we did a strong select with everything
+            const knownValue = statusInfo.lastConsistencyCheck === null ? objectInfo.r : (
+              await
+                rawDBClient.performRawDBSelect(
+                  idef,
+                  (s) =>
+                    s.selectAll().whereBuilder
+                      .andWhereColumn("id", objectInfo.r.id).andWhereColumn("version", objectInfo.r.version || "")
+                )
+            )[0];
+
+            // we lost the value while doing our operation
+            // an edge case scenario, that now implies the value has been deleted
+            // during this time, hence we don't do anything, the next check
+            // will take care of that
+            if (!knownValue) {
+              return null;
+            }
+
+            const convertedSQL = convertSQLValueToElasticSQLValueForItemDefinition(
+              this.serverData,
+              null,
+              idef,
+              knownValue,
+            );
+
+            const isOutdated = notMissingButOutdated.includes(id);
+
+            const indexItWillBelongTo = baseIndexPrefix + (objectInfo.language || "none");
+
+            // if it's missing then we gotta be sure the index where it will be added
+            // is there, just in case
+            if (!isOutdated) {
+              // if this doesn't find that our index exists
+              // then it will create it for our later operations
+              await this.ensureIndexInGroup(
+                indexItWillBelongTo,
+                objectInfo.language,
+                this.rootSchema[qualifiedPathName],
+                // here we are passing our ensurance cache
+                // it will be modified by this function so we don't
+                // double ask elastic for the same
+                ensuranceCache,
+              );
+            }
+
+            CAN_LOG_DEBUG && logger.debug(
+              {
+                className: "ItemizeElasticClient",
+                methodName: "_runConsistencyCheck",
+                message: "Operation for " + qualifiedPathName + " has been added",
+                data: {
+                  operation: isOutdated ? "update" : "create",
+                  index: indexItWillBelongTo,
+                  id,
+                },
+              }
+            );
+
+            return [
+              {
+                [isOutdated ? "update" : "create"]: {
+                  _index: indexItWillBelongTo,
+                  _id: id,
+                }
+              },
+              convertedSQL,
+            ]
+          }))) as any[][];
+
+          operations.forEach((oGroup) => {
+            // edge case operation
+            if (oGroup === null) {
+              return;
+            }
+
+            if (!bulkOperations[bulkOperationCurrentIndex]) {
+              bulkOperations[bulkOperationCurrentIndex] = [];
+              bulkOperationCurrentIndexSize = 0;
+            }
+            bulkOperations[bulkOperationCurrentIndex].push(oGroup[0], oGroup[1]);
+            bulkOperationCurrentIndexSize++;
+            if (bulkOperationCurrentIndexSize >= bulkOperationMaxSize) {
+              bulkOperationCurrentIndex++;
+            }
+          });
+        } else if (CAN_LOG_DEBUG) {
+          logger.debug(
+            {
+              className: "ItemizeElasticClient",
+              methodName: "_runConsistencyCheck",
+              message: "Did not recieve any new documents (that are missing or outdated in elastic) for " + qualifiedPathName,
+            },
+          );
+        }
+
+        if (bulkOperations.length) {
+          logger.info(
+            {
+              className: "ItemizeElasticClient",
+              methodName: "_runConsistencyCheck",
+              message: bulkOperations.length +
+                " bulk operations have been created for batch " +
+                (batchNumber + 1) +
+                " of " +
+                qualifiedPathName,
+            },
+          );
+          // we are done
+          try {
+            // the operation chunk size is 20 fixes at once, this is smaller than the selection
+            // but we are not sure how big our http requests can get, we will now split
+            // as some of these elastic servers can really take very tiny payloads
+            // this will ensure a rather constant stream of data
+            await Promise.all(bulkOperations.map(async (bulkOp, index) => {
+              logger.info(
+                {
+                  className: "ItemizeElasticClient",
+                  methodName: "_runConsistencyCheck",
+                  message: "Executing bulk number " +
+                    (index + 1) +
+                    "/" +
+                    bulkOperations.length +
+                    " for batch " +
+                    (batchNumber + 1) +
+                    " of " +
+                    qualifiedPathName,
+                },
+              );
+
+              const operations = await this.elasticClient.bulk({
+                operations: bulkOp,
+              });
+
+              // bulk fails silently but we must not accept this because this means
+              // invalid consistency and we must ensure consistency
+              if (operations.errors) {
+                const errored = operations.items.map((o) => {
+                  // avoid reporting version conflict engine exceptions as the values have been created
+                  const error = (o.create && o.create.error && o.create.status !== 409 && o.create.error) ||
+                    (o.update && o.update.error) ||
+                    (o.delete && o.delete.error && o.delete.status !== 404 && o.delete.error);
+
+                  // ignoring race conditions where for some incredible reason of the gods
+                  // somehow the record got deleted, say by another instance
+                  // while we are trying to apply consistency, this is incredibly unlikely
+                  // but who knows, we ignore those cases
+
+                  // as for update, we can't be sure why the document dissapeared
+
+                  return error || null;
+                }).filter((e) => !!e);
+
+                if (errored.length) {
+                  throw new Error(
+                    JSON.stringify(errored),
+                  );
+                }
+              }
+            }));
+          } catch (err) {
+            logger.error(
+              {
+                className: "ItemizeElasticClient",
+                methodName: "_runConsistencyCheck",
+                message: "Some bulk operations failed for " + qualifiedPathName,
+                serious: true,
+                err,
+                data: {
+                  batchNumber,
+                }
+              }
+            );
+            // we consume the error and allow the function to recurse
+            error = err;
+          }
+        } else if (CAN_LOG_DEBUG) {
+          logger.debug(
+            {
+              className: "ItemizeElasticClient",
+              methodName: "_runConsistencyCheck",
+              message: "Did not recieve any bulk operations for " + qualifiedPathName,
+            },
+          );
+        }
       } else if (CAN_LOG_DEBUG) {
         logger.debug(
           {
             className: "ItemizeElasticClient",
-            methodName: "runConsistencyCheck",
-            message: "Did not recieve any new documents (that are missing or outdated in elastic) for " + qualifiedPathName,
+            methodName: "_runConsistencyCheck",
+            message: "Did not recieve any new documents since nothing has changed since last check for " + qualifiedPathName,
           },
         );
       }
 
-      if (bulkOperations.length) {
-        logger.info(
-          {
-            className: "ItemizeElasticClient",
-            methodName: "runConsistencyCheck",
-            message: bulkOperations.length +
-              " bulk operations have been created for batch " +
-              (batchNumber + 1) +
-              " of " +
-              qualifiedPathName,
-          },
+      // if we have another batch then we should consume such batch
+      if (hasNextBatch) {
+        await this._runConsistencyCheck(
+          rawDBClient,
+          idef,
+          timeRan,
+          batchNumber + 1,
+          statusInfo,
+          limiters,
+          ensuranceCache,
         );
-        // we are done
+
+        // this will throw the error that occured in this layer
+        // but will allow to keep processing the other batches
+        // whatever happened hopefully will fix itself on the next
+        // consistency check round, but we tried to update and fix
+        // as many records as possible
+        if (error) {
+          throw error;
+        }
+      } else {
         try {
-          // the operation chunk size is 20 fixes at once, this is smaller than the selection
-          // but we are not sure how big our http requests can get, we will now split
-          // as some of these elastic servers can really take very tiny payloads
-          // this will ensure a rather constant stream of data
-          await Promise.all(bulkOperations.map(async (bulkOp, index) => {
-            logger.info(
-              {
-                className: "ItemizeElasticClient",
-                methodName: "runConsistencyCheck",
-                message: "Executing bulk number " +
-                  (index + 1) +
-                  "/" +
-                  bulkOperations.length +
-                  " for batch " +
-                  (batchNumber + 1) +
-                  " of " +
-                  qualifiedPathName,
-              },
-            );
-
-            const operations = await this.elasticClient.bulk({
-              operations: bulkOp,
-            });
-
-            // bulk fails silently but we must not accept this because this means
-            // invalid consistency and we must ensure consistency
-            if (operations.errors) {
-              const errored = operations.items.map((o) => {
-                // avoid reporting version conflict engine exceptions as the values have been created
-                const error = (o.create && o.create.error && o.create.status !== 409 && o.create.error) ||
-                  (o.update && o.update.error) ||
-                  (o.delete && o.delete.error && o.delete.status !== 404 && o.delete.error);
-
-                // ignoring race conditions where for some incredible reason of the gods
-                // somehow the record got deleted, say by another instance
-                // while we are trying to apply consistency, this is incredibly unlikely
-                // but who knows, we ignore those cases
-
-                // as for update, we can't be sure why the document dissapeared
-
-                return error || null;
-              }).filter((e) => !!e);
-
-              if (errored.length) {
-                throw new Error(
-                  JSON.stringify(errored),
-                );
-              }
-            }
-          }));
+          await rawDBClient.closeRawDBCursor(cursorName);
         } catch (err) {
           logger.error(
             {
               className: "ItemizeElasticClient",
-              methodName: "runConsistencyCheck",
-              message: "Some bulk operations failed for " + qualifiedPathName,
+              methodName: "_runConsistencyCheck",
+              message: "Failed to close cursor for " + cursorName + " when ending",
               serious: true,
               err,
               data: {
                 batchNumber,
+                cursorName,
               }
             }
           );
-          // we consume the error and allow the function to recurse
-          error = err;
         }
-      } else if (CAN_LOG_DEBUG) {
-        logger.debug(
+      }
+
+      // we can update our timestamp if we are the initial and not some batch
+      // this wil not occur if an error is triggered
+      // causing it to retry from the same point
+      if (batchNumber === 0) {
+        await this.setIndexStatusInfo(
+          qualifiedPathName,
           {
-            className: "ItemizeElasticClient",
-            methodName: "runConsistencyCheck",
-            message: "Did not recieve any bulk operations for " + qualifiedPathName,
-          },
+            lastConsistencyCheck: timeRan.toISOString(),
+            signature: JSON.stringify({
+              limiters: limiters,
+            })
+          }
         );
       }
-    } else if (CAN_LOG_DEBUG) {
-      logger.debug(
-        {
-          className: "ItemizeElasticClient",
-          methodName: "runConsistencyCheck",
-          message: "Did not recieve any new documents since nothing has changed since last check for " + qualifiedPathName,
-        },
-      );
-    }
-
-    // if we have another batch then we should consume such batch
-    if (hasNextBatch) {
-      await this._runConsistencyCheck(
-        idef,
-        timeRan,
-        batchNumber + 1,
-        statusInfo,
-        ensuranceCache,
-      );
-
-      // this will throw the error that occured in this layer
-      // but will allow to keep processing the other batches
-      // whatever happened hopefully will fix itself on the next
-      // consistency check round, but we tried to update and fix
-      // as many records as possible
-      if (error) {
-        throw error;
-      }
-    }
-
-    // we can update our timestamp if we are the initial and not some batch
-    // this wil not occur if an error is triggered
-    // causing it to retry from the same point
-    if (batchNumber === 0) {
-      await this.setIndexStatusInfo(
-        qualifiedPathName,
-        {
-          lastConsistencyCheck: timeRan.toISOString(),
-          signature: JSON.stringify({
-            limiters: limiters,
-          })
+    } catch (err) {
+      if (cursorIsOpen) {
+        try {
+          await rawDBClient.closeRawDBCursor(cursorName);
+        } catch (err2) {
+          logger.error(
+            {
+              className: "ItemizeElasticClient",
+              methodName: "_runConsistencyCheck",
+              message: "Failed to close cursor for " + cursorName + " during error handling",
+              serious: true,
+              err: err2,
+              data: {
+                batchNumber,
+                cursorName,
+              }
+            }
+          );
         }
-      );
+      }
+
+      throw err;
     }
   }
 

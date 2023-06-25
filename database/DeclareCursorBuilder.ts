@@ -11,6 +11,8 @@ import { QueryBuilder } from "./base";
 export class DeclareCursorBuilder extends QueryBuilder {
   public forQuery: QueryBuilder;
   public name: string;
+  public isWithHold: boolean = false;
+  public scrollState: string = null;
 
   /**
    * Builds a new declare query builder
@@ -23,8 +25,38 @@ export class DeclareCursorBuilder extends QueryBuilder {
     this.name = name;
     this.forQuery = forQuery;
 
-    this.addBindingSource(this.name);
+    // this.addBindingSource(this.name);
     this.addBindingSource(this.forQuery);
+  }
+
+  public withHold() {
+    this.isWithHold = true;
+
+    return this;
+  }
+
+  public withoutHold() {
+    this.isWithHold = false;
+
+    return this;
+  }
+
+  public scroll() {
+    this.scrollState = "SCROLL";
+
+    return this;
+  }
+
+  public noScroll() {
+    this.scrollState = "NO SCROLL";
+
+    return this;
+  }
+
+  public clearScroll() {
+    this.scrollState = null;
+
+    return this;
   }
 
   /**
@@ -32,6 +64,10 @@ export class DeclareCursorBuilder extends QueryBuilder {
    * @returns a string that represents the compiled result
    */
   public compile(): string {
-    return "DECLARE ? CURSOR FOR " + this.forQuery.compile();
+    return "DECLARE " + JSON.stringify(this.name) +
+      (this.scrollState ? " " + this.scrollState : "") +
+      " CURSOR" +
+      (this.isWithHold ? " WITH HOLD" : " WITHOUT HOLD") +
+      " FOR " + this.forQuery.compile();
   }
 }
