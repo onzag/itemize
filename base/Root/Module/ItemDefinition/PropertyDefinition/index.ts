@@ -2275,6 +2275,33 @@ export default class PropertyDefinition {
     return this.rawData.type === "string" && this.rawData.subtype && this.rawData.subtype.endsWith("-tracked");
   }
 
+  public isPointer() {
+    return this.rawData.type === "string" && this.rawData.subtype && this.rawData.subtype.startsWith("pointer");
+  }
+
+  public isPointerList() {
+    return this.rawData.type === "taglist" && this.rawData.subtype && this.rawData.subtype.startsWith("pointer");
+  }
+
+  public getPointerSynchronizationItem(): ItemDefinition {
+    const item = this.getPointerSynchronizationItem();
+    if (!item || item instanceof Module) {
+      return null;
+    }
+    return item;
+  }
+
+  public getPointerSynchronizationProperty(): PropertyDefinition {
+    const item = this.getPointerSynchronizationItem();
+    if (!item) {
+      return null;
+    }
+    if (!item.hasPropertyDefinitionFor(this.rawData.config.synchronizeProperty, true)) {
+      return null;
+    }
+    return item.getPropertyDefinitionFor(this.rawData.config.synchronizeProperty, true);
+  }
+
   /**
    * Provides the max length as defined, or null if not available
    * @returns a number or null

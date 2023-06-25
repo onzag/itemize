@@ -142,7 +142,7 @@ export function standardElasticOrderBy(arg: ISQLOrderByInfo) {
  * @param arg the in arg
  * @returns the rows to select
  */
-export function standardSQLSelect(arg: ISQLArgInfo): string[] {
+export function standardSQLSelect(arg: IArgInfo): string[] {
   // as simple as this
   return [
     arg.prefix + arg.id,

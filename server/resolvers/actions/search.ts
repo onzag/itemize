@@ -244,8 +244,6 @@ export async function searchModule(
           itemDefinition: null,
           prefix: "",
           property: propDef,
-          serverData: appData.cache.getServerData(),
-          appData,
         });
         sqlFieldsToRequest = sqlFieldsToRequest.concat(sqlSelectFields);
       }
@@ -1086,9 +1084,7 @@ export async function searchItemDefinition(
                 itemDefinition,
                 prefix: includePrefix,
                 property: propDef,
-                serverData: appData.cache.getServerData(),
                 include,
-                appData,
               });
               sqlFieldsToRequest = sqlFieldsToRequest.concat(sqlSelectFields);
             });
@@ -1106,8 +1102,6 @@ export async function searchItemDefinition(
               itemDefinition,
               prefix: "",
               property: propDef,
-              serverData: appData.cache.getServerData(),
-              appData,
             });
             sqlFieldsToRequest = sqlFieldsToRequest.concat(...sqlSelectFields);
           }

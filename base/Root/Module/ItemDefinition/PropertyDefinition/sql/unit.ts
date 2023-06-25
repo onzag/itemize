@@ -61,7 +61,7 @@ export function unitElastic(arg: ISQLArgInfo) {
  * the selection function for unit based elements
  * @param arg the arg
  */
-export function unitSQLSelect(arg: ISQLArgInfo) {
+export function unitSQLSelect(arg: IArgInfo) {
   return [
     arg.prefix + arg.id + "_VALUE",
     arg.prefix + arg.id + "_UNIT",

@@ -64,7 +64,20 @@ const typeValue: IPropertyDefinitionSupportedType<PropertyDefinitionSupportedTag
   sqlOrderBy: null,
   elasticSort: null,
   localOrderBy: null,
-  supportedSubtypes: ["arbitrary-tags"],
+  supportedSubtypes: ["arbitrary", "pointers"],
+
+  configOptions: [
+    {
+      name: "synchronizeProperty",
+      type: "string",
+      required: ["pointers"],
+    },
+    {
+      name: "synchronizeItem",
+      type: "string",
+      required: ["pointers"],
+    },
+  ],
 
   localSearch: (arg) => {
     // item is deleted
@@ -107,10 +120,10 @@ const typeValue: IPropertyDefinitionSupportedType<PropertyDefinitionSupportedTag
   },
   isNull: (v) => !v || !v.length,
   validate: (s: PropertyDefinitionSupportedTagListType, p: IPropertyDefinitionRawJSONDataType) => {
-    if (p.subtype !== "arbitrary-tags") {
+    if (p.subtype !== "arbitrary") {
       if (!s.every((v) => {
         return (
-          typeof v === "string" &&
+          typeof v === "string" &&
           p.values.includes(v)
         );
       })) {

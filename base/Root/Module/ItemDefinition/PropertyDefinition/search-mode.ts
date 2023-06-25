@@ -671,7 +671,7 @@ export function buildSearchModePropertyDefinitions(
     newPropDef2 = {
       ...newPropDef,
       type: "taglist",
-      subtype: rawData.values ? null : "arbitrary-tags",
+      subtype: rawData.values ? null : "arbitrary",
       id: PropertyDefinitionSearchInterfacesPrefixes.IN + rawData.id,
     }
 

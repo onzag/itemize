@@ -36,11 +36,13 @@ import { WithBuilder } from "../database/WithBuilder";
 import { UpdateBuilder } from "../database/UpdateBuilder";
 import { SelectBuilder } from "../database/SelectBuilder";
 import { convertSQLValueToGQLValueForProperty } from "../base/Root/Module/ItemDefinition/PropertyDefinition/sql";
+import type PropertyDefinition from "../base/Root/Module/ItemDefinition/PropertyDefinition";
 
 import {
   CAN_LOG_DEBUG,
 } from "./environment";
-import { ItemizeElasticClient } from "./elastic";
+import type { ItemizeElasticClient } from "./elastic";
+import type { ItemizeRawDB } from "./raw-db";
 
 const CACHE_EXPIRES_DAYS = 14;
 const MEMCACHE_EXPIRES_MS = 1000;
@@ -49,6 +51,14 @@ interface IPropertyMapElement {
   id: string,
   newValue: string,
   originalValue: string,
+}
+
+interface IPropertyMapElementPointer {
+  newValue: string[],
+  originalValue: string[],
+  sourceProperty: PropertyDefinition;
+  targetIdef: ItemDefinition;
+  targetProperty: PropertyDefinition;
 }
 
 /**
@@ -839,6 +849,32 @@ export class Cache {
       }
     });
 
+    const pointerMap: IPropertyMapElementPointer[] = [];
+    itemDefinition.getAllPropertyDefinitionsAndExtensions().forEach((pDef) => {
+      if (pDef.isPointer() || pDef.isPointerList()) {
+        let newValue: string[] = typeof value[pDef.getId()] === "undefined" ? null : (value[pDef.getId()] || null);
+        if (Array.isArray(newValue)) {
+          newValue = newValue.sort().filter((element, index, arr) => {
+            return arr.indexOf(element) === index;
+          });
+        } else if (typeof newValue === "string") {
+          newValue = [newValue];
+        } else if (!newValue) {
+          newValue = [];
+        }
+
+        if (newValue && newValue.length) {
+          pointerMap.push({
+            newValue,
+            originalValue: [],
+            sourceProperty: pDef,
+            targetIdef: pDef.getPointerSynchronizationItem(),
+            targetProperty: pDef.getPointerSynchronizationProperty(),
+          });
+        }
+      }
+    });
+
     if (!options.ignorePreSideEffects) {
       const preSideEffected = itemDefinition.getAllSideEffectedProperties(true);
       // looop into them
@@ -1006,6 +1042,7 @@ export class Cache {
     // two tables to be modified, and it always does so, as item definition information
     // must be added because create requires so
     let sqlValue: ISQLTableRowValue;
+    let potentialTransactingRawDB: ItemizeRawDB = null;
 
     try {
       sqlValue = convertVersionsIntoNullsWhenNecessary(
@@ -1030,6 +1067,11 @@ export class Cache {
           insertQueryIdef.insert(sqlIdefData).returningBuilder.returningAll();
           // so we call the qery
           const insertQueryValueIdef = await transactingDatabase.queryFirst(insertQueryIdef);
+
+          if (pointerMap.length) {
+            potentialTransactingRawDB =
+              await this.updatePointerMap(transactingDatabase, itemDefinition, insertQueryValueMod.id, insertQueryValueMod.version || null, pointerMap);
+          }
 
           // and we return the joined result
           return {
@@ -1104,6 +1146,30 @@ export class Cache {
           },
         }
       );
+    }
+
+    if (potentialTransactingRawDB) {
+      (async () => {
+        try {
+          await potentialTransactingRawDB.consumeTransactingEventQueue();
+        } catch (err) {
+          logger.error(
+            {
+              className: "Cache",
+              methodName: "requestCreation",
+              message: "Could not call consumeTransactingEventQueue to call the updates on pointers",
+              serious: true,
+              err,
+              data: {
+                selfTable,
+                moduleTable,
+                forId,
+                version,
+              },
+            }
+          );
+        }
+      })();
     }
 
     (async () => {
@@ -1537,7 +1603,7 @@ export class Cache {
     const propertyMap: IPropertyMapElement[] = [];
     itemDefinition.getAllPropertyDefinitionsAndExtensions().forEach((pDef) => {
       if (pDef.isTracked()) {
-        const currentValue = typeof currentSQLValue[pDef.getId()] === "undefined" ? null : currentSQLValue[pDef.getId()] ;
+        const currentValue = typeof currentSQLValue[pDef.getId()] === "undefined" ? null : currentSQLValue[pDef.getId()];
         propertyMap.push({
           id: pDef.getId(),
           newValue: typeof update[pDef.getId()] as string === "undefined" ? currentValue : update[pDef.getId()],
@@ -1546,6 +1612,46 @@ export class Cache {
       }
     });
 
+    const pointerMap: IPropertyMapElementPointer[] = [];
+    itemDefinition.getAllPropertyDefinitionsAndExtensions().forEach((pDef) => {
+      if (pDef.isPointer() || pDef.isPointerList()) {
+        let currentValue: string[] = typeof currentSQLValue[pDef.getId()] === "undefined" ? null : currentSQLValue[pDef.getId()];
+        let newValue: string[] = typeof update[pDef.getId()] === "undefined" ? null : (update[pDef.getId()] as any) || null;
+
+        if (Array.isArray(currentValue)) {
+          currentValue = currentValue.sort().filter((element, index, arr) => {
+            return arr.indexOf(element) === index;
+          });
+        } else if (typeof currentValue === "string") {
+          currentValue = [currentValue];
+        } else if (!currentValue) {
+          currentValue = [];
+        }
+
+        if (Array.isArray(newValue)) {
+          newValue = newValue.sort().filter((element, index, arr) => {
+            return arr.indexOf(element) === index;
+          });
+        } else if (typeof newValue === "string") {
+          newValue = [newValue];
+        } else if (!newValue) {
+          newValue = [];
+        }
+
+        if (
+          (newValue.length !== currentValue.length) ||
+          (!newValue.every((v, index) => currentValue[index] === v))
+        ) {
+          pointerMap.push({
+            newValue,
+            originalValue: currentValue,
+            sourceProperty: pDef,
+            targetIdef: pDef.getPointerSynchronizationItem(),
+            targetProperty: pDef.getPointerSynchronizationProperty(),
+          });
+        }
+      }
+    });
 
     CAN_LOG_DEBUG && logger.debug(
       {
@@ -1815,109 +1921,118 @@ export class Cache {
 
     // we build the transaction for the action
     let sqlValue: ISQLTableRowValue;
+    let potentialTransactingRawDB: ItemizeRawDB = null;
+
     try {
       const changedPropertyMap = propertyMap.filter((v) => v.newValue !== v.originalValue);
 
-      sqlValue = (actualReparent || changedPropertyMap.length) ? (
+      sqlValue = (actualReparent || changedPropertyMap.length || pointerMap.length) ? (
         this.databaseConnection.startTransaction(async (transactingDatabase) => {
           const internalSQLValue = convertVersionsIntoNullsWhenNecessary(
             await transactingDatabase.queryFirst(withQuery),
           );
 
-          const insertQueryBuilder = transactingDatabase.getInsertBuilder();
-          insertQueryBuilder.table(TRACKERS_REGISTRY_IDENTIFIER);
+          if (actualReparent || changedPropertyMap.length) {
+            const insertQueryBuilder = transactingDatabase.getInsertBuilder();
+            insertQueryBuilder.table(TRACKERS_REGISTRY_IDENTIFIER);
 
-          if (reparent) {
-            const originalParent = {
-              id: currentSQLValue.parent_id,
-              version: currentSQLValue.parent_version || null,
-              type: currentSQLValue.parent_type,
-            };
+            if (actualReparent) {
+              const originalParent = {
+                id: currentSQLValue.parent_id,
+                version: currentSQLValue.parent_version || null,
+                type: currentSQLValue.parent_type,
+              };
 
-            if (actualReparent.id) {
-              // store the new parenting
-              insertQueryBuilder.insert({
-                id,
-                version: version || "",
-                type: selfTable,
-                module: moduleTable,
-                property: "PARENT",
-                value: actualReparent.type + "." + actualReparent.id + "." + (actualReparent.version || ""),
-                status: true,
-                transaction_time: [
-                  "NOW()",
-                  [],
-                ],
-              });
+              if (actualReparent.id) {
+                // store the new parenting
+                insertQueryBuilder.insert({
+                  id,
+                  version: version || "",
+                  type: selfTable,
+                  module: moduleTable,
+                  property: "PARENT",
+                  value: actualReparent.type + "." + actualReparent.id + "." + (actualReparent.version || ""),
+                  status: true,
+                  transaction_time: [
+                    "NOW()",
+                    [],
+                  ],
+                });
+              }
+              if (originalParent.id) {
+                insertQueryBuilder.insert({
+                  id,
+                  version: version || "",
+                  type: selfTable,
+                  module: moduleTable,
+                  property: "PARENT",
+                  value: originalParent.type + "." + originalParent.id + "." + (originalParent.version || ""),
+                  status: false,
+                  transaction_time: [
+                    "NOW()",
+                    [],
+                  ],
+                });
+              }
             }
-            if (originalParent.id) {
-              insertQueryBuilder.insert({
-                id,
-                version: version || "",
-                type: selfTable,
-                module: moduleTable,
-                property: "PARENT",
-                value: originalParent.type + "." + originalParent.id + "." + (originalParent.version || ""),
-                status: false,
-                transaction_time: [
-                  "NOW()",
-                  [],
-                ],
-              });
-            }
+
+            changedPropertyMap.forEach((v) => {
+              if (v.originalValue) {
+                insertQueryBuilder.insert({
+                  id,
+                  version: version || "",
+                  type: selfTable,
+                  module: moduleTable,
+                  property: v.id,
+                  value: v.originalValue,
+                  status: false,
+                  transaction_time: [
+                    "NOW()",
+                    [],
+                  ],
+                });
+              }
+              if (v.newValue) {
+                insertQueryBuilder.insert({
+                  id,
+                  version: version || "",
+                  type: selfTable,
+                  module: moduleTable,
+                  property: v.id,
+                  value: v.newValue,
+                  status: true,
+                  transaction_time: [
+                    "NOW()",
+                    [],
+                  ],
+                });
+              }
+            });
+
+            // there can only be one property tracker in the trackers table on whether
+            // the given property id, property value, id, version, type combo; whether
+            // it was lost or gained, as all other info is irrelevant, this uniqueness constrain
+            // will be abused to ensure updates and to keep the tracking database small
+            insertQueryBuilder.onConflict("UPDATE", (setBlder) => {
+              setBlder.setColumn(
+                "transaction_time", [
+                "NOW()",
+                [],
+              ],
+              );
+              setBlder.setColumn(
+                "status", [
+                "EXCLUDED.\"status\"",
+                [],
+              ],
+              );
+            });
           }
 
-          changedPropertyMap.forEach((v) => {
-            if (v.originalValue) {
-              insertQueryBuilder.insert({
-                id,
-                version: version || "",
-                type: selfTable,
-                module: moduleTable,
-                property: v.id,
-                value: v.originalValue,
-                status: false,
-                transaction_time: [
-                  "NOW()",
-                  [],
-                ],
-              });
-            }
-            if (v.newValue) {
-              insertQueryBuilder.insert({
-                id,
-                version: version || "",
-                type: selfTable,
-                module: moduleTable,
-                property: v.id,
-                value: v.newValue,
-                status: true,
-                transaction_time: [
-                  "NOW()",
-                  [],
-                ],
-              });
-            }
-          });
-
-          // there can only be one property tracker in the trackers table on whether
-          // the given property id, property value, id, version, type combo; whether
-          // it was lost or gained, as all other info is irrelevant, this uniqueness constrain
-          // will be abused to ensure updates and to keep the tracking database small
-          insertQueryBuilder.onConflict("UPDATE", (setBlder) => {
-            setBlder.setColumn(
-              "transaction_time", [
-              "NOW()",
-              [],
-            ],
-            );
-            setBlder.setColumn(
-              "status", [
-              "EXCLUDED.\"status\"",
-              [],
-            ],
-            );
-          });
+          if (pointerMap.length) {
+            potentialTransactingRawDB =
+              await this.updatePointerMap(transactingDatabase, itemDefinition, internalSQLValue.id, internalSQLValue.version || null, pointerMap);
+          }
 
           return internalSQLValue;
         })
@@ -1993,6 +2108,30 @@ export class Cache {
           },
         }
       );
+    }
+
+    if (potentialTransactingRawDB) {
+      (async () => {
+        try {
+          await potentialTransactingRawDB.consumeTransactingEventQueue();
+        } catch (err) {
+          logger.error(
+            {
+              className: "Cache",
+              methodName: "requestCreation",
+              message: "Could not call consumeTransactingEventQueue to call the updates on pointers",
+              serious: true,
+              err,
+              data: {
+                selfTable,
+                moduleTable,
+                id,
+                version,
+              },
+            }
+          );
+        }
+      });
     }
 
     // we return and this executes after it returns
@@ -3126,5 +3265,89 @@ export class Cache {
    */
   public setAppData(appData: IAppDataType) {
     this.appData = appData;
+  }
+
+  private async updatePointerMap(
+    transactingDatabase: DatabaseConnection,
+    itemDefinition: ItemDefinition,
+    id: string,
+    version: string,
+    pointerMap: IPropertyMapElementPointer[],
+  ) {
+    // so first we grab a new raw db to those those pesky pointer updates
+    // so that the events are equeued, we build hook this transaction into the raw
+    // db, and tell it that it's transacting so that events don't execute immediately
+    const newRawDB = this.appData.rawDB.hookInto(transactingDatabase, { transacting: true });
+
+    // and these is our own, self id/version combo
+    const idVersionToAddOrRemove = id + (version ? "." + version : "");
+
+    // now we start looking into that pointer map
+    await Promise.all(pointerMap.map(async (pointer) => {
+      // so this is whatever it was pointing at that is now not anymore
+      const whereThisWasRemoved = pointer.originalValue.filter((value) => !pointer.newValue.includes(value));
+      // and the opposite these is where is newly pointing at
+      const whereThisWasAdded = pointer.newValue.filter((value) => !pointer.originalValue.includes(value));
+
+      // now we gonna check if our target property is a taglist or whatever
+      const targetPropertyIsArray = pointer.targetProperty.getType() === "string";
+      const targetPropertyId = pointer.targetProperty.getId();
+
+      // and now we loop for both where we add and where we remove
+      await Promise.all([whereThisWasAdded, whereThisWasRemoved].map(async (whereToDealWith, index) => {
+        // only the first is add
+        const isAdd = index = 0;
+        // and we deal with it if we have something to deal with
+        if (whereToDealWith.length) {
+          // we split the id.version complex
+          const whereToDealWithComplex = whereToDealWith.map((v) => v.split("."))
+          // and check if they are all unversioned
+          const isAllNullVersions = whereToDealWithComplex.every((idVersion) => !idVersion[1]);
+
+          // now we update
+          await newRawDB.performBatchRawDBUpdate(
+            // at the target item definition
+            pointer.targetIdef,
+            {
+              // we check if it's a extension to know if it's moduleTableUpdate or itemTableUpdate
+              [pointer.targetProperty.isExtension() ? "moduleTableUpdate" : "itemTableUpdate"]: {
+                // and now we can update that one property that luckily because it's one of those
+                // pointers the sql is the same as its id
+                [targetPropertyId]: targetPropertyIsArray ? [
+                  // if it's array then we got to give this array_add and array_remove thing
+                  (isAdd ? "array_append" : "array_remove") + "(" + JSON.stringify(targetPropertyId) + ", ?)",
+                  [idVersionToAddOrRemove],
+                  // otherwise we set the value or remove it altogether since
+                  // we are not pointing at it anymore
+                ] : (isAdd ? idVersionToAddOrRemove : null)
+              },
+              whereCriteriaSelector: (whereBuilder) => {
+                // now this is where we select where
+                if (isAllNullVersions) {
+                  // for all null versions we use the ANY trick
+                  whereBuilder.andWhere(
+                    "\"id\" = ANY(ARRAY[" + whereToDealWithComplex.map(() => "?").join(",") + "]::TEXT[])",
+                    whereToDealWithComplex.map((v) => v[0]),
+                  ).andWhereColumn("version", "");
+                } else {
+                  // otherwise this annoying selector one by one
+                  whereToDealWithComplex.forEach((idVersion) => {
+                    whereBuilder.orWhere((subBuilder) => {
+                      subBuilder.andWhereColumn("id", idVersion[0]);
+                      subBuilder.andWhereColumn("version", idVersion[1] || "");
+                    });
+                  });
+                }
+              }
+            },
+          )
+        }
+      }))
+    }));
+
+    // and this should do it, note that this does not trigger the events in the queue because this
+    // is happening in a transaction that we just hooked into, so we gotta consume the events
+    // later on once we have succeeded
+    return newRawDB;
   }
 }

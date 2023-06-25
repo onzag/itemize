@@ -415,12 +415,12 @@ export default class MailProvider<T> extends ServiceProvider<T> {
       {
         id: "references",
         type: "taglist",
-        subtype: "arbitrary-tags",
+        subtype: "arbitrary",
       },
       {
         id: "target",
         type: "taglist",
-        subtype: "arbitrary-tags",
+        subtype: "arbitrary",
       },
       {
         id: "source",

@@ -10,10 +10,8 @@ import {
   standardSQLInFn,
   standardSQLOutFn,
   standardSQLEqualFn,
-  getStandardSQLFnFor,
   standardSQLBtreeIndexable,
   standardSQLSelect,
-  standardSQLElasticInFn,
 } from "../sql";
 import {
   standardSQLSSCacheEqualFn, standardLocalEqual,
@@ -68,8 +66,10 @@ export const exactStringSearchSubtypes = [
   "currency",
   "role",
   "exact-identifier",
+  "pointer",
   "exact-value",
   "exact-value-tracked",
+  "pointer-tracked",
   "exact-identifier-tracked",
   // TODO check that JSON works well
   // it's an unchecked subtype
@@ -191,7 +191,13 @@ const typeValue: IPropertyDefinitionSupportedType<PropertyDefinitionSupportedStr
       return PropertyInvalidReason.INVALID_SUBTYPE_VALUE;
     }
 
-    if (subtype === "identifier" || subtype === "exact-identifier") {
+    if (
+      subtype === "identifier" ||
+      subtype === "exact-identifier" ||
+      subtype === "pointer" ||
+      subtype === "pointer-tracked" ||
+      subtype === "exact-identifier-tracked"
+    ) {
       const containsOneOfThose = SPECIAL_CHARACTERS.some((c) => s.indexOf(c) !== -1);
       if (containsOneOfThose) {
         return PropertyInvalidReason.INVALID_SUBTYPE_VALUE;
@@ -236,14 +242,29 @@ const typeValue: IPropertyDefinitionSupportedType<PropertyDefinitionSupportedStr
   searchInterface: PropertyDefinitionSearchInterfacesType.STRING,
   allowsMinMaxLengthDefined: true,
 
+  configOptions: [
+    {
+      name: "synchronizeProperty",
+      type: "string",
+      required: ["pointer", "pointer-tracked"],
+    },
+    {
+      name: "synchronizeItem",
+      type: "string",
+      required: ["pointer", "pointer-tracked"],
+    },
+  ],
+
   // i18n attributes required
   i18n: {
     base: CLASSIC_BASE_I18N,
     optional: CLASSIC_OPTIONAL_I18N,
     searchBase: CLASSIC_SEARCH_BASE_I18N,
     searchOptional: CLASSIC_SEARCH_OPTIONAL_I18N,
-    tooLargeErrorInclude: [null, "phone", "email", "identifier", "exact-identifier", "exact-value"],
-    invalidSubtypeErrorInclude: ["phone", "email", "identifier", "locale", "comprehensive-locale", "language", "country", "currency"],
+    tooLargeErrorInclude: [null, "phone", "email", "identifier", "exact-identifier", "exact-identifier-tracked",
+      "exact-value", "pointer", "pointer-tracked"],
+    invalidSubtypeErrorInclude: ["phone", "email", "identifier", "locale", "comprehensive-locale", "language", "country",
+      "currency", "pointer", "pointer-tracked"],
   },
 };
 export default typeValue;

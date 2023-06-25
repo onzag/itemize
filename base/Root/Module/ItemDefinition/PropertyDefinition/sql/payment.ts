@@ -71,7 +71,7 @@ export function paymentElastic(arg: ISQLArgInfo) {
  * The selection for the payment in searches
  * @param arg 
  */
-export function paymentSQLSelect(arg: ISQLArgInfo) {
+export function paymentSQLSelect(arg: IArgInfo) {
   return [
     arg.prefix + arg.id + "_TYPE",
     arg.prefix + arg.id + "_AMOUNT",

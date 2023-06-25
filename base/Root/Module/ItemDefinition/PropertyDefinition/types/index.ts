@@ -293,7 +293,7 @@ export interface IPropertyDefinitionSupportedType<T> {
    * the minimum necessary to perform a selection, this is used
    * for traditional search mainly
    */
-  sqlSelect: (arg: ISQLArgInfo) => string[];
+  sqlSelect: (arg: IArgInfo) => string[];
   /**
    * specifies how data is stored, by default it just sets the row value
    * to whatever is given, however if you have a complex value you should

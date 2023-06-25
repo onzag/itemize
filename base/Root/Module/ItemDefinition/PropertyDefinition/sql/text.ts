@@ -39,7 +39,7 @@ export function textSQL(arg: ISQLArgInfo) {
   };
 }
 
-export function textSQLSelect(arg: ISQLArgInfo) {
+export function textSQLSelect(arg: IArgInfo) {
   return [
     arg.prefix + arg.id,
     arg.prefix + arg.id + "_LANGUAGE",

@@ -144,10 +144,10 @@ export class ItemizeRawDB {
     this.elastic = elastic;
   }
 
-  private async consumeTransactingQueue(ensureOrder?: boolean) {
+  public async consumeTransactingEventQueue(options: {ensureOrder?: boolean} = {}) {
     // resolve the transacting queue that was generated in the raw db once it resolved
     const errors: Error[] = [];
-    if (ensureOrder) {
+    if (options.ensureOrder) {
       for (const q of this.transactingQueue) {
         try {
           await q();
@@ -172,13 +172,31 @@ export class ItemizeRawDB {
   }
 
   /**
+   * Hooks into an existing database connection to give it raw db capabilities
+   * @param connection the connection in question
+   * @param options the options given
+   * @param options.transacting if transacting please make sure to consume the events yourself
+   * by calling consumeTransactingEventQueue once the changes have been commited
+   * @returns a new instance of raw db
+   */
+  public hookInto(connection: DatabaseConnection, options: {transacting: boolean}): ItemizeRawDB {
+    const newRawDB = new ItemizeRawDB(this.redisGlobal, this.redisPub, this.redisSub, connection, this.root);
+    if (options.transacting) {
+      newRawDB.transacting = true;
+    }
+    return newRawDB;
+  }
+
+  /**
    * Starts a new instance of raw db but in transaction mode
    * @param fn the transactional function
    * @param opts.ensureOrder will make sure that the order is respected regarding the events
    * that are fired after the transaction is done, such as informing changes to keep the database realtime
    * @returns whatever is returned in the transactional function
    */
-  public async startTransaction<T>(fn: (transactingRawDB: ItemizeRawDB) => Promise<T>, opts: { ensureOrder?: boolean } = {}): Promise<T> {
+  public async startTransaction<T>(fn: (transactingRawDB: ItemizeRawDB) => Promise<T>, opts: {
+    ensureEventConsumptionOrder?: boolean,
+  } = {}): Promise<T> {
     let newRawDB: ItemizeRawDB;
     const rs = await this.databaseConnection.startTransaction(async (transactingClient) => {
       newRawDB = new ItemizeRawDB(this.redisGlobal, this.redisPub, this.redisSub, transactingClient, this.root);
@@ -186,7 +204,7 @@ export class ItemizeRawDB {
       return await fn(newRawDB);
     });
 
-    await newRawDB.consumeTransactingQueue(opts.ensureOrder);
+    await newRawDB.consumeTransactingEventQueue({ensureOrder: opts.ensureEventConsumptionOrder});
 
     return rs;
   }
@@ -199,7 +217,9 @@ export class ItemizeRawDB {
    * @param fn the transactional function
    * @returns whatever is returned in the transactional function
    */
-  public async startSingleClientOperation<T>(fn: (transactingRawDB: ItemizeRawDB) => Promise<T>, opts: { ensureOrder?: boolean } = {}): Promise<T> {
+  public async startSingleClientOperation<T>(fn: (transactingRawDB: ItemizeRawDB) => Promise<T>, opts: {
+    ensureEventConsumptionOrder?: boolean,
+  } = {}): Promise<T> {
     let newRawDB: ItemizeRawDB;
     const rs = await this.databaseConnection.startSingleClientOperation(async (transactingClient) => {
       newRawDB = new ItemizeRawDB(this.redisGlobal, this.redisPub, this.redisSub, transactingClient, this.root);
@@ -208,7 +228,7 @@ export class ItemizeRawDB {
       return await fn(newRawDB);
     });
 
-    await newRawDB.consumeTransactingQueue(opts.ensureOrder);
+    await newRawDB.consumeTransactingEventQueue({ensureOrder: opts.ensureEventConsumptionOrder});
 
     return rs;
   }
@@ -1382,8 +1402,6 @@ export class ItemizeRawDB {
    * refer to processGQLValue in order to aid yourself a little when doing a raw db
    * insert
    * 
-   * TODO returning builder access in order to modify what to return
-   * 
    * @param item 
    * @param inserter 
    * @returns 
@@ -2138,6 +2156,14 @@ export class ItemizeRawDB {
    * in the database this is a very powerful and quite
    * advanced method
    * 
+   * Updating tracked properties will result in slower speeds for the query
+   * try to avoid updating tracked properties using a raw db query
+   * 
+   * NOTE: A raw db update is unable to update the pointers properly as it will
+   * only update the pointer in the given side while ignoring the pointers
+   * of the other side, normally the raw db update will refuse to update pointers
+   * (that is able to detect) unless dangerousForceUpdatePointers is specified
+   * 
    * @param item 
    * @param updater 
    */
@@ -2167,6 +2193,21 @@ export class ItemizeRawDB {
        * Will update search indices anyway
        */
       dangerousForceElasticUpdate?: boolean;
+      /**
+       * Update pointers columns anyway
+       * 
+       * A raw db update is unable to update the pointers properly as it will
+       * only update the pointer in the given side while ignoring the pointers
+       * of the other side, normally the raw db update will refuse to update pointers
+       * (that is able to detect) unless dangerousForceUpdatePointers is specified
+       */
+      dangerousForceUpdatePointers?: boolean;
+      /**
+       * List of properties to return old columns for, give the property names
+       * and the old values for such properties will be returned
+       * note that there's quite a big overhead for such query
+       */
+      returnOldColumnsFor?: string[];
     },
   ): Promise<ISQLTableRowValue[]> {
     if (
@@ -2240,6 +2281,15 @@ export class ItemizeRawDB {
 
       const basicModTracked = mod.getAllPropExtensions().filter((pExt) => pExt.isTracked()).map((pExt) => pExt.getId());
 
+      if (!updater.dangerousForceUpdatePointers) {
+        const basicModPointers = mod.getAllPropExtensions().filter((pExt) => pExt.isPointer() || pExt.isPointerList()).map((pExt) => pExt.getId());
+        moduleUpdateQuery.setBuilder.knownAffectedColumns.forEach((affected) => {
+          if (affected[0] === null && basicModPointers.includes(affected[1])) {
+            throw new Error("Updating pointers is not allowed unless dangerousForceUpdatePointers is set to true, at: " + affected[1]);
+          }
+        });
+      }
+
       const allModTracked = [
         "parent_id",
         "parent_type",
@@ -2255,13 +2305,30 @@ export class ItemizeRawDB {
 
       potentialAffectedTrackedProperties = potentialAffectedTrackedModProperties;
 
+      const returnOldColumnsForModule = updater.returnOldColumnsFor ? (
+        updater.returnOldColumnsFor.filter((p) => mod.hasPropExtensionFor(p)).map((p) => {
+          const pdef = mod.getPropExtensionFor(p)
+          return pdef.getPropertyDefinitionDescription().sqlSelect({
+            id: pdef.getId(),
+            itemDefinition: pdef.getParentItemDefinition(),
+            prefix: "",
+            property: pdef,
+            include: null,
+          })
+        }).flat()
+      ) : [];
+
       // now we may want to know the old values of these columnd
       // if they had happened to be affected as we have to know
       // what value they used to hold in order to trigger an update
       // to the old (eg. a reparent that a record was lost)
       // and to the new (eg. that a record was gained)
-      if (potentialAffectedTrackedModProperties.length && !updater.dangerousUseSilentMode) {
+      if ((potentialAffectedTrackedModProperties.length && !updater.dangerousUseSilentMode) || returnOldColumnsForModule.length) {
         potentialAffectedTrackedModProperties.forEach((p) => {
+          moduleUpdateQuery.returningBuilder.returningColumn("OLD_" + p);
+        });
+        const filteredModColumsToReturn = returnOldColumnsForModule.filter((p) => !potentialAffectedTrackedModProperties.includes(p));
+        filteredModColumsToReturn.forEach((p) => {
           moduleUpdateQuery.returningBuilder.returningColumn("OLD_" + p);
         });
         moduleUpdateQuery.fromBuilder.fromSelect((b) => {
@@ -2269,6 +2336,9 @@ export class ItemizeRawDB {
           b.selectExpression("\"id\" \"OLD_id\"");
           b.selectExpression("\"version\" \"OLD_version\"");
           potentialAffectedTrackedModProperties.forEach((p) => {
+            b.selectExpression(JSON.stringify(p) + " " + JSON.stringify("OLD_" + p));
+          });
+          filteredModColumsToReturn.forEach((p) => {
             b.selectExpression(JSON.stringify(p) + " " + JSON.stringify("OLD_" + p));
           });
           updater.whereCriteriaSelector(b.whereBuilder);
@@ -2313,7 +2383,17 @@ export class ItemizeRawDB {
         }
       });
 
-      const basicIdefTracked = mod.getAllPropExtensions().filter((pExt) => pExt.isTracked()).map((pExt) => pExt.getId());
+      const basicIdefTracked = itemDefinition.getAllPropertyDefinitions().filter((pDef) => pDef.isTracked()).map((pDef) => pDef.getId());
+
+      if (!updater.dangerousForceUpdatePointers) {
+        const basicIdefPointers = itemDefinition.getAllPropertyDefinitions().filter((pDef) => pDef.isPointer() || pDef.isPointerList())
+          .map((pDef) => pDef.getId());
+          itemUpdateQuery.setBuilder.knownAffectedColumns.forEach((affected) => {
+          if (affected[0] === null && basicIdefPointers.includes(affected[1])) {
+            throw new Error("Updating pointers is not allowed unless dangerousForceUpdatePointers is set to true, at: " + affected[1]);
+          }
+        });
+      }
 
       const potentialAffectedTrackedIdefProperties = itemUpdateQuery.setBuilder.hasUnknownAffectedColumnExpression ? basicIdefTracked : (
         basicIdefTracked.filter((tracked) => itemUpdateQuery.setBuilder.knownAffectedColumns.some(
@@ -2323,13 +2403,30 @@ export class ItemizeRawDB {
 
       potentialAffectedTrackedProperties = potentialAffectedTrackedProperties.concat(potentialAffectedTrackedIdefProperties);
 
+      const returnOldColumnsForIdef = updater.returnOldColumnsFor ? (
+        updater.returnOldColumnsFor.filter((p) => itemDefinition.hasPropertyDefinitionFor(p, false)).map((p) => {
+          const pdef = itemDefinition.getPropertyDefinitionFor(p, false);
+          return pdef.getPropertyDefinitionDescription().sqlSelect({
+            id: pdef.getId(),
+            itemDefinition: pdef.getParentItemDefinition(),
+            prefix: "",
+            property: pdef,
+            include: null,
+          })
+        }).flat()
+      ) : [];
+
       // now we may want to know the old values of these columnd
       // if they had happened to be affected as we have to know
       // what value they used to hold in order to trigger an update
       // to the old (eg. a reparent that a record was lost)
       // and to the new (eg. that a record was gained)
-      if (potentialAffectedTrackedIdefProperties.length && !updater.dangerousUseSilentMode) {
+      if ((potentialAffectedTrackedIdefProperties.length && !updater.dangerousUseSilentMode) || returnOldColumnsForIdef.length) {
         potentialAffectedTrackedIdefProperties.forEach((p) => {
+          itemUpdateQuery.returningBuilder.returningColumn("OLD_" + p);
+        });
+        const filteredIdefColumsToReturn = returnOldColumnsForIdef.filter((p) => !potentialAffectedTrackedIdefProperties.includes(p));
+        filteredIdefColumsToReturn.forEach((p) => {
           itemUpdateQuery.returningBuilder.returningColumn("OLD_" + p);
         });
         itemUpdateQuery.fromBuilder.fromSelect((b) => {
@@ -2337,6 +2434,9 @@ export class ItemizeRawDB {
           b.selectExpression(JSON.stringify(CONNECTOR_SQL_COLUMN_ID_FK_NAME) + " " + JSON.stringify("OLD_" + CONNECTOR_SQL_COLUMN_ID_FK_NAME));
           b.selectExpression(JSON.stringify(CONNECTOR_SQL_COLUMN_VERSION_FK_NAME) + " " + JSON.stringify("OLD_" + CONNECTOR_SQL_COLUMN_VERSION_FK_NAME));
           potentialAffectedTrackedIdefProperties.forEach((p) => {
+            b.selectExpression(JSON.stringify(p) + " " + JSON.stringify("OLD_" + p));
+          });
+          filteredIdefColumsToReturn.forEach((p) => {
             b.selectExpression(JSON.stringify(p) + " " + JSON.stringify("OLD_" + p));
           });
           updater.whereCriteriaSelector(b.whereBuilder);
@@ -2760,8 +2860,6 @@ export class ItemizeRawDB {
   /**
    * Performs a raw database update, use this method in order to update critical data that could
    * lead to race conditions, otherwise stay by updating through the cache
-   * 
-   * TODO returning builder access will affect tracked properties
    *
    * @param item 
    * @param id 

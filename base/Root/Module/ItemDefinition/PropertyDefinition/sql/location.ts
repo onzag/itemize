@@ -56,7 +56,7 @@ export function locationSQL(arg: ISQLArgInfo) {
   };
 }
 
-export function locationElastic(arg: ISQLArgInfo) {
+export function locationElastic(arg: IArgInfo) {
   return {
     properties: {
       [arg.prefix + arg.id + "_ID"]: {

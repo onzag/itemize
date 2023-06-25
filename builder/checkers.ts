@@ -1748,7 +1748,7 @@ function checkMailItem(
     {
       id: "target",
       type: "taglist",
-      subtype: "arbitrary-tags",
+      subtype: "arbitrary",
     },
     {
       id: "timestamp",
@@ -1757,7 +1757,7 @@ function checkMailItem(
     {
       id: "references",
       type: "taglist",
-      subtype: "arbitrary-tags",
+      subtype: "arbitrary",
     },
     {
       id: "source",

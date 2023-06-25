@@ -12,7 +12,7 @@
         {
             "id": "references",
             "type": "taglist",
-            "subtype": "arbitrary-tags",
+            "subtype": "arbitrary",
             "editRoleAccess": [],
             "createRoleAccess": [],
             "hidden": true,
@@ -31,7 +31,7 @@
         {
             "id": "target",
             "type": "taglist",
-            "subtype": "arbitrary-tags",
+            "subtype": "arbitrary",
             "editRoleAccess": [],
             "maxLength": 50
         },

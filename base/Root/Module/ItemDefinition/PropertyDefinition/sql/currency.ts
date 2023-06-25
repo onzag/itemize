@@ -25,6 +25,14 @@ export function currencySQL(arg: ISQLArgInfo) {
   };
 }
 
+export function currencyShape(arg: IArgInfo) {
+  return [
+    arg.prefix + arg.id + "_VALUE",
+    arg.prefix + arg.id + "_CURRENCY",
+    arg.prefix + arg.id + "_NORMALIZED_VALUE",
+  ];
+}
+
 export function currencyElastic(arg: ISQLArgInfo) {
   const currencyFactors = arg.serverData[CURRENCY_FACTORS_IDENTIFIER];
 
@@ -57,7 +65,7 @@ export function currencyElastic(arg: ISQLArgInfo) {
  * does not need the normalized value
  * @param arg 
  */
-export function currencySQLSelect(arg: ISQLArgInfo) {
+export function currencySQLSelect(arg: IArgInfo) {
   return [
     arg.prefix + arg.id + "_VALUE",
     arg.prefix + arg.id + "_CURRENCY",

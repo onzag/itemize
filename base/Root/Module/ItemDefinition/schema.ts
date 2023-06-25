@@ -348,7 +348,26 @@ export default {
       additionalProperties: false,
       required: ["condition"],
     },
-
+    // searchCaches: {
+    //   type: "object",
+    //   properties: {
+    //     policies: {
+    //       type: "array",
+    //       items: {
+    //         type: "string",
+    //         enum: ["by-owner", "by-parent", "by-parent-and-owner", "by-property"]
+    //       }
+    //     },
+    //     trackedProperties: {
+    //       type: "array",
+    //       items: {
+    //         type: "string"
+    //       }
+    //     }
+    //   },
+    //   additionalProperties: false,
+    //   required: ["policies"],
+    // },
     // used for schema purposes and documentation only
     // and removed during build
     description: {
