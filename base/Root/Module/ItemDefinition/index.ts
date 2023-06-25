@@ -959,12 +959,12 @@ export default class ItemDefinition {
     } else {
       const parentModule = this.getParentModule();
 
-      const limitersIdef = this.rawData.searchLimiters || null;
-      const limitersMod = parentModule.getSearchLimiters();
+      const limitersIdef = this.isSearchEngineEnabled() ? this.rawData.searchLimiters || null : null;
+      const limitersMod = parentModule.isSearchEngineEnabled() ? parentModule.getSearchLimiters() : null;
 
       const cannotEstablishAnyLimit = (
-        !limitersIdef || limitersIdef.condition === "OR" ||
-        (!limitersMod && parentModule.isSearchEngineEnabled()) || limitersMod.condition === "OR"
+        (limitersIdef && limitersIdef.condition === "OR") ||
+        (limitersMod && limitersMod.condition === "OR")
       );
 
       if (cannotEstablishAnyLimit) {
@@ -973,26 +973,25 @@ export default class ItemDefinition {
 
       let sinceLimiter: number = null;
       let mustHaveParent: boolean = false;
-      let propertyLimitersSignature: string = null;
 
       // if we can establish limiters
       // establish the since limiter if possible
-      sinceLimiter = limitersIdef.since || null;
+      sinceLimiter = (limitersIdef && limitersIdef.since) || null;
 
       // if it's bigger we use the bigger value as the true limiter for our data
-      if (parentModule.isSearchEngineEnabled() && limitersMod && limitersMod.since > sinceLimiter) {
+      if (limitersMod && limitersMod.since > sinceLimiter) {
         sinceLimiter = limitersMod.since;
       }
 
       // establish whether it has to have a parent
-      mustHaveParent = limitersIdef.parenting;
+      mustHaveParent = limitersIdef && limitersIdef.parenting;
       // if we established we need a parent but the module says it doesn't, then we need the parent too
-      if (mustHaveParent && parentModule.isSearchEngineEnabled() && limitersMod && !limitersMod.parenting) {
+      if (mustHaveParent && limitersMod && !limitersMod.parenting) {
         mustHaveParent = false;
       }
 
       // the real limiter are the properties in common with the same values in common
-      let propertyLimiters = limitersIdef.properties ? [...limitersIdef.properties] : [];
+      let propertyLimiters = limitersIdef && limitersIdef.properties ? [...limitersIdef.properties] : [];
       propertyLimiters = propertyLimiters.map((limiter) => {
         // well module cannot be searched using search engine
         // so this is the only limiter
@@ -1007,7 +1006,7 @@ export default class ItemDefinition {
 
         // nothing in common this doesn't limit by properties
         // all properties are required
-        if (!limitersMod.properties) {
+        if (!limitersMod || !limitersMod.properties) {
           return null;
         }
 
@@ -3130,15 +3129,19 @@ export default class ItemDefinition {
    * @returns 
    */
   public shouldRowBeIncludedInSearchEngine(rowValue: any, combinedLimiters: ISearchLimitersType, checkSinceLimiter?: boolean) {
+    // no limiters it therefore should be included
     if (!combinedLimiters) {
       return true;
     }
 
+    // needs a parent bu no parent given
     if (combinedLimiters.parenting && !rowValue.parent_id) {
       return false;
     }
 
+    // if we are to check for the since limiter
     if (checkSinceLimiter && combinedLimiters.since) {
+      // check it
       const minimumCreatedAtAsDate = (new Date((new Date()).getTime() - combinedLimiters.since)).getTime() as number;
       const selfCreatedAt = (new Date(rowValue.created_at)).getTime();
 
@@ -3147,10 +3150,12 @@ export default class ItemDefinition {
       }
     }
 
+    // no limiters for properties
     if (!combinedLimiters.properties || !combinedLimiters.properties.length) {
       return true;
     }
 
+    // otherwise check that they are all included
     return combinedLimiters.properties.every((l) => {
       // the row has the value in the potential value
       const potentialValues = l.values || [];

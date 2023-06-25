@@ -8,7 +8,7 @@ import { logger } from "./logger";
 import equals from "deep-equal";
 import { convertSQLValueToElasticSQLValueForItemDefinition } from "../base/Root/Module/ItemDefinition/sql";
 import { DELETED_REGISTRY_IDENTIFIER, SERVER_ELASTIC_PING_INTERVAL_TIME } from "../constants";
-import { CAN_LOG_DEBUG, INSTANCE_UUID } from "./environment";
+import { CAN_LOG_DEBUG, FORCE_ELASTIC_REBUILD, INSTANCE_UUID } from "./environment";
 import { NanoSecondComposedDate } from "../nanodate";
 import { AggregationsAggregationContainer, FieldValue, QueryDslMatchPhraseQuery, QueryDslMatchQuery, QueryDslQueryContainer, QueryDslTermQuery, QueryDslTermsQuery, SearchRequest } from "@elastic/elasticsearch/lib/api/types";
 import { setInterval } from "timers";
@@ -317,7 +317,7 @@ export class ItemizeElasticClient {
           while (attempts <= 3) {
             attempts++;
             try {
-              await this._rebuildIndexGroup(r, shemaInfo);
+              await this._rebuildIndexGroup(r, shemaInfo, false);
               break;
             } catch (err) {
               await wait(1000);
@@ -636,6 +636,7 @@ export class ItemizeElasticClient {
   private async _rebuildIndexGroup(
     qualifiedName: string,
     value: IElasticIndexDefinitionType,
+    isInitialRebuildIndexes: boolean,
   ) {
     logger.info(
       {
@@ -655,12 +656,25 @@ export class ItemizeElasticClient {
       limiters: idef.getSearchLimiters(true),
     }
 
-    if (!indexInfo) {
+    let currentSignature: any = null;
+    try {
+      currentSignature = indexInfo ? JSON.parse(indexInfo.signature) : null;
+    } catch {
+    }
+
+    const equalSignature = equals(signature, currentSignature);
+
+    const force = (isInitialRebuildIndexes ? FORCE_ELASTIC_REBUILD : false);
+
+    if (!indexInfo || force || !equalSignature) {
       logger.info(
         {
           className: "ItemizeElasticClient",
           methodName: "_rebuildIndexGroup",
           message: "Index group for " + qualifiedName + " status to be created",
+          data: {
+            force,
+          }
         },
       );
 
@@ -677,7 +691,18 @@ export class ItemizeElasticClient {
           {
             className: "ItemizeElasticClient",
             methodName: "_rebuildIndexGroup",
-            message: "Index group for " + qualifiedName + " deemed missing, but mapping found, destructive actions taken",
+            message: "Index group for " + qualifiedName + (
+              FORCE_ELASTIC_REBUILD ?
+                " exists but FORCE_ELASTIC_REBUILD is set to true, destructive actions taken" :
+                (!equalSignature && indexInfo ?
+                  " exists but the signature of the index is deemed incompatible, destructive actions taken" :
+                  " deemed missing, but mapping found, destructive actions taken")
+            ),
+            data: {
+              currentSignature,
+              signature,
+              force,
+            }
           },
         );
 
@@ -785,6 +810,7 @@ export class ItemizeElasticClient {
     await this._rebuildIndexGroup(
       qualifiedName,
       schemaToBuild,
+      true,
     );
   }
 
@@ -1069,32 +1095,6 @@ export class ItemizeElasticClient {
     let statusInfo = knownStatusInfo || await this.retrieveIndexStatusInfo(qualifiedPathName);
     const limiters = idef.getSearchLimiters(true);
 
-    // check that the status matches the correct signature during the first batch
-    if (batchNumber === 0) {
-      let currentSignature: any = null;
-      try {
-        currentSignature = statusInfo ? JSON.parse(statusInfo.signature) : null;
-      } catch {
-      }
-      const expectedSignature = {
-        limiters,
-      }
-
-      const equalSignature = equals(expectedSignature, currentSignature);
-
-      // it doesn't rebuild it up
-      if (!statusInfo || !equalSignature) {
-        await this._rebuildIndexGroup(
-          qualifiedPathName,
-          this.rootSchema[qualifiedPathName],
-        );
-        statusInfo = {
-          lastConsistencyCheck: null,
-          signature: JSON.stringify(expectedSignature),
-        }
-      }
-    }
-
     const baseIndexPrefix = qualifiedPathName.toLowerCase() + "_";
     const wildcardIndexName = baseIndexPrefix + "*";
 
@@ -1322,7 +1322,7 @@ export class ItemizeElasticClient {
           r: r as any,
           language: idef.getSearchEngineMainLanguageFromRow(r),
           lastModified: new NanoSecondComposedDate(r.last_modified),
-          isSearchLimited: idef.shouldRowBeIncludedInSearchEngine(r, limiters),
+          isSearchLimited: !idef.shouldRowBeIncludedInSearchEngine(r, limiters),
         }
       });
 

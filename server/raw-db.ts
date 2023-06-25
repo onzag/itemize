@@ -1474,6 +1474,14 @@ export class ItemizeRawDB {
     return builder;
   }
 
+  /**
+   * Declares a new cursor agains a select statment and does nothing about it
+   * @param itemDefinitionOrModule 
+   * @param cursorName 
+   * @param selecter 
+   * @param options 
+   * @returns 
+   */
   public async declareRawDBCursorSelect(
     itemDefinitionOrModule: ItemDefinition | Module | string,
     cursorName: string,
@@ -1488,6 +1496,12 @@ export class ItemizeRawDB {
     return await this.databaseConnection.query(declare);
   }
 
+  /**
+   * Fetches from a cursor that was already declared
+   * @param cursorName 
+   * @param fetcher 
+   * @returns 
+   */
   public async fetchFromRawDBCursor(
     cursorName: string,
     fetcher: (builder: FetchOrMoveFromCursorBuilder) => void,
@@ -1497,6 +1511,12 @@ export class ItemizeRawDB {
     return await this.databaseConnection.queryRows(builder);
   }
 
+  /**
+   * Moves from a cursor that was already declared
+   * @param cursorName 
+   * @param mover 
+   * @returns 
+   */
   public async moveFromRawDBCursor(
     cursorName: string,
     mover: (builder: FetchOrMoveFromCursorBuilder) => void,
@@ -1506,10 +1526,31 @@ export class ItemizeRawDB {
     return await this.databaseConnection.query(builder);
   }
 
+  /**
+   * Removes a given cursor
+   * @param cursorName 
+   * @returns 
+   */
   public async closeRawDBCursor(cursorName: string) {
     return await this.databaseConnection.query(new CloseCursorBuilder(cursorName));
   }
 
+  /**
+   * This generator peforms a cursos based raw db select
+   * executing a select function batch by batch with a given
+   * batch size that defaults to 100 until all records of the
+   * select are consumed
+   * 
+   * Whenever retrieving the next value you can provide a boolean
+   * on whether the process should continue or it should stop, you should always ensure
+   * that either the entire rows are consumed or if you need to abruptly stop
+   * the processing to pass false to the next iterator because otherwise
+   * the cursor will remain in the database hogging memory
+   * 
+   * @param itemDefinitionOrModule 
+   * @param selecter 
+   * @param options 
+   */
   public async *performRawDBCursorSelect(
     itemDefinitionOrModule: ItemDefinition | Module | string,
     selecter: (builder: SelectBuilder) => void,
@@ -1517,7 +1558,7 @@ export class ItemizeRawDB {
       preventJoin?: boolean,
       batchSize?: number,
     } = {}
-  ) {
+  ): AsyncGenerator<ISQLTableRowValue[], void, boolean | undefined> {
     const cursorname = "cursor_" + uuid.v4().replace(/-/g, "");
     const batchSize = options.batchSize || 100;
     await this.declareRawDBCursorSelect(
@@ -1533,7 +1574,11 @@ export class ItemizeRawDB {
       });
 
       while (currentBatch.length) {
-        yield currentBatch;
+        const continueProcessing = yield currentBatch;
+        // do not treat undefined or null to break
+        if (continueProcessing === false) {
+          break;
+        }
         currentBatch = await this.fetchFromRawDBCursor(cursorname, (b) => {
           b.forward(batchSize);
         });

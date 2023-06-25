@@ -47,7 +47,6 @@ export const FAKE_SMS = process.env.FAKE_SMS === "true";
 export const FAKE_EMAILS = process.env.FAKE_EMAILS === "true";
 export const FAKE_USSD = process.env.FAKE_USSD === "true";
 export const LOG_LEVEL: "debug" | "silly" | "info" | "error" = process.env.LOG_LEVEL as any || null;
-export const FORCE_CONSOLE_LOGS = process.env.FORCE_CONSOLE_LOGS === "true";
 if (
   LOG_LEVEL &&
   LOG_LEVEL !== "debug" &&
@@ -66,6 +65,10 @@ if (
 export const CAN_LOG_DEBUG = LOG_LEVEL === "debug" || LOG_LEVEL === "silly" || (!LOG_LEVEL && process.env.NODE_ENV !== "production");
 export const NO_SEO = process.env.NO_SEO === "true";
 export const NO_SSR = process.env.NO_SSR === "true";
+
+// FORCING STUFF
+export const FORCE_ELASTIC_REBUILD = process.env.FORCE_ELASTIC_REBUILD === "true";
+export const FORCE_CONSOLE_LOGS = process.env.FORCE_CONSOLE_LOGS === "true";
 
 export const ENVIRONMENT_DETAILS = {
   INSTANCE_GROUP_ID,

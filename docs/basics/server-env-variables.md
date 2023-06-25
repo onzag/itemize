@@ -43,6 +43,10 @@ Use this log level when attempting to find hard bugs, this logs basically everyt
 
 By default console logging only happens in development mode, with this variable set to `true` you can force them to be piped to console, useful for debugging stubborn clusters without having to rely on elastic or file logging
 
+## FORCE_ELASTIC_REBUILD
+
+If set to `true` forces elastic to delete its indexes and rebuild them from scratch, this is a dangerous option as indexes are synchronized with the database and when using this option everything will be redone from scratch
+
 ## PORT
 
 The port to be used, default is `8000`
