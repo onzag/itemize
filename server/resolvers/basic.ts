@@ -982,32 +982,6 @@ export async function serverSideCheckItemDefinitionAgainst(
   }
 }
 
-/**
- * Users cannot search if they have an active read policy in their roles
- * this function checks and throws an error if there's such a thing
- * @param itemDefinition the item definition to check read policies for
- * @param role the role
- */
-export function checkReadPoliciesAllowThisUserToSearch(
-  itemDefinition: ItemDefinition,
-  role: string,
-) {
-  const policiesForThisType = itemDefinition.getPolicyNamesFor("read");
-  policiesForThisType.forEach((policyName) => {
-    const roles = itemDefinition.getRolesForPolicy("read", policyName);
-    if (
-      roles.includes(role) ||
-      roles.includes(ANYONE_METAROLE) ||
-      (roles.includes(ANYONE_LOGGED_METAROLE) && role !== GUEST_METAROLE)
-    ) {
-      throw new EndpointError({
-        message: "Searching with an active read policy is not allowed, the policy in question is " + policyName,
-        code: ENDPOINT_ERRORS.FORBIDDEN,
-      });
-    }
-  });
-}
-
 const reservedKeys = Object.keys(RESERVED_BASE_PROPERTIES);
 /**
  * Splits the arguments in a graphql query from what it comes to be part
@@ -1184,6 +1158,8 @@ export async function runPolicyCheck(
         // now we are going to see if we are respcting them
         const applyingPropertyIds =
           arg.itemDefinition.getApplyingPropertyIdsForPolicy(policyType, policyName);
+        const applyingIncludeIds =
+          arg.itemDefinition.getApplyingIncludeIdsForPolicy(policyType, policyName);
         const applyingPropertyOnlyAppliesWhenCurrentIsNonNull =
           arg.itemDefinition.doesApplyingPropertyForPolicyOnlyAppliesWhenCurrentIsNonNull(policyType, policyName);
 
@@ -1207,9 +1183,6 @@ export async function runPolicyCheck(
 
         // now we can check the includes too
         if (!someIncludeOrPropertyIsApplied) {
-          const applyingIncludeIds =
-            arg.itemDefinition.getApplyingIncludeIdsForPolicy(policyType, policyName);
-
           // and we do the same thing
           if (applyingIncludeIds) {
             someIncludeOrPropertyIsApplied =
@@ -1227,9 +1200,10 @@ export async function runPolicyCheck(
 
         // if nothing is applied, we can continue to the next policy
         // as the policy does not apply overall
-        if (!someIncludeOrPropertyIsApplied) {
+        if (!someIncludeOrPropertyIsApplied && (applyingIncludeIds || applyingPropertyIds)) {
           continue;
         }
+        // otherwise it does apply because there was nothing to check against
       }
 
       const root = arg.itemDefinition.getParentModule().getParentRoot();

@@ -2348,6 +2348,100 @@ export default class ItemDefinition {
     return hasAccess;
   }
 
+  public async getFirstApplyingReadPolicy(
+    role: string,
+    userId: string,
+    ownerUserId: string,
+    requestedFields: IGQLRequestFields,
+    knownSqlValue: any,
+    rolesManager: ICustomRoleManager,
+  ): Promise<{ policyName: string, applyingPropertyOrInclude: string }> {
+    const allReadPolicies = this.getPolicyNamesFor("read");
+    if (!allReadPolicies || allReadPolicies.length === 0) {
+      return null;
+    }
+
+    // we do it like this to make it less overwhelming
+    for (const policy of allReadPolicies) {
+      const applyingPropertyIds = this.getApplyingPropertyIdsForPolicy("read", policy);
+      const applyingIncludeIds = this.getApplyingIncludeIdsForPolicy("read", policy);
+      const applyingPropertyOnlyAppliesWhenCurrentIsNonNull = this.doesApplyingPropertyForPolicyOnlyAppliesWhenCurrentIsNonNull("read", policy);
+      let applied: { policyName: string, applyingPropertyOrInclude: string } = null;
+
+      // now we can check those applying properties
+      let someIncludeOrPropertyIsRead: string = null;
+      if (applyingPropertyIds) {
+        someIncludeOrPropertyIsRead =
+          // now we check whether it is being modified, or read
+          applyingPropertyIds.find(
+            (applyingPropertyId) => {
+              const isBeingRead = typeof requestedFields[applyingPropertyId] !== "undefined";
+              if (knownSqlValue) {
+                const isCurrentlyNull = knownSqlValue[applyingPropertyId] === null;
+                // and we do respect if we care about non-nulls
+                if (applyingPropertyOnlyAppliesWhenCurrentIsNonNull && isCurrentlyNull) {
+                  return false;
+                }
+              }
+              return isBeingRead;
+            }
+          );
+      }
+
+      if (!someIncludeOrPropertyIsRead && applyingIncludeIds) {
+        someIncludeOrPropertyIsRead =
+          applyingIncludeIds.find(
+            (applyingIncludeId) => {
+              const include = this.getIncludeFor(applyingIncludeId);
+              return (
+                typeof requestedFields[include.getQualifiedIdentifier()] !== "undefined" ||
+                typeof requestedFields[include.getQualifiedExclusionStateIdentifier()] !== "undefined"
+              );
+            },
+          );
+      }
+
+      if (someIncludeOrPropertyIsRead) {
+        // it applies because it was read
+        applied = {
+          policyName: policy,
+          applyingPropertyOrInclude: someIncludeOrPropertyIsRead,
+        };
+      } else if (!applyingPropertyIds && !applyingIncludeIds) {
+        // general apply it applies because there are no applying properties or includes
+        applied = {
+          policyName: policy,
+          applyingPropertyOrInclude: null,
+        };
+      }
+
+      if (!applied) {
+        continue;
+      }
+
+      // so far it applied but now we must check that it respect the role that it was applied to
+      // and we get the roles that need to apply to this policy
+      const rolesForThisSpecificPolicy = this.getRolesForPolicy("read", policy);
+      // if this is not our user, we can just continue with the next
+      //const ownerUserId = this.isOwnerObjectId() ? sqlValue.id : sqlValue.created_by;
+      const appliesToThisUser = rolesForThisSpecificPolicy.includes(ANYONE_METAROLE) ||
+        (
+          rolesForThisSpecificPolicy.includes(ANYONE_LOGGED_METAROLE) && role !== GUEST_METAROLE
+        ) || (
+          rolesForThisSpecificPolicy.includes(OWNER_METAROLE) && userId === ownerUserId
+        ) || rolesForThisSpecificPolicy.includes(role) || (await rolesManager.checkRoleAccessFor(rolesForThisSpecificPolicy)).granted;
+
+      if (appliesToThisUser) {
+        return applied
+      }
+
+      // otherwise we continue
+    }
+
+    // nothing found we return null
+    return null;
+  }
+
   /**
    * Checks the role access for an action in an item
    * defintition

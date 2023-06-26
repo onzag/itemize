@@ -8,7 +8,6 @@ import {
   getDictionary,
   serverSideCheckItemDefinitionAgainst,
   validateTokenIsntBlocked,
-  checkReadPoliciesAllowThisUserToSearch,
   filterAndPrepareGQLValue,
   retrieveSince,
   checkLimit,
@@ -948,10 +947,6 @@ export async function searchItemDefinition(
     // check the language and region
     checkLanguage(appData, resolverArgs.args);
     const tokenData = await validateTokenAndGetData(appData, resolverArgs.args.token);
-    checkReadPoliciesAllowThisUserToSearch(
-      itemDefinition,
-      tokenData.role,
-    );
     await validateTokenIsntBlocked(appData.cache, tokenData);
     checkUserCanSearch(resolverArgs.args, itemDefinition, tokenData);
 
@@ -1119,6 +1114,27 @@ export async function searchItemDefinition(
       }
       if (!sqlFieldsToRequest.includes("created_at")) {
         sqlFieldsToRequest.push("created_at");
+      }
+      if (!sqlFieldsToRequest.includes("created_by")) {
+        sqlFieldsToRequest.push("created_by");
+      }
+
+      const applyingReadPolicy = await itemDefinition.getFirstApplyingReadPolicy(
+        tokenData.role,
+        tokenData.id,
+        ownerToCheckAgainst,
+        requestedFields,
+        null,
+        rolesManager,
+      );
+
+      if (applyingReadPolicy) {
+        throw new EndpointError({
+          message: itemDefinition.getQualifiedPathName() + " has hit an applying unsatisifed read policy for user of role " + tokenData.role +
+            " the policy in question is " + applyingReadPolicy.policyName +
+            (applyingReadPolicy.applyingPropertyOrInclude ? " due to the reading of " + applyingReadPolicy.applyingPropertyOrInclude : ""),
+          code: ENDPOINT_ERRORS.FORBIDDEN,
+        });
       }
 
       await itemDefinition.checkRoleAccessFor(

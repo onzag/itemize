@@ -10,7 +10,6 @@ import {
   validateTokenIsntBlocked,
   checkListTypes,
   runPolicyCheck,
-  checkReadPoliciesAllowThisUserToSearch,
   defaultTriggerForbiddenFunction,
   getDictionary,
 } from "../basic";
@@ -335,10 +334,6 @@ export async function getItemDefinitionList(
   const mod = itemDefinition.getParentModule();
   checkListTypes(resolverArgs.args.records, mod);
   const tokenData = await validateTokenAndGetData(appData, resolverArgs.args.token);
-  checkReadPoliciesAllowThisUserToSearch(
-    itemDefinition,
-    tokenData.role,
-  );
 
   // now we find the requested fields that are requested
   // in the get request
@@ -488,6 +483,24 @@ export async function getItemDefinitionList(
         rolesManager,
         true,
       );
+
+      const applyingReadPolicy = await itemDefinition.getFirstApplyingReadPolicy(
+        tokenData.role,
+        tokenData.id,
+        ownerToCheckAgainst,
+        requestedFields,
+        value,
+        rolesManager,
+      );
+
+      if (applyingReadPolicy) {
+        throw new EndpointError({
+          message: itemDefinition.getQualifiedPathName() + " has hit an applying unsatisifed read policy for user of role " + tokenData.role +
+            " the policy in question is " + applyingReadPolicy.policyName +
+            (applyingReadPolicy.applyingPropertyOrInclude ? " due to the reading of " + applyingReadPolicy.applyingPropertyOrInclude : ""),
+          code: ENDPOINT_ERRORS.FORBIDDEN,
+        });
+      }
 
       const valueToProvide = await filterAndPrepareGQLValue(
         appData.cache.getServerData(),
