@@ -364,7 +364,7 @@ export function checkLimiters(args: IGQLArgs, idefOrMod: Module | ItemDefinition
           const expectedConversionIds = getConversionIdsForCheckingAgainstLimiters(property.rawData);
           const succeed = expectedConversionIds.some((conversionIdRule) => {
             return conversionIdRule.every((id) => {
-              return typeof args[id] === "undefined";
+              return typeof args[id] !== "undefined";
             });
           });
 
@@ -419,6 +419,16 @@ export function checkLimiters(args: IGQLArgs, idefOrMod: Module | ItemDefinition
                 // this is weird
                 succedValues = false;
               }
+
+              if (!succedValues) {
+                if (isModLimiter) {
+                  customError = "The limiter values for " + limiter.id + " in module " +
+                    mod.getQualifiedPathName() + " were not respected";
+                } else {
+                  customError = "The limiter values for " + limiter.id + " in idef " +
+                    idefOrMod.getQualifiedPathName() + " were not respected";
+                }
+              }
             }
   
             // if we passed
@@ -426,14 +436,6 @@ export function checkLimiters(args: IGQLArgs, idefOrMod: Module | ItemDefinition
               atLeastOneLimitedPropertyWasSetAndChecked = true;
             } else {
               allLimitedPropertiesSet = false;
-
-              if (isModLimiter) {
-                customError = "The limiter values for " + limiter.id + " in module " +
-                  mod.getQualifiedPathName() + " were not respected";
-              } else {
-                customError = "The limiter values for " + limiter.id + " in idef " +
-                  idefOrMod.getQualifiedPathName() + " were not respected";
-              }
             }
           }
         });
