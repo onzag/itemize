@@ -997,7 +997,7 @@ export default class ItemDefinition {
       }
 
       // establish whether it has to have a parent
-      mustHaveParent = limitersIdef && limitersIdef.parenting;
+      mustHaveParent = !!(limitersIdef && limitersIdef.parenting);
       // if we established we need a parent but the module says it doesn't, then we need the parent too
       if (mustHaveParent && limitersMod && !limitersMod.parenting) {
         mustHaveParent = false;

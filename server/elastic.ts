@@ -664,7 +664,7 @@ export class ItemizeElasticClient {
     } catch {
     }
 
-    const equalSignature = equals(signature, currentSignature);
+    const equalSignature = equals(signature, currentSignature, {strict: true});
 
     const force = (isInitialRebuildIndexes ? FORCE_ELASTIC_REBUILD : false);
 
