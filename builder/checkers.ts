@@ -468,55 +468,59 @@ export function checkItemDefinition(
         // it is actually hard to check and enforce, currently it is not checked
         // an owner metarole is simply ignored, rules that only apply to owners are odd
         // to start with, why would an owner be subjected to a more complex policy
-        if (policyValue.roles.includes(OWNER_METAROLE)) {
-          throw new CheckUpError(
-            "Policy rule '" + policyName +
-            "' includes a &OWNER role, and this is not allowed",
-            actualTraceback
-              .newTraceToBit("policies")
-              .newTraceToBit(policyType)
-              .newTraceToBit(policyName)
-              .newTraceToBit("roles"),
-          );
-        }
+        // if (policyValue.roles.includes(OWNER_METAROLE)) {
+        //   throw new CheckUpError(
+        //     "Policy rule '" + policyName +
+        //     "' includes a &OWNER role, and this is not allowed",
+        //     actualTraceback
+        //       .newTraceToBit("policies")
+        //       .newTraceToBit(policyType)
+        //       .newTraceToBit(policyName)
+        //       .newTraceToBit("roles"),
+        //   );
+        // }
 
         // let's get the module and item definition, parent policy uses this
         let moduleForPolicy: IModuleRawJSONDataType = parentModule;
         let itemDefinitionForPolicy: IItemDefinitionRawJSONDataType = rawData;
 
         // if we have one, we must check that these paths are right
-        if (policyValue.module) {
+        if (policyValue.parentModule) {
           // using the root we can call the static function
-          moduleForPolicy = Root.getModuleRawFor(rawRootData, policyValue.module.split("/"));
-          itemDefinitionForPolicy = null;
+          if (policyValue.checkOnParent) {
+            moduleForPolicy = Root.getModuleRawFor(rawRootData, policyValue.parentModule.split("/"));
+            itemDefinitionForPolicy = null;
+          }
           if (!moduleForPolicy) {
             throw new CheckUpError(
               "Policy rule '" + policyName +
-              "' contains an invalid module that cannot be found '" + policyValue.module + "'",
+              "' contains an invalid module that cannot be found '" + policyValue.parentModule + "'",
               actualTraceback
                 .newTraceToBit("policies")
                 .newTraceToBit(policyType)
                 .newTraceToBit(policyName)
-                .newTraceToBit("module"),
+                .newTraceToBit("parentModule"),
             );
           }
 
           // the same for the item definition
-          if (policyValue.itemDefinition) {
-            itemDefinitionForPolicy = Module.getItemDefinitionRawFor(moduleForPolicy, policyValue.itemDefinition.split("/"));
+          if (policyValue.parentItem) {
+            if (policyValue.checkOnParent) {
+              itemDefinitionForPolicy = Module.getItemDefinitionRawFor(moduleForPolicy, policyValue.parentItem.split("/"));
+            }
             if (!itemDefinitionForPolicy) {
               throw new CheckUpError(
                 "Policy rule '" + policyName +
-                "' contains an invalid item definition that cannot be found '" + policyValue.itemDefinition + "'",
+                "' contains an invalid item definition that cannot be found '" + policyValue.parentItem + "' inside the module",
                 actualTraceback
                   .newTraceToBit("policies")
                   .newTraceToBit(policyType)
                   .newTraceToBit(policyName)
-                  .newTraceToBit("itemDefinition"),
+                  .newTraceToBit("parentItem"),
               );
             }
           }
-        } else if (policyValue.itemDefinition) {
+        } else if (policyValue.parentItem) {
           // otherwise if we have an item definition but no module
           // specified this is bad input
           throw new CheckUpError(
@@ -526,7 +530,22 @@ export function checkItemDefinition(
               .newTraceToBit("policies")
               .newTraceToBit(policyType)
               .newTraceToBit(policyName)
-              .newTraceToBit("itemDefinition"),
+              .newTraceToBit("parentItem"),
+          );
+        }
+
+        if (
+          policyValue.checkOnParent &&
+          !policyValue.parentModule
+        ) {
+          throw new CheckUpError(
+            "Policy rule '" + policyName +
+            "' is checked against the parent but it has not even a parentModule",
+            actualTraceback
+              .newTraceToBit("policies")
+              .newTraceToBit(policyType)
+              .newTraceToBit(policyName)
+              .newTraceToBit("checkOnParent"),
           );
         }
 

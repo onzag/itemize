@@ -23,7 +23,7 @@ import { ISQLTableRowValue } from "../../../base/Root/sql";
 import Module from "../../../base/Root/Module";
 import { flattenRawGQLValueOrFields } from "../../../gql-util";
 import { EndpointError } from "../../../base/errors";
-import { IGQLSearchRecord } from "../../../gql-querier";
+import { IGQLSearchRecord, IGQLValue } from "../../../gql-querier";
 import { IOTriggerActions } from "../triggers";
 import { buildElasticQueryForItemDefinition, convertSQLValueToGQLValueForItemDefinition } from "../../../base/Root/Module/ItemDefinition/sql";
 import { CustomRoleGranterEnvironment, CustomRoleManager } from "../roles";
@@ -55,6 +55,10 @@ export async function getItemDefinition(
   const rawFields = resolverArgs.fields;
   const requestedFields = flattenRawGQLValueOrFields(rawFields);
 
+  let currentWholeValueAsGQL: IGQLValue;
+  let ownerId: string;
+  let rolesManager: CustomRoleManager;
+
   // so we run the policy check for read, this item definition,
   // with the given id
   const selectQueryValue: ISQLTableRowValue = await runPolicyCheck(
@@ -64,9 +68,41 @@ export async function getItemDefinition(
       id: resolverArgs.args.id,
       version: resolverArgs.args.version || null,
       role: tokenData.role,
+      userId: tokenData.id,
       gqlArgValue: resolverArgs.args,
       gqlFlattenedRequestedFiels: requestedFields,
       appData,
+      rolesManager: (sqlValue: ISQLTableRowValue) => {
+        currentWholeValueAsGQL = sqlValue ? convertSQLValueToGQLValueForItemDefinition(
+          appData.cache.getServerData(),
+          appData,
+          itemDefinition,
+          sqlValue,
+        ) : null;
+      
+        ownerId = sqlValue ? (itemDefinition.isOwnerObjectId() ? sqlValue.id : sqlValue.created_by) : null;
+        rolesManager = new CustomRoleManager(appData.customRoles, {
+          cache: appData.cache,
+          databaseConnection: appData.databaseConnection,
+          rawDB: appData.rawDB,
+          value: currentWholeValueAsGQL,
+          item: itemDefinition,
+          module: itemDefinition.getParentModule(),
+          root: appData.root,
+          tokenData: tokenData,
+          environment: CustomRoleGranterEnvironment.RETRIEVING,
+          requestArgs: resolverArgs.args,
+          owner: ownerId,
+          parent: sqlValue && sqlValue.parent_id ? {
+            id: sqlValue.parent_id,
+            type: sqlValue.parent_type,
+            version: sqlValue.parent_version,
+          } : null,
+          customId: null,
+        });
+
+        return rolesManager;
+      },
       preValidation: (content: ISQLTableRowValue) => {
         // if there is no content, we force the entire policy check not to
         // be performed and return null
@@ -87,34 +123,6 @@ export async function getItemDefinition(
     ) {
       requestedFieldsInIdef[arg] = requestedFields[arg];
     }
-  });
-
-  const currentWholeValueAsGQL = selectQueryValue ? convertSQLValueToGQLValueForItemDefinition(
-    appData.cache.getServerData(),
-    appData,
-    itemDefinition,
-    selectQueryValue,
-  ) : null;
-
-  const ownerId = selectQueryValue ? (itemDefinition.isOwnerObjectId() ? selectQueryValue.id : selectQueryValue.created_by) : null;
-  const rolesManager = new CustomRoleManager(appData.customRoles, {
-    cache: appData.cache,
-    databaseConnection: appData.databaseConnection,
-    rawDB: appData.rawDB,
-    value: currentWholeValueAsGQL,
-    item: itemDefinition,
-    module: itemDefinition.getParentModule(),
-    root: appData.root,
-    tokenData: tokenData,
-    environment: CustomRoleGranterEnvironment.RETRIEVING,
-    requestArgs: resolverArgs.args,
-    owner: ownerId,
-    parent: selectQueryValue && selectQueryValue.parent_id ? {
-      id: selectQueryValue.parent_id,
-      type: selectQueryValue.parent_type,
-      version: selectQueryValue.parent_version,
-    } : null,
-    customId: null,
   });
 
   // if we don't have any result, we cannot even check permissions

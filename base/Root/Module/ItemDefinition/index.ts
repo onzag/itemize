@@ -103,8 +103,9 @@ export interface IPolicyValueRawJSONDataType {
 
   // we do not filter these here, the schema.ts file takes care of ensuring
   // they have the right form
-  module?: string;
-  itemDefinition?: string;
+  parentModule?: string;
+  parentItem?: string;
+  checkOnParent?: boolean;
 }
 
 /**
@@ -757,6 +758,12 @@ export default class ItemDefinition {
    * All the policies within the item definition
    */
   private policyPropertyDefinitions: IPoliciesType;
+  private policyModuleParentDefinitions: {
+    [name: string]: Module;
+  };
+  private policyItemParentDefinitions: {
+    [name: string]: ItemDefinition;
+  };
   /**
    * The parent module
    */
@@ -898,6 +905,8 @@ export default class ItemDefinition {
     // and not in constructor is because we might need to get access to properties in
     // other item definitions for the purposes of the parenting rules
     this.policyPropertyDefinitions = {};
+    this.policyModuleParentDefinitions = {};
+    this.policyItemParentDefinitions = {};
 
     // if we have policies at all
     if (this.rawData.policies) {
@@ -911,8 +920,8 @@ export default class ItemDefinition {
           // we get the policy value
           const policyValue: IPolicyValueRawJSONDataType = this.rawData.policies[policyType][policyName];
           // check if there's a module and item definition in question
-          const moduleInQuestionPath = policyValue.module;
-          const itemDefinitionInQuestionPath = policyValue.itemDefinition;
+          const moduleInQuestionPath = policyValue.checkOnParent ? policyValue.parentModule : null;
+          const itemDefinitionInQuestionPath = policyValue.checkOnParent ? policyValue.parentItem : null;
 
           // by default the item definition in question is this same item definiton
           // and properties referred are the same as this ones
@@ -921,13 +930,17 @@ export default class ItemDefinition {
           if (moduleInQuestionPath) {
             // we need to get that referred module
             const referredModule = this.getParentModule().getParentRoot().getModuleFor(moduleInQuestionPath.split("/"));
+            this.policyModuleParentDefinitions[policyName] = referredModule;
             // and extract the item definition from it, notice how there might not be a path specified
             if (itemDefinitionInQuestionPath) {
               itemDefinition = referredModule.getItemDefinitionFor(itemDefinitionInQuestionPath.split("/"));
+              this.policyItemParentDefinitions[policyName] = itemDefinition;
             } else {
               // and in such case we use the extensions instance as a way to hack it
               itemDefinition = referredModule.getPropExtensionItemDefinition();
             }
+          } else {
+            this.policyModuleParentDefinitions[policyName] = this.getParentModule();
           }
 
           // now we setup the property definition value by reinstantiating
@@ -2937,13 +2950,32 @@ export default class ItemDefinition {
   }
 
   /**
+   * Checks whether the check for a given parent policy check is done against
+   * the parent value
+   * @param type 
+   * @param name 
+   */
+  public doesPropertyParentPolicyCheckIsDoneOnParent(name: string): boolean {
+    const status = this.rawData.policies.parent[name].checkOnParent;
+    return !!status;
+  }
+
+  public getPropertyParentPolicyCheckModule(name: string): Module {
+    return this.policyModuleParentDefinitions[name] || null;
+  }
+
+  public getPropertyParentPolicyCheckItemDefinition(name: string): ItemDefinition {
+    return this.policyItemParentDefinitions[name] || null;
+  }
+
+  /**
    * Tells whether the list of applying properties only applies when going from a non null
    * value to a new value
    * @param type the policy type
    * @param name the policy name
    * @return a boolean value
    */
-  public doesApplyingPropertyOnlyAppliesWhenCurrentIsNonNull(type: string, name: string): boolean {
+  public doesApplyingPropertyForPolicyOnlyAppliesWhenCurrentIsNonNull(type: string, name: string): boolean {
     const status = this.rawData.policies[type][name].applyingPropertyOnlyAppliesWhenCurrentIsNonNull;
     return !!status;
   }

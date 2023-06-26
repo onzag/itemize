@@ -57,6 +57,9 @@ export async function deleteItemDefinition(
     },
   );
 
+  let currentWholeValueAsGQL: IGQLValue;
+  let rolesManager: CustomRoleManager;
+
   // we need to run the policy check for delete,
   // because there might be extra rules for data request
   // for doing a delete, for example, requesting a password
@@ -72,9 +75,39 @@ export async function deleteItemDefinition(
       id: resolverArgs.args.id,
       version: resolverArgs.args.version || null,
       role: tokenData.role,
+      userId: tokenData.id,
       gqlArgValue: resolverArgs.args,
       gqlFlattenedRequestedFiels: null,
       appData,
+      rolesManager: (sqlValue: ISQLTableRowValue) => {
+        const ownerUserId = sqlValue ? (itemDefinition.isOwnerObjectId() ? sqlValue.id : sqlValue.created_by) : null;
+        currentWholeValueAsGQL = convertSQLValueToGQLValueForItemDefinition(
+          appData.cache.getServerData(),
+          appData,
+          itemDefinition,
+          sqlValue,
+        );
+        rolesManager = new CustomRoleManager(appData.customRoles, {
+          cache: appData.cache,
+          databaseConnection: appData.databaseConnection,
+          rawDB: appData.rawDB,
+          value: currentWholeValueAsGQL,
+          item: itemDefinition,
+          module: itemDefinition.getParentModule(),
+          root: appData.root,
+          tokenData: tokenData,
+          environment: CustomRoleGranterEnvironment.REMOVAL,
+          requestArgs: resolverArgs.args,
+          owner: ownerUserId,
+          parent: sqlValue && sqlValue.parent_id ? {
+            id: sqlValue.parent_id,
+            type: sqlValue.parent_type,
+            version: sqlValue.parent_version,
+          } : null,
+          customId: null,
+        });
+        return rolesManager;
+      },
       // this functions runs before the policy has been checked
       // and we do it for being efficient, because we can run
       // both of these checks with a single SQL query, and the policy
@@ -130,34 +163,6 @@ export async function deleteItemDefinition(
       },
     },
   );
-
-  const currentWholeValueAsGQL: IGQLValue = convertSQLValueToGQLValueForItemDefinition(
-    appData.cache.getServerData(),
-    appData,
-    itemDefinition,
-    wholeSqlStoredValue,
-  );
-
-  const ownerUserId = wholeSqlStoredValue ? (itemDefinition.isOwnerObjectId() ? wholeSqlStoredValue.id : wholeSqlStoredValue.created_by) : null;
-  const rolesManager = new CustomRoleManager(appData.customRoles, {
-    cache: appData.cache,
-    databaseConnection: appData.databaseConnection,
-    rawDB: appData.rawDB,
-    value: currentWholeValueAsGQL,
-    item: itemDefinition,
-    module: itemDefinition.getParentModule(),
-    root: appData.root,
-    tokenData: tokenData,
-    environment: CustomRoleGranterEnvironment.REMOVAL,
-    requestArgs: resolverArgs.args,
-    owner: ownerUserId,
-    parent: wholeSqlStoredValue && wholeSqlStoredValue.parent_id ? {
-      id: wholeSqlStoredValue.parent_id,
-      type: wholeSqlStoredValue.parent_type,
-      version: wholeSqlStoredValue.parent_version,
-    } : null,
-    customId: null,
-  });
 
   // yet now we check the role access, for the action of delete
   // note how we don't pass requested fields, because that's irrelevant
@@ -309,7 +314,7 @@ export async function deleteItemDefinition(
 
     (async () => {
       try {
-        const detachedArgs = {...args};
+        const detachedArgs = { ...args };
         detachedArgs.action = IOTriggerActions.DELETED;
         await moduleTrigger(detachedArgs);
       } catch (err) {
@@ -363,7 +368,7 @@ export async function deleteItemDefinition(
 
     (async () => {
       try {
-        const detachedArgs = {...args};
+        const detachedArgs = { ...args };
         detachedArgs.action = IOTriggerActions.DELETED;
         await itemDefinitionTrigger(detachedArgs);
       } catch (err) {

@@ -297,6 +297,7 @@ export async function addItemDefinition(
         id: null,
         version: null,
         role: tokenData.role,
+        userId: tokenData.id,
         gqlArgValue: resolverArgs.args,
         gqlFlattenedRequestedFiels: requestedFields,
         appData,
@@ -304,6 +305,7 @@ export async function addItemDefinition(
         parentType: resolverArgs.args.parent_type,
         parentId: resolverArgs.args.parent_id,
         parentVersion: resolverArgs.args.parent_version || null,
+        rolesManager,
         preParentValidation: (content: ISQLTableRowValue) => {
           // this shouldn't really happen because validateParentingRules should have
           // checked whether it existed, but we check anyway

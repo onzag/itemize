@@ -26,7 +26,7 @@ import {
 import { EndpointError } from "../../../base/errors";
 import { flattenRawGQLValueOrFields } from "../../../gql-util";
 import { ISQLTableRowValue } from "../../../base/Root/sql";
-import { IGQLArgs } from "../../../gql-querier";
+import { IGQLArgs, IGQLValue } from "../../../gql-querier";
 import { IOTriggerActions } from "../triggers";
 import Root from "../../../base/Root";
 import { CustomRoleGranterEnvironment, CustomRoleManager } from "../roles";
@@ -90,6 +90,10 @@ export async function editItemDefinition(
       },
     );
 
+    let currentWholeValueAsGQL: IGQLValue;
+    let rolesManager: CustomRoleManager;
+    let ownerUserId: string;
+
     // so we run the policy check for edit, this item definition,
     // with the given id
     const wholeSqlStoredValue: ISQLTableRowValue = await runPolicyCheck(
@@ -99,9 +103,43 @@ export async function editItemDefinition(
         id: resolverArgs.args.id,
         version: resolverArgs.args.version,
         role: tokenData.role,
+      userId: tokenData.id,
         gqlArgValue: resolverArgs.args,
         gqlFlattenedRequestedFiels: requestedFields,
         appData,
+        rolesManager: (sqlValue: ISQLTableRowValue) => {
+          // Now that the policies have been checked, and that we get the value of the entire item
+          // definition, we need to convert that value to GQL value, and for that we use the converter
+          // note how we don't pass the requested fields because we want it all
+          currentWholeValueAsGQL = convertSQLValueToGQLValueForItemDefinition(
+            appData.cache.getServerData(),
+            appData,
+            itemDefinition,
+            sqlValue,
+          );
+
+          ownerUserId = itemDefinition.isOwnerObjectId() ? sqlValue.id : sqlValue.created_by;
+          rolesManager = new CustomRoleManager(appData.customRoles, {
+            cache: appData.cache,
+            databaseConnection: appData.databaseConnection,
+            rawDB: appData.rawDB,
+            value: currentWholeValueAsGQL,
+            item: itemDefinition,
+            module: itemDefinition.getParentModule(),
+            root: appData.root,
+            tokenData: tokenData,
+            environment: CustomRoleGranterEnvironment.MODIFYING,
+            requestArgs: resolverArgs.args,
+            owner: ownerUserId,
+            parent: sqlValue.parent_id ? {
+              id: sqlValue.parent_id,
+              type: sqlValue.parent_type,
+              version: sqlValue.parent_version,
+            } : null,
+            customId: null,
+          });
+          return rolesManager;
+        },
         preValidation: (content: ISQLTableRowValue) => {
           // if we don't get an user id this means that there's no owner, this is bad input
           if (!content) {
@@ -133,37 +171,6 @@ export async function editItemDefinition(
         },
       },
     );
-
-    // Now that the policies have been checked, and that we get the value of the entire item
-    // definition, we need to convert that value to GQL value, and for that we use the converter
-    // note how we don't pass the requested fields because we want it all
-    const currentWholeValueAsGQL = convertSQLValueToGQLValueForItemDefinition(
-      appData.cache.getServerData(),
-      appData,
-      itemDefinition,
-      wholeSqlStoredValue,
-    );
-
-    const ownerUserId = itemDefinition.isOwnerObjectId() ? wholeSqlStoredValue.id : wholeSqlStoredValue.created_by;
-    const rolesManager = new CustomRoleManager(appData.customRoles, {
-      cache: appData.cache,
-      databaseConnection: appData.databaseConnection,
-      rawDB: appData.rawDB,
-      value: currentWholeValueAsGQL,
-      item: itemDefinition,
-      module: itemDefinition.getParentModule(),
-      root: appData.root,
-      tokenData: tokenData,
-      environment: CustomRoleGranterEnvironment.MODIFYING,
-      requestArgs: resolverArgs.args,
-      owner: ownerUserId,
-      parent: wholeSqlStoredValue.parent_id ? {
-        id: wholeSqlStoredValue.parent_id,
-        type: wholeSqlStoredValue.parent_type,
-        version: wholeSqlStoredValue.parent_version,
-      } : null,
-      customId: null,
-    });
 
     await validateParentingRules(
       appData,
@@ -474,7 +481,7 @@ export async function editItemDefinition(
 
       (async () => {
         try {
-          const detachedArgs = {...args};
+          const detachedArgs = { ...args };
           detachedArgs.action = IOTriggerActions.EDITED;
           await moduleTrigger(detachedArgs);
         } catch (err) {
@@ -531,7 +538,7 @@ export async function editItemDefinition(
 
       (async () => {
         try {
-          const detachedArgs = {...args};
+          const detachedArgs = { ...args };
           detachedArgs.action = IOTriggerActions.EDITED;
           await itemDefinitionTrigger(detachedArgs);
         } catch (err) {

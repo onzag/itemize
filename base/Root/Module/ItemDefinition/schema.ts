@@ -60,7 +60,7 @@ const policySchema = {
 /**
  * The policy schema, used for parenting
  */
-const policySchemaWithModuleAndItemDefinition = {
+const policySchemaForParent = {
   type: "object",
   patternProperties: {
     "^[A-Z_]+$": {
@@ -79,14 +79,17 @@ const policySchemaWithModuleAndItemDefinition = {
           },
           minItems: 1,
         },
-        module: {
+        parentModule: {
           type: "string",
         },
-        itemDefinition: {
+        parentItem: {
           type: "string",
+        },
+        checkOnParent: {
+          type: "boolean",
         },
       },
-      required: ["roles", "properties", "module"],
+      required: ["roles", "properties", "checkOnParent"],
     },
   },
   additionalProperties: false,
@@ -232,7 +235,7 @@ export default {
         edit: policySchema,
         delete: policySchemaNoApplying,
         read: policySchema,
-        parent: policySchemaWithModuleAndItemDefinition,
+        parent: policySchemaForParent,
       },
     },
     ownerIsObjectId: {

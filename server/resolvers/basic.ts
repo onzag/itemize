@@ -27,6 +27,7 @@ import { PropertyDefinitionSupportedType } from "../../base/Root/Module/ItemDefi
 import { ISensitiveConfigRawJSONDataType } from "../../config";
 import { getConversionIdsForCheckingAgainstLimiters, getValuesStrategyForLimiters } from "../../base/Root/Module/ItemDefinition/PropertyDefinition/search-mode";
 import { CustomRoleGranterEnvironment, CustomRoleManager } from "./roles";
+import Root from "../../base/Root";
 
 export interface IServerSideTokenDataType {
   // role always present
@@ -430,7 +431,7 @@ export function checkLimiters(args: IGQLArgs, idefOrMod: Module | ItemDefinition
                 }
               }
             }
-  
+
             // if we passed
             if (succedValues) {
               atLeastOneLimitedPropertyWasSetAndChecked = true;
@@ -1039,6 +1040,17 @@ export function splitArgsInGraphqlQuery(
 }
 
 /**
+ * @ignore
+ * @param row 
+ * @param root 
+ * @returns 
+ */
+function getOwnerUserId(row: ISQLTableRowValue, root: Root) {
+  const idef = root.registry[row.type] as ItemDefinition;
+  return idef.isOwnerObjectId() ? row.id : row.created_by;
+}
+
+/**
  * Runs a policy check on the requested information
  * @param arg.policyType the policy type on which the request is made on, edit, delete
  * @param arg.itemDefinition the item definition in question
@@ -1064,6 +1076,7 @@ export async function runPolicyCheck(
     id: string,
     version: string,
     role: string,
+    userId: string,
     gqlArgValue: IGQLValue,
     gqlFlattenedRequestedFiels: any,
     appData: IAppDataType,
@@ -1073,14 +1086,19 @@ export async function runPolicyCheck(
     parentId?: string,
     parentVersion?: string,
     preParentValidation?: (content: ISQLTableRowValue) => void | ISQLTableRowValue,
+    rolesManager: CustomRoleManager | ((content: ISQLTableRowValue) => CustomRoleManager);
   },
 ) {
   // so now we get the information we need first
   const mod = arg.itemDefinition.getParentModule();
 
+  // get the value of the target or the parent to solve parent policies
   let selectQueryValue: ISQLTableRowValue = null;
   let parentSelectQueryValue: ISQLTableRowValue = null;
+
+  // for read, delete and edit checking
   if (arg.policyTypes.includes("read") || arg.policyTypes.includes("delete") || arg.policyTypes.includes("edit")) {
+    // we get the current value for the row that we are trying to read/delete or edit
     try {
       selectQueryValue = await arg.appData.cache.requestValue(arg.itemDefinition, arg.id, arg.version);
     } catch (err) {
@@ -1100,6 +1118,8 @@ export async function runPolicyCheck(
       throw err;
     }
   }
+
+  // for the parent we need the value of the parent instead
   if (arg.policyTypes.includes("parent")) {
     try {
       parentSelectQueryValue = await arg.appData.cache.requestValue(
@@ -1124,48 +1144,59 @@ export async function runPolicyCheck(
     }
   }
 
+  // run prevalidation if given
   if (arg.preValidation) {
     const forcedResult = arg.preValidation(selectQueryValue);
+    // a forced result causes the validation to short circuit
     if (typeof forcedResult !== "undefined") {
+      typeof arg.rolesManager === "function" && arg.rolesManager(forcedResult);
       return forcedResult;
     }
   }
 
+  // run the pre-parent if given
   if (arg.preParentValidation) {
     const forcedResult2 = arg.preParentValidation(parentSelectQueryValue);
+    // a forced result causes the validation to short circuit
     if (typeof forcedResult2 !== "undefined") {
       return forcedResult2;
     }
   }
 
+  const rolesManager = typeof arg.rolesManager === "function" ? arg.rolesManager(selectQueryValue) : arg.rolesManager;
+
+  // now we can check the policies that we want to check
   for (const policyType of arg.policyTypes) {
     // let's get all the policies that we have for this policy type group
     const policiesForThisType = arg.itemDefinition.getPolicyNamesFor(policyType);
 
     // so we loop in these policies
     for (const policyName of policiesForThisType) {
-      // and we get the roles that need to apply to this policy
-      const rolesForThisSpecificPolicy = arg.itemDefinition.getRolesForPolicy(policyType, policyName);
-      // if this is not our user, we can just continue with the next
-      if (!rolesForThisSpecificPolicy.includes(arg.role)) {
-        continue;
-      }
-
-      const gqlCheckingElement = policyType === "read" ? arg.gqlFlattenedRequestedFiels : arg.gqlArgValue;
-
+      // so in the case not delete and not parent, aka read and edit
+      // this is where applying properties matter as it doesn't matter during delete
+      // because there are no applying properties and it doesn't matter during
+      // parent either as it cannot have applying properties either
+      // also applying includes
       if (policyType !== "delete" && policyType !== "parent") {
+        // now we can use our policy 
+        const gqlCheckingElement = policyType === "read" ? arg.gqlFlattenedRequestedFiels : arg.gqlArgValue;
+
+        // now we are going to see if we are respcting them
         const applyingPropertyIds =
           arg.itemDefinition.getApplyingPropertyIdsForPolicy(policyType, policyName);
         const applyingPropertyOnlyAppliesWhenCurrentIsNonNull =
-          arg.itemDefinition.doesApplyingPropertyOnlyAppliesWhenCurrentIsNonNull(policyType, policyName);
+          arg.itemDefinition.doesApplyingPropertyForPolicyOnlyAppliesWhenCurrentIsNonNull(policyType, policyName);
 
+        // now we can check those applying properties
         let someIncludeOrPropertyIsApplied = false;
         if (applyingPropertyIds) {
           someIncludeOrPropertyIsApplied =
+            // now we check whether it is being modified, or read
             applyingPropertyIds.some(
               (applyingPropertyId) => {
                 const isDefinedInReadOrEdit = typeof gqlCheckingElement[applyingPropertyId] !== "undefined";
                 const isCurrentlyNull = selectQueryValue[applyingPropertyId] === null;
+                // and we do respect if we care about non-nulls
                 if (applyingPropertyOnlyAppliesWhenCurrentIsNonNull && isCurrentlyNull) {
                   return false;
                 }
@@ -1174,10 +1205,12 @@ export async function runPolicyCheck(
             );
         }
 
+        // now we can check the includes too
         if (!someIncludeOrPropertyIsApplied) {
           const applyingIncludeIds =
             arg.itemDefinition.getApplyingIncludeIdsForPolicy(policyType, policyName);
 
+          // and we do the same thing
           if (applyingIncludeIds) {
             someIncludeOrPropertyIsApplied =
               applyingIncludeIds.some(
@@ -1192,9 +1225,52 @@ export async function runPolicyCheck(
           }
         }
 
+        // if nothing is applied, we can continue to the next policy
+        // as the policy does not apply overall
         if (!someIncludeOrPropertyIsApplied) {
           continue;
         }
+      }
+
+      const root = arg.itemDefinition.getParentModule().getParentRoot();
+
+      // now we check for the parent to see if it applies too
+      // it will only apply when the given parent is of the correct module/idef
+      if (policyType === "parent") {
+        const checkOnParent = arg.itemDefinition.doesPropertyParentPolicyCheckIsDoneOnParent(policyName);
+
+        if (checkOnParent) {
+          const parentIdef = root.registry[parentSelectQueryValue.type] as ItemDefinition;
+          const parentModule = parentIdef.getParentModule();
+
+          const moduleToCheck = arg.itemDefinition.getPropertyParentPolicyCheckModule(policyName);
+
+          // does not apply
+          if (moduleToCheck && parentModule.getQualifiedPathName() !== moduleToCheck.getQualifiedPathName()) {
+            continue;
+          }
+
+          const itemToCheck = arg.itemDefinition.getPropertyParentPolicyCheckItemDefinition(policyName);
+
+          // does not apply
+          if (itemToCheck && parentIdef.getQualifiedPathName() !== itemToCheck.getQualifiedPathName()) {
+            continue;
+          }
+        }
+      }
+
+      // and we get the roles that need to apply to this policy
+      const rolesForThisSpecificPolicy = arg.itemDefinition.getRolesForPolicy(policyType, policyName);
+      // if this is not our user, we can just continue with the next
+      const appliesToThisUser = rolesForThisSpecificPolicy.includes(ANYONE_METAROLE) ||
+        (
+          rolesForThisSpecificPolicy.includes(ANYONE_LOGGED_METAROLE) && arg.role !== GUEST_METAROLE
+        ) || (
+          rolesForThisSpecificPolicy.includes(OWNER_METAROLE) && arg.userId === getOwnerUserId(selectQueryValue, root)
+        ) || rolesForThisSpecificPolicy.includes(arg.role) || (await rolesManager.checkRoleAccessFor(rolesForThisSpecificPolicy)).granted;
+
+      if (!appliesToThisUser) {
+        continue;
       }
 
       // otherwise we need to see which properties are in consideration for this
@@ -1254,13 +1330,16 @@ export async function runPolicyCheck(
           id: property.getId(),
           value: policyValueForTheProperty,
           prefix: "",
-          row: policyType === "parent" ? parentSelectQueryValue : selectQueryValue,
+          row: policyType === "parent" &&
+            arg.itemDefinition.doesPropertyParentPolicyCheckIsDoneOnParent(policyName) ?
+            parentSelectQueryValue : selectQueryValue,
           property,
           serverData: arg.appData.cache.getServerData(),
-          itemDefinition: arg.itemDefinition,
+          itemDefinition: property.getParentItemDefinition(),
           appData: arg.appData,
         });
 
+        // if it doesn't match then we have failed the policy
         if (!policyMatches) {
           throw new EndpointError({
             message: `validation failed for policy ${policyName}`,
