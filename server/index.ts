@@ -209,7 +209,8 @@ export interface IAppDataType {
   express: typeof express,
   customRoles: ICustomRoleType[];
   rawDB: ItemizeRawDB;
-  elastic: ItemizeElasticClient,
+  elastic: ItemizeElasticClient;
+  domain: string;
 }
 
 export interface IServerDataType {
@@ -1233,6 +1234,7 @@ export async function initializeServer(
       rawDB,
       elastic,
       express,
+      domain,
       // assigned later during rest setup
       customUserTokenQuery: null,
     };

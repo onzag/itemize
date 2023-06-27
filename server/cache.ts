@@ -62,6 +62,53 @@ interface IPropertyMapElementPointer {
 }
 
 /**
+  * This function finds modules for a given module, including its children
+  * that do match a possible parent rule
+  * @param possibleParent the possible parent
+  * @param module the current module to analyze
+  * @returns a list of modules
+  */
+export function analyzeModuleForPossibleParent(possibleParent: ItemDefinition, module: Module): Module[] {
+  // first we set up the modules we have collected, nothing yet
+  let collectedModules: Module[] = [];
+  // now we check if at least one of the item definitions within this module
+  // can be set as child of the given possible parent
+  const canAtLeastOneIdefBeChildOf = module.getAllChildItemDefinitions().some(analyzeIdefForPossibleParent.bind(this, possibleParent));
+  // if that's the case we add this same module to the list
+  if (canAtLeastOneIdefBeChildOf) {
+    collectedModules.push(module);
+  }
+
+  // now we need to check the child modules, for that we run this function recursively
+  const childModules = module.getAllModules().map(analyzeModuleForPossibleParent.bind(this, possibleParent)) as Module[];
+  // and now we check if we got anything, if we did
+  if (childModules.length) {
+    // we concat the result
+    collectedModules = collectedModules.concat(childModules);
+  }
+
+  // and return that
+  return collectedModules;
+}
+
+/**
+  * This function analyzes an item definition to check for a possible
+  * parent and returns true if there's any parent rule within itself, including
+  * its children that matches the possible parent
+  * @param possibleParent the possible parent
+  * @param idef the item definition in question
+  * @returns a simple boolean
+  */
+export function analyzeIdefForPossibleParent(possibleParent: ItemDefinition, idef: ItemDefinition): boolean {
+  const canBeParented = idef.checkCanBeParentedBy(possibleParent, false);
+  if (canBeParented) {
+    return true;
+  }
+
+  return idef.getChildDefinitions().some(analyzeIdefForPossibleParent.bind(this, possibleParent));
+}
+
+/**
  * The cache class that provides all the functionality that is
  * specified for the cache package, the cache is more than what
  * it name implies because it contains redis and it's the same in
@@ -2290,60 +2337,13 @@ export class Cache {
   }
 
   /**
-  * This function analyzes an item definition to check for a possible
-  * parent and returns true if there's any parent rule within itself, including
-  * its children that matches the possible parent
-  * @param possibleParent the possible parent
-  * @param idef the item definition in question
-  * @returns a simple boolean
-  */
-  private analyzeIdefForPossibleParent(possibleParent: ItemDefinition, idef: ItemDefinition): boolean {
-    const canBeParented = idef.checkCanBeParentedBy(possibleParent, false);
-    if (canBeParented) {
-      return true;
-    }
-
-    return idef.getChildDefinitions().some(this.analyzeIdefForPossibleParent.bind(this, possibleParent));
-  }
-
-  /**
-  * This function finds modules for a given module, including its children
-  * that do match a possible parent rule
-  * @param possibleParent the possible parent
-  * @param module the current module to analyze
-  * @returns a list of modules
-  */
-  private analyzeModuleForPossibleParent(possibleParent: ItemDefinition, module: Module): Module[] {
-    // first we set up the modules we have collected, nothing yet
-    let collectedModules: Module[] = [];
-    // now we check if at least one of the item definitions within this module
-    // can be set as child of the given possible parent
-    const canAtLeastOneIdefBeChildOf = module.getAllChildItemDefinitions().some(this.analyzeIdefForPossibleParent.bind(this, possibleParent));
-    // if that's the case we add this same module to the list
-    if (canAtLeastOneIdefBeChildOf) {
-      collectedModules.push(module);
-    }
-
-    // now we need to check the child modules, for that we run this function recursively
-    const childModules = module.getAllModules().map(this.analyzeModuleForPossibleParent.bind(this, possibleParent)) as Module[];
-    // and now we check if we got anything, if we did
-    if (childModules.length) {
-      // we concat the result
-      collectedModules = collectedModules.concat(childModules);
-    }
-
-    // and return that
-    return collectedModules;
-  }
-
-  /**
  * Deletes all the possible children that might have been set as parent of the deleted
  * item definition value
  * @param itemDefinition 
  * @param id 
  * @param version 
  */
-  private async deletePossibleChildrenOf(
+  public async deletePossibleChildrenOf(
     itemDefinition: ItemDefinition,
     id: string,
     version: string,
@@ -2351,7 +2351,7 @@ export class Cache {
     // first we need to find if there is even such a rule and in which modules so we can
     // query the database
     const modulesThatMightBeSetAsChildOf: Module[] =
-      this.root.getAllModules().map(this.analyzeModuleForPossibleParent.bind(this, itemDefinition)).flat() as Module[];
+      this.root.getAllModules().map(analyzeModuleForPossibleParent.bind(this, itemDefinition)).flat() as Module[];
 
     // if such is the case
     if (modulesThatMightBeSetAsChildOf.length) {
@@ -2414,11 +2414,6 @@ export class Cache {
                 deleteItemDefinition,
                 r.id,
                 r.version || null,
-                // delete all versions is false because
-                // different versions may have different parents
-                // however if the version is the unversioned
-                // then it will destroy everything
-                r.version ? false : true,
                 r.container_id,
                 null,
               );
@@ -2461,8 +2456,6 @@ export class Cache {
     item: ItemDefinition | string,
     id: string,
     version: string,
-    dropAllVersions: boolean,
-    containerId: string,
     listenerUUID: string,
     options: {
       ignoreSideEffects?: boolean,
@@ -2476,6 +2469,8 @@ export class Cache {
     const selfTable = itemDefinition.getQualifiedPathName();
     const moduleTable = itemDefinition.getParentModule().getQualifiedPathName();
 
+    const dropAllVersions = !version;
+
     CAN_LOG_DEBUG && logger.debug(
       {
         className: "Cache",
@@ -2485,19 +2480,18 @@ export class Cache {
       },
     );
 
-    // whether we have a container for this
-    const containerExists = containerId && this.storageClients[containerId];
-
     // this helper function will allow us to delete all the files
     // for a given version, if we are dropping all version this is useful
     // we want to delete files
-    const deleteFilesInContainer = async (specifiedVersion: string) => {
+    const deleteFilesInContainer = async (containerId: string, specifiedVersion: string) => {
       // first we need to find if we have any file type in either the property
       // definitions of the prop extensions, any will do
       const someFilesInItemDef = itemDefinition.getAllPropertyDefinitions()
         .some((pdef) => pdef.getPropertyDefinitionDescription().gqlAddFileToFields);
       const someFilesInModule = itemDefinition.getParentModule().getAllPropExtensions()
         .some((pdef) => pdef.getPropertyDefinitionDescription().gqlAddFileToFields);
+
+      const containerExists = this.storageClients && this.storageClients[containerId];
 
       // for item definition found files
       if (someFilesInItemDef) {
@@ -2598,7 +2592,7 @@ export class Cache {
       trackedProperties: string[],
     ) => {
       // got to cascade and delete all the children, this method should be able to execute after
-      this.deletePossibleChildrenOf(itemDefinition, id, record.version);
+      this.deletePossibleChildrenOf(itemDefinition, record.id, record.version);
 
       if (this.elastic) {
         try {
@@ -2631,7 +2625,7 @@ export class Cache {
 
       try {
         // update the cache with the new value
-        await this.forceCacheInto(selfTable, id, record.version, null);
+        await this.forceCacheInto(selfTable, record.id, record.version, null);
         // trigger the change event informing of the update
         const changeEvent: IChangedFeedbackEvent = {
           itemDefinition: selfTable,
@@ -2646,7 +2640,7 @@ export class Cache {
           listenerUUID || null,
         );
         // we don't await for this delete to happen
-        deleteFilesInContainer(record.version);
+        deleteFilesInContainer(row.container_id, record.version);
       } catch (err) {
         logger.error(
           {
@@ -2660,6 +2654,8 @@ export class Cache {
     }
 
     // now time to do this and actually do the dropping
+    // NOTE this code is quite copy pasted in raw db delete
+    // if any bug is found here it will likely also exist in raw db
     try {
       let rowsToPerformDeleteSideEffects: ISQLTableRowValue[] = null;
 
@@ -2715,7 +2711,7 @@ export class Cache {
       // as for the module, this is always going to be retrieved
       const returningElementsModule = needSideEffects ?
         "*" :
-        `"id","version","parent_id","parent_type","parent_version","created_by"${trackedPropertiesModStr}${extraLanguageColumnModule}`;
+        `"id","version","parent_id","parent_type","parent_version","container_id","created_by"${trackedPropertiesModStr}${extraLanguageColumnModule}`;
 
       // dropping all versions is a tricky process, first we need to drop everything
       if (dropAllVersions) {
@@ -2768,8 +2764,8 @@ export class Cache {
               });
 
               insertQueryBuilder.insert({
-                id,
-                version: version || "",
+                id: row.id,
+                version: row.version || "",
                 type: selfTable,
                 module: moduleTable,
                 created_by: row.created_by || null,
@@ -2804,7 +2800,7 @@ export class Cache {
           // we need to construct the record
           // the last modified is the transaction time of the deletition
           const record: IGQLSearchRecord = {
-            id,
+            id: row.id,
             version: row.version || null,
             last_modified: row.last_modified,
             type: selfTable,
@@ -2869,8 +2865,8 @@ export class Cache {
           const insertQueryBuilder = transactingDatabase.getInsertBuilder();
           insertQueryBuilder.table(DELETED_REGISTRY_IDENTIFIER);
           insertQueryBuilder.insert({
-            id,
-            version: version || "",
+            id: interalDroppedRow.id,
+            version: interalDroppedRow.version || "",
             type: selfTable,
             module: moduleTable,
             created_by: interalDroppedRow.created_by || null,

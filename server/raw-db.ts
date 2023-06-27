@@ -30,14 +30,24 @@ import uuidv5 from "uuid/v5";
 import type PropertyDefinition from "../base/Root/Module/ItemDefinition/PropertyDefinition";
 import type Include from "../base/Root/Module/ItemDefinition/Include";
 import { ItemizeElasticClient } from "./elastic";
-import type { IAppDataType } from "../server";
+import type { IAppDataType, IStorageProviders } from "../server";
 import { DeclareCursorBuilder } from "../database/DeclareCursorBuilder";
 import { CloseCursorBuilder } from "../database/CloseCursorBuilder";
 import { FetchOrMoveFromCursorBuilder } from "../database/FetchOrMoveFromCursorBuilder";
+import type { IGQLSearchRecord } from "../gql-querier";
+import { IStorageProvidersObject } from "./services/base/StorageProvider";
+import { deleteEverythingInFilesContainerId } from "../base/Root/Module/ItemDefinition/PropertyDefinition/sql/file-management";
+import { analyzeModuleForPossibleParent } from "./cache";
 
 type changeRowLanguageFnPropertyBased = (language: string, dictionary: string, property: string) => void;
 type changeRowLanguageFnPropertyIncludeBased = (language: string, dictionary: string, include: string, property: string) => void;
 type changeRowLanguageFn = changeRowLanguageFnPropertyBased | changeRowLanguageFnPropertyIncludeBased;
+
+interface IPropertyMapElement {
+  id: string,
+  newValue: string,
+  originalValue: string,
+}
 
 const NAMESPACE = "23ab4609-af49-4cdf-921b-4700adb284f3";
 export function makeIdOutOf(str: string) {
@@ -144,7 +154,7 @@ export class ItemizeRawDB {
     this.elastic = elastic;
   }
 
-  public async consumeTransactingEventQueue(options: {ensureOrder?: boolean} = {}) {
+  public async consumeTransactingEventQueue(options: { ensureOrder?: boolean } = {}) {
     // resolve the transacting queue that was generated in the raw db once it resolved
     const errors: Error[] = [];
     if (options.ensureOrder) {
@@ -179,7 +189,7 @@ export class ItemizeRawDB {
    * by calling consumeTransactingEventQueue once the changes have been commited
    * @returns a new instance of raw db
    */
-  public hookInto(connection: DatabaseConnection, options: {transacting: boolean}): ItemizeRawDB {
+  public hookInto(connection: DatabaseConnection, options: { transacting: boolean }): ItemizeRawDB {
     const newRawDB = new ItemizeRawDB(this.redisGlobal, this.redisPub, this.redisSub, connection, this.root);
     if (options.transacting) {
       newRawDB.transacting = true;
@@ -204,7 +214,7 @@ export class ItemizeRawDB {
       return await fn(newRawDB);
     });
 
-    await newRawDB.consumeTransactingEventQueue({ensureOrder: opts.ensureEventConsumptionOrder});
+    await newRawDB.consumeTransactingEventQueue({ ensureOrder: opts.ensureEventConsumptionOrder });
 
     return rs;
   }
@@ -228,7 +238,7 @@ export class ItemizeRawDB {
       return await fn(newRawDB);
     });
 
-    await newRawDB.consumeTransactingEventQueue({ensureOrder: opts.ensureEventConsumptionOrder});
+    await newRawDB.consumeTransactingEventQueue({ ensureOrder: opts.ensureEventConsumptionOrder });
 
     return rs;
   }
@@ -1369,27 +1379,404 @@ export class ItemizeRawDB {
     id: string,
     version: string,
     deleter: {
+      where?: (builder: WhereBuilder) => void;
+      useJoinedWhere?: boolean;
+      useJoinedReturn?: boolean;
+      returnAll?: boolean;
       dangerousUseSilentMode?: boolean;
-    },
+    } = {},
   ) {
-    // TODO must be similar to the select builder anyway
-    const itemDefinitionOrModuleInstance = typeof itemDefinitionOrModule === "string" ?
-      this.root.registry[itemDefinitionOrModule] :
-      itemDefinitionOrModule;
+    return await this.performBatchRawDBDelete(
+      itemDefinitionOrModule,
+      (b) => {
+        b.andWhereColumn("id", id).andWhereColumn("version", version);
+      }
+    )
   }
 
   public async performBatchRawDBDelete(
     itemDefinitionOrModule: ItemDefinition | Module | string,
+    where: (builder: WhereBuilder) => void,
+    deleteFiles?: {
+      domain: string;
+      storage: IStorageProvidersObject;
+    } | false,
     deleter: {
-      select: (builder: SelectBuilder) => void;
-      preventJoin?: boolean;
+      useJoinedWhere?: boolean;
+      useJoinedReturn?: boolean;
       dangerousUseSilentMode?: boolean;
-    },
+      returningAll?: boolean;
+    } = {},
   ) {
-    // TODO there is no delete builder, must be similar to the select builder anyway
     const itemDefinitionOrModuleInstance = typeof itemDefinitionOrModule === "string" ?
       this.root.registry[itemDefinitionOrModule] :
       itemDefinitionOrModule;
+
+    if (itemDefinitionOrModuleInstance instanceof Module && (deleter.useJoinedWhere || deleter.useJoinedReturn)) {
+      throw new Error("Cannot useJoinedWhere or useJoinedReturn when a module was provided to perform a batch delete");
+    }
+
+    // we need to do a select first because we do a lot of shenanigans and need
+    // to analyze the results, the where builder we are passing also may need
+    // the information from item definition
+    const specificIdVersionsToDelete: ISQLTableRowValue[] =
+      await this.performRawDBSelect(itemDefinitionOrModuleInstance, (selecter) => {
+        selecter.select("id", "version", "type")
+        where(selecter.whereBuilder);
+      }, {
+        preventJoin: !deleter.useJoinedWhere,
+      });
+
+    // we are going to find the unversioned we are attempting to delete among the versioned
+    // that we catched in there
+    const specificIdVersionsToDeleteUnversioned = specificIdVersionsToDelete.filter((v) => !v.version);
+    // the versioned that matter should not be in the unversioned list
+    const specificIdVersionsToDeleteVersioned = specificIdVersionsToDelete
+      .filter((v) => v.version && !specificIdVersionsToDeleteUnversioned.find((v2) => v2.id === v.id));
+
+    const typeSorts: any = {};
+
+    specificIdVersionsToDeleteUnversioned.forEach((v) => {
+      if (!typeSorts[v.type]) {
+        typeSorts[v.type] = {
+          unversioned: [],
+          versioned: [],
+        }
+      }
+      typeSorts[v.type].unversioned.push(v);
+    });
+
+    specificIdVersionsToDeleteVersioned.forEach((v) => {
+      if (!typeSorts[v.type]) {
+        typeSorts[v.type] = [];
+      }
+      if (!typeSorts[v.type]) {
+        typeSorts[v.type] = {
+          unversioned: [],
+          versioned: [],
+        }
+      }
+      typeSorts[v.type].versioned.push(v);
+    });
+
+    await Promise.all(Object.keys(typeSorts).map(async (type) => {
+      const moduleTable = itemDefinitionOrModuleInstance instanceof Module ?
+        itemDefinitionOrModuleInstance.getQualifiedPathName() :
+        itemDefinitionOrModuleInstance.getParentModule().getQualifiedPathName();
+      const itemDefinition = this.root.registry[type] as ItemDefinition;
+      const selfTable = itemDefinition.getQualifiedPathName();
+
+      // this helper function will allow us to delete all the files
+      // for a given version, if we are dropping all version this is useful
+      // we want to delete files
+      const deleteFilesInContainer = !deleteFiles ? null : async (containerId: string, id: string, specifiedVersion: string) => {
+        // first we need to find if we have any file type in either the property
+        // definitions of the prop extensions, any will do
+        const someFilesInItemDef = itemDefinition.getAllPropertyDefinitions()
+          .some((pdef) => pdef.getPropertyDefinitionDescription().gqlAddFileToFields);
+        const someFilesInModule = itemDefinition.getParentModule().getAllPropExtensions()
+          .some((pdef) => pdef.getPropertyDefinitionDescription().gqlAddFileToFields);
+
+        const containerExists = deleteFiles && deleteFiles[containerId];
+
+        // for item definition found files
+        if (someFilesInItemDef) {
+          // we need to ensure the container exists and is some value
+          if (containerExists) {
+            // and now we can try to delete everything in there
+            // for our given domain and with the handle mysite.com/MOD_x__IDEF_y/id.version
+            // that will delete literally everything for the given id.version combo
+            try {
+              await deleteEverythingInFilesContainerId(
+                deleteFiles.domain,
+                deleteFiles.storage[containerId],
+                itemDefinition,
+                id + "." + (specifiedVersion || null),
+              );
+            } catch (err) {
+              logger.error(
+                {
+                  className: "ItemizeRawDB",
+                  methodName: "performBatchRawDBDelete",
+                  message: "Could not remove all the files for item definition storage",
+                  serious: true,
+                  err,
+                  data: {
+                    domain: deleteFiles.domain,
+                    containerId,
+                    itemDefinition: itemDefinition.getQualifiedPathName(),
+                    id,
+                    version: specifiedVersion || null,
+                  },
+                }
+              );
+            }
+          } else {
+            logger.error(
+              {
+                className: "ItemizeRawDB",
+                methodName: "performBatchRawDBDelete",
+                message: "Item for " + selfTable + " contains a file field but no container id for data storage is available",
+                data: {
+                  containerId,
+                },
+              }
+            );
+          }
+        }
+
+        // this is doing exactly the same but for the module
+        if (someFilesInModule) {
+          if (containerExists) {
+            try {
+              await deleteEverythingInFilesContainerId(
+                deleteFiles.domain,
+                deleteFiles.storage[containerId],
+                itemDefinition.getParentModule(),
+                id + "." + (specifiedVersion || null),
+              );
+            } catch (err) {
+              logger.error(
+                {
+                  className: "ItemizeRawDB",
+                  methodName: "performBatchRawDBDelete",
+                  message: "Could not remove all the files for module storage",
+                  serious: true,
+                  err,
+                  data: {
+                    domain: deleteFiles.domain,
+                    containerId,
+                    module: itemDefinition.getParentModule().getQualifiedPathName(),
+                    id,
+                    version: specifiedVersion || null,
+                  },
+                }
+              );
+            }
+          } else {
+            logger.error(
+              {
+                className: "ItemizeRawDB",
+                methodName: "performBatchRawDBDelete",
+                message: "Item for " + selfTable + " at module contains a file field but no container id for data storage is available",
+                data: {
+                  containerId,
+                },
+              }
+            );
+          }
+        }
+      }
+
+      // COPIED FROM CACHE
+      //let rowsToPerformDeleteSideEffects: ISQLTableRowValue[] = null;
+
+      const searchEngineEnabled = itemDefinition.isSearchEngineEnabled();
+
+      // we are going to see what extra stuff we need due to the language info
+      // and elastic cache and whatnot
+      let extraLanguageColumnModule = "";
+      let extraLanguageColumnIdef = "";
+      // only if we are search engine enabled
+      if (searchEngineEnabled) {
+        // let's get the extra column we use (if any)
+        const searchEngineLanguageColumn = itemDefinition.getSearchEngineDynamicMainLanguageColumn();
+        // and if there is one
+        if (searchEngineLanguageColumn) {
+          // is it in the module or item definition
+          if (itemDefinition.isSearchEngineDynamicMainLanguageColumnInModule()) {
+            extraLanguageColumnModule = ", " + JSON.stringify(searchEngineLanguageColumn);
+          } else {
+            extraLanguageColumnIdef = ", " + JSON.stringify(searchEngineLanguageColumn);
+          }
+        }
+      }
+
+      // now we check for side effects if we have side effect (basically currency stuff)
+      // we would need all the data of what we just have dropped to be processsed
+      // eg. that happens in the case of payments
+      //const sideEffectedProperties = itemDefinition.getAllSideEffectedProperties();
+      //const needSideEffects = sideEffectedProperties.length !== 0;
+
+      const trackedPropertiesIdef = itemDefinition.getAllPropertyDefinitions()
+        .filter((p) => p.isTracked());
+      const trackedPropertiesIdefStr = trackedPropertiesIdef.length ? "," + trackedPropertiesIdef.map((p) => {
+        return JSON.stringify(p.getId());
+      }).join(",") : "";
+      const trackedPropertiesMod = itemDefinition.getParentModule().getAllPropExtensions()
+        .filter((p) => p.isTracked());
+      const trackedPropertiesModStr = trackedPropertiesMod.length ? "," + trackedPropertiesMod.map((p) => {
+        return JSON.stringify(p.getId());
+      }).join(",") : "";
+      const trackedProperties = trackedPropertiesIdef.concat(trackedPropertiesMod).map((p) => p.getId());
+
+      const hasPotentialTrackers = trackedProperties.length || itemDefinition.isReparentingEnabled();
+
+      // now we see what we are going to return if we got side effects, everything, otherwise
+      // it's just some basic stuff with that extra row
+      const returningElementsIdef = deleter.returningAll ?
+        "*" :
+        `${JSON.stringify(CONNECTOR_SQL_COLUMN_ID_FK_NAME)},${JSON.stringify(CONNECTOR_SQL_COLUMN_VERSION_FK_NAME)}${trackedPropertiesIdefStr}${extraLanguageColumnIdef}`;
+      // but we only truly add those elements if we either need an idef join wether we have
+      // side effects, and want all the data, or we have that extra column we want
+      const needsIdefJoin = deleter.useJoinedReturn || trackedPropertiesIdefStr || extraLanguageColumnIdef;
+      // as for the module, this is always going to be retrieved
+      const returningElementsModule = deleter.returningAll ?
+        "*" :
+        `"id","version","parent_id","parent_type","parent_version","container_id","created_by"${trackedPropertiesModStr}${extraLanguageColumnModule}`;
+      // COPIED FROM CACHE
+
+      const unversionedsToDelete = typeSorts[type].unversioned as ISQLTableRowValue[];
+      const versionedsToDelete = typeSorts[type].versioned as ISQLTableRowValue[];
+
+      const dataArray = [selfTable];
+      let sqlQueryBuildupMod = "";
+      let sqlQueryBuildupIdef = "";
+
+      if (unversionedsToDelete.length) {
+        const anyQuery = "ANY(ARRAY[" + unversionedsToDelete.map((v, index) => {
+          dataArray.push(v.id);
+          return "$" + (index + 2);
+        }).join(",") + "])::TEXT[]";
+        sqlQueryBuildupMod += " \"id\" = " + anyQuery;
+        sqlQueryBuildupIdef += " " + JSON.stringify(CONNECTOR_SQL_COLUMN_ID_FK_NAME) + " = " + anyQuery;
+      }
+
+      if (versionedsToDelete.length) {
+        versionedsToDelete.forEach((v) => {
+          const n = dataArray.length + 1;
+          dataArray.push(v.id);
+          dataArray.push(v.version);
+          sqlQueryBuildupMod += " OR (\"id\" = $" + n + " AND \"version\" = $" + (n + 1) + ")"
+          sqlQueryBuildupIdef += " OR (" + JSON.stringify(CONNECTOR_SQL_COLUMN_ID_FK_NAME) + " = $" + n + " AND " +
+            JSON.stringify(CONNECTOR_SQL_COLUMN_ID_FK_NAME) + " = $" + (n + 1) + ")"
+        });
+      }
+
+      // COPIED FROM CACHE OUT (THIS IS SOME ADAPTING HERE)
+      // now we can make the rule by using a raw delete
+      const deleteQueryBase = `DELETE FROM ${JSON.stringify(moduleTable)} WHERE${sqlQueryBuildupMod} AND "type" = $1 RETURNING ${returningElementsModule}`;
+      const deleteQuery = needsIdefJoin ?
+        `WITH "ITABLE" AS (SELECT ${returningElementsIdef} FROM ${JSON.stringify(selfTable)
+        } WHERE${sqlQueryBuildupIdef}), "MTABLE" AS (${deleteQueryBase
+        }) ` +
+        `SELECT * FROM "ITABLE" join "MTABLE" ON ${JSON.stringify(CONNECTOR_SQL_COLUMN_ID_FK_NAME)}="id" AND ` +
+        `${JSON.stringify(CONNECTOR_SQL_COLUMN_VERSION_FK_NAME)}="version"` :
+        deleteQueryBase;
+
+      const deleteAllTrackers = `DELETE FROM ${JSON.stringify(TRACKERS_REGISTRY_IDENTIFIER)} WHERE${sqlQueryBuildupMod} AND "type" = $1`;
+      // super complex delete geez
+
+      // COPY FROM CACHE AGAIN
+      // for that we run a transaction
+      const allVersionsDropped: ISQLTableRowValue[] = await this.databaseConnection.startTransaction(async (transactingDatabase) => {
+        // and we delete based on id and type
+        const allVersionsDroppedInternal: ISQLTableRowValue[] = await transactingDatabase.queryRows(
+          deleteQuery,
+          dataArray,
+        );
+
+        // delete all outdated trackers
+        if (hasPotentialTrackers) {
+          await transactingDatabase.queryRows(deleteAllTrackers, dataArray);
+        }
+
+        //rowsToPerformDeleteSideEffects = needSideEffects ? allVersionsDroppedInternal : null;
+        // but yet we return the version to see what we dropped, and well parenting and creator
+
+        // and now we need to store the fact we have lost these records in the deleted registry
+
+        let trasactionTimes: string[] = []
+        if (allVersionsDroppedInternal.length) {
+          const insertQueryBuilder = transactingDatabase.getInsertBuilder();
+          insertQueryBuilder.table(DELETED_REGISTRY_IDENTIFIER);
+
+          allVersionsDroppedInternal.forEach(async (row) => {
+
+            const trackers: { [key: string]: string } = trackedProperties ? {} : null;
+            trackedProperties.forEach((pId) => {
+              const currentValue = row[pId] || null;
+              if (currentValue) {
+                trackers[pId] = currentValue;
+              }
+            });
+
+            insertQueryBuilder.insert({
+              id: row.id,
+              version: row.version || "",
+              type: selfTable,
+              module: moduleTable,
+              created_by: row.created_by || null,
+              parenting_id: row.parent_id ? (row.parent_type + "." + row.parent_id + "." + row.parent_version || "") : null,
+              transaction_time: [
+                "NOW()",
+                [],
+              ],
+              trackers: trackers ? JSON.stringify(trackers) : null,
+            });
+          });
+
+          // but we need the transaction time for each as the new record
+          // last_modified is that transaction time
+          insertQueryBuilder.returningBuilder.returningColumn("transaction_time");
+
+          const queryResult = await transactingDatabase.queryRows(insertQueryBuilder);
+          trasactionTimes = queryResult.map((r) => r.transaction_time);
+        }
+
+        // now we return these rows we got with version, parent_id, parent_type, parent_version and created_by
+        // but we add last_modified based on the insert query
+        return allVersionsDroppedInternal.map((row, index) => ({
+          ...row,
+          last_modified: trasactionTimes[index],
+        }));
+      });
+
+      // COPYING FROM CACHE OUT
+      // and now we can see all what we have dropped
+      allVersionsDropped.forEach(async (row) => {
+        deleteFilesInContainer && deleteFilesInContainer(row.container_id, row.id, row.version || null);
+        const modulesThatMightBeSetAsChildOf: Module[] =
+          this.root.getAllModules().map(analyzeModuleForPossibleParent.bind(this, itemDefinition)).flat() as Module[];
+
+        if (modulesThatMightBeSetAsChildOf.length) {
+          // now we can loop in these modules
+          await Promise.all(modulesThatMightBeSetAsChildOf.map(async (mod) => {
+            try {
+              await this.performBatchRawDBDelete(
+                mod,
+                (b) => {
+                  b.andWhereColumn("parent_id", row.id).andWhereColumn("parent_type", row.type).andWhereColumn("parent_version", row.version || "")
+                },
+                deleteFiles,
+                {
+                  useJoinedWhere: false,
+                  useJoinedReturn: false,
+                }
+              )
+            } catch (err) {
+              logger.error(
+                {
+                  className: "ItemizeRawDB",
+                  methodName: "performBatchRawDBDelete",
+                  orphan: true,
+                  message: "Failed to attempt to find orphans for deleting",
+                  err,
+                  data: {
+                    parentItemDefinition: itemDefinition.getQualifiedPathName(),
+                    parentId: row.id,
+                    parentVersion: row.version,
+                    moduleChildCheck: mod.getQualifiedPathName(),
+                  },
+                },
+              );
+            }
+          }));
+        }
+      });
+
+      this.informRowsHaveBeenDeleted(allVersionsDropped);
+    }));
   }
 
   /**
@@ -1524,6 +1911,10 @@ export class ItemizeRawDB {
     const itemDefinitionOrModuleInstance = typeof itemDefinitionOrModule === "string" ?
       this.root.registry[itemDefinitionOrModule] :
       itemDefinitionOrModule;
+
+    if (itemDefinitionOrModuleInstance instanceof Module && options.preventJoin) {
+      throw new Error("Cannot preventJoin when a module is provided to retrieve a raw db select");
+    }
 
     if (!itemDefinitionOrModuleInstance) {
       if (typeof itemDefinitionOrModule === "string") {
@@ -2388,7 +2779,7 @@ export class ItemizeRawDB {
       if (!updater.dangerousForceUpdatePointers) {
         const basicIdefPointers = itemDefinition.getAllPropertyDefinitions().filter((pDef) => pDef.isPointer() || pDef.isPointerList())
           .map((pDef) => pDef.getId());
-          itemUpdateQuery.setBuilder.knownAffectedColumns.forEach((affected) => {
+        itemUpdateQuery.setBuilder.knownAffectedColumns.forEach((affected) => {
           if (affected[0] === null && basicIdefPointers.includes(affected[1])) {
             throw new Error("Updating pointers is not allowed unless dangerousForceUpdatePointers is set to true, at: " + affected[1]);
           }
