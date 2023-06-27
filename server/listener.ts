@@ -187,6 +187,7 @@ export class Listener {
   private server: Server;
   private customRoles: ICustomRoleType[];
 
+  private awaitingBasicEvent: {[key: string]: IChangedFeedbackEvent} = {};
   private awaitingOwnedSearchEvents: {[key: string]: IOwnedSearchRecordsEvent} = {};
   private awaitingOwnedParentedSearchEvents: {[key: string]: IOwnedParentedSearchRecordsEvent} = {};
   private awaitingParentedSearchEvents: {[key: string]: IParentedSearchRecordsEvent} = {};
@@ -2770,31 +2771,45 @@ export class Listener {
     listenerUUID: string,
   ) {
     const mergedIndexIdentifier = event.itemDefinition + "." + event.id + "." + (event.version || "");
-    const redisEvent: IRedisEvent = {
-      event,
-      listenerUUID,
-      serverInstanceGroupId: INSTANCE_GROUP_ID,
-      source: "global",
-      mergedIndexIdentifier,
-      type: CHANGED_FEEDBACK_EVENT,
-      data,
-    };
+    
+    if (this.awaitingBasicEvent[mergedIndexIdentifier]) {
+      // patch it and go
+      this.awaitingBasicEvent[mergedIndexIdentifier] = event;
+      return;
+    }
 
-    // due to data we avoid logging this, data can be fairly large
-    CAN_LOG_DEBUG && logger.debug(
-      {
-        className: "Listener",
-        methodName: "triggerChangedListeners",
-        message: "Triggering redis changed event for",
-        data: {
-          event: redisEvent.event,
-          listenerUUID,
-          serverInstanceGroupId: INSTANCE_GROUP_ID,
+    // alright we are waiting
+    this.awaitingBasicEvent[mergedIndexIdentifier] = event;
+
+    setTimeout(() => {
+      const redisEvent: IRedisEvent = {
+        event: this.awaitingBasicEvent[mergedIndexIdentifier],
+        listenerUUID,
+        serverInstanceGroupId: INSTANCE_GROUP_ID,
+        source: "global",
+        mergedIndexIdentifier,
+        type: CHANGED_FEEDBACK_EVENT,
+        data,
+      };
+
+      delete this.awaitingBasicEvent[mergedIndexIdentifier];
+  
+      // due to data we avoid logging this, data can be fairly large
+      CAN_LOG_DEBUG && logger.debug(
+        {
+          className: "Listener",
+          methodName: "triggerChangedListeners",
+          message: "Triggering redis changed event for",
+          data: {
+            event: redisEvent.event,
+            listenerUUID,
+            serverInstanceGroupId: INSTANCE_GROUP_ID,
+          },
         },
-      },
-    );
-
-    this.redisGlobalPub.redisClient.publish(mergedIndexIdentifier, JSON.stringify(redisEvent));
+      );
+  
+      this.redisGlobalPub.redisClient.publish(mergedIndexIdentifier, JSON.stringify(redisEvent));
+    }, 250);
   }
   public triggerOwnedSearchListeners(
     event: IOwnedSearchRecordsEvent,
