@@ -1325,6 +1325,14 @@ export const RESERVED_IDEF_SEARCH_PROPERTIES = (orderByRule: any) => ({
     type: GraphQLList && GraphQLList(GraphQLString),
     description: "Blacklists the given ids",
   },
+  created_by_filter: {
+    type: GraphQLList && GraphQLList(GraphQLString),
+    description: "Only allows the given creators (note this is a filter and does not replace created_by)",
+  },
+  created_by_filter_out: {
+    type: GraphQLList && GraphQLList(GraphQLString),
+    description: "Blacklists the given creators (note that this is a filter and does not replace created_by)",
+  },
   search: {
     type: GraphQLString,
     description: "A search string, searches within the prop extensions and the prop extensions only",

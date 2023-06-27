@@ -249,7 +249,7 @@ const typeValue: IPropertyDefinitionSupportedType<PropertyDefinitionSupportedStr
       required: ["pointer", "pointer-tracked"],
     },
     {
-      name: "synchronizeItem",
+      name: "targetItem",
       type: "string",
       required: ["pointer", "pointer-tracked"],
     },

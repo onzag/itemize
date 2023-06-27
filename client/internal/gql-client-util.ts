@@ -1493,6 +1493,8 @@ interface ISearchQueryArg {
   versionFilterOut?: string;
   idsFilter?: string[];
   idsFilterOut?: string[];
+  createdByFilter?: string[];
+  createdByFilterOut?: string[];
   useSearchEngine?: boolean | string;
 }
 
@@ -1542,12 +1544,20 @@ export function getSearchArgsFor(
     searchArgs.version_filter_out = arg.versionFilterOut || null;
   }
 
-  if (arg.idsFilter && arg.idsFilter.length) {
+  if (arg.idsFilter) {
     searchArgs.ids_filter = arg.idsFilter;
   }
 
   if (arg.idsFilterOut && arg.idsFilterOut.length) {
     searchArgs.ids_filter_out = arg.idsFilterOut;
+  }
+
+  if (arg.createdByFilter) {
+    searchArgs.created_by_filter = arg.createdByFilter;
+  }
+
+  if (arg.createdByFilterOut && arg.createdByFilterOut.length) {
+    searchArgs.created_by_filter_out = arg.createdByFilterOut;
   }
 
   if (arg.createdBy) {
@@ -1780,7 +1790,10 @@ export async function runSearchQueryFor(
         let refetchSpecificRecords: IGQLSearchRecord[] = null;
 
         // if we have a value there and it differs
-        if (!equals(currentMetadata.value, arg.cacheStoreMetadata, { strict: true })) {
+        if (
+          !currentMetadata ||
+          !equals(currentMetadata.value, arg.cacheStoreMetadata, { strict: true })
+        ) {
           // it was mismatched
           metadataWasMismatch = true;
 

@@ -73,7 +73,7 @@ const typeValue: IPropertyDefinitionSupportedType<PropertyDefinitionSupportedTag
       required: ["pointers"],
     },
     {
-      name: "synchronizeItem",
+      name: "targetItem",
       type: "string",
       required: ["pointers"],
     },

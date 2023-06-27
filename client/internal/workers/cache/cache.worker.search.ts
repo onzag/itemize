@@ -285,6 +285,26 @@ async function checkOne(
     shouldBeIncluded = false;
   } else if (searchArgs.ids_filter_out && searchArgs.ids_filter_out.includes(searchRecord.id)) {
     shouldBeIncluded = false;
+  } else if (searchArgs.created_by_filter && !searchArgs.created_by_filter.includes((value.DATA as any).created_by)) {
+    shouldBeIncluded = false;
+  } else if (searchArgs.created_by_filter_out && searchArgs.created_by_filter_out.includes((value.DATA as any).created_by)) {
+    shouldBeIncluded = false;
+  } else if (searchArgs.created_by && searchArgs.created_by !== (value.DATA as any).created_by) {
+    shouldBeIncluded = false;
+  }
+
+  if (shouldBeIncluded && searchArgs.parent_type) {
+    const parentId = (value.DATA as any).parent_id;
+    const parentType = (value.DATA as any).parent_type;
+    const parentVersion = (value.DATA as any).parent_version;
+
+    if (
+      searchArgs.parent_type !== parentType ||
+      searchArgs.parent_id !== parentId ||
+      searchArgs.parent_version !== parentVersion
+    ) {
+      shouldBeIncluded = false;
+    }
   }
 
   // otherwise if it passed that, let's check more specifically

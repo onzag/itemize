@@ -362,6 +362,30 @@ export async function searchModule(
       });
     }
 
+    if (typeof resolverArgs.args.created_by_filter !== "undefined") {
+      elasticQuery.mustTerms({
+        created_by: resolverArgs.args.created_by_filter
+      }, {
+        groupId: "CREATED_BY",
+      });
+    }
+
+    if (typeof resolverArgs.args.created_by_filter_out !== "undefined") {
+      elasticQuery.mustNotTerms({
+        created_by: resolverArgs.args.created_by_filter_out
+      }, {
+        groupId: "CREATED_BY",
+      });
+    }
+
+    if (typeof resolverArgs.args.ids_filter_out !== "undefined") {
+      elasticQuery.mustNotTerms({
+        id: resolverArgs.args.ids_filter_out
+      }, {
+        groupId: "IDS",
+      });
+    }
+
     if (resolverArgs.args.parent_id && resolverArgs.args.parent_type) {
       elasticQuery.mustTerm({
         parent_id: resolverArgs.args.parent_id,
@@ -440,6 +464,20 @@ export async function searchModule(
       queryModel.whereBuilder.andWhere(
         `"id" != ANY(ARRAY[${resolverArgs.args.ids_filter_out.map(() => "?").join(",")}]::TEXT[])`,
         resolverArgs.args.ids_filter_out,
+      );
+    }
+
+    if (typeof resolverArgs.args.created_by_filter !== "undefined") {
+      queryModel.whereBuilder.andWhere(
+        `"created_by" = ANY(ARRAY[${resolverArgs.args.created_by_filter.map(() => "?").join(",")}]::TEXT[])`,
+        resolverArgs.args.created_by_filter,
+      );
+    }
+
+    if (typeof resolverArgs.args.created_by_filter_out !== "undefined") {
+      queryModel.whereBuilder.andWhere(
+        `"created_by" != ANY(ARRAY[${resolverArgs.args.created_by_filter_out.map(() => "?").join(",")}]::TEXT[])`,
+        resolverArgs.args.created_by_filter_out,
       );
     }
 
@@ -1240,6 +1278,22 @@ export async function searchItemDefinition(
         });
       }
 
+      if (typeof resolverArgs.args.created_by_filter !== "undefined") {
+        elasticQuery.mustTerms({
+          created_by: resolverArgs.args.created_by_filter
+        }, {
+          groupId: "CREATED_BY",
+        });
+      }
+
+      if (typeof resolverArgs.args.created_by_filter_out !== "undefined") {
+        elasticQuery.mustNotTerms({
+          created_by: resolverArgs.args.created_by_filter_out
+        }, {
+          groupId: "CREATED_BY",
+        });
+      }
+
       if (resolverArgs.args.parent_id && resolverArgs.args.parent_type) {
         elasticQuery.mustTerm({
           parent_id: resolverArgs.args.parent_id,
@@ -1316,6 +1370,20 @@ export async function searchItemDefinition(
         queryModel.whereBuilder.andWhere(
           `"id" != ANY(ARRAY[${resolverArgs.args.ids_filter_out.map(() => "?").join(",")}]::TEXT[])`,
           resolverArgs.args.ids_filter_out,
+        );
+      }
+
+      if (typeof resolverArgs.args.created_by_filter !== "undefined") {
+        queryModel.whereBuilder.andWhere(
+          `"created_by" = ANY(ARRAY[${resolverArgs.args.created_by_filter.map(() => "?").join(",")}]::TEXT[])`,
+          resolverArgs.args.created_by_filter,
+        );
+      }
+
+      if (typeof resolverArgs.args.created_by_filter_out !== "undefined") {
+        queryModel.whereBuilder.andWhere(
+          `"created_by" != ANY(ARRAY[${resolverArgs.args.created_by_filter_out.map(() => "?").join(",")}]::TEXT[])`,
+          resolverArgs.args.created_by_filter_out,
         );
       }
 

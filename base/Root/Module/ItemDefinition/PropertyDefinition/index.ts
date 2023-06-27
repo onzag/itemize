@@ -2283,8 +2283,8 @@ export default class PropertyDefinition {
     return this.rawData.type === "taglist" && this.rawData.subtype && this.rawData.subtype.startsWith("pointer");
   }
 
-  public getPointerSynchronizationItem(): ItemDefinition {
-    const item = this.getPointerSynchronizationItem();
+  public getPointerTargetItem(): ItemDefinition {
+    const item = this.parentModule.getParentRoot().registry[this.rawData.config.targetItem] as ItemDefinition;
     if (!item || item instanceof Module) {
       return null;
     }
@@ -2292,7 +2292,7 @@ export default class PropertyDefinition {
   }
 
   public getPointerSynchronizationProperty(): PropertyDefinition {
-    const item = this.getPointerSynchronizationItem();
+    const item = this.getPointerTargetItem();
     if (!item) {
       return null;
     }

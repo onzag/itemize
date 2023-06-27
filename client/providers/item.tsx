@@ -891,6 +891,24 @@ export interface IActionSearchOptions extends IActionCleanOptions {
   idsFilterOut?: string[];
 
   /**
+   * Only allows items of a given creator
+   * 
+   * this acts like a filter after a search is done and does not replace
+   * specifying the creator by createdBy as createdBy
+   * has considerations with permissions
+   */
+  createdByFilterOut?: string[];
+
+  /**
+   * Denies items of a given creator (blacklist)
+   * 
+   * this acts like a filter after a search is done and does not replace
+   * specifying the creator by createdBy as createdBy
+   * has considerations with permissions
+   */
+  createdByFilter?: string[];
+
+  /**
    * TODO implement pile search
    */
   pileSearch?: boolean;
@@ -5151,6 +5169,8 @@ export class ActualItemProvider extends
       versionFilter: options.versionFilter,
       idsFilter: options.idsFilter,
       idsFilterOut: options.idsFilterOut,
+      createdByFilter: options.createdByFilter,
+      createdByFilterOut: options.createdByFilterOut,
       versionFilterOut: options.versionFilterOut,
     }, {
       remoteListener: this.props.remoteListener,

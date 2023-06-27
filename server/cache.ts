@@ -868,7 +868,7 @@ export class Cache {
             newValue,
             originalValue: [],
             sourceProperty: pDef,
-            targetIdef: pDef.getPointerSynchronizationItem(),
+            targetIdef: pDef.getPointerTargetItem(),
             targetProperty: pDef.getPointerSynchronizationProperty(),
           });
         }
@@ -1646,7 +1646,7 @@ export class Cache {
             newValue,
             originalValue: currentValue,
             sourceProperty: pDef,
-            targetIdef: pDef.getPointerSynchronizationItem(),
+            targetIdef: pDef.getPointerTargetItem(),
             targetProperty: pDef.getPointerSynchronizationProperty(),
           });
         }
