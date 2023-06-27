@@ -112,7 +112,7 @@ export class DatabaseConnection {
       //     optimizedBindingsIndexes.push(optimizedBindingsIndex);
       //   }
       // });
-  
+
       let holes: number = 0;
       queryValue = "";
       splittedValue.forEach((v, index) => {
@@ -284,16 +284,27 @@ export class DatabaseConnection {
 
   /**
    * Starts a transaction, while handling rollbacks and everything
+   * if provided a client to already use in the transaction it will not be auto-released
+   * all changes are automatically rolled back
+   * 
    * @param arg a function that returns anything and handles the transacting client
    * @returns whatever you returned in your arg function
    */
-  public async startTransaction(arg: (transactingClient: DatabaseConnection) => Promise<any>): Promise<any> {
+  public async startTransaction(
+    arg: (transactingClient: DatabaseConnection) => Promise<any>,
+    options: {
+      useClient?: DatabaseConnection,
+      noAutoCommit?: boolean,
+      noAutoRollback?: boolean,
+      noBegin?: boolean,
+    } = {}
+  ): Promise<any> {
     // first we fetch a client
     const client = await this.pool.connect();
     let result = null;
 
     // now we build a treansacting client as a new database connection
-    const transactingClient = new DatabaseConnection(null, client, this.pool);
+    const transactingClient = options.useClient || new DatabaseConnection(null, client, this.pool);
     if (this.suppressLogs) {
       transactingClient.suppressLogging();
     }
@@ -304,22 +315,32 @@ export class DatabaseConnection {
     // now we can try this
     try {
       // let's begin the transaction
-      await client.query("BEGIN");
+      if (!options.noBegin) {
+        await client.query("BEGIN");
+      }
       // now we can call the transacting client in the function and get the result
       result = await arg(transactingClient);
     } catch (err) {
       // any fail and we rollback
-      await client.query("ROLLBACK");
-      // then release such client
-      client.release();
+      if (!options.noAutoRollback) {
+        await client.query("ROLLBACK");
+      }
+      if (!options.useClient) {
+        // then release such client
+        client.release();
+      }
       throw err;
     }
 
     // now we can commit
-    await client.query("COMMIT");
+    if (!options.noAutoCommit) {
+      await client.query("COMMIT");
+    }
 
     // then release such client
-    client.release();
+    if (!options.useClient) {
+      client.release();
+    }
 
     // and return the result we had given in the start
     return result;

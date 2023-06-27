@@ -1198,13 +1198,13 @@ export class Cache {
     if (potentialTransactingRawDB) {
       (async () => {
         try {
-          await potentialTransactingRawDB.consumeTransactingEventQueue();
+          await potentialTransactingRawDB.consumeEventQueue();
         } catch (err) {
           logger.error(
             {
               className: "Cache",
               methodName: "requestCreation",
-              message: "Could not call consumeTransactingEventQueue to call the updates on pointers",
+              message: "Could not call consumeEventQueue to call the updates on pointers",
               serious: true,
               err,
               data: {
@@ -1974,7 +1974,7 @@ export class Cache {
       const changedPropertyMap = propertyMap.filter((v) => v.newValue !== v.originalValue);
 
       sqlValue = (actualReparent || changedPropertyMap.length || pointerMap.length) ? (
-        this.databaseConnection.startTransaction(async (transactingDatabase) => {
+        await this.databaseConnection.startTransaction(async (transactingDatabase) => {
           const internalSQLValue = convertVersionsIntoNullsWhenNecessary(
             await transactingDatabase.queryFirst(withQuery),
           );
@@ -2160,13 +2160,13 @@ export class Cache {
     if (potentialTransactingRawDB) {
       (async () => {
         try {
-          await potentialTransactingRawDB.consumeTransactingEventQueue();
+          await potentialTransactingRawDB.consumeEventQueue();
         } catch (err) {
           logger.error(
             {
               className: "Cache",
-              methodName: "requestCreation",
-              message: "Could not call consumeTransactingEventQueue to call the updates on pointers",
+              methodName: "requestUpdate",
+              message: "Could not call consumeEventQueue to call the updates on pointers",
               serious: true,
               err,
               data: {
@@ -2178,7 +2178,7 @@ export class Cache {
             }
           );
         }
-      });
+      })();
     }
 
     // we return and this executes after it returns
@@ -3286,13 +3286,13 @@ export class Cache {
       const whereThisWasAdded = pointer.newValue.filter((value) => !pointer.originalValue.includes(value));
 
       // now we gonna check if our target property is a taglist or whatever
-      const targetPropertyIsArray = pointer.targetProperty.getType() === "string";
+      const targetPropertyIsArray = pointer.targetProperty.getType() === "taglist";
       const targetPropertyId = pointer.targetProperty.getId();
 
       // and now we loop for both where we add and where we remove
       await Promise.all([whereThisWasAdded, whereThisWasRemoved].map(async (whereToDealWith, index) => {
         // only the first is add
-        const isAdd = index = 0;
+        const isAdd = index === 0;
         // and we deal with it if we have something to deal with
         if (whereToDealWith.length) {
           // we split the id.version complex

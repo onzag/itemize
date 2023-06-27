@@ -120,7 +120,7 @@ const typeValue: IPropertyDefinitionSupportedType<PropertyDefinitionSupportedTag
   },
   isNull: (v) => !v || !v.length,
   validate: (s: PropertyDefinitionSupportedTagListType, p: IPropertyDefinitionRawJSONDataType) => {
-    if (p.subtype !== "arbitrary") {
+    if (p.subtype !== "arbitrary" && p.subtype !== "pointers" && p.values) {
       if (!s.every((v) => {
         return (
           typeof v === "string" &&

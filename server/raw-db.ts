@@ -92,8 +92,8 @@ export class ItemizeRawDB {
   private elastic: ItemizeElasticClient;
 
   private transacting: boolean;
-  private transactingUsingSingleClientMode: boolean;
-  private transactingQueue: Function[] = [];
+  private singleClientMode: boolean;
+  private eventQueue: Function[] = [];
 
   private cachedSelects: {
     [prefixedUniqueID: string]: {
@@ -154,11 +154,11 @@ export class ItemizeRawDB {
     this.elastic = elastic;
   }
 
-  public async consumeTransactingEventQueue(options: { ensureOrder?: boolean } = {}) {
+  public async consumeEventQueue(options: { ensureOrder?: boolean } = {}) {
     // resolve the transacting queue that was generated in the raw db once it resolved
     const errors: Error[] = [];
     if (options.ensureOrder) {
-      for (const q of this.transactingQueue) {
+      for (const q of this.eventQueue) {
         try {
           await q();
         } catch (err) {
@@ -167,7 +167,7 @@ export class ItemizeRawDB {
       }
     } else {
       // we don't want to kill the transaction queue 
-      await Promise.all(this.transactingQueue.map(async (q) => {
+      await Promise.all(this.eventQueue.map(async (q) => {
         try {
           await q();
         } catch (err) {
@@ -175,6 +175,8 @@ export class ItemizeRawDB {
         }
       }));
     }
+
+    this.eventQueue = [];
 
     if (errors.length) {
       throw new TransactingQueueError("Errors ocurred by the end of the transaction", errors);
@@ -189,10 +191,14 @@ export class ItemizeRawDB {
    * by calling consumeTransactingEventQueue once the changes have been commited
    * @returns a new instance of raw db
    */
-  public hookInto(connection: DatabaseConnection, options: { transacting: boolean }): ItemizeRawDB {
+  public hookInto(connection: DatabaseConnection, options: { transacting?: boolean, singleClient?: boolean } = {}): ItemizeRawDB {
     const newRawDB = new ItemizeRawDB(this.redisGlobal, this.redisPub, this.redisSub, connection, this.root);
+    newRawDB.setupElastic(this.elastic);
     if (options.transacting) {
       newRawDB.transacting = true;
+    }
+    if (options.singleClient) {
+      newRawDB.singleClientMode = true;
     }
     return newRawDB;
   }
@@ -210,11 +216,12 @@ export class ItemizeRawDB {
     let newRawDB: ItemizeRawDB;
     const rs = await this.databaseConnection.startTransaction(async (transactingClient) => {
       newRawDB = new ItemizeRawDB(this.redisGlobal, this.redisPub, this.redisSub, transactingClient, this.root);
+      newRawDB.setupElastic(this.elastic);
       newRawDB.transacting = true;
       return await fn(newRawDB);
     });
 
-    await newRawDB.consumeTransactingEventQueue({ ensureOrder: opts.ensureEventConsumptionOrder });
+    await newRawDB.consumeEventQueue({ ensureOrder: opts.ensureEventConsumptionOrder });
 
     return rs;
   }
@@ -233,12 +240,12 @@ export class ItemizeRawDB {
     let newRawDB: ItemizeRawDB;
     const rs = await this.databaseConnection.startSingleClientOperation(async (transactingClient) => {
       newRawDB = new ItemizeRawDB(this.redisGlobal, this.redisPub, this.redisSub, transactingClient, this.root);
-      newRawDB.transacting = true;
-      newRawDB.transactingUsingSingleClientMode = true;
+      newRawDB.setupElastic(this.elastic);
+      newRawDB.singleClientMode = true;
       return await fn(newRawDB);
     });
 
-    await newRawDB.consumeTransactingEventQueue({ ensureOrder: opts.ensureEventConsumptionOrder });
+    await newRawDB.consumeEventQueue({ ensureOrder: opts.ensureEventConsumptionOrder });
 
     return rs;
   }
@@ -715,6 +722,7 @@ export class ItemizeRawDB {
     rowDataIsComplete: boolean,
   ) {
     const [completedRows, newRowDataIsComplete] = rowDataIsComplete || action === "deleted" ? [rows, rowDataIsComplete] : await this.completeRowData(rows);
+
     // first we call to change every single row so that the changed events propagate
     const processedChanges = (await Promise.all(completedRows.map((r) => this.informChangeOnRow(r, action, elasticLanguageOverride, newRowDataIsComplete)))).filter((r) => r !== null);
 
@@ -1792,6 +1800,8 @@ export class ItemizeRawDB {
    * refer to processGQLValue in order to aid yourself a little when doing a raw db
    * insert
    * 
+   * NOTE a raw db insert is unable to trigger side effects
+   * 
    * @param item 
    * @param inserter 
    * @returns 
@@ -1883,19 +1893,19 @@ export class ItemizeRawDB {
 
     const allInsertedRows: ISQLTableRowValue[] = this.transacting ?
       await transactionFn(this.databaseConnection) :
-      await this.databaseConnection.startTransaction(transactionFn);
+      await this.databaseConnection.startTransaction(transactionFn, {useClient: this.singleClientMode ? this.databaseConnection : null});
 
     const result = allInsertedRows.map(convertVersionsIntoNullsWhenNecessary);
 
     if (!inserter.dangerousUseSilentMode) {
-      if (this.transacting) {
-        this.transactingQueue.push(this.informRowsHaveBeenAdded.bind(this, result, inserter.dangerousForceElasticLangUpdateTo, true));
+      if (this.transacting || this.singleClientMode) {
+        this.eventQueue.push(this.informRowsHaveBeenAdded.bind(this, result, inserter.dangerousForceElasticLangUpdateTo, true));
       } else {
         await this.informRowsHaveBeenAdded(result, inserter.dangerousForceElasticLangUpdateTo, true);
       }
     } else if (typeof inserter.dangerousForceElasticLangUpdateTo !== "undefined" || inserter.dangerousForceElasticUpdate) {
-      if (this.transacting) {
-        this.transactingQueue.push(this.informRowsHaveBeenAddedElasticOnly.bind(this, result, inserter.dangerousForceElasticLangUpdateTo, true));
+      if (this.transacting || this.singleClientMode) {
+        this.eventQueue.push(this.informRowsHaveBeenAddedElasticOnly.bind(this, result, inserter.dangerousForceElasticLangUpdateTo, true));
       } else {
         await this.informRowsHaveBeenAddedElasticOnly(result, inserter.dangerousForceElasticLangUpdateTo, true);
       }
@@ -1963,8 +1973,8 @@ export class ItemizeRawDB {
       noScroll?: boolean,
     } = {}
   ) {
-    if (!this.transacting) {
-      const err = new Error("Attempted to declare a raw db cursor when not transacting");
+    if (!this.transacting && !this.singleClientMode) {
+      const err = new Error("Attempted to declare a raw db cursor when not transacting and not in single client mode");
       logger.error({
         methodName: "declareRawDBCursorSelect",
         className: "ItemizeRawDB",
@@ -1979,7 +1989,7 @@ export class ItemizeRawDB {
       throw err;
     }
 
-    if (this.transactingUsingSingleClientMode && !options.withHold) {
+    if (this.singleClientMode && !options.withHold) {
       const err = new Error("Attempted to declare raw db cursor WITHOUT HOLD directly into the database");
       logger.error({
         methodName: "declareRawDBCursorSelect",
@@ -2558,6 +2568,8 @@ export class ItemizeRawDB {
    * of the other side, normally the raw db update will refuse to update pointers
    * (that is able to detect) unless dangerousForceUpdatePointers is specified
    * 
+   * NOTE a raw db update is unable to trigger side effects
+   * 
    * @param item 
    * @param updater 
    */
@@ -2884,7 +2896,7 @@ export class ItemizeRawDB {
     // we got to get all rows, first we create a pseudo table
     // for our module
     const allRows = potentialAffectedTrackedProperties.length && !updater.dangerousUseSilentMode ? (
-      await this.databaseConnection.startTransaction(async (transactingDb) => {
+      !this.transacting || this.singleClientMode ? (await this.databaseConnection.startTransaction(async (transactingDb) => {
         const results = await transactingDb.queryRows(withQuery);
 
         await this.updateTrackers(
@@ -2895,21 +2907,37 @@ export class ItemizeRawDB {
         );
 
         return results;
-      })
+      }, {
+        useClient: this.singleClientMode ? this.databaseConnection : null,
+      })) : (
+        // already transacting use the same connection
+        (async () => {
+          const results = await this.databaseConnection.queryRows(withQuery);
+
+          await this.updateTrackers(
+            this.databaseConnection,
+            results,
+            potentialAffectedTrackedProperties,
+            moduleTable,
+          );
+
+          return results;
+        })()
+      )
     ) : (
       await this.databaseConnection.queryRows(withQuery)
     );
     const result = allRows.map(convertVersionsIntoNullsWhenNecessary);
 
     if (!updater.dangerousUseSilentMode) {
-      if (this.transacting) {
-        this.transactingQueue.push(this.informRowsHaveBeenModified.bind(this, result, updater.dangerousForceElasticLangUpdateTo, true));
+      if (this.transacting || this.singleClientMode) {
+        this.eventQueue.push(this.informRowsHaveBeenModified.bind(this, result, updater.dangerousForceElasticLangUpdateTo, true));
       } else {
         await this.informRowsHaveBeenModified(result, updater.dangerousForceElasticLangUpdateTo, true);
       }
     } else if (typeof updater.dangerousForceElasticLangUpdateTo !== "undefined" || updater.dangerousForceElasticUpdate) {
-      if (this.transacting) {
-        this.transactingQueue.push(this.informRowsHaveBeenModifiedElasticOnly.bind(this, result, updater.dangerousForceElasticLangUpdateTo, true));
+      if (this.transacting || this.singleClientMode) {
+        this.eventQueue.push(this.informRowsHaveBeenModifiedElasticOnly.bind(this, result, updater.dangerousForceElasticLangUpdateTo, true));
       } else {
         await this.informRowsHaveBeenModifiedElasticOnly(result, updater.dangerousForceElasticLangUpdateTo, true);
       }
@@ -3213,7 +3241,7 @@ export class ItemizeRawDB {
     // we got to get all rows, first we create a pseudo table
     // for our module
     const allRows = potentialAffectedTrackedProperties.length && !updater.dangerousUseSilentMode ? (
-      await this.databaseConnection.startTransaction(async (transactingDb) => {
+      !this.transacting || this.singleClientMode ? (await this.databaseConnection.startTransaction(async (transactingDb) => {
         const results = await transactingDb.queryRows(moduleUpdateQuery);
 
         await this.updateTrackers(
@@ -3224,25 +3252,41 @@ export class ItemizeRawDB {
         );
 
         return results;
-      })
+      }, {
+        useClient: this.singleClientMode ? this.databaseConnection : null,
+      })) : (
+        // already in a transaction block
+        (async () => {
+          const results = await this.databaseConnection.queryRows(moduleUpdateQuery);
+
+          await this.updateTrackers(
+            this.databaseConnection,
+            results,
+            potentialAffectedTrackedProperties,
+            moduleTable,
+          );
+
+          return results;
+        })
+      )
     ) : (
       await this.databaseConnection.queryRows(moduleUpdateQuery)
     );
     const result = allRows.map(convertVersionsIntoNullsWhenNecessary);
 
     if (!updater.dangerousUseSilentMode) {
-      if (this.transacting) {
+      if (this.transacting || this.singleClientMode) {
         // row data is not complete so we pass false
         // otherwise we would corrupt the cache
-        this.transactingQueue.push(this.informRowsHaveBeenModified.bind(this, result, updater.dangerousForceElasticLangUpdateTo, false));
+        this.eventQueue.push(this.informRowsHaveBeenModified.bind(this, result, updater.dangerousForceElasticLangUpdateTo, false));
       } else {
         await this.informRowsHaveBeenModified(result, updater.dangerousForceElasticLangUpdateTo, false);
       }
     } else if (typeof updater.dangerousForceElasticLangUpdateTo !== "undefined" || updater.dangerousForceElasticUpdate) {
-      if (this.transacting) {
+      if (this.transacting || this.singleClientMode) {
         // row data is not complete so we pass false
         // otherwise we would corrupt the cache
-        this.transactingQueue.push(this.informRowsHaveBeenModifiedElasticOnly.bind(this, result, updater.dangerousForceElasticLangUpdateTo, false));
+        this.eventQueue.push(this.informRowsHaveBeenModifiedElasticOnly.bind(this, result, updater.dangerousForceElasticLangUpdateTo, false));
       } else {
         await this.informRowsHaveBeenModifiedElasticOnly(result, updater.dangerousForceElasticLangUpdateTo, false);
       }
