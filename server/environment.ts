@@ -128,3 +128,7 @@ export function buildEnvironmentInfo(
     environment: ENVIRONMENT_DETAILS,
   };
 }
+
+export const EMULATE_ELASTIC_SYNC_FAILURE_AT = process.env.EMULATE_ELASTIC_SYNC_FAILURE_AT || null;
+export const EMULATE_SILENT_ELASTIC_SYNC_FAILURE_AT = process.env.EMULATE_SILENT_ELASTIC_SYNC_FAILURE_AT || null;
+export const EMULATE_BAD_REDIS_WRITES = process.env.EMULATE_BAD_REDIS_WRITES === "true";

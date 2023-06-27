@@ -8,7 +8,7 @@ import { logger } from "./logger";
 import equals from "deep-equal";
 import { convertSQLValueToElasticSQLValueForItemDefinition } from "../base/Root/Module/ItemDefinition/sql";
 import { DELETED_REGISTRY_IDENTIFIER, SERVER_ELASTIC_PING_INTERVAL_TIME } from "../constants";
-import { CAN_LOG_DEBUG, FORCE_ELASTIC_REBUILD, INSTANCE_UUID } from "./environment";
+import { CAN_LOG_DEBUG, EMULATE_ELASTIC_SYNC_FAILURE_AT, EMULATE_SILENT_ELASTIC_SYNC_FAILURE_AT, FORCE_ELASTIC_REBUILD, INSTANCE_UUID } from "./environment";
 import { NanoSecondComposedDate } from "../nanodate";
 import { AggregationsAggregationContainer, FieldValue, QueryDslMatchPhraseQuery, QueryDslMatchQuery, QueryDslQueryContainer, QueryDslTermQuery, QueryDslTermsQuery, SearchRequest } from "@elastic/elasticsearch/lib/api/types";
 import { setInterval } from "timers";
@@ -1999,6 +1999,21 @@ export class ItemizeElasticClient {
       return;
     }
 
+    if (EMULATE_ELASTIC_SYNC_FAILURE_AT && EMULATE_ELASTIC_SYNC_FAILURE_AT === idef.getQualifiedPathName()) {
+      throw new Error("EMULATE_ELASTIC_SYNC_FAILURE_AT is enabled for " + EMULATE_ELASTIC_SYNC_FAILURE_AT);
+    }
+
+    if (EMULATE_SILENT_ELASTIC_SYNC_FAILURE_AT && EMULATE_SILENT_ELASTIC_SYNC_FAILURE_AT === idef.getQualifiedPathName()) {
+      logger.info(
+        {
+          className: "ItemizeElasticClient",
+          methodName: "createDocumentUnknownEverything",
+          message: "EMULATE_SILENT_ELASTIC_SYNC_FAILURE_AT is enabled for " + EMULATE_SILENT_ELASTIC_SYNC_FAILURE_AT,
+        }
+      );
+      return;
+    }
+
     const value = (await this.rawDB.performRawDBSelect(
       idef,
       (b) => b.selectAll().whereBuilder.andWhereColumn("id", id).andWhereColumn("version", version || "")
@@ -2020,6 +2035,21 @@ export class ItemizeElasticClient {
     const idef = (typeof itemDefinition === "string" ? this.root.registry[itemDefinition] : itemDefinition) as ItemDefinition;
 
     if (!idef.isSearchEngineEnabled()) {
+      return;
+    }
+
+    if (EMULATE_ELASTIC_SYNC_FAILURE_AT && EMULATE_ELASTIC_SYNC_FAILURE_AT === idef.getQualifiedPathName()) {
+      throw new Error("EMULATE_ELASTIC_SYNC_FAILURE_AT is enabled for " + EMULATE_ELASTIC_SYNC_FAILURE_AT);
+    }
+
+    if (EMULATE_SILENT_ELASTIC_SYNC_FAILURE_AT && EMULATE_SILENT_ELASTIC_SYNC_FAILURE_AT === idef.getQualifiedPathName()) {
+      logger.info(
+        {
+          className: "ItemizeElasticClient",
+          methodName: "updateDocumentUnknownEverything",
+          message: "EMULATE_SILENT_ELASTIC_SYNC_FAILURE_AT is enabled for " + EMULATE_SILENT_ELASTIC_SYNC_FAILURE_AT,
+        }
+      );
       return;
     }
 
@@ -2071,6 +2101,21 @@ export class ItemizeElasticClient {
     const idef = (typeof itemDefinition === "string" ? this.root.registry[itemDefinition] : itemDefinition) as ItemDefinition;
 
     if (!idef.isSearchEngineEnabled()) {
+      return;
+    }
+
+    if (EMULATE_ELASTIC_SYNC_FAILURE_AT && EMULATE_ELASTIC_SYNC_FAILURE_AT === idef.getQualifiedPathName()) {
+      throw new Error("EMULATE_ELASTIC_SYNC_FAILURE_AT is enabled for " + EMULATE_ELASTIC_SYNC_FAILURE_AT);
+    }
+
+    if (EMULATE_SILENT_ELASTIC_SYNC_FAILURE_AT && EMULATE_SILENT_ELASTIC_SYNC_FAILURE_AT === idef.getQualifiedPathName()) {
+      logger.info(
+        {
+          className: "ItemizeElasticClient",
+          methodName: "updateDocument",
+          message: "EMULATE_SILENT_ELASTIC_SYNC_FAILURE_AT is enabled for " + EMULATE_SILENT_ELASTIC_SYNC_FAILURE_AT,
+        }
+      );
       return;
     }
 

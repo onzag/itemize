@@ -155,3 +155,23 @@ If you don't wish to do this you should save your http certificate so that it ca
 Default `false`
 
 If you forget your main admin password with user `admin` you can use this variable to establish a brand new password for it
+
+# Developer Specific Environment Variables
+
+Normally used for development and testing with itemize, they should not be used in projects directly or production builds
+
+## EMULATE_ELASTIC_SYNC_FAILURE_AT
+
+Provide a qualified path name so that every time single documents are attempted to be created or updated it will throw an error and fail
+
+Does not affect sync checks and it's used to check sync checks.
+
+## EMULATE_SILENT_ELASTIC_SYNC_FAILURE_AT
+
+Provide a qualified path name so that every time single documents are attempted to be created or updated it will fail to write silently
+
+Does not affect sync checks and it's used to check sync checks.
+
+## EMULATE_BAD_REDIS_WRITES
+
+All redis instances act dead and throw errors, even when they connect; simulates connection issues

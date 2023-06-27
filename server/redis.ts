@@ -8,6 +8,7 @@ import { ISingleRedisConfigRawJSONDataType } from "../config";
 import redis, { RedisClient } from "redis";
 import { logger } from "./logger";
 import { promisify } from "util";
+import { EMULATE_BAD_REDIS_WRITES } from "./environment";
 
 /**
  * The itemize redis client is different from the standard client
@@ -153,7 +154,9 @@ export class ItemizeRedisClient {
   private callFn(fn: (...args: any[]) => Promise<any>): (...args: any[]) => Promise<any> {
     // typescript is funky again got to make everyhting any
     return (...args: any[]) => {
-      if (this.isReconnecting) {
+      if (EMULATE_BAD_REDIS_WRITES) {
+        throw new Error("EMULATE_BAD_REDIS_WRITES is enabled");
+      } else if (this.isReconnecting) {
         throw new Error("Redis has lost the connection and cannot be relied upon");
       } else {
         return fn(...args);

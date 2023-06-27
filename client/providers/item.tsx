@@ -4906,6 +4906,18 @@ export class ActualItemProvider extends
       });
     }
 
+    if (options.cachePolicy !== "none" && options.useSearchEngine) {
+      // using a cache policy and then listening for changes could result in catasthrope if a record
+      // is invalid (inconsistent) in the search engine, the client will not realize and then ask to get fed
+      // changes, an invalid record may therefore remain invalid even after is fixed in a consistency check
+      // but the client will never realize; when using the SQL database which is the source of truth this is assured not
+      // to occur
+      throw new Error(
+        "Using a search engine with cache policy is not allowed for consistency reasons, "
+        + "search engine isn't 100% assured to be consistent, but the database is",
+      );
+    }
+
     if (options.ssrEnabled && options.cachePolicy && options.cachePolicy !== "none") {
       console.warn("You have a SSR enabled search that uses cache policy, this will not execute in the server side due to conflicting instructions");
     }
