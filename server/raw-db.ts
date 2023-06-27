@@ -1406,6 +1406,7 @@ export class ItemizeRawDB {
       useJoinedReturn?: boolean;
       dangerousUseSilentMode?: boolean;
       returningAll?: boolean;
+
     } = {},
   ) {
     const itemDefinitionOrModuleInstance = typeof itemDefinitionOrModule === "string" ?
@@ -1459,7 +1460,7 @@ export class ItemizeRawDB {
       typeSorts[v.type].versioned.push(v);
     });
 
-    await Promise.all(Object.keys(typeSorts).map(async (type) => {
+    return (await Promise.all(Object.keys(typeSorts).map(async (type) => {
       const moduleTable = itemDefinitionOrModuleInstance instanceof Module ?
         itemDefinitionOrModuleInstance.getQualifiedPathName() :
         itemDefinitionOrModuleInstance.getParentModule().getQualifiedPathName();
@@ -1776,7 +1777,9 @@ export class ItemizeRawDB {
       });
 
       this.informRowsHaveBeenDeleted(allVersionsDropped);
-    }));
+
+      return allVersionsDropped;
+    }))).flat();
   }
 
   /**
