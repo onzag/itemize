@@ -5,7 +5,7 @@
  * @module
  */
 
-import React from "react";
+import React, { useContext, useEffect } from "react";
 import { ItemContext, SearchItemValueContext, IItemProviderProps } from "../../providers/item";
 import equals from "deep-equal";
 import ItemDefinition, { IItemDefinitionGQLValueType } from "../../../base/Root/Module/ItemDefinition";
@@ -203,7 +203,7 @@ export interface ISearchLoaderProps {
   /**
    * Triggers when the search data changes, as in a new search id
    */
-  onSearchDataChange?: (searchId: string, wasRestored: "NO" | "FROM_LOCATION" | "FROM_STATE") =>  void;
+  onSearchDataChange?: (searchId: string, wasRestored: "NO" | "FROM_LOCATION" | "FROM_STATE") => void;
 }
 
 /**
@@ -1069,49 +1069,36 @@ class ActualSearchLoader extends React.Component<IActualSearchLoaderProps, IActu
  * @returns a react component
  */
 export default function SearchLoader(props: ISearchLoaderProps) {
+  const localeData = useContext(LocaleContext);
+  const tokenData = useContext(TokenContext);
+  const itemContext = useContext(ItemContext);
   return (
-    <LocaleContext.Consumer>
-      {
-        (localeData) => (
-          <TokenContext.Consumer>
-            {
-              (tokenData) => (
-                <ItemContext.Consumer>{
-                  (itemContext) => (
-                    <ActualSearchLoader
-                      {...props}
-                      itemDefinitionInstance={itemContext.idef}
-                      remoteListener={itemContext.remoteListener}
-                      searchId={itemContext.searchId}
-                      searchWasRestored={itemContext.searchWasRestored}
-                      searchRecords={itemContext.searchRecords}
-                      searchResults={itemContext.searchResults}
-                      searchCount={itemContext.searchCount}
-                      searchOffset={itemContext.searchOffset}
-                      searchLimit={itemContext.searchLimit}
-                      searchOwner={itemContext.searchOwner}
-                      searchShouldCache={itemContext.searchShouldCache}
-                      searchRequestedIncludes={itemContext.searchRequestedIncludes}
-                      searchRequestedProperties={itemContext.searchRequestedProperties}
-                      searchEngineEnabled={itemContext.searchEngineEnabled}
-                      searchEngineEnabledLang={itemContext.searchEngineEnabledLang}
-                      searchEngineHighlightArgs={itemContext.searchEngineHighlightArgs}
-                      searchError={itemContext.searchError}
-                      searchErrorDismiss={itemContext.dismissSearchError}
-                      searchHighlights={itemContext.searchHighlights}
-                      searchFields={itemContext.searchFields}
-                      searchMetadata={itemContext.searchMetadata}
-                      searching={itemContext.searching}
-                      tokenData={tokenData}
-                      localeData={localeData}
-                    />
-                  )
-                }</ItemContext.Consumer>
-              )
-            }
-          </TokenContext.Consumer>
-        )
-      }
-    </LocaleContext.Consumer>
+    <ActualSearchLoader
+      {...props}
+      itemDefinitionInstance={itemContext.idef}
+      remoteListener={itemContext.remoteListener}
+      searchId={itemContext.searchId}
+      searchWasRestored={itemContext.searchWasRestored}
+      searchRecords={itemContext.searchRecords}
+      searchResults={itemContext.searchResults}
+      searchCount={itemContext.searchCount}
+      searchOffset={itemContext.searchOffset}
+      searchLimit={itemContext.searchLimit}
+      searchOwner={itemContext.searchOwner}
+      searchShouldCache={itemContext.searchShouldCache}
+      searchRequestedIncludes={itemContext.searchRequestedIncludes}
+      searchRequestedProperties={itemContext.searchRequestedProperties}
+      searchEngineEnabled={itemContext.searchEngineEnabled}
+      searchEngineEnabledLang={itemContext.searchEngineEnabledLang}
+      searchEngineHighlightArgs={itemContext.searchEngineHighlightArgs}
+      searchError={itemContext.searchError}
+      searchErrorDismiss={itemContext.dismissSearchError}
+      searchHighlights={itemContext.searchHighlights}
+      searchFields={itemContext.searchFields}
+      searchMetadata={itemContext.searchMetadata}
+      searching={itemContext.searching}
+      tokenData={tokenData}
+      localeData={localeData}
+    />
   );
 }

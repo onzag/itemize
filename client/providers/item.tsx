@@ -1454,6 +1454,15 @@ export interface IItemProviderProps {
    */
   automaticSearchInstant?: boolean;
   /**
+   * Automatic search seeks for changes, sometimes what these changes
+   * imply is that no search should be done, for example when having an automatic
+   * search and then not having one, this will cause the search results to go away
+   * and be dismissed, this may be unwanted behaviour for example if waiting for
+   * some data to trigger an automatic search between automatic searches, you can prevent
+   * it from being dismissed by using this option
+   */
+  automaticSearchDoNotAutoDismissDuringChanges?: boolean;
+  /**
    * Load searches from the popstate event, use with the option for
    * storeResultsInNavigation and the same identifier
    */
@@ -2839,7 +2848,7 @@ export class ActualItemProvider extends
             this.search(this.props.automaticSearch);
           }
         }
-      } else {
+      } else if (!this.props.automaticSearchDoNotAutoDismissDuringChanges) {
         this.dismissSearchResults();
       }
     } else if (getDerivedTriggeredASearchChange && this.state.searchId) {
