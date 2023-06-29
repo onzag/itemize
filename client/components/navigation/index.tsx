@@ -17,7 +17,7 @@ import { history } from "../..";
 export function setHistoryState<S>(location: Location, state: Partial<S>, replace?: boolean) {
   // first we copy the current state
   // due to a bug in typescript this cannot be achieved anymore and has to be set as any
-  const newState = {...(location as any).state};
+  const newState = { ...(location as any).state };
 
   // and if we have a new partial state
   if (state) {
@@ -65,7 +65,7 @@ export function setHistoryQSState<S>(location: Location, state: Partial<S>, repl
       // and the value differs from what we have now
       if (
         !differs &&
-        state[key] !== searchParams.get(key) 
+        state[key] !== searchParams.get(key)
       ) {
         // differs is true
         differs = true;
@@ -94,10 +94,17 @@ export function setHistoryQSState<S>(location: Location, state: Partial<S>, repl
 
   // and we do a push or replace accordingly
   if (!replace) {
-    history.push(location.pathname + searchPart  + location.hash, location.state);
+    history.push(location.pathname + searchPart + location.hash, location.state);
   } else {
     history.replace(location.pathname + searchPart + location.hash, location.state);
   }
+}
+
+interface IRedirectOptions {
+  state?: any;
+  replace?: boolean;
+  retainQueryParamsFor?: string[];
+  retainAllQueryParams?: boolean;
 }
 
 /**
@@ -106,11 +113,45 @@ export function setHistoryQSState<S>(location: Location, state: Partial<S>, repl
  * @param state the new state
  * @param replace whether to replace rather than push
  */
-export function redirectTo(newLocation: string, state?: any, replace?: boolean) {
-  if (replace) {
-    history.replace(newLocation, state);
+export function redirectTo(newLocation: string, options: IRedirectOptions = {}) {
+  let finalNewLocation = newLocation;
+  // keeping the qs values as they are defined
+  if (options.retainQueryParamsFor || options.retainAllQueryParams) {
+    const currentQs = finalNewLocation.split("?")[1];
+    const urlToParsed = currentQs ? new URLSearchParams("?" + currentQs) : null;
+    const locationQs = new URLSearchParams(location.search);
+
+    // we iterate depending on what we are copying from the source
+    (options.retainAllQueryParams ? Array.from(locationQs.keys()) : options.retainQueryParamsFor).forEach((bit) => {
+      // if we don't have any qs in our target or if that value is not defined there
+      if (!urlToParsed || !urlToParsed.get(bit)) {
+        // then we can add this value
+        const locationQsValue = locationQs.get(bit);
+
+        // if we have it of course
+        if (locationQsValue) {
+          // if the url ends with ? or & we are ready to append, if not...
+          if (!finalNewLocation.endsWith("?") && !finalNewLocation.endsWith("&")) {
+            // if we don't have a querystring at all we must start with that
+            if (!currentQs) {
+              finalNewLocation += "?";
+            } else {
+              // otherwise we are adding to that querystring
+              finalNewLocation += "&";
+            }
+          }
+
+          // now we can add the bit and the value
+          finalNewLocation += bit + "=" + encodeURIComponent(locationQsValue);
+        }
+      }
+    });
+  }
+
+  if (options.replace) {
+    history.replace(finalNewLocation, options.state);
   } else {
-    history.push(newLocation, state);
+    history.push(finalNewLocation, options.state);
   }
 }
 
@@ -121,7 +162,7 @@ export function redirectTo(newLocation: string, state?: any, replace?: boolean) 
  * @param state the new state
  * @param replace whether to replace
  */
-export function localizedRedirectTo(newLocation: string, state?: any, replace?: boolean) {
+export function localizedRedirectTo(newLocation: string, options: IRedirectOptions = {}) {
   // so first we get the current location from our url
   const currentLocaleFromURL = location.pathname.split("/")[1] || null;
   // if there's nothing
@@ -139,7 +180,7 @@ export function localizedRedirectTo(newLocation: string, state?: any, replace?: 
   // and then add the locale from there
   const urlTo = `/${currentLocaleFromURL}${urlDefined}`;
   // then call the redirect function
-  return redirectTo(urlTo, state, replace);
+  return redirectTo(urlTo, options);
 }
 
 /**

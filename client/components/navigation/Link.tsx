@@ -29,6 +29,14 @@ interface ICustomLinkProps extends LinkProps {
    * Whether to prevent propagation
    */
   propagateClicks?: boolean;
+  /**
+   * Retains the current query params if found for the given values
+   */
+  retainQueryParamsFor?: string[];
+  /**
+   * Retains all the query params of the current
+   */
+  retainAllQueryParams?: boolean;
 }
 
 /**
@@ -56,7 +64,7 @@ function linkOnClick(props: ICustomLinkProps, e: React.MouseEvent<HTMLAnchorElem
  */
 function LinkCustomComponent(Tag: string, props: any) {
   const { navigate, ...rest } = props;
-  return <Tag {...rest} onClick={navigate}/>;
+  return <Tag {...rest} onClick={navigate} />;
 }
 
 /**
@@ -91,8 +99,41 @@ const Link = React.forwardRef((props: ICustomLinkProps, ref: ForwardedRef<HTMLAn
   if (urlDefined !== null && typeof urlDefined !== "undefined" && urlDefined[0] !== "/") {
     urlDefined = "/" + urlDefined;
   }
-  const urlTo = urlDefined ? `/${currentLocaleFromURL}${urlDefined}` : null;
+  let urlTo = urlDefined ? `/${currentLocaleFromURL}${urlDefined}` : null;
   // and as such it's calculated
+
+  // keeping the qs values as they are defined
+  if (props.retainQueryParamsFor || props.retainAllQueryParams) {
+    const currentQs = urlTo.split("?")[1];
+    const urlToParsed = currentQs ? new URLSearchParams("?" + currentQs) : null;
+    const locationQs = new URLSearchParams(locationCur.search);
+
+    // we iterate depending on what we are copying from the source
+    (props.retainAllQueryParams ? Array.from(locationQs.keys()) : props.retainQueryParamsFor).forEach((bit) => {
+      // if we don't have any qs in our target or if that value is not defined there
+      if (!urlToParsed || !urlToParsed.get(bit)) {
+        // then we can add this value
+        const locationQsValue = locationQs.get(bit);
+
+        // if we have it of course
+        if (locationQsValue) {
+          // if the url ends with ? or & we are ready to append, if not...
+          if (!urlTo.endsWith("?") && !urlTo.endsWith("&")) {
+            // if we don't have a querystring at all we must start with that
+            if (!currentQs) {
+              urlTo += "?";
+            } else {
+              // otherwise we are adding to that querystring
+              urlTo += "&";
+            }
+          }
+
+          // now we can add the bit and the value
+          urlTo += bit + "=" + encodeURIComponent(locationQsValue);
+        }
+      }
+    });
+  }
 
   // and these are the new props for the link
   const newProps: LinkProps = {
@@ -102,6 +143,8 @@ const Link = React.forwardRef((props: ICustomLinkProps, ref: ForwardedRef<HTMLAn
 
   // an we delete the propagation of clicks
   delete newProps["propagateClicks"];
+  delete newProps["retainQueryParamsFor"];
+  delete newProps["retainAllQueryParams"];
 
   // if we have an as
   if (props.as) {
@@ -112,7 +155,7 @@ const Link = React.forwardRef((props: ICustomLinkProps, ref: ForwardedRef<HTMLAn
   }
 
   // call the link with the new props and the on click event
-  return <RouterLink {...newProps} onClick={linkOnClick.bind(null, props)} ref={ref}/>;
+  return <RouterLink {...newProps} onClick={linkOnClick.bind(null, props)} ref={ref} />;
 })
 
 export default Link;

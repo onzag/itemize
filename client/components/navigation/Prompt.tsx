@@ -227,7 +227,7 @@ export default class Prompt extends React.PureComponent<PromptProps, PromptState
       redirectTo(this.state.dialogOpenedFor.pathname + this.state.dialogOpenedFor.search + this.state.dialogOpenedFor.hash);
     } else {
       // otherwise if we are in the same location we replace
-      redirectTo(this.state.dialogOpenedFor.pathname + this.state.dialogOpenedFor.search + this.state.dialogOpenedFor.hash, null, true);
+      redirectTo(this.state.dialogOpenedFor.pathname + this.state.dialogOpenedFor.search + this.state.dialogOpenedFor.hash, {replace: true});
     }
   }
 

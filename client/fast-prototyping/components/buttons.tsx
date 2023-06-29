@@ -128,10 +128,10 @@ export function SubmitButton(props: ISubmitButtonProps) {
             if (props.redirectGoBack) {
               goBack();
               setTimeout(() => {
-                localizedRedirectTo(redirectCalculated, null, props.redirectReplace);
+                localizedRedirectTo(redirectCalculated, {replace: props.redirectReplace});
               }, 10);
             } else {
-              localizedRedirectTo(redirectCalculated, null, props.redirectReplace);
+              localizedRedirectTo(redirectCalculated, {replace: props.redirectReplace});
             }
           }
         }
@@ -284,10 +284,10 @@ export function DeleteButton(props: IDeleteButtonProps) {
             if (props.redirectGoBack) {
               goBack();
               setTimeout(() => {
-                localizedRedirectTo(redirectCalculated, null, props.redirectReplace);
+                localizedRedirectTo(redirectCalculated, {replace: props.redirectReplace});
               }, 10);
             } else {
-              localizedRedirectTo(redirectCalculated, null, props.redirectReplace);
+              localizedRedirectTo(redirectCalculated, {replace: props.redirectReplace});
             }
           }
         }
