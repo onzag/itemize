@@ -13,6 +13,10 @@ import { DataContext, IDataContextType } from "../../internal/providers/appdata-
 import { IModuleContextType, ModuleContext } from "../../providers/module";
 import { IItemContextType, ItemContext } from "../../providers/item";
 import { IIncludeContext, IncludeContext } from "../../providers/include";
+import type Root from "./../../../base/Root";
+import { useRootRetriever } from "../root/RootRetriever";
+import ItemDefinition from "../../../base/Root/Module/ItemDefinition";
+import type Module from "../../../base/Root/Module";
 
 /**
  * The props for the read many
@@ -45,6 +49,7 @@ interface Ii18nReadManyProps {
  * @param props the actual read many props
  */
 export function i18nReadManyInternal(
+  root: Root,
   localeContext: ILocaleContextType,
   dataContext: IDataContextType,
   moduleContextualValue: IModuleContextType,
@@ -66,6 +71,22 @@ export function i18nReadManyInternal(
         />
       );
     } else {
+      if (toProvidePropsAsStdProps.context) {
+        const itemDefOrModule = root.registry[toProvidePropsAsStdProps.context];
+
+        const idef = itemDefOrModule instanceof ItemDefinition ? itemDefOrModule : null;
+        const mod: Module = idef ? idef.getParentModule() : itemDefOrModule as Module;
+
+        return (
+          <I18nReadInternalOptimized
+            {...toProvidePropsAsStdProps}
+            localeContext={localeContext}
+            mod={mod}
+            idef={idef}
+            include={null}
+          />
+        );
+      }
       return (
         <I18nReadInternalOptimized
           localeContext={localeContext}
@@ -89,6 +110,7 @@ export function i18nReadManyInternal(
  * when such a function returns a react node
  */
 export default function I18nReadMany(props: Ii18nReadManyProps): any {
+  const root = useRootRetriever();
   // if we got nothing
   if (props.data.length === 0) {
     // just return the children with no args
@@ -126,7 +148,7 @@ export default function I18nReadMany(props: Ii18nReadManyProps): any {
             <DataContext.Consumer>
               {
                 (dataContext) => {
-                  return i18nReadManyInternal(localeContext, dataContext, null, null, null, props);
+                  return i18nReadManyInternal(root.root, localeContext, dataContext, null, null, null, props);
                 }
               }
             </DataContext.Consumer>
@@ -149,7 +171,7 @@ export default function I18nReadMany(props: Ii18nReadManyProps): any {
                         <IncludeContext.Consumer>
                           {
                             (includeContext) => {
-                              return i18nReadManyInternal(localeContext, null, moduleContextualValue, itemContextualValue, includeContext, props);
+                              return i18nReadManyInternal(root.root, localeContext, null, moduleContextualValue, itemContextualValue, includeContext, props);
                             }
                           }
                         </IncludeContext.Consumer>
@@ -181,7 +203,7 @@ export default function I18nReadMany(props: Ii18nReadManyProps): any {
                               <IncludeContext.Consumer>
                                 {
                                   (includeContext) => {
-                                    return i18nReadManyInternal(localeContext, dataContext, moduleContextualValue, itemContextualValue, includeContext, props);
+                                    return i18nReadManyInternal(root.root, localeContext, dataContext, moduleContextualValue, itemContextualValue, includeContext, props);
                                   }
                                 }
                               </IncludeContext.Consumer>
