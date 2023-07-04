@@ -44,17 +44,21 @@ export class NanoSecondComposedDate {
     // for the seconds section, and get the remainder; the date component
     // can parse the first 3 values, but not the remaining values
     let strRemainder: string;
-    if (str.endsWith("Z")) {
-      const splitted = str.split("Z");
-      strRemainder = splitted[0].split(".")[1].substr(3);
-    } else {
-      let splitted = str.split("+");
-      if (splitted.length === 1) {
-        splitted = str.split("-");
+    if (str) {
+      if (str.endsWith("Z")) {
+        const splitted = str.split("Z");
+        strRemainder = splitted[0].split(".")[1].substr(3);
+      } else {
+        let splitted = str.split("+");
+        if (splitted.length === 1) {
+          splitted = str.split("-");
+        }
+        strRemainder = splitted[0].split(".")[1].substr(3);
       }
-      strRemainder = splitted[0].split(".")[1].substr(3);
+    } else {
+      strRemainder = "";
     }
-    
+
 
     // since we are using a total number, we need to ensure the size is exact
     // as our precision because we are parsing decimals
@@ -86,7 +90,7 @@ export class NanoSecondComposedDate {
     // first we check if the time itself is greater than the other
     if (this.time > otherDate.time) {
       return true;
-    // otherwise if these dates are equal in milliseconds
+      // otherwise if these dates are equal in milliseconds
     } else if (this.time === otherDate.time) {
       // We use the more precise remainder
       return this.remainder > otherDate.remainder;

@@ -650,6 +650,7 @@ export async function initializeServer(
         [],
         sensitiveConfig,
       );
+      listener.init();
       // we need to inform that the cluster manager has been reset
       // the extended nodes come after the cluster manager
       // but if the cluster manager dies for some reason, a reset ought
@@ -1041,6 +1042,7 @@ export async function initializeServer(
       custom.customRoles || [],
       sensitiveConfig,
     );
+    listener.init();
 
     if (sensitiveConfig.userLocalization) {
       logger.info(

@@ -38,6 +38,7 @@ import type { IGQLSearchRecord } from "../gql-querier";
 import { IStorageProvidersObject } from "./services/base/StorageProvider";
 import { deleteEverythingInFilesContainerId } from "../base/Root/Module/ItemDefinition/PropertyDefinition/sql/file-management";
 import { analyzeModuleForPossibleParent } from "./cache";
+import { Listener } from "./listener";
 
 type changeRowLanguageFnPropertyBased = (language: string, dictionary: string, property: string) => void;
 type changeRowLanguageFnPropertyIncludeBased = (language: string, dictionary: string, include: string, property: string) => void;
@@ -52,12 +53,6 @@ interface IPropertyMapElement {
 const NAMESPACE = "23ab4609-af49-4cdf-921b-4700adb284f3";
 export function makeIdOutOf(str: string) {
   return uuidv5(str, NAMESPACE).replace(/-/g, "");
-}
-
-async function wait(ms: number) {
-  return new Promise((r) => {
-    setTimeout(r, ms);
-  });
 }
 
 class TransactingQueueError extends Error {
@@ -87,6 +82,8 @@ export class ItemizeRawDB {
   private redisPub: ItemizeRedisClient;
   private redisSub: ItemizeRedisClient;
   private redisGlobal: ItemizeRedisClient;
+
+  private fakeListener: Listener;
 
   private root: Root;
   private elastic: ItemizeElasticClient;
@@ -143,6 +140,24 @@ export class ItemizeRawDB {
 
     this.databaseConnection = databaseConnection;
     this.root = root;
+
+    // massive amount of nulls, this is a fake
+    // listener that is used to trigger events
+    // in the redis only
+    this.fakeListener = new Listener(
+      null,
+      this.redisGlobal,
+      this.redisPub,
+      this.redisSub,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+    );
   }
 
   /**
@@ -656,31 +671,24 @@ export class ItemizeRawDB {
       version: row.version || null,
     }
 
-    // and the merged index identifier that the caches use for this event
-    const mergedIndexIdentifier = changedFeedbackEvent.itemDefinition + "." +
-      changedFeedbackEvent.id + "." + (changedFeedbackEvent.version || "");
-
-    // now we can get ready to pipe the event into redis
-    // we do not use an instance group id because
-    // these changes are not given by the cache itself
-    const event: IRedisEvent = {
-      event: changedFeedbackEvent,
-      serverInstanceGroupId: null,
-      source: "global",
-      mergedIndexIdentifier,
-      type: CHANGED_FEEDBACK_EVENT,
-    }
-
+    let data: ISQLTableRowValue = undefined;
     // if the data is complete, the data of the event
     // can be passed
     if (dataIsComplete && action !== "deleted") {
-      event.data = row;
+      data = row;
     } else if (action === "deleted") {
-      event.data = null;
+      data = null;
     }
 
     // publish the event
-    this.redisPub.redisClient.publish(mergedIndexIdentifier, JSON.stringify(event));
+    this.fakeListener.triggerChangedListeners(
+      changedFeedbackEvent,
+      data,
+      null,
+      {
+        noInstanceGroupId: true,
+      },
+    );
 
     // and let's return this information about the row
     return {
@@ -1132,15 +1140,17 @@ export class ItemizeRawDB {
         ownedEvent.createdRecords,
       );
 
-      const redisEvent: IRedisEvent = {
-        event: ownedEvent,
-        serverInstanceGroupId: null,
-        source: "global",
-        type: OWNED_SEARCH_RECORDS_EVENT,
-        mergedIndexIdentifier,
-      };
+      // const redisEvent: IRedisEvent = {
+      //   event: ownedEvent,
+      //   serverInstanceGroupId: null,
+      //   source: "global",
+      //   type: OWNED_SEARCH_RECORDS_EVENT,
+      //   mergedIndexIdentifier,
+      // };
 
-      this.redisPub.redisClient.publish(mergedIndexIdentifier, JSON.stringify(redisEvent));
+      this.fakeListener.triggerOwnedSearchListeners(ownedEvent, null, {noInstanceGroupId: true});
+
+      // this.redisPub.redisClient.publish(mergedIndexIdentifier, JSON.stringify(redisEvent));
     });
 
     // now with the parented ones
@@ -1158,15 +1168,17 @@ export class ItemizeRawDB {
         parentedEvent.createdRecords,
       );
 
-      const redisEvent: IRedisEvent = {
-        event: parentedEvent,
-        serverInstanceGroupId: null,
-        source: "global",
-        type: PARENTED_SEARCH_RECORDS_EVENT,
-        mergedIndexIdentifier,
-      };
+      // const redisEvent: IRedisEvent = {
+      //   event: parentedEvent,
+      //   serverInstanceGroupId: null,
+      //   source: "global",
+      //   type: PARENTED_SEARCH_RECORDS_EVENT,
+      //   mergedIndexIdentifier,
+      // };
 
-      this.redisPub.redisClient.publish(mergedIndexIdentifier, JSON.stringify(redisEvent));
+      this.fakeListener.triggerParentedSearchListeners(parentedEvent, null, { noInstanceGroupId: true });
+
+      // this.redisPub.redisClient.publish(mergedIndexIdentifier, JSON.stringify(redisEvent));
     });
 
     // now with the parented ones
@@ -1184,15 +1196,17 @@ export class ItemizeRawDB {
         ownedParentedEvent.createdRecords,
       );
 
-      const redisEvent: IRedisEvent = {
-        event: ownedParentedEvent,
-        serverInstanceGroupId: null,
-        source: "global",
-        type: OWNED_PARENTED_SEARCH_RECORDS_EVENT,
-        mergedIndexIdentifier,
-      };
+      // const redisEvent: IRedisEvent = {
+      //   event: ownedParentedEvent,
+      //   serverInstanceGroupId: null,
+      //   source: "global",
+      //   type: OWNED_PARENTED_SEARCH_RECORDS_EVENT,
+      //   mergedIndexIdentifier,
+      // };
 
-      this.redisPub.redisClient.publish(mergedIndexIdentifier, JSON.stringify(redisEvent));
+      this.fakeListener.triggerOwnedParentedSearchListeners(ownedParentedEvent, null, { noInstanceGroupId: true });
+
+      // this.redisPub.redisClient.publish(mergedIndexIdentifier, JSON.stringify(redisEvent));
     });
 
     // now with the parented ones
@@ -1210,15 +1224,17 @@ export class ItemizeRawDB {
         propertyEvent.createdRecords,
       );
 
-      const redisEvent: IRedisEvent = {
-        event: propertyEvent,
-        serverInstanceGroupId: null,
-        source: "global",
-        type: PROPERTY_SEARCH_RECORDS_EVENT,
-        mergedIndexIdentifier,
-      };
+      // const redisEvent: IRedisEvent = {
+      //   event: propertyEvent,
+      //   serverInstanceGroupId: null,
+      //   source: "global",
+      //   type: PROPERTY_SEARCH_RECORDS_EVENT,
+      //   mergedIndexIdentifier,
+      // };
 
-      this.redisPub.redisClient.publish(mergedIndexIdentifier, JSON.stringify(redisEvent));
+      this.fakeListener.triggerPropertySearchListeners(propertyEvent, null, { noInstanceGroupId: true });
+
+      // this.redisPub.redisClient.publish(mergedIndexIdentifier, JSON.stringify(redisEvent));
     });
 
 

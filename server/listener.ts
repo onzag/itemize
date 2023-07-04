@@ -218,15 +218,15 @@ export class Listener {
     this.sensitiveConfig = sensitiveConfig;
     this.customRoles = customRoles;
     this.registry = registry;
-
-    this.cache.setListener(this);
+    this.server = server;
 
     this.die = this.die.bind(this);
     this.revive = this.revive.bind(this);
 
     this.globalRedisListener = this.globalRedisListener.bind(this);
     this.localRedisListener = this.localRedisListener.bind(this);
-
+  }
+  public init() {
     this.redisGlobalSub.redisClient.on("message", this.globalRedisListener);
     this.redisGlobalSub.redisClient.subscribe(SERVER_DATA_IDENTIFIER);
     this.redisGlobalSub.redisClient.on("error", this.die);
@@ -242,7 +242,7 @@ export class Listener {
       this.redisLocalSub.redisClient.subscribe(CLUSTER_MANAGER_RESET);
     }
 
-    this.server = server;
+    this.cache.setListener(this);
     this.setupSocketIO();
   }
   public die() {
@@ -2769,12 +2769,21 @@ export class Listener {
     event: IChangedFeedbackEvent,
     data: ISQLTableRowValue,
     listenerUUID: string,
+    options: {
+      noInstanceGroupId?: boolean,
+    } = {}
   ) {
     const mergedIndexIdentifier = event.itemDefinition + "." + event.id + "." + (event.version || "");
     
     if (this.awaitingBasicEvent[mergedIndexIdentifier]) {
       // patch it and go
-      this.awaitingBasicEvent[mergedIndexIdentifier] = event;
+      const currentLastModified = new NanoSecondComposedDate(this.awaitingBasicEvent[mergedIndexIdentifier].lastModified);
+      const newLastModified = new NanoSecondComposedDate(event.lastModified);
+
+      if (newLastModified.greaterThan(currentLastModified)) {
+        this.awaitingBasicEvent[mergedIndexIdentifier] = event;
+      }
+
       return;
     }
 
@@ -2785,7 +2794,7 @@ export class Listener {
       const redisEvent: IRedisEvent = {
         event: this.awaitingBasicEvent[mergedIndexIdentifier],
         listenerUUID,
-        serverInstanceGroupId: INSTANCE_GROUP_ID,
+        serverInstanceGroupId: options.noInstanceGroupId ? null : INSTANCE_GROUP_ID,
         source: "global",
         mergedIndexIdentifier,
         type: CHANGED_FEEDBACK_EVENT,
@@ -2814,6 +2823,9 @@ export class Listener {
   public triggerOwnedSearchListeners(
     event: IOwnedSearchRecordsEvent,
     listenerUUID: string,
+    options: {
+      noInstanceGroupId?: boolean,
+    } = {}
   ) {
     const mergedIndexIdentifier = generateOwnedSearchMergedIndexIdentifier(
       event.qualifiedPathName,
@@ -2833,7 +2845,7 @@ export class Listener {
         event: this.awaitingOwnedSearchEvents[mergedIndexIdentifier],
         listenerUUID,
         mergedIndexIdentifier,
-        serverInstanceGroupId: INSTANCE_GROUP_ID,
+        serverInstanceGroupId: options.noInstanceGroupId ? null : INSTANCE_GROUP_ID,
         source: "global",
       };
   
@@ -2856,6 +2868,9 @@ export class Listener {
   public triggerPropertySearchListeners(
     event: IPropertySearchRecordsEvent,
     listenerUUID: string,
+    options: {
+      noInstanceGroupId?: boolean,
+    } = {}
   ) {
     const mergedIndexIdentifier = generatePropertySearchMergedIndexIdentifier(
       event.qualifiedPathName,
@@ -2876,7 +2891,7 @@ export class Listener {
         event: this.awaitingPropertySearchEvents[mergedIndexIdentifier],
         listenerUUID,
         mergedIndexIdentifier,
-        serverInstanceGroupId: INSTANCE_GROUP_ID,
+        serverInstanceGroupId: options.noInstanceGroupId ? null : INSTANCE_GROUP_ID,
         source: "global",
       };
 
@@ -2898,6 +2913,9 @@ export class Listener {
   public triggerParentedSearchListeners(
     event: IParentedSearchRecordsEvent,
     listenerUUID: string,
+    options: {
+      noInstanceGroupId?: boolean,
+    } = {}
   ) {
     const mergedIndexIdentifier = generateParentedSearchMergedIndexIdentifier(
       event.qualifiedPathName,
@@ -2919,7 +2937,7 @@ export class Listener {
         listenerUUID,
         mergedIndexIdentifier,
         type: PARENTED_SEARCH_RECORDS_EVENT,
-        serverInstanceGroupId: INSTANCE_GROUP_ID,
+        serverInstanceGroupId: options.noInstanceGroupId ? null : INSTANCE_GROUP_ID,
         source: "global",
       }
 
@@ -2941,6 +2959,9 @@ export class Listener {
   public triggerOwnedParentedSearchListeners(
     event: IOwnedParentedSearchRecordsEvent,
     listenerUUID: string,
+    options: {
+      noInstanceGroupId?: boolean,
+    } = {}
   ) {
     const mergedIndexIdentifier = generateOwnedParentedSearchMergedIndexIdentifier(
       event.qualifiedPathName,
@@ -2963,7 +2984,7 @@ export class Listener {
         listenerUUID,
         mergedIndexIdentifier,
         type: OWNED_PARENTED_SEARCH_RECORDS_EVENT,
-        serverInstanceGroupId: INSTANCE_GROUP_ID,
+        serverInstanceGroupId: options.noInstanceGroupId ? null : INSTANCE_GROUP_ID,
         source: "global",
       }
 

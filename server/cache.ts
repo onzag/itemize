@@ -43,6 +43,7 @@ import {
 } from "./environment";
 import type { ItemizeElasticClient } from "./elastic";
 import type { ItemizeRawDB } from "./raw-db";
+import { NanoSecondComposedDate } from "../nanodate";
 
 const CACHE_EXPIRES_DAYS = 14;
 const MEMCACHE_EXPIRES_MS = 1000;
@@ -279,8 +280,10 @@ export class Cache {
    * @param id the id
    * @param version the version or null
    * @param value the value to store
+   * @param ensure if true does not trust the value right away and checks it against the current value last modified signature
+   * and will only set it if it's older (newer)
    */
-  private forceCacheInto(idefTable: string, id: string, version: string, value: ISQLTableRowValue) {
+  private async forceCacheInto(idefTable: string, id: string, version: string, value: ISQLTableRowValue, ensure: boolean) {
     const idefQueryIdentifier = "IDEFQUERY:" + idefTable + "." + id.toString() + "." + (version || "");
     CAN_LOG_DEBUG && logger.debug(
       {
@@ -289,6 +292,20 @@ export class Cache {
         message: "Setting new cache value for " + idefQueryIdentifier,
       },
     );
+
+    if (ensure && value !== null) {
+      const currentValue = await this.getRaw<ISQLTableRowValue>(idefQueryIdentifier);
+      if (currentValue) {
+        const currentLastModified = new NanoSecondComposedDate(currentValue.value.last_modified);
+        const newLastModified = new NanoSecondComposedDate(value.last_modified);
+
+        // do not modify
+        if (currentLastModified.greaterThanEqual(newLastModified)) {
+          return;
+        }
+      }
+    }
+
     this.listener.registerSS({
       itemDefinition: idefTable,
       id: id,
@@ -1227,7 +1244,7 @@ export class Cache {
           message: "Storing cache value from the action",
         },
       );
-      await this.forceCacheInto(selfTable, sqlValue.id, sqlValue.version, sqlValue);
+      await this.forceCacheInto(selfTable, sqlValue.id, sqlValue.version, sqlValue, false);
       const changeEvent: IChangedFeedbackEvent = {
         itemDefinition: selfTable,
         id: sqlValue.id,
@@ -2190,7 +2207,7 @@ export class Cache {
           message: "Storing cache value from the action",
         },
       );
-      await this.forceCacheInto(selfTable, id, version, sqlValue);
+      await this.forceCacheInto(selfTable, id, version, sqlValue, false);
 
       if (this.elastic) {
         const language = itemDefinition.getSearchEngineMainLanguageFromRow(sqlValue);
@@ -2625,7 +2642,7 @@ export class Cache {
 
       try {
         // update the cache with the new value
-        await this.forceCacheInto(selfTable, record.id, record.version, null);
+        await this.forceCacheInto(selfTable, record.id, record.version, null, false);
         // trigger the change event informing of the update
         const changeEvent: IChangedFeedbackEvent = {
           itemDefinition: selfTable,
@@ -3102,7 +3119,7 @@ export class Cache {
         ),
       );
       // we don't wait for this
-      this.forceCacheInto(idefTable, id, version, queryValue);
+      this.forceCacheInto(idefTable, id, version, queryValue, false);
 
       if (memCache) {
         const idefQueryIdentifier = "IDEFQUERY:" + idefTable + "." + id.toString() + "." + (version || "");
@@ -3197,7 +3214,7 @@ export class Cache {
           );
         } else {
           // if we have such a value we want to update it
-          await this.forceCacheInto(itemDefinition, id, version, data);
+          await this.forceCacheInto(itemDefinition, id, version, data, true);
         }
       } else {
         // it's done, the value has just expired and it's not hold in
