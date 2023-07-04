@@ -131,6 +131,12 @@ export class Cache {
     };
   } = {};
   private appData: IAppDataType;
+  private currentlySetting: { [id: string]:
+    {
+      valueBeingSet: any;
+      replacement: any;
+    }
+  } = {};
 
   /**
    * Builds a new cache instance, before the cache is ready
@@ -225,7 +231,7 @@ export class Cache {
     }
   }
 
-  public async setRaw(key: string, value: any) {
+  public async setRaw(key: string, value: any, onConflict: (value: any) => boolean) {
     CAN_LOG_DEBUG && logger.debug(
       {
         className: "Cache",
@@ -233,14 +239,40 @@ export class Cache {
         message: "Setting " + key,
       },
     );
+
+    // if we are currently setting
+    if (this.currentlySetting[key]) {
+      // we got to compare against what we are checking, if we have a replacement
+      // that's the one to beat, if not it's the value being set
+      const valueToCheckAgainst = typeof this.currentlySetting[key].replacement !== "undefined" ?
+        this.currentlySetting[key].replacement : this.currentlySetting[key].valueBeingSet;
+      // if we should replace that
+      const shouldReplace = onConflict(valueToCheckAgainst);
+
+      // if we do then we indicate that so that it's done
+      if (shouldReplace) {
+        this.currentlySetting[key].replacement = value;
+      }
+
+      return;
+    }
+
     try {
+      this.currentlySetting[key] = { valueBeingSet: value, replacement: undefined };
       await this.redisClient.set(key, JSON.stringify(value));
+      while (typeof this.currentlySetting[key].replacement !== "undefined") {
+        const replacement = this.currentlySetting[key].replacement;
+        this.currentlySetting[key].valueBeingSet = replacement;
+        this.currentlySetting[key].replacement = undefined;
+        await this.redisClient.set(key, JSON.stringify(replacement));
+      }
+      delete this.currentlySetting[key];
       this.pokeCache(key);
     } catch (err) {
       logger.error(
         {
           className: "Cache",
-          methodName: "forceCacheInto",
+          methodName: "setRaw",
           message: "Could not set value for " + key + " with error",
           err,
         },
@@ -293,16 +325,46 @@ export class Cache {
       },
     );
 
+    let newLastModified: NanoSecondComposedDate;
     if (ensure && value !== null) {
       const currentValue = await this.getRaw<ISQLTableRowValue>(idefQueryIdentifier);
-      if (currentValue) {
+      if (currentValue && currentValue.value) {
         const currentLastModified = new NanoSecondComposedDate(currentValue.value.last_modified);
-        const newLastModified = new NanoSecondComposedDate(value.last_modified);
+        newLastModified = new NanoSecondComposedDate(value.last_modified);
 
         // do not modify
         if (currentLastModified.greaterThanEqual(newLastModified)) {
           return;
         }
+      }
+
+      const idef = this.root.registry[idefTable] as ItemDefinition;
+      const mod = idef.getParentModule();
+
+      const currentLastModifiedFromDb = await this.databaseConnection.queryRows(
+        `SELECT "last_modified" FROM ${JSON.stringify(mod.getQualifiedPathName())} WHERE ` +
+        `id = $1 AND version = $2 LIMIT 1`,
+        [
+          id,
+          version || "",
+        ]
+      );
+
+      // well it's been deleted
+      if (!currentLastModifiedFromDb.length) {
+        this.listener.unregisterSS({
+          itemDefinition: idefTable,
+          id,
+          version,
+        });
+        return;
+      }
+
+      const valueOfLastModifiedFromDB = currentLastModifiedFromDb[0].last_modified;
+
+      // does not match source of truth, it will therefore not add
+      if (value.last_modified !== valueOfLastModifiedFromDB) {
+        return;
       }
     }
 
@@ -311,7 +373,20 @@ export class Cache {
       id: id,
       version: version || null,
     });
-    return this.setRaw(idefQueryIdentifier, value);
+    return this.setRaw(idefQueryIdentifier, value, (otherValue: any) => {
+      if (!otherValue) {
+        return false;
+      }
+      newLastModified = newLastModified || new NanoSecondComposedDate(value.last_modified);
+      const otherLastModified = new NanoSecondComposedDate(otherValue.last_modified);
+
+      // do not modify
+      if (otherLastModified.greaterThanEqual(newLastModified)) {
+        return false;
+      }
+
+      return true;
+    });
   }
 
   public triggerSearchListenersFor(
@@ -2211,9 +2286,8 @@ export class Cache {
 
       if (this.elastic) {
         const language = itemDefinition.getSearchEngineMainLanguageFromRow(sqlValue);
-        const originalLanguage = itemDefinition.getSearchEngineMainLanguageFromRow(currentSQLValue);
         try {
-          await this.elastic.updateDocument(selfTable, originalLanguage, language, sqlValue.id, sqlValue.version, sqlValue);
+          await this.elastic.updateDocument(selfTable, language, sqlValue.id, sqlValue.version, sqlValue);
         } catch (err) {
           logger.error(
             {

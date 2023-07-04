@@ -10,7 +10,7 @@ import { convertSQLValueToElasticSQLValueForItemDefinition } from "../base/Root/
 import { DELETED_REGISTRY_IDENTIFIER, SERVER_ELASTIC_PING_INTERVAL_TIME } from "../constants";
 import { CAN_LOG_DEBUG, EMULATE_ELASTIC_SYNC_FAILURE_AT, EMULATE_SILENT_ELASTIC_SYNC_FAILURE_AT, FORCE_ELASTIC_REBUILD, INSTANCE_UUID } from "./environment";
 import { NanoSecondComposedDate } from "../nanodate";
-import { AggregationsAggregationContainer, FieldValue, QueryDslMatchPhraseQuery, QueryDslMatchQuery, QueryDslQueryContainer, QueryDslTermQuery, QueryDslTermsQuery, SearchRequest } from "@elastic/elasticsearch/lib/api/types";
+import { AggregationsAggregationContainer, FieldValue, GetResponse, QueryDslMatchPhraseQuery, QueryDslMatchQuery, QueryDslQueryContainer, QueryDslTermQuery, QueryDslTermsQuery, SearchRequest, UpdateRequest } from "@elastic/elasticsearch/lib/api/types";
 import { setInterval } from "timers";
 import type { IElasticHighlightReply } from "../base/Root/Module/ItemDefinition/PropertyDefinition/types";
 import { ISearchLimitersType } from "../base/Root";
@@ -664,7 +664,7 @@ export class ItemizeElasticClient {
     } catch {
     }
 
-    const equalSignature = equals(signature, currentSignature, {strict: true});
+    const equalSignature = equals(signature, currentSignature, { strict: true });
 
     const force = (isInitialRebuildIndexes ? FORCE_ELASTIC_REBUILD : false);
 
@@ -1876,6 +1876,46 @@ export class ItemizeElasticClient {
     });
   }
 
+  public async getDocumentBasicInfo(
+    itemDefinition: string | ItemDefinition,
+    id: string,
+    version: string,
+  ): Promise<{ lastModified: string, seqNo: number, index: string, language: string }> {
+    const idef = typeof itemDefinition === "string" ? this.root.registry[itemDefinition] : itemDefinition;
+
+    const qualifiedNameItem = idef.getQualifiedPathName();
+    const indexNameIdef = qualifiedNameItem.toLowerCase() + "_*";
+
+    let value: GetResponse;
+    try {
+      value = await this.elasticClient.get({
+        index: "indexNameIdef_*",
+        id: id + "." + (version || ""),
+        _source: ["last_modified"],
+        stored_fields: [],
+      });
+    } catch (err) {
+      if (err.meta.statusCode === 404) {
+        return null;
+      } else {
+        throw err;
+      }
+    }
+
+    if (!value || !value._source || !value.found) {
+      return null;
+    }
+
+    const indexNameUnlanguaged = qualifiedNameItem.toLowerCase() + "_";
+
+    return {
+      lastModified: (value._source as any).last_modified,
+      seqNo: value._seq_no,
+      index: value._index,
+      language: value._index.replace(indexNameUnlanguaged, ""),
+    };
+  }
+
   public async deleteDocumentsUnknownLanguage(
     itemDefinition: string | ItemDefinition,
     ids: Array<{
@@ -2092,7 +2132,6 @@ export class ItemizeElasticClient {
    */
   public async updateDocument(
     itemDefinition: string | ItemDefinition,
-    originalLanguage: string,
     language: string,
     id: string,
     version: string,
@@ -2128,14 +2167,9 @@ export class ItemizeElasticClient {
           id,
           version,
           language,
-          originalLanguage,
         },
       }
     );
-
-    if (originalLanguage !== language) {
-      await this.deleteDocument(itemDefinition, originalLanguage, id, version);
-    }
 
     const newValue = value || ((await this.rawDB.performRawDBSelect(
       itemDefinition,
@@ -2151,19 +2185,38 @@ export class ItemizeElasticClient {
     const combinedLimiters = idef.getSearchLimiters(true);
     const shouldBeIncluded = idef.shouldRowBeIncludedInSearchEngine(newValue, combinedLimiters, true);
 
-    if (!shouldBeIncluded) {
+    let currentDocumentInfo = await this.getDocumentBasicInfo(
+      idef,
+      id,
+      version,
+    );
+
+    if (!shouldBeIncluded && currentDocumentInfo) {
       // denied to limiters however it could just have been a change
       // where it is now limited, and we will safely try to remove any potential value
-      // there is for this row, this is a bit crazy because this means that every time the user
-      // creates or updates something and it will not be included in the search engine
-      // because it is request limited, it will launch a delete query, but what other option we have here?
-      // we don't know the current value in elasticsearch!... we can't check if it's there or not without doing
-      // a request, so telling it to delete is just cheaper than checking if it's there and then delete, that's two
-      // request, vs one request to delete
-      await this.deleteDocument(itemDefinition, language, id, version);
+      await this.deleteDocument(itemDefinition, currentDocumentInfo.language, id, version);
       return;
     }
 
+    if (currentDocumentInfo) {
+      const elasticLastModified = new NanoSecondComposedDate(currentDocumentInfo.lastModified);
+      const updateLastModified = new NanoSecondComposedDate(newValue.last_modified);
+
+      // denied because the current value has a greater signature
+      if (elasticLastModified.greaterThanEqual(updateLastModified)) {
+        return;
+      }
+    }
+
+    // if it doesn't match the language then we must delete the old one
+    if (currentDocumentInfo.language !== language) {
+      // deleting because it doesn't match the language but otherwise proceeding
+      // with the update
+      await this.deleteDocument(itemDefinition, currentDocumentInfo.language, id, version);
+      currentDocumentInfo = null;
+    }
+
+    // we proceed
     const mergedId = id + "." + (version || "");
     const elasticFormIdef = convertSQLValueToElasticSQLValueForItemDefinition(
       this.serverData,
@@ -2175,13 +2228,17 @@ export class ItemizeElasticClient {
     const qualifiedNameIdef = idef.getQualifiedPathName();
     const indexName = qualifiedNameIdef.toLowerCase() + "_" + (language || "none");
 
-    const updateAction = {
+    const updateAction: UpdateRequest = {
       id: mergedId,
       index: indexName,
       doc: elasticFormIdef,
       doc_as_upsert: true,
       refresh: "wait_for" as any,
     };
+
+    if (currentDocumentInfo) {
+      updateAction.if_seq_no = currentDocumentInfo.seqNo;
+    }
 
     try {
       try {
@@ -2198,6 +2255,23 @@ export class ItemizeElasticClient {
           await this.waitForServerData();
           await this.generateMissingIndexInGroup(indexName, language, this.rootSchema[qualifiedNameIdef]);
           await this.elasticClient.update(updateAction);
+        } else if (err.meta.statusCode === 409) {
+          CAN_LOG_DEBUG && logger.debug(
+            {
+              className: "ItemizeElasticClient",
+              methodName: "updateDocument",
+              message: "Race condition at " + idef.getQualifiedPathName() + " detected",
+              data: {
+                id,
+                version,
+                language,
+              },
+            }
+          );
+          // so we got an error that we ran into a race condition
+          // likely it got updated by something so the seqno didn't match, but was that something newer
+          // than us? we will have to check again!
+          await this.updateDocument(idef, language, id, version, newValue);
         } else {
           // some other weird error
           throw err;
@@ -2234,7 +2308,7 @@ export class ItemizeElasticClient {
   ) {
     // we cheat and pass the same as the original and target language
     // so that the old version is not checked for whatever it is
-    return this.updateDocument(itemDefinition, language, language, id, version, value);
+    return this.updateDocument(itemDefinition, language, id, version, value);
   }
 
   /**
