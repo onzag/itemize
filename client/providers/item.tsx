@@ -1795,6 +1795,12 @@ export class ActualItemProvider extends
   // every time something changes
   private storeStateTimeout: NodeJS.Timeout = null;
 
+  /**
+   * The consumabel qs state that is being set
+   */
+  private consumableQsState: any = null;
+  private consumeQsStateTimeout: NodeJS.Timeout = null;
+
   private static getItemStateStatic(props: IActualItemProviderProps) {
     return props.itemDefinitionInstance.getStateNoExternalChecking(
       props.forId || null,
@@ -2133,7 +2139,7 @@ export class ActualItemProvider extends
     this.submit = this.submit.bind(this);
     this.dismissLoadError = this.dismissLoadError.bind(this);
     this.dismissSubmitError = this.dismissSubmitError.bind(this);
-    this.dismissDeleteError = this.dismissSubmitError.bind(this);
+    this.dismissDeleteError = this.dismissDeleteError.bind(this);
     this.onPropertyEnforce = this.onPropertyEnforce.bind(this);
     this.onPropertyClearEnforce = this.onPropertyClearEnforce.bind(this);
     this.onPropertyEnforceOrClearFinal = this.onPropertyEnforceOrClearFinal.bind(this);
@@ -3665,12 +3671,22 @@ export class ActualItemProvider extends
       const isToSync = propertiesToSync.find((p) => p === idToSync);
 
       if (isToSync) {
-        setHistoryQSState(this.props.location, {
-          [idToSync]: JSON.stringify(property.getCurrentValue(
-            this.props.forId || null,
-            this.props.forVersion || null,
-          ))
-        }, this.props.queryStringSyncReplace);
+        const value = property.getCurrentValue(
+          this.props.forId || null,
+          this.props.forVersion || null,
+        );
+        if (this.consumableQsState) {
+          this.consumableQsState[idToSync] = value === null ? null : JSON.stringify(value);
+        } else {
+          this.consumableQsState = {
+            [idToSync]: value === null ? null : JSON.stringify(value)
+          };
+          this.consumeQsStateTimeout = setTimeout(() => {
+            setHistoryQSState(this.props.location, this.consumableQsState, this.props.queryStringSyncReplace);
+            this.consumableQsState = null;
+            this.consumeQsStateTimeout = null;
+          }, 200);
+        }
       }
     }
   }

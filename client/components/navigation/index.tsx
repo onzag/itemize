@@ -8,6 +8,15 @@
 import { Location } from "history";
 import { history } from "../..";
 
+
+type QsParamsFn = (current: URLSearchParams, next: URLSearchParams) => string | string[];
+
+interface IQueryParamsSpec {
+  [key: string]: string | string[] | QsParamsFn;
+};
+
+type QsParamsSpecFn = (current: URLSearchParams, next: URLSearchParams) => IQueryParamsSpec;
+
 /**
  * Allows to set the history state to a new state
  * @param location the location object
@@ -105,6 +114,10 @@ interface IRedirectOptions {
   replace?: boolean;
   retainQueryParamsFor?: string[];
   retainAllQueryParams?: boolean;
+  /**
+   * Provide query params either automatically or dynamically
+   */
+  qsParams?: QsParamsSpecFn | IQueryParamsSpec;
 }
 
 /**
@@ -115,37 +128,56 @@ interface IRedirectOptions {
  */
 export function redirectTo(newLocation: string, options: IRedirectOptions = {}) {
   let finalNewLocation = newLocation;
+
   // keeping the qs values as they are defined
-  if (options.retainQueryParamsFor || options.retainAllQueryParams) {
-    const currentQs = finalNewLocation.split("?")[1];
-    const urlToParsed = currentQs ? new URLSearchParams("?" + currentQs) : null;
+  if ((options.retainQueryParamsFor || options.retainAllQueryParams || options.qsParams) && finalNewLocation) {
+    const isAFullFledgedHttpURL =
+      finalNewLocation.startsWith("http") ||
+      finalNewLocation.startsWith("ftp");
+    const dummyURL = new URL((!isAFullFledgedHttpURL ? "http://dummy" : "") + finalNewLocation);
+
+    const nextQsParsed = dummyURL.searchParams;
     const locationQs = new URLSearchParams(location.search);
 
-    // we iterate depending on what we are copying from the source
-    (options.retainAllQueryParams ? Array.from(locationQs.keys()) : options.retainQueryParamsFor).forEach((bit) => {
-      // if we don't have any qs in our target or if that value is not defined there
-      if (!urlToParsed || !urlToParsed.get(bit)) {
-        // then we can add this value
-        const locationQsValue = locationQs.get(bit);
+    let changed = false;
+    if (options.retainQueryParamsFor || options.retainAllQueryParams) {
+      // we iterate depending on what we are copying from the source
+      (options.retainAllQueryParams ? Array.from(locationQs.keys()) : options.retainQueryParamsFor).forEach((bit) => {
+        // if we don't have any qs in our target or if that value is not defined there
+        if (!nextQsParsed.get(bit)) {
+          // then we can add this value
+          const locationQsValue = locationQs.get(bit);
 
-        // if we have it of course
-        if (locationQsValue) {
-          // if the url ends with ? or & we are ready to append, if not...
-          if (!finalNewLocation.endsWith("?") && !finalNewLocation.endsWith("&")) {
-            // if we don't have a querystring at all we must start with that
-            if (!currentQs) {
-              finalNewLocation += "?";
-            } else {
-              // otherwise we are adding to that querystring
-              finalNewLocation += "&";
-            }
+          // if we have it of course
+          if (locationQsValue) {
+            // now we can add the bit and the value
+            changed = true;
+            nextQsParsed.set(bit, locationQsValue);
           }
-
-          // now we can add the bit and the value
-          finalNewLocation += bit + "=" + encodeURIComponent(locationQsValue);
         }
-      }
-    });
+      });
+    }
+
+    if (options.qsParams) {
+      const value = typeof options.qsParams === "function" ? options.qsParams(locationQs, nextQsParsed) : options.qsParams;
+      Object.keys(value).forEach((key) => {
+        const vKeyRaw = value[key];
+        const valueForKey = typeof vKeyRaw === "function" ? vKeyRaw(locationQs, nextQsParsed) : vKeyRaw;
+        if (typeof valueForKey !== "undefined" && valueForKey !== null) {
+          changed = true;
+          nextQsParsed.set(key, valueForKey as any);
+        }
+      });
+    }
+
+    if (changed) {
+      const strParams = dummyURL.searchParams.toString();
+      finalNewLocation = (
+        isAFullFledgedHttpURL ?
+        (dummyURL.protocol + "//" + dummyURL.host) :
+        ""
+      ) + dummyURL.pathname + (strParams ? "?" + strParams : "") + dummyURL.hash;
+    }
   }
 
   if (options.replace) {

@@ -12,6 +12,14 @@ import {
   useLocation,
 } from "react-router-dom";
 
+type QsParamsFn = (current: URLSearchParams, next: URLSearchParams) => string | string[];
+
+interface IQueryParamsSpec {
+  [key: string]: string | string[] | QsParamsFn;
+};
+
+type QsParamsSpecFn = (current: URLSearchParams, next: URLSearchParams) => IQueryParamsSpec;
+
 /**
  * We take the link props from the react router dom and extend them to add
  * these
@@ -37,6 +45,10 @@ interface ICustomLinkProps extends LinkProps {
    * Retains all the query params of the current
    */
   retainAllQueryParams?: boolean;
+  /**
+   * Provide query params either automatically or dynamically
+   */
+  qsParams?: QsParamsSpecFn | IQueryParamsSpec;
 }
 
 /**
@@ -103,36 +115,47 @@ const Link = React.forwardRef((props: ICustomLinkProps, ref: ForwardedRef<HTMLAn
   // and as such it's calculated
 
   // keeping the qs values as they are defined
-  if (props.retainQueryParamsFor || props.retainAllQueryParams) {
-    const currentQs = urlTo.split("?")[1];
-    const urlToParsed = currentQs ? new URLSearchParams("?" + currentQs) : null;
+  if ((props.retainQueryParamsFor || props.retainAllQueryParams || props.qsParams) && urlTo) {
+    const dummyURL = new URL("http://dummy" + urlTo);
+
+    const nextQsParsed = dummyURL.searchParams;
     const locationQs = new URLSearchParams(locationCur.search);
 
-    // we iterate depending on what we are copying from the source
-    (props.retainAllQueryParams ? Array.from(locationQs.keys()) : props.retainQueryParamsFor).forEach((bit) => {
-      // if we don't have any qs in our target or if that value is not defined there
-      if (!urlToParsed || !urlToParsed.get(bit)) {
-        // then we can add this value
-        const locationQsValue = locationQs.get(bit);
+    let changed = false;
+    if (props.retainQueryParamsFor || props.retainAllQueryParams) {
+      // we iterate depending on what we are copying from the source
+      (props.retainAllQueryParams ? Array.from(locationQs.keys()) : props.retainQueryParamsFor).forEach((bit) => {
+        // if we don't have any qs in our target or if that value is not defined there
+        if (!nextQsParsed.get(bit)) {
+          // then we can add this value
+          const locationQsValue = locationQs.get(bit);
 
-        // if we have it of course
-        if (locationQsValue) {
-          // if the url ends with ? or & we are ready to append, if not...
-          if (!urlTo.endsWith("?") && !urlTo.endsWith("&")) {
-            // if we don't have a querystring at all we must start with that
-            if (!currentQs) {
-              urlTo += "?";
-            } else {
-              // otherwise we are adding to that querystring
-              urlTo += "&";
-            }
+          // if we have it of course
+          if (locationQsValue) {
+            // now we can add the bit and the value
+            changed = true;
+            nextQsParsed.set(bit, locationQsValue);
           }
-
-          // now we can add the bit and the value
-          urlTo += bit + "=" + encodeURIComponent(locationQsValue);
         }
-      }
-    });
+      });
+    }
+
+    if (props.qsParams) {
+      const value = typeof props.qsParams === "function" ? props.qsParams(locationQs, nextQsParsed) : props.qsParams;
+      Object.keys(value).forEach((key) => {
+        const vKeyRaw = value[key];
+        const valueForKey = typeof vKeyRaw === "function" ? vKeyRaw(locationQs, nextQsParsed) : vKeyRaw;
+        if (typeof valueForKey !== "undefined" && valueForKey !== null) {
+          changed = true;
+          nextQsParsed.set(key, valueForKey as any);
+        }
+      });
+    }
+
+    if (changed) {
+      const strParams = dummyURL.searchParams.toString();
+      urlTo = dummyURL.pathname + (strParams ? "?" + strParams : "")  + dummyURL.hash;
+    }
   }
 
   // and these are the new props for the link
@@ -145,6 +168,7 @@ const Link = React.forwardRef((props: ICustomLinkProps, ref: ForwardedRef<HTMLAn
   delete newProps["propagateClicks"];
   delete newProps["retainQueryParamsFor"];
   delete newProps["retainAllQueryParams"];
+  delete newProps["qsParams"];
 
   // if we have an as
   if (props.as) {

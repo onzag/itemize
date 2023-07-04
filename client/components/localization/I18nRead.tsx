@@ -15,7 +15,7 @@ import { capitalize } from "../../../util";
 import Module from "../../../base/Root/Module";
 import ItemDefinition from "../../../base/Root/Module/ItemDefinition";
 import Include from "../../../base/Root/Module/ItemDefinition/Include";
-import RootRetriever from "../root/RootRetriever";
+import RootRetriever, { useRootRetriever } from "../root/RootRetriever";
 import PropertyDefinition from "../../../base/Root/Module/ItemDefinition/PropertyDefinition";
 
 /**
@@ -461,10 +461,27 @@ export function useI18nRead(options: I18nReadOptions): React.ReactNode {
   const moduleContextualValue = useContext(ModuleContext);
   const itemContextualValue = useContext(ItemContext);
   const includeContext = useContext(IncludeContext);
+  const root = useRootRetriever();
 
   if (!options.id) {
     return "MISSING ID";
   };
+
+  if (options.context) {
+    const rootV = root.root;
+    const itemDefOrModule = rootV.registry[options.context];
+  
+    const idef = itemDefOrModule instanceof ItemDefinition ? itemDefOrModule : null;
+    const mod: Module = idef ? idef.getParentModule() : itemDefOrModule as Module;
+
+    return i18nReadInternal(
+      localeContext,
+      mod,
+      idef,
+      null,
+      options,
+    );
+  }
 
   return i18nReadInternal(
     localeContext,
