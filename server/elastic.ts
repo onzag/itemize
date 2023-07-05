@@ -1646,7 +1646,7 @@ export class ItemizeElasticClient {
                   // it will have to be created again
                   isOutdated = null;
 
-                // guess it was legit gone, we are good
+                  // guess it was legit gone, we are good
                 } else {
                   return null;
                 }
@@ -1685,7 +1685,7 @@ export class ItemizeElasticClient {
                   _id: id,
                 }
               },
-              convertedSQL,
+              isOutdated ? {doc: convertedSQL} : convertedSQL,
             ]
           }))) as any[][];
 
@@ -1871,6 +1871,7 @@ export class ItemizeElasticClient {
           throw error;
         }
       } else {
+        // no next batch so we need to close the cursor
         try {
           await rawDBClient.closeRawDBCursor(cursorName);
         } catch (err) {
@@ -1887,6 +1888,12 @@ export class ItemizeElasticClient {
               }
             }
           );
+        }
+
+        // throwing the error too that ocurred in this layer
+        // will prevent setting the index status info
+        if (error) {
+          throw error;
         }
       }
 
@@ -2376,9 +2383,20 @@ export class ItemizeElasticClient {
     if (!shouldBeIncluded && currentDocumentInfo) {
       // denied to limiters however it could just have been a change
       // where it is now limited, and we will safely try to remove any potential value
-      // TODO ignore errors
       await Promise.all(currentDocumentInfo.map(async (v) => {
-        await this.deleteDocument(itemDefinition, v.language, id, version);
+        try {
+          await this.deleteDocument(itemDefinition, v.language, id, version);
+        } catch (err) {
+          logger.error(
+            {
+              className: "ItemizeElasticClient",
+              methodName: "updateDocument",
+              message: "Could not delete an invalid search limited document for " + mergedId + " at " + v.index,
+              serious: true,
+              err,
+            }
+          );
+        }
       }));
       return;
     }
@@ -2406,7 +2424,19 @@ export class ItemizeElasticClient {
       // TODO ignore errors
       await Promise.all(currentDocumentInfo.map(async (v) => {
         if (v !== greaterCurrentDocumentInfo) {
-          await this.deleteDocument(itemDefinition, v.language, id, version);
+          try {
+            await this.deleteDocument(itemDefinition, v.language, id, version);
+          } catch (err) {
+            logger.error(
+              {
+                className: "ItemizeElasticClient",
+                methodName: "updateDocument",
+                message: "Could not delete an invalid duplicate document for " + mergedId + " at " + v.index,
+                serious: true,
+                err,
+              }
+            );
+          }
         }
       }));
 
@@ -2419,7 +2449,7 @@ export class ItemizeElasticClient {
 
     // if it doesn't match the language then we must delete the old one
     // because this document should be in the correct language and the right index
-    if (greaterCurrentDocumentInfo.language !== language) {
+    if (greaterCurrentDocumentInfo && greaterCurrentDocumentInfo.language !== language) {
       // deleting because it doesn't match the language but otherwise proceeding
       // with the update
       // TODO ignore errors
