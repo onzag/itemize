@@ -456,37 +456,37 @@ export class ItemizeRawDB {
    * @param moduleName the module that it belongs to (based on the type)
    * @returns the transaction time
    */
-  private async storeInDeleteRegistry(row: ISQLTableRowValue, moduleName: string, trackedProperties: string[]) {
-    const insertQuery = this.databaseConnection.getInsertBuilder();
+  // private async storeInDeleteRegistry(transactingDb: DatabaseConnection, row: ISQLTableRowValue, moduleName: string, trackedProperties: string[]) {
+  //   const insertQuery = transactingDb.getInsertBuilder();
 
-    const trackers: { [key: string]: string } = trackedProperties ? {} : null;
-    trackedProperties.forEach((pId) => {
-      const currentValue = row[pId] || null;
-      if (currentValue) {
-        trackers[pId] = currentValue;
-      }
-    });
+  //   const trackers: { [key: string]: string } = trackedProperties ? {} : null;
+  //   trackedProperties.forEach((pId) => {
+  //     const currentValue = row[pId] || null;
+  //     if (currentValue) {
+  //       trackers[pId] = currentValue;
+  //     }
+  //   });
 
-    insertQuery.table(DELETED_REGISTRY_IDENTIFIER).insert({
-      id: row.id,
-      version: row.version,
-      type: row.type,
-      module: moduleName,
-      created_by: row.created_by || null,
-      parenting_id: row.parent_id ? (row.parent_type + "." + row.parent_id + "." + row.parent_version || "") : null,
-      transaction_time: [
-        "NOW()",
-        [],
-      ],
-    });
-    insertQuery.returningBuilder.returningColumn("transaction_time");
+  //   insertQuery.table(DELETED_REGISTRY_IDENTIFIER).insert({
+  //     id: row.id,
+  //     version: row.version,
+  //     type: row.type,
+  //     module: moduleName,
+  //     created_by: row.created_by || null,
+  //     parenting_id: row.parent_id ? (row.parent_type + "." + row.parent_id + "." + row.parent_version || "") : null,
+  //     transaction_time: [
+  //       "NOW()",
+  //       [],
+  //     ],
+  //   });
+  //   insertQuery.returningBuilder.returningColumn("transaction_time");
 
-    // simply build the query
-    const insertQueryValue = await this.databaseConnection.queryFirst(insertQuery);
+  //   // simply build the query
+  //   const insertQueryValue = await transactingDb.queryFirst(insertQuery);
 
-    // returning the transaction time
-    return insertQueryValue.transaction_time as string;
-  }
+  //   // returning the transaction time
+  //   return insertQueryValue.transaction_time as string;
+  // }
 
   private async checkRowValidityForInformingChanges(row: ISQLTableRowValue, idef: ItemDefinition, doNotCheckTracked?: boolean) {
     return !!(row && (
@@ -649,18 +649,35 @@ export class ItemizeRawDB {
       return null;
     }
 
-    await this.informChangeOnRowElastic(row, action, elasticLanguageOverride, dataIsComplete, true);
-
+    try {
+      await this.informChangeOnRowElastic(row, action, elasticLanguageOverride, dataIsComplete, true);
+    } catch (err) {
+      logger.error(
+        {
+          className: "ItemizeRawDB",
+          methodName: "informChangeOnRow",
+          message: "Failed to inform change on row at elastic level",
+          serious: true,
+          err,
+          data: {
+            id: row.id,
+            version: row.version,
+          },
+        }
+      );
+    }
+  
     // now let's grab the module qualified name
     const moduleName = idef.getParentModule().getQualifiedPathName();
 
-    const tracked = idef.getAllPropertyDefinitionsAndExtensions().filter((pdef) => pdef.isTracked()).map((pdef) => pdef.getId());
+    // const tracked = idef.getAllPropertyDefinitionsAndExtensions().filter((pdef) => pdef.isTracked()).map((pdef) => pdef.getId());
 
     // and set into the deleted registry if we don't have it
-    let lastModified = row.last_modified;
-    if (action === "deleted") {
-      lastModified = await this.storeInDeleteRegistry(row, moduleName, tracked);
-    }
+    const lastModified = row.last_modified;
+    // the last modified will now be the transaction_time but will be done during the transaction
+    // if (action === "deleted") {
+    //   lastModified = await this.storeInDeleteRegistry(row, moduleName, tracked);
+    // }
 
     // build the change event
     const changedFeedbackEvent: IChangedFeedbackEvent = {
@@ -709,7 +726,21 @@ export class ItemizeRawDB {
     completedRows.forEach(async (r) => {
       try {
         await this.informChangeOnRowElastic(r, action, elasticLanguageOverride, newRowDataIsComplete, false)
-      } catch { }
+      } catch (err) {
+        logger.error(
+          {
+            className: "ItemizeRawDB",
+            methodName: "informChangeOnRowsElasticOnly",
+            message: "Failed to inform change on row at elastic level",
+            serious: true,
+            err,
+            data: {
+              id: r.id,
+              version: r.version,
+            },
+          }
+        );
+      }
     });
   }
 
@@ -1402,6 +1433,10 @@ export class ItemizeRawDB {
     itemDefinitionOrModule: ItemDefinition | Module | string,
     id: string,
     version: string,
+    deleteFiles?: {
+      domain: string;
+      storage: IStorageProvidersObject;
+    } | false,
     deleter: {
       where?: (builder: WhereBuilder) => void;
       useJoinedWhere?: boolean;
@@ -1414,7 +1449,12 @@ export class ItemizeRawDB {
       itemDefinitionOrModule,
       (b) => {
         b.andWhereColumn("id", id).andWhereColumn("version", version);
-      }
+        if (deleter.where) {
+          deleter.where(b);
+        }
+      },
+      deleteFiles,
+      deleter,
     )
   }
 
@@ -1430,7 +1470,6 @@ export class ItemizeRawDB {
       useJoinedReturn?: boolean;
       dangerousUseSilentMode?: boolean;
       returningAll?: boolean;
-
     } = {},
   ) {
     const itemDefinitionOrModuleInstance = typeof itemDefinitionOrModule === "string" ?

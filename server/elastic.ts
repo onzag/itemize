@@ -10,7 +10,7 @@ import { convertSQLValueToElasticSQLValueForItemDefinition } from "../base/Root/
 import { DELETED_REGISTRY_IDENTIFIER, SERVER_ELASTIC_PING_INTERVAL_TIME } from "../constants";
 import { CAN_LOG_DEBUG, EMULATE_ELASTIC_SYNC_FAILURE_AT, EMULATE_SILENT_ELASTIC_SYNC_FAILURE_AT, FORCE_ELASTIC_REBUILD, INSTANCE_UUID } from "./environment";
 import { NanoSecondComposedDate } from "../nanodate";
-import { AggregationsAggregationContainer, FieldValue, GetResponse, QueryDslMatchPhraseQuery, QueryDslMatchQuery, QueryDslQueryContainer, QueryDslTermQuery, QueryDslTermsQuery, SearchHit, SearchRequest, UpdateRequest } from "@elastic/elasticsearch/lib/api/types";
+import { AggregationsAggregationContainer, FieldValue, GetResponse, MgetResponse, QueryDslMatchPhraseQuery, QueryDslMatchQuery, QueryDslQueryContainer, QueryDslTermQuery, QueryDslTermsQuery, SearchHit, SearchRequest, SearchResponse, UpdateRequest } from "@elastic/elasticsearch/lib/api/types";
 import { setInterval } from "timers";
 import type { IElasticHighlightReply } from "../base/Root/Module/ItemDefinition/PropertyDefinition/types";
 import { ISearchLimitersType } from "../base/Root";
@@ -28,6 +28,9 @@ interface ElasticRequestOptions {
   noHighlights?: boolean;
   ignoresDoNotApplyToAggregations?: boolean;
 };
+
+interface IDocumentBasicInfo { lastModified: NanoSecondComposedDate, index: string, language: string, id: string };
+interface IDocumentSeqNoInfo { seqNo: number, primaryTerm: number, lastModified: NanoSecondComposedDate };
 
 export interface IElasticPing<N> {
   statusIndex: string;
@@ -1508,7 +1511,7 @@ export class ItemizeElasticClient {
               delete: {
                 _index: hit._index,
                 _id: hit._id,
-                if_seq_no: hit._seq_no,
+                // if_seq_no: hit._seq_no,
               }
             });
             bulkOperationCurrentIndexSize++;
@@ -1549,7 +1552,7 @@ export class ItemizeElasticClient {
               delete: {
                 _index: hit._index,
                 _id: hit._id,
-                if_seq_no: hit._seq_no,
+                // if_seq_no: hit._seq_no,
               }
             });
             bulkOperationCurrentIndexSize++;
@@ -1568,7 +1571,7 @@ export class ItemizeElasticClient {
             // and now let's get the value for this row, if the last consistency check is null
             // this means that is cheekily stored in the object info already because
             // we did a strong select with everything
-            const knownValue = statusInfo.lastConsistencyCheck === null ? objectInfo.r : (
+            let knownValue = statusInfo.lastConsistencyCheck === null ? objectInfo.r : (
               await
                 rawDBClient.performRawDBSelect(
                   idef,
@@ -1593,7 +1596,7 @@ export class ItemizeElasticClient {
               knownValue,
             );
 
-            const isOutdated = notMissingButOutdated.find((r) => r._id === id);
+            let isOutdated = notMissingButOutdated.find((r) => r._id === id);
 
             const indexItWillBelongTo = baseIndexPrefix + (objectInfo.language || "none");
 
@@ -1611,6 +1614,50 @@ export class ItemizeElasticClient {
                 // double ask elastic for the same
                 ensuranceCache,
               );
+            }
+
+            // due to elasticsearch not providing primary term
+            // information because their "reasons", we are forced
+            // to retrieve the primary term manually per update
+            // and check it against the current just in case
+            let seqNoInfo: IDocumentSeqNoInfo = null;
+            if (isOutdated) {
+              seqNoInfo = await this.getSeqNoInfo({
+                id: isOutdated._id,
+                index: isOutdated._index,
+                language: null,
+                lastModified: null,
+              });
+
+              // somehow was deleted during this operation
+              // assuming that is because it was indeed deleted from db
+              // and another elasticseach call deleted the value, lets confirm
+              if (!seqNoInfo) {
+                knownValue = await
+                  rawDBClient.performRawDBSelect(
+                    idef,
+                    (s) =>
+                      s.selectAll().whereBuilder
+                        .andWhereColumn("id", objectInfo.r.id).andWhereColumn("version", objectInfo.r.version || "")
+                  );
+
+                // it was not deleted, what happened? why is it gone?
+                if (knownValue) {
+                  // it will have to be created again
+                  isOutdated = null;
+
+                // guess it was legit gone, we are good
+                } else {
+                  return null;
+                }
+              }
+
+              // we got our seq info but it's greater than our database value
+              // somehow it got updated in the meantime
+              if (seqNoInfo && seqNoInfo.lastModified.greaterThanEqual(objectInfo.lastModified)) {
+                // we do nothing it was updaed by something else
+                return null;
+              }
             }
 
             CAN_LOG_DEBUG && logger.debug(
@@ -1631,7 +1678,8 @@ export class ItemizeElasticClient {
                 [isOutdated ? "update" : "create"]: isOutdated ? {
                   _index: isOutdated._index,
                   _id: isOutdated._id,
-                  if_seq_no: isOutdated._seq_no,
+                  if_seq_no: seqNoInfo.seqNo,
+                  if_primary_term: seqNoInfo.primaryTerm,
                 } : {
                   _index: indexItWillBelongTo,
                   _id: id,
@@ -1968,21 +2016,14 @@ export class ItemizeElasticClient {
     });
   }
 
-  public async getDocumentBasicInfo(
-    itemDefinition: string | ItemDefinition,
-    id: string,
-    version: string,
-  ): Promise<{ lastModified: string, seqNo: number, index: string, language: string }> {
-    const idef = typeof itemDefinition === "string" ? this.root.registry[itemDefinition] : itemDefinition;
-
-    const qualifiedNameItem = idef.getQualifiedPathName();
-    const indexNameIdef = qualifiedNameItem.toLowerCase() + "_*";
-
+  public async getSeqNoInfo(
+    info: IDocumentBasicInfo,
+  ): Promise<IDocumentSeqNoInfo> {
     let value: GetResponse;
     try {
       value = await this.elasticClient.get({
-        index: "indexNameIdef_*",
-        id: id + "." + (version || ""),
+        index: info.index,
+        id: info.id,
         _source: ["last_modified"],
         stored_fields: [],
       });
@@ -1994,18 +2035,62 @@ export class ItemizeElasticClient {
       }
     }
 
-    if (!value || !value._source || !value.found) {
+    if (!value || !value.found) {
+      return null;
+    }
+
+    return {
+      lastModified: new NanoSecondComposedDate((value._source as any).last_modified),
+      seqNo: value._seq_no,
+      primaryTerm: value._primary_term,
+    };
+  }
+
+  public async getDocumentBasicInfo(
+    itemDefinition: string | ItemDefinition,
+    id: string,
+    version: string,
+  ): Promise<IDocumentBasicInfo[]> {
+    const idef = typeof itemDefinition === "string" ? this.root.registry[itemDefinition] : itemDefinition;
+
+    const qualifiedNameItem = idef.getQualifiedPathName();
+    const indexNameIdef = qualifiedNameItem.toLowerCase() + "_*";
+    const _id = id + "." + (version || "");
+
+    let values: SearchResponse;
+    try {
+      values = await this.elasticClient.search({
+        index: indexNameIdef,
+        query: {
+          terms: {
+            _id: [_id],
+          }
+        },
+        allow_no_indices: true,
+        // not allowed to have wait_for here
+        _source: ["last_modified"],
+        stored_fields: [],
+      });
+    } catch (err) {
+      if (err.meta.statusCode === 404) {
+        return null;
+      } else {
+        throw err;
+      }
+    }
+
+    if (!values || !values.hits || !values.hits.hits.length) {
       return null;
     }
 
     const indexNameUnlanguaged = qualifiedNameItem.toLowerCase() + "_";
 
-    return {
-      lastModified: (value._source as any).last_modified,
-      seqNo: value._seq_no,
+    return values.hits.hits.map((value) => ({
+      lastModified: new NanoSecondComposedDate((value._source as any).last_modified),
       index: value._index,
       language: value._index.replace(indexNameUnlanguaged, ""),
-    };
+      id: _id,
+    }));
   }
 
   public async deleteDocumentsUnknownLanguage(
@@ -2277,35 +2362,69 @@ export class ItemizeElasticClient {
     const combinedLimiters = idef.getSearchLimiters(true);
     const shouldBeIncluded = idef.shouldRowBeIncludedInSearchEngine(newValue, combinedLimiters, true);
 
+    // we get our current document info which provides
+    // info about every document that has that id version for that idef
+    // with the potential to find corrupt records with duplicate
+    // data as it gives an array
     let currentDocumentInfo = await this.getDocumentBasicInfo(
       idef,
       id,
       version,
     );
 
+    // should not be included but we have matches
     if (!shouldBeIncluded && currentDocumentInfo) {
       // denied to limiters however it could just have been a change
       // where it is now limited, and we will safely try to remove any potential value
-      await this.deleteDocument(itemDefinition, currentDocumentInfo.language, id, version);
+      // TODO ignore errors
+      await Promise.all(currentDocumentInfo.map(async (v) => {
+        await this.deleteDocument(itemDefinition, v.language, id, version);
+      }));
       return;
     }
 
-    if (currentDocumentInfo) {
-      const elasticLastModified = new NanoSecondComposedDate(currentDocumentInfo.lastModified);
-      const updateLastModified = new NanoSecondComposedDate(newValue.last_modified);
+    const updateLastModified = new NanoSecondComposedDate(newValue.last_modified);
 
-      // denied because the current value has a greater signature
-      if (elasticLastModified.greaterThanEqual(updateLastModified)) {
+    // now we are going to check those documents we have got to see if we have got any
+    let greaterCurrentDocumentInfo: IDocumentBasicInfo = null;
+    if (currentDocumentInfo) {
+      // let's find the greater document that is more up to date
+      greaterCurrentDocumentInfo = currentDocumentInfo.length === 1 ? currentDocumentInfo[0] : currentDocumentInfo.reduce((v1, v2) => {
+        // denied because the current value has a greater signature
+        if (v1.lastModified.greaterThanEqual(v2.lastModified)) {
+          return v1;
+        }
+
+        return v2;
+      });
+
+      // and check it against our update
+      const greaterValueIsMoreOrEqualToUs = greaterCurrentDocumentInfo.lastModified.greaterThanEqual(updateLastModified);
+
+      // need to delete anything that is not our greater value just for the sake of consistency
+      // these are duplicates that shall not exist but for some reason do
+      // TODO ignore errors
+      await Promise.all(currentDocumentInfo.map(async (v) => {
+        if (v !== greaterCurrentDocumentInfo) {
+          await this.deleteDocument(itemDefinition, v.language, id, version);
+        }
+      }));
+
+      // if the values in elastic are somehow greater than us, well then that
+      // is the real value and this update is flawed
+      if (greaterValueIsMoreOrEqualToUs) {
         return;
       }
     }
 
     // if it doesn't match the language then we must delete the old one
-    if (currentDocumentInfo.language !== language) {
+    // because this document should be in the correct language and the right index
+    if (greaterCurrentDocumentInfo.language !== language) {
       // deleting because it doesn't match the language but otherwise proceeding
       // with the update
-      await this.deleteDocument(itemDefinition, currentDocumentInfo.language, id, version);
-      currentDocumentInfo = null;
+      // TODO ignore errors
+      await this.deleteDocument(itemDefinition, greaterCurrentDocumentInfo.language, id, version);
+      greaterCurrentDocumentInfo = null;
     }
 
     // we proceed
@@ -2328,8 +2447,24 @@ export class ItemizeElasticClient {
       refresh: "wait_for" as any,
     };
 
-    if (currentDocumentInfo) {
-      updateAction.if_seq_no = currentDocumentInfo.seqNo;
+    if (greaterCurrentDocumentInfo) {
+      const seqNoInfo = await this.getSeqNoInfo(greaterCurrentDocumentInfo);
+      // was deleted somehow while we were doing this
+      if (!seqNoInfo) {
+
+      } else {
+        // somehow the document itself changed and was updated while we weren't looking
+        // and trying to get this seq no info
+        if (seqNoInfo.lastModified.greaterThanEqual(updateLastModified)) {
+          // cancel it like before
+          return;
+        }
+
+        // proceed with the update
+        delete updateAction.doc_as_upsert;
+        updateAction.if_seq_no = seqNoInfo.seqNo;
+        updateAction.if_primary_term = seqNoInfo.primaryTerm;
+      }
     }
 
     try {

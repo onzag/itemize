@@ -131,7 +131,8 @@ export class Cache {
     };
   } = {};
   private appData: IAppDataType;
-  private currentlySetting: { [id: string]:
+  private currentlySetting: {
+    [id: string]:
     {
       valueBeingSet: any;
       replacement: any;
@@ -3117,7 +3118,6 @@ export class Cache {
    * @param item the item definition or a qualified name
    * @param id the id to request for
    * @param version the version
-   * @param options.refresh whether to skip the cache and request directly from the database and update the cache
    * @param options.useMemoryCache a total opposite of refresh, (do not use together as refresh beats this one)
    * which will use a 1 second memory cache to retrieve values and store them, use this if you think the value
    * might be used consecutively and you don't care about accuraccy that much
@@ -3127,14 +3127,14 @@ export class Cache {
     item: ItemDefinition | string,
     id: string,
     version: string,
-    options?: {
-      refresh?: boolean,
+    options: {
       useMemoryCache?: boolean,
       useMemoryCacheMs?: number,
-    },
+      doNotEnsure?: boolean,
+      forceRefresh?: boolean,
+    } = {},
   ): Promise<ISQLTableRowValue> {
-    const refresh = options && options.refresh;
-    const memCache = options && options.useMemoryCache;
+    const memCache = options.useMemoryCache;
 
     const itemDefinition = typeof item === "string" ?
       this.root.registry[item] as ItemDefinition :
@@ -3148,25 +3148,84 @@ export class Cache {
         className: "Cache",
         methodName: "requestValue",
         message: "Requesting value for " + idefTable + " at module " +
-          moduleTable + " for id " + id + " and version " + version + " with refresh " + !!refresh,
+          moduleTable + " for id " + id + " and version " + version + " with doNotRecheck " + !!options.doNotEnsure,
       },
     );
 
-    if (!refresh) {
-      const idefQueryIdentifier = "IDEFQUERY:" + idefTable + "." + id.toString() + "." + (version || "");
-      if (memCache && this.memoryCache[idefQueryIdentifier]) {
-        return this.memoryCache[idefQueryIdentifier].value;
+    const idefQueryIdentifier = "IDEFQUERY:" + idefTable + "." + id.toString() + "." + (version || "");
+    if (memCache && this.memoryCache[idefQueryIdentifier]) {
+      return this.memoryCache[idefQueryIdentifier].value;
+    }
+
+    // whether we need to refresh
+    let refresh = false;
+    let refreshWasDeleted = false;
+
+    if (!options.forceRefresh) {
+      let currentValue = await this.getRaw<ISQLTableRowValue>(idefQueryIdentifier);
+      // we do not need to refresh the value
+      if (currentValue && !options.doNotEnsure) {
+        const rowResultLastMod: ISQLTableRowValue = convertVersionsIntoNullsWhenNecessary(
+          // let's remember versions as null do not exist in the database, instead it uses
+          // the invalid empty string "" value
+          await this.databaseConnection.queryFirst(
+            `SELECT "last_modified" FROM ${JSON.stringify(moduleTable)} WHERE "id" = $1 AND "version" = $2 ` +
+            `LIMIT 1`,
+            [
+              id,
+              version || "",
+            ],
+          ),
+        );
+
+        // it's there but does it match our redis
+        if (rowResultLastMod) {
+          // well it does not, redis says it's gone
+          if (!currentValue.value) {
+            // refresh please
+            refresh = true;
+          } else if (currentValue.value.last_modified !== rowResultLastMod.last_modified) {
+            refresh = true;
+          }
+          // it's not there
+        } else {
+          // but this says it does
+          if (currentValue.value) {
+            // we refresh but also say that we know it was deleted
+            refresh = true;
+            refreshWasDeleted = true;
+          }
+        }
+      } else if (!currentValue) {
+        // I mean we need to refresh if we got no value
+        refresh = true;
       }
-      const currentValue = await this.getRaw<ISQLTableRowValue>(idefQueryIdentifier);
-      if (currentValue) {
+      // otherwise we got a value and we do not use the recheck
+      // so we are going to go with that
+
+      // if we are not refreshing or it was deleted
+      if (!refresh || refreshWasDeleted) {
+        // if it was deleted
+        if (refreshWasDeleted) {
+          // force the damn thing
+          this.forceCacheInto(idefTable, id, version, null, false);
+          currentValue = {
+            value: null,
+          }
+        }
+
+        // store in memcache
         if (memCache) {
           this.memoryCache[idefQueryIdentifier] = currentValue;
           setTimeout(() => {
             delete this.memoryCache[idefQueryIdentifier];
           }, typeof options.useMemoryCacheMs !== "undefined" ? options.useMemoryCacheMs : MEMCACHE_EXPIRES_MS);
         }
+
         return currentValue.value;
       }
+    } else {
+      refresh = true;
     }
 
     CAN_LOG_DEBUG && logger.debug(
@@ -3283,7 +3342,7 @@ export class Cache {
             id,
             version,
             {
-              refresh: true,
+              forceRefresh: true,
             },
           );
         } else {
