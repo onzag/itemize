@@ -10,7 +10,7 @@ import { convertSQLValueToElasticSQLValueForItemDefinition } from "../base/Root/
 import { DELETED_REGISTRY_IDENTIFIER, SERVER_ELASTIC_PING_INTERVAL_TIME } from "../constants";
 import { CAN_LOG_DEBUG, EMULATE_ELASTIC_SYNC_FAILURE_AT, EMULATE_SILENT_ELASTIC_SYNC_FAILURE_AT, FORCE_ELASTIC_REBUILD, INSTANCE_UUID } from "./environment";
 import { NanoSecondComposedDate } from "../nanodate";
-import { AggregationsAggregationContainer, FieldValue, GetResponse, QueryDslMatchPhraseQuery, QueryDslMatchQuery, QueryDslQueryContainer, QueryDslTermQuery, QueryDslTermsQuery, SearchRequest, UpdateRequest } from "@elastic/elasticsearch/lib/api/types";
+import { AggregationsAggregationContainer, FieldValue, GetResponse, QueryDslMatchPhraseQuery, QueryDslMatchQuery, QueryDslQueryContainer, QueryDslTermQuery, QueryDslTermsQuery, SearchHit, SearchRequest, UpdateRequest } from "@elastic/elasticsearch/lib/api/types";
 import { setInterval } from "timers";
 import type { IElasticHighlightReply } from "../base/Root/Module/ItemDefinition/PropertyDefinition/types";
 import { ISearchLimitersType } from "../base/Root";
@@ -1049,7 +1049,17 @@ export class ItemizeElasticClient {
         }
       } else if (actualOnElement instanceof ItemDefinition) {
         await this.rawDB.startSingleClientOperation(async (rawDBClient) => {
-          await this._runConsistencyCheck(rawDBClient, actualOnElement, new Date(), 0, null, null, {});
+          // sometimes the consistency check doesn't manage to be effective and it's not due to an error
+          // but because there may have been so many inconsistencies or race conditions occurred during
+          // the consistency check in such cases we try again
+          // to run the consistency check to keep adding consistency until it is effective or until
+          // we stop trying
+          let wasEffective = false;
+          let tries = 0;
+          while (!wasEffective && tries < 3) {
+            wasEffective = await this._runConsistencyCheck(rawDBClient, actualOnElement, new Date(), 0, null, null, {});
+            tries++;
+          }
         });
       }
       pResolve && pResolve();
@@ -1080,6 +1090,8 @@ export class ItemizeElasticClient {
     const cursorName = idef.getQualifiedPathName().toLowerCase() + "_elastic_cursor";
 
     try {
+      let wasIneffective: boolean = false;
+
       const parentModule = idef.getParentModule();
       const parentModuleEnabled = parentModule.isSearchEngineEnabled();
 
@@ -1186,6 +1198,7 @@ export class ItemizeElasticClient {
         }
       }
 
+      let hasSomeDuplicateCorruptionAndMayHaveMore = false;
       if (batchNumber === 0) {
         const expectedLanguageColumn = idef.getSearchEngineDynamicMainLanguageColumn();
         const limitedColumns = idef.getSearchEngineLimitedColumns(limiters);
@@ -1388,54 +1401,64 @@ export class ItemizeElasticClient {
           ],
           _source: false,
           allow_no_indices: true,
-          size: arrayOfIds.length,
+          // we try to catch at least 5 potential duplicates
+          // in languages where they may not belong
+          size: arrayOfIds.length + 5,
         });
+
+        // check for duplication corruption where we got more results
+        // we wil have to run our check again towards the same last modified date
+        // after this
+        hasSomeDuplicateCorruptionAndMayHaveMore = comparativeResults.hits.hits.length === arrayOfIds.length + 5;
 
         const baseIndexPrefixLen = baseIndexPrefix.length;
         const missingFromResults: string[] = [];
-        const extraAtResults: string[] = [];
+        const extraAtResults: SearchHit[] = [];
         arrayOfIds.forEach((id) => {
           if (resultObj[id].isSearchLimited) {
-            const isThere = (
-              comparativeResults.hits.hits.some((hit) => {
-                return hit._id === id;
-              })
-            )
-            if (isThere) {
-              extraAtResults.push(id);
-            }
+            comparativeResults.hits.hits.forEach((hit) => {
+              if (hit._id === id) {
+                extraAtResults.push(hit);
+              }
+            });
           } else {
-            const isMissing = (
-              !comparativeResults.hits.hits.some((hit) => {
-                const isSameId = hit._id === id;
+            const isMissing = !comparativeResults.hits.hits.some((hit) => {
+              const isSameId = hit._id === id;
 
-                if (!isSameId) {
-                  return false;
-                }
+              if (!isSameId) {
+                return;
+              }
 
-                let language = hit._index.substring(baseIndexPrefixLen);
-                if (language === "none") {
-                  language = null;
-                }
-                const objInfo = resultObj[hit._id];
-                const isSameLanguage = objInfo.language === language;
+              let language = hit._index.substring(baseIndexPrefixLen);
+              if (language === "none") {
+                language = null;
+              }
+              const objInfo = resultObj[hit._id];
+              const isSameLanguage = objInfo.language === language;
 
-                // exists with the same id and the same language
-                // so it is in the right index, otherwise
-                // it is considered missing
+              // exists with the same id and the same language
+              // so it is in the right index, otherwise
+              // it is considered missing
 
-                // the old value will be removed by notMissingButOutdated
-                // check for isInTheWrongLanguage for that check that comes just next
-                return isSameLanguage;
-              })
-            );
+              // the old value (or values) will be removed by notMissingButOutdated
+              // check for isInTheWrongLanguage for that check that comes just next
+              return isSameLanguage;
+            })
 
-            if (isMissing) {
+            if (isMissing && !hasSomeDuplicateCorruptionAndMayHaveMore) {
+              // we check for this because the reason we may have not found our record
+              // from the list is because we are limiting to the amount of results
+              // so we don't know if that occurred because of having duplicates
+              // that filled our list so we don't want to potentially add again
+              // the consistency needs to be ran again
+
+              // because hasSomeDuplicate... is true if this doesn't occur when it should
+              // the consistency will return false, meaning it was not effective
               missingFromResults.push(id);
             }
           }
         });
-        const notMissingButOutdated: string[] = [];
+        const notMissingButOutdated: SearchHit[] = [];
 
         let bulkOperations: any[][] = [];
         let bulkOperationCurrentIndex: number = 0;
@@ -1465,7 +1488,7 @@ export class ItemizeElasticClient {
           // so the language will differ, if both of them are invalid they will also go away
           // for different reasons
           const isInTheWrongLanguage = objectInfo.language !== language;
-          const isOutdated = corruptRecord ? true : objectInfo.lastModified.notEqual(lastModified);
+          const isOutdated = corruptRecord ? true : objectInfo.lastModified.greaterThan(lastModified);
 
           // we basically have confirmed these index exist
           // so we don't have to later
@@ -1485,6 +1508,7 @@ export class ItemizeElasticClient {
               delete: {
                 _index: hit._index,
                 _id: hit._id,
+                if_seq_no: hit._seq_no,
               }
             });
             bulkOperationCurrentIndexSize++;
@@ -1508,23 +1532,37 @@ export class ItemizeElasticClient {
           } else if (isOutdated) {
             // if it's outdated then we add it to this list
             // where the value will be fetched
-            notMissingButOutdated.push(hit._id);
+            notMissingButOutdated.push(hit);
           }
         });
 
         // extra documents that shouldn't be there
         if (extraAtResults.length) {
           // these are disrespecting the limiters and shouldn't be there anymore to begin with
-          await this.deleteDocumentsUnknownLanguage(
-            idef,
-            extraAtResults,
-          );
+          extraAtResults.forEach((hit) => {
+            // it goes away by the bulk operations
+            if (!bulkOperations[bulkOperationCurrentIndex]) {
+              bulkOperations[bulkOperationCurrentIndex] = [];
+              bulkOperationCurrentIndexSize = 0;
+            }
+            bulkOperations[bulkOperationCurrentIndex].push({
+              delete: {
+                _index: hit._index,
+                _id: hit._id,
+                if_seq_no: hit._seq_no,
+              }
+            });
+            bulkOperationCurrentIndexSize++;
+            if (bulkOperationCurrentIndexSize >= bulkOperationMaxSize) {
+              bulkOperationCurrentIndex++;
+            }
+          });
         }
 
         // if we have any of these mising or missing but outdated
         if (missingFromResults.length + notMissingButOutdated.length) {
           // we are going to loop over both
-          const operations = (await Promise.all(missingFromResults.concat(notMissingButOutdated).map(async (id) => {
+          const operations = (await Promise.all(missingFromResults.concat(notMissingButOutdated.map((v) => v._id)).map(async (id) => {
             // let's get the info we got from our database
             const objectInfo = resultObj[id];
             // and now let's get the value for this row, if the last consistency check is null
@@ -1555,7 +1593,7 @@ export class ItemizeElasticClient {
               knownValue,
             );
 
-            const isOutdated = notMissingButOutdated.includes(id);
+            const isOutdated = notMissingButOutdated.find((r) => r._id === id);
 
             const indexItWillBelongTo = baseIndexPrefix + (objectInfo.language || "none");
 
@@ -1590,7 +1628,11 @@ export class ItemizeElasticClient {
 
             return [
               {
-                [isOutdated ? "update" : "create"]: {
+                [isOutdated ? "update" : "create"]: isOutdated ? {
+                  _index: isOutdated._index,
+                  _id: isOutdated._id,
+                  if_seq_no: isOutdated._seq_no,
+                } : {
                   _index: indexItWillBelongTo,
                   _id: id,
                 }
@@ -1668,9 +1710,32 @@ export class ItemizeElasticClient {
               if (operations.errors) {
                 const errored = operations.items.map((o) => {
                   // avoid reporting version conflict engine exceptions as the values have been created
+                  // potential errors be like (1. the create failed because it was created while it was trying)
+                  // we ignore that
                   const error = (o.create && o.create.error && o.create.status !== 409 && o.create.error) ||
-                    (o.update && o.update.error) ||
-                    (o.delete && o.delete.error && o.delete.status !== 404 && o.delete.error);
+                    // we take in the errors where we updated and the version engine exception occurred
+                    // as well as any other errors, if it really fixed itself somehow
+                    // then the next loop will not find that problem
+
+                    // potential errors are like (1. the update failed because the value changed 409 while it was being done)
+                    // 2. the update failed because the value was deleted 404 while it was being done
+                    // because we don't know if it was updated correctly we store this error
+                    // and check again
+                    (o.update && o.update.error && o.update.status !== 409 && o.update.status !== 404 && o.update.error) ||
+                    // was deleted already, 2. was recreated? wtf?...
+                    (o.delete && o.delete.error && o.delete.status !== 404 && o.delete.status !== 404 && o.delete.error);
+
+                  if (!error) {
+                    const ineffective = (o.create && o.create.error && o.create.status !== 409 && o.create.error) ||
+                      // all update errors mark it as ineffective
+                      (o.update && o.update.error) ||
+                      // avoid reporting delete exceptions when the value have been deleted already
+                      (o.delete && o.delete.error && o.delete.status !== 404 && o.delete.error);
+
+                    if (ineffective) {
+                      wasIneffective = true;
+                    }
+                  }
 
                   // ignoring race conditions where for some incredible reason of the gods
                   // somehow the record got deleted, say by another instance
@@ -1726,7 +1791,12 @@ export class ItemizeElasticClient {
 
       // if we have another batch then we should consume such batch
       if (hasNextBatch) {
-        await this._runConsistencyCheck(
+        // all the layers run their operations (all they can)
+        // before throwing an error so they are guaranteed to
+        // do all they can, one of their errors may come here
+        // too, but we have already ran our own operations
+        // (whether we failed or succeeded)
+        const wasNextBatchEffective = await this._runConsistencyCheck(
           rawDBClient,
           idef,
           timeRan,
@@ -1736,12 +1806,20 @@ export class ItemizeElasticClient {
           ensuranceCache,
         );
 
+        // mark us as ineffective too because our next batch
+        // was not effective
+        if (!wasNextBatchEffective) {
+          wasIneffective = true;
+        }
+
         // this will throw the error that occured in this layer
         // but will allow to keep processing the other batches
         // whatever happened hopefully will fix itself on the next
         // consistency check round, but we tried to update and fix
         // as many records as possible
         if (error) {
+          // the cursor will still be closed because we catch
+          // all errors at the bottom to close the cursor
           throw error;
         }
       } else {
@@ -1768,15 +1846,29 @@ export class ItemizeElasticClient {
       // this wil not occur if an error is triggered
       // causing it to retry from the same point
       if (batchNumber === 0) {
-        await this.setIndexStatusInfo(
-          qualifiedPathName,
-          {
-            lastConsistencyCheck: timeRan.toISOString(),
-            signature: JSON.stringify({
-              limiters: limiters,
-            })
-          }
-        );
+        // so this exists in batch 0, we checked for everything and we have succeeded
+        // if we made it here, but we also received more records than we bargained for and
+        // hit the limit, this means we cannot be 100% sure we correctly
+        // did the consistency, plus records are not created when this duplicate corruption
+        // happens the consistency check needs to be ran again
+        if (!hasSomeDuplicateCorruptionAndMayHaveMore && !wasIneffective) {
+          await this.setIndexStatusInfo(
+            qualifiedPathName,
+            {
+              lastConsistencyCheck: timeRan.toISOString(),
+              signature: JSON.stringify({
+                limiters: limiters,
+              })
+            }
+          );
+          // was effective
+          return true;
+        }
+
+        // was not effective
+        return false;
+      } else {
+        return !wasIneffective;
       }
     } catch (err) {
       if (cursorIsOpen) {
