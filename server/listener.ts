@@ -2878,12 +2878,12 @@ export class Listener {
       event.propertyValue,
     );
 
-    this.awaitingPropertySearchEvents[mergedIndexIdentifier] = event;
-
     if (this.awaitingPropertySearchEvents[mergedIndexIdentifier]) {
       this.patchAwaitingSearchEvent(this.awaitingPropertySearchEvents[mergedIndexIdentifier], event);
       return;
     }
+
+    this.awaitingPropertySearchEvents[mergedIndexIdentifier] = event;
 
     setTimeout(() => {
       const redisEvent: IRedisEvent = {
@@ -2924,12 +2924,12 @@ export class Listener {
       event.parentVersion,
     );
 
-    this.awaitingParentedSearchEvents[mergedIndexIdentifier] = event;
-
     if (this.awaitingParentedSearchEvents[mergedIndexIdentifier]) {
       this.patchAwaitingSearchEvent(this.awaitingParentedSearchEvents[mergedIndexIdentifier], event);
       return;
     }
+
+    this.awaitingParentedSearchEvents[mergedIndexIdentifier] = event;
 
     setTimeout(() => {
       const redisEvent: IRedisEvent = {
@@ -2971,12 +2971,12 @@ export class Listener {
       event.parentVersion,
     );
 
-    this.awaitingOwnedParentedSearchEvents[mergedIndexIdentifier] = event;
-
     if (this.awaitingOwnedParentedSearchEvents[mergedIndexIdentifier]) {
       this.patchAwaitingSearchEvent(this.awaitingOwnedParentedSearchEvents[mergedIndexIdentifier], event);
       return;
     }
+
+    this.awaitingOwnedParentedSearchEvents[mergedIndexIdentifier] = event;
 
     setTimeout(() => {
       const redisEvent: IRedisEvent = {
