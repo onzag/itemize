@@ -389,7 +389,15 @@ export async function searchModule(
     if (resolverArgs.args.parent_id && resolverArgs.args.parent_type) {
       elasticQuery.mustTerm({
         parent_id: resolverArgs.args.parent_id,
-        parent_version: resolverArgs.args.parent_version || null,
+      }, {
+        groupId: "PARENT",
+      });
+      elasticQuery.mustTerm({
+        parent_version: resolverArgs.args.parent_version || "?NULL",
+      }, {
+        groupId: "PARENT",
+      });
+      elasticQuery.mustTerm({
         parent_type: resolverArgs.args.parent_type,
       }, {
         groupId: "PARENT",
@@ -1297,7 +1305,15 @@ export async function searchItemDefinition(
       if (resolverArgs.args.parent_id && resolverArgs.args.parent_type) {
         elasticQuery.mustTerm({
           parent_id: resolverArgs.args.parent_id,
-          parent_version: resolverArgs.args.parent_version || null,
+        }, {
+          groupId: "PARENT",
+        });
+        elasticQuery.mustTerm({
+          parent_version: resolverArgs.args.parent_version || "?NULL",
+        }, {
+          groupId: "PARENT",
+        });
+        elasticQuery.mustTerm({
           parent_type: resolverArgs.args.parent_type,
         }, {
           groupId: "PARENT",
