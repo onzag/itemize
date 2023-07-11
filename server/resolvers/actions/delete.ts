@@ -272,7 +272,10 @@ export async function deleteItemDefinition(
     itemDefinition,
     resolverArgs.args.id,
     resolverArgs.args.version,
-    resolverArgs.args.listener_uuid || null,
+    {
+      listenerUUID: resolverArgs.args.listener_uuid || null,
+      indexing: resolverArgs.args.indexing || "detached",
+    },
   );
 
   if (moduleTrigger) {

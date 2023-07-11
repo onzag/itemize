@@ -1384,6 +1384,10 @@ export const RESERVED_CHANGE_PROPERTIES = {
     type: GraphQLString,
     description: "An uuid to identify the creator of this action",
   },
+  indexing: {
+    type: GraphQLString,
+    description: "Respective to the indexing, specifically search engine indexes, what do to regarding it",
+  },
   parent_id: {
     type: GraphQLString,
     description: "A new parent to move this node to (the id)",
@@ -1446,6 +1450,10 @@ export const RESERVED_ADD_PROPERTIES = {
   listener_uuid: {
     type: GraphQLString,
     description: "An uuid to identify the creator of this action",
+  },
+  indexing: {
+    type: GraphQLString,
+    description: "Respective to the indexing, specifically search engine indexes, what do to regarding it",
   },
   in_behalf_of: {
     type: GraphQLString,

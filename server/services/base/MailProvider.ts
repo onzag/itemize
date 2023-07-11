@@ -1210,16 +1210,18 @@ export default class MailProvider<T> extends ServiceProvider<T> {
       if (replyOf) {
         // this message is not the tip of the given conversation anymore
         if (replyOf.tip) {
-          await this.localAppData.cache.requestUpdateSimple(
+          await this.localAppData.cache.requestUpdate(
             this.storageIdef,
             replyOf.id,
             replyOf.version || null,
             {
               tip: false,
             },
-            "en",
-            "simple",
-            replyOf,
+            {
+              currentSQLValue: replyOf,
+              dictionary: "simple",
+              language: "en",
+            }
           );
         }
         parent = {
@@ -1231,8 +1233,6 @@ export default class MailProvider<T> extends ServiceProvider<T> {
 
       storedMessages.push(await this.localAppData.cache.requestCreation(
         this.storageIdef,
-        idBase + "+" + potentialSender.id,
-        null,
         {
           uuid: uuidToUse,
           target: to,
@@ -1257,16 +1257,17 @@ export default class MailProvider<T> extends ServiceProvider<T> {
           ...optionalArgs,
           ...this.getExtraArgs(),
         },
-        potentialSender.id,
-        specifiedLanguage || potentialSender.app_language,
-        specifiedDictionary ||
-        this.localAppData.databaseConfig.dictionaries[potentialSender.app_language] ||
-        this.localAppData.databaseConfig.dictionaries["*"],
-        senderContainerId,
-        parent,
-        null,
         {
+          forId: idBase + "+" + potentialSender.id,
+          version: null,
           ignoreAlreadyExists: true,
+          language: specifiedLanguage || potentialSender.app_language,
+          dictionary: specifiedDictionary ||
+            this.localAppData.databaseConfig.dictionaries[potentialSender.app_language] ||
+            this.localAppData.databaseConfig.dictionaries["*"],
+          containerId: senderContainerId,
+          parent,
+          createdBy: potentialSender.id,
           // ensure we populate the stored messages
           // even if it's already existant
           ifAlreadyExistsReturn: "current",
@@ -1350,16 +1351,18 @@ export default class MailProvider<T> extends ServiceProvider<T> {
           if (replyOf) {
             // this message is not the tip of the given conversation anymore
             if (replyOf.tip) {
-              await this.localAppData.cache.requestUpdateSimple(
+              await this.localAppData.cache.requestUpdate(
                 this.storageIdef,
                 replyOf.id,
                 replyOf.version || null,
                 {
                   tip: false,
                 },
-                "en",
-                "simple",
-                replyOf,
+                {
+                  dictionary: "simple",
+                  language: "en",
+                  currentSQLValue: replyOf,
+                }
               );
             }
             parent = {
@@ -1388,24 +1391,24 @@ export default class MailProvider<T> extends ServiceProvider<T> {
               this.storageIdef,
               bestMatchStoredMessage.id,
               bestMatchStoredMessage.version,
-              idBase + "+" + user.id,
-              null,
-              targetContainerId,
-              user.id,
-              parent,
               {
-                is_sender: false,
-                is_receiver: true,
-                read: false,
-                spam: isSpam,
-              },
-              bestMatchStoredMessage,
-              {
+                targetId: idBase + "+" + user.id,
+                targetVersion: null,
+                targetContainerId,
+                targetCreatedBy: user.id,
+                targetParent: parent,
+                currentRawValueSQL: bestMatchStoredMessage,
                 // by default this will return null if it already exists
                 ignoreAlreadyExists: true,
                 // but we want to store it anyway so if it already exists we store
                 ifAlreadyExistsCall(v) {
                   storedMessages.push(v);
+                },
+                targetOverrides: {
+                  is_sender: false,
+                  is_receiver: true,
+                  read: false,
+                  spam: isSpam,
                 },
               },
             );
@@ -1413,8 +1416,6 @@ export default class MailProvider<T> extends ServiceProvider<T> {
             // the first time creating the message and consuming the streams
             messageForUser = await this.localAppData.cache.requestCreation(
               this.storageIdef,
-              idBase + "+" + user.id,
-              null,
               {
                 uuid: uuidToUse,
                 target: to,
@@ -1437,19 +1438,20 @@ export default class MailProvider<T> extends ServiceProvider<T> {
                 ...optionalArgs,
                 ...this.getExtraArgs(),
               },
-              user.id,
-              specifiedLanguageCode || user.app_language,
-              specifiedDictionary ||
-              this.localAppData.databaseConfig.dictionaries[user.app_language] ||
-              this.localAppData.databaseConfig.dictionaries["*"],
-              targetContainerId,
-              parent,
-              null,
               {
+                createdBy: user.id,
+                forId: idBase + "+" + user.id,
+                version: null,
+                language: specifiedLanguageCode || user.app_language,
+                dictionary: specifiedDictionary ||
+                this.localAppData.databaseConfig.dictionaries[user.app_language] ||
+                this.localAppData.databaseConfig.dictionaries["*"],
+                parent,
                 ignoreAlreadyExists: true,
                 ifAlreadyExistsCall(v) {
                   storedMessages.push(v);
                 },
+                containerId: targetContainerId,
               },
             );
           }
@@ -2082,16 +2084,18 @@ export default class MailProvider<T> extends ServiceProvider<T> {
       } else {
         // matching reply found, this will be connected
         if (replyOfForUser.tip) {
-          await cache.requestUpdateSimple(
+          await cache.requestUpdate(
             this.storageIdef,
             replyOfForUser.id,
             null,
             {
               tip: false,
             },
-            "en",
-            "simple",
-            replyOfForUser,
+            {
+              dictionary: "simple",
+              language: "en",
+              currentSQLValue: replyOfForUser,
+            }
           );
         }
         parent = {
@@ -2106,17 +2110,19 @@ export default class MailProvider<T> extends ServiceProvider<T> {
       this.storageIdef,
       message.id,
       message.version || null,
-      message.id.split("+")[0] + "+" + user.id,
-      null,
-      containerID,
-      user.id,
-      parent,
       {
-        tip: false,
-        spam: isSpam,
-        read: false,
-        is_sender: message.source === user.id,
-        is_receiver: message.target.includes(user.id),
+        targetId: message.id.split("+")[0] + "+" + user.id,
+        targetVersion: null,
+        targetContainerId: containerID,
+        targetCreatedBy: user.id,
+        targetParent: parent,
+        targetOverrides: {
+          tip: false,
+          spam: isSpam,
+          read: false,
+          is_sender: message.source === user.id,
+          is_receiver: message.target.includes(user.id),
+        },
       },
     );
   }
@@ -2418,16 +2424,18 @@ export default class MailProvider<T> extends ServiceProvider<T> {
               // the reply is not the tip anymore for this tree
               if (replyOf && replyOf.tip) {
                 // this reply is
-                replyOf = await arg.appData.cache.requestUpdateSimple(
+                replyOf = await arg.appData.cache.requestUpdate(
                   this.storageIdef,
                   replyOf.id,
                   replyOf.version || null,
                   {
                     tip: false,
                   },
-                  "en",
-                  "simple",
-                  replyOf,
+                  {
+                    dictionary: "simple",
+                    language: "en",
+                    currentSQLValue: replyOf,
+                  }
                 );
               }
 
@@ -2565,16 +2573,18 @@ export default class MailProvider<T> extends ServiceProvider<T> {
                           );
                         } else {
                           // the old reply is not the tip of the conversation anymore
-                          await arg.appData.cache.requestUpdateSimple(
+                          await arg.appData.cache.requestUpdate(
                             this.storageIdef,
                             idOfReplyForThatUser,
                             null,
                             {
                               tip: false,
                             },
-                            "en",
-                            "simple",
-                            replyOfForThatUser,
+                            {
+                              language: "en",
+                              dictionary: "simple",
+                              currentSQLValue: replyOfForThatUser,
+                            },
                           );
                           replyBasedParent = {
                             id: replyOfForThatUser.id,
@@ -2589,18 +2599,20 @@ export default class MailProvider<T> extends ServiceProvider<T> {
                         this.storageIdef,
                         arg.id,
                         arg.version,
-                        arg.id.split("+")[0] + "+" + targetUser.id,
-                        null,
-                        userContainerId,
-                        targetUser.id,
-                        replyBasedParent,
                         {
-                          spam: isSpam,
-                          read: false,
-                          is_sender: false,
-                          is_receiver: true,
+                          targetId: arg.id.split("+")[0] + "+" + targetUser.id,
+                          targetVersion: null,
+                          targetContainerId: userContainerId,
+                          currentRawValueSQL: arg.newValueSQL,
+                          targetParent: replyBasedParent,
+                          targetOverrides: {
+                            spam: isSpam,
+                            read: false,
+                            is_sender: false,
+                            is_receiver: true,
+                          },
+                          targetCreatedBy: targetUser.id,
                         },
-                        arg.newValueSQL,
                       );
 
                       // and let's do this, we are adding by target

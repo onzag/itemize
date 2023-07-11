@@ -62,6 +62,72 @@ interface IPropertyMapElementPointer {
   targetProperty: PropertyDefinition;
 }
 
+export interface IBasicOptions {
+  indexing?: "wait_for" | "detached";
+  listenerUUID?: string;
+  ignorePreSideEffects?: boolean;
+  ignoreSideEffects?: boolean;
+}
+
+export interface IDeleteOptions {
+  ignoreSideEffects?: boolean,
+  indexing?: "wait_for" | "detached";
+  listenerUUID?: string,
+}
+
+export interface IWritingOptions extends IBasicOptions {
+  ignoreAlreadyExists?: boolean;
+  ifAlreadyExistsReturn?: "null" | "current";
+  ifAlreadyExistsCall?: (v: ISQLTableRowValue) => void;
+}
+
+export interface ICreationOptions extends IWritingOptions {
+  forId?: string;
+  version?: string;
+  createdBy?: string;
+  language: string;
+  dictionary: string;
+  containerId: string;
+  parent?: {
+    id: string,
+    version: string,
+    type: string,
+  };
+}
+
+export interface ICopyOptions extends IWritingOptions {
+  targetId?: string;
+  targetVersion?: string;
+  targetContainerId?: string;
+  targetCreatedBy?: string;
+  targetParent?: {
+    id: string;
+    type: string;
+    version: string;
+  },
+  targetOverrides?: ISQLTableRowValue;
+  currentRawValueSQL?: ISQLTableRowValue;
+}
+
+export interface IUpdateOptions extends IBasicOptions {
+  currentSQLValue?: ISQLTableRowValue;
+  currentGQLValue?: IGQLValue;
+  editedBy?: string;
+  language: string;
+  dictionary: string;
+  containerId?: string;
+  reparent?: {
+    id: string,
+    version: string,
+    type: string,
+  };
+  blocking?: {
+    status: boolean,
+    reason: string,
+    until: string,
+  };
+}
+
 /**
   * This function finds modules for a given module, including its children
   * that do match a possible parent rule
@@ -917,43 +983,13 @@ export class Cache {
   /**
    * Request the creation of a new item definition value for an specific item definition
    * @param itemDefinition the item definition we refer to
-   * @param forId an optional (or null) value for the id that is meant to be created for, when
-   * forId is used the item should exist, note that the cache doesn't check for any of this
-   * @param version an optional (or null) version for the item definition
    * @param value the value to create, the value can be partial
-   * @param createdBy the creator of this item, it can be null, in which case the creator would be left unspecified
-   * @param dictionary the dictionary to use, this can be left null as well when no text field is present but it is
-   * recommended to be set, represents a postgresql dictionary for building text indexes
-   * @param parent the parent of this item, can be left null, note that no checks for parenting are done it will
-   * just execute
-   * @param parent.id the parent id
-   * @param parent.version the parent version
-   * @param parent.type the parent type
-   * @param listenerUUID the listener uuid
-   * @returns a total sql combined row value that can be converted into grapqhl
+   * @param options options as to create, some options are required
    */
   public async requestCreation(
     itemDefinition: ItemDefinition,
-    forId: string,
-    version: string,
     value: IGQLArgs | IGQLValue | ISQLTableRowValue,
-    createdBy: string,
-    language: string,
-    dictionary: string,
-    containerId: string,
-    parent: {
-      id: string,
-      version: string,
-      type: string,
-    },
-    listenerUUID: string,
-    options: {
-      ignorePreSideEffects?: boolean;
-      ignoreSideEffects?: boolean;
-      ignoreAlreadyExists?: boolean;
-      ifAlreadyExistsReturn?: "null" | "current";
-      ifAlreadyExistsCall?: (v: ISQLTableRowValue) => void;
-    } = {},
+    options: ICreationOptions,
   ): Promise<ISQLTableRowValue> {
     const selfTable = itemDefinition.getQualifiedPathName();
     const moduleTable = itemDefinition.getParentModule().getQualifiedPathName();
@@ -963,7 +999,8 @@ export class Cache {
         className: "Cache",
         methodName: "requestCreation",
         message: "Requesting creation for " + selfTable + " at module " +
-          moduleTable + " for id " + forId + " and version " + version + " created by " + createdBy + " using dictionary " + dictionary,
+          moduleTable + " for id " + options.forId + " and version " + options.version +
+          " created by " + options.createdBy + " using dictionary " + options.dictionary,
       },
     );
 
@@ -1042,8 +1079,8 @@ export class Cache {
             prefix: preSideEffectedProperty.include ? preSideEffectedProperty.include.getPrefixedQualifiedIdentifier() : "",
             property: preSideEffectedProperty.property,
             newValue,
-            rowId: forId,
-            rowVersion: version,
+            rowId: options.forId || null,
+            rowVersion: options.version || null,
             include: preSideEffectedProperty.include,
           });
 
@@ -1057,7 +1094,7 @@ export class Cache {
       }));
     }
 
-    const containerExists = containerId && this.storageClients[containerId];
+    const containerExists = options.containerId && this.storageClients[options.containerId];
 
     // now we extract the SQL information for both item definition table
     // and the module table, this value is database ready
@@ -1067,12 +1104,12 @@ export class Cache {
       itemDefinition,
       gqlValue, // when this is a SQL type it gets converted into the gql type so it can be processed here
       null,
-      containerExists ? this.storageClients[containerId] : null,
+      containerExists ? this.storageClients[options.containerId] : null,
       this.domain,
       // if this is a copy that is passing a SQL value and not specifying a language
       // then use what is found in the sql row and copy it
-      language ? language : (isSQLType ? value as ISQLTableRowValue : null),
-      dictionary ? dictionary : (isSQLType ? value as ISQLTableRowValue : null),
+      options.language ? options.language : (isSQLType ? value as ISQLTableRowValue : null),
+      options.dictionary ? options.dictionary : (isSQLType ? value as ISQLTableRowValue : null),
     );
     const sqlModDataComposed: ISQLStreamComposedTableRowValue = convertGQLValueToSQLValueForModule(
       this.serverData,
@@ -1080,10 +1117,10 @@ export class Cache {
       itemDefinition.getParentModule(),
       gqlValue, // when this is a SQL type it gets converted into the gql type so it can be processed here
       null,
-      containerExists ? this.storageClients[containerId] : null,
+      containerExists ? this.storageClients[options.containerId] : null,
       this.domain,
-      language ? language : (isSQLType ? value as ISQLTableRowValue : null),
-      dictionary ? dictionary : (isSQLType ? value as ISQLTableRowValue : null),
+      options.language ? options.language : (isSQLType ? value as ISQLTableRowValue : null),
+      options.dictionary ? options.dictionary : (isSQLType ? value as ISQLTableRowValue : null),
     );
     const sqlModData = sqlModDataComposed.value;
     const sqlIdefData = sqlIdefDataComposed.value;
@@ -1100,24 +1137,24 @@ export class Cache {
       "NOW()",
       [],
     ];
-    sqlModData.created_by = createdBy || UNSPECIFIED_OWNER;
-    sqlModData.version = version || "";
-    sqlModData.container_id = containerId;
+    sqlModData.created_by = options.createdBy || UNSPECIFIED_OWNER;
+    sqlModData.version = options.version || "";
+    sqlModData.container_id = options.containerId;
 
-    if (!forId && version) {
+    if (!options.forId && options.version) {
       throw new EndpointError({
         message: "You can't specify a version without a standard for_id value",
         code: ENDPOINT_ERRORS.FORBIDDEN,
       });
-    } else if (forId) {
+    } else if (options.forId) {
       // now this is important
-      sqlModData.id = forId;
+      sqlModData.id = options.forId;
 
       // let's find if such a value exists already
       const currentValue = await this.requestValue(
         itemDefinition,
-        forId,
-        version || null,
+        options.forId,
+        options.version || null,
       );
 
       // if there's one it's a forbidden action
@@ -1137,11 +1174,11 @@ export class Cache {
         });
       }
 
-      if (version) {
+      if (options.version) {
         // otherwise let's find the unversioned value if a version was specified
         const unversionedValue = await this.requestValue(
           itemDefinition,
-          forId,
+          options.forId,
           null,
         );
 
@@ -1155,6 +1192,7 @@ export class Cache {
       }
     }
 
+    const parent = options.parent;
     if (parent) {
       CAN_LOG_DEBUG && logger.debug(
         {
@@ -1231,8 +1269,8 @@ export class Cache {
           data: {
             selfTable,
             moduleTable,
-            forId,
-            version,
+            forId: options.forId,
+            version: options.version,
             sqlIdefData,
             sqlModData,
           },
@@ -1262,8 +1300,8 @@ export class Cache {
           data: {
             selfTable,
             moduleTable,
-            forId,
-            version,
+            forId: options.forId,
+            version: options.version,
           },
         }
       );
@@ -1281,8 +1319,8 @@ export class Cache {
           data: {
             selfTable,
             moduleTable,
-            forId,
-            version,
+            forId: options.forId,
+            version: options.version,
           },
         }
       );
@@ -1303,8 +1341,8 @@ export class Cache {
               data: {
                 selfTable,
                 moduleTable,
-                forId,
-                version,
+                forId: options.forId,
+                version: options.version,
               },
             }
           );
@@ -1321,10 +1359,13 @@ export class Cache {
         },
       );
       await this.forceCacheInto(selfTable, sqlValue.id, sqlValue.version, sqlValue, false);
+    })();
+
+    const indexingFn = async () => {
       const changeEvent: IChangedFeedbackEvent = {
         itemDefinition: selfTable,
         id: sqlValue.id,
-        version: version || null,
+        version: options.version || null,
         type: "created",
         lastModified: null,
       };
@@ -1344,8 +1385,8 @@ export class Cache {
               data: {
                 selfTable,
                 moduleTable,
-                forId,
-                version,
+                forId: options.forId,
+                version: options.version,
               },
             }
           );
@@ -1365,7 +1406,7 @@ export class Cache {
       this.listener.triggerChangedListeners(
         changeEvent,
         sqlValue,
-        listenerUUID,
+        options.listenerUUID,
       );
 
       const searchResultForThisValue: IGQLSearchRecord = {
@@ -1377,14 +1418,20 @@ export class Cache {
 
       this.triggerSearchListenersFor(
         itemDefinition,
-        createdBy,
+        options.createdBy,
         parent,
         null,
         propertyMap,
         searchResultForThisValue,
         "new",
       );
-    })();
+    };
+
+    if (options.indexing === "wait_for") {
+      await indexingFn();
+    } else {
+      indexingFn();
+    }
 
     // Execute side effects of modification according
     // to the given side effected types
@@ -1433,8 +1480,8 @@ export class Cache {
               data: {
                 selfTable,
                 moduleTable,
-                forId,
-                version,
+                forId: options.forId,
+                version: options.version,
               },
             },
           );
@@ -1464,33 +1511,16 @@ export class Cache {
     item: ItemDefinition | string,
     id: string,
     version: string,
-    targetId: string,
-    targetVersion: string,
-    targetContainerId?: string,
-    targetCreatedBy?: string,
-    targetParent?: {
-      id: string;
-      type: string;
-      version: string;
-    },
-    targetOverrides?: ISQLTableRowValue,
-    currentRawValueSQL?: ISQLTableRowValue,
-    options: {
-      ignorePreSideEffects?: boolean;
-      ignoreSideEffects?: boolean;
-      ignoreAlreadyExists?: boolean;
-      ifAlreadyExistsReturn?: "null" | "current";
-      ifAlreadyExistsCall?: (v: ISQLTableRowValue) => void;
-    } = {},
+    options: ICopyOptions = {},
   ): Promise<ISQLTableRowValue> {
     const itemDefinition = typeof item === "string" ?
       this.root.registry[item] as ItemDefinition :
       item;
 
-    const currentValueSrc = currentRawValueSQL || await this.requestValue(itemDefinition, id, version);
-    const valueToStore = targetOverrides ? {
+    const currentValueSrc = options.currentRawValueSQL || await this.requestValue(itemDefinition, id, version);
+    const valueToStore = options.targetOverrides ? {
       ...currentValueSrc,
-      ...targetOverrides,
+      ...options.targetOverrides,
     } : currentValueSrc;
 
     const allModuleFilesLocation = `${this.domain}/${itemDefinition.getParentModule().getQualifiedPathName()}/${id}.${version || ""}`;
@@ -1498,7 +1528,7 @@ export class Cache {
 
     const currentContainerId = valueToStore.container_id;
     const currentStorageClient = this.storageClients[currentContainerId];
-    const targetStorageClient = this.storageClients[targetContainerId || currentContainerId];
+    const targetStorageClient = this.storageClients[options.targetContainerId || currentContainerId];
 
     const hasModuleFiles = await currentStorageClient.exists(allModuleFilesLocation);
     const hasIdefFiles = await currentStorageClient.exists(allItemFilesLocation);
@@ -1511,20 +1541,21 @@ export class Cache {
     try {
       const value = await this.requestCreation(
         itemDefinition,
-        targetId,
-        targetVersion,
         valueToStore,
-        targetCreatedBy || currentValueSrc.created_by,
-        null,
-        null,
-        targetContainerId || currentContainerId,
-        targetParent || (currentValueSrc.parent_id ? {
-          id: currentValueSrc.parent_id,
-          type: currentValueSrc.parent_type,
-          version: currentValueSrc.parent_version || null,
-        } : null),
-        null,
-        options,
+        {
+          ...options,
+          containerId: options.targetContainerId || currentContainerId,
+          dictionary: null,
+          language: null,
+          forId: options.targetId,
+          version: options.targetVersion,
+          createdBy: options.targetCreatedBy || currentValueSrc.created_by,
+          parent: options.targetParent || (currentValueSrc.parent_id ? {
+            id: currentValueSrc.parent_id,
+            type: currentValueSrc.parent_type,
+            version: currentValueSrc.parent_version || null,
+          } : null),
+        },
       );
 
       targetModuleFilesLocation = `${this.domain}/${itemDefinition.getParentModule().getQualifiedPathName()}/${value.id}.${value.version || ""}`;
@@ -1556,7 +1587,7 @@ export class Cache {
                 err: err2,
                 data: {
                   targetModuleFilesLocation,
-                  targetContainerId,
+                  targetContainerId: options.targetContainerId,
                 },
               }
             );
@@ -1578,7 +1609,7 @@ export class Cache {
                 err: err2,
                 data: {
                   targetItemFilesLocation,
-                  targetContainerId,
+                  targetContainerId: options.targetContainerId,
                 },
               }
             );
@@ -1596,68 +1627,17 @@ export class Cache {
           data: {
             targetItemFilesLocation,
             targetModuleFilesLocation,
-            targetContainerId,
+            targetContainerId: options.targetContainerId,
             id,
             version,
-            targetId,
-            targetVersion,
+            targetId: options.targetId,
+            targetVersion: options.targetVersion,
           },
         }
       );
 
       throw err;
     }
-  }
-
-  /**
-   * Requests an update for an item definition in a simple way
-   * this might have more overhead than the normal request update
-   * @param itemDefinition the item definition in question
-   * @param id 
-   * @param version 
-   * @param update 
-   * @param dictionary 
-   */
-  public async requestUpdateSimple(
-    item: ItemDefinition | string,
-    id: string,
-    version: string,
-    update: IGQLArgs,
-    language: string,
-    dictionary: string,
-    currentRawValueSQL?: ISQLTableRowValue,
-    options?: {
-      ignorePreSideEffects?: boolean;
-      ignoreSideEffects?: boolean;
-    },
-  ): Promise<ISQLTableRowValue> {
-    const itemDefinition = typeof item === "string" ?
-      this.root.registry[item] as ItemDefinition :
-      item;
-
-    const currentValue = currentRawValueSQL || await this.requestValue(itemDefinition, id, version);
-    const currentValueAsGQL = convertSQLValueToGQLValueForItemDefinition(
-      this.serverData,
-      this.appData,
-      itemDefinition,
-      currentValue,
-    );
-    return await this.requestUpdate(
-      itemDefinition,
-      id,
-      version,
-      update,
-      currentValue,
-      currentValueAsGQL,
-      null,
-      language,
-      dictionary,
-      currentValue.container_id,
-      null,
-      null,
-      null,
-      options,
-    );
   }
 
   /**
@@ -1693,27 +1673,7 @@ export class Cache {
     id: string,
     version: string,
     update: IGQLArgs,
-    currentSQLValue: ISQLTableRowValue,
-    currentValue: IGQLValue,
-    editedBy: string,
-    language: string,
-    dictionary: string,
-    containerId: string,
-    listenerUUID: string,
-    reparent: {
-      id: string,
-      version: string,
-      type: string,
-    },
-    blocking: {
-      status: boolean,
-      reason: string,
-      until: string,
-    },
-    options: {
-      ignorePreSideEffects?: boolean;
-      ignoreSideEffects?: boolean;
-    } = {},
+    options: IUpdateOptions,
   ): Promise<ISQLTableRowValue> {
     const itemDefinition = item instanceof ItemDefinition ? item : this.root.registry[item] as ItemDefinition;
 
@@ -1739,6 +1699,15 @@ export class Cache {
       );
       throw err;
     }
+
+    const currentSQLValue = options.currentSQLValue || await this.requestValue(itemDefinition, id, version);
+    const editedBy = options.editedBy || UNSPECIFIED_OWNER;
+    const currentValueAsGQL = options.currentGQLValue || convertSQLValueToGQLValueForItemDefinition(
+      this.serverData,
+      this.appData,
+      itemDefinition,
+      currentSQLValue,
+    );
 
     const propertyMap: IPropertyMapElement[] = [];
     itemDefinition.getAllPropertyDefinitionsAndExtensions().forEach((pDef) => {
@@ -1798,8 +1767,8 @@ export class Cache {
         className: "Cache",
         methodName: "requestUpdate",
         message: "Requesting update for " + selfTable + " at module " +
-          moduleTable + " for id " + id + " and version " + version + " edited by " + editedBy + " using dictionary " + dictionary + " and " +
-          "container id " + containerId,
+          moduleTable + " for id " + id + " and version " + version + " edited by " + editedBy + " using dictionary " + options.dictionary + " and " +
+          "container id " + options.containerId,
       },
     );
 
@@ -1869,7 +1838,7 @@ export class Cache {
       }
     });
 
-    const containerExists = containerId && this.storageClients[containerId];
+    const containerExists = options.containerId && this.storageClients[options.containerId];
 
     // and we now build both queries for updating
     // we are telling by setting the partialFields variable
@@ -1881,11 +1850,11 @@ export class Cache {
       this.appData,
       itemDefinition,
       update,
-      currentValue,
-      containerExists ? this.storageClients[containerId] : null,
+      currentValueAsGQL,
+      containerExists ? this.storageClients[options.containerId] : null,
       this.domain,
-      language,
-      dictionary,
+      options.language,
+      options.dictionary,
       partialUpdateFields,
     );
     const sqlModDataComposed = convertGQLValueToSQLValueForModule(
@@ -1893,17 +1862,17 @@ export class Cache {
       this.appData,
       itemDefinition.getParentModule(),
       update,
-      currentValue,
-      containerExists ? this.storageClients[containerId] : null,
+      currentValueAsGQL,
+      containerExists ? this.storageClients[options.containerId] : null,
       this.domain,
-      language,
-      dictionary,
+      options.language,
+      options.dictionary,
       partialUpdateFields,
     );
     const sqlModData: IManyValueType = sqlModDataComposed.value;
     const sqlIdefData: IManyValueType = sqlIdefDataComposed.value;
 
-    let actualReparent = reparent;
+    let actualReparent = options.reparent;
     if (actualReparent) {
       const currentParent = {
         id: currentSQLValue.parent_id || null,
@@ -1932,36 +1901,36 @@ export class Cache {
         {
           className: "Cache",
           methodName: "requestUpdate",
-          message: "Re-parent specified is id " + reparent.id + " with version " + reparent.version + " and type " + reparent.type,
+          message: "Re-parent specified is id " + options.reparent.id + " with version " + options.reparent.version + " and type " + options.reparent.type,
         },
       );
-      sqlModData.parent_id = reparent.id;
+      sqlModData.parent_id = options.reparent.id;
       // the version can never be null, so we must cast it into the invalid
       // empty string value
-      sqlModData.parent_version = reparent.version || "";
-      sqlModData.parent_type = reparent.type;
+      sqlModData.parent_version = options.reparent.version || "";
+      sqlModData.parent_type = options.reparent.type;
     }
 
-    if (blocking) {
+    if (options.blocking) {
       CAN_LOG_DEBUG && logger.debug(
         {
           className: "Cache",
           methodName: "requestUpdate",
-          message: "Blocking for resource specified as " + blocking.status,
+          message: "Blocking for resource specified as " + options.blocking.status,
         },
       );
 
-      if (blocking.status) {
+      if (options.blocking.status) {
         sqlModData.blocked_at = [
           "NOW()",
           [],
         ];
         sqlModData.blocked_by = editedBy;
-        if (blocking.reason) {
-          sqlModData.blocked_reason = blocking.reason;
+        if (options.blocking.reason) {
+          sqlModData.blocked_reason = options.blocking.reason;
         }
-        if (blocking.until) {
-          sqlModData.blocked_until = blocking.until;
+        if (options.blocking.until) {
+          sqlModData.blocked_until = options.blocking.until;
         }
       } else {
         sqlModData.blocked_at = null;
@@ -2274,17 +2243,7 @@ export class Cache {
       })();
     }
 
-    // we return and this executes after it returns
-    (async () => {
-      CAN_LOG_DEBUG && logger.debug(
-        {
-          className: "Cache",
-          methodName: "requestUpdate",
-          message: "Storing cache value from the action",
-        },
-      );
-      await this.forceCacheInto(selfTable, id, version, sqlValue, false);
-
+    const indexingFn = async () => {
       if (this.elastic) {
         const language = itemDefinition.getSearchEngineMainLanguageFromRow(sqlValue);
         try {
@@ -2307,6 +2266,24 @@ export class Cache {
           );
         }
       }
+    }
+
+    if (options.indexing === "wait_for") {
+      await indexingFn();
+    } else {
+      indexingFn();
+    }
+
+    // we return and this executes after it returns
+    (async () => {
+      CAN_LOG_DEBUG && logger.debug(
+        {
+          className: "Cache",
+          methodName: "requestUpdate",
+          message: "Storing cache value from the action",
+        },
+      );
+      await this.forceCacheInto(selfTable, id, version, sqlValue, false);
 
       const changeEvent: IChangedFeedbackEvent = {
         itemDefinition: selfTable,
@@ -2328,7 +2305,7 @@ export class Cache {
       this.listener.triggerChangedListeners(
         changeEvent,
         sqlValue,
-        listenerUUID || null,
+        options.listenerUUID || null,
       );
 
       const searchRecord: IGQLSearchRecord = {
@@ -2507,7 +2484,6 @@ export class Cache {
                 r.id,
                 r.version || null,
                 r.container_id,
-                null,
               );
             } catch (err) {
               logger.error(
@@ -2548,10 +2524,7 @@ export class Cache {
     item: ItemDefinition | string,
     id: string,
     version: string,
-    listenerUUID: string,
-    options: {
-      ignoreSideEffects?: boolean,
-    } = {},
+    options: IDeleteOptions = {},
   ): Promise<void> {
     const itemDefinition = typeof item === "string" ?
       this.root.registry[item] as ItemDefinition :
@@ -2729,7 +2702,7 @@ export class Cache {
         this.listener.triggerChangedListeners(
           changeEvent,
           null,
-          listenerUUID || null,
+          options.listenerUUID || null,
         );
         // we don't await for this delete to happen
         deleteFilesInContainer(row.container_id, record.version);
@@ -2887,7 +2860,7 @@ export class Cache {
         });
 
         // and now we can see all what we have dropped
-        allVersionsDropped.forEach((row) => {
+        await Promise.all(allVersionsDropped.map(async (row) => {
           // this version can be null (aka empty string)
           // we need to construct the record
           // the last modified is the transaction time of the deletition
@@ -2909,8 +2882,12 @@ export class Cache {
           // we update the caches
           // we do this without awaiting, as for all it concerns
           // our action is done and only events will need to fire
-          performProperDeleteOf(row, record, parent, createdBy, trackedProperties);
-        });
+          if (options.indexing === "wait_for") {
+            await performProperDeleteOf(row, record, parent, createdBy, trackedProperties);
+          } else {
+            performProperDeleteOf(row, record, parent, createdBy, trackedProperties);
+          }
+        }));
       } else {
         const deleteQueryBase = `DELETE FROM ${JSON.stringify(moduleTable)} WHERE ` +
           `"id" = $1 AND "version" = $2 AND "type" = $3 RETURNING ${returningElementsModule}`;
@@ -3000,7 +2977,11 @@ export class Cache {
         } : null;
         const createdBy = row.created_by;
         // we don't want to await any of this
-        performProperDeleteOf(row, record, parent, createdBy, trackedProperties);
+        if (options.indexing === "wait_for") {
+          await performProperDeleteOf(row, record, parent, createdBy, trackedProperties);
+        } else {
+          performProperDeleteOf(row, record, parent, createdBy, trackedProperties);
+        }
       }
 
       if (rowsToPerformDeleteSideEffects && rowsToPerformDeleteSideEffects.length) {

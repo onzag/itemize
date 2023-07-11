@@ -406,23 +406,26 @@ export async function editItemDefinition(
       resolverArgs.args.id,
       resolverArgs.args.version || null,
       gqlValueToConvert,
-      wholeSqlStoredValue,
-      currentWholeValueAsGQL,
-      tokenData.id,
-      resolverArgs.args.language,
-      dictionary,
-      wholeSqlStoredValue.container_id as string,
-      resolverArgs.args.listener_uuid || null,
-      isReparenting ? {
-        id: gqlValueToConvert.parent_id as string,
-        version: gqlValueToConvert.parent_version as string,
-        type: gqlValueToConvert.parent_type as string,
-      } : null,
-      (isToUnblock || isToBlock) ? {
-        reason: resolverArgs.args.blocked_reason,
-        status: resolverArgs.args.blocked,
-        until: resolverArgs.args.blocked_until,
-      } : null,
+      {
+        currentGQLValue: currentWholeValueAsGQL,
+        currentSQLValue: wholeSqlStoredValue,
+        editedBy: tokenData.id,
+        language: resolverArgs.args.language,
+        dictionary,
+        containerId: wholeSqlStoredValue.container_id as string,
+        listenerUUID: resolverArgs.args.listener_uuid || null,
+        reparent: isReparenting ? {
+          id: gqlValueToConvert.parent_id as string,
+          version: gqlValueToConvert.parent_version as string,
+          type: gqlValueToConvert.parent_type as string,
+        } : null,
+        blocking: (isToUnblock || isToBlock) ? {
+          reason: resolverArgs.args.blocked_reason,
+          status: resolverArgs.args.blocked,
+          until: resolverArgs.args.blocked_until,
+        } : null,
+        indexing: resolverArgs.args.indexing || "detached",
+      },
     );
 
     CAN_LOG_DEBUG && logger.debug(

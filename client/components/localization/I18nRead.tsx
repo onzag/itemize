@@ -398,6 +398,10 @@ export default function I18nRead(props: II18nReadProps) {
                   const idef = itemDefOrModule instanceof ItemDefinition ? itemDefOrModule : null;
                   const mod: Module = idef ? idef.getParentModule() : itemDefOrModule as Module;
 
+                  if (!idef && !mod) {
+                    throw new Error("The given context for " + props.context + " does not exist");
+                  }
+
                   return (
                     <I18nReadInternalOptimized
                       {...props}
@@ -473,6 +477,10 @@ export function useI18nRead(options: I18nReadOptions): React.ReactNode {
   
     const idef = itemDefOrModule instanceof ItemDefinition ? itemDefOrModule : null;
     const mod: Module = idef ? idef.getParentModule() : itemDefOrModule as Module;
+
+    if (!idef && !mod) {
+      throw new Error("The given context for " + options.context + " does not exist");
+    }
 
     return i18nReadInternal(
       localeContext,

@@ -546,6 +546,16 @@ export interface IActionSubmitOptions extends IActionCleanOptions {
    * This allows to clear the state from the local database and free the space
    */
   clearStoredStateIfConnected?: boolean;
+  /**
+   * Specifices what to do about searchengine indexes, wait for ensures that search engine indexes have been (tried) to be
+   * updated before the request is released from the server, while the indexing may have failed (and that's silent) this can be
+   * used to wait for indexing to be attempted and done/or fail just so that in most cases scenarios after this is released
+   * search shall be guaranteed to contain updated results to whatever changed occurred
+   * 
+   * this doesn't apply for SQL indexes that don't use search engine, SQL indexes are consistent and are assured to be consistent
+   * this is only concerning search engine synchronization
+   */
+  indexing?: "wait_for" | "detached";
 }
 
 /**
@@ -4931,7 +4941,7 @@ export class ActualItemProvider extends
       });
     }
 
-    if (options.cachePolicy !== "none" && options.useSearchEngine) {
+    if (options.cachePolicy && options.cachePolicy !== "none" && options.useSearchEngine) {
       // using a cache policy and then listening for changes could result in catasthrope if a record
       // is invalid (inconsistent) in the search engine, the client will not realize and then ask to get fed
       // changes, an invalid record may therefore remain invalid even after is fixed in a consistency check

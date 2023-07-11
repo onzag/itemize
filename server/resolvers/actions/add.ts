@@ -493,19 +493,22 @@ export async function addItemDefinition(
     // are valid and do not create strange data structures
     const value = await appData.cache.requestCreation(
       itemDefinition,
-      forId || resolverArgs.args.for_id || null,
-      typeof forVersion !== "undefined" ? forVersion : (resolverArgs.args.version || null),
       gqlValueToConvert,
-      finalOwner,
-      resolverArgs.args.language,
-      dictionary,
-      containerId,
-      isNowParenting ? {
-        id: gqlValueToConvert.parent_id as string,
-        version: gqlValueToConvert.parent_version as string,
-        type: gqlValueToConvert.parent_type as string,
-      } : null,
-      resolverArgs.args.listener_uuid || null,
+      {
+        forId: forId || resolverArgs.args.for_id || null,
+        version: typeof forVersion !== "undefined" ? forVersion : (resolverArgs.args.version || null),
+        createdBy: finalOwner,
+        language: resolverArgs.args.language,
+        dictionary,
+        containerId,
+        parent: isNowParenting ? {
+          id: gqlValueToConvert.parent_id as string,
+          version: gqlValueToConvert.parent_version as string,
+          type: gqlValueToConvert.parent_type as string,
+        } : null,
+        listenerUUID: resolverArgs.args.listener_uuid || null,
+        indexing: resolverArgs.args.indexing || "detached",
+      },
     );
 
     CAN_LOG_DEBUG && logger.debug(
