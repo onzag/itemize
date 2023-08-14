@@ -1470,7 +1470,7 @@ export class RemoteListener {
    * result that is cached by owner
    * @param event the owned search event
    */
-  private async onOwnedSearchRecordsEvent(
+  public async onOwnedSearchRecordsEvent(
     event: IOwnedSearchRecordsEvent,
   ) {
     this.pushTestingInfo(
@@ -1530,7 +1530,7 @@ export class RemoteListener {
    * result that is cached by parent
    * @param event the parent search records added event
    */
-  private async onParentedSearchRecordsEvent(
+  public async onParentedSearchRecordsEvent(
     event: IParentedSearchRecordsEvent,
   ) {
     this.pushTestingInfo(
@@ -1588,7 +1588,7 @@ export class RemoteListener {
     }
   }
 
-  private async onPropertySearchRecordsEvent(
+  public async onPropertySearchRecordsEvent(
     event: IPropertySearchRecordsEvent,
   ) {
     this.pushTestingInfo(
@@ -1648,7 +1648,7 @@ export class RemoteListener {
    * result that is cached by parent
    * @param event the parent search records added event
    */
-  private async onOwnedParentedSearchRecordsEvent(
+  public async onOwnedParentedSearchRecordsEvent(
     event: IOwnedParentedSearchRecordsEvent,
   ) {
     this.pushTestingInfo(

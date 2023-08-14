@@ -1286,6 +1286,7 @@ export async function runAddQueryFor(
     waitAndMerge?: boolean,
     progresser?: ProgresserFn,
   },
+  options: IRunQueryOptions,
 ): Promise<{
   error: EndpointErrorType,
   value: IGQLValue,
@@ -1321,6 +1322,7 @@ export async function runAddQueryFor(
       arg.fields,
       arg.cacheStore,
     );
+
     return {
       error,
       value: mergedResults.value,
@@ -1509,9 +1511,13 @@ interface IRunSearchQueryArg extends ISearchQueryArg {
   progresser?: ProgresserFn;
 }
 
+interface IRunQueryOptions {
+  remoteListener: RemoteListener;
+}
+
 interface IRunSearchQuerySearchOptions {
-  remoteListener: RemoteListener,
-  preventCacheStaleFeeback: boolean,
+  remoteListener: RemoteListener;
+  preventCacheStaleFeeback: boolean;
 }
 
 interface IRunSearchQueryResult {

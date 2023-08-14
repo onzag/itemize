@@ -521,15 +521,17 @@ export const customUserQueries = (appData: IAppDataType): IGQLQueryFieldsDefinit
         }
 
         try {
-          await appData.cache.requestUpdateSimple(
+          await appData.cache.requestUpdate(
             userIdef,
             decoded.validateUserId,
             null,
             {
               [decoded.validateType === "email" ? "e_validated" : "p_validated"]: true,
             },
-            null,
-            null,
+            {
+              dictionary: "simple",
+              language: "en",
+            }
           );
         } catch (err) {
           logger.error(
@@ -1379,15 +1381,17 @@ export const customUserQueries = (appData: IAppDataType): IGQLQueryFieldsDefinit
         }
 
         try {
-          await appData.cache.requestUpdateSimple(
+          await appData.cache.requestUpdate(
             userIdef,
             userId,
             null,
             {
               password: args.new_password,
             },
-            null,
-            null,
+            {
+              dictionary: "simple",
+              language: "en",
+            },
           );
         } catch (err) {
           logger.error(

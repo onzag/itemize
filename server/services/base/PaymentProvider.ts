@@ -673,18 +673,17 @@ export default class PaymentProvider<T> extends ServiceProvider<T> {
     // we are however ignoring the pre side effects
     // because we want to allow to modify the read only
     // rometadata field
-    await this.localAppData.cache.requestUpdateSimple(
+    await this.localAppData.cache.requestUpdate(
       paymentObject.item,
       paymentObject.location.id,
       paymentObject.location.version,
       paymentObject.include ? {
         [paymentObject.include.getQualifiedIdentifier()]: update,
       } : update,
-      null,
-      null,
-      paymentObject.rowValue,
       {
         ignorePreSideEffects: true,
+        language: "en",
+        dictionary: "simple",
       }
     );
   }
