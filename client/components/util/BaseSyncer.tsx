@@ -1,9 +1,6 @@
 import React, { useRef, useCallback, useEffect, useState, useMemo } from "react";
 import type { EndpointErrorType } from "../../../base/errors";
-import type { IGQLValue } from "../../../gql-querier";
 import CacheWorkerInstance from "../../internal/workers/cache";
-import { IActionResponseWithValue, ItemProvider } from "../../providers/item";
-import { ModuleProvider } from "../../providers/module";
 
 export interface IBaseSyncerHandle {
   onDismount: (id: string) => void;
@@ -28,20 +25,39 @@ export interface IBaseSyncerHandleMechanism {
    * synced, note that this variable may change values quickly and dramatically for example
    * say a syncer managed to sync but with the data retrieved new elements are added to add
    * to the syncing queue, in this sense, it will change drastically and it's not recommended
-   * to use this value, use syncedDelayed instead which will try to make up for these
+   * to use this value, use gracefulTreeSynced instead which will try to make up for these
    */
-  synced: boolean;
+  treeSynced: boolean;
 
   /**
    * whether it is currently synced except it prevents value flickering by adding a delay
+   * the value always starts in a false state
    */
-  syncedDelayed: boolean;
+  gracefulTreeSynced: boolean;
+
+  /**
+   * Similarly to gracefulTreeSynced but once it syncs for the first time it never goes
+   * to an unsynced state, basically specifies whether it has synced at least once
+   */
+  gracefulTreeHasSynced: boolean;
 
   /**
    * Whether it is synced up to this level and this level alone, for example in an ItemSyncer
    * this means that all the item data is loaded, in an search syncer that the search has been done
    */
   selfSynced: boolean;
+
+  /**
+   * Whether this layer and this layer alone is currently synced and prevents value flickering by adding
+   * a delay
+   */
+  gracefulSelfSynced: boolean;
+
+  /**
+   * Similarly to gracefulSelfSynced but once it syncs for the first time it never goes
+   * to an unsynced state, basically specifies whether it has synced at least once
+   */
+  gracefulSelfHasSynced: boolean;
 
   /**
    * Whether it has failed to synchronize, whether itself or at any children level
@@ -79,8 +95,13 @@ export function useHandleMechanism(
   // the syncing may pop on and off as more items get added to the syncing queue as
   // so this will add a time to make it to avoid this flickering in the synced
   // element
+  const [treeSyncedDelayed, setTreeSyncedDelayed] = useState(false);
+  const [treeSyncedDelayedOnce, setTreeSyncedDelayedOnce] = useState(false);
+  const treeSyncedDelayedTimer = useRef(null as NodeJS.Timer);
+
   const [selfSyncedDelayed, setSelfSyncedDelayed] = useState(false);
-  const syncedDelayedTimer = useRef(null as NodeJS.Timer);
+  const [selfSyncedDelayedOnce, setSelfSyncedDelayedOnce] = useState(false);
+  const selfSyncedDelayedTimer = useRef(null as NodeJS.Timer);
 
   // determine if dependants are synced
   const isDepedantsSync = useCallback(() => {
@@ -120,7 +141,7 @@ export function useHandleMechanism(
     }
 
     return () => {
-      clearTimeout(syncedDelayedTimer.current);
+      clearTimeout(treeSyncedDelayedTimer.current);
     }
   }, []);
 
@@ -141,12 +162,34 @@ export function useHandleMechanism(
     }
   }, [id]);
 
+  const selfSynced = depsFailedSync ? false : (depsSynced && synced);
   // on whether it is synced
   useEffect(() => {
     if (handle) {
-      handle.setSync(id, depsFailedSync ? false : (depsSynced && synced));
+      handle.setSync(id, selfSynced);
     }
-  }, [depsSynced, synced, depsFailedSync]);
+  }, [id, selfSynced]);
+  useEffect(() => {
+    if (selfSynced !== selfSyncedDelayed) {
+      clearTimeout(selfSyncedDelayedTimer.current);
+      // will only pop when it's stable
+      selfSyncedDelayedTimer.current = setTimeout(() => {
+        setSelfSyncedDelayed(selfSynced);
+        selfSyncedDelayedTimer.current = null;
+      }, 100);
+
+      // it's equal but there's likely a timer trying
+      // to change that fact
+    } else if (selfSyncedDelayedTimer.current) {
+      clearTimeout(selfSyncedDelayedTimer.current);
+      selfSyncedDelayedTimer.current = null;
+    }
+  }, [selfSynced, selfSyncedDelayed]);
+  useEffect(() => {
+    if (selfSyncedDelayed && !selfSyncedDelayedOnce) {
+      setSelfSyncedDelayedOnce(true);
+    }
+  }, [selfSyncedDelayed, selfSyncedDelayedOnce]);
 
   // on whether it has failed sync
   useEffect(() => {
@@ -169,21 +212,26 @@ export function useHandleMechanism(
   // state flickering
   useEffect(() => {
     const state = depsFailedSync ? false : (depsSynced && synced);
-    if (state !== selfSyncedDelayed) {
-      clearTimeout(syncedDelayedTimer.current);
+    if (state !== treeSyncedDelayed) {
+      clearTimeout(treeSyncedDelayedTimer.current);
       // will only pop when it's stable
-      syncedDelayedTimer.current = setTimeout(() => {
-        setSelfSyncedDelayed(state);
-        syncedDelayedTimer.current = null;
+      treeSyncedDelayedTimer.current = setTimeout(() => {
+        setTreeSyncedDelayed(state);
+        treeSyncedDelayedTimer.current = null;
       }, 100);
 
-    // it's equal but there's likely a timer trying
-    // to change that fact
-    } else if (syncedDelayedTimer.current) {
-      clearTimeout(syncedDelayedTimer.current);
-      syncedDelayedTimer.current = null;
+      // it's equal but there's likely a timer trying
+      // to change that fact
+    } else if (treeSyncedDelayedTimer.current) {
+      clearTimeout(treeSyncedDelayedTimer.current);
+      treeSyncedDelayedTimer.current = null;
     }
-  }, [depsSynced, selfSyncedDelayed, synced]);
+  }, [depsSynced, treeSyncedDelayed, synced]);
+  useEffect(() => {
+    if (treeSyncedDelayed && !treeSyncedDelayedOnce) {
+      setTreeSyncedDelayedOnce(true);
+    }
+  }, [treeSyncedDelayed, treeSyncedDelayedOnce]);
 
   // own handle removal
   const handleDismount = useCallback((id: string) => {
@@ -225,9 +273,12 @@ export function useHandleMechanism(
   return {
     ready,
     handle: ownHandle,
-    synced: depsFailedSync ? false : (depsSynced && synced),
+    treeSynced: depsFailedSync ? false : (depsSynced && synced),
     selfSynced: synced,
-    syncedDelayed: selfSyncedDelayed,
+    gracefulTreeSynced: treeSyncedDelayed,
+    gracefulSelfSynced: selfSyncedDelayed,
+    gracefulSelfHasSynced: selfSyncedDelayedOnce,
+    gracefulTreeHasSynced: treeSyncedDelayedOnce,
     failedSync: failed || depsFailedSync,
     failedSyncErr: err || depsFailedSyncErr,
   }
@@ -239,17 +290,17 @@ interface IBaseSyncerProps {
    */
   id: string;
 
-  /**
-   * Called whenever the sync state changes
-   * you should assume true at the start
-   */
-  setSync?: (state: boolean) => void;
-  /**
-   * An error may be available if one produced it
-   * another reason for a failed sync could be that
-   * no storage engine is available at all
-   */
-  onFailedSync?: (err?: EndpointErrorType) => void;
+  // /**
+  //  * Called whenever the sync state changes
+  //  * you should assume true at the start
+  //  */
+  // setSync?: (state: boolean) => void;
+  // /**
+  //  * An error may be available if one produced it
+  //  * another reason for a failed sync could be that
+  //  * no storage engine is available at all
+  //  */
+  // onFailedSync?: (err?: EndpointErrorType) => void;
 
   /**
    * allow for fallback if cache worker is not available

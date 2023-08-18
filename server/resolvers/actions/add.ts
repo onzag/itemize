@@ -118,6 +118,7 @@ export async function addItemDefinition(
       root: appData.root,
       tokenData: tokenData,
       environment: CustomRoleGranterEnvironment.CREATION,
+      user: tokenData,
       requestArgs: resolverArgs.args,
       owner: ownerId,
       parent: isParenting ? {

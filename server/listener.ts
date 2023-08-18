@@ -187,11 +187,11 @@ export class Listener {
   private server: Server;
   private customRoles: ICustomRoleType[];
 
-  private awaitingBasicEvent: {[key: string]: IChangedFeedbackEvent} = {};
-  private awaitingOwnedSearchEvents: {[key: string]: IOwnedSearchRecordsEvent} = {};
-  private awaitingOwnedParentedSearchEvents: {[key: string]: IOwnedParentedSearchRecordsEvent} = {};
-  private awaitingParentedSearchEvents: {[key: string]: IParentedSearchRecordsEvent} = {};
-  private awaitingPropertySearchEvents: {[key: string]: IPropertySearchRecordsEvent} = {};
+  private awaitingBasicEvent: { [key: string]: IChangedFeedbackEvent } = {};
+  private awaitingOwnedSearchEvents: { [key: string]: IOwnedSearchRecordsEvent } = {};
+  private awaitingOwnedParentedSearchEvents: { [key: string]: IOwnedParentedSearchRecordsEvent } = {};
+  private awaitingParentedSearchEvents: { [key: string]: IParentedSearchRecordsEvent } = {};
+  private awaitingPropertySearchEvents: { [key: string]: IPropertySearchRecordsEvent } = {};
 
   constructor(
     buildnumber: string,
@@ -661,6 +661,7 @@ export class Listener {
         rawDB: this.rawDB,
         item: itemDefinition,
         tokenData: listenerData.user,
+        user: listenerData.user,
         module: itemDefinition.getParentModule(),
         root: this.root,
         value: value ? convertSQLValueToGQLValueForItemDefinition(
@@ -804,6 +805,7 @@ export class Listener {
           rawDB: this.rawDB,
           item: itemDefinitionOrModule instanceof ItemDefinition ? itemDefinitionOrModule : null,
           tokenData: listenerData.user,
+          user: listenerData.user,
           module: itemDefinitionOrModule instanceof Module ? itemDefinitionOrModule : itemDefinitionOrModule.getParentModule(),
           root: this.root,
           value: null,
@@ -979,6 +981,7 @@ export class Listener {
           rawDB: this.rawDB,
           item: itemDefinitionOrModule instanceof ItemDefinition ? itemDefinitionOrModule : null,
           tokenData: listenerData.user,
+          user: listenerData.user,
           module: itemDefinitionOrModule instanceof Module ? itemDefinitionOrModule : itemDefinitionOrModule.getParentModule(),
           root: this.root,
           value: null,
@@ -1112,6 +1115,7 @@ export class Listener {
           rawDB: this.rawDB,
           item: itemDefinitionOrModule instanceof ItemDefinition ? itemDefinitionOrModule : null,
           tokenData: listenerData.user,
+          user: listenerData.user,
           module: itemDefinitionOrModule instanceof Module ? itemDefinitionOrModule : itemDefinitionOrModule.getParentModule(),
           root: this.root,
           value: null,
@@ -1250,6 +1254,7 @@ export class Listener {
           rawDB: this.rawDB,
           item: itemDefinitionOrModule instanceof ItemDefinition ? itemDefinitionOrModule : null,
           tokenData: listenerData.user,
+          user: listenerData.user,
           module: itemDefinitionOrModule instanceof Module ? itemDefinitionOrModule : itemDefinitionOrModule.getParentModule(),
           root: this.root,
           value: null,
@@ -1384,6 +1389,7 @@ export class Listener {
           rawDB: this.rawDB,
           item: itemDefinitionOrModule instanceof ItemDefinition ? itemDefinitionOrModule : null,
           tokenData: listenerData.user,
+          user: listenerData.user,
           module: itemDefinitionOrModule instanceof Module ? itemDefinitionOrModule : itemDefinitionOrModule.getParentModule(),
           root: this.root,
           value: null,
@@ -1645,6 +1651,7 @@ export class Listener {
           rawDB: this.rawDB,
           item: itemDefinitionOrModule instanceof ItemDefinition ? itemDefinitionOrModule : null,
           tokenData: listenerData.user,
+          user: listenerData.user,
           module: itemDefinitionOrModule instanceof Module ? itemDefinitionOrModule : itemDefinitionOrModule.getParentModule(),
           root: this.root,
           value: null,
@@ -1907,6 +1914,7 @@ export class Listener {
           rawDB: this.rawDB,
           item: itemDefinitionOrModule instanceof ItemDefinition ? itemDefinitionOrModule : null,
           tokenData: listenerData.user,
+          user: listenerData.user,
           module: itemDefinitionOrModule instanceof Module ? itemDefinitionOrModule : itemDefinitionOrModule.getParentModule(),
           root: this.root,
           value: null,
@@ -2176,6 +2184,7 @@ export class Listener {
           rawDB: this.rawDB,
           item: itemDefinitionOrModule instanceof ItemDefinition ? itemDefinitionOrModule : null,
           tokenData: listenerData.user,
+          user: listenerData.user,
           module: itemDefinitionOrModule instanceof Module ? itemDefinitionOrModule : itemDefinitionOrModule.getParentModule(),
           root: this.root,
           value: null,
@@ -2416,6 +2425,7 @@ export class Listener {
         rawDB: this.rawDB,
         item: itemDefinition,
         tokenData: listenerData.user,
+        user: listenerData.user,
         module: itemDefinition.getParentModule(),
         root: this.root,
         value: value ? convertSQLValueToGQLValueForItemDefinition(
@@ -2774,7 +2784,7 @@ export class Listener {
     } = {}
   ) {
     const mergedIndexIdentifier = event.itemDefinition + "." + event.id + "." + (event.version || "");
-    
+
     if (this.awaitingBasicEvent[mergedIndexIdentifier]) {
       // patch it and go
       const currentLastModified = new NanoSecondComposedDate(this.awaitingBasicEvent[mergedIndexIdentifier].lastModified);
@@ -2802,7 +2812,7 @@ export class Listener {
       };
 
       delete this.awaitingBasicEvent[mergedIndexIdentifier];
-  
+
       // due to data we avoid logging this, data can be fairly large
       CAN_LOG_DEBUG && logger.debug(
         {
@@ -2816,7 +2826,7 @@ export class Listener {
           },
         },
       );
-  
+
       this.redisGlobalPub.redisClient.publish(mergedIndexIdentifier, JSON.stringify(redisEvent));
     }, 250);
   }
@@ -2848,9 +2858,9 @@ export class Listener {
         serverInstanceGroupId: options.noInstanceGroupId ? null : INSTANCE_GROUP_ID,
         source: "global",
       };
-  
+
       delete this.awaitingOwnedSearchEvents[mergedIndexIdentifier];
-      
+
       CAN_LOG_DEBUG && logger.debug(
         {
           className: "Listener",
@@ -2861,7 +2871,7 @@ export class Listener {
           }
         },
       );
-  
+
       this.redisGlobalPub.redisClient.publish(mergedIndexIdentifier, JSON.stringify(redisEvent));
     }, 250);
   }

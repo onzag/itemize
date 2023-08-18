@@ -67,10 +67,15 @@ interface ITotalPagedSearchLoaderProps {
    * this is why total is the better option
    */
   static?: "TOTAL" | "NO_LISTENING";
+  /**
+   * The location of the page identifier in the querystring
+   * by default it is p
+   */
+  queryStringPageLocation?: string;
 }
 
 interface ITotalPagedSearchLoaderState {
-  p: string;
+  [pLoc: string]: string;
   r: string;
 }
 
@@ -80,6 +85,7 @@ interface IActualTotalPagedSearchLoaderProps extends ITotalPagedSearchLoaderProp
   count: number;
   state: ITotalPagedSearchLoaderState;
   setState: (s: Partial<ITotalPagedSearchLoaderState>) => void;
+  pLoc: string;
 }
 
 /**
@@ -106,7 +112,7 @@ class ActualTotalPagedSearchLoader extends React.PureComponent<IActualTotalPaged
 
       // current page is 0 indexed whereas the qs parameter is 1 indexed for user understanding
       this.props.setState({
-        p: (currentPage + 2).toString(),
+        [this.props.pLoc]: (currentPage + 2).toString(),
         r: "t",
       });
     }
@@ -120,7 +126,7 @@ class ActualTotalPagedSearchLoader extends React.PureComponent<IActualTotalPaged
 
       // current page is 0 indexed whereas the qs parameter is 1 indexed for user understanding
       this.props.setState({
-        p: currentPage.toString(),
+        [this.props.pLoc]: currentPage.toString(),
         r: "t",
       });
     }
@@ -150,7 +156,7 @@ class ActualTotalPagedSearchLoader extends React.PureComponent<IActualTotalPaged
 
     // page is a 0 indexed number, and we expect that so in order to set the right state
     this.props.setState({
-      p: (page + 1).toString(),
+      [this.props.pLoc]: (page + 1).toString(),
       r: "t",
     });
   }
@@ -166,7 +172,7 @@ class ActualTotalPagedSearchLoader extends React.PureComponent<IActualTotalPaged
       if (actualP !== 0) {
         // this is rFlagged
         this.props.setState({
-          p: "1",
+          [this.props.pLoc]: "1",
           r: "t",
         });
       }
@@ -180,7 +186,7 @@ class ActualTotalPagedSearchLoader extends React.PureComponent<IActualTotalPaged
   public componentDidUpdate(prevProps: Readonly<IActualTotalPagedSearchLoaderProps>): void {
     // when going back or moving around sometimes we get out of bounds
     if (!this.isOutOfBounds && this.props.limit !== null) {
-      let actualP = parseInt(this.props.state.p, 10) || 1;
+      let actualP = parseInt(this.props.state[this.props.pLoc], 10) || 1;
       actualP--;
       const currentPage = actualP;
       const pagesBeforeThis = this.props.offset / this.props.pageSize;
@@ -195,7 +201,7 @@ class ActualTotalPagedSearchLoader extends React.PureComponent<IActualTotalPaged
     }
   }
   public render() {
-    let actualP = parseInt(this.props.state.p, 10) || 1;
+    let actualP = parseInt(this.props.state[this.props.pLoc], 10) || 1;
     actualP--;
 
     const currentPage = actualP;
@@ -312,7 +318,7 @@ export class TotalPagedSearchLoader extends React.PureComponent<ITotalPagedSearc
       r: "t",
     }
   }
-  public renderPagedLoader(limit: number, offset: number, count: number, state: ITotalPagedSearchLoaderState, setState: (qs: Partial<ITotalPagedSearchLoaderState>) => void) {
+  public renderPagedLoader(limit: number, offset: number, count: number, state: ITotalPagedSearchLoaderState, setState: (qs: Partial<ITotalPagedSearchLoaderState>) => void, pLoc: string) {
     return (
       <ActualTotalPagedSearchLoader
         {...this.props}
@@ -321,6 +327,7 @@ export class TotalPagedSearchLoader extends React.PureComponent<ITotalPagedSearc
         count={count}
         state={state}
         setState={setState}
+        pLoc={pLoc}
       />
     );
   }
@@ -334,11 +341,12 @@ export class TotalPagedSearchLoader extends React.PureComponent<ITotalPagedSearc
               itemContext.searchOffset,
               itemContext.searchCount,
               this.state,
-              this.setState as any,
+              this.setState.bind(this) as any,
+              "p",
             );
           }
           return (
-            <LocationStateReader defaultState={{ p: "1", r: "f" }} stateIsInQueryString={true}>
+            <LocationStateReader defaultState={{ [this.props.queryStringPageLocation || "p"]: "1", r: "f" }} stateIsInQueryString={true}>
               {(state, setState) => {
                 return this.renderPagedLoader(
                   itemContext.searchLimit,
@@ -346,6 +354,7 @@ export class TotalPagedSearchLoader extends React.PureComponent<ITotalPagedSearc
                   itemContext.searchCount,
                   state,
                   setState,
+                  this.props.queryStringPageLocation || "p",
                 );
               }}
             </LocationStateReader>

@@ -65,6 +65,12 @@ interface ISearchLoaderWithPaginationProps {
   paginationVariant?: "text" | "outlined";
 
   /**
+   * Specifies the query string parameter to use in the query string to keep the page number
+   * by default it is p
+   */
+  queryStringPageLocation?: string;
+
+  /**
    * make accessible with the alt badge reactioner
    */
   accessible?: boolean;
@@ -140,6 +146,7 @@ export function SearchLoaderWithPagination(props: ISearchLoaderWithPaginationPro
       onOutOfBounds={props.onTotalOutOfBounds}
       static={props.static}
       enableExternalChecks={props.enableExternalChecks}
+      queryStringPageLocation={props.queryStringPageLocation}
     >
       {(arg) => {
         const handlePageChange = (e: React.ChangeEvent, value: number) => {

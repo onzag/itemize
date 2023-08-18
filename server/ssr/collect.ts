@@ -706,6 +706,7 @@ export class Collector {
         } : null,
         requestArgs: null,
         tokenData: this.appliedRule.forUser,
+        user: this.appliedRule.forUser,
         value: rowValue ? convertSQLValueToGQLValueForItemDefinition(
           this.appData.cache.getServerData(),
           this.appData,

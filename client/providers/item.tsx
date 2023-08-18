@@ -185,6 +185,10 @@ export interface IActionResponseWithSearchResults extends IBasicActionResponse {
   limit: number;
   offset: number;
   cached: boolean;
+  /**
+   * Only truly relevant when pileSearch is used
+   */
+  cancelled: boolean;
 }
 
 export type PolicyPathType = [string, string, string];
@@ -360,7 +364,8 @@ export interface IActionCleanOptions {
   cleanStateOnAny?: boolean;
 }
 
-type ActionSubmitOptionCb = (lastResponse: IActionSubmitResponse) => Partial<IActionSubmitOptions>;
+type ActionSubmitOptionCb = (lastResponse: IActionSubmitResponse, lastOptions: IActionSubmitOptions) => Partial<IActionSubmitOptions> | boolean;
+type ActionSearchOptionCb = (lastResponse: IActionResponseWithSearchResults, lastOptions: IActionSearchOptions) => Partial<IActionSearchOptions> | boolean;
 
 /**
  * The options for submitting, ediitng, adding, etc...
@@ -919,9 +924,10 @@ export interface IActionSearchOptions extends IActionCleanOptions {
   createdByFilter?: string[];
 
   /**
-   * TODO implement pile search
+   * Pile search allows to pile search queries one on top of another and resolve conflicts that could be caused
+   * by searching while searching, passing a boolean puts things in a queue where the last search is executed
    */
-  pileSearch?: boolean;
+  pileSearch?: boolean | ActionSearchOptionCb;
 }
 
 /**
@@ -2117,8 +2123,12 @@ export class ActualItemProvider extends
   private submitBlockPromises: Array<Promise<any>> = [];
 
   // the list of submit block promises
-  private activeSubmitPromise: Promise<IActionSubmitResponse> = null;
+  private activeSubmitPromise: Promise<{ response: IActionSubmitResponse, options: IActionSubmitOptions }> = null;
   private activeSubmitPromiseAwaiter: string = null;
+
+  // the list of search block promises
+  private activeSearchPromise: Promise<{ response: IActionResponseWithSearchResults, options: IActionSearchOptions }> = null;
+  private activeSearchPromiseAwaiter: string = null;
 
   // sometimes reload calls can come in batches due to triggering actions
   // it doesn't hurt to catch them all and create a timeout
@@ -4016,6 +4026,7 @@ export class ActualItemProvider extends
         count: null,
         error: emulatedError,
         cached: false,
+        cancelled: false,
       };
     } else {
       return {
@@ -4356,6 +4367,16 @@ export class ActualItemProvider extends
 
     // if we are already submitting
     let options = originalOptions;
+
+    const cancelledResponse = {
+      id: originalOptions.submitForId !== "undefined" ? options.submitForId : this.props.forId,
+      version: originalOptions.submitForVersion !== "undefined" ? options.submitForVersion : this.props.forVersion,
+      cancelled: true,
+      deletedState: false,
+      storedState: false,
+      error: null as any,
+    };
+
     if (this.state.submitting || this.activeSubmitPromise) {
       if (originalOptions.pileSubmit) {
         const id = uuid.v4();
@@ -4367,23 +4388,23 @@ export class ActualItemProvider extends
         // we must not execute, we have been cancelled
         if (this.activeSubmitPromiseAwaiter !== id) {
           // cancelled
-          return {
-            id: originalOptions.submitForId !== "undefined" ? options.submitForId : this.props.forId,
-            version: originalOptions.submitForVersion !== "undefined" ? options.submitForVersion : this.props.forVersion,
-            cancelled: true,
-            deletedState: false,
-            storedState: false,
-            error: null,
-          };
+          return cancelledResponse;
         }
 
         this.activeSubmitPromiseAwaiter = null;
 
         // patch the submit action
         if (typeof originalOptions.pileSubmit === "function") {
-          options = {
-            ...options,
-            ...originalOptions.pileSubmit(lastResponse),
+          const optionsOverride = originalOptions.pileSubmit(lastResponse.response, lastResponse.options);
+
+          if (optionsOverride === false) {
+            // cancel
+            return cancelledResponse;
+          } else if (optionsOverride !== true) {
+            options = {
+              ...options,
+              ...optionsOverride,
+            }
           }
         }
       } else {
@@ -4392,8 +4413,10 @@ export class ActualItemProvider extends
     }
 
     let activeSubmitPromiseResolve = null as any;
-    this.activeSubmitPromise = new Promise((resolve) => {
+    let activeSubmitPromiseReject = null as any;
+    this.activeSubmitPromise = new Promise((resolve, reject) => {
       activeSubmitPromiseResolve = resolve;
+      activeSubmitPromiseReject = reject;
     });
 
     const isValid = this.checkItemStateValidity(options);
@@ -4425,7 +4448,7 @@ export class ActualItemProvider extends
         false,
       ) as IActionSubmitResponse;
       this.activeSubmitPromise = null;
-      activeSubmitPromiseResolve(returnValue);
+      activeSubmitPromiseResolve({ response: returnValue, options });
 
       // if it's not poked already, let's poke it
       return returnValue;
@@ -4445,11 +4468,17 @@ export class ActualItemProvider extends
     // now checking the option for the before submit function, if it returns
     // false we cancel the submit request, we don't check policies yet
     if (options.beforeSubmit) {
-      const result = await options.beforeSubmit();
-      if (!result) {
+      try {
+        const result = await options.beforeSubmit();
+        if (!result) {
+          this.activeSubmitPromise = null;
+          activeSubmitPromiseResolve({ response: cancelledResponse, options });
+          return cancelledResponse;
+        }
+      } catch (err) {
         this.activeSubmitPromise = null;
-        activeSubmitPromiseResolve(null);
-        return null;
+        activeSubmitPromiseReject(err);
+        throw err;
       }
     }
 
@@ -4460,7 +4489,10 @@ export class ActualItemProvider extends
       this.props.itemDefinitionInstance;
 
     if (!itemDefinitionToSubmitFor) {
-      throw new Error("Could not determine the item definition to submit for, " + options.submitForItem);
+      const err = new Error("Could not determine the item definition to submit for, " + options.submitForItem);
+      this.activeSubmitPromise = null;
+      activeSubmitPromiseReject(err);
+      throw err;
     }
 
     // now we are going to build our query
@@ -4515,7 +4547,7 @@ export class ActualItemProvider extends
           deletedState: false,
           cancelled: false,
         }
-        activeSubmitPromiseResolve();
+        activeSubmitPromiseResolve({ response: returnValue, options });
         return returnValue;
       }
 
@@ -4529,7 +4561,7 @@ export class ActualItemProvider extends
         ENDPOINT_ERRORS.NOTHING_TO_UPDATE,
       ) as IActionSubmitResponse;
       this.activeSubmitPromise = null;
-      activeSubmitPromiseResolve(returnValue);
+      activeSubmitPromiseResolve({ response: returnValue, options });
 
       // if it's not poked already, let's poke it
       return returnValue;
@@ -4666,6 +4698,8 @@ export class ActualItemProvider extends
         waitAndMerge: options.waitAndMerge,
         containerId,
         progresser: options.progresser,
+      }, {
+        remoteListener: this.props.remoteListener,
       });
       value = totalValues.value;
       error = totalValues.error;
@@ -4778,7 +4812,7 @@ export class ActualItemProvider extends
     this.props.onSubmit && this.props.onSubmit(result);
 
     this.activeSubmitPromise = null;
-    activeSubmitPromiseResolve(result);
+    activeSubmitPromiseResolve({ response: result, options });
 
     return result;
   }
@@ -4895,9 +4929,9 @@ export class ActualItemProvider extends
     }
   }
   public async search(
-    options: IActionSearchOptions,
+    originalOptions: IActionSearchOptions,
   ): Promise<IActionResponseWithSearchResults> {
-    if (!options) {
+    if (!originalOptions) {
       return;
     }
 
@@ -4913,8 +4947,53 @@ export class ActualItemProvider extends
     const preventSearchFeedbackOnPossibleStaleData = this.preventSearchFeedbackOnPossibleStaleData;
     this.preventSearchFeedbackOnPossibleStaleData = false;
 
-    if (this.state.searching) {
-      throw new Error("Can't search while searching, please consider your calls");
+    let options = originalOptions;
+
+    const cancelledResponse: IActionResponseWithSearchResults = {
+      searchId: null,
+      cached: false,
+      count: null,
+      limit: options.limit,
+      offset: options.offset,
+      records: null,
+      results: null,
+      cancelled: true,
+      error: null,
+    };
+
+    if (this.state.searching || this.activeSearchPromise) {
+      if (originalOptions.pileSearch) {
+        const id = uuid.v4();
+        this.activeSearchPromiseAwaiter = id;
+
+        const lastResponse = await this.activeSearchPromise;
+
+        // another pile element has overtaken us
+        // we must not execute, we have been cancelled
+        if (this.activeSearchPromiseAwaiter !== id) {
+          // cancelled
+          return cancelledResponse;
+        }
+
+        this.activeSubmitPromiseAwaiter = null;
+
+        // patch the submit action
+        if (typeof originalOptions.pileSearch === "function") {
+          const optionsOverride = originalOptions.pileSearch(lastResponse.response, lastResponse.options);
+
+          if (optionsOverride === false) {
+            // cancel
+            return cancelledResponse;
+          } else if (optionsOverride !== true) {
+            options = {
+              ...options,
+              ...optionsOverride,
+            }
+          }
+        }
+      } else {
+        throw new Error("Can't search while searching, please consider your calls");
+      }
     }
 
     if (options.searchByProperties.includes("created_by") && options.createdBy) {
@@ -4990,6 +5069,7 @@ export class ActualItemProvider extends
       const result = this.giveEmulatedInvalidError("searchError", false, true) as IActionResponseWithSearchResults;
       this.props.onWillSearch && this.props.onWillSearch();
       this.props.onSearch && this.props.onSearch(result);
+
       return result;;
     }
 
@@ -5170,6 +5250,13 @@ export class ActualItemProvider extends
     } else if ((listenPolicy === "by-parent" || listenPolicy === "by-owner-and-parent") && (!parentedBy || !parentedBy.id)) {
       throw new Error("Listen policy is by-parent yet there's no parent specified with a specific id");
     }
+
+    let activeSearchPromiseResolve = null as any;
+    let activeSearchPromiseReject = null as any;
+    this.activeSearchPromise = new Promise((resolve, reject) => {
+      activeSearchPromiseResolve = resolve;
+      activeSearchPromiseReject = reject;
+    });
 
     const {
       results,
@@ -5432,8 +5519,11 @@ export class ActualItemProvider extends
       offset,
       error,
       cached,
+      cancelled: false,
     };
     this.props.onSearch && this.props.onSearch(result);
+    this.activeSearchPromise = null;
+    activeSearchPromiseResolve({response: result, options});
     return result;
   }
   public dismissLoadError() {

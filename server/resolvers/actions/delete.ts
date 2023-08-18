@@ -96,6 +96,7 @@ export async function deleteItemDefinition(
           module: itemDefinition.getParentModule(),
           root: appData.root,
           tokenData: tokenData,
+          user: tokenData,
           environment: CustomRoleGranterEnvironment.REMOVAL,
           requestArgs: resolverArgs.args,
           owner: ownerUserId,

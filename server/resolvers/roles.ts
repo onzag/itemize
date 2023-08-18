@@ -20,7 +20,20 @@ export enum CustomRoleGranterEnvironment {
 }
 
 export interface ICustomRoleGranterArg {
+  /**
+   * This is the token data for the user that performed
+   * the action and not the expected creator/owner
+   * @deprecated use user instead
+   */
   tokenData: IServerSideTokenDataType;
+  /**
+   * This is the user information for the user that performed
+   * the action and not the expected creator/owner
+   * 
+   * Do not use this attribute to know who owns an item, use owner
+   * instead and it can vary when performing actions in behalf of someone else
+   */
+  user: IServerSideTokenDataType;
   cache: Cache;
   databaseConnection: DatabaseConnection;
   rawDB: ItemizeRawDB;
@@ -29,13 +42,23 @@ export interface ICustomRoleGranterArg {
   value: IGQLValue;
   environment: CustomRoleGranterEnvironment;
   requestArgs: IGQLArgs;
+  /**
+   * Represents the expected owner of the given item
+   * and it's affected by executing actions in behalf of someone else
+   */
   owner: string;
   root: Root;
+  /**
+   * The known or expected parent of the item
+   */
   parent: {
     id: string;
     type: string;
     version: string;
   };
+  /**
+   * When creating, if a custom id is given this field will contain it
+   */
   customId: string;
 }
 

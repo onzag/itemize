@@ -128,6 +128,7 @@ export async function editItemDefinition(
             module: itemDefinition.getParentModule(),
             root: appData.root,
             tokenData: tokenData,
+            user: tokenData,
             environment: CustomRoleGranterEnvironment.MODIFYING,
             requestArgs: resolverArgs.args,
             owner: ownerUserId,
