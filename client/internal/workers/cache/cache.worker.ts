@@ -396,6 +396,7 @@ export default class CacheWorker {
     id: string,
     version: string,
     value: any,
+    lastModifiedOfKnownValue: string,
   ) {
     // console.log("REQUESTED TO STORE STATE FOR", qualifiedName, id, version, value);
 
@@ -414,7 +415,7 @@ export default class CacheWorker {
     // and try to save it in the database, notice how we setup the expirarion
     // date
     try {
-      await this.db.put(STATES_TABLE_NAME, value, queryIdentifier);
+      await this.db.put(STATES_TABLE_NAME, {...value, METADATA: {lastModifiedOfKnownValue: lastModifiedOfKnownValue || null}}, queryIdentifier);
     } catch (err) {
       console.warn(err);
       return false;
@@ -427,7 +428,7 @@ export default class CacheWorker {
     qualifiedName: string,
     id: string,
     version: string,
-  ) {
+  ): Promise<[any, {lastModifiedOfKnownValue: string}]> {
     // console.log("REQUESTED STORED STATE FOR", qualifiedName, id, version);
 
     await this.waitForSetupPromise;
@@ -445,7 +446,10 @@ export default class CacheWorker {
     // and try to save it in the database, notice how we setup the expirarion
     // date
     try {
-      return await this.db.get(STATES_TABLE_NAME, queryIdentifier);
+      const value = await this.db.get(STATES_TABLE_NAME, queryIdentifier);
+      const METADATA = value.METADATA;
+      delete value.METADATA;
+      return [value, METADATA];
     } catch (err) {
       console.warn(err);
       return null;

@@ -103,7 +103,7 @@ export async function editItemDefinition(
         id: resolverArgs.args.id,
         version: resolverArgs.args.version,
         role: tokenData.role,
-      userId: tokenData.id,
+        userId: tokenData.id,
         gqlArgValue: resolverArgs.args,
         gqlFlattenedRequestedFiels: requestedFields,
         appData,
@@ -169,11 +169,25 @@ export async function editItemDefinition(
               code: ENDPOINT_ERRORS.BLOCKED,
             });
           }
+
+          if (resolverArgs.args.if_last_modified && content.last_modified !== resolverArgs.args.if_last_modified) {
+            CAN_LOG_DEBUG && logger.debug(
+              {
+                functionName: "editItemDefinition",
+                message: "Failed due to element failing last modified check",
+              },
+            );
+
+            throw new EndpointError({
+              message: "The item conflicts with its last modification date",
+              code: ENDPOINT_ERRORS.CONFLICT,
+            });
+          }
         },
       },
     );
 
-    await validateParentingRules(
+    const knownParent = await validateParentingRules(
       appData,
       resolverArgs.args.parent_id,
       resolverArgs.args.parent_version || null,
@@ -325,6 +339,7 @@ export async function editItemDefinition(
             id: resolverArgs.args.parent_id as string,
             version: resolverArgs.args.parent_version as string,
             type: resolverArgs.args.parent_type as string,
+            value: knownParent,
           } : null,
           requestedUpdateCreatedBy: null,
           newValue: null,
@@ -372,6 +387,7 @@ export async function editItemDefinition(
             id: resolverArgs.args.parent_id as string,
             version: resolverArgs.args.parent_version as string,
             type: resolverArgs.args.parent_type as string,
+            value: knownParent,
           } : null,
           requestedUpdateCreatedBy: null,
           newValue: null,
@@ -462,6 +478,7 @@ export async function editItemDefinition(
           id: gqlValueToConvert.parent_id as string,
           version: gqlValueToConvert.parent_version as string,
           type: gqlValueToConvert.parent_type as string,
+          value: knownParent,
         } : null,
         newValue: gqlValue,
         newValueSQL: sqlValue,
@@ -519,6 +536,7 @@ export async function editItemDefinition(
           id: gqlValueToConvert.parent_id as string,
           version: gqlValueToConvert.parent_version as string,
           type: gqlValueToConvert.parent_type as string,
+          value: knownParent,
         } : null,
         newValue: gqlValue,
         newValueSQL: sqlValue,

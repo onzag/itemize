@@ -204,7 +204,8 @@ error.USER_EMAIL_TAKEN = this email has been taken already
 error.USER_PHONE_TAKEN = this phone number has been taken already
 error.INVALID_PROPERTY = invalid property
 error.INVALID_INCLUDE = invalid include
-error.INVALID_POLICY = policy security checks have failed`
+error.INVALID_POLICY = policy security checks have failed
+error.CONFLICT = version conflict`
 
 const fi = `[fi]
 name = suomi
@@ -412,7 +413,8 @@ error.USER_EMAIL_TAKEN = this email has been taken already
 error.USER_PHONE_TAKEN = this phone number has been taken already
 error.INVALID_PROPERTY = invalid property
 error.INVALID_INCLUDE = invalid include
-error.INVALID_POLICY = policy security checks have failed`
+error.INVALID_POLICY = policy security checks have failed
+error.CONFLICT = version conflict`
 
 const ru = `[ru]
 name = suomi
@@ -620,7 +622,8 @@ error.USER_EMAIL_TAKEN = this email has been taken already
 error.USER_PHONE_TAKEN = this phone number has been taken already
 error.INVALID_PROPERTY = invalid property
 error.INVALID_INCLUDE = invalid include
-error.INVALID_POLICY = policy security checks have failed`
+error.INVALID_POLICY = policy security checks have failed
+error.CONFLICT = version conflict`
 
 const de = `[de]
 name = Deutsch
@@ -828,7 +831,8 @@ error.USER_EMAIL_TAKEN = Diese E-Mail-Adresse ist bereits vergeben.
 error.USER_PHONE_TAKEN = Diese Telefonnummer ist bereits vergeben.
 error.INVALID_PROPERTY = ungültige Eigenschaft
 error.INVALID_INCLUDE = ungültige Einbindung
-error.INVALID_POLICY = Sicherheitsabfrage gescheitert`
+error.INVALID_POLICY = Sicherheitsabfrage gescheitert
+error.CONFLICT = Versionskonflikt`
 
 const es = `[es]
 name = español
@@ -1036,7 +1040,8 @@ error.USER_EMAIL_TAKEN = el email ya ha sido tomado por otro usuario
 error.USER_PHONE_TAKEN = el número telefónico ya ha sido tomado por otro usuario
 error.INVALID_PROPERTY = propiedad inválida
 error.INVALID_INCLUDE = elemento de inclusión inválido
-error.INVALID_POLICY = chequeos de seguridad han fallado`
+error.INVALID_POLICY = chequeos de seguridad han fallado
+error.CONFLICT = conflicto de versiones`
 
 const ar = `[ar]
 name = العربية
@@ -1244,7 +1249,8 @@ error.USER_EMAIL_TAKEN = هذا البريد مأخوذ حاليا
 error.USER_PHONE_TAKEN = هذا الهاتف مأخوذ حاليا
 error.INVALID_PROPERTY = خاصية غير مناسبة
 error.INVALID_INCLUDE = مضمون غير مناسب
-error.INVALID_POLICY = فشل إجراءات السياسة الأمنية`
+error.INVALID_POLICY = فشل إجراءات السياسة الأمنية
+error.CONFLICT = تعارض الإصدار`
 
 const ALL = {en, fi, ru, de, es, ar};
 

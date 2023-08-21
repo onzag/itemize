@@ -222,7 +222,7 @@ export async function addItemDefinition(
       }
     }
 
-    await validateParentingRules(
+    const knownParent = await validateParentingRules(
       appData,
       resolverArgs.args.parent_id,
       resolverArgs.args.parent_version || null,
@@ -402,6 +402,7 @@ export async function addItemDefinition(
             id: gqlValueToConvert.parent_id as string,
             version: gqlValueToConvert.parent_version as string,
             type: gqlValueToConvert.parent_type as string,
+            value: knownParent,
           } : null,
           requestedUpdateToBlock: false,
           requestedUpdateToUnblock: false,
@@ -453,6 +454,7 @@ export async function addItemDefinition(
             id: gqlValueToConvert.parent_id as string,
             version: gqlValueToConvert.parent_version as string,
             type: gqlValueToConvert.parent_type as string,
+            value: knownParent,
           } : null,
           requestedUpdateCreatedBy: ownerId,
           requestedUpdateToBlock: false,
@@ -548,6 +550,7 @@ export async function addItemDefinition(
           id: gqlValueToConvert.parent_id as string,
           version: gqlValueToConvert.parent_version as string,
           type: gqlValueToConvert.parent_type as string,
+          value: knownParent,
         } : null,
         requestedUpdateCreatedBy: ownerId,
         requestedUpdateToBlock: false,
@@ -605,6 +608,7 @@ export async function addItemDefinition(
           id: gqlValueToConvert.parent_id as string,
           version: gqlValueToConvert.parent_version as string,
           type: gqlValueToConvert.parent_type as string,
+          value: knownParent,
         } : null,
         requestedUpdateCreatedBy: ownerId,
         newValue: gqlValue,

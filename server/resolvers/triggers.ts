@@ -86,6 +86,7 @@ export interface IOTriggerArgType {
     id: string;
     version: string;
     type: string;
+    value: ISQLTableRowValue;
   }
   /**
    * Whether the requested update is trying to set the state

@@ -363,6 +363,7 @@ export const ENDPOINT_ERRORS = {
   USER_EMAIL_TAKEN: "USER_EMAIL_TAKEN",
   USER_PHONE_TAKEN: "USER_PHONE_TAKEN",
   NOT_FOUND: "NOT_FOUND",
+  CONFLICT: "CONFLICT",
 };
 
 /**
@@ -1411,6 +1412,10 @@ export const RESERVED_CHANGE_PROPERTIES = {
   blocked_until: {
     type: GraphQLString,
     description: "A date in the future to make a temporary blockage",
+  },
+  if_last_modified: {
+    type: GraphQLString,
+    description: "Will only edit if the current value was last modified at the exact given date otherwise raises a conflict error",
   },
 };
 

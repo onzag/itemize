@@ -548,6 +548,8 @@ export interface IActionSubmitOptions extends IActionCleanOptions {
    * After a draft has been used, it's likely that you don't need this value anymore as it reflects what the server side holds, so
    * storeStateIfCantConnect option and clearStoredStateIfConnected tend to be used in conjunction
    * 
+   * when a successful submit is executed that is the state will be cleared
+   * 
    * This allows to clear the state from the local database and free the space
    */
   clearStoredStateIfConnected?: boolean;
@@ -561,6 +563,16 @@ export interface IActionSubmitOptions extends IActionCleanOptions {
    * this is only concerning search engine synchronization
    */
   indexing?: "wait_for" | "detached";
+  /**
+   * Specify the last modified value of the current value in an edit action and it will only overwrite values
+   * if the last modified matches what is given here, this is for usage of concurrency when making updates with offline
+   * support by storing states in drafts, when using onStateLoadedFromStore you will receive metadata that specifies the last_modified
+   * signature of the given known loaded value when it was attempted to be written (be so one was loaded) this will allow to specify that 
+   * lastModifiedOfKnownValue as the ifLastModified so a CONFLICT error will be raised if the submit fails to write due to that reason
+   * 
+   * You may resolve conflicts manually
+   */
+  ifLastModified?: string;
 }
 
 /**
@@ -1626,7 +1638,7 @@ export interface IItemProviderProps {
    * On state changes but from the store that is loaded
    * from a cache worker
    */
-  onStateLoadedFromStore?: (state: IItemStateType, fns: IBasicFns) => void;
+  onStateLoadedFromStore?: (state: IItemStateType, metadata: {lastModifiedOfKnownValue: string}, fns: IBasicFns) => void;
   /**
    * Runs when the state was stored for whatever reason
    */
@@ -2911,14 +2923,19 @@ export class ActualItemProvider extends
   private async storeStateDelayed() {
     if (this.props.storeStateOnChange) {
       const serializable = ItemDefinition.getSerializableState(this.state.itemState);
-      const storedState = await CacheWorkerInstance.instance.storeState(
+      const stateWasStored = await CacheWorkerInstance.instance.storeState(
         this.props.itemDefinitionQualifiedName,
         this.props.forId || null,
         this.props.forVersion || null,
         serializable,
+        (
+          this.state.itemState &&
+          this.state.itemState.gqlOriginalFlattenedValue &&
+          (this.state.itemState.gqlOriginalFlattenedValue as any).last_modified
+        ) || null,
       );
 
-      if (storedState) {
+      if (stateWasStored) {
         this.props.onStateStored && this.props.onStateStored(this.state.itemState);
       } else {
         this.props.onStateStoreFailed && this.props.onStateStoreFailed(this.state.itemState);
@@ -3206,7 +3223,7 @@ export class ActualItemProvider extends
   }
   public async loadStoredState() {
     if (CacheWorkerInstance.isSupported) {
-      const storedState = await CacheWorkerInstance.instance.retrieveState(
+      const [storedState, metadata] = await CacheWorkerInstance.instance.retrieveState(
         this.props.itemDefinitionQualifiedName,
         this.props.forId || null,
         this.props.forVersion || null,
@@ -3227,7 +3244,7 @@ export class ActualItemProvider extends
         this.setState({
           itemState: this.getItemState(),
         }, () => {
-          this.props.onStateLoadedFromStore && this.props.onStateLoadedFromStore(storedState, {
+          this.props.onStateLoadedFromStore && this.props.onStateLoadedFromStore(storedState, metadata, {
             submit: this.submit,
             delete: this.delete,
             reload: this.loadValue,
@@ -4581,6 +4598,14 @@ export class ActualItemProvider extends
       argumentsForQuery.in_behalf_of = options.inBehalfOf;
     }
 
+    if (options.indexing) {
+      argumentsForQuery.indexing = options.indexing;
+    }
+
+    if (options.ifLastModified) {
+      argumentsForQuery.if_last_modified = options.ifLastModified;
+    }
+
     // now it's when we are actually submitting
     if (!this.isUnmounted) {
       this.setState({
@@ -4720,6 +4745,10 @@ export class ActualItemProvider extends
           this.props.forId || null,
           this.props.forVersion || null,
         );
+        const appliedValue = this.props.itemDefinitionInstance.getGQLAppliedValue(
+          this.props.forId || null,
+          this.props.forVersion || null,
+        );
         const serializable = ItemDefinition.getSerializableState(state);
         storedState = await CacheWorkerInstance.instance.storeState(
           // eh its the same as itemDefinitionToRetrieveDataFrom
@@ -4727,6 +4756,7 @@ export class ActualItemProvider extends
           this.props.forId || null,
           this.props.forVersion || null,
           serializable,
+          (appliedValue && appliedValue.flattenedValue && (appliedValue.flattenedValue as any).last_modified) || null,
         );
 
         // inform potential callbacks

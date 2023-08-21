@@ -302,7 +302,11 @@ export async function validateParentingRules(
       ),
     })
     await itemDefinition.checkRoleAccessForParenting(role, userId, parentOwnerId, parentingRolesManager, true);
+
+    return result;
   }
+
+  return null;
 }
 
 export function retrieveSince(args: IGQLArgs): string {
