@@ -251,6 +251,75 @@ export async function validateParentingRules(
       }
     }
 
+    const owningRule = itemDefinition.getOwningRule();
+    const maxOwnedCountSameType = itemDefinition.getMaxOwnedCountSameType();
+    const maxOwnedCountAnyType = itemDefinition.getMaxOwnedCountAnyType();
+    if (owningRule === "ONCE" || maxOwnedCountSameType) {
+      const valueCount =
+        await appData.databaseConnection.queryFirst(
+          `SELECT COUNT(*) AS "count" FROM ${JSON.stringify(itemDefinition.getParentModule().getQualifiedPathName())} WHERE "type"=$1 AND "created_by"=$2`,
+          [
+            itemDefinition.getQualifiedPathName(),
+            actualFinalOwnerId,
+          ]
+        );
+
+      if (valueCount.count) {
+        if (owningRule === "ONCE") {
+          throw new EndpointError({
+            message: "Owning rule is set to ONCE and there's already an item of this type for the given owner",
+            code: ENDPOINT_ERRORS.FORBIDDEN,
+          });
+        } else if (valueCount.count >= maxOwnedCountSameType) {
+          throw new EndpointError({
+            message: "Max item count for the same owner is set to " + maxOwnedCountSameType + " and there's already that much",
+            code: ENDPOINT_ERRORS.FORBIDDEN,
+          });
+        }
+      }
+    }
+
+    if (maxOwnedCountAnyType) {
+      const valueCount =
+        await appData.databaseConnection.queryFirst(
+          `SELECT COUNT(*) AS "count" FROM ${JSON.stringify(itemDefinition.getParentModule().getQualifiedPathName())} WHERE "created_by"=$1`,
+          [
+            actualFinalOwnerId,
+          ]
+        );
+
+      if (valueCount.count && valueCount.count >= maxOwnedCountAnyType) {
+        throw new EndpointError({
+          message: "Max item count for any type and the given same owner is set to " + maxOwnedCountAnyType + " and there's already that much",
+          code: ENDPOINT_ERRORS.FORBIDDEN,
+        });
+      }
+    }
+
+    // This check is the same as the one for the parenting rule hence it doesn't make
+    // sense to redo if the per owner passed
+    if (owningRule === "ONCE_PER_PARENT" && parentingRule !== "ONCE_PER_OWNER") {
+      const valueExists =
+        await appData.databaseConnection.queryFirst(
+          `SELECT id FROM ${JSON.stringify(itemDefinition.getParentModule().getQualifiedPathName())} WHERE "type"=$1 AND "parent_type"=$2 AND ` +
+          `"parent_id"=$3 AND "parent_version"=$4 AND "created_by"=$5 `,
+          [
+            itemDefinition.getQualifiedPathName(),
+            parentingItemDefinition.getQualifiedPathName(),
+            parentId,
+            parentVersion || "",
+            actualFinalOwnerId,
+          ]
+        );
+
+      if (valueExists) {
+        throw new EndpointError({
+          message: "Owning rule is set to ONCE_PER_PARENT and there's already an item of this type for the given owner and parent",
+          code: ENDPOINT_ERRORS.FORBIDDEN,
+        });
+      }
+    }
+
     let result: ISQLTableRowValue;
     try {
       result = await appData.cache.requestValue(

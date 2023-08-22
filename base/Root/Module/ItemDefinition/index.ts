@@ -346,6 +346,16 @@ export interface IItemDefinitionRawJSONDataType {
    */
   parentMaxChildCountAnyType?: number;
   /**
+   * Limits the number of children that can be parented
+   * by the same type
+   */
+  maxOwnedCountSameType?: number;
+  /**
+   * Limits the number of children that can be parented
+   * by the any type
+   */
+  maxOwnedCountAnyType?: number;
+  /**
    * Allows to move children from one parent to another
    * by providing a new parent during edit
    */
@@ -362,6 +372,14 @@ export interface IItemDefinitionRawJSONDataType {
    * MANY is the default there can be as many children of the same type as it wants
    */
   parentingRule?: "ONCE" | "ONCE_PER_OWNER" | "MANY";
+  /**
+   * The owning rule
+   * ONCE means that this item can only exist for once for the given owner
+   * so once the owner creates one of it, that's it
+   * ONCE_PER_PARENT means that the rule applies for a per parent basis
+   * MANY is the default as the user can create as many as it wants
+   */
+  owningRule?: "ONCE" | "ONCE_PER_PARENT" | "MANY";
   /**
    * A list of roles who have access to parenting
    */
@@ -2803,6 +2821,18 @@ export default class ItemDefinition {
 
   public getParentingMaxChildCountAnyType() {
     return this.rawData.parentMaxChildCountAnyType || null;
+  }
+
+  public getMaxOwnedCountSameType() {
+    return this.rawData.parentMaxChildCountSameType || null;
+  }
+
+  public getMaxOwnedCountAnyType() {
+    return this.rawData.parentMaxChildCountAnyType || null;
+  }
+
+  public getOwningRule() {
+    return this.rawData.owningRule || "MANY";
   }
 
   /**

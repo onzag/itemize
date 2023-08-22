@@ -268,6 +268,16 @@ export default {
         type: "string",
       },
     },
+    maxOwnedCountSameType: {
+      type: "number",
+    },
+    maxOwnedCountAnyType: {
+      type: "number",
+    },
+    owningRule: {
+      type: "string",
+      enum: ["ONCE", "ONCE_PER_PARENT", "MANY"]
+    },
     canBeParentedBy: {
       type: "array",
       items: itemReferenceSchema,

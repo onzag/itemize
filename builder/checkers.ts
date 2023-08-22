@@ -231,6 +231,13 @@ export function checkItemDefinition(
     );
   }
 
+  if (rawData.maxOwnedCountSameType <= 0) {
+    throw new CheckUpError(
+      "Setting maxOwnedCountSameType cannot be less or equal to zero",
+      actualTraceback.newTraceToBit("maxOwnedCountSameType"),
+    );
+  }
+
   if (rawData.parentMaxChildCountAnyType && !rawData.canBeParentedBy) {
     throw new CheckUpError(
       "Setting parentMaxChildCountAnyType without canBeParentedBy specifications",
@@ -240,6 +247,13 @@ export function checkItemDefinition(
     throw new CheckUpError(
       "Setting parentMaxChildCountAnyType cannot be less or equal to zero",
       actualTraceback.newTraceToBit("parentMaxChildCountAnyType"),
+    );
+  }
+
+  if (rawData.maxOwnedCountAnyType <= 0) {
+    throw new CheckUpError(
+      "Setting maxOwnedCountAnyType cannot be less or equal to zero",
+      actualTraceback.newTraceToBit("maxOwnedCountAnyType"),
     );
   }
 

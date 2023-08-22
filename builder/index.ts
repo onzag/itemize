@@ -111,13 +111,16 @@ export interface IFileItemDefinitionUntreatedRawJSONDataType {
   canBeParentedBy?: IItemDefinitionParentingRawJSONDataType[];
   parentMaxChildCountSameType?: number;
   parentMaxChildCountAnyType?: number;
+  maxOwnedCountAnyTime?: number;
+  maxOwnedCountSameType?: number;
   customIdRoleAccess?: string[];
   canCreateInBehalf?: boolean;
   canCreateInBehalfRoleAccess?: string[];
   canCreateInBehalfTargetRoles?: string[];
   mustBeParented?: boolean;
   enableReparenting?: boolean;
-  parentingRule?: "ONCE" | "ONCE_PER_OWNER" | "MANY",
+  parentingRule?: "ONCE" | "ONCE_PER_OWNER" | "MANY";
+  owningRule?: "ONCE" | "ONCE_PER_PARENT" | "MANY";
   policies?: IPoliciesRawJSONDataType;
   ownerIsObjectId?: boolean;
   ownerReadRoleAccess?: string[];
