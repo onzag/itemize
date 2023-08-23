@@ -2295,7 +2295,31 @@ export class Listener {
           }
         ));
 
-      const totalDiffRecordCount = createdAndModifiedRecordsSQL.length + deletedRecords.length;
+      const gainedOrLostRecordsQuery = this.rawDB.databaseConnection.queryRows(
+        `SELECT "id", "version", "type", "transaction_time", "status" FROM ${JSON.stringify(TRACKERS_REGISTRY_IDENTIFIER)} ` +
+        `WHERE "property" = ? AND "value" = ?` +
+        (
+          request.lastModified ?
+            ` AND "transaction_time" > ?` :
+            ""
+        ) +
+        (
+          requiredType ?
+            ` AND "type" = ?` :
+            ""
+        ),
+        [
+          "OWNER+PARENT",
+          request.createdBy + "+" + parentingId,
+          request.lastModified || null,
+          requiredType || null,
+        ].filter((v) => v !== null),
+        true,
+      );
+
+      const gainedOrLostRecordsSQL = (await gainedOrLostRecordsQuery).map(convertVersionsIntoNullsWhenNecessary);
+
+      const totalDiffRecordCount = createdAndModifiedRecordsSQL.length + deletedRecords.length + gainedOrLostRecordsSQL.length;
 
       if (totalDiffRecordCount) {
         const createdRecords: IGQLSearchRecord[] = createdAndModifiedRecordsSQL.filter((r) => r.WAS_CREATED).map((r) => (
@@ -2314,24 +2338,41 @@ export class Listener {
             last_modified: r.last_modified,
           }
         ));
+        const newRecords: IGQLSearchRecord[] = gainedOrLostRecordsSQL.filter((r) => r.status).map((r) => (
+          {
+            id: r.id,
+            version: r.version,
+            type: r.type,
+            last_modified: r.last_modified,
+          }
+        ));
+        const lostRecords: IGQLSearchRecord[] = gainedOrLostRecordsSQL.filter((r) => !r.status).map((r) => (
+          {
+            id: r.id,
+            version: r.version,
+            type: r.type,
+            last_modified: r.last_modified,
+          }
+        ));
 
         const event: IOwnedParentedSearchRecordsEvent = {
+          createdBy: request.createdBy || UNSPECIFIED_OWNER,
           parentId: request.parentId,
           parentVersion: request.parentVersion || null,
           parentType: request.parentType,
           qualifiedPathName: request.qualifiedPathName,
-          createdBy: request.createdBy || UNSPECIFIED_OWNER,
+          newRecords,
+          lostRecords,
           createdRecords,
           modifiedRecords,
           deletedRecords,
-          lostRecords: [],
-          newRecords: [],
           newLastModified: findLastRecordDate("max", "last_modified", createdRecords, modifiedRecords, deletedRecords),
         };
+
         CAN_LOG_DEBUG && logger.debug(
           {
             className: "Listener",
-            methodName: "parentedSearchFeedback",
+            methodName: "ownedParentedSearchFeedback",
             message: "Emmitting " + OWNED_PARENTED_SEARCH_RECORDS_EVENT,
             data: {
               event,

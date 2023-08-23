@@ -2067,6 +2067,19 @@ export class Cache {
                     [],
                   ],
                 });
+                insertQueryBuilder.insert({
+                  id,
+                  version: version || "",
+                  type: selfTable,
+                  module: moduleTable,
+                  property: "OWNER+PARENT",
+                  value: currentSQLValue.created_by + "+" + actualReparent.type + "." + actualReparent.id + "." + (actualReparent.version || ""),
+                  status: true,
+                  transaction_time: [
+                    "NOW()",
+                    [],
+                  ],
+                });
               }
               if (originalParent.id) {
                 insertQueryBuilder.insert({
@@ -2076,6 +2089,19 @@ export class Cache {
                   module: moduleTable,
                   property: "PARENT",
                   value: originalParent.type + "." + originalParent.id + "." + (originalParent.version || ""),
+                  status: false,
+                  transaction_time: [
+                    "NOW()",
+                    [],
+                  ],
+                });
+                insertQueryBuilder.insert({
+                  id,
+                  version: version || "",
+                  type: selfTable,
+                  module: moduleTable,
+                  property: "OWNER+PARENT",
+                  value: currentSQLValue.created_by + "+" + originalParent.type + "." + originalParent.id + "." + (originalParent.version || ""),
                   status: false,
                   transaction_time: [
                     "NOW()",

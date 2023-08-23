@@ -44,11 +44,11 @@ type changeRowLanguageFnPropertyBased = (language: string, dictionary: string, p
 type changeRowLanguageFnPropertyIncludeBased = (language: string, dictionary: string, include: string, property: string) => void;
 type changeRowLanguageFn = changeRowLanguageFnPropertyBased | changeRowLanguageFnPropertyIncludeBased;
 
-interface IPropertyMapElement {
-  id: string,
-  newValue: string,
-  originalValue: string,
-}
+// interface IPropertyMapElement {
+//   id: string,
+//   newValue: string,
+//   originalValue: string,
+// }
 
 const NAMESPACE = "23ab4609-af49-4cdf-921b-4700adb284f3";
 export function makeIdOutOf(str: string) {
@@ -3049,6 +3049,19 @@ export class ItemizeRawDB {
                   [],
                 ],
               });
+              insertQueryBuilder.insert({
+                id: result.id,
+                version: result.version || "",
+                type: result.type,
+                module: moduleTable,
+                property: "OWNER+PARENT",
+                value: result.created_by + "+" + currentParent.type + "." + currentParent.id + "." + (currentParent.version || ""),
+                status: true,
+                transaction_time: [
+                  "NOW()",
+                  [],
+                ],
+              });
               hasAddedAtLeastOneInsert = true;
             }
             if (oldParent.id) {
@@ -3059,6 +3072,19 @@ export class ItemizeRawDB {
                 module: moduleTable,
                 property: "PARENT",
                 value: oldParent.type + "." + oldParent.id + "." + (oldParent.version || ""),
+                status: false,
+                transaction_time: [
+                  "NOW()",
+                  [],
+                ],
+              });
+              insertQueryBuilder.insert({
+                id: result.id,
+                version: result.version || "",
+                type: result.type,
+                module: moduleTable,
+                property: "OWNER+PARENT",
+                value: result.created_by + "+" + oldParent.type + "." + oldParent.id + "." + (oldParent.version || ""),
                 status: false,
                 transaction_time: [
                   "NOW()",

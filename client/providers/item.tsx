@@ -5181,17 +5181,42 @@ export class ActualItemProvider extends
       searchCacheUsesProperty = [trackedPropertyDef.getId(), trackedPropertyVal];
     }
 
-    if (options.cachePolicy === "by-owner") {
-      if (options.createdBy !== this.state.searchOwner) {
-        // this search listener is bad because the search
-        // owner has changed, and the previously registered listener
-        // if any does not match the owner, remember the search owner is the created by
-        // value, and we are now redoing the search, and we might have a search listener
-        // registered already for this search if that is the case
-        this.removePossibleSearchListeners();
+    const listenPolicy = options.listenPolicy || options.cachePolicy || "none";
+
+    if (listenPolicy !== this.state.searchListenPolicy) {
+      // the listener is bad altogether
+      this.removePossibleSearchListeners();
+    } else {
+      if (listenPolicy.includes("owner")) {
+        if (options.createdBy !== this.state.searchOwner) {
+          // this search listener is bad because the search
+          // owner has changed, and the previously registered listener
+          // if any does not match the owner, remember the search owner is the created by
+          // value, and we are now redoing the search, and we might have a search listener
+          // registered already for this search if that is the case
+          this.removePossibleSearchListeners();
+        }
+      }
+      
+      if (listenPolicy.includes("parent")) {
+        // we basically do the exact same here, same logic
+        if (!equals(searchParent, this.state.searchParent, { strict: true })) {
+          // this search listener is bad because the search
+          // parent has changed, and the previously registered listener
+          // if any does not match the owner
+          this.removePossibleSearchListeners();
+        }
       }
 
-      if (options.markForDestructionOnLogout) {
+      if (listenPolicy.includes("property")) {
+        if (!equals(searchCacheUsesProperty, this.state.searchCacheUsesProperty, { strict: true })) {
+          this.removePossibleSearchListeners();
+        }
+      }
+    }
+
+    if (options.cachePolicy && options.markForDestructionOnLogout) {
+      if (options.cachePolicy === "by-owner") {
         this.markSearchForDestruction(
           options.cachePolicy,
           standardCounterpart.getQualifiedPathName(),
@@ -5199,21 +5224,23 @@ export class ActualItemProvider extends
           null,
           null,
         );
-      }
-    } else if (options.cachePolicy === "by-parent") {
-      // we basically do the exact same here, same logic
-      if (!equals(searchParent, this.state.searchParent, { strict: true })) {
-        // this search listener is bad because the search
-        // parent has changed, and the previously registered listener
-        // if any does not match the owner
-        this.removePossibleSearchListeners();
-      }
-    } else if (options.cachePolicy === "by-property") {
-      if (!equals(searchCacheUsesProperty, this.state.searchCacheUsesProperty, { strict: true })) {
-        this.removePossibleSearchListeners();
-      }
-
-      if (options.markForDestructionOnLogout) {
+      } else if (options.cachePolicy === "by-parent") {
+        this.markSearchForDestruction(
+          options.cachePolicy,
+          standardCounterpart.getQualifiedPathName(),
+          null,
+          searchParent,
+          null,
+        );
+      } else if (options.cachePolicy === "by-owner-and-parent") {
+        this.markSearchForDestruction(
+          options.cachePolicy,
+          standardCounterpart.getQualifiedPathName(),
+          options.createdBy,
+          searchParent,
+          null,
+        );
+      } else if (options.cachePolicy === "by-property") {
         this.markSearchForDestruction(
           options.cachePolicy,
           standardCounterpart.getQualifiedPathName(),
@@ -5222,10 +5249,6 @@ export class ActualItemProvider extends
           searchCacheUsesProperty,
         );
       }
-    } else {
-      // otherwise we are removing here because we have no cache policy
-      // and hence no reason to have search listeners at all to listen to changes
-      this.removePossibleSearchListeners();
     }
 
     // and then set the state to searching
@@ -5272,8 +5295,6 @@ export class ActualItemProvider extends
       this.props.forId || null,
       this.props.forVersion || null,
     );
-
-    const listenPolicy = options.listenPolicy || options.cachePolicy || "none";
 
     if ((listenPolicy === "by-owner" || listenPolicy === "by-owner-and-parent") && !options.createdBy || options.createdBy === UNSPECIFIED_OWNER) {
       throw new Error("Listen policy is by-owner yet there's no creator specified");
