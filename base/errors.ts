@@ -12,6 +12,7 @@
 interface IEndpointErrorBaseType {
   message: string;
   code: string;
+  data?: any;
 }
 
 /**

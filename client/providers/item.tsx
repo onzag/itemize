@@ -34,13 +34,23 @@ import { IConfigRawJSONDataType } from "../../config";
 import { setHistoryQSState, setHistoryState } from "../components/navigation";
 import LocationRetriever from "../components/navigation/LocationRetriever";
 import { Location } from "history";
-import type { ICacheMetadataMatchType } from "../internal/workers/cache/cache.worker";
+import type { ICacheMetadataMatchType, ICacheStateMetadata } from "../internal/workers/cache/cache.worker";
 import { blobToTransferrable } from "../../util";
 
 const isDevelopment = process.env.NODE_ENV === "development";
 
 const SSR_GRACE_TIME = 10000;
 const LOAD_TIME = (new Date()).getTime();
+
+interface IStoredStateLocation { id: string; version: string };
+
+function getStoredStateLocation(v: boolean | string | IStoredStateLocation, currentId: string, currentVersion: string): IStoredStateLocation {
+  return typeof v === "string" ?
+    { id: v, version: null } : (
+      typeof v === "boolean" ? { id: currentId || null, version: currentVersion || null } :
+        v
+    )
+}
 
 // THIS IS THE MOST IMPORTANT FILE OF WHOLE ITEMIZE
 // HERE IS WHERE THE MAGIC HAPPENS
@@ -540,19 +550,22 @@ export interface IActionSubmitOptions extends IActionCleanOptions {
    * 
    * Check loadStoredState for retrieving this state from the item's provider when loading a value
    * 
-   * The option clearStoredStateIfConnected tends to be used in conjunction with this one
+   * The option clearStoredStateIfSubmitted tends to be used in conjunction with this one
    */
-  storeStateIfCantConnect?: boolean;
+  storeStateIfCantConnect?: boolean | string | IStoredStateLocation;
 
   /**
    * After a draft has been used, it's likely that you don't need this value anymore as it reflects what the server side holds, so
-   * storeStateIfCantConnect option and clearStoredStateIfConnected tend to be used in conjunction
+   * storeStateIfCantConnect option and clearStoredStateIfSubmitted tend to be used in conjunction
    * 
    * when a successful submit is executed that is the state will be cleared
    * 
    * This allows to clear the state from the local database and free the space
+   * 
+   * when used as a string represents an unique slot where it will be stored
+   * otherwise the one specified forId will be used
    */
-  clearStoredStateIfConnected?: boolean;
+  clearStoredStateIfSubmitted?: boolean | string | IStoredStateLocation;
   /**
    * Specifices what to do about searchengine indexes, wait for ensures that search engine indexes have been (tried) to be
    * updated before the request is released from the server, while the indexing may have failed (and that's silent) this can be
@@ -568,7 +581,7 @@ export interface IActionSubmitOptions extends IActionCleanOptions {
    * if the last modified matches what is given here, this is for usage of concurrency when making updates with offline
    * support by storing states in drafts, when using onStateLoadedFromStore you will receive metadata that specifies the last_modified
    * signature of the given known loaded value when it was attempted to be written (be so one was loaded) this will allow to specify that 
-   * lastModifiedOfKnownValue as the ifLastModified so a CONFLICT error will be raised if the submit fails to write due to that reason
+   * overwriteLastModified as the ifLastModified so a CONFLICT error will be raised if the submit fails to write due to that reason
    * 
    * You may resolve conflicts manually
    */
@@ -1570,11 +1583,11 @@ export interface IItemProviderProps {
    * storeStateIfCantConnect from submit action
    * and clearStoredStateIfConnected from submit action
    */
-  loadStoredState?: boolean;
+  loadStoredState?: boolean | string | IStoredStateLocation;
   /**
    * stores the state whenever the state changes
    */
-  storeStateOnChange?: boolean;
+  storeStateOnChange?: boolean | string | IStoredStateLocation;
   /**
    * marks the item for destruction as the user logs out
    */
@@ -1638,7 +1651,7 @@ export interface IItemProviderProps {
    * On state changes but from the store that is loaded
    * from a cache worker
    */
-  onStateLoadedFromStore?: (state: IItemStateType, metadata: {lastModifiedOfKnownValue: string}, fns: IBasicFns) => void;
+  onStateLoadedFromStore?: (state: IItemStateType, metadata: ICacheStateMetadata, fns: IBasicFns) => void;
   /**
    * Runs when the state was stored for whatever reason
    */
@@ -2454,7 +2467,9 @@ export class ActualItemProvider extends
       await this.loadValue();
     }
     if (this.props.loadStoredState) {
-      await this.loadStoredState();
+      const loc = getStoredStateLocation(this.props.loadStoredState, this.props.forId, this.props.forVersion);
+      await this.loadStoredState(loc);
+      // this.setupStoredStateListener(loc);
     }
   }
 
@@ -2803,7 +2818,7 @@ export class ActualItemProvider extends
       uniqueIDChanged &&
       this.props.loadStoredState
     ) {
-      await this.loadStoredState();
+      await this.loadStoredState(getStoredStateLocation(this.props.loadStoredState, this.props.forId, this.props.forVersion));
     }
 
     // no search id for example if the slot changed during
@@ -2922,17 +2937,22 @@ export class ActualItemProvider extends
 
   private async storeStateDelayed() {
     if (this.props.storeStateOnChange) {
+      const location = getStoredStateLocation(this.props.storeStateOnChange, this.props.forId, this.props.forVersion);
       const serializable = ItemDefinition.getSerializableState(this.state.itemState);
+      const metadataSource = this.state.itemState &&
+        this.state.itemState.gqlOriginalFlattenedValue &&
+        (this.state.itemState.gqlOriginalFlattenedValue as any);
       const stateWasStored = await CacheWorkerInstance.instance.storeState(
         this.props.itemDefinitionQualifiedName,
-        this.props.forId || null,
-        this.props.forVersion || null,
+        location.id,
+        location.version,
         serializable,
-        (
-          this.state.itemState &&
-          this.state.itemState.gqlOriginalFlattenedValue &&
-          (this.state.itemState.gqlOriginalFlattenedValue as any).last_modified
-        ) || null,
+        {
+          overwriteLastModified: (metadataSource && metadataSource.last_modified) || null,
+          overwriteId: (metadataSource && metadataSource.id) || null,
+          overwriteVersion: (metadataSource && metadataSource.version) || null,
+          overwriteType: (metadataSource && metadataSource.type) || null,
+        }
       );
 
       if (stateWasStored) {
@@ -3221,12 +3241,27 @@ export class ActualItemProvider extends
       true,
     );
   }
-  public async loadStoredState() {
+  // public setupStoredStateListener(qPath: string, location: IStoredStateLocation) {
+  //   if (CacheWorkerInstance.isSupported) {
+  //     CacheWorkerInstance.instance.addEventListenerToStateChange(qPath, location.id, location.version, this.loadStoredStateListener);
+  //   }
+  // }
+  // public removeStoredStateListener(qPath: string, location: IStoredStateLocation) {
+  //   if (CacheWorkerInstance.isSupported) {
+  //     CacheWorkerInstance.instance.removeEventListenerToStateChange(qPath, location.id, location.version, this.loadStoredStateListener);
+  //   }
+  // }
+  // public loadStoredStateListener(id: string, version: string, value: any, metadata: {overwriteLastModified: string}) {
+  //   if (value) {
+
+  //   }
+  // }
+  public async loadStoredState(location: IStoredStateLocation) {
     if (CacheWorkerInstance.isSupported) {
       const [storedState, metadata] = await CacheWorkerInstance.instance.retrieveState(
         this.props.itemDefinitionQualifiedName,
-        this.props.forId || null,
-        this.props.forVersion || null,
+        location.id,
+        location.version,
       );
 
       if (storedState) {
@@ -4750,13 +4785,21 @@ export class ActualItemProvider extends
           this.props.forVersion || null,
         );
         const serializable = ItemDefinition.getSerializableState(state);
+        const storingLocation = getStoredStateLocation(options.storeStateIfCantConnect, this.props.forId, this.props.forVersion);
+        const metadataSource = appliedValue &&
+          appliedValue.flattenedValue as any;
         storedState = await CacheWorkerInstance.instance.storeState(
           // eh its the same as itemDefinitionToRetrieveDataFrom
           this.props.itemDefinitionQualifiedName,
-          this.props.forId || null,
-          this.props.forVersion || null,
+          storingLocation.id,
+          storingLocation.version,
           serializable,
-          (appliedValue && appliedValue.flattenedValue && (appliedValue.flattenedValue as any).last_modified) || null,
+          {
+            overwriteLastModified: (metadataSource && metadataSource.last_modified) || null,
+            overwriteId: (metadataSource && metadataSource.id) || null,
+            overwriteVersion: (metadataSource && metadataSource.version) || null,
+            overwriteType: (metadataSource && metadataSource.type) || null,
+          },
         );
 
         // inform potential callbacks
@@ -4778,14 +4821,15 @@ export class ActualItemProvider extends
       this.cleanWithProps(this.props, options, "fail");
     } else if (value) {
       if (
-        options.clearStoredStateIfConnected &&
+        options.clearStoredStateIfSubmitted &&
         CacheWorkerInstance.isSupported
       ) {
+        const storedLocation = getStoredStateLocation(options.clearStoredStateIfSubmitted, this.props.forId, this.props.forVersion);
         deletedState = await CacheWorkerInstance.instance.deleteState(
           // eh its the same itemDefinitionToRetrieveDataFrom
           this.props.itemDefinitionQualifiedName,
-          this.props.forId || null,
-          this.props.forVersion || null,
+          storedLocation.id,
+          storedLocation.version,
         );
       }
 
@@ -5197,7 +5241,7 @@ export class ActualItemProvider extends
           this.removePossibleSearchListeners();
         }
       }
-      
+
       if (listenPolicy.includes("parent")) {
         // we basically do the exact same here, same logic
         if (!equals(searchParent, this.state.searchParent, { strict: true })) {
@@ -5574,7 +5618,7 @@ export class ActualItemProvider extends
     };
     this.props.onSearch && this.props.onSearch(result);
     this.activeSearchPromise = null;
-    activeSearchPromiseResolve({response: result, options});
+    activeSearchPromiseResolve({ response: result, options });
     return result;
   }
   public dismissLoadError() {

@@ -141,7 +141,7 @@ export interface IOTriggerArgType {
   /**
    * Causes the request to be forbidden
    */
-  forbid: (message: string, customCode?: string) => void;
+  forbid: (message: string, customCode?: string, data?: any) => void;
   /**
    * Changes the id that will be used in a CREATE event
    */
@@ -179,7 +179,7 @@ export interface ISearchTriggerArgType {
   traditional: boolean;
   records: IGQLSearchRecordsContainer,
   results: IGQLSearchResultsContainer,
-  forbid: (message: string, customCode?: string) => void;
+  forbid: (message: string, customCode?: string, data?: any) => void;
   setSearchMetadata: (metadata: string) => void;
 }
 

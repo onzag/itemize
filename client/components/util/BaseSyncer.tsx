@@ -290,6 +290,25 @@ interface IBaseSyncerProps {
    */
   id: string;
 
+  /**
+   * Whether it is itself synced
+   * 
+   * default to true if not specified
+   */
+  synced?: boolean;
+
+  /**
+   * Whether it itself has failed
+   * defaults to false
+   */
+  failed?: boolean;
+
+  /**
+   * The error for why it has failed
+   * defaults to null
+   */
+  failedErr?: EndpointErrorType;
+
   // /**
   //  * Called whenever the sync state changes
   //  * you should assume true at the start
@@ -334,7 +353,14 @@ interface IBaseSyncerProps {
 export default function BaseSyncer(props: IBaseSyncerProps): any {
   // because we are not loading anything we pass true as our internally synced value of whatever
   // we are supposed to be loading
-  const handleMechanism = useHandleMechanism(props.id, props.parentHandle, props.allowFallback, true, false, null);
+  const handleMechanism = useHandleMechanism(
+    props.id,
+    props.parentHandle,
+    props.allowFallback,
+    typeof props.synced === "boolean" ? props.synced : true,
+    props.failed || false,
+    props.failedErr || null,
+  );
 
   if (!handleMechanism.ready && !props.alwaysRenderChildren) {
     return null;

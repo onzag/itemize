@@ -10,7 +10,7 @@ import {
   EXCLUSION_STATE_SUFFIX,
   JWT_KEY,
 } from "../../constants";
-import { EndpointError } from "../../base/errors";
+import { EndpointError, EndpointErrorType } from "../../base/errors";
 import ItemDefinition, { IItemStateType } from "../../base/Root/Module/ItemDefinition";
 import Module from "../../base/Root/Module";
 import { convertSQLValueToGQLValueForItemDefinition } from "../../base/Root/Module/ItemDefinition/sql";
@@ -43,18 +43,22 @@ export interface IServerSideTokenDataType {
   customData?: any;
 }
 
-export function defaultTriggerForbiddenFunction(message: string, customCode?: string) {
-  throw new EndpointError({
+export function defaultTriggerForbiddenFunction(message: string, customCode?: string, data?: any) {
+  const baseError = {
     message,
     code: customCode || ENDPOINT_ERRORS.FORBIDDEN,
-  });
+  } as EndpointErrorType;
+  if (typeof data !== "undefined") {
+    baseError.data = data;
+  }
+  throw new EndpointError(baseError);
 }
 
 export function defaultTriggerWaitForPromiseFunction() {
   return;
 }
 
-export function defaultTriggerInvalidForbiddenFunction(message: string, customCode?: string) {
+export function defaultTriggerInvalidForbiddenFunction(message: string, customCode?: string, data?: any) {
   logger.error(
     {
       functionName: "defaultTriggerInvalidForbiddenFunction",
@@ -62,13 +66,14 @@ export function defaultTriggerInvalidForbiddenFunction(message: string, customCo
       data: {
         message,
         customCode,
+        data,
       },
     }
   );
   return;
 }
 
-export function defaultTriggerSearchInvalidForbiddenFunction(message: string, customCode?: string) {
+export function defaultTriggerSearchInvalidForbiddenFunction(message: string, customCode?: string, data?: any) {
   logger.error(
     {
       functionName: "defaultTriggerInvalidForbiddenFunction",
@@ -76,6 +81,7 @@ export function defaultTriggerSearchInvalidForbiddenFunction(message: string, cu
       data: {
         message,
         customCode,
+        data,
       },
     }
   );

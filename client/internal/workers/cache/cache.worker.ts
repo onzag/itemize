@@ -25,6 +25,14 @@ import type ItemDefinition from "../../../../base/Root/Module/ItemDefinition";
 import type PropertyDefinition from "../../../../base/Root/Module/ItemDefinition/PropertyDefinition";
 import type Include from "../../../../base/Root/Module/ItemDefinition/Include";
 import type { IConfigRawJSONDataType } from "../../../../config";
+import type { IItemStateType } from "../../../../base/Root/Module/ItemDefinition";
+
+export interface ICacheStateMetadata {
+  overwriteLastModified: string;
+  overwriteId: string;
+  overwriteVersion: string;
+  overwriteType: string;
+}
 
 async function wait(n: number) {
   return new Promise((r) => {
@@ -145,7 +153,7 @@ export interface ICacheDB extends DBSchema {
    */
   states: {
     key: string;
-    value: any;
+    value: IItemStateType;
   };
   /**
    * Metadata stuff
@@ -306,7 +314,7 @@ export default class CacheWorker {
             try {
               db.deleteObjectStore(QUERIES_TABLE_NAME);
               db.deleteObjectStore(SEARCHES_TABLE_NAME);
-              db.deleteObjectStore(STATES_TABLE_NAME);
+              // db.deleteObjectStore(STATES_TABLE_NAME);
               db.deleteObjectStore(METADATA_TABLE_NAME);
 
             } catch (err) {
@@ -315,7 +323,11 @@ export default class CacheWorker {
             }
             db.createObjectStore(QUERIES_TABLE_NAME);
             db.createObjectStore(SEARCHES_TABLE_NAME);
-            db.createObjectStore(STATES_TABLE_NAME);
+            // the states should not be removed as they represent
+            // stuff that the user saved
+            if (!db.objectStoreNames.contains(STATES_TABLE_NAME)) {
+              db.createObjectStore(STATES_TABLE_NAME)
+            }
             db.createObjectStore(METADATA_TABLE_NAME);
           } catch (err) {
             console.warn(err);
@@ -391,12 +403,42 @@ export default class CacheWorker {
     // console.log("CACHE SETUP", version);
   }
 
+  public async addEventListenerToStateChange(
+    qualifiedName: string,
+    id: string,
+    version: string,
+    callback: (id: string, version: string, state: any, metadata: ICacheStateMetadata) => void,
+  ) {
+  }
+
+  public async removeEventListenerToStateChange(
+    qualifiedName: string,
+    id: string,
+    version: string,
+    callback: (id: string, version: string, state: any, metadata: ICacheStateMetadata) => void,
+  ) {
+  }
+
+  public async addUnversionedEventListenerToStateChange(
+    qualifiedName: string,
+    id: string,
+    callback: (id: string, version: string, state: any, metadata: ICacheStateMetadata) => void,
+  ) {
+  }
+
+  public async removeUnversionedEventListenerToStateChange(
+    qualifiedName: string,
+    id: string,
+    callback: (id: string, version: string, state: any, metadata: ICacheStateMetadata) => void,
+  ) {
+  }
+
   public async storeState(
     qualifiedName: string,
     id: string,
     version: string,
-    value: any,
-    lastModifiedOfKnownValue: string,
+    state: IItemStateType,
+    metadata: ICacheStateMetadata,
   ) {
     // console.log("REQUESTED TO STORE STATE FOR", qualifiedName, id, version, value);
 
@@ -415,7 +457,11 @@ export default class CacheWorker {
     // and try to save it in the database, notice how we setup the expirarion
     // date
     try {
-      await this.db.put(STATES_TABLE_NAME, {...value, METADATA: {lastModifiedOfKnownValue: lastModifiedOfKnownValue || null}}, queryIdentifier);
+      // cheating we slap METADATA in there
+      await this.db.put(
+        STATES_TABLE_NAME,
+        ({ ...state, METADATA: metadata }
+      ) as any, queryIdentifier);
     } catch (err) {
       console.warn(err);
       return false;
@@ -424,11 +470,33 @@ export default class CacheWorker {
     return true;
   }
 
+  public async retrieveUnversionedStateList(
+    qualifiedName: string,
+    id: string,
+  ): Promise<Array<{ id: string, version: string }>> {
+    await this.waitForSetupPromise;
+
+    if (!this.db) {
+      console.warn("Could not retrieve IndexedDB");
+      // what gives, we return
+      return [];
+    }
+
+    const tx = this.db.transaction("states");
+    const store = tx.objectStore("states");
+    const keys = await store.getAllKeys();
+
+    // with all the keys now we know the value
+    return keys.map((v) => v.split(".") as [string, string, string]).filter((v) => v[0] === qualifiedName && v[1] === id).map((v) => (
+      { id: v[1], version: v[2] }
+    ));
+  }
+
   public async retrieveState(
     qualifiedName: string,
     id: string,
     version: string,
-  ): Promise<[any, {lastModifiedOfKnownValue: string}]> {
+  ): Promise<[IItemStateType, ICacheStateMetadata]> {
     // console.log("REQUESTED STORED STATE FOR", qualifiedName, id, version);
 
     await this.waitForSetupPromise;
@@ -447,8 +515,8 @@ export default class CacheWorker {
     // date
     try {
       const value = await this.db.get(STATES_TABLE_NAME, queryIdentifier);
-      const METADATA = value.METADATA;
-      delete value.METADATA;
+      const METADATA = (value as any).METADATA;
+      delete (value as any).METADATA;
       return [value, METADATA];
     } catch (err) {
       console.warn(err);
