@@ -34,7 +34,7 @@ import { IConfigRawJSONDataType } from "../../config";
 import { setHistoryQSState, setHistoryState } from "../components/navigation";
 import LocationRetriever from "../components/navigation/LocationRetriever";
 import { Location } from "history";
-import type { ICacheMetadataMatchType, ICacheStateMetadata } from "../internal/workers/cache/cache.worker";
+import type { ICacheMetadataMatchType, ICacheStateMetadata } from "../internal/workers/cache/cache.worker.class";
 import { blobToTransferrable } from "../../util";
 
 const isDevelopment = process.env.NODE_ENV === "development";
@@ -796,6 +796,9 @@ export interface IActionSearchOptions extends IActionCleanOptions {
   /**
    * refuse to fallback if no cache worker support or if cache fails for some reason
    * not recommended to use this anywhere unless for syncing
+   * 
+   * you may want to enable cacheDoNotUsePolyfill as well as searches are allowed to use polyfills
+   * by default
    */
   cacheDoNotFallback?: boolean;
   /**
@@ -804,6 +807,10 @@ export interface IActionSearchOptions extends IActionCleanOptions {
    * but it may take forever due to batching, specially if the user has a lot of data
    */
   cacheNoLimitOffset?: boolean;
+  /**
+   * Will not use the memory polyfilled version of the cache worker when this is not available
+   */
+  cacheDoNotUsePolyfill?: boolean;
   /**
    * The tracked property, all tracked properties must be of type exact-value-tracked or exact-identifier-tracked
    * exact-value-tracked is an arbitrary string value, where an exact-identifier-tracked is used for ids such as user ids
@@ -2226,7 +2233,7 @@ export class ActualItemProvider extends
 
     // and if we have a cache, which runs behind a worker
     // won't run in server mode so it's safe
-    if (CacheWorkerInstance.isSupported) {
+    if (CacheWorkerInstance.isSupported || CacheWorkerInstance.isPolyfilled) {
       // let's set it up
       // as you can see this function might run several times per instance
       // but that's okay, all next runs get ignored
@@ -2921,6 +2928,7 @@ export class ActualItemProvider extends
         this.props.onStateChange ||
         (
           this.props.storeStateOnChange &&
+          // won't use polyfills for storing states as that's just downright dangerous
           CacheWorkerInstance.isSupported
         )
       ) &&
@@ -2936,7 +2944,7 @@ export class ActualItemProvider extends
   }
 
   private async storeStateDelayed() {
-    if (this.props.storeStateOnChange) {
+    if (this.props.storeStateOnChange && CacheWorkerInstance.isSupported) {
       const location = getStoredStateLocation(this.props.storeStateOnChange, this.props.forId, this.props.forVersion);
       const serializable = ItemDefinition.getSerializableState(this.state.itemState);
       const metadataSource = this.state.itemState &&
@@ -3156,6 +3164,7 @@ export class ActualItemProvider extends
       let cached: boolean = false;
       // we need to cache what we have been just specified
       if (
+        // we do not use the polyfill to save get values
         CacheWorkerInstance.isSupported &&
         this.props.longTermCaching
       ) {
@@ -3257,6 +3266,7 @@ export class ActualItemProvider extends
   //   }
   // }
   public async loadStoredState(location: IStoredStateLocation) {
+    // no polyfills for loaded states
     if (CacheWorkerInstance.isSupported) {
       const [storedState, metadata] = await CacheWorkerInstance.instance.retrieveState(
         this.props.itemDefinitionQualifiedName,
@@ -3382,6 +3392,7 @@ export class ActualItemProvider extends
       !denyCaches &&
       !this.props.doNotUseMemoryCache &&
       this.props.longTermCachingMetadata &&
+      // no polyfilling for loading value and related meatadat
       CacheWorkerInstance.isSupported
     ) {
       currentMetadata = await CacheWorkerInstance.instance.readMetadata(
@@ -4774,6 +4785,7 @@ export class ActualItemProvider extends
       if (
         options.storeStateIfCantConnect &&
         error.code === ENDPOINT_ERRORS.CANT_CONNECT &&
+        // no polyfilling for storing states
         CacheWorkerInstance.isSupported
       ) {
         const state = this.props.itemDefinitionInstance.getStateNoExternalChecking(
@@ -4822,6 +4834,7 @@ export class ActualItemProvider extends
     } else if (value) {
       if (
         options.clearStoredStateIfSubmitted &&
+        // no polyfilling for state based stuff
         CacheWorkerInstance.isSupported
       ) {
         const storedLocation = getStoredStateLocation(options.clearStoredStateIfSubmitted, this.props.forId, this.props.forVersion);
@@ -5370,6 +5383,7 @@ export class ActualItemProvider extends
       itemDefinition: this.props.itemDefinitionInstance,
       cachePolicy: options.cachePolicy || "none",
       cacheDoNotFallback: options.cacheDoNotFallback,
+      cacheDoNotUsePolyfill: options.cacheDoNotUsePolyfill,
       cacheNoLimitOffset: options.cacheNoLimitOffset,
       trackedProperty: options.trackedProperty || null,
       createdBy: options.createdBy || null,

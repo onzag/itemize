@@ -2,7 +2,7 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import CacheWorkerInstance from "../../internal/workers/cache";
 import { useRootRetriever } from "../root/RootRetriever";
 import { IItemStateType } from "../../../base/Root/Module/ItemDefinition";
-import type { ICacheStateMetadata } from "../../internal/workers/cache/cache.worker";
+import type { ICacheStateMetadata } from "../../internal/workers/cache/cache.worker.class";
 
 export interface IOfflineCacheStatesLoaderOptions {
   itemOrModule: string;
@@ -11,12 +11,19 @@ export interface IOfflineCacheStatesLoaderOptions {
 
 export interface ICacheRecord {id: string, version: string, state: IItemStateType, metadata: ICacheStateMetadata};
 
+export interface IOfflineCacheStatesLoaderArg {
+  loading: boolean;
+  unsupported: boolean;
+  records: ICacheRecord[];
+}
+
 export interface IOfflineCacheStatesLoaderProps extends IOfflineCacheStatesLoaderOptions {
-  children: (loading: boolean, records: ICacheRecord[]) => React.ReactNode;
+  children: (arg: IOfflineCacheStatesLoaderArg) => React.ReactNode;
 }
 
 export function useOfflineCacheStatesLoader(options: IOfflineCacheStatesLoaderOptions) {
   const [ready, setReady] = useState(false);
+  const [unsupported, setUnsupported] = useState(false);
   const [loading, setLoading] = useState(true);
 
   const [records, setRecords] = useState([] as ICacheRecord[]);
@@ -69,6 +76,9 @@ export function useOfflineCacheStatesLoader(options: IOfflineCacheStatesLoaderOp
 
   useEffect(() => {
     setReady(CacheWorkerInstance.isSupported);
+    if (!CacheWorkerInstance.isSupported) {
+      setUnsupported(true);
+    }
   }, []);
 
   useEffect(() => {
@@ -84,13 +94,14 @@ export function useOfflineCacheStatesLoader(options: IOfflineCacheStatesLoaderOp
 
   return {
     loading,
+    unsupported,
     records,
   }
 }
 
 export default function OfflineCacheStatesLoader(props: IOfflineCacheStatesLoaderProps) {
   const state = useOfflineCacheStatesLoader(props);
-  const child = props.children(state.loading, state.records);
+  const child = props.children(state);
   return child;
 }
 

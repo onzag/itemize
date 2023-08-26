@@ -6,7 +6,7 @@
  */
 
 import { wrap, proxy } from "comlink";
-import CacheWorker from "./cache.worker";
+import CacheWorker from "./cache.worker.class";
 
 // we need to know in which environemnt we are in order to load
 // the right version
@@ -29,11 +29,16 @@ const supportsCacheWorker = typeof window !== "undefined" && window.Worker && (
 );
 
 // we build the instance
-const instance = supportsCacheWorker ? wrap<CacheWorker>(new Worker(url)) : null;
+let instance = supportsCacheWorker ? wrap<CacheWorker>(new Worker(url)) : null;
+if (!instance) {
+  // make a polyfilled version
+  instance = new CacheWorker(true) as any;
+}
 
 // and wrap it into some information
 const CacheWorkerInstance = {
   isSupported: !!supportsCacheWorker,
+  isPolyfilled: !supportsCacheWorker,
   instance,
   getProxy: (obj: unknown) => {
     return proxy(obj);
@@ -42,7 +47,7 @@ const CacheWorkerInstance = {
 
 if (typeof window !== "undefined"){(window as any).CACHE_WORKER = CacheWorkerInstance};
 
-if (CacheWorkerInstance.isSupported) {
+if (CacheWorkerInstance.instance) {
   const STATE_LISTENERS: {[key: string]: Array<Function>} = {};
 
   const originalStoreState = CacheWorkerInstance.instance.storeState;

@@ -986,6 +986,13 @@ export function checkPropertyDefinition(
   const propertyDefintionTypeStandard = PropertyDefinition
     .supportedTypesStandard[rawData.type];
 
+  if (!propertyDefintionTypeStandard) {
+    throw new CheckUpError(
+      "Property '" + rawData.id + "' is of an invalid type",
+      traceback.newTraceToBit("type"),
+    );
+  }
+
   // if we have subtype let's check the subtype is valid
   if (rawData.subtype &&
     !(propertyDefintionTypeStandard.supportedSubtypes || []).includes(rawData.subtype)) {

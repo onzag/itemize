@@ -32,7 +32,7 @@ import { fileURLAbsoluter } from "../../util";
 import { IConfigRawJSONDataType } from "../../config";
 import PropertyDefinition from "../../base/Root/Module/ItemDefinition/PropertyDefinition";
 import equals from "deep-equal";
-import type { ICacheMatchType, ICacheMetadataMatchType } from "./workers/cache/cache.worker";
+import type { ICacheMatchType, ICacheMetadataMatchType } from "./workers/cache/cache.worker.class";
 import { PropertyDefinitionSearchInterfacesPrefixes } from "../../base/Root/Module/ItemDefinition/PropertyDefinition/search-interfaces";
 import { getConversionIds } from "../../base/Root/Module/ItemDefinition/PropertyDefinition/search-mode";
 import type { IPropertyCoreProps } from "../../client/components/property/base";
@@ -1504,6 +1504,7 @@ interface IRunSearchQueryArg extends ISearchQueryArg {
   cachePolicy: "by-owner" | "by-parent" | "by-owner-and-parent" | "by-property" | "none";
   cacheNoLimitOffset?: boolean;
   cacheDoNotFallback?: boolean;
+  cacheDoNotUsePolyfill?: boolean;
   cacheStoreMetadata?: any;
   cacheStoreMetadataMismatchAction?: SearchCacheMetadataMismatchActionFn | ISearchCacheMetadataMismatchAction;
   trackedProperty?: string;
@@ -1714,7 +1715,10 @@ export async function runSearchQueryFor(
   let usesCacheWorker: boolean = (
     // will use cache worker
     arg.cachePolicy !== "none" &&
-    CacheWorkerInstance.isSupported
+    (
+      CacheWorkerInstance.isSupported ||
+      (arg.cacheDoNotUsePolyfill ? false : CacheWorkerInstance.isPolyfilled)
+    )
   );
   // if we are in a search with
   // a cache policy then we should be able

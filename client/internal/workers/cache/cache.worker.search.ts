@@ -5,7 +5,7 @@
 
 import { IGQLArgs, IGQLSearchRecord, IGQLValue } from "../../../../gql-querier";
 import { IDBPDatabase } from "idb";
-import { fixFilesURLAt, ICacheDB, ICacheMatchType, QUERIES_TABLE_NAME } from "./cache.worker";
+import { fixFilesURLAt, ICacheDB, ICacheMatchType, QUERIES_TABLE_NAME, POLYFILLED_INDEXED_DB } from "./cache.worker.class";
 import { PREFIX_GET, IOrderByRuleType } from "../../../../constants";
 import Root from "../../../../base/Root";
 import ItemDefinition from "../../../../base/Root/Module/ItemDefinition";
@@ -87,7 +87,10 @@ export async function search(
       try {
         // and we need to read these values
         const queryIdentifier = `${PREFIX_GET}${result.type}.${result.id}.${result.version || ""}`;
-        const value = await db.get(QUERIES_TABLE_NAME, queryIdentifier);
+        // db being true means is using polyfill
+        const value = (db as any) === true ?
+          POLYFILLED_INDEXED_DB[QUERIES_TABLE_NAME][queryIdentifier] :
+          await db.get(QUERIES_TABLE_NAME, queryIdentifier);
 
         if (returnSourceResults) {
           sourceResults[index] = value

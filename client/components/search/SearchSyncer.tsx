@@ -147,6 +147,13 @@ export default function SearchSyncer(props: ISearchSyncerProps): any {
     " set cacheDoNotFallback in the automatic search options, use allowTraditionalFallback to force a fallback");
   }
 
+  if (props.search && !props.search.cacheDoNotUsePolyfill) {
+    console.warn(
+      "The cache search syncer does not have cacheDoNotUsePolyfill as true, this will cause the sync to succeed even with no cache support and store "+
+      "the values in volatile memory (polyfill version), make sure this is intentional"
+    );
+  }
+
   let searchArgs = props.search;
 
   let modified = false;
