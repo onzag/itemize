@@ -23,6 +23,7 @@ import type Include from "../../../../base/Root/Module/ItemDefinition/Include";
 import type { IConfigRawJSONDataType } from "../../../../config";
 import type { IItemStateType } from "../../../../base/Root/Module/ItemDefinition";
 
+const STATE_LISTENERS: { [key: string]: Array<Function> } = {};
 export const POLYFILLED_INDEXED_DB: {
   [storeName: string]: {
     [key: string]: any;
@@ -277,12 +278,23 @@ export default class CacheWorker {
    * whether to use a polyfilled cache worker
    */
   private polyfilled: boolean = false;
+  /**
+   * because we need to repair the cache worker to have some functions
+   * called within the main thread, we need to have this remote one
+   * wrapped inside our main
+   */
+  private worker: CacheWorker = null;
 
   /**
    * Constructs a new cache worker
    */
-  public constructor(polyfilled: boolean) {
+  public constructor(polyfilled: boolean, worker?: CacheWorker) {
     this.polyfilled = polyfilled;
+    this.worker = worker;
+
+    if (this.worker) {
+      return;
+    }
 
     if (!this.polyfilled) {
       // we build the promise for wait for setup
@@ -311,7 +323,11 @@ export default class CacheWorker {
    * This actually setups the worker
    * @param version pass the build number here
    */
-  public async setupVersion(version: number) {
+  public async setupVersion(version: number): Promise<void> {
+    if (this.worker) {
+      return this.worker.setupVersion(version);
+    }
+
     if (this.polyfilled) {
       POLYFILLED_INDEXED_DB[STATES_TABLE_NAME] = {};
       POLYFILLED_INDEXED_DB[SEARCHES_TABLE_NAME] = {};
@@ -432,6 +448,17 @@ export default class CacheWorker {
     version: string,
     callback: (id: string, version: string, state: any, metadata: ICacheStateMetadata) => void,
   ) {
+    if (this.worker) {
+      const listenerLoc = qualifiedName + "." + (id || "") + "." + (version || "");
+      if (!STATE_LISTENERS[listenerLoc]) {
+        STATE_LISTENERS[listenerLoc] = [callback];
+      } else {
+        STATE_LISTENERS[listenerLoc].push(callback);
+      }
+    } else {
+      console.error("The actual worker cannot add event listeners to the state change");
+      return;
+    }
   }
 
   public async removeEventListenerToStateChange(
@@ -440,6 +467,18 @@ export default class CacheWorker {
     version: string,
     callback: (id: string, version: string, state: any, metadata: ICacheStateMetadata) => void,
   ) {
+    if (this.worker) {
+      const listenerLoc = qualifiedName + "." + (id || "") + "." + (version || "");
+      if (STATE_LISTENERS[listenerLoc]) {
+        const index = STATE_LISTENERS[listenerLoc].indexOf(callback);
+        if (index !== -1) {
+          STATE_LISTENERS[listenerLoc].splice(index, 1);
+        }
+      }
+    } else {
+      console.error("The actual worker cannot remove event listeners to the state change");
+      return;
+    }
   }
 
   public async addUnversionedEventListenerToStateChange(
@@ -447,6 +486,17 @@ export default class CacheWorker {
     id: string,
     callback: (id: string, version: string, state: any, metadata: ICacheStateMetadata) => void,
   ) {
+    if (this.worker) {
+      const listenerLoc = qualifiedName + "." + (id || "");
+      if (!STATE_LISTENERS[listenerLoc]) {
+        STATE_LISTENERS[listenerLoc] = [callback];
+      } else {
+        STATE_LISTENERS[listenerLoc].push(callback);
+      }
+    } else {
+      console.error("The actual worker cannot add unversioned event listeners to the state change");
+      return;
+    }
   }
 
   public async removeUnversionedEventListenerToStateChange(
@@ -454,6 +504,18 @@ export default class CacheWorker {
     id: string,
     callback: (id: string, version: string, state: any, metadata: ICacheStateMetadata) => void,
   ) {
+    if (this.worker) {
+      const listenerLoc = qualifiedName + "." + (id || "");
+      if (STATE_LISTENERS[listenerLoc]) {
+        const index = STATE_LISTENERS[listenerLoc].indexOf(callback);
+        if (index !== -1) {
+          STATE_LISTENERS[listenerLoc].splice(index, 1);
+        }
+      }
+    } else {
+      console.error("The actual worker cannot remove unversioned event listeners to the state change");
+      return;
+    }
   }
 
   public async storeState(
@@ -462,8 +524,19 @@ export default class CacheWorker {
     version: string,
     state: IItemStateType,
     metadata: ICacheStateMetadata,
-  ) {
+  ): Promise<boolean> {
     // console.log("REQUESTED TO STORE STATE FOR", qualifiedName, id, version, value);
+    if (this.worker) {
+      const rs = await this.worker.storeState(qualifiedName, id, version, state, metadata);
+      if (rs) {
+        const listeners = STATE_LISTENERS[qualifiedName + "." + (id || "") + "." + (version || "")];
+        listeners.forEach((l) => l(id, version, state, { overwriteLastModified: metadata || null }));
+
+        const idSpecificListeners = STATE_LISTENERS[qualifiedName + "." + (id || "")];
+        idSpecificListeners.forEach((l) => l(id, version, state, { overwriteLastModified: metadata || null }));
+      }
+      return rs;
+    }
 
     await this.waitForSetupPromise;
 
@@ -500,6 +573,10 @@ export default class CacheWorker {
     qualifiedName: string,
     id: string,
   ): Promise<Array<{ id: string, version: string }>> {
+    if (this.worker) {
+      return this.worker.retrieveUnversionedStateList(qualifiedName, id);
+    }
+
     await this.waitForSetupPromise;
 
     if (!this.db) {
@@ -528,6 +605,9 @@ export default class CacheWorker {
     id: string,
     version: string,
   ): Promise<[IItemStateType, ICacheStateMetadata]> {
+    if (this.worker) {
+      return this.worker.retrieveState(qualifiedName, id, version);
+    }
     // console.log("REQUESTED STORED STATE FOR", qualifiedName, id, version);
 
     await this.waitForSetupPromise;
@@ -562,8 +642,19 @@ export default class CacheWorker {
     qualifiedName: string,
     id: string,
     version: string,
-  ) {
+  ): Promise<boolean> {
     // console.log("REQUESTED TO DELETE STATE FOR", qualifiedName, id, version);
+    if (this.worker) {
+      const rs = await this.worker.deleteState(qualifiedName, id, version);
+      if (rs) {
+        const listeners = STATE_LISTENERS[qualifiedName + "." + (id || "") + "." + (version || "")];
+        listeners.forEach((l) => l(id, version, null, null));
+
+        const idSpecificListeners = STATE_LISTENERS[qualifiedName + "." + (id || "")];
+        idSpecificListeners.forEach((l) => l(id, version, null, null));
+      }
+      return rs;
+    }
 
     await this.waitForSetupPromise;
 
@@ -749,6 +840,17 @@ export default class CacheWorker {
     partialFields: IGQLRequestFields,
     merge?: boolean,
   ): Promise<boolean> {
+    if (this.worker) {
+      return this.worker.setCachedValue(
+        queryName,
+        id,
+        version,
+        partialValue,
+        partialFields,
+        merge,
+      );
+    }
+
     // if (!merge) {
     //   console.log("REQUESTED TO STORE", queryName, id, version, partialValue);
     // }
@@ -821,6 +923,9 @@ export default class CacheWorker {
     id: string,
     version: string,
   ): Promise<boolean> {
+    if (this.worker) {
+      return this.worker.deleteCachedValue(queryName, id, version);
+    }
     // console.log("REQUESTED TO DELETE", queryName, id, version);
 
     // so we wait for the setup, just in case
@@ -866,7 +971,21 @@ export default class CacheWorker {
     parentIdIfKnown: string,
     parentVersionIfKnown: string,
     metadata: any,
-  ) {
+  ): Promise<boolean> {
+    if (this.worker) {
+      return this.worker.writeSearchMetadata(
+        queryName,
+        searchArgs,
+        cachePolicy,
+        trackedProperty,
+        createdByIfKnown,
+        parentTypeIfKnown,
+        parentIdIfKnown,
+        parentVersionIfKnown,
+        metadata,
+      )
+    }
+
     // console.log(
     //   "REQUESTED TO STORE SEARCH METADATA FOR",
     //   queryName, cachePolicy, createdByIfKnown, parentTypeIfKnown, parentIdIfKnown, parentVersionIfKnown);
@@ -920,7 +1039,10 @@ export default class CacheWorker {
     id: string,
     version: string,
     metadata: any,
-  ) {
+  ): Promise<boolean> {
+    if (this.worker) {
+      return this.worker.writeMetadata(queryName, id, version, metadata);
+    }
     // console.log("REQUESTED TO STORE METADATA FOR", queryName, id, version, metadata);
 
     await this.waitForSetupPromise;
@@ -964,6 +1086,18 @@ export default class CacheWorker {
     parentIdIfKnown: string,
     parentVersionIfKnown: string,
   ): Promise<ICacheMetadataMatchType> {
+    if (this.worker) {
+      return this.worker.readSearchMetadata(
+        queryName,
+        searchArgs,
+        cachePolicy,
+        trackedProperty,
+        createdByIfKnown,
+        parentTypeIfKnown,
+        parentIdIfKnown,
+        parentVersionIfKnown,
+      );
+    }
     // console.log(
     //   "REQUESTED TO READ SEARCH METADATA FOR",
     //   queryName, cachePolicy, createdByIfKnown, parentTypeIfKnown, parentIdIfKnown, parentVersionIfKnown);
@@ -1010,6 +1144,9 @@ export default class CacheWorker {
     id: string,
     version: string,
   ): Promise<ICacheMetadataMatchType> {
+    if (this.worker) {
+      return this.worker.readMetadata(queryName, id, version);
+    }
     // console.log("REQUESTED TO READ METADATA FOR", queryName, id, version);
 
     await this.waitForSetupPromise;
@@ -1048,7 +1185,11 @@ export default class CacheWorker {
     owner: string,
     parent: [string, string, string],
     property: [string, string],
-  ) {
+  ): Promise<boolean> {
+    if (this.worker) {
+      return this.deleteCachedSearch(queryName, type, owner, parent, property);
+    }
+
     // so we wait for the setup, just in case
     await this.waitForSetupPromise;
 
@@ -1129,6 +1270,9 @@ export default class CacheWorker {
     partialValue: IGQLValue,
     partialFields: IGQLRequestFields,
   ): Promise<boolean> {
+    if (this.worker) {
+      return this.worker.mergeCachedValue(queryName, id, version, partialValue, partialFields);
+    }
     // console.log("REQUESTED TO MERGE", queryName, id, version, partialValue);
 
     // so we get the current value
@@ -1201,6 +1345,10 @@ export default class CacheWorker {
     version: string,
     requestedFields?: IGQLRequestFields,
   ): Promise<ICacheMatchType> {
+    if (this.worker) {
+      return this.worker.getCachedValue(queryName, id, version, requestedFields);
+    }
+
     // if (requestedFields) {
     //   console.log("CACHED QUERY REQUESTED", queryName, id, version, requestedFields);
     // }
@@ -1293,6 +1441,25 @@ export default class CacheWorker {
     newLastModified: string,
     cachePolicy: "by-owner" | "by-parent" | "by-property" | "by-owner-and-parent",
   ): Promise<boolean> {
+    if (this.worker) {
+      return this.worker.updateRecordsOnCachedSearch(
+        searchQueryName,
+        createdByIfKnown,
+        parentTypeIfKnown,
+        parentIdIfKnown,
+        parentVersionIfKnown,
+        trackedProperty,
+        cachePropertyValue,
+        newRecords,
+        createdRecords,
+        modifiedRecords,
+        lostRecords,
+        deletedRecords,
+        newLastModified,
+        cachePolicy,
+      );
+    }
+
     await this.waitForSetupPromise;
 
     // so we fetch our db like usual
@@ -1453,6 +1620,25 @@ export default class CacheWorker {
     redoSearch: boolean,
     redoRecords: boolean | IGQLSearchRecord[],
   ): Promise<ICachedSearchResult> {
+    if (this.worker) {
+      return this.worker.runCachedSearch(
+        searchQueryName,
+        searchArgs,
+        getListQueryName,
+        getListTokenArg,
+        getListLangArg,
+        getListRequestedFields,
+        cachePolicy,
+        cacheNoLimitOffset,
+        trackedProperty,
+        maxLimit,
+        maxGetListResultsAtOnce,
+        returnSources,
+        redoSearch,
+        redoRecords,
+      );
+    }
+
     await this.waitForSetupPromise;
 
     if (!this.db) {
@@ -2003,12 +2189,20 @@ export default class CacheWorker {
     }
   }
 
-  public async proxyRoot(rootProxy: IRootRawJSONDataType, config: IConfigRawJSONDataType) {
+  public async proxyRoot(rootProxy: IRootRawJSONDataType, config: IConfigRawJSONDataType): Promise<void> {
+    if (this.worker) {
+      return this.worker.proxyRoot(rootProxy, config);
+    }
+
     this.root = new Root(rootProxy);
     this.config = config;
   }
 
-  public async setBlockedCallback(callback: (state: boolean) => void) {
+  public async setBlockedCallback(callback: (state: boolean) => void): Promise<void> {
+    if (this.worker) {
+      return this.worker.setBlockedCallback(callback);
+    }
+
     this.blockedCallback = callback;
     if (this.isCurrentlyBlocked) {
       callback(this.isCurrentlyBlocked);

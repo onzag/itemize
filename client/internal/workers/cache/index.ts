@@ -35,6 +35,13 @@ if (!instance) {
   instance = new CacheWorker(true) as any;
 }
 
+// double wrap despite of all
+// in order to have the main thread functions
+// available
+if (instance) {
+  instance = new CacheWorker(true, instance as any) as any;
+}
+
 // and wrap it into some information
 const CacheWorkerInstance = {
   isSupported: !!supportsCacheWorker,
@@ -46,103 +53,6 @@ const CacheWorkerInstance = {
 };
 
 if (typeof window !== "undefined"){(window as any).CACHE_WORKER = CacheWorkerInstance};
-
-if (CacheWorkerInstance.instance) {
-  const STATE_LISTENERS: {[key: string]: Array<Function>} = {};
-
-  const originalStoreState = CacheWorkerInstance.instance.storeState;
-  const originalDeleteState = CacheWorkerInstance.instance.deleteState;
-
-  CacheWorkerInstance.instance.storeState = (async (
-    qualifiedName: string,
-    id: string,
-    version: string,
-    value: any,
-    overwriteLastModified: string,
-  ) => {
-    const rs = await originalStoreState.call(CacheWorkerInstance.instance, qualifiedName, id, version, value, overwriteLastModified);
-    if (rs) {
-      const listeners = STATE_LISTENERS[qualifiedName + "." + (id || "") + "." + (version || "")];
-      listeners.forEach((l) => l(id, version, value, {overwriteLastModified: overwriteLastModified || null}));
-
-      const idSpecificListeners = STATE_LISTENERS[qualifiedName + "." + (id || "")];
-      idSpecificListeners.forEach((l) => l(id, version, value, {overwriteLastModified: overwriteLastModified || null}));
-    }
-    return rs;
-  }) as any;
-
-  CacheWorkerInstance.instance.deleteState = (async (
-    qualifiedName: string,
-    id: string,
-    version: string,
-  ) => {
-    const rs = await originalDeleteState.call(CacheWorkerInstance.instance, qualifiedName, id, version);
-    if (rs) {
-      const listeners = STATE_LISTENERS[qualifiedName + "." + (id || "") + "." + (version || "")];
-      listeners.forEach((l) => l(id, version, null, null));
-
-      const idSpecificListeners = STATE_LISTENERS[qualifiedName + "." + (id || "")];
-      idSpecificListeners.forEach((l) => l(id, version, null, null));
-    }
-    return rs;
-  }) as any;
-
-  CacheWorkerInstance.instance.addEventListenerToStateChange = ((
-    qualifiedName: string,
-    id: string,
-    version: string,
-    callback: (id: string, version: string, value: any, metadata: any) => void,
-  ) => {
-    const listenerLoc = qualifiedName + "." + (id || "") + "." + (version || "");
-    if (!STATE_LISTENERS[listenerLoc]) {
-      STATE_LISTENERS[listenerLoc] = [callback];
-    } else {
-      STATE_LISTENERS[listenerLoc].push(callback);
-    }
-  }) as any;
-
-  CacheWorkerInstance.instance.removeEventListenerToStateChange = ((
-    qualifiedName: string,
-    id: string,
-    version: string,
-    callback: (id: string, version: string, value: any, metadata: any) => void,
-  ) => {
-    const listenerLoc = qualifiedName + "." + (id || "") + "." + (version || "");
-    if (STATE_LISTENERS[listenerLoc]) {
-      const index = STATE_LISTENERS[listenerLoc].indexOf(callback);
-      if (index !== -1) {
-        STATE_LISTENERS[listenerLoc].splice(index, 1);
-      } 
-    }
-  }) as any;
-
-  CacheWorkerInstance.instance.addUnversionedEventListenerToStateChange = ((
-    qualifiedName: string,
-    id: string,
-    callback: (id: string, version: string, value: any, metadata: any) => void,
-  ) => {
-    const listenerLoc = qualifiedName + "." + (id || "");
-    if (!STATE_LISTENERS[listenerLoc]) {
-      STATE_LISTENERS[listenerLoc] = [callback];
-    } else {
-      STATE_LISTENERS[listenerLoc].push(callback);
-    }
-  }) as any;
-
-  CacheWorkerInstance.instance.removeUnversionedEventListenerToStateChange = ((
-    qualifiedName: string,
-    id: string,
-    callback: (id: string, version: string, value: any, metadata: any) => void,
-  ) => {
-    const listenerLoc = qualifiedName + "." + (id || "");
-    if (STATE_LISTENERS[listenerLoc]) {
-      const index = STATE_LISTENERS[listenerLoc].indexOf(callback);
-      if (index !== -1) {
-        STATE_LISTENERS[listenerLoc].splice(index, 1);
-      } 
-    }
-  }) as any;
-};
 
 // return it
 export default CacheWorkerInstance;
