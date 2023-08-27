@@ -14,6 +14,7 @@ import {
   IOrderByRuleType,
   MEMCACHED_SEARCH_DESTRUCTION_MARKERS_LOCATION,
   SEARCH_DESTRUCTION_MARKERS_LOCATION,
+  PREFIX_SEARCH,
 } from "../../constants";
 import { IGQLSearchRecord, IGQLValue, IGQLRequestFields, ProgresserFn } from "../../gql-querier";
 import { requestFieldsAreContained } from "../../gql-util";
@@ -858,6 +859,11 @@ export interface IActionSearchOptions extends IActionCleanOptions {
    */
   markForDestructionOnLogout?: boolean;
   /**
+   * The destruction marker is executed once this component unmounts which will destroy
+   * the search elements
+   */
+  markForDestructionOnUnmount?: boolean;
+  /**
    * Normally searches will download a list of records and use these records to retrieve the next
    * values, so even if the database changes, the value is kept as it was during that one search,
    * however if the list is small this is rather ineffective, a traditional search will simply download
@@ -1600,6 +1606,10 @@ export interface IItemProviderProps {
    */
   markForDestructionOnLogout?: boolean;
   /**
+   * marks the item for destruction as the component unmounts
+   */
+  markForDestructionOnUnmount?: boolean;
+  /**
    * avoids running loadValue
    */
   avoidLoading?: boolean;
@@ -1766,6 +1776,8 @@ export class ActualItemProvider extends
   React.Component<IActualItemProviderProps, IActualItemProviderState> {
   // an internal uuid only used for testing purposes
   private internalUUID: string;
+
+  private internalSearchDestructionMarkers: Array<[string, string, string, [string, string, string], [string, string]]> = [];
 
   // this variable is useful is async tasks like loadValue are still executing after
   // this component has unmounted, which is a memory leak
@@ -3885,6 +3897,24 @@ export class ActualItemProvider extends
         this.cleanWithProps(props, props.cleanOnDismount, "success", false);
       }
     }
+
+    if (props.markForDestructionOnUnmount && props.forId) {
+      const qualifiedName = this.props.itemDefinitionInstance.getQualifiedPathName();
+      CacheWorkerInstance.instance.deleteCachedValue(qualifiedName, props.forId, props.forVersion || null);
+    }
+
+    if (this.internalSearchDestructionMarkers && this.internalSearchDestructionMarkers.length) {
+      // executing destruction markers for search
+      this.internalSearchDestructionMarkers.forEach((m, index) => {
+        CacheWorkerInstance.instance.deleteCachedSearch(
+          PREFIX_SEARCH + m[0],
+          m[1] as any,
+          m[2],
+          m[3],
+          m[4],
+        );
+      });
+    }
   }
   public componentWillUnmount() {
     this.isUnmounted = true;
@@ -5206,6 +5236,16 @@ export class ActualItemProvider extends
           null,
         );
       }
+
+      if (options.markForDestructionOnUnmount) {
+        this.installInternalSearchDestructionMarker([
+          options.cachePolicy,
+          standardCounterpart.getQualifiedPathName(),
+          options.createdBy || null,
+          searchParent,
+          null,
+        ]);
+      }
     }
 
     this.props.onWillSearch && this.props.onWillSearch();
@@ -5305,6 +5345,42 @@ export class ActualItemProvider extends
           null,
           searchCacheUsesProperty,
         );
+      }
+    }
+
+    if (options.cachePolicy && options.markForDestructionOnUnmount) {
+      if (options.cachePolicy === "by-owner") {
+        this.installInternalSearchDestructionMarker([
+          options.cachePolicy,
+          standardCounterpart.getQualifiedPathName(),
+          options.createdBy,
+          null,
+          null,
+        ]);
+      } else if (options.cachePolicy === "by-parent") {
+        this.installInternalSearchDestructionMarker([
+          options.cachePolicy,
+          standardCounterpart.getQualifiedPathName(),
+          null,
+          searchParent,
+          null,
+        ]);
+      } else if (options.cachePolicy === "by-owner-and-parent") {
+        this.installInternalSearchDestructionMarker([
+          options.cachePolicy,
+          standardCounterpart.getQualifiedPathName(),
+          options.createdBy,
+          searchParent,
+          null,
+        ]);
+      } else if (options.cachePolicy === "by-property") {
+        this.installInternalSearchDestructionMarker([
+          options.cachePolicy,
+          standardCounterpart.getQualifiedPathName(),
+          null,
+          null,
+          searchCacheUsesProperty,
+        ]);
       }
     }
 
@@ -5783,6 +5859,12 @@ export class ActualItemProvider extends
         policies: [],
       },
     });
+  }
+  private installInternalSearchDestructionMarker(marker: [string, string, string, [string, string, string], [string, string]]) {
+    const exists = this.internalSearchDestructionMarkers.find((m) => equals(m, marker, { strict: true }));
+    if (!exists) {
+      this.internalSearchDestructionMarkers.push(marker);
+    }
   }
   public render() {
     if (

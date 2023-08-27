@@ -729,6 +729,7 @@ export async function searchModule(
                 customId: null,
                 setForId: noop,
                 setVersion: noop,
+                triggerCache: {},
               });
             }
 
@@ -763,6 +764,7 @@ export async function searchModule(
                 customId: null,
                 setForId: noop,
                 setVersion: noop,
+                triggerCache: {},
               });
             }
           }
@@ -1625,6 +1627,7 @@ export async function searchItemDefinition(
                   customId: null,
                   setForId: noop,
                   setVersion: noop,
+                  triggerCache: {},
                 });
               }
 
@@ -1659,6 +1662,7 @@ export async function searchItemDefinition(
                   customId: null,
                   setForId: noop,
                   setVersion: noop,
+                  triggerCache: {},
                 });
               }
             }

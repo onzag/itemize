@@ -364,6 +364,9 @@ export async function addItemDefinition(
     const itemDefinitionTrigger = appData.triggers.item.io[pathOfThisIdef]
     const moduleTrigger = appData.triggers.module.io[pathOfThisModule];
 
+    const triggerCache = {};
+    const modTriggerCache = {};
+
     let itemDefinitionSpecificArgs: IGQLArgs = null;
     let extraArgs: IGQLArgs = null;
     let forId: string = null;
@@ -426,7 +429,8 @@ export async function addItemDefinition(
           },
           setVersion: (version: string) => {
             forVersion = version;
-          }
+          },
+          triggerCache: modTriggerCache,
         });
         // and if we have a new value
         if (newValueAccordingToModule) {
@@ -479,7 +483,8 @@ export async function addItemDefinition(
           },
           setVersion: (version: string) => {
             forVersion = version;
-          }
+          },
+          triggerCache
         });
         // and make it the new value if such trigger was registered
         if (newValueAccordingToIdef) {
@@ -571,6 +576,7 @@ export async function addItemDefinition(
         customId: null as string,
         setForId: noop,
         setVersion: noop,
+        triggerCache: modTriggerCache,
       };
       await moduleTrigger(args);
 
@@ -627,6 +633,7 @@ export async function addItemDefinition(
         customId: null as string,
         setForId: noop,
         setVersion: noop,
+        triggerCache,
       };
       await itemDefinitionTrigger(args);
 

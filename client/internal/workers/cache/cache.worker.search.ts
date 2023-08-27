@@ -69,7 +69,7 @@ export async function search(
   searchRecords: IGQLSearchRecord[],
   searchArgs: IGQLArgs,
   returnSourceResults: boolean,
-  noLimitOffset: boolean,
+  cacheNoLimitOffset: boolean,
 ): Promise<
   {
     filteredRecords: IGQLSearchRecord[];
@@ -205,7 +205,7 @@ export async function search(
   let filteredResults = newSearchRecords.map((r) => r.searchResult);
   const count = filteredRecords.length;
 
-  if (!noLimitOffset && (searchArgs.offset !== 0 || filteredRecords.length > (searchArgs.limit as number))) {
+  if (!cacheNoLimitOffset && (searchArgs.offset !== 0 || filteredRecords.length > (searchArgs.limit as number))) {
     // apply limit and offset
     filteredRecords = filteredRecords.slice(
       searchArgs.offset as number || 0,

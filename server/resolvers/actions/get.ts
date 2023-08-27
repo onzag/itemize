@@ -241,6 +241,7 @@ export async function getItemDefinition(
         customId: null,
         setForId: noop,
         setVersion: noop,
+        triggerCache: {},
       });
     }
 
@@ -275,6 +276,7 @@ export async function getItemDefinition(
         customId: null,
         setForId: noop,
         setVersion: noop,
+        triggerCache: {},
       });
     }
   }
@@ -550,6 +552,7 @@ export async function getItemDefinitionList(
             customId: null,
             setForId: noop,
             setVersion: noop,
+            triggerCache: {},
           });
         }
 
@@ -584,6 +587,7 @@ export async function getItemDefinitionList(
             customId: null,
             setForId: noop,
             setVersion: noop,
+            triggerCache: {},
           });
         }
       }
@@ -832,6 +836,7 @@ export async function getModuleList(
             customId: null,
             setForId: noop,
             setVersion: noop,
+            triggerCache: {},
           });
         }
 
@@ -866,6 +871,7 @@ export async function getModuleList(
             customId: null,
             setForId: noop,
             setVersion: noop,
+            triggerCache: {},
           });
         }
       }

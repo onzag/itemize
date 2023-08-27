@@ -301,6 +301,8 @@ export async function editItemDefinition(
     const dictionary = getDictionary(appData, resolverArgs.args);
 
     let extraArgs: IGQLArgs;
+    const triggerCache = {};
+    const modTriggerCache = {};
 
     // if we got any of them
     if (
@@ -358,6 +360,7 @@ export async function editItemDefinition(
           customId: null,
           setForId: noop,
           setVersion: noop,
+          triggerCache: modTriggerCache,
         });
         // and if we have a new value
         if (newValueAccordingToModule) {
@@ -406,6 +409,7 @@ export async function editItemDefinition(
           customId: null,
           setForId: noop,
           setVersion: noop,
+          triggerCache,
         });
         // and make it the new value if such trigger was registered
         if (newValueAccordingToIdef) {
@@ -496,6 +500,7 @@ export async function editItemDefinition(
         customId: null as string,
         setForId: noop,
         setVersion: noop,
+        triggerCache: modTriggerCache,
       };
       // we execute the trigger
       await moduleTrigger(args);
@@ -554,6 +559,7 @@ export async function editItemDefinition(
         customId: null as string,
         setForId: noop,
         setVersion: noop,
+        triggerCache,
       };
       // we call the trigger
       await itemDefinitionTrigger(args);

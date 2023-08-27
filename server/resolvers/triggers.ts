@@ -150,6 +150,10 @@ export interface IOTriggerArgType {
    * Changes the version that will be used in a CREATE event
    */
   setVersion: (version: string) => void;
+  /**
+   * a trigger cache you may freely use to store arbitrary values during the run
+   */
+  triggerCache: {[key: string]: any};
 }
 
 export interface ISearchTriggerArgType {

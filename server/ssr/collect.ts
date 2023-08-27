@@ -791,6 +791,7 @@ export class Collector {
               queryWasForbiddenByTriggers = true;
               forbiddenSignatureReason = "[FORBIDDEN_BY_MOD_TRIGGER]";
             },
+            triggerCache: {},
             customId: null,
             setForId: noop,
             setVersion: noop,
@@ -831,6 +832,7 @@ export class Collector {
             customId: null,
             setForId: noop,
             setVersion: noop,
+            triggerCache: {},
           });
         }
       }

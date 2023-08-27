@@ -186,6 +186,9 @@ export async function deleteItemDefinition(
 
   let dictionary: string;
 
+  const triggerCache = {};
+  const modTriggerCache = {};
+
   // however now we need to check if we have triggers, for that we get
   // the absolute paths
   const pathOfThisIdef = itemDefinition.getAbsolutePath().join("/");
@@ -230,6 +233,7 @@ export async function deleteItemDefinition(
         customId: null,
         setForId: noop,
         setVersion: noop,
+        triggerCache: modTriggerCache,
       });
     }
     // same with the item definition
@@ -265,6 +269,7 @@ export async function deleteItemDefinition(
         customId: null,
         setForId: noop,
         setVersion: noop,
+        triggerCache,
       });
     }
   }
@@ -310,6 +315,7 @@ export async function deleteItemDefinition(
       customId: null as string,
       setForId: noop,
       setVersion: noop,
+      triggerCache: modTriggerCache,
     };
     // we execute the trigger
     await moduleTrigger(args);
@@ -364,6 +370,7 @@ export async function deleteItemDefinition(
       customId: null as string,
       setForId: noop,
       setVersion: noop,
+      triggerCache,
     };
     // we call the trigger
     await itemDefinitionTrigger(args);
