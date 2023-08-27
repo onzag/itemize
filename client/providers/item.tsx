@@ -85,6 +85,7 @@ function getSearchStateOf(state: IActualItemProviderState): IItemSearchStateType
     searchCachePolicy: state.searchCachePolicy,
     searchListenPolicy: state.searchListenPolicy,
     searchOriginalOptions: state.searchOriginalOptions,
+    searchListenSlowPolling: state.searchListenSlowPolling,
   };
 }
 
@@ -853,6 +854,11 @@ export interface IActionSearchOptions extends IActionCleanOptions {
    */
   listenPolicy?: "by-owner" | "by-parent" | "by-owner-and-parent" | "by-property" | "none";
   /**
+   * uses slow polling rather than realtime listening
+   * this is not recommended to use, values update each minute more or less
+   */
+  listenPolicySlowPolling?: boolean;
+  /**
    * Creates a destruction marker so that the value is destroyed during logout
    * once the user logouts the database is wiped from this search given its criteria
    * it should therefore have a cache policy
@@ -1574,6 +1580,14 @@ export interface IItemProviderProps {
    */
   static?: "TOTAL" | "NO_LISTENING";
   /**
+   * uses polling to keep the value updated rather than
+   * using the standard method, it's updated only sometimes
+   * on a minute basis, but it doesn't use a listener in exchange
+   * 
+   * It's not recommended to use this
+   */
+  slowPolling?: boolean;
+  /**
    * uses long term caching with the worker cache strategy
    */
   longTermCaching?: boolean;
@@ -1928,6 +1942,7 @@ export class ActualItemProvider extends
         searchListenPolicy: "none",
         searchHighlights: {},
         searchMetadata: null,
+        searchListenSlowPolling: false,
         searchOriginalOptions: null,
       };
 
@@ -2096,6 +2111,7 @@ export class ActualItemProvider extends
       searchCachePolicy: "none",
       searchListenPolicy: "none",
       searchOriginalOptions: null,
+      searchListenSlowPolling: false,
     };
     const searchStateComplex = props.itemDefinitionInstance.getSearchState(
       props.forId || null, props.forVersion || null,
@@ -2573,6 +2589,7 @@ export class ActualItemProvider extends
           this.props.itemDefinitionInstance.getQualifiedPathName(),
           this.props.forId,
           this.props.forVersion || null,
+          this.props.slowPolling,
         );
       }
     }
@@ -2750,6 +2767,7 @@ export class ActualItemProvider extends
         this.props.remoteListener.addItemDefinitionListenerFor(
           this, this.props.itemDefinitionInstance.getQualifiedPathName(),
           this.props.forId, this.props.forVersion || null,
+          this.props.slowPolling,
         );
       }
 
@@ -2799,7 +2817,9 @@ export class ActualItemProvider extends
           );
           this.props.remoteListener.addItemDefinitionListenerFor(
             this, this.props.itemDefinitionInstance.getQualifiedPathName(),
-            this.props.forId, this.props.forVersion || null,
+            this.props.forId,
+            this.props.forVersion || null,
+            this.props.slowPolling,
           );
         }
       }
@@ -3026,6 +3046,7 @@ export class ActualItemProvider extends
       searchCachePolicy: "none",
       searchListenPolicy: "none",
       searchOriginalOptions: null,
+      searchListenSlowPolling: false,
     };
 
     const searchStateComplex = this.props.itemDefinitionInstance.getSearchState(
@@ -4962,6 +4983,7 @@ export class ActualItemProvider extends
         state.searchLastModified,
         this.onSearchReload,
         state.searchCachePolicy !== "none",
+        state.searchListenSlowPolling,
       );
     } else if (state.searchListenPolicy === "by-parent") {
       this.props.remoteListener.addParentedSearchListenerFor(
@@ -4971,7 +4993,8 @@ export class ActualItemProvider extends
         state.searchParent[2] || null,
         state.searchLastModified,
         this.onSearchReload,
-        state.searchCachePolicy !== "none"
+        state.searchCachePolicy !== "none",
+        state.searchListenSlowPolling,
       );
     } else if (state.searchListenPolicy === "by-owner-and-parent") {
       this.props.remoteListener.addOwnedParentedSearchListenerFor(
@@ -4982,7 +5005,8 @@ export class ActualItemProvider extends
         state.searchParent[2] || null,
         state.searchLastModified,
         this.onSearchReload,
-        state.searchCachePolicy !== "none"
+        state.searchCachePolicy !== "none",
+        state.searchListenSlowPolling,
       );
     } else if (state.searchListenPolicy === "by-property") {
       this.props.remoteListener.addPropertySearchListenerFor(
@@ -4991,7 +5015,8 @@ export class ActualItemProvider extends
         state.searchCacheUsesProperty[1],
         state.searchLastModified,
         this.onSearchReload,
-        state.searchCachePolicy !== "none"
+        state.searchCachePolicy !== "none",
+        state.searchListenSlowPolling,
       );
     }
 
@@ -5524,6 +5549,7 @@ export class ActualItemProvider extends
         searchCachePolicy: options.cachePolicy || "none",
         searchListenPolicy: options.listenPolicy || options.cachePolicy || "none",
         searchOriginalOptions: options,
+        searchListenSlowPolling: options.listenPolicySlowPolling || false,
       };
 
       // this would be a wasted instruction otherwise as it'd be reversed
@@ -5627,6 +5653,7 @@ export class ActualItemProvider extends
         searchCachePolicy: options.cachePolicy || "none",
         searchListenPolicy: options.listenPolicy || options.cachePolicy || "none",
         searchOriginalOptions: options,
+        searchListenSlowPolling: options.listenPolicySlowPolling || false,
       };
 
       this.searchListenersSetup(

@@ -64,6 +64,13 @@ import {
 import ItemDefinition from "../../../base/Root/Module/ItemDefinition";
 import type { IGQLSearchRecord } from "../../../gql-querier";
 
+const SLOW_POLLING_MIN_TIME = 60 * 1000;
+const SLOW_POLLING_TIME_BETWEEN_REQUESTS = 5 * 1000;
+
+async function wait(ms: number) {
+  return new Promise<void>((r) => setTimeout(r, ms));
+}
+
 /**
  * This is what the remote listener expects of an argument taken
  * by the callback
@@ -94,6 +101,11 @@ export class RemoteListener {
   private root: Root;
 
   /**
+   * Time when a last feedback was requested
+   */
+  private slowPoolingTimer: any;
+
+  /**
    * A registry of listeners of which are
    * listening for changes
    */
@@ -114,6 +126,10 @@ export class RemoteListener {
        * and unregistered
        */
       parentInstances: any[];
+      /**
+       * using the slow pooling method
+       */
+      pooling: boolean;
     },
   };
 
@@ -146,6 +162,10 @@ export class RemoteListener {
        * Whether to use the long term caching
        */
       useCacheWorker: boolean[];
+      /**
+       * using the slow pooling method
+       */
+      pooling: boolean;
     },
   };
 
@@ -178,6 +198,10 @@ export class RemoteListener {
        * Whether to use the long term caching
        */
       useCacheWorker: boolean[];
+      /**
+       * using the slow pooling method
+       */
+      pooling: boolean;
     },
   };
 
@@ -207,6 +231,10 @@ export class RemoteListener {
        * Whether to use the long term caching
        */
       useCacheWorker: boolean[];
+      /**
+       * using the slow pooling method
+       */
+      pooling: boolean;
     },
   };
 
@@ -236,6 +264,10 @@ export class RemoteListener {
        * Whether to use the long term caching
        */
       useCacheWorker: boolean[];
+      /**
+       * using the slow pooling method
+       */
+      pooling: boolean;
     },
   };
 
@@ -317,6 +349,7 @@ export class RemoteListener {
     this.consumeDelayedFeedbacks = this.consumeDelayedFeedbacks.bind(this);
     this.onError = this.onError.bind(this);
     this.pushTestingInfo = this.pushTestingInfo.bind(this);
+    this.executeSlowPollingFeedbacks = this.executeSlowPollingFeedbacks.bind(this);
 
     this.root = root;
     this.listeners = {};
@@ -552,12 +585,14 @@ export class RemoteListener {
    * @param itemDefinitionQualifiedPathName the qualifie path name of the item definition
    * @param forId for which id
    * @param forVersion for which version (null allowed)
+   * @param pooling uses slow pooling to keep for updates
    */
   public addItemDefinitionListenerFor(
     parentInstance: any,
     itemDefinitionQualifiedPathName: string,
     forId: string,
     forVersion: string,
+    pooling: boolean,
   ) {
     // first we build this qualified identifier that will act as key
     const qualifiedIdentifier = itemDefinitionQualifiedPathName + "." + forId + "." + (forVersion || "");
@@ -569,6 +604,10 @@ export class RemoteListener {
       if (index === -1) {
         // and we add it, just to keep track
         this.listeners[qualifiedIdentifier].parentInstances.push(parentInstance);
+        if (this.listeners[qualifiedIdentifier].pooling && !pooling) {
+          this.listeners[qualifiedIdentifier].pooling = false;
+          this.attachItemDefinitionListenerFor(this.listeners[qualifiedIdentifier].request);
+        }
       }
       return;
     }
@@ -585,10 +624,13 @@ export class RemoteListener {
     this.listeners[qualifiedIdentifier] = {
       request,
       parentInstances: [parentInstance],
+      pooling,
     };
 
     // and then the event is attached if possible (aka online)
-    this.attachItemDefinitionListenerFor(request);
+    if (!pooling) {
+      this.attachItemDefinitionListenerFor(request);
+    }
   }
 
   /**
@@ -645,7 +687,7 @@ export class RemoteListener {
         delete this.listeners[qualifiedID];
         this.listenerCount--;
         // and if we are connected
-        if (this.socket.connected) {
+        if (this.socket.connected && !newListenerValue.pooling) {
           // we can launch the unregister request
           const request: IUnregisterRequest = {
             id: forId,
@@ -752,6 +794,7 @@ export class RemoteListener {
     lastModified: string,
     callback: RemoteListenerRecordsCallback,
     useCacheWorker: boolean,
+    pooling: boolean,
   ) {
     // so we build our qualified identifier as well
     const qualifiedIdentifier = itemDefinitionOrModuleQualifiedPathName + "." + propertyId + "." + propertyValue;
@@ -769,6 +812,11 @@ export class RemoteListener {
       } else {
         this.propertySearchListeners[qualifiedIdentifier].useCacheWorker[index] = useCacheWorker;
       }
+
+      if (this.propertySearchListeners[qualifiedIdentifier].pooling && !pooling) {
+        this.propertySearchListeners[qualifiedIdentifier].pooling = false;
+        this.attachPropertySearchListener(this.propertySearchListeners[qualifiedIdentifier].request);
+      }
       return;
     }
 
@@ -785,10 +833,13 @@ export class RemoteListener {
       callbacks: [callback],
       lastModified,
       useCacheWorker: [useCacheWorker],
+      pooling,
     };
 
     // and attach the owner listener if possible
-    this.attachPropertySearchListener(request);
+    if (!pooling) {
+      this.attachPropertySearchListener(request);
+    }
   }
 
   /**
@@ -804,6 +855,7 @@ export class RemoteListener {
     lastModified: string,
     callback: RemoteListenerRecordsCallback,
     useCacheWorker: boolean,
+    pooling: boolean,
   ) {
     // so we build our qualified identifier as well
     const qualifiedIdentifier = itemDefinitionOrModuleQualifiedPathName + "." + createdBy;
@@ -821,6 +873,11 @@ export class RemoteListener {
       } else {
         this.ownedSearchListeners[qualifiedIdentifier].useCacheWorker[index] = useCacheWorker;
       }
+
+      if (this.ownedSearchListeners[qualifiedIdentifier].pooling && !pooling) {
+        this.ownedSearchListeners[qualifiedIdentifier].pooling = false;
+        this.attachOwnedSearchListenerFor(this.ownedSearchListeners[qualifiedIdentifier].request);
+      }
       return;
     }
 
@@ -836,10 +893,13 @@ export class RemoteListener {
       callbacks: [callback],
       lastModified,
       useCacheWorker: [useCacheWorker],
+      pooling,
     };
 
     // and attach the owner listener if possible
-    this.attachOwnedSearchListenerFor(request);
+    if (!pooling) {
+      this.attachOwnedSearchListenerFor(request);
+    }
   }
 
   /**
@@ -913,7 +973,7 @@ export class RemoteListener {
         delete this.ownedSearchListeners[qualifiedIdentifier];
         this.listenerCount--;
         // and if we are connected
-        if (this.socket.connected) {
+        if (this.socket.connected && !listenerValue.pooling) {
           // we can perform the unregister request
           const request: IOwnedSearchUnregisterRequest = {
             qualifiedPathName: itemDefinitionOrModuleQualifiedPathName,
@@ -967,7 +1027,7 @@ export class RemoteListener {
         delete this.propertySearchListeners[qualifiedIdentifier];
         this.listenerCount--;
         // and if we are connected
-        if (this.socket.connected) {
+        if (this.socket.connected && !listenerValue.pooling) {
           // we can perform the unregister request
           const request: IPropertySearchUnregisterRequest = {
             qualifiedPathName: itemDefinitionOrModuleQualifiedPathName,
@@ -1048,6 +1108,7 @@ export class RemoteListener {
     lastModified: string,
     callback: RemoteListenerRecordsCallback,
     useCacheWorker: boolean,
+    pooling: boolean,
   ) {
     // so we build the id for the parent type
     const qualifiedIdentifier = itemDefinitionOrModuleQualifiedPathName + "." +
@@ -1066,6 +1127,11 @@ export class RemoteListener {
       } else {
         this.parentedSearchListeners[qualifiedIdentifier].useCacheWorker[index] = useCacheWorker;
       }
+
+      if (this.parentedSearchListeners[qualifiedIdentifier].pooling && !pooling) {
+        this.parentedSearchListeners[qualifiedIdentifier].pooling = false;
+        this.attachParentedSearchListenerFor(this.parentedSearchListeners[qualifiedIdentifier].request);
+      }
       return;
     }
 
@@ -1083,10 +1149,13 @@ export class RemoteListener {
       callbacks: [callback],
       lastModified,
       useCacheWorker: [useCacheWorker],
+      pooling,
     };
 
     // and attempt to attach it
-    this.attachParentedSearchListenerFor(request);
+    if (!pooling) {
+      this.attachParentedSearchListenerFor(request);
+    }
   }
 
   /**
@@ -1108,6 +1177,7 @@ export class RemoteListener {
     lastModified: string,
     callback: RemoteListenerRecordsCallback,
     useCacheWorker: boolean,
+    pooling: boolean,
   ) {
     // so we build the id for the parent type
     const qualifiedIdentifier = itemDefinitionOrModuleQualifiedPathName + "." + createdBy + "." +
@@ -1125,6 +1195,11 @@ export class RemoteListener {
         this.ownedParentedSearchListeners[qualifiedIdentifier].useCacheWorker.push(useCacheWorker);
       } else {
         this.ownedParentedSearchListeners[qualifiedIdentifier].useCacheWorker[index] = useCacheWorker;
+      }
+
+      if (this.ownedParentedSearchListeners[qualifiedIdentifier].pooling && !pooling) {
+        this.ownedParentedSearchListeners[qualifiedIdentifier].pooling = false;
+        this.attachOwnedParentedSearchListenerFor(this.ownedParentedSearchListeners[qualifiedIdentifier].request);
       }
       return;
     }
@@ -1144,10 +1219,13 @@ export class RemoteListener {
       callbacks: [callback],
       lastModified,
       useCacheWorker: [useCacheWorker],
+      pooling,
     };
 
     // and attempt to attach it
-    this.attachOwnedParentedSearchListenerFor(request);
+    if (!pooling) {
+      this.attachOwnedParentedSearchListenerFor(request);
+    }
   }
 
   /**
@@ -1235,7 +1313,7 @@ export class RemoteListener {
         delete this.parentedSearchListeners[qualifiedIdentifier];
         this.listenerCount--;
         // and if we are connected
-        if (this.socket.connected) {
+        if (this.socket.connected && !listenerValue.pooling) {
           // we can unregister the listener
           const request: IParentedSearchUnregisterRequest = {
             qualifiedPathName: itemDefinitionOrModuleQualifiedPathName,
@@ -1297,7 +1375,7 @@ export class RemoteListener {
         delete this.ownedParentedSearchListeners[qualifiedIdentifier];
         this.listenerCount--;
         // and if we are connected
-        if (this.socket.connected) {
+        if (this.socket.connected && !listenerValue.pooling) {
           // we can unregister the listener
           const request: IOwnedParentedSearchUnregisterRequest = {
             qualifiedPathName: itemDefinitionOrModuleQualifiedPathName,
@@ -1744,6 +1822,8 @@ export class RemoteListener {
   private async onConnect() {
     this.offline = false;
 
+    this.slowPoolingTimer = setTimeout(this.executeSlowPollingFeedbacks, SLOW_POLLING_MIN_TIME);
+
     // we attach any detached requests, all of them are
     // by doing it here we ensure that any subsequent add won't
     // trigger twice due to the following wait
@@ -1789,6 +1869,94 @@ export class RemoteListener {
     this.connectionListeners.slice().forEach((l) => l());
   }
 
+  private async executeSlowPollingFeedbacks() {
+    if (this.socket.connected) {
+      const started = (new Date().getTime());
+      for (let listenerKey of Object.keys(this.listeners)) {
+        if (this.listeners[listenerKey].pooling) {
+          this.requestFeedbackFor(this.listeners[listenerKey].request, true);
+          await wait(SLOW_POLLING_TIME_BETWEEN_REQUESTS);
+
+          if (!this.socket.connected) {
+            return;
+          }
+        }
+      }
+
+      for (let listenerKey of Object.keys(this.ownedSearchListeners)) {
+        if (this.ownedSearchListeners[listenerKey].pooling) {
+          const lastModified = this.ownedSearchListeners[listenerKey].lastModified;
+          this.requestOwnedSearchFeedbackFor({
+            ...this.ownedSearchListeners[listenerKey].request,
+            lastModified: lastModified,
+          });
+          await wait(SLOW_POLLING_TIME_BETWEEN_REQUESTS);
+
+          if (!this.socket.connected) {
+            return;
+          }
+        }
+      }
+
+      for (let listenerKey of Object.keys(this.parentedSearchListeners)) {
+        if (this.parentedSearchListeners[listenerKey].pooling) {
+          const lastModified = this.parentedSearchListeners[listenerKey].lastModified;
+          this.requestParentedSearchFeedbackFor({
+            ...this.parentedSearchListeners[listenerKey].request,
+            lastModified: lastModified,
+          });
+          await wait(SLOW_POLLING_TIME_BETWEEN_REQUESTS);
+
+          if (!this.socket.connected) {
+            return;
+          }
+        }
+      }
+
+      for (let listenerKey of Object.keys(this.ownedParentedSearchListeners)) {
+        if (this.ownedParentedSearchListeners[listenerKey].pooling) {
+          const lastModified = this.ownedParentedSearchListeners[listenerKey].lastModified;
+          this.requestOwnedParentedSearchFeedbackFor({
+            ...this.ownedParentedSearchListeners[listenerKey].request,
+            lastModified: lastModified,
+          });
+          await wait(SLOW_POLLING_TIME_BETWEEN_REQUESTS);
+
+          if (!this.socket.connected) {
+            return;
+          }
+        }
+      }
+
+      for (let listenerKey of Object.keys(this.propertySearchListeners)) {
+        if (this.propertySearchListeners[listenerKey].pooling) {
+          const lastModified = this.propertySearchListeners[listenerKey].lastModified;
+          this.requestPropertySearchFeedbackFor({
+            ...this.propertySearchListeners[listenerKey].request,
+            lastModified: lastModified,
+          });
+          await wait(SLOW_POLLING_TIME_BETWEEN_REQUESTS);
+
+          if (!this.socket.connected) {
+            return;
+          }
+        }
+      }
+
+      // the difference for when we started and now
+      const diff = (new Date().getTime()) - started;
+      // we took too long we start over again
+      if (diff >= SLOW_POLLING_MIN_TIME) {
+        this.executeSlowPollingFeedbacks();
+      } else {
+        // we were quite fast, we wait for the next min time
+        const timeLeft = SLOW_POLLING_MIN_TIME - diff;
+        // this will get killed if it's disconnected and reset
+        this.slowPoolingTimer = setTimeout(this.executeSlowPollingFeedbacks, timeLeft);
+      }
+    }
+  }
+
   /**
    * Reattachs the detached requests
    */
@@ -1815,7 +1983,9 @@ export class RemoteListener {
 
     // now we reconnect the listeners again
     Object.keys(this.listeners).forEach((listenerKey) => {
-      this.attachItemDefinitionListenerFor(this.listeners[listenerKey].request);
+      if (!this.listeners[listenerKey].pooling) {
+        this.attachItemDefinitionListenerFor(this.listeners[listenerKey].request);
+      }
       if (requiresFeedback) {
         this.requestFeedbackFor(this.listeners[listenerKey].request, true);
       }
@@ -1823,7 +1993,9 @@ export class RemoteListener {
 
     // add the owned search listeners again
     Object.keys(this.ownedSearchListeners).forEach((listenerKey) => {
-      this.attachOwnedSearchListenerFor(this.ownedSearchListeners[listenerKey].request);
+      if (!this.ownedSearchListeners[listenerKey].pooling) {
+        this.attachOwnedSearchListenerFor(this.ownedSearchListeners[listenerKey].request);
+      }
 
       if (requiresFeedback) {
         const lastModified = this.ownedSearchListeners[listenerKey].lastModified;
@@ -1836,7 +2008,9 @@ export class RemoteListener {
 
     // and the parented search listeners as well
     Object.keys(this.parentedSearchListeners).forEach((listenerKey) => {
-      this.attachParentedSearchListenerFor(this.parentedSearchListeners[listenerKey].request);
+      if (!this.parentedSearchListeners[listenerKey].pooling) {
+        this.attachParentedSearchListenerFor(this.parentedSearchListeners[listenerKey].request);
+      }
 
       if (requiresFeedback) {
         const lastModified = this.parentedSearchListeners[listenerKey].lastModified;
@@ -1849,7 +2023,9 @@ export class RemoteListener {
 
     // and the parented search listeners as well
     Object.keys(this.ownedParentedSearchListeners).forEach((listenerKey) => {
-      this.attachOwnedParentedSearchListenerFor(this.ownedParentedSearchListeners[listenerKey].request);
+      if (!this.ownedParentedSearchListeners[listenerKey].pooling) {
+        this.attachOwnedParentedSearchListenerFor(this.ownedParentedSearchListeners[listenerKey].request);
+      }
 
       if (requiresFeedback) {
         const lastModified = this.ownedParentedSearchListeners[listenerKey].lastModified;
@@ -1862,7 +2038,9 @@ export class RemoteListener {
 
     // and the parented search listeners as well
     Object.keys(this.propertySearchListeners).forEach((listenerKey) => {
-      this.attachPropertySearchListener(this.propertySearchListeners[listenerKey].request);
+      if (!this.propertySearchListeners[listenerKey].pooling) {
+        this.attachPropertySearchListener(this.propertySearchListeners[listenerKey].request);
+      }
 
       if (requiresFeedback) {
         const lastModified = this.propertySearchListeners[listenerKey].lastModified;
@@ -1885,11 +2063,12 @@ export class RemoteListener {
   private onDisconnect() {
     this.offline = true;
     this.isReady = false;
+    clearTimeout(this.slowPoolingTimer);
 
     // Javascript is totally stupid and so it will crash because the event of calling the callback will modify the array
-      // and you would think that the forEach will manage to loop but the loop crashes because apparently it works
-      // just like a for loop where you grab the index (and then what's the point of foreach) when the event is called because
-      // Javascript is like that so I must make a copy of the array because JavaScript
+    // and you would think that the forEach will manage to loop but the loop crashes because apparently it works
+    // just like a for loop where you grab the index (and then what's the point of foreach) when the event is called because
+    // Javascript is like that so I must make a copy of the array because JavaScript
     this.connectionListeners.slice().forEach((l) => l());
   }
 }

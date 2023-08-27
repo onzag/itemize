@@ -553,6 +553,7 @@ export class Collector {
 
         // we don't need because they are traditional
         searchEngineHighlightArgs: null as any,
+        searchListenSlowPolling: args.listenPolicySlowPolling || false,
       };
 
       const state = {
