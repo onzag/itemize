@@ -62,7 +62,7 @@ interface ISearchSyncerProps {
    * can still use them, however it will be considered not synced and the non sync functions
    * will trigger, the fallback flag will be set to true
    */
-  allowPolyfilledFallback?: true;
+  allowPolyfilledFallback?: boolean;
   parentHandle?: IBaseSyncerHandle;
   onBulkLoad?: (values: IGQLValue[]) => void;
 
