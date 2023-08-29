@@ -23,12 +23,22 @@ import type Include from "../../../../base/Root/Module/ItemDefinition/Include";
 import type { IConfigRawJSONDataType } from "../../../../config";
 import type { IItemStateType } from "../../../../base/Root/Module/ItemDefinition";
 
+// Name of the table
+export const QUERIES_TABLE_NAME = "queries";
+export const SEARCHES_TABLE_NAME = "searches";
+export const STATES_TABLE_NAME = "states";
+export const METADATA_TABLE_NAME = "metadata";
+
 const STATE_LISTENERS: { [key: string]: Array<Function> } = {};
 export const POLYFILLED_INDEXED_DB: {
   [storeName: string]: {
     [key: string]: any;
   }
 } = {};
+POLYFILLED_INDEXED_DB[STATES_TABLE_NAME] = {};
+POLYFILLED_INDEXED_DB[SEARCHES_TABLE_NAME] = {};
+POLYFILLED_INDEXED_DB[QUERIES_TABLE_NAME] = {};
+POLYFILLED_INDEXED_DB[METADATA_TABLE_NAME] = {};
 
 export interface ICacheStateMetadata {
   overwriteLastModified: string;
@@ -93,6 +103,12 @@ export interface ICachedSearchResult {
    * and matching data that was available
    */
   sourceResults: ICacheMatchType[];
+  /**
+   * Whether the polyfill had to be used in the process say due to errors
+   * while storing with indexedb and if the option to enable writes
+   * to polyfill was allowed
+   */
+  polyfilled: boolean;
 }
 
 /**
@@ -212,11 +228,6 @@ export function fixFilesURLAt(
 
 // Name of the cache in the indexed db database
 export const CACHE_NAME = "ITEMIZE_CACHE";
-// Name of the table
-export const QUERIES_TABLE_NAME = "queries";
-export const SEARCHES_TABLE_NAME = "searches";
-export const STATES_TABLE_NAME = "states";
-export const METADATA_TABLE_NAME = "metadata";
 
 /**
  * This class represents a worker that works under the hood
@@ -286,6 +297,13 @@ export default class CacheWorker {
   private worker: CacheWorker = null;
 
   /**
+   * force storage full functionality
+   */
+  private storageFullForced: boolean = false;
+  private badReadsForced: boolean = false;
+  private badWritesForced: boolean = false;
+
+  /**
    * Constructs a new cache worker
    */
   public constructor(polyfilled: boolean, worker?: CacheWorker) {
@@ -319,6 +337,18 @@ export default class CacheWorker {
     }
   }
 
+  public forceStorageFull() {
+    this.storageFullForced = true;
+  }
+
+  public forceBadReads() {
+    this.badReadsForced = true;
+  }
+
+  public forceBadWrites() {
+    this.badWritesForced = true;
+  }
+
   /**
    * This actually setups the worker
    * @param version pass the build number here
@@ -329,10 +359,6 @@ export default class CacheWorker {
     }
 
     if (this.polyfilled) {
-      POLYFILLED_INDEXED_DB[STATES_TABLE_NAME] = {};
-      POLYFILLED_INDEXED_DB[SEARCHES_TABLE_NAME] = {};
-      POLYFILLED_INDEXED_DB[QUERIES_TABLE_NAME] = {};
-      POLYFILLED_INDEXED_DB[METADATA_TABLE_NAME] = {};
       this.db = true as any;
       return;
     }
@@ -524,10 +550,13 @@ export default class CacheWorker {
     version: string,
     state: IItemStateType,
     metadata: ICacheStateMetadata,
+    options?: {
+      allowFallbackWritesToPolyfill?: boolean,
+    }
   ): Promise<boolean> {
     // console.log("REQUESTED TO STORE STATE FOR", qualifiedName, id, version, value);
     if (this.worker) {
-      const rs = await this.worker.storeState(qualifiedName, id, version, state, metadata);
+      const rs = await this.worker.storeState(qualifiedName, id, version, state, metadata, options);
       if (rs) {
         const listeners = STATE_LISTENERS[qualifiedName + "." + (id || "") + "." + (version || "")];
         listeners.forEach((l) => l(id, version, state, { overwriteLastModified: metadata || null }));
@@ -557,11 +586,22 @@ export default class CacheWorker {
       if (this.polyfilled) {
         POLYFILLED_INDEXED_DB[STATES_TABLE_NAME][queryIdentifier] = { state, metadata };
       } else {
+        delete POLYFILLED_INDEXED_DB[STATES_TABLE_NAME][queryIdentifier];
+        if (this.badWritesForced) {
+          throw new Error("Forced bad writes error");
+        }
+        if (this.storageFullForced) {
+          throw new Error("Forced storage full error");
+        }
         await this.db.put(
           STATES_TABLE_NAME,
           ({ state, metadata }), queryIdentifier);
       }
     } catch (err) {
+      if (options && options.allowFallbackWritesToPolyfill) {
+        POLYFILLED_INDEXED_DB[STATES_TABLE_NAME][queryIdentifier] = { state, metadata };
+        return true;
+      }
       console.warn(err);
       return false;
     }
@@ -592,6 +632,9 @@ export default class CacheWorker {
       const tx = this.db.transaction(STATES_TABLE_NAME);
       const store = tx.objectStore(STATES_TABLE_NAME);
       keys = await store.getAllKeys();
+      // add the keys from the polyfilled
+      const polyfilledKeys = keys = Object.keys(POLYFILLED_INDEXED_DB[STATES_TABLE_NAME]);
+      Object.assign(keys, polyfilledKeys);
     }
 
     // with all the keys now we know the value
@@ -629,7 +672,13 @@ export default class CacheWorker {
       if (this.polyfilled) {
         value = POLYFILLED_INDEXED_DB[STATES_TABLE_NAME][queryIdentifier] || null;
       } else {
-        value = await this.db.get(STATES_TABLE_NAME, queryIdentifier);
+        value = POLYFILLED_INDEXED_DB[STATES_TABLE_NAME][queryIdentifier];
+        if (!value) {
+          if (this.badReadsForced) {
+            throw new Error("Forced bad read error");
+          }
+          value = await this.db.get(STATES_TABLE_NAME, queryIdentifier);
+        }
       }
       return [value.state, value.metadata];
     } catch (err) {
@@ -671,9 +720,12 @@ export default class CacheWorker {
     // and try to save it in the database, notice how we setup the expirarion
     // date
     try {
-      if (this.polyfilled) {
-        delete POLYFILLED_INDEXED_DB[STATES_TABLE_NAME][queryIdentifier];
-      } else {
+      // if (this.polyfilled) {
+      delete POLYFILLED_INDEXED_DB[STATES_TABLE_NAME][queryIdentifier];
+      if (!this.polyfilled) {
+        if (this.badWritesForced) {
+          throw new Error("Forced bad writes error");
+        }
         await this.db.delete(STATES_TABLE_NAME, queryIdentifier);
       }
     } catch (err) {
@@ -838,7 +890,9 @@ export default class CacheWorker {
     version: string,
     partialValue: IGQLValue,
     partialFields: IGQLRequestFields,
-    merge?: boolean,
+    options?: {
+      allowFallbackWritesToPolyfill?: boolean,
+    }
   ): Promise<boolean> {
     if (this.worker) {
       return this.worker.setCachedValue(
@@ -847,7 +901,7 @@ export default class CacheWorker {
         version,
         partialValue,
         partialFields,
-        merge,
+        options,
       );
     }
 
@@ -890,21 +944,32 @@ export default class CacheWorker {
 
     // otherwise we build the index indentifier, which is simple
     const queryIdentifier = `${queryName}.${id}.${(version || "")}`;
+    const idbNewValue = {
+      value: partialValue,
+      fields: partialFields,
+    };
 
-    // and try to save it in the database, notice how we setup the expirarion
-    // date
+    // and try to save it in the database
     try {
-      const idbNewValue = {
-        value: partialValue,
-        fields: partialFields,
-      };
       if (this.polyfilled) {
         POLYFILLED_INDEXED_DB[QUERIES_TABLE_NAME][queryIdentifier] = idbNewValue;
       } else {
+        // delete a potential polyfilled in case
+        delete POLYFILLED_INDEXED_DB[QUERIES_TABLE_NAME][queryIdentifier];
+        if (this.badWritesForced) {
+          throw new Error("Forced bad writes error");
+        }
+        if (this.storageFullForced) {
+          throw new Error("Forced storage full error");
+        }
         await this.db.put(QUERIES_TABLE_NAME, idbNewValue, queryIdentifier);
       }
     } catch (err) {
       console.warn(err);
+      if (options && options.allowFallbackWritesToPolyfill) {
+        POLYFILLED_INDEXED_DB[QUERIES_TABLE_NAME][queryIdentifier] = idbNewValue;
+        return true;
+      }
       return false;
     }
 
@@ -946,10 +1011,13 @@ export default class CacheWorker {
 
     // and now we try this
     try {
-      if (this.polyfilled) {
-        delete POLYFILLED_INDEXED_DB[QUERIES_TABLE_NAME][queryIdentifier];
-        delete POLYFILLED_INDEXED_DB[METADATA_TABLE_NAME][queryIdentifier];
-      } else {
+      // if (this.polyfilled) {
+      delete POLYFILLED_INDEXED_DB[QUERIES_TABLE_NAME][queryIdentifier];
+      delete POLYFILLED_INDEXED_DB[METADATA_TABLE_NAME][queryIdentifier];
+      if (!this.polyfilled) {
+        if (this.badWritesForced) {
+          throw new Error("Forced bad writes error");
+        }
         await this.db.delete(QUERIES_TABLE_NAME, queryIdentifier);
         await this.db.delete(METADATA_TABLE_NAME, queryIdentifier);
       }
@@ -971,6 +1039,9 @@ export default class CacheWorker {
     parentIdIfKnown: string,
     parentVersionIfKnown: string,
     metadata: any,
+    options?: {
+      allowFallbackWritesToPolyfill?: boolean,
+    },
   ): Promise<boolean> {
     if (this.worker) {
       return this.worker.writeSearchMetadata(
@@ -983,7 +1054,8 @@ export default class CacheWorker {
         parentIdIfKnown,
         parentVersionIfKnown,
         metadata,
-      )
+        options,
+      );
     }
 
     // console.log(
@@ -1015,18 +1087,30 @@ export default class CacheWorker {
       storeKeyName += (createdByIfKnown || "") + "." + parentTypeIfKnown + "." + parentIdIfKnown + "." + (parentVersionIfKnown || "");
     }
 
+    const idbNewValue = {
+      value: metadata,
+    };
+
     // and try to save it in the database, notice how we setup the expirarion
     // date
     try {
-      const idbNewValue = {
-        value: metadata,
-      };
       if (this.polyfilled) {
         POLYFILLED_INDEXED_DB[METADATA_TABLE_NAME][storeKeyName] = idbNewValue;
       } else {
+        delete POLYFILLED_INDEXED_DB[METADATA_TABLE_NAME][storeKeyName];
+        if (this.badWritesForced) {
+          throw new Error("Forced bad writes error");
+        }
+        if (this.storageFullForced) {
+          throw new Error("Forced storage full error");
+        }
         await this.db.put(METADATA_TABLE_NAME, idbNewValue, storeKeyName);
       }
     } catch (err) {
+      if (options && options.allowFallbackWritesToPolyfill) {
+        POLYFILLED_INDEXED_DB[METADATA_TABLE_NAME][storeKeyName] = idbNewValue;
+        return true;
+      }
       console.warn(err);
       return false;
     }
@@ -1039,9 +1123,12 @@ export default class CacheWorker {
     id: string,
     version: string,
     metadata: any,
+    options?: {
+      allowFallbackWritesToPolyfill?: boolean,
+    },
   ): Promise<boolean> {
     if (this.worker) {
-      return this.worker.writeMetadata(queryName, id, version, metadata);
+      return this.worker.writeMetadata(queryName, id, version, metadata, options);
     }
     // console.log("REQUESTED TO STORE METADATA FOR", queryName, id, version, metadata);
 
@@ -1057,18 +1144,30 @@ export default class CacheWorker {
     // otherwise we build the index indentifier, which is simple
     const queryIdentifier = `${queryName}.${id}.${(version || "")}`;
 
+    const idbNewValue = {
+      value: metadata,
+    };
+
     // and try to save it in the database, notice how we setup the expirarion
     // date
     try {
-      const idbNewValue = {
-        value: metadata,
-      };
       if (this.polyfilled) {
         POLYFILLED_INDEXED_DB[METADATA_TABLE_NAME][queryIdentifier] = idbNewValue;
       } else {
+        delete POLYFILLED_INDEXED_DB[METADATA_TABLE_NAME][queryIdentifier];
+        if (this.badWritesForced) {
+          throw new Error("Forced bad writes error");
+        }
+        if (this.storageFullForced) {
+          throw new Error("Forced storage full error");
+        }
         await this.db.put(METADATA_TABLE_NAME, idbNewValue, queryIdentifier);
       }
     } catch (err) {
+      if (options && options.allowFallbackWritesToPolyfill) {
+        POLYFILLED_INDEXED_DB[METADATA_TABLE_NAME][queryIdentifier] = idbNewValue;
+        return true;
+      }
       console.warn(err);
       return false;
     }
@@ -1131,7 +1230,14 @@ export default class CacheWorker {
       if (this.polyfilled) {
         return POLYFILLED_INDEXED_DB[METADATA_TABLE_NAME][storeKeyName] || null;
       } else {
-        return await this.db.get(METADATA_TABLE_NAME, storeKeyName);
+        let value = POLYFILLED_INDEXED_DB[METADATA_TABLE_NAME][storeKeyName];
+        if (!value) {
+          if (this.badReadsForced) {
+            throw new Error("Forced bad read error");
+          }
+          value = await this.db.get(METADATA_TABLE_NAME, storeKeyName);
+        }
+        return value;
       }
     } catch (err) {
       console.warn(err);
@@ -1165,7 +1271,14 @@ export default class CacheWorker {
       if (this.polyfilled) {
         return POLYFILLED_INDEXED_DB[METADATA_TABLE_NAME][queryIdentifier] || null;
       } else {
-        return await this.db.get(METADATA_TABLE_NAME, queryIdentifier);
+        let value = POLYFILLED_INDEXED_DB[METADATA_TABLE_NAME][queryIdentifier];
+        if (!value) {
+          if (this.badReadsForced) {
+            throw new Error("Forced bad read error");
+          }
+          value = await this.db.get(METADATA_TABLE_NAME, queryIdentifier);
+        }
+        return value;
       }
     } catch (err) {
       console.warn(err);
@@ -1214,9 +1327,14 @@ export default class CacheWorker {
 
     try {
       // get the current value
-      const currentValue: ISearchMatchType = this.polyfilled ?
-        POLYFILLED_INDEXED_DB[SEARCHES_TABLE_NAME][storeKeyName] || null :
-        await this.db.get(SEARCHES_TABLE_NAME, storeKeyName);
+      let currentValue: ISearchMatchType = POLYFILLED_INDEXED_DB[SEARCHES_TABLE_NAME][storeKeyName] || null;
+
+      if (!currentValue && !this.polyfilled) {
+        if (this.badReadsForced) {
+          throw new Error("Forced bad read error");
+        }
+        currentValue = await this.db.get(SEARCHES_TABLE_NAME, storeKeyName);
+      }
 
       if (!currentValue) {
         console.warn("Requested to delete " + storeKeyName + " but no such search is found in IndexedDB");
@@ -1239,9 +1357,12 @@ export default class CacheWorker {
       );
 
       // and now we can delete the search itself
-      if (this.polyfilled) {
-        delete POLYFILLED_INDEXED_DB[SEARCHES_TABLE_NAME][storeKeyName];
-      } else {
+      // if (this.polyfilled) {
+      delete POLYFILLED_INDEXED_DB[SEARCHES_TABLE_NAME][storeKeyName];
+      if (!this.polyfilled) {
+        if (this.badWritesForced) {
+          throw new Error("Forced bad writes error");
+        }
         await this.db.delete(SEARCHES_TABLE_NAME, storeKeyName);
       }
     } catch (err) {
@@ -1269,9 +1390,12 @@ export default class CacheWorker {
     version: string,
     partialValue: IGQLValue,
     partialFields: IGQLRequestFields,
+    options?: {
+      allowFallbackWritesToPolyfill?: boolean,
+    },
   ): Promise<boolean> {
     if (this.worker) {
-      return this.worker.mergeCachedValue(queryName, id, version, partialValue, partialFields);
+      return this.worker.mergeCachedValue(queryName, id, version, partialValue, partialFields, options);
     }
     // console.log("REQUESTED TO MERGE", queryName, id, version, partialValue);
 
@@ -1301,7 +1425,8 @@ export default class CacheWorker {
           version,
           partialValue,
           partialFields,
-          true,
+          options,
+          // true,
         );
       }
 
@@ -1324,7 +1449,8 @@ export default class CacheWorker {
         version,
         mergedValue,
         mergedFields,
-        true,
+        options,
+        // true,
       );
     }
   }
@@ -1365,9 +1491,15 @@ export default class CacheWorker {
     const queryIdentifier = `${queryName}.${id}.${(version || "")}`;
     try {
       // and we attempt to get the value from the database
-      const idbValue: ICacheMatchType = this.polyfilled ?
-        POLYFILLED_INDEXED_DB[QUERIES_TABLE_NAME][queryIdentifier] || null :
-        await this.db.get(QUERIES_TABLE_NAME, queryIdentifier);
+      let idbValue: ICacheMatchType = POLYFILLED_INDEXED_DB[QUERIES_TABLE_NAME][queryIdentifier] || null;
+
+      if (!idbValue && !this.polyfilled) {
+        if (this.badReadsForced) {
+          throw new Error("Forced bad read error");
+        }
+        idbValue = await this.db.get(QUERIES_TABLE_NAME, queryIdentifier);
+      }
+
       // if we found a value, in this case a null value means
       // no match
       if (idbValue) {
@@ -1487,7 +1619,10 @@ export default class CacheWorker {
           r.version,
           null,
           null,
-          undefined,
+          {
+            allowFallbackWritesToPolyfill: true,
+          }
+          // undefined,
         );
       }));
     } catch {
@@ -1497,9 +1632,14 @@ export default class CacheWorker {
     // So we say that not all results are preloaded so that when the next iteration of the
     // search notices (which should be executed shortly afterwards, then the new records are loaded)
     try {
-      const currentValue: ISearchMatchType = this.polyfilled ?
-        POLYFILLED_INDEXED_DB[SEARCHES_TABLE_NAME][storeKeyName] || null :
-        await this.db.get(SEARCHES_TABLE_NAME, storeKeyName);
+      let currentValue: ISearchMatchType = POLYFILLED_INDEXED_DB[SEARCHES_TABLE_NAME][storeKeyName] || null;
+
+      if (!currentValue && !this.polyfilled) {
+        if (this.badReadsForced) {
+          throw new Error("Forced bad read error");
+        }
+        currentValue = await this.db.get(SEARCHES_TABLE_NAME, storeKeyName);
+      }
 
       if (!currentValue) {
         console.warn("Requested update for " + storeKeyName + " but no such search is found in IndexedDB");
@@ -1574,6 +1714,13 @@ export default class CacheWorker {
             allResultsPreloaded: false,
           };
         } else {
+          delete POLYFILLED_INDEXED_DB[SEARCHES_TABLE_NAME][storeKeyName];
+          if (this.badWritesForced) {
+            throw new Error("Forced bad writes error");
+          }
+          if (this.storageFullForced) {
+            throw new Error("Forced storage full error");
+          }
           await this.db.put(SEARCHES_TABLE_NAME, {
             ...currentValue,
             lastModified: newLastModified,
@@ -1619,6 +1766,9 @@ export default class CacheWorker {
     returnSources: boolean,
     redoSearch: boolean,
     redoRecords: boolean | IGQLSearchRecord[],
+    options?: {
+      allowFallbackWritesToPolyfill?: boolean,
+    }
   ): Promise<ICachedSearchResult> {
     if (this.worker) {
       return this.worker.runCachedSearch(
@@ -1636,6 +1786,7 @@ export default class CacheWorker {
         returnSources,
         redoSearch,
         redoRecords,
+        options,
       );
     }
 
@@ -1665,6 +1816,8 @@ export default class CacheWorker {
         searchArgs.parent_id + "." + (searchArgs.parent_version || "");
     }
 
+    let polyfilled = false;
+
     // first we build an array for the results that we need to process
     // this means results that are not loaded in memory or partially loaded
     // in memory for some reason, say if the last search failed partially
@@ -1679,11 +1832,15 @@ export default class CacheWorker {
 
     try {
       // now we request indexed db for a result
-      const dbValue: ISearchMatchType = redoSearch ? null : (
-        this.polyfilled ?
-          POLYFILLED_INDEXED_DB[SEARCHES_TABLE_NAME][storeKeyName] :
-          await this.db.get(SEARCHES_TABLE_NAME, storeKeyName)
+      let dbValue: ISearchMatchType = redoSearch ? null : (
+        POLYFILLED_INDEXED_DB[SEARCHES_TABLE_NAME][storeKeyName] || null
       );
+      if (!dbValue && !this.polyfilled && !redoSearch) {
+        if (this.badReadsForced) {
+          throw new Error("Forced bad read error");
+        }
+        dbValue = await this.db.get(SEARCHES_TABLE_NAME, storeKeyName);
+      }
       // if the database is not offering anything or the limit is less than
       // it is supposed to be, this means that we have grown the cache size, but yet
       // the cache remains constrained by the older size
@@ -1752,6 +1909,7 @@ export default class CacheWorker {
             lastModified: null,
             sourceRecords: null,
             sourceResults: null,
+            polyfilled,
           };
         }
 
@@ -1796,6 +1954,7 @@ export default class CacheWorker {
               lastModified: null,
               sourceRecords: null,
               sourceResults: null,
+              polyfilled,
             };
           }
 
@@ -1857,6 +2016,7 @@ export default class CacheWorker {
               lastModified,
               sourceRecords: resultsToProcess,
               sourceResults,
+              polyfilled,
             };
           } catch (err) {
             // It comes here if it finds data corruption during the search and it should
@@ -1887,6 +2047,7 @@ export default class CacheWorker {
         lastModified,
         sourceRecords: null,
         sourceResults: null,
+        polyfilled,
       };
     }
 
@@ -1905,14 +2066,56 @@ export default class CacheWorker {
         lastModified,
         count: resultsCount,
       };
+      polyfilled = true;
     } else {
-      await this.db.put(SEARCHES_TABLE_NAME, {
-        value: resultsToProcess,
-        fields: getListRequestedFields,
-        allResultsPreloaded: false,
-        lastModified,
-        count: resultsCount,
-      }, storeKeyName);
+      try {
+        delete POLYFILLED_INDEXED_DB[SEARCHES_TABLE_NAME][storeKeyName];
+        if (this.badWritesForced) {
+          throw new Error("Forced bad writes error");
+        }
+        if (this.storageFullForced) {
+          throw new Error("Forced storage full error");
+        }
+        await this.db.put(SEARCHES_TABLE_NAME, {
+          value: resultsToProcess,
+          fields: getListRequestedFields,
+          allResultsPreloaded: false,
+          lastModified,
+          count: resultsCount,
+        }, storeKeyName);
+      } catch (err) {
+        console.error(err);
+        if (options && options.allowFallbackWritesToPolyfill) {
+          POLYFILLED_INDEXED_DB[SEARCHES_TABLE_NAME][storeKeyName] = {
+            value: resultsToProcess,
+            fields: getListRequestedFields,
+            allResultsPreloaded: false,
+            lastModified,
+            count: resultsCount,
+          };
+          polyfilled = true;
+        } else {
+          const gqlValue: IGQLEndpointValue = {
+            data: null,
+            errors: [
+              {
+                extensions: {
+                  code: ENDPOINT_ERRORS.UNSPECIFIED,
+                  message: "Error at the cache worker level, you may want to allowFallbackWritesToPolyfill",
+                },
+              },
+            ],
+          };
+          return {
+            gqlValue,
+            dataMightBeStale,
+            lastModified,
+            sourceRecords: null,
+            sourceResults: null,
+            polyfilled: false,
+          };
+        }
+      }
     }
 
     // now we first got to extract what is has actually been loaded from those
@@ -1979,53 +2182,78 @@ export default class CacheWorker {
     });
 
     // now we need to load all those batches into graphql queries
-    const processedBatches = await Promise.all(batches.map(async (batch) => {
-      // makes no sense sending a request with nothing to fetch
-      if (batch.length === 0) {
-        return {
-          gqlValue: {
-            data: {
-              [getListQueryName]: {
-                results: [],
-              }
+    let processedBatches: Array<{ gqlValue: IGQLEndpointValue, batch: IGQLSearchRecord[] }>;
+    try {
+      processedBatches = await Promise.all(batches.map(async (batch) => {
+        // makes no sense sending a request with nothing to fetch
+        if (batch.length === 0) {
+          return {
+            gqlValue: {
+              data: {
+                [getListQueryName]: {
+                  results: [],
+                }
+              },
+            },
+            batch,
+          }
+        }
+
+        const args: IGQLArgs = {
+          token: getListTokenArg,
+          language: getListLangArg,
+          records: batch,
+        };
+        if (searchArgs.created_by) {
+          args.created_by = searchArgs.created_by;
+        }
+        // we build the query, using the get list functionality
+        const listQuery = buildGqlQuery({
+          name: getListQueryName,
+          args,
+          fields: {
+            results: getListRequestedFields,
+          },
+        });
+        // and execute it
+        const gqlValue = await gqlQuery(
+          listQuery,
+          // let's not do that, this thing batches
+          // because requests are big
+          // {
+          //   // should allow to merge all the
+          //   // current batches into one request
+          //   merge: true,
+          //   mergeMS: 10,
+          // }
+        );
+
+        // return the value, whatever it is, null, error, etc..
+        return { gqlValue, batch };
+      }));
+    } catch (err) {
+      console.error(err);
+
+      const gqlValue: IGQLEndpointValue = {
+        data: null,
+        errors: [
+          {
+            extensions: {
+              code: ENDPOINT_ERRORS.UNSPECIFIED,
+              message: "Error at the cache worker level, fetch has failed",
             },
           },
-          batch,
-        }
-      }
-
-      const args: IGQLArgs = {
-        token: getListTokenArg,
-        language: getListLangArg,
-        records: batch,
+        ],
       };
-      if (searchArgs.created_by) {
-        args.created_by = searchArgs.created_by;
-      }
-      // we build the query, using the get list functionality
-      const listQuery = buildGqlQuery({
-        name: getListQueryName,
-        args,
-        fields: {
-          results: getListRequestedFields,
-        },
-      });
-      // and execute it
-      const gqlValue = await gqlQuery(
-        listQuery,
-        // let's not do that, this thing batches
-        // because requests are big
-        // {
-        //   // should allow to merge all the
-        //   // current batches into one request
-        //   merge: true,
-        //   mergeMS: 10,
-        // }
-      );
-
-      // return the value, whatever it is, null, error, etc..
-      return { gqlValue, batch };
-    }));
+      return {
+        gqlValue,
+        dataMightBeStale,
+        lastModified,
+        sourceRecords: null,
+        sourceResults: null,
+        polyfilled: false,
+      };
+    }
 
     // we will assume one error, whatever we pick at last, to be
     // the global error and consider everything to be failed even if
@@ -2070,7 +2298,8 @@ export default class CacheWorker {
                 originalBatchRequest.id,
                 originalBatchRequest.version,
                 null,
-                null
+                null,
+                options,
               );
             } else {
               // otherwise we do push the value and merge the cache
@@ -2082,6 +2311,7 @@ export default class CacheWorker {
                 originalBatchRequest.version,
                 value,
                 getListRequestedFields,
+                options,
               );
             }
 
@@ -2103,20 +2333,65 @@ export default class CacheWorker {
     if (!somethingFailed) {
       // we mark everything as cached, it has succeed caching
       // everything!
-      const actualCurrentSearchValue: ISearchMatchType = this.polyfilled ?
-        (POLYFILLED_INDEXED_DB[SEARCHES_TABLE_NAME][storeKeyName] || null) :
-        await this.db.get(SEARCHES_TABLE_NAME, storeKeyName);
+      let actualCurrentSearchValue: ISearchMatchType = POLYFILLED_INDEXED_DB[SEARCHES_TABLE_NAME][storeKeyName] || null;
+
+      if (!actualCurrentSearchValue && !this.polyfilled) {
+        if (this.badReadsForced) {
+          throw new Error("Forced bad read error");
+        }
+        actualCurrentSearchValue = await this.db.get(SEARCHES_TABLE_NAME, storeKeyName);
+      }
 
       if (this.polyfilled) {
         POLYFILLED_INDEXED_DB[SEARCHES_TABLE_NAME][storeKeyName] = {
           ...actualCurrentSearchValue,
           allResultsPreloaded: true,
         };
+        polyfilled = true;
       } else {
-        await this.db.put(SEARCHES_TABLE_NAME, {
-          ...actualCurrentSearchValue,
-          allResultsPreloaded: true,
-        }, storeKeyName);
+        try {
+          delete POLYFILLED_INDEXED_DB[SEARCHES_TABLE_NAME][storeKeyName];
+          if (this.badWritesForced) {
+            throw new Error("Forced bad writes error");
+          }
+          if (this.storageFullForced) {
+            throw new Error("Forced storage full error");
+          }
+          await this.db.put(SEARCHES_TABLE_NAME, {
+            ...actualCurrentSearchValue,
+            allResultsPreloaded: true,
+          }, storeKeyName);
+        } catch (err) {
+          if (options && options.allowFallbackWritesToPolyfill) {
+            POLYFILLED_INDEXED_DB[SEARCHES_TABLE_NAME][storeKeyName] = {
+              ...actualCurrentSearchValue,
+              allResultsPreloaded: true,
+            };
+            polyfilled = true;
+          } else {
+            console.error(err);
+
+            const gqlValue: IGQLEndpointValue = {
+              data: null,
+              errors: [
+                {
+                  extensions: {
+                    code: ENDPOINT_ERRORS.UNSPECIFIED,
+                    message: "Error at the cache worker level, storing the new all results preloaded state failed",
+                  },
+                },
+              ],
+            };
+            return {
+              gqlValue,
+              dataMightBeStale,
+              lastModified,
+              sourceRecords: null,
+              sourceResults: null,
+              polyfilled: false,
+            };
+          }
+        }
       }
 
       // Now we need to filter the search results in order to return what is
@@ -2144,6 +2419,7 @@ export default class CacheWorker {
         lastModified,
         sourceResults,
         sourceRecords: actualCurrentSearchValue.value,
+        polyfilled,
       };
     } else if (error) {
       // if we managed to catch an error, we pretend
@@ -2162,6 +2438,7 @@ export default class CacheWorker {
         lastModified,
         sourceRecords: null,
         sourceResults: null,
+        polyfilled: false,
       };
     } else {
       // otherwise it must have been some sort
@@ -2185,6 +2462,7 @@ export default class CacheWorker {
         lastModified,
         sourceRecords: null,
         sourceResults: null,
+        polyfilled: false,
       };
     }
   }

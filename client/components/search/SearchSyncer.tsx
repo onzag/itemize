@@ -57,12 +57,12 @@ interface ISearchSyncerProps {
   mod: string;
 
   /**
-   * This will make it so that the search is executed as a traditional search if there's no way
+   * This will make it so that the search is executed as a polyfilled search if there's no way
    * to execute it otherwise (as in no way to save the search results is available) so that you
    * can still use them, however it will be considered not synced and the non sync functions
    * will trigger, the fallback flag will be set to true
    */
-  allowTraditionalFallback?: boolean;
+  allowPolyfilledFallback?: true;
   parentHandle?: IBaseSyncerHandle;
   onBulkLoad?: (values: IGQLValue[]) => void;
 
@@ -90,7 +90,7 @@ export default function SearchSyncer(props: ISearchSyncerProps): any {
   const handleMechanism = useHandleMechanism(
     props.id,
     props.parentHandle,
-    props.allowTraditionalFallback,
+    props.allowPolyfilledFallback,
 
     selfUsedFallback ? false : selfSynced,
     selfUsedFallback ? true : !!failed,
@@ -118,16 +118,16 @@ export default function SearchSyncer(props: ISearchSyncerProps): any {
     // we sync
     setSelfSynced(!data.error && data.cached);
 
-    if (!data.error && data.cached) {
+    if (!data.error && data.cached && !data.polyfilled) {
       console.log("Synced search for " + (props.type || props.mod) +  " from " + props.id + " with " + data.count + " results");
     } else {
-      const reason = data.cached ? " not cached" : " error";
+      const reason = data.polyfilled ? " polyfilled" : (data.cached ? " not cached" : " error");
       console.log("Could not sync " + (props.type || props.mod) +  " from " + props.id + " with " + data.count + " results," + reason);
     }
 
     if (data.error) {
       setFailed(data.error);
-    } else if (props.allowTraditionalFallback || data.cached) {
+    } else if (props.allowPolyfilledFallback || data.cached) {
       // grab the results and send them
       const results = data.results;
       props.onBulkLoad && props.onBulkLoad(results);
@@ -136,32 +136,29 @@ export default function SearchSyncer(props: ISearchSyncerProps): any {
         setSelfUsedFallback(true);
       }
     }
-  }, [props.allowTraditionalFallback, props.onBulkLoad]);
+  }, [props.allowPolyfilledFallback, props.onBulkLoad]);
 
   if (props.search && !props.search.cachePolicy) {
     throw new Error("You should use a cache policy for the search syncer, set cachePolicy in the automatic search options");
   }
 
-  if (props.search && !props.search.cacheDoNotFallback) {
+  if (props.search && !props.search.cacheDoNotFallbackToSimpleSearch) {
     throw new Error("The cache search syncer needs to be in non-fallback mode " +
-    " set cacheDoNotFallback in the automatic search options, use allowTraditionalFallback to force a fallback");
+    " set cacheDoNotFallbackToSimpleSearch in the automatic search options, use allowPolyfilledFallback to force a fallback");
   }
 
-  if (props.search && !props.search.cacheDoNotUsePolyfill) {
-    console.warn(
-      "The cache search syncer does not have cacheDoNotUsePolyfill as true, this will cause the sync to succeed even with no cache support and store "+
-      "the values in volatile memory (polyfill version), make sure this is intentional"
-    );
+  if (props.search && !props.search.cacheDoNotFallbackToPolyfill) {
+    throw new Error("The cache search syncer needs to be in non-fallback to polyfill mode " +
+      " set cacheDoNotFallbackToPolyfill to true in the automatic search options, use allowPolyfilledFallback to force a fallback");
   }
 
   let searchArgs = props.search;
 
   let modified = false;
-  if (props.allowTraditionalFallback && searchArgs) {
+  if (props.allowPolyfilledFallback && searchArgs) {
     searchArgs = {
       ...searchArgs,
-      traditional: true,
-      cacheDoNotFallback: false,
+      cacheDoNotFallbackToPolyfill: false,
     }
     modified = true;
   }

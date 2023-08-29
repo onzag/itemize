@@ -90,7 +90,7 @@ export async function search(
         // db being true means is using polyfill
         const value = (db as any) === true ?
           POLYFILLED_INDEXED_DB[QUERIES_TABLE_NAME][queryIdentifier] :
-          await db.get(QUERIES_TABLE_NAME, queryIdentifier);
+          POLYFILLED_INDEXED_DB[QUERIES_TABLE_NAME][queryIdentifier] || await db.get(QUERIES_TABLE_NAME, queryIdentifier);
 
         if (returnSourceResults) {
           sourceResults[index] = value

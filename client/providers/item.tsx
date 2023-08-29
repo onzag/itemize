@@ -197,6 +197,7 @@ export interface IActionResponseWithSearchResults extends IBasicActionResponse {
   limit: number;
   offset: number;
   cached: boolean;
+  polyfilled: boolean;
   /**
    * Only truly relevant when pileSearch is used
    */
@@ -796,13 +797,13 @@ export interface IActionSearchOptions extends IActionCleanOptions {
    */
   cachePolicy?: "by-owner" | "by-parent" | "by-owner-and-parent" | "by-property" | "none";
   /**
-   * refuse to fallback if no cache worker support or if cache fails for some reason
+   * refuse to fallback to a standard search if no cache worker support or if cache fails for some reason
    * not recommended to use this anywhere unless for syncing
    * 
    * you may want to enable cacheDoNotUsePolyfill as well as searches are allowed to use polyfills
    * by default
    */
-  cacheDoNotFallback?: boolean;
+  cacheDoNotFallbackToSimpleSearch?: boolean;
   /**
    * if set searches that have been executed with the cache worker will not have a limit nor offset
    * applied to them, recommended to use if you want to download everything related to a specific user
@@ -810,9 +811,11 @@ export interface IActionSearchOptions extends IActionCleanOptions {
    */
   cacheNoLimitOffset?: boolean;
   /**
-   * Will not use the memory polyfilled version of the cache worker when this is not available
+   * Will not fallback to polyfill to store search results if the cache worker fails midway or is
+   * otherwise not available, by default search will do all in its power to succesfully cache
+   * even if that means using volatile memory
    */
-  cacheDoNotUsePolyfill?: boolean;
+  cacheDoNotFallbackToPolyfill?: boolean;
   /**
    * The tracked property, all tracked properties must be of type exact-value-tracked or exact-identifier-tracked
    * exact-value-tracked is an arbitrary string value, where an exact-identifier-tracked is used for ids such as user ids
@@ -2261,7 +2264,7 @@ export class ActualItemProvider extends
 
     // and if we have a cache, which runs behind a worker
     // won't run in server mode so it's safe
-    if (CacheWorkerInstance.isSupported || CacheWorkerInstance.isPolyfilled) {
+    if (CacheWorkerInstance.isSupportedAsWorker || CacheWorkerInstance.isPolyfilled) {
       // let's set it up
       // as you can see this function might run several times per instance
       // but that's okay, all next runs get ignored
@@ -2961,7 +2964,7 @@ export class ActualItemProvider extends
         (
           this.props.storeStateOnChange &&
           // won't use polyfills for storing states as that's just downright dangerous
-          CacheWorkerInstance.isSupported
+          CacheWorkerInstance.isSupportedAsWorker
         )
       ) &&
       !equals(this.state.itemState, prevState.itemState, { strict: true })
@@ -2976,7 +2979,7 @@ export class ActualItemProvider extends
   }
 
   private async storeStateDelayed() {
-    if (this.props.storeStateOnChange && CacheWorkerInstance.isSupported) {
+    if (this.props.storeStateOnChange && CacheWorkerInstance.isSupportedAsWorker) {
       const location = getStoredStateLocation(this.props.storeStateOnChange, this.props.forId, this.props.forVersion);
       const serializable = ItemDefinition.getSerializableState(this.state.itemState);
       const metadataSource = this.state.itemState &&
@@ -3198,7 +3201,7 @@ export class ActualItemProvider extends
       // we need to cache what we have been just specified
       if (
         // we do not use the polyfill to save get values
-        CacheWorkerInstance.isSupported &&
+        CacheWorkerInstance.isSupportedAsWorker &&
         this.props.longTermCaching
       ) {
         const qualifiedName = this.props.itemDefinitionInstance.getQualifiedPathName();
@@ -3284,12 +3287,12 @@ export class ActualItemProvider extends
     );
   }
   // public setupStoredStateListener(qPath: string, location: IStoredStateLocation) {
-  //   if (CacheWorkerInstance.isSupported) {
+  //   if (CacheWorkerInstance.isSupportedAsWorker) {
   //     CacheWorkerInstance.instance.addEventListenerToStateChange(qPath, location.id, location.version, this.loadStoredStateListener);
   //   }
   // }
   // public removeStoredStateListener(qPath: string, location: IStoredStateLocation) {
-  //   if (CacheWorkerInstance.isSupported) {
+  //   if (CacheWorkerInstance.isSupportedAsWorker) {
   //     CacheWorkerInstance.instance.removeEventListenerToStateChange(qPath, location.id, location.version, this.loadStoredStateListener);
   //   }
   // }
@@ -3300,7 +3303,7 @@ export class ActualItemProvider extends
   // }
   public async loadStoredState(location: IStoredStateLocation) {
     // no polyfills for loaded states
-    if (CacheWorkerInstance.isSupported) {
+    if (CacheWorkerInstance.isSupportedAsWorker) {
       const [storedState, metadata] = await CacheWorkerInstance.instance.retrieveState(
         this.props.itemDefinitionQualifiedName,
         location.id,
@@ -3426,7 +3429,7 @@ export class ActualItemProvider extends
       !this.props.doNotUseMemoryCache &&
       this.props.longTermCachingMetadata &&
       // no polyfilling for loading value and related meatadat
-      CacheWorkerInstance.isSupported
+      CacheWorkerInstance.isSupportedAsWorker
     ) {
       currentMetadata = await CacheWorkerInstance.instance.readMetadata(
         PREFIX_GET + qualifiedName,
@@ -3469,7 +3472,7 @@ export class ActualItemProvider extends
         // make it so that when we are exiting the search context it caches
         let cached: boolean = false;
         if (
-          CacheWorkerInstance.isSupported &&
+          CacheWorkerInstance.isSupportedAsWorker &&
           this.props.longTermCaching &&
           !this.props.searchContext
         ) {
@@ -4140,6 +4143,7 @@ export class ActualItemProvider extends
         count: null,
         error: emulatedError,
         cached: false,
+        polyfilled: false,
         cancelled: false,
       };
     } else {
@@ -4837,7 +4841,7 @@ export class ActualItemProvider extends
         options.storeStateIfCantConnect &&
         error.code === ENDPOINT_ERRORS.CANT_CONNECT &&
         // no polyfilling for storing states
-        CacheWorkerInstance.isSupported
+        CacheWorkerInstance.isSupportedAsWorker
       ) {
         const state = this.props.itemDefinitionInstance.getStateNoExternalChecking(
           this.props.forId || null,
@@ -4886,7 +4890,7 @@ export class ActualItemProvider extends
       if (
         options.clearStoredStateIfSubmitted &&
         // no polyfilling for state based stuff
-        CacheWorkerInstance.isSupported
+        CacheWorkerInstance.isSupportedAsWorker
       ) {
         const storedLocation = getStoredStateLocation(options.clearStoredStateIfSubmitted, this.props.forId, this.props.forVersion);
         deletedState = await CacheWorkerInstance.instance.deleteState(
@@ -5094,6 +5098,7 @@ export class ActualItemProvider extends
     const cancelledResponse: IActionResponseWithSearchResults = {
       searchId: null,
       cached: false,
+      polyfilled: false,
       count: null,
       limit: options.limit,
       offset: options.offset,
@@ -5478,13 +5483,14 @@ export class ActualItemProvider extends
       highlights,
       metadata,
       cached,
+      polyfilled,
     } = await runSearchQueryFor({
       args: argumentsForQuery,
       fields: requestedSearchFields,
       itemDefinition: this.props.itemDefinitionInstance,
       cachePolicy: options.cachePolicy || "none",
-      cacheDoNotFallback: options.cacheDoNotFallback,
-      cacheDoNotUsePolyfill: options.cacheDoNotUsePolyfill,
+      cacheDoNotFallbackToSimpleSearch: options.cacheDoNotFallbackToSimpleSearch,
+      cacheDoNotFallbackToPolyfill: options.cacheDoNotFallbackToPolyfill,
       cacheNoLimitOffset: options.cacheNoLimitOffset,
       trackedProperty: options.trackedProperty || null,
       createdBy: options.createdBy || null,
@@ -5732,6 +5738,7 @@ export class ActualItemProvider extends
       error,
       cached,
       cancelled: false,
+      polyfilled,
     };
     this.props.onSearch && this.props.onSearch(result);
     this.activeSearchPromise = null;

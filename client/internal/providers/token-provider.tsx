@@ -371,7 +371,7 @@ class ActualTokenProvider extends React.Component<IActualTokenProviderProps, IAc
 
       // so if we got a cache, we will give it a go first, regardless
       // this should work in offline mode too
-      if (CacheWorkerInstance.isSupported) {
+      if (CacheWorkerInstance.isSupportedAsWorker) {
         // we get the cached value for this query
         const cachedValue =
           await CacheWorkerInstance.instance.getCachedValue(
@@ -445,7 +445,7 @@ class ActualTokenProvider extends React.Component<IActualTokenProviderProps, IAc
           }
 
           // and if our cache is supported
-          if (CacheWorkerInstance.isSupported) {
+          if (CacheWorkerInstance.isSupportedAsWorker) {
             // we do merge the thing if possible
             const newCachedValue = userLanguageData.data.GET_MOD_users__IDEF_user;
             CacheWorkerInstance.instance.mergeCachedValue(

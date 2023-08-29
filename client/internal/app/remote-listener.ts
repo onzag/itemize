@@ -1496,7 +1496,7 @@ export class RemoteListener {
 
         // and if we got a cache worker
         // since we are deleting we ignore the cache worker policy
-        if (CacheWorkerInstance.isSupported) {
+        if (CacheWorkerInstance.isSupportedAsWorker) {
           // we do the delete
           CacheWorkerInstance.instance.setCachedValue(
             PREFIX_GET + itemDefinition.getQualifiedPathName(),
@@ -1525,7 +1525,7 @@ export class RemoteListener {
 
       // and if we got a cache worker
       // since we are deleting we ignore the cache worker policy
-      if (CacheWorkerInstance.isSupported) {
+      if (CacheWorkerInstance.isSupportedAsWorker) {
         // we are going to do this to upate such it gets deleted
         // if it exists there
         CacheWorkerInstance.instance.setCachedValue(
@@ -1565,7 +1565,7 @@ export class RemoteListener {
       ownedListener.lastModified = event.newLastModified;
 
       // and if our cache worker is supported
-      if (CacheWorkerInstance.isSupported && ownedListener.useCacheWorker.some((w) => w)) {
+      if (CacheWorkerInstance.isSupportedAsWorker && ownedListener.useCacheWorker.some((w) => w)) {
         // we are going to request it to add the new records that our event
         // comes loaded with the new records that were added to it
         await CacheWorkerInstance.instance.updateRecordsOnCachedSearch(
@@ -1628,7 +1628,7 @@ export class RemoteListener {
       parentedListener.lastModified = event.newLastModified;
 
       // and equally we try to add these records
-      if (CacheWorkerInstance.isSupported && parentedListener.useCacheWorker.some((w) => w)) {
+      if (CacheWorkerInstance.isSupportedAsWorker && parentedListener.useCacheWorker.some((w) => w)) {
         await CacheWorkerInstance.instance.updateRecordsOnCachedSearch(
           PREFIX_SEARCH + event.qualifiedPathName,
           null,
@@ -1685,7 +1685,7 @@ export class RemoteListener {
       propertyListener.lastModified = event.newLastModified;
 
       // and equally we try to add these records
-      if (CacheWorkerInstance.isSupported && propertyListener.useCacheWorker.some((w) => w)) {
+      if (CacheWorkerInstance.isSupportedAsWorker && propertyListener.useCacheWorker.some((w) => w)) {
         await CacheWorkerInstance.instance.updateRecordsOnCachedSearch(
           PREFIX_SEARCH + event.qualifiedPathName,
           null,
@@ -1746,7 +1746,7 @@ export class RemoteListener {
       ownedParentedListener.lastModified = event.newLastModified;
 
       // and equally we try to add these records
-      if (CacheWorkerInstance.isSupported && ownedParentedListener.useCacheWorker.some((w) => w)) {
+      if (CacheWorkerInstance.isSupportedAsWorker && ownedParentedListener.useCacheWorker.some((w) => w)) {
         await CacheWorkerInstance.instance.updateRecordsOnCachedSearch(
           PREFIX_SEARCH + event.qualifiedPathName,
           event.createdBy,

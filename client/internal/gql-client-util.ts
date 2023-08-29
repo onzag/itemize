@@ -771,7 +771,7 @@ async function storeAndCombineStorageValuesFor(
 
   const qualifiedName = itemDefinition.getQualifiedPathName();
 
-  if (cacheStore && CacheWorkerInstance.isSupported) {
+  if (cacheStore && CacheWorkerInstance.isSupportedAsWorker) {
     // in the case of delete, we just cache nulls also
     // the same applies in the case of get and a not found
     // was the output
@@ -867,7 +867,7 @@ export async function runGetQueryFor(
 
   // otherwise now let's check for the worker
   if (
-    CacheWorkerInstance.isSupported &&
+    CacheWorkerInstance.isSupportedAsWorker &&
     arg.returnWorkerCachedValues
   ) {
 
@@ -1013,7 +1013,7 @@ export async function runGetQueryFor(
   } else if (error.code === ENDPOINT_ERRORS.CANT_CONNECT) {
     // otherwise now let's check for the worker
     if (
-      CacheWorkerInstance.isSupported &&
+      CacheWorkerInstance.isSupportedAsWorker &&
       arg.returnWorkerCachedValuesIfNoInternet
     ) {
       // we ask the worker for the value
@@ -1503,8 +1503,9 @@ interface ISearchQueryArg {
 interface IRunSearchQueryArg extends ISearchQueryArg {
   cachePolicy: "by-owner" | "by-parent" | "by-owner-and-parent" | "by-property" | "none";
   cacheNoLimitOffset?: boolean;
-  cacheDoNotFallback?: boolean;
+  cacheDoNotFallbackToSimpleSearch?: boolean;
   cacheDoNotUsePolyfill?: boolean;
+  cacheDoNotFallbackToPolyfill?: boolean;
   cacheStoreMetadata?: any;
   cacheStoreMetadataMismatchAction?: SearchCacheMetadataMismatchActionFn | ISearchCacheMetadataMismatchAction;
   trackedProperty?: string;
@@ -1532,6 +1533,7 @@ interface IRunSearchQueryResult {
   highlights: IElasticHighlightRecordInfo;
   metadata: string;
   cached: boolean;
+  polyfilled: boolean;
 }
 
 export function getSearchArgsFor(
@@ -1712,12 +1714,13 @@ export async function runSearchQueryFor(
 
   let gqlValue: IGQLEndpointValue;
   let cached: boolean = false;
-  let usesCacheWorker: boolean = (
+  let polyfilled: boolean = false;
+  let useCacheWorker: boolean = (
     // will use cache worker
     arg.cachePolicy !== "none" &&
     (
-      CacheWorkerInstance.isSupported ||
-      (arg.cacheDoNotUsePolyfill ? false : CacheWorkerInstance.isPolyfilled)
+      CacheWorkerInstance.isSupportedAsWorker ||
+      (arg.cacheDoNotFallbackToPolyfill ? false : CacheWorkerInstance.isPolyfilled)
     )
   );
   // if we are in a search with
@@ -1728,7 +1731,7 @@ export async function runSearchQueryFor(
   // for that we would totally relegate the search functionality
   // and even requesting the server to the cache worker, it will take
   // as much time as it is necessary
-  if (usesCacheWorker) {
+  if (useCacheWorker) {
     if ((arg.cachePolicy === "by-owner" || arg.cachePolicy === "by-owner-and-parent") && !arg.createdBy || arg.createdBy === UNSPECIFIED_OWNER) {
       throw new Error("Cache policy is by-owner yet there's no creator specified");
     } else if ((arg.cachePolicy === "by-parent" || arg.cachePolicy === "by-owner-and-parent") && (!arg.parentedBy || !arg.parentedBy.id)) {
@@ -1759,12 +1762,15 @@ export async function runSearchQueryFor(
       !!arg.cacheStoreMetadataMismatchAction,
       false,
       false,
+      {
+        allowFallbackWritesToPolyfill: !arg.cacheDoNotFallbackToPolyfill,
+      }
     );
 
     // failed to retrieve indexed db, something happened
     if (!cacheWorkerGivenSearchValue) {
       cached = false;
-      usesCacheWorker = false;
+      useCacheWorker = false;
     } else {
       // we are now going to check for metadata used in
       // the search, by default there's no mismatch
@@ -1862,6 +1868,9 @@ export async function runSearchQueryFor(
             false,
             redoSearch,
             refetchSpecificRecords || refetchAllRecords,
+            {
+              allowFallbackWritesToPolyfill: !arg.cacheDoNotFallbackToPolyfill,
+            }
           );
         }
       }
@@ -1883,16 +1892,20 @@ export async function runSearchQueryFor(
           arg.parentedBy ? arg.parentedBy.id : null,
           arg.parentedBy ? arg.parentedBy.version || null : null,
           arg.cacheStoreMetadata,
+          {
+            allowFallbackWritesToPolyfill: !arg.cacheDoNotFallbackToPolyfill,
+          }
         );
       }
 
       if (!cacheWorkerGivenSearchValue) {
         cached = false;
-        usesCacheWorker = false;
+        useCacheWorker = false;
       } else {
         // cached depends on whether we got no errors
         // errors indicate it didn't cache
         cached = !cacheWorkerGivenSearchValue.gqlValue.errors;
+        polyfilled = cacheWorkerGivenSearchValue.polyfilled;
 
         // last record date of the given record
         // might be null, if no records
@@ -1950,9 +1963,9 @@ export async function runSearchQueryFor(
 
   // not using cache worker despite cache policy not being none
   // and being asked not to fallback, must be unsupported
-  if (!usesCacheWorker && arg.cachePolicy !== "none" && arg.cacheDoNotFallback) {
+  if (!useCacheWorker && arg.cachePolicy !== "none" && arg.cacheDoNotFallbackToSimpleSearch) {
     gqlValue = null;
-  } else if (!arg.traditional && !usesCacheWorker) {
+  } else if (!arg.traditional && !useCacheWorker) {
     const query = buildGqlQuery({
       name: queryName,
       args: searchArgs,
@@ -1982,7 +1995,7 @@ export async function runSearchQueryFor(
     if (data) {
       lastModified = data.last_modified as string;
     }
-  } else if (!usesCacheWorker) {
+  } else if (!useCacheWorker) {
     const query = buildGqlQuery({
       name: queryName,
       args: searchArgs,
@@ -2051,7 +2064,7 @@ export async function runSearchQueryFor(
   // the cache worker is actually always returning
   // search results regardless of what method was
   // used
-  if (!arg.traditional && !usesCacheWorker) {
+  if (!arg.traditional && !useCacheWorker) {
     const records: IGQLSearchRecord[] = (
       data && data.records
     ) as IGQLSearchRecord[] || null;
@@ -2067,6 +2080,7 @@ export async function runSearchQueryFor(
       highlights,
       metadata,
       cached,
+      polyfilled,
     };
   } else {
     // we may get records anyway eg. when using cache worker
@@ -2091,6 +2105,7 @@ export async function runSearchQueryFor(
       highlights,
       metadata,
       cached,
+      polyfilled,
     };
   }
 }

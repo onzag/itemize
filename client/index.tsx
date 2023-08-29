@@ -531,7 +531,7 @@ export async function initializeItemizeApp(
       window.ROOT = new Root(initialRoot);
       window.LANG = lang;
       window.INITIAL_CURRENCY_FACTORS = currencyFactors;
-      if (CacheWorkerInstance.isSupported || CacheWorkerInstance.isPolyfilled) {
+      if (CacheWorkerInstance.isSupportedAsWorker || CacheWorkerInstance.isPolyfilled) {
         CacheWorkerInstance.instance.proxyRoot(initialRoot, config);
       }
     }

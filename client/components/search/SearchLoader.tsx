@@ -679,7 +679,7 @@ class ActualSearchLoader extends React.Component<IActualSearchLoaderProps, IActu
       // otherwise let's see our cache
       // if it's not supported then we push already to our uncached results
       // also if we need to produce new results for uncached we can't use cache
-      if (willItProduceNewHighlights || !CacheWorkerInstance.isSupported) {
+      if (willItProduceNewHighlights || !CacheWorkerInstance.isSupportedAsWorker) {
         uncachedResults.push(searchRecord);
         return null;
       } else {

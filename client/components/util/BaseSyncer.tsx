@@ -113,11 +113,11 @@ export function useHandleMechanism(
     // if we allow for fallback then we are ready out of the box
     // otherwise we are only ready if the cache worker instance is supported
     // and we will begin the sync process
-    setReady(allowFallback ? true : CacheWorkerInstance.isSupported);
+    setReady(allowFallback ? true : CacheWorkerInstance.isSupportedAsWorker);
 
     // if it's not supported we have failed to sync
     // we inform the parent handle
-    if (!CacheWorkerInstance.isSupported) {
+    if (!CacheWorkerInstance.isSupportedAsWorker) {
       if (handle) {
         handle.onFailedSync(null);
       }

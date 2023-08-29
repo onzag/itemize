@@ -75,8 +75,8 @@ export function useOfflineCacheStatesLoader(options: IOfflineCacheStatesLoaderOp
   }, [options.id, qualifiedName]);
 
   useEffect(() => {
-    setReady(CacheWorkerInstance.isSupported);
-    if (!CacheWorkerInstance.isSupported) {
+    setReady(CacheWorkerInstance.isSupportedAsWorker);
+    if (!CacheWorkerInstance.isSupportedAsWorker) {
       setUnsupported(true);
     }
   }, []);

@@ -169,7 +169,7 @@ export default class App extends React.Component<IAppProps, IAppState> {
     // when it's blocked and can't release indexeddb, we need to pass it
     this.setBlockedCallbackState = this.setBlockedCallbackState.bind(this);
     // but it's a worker so we need to check if it's supported
-    if (CacheWorkerInstance.isSupported) {
+    if (CacheWorkerInstance.isSupportedAsWorker) {
       // since we are using comlink we use this method
       CacheWorkerInstance.instance.setBlockedCallback(proxy(this.setBlockedCallbackState))
     }
