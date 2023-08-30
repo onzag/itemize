@@ -183,7 +183,7 @@ export function getPropertyListForSearchMode(properties: Array<string | IPropert
   if (!properties) {
     return [];
   }
-  
+
   let result: string[] = [];
   properties.forEach((property) => {
 
@@ -899,6 +899,14 @@ export async function runGetQueryFor(
       metadataWasMismatch = !equals(expectedCacheMetadata, currentCacheMetadata, { strict: true });
 
       if (metadataWasMismatch) {
+        console.log(
+          "Metadata mismatch triggers refetch",
+          {
+            expectedCacheMetadata,
+            currentCacheMetadata,
+          }
+        );
+
         const actionToPerform: ICacheMetadataMismatchAction = typeof arg.cacheStoreMetadataMismatchAction === "function" ?
           arg.cacheStoreMetadataMismatchAction(currentCacheMetadata, expectedCacheMetadata) :
           arg.cacheStoreMetadataMismatchAction;
@@ -1806,15 +1814,20 @@ export async function runSearchQueryFor(
         let refetchSpecificRecords: IGQLSearchRecord[] = null;
 
         // if we have a value there and it differs
-        if (
-          !currentMetadata ||
-          !equals(currentMetadata.value, arg.cacheStoreMetadata, { strict: true })
-        ) {
+        if (!equals(currentMetadata, arg.cacheStoreMetadata, { strict: true })) {
           // it was mismatched
           metadataWasMismatch = true;
 
+          console.log(
+            "Search metadata mismatch triggers refetch",
+            {
+              expectedCacheMetadata: arg.cacheStoreMetadata,
+              currentCacheMetadata: currentMetadata,
+            }
+          );
+
           const actionToPerform: ISearchCacheMetadataMismatchAction = typeof arg.cacheStoreMetadataMismatchAction === "function" ?
-            arg.cacheStoreMetadataMismatchAction(currentMetadata.value, arg.cacheStoreMetadata) :
+            arg.cacheStoreMetadataMismatchAction(currentMetadata, arg.cacheStoreMetadata) :
             arg.cacheStoreMetadataMismatchAction;
 
           // so what action we have here, redo search
