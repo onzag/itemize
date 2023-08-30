@@ -680,10 +680,14 @@ export default class CacheWorker {
           value = await this.db.get(STATES_TABLE_NAME, queryIdentifier);
         }
       }
-      return [value.state, value.metadata];
+      if (value) {
+        return [value.state, value.metadata];
+      } else {
+        return [null, null];
+      }
     } catch (err) {
       console.warn(err);
-      return null;
+      return [null, null];
     }
   }
 

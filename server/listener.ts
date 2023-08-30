@@ -83,7 +83,7 @@ import { convertVersionsIntoNullsWhenNecessary } from "./version-null-value";
 import { logger } from "./logger";
 import {
   SERVER_DATA_IDENTIFIER, SERVER_USER_KICK_IDENTIFIER,
-  UNSPECIFIED_OWNER, MAX_REMOTE_LISTENERS_PER_SOCKET, GUEST_METAROLE, DELETED_REGISTRY_IDENTIFIER, TRACKERS_REGISTRY_IDENTIFIER, JWT_KEY
+  UNSPECIFIED_OWNER, MAX_REMOTE_LISTENERS_PER_SOCKET, GUEST_METAROLE, DELETED_REGISTRY_IDENTIFIER, TRACKERS_REGISTRY_IDENTIFIER, JWT_KEY, CONNECTOR_SQL_COLUMN_ID_FK_NAME, CONNECTOR_SQL_COLUMN_VERSION_FK_NAME
 } from "../constants";
 import Ajv from "ajv";
 import { jwtVerify } from "./token";
@@ -1698,12 +1698,15 @@ export class Listener {
         return;
       }
 
+      const propertyIsInIdef = itemDefinitionOrModule instanceof ItemDefinition && itemDefinitionOrModule.hasPropertyDefinitionFor(request.propertyId, false);
+      const idefJoinExtra = propertyIsInIdef ? ` JOIN ${JSON.stringify(itemDefinitionOrModule.getQualifiedPathName())} ON `+
+        `${JSON.stringify(CONNECTOR_SQL_COLUMN_ID_FK_NAME)} = "id" AND ${JSON.stringify(CONNECTOR_SQL_COLUMN_VERSION_FK_NAME)} = "version"` : "";
       const createdAndModifiedRecordsSQL: ISQLTableRowValue[] = (await this.rawDB.databaseConnection.queryRows(
         `SELECT "id", "version", "type", "last_modified", ` + (
           request.lastModified ?
             `"created_at" > ? AS "WAS_CREATED"` :
             `TRUE AS "WAS_CREATED"`
-        ) + ` FROM ${JSON.stringify(mod.getQualifiedPathName())} WHERE ` + (
+        ) + ` FROM ${JSON.stringify(mod.getQualifiedPathName())}${idefJoinExtra} WHERE ` + (
           requiredType ?
             `"type" = ? AND ` :
             ""
