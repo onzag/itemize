@@ -104,7 +104,7 @@ export interface IGQLFile {
   /**
    * A source, either a File, Blob or a read stream
    */
-  src?: File | Blob | ReadStream | Promise<{createReadStream: () => ReadStream}>;
+  src?: File | Blob | ReadStream | Promise<{ createReadStream: () => ReadStream }>;
 }
 
 /**
@@ -193,6 +193,11 @@ export class GQLQuery {
   private progressers: ProgresserFn[] = [];
 
   /**
+   * The current known reply for the query
+   */
+  public reply: IGQLEndpointValue = null;
+
+  /**
    * Build a graphql query
    * @param type query or mutation
    * @param queries the queries that we want to execute
@@ -253,8 +258,32 @@ export class GQLQuery {
     return !query.processedQueries.some((q) => q.alias);
   }
 
+  public isContainedWithin(query: GQLQuery) {
+    if (query.type !== this.type || query.type !== "query") {
+      return false;
+    }
+
+    return this.processedQueries.every((q) => {
+      const matchingCounterpart = query.processedQueries.find((q2) => {
+        const isNameEqual = q2.name === q.name && q.alias === q2.alias;
+        if (!isNameEqual) {
+          return false;
+        }
+
+        const areArgsEqual = equals(q.args, q2.args);
+        if (!areArgsEqual) {
+          return false;
+        }
+
+        return requestFieldsAreContained(q.fields, q2.fields);
+      });
+
+      return matchingCounterpart;
+    });
+  }
+
   private isNameMergableWith(ourValue: IGQLQueryObj, theirValue: IGQLQueryObj) {
-    if (!equals(ourValue.args, theirValue.args, {strict: true})) {
+    if (!equals(ourValue.args, theirValue.args, { strict: true })) {
       return false;
     }
 
@@ -313,7 +342,7 @@ export class GQLQuery {
         // so we couldn't find anything to merge
         if (!itMerged) {
           // So we create a new entire entry for this
-          const queryClone = {...q};
+          const queryClone = { ...q };
           const usedAliases = this.processedQueries.map(q => q.alias);
           let numberToSuffix: number = 2;
           let newAlias = queryClone.name + "_" + numberToSuffix;
@@ -343,6 +372,7 @@ export class GQLQuery {
    */
   public informReply(reply: IGQLEndpointValue) {
     this.listeners.forEach((l) => l(reply));
+    this.reply = reply;
   }
 
   public informProgress(arg: IXMLHttpRequestProgressInfo) {
@@ -615,7 +645,7 @@ function buildFields(fields: IGQLRequestFields) {
  * @param args the arguments to build
  * @returns the serialized args
  */
- function buildArgsServerSide(
+function buildArgsServerSide(
   args: any,
 ): any {
   // if it's not an object or if it's null
@@ -750,6 +780,7 @@ function wait(ms: number): Promise<void> {
 }
 
 const QUERIES_IN_WAITING: GQLQuery[] = [];
+const QUERIES_IN_NETWORK: GQLQuery[] = [];
 
 export interface IXMLHttpRequestProgressInfo {
   total: number;
@@ -785,8 +816,8 @@ export async function oldXMLHttpRequest(
     request.upload.addEventListener("progress", (ev) => {
       const total = ev.total;
       const loaded = ev.loaded;
-  
-      query.informProgress({total, loaded});
+
+      query.informProgress({ total, loaded });
     });
 
     request.send(body);
@@ -814,6 +845,30 @@ export async function gqlQuery(query: GQLQuery, options?: {
   // if we are in browser context and we have no host
   if (typeof fetch === "undefined" && !host) {
     throw new Error("You must provide a host when using graphql querier outside of the browser, eg: http://mysite.com");
+  }
+
+  // check in network
+  const queryThatSatifies = QUERIES_IN_NETWORK.find((q) => {
+    return query.isContainedWithin(q);
+  });
+
+  if (queryThatSatifies) {
+    // it has already a known reply
+    // there's a grace time where it remains in the network
+    // queue for a little window of time
+    if (queryThatSatifies.reply) {
+      return queryThatSatifies.reply;
+    }
+
+    if (options && options.progresser) {
+      queryThatSatifies.addProgresserListener(options.progresser);
+    }
+
+    return new Promise((resolve) => {
+      queryThatSatifies.addEventListenerOnReplyInformed((response) => {
+        resolve(response);
+      });
+    });
   }
 
   // if we are allowed to merge and not concerned with full speed but rather full optimal
@@ -850,7 +905,7 @@ export async function gqlQuery(query: GQLQuery, options?: {
             if (response.errors) {
               response.errors.forEach((e) => {
                 if (!e.path || e.path[0] === alias) {
-                  const newError = {...e};
+                  const newError = { ...e };
                   if (newError.path) {
                     newError.path = [origName];
                   }
@@ -880,6 +935,8 @@ export async function gqlQuery(query: GQLQuery, options?: {
       }
     }
   }
+
+  QUERIES_IN_NETWORK.push(query);
 
   // building the form data
   const formData = typeof FormData !== "undefined" ? new FormData() : new FormDataNode();
@@ -926,5 +983,16 @@ export async function gqlQuery(query: GQLQuery, options?: {
   }
 
   query.informReply(reply);
+
+  // small window of time to delete the query in the network
+  // to allow delayed requests
+  //setTimeout(() => {
+    const index = QUERIES_IN_NETWORK.findIndex((q) => q === query);
+    if (index !== -1) {
+      QUERIES_IN_NETWORK.splice(index, 1);
+    }
+  // }, 70);
+
+  // return the reply
   return reply;
 }

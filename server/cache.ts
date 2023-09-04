@@ -2294,14 +2294,8 @@ export class Cache {
       }
     }
 
-    if (options.indexing === "wait_for") {
-      await indexingFn();
-    } else {
-      indexingFn();
-    }
-
     // we return and this executes after it returns
-    (async () => {
+    const storeInCacheAndSendEvents = (async () => {
       CAN_LOG_DEBUG && logger.debug(
         {
           className: "Cache",
@@ -2360,11 +2354,11 @@ export class Cache {
         searchRecord,
         "modified",
       );
-    })();
+    });
 
     // Execute side effects of modification according
     // to the given side effected types
-    !options.ignoreSideEffects ? (async () => {
+    const triggerSideEffects = !options.ignoreSideEffects ? (async () => {
       // let's find all of them
       const sideEffected = itemDefinition.getAllSideEffectedProperties();
       // looop into them
@@ -2426,7 +2420,19 @@ export class Cache {
           );
         }
       });
-    })() : null;
+    }) : null;
+
+    if (options.indexing === "wait_for") {
+      await indexingFn();
+      storeInCacheAndSendEvents();
+      triggerSideEffects();
+    } else {
+      (async () => {
+        await indexingFn();
+        storeInCacheAndSendEvents();
+        triggerSideEffects();
+      })();
+    }
 
     return sqlValue;
   }
