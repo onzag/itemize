@@ -69,6 +69,10 @@ export interface IBaseSyncerHandleMechanism {
    * if no cache worker is present, it just can't sync
    */
   failedSyncErr?: EndpointErrorType;
+  /**
+   * A reference to being unmounted
+   */
+  unmountRef: React.RefObject<boolean>;
 }
 
 interface IBaseDependants {
@@ -86,6 +90,8 @@ export function useHandleMechanism(
   // first get the dependants
   const dependants = useRef({} as IBaseDependants);
   const [ready, setReady] = useState(false);
+
+  const unmountRef = useRef(false);
 
   const [depsSynced, setDepsSynced] = useState(false);
 
@@ -142,6 +148,7 @@ export function useHandleMechanism(
 
     return () => {
       clearTimeout(treeSyncedDelayedTimer.current);
+      unmountRef.current = true;
     }
   }, []);
 
@@ -174,7 +181,9 @@ export function useHandleMechanism(
       clearTimeout(selfSyncedDelayedTimer.current);
       // will only pop when it's stable
       selfSyncedDelayedTimer.current = setTimeout(() => {
-        setSelfSyncedDelayed(selfSynced);
+        if (!unmountRef.current) {
+          setSelfSyncedDelayed(selfSynced);
+        }
         selfSyncedDelayedTimer.current = null;
       }, 100);
 
@@ -216,7 +225,9 @@ export function useHandleMechanism(
       clearTimeout(treeSyncedDelayedTimer.current);
       // will only pop when it's stable
       treeSyncedDelayedTimer.current = setTimeout(() => {
-        setTreeSyncedDelayed(state);
+        if (!unmountRef.current) {
+          setTreeSyncedDelayed(state);
+        }
         treeSyncedDelayedTimer.current = null;
       }, 100);
 
@@ -281,6 +292,7 @@ export function useHandleMechanism(
     gracefulTreeHasSynced: treeSyncedDelayedOnce,
     failedSync: failed || depsFailedSync,
     failedSyncErr: err || depsFailedSyncErr,
+    unmountRef,
   }
 }
 

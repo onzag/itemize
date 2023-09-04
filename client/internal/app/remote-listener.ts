@@ -282,6 +282,10 @@ export class RemoteListener {
    */
   private connectionListeners: Array<() => void> = [];
   /**
+   * Listeners for connection change status, offline/online
+   */
+  private connectionOnConnectOnceListeners: Array<() => void> = [];
+  /**
    * Listeners for the app updated changes, when a buildnumber
    * event is received
    */
@@ -358,6 +362,7 @@ export class RemoteListener {
     this.ownedParentedSearchListeners = {};
     this.propertySearchListeners = {};
     this.connectionListeners = [];
+    this.connectionOnConnectOnceListeners = [];
     this.appUpdatedListeners = [];
     this.lastRecievedBuildNumber = window.BUILD_NUMBER;
     this.setupTime = (new Date()).getTime();
@@ -515,6 +520,35 @@ export class RemoteListener {
     const index = this.connectionListeners.indexOf(listener);
     if (index !== -1) {
       this.connectionListeners.splice(index, 1);
+    }
+  }
+
+  /**
+  * Adds a listener for when the app online status changes
+  * to connected, only once
+  * 
+  * if the listener is currently connected the function will be
+  * called right away
+  * 
+  * @param listener the listener to add
+  */
+  public addOnConnectOnceListener(listener: () => void) {
+    if (!this.offline) {
+      listener();
+      return;
+    }
+    this.connectionOnConnectOnceListeners.push(listener);
+  }
+
+  /**
+   * Removes a listener for when the app online status changes
+   * to connected, only once
+   * @param listener the listener to remove
+   */
+  public removeOnConnectOnceListener(listener: () => void) {
+    const index = this.connectionOnConnectOnceListeners.indexOf(listener);
+    if (index !== -1) {
+      this.connectionOnConnectOnceListeners.splice(index, 1);
     }
   }
 
@@ -1867,6 +1901,8 @@ export class RemoteListener {
     // just like a for loop where you grab the index (and then what's the point of foreach) when the event is called because
     // Javascript is like that so I must make a copy of the array because JavaScript
     this.connectionListeners.slice().forEach((l) => l());
+    this.connectionOnConnectOnceListeners.slice().forEach((l) => l());
+    this.connectionOnConnectOnceListeners = [];
   }
 
   private async executeSlowPollingFeedbacks() {

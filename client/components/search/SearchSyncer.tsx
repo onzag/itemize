@@ -127,12 +127,12 @@ export default function SearchSyncer(props: ISearchSyncerProps): any {
 
     if (data.error) {
       setFailed(data.error);
-    } else if (props.allowPolyfilledFallback || data.cached) {
+    } else if (data.polyfilled || data.cached) {
       // grab the results and send them
       const results = data.results;
       props.onBulkLoad && props.onBulkLoad(results);
       setSelfSearchResults(data.results);
-      if (!data.cached) {
+      if (data.polyfilled) {
         setSelfUsedFallback(true);
       }
     }

@@ -1463,6 +1463,12 @@ export interface IItemProviderProps {
    */
   loadUnversionedFallback?: boolean;
   /**
+   * Normally items will be automatically reloaded when
+   * their value couldn't be retrieved because it couldn't connect
+   * the moment they are to connect, use this to disable that
+   */
+  doNotAutomaticReloadIfCantConnect?: boolean;
+  /**
    * whether this is about the search counterpart for using
    * with searches, this opens a whole can of worms
    */
@@ -3512,6 +3518,21 @@ export class ActualItemProvider extends
       }
     }
 
+    if (this.props.remoteListener.isOffline()) {
+      const completedValue = this.loadValueCompleted({
+        value: null,
+        error: {
+          code: ENDPOINT_ERRORS.CANT_CONNECT,
+          message: "Remote listener is already known to be offline",
+        },
+        cached: false,
+        id: forId,
+        version: forVersion,
+      });
+
+      return completedValue;
+    }
+
     // the loading state is launched here, however
     // the loading is removed by the listener not by
     // this same function, to be efficient, we could remove
@@ -3655,6 +3676,15 @@ export class ActualItemProvider extends
         loading: false,
         itemState: this.getItemState(),
       });
+
+      // load later when connection is available
+      if (
+        !this.isUnmounted &&
+        value.error.code === ENDPOINT_ERRORS.CANT_CONNECT &&
+        !this.props.doNotAutomaticReloadIfCantConnect
+      ) {
+        this.props.remoteListener.addOnConnectOnceListener(this.loadValue);
+      }
       // otherwise if there's no value, it means the item is not found
     } else if (!value.value) {
       // we mark it as so, it is not found
