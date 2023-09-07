@@ -7,9 +7,10 @@ import type { ICacheStateMetadata } from "../../internal/workers/cache/cache.wor
 export interface IOfflineCacheStatesLoaderOptions {
   itemOrModule: string;
   id: string;
+  disabled?: boolean;
 }
 
-export interface ICacheRecord {id: string, version: string, state: IItemStateType, metadata: ICacheStateMetadata};
+export interface ICacheRecord { id: string, version: string, state: IItemStateType, metadata: ICacheStateMetadata };
 
 export interface IOfflineCacheStatesLoaderArg {
   loading: boolean;
@@ -58,21 +59,26 @@ export function useOfflineCacheStatesLoader(options: IOfflineCacheStatesLoaderOp
   }, []);
 
   const recalculate = useCallback(async () => {
-    setLoading(true);
-    const unversionedStateList = await CacheWorkerInstance.instance.retrieveUnversionedStateList(qualifiedName, options.id);
-    const values = await Promise.all(unversionedStateList.map(async (v) => {
-      const [state, metadata] = await CacheWorkerInstance.instance.retrieveState(qualifiedName, v.id, v.version);
-      return {
-        id: v.id,
-        version: v.version,
-        state,
-        metadata,
-      }
-    }));
-    recordsRef.current = [...values];
-    setRecords(values);
-    setLoading(false);
-  }, [options.id, qualifiedName]);
+    if (!options.disabled) {
+      setLoading(true);
+      const unversionedStateList = await CacheWorkerInstance.instance.retrieveUnversionedStateList(qualifiedName, options.id);
+      const values = await Promise.all(unversionedStateList.map(async (v) => {
+        const [state, metadata] = await CacheWorkerInstance.instance.retrieveState(qualifiedName, v.id, v.version);
+        return {
+          id: v.id,
+          version: v.version,
+          state,
+          metadata,
+        }
+      }));
+      recordsRef.current = [...values];
+      setRecords(values);
+      setLoading(false);
+    } else {
+      recordsRef.current = [];
+      setRecords([]);
+    }
+  }, [options.id, options.disabled, qualifiedName]);
 
   useEffect(() => {
     setReady(CacheWorkerInstance.isSupportedAsWorker);
@@ -83,14 +89,14 @@ export function useOfflineCacheStatesLoader(options: IOfflineCacheStatesLoaderOp
 
   useEffect(() => {
     if (ready) {
-      CacheWorkerInstance.instance.addUnversionedEventListenerToStateChange(qualifiedName, options.id, onShouldUpdate);
+      !options.disabled && CacheWorkerInstance.instance.addUnversionedEventListenerToStateChange(qualifiedName, options.id, onShouldUpdate);
       recalculate();
 
       return () => {
-        CacheWorkerInstance.instance.removeUnversionedEventListenerToStateChange(qualifiedName, options.id, onShouldUpdate);
+        !options.disabled && CacheWorkerInstance.instance.removeUnversionedEventListenerToStateChange(qualifiedName, options.id, onShouldUpdate);
       }
     }
-  }, [ready, recalculate, options.id, qualifiedName]);
+  }, [ready, recalculate, options.id, options.disabled, qualifiedName]);
 
   return {
     loading,

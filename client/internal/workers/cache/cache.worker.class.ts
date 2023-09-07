@@ -559,10 +559,10 @@ export default class CacheWorker {
       const rs = await this.worker.storeState(qualifiedName, id, version, state, metadata, options);
       if (rs) {
         const listeners = STATE_LISTENERS[qualifiedName + "." + (id || "") + "." + (version || "")];
-        listeners.forEach((l) => l(id, version, state, { overwriteLastModified: metadata || null }));
+        listeners && listeners.forEach((l) => l(id, version, state, { overwriteLastModified: metadata || null }));
 
         const idSpecificListeners = STATE_LISTENERS[qualifiedName + "." + (id || "")];
-        idSpecificListeners.forEach((l) => l(id, version, state, { overwriteLastModified: metadata || null }));
+        idSpecificListeners && idSpecificListeners.forEach((l) => l(id, version, state, { overwriteLastModified: metadata || null }));
       }
       return rs;
     }
@@ -577,7 +577,7 @@ export default class CacheWorker {
     }
 
     // otherwise we build the index indentifier, which is simple
-    const queryIdentifier = `${qualifiedName}.${id}.${(version || "")}`;
+    const queryIdentifier = `${qualifiedName}.${(id || "")}.${(version || "")}`;
 
     // and try to save it in the database, notice how we setup the expirarion
     // date
@@ -659,11 +659,11 @@ export default class CacheWorker {
     if (!this.db) {
       console.warn("Could not retrieve IndexedDB");
       // what gives, we return
-      return null;
+      return [null, null];
     }
 
     // otherwise we build the index indentifier, which is simple
-    const queryIdentifier = `${qualifiedName}.${id}.${(version || "")}`;
+    const queryIdentifier = `${qualifiedName}.${(id || "")}.${(version || "")}`;
 
     // and try to save it in the database, notice how we setup the expirarion
     // date
@@ -701,10 +701,10 @@ export default class CacheWorker {
       const rs = await this.worker.deleteState(qualifiedName, id, version);
       if (rs) {
         const listeners = STATE_LISTENERS[qualifiedName + "." + (id || "") + "." + (version || "")];
-        listeners.forEach((l) => l(id, version, null, null));
+        listeners && listeners.forEach((l) => l(id, version, null, null));
 
         const idSpecificListeners = STATE_LISTENERS[qualifiedName + "." + (id || "")];
-        idSpecificListeners.forEach((l) => l(id, version, null, null));
+        idSpecificListeners && idSpecificListeners.forEach((l) => l(id, version, null, null));
       }
       return rs;
     }
@@ -719,7 +719,7 @@ export default class CacheWorker {
     }
 
     // otherwise we build the index indentifier, which is simple
-    const queryIdentifier = `${qualifiedName}.${id}.${(version || "")}`;
+    const queryIdentifier = `${qualifiedName}.${(id || "")}.${(version || "")}`;
 
     // and try to save it in the database, notice how we setup the expirarion
     // date
