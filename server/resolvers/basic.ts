@@ -169,7 +169,7 @@ export async function validateParentingRules(
       code: ENDPOINT_ERRORS.UNSPECIFIED,
     });
   } else if (isParenting) {
-    if (isReparenting && !itemDefinition.isReparentingEnabled()) {
+    if (isReparenting && !itemDefinition.canBeReparentedEnabled()) {
       throw new EndpointError({
         message: "Reparenting is not been enabled as such you can't move children after they have been created",
         code: ENDPOINT_ERRORS.FORBIDDEN,
@@ -186,10 +186,10 @@ export async function validateParentingRules(
 
     itemDefinition.checkCanBeParentedBy(parentingItemDefinition, true);
 
-    const parentingRule = itemDefinition.getParentingRule();
+    const canBeParentedRule = itemDefinition.getCanBeParentedRule();
     const maxChildCountSameType = itemDefinition.getParentingMaxChildCountSameType();
     const maxChildCountAnyType = itemDefinition.getParentingMaxChildCountAnyType();
-    if (parentingRule === "ONCE" || maxChildCountSameType) {
+    if (canBeParentedRule === "ONCE" || maxChildCountSameType) {
       const valueCount =
         await appData.databaseConnection.queryFirst(
           `SELECT COUNT(*) AS "count" FROM ${JSON.stringify(itemDefinition.getParentModule().getQualifiedPathName())} WHERE "type"=$1 AND "parent_type"=$2 AND "parent_id"=$3 AND "parent_version"=$4`,
@@ -202,7 +202,7 @@ export async function validateParentingRules(
         );
 
       if (valueCount.count) {
-        if (parentingRule === "ONCE") {
+        if (canBeParentedRule === "ONCE") {
           throw new EndpointError({
             message: "Parenting rule is set to ONCE and there's already a children of this type for the given parent",
             code: ENDPOINT_ERRORS.FORBIDDEN,
@@ -235,7 +235,7 @@ export async function validateParentingRules(
       }
     }
 
-    if (parentingRule === "ONCE_PER_OWNER") {
+    if (canBeParentedRule === "ONCE_PER_OWNER") {
       const valueExists =
         await appData.databaseConnection.queryFirst(
           `SELECT id FROM ${JSON.stringify(itemDefinition.getParentModule().getQualifiedPathName())} WHERE "type"=$1 AND "parent_type"=$2 AND ` +
@@ -304,7 +304,7 @@ export async function validateParentingRules(
 
     // This check is the same as the one for the parenting rule hence it doesn't make
     // sense to redo if the per owner passed
-    if (owningRule === "ONCE_PER_PARENT" && parentingRule !== "ONCE_PER_OWNER") {
+    if (owningRule === "ONCE_PER_PARENT" && canBeParentedRule !== "ONCE_PER_OWNER") {
       const valueExists =
         await appData.databaseConnection.queryFirst(
           `SELECT id FROM ${JSON.stringify(itemDefinition.getParentModule().getQualifiedPathName())} WHERE "type"=$1 AND "parent_type"=$2 AND ` +
@@ -364,19 +364,20 @@ export async function validateParentingRules(
       item: parentingItemDefinition,
       environment: CustomRoleGranterEnvironment.ADDING_CHILD,
       module: parentingItemDefinition.getParentModule(),
-      parent: {
+      parent: result.parent_id ? {
         id: result.parent_id,
         version: result.parent_version || null,
         type: result.parent_type,
-      },
+      } : null,
       value: convertSQLValueToGQLValueForItemDefinition(
         appData.cache.getServerData(),
         appData,
         parentingItemDefinition,
         result,
       ),
-    })
-    await itemDefinition.checkRoleAccessForParenting(role, userId, parentOwnerId, parentingRolesManager, true);
+      customId: null,
+    });
+    await itemDefinition.checkRoleAccessForParenting(role, userId, parentOwnerId, itemDefinition, parentingRolesManager, true);
 
     return result;
   }

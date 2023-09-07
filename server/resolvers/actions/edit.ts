@@ -138,6 +138,7 @@ export async function editItemDefinition(
               version: sqlValue.parent_version,
             } : null,
             customId: null,
+            environmentParent: null,
           });
           return rolesManager;
         },
@@ -585,6 +586,7 @@ export async function editItemDefinition(
     const newRolesManagerWithEditedValue = rolesManager.subEnvironment({
       environment: CustomRoleGranterEnvironment.RETRIEVING,
       value: gqlValue,
+      customId: null,
     });
 
     CAN_LOG_DEBUG && logger.debug({

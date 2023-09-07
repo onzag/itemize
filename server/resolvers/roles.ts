@@ -60,6 +60,11 @@ export interface ICustomRoleGranterArg {
    * When creating, if a custom id is given this field will contain it
    */
   customId: string;
+  /**
+   * The environment that sits above this one, that caused this one to be generated
+   * useful when adding children and needing to know who is adding such children
+   */
+  environmentParent: ICustomRoleGranterArg;
 }
 
 export interface ICustomRoleType {
@@ -161,6 +166,7 @@ export class CustomRoleManager {
     return new CustomRoleManager(this.allRoles, {
       ...this.argEnv,
       ...newEnv,
+      environmentParent: this.argEnv,
     });
   }
 }

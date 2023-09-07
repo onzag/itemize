@@ -147,6 +147,7 @@ export async function searchModule(
       version: resolverArgs.args.parent_version || null,
     } : null,
     customId: null,
+    environmentParent: null,
   });
   await searchModeCounterpart.checkRoleAccessFor(
     ItemDefinitionIOActions.READ,
@@ -191,6 +192,7 @@ export async function searchModule(
   for (let t of typesToCheckReadToo) {
     const specificRolesManager = rolesManager.subEnvironment({
       item: t,
+      customId: null,
     });
 
     await t.checkRoleAccessFor(
@@ -1037,6 +1039,7 @@ export async function searchItemDefinition(
         version: resolverArgs.args.parent_version || null,
       } : null,
       customId: null,
+      environmentParent: null,
     });
 
     const created_by = resolverArgs.args.created_by;

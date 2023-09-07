@@ -106,6 +106,7 @@ export async function deleteItemDefinition(
             version: sqlValue.parent_version,
           } : null,
           customId: null,
+          environmentParent: null,
         });
         return rolesManager;
       },

@@ -99,6 +99,7 @@ export async function getItemDefinition(
             version: sqlValue.parent_version,
           } : null,
           customId: null,
+          environmentParent: null,
         });
 
         return rolesManager;
@@ -476,6 +477,7 @@ export async function getItemDefinitionList(
           version: value.parent_version,
         } : null,
         customId: null,
+        environmentParent: null,
       });
 
       await itemDefinition.checkRoleAccessFor(
@@ -779,6 +781,7 @@ export async function getModuleList(
           version: value.parent_version,
         } : null,
         customId: null,
+        environmentParent: null,
       });
       await mod.checkRoleAccessFor(
         ItemDefinitionIOActions.READ,

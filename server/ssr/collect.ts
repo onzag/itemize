@@ -715,6 +715,7 @@ export class Collector {
           rowValue,
         ) : null,
         customId: null,
+        environmentParent: null,
       }
     );
 

@@ -360,7 +360,7 @@ export interface IItemDefinitionRawJSONDataType {
    * Allows to move children from one parent to another
    * by providing a new parent during edit
    */
-  enableReparenting?: boolean;
+  canBeReparented?: boolean;
   /**
    * Whether it actually must always be parented
    */
@@ -372,7 +372,7 @@ export interface IItemDefinitionRawJSONDataType {
    * ONCE_PER_OWNER means that the rule applies as of a per owner basis
    * MANY is the default there can be as many children of the same type as it wants
    */
-  parentingRule?: "ONCE" | "ONCE_PER_OWNER" | "MANY";
+  canBeParentedRule?: "ONCE" | "ONCE_PER_OWNER" | "MANY";
   /**
    * The owning rule
    * ONCE means that this item can only exist for once for the given owner
@@ -384,7 +384,7 @@ export interface IItemDefinitionRawJSONDataType {
   /**
    * A list of roles who have access to parenting
    */
-  parentingRoleAccess?: string[];
+  parentingRoleAccess?: {[key: string]: string[]};
   /**
    * the request limiters
    */
@@ -2808,12 +2808,12 @@ export default class ItemDefinition {
    * Tells whether reparenting is enabled
    * @returns a boolean
    */
-  public isReparentingEnabled() {
-    return !!this.rawData.enableReparenting;
+  public canBeReparentedEnabled() {
+    return !!this.rawData.canBeReparented;
   }
 
-  public getParentingRule() {
-    return this.rawData.parentingRule || "MANY";
+  public getCanBeParentedRule() {
+    return this.rawData.canBeParentedRule || "MANY";
   }
 
   public getParentingMaxChildCountSameType() {
@@ -2895,22 +2895,25 @@ export default class ItemDefinition {
     role: string,
     userId: string,
     parentOwnerUserId: string,
+    childItem: ItemDefinition,
     rolesManager: ICustomRoleManager,
     throwError: boolean,
   ) {
     let hasParentingRoleAccess = false;
-    if (this.rawData.parentingRoleAccess) {
-      hasParentingRoleAccess = this.rawData.parentingRoleAccess.includes(ANYONE_METAROLE) ||
+    const parentingAccessKey = childItem.getAbsolutePath().join("/");
+    if (this.rawData.parentingRoleAccess && this.rawData.parentingRoleAccess[parentingAccessKey]) {
+      const parentingRoles = this.rawData.parentingRoleAccess[parentingAccessKey];
+      hasParentingRoleAccess = parentingRoles.includes(ANYONE_METAROLE) ||
         (
-          this.rawData.parentingRoleAccess.includes(ANYONE_LOGGED_METAROLE) && role !== GUEST_METAROLE
+          parentingRoles.includes(ANYONE_LOGGED_METAROLE) && role !== GUEST_METAROLE
         ) || (
-          this.rawData.parentingRoleAccess.includes(OWNER_METAROLE) && userId === parentOwnerUserId
-        ) || this.rawData.parentingRoleAccess.includes(role);
+          parentingRoles.includes(OWNER_METAROLE) && userId === parentOwnerUserId
+        ) || parentingRoles.includes(role);
 
       let code: string = null;
       let message: string = null;
       if (!hasParentingRoleAccess) {
-        const managerStatus = await rolesManager.checkRoleAccessFor(this.rawData.parentingRoleAccess);
+        const managerStatus = await rolesManager.checkRoleAccessFor(parentingRoles);
         hasParentingRoleAccess = managerStatus.granted;
         code = managerStatus.errorCode;
         message = managerStatus.errorMessage;
@@ -2921,13 +2924,13 @@ export default class ItemDefinition {
       if (!hasParentingRoleAccess && throwError) {
         throw new EndpointError({
           message: message || `Forbidden, user ${userId} with role ${role} has no parenting role access to resource ${this.getName()}` +
-            ` only roles ${this.rawData.parentingRoleAccess.join(", ")} can be granted access`,
+            ` only roles ${parentingRoles.join(", ")} can be granted access`,
           code: notLoggedInWhenShould ? ENDPOINT_ERRORS.MUST_BE_LOGGED_IN : (code || ENDPOINT_ERRORS.FORBIDDEN),
         });
       }
     } else {
       throw new EndpointError({
-        message: "parenting role access is not supported",
+        message: "parenting role access is not supported for " + parentingAccessKey,
         // here we pass always forbidden simply because it's not supported at all
         // and it was not a login mistake
         code: ENDPOINT_ERRORS.FORBIDDEN,

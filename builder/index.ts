@@ -107,7 +107,7 @@ export interface IFileItemDefinitionUntreatedRawJSONDataType {
   deleteRoleAccess?: string[];
   searchRoleAccess?: string[];
   readRoleAccess?: string[];
-  parentingRoleAccess?: string[];
+  parentingRoleAccess?: {[key: string]: string[]};
   canBeParentedBy?: IItemDefinitionParentingRawJSONDataType[];
   parentMaxChildCountSameType?: number;
   parentMaxChildCountAnyType?: number;
@@ -118,8 +118,8 @@ export interface IFileItemDefinitionUntreatedRawJSONDataType {
   canCreateInBehalfRoleAccess?: string[];
   canCreateInBehalfTargetRoles?: string[];
   mustBeParented?: boolean;
-  enableReparenting?: boolean;
-  parentingRule?: "ONCE" | "ONCE_PER_OWNER" | "MANY";
+  canBeReparented?: boolean;
+  canBeParentedRule?: "ONCE" | "ONCE_PER_OWNER" | "MANY";
   owningRule?: "ONCE" | "ONCE_PER_PARENT" | "MANY";
   policies?: IPoliciesRawJSONDataType;
   ownerIsObjectId?: boolean;
@@ -717,12 +717,12 @@ async function buildItemDefinition(
     finalValue.mustBeParented = true;
   }
 
-  if (actualEvaledFileData.enableReparenting) {
-    finalValue.enableReparenting = true;
+  if (actualEvaledFileData.canBeReparented) {
+    finalValue.canBeReparented = true;
   }
 
-  if (actualEvaledFileData.parentingRule === "ONCE" || actualEvaledFileData.parentingRule === "ONCE_PER_OWNER") {
-    finalValue.parentingRule = actualEvaledFileData.parentingRule;
+  if (actualEvaledFileData.canBeParentedRule === "ONCE" || actualEvaledFileData.canBeParentedRule === "ONCE_PER_OWNER") {
+    finalValue.canBeParentedRule = actualEvaledFileData.canBeParentedRule;
   }
 
   if (actualEvaledFileData.canBeParentedBy) {

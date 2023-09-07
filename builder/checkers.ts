@@ -174,6 +174,7 @@ export function checkItemDefinition(
   rawData: IItemDefinitionRawJSONDataType,
   parentModule: IModuleRawJSONDataType,
   traceback: Traceback,
+  absPath: string[],
 ) {
   // so we setup the traceback to the location of the item definition file
   const actualTraceback = traceback.newTraceToLocation(rawData.location);
@@ -258,35 +259,30 @@ export function checkItemDefinition(
   }
 
   // Also these two must be specified together
-  if (rawData.enableReparenting && !rawData.canBeParentedBy) {
+  if (rawData.canBeReparented && !rawData.canBeParentedBy) {
     throw new CheckUpError(
-      "Setting enableReparenting without canBeParentedBy specifications",
-      actualTraceback.newTraceToBit("enableReparenting"),
+      "Setting canBeReparented without canBeParentedBy specifications",
+      actualTraceback.newTraceToBit("canBeReparented"),
     );
   }
 
   // Also these two must be specified together
-  if (rawData.parentingRule && !rawData.canBeParentedBy) {
+  if (rawData.canBeParentedRule && !rawData.canBeParentedBy) {
     throw new CheckUpError(
-      "Setting parentingRule without canBeParentedBy specifications",
-      actualTraceback.newTraceToBit("parentingRule"),
+      "Setting canBeParentedRule without canBeParentedBy specifications",
+      actualTraceback.newTraceToBit("canBeParentedRule"),
     );
   }
 
+  const absPathStr = absPath.join("/");
+
   // if it can be parented
   if (rawData.canBeParentedBy) {
-    if (!rawData.parentingRoleAccess) {
-      throw new CheckUpError(
-        "Setting canBeParentedBy without parentingRoleAccess specifications",
-        actualTraceback.newTraceToBit("canBeParentedBy"),
-      );
-    }
-
     // we need to check that all the paths are valid
-    rawData.canBeParentedBy.forEach((parentingRule, index) => {
+    rawData.canBeParentedBy.forEach((canBeParentedRule, index) => {
       // we get the module path and try to find the module
-      const parentingRuleModulePath = parentingRule.module.split("/");
-      const parentingModule = Root.getModuleRawFor(rawRootData, parentingRuleModulePath);
+      const canBeParentedRuleModulePath = canBeParentedRule.module.split("/");
+      const parentingModule = Root.getModuleRawFor(rawRootData, canBeParentedRuleModulePath);
       // if we don't find it we throw an error
       if (!parentingModule) {
         throw new CheckUpError(
@@ -295,10 +291,11 @@ export function checkItemDefinition(
         );
       }
 
+      let itemsToCheckParentingRule: IItemDefinitionRawJSONDataType[] = [];
       // now we try to find the item definition if we have specified one
-      if (parentingRule.item) {
+      if (canBeParentedRule.item) {
         // and we extract it if possible
-        const itemDefinitionPath = parentingRule.item.split("/");
+        const itemDefinitionPath = canBeParentedRule.item.split("/");
         const parentingItemDefinition = Module.getItemDefinitionRawFor(parentingModule, itemDefinitionPath);
 
         // if we have no result it's an error
@@ -308,16 +305,35 @@ export function checkItemDefinition(
             actualTraceback.newTraceToBit("canBeParentedBy").newTraceToBit(index).newTraceToBit("item"),
           );
         }
-      }
-    });
-  }
 
-  // if we have a parenting role access we must have a can be parented by rule
-  if (rawData.parentingRoleAccess && !rawData.canBeParentedBy) {
-    throw new CheckUpError(
-      "Setting parentingRoleAccess without canBeParentedBy rules",
-      actualTraceback.newTraceToBit("parentingRoleAccess"),
-    );
+        if (!parentingItemDefinition.parentingRoleAccess) {
+          throw new CheckUpError(
+            "The item in question does not have parenting rule to specify who can use it as parent and a result it cannot be parented",
+            actualTraceback.newTraceToBit("canBeParentedBy").newTraceToBit(index).newTraceToBit("item"),
+          );
+        }
+
+        if (!parentingItemDefinition.parentingRoleAccess[absPathStr]) {
+          throw new CheckUpError(
+            "The item in question does not have parenting rule for (" + absPathStr +
+            ") to specify who can use it as parent and a result it cannot be parented",
+            actualTraceback.newTraceToBit("canBeParentedBy").newTraceToBit(index).newTraceToBit("item"),
+          );
+        }
+      } else {
+        itemsToCheckParentingRule = parentingModule.children.filter((v) => v.type === "item") as IItemDefinitionRawJSONDataType[];
+      }
+
+      itemsToCheckParentingRule.forEach((item) => {
+        if (!item.parentingRoleAccess || !item.parentingRoleAccess[absPathStr]) {
+          throw new CheckUpError(
+            "One of the items (" + item.name +
+              ") in question does not have parenting rule for (" + absPathStr + ") specify who can use it as parent and a result it cannot be parented",
+            actualTraceback.newTraceToBit("canBeParentedBy").newTraceToBit(index).newTraceToBit("module"),
+          );
+        }
+      });
+    });
   }
 
   // check the request limiters
@@ -676,7 +692,7 @@ export function checkItemDefinition(
   if (rawData.childDefinitions) {
     rawData
       .childDefinitions.forEach((cd) =>
-        checkItemDefinition(rawRootData, cd, parentModule, actualTraceback));
+        checkItemDefinition(rawRootData, cd, parentModule, actualTraceback, absPath.concat([cd.name])));
   }
 
   // and also includes, if they exist
@@ -1395,6 +1411,7 @@ export function checkModule(
   rawRootData: IRootRawJSONDataType,
   rawData: IModuleRawJSONDataType,
   traceback: Traceback,
+  absPath: string[],
 ) {
   // so first we make it point to our own file where this module
   // is located
@@ -1471,10 +1488,10 @@ export function checkModule(
       // but it depends on what they are, say they are a module
       if (moduleOrItemDef.type === "module") {
         // we send them to the checking module function
-        checkModule(rawRootData, moduleOrItemDef, actualTraceback);
+        checkModule(rawRootData, moduleOrItemDef, actualTraceback, absPath.concat([moduleOrItemDef.name]));
       } else {
         // otherwise it must be an item definition
-        checkItemDefinition(rawRootData, moduleOrItemDef, rawData, actualTraceback);
+        checkItemDefinition(rawRootData, moduleOrItemDef, rawData, actualTraceback, absPath.concat([moduleOrItemDef.name]));
       }
     });
   }
@@ -1720,6 +1737,7 @@ export function checkRoot(
         rawData,
         mod,
         traceback.newTraceToBit("children").newTraceToBit(index),
+        [mod.name],
       );
     });
 

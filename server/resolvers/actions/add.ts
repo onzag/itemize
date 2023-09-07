@@ -127,6 +127,7 @@ export async function addItemDefinition(
         version: resolverArgs.args.parent_version || null,
       } : null,
       customId,
+      environmentParent: null,
     });
 
     // if we are specifying a for_id

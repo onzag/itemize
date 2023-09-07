@@ -35,7 +35,6 @@
             "searchable": false
         }
     ],
-    "parentingRoleAccess": ["&ANYONE_LOGGED"],
     "mustBeParented": true,
     "canBeParentedBy": [
         {

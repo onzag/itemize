@@ -2795,7 +2795,7 @@ export class Cache {
       }).join(",") : "";
       const trackedProperties = trackedPropertiesIdef.concat(trackedPropertiesMod).map((p) => p.getId());
 
-      const hasPotentialTrackers = trackedProperties.length || itemDefinition.isReparentingEnabled();
+      const hasPotentialTrackers = trackedProperties.length || itemDefinition.canBeReparentedEnabled();
 
       // now we see what we are going to return if we got side effects, everything, otherwise
       // it's just some basic stuff with that extra row

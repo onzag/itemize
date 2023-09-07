@@ -292,17 +292,20 @@ export default {
     mustBeParented: {
       type: "boolean",
     },
-    enableReparenting: {
+    canBeReparented: {
       type: "boolean",
     },
-    parentingRule: {
+    canBeParentedRule: {
       type: "string",
       enum: ["ONCE", "ONCE_PER_OWNER", "MANY"],
     },
     parentingRoleAccess: {
-      type: "array",
-      items: {
-        type: "string",
+      type: "object",
+      additionalProperties: {
+        type: "array",
+        items: {
+          type: "string",
+        },
       },
     },
     enableVersioning: {

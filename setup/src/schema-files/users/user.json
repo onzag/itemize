@@ -208,5 +208,8 @@
     },
     "createRoleAccess": "$CONFIG:if(config.roles.includes('ADMIN')){return ['&GUEST', 'ADMIN']}else{return ['&GUEST']}",
     "editRoleAccess":"$CONFIG:if(config.roles.includes('ADMIN')){return ['&OWNER', 'ADMIN']}else{return ['&OWNER']}",
-    "ownerIsObjectId": true
+    "ownerIsObjectId": true,
+    "parentingRoleAccess": {
+        "flag/flag": ["&ANYONE_LOGGED"]
+    }
 }

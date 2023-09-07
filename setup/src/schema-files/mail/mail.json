@@ -149,10 +149,12 @@
         }
     ],
     "editRoleAccess": ["&OWNER"],
-    "parentingRoleAccess": ["&OWNER"],
     "readRoleAccess": ["&OWNER"],
     "searchEngineEnabled": true,
     "searchEngineMainLangProperty": "subject",
+    "parentingRoleAccess": {
+        "mail/mail": ["&OWNER"]
+    },
     "canBeParentedBy": [
         {
             "module": "mail",

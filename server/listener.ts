@@ -679,6 +679,7 @@ export class Listener {
           version: value.parent_version || null,
         } : null,
         customId: null,
+        environmentParent: null,
       }
     );
 
@@ -814,6 +815,7 @@ export class Listener {
           owner: request.createdBy || UNSPECIFIED_OWNER,
           parent: null,
           customId: null,
+          environmentParent: null,
         }
       );
       try {
@@ -992,6 +994,7 @@ export class Listener {
           owner: UNSPECIFIED_OWNER,
           parent: null,
           customId: null,
+          environmentParent: null,
         }
       );
       try {
@@ -1128,6 +1131,7 @@ export class Listener {
             version: request.parentVersion,
           },
           customId: null,
+          environmentParent: null,
         }
       );
       try {
@@ -1267,6 +1271,7 @@ export class Listener {
             version: request.parentVersion,
           },
           customId: null,
+          environmentParent: null,
         }
       );
       try {
@@ -1398,6 +1403,7 @@ export class Listener {
           owner: request.createdBy || UNSPECIFIED_OWNER,
           parent: null,
           customId: null,
+          environmentParent: null,
         }
       );
       try {
@@ -1662,6 +1668,7 @@ export class Listener {
           owner: UNSPECIFIED_OWNER,
           parent: null,
           customId: null,
+          environmentParent: null,
         }
       );
       try {
@@ -1930,6 +1937,7 @@ export class Listener {
             version: request.parentVersion,
           },
           customId: null,
+          environmentParent: null,
         }
       );
 
@@ -2200,6 +2208,7 @@ export class Listener {
             version: request.parentVersion,
           },
           customId: null,
+          environmentParent: null,
         }
       );
 
@@ -2487,6 +2496,7 @@ export class Listener {
           version: value.parent_version || null,
         } : null,
         customId: null,
+        environmentParent: null,
       }
     );
 
