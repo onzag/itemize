@@ -714,6 +714,7 @@ export class Listener {
           err,
         },
       );
+      this.emitError(socket, "Internal Server Error", request);
       return;
     }
 
@@ -837,6 +838,7 @@ export class Listener {
             err,
           },
         );
+        this.emitError(socket, "Internal Server Error", request);
         return;
       }
     }
@@ -1016,6 +1018,7 @@ export class Listener {
             err,
           },
         );
+        this.emitError(socket, "Internal Server Error", request);
         return;
       }
     }
@@ -1153,6 +1156,7 @@ export class Listener {
             err,
           },
         );
+        this.emitError(socket, "Internal Server Error", request);
         return;
       }
     }
@@ -1293,6 +1297,7 @@ export class Listener {
             err,
           },
         );
+        this.emitError(socket, "Internal Server Error", request);
         return;
       }
     }
@@ -1437,6 +1442,7 @@ export class Listener {
             err,
           },
         );
+        this.emitError(socket, "Internal Server Error", request);
         return;
       }
 
@@ -1547,8 +1553,10 @@ export class Listener {
           methodName: "ownedSearchFeedback",
           message: "Failed to provide feedback",
           err,
-        }
+        },
       );
+      this.emitError(socket, "Internal Server Error", request);
+      return;
     }
   }
   public async propertySearchFeedback(
@@ -1702,6 +1710,7 @@ export class Listener {
             err,
           },
         );
+        this.emitError(socket, "Internal Server Error", request);
         return;
       }
 
@@ -1857,8 +1866,10 @@ export class Listener {
           methodName: "propertySearchFeedback",
           message: "Failed to provide feedback",
           err,
-        }
+        },
       );
+      this.emitError(socket, "Internal Server Error", request);
+      return;
     }
   }
   public async parentedSearchFeedback(
@@ -1970,8 +1981,9 @@ export class Listener {
             methodName: "parentedSearchFeedback",
             message: "Failed to provide feedback",
             err,
-          }
+          },
         );
+        this.emitError(socket, "Internal Server Error", request);
         return;
       }
 
@@ -2128,8 +2140,10 @@ export class Listener {
           methodName: "parentedSearchFeedback",
           message: "Failed to provide feedback",
           err,
-        }
+        },
       );
+      this.emitError(socket, "Internal Server Error", request);
+      return;
     }
   }
   public async ownedParentedSearchFeedback(
@@ -2241,8 +2255,9 @@ export class Listener {
             methodName: "ownedParentedSearchFeedback",
             message: "Failed to provide feedback",
             err,
-          }
+          },
         );
+        this.emitError(socket, "Internal Server Error", request);
         return;
       }
 
@@ -2403,8 +2418,10 @@ export class Listener {
           methodName: "ownedParentedSearchFeedback",
           message: "Failed to provide feedback",
           err,
-        }
+        },
       );
+      this.emitError(socket, "Internal Server Error", request);
+      return;
     }
   }
   public async feedback(
@@ -2575,8 +2592,10 @@ export class Listener {
           methodName: "feedback",
           message: "Failed to provide feedback",
           err,
-        }
+        },
       );
+      this.emitError(socket, "Internal Server Error", request);
+      return;
     }
   }
   public removeListenerFinal(

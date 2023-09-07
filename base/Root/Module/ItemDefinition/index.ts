@@ -2930,7 +2930,7 @@ export default class ItemDefinition {
       }
     } else {
       throw new EndpointError({
-        message: "parenting role access is not supported for " + parentingAccessKey,
+        message: "parenting role access is not found for " + parentingAccessKey + " in " + this.getName(),
         // here we pass always forbidden simply because it's not supported at all
         // and it was not a login mistake
         code: ENDPOINT_ERRORS.FORBIDDEN,

@@ -377,7 +377,7 @@ export async function validateParentingRules(
       ),
       customId: null,
     });
-    await itemDefinition.checkRoleAccessForParenting(role, userId, parentOwnerId, itemDefinition, parentingRolesManager, true);
+    await parentingItemDefinition.checkRoleAccessForParenting(role, userId, parentOwnerId, itemDefinition, parentingRolesManager, true);
 
     return result;
   }
