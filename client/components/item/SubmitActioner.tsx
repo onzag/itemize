@@ -67,7 +67,7 @@ interface ISubmitActionerProps {
    * 
    * check executeIf in order to setup conditional execution
    */
-  execute?: (arg: ISubmitActionerInfoArgType) => void;
+  execute?: (arg: ISubmitActionerInfoArgType) => Promise<void> | void;
   /**
    * A boolean to specify whether it would execute, it will execute
    * if it is set to true
@@ -75,6 +75,11 @@ interface ISubmitActionerProps {
    * if the value is undefined the execution will trigger
    */
   executeIf?: boolean;
+  /**
+   * Allows multiple attempts on execution when the value goes from false to true
+   * every time
+   */
+  executeIfAllowMultiple?: boolean;
   children?: (arg: ISubmitActionerInfoArgType) => React.ReactNode;
 }
 
@@ -92,21 +97,45 @@ interface IActualSubmitActionerProps extends ISubmitActionerProps {
  */
 class ActualSubmitActioner extends React.Component<IActualSubmitActionerProps> {
   private hasExecuted: boolean = false;
-  public componentDidMount() {
+  private isExecuting: boolean = false;
+  public async componentDidMount() {
     if (this.props.execute && (typeof this.props.executeIf === "undefined" || this.props.executeIf)) {
-      this.props.execute(this.getArg());
       this.hasExecuted = true;
+      this.isExecuting = true;
+      await this.props.execute(this.getArg());
+      this.isExecuting = false;
     }
   }
-  public componentDidUpdate(): void {
-    if (!this.hasExecuted && this.props.execute && (typeof this.props.executeIf === "undefined" || this.props.executeIf)) {
-      this.props.execute(this.getArg());
+  public async componentDidUpdate(prevProps: IActualSubmitActionerProps) {
+    const shouldExecute = (typeof this.props.executeIf === "undefined" || this.props.executeIf);
+    const shouldExecuteAccordingToPrev = (typeof prevProps.executeIf === "undefined" || prevProps.executeIf);
+    if (
+      this.props.executeIfAllowMultiple &&
+      !this.isExecuting &&
+      this.props.execute &&
+      shouldExecute &&
+      !shouldExecuteAccordingToPrev
+    ) {
       this.hasExecuted = true;
+      this.isExecuting = true;
+      await this.props.execute(this.getArg());
+      this.isExecuting = false;
+    } else if (
+      !this.hasExecuted &&
+      !this.isExecuting &&
+      this.props.execute &&
+      shouldExecute
+    ) {
+      this.hasExecuted = true;
+      this.isExecuting = true;
+      await this.props.execute(this.getArg());
+      this.isExecuting = false;
     }
   }
   public shouldComponentUpdate(nextProps: IActualSubmitActionerProps) {
     return nextProps.children !== this.props.children ||
       nextProps.executeIf !== this.props.executeIf ||
+      nextProps.executeIfAllowMultiple !== this.props.executeIfAllowMultiple ||
       nextProps.itemContext.submitError !== this.props.itemContext.submitError ||
       nextProps.itemContext.submitting !== this.props.itemContext.submitting ||
       nextProps.itemContext.submitted !== this.props.itemContext.submitted;

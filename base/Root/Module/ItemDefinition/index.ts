@@ -36,6 +36,7 @@ import { transferrableToBlob, blobToTransferrable, fileURLAbsoluter } from "../.
 import type { IConfigRawJSONDataType } from "../../../../config";
 import type { IElasticHighlightRecordInfo, PropertyDefinitionSupportedType } from "./PropertyDefinition/types";
 import type { IActionSearchOptions } from "../../../../client/providers/item";
+import { IPropertyOverride } from "../../../../client/internal/gql-client-util";
 
 export interface IItemSearchStateHighlightType {
   [pId: string]: string[];
@@ -681,7 +682,7 @@ export default class ItemDefinition {
    * serialized, the serialized state removes possible useless data
    * @param state 
    */
-  public static getSerializableState(state: IItemStateType): IItemStateType {
+  public static getSerializableState(state: IItemStateType, pOverrides?: IPropertyOverride[]): IItemStateType {
     const newState: IItemStateType = {
       forId: state.forId,
       forVersion: state.forVersion,
@@ -697,9 +698,13 @@ export default class ItemDefinition {
     } as any;
 
     newState.properties.forEach((p, index) => {
+      let override: IPropertyOverride;
+      if (pOverrides) {
+        override = pOverrides.find((p2) => p2.id === p.propertyId);
+      }
       newState.properties[index] = {
-        stateValue: p.stateValue,
-        stateValueModified: p.stateValueModified,
+        stateValue: override ? override.value : p.stateValue,
+        stateValueModified: override ? true : p.stateValueModified,
         propertyId: p.propertyId,
       } as any;
     });

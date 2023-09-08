@@ -378,6 +378,10 @@ export default function BaseSyncer(props: IBaseSyncerProps): any {
     return null;
   }
 
+  if (!props.children) {
+    return null;
+  }
+
   return props.children(
     handleMechanism
   );

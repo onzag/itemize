@@ -559,10 +559,10 @@ export default class CacheWorker {
       const rs = await this.worker.storeState(qualifiedName, id, version, state, metadata, options);
       if (rs) {
         const listeners = STATE_LISTENERS[qualifiedName + "." + (id || "") + "." + (version || "")];
-        listeners && listeners.forEach((l) => l(id, version, state, { overwriteLastModified: metadata || null }));
+        listeners && listeners.forEach((l) => l(id, version, state, metadata || null));
 
         const idSpecificListeners = STATE_LISTENERS[qualifiedName + "." + (id || "")];
-        idSpecificListeners && idSpecificListeners.forEach((l) => l(id, version, state, { overwriteLastModified: metadata || null }));
+        idSpecificListeners && idSpecificListeners.forEach((l) => l(id, version, state, metadata || null ));
       }
       return rs;
     }

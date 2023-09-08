@@ -14,6 +14,18 @@ type OfflineStatusCb = (offline: boolean) => React.ReactNode;
  * The props basically takes a children that tells if connected or not
  */
 interface IOfflineStatusRetrieverProps {
+  /**
+   * By default the retreives starts in an online state and then falls into an offline state
+   * if determined, this will do the reverse and asume it's initially offline and go into offline
+   * if necessary
+   */
+  assumeOfflineFirst?: boolean;
+  /**
+   * Will use the remote listener to retrieve immediate values and do not assume anything
+   * nor leave grace times, NOTE that this mode will break SSR and should only be used in
+   * the client side
+   */
+  immediate_breaksSSR?: boolean;
   children?: React.ReactNode | OfflineStatusCb;
   onRestoredConnection?: () => void;
   onLostConnection?: () => void;
@@ -50,8 +62,8 @@ class ActualOfflineStatusRetriever extends
     // note how we check for the remote listener itself, as it can be undefined
     // if we happen to be on the server side
     this.state = {
-      offline: false,
-      canAcceptConclusion: false,
+      offline: props.immediate_breaksSSR ? props.remoteListener.isOffline() : (props.assumeOfflineFirst ? true : false),
+      canAcceptConclusion: !!props.immediate_breaksSSR || false,
     };
 
     // and then add the a on connection status change
@@ -60,8 +72,8 @@ class ActualOfflineStatusRetriever extends
   public shouldComponentUpdate(
     nextProps: IActualOfflineStatusRetrieverProps, nextState: IActualOfflineStatusRetrieverState,
   ) {
-    const isOffline = this.state.canAcceptConclusion ? this.state.offline : false;
-    const willBeOffline = nextState.canAcceptConclusion ? nextState.offline : false;
+    const isOffline = this.state.canAcceptConclusion ? this.state.offline : (this.props.assumeOfflineFirst ? true : false);
+    const willBeOffline = nextState.canAcceptConclusion ? nextState.offline : (nextProps.assumeOfflineFirst ? true : false);
 
     if (isOffline !== willBeOffline) {
       if (willBeOffline) {
@@ -74,7 +86,7 @@ class ActualOfflineStatusRetriever extends
     // only if the children and the conclusion changes, of both the offline state and whether
     // we can accept such conclusion, we accept it
     return nextProps.children !== this.props.children ||
-    isOffline !== willBeOffline;
+      isOffline !== willBeOffline;
   }
   /**
    * when the mount event happens
@@ -84,26 +96,30 @@ class ActualOfflineStatusRetriever extends
     this.setState({
       offline: this.props.remoteListener.isOffline(),
     });
-    // if the time it has passed has been more than 3 seconds this is a component
-    // that has been loaded later and the websocket must have had time to setup
-    // so we can accept this conclusion
-    if (TIME_WHEN_SRC_LOADED - (new Date()).getTime() >= 3000) {
-      this.setState({
-        canAcceptConclusion: true,
-      });
-    } else {
-      // we first take some time and wait 1 second, for the user
-      // to be connected, since the remote listener is offline until
-      // it is connected, and we don't want offline status retriever to show
-      // when the app is online, we wait 1 second to show
-      setTimeout(() => {
-        if (!this.isUnmounted) {
-          this.setState({
-            canAcceptConclusion: true,
-          });
-        }
-      }, 1000);
+
+    if (!this.props.immediate_breaksSSR) {
+      // if the time it has passed has been more than 3 seconds this is a component
+      // that has been loaded later and the websocket must have had time to setup
+      // so we can accept this conclusion
+      if (TIME_WHEN_SRC_LOADED - (new Date()).getTime() >= 3000) {
+        this.setState({
+          canAcceptConclusion: true,
+        });
+      } else {
+        // we first take some time and wait 1 second, for the user
+        // to be connected, since the remote listener is offline until
+        // it is connected, and we don't want offline status retriever to show
+        // when the app is online, we wait 1 second to show
+        setTimeout(() => {
+          if (!this.isUnmounted) {
+            this.setState({
+              canAcceptConclusion: true,
+            });
+          }
+        }, 1000);
+      }
     }
+
     // and add the listener to listen for changes
     this.props.remoteListener.addConnectStatusListener(this.onConnectionStatusChange);
   }
@@ -119,7 +135,7 @@ class ActualOfflineStatusRetriever extends
   }
   public render() {
     if (typeof this.props.children === "function") {
-      return this.props.children(this.state.canAcceptConclusion ? this.state.offline : false);
+      return this.props.children(this.state.canAcceptConclusion ? this.state.offline : (this.props.assumeOfflineFirst ? true : false));
     }
 
     return this.props.children || null;
@@ -135,7 +151,7 @@ class ActualOfflineStatusRetriever extends
 export default function OfflineStatusRetriever(props: IOfflineStatusRetrieverProps) {
   return (
     <DataContext.Consumer>
-      {(data) => (<ActualOfflineStatusRetriever {...props} remoteListener={data.remoteListener}/>)}
+      {(data) => (<ActualOfflineStatusRetriever {...props} remoteListener={data.remoteListener} />)}
     </DataContext.Consumer>
   );
 }

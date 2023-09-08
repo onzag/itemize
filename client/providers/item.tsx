@@ -4894,7 +4894,7 @@ export class ActualItemProvider extends
           this.props.forId || null,
           this.props.forVersion || null,
         );
-        const serializable = ItemDefinition.getSerializableState(state);
+        const serializable = ItemDefinition.getSerializableState(state, options.propertyOverrides);
         const storingLocation = getStoredStateLocation(options.storeStateIfCantConnect, this.props.forId, this.props.forVersion);
         const metadataSource = appliedValue &&
           appliedValue.flattenedValue as any;
