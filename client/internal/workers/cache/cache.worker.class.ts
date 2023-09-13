@@ -1304,7 +1304,7 @@ export default class CacheWorker {
     property: [string, string],
   ): Promise<boolean> {
     if (this.worker) {
-      return this.deleteCachedSearch(queryName, type, owner, parent, property);
+      return this.worker.deleteCachedSearch(queryName, type, owner, parent, property);
     }
 
     // so we wait for the setup, just in case

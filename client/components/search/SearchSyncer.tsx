@@ -96,7 +96,7 @@ export default function SearchSyncer(props: ISearchSyncerProps): any {
     selfUsedFallback ? true : !!failed,
     failed,
   );
-
+  
   // ensure that there are no search results
   // when no search is available
   // results may linger as it syncs
@@ -109,7 +109,7 @@ export default function SearchSyncer(props: ISearchSyncerProps): any {
   }, [props.search]);
 
   const onWillSearch = useCallback(() => {
-    setSelfSearchResults(null);
+    // setSelfSearchResults(null);
     setSelfUsedFallback(false);
     setSelfSynced(false);
   }, []);
@@ -126,6 +126,7 @@ export default function SearchSyncer(props: ISearchSyncerProps): any {
     }
 
     if (data.error) {
+      setSelfSearchResults(null);
       setFailed(data.error);
     } else if (data.polyfilled || data.cached) {
       // grab the results and send them
@@ -135,6 +136,8 @@ export default function SearchSyncer(props: ISearchSyncerProps): any {
       if (data.polyfilled) {
         setSelfUsedFallback(true);
       }
+    } else {
+      setSelfSearchResults(null);
     }
   }, [props.allowPolyfilledFallback, props.onBulkLoad]);
 
