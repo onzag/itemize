@@ -174,8 +174,8 @@ export function redirectTo(newLocation: string, options: IRedirectOptions = {}) 
       const strParams = dummyURL.searchParams.toString();
       finalNewLocation = (
         isAFullFledgedHttpURL ?
-        (dummyURL.protocol + "//" + dummyURL.host) :
-        ""
+          (dummyURL.protocol + "//" + dummyURL.host) :
+          ""
       ) + dummyURL.pathname + (strParams ? "?" + strParams : "") + dummyURL.hash;
     }
   }
@@ -190,21 +190,26 @@ export function redirectTo(newLocation: string, options: IRedirectOptions = {}) 
 /**
  * A very simple redirect as well, but this time ensures that localization
  * is respected in the url
- * @param newLocation the new location without localization
+ * @param newLocation the new location without localization, use $HERE to specify the current location without query parameters
  * @param state the new state
  * @param replace whether to replace
  */
 export function localizedRedirectTo(newLocation: string, options: IRedirectOptions = {}) {
   // so first we get the current location from our url
-  const currentLocaleFromURL = location.pathname.split("/")[1] || null;
+  const splitted = location.pathname.split("/");
+  splitted.shift();
+  const currentLocaleFromURL = splitted.shift() || null;
   // if there's nothing
   if (!currentLocaleFromURL) {
     // we can't do anything
     return;
   }
 
+  const restOfURL = splitted.join("/").split("?")[0];
+
   // now we get the new url
   let urlDefined = newLocation;
+  urlDefined = urlDefined && urlDefined.replace("$HERE", restOfURL);
   // add a trailing / if it isn't there
   if (urlDefined[0] !== "/") {
     urlDefined = "/" + urlDefined;

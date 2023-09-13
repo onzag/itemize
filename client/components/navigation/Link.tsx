@@ -27,6 +27,8 @@ type QsParamsSpecFn = (current: URLSearchParams, next: URLSearchParams) => IQuer
 interface ICustomLinkProps extends LinkProps {
   /**
    * to where we are redirecting to, only a string allowed now
+   * 
+   * use the shortcut $HERE to specify the current path as it is without query parameters
    */
   to: string;
   /**
@@ -99,15 +101,20 @@ const Link = React.forwardRef((props: ICustomLinkProps, ref: ForwardedRef<HTMLAn
   // first we need to use the location
   const locationCur = useLocation();
   // and now let's ge thte current locale from our location
-  const currentLocaleFromURL = locationCur.pathname.split("/")[1] || null;
+  const splitted = locationCur.pathname.split("/");
+  splitted.shift();
+  const currentLocaleFromURL = splitted.shift() || null;
 
   // we cannot render if we don't have one
   if (!currentLocaleFromURL) {
     return null;
   }
 
+  const restOfURL = splitted.join("/").split("?")[0];
+
   // now let's get the url we want to go to
   let urlDefined = props.to;
+  urlDefined = urlDefined && urlDefined.replace("$HERE", restOfURL);
   if (urlDefined !== null && typeof urlDefined !== "undefined" && urlDefined[0] !== "/") {
     urlDefined = "/" + urlDefined;
   }
