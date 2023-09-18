@@ -1375,8 +1375,6 @@ export default class CacheWorker {
       // useful information
       console.log("Deleting search query for " + storeKeyName);
 
-      console.log(currentValue, "claims it's undefined but I know it's bullshit");
-
       // and now we loop on all the records and delete them
       // as well
       await Promise.all(
