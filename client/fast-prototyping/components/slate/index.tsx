@@ -4788,6 +4788,9 @@ export class SlateEditor extends React.Component<ISlateEditorProps, ISlateEditor
 
     if (this.props.autoFocus) {
       ReactEditor.focus(this.editor);
+      // bug sometimes it will not focus
+      // Focus god damn it
+      this.forceFocus();
     }
 
     const editableHTMLElement = this.editableRef.current.childNodes[0] as HTMLDivElement;

@@ -89,6 +89,8 @@ export async function getItemDefinition(
           module: itemDefinition.getParentModule(),
           root: appData.root,
           tokenData: tokenData,
+          id: resolverArgs.args.id,
+          version: resolverArgs.args.version || null,
           user: tokenData,
           environment: CustomRoleGranterEnvironment.RETRIEVING,
           requestArgs: resolverArgs.args,
@@ -470,6 +472,8 @@ export async function getItemDefinitionList(
         user: tokenData,
         environment: CustomRoleGranterEnvironment.RETRIEVING,
         requestArgs: resolverArgs.args,
+        id: value.id,
+        version: value.version || null,
         owner: ownerId,
         parent: value.parent_id ? {
           id: value.parent_id,
@@ -774,6 +778,8 @@ export async function getModuleList(
         user: tokenData,
         environment: CustomRoleGranterEnvironment.RETRIEVING,
         requestArgs: resolverArgs.args,
+        id: value.id,
+        version: value.version || null,
         owner: ownerId,
         parent: value.parent_id ? {
           id: value.parent_id,

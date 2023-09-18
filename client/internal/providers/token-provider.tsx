@@ -7,11 +7,12 @@ import React from "react";
 import { gqlQuery, buildGqlQuery, IGQLValue } from "../../../gql-querier";
 import { EndpointErrorType } from "../../../base/errors";
 import { ILocaleContextType } from "./locale-provider";
-import { GUEST_METAROLE, ENDPOINT_ERRORS, MEMCACHED_DESTRUCTION_MARKERS_LOCATION, DESTRUCTION_MARKERS_LOCATION, PREFIX_GET, SEARCH_DESTRUCTION_MARKERS_LOCATION, MEMCACHED_SEARCH_DESTRUCTION_MARKERS_LOCATION, PREFIX_SEARCH } from "../../../constants";
+import { GUEST_METAROLE, ENDPOINT_ERRORS } from "../../../constants";
 import CacheWorkerInstance from "../workers/cache";
 import equals from "deep-equal";
 import { ISSRContextType, SSRContext } from "./ssr-provider";
 import { getCookie, COOKIE_EXPIRATION_DATE } from "../..";
+import { destroyDestructionMarkers, destroySearchDestructionMarkers } from "../app/destruction-markers";
 
 /**
  * State for the actual token provider that actually
@@ -467,64 +468,20 @@ class ActualTokenProvider extends React.Component<IActualTokenProviderProps, IAc
   /**
    * Cleans all the destruction markers
    */
-  public cleanAndDestroyLoggedData() {
+  public async cleanAndDestroyLoggedData() {
     // removing the user data
     document.cookie = "token=;expires=Thu, 01-Jan-1970 00:00:01 GMT;path=/";
     document.cookie = "role=;expires=Thu, 01-Jan-1970 00:00:01 GMT;path=/";
     document.cookie = "id=;expires=Thu, 01-Jan-1970 00:00:01 GMT;path=/";
 
-    // gathering the destruction markers
-    const destructionMarkers =
-      // if we have memcached them, pick those
-      (window as any)[MEMCACHED_DESTRUCTION_MARKERS_LOCATION] ||
-      // otherwise get them from local storage
-      JSON.parse(localStorage.getItem(DESTRUCTION_MARKERS_LOCATION) || "{}");
-    // clean them from the memory cache to match local storage
-    (window as any)[MEMCACHED_DESTRUCTION_MARKERS_LOCATION] = {};
-    // as we delete from local storage as well
-    localStorage.removeItem(DESTRUCTION_MARKERS_LOCATION);
-
-    // now we loop over the destruction markers
-    Object.keys(destructionMarkers).forEach((qualifiedPathName: string) => {
-      destructionMarkers[qualifiedPathName].forEach((marker: [string, string]) => {
-        // and delete everything within it
-        CacheWorkerInstance.instance.deleteCachedValue(
-          PREFIX_GET + qualifiedPathName,
-          marker[0],
-          marker[1],
-        );
-      });
-    });
-
-    // gathering the search destruction markers
-    const searchDestructionMarkers =
-      // if we have memcached them, pick those
-      (window as any)[MEMCACHED_SEARCH_DESTRUCTION_MARKERS_LOCATION] ||
-      // otherwise get them from local storage
-      JSON.parse(localStorage.getItem(SEARCH_DESTRUCTION_MARKERS_LOCATION) || "{}");
-  
-    // clean them from the memory cache to match local storage
-    (window as any)[MEMCACHED_SEARCH_DESTRUCTION_MARKERS_LOCATION] = {};
-    // as we delete from local storage as well
-    localStorage.removeItem(SEARCH_DESTRUCTION_MARKERS_LOCATION);
-
-    // now we loop over the destruction markers
-    Object.keys(searchDestructionMarkers).forEach((qualifiedPathName: string) => {
-      searchDestructionMarkers[qualifiedPathName].forEach((marker: [string, string, [string, string, string], [string, string]]) => {
-        // and delete everything within it
-        // the first value of the marker is the type of caching that was used
-        // the second is the owner
-        // the thrid is the parent
-        // the fourth is the tracked property
-        CacheWorkerInstance.instance.deleteCachedSearch(
-          PREFIX_SEARCH + qualifiedPathName,
-          marker[0] as any,
-          marker[1],
-          marker[2],
-          marker[3],
-        );
-      });
-    });
+    const dmStatus = await destroyDestructionMarkers();
+    if (!dmStatus) {
+      console.warn("Failed to remove destruction markers for an unknown reason");
+    }
+    const searchStatus = await destroySearchDestructionMarkers();
+    if (!searchStatus) {
+      console.warn("Failed to remove destruction markers for search for an unknown reason");
+    }
   }
 
   /**

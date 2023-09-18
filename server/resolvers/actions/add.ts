@@ -113,6 +113,8 @@ export async function addItemDefinition(
       databaseConnection: appData.databaseConnection,
       rawDB: appData.rawDB,
       value: null,
+      id: customId,
+      version: null,
       item: itemDefinition,
       module: itemDefinition.getParentModule(),
       root: appData.root,
@@ -660,6 +662,8 @@ export async function addItemDefinition(
       environment: CustomRoleGranterEnvironment.RETRIEVING,
       value: gqlValue,
       customId: null,
+      id: value.id,
+      version: value.version || null,
     });
 
     // so now we check the role access for the reading of

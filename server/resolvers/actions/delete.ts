@@ -107,6 +107,8 @@ export async function deleteItemDefinition(
           } : null,
           customId: null,
           environmentParent: null,
+          id: resolverArgs.args.id,
+          version: resolverArgs.args.version || null,
         });
         return rolesManager;
       },

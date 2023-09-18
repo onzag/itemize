@@ -53,6 +53,15 @@ async function wait(n: number) {
   })
 }
 
+// TODO make orphan table
+// when deleting cached values that are marked for destruction
+// for example within a search they will delete such values regardless
+// of whom is using them, for example, say a search and another search have
+// overlapping values, deleting one search will delete all the values that
+// are in use in the other search, a source of origin must be specified so
+// that values are only deleted once the sources of origin have been
+// exhaused so that the element is not left orphaned
+
 /**
  * A cache match for a standard query, basically
  * contains the value it got with the fields it requested

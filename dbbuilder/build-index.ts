@@ -216,7 +216,7 @@ export async function buildIndexes(
         )) {
           // we drop the index
           try {
-            if (newIndex.type !== "primary") {
+            if (currentIndex.type !== "primary") {
               await databaseConnection.query(
                 `DROP INDEX IF EXISTS ${JSON.stringify(pgIndexName)}`,
               );

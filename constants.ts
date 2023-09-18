@@ -324,7 +324,17 @@ export const DESTRUCTION_MARKERS_LOCATION = "DESTRUCTION_MARKERS";
 /**
  * Where the destruction markers are located
  */
+export const UNMOUNT_DESTRUCTION_MARKERS_LOCATION = "UNMOUNT_DESTRUCTION_MARKERS";
+
+/**
+ * Where the destruction markers are located
+ */
 export const SEARCH_DESTRUCTION_MARKERS_LOCATION = "SEARCH_DESTRUCTION_MARKERS";
+
+/**
+ * Where the destruction markers are located
+ */
+export const UNMOUNT_SEARCH_DESTRUCTION_MARKERS_LOCATION = "UNMOUNT_SEARCH_DESTRUCTION_MARKERS";
 
 /**
  * Where destruction markers get memory cached
@@ -334,7 +344,17 @@ export const MEMCACHED_DESTRUCTION_MARKERS_LOCATION = "MEMCACHED_" + DESTRUCTION
 /**
  * Where destruction markers get memory cached
  */
+export const MEMCACHED_UNMOUNT_DESTRUCTION_MARKERS_LOCATION = "MEMCACHED_" + UNMOUNT_DESTRUCTION_MARKERS_LOCATION;
+
+/**
+ * Where destruction markers get memory cached
+ */
 export const MEMCACHED_SEARCH_DESTRUCTION_MARKERS_LOCATION = "MEMCACHED_" + SEARCH_DESTRUCTION_MARKERS_LOCATION;
+
+/**
+ * Where the destruction markers are located
+ */
+export const MEMCACHED_UNMOUNT_SEARCH_DESTRUCTION_MARKERS_LOCATION = "MEMCACHED_" + UNMOUNT_SEARCH_DESTRUCTION_MARKERS_LOCATION;
 
 /**
  * Store a last rich text change size global to use to save memory for lenght calculation

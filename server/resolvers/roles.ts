@@ -40,6 +40,8 @@ export interface ICustomRoleGranterArg {
   item: ItemDefinition;
   module: Module;
   value: IGQLValue;
+  id: string;
+  version: string;
   environment: CustomRoleGranterEnvironment;
   requestArgs: IGQLArgs;
   /**

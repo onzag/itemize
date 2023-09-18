@@ -705,6 +705,8 @@ export class Collector {
           type: rowValue.parent_type,
           version: rowValue.parent_version,
         } : null,
+        id: id,
+        version: version || null,
         requestArgs: null,
         tokenData: this.appliedRule.forUser,
         user: this.appliedRule.forUser,
