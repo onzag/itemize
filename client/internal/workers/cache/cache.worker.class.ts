@@ -313,6 +313,13 @@ export default class CacheWorker {
   private badWritesForced: boolean = false;
 
   /**
+   * used during initialization to block the execution
+   * of code
+   */
+  private waitForBlockPromise: Promise<void> = null;
+  private waitForBlockPromiseResolve: () => void = null;
+
+  /**
    * Constructs a new cache worker
    */
   public constructor(polyfilled: boolean, worker?: CacheWorker) {
@@ -577,6 +584,7 @@ export default class CacheWorker {
     }
 
     await this.waitForSetupPromise;
+    await this.waitForBlockPromise;
 
     // so first we await for our database
     if (!this.db) {
@@ -627,6 +635,7 @@ export default class CacheWorker {
     }
 
     await this.waitForSetupPromise;
+    await this.waitForBlockPromise;
 
     if (!this.db) {
       console.warn("Could not retrieve IndexedDB");
@@ -663,6 +672,7 @@ export default class CacheWorker {
     // console.log("REQUESTED STORED STATE FOR", qualifiedName, id, version);
 
     await this.waitForSetupPromise;
+    await this.waitForBlockPromise;
 
     // so first we await for our database
     if (!this.db) {
@@ -719,6 +729,7 @@ export default class CacheWorker {
     }
 
     await this.waitForSetupPromise;
+    await this.waitForBlockPromise;
 
     // so first we await for our database
     if (!this.db) {
@@ -923,6 +934,7 @@ export default class CacheWorker {
     // }
 
     await this.waitForSetupPromise;
+    await this.waitForBlockPromise;
 
     // so first we await for our database
     if (!this.db) {
@@ -1008,6 +1020,7 @@ export default class CacheWorker {
 
     // so we wait for the setup, just in case
     await this.waitForSetupPromise;
+    // await this.waitForBlockPromise;
 
     // if we don't have it
     if (!this.db) {
@@ -1076,6 +1089,7 @@ export default class CacheWorker {
     //   queryName, cachePolicy, createdByIfKnown, parentTypeIfKnown, parentIdIfKnown, parentVersionIfKnown);
 
     await this.waitForSetupPromise;
+    await this.waitForBlockPromise;
 
     // so first we await for our database
     if (!this.db) {
@@ -1146,6 +1160,7 @@ export default class CacheWorker {
     // console.log("REQUESTED TO STORE METADATA FOR", queryName, id, version, metadata);
 
     await this.waitForSetupPromise;
+    await this.waitForBlockPromise;
 
     // so first we await for our database
     if (!this.db) {
@@ -1215,6 +1230,7 @@ export default class CacheWorker {
     //   queryName, cachePolicy, createdByIfKnown, parentTypeIfKnown, parentIdIfKnown, parentVersionIfKnown);
 
     await this.waitForSetupPromise;
+    await this.waitForBlockPromise;
 
     // so first we await for our database
     if (!this.db) {
@@ -1269,6 +1285,7 @@ export default class CacheWorker {
     // console.log("REQUESTED TO READ METADATA FOR", queryName, id, version);
 
     await this.waitForSetupPromise;
+    await this.waitForBlockPromise;
 
     // so first we await for our database
     if (!this.db) {
@@ -1318,6 +1335,7 @@ export default class CacheWorker {
 
     // so we wait for the setup, just in case
     await this.waitForSetupPromise;
+    // await this.waitForBlockPromise;
 
     // if we don't have it
     if (!this.db) {
@@ -1351,11 +1369,13 @@ export default class CacheWorker {
 
       if (!currentValue) {
         console.warn("Requested to delete " + storeKeyName + " but no such search is found in IndexedDB");
-        return false;
+        return true;
       }
 
       // useful information
       console.log("Deleting search query for " + storeKeyName);
+
+      console.log(currentValue, "claims it's undefined but I know it's bullshit");
 
       // and now we loop on all the records and delete them
       // as well
@@ -1493,6 +1513,7 @@ export default class CacheWorker {
     // }
 
     await this.waitForSetupPromise;
+    await this.waitForBlockPromise;
 
     // if we don't have a database no match
     if (!this.db) {
@@ -1606,6 +1627,7 @@ export default class CacheWorker {
     }
 
     await this.waitForSetupPromise;
+    await this.waitForBlockPromise;
 
     // so we fetch our db like usual
     if (!this.db) {
@@ -1804,6 +1826,7 @@ export default class CacheWorker {
     }
 
     await this.waitForSetupPromise;
+    await this.waitForBlockPromise;
 
     if (!this.db) {
       console.warn("Could not retrieve IndexedDB");
@@ -2498,5 +2521,30 @@ export default class CacheWorker {
     if (this.isCurrentlyBlocked) {
       callback(this.isCurrentlyBlocked);
     }
+  }
+
+  public async startInitializationBlock(): Promise<void> {
+    if (this.worker) {
+      return this.worker.startInitializationBlock();
+    }
+    this.waitForBlockPromise = new Promise((r) => {
+      this.waitForBlockPromiseResolve = r;
+    });
+  }
+
+  public async endInitializationBlock(): Promise<void> {
+    if (this.worker) {
+      return this.worker.endInitializationBlock();
+    }
+    this.waitForBlockPromiseResolve();
+  }
+
+  public async waitForInitializationBlock(): Promise<void> {
+    if (this.worker) {
+      return this.worker.waitForInitializationBlock();
+    }
+
+    await this.waitForBlockPromise;
+    return;
   }
 }

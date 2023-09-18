@@ -2277,15 +2277,6 @@ export class ActualItemProvider extends
 
     // we get the initial state
     this.state = ActualItemProvider.setupInitialState(props);
-
-    // and if we have a cache, which runs behind a worker
-    // won't run in server mode so it's safe
-    if (CacheWorkerInstance.isSupportedAsWorker || CacheWorkerInstance.isPolyfilled) {
-      // let's set it up
-      // as you can see this function might run several times per instance
-      // but that's okay, all next runs get ignored
-      CacheWorkerInstance.instance.setupVersion(parseInt(window.BUILD_NUMBER, 10));
-    }
   }
   public blockCleanup(props: IActualItemProviderProps = this.props) {
     if (props.forId) {
@@ -2306,8 +2297,11 @@ export class ActualItemProvider extends
   public injectSubmitBlockPromise(p: Promise<any>) {
     this.submitBlockPromises.push(p);
   }
-  public clearFromDestruction(props: IActualItemProviderProps = this.props, unmount: boolean) {
+  public async clearFromDestruction(props: IActualItemProviderProps = this.props, unmount: boolean) {
     if (props.forId) {
+      if (CacheWorkerInstance.instance) {
+        await CacheWorkerInstance.instance.waitForInitializationBlock();
+      }
       const qualifiedName = props.itemDefinitionInstance.getQualifiedPathName();
       const forId = props.forId;
       const forVersion = props.forVersion || null;
@@ -2329,8 +2323,12 @@ export class ActualItemProvider extends
       }
     }
   }
-  public markForDestruction(unmount: boolean) {
+  public async markForDestruction(unmount: boolean) {
     if (this.props.forId) {
+      if (CacheWorkerInstance.instance) {
+        await CacheWorkerInstance.instance.waitForInitializationBlock();
+      }
+
       const qualifiedName = this.props.itemDefinitionInstance.getQualifiedPathName();
       const forId = this.props.forId;
       const forVersion = this.props.forVersion || null;
@@ -2359,7 +2357,7 @@ export class ActualItemProvider extends
       }
     }
   }
-  public clearSearchFromDestruction(
+  public async clearSearchFromDestruction(
     type: "by-parent" | "by-owner" | "by-owner-and-parent" | "by-property",
     qualifiedName: string,
     owner: string,
@@ -2367,6 +2365,10 @@ export class ActualItemProvider extends
     property: [string, string],
     unmount: boolean,
   ) {
+    if (CacheWorkerInstance.instance) {
+      await CacheWorkerInstance.instance.waitForInitializationBlock();
+    }
+
     const locationMemcached =
       unmount ? MEMCACHED_UNMOUNT_SEARCH_DESTRUCTION_MARKERS_LOCATION : MEMCACHED_SEARCH_DESTRUCTION_MARKERS_LOCATION;
     const locationReal =
@@ -2387,7 +2389,7 @@ export class ActualItemProvider extends
       }
     }
   }
-  public markSearchForDestruction(
+  public async markSearchForDestruction(
     type: "by-parent" | "by-owner" | "by-owner-and-parent" | "by-property",
     qualifiedName: string,
     owner: string,
@@ -2395,6 +2397,10 @@ export class ActualItemProvider extends
     property: [string, string],
     unmount: boolean,
   ) {
+    if (CacheWorkerInstance.instance) {
+      await CacheWorkerInstance.instance.waitForInitializationBlock();
+    }
+
     const locationMemcached =
       unmount ? MEMCACHED_UNMOUNT_SEARCH_DESTRUCTION_MARKERS_LOCATION : MEMCACHED_SEARCH_DESTRUCTION_MARKERS_LOCATION;
     const locationReal =
@@ -5322,6 +5328,9 @@ export class ActualItemProvider extends
 
     // we need the standard counterpart given we are in search mode right now, 
     const standardCounterpart = this.props.itemDefinitionInstance.getStandardCounterpart();
+    const standardCounterpartQualifiedName = (standardCounterpart.isExtensionsInstance() ?
+      standardCounterpart.getParentModule().getQualifiedPathName() :
+      standardCounterpart.getQualifiedPathName());
     // first we calculate the properties that are to be submitted, by using the standard counterpart
     // a search action is only to be executed if the item definition (either a real item definition or
     // one representing a module) is actually in search mode, otherwise this would crash
@@ -5488,7 +5497,7 @@ export class ActualItemProvider extends
       if (options.cachePolicy === "by-owner") {
         this.markSearchForDestruction(
           options.cachePolicy,
-          standardCounterpart.getQualifiedPathName(),
+          standardCounterpartQualifiedName,
           options.createdBy,
           null,
           null,
@@ -5497,7 +5506,7 @@ export class ActualItemProvider extends
       } else if (options.cachePolicy === "by-parent") {
         this.markSearchForDestruction(
           options.cachePolicy,
-          standardCounterpart.getQualifiedPathName(),
+          standardCounterpartQualifiedName,
           null,
           searchParent,
           null,
@@ -5506,7 +5515,7 @@ export class ActualItemProvider extends
       } else if (options.cachePolicy === "by-owner-and-parent") {
         this.markSearchForDestruction(
           options.cachePolicy,
-          standardCounterpart.getQualifiedPathName(),
+          standardCounterpartQualifiedName,
           options.createdBy,
           searchParent,
           null,
@@ -5515,7 +5524,7 @@ export class ActualItemProvider extends
       } else if (options.cachePolicy === "by-property") {
         this.markSearchForDestruction(
           options.cachePolicy,
-          standardCounterpart.getQualifiedPathName(),
+          standardCounterpartQualifiedName,
           null,
           null,
           searchCacheUsesProperty,
@@ -5528,14 +5537,14 @@ export class ActualItemProvider extends
       if (options.cachePolicy === "by-owner") {
         this.installInternalSearchDestructionMarker([
           options.cachePolicy,
-          standardCounterpart.getQualifiedPathName(),
+          standardCounterpartQualifiedName,
           options.createdBy,
           null,
           null,
         ]);
         this.markSearchForDestruction(
           options.cachePolicy,
-          standardCounterpart.getQualifiedPathName(),
+          standardCounterpartQualifiedName,
           options.createdBy,
           null,
           null,
@@ -5544,14 +5553,14 @@ export class ActualItemProvider extends
       } else if (options.cachePolicy === "by-parent") {
         this.installInternalSearchDestructionMarker([
           options.cachePolicy,
-          standardCounterpart.getQualifiedPathName(),
+          standardCounterpartQualifiedName,
           null,
           searchParent,
           null,
         ]);
         this.markSearchForDestruction(
           options.cachePolicy,
-          standardCounterpart.getQualifiedPathName(),
+          standardCounterpartQualifiedName,
           null,
           searchParent,
           null,
@@ -5560,14 +5569,14 @@ export class ActualItemProvider extends
       } else if (options.cachePolicy === "by-owner-and-parent") {
         this.installInternalSearchDestructionMarker([
           options.cachePolicy,
-          standardCounterpart.getQualifiedPathName(),
+          standardCounterpartQualifiedName,
           options.createdBy,
           searchParent,
           null,
         ]);
         this.markSearchForDestruction(
           options.cachePolicy,
-          standardCounterpart.getQualifiedPathName(),
+          standardCounterpartQualifiedName,
           options.createdBy,
           searchParent,
           null,
@@ -5576,14 +5585,14 @@ export class ActualItemProvider extends
       } else if (options.cachePolicy === "by-property") {
         this.installInternalSearchDestructionMarker([
           options.cachePolicy,
-          standardCounterpart.getQualifiedPathName(),
+          standardCounterpartQualifiedName,
           null,
           null,
           searchCacheUsesProperty,
         ]);
         this.markSearchForDestruction(
           options.cachePolicy,
-          standardCounterpart.getQualifiedPathName(),
+          standardCounterpartQualifiedName,
           null,
           null,
           searchCacheUsesProperty,

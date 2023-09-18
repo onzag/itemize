@@ -1,7 +1,7 @@
 import { MEMCACHED_DESTRUCTION_MARKERS_LOCATION, DESTRUCTION_MARKERS_LOCATION, PREFIX_GET, SEARCH_DESTRUCTION_MARKERS_LOCATION, MEMCACHED_SEARCH_DESTRUCTION_MARKERS_LOCATION, PREFIX_SEARCH, MEMCACHED_UNMOUNT_DESTRUCTION_MARKERS_LOCATION, UNMOUNT_DESTRUCTION_MARKERS_LOCATION, MEMCACHED_UNMOUNT_SEARCH_DESTRUCTION_MARKERS_LOCATION, UNMOUNT_SEARCH_DESTRUCTION_MARKERS_LOCATION } from "../../../constants";
 import CacheWorkerInstance from "../workers/cache";
 
-export async function destroyDestructionMarkers(unmount?: boolean) {
+export async function destroyDestructionMarkers(unmount?: boolean, intialization?: boolean) {
   const locReal = unmount ? UNMOUNT_DESTRUCTION_MARKERS_LOCATION : DESTRUCTION_MARKERS_LOCATION;
   const locMemcached = unmount ? MEMCACHED_UNMOUNT_DESTRUCTION_MARKERS_LOCATION : MEMCACHED_DESTRUCTION_MARKERS_LOCATION;
 
@@ -34,10 +34,10 @@ export async function destroyDestructionMarkers(unmount?: boolean) {
     localStorage.removeItem(locReal);
   }
 
-  return failed;
+  return !failed;
 }
 
-export async function destroySearchDestructionMarkers(unmount?: boolean) {
+export async function destroySearchDestructionMarkers(unmount?: boolean, intialization?: boolean) {
   const locSearchReal = unmount ? UNMOUNT_SEARCH_DESTRUCTION_MARKERS_LOCATION : SEARCH_DESTRUCTION_MARKERS_LOCATION;
   const locSearchMemcached = unmount ? MEMCACHED_UNMOUNT_SEARCH_DESTRUCTION_MARKERS_LOCATION : MEMCACHED_SEARCH_DESTRUCTION_MARKERS_LOCATION;
 
@@ -76,5 +76,5 @@ export async function destroySearchDestructionMarkers(unmount?: boolean) {
     localStorage.removeItem(locSearchReal);
   }
 
-  return searchFailed;
+  return !searchFailed;
 }

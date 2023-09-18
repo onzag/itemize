@@ -25,6 +25,7 @@ import ItemDefinition from "../base/Root/Module/ItemDefinition";
 import Module from "../base/Root/Module";
 import { IGlobalTestingType, setupTesting } from "./internal/testing";
 import type { ISSRServerModeInfo } from "../server/ssr";
+import { destroyDestructionMarkers, destroySearchDestructionMarkers } from "./internal/app/destruction-markers";
 
 /**
  * when cookies expire
@@ -372,7 +373,7 @@ export async function initializeItemizeApp(
     // Let's set the values
     guessedLang = storedLang || guessedUserData.language;
     guessedCountry = storedCountry || guessedUserData.country;
-    guessedCurrency = storedCurrency|| guessedUserData.currency;
+    guessedCurrency = storedCurrency || guessedUserData.currency;
 
     // So this is a global variable, that must exist, sadly but necessary
     // this is a very simple way to have it available in the client side
@@ -475,7 +476,7 @@ export async function initializeItemizeApp(
       const injectedStyle = document.createElement("style");
       injectedStyle.type = "text/css";
 
-      if ((injectedStyle as any).styleSheet){
+      if ((injectedStyle as any).styleSheet) {
         (injectedStyle as any).styleSheet.cssText = loadingCss;
       } else {
         injectedStyle.appendChild(document.createTextNode(loadingCss));
@@ -532,7 +533,64 @@ export async function initializeItemizeApp(
       window.LANG = lang;
       window.INITIAL_CURRENCY_FACTORS = currencyFactors;
       if (CacheWorkerInstance.isSupportedAsWorker || CacheWorkerInstance.isPolyfilled) {
+        // proxy the root to the cache worker
         CacheWorkerInstance.instance.proxyRoot(initialRoot, config);
+
+        // let's set it up
+        // as you can see this function might run several times per instance
+        // but that's okay, all next runs get ignored
+        CacheWorkerInstance.instance.setupVersion(parseInt(window.BUILD_NUMBER, 10));
+
+        // we will block the initialization and use of the cache worker until
+        // our destruction markers are deleted
+        await CacheWorkerInstance.instance.startInitializationBlock();
+
+        (async () => {
+          const storedToken = getCookie("token");
+          // not logged in with cache worker available
+          if (!storedToken && !ssrContext.user.token && CacheWorkerInstance.isSupportedAsWorker) {
+            try {
+              const succeeded = await destroyDestructionMarkers(false, true);
+              if (!succeeded) {
+                console.warn("Failed to clean logout destruction markers");
+              }
+            } catch (err) {
+              console.error(err);
+            }
+            try {
+              const succeeded = await destroySearchDestructionMarkers(false, true);
+              if (!succeeded) {
+                console.warn("Failed to clean logout destruction markers");
+              }
+            } catch (err) {
+              console.error(err);
+            }
+          }
+
+          // clean potentially missing unmount destruction markers that should have done
+          // on unmount and may have been left dangling
+          if (CacheWorkerInstance.isSupportedAsWorker) {
+            try {
+              const succeeded = await destroyDestructionMarkers(true, true);
+              if (!succeeded) {
+                console.warn("Failed to clean unmount destruction markers");
+              }
+            } catch (err) {
+              console.error(err);
+            }
+            try {
+              const succeeded = await destroySearchDestructionMarkers(true, true);
+              if (!succeeded) {
+                console.warn("Failed to clean unmount destruction markers");
+              }
+            } catch (err) {
+              console.error(err);
+            }
+          }
+
+          // now the cache worker is free to be used
+          CacheWorkerInstance.instance.endInitializationBlock();
+        })();
       }
     }
 
@@ -648,26 +706,26 @@ export async function initializeItemizeApp(
 }
 
 if (typeof document !== "undefined" && process.env.NODE_ENV === "development") {
-  window.GET_MEMORY_STATE = function() {
+  window.GET_MEMORY_STATE = function () {
     const state: any = {
       idefs: {},
       mods: {},
     };
-  
+
     function processMod(m: Module) {
       m.getAllModules().forEach(processMod);
       m.getAllChildDefinitionsRecursive().forEach(processIdef);
-  
+
       const absPath = m.getPath().join("/");
       state.mods[absPath] = {
         properties: {},
       }
-  
+
       m.getAllPropExtensions().forEach((p) => {
         state.mods[absPath].properties[p.getId()] = processProperty(p);
       });
     }
-  
+
     function processIdef(idef: ItemDefinition) {
       const absPath = idef.getAbsolutePath().join("/");
       state.idefs[absPath] = {
@@ -676,16 +734,16 @@ if (typeof document !== "undefined" && process.env.NODE_ENV === "development") {
         properties: {},
         includes: {}
       }
-  
+
       idef.getAllPropertyDefinitionsAndExtensions().forEach((p) => {
         state.idefs[absPath].properties[p.getId()] = processProperty(p);
       });
-  
+
       idef.getAllIncludes().forEach((i) => {
         state.idefs[absPath].includes[i.getId()] = processInclude(i);
       });
     }
-  
+
     function processProperty(p: PropertyDefinition) {
       return {
         values: (p as any).stateValue,
@@ -694,7 +752,7 @@ if (typeof document !== "undefined" && process.env.NODE_ENV === "development") {
         internalValues: (p as any).stateInternalValue,
       }
     }
-  
+
     function processInclude(i: Include) {
       const data: any = {};
       i.getSinkingProperties().forEach((p) => {
@@ -702,9 +760,9 @@ if (typeof document !== "undefined" && process.env.NODE_ENV === "development") {
       });
       return data;
     }
-  
+
     window.ROOT.getAllModules().forEach(processMod);
-  
+
     return state;
   }
 }
