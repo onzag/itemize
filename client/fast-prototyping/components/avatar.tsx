@@ -113,6 +113,9 @@ const avatarStyles = {
       opacity: 1,
     },
   },
+  whitebg: {
+    backgroundColor: "white",
+  },
   avatarLarge: {
     width: "200px",
     height: "200px",
@@ -272,7 +275,7 @@ function SimpleAvatar(props: SimpleAvatarProps) {
   const sx = useMemo(() => {
     const value = {
       ...avatarStyles.avatar,
-      ...avatarStyles["randomColor" + props.numberColorId],
+      ...(props.imgSrc ?  avatarStyles.whitebg : avatarStyles["randomColor" + props.numberColorId]),
     };
 
     if (props.size === "large") {
@@ -292,7 +295,7 @@ function SimpleAvatar(props: SimpleAvatarProps) {
     }
 
     return value;
-  }, [props.size, props.isSpecialUser, props.numberColorId]);
+  }, [props.size, props.isSpecialUser, props.numberColorId, props.imgSrc]);
 
   return (
     <MAvatar

@@ -548,7 +548,7 @@ export async function initializeItemizeApp(
         (async () => {
           const storedToken = getCookie("token");
           // not logged in with cache worker available
-          if (!storedToken && !ssrContext.user.token && CacheWorkerInstance.isSupportedAsWorker) {
+          if (!storedToken && !ssrContext?.user.token && CacheWorkerInstance.isSupportedAsWorker) {
             try {
               const succeeded = await destroyDestructionMarkers(false, true);
               if (!succeeded) {
