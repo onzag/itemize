@@ -40,7 +40,9 @@ interface IItemSyncerProps {
   /**
    * avoid marking for destruction on logout, by default the application tree will be removed
    */
-  doNotMarkForDestruction?: boolean;
+  doNotMarkForDestructionOnLogout?: boolean;
+
+  markForDestructionOnUnmount?: boolean;
 
   /**
    * This children is a function that will be run against each one
@@ -173,7 +175,8 @@ export default function ItemSyncer(props: IItemSyncerProps) {
                 onWillLoad={onWillLoadOne.bind(null, id, version)}
                 onLoad={onLoadedOne.bind(null, id, version)}
                 static={props.static}
-                markForDestructionOnLogout={props.doNotMarkForDestruction ? false : true}
+                markForDestructionOnLogout={props.doNotMarkForDestructionOnLogout ? false : true}
+                markForDestructionOnUnmount={props.markForDestructionOnUnmount}
                 loadUnversionedFallback={props.loadUnversionedFallback}
                 key={key}
               />

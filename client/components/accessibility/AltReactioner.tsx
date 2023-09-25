@@ -1155,16 +1155,32 @@ export class ActualAltBase<P extends IAltBaseProps, S> extends React.PureCompone
     // we will compare with siblings that are parented by the same group
     // if no parent is found then use the lowermost element since they are considered siblings
     const comparisonSelf: HTMLElement = elementInCommonIndex === -1 ?
+      // we have to compare one with each other because they have no parent in common
       treeAncestrySelf[0] :
+      // we will use the sibling of the element in common
+      // for example div1>div2>p div1>div2>span where div1 and div2 are alt groups will use p and span to compare
+      // each other but say div1>div2>p vs div1>span will use the span and the div2 to compare, basically
+      // the comparison is done at the same level
       treeAncestrySelf[elementInCommonIndex + 1];
     const comparisonOther: HTMLElement = elementInCommonIndex === -1 ?
       treeAncestryOther[0] :
       treeAncestryOther[elementInCommonIndex + 1];
 
-    // can only truly happen if they are equal
+    // can only truly happen if they are equal or if one is contained
     if (!comparisonSelf || !comparisonOther) {
-      console.warn("Could not determine a comparison between two elements in alt reactioner, are they the same?");
-      return false;
+      // basically the other that we are checking to compare is contained within
+      // eg. comparing div1>p against div1 itself, p, will try to compare the element in common
+      // div1, so it will use p, but div1 itself goes out of range, therefore we are going to check
+      // if the element in common is contained
+      const isOtherContainedInSelf = elementInCommonIndex !== -1 &&
+        elementInCommonIndex === (treeAncestrySelf.length - 1);
+
+      // we are before if we contain it as we have priority as a container
+      return isOtherContainedInSelf;
+
+
+      // console.warn("Could not determine a comparison between two elements in alt reactioner, are they the same?");
+      // return false;
     }
 
     if (
