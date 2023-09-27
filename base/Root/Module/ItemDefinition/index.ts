@@ -850,6 +850,13 @@ export default class ItemDefinition {
   }
 
   /**
+   * The custom search engine limiter function installed via the server
+   */
+  private customSearchEngineLimiterFn: (row: any) => boolean;
+  public customSearchEngineLimiterFnId: string = null;
+  public customSearchEngineLimiterFnColumns: string[] = null;
+
+  /**
    * Build a new ItemDefinition instance
    * @param rawJSON the raw json form
    * @param parentModule the parent module instance
@@ -3286,6 +3293,12 @@ export default class ItemDefinition {
     return this.getSearchEngineFallbackLanguage();
   }
 
+  public setCustomSearchEngineLimiterFn(id: string, fn: (rowValue: any) => boolean, relevantColumns: string[]) {
+    this.customSearchEngineLimiterFnId = id;
+    this.customSearchEngineLimiterFn = fn;
+    this.customSearchEngineLimiterFnColumns = relevantColumns;
+  }
+
   /**
    * Check against the limiters BUT NOT against creation date unless specified
    * @param rowValue 
@@ -3296,7 +3309,7 @@ export default class ItemDefinition {
   public shouldRowBeIncludedInSearchEngine(rowValue: any, combinedLimiters: ISearchLimitersType, checkSinceLimiter?: boolean) {
     // no limiters it therefore should be included
     if (!combinedLimiters) {
-      return true;
+      return this.customSearchEngineLimiterFn ? this.customSearchEngineLimiterFn(rowValue) : true;
     }
 
     // needs a parent bu no parent given
@@ -3317,15 +3330,21 @@ export default class ItemDefinition {
 
     // no limiters for properties
     if (!combinedLimiters.properties || !combinedLimiters.properties.length) {
-      return true;
+      return this.customSearchEngineLimiterFn ? this.customSearchEngineLimiterFn(rowValue) : true;
     }
 
     // otherwise check that they are all included
-    return combinedLimiters.properties.every((l) => {
+    const shouldBeIncluded = combinedLimiters.properties.every((l) => {
       // the row has the value in the potential value
-      const potentialValues = l.values || [];
+      if (!l.values) {
+        return typeof rowValue[l.id] !== "undefined" && rowValue[l.id] !== null;
+      }
+      const potentialValues = l.values;
       return potentialValues.includes(rowValue[l.id] || null);
     });
+
+    // pass it to the custom search engine limiter function or otherwise is false
+    return shouldBeIncluded ? (this.customSearchEngineLimiterFn ? this.customSearchEngineLimiterFn(rowValue) : true) : false;
   }
 
   /**

@@ -659,6 +659,7 @@ export class ItemizeElasticClient {
     const idef = this.root.registry[qualifiedName] as ItemDefinition;
     const signature = {
       limiters: idef.getSearchLimiters(true),
+      customFnLimiterId: idef.customSearchEngineLimiterFnId || null,
     }
 
     let currentSignature: any = null;
@@ -1119,6 +1120,7 @@ export class ItemizeElasticClient {
 
       let statusInfo = knownStatusInfo || await this.retrieveIndexStatusInfo(qualifiedPathName);
       const limiters = knownLimiters || idef.getSearchLimiters(true);
+      const customFnLimiterId = idef.customSearchEngineLimiterFnId || null;
 
       const baseIndexPrefix = qualifiedPathName.toLowerCase() + "_";
       const wildcardIndexName = baseIndexPrefix + "*";
@@ -1205,6 +1207,7 @@ export class ItemizeElasticClient {
       if (batchNumber === 0) {
         const expectedLanguageColumn = idef.getSearchEngineDynamicMainLanguageColumn();
         const limitedColumns = idef.getSearchEngineLimitedColumns(limiters);
+        const relevantColumns = idef.customSearchEngineLimiterFnColumns;
 
         // now we can do the select
         // we only select 100 as limit when doing a initial consistency check
@@ -1215,7 +1218,7 @@ export class ItemizeElasticClient {
 
         // no last consistency check then we gotta retrieve the whole thing because
         // we want whole data this one round
-        const useModuleOnly = limitedColumns.idef.length || statusInfo.lastConsistencyCheck === null ? false : (
+        const useModuleOnly = limitedColumns.idef.length || statusInfo.lastConsistencyCheck === null || relevantColumns?.length ? false : (
           // otherwise it depends if we got a language column, it will depend on wether such column
           // is in the module, otherwise we can be free to use module only
           expectedLanguageColumn ? idef.isSearchEngineDynamicMainLanguageColumnInModule() : true
@@ -1239,6 +1242,9 @@ export class ItemizeElasticClient {
             }
             if (limitedColumns.mod) {
               limitedColumns.mod.forEach((p) => columnsToSelect.push(p));
+            }
+            if (relevantColumns) {
+              relevantColumns.forEach((c) => columnsToSelect.push(c));
             }
             // otherwise we assume our data isn't corrupted, and just select what
             // we need making a minimal query
@@ -1913,6 +1919,7 @@ export class ItemizeElasticClient {
               lastConsistencyCheck: timeRan.toISOString(),
               signature: JSON.stringify({
                 limiters: limiters,
+                customFnLimiterId,
               })
             }
           );

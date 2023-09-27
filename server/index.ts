@@ -73,6 +73,7 @@ import { Client } from "@elastic/elasticsearch";
 import { ItemizeElasticClient } from "./elastic";
 import { ElasticLoggerService } from "./services/elastic-logger";
 import { ElasticLocationService } from "./services/elastic-location";
+import ItemDefinition from "../base/Root/Module/ItemDefinition";
 
 // load the custom services configuration
 let serviceCustom: IServiceCustomizationType = {};
@@ -239,6 +240,34 @@ export interface IServiceCustomizationType {
   };
 }
 
+interface ICustomSearchEngineIndexingType {
+  /**
+   * Provide the path of the item in question
+   * to be applied a customized search limiter for indexing
+   * specifically which will only affect search engine
+   */
+  [itemPath: string]: {
+    /**
+     * The function that will do the filtering
+     * @param rowValue 
+     * @returns 
+     */
+    fn: (rowValue: any) => boolean;
+    /**
+     * The version of this function, changing this version
+     * will change the signature causing the index to be needed
+     * to be rebuilt from scratch just like the search limiters
+     * changing would cause that
+     */
+    version: string;
+    /**
+     * Relevant extra columns to select from the row value in order to do
+     * the check
+     */
+    relevantColumns: string[];
+  };
+}
+
 export interface IServerCustomizationDataType {
   customGQLQueries?: (appData: IAppDataType) => IGQLQueryFieldsDefinitionType;
   customTokenGQLQueries?: ICustomTokensType;
@@ -247,6 +276,8 @@ export interface IServerCustomizationDataType {
   customRouter?: (appData: IAppDataType) => express.Router;
   customTriggers?: ITriggerRegistry;
   customRoles?: ICustomRoleType[];
+  customSearchEngineIndexing?: ICustomSearchEngineIndexingType;
+
   callback?: (appData: IAppDataType) => void | Promise<void>;
 
   globalManagerInitialServerDataFunction?: InitialExecutionServerDataFn,
@@ -614,6 +645,27 @@ export async function initializeServer(
       },
     );
     const root = new Root(build);
+
+    if (custom.customSearchEngineIndexing) {
+      Object.keys(custom.customSearchEngineIndexing).forEach((v) => {
+        const idef = root.registry[v] as ItemDefinition;
+        if (!(idef instanceof ItemDefinition)) {
+          logger.error(
+            {
+              functionName: "initializeServer",
+              message: "While trying to apply a custom search engine indexing rule for " + v +
+                " no matching item definition could be found in the registry",
+            }
+          );
+        } else {
+          idef.setCustomSearchEngineLimiterFn(
+            custom.customSearchEngineIndexing[v].version,
+            custom.customSearchEngineIndexing[v].fn,
+            custom.customSearchEngineIndexing[v].relevantColumns,
+          );
+        }
+      });
+    }
 
     // now for the cluster manager, which manages a specific cluster, it goes here, and it doesn't
     // go futher, the job of the cluster manager is to mantain the cluster redis database

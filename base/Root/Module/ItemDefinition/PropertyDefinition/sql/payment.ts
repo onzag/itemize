@@ -53,9 +53,15 @@ export function paymentElastic(arg: ISQLArgInfo) {
       },
       [arg.prefix + arg.id + "_CURRENCY"]: {
         type: "keyword",
+
+        // This is an invalid type for payment so it works fine
+        null_value: "NULL",
       },
       [arg.prefix + arg.id + "_STATUS"]: {
         type: "keyword",
+
+        // This is an invalid type for payment so it works fine
+        null_value: "NULL",
       },
       [arg.prefix + arg.id + "_METADATA"]: {
         enabled: false,
@@ -230,7 +236,7 @@ export function paymentSQLOut(arg: ISQLOutInfo) {
 export function paymentSQLElasticIn(arg: ISQLOutInfo) {
   return {
     [arg.prefix + arg.id + "_TYPE"]: arg.row[arg.prefix + arg.id + "_TYPE"],
-    [arg.prefix + arg.id + "_AMOUNT"]: [arg.prefix + arg.id + "_AMOUNT"],
+    [arg.prefix + arg.id + "_AMOUNT"]: arg.row[arg.prefix + arg.id + "_AMOUNT"],
     [arg.prefix + arg.id + "_CURRENCY"]: arg.row[arg.prefix + arg.id + "_CURRENCY"],
     [arg.prefix + arg.id + "_STATUS"]: arg.row[arg.prefix + arg.id + "_STATUS"],
     [arg.prefix + arg.id + "_METADATA"]: arg.row[arg.prefix + arg.id + "_METADATA"],
