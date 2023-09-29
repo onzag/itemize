@@ -594,13 +594,17 @@ export class ItemizeRawDB {
       }
 
       if (action === "created") {
-        await this.elastic.createDocument(
-          idef,
-          language,
-          row.id,
-          row.version || null,
-          row,
-        );
+        const combinedLimiters = idef.getSearchLimiters(true);
+        const isSearchLimited = idef.shouldRowBeIncludedInSearchEngine(row, combinedLimiters, true);
+        if (!isSearchLimited) {
+          await this.elastic.createDocument(
+            idef,
+            language,
+            row.id,
+            row.version || null,
+            row,
+          );
+        }
       } else if (action === "deleted") {
         await this.elastic.deleteDocument(
           idef,
@@ -609,13 +613,23 @@ export class ItemizeRawDB {
           row.version || null,
         );
       } else if (action === "modified") {
-        await this.elastic.updateDocumentUnknownOriginalLanguage(
-          idef,
-          language,
-          row.id,
-          row.version || null,
-          row,
-        );
+        const combinedLimiters = idef.getSearchLimiters(true);
+        const isSearchLimited = idef.shouldRowBeIncludedInSearchEngine(row, combinedLimiters, true);
+        if (isSearchLimited) {
+          await this.elastic.deleteDocumentUnknownLanguage(
+            idef,
+            row.id,
+            row.version || null,
+          );
+        } else {
+          await this.elastic.updateDocumentUnknownOriginalLanguage(
+            idef,
+            language,
+            row.id,
+            row.version || null,
+            row,
+          );
+        }
       }
     }
   }
@@ -666,7 +680,7 @@ export class ItemizeRawDB {
         }
       );
     }
-  
+
     // now let's grab the module qualified name
     const moduleName = idef.getParentModule().getQualifiedPathName();
 
@@ -1179,7 +1193,7 @@ export class ItemizeRawDB {
       //   mergedIndexIdentifier,
       // };
 
-      this.fakeListener.triggerOwnedSearchListeners(ownedEvent, null, {noInstanceGroupId: true});
+      this.fakeListener.triggerOwnedSearchListeners(ownedEvent, null, { noInstanceGroupId: true });
 
       // this.redisPub.redisClient.publish(mergedIndexIdentifier, JSON.stringify(redisEvent));
     });
@@ -1948,7 +1962,7 @@ export class ItemizeRawDB {
 
     const allInsertedRows: ISQLTableRowValue[] = this.transacting ?
       await transactionFn(this.databaseConnection) :
-      await this.databaseConnection.startTransaction(transactionFn, {useClient: this.singleClientMode ? this.databaseConnection : null});
+      await this.databaseConnection.startTransaction(transactionFn, { useClient: this.singleClientMode ? this.databaseConnection : null });
 
     const result = allInsertedRows.map(convertVersionsIntoNullsWhenNecessary);
 

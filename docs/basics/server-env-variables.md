@@ -172,6 +172,10 @@ Provide a qualified path name so that every time single documents are attempted 
 
 Does not affect sync checks and it's used to check sync checks.
 
+## ELASTIC_EXECUTE_CONSISTENCY_CHECKS_FROM_SCRATCH_AT
+
+Provide a qualified path name so that consistency checks are done from scratch at a given pathname in order to fix consistency issues during runtime
+
 ## EMULATE_BAD_REDIS_WRITES
 
 All redis instances act dead and throw errors, even when they connect; simulates connection issues

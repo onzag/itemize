@@ -8,7 +8,7 @@ import { logger } from "./logger";
 import equals from "deep-equal";
 import { convertSQLValueToElasticSQLValueForItemDefinition } from "../base/Root/Module/ItemDefinition/sql";
 import { DELETED_REGISTRY_IDENTIFIER, SERVER_ELASTIC_PING_INTERVAL_TIME } from "../constants";
-import { CAN_LOG_DEBUG, EMULATE_ELASTIC_SYNC_FAILURE_AT, EMULATE_SILENT_ELASTIC_SYNC_FAILURE_AT, FORCE_ELASTIC_REBUILD, INSTANCE_UUID } from "./environment";
+import { CAN_LOG_DEBUG, ELASTIC_EXECUTE_CONSISTENCY_CHECKS_FROM_SCRATCH_AT, EMULATE_ELASTIC_SYNC_FAILURE_AT, EMULATE_SILENT_ELASTIC_SYNC_FAILURE_AT, FORCE_ELASTIC_REBUILD, INSTANCE_UUID } from "./environment";
 import { NanoSecondComposedDate } from "../nanodate";
 import { AggregationsAggregationContainer, FieldValue, GetResponse, MgetResponse, QueryDslMatchPhraseQuery, QueryDslMatchQuery, QueryDslQueryContainer, QueryDslTermQuery, QueryDslTermsQuery, SearchHit, SearchRequest, SearchResponse, UpdateRequest } from "@elastic/elasticsearch/lib/api/types";
 import { setInterval } from "timers";
@@ -1125,6 +1125,9 @@ export class ItemizeElasticClient {
       const baseIndexPrefix = qualifiedPathName.toLowerCase() + "_";
       const wildcardIndexName = baseIndexPrefix + "*";
 
+      const willForceConsistencyCheckFromScratch = ELASTIC_EXECUTE_CONSISTENCY_CHECKS_FROM_SCRATCH_AT &&
+        ELASTIC_EXECUTE_CONSISTENCY_CHECKS_FROM_SCRATCH_AT === idef.getQualifiedPathName();
+
       let minimumCreatedAt: string = null;
       if (limiters && limiters.since && batchNumber === 0) {
         // cannot retrieve anything before this date, we do not need any older records
@@ -1254,7 +1257,7 @@ export class ItemizeElasticClient {
           // now we can decide what we select for
           // maybe it is everything, kind of scary
           const whereBuilder = selecter.whereBuilder;
-          if (statusInfo.lastConsistencyCheck) {
+          if (statusInfo.lastConsistencyCheck && !willForceConsistencyCheckFromScratch) {
             whereBuilder.andWhereColumn("last_modified", ">", statusInfo.lastConsistencyCheck);
           }
 
@@ -1691,7 +1694,7 @@ export class ItemizeElasticClient {
                   _id: id,
                 }
               },
-              isOutdated ? {doc: convertedSQL} : convertedSQL,
+              isOutdated ? { doc: convertedSQL } : convertedSQL,
             ]
           }))) as any[][];
 
@@ -3322,16 +3325,29 @@ export class ElasticQueryBuilder {
     this.children = this.children.filter((r) => r.uniqueId !== id);
   }
 
-  public getAllChildrenWithPropertyId(options: { but?: string, noAgg?: boolean, noQuery?: boolean } = {}) {
-    return this.children.filter((r) =>
-      !!r.propertyId && (options.but ? r.propertyId !== options.but : true) &&
-      (options.noAgg ? !r.agg : true) && (options.noQuery ? !!r.agg : true));
+  public getAllChildrenWithPropertyId(options: { but?: string | string[], noAgg?: boolean, noQuery?: boolean, includeWithoutPropertyId?: boolean } = {}) {
+    return this.children.filter((r) => {
+      if (!r.propertyId && options.includeWithoutPropertyId) {
+        return true;
+      }
+
+      return (
+        !!r.propertyId && (options.but ? (Array.isArray(options.but) ? !options.but.includes(r.propertyId) : r.propertyId !== options.but) : true) &&
+        (options.noAgg ? !r.agg : true) && (options.noQuery ? !!r.agg : true)
+      );
+    });
   }
 
-  public getAllChildrenWithGroupId(options: { but?: string, noAgg?: boolean, noQuery?: boolean } = {}) {
-    return this.children.filter((r) =>
-      !!r.groupId && (options.but ? r.groupId !== options.but : true) &&
-      (options.noAgg ? !r.agg : true) && (options.noQuery ? !!r.agg : true));
+  public getAllChildrenWithGroupId(options: { but?: string | string[], noAgg?: boolean, noQuery?: boolean, includeWithoutGroupId?: boolean } = {}) {
+    return this.children.filter((r) => {
+      if (!r.groupId && options.includeWithoutGroupId) {
+        return true;
+      }
+      return (
+        !!r.groupId && (options.but ? (Array.isArray(options.but) ? !options.but.includes(r.groupId) : r.groupId !== options.but) : true) &&
+        (options.noAgg ? !r.agg : true) && (options.noQuery ? !!r.agg : true)
+      )
+    });
   }
 
   public getAllChildrenWithUniqueId() {

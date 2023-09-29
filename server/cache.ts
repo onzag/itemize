@@ -3497,7 +3497,10 @@ export class Cache {
                     });
                   });
                 }
-              }
+              },
+
+              // our target property may also be a pointer we allow it to be updated
+              dangerousForceUpdatePointers: true,
             },
           )
         }
