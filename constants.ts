@@ -1354,6 +1354,22 @@ export const RESERVED_IDEF_SEARCH_PROPERTIES = (orderByRule: any) => ({
     type: GraphQLList && GraphQLList(GraphQLString),
     description: "Blacklists the given creators (note that this is a filter and does not replace created_by)",
   },
+  parent_ids_filter: {
+    type: GraphQLList && GraphQLList(GraphQLString),
+    description: "Only allows the given parent ids (note this is a filter and does not replace parent_id parent_type and parent_version)",
+  },
+  parent_ids_filter_out: {
+    type: GraphQLList && GraphQLList(GraphQLString),
+    description: "Blacklists the given parent ids (note that this is a filter and does not replace parent_id parent_type and parent_version)",
+  },
+  parent_type_filter: {
+    type: GraphQLList && GraphQLList(GraphQLString),
+    description: "Only allows the given parent types (note this is a filter and does not replace parent_id parent_type and parent_version)",
+  },
+  parent_type_filter_out: {
+    type: GraphQLList && GraphQLList(GraphQLString),
+    description: "Blacklists the given parent types (note that this is a filter and does not replace parent_id parent_type and parent_version)",
+  },
   search: {
     type: GraphQLString,
     description: "A search string, searches within the prop extensions and the prop extensions only",

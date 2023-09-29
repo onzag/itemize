@@ -1505,6 +1505,10 @@ interface ISearchQueryArg {
   idsFilterOut?: string[];
   createdByFilter?: string[];
   createdByFilterOut?: string[];
+  parentTypeFilter?: string[];
+  parentTypeFilterOut?: string[];
+  parentIdsFilter?: string[];
+  parentIdsFilterOut?: string[];
   useSearchEngine?: boolean | string;
 }
 
@@ -1553,6 +1557,8 @@ export function getSearchArgsFor(
     arg.language,
   );
 
+  const root = arg.itemDefinition.getParentModule().getParentRoot();
+
   if (typeof arg.versionFilter !== "undefined") {
     searchArgs.version_filter = arg.versionFilter || null;
   }
@@ -1577,6 +1583,22 @@ export function getSearchArgsFor(
     searchArgs.created_by_filter_out = arg.createdByFilterOut;
   }
 
+  if (arg.parentIdsFilter) {
+    searchArgs.parent_ids_filter = arg.parentIdsFilter;
+  }
+
+  if (arg.parentIdsFilterOut) {
+    searchArgs.parent_ids_filter_out = arg.parentIdsFilterOut.map((v) => root.registry[v].getQualifiedPathName());
+  }
+
+  if (arg.parentTypeFilter) {
+    searchArgs.parent_type_filter = arg.parentTypeFilter.map((v) => root.registry[v].getQualifiedPathName());
+  }
+
+  if (arg.parentTypeFilterOut) {
+    searchArgs.parent_type_filter_out = arg.parentIdsFilterOut;
+  }
+
   if (arg.createdBy) {
     searchArgs.created_by = arg.createdBy;
   }
@@ -1590,7 +1612,7 @@ export function getSearchArgsFor(
   }
 
   if (arg.types) {
-    searchArgs.types = arg.types;
+    searchArgs.types = arg.types.map((v) => root.registry[v].getQualifiedPathName());
   }
 
   if (arg.useSearchEngine) {

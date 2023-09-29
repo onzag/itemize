@@ -294,6 +294,14 @@ async function checkOne(
     shouldBeIncluded = false;
   } else if (searchArgs.created_by && searchArgs.created_by !== (value.DATA as any).created_by) {
     shouldBeIncluded = false;
+  } else if (searchArgs.parent_type_filter && !searchArgs.parent_type_filter.includes((value.DATA as any).parent_type)) {
+    shouldBeIncluded = false;
+  } else if (searchArgs.parent_type_filter_out && searchArgs.parent_type_filter_out.includes((value.DATA as any).parent_type)) {
+    shouldBeIncluded = false;
+  } else if (searchArgs.parent_ids_filter && !searchArgs.parent_ids_filter.includes((value.DATA as any).parent_id)) {
+    shouldBeIncluded = false;
+  } else if (searchArgs.parent_ids_filter_out && searchArgs.parent_ids_filter_out.includes((value.DATA as any).parent_id)) {
+    shouldBeIncluded = false;
   }
 
   if (shouldBeIncluded && searchArgs.parent_type) {

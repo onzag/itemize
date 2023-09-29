@@ -520,6 +520,8 @@ export function checkLimiters(args: IGQLArgs, idefOrMod: Module | ItemDefinition
             }
           }
         });
+      } else {
+        atLeastOneLimitedPropertyWasSetAndChecked = true;
       }
 
       if (limiter.condition === "AND" && !allLimitedPropertiesSet) {
@@ -546,6 +548,8 @@ export function checkLimiters(args: IGQLArgs, idefOrMod: Module | ItemDefinition
             sinceSucceed = true;
           }
         }
+      } else {
+        sinceSucceed = true;
       }
 
       if (
@@ -562,6 +566,8 @@ export function checkLimiters(args: IGQLArgs, idefOrMod: Module | ItemDefinition
       let createdBySucceed = false;
       if (limiter.createdBy) {
         createdBySucceed = !!(args.created_by);
+      } else {
+        createdBySucceed = true;
       }
 
       if (
@@ -578,6 +584,8 @@ export function checkLimiters(args: IGQLArgs, idefOrMod: Module | ItemDefinition
       let parentingSucceed = false;
       if (limiter.parenting) {
         parentingSucceed = !!(args.parent_id && args.parent_type);
+      } else {
+        parentingSucceed = true;
       }
 
       if (

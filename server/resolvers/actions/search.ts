@@ -383,6 +383,38 @@ export async function searchModule(
       });
     }
 
+    if (typeof resolverArgs.args.parent_type_filter !== "undefined") {
+      elasticQuery.mustTerms({
+        parent_type: resolverArgs.args.parent_type_filter
+      }, {
+        groupId: "PARENT",
+      });
+    }
+
+    if (typeof resolverArgs.args.parent_type_filter_out !== "undefined") {
+      elasticQuery.mustNotTerms({
+        parent_type: resolverArgs.args.parent_type_filter_out
+      }, {
+        groupId: "PARENT",
+      });
+    }
+
+    if (typeof resolverArgs.args.parent_ids_filter !== "undefined") {
+      elasticQuery.mustTerms({
+        parent_id: resolverArgs.args.parent_ids_filter
+      }, {
+        groupId: "PARENT",
+      });
+    }
+
+    if (typeof resolverArgs.args.parent_ids_filter_out !== "undefined") {
+      elasticQuery.mustNotTerms({
+        parent_id: resolverArgs.args.parent_ids_filter_out
+      }, {
+        groupId: "PARENT",
+      });
+    }
+
     if (typeof resolverArgs.args.ids_filter_out !== "undefined") {
       elasticQuery.mustNotTerms({
         id: resolverArgs.args.ids_filter_out
@@ -491,6 +523,34 @@ export async function searchModule(
       queryModel.whereBuilder.andWhere(
         `"created_by" != ANY(ARRAY[${resolverArgs.args.created_by_filter_out.map(() => "?").join(",")}]::TEXT[])`,
         resolverArgs.args.created_by_filter_out,
+      );
+    }
+
+    if (typeof resolverArgs.args.parent_type_filter !== "undefined") {
+      queryModel.whereBuilder.andWhere(
+        `"parent_type" = ANY(ARRAY[${resolverArgs.args.parent_type_filter.map(() => "?").join(",")}]::TEXT[])`,
+        resolverArgs.args.parent_type_filter,
+      );
+    }
+
+    if (typeof resolverArgs.args.parent_type_filter_out !== "undefined") {
+      queryModel.whereBuilder.andWhere(
+        `"parent_type" != ANY(ARRAY[${resolverArgs.args.parent_type_filter_out.map(() => "?").join(",")}]::TEXT[])`,
+        resolverArgs.args.parent_type_filter_out,
+      );
+    }
+
+    if (typeof resolverArgs.args.parent_ids_filter !== "undefined") {
+      queryModel.whereBuilder.andWhere(
+        `"parent_id" = ANY(ARRAY[${resolverArgs.args.parent_ids_filter.map(() => "?").join(",")}]::TEXT[])`,
+        resolverArgs.args.parent_ids_filter,
+      );
+    }
+
+    if (typeof resolverArgs.args.parent_ids_filter_out !== "undefined") {
+      queryModel.whereBuilder.andWhere(
+        `"parent_id" != ANY(ARRAY[${resolverArgs.args.parent_ids_filter_out.map(() => "?").join(",")}]::TEXT[])`,
+        resolverArgs.args.parent_ids_filter_out,
       );
     }
 
@@ -1211,7 +1271,7 @@ export async function searchItemDefinition(
     const dictionary = getDictionary(appData, resolverArgs.args);
     const limit: number = resolverArgs.args.limit;
     const offset: number = resolverArgs.args.offset;
-  
+
     // now we build the search query
     if (usesElastic) {
       elasticQuery = appData.elastic.getSelectBuilder(
@@ -1313,6 +1373,38 @@ export async function searchItemDefinition(
         });
       }
 
+      if (typeof resolverArgs.args.parent_type_filter !== "undefined") {
+        elasticQuery.mustTerms({
+          parent_type: resolverArgs.args.parent_type_filter
+        }, {
+          groupId: "PARENT",
+        });
+      }
+
+      if (typeof resolverArgs.args.parent_type_filter_out !== "undefined") {
+        elasticQuery.mustNotTerms({
+          parent_type: resolverArgs.args.parent_type_filter_out
+        }, {
+          groupId: "PARENT",
+        });
+      }
+
+      if (typeof resolverArgs.args.parent_ids_filter !== "undefined") {
+        elasticQuery.mustTerms({
+          parent_id: resolverArgs.args.parent_ids_filter
+        }, {
+          groupId: "PARENT",
+        });
+      }
+
+      if (typeof resolverArgs.args.parent_ids_filter_out !== "undefined") {
+        elasticQuery.mustNotTerms({
+          parent_id: resolverArgs.args.parent_ids_filter_out
+        }, {
+          groupId: "PARENT",
+        });
+      }
+
       if (resolverArgs.args.parent_id && resolverArgs.args.parent_type) {
         elasticQuery.mustTerm({
           parent_id: resolverArgs.args.parent_id,
@@ -1411,6 +1503,34 @@ export async function searchItemDefinition(
         queryModel.whereBuilder.andWhere(
           `"created_by" != ANY(ARRAY[${resolverArgs.args.created_by_filter_out.map(() => "?").join(",")}]::TEXT[])`,
           resolverArgs.args.created_by_filter_out,
+        );
+      }
+
+      if (typeof resolverArgs.args.parent_type_filter !== "undefined") {
+        queryModel.whereBuilder.andWhere(
+          `"parent_type" = ANY(ARRAY[${resolverArgs.args.parent_type_filter.map(() => "?").join(",")}]::TEXT[])`,
+          resolverArgs.args.parent_type_filter,
+        );
+      }
+
+      if (typeof resolverArgs.args.parent_type_filter_out !== "undefined") {
+        queryModel.whereBuilder.andWhere(
+          `"parent_type" != ANY(ARRAY[${resolverArgs.args.parent_type_filter_out.map(() => "?").join(",")}]::TEXT[])`,
+          resolverArgs.args.parent_type_filter_out,
+        );
+      }
+
+      if (typeof resolverArgs.args.parent_ids_filter !== "undefined") {
+        queryModel.whereBuilder.andWhere(
+          `"parent_id" = ANY(ARRAY[${resolverArgs.args.parent_ids_filter.map(() => "?").join(",")}]::TEXT[])`,
+          resolverArgs.args.parent_ids_filter,
+        );
+      }
+
+      if (typeof resolverArgs.args.parent_ids_filter_out !== "undefined") {
+        queryModel.whereBuilder.andWhere(
+          `"parent_id" != ANY(ARRAY[${resolverArgs.args.parent_ids_filter_out.map(() => "?").join(",")}]::TEXT[])`,
+          resolverArgs.args.parent_ids_filter_out,
         );
       }
 

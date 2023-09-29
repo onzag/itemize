@@ -975,6 +975,42 @@ export interface IActionSearchOptions extends IActionCleanOptions {
   createdByFilter?: string[];
 
   /**
+  * Only allows items of a given parent type
+  * 
+  * this acts like a filter after a search is done and does not replace
+  * specifying the parent by parentedBy
+  * has considerations with permissions
+  */
+  parentTypeFilter?: string[];
+
+  /**
+   * Denies items of a given parent type (blacklist)
+   * 
+   * this acts like a filter after a search is done and does not replace
+   * specifying the parent by parentedBy
+   * has considerations with permissions
+   */
+  parentTypeFilterOut?: string[];
+
+  /**
+  * Only allows items of a given parent id
+  * 
+  * this acts like a filter after a search is done and does not replace
+  * specifying the parent by parentedBy
+  * has considerations with permissions
+  */
+  parentIdsFilter?: string[];
+
+  /**
+   * Denies items of a given parent id (blacklist)
+   * 
+   * this acts like a filter after a search is done and does not replace
+   * specifying the parent by parentedBy
+   * has considerations with permissions
+   */
+  parentIdsFilterOut?: string[];
+
+  /**
    * Pile search allows to pile search queries one on top of another and resolve conflicts that could be caused
    * by searching while searching, passing a boolean puts things in a queue where the last search is executed
    */
@@ -2811,7 +2847,7 @@ export class ActualItemProvider extends
       if (this.props.markForDestructionOnUnmount) {
         this.markForDestruction(false);
       }
-      
+
       if (this.props.markForDestructionOnUnmount) {
         this.markForDestruction(true);
       }
@@ -5708,6 +5744,10 @@ export class ActualItemProvider extends
       idsFilterOut: options.idsFilterOut,
       createdByFilter: options.createdByFilter,
       createdByFilterOut: options.createdByFilterOut,
+      parentTypeFilter: options.parentTypeFilter,
+      parentTypeFilterOut: options.parentTypeFilterOut,
+      parentIdsFilter: options.parentIdsFilter,
+      parentIdsFilterOut: options.parentIdsFilterOut,
       versionFilterOut: options.versionFilterOut,
     }, {
       remoteListener: this.props.remoteListener,
