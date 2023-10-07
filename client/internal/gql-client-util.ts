@@ -206,7 +206,7 @@ export function getPropertyListForSearchMode(properties: Array<string | IPropert
     if (!searchVariantSpecified) {
       result = result.concat(getConversionIds(standardProperty.rawData, true));
     } else {
-      const id = PropertyDefinitionSearchInterfacesPrefixes[searchVariantSpecified.toUpperCase()] + propertyId;
+      const id = PropertyDefinitionSearchInterfacesPrefixes[searchVariantSpecified.toUpperCase().replace("-", "_")] + propertyId;
       result.push(id);
     }
   });
@@ -227,7 +227,7 @@ export function getPropertyListDefault(properties: Array<string | IPropertyCoreP
     if (!searchVariantSpecified) {
       result.push(propertyId);
     } else {
-      const id = PropertyDefinitionSearchInterfacesPrefixes[searchVariantSpecified.toUpperCase()] + propertyId;
+      const id = PropertyDefinitionSearchInterfacesPrefixes[searchVariantSpecified.toUpperCase().replace("-", "_")] + propertyId;
       result.push(id);
     }
   });

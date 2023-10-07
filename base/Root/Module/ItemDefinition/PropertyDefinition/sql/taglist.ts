@@ -69,6 +69,17 @@ export function tagListElasticSearch(arg: IElasticSearchInfo) {
   // first we analyze and get the search name
   const searchName = PropertyDefinitionSearchInterfacesPrefixes.SEARCH + arg.prefix + arg.id;
 
+  // This original deleted one allows for check that any of this is contained
+  // but not all of them so no subset check
+  // arg.elasticQueryBuilder.mustTerms({
+  //   [arg.prefix + arg.id]: tagCompareCheck,
+  // }, {
+  //   boost: arg.boost,
+  //   groupId: searchName,
+  //   propertyId: arg.prefix + arg.id,
+  // });
+
+
   // now we see if we have an argument for it
   if (typeof arg.args[searchName] !== "undefined" && arg.args[searchName] !== null) {
     const tagCompareCheck = arg.args[searchName] as string[];
@@ -76,13 +87,14 @@ export function tagListElasticSearch(arg: IElasticSearchInfo) {
     // and we check it... we are using the includes containment
     // where we ensure that all the provided tags are included
     // into this search
-    arg.elasticQueryBuilder.mustTerms({
-      [arg.prefix + arg.id]: tagCompareCheck,
-      minimum_should_match : tagCompareCheck.length,
-    }, {
-      boost: arg.boost,
-      groupId: searchName,
-      propertyId: arg.prefix + arg.id,
+    tagCompareCheck.forEach((v) => {
+      arg.elasticQueryBuilder.mustTerm({
+        [arg.prefix + arg.id]: v,
+      }, {
+        boost: arg.boost,
+        groupId: searchName,
+        propertyId: arg.prefix + arg.id,
+      });
     });
 
     return {};
