@@ -136,9 +136,10 @@ function PropertyEntryPaymentRenderer(props: IPropertyEntryPaymentRendererProps)
     </IconButton>
   ) : null;
 
-  let internalContent: React.ReactNode = null;
+  let fieldComponent: React.ReactNode = null;
+
   if (props.currentValue !== null) {
-    const typePaymentSelector = props.allowedTypes.length !== 1 ? (
+    const typePaymentSelector = props.allowedTypes.length !== 1 && !props.args.noType ? (
       <PropertyEntrySelectRenderer
         uniqueId={props.uniqueId + "_type"}
         values={props.allowedTypes}
@@ -152,7 +153,10 @@ function PropertyEntryPaymentRenderer(props: IPropertyEntryPaymentRendererProps)
         rtl={props.rtl}
         propertyId={props.propertyId + "-type"}
         placeholder={props.i18nPayment.type}
-        args={{}}
+        args={{
+          InputProps: props.args.InputPropsType,
+          fieldVariant: props.args.fieldVariantType,
+        }}
         label={props.i18nPayment.type}
         disabled={props.disabled}
         autoFocus={props.autoFocus}
@@ -168,7 +172,7 @@ function PropertyEntryPaymentRenderer(props: IPropertyEntryPaymentRendererProps)
       />
     ) : null;
 
-    const statusPaymentSelector = props.allowedStatuses.length ? (
+    const statusPaymentSelector = props.allowedStatuses.length && !props.args.noStatus ? (
       <PropertyEntrySelectRenderer
         uniqueId={props.uniqueId + "_status"}
         values={props.allowedStatuses}
@@ -182,7 +186,10 @@ function PropertyEntryPaymentRenderer(props: IPropertyEntryPaymentRendererProps)
         rtl={props.rtl}
         propertyId={props.propertyId + "-status"}
         placeholder={props.i18nPayment.status}
-        args={{}}
+        args={{
+          InputProps: props.args.InputPropsStatus,
+          fieldVariant: props.args.fieldVariantStatus,
+        }}
         label={props.i18nPayment.status}
         disabled={props.disabled}
         autoFocus={props.autoFocus}
@@ -198,14 +205,17 @@ function PropertyEntryPaymentRenderer(props: IPropertyEntryPaymentRendererProps)
       />
     ) : null;
 
-    const amountEntry = (
+    const amountEntry = !props.args.noAmount ? (
       <PropertyEntryFieldRenderer
         currentValueLang={null}
         onChangeTextLanguage={() => null as any}
         uniqueId={props.uniqueId + "_amount"}
         label={props.i18nPayment.amount}
         placeholder={props.i18nPayment.amount}
-        args={{}}
+        args={{
+          InputProps: props.args.InputPropsAmount,
+          fieldVariant: props.args.fieldVariantAmount,
+        }}
         autoFocus={props.autoFocus}
         canRestore={false}
         currentAppliedValue={props.currentAppliedValue && {
@@ -235,48 +245,65 @@ function PropertyEntryPaymentRenderer(props: IPropertyEntryPaymentRendererProps)
         language={props.language}
         languageOverride={props.languageOverride}
       />
-    );
+    ) : null;
 
-    internalContent = (
-      <>
-        {typePaymentSelector}
-        {statusPaymentSelector}
-        {amountEntry}
-      </>
+    fieldComponent = props.args.useCustomInternalFieldRender ?
+      props.args.useCustomInternalFieldRender(typePaymentSelector, statusPaymentSelector, amountEntry) :
+      (
+        <>
+          {typePaymentSelector}
+          {statusPaymentSelector}
+          {amountEntry}
+        </>
+      );
+  }
+
+  const labelComponent = (
+    props.label ? <Box
+      sx={style.label(isInvalid)}
+    >
+      {secondIconComponent}
+      {capitalize(props.label)}
+      {iconComponent}
+    </Box> : null
+  );
+
+  let descriptionObject: React.ReactNode = null;
+  if (props.description) {
+    descriptionObject = descriptionAsAlert ? (
+      <Alert severity="info" sx={style.description} role="note" id={props.uniqueId + "_desc"}>
+        {props.description}
+      </Alert>
+    ) : (
+      <Typography variant="caption" sx={style.description} id={props.uniqueId + "_desc"}>
+        {props.description}
+      </Typography>
     );
   }
 
-  // TODO custom field renderer
+  const error = props.args.hideError ? null : <Box sx={style.errorMessage} id={props.uniqueId + "_error"} role="alert">
+    {props.currentInvalidReason}
+  </Box>;
+
+  let inner: React.ReactNode;
+  if (props.args.useCustomFieldRender) {
+    inner = props.args.useCustomFieldRender(descriptionObject, labelComponent, fieldComponent, error, props.disabled);
+  } else {
+    inner = (
+      <>
+        {descriptionObject}
+        <div>
+          {labelComponent}
+          {fieldComponent}
+        </div>
+        {error}
+      </>
+    )
+  }
 
   return (
     <Box sx={style.container}>
-      {
-        props.description && descriptionAsAlert ?
-          <Alert severity="info" sx={style.description} role="note" id={this.props.uniqueId + "_desc"}>
-            {props.description}
-          </Alert> :
-          null
-      }
-      {
-        props.description && !descriptionAsAlert ?
-          <Typography variant="caption" sx={style.description} id={this.props.uniqueId + "_desc"}>
-            {props.description}
-          </Typography> :
-          null
-      }
-      <div>
-        {props.label ? <Box
-          sx={style.label(isInvalid)}
-        >
-          {secondIconComponent}
-          {capitalize(props.label)}
-          {iconComponent}
-        </Box> : null}
-        {internalContent}
-      </div>
-      {props.args.hideError ? null : <Box sx={style.errorMessage} id={this.props.uniqueId + "_error"} role="alert">
-        {props.currentInvalidReason}
-      </Box>}
+      {inner}
     </Box>
   );
 };
