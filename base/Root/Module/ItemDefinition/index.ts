@@ -2837,11 +2837,11 @@ export default class ItemDefinition {
   }
 
   public getMaxOwnedCountSameType() {
-    return this.rawData.parentMaxChildCountSameType || null;
+    return this.rawData.maxOwnedCountSameType || null;
   }
 
   public getMaxOwnedCountAnyType() {
-    return this.rawData.parentMaxChildCountAnyType || null;
+    return this.rawData.maxOwnedCountAnyType || null;
   }
 
   public getOwningRule() {

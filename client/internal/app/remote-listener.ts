@@ -314,7 +314,11 @@ export class RemoteListener {
   /**
    * Whether it's ready to attach events
    */
-  private isReady: boolean = false;
+  public isReady: boolean = false;
+  /**
+   * Whether it's been ready at least once
+   */
+  public hasBeenReadyOnce: boolean = false;
   /**
    * The function to trigger on logout
    * this comes from the current active token provider
@@ -460,6 +464,7 @@ export class RemoteListener {
       );
       await this.onIdentificationDone();
       this.isReady = true;
+      this.hasBeenReadyOnce = true;
     }
   }
 
@@ -1894,6 +1899,7 @@ export class RemoteListener {
 
       // if we survived that then we are ready
       this.isReady = true;
+      this.hasBeenReadyOnce = true;
     }
 
     // Javascript is totally stupid and so it will crash because the event of calling the callback will modify the array

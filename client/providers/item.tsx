@@ -2994,11 +2994,13 @@ export class ActualItemProvider extends
       }
     }
 
+    const currentStoredStateLocation = getStoredStateLocation(prevProps.loadStoredState || null, prevProps.forId || null, prevProps.forVersion || null);
+    const nextStoredStateLocation = getStoredStateLocation(this.props.loadStoredState || null, this.props.forId || null, this.props.forVersion || null);
+
     if (
-      uniqueIDChanged &&
-      this.props.loadStoredState
+      !equals(currentStoredStateLocation, nextStoredStateLocation, { strict: true })
     ) {
-      await this.loadStoredState(getStoredStateLocation(this.props.loadStoredState, this.props.forId, this.props.forVersion));
+      await this.loadStoredState(nextStoredStateLocation);
     }
 
     // no search id for example if the slot changed during
@@ -3441,7 +3443,7 @@ export class ActualItemProvider extends
   // }
   public async loadStoredState(location: IStoredStateLocation) {
     // no polyfills for loaded states
-    if (CacheWorkerInstance.isSupportedAsWorker) {
+    if (CacheWorkerInstance.isSupportedAsWorker && location) {
       const [storedState, metadata] = await CacheWorkerInstance.instance.retrieveState(
         this.props.itemDefinitionQualifiedName,
         location.id,
@@ -3650,7 +3652,13 @@ export class ActualItemProvider extends
       }
     }
 
-    if (this.props.remoteListener.isOffline()) {
+    if (
+      this.props.remoteListener.isOffline() &&
+      // can be trusted it has been ready at some point
+      // but otherwise we are not sure as it's likely still trying
+      // to connect
+      this.props.remoteListener.hasBeenReadyOnce
+    ) {
       const completedValue = this.loadValueCompleted({
         value: null,
         error: {

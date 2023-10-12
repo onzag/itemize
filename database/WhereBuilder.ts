@@ -114,7 +114,7 @@ export class WhereBuilder extends ConditionalBuilder {
     const comparator = typeof valueToCompare !== "undefined" ? valueOrComparator : "=";
 
     if (value === null && (column === "version" || column === CONNECTOR_SQL_COLUMN_VERSION_FK_NAME || column === "parent_version")) {
-      value === ""
+      value = ""
     }
 
     if (Array.isArray(value)) {
@@ -139,10 +139,10 @@ export class WhereBuilder extends ConditionalBuilder {
    * @returns itself
    */
   public orWhereColumn(column: string, valueOrComparator: ValueType, valueToCompare?: ValueType) {
-    const value = valueToCompare || valueOrComparator;
+    let value = valueToCompare || valueOrComparator;
 
     if (value === null && (column === "version" || column === CONNECTOR_SQL_COLUMN_VERSION_FK_NAME || column === "parent_version")) {
-      value === ""
+      value = ""
     }
 
     const comparator = typeof valueToCompare !== "undefined" ? valueOrComparator : "=";

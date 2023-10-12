@@ -104,7 +104,13 @@ interface ICurrencyI18nType {
 /**
  * The property field renderers that every field will get
  */
-export interface IPropertyEntryFieldRendererProps extends IPropertyEntryRendererProps<string | number | IPropertyDefinitionSupportedCurrencyType | IPropertyDefinitionSupportedUnitType> {
+export interface IPropertyEntryFieldRendererProps extends IPropertyEntryRendererProps<
+  string |
+  number |
+  IPropertyDefinitionSupportedCurrencyType |
+  IPropertyDefinitionSupportedUnitType |
+  IPropertyDefinitionSupportedTextType
+> {
   /**
    * These are the types that every field renderer is expected to support, the handler
    * makes it easier so implementing it shouldn't be too hard

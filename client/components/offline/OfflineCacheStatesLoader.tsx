@@ -35,9 +35,11 @@ export function useOfflineCacheStatesLoader(options: IOfflineCacheStatesLoaderOp
 
   const onShouldUpdate = useCallback((id: string, version: string, state: IItemStateType, metadata: ICacheStateMetadata) => {
     const existingValueIndex = recordsRef.current.findIndex((v) => v.id === id && v.version === version);
+    let changed: boolean = false;
     if (existingValueIndex !== -1) {
       if (state === null) {
         recordsRef.current.splice(existingValueIndex, 1);
+        changed = true;
       } else {
         recordsRef.current[existingValueIndex] = {
           id,
@@ -45,17 +47,21 @@ export function useOfflineCacheStatesLoader(options: IOfflineCacheStatesLoaderOp
           state,
           metadata,
         };
+        changed = true;
       }
-    } else {
+    } else if (state !== null) {
       recordsRef.current.push({
         id,
         version,
         state,
         metadata,
       });
+      changed = true;
     }
 
-    setRecords([...recordsRef.current]);
+    if (changed) {
+      setRecords([...recordsRef.current]);
+    }
   }, []);
 
   const recalculate = useCallback(async () => {
