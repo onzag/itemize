@@ -139,6 +139,15 @@ export interface IPropertyEntryProps<RendererPropsType> extends IPropertyBaseWit
    * Suppress hidden warning
    */
   suppressWarnings?: boolean;
+
+  /**
+   * Handle as the given type subtype rather than
+   * the default
+   */
+  handleAs?: {
+    type: string;
+    subtype?: string;
+  }
 }
 
 /**
@@ -600,6 +609,7 @@ export function EntryViewReadSet(
         disabled={props.disabled}
         displayHidden={props.displayHidden}
         languageOverride={props.languageOverride}
+        handleAs={props.handleAs}
       />
     );
   } else {

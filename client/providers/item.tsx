@@ -4656,13 +4656,20 @@ export class ActualItemProvider extends
     // the submit button was pressed really fast
     const waitingForLoad = this.props.forId && !this.state.loaded && !this.props.avoidLoading;
     if (waitingForLoad) {
-      console.warn(
-        "Attempted to submit so fast that the value was not yet loaded in memory, this is not an error, " +
-        "if this was an user triggered action, then the app is sluggish, if otherwise you submit manually eg. an automatic action " +
-        "that triggers faster than a human can begin to react then it's not a problem, overall the app was loading a value for " +
-        this.props.itemDefinitionInstance.getName() + " and the submit happened before such NEW value could be loaded, if your submit " +
-        "is tied to a condition it could have been resolved with the old data if it held a partial value",
-      );
+      if (this.state.loadError) {
+        console.warn(
+          "Attempted to submit with a loaded value in an error state, the result is that the value is not loaded " +
+          "in memory, this is not an error, it simply means that the value was not considered for the update",
+        );
+      } else {
+        console.warn(
+          "Attempted to submit so fast that the value was not yet loaded in memory, this is not an error, " +
+          "if this was an user triggered action, then the app is sluggish, if otherwise you submit manually eg. an automatic action " +
+          "that triggers faster than a human can begin to react then it's not a problem, overall the app was loading a value for " +
+          this.props.itemDefinitionInstance.getName() + " and the submit happened before such NEW value could be loaded, if your submit " +
+          "is tied to a condition it could have been resolved with the old data if it held a partial value",
+        );
+      }
       await this.lastLoadValuePromise;
     }
 

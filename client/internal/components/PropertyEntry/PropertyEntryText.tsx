@@ -17,6 +17,26 @@ import { deepRendererArgsComparer } from "../general-fn";
 import type { IPropertyDefinitionSupportedTextType } from "../../../../base/Root/Module/ItemDefinition/PropertyDefinition/types/text";
 import { imageSrcSetRetriever } from "../../../components/util";
 
+function canRestoreCalculator(v: IPropertyDefinitionSupportedTextType, v2: IPropertyDefinitionSupportedTextType) {
+  if (v === v2) {
+    return false;
+  }
+  if (
+    typeof v === "string" || typeof v === "number" || !v || typeof v === "boolean" ||
+    typeof v2 === "string" || typeof v2 === "number" || !v2 || typeof v2 === "boolean"
+  ) {
+    return v !== v2;
+  }
+
+  const language1 = v.language;
+  const language2 = v2.language;
+  const value1 = v.value;
+  const value2 = v2.value;
+
+  return language1 !== language2 || value1 !== value2;
+}
+
+
 /**
  * Information about the file that has just been inserted
  */
@@ -276,7 +296,7 @@ export interface IPropertyEntryTextRendererProps extends IPropertyEntryRendererP
    * @param fileId the file id
    * @returns the single file
    */
-  onRetrieveImage: (fileId: String) => {file: IPropertyDefinitionSupportedSingleFilesType, srcset: string};
+  onRetrieveImage: (fileId: String) => { file: IPropertyDefinitionSupportedSingleFilesType, srcset: string };
 
   /**
    * Given a blob URL that doesn't have a remote server located storage
@@ -635,7 +655,7 @@ export default class PropertyEntryText
     return value;
   }
 
-  public onRetrieveImage(fileId: string): {file: IPropertyDefinitionSupportedSingleFilesType, srcset: string} {
+  public onRetrieveImage(fileId: string): { file: IPropertyDefinitionSupportedSingleFilesType, srcset: string } {
     const value = this.onRetrieveFile(fileId);
 
     if (!value) {
@@ -647,7 +667,7 @@ export default class PropertyEntryText
       this.cachedMediaProperty,
     );
 
-    return ({file: value, srcset});
+    return ({ file: value, srcset });
   }
 
   // public onRetrieveDataURI(fileId: string) {
@@ -999,7 +1019,7 @@ export default class PropertyEntryText
       currentValid: !isCurrentlyShownAsInvalid && !this.props.forceInvalid,
       currentInvalidReason: i18nInvalidReason,
       currentInternalValue: this.props.state.internalValue,
-      canRestore: this.props.state.value !== this.props.state.stateAppliedValue,
+      canRestore: canRestoreCalculator(this.props.state.value, this.props.state.stateAppliedValue),
 
       currentValueText,
       currentValueLang,

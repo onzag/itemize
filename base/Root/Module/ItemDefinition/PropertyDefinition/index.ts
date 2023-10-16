@@ -797,7 +797,7 @@ export default class PropertyDefinition {
         } else {
           // otherwise we need to create a dummy element and count the characters
           const dummyElement = DOMWindow.document.createElement("div");
-          dummyElement.innerHTML = value.toString();
+          dummyElement.innerHTML = (value as IPropertyDefinitionSupportedTextType).value.toString();
           count = dummyElement.textContent.length;
 
           // Something that happens with quilljs

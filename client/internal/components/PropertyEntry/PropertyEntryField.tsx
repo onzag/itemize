@@ -33,6 +33,43 @@ export enum NumericType {
   NAN,
 }
 
+function canRestoreCalculator(v: ValueType, v2: ValueType, comparisonType: string) {
+  if (v === v2) {
+    return false;
+  }
+  if (
+    typeof v === "string" || typeof v === "number" || !v || typeof v === "boolean" ||
+    typeof v2 === "string" || typeof v2 === "number" || !v2 || typeof v2 === "boolean"
+  ) {
+    return v !== v2;
+  }
+
+  if (comparisonType === "currency") {
+    const currency1 = (v as IPropertyDefinitionSupportedCurrencyType).currency;
+    const currency2 = (v2 as IPropertyDefinitionSupportedCurrencyType).currency;
+    const value1 = (v as IPropertyDefinitionSupportedCurrencyType).value;
+    const value2 = (v2 as IPropertyDefinitionSupportedCurrencyType).value;
+
+    return currency1 !== currency2 || value1 !== value2;
+  } else if (comparisonType === "text") {
+    const language1 = (v as IPropertyDefinitionSupportedTextType).language;
+    const language2 = (v2 as IPropertyDefinitionSupportedTextType).language;
+    const value1 = (v as IPropertyDefinitionSupportedTextType).value;
+    const value2 = (v2 as IPropertyDefinitionSupportedTextType).value;
+
+    return language1 !== language2 || value1 !== value2;
+  } else if (comparisonType === "unit") {
+    const unit1 = (v as IPropertyDefinitionSupportedUnitType).unit;
+    const unit2 = (v2 as IPropertyDefinitionSupportedUnitType).unit;
+    const value1 = (v as IPropertyDefinitionSupportedUnitType).value;
+    const value2 = (v2 as IPropertyDefinitionSupportedUnitType).value;
+
+    return unit1 !== unit2 || value1 !== value2;
+  }
+
+  return v !== v2;
+}
+
 /**
  * Provides the numeric type of a given type
  * @param type the type we are using, number, currency, unit, etc...
@@ -104,13 +141,7 @@ interface ICurrencyI18nType {
 /**
  * The property field renderers that every field will get
  */
-export interface IPropertyEntryFieldRendererProps extends IPropertyEntryRendererProps<
-  string |
-  number |
-  IPropertyDefinitionSupportedCurrencyType |
-  IPropertyDefinitionSupportedUnitType |
-  IPropertyDefinitionSupportedTextType
-> {
+export interface IPropertyEntryFieldRendererProps extends IPropertyEntryRendererProps<ValueType> {
   /**
    * These are the types that every field renderer is expected to support, the handler
    * makes it easier so implementing it shouldn't be too hard
@@ -872,7 +903,7 @@ export default class PropertyEntryField
       currentInternalValue: this.props.state.internalValue,
       currentTextualValue,
       currentValueLang,
-      canRestore: this.props.state.value !== this.props.state.stateAppliedValue,
+      canRestore: canRestoreCalculator(this.props.state.value, this.props.state.stateAppliedValue, type),
 
       disabled:
         typeof this.props.disabled !== "undefined" && this.props.disabled !== null ?

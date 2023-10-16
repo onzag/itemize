@@ -1975,7 +1975,9 @@ function normalizeAccordingToUIHAndlerRules(
 export function deserializeChildrenForNode(
   node: Node,
 ): Array<RichElement | IText> {
-  const nodes = node.childNodes;
+  // why is it now Array.from since when this wasn't iterable?
+  // when it changed, yesterday?...
+  const nodes = Array.from(node.childNodes);
 
   const resultRaw: Array<RichElement | IText | Array<RichElement | IText>> = [];
   for (let cnode of nodes) {

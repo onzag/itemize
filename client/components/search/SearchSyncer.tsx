@@ -109,12 +109,18 @@ export default function SearchSyncer(props: ISearchSyncerProps): any {
   }, [props.search]);
 
   const onWillSearch = useCallback(() => {
+    if (handleMechanism.unmountRef.current) {
+      return;
+    }
     // setSelfSearchResults(null);
     setSelfUsedFallback(false);
     setSelfSynced(false);
   }, []);
 
   const onSearch = useCallback((data: IActionResponseWithSearchResults) => {
+    if (handleMechanism.unmountRef.current) {
+      return;
+    }
     // we sync
     setSelfSynced(!data.error && data.cached);
 

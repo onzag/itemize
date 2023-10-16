@@ -338,6 +338,14 @@ export interface IPropertyEntryMainHandlerProps<ValueType extends PropertyDefini
    * value if it has its own
    */
   languageOverride?: string;
+  /**
+   * Handle as a given type/subtype instead
+   * of the basic form
+   */
+  handleAs?: {
+    type: string;
+    subtype?: string;
+  }
 }
 
 /**
@@ -676,8 +684,8 @@ export default class PropertyEntry extends
     }
 
     // now we need the type and subtype of the property itself
-    const type = this.props.property.getType();
-    const subtype = this.props.property.getSubtype();
+    const type = this.props.handleAs?.type || this.props.property.getType();
+    const subtype = this.props.handleAs?.subtype || this.props.property.getSubtype();
 
     // First get the handler by the type
     // so our exception handler, for select, when we have specific valid values
