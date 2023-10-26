@@ -51,6 +51,10 @@ export interface IAltBaseProps {
    */
   triggerAltAfterAction?: boolean;
   /**
+   * Triggers when the action triggers
+   */
+  onActionTriggered?: (tabNavigating: boolean) => void;
+  /**
    * when you press the tab button and want to wrap around
    * elements, use this to specify whether the component is tabbable
    * and can be focused via the tab key
@@ -180,6 +184,18 @@ export interface IAltReactionerProps extends IAltBaseProps {
    */
   onAmbiguousReaction: (isExpected: boolean, id: number, plusCount: number) => void;
   onAmbiguousClear: () => void;
+
+  /**
+   * By default enter and space when executed will simply pipe to the application
+   * unless the action=click by setting consumeEnterAndSpace=true even elements with
+   * action=focus will trigger the action in question (aka it will attempt to focus again)
+   * and then it will trigger onActionTriggered as if the reactioner had executed it
+   * 
+   * when the action is focus and one tabs in, onActionTriggered does not get called because
+   * it wasn't focus by the actioner, but rather by tabbing, this allows to make it
+   * trigger again by using enter and/or space
+   */
+  consumeEnterAndSpace?: boolean;
 
   /**
    * Triggers when alt has been triggered
@@ -669,11 +685,14 @@ function triggerBasedOn(code: string, shiftKey: boolean, callbackIfmatch: () => 
     code === "enter" ||
     code === " "
   ) {
-    const relatedActiveElement = ALT_REGISTRY.isDisplayingLayereds.find((v) => v.getElement() === document.activeElement);
+    const relatedActiveElement = ALT_REGISTRY.all.find((v) => v.getElement() === document.activeElement);
     if (
       relatedActiveElement &&
       relatedActiveElement instanceof ActualAltReactioner &&
-      relatedActiveElement.props.action !== "focus"
+      (
+        relatedActiveElement.props.action !== "focus" ||
+        relatedActiveElement.props.consumeEnterAndSpace
+      )
     ) {
       callbackIfmatch();
       hideAll();
@@ -895,6 +914,8 @@ if (typeof document !== "undefined") {
     const isAltKey = e.altKey;
     const isTab = keyCode === "tab";
     const isEscape = keyCode === "escape";
+    const isEnter = keyCode === "enter";
+    const isSpace = keyCode === " ";
 
     // uncontrolled
     if (ALT_REGISTRY.uncontrolled && (isTab || isArrow)) {
@@ -931,7 +952,7 @@ if (typeof document !== "undefined") {
           e.preventDefault();
         });
       }
-    } else if (!isArrow && (isAltKey || ALT_REGISTRY.isDisplayingLayereds || isEscape)) {
+    } else if (!isArrow && (isAltKey || ALT_REGISTRY.isDisplayingLayereds || isEscape || isEnter || isSpace)) {
       keyCodeConsumed = e.code;
       keyConsumed = e.key;
 
@@ -1011,8 +1032,11 @@ export class ActualAltBase<P extends IAltBaseProps, S> extends React.PureCompone
   }
 
   public isBlocking() {
-    if (this.props.blocksQuickActionsWhileFocused) {
-      return true;
+    if (
+      typeof this.props.blocksQuickActionsWhileFocused !== "undefined" &&
+      this.props.blocksQuickActionsWhileFocused !== null
+    ) {
+      return this.props.blocksQuickActionsWhileFocused;
     }
 
     const element = this.getElement();
@@ -1021,7 +1045,12 @@ export class ActualAltBase<P extends IAltBaseProps, S> extends React.PureCompone
       return false;
     }
 
-    return element.tagName === "INPUT" || element.tagName === "TEXTAREA" || element.isContentEditable;
+    if (element.tagName === "INPUT") {
+      const type = element.getAttribute("type");
+      return type !== "radio" && type !== "checkbox" && type !== "button" && type !== "submit";
+    }
+
+    return element.tagName === "TEXTAREA" || element.isContentEditable;
   }
 
   /**
@@ -1402,6 +1431,39 @@ export class ActualAltBase<P extends IAltBaseProps, S> extends React.PureCompone
   }
 }
 
+export function triggerAltCycle(tabNavigation: boolean) {
+  setTimeout(() => {
+    showLayereds(calculatePriorityOfLayereds(true));
+    // something else must have focused an element that is part of our flow
+    // or whatnot, for example, an autofocused element
+    const somethingAlreadyActive =
+      ALT_REGISTRY.isDisplayingLayereds &&
+      ALT_REGISTRY.isDisplayingLayereds.find((a) => a.getElement() === document.activeElement);
+
+    if (
+      somethingAlreadyActive
+    ) {
+      // must check if it's a blocking input
+      // not anymore because a triggered alt cycle must consider itself to override
+      // blocking inputs, it's as if I have pressed alt
+      ALT_REGISTRY.isBlocked = false;// somethingAlreadyActive.isBlocking();
+      ALT_REGISTRY.isDisplayingLayereds.forEach((e) => e.setBlocked(ALT_REGISTRY.isBlocked));
+      setScrollerBlockStatus(ALT_REGISTRY.isBlocked || ALT_REGISTRY.uncontrolled);
+      // otherwise if we are not we can go ahead and trigger tab
+    } else if (tabNavigation) {
+      // because we were tab navigating before we want to tab navigate
+      // the new cycle too and ensure something is selected
+      triggerBasedOn("tab", false, () => { });
+    }
+  }, 50);
+}
+
+export function triggerTabCycle() {
+  setTimeout(() => {
+    triggerBasedOn("tab", false, () => { });
+  }, 50);
+}
+
 export class ActualAltReactioner extends ActualAltBase<IAltReactionerProps, IActualAltReactionerState> {
   constructor(props: IAltReactionerProps) {
     super(props);
@@ -1410,8 +1472,6 @@ export class ActualAltReactioner extends ActualAltBase<IAltReactionerProps, IAct
       displayed: false,
       blocked: false,
     }
-
-    this.triggerAltCycle = this.triggerAltCycle.bind(this);
   }
 
   public setBlocked(blocked: boolean) {
@@ -1517,31 +1577,6 @@ export class ActualAltReactioner extends ActualAltBase<IAltReactionerProps, IAct
     return this.props.onAmbiguousClear();
   }
 
-  public triggerAltCycle(isTabNavigatingCurrent: boolean) {
-    showLayereds(calculatePriorityOfLayereds(true));
-    // something else must have focused an element that is part of our flow
-    // or whatnot, for example, an autofocused element
-    const somethingAlreadyActive =
-      ALT_REGISTRY.isDisplayingLayereds &&
-      ALT_REGISTRY.isDisplayingLayereds.find((a) => a.getElement() === document.activeElement);
-
-    if (
-      somethingAlreadyActive
-    ) {
-      // must check if it's a blocking input
-      // not anymore because a triggered alt cycle must consider itself to override
-      // blocking inputs, it's as if I have pressed alt
-      ALT_REGISTRY.isBlocked = false;// somethingAlreadyActive.isBlocking();
-      ALT_REGISTRY.isDisplayingLayereds.forEach((e) => e.setBlocked(ALT_REGISTRY.isBlocked));
-      setScrollerBlockStatus(ALT_REGISTRY.isBlocked || ALT_REGISTRY.uncontrolled);
-      // otherwise if we are not we can go ahead and trigger tab
-    } else if (isTabNavigatingCurrent) {
-      // because we were tab navigating before we want to tab navigate
-      // the new cycle too and ensure something is selected
-      triggerBasedOn("tab", false, () => { });
-    }
-  }
-
   public trigger(isTabNavigatingCurrent: boolean) {
     let element = this.getElement();
     if (!element) {
@@ -1558,9 +1593,16 @@ export class ActualAltReactioner extends ActualAltBase<IAltReactionerProps, IAct
     //   return;
     // }
 
-    if (!this.props.action || this.props.action === "click") {
+    // due to a bug in react altering the props before the next
+    // render cycle I need to store it like this so it actually works
+    // and stops modifying immutable values as side effects
+    const triggerAltAfterAction = this.props.triggerAltAfterAction;
+    const action = this.props.action;
+    const onActionTriggered = this.props.onActionTriggered;
+
+    if (!action || action === "click") {
       (element as HTMLElement).click();
-    } else if (this.props.action === "focus") {
+    } else if (action === "focus") {
       (element as HTMLElement).focus();
 
       if (!isInView(element)) {
@@ -1570,11 +1612,13 @@ export class ActualAltReactioner extends ActualAltBase<IAltReactionerProps, IAct
       ALT_REGISTRY.uncontrolled = this.isUncontrolled();
     }
 
-    if (this.props.triggerAltAfterAction) {
-      setTimeout(() => {
-        // due to react being slow better to put it in a timeout
-        this.triggerAltCycle(isTabNavigatingCurrent);
-      }, 50);
+    if (onActionTriggered) {
+      onActionTriggered(isTabNavigatingCurrent);
+    }
+
+    if (triggerAltAfterAction) {
+      // due to react being slow better to put it in a timeout
+      triggerAltCycle(isTabNavigatingCurrent);
     }
   }
 

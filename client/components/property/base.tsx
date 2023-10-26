@@ -214,6 +214,14 @@ export interface IPropertyViewProps<RendererPropsType> extends IPropertyBaseWith
    * Will display even if it's hidden
    */
   displayHidden?: boolean;
+  /**
+   * Handle as the given type subtype rather than
+   * the default
+   */
+  handleAs?: {
+    type: string;
+    subtype?: string;
+  }
 }
 
 /**
@@ -454,6 +462,7 @@ export function EntryViewReadSet(
           cacheFiles={props.cacheFiles}
           displayHidden={props.displayHidden}
           highlights={itemContextualValue.highlights && itemContextualValue.highlights[property.getId()]}
+          handleAs={props.handleAs}
         />
       );
     }

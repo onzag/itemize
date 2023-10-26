@@ -10,7 +10,7 @@ export interface IAltTextProps extends IAltBaseProps {
   /**
    * The children that should be read
    */
-  children: React.ReactNode;
+  children?: React.ReactNode;
 
   /**
    * aria-label

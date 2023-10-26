@@ -15,7 +15,7 @@ import equals from "deep-equal";
 import { renderTemplateDynamically } from "../../../internal/text";
 import type { TemplateArgs } from "../../../internal/text/serializer/template-args";
 import type { IImage } from "../../../internal/text/serializer/types/image";
-import { deserialize, IRootLevelDocument } from "../../../internal/text/serializer";
+import { deserialize, deserializePlain, IRootLevelDocument } from "../../../internal/text/serializer";
 import { IText, STANDARD_TEXT_NODE } from "../../../internal/text/serializer/types/text";
 import type { RichElement } from "../../../internal/text/serializer";
 
@@ -150,6 +150,7 @@ interface IPropertyViewRichTextViewerProps {
   children?: string;
   className?: string;
   Node?: any;
+  NodeProps?: any;
   onCustom?: (
     arg: RichElement | IText,
     props: any,
@@ -165,6 +166,7 @@ interface IPropertyViewRichTextViewerProps {
   onCustomAttributesFor?: (arg: RichElement | IText) => any;
   onCustomWrap?: (arg: RichElement | IText, elementAsNode: React.ReactNode) => React.ReactNode;
   lang: string;
+  isRichText: boolean;
 }
 
 /**
@@ -366,7 +368,8 @@ export class PropertyViewRichTextViewer extends React.Component<IPropertyViewRic
   }
   public shouldComponentUpdate(nextProps: IPropertyViewRichTextViewerProps, nextState: IPropertyViewRichTextViewerState) {
     if (
-      nextProps.children !== this.props.children
+      nextProps.children !== this.props.children ||
+      !equals(nextProps.NodeProps, this.props.NodeProps, {strict: true})
     ) {
       this.updateHTML(nextProps.children);
     }
@@ -381,6 +384,7 @@ export class PropertyViewRichTextViewer extends React.Component<IPropertyViewRic
         lang={this.props.lang}
         ref={this.divref}
         dangerouslySetInnerHTML={{ __html: this.state.html }}
+        {...this.props.NodeProps}
       />
     );
   }
@@ -404,13 +408,16 @@ export class TemplatedPropertyViewRichTextRenderer extends React.Component<
     return (
       nextProps.children !== this.props.children ||
       nextProps.lang !== this.props.lang ||
+      !equals(nextProps.NodeProps, this.props.NodeProps, {strict: true}) ||
       !equals(nextProps.templateArgs, this.props.templateArgs, { strict: true })
     );
   }
   public render() {
-    const deserializedValue = deserialize(this.props.children, null, { dontNormalize: true });
+    const deserializedValue = this.props.isRichText ?
+      deserialize(this.props.children, null, { dontNormalize: true }) :
+      deserializePlain(this.props.children, null);
     const Node = this.props.Node;
-    return <Node className={"rich-text" + (this.props.className ? " " + this.props.className : "")} lang={this.props.lang}>
+    return <Node className={"rich-text" + (this.props.className ? " " + this.props.className : "")} lang={this.props.lang} {...this.props.NodeProps}>
       {renderTemplateDynamically(
         deserializedValue,
         this.props.templateArgs, {
@@ -444,38 +451,55 @@ export default function PropertyViewTextRenderer(props: IPropertyViewTextRendere
   }
 
   const Node: any = props.args.Node ? props.args.Node : ((props.isRichText || props.subtype === "plain") ? "div" : "span");
+  const NodeProps: any = props.args.Node && props.args.NodeProps ? props.args.NodeProps : {};
 
-  if (props.isRichText) {
-    if (props.args.makeTemplate || props.args.makeAccessible) {
+  if (props.isRichText || props.args.treatLikeRichText) {
+    if (
+      props.args.makeTemplate ||
+      props.args.makeAccessible ||
+      (props.args.treatLikeRichText && !props.isRichText)
+    ) {
       return (
         <TemplatedPropertyViewRichTextRenderer
           className={props.args.className}
           templateArgs={props.args.templateArgs}
           Node={Node}
+          NodeProps={NodeProps}
           onCustom={props.args.onCustom}
           onCustomAttributesFor={props.args.onCustomAttributesFor}
           onCustomWrap={props.args.onCustomWrap}
           lang={props.args.overrideLanguage || props.currentValueLang}
+          isRichText={props.isRichText}
         >
           {props.currentValueText}
         </TemplatedPropertyViewRichTextRenderer>
       );
     } else {
       return (
-        <PropertyViewRichTextViewer className={props.args.className} Node={Node} lang={props.args.overrideLanguage || props.currentValueLang}>
+        <PropertyViewRichTextViewer
+          className={props.args.className}
+          Node={Node}
+          NodeProps={NodeProps}
+          lang={props.args.overrideLanguage || props.currentValueLang}
+          isRichText={props.isRichText}
+        >
           {props.currentValueText}
         </PropertyViewRichTextViewer>
       );
     }
   } else if (props.subtype === "plain") {
     return (
-      <Node className={"plain-text" + (props.args.className ? " " + props.args.className : "")} lang={props.args.overrideLanguage || props.currentValueLang}>
+      <Node
+        className={"plain-text" + (props.args.className ? " " + props.args.className : "")}
+        lang={props.args.overrideLanguage || props.currentValueLang}
+        {...NodeProps}
+      >
         {props.currentValueText}
       </Node>
     );
   }
   return (
-    <Node lang={props.args.overrideLanguage || props.currentValueLang} className={props.args.className}>
+    <Node lang={props.args.overrideLanguage || props.currentValueLang} className={props.args.className} {...NodeProps}>
       {props.currentValueText}
     </Node>
   );

@@ -142,7 +142,14 @@ export interface IPropertyViewMainHandlerProps<ValueType extends PropertyDefinit
    * Provided by the item via the record properties
    * may be developer provided in the item
    */
-  highlights: IElasticHighlighPropertyInfo;
+  highlights: IElasticHighlighPropertyInfo;/**
+  * Handle as a given type/subtype instead
+  * of the basic form
+  */
+  handleAs?: {
+    type: string;
+    subtype?: string;
+  }
 }
 
 /**
@@ -388,7 +395,7 @@ export function RawBasePropertyView(props: {
                       default: null,
                       enforced: false,
                       hidden: false,
-                      valid: true,        
+                      valid: true,
                       value: props.value,
                       stateValue: props.value,
                       stateAppliedValue: props.value,
@@ -426,8 +433,8 @@ export default function PropertyView(
     return null;
   }
 
-  const type = props.property.getType();
-  const subtype = props.property.getSubtype();
+  const type = props.handleAs?.type || props.property.getType();
+  const subtype = props.handleAs?.subtype || props.property.getSubtype();
 
   // First get the handler by the type
   let registryEntry: IRendererWholeHandlerType = handlerRegistry[type];

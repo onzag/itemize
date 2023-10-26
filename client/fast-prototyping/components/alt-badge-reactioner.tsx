@@ -149,6 +149,17 @@ interface IAltBadgeReactionerProps {
  */
   triggerAltAfterAction?: boolean;
   /**
+   * By default enter and space when executed will simply pipe to the application
+   * unless the action=click by setting consumeEnterAndSpace=true even elements with
+   * action=focus will trigger the action in question (aka it will attempt to focus again)
+   * and then it will trigger onActionTriggered as if the reactioner had executed it
+   * 
+   * when the action is focus and one tabs in, onActionTriggered does not get called because
+   * it wasn't focus by the actioner, but rather by tabbing, this allows to make it
+   * trigger again by using enter and/or space
+   */
+  consumeEnterAndSpace?: boolean;
+  /**
    * custom sx for the badge
    */
   sx?: SxProps<Theme>;
@@ -193,6 +204,11 @@ interface IAltBadgeReactionerProps {
    * layer, use this to select which reaction key would you like to trigger from the current active flow
    */
   onTabOutTrigger?: string;
+
+  /**
+   * Triggers when the action triggers
+   */
+  onActionTriggered?: (tabNavigating: boolean) => void;
 
   /**
    * Once this element is focused it will go into an uncontrolled state

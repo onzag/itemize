@@ -6016,7 +6016,7 @@ export class ActualItemProvider extends
       return;
     }
     this.setState({
-      submitted: null,
+      submitted: false,
     });
   }
   public dismissDeleted() {
