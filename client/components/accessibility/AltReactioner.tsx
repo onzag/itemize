@@ -360,31 +360,31 @@ export function calculateLayereds(priorityToUse: number, doNotShowHide: boolean)
 
   ALT_REGISTRY.all.forEach((v) => {
     if (v instanceof ActualAltReactioner) {
+      // FOR ALT REACTIONER
       if (
+        // not disabled
         !v.isDisabled() &&
+        // fits priority
         (v.getPriority() === priorityToUse || v.getPriority() === "ALWAYS_ON_TOP" || v.getPriority() === "ALWAYS_ON_TOP_KEEP_FLOW")
       ) {
-        if (v instanceof ActualAltReactioner) {
-          const reactionKey = v.getReactionKey();
-          if (!actionResults[reactionKey]) {
-            actionResults[reactionKey] = [v];
-          } else {
-            actionResults[reactionKey].push(v);
-          }
+        const reactionKey = v.getReactionKey();
+        if (!actionResults[reactionKey]) {
+          actionResults[reactionKey] = [v];
         } else {
-          layereds.push(v);
+          actionResults[reactionKey].push(v);
         }
-      } else if (v instanceof ActualAltReactioner && !doNotShowHide && v.isDisplayed()) {
+      } else if (!doNotShowHide && v.isDisplayed()) {
         v.hide();
       }
+
+    // FOR ALT TEXT
     } else if (
-      !v.isUsedInFlow() &&
+      // non disabled
       !v.isDisabled() &&
+      // fits priority
       (v.getPriority() === priorityToUse || v.getPriority() === "ALWAYS_ON_TOP" || v.getPriority() === "ALWAYS_ON_TOP_KEEP_FLOW")
     ) {
       layereds.push(v);
-    } else if (v instanceof ActualAltReactioner && !doNotShowHide && v.isDisplayed()) {
-      v.hide();
     }
   });
 
