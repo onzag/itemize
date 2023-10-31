@@ -23,6 +23,27 @@ import type Include from "../../../../base/Root/Module/ItemDefinition/Include";
 import type { IConfigRawJSONDataType } from "../../../../config";
 import type { IItemStateType } from "../../../../base/Root/Module/ItemDefinition";
 
+// taken from the server side to specify what is a valid
+const customIdVersionRegex = /^[A-Za-z0-9-_\+\!\#]+$/;
+export function validateCustomIdVersion(idOrVersion: string) {
+  if (!customIdVersionRegex.test(idOrVersion)) {
+    return false;
+  }
+  return true;
+}
+
+function checkIdVersionThrowErr(idOrVersion: string): void {
+  if (!idOrVersion) {
+    return;
+  }
+
+  const isValid = validateCustomIdVersion(idOrVersion);
+
+  if (!isValid) {
+    throw new Error("Invalid id/version specified that contains special invalid characters " + idOrVersion);
+  }
+}
+
 // Name of the table
 export const QUERIES_TABLE_NAME = "queries";
 export const SEARCHES_TABLE_NAME = "searches";
@@ -490,6 +511,9 @@ export default class CacheWorker {
     version: string,
     callback: (id: string, version: string, state: any, metadata: ICacheStateMetadata) => void,
   ) {
+    checkIdVersionThrowErr(id);
+    checkIdVersionThrowErr(version);
+
     if (this.worker) {
       const listenerLoc = qualifiedName + "." + (id || "") + "." + (version || "");
       if (!STATE_LISTENERS[listenerLoc]) {
@@ -509,6 +533,9 @@ export default class CacheWorker {
     version: string,
     callback: (id: string, version: string, state: any, metadata: ICacheStateMetadata) => void,
   ) {
+    checkIdVersionThrowErr(id);
+    checkIdVersionThrowErr(version);
+
     if (this.worker) {
       const listenerLoc = qualifiedName + "." + (id || "") + "." + (version || "");
       if (STATE_LISTENERS[listenerLoc]) {
@@ -528,6 +555,8 @@ export default class CacheWorker {
     id: string,
     callback: (id: string, version: string, state: any, metadata: ICacheStateMetadata) => void,
   ) {
+    checkIdVersionThrowErr(id);
+
     if (this.worker) {
       const listenerLoc = qualifiedName + "." + (id || "");
       if (!STATE_LISTENERS[listenerLoc]) {
@@ -546,6 +575,8 @@ export default class CacheWorker {
     id: string,
     callback: (id: string, version: string, state: any, metadata: ICacheStateMetadata) => void,
   ) {
+    checkIdVersionThrowErr(id);
+
     if (this.worker) {
       const listenerLoc = qualifiedName + "." + (id || "");
       if (STATE_LISTENERS[listenerLoc]) {
@@ -570,6 +601,9 @@ export default class CacheWorker {
       allowFallbackWritesToPolyfill?: boolean,
     }
   ): Promise<boolean> {
+    checkIdVersionThrowErr(id);
+    checkIdVersionThrowErr(version);
+
     // console.log("REQUESTED TO STORE STATE FOR", qualifiedName, id, version, value);
     if (this.worker) {
       const rs = await this.worker.storeState(qualifiedName, id, version, state, metadata, options);
@@ -578,7 +612,7 @@ export default class CacheWorker {
         listeners && listeners.forEach((l) => l(id, version, state, metadata || null));
 
         const idSpecificListeners = STATE_LISTENERS[qualifiedName + "." + (id || "")];
-        idSpecificListeners && idSpecificListeners.forEach((l) => l(id, version, state, metadata || null ));
+        idSpecificListeners && idSpecificListeners.forEach((l) => l(id, version, state, metadata || null));
       }
       return rs;
     }
@@ -630,6 +664,8 @@ export default class CacheWorker {
     qualifiedName: string,
     id: string,
   ): Promise<Array<{ id: string, version: string }>> {
+    checkIdVersionThrowErr(id);
+
     if (this.worker) {
       return this.worker.retrieveUnversionedStateList(qualifiedName, id);
     }
@@ -651,13 +687,13 @@ export default class CacheWorker {
       const store = tx.objectStore(STATES_TABLE_NAME);
       keys = await store.getAllKeys();
       // add the keys from the polyfilled
-      const polyfilledKeys = keys = Object.keys(POLYFILLED_INDEXED_DB[STATES_TABLE_NAME]);
+      const polyfilledKeys = Object.keys(POLYFILLED_INDEXED_DB[STATES_TABLE_NAME]);
       Object.assign(keys, polyfilledKeys);
     }
 
     // with all the keys now we know the value
     return keys.map((v) => v.split(".") as [string, string, string]).filter((v) => v[0] === qualifiedName && v[1] === id).map((v) => (
-      { id: v[1], version: v[2] }
+      { id, version: v[2] }
     ));
   }
 
@@ -666,6 +702,8 @@ export default class CacheWorker {
     id: string,
     version: string,
   ): Promise<[IItemStateType, ICacheStateMetadata]> {
+    checkIdVersionThrowErr(id);
+
     if (this.worker) {
       return this.worker.retrieveState(qualifiedName, id, version);
     }
@@ -715,6 +753,9 @@ export default class CacheWorker {
     id: string,
     version: string,
   ): Promise<boolean> {
+    checkIdVersionThrowErr(id);
+    checkIdVersionThrowErr(version);
+
     // console.log("REQUESTED TO DELETE STATE FOR", qualifiedName, id, version);
     if (this.worker) {
       const rs = await this.worker.deleteState(qualifiedName, id, version);
@@ -918,6 +959,9 @@ export default class CacheWorker {
       allowFallbackWritesToPolyfill?: boolean,
     }
   ): Promise<boolean> {
+    checkIdVersionThrowErr(id);
+    checkIdVersionThrowErr(version);
+
     if (this.worker) {
       return this.worker.setCachedValue(
         queryName,
@@ -1013,6 +1057,9 @@ export default class CacheWorker {
     id: string,
     version: string,
   ): Promise<boolean> {
+    checkIdVersionThrowErr(id);
+    checkIdVersionThrowErr(version);
+
     if (this.worker) {
       return this.worker.deleteCachedValue(queryName, id, version);
     }
@@ -1154,6 +1201,9 @@ export default class CacheWorker {
       allowFallbackWritesToPolyfill?: boolean,
     },
   ): Promise<boolean> {
+    checkIdVersionThrowErr(id);
+    checkIdVersionThrowErr(version);
+
     if (this.worker) {
       return this.worker.writeMetadata(queryName, id, version, metadata, options);
     }
@@ -1279,6 +1329,9 @@ export default class CacheWorker {
     id: string,
     version: string,
   ): Promise<ICacheMetadataMatchType> {
+    checkIdVersionThrowErr(id);
+    checkIdVersionThrowErr(version);
+
     if (this.worker) {
       return this.worker.readMetadata(queryName, id, version);
     }
@@ -1425,6 +1478,9 @@ export default class CacheWorker {
       allowFallbackWritesToPolyfill?: boolean,
     },
   ): Promise<boolean> {
+    checkIdVersionThrowErr(id);
+    checkIdVersionThrowErr(version);
+
     if (this.worker) {
       return this.worker.mergeCachedValue(queryName, id, version, partialValue, partialFields, options);
     }
@@ -1502,6 +1558,9 @@ export default class CacheWorker {
     version: string,
     requestedFields?: IGQLRequestFields,
   ): Promise<ICacheMatchType> {
+    checkIdVersionThrowErr(id);
+    checkIdVersionThrowErr(version);
+
     if (this.worker) {
       return this.worker.getCachedValue(queryName, id, version, requestedFields);
     }

@@ -88,11 +88,19 @@ export function defaultTriggerSearchInvalidForbiddenFunction(message: string, cu
   return;
 }
 
-const customIdRegex = /[A-Za-z0-9-_\+\!\#]+/;
+const customIdVersionRegex = /^[A-Za-z0-9-_\+\!\#]+$/;
 export function validateCustomId(id: string) {
-  if (!customIdRegex.test(id)) {
+  if (!customIdVersionRegex.test(id)) {
     throw new EndpointError({
       message: "Invalid custom id must only contain alphanumeric characters, numbers, -, +, ! or #",
+      code: ENDPOINT_ERRORS.FORBIDDEN,
+    });
+  }
+}
+export function validateCustomVersion(version: string) {
+  if (!customIdVersionRegex.test(version)) {
+    throw new EndpointError({
+      message: "Invalid version must only contain alphanumeric characters, numbers, -, +, ! or #",
       code: ENDPOINT_ERRORS.FORBIDDEN,
     });
   }

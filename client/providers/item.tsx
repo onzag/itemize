@@ -3564,6 +3564,7 @@ export class ActualItemProvider extends
 
     let currentMetadata: ICacheMetadataMatchType;
     let denyMemoryCache: boolean = false;
+    let denyCacheWorker: boolean = false;
     if (
       !denyCaches &&
       !this.props.doNotUseMemoryCache &&
@@ -3583,6 +3584,7 @@ export class ActualItemProvider extends
         // as this value might have come from the cache when it was loaded
         // with such unmatching metadata
         denyMemoryCache = true;
+        denyCacheWorker = true;
       }
     }
 
@@ -3652,27 +3654,6 @@ export class ActualItemProvider extends
       }
     }
 
-    if (
-      this.props.remoteListener.isOffline() &&
-      // can be trusted it has been ready at some point
-      // but otherwise we are not sure as it's likely still trying
-      // to connect
-      this.props.remoteListener.hasBeenReadyOnce
-    ) {
-      const completedValue = this.loadValueCompleted({
-        value: null,
-        error: {
-          code: ENDPOINT_ERRORS.CANT_CONNECT,
-          message: "Remote listener is already known to be offline",
-        },
-        cached: false,
-        id: forId,
-        version: forVersion,
-      });
-
-      return completedValue;
-    }
-
     // the loading state is launched here, however
     // the loading is removed by the listener not by
     // this same function, to be efficient, we could remove
@@ -3693,6 +3674,10 @@ export class ActualItemProvider extends
       });
     }
 
+    if (this.isUnmounted) {
+      return;
+    }
+
     const containsExternallyCheckedProperty = this.props.containsExternallyCheckedProperty;
     const qualifiedPathName = this.props.itemDefinitionInstance.getQualifiedPathName();
 
@@ -3708,7 +3693,7 @@ export class ActualItemProvider extends
       args: {},
       fields: requestFields,
       returnMemoryCachedValues: false,
-      returnWorkerCachedValues: !denyCaches && !this.props.doNotUseCache,
+      returnWorkerCachedValues: !denyCaches && !denyCacheWorker && !this.props.doNotUseCache,
       itemDefinition: this.props.itemDefinitionInstance,
       id: forId,
       version: forVersion,
@@ -3719,6 +3704,8 @@ export class ActualItemProvider extends
       cacheStoreMetadataMismatchAction: this.props.longTermCachingMetadataMismatchAction,
       waitAndMerge: this.props.waitAndMerge,
       currentKnownMetadata: currentMetadata,
+    }, {
+      remoteListener: this.props.remoteListener,
     });
 
     if (!error) {

@@ -194,8 +194,6 @@ const typeValue: IPropertyDefinitionSupportedType<PropertyDefinitionSupportedStr
     if (
       subtype === "identifier" ||
       subtype === "exact-identifier" ||
-      subtype === "pointer" ||
-      subtype === "pointer-tracked" ||
       subtype === "exact-identifier-tracked"
     ) {
       const containsOneOfThose = SPECIAL_CHARACTERS.some((c) => s.indexOf(c) !== -1);

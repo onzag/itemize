@@ -22,6 +22,7 @@ import {
   defaultTriggerForbiddenFunction,
   defaultTriggerInvalidForbiddenFunction,
   validateCustomId,
+  validateCustomVersion,
 } from "../basic";
 import {
   INCLUDE_PREFIX,
@@ -174,7 +175,13 @@ export async function addItemDefinition(
       });
     }
 
+    // general validation
+    if (resolverArgs.args.version) {
+      validateCustomVersion(resolverArgs.args.version);
+    }
+
     // check the version on whether it's a valid value
+    // specific validation for specific rules
     const isValidVersion =
       itemDefinition.isValidVersion(resolverArgs.args.version || null, appData.config.supportedLanguages);
     if (!isValidVersion) {

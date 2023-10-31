@@ -836,6 +836,7 @@ export async function runGetQueryFor(
     progresser?: ProgresserFn,
     currentKnownMetadata?: ICacheMetadataMatchType,
   },
+  options: IRunQueryOptions,
 ): Promise<{
   error: EndpointErrorType,
   value: IGQLValue,
@@ -969,6 +970,28 @@ export async function runGetQueryFor(
         getQueryFields: workerCachedValue.fields,
       };
     }
+  }
+
+  if (
+    options.remoteListener &&
+    options.remoteListener.isOffline() &&
+    // can be trusted it has been ready at some point
+    // but otherwise we are not sure as it's likely still trying
+    // to connect
+    options.remoteListener.hasBeenReadyOnce
+  ) {
+    return (
+      {
+        error: {
+          code: ENDPOINT_ERRORS.CANT_CONNECT,
+          message: "Remote listener is already known to be offline",
+        },
+        value: null,
+        memoryCached: false,
+        cached: false,
+        getQueryFields: null,
+      }
+    );  
   }
 
   const args = getQueryArgsFor(

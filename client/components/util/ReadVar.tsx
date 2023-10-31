@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useState } from "react";
+import React, { useCallback, useEffect, useReducer, useState } from "react";
 
 import SetVar from "./SetVar";
 import equals from "deep-equal";
@@ -51,11 +51,11 @@ export default class ReadVar extends React.PureComponent<IReadVarProps> {
 }
 
 export function useReadVar(id: string) {
-  const [value, setValue] = useState(null as any);
+  const forceUpdate = useReducer(() => ({}), {})[1];
 
   const onTickled = useCallback(() => {
-    setValue(SetVar.VAR_REGISTRY[id]);
-  }, [id]);
+    forceUpdate();
+  }, []);
 
   useEffect(() => {
     SetVar.addListener(id, onTickled);
