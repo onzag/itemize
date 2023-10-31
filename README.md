@@ -2,7 +2,7 @@
 
 # ItemizeJS
 
-Itemize is a fully featured end to end library powered by react, postgresql, graphql, docker and redis to create fully featured internationalized scalable realtime offline first websites; Fast, very fast.
+Itemize is a fully featured end to end library powered by react, postgresql, elasticsearch, graphql, docker and redis to create fully featured internationalized scalable realtime offline first websites; Fast, very fast.
 
 The aim of itemize is to be a library that can produce and deliver results fast, reliably and cheaply; and that these results can also be the final product and not just a prototype; scale is key.
 
@@ -74,6 +74,10 @@ Ability to automatically generate sitemaps and update these, this with SSR shoul
 
 Every item in itemize is realtime, and as such changes populate over all the network when it detects so.
 
+### Search Engine
+
+Items can be indexed using elasticsearch then searched, and it will work seamlessly with no extra effort.
+
 ### Mail Integration
 
 With little configuration itemize automatically handles email sending and management, as well as subscriptions.
@@ -104,7 +108,7 @@ Documentation is available [here](./docs)
 
 Wordpress is a tool to create simple websites to give a web precense, while it is possible to modify and add a lot of functionality on top of it, such as ecommerce, itemize offers much more functionality and it's much more complex; for a simple web presence, wordpress will be the tool to use, itemize is to make much more complex apps with more needs.
 
-### Plain ReactJS + Graphql + PostgreSQL + NodeJS stack
+### Plain ReactJS + Graphql + PostgreSQL + ElasticSearch + NodeJS stack
 
 A plain stack is very powerful and can morph into anything and make anything, after all, Itemize is this same stack with a lot of features on top of it, the issue is that you would have to create a custom infraestructure and spend a lot of time developing it, when itemize comes with these out of the box and hides all this configuration so that the developer can focus on making what is important for the user
 
