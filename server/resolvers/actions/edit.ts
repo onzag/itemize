@@ -13,6 +13,7 @@ import {
   defaultTriggerForbiddenFunction,
   defaultTriggerInvalidForbiddenFunction,
   validateParentingRules,
+  handleConflictError,
 } from "../basic";
 import {
   INCLUDE_PREFIX,
@@ -23,7 +24,7 @@ import {
 import {
   convertSQLValueToGQLValueForItemDefinition,
 } from "../../../base/Root/Module/ItemDefinition/sql";
-import { EndpointError } from "../../../base/errors";
+import { EndpointError, EndpointErrorType } from "../../../base/errors";
 import { flattenRawGQLValueOrFields } from "../../../gql-util";
 import { ISQLTableRowValue } from "../../../base/Root/sql";
 import { IGQLArgs, IGQLValue } from "../../../gql-querier";
@@ -144,7 +145,7 @@ export async function editItemDefinition(
           });
           return rolesManager;
         },
-        preValidation: (content: ISQLTableRowValue) => {
+        preValidation: async (content: ISQLTableRowValue) => {
           // if we don't get an user id this means that there's no owner, this is bad input
           if (!content) {
             CAN_LOG_DEBUG && logger.debug(
@@ -181,10 +182,29 @@ export async function editItemDefinition(
               },
             );
 
-            throw new EndpointError({
+            const err: EndpointErrorType = {
               message: "The item conflicts with its last modification date",
               code: ENDPOINT_ERRORS.CONFLICT,
-            });
+            };
+
+            // now we need to find the triggers path
+            // that due to a bug in typescript apparently this believes
+            // its going to be initialized, so I have to do it again
+            // here
+            const pathOfThisIdef = itemDefinition.getAbsolutePath().join("/");
+            const pathOfThisModule = mod.getPath().join("/");
+
+            const shouldProceedAndOverwrite = await handleConflictError(
+              pathOfThisIdef,
+              pathOfThisModule,
+              appData,
+              err,
+              content,
+            );
+
+            if (!shouldProceedAndOverwrite) {
+              throw new EndpointError(err);
+            }
           }
         },
       },

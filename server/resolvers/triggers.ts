@@ -6,6 +6,7 @@ import { WhereBuilder } from "../../database/WhereBuilder";
 import { ISQLTableRowValue } from "../../base/Root/sql";
 import type { ElasticQueryBuilder } from "../elastic";
 import type { SearchResponse } from "@elastic/elasticsearch/lib/api/types";
+import { EndpointErrorType } from "../../base/errors";
 
 export enum IOTriggerActions {
   CREATE,
@@ -187,8 +188,27 @@ export interface ISearchTriggerArgType {
   setSearchMetadata: (metadata: string) => void;
 }
 
+export interface IOConflictTriggerArgType {
+  /**
+   * Feel free to modify the error this is a modifiable event the prupose
+   * of the trigger is to add data into this error before is sent
+   */
+  error: EndpointErrorType;
+  /**
+   * The row, may be available if it was checked against, some errors
+   * have no row data
+   */
+  row: ISQLTableRowValue;
+}
+
 export type IOTriggerType = (arg: IOTriggerArgType) => IGQLValue | Promise<IGQLValue> | IGQLArgs | Promise<IGQLArgs>;
 export type SearchTriggerType = (arg: ISearchTriggerArgType) => void | Promise<void>;
+
+/**
+ * return true to overwrite
+ * false to throw the error
+ */
+export type IOConflictTriggerType = (arg: IOConflictTriggerArgType) => void | boolean | Promise<void | boolean>;
 
 export interface IBaseTriggerRegistry {
   io?: {
@@ -197,6 +217,9 @@ export interface IBaseTriggerRegistry {
   search?: {
     [path: string]: SearchTriggerType;
   },
+  ioConflict?: {
+    [path: string]: IOConflictTriggerType;
+  }
 }
 
 export interface ITriggerRegistry {
@@ -217,6 +240,26 @@ function fixPaths<T>(src: T): T {
     output[actualPathKey] = src[key];
   });
   return output;
+}
+
+function mergeioConflictTriggers(
+  triggerA: IOConflictTriggerType,
+  triggerB: IOConflictTriggerType,
+) {
+  if (!triggerA) {
+    return triggerB;
+  } else if (!triggerB) {
+    return triggerA;
+  }
+
+  const mergedTrigger: IOConflictTriggerType = async (arg) => {
+    const overwrite1 = await triggerA(arg);
+    const overwrite2 = await triggerB(arg);
+
+    return (overwrite1 && overwrite2);
+  }
+
+  return mergedTrigger;
 }
 
 function mergeIOTriggers(
@@ -276,10 +319,12 @@ export function mergeTriggerRegistries(
     item: {
       io: {},
       search: {},
+      ioConflict: {},
     },
     module: {
       io: {},
       search: {},
+      ioConflict: {},
     },
   };
 
@@ -311,6 +356,15 @@ export function mergeTriggerRegistries(
           );
         });
       }
+      if (iTrigger.ioConflict) {
+        const fixed = fixPaths(iTrigger.ioConflict);
+        Object.keys(fixed).forEach((path: string) => {
+          final.item.ioConflict[path] = mergeioConflictTriggers(
+            final.item.ioConflict[path],
+            fixed[path],
+          );
+        });
+      }
     }
 
     if (modTrigger) {
@@ -328,6 +382,15 @@ export function mergeTriggerRegistries(
         Object.keys(fixed).forEach((path: string) => {
           final.module.search[path] = mergeSearchTriggers(
             final.module.search[path],
+            fixed[path],
+          );
+        });
+      }
+      if (modTrigger.ioConflict) {
+        const fixed = fixPaths(modTrigger.ioConflict);
+        Object.keys(fixed).forEach((path: string) => {
+          final.module.ioConflict[path] = mergeioConflictTriggers(
+            final.module.ioConflict[path],
             fixed[path],
           );
         });

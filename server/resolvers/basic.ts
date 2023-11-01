@@ -106,6 +106,42 @@ export function validateCustomVersion(version: string) {
   }
 }
 
+export async function handleConflictError(
+  pathOfThisIdef: string,
+  pathOfThisModule: string,
+  appData: IAppDataType,
+  error: EndpointErrorType,
+  rowValue: ISQLTableRowValue,
+) {
+  const moduleTrigger = appData.triggers.module.ioConflict[pathOfThisModule];
+  const itemTrigger = appData.triggers.item.ioConflict[pathOfThisIdef];
+
+  if (moduleTrigger && itemTrigger) {
+    const overwrite = !!(await moduleTrigger({
+      error,
+      row: rowValue,
+    }));
+    const overwrite2 = !!(await itemTrigger({
+      error,
+      row: rowValue,
+    }));
+
+    return overwrite && overwrite2;
+  } else if (moduleTrigger) {
+    return !!(await moduleTrigger({
+      error,
+      row: rowValue,
+    }));
+  } else if (itemTrigger) {
+    return !!(await itemTrigger({
+      error,
+      row: rowValue,
+    }));
+  }
+
+  return false;
+}
+
 /**
  * Given a token, it validates and provides the role information
  * for use in the system
@@ -1150,7 +1186,7 @@ export async function runPolicyCheck(
     gqlArgValue: IGQLValue,
     gqlFlattenedRequestedFiels: any,
     appData: IAppDataType,
-    preValidation?: (content: ISQLTableRowValue) => void | ISQLTableRowValue,
+    preValidation?: (content: ISQLTableRowValue) => void | ISQLTableRowValue | Promise<void | ISQLTableRowValue>,
     parentModule?: string,
     parentType?: string,
     parentId?: string,
@@ -1216,7 +1252,7 @@ export async function runPolicyCheck(
 
   // run prevalidation if given
   if (arg.preValidation) {
-    const forcedResult = arg.preValidation(selectQueryValue);
+    const forcedResult = await arg.preValidation(selectQueryValue);
     // a forced result causes the validation to short circuit
     if (typeof forcedResult !== "undefined") {
       typeof arg.rolesManager === "function" && arg.rolesManager(forcedResult);
