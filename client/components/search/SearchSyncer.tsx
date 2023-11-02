@@ -6,6 +6,7 @@ import { ModuleProvider } from "../../providers/module";
 import { IBaseSyncerHandle, IBaseSyncerHandleMechanism, useHandleMechanism } from "../util/BaseSyncer";
 import { IPropertySetterProps } from "../property/base";
 import { PropertyDefinitionSupportedType } from "../../../base/Root/Module/ItemDefinition/PropertyDefinition/types";
+import SearchLoader from "./SearchLoader";
 
 interface ISearchSyncerProps {
   id: string;
@@ -73,11 +74,21 @@ interface ISearchSyncerProps {
   alwaysRenderChildren?: boolean;
 
   /**
+   * By default a search loader is used in order to keep loaded
+   * results synchornized, use this to prevent that but notice that
+   * this may cause issues regarding synchronization, use this for optimization reasons
+   * only if you don't need to have the app show <Entry> <View> in realtime
+   * as the SearchLoader informs everything when something has changed from
+   * search results
+   */
+  noSearchLoader?: boolean;
+
+  /**
    * The children once the values are loaded and cached, if you get the fallback flag
    * as true this means that they were not actually cached and these values are just fallback
    * which is a good sign not to keep chaining providers as they will all not sync
    */
-  children?: (values: IGQLValue[], handle: IBaseSyncerHandleMechanism, info: {fallback: boolean}) => React.ReactNode;
+  children?: (values: IGQLValue[], handle: IBaseSyncerHandleMechanism, info: { fallback: boolean }) => React.ReactNode;
 }
 
 // buggy typescript I must return any because it's buggy
@@ -96,7 +107,7 @@ export default function SearchSyncer(props: ISearchSyncerProps): any {
     selfUsedFallback ? true : !!failed,
     failed,
   );
-  
+
   // ensure that there are no search results
   // when no search is available
   // results may linger as it syncs
@@ -125,10 +136,10 @@ export default function SearchSyncer(props: ISearchSyncerProps): any {
     setSelfSynced(!data.error && data.cached);
 
     if (!data.error && data.cached && !data.polyfilled) {
-      console.log("Synced search for " + (props.type || props.mod) +  " from " + props.id + " with " + data.count + " results");
+      console.log("Synced search for " + (props.type || props.mod) + " from " + props.id + " with " + data.count + " results");
     } else {
       const reason = data.polyfilled ? " polyfilled" : (data.cached ? " not cached" : " error");
-      console.log("Could not sync " + (props.type || props.mod) +  " from " + props.id + " with " + data.count + " results," + reason);
+      console.log("Could not sync " + (props.type || props.mod) + " from " + props.id + " with " + data.count + " results," + reason);
     }
 
     if (data.error) {
@@ -153,7 +164,7 @@ export default function SearchSyncer(props: ISearchSyncerProps): any {
 
   if (props.search && !props.search.cacheDoNotFallbackToSimpleSearch) {
     throw new Error("The cache search syncer needs to be in non-fallback mode " +
-    " set cacheDoNotFallbackToSimpleSearch in the automatic search options, use allowPolyfilledFallback to force a fallback");
+      " set cacheDoNotFallbackToSimpleSearch in the automatic search options, use allowPolyfilledFallback to force a fallback");
   }
 
   if (props.search && !props.search.cacheDoNotFallbackToPolyfill) {
@@ -189,7 +200,7 @@ export default function SearchSyncer(props: ISearchSyncerProps): any {
       return (
         <>
           {null}
-          {props.children([], handleMechanism, {fallback: false})}
+          {props.children([], handleMechanism, { fallback: false })}
         </>
       );
     }
@@ -204,9 +215,11 @@ export default function SearchSyncer(props: ISearchSyncerProps): any {
   }
 
   if ((actualSelfSearchResults || props.alwaysRenderChildren) && props.children) {
-    children = props.children(actualSelfSearchResults || [], handleMechanism, {fallback: selfUsedFallback});
+    children = props.children(actualSelfSearchResults || [], handleMechanism, { fallback: selfUsedFallback });
   }
 
+  // Need to use a search loader to ensure that the search
+  // results are well, loaded...
   return (
     <>
       <ModuleProvider module={props.mod}>
@@ -223,7 +236,9 @@ export default function SearchSyncer(props: ISearchSyncerProps): any {
           automaticSearchNoGraceTime={true}
           onWillSearch={onWillSearch}
           onSearch={onSearch}
-        />
+        >
+          {props.noSearchLoader ? null : <SearchLoader currentPage={0} pageSize="ALL"/>}
+        </ItemProvider>
       </ModuleProvider>
       {children}
     </>

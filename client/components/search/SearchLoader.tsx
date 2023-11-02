@@ -159,15 +159,17 @@ export interface ISearchLoaderProps {
    * large as this can be forbidden, depends on max search results
    * at once
    */
-  pageSize: number;
+  pageSize: number | "ALL";
   /**
    * The current page we are in
+   * if pageSize is ALL the current page should be 0
+   * otherwise this will cause an error
    */
   currentPage: number;
   /**
    * The children function which specifies how to retrieve these results
    */
-  children: (arg: ISearchLoaderArg) => any;
+  children?: (arg: ISearchLoaderArg) => any;
   /**
    * whether to include the policies in the resulting
    * item definition loader props
@@ -464,12 +466,12 @@ function loadValues(
 class ActualSearchLoader extends React.Component<IActualSearchLoaderProps, IActualSearchLoaderState> {
   private isUnmounted: boolean = false;
   public static getDerivedStateFromProps(props: IActualSearchLoaderProps, state: IActualSearchLoaderState) {
-    const sliceStart = props.pageSize * props.currentPage;
-    const sliceEnd = props.pageSize * (props.currentPage + 1);
-    const currentSearchRecords = (props.searchRecords || []).slice(
+    const sliceStart = typeof props.pageSize === "number" ? (props.pageSize * props.currentPage) : 0;
+    const sliceEnd = typeof props.pageSize === "number" ? props.pageSize * (props.currentPage + 1) : 0;
+    const currentSearchRecords = typeof props.pageSize === "number" ? (props.searchRecords || []).slice(
       sliceStart,
       sliceEnd,
-    );
+    ) : (props.searchRecords || []);
 
     if (
       willProduceNewHighlights(props, state.currentSearchElementType, state.currentHighlightArgs) ||
@@ -493,6 +495,10 @@ class ActualSearchLoader extends React.Component<IActualSearchLoaderProps, IActu
     this.refreshPage = this.refreshPage.bind(this);
     this.refreshPageNoCb = this.refreshPageNoCb.bind(this);
     this.getRawSearchResults = this.getRawSearchResults.bind(this);
+
+    if (props.pageSize === "ALL" && props.currentPage !== 0) {
+      console.error("Used pageSize of ALL and current page not zero at SearchLoader");
+    }
 
     // now by default it's nothing like this
     // the refresh page will populate the values based on the load
@@ -559,6 +565,10 @@ class ActualSearchLoader extends React.Component<IActualSearchLoaderProps, IActu
     this.ensureCleanupOfOldSearchResults(this.props, null);
   }
   public componentDidUpdate(prevProps: IActualSearchLoaderProps) {
+    if (this.props.pageSize === "ALL" && this.props.currentPage !== 0) {
+      console.error("Used pageSize of ALL and current page not zero at SearchLoader");
+    }
+
     // if this is a new search
     if (
       prevProps.searchId !== this.props.searchId
@@ -592,12 +602,12 @@ class ActualSearchLoader extends React.Component<IActualSearchLoaderProps, IActu
   }
   public refreshPage(isConstruct?: boolean): Partial<IActualSearchLoaderState> {
     // a refresh will reload regardless
-    const sliceStart = this.props.pageSize * this.props.currentPage;
-    const sliceEnd = this.props.pageSize * (this.props.currentPage + 1);
-    const currentSearchRecords = (this.props.searchRecords || []).slice(
+    const sliceStart = typeof this.props.pageSize === "number" ? (this.props.pageSize * this.props.currentPage) : 0;
+    const sliceEnd = typeof this.props.pageSize === "number" ? (this.props.pageSize * (this.props.currentPage + 1)) : 0;
+    const currentSearchRecords = typeof this.props.pageSize === "number" ? (this.props.searchRecords || []).slice(
       sliceStart,
       sliceEnd,
-    );
+    ) : (this.props.searchRecords || []);
     return loadValues(this.props, this.state, currentSearchRecords, this.isUnmounted, isConstruct, this);
   }
   public dismissError() {
@@ -976,10 +986,14 @@ class ActualSearchLoader extends React.Component<IActualSearchLoaderProps, IActu
       !equals(this.state, nextState, { strict: true });
   }
   public render() {
+    if (!this.props.children) {
+      return null;
+    }
+
     // the accessible count is just the length of the search records
     const accessibleCount = (this.props.searchRecords || []).length;
     // the page count, is the top from the page size, or 0 if accessible count is 0
-    const pageCount = accessibleCount === 0 ? 0 : Math.ceil(accessibleCount / this.props.pageSize);
+    const pageCount = accessibleCount === 0 ? 0 : (typeof this.props.pageSize === "number" ? Math.ceil(accessibleCount / this.props.pageSize) : 1);
     // the total count is the search count or 0, the search count is a count(*) from the database
     const totalCount = this.props.searchCount || 0;
 
