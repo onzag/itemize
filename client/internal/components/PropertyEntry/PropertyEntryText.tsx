@@ -872,6 +872,7 @@ export default class PropertyEntryText
       this.props.hideLabel !== nextProps.hideLabel ||
       this.props.hidePlaceholder !== nextProps.hidePlaceholder ||
       !!this.props.ignoreErrors !== !!nextProps.ignoreErrors ||
+      this.props.useAppliedValue !== nextProps.useAppliedValue ||
       nextProps.language !== this.props.language ||
       nextProps.languageOverride !== this.props.languageOverride ||
       nextProps.i18n !== this.props.i18n ||
@@ -937,14 +938,20 @@ export default class PropertyEntryText
       }
     }
 
-    const currentValue = this.props.state.value as IPropertyDefinitionSupportedTextType;
+    const currentValue = this.props.useAppliedValue ?
+      this.props.state.stateAppliedValue as IPropertyDefinitionSupportedTextType :
+      this.props.state.value as IPropertyDefinitionSupportedTextType;
     let currentValueText = (currentValue && currentValue.value) || null;
     const currentValueLang = (currentValue && currentValue.language) || null;
     // we only want to purify values that haven't been manually set by the user, other
     // than that we can trust the value, it'd be a waste
     if (isRichText && currentValue && !this.props.state.stateValueHasBeenManuallySet) {
       const currentFiles: PropertyDefinitionSupportedFilesType = this.cachedMediaProperty &&
-        this.cachedMediaProperty.getCurrentValue(this.props.forId || null, this.props.forVersion || null) as PropertyDefinitionSupportedFilesType;
+        (
+          this.props.useAppliedValue ?
+            this.cachedMediaProperty.getAppliedValue(this.props.forId || null, this.props.forVersion || null) as PropertyDefinitionSupportedFilesType :
+            this.cachedMediaProperty.getCurrentValue(this.props.forId || null, this.props.forVersion || null) as PropertyDefinitionSupportedFilesType
+        );
 
       currentValueText = sanitize(
         {
@@ -1016,10 +1023,10 @@ export default class PropertyEntryText
 
       currentAppliedValue: this.props.state.stateAppliedValue as IPropertyDefinitionSupportedTextType,
       currentValue,
-      currentValid: !isCurrentlyShownAsInvalid && !this.props.forceInvalid,
-      currentInvalidReason: i18nInvalidReason,
-      currentInternalValue: this.props.state.internalValue,
-      canRestore: canRestoreCalculator(this.props.state.value, this.props.state.stateAppliedValue),
+      currentValid: this.props.useAppliedValue && !this.props.forceInvalid ? false : !isCurrentlyShownAsInvalid && !this.props.forceInvalid,
+      currentInvalidReason: this.props.useAppliedValue ? null : i18nInvalidReason,
+      currentInternalValue: this.props.useAppliedValue ? null : this.props.state.internalValue,
+      canRestore: this.props.useAppliedValue ? false : canRestoreCalculator(this.props.state.value, this.props.state.stateAppliedValue),
 
       currentValueText,
       currentValueLang,
@@ -1027,7 +1034,7 @@ export default class PropertyEntryText
       disabled:
         typeof this.props.disabled !== "undefined" && this.props.disabled !== null ?
           this.props.disabled :
-          this.props.state.enforced,
+          (this.props.useAppliedValue || this.props.state.enforced),
 
       autoFocus: this.props.autoFocus || false,
 
@@ -1162,7 +1169,7 @@ export default class PropertyEntryText
       features,
       isRichText,
 
-      lastLoadedFileError,
+      lastLoadedFileError: this.props.useAppliedValue ? null : lastLoadedFileError,
       dismissLastLoadedFileError: this.dismissLastLoadedFileError,
 
       onChange: supportsMedia ? this.onChangeHijacked : this.props.onChange,

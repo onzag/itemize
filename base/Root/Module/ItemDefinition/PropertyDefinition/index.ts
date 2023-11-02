@@ -1864,6 +1864,8 @@ export default class PropertyDefinition {
       this.stateValueHasBeenManuallySet[mergedID] = false;
     }
 
+    const oldAppliedValue = this.stateAppliedValue[mergedID];
+
     // this value does not come from the server
     // it's just applied to change its state
     if (!rejectStateAppliedValue) {
@@ -1882,27 +1884,39 @@ export default class PropertyDefinition {
     // only truly happens client side
     if ((this.getType() === "files" || this.getType() === "file") && URL.revokeObjectURL) {
       const actualValue = this.stateValue[mergedID];
+      const actualAppliedValue = this.stateAppliedValue[mergedID];
       const previousValue = currentValue;
+      const previousAppliedValue = oldAppliedValue;
 
       // we will revoke anything of the urls that are in memory for files
-      if (previousValue) {
-        if (this.getType() === "file") {
-          if (
-            (previousValue as IGQLFile).url.startsWith("blob:") &&
-            (!actualValue || (actualValue as IGQLFile).url !== (previousValue as IGQLFile).url)
-          ) {
-            PropertyDefinition.revokeFileForProperty(previousValue as IGQLFile);
+      for (let previousValueToWorkWith of [previousValue, previousAppliedValue]) {
+        if (previousValueToWorkWith) {
+          if (this.getType() === "file") {
+            if (
+              (previousValueToWorkWith as IGQLFile).url.startsWith("blob:") &&
+              (!actualValue || (actualValue as IGQLFile).url !== (previousValueToWorkWith as IGQLFile).url) &&
+              (!actualAppliedValue || (actualAppliedValue as IGQLFile).url !== (actualAppliedValue as IGQLFile).url)
+            ) {
+              PropertyDefinition.revokeFileForProperty(previousValueToWorkWith as IGQLFile);
+            }
+          } else {
+            let actualValueArr: IGQLFile[] = [];
+            if (actualValue) {
+              actualValueArr = actualValueArr.concat(actualValue as IGQLFile[]);
+            }
+            if (actualAppliedValue) {
+              actualValueArr = actualValueArr.concat(actualAppliedValue as IGQLFile[]);
+            }
+            (previousValueToWorkWith as IGQLFile[]).forEach((p) => {
+              if (!p.url.startsWith("blob:")) {
+                return;
+              }
+              const shouldRevoke = !(actualValueArr as IGQLFile[]).find((v) => v.url === p.url);
+              if (shouldRevoke) {
+                PropertyDefinition.revokeFileForProperty(p);
+              }
+            });
           }
-        } else {
-          (previousValue as IGQLFile[]).forEach((p) => {
-            if (!p.url.startsWith("blob:")) {
-              return;
-            }
-            const shouldRevoke = actualValue ? !(actualValue as IGQLFile[]).find((v) => v.url === p.url) : true;
-            if (shouldRevoke) {
-              PropertyDefinition.revokeFileForProperty(p);
-            }
-          });
         }
       }
     }

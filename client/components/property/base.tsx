@@ -147,7 +147,15 @@ export interface IPropertyEntryProps<RendererPropsType> extends IPropertyBaseWit
   handleAs?: {
     type: string;
     subtype?: string;
-  }
+  };
+
+  /**
+   * uses the applied value to display
+   * NOTE: this makes the entry basically readonly
+   * as it can't update the value, use this only
+   * in disabled entries
+   */
+  useAppliedValue?: boolean;
 }
 
 /**
@@ -619,6 +627,7 @@ export function EntryViewReadSet(
         displayHidden={props.displayHidden}
         languageOverride={props.languageOverride}
         handleAs={props.handleAs}
+        useAppliedValue={props.useAppliedValue}
       />
     );
   } else {

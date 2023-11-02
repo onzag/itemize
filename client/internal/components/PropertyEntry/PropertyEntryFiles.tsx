@@ -151,8 +151,8 @@ interface IPropertyEntryFilesState {
  */
 export default class PropertyEntryFile
   extends React.Component<
-  IPropertyEntryHandlerProps<PropertyDefinitionSupportedFilesType, IPropertyEntryFilesRendererProps>,
-  IPropertyEntryFilesState
+    IPropertyEntryHandlerProps<PropertyDefinitionSupportedFilesType, IPropertyEntryFilesRendererProps>,
+    IPropertyEntryFilesState
   > {
 
   /**
@@ -210,6 +210,7 @@ export default class PropertyEntryFile
       this.props.hideLabel !== nextProps.hideLabel ||
       this.props.hidePlaceholder !== nextProps.hidePlaceholder ||
       !!this.props.ignoreErrors !== !!nextProps.ignoreErrors ||
+      this.props.useAppliedValue !== nextProps.useAppliedValue ||
       nextProps.language !== this.props.language ||
       nextProps.languageOverride !== this.props.languageOverride ||
       nextProps.i18n !== this.props.i18n ||
@@ -244,7 +245,11 @@ export default class PropertyEntryFile
    */
   private getCurrentValue(doNotAbsolute: boolean) {
     const currentValue: PropertyDefinitionSupportedFilesType = (
-      this.props.state.value as PropertyDefinitionSupportedFilesType || []
+      (
+        this.props.useAppliedValue ?
+          (this.props.state.stateAppliedValue as PropertyDefinitionSupportedFilesType) :
+          (this.props.state.value as PropertyDefinitionSupportedFilesType)
+      ) || []
     ).map((v) => {
       if (v.url.indexOf("blob:") !== 0) {
         if (this.ownedObjectURLPool[v.id]) {
@@ -647,18 +652,20 @@ export default class PropertyEntryFile
     }
     genericSelectLabel = capitalize(genericSelectLabel);
 
-    const canRestore = !this.props.state.value ? (
-      this.props.state.value !== this.props.state.stateAppliedValue
-    ) : !(this.props.state.value as PropertyDefinitionSupportedFilesType).every((v, index) => {
-      if (!this.props.state.stateAppliedValue) {
-        return false;
-      }
-      const stateValueCounterpart = this.props.state.stateAppliedValue[index];
-      if (!stateValueCounterpart) {
-        return false;
-      }
-      return (v.id === stateValueCounterpart.id);
-    });
+    const canRestore = this.props.useAppliedValue ? false : (
+      !this.props.state.value ? (
+        this.props.state.value !== this.props.state.stateAppliedValue
+      ) : !(this.props.state.value as PropertyDefinitionSupportedFilesType).every((v, index) => {
+        if (!this.props.state.stateAppliedValue) {
+          return false;
+        }
+        const stateValueCounterpart = this.props.state.stateAppliedValue[index];
+        if (!stateValueCounterpart) {
+          return false;
+        }
+        return (v.id === stateValueCounterpart.id);
+      })
+    );
 
     const RendererElement = this.props.renderer;
     const rendererArgs: IPropertyEntryFilesRendererProps = {
@@ -676,15 +683,17 @@ export default class PropertyEntryFile
       languageOverride: this.props.languageOverride,
 
       currentAppliedValue: this.props.state.stateAppliedValue as PropertyDefinitionSupportedFilesType,
-      currentValue: this.props.state.value as PropertyDefinitionSupportedFilesType,
-      currentValid: !isCurrentlyShownAsInvalid && !this.props.forceInvalid,
-      currentInvalidReason: i18nInvalidReason,
-      currentInternalValue: this.props.state.internalValue,
+      currentValue: this.props.useAppliedValue ?
+        this.props.state.stateAppliedValue as PropertyDefinitionSupportedFilesType :
+        this.props.state.value as PropertyDefinitionSupportedFilesType,
+      currentValid: this.props.useAppliedValue && !this.props.forceInvalid ? false : !isCurrentlyShownAsInvalid && !this.props.forceInvalid,
+      currentInvalidReason: this.props.useAppliedValue ? null : i18nInvalidReason,
+      currentInternalValue: this.props.useAppliedValue ? null : this.props.state.internalValue,
 
       disabled:
         typeof this.props.disabled !== "undefined" && this.props.disabled !== null ?
           this.props.disabled :
-          this.props.state.enforced,
+          (this.props.useAppliedValue || this.props.state.enforced),
       autoFocus: this.props.autoFocus || false,
       onChange: this.props.onChange,
       onRestore: this.props.onRestore,

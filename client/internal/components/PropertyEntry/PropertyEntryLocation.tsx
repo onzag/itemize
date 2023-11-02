@@ -294,6 +294,7 @@ export default class PropertyEntryLocation
       this.props.hideLabel !== nextProps.hideLabel ||
       this.props.hidePlaceholder !== nextProps.hidePlaceholder ||
       !!this.props.ignoreErrors !== !!nextProps.ignoreErrors ||
+      this.props.useAppliedValue !== nextProps.useAppliedValue ||
       nextProps.language !== this.props.language ||
       nextProps.languageOverride !== this.props.languageOverride ||
       nextProps.i18n !== this.props.i18n ||
@@ -757,8 +758,14 @@ export default class PropertyEntryLocation
       i18nInvalidReason = i18nData.error[invalidReason];
     }
 
-    const currentValue: IPropertyDefinitionSupportedLocationType = this.props.state.value as IPropertyDefinitionSupportedLocationType;
-    const searchQuery = this.props.state.internalValue || (currentValue && currentValue.txt) || "";
+    const currentValue: IPropertyDefinitionSupportedLocationType = (
+      this.props.useAppliedValue ?
+      this.props.state.stateAppliedValue as IPropertyDefinitionSupportedLocationType :
+      this.props.state.value as IPropertyDefinitionSupportedLocationType
+    );
+    const searchQuery = this.props.useAppliedValue ? ((currentValue && currentValue.txt) || "") : (
+      this.props.state.internalValue || (currentValue && currentValue.txt) || ""
+    );
 
     const activeSearchResults = this.state.searchResults;
     const nextSearchResult: IPropertyDefinitionSupportedLocationType =
@@ -799,18 +806,18 @@ export default class PropertyEntryLocation
 
       currentAppliedValue: this.props.state.stateAppliedValue as IPropertyDefinitionSupportedLocationType,
       currentValue,
-      currentValid: !isCurrentlyShownAsInvalid && !this.props.forceInvalid,
-      currentInvalidReason: i18nInvalidReason,
-      currentInternalValue: this.props.state.internalValue,
+      currentValid: this.props.useAppliedValue && !this.props.forceInvalid ? null : !isCurrentlyShownAsInvalid && !this.props.forceInvalid,
+      currentInvalidReason: this.props.useAppliedValue ? null : i18nInvalidReason,
+      currentInternalValue: this.props.useAppliedValue ? null : this.props.state.internalValue,
 
       disabled:
         typeof this.props.disabled !== "undefined" && this.props.disabled !== null ?
         this.props.disabled :
-        this.props.state.enforced,
+        (this.props.useAppliedValue || this.props.state.enforced),
       autoFocus: this.props.autoFocus || false,
       onChange: this.props.onChange,
       onRestore: this.onRestoreHijacked,
-      canRestore: !this.props.property.getPropertyDefinitionDescription().localEqual(
+      canRestore: this.props.useAppliedValue ? false : !this.props.property.getPropertyDefinitionDescription().localEqual(
         {
           itemDefinition: this.props.itemDefinition, 
           a: this.props.state.stateAppliedValue,
@@ -832,13 +839,13 @@ export default class PropertyEntryLocation
       clearSearchResults: this.clearSearchResults,
 
       viewport: this.state.viewport,
-      searchSuggestions: this.state.suggestions,
+      searchSuggestions: this.props.useAppliedValue ? [] : this.state.suggestions,
       searchQuery,
-      activeSearchResults,
-      nextSearchResult,
-      nextSearchResultCircular,
-      prevSearchResult,
-      prevSearchResultCircular,
+      activeSearchResults: this.props.useAppliedValue ? [] : activeSearchResults,
+      nextSearchResult: this.props.useAppliedValue ? null : nextSearchResult,
+      nextSearchResultCircular: this.props.useAppliedValue ? null : nextSearchResultCircular,
+      prevSearchResult: this.props.useAppliedValue ? null : prevSearchResult,
+      prevSearchResultCircular: this.props.useAppliedValue ? null : prevSearchResultCircular,
 
       enableUserSetErrors: this.enableUserSetErrors,
     };

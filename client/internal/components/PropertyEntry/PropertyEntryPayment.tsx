@@ -223,11 +223,12 @@ export default class PropertyEntryPayment extends React.Component<
 
     return nextState.showUserSetErrors !== this.state.showUserSetErrors ||
       nextProps.property !== this.props.property ||
-      !equals(this.props.state, nextProps.state, {strict: true}) ||
+      !equals(this.props.state, nextProps.state, { strict: true }) ||
       !!this.props.poked !== !!nextProps.poked ||
       !!this.props.forceInvalid !== !!nextProps.forceInvalid ||
       this.props.altDescription !== nextProps.altDescription ||
       this.props.altPlaceholder !== nextProps.altPlaceholder ||
+      this.props.useAppliedValue !== nextProps.useAppliedValue ||
       this.props.altLabel !== nextProps.altLabel ||
       this.props.hideLabel !== nextProps.hideLabel ||
       this.props.hidePlaceholder !== nextProps.hidePlaceholder ||
@@ -262,12 +263,14 @@ export default class PropertyEntryPayment extends React.Component<
       i18nInvalidReason = i18nData.error[invalidReason];
     }
 
-    const currentTextualValueOfAmount = this.props.state.value ?
+    const valueToUse = this.props.useAppliedValue ? this.props.state.stateAppliedValue : this.props.state.value;
+
+    const currentTextualValueOfAmount = valueToUse ?
       (
         typeof this.props.state.internalValue === "string" ?
-        this.props.state.internalValue :
-        (this.props.state.value as IPropertyDefinitionSupportedPaymentType)
-          .amount.toString().replace(/\./g, this.props.i18n[this.props.language].number_decimal_separator)
+          this.props.state.internalValue :
+          (valueToUse as IPropertyDefinitionSupportedPaymentType)
+            .amount.toString().replace(/\./g, this.props.i18n[this.props.language].number_decimal_separator)
       ) :
       null;
 
@@ -275,9 +278,9 @@ export default class PropertyEntryPayment extends React.Component<
 
     const countrySelectedCurrency = this.props.currency.code;
     const currentCurrency = (
-      this.props.state.value ?
-      (this.props.state.value as IPropertyDefinitionSupportedPaymentType).currency :
-      countrySelectedCurrency
+      valueToUse ?
+        (valueToUse as IPropertyDefinitionSupportedPaymentType).currency :
+        countrySelectedCurrency
     );
     const currencyFormat = this.props.i18n[this.props.language].currency_format;
     const currencyI18n = {
@@ -348,17 +351,19 @@ export default class PropertyEntryPayment extends React.Component<
       currencyAvailable,
 
       currentAppliedValue: this.props.state.stateAppliedValue as IPropertyDefinitionSupportedPaymentType,
-      currentValue: this.props.state.value as IPropertyDefinitionSupportedPaymentType,
-      currentValid: !isCurrentlyShownAsInvalid && !this.props.forceInvalid,
+      currentValue: this.props.useAppliedValue ?
+        this.props.state.stateAppliedValue as IPropertyDefinitionSupportedPaymentType :
+        this.props.state.value as IPropertyDefinitionSupportedPaymentType,
+      currentValid: this.props.useAppliedValue && !this.props.forceInvalid ? false : !isCurrentlyShownAsInvalid && !this.props.forceInvalid,
       currentTextualValueOfAmount,
-      currentInvalidReason: i18nInvalidReason,
-      currentInternalValue: this.props.state.internalValue,
-      canRestore: (this.props.state.value || false) !== (this.props.state.stateAppliedValue || false),
+      currentInvalidReason: this.props.useAppliedValue ? null : i18nInvalidReason,
+      currentInternalValue: this.props.useAppliedValue ? null : this.props.state.internalValue,
+      canRestore: this.props.useAppliedValue ? false : ((this.props.state.value || false) !== (this.props.state.stateAppliedValue || false)),
 
       disabled:
         typeof this.props.disabled !== "undefined" && this.props.disabled !== null ?
-        this.props.disabled :
-        this.props.state.enforced,
+          this.props.disabled :
+          (this.props.useAppliedValue || this.props.state.enforced),
       autoFocus: this.props.autoFocus || false,
       onChange: this.props.onChange,
       onRestore: this.props.onRestore,

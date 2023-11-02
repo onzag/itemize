@@ -682,7 +682,7 @@ export default class ItemDefinition {
    * serialized, the serialized state removes possible useless data
    * @param state 
    */
-  public static getSerializableState(state: IItemStateType, pOverrides?: IPropertyOverride[]): IItemStateType {
+  public static getSerializableState(state: IItemStateType, pOverrides?: IPropertyOverride[], applyEnforcedValues?: boolean): IItemStateType {
     const newState: IItemStateType = {
       forId: state.forId,
       forVersion: state.forVersion,
@@ -703,8 +703,8 @@ export default class ItemDefinition {
         override = pOverrides.find((p2) => p2.id === p.propertyId);
       }
       newState.properties[index] = {
-        stateValue: override ? override.value : p.stateValue,
-        stateValueModified: override ? true : p.stateValueModified,
+        stateValue: override ? override.value : (applyEnforcedValues ? p.value : p.stateValue),
+        stateValueModified: (override || applyEnforcedValues) ? true : p.stateValueModified,
         propertyId: p.propertyId,
       } as any;
     });

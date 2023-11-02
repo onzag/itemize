@@ -52,6 +52,7 @@ export default class PropertyEntryTagList extends React.Component<
       this.props.hideLabel !== nextProps.hideLabel ||
       this.props.hidePlaceholder !== nextProps.hidePlaceholder ||
       !!this.props.ignoreErrors !== !!nextProps.ignoreErrors ||
+      this.props.useAppliedValue !== nextProps.useAppliedValue ||
       nextProps.language !== this.props.language ||
       nextProps.languageOverride !== this.props.languageOverride ||
       nextProps.i18n !== this.props.i18n ||
@@ -84,7 +85,7 @@ export default class PropertyEntryTagList extends React.Component<
     const rendererArgs: IPropertyEntryTagListRendererProps = {
       propertyId: this.props.property.getId(),
       uniqueId: this.props.property.getUniqueIdentifier(this.props.forId, this.props.forVersion),
-  
+
       args: this.props.rendererArgs || {},
       rtl: this.props.rtl,
       label: i18nLabel,
@@ -94,16 +95,18 @@ export default class PropertyEntryTagList extends React.Component<
       languageOverride: this.props.languageOverride,
 
       currentAppliedValue: this.props.state.stateAppliedValue as PropertyDefinitionSupportedTagListType,
-      currentValue: this.props.state.value as PropertyDefinitionSupportedTagListType,
-      currentValid: !isCurrentlyShownAsInvalid && !this.props.forceInvalid,
-      currentInvalidReason: i18nInvalidReason,
-      currentInternalValue: this.props.state.internalValue,
-      canRestore: (this.props.state.value || false) !== (this.props.state.stateAppliedValue || false),
+      currentValue: this.props.useAppliedValue ?
+        this.props.state.stateAppliedValue as PropertyDefinitionSupportedTagListType :
+        this.props.state.value as PropertyDefinitionSupportedTagListType,
+      currentValid: this.props.useAppliedValue && !this.props.forceInvalid ? false : !isCurrentlyShownAsInvalid && !this.props.forceInvalid,
+      currentInvalidReason: this.props.useAppliedValue ? null : i18nInvalidReason,
+      currentInternalValue: this.props.useAppliedValue ? null : this.props.state.internalValue,
+      canRestore: this.props.useAppliedValue ? false : ((this.props.state.value || false) !== (this.props.state.stateAppliedValue || false)),
 
       disabled:
         typeof this.props.disabled !== "undefined" && this.props.disabled !== null ?
-        this.props.disabled :
-        this.props.state.enforced,
+          this.props.disabled :
+          this.props.state.enforced,
       autoFocus: this.props.autoFocus || false,
       onChange: this.props.onChange,
       onRestore: this.props.onRestore,

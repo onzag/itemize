@@ -346,6 +346,12 @@ export interface IPropertyEntryMainHandlerProps<ValueType extends PropertyDefini
     type: string;
     subtype?: string;
   }
+
+  /**
+   * Use the applied value rather than the stateful value
+   * NOTE: this makes the field virtually readonly
+   */
+  useAppliedValue?: boolean;
 }
 
 /**

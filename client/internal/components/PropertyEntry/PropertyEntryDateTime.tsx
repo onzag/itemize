@@ -53,10 +53,10 @@ export interface IPropertyEntryDateTimeRendererProps extends IPropertyEntryRende
 }
 
 export default class PropertyEntryDateTime extends
- React.Component<
-  IPropertyEntryHandlerProps<PropertyDefinitionSupportedDateType, IPropertyEntryDateTimeRendererProps>,
-  IPropertyEntryDateTimeState
-> {
+  React.Component<
+    IPropertyEntryHandlerProps<PropertyDefinitionSupportedDateType, IPropertyEntryDateTimeRendererProps>,
+    IPropertyEntryDateTimeState
+  > {
   constructor(props: IPropertyEntryHandlerProps<PropertyDefinitionSupportedDateType, IPropertyEntryDateTimeRendererProps>) {
     super(props);
 
@@ -67,8 +67,10 @@ export default class PropertyEntryDateTime extends
     this.state = {
       value: getValue(
         false,
-        props.state.internalValue,
-        props.state.value as PropertyDefinitionSupportedDateType,
+        props.useAppliedValue ? null : props.state.internalValue,
+        props.useAppliedValue ?
+          props.state.stateAppliedValue as PropertyDefinitionSupportedDateType :
+          props.state.value as PropertyDefinitionSupportedDateType,
         props.property.getType(),
       ),
       showUserSetErrors: false,
@@ -90,6 +92,7 @@ export default class PropertyEntryDateTime extends
       !!this.props.forceInvalid !== !!nextProps.forceInvalid ||
       this.props.altDescription !== nextProps.altDescription ||
       this.props.altPlaceholder !== nextProps.altPlaceholder ||
+      this.props.useAppliedValue !== nextProps.useAppliedValue ||
       this.props.altLabel !== nextProps.altLabel ||
       this.props.hideLabel !== nextProps.hideLabel ||
       this.props.hidePlaceholder !== nextProps.hidePlaceholder ||
@@ -109,15 +112,18 @@ export default class PropertyEntryDateTime extends
     this.setState({
       value: getValue(
         false,
-        this.props.state.internalValue,
-        this.props.state.value as PropertyDefinitionSupportedDateType,
+        this.props.useAppliedValue ? null : this.props.state.internalValue,
+        this.props.useAppliedValue ?
+          this.props.state.stateAppliedValue as PropertyDefinitionSupportedDateType :
+          this.props.state.value as PropertyDefinitionSupportedDateType,
         this.props.property.getType(),
       ),
     });
   }
   public componentDidUpdate(prevProps: IPropertyEntryHandlerProps<PropertyDefinitionSupportedDateType, IPropertyEntryDateTimeRendererProps>) {
     // if the value is null we update accordingly
-    if (this.props.state.value === null) {
+    const valueToUse = (this.props.useAppliedValue ? this.props.state.stateAppliedValue : this.props.state.value);
+    if (valueToUse === null) {
       if (this.state.value !== null) {
         this.setState({
           value: null,
@@ -138,7 +144,7 @@ export default class PropertyEntryDateTime extends
     } else if (type === "time") {
       dbFormat = TIME_FORMAT;
     }
-    const valueParsed = Moment(this.props.state.value as string, dbFormat);
+    const valueParsed = Moment(valueToUse, dbFormat);
     if (valueParsed.isValid() && !valueParsed.isSame(this.state.value)) {
       this.setState({
         value: valueParsed,
@@ -186,7 +192,7 @@ export default class PropertyEntryDateTime extends
     ) {
       i18nInvalidReason = i18nData.error[invalidReason];
     }
-    
+
     const type = this.props.property.getType() as any;
 
     let dateTimeFormat: string;
@@ -212,11 +218,11 @@ export default class PropertyEntryDateTime extends
       languageOverride: this.props.languageOverride,
 
       currentAppliedValue: this.props.state.stateAppliedValue as string,
-      currentValue: this.props.state.value as string,
-      currentValid: !isCurrentlyShownAsInvalid && !this.props.forceInvalid,
-      currentInvalidReason: i18nInvalidReason,
-      currentInternalValue: this.props.state.internalValue,
-      canRestore: this.props.state.value !== this.props.state.stateAppliedValue,
+      currentValue: this.props.useAppliedValue ? this.props.state.stateAppliedValue as string : this.props.state.value as string,
+      currentValid: this.props.useAppliedValue && !this.props.forceInvalid ? true : (!isCurrentlyShownAsInvalid && !this.props.forceInvalid),
+      currentInvalidReason: this.props.useAppliedValue ? null : i18nInvalidReason,
+      currentInternalValue: this.props.useAppliedValue ? null : this.props.state.internalValue,
+      canRestore: this.props.useAppliedValue ? false : (this.props.state.value !== this.props.state.stateAppliedValue),
 
       momentValue: this.state.value,
       type,
@@ -224,8 +230,8 @@ export default class PropertyEntryDateTime extends
 
       disabled:
         typeof this.props.disabled !== "undefined" && this.props.disabled !== null ?
-        this.props.disabled :
-        this.props.state.enforced,
+          this.props.disabled :
+          (this.props.useAppliedValue || this.props.state.enforced),
 
       autoFocus: this.props.autoFocus || false,
 
@@ -238,6 +244,6 @@ export default class PropertyEntryDateTime extends
       enableUserSetErrors: this.enableUserSetErrors,
     };
 
-    return <RendererElement {...rendererArgs}/>
+    return <RendererElement {...rendererArgs} />
   }
 }

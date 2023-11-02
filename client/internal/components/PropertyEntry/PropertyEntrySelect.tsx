@@ -94,6 +94,7 @@ export default class PropertyEntrySelect
       this.props.altLabel !== nextProps.altLabel ||
       this.props.hideLabel !== nextProps.hideLabel ||
       this.props.hidePlaceholder !== nextProps.hidePlaceholder ||
+      this.props.useAppliedValue !== nextProps.useAppliedValue ||
       !!this.props.ignoreErrors !== !!nextProps.ignoreErrors ||
       nextProps.language !== this.props.language ||
       nextProps.languageOverride !== this.props.languageOverride ||
@@ -124,7 +125,9 @@ export default class PropertyEntrySelect
       i18nValue: i18nData.values[v] || v,
       value: v,
     }));
-    const currentValue = this.props.state.value as any;
+    const currentValue = this.props.useAppliedValue ?
+      this.props.state.stateAppliedValue as any :
+      this.props.state.value as any;
     const isNullable = this.props.property.isNullable() && !this.props.property.isCoercedIntoDefaultWhenNull();
 
     const type = this.props.property.getType();
@@ -159,16 +162,16 @@ export default class PropertyEntrySelect
 
       currentAppliedValue: this.props.state.stateAppliedValue as any,
       currentValue,
-      currentValid: !isCurrentlyShownAsInvalid && !this.props.forceInvalid,
-      currentInvalidReason: i18nInvalidReason,
-      currentInternalValue: this.props.state.internalValue,
+      currentValid: this.props.useAppliedValue && !this.props.forceInvalid ? false : !isCurrentlyShownAsInvalid && !this.props.forceInvalid,
+      currentInvalidReason: this.props.useAppliedValue ? null : i18nInvalidReason,
+      currentInternalValue: this.props.useAppliedValue ? null : this.props.state.internalValue,
       currentI18nValue,
-      canRestore: this.props.state.value !== this.props.state.stateAppliedValue,
+      canRestore: this.props.useAppliedValue ? false : this.props.state.value !== this.props.state.stateAppliedValue,
 
       disabled:
         typeof this.props.disabled !== "undefined" && this.props.disabled !== null ?
-        this.props.disabled :
-        this.props.state.enforced,
+          this.props.disabled :
+          this.props.state.enforced,
 
       autoFocus: this.props.autoFocus || false,
 
@@ -177,6 +180,6 @@ export default class PropertyEntrySelect
       enableUserSetErrors: this.enableUserSetErrors,
     };
 
-    return <RendererElement {...rendererArgs}/>
+    return <RendererElement {...rendererArgs} />
   }
 }

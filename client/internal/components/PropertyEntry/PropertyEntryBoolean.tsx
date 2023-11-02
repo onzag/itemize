@@ -84,6 +84,7 @@ export default class PropertyEntryBoolean extends React.Component<
       this.props.altLabel !== nextProps.altLabel ||
       this.props.hideLabel !== nextProps.hideLabel ||
       this.props.hidePlaceholder !== nextProps.hidePlaceholder ||
+      this.props.useAppliedValue !== nextProps.useAppliedValue ||
       !!this.props.ignoreErrors !== !!nextProps.ignoreErrors ||
       nextProps.language !== this.props.language ||
       nextProps.languageOverride !== this.props.languageOverride ||
@@ -146,16 +147,18 @@ export default class PropertyEntryBoolean extends React.Component<
       nullLabel,
 
       currentAppliedValue: this.props.state.stateAppliedValue as boolean,
-      currentValue: isTernary ? (this.props.state.value as boolean) : ((this.props.state.value as boolean) || false),
-      currentValid: !isCurrentlyShownAsInvalid && !this.props.forceInvalid,
-      currentInvalidReason: i18nInvalidReason,
-      currentInternalValue: this.props.state.internalValue,
-      canRestore: (this.props.state.value || false) !== (this.props.state.stateAppliedValue || false),
+      currentValue: isTernary ?
+        (this.props.useAppliedValue ? this.props.state.stateAppliedValue as boolean : this.props.state.value as boolean) :
+        ((this.props.useAppliedValue ? this.props.state.stateAppliedValue as boolean : this.props.state.value as boolean) || false),
+      currentValid: this.props.useAppliedValue && !this.props.forceInvalid ? true : (!isCurrentlyShownAsInvalid && !this.props.forceInvalid),
+      currentInvalidReason: this.props.useAppliedValue ? null : i18nInvalidReason,
+      currentInternalValue: this.props.useAppliedValue ? null : this.props.state.internalValue,
+      canRestore: this.props.useAppliedValue ? false : ((this.props.state.value || false) !== (this.props.state.stateAppliedValue || false)),
 
       disabled:
         typeof this.props.disabled !== "undefined" && this.props.disabled !== null ?
         this.props.disabled :
-        this.props.state.enforced,
+        (this.props.useAppliedValue || this.props.state.enforced),
       autoFocus: this.props.autoFocus || false,
       onChange: this.props.onChange,
       onRestore: this.onRestoreHijacked,

@@ -420,6 +420,7 @@ export default class PropertyEntryField
       nextProps.country.code !== this.props.country.code ||
       this.props.altDescription !== nextProps.altDescription ||
       this.props.altPlaceholder !== nextProps.altPlaceholder ||
+      this.props.useAppliedValue !== nextProps.useAppliedValue ||
       this.props.altLabel !== nextProps.altLabel ||
       this.props.hideLabel !== nextProps.hideLabel ||
       this.props.hidePlaceholder !== nextProps.hidePlaceholder ||
@@ -762,6 +763,8 @@ export default class PropertyEntryField
     const i18nDescription = this.props.hideDescription ? null : (typeof this.props.altDescription !== "undefined" ? this.props.altDescription : (i18nData && i18nData.description));
     const i18nPlaceholder = this.props.hidePlaceholder ? null : (this.props.altPlaceholder || (i18nData && i18nData.placeholder));
 
+    const valueToUse = this.props.useAppliedValue ? this.props.state.stateAppliedValue : this.props.state.value;
+
     // get the invalid reason if any
     const invalidReason = this.props.state.invalidReason;
     const isCurrentlyShownAsInvalid = !this.props.ignoreErrors &&
@@ -849,8 +852,8 @@ export default class PropertyEntryField
 
     let currentValueLang: string = null;
 
-    if (type === "text" && this.props.state.value) {
-      currentValueLang = (this.props.state.value as any).language || null;
+    if (type === "text" && valueToUse) {
+      currentValueLang = (valueToUse as any).language || null;
     }
 
     let currentTextualValue: string = (type === "unit" || type === "currency" || type === "text") && this.props.state.internalValue ?
@@ -858,12 +861,12 @@ export default class PropertyEntryField
 
     if (!currentTextualValue) {
       if (type === "text") {
-        currentTextualValue = this.props.state.value ?
-          (this.props.state.value as any).value : "";
+        currentTextualValue = valueToUse ?
+          (valueToUse as any).value : "";
       } else {
-        currentTextualValue = (type === "unit" || type === "currency") && this.props.state.value ?
-          (this.props.state.value as any).value.toString() : (
-            this.props.state.value && this.props.state.value.toString()
+        currentTextualValue = (type === "unit" || type === "currency") && valueToUse ?
+          (valueToUse as any).value.toString() : (
+            valueToUse && valueToUse.toString()
           );
       }
     }
@@ -897,18 +900,18 @@ export default class PropertyEntryField
       languageOverride: this.props.languageOverride,
 
       currentAppliedValue: this.props.state.stateAppliedValue as any,
-      currentValue: this.props.state.value as any,
-      currentValid: !isCurrentlyShownAsInvalid && !this.props.forceInvalid,
-      currentInvalidReason: i18nInvalidReason,
-      currentInternalValue: this.props.state.internalValue,
+      currentValue: valueToUse,
+      currentValid: this.props.useAppliedValue && !this.props.forceInvalid ? true : (!isCurrentlyShownAsInvalid && !this.props.forceInvalid),
+      currentInvalidReason: this.props.useAppliedValue ? null : i18nInvalidReason,
+      currentInternalValue: this.props.useAppliedValue ? null : this.props.state.internalValue,
       currentTextualValue,
       currentValueLang,
-      canRestore: canRestoreCalculator(this.props.state.value, this.props.state.stateAppliedValue, type),
+      canRestore: this.props.useAppliedValue ? false : canRestoreCalculator(this.props.state.value, this.props.state.stateAppliedValue, type),
 
       disabled:
         typeof this.props.disabled !== "undefined" && this.props.disabled !== null ?
           this.props.disabled :
-          this.props.state.enforced,
+          (this.props.useAppliedValue || this.props.state.enforced),
 
       autoFocus: this.props.autoFocus || false,
 

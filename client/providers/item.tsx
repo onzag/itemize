@@ -562,6 +562,12 @@ export interface IActionSubmitOptions extends IActionCleanOptions {
   storeStateIfCantConnect?: boolean | string | IStoredStateLocation;
 
   /**
+   * Normally when storing state the enforced values that have been set via setters are not in use
+   * as those are set on top of the current value, use this to force them to be applied in the stored value
+   */
+  storeStateIfCantConnectApplyEnforced?: boolean;
+
+  /**
    * After a draft has been used, it's likely that you don't need this value anymore as it reflects what the server side holds, so
    * storeStateIfCantConnect option and clearStoredStateIfSubmitted tend to be used in conjunction
    * 
@@ -1670,6 +1676,12 @@ export interface IItemProviderProps {
    * stores the state whenever the state changes
    */
   storeStateOnChange?: boolean | string | IStoredStateLocation;
+  /**
+   * When storing a state normally the value of the current state
+   * does not include enforced values that have been set
+   * with setters, or Setter or otherwise enforced
+   */
+  storeStateOnChangeApplyEnforced?: boolean;
   /**
    * marks the item for destruction as the user logs out
    */
@@ -3121,7 +3133,7 @@ export class ActualItemProvider extends
   private async storeStateDelayed() {
     if (this.props.storeStateOnChange && CacheWorkerInstance.isSupportedAsWorker) {
       const location = getStoredStateLocation(this.props.storeStateOnChange, this.props.forId, this.props.forVersion);
-      const serializable = ItemDefinition.getSerializableState(this.state.itemState);
+      const serializable = ItemDefinition.getSerializableState(this.state.itemState, null, this.props.storeStateOnChangeApplyEnforced);
       const metadataSource = this.state.itemState &&
         this.state.itemState.gqlOriginalFlattenedValue &&
         (this.state.itemState.gqlOriginalFlattenedValue as any);
@@ -5028,7 +5040,7 @@ export class ActualItemProvider extends
           this.props.forId || null,
           this.props.forVersion || null,
         );
-        const serializable = ItemDefinition.getSerializableState(state, options.propertyOverrides);
+        const serializable = ItemDefinition.getSerializableState(state, options.propertyOverrides, options.storeStateIfCantConnectApplyEnforced);
         const storingLocation = getStoredStateLocation(options.storeStateIfCantConnect, this.props.forId, this.props.forVersion);
         const metadataSource = appliedValue &&
           appliedValue.flattenedValue as any;

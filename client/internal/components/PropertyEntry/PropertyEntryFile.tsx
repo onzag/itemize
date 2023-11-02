@@ -214,6 +214,7 @@ export default class PropertyEntryFile
       this.props.hideLabel !== nextProps.hideLabel ||
       this.props.hidePlaceholder !== nextProps.hidePlaceholder ||
       !!this.props.ignoreErrors !== !!nextProps.ignoreErrors ||
+      this.props.useAppliedValue !== nextProps.useAppliedValue ||
       nextProps.language !== this.props.language ||
       nextProps.languageOverride !== this.props.languageOverride ||
       nextProps.i18n !== this.props.i18n ||
@@ -233,7 +234,11 @@ export default class PropertyEntryFile
    * @returns a PropertyDefinitionSupportedFileType
    */
   private getCurrentValue() {
-    let currentValue = this.props.state.value as PropertyDefinitionSupportedFileType;
+    let currentValue = (
+      this.props.useAppliedValue ?
+      this.props.state.stateAppliedValue as PropertyDefinitionSupportedFileType :
+      this.props.state.value as PropertyDefinitionSupportedFileType
+    );
 
     if (
       currentValue &&
@@ -469,8 +474,10 @@ export default class PropertyEntryFile
     const extension = currentValue && mimeTypeToExtension(currentValue.type);
     const rejectedExtension = rejectedValue && mimeTypeToExtension(rejectedValue.type);
 
-    const stateValue = (this.props.state.value as PropertyDefinitionSupportedFileType);
-    const extraMetadata: string = (stateValue && stateValue.metadata && stateValue.metadata.split(";")[3]) || null;
+    const valueToUse = this.props.useAppliedValue ?
+      (this.props.state.stateAppliedValue as PropertyDefinitionSupportedFileType) :
+      (this.props.state.value as PropertyDefinitionSupportedFileType);
+    const extraMetadata: string = (valueToUse && valueToUse.metadata && valueToUse.metadata.split(";")[3]) || null;
 
     let rejectedReason = this.state.rejectedReason ? this.props.i18n[this.props.language][this.state.rejectedReason] : null;
     if (
@@ -498,18 +505,18 @@ export default class PropertyEntryFile
 
       currentAppliedValue: this.props.state.stateAppliedValue as PropertyDefinitionSupportedFileType,
       currentValue,
-      currentValid: !isCurrentlyShownAsInvalid && !this.props.forceInvalid,
-      currentInvalidReason: i18nInvalidReason,
-      currentInternalValue: this.props.state.internalValue,
+      currentValid: this.props.useAppliedValue && !this.props.forceInvalid ? true : (!isCurrentlyShownAsInvalid && !this.props.forceInvalid),
+      currentInvalidReason: this.props.useAppliedValue ? null : i18nInvalidReason,
+      currentInternalValue: this.props.useAppliedValue ? null : this.props.state.internalValue,
 
       disabled:
         typeof this.props.disabled !== "undefined" && this.props.disabled !== null ?
           this.props.disabled :
-          this.props.state.enforced,
+          (this.props.useAppliedValue || this.props.state.enforced),
       autoFocus: this.props.autoFocus || false,
       onChange: this.props.onChange,
       onRestore: this.props.onRestore,
-      canRestore: !equals(this.props.state.value, this.props.state.stateAppliedValue, { strict: true }),
+      canRestore: this.props.useAppliedValue ? false : !equals(this.props.state.value, this.props.state.stateAppliedValue, { strict: true }),
 
       onSetFile: this.onSetFile,
       onRemoveFile: this.onRemoveFile,
@@ -523,11 +530,11 @@ export default class PropertyEntryFile
       genericSelectLabel,
       extraMetadata,
 
-      rejected: !!this.state.rejectedReason,
-      rejectedReason,
-      rejectedValue,
-      rejectedPrettySize,
-      rejectedExtension,
+      rejected: this.props.useAppliedValue ? false : !!this.state.rejectedReason,
+      rejectedReason: this.props.useAppliedValue ? null : rejectedReason,
+      rejectedValue: this.props.useAppliedValue ? null : rejectedValue,
+      rejectedPrettySize: this.props.useAppliedValue ? null : rejectedPrettySize,
+      rejectedExtension: this.props.useAppliedValue ? null : rejectedExtension,
       isRejectedSupportedImage,
 
       isSupportedImage,
