@@ -75,6 +75,14 @@ interface IPagedSearchLoaderProps {
    * by default it is p
    */
   queryStringPageLocation?: string;
+  /**
+   * Searching will be set to true until at least
+   * a first search is retrieved
+   * 
+   * mainly used for SSR purposes so that searching always
+   * starts at true
+   */
+  startInSearchingState?: boolean;
 }
 
 interface IPagedSearchLoaderState {
@@ -156,6 +164,7 @@ export class PagedSearchLoader extends React.Component<IPagedSearchLoaderProps, 
         onSearchDataChange={this.onSearchDataChange.bind(null, actualP, setState, pLoc)}
         static={this.props.static}
         enableExternalChecks={this.props.enableExternalChecks}
+        startInSearchingState={this.props.startInSearchingState}
       >
         {(arg) => {
           return this.props.children({

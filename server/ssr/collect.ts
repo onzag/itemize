@@ -86,7 +86,7 @@ export interface ISearchCollectionResult extends IBaseCollectionResult {
  * react rendering
  * 
  * The collector binds it collect function to the request manager of the root
- * the item-provider (for example) calls this function during the beforeSSRRender
+ * the item-provider (for example) calls this function during the getDerivedServerSideStateFromProps
  * that is used during SSR, which delays the execution of render until the collection
  * is done
  * 
@@ -609,7 +609,7 @@ export class Collector {
 
   /**
    * This is the actual collection function and it is what is called
-   * by the beforeSSRRender function in the custom build on the server side
+   * by the getDerivedServerSideStateFromProps function in the custom build on the server side
    * @param idef the item definition in question
    * @param id the id we want
    * @param version the version we want

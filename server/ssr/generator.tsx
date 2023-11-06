@@ -24,6 +24,9 @@ import { convertHTMLToUSSDTree, IUSSDChunk } from "../../ussd";
 import { walkReactTree } from "./react-analyze";
 import ReactDOMServer from "react-dom/server";
 import { NODE_ENV, NO_SSR } from "../environment";
+import uuidv5 from "uuid/v5";
+
+const ETAG_UUID_NAMESPACE = "4870ebbf-2ecf-40df-9f8b-10729e66f30c";
 
 // This is a custom react dom build
 const developmentISSSRMode = NODE_ENV !== "production";
@@ -128,7 +131,7 @@ export async function ssrGenerator(
 
   // prepare to build etag
   // these etags are different per url on purpose
-  let etag: string;
+  let rawEtagSrc: string;
   let quotedEtag: string;
 
   // for the nossr mode the last modified is when the app was built
@@ -155,11 +158,11 @@ export async function ssrGenerator(
 
     // standard etag with an asterisk which means this is the general version
     // NO SSR is used when this etag comes
-    etag = "*." + appData.buildnumber + "." + mode + "." + submode;
+    rawEtagSrc = "*." + appData.buildnumber + "." + mode + "." + submode;
     // this is the root form without any language or any means, there's no SSR data to fill
 
     // etag quoted
-    quotedEtag = JSON.stringify(etag);
+    quotedEtag = JSON.stringify(uuidv5(rawEtagSrc, ETAG_UUID_NAMESPACE));
 
     if (
       info.mode === "html" &&
@@ -170,6 +173,9 @@ export async function ssrGenerator(
       info.res.setHeader("Last-Modified", Moment(lastModified).utc().locale("en").format(DATE_RFC2822));
       info.res.setHeader("Date", Moment().utc().locale("en").format(DATE_RFC2822));
       info.res.setHeader("ETag", quotedEtag);
+      if (mode === "development") {
+        info.res.setHeader("X-ETag-Raw", rawEtagSrc);
+      }
       info.res.setHeader("Cache-Control", "public, max-age=0");
       if (language && config.supportedLanguages.includes(language)) {
         info.res.setHeader("Content-Language", language);
@@ -235,7 +241,7 @@ export async function ssrGenerator(
     }
 
     // creating etag for this url
-    etag = appData.buildnumber + "." + mode + "." + submode;
+    rawEtagSrc = appData.buildnumber + "." + mode + "." + submode;
   }
 
   // now we need a root instance, because this will be used
@@ -463,8 +469,8 @@ export async function ssrGenerator(
 
       // update the last modified and the etag signature
       lastModified = collector.getLastModified();
-      etag += "_" + collector.getSignature();
-      quotedEtag = JSON.stringify(etag);
+      rawEtagSrc += "_" + collector.getSignature();
+      quotedEtag = JSON.stringify(uuidv5(rawEtagSrc, ETAG_UUID_NAMESPACE));
       shouldBe403 = collector.hasForbiddenResources();
       if (shouldBe403) {
         forbiddenSignature = collector.getForbiddenSignature();
@@ -481,6 +487,9 @@ export async function ssrGenerator(
         info.res.setHeader("Last-Modified", Moment(lastModified).utc().locale("en").format(DATE_RFC2822));
         info.res.setHeader("Date", Moment().utc().locale("en").format(DATE_RFC2822));
         info.res.setHeader("ETag", quotedEtag);
+        if (mode === "development") {
+          info.res.setHeader("X-ETag-Raw", rawEtagSrc);
+        }
         if (appliedRule.forUser && appliedRule.forUser.id) {
           info.res.setHeader("Cache-Control", "private");
         } else {
@@ -625,6 +634,9 @@ export async function ssrGenerator(
     info.res.setHeader("Last-Modified", Moment(lastModified).utc().locale("en").format(DATE_RFC2822));
     info.res.setHeader("Date", Moment().utc().locale("en").format(DATE_RFC2822));
     info.res.setHeader("ETag", quotedEtag);
+    if (mode === "development") {
+      info.res.setHeader("X-ETag-Raw", rawEtagSrc);
+    }
     // for individual users the cache control is then
     // set to private
     if (appliedRule.forUser && appliedRule.forUser.id) {

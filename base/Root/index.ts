@@ -223,7 +223,7 @@ export default class Root {
   /**
    * This is used for SSR and lives in the root
    * allows the root to request for data, this is what is used
-   * by the beforeSSRRender functionality
+   * by the getDerivedServerSideStateFromProps functionality
    * @internal
    */
   private requestManager: RequestManagerFn = null;
@@ -231,7 +231,7 @@ export default class Root {
   /**
    * This is used for SSR and lives in the root
    * allows the root to request for data, this is what is used
-   * by the beforeSSRRender functionality
+   * by the getDerivedServerSideStateFromProps functionality
    * @internal
    */
   private requestManagerSearch: RequestManagerSearchFn = null;
@@ -239,7 +239,7 @@ export default class Root {
   /**
    * This is used for SSR and lives in the root
    * allows the root to request for resources, this is what is used
-   * by the beforeSSRRender functionality
+   * by the getDerivedServerSideStateFromProps functionality
    * @internal
    */
   private requestManagerResource: RequestManagerResourceFn = null;

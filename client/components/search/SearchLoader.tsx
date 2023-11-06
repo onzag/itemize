@@ -191,6 +191,14 @@ export interface ISearchLoaderProps {
    */
   avoidLoadingSearchResults?: boolean;
   /**
+   * Searching will be set to true until at least
+   * a first search is retrieved
+   * 
+   * mainly used for SSR purposes so that searching always
+   * starts at true
+   */
+  startInSearchingState?: boolean;
+  /**
    * The static state for the children item definition, TOTAL for
    * basically not even asking for feedback (useful when the search was traditional)
    * or NO_LISTENING for just not getting updates but asking for feedback
@@ -263,6 +271,8 @@ interface IActualSearchLoaderState {
   searchResultsNeedToBeLoaded: boolean;
   searchWillProduceNewHighlights: boolean;
   searchCanProduceHighlights: boolean;
+
+  showAsSearching: boolean;
 }
 
 function canProduceHighlights(props: IActualSearchLoaderProps) {
@@ -516,6 +526,7 @@ class ActualSearchLoader extends React.Component<IActualSearchLoaderProps, IActu
       searchResultsNeedToBeLoaded: false,
       searchWillProduceNewHighlights: false,
       searchCanProduceHighlights: false,
+      showAsSearching: !!props.startInSearchingState,
     };
 
     // refresh the state
@@ -584,6 +595,12 @@ class ActualSearchLoader extends React.Component<IActualSearchLoaderProps, IActu
       if (this.props.onSearchDataChange) {
         // to get the actual page we are meant to load
         this.props.onSearchDataChange(this.props.searchId, this.props.searchWasRestored);
+      }
+
+      if (this.state.showAsSearching) {
+        this.setState({
+          showAsSearching: false,
+        });
       }
     }
 
@@ -1066,7 +1083,7 @@ class ActualSearchLoader extends React.Component<IActualSearchLoaderProps, IActu
             refreshPage: this.refreshPageNoCb,
             searchId: this.props.searchId,
             isLoadingSearchResults: this.state.currentlySearching.length !== 0,
-            searching: this.props.searching,
+            searching: this.props.searching || this.state.showAsSearching,
             limit: this.props.searchLimit,
             offset: this.props.searchOffset,
             metadata: this.props.searchMetadata,

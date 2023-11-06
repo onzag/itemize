@@ -74,6 +74,14 @@ interface ISearchLoaderWithPaginationProps {
    * make accessible with the alt badge reactioner
    */
   accessible?: boolean;
+  /**
+   * Searching will be set to true until at least
+   * a first search is retrieved
+   * 
+   * mainly used for SSR purposes so that searching always
+   * starts at true
+   */
+  startInSearchingState?: boolean;
 
   accessiblePriority?: number;
   accessibleUseInFlow?: boolean;
@@ -147,6 +155,7 @@ export function SearchLoaderWithPagination(props: ISearchLoaderWithPaginationPro
       static={props.static}
       enableExternalChecks={props.enableExternalChecks}
       queryStringPageLocation={props.queryStringPageLocation}
+      startInSearchingState={props.startInSearchingState}
     >
       {(arg) => {
         const handlePageChange = (e: React.ChangeEvent, value: number) => {

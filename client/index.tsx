@@ -250,7 +250,13 @@ export async function initializeItemizeApp(
   // so /en/whatever /fi/whatever, determine the language
   // there should be an url language set
   const pathNameSplitted = serverMode ? serverMode.originalUrl.split("/") : window.location.pathname.split("/");
-  const urlLanguage = pathNameSplitted[1];
+  let urlLanguage = pathNameSplitted[1];
+  if (urlLanguage.includes("?")) {
+    urlLanguage = urlLanguage.split("?")[0];
+  }
+  if (urlLanguage.includes("#")) {
+    urlLanguage = urlLanguage.split("#")[0];
+  }
   let expectedLanguageToUse = urlLanguage;
 
   // The stored locale data takes priority over everything
