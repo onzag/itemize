@@ -16,6 +16,9 @@ import type { IAppDataType } from "../../../server";
 import type { IResourceCollectionResult } from "../../../server/ssr/collect";
 import { TokenContext } from "../../internal/providers/token-provider";
 
+const SSR_GRACE_TIME = 10000;
+const LOAD_TIME = (new Date()).getTime();
+
 /**
  * The props for the html resource loader
  */
@@ -30,16 +33,23 @@ export interface IResourceLoaderProps {
   path?: string;
   /**
    * The server side resolver
-   * TODO this has to do with the generator in order
    * to realize how this is resolved we need to support resources
    * in our SSR and request manager
+   * 
+   * does not support binary types
    */
-  serverSideResolver?: (appData: IAppDataType) => Promise<IResourceCollectionResult>;
+  serverSideResolver?: (appData: IAppDataType, fullsrc: string) => IResourceCollectionResult | Promise<IResourceCollectionResult>;
+  /**
+   * A client side resolver to resolve instead of using fetch
+   * 
+   * does not support binary types
+   */
+  clientSideResolver?: (fullsrc: string) => string | Promise<string>;
   /**
    * the source as a string, without the /rest/resource/ part, which is
    * defined in the path
    */
-  src: string;
+  src?: string;
   /**
    * To define how the data is to be used
    */
@@ -117,7 +127,7 @@ class ActualResourceLoader
 
     const value = await props.root.callRequestManagerResource(actualSrc, props.serverSideResolver);
     return {
-      content: value,
+      content: props.type === "json" ? JSON.parse(value) : value,
       loading: false,
       failed: false,
     }
@@ -125,6 +135,14 @@ class ActualResourceLoader
 
   constructor(props: IActualResourceLoaderProps) {
     super(props);
+
+    if (props.serverSideResolver && (props.type === "binary-blob" || props.type === "binary-arraybuffer")) {
+      throw new Error("Used a ResourceLoader with a " + props.type + " resource with a server side resolver");
+    }
+
+    if (props.clientSideResolver && (props.type === "binary-blob" || props.type === "binary-arraybuffer")) {
+      throw new Error("Used a ResourceLoader with a " + props.type + " resource with a client side side resolver");
+    }
 
     // so first we need to see if it's in our ssr context
     let content: string = null;
@@ -137,6 +155,10 @@ class ActualResourceLoader
       const actualSrc = path + (props.src[0] === "/" ? props.src.substr(1) : props.src);
       // and try to set that as the value if we find it
       content = props.ssrContext.resources[actualSrc] || null;
+
+      if (props.type === "json") {
+        content = JSON.parse(content);
+      }
     }
 
     // and set the state for this
@@ -175,12 +197,15 @@ class ActualResourceLoader
     // now just like we did in the constructor we calculate this form
     const actualSrc = path + (this.props.src[0] === "/" ? this.props.src.substr(1) : this.props.src);
 
+    const shouldRequestNewAlways = (new Date()).getTime() - LOAD_TIME > SSR_GRACE_TIME;
+
     // and this executes regardless we have an html content or not, so we are going to check
     // our ssr context again here, and who knows, the user might be going back or doing
     // something that we can take advantage of our ssr context once again
     if (
       this.props.ssrContext &&
-      (this.props.ssrContext.resources[actualSrc])
+      (this.props.ssrContext.resources[actualSrc]) &&
+      !shouldRequestNewAlways
     ) {
       // so we found it there so we get the value
       const contentNew = (this.props.ssrContext.resources[actualSrc]);
@@ -188,30 +213,32 @@ class ActualResourceLoader
       // going to differ in a meaningful way
       if (contentNew !== this.state.content) {
         this.setState({
-          content: contentNew,
+          content: this.props.type === "json" ? JSON.parse(contentNew) : contentNew,
           failed: false,
           loading: false,
         });
       }
 
-      // now we are going to call the API anyway
-      // the reason for this is that we want to tickle the service
-      // worker to cache this file for the given buildnumber
-      const loadURL = actualSrc;
+      if ((this.props.swCacheable || this.props.swRecheck) && !this.props.clientSideResolver) {
+        // now we are going to call the API anyway
+        // the reason for this is that we want to tickle the service
+        // worker to cache this file for the given buildnumber
+        const loadURL = actualSrc;
 
-      // we run this request in order to cache, even when it's not really used
-      const headers: any = {
-        "sw-cacheable": typeof this.props.swCacheable ? JSON.stringify(this.props.swCacheable) : "true",
-        "sw-network-first": typeof this.props.swNetworkFirst ? JSON.stringify(this.props.swNetworkFirst) : "false",
-        "sw-recheck": typeof this.props.swRecheck ? JSON.stringify(this.props.swRecheck) : "false",
-      };
+        // we run this request in order to cache, even when it's not really used
+        const headers: any = {
+          "sw-cacheable": typeof this.props.swCacheable ? JSON.stringify(this.props.swCacheable) : "true",
+          "sw-network-first": typeof this.props.swNetworkFirst ? JSON.stringify(this.props.swNetworkFirst) : "false",
+          "sw-recheck": typeof this.props.swRecheck ? JSON.stringify(this.props.swRecheck) : "false",
+        };
 
-      if (this.props.includeToken) {
-        headers.token = this.props.token;
+        if (this.props.includeToken) {
+          headers.token = this.props.token;
+        }
+        fetch(loadURL, {
+          headers,
+        });
       }
-      fetch(loadURL, {
-        headers,
-      });
       // return
       return;
     }
@@ -249,6 +276,17 @@ class ActualResourceLoader
 
     // and we try to load
     try {
+      if (this.props.clientSideResolver) {
+        const response = await this.props.clientSideResolver(loadURL);
+        clearTimeout(waitTimeoutForLoading);
+        !this.isUnmounted && this.setState({
+          content: this.props.type === "json" ? JSON.parse(response) : response,
+          loading: false,
+          failed: false,
+        });
+        return;
+      }
+
       // and here we run fetch
       const fetchResponse =
         await fetch(loadURL, {

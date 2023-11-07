@@ -2024,6 +2024,16 @@ export class ItemizeRawDB {
     return builder;
   }
 
+  private _retrieveRawDBSelectSimple(
+    table: string,
+    selecter: (builder: SelectBuilder) => void,
+  ) {
+    const builder = new SelectBuilder();
+    builder.fromBuilder.from(table);
+    selecter(builder);
+    return builder;
+  }
+
   /**
    * Declares a new cursor agains a select statment and does nothing about it
    * @param itemDefinitionOrModule 
@@ -2225,6 +2235,14 @@ export class ItemizeRawDB {
         }
       });
     }
+  }
+
+  public async performRawDBSelectAgainstDeletedRegistry(
+    selecter: (builder: SelectBuilder) => void,
+  ): Promise<ISQLTableRowValue[]> {
+    const builder = this._retrieveRawDBSelectSimple(DELETED_REGISTRY_IDENTIFIER, selecter);
+    const value: ISQLTableRowValue[] = (await this.databaseConnection.queryRows(builder)).map(convertVersionsIntoNullsWhenNecessary);
+    return value;
   }
 
   /**
@@ -3208,6 +3226,15 @@ export class ItemizeRawDB {
        * Will update search indices anyway
        */
       dangerousForceElasticUpdate?: boolean;
+      /**
+       * When tracked properties are present a module based update
+       * isnt possible, however by using this you may split the update
+       * into several sub-updates that are item based
+       * 
+       * A transaction will not be used, changes will be commited
+       * instantly
+       */
+      dangerousSplitIntoItemUpdatesIfTrackedPropertiesPresent?: boolean;
     },
   ): Promise<ISQLTableRowValue[]> {
     if (
@@ -3236,6 +3263,7 @@ export class ItemizeRawDB {
 
     // we are going to check that no tracked properties exist in the item, otherwise the update can't be done
     // using a batch raw db update because we are missing the tracked properties of each item definition for that
+    // remember when changes occur to a row with a tracked property, search events are emitted
     if (!updater.dangerousUseSilentMode) {
       let affectedId: string = "";
       const affectedIdef = mod.getAllChildItemDefinitions().find((cIdef) => {
@@ -3248,9 +3276,14 @@ export class ItemizeRawDB {
         return false;
       });
 
-      if (affectedIdef) {
+      if (affectedIdef && !updater.dangerousSplitIntoItemUpdatesIfTrackedPropertiesPresent) {
         throw new Error("Cannot run a batch module based update because child item " +
           affectedIdef.getName() + " has a tracked property " + affectedId);
+      } else if (affectedIdef) {
+        const allChild = mod.getAllChildItemDefinitions();
+        return (await Promise.all(allChild.map((v) => {
+          return this.performBatchRawDBUpdate(v, updater);
+        }))).flat();
       }
     }
 

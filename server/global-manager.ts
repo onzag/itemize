@@ -577,6 +577,7 @@ export class GlobalManager {
           blocked_by: null,
           blocked_until: null,
         },
+        dangerousSplitIntoItemUpdatesIfTrackedPropertiesPresent: true,
       });
     }
 

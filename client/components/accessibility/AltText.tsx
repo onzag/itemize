@@ -43,12 +43,22 @@ const AltText = React.forwardRef((props: IAltTextProps, ref: ForwardedRef<Actual
   return (
     <AltPriorityShifterContext.Consumer>
       {(v) => {
-        const args = {
-          ["aria-labelledby"]: props.labelledBy,
-          ["aria-describedby"]: props.describedBy,
-          ["aria-label"]: props.label,
-          ["aria-description"]: props.description,
-        };
+        // REACT BUGGY MESS ATTEMPT TO FIX
+        // react complains of properties even when they are no used
+        // because react forgot to check for unset properties
+        const args = {};
+        if (props.labelledBy) {
+          args["aria-labelledby"] = props.labelledBy;
+        }
+        if (props.describedBy) {
+          args["aria-describedby"] = props.describedBy;
+        }
+        if (props.label) {
+          args["aria-label"] = props.label;
+        }
+        if (props.description) {
+          args["aria-description"] = props.description;
+        }
 
         if (props.componentProps) {
           Object.assign(args, props.componentProps);

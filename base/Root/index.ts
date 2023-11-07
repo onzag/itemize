@@ -77,7 +77,7 @@ export interface ICustomRoleManager {
 
 type RequestManagerFn = (itemDefinition: ItemDefinition, id: string, version: string, requestFields: IGQLRequestFields) => Promise<void>;
 type RequestManagerSearchFn = (itemDefinition: ItemDefinition, id: string, version: string, args: any) => Promise<void>;
-type RequestManagerResourceFn = (finalPath: string, customResolver?: (appData: IAppDataType) => Promise<IResourceCollectionResult>) => Promise<string>;
+type RequestManagerResourceFn = (finalPath: string, customResolver?: (appData: IAppDataType, finalPath: string) => IResourceCollectionResult | Promise<IResourceCollectionResult>) => Promise<string>;
 
 /**
  * This is the raw processed form of the root
@@ -367,7 +367,7 @@ export default class Root {
    * @param customResolver
    * @internal
    */
-   public async callRequestManagerResource(finalPath: string, customResolver?: (appData: IAppDataType) => Promise<IResourceCollectionResult>): Promise<string> {
+   public async callRequestManagerResource(finalPath: string, customResolver?: (appData: IAppDataType, finalPath: string) => IResourceCollectionResult | Promise<IResourceCollectionResult>): Promise<string> {
     return await this.requestManagerResource(finalPath, customResolver);
   }
 

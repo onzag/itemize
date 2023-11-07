@@ -231,7 +231,7 @@ export class Collector {
     return this.results.some((r) => r === null);
   }
 
-  public async collectResource(finalPath: string, customResolver: (appData: IAppDataType) => Promise<IResourceCollectionResult>): Promise<string> {
+  public async collectResource(finalPath: string, customResolver: (appData: IAppDataType, finalPath: string) => Promise<IResourceCollectionResult>): Promise<string> {
     const mergedID = "__RESOURCE__" + finalPath;
 
     // request has been done and it's ready
@@ -256,7 +256,7 @@ export class Collector {
 
     if (customResolver) {
       try {
-        result = await customResolver(this.appData);
+        result = await customResolver(this.appData, finalPath);
 
         if (!result.lastModified) {
           result.lastModified = new Date();
