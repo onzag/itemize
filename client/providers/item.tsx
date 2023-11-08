@@ -641,6 +641,15 @@ export type CacheMetadataGeneratorFn = (record: IGQLSearchRecord) => any;
  */
 export interface IActionSearchOptions extends IActionCleanOptions {
   /**
+   * Disables the search in the client side
+   * 
+   * There are many reasons you may want to do this.
+   * 1. Just to disable a search, if that isn't ssrEnabled is equivalent to it being disabled altogether
+   * 2. To make a search only be executed in the server side and never in the client side with ssrEnabled true, this will
+   * still retain consistency during render
+   */
+  clientDisabled?: boolean;
+  /**
    * The properties to request from the search that will apply to
    * each element in the search, these properties will be requested
    * 
@@ -649,9 +658,22 @@ export interface IActionSearchOptions extends IActionCleanOptions {
    */
   requestedProperties: string[];
   /**
+   * Use for server side optimization to avoid large payloads when doing SSR specific
+   * renders, since the search is built and then stored as its state the mismatch
+   * of signature is irrelevant
+   * 
+   * searches done using ssrRequestedProperties will unavoidably get re-requested
+   * by the client side once it is mounted, similar to the case of cache policies
+   */
+  ssrRequestedProperties?: string[];
+  /**
    * The requested includes and the sinking properties related to these includes
    */
   requestedIncludes?: { [include: string]: string[] };
+  /**
+   * Similar to ssrRequestedProperties but for includes
+   */
+  ssrRequestedIncludes?: { [include: string]: string[] };
   /**
    * The properties to be used to search with, properties to be used in search in the
    * search mode item (or module) must be searchable and used for search (or search only)
@@ -820,6 +842,12 @@ export interface IActionSearchOptions extends IActionCleanOptions {
    * but it may take forever due to batching, specially if the user has a lot of data
    */
   cacheNoLimitOffset?: boolean;
+  /**
+   * When resolving SSR based searches they can be done without the use of a limit offset
+   * this property is secure because it is resolved in the server side only so if the search
+   * is marked like this it cannot be requested via the client
+   */
+  ssrNoLimitOffset?: boolean;
   /**
    * Will not fallback to polyfill to store search results if the cache worker fails midway or is
    * otherwise not available, by default search will do all in its power to succesfully cache
@@ -2372,6 +2400,9 @@ export class ActualItemProvider extends
     }
   }
   public async markForDestruction(unmount: boolean) {
+    if (typeof document === "undefined") {
+      return;
+    }
     if (this.props.forId) {
       if (CacheWorkerInstance.instance) {
         await CacheWorkerInstance.instance.waitForInitializationBlock();
@@ -2445,6 +2476,10 @@ export class ActualItemProvider extends
     property: [string, string],
     unmount: boolean,
   ) {
+    if (typeof document === "undefined") {
+      return;
+    }
+
     if (CacheWorkerInstance.instance) {
       await CacheWorkerInstance.instance.waitForInitializationBlock();
     }
@@ -2584,7 +2619,25 @@ export class ActualItemProvider extends
       this.setStateToCurrentValueWithExternalChecking(null);
     }
 
-    if (this.props.automaticSearch) {
+    const listenersSetup = () => {
+      const currentSearch = this.state;
+
+      // when we have a search that was done during SSR and was not stored
+      // somewherue in our stuff, we don't want to request feedback
+      // when we jst loaded the app because then it makes no sense
+      // as the information should be up to date
+      const shouldRequestFeedback = currentSearch.searchId === "SSR_SEARCH" && !this.props.automaticSearchNoGraceTime ? (
+        (new Date()).getTime() - LOAD_TIME > SSR_GRACE_TIME
+      ) : true;
+
+      this.searchListenersSetup(
+        currentSearch,
+        shouldRequestFeedback,
+      );
+    };
+
+    let searchWasRedone = false;
+    if (this.props.automaticSearch && !this.props.automaticSearch.clientDisabled) {
       // the search listener might have triggered during the mount callback,
       // which means this function won't see the new state and won't trigger
       // automatic search so we use this variable to check it
@@ -2595,29 +2648,34 @@ export class ActualItemProvider extends
         // no search id at all, not in the state, not on the changed listener, nowhere
         (!searchIdToCheckAgainst) ||
         // search is forced and we didn't load from location
-        (this.props.automaticSearchForce && this.state.searchWasRestored !== "FROM_LOCATION")
+        (this.props.automaticSearchForce && this.state.searchWasRestored !== "FROM_LOCATION") ||
+        // cache policies searches that have been resolved by SSR need to be redone
+        // this is only relevant during mount of course
+        // the reason is that the cache may have changes or not be inline with whatever
+        // was calculated from the server side
+        // that's the issue with ssrEnabled searches that are also cache
+        (searchIdToCheckAgainst === "SSR_SEARCH" && this.props.automaticSearch.cachePolicy !== "none") ||
+        (searchIdToCheckAgainst === "SSR_SEARCH" && this.props.automaticSearch.ssrRequestedProperties)
       ) {
         // this variable that is passed into the search is used to set the initial
         // state in case it needs to be saved in the history
-        this.initialAutomaticNextSearch = true;
-        this.search(this.props.automaticSearch);
+        searchWasRedone = true;
+        (async () => {
+          try {
+            this.initialAutomaticNextSearch = true;
+            await this.search(this.props.automaticSearch);
+          } catch {
+            // setup listeners just in case
+            // for a failed search
+            listenersSetup();
+          }
+        })();
       }
     }
 
-    const currentSearch = this.state;
-
-    // when we have a search that was done during SSR and was not stored
-    // somewherue in our stuff, we don't want to request feedback
-    // when we jst loaded the app because then it makes no sense
-    // as the information should be up to date
-    const shouldRequestFeedback = currentSearch.searchId === "SSR_SEARCH" && !this.props.automaticSearchNoGraceTime ? (
-      (new Date()).getTime() - LOAD_TIME > SSR_GRACE_TIME
-    ) : true;
-
-    this.searchListenersSetup(
-      currentSearch,
-      shouldRequestFeedback,
-    );
+    if (!searchWasRedone) {
+      listenersSetup();
+    }
 
     if (this.props.onSearchStateLoaded || this.props.onSearchStateChange) {
       const searchState = getSearchStateOf(this.state);
@@ -3080,7 +3138,7 @@ export class ActualItemProvider extends
       ) && !this.state.searching
     ) {
       // maybe there's no new automatic search
-      if (this.props.automaticSearch) {
+      if (this.props.automaticSearch && !this.props.automaticSearch.clientDisabled) {
         // always perform the search even if there's a state
         if (this.props.automaticSearchForce || this.state.searchId === null) {
           this.search(this.props.automaticSearch);
@@ -3925,7 +3983,7 @@ export class ActualItemProvider extends
 
     // if we are in search mode and have an automatic search we need
     // to retrigger the search when properties change
-    if (this.props.automaticSearch && !this.props.automaticSearchIsOnlyInitial) {
+    if (this.props.automaticSearch && !this.props.automaticSearch.clientDisabled && !this.props.automaticSearchIsOnlyInitial) {
       clearTimeout(this.automaticSearchTimeout);
 
       // if the search must be done instantly
@@ -4036,6 +4094,7 @@ export class ActualItemProvider extends
     if (
       !internal &&
       this.props.automaticSearch &&
+      !this.props.automaticSearch.clientDisabled &&
       !this.props.automaticSearchIsOnlyInitial &&
       this.isCMounted
     ) {
@@ -5266,7 +5325,7 @@ export class ActualItemProvider extends
   public async search(
     originalOptions: IActionSearchOptions,
   ): Promise<IActionResponseWithSearchResults> {
-    if (!originalOptions) {
+    if (!originalOptions || originalOptions.clientDisabled) {
       return;
     }
 
@@ -5368,9 +5427,9 @@ export class ActualItemProvider extends
       );
     }
 
-    if (options.ssrEnabled && options.cachePolicy && options.cachePolicy !== "none") {
-      console.warn("You have a SSR enabled search that uses cache policy, this will not execute in the server side due to conflicting instructions");
-    }
+    // if (options.ssrEnabled && options.cachePolicy && options.cachePolicy !== "none") {
+    //   console.warn("You have a SSR enabled search that uses cache policy, this will not execute in the server side due to conflicting instructions");
+    // }
 
     if (options.ssrEnabled && !options.traditional) {
       console.warn("You have a SSR enabled search that does not use traditional search, this will not execute in the server side due to conflicting instructions");

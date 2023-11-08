@@ -61,14 +61,17 @@ export function searchModuleTraditional(
   resolverArgs: IGraphQLIdefResolverArgs,
   mod: Module,
 ) {
-  return searchModule(appData, resolverArgs, mod, true);
+  return searchModule(appData, resolverArgs, mod, {traditional: true});
 }
 
 export async function searchModule(
   appData: IAppDataType,
   resolverArgs: IGraphQLIdefResolverArgs,
   mod: Module,
-  traditional?: boolean,
+  opts: {
+    traditional?: boolean,
+    noLimitOffset?: boolean,
+  } = {},
 ) {
   CAN_LOG_DEBUG && logger.debug(
     {
@@ -89,7 +92,9 @@ export async function searchModule(
 
   const since = retrieveSince(resolverArgs.args);
   const until = retrieveUntil(resolverArgs.args);
-  checkLimit(resolverArgs.args.limit as number, mod, traditional);
+  if (!opts.noLimitOffset) {
+    checkLimit(resolverArgs.args.limit as number, mod, opts.traditional);
+  }
   checkLimiters(resolverArgs.args, mod);
 
   // check language and region
@@ -140,7 +145,7 @@ export async function searchModule(
     root: appData.root,
     tokenData: tokenData,
     user: tokenData,
-    environment: traditional ? CustomRoleGranterEnvironment.SEARCHING_TRADITIONAL : CustomRoleGranterEnvironment.SEARCHING_RECORDS,
+    environment: opts.traditional ? CustomRoleGranterEnvironment.SEARCHING_TRADITIONAL : CustomRoleGranterEnvironment.SEARCHING_RECORDS,
     requestArgs: resolverArgs.args,
     owner: ownerId,
     parent: resolverArgs.args.parent_id && resolverArgs.args.parent_type ? {
@@ -216,7 +221,7 @@ export async function searchModule(
   let sqlFieldsToRequest: string[] = ["id", "version", "type", "last_modified", "created_at"];
   let requestedFields: any = null;
   const generalFields = resolverArgs.fields;
-  if (traditional) {
+  if (opts.traditional) {
     requestedFields = flattenRawGQLValueOrFields(generalFields.results);
     const fieldsToRequestRawValue = Object.keys(requestedFields);
 
@@ -460,10 +465,13 @@ export async function searchModule(
     );
 
     elasticQuery.setSourceIncludes(sqlFieldsToRequest);
-    elasticQuery.setSize(limit);
+    if (!opts.noLimitOffset) {
+      elasticQuery.setFrom(offset);
+      elasticQuery.setSize(limit);
+    }
 
     // set the highlight keys only the columns that will be highlighted
-    if (traditional) {
+    if (opts.traditional) {
       elasticQuery.setHighlightsOn(rHighReply);
     }
   } else {
@@ -592,7 +600,9 @@ export async function searchModule(
     addedSearchRaw.forEach((srApplyArgs) => {
       queryModel.selectExpression(srApplyArgs[0], srApplyArgs[1]);
     });
-    queryModel.limit(limit).offset(offset);
+    if (!opts.noLimitOffset) {
+      queryModel.limit(limit).offset(offset);
+    }
   }
 
   let metadata: string = null;
@@ -624,7 +634,7 @@ export async function searchModule(
       action: SearchTriggerActions.SEARCH,
       elasticQueryBuilder: elasticQuery || null,
       whereBuilder: queryModel ? queryModel.whereBuilder : null,
-      traditional,
+      traditional: opts.traditional,
       forbid: defaultTriggerForbiddenFunction,
       setSearchMetadata,
       elasticResponse: null,
@@ -665,7 +675,7 @@ export async function searchModule(
       }
       baseResult = elasticResponse.hits.hits.map((r) => {
         highlightsJSON[r._id] = {};
-        if (traditional) {
+        if (opts.traditional) {
           highlightKeys.forEach((highlightNameOriginal) => {
             const originalMatch = highlightInfo[highlightNameOriginal];
             // record id, original name of the given property with the prefixed include
@@ -681,7 +691,7 @@ export async function searchModule(
       });
 
       // setting the highlights
-      if (traditional) {
+      if (opts.traditional) {
         highlights = JSON.stringify(highlightsJSON);
       }
     } else if (requestCount) {
@@ -705,9 +715,12 @@ export async function searchModule(
     queryModel.selectExpression(`COUNT(*) AS "count"`);
     queryModel.orderByBuilder.clear();
 
+    if (requestBaseResult && opts.noLimitOffset) {
+      count = baseResult.length;
+    }
     // if we have requested for a base result, and we got less than the limit, we know the count right away
     // it's the same as our array len plus the offset
-    if (requestBaseResult && baseResult.length < limit) {
+    else if (requestBaseResult && baseResult.length < limit) {
       count = baseResult.length + offset;
     } else {
       const countResult: ISQLTableRowValue = generalFields.count ? (await appData.databaseConnection.queryFirst(queryModel)) : null;
@@ -715,7 +728,7 @@ export async function searchModule(
     }
   }
 
-  if (traditional) {
+  if (opts.traditional) {
     const finalResult: IGQLSearchResultsContainer = {
       results: await Promise.all(
         baseResult.filter((r) => {
@@ -860,8 +873,8 @@ export async function searchModule(
       // just that when it asks for feedback it will realize the mismatch and try to update
       // if a newer record was created and then deleted
       last_modified: generalFields.last_modified ? findLastRecordDate("max", "last_modified", baseResult) : null,
-      limit,
-      offset,
+      limit: opts.noLimitOffset ? count : limit,
+      offset: opts.noLimitOffset ? 0 : offset,
       count,
       highlights,
       metadata,
@@ -884,7 +897,7 @@ export async function searchModule(
         action: SearchTriggerActions.SEARCHED_SYNC,
         whereBuilder: queryModel ? queryModel.whereBuilder : null,
         elasticQueryBuilder: elasticQuery || null,
-        traditional,
+        traditional: opts.traditional,
         forbid: defaultTriggerSearchInvalidForbiddenFunction,
         setSearchMetadata,
         elasticResponse,
@@ -932,8 +945,8 @@ export async function searchModule(
       last_modified: generalFields.last_modified ? findLastRecordDate("max", "last_modified", baseResult) : null,
       earliest_created_at: generalFields.earliest_created_at ? findLastRecordDate("min", "created_at", baseResult) : null,
       oldest_created_at: generalFields.oldest_created_at ? findLastRecordDate("max", "created_at", baseResult) : null,
-      limit,
-      offset,
+      limit: opts.noLimitOffset ? count : limit,
+      offset: opts.noLimitOffset ? 0 : offset,
       count,
       metadata,
     };
@@ -962,7 +975,7 @@ export async function searchModule(
         action: SearchTriggerActions.SEARCHED_SYNC,
         whereBuilder: queryModel ? queryModel.whereBuilder : null,
         elasticQueryBuilder: elasticQuery || null,
-        traditional,
+        traditional: opts.traditional,
         forbid: defaultTriggerSearchInvalidForbiddenFunction,
         setSearchMetadata,
         elasticResponse,
@@ -1004,14 +1017,17 @@ export function searchItemDefinitionTraditional(
   resolverArgs: IGraphQLIdefResolverArgs,
   itemDefinition: ItemDefinition,
 ) {
-  return searchItemDefinition(appData, resolverArgs, itemDefinition, true);
+  return searchItemDefinition(appData, resolverArgs, itemDefinition, {traditional: true});
 }
 
 export async function searchItemDefinition(
   appData: IAppDataType,
   resolverArgs: IGraphQLIdefResolverArgs,
   resolverItemDefinition: ItemDefinition,
-  traditional?: boolean,
+  opts: {
+    traditional?: boolean,
+    noLimitOffset?: boolean,
+  } = {}
 ) {
   const usesElastic = resolverArgs.args.searchengine === true;
   const elasticIndexLang = (usesElastic && resolverArgs.args.searchengine_language) || null;
@@ -1054,7 +1070,9 @@ export async function searchItemDefinition(
 
     const since = retrieveSince(resolverArgs.args);
     const until = retrieveUntil(resolverArgs.args);
-    checkLimit(resolverArgs.args.limit as number, itemDefinition, traditional);
+    if (!opts.noLimitOffset) {
+      checkLimit(resolverArgs.args.limit as number, itemDefinition, opts.traditional);
+    }
     checkLimiters(resolverArgs.args, itemDefinition);
 
     // check the language and region
@@ -1094,7 +1112,7 @@ export async function searchItemDefinition(
       tokenData: tokenData,
       user: tokenData,
       root: appData.root,
-      environment: traditional ? CustomRoleGranterEnvironment.SEARCHING_TRADITIONAL : CustomRoleGranterEnvironment.SEARCHING_RECORDS,
+      environment: opts.traditional ? CustomRoleGranterEnvironment.SEARCHING_TRADITIONAL : CustomRoleGranterEnvironment.SEARCHING_RECORDS,
       requestArgs: resolverArgs.args,
       owner: ownerId,
       parent: resolverArgs.args.parent_id && resolverArgs.args.parent_type ? {
@@ -1158,7 +1176,7 @@ export async function searchItemDefinition(
     let sqlFieldsToRequest: string[] = ["id", "version", "type", "last_modified", "created_at"];
     let requestedFields: any = null;
     const generalFields = resolverArgs.fields;
-    if (traditional) {
+    if (opts.traditional) {
       requestedFields = flattenRawGQLValueOrFields(generalFields.results);
       const fieldsToRequestRawValue = Object.keys(requestedFields);
 
@@ -1442,10 +1460,13 @@ export async function searchItemDefinition(
       );
 
       elasticQuery.setSourceIncludes(sqlFieldsToRequest);
-      elasticQuery.setFrom(offset);
-      elasticQuery.setSize(limit);
 
-      if (traditional) {
+      if (!opts.noLimitOffset) {
+        elasticQuery.setFrom(offset);
+        elasticQuery.setSize(limit);
+      }
+
+      if (opts.traditional) {
         elasticQuery.setHighlightsOn(rHighReply);
       }
 
@@ -1561,7 +1582,9 @@ export async function searchItemDefinition(
       addedSearchRaw.forEach((srApplyArgs) => {
         queryModel.selectExpression(srApplyArgs[0], srApplyArgs[1]);
       });
-      queryModel.limit(limit).offset(offset);
+      if (!opts.noLimitOffset) {
+        queryModel.limit(limit).offset(offset);
+      }
     }
 
 
@@ -1602,7 +1625,7 @@ export async function searchItemDefinition(
         records: null,
         results: null,
         sqlResponse: null,
-        traditional,
+        traditional: opts.traditional,
       };
       if (moduleTrigger) {
         await moduleTrigger(args);
@@ -1647,7 +1670,7 @@ export async function searchItemDefinition(
         }
         baseResult = elasticResponse.hits.hits.map((r) => {
           highlightsJSON[r._id] = {};
-          if (traditional) {
+          if (opts.traditional) {
             highlightKeys.forEach((highlightNameOriginal) => {
               const originalMatch = highlightInfo[highlightNameOriginal];
               highlightsJSON[r._id][originalMatch.name] = {
@@ -1658,7 +1681,7 @@ export async function searchItemDefinition(
           }
           return r._source;
         });
-        if (traditional) {
+        if (opts.traditional) {
           highlights = JSON.stringify(highlightsJSON);
         }
       } else if (requestCount) {
@@ -1684,9 +1707,12 @@ export async function searchItemDefinition(
       queryModel.selectExpression(`COUNT(*) AS "count"`);
       queryModel.orderByBuilder.clear();
 
+      if (requestBaseResult && opts.noLimitOffset) {
+        count = baseResult.length;
+      }
       // if we have requested for a base result, and we got less than the limit, we know the count right away
       // it's the same as our array len plus the offset
-      if (requestBaseResult && baseResult.length < limit) {
+      else if (requestBaseResult && baseResult.length < limit) {
         count = baseResult.length + offset;
       } else {
         const countResult: ISQLTableRowValue = generalFields.count ? (await appData.databaseConnection.queryFirst(queryModel)) : null;
@@ -1694,7 +1720,7 @@ export async function searchItemDefinition(
       }
     }
 
-    if (traditional) {
+    if (opts.traditional) {
       const finalResult: IGQLSearchResultsContainer = {
         results: await Promise.all(
           baseResult.map(async (r) => {
@@ -1815,8 +1841,8 @@ export async function searchItemDefinition(
           })
         ),
         last_modified: generalFields.last_modified ? findLastRecordDate("max", "last_modified", baseResult) : null,
-        limit,
-        offset,
+        limit: opts.noLimitOffset ? count : limit,
+        offset: opts.noLimitOffset ? 0 : offset,
         count,
         highlights,
         metadata,
@@ -1839,7 +1865,7 @@ export async function searchItemDefinition(
           action: SearchTriggerActions.SEARCHED_SYNC,
           whereBuilder: queryModel ? queryModel.whereBuilder : null,
           elasticQueryBuilder: elasticQuery || null,
-          traditional,
+          traditional: opts.traditional,
           forbid: defaultTriggerSearchInvalidForbiddenFunction,
           setSearchMetadata,
           elasticResponse,
@@ -1900,8 +1926,8 @@ export async function searchItemDefinition(
         last_modified: generalFields.last_modified ? findLastRecordDate("max", "last_modified", baseResult) : null,
         earliest_created_at: generalFields.earliest_created_at ? findLastRecordDate("min", "created_at", baseResult) : null,
         oldest_created_at: generalFields.oldest_created_at ? findLastRecordDate("max", "created_at", baseResult) : null,
-        limit,
-        offset,
+        limit: opts.noLimitOffset ? count : limit,
+        offset: opts.noLimitOffset ? 0 : offset,
         count,
         metadata,
       };
@@ -1923,7 +1949,7 @@ export async function searchItemDefinition(
           action: SearchTriggerActions.SEARCHED_SYNC,
           whereBuilder: queryModel ? queryModel.whereBuilder : null,
           elasticQueryBuilder: elasticQuery || null,
-          traditional,
+          traditional: opts.traditional,
           forbid: defaultTriggerSearchInvalidForbiddenFunction,
           setSearchMetadata,
           elasticResponse,

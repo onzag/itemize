@@ -408,8 +408,8 @@ export class Collector {
       const searchFieldsAndArgs = getFieldsAndArgs({
         includeArgs: false,
         includeFields: true,
-        properties: args.requestedProperties,
-        includes: args.requestedIncludes || {},
+        properties: args.ssrRequestedProperties || args.requestedProperties,
+        includes: args.ssrRequestedIncludes || args.requestedIncludes || {},
         itemDefinitionInstance: standardCounterpart,
         forId: null,
         forVersion: null,
@@ -485,7 +485,7 @@ export class Collector {
             fields: basicQueryElement.fields,
           },
           idef.getParentModule().getStandardModule(),
-          true,
+          {traditional: true, noLimitOffset: args.ssrNoLimitOffset},
         ) as IGQLSearchResultsContainer;
       } else {
         rs = await searchItemDefinition(
@@ -495,7 +495,7 @@ export class Collector {
             fields: basicQueryElement.fields,
           },
           idef.getStandardCounterpart(),
-          true,
+          {traditional: true, noLimitOffset: args.ssrNoLimitOffset},
         ) as IGQLSearchResultsContainer;
       }
 

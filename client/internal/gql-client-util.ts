@@ -1761,6 +1761,8 @@ export async function runSearchQueryFor(
 
   const searchArgs = getSearchArgsFor(arg);
 
+  const serverEnvironment = typeof document === "undefined";
+
   // when the search was last modified
   // in practice the last modified of the last record
   let lastModified: string = null;
@@ -1768,7 +1770,7 @@ export async function runSearchQueryFor(
   let gqlValue: IGQLEndpointValue;
   let cached: boolean = false;
   let polyfilled: boolean = false;
-  let useCacheWorker: boolean = (
+  let useCacheWorker: boolean = serverEnvironment ? false : (
     // will use cache worker
     arg.cachePolicy !== "none" &&
     (
@@ -2019,10 +2021,15 @@ export async function runSearchQueryFor(
     }
   }
 
+  let internalError: EndpointErrorType = null;
   // not using cache worker despite cache policy not being none
   // and being asked not to fallback, must be unsupported
   if (!useCacheWorker && arg.cachePolicy !== "none" && arg.cacheDoNotFallbackToSimpleSearch) {
     gqlValue = null;
+    internalError = {
+      code: "UNSPECIFIED",
+      message: "There is no support for cache worker yet the search did not fallback to simple search",
+    }
   } else if (!arg.traditional && !useCacheWorker) {
     const query = buildGqlQuery({
       name: queryName,
@@ -2112,9 +2119,9 @@ export async function runSearchQueryFor(
   }
 
   // now we got to check for errors
-  let error: EndpointErrorType = null;
+  let error: EndpointErrorType = internalError || null;
 
-  if (gqlValue.errors) {
+  if (gqlValue && gqlValue.errors) {
     // if the server itself returned an error, we use that error
     error = gqlValue.errors[0].extensions;
   }
