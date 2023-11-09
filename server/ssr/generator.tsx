@@ -23,7 +23,7 @@ import { IServerSideTokenDataType } from "../resolvers/basic";
 import { convertHTMLToUSSDTree, IUSSDChunk } from "../../ussd";
 import { walkReactTree } from "./react-analyze";
 import ReactDOMServer from "react-dom/server";
-import { NODE_ENV, NO_SSR } from "../environment";
+import { NODE_ENV, NO_SSR, TRUST_ALL_INBOUND_CONNECTIONS } from "../environment";
 import uuidv5 from "uuid/v5";
 
 const ETAG_UUID_NAMESPACE = "4870ebbf-2ecf-40df-9f8b-10729e66f30c";
@@ -58,12 +58,16 @@ export async function ssrGenerator(
   if (info.mode === "html") {
     const hostname = info.req.headers["host"];
     if (
+      !TRUST_ALL_INBOUND_CONNECTIONS &&
       hostname !== "localhost" &&
       hostname.indexOf("localhost") !== 0 &&
       hostname !== appData.config.developmentHostname &&
       hostname !== appData.config.productionHostname
     ) {
-      info.res.status(403).end("Invalid Hostname");
+      info.res.setHeader("content-type", "text/html");
+      info.res.status(403)
+        .end(`<!DOCTYPE html><html><body><a href="https://${appData.config.productionHostname}">` +
+          `Please visit the real website at ${appData.config.productionHostname}</a></body></html>`);
       return;
     }
   }

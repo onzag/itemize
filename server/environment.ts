@@ -2,6 +2,8 @@ import type { IDBConfigRawJSONDataType, IRedisConfigRawJSONDataType, ISingleRedi
 import uuid from "uuid";
 import fs from "fs";
 
+export const TRUST_ALL_INBOUND_CONNECTIONS = process.env.TRUST_ALL_INBOUND_CONNECTIONS === "true";
+
 // get the environment in order to be able to set it up
 export const NODE_ENV: "development" | "production" = process.env.NODE_ENV as any || "development";
 if (NODE_ENV !== "development" && NODE_ENV !== "production") {

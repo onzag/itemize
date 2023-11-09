@@ -272,21 +272,23 @@ export async function initializeItemizeApp(
 
   // so if we are not in server mode, and we are definetely in
   // the client side
-  if (!serverMode && document) {
-    // prevent SEO hijacking
-    // allows subdomains to be allowable
-    if (
-      location.hostname !== config.productionHostname &&
-      !location.hostname.endsWith("." + config.productionHostname) &&
-      location.hostname !== config.developmentHostname &&
-      !location.hostname.endsWith("." + config.developmentHostname) &&
-      location.hostname !== "localhost"
-    ) {
-      document.body.innerHTML =
-        `<a href="https://${config.productionHostname}">Please visit the real website at ${config.productionHostname}</a>`;
-      return;
-    }
-  }
+  // SEO Hijacking is prevented in the server side right now
+  // when ssr is enabled
+  // if (!serverMode && document) {
+  //   // prevent SEO hijacking
+  //   // allows subdomains to be allowable
+  //   if (
+  //     location.hostname !== config.productionHostname &&
+  //     !location.hostname.endsWith("." + config.productionHostname) &&
+  //     location.hostname !== config.developmentHostname &&
+  //     !location.hostname.endsWith("." + config.developmentHostname) &&
+  //     location.hostname !== "localhost"
+  //   ) {
+  //     document.body.innerHTML =
+  //       `<a href="https://${config.productionHostname}">Please visit the real website at ${config.productionHostname}</a>`;
+  //     return;
+  //   }
+  // }
 
   // so if we have a stored language, and that stored language
   // that do differ, we need to change it to the stored language

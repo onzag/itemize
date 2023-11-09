@@ -179,3 +179,11 @@ Provide a qualified path name so that consistency checks are done from scratch a
 ## EMULATE_BAD_REDIS_WRITES
 
 All redis instances act dead and throw errors, even when they connect; simulates connection issues
+
+## TRUST_ALL_INBOUND_CONNECTIONS
+
+Default `false`
+
+Use if you see "invalid hostname" or "please visit the real site at" on development builds for testing
+
+When connecting, itemize expects the client to be attempting to connect from localhost or from one of the specified domains and with no port; otherwise it believes it is being SEO hijacked, use this flag for disabling that in order to do computer to computer testing with raw IPs.

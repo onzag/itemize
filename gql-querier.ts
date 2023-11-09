@@ -9,7 +9,7 @@ import FormDataNode from "form-data";
 // TODO remove to go back to just using plain http and https
 import fetchNode from "node-fetch";
 import { EndpointErrorType } from "./base/errors";
-import { ENDPOINT_ERRORS, MAX_FILES_PER_REQUEST } from "./constants";
+import { ENDPOINT_ERRORS, EXTERNALLY_ACCESSIBLE_RESERVED_BASE_PROPERTIES, MAX_FILES_PER_REQUEST, STANDARD_ACCESSIBLE_RESERVED_BASE_PROPERTIES } from "./constants";
 import equals from "deep-equal";
 import { requestFieldsAreContained } from "./gql-util";
 import type { ReadStream } from "fs";
@@ -431,6 +431,14 @@ export class GQLQuery {
     };
   }
 
+  public getCompressedOperations() {
+    return buildCompressedThing(...this.processedQueries);
+  }
+
+  public getType() {
+    return this.type;
+  }
+
   /**
    * Provides the map of the variables to files and/or streams that exists in the
    * file form that will map the variables to the form data
@@ -614,6 +622,35 @@ export class GQLVar extends GQLRaw {
   public __type__: string = "GQLVar";
 }
 
+function buildCompressedFields(fields: IGQLRequestFields) {
+  const rs = [];
+  const hasAllExternal = EXTERNALLY_ACCESSIBLE_RESERVED_BASE_PROPERTIES.every((f) => {
+    return !!fields[f];
+  });
+  const hasAllStandard = STANDARD_ACCESSIBLE_RESERVED_BASE_PROPERTIES.every((f) => {
+    return !!(fields.DATA && fields.DATA[f]);
+  });
+  if (hasAllExternal && hasAllStandard) {
+    rs.push("ALL");
+  } else if (hasAllExternal) {
+    rs.push("EXT");
+  } else {
+    rs.push("STD");
+  }
+
+  if (fields.DATA) {
+    Object.keys(fields.DATA).forEach((f) => {
+      if (STANDARD_ACCESSIBLE_RESERVED_BASE_PROPERTIES.includes(f)) {
+        return;
+      }
+
+      rs.push(f);
+    });
+  }
+
+  return rs;
+}
+
 /**
  * Build all the fields from the request field list
  * for the graphql query string
@@ -712,6 +749,36 @@ function buildArgs(
   }).join(",") + keyCloseType;
 }
 
+function buildCompressedArgs(
+  args: IGQLArgs,
+): any {
+  // if it's not an object or if it's null
+  if (typeof args !== "object" || args === null) {
+    // return it as it is
+    return args;
+  }
+
+  // if we have a variable
+  if (args instanceof GQLVar) {
+    // return it in the variable form
+    return {
+      __TYPE__: "VAR",
+      value: args.value,
+    };
+  } else if (args instanceof GQLEnum || args instanceof GQLRaw) {
+    return args.value;
+  } else if (Array.isArray(args)) {
+    return args.map((v: any) => buildCompressedArgs(v));
+  }
+
+  const rs: any = {};
+  Object.keys(args).forEach((key) => {
+    rs[key] = buildCompressedArgs(args[key] as any);
+  });
+
+  return rs;
+}
+
 /**
  * build a single graphql query string with its main args and its sub queries
  * @param type the type, either mutation or query
@@ -753,6 +820,23 @@ function buildGqlThing(type: "mutation" | "query", mainArgs: IGQLArgs, ...querie
   queryStr += "}";
   // return it
   return queryStr;
+}
+
+function buildCompressedThing(...queries: IGQLQueryObj[]) {
+  const qs: any = {};
+  queries.forEach((query) => {
+    const qObj: any = {
+      n: query.name,
+    };
+    if (query.fields) {
+      qObj.f = buildCompressedFields(query.fields);
+    }
+    if (query.args) {
+      qObj.args = buildCompressedArgs(query.args);
+    }
+    qs[query.alias || query.name] = qObj;
+  });
+  return qs;
 }
 
 /**
@@ -940,9 +1024,17 @@ export async function gqlQuery(query: GQLQuery, options?: {
 
   // building the form data
   const formData = typeof FormData !== "undefined" ? new FormData() : new FormDataNode();
-  // append this stuff to the form data
-  formData.append("operations", JSON.stringify(query.getOperations()));
-  formData.append("map", JSON.stringify(query.getMap()));
+
+  // TODO enable the compressed form and phase out graphql slowly
+  // if (true) {
+    // append this stuff to the form data
+    formData.append("operations", JSON.stringify(query.getOperations()));
+    formData.append("map", JSON.stringify(query.getMap()));
+  // } else {
+  //   formData.append(this.getType(), JSON.stringify(query.getOperations()));
+  //   console.log(query.getCompressedOperations());
+  // }
+
   // now let's get all the attachents and append them to the form data
   query.getAttachments().forEach((attachment) => {
     formData.append(attachment.id, attachment.src as File);
@@ -987,10 +1079,10 @@ export async function gqlQuery(query: GQLQuery, options?: {
   // small window of time to delete the query in the network
   // to allow delayed requests
   //setTimeout(() => {
-    const index = QUERIES_IN_NETWORK.findIndex((q) => q === query);
-    if (index !== -1) {
-      QUERIES_IN_NETWORK.splice(index, 1);
-    }
+  const index = QUERIES_IN_NETWORK.findIndex((q) => q === query);
+  if (index !== -1) {
+    QUERIES_IN_NETWORK.splice(index, 1);
+  }
   // }, 70);
 
   // return the reply

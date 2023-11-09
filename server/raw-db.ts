@@ -436,7 +436,7 @@ export class ItemizeRawDB {
       // this include OLD_ stuff that is used during events
       // and trackers and whatnot
       return {
-        ...newRowData,
+        ...d,
         ...originalRowData,
       };
     });
