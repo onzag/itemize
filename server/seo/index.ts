@@ -5,6 +5,8 @@
 
 import { ItemizeRawDB } from "../../server/raw-db";
 import Root from "../../base/Root";
+import { ISQLTableRowValue } from "../../base/Root/sql";
+import type { WhereBuilder } from "../../database/WhereBuilder";
 
 /**
  * Specifies the parameters that are to be given
@@ -16,40 +18,19 @@ import Root from "../../base/Root";
  */
 export interface ISEOParametrizer {
   params: {
-    [parameter: string]: string
-  },
-}
-
-/**
- * Represents a collected data point
- * the id, version and created_at are always
- * provided to the given seo collection endpoint
- * however extra properties can be added when requested by
- * the ISEOCollectionRequest
- */
-export interface ISEOCollectedData {
-  id: string;
-  version: string;
-  created_at: string;
-  [extraProperty: string]: any;
+    [parameter: string]: string;
+  };
+  lastModified: Date;
 }
 
 export interface ISEOCollectionRequest {
-  module: string,
-  item?: string,
-  extraProperties?: string[],
+  itemOrModule: string;
+  extraColumns?: string[];
+  customWhere?: (b: WhereBuilder) => void;
   /**
    * By default only the base version is collected, if you wish you can collect all the versions
    */
   collectAllVersions?: boolean;
-}
-
-/**
- * When collection is done a list of collected results is obtained
- * this is what a single collected result looks like
- */
-export interface ISEOCollectedResult {
-  collected: ISEOCollectedData[];
 }
 
 /**
@@ -73,9 +54,8 @@ export interface ISEORule {
    * lets suppose you are about to build urls for /group/:id/subgroup/:sid where a subgroup is parented by a group
    * in that case your collection rule would be as you only need the subgroups as this is a subgroup url
    * [{
-   *   module: "social",
-   *   item: "subgroup",
-   *   extraProperties: ["parent_id"]
+   *   itemOrModule: "social/group",
+   *   extraColumns: ["parent_id"]
    * }]
    * 
    * When you run the parametrize function you will get all the results for these, suppose you got a new group added
@@ -83,21 +63,17 @@ export interface ISEORule {
    * 
    * [
    *   {
-   *     collected: [
-   *       {
-   *         id: 3,
-   *         version: null,
-   *         created_at: "???",
-   *         parent_id: 2
-   *       },
-   *       {
-   *         id: 4,
-   *         version: null,
-   *         created_at: "???",
-   *         parent_id: 1
-   *       },
-   *     ]
-   *   }
+   *     id: 3,
+   *     version: null,
+   *     created_at: "???",
+   *     parent_id: 2
+   *   },
+   *   {
+   *     id: 4,
+   *     version: null,
+   *     created_at: "???",
+   *     parent_id: 1
+   *   },
    * ]
    * 
    * So this specifies all the new subgroups added and now you can build the url by using the parametrize function
@@ -109,13 +85,13 @@ export interface ISEORule {
    * /group/:name/subgroup/:name instead in the urls (however this is not recommended unless your names are static)
    * and this isn't even good for indexing, but whatever, even this is possible to SEO
    * 
-   * In this case you will have to change your extraProperties rule to include the name, and you will have to request
+   * In this case you will have to change your extraColumns rule to include the name, and you will have to request
    * the parent in the parent_id using raw db (there's no cache on the global manager) and you should get the container it
    * is in; you might want to use a memory cache while the parametrizer run, the parametrizer can return a promise so
    * it can be async
    * 
    */
-  collect?: ISEOCollectionRequest[];
+  collect?: ISEOCollectionRequest;
   /**
    * This is the parametrize function, only makes sense to use when you specify the collect attribute as this needs
    * to make use of collected results, however you might specify parametrize without using collect at all, but bear in mind that
@@ -123,7 +99,7 @@ export interface ISEORule {
    * collect
    */
   parametrize?: (arg: {
-    collectedResults: ISEOCollectedResult[];
+    collectedResults: ISQLTableRowValue[];
     root: Root,
     rawDB: ItemizeRawDB,
   }) => ISEOParametrizer[] | Promise<ISEOParametrizer[]>

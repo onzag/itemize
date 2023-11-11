@@ -634,7 +634,7 @@ function buildCompressedFields(fields: IGQLRequestFields) {
     rs.push("ALL");
   } else if (hasAllExternal) {
     rs.push("EXT");
-  } else {
+  } else if (hasAllStandard) {
     rs.push("STD");
   }
 
@@ -1026,6 +1026,10 @@ export async function gqlQuery(query: GQLQuery, options?: {
   const formData = typeof FormData !== "undefined" ? new FormData() : new FormDataNode();
 
   // TODO enable the compressed form and phase out graphql slowly
+  // for doing that we must disable all custom graphql endpoints, in favour of simple rest
+  // that includes token related
+  // everything graphql must be gone
+
   // if (true) {
     // append this stuff to the form data
     formData.append("operations", JSON.stringify(query.getOperations()));

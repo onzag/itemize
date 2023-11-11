@@ -278,10 +278,6 @@ export interface ISensitiveConfigRawJSONDataType {
    */
   defaultContainerID: string;
   /**
-   * The seo container id used when storing sitemaps
-   */
-  seoContainerID: string;
-  /**
    * A development key, allows to use development files in its full form on the production
    * interface
    */
@@ -425,9 +421,6 @@ export const rawSensitiveConfigSchema = {
     defaultContainerID: {
       type: "string",
     },
-    seoContainerID: {
-      type: "string",
-    },
     custom: {
       type: "object",
       additionalProperties: {}
@@ -448,7 +441,6 @@ export const rawSensitiveConfigSchema = {
     "ussd",
     "logging",
     "defaultContainerID",
-    "seoContainerID",
     "devKey",
   ],
 };

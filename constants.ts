@@ -84,12 +84,6 @@ export interface IItemizeConstantsConfig {
    */
   SERVER_DATA_MIN_UPDATE_TIME?: number;
   /**
-   * The time it takes for sitemaps to be refreshed
-   * 
-   * this is a millisecond amount
-   */
-  SERVER_MAPPING_TIME?: number;
-  /**
    * The time it takes for block_until to be refreshed
    * and blockage to be cleared
    * 
@@ -224,11 +218,6 @@ export const MAX_SEARCH_FIELD_LENGTH = R_ITEMIZE_CONSTANTS_CONFIG.MAX_SEARCH_FIE
  * updating the currency information
  */
 export const SERVER_DATA_MIN_UPDATE_TIME = R_ITEMIZE_CONSTANTS_CONFIG.SERVER_DATA_MIN_UPDATE_TIME || 259200000; // 3 days
-
-/**
- * The time it takes for sitemaps to be refreshed
- */
-export const SERVER_MAPPING_TIME = R_ITEMIZE_CONSTANTS_CONFIG.SERVER_MAPPING_TIME || 86400000; // 1 day, to sitemap the site
 
 /**
  * The time it takes for blocks to be refreshed, the blocks represent the blocked_at and blocked_until functionality

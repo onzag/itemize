@@ -29,7 +29,6 @@ import { ICollectorType } from "../client";
 import { Pool } from "tarn";
 import { retrieveRootPool } from "./rootpool";
 import { ISEORuleSet } from "./seo";
-import { SEOGenerator } from "./seo/generator";
 import { initializeApp } from "./initialize";
 import { LocalStorageService } from "./services/local-storage";
 import { OpenstackService } from "./services/openstack";
@@ -60,7 +59,6 @@ import {
   INSTANCE_MODE,
   NODE_ENV,
   USING_DOCKER,
-  PING_GOOGLE,
   FAKE_EMAILS,
   FAKE_SMS,
   PORT,
@@ -461,7 +459,7 @@ export async function initializeServer(
       redisConfig,
     };
 
-        // We change the hosts depending to whether we are using docker or not
+    // We change the hosts depending to whether we are using docker or not
     // and if our hosts are set to the local
     if (USING_DOCKER) {
       if (redisConfig.cache.host === "127.0.0.1" || redisConfig.cache.host === "localhost") {
@@ -489,7 +487,6 @@ export async function initializeServer(
     }
 
     const mayUseLoggerService =
-      INSTANCE_MODE !== "CLEAN_SITEMAPS" &&
       INSTANCE_MODE !== "CLEAN_STORAGE";
 
     const LoggingServiceClass = mayUseLoggerService ? (serviceCustom && serviceCustom.loggingServiceProvider) || (
@@ -626,7 +623,7 @@ export async function initializeServer(
 
     let redisGlobalClient: ItemizeRedisClient;
 
-    if (INSTANCE_MODE !== "CLEAN_SITEMAPS" && INSTANCE_MODE !== "CLEAN_STORAGE") {
+    if (INSTANCE_MODE !== "CLEAN_STORAGE") {
       logger.info(
         {
           functionName: "initializeServer",
@@ -911,67 +908,6 @@ export async function initializeServer(
       }
 
       await manager.initializeServices();
-
-      if (seoConfig && sensitiveConfig.seoContainerID) {
-        logger.info(
-          {
-            functionName: "initializeServer",
-            message: "Initializing SEO configuration",
-          },
-        );
-        const seoContainerData = sensitiveConfig.containers &&
-          sensitiveConfig.containers[sensitiveConfig.seoContainerID];
-        const isLocalInstead = sensitiveConfig.seoContainerID === sensitiveConfig.localContainer;
-        if (!seoContainerData && !isLocalInstead) {
-          logger.error(
-            {
-              functionName: "initializeServer",
-              message: "Invalid seo container id for the container '" + sensitiveConfig.seoContainerID + "'",
-              serious: true,
-            },
-          );
-        } else {
-          let prefix = config.containersHostnamePrefixes[sensitiveConfig.seoContainerID];
-          if (!prefix) {
-            logger.error(
-              {
-                functionName: "initializeServer",
-                message: "Could not find prefix for SEO in '" + sensitiveConfig.seoContainerID + "'",
-                serious: true,
-              },
-            );
-            return;
-          }
-          if (prefix.indexOf("/") !== 0) {
-            prefix = "https://" + prefix;
-          }
-
-          let storageClient: StorageProvider<any>;
-          if (isLocalInstead) {
-            storageClient = new LocalStorageService(null, registry, configsObj);
-          } else {
-            const type = seoContainerData.type;
-            const ServiceClass = (serviceCustom && serviceCustom.storageServiceProviders[type]) || OpenstackService;
-            storageClient = (new ServiceClass(seoContainerData.config, registry, configsObj)) as any;
-          }
-
-          storageClient.setId(sensitiveConfig.seoContainerID);
-          storageClient.setPrefix(prefix);
-
-          await storageClient.initialize();
-
-          const seoGenerator = new SEOGenerator(
-            seoConfig.seoRules,
-            storageClient,
-            rawDB,
-            root,
-            config.supportedLanguages,
-            domain,
-            PING_GOOGLE,
-          );
-          manager.setSEOGenerator(seoGenerator);
-        }
-      }
       manager.run();
       if (INSTANCE_MODE === "GLOBAL_MANAGER") {
         return;
@@ -996,7 +932,7 @@ export async function initializeServer(
       registry,
     );
 
-    if (INSTANCE_MODE === "CLEAN_STORAGE" || INSTANCE_MODE === "CLEAN_SITEMAPS") {
+    if (INSTANCE_MODE === "CLEAN_STORAGE") {
       logger.info(
         {
           functionName: "initializeServer",
@@ -1005,25 +941,14 @@ export async function initializeServer(
       );
 
       await Promise.all(Object.keys(storageClients.cloudClients).map(async (containerId) => {
-        if (INSTANCE_MODE === "CLEAN_SITEMAPS") {
-          logger.info(
-            {
-              functionName: "initializeServer",
-              message: "Cleaning " + containerId + " sitemaps for " + domain,
-            },
-          );
-          const client = storageClients.cloudClients[containerId];
-          await client.removeFolder("sitemaps/" + domain);
-        } else {
-          logger.info(
-            {
-              functionName: "initializeServer",
-              message: "Cleaning " + containerId + " data for " + domain,
-            },
-          );
-          const client = storageClients.cloudClients[containerId];
-          await client.removeFolder(domain);
-        }
+        logger.info(
+          {
+            functionName: "initializeServer",
+            message: "Cleaning " + containerId + " data for " + domain,
+          },
+        );
+        const client = storageClients.cloudClients[containerId];
+        await client.removeFolder(domain);
       }));
 
       process.exit(0);
@@ -1115,8 +1040,8 @@ export async function initializeServer(
         sensitiveConfig.userLocalization ||
         UserLocalizationServiceClass === ElasticLocationService
       ) ?
-      new UserLocalizationServiceClass(sensitiveConfig.userLocalization, registry, configsObj) :
-      null) as any;
+        new UserLocalizationServiceClass(sensitiveConfig.userLocalization, registry, configsObj) :
+        null) as any;
 
     if (sensitiveConfig.mail) {
       logger.info(

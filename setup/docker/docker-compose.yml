@@ -39,7 +39,6 @@ services:
             - LOG_LEVEL=info
             - USING_DOCKER=true
             - NO_SEO=false
-            - PING_GOOGLE=false
             - FORCE_CONSOLE_LOGS=false
     servers:
         image: app:latest

@@ -8,7 +8,7 @@ import { logger } from "./logger";
 import equals from "deep-equal";
 import { convertSQLValueToElasticSQLValueForItemDefinition } from "../base/Root/Module/ItemDefinition/sql";
 import { DELETED_REGISTRY_IDENTIFIER, SERVER_ELASTIC_PING_INTERVAL_TIME } from "../constants";
-import { CAN_LOG_DEBUG, ELASTIC_EXECUTE_CONSISTENCY_CHECKS_FROM_SCRATCH_AT, EMULATE_ELASTIC_SYNC_FAILURE_AT, EMULATE_SILENT_ELASTIC_SYNC_FAILURE_AT, FORCE_ELASTIC_REBUILD, INSTANCE_UUID } from "./environment";
+import { CAN_LOG_DEBUG, ELASTIC_EXECUTE_CONSISTENCY_CHECKS_FROM_SCRATCH_AT, EMULATE_ELASTIC_SYNC_FAILURE_AT, EMULATE_SILENT_ELASTIC_SYNC_FAILURE_AT, FORCE_ELASTIC_REBUILD, GLOBAL_MANAGER_MODE, INSTANCE_MODE, INSTANCE_UUID } from "./environment";
 import { NanoSecondComposedDate } from "../nanodate";
 import { AggregationsAggregationContainer, FieldValue, GetResponse, MgetResponse, QueryDslMatchPhraseQuery, QueryDslMatchQuery, QueryDslQueryContainer, QueryDslTermQuery, QueryDslTermsQuery, SearchHit, SearchRequest, SearchResponse, UpdateRequest } from "@elastic/elasticsearch/lib/api/types";
 import { setInterval } from "timers";
@@ -291,7 +291,11 @@ export class ItemizeElasticClient {
     // we need to handle this ourselves in this function
     // and update the runtime indexes that contain
     // currency information
-    if (!this.prepareInstancePromise) {
+    if (!this.prepareInstancePromise && (
+      INSTANCE_MODE === "ABSOLUTE" || (
+        INSTANCE_MODE === "GLOBAL_MANAGER" && (GLOBAL_MANAGER_MODE === "ABSOLUTE" || GLOBAL_MANAGER_MODE === "ELASTIC")
+      )
+    )) {
       // this is new server data that was given to us and we should update
       // the related 
       // now we can begin qeuing the indexes that we want created

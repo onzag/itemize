@@ -10,7 +10,6 @@ import {
   CONNECTOR_SQL_COLUMN_ID_FK_NAME,
   CONNECTOR_SQL_COLUMN_VERSION_FK_NAME,
   UNSPECIFIED_OWNER,
-  SERVER_MAPPING_TIME,
   SERVER_BLOCK_UNTIL_REFRESH_TIME,
   SERVER_ELASTIC_CONSISTENCY_CHECK_TIME,
 } from "../constants";
@@ -21,7 +20,6 @@ import {
 import PropertyDefinition from "../base/Root/Module/ItemDefinition/PropertyDefinition";
 import uuid from "uuid";
 import Include, { IncludeExclusionState } from "../base/Root/Module/ItemDefinition/Include";
-import { SEOGenerator } from "./seo/generator";
 import { IRedisEvent } from "../base/remote-protocol";
 import { ServiceProvider } from "./services";
 import CurrencyFactorsProvider from "./services/base/CurrencyFactorsProvider";
@@ -68,14 +66,12 @@ export class GlobalManager {
   private modNeedsMantenience: Module[];
   public serverData: IServerDataType;
   private serverDataLastUpdated: number;
-  private seoGenLastUpdated: number;
   private elasticCleanupLastExecuted: number;
   private blocksReleaseLastExecuted: number;
   private currencyFactorsProvider: CurrencyFactorsProvider<any>;
   public sensitiveConfig: ISensitiveConfigRawJSONDataType;
   public mailProvider: MailProvider<any>;
   public config: IConfigRawJSONDataType;
-  private seoGenerator: SEOGenerator;
   private customServices: {
     [name: string]: ServiceProvider<any>;
   };
@@ -174,9 +170,6 @@ export class GlobalManager {
     if (GLOBAL_MANAGER_MODE === "ABSOLUTE" || GLOBAL_MANAGER_MODE === "ELASTIC") {
       this.elastic && this.elastic.prepareInstance();
     }
-  }
-  public setSEOGenerator(seoGenerator: SEOGenerator) {
-    this.seoGenerator = seoGenerator;
   }
   public installGlobalService(service: ServiceProvider<any>) {
     if (
@@ -471,7 +464,14 @@ export class GlobalManager {
           }
         );
       }
-
+    } else {
+      logger.info(
+        {
+          className: "GlobalManager",
+          methodName: "addAdminUserIfMissing",
+          message: "Admin user was found, nothing to do",
+        }
+      );
     }
   }
   private processModule(mod: Module) {
@@ -680,65 +680,6 @@ export class GlobalManager {
       GLOBAL_MANAGER_MODE === "ABSOLUTE"
     ) {
       this.mailProvider.execute();
-    }
-
-    // hijack the seo generator and do our own executions
-    if (this.seoGenerator && (GLOBAL_MANAGER_MODE === "ABSOLUTE" || GLOBAL_MANAGER_MODE === "SITEMAPS")) {
-      (async () => {
-        while (true) {
-          this.seoGenLastUpdated = new Date().getTime();
-
-          logger.info({
-            className: "GlobalManager",
-            methodName: "run",
-            message: "Running SEO Generator",
-          });
-          try {
-            await this.seoGenerator.run();
-          } catch (err) {
-            logger.error(
-              {
-                className: "GlobalManager",
-                methodName: "run",
-                message: "Seo generator failed to run",
-                serious: true,
-                err,
-              }
-            );
-          }
-
-          const nowTime = new Date().getTime();
-          const timeItPassedSinceSeoGenRan = nowTime - this.seoGenLastUpdated;
-          const timeUntilSeoGenNeedsToRun =
-            SERVER_MAPPING_TIME - timeItPassedSinceSeoGenRan;
-
-          if (timeUntilSeoGenNeedsToRun <= 0) {
-            logger.error(
-              {
-                className: "GlobalManager",
-                methodName: "run",
-                message: "During the processing of events the time needed until next mapping was negative" +
-                  " this means the server took forever doing the last mapping; clearly something is off",
-                serious: true,
-                data: {
-                  timeUntilSeoGenNeedsToRun,
-                },
-              }
-            );
-          } else {
-            logger.info(
-              {
-                className: "GlobalManager",
-                methodName: "run",
-                message: "SEO generator tasked to run in " +
-                  timeUntilSeoGenNeedsToRun +
-                  "ms",
-              }
-            );
-            await wait(timeUntilSeoGenNeedsToRun);
-          }
-        }
-      })();
     }
 
     if (this.elastic && (GLOBAL_MANAGER_MODE === "ABSOLUTE" || GLOBAL_MANAGER_MODE === "ELASTIC")) {

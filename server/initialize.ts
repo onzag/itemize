@@ -25,6 +25,7 @@ import { userRestServices } from "./user/rest";
 import { NODE_ENV, NO_SEO } from "./environment";
 
 import { ssrGenerator } from "./ssr/generator";
+import { SEOGenerator } from "./seo/generator";
 
 /**
  * This is the function that catches the errors that are thrown
@@ -227,6 +228,7 @@ export function initializeApp(appData: IAppDataType, custom: IServerCustomizatio
   }
 
   const hostname = NODE_ENV === "production" ? appData.config.productionHostname : appData.config.developmentHostname;
+  const host = "https://" + hostname;
   app.get("/robots.txt", (req, res) => {
     res.setHeader("content-type", "text/plain; charset=utf-8");
 
@@ -237,6 +239,7 @@ export function initializeApp(appData: IAppDataType, custom: IServerCustomizatio
 
     let result: string = "user-agent: *\ndisallow: /rest/util/*\ndisallow: /rest/index-check/*\n" +
       "disallow: /rest/currency-factors\ndisallow: /graphql\n";
+
     if (appData.seoConfig) {
       Object.keys(appData.seoConfig.seoRules).forEach((urlSet) => {
         const rule = appData.seoConfig.seoRules[urlSet];
@@ -253,29 +256,24 @@ export function initializeApp(appData: IAppDataType, custom: IServerCustomizatio
           });
         }
       });
-
-      const prefix = appData.storage[appData.sensitiveConfig.seoContainerID].getPrefix();
-      let host = "";
-      if (prefix.startsWith("/")) {
-        host = "https://" +
-          (
-            NODE_ENV === "production" ?
-              appData.config.productionHostname :
-              appData.config.developmentHostname
-          );
-      }
-      result += "Sitemap: " + host +
-        prefix + (prefix.endsWith("/") ? "" : "/") +
-        "sitemaps/" + hostname + "/index.xml";
+      result += "Sitemap: " + host + (host.endsWith("/") ? "" : "/") + "sitemap.xml";
     }
 
     res.end(result);
   });
 
   if (!NO_SEO) {
-    const prefix = appData.storage[appData.sensitiveConfig.seoContainerID].getPrefix();
+    const seoGenerator = new SEOGenerator(
+      appData.seoConfig.seoRules,
+      appData.rawDB,
+      appData.root,
+      appData.config.supportedLanguages,
+      hostname,
+      appData.buildnumber,
+    );
+
     app.get("/sitemap.xml", (req, res) => {
-      res.redirect(prefix + (prefix.endsWith("/") ? "" : "/") + "sitemaps/" + hostname + "/index.xml")
+      seoGenerator.provide(req, res);
     });
   }
 

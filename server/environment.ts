@@ -12,8 +12,8 @@ if (NODE_ENV !== "development" && NODE_ENV !== "production") {
 }
 export const PORT: number = process.env.PORT ? (parseInt(process.env.PORT) || 8000) : 8000;
 export const INSTANCE_GROUP_ID = process.env.INSTANCE_GROUP_ID || "UNIDENTIFIED";
-export const INSTANCE_MODE: "CLUSTER_MANAGER" | "GLOBAL_MANAGER" | "ABSOLUTE" | "EXTENDED" | "BUILD_DATABASE" | "LOAD_DATABASE_DUMP" | "CLEAN_STORAGE" | "CLEAN_SITEMAPS" = process.env.INSTANCE_MODE || "ABSOLUTE" as any;
-export const GLOBAL_MANAGER_MODE: "ABSOLUTE" | "ELASTIC" | "SITEMAPS" | "SERVER_DATA" | "SERVICES" = process.env.GLOBAL_MANAGER_MODE || "ABSOLUTE" as any;
+export const INSTANCE_MODE: "CLUSTER_MANAGER" | "GLOBAL_MANAGER" | "ABSOLUTE" | "EXTENDED" | "BUILD_DATABASE" | "LOAD_DATABASE_DUMP" | "CLEAN_STORAGE" = process.env.INSTANCE_MODE || "ABSOLUTE" as any;
+export const GLOBAL_MANAGER_MODE: "ABSOLUTE" | "ELASTIC" | "SERVER_DATA" | "SERVICES" = process.env.GLOBAL_MANAGER_MODE || "ABSOLUTE" as any;
 export const GLOBAL_MANAGER_SERVICES: string[] = (process.env.GLOBAL_MANAGER_SERVICES && process.env.GLOBAL_MANAGER_SERVICES.split(",").map((s) => s.trim())) || [];
 export const INSTANCE_UUID =
   INSTANCE_MODE + "_" +
@@ -32,7 +32,6 @@ if (
   INSTANCE_MODE !== "EXTENDED" &&
   INSTANCE_MODE !== "BUILD_DATABASE" &&
   INSTANCE_MODE !== "LOAD_DATABASE_DUMP" &&
-  INSTANCE_MODE !== "CLEAN_SITEMAPS" &&
   INSTANCE_MODE !== "CLEAN_STORAGE"
 ) {
   fs.writeFileSync(INSTANCE_LOG_ERROR_FILE, JSON.stringify({
@@ -44,7 +43,6 @@ if (
 }
 
 export const USING_DOCKER = process.env.USING_DOCKER === "true";
-export const PING_GOOGLE = process.env.PING_GOOGLE === "true";
 export const FAKE_SMS = process.env.FAKE_SMS === "true";
 export const FAKE_EMAILS = process.env.FAKE_EMAILS === "true";
 export const FAKE_USSD = process.env.FAKE_USSD === "true";
@@ -80,7 +78,6 @@ export const ENVIRONMENT_DETAILS = {
   NO_SSR,
   NO_SEO,
   LOG_LEVEL,
-  PING_GOOGLE,
   USING_DOCKER,
   NODE_ENV,
 };
