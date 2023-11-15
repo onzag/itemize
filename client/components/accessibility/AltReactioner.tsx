@@ -109,6 +109,11 @@ export interface IAltBaseProps {
   onTabOutTrigger?: string;
 
   /**
+   * Language override
+   */
+  lang?: string;
+
+  /**
    * When an element is about to be focused what element to focus, by default it will
    * focus the element that it is tracking, but you may change this behaviour
    *
@@ -383,7 +388,7 @@ export function calculateLayereds(priorityToUse: number, doNotShowHide: boolean)
         v.hide();
       }
 
-    // FOR ALT TEXT
+      // FOR ALT TEXT
     } else if (
       // non disabled
       !v.isDisabled() &&
@@ -1466,6 +1471,17 @@ export function triggerAltCycle(tabNavigation: boolean) {
 
 export function triggerTabCycle() {
   setTimeout(() => {
+    const activeFlowPriority = calculateActiveFlow();
+
+    if (!ALT_REGISTRY.isDisplayingLayereds) {
+      // pressing tab with nothing displayed
+      const displayElementsPriority = calculatePriorityOfLayereds();
+
+      if (displayElementsPriority > activeFlowPriority) {
+        showLayereds(displayElementsPriority);
+      }
+    }
+
     triggerBasedOn("tab", false, () => { });
   }, 50);
 }
@@ -1615,7 +1631,7 @@ export class ActualAltReactioner extends ActualAltBase<IAltReactionerProps, IAct
         const isFocused = document.activeElement === element;
         const satisify1 = (
           isFocused &&
-          focusOptions.blurIfAlreadyFocused === "ONLY_IF_NOT_DISPLAYING_ACTIONS" && 
+          focusOptions.blurIfAlreadyFocused === "ONLY_IF_NOT_DISPLAYING_ACTIONS" &&
           !ALT_REGISTRY.isDisplayingLayereds &&
           !ALT_REGISTRY.awaitingLayerKeycodes
         );
@@ -1661,6 +1677,7 @@ export class ActualAltReactioner extends ActualAltBase<IAltReactionerProps, IAct
         ref={this.containerRef}
         data-alt-reactioner={true}
         data-priority={this.props.priority || 0}
+        lang={this.props.lang}
         {...this.props.componentProps}
       >
         {this.props.children(this.state.displayed, this.state.blocked)}

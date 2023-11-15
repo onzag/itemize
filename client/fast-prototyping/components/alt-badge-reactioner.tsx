@@ -227,6 +227,11 @@ interface IAltBadgeReactionerProps {
   uncontrolled?: boolean;
 
   /**
+   * Language override
+   */
+  lang?: string;
+
+  /**
    * Triggers when it enters keycodes mode for an expected target
    */
   onEnterKeyCodes?: () => void;

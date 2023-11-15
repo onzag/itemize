@@ -678,10 +678,6 @@ export async function getModuleList(
   });
 
   const created_by = resolverArgs.args.created_by;
-  let ownerToCheckAgainst = UNSPECIFIED_OWNER;
-  if (created_by) {
-    ownerToCheckAgainst = created_by;
-  }
 
   let highlights: string = null;
   let resultValues: ISQLTableRowValue[];
@@ -740,6 +736,9 @@ export async function getModuleList(
     async (value) => {
       // preveting another security leak here, the user might have lied by saying that these
       // items were all created by this specific creator when doing searches
+
+      // TODO this doesn't really matter anymore items are checked individually for access
+      // delete when implementing via rq
       if (created_by && value.created_by !== created_by) {
         throw new EndpointError({
           message: "created_by mismatch, one of the items requested was not created by whom it was claimed",
@@ -794,7 +793,7 @@ export async function getModuleList(
         ItemDefinitionIOActions.READ,
         tokenData.role,
         tokenData.id,
-        ownerToCheckAgainst,
+        value.created_by,
         requestedFieldsInMod,
         rolesManager,
         true,
@@ -807,7 +806,7 @@ export async function getModuleList(
         requestedFields,
         tokenData.role,
         tokenData.id,
-        ownerToCheckAgainst,
+        value.created_by,
         rolesManager,
         mod,
       );

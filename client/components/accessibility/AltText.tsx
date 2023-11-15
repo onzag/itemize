@@ -33,6 +33,11 @@ export interface IAltTextProps extends IAltBaseProps {
   describedBy?: string;
 
   /**
+   * Language override
+   */
+  lang?: string;
+
+  /**
    * When an element is tabbed but it is not part of the current flow but it kept its focus while being in another
    * layer, use this to select which reaction key would you like to trigger from the current active flow
    */
@@ -58,6 +63,9 @@ const AltText = React.forwardRef((props: IAltTextProps, ref: ForwardedRef<Actual
         }
         if (props.description) {
           args["aria-description"] = props.description;
+        }
+        if (props.lang) {
+          args["lang"] = props.lang;
         }
 
         if (props.componentProps) {
