@@ -81,6 +81,9 @@ export const exactStringSearchSubtypes = [
  */
 const typeValue: IPropertyDefinitionSupportedType<PropertyDefinitionSupportedStringType> = {
   gql: GraphQLString,
+  rq: {
+    type: "string",
+  },
   // a string is a string
   json: "string",
   sql: stringSQL,

@@ -226,7 +226,7 @@ class PropertyEntryTextRenderer extends React.PureComponent<IPropertyEntryTextRe
         rootContext={this.props.args.context || null}
         currentValid={this.props.currentValid}
         currentLoadError={this.props.lastLoadedFileError}
-        currentGeneralError={!this.props.args.hideError ? this.props.uniqueId + "_error" : null}
+        currentGeneralErrorElementId={!this.props.args.hideError && !this.props.currentValid ? this.props.uniqueId + "_error" : null}
         currentDescribedBy={this.props.description ? this.props.uniqueId + "_desc" : null}
         dismissCurrentLoadError={this.props.dismissLastLoadedFileError}
         Wrapper={this.props.args.Wrapper || MaterialUISlateWrapper}

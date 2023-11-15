@@ -77,7 +77,7 @@ export interface RQQuery {
   ownFields: {
     [id: string]: RQField;
   };
-  resolve: FRQIdefResolverType | FRQModResolverType;
+  resolve?: FRQIdefResolverType | FRQModResolverType;
 }
 
 /**
@@ -150,4 +150,29 @@ export function getRQSchemaForRoot(
     query,
     mutation,
   };
+}
+
+export function rqFieldsToRqArgs(field: RQField): RQArg {
+  if (field.type !== "object") {
+    return field;
+  }
+
+  const copy: RQArg = {properties: {}, ...field};
+  if ((copy as RQField).stdFields) {
+    Object.assign(copy.properties, (copy as RQField).stdFields);
+    delete (copy as RQField).stdFields;
+  }
+  if ((copy as RQField).extFields) {
+    Object.assign(copy.properties, (copy as RQField).extFields);
+    delete (copy as RQField).extFields;
+  }
+  if ((copy as RQField).ownFields) {
+    Object.assign(copy.properties, (copy as RQField).ownFields);
+    delete (copy as RQField).ownFields;
+  }
+
+  Object.keys(copy.properties).forEach((p) => {
+    copy.properties[p] = rqFieldsToRqArgs(copy.properties[p]);
+  });
+  return copy;
 }

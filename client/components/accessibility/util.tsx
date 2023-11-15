@@ -8,6 +8,7 @@ import AltText from "./AltText";
 import AltGroup from "./AltGroup";
 import { IText } from "../../internal/text/serializer/types/text";
 import { ILink } from "../../internal/text/serializer/types/link";
+import { useI18nRead } from "../localization/I18nRead";
 
 export function onKeyDown(e: React.KeyboardEvent) {
   if (e.code === "Enter" || e.code === "Space") {
@@ -121,6 +122,8 @@ interface IAccessibleImageProps extends React.DetailedHTMLProps<React.AnchorHTML
   altReactionerExtraProps: any;
   AltReactionerComponent: AltReactionerComponentType;
   priority?: number;
+  i18nLabelId: string;
+  i18nLabelContext: string;
 }
 
 function AccessibleImage(props: IAccessibleImageProps) {
@@ -128,6 +131,11 @@ function AccessibleImage(props: IAccessibleImageProps) {
     props.onClick && props.onClick(e);
     props.onImageClick && props.onImageClick(props.image);
   }, [props.onClick, props.image, props.onImageClick]);
+
+  const i18nLabel = useI18nRead({
+    id: props.i18nLabelId,
+    context: props.i18nLabelContext,
+  }) as string;
 
   const newProps = { ...props };
   delete newProps.styleActive;
@@ -139,6 +147,8 @@ function AccessibleImage(props: IAccessibleImageProps) {
   delete newProps.altReactionerExtraProps;
   delete newProps.AltReactionerComponent;
   delete newProps.priority;
+  delete newProps.i18nLabelContext;
+  delete newProps.i18nLabelId;
 
   if (props.styleActive || props.styleHover) {
     if (!props.onImageClick) {
@@ -151,7 +161,7 @@ function AccessibleImage(props: IAccessibleImageProps) {
             Component: props.Tag,
             styleActive: props.styleActive,
             styleHover: props.styleHover,
-            ["aria-label"]: props.image.alt,
+            ["aria-label"]: i18nLabel + (props.image.alt ? (" - " + props.image.alt) : ""),
           }}
           priority={props.priority}
         >
@@ -190,7 +200,7 @@ function AccessibleImage(props: IAccessibleImageProps) {
         component={Tag}
         componentProps={{
           ...newProps,
-          ["aria-label"]: props.image.alt,
+          ["aria-label"]: i18nLabel + (props.image.alt ? (" - " + props.image.alt) : ""),
         }}
         priority={props.priority}
       >
@@ -326,6 +336,16 @@ interface IAccessibleFns {
    * get a shared reaction key and are enumerated
    */
   imageReactionKey?: string;
+
+  /**
+   * The id to read the label to say it's an image
+   */
+  imageI18nId?: string;
+
+  /**
+   * The context in question for the label
+   */
+  imageI18nContext?: string;
 
   /**
    * The reaction key to use for links, all links
@@ -490,6 +510,8 @@ function accessibilityEnabledCustomTextProcesser(
         AltReactionerComponent={fns.AltReactionerComponent}
         altReactionerExtraProps={fns.altReactionerCustomProps && fns.altReactionerCustomProps((element as RichElement))}
         priority={fns.priority}
+        i18nLabelId={fns.imageI18nId || "rich_image"}
+        i18nLabelContext={fns.imageI18nContext}
       />
     );
   }

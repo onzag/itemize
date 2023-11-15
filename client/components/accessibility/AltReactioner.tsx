@@ -53,7 +53,7 @@ export interface IAltBaseProps {
   /**
    * Triggers when the action triggers
    */
-  onActionTriggered?: (tabNavigating: boolean) => void;
+  onActionTriggered?: (tabNavigating: boolean, action: "click" | "focus" | "blur") => void;
   /**
    * when you press the tab button and want to wrap around
    * elements, use this to specify whether the component is tabbable
@@ -165,6 +165,12 @@ export interface IAltReactionerProps extends IAltBaseProps {
    * click will click the element
    */
   action?: "focus" | "click";
+  /**
+   * Options for the focus action when triggered via keyboard
+   */
+  focusOptions?: {
+    blurIfAlreadyFocused?: "ALWAYS" | "ONLY_IF_NOT_DISPLAYING_ACTIONS",
+  }
   /**
    * Will use the reactioner in the text flow as well so that it's selectable while
    * going through textual elements, however it will not be displayed and be treated
@@ -1603,6 +1609,30 @@ export class ActualAltReactioner extends ActualAltBase<IAltReactionerProps, IAct
     if (!action || action === "click") {
       (element as HTMLElement).click();
     } else if (action === "focus") {
+      const focusOptions = this.props.focusOptions;
+
+      if (focusOptions?.blurIfAlreadyFocused) {
+        const isFocused = document.activeElement === element;
+        const satisify1 = (
+          isFocused &&
+          focusOptions.blurIfAlreadyFocused === "ONLY_IF_NOT_DISPLAYING_ACTIONS" && 
+          !ALT_REGISTRY.isDisplayingLayereds &&
+          !ALT_REGISTRY.awaitingLayerKeycodes
+        );
+        const satisfy2 = (
+          isFocused &&
+          focusOptions.blurIfAlreadyFocused === "ALWAYS"
+        );
+        if (satisfy2 || satisify1) {
+          (element as HTMLElement).blur();
+          if (onActionTriggered) {
+            onActionTriggered(isTabNavigatingCurrent, "blur");
+          }
+          ALT_REGISTRY.uncontrolled = false;
+          return;
+        }
+      }
+
       (element as HTMLElement).focus();
 
       if (!isInView(element)) {
@@ -1613,7 +1643,7 @@ export class ActualAltReactioner extends ActualAltBase<IAltReactionerProps, IAct
     }
 
     if (onActionTriggered) {
-      onActionTriggered(isTabNavigatingCurrent);
+      onActionTriggered(isTabNavigatingCurrent, action || "click");
     }
 
     if (triggerAltAfterAction) {

@@ -56,6 +56,17 @@ const typeValue: IPropertyDefinitionSupportedType<IPropertyDefinitionSupportedTe
       type: GraphQLString,
     },
   },
+  rq: {
+    type: "object",
+    stdFields: {
+      value: {
+        type: "string",
+      },
+      language: {
+        type: "string",
+      },
+    }
+  },
   ownLanguageProperty: "language",
   isNull: (v) => {
     if (v === null) {

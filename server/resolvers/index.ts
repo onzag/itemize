@@ -1,12 +1,14 @@
-import { getItemDefinitionFn, getModuleListFn, getItemDefinitionListFn } from "./actions/get";
-import { addItemDefinitionFn } from "./actions/add";
-import { searchItemDefinitionFn, searchModuleFn, searchModuleTraditionalFn, searchItemDefinitionTraditionalFn} from "./actions/search";
-import { editItemDefinitionFn } from "./actions/edit";
+import { getItemDefinitionFn, getModuleListFn, getItemDefinitionListFn,
+  getItemDefinitionFnRQ, getModuleListFnRQ, getItemDefinitionListFnRQ } from "./actions/get";
+import { addItemDefinitionFn, addItemDefinitionFnRQ } from "./actions/add";
+import { searchItemDefinitionFn, searchModuleFn, searchModuleTraditionalFn, searchItemDefinitionTraditionalFn,
+  searchItemDefinitionFnRQ, searchModuleFnRQ, searchModuleTraditionalFnRQ, searchItemDefinitionTraditionalFnRQ} from "./actions/search";
+import { editItemDefinitionFn, editItemDefinitionFnRQ } from "./actions/edit";
 import { IAppDataType } from "..";
 import { IGraphQLResolversType } from "../../base/Root/gql";
-import { deleteItemDefinitionFn } from "./actions/delete";
+import { deleteItemDefinitionFn, deleteItemDefinitionFnRQ } from "./actions/delete";
 
-export default function resolvers(appData: IAppDataType): IGraphQLResolversType {
+export function resolvers(appData: IAppDataType): IGraphQLResolversType {
   return {
     getItemDefinition: getItemDefinitionFn(appData),
     searchItemDefinition: searchItemDefinitionFn(appData),
@@ -18,7 +20,20 @@ export default function resolvers(appData: IAppDataType): IGraphQLResolversType 
     deleteItemDefinition: deleteItemDefinitionFn(appData),
     getItemDefinitionList: getItemDefinitionListFn(appData),
     getModuleList: getModuleListFn(appData),
+  };
+}
 
-    // blockItem
+export function resolversRQ(appData: IAppDataType): IGraphQLResolversType {
+  return {
+    getItemDefinition: getItemDefinitionFnRQ(appData),
+    searchItemDefinition: searchItemDefinitionFnRQ(appData),
+    searchItemDefinitionTraditional: searchItemDefinitionTraditionalFnRQ(appData),
+    searchModule: searchModuleFnRQ(appData),
+    searchModuleTraditional: searchModuleTraditionalFnRQ(appData),
+    addItemDefinition: addItemDefinitionFnRQ(appData),
+    editItemDefinition: editItemDefinitionFnRQ(appData),
+    deleteItemDefinition: deleteItemDefinitionFnRQ(appData),
+    getItemDefinitionList: getItemDefinitionListFnRQ(appData),
+    getModuleList: getModuleListFnRQ(appData),
   };
 }

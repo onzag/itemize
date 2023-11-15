@@ -295,8 +295,8 @@ class ActualTokenProvider extends React.Component<IActualTokenProviderProps, IAc
       tokenDataToken = tokenData ? tokenData.token as string : null;
 
       let cookieEnd = ";domain=" + location.hostname;
-      if (location.hostname !== "localhost") {
-        cookieEnd = ";secure=true";
+      if (location.protocol === "https:") {
+        cookieEnd += ";secure=true";
       }
 
       // so if we got the token, and assumingly an id and role; aka

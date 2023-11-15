@@ -42,6 +42,7 @@ import { CustomRoleGranterEnvironment, CustomRoleManager } from "../roles";
 import {
   CAN_LOG_DEBUG,
 } from "../../environment";
+import { FRQIdefResolverType } from "../../../base/Root/rq";
 
 function noop() {};
 
@@ -728,5 +729,9 @@ export async function addItemDefinition(
 }
 
 export function addItemDefinitionFn(appData: IAppDataType): FGraphQLIdefResolverType {
+  return addItemDefinition.bind(null, appData);
+}
+
+export function addItemDefinitionFnRQ(appData: IAppDataType): FRQIdefResolverType {
   return addItemDefinition.bind(null, appData);
 }

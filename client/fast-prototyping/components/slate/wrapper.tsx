@@ -1396,6 +1396,7 @@ class RichTextEditorToolbar extends React.Component<RichTextEditorToolbarProps, 
           this.appBarHeader = obj as any;
         }}
         data-alt-group={true}
+        data-unblur={true}
       >
         <StyledToolbar sx={this.props.toolbarSx} className={this.props.toolbarClassName}>
           {toolbarFormMapped}
@@ -1570,6 +1571,13 @@ export class MaterialUISlateWrapper extends React.PureComponent<IMaterialUISlate
     this.setToolbarState = this.setToolbarState.bind(this);
     this.selectiveHardBlur = this.selectiveHardBlur.bind(this);
     this.keyUpListener = this.keyUpListener.bind(this);
+    this.onAltActionTriggered = this.onAltActionTriggered.bind(this);
+  }
+
+  public onAltActionTriggered(tabNav: boolean, action: "click" | "focus" | "blur") {
+    if (action === "blur") {
+      this.props.helpers.hardBlur();
+    }
   }
 
   public onHeightChange(newHeight: number) {
@@ -1627,17 +1635,18 @@ export class MaterialUISlateWrapper extends React.PureComponent<IMaterialUISlate
     }
   }
 
-  public selectiveHardBlur(e: MouseEvent | KeyboardEvent) {
+  public selectiveHardBlur(e: MouseEvent | KeyboardEvent, altTarget?: HTMLElement) {
+    const target = altTarget || (e.target as HTMLElement);
     // we are currently in focus
     if (this.props.state.currentSelectedText) {
       // if it's an unblurred target, such as the toolbar
       // or the drawer
-      if (this.isUnblurred(e.target as any)) {
-        if ((e.target as HTMLElement).tagName !== "INPUT") {
+      if (this.isUnblurred(target)) {
+        if (target.tagName !== "INPUT") {
           // stop from losing focus
           e.preventDefault();
         }
-      } else if (!this.isInEditor(e.target as any)) {
+      } else if (!this.isInEditor(target)) {
         // otherwise if we are not in the editor
         // just lose all the focus
         this.props.helpers.hardBlur();
@@ -1662,6 +1671,11 @@ export class MaterialUISlateWrapper extends React.PureComponent<IMaterialUISlate
   }
 
   public isInEditor(ele: HTMLElement): boolean {
+    if (
+      ele.dataset.notEditor
+    ) {
+      return false;
+    }
     if (
       ele === this.editorRef.current
     ) {
@@ -1928,7 +1942,9 @@ export class MaterialUISlateWrapper extends React.PureComponent<IMaterialUISlate
           } sx={this.props.wrapperTextEditorSx}>
             {this.props.children}
           </Box>
-          {extraChildren}
+          <Box data-not-editor={true} sx={{width: "100%"}}>
+            {extraChildren}
+          </Box>
         </StyledDisjointedEditorContainer>
       );
     } else {
@@ -1965,6 +1981,10 @@ export class MaterialUISlateWrapper extends React.PureComponent<IMaterialUISlate
             this.props.state.currentSelectedElement ? "escape" : (this.props.reactionerKey || "t")}
           label={this.props.state.isRichText &&
             this.props.state.currentSelectedElement ? "esc" : null}
+          focusOptions={{
+            blurIfAlreadyFocused: "ONLY_IF_NOT_DISPLAYING_ACTIONS"
+          }}
+          onActionTriggered={this.onAltActionTriggered}
           tabbable={!this.props.state.currentSelectedElement}
           useInFlow={this.props.reactionerUseInFlow}
           action="focus"

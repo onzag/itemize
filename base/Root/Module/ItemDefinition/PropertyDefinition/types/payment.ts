@@ -92,6 +92,38 @@ const typeValue: IPropertyDefinitionSupportedType<IPropertyDefinitionSupportedPa
       type: GraphQLString,
     },
   },
+  rq: {
+    type: "object",
+    stdFields: {
+      type: {
+        type: "string",
+        required: true,
+        values: paymentTypesArr,
+      },
+      amount: {
+        type: "number",
+        required: true,
+      },
+      currency: {
+        type: "string",
+        required: true,
+      },
+      status: {
+        type: "string",
+        required: true,
+        values: paymentStatusesArr,
+      },
+      metadata: {
+        type: "string",
+      },
+      rometadata: {
+        type: "string",
+      },
+      target: {
+        type: "string",
+      },
+    },
+  },
 
   // from the sql file to save space as they are not
   // used in the client side

@@ -83,6 +83,31 @@ const typeValue: IPropertyDefinitionSupportedType<IPropertyDefinitionSupportedLo
       type: GraphQLNonNull && GraphQLNonNull(GraphQLString),
     },
   },
+  rq: {
+    type: "object",
+    stdFields: {
+      lng: {
+        type: "number",
+        required: true,
+      },
+      lat: {
+        type: "number",
+        required: true,
+      },
+      txt: {
+        type: "string",
+        required: true,
+      },
+      atxt: {
+        type: "string",
+        required: true,
+      },
+      id: {
+        type: "string",
+        required: true,
+      },
+    },
+  },
   sql: locationSQL,
   elastic: locationElastic,
   sqlSelect: locationSQLSelect,

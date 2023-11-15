@@ -49,6 +49,9 @@ export type PropertyDefinitionSupportedNumberType = number;
 const typeValue: IPropertyDefinitionSupportedType<PropertyDefinitionSupportedNumberType> = {
   // a number is just a number can be integer or decimal
   json: "number",
+  rq: {
+    type: "number",
+  },
   gql: GraphQLFloat,
   sql: getStandardSQLFnFor && getStandardSQLFnFor("REAL"),
   elastic: getStandardElasticForWithNullField && getStandardElasticForWithNullField("float"),

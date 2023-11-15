@@ -37,6 +37,9 @@ const typeValue: IPropertyDefinitionSupportedType<PropertyDefinitionSupportedBoo
   // a boolean type can be written as a boolean
   json: "boolean",
   gql: GraphQLBoolean,
+  rq: {
+    type: "boolean",
+  },
   sql: getStandardSQLFnFor && getStandardSQLFnFor("BOOLEAN"),
   elastic: getStandardElasticForWithNullField && getStandardElasticForWithNullField("boolean"),
   sqlSelect: standardSQLSelect,

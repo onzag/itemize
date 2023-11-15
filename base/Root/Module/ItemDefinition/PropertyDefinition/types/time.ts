@@ -48,6 +48,9 @@ export type PropertyDefinitionSupportedTimeType = string;
  */
 const typeValue: IPropertyDefinitionSupportedType<PropertyDefinitionSupportedTimeType> = {
   gql: GraphQLString,
+  rq: {
+    type: "string",
+  },
   searchable: true,
   searchInterface: PropertyDefinitionSearchInterfacesType.EXACT_AND_RANGE,
   sql: getStandardSQLFnFor && getStandardSQLFnFor("TIME"),

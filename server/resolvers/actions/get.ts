@@ -29,6 +29,7 @@ import { CustomRoleGranterEnvironment, CustomRoleManager } from "../roles";
 import { CAN_LOG_DEBUG } from "../../environment";
 import type { IElasticHighlightReply, IElasticHighlightRecordInfo } from "../../../base/Root/Module/ItemDefinition/PropertyDefinition/types";
 import { buildElasticQueryForModule } from "../../../base/Root/Module/sql";
+import { FRQIdefResolverType, FRQModResolverType } from "../../../base/Root/rq";
 
 function noop() { };
 
@@ -928,5 +929,17 @@ export function getItemDefinitionListFn(appData: IAppDataType): FGraphQLIdefReso
 }
 
 export function getModuleListFn(appData: IAppDataType): FGraphQLModResolverType {
+  return getModuleList.bind(null, appData);
+}
+
+export function getItemDefinitionFnRQ(appData: IAppDataType): FRQIdefResolverType {
+  return getItemDefinition.bind(null, appData);
+}
+
+export function getItemDefinitionListFnRQ(appData: IAppDataType): FRQIdefResolverType {
+  return getItemDefinitionList.bind(null, appData);
+}
+
+export function getModuleListFnRQ(appData: IAppDataType): FRQModResolverType {
   return getModuleList.bind(null, appData);
 }

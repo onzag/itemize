@@ -366,6 +366,8 @@ export default async function build(version: string, buildID: string, services: 
       "\ndocker-compose -f docker-compose-only-db.yml up -d" +
       "\nthen run the code for accessing the builder" +
       "\ndir=${PWD##*/}; docker run -it --network \"${dir,,}_default\" " +
+      "-v $PWD/patch/nodejs:/home/node/app/node_modules/@onzag/itemize/nodejs " +
+      "-v $PWD/patch/dist:/home/node/app/dist " +
       "-v $PWD/config:/home/node/app/config -e NODE_ENV=" + version +
       " -e INSTANCE_MODE=BUILD_DATABASE app:latest" +
       "\nalso if you need to load dumps remember to run:" +

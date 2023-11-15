@@ -20,8 +20,10 @@ import {
 import Module from ".";
 // import { getRQSchemaForItem } from "./ItemDefinition/rq";
 // import { getRQDefinitionForProperty } from "./ItemDefinition/PropertyDefinition/rq";
-import { IRQIdefResolverArgs, IRQResolversType, RQArg, RQField, RQQuery, RQRootSchema } from "../rq";
+import { IRQIdefResolverArgs, IRQResolversType, RQArg, RQField, RQQuery, RQRootSchema, rqFieldsToRqArgs } from "../rq";
 import { EndpointError } from "../../errors";
+import { getRQSchemaForItemDefinition } from "./ItemDefinition/rq";
+import { getRQDefinitionForProperty } from "./ItemDefinition/PropertyDefinition/rq";
 
 /**
  * Provides the fields definition for the module itself, and for all
@@ -42,20 +44,20 @@ export function getRQDefinitionForModule(
     optionalForm: boolean;
     onlyTextFilters: boolean;
   },
-): [{ [id: string]: RQArg }, { [id: string]: RQArg }, { [id: string]: RQArg }] {
-  const stdFields: { [id: string]: RQArg } = {};
-  const extFields: { [id: string]: RQArg } = {};
-  const ownFields: { [id: string]: RQArg } = {};
+): RQField {
+  const stdFields: { [id: string]: RQField } = {};
+  const extFields: { [id: string]: RQField } = {};
+  const ownFields: { [id: string]: RQField } = {};
 
   if (!options.excludeBase) {
-  Object.keys(RESERVED_BASE_PROPERTIES_RQ).forEach((property) => {
-    if (EXTERNALLY_ACCESSIBLE_RESERVED_BASE_PROPERTIES.includes(property)) {
-      extFields[property] = RESERVED_BASE_PROPERTIES_RQ[property];
-    } else {
-      stdFields[property] = RESERVED_BASE_PROPERTIES_RQ[property];
-    }
-  });
-}
+    Object.keys(RESERVED_BASE_PROPERTIES_RQ).forEach((property) => {
+      if (EXTERNALLY_ACCESSIBLE_RESERVED_BASE_PROPERTIES.includes(property)) {
+        extFields[property] = RESERVED_BASE_PROPERTIES_RQ[property];
+      } else {
+        stdFields[property] = RESERVED_BASE_PROPERTIES_RQ[property];
+      }
+    });
+  }
 
   // now we get all prop extensions of this module
   mod.getAllPropExtensions().forEach((propExtension) => {
@@ -68,15 +70,19 @@ export function getRQDefinitionForModule(
     }
 
     // and basically get the fields for that property
-    // TODO uncomment
-    // Object.assign(ownFields, getRQDefinitionForProperty(propExtension, {
-    //   optionalForm: options.optionalForm,
-    //   prefix: "",
-    // }));
+    Object.assign(ownFields, getRQDefinitionForProperty(propExtension, {
+      optionalForm: options.optionalForm,
+      prefix: "",
+    }));
   });
 
   // return that
-  return [stdFields, extFields, ownFields];
+  return {
+    type: "object",
+    ownFields,
+    stdFields,
+    extFields,
+  };
 }
 
 /**
@@ -106,7 +112,7 @@ export function getRQSchemaForModule(
   let query: { [id: string]: RQQuery } = {};
 
   if (mod.isSearchable()) {
-    const [basicOutputStdFields, basicOutputExtFields, basicOutputOwnFields] = getRQDefinitionForModule(mod, {
+    const rqFiledModule = getRQDefinitionForModule(mod, {
       retrievalMode: true,
       excludeBase: false,
       onlyTextFilters: false,
@@ -129,25 +135,25 @@ export function getRQSchemaForModule(
       orderByRuleArg.properties[p.getId()] = ORDERBY_RULE_RQ;
     });
 
-    const [basicOutputStdFields2, basicOutputExtFields2, basicOutputOwnFields2] = getRQDefinitionForModule(mod.getSearchModule(), {
+    const rqFiledModule2 = getRQDefinitionForModule(mod.getSearchModule(), {
       retrievalMode: false,
       excludeBase: true,
       optionalForm: true,
       onlyTextFilters: false,
-    })
+    });
+    delete rqFiledModule2.extFields;
+    delete rqFiledModule2.stdFields;
+    const rqFiledModule2AsArg = rqFieldsToRqArgs(rqFiledModule2);
 
-    const searchArgs: {[id: string]: RQArg} = {
+    const searchArgs: { [id: string]: RQArg } = {
       // as you can realize the arguments exclude the base and make it into input mode
       // that means no RESERVED_BASE_PROPERTIES
-      ...basicOutputOwnFields2,
+      ...rqFiledModule2AsArg.properties,
       ...RESERVED_MODULE_SEARCH_PROPERTIES_RQ(orderByRuleArg),
     };
 
     const resultsField: RQField = {
-      type: "object",
-      stdFields: basicOutputStdFields,
-      extFields: basicOutputExtFields,
-      ownFields: basicOutputOwnFields,
+      ...rqFiledModule,
       array: true,
       required: true,
     };
@@ -156,10 +162,9 @@ export function getRQSchemaForModule(
       stdFields: SEARCH_RECORDS_CONTAINER_RQ.properties,
       ownFields: {},
       args: searchArgs,
-      resolve: resolveGenericFunction.bind(null, "searchModule", mod, resolvers),
     };
 
-    const traditionalStdFields = {...SEARCH_RECORDS_CONTAINER_RQ.properties};
+    const traditionalStdFields = { ...SEARCH_RECORDS_CONTAINER_RQ.properties };
     delete traditionalStdFields.records;
     delete traditionalStdFields.earliest_created_at;
     delete traditionalStdFields.oldest_created_at;
@@ -169,8 +174,8 @@ export function getRQSchemaForModule(
       args: searchArgs,
       stdFields: traditionalStdFields,
       ownFields: {},
-      resolve: resolveGenericFunction.bind(null, "searchModuleTraditional", mod, resolvers),
     };
+
     query[PREFIX_GET_LIST + mod.getQualifiedPathName()] = {
       args: RESERVED_GETTER_LIST_PROPERTIES_RQ,
       stdFields: {
@@ -180,18 +185,25 @@ export function getRQSchemaForModule(
         }
       },
       ownFields: {},
-      resolve: resolveGenericFunction.bind(null, "getModuleList", mod, resolvers),
+    }
+
+    if (resolvers) {
+      query[PREFIX_TRADITIONAL_SEARCH + mod.getQualifiedPathName()].resolve =
+        resolveGenericFunction.bind(null, "searchModuleTraditional", mod, resolvers);
+      query[PREFIX_GET_LIST + mod.getQualifiedPathName()].resolve =
+        resolveGenericFunction.bind(null, "getModuleList", mod, resolvers);
+      query[PREFIX_SEARCH + mod.getQualifiedPathName()].resolve =
+        resolveGenericFunction.bind(null, "searchModule", mod, resolvers);
     }
   }
 
   // now we get all child definitions and add the query
   // fields for each of them
-  // TODO uncomment
-  // mod.getAllChildItemDefinitions().forEach((cIdef) => {
-  //   const schema = getRQSchemaForItem(cIdef, resolvers);
-  //   Object.assign(query, schema.query);
-  //   Object.assign(mutation, schema.mutation);
-  // });
+  mod.getAllChildItemDefinitions().forEach((cIdef) => {
+    const schema = getRQSchemaForItemDefinition(cIdef, resolvers);
+    Object.assign(query, schema.query);
+    Object.assign(mutation, schema.mutation);
+  });
 
   mod.getAllModules().forEach((cMod) => {
     const schema = getRQSchemaForModule(cMod, resolvers);

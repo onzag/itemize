@@ -123,6 +123,21 @@ export interface IGQLRequestFields {
 }
 
 /**
+ * Request fields for rq in the exploded form
+ * ```
+ * {
+ *   field: {},
+ *   other: {
+ *     field: {}
+ *   }
+ * }
+ * ```
+ */
+export interface IRQRequestFields {
+  [key: string]: IRQRequestFields;
+}
+
+/**
  * Single arg, can take many shapes
  */
 type GQLArg = boolean | string | number | null | GQLRaw | GQLEnum | GQLVar | IGQLFile | IGQLSearchRecord | IGQLArgs;
@@ -431,8 +446,8 @@ export class GQLQuery {
     };
   }
 
-  public getCompressedOperations() {
-    return buildCompressedThing(...this.processedQueries);
+  public getRQOperations() {
+    return buildRQThing(...this.processedQueries);
   }
 
   public getType() {
@@ -622,31 +637,30 @@ export class GQLVar extends GQLRaw {
   public __type__: string = "GQLVar";
 }
 
-function buildCompressedFields(fields: IGQLRequestFields) {
-  const rs = [];
-  const hasAllExternal = EXTERNALLY_ACCESSIBLE_RESERVED_BASE_PROPERTIES.every((f) => {
-    return !!fields[f];
-  });
-  const hasAllStandard = STANDARD_ACCESSIBLE_RESERVED_BASE_PROPERTIES.every((f) => {
-    return !!(fields.DATA && fields.DATA[f]);
-  });
-  if (hasAllExternal && hasAllStandard) {
-    rs.push("ALL");
-  } else if (hasAllExternal) {
-    rs.push("EXT");
-  } else if (hasAllStandard) {
-    rs.push("STD");
+type RqFieldList = Array<string | RqFieldList>;
+
+// TODO add the schema info to be able to compress this
+function buildRQFields(
+  fields: IRQRequestFields,
+  keyd?: string,
+) {
+  const rs: RqFieldList = [];
+
+  if (keyd) {
+    rs.push(keyd);
   }
 
-  if (fields.DATA) {
-    Object.keys(fields.DATA).forEach((f) => {
-      if (STANDARD_ACCESSIBLE_RESERVED_BASE_PROPERTIES.includes(f)) {
-        return;
-      }
+  Object.keys(fields).forEach((fKey) => {
+    // we are in the external
+    if (fKey === "DATA") {
+      rs.push(buildRQFields(fields[fKey], fKey));
+    }
 
-      rs.push(f);
-    });
-  }
+    const subFields = Object.keys(fields[fKey]);
+    if (subFields.length === 0) {
+      rs.push(fKey);
+    }
+  });
 
   return rs;
 }
@@ -749,7 +763,7 @@ function buildArgs(
   }).join(",") + keyCloseType;
 }
 
-function buildCompressedArgs(
+function buildRQArgs(
   args: IGQLArgs,
 ): any {
   // if it's not an object or if it's null
@@ -768,12 +782,12 @@ function buildCompressedArgs(
   } else if (args instanceof GQLEnum || args instanceof GQLRaw) {
     return args.value;
   } else if (Array.isArray(args)) {
-    return args.map((v: any) => buildCompressedArgs(v));
+    return args.map((v: any) => buildRQArgs(v));
   }
 
   const rs: any = {};
   Object.keys(args).forEach((key) => {
-    rs[key] = buildCompressedArgs(args[key] as any);
+    rs[key] = buildRQArgs(args[key] as any);
   });
 
   return rs;
@@ -822,17 +836,17 @@ function buildGqlThing(type: "mutation" | "query", mainArgs: IGQLArgs, ...querie
   return queryStr;
 }
 
-function buildCompressedThing(...queries: IGQLQueryObj[]) {
+function buildRQThing(...queries: IGQLQueryObj[]) {
   const qs: any = {};
   queries.forEach((query) => {
     const qObj: any = {
       n: query.name,
     };
     if (query.fields) {
-      qObj.f = buildCompressedFields(query.fields);
+      qObj.f = buildRQFields(query.fields);
     }
     if (query.args) {
-      qObj.args = buildCompressedArgs(query.args);
+      qObj.args = buildRQArgs(query.args);
     }
     qs[query.alias || query.name] = qObj;
   });
@@ -1036,7 +1050,7 @@ export async function gqlQuery(query: GQLQuery, options?: {
     formData.append("map", JSON.stringify(query.getMap()));
   // } else {
   //   formData.append(this.getType(), JSON.stringify(query.getOperations()));
-  //   console.log(query.getCompressedOperations());
+    //console.log(query.getRQOperations());
   // }
 
   // now let's get all the attachents and append them to the form data

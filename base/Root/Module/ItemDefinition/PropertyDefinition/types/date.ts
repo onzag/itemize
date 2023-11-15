@@ -47,6 +47,9 @@ export type PropertyDefinitionSupportedDateType = string;
  */
 const typeValue: IPropertyDefinitionSupportedType<PropertyDefinitionSupportedDateType> = {
   gql: GraphQLString,
+  rq: {
+    type: "string",
+  },
   searchable: true,
   searchInterface: PropertyDefinitionSearchInterfacesType.EXACT_AND_RANGE,
   sql: getStandardSQLFnFor && getStandardSQLFnFor("DATE"),

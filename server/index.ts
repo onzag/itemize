@@ -72,6 +72,7 @@ import { ItemizeElasticClient } from "./elastic";
 import { ElasticLoggerService } from "./services/elastic-logger";
 import { ElasticLocationService } from "./services/elastic-location";
 import ItemDefinition from "../base/Root/Module/ItemDefinition";
+import { RQRootSchema, getRQSchemaForRoot } from "../base/Root/rq";
 
 // load the custom services configuration
 let serviceCustom: IServiceCustomizationType = {};
@@ -172,6 +173,7 @@ export interface ISEOConfig {
 export interface IAppDataType {
   root: Root;
   rootPool: Pool<Root>,
+  rqSchema: RQRootSchema;
   langLocales: ILangLocalesType;
   ssrConfig: ISSRConfig;
   seoConfig: ISEOConfig;
@@ -1178,6 +1180,7 @@ export async function initializeServer(
     const appData: IAppDataType = {
       root,
       rootPool: retrieveRootPool(root.rawData),
+      rqSchema: getRQSchemaForRoot(root),
       langLocales,
       ssrConfig,
       seoConfig,

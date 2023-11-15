@@ -23,6 +23,7 @@ import { IOTriggerActions } from "../triggers";
 import { IGQLValue } from "../../../gql-querier";
 import { CustomRoleGranterEnvironment, CustomRoleManager } from "../roles";
 import { CAN_LOG_DEBUG } from "../../environment";
+import { FRQIdefResolverType } from "../../../base/Root/rq";
 
 function noop() { };
 
@@ -410,5 +411,9 @@ export async function deleteItemDefinition(
 }
 
 export function deleteItemDefinitionFn(appData: IAppDataType): FGraphQLIdefResolverType {
+  return deleteItemDefinition.bind(null, appData);
+}
+
+export function deleteItemDefinitionFnRQ(appData: IAppDataType): FRQIdefResolverType {
   return deleteItemDefinition.bind(null, appData);
 }

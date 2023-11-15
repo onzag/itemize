@@ -56,6 +56,27 @@ const typeValue: IPropertyDefinitionSupportedType<IPropertyDefinitionSupportedUn
       type: GraphQLNonNull && GraphQLNonNull(GraphQLString),
     },
   },
+  rq: {
+    type: "object",
+    stdFields: {
+      value: {
+        type: "number",
+        required: true,
+      },
+      unit: {
+        type: "string",
+        required: true,
+      },
+      normalizedValue: {
+        type: "number",
+        required: true,
+      },
+      normalizedUnit: {
+        type: "string",
+        required: true,
+      },
+    },
+  },
   sql: unitSQL,
   elastic: unitElastic,
   sqlIn: unitSQLIn,

@@ -116,6 +116,12 @@ interface IAltBadgeReactionerProps {
    */
   action?: "focus" | "click";
   /**
+   * Options for the focus action when triggered via keyboard
+   */
+  focusOptions?: {
+    blurIfAlreadyFocused?: "ALWAYS" | "ONLY_IF_NOT_DISPLAYING_ACTIONS",
+  };
+  /**
    * What color to use
    */
   colorSchema?: "default" | "contrast";
@@ -208,7 +214,7 @@ interface IAltBadgeReactionerProps {
   /**
    * Triggers when the action triggers
    */
-  onActionTriggered?: (tabNavigating: boolean) => void;
+  onActionTriggered?: (tabNavigating: boolean, action: "click" | "focus" | "blur") => void;
 
   /**
    * Once this element is focused it will go into an uncontrolled state

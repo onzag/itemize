@@ -38,7 +38,6 @@ services:
             - NODE_ENV=%{NODE_ENV}
             - LOG_LEVEL=info
             - USING_DOCKER=true
-            - NO_SEO=false
             - FORCE_CONSOLE_LOGS=false
     servers:
         image: app:latest
@@ -65,6 +64,7 @@ services:
             - LOG_LEVEL=info
             - USING_DOCKER=true
             - NO_SSR=false
+            - NO_SEO=false
             - FAKE_EMAILS=false
             - FAKE_SMS=false
             - FAKE_USSD=false

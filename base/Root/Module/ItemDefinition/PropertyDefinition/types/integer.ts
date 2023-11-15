@@ -47,6 +47,9 @@ export type PropertyDefinitionSupportedIntegerType = number;
 const typeValue: IPropertyDefinitionSupportedType<PropertyDefinitionSupportedIntegerType> = {
   // an integer is represented as a number
   json: "number",
+  rq: {
+    type: "integer",
+  },
   gql: GraphQLInt,
   sql: getStandardSQLFnFor && getStandardSQLFnFor("INTEGER"),
   elastic: getStandardElasticForWithNullField && getStandardElasticForWithNullField("long"),

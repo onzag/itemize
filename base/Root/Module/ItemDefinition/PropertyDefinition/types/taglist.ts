@@ -40,6 +40,10 @@ const typeValue: IPropertyDefinitionSupportedType<PropertyDefinitionSupportedTag
   gql: GraphQLString,
   json: "string",
   gqlList: true,
+  rq: {
+    type: "string",
+    array: true,
+  },
   sql: getStandardSQLFnFor && getStandardSQLFnFor("TEXT[]", null, (subtype: string, sqlPrefix: string, id: string) => {
     return {
       type: "gin",

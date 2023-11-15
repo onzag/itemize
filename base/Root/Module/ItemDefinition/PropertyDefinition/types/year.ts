@@ -47,6 +47,9 @@ export type PropertyDefinitionSupportedYearType = number;
  */
 const typeValue: IPropertyDefinitionSupportedType<PropertyDefinitionSupportedYearType> = {
   gql: GraphQLInt,
+  rq: {
+    type: "integer-positive",
+  },
   // years can be set as a number
   json: "number",
   sql: getStandardSQLFnFor && getStandardSQLFnFor("SMALLINT"),

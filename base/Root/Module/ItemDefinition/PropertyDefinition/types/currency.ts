@@ -55,6 +55,19 @@ const typeValue: IPropertyDefinitionSupportedType<IPropertyDefinitionSupportedCu
       type: GraphQLNonNull && GraphQLNonNull(GraphQLString),
     },
   },
+  rq: {
+    type: "object",
+    stdFields: {
+      value: {
+        type: "number",
+        required: true,
+      },
+      currency: {
+        type: "string",
+        required: true,
+      }
+    },
+  },
 
   // from the sql file to save space as they are not
   // used in the client side

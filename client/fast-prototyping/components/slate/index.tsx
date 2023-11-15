@@ -21,11 +21,10 @@ import {
   IFeatureSupportOptions, RICH_TEXT_CLASS_PREFIX, serialize, serializeString, TABLE_CLASS_PREFIX
 } from "../../../internal/text";
 import { FILE_SUPPORTED_IMAGE_TYPES, LAST_RICH_TEXT_CHANGE_LENGTH } from "../../../../constants";
-import uuid from "uuid";
 import { IInsertedFileInformationType } from "../../../internal/components/PropertyEntry/PropertyEntryText";
 import { convertStyleStringToReactObject, IUIHandlerProps } from "../../../internal/text/serializer/base";
 import { IVideo } from "../../../internal/text/serializer/types/video";
-import { fileURLAbsoluter, localeReplacer, mimeTypeToExtension } from "../../../../util";
+import { localeReplacer, mimeTypeToExtension } from "../../../../util";
 import prettyBytes from "pretty-bytes";
 import { IContainer } from "../../../internal/text/serializer/types/container";
 import { IFile } from "../../../internal/text/serializer/types/file";
@@ -85,19 +84,27 @@ function findLastIndex(arr: any[], fn: (ele: any) => boolean) {
 // remove when shift+tab is fixed
 const EDITOR_POOL = new Map<HTMLElement, SlateEditor>();
 
-function onShiftTab() {
+// buggy to repair it not focusing when it should and keeping focus when it shouldn't
+// for both tab and shift tab
+function onAnyTab(ev: KeyboardEvent) {
   setTimeout(() => {
     const editorElement = EDITOR_POOL.get(document.activeElement as any);
+    EDITOR_POOL.forEach((e) => e !== editorElement && e.selectiveHardBlurIfHasSelectedElement(ev, document.activeElement instanceof HTMLElement ?
+        document.activeElement : null));
     if (editorElement) {
+      // maybe a way to keep the cursor where it was?....
+      // it's kind of annoying that the cursor moves
       editorElement.forceFocus();
     }
   }, 70);
 }
 
+// what's worse sometimes it retains focus when it shouldn't
+
 if (typeof document !== "undefined") {
   document.addEventListener("keydown", (e) => {
-    if (e.key === "Tab" && e.shiftKey) {
-      onShiftTab();
+    if (e.key === "Tab") {
+      onAnyTab(e);
     }
   });
 }
@@ -781,6 +788,13 @@ export interface ISlateEditorElementWrappers {
  * You might extend this class and require extra props, these
  * props might be passed by using the wrapperArgs from
  * the main component which will pass them to the wrapper
+ * 
+ * When implementing the wrapper you may add a selectiveHardBlur function
+ * for which triggers when the element is blurred to prevent real blurring (aka executing hardBlur)
+ * depending on if something is selected in the wrapper
+ * 
+ * The selectiveHardBlur should take a (ev: KeyboardEvent, target: HTMLElement) if you wish to prevent
+ * the blur from happening
  */
 export interface ISlateEditorWrapperBaseProps {
   /**
@@ -903,7 +917,7 @@ interface ISlateEditorProps {
    * 
    * affects both aria-invalid and aria-errormessage
    */
-  currentGeneralError?: string;
+  currentGeneralErrorElementId?: string;
   /**
    * affects aria-describedby
    */
@@ -1124,6 +1138,7 @@ export class SlateEditor extends React.Component<ISlateEditorProps, ISlateEditor
   private isUnmounted: boolean;
 
   private editableRef: React.RefObject<HTMLDivElement> = React.createRef();
+  private wrapperRef: React.RefObject<any> = React.createRef();
 
   /**
    * The standard derived state function is used in order to set the state in an effective way
@@ -1430,6 +1445,7 @@ export class SlateEditor extends React.Component<ISlateEditorProps, ISlateEditor
     this.moveNodeAt = this.moveNodeAt.bind(this);
 
     this.hardBlur = this.hardBlur.bind(this);
+    this.selectiveHardBlurIfHasSelectedElement = this.selectiveHardBlurIfHasSelectedElement.bind(this);
     this.softBlur = this.softBlur.bind(this);
   }
 
@@ -3096,6 +3112,16 @@ export class SlateEditor extends React.Component<ISlateEditorProps, ISlateEditor
     });
     Transforms.deselect(this.editor);
     ReactEditor.blur(this.editor);
+  }
+
+  public selectiveHardBlurIfHasSelectedElement(e: KeyboardEvent, ele: HTMLElement) {
+    if (this.state.currentSelectedElement) {
+      if (ele && this.wrapperRef?.current?.selectiveHardBlur) {
+        this.wrapperRef?.current?.selectiveHardBlur(e, ele);
+      } else {
+        this.hardBlur();
+      }
+    }
   }
 
   /**
@@ -4961,6 +4987,7 @@ export class SlateEditor extends React.Component<ISlateEditorProps, ISlateEditor
       }
       // bug in slate sometimes it just rejects to focus
       // when using tab, specifically shift+tab
+      // nah it does it also with tab sometimes
       this.focusAt({
         anchor: {
           offset: 0,
@@ -5018,9 +5045,10 @@ export class SlateEditor extends React.Component<ISlateEditorProps, ISlateEditor
             // onFocus={this.forceFocus}
             onBlur={this.forceBlur}
             // onClick={preventFocus}
-            aria-invalid={!!this.props.currentGeneralError}
-            aria-errormessage={this.props.currentGeneralError}
+            aria-invalid={!this.props.currentValid}
+            aria-errormessage={this.props.currentValid ? null : this.props.currentGeneralErrorElementId}
             aria-describedby={this.props.currentDescribedBy}
+            aria-placeholder={this.props.placeholder}
           />
         </div>
       </CurrentElementProvider>
@@ -5043,6 +5071,7 @@ export class SlateEditor extends React.Component<ISlateEditorProps, ISlateEditor
           featureSupport={this.getFeatureSupport()}
           currentLoadError={this.props.currentLoadError}
           dismissCurrentLoadError={this.props.dismissCurrentLoadError}
+          ref={this.wrapperRef}
         >
           {children}
         </Wrapper>

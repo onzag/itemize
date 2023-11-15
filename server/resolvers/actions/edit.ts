@@ -32,6 +32,7 @@ import { IOTriggerActions } from "../triggers";
 import Root from "../../../base/Root";
 import { CustomRoleGranterEnvironment, CustomRoleManager } from "../roles";
 import { CAN_LOG_DEBUG } from "../../environment";
+import { FRQIdefResolverType } from "../../../base/Root/rq";
 
 function noop() { }
 
@@ -676,5 +677,9 @@ export async function editItemDefinition(
 }
 
 export function editItemDefinitionFn(appData: IAppDataType): FGraphQLIdefResolverType {
+  return editItemDefinition.bind(null, appData);
+}
+
+export function editItemDefinitionFnRQ(appData: IAppDataType): FRQIdefResolverType {
   return editItemDefinition.bind(null, appData);
 }

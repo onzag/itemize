@@ -34,6 +34,7 @@ import Include from "../../Include";
 import { WhereBuilder } from "../../../../../../database/WhereBuilder";
 import type { IAppDataType } from "../../../../../../server";
 import type { ElasticQueryBuilder } from "../../../../../../server/elastic";
+import { RQField } from "../../../../rq";
 
 /**
  * All the supported property types
@@ -258,6 +259,10 @@ export interface IPropertyDefinitionSupportedType<T> {
    * gqlFields should be defined
    */
   gql: GraphQLOutputType | string;
+  /**
+   * The rq type
+   */
+  rq: RQField;
   /**
    * when gql is a string, the fields that it represents, this is for complex
    * types, only basic types are allowed

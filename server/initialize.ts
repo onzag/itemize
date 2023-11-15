@@ -10,7 +10,7 @@ import { logger } from "./logger";
 import express from "express";
 import graphqlHTTP from "express-graphql";
 import path from "path";
-import resolvers from "./resolvers";
+import { resolvers, resolversRQ } from "./resolvers";
 import { getGQLSchemaForRoot } from "../base/Root/gql";
 import { MAX_FILES_PER_REQUEST, MAX_FILE_SIZE, MAX_FIELD_SIZE, ENDPOINT_ERRORS } from "../constants";
 import { GraphQLError } from "graphql";
@@ -26,6 +26,8 @@ import { NODE_ENV, NO_SEO } from "./environment";
 
 import { ssrGenerator } from "./ssr/generator";
 import { SEOGenerator } from "./seo/generator";
+import { getRQSchemaForRoot } from "../base/Root/rq";
+import { rqSystem } from "./rq";
 
 /**
  * This is the function that catches the errors that are thrown
@@ -185,6 +187,20 @@ export function initializeApp(appData: IAppDataType, custom: IServerCustomizatio
     }),
   );
 
+  app.use(
+    "/rq",
+    rqSystem({
+      maxFileSize: MAX_FILE_SIZE,
+      maxFiles: MAX_FILES_PER_REQUEST,
+      maxFieldSize: MAX_FIELD_SIZE,
+      jsonSchema: appData.rqSchema,
+      schema: getRQSchemaForRoot(
+        appData.root,
+        resolversRQ(appData),
+      ),
+    }),
+  );
+
   // service worker setup
   app.get("/sw.development.js", (req, res) => {
     if (reprocessedCache["/service-worker.development.js"]) {
@@ -238,7 +254,7 @@ export function initializeApp(appData: IAppDataType, custom: IServerCustomizatio
     }
 
     let result: string = "user-agent: *\ndisallow: /rest/util/*\ndisallow: /rest/index-check/*\n" +
-      "disallow: /rest/currency-factors\ndisallow: /graphql\n";
+      "disallow: /rest/currency-factors\ndisallow: /graphql\ndisallow: /rq\n";
 
     if (appData.seoConfig) {
       Object.keys(appData.seoConfig.seoRules).forEach((urlSet) => {

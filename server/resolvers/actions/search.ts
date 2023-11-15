@@ -42,6 +42,7 @@ import type { SelectBuilder } from "../../../database/SelectBuilder";
 import type { ElasticQueryBuilder } from "../../elastic";
 import type { IElasticHighlightRecordInfo } from "../../../base/Root/Module/ItemDefinition/PropertyDefinition/types";
 import { SearchResponse } from "@elastic/elasticsearch/lib/api/types";
+import { FRQIdefResolverType, FRQModResolverType } from "../../../base/Root/rq";
 
 export function findLastRecordDate(comp: "min" | "max", p: string, ...records: ISQLTableRowValue[][]): string {
   const recordsRespectiveNanoSecondAccuracyArray = records.flat().map((r) => new NanoSecondComposedDate(r[p]));
@@ -2023,5 +2024,21 @@ export function searchItemDefinitionTraditionalFn(appData: IAppDataType): FGraph
 }
 
 export function searchModuleTraditionalFn(appData: IAppDataType): FGraphQLModResolverType {
+  return searchModuleTraditional.bind(null, appData);
+}
+
+export function searchItemDefinitionFnRQ(appData: IAppDataType): FRQIdefResolverType {
+  return searchItemDefinition.bind(null, appData);
+}
+
+export function searchModuleFnRQ(appData: IAppDataType): FRQModResolverType {
+  return searchModule.bind(null, appData);
+}
+
+export function searchItemDefinitionTraditionalFnRQ(appData: IAppDataType): FRQIdefResolverType {
+  return searchItemDefinitionTraditional.bind(null, appData);
+}
+
+export function searchModuleTraditionalFnRQ(appData: IAppDataType): FRQModResolverType {
   return searchModuleTraditional.bind(null, appData);
 }

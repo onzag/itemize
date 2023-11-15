@@ -70,12 +70,6 @@ export default async function build(version: string, action: "build" | "dump" | 
     dbConnectionConfig.host = "pgsql";
   }
 
-  console.log(colors.yellow(`attempting database connection at ${dbConnectionConfig.host}...`));
-
-  // we only need one client instance
-  const databaseConnection = new DatabaseConnection(dbConnectionConfig);
-  databaseConnection.forceLogging();
-
   // parse the data
   let data: any;
   try {
@@ -83,12 +77,32 @@ export default async function build(version: string, action: "build" | "dump" | 
       path.join("dist", "data", "build.all.json"),
       "utf8",
     ));
-  } catch {
-    data = JSON.parse(await fsAsync.readFile(
-      "build.all.json",
-      "utf8",
-    ));
+  } catch (err) {
+    console.log(colors.yellow("Error while reading " + path.join("dist", "data", "build.all.json")));
+    console.log(colors.red(err.stack));
+
+    try {
+      data = JSON.parse(await fsAsync.readFile(
+        "build.all.json",
+        "utf8",
+      ));
+    } catch (err) {
+      console.log(colors.yellow("Error while reading build.all.json"));
+      console.log(colors.red(err.stack));
+    }
   }
+
+  if (!data) {
+    process.exit(1);
+  }
+
+  console.log(colors.yellow(`attempting database connection at ${dbConnectionConfig.host}...`));
+
+  // we only need one client instance
+  const databaseConnection = new DatabaseConnection(dbConnectionConfig);
+  databaseConnection.forceLogging();
+
+  console.log(colors.yellow(`Established at ${dbConnectionConfig.host}...`));
 
   // build the root from that data
   const root = new Root(data);

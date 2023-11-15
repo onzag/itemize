@@ -29,6 +29,37 @@ const typeValue: IPropertyDefinitionSupportedType<PropertyDefinitionSupportedFil
   gqlFields: {},
   gqlAddFileToFields: true,
   gqlList: false,
+  rq: {
+    type: "object",
+    stdFields: {
+      id: {
+        type: "string",
+        required: true,
+      },
+      metadata: {
+        type: "string",
+      },
+      name: {
+        type: "string",
+        required: true,
+      },
+      size: {
+        type: "number",
+        required: true,
+      },
+      type: {
+        type: "string",
+        required: true,
+      },
+      url: {
+        type: "string",
+        required: true,
+      },
+      src: {
+        type: "binary",
+      },
+    }
+  },
 
   searchable: false,
   configOptions: [
