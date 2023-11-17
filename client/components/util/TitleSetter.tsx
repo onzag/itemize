@@ -8,13 +8,14 @@
 import React from "react";
 import { ActualTitleReader } from "./TitleReader";
 import RootRetriever from "../root/RootRetriever";
+import ReactDOM from "react-dom";
 
 /**
  * The title setter props, takes a string children
  */
 interface ITitleSetterProps {
   children: string;
-  type?: "document" | "og" | "both",
+  type?: "document" | "og" | "both";
 }
 
 /**
@@ -28,7 +29,7 @@ let TitleSetterInstanceIsLoaded = false;
  * 
  * Do not have two title setters at once as this would cause an error
  */
-export class ActualTitleSetter extends React.Component<ITitleSetterProps, {}> {
+export class ActualTitleSetter extends React.Component<ITitleSetterProps, {changedTitle: boolean}> {
   /**
    * Stores title readers to inform them of changes
    */
@@ -36,6 +37,10 @@ export class ActualTitleSetter extends React.Component<ITitleSetterProps, {}> {
 
   constructor(props: ITitleSetterProps) {
     super(props);
+
+    this.state = {
+      changedTitle: false,
+    };
   }
   public componentDidMount() {
     if (TitleSetterInstanceIsLoaded) {
@@ -48,6 +53,7 @@ export class ActualTitleSetter extends React.Component<ITitleSetterProps, {}> {
     const newTitle = this.props.children || "";
     if (newTitle !== document.title) {
       document.title = newTitle;
+      this.setState({changedTitle: true});
       ActualTitleSetter.changedListeners.forEach((listener) => listener());
     }
   }
@@ -55,6 +61,7 @@ export class ActualTitleSetter extends React.Component<ITitleSetterProps, {}> {
     // change the title if we have different titles
     if ((prevProps.children || "") !== (this.props.children || "")) {
       document.title = this.props.children || "";
+      this.setState({changedTitle: true});
       ActualTitleSetter.changedListeners.forEach((listener) => listener());
     }
   }
@@ -63,6 +70,26 @@ export class ActualTitleSetter extends React.Component<ITitleSetterProps, {}> {
     TitleSetterInstanceIsLoaded = false;
   }
   public render() {
+    if (this.state.changedTitle && this.props.children) {
+      // Accessibility support as the change in title is often
+      // not announced
+      return ReactDOM.createPortal(
+        <span aria-live="polite" style={{
+          border: 0,
+          clip: "rect(0 0 0 0)",
+          height: "1px",
+          margin: "-1px",
+          overflow: "hidden",
+          padding: 0,
+          position: "absolute",
+          width: "1px",
+        }}>
+          {this.props.children}
+        </span>,
+        document.body,
+      );
+    }
+
     // retuns nothing
     return null as React.ReactNode;
   }
@@ -84,7 +111,7 @@ export default class TitleSetter extends React.Component<ITitleSetterProps, {}> 
       return (
         <RootRetriever>{
           (arg) => {
-            if (this.props.type === "og" || !this.props.type || this.props.type === "both") {
+            if (this.props.type === "og" || !this.props.type || this.props.type === "both") {
               arg.root.setStateKey("ogTitle", this.props.children);
             }
 
