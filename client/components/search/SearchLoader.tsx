@@ -526,7 +526,7 @@ class ActualSearchLoader extends React.Component<IActualSearchLoaderProps, IActu
       searchResultsNeedToBeLoaded: false,
       searchWillProduceNewHighlights: false,
       searchCanProduceHighlights: false,
-      showAsSearching: !!props.startInSearchingState,
+      showAsSearching: !!props.startInSearchingState && !props.searchId,
     };
 
     // refresh the state

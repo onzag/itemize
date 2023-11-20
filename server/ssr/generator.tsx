@@ -318,6 +318,7 @@ export async function ssrGenerator(
     newHTML = newHTML.replace(/\$SSROGTITLE/g, usedOgTitle);
     newHTML = newHTML.replace(/\$SSROGDESCR/g, usedOgDescription);
     newHTML = newHTML.replace(/\$SSROGIMG/g, usedOgImage);
+    newHTML = newHTML.replace(/\$SSRROBOTS/g, "all");
     newHTML = newHTML.replace(/\$SSRAPP/g, "");
     newHTML = newHTML.replace(/\"\$SSR\"/g, "null");
     newHTML = newHTML.replace(/\"\$CONFIG\"/g, JSON.stringify(config));
@@ -558,11 +559,13 @@ export async function ssrGenerator(
 
         // now we calculate the same way title and description
         const finalDescription = root.getStateKey("description");
+        const finalRobots = root.getStateKey("robots");
 
         const usedDescription = finalDescription || i18nAppDescription || i18nAppName || config.appName || "";
         const usedOgTitle = finalOgTitle || usedTitle;
         const usedOgDescription = finalOgDescription || usedDescription;
         const usedOgImage = finalOgImage || "/rest/resource/icons/android-chrome-512x512.png";
+        const usedRobots = finalRobots || "all";
 
         // now we need to make the title match
         newHTML = newHTML.replace(/\$SSRAPP/g, staticMarkup);
@@ -573,6 +576,7 @@ export async function ssrGenerator(
         newHTML = newHTML.replace(/\$SSROGTITLE/g, usedOgTitle);
         newHTML = newHTML.replace(/\$SSROGDESCR/g, usedOgDescription);
         newHTML = newHTML.replace(/\$SSROGIMG/g, usedOgImage);
+        newHTML = newHTML.replace(/\$SSRROBOTS/g, usedRobots);
 
         // we replace the HTML with the SSR information that we are using
         newHTML = newHTML.replace(/\"\$SSR\"/g, JSON.stringify(clientSSR));
@@ -620,6 +624,7 @@ export async function ssrGenerator(
       newHTML = newHTML.replace(/\$SSROGDESCR/g, usedOgDescription);
       newHTML = newHTML.replace(/\$SSROGIMG/g, usedOgImage);
       newHTML = newHTML.replace(/\$SSRAPP/g, "");
+      newHTML = newHTML.replace(/\$SSRROBOTS/g, "all");
       newHTML = newHTML.replace(/\"\$SSR\"/g, "null");
       newHTML = newHTML.replace(/\"\$CONFIG\"/g, JSON.stringify(config));
       newHTML = newHTML.replace(/\<SSRHEAD\>\s*\<\/SSRHEAD\>|\<SSRHEAD\/\>|\<SSRHEAD\>/ig, langHrefLangTags || "");
