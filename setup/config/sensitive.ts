@@ -42,9 +42,9 @@ export async function sensitiveConfigSetup(
       {
         variableName: "userLocalization",
         message: "The configuration used by the user localizer, if given, this enables to find the user location in order " +
-        "to accurately predict what language such user speaks, it uses the ip in order to do such prediction, itemize by default " +
-        "uses elasticsearch (so you may leave it null) however without elastic, you may specify data for the IPStack provider, " +
-        "so you might refer to https://ipstack.com/product to get a free API key",
+          "to accurately predict what language such user speaks, it uses the ip in order to do such prediction, itemize by default " +
+          "uses elasticsearch (so you may leave it null) however without elastic, you may specify data for the IPStack provider, " +
+          "so you might refer to https://ipstack.com/product to get a free API key",
         type: "config",
         defaultValue: null,
         extractData: [
@@ -68,8 +68,8 @@ export async function sensitiveConfigSetup(
       {
         variableName: "currencyFactors",
         message: "The configuration used by the currency manager in the global manager, if given, this enables to be abel to " +
-        "use the currency type, note that this is necessary in order to support currencies, by default itemize uses the currency " +
-        "provider from https://currencylayer.com/ you can get a free API key from there",
+          "use the currency type, note that this is necessary in order to support currencies, by default itemize uses the currency " +
+          "provider from https://currencylayer.com/ you can get a free API key from there",
         type: "config",
         defaultValue: null,
         extractData: [
@@ -93,9 +93,9 @@ export async function sensitiveConfigSetup(
       {
         variableName: "locationSearch",
         message: "The API used in order to fetch search results for used for location search autocompletition " +
-        "it is necessary in order to be able to use the location service as this enables the searchbox " +
-        "while you can still use location, it is preferable to have this service enabled, it can be accessed by " +
-        "rest endpoints and used by the renderers, by default itemize uses here maps autocomplete, get a key at https://developer.here.com/",
+          "it is necessary in order to be able to use the location service as this enables the searchbox " +
+          "while you can still use location, it is preferable to have this service enabled, it can be accessed by " +
+          "rest endpoints and used by the renderers, by default itemize uses here maps autocomplete, get a key at https://developer.here.com/",
         type: "config",
         defaultValue: null,
         extractData: [
@@ -131,8 +131,8 @@ export async function sensitiveConfigSetup(
       {
         variableName: "mail",
         message: "The configuration used by the email service provider by default itemize will use the " +
-        "mailgun provider you might get a key at https://www.mailgun.com/ however you can also start the system " +
-        "with FAKE_EMAILS=true in order to use an email delivery system that just logs the emails",
+          "mailgun provider you might get a key at https://www.mailgun.com/ however you can also start the system " +
+          "with FAKE_EMAILS=true in order to use an email delivery system that just logs the emails",
         type: "config",
         defaultValue: null,
         extractData: [
@@ -162,7 +162,7 @@ export async function sensitiveConfigSetup(
       {
         variableName: "phone",
         message: "The configuration used by the phone service provider by default itemize will use twilio however you can also start the system " +
-        "with FAKE_SMS=true in order to use an sms delivery system that just logs the sms",
+          "with FAKE_SMS=true in order to use an sms delivery system that just logs the sms",
         type: "config",
         defaultValue: null,
         extractData: [
@@ -181,9 +181,12 @@ export async function sensitiveConfigSetup(
           },
           {
             variableName: "phoneNumbers",
-            type: "strarray",
-            message: "The available phone numbers that your account can make use of, the first number will be considered the default",
-            defaultValue: [],
+            type: "strobject",
+            message: "The available phone numbers that your account can make use of, the number in '*' is considered the default," +
+              " use (+??) country codes to match specific countries with specific phone numbers",
+            defaultValue: {
+              "*": "+358????????",
+            },
           },
         ],
         preferUnfilled: true,

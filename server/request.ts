@@ -12,10 +12,12 @@ interface IHTTPRequestInfo {
   method: string;
   stream?: ReadStream;
   formData?: { [key: string]: any };
-  headers?: any;
+  urlEncoded?: { [key: string]: string | string[] };
+  headers?: { [key: string]: any };
   dontProcessResponse?: boolean;
   processAsJSON?: boolean;
   returnNonOk?: boolean;
+  auth?: string;
 }
 
 interface IHTTPResponse<T> {
@@ -26,6 +28,14 @@ interface IHTTPResponse<T> {
 export function httpRequest<T>(data: IHTTPRequestInfo): Promise<IHTTPResponse<T>> {
   if (data.formData && data.stream) {
     throw new Error("Cannot use form data and stream at the same time in request");
+  }
+
+  if (data.formData && data.urlEncoded) {
+    throw new Error("Cannot use form data and url ecoded at the same time in request");
+  }
+
+  if (data.stream && data.urlEncoded) {
+    throw new Error("Cannot use stream and url ecoded at the same time in request");
   }
 
   if (CAN_LOG_DEBUG) {
@@ -40,7 +50,7 @@ export function httpRequest<T>(data: IHTTPRequestInfo): Promise<IHTTPResponse<T>
   return new Promise((resolve, reject) => {
     try {
       let stream: ReadStream = data.stream;
-      let headers = data.headers;
+      let headers = data.headers || {};
       if (data.formData) {
         const formData = new FormDataNode();
         Object.keys(data.formData).forEach((k) => {
@@ -62,11 +72,36 @@ export function httpRequest<T>(data: IHTTPRequestInfo): Promise<IHTTPResponse<T>
         stream = formData as any;
       }
 
+
+      let urlEncodedToWrite: string = null;
+      if (data.urlEncoded) {
+        urlEncodedToWrite = "";
+        Object.keys(data.urlEncoded).forEach((key, index) => {
+          if (index) {
+            urlEncodedToWrite += "&";
+          }
+          const value = data.urlEncoded[key];
+          if (Array.isArray(value)) {
+            value.forEach((subvalue, index2) => {
+              if (index2) {
+                urlEncodedToWrite += "&";
+              }
+              urlEncodedToWrite += key + "=" + encodeURIComponent(subvalue);
+            });
+          } else {
+            urlEncodedToWrite += key + "=" + encodeURIComponent(value);
+          }
+        });
+        headers["Content-Type"] = "application/x-www-form-urlencoded";
+        headers["Content-Length"] = Buffer.byteLength(urlEncodedToWrite);
+      }
+
       const request = (data.isHttps ? https : http).request({
         method: data.method,
         host: data.host,
         path: data.path,
         headers,
+        auth: data.auth,
       });
 
       if (stream) {
@@ -132,6 +167,10 @@ export function httpRequest<T>(data: IHTTPRequestInfo): Promise<IHTTPResponse<T>
         !hasFiredError && reject(err);
         hasFiredError = true;
       });
+
+      if (urlEncodedToWrite) {
+        request.write(urlEncodedToWrite);
+      }
 
       if (!stream) {
         request.end();
