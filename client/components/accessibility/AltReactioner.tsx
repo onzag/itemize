@@ -103,6 +103,13 @@ export interface IAltBaseProps {
   uncontrolled?: boolean;
 
   /**
+   * the default is "*[tabindex],button:not(:disabled),input:not(:disabled),a[href],iframe:not(:disabled)"
+   * determines what should be selected inside an uncontrolled container, it will pick it from below or above
+   * depending on selection style
+   */
+  uncontrolledSelector?: string;
+
+  /**
    * When an element is tabbed but it is not part of the current flow but it kept its focus while being in another
    * layer, use this to select which reaction key would you like to trigger from the current active flow
    */
@@ -653,9 +660,7 @@ function triggerBasedOn(code: string, shiftKey: boolean, callbackIfmatch: () => 
     }
 
     setScrollerBlockStatus(ALT_REGISTRY.isBlocked || ALT_REGISTRY.uncontrolled);
-    if (!ALT_REGISTRY.uncontrolled) {
-      callbackIfmatch();
-    }
+    callbackIfmatch();
     return;
   }
 
@@ -798,6 +803,9 @@ export function toggleAlt() {
 const rawSymbols = "+-.,;(){}=?!#%&";
 
 if (typeof document !== "undefined") {
+  let lastKeyDownWasTab = false;
+  let lastKeyDownWasShiftTab = false;
+
   // this is a keycode that was consumed by the alt actioner
   // during the keydown event, if the keycode was not consumed
   // eg. the alt actioner was not active
@@ -821,7 +829,7 @@ if (typeof document !== "undefined") {
         if (!ALT_REGISTRY.uncontrolled) {
           // one should be into active flow
           if (ALT_REGISTRY.awaitingLayerKeycodesFocusIndex !== -1) {
-            let nextIndex = ALT_REGISTRY.awaitingLayerKeycodesFocusIndex + 1;
+            let nextIndex = ALT_REGISTRY.awaitingLayerKeycodesFocusIndex + (lastKeyDownWasShiftTab ? -1 : 1);
             if (nextIndex >= ALT_REGISTRY.awaitingLayerKeycodes.length) {
               nextIndex = 0;
             }
@@ -830,10 +838,10 @@ if (typeof document !== "undefined") {
 
             if (nextElement.getElement() !== document.activeElement) {
               ALT_REGISTRY.awaitingLayerKeycodesFocusIndex = nextIndex;
-              nextElement.focus("precise");
+              nextElement.focus(lastKeyDownWasShiftTab ? "below" : "above");
             }
           } else if (ALT_REGISTRY.isDisplayingLayereds) {
-            let nextIndex = ALT_REGISTRY.displayedLayeredFocusIndex + 1;
+            let nextIndex = ALT_REGISTRY.displayedLayeredFocusIndex + (lastKeyDownWasShiftTab ? -1 : 1);
             if (nextIndex >= ALT_REGISTRY.isDisplayingLayereds.length) {
               nextIndex = 0;
             }
@@ -842,10 +850,10 @@ if (typeof document !== "undefined") {
 
             if (nextElement.getElement() !== document.activeElement) {
               ALT_REGISTRY.displayedLayeredFocusIndex = nextIndex;
-              nextElement.focus("precise");
+              nextElement.focus(lastKeyDownWasShiftTab ? "below" : "above");
             }
           } else if (ALT_REGISTRY.activeFlowFocusIndex !== -1) {
-            let nextIndex = ALT_REGISTRY.activeFlowFocusIndex + 1;
+            let nextIndex = ALT_REGISTRY.activeFlowFocusIndex + (lastKeyDownWasShiftTab ? -1 : 1);
             if (nextIndex >= ALT_REGISTRY.activeFlow.length) {
               nextIndex = 0;
             }
@@ -853,7 +861,7 @@ if (typeof document !== "undefined") {
 
             if (nextElement.getElement() !== document.activeElement) {
               ALT_REGISTRY.activeFlowFocusIndex = nextIndex;
-              nextElement.focus("precise");
+              nextElement.focus(lastKeyDownWasShiftTab ? "below" : "above");
             }
           }
         }
@@ -927,6 +935,9 @@ if (typeof document !== "undefined") {
     const isEscape = keyCode === "escape";
     const isEnter = keyCode === "enter";
     const isSpace = keyCode === " ";
+
+    lastKeyDownWasTab = isTab && !e.shiftKey;
+    lastKeyDownWasShiftTab = isTab && e.shiftKey;
 
     // uncontrolled
     if (ALT_REGISTRY.uncontrolled && (isTab || isArrow)) {
@@ -1116,6 +1127,14 @@ export class ActualAltBase<P extends IAltBaseProps, S> extends React.PureCompone
     }
 
     return this.containerRef.current as HTMLElement;
+  }
+
+  public getContainer() {
+    if (!this.containerRef.current) {
+      return null as HTMLElement;
+    }
+
+    return this.containerRef.current;
   }
 
   /**
@@ -1348,10 +1367,35 @@ export class ActualAltBase<P extends IAltBaseProps, S> extends React.PureCompone
   public focus(how: "precise" | "above" | "below") {
     // uncontrolled elements cannot focus and are not themselves focuseable
     if (this.isUncontrolled()) {
+      const container = this.getContainer();
+      const selector = this.props.uncontrolledSelector || "*[tabindex],button:not(:disabled),input:not(:disabled),a[href],iframe:not(:disabled)";
+
+      let elementToFocus: HTMLElement = null;
+      // normal tabbing or precise selection
+      if (how !== "below") {
+        elementToFocus = container.querySelector(selector);
+      } else {
+        // shift tab
+        const arr = container.querySelectorAll(selector);
+        if (arr.length) {
+          elementToFocus = arr[arr.length - 1] as HTMLElement;
+        }
+      }
+
+      if (!elementToFocus) {
+        console.warn("Could not find anything focuseable inside uncontrolled container");
+      } else {
+        elementToFocus.focus();
+
+        if (!isInView(elementToFocus) && elementToFocus) {
+          elementToFocus.scrollIntoView({ behavior: "smooth" });
+        }
+      }
+
       return;
     }
 
-    let element = this.getElement();
+    const element = this.getElement();
 
     // if (this.props.onFocusAttempt) {
     //   element = this.props.onFocusAttempt(how, element);

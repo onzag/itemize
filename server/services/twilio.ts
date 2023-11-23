@@ -19,6 +19,19 @@ export class TwilioService extends PhoneProvider<ITWilioConfig> {
   // TODO allow to send to bulk groups
 
   public async sendSMS(data: ISendSMSData) {
+    if (data.text.length > 1600) {
+      const err = new Error("The text attempted to be sent is too long as it exceeds 1600 characters");
+      this.logError({
+        message: "Text is too long",
+        data,
+        err,
+        className: "TwilioService",
+        methodName: "sendSMS",
+        serious: true,
+      });
+      throw err;
+    }
+
     const targetPhones = Array.isArray(data.to) ? data.to : [data.to];
 
     const targetPhonesSorted: { [match: string]: string[] } = {};
@@ -67,8 +80,18 @@ export class TwilioService extends PhoneProvider<ITWilioConfig> {
 
     // twilio doesn't support bulk like that
     // it needs to be previously specified
+    let errorRaised: Error;
     for (let target of to) {
-      await this.sendSMSToSingleTarget(sourcePhone, target, text);
+      try {
+        // let's allow it to at least try all before cancelling
+        await this.sendSMSToSingleTarget(sourcePhone, target, text);
+      } catch (err) {
+        errorRaised = err;
+      }
+    }
+
+    if (errorRaised) {
+      throw errorRaised;
     }
   }
 
@@ -98,7 +121,8 @@ export class TwilioService extends PhoneProvider<ITWilioConfig> {
           to,
           text,
         },
-      })
+      });
+      throw err;
     }
   }
 }

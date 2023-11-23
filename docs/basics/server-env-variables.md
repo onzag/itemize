@@ -187,3 +187,11 @@ Default `false`
 Use if you see "invalid hostname" or "please visit the real site at" on development builds for testing
 
 When connecting, itemize expects the client to be attempting to connect from localhost or from one of the specified domains and with no port; otherwise it believes it is being SEO hijacked, use this flag for disabling that in order to do computer to computer testing with raw IPs.
+
+## FORCE_ALL_OUTBOUND_MAIL_TO
+
+When sending an email via SMTP service, the receipient or recepients don't matter at all, since all the mail will be received by that one specific target, the data to send will be overwritten; this is useful in debugging and testing scenarios
+
+## FORCE_ALL_OUTBOUND_SMS_TO
+
+When sending an email via the phone service, the target or targets don't matter at all, since all the messages will be received by that one specific target, the data to send will be overwritten; this is useful in debugging and testing scenarios

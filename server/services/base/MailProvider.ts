@@ -15,7 +15,7 @@ import type { IGQLValue } from "../../../gql-querier";
 import { jwtSign } from "../../token";
 import { IUnsubscribeUserTokenDataType } from "../../user/rest";
 import { ServiceProvider, ServiceProviderType } from "..";
-import { NODE_ENV } from "../../environment";
+import { FORCE_ALL_OUTBOUND_MAIL_TO, NODE_ENV } from "../../environment";
 import type { IPropertyDefinitionSupportedSingleFilesType, PropertyDefinitionSupportedFilesType } from "../../../base/Root/Module/ItemDefinition/PropertyDefinition/types/files";
 import { IOTriggerActions, ITriggerRegistry } from "../../resolvers/triggers";
 import path from "path";
@@ -31,6 +31,7 @@ import addressRFC2822, { IRFC2822Data } from "address-rfc2822";
 import { httpRequest } from "../../request";
 import fs, { ReadStream } from "fs";
 import os from "os";
+import type { RegistryService } from "../registry";
 
 /**
  * This is the mail namespace, and it's used to convert the mail
@@ -250,6 +251,20 @@ export interface IEmailRenderedMessage {
 export default class MailProvider<T> extends ServiceProvider<T> {
   public static getType() {
     return ServiceProviderType.HYBRID;
+  }
+
+  constructor(c: T, registry: RegistryService, configs: any) {
+    super(c, registry, configs);
+
+    if (FORCE_ALL_OUTBOUND_MAIL_TO) {
+      const originalSendMail = this.sendEmail.bind(this);
+      this.sendEmail = (data: ISendEmailData) => {
+        const newData = {...data};
+        newData.to = FORCE_ALL_OUTBOUND_MAIL_TO;
+
+        return originalSendMail(newData);
+      }
+    }
   }
 
   /**

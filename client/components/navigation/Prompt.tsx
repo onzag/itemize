@@ -67,8 +67,18 @@ interface PromptProps {
    * write your current location without language eg, if /en/location/this
    * pass /location/this the trailing / is very important and it shall not end
    * in / in order for a correct comparison to be performed
+   * 
+   * Check ignoreSimpleLanguageChangeFromIgnoreSearchParams if you would like
+   * to prevent the query params for being considered during the comparison
    */
   ignoreSimpleLanguageChangeFrom?: string;
+
+  /**
+   * When ignoring paths based on the ignoreSimpleLanguageChangeFrom it will consider
+   * or not the search parameters according to this option, by default it doesn't ignore them
+   * and will consider every single attribute in the parameters
+   */
+  ignoreSimpleLanguageChangeFromIgnoreSearchParams?: boolean;
 
   /**
    * detect a change yourself in the location
@@ -167,7 +177,7 @@ export default class Prompt extends React.PureComponent<PromptProps, PromptState
           splitted.pop();
         }
 
-        const urlWithoutLanguage = "/" + (splitted.join("/") + location.search);
+        const urlWithoutLanguage = "/" + (splitted.join("/") + (this.props.ignoreSimpleLanguageChangeFromIgnoreSearchParams ? "" : location.search));
         const comparison = this.props.ignoreSimpleLanguageChangeFrom.startsWith("/") ?
           this.props.ignoreSimpleLanguageChangeFrom : "/" + this.props.ignoreSimpleLanguageChangeFrom;
 

@@ -227,6 +227,13 @@ interface IAltBadgeReactionerProps {
   uncontrolled?: boolean;
 
   /**
+   * the default is "*[tabindex],button:not(:disabled),input:not(:disabled),a[href],iframe:not(:disabled)"
+   * determines what should be selected inside an uncontrolled container, it will pick it from below or above
+   * depending on selection style
+   */
+  uncontrolledSelector?: string;
+
+  /**
    * Language override
    */
   lang?: string;

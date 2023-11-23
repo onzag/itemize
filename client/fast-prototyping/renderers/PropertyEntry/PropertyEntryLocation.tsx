@@ -495,18 +495,35 @@ class PropertyEntryLocationRenderer extends
           (this.props.currentValue && this.props.currentValue.atxt ? idToUse + "_atxt" : "") +
           (this.props.description ? " " + idToUse + "_desc" : ""),
       },
+      ...this.props.args.InputProps,
     };
 
     // and add the text field props from the autosuggest
     if (textFieldProps) {
       const { inputRef = () => { return; }, ref, ...other } = textFieldProps;
-      appliedTextFieldProps = other;
       appliedInputProps = {
+        ...other,
         ...appliedInputProps,
         inputRef: (node: HTMLInputElement) => {
           ref(node);
           inputRef(node);
         },
+        onBlur: (e: any) => {
+          other?.onBlur && other.onBlur(e);
+          this.props.args.InputProps?.onBlur && this.props.args.InputProps.onBlur(e);
+        },
+        onChange: (e: any) => {
+          other?.onChange && other.onChange(e);
+          this.props.args.InputProps?.onChange && this.props.args.InputProps.onChange(e);
+        },
+        onFocus: (e: any) => {
+          other?.onFocus && other.onFocus(e);
+          this.props.args.InputProps?.onFocus && this.props.args.InputProps.onFocus(e);
+        },
+        onKeyDown: (e: any) => {
+          other?.onKeyDown && other.onKeyDown(e);
+          this.props.args.InputProps?.onKeyDown && this.props.args.InputProps.onKeyDown(e);
+        }
       };
     }
 
@@ -703,7 +720,6 @@ class PropertyEntryLocationRenderer extends
           },
           disabled: this.props.disabled,
           ...appliedInputProps,
-          ...this.props.args.InputProps,
         }}
         InputLabelProps={{
           sx: style.label(isInvalid),

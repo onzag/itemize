@@ -91,6 +91,10 @@ export interface IPropertyEntryFileRendererProps extends IPropertyEntryRendererP
    */
   isRejectedSupportedImage: boolean;
   /**
+   * Removes the rejected state
+   */
+  cleanRejected: () => void;
+  /**
    * A source set for the image type that exists if isSupportedImage is true
    */
   imageSrcSet: string;
@@ -195,6 +199,7 @@ export default class PropertyEntryFile
     this.openFile = this.openFile.bind(this);
     this.enableUserSetErrors = this.enableUserSetErrors.bind(this);
     this.onUpdateExtraMetadata = this.onUpdateExtraMetadata.bind(this);
+    this.cleanRejected = this.cleanRejected.bind(this);
   }
   public shouldComponentUpdate(
     nextProps: IPropertyEntryHandlerProps<PropertyDefinitionSupportedFileType, IPropertyEntryFileRendererProps>,
@@ -413,6 +418,12 @@ export default class PropertyEntryFile
       showUserSetErrors: true,
     });
   }
+  public cleanRejected() {
+    this.setState({
+      rejectedReason: null,
+      rejectedValue: null
+    });
+  }
   public render() {
     const currentValue = this.getCurrentValue();
     const rejectedValue = this.state.rejectedValue;
@@ -535,6 +546,7 @@ export default class PropertyEntryFile
       rejectedValue: this.props.useAppliedValue ? null : rejectedValue,
       rejectedPrettySize: this.props.useAppliedValue ? null : rejectedPrettySize,
       rejectedExtension: this.props.useAppliedValue ? null : rejectedExtension,
+      cleanRejected: this.cleanRejected,
       isRejectedSupportedImage,
 
       isSupportedImage,

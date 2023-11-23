@@ -608,7 +608,7 @@ export default class App extends React.Component<IAppProps, IAppState> {
     // We set the currency in local storage
     document.cookie = "currency=" + codeToSet + ";expires=" + COOKIE_EXPIRATION_DATE + ";path=/" + cookieEnd;
     if (!avoidUpdatingUser) {
-      const err = this.updateUserProperty("app_currency", codeToSet);
+      const err = await this.updateUserProperty("app_currency", codeToSet);
       if (err) {
         return err;
       }

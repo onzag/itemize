@@ -81,6 +81,7 @@ const style = {
     "&.open": {
       width: "300px",
       height: "800px",
+      zIndex: 1000,
     },
     overflow: "hidden",
     position: "relative",
@@ -114,6 +115,7 @@ const style = {
     transition: "width 0.5s ease-in-out",
     "&.open": {
       width: "300px",
+      zIndex: 1000,
     },
     overflow: "hidden",
     position: "fixed",

@@ -13,7 +13,8 @@ import { ISQLTableRowValue } from "../../../base/Root/sql";
 import { renderTemplateAsNode, convertNodeToText } from "../../../client/internal/text";
 import type { IGQLValue } from "../../../gql-querier";
 import { ServiceProvider, ServiceProviderType } from "..";
-import { NODE_ENV } from "../../environment";
+import { FORCE_ALL_OUTBOUND_SMS_TO, NODE_ENV } from "../../environment";
+import type { RegistryService } from "../registry";
 
 /**
  * The shape of an sms that is being wanted to be sent
@@ -40,6 +41,20 @@ export interface ISendSMSData {
 export default class PhoneProvider<T> extends ServiceProvider<T> {
   public static getType() {
     return ServiceProviderType.HYBRID;
+  }
+
+  constructor(c: T, registry: RegistryService, configs: any) {
+    super(c, registry, configs);
+
+    if (FORCE_ALL_OUTBOUND_SMS_TO) {
+      const originalSendSMS = this.sendSMS.bind(this);
+      this.sendSMS = (data: ISendSMSData) => {
+        const newData = {...data};
+        newData.to = FORCE_ALL_OUTBOUND_SMS_TO;
+
+        return originalSendSMS(newData);
+      }
+    }
   }
 
   /**
@@ -168,7 +183,7 @@ export default class PhoneProvider<T> extends ServiceProvider<T> {
       // which is not HTML
       textValue = "You do not have a template fragment setup for " +
         actualItemDefinition.getQualifiedPathName() + "." + arg.id + "." + (arg.version || "");
-      textValue += "\n\n" + JSON.stringify(arg.args, null, 2) + "\n";
+      // textValue += "\n\n" + JSON.stringify(arg.args, null, 2) + "\n";
     } else {
       textValue = convertNodeToText(parsedTemplateValue);
     }
@@ -279,11 +294,6 @@ export default class PhoneProvider<T> extends ServiceProvider<T> {
       );
       throw new Error("There is no " + arg.subscribeProperty + " property in the item definition for user");
     }
-
-    // now we need the hostname
-    const hostname = NODE_ENV === "development" ?
-      this.appConfig.developmentHostname :
-      this.appConfig.productionHostname;
 
     // and we are going to make this an array
     let actualUsersToSend: any[] = Array.isArray(arg.to) ? arg.to : [arg.to];
