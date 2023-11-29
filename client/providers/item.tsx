@@ -6094,6 +6094,14 @@ export class ActualItemProvider extends
     });
   }
   public async onSearchReload(arg: IRemoteListenerRecordsCallbackArg) {
+    // prevent double searches and warn the developer
+    if (this.state.searching) {
+      console.warn(
+        "Could not execute a search reload because the item is currently search reloading",
+      );
+      return;
+    }
+
     // this function is called when remotely the search
     // is said to update, and it needs to be reloaded
     // however the server has already specified how the data

@@ -106,6 +106,14 @@ export class RemoteListener {
   private slowPoolingTimer: any;
 
   /**
+   * Awaiting search requests to prevent spamming
+   */
+  private awaitingOwnedSearchRequests: IOwnedSearchFeedbackRequest[] = [];
+  private awaitingParentedSearchRequests: IParentedSearchFeedbackRequest[] = [];
+  private awaitingOwnedParentedSearchRequests: IOwnedParentedSearchFeedbackRequest[] = [];
+  private awaitingPropertySearchRequests: IPropertySearchFeedbackRequest[] = [];
+
+  /**
    * A registry of listeners of which are
    * listening for changes
    */
@@ -1100,6 +1108,28 @@ export class RemoteListener {
           "ownedSearchFeedbackRequests",
           request,
         );
+
+        if (
+          this.awaitingOwnedSearchRequests.find((r) =>
+            r.createdBy === request.createdBy &&
+            r.lastModified === request.lastModified &&
+            r.qualifiedPathName === request.qualifiedPathName
+          )
+        ) {
+          console.warn("Requested owned search feedback with no yet previous response for", request);
+          return;
+        }
+
+        this.awaitingOwnedSearchRequests.push(request);
+
+        // autoclear
+        setTimeout(() => {
+          const index = this.awaitingOwnedSearchRequests.indexOf(request);
+          if (index !== -1) {
+            this.awaitingOwnedSearchRequests.splice(index, 1);
+          }
+        }, 3000);
+
         this.socket.emit(
           OWNED_SEARCH_FEEDBACK_REQUEST,
           request,
@@ -1122,6 +1152,29 @@ export class RemoteListener {
           "propertySearchFeedbackRequests",
           request,
         );
+
+        if (
+          this.awaitingPropertySearchRequests.find((r) =>
+            r.propertyId === request.propertyId &&
+            r.propertyValue === request.propertyValue &&
+            r.lastModified === request.lastModified &&
+            r.qualifiedPathName === request.qualifiedPathName
+          )
+        ) {
+          console.warn("Requested property search feedback with no yet previous response for", request);
+          return;
+        }
+
+        this.awaitingPropertySearchRequests.push(request);
+
+        // autoclear
+        setTimeout(() => {
+          const index = this.awaitingPropertySearchRequests.indexOf(request);
+          if (index !== -1) {
+            this.awaitingPropertySearchRequests.splice(index, 1);
+          }
+        }, 3000);
+
         this.socket.emit(
           PROPERTY_SEARCH_FEEDBACK_REQUEST,
           request,
@@ -1450,6 +1503,30 @@ export class RemoteListener {
           "parentedSearchFeebackRequests",
           request,
         );
+
+        if (
+          this.awaitingParentedSearchRequests.find((r) =>
+            r.parentId === request.parentId &&
+            r.parentType === request.parentType &&
+            r.parentVersion === request.parentVersion &&
+            r.lastModified === request.lastModified &&
+            r.qualifiedPathName === request.qualifiedPathName
+          )
+        ) {
+          console.warn("Requested parented search feedback with no yet previous response for", request);
+          return;
+        }
+
+        this.awaitingParentedSearchRequests.push(request);
+
+        // autoclear
+        setTimeout(() => {
+          const index = this.awaitingParentedSearchRequests.indexOf(request);
+          if (index !== -1) {
+            this.awaitingParentedSearchRequests.splice(index, 1);
+          }
+        }, 3000);
+
         this.socket.emit(
           PARENTED_SEARCH_FEEDBACK_REQUEST,
           request,
@@ -1472,6 +1549,31 @@ export class RemoteListener {
           "ownedParentedSearchFeebackRequests",
           request,
         );
+
+        if (
+          this.awaitingOwnedParentedSearchRequests.find((r) =>
+            r.createdBy === request.createdBy &&
+            r.parentId === request.parentId &&
+            r.parentType === request.parentType &&
+            r.parentVersion === request.parentVersion &&
+            r.lastModified === request.lastModified &&
+            r.qualifiedPathName === request.qualifiedPathName
+          )
+        ) {
+          console.warn("Requested owned parented search feedback with no yet previous response for", request);
+          return;
+        }
+
+        this.awaitingOwnedParentedSearchRequests.push(request);
+
+        // autoclear
+        setTimeout(() => {
+          const index = this.awaitingOwnedParentedSearchRequests.indexOf(request);
+          if (index !== -1) {
+            this.awaitingOwnedParentedSearchRequests.splice(index, 1);
+          }
+        }, 3000);
+
         this.socket.emit(
           OWNED_PARENTED_SEARCH_FEEDBACK_REQUEST,
           request,
@@ -1595,6 +1697,14 @@ export class RemoteListener {
       event,
     );
 
+    let index = 0;
+    do {
+      index = this.awaitingOwnedSearchRequests.findIndex((r) => r.createdBy === event.createdBy && r.qualifiedPathName === event.qualifiedPathName);
+      if (index !== -1) {
+        this.awaitingOwnedSearchRequests.splice(index, 1);
+      }
+    } while (index !== -1);
+
     // so first we want to get our owned listener for it
     const ownedListener = this.ownedSearchListeners[event.qualifiedPathName + "." + event.createdBy];
 
@@ -1655,6 +1765,19 @@ export class RemoteListener {
       event,
     );
 
+    let index = 0;
+    do {
+      index = this.awaitingParentedSearchRequests.findIndex((r) =>
+        r.parentId === event.parentId &&
+        r.parentType === event.parentType &&
+        r.parentVersion === event.parentVersion &&
+        r.qualifiedPathName === event.qualifiedPathName
+      );
+      if (index !== -1) {
+        this.awaitingParentedSearchRequests.splice(index, 1);
+      }
+    } while (index !== -1);
+
     // build the listener id
     const parentedListener = this.parentedSearchListeners[
       event.qualifiedPathName + "." + event.parentType + "." +
@@ -1712,6 +1835,18 @@ export class RemoteListener {
       "propertySearchRecordsEvent",
       event,
     );
+
+    let index = 0;
+    do {
+      index = this.awaitingPropertySearchRequests.findIndex((r) =>
+        r.propertyId === event.propertyId &&
+        r.propertyValue === event.propertyValue &&
+        r.qualifiedPathName === event.qualifiedPathName
+      );
+      if (index !== -1) {
+        this.awaitingPropertySearchRequests.splice(index, 1);
+      }
+    } while (index !== -1);
 
     // build the listener id
     const propertyListener = this.propertySearchListeners[
@@ -1772,6 +1907,20 @@ export class RemoteListener {
       "ownedParentedSearchRecordsEvent",
       event,
     );
+
+    let index = 0;
+    do {
+      index = this.awaitingOwnedParentedSearchRequests.findIndex((r) =>
+        r.createdBy === event.createdBy &&
+        r.parentId === event.parentId &&
+        r.parentType === event.parentType &&
+        r.parentVersion === event.parentVersion &&
+        r.qualifiedPathName === event.qualifiedPathName
+      );
+      if (index !== -1) {
+        this.awaitingOwnedParentedSearchRequests.splice(index, 1);
+      }
+    } while (index !== -1);
 
     // build the listener id
     const ownedParentedListener = this.ownedParentedSearchListeners[
