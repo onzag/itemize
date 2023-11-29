@@ -18,6 +18,12 @@ import STANDARD_REPLY from "../custom-graphql/graphql-standard-reply-object";
 import { capitalize, checkIsPossiblePhoneNumber, convertPhoneNumberToInternational } from "../../util";
 import { NODE_ENV } from "../environment";
 
+async function wait(n: number) {
+  return new Promise((r) => {
+    setTimeout(r, n);
+  })
+}
+
 const chars = "0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ";
 function generateRandomId(size: number) {
   var result = '';
@@ -295,6 +301,73 @@ export const customUserQueries = (appData: IAppDataType): IGQLQueryFieldsDefinit
               appData,
             })
           });
+
+          // Security slowdown
+          // should prevent brute force logins even if they are using different IPs
+          // yes it has the potential to affect the user, making its login slow too
+          try {
+            // get the last login data if any
+            const lastLoginAttemptData = await appData.redisGlobal.get(
+              "USER_LAST_LOGIN_ATTEMPT." + args.username,
+            );
+            const lastLoginAttemptDataParsed: [string, number] = (lastLoginAttemptData && JSON.parse(lastLoginAttemptData)) || [null, 0];
+
+            // save the current last login attempt for the user
+            const currentDate = new Date();
+            await appData.redisGlobal.set(
+              "USER_LAST_LOGIN_ATTEMPT." + args.username,
+              JSON.stringify([currentDate.toISOString(), lastLoginAttemptDataParsed[1] + 1]),
+            );
+            // make it expire 10 seconds
+            await appData.redisGlobal.expire(
+              "USER_LAST_LOGIN_ATTEMPT." + args.username,
+              10,
+            );
+
+            // we have a date that we last tried
+            if (lastLoginAttemptDataParsed[0]) {
+              // lets parse it
+              const lastLoginAttemptTime = (new Date(lastLoginAttemptDataParsed[0])).getTime();
+              // current time
+              const currentTime = currentDate.getTime();
+
+              // the amount of time it ellapsed
+              const diff = currentTime - lastLoginAttemptTime;
+              // so we add 100ms to the number of attempts within 10 seconds, that's the smallest
+              // time we are allowed to try to login again
+              let minAllowedDiff = 100 * lastLoginAttemptDataParsed[1];
+              // make it 10 seconds tops
+              if (minAllowedDiff > 10000) {
+                minAllowedDiff = 10000;
+              }
+
+              // so if we tried to login again in less than the allowed minimum time
+              if (diff < minAllowedDiff) {
+                // the amount of time necessary to make up for those milliseconds
+                const msDiff = minAllowedDiff - diff;
+
+                // only relevant if more than 100ms
+                if (msDiff >= 100) {
+                  // make it slow
+                  await wait(msDiff);
+                }
+              }
+            }
+          } catch (err) {
+            logger.error(
+              {
+                functionName: "customUserQueries",
+                endpoint: "token",
+                message: "Failed to perform the security slowdown for preventing brute force login attempts",
+                serious: true,
+                err,
+                data: {
+                  username: args.username,
+                },
+              },
+            );
+            throw err;
+          }
 
           try {
             resultUser = await appData.databaseConnection.queryFirst(selectQuery) || null;

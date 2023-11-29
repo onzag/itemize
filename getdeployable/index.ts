@@ -12,6 +12,7 @@ import { IDBConfigRawJSONDataType, IRedisConfigRawJSONDataType } from "../config
 import YAML from 'yaml';
 import { request } from "../setup/read";
 import { execSudo, execAsync } from "../setup/exec";
+import Waf from "./waf";
 
 const fsAsync = fs.promises;
 
@@ -111,7 +112,8 @@ export default async function build(version: string, buildID: string, services: 
   if (isPatch) {
     message += "This build is a patch, patches can be unpredictable and are used to quickly wed out bugs and client side issues\n" +
       "the patch can only patch server specific code, client side behaviour, and itemize itself, but it cannot resolve for new libraries\n" +
-      "patches should be not used very often, in order to patch, just replace the patch folder with this content and restart";
+      "patches should be not used very often, in order to patch, just replace the patch folder with this content and restart.\n\n" +
+      "The nginx service file is also included in the patch but should be placed in the correct folder";
   }
 
   if (actualServices.includes("cluster-manager") || actualServices.includes("servers")) {
@@ -234,16 +236,27 @@ export default async function build(version: string, buildID: string, services: 
   }
 
   // finally our nginx file
-  if (actualServices.includes("nginx")) {
+  if (actualServices.includes("nginx") || isPatch) {
     // and the deployements start-ssl.sh file
-    console.log("emiting " + colors.green(path.join("deployments", buildID, "start-ssl.sh")));
-    await fsAsync.copyFile("start-ssl.sh", path.join("deployments", buildID, "start-ssl.sh"));
+    if (!isPatch) {
+      console.log("emiting " + colors.green(path.join("deployments", buildID, "start-ssl.sh")));
+      await fsAsync.copyFile("start-ssl.sh", path.join("deployments", buildID, "start-ssl.sh"));
+    }
+
+    const config = JSON.parse(await fsAsync.readFile(path.join("config", "index.json"), "utf-8"));
+    const nginxConf = await fsAsync.readFile("nginx.conf", "utf-8");
+    const nginxConfSSL = await fsAsync.readFile("nginx-ssl.conf", "utf-8");
+    const wafConfig = JSON.parse(await fsAsync.readFile("waf.json", "utf-8"));
+
+    const waf = new Waf(wafConfig, config);
+    const newNginxConf = waf.patchNginx(nginxConf);
+    const newNginxConfSSL = waf.patchNginx(nginxConfSSL);
 
     console.log("emiting " + colors.green(path.join("deployments", buildID, "nginx.conf")));
-    await fsAsync.copyFile("nginx.conf", path.join("deployments", buildID, "nginx.conf"));
+    await fsAsync.writeFile(path.join("deployments", buildID, "nginx.conf"), newNginxConf);
 
     console.log("emiting " + colors.green(path.join("deployments", buildID, "nginx-ssl.conf")));
-    await fsAsync.copyFile("nginx-ssl.conf", path.join("deployments", buildID, "nginx-ssl.conf"));
+    await fsAsync.writeFile(path.join("deployments", buildID, "nginx-ssl.conf"), newNginxConfSSL);
   }
 
   // now we add a bunch of messages about configuration

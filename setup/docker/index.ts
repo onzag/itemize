@@ -25,6 +25,7 @@ const filesToConfirm = [
   "start.sh",
   "start-ssl.sh",
   "stop.sh",
+  "waf.json",
 ];
 
 /**

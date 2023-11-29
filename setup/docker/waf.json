@@ -1,0 +1,35 @@
+{
+    "allowedAppLocations": [
+        "profile/:id",
+        "my-profile/:id",
+        "preferences",
+        "news",
+        "reset-password",
+        "change-password",
+        "cms",
+        "privacy-policy",
+        "terms-and-conditions",
+        "contact"
+    ],
+    "allowedLocations": [
+        {
+            "location": "/graphql",
+            "rules": "client_max_body_size: 100M; limit_except POST {deny all;}"
+        },
+        {
+            "location": "/rq",
+            "rules": "client_max_body_size: 100M; limit_except POST {deny all;}"
+        },
+        "/robots.txt",
+        "/uploads/...",
+        "/sw.production.js",
+        "/sw.development.js",
+        "/sitemap.xml",
+        {
+            "location": "/rest/...",
+            "rules": "client_max_body_size: 1M;"
+        },
+        "/"
+    ],
+    "proxyRule": "proxy_pass http://scalable_servers;proxy_set_header Host $host;proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;"
+}
