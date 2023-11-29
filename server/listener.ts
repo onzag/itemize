@@ -193,6 +193,13 @@ export class Listener {
   private awaitingParentedSearchEvents: { [key: string]: IParentedSearchRecordsEvent } = {};
   private awaitingPropertySearchEvents: { [key: string]: IPropertySearchRecordsEvent } = {};
 
+  private awaitingBasicFeedbacks: { [sockedId: string]: IFeedbackRequest[] } = {};
+  private awaitingOwnedSearchFeedbacks: { [sockedId: string]: IOwnedSearchFeedbackRequest[] } = {};
+  private awaitingOwnedParentedSearchFeedbacks: { [sockedId: string]: IOwnedParentedSearchFeedbackRequest[] } = {};
+  private awaitingParentedSearchFeedbacks: { [sockedId: string]: IParentedSearchFeedbackRequest[] } = {};
+  private awaitingPropertySearchFeedbacks: { [sockedId: string]: IPropertySearchFeedbackRequest[] } = {};
+
+
   constructor(
     buildnumber: string,
     redisGlobalSub: ItemizeRedisClient,
@@ -1378,20 +1385,63 @@ export class Listener {
       this.emitError(socket, "invalid request", request);
       return;
     }
-    try {
-      const itemDefinitionOrModule = this.root.registry[request.qualifiedPathName];
-      if (!itemDefinitionOrModule) {
-        CAN_LOG_DEBUG && logger.debug(
-          {
-            className: "Listener",
-            methodName: "ownedSearchFeedback",
-            message: "Could not find " + request.qualifiedPathName,
-          },
-        );
-        this.emitError(socket, "could not find item definition or module", request);
-        return;
-      }
 
+    const itemDefinitionOrModule = this.root.registry[request.qualifiedPathName];
+    if (!itemDefinitionOrModule) {
+      CAN_LOG_DEBUG && logger.debug(
+        {
+          className: "Listener",
+          methodName: "ownedSearchFeedback",
+          message: "Could not find " + request.qualifiedPathName,
+        },
+      );
+      this.emitError(socket, "could not find item definition or module", request);
+      return;
+    }
+
+    if (
+      this.awaitingOwnedSearchFeedbacks &&
+      this.awaitingOwnedSearchFeedbacks[socket.id] &&
+      this.awaitingOwnedSearchFeedbacks[socket.id].find((r) =>
+        r.createdBy === request.createdBy &&
+        r.qualifiedPathName === request.qualifiedPathName &&
+        r.lastModified === request.lastModified
+      )
+    ) {
+      CAN_LOG_DEBUG && logger.debug(
+        {
+          className: "Listener",
+          methodName: "ownedSearchFeedback",
+          message: "Already being handled for " + socket.id,
+          data: {
+            request,
+          }
+        },
+      );
+      this.emitError(
+        socket,
+        "The following feedback request will not be answered since a similar one is already being handled; " +
+        "this is not an error but it suggest your app is asking for the same feedback many times which " +
+        "suggests it's being inefficient (eg. a component mounts/dismounts over and over or two components at the same time)",
+        request,
+      );
+      return;
+    }
+
+    if (!this.awaitingOwnedSearchFeedbacks[socket.id]) {
+      this.awaitingOwnedSearchFeedbacks[socket.id] = [];
+    }
+
+    this.awaitingOwnedSearchFeedbacks[socket.id].push(request);
+
+    const removeAwaiting = () => {
+      const currentIndex = this.awaitingOwnedSearchFeedbacks[socket.id].indexOf(request);
+      if (currentIndex !== -1) {
+        this.awaitingOwnedSearchFeedbacks[socket.id].splice(currentIndex, 1);
+      }
+    }
+
+    try {
       let mod: Module;
       let requiredType: string = null;
       if (itemDefinitionOrModule instanceof ItemDefinition) {
@@ -1442,6 +1492,7 @@ export class Listener {
                 " with role " + listenerData.user.role + " cannot listen to " + request.qualifiedPathName,
             },
           );
+          removeAwaiting();
           this.emitError(socket, "user has not access", request);
           return;
         }
@@ -1454,6 +1505,7 @@ export class Listener {
             err,
           },
         );
+        removeAwaiting();
         this.emitError(socket, "Internal Server Error", request);
         return;
       }
@@ -1553,10 +1605,13 @@ export class Listener {
             }
           },
         );
+        removeAwaiting();
         socket.emit(
           OWNED_SEARCH_RECORDS_EVENT,
           event,
         );
+      } else {
+        removeAwaiting();
       }
     } catch (err) {
       logger.error(
@@ -1567,6 +1622,7 @@ export class Listener {
           err,
         },
       );
+      removeAwaiting();
       this.emitError(socket, "Internal Server Error", request);
       return;
     }
@@ -1616,59 +1672,102 @@ export class Listener {
       return;
     }
 
+    const itemDefinitionOrModule = this.root.registry[request.qualifiedPathName];
+    if (!itemDefinitionOrModule) {
+      CAN_LOG_DEBUG && logger.debug(
+        {
+          className: "Listener",
+          methodName: "propertySearchFeedback",
+          message: "Could not find " + request.qualifiedPathName,
+        },
+      );
+      this.emitError(socket, "could not find item definition or module", request);
+      return;
+    }
+
+    let mod: Module;
+    let requiredType: string = null;
+    if (itemDefinitionOrModule instanceof ItemDefinition) {
+      mod = itemDefinitionOrModule.getParentModule();
+      requiredType = request.qualifiedPathName;
+    } else {
+      mod = itemDefinitionOrModule;
+    }
+
+    const hasProperty = itemDefinitionOrModule instanceof ItemDefinition ?
+      itemDefinitionOrModule.hasPropertyDefinitionFor(request.propertyId, true) :
+      itemDefinitionOrModule.hasPropExtensionFor(request.propertyId);
+    if (!hasProperty) {
+      CAN_LOG_DEBUG && logger.debug(
+        {
+          className: "Listener",
+          methodName: "propertySearchFeedback",
+          message: "Could not find property in item definition or module for " + request.propertyId,
+        },
+      );
+      this.emitError(socket, "could not property", request);
+      return;
+    }
+    const propDef = itemDefinitionOrModule instanceof ItemDefinition ?
+      itemDefinitionOrModule.getPropertyDefinitionFor(request.propertyId, true) :
+      itemDefinitionOrModule.getPropExtensionFor(request.propertyId);
+
+    if (!propDef.isTracked()) {
+      CAN_LOG_DEBUG && logger.debug(
+        {
+          className: "Listener",
+          methodName: "propertySearchFeedback",
+          message: "Property " + request.propertyId + " is not a string tracked type",
+        },
+      );
+      this.emitError(socket, "property is not of the tracked type", request);
+      return;
+    }
+
+    if (
+      this.awaitingPropertySearchFeedbacks &&
+      this.awaitingPropertySearchFeedbacks[socket.id] &&
+      this.awaitingPropertySearchFeedbacks[socket.id].find((r) =>
+        r.propertyId === request.propertyId &&
+        r.propertyValue === request.propertyValue &&
+        r.qualifiedPathName === request.qualifiedPathName &&
+        r.lastModified === request.lastModified
+      )
+    ) {
+      CAN_LOG_DEBUG && logger.debug(
+        {
+          className: "Listener",
+          methodName: "propertySearchFeedback",
+          message: "Already being handled for " + socket.id,
+          data: {
+            request,
+          }
+        },
+      );
+      this.emitError(
+        socket,
+        "The following feedback request will not be answered since a similar one is already being handled; " +
+        "this is not an error but it suggest your app is asking for the same feedback many times which " +
+        "suggests it's being inefficient (eg. a component mounts/dismounts over and over or two components at the same time)",
+        request,
+      );
+      return;
+    }
+
+    if (!this.awaitingPropertySearchFeedbacks[socket.id]) {
+      this.awaitingPropertySearchFeedbacks[socket.id] = [];
+    }
+
+    this.awaitingPropertySearchFeedbacks[socket.id].push(request);
+
+    const removeAwaiting = () => {
+      const currentIndex = this.awaitingPropertySearchFeedbacks[socket.id].indexOf(request);
+      if (currentIndex !== -1) {
+        this.awaitingPropertySearchFeedbacks[socket.id].splice(currentIndex, 1);
+      }
+    }
+
     try {
-      const itemDefinitionOrModule = this.root.registry[request.qualifiedPathName];
-      if (!itemDefinitionOrModule) {
-        CAN_LOG_DEBUG && logger.debug(
-          {
-            className: "Listener",
-            methodName: "propertySearchFeedback",
-            message: "Could not find " + request.qualifiedPathName,
-          },
-        );
-        this.emitError(socket, "could not find item definition or module", request);
-        return;
-      }
-
-      let mod: Module;
-      let requiredType: string = null;
-      if (itemDefinitionOrModule instanceof ItemDefinition) {
-        mod = itemDefinitionOrModule.getParentModule();
-        requiredType = request.qualifiedPathName;
-      } else {
-        mod = itemDefinitionOrModule;
-      }
-
-      const hasProperty = itemDefinitionOrModule instanceof ItemDefinition ?
-        itemDefinitionOrModule.hasPropertyDefinitionFor(request.propertyId, true) :
-        itemDefinitionOrModule.hasPropExtensionFor(request.propertyId);
-      if (!hasProperty) {
-        CAN_LOG_DEBUG && logger.debug(
-          {
-            className: "Listener",
-            methodName: "propertySearchFeedback",
-            message: "Could not find property in item definition or module for " + request.propertyId,
-          },
-        );
-        this.emitError(socket, "could not property", request);
-        return;
-      }
-      const propDef = itemDefinitionOrModule instanceof ItemDefinition ?
-        itemDefinitionOrModule.getPropertyDefinitionFor(request.propertyId, true) :
-        itemDefinitionOrModule.getPropExtensionFor(request.propertyId);
-
-      if (!propDef.isTracked()) {
-        CAN_LOG_DEBUG && logger.debug(
-          {
-            className: "Listener",
-            methodName: "propertySearchFeedback",
-            message: "Property " + request.propertyId + " is not a string tracked type",
-          },
-        );
-        this.emitError(socket, "property is not of the tracked type", request);
-        return;
-      }
-
       const rolesManager = new CustomRoleManager(
         this.customRoles,
         {
@@ -1712,6 +1811,7 @@ export class Listener {
                 " with role " + listenerData.user.role + " cannot listen to " + request.qualifiedPathName,
             },
           );
+          removeAwaiting();
           this.emitError(socket, "user has not access", request);
           return;
         }
@@ -1724,12 +1824,13 @@ export class Listener {
             err,
           },
         );
+        removeAwaiting();
         this.emitError(socket, "Internal Server Error", request);
         return;
       }
 
       const propertyIsInIdef = itemDefinitionOrModule instanceof ItemDefinition && itemDefinitionOrModule.hasPropertyDefinitionFor(request.propertyId, false);
-      const idefJoinExtra = propertyIsInIdef ? ` JOIN ${JSON.stringify(itemDefinitionOrModule.getQualifiedPathName())} ON `+
+      const idefJoinExtra = propertyIsInIdef ? ` JOIN ${JSON.stringify(itemDefinitionOrModule.getQualifiedPathName())} ON ` +
         `${JSON.stringify(CONNECTOR_SQL_COLUMN_ID_FK_NAME)} = "id" AND ${JSON.stringify(CONNECTOR_SQL_COLUMN_VERSION_FK_NAME)} = "version"` : "";
       const createdAndModifiedRecordsSQL: ISQLTableRowValue[] = (await this.rawDB.databaseConnection.queryRows(
         `SELECT "id", "version", "type", "last_modified", ` + (
@@ -1868,10 +1969,13 @@ export class Listener {
             }
           },
         );
+        removeAwaiting();
         socket.emit(
           PROPERTY_SEARCH_RECORDS_EVENT,
           event,
         );
+      } else {
+        removeAwaiting();
       }
     } catch (err) {
       logger.error(
@@ -1882,6 +1986,7 @@ export class Listener {
           err,
         },
       );
+      removeAwaiting();
       this.emitError(socket, "Internal Server Error", request);
       return;
     }
@@ -1918,20 +2023,65 @@ export class Listener {
       this.emitError(socket, "invalid request", request);
       return;
     }
-    try {
-      const itemDefinitionOrModule = this.root.registry[request.qualifiedPathName];
-      if (!itemDefinitionOrModule) {
-        CAN_LOG_DEBUG && logger.debug(
-          {
-            className: "Listener",
-            methodName: "parentedSearchFeedback",
-            message: "Could not find " + request.qualifiedPathName,
-          },
-        );
-        this.emitError(socket, "could not find item definition or module", request);
-        return;
-      }
 
+    const itemDefinitionOrModule = this.root.registry[request.qualifiedPathName];
+    if (!itemDefinitionOrModule) {
+      CAN_LOG_DEBUG && logger.debug(
+        {
+          className: "Listener",
+          methodName: "parentedSearchFeedback",
+          message: "Could not find " + request.qualifiedPathName,
+        },
+      );
+      this.emitError(socket, "could not find item definition or module", request);
+      return;
+    }
+
+    if (
+      this.awaitingParentedSearchFeedbacks &&
+      this.awaitingParentedSearchFeedbacks[socket.id] &&
+      this.awaitingParentedSearchFeedbacks[socket.id].find((r) =>
+        r.parentId === request.parentId &&
+        r.parentType === request.parentType &&
+        r.parentVersion === request.parentVersion &&
+        r.qualifiedPathName === request.qualifiedPathName &&
+        r.lastModified === request.lastModified
+      )
+    ) {
+      CAN_LOG_DEBUG && logger.debug(
+        {
+          className: "Listener",
+          methodName: "parentedSearchFeedback",
+          message: "Already being handled for " + socket.id,
+          data: {
+            request,
+          }
+        },
+      );
+      this.emitError(
+        socket,
+        "The following feedback request will not be answered since a similar one is already being handled; " +
+        "this is not an error but it suggest your app is asking for the same feedback many times which " +
+        "suggests it's being inefficient (eg. a component mounts/dismounts over and over or two components at the same time)",
+        request,
+      );
+      return;
+    }
+
+    if (!this.awaitingParentedSearchFeedbacks[socket.id]) {
+      this.awaitingParentedSearchFeedbacks[socket.id] = [];
+    }
+
+    this.awaitingParentedSearchFeedbacks[socket.id].push(request);
+
+    const removeAwaiting = () => {
+      const currentIndex = this.awaitingParentedSearchFeedbacks[socket.id].indexOf(request);
+      if (currentIndex !== -1) {
+        this.awaitingParentedSearchFeedbacks[socket.id].splice(currentIndex, 1);
+      }
+    }
+
+    try {
       let mod: Module;
       let requiredType: string = null;
       if (itemDefinitionOrModule instanceof ItemDefinition) {
@@ -1987,6 +2137,7 @@ export class Listener {
                 " with role " + listenerData.user.role + " cannot listen to " + request.qualifiedPathName,
             },
           );
+          removeAwaiting();
           this.emitError(socket, "user has not access", request);
           return;
         }
@@ -1999,6 +2150,7 @@ export class Listener {
             err,
           },
         );
+        removeAwaiting();
         this.emitError(socket, "Internal Server Error", request);
         return;
       }
@@ -2144,10 +2296,13 @@ export class Listener {
             },
           },
         );
+        removeAwaiting();
         socket.emit(
           PARENTED_SEARCH_RECORDS_EVENT,
           event,
         );
+      } else {
+        removeAwaiting();
       }
     } catch (err) {
       logger.error(
@@ -2158,6 +2313,7 @@ export class Listener {
           err,
         },
       );
+      removeAwaiting();
       this.emitError(socket, "Internal Server Error", request);
       return;
     }
@@ -2194,20 +2350,66 @@ export class Listener {
       this.emitError(socket, "invalid request", request);
       return;
     }
-    try {
-      const itemDefinitionOrModule = this.root.registry[request.qualifiedPathName];
-      if (!itemDefinitionOrModule) {
-        CAN_LOG_DEBUG && logger.debug(
-          {
-            className: "Listener",
-            methodName: "ownedParentedSearchFeedback",
-            message: "Could not find " + request.qualifiedPathName,
-          },
-        );
-        this.emitError(socket, "could not find item definition or module", request);
-        return;
-      }
 
+    const itemDefinitionOrModule = this.root.registry[request.qualifiedPathName];
+    if (!itemDefinitionOrModule) {
+      CAN_LOG_DEBUG && logger.debug(
+        {
+          className: "Listener",
+          methodName: "ownedParentedSearchFeedback",
+          message: "Could not find " + request.qualifiedPathName,
+        },
+      );
+      this.emitError(socket, "could not find item definition or module", request);
+      return;
+    }
+
+    if (
+      this.awaitingOwnedParentedSearchFeedbacks &&
+      this.awaitingOwnedParentedSearchFeedbacks[socket.id] &&
+      this.awaitingOwnedParentedSearchFeedbacks[socket.id].find((r) =>
+        r.createdBy === request.createdBy &&
+        r.parentId === request.parentId &&
+        r.parentType === request.parentType &&
+        r.parentVersion === request.parentVersion &&
+        r.qualifiedPathName === request.qualifiedPathName &&
+        r.lastModified === request.lastModified
+      )
+    ) {
+      CAN_LOG_DEBUG && logger.debug(
+        {
+          className: "Listener",
+          methodName: "ownedParentedSearchFeedback",
+          message: "Already being handled for " + socket.id,
+          data: {
+            request,
+          }
+        },
+      );
+      this.emitError(
+        socket,
+        "The following feedback request will not be answered since a similar one is already being handled; " +
+        "this is not an error but it suggest your app is asking for the same feedback many times which " +
+        "suggests it's being inefficient (eg. a component mounts/dismounts over and over or two components at the same time)",
+        request,
+      );
+      return;
+    }
+
+    if (!this.awaitingOwnedParentedSearchFeedbacks[socket.id]) {
+      this.awaitingOwnedParentedSearchFeedbacks[socket.id] = [];
+    }
+
+    this.awaitingOwnedParentedSearchFeedbacks[socket.id].push(request);
+
+    const removeAwaiting = () => {
+      const currentIndex = this.awaitingOwnedParentedSearchFeedbacks[socket.id].indexOf(request);
+      if (currentIndex !== -1) {
+        this.awaitingOwnedParentedSearchFeedbacks[socket.id].splice(currentIndex, 1);
+      }
+    }
+
+    try {
       let mod: Module;
       let requiredType: string = null;
       if (itemDefinitionOrModule instanceof ItemDefinition) {
@@ -2263,6 +2465,7 @@ export class Listener {
                 " with role " + listenerData.user.role + " cannot listen to " + request.qualifiedPathName,
             },
           );
+          removeAwaiting();
           this.emitError(socket, "user has not access", request);
           return;
         }
@@ -2275,6 +2478,7 @@ export class Listener {
             err,
           },
         );
+        removeAwaiting();
         this.emitError(socket, "Internal Server Error", request);
         return;
       }
@@ -2424,10 +2628,13 @@ export class Listener {
             },
           },
         );
+        removeAwaiting();
         socket.emit(
           OWNED_PARENTED_SEARCH_RECORDS_EVENT,
           event,
         );
+      } else {
+        removeAwaiting();
       }
     } catch (err) {
       logger.error(
@@ -2438,6 +2645,7 @@ export class Listener {
           err,
         },
       );
+      removeAwaiting();
       this.emitError(socket, "Internal Server Error", request);
       return;
     }
@@ -2447,6 +2655,7 @@ export class Listener {
     request: IFeedbackRequest,
   ) {
     const listenerData = this.listeners[socket.id];
+
     if (!listenerData) {
       CAN_LOG_DEBUG && logger.debug(
         {
@@ -2488,6 +2697,48 @@ export class Listener {
       return;
     }
 
+    if (
+      this.awaitingBasicFeedbacks &&
+      this.awaitingBasicFeedbacks[socket.id] &&
+      this.awaitingBasicFeedbacks[socket.id].find((r) =>
+        r.id === request.id &&
+        r.itemDefinition === request.itemDefinition &&
+        r.version === request.version
+      )
+    ) {
+      CAN_LOG_DEBUG && logger.debug(
+        {
+          className: "Listener",
+          methodName: "feedback",
+          message: "Already being handled for " + socket.id,
+          data: {
+            request,
+          }
+        },
+      );
+      this.emitError(
+        socket,
+        "The following feedback request will not be answered since a similar one is already being handled; " +
+        "this is not an error but it suggest your app is asking for the same feedback many times which " +
+        "suggests it's being inefficient (eg. a component mounts/dismounts over and over or two components at the same time)",
+        request,
+      );
+      return;
+    }
+
+    if (!this.awaitingBasicFeedbacks[socket.id]) {
+      this.awaitingBasicFeedbacks[socket.id] = [];
+    }
+
+    this.awaitingBasicFeedbacks[socket.id].push(request);
+
+    const removeAwaiting = () => {
+      const currentIndex = this.awaitingBasicFeedbacks[socket.id].indexOf(request);
+      if (currentIndex !== -1) {
+        this.awaitingBasicFeedbacks[socket.id].splice(currentIndex, 1);
+      }
+    }
+
     let value: ISQLTableRowValue;
     try {
       value = await this.cache.requestValue(itemDefinition, request.id, request.version);
@@ -2501,6 +2752,8 @@ export class Listener {
           err,
         }
       );
+      this.emitError(socket, "Cache failure", request);
+      removeAwaiting();
       return;
     }
     const creator = value ? (itemDefinition.isOwnerObjectId() ? value.id : value.created_by) : UNSPECIFIED_OWNER;
@@ -2556,6 +2809,7 @@ export class Listener {
               " with role " + listenerData.user.role + " cannot listen to " + itemDefinition,
           },
         );
+        removeAwaiting();
         this.emitError(socket, "user has not access", request);
         return;
       }
@@ -2578,6 +2832,7 @@ export class Listener {
             },
           },
         );
+        removeAwaiting();
         socket.emit(
           CHANGED_FEEDBACK_EVENT,
           event,
@@ -2600,6 +2855,7 @@ export class Listener {
             },
           },
         );
+        removeAwaiting();
         socket.emit(
           CHANGED_FEEDBACK_EVENT,
           event,
@@ -2615,6 +2871,7 @@ export class Listener {
         },
       );
       this.emitError(socket, "Internal Server Error", request);
+      removeAwaiting();
       return;
     }
   }
@@ -3350,6 +3607,11 @@ export class Listener {
       }
     });
     delete this.listeners[socket.id];
+    delete this.awaitingBasicFeedbacks[socket.id];
+    delete this.awaitingOwnedParentedSearchEvents[socket.id];
+    delete this.awaitingParentedSearchEvents[socket.id];
+    delete this.awaitingOwnedSearchEvents[socket.id];
+    delete this.awaitingPropertySearchEvents[socket.id];
   }
   public onClusterManagerResetInformed() {
     // the redis database has been wiped if this happened here
