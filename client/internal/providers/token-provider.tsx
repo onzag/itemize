@@ -476,11 +476,11 @@ class ActualTokenProvider extends React.Component<IActualTokenProviderProps, IAc
 
     const dmStatus = await destroyDestructionMarkers();
     if (!dmStatus) {
-      console.warn("Failed to remove destruction markers for an unknown reason");
+      console.warn("Failed to remove all destruction markers for an unknown reason");
     }
     const searchStatus = await destroySearchDestructionMarkers();
     if (!searchStatus) {
-      console.warn("Failed to remove destruction markers for search for an unknown reason");
+      console.warn("Failed to remove all destruction markers for search for an unknown reason");
     }
   }
 

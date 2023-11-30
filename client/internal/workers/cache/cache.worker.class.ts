@@ -1409,6 +1409,18 @@ export default class CacheWorker {
       storeKeyName += property[0] + "." + property[1];
     }
 
+    if (!this.polyfilled) {
+      try {
+        if (this.badWritesForced) {
+          throw new Error("Forced bad writes error");
+        }
+        await this.db.delete(METADATA_TABLE_NAME, storeKeyName);
+      } catch (err) {
+        console.error("Could not delete " + storeKeyName + " search metadata");
+        console.error(err.stack);
+      }
+    }
+
     try {
       // get the current value
       let currentValue: ISearchMatchType = POLYFILLED_INDEXED_DB[SEARCHES_TABLE_NAME][storeKeyName] || null;
@@ -1428,17 +1440,21 @@ export default class CacheWorker {
       // useful information
       console.log("Deleting search query for " + storeKeyName);
 
-      // and now we loop on all the records and delete them
-      // as well
-      await Promise.all(
-        currentValue.value.map((record) => {
-          return this.deleteCachedValue(
-            PREFIX_GET + record.type,
-            record.id,
-            record.version,
-          );
-        })
-      );
+      if (!currentValue.value || !Array.isArray(currentValue.value)) {
+        console.warn("Requested to delete " + storeKeyName + " but it was corrupted");
+      } else {
+        // and now we loop on all the records and delete them
+        // as well
+        await Promise.all(
+          currentValue.value.map((record) => {
+            return this.deleteCachedValue(
+              PREFIX_GET + record.type,
+              record.id,
+              record.version,
+            );
+          })
+        );
+      }
 
       // and now we can delete the search itself
       // if (this.polyfilled) {
@@ -1934,6 +1950,14 @@ export default class CacheWorker {
         }
         dbValue = await this.db.get(SEARCHES_TABLE_NAME, storeKeyName);
       }
+
+      if (dbValue) {
+        if (!dbValue.value || typeof dbValue.count !== "number" || !Array.isArray(dbValue.value)) {
+          console.warn("Detected data corruption on " + storeKeyName);
+          dbValue = null;
+        }
+      }
+
       // if the database is not offering anything or the limit is less than
       // it is supposed to be, this means that we have grown the cache size, but yet
       // the cache remains constrained by the older size
@@ -2120,6 +2144,8 @@ export default class CacheWorker {
         }
       }
     } catch (err) {
+      console.error(err.stack);
+
       // yet some other errors might come here
       // we return an unspecified error if we hit an error
       const gqlValue: IGQLEndpointValue = {
@@ -2534,9 +2560,11 @@ export default class CacheWorker {
         polyfilled: false,
       };
     } else {
+      console.error("Unknown error in worker");
       // otherwise it must have been some sort
       // of connection failure (or database error)
       // we return an unspecified error if we hit an error
+      // actually it seems impossible to get to this state
       const gqlValue: IGQLEndpointValue = {
         data: null,
         errors: [

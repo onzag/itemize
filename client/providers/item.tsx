@@ -2373,44 +2373,18 @@ export class ActualItemProvider extends
   public injectSubmitBlockPromise(p: Promise<any>) {
     this.submitBlockPromises.push(p);
   }
-  public async clearFromDestruction(props: IActualItemProviderProps = this.props, unmount: boolean) {
+  public async markForDestruction(unmount: boolean, unmark: boolean, props: IActualItemProviderProps = this.props) {
+    if (typeof document === "undefined") {
+      return;
+    }
     if (props.forId) {
       if (CacheWorkerInstance.instance) {
         await CacheWorkerInstance.instance.waitForInitializationBlock();
       }
+
       const qualifiedName = props.itemDefinitionInstance.getQualifiedPathName();
       const forId = props.forId;
       const forVersion = props.forVersion || null;
-
-      const locationMemcached = unmount ? MEMCACHED_UNMOUNT_DESTRUCTION_MARKERS_LOCATION : MEMCACHED_DESTRUCTION_MARKERS_LOCATION;
-      const locationReal = unmount ? UNMOUNT_DESTRUCTION_MARKERS_LOCATION : DESTRUCTION_MARKERS_LOCATION;
-
-      (window as any)[locationMemcached] =
-        (window as any)[locationMemcached] ||
-        JSON.parse(localStorage.getItem(locationReal) || "{}");
-
-      if ((window as any)[locationMemcached][qualifiedName]) {
-        const foundValueIndex = (window as any)[locationMemcached][qualifiedName]
-          .find((m: [string, string]) => m[0] === forId && m[1] === forVersion);
-        if (foundValueIndex !== -1) {
-          (window as any)[locationMemcached][qualifiedName].splice(foundValueIndex, 1);
-          localStorage.setItem(locationReal, JSON.stringify((window as any)[locationMemcached]));
-        }
-      }
-    }
-  }
-  public async markForDestruction(unmount: boolean) {
-    if (typeof document === "undefined") {
-      return;
-    }
-    if (this.props.forId) {
-      if (CacheWorkerInstance.instance) {
-        await CacheWorkerInstance.instance.waitForInitializationBlock();
-      }
-
-      const qualifiedName = this.props.itemDefinitionInstance.getQualifiedPathName();
-      const forId = this.props.forId;
-      const forVersion = this.props.forVersion || null;
 
       const locationMemcached = unmount ? MEMCACHED_UNMOUNT_DESTRUCTION_MARKERS_LOCATION : MEMCACHED_DESTRUCTION_MARKERS_LOCATION;
       const locationReal = unmount ? UNMOUNT_DESTRUCTION_MARKERS_LOCATION : DESTRUCTION_MARKERS_LOCATION;
@@ -2420,50 +2394,33 @@ export class ActualItemProvider extends
         (window as any)[locationMemcached] ||
         JSON.parse(localStorage.getItem(locationReal) || "{}");
       let changed = false;
-      if (!(window as any)[locationMemcached][qualifiedName]) {
-        (window as any)[locationMemcached][qualifiedName] = [[forId, forVersion]];
-        changed = true;
+
+      if (unmark) {
+        if (!(window as any)[locationMemcached][qualifiedName]) {
+          // already unmarked
+        } else {
+          const indexFound = (window as any)[locationMemcached][qualifiedName]
+            .findIndex((m: [string, string]) => m[0] === forId && m[1] === forVersion);
+          // found at index
+          if (indexFound !== -1) {
+            changed = true;
+            (window as any)[locationMemcached][qualifiedName].splice(indexFound, 1);
+          }
+        }
       } else {
-        if (!(window as any)[locationMemcached][qualifiedName]
-          .find((m: [string, string]) => m[0] === forId && m[1] === forVersion)) {
+        if (!(window as any)[locationMemcached][qualifiedName]) {
+          (window as any)[locationMemcached][qualifiedName] = [[forId, forVersion]];
           changed = true;
-          (window as any)[locationMemcached][qualifiedName].push([forId, forVersion]);
+        } else {
+          if (!(window as any)[locationMemcached][qualifiedName]
+            .find((m: [string, string]) => m[0] === forId && m[1] === forVersion)) {
+            changed = true;
+            (window as any)[locationMemcached][qualifiedName].push([forId, forVersion]);
+          }
         }
       }
 
       if (changed) {
-        localStorage.setItem(locationReal, JSON.stringify((window as any)[locationMemcached]));
-      }
-    }
-  }
-  public async clearSearchFromDestruction(
-    type: "by-parent" | "by-owner" | "by-owner-and-parent" | "by-property",
-    qualifiedName: string,
-    owner: string,
-    parent: [string, string, string],
-    property: [string, string],
-    unmount: boolean,
-  ) {
-    if (CacheWorkerInstance.instance) {
-      await CacheWorkerInstance.instance.waitForInitializationBlock();
-    }
-
-    const locationMemcached =
-      unmount ? MEMCACHED_UNMOUNT_SEARCH_DESTRUCTION_MARKERS_LOCATION : MEMCACHED_SEARCH_DESTRUCTION_MARKERS_LOCATION;
-    const locationReal =
-      unmount ? UNMOUNT_SEARCH_DESTRUCTION_MARKERS_LOCATION : SEARCH_DESTRUCTION_MARKERS_LOCATION;
-
-    (window as any)[locationMemcached] =
-      (window as any)[locationMemcached] ||
-      JSON.parse(localStorage.getItem(locationReal) || "{}");
-
-    if ((window as any)[locationMemcached][qualifiedName]) {
-      const foundValueIndex = (window as any)[locationMemcached][qualifiedName]
-        .findIndex((m: [string, string, [string, string, string], [string, string]]) =>
-          m[0] === type && equals(m[1], owner, { strict: true }) && equals(m[2], parent, { strict: true }) && equals(m[3], property, { strict: true }));
-
-      if (foundValueIndex !== -1) {
-        (window as any)[locationMemcached][qualifiedName].splice(foundValueIndex, 1);
         localStorage.setItem(locationReal, JSON.stringify((window as any)[locationMemcached]));
       }
     }
@@ -2475,6 +2432,7 @@ export class ActualItemProvider extends
     parent: [string, string, string],
     property: [string, string],
     unmount: boolean,
+    unmark: boolean,
   ) {
     if (typeof document === "undefined") {
       return;
@@ -2493,19 +2451,34 @@ export class ActualItemProvider extends
       (window as any)[locationMemcached] ||
       JSON.parse(localStorage.getItem(locationReal) || "{}");
     let changed = false;
-    if (!(window as any)[locationMemcached][qualifiedName]) {
-      (window as any)[locationMemcached][qualifiedName] = [
-        [type, owner, parent, property],
-      ];
-      changed = true;
+
+    if (unmark) {
+      if (!(window as any)[locationMemcached][qualifiedName]) {
+        // already not there
+      } else {
+        const foundValueIndex = (window as any)[locationMemcached][qualifiedName]
+          .findIndex((m: [string, string, [string, string, string], [string, string]]) =>
+            m[0] === type && equals(m[1], owner, { strict: true }) && equals(m[2], parent, { strict: true }) && equals(m[3], property, { strict: true }));
+        if (foundValueIndex !== -1) {
+          changed = true;
+          (window as any)[locationMemcached][qualifiedName].splice(foundValueIndex, 1);
+        }
+      }
     } else {
-      if (
-        !(window as any)[locationMemcached][qualifiedName]
-          .find((m: [string, string, [string, string, string], [string, string]]) =>
-            m[0] === type && equals(m[1], owner, { strict: true }) && equals(m[2], parent, { strict: true }) && equals(m[3], property, { strict: true }))
-      ) {
+      if (!(window as any)[locationMemcached][qualifiedName]) {
+        (window as any)[locationMemcached][qualifiedName] = [
+          [type, owner, parent, property],
+        ];
         changed = true;
-        (window as any)[locationMemcached][qualifiedName].push([type, owner, parent, property]);
+      } else {
+        if (
+          !(window as any)[locationMemcached][qualifiedName]
+            .find((m: [string, string, [string, string, string], [string, string]]) =>
+              m[0] === type && equals(m[1], owner, { strict: true }) && equals(m[2], parent, { strict: true }) && equals(m[3], property, { strict: true }))
+        ) {
+          changed = true;
+          (window as any)[locationMemcached][qualifiedName].push([type, owner, parent, property]);
+        }
       }
     }
 
@@ -2685,12 +2658,20 @@ export class ActualItemProvider extends
       }
     }
 
-    if (this.props.markForDestructionOnLogout) {
-      this.markForDestruction(false);
+    if (typeof this.props.markForDestructionOnLogout !== "undefined" && this.props.markForDestructionOnLogout !== null) {
+      if (this.props.markForDestructionOnLogout) {
+        this.markForDestruction(false, false);
+      } else {
+        this.markForDestruction(false, true);
+      }
     }
 
-    if (this.props.markForDestructionOnUnmount) {
-      this.markForDestruction(true);
+    if (typeof this.props.markForDestructionOnUnmount !== "undefined" && this.props.markForDestructionOnUnmount !== null) {
+      if (this.props.markForDestructionOnUnmount) {
+        this.markForDestruction(true, false);
+      } else {
+        this.markForDestruction(true, true);
+      }
     }
 
     if (window.TESTING && process.env.NODE_ENV === "development") {
@@ -2906,20 +2887,28 @@ export class ActualItemProvider extends
     // we recheck it
     if (
       (
-        this.props.markForDestructionOnLogout ||
-        this.props.markForDestructionOnUnmount
-      ) &&
-      (
         itemDefinitionWasUpdated ||
         uniqueIDChanged
+      ) || (
+        this.props.markForDestructionOnLogout !== prevProps.markForDestructionOnLogout
+      ) || (
+        this.props.markForDestructionOnUnmount !== prevProps.markForDestructionOnUnmount
       )
     ) {
-      if (this.props.markForDestructionOnUnmount) {
-        this.markForDestruction(false);
+      if (typeof this.props.markForDestructionOnLogout !== "undefined" && this.props.markForDestructionOnLogout !== null) {
+        if (this.props.markForDestructionOnLogout) {
+          this.markForDestruction(false, false);
+        } else {
+          this.markForDestruction(false, true);
+        }
       }
 
-      if (this.props.markForDestructionOnUnmount) {
-        this.markForDestruction(true);
+      if (typeof this.props.markForDestructionOnUnmount !== "undefined" && this.props.markForDestructionOnUnmount !== null) {
+        if (this.props.markForDestructionOnUnmount) {
+          this.markForDestruction(false, false);
+        } else {
+          this.markForDestruction(false, true);
+        }
       }
     }
 
@@ -4156,9 +4145,10 @@ export class ActualItemProvider extends
     if (props.markForDestructionOnUnmount && props.forId) {
       const qualifiedName = this.props.itemDefinitionInstance.getQualifiedPathName();
       (async () => {
-        const status = await CacheWorkerInstance.instance.deleteCachedValue(qualifiedName, props.forId, props.forVersion || null);
+        const status = await CacheWorkerInstance.instance.deleteCachedValue(PREFIX_GET + qualifiedName, props.forId, props.forVersion || null);
         if (status) {
-          this.clearFromDestruction(props, true);
+          // unmark destruction
+          this.markForDestruction(true, true, props);
         }
       })();
     }
@@ -4167,8 +4157,8 @@ export class ActualItemProvider extends
       // executing destruction markers for search
       this.internalSearchDestructionMarkers.forEach(async (m, index) => {
         const status = await CacheWorkerInstance.instance.deleteCachedSearch(
-          PREFIX_SEARCH + m[0], //qualified path name
-          m[1] as any, // by-
+          PREFIX_SEARCH + m[1], //qualified path name
+          m[0] as any, // by-
           m[2], // created by
           m[3], // parent
           m[4], // property
@@ -4176,7 +4166,7 @@ export class ActualItemProvider extends
 
         if (status) {
           // remove it from the destruction marker
-          this.clearSearchFromDestruction(m[1] as any, m[0], m[2], m[3], m[4], true);
+          this.markSearchForDestruction(m[0] as any, m[1], m[2], m[3], m[4], true, true);
         }
       });
     }
@@ -5507,35 +5497,6 @@ export class ActualItemProvider extends
         options.parentedBy.id,
         options.parentedBy.version || null,
       ];
-
-      // if (options.markForDestructionOnLogout && (options.cachePolicy === "by-parent" || options.cachePolicy === "by-owner-and-parent")) {
-      //   this.markSearchForDestruction(
-      //     options.cachePolicy,
-      //     standardCounterpart.getQualifiedPathName(),
-      //     options.createdBy || null,
-      //     searchParent,
-      //     null,
-      //     false,
-      //   );
-      // }
-
-      // if (options.markForDestructionOnUnmount) {
-      //   this.installInternalSearchDestructionMarker([
-      //     options.cachePolicy,
-      //     standardCounterpart.getQualifiedPathName(),
-      //     options.createdBy || null,
-      //     searchParent,
-      //     null,
-      //   ]);
-      //   this.markSearchForDestruction(
-      //     options.cachePolicy,
-      //     standardCounterpart.getQualifiedPathName(),
-      //     options.createdBy || null,
-      //     searchParent,
-      //     null,
-      //     true,
-      //   );
-      // }
     }
 
     this.props.onWillSearch && this.props.onWillSearch();
@@ -5602,7 +5563,11 @@ export class ActualItemProvider extends
       }
     }
 
-    if (options.cachePolicy && options.markForDestructionOnLogout) {
+    if (
+      options.cachePolicy &&
+      typeof options.markForDestructionOnLogout !== "undefined" &&
+      options.markForDestructionOnLogout !== null
+    ) {
       if (options.cachePolicy === "by-owner") {
         this.markSearchForDestruction(
           options.cachePolicy,
@@ -5611,6 +5576,8 @@ export class ActualItemProvider extends
           null,
           null,
           false,
+          // unmark
+          !options.markForDestructionOnLogout,
         );
       } else if (options.cachePolicy === "by-parent") {
         this.markSearchForDestruction(
@@ -5620,6 +5587,8 @@ export class ActualItemProvider extends
           searchParent,
           null,
           false,
+          // unmark
+          !options.markForDestructionOnLogout,
         );
       } else if (options.cachePolicy === "by-owner-and-parent") {
         this.markSearchForDestruction(
@@ -5629,6 +5598,8 @@ export class ActualItemProvider extends
           searchParent,
           null,
           false,
+          // unmark
+          !options.markForDestructionOnLogout,
         );
       } else if (options.cachePolicy === "by-property") {
         this.markSearchForDestruction(
@@ -5638,11 +5609,17 @@ export class ActualItemProvider extends
           null,
           searchCacheUsesProperty,
           false,
+          // unmark
+          !options.markForDestructionOnLogout,
         );
       }
     }
 
-    if (options.cachePolicy && options.markForDestructionOnUnmount) {
+    if (
+      options.cachePolicy &&
+      typeof options.markForDestructionOnUnmount !== "undefined" &&
+      options.markForDestructionOnUnmount !== null
+    ) {
       if (options.cachePolicy === "by-owner") {
         this.installInternalSearchDestructionMarker([
           options.cachePolicy,
@@ -5650,7 +5627,7 @@ export class ActualItemProvider extends
           options.createdBy,
           null,
           null,
-        ]);
+        ], !options.markForDestructionOnUnmount);
         this.markSearchForDestruction(
           options.cachePolicy,
           standardCounterpartQualifiedName,
@@ -5658,6 +5635,7 @@ export class ActualItemProvider extends
           null,
           null,
           true,
+          !options.markForDestructionOnUnmount,
         );
       } else if (options.cachePolicy === "by-parent") {
         this.installInternalSearchDestructionMarker([
@@ -5666,7 +5644,7 @@ export class ActualItemProvider extends
           null,
           searchParent,
           null,
-        ]);
+        ], !options.markForDestructionOnUnmount);
         this.markSearchForDestruction(
           options.cachePolicy,
           standardCounterpartQualifiedName,
@@ -5674,6 +5652,7 @@ export class ActualItemProvider extends
           searchParent,
           null,
           true,
+          !options.markForDestructionOnUnmount,
         );
       } else if (options.cachePolicy === "by-owner-and-parent") {
         this.installInternalSearchDestructionMarker([
@@ -5682,7 +5661,7 @@ export class ActualItemProvider extends
           options.createdBy,
           searchParent,
           null,
-        ]);
+        ], !options.markForDestructionOnUnmount);
         this.markSearchForDestruction(
           options.cachePolicy,
           standardCounterpartQualifiedName,
@@ -5690,6 +5669,7 @@ export class ActualItemProvider extends
           searchParent,
           null,
           true,
+          !options.markForDestructionOnUnmount,
         );
       } else if (options.cachePolicy === "by-property") {
         this.installInternalSearchDestructionMarker([
@@ -5698,7 +5678,7 @@ export class ActualItemProvider extends
           null,
           null,
           searchCacheUsesProperty,
-        ]);
+        ], !options.markForDestructionOnUnmount);
         this.markSearchForDestruction(
           options.cachePolicy,
           standardCounterpartQualifiedName,
@@ -5706,6 +5686,7 @@ export class ActualItemProvider extends
           null,
           searchCacheUsesProperty,
           true,
+          !options.markForDestructionOnUnmount,
         );
       }
     }
@@ -6202,9 +6183,18 @@ export class ActualItemProvider extends
       },
     });
   }
-  private installInternalSearchDestructionMarker(marker: [string, string, string, [string, string, string], [string, string]]) {
-    const exists = this.internalSearchDestructionMarkers.find((m) => equals(m, marker, { strict: true }));
-    if (!exists) {
+  private installInternalSearchDestructionMarker(marker: [string, string, string, [string, string, string], [string, string]], unmark: boolean) {
+    const index = this.internalSearchDestructionMarkers.findIndex((m) => equals(m, marker, { strict: true }));
+    if (unmark) {
+      // found somwehre
+      if (index !== -1) {
+        // unmark it
+        this.internalSearchDestructionMarkers.splice(index, 1);
+      }
+
+    // not found
+    } else if (index === -1) {
+      // mark it
       this.internalSearchDestructionMarkers.push(marker);
     }
   }

@@ -12,27 +12,40 @@ export async function destroyDestructionMarkers(unmount?: boolean, intialization
     // otherwise get them from local storage
     JSON.parse(localStorage.getItem(locReal) || "{}");
 
+  let failed = false;
+
   // now we loop over the destruction markers
-  const statuses: boolean[][] = await Promise.all(Object.keys(destructionMarkers).map((qualifiedPathName: string) => {
-    return Promise.all(destructionMarkers[qualifiedPathName].map((marker: [string, string]) => {
+  await Promise.all(Object.keys(destructionMarkers).map((qualifiedPathName: string) => {
+    return Promise.all(destructionMarkers[qualifiedPathName].map(async (marker: [string, string]) => {
       // and delete everything within it
-      return CacheWorkerInstance.instance.deleteCachedValue(
+      const status = await CacheWorkerInstance.instance.deleteCachedValue(
         PREFIX_GET + qualifiedPathName,
         marker[0],
         marker[1],
       );
+
+      if (status) {
+        const currentIndex = destructionMarkers[qualifiedPathName].findIndex((m: any) => m === marker);
+        if (currentIndex !== -1) {
+          // remove marker
+          destructionMarkers[qualifiedPathName].splice(currentIndex, 1);
+        }
+        if (destructionMarkers[qualifiedPathName].length === 0) {
+          delete destructionMarkers[qualifiedPathName];
+        }
+      } else {
+        failed = true;
+        console.warn(
+          "Failed to remove destruction marker for " + qualifiedPathName + " with id " + marker[0] + " and version " + marker[1],
+        );
+      }
     }));
   }));
 
-  const statusesFlat: boolean[] = statuses.flat();
-  const failed: boolean = statusesFlat.some((s) => !s);
-
-  if (!failed) {
-    // clean them from the memory cache to match local storage
-    (window as any)[locMemcached] = {};
-    // as we delete from local storage as well
-    localStorage.removeItem(locReal);
-  }
+  // clean them from the memory cache to match local storage
+  (window as any)[locMemcached] = destructionMarkers;
+  // as we delete from local storage as well
+  localStorage.setItem(locReal, JSON.stringify(destructionMarkers));
 
   return !failed;
 }
@@ -48,33 +61,47 @@ export async function destroySearchDestructionMarkers(unmount?: boolean, intiali
     // otherwise get them from local storage
     JSON.parse(localStorage.getItem(locSearchReal) || "{}");
 
+  let failed = false;
+
   // now we loop over the destruction markers
-  const searchStatuses: boolean[][] = await Promise.all(Object.keys(searchDestructionMarkers).map((qualifiedPathName: string) => {
-    return Promise.all(searchDestructionMarkers[qualifiedPathName].map((marker: [string, string, [string, string, string], [string, string]]) => {
+  await Promise.all(Object.keys(searchDestructionMarkers).map((qualifiedPathName: string) => {
+    return Promise.all(searchDestructionMarkers[qualifiedPathName].map(async (marker: [string, string, [string, string, string], [string, string]]) => {
       // and delete everything within it
       // the first value of the marker is the type of caching that was used
       // the second is the owner
       // the thrid is the parent
       // the fourth is the tracked property
-      return CacheWorkerInstance.instance.deleteCachedSearch(
+      const status = await CacheWorkerInstance.instance.deleteCachedSearch(
         PREFIX_SEARCH + qualifiedPathName,
         marker[0] as any,
         marker[1],
         marker[2],
         marker[3],
       );
+
+      if (status) {
+        const currentIndex = searchDestructionMarkers[qualifiedPathName].findIndex((m: any) => m === marker);
+        if (currentIndex !== -1) {
+          // remove marker
+          searchDestructionMarkers[qualifiedPathName].splice(currentIndex, 1);
+        }
+        if (searchDestructionMarkers[qualifiedPathName].length === 0) {
+          delete searchDestructionMarkers[qualifiedPathName];
+        }
+      } else {
+        failed = true;
+        console.warn(
+          "Failed to remove search destruction marker for " + qualifiedPathName,
+          marker,
+        );
+      }
     }));
   }));
 
-  const searchStatusesFlat: boolean[] = searchStatuses.flat();
-  const searchFailed: boolean = searchStatusesFlat.some((s) => !s);
+  // clean them from the memory cache to match local storage
+  (window as any)[locSearchMemcached] = searchDestructionMarkers;
+  // as we delete from local storage as well
+  localStorage.setItem(locSearchReal, JSON.stringify(searchDestructionMarkers));
 
-  if (!searchFailed) {
-    // clean them from the memory cache to match local storage
-    (window as any)[locSearchMemcached] = {};
-    // as we delete from local storage as well
-    localStorage.removeItem(locSearchReal);
-  }
-
-  return !searchFailed;
+  return !failed;
 }

@@ -560,7 +560,7 @@ export async function initializeItemizeApp(
             try {
               const succeeded = await destroyDestructionMarkers(false, true);
               if (!succeeded) {
-                console.warn("Failed to clean logout destruction markers");
+                console.warn("Failed to clean all logout destruction markers");
               }
             } catch (err) {
               console.error(err);
@@ -568,7 +568,7 @@ export async function initializeItemizeApp(
             try {
               const succeeded = await destroySearchDestructionMarkers(false, true);
               if (!succeeded) {
-                console.warn("Failed to clean logout destruction markers");
+                console.warn("Failed to clean all logout destruction markers");
               }
             } catch (err) {
               console.error(err);
@@ -581,7 +581,7 @@ export async function initializeItemizeApp(
             try {
               const succeeded = await destroyDestructionMarkers(true, true);
               if (!succeeded) {
-                console.warn("Failed to clean unmount destruction markers");
+                console.warn("Failed to clean all unmount destruction markers");
               }
             } catch (err) {
               console.error(err);
@@ -589,7 +589,7 @@ export async function initializeItemizeApp(
             try {
               const succeeded = await destroySearchDestructionMarkers(true, true);
               if (!succeeded) {
-                console.warn("Failed to clean unmount destruction markers");
+                console.warn("Failed to clean all unmount destruction markers");
               }
             } catch (err) {
               console.error(err);
