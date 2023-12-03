@@ -3700,16 +3700,13 @@ export class ActualItemProvider extends
           }
         }
 
-        const completedValue = this.loadValueCompleted({
+        return this.loadValueCompleted({
           value: appliedGQLValue.rawValue,
           error: null,
           cached,
           id: forId,
           version: forVersion,
         });
-
-        this.props.onLoad && this.props.onLoad(completedValue);
-        return completedValue;
       }
     }
 

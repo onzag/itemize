@@ -91,6 +91,10 @@ export default function ItemSyncer(props: IItemSyncerProps) {
 
   // when one item loads of all of them
   const onLoadedOne = useCallback((id: string, version: string, e: IActionResponseWithValue) => {
+    if (handleMechanism.unmountRef.current) {
+      return;
+    }
+    
     if (!e.error && e.cached) {
       // can't use e.value.id because it could be null and we would get stuck
       console.log("Synced " + props.type + " from " + props.id + " with id " + id + " and version " + version);
@@ -136,7 +140,9 @@ export default function ItemSyncer(props: IItemSyncerProps) {
       loaded: false,
       fallback: false,
     }
-    setLoaded(newLoaded);
+    if (!handleMechanism.unmountRef.current) {
+      setLoaded(newLoaded);
+    }
   }, [loaded]);
 
   if (!handleMechanism.ready) {
