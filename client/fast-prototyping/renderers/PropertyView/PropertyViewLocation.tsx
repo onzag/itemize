@@ -12,6 +12,7 @@ import { ZOOMS } from "../PropertyEntry/PropertyEntryLocation";
 import GPSFixedIcon from "@mui/icons-material/GpsFixed";
 import Box from "@mui/material/Box";
 import { ConfigContext } from "../../../internal/providers/config-provider";
+import AppLanguageRetriever from "../../../components/localization/AppLanguageRetriever";
 
 // this logic is similar to the entry
 // it has to do with SSR not supporting
@@ -113,29 +114,35 @@ class PropertyViewLocationMap extends React.Component<IPropertyViewLocationRende
         onViewportChanged={this.props.onViewportChange}
         className={this.props.args.leafletMapClassName}
       >
-        <ConfigContext.Consumer>
-          {(config) => {
-            let attribution = '&copy; <a href="http://osm.org/copyright">OpenStreetMap</a> contributors';
-            let url = "http://{s}.tile.osm.org/{z}/{x}/{y}.png";
+        <AppLanguageRetriever>
+          {(lang) => (
+            <ConfigContext.Consumer>
+              {(config) => {
+                let attribution = '&copy; <a href="http://osm.org/copyright">OpenStreetMap</a> contributors';
+                let url = "http://{s}.tile.osm.org/{z}/{x}/{y}.png";
 
-            if (config.shared) {
-              if (config.shared.leafletAttribution) {
-                attribution = config.shared.leafletAttribution;
-              }
+                if (config.shared) {
+                  if (config.shared.leafletAttribution) {
+                    attribution = config.shared.leafletAttribution;
+                  }
 
-              if (config.shared.leafletUrl) {
-                url = config.shared.leafletUrl;
-              }
-            }
+                  if (config.shared.leafletUrl) {
+                    url = config.shared.leafletUrl;
+                  }
 
-            return (
-              <CTileLayer
-                attribution={attribution}
-                url={url}
-              />
-            );
-          }}
-        </ConfigContext.Consumer>
+                  url = url.replace("{lang}", lang.currentLanguage.code);
+                }
+
+                return (
+                  <CTileLayer
+                    attribution={attribution}
+                    url={url}
+                  />
+                );
+              }}
+            </ConfigContext.Consumer>
+          )}
+        </AppLanguageRetriever>
         {this.props.currentValue ? <CMarker position={[
           this.props.currentValue.lat, this.props.currentValue.lng,
         ]} /> : null}

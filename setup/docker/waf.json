@@ -14,11 +14,11 @@
     "allowedLocations": [
         {
             "location": "/graphql",
-            "rules": "client_max_body_size: 100M; limit_except POST {deny all;}"
+            "rules": "client_max_body_size 100M; limit_except POST {deny all;}"
         },
         {
             "location": "/rq",
-            "rules": "client_max_body_size: 100M; limit_except POST {deny all;}"
+            "rules": "client_max_body_size 100M; limit_except POST {deny all;}"
         },
         "/robots.txt",
         "/uploads/...",
@@ -27,7 +27,7 @@
         "/sitemap.xml",
         {
             "location": "/rest/...",
-            "rules": "client_max_body_size: 1M;"
+            "rules": "client_max_body_size 1M;"
         },
         "/"
     ],

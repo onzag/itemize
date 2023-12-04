@@ -48,7 +48,7 @@ export default class LocationSearchProvider<T> extends ServiceProvider<T> {
    * @returns a promise for a location
    * @override
    */
-  public async requestGeocodeFor(
+  public async requestRevGeocodeFor(
     lat: string | number,
     lng: string | number,
     query: string,

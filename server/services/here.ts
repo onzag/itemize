@@ -8,18 +8,35 @@ import LocationSearchProvider from "./base/LocationSearchProvider";
 // https://places.demo.api.here.com/places/v1/autosuggest
 interface IHereResult {
   title: string;
-  highlightedTitle: string;
-  vicinity?: string;
-  highlightedVicinity?: string;
-  position: [number, number];
-  category: string;
-  categoryTitle: string;
-  bbox?: [number, number, number, number];
-  href?: string;
-  type: string;
-  resultType: string;
   id: string;
+  resultType: string;
+  address: {
+    label: string;
+
+    // search props
+    countryCode?: string;
+    countryName?: string;
+    state?: string;
+    county?: string;
+    city?: string;
+    district?: string;
+    street: string;
+    postalCode: string;
+    houseNumber?: string;
+  },
+  position: {
+    lat: number;
+    lng: number;
+  };
+  access: Array<{ lat: number, lng: number }>;
   distance: number;
+
+  // aucom props
+  highlights: any;
+
+  // search props
+  ontologyId?: string;
+  houseNumberType?: string;
 }
 
 export interface IHereMapsConfig {
@@ -32,25 +49,23 @@ export class HereMapsService extends LocationSearchProvider<IHereMapsConfig> {
   }
   private processHereResult(wordSeparator: string, suggestion: IHereResult, overwriteTxt?: string) {
     return {
-      lat: suggestion.position[0],
-      lng: suggestion.position[1],
+      lat: suggestion.position.lat,
+      lng: suggestion.position.lng,
       txt: overwriteTxt || suggestion.title,
-      id: this.makeIdOutOf(suggestion.position[0], suggestion.position[1]),
-      // NOTE adding tf=plain makes plain text results, but this works pretty well
-      // the word separator should be used by default now
-      atxt: suggestion.vicinity ? suggestion.vicinity.replace(/\<br\/\>/g, " ") : null,
+      id: this.makeIdOutOf(suggestion.position.lat, suggestion.position.lng),
+      atxt: (suggestion.address && suggestion.address.label) || null,
     };
   }
-  public requestGeocodeFor(
+  public requestRevGeocodeFor(
     lat: string | number,
     lng: string | number,
     query: string,
     lang: string,
     sep: string,
   ): Promise<IPropertyDefinitionSupportedLocationType> {
-    const hostname = "places.ls.hereapi.com";
-    const path = "/places/v1/discover/here";
-    const qs = `?at=${lat},${lng}&cat=none&apiKey=${this.config.apiKey}`;
+    const hostname = "discover.search.hereapi.com";
+    const path = "/v1/revgeocode";
+    const qs = `?at=${lat},${lng}&apiKey=${this.config.apiKey}&lang=${encodeURIComponent(lang)}`;
     const pathwithqs = path + qs;
 
     const latp = typeof lat === "number" ? lat : parseFloat(lat);
@@ -82,7 +97,7 @@ export class HereMapsService extends LocationSearchProvider<IHereMapsConfig> {
             this.logError(
               {
                 className: "HereMapsService",
-                methodName: "requestGeocodeFor",
+                methodName: "requestRevGeocodeFor",
                 message: "Here response cancelled",
                 serious: true,
                 err,
@@ -102,18 +117,23 @@ export class HereMapsService extends LocationSearchProvider<IHereMapsConfig> {
             // now that we got the answer, let's use our guess
             try {
               const parsedData = JSON.parse(data);
-              const address = parsedData.search.context.location.address;
-              const addressText = address && address.text ? address.text.replace(/\<br\/\>/g, sep + " ") : "???";
+
+              if (!parsedData.items[0]) {
+                resolve(standardResponse);
+              }
+
+              const title = parsedData.items[0].title;
+              const address = parsedData.items[0]?.address?.label;
               resolve({
                 ...standardResponse,
-                atxt: addressText,
-                txt: query ? query : addressText,
+                atxt: address || "???",
+                txt: query ? query : title,
               });
             } catch (err) {
               this.logError(
                 {
                   className: "HereMapsService",
-                  methodName: "requestGeocodeFor",
+                  methodName: "requestRevGeocodeFor",
                   message: "Here replied with invalid data or with error message",
                   serious: true,
                   err,
@@ -135,7 +155,7 @@ export class HereMapsService extends LocationSearchProvider<IHereMapsConfig> {
         this.logError(
           {
             className: "HereMapsService",
-            methodName: "requestGeocodeFor",
+            methodName: "requestRevGeocodeFor",
             message: "Https request to here API failed",
             serious: true,
             err,
@@ -159,9 +179,9 @@ export class HereMapsService extends LocationSearchProvider<IHereMapsConfig> {
     lang: string,
     sep: string,
   ): Promise<IPropertyDefinitionSupportedLocationType[]> {
-    const hostname = "places.ls.hereapi.com";
-    const path = "/places/v1/discover/search";
-    const qs = `?at=${lat},${lng}&q=${encodeURIComponent(query)}&apiKey=${this.config.apiKey}`;
+    const hostname = "discover.search.hereapi.com";
+    const path = "/v1/geocode";
+    const qs = `?at=${lat},${lng}&q=${encodeURIComponent(query)}&apiKey=${this.config.apiKey}&lang=${encodeURIComponent(lang)}`;
     const pathwithqs = path + qs;
 
     return new Promise<IPropertyDefinitionSupportedLocationType[]>((resolve, reject) => {
@@ -203,7 +223,7 @@ export class HereMapsService extends LocationSearchProvider<IHereMapsConfig> {
             // now that we got the answer, let's use our guess
             try {
               const parsedData = JSON.parse(data);
-              parsedData.results.items = parsedData.results.items
+              parsedData.items = parsedData.items
                 .filter((r: IHereResult) => r.position)
                 .filter((r: IHereResult, index: number, arr: IHereResult[]) => {
                   return arr.findIndex((r2: IHereResult) =>
@@ -211,7 +231,7 @@ export class HereMapsService extends LocationSearchProvider<IHereMapsConfig> {
                   ) === index;
                 }
                 );
-              resolve(parsedData.results.items.map((r: IHereResult) => this.processHereResult(
+              resolve(parsedData.items.map((r: IHereResult) => this.processHereResult(
                 sep,
                 r,
                 query,
@@ -266,9 +286,9 @@ export class HereMapsService extends LocationSearchProvider<IHereMapsConfig> {
     lang: string,
     sep: string,
   ): Promise<IPropertyDefinitionSupportedLocationType[]> {
-    const hostname = "places.ls.hereapi.com";
-    const path = "/places/v1/autosuggest";
-    const qs = `?at=${lat},${lng}&q=${encodeURIComponent(query)}&apiKey=${this.config.apiKey}&size=6`;
+    const hostname = "autosuggest.search.hereapi.com";
+    const path = "/v1/autosuggest";
+    const qs = `?at=${lat},${lng}&q=${encodeURIComponent(query)}&apiKey=${this.config.apiKey}&limit=6`;
     const pathwithqs = path + qs;
 
     return new Promise<IPropertyDefinitionSupportedLocationType[]>((resolve, reject) => {
@@ -310,8 +330,8 @@ export class HereMapsService extends LocationSearchProvider<IHereMapsConfig> {
             // now that we got the answer, let's use our guess
             try {
               const parsedData = JSON.parse(data);
-              parsedData.results = parsedData.results.filter((s: IHereResult) => s.position);
-              resolve(parsedData.results.map((r: IHereResult) => this.processHereResult(
+              parsedData.items = parsedData.items.filter((s: IHereResult) => s.position);
+              resolve(parsedData.items.map((r: IHereResult) => this.processHereResult(
                 sep,
                 r,
               )));

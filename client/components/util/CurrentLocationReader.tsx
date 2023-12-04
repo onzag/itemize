@@ -87,7 +87,7 @@ export function useCurrentLocationReader(props: ICurrentLocationReaderInfo = {})
       setGeocoding(true);
 
       try {
-        const rs = await fetch(`/rest/util/location-geocode?lat=${position.coords.latitude}&lng=${position.coords.longitude}` +
+        const rs = await fetch(`/rest/util/location-revgeocode?lat=${position.coords.latitude}&lng=${position.coords.longitude}` +
           `&sep=${encodeURIComponent(sep)}&lang=${langInfo.currentLanguage.code}`);
 
         if (rs.status === 200) {

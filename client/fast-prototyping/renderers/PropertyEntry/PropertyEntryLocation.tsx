@@ -34,6 +34,7 @@ import { ConfigContext } from "../../../internal/providers/config-provider";
 import { Map, TileLayer, Marker } from "react-leaflet";
 import Box from "@mui/material/Box";
 import { RestoreIconButton } from "./general";
+import AppLanguageRetriever from "../../../components/localization/AppLanguageRetriever";
 
 // we only use these types to define these C prefixed types
 let CMap: typeof Map;
@@ -553,29 +554,35 @@ class PropertyEntryLocationRenderer extends
         onClick={this.setLocationManually}
         ref={this.cmapRef}
       >
-        <ConfigContext.Consumer>
-          {(config) => {
-            let attribution = '&copy; <a href="http://osm.org/copyright">OpenStreetMap</a> contributors';
-            let url = "http://{s}.tile.osm.org/{z}/{x}/{y}.png";
+        <AppLanguageRetriever>
+          {(lang) => (
+            <ConfigContext.Consumer>
+              {(config) => {
+                let attribution = '&copy; <a href="http://osm.org/copyright">OpenStreetMap</a> contributors';
+                let url = "http://{s}.tile.osm.org/{z}/{x}/{y}.png";
 
-            if (config.shared) {
-              if (config.shared.leafletAttribution) {
-                attribution = config.shared.leafletAttribution;
-              }
+                if (config.shared) {
+                  if (config.shared.leafletAttribution) {
+                    attribution = config.shared.leafletAttribution;
+                  }
 
-              if (config.shared.leafletUrl) {
-                url = config.shared.leafletUrl;
-              }
-            }
+                  if (config.shared.leafletUrl) {
+                    url = config.shared.leafletUrl;
+                  }
 
-            return (
-              <CTileLayer
-                attribution={attribution}
-                url={url}
-              />
-            );
-          }}
-        </ConfigContext.Consumer>
+                  url = url.replace("{lang}", lang.currentLanguage.code);
+                }
+
+                return (
+                  <CTileLayer
+                    attribution={attribution}
+                    url={url}
+                  />
+                );
+              }}
+            </ConfigContext.Consumer>
+          )}
+        </AppLanguageRetriever>
         {this.props.currentValue ? <CMarker position={[
           this.props.currentValue.lat, this.props.currentValue.lng,
         ]} /> : null}

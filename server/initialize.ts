@@ -291,6 +291,10 @@ export function initializeApp(appData: IAppDataType, custom: IServerCustomizatio
     app.get("/sitemap.xml", (req, res) => {
       seoGenerator.provide(req, res);
     });
+  } else {
+    app.get("/sitemap.xml", (req, res) => {
+      res.status(404).end();
+    });
   }
 
   // and now the main index setup

@@ -656,7 +656,7 @@ export default class PropertyEntryLocation
     try {
       const sep = this.props.i18n[this.props.language].word_separator;
       const response = await fetch(
-        `/rest/util/location-geocode?lat=${value.lat}&lng=${value.lng}` + 
+        `/rest/util/location-revgeocode?lat=${value.lat}&lng=${value.lng}` + 
         `&q=${encodeURIComponent(value.txt)}&sep=${encodeURIComponent(sep)}&lang=${this.props.language}`,
       );
       if (response.status === 200) {

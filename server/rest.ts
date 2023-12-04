@@ -217,7 +217,7 @@ export default function restServices(appData: IAppDataType) {
     res.end(JSON.stringify(serviceResponse));
   });
 
-  router.get("/util/location-geocode", async (req, res) => {
+  router.get("/util/location-revgeocode", async (req, res) => {
     res.setHeader("content-type", "application/json; charset=utf-8");
 
     if (
@@ -245,7 +245,7 @@ export default function restServices(appData: IAppDataType) {
       return;
     }
 
-    const finalResult = await appData.locationSearchService.requestGeocodeFor(
+    const finalResult = await appData.locationSearchService.requestRevGeocodeFor(
       req.query.lat as string,
       req.query.lng as string,
       req.query.q as string || null,

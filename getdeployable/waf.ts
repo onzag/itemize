@@ -36,13 +36,18 @@ export default class Waf {
     this.compiled = this.getCompiledPaths();
   }
   public patchNginx(nginxConf: string) {
-    let wafText = this.compiled.map((r) => r.location + "{" + r.rules + (r.rules.endsWith(";") ? "" : ";") + this.config.proxyRule + "}").join("\n");
+    let wafText = this.compiled.map((r) => {
+      const trimmedRules = r.rules ? r.rules.trim() : "";
+      return (
+        r.location + " {" + trimmedRules + (trimmedRules.endsWith("}") || trimmedRules.endsWith(";") ? "" : ";") + this.config.proxyRule + "}"
+      );
+    }).join("\n");
 
     // firewall
     wafText += "\nlocation / {return 444;}";
     
     // replace in the nginx configuration
-    return nginxConf.replace("WAF", wafText);
+    return nginxConf.replace("WAF;", wafText).replace("WAF", wafText);;
   }
   public compileRegex(path: string) {
     let regex = "^" + path
