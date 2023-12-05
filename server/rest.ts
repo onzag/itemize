@@ -14,10 +14,45 @@ import ItemDefinition from "../base/Root/Module/ItemDefinition";
 import bodyParser from "body-parser";
 import { PROTECTED_RESOURCES, ENDPOINT_ERRORS, PING_DATA_IDENTIFIER, PING_STATUS_IDENTIFIER, JWT_KEY, REPROCESSED_RESOURCES } from "../constants";
 import { getMode } from "./mode";
-import { ENVIRONMENT_DETAILS } from "./environment";
+import { ENVIRONMENT_DETAILS, TRUST_ALL_INBOUND_CONNECTIONS } from "./environment";
 import { jwtVerify } from "./token";
 import { IServerSideTokenDataType } from "./resolvers/basic";
 import fs from "fs";
+
+export function secureEndpointRouter(appData: IAppDataType, req: express.Request, res: express.Response, next: () => void) {
+  const hostname = req.headers["host"];
+  const isLocalhost = hostname === "localhost" || hostname.indexOf("localhost") === 0;
+  if (
+    !TRUST_ALL_INBOUND_CONNECTIONS &&
+    !isLocalhost &&
+    hostname !== appData.config.developmentHostname &&
+    hostname !== appData.config.productionHostname
+  ) {
+    res.status(403).end("Invalid hostname");
+    return;
+  }
+
+  if (!isLocalhost && !TRUST_ALL_INBOUND_CONNECTIONS) {
+    if (hostname === appData.config.developmentHostname) {
+      res.set("Access-Control-Allow-Origin", appData.config.developmentHostname);
+    } else {
+      res.set("Access-Control-Allow-Origin", appData.config.productionHostname);
+    }
+  } else {
+    if (TRUST_ALL_INBOUND_CONNECTIONS) {
+      res.set("Access-Control-Allow-Origin", "*");
+    } else {
+      res.set("Access-Control-Allow-Origin", req.hostname);
+    }
+  }
+
+  if (!isLocalhost && !TRUST_ALL_INBOUND_CONNECTIONS) {
+    res.set("Strict-Transport-Security", "max-age=63072000; includeSubDomains; preload");
+  }
+
+  res.set("X-Frame-Options", "SAMEORIGIN");
+  next();
+}
 
 /**
  * this function contains and build all the rest services
@@ -343,7 +378,7 @@ export default function restServices(appData: IAppDataType) {
   const reprocessedCache = {};
   REPROCESSED_RESOURCES.forEach((rr) => {
     const fileLocation = path.resolve(path.join("dist", "data", rr));
-    
+
     // yes we are using sync, we need to stop the execution anyway
     // until this is processed
     const fileData = fs.readFileSync(fileLocation, "utf-8");
@@ -366,7 +401,7 @@ export default function restServices(appData: IAppDataType) {
     }
 
     const isReprocessedResource = REPROCESSED_RESOURCES.includes(req.path);
-    
+
     if (isReprocessedResource) {
       res.writeHead(200, {
         "Content-Type": "application/javascript"

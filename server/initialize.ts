@@ -15,7 +15,7 @@ import { getGQLSchemaForRoot } from "../base/Root/gql";
 import { MAX_FILES_PER_REQUEST, MAX_FILE_SIZE, MAX_FIELD_SIZE, ENDPOINT_ERRORS } from "../constants";
 import { GraphQLError } from "graphql";
 import { EndpointError, EndpointErrorType } from "../base/errors";
-import restServices from "./rest";
+import restServices, { secureEndpointRouter } from "./rest";
 import { customUserQueries } from "./user/queries";
 import { customUserMutations } from "./user/mutations";
 import { graphqlUploadExpress } from "graphql-upload";
@@ -114,6 +114,8 @@ export function initializeApp(appData: IAppDataType, custom: IServerCustomizatio
     res.removeHeader("X-Powered-By");
     next();
   });
+
+  app.use(secureEndpointRouter.bind(null, appData));
 
   // if we have a custom router and custom router endpoint rather than the standard
   if (custom.customRouterEndpoint) {
