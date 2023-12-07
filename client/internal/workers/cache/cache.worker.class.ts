@@ -13,7 +13,7 @@ import {
   IGQLValue, IGQLRequestFields, IGQLArgs, IGQLEndpointValue, IGQLFile
 } from "../../../../gql-querier";
 import { PREFIX_GET, ENDPOINT_ERRORS } from "../../../../constants";
-import { EndpointErrorType } from "../../../../base/errors";
+import type { EndpointErrorType } from "../../../../base/errors";
 import { search } from "./cache.worker.search";
 import Root, { IRootRawJSONDataType } from "../../../../base/Root";
 import { NanoSecondComposedDate } from "../../../../nanodate";

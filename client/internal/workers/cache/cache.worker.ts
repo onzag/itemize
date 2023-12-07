@@ -1,5 +1,5 @@
-import "core-js/stable";
-import "regenerator-runtime/runtime";
+// import "core-js/stable";
+// import "regenerator-runtime/runtime";
 import CacheWorker from "./cache.worker.class";
 
 import { expose } from "comlink";

@@ -7,8 +7,8 @@ import { IGQLArgs, IGQLSearchRecord, IGQLValue } from "../../../../gql-querier";
 import { IDBPDatabase } from "idb";
 import { fixFilesURLAt, ICacheDB, ICacheMatchType, QUERIES_TABLE_NAME, POLYFILLED_INDEXED_DB } from "./cache.worker.class";
 import { PREFIX_GET, IOrderByRuleType } from "../../../../constants";
-import Root from "../../../../base/Root";
-import ItemDefinition from "../../../../base/Root/Module/ItemDefinition";
+import type Root from "../../../../base/Root";
+import type ItemDefinition from "../../../../base/Root/Module/ItemDefinition";
 import { NanoSecondComposedDate } from "../../../../nanodate";
 
 /**
