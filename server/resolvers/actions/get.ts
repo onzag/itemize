@@ -390,6 +390,7 @@ export async function getItemDefinitionList(
     resultQuery.mustTerms({
       _id: resolverArgs.args.records.map((r: IGQLSearchRecord) => r.id + "." + (r.version || ""))
     });
+    resultQuery.setSize(resolverArgs.args.records.length);
 
     const dictionary = getDictionary(appData, resolverArgs.args);
 
@@ -690,6 +691,7 @@ export async function getModuleList(
     resultQuery.mustTerms({
       _id: resolverArgs.args.records.map((r: IGQLSearchRecord) => r.id + "." + (r.version || ""))
     });
+    resultQuery.setSize(resolverArgs.args.records.length);
 
     const dictionary = getDictionary(appData, resolverArgs.args);
 
