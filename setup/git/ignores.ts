@@ -4,7 +4,7 @@
  */
 
 export default [
-  // dist folder that itemize generates on webpack build
+  // dist folder that itemize generates on esbuild build
   "/dist",
   // the itemize folder used to be there some time ago and sometimes used
   // during development

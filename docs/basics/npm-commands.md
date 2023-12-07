@@ -20,25 +20,25 @@ By default the standard test that is written automatically during the setup cont
 
 Runs the test in production mode, this mode is not recommended as it will not be able to perform the full range of tests, and it is aimed to run against production servers and builds, it supports the same options as the development mode
 
-## npm run webpack
+## npm run esbuild
 
-Runs the webpack transpiler to create the web production builds, note that the production builds do not mean that they are only accessible when the web is ran with production configuration, there's a difference between the web app production/development builds and the server development/production environment, while in your application client data using NODE_ENV refers to this mode, in your server data NODE_ENV refers to the three values, and they can be combined.
+Runs the esbuild transpiler to create the web production builds, note that the production builds do not mean that they are only accessible when the web is ran with production configuration, there's a difference between the web app production/development builds and the server development/production environment, while in your application client data using NODE_ENV refers to this mode, in your server data NODE_ENV refers to the three values, and they can be combined.
 
 itemize builds the client in a way that both can be accessed no matter the mode, you can access production builds from development mode and vice-versa, any combination is possible; however when developing you are most often interacting with development builds, by default the client mode is setup to production if the client is not connecting from localhost, a cookie can be set to toggle this development mode and is accessible via the SET_DEV_MODE(mode, key) function that is available from the console of any build, where mode is development or production and the key is the devKey in your sensitive config
 
-## npm run webpack-dev
+## npm run esbuild-dev
 
-Runs the webpack transpiler to create the web development builds, the same logic as the production builds applies, these builds are onl available by default when the host you connect from is localhost
+Runs the esbuild transpiler to create the web development builds, the same logic as the production builds applies, these builds are onl available by default when the host you connect from is localhost
 
-The webpack dev mode is useful when developing, but you should disable service workers in order for this command to be usable, otherwise due to an equal build number the caches might refuse to update service worker data leaving you with the same build as if nothing has happened.
+The esbuild dev mode is useful when developing, but you should disable service workers in order for this command to be usable, otherwise due to an equal build number the caches might refuse to update service worker data leaving you with the same build as if nothing has happened.
 
-## npm run webpack-analyze
+## npm run esbuild-analyze
 
-Runs the webpack transpiler to create production builds but also uses the bundle analyze plugin as well
+Runs the esbuild transpiler to create production builds but also uses the bundle analyze plugin as well
 
 ## npm run build
 
-Runs both tsc, webpack, webpack-dev and build-data combined giving a new buildnumber and a fresh app, this should be the go to command before spinning a new app version.
+Runs both tsc, esbuild, esbuild-dev and build-data combined giving a new buildnumber and a fresh app, this should be the go to command before spinning a new app version.
 
 ## npm run build-data
 

@@ -123,7 +123,7 @@ export interface IItemizeConstantsConfig {
   PROTECTED_USERNAMES?: string[];
 }
 
-// in the client side it gets injected via webpack in the server side
+// in the client side it gets injected via esbuild in the server side
 // it has to be required
 declare var ITEMIZE_CONSTANTS_CONFIG: IItemizeConstantsConfig;
 let R_ITEMIZE_CONSTANTS_CONFIG: IItemizeConstantsConfig = typeof ITEMIZE_CONSTANTS_CONFIG !== "undefined" ?
@@ -2013,12 +2013,12 @@ export const UNSPECIFIED_OWNER = "UNSPECIFIED";
  * Resources that are protected from fetching without specifying the devkey
  */
 export const PROTECTED_RESOURCES = [
-  "/build.development.js",
+  "/index.development.js",
 ]
 
 export const REPROCESSED_RESOURCES = [
-  "/service-worker.production.js",
-  "/service-worker.development.js",
+  "/service.worker.production.js",
+  "/service.worker.development.js",
 ];
 
 /**

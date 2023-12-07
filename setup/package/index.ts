@@ -11,7 +11,6 @@ import { execAsync } from "../exec";
 import dependencies from "./dependencies";
 import devDependencies from "./dev-dependencies";
 import scripts from "./scripts";
-import { default as workingPackageJSON } from "./package-lock";
 
 /**
  * modifies the package documentation either by installing stuff or by adding scripts onto it
@@ -75,78 +74,6 @@ export default async function packageSetup(arg: ISetupConfigType): Promise<ISetu
     newPackageJSON.scripts = newScripts;
     console.log("emiting " + colors.green("package.json"));
     await fsAsync.writeFile("package.json", JSON.stringify(newPackageJSON, null, 2));
-  }
-
-  // now we have to repair the package-lock.json because npm is really strange on
-  // how it resolves everything causing a dependency hell that is impossible to escape
-  // in short npm is really dumb and does things in a non-repeatable manner
-  const currentPackageLockJSON = JSON.parse(await fsAsync.readFile("package-lock.json", "utf-8"));
-  let needsReinstall = false;
-  const ignoreListPrefix = [
-    //"@mui",
-    // tried to ignore it but npm also messes up the imports
-    // npm can't get anything right even once
-    "react",
-    "@onzag",
-  ];
-  // NPM IS THE MOST STUPID SHIT IN THE WORLD
-  const npmForceRewriteOfPackages = {};
-  Object.keys(workingPackageJSON.dependencies).forEach((dependency) => {
-    const shallIgnore = ignoreListPrefix.some((p) => dependency.startsWith(p));
-    if (shallIgnore) {
-      return;
-    }
-
-    if (currentPackageLockJSON.dependencies[dependency]) {
-      const currentVersion = currentPackageLockJSON.dependencies[dependency].version;
-      const expectedVersion = workingPackageJSON.dependencies[dependency].version;
-
-      if (currentVersion !== expectedVersion) {
-        console.log(colors.yellow("invalid version resolved by npm for " + dependency + " expected: " + expectedVersion + ", current: " + currentVersion));
-        needsReinstall = true;
-
-        currentPackageLockJSON.dependencies[dependency] = workingPackageJSON.dependencies[dependency];
-        npmForceRewriteOfPackages[dependency] = expectedVersion;
-      }
-    }
-  });
-
-  // why is npm like this why is it such a disgrace?
-  if (needsReinstall) {
-    // due to npm being incredibly stupid we need to rewrite the package json just to overwrite the package-lock file
-    // because otherwise it will execute the scripts for installation without consent
-    const newPackageJSONAgainNPMISAMess = JSON.parse(await fsAsync.readFile("package.json", "utf-8"));
-
-    // what a disgrace that npm is
-    Object.keys(npmForceRewriteOfPackages).forEach((v) => {
-      if (newPackageJSONAgainNPMISAMess.dependencies && newPackageJSONAgainNPMISAMess.dependencies[v]) {
-        newPackageJSONAgainNPMISAMess.dependencies[v] = npmForceRewriteOfPackages[v];
-      }
-      if (newPackageJSONAgainNPMISAMess.devDependencies && newPackageJSONAgainNPMISAMess.devDependencies[v]) {
-        newPackageJSONAgainNPMISAMess.devDependencies[v] = npmForceRewriteOfPackages[v];
-      }
-      if (newPackageJSONAgainNPMISAMess.peerDependencies && newPackageJSONAgainNPMISAMess.peerDependencies[v]) {
-        newPackageJSONAgainNPMISAMess.peerDependencies[v] = npmForceRewriteOfPackages[v];
-      }
-    });
-
-    const oldScripts = newPackageJSONAgainNPMISAMess.scripts;
-    delete newPackageJSONAgainNPMISAMess.scripts;
-    console.log("emiting " + colors.green("package.json"));
-    await fsAsync.writeFile("package.json", JSON.stringify(newPackageJSONAgainNPMISAMess, null, 2));
-
-    console.log("emiting " + colors.green("package-lock.json"));
-    await fsAsync.writeFile("package-lock.json", JSON.stringify(currentPackageLockJSON, null, 2));
-    //console.log(colors.yellow("Removing invalid node_modules and reinstalling"));
-    // same running exec
-    //await execAsync("rm -r ./node_modules");
-    await execAsync("npm install");
-
-    // hopefully this will prevent npm doing stupid things
-    // for the nth time
-    newPackageJSONAgainNPMISAMess.scripts = oldScripts;
-    console.log("emiting " + colors.green("package.json"));
-    await fsAsync.writeFile("package.json", JSON.stringify(newPackageJSONAgainNPMISAMess, null, 2));
   }
 
   // return the same arg

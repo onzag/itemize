@@ -14,7 +14,7 @@ import equals from "deep-equal";
 import gitSetup from "./git";
 import packageSetup from "./package";
 import babelSetup from "./babel";
-import webpackSetup from "./webpack";
+import esbuildSetup from "./esbuild";
 import itemizeConfigSetup from "./itemize";
 import srcSetup from "./src";
 import typescriptSetup from "./typescript";
@@ -81,8 +81,8 @@ const stepsInOrder: IStepType[] = [
     name: "typescript",
   },
   {
-    fn: webpackSetup,
-    name: "webpack",
+    fn: esbuildSetup,
+    name: "esbuild",
   },
   {
     fn: itemizeConfigSetup,

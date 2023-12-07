@@ -37,7 +37,7 @@ export function Frontpage() {
 }
 ```
 
-And now the frontpage after running `npm run webpack-dev`
+And now the frontpage after running `npm run esbuild-dev`
 
 ![Frontpage Clean](./images/frontpage-clean.png)
 

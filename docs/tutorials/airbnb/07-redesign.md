@@ -163,7 +163,7 @@ Just note that the way we are templating here is specific to the slate based pro
 
 If you need to create your own editor you can use itemize source code, clone the editor code, and modify it from there, remove buttons, change the behaviour of templates, and create ui handled mechanisms.
 
-Now back to our webpage, after building with webpack dev, we should find this section:
+Now back to our webpage, after building with esbuild dev, we should find this section:
 
 ![Header Body Content Fragment](./images/header-body-content-fragment.png)
 

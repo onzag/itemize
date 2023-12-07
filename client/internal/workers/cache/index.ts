@@ -5,7 +5,7 @@
  * @module
  */
 
-import { wrap, proxy } from "comlink";
+import { wrap, proxy, Remote } from "comlink";
 import CacheWorker from "./cache.worker.class";
 
 // we need to know in which environemnt we are in order to load
@@ -13,9 +13,9 @@ import CacheWorker from "./cache.worker.class";
 const isDevelopment = process.env.NODE_ENV === "development";
 let url: string;
 if (isDevelopment) {
-  url = "/rest/resource/cache-worker.injector.development.js";
+  url = "/rest/resource/cache.worker.development.js";
 } else {
-  url = "/rest/resource/cache-worker.injector.production.js";
+  url = "/rest/resource/cache.worker.production.js";
 }
 
 const CACHE_WORKER_FORCE_POLYFILL = typeof localStorage !== "undefined" && localStorage.getItem("CACHE_WORKER_FORCE_POLYFILL") === "true";
@@ -36,30 +36,47 @@ const supportsCacheWorker = CACHE_WORKER_FORCE_POLYFILL ? false : (
 );
 
 // we build the instance
-let instance = supportsCacheWorker ? wrap<CacheWorker>(new Worker(url)) : null;
-if (instance && CACHE_WORKER_FORCE_STORAGE_FULL) {
-  instance.forceStorageFull();
-}
-if (instance && CACHE_WORKER_FORCE_BAD_READS) {
-  instance.forceBadReads();
-}
-if (instance && CACHE_WORKER_FORCE_BAD_WRITES) {
-  instance.forceBadWrites();
-}
-if (!instance) {
-  // make a polyfilled version
-  instance = new CacheWorker(true) as any;
-}
+let instance: Remote<CacheWorker> = null;
+let errored = false;
+try {
+  const worker = supportsCacheWorker ? new Worker(url,  { type: "module" }) : null;
 
-// double wrap despite of all
-// in order to have the main thread functions
-// available
-instance = new CacheWorker(true, instance as any) as any;
+  // TODO maybe do something in case like this?
+  // it locks the main thread as the tread will wait for the worker
+  // if (worker) {
+  //   worker.onerror((ev) => {
+
+  //   })
+  // }
+  
+  instance = supportsCacheWorker ? wrap<CacheWorker>(worker) : null;
+  if (instance && CACHE_WORKER_FORCE_STORAGE_FULL) {
+    instance.forceStorageFull();
+  }
+  if (instance && CACHE_WORKER_FORCE_BAD_READS) {
+    instance.forceBadReads();
+  }
+  if (instance && CACHE_WORKER_FORCE_BAD_WRITES) {
+    instance.forceBadWrites();
+  }
+  if (!instance) {
+    // make a polyfilled version
+    instance = new CacheWorker(true) as any;
+  }
+  // double wrap despite of all
+  // in order to have the main thread functions
+  // available
+  instance = new CacheWorker(true, instance as any) as any;
+} catch (err) {
+  console.warn(err.stack);
+  errored = true;
+  instance = new CacheWorker(true, null) as any;
+}
 
 // and wrap it into some information
 const CacheWorkerInstance = {
-  isSupportedAsWorker: !!supportsCacheWorker,
-  isPolyfilled: !supportsCacheWorker,
+  isSupportedAsWorker: errored ? false : !!supportsCacheWorker,
+  isPolyfilled: errored ? true : !supportsCacheWorker,
   instance,
   getProxy: (obj: unknown) => {
     return proxy(obj);

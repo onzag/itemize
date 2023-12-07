@@ -205,22 +205,22 @@ export function initializeApp(appData: IAppDataType, custom: IServerCustomizatio
 
   // service worker setup
   app.get("/sw.development.js", (req, res) => {
-    if (reprocessedCache["/service-worker.development.js"]) {
+    if (reprocessedCache["/service.worker.development.js"]) {
       res.writeHead(200, {
         "Content-Type": "application/javascript"
-      }).end(reprocessedCache["/service-worker.development.js"]);
+      }).end(reprocessedCache["/service.worker.development.js"]);
       return;
     }
-    res.sendFile(path.resolve(path.join("dist", "data", "service-worker.development.js")));
+    res.sendFile(path.resolve(path.join("dist", "data", "service.worker.development.js")));
   });
   app.get("/sw.production.js", (req, res) => {
-    if (reprocessedCache["/service-worker.production.js"]) {
+    if (reprocessedCache["/service.worker.production.js"]) {
       res.writeHead(200, {
         "Content-Type": "application/javascript"
-      }).end(reprocessedCache["/service-worker.production.js"]);
+      }).end(reprocessedCache["/service.worker.production.js"]);
       return;
     }
-    res.sendFile(path.resolve(path.join("dist", "data", "service-worker.production.js")));
+    res.sendFile(path.resolve(path.join("dist", "data", "service.worker.production.js")));
   });
 
   if (appData.sensitiveConfig.localContainer) {

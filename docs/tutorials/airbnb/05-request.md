@@ -571,7 +571,7 @@ We want to go to the file `src/client/pages/cms/fragment` and add to the known f
 }
 ```
 
-Now try to rebuild with webpack dev and refresh the site on your admin user and check out the CMS.
+Now try to rebuild with esbuild dev and refresh the site on your admin user and check out the CMS.
 
 ![First Fragment](./images/first-fragment.png)
 
@@ -801,7 +801,7 @@ custom.view_reservations = view reservations
 custom.view_reservations = ver reservaciones
 ```
 
-And now we should have a menu entry added, remember to run `build-data` and `webpack-dev`
+And now we should have a menu entry added, remember to run `build-data` and `esbuild-dev`
 
 ![View Reservations Menu](./images/view-reservations-menu.png)
 
@@ -1121,7 +1121,7 @@ We will take our hosting menu entry and update it to:
 }
 ```
 
-After we have done all this lets test our changes, by running `npm run install` and `npm run webpack-dev`, restarting then the server, and refreshing our page, we might then find this view in our menu:
+After we have done all this lets test our changes, by running `npm run install` and `npm run esbuild-dev`, restarting then the server, and refreshing our page, we might then find this view in our menu:
 
 ![Initial 0 Manage Units](./images/initial-0-manage-units.png)
 
@@ -1553,7 +1553,7 @@ custom.deny = denegar pedido
 custom.change_success = cambio de estado exitoso
 ```
 
-We got to run `npm run build-data` due to the changes in the schema and `npm run webpack-dev` to update our app, now we should be able to see the following screen when we are checking a single request.
+We got to run `npm run build-data` due to the changes in the schema and `npm run esbuild-dev` to update our app, now we should be able to see the following screen when we are checking a single request.
 
 ![Request Status Page](./images/request-status-page.png)
 

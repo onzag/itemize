@@ -5,7 +5,7 @@ This document will explain how the development flow goes with itemize, there are
 It is assumed that your app is initialized and currently running, if you haven't done so check [Initialization](./initialization.md)
 
  - Buildnumber: The build number is a number that represents a timestamp on when the application was last built and it's actually generated when the command `npm run build-data` is launched, when the application determines a new buildnumber, caches are wiped; the build number is tied to the server, as such, the server needs to be reloaded in order for this to be of effect, if the buildnumber changes while a client is active; eg. `npm run build-data`, then you kill the dev server ctrl+c in terminal, then restart via `npm run start-dev-server`, the client will take notice of this and mark the app as outdated due to a buildnumber mismatch.
- - Distribution Sources: The files that are generated via the `npm run build-data`, `npm run webpack`, `npm run install` and `npm run webpack-dev` commands and resides in the dist folder, `npm run build` is a shorthand for all these 4 commands.
+ - Distribution Sources: The files that are generated via the `npm run build-data`, `npm run esbuild`, `npm run install` and `npm run esbuild-dev` commands and resides in the dist folder, `npm run build` is a shorthand for all these 4 commands.
  - Distribution Resources: These are part of the distribution sources and it represents files that can be accessed and are meant to be accessed by the browser, they should exist within a folder called `dist/data` and can be accessed in the browser via `/rest/resources/[name of the resource]`
  - Source Resources: It represents sources for resources that are to be copied (and sometimes optimized) to place within these `/rest/resources` for access via the browser these resources are defined by you the developer and they are considered as tied to the buildnumber, as such, they might be cached and considered frozen until the build number changes, make sure that there's no overlap, and use folders when possible, you don't want a `index.html` file in such sources.
 
@@ -51,7 +51,7 @@ You need to have service workers disabled in order for this method to work.
 
 If you are developing in the client side and doing changes to it, and only the client side files, (that means no schema files, and no server files); then there's a fast and simple way to trigger the changes.
 
- 1. `npm run webpack-dev` or `npm run webpack` (if using the production version)
+ 1. `npm run esbuild-dev` or `npm run esbuild` (if using the production version)
  2. Refresh your browser, changes should appear.
 
 ## Schema, Internationalization and Database Changes
@@ -125,7 +125,7 @@ You should have your own local repository of itemize for this, and do the change
  1. Kill the server of the itemize powered application. (within the project directory)
  2. `npm run install` (within the itemize repository)
  3. `cp -r * directory/of/your/project/node_modules/@onzag/itemize` (within the itemize repository)
- 4. `npm run webpack-dev` or `npm run webpack` (within the project directory)
+ 4. `npm run esbuild-dev` or `npm run esbuild` (within the project directory)
  5. `npm run start-dev-server` or `NODE_TLS_REJECT_UNAUTHORIZED=0 FAKE_USSD=true FAKE_EMAILS=true FAKE_SMS=true NO_SSR=true NO_SEO=true npm run start-dev-server` (within the project directory)
 
 ### Testing debugging

@@ -251,7 +251,7 @@ custom.edit = editar unidad
 custom.edit_success = la unidad ha sido editada exitosamente
 ```
 
-Now you need to run both `npm run build-data` and `npm run webpack-dev` and refresh your page, try to check out a listing.
+Now you need to run both `npm run build-data` and `npm run esbuild-dev` and refresh your page, try to check out a listing.
 
 And if you click a listing now, and get to its edit url you should find yourself into a functional edit page, images and all, and requally realtime.
 

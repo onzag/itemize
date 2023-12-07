@@ -6,10 +6,9 @@
 export default {
   "install": "tsc",
   "tsc": "tsc",
-  "webpack": "NODE_ENV=production webpack",
-  "webpack-dev": "NODE_ENV=development webpack",
-  "webpack-analyze": "NODE_ENV=production BUNDLE_ANALYZE=true webpack",
-  "build": "itemize build-data && tsc && NODE_ENV=development webpack && NODE_ENV=production webpack",
+  "esbuild": "NODE_ENV=production node esbuild.js",
+  "esbuild-dev": "NODE_ENV=development node esbuild.js",
+  "build": "itemize build-data && tsc && NODE_ENV=development node esbuild.js && NODE_ENV=production node esbuild.js",
   "start-silly-server": "LOG_LEVEL=silly NODE_ENV=development node -r tsconfig-paths/register ./dist/server/index.js",
   "start-dev-server": "NODE_ENV=development node -r tsconfig-paths/register ./dist/server/index.js",
   "test-development": "NODE_ENV=development node -r tsconfig-paths/register ./tests/index.js",

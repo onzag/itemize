@@ -501,7 +501,7 @@ And in the properties to submit in the `SubmitButton`
 ]
 ```
 
-And now if we run the webpack build and check our page we should indeed have the following element included
+And now if we run the esbuild build and check our page we should indeed have the following element included
 
 ![Price Edit Unit](./images/price-edit-unit.png)
 
@@ -574,7 +574,7 @@ And in the text property that displays the title at the `ListItemText`, let's ju
 </>
 ```
 
-The next step is to rebuild with webpack and to give it a try, let's first try with our standard euros based user.
+The next step is to rebuild with esbuild and to give it a try, let's first try with our standard euros based user.
 
 ![Search Filtering By Euros](./images/search-filtering-by-euros.png)
 

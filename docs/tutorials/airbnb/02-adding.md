@@ -41,7 +41,7 @@ Now we get to the file named `src/client/app.tsx` and find a variable named `MEN
 },
 ```
 
-Now given that we want to fast develop, we just need to run `npm run webpack-dev` and since service workers are not active, and we are bypassing the cache, we should get served the new version.
+Now given that we want to fast develop, we just need to run `npm run esbuild-dev` and since service workers are not active, and we are bypassing the cache, we should get served the new version.
 
 And the moment you attempt to open the menu, the app crashed, what happened?...
 
@@ -372,7 +372,7 @@ And in spanish:
 custom.submit = crear nueva unidad
 ```
 
-Now you should rebuild the data and schemas via `npm run build-data` and also `npm run webpack-dev` refresh your browser add button should take you to the following screen.
+Now you should rebuild the data and schemas via `npm run build-data` and also `npm run esbuild-dev` refresh your browser add button should take you to the following screen.
 
 ![Hosting Unit Create Screen](./images/hosting-unit-create-screen.png)
 

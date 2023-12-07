@@ -271,7 +271,7 @@ Follow the steps that are requested, there are many of them, more often than not
 
 `npm run build`
 
-This will run webpack, typescript compiler and the build data process that is necessary.
+This will run esbuild, typescript compiler and the build data process that is necessary.
 
 ### Start a development environment (optional but necessary if you don't have an external database/redis/elastic)
 
