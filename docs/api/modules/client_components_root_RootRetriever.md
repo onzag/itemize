@@ -33,7 +33,7 @@ a react element
 
 #### Defined in
 
-[client/components/root/RootRetriever.tsx:26](https://github.com/onzag/itemize/blob/f2db74a5/client/components/root/RootRetriever.tsx#L26)
+[client/components/root/RootRetriever.tsx:26](https://github.com/onzag/itemize/blob/a24376ed/client/components/root/RootRetriever.tsx#L26)
 
 ___
 
@@ -51,4 +51,4 @@ ___
 
 #### Defined in
 
-[client/components/root/RootRetriever.tsx:40](https://github.com/onzag/itemize/blob/f2db74a5/client/components/root/RootRetriever.tsx#L40)
+[client/components/root/RootRetriever.tsx:40](https://github.com/onzag/itemize/blob/a24376ed/client/components/root/RootRetriever.tsx#L40)

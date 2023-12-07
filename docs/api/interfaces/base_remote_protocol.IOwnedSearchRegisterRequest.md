@@ -32,7 +32,7 @@ check [IOwnedSearchRecordsEvent](base_remote_protocol.IOwnedSearchRecordsEvent.m
 
 #### Defined in
 
-[base/remote-protocol.ts:340](https://github.com/onzag/itemize/blob/f2db74a5/base/remote-protocol.ts#L340)
+[base/remote-protocol.ts:340](https://github.com/onzag/itemize/blob/a24376ed/base/remote-protocol.ts#L340)
 
 ___
 
@@ -46,4 +46,4 @@ IBaseSearchRegisterRequest.qualifiedPathName
 
 #### Defined in
 
-[base/remote-protocol.ts:327](https://github.com/onzag/itemize/blob/f2db74a5/base/remote-protocol.ts#L327)
+[base/remote-protocol.ts:327](https://github.com/onzag/itemize/blob/a24376ed/base/remote-protocol.ts#L327)

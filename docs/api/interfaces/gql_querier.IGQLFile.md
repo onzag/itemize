@@ -35,7 +35,7 @@ an unique id
 
 #### Defined in
 
-[gql-querier.ts:85](https://github.com/onzag/itemize/blob/f2db74a5/gql-querier.ts#L85)
+[gql-querier.ts:87](https://github.com/onzag/itemize/blob/a24376ed/gql-querier.ts#L87)
 
 ___
 
@@ -51,7 +51,7 @@ dimensions, large, small and medium do not count
 
 #### Defined in
 
-[gql-querier.ts:101](https://github.com/onzag/itemize/blob/f2db74a5/gql-querier.ts#L101)
+[gql-querier.ts:103](https://github.com/onzag/itemize/blob/a24376ed/gql-querier.ts#L103)
 
 ___
 
@@ -63,7 +63,7 @@ the name of the file
 
 #### Defined in
 
-[gql-querier.ts:77](https://github.com/onzag/itemize/blob/f2db74a5/gql-querier.ts#L77)
+[gql-querier.ts:79](https://github.com/onzag/itemize/blob/a24376ed/gql-querier.ts#L79)
 
 ___
 
@@ -75,7 +75,7 @@ The size of the file in bytes
 
 #### Defined in
 
-[gql-querier.ts:93](https://github.com/onzag/itemize/blob/f2db74a5/gql-querier.ts#L93)
+[gql-querier.ts:95](https://github.com/onzag/itemize/blob/a24376ed/gql-querier.ts#L95)
 
 ___
 
@@ -87,7 +87,7 @@ A source, either a File, Blob or a read stream
 
 #### Defined in
 
-[gql-querier.ts:105](https://github.com/onzag/itemize/blob/f2db74a5/gql-querier.ts#L105)
+[gql-querier.ts:107](https://github.com/onzag/itemize/blob/a24376ed/gql-querier.ts#L107)
 
 ___
 
@@ -99,7 +99,7 @@ The mime type
 
 #### Defined in
 
-[gql-querier.ts:81](https://github.com/onzag/itemize/blob/f2db74a5/gql-querier.ts#L81)
+[gql-querier.ts:83](https://github.com/onzag/itemize/blob/a24376ed/gql-querier.ts#L83)
 
 ___
 
@@ -111,4 +111,4 @@ the url where it is stored
 
 #### Defined in
 
-[gql-querier.ts:89](https://github.com/onzag/itemize/blob/f2db74a5/gql-querier.ts#L89)
+[gql-querier.ts:91](https://github.com/onzag/itemize/blob/a24376ed/gql-querier.ts#L91)

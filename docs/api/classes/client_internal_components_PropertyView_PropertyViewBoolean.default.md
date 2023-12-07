@@ -62,7 +62,7 @@ React.Component&lt;IPropertyViewHandlerProps&lt;boolean, IPropertyViewBooleanRen
 
 #### Defined in
 
-[client/internal/components/PropertyView/PropertyViewBoolean.tsx:33](https://github.com/onzag/itemize/blob/f2db74a5/client/internal/components/PropertyView/PropertyViewBoolean.tsx#L33)
+[client/internal/components/PropertyView/PropertyViewBoolean.tsx:33](https://github.com/onzag/itemize/blob/a24376ed/client/internal/components/PropertyView/PropertyViewBoolean.tsx#L33)
 
 ## Properties
 
@@ -569,7 +569,7 @@ React.Component.render
 
 #### Defined in
 
-[client/internal/components/PropertyView/PropertyViewBoolean.tsx:50](https://github.com/onzag/itemize/blob/f2db74a5/client/internal/components/PropertyView/PropertyViewBoolean.tsx#L50)
+[client/internal/components/PropertyView/PropertyViewBoolean.tsx:50](https://github.com/onzag/itemize/blob/a24376ed/client/internal/components/PropertyView/PropertyViewBoolean.tsx#L50)
 
 ___
 
@@ -624,4 +624,4 @@ React.Component.shouldComponentUpdate
 
 #### Defined in
 
-[client/internal/components/PropertyView/PropertyViewBoolean.tsx:36](https://github.com/onzag/itemize/blob/f2db74a5/client/internal/components/PropertyView/PropertyViewBoolean.tsx#L36)
+[client/internal/components/PropertyView/PropertyViewBoolean.tsx:36](https://github.com/onzag/itemize/blob/a24376ed/client/internal/components/PropertyView/PropertyViewBoolean.tsx#L36)

@@ -30,4 +30,4 @@
 
 #### Defined in
 
-[client/components/item/ItemSyncer.tsx:68](https://github.com/onzag/itemize/blob/f2db74a5/client/components/item/ItemSyncer.tsx#L68)
+[client/components/item/ItemSyncer.tsx:70](https://github.com/onzag/itemize/blob/a24376ed/client/components/item/ItemSyncer.tsx#L70)

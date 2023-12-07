@@ -41,7 +41,7 @@
 
 #### Defined in
 
-[server/ssr/react-analyze.ts:79](https://github.com/onzag/itemize/blob/f2db74a5/server/ssr/react-analyze.ts#L79)
+[server/ssr/react-analyze.ts:79](https://github.com/onzag/itemize/blob/a24376ed/server/ssr/react-analyze.ts#L79)
 
 ## Functions
 
@@ -62,4 +62,4 @@
 
 #### Defined in
 
-[server/ssr/react-analyze.ts:161](https://github.com/onzag/itemize/blob/f2db74a5/server/ssr/react-analyze.ts#L161)
+[server/ssr/react-analyze.ts:161](https://github.com/onzag/itemize/blob/a24376ed/server/ssr/react-analyze.ts#L161)

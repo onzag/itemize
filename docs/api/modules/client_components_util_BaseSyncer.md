@@ -35,7 +35,7 @@ syncers
 
 #### Defined in
 
-[client/components/util/BaseSyncer.tsx:276](https://github.com/onzag/itemize/blob/f2db74a5/client/components/util/BaseSyncer.tsx#L276)
+[client/components/util/BaseSyncer.tsx:365](https://github.com/onzag/itemize/blob/a24376ed/client/components/util/BaseSyncer.tsx#L365)
 
 ___
 
@@ -60,4 +60,4 @@ ___
 
 #### Defined in
 
-[client/components/util/BaseSyncer.tsx:62](https://github.com/onzag/itemize/blob/f2db74a5/client/components/util/BaseSyncer.tsx#L62)
+[client/components/util/BaseSyncer.tsx:82](https://github.com/onzag/itemize/blob/a24376ed/client/components/util/BaseSyncer.tsx#L82)

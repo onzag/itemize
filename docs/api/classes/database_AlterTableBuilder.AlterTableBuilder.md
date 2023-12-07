@@ -52,7 +52,7 @@ Builds a new alter table query builder
 
 #### Defined in
 
-[database/AlterTableBuilder.ts:36](https://github.com/onzag/itemize/blob/f2db74a5/database/AlterTableBuilder.ts#L36)
+[database/AlterTableBuilder.ts:36](https://github.com/onzag/itemize/blob/a24376ed/database/AlterTableBuilder.ts#L36)
 
 ## Properties
 
@@ -62,7 +62,7 @@ Builds a new alter table query builder
 
 #### Defined in
 
-[database/AlterTableBuilder.ts:32](https://github.com/onzag/itemize/blob/f2db74a5/database/AlterTableBuilder.ts#L32)
+[database/AlterTableBuilder.ts:32](https://github.com/onzag/itemize/blob/a24376ed/database/AlterTableBuilder.ts#L32)
 
 ___
 
@@ -72,7 +72,7 @@ ___
 
 #### Defined in
 
-[database/AlterTableBuilder.ts:31](https://github.com/onzag/itemize/blob/f2db74a5/database/AlterTableBuilder.ts#L31)
+[database/AlterTableBuilder.ts:31](https://github.com/onzag/itemize/blob/a24376ed/database/AlterTableBuilder.ts#L31)
 
 ___
 
@@ -84,7 +84,7 @@ Table name in question we are updating against
 
 #### Defined in
 
-[database/AlterTableBuilder.ts:30](https://github.com/onzag/itemize/blob/f2db74a5/database/AlterTableBuilder.ts#L30)
+[database/AlterTableBuilder.ts:30](https://github.com/onzag/itemize/blob/a24376ed/database/AlterTableBuilder.ts#L30)
 
 ## Methods
 
@@ -110,7 +110,7 @@ Adds a binding source to the binding source list in order
 
 #### Defined in
 
-[database/base.ts:69](https://github.com/onzag/itemize/blob/f2db74a5/database/base.ts#L69)
+[database/base.ts:69](https://github.com/onzag/itemize/blob/a24376ed/database/base.ts#L69)
 
 ___
 
@@ -136,7 +136,7 @@ Adds many binding sources to the bindings sources list
 
 #### Defined in
 
-[database/base.ts:77](https://github.com/onzag/itemize/blob/f2db74a5/database/base.ts#L77)
+[database/base.ts:77](https://github.com/onzag/itemize/blob/a24376ed/database/base.ts#L77)
 
 ___
 
@@ -161,7 +161,7 @@ itself
 
 #### Defined in
 
-[database/AlterTableBuilder.ts:47](https://github.com/onzag/itemize/blob/f2db74a5/database/AlterTableBuilder.ts#L47)
+[database/AlterTableBuilder.ts:47](https://github.com/onzag/itemize/blob/a24376ed/database/AlterTableBuilder.ts#L47)
 
 ___
 
@@ -179,7 +179,7 @@ itself
 
 #### Defined in
 
-[database/AlterTableBuilder.ts:98](https://github.com/onzag/itemize/blob/f2db74a5/database/AlterTableBuilder.ts#L98)
+[database/AlterTableBuilder.ts:98](https://github.com/onzag/itemize/blob/a24376ed/database/AlterTableBuilder.ts#L98)
 
 ___
 
@@ -195,7 +195,7 @@ Clears only the alters without modifying the table name
 
 #### Defined in
 
-[database/AlterTableBuilder.ts:88](https://github.com/onzag/itemize/blob/f2db74a5/database/AlterTableBuilder.ts#L88)
+[database/AlterTableBuilder.ts:88](https://github.com/onzag/itemize/blob/a24376ed/database/AlterTableBuilder.ts#L88)
 
 ___
 
@@ -215,7 +215,7 @@ Removes all binding sources
 
 #### Defined in
 
-[database/base.ts:105](https://github.com/onzag/itemize/blob/f2db74a5/database/base.ts#L105)
+[database/base.ts:105](https://github.com/onzag/itemize/blob/a24376ed/database/base.ts#L105)
 
 ___
 
@@ -237,7 +237,7 @@ a string that represents the compiled result
 
 #### Defined in
 
-[database/AlterTableBuilder.ts:108](https://github.com/onzag/itemize/blob/f2db74a5/database/AlterTableBuilder.ts#L108)
+[database/AlterTableBuilder.ts:108](https://github.com/onzag/itemize/blob/a24376ed/database/AlterTableBuilder.ts#L108)
 
 ___
 
@@ -260,7 +260,7 @@ a list of basic bindings
 
 #### Defined in
 
-[database/base.ts:168](https://github.com/onzag/itemize/blob/f2db74a5/database/base.ts#L168)
+[database/base.ts:168](https://github.com/onzag/itemize/blob/a24376ed/database/base.ts#L168)
 
 ___
 
@@ -280,7 +280,7 @@ Removes the last added biding source and returns it
 
 #### Defined in
 
-[database/base.ts:112](https://github.com/onzag/itemize/blob/f2db74a5/database/base.ts#L112)
+[database/base.ts:112](https://github.com/onzag/itemize/blob/a24376ed/database/base.ts#L112)
 
 ___
 
@@ -307,7 +307,7 @@ list
 
 #### Defined in
 
-[database/base.ts:89](https://github.com/onzag/itemize/blob/f2db74a5/database/base.ts#L89)
+[database/base.ts:89](https://github.com/onzag/itemize/blob/a24376ed/database/base.ts#L89)
 
 ___
 
@@ -334,7 +334,7 @@ list
 
 #### Defined in
 
-[database/base.ts:98](https://github.com/onzag/itemize/blob/f2db74a5/database/base.ts#L98)
+[database/base.ts:98](https://github.com/onzag/itemize/blob/a24376ed/database/base.ts#L98)
 
 ___
 
@@ -358,7 +358,7 @@ itself
 
 #### Defined in
 
-[database/AlterTableBuilder.ts:80](https://github.com/onzag/itemize/blob/f2db74a5/database/AlterTableBuilder.ts#L80)
+[database/AlterTableBuilder.ts:80](https://github.com/onzag/itemize/blob/a24376ed/database/AlterTableBuilder.ts#L80)
 
 ___
 
@@ -380,4 +380,4 @@ a sql builder result with the bindings and the query itself
 
 #### Defined in
 
-[database/base.ts:129](https://github.com/onzag/itemize/blob/f2db74a5/database/base.ts#L129)
+[database/base.ts:129](https://github.com/onzag/itemize/blob/a24376ed/database/base.ts#L129)

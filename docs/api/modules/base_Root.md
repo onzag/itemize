@@ -20,6 +20,7 @@ but you might access it in the server side, for example via appData
 - [ICustomRoleManager](../interfaces/base_Root.ICustomRoleManager.md)
 - [ICustomRoleManagerRoleStatus](../interfaces/base_Root.ICustomRoleManagerRoleStatus.md)
 - [ILangLocalesType](../interfaces/base_Root.ILangLocalesType.md)
-- [IRequestLimitersType](../interfaces/base_Root.IRequestLimitersType.md)
+- [IPropertyRequestLimiter](../interfaces/base_Root.IPropertyRequestLimiter.md)
 - [IRootRawJSONDataType](../interfaces/base_Root.IRootRawJSONDataType.md)
+- [ISearchLimitersType](../interfaces/base_Root.ISearchLimitersType.md)
 - [Ii18NType](../interfaces/base_Root.Ii18NType.md)

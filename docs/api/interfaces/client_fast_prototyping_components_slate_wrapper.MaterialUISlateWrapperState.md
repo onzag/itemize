@@ -28,7 +28,7 @@ Specifies the state of the drawer
 
 #### Defined in
 
-[client/fast-prototyping/components/slate/wrapper.tsx:1423](https://github.com/onzag/itemize/blob/f2db74a5/client/fast-prototyping/components/slate/wrapper.tsx#L1423)
+[client/fast-prototyping/components/slate/wrapper.tsx:1431](https://github.com/onzag/itemize/blob/a24376ed/client/fast-prototyping/components/slate/wrapper.tsx#L1431)
 
 ___
 
@@ -43,7 +43,7 @@ before that happened
 
 #### Defined in
 
-[client/fast-prototyping/components/slate/wrapper.tsx:1451](https://github.com/onzag/itemize/blob/f2db74a5/client/fast-prototyping/components/slate/wrapper.tsx#L1451)
+[client/fast-prototyping/components/slate/wrapper.tsx:1459](https://github.com/onzag/itemize/blob/a24376ed/client/fast-prototyping/components/slate/wrapper.tsx#L1459)
 
 ___
 
@@ -59,7 +59,7 @@ of the state as it's only used there
 
 #### Defined in
 
-[client/fast-prototyping/components/slate/wrapper.tsx:1443](https://github.com/onzag/itemize/blob/f2db74a5/client/fast-prototyping/components/slate/wrapper.tsx#L1443)
+[client/fast-prototyping/components/slate/wrapper.tsx:1451](https://github.com/onzag/itemize/blob/a24376ed/client/fast-prototyping/components/slate/wrapper.tsx#L1451)
 
 ___
 
@@ -72,7 +72,7 @@ when the drawer is open in disjointed mode
 
 #### Defined in
 
-[client/fast-prototyping/components/slate/wrapper.tsx:1429](https://github.com/onzag/itemize/blob/f2db74a5/client/fast-prototyping/components/slate/wrapper.tsx#L1429)
+[client/fast-prototyping/components/slate/wrapper.tsx:1437](https://github.com/onzag/itemize/blob/a24376ed/client/fast-prototyping/components/slate/wrapper.tsx#L1437)
 
 ___
 
@@ -84,4 +84,4 @@ A custom toolbar state
 
 #### Defined in
 
-[client/fast-prototyping/components/slate/wrapper.tsx:1434](https://github.com/onzag/itemize/blob/f2db74a5/client/fast-prototyping/components/slate/wrapper.tsx#L1434)
+[client/fast-prototyping/components/slate/wrapper.tsx:1442](https://github.com/onzag/itemize/blob/a24376ed/client/fast-prototyping/components/slate/wrapper.tsx#L1442)

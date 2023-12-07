@@ -45,7 +45,7 @@ return null for not handling anything an using the default
 
 #### Defined in
 
-[client/internal/text/serializer/index.ts:66](https://github.com/onzag/itemize/blob/f2db74a5/client/internal/text/serializer/index.ts#L66)
+[client/internal/text/serializer/index.ts:66](https://github.com/onzag/itemize/blob/a24376ed/client/internal/text/serializer/index.ts#L66)
 
 ___
 
@@ -73,7 +73,7 @@ return an object or null
 
 #### Defined in
 
-[client/internal/text/serializer/index.ts:56](https://github.com/onzag/itemize/blob/f2db74a5/client/internal/text/serializer/index.ts#L56)
+[client/internal/text/serializer/index.ts:56](https://github.com/onzag/itemize/blob/a24376ed/client/internal/text/serializer/index.ts#L56)
 
 ___
 
@@ -97,4 +97,4 @@ return the elementAsNode itself or a new node to replace it
 
 #### Defined in
 
-[client/internal/text/serializer/index.ts:83](https://github.com/onzag/itemize/blob/f2db74a5/client/internal/text/serializer/index.ts#L83)
+[client/internal/text/serializer/index.ts:83](https://github.com/onzag/itemize/blob/a24376ed/client/internal/text/serializer/index.ts#L83)

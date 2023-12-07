@@ -32,4 +32,4 @@ page so it means that it builds history in it
 
 #### Defined in
 
-[client/fast-prototyping/components/search-loader-with-pagination.tsx:94](https://github.com/onzag/itemize/blob/f2db74a5/client/fast-prototyping/components/search-loader-with-pagination.tsx#L94)
+[client/fast-prototyping/components/search-loader-with-pagination.tsx:108](https://github.com/onzag/itemize/blob/a24376ed/client/fast-prototyping/components/search-loader-with-pagination.tsx#L108)

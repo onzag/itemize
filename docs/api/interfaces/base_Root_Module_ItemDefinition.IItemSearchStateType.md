@@ -21,6 +21,8 @@
 - [searchLastModified](base_Root_Module_ItemDefinition.IItemSearchStateType.md#searchlastmodified)
 - [searchLimit](base_Root_Module_ItemDefinition.IItemSearchStateType.md#searchlimit)
 - [searchListenPolicy](base_Root_Module_ItemDefinition.IItemSearchStateType.md#searchlistenpolicy)
+- [searchListenSlowPolling](base_Root_Module_ItemDefinition.IItemSearchStateType.md#searchlistenslowpolling)
+- [searchMetadata](base_Root_Module_ItemDefinition.IItemSearchStateType.md#searchmetadata)
 - [searchOffset](base_Root_Module_ItemDefinition.IItemSearchStateType.md#searchoffset)
 - [searchOriginalOptions](base_Root_Module_ItemDefinition.IItemSearchStateType.md#searchoriginaloptions)
 - [searchOwner](base_Root_Module_ItemDefinition.IItemSearchStateType.md#searchowner)
@@ -40,7 +42,7 @@
 
 #### Defined in
 
-[base/Root/Module/ItemDefinition/index.ts:62](https://github.com/onzag/itemize/blob/f2db74a5/base/Root/Module/ItemDefinition/index.ts#L62)
+[base/Root/Module/ItemDefinition/index.ts:64](https://github.com/onzag/itemize/blob/a24376ed/base/Root/Module/ItemDefinition/index.ts#L64)
 
 ___
 
@@ -50,7 +52,7 @@ ___
 
 #### Defined in
 
-[base/Root/Module/ItemDefinition/index.ts:64](https://github.com/onzag/itemize/blob/f2db74a5/base/Root/Module/ItemDefinition/index.ts#L64)
+[base/Root/Module/ItemDefinition/index.ts:66](https://github.com/onzag/itemize/blob/a24376ed/base/Root/Module/ItemDefinition/index.ts#L66)
 
 ___
 
@@ -60,7 +62,7 @@ ___
 
 #### Defined in
 
-[base/Root/Module/ItemDefinition/index.ts:56](https://github.com/onzag/itemize/blob/f2db74a5/base/Root/Module/ItemDefinition/index.ts#L56)
+[base/Root/Module/ItemDefinition/index.ts:57](https://github.com/onzag/itemize/blob/a24376ed/base/Root/Module/ItemDefinition/index.ts#L57)
 
 ___
 
@@ -70,7 +72,7 @@ ___
 
 #### Defined in
 
-[base/Root/Module/ItemDefinition/index.ts:68](https://github.com/onzag/itemize/blob/f2db74a5/base/Root/Module/ItemDefinition/index.ts#L68)
+[base/Root/Module/ItemDefinition/index.ts:70](https://github.com/onzag/itemize/blob/a24376ed/base/Root/Module/ItemDefinition/index.ts#L70)
 
 ___
 
@@ -80,7 +82,7 @@ ___
 
 #### Defined in
 
-[base/Root/Module/ItemDefinition/index.ts:69](https://github.com/onzag/itemize/blob/f2db74a5/base/Root/Module/ItemDefinition/index.ts#L69)
+[base/Root/Module/ItemDefinition/index.ts:71](https://github.com/onzag/itemize/blob/a24376ed/base/Root/Module/ItemDefinition/index.ts#L71)
 
 ___
 
@@ -90,7 +92,7 @@ ___
 
 #### Defined in
 
-[base/Root/Module/ItemDefinition/index.ts:71](https://github.com/onzag/itemize/blob/f2db74a5/base/Root/Module/ItemDefinition/index.ts#L71)
+[base/Root/Module/ItemDefinition/index.ts:73](https://github.com/onzag/itemize/blob/a24376ed/base/Root/Module/ItemDefinition/index.ts#L73)
 
 ___
 
@@ -100,7 +102,7 @@ ___
 
 #### Defined in
 
-[base/Root/Module/ItemDefinition/index.ts:50](https://github.com/onzag/itemize/blob/f2db74a5/base/Root/Module/ItemDefinition/index.ts#L50)
+[base/Root/Module/ItemDefinition/index.ts:51](https://github.com/onzag/itemize/blob/a24376ed/base/Root/Module/ItemDefinition/index.ts#L51)
 
 ___
 
@@ -110,7 +112,7 @@ ___
 
 #### Defined in
 
-[base/Root/Module/ItemDefinition/index.ts:67](https://github.com/onzag/itemize/blob/f2db74a5/base/Root/Module/ItemDefinition/index.ts#L67)
+[base/Root/Module/ItemDefinition/index.ts:69](https://github.com/onzag/itemize/blob/a24376ed/base/Root/Module/ItemDefinition/index.ts#L69)
 
 ___
 
@@ -120,7 +122,7 @@ ___
 
 #### Defined in
 
-[base/Root/Module/ItemDefinition/index.ts:73](https://github.com/onzag/itemize/blob/f2db74a5/base/Root/Module/ItemDefinition/index.ts#L73)
+[base/Root/Module/ItemDefinition/index.ts:75](https://github.com/onzag/itemize/blob/a24376ed/base/Root/Module/ItemDefinition/index.ts#L75)
 
 ___
 
@@ -130,7 +132,7 @@ ___
 
 #### Defined in
 
-[base/Root/Module/ItemDefinition/index.ts:57](https://github.com/onzag/itemize/blob/f2db74a5/base/Root/Module/ItemDefinition/index.ts#L57)
+[base/Root/Module/ItemDefinition/index.ts:58](https://github.com/onzag/itemize/blob/a24376ed/base/Root/Module/ItemDefinition/index.ts#L58)
 
 ___
 
@@ -140,7 +142,7 @@ ___
 
 #### Defined in
 
-[base/Root/Module/ItemDefinition/index.ts:59](https://github.com/onzag/itemize/blob/f2db74a5/base/Root/Module/ItemDefinition/index.ts#L59)
+[base/Root/Module/ItemDefinition/index.ts:60](https://github.com/onzag/itemize/blob/a24376ed/base/Root/Module/ItemDefinition/index.ts#L60)
 
 ___
 
@@ -150,7 +152,7 @@ ___
 
 #### Defined in
 
-[base/Root/Module/ItemDefinition/index.ts:54](https://github.com/onzag/itemize/blob/f2db74a5/base/Root/Module/ItemDefinition/index.ts#L54)
+[base/Root/Module/ItemDefinition/index.ts:55](https://github.com/onzag/itemize/blob/a24376ed/base/Root/Module/ItemDefinition/index.ts#L55)
 
 ___
 
@@ -160,7 +162,27 @@ ___
 
 #### Defined in
 
-[base/Root/Module/ItemDefinition/index.ts:61](https://github.com/onzag/itemize/blob/f2db74a5/base/Root/Module/ItemDefinition/index.ts#L61)
+[base/Root/Module/ItemDefinition/index.ts:63](https://github.com/onzag/itemize/blob/a24376ed/base/Root/Module/ItemDefinition/index.ts#L63)
+
+___
+
+### searchListenSlowPolling
+
+• **searchListenSlowPolling**: `boolean`
+
+#### Defined in
+
+[base/Root/Module/ItemDefinition/index.ts:61](https://github.com/onzag/itemize/blob/a24376ed/base/Root/Module/ItemDefinition/index.ts#L61)
+
+___
+
+### searchMetadata
+
+• **searchMetadata**: `string`
+
+#### Defined in
+
+[base/Root/Module/ItemDefinition/index.ts:78](https://github.com/onzag/itemize/blob/a24376ed/base/Root/Module/ItemDefinition/index.ts#L78)
 
 ___
 
@@ -170,7 +192,7 @@ ___
 
 #### Defined in
 
-[base/Root/Module/ItemDefinition/index.ts:55](https://github.com/onzag/itemize/blob/f2db74a5/base/Root/Module/ItemDefinition/index.ts#L55)
+[base/Root/Module/ItemDefinition/index.ts:56](https://github.com/onzag/itemize/blob/a24376ed/base/Root/Module/ItemDefinition/index.ts#L56)
 
 ___
 
@@ -180,7 +202,7 @@ ___
 
 #### Defined in
 
-[base/Root/Module/ItemDefinition/index.ts:74](https://github.com/onzag/itemize/blob/f2db74a5/base/Root/Module/ItemDefinition/index.ts#L74)
+[base/Root/Module/ItemDefinition/index.ts:76](https://github.com/onzag/itemize/blob/a24376ed/base/Root/Module/ItemDefinition/index.ts#L76)
 
 ___
 
@@ -190,7 +212,7 @@ ___
 
 #### Defined in
 
-[base/Root/Module/ItemDefinition/index.ts:58](https://github.com/onzag/itemize/blob/f2db74a5/base/Root/Module/ItemDefinition/index.ts#L58)
+[base/Root/Module/ItemDefinition/index.ts:59](https://github.com/onzag/itemize/blob/a24376ed/base/Root/Module/ItemDefinition/index.ts#L59)
 
 ___
 
@@ -200,7 +222,7 @@ ___
 
 #### Defined in
 
-[base/Root/Module/ItemDefinition/index.ts:60](https://github.com/onzag/itemize/blob/f2db74a5/base/Root/Module/ItemDefinition/index.ts#L60)
+[base/Root/Module/ItemDefinition/index.ts:62](https://github.com/onzag/itemize/blob/a24376ed/base/Root/Module/ItemDefinition/index.ts#L62)
 
 ___
 
@@ -210,7 +232,7 @@ ___
 
 #### Defined in
 
-[base/Root/Module/ItemDefinition/index.ts:52](https://github.com/onzag/itemize/blob/f2db74a5/base/Root/Module/ItemDefinition/index.ts#L52)
+[base/Root/Module/ItemDefinition/index.ts:53](https://github.com/onzag/itemize/blob/a24376ed/base/Root/Module/ItemDefinition/index.ts#L53)
 
 ___
 
@@ -224,7 +246,7 @@ ___
 
 #### Defined in
 
-[base/Root/Module/ItemDefinition/index.ts:66](https://github.com/onzag/itemize/blob/f2db74a5/base/Root/Module/ItemDefinition/index.ts#L66)
+[base/Root/Module/ItemDefinition/index.ts:68](https://github.com/onzag/itemize/blob/a24376ed/base/Root/Module/ItemDefinition/index.ts#L68)
 
 ___
 
@@ -234,7 +256,7 @@ ___
 
 #### Defined in
 
-[base/Root/Module/ItemDefinition/index.ts:65](https://github.com/onzag/itemize/blob/f2db74a5/base/Root/Module/ItemDefinition/index.ts#L65)
+[base/Root/Module/ItemDefinition/index.ts:67](https://github.com/onzag/itemize/blob/a24376ed/base/Root/Module/ItemDefinition/index.ts#L67)
 
 ___
 
@@ -244,7 +266,7 @@ ___
 
 #### Defined in
 
-[base/Root/Module/ItemDefinition/index.ts:53](https://github.com/onzag/itemize/blob/f2db74a5/base/Root/Module/ItemDefinition/index.ts#L53)
+[base/Root/Module/ItemDefinition/index.ts:54](https://github.com/onzag/itemize/blob/a24376ed/base/Root/Module/ItemDefinition/index.ts#L54)
 
 ___
 
@@ -254,7 +276,7 @@ ___
 
 #### Defined in
 
-[base/Root/Module/ItemDefinition/index.ts:63](https://github.com/onzag/itemize/blob/f2db74a5/base/Root/Module/ItemDefinition/index.ts#L63)
+[base/Root/Module/ItemDefinition/index.ts:65](https://github.com/onzag/itemize/blob/a24376ed/base/Root/Module/ItemDefinition/index.ts#L65)
 
 ___
 
@@ -264,4 +286,4 @@ ___
 
 #### Defined in
 
-[base/Root/Module/ItemDefinition/index.ts:51](https://github.com/onzag/itemize/blob/f2db74a5/base/Root/Module/ItemDefinition/index.ts#L51)
+[base/Root/Module/ItemDefinition/index.ts:52](https://github.com/onzag/itemize/blob/a24376ed/base/Root/Module/ItemDefinition/index.ts#L52)

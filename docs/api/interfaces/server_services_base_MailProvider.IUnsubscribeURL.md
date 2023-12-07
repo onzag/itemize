@@ -24,7 +24,7 @@ of 200 if succeeded
 
 #### Defined in
 
-[server/services/base/MailProvider.ts:63](https://github.com/onzag/itemize/blob/f2db74a5/server/services/base/MailProvider.ts#L63)
+[server/services/base/MailProvider.ts:64](https://github.com/onzag/itemize/blob/a24376ed/server/services/base/MailProvider.ts#L64)
 
 ___
 
@@ -37,4 +37,4 @@ a human readable message
 
 #### Defined in
 
-[server/services/base/MailProvider.ts:58](https://github.com/onzag/itemize/blob/f2db74a5/server/services/base/MailProvider.ts#L58)
+[server/services/base/MailProvider.ts:59](https://github.com/onzag/itemize/blob/a24376ed/server/services/base/MailProvider.ts#L59)

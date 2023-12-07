@@ -25,7 +25,7 @@ A graphql endpoint output
 
 #### Defined in
 
-[gql-querier.ts:151](https://github.com/onzag/itemize/blob/f2db74a5/gql-querier.ts#L151)
+[gql-querier.ts:168](https://github.com/onzag/itemize/blob/a24376ed/gql-querier.ts#L168)
 
 ___
 
@@ -35,4 +35,4 @@ ___
 
 #### Defined in
 
-[gql-querier.ts:154](https://github.com/onzag/itemize/blob/f2db74a5/gql-querier.ts#L154)
+[gql-querier.ts:171](https://github.com/onzag/itemize/blob/a24376ed/gql-querier.ts#L171)

@@ -30,4 +30,4 @@ The standard reply exists because graphql needs something for success
 
 #### Defined in
 
-[server/custom-graphql/graphql-standard-reply-object.ts:21](https://github.com/onzag/itemize/blob/f2db74a5/server/custom-graphql/graphql-standard-reply-object.ts#L21)
+[server/custom-graphql/graphql-standard-reply-object.ts:21](https://github.com/onzag/itemize/blob/a24376ed/server/custom-graphql/graphql-standard-reply-object.ts#L21)

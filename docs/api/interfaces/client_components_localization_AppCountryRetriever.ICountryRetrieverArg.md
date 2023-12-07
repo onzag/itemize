@@ -35,7 +35,7 @@ IActualAppCountryRetrieverProps.availableCountries
 
 #### Defined in
 
-[client/components/localization/AppCountryRetriever.tsx:14](https://github.com/onzag/itemize/blob/f2db74a5/client/components/localization/AppCountryRetriever.tsx#L14)
+[client/components/localization/AppCountryRetriever.tsx:14](https://github.com/onzag/itemize/blob/a24376ed/client/components/localization/AppCountryRetriever.tsx#L14)
 
 ___
 
@@ -49,7 +49,7 @@ IActualAppCountryRetrieverProps.changeCountryTo
 
 #### Defined in
 
-[client/components/localization/AppCountryRetriever.tsx:15](https://github.com/onzag/itemize/blob/f2db74a5/client/components/localization/AppCountryRetriever.tsx#L15)
+[client/components/localization/AppCountryRetriever.tsx:15](https://github.com/onzag/itemize/blob/a24376ed/client/components/localization/AppCountryRetriever.tsx#L15)
 
 ___
 
@@ -63,7 +63,7 @@ IActualAppCountryRetrieverProps.currentCountry
 
 #### Defined in
 
-[client/components/localization/AppCountryRetriever.tsx:13](https://github.com/onzag/itemize/blob/f2db74a5/client/components/localization/AppCountryRetriever.tsx#L13)
+[client/components/localization/AppCountryRetriever.tsx:13](https://github.com/onzag/itemize/blob/a24376ed/client/components/localization/AppCountryRetriever.tsx#L13)
 
 ___
 
@@ -73,7 +73,7 @@ ___
 
 #### Defined in
 
-[client/components/localization/AppCountryRetriever.tsx:23](https://github.com/onzag/itemize/blob/f2db74a5/client/components/localization/AppCountryRetriever.tsx#L23)
+[client/components/localization/AppCountryRetriever.tsx:23](https://github.com/onzag/itemize/blob/a24376ed/client/components/localization/AppCountryRetriever.tsx#L23)
 
 ## Methods
 
@@ -87,4 +87,4 @@ ___
 
 #### Defined in
 
-[client/components/localization/AppCountryRetriever.tsx:24](https://github.com/onzag/itemize/blob/f2db74a5/client/components/localization/AppCountryRetriever.tsx#L24)
+[client/components/localization/AppCountryRetriever.tsx:24](https://github.com/onzag/itemize/blob/a24376ed/client/components/localization/AppCountryRetriever.tsx#L24)

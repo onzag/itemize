@@ -31,7 +31,7 @@
 
 #### Defined in
 
-[base/remote-protocol.ts:639](https://github.com/onzag/itemize/blob/f2db74a5/base/remote-protocol.ts#L639)
+[base/remote-protocol.ts:639](https://github.com/onzag/itemize/blob/a24376ed/base/remote-protocol.ts#L639)
 
 ___
 
@@ -49,7 +49,7 @@ something has been added
 
 #### Defined in
 
-[base/remote-protocol.ts:628](https://github.com/onzag/itemize/blob/f2db74a5/base/remote-protocol.ts#L628)
+[base/remote-protocol.ts:628](https://github.com/onzag/itemize/blob/a24376ed/base/remote-protocol.ts#L628)
 
 ___
 
@@ -66,7 +66,7 @@ or item definition
 
 #### Defined in
 
-[base/remote-protocol.ts:622](https://github.com/onzag/itemize/blob/f2db74a5/base/remote-protocol.ts#L622)
+[base/remote-protocol.ts:622](https://github.com/onzag/itemize/blob/a24376ed/base/remote-protocol.ts#L622)
 
 ___
 
@@ -76,4 +76,4 @@ ___
 
 #### Defined in
 
-[client/internal/testing.ts:67](https://github.com/onzag/itemize/blob/f2db74a5/client/internal/testing.ts#L67)
+[client/internal/testing.ts:67](https://github.com/onzag/itemize/blob/a24376ed/client/internal/testing.ts#L67)

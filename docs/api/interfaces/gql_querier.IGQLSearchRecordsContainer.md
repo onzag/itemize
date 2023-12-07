@@ -15,6 +15,7 @@ when it returns a bunch of records
 - [earliest\_created\_at](gql_querier.IGQLSearchRecordsContainer.md#earliest_created_at)
 - [last\_modified](gql_querier.IGQLSearchRecordsContainer.md#last_modified)
 - [limit](gql_querier.IGQLSearchRecordsContainer.md#limit)
+- [metadata](gql_querier.IGQLSearchRecordsContainer.md#metadata)
 - [offset](gql_querier.IGQLSearchRecordsContainer.md#offset)
 - [oldest\_created\_at](gql_querier.IGQLSearchRecordsContainer.md#oldest_created_at)
 - [records](gql_querier.IGQLSearchRecordsContainer.md#records)
@@ -27,7 +28,7 @@ when it returns a bunch of records
 
 #### Defined in
 
-[gql-querier.ts:49](https://github.com/onzag/itemize/blob/f2db74a5/gql-querier.ts#L49)
+[gql-querier.ts:49](https://github.com/onzag/itemize/blob/a24376ed/gql-querier.ts#L49)
 
 ___
 
@@ -37,7 +38,7 @@ ___
 
 #### Defined in
 
-[gql-querier.ts:52](https://github.com/onzag/itemize/blob/f2db74a5/gql-querier.ts#L52)
+[gql-querier.ts:52](https://github.com/onzag/itemize/blob/a24376ed/gql-querier.ts#L52)
 
 ___
 
@@ -47,7 +48,7 @@ ___
 
 #### Defined in
 
-[gql-querier.ts:48](https://github.com/onzag/itemize/blob/f2db74a5/gql-querier.ts#L48)
+[gql-querier.ts:48](https://github.com/onzag/itemize/blob/a24376ed/gql-querier.ts#L48)
 
 ___
 
@@ -57,7 +58,17 @@ ___
 
 #### Defined in
 
-[gql-querier.ts:50](https://github.com/onzag/itemize/blob/f2db74a5/gql-querier.ts#L50)
+[gql-querier.ts:50](https://github.com/onzag/itemize/blob/a24376ed/gql-querier.ts#L50)
+
+___
+
+### metadata
+
+• **metadata**: `string`
+
+#### Defined in
+
+[gql-querier.ts:54](https://github.com/onzag/itemize/blob/a24376ed/gql-querier.ts#L54)
 
 ___
 
@@ -67,7 +78,7 @@ ___
 
 #### Defined in
 
-[gql-querier.ts:51](https://github.com/onzag/itemize/blob/f2db74a5/gql-querier.ts#L51)
+[gql-querier.ts:51](https://github.com/onzag/itemize/blob/a24376ed/gql-querier.ts#L51)
 
 ___
 
@@ -77,7 +88,7 @@ ___
 
 #### Defined in
 
-[gql-querier.ts:53](https://github.com/onzag/itemize/blob/f2db74a5/gql-querier.ts#L53)
+[gql-querier.ts:53](https://github.com/onzag/itemize/blob/a24376ed/gql-querier.ts#L53)
 
 ___
 
@@ -87,4 +98,4 @@ ___
 
 #### Defined in
 
-[gql-querier.ts:47](https://github.com/onzag/itemize/blob/f2db74a5/gql-querier.ts#L47)
+[gql-querier.ts:47](https://github.com/onzag/itemize/blob/a24376ed/gql-querier.ts#L47)

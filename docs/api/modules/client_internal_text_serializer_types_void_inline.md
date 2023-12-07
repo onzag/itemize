@@ -36,4 +36,4 @@ registry
 
 #### Defined in
 
-[client/internal/text/serializer/types/void-inline.ts:17](https://github.com/onzag/itemize/blob/f2db74a5/client/internal/text/serializer/types/void-inline.ts#L17)
+[client/internal/text/serializer/types/void-inline.ts:17](https://github.com/onzag/itemize/blob/a24376ed/client/internal/text/serializer/types/void-inline.ts#L17)

@@ -64,7 +64,7 @@ A json validating schema for the dump configuration
 
 #### Defined in
 
-[config.ts:459](https://github.com/onzag/itemize/blob/f2db74a5/config.ts#L459)
+[config.ts:451](https://github.com/onzag/itemize/blob/a24376ed/config.ts#L451)
 
 ___
 
@@ -165,7 +165,7 @@ A json validating schema for the standard configuration
 
 #### Defined in
 
-[config.ts:572](https://github.com/onzag/itemize/blob/f2db74a5/config.ts#L572)
+[config.ts:564](https://github.com/onzag/itemize/blob/a24376ed/config.ts#L564)
 
 ___
 
@@ -207,7 +207,7 @@ A json validating schema for the database configuration
 
 #### Defined in
 
-[config.ts:728](https://github.com/onzag/itemize/blob/f2db74a5/config.ts#L728)
+[config.ts:720](https://github.com/onzag/itemize/blob/a24376ed/config.ts#L720)
 
 ___
 
@@ -271,7 +271,7 @@ ___
 
 #### Defined in
 
-[config.ts:829](https://github.com/onzag/itemize/blob/f2db74a5/config.ts#L829)
+[config.ts:821](https://github.com/onzag/itemize/blob/a24376ed/config.ts#L821)
 
 ___
 
@@ -302,7 +302,7 @@ A json validating schema for the redis config
 
 #### Defined in
 
-[config.ts:779](https://github.com/onzag/itemize/blob/f2db74a5/config.ts#L779)
+[config.ts:771](https://github.com/onzag/itemize/blob/a24376ed/config.ts#L771)
 
 ___
 
@@ -356,8 +356,6 @@ A JSON validating schema for the sensitive configuration
 | `properties.phone` | `Object` |
 | `properties.phone.additionalProperties` | `Object` |
 | `properties.phone.type` | `string`[] |
-| `properties.seoContainerID` | `Object` |
-| `properties.seoContainerID.type` | `string` |
 | `properties.shared` | `Object` |
 | `properties.shared.additionalProperties` | `Object` |
 | `properties.shared.type` | `string` |
@@ -372,4 +370,4 @@ A JSON validating schema for the sensitive configuration
 
 #### Defined in
 
-[config.ts:365](https://github.com/onzag/itemize/blob/f2db74a5/config.ts#L365)
+[config.ts:361](https://github.com/onzag/itemize/blob/a24376ed/config.ts#L361)

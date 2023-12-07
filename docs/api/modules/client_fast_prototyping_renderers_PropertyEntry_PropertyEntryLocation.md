@@ -31,7 +31,7 @@ Contains the entry for the location type
 
 #### Defined in
 
-[client/fast-prototyping/renderers/PropertyEntry/PropertyEntryLocation.tsx:67](https://github.com/onzag/itemize/blob/f2db74a5/client/fast-prototyping/renderers/PropertyEntry/PropertyEntryLocation.tsx#L67)
+[client/fast-prototyping/renderers/PropertyEntry/PropertyEntryLocation.tsx:68](https://github.com/onzag/itemize/blob/a24376ed/client/fast-prototyping/renderers/PropertyEntry/PropertyEntryLocation.tsx#L68)
 
 ___
 
@@ -173,4 +173,4 @@ The styles for the location entry
 
 #### Defined in
 
-[client/fast-prototyping/renderers/PropertyEntry/PropertyEntryLocation.tsx:85](https://github.com/onzag/itemize/blob/f2db74a5/client/fast-prototyping/renderers/PropertyEntry/PropertyEntryLocation.tsx#L85)
+[client/fast-prototyping/renderers/PropertyEntry/PropertyEntryLocation.tsx:86](https://github.com/onzag/itemize/blob/a24376ed/client/fast-prototyping/renderers/PropertyEntry/PropertyEntryLocation.tsx#L86)

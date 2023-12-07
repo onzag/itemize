@@ -30,4 +30,4 @@
 
 #### Defined in
 
-[client/components/util/ReadVar.tsx:53](https://github.com/onzag/itemize/blob/f2db74a5/client/components/util/ReadVar.tsx#L53)
+[client/components/util/ReadVar.tsx:53](https://github.com/onzag/itemize/blob/a24376ed/client/components/util/ReadVar.tsx#L53)

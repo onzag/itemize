@@ -40,4 +40,4 @@ a react node
 
 #### Defined in
 
-[client/components/item/PokeActioner.tsx:205](https://github.com/onzag/itemize/blob/f2db74a5/client/components/item/PokeActioner.tsx#L205)
+[client/components/item/PokeActioner.tsx:205](https://github.com/onzag/itemize/blob/a24376ed/client/components/item/PokeActioner.tsx#L205)

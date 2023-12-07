@@ -64,7 +64,7 @@ Reads a boolean value using the reader mechanism
 
 #### Defined in
 
-[client/components/property/Reader.tsx:95](https://github.com/onzag/itemize/blob/f2db74a5/client/components/property/Reader.tsx#L95)
+[client/components/property/Reader.tsx:95](https://github.com/onzag/itemize/blob/a24376ed/client/components/property/Reader.tsx#L95)
 
 ___
 
@@ -86,7 +86,7 @@ Reads a currency value using the reader mechanism
 
 #### Defined in
 
-[client/components/property/Reader.tsx:155](https://github.com/onzag/itemize/blob/f2db74a5/client/components/property/Reader.tsx#L155)
+[client/components/property/Reader.tsx:170](https://github.com/onzag/itemize/blob/a24376ed/client/components/property/Reader.tsx#L170)
 
 ___
 
@@ -108,7 +108,7 @@ Reads a date value using the reader mechanism
 
 #### Defined in
 
-[client/components/property/Reader.tsx:255](https://github.com/onzag/itemize/blob/f2db74a5/client/components/property/Reader.tsx#L255)
+[client/components/property/Reader.tsx:295](https://github.com/onzag/itemize/blob/a24376ed/client/components/property/Reader.tsx#L295)
 
 ___
 
@@ -130,7 +130,7 @@ Reads a timestamp value using the reader mechanism
 
 #### Defined in
 
-[client/components/property/Reader.tsx:295](https://github.com/onzag/itemize/blob/f2db74a5/client/components/property/Reader.tsx#L295)
+[client/components/property/Reader.tsx:344](https://github.com/onzag/itemize/blob/a24376ed/client/components/property/Reader.tsx#L344)
 
 ___
 
@@ -152,7 +152,7 @@ Reads a file value using the reader mechanism
 
 #### Defined in
 
-[client/components/property/Reader.tsx:335](https://github.com/onzag/itemize/blob/f2db74a5/client/components/property/Reader.tsx#L335)
+[client/components/property/Reader.tsx:393](https://github.com/onzag/itemize/blob/a24376ed/client/components/property/Reader.tsx#L393)
 
 ___
 
@@ -174,7 +174,7 @@ Reads a files array value using the reader mechanism
 
 #### Defined in
 
-[client/components/property/Reader.tsx:355](https://github.com/onzag/itemize/blob/f2db74a5/client/components/property/Reader.tsx#L355)
+[client/components/property/Reader.tsx:418](https://github.com/onzag/itemize/blob/a24376ed/client/components/property/Reader.tsx#L418)
 
 ___
 
@@ -196,7 +196,7 @@ Reads an integer value using the reader mechanism
 
 #### Defined in
 
-[client/components/property/Reader.tsx:115](https://github.com/onzag/itemize/blob/f2db74a5/client/components/property/Reader.tsx#L115)
+[client/components/property/Reader.tsx:120](https://github.com/onzag/itemize/blob/a24376ed/client/components/property/Reader.tsx#L120)
 
 ___
 
@@ -218,7 +218,7 @@ Reads a location coordinates value using the reader mechanism
 
 #### Defined in
 
-[client/components/property/Reader.tsx:315](https://github.com/onzag/itemize/blob/f2db74a5/client/components/property/Reader.tsx#L315)
+[client/components/property/Reader.tsx:369](https://github.com/onzag/itemize/blob/a24376ed/client/components/property/Reader.tsx#L369)
 
 ___
 
@@ -240,7 +240,7 @@ Reads a numeric value using the reader mechanism
 
 #### Defined in
 
-[client/components/property/Reader.tsx:135](https://github.com/onzag/itemize/blob/f2db74a5/client/components/property/Reader.tsx#L135)
+[client/components/property/Reader.tsx:145](https://github.com/onzag/itemize/blob/a24376ed/client/components/property/Reader.tsx#L145)
 
 ___
 
@@ -262,7 +262,7 @@ Reads a payment value using the reader mechanism
 
 #### Defined in
 
-[client/components/property/Reader.tsx:375](https://github.com/onzag/itemize/blob/f2db74a5/client/components/property/Reader.tsx#L375)
+[client/components/property/Reader.tsx:443](https://github.com/onzag/itemize/blob/a24376ed/client/components/property/Reader.tsx#L443)
 
 ___
 
@@ -284,7 +284,7 @@ Reads a string value using the reader mechanism
 
 #### Defined in
 
-[client/components/property/Reader.tsx:195](https://github.com/onzag/itemize/blob/f2db74a5/client/components/property/Reader.tsx#L195)
+[client/components/property/Reader.tsx:220](https://github.com/onzag/itemize/blob/a24376ed/client/components/property/Reader.tsx#L220)
 
 ___
 
@@ -306,7 +306,7 @@ Reads a taglist (array of string) value using the reader mechanism
 
 #### Defined in
 
-[client/components/property/Reader.tsx:395](https://github.com/onzag/itemize/blob/f2db74a5/client/components/property/Reader.tsx#L395)
+[client/components/property/Reader.tsx:468](https://github.com/onzag/itemize/blob/a24376ed/client/components/property/Reader.tsx#L468)
 
 ___
 
@@ -328,7 +328,7 @@ Reads a textual value using the reader mechanism
 
 #### Defined in
 
-[client/components/property/Reader.tsx:215](https://github.com/onzag/itemize/blob/f2db74a5/client/components/property/Reader.tsx#L215)
+[client/components/property/Reader.tsx:245](https://github.com/onzag/itemize/blob/a24376ed/client/components/property/Reader.tsx#L245)
 
 ___
 
@@ -350,7 +350,7 @@ Reads a time value using the reader mechanism
 
 #### Defined in
 
-[client/components/property/Reader.tsx:275](https://github.com/onzag/itemize/blob/f2db74a5/client/components/property/Reader.tsx#L275)
+[client/components/property/Reader.tsx:319](https://github.com/onzag/itemize/blob/a24376ed/client/components/property/Reader.tsx#L319)
 
 ___
 
@@ -372,7 +372,7 @@ Reads a unit value using the reader mechanism
 
 #### Defined in
 
-[client/components/property/Reader.tsx:175](https://github.com/onzag/itemize/blob/f2db74a5/client/components/property/Reader.tsx#L175)
+[client/components/property/Reader.tsx:195](https://github.com/onzag/itemize/blob/a24376ed/client/components/property/Reader.tsx#L195)
 
 ___
 
@@ -394,7 +394,7 @@ Reads a year value using the reader mechanism
 
 #### Defined in
 
-[client/components/property/Reader.tsx:235](https://github.com/onzag/itemize/blob/f2db74a5/client/components/property/Reader.tsx#L235)
+[client/components/property/Reader.tsx:270](https://github.com/onzag/itemize/blob/a24376ed/client/components/property/Reader.tsx#L270)
 
 ___
 
@@ -439,13 +439,13 @@ a react component
 
 #### Defined in
 
-[client/components/property/Reader.tsx:55](https://github.com/onzag/itemize/blob/f2db74a5/client/components/property/Reader.tsx#L55)
+[client/components/property/Reader.tsx:55](https://github.com/onzag/itemize/blob/a24376ed/client/components/property/Reader.tsx#L55)
 
 ___
 
 ### useBooleanReader
 
-▸ **useBooleanReader**(`options`): [`boolean`, [`IPropertyDefinitionState`](../interfaces/base_Root_Module_ItemDefinition_PropertyDefinition.IPropertyDefinitionState.md)<`boolean`\>]
+▸ **useBooleanReader**(`options`): [`boolean`, [`IPropertyDefinitionState`](../interfaces/base_Root_Module_ItemDefinition_PropertyDefinition.IPropertyDefinitionState.md)<`boolean`\>, `ReadSetterCallback`<`boolean`\>]
 
 Reads a boolean value using the reader mechanism
 
@@ -457,17 +457,17 @@ Reads a boolean value using the reader mechanism
 
 #### Returns
 
-[`boolean`, [`IPropertyDefinitionState`](../interfaces/base_Root_Module_ItemDefinition_PropertyDefinition.IPropertyDefinitionState.md)<`boolean`\>]
+[`boolean`, [`IPropertyDefinitionState`](../interfaces/base_Root_Module_ItemDefinition_PropertyDefinition.IPropertyDefinitionState.md)<`boolean`\>, `ReadSetterCallback`<`boolean`\>]
 
 #### Defined in
 
-[client/components/property/Reader.tsx:105](https://github.com/onzag/itemize/blob/f2db74a5/client/components/property/Reader.tsx#L105)
+[client/components/property/Reader.tsx:105](https://github.com/onzag/itemize/blob/a24376ed/client/components/property/Reader.tsx#L105)
 
 ___
 
 ### useCurrencyReader
 
-▸ **useCurrencyReader**(`options`): [[`IPropertyDefinitionSupportedCurrencyType`](../interfaces/base_Root_Module_ItemDefinition_PropertyDefinition_types_currency.IPropertyDefinitionSupportedCurrencyType.md), [`IPropertyDefinitionState`](../interfaces/base_Root_Module_ItemDefinition_PropertyDefinition.IPropertyDefinitionState.md)<[`IPropertyDefinitionSupportedCurrencyType`](../interfaces/base_Root_Module_ItemDefinition_PropertyDefinition_types_currency.IPropertyDefinitionSupportedCurrencyType.md)\>]
+▸ **useCurrencyReader**(`options`): [[`IPropertyDefinitionSupportedCurrencyType`](../interfaces/base_Root_Module_ItemDefinition_PropertyDefinition_types_currency.IPropertyDefinitionSupportedCurrencyType.md), [`IPropertyDefinitionState`](../interfaces/base_Root_Module_ItemDefinition_PropertyDefinition.IPropertyDefinitionState.md)<[`IPropertyDefinitionSupportedCurrencyType`](../interfaces/base_Root_Module_ItemDefinition_PropertyDefinition_types_currency.IPropertyDefinitionSupportedCurrencyType.md)\>, `ReadSetterCallback`<[`IPropertyDefinitionSupportedCurrencyType`](../interfaces/base_Root_Module_ItemDefinition_PropertyDefinition_types_currency.IPropertyDefinitionSupportedCurrencyType.md)\>]
 
 Reads a currency value using the reader mechanism
 
@@ -479,17 +479,17 @@ Reads a currency value using the reader mechanism
 
 #### Returns
 
-[[`IPropertyDefinitionSupportedCurrencyType`](../interfaces/base_Root_Module_ItemDefinition_PropertyDefinition_types_currency.IPropertyDefinitionSupportedCurrencyType.md), [`IPropertyDefinitionState`](../interfaces/base_Root_Module_ItemDefinition_PropertyDefinition.IPropertyDefinitionState.md)<[`IPropertyDefinitionSupportedCurrencyType`](../interfaces/base_Root_Module_ItemDefinition_PropertyDefinition_types_currency.IPropertyDefinitionSupportedCurrencyType.md)\>]
+[[`IPropertyDefinitionSupportedCurrencyType`](../interfaces/base_Root_Module_ItemDefinition_PropertyDefinition_types_currency.IPropertyDefinitionSupportedCurrencyType.md), [`IPropertyDefinitionState`](../interfaces/base_Root_Module_ItemDefinition_PropertyDefinition.IPropertyDefinitionState.md)<[`IPropertyDefinitionSupportedCurrencyType`](../interfaces/base_Root_Module_ItemDefinition_PropertyDefinition_types_currency.IPropertyDefinitionSupportedCurrencyType.md)\>, `ReadSetterCallback`<[`IPropertyDefinitionSupportedCurrencyType`](../interfaces/base_Root_Module_ItemDefinition_PropertyDefinition_types_currency.IPropertyDefinitionSupportedCurrencyType.md)\>]
 
 #### Defined in
 
-[client/components/property/Reader.tsx:165](https://github.com/onzag/itemize/blob/f2db74a5/client/components/property/Reader.tsx#L165)
+[client/components/property/Reader.tsx:180](https://github.com/onzag/itemize/blob/a24376ed/client/components/property/Reader.tsx#L180)
 
 ___
 
 ### useDateReader
 
-▸ **useDateReader**(`options`): [`string`, [`IPropertyDefinitionState`](../interfaces/base_Root_Module_ItemDefinition_PropertyDefinition.IPropertyDefinitionState.md)<`string`\>]
+▸ **useDateReader**(`options`): [`string`, [`IPropertyDefinitionState`](../interfaces/base_Root_Module_ItemDefinition_PropertyDefinition.IPropertyDefinitionState.md)<`string`\>, `ReadSetterCallback`<`string`\>]
 
 Reads a year value using the reader mechanism
 
@@ -501,17 +501,17 @@ Reads a year value using the reader mechanism
 
 #### Returns
 
-[`string`, [`IPropertyDefinitionState`](../interfaces/base_Root_Module_ItemDefinition_PropertyDefinition.IPropertyDefinitionState.md)<`string`\>]
+[`string`, [`IPropertyDefinitionState`](../interfaces/base_Root_Module_ItemDefinition_PropertyDefinition.IPropertyDefinitionState.md)<`string`\>, `ReadSetterCallback`<`string`\>]
 
 #### Defined in
 
-[client/components/property/Reader.tsx:265](https://github.com/onzag/itemize/blob/f2db74a5/client/components/property/Reader.tsx#L265)
+[client/components/property/Reader.tsx:305](https://github.com/onzag/itemize/blob/a24376ed/client/components/property/Reader.tsx#L305)
 
 ___
 
 ### useDatetimeReader
 
-▸ **useDatetimeReader**(`options`): [`string`, [`IPropertyDefinitionState`](../interfaces/base_Root_Module_ItemDefinition_PropertyDefinition.IPropertyDefinitionState.md)<`string`\>]
+▸ **useDatetimeReader**(`options`): [`string`, [`IPropertyDefinitionState`](../interfaces/base_Root_Module_ItemDefinition_PropertyDefinition.IPropertyDefinitionState.md)<`string`\>, `ReadSetterCallback`<`string`\>]
 
 Reads a timestamp value using the reader mechanism
 
@@ -523,17 +523,17 @@ Reads a timestamp value using the reader mechanism
 
 #### Returns
 
-[`string`, [`IPropertyDefinitionState`](../interfaces/base_Root_Module_ItemDefinition_PropertyDefinition.IPropertyDefinitionState.md)<`string`\>]
+[`string`, [`IPropertyDefinitionState`](../interfaces/base_Root_Module_ItemDefinition_PropertyDefinition.IPropertyDefinitionState.md)<`string`\>, `ReadSetterCallback`<`string`\>]
 
 #### Defined in
 
-[client/components/property/Reader.tsx:305](https://github.com/onzag/itemize/blob/f2db74a5/client/components/property/Reader.tsx#L305)
+[client/components/property/Reader.tsx:354](https://github.com/onzag/itemize/blob/a24376ed/client/components/property/Reader.tsx#L354)
 
 ___
 
 ### useFileReader
 
-▸ **useFileReader**(`options`): [[`IGQLFile`](../interfaces/gql_querier.IGQLFile.md), [`IPropertyDefinitionState`](../interfaces/base_Root_Module_ItemDefinition_PropertyDefinition.IPropertyDefinitionState.md)<[`IGQLFile`](../interfaces/gql_querier.IGQLFile.md)\>]
+▸ **useFileReader**(`options`): [[`IGQLFile`](../interfaces/gql_querier.IGQLFile.md), [`IPropertyDefinitionState`](../interfaces/base_Root_Module_ItemDefinition_PropertyDefinition.IPropertyDefinitionState.md)<[`IGQLFile`](../interfaces/gql_querier.IGQLFile.md)\>, `ReadSetterCallback`<[`IGQLFile`](../interfaces/gql_querier.IGQLFile.md)\>]
 
 Reads a file value using the reader mechanism
 
@@ -545,17 +545,17 @@ Reads a file value using the reader mechanism
 
 #### Returns
 
-[[`IGQLFile`](../interfaces/gql_querier.IGQLFile.md), [`IPropertyDefinitionState`](../interfaces/base_Root_Module_ItemDefinition_PropertyDefinition.IPropertyDefinitionState.md)<[`IGQLFile`](../interfaces/gql_querier.IGQLFile.md)\>]
+[[`IGQLFile`](../interfaces/gql_querier.IGQLFile.md), [`IPropertyDefinitionState`](../interfaces/base_Root_Module_ItemDefinition_PropertyDefinition.IPropertyDefinitionState.md)<[`IGQLFile`](../interfaces/gql_querier.IGQLFile.md)\>, `ReadSetterCallback`<[`IGQLFile`](../interfaces/gql_querier.IGQLFile.md)\>]
 
 #### Defined in
 
-[client/components/property/Reader.tsx:345](https://github.com/onzag/itemize/blob/f2db74a5/client/components/property/Reader.tsx#L345)
+[client/components/property/Reader.tsx:403](https://github.com/onzag/itemize/blob/a24376ed/client/components/property/Reader.tsx#L403)
 
 ___
 
 ### useFilesReader
 
-▸ **useFilesReader**(`options`): [[`PropertyDefinitionSupportedFilesType`](base_Root_Module_ItemDefinition_PropertyDefinition_types_files.md#propertydefinitionsupportedfilestype), [`IPropertyDefinitionState`](../interfaces/base_Root_Module_ItemDefinition_PropertyDefinition.IPropertyDefinitionState.md)<[`PropertyDefinitionSupportedFilesType`](base_Root_Module_ItemDefinition_PropertyDefinition_types_files.md#propertydefinitionsupportedfilestype)\>]
+▸ **useFilesReader**(`options`): [[`PropertyDefinitionSupportedFilesType`](base_Root_Module_ItemDefinition_PropertyDefinition_types_files.md#propertydefinitionsupportedfilestype), [`IPropertyDefinitionState`](../interfaces/base_Root_Module_ItemDefinition_PropertyDefinition.IPropertyDefinitionState.md)<[`PropertyDefinitionSupportedFilesType`](base_Root_Module_ItemDefinition_PropertyDefinition_types_files.md#propertydefinitionsupportedfilestype)\>, `ReadSetterCallback`<[`PropertyDefinitionSupportedFilesType`](base_Root_Module_ItemDefinition_PropertyDefinition_types_files.md#propertydefinitionsupportedfilestype)\>]
 
 Reads a files array value using the reader mechanism
 
@@ -567,17 +567,17 @@ Reads a files array value using the reader mechanism
 
 #### Returns
 
-[[`PropertyDefinitionSupportedFilesType`](base_Root_Module_ItemDefinition_PropertyDefinition_types_files.md#propertydefinitionsupportedfilestype), [`IPropertyDefinitionState`](../interfaces/base_Root_Module_ItemDefinition_PropertyDefinition.IPropertyDefinitionState.md)<[`PropertyDefinitionSupportedFilesType`](base_Root_Module_ItemDefinition_PropertyDefinition_types_files.md#propertydefinitionsupportedfilestype)\>]
+[[`PropertyDefinitionSupportedFilesType`](base_Root_Module_ItemDefinition_PropertyDefinition_types_files.md#propertydefinitionsupportedfilestype), [`IPropertyDefinitionState`](../interfaces/base_Root_Module_ItemDefinition_PropertyDefinition.IPropertyDefinitionState.md)<[`PropertyDefinitionSupportedFilesType`](base_Root_Module_ItemDefinition_PropertyDefinition_types_files.md#propertydefinitionsupportedfilestype)\>, `ReadSetterCallback`<[`PropertyDefinitionSupportedFilesType`](base_Root_Module_ItemDefinition_PropertyDefinition_types_files.md#propertydefinitionsupportedfilestype)\>]
 
 #### Defined in
 
-[client/components/property/Reader.tsx:365](https://github.com/onzag/itemize/blob/f2db74a5/client/components/property/Reader.tsx#L365)
+[client/components/property/Reader.tsx:428](https://github.com/onzag/itemize/blob/a24376ed/client/components/property/Reader.tsx#L428)
 
 ___
 
 ### useIntegerReader
 
-▸ **useIntegerReader**(`options`): [`number`, [`IPropertyDefinitionState`](../interfaces/base_Root_Module_ItemDefinition_PropertyDefinition.IPropertyDefinitionState.md)<`number`\>]
+▸ **useIntegerReader**(`options`): [`number`, [`IPropertyDefinitionState`](../interfaces/base_Root_Module_ItemDefinition_PropertyDefinition.IPropertyDefinitionState.md)<`number`\>, `ReadSetterCallback`<`number`\>]
 
 Reads an integer value using the reader mechanism
 
@@ -589,17 +589,17 @@ Reads an integer value using the reader mechanism
 
 #### Returns
 
-[`number`, [`IPropertyDefinitionState`](../interfaces/base_Root_Module_ItemDefinition_PropertyDefinition.IPropertyDefinitionState.md)<`number`\>]
+[`number`, [`IPropertyDefinitionState`](../interfaces/base_Root_Module_ItemDefinition_PropertyDefinition.IPropertyDefinitionState.md)<`number`\>, `ReadSetterCallback`<`number`\>]
 
 #### Defined in
 
-[client/components/property/Reader.tsx:125](https://github.com/onzag/itemize/blob/f2db74a5/client/components/property/Reader.tsx#L125)
+[client/components/property/Reader.tsx:130](https://github.com/onzag/itemize/blob/a24376ed/client/components/property/Reader.tsx#L130)
 
 ___
 
 ### useLocationReader
 
-▸ **useLocationReader**(`options`): [[`IPropertyDefinitionSupportedLocationType`](../interfaces/base_Root_Module_ItemDefinition_PropertyDefinition_types_location.IPropertyDefinitionSupportedLocationType.md), [`IPropertyDefinitionState`](../interfaces/base_Root_Module_ItemDefinition_PropertyDefinition.IPropertyDefinitionState.md)<[`IPropertyDefinitionSupportedLocationType`](../interfaces/base_Root_Module_ItemDefinition_PropertyDefinition_types_location.IPropertyDefinitionSupportedLocationType.md)\>]
+▸ **useLocationReader**(`options`): [[`IPropertyDefinitionSupportedLocationType`](../interfaces/base_Root_Module_ItemDefinition_PropertyDefinition_types_location.IPropertyDefinitionSupportedLocationType.md), [`IPropertyDefinitionState`](../interfaces/base_Root_Module_ItemDefinition_PropertyDefinition.IPropertyDefinitionState.md)<[`IPropertyDefinitionSupportedLocationType`](../interfaces/base_Root_Module_ItemDefinition_PropertyDefinition_types_location.IPropertyDefinitionSupportedLocationType.md)\>, `ReadSetterCallback`<[`IPropertyDefinitionSupportedLocationType`](../interfaces/base_Root_Module_ItemDefinition_PropertyDefinition_types_location.IPropertyDefinitionSupportedLocationType.md)\>]
 
 Reads a location coordinates value using the reader mechanism
 
@@ -611,17 +611,17 @@ Reads a location coordinates value using the reader mechanism
 
 #### Returns
 
-[[`IPropertyDefinitionSupportedLocationType`](../interfaces/base_Root_Module_ItemDefinition_PropertyDefinition_types_location.IPropertyDefinitionSupportedLocationType.md), [`IPropertyDefinitionState`](../interfaces/base_Root_Module_ItemDefinition_PropertyDefinition.IPropertyDefinitionState.md)<[`IPropertyDefinitionSupportedLocationType`](../interfaces/base_Root_Module_ItemDefinition_PropertyDefinition_types_location.IPropertyDefinitionSupportedLocationType.md)\>]
+[[`IPropertyDefinitionSupportedLocationType`](../interfaces/base_Root_Module_ItemDefinition_PropertyDefinition_types_location.IPropertyDefinitionSupportedLocationType.md), [`IPropertyDefinitionState`](../interfaces/base_Root_Module_ItemDefinition_PropertyDefinition.IPropertyDefinitionState.md)<[`IPropertyDefinitionSupportedLocationType`](../interfaces/base_Root_Module_ItemDefinition_PropertyDefinition_types_location.IPropertyDefinitionSupportedLocationType.md)\>, `ReadSetterCallback`<[`IPropertyDefinitionSupportedLocationType`](../interfaces/base_Root_Module_ItemDefinition_PropertyDefinition_types_location.IPropertyDefinitionSupportedLocationType.md)\>]
 
 #### Defined in
 
-[client/components/property/Reader.tsx:325](https://github.com/onzag/itemize/blob/f2db74a5/client/components/property/Reader.tsx#L325)
+[client/components/property/Reader.tsx:379](https://github.com/onzag/itemize/blob/a24376ed/client/components/property/Reader.tsx#L379)
 
 ___
 
 ### useNumberReader
 
-▸ **useNumberReader**(`options`): [`number`, [`IPropertyDefinitionState`](../interfaces/base_Root_Module_ItemDefinition_PropertyDefinition.IPropertyDefinitionState.md)<`number`\>]
+▸ **useNumberReader**(`options`): [`number`, [`IPropertyDefinitionState`](../interfaces/base_Root_Module_ItemDefinition_PropertyDefinition.IPropertyDefinitionState.md)<`number`\>, `ReadSetterCallback`<`number`\>]
 
 Reads a numeric value using the reader mechanism
 
@@ -633,17 +633,17 @@ Reads a numeric value using the reader mechanism
 
 #### Returns
 
-[`number`, [`IPropertyDefinitionState`](../interfaces/base_Root_Module_ItemDefinition_PropertyDefinition.IPropertyDefinitionState.md)<`number`\>]
+[`number`, [`IPropertyDefinitionState`](../interfaces/base_Root_Module_ItemDefinition_PropertyDefinition.IPropertyDefinitionState.md)<`number`\>, `ReadSetterCallback`<`number`\>]
 
 #### Defined in
 
-[client/components/property/Reader.tsx:145](https://github.com/onzag/itemize/blob/f2db74a5/client/components/property/Reader.tsx#L145)
+[client/components/property/Reader.tsx:155](https://github.com/onzag/itemize/blob/a24376ed/client/components/property/Reader.tsx#L155)
 
 ___
 
 ### usePaymentReader
 
-▸ **usePaymentReader**(`options`): [[`IPropertyDefinitionSupportedPaymentType`](../interfaces/base_Root_Module_ItemDefinition_PropertyDefinition_types_payment.IPropertyDefinitionSupportedPaymentType.md), [`IPropertyDefinitionState`](../interfaces/base_Root_Module_ItemDefinition_PropertyDefinition.IPropertyDefinitionState.md)<[`IPropertyDefinitionSupportedPaymentType`](../interfaces/base_Root_Module_ItemDefinition_PropertyDefinition_types_payment.IPropertyDefinitionSupportedPaymentType.md)\>]
+▸ **usePaymentReader**(`options`): [[`IPropertyDefinitionSupportedPaymentType`](../interfaces/base_Root_Module_ItemDefinition_PropertyDefinition_types_payment.IPropertyDefinitionSupportedPaymentType.md), [`IPropertyDefinitionState`](../interfaces/base_Root_Module_ItemDefinition_PropertyDefinition.IPropertyDefinitionState.md)<[`IPropertyDefinitionSupportedPaymentType`](../interfaces/base_Root_Module_ItemDefinition_PropertyDefinition_types_payment.IPropertyDefinitionSupportedPaymentType.md)\>, `ReadSetterCallback`<[`IPropertyDefinitionSupportedPaymentType`](../interfaces/base_Root_Module_ItemDefinition_PropertyDefinition_types_payment.IPropertyDefinitionSupportedPaymentType.md)\>]
 
 Reads a payment value using the reader mechanism
 
@@ -655,17 +655,17 @@ Reads a payment value using the reader mechanism
 
 #### Returns
 
-[[`IPropertyDefinitionSupportedPaymentType`](../interfaces/base_Root_Module_ItemDefinition_PropertyDefinition_types_payment.IPropertyDefinitionSupportedPaymentType.md), [`IPropertyDefinitionState`](../interfaces/base_Root_Module_ItemDefinition_PropertyDefinition.IPropertyDefinitionState.md)<[`IPropertyDefinitionSupportedPaymentType`](../interfaces/base_Root_Module_ItemDefinition_PropertyDefinition_types_payment.IPropertyDefinitionSupportedPaymentType.md)\>]
+[[`IPropertyDefinitionSupportedPaymentType`](../interfaces/base_Root_Module_ItemDefinition_PropertyDefinition_types_payment.IPropertyDefinitionSupportedPaymentType.md), [`IPropertyDefinitionState`](../interfaces/base_Root_Module_ItemDefinition_PropertyDefinition.IPropertyDefinitionState.md)<[`IPropertyDefinitionSupportedPaymentType`](../interfaces/base_Root_Module_ItemDefinition_PropertyDefinition_types_payment.IPropertyDefinitionSupportedPaymentType.md)\>, `ReadSetterCallback`<[`IPropertyDefinitionSupportedPaymentType`](../interfaces/base_Root_Module_ItemDefinition_PropertyDefinition_types_payment.IPropertyDefinitionSupportedPaymentType.md)\>]
 
 #### Defined in
 
-[client/components/property/Reader.tsx:385](https://github.com/onzag/itemize/blob/f2db74a5/client/components/property/Reader.tsx#L385)
+[client/components/property/Reader.tsx:453](https://github.com/onzag/itemize/blob/a24376ed/client/components/property/Reader.tsx#L453)
 
 ___
 
 ### useReader
 
-▸ **useReader**<`T`\>(`options`): [`T`, [`IPropertyDefinitionState`](../interfaces/base_Root_Module_ItemDefinition_PropertyDefinition.IPropertyDefinitionState.md)<`T`\>]
+▸ **useReader**<`T`\>(`options`): [`T`, [`IPropertyDefinitionState`](../interfaces/base_Root_Module_ItemDefinition_PropertyDefinition.IPropertyDefinitionState.md)<`T`\>, `ReadSetterCallback`<`T`\>]
 
 Uses the generic reader to read the value of a property of a given id
 
@@ -703,17 +703,17 @@ useTaglistReader
 
 #### Returns
 
-[`T`, [`IPropertyDefinitionState`](../interfaces/base_Root_Module_ItemDefinition_PropertyDefinition.IPropertyDefinitionState.md)<`T`\>]
+[`T`, [`IPropertyDefinitionState`](../interfaces/base_Root_Module_ItemDefinition_PropertyDefinition.IPropertyDefinitionState.md)<`T`\>, `ReadSetterCallback`<`T`\>]
 
 #### Defined in
 
-[client/components/property/Reader.tsx:85](https://github.com/onzag/itemize/blob/f2db74a5/client/components/property/Reader.tsx#L85)
+[client/components/property/Reader.tsx:85](https://github.com/onzag/itemize/blob/a24376ed/client/components/property/Reader.tsx#L85)
 
 ___
 
 ### useStringReader
 
-▸ **useStringReader**(`options`): [`string`, [`IPropertyDefinitionState`](../interfaces/base_Root_Module_ItemDefinition_PropertyDefinition.IPropertyDefinitionState.md)<`string`\>]
+▸ **useStringReader**(`options`): [`string`, [`IPropertyDefinitionState`](../interfaces/base_Root_Module_ItemDefinition_PropertyDefinition.IPropertyDefinitionState.md)<`string`\>, `ReadSetterCallback`<`string`\>]
 
 Reads a string value using the reader mechanism
 
@@ -725,17 +725,17 @@ Reads a string value using the reader mechanism
 
 #### Returns
 
-[`string`, [`IPropertyDefinitionState`](../interfaces/base_Root_Module_ItemDefinition_PropertyDefinition.IPropertyDefinitionState.md)<`string`\>]
+[`string`, [`IPropertyDefinitionState`](../interfaces/base_Root_Module_ItemDefinition_PropertyDefinition.IPropertyDefinitionState.md)<`string`\>, `ReadSetterCallback`<`string`\>]
 
 #### Defined in
 
-[client/components/property/Reader.tsx:205](https://github.com/onzag/itemize/blob/f2db74a5/client/components/property/Reader.tsx#L205)
+[client/components/property/Reader.tsx:230](https://github.com/onzag/itemize/blob/a24376ed/client/components/property/Reader.tsx#L230)
 
 ___
 
 ### useTaglistReader
 
-▸ **useTaglistReader**(`options`): [[`PropertyDefinitionSupportedTagListType`](base_Root_Module_ItemDefinition_PropertyDefinition_types_taglist.md#propertydefinitionsupportedtaglisttype), [`IPropertyDefinitionState`](../interfaces/base_Root_Module_ItemDefinition_PropertyDefinition.IPropertyDefinitionState.md)<[`PropertyDefinitionSupportedTagListType`](base_Root_Module_ItemDefinition_PropertyDefinition_types_taglist.md#propertydefinitionsupportedtaglisttype)\>]
+▸ **useTaglistReader**(`options`): [[`PropertyDefinitionSupportedTagListType`](base_Root_Module_ItemDefinition_PropertyDefinition_types_taglist.md#propertydefinitionsupportedtaglisttype), [`IPropertyDefinitionState`](../interfaces/base_Root_Module_ItemDefinition_PropertyDefinition.IPropertyDefinitionState.md)<[`PropertyDefinitionSupportedTagListType`](base_Root_Module_ItemDefinition_PropertyDefinition_types_taglist.md#propertydefinitionsupportedtaglisttype)\>, `ReadSetterCallback`<[`PropertyDefinitionSupportedTagListType`](base_Root_Module_ItemDefinition_PropertyDefinition_types_taglist.md#propertydefinitionsupportedtaglisttype)\>]
 
 Reads a taglist (array of string)  value using the reader mechanism
 
@@ -747,17 +747,17 @@ Reads a taglist (array of string)  value using the reader mechanism
 
 #### Returns
 
-[[`PropertyDefinitionSupportedTagListType`](base_Root_Module_ItemDefinition_PropertyDefinition_types_taglist.md#propertydefinitionsupportedtaglisttype), [`IPropertyDefinitionState`](../interfaces/base_Root_Module_ItemDefinition_PropertyDefinition.IPropertyDefinitionState.md)<[`PropertyDefinitionSupportedTagListType`](base_Root_Module_ItemDefinition_PropertyDefinition_types_taglist.md#propertydefinitionsupportedtaglisttype)\>]
+[[`PropertyDefinitionSupportedTagListType`](base_Root_Module_ItemDefinition_PropertyDefinition_types_taglist.md#propertydefinitionsupportedtaglisttype), [`IPropertyDefinitionState`](../interfaces/base_Root_Module_ItemDefinition_PropertyDefinition.IPropertyDefinitionState.md)<[`PropertyDefinitionSupportedTagListType`](base_Root_Module_ItemDefinition_PropertyDefinition_types_taglist.md#propertydefinitionsupportedtaglisttype)\>, `ReadSetterCallback`<[`PropertyDefinitionSupportedTagListType`](base_Root_Module_ItemDefinition_PropertyDefinition_types_taglist.md#propertydefinitionsupportedtaglisttype)\>]
 
 #### Defined in
 
-[client/components/property/Reader.tsx:405](https://github.com/onzag/itemize/blob/f2db74a5/client/components/property/Reader.tsx#L405)
+[client/components/property/Reader.tsx:478](https://github.com/onzag/itemize/blob/a24376ed/client/components/property/Reader.tsx#L478)
 
 ___
 
 ### useTextReader
 
-▸ **useTextReader**(`options`): [[`IPropertyDefinitionSupportedTextType`](../interfaces/base_Root_Module_ItemDefinition_PropertyDefinition_types_text.IPropertyDefinitionSupportedTextType.md), [`IPropertyDefinitionState`](../interfaces/base_Root_Module_ItemDefinition_PropertyDefinition.IPropertyDefinitionState.md)<[`IPropertyDefinitionSupportedTextType`](../interfaces/base_Root_Module_ItemDefinition_PropertyDefinition_types_text.IPropertyDefinitionSupportedTextType.md)\>]
+▸ **useTextReader**(`options`): [[`IPropertyDefinitionSupportedTextType`](../interfaces/base_Root_Module_ItemDefinition_PropertyDefinition_types_text.IPropertyDefinitionSupportedTextType.md), [`IPropertyDefinitionState`](../interfaces/base_Root_Module_ItemDefinition_PropertyDefinition.IPropertyDefinitionState.md)<[`IPropertyDefinitionSupportedTextType`](../interfaces/base_Root_Module_ItemDefinition_PropertyDefinition_types_text.IPropertyDefinitionSupportedTextType.md)\>, `ReadSetterCallback`<[`IPropertyDefinitionSupportedTextType`](../interfaces/base_Root_Module_ItemDefinition_PropertyDefinition_types_text.IPropertyDefinitionSupportedTextType.md)\>]
 
 Reads a textual value using the reader mechanism
 
@@ -769,17 +769,17 @@ Reads a textual value using the reader mechanism
 
 #### Returns
 
-[[`IPropertyDefinitionSupportedTextType`](../interfaces/base_Root_Module_ItemDefinition_PropertyDefinition_types_text.IPropertyDefinitionSupportedTextType.md), [`IPropertyDefinitionState`](../interfaces/base_Root_Module_ItemDefinition_PropertyDefinition.IPropertyDefinitionState.md)<[`IPropertyDefinitionSupportedTextType`](../interfaces/base_Root_Module_ItemDefinition_PropertyDefinition_types_text.IPropertyDefinitionSupportedTextType.md)\>]
+[[`IPropertyDefinitionSupportedTextType`](../interfaces/base_Root_Module_ItemDefinition_PropertyDefinition_types_text.IPropertyDefinitionSupportedTextType.md), [`IPropertyDefinitionState`](../interfaces/base_Root_Module_ItemDefinition_PropertyDefinition.IPropertyDefinitionState.md)<[`IPropertyDefinitionSupportedTextType`](../interfaces/base_Root_Module_ItemDefinition_PropertyDefinition_types_text.IPropertyDefinitionSupportedTextType.md)\>, `ReadSetterCallback`<[`IPropertyDefinitionSupportedTextType`](../interfaces/base_Root_Module_ItemDefinition_PropertyDefinition_types_text.IPropertyDefinitionSupportedTextType.md)\>]
 
 #### Defined in
 
-[client/components/property/Reader.tsx:225](https://github.com/onzag/itemize/blob/f2db74a5/client/components/property/Reader.tsx#L225)
+[client/components/property/Reader.tsx:255](https://github.com/onzag/itemize/blob/a24376ed/client/components/property/Reader.tsx#L255)
 
 ___
 
 ### useTimeReader
 
-▸ **useTimeReader**(`options`): [`string`, [`IPropertyDefinitionState`](../interfaces/base_Root_Module_ItemDefinition_PropertyDefinition.IPropertyDefinitionState.md)<`string`\>]
+▸ **useTimeReader**(`options`): [`string`, [`IPropertyDefinitionState`](../interfaces/base_Root_Module_ItemDefinition_PropertyDefinition.IPropertyDefinitionState.md)<`string`\>, `ReadSetterCallback`<`string`\>]
 
 Reads a time value using the reader mechanism
 
@@ -791,17 +791,17 @@ Reads a time value using the reader mechanism
 
 #### Returns
 
-[`string`, [`IPropertyDefinitionState`](../interfaces/base_Root_Module_ItemDefinition_PropertyDefinition.IPropertyDefinitionState.md)<`string`\>]
+[`string`, [`IPropertyDefinitionState`](../interfaces/base_Root_Module_ItemDefinition_PropertyDefinition.IPropertyDefinitionState.md)<`string`\>, `ReadSetterCallback`<`string`\>]
 
 #### Defined in
 
-[client/components/property/Reader.tsx:285](https://github.com/onzag/itemize/blob/f2db74a5/client/components/property/Reader.tsx#L285)
+[client/components/property/Reader.tsx:329](https://github.com/onzag/itemize/blob/a24376ed/client/components/property/Reader.tsx#L329)
 
 ___
 
 ### useUnitReader
 
-▸ **useUnitReader**(`options`): [[`IPropertyDefinitionSupportedUnitType`](../interfaces/base_Root_Module_ItemDefinition_PropertyDefinition_types_unit.IPropertyDefinitionSupportedUnitType.md), [`IPropertyDefinitionState`](../interfaces/base_Root_Module_ItemDefinition_PropertyDefinition.IPropertyDefinitionState.md)<[`IPropertyDefinitionSupportedUnitType`](../interfaces/base_Root_Module_ItemDefinition_PropertyDefinition_types_unit.IPropertyDefinitionSupportedUnitType.md)\>]
+▸ **useUnitReader**(`options`): [[`IPropertyDefinitionSupportedUnitType`](../interfaces/base_Root_Module_ItemDefinition_PropertyDefinition_types_unit.IPropertyDefinitionSupportedUnitType.md), [`IPropertyDefinitionState`](../interfaces/base_Root_Module_ItemDefinition_PropertyDefinition.IPropertyDefinitionState.md)<[`IPropertyDefinitionSupportedUnitType`](../interfaces/base_Root_Module_ItemDefinition_PropertyDefinition_types_unit.IPropertyDefinitionSupportedUnitType.md)\>, `ReadSetterCallback`<[`IPropertyDefinitionSupportedUnitType`](../interfaces/base_Root_Module_ItemDefinition_PropertyDefinition_types_unit.IPropertyDefinitionSupportedUnitType.md)\>]
 
 Reads a unit value using the reader mechanism
 
@@ -813,17 +813,17 @@ Reads a unit value using the reader mechanism
 
 #### Returns
 
-[[`IPropertyDefinitionSupportedUnitType`](../interfaces/base_Root_Module_ItemDefinition_PropertyDefinition_types_unit.IPropertyDefinitionSupportedUnitType.md), [`IPropertyDefinitionState`](../interfaces/base_Root_Module_ItemDefinition_PropertyDefinition.IPropertyDefinitionState.md)<[`IPropertyDefinitionSupportedUnitType`](../interfaces/base_Root_Module_ItemDefinition_PropertyDefinition_types_unit.IPropertyDefinitionSupportedUnitType.md)\>]
+[[`IPropertyDefinitionSupportedUnitType`](../interfaces/base_Root_Module_ItemDefinition_PropertyDefinition_types_unit.IPropertyDefinitionSupportedUnitType.md), [`IPropertyDefinitionState`](../interfaces/base_Root_Module_ItemDefinition_PropertyDefinition.IPropertyDefinitionState.md)<[`IPropertyDefinitionSupportedUnitType`](../interfaces/base_Root_Module_ItemDefinition_PropertyDefinition_types_unit.IPropertyDefinitionSupportedUnitType.md)\>, `ReadSetterCallback`<[`IPropertyDefinitionSupportedUnitType`](../interfaces/base_Root_Module_ItemDefinition_PropertyDefinition_types_unit.IPropertyDefinitionSupportedUnitType.md)\>]
 
 #### Defined in
 
-[client/components/property/Reader.tsx:185](https://github.com/onzag/itemize/blob/f2db74a5/client/components/property/Reader.tsx#L185)
+[client/components/property/Reader.tsx:205](https://github.com/onzag/itemize/blob/a24376ed/client/components/property/Reader.tsx#L205)
 
 ___
 
 ### useYearReader
 
-▸ **useYearReader**(`options`): [`number`, [`IPropertyDefinitionState`](../interfaces/base_Root_Module_ItemDefinition_PropertyDefinition.IPropertyDefinitionState.md)<`number`\>]
+▸ **useYearReader**(`options`): [`number`, [`IPropertyDefinitionState`](../interfaces/base_Root_Module_ItemDefinition_PropertyDefinition.IPropertyDefinitionState.md)<`number`\>, `ReadSetterCallback`<`number`\>]
 
 Reads a year value using the reader mechanism
 
@@ -835,8 +835,8 @@ Reads a year value using the reader mechanism
 
 #### Returns
 
-[`number`, [`IPropertyDefinitionState`](../interfaces/base_Root_Module_ItemDefinition_PropertyDefinition.IPropertyDefinitionState.md)<`number`\>]
+[`number`, [`IPropertyDefinitionState`](../interfaces/base_Root_Module_ItemDefinition_PropertyDefinition.IPropertyDefinitionState.md)<`number`\>, `ReadSetterCallback`<`number`\>]
 
 #### Defined in
 
-[client/components/property/Reader.tsx:245](https://github.com/onzag/itemize/blob/f2db74a5/client/components/property/Reader.tsx#L245)
+[client/components/property/Reader.tsx:280](https://github.com/onzag/itemize/blob/a24376ed/client/components/property/Reader.tsx#L280)

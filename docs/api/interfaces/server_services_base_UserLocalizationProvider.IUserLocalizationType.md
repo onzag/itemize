@@ -20,7 +20,7 @@
 
 #### Defined in
 
-[server/services/base/UserLocalizationProvider.ts:4](https://github.com/onzag/itemize/blob/f2db74a5/server/services/base/UserLocalizationProvider.ts#L4)
+[server/services/base/UserLocalizationProvider.ts:4](https://github.com/onzag/itemize/blob/a24376ed/server/services/base/UserLocalizationProvider.ts#L4)
 
 ___
 
@@ -30,7 +30,7 @@ ___
 
 #### Defined in
 
-[server/services/base/UserLocalizationProvider.ts:5](https://github.com/onzag/itemize/blob/f2db74a5/server/services/base/UserLocalizationProvider.ts#L5)
+[server/services/base/UserLocalizationProvider.ts:5](https://github.com/onzag/itemize/blob/a24376ed/server/services/base/UserLocalizationProvider.ts#L5)
 
 ___
 
@@ -40,4 +40,4 @@ ___
 
 #### Defined in
 
-[server/services/base/UserLocalizationProvider.ts:6](https://github.com/onzag/itemize/blob/f2db74a5/server/services/base/UserLocalizationProvider.ts#L6)
+[server/services/base/UserLocalizationProvider.ts:6](https://github.com/onzag/itemize/blob/a24376ed/server/services/base/UserLocalizationProvider.ts#L6)

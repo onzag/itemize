@@ -28,6 +28,7 @@ itself as it performs a lot of storing, checking and so on
 - [getAddQueryFor](client_internal_gql_client_util.md#getaddqueryfor)
 - [getEditQueryFor](client_internal_gql_client_util.md#geteditqueryfor)
 - [getFieldsAndArgs](client_internal_gql_client_util.md#getfieldsandargs)
+- [getPropertyListDefault](client_internal_gql_client_util.md#getpropertylistdefault)
 - [getPropertyListForSearchMode](client_internal_gql_client_util.md#getpropertylistforsearchmode)
 - [getSearchArgsFor](client_internal_gql_client_util.md#getsearchargsfor)
 - [getSearchQueryFor](client_internal_gql_client_util.md#getsearchqueryfor)
@@ -64,7 +65,7 @@ A function to use for the mismatch action
 
 #### Defined in
 
-[client/internal/gql-client-util.ts:123](https://github.com/onzag/itemize/blob/f2db74a5/client/internal/gql-client-util.ts#L123)
+[client/internal/gql-client-util.ts:123](https://github.com/onzag/itemize/blob/a24376ed/client/internal/gql-client-util.ts#L123)
 
 ___
 
@@ -91,7 +92,7 @@ A function to use for the mismatch action
 
 #### Defined in
 
-[client/internal/gql-client-util.ts:128](https://github.com/onzag/itemize/blob/f2db74a5/client/internal/gql-client-util.ts#L128)
+[client/internal/gql-client-util.ts:128](https://github.com/onzag/itemize/blob/a24376ed/client/internal/gql-client-util.ts#L128)
 
 ## Functions
 
@@ -104,7 +105,7 @@ A function to use for the mismatch action
 | Name | Type |
 | :------ | :------ |
 | `condition` | [`ICacheMetadataMismatchCondition`](../interfaces/client_internal_gql_client_util.ICacheMetadataMismatchCondition.md) |
-| `dbValue` | [`ICacheMatchType`](../interfaces/client_internal_workers_cache_cache_worker.ICacheMatchType.md) |
+| `dbValue` | [`ICacheMatchType`](../interfaces/client_internal_workers_cache_cache_worker_class.ICacheMatchType.md) |
 | `oldMetadata` | `any` |
 | `newMetadata` | `any` |
 
@@ -114,7 +115,7 @@ A function to use for the mismatch action
 
 #### Defined in
 
-[client/internal/gql-client-util.ts:130](https://github.com/onzag/itemize/blob/f2db74a5/client/internal/gql-client-util.ts#L130)
+[client/internal/gql-client-util.ts:130](https://github.com/onzag/itemize/blob/a24376ed/client/internal/gql-client-util.ts#L130)
 
 ___
 
@@ -145,7 +146,7 @@ ___
 
 #### Defined in
 
-[client/internal/gql-client-util.ts:1103](https://github.com/onzag/itemize/blob/f2db74a5/client/internal/gql-client-util.ts#L1103)
+[client/internal/gql-client-util.ts:1159](https://github.com/onzag/itemize/blob/a24376ed/client/internal/gql-client-util.ts#L1159)
 
 ___
 
@@ -173,7 +174,7 @@ ___
 
 #### Defined in
 
-[client/internal/gql-client-util.ts:1313](https://github.com/onzag/itemize/blob/f2db74a5/client/internal/gql-client-util.ts#L1313)
+[client/internal/gql-client-util.ts:1371](https://github.com/onzag/itemize/blob/a24376ed/client/internal/gql-client-util.ts#L1371)
 
 ___
 
@@ -225,7 +226,27 @@ to create a query
 
 #### Defined in
 
-[client/internal/gql-client-util.ts:228](https://github.com/onzag/itemize/blob/f2db74a5/client/internal/gql-client-util.ts#L228)
+[client/internal/gql-client-util.ts:253](https://github.com/onzag/itemize/blob/a24376ed/client/internal/gql-client-util.ts#L253)
+
+___
+
+### getPropertyListDefault
+
+▸ **getPropertyListDefault**(`properties`): `string`[]
+
+#### Parameters
+
+| Name | Type |
+| :------ | :------ |
+| `properties` | (`string` \| [`IPropertyCoreProps`](../interfaces/client_components_property_base.IPropertyCoreProps.md))[] |
+
+#### Returns
+
+`string`[]
+
+#### Defined in
+
+[client/internal/gql-client-util.ts:216](https://github.com/onzag/itemize/blob/a24376ed/client/internal/gql-client-util.ts#L216)
 
 ___
 
@@ -246,7 +267,7 @@ ___
 
 #### Defined in
 
-[client/internal/gql-client-util.ts:182](https://github.com/onzag/itemize/blob/f2db74a5/client/internal/gql-client-util.ts#L182)
+[client/internal/gql-client-util.ts:182](https://github.com/onzag/itemize/blob/a24376ed/client/internal/gql-client-util.ts#L182)
 
 ___
 
@@ -266,7 +287,7 @@ ___
 
 #### Defined in
 
-[client/internal/gql-client-util.ts:1499](https://github.com/onzag/itemize/blob/f2db74a5/client/internal/gql-client-util.ts#L1499)
+[client/internal/gql-client-util.ts:1574](https://github.com/onzag/itemize/blob/a24376ed/client/internal/gql-client-util.ts#L1574)
 
 ___
 
@@ -286,7 +307,7 @@ ___
 
 #### Defined in
 
-[client/internal/gql-client-util.ts:1548](https://github.com/onzag/itemize/blob/f2db74a5/client/internal/gql-client-util.ts#L1548)
+[client/internal/gql-client-util.ts:1661](https://github.com/onzag/itemize/blob/a24376ed/client/internal/gql-client-util.ts#L1661)
 
 ___
 
@@ -320,7 +341,7 @@ regarding these files
 
 #### Defined in
 
-[client/internal/gql-client-util.ts:582](https://github.com/onzag/itemize/blob/f2db74a5/client/internal/gql-client-util.ts#L582)
+[client/internal/gql-client-util.ts:607](https://github.com/onzag/itemize/blob/a24376ed/client/internal/gql-client-util.ts#L607)
 
 ___
 
@@ -349,13 +370,13 @@ to specify a blob this function will do such job
 
 #### Defined in
 
-[client/internal/gql-client-util.ts:528](https://github.com/onzag/itemize/blob/f2db74a5/client/internal/gql-client-util.ts#L528)
+[client/internal/gql-client-util.ts:553](https://github.com/onzag/itemize/blob/a24376ed/client/internal/gql-client-util.ts#L553)
 
 ___
 
 ### runAddQueryFor
 
-▸ **runAddQueryFor**(`arg`): `Promise`<{ `error`: [`EndpointErrorType`](base_errors.md#endpointerrortype) ; `getQueryFields`: [`IGQLRequestFields`](../interfaces/gql_querier.IGQLRequestFields.md) ; `value`: [`IGQLValue`](../interfaces/gql_querier.IGQLValue.md)  }\>
+▸ **runAddQueryFor**(`arg`, `options`): `Promise`<{ `error`: [`EndpointErrorType`](base_errors.md#endpointerrortype) ; `getQueryFields`: [`IGQLRequestFields`](../interfaces/gql_querier.IGQLRequestFields.md) ; `value`: [`IGQLValue`](../interfaces/gql_querier.IGQLValue.md)  }\>
 
 Runs an add query for a given item definition
 
@@ -376,6 +397,7 @@ Runs an add query for a given item definition
 | `arg.progresser?` | [`ProgresserFn`](gql_querier.md#progresserfn) | - |
 | `arg.token` | `string` | the token we are using for the addition process |
 | `arg.waitAndMerge?` | `boolean` | - |
+| `options` | `IRunQueryOptions` | - |
 
 #### Returns
 
@@ -386,7 +408,7 @@ query, and the value that was retrieved
 
 #### Defined in
 
-[client/internal/gql-client-util.ts:1249](https://github.com/onzag/itemize/blob/f2db74a5/client/internal/gql-client-util.ts#L1249)
+[client/internal/gql-client-util.ts:1305](https://github.com/onzag/itemize/blob/a24376ed/client/internal/gql-client-util.ts#L1305)
 
 ___
 
@@ -418,7 +440,7 @@ a promise with an error on whether it succeed or not
 
 #### Defined in
 
-[client/internal/gql-client-util.ts:1036](https://github.com/onzag/itemize/blob/f2db74a5/client/internal/gql-client-util.ts#L1036)
+[client/internal/gql-client-util.ts:1092](https://github.com/onzag/itemize/blob/a24376ed/client/internal/gql-client-util.ts#L1092)
 
 ___
 
@@ -451,13 +473,13 @@ Runs an edit query for a given item definition
 
 #### Defined in
 
-[client/internal/gql-client-util.ts:1365](https://github.com/onzag/itemize/blob/f2db74a5/client/internal/gql-client-util.ts#L1365)
+[client/internal/gql-client-util.ts:1423](https://github.com/onzag/itemize/blob/a24376ed/client/internal/gql-client-util.ts#L1423)
 
 ___
 
 ### runGetQueryFor
 
-▸ **runGetQueryFor**(`arg`): `Promise`<{ `cached`: `boolean` ; `error`: [`EndpointErrorType`](base_errors.md#endpointerrortype) ; `getQueryFields`: [`IGQLRequestFields`](../interfaces/gql_querier.IGQLRequestFields.md) ; `memoryCached`: `boolean` ; `value`: [`IGQLValue`](../interfaces/gql_querier.IGQLValue.md)  }\>
+▸ **runGetQueryFor**(`arg`, `options`): `Promise`<{ `cached`: `boolean` ; `error`: [`EndpointErrorType`](base_errors.md#endpointerrortype) ; `getQueryFields`: [`IGQLRequestFields`](../interfaces/gql_querier.IGQLRequestFields.md) ; `memoryCached`: `boolean` ; `value`: [`IGQLValue`](../interfaces/gql_querier.IGQLValue.md)  }\>
 
 Runs a get query for a given item definition and its args
 
@@ -470,7 +492,7 @@ Runs a get query for a given item definition and its args
 | `arg.cacheStore` | `boolean` | whether to store the results in the cache |
 | `arg.cacheStoreMetadata?` | `any` | - |
 | `arg.cacheStoreMetadataMismatchAction?` | [`CacheMetadataMismatchActionFn`](client_internal_gql_client_util.md#cachemetadatamismatchactionfn) \| [`ICacheMetadataMismatchAction`](../interfaces/client_internal_gql_client_util.ICacheMetadataMismatchAction.md) | - |
-| `arg.currentKnownMetadata?` | [`ICacheMetadataMatchType`](../interfaces/client_internal_workers_cache_cache_worker.ICacheMetadataMatchType.md) | - |
+| `arg.currentKnownMetadata?` | [`ICacheMetadataMatchType`](../interfaces/client_internal_workers_cache_cache_worker_class.ICacheMetadataMatchType.md) | - |
 | `arg.fields` | [`IGQLRequestFields`](../interfaces/gql_querier.IGQLRequestFields.md) | the fields we are requesting |
 | `arg.id` | `string` | the id we are requesting for |
 | `arg.itemDefinition` | [`default`](../classes/base_Root_Module_ItemDefinition.default.md) | the item definition we are requesting for |
@@ -482,6 +504,7 @@ Runs a get query for a given item definition and its args
 | `arg.token` | `string` | the token we are using |
 | `arg.version` | `string` | the version we are requesting for |
 | `arg.waitAndMerge?` | `boolean` | - |
+| `options` | `IRunQueryOptions` | - |
 
 #### Returns
 
@@ -491,7 +514,7 @@ a promise with a bunch of information
 
 #### Defined in
 
-[client/internal/gql-client-util.ts:795](https://github.com/onzag/itemize/blob/f2db74a5/client/internal/gql-client-util.ts#L795)
+[client/internal/gql-client-util.ts:820](https://github.com/onzag/itemize/blob/a24376ed/client/internal/gql-client-util.ts#L820)
 
 ___
 
@@ -518,4 +541,4 @@ be equal to the limit, and the offset given
 
 #### Defined in
 
-[client/internal/gql-client-util.ts:1635](https://github.com/onzag/itemize/blob/f2db74a5/client/internal/gql-client-util.ts#L1635)
+[client/internal/gql-client-util.ts:1750](https://github.com/onzag/itemize/blob/a24376ed/client/internal/gql-client-util.ts#L1750)

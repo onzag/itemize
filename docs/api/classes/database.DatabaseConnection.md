@@ -34,6 +34,7 @@ to exist as a single instance and execute transactions
 - [query](database.DatabaseConnection.md#query)
 - [queryFirst](database.DatabaseConnection.md#queryfirst)
 - [queryRows](database.DatabaseConnection.md#queryrows)
+- [startSingleClientOperation](database.DatabaseConnection.md#startsingleclientoperation)
 - [startTransaction](database.DatabaseConnection.md#starttransaction)
 - [suppressLogging](database.DatabaseConnection.md#suppresslogging)
 
@@ -55,7 +56,7 @@ Constructs a new database connection
 
 #### Defined in
 
-[database/index.ts:62](https://github.com/onzag/itemize/blob/f2db74a5/database/index.ts#L62)
+[database/index.ts:62](https://github.com/onzag/itemize/blob/a24376ed/database/index.ts#L62)
 
 ## Properties
 
@@ -69,7 +70,7 @@ for child connections used for transactions
 
 #### Defined in
 
-[database/index.ts:44](https://github.com/onzag/itemize/blob/f2db74a5/database/index.ts#L44)
+[database/index.ts:44](https://github.com/onzag/itemize/blob/a24376ed/database/index.ts#L44)
 
 ___
 
@@ -81,7 +82,7 @@ Forces the logging even if env is not development
 
 #### Defined in
 
-[database/index.ts:54](https://github.com/onzag/itemize/blob/f2db74a5/database/index.ts#L54)
+[database/index.ts:54](https://github.com/onzag/itemize/blob/a24376ed/database/index.ts#L54)
 
 ___
 
@@ -93,7 +94,7 @@ This is the pg pool
 
 #### Defined in
 
-[database/index.ts:38](https://github.com/onzag/itemize/blob/f2db74a5/database/index.ts#L38)
+[database/index.ts:38](https://github.com/onzag/itemize/blob/a24376ed/database/index.ts#L38)
 
 ___
 
@@ -105,7 +106,7 @@ Suppresses console logging
 
 #### Defined in
 
-[database/index.ts:49](https://github.com/onzag/itemize/blob/f2db74a5/database/index.ts#L49)
+[database/index.ts:49](https://github.com/onzag/itemize/blob/a24376ed/database/index.ts#L49)
 
 ## Methods
 
@@ -122,7 +123,7 @@ development
 
 #### Defined in
 
-[database/index.ts:84](https://github.com/onzag/itemize/blob/f2db74a5/database/index.ts#L84)
+[database/index.ts:84](https://github.com/onzag/itemize/blob/a24376ed/database/index.ts#L84)
 
 ___
 
@@ -140,7 +141,7 @@ a new alter table builder
 
 #### Defined in
 
-[database/index.ts:225](https://github.com/onzag/itemize/blob/f2db74a5/database/index.ts#L225)
+[database/index.ts:225](https://github.com/onzag/itemize/blob/a24376ed/database/index.ts#L225)
 
 ___
 
@@ -158,7 +159,7 @@ the client
 
 #### Defined in
 
-[database/index.ts:241](https://github.com/onzag/itemize/blob/f2db74a5/database/index.ts#L241)
+[database/index.ts:241](https://github.com/onzag/itemize/blob/a24376ed/database/index.ts#L241)
 
 ___
 
@@ -176,7 +177,7 @@ a new create table builder
 
 #### Defined in
 
-[database/index.ts:217](https://github.com/onzag/itemize/blob/f2db74a5/database/index.ts#L217)
+[database/index.ts:217](https://github.com/onzag/itemize/blob/a24376ed/database/index.ts#L217)
 
 ___
 
@@ -194,7 +195,7 @@ a new insert builder
 
 #### Defined in
 
-[database/index.ts:209](https://github.com/onzag/itemize/blob/f2db74a5/database/index.ts#L209)
+[database/index.ts:209](https://github.com/onzag/itemize/blob/a24376ed/database/index.ts#L209)
 
 ___
 
@@ -212,7 +213,7 @@ the pool
 
 #### Defined in
 
-[database/index.ts:233](https://github.com/onzag/itemize/blob/f2db74a5/database/index.ts#L233)
+[database/index.ts:233](https://github.com/onzag/itemize/blob/a24376ed/database/index.ts#L233)
 
 ___
 
@@ -230,7 +231,7 @@ a new select builder
 
 #### Defined in
 
-[database/index.ts:201](https://github.com/onzag/itemize/blob/f2db74a5/database/index.ts#L201)
+[database/index.ts:201](https://github.com/onzag/itemize/blob/a24376ed/database/index.ts#L201)
 
 ___
 
@@ -248,7 +249,7 @@ a new update builder
 
 #### Defined in
 
-[database/index.ts:193](https://github.com/onzag/itemize/blob/f2db74a5/database/index.ts#L193)
+[database/index.ts:193](https://github.com/onzag/itemize/blob/a24376ed/database/index.ts#L193)
 
 ___
 
@@ -274,7 +275,7 @@ a promise of a query result
 
 #### Defined in
 
-[database/index.ts:95](https://github.com/onzag/itemize/blob/f2db74a5/database/index.ts#L95)
+[database/index.ts:95](https://github.com/onzag/itemize/blob/a24376ed/database/index.ts#L95)
 
 ___
 
@@ -300,7 +301,7 @@ a promise of a single row
 
 #### Defined in
 
-[database/index.ts:185](https://github.com/onzag/itemize/blob/f2db74a5/database/index.ts#L185)
+[database/index.ts:185](https://github.com/onzag/itemize/blob/a24376ed/database/index.ts#L185)
 
 ___
 
@@ -326,21 +327,55 @@ a promise of a list of rows
 
 #### Defined in
 
-[database/index.ts:174](https://github.com/onzag/itemize/blob/f2db74a5/database/index.ts#L174)
+[database/index.ts:174](https://github.com/onzag/itemize/blob/a24376ed/database/index.ts#L174)
+
+___
+
+### startSingleClientOperation
+
+▸ **startSingleClientOperation**(`arg`): `Promise`<`any`\>
+
+Starts a single client operation without starting a transaction
+so whatever happens here cannot be rolled back nor commited
+
+DO NOT USE for changes in the DB because they will be executed immediately
+USE for select cursors that are using WITH HOLD as they persist within
+a single client
+
+#### Parameters
+
+| Name | Type |
+| :------ | :------ |
+| `arg` | (`transactingClient`: [`DatabaseConnection`](database.DatabaseConnection.md)) => `Promise`<`any`\> |
+
+#### Returns
+
+`Promise`<`any`\>
+
+#### Defined in
+
+[database/index.ts:256](https://github.com/onzag/itemize/blob/a24376ed/database/index.ts#L256)
 
 ___
 
 ### startTransaction
 
-▸ **startTransaction**(`arg`): `Promise`<`any`\>
+▸ **startTransaction**(`arg`, `options?`): `Promise`<`any`\>
 
 Starts a transaction, while handling rollbacks and everything
+if provided a client to already use in the transaction it will not be auto-released
+all changes are automatically rolled back
 
 #### Parameters
 
 | Name | Type | Description |
 | :------ | :------ | :------ |
 | `arg` | (`transactingClient`: [`DatabaseConnection`](database.DatabaseConnection.md)) => `Promise`<`any`\> | a function that returns anything and handles the transacting client |
+| `options` | `Object` | - |
+| `options.noAutoCommit?` | `boolean` | - |
+| `options.noAutoRollback?` | `boolean` | - |
+| `options.noBegin?` | `boolean` | - |
+| `options.useClient?` | [`DatabaseConnection`](database.DatabaseConnection.md) | - |
 
 #### Returns
 
@@ -350,7 +385,7 @@ whatever you returned in your arg function
 
 #### Defined in
 
-[database/index.ts:250](https://github.com/onzag/itemize/blob/f2db74a5/database/index.ts#L250)
+[database/index.ts:293](https://github.com/onzag/itemize/blob/a24376ed/database/index.ts#L293)
 
 ___
 
@@ -366,4 +401,4 @@ Suppresses console logging
 
 #### Defined in
 
-[database/index.ts:76](https://github.com/onzag/itemize/blob/f2db74a5/database/index.ts#L76)
+[database/index.ts:76](https://github.com/onzag/itemize/blob/a24376ed/database/index.ts#L76)

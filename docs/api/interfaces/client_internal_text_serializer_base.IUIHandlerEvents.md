@@ -35,7 +35,7 @@
 
 #### Defined in
 
-[client/internal/text/serializer/base.tsx:18](https://github.com/onzag/itemize/blob/f2db74a5/client/internal/text/serializer/base.tsx#L18)
+[client/internal/text/serializer/base.tsx:18](https://github.com/onzag/itemize/blob/a24376ed/client/internal/text/serializer/base.tsx#L18)
 
 ___
 
@@ -45,7 +45,7 @@ ___
 
 #### Defined in
 
-[client/internal/text/serializer/base.tsx:17](https://github.com/onzag/itemize/blob/f2db74a5/client/internal/text/serializer/base.tsx#L17)
+[client/internal/text/serializer/base.tsx:17](https://github.com/onzag/itemize/blob/a24376ed/client/internal/text/serializer/base.tsx#L17)
 
 ___
 
@@ -55,7 +55,7 @@ ___
 
 #### Defined in
 
-[client/internal/text/serializer/base.tsx:19](https://github.com/onzag/itemize/blob/f2db74a5/client/internal/text/serializer/base.tsx#L19)
+[client/internal/text/serializer/base.tsx:19](https://github.com/onzag/itemize/blob/a24376ed/client/internal/text/serializer/base.tsx#L19)
 
 ___
 
@@ -65,7 +65,7 @@ ___
 
 #### Defined in
 
-[client/internal/text/serializer/base.tsx:20](https://github.com/onzag/itemize/blob/f2db74a5/client/internal/text/serializer/base.tsx#L20)
+[client/internal/text/serializer/base.tsx:20](https://github.com/onzag/itemize/blob/a24376ed/client/internal/text/serializer/base.tsx#L20)
 
 ___
 
@@ -75,7 +75,7 @@ ___
 
 #### Defined in
 
-[client/internal/text/serializer/base.tsx:21](https://github.com/onzag/itemize/blob/f2db74a5/client/internal/text/serializer/base.tsx#L21)
+[client/internal/text/serializer/base.tsx:21](https://github.com/onzag/itemize/blob/a24376ed/client/internal/text/serializer/base.tsx#L21)
 
 ___
 
@@ -85,7 +85,7 @@ ___
 
 #### Defined in
 
-[client/internal/text/serializer/base.tsx:22](https://github.com/onzag/itemize/blob/f2db74a5/client/internal/text/serializer/base.tsx#L22)
+[client/internal/text/serializer/base.tsx:22](https://github.com/onzag/itemize/blob/a24376ed/client/internal/text/serializer/base.tsx#L22)
 
 ___
 
@@ -95,7 +95,7 @@ ___
 
 #### Defined in
 
-[client/internal/text/serializer/base.tsx:23](https://github.com/onzag/itemize/blob/f2db74a5/client/internal/text/serializer/base.tsx#L23)
+[client/internal/text/serializer/base.tsx:23](https://github.com/onzag/itemize/blob/a24376ed/client/internal/text/serializer/base.tsx#L23)
 
 ___
 
@@ -105,7 +105,7 @@ ___
 
 #### Defined in
 
-[client/internal/text/serializer/base.tsx:24](https://github.com/onzag/itemize/blob/f2db74a5/client/internal/text/serializer/base.tsx#L24)
+[client/internal/text/serializer/base.tsx:24](https://github.com/onzag/itemize/blob/a24376ed/client/internal/text/serializer/base.tsx#L24)
 
 ___
 
@@ -115,7 +115,7 @@ ___
 
 #### Defined in
 
-[client/internal/text/serializer/base.tsx:25](https://github.com/onzag/itemize/blob/f2db74a5/client/internal/text/serializer/base.tsx#L25)
+[client/internal/text/serializer/base.tsx:25](https://github.com/onzag/itemize/blob/a24376ed/client/internal/text/serializer/base.tsx#L25)
 
 ___
 
@@ -125,7 +125,7 @@ ___
 
 #### Defined in
 
-[client/internal/text/serializer/base.tsx:26](https://github.com/onzag/itemize/blob/f2db74a5/client/internal/text/serializer/base.tsx#L26)
+[client/internal/text/serializer/base.tsx:26](https://github.com/onzag/itemize/blob/a24376ed/client/internal/text/serializer/base.tsx#L26)
 
 ___
 
@@ -135,7 +135,7 @@ ___
 
 #### Defined in
 
-[client/internal/text/serializer/base.tsx:27](https://github.com/onzag/itemize/blob/f2db74a5/client/internal/text/serializer/base.tsx#L27)
+[client/internal/text/serializer/base.tsx:27](https://github.com/onzag/itemize/blob/a24376ed/client/internal/text/serializer/base.tsx#L27)
 
 ___
 
@@ -145,7 +145,7 @@ ___
 
 #### Defined in
 
-[client/internal/text/serializer/base.tsx:28](https://github.com/onzag/itemize/blob/f2db74a5/client/internal/text/serializer/base.tsx#L28)
+[client/internal/text/serializer/base.tsx:28](https://github.com/onzag/itemize/blob/a24376ed/client/internal/text/serializer/base.tsx#L28)
 
 ___
 
@@ -155,7 +155,7 @@ ___
 
 #### Defined in
 
-[client/internal/text/serializer/base.tsx:29](https://github.com/onzag/itemize/blob/f2db74a5/client/internal/text/serializer/base.tsx#L29)
+[client/internal/text/serializer/base.tsx:29](https://github.com/onzag/itemize/blob/a24376ed/client/internal/text/serializer/base.tsx#L29)
 
 ___
 
@@ -165,7 +165,7 @@ ___
 
 #### Defined in
 
-[client/internal/text/serializer/base.tsx:33](https://github.com/onzag/itemize/blob/f2db74a5/client/internal/text/serializer/base.tsx#L33)
+[client/internal/text/serializer/base.tsx:33](https://github.com/onzag/itemize/blob/a24376ed/client/internal/text/serializer/base.tsx#L33)
 
 ___
 
@@ -175,7 +175,7 @@ ___
 
 #### Defined in
 
-[client/internal/text/serializer/base.tsx:32](https://github.com/onzag/itemize/blob/f2db74a5/client/internal/text/serializer/base.tsx#L32)
+[client/internal/text/serializer/base.tsx:32](https://github.com/onzag/itemize/blob/a24376ed/client/internal/text/serializer/base.tsx#L32)
 
 ___
 
@@ -185,7 +185,7 @@ ___
 
 #### Defined in
 
-[client/internal/text/serializer/base.tsx:31](https://github.com/onzag/itemize/blob/f2db74a5/client/internal/text/serializer/base.tsx#L31)
+[client/internal/text/serializer/base.tsx:31](https://github.com/onzag/itemize/blob/a24376ed/client/internal/text/serializer/base.tsx#L31)
 
 ___
 
@@ -195,7 +195,7 @@ ___
 
 #### Defined in
 
-[client/internal/text/serializer/base.tsx:30](https://github.com/onzag/itemize/blob/f2db74a5/client/internal/text/serializer/base.tsx#L30)
+[client/internal/text/serializer/base.tsx:30](https://github.com/onzag/itemize/blob/a24376ed/client/internal/text/serializer/base.tsx#L30)
 
 ___
 
@@ -205,4 +205,4 @@ ___
 
 #### Defined in
 
-[client/internal/text/serializer/base.tsx:34](https://github.com/onzag/itemize/blob/f2db74a5/client/internal/text/serializer/base.tsx#L34)
+[client/internal/text/serializer/base.tsx:34](https://github.com/onzag/itemize/blob/a24376ed/client/internal/text/serializer/base.tsx#L34)

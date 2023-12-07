@@ -31,7 +31,7 @@
 
 #### Defined in
 
-[base/remote-protocol.ts:295](https://github.com/onzag/itemize/blob/f2db74a5/base/remote-protocol.ts#L295)
+[base/remote-protocol.ts:295](https://github.com/onzag/itemize/blob/a24376ed/base/remote-protocol.ts#L295)
 
 ___
 
@@ -45,7 +45,7 @@ ___
 
 #### Defined in
 
-[base/remote-protocol.ts:294](https://github.com/onzag/itemize/blob/f2db74a5/base/remote-protocol.ts#L294)
+[base/remote-protocol.ts:294](https://github.com/onzag/itemize/blob/a24376ed/base/remote-protocol.ts#L294)
 
 ___
 
@@ -55,7 +55,7 @@ ___
 
 #### Defined in
 
-[client/internal/testing.ts:63](https://github.com/onzag/itemize/blob/f2db74a5/client/internal/testing.ts#L63)
+[client/internal/testing.ts:63](https://github.com/onzag/itemize/blob/a24376ed/client/internal/testing.ts#L63)
 
 ___
 
@@ -69,4 +69,4 @@ ___
 
 #### Defined in
 
-[base/remote-protocol.ts:296](https://github.com/onzag/itemize/blob/f2db74a5/base/remote-protocol.ts#L296)
+[base/remote-protocol.ts:296](https://github.com/onzag/itemize/blob/a24376ed/base/remote-protocol.ts#L296)

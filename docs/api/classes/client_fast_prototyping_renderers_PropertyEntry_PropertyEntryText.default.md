@@ -67,7 +67,7 @@ React.PureComponent&lt;IPropertyEntryTextRendererProps, IPropertyEntryTextRender
 
 #### Defined in
 
-[client/fast-prototyping/renderers/PropertyEntry/PropertyEntryText.tsx:129](https://github.com/onzag/itemize/blob/f2db74a5/client/fast-prototyping/renderers/PropertyEntry/PropertyEntryText.tsx#L129)
+[client/fast-prototyping/renderers/PropertyEntry/PropertyEntryText.tsx:129](https://github.com/onzag/itemize/blob/a24376ed/client/fast-prototyping/renderers/PropertyEntry/PropertyEntryText.tsx#L129)
 
 ## Properties
 
@@ -570,7 +570,7 @@ ___
 
 #### Defined in
 
-[client/fast-prototyping/renderers/PropertyEntry/PropertyEntryText.tsx:146](https://github.com/onzag/itemize/blob/f2db74a5/client/fast-prototyping/renderers/PropertyEntry/PropertyEntryText.tsx#L146)
+[client/fast-prototyping/renderers/PropertyEntry/PropertyEntryText.tsx:146](https://github.com/onzag/itemize/blob/a24376ed/client/fast-prototyping/renderers/PropertyEntry/PropertyEntryText.tsx#L146)
 
 ___
 
@@ -591,7 +591,7 @@ ___
 
 #### Defined in
 
-[client/fast-prototyping/renderers/PropertyEntry/PropertyEntryText.tsx:152](https://github.com/onzag/itemize/blob/f2db74a5/client/fast-prototyping/renderers/PropertyEntry/PropertyEntryText.tsx#L152)
+[client/fast-prototyping/renderers/PropertyEntry/PropertyEntryText.tsx:152](https://github.com/onzag/itemize/blob/a24376ed/client/fast-prototyping/renderers/PropertyEntry/PropertyEntryText.tsx#L152)
 
 ___
 
@@ -605,7 +605,7 @@ ___
 
 #### Defined in
 
-[client/fast-prototyping/renderers/PropertyEntry/PropertyEntryText.tsx:141](https://github.com/onzag/itemize/blob/f2db74a5/client/fast-prototyping/renderers/PropertyEntry/PropertyEntryText.tsx#L141)
+[client/fast-prototyping/renderers/PropertyEntry/PropertyEntryText.tsx:141](https://github.com/onzag/itemize/blob/a24376ed/client/fast-prototyping/renderers/PropertyEntry/PropertyEntryText.tsx#L141)
 
 ___
 
@@ -623,7 +623,7 @@ React.PureComponent.render
 
 #### Defined in
 
-[client/fast-prototyping/renderers/PropertyEntry/PropertyEntryText.tsx:163](https://github.com/onzag/itemize/blob/f2db74a5/client/fast-prototyping/renderers/PropertyEntry/PropertyEntryText.tsx#L163)
+[client/fast-prototyping/renderers/PropertyEntry/PropertyEntryText.tsx:163](https://github.com/onzag/itemize/blob/a24376ed/client/fast-prototyping/renderers/PropertyEntry/PropertyEntryText.tsx#L163)
 
 ___
 

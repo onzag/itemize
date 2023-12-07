@@ -11,6 +11,7 @@ is added
 
 - [addItemDefinition](server_resolvers_actions_add.md#additemdefinition)
 - [addItemDefinitionFn](server_resolvers_actions_add.md#additemdefinitionfn)
+- [addItemDefinitionFnRQ](server_resolvers_actions_add.md#additemdefinitionfnrq)
 
 ## Functions
 
@@ -32,7 +33,7 @@ is added
 
 #### Defined in
 
-[server/resolvers/actions/add.ts:47](https://github.com/onzag/itemize/blob/f2db74a5/server/resolvers/actions/add.ts#L47)
+[server/resolvers/actions/add.ts:49](https://github.com/onzag/itemize/blob/a24376ed/server/resolvers/actions/add.ts#L49)
 
 ___
 
@@ -52,4 +53,24 @@ ___
 
 #### Defined in
 
-[server/resolvers/actions/add.ts:665](https://github.com/onzag/itemize/blob/f2db74a5/server/resolvers/actions/add.ts#L665)
+[server/resolvers/actions/add.ts:731](https://github.com/onzag/itemize/blob/a24376ed/server/resolvers/actions/add.ts#L731)
+
+___
+
+### addItemDefinitionFnRQ
+
+▸ **addItemDefinitionFnRQ**(`appData`): [`FRQIdefResolverType`](base_Root_rq.md#frqidefresolvertype)
+
+#### Parameters
+
+| Name | Type |
+| :------ | :------ |
+| `appData` | [`IAppDataType`](../interfaces/server.IAppDataType.md) |
+
+#### Returns
+
+[`FRQIdefResolverType`](base_Root_rq.md#frqidefresolvertype)
+
+#### Defined in
+
+[server/resolvers/actions/add.ts:735](https://github.com/onzag/itemize/blob/a24376ed/server/resolvers/actions/add.ts#L735)

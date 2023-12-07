@@ -392,7 +392,6 @@ Represents the code that is used primarily in the client side.
     * [PropertyViewFile](modules/client_internal_components_PropertyView_PropertyViewFile.md)
     * [PropertyViewFiles](modules/client_internal_components_PropertyView_PropertyViewFiles.md)
     * [PropertyViewLocation](modules/client_internal_components_PropertyView_PropertyViewLocation.md)
-    * [PropertyViewReference](modules/client_internal_components_PropertyView_PropertyViewReference.md)
     * [PropertyViewSimple](modules/client_internal_components_PropertyView_PropertyViewSimple.md)
     * [PropertyViewText](modules/client_internal_components_PropertyView_PropertyViewText.md)
     * [PropertyViewPayment](modules/client_internal_components_PropertyView_PropertyViewPayment.md)

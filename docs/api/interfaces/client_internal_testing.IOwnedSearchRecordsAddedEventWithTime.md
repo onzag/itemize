@@ -36,7 +36,7 @@
 
 #### Defined in
 
-[base/remote-protocol.ts:138](https://github.com/onzag/itemize/blob/f2db74a5/base/remote-protocol.ts#L138)
+[base/remote-protocol.ts:138](https://github.com/onzag/itemize/blob/a24376ed/base/remote-protocol.ts#L138)
 
 ___
 
@@ -50,7 +50,7 @@ ___
 
 #### Defined in
 
-[base/remote-protocol.ts:112](https://github.com/onzag/itemize/blob/f2db74a5/base/remote-protocol.ts#L112)
+[base/remote-protocol.ts:112](https://github.com/onzag/itemize/blob/a24376ed/base/remote-protocol.ts#L112)
 
 ___
 
@@ -64,7 +64,7 @@ ___
 
 #### Defined in
 
-[base/remote-protocol.ts:117](https://github.com/onzag/itemize/blob/f2db74a5/base/remote-protocol.ts#L117)
+[base/remote-protocol.ts:117](https://github.com/onzag/itemize/blob/a24376ed/base/remote-protocol.ts#L117)
 
 ___
 
@@ -80,7 +80,7 @@ the records that have been deleted
 
 #### Defined in
 
-[base/remote-protocol.ts:116](https://github.com/onzag/itemize/blob/f2db74a5/base/remote-protocol.ts#L116)
+[base/remote-protocol.ts:116](https://github.com/onzag/itemize/blob/a24376ed/base/remote-protocol.ts#L116)
 
 ___
 
@@ -96,7 +96,7 @@ the records that have been modified
 
 #### Defined in
 
-[base/remote-protocol.ts:121](https://github.com/onzag/itemize/blob/f2db74a5/base/remote-protocol.ts#L121)
+[base/remote-protocol.ts:121](https://github.com/onzag/itemize/blob/a24376ed/base/remote-protocol.ts#L121)
 
 ___
 
@@ -112,7 +112,7 @@ the new last record search result
 
 #### Defined in
 
-[base/remote-protocol.ts:125](https://github.com/onzag/itemize/blob/f2db74a5/base/remote-protocol.ts#L125)
+[base/remote-protocol.ts:125](https://github.com/onzag/itemize/blob/a24376ed/base/remote-protocol.ts#L125)
 
 ___
 
@@ -128,7 +128,7 @@ the new records that have been added
 
 #### Defined in
 
-[base/remote-protocol.ts:111](https://github.com/onzag/itemize/blob/f2db74a5/base/remote-protocol.ts#L111)
+[base/remote-protocol.ts:111](https://github.com/onzag/itemize/blob/a24376ed/base/remote-protocol.ts#L111)
 
 ___
 
@@ -144,7 +144,7 @@ the qualified path name or type of the either module or item definition
 
 #### Defined in
 
-[base/remote-protocol.ts:107](https://github.com/onzag/itemize/blob/f2db74a5/base/remote-protocol.ts#L107)
+[base/remote-protocol.ts:107](https://github.com/onzag/itemize/blob/a24376ed/base/remote-protocol.ts#L107)
 
 ___
 
@@ -154,4 +154,4 @@ ___
 
 #### Defined in
 
-[client/internal/testing.ts:107](https://github.com/onzag/itemize/blob/f2db74a5/client/internal/testing.ts#L107)
+[client/internal/testing.ts:107](https://github.com/onzag/itemize/blob/a24376ed/client/internal/testing.ts#L107)

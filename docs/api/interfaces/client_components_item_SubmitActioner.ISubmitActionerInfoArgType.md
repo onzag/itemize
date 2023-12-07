@@ -33,7 +33,7 @@ item definition slot
 
 #### Defined in
 
-[client/components/item/SubmitActioner.tsx:29](https://github.com/onzag/itemize/blob/f2db74a5/client/components/item/SubmitActioner.tsx#L29)
+[client/components/item/SubmitActioner.tsx:29](https://github.com/onzag/itemize/blob/a24376ed/client/components/item/SubmitActioner.tsx#L29)
 
 ___
 
@@ -45,7 +45,7 @@ Whether it submitted, sucesfully
 
 #### Defined in
 
-[client/components/item/SubmitActioner.tsx:38](https://github.com/onzag/itemize/blob/f2db74a5/client/components/item/SubmitActioner.tsx#L38)
+[client/components/item/SubmitActioner.tsx:38](https://github.com/onzag/itemize/blob/a24376ed/client/components/item/SubmitActioner.tsx#L38)
 
 ___
 
@@ -58,7 +58,7 @@ as you cannot really submit while submitting
 
 #### Defined in
 
-[client/components/item/SubmitActioner.tsx:34](https://github.com/onzag/itemize/blob/f2db74a5/client/components/item/SubmitActioner.tsx#L34)
+[client/components/item/SubmitActioner.tsx:34](https://github.com/onzag/itemize/blob/a24376ed/client/components/item/SubmitActioner.tsx#L34)
 
 ## Methods
 
@@ -82,7 +82,7 @@ clean function, also a mirror from the item definition one
 
 #### Defined in
 
-[client/components/item/SubmitActioner.tsx:55](https://github.com/onzag/itemize/blob/f2db74a5/client/components/item/SubmitActioner.tsx#L55)
+[client/components/item/SubmitActioner.tsx:55](https://github.com/onzag/itemize/blob/a24376ed/client/components/item/SubmitActioner.tsx#L55)
 
 ___
 
@@ -98,7 +98,7 @@ Dismiss the error state, and make it clean
 
 #### Defined in
 
-[client/components/item/SubmitActioner.tsx:42](https://github.com/onzag/itemize/blob/f2db74a5/client/components/item/SubmitActioner.tsx#L42)
+[client/components/item/SubmitActioner.tsx:42](https://github.com/onzag/itemize/blob/a24376ed/client/components/item/SubmitActioner.tsx#L42)
 
 ___
 
@@ -114,7 +114,7 @@ dismiss the submitted state and make it clean
 
 #### Defined in
 
-[client/components/item/SubmitActioner.tsx:46](https://github.com/onzag/itemize/blob/f2db74a5/client/components/item/SubmitActioner.tsx#L46)
+[client/components/item/SubmitActioner.tsx:46](https://github.com/onzag/itemize/blob/a24376ed/client/components/item/SubmitActioner.tsx#L46)
 
 ___
 
@@ -137,4 +137,4 @@ item definition provider one
 
 #### Defined in
 
-[client/components/item/SubmitActioner.tsx:51](https://github.com/onzag/itemize/blob/f2db74a5/client/components/item/SubmitActioner.tsx#L51)
+[client/components/item/SubmitActioner.tsx:51](https://github.com/onzag/itemize/blob/a24376ed/client/components/item/SubmitActioner.tsx#L51)

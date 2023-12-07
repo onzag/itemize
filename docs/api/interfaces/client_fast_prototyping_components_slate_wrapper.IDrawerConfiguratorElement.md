@@ -21,7 +21,7 @@ Specifies a configurator to be added to the drawer
 
 #### Defined in
 
-[client/fast-prototyping/components/slate/wrapper.tsx:382](https://github.com/onzag/itemize/blob/f2db74a5/client/fast-prototyping/components/slate/wrapper.tsx#L382)
+[client/fast-prototyping/components/slate/wrapper.tsx:384](https://github.com/onzag/itemize/blob/a24376ed/client/fast-prototyping/components/slate/wrapper.tsx#L384)
 
 ___
 
@@ -31,4 +31,4 @@ ___
 
 #### Defined in
 
-[client/fast-prototyping/components/slate/wrapper.tsx:381](https://github.com/onzag/itemize/blob/f2db74a5/client/fast-prototyping/components/slate/wrapper.tsx#L381)
+[client/fast-prototyping/components/slate/wrapper.tsx:383](https://github.com/onzag/itemize/blob/a24376ed/client/fast-prototyping/components/slate/wrapper.tsx#L383)

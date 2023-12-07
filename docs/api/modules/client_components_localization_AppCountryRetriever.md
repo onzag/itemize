@@ -38,7 +38,7 @@ a react node
 
 #### Defined in
 
-[client/components/localization/AppCountryRetriever.tsx:59](https://github.com/onzag/itemize/blob/f2db74a5/client/components/localization/AppCountryRetriever.tsx#L59)
+[client/components/localization/AppCountryRetriever.tsx:59](https://github.com/onzag/itemize/blob/a24376ed/client/components/localization/AppCountryRetriever.tsx#L59)
 
 ___
 
@@ -58,4 +58,4 @@ ___
 
 #### Defined in
 
-[client/components/localization/AppCountryRetriever.tsx:95](https://github.com/onzag/itemize/blob/f2db74a5/client/components/localization/AppCountryRetriever.tsx#L95)
+[client/components/localization/AppCountryRetriever.tsx:95](https://github.com/onzag/itemize/blob/a24376ed/client/components/localization/AppCountryRetriever.tsx#L95)

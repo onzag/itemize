@@ -8,10 +8,13 @@
 
 - [getItemDefinition](server_resolvers_actions_get.md#getitemdefinition)
 - [getItemDefinitionFn](server_resolvers_actions_get.md#getitemdefinitionfn)
+- [getItemDefinitionFnRQ](server_resolvers_actions_get.md#getitemdefinitionfnrq)
 - [getItemDefinitionList](server_resolvers_actions_get.md#getitemdefinitionlist)
 - [getItemDefinitionListFn](server_resolvers_actions_get.md#getitemdefinitionlistfn)
+- [getItemDefinitionListFnRQ](server_resolvers_actions_get.md#getitemdefinitionlistfnrq)
 - [getModuleList](server_resolvers_actions_get.md#getmodulelist)
 - [getModuleListFn](server_resolvers_actions_get.md#getmodulelistfn)
+- [getModuleListFnRQ](server_resolvers_actions_get.md#getmodulelistfnrq)
 
 ## Functions
 
@@ -33,7 +36,7 @@
 
 #### Defined in
 
-[server/resolvers/actions/get.ts:36](https://github.com/onzag/itemize/blob/f2db74a5/server/resolvers/actions/get.ts#L36)
+[server/resolvers/actions/get.ts:36](https://github.com/onzag/itemize/blob/a24376ed/server/resolvers/actions/get.ts#L36)
 
 ___
 
@@ -53,7 +56,27 @@ ___
 
 #### Defined in
 
-[server/resolvers/actions/get.ts:883](https://github.com/onzag/itemize/blob/f2db74a5/server/resolvers/actions/get.ts#L883)
+[server/resolvers/actions/get.ts:924](https://github.com/onzag/itemize/blob/a24376ed/server/resolvers/actions/get.ts#L924)
+
+___
+
+### getItemDefinitionFnRQ
+
+▸ **getItemDefinitionFnRQ**(`appData`): [`FRQIdefResolverType`](base_Root_rq.md#frqidefresolvertype)
+
+#### Parameters
+
+| Name | Type |
+| :------ | :------ |
+| `appData` | [`IAppDataType`](../interfaces/server.IAppDataType.md) |
+
+#### Returns
+
+[`FRQIdefResolverType`](base_Root_rq.md#frqidefresolvertype)
+
+#### Defined in
+
+[server/resolvers/actions/get.ts:936](https://github.com/onzag/itemize/blob/a24376ed/server/resolvers/actions/get.ts#L936)
 
 ___
 
@@ -75,7 +98,7 @@ ___
 
 #### Defined in
 
-[server/resolvers/actions/get.ts:301](https://github.com/onzag/itemize/blob/f2db74a5/server/resolvers/actions/get.ts#L301)
+[server/resolvers/actions/get.ts:315](https://github.com/onzag/itemize/blob/a24376ed/server/resolvers/actions/get.ts#L315)
 
 ___
 
@@ -95,7 +118,27 @@ ___
 
 #### Defined in
 
-[server/resolvers/actions/get.ts:887](https://github.com/onzag/itemize/blob/f2db74a5/server/resolvers/actions/get.ts#L887)
+[server/resolvers/actions/get.ts:928](https://github.com/onzag/itemize/blob/a24376ed/server/resolvers/actions/get.ts#L928)
+
+___
+
+### getItemDefinitionListFnRQ
+
+▸ **getItemDefinitionListFnRQ**(`appData`): [`FRQIdefResolverType`](base_Root_rq.md#frqidefresolvertype)
+
+#### Parameters
+
+| Name | Type |
+| :------ | :------ |
+| `appData` | [`IAppDataType`](../interfaces/server.IAppDataType.md) |
+
+#### Returns
+
+[`FRQIdefResolverType`](base_Root_rq.md#frqidefresolvertype)
+
+#### Defined in
+
+[server/resolvers/actions/get.ts:940](https://github.com/onzag/itemize/blob/a24376ed/server/resolvers/actions/get.ts#L940)
 
 ___
 
@@ -117,7 +160,7 @@ ___
 
 #### Defined in
 
-[server/resolvers/actions/get.ts:603](https://github.com/onzag/itemize/blob/f2db74a5/server/resolvers/actions/get.ts#L603)
+[server/resolvers/actions/get.ts:638](https://github.com/onzag/itemize/blob/a24376ed/server/resolvers/actions/get.ts#L638)
 
 ___
 
@@ -137,4 +180,24 @@ ___
 
 #### Defined in
 
-[server/resolvers/actions/get.ts:891](https://github.com/onzag/itemize/blob/f2db74a5/server/resolvers/actions/get.ts#L891)
+[server/resolvers/actions/get.ts:932](https://github.com/onzag/itemize/blob/a24376ed/server/resolvers/actions/get.ts#L932)
+
+___
+
+### getModuleListFnRQ
+
+▸ **getModuleListFnRQ**(`appData`): [`FRQModResolverType`](base_Root_rq.md#frqmodresolvertype)
+
+#### Parameters
+
+| Name | Type |
+| :------ | :------ |
+| `appData` | [`IAppDataType`](../interfaces/server.IAppDataType.md) |
+
+#### Returns
+
+[`FRQModResolverType`](base_Root_rq.md#frqmodresolvertype)
+
+#### Defined in
+
+[server/resolvers/actions/get.ts:944](https://github.com/onzag/itemize/blob/a24376ed/server/resolvers/actions/get.ts#L944)

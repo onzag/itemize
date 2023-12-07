@@ -54,6 +54,7 @@ are to be defined
 - [cleanValueFor](base_Root_Module_ItemDefinition_PropertyDefinition.default.md#cleanvaluefor)
 - [clearSuperEnforced](base_Root_Module_ItemDefinition_PropertyDefinition.default.md#clearsuperenforced)
 - [getAppliedValue](base_Root_Module_ItemDefinition_PropertyDefinition.default.md#getappliedvalue)
+- [getConfigValue](base_Root_Module_ItemDefinition_PropertyDefinition.default.md#getconfigvalue)
 - [getCurrentValue](base_Root_Module_ItemDefinition_PropertyDefinition.default.md#getcurrentvalue)
 - [getDefaultValue](base_Root_Module_ItemDefinition_PropertyDefinition.default.md#getdefaultvalue)
 - [getEnforcedValue](base_Root_Module_ItemDefinition_PropertyDefinition.default.md#getenforcedvalue)
@@ -66,6 +67,8 @@ are to be defined
 - [getNewInstance](base_Root_Module_ItemDefinition_PropertyDefinition.default.md#getnewinstance)
 - [getParentItemDefinition](base_Root_Module_ItemDefinition_PropertyDefinition.default.md#getparentitemdefinition)
 - [getParentModule](base_Root_Module_ItemDefinition_PropertyDefinition.default.md#getparentmodule)
+- [getPointerSynchronizationProperty](base_Root_Module_ItemDefinition_PropertyDefinition.default.md#getpointersynchronizationproperty)
+- [getPointerTargetItem](base_Root_Module_ItemDefinition_PropertyDefinition.default.md#getpointertargetitem)
 - [getPolicyName](base_Root_Module_ItemDefinition_PropertyDefinition.default.md#getpolicyname)
 - [getPolicyType](base_Root_Module_ItemDefinition_PropertyDefinition.default.md#getpolicytype)
 - [getPropertyDefinitionDescription](base_Root_Module_ItemDefinition_PropertyDefinition.default.md#getpropertydefinitiondescription)
@@ -73,7 +76,6 @@ are to be defined
 - [getRequestFields](base_Root_Module_ItemDefinition_PropertyDefinition.default.md#getrequestfields)
 - [getRolesWithAccessTo](base_Root_Module_ItemDefinition_PropertyDefinition.default.md#getroleswithaccessto)
 - [getSearchBoost](base_Root_Module_ItemDefinition_PropertyDefinition.default.md#getsearchboost)
-- [getSpecialProperty](base_Root_Module_ItemDefinition_PropertyDefinition.default.md#getspecialproperty)
 - [getSpecificValidValues](base_Root_Module_ItemDefinition_PropertyDefinition.default.md#getspecificvalidvalues)
 - [getState](base_Root_Module_ItemDefinition_PropertyDefinition.default.md#getstate)
 - [getStateNoExternalChecking](base_Root_Module_ItemDefinition_PropertyDefinition.default.md#getstatenoexternalchecking)
@@ -88,6 +90,8 @@ are to be defined
 - [isList](base_Root_Module_ItemDefinition_PropertyDefinition.default.md#islist)
 - [isNonCaseSensitiveUnique](base_Root_Module_ItemDefinition_PropertyDefinition.default.md#isnoncasesensitiveunique)
 - [isNullable](base_Root_Module_ItemDefinition_PropertyDefinition.default.md#isnullable)
+- [isPointer](base_Root_Module_ItemDefinition_PropertyDefinition.default.md#ispointer)
+- [isPointerList](base_Root_Module_ItemDefinition_PropertyDefinition.default.md#ispointerlist)
 - [isPolicyPropertyDefinition](base_Root_Module_ItemDefinition_PropertyDefinition.default.md#ispolicypropertydefinition)
 - [isRangedSearchDisabled](base_Root_Module_ItemDefinition_PropertyDefinition.default.md#israngedsearchdisabled)
 - [isRetrievalDisabled](base_Root_Module_ItemDefinition_PropertyDefinition.default.md#isretrievaldisabled)
@@ -133,7 +137,7 @@ Builds a property definition
 
 #### Defined in
 
-[base/Root/Module/ItemDefinition/PropertyDefinition/index.ts:961](https://github.com/onzag/itemize/blob/f2db74a5/base/Root/Module/ItemDefinition/PropertyDefinition/index.ts#L961)
+[base/Root/Module/ItemDefinition/PropertyDefinition/index.ts:969](https://github.com/onzag/itemize/blob/a24376ed/base/Root/Module/ItemDefinition/PropertyDefinition/index.ts#L969)
 
 ## Properties
 
@@ -143,7 +147,7 @@ Builds a property definition
 
 #### Defined in
 
-[base/Root/Module/ItemDefinition/PropertyDefinition/index.ts:943](https://github.com/onzag/itemize/blob/f2db74a5/base/Root/Module/ItemDefinition/PropertyDefinition/index.ts#L943)
+[base/Root/Module/ItemDefinition/PropertyDefinition/index.ts:951](https://github.com/onzag/itemize/blob/a24376ed/base/Root/Module/ItemDefinition/PropertyDefinition/index.ts#L951)
 
 ___
 
@@ -155,7 +159,7 @@ Processed rules for default from the raw data
 
 #### Defined in
 
-[base/Root/Module/ItemDefinition/PropertyDefinition/index.ts:853](https://github.com/onzag/itemize/blob/f2db74a5/base/Root/Module/ItemDefinition/PropertyDefinition/index.ts#L853)
+[base/Root/Module/ItemDefinition/PropertyDefinition/index.ts:861](https://github.com/onzag/itemize/blob/a24376ed/base/Root/Module/ItemDefinition/PropertyDefinition/index.ts#L861)
 
 ___
 
@@ -167,7 +171,7 @@ Processed enforced values from the raw data
 
 #### Defined in
 
-[base/Root/Module/ItemDefinition/PropertyDefinition/index.ts:861](https://github.com/onzag/itemize/blob/f2db74a5/base/Root/Module/ItemDefinition/PropertyDefinition/index.ts#L861)
+[base/Root/Module/ItemDefinition/PropertyDefinition/index.ts:869](https://github.com/onzag/itemize/blob/a24376ed/base/Root/Module/ItemDefinition/PropertyDefinition/index.ts#L869)
 
 ___
 
@@ -180,7 +184,7 @@ default value
 
 #### Defined in
 
-[base/Root/Module/ItemDefinition/PropertyDefinition/index.ts:882](https://github.com/onzag/itemize/blob/f2db74a5/base/Root/Module/ItemDefinition/PropertyDefinition/index.ts#L882)
+[base/Root/Module/ItemDefinition/PropertyDefinition/index.ts:890](https://github.com/onzag/itemize/blob/a24376ed/base/Root/Module/ItemDefinition/PropertyDefinition/index.ts#L890)
 
 ___
 
@@ -194,7 +198,7 @@ hence the enforced value is global
 
 #### Defined in
 
-[base/Root/Module/ItemDefinition/PropertyDefinition/index.ts:876](https://github.com/onzag/itemize/blob/f2db74a5/base/Root/Module/ItemDefinition/PropertyDefinition/index.ts#L876)
+[base/Root/Module/ItemDefinition/PropertyDefinition/index.ts:884](https://github.com/onzag/itemize/blob/a24376ed/base/Root/Module/ItemDefinition/PropertyDefinition/index.ts#L884)
 
 ___
 
@@ -206,7 +210,7 @@ Processed hidden conditions from the raw data
 
 #### Defined in
 
-[base/Root/Module/ItemDefinition/PropertyDefinition/index.ts:865](https://github.com/onzag/itemize/blob/f2db74a5/base/Root/Module/ItemDefinition/PropertyDefinition/index.ts#L865)
+[base/Root/Module/ItemDefinition/PropertyDefinition/index.ts:873](https://github.com/onzag/itemize/blob/a24376ed/base/Root/Module/ItemDefinition/PropertyDefinition/index.ts#L873)
 
 ___
 
@@ -218,7 +222,7 @@ Processed rules for invalid if from the raw data
 
 #### Defined in
 
-[base/Root/Module/ItemDefinition/PropertyDefinition/index.ts:857](https://github.com/onzag/itemize/blob/f2db74a5/base/Root/Module/ItemDefinition/PropertyDefinition/index.ts#L857)
+[base/Root/Module/ItemDefinition/PropertyDefinition/index.ts:865](https://github.com/onzag/itemize/blob/a24376ed/base/Root/Module/ItemDefinition/PropertyDefinition/index.ts#L865)
 
 ___
 
@@ -230,7 +234,7 @@ list of listeners
 
 #### Defined in
 
-[base/Root/Module/ItemDefinition/PropertyDefinition/index.ts:869](https://github.com/onzag/itemize/blob/f2db74a5/base/Root/Module/ItemDefinition/PropertyDefinition/index.ts#L869)
+[base/Root/Module/ItemDefinition/PropertyDefinition/index.ts:877](https://github.com/onzag/itemize/blob/a24376ed/base/Root/Module/ItemDefinition/PropertyDefinition/index.ts#L877)
 
 ___
 
@@ -243,7 +247,7 @@ directly attached to the tree
 
 #### Defined in
 
-[base/Root/Module/ItemDefinition/PropertyDefinition/index.ts:848](https://github.com/onzag/itemize/blob/f2db74a5/base/Root/Module/ItemDefinition/PropertyDefinition/index.ts#L848)
+[base/Root/Module/ItemDefinition/PropertyDefinition/index.ts:856](https://github.com/onzag/itemize/blob/a24376ed/base/Root/Module/ItemDefinition/PropertyDefinition/index.ts#L856)
 
 ___
 
@@ -255,7 +259,7 @@ The parent item definition, if any, not available to extensions
 
 #### Defined in
 
-[base/Root/Module/ItemDefinition/PropertyDefinition/index.ts:839](https://github.com/onzag/itemize/blob/f2db74a5/base/Root/Module/ItemDefinition/PropertyDefinition/index.ts#L839)
+[base/Root/Module/ItemDefinition/PropertyDefinition/index.ts:847](https://github.com/onzag/itemize/blob/a24376ed/base/Root/Module/ItemDefinition/PropertyDefinition/index.ts#L847)
 
 ___
 
@@ -267,7 +271,7 @@ the parent module of the property
 
 #### Defined in
 
-[base/Root/Module/ItemDefinition/PropertyDefinition/index.ts:835](https://github.com/onzag/itemize/blob/f2db74a5/base/Root/Module/ItemDefinition/PropertyDefinition/index.ts#L835)
+[base/Root/Module/ItemDefinition/PropertyDefinition/index.ts:843](https://github.com/onzag/itemize/blob/a24376ed/base/Root/Module/ItemDefinition/PropertyDefinition/index.ts#L843)
 
 ___
 
@@ -277,7 +281,7 @@ ___
 
 #### Defined in
 
-[base/Root/Module/ItemDefinition/PropertyDefinition/index.ts:489](https://github.com/onzag/itemize/blob/f2db74a5/base/Root/Module/ItemDefinition/PropertyDefinition/index.ts#L489)
+[base/Root/Module/ItemDefinition/PropertyDefinition/index.ts:497](https://github.com/onzag/itemize/blob/a24376ed/base/Root/Module/ItemDefinition/PropertyDefinition/index.ts#L497)
 
 ___
 
@@ -287,7 +291,7 @@ ___
 
 #### Defined in
 
-[base/Root/Module/ItemDefinition/PropertyDefinition/index.ts:488](https://github.com/onzag/itemize/blob/f2db74a5/base/Root/Module/ItemDefinition/PropertyDefinition/index.ts#L488)
+[base/Root/Module/ItemDefinition/PropertyDefinition/index.ts:496](https://github.com/onzag/itemize/blob/a24376ed/base/Root/Module/ItemDefinition/PropertyDefinition/index.ts#L496)
 
 ___
 
@@ -299,7 +303,7 @@ Whether the property is an extension
 
 #### Defined in
 
-[base/Root/Module/ItemDefinition/PropertyDefinition/index.ts:843](https://github.com/onzag/itemize/blob/f2db74a5/base/Root/Module/ItemDefinition/PropertyDefinition/index.ts#L843)
+[base/Root/Module/ItemDefinition/PropertyDefinition/index.ts:851](https://github.com/onzag/itemize/blob/a24376ed/base/Root/Module/ItemDefinition/PropertyDefinition/index.ts#L851)
 
 ___
 
@@ -311,7 +315,7 @@ the raw data for the property definition
 
 #### Defined in
 
-[base/Root/Module/ItemDefinition/PropertyDefinition/index.ts:831](https://github.com/onzag/itemize/blob/f2db74a5/base/Root/Module/ItemDefinition/PropertyDefinition/index.ts#L831)
+[base/Root/Module/ItemDefinition/PropertyDefinition/index.ts:839](https://github.com/onzag/itemize/blob/a24376ed/base/Root/Module/ItemDefinition/PropertyDefinition/index.ts#L839)
 
 ___
 
@@ -327,7 +331,7 @@ representing the original applied state of the class
 
 #### Defined in
 
-[base/Root/Module/ItemDefinition/PropertyDefinition/index.ts:894](https://github.com/onzag/itemize/blob/f2db74a5/base/Root/Module/ItemDefinition/PropertyDefinition/index.ts#L894)
+[base/Root/Module/ItemDefinition/PropertyDefinition/index.ts:902](https://github.com/onzag/itemize/blob/a24376ed/base/Root/Module/ItemDefinition/PropertyDefinition/index.ts#L902)
 
 ___
 
@@ -343,7 +347,7 @@ an internal value
 
 #### Defined in
 
-[base/Root/Module/ItemDefinition/PropertyDefinition/index.ts:927](https://github.com/onzag/itemize/blob/f2db74a5/base/Root/Module/ItemDefinition/PropertyDefinition/index.ts#L927)
+[base/Root/Module/ItemDefinition/PropertyDefinition/index.ts:935](https://github.com/onzag/itemize/blob/a24376ed/base/Root/Module/ItemDefinition/PropertyDefinition/index.ts#L935)
 
 ___
 
@@ -357,7 +361,7 @@ ___
 
 #### Defined in
 
-[base/Root/Module/ItemDefinition/PropertyDefinition/index.ts:944](https://github.com/onzag/itemize/blob/f2db74a5/base/Root/Module/ItemDefinition/PropertyDefinition/index.ts#L944)
+[base/Root/Module/ItemDefinition/PropertyDefinition/index.ts:952](https://github.com/onzag/itemize/blob/a24376ed/base/Root/Module/ItemDefinition/PropertyDefinition/index.ts#L952)
 
 ___
 
@@ -371,7 +375,7 @@ ___
 
 #### Defined in
 
-[base/Root/Module/ItemDefinition/PropertyDefinition/index.ts:947](https://github.com/onzag/itemize/blob/f2db74a5/base/Root/Module/ItemDefinition/PropertyDefinition/index.ts#L947)
+[base/Root/Module/ItemDefinition/PropertyDefinition/index.ts:955](https://github.com/onzag/itemize/blob/a24376ed/base/Root/Module/ItemDefinition/PropertyDefinition/index.ts#L955)
 
 ___
 
@@ -388,7 +392,7 @@ to be used in the client side
 
 #### Defined in
 
-[base/Root/Module/ItemDefinition/PropertyDefinition/index.ts:936](https://github.com/onzag/itemize/blob/f2db74a5/base/Root/Module/ItemDefinition/PropertyDefinition/index.ts#L936)
+[base/Root/Module/ItemDefinition/PropertyDefinition/index.ts:944](https://github.com/onzag/itemize/blob/a24376ed/base/Root/Module/ItemDefinition/PropertyDefinition/index.ts#L944)
 
 ___
 
@@ -406,7 +410,7 @@ the user interaction, values are enforced
 
 #### Defined in
 
-[base/Root/Module/ItemDefinition/PropertyDefinition/index.ts:902](https://github.com/onzag/itemize/blob/f2db74a5/base/Root/Module/ItemDefinition/PropertyDefinition/index.ts#L902)
+[base/Root/Module/ItemDefinition/PropertyDefinition/index.ts:910](https://github.com/onzag/itemize/blob/a24376ed/base/Root/Module/ItemDefinition/PropertyDefinition/index.ts#L910)
 
 ___
 
@@ -422,7 +426,7 @@ representing the state of the class
 
 #### Defined in
 
-[base/Root/Module/ItemDefinition/PropertyDefinition/index.ts:888](https://github.com/onzag/itemize/blob/f2db74a5/base/Root/Module/ItemDefinition/PropertyDefinition/index.ts#L888)
+[base/Root/Module/ItemDefinition/PropertyDefinition/index.ts:896](https://github.com/onzag/itemize/blob/a24376ed/base/Root/Module/ItemDefinition/PropertyDefinition/index.ts#L896)
 
 ___
 
@@ -440,7 +444,7 @@ is what is supposed to be used by the user
 
 #### Defined in
 
-[base/Root/Module/ItemDefinition/PropertyDefinition/index.ts:921](https://github.com/onzag/itemize/blob/f2db74a5/base/Root/Module/ItemDefinition/PropertyDefinition/index.ts#L921)
+[base/Root/Module/ItemDefinition/PropertyDefinition/index.ts:929](https://github.com/onzag/itemize/blob/a24376ed/base/Root/Module/ItemDefinition/PropertyDefinition/index.ts#L929)
 
 ___
 
@@ -458,7 +462,7 @@ apply value or set value by user
 
 #### Defined in
 
-[base/Root/Module/ItemDefinition/PropertyDefinition/index.ts:913](https://github.com/onzag/itemize/blob/f2db74a5/base/Root/Module/ItemDefinition/PropertyDefinition/index.ts#L913)
+[base/Root/Module/ItemDefinition/PropertyDefinition/index.ts:921](https://github.com/onzag/itemize/blob/a24376ed/base/Root/Module/ItemDefinition/PropertyDefinition/index.ts#L921)
 
 ___
 
@@ -468,7 +472,7 @@ ___
 
 #### Defined in
 
-[base/Root/Module/ItemDefinition/PropertyDefinition/index.ts:487](https://github.com/onzag/itemize/blob/f2db74a5/base/Root/Module/ItemDefinition/PropertyDefinition/index.ts#L487)
+[base/Root/Module/ItemDefinition/PropertyDefinition/index.ts:495](https://github.com/onzag/itemize/blob/a24376ed/base/Root/Module/ItemDefinition/PropertyDefinition/index.ts#L495)
 
 ___
 
@@ -478,7 +482,7 @@ ___
 
 #### Defined in
 
-[base/Root/Module/ItemDefinition/PropertyDefinition/index.ts:484](https://github.com/onzag/itemize/blob/f2db74a5/base/Root/Module/ItemDefinition/PropertyDefinition/index.ts#L484)
+[base/Root/Module/ItemDefinition/PropertyDefinition/index.ts:492](https://github.com/onzag/itemize/blob/a24376ed/base/Root/Module/ItemDefinition/PropertyDefinition/index.ts#L492)
 
 ## Methods
 
@@ -502,7 +506,7 @@ not to applied changes of the sorts
 
 #### Defined in
 
-[base/Root/Module/ItemDefinition/PropertyDefinition/index.ts:1127](https://github.com/onzag/itemize/blob/f2db74a5/base/Root/Module/ItemDefinition/PropertyDefinition/index.ts#L1127)
+[base/Root/Module/ItemDefinition/PropertyDefinition/index.ts:1135](https://github.com/onzag/itemize/blob/a24376ed/base/Root/Module/ItemDefinition/PropertyDefinition/index.ts#L1135)
 
 ___
 
@@ -531,7 +535,7 @@ into this, and not meant for user input
 
 #### Defined in
 
-[base/Root/Module/ItemDefinition/PropertyDefinition/index.ts:1762](https://github.com/onzag/itemize/blob/f2db74a5/base/Root/Module/ItemDefinition/PropertyDefinition/index.ts#L1762)
+[base/Root/Module/ItemDefinition/PropertyDefinition/index.ts:1770](https://github.com/onzag/itemize/blob/a24376ed/base/Root/Module/ItemDefinition/PropertyDefinition/index.ts#L1770)
 
 ___
 
@@ -558,7 +562,7 @@ a given property
 
 #### Defined in
 
-[base/Root/Module/ItemDefinition/PropertyDefinition/index.ts:2430](https://github.com/onzag/itemize/blob/f2db74a5/base/Root/Module/ItemDefinition/PropertyDefinition/index.ts#L2430)
+[base/Root/Module/ItemDefinition/PropertyDefinition/index.ts:2479](https://github.com/onzag/itemize/blob/a24376ed/base/Root/Module/ItemDefinition/PropertyDefinition/index.ts#L2479)
 
 ___
 
@@ -578,7 +582,7 @@ ___
 
 #### Defined in
 
-[base/Root/Module/ItemDefinition/PropertyDefinition/index.ts:1485](https://github.com/onzag/itemize/blob/f2db74a5/base/Root/Module/ItemDefinition/PropertyDefinition/index.ts#L1485)
+[base/Root/Module/ItemDefinition/PropertyDefinition/index.ts:1493](https://github.com/onzag/itemize/blob/a24376ed/base/Root/Module/ItemDefinition/PropertyDefinition/index.ts#L1493)
 
 ___
 
@@ -608,7 +612,7 @@ a boolean on whether it has been granted access
 
 #### Defined in
 
-[base/Root/Module/ItemDefinition/PropertyDefinition/index.ts:2510](https://github.com/onzag/itemize/blob/f2db74a5/base/Root/Module/ItemDefinition/PropertyDefinition/index.ts#L2510)
+[base/Root/Module/ItemDefinition/PropertyDefinition/index.ts:2559](https://github.com/onzag/itemize/blob/a24376ed/base/Root/Module/ItemDefinition/PropertyDefinition/index.ts#L2559)
 
 ___
 
@@ -634,7 +638,7 @@ property
 
 #### Defined in
 
-[base/Root/Module/ItemDefinition/PropertyDefinition/index.ts:2480](https://github.com/onzag/itemize/blob/f2db74a5/base/Root/Module/ItemDefinition/PropertyDefinition/index.ts#L2480)
+[base/Root/Module/ItemDefinition/PropertyDefinition/index.ts:2529](https://github.com/onzag/itemize/blob/a24376ed/base/Root/Module/ItemDefinition/PropertyDefinition/index.ts#L2529)
 
 ___
 
@@ -648,7 +652,7 @@ ___
 
 #### Defined in
 
-[base/Root/Module/ItemDefinition/PropertyDefinition/index.ts:1014](https://github.com/onzag/itemize/blob/f2db74a5/base/Root/Module/ItemDefinition/PropertyDefinition/index.ts#L1014)
+[base/Root/Module/ItemDefinition/PropertyDefinition/index.ts:1022](https://github.com/onzag/itemize/blob/a24376ed/base/Root/Module/ItemDefinition/PropertyDefinition/index.ts#L1022)
 
 ___
 
@@ -672,7 +676,7 @@ it will not clear enforced values
 
 #### Defined in
 
-[base/Root/Module/ItemDefinition/PropertyDefinition/index.ts:1918](https://github.com/onzag/itemize/blob/f2db74a5/base/Root/Module/ItemDefinition/PropertyDefinition/index.ts#L1918)
+[base/Root/Module/ItemDefinition/PropertyDefinition/index.ts:1940](https://github.com/onzag/itemize/blob/a24376ed/base/Root/Module/ItemDefinition/PropertyDefinition/index.ts#L1940)
 
 ___
 
@@ -696,7 +700,7 @@ Clears a super enforced value set in a slot id
 
 #### Defined in
 
-[base/Root/Module/ItemDefinition/PropertyDefinition/index.ts:1611](https://github.com/onzag/itemize/blob/f2db74a5/base/Root/Module/ItemDefinition/PropertyDefinition/index.ts#L1611)
+[base/Root/Module/ItemDefinition/PropertyDefinition/index.ts:1619](https://github.com/onzag/itemize/blob/a24376ed/base/Root/Module/ItemDefinition/PropertyDefinition/index.ts#L1619)
 
 ___
 
@@ -727,7 +731,32 @@ the applied value
 
 #### Defined in
 
-[base/Root/Module/ItemDefinition/PropertyDefinition/index.ts:1232](https://github.com/onzag/itemize/blob/f2db74a5/base/Root/Module/ItemDefinition/PropertyDefinition/index.ts#L1232)
+[base/Root/Module/ItemDefinition/PropertyDefinition/index.ts:1240](https://github.com/onzag/itemize/blob/a24376ed/base/Root/Module/ItemDefinition/PropertyDefinition/index.ts#L1240)
+
+___
+
+### getConfigValue
+
+▸ **getConfigValue**(`name`): `any`
+
+Provides the value of a special property if it's available
+they can only be of type, boolean, string, or number
+
+#### Parameters
+
+| Name | Type | Description |
+| :------ | :------ | :------ |
+| `name` | `string` | the name of that specifial property |
+
+#### Returns
+
+`any`
+
+the special property value, either a boolean, number or string, or null
+
+#### Defined in
+
+[base/Root/Module/ItemDefinition/PropertyDefinition/index.ts:2366](https://github.com/onzag/itemize/blob/a24376ed/base/Root/Module/ItemDefinition/PropertyDefinition/index.ts#L2366)
 
 ___
 
@@ -759,7 +788,7 @@ the current value
 
 #### Defined in
 
-[base/Root/Module/ItemDefinition/PropertyDefinition/index.ts:1182](https://github.com/onzag/itemize/blob/f2db74a5/base/Root/Module/ItemDefinition/PropertyDefinition/index.ts#L1182)
+[base/Root/Module/ItemDefinition/PropertyDefinition/index.ts:1190](https://github.com/onzag/itemize/blob/a24376ed/base/Root/Module/ItemDefinition/PropertyDefinition/index.ts#L1190)
 
 ___
 
@@ -777,7 +806,7 @@ a property definition value, or null
 
 #### Defined in
 
-[base/Root/Module/ItemDefinition/PropertyDefinition/index.ts:2370](https://github.com/onzag/itemize/blob/f2db74a5/base/Root/Module/ItemDefinition/PropertyDefinition/index.ts#L2370)
+[base/Root/Module/ItemDefinition/PropertyDefinition/index.ts:2419](https://github.com/onzag/itemize/blob/a24376ed/base/Root/Module/ItemDefinition/PropertyDefinition/index.ts#L2419)
 
 ___
 
@@ -815,7 +844,7 @@ the value can be null
 
 #### Defined in
 
-[base/Root/Module/ItemDefinition/PropertyDefinition/index.ts:1036](https://github.com/onzag/itemize/blob/f2db74a5/base/Root/Module/ItemDefinition/PropertyDefinition/index.ts#L1036)
+[base/Root/Module/ItemDefinition/PropertyDefinition/index.ts:1044](https://github.com/onzag/itemize/blob/a24376ed/base/Root/Module/ItemDefinition/PropertyDefinition/index.ts#L1044)
 
 ___
 
@@ -839,7 +868,7 @@ the locale data
 
 #### Defined in
 
-[base/Root/Module/ItemDefinition/PropertyDefinition/index.ts:2379](https://github.com/onzag/itemize/blob/f2db74a5/base/Root/Module/ItemDefinition/PropertyDefinition/index.ts#L2379)
+[base/Root/Module/ItemDefinition/PropertyDefinition/index.ts:2428](https://github.com/onzag/itemize/blob/a24376ed/base/Root/Module/ItemDefinition/PropertyDefinition/index.ts#L2428)
 
 ___
 
@@ -857,7 +886,7 @@ the id
 
 #### Defined in
 
-[base/Root/Module/ItemDefinition/PropertyDefinition/index.ts:1109](https://github.com/onzag/itemize/blob/f2db74a5/base/Root/Module/ItemDefinition/PropertyDefinition/index.ts#L1109)
+[base/Root/Module/ItemDefinition/PropertyDefinition/index.ts:1117](https://github.com/onzag/itemize/blob/a24376ed/base/Root/Module/ItemDefinition/PropertyDefinition/index.ts#L1117)
 
 ___
 
@@ -877,7 +906,7 @@ a number or null
 
 #### Defined in
 
-[base/Root/Module/ItemDefinition/PropertyDefinition/index.ts:2294](https://github.com/onzag/itemize/blob/f2db74a5/base/Root/Module/ItemDefinition/PropertyDefinition/index.ts#L2294)
+[base/Root/Module/ItemDefinition/PropertyDefinition/index.ts:2343](https://github.com/onzag/itemize/blob/a24376ed/base/Root/Module/ItemDefinition/PropertyDefinition/index.ts#L2343)
 
 ___
 
@@ -895,7 +924,7 @@ a number or null
 
 #### Defined in
 
-[base/Root/Module/ItemDefinition/PropertyDefinition/index.ts:2274](https://github.com/onzag/itemize/blob/f2db74a5/base/Root/Module/ItemDefinition/PropertyDefinition/index.ts#L2274)
+[base/Root/Module/ItemDefinition/PropertyDefinition/index.ts:2323](https://github.com/onzag/itemize/blob/a24376ed/base/Root/Module/ItemDefinition/PropertyDefinition/index.ts#L2323)
 
 ___
 
@@ -915,7 +944,7 @@ a number or null
 
 #### Defined in
 
-[base/Root/Module/ItemDefinition/PropertyDefinition/index.ts:2304](https://github.com/onzag/itemize/blob/f2db74a5/base/Root/Module/ItemDefinition/PropertyDefinition/index.ts#L2304)
+[base/Root/Module/ItemDefinition/PropertyDefinition/index.ts:2353](https://github.com/onzag/itemize/blob/a24376ed/base/Root/Module/ItemDefinition/PropertyDefinition/index.ts#L2353)
 
 ___
 
@@ -933,7 +962,7 @@ a number or null
 
 #### Defined in
 
-[base/Root/Module/ItemDefinition/PropertyDefinition/index.ts:2283](https://github.com/onzag/itemize/blob/f2db74a5/base/Root/Module/ItemDefinition/PropertyDefinition/index.ts#L2283)
+[base/Root/Module/ItemDefinition/PropertyDefinition/index.ts:2332](https://github.com/onzag/itemize/blob/a24376ed/base/Root/Module/ItemDefinition/PropertyDefinition/index.ts#L2332)
 
 ___
 
@@ -954,7 +983,7 @@ a new instance
 
 #### Defined in
 
-[base/Root/Module/ItemDefinition/PropertyDefinition/index.ts:2092](https://github.com/onzag/itemize/blob/f2db74a5/base/Root/Module/ItemDefinition/PropertyDefinition/index.ts#L2092)
+[base/Root/Module/ItemDefinition/PropertyDefinition/index.ts:2114](https://github.com/onzag/itemize/blob/a24376ed/base/Root/Module/ItemDefinition/PropertyDefinition/index.ts#L2114)
 
 ___
 
@@ -972,7 +1001,7 @@ a item definition that holds this property if any
 
 #### Defined in
 
-[base/Root/Module/ItemDefinition/PropertyDefinition/index.ts:2337](https://github.com/onzag/itemize/blob/f2db74a5/base/Root/Module/ItemDefinition/PropertyDefinition/index.ts#L2337)
+[base/Root/Module/ItemDefinition/PropertyDefinition/index.ts:2386](https://github.com/onzag/itemize/blob/a24376ed/base/Root/Module/ItemDefinition/PropertyDefinition/index.ts#L2386)
 
 ___
 
@@ -990,7 +1019,35 @@ a Module
 
 #### Defined in
 
-[base/Root/Module/ItemDefinition/PropertyDefinition/index.ts:2329](https://github.com/onzag/itemize/blob/f2db74a5/base/Root/Module/ItemDefinition/PropertyDefinition/index.ts#L2329)
+[base/Root/Module/ItemDefinition/PropertyDefinition/index.ts:2378](https://github.com/onzag/itemize/blob/a24376ed/base/Root/Module/ItemDefinition/PropertyDefinition/index.ts#L2378)
+
+___
+
+### getPointerSynchronizationProperty
+
+▸ **getPointerSynchronizationProperty**(): [`default`](base_Root_Module_ItemDefinition_PropertyDefinition.default.md)
+
+#### Returns
+
+[`default`](base_Root_Module_ItemDefinition_PropertyDefinition.default.md)
+
+#### Defined in
+
+[base/Root/Module/ItemDefinition/PropertyDefinition/index.ts:2308](https://github.com/onzag/itemize/blob/a24376ed/base/Root/Module/ItemDefinition/PropertyDefinition/index.ts#L2308)
+
+___
+
+### getPointerTargetItem
+
+▸ **getPointerTargetItem**(): [`default`](base_Root_Module_ItemDefinition.default.md)
+
+#### Returns
+
+[`default`](base_Root_Module_ItemDefinition.default.md)
+
+#### Defined in
+
+[base/Root/Module/ItemDefinition/PropertyDefinition/index.ts:2300](https://github.com/onzag/itemize/blob/a24376ed/base/Root/Module/ItemDefinition/PropertyDefinition/index.ts#L2300)
 
 ___
 
@@ -1009,7 +1066,7 @@ the policy name
 
 #### Defined in
 
-[base/Root/Module/ItemDefinition/PropertyDefinition/index.ts:2123](https://github.com/onzag/itemize/blob/f2db74a5/base/Root/Module/ItemDefinition/PropertyDefinition/index.ts#L2123)
+[base/Root/Module/ItemDefinition/PropertyDefinition/index.ts:2145](https://github.com/onzag/itemize/blob/a24376ed/base/Root/Module/ItemDefinition/PropertyDefinition/index.ts#L2145)
 
 ___
 
@@ -1028,7 +1085,7 @@ the policy type
 
 #### Defined in
 
-[base/Root/Module/ItemDefinition/PropertyDefinition/index.ts:2114](https://github.com/onzag/itemize/blob/f2db74a5/base/Root/Module/ItemDefinition/PropertyDefinition/index.ts#L2114)
+[base/Root/Module/ItemDefinition/PropertyDefinition/index.ts:2136](https://github.com/onzag/itemize/blob/a24376ed/base/Root/Module/ItemDefinition/PropertyDefinition/index.ts#L2136)
 
 ___
 
@@ -1047,7 +1104,7 @@ the property definition description for its type
 
 #### Defined in
 
-[base/Root/Module/ItemDefinition/PropertyDefinition/index.ts:2155](https://github.com/onzag/itemize/blob/f2db74a5/base/Root/Module/ItemDefinition/PropertyDefinition/index.ts#L2155)
+[base/Root/Module/ItemDefinition/PropertyDefinition/index.ts:2177](https://github.com/onzag/itemize/blob/a24376ed/base/Root/Module/ItemDefinition/PropertyDefinition/index.ts#L2177)
 
 ___
 
@@ -1072,7 +1129,7 @@ a string for the qualified policy prefix for this specific property id
 
 #### Defined in
 
-[base/Root/Module/ItemDefinition/PropertyDefinition/index.ts:2589](https://github.com/onzag/itemize/blob/f2db74a5/base/Root/Module/ItemDefinition/PropertyDefinition/index.ts#L2589)
+[base/Root/Module/ItemDefinition/PropertyDefinition/index.ts:2638](https://github.com/onzag/itemize/blob/a24376ed/base/Root/Module/ItemDefinition/PropertyDefinition/index.ts#L2638)
 
 ___
 
@@ -1092,7 +1149,7 @@ the requested fields that are necessary
 
 #### Defined in
 
-[base/Root/Module/ItemDefinition/PropertyDefinition/index.ts:1148](https://github.com/onzag/itemize/blob/f2db74a5/base/Root/Module/ItemDefinition/PropertyDefinition/index.ts#L1148)
+[base/Root/Module/ItemDefinition/PropertyDefinition/index.ts:1156](https://github.com/onzag/itemize/blob/a24376ed/base/Root/Module/ItemDefinition/PropertyDefinition/index.ts#L1156)
 
 ___
 
@@ -1117,7 +1174,7 @@ an array of string for the roles
 
 #### Defined in
 
-[base/Root/Module/ItemDefinition/PropertyDefinition/index.ts:2405](https://github.com/onzag/itemize/blob/f2db74a5/base/Root/Module/ItemDefinition/PropertyDefinition/index.ts#L2405)
+[base/Root/Module/ItemDefinition/PropertyDefinition/index.ts:2454](https://github.com/onzag/itemize/blob/a24376ed/base/Root/Module/ItemDefinition/PropertyDefinition/index.ts#L2454)
 
 ___
 
@@ -1131,32 +1188,7 @@ ___
 
 #### Defined in
 
-[base/Root/Module/ItemDefinition/PropertyDefinition/index.ts:2222](https://github.com/onzag/itemize/blob/f2db74a5/base/Root/Module/ItemDefinition/PropertyDefinition/index.ts#L2222)
-
-___
-
-### getSpecialProperty
-
-▸ **getSpecialProperty**(`name`): `any`
-
-Provides the value of a special property if it's available
-they can only be of type, boolean, string, or number
-
-#### Parameters
-
-| Name | Type | Description |
-| :------ | :------ | :------ |
-| `name` | `string` | the name of that specifial property |
-
-#### Returns
-
-`any`
-
-the special property value, either a boolean, number or string, or null
-
-#### Defined in
-
-[base/Root/Module/ItemDefinition/PropertyDefinition/index.ts:2317](https://github.com/onzag/itemize/blob/f2db74a5/base/Root/Module/ItemDefinition/PropertyDefinition/index.ts#L2317)
+[base/Root/Module/ItemDefinition/PropertyDefinition/index.ts:2244](https://github.com/onzag/itemize/blob/a24376ed/base/Root/Module/ItemDefinition/PropertyDefinition/index.ts#L2244)
 
 ___
 
@@ -1174,7 +1206,7 @@ a boolean
 
 #### Defined in
 
-[base/Root/Module/ItemDefinition/PropertyDefinition/index.ts:2246](https://github.com/onzag/itemize/blob/f2db74a5/base/Root/Module/ItemDefinition/PropertyDefinition/index.ts#L2246)
+[base/Root/Module/ItemDefinition/PropertyDefinition/index.ts:2268](https://github.com/onzag/itemize/blob/a24376ed/base/Root/Module/ItemDefinition/PropertyDefinition/index.ts#L2268)
 
 ___
 
@@ -1205,7 +1237,7 @@ a promise for the current value state
 
 #### Defined in
 
-[base/Root/Module/ItemDefinition/PropertyDefinition/index.ts:1344](https://github.com/onzag/itemize/blob/f2db74a5/base/Root/Module/ItemDefinition/PropertyDefinition/index.ts#L1344)
+[base/Root/Module/ItemDefinition/PropertyDefinition/index.ts:1352](https://github.com/onzag/itemize/blob/a24376ed/base/Root/Module/ItemDefinition/PropertyDefinition/index.ts#L1352)
 
 ___
 
@@ -1239,7 +1271,7 @@ the current value state
 
 #### Defined in
 
-[base/Root/Module/ItemDefinition/PropertyDefinition/index.ts:1248](https://github.com/onzag/itemize/blob/f2db74a5/base/Root/Module/ItemDefinition/PropertyDefinition/index.ts#L1248)
+[base/Root/Module/ItemDefinition/PropertyDefinition/index.ts:1256](https://github.com/onzag/itemize/blob/a24376ed/base/Root/Module/ItemDefinition/PropertyDefinition/index.ts#L1256)
 
 ___
 
@@ -1257,7 +1289,7 @@ the subtype string or null
 
 #### Defined in
 
-[base/Root/Module/ItemDefinition/PropertyDefinition/index.ts:2254](https://github.com/onzag/itemize/blob/f2db74a5/base/Root/Module/ItemDefinition/PropertyDefinition/index.ts#L2254)
+[base/Root/Module/ItemDefinition/PropertyDefinition/index.ts:2276](https://github.com/onzag/itemize/blob/a24376ed/base/Root/Module/ItemDefinition/PropertyDefinition/index.ts#L2276)
 
 ___
 
@@ -1275,7 +1307,7 @@ the type
 
 #### Defined in
 
-[base/Root/Module/ItemDefinition/PropertyDefinition/index.ts:1117](https://github.com/onzag/itemize/blob/f2db74a5/base/Root/Module/ItemDefinition/PropertyDefinition/index.ts#L1117)
+[base/Root/Module/ItemDefinition/PropertyDefinition/index.ts:1125](https://github.com/onzag/itemize/blob/a24376ed/base/Root/Module/ItemDefinition/PropertyDefinition/index.ts#L1125)
 
 ___
 
@@ -1301,7 +1333,7 @@ a string
 
 #### Defined in
 
-[base/Root/Module/ItemDefinition/PropertyDefinition/index.ts:2140](https://github.com/onzag/itemize/blob/f2db74a5/base/Root/Module/ItemDefinition/PropertyDefinition/index.ts#L2140)
+[base/Root/Module/ItemDefinition/PropertyDefinition/index.ts:2162](https://github.com/onzag/itemize/blob/a24376ed/base/Root/Module/ItemDefinition/PropertyDefinition/index.ts#L2162)
 
 ___
 
@@ -1319,7 +1351,7 @@ a boolean
 
 #### Defined in
 
-[base/Root/Module/ItemDefinition/PropertyDefinition/index.ts:2230](https://github.com/onzag/itemize/blob/f2db74a5/base/Root/Module/ItemDefinition/PropertyDefinition/index.ts#L2230)
+[base/Root/Module/ItemDefinition/PropertyDefinition/index.ts:2252](https://github.com/onzag/itemize/blob/a24376ed/base/Root/Module/ItemDefinition/PropertyDefinition/index.ts#L2252)
 
 ___
 
@@ -1337,7 +1369,7 @@ a booean
 
 #### Defined in
 
-[base/Root/Module/ItemDefinition/PropertyDefinition/index.ts:2354](https://github.com/onzag/itemize/blob/f2db74a5/base/Root/Module/ItemDefinition/PropertyDefinition/index.ts#L2354)
+[base/Root/Module/ItemDefinition/PropertyDefinition/index.ts:2403](https://github.com/onzag/itemize/blob/a24376ed/base/Root/Module/ItemDefinition/PropertyDefinition/index.ts#L2403)
 
 ___
 
@@ -1362,7 +1394,7 @@ a boolean
 
 #### Defined in
 
-[base/Root/Module/ItemDefinition/PropertyDefinition/index.ts:1099](https://github.com/onzag/itemize/blob/f2db74a5/base/Root/Module/ItemDefinition/PropertyDefinition/index.ts#L1099)
+[base/Root/Module/ItemDefinition/PropertyDefinition/index.ts:1107](https://github.com/onzag/itemize/blob/a24376ed/base/Root/Module/ItemDefinition/PropertyDefinition/index.ts#L1107)
 
 ___
 
@@ -1381,7 +1413,7 @@ a boolean
 
 #### Defined in
 
-[base/Root/Module/ItemDefinition/PropertyDefinition/index.ts:2346](https://github.com/onzag/itemize/blob/f2db74a5/base/Root/Module/ItemDefinition/PropertyDefinition/index.ts#L2346)
+[base/Root/Module/ItemDefinition/PropertyDefinition/index.ts:2395](https://github.com/onzag/itemize/blob/a24376ed/base/Root/Module/ItemDefinition/PropertyDefinition/index.ts#L2395)
 
 ___
 
@@ -1399,7 +1431,7 @@ a boolean
 
 #### Defined in
 
-[base/Root/Module/ItemDefinition/PropertyDefinition/index.ts:2187](https://github.com/onzag/itemize/blob/f2db74a5/base/Root/Module/ItemDefinition/PropertyDefinition/index.ts#L2187)
+[base/Root/Module/ItemDefinition/PropertyDefinition/index.ts:2209](https://github.com/onzag/itemize/blob/a24376ed/base/Root/Module/ItemDefinition/PropertyDefinition/index.ts#L2209)
 
 ___
 
@@ -1417,7 +1449,7 @@ a boolean
 
 #### Defined in
 
-[base/Root/Module/ItemDefinition/PropertyDefinition/index.ts:2238](https://github.com/onzag/itemize/blob/f2db74a5/base/Root/Module/ItemDefinition/PropertyDefinition/index.ts#L2238)
+[base/Root/Module/ItemDefinition/PropertyDefinition/index.ts:2260](https://github.com/onzag/itemize/blob/a24376ed/base/Root/Module/ItemDefinition/PropertyDefinition/index.ts#L2260)
 
 ___
 
@@ -1435,7 +1467,7 @@ a boolean
 
 #### Defined in
 
-[base/Root/Module/ItemDefinition/PropertyDefinition/index.ts:2179](https://github.com/onzag/itemize/blob/f2db74a5/base/Root/Module/ItemDefinition/PropertyDefinition/index.ts#L2179)
+[base/Root/Module/ItemDefinition/PropertyDefinition/index.ts:2201](https://github.com/onzag/itemize/blob/a24376ed/base/Root/Module/ItemDefinition/PropertyDefinition/index.ts#L2201)
 
 ___
 
@@ -1453,7 +1485,35 @@ a boolean
 
 #### Defined in
 
-[base/Root/Module/ItemDefinition/PropertyDefinition/index.ts:2163](https://github.com/onzag/itemize/blob/f2db74a5/base/Root/Module/ItemDefinition/PropertyDefinition/index.ts#L2163)
+[base/Root/Module/ItemDefinition/PropertyDefinition/index.ts:2185](https://github.com/onzag/itemize/blob/a24376ed/base/Root/Module/ItemDefinition/PropertyDefinition/index.ts#L2185)
+
+___
+
+### isPointer
+
+▸ **isPointer**(): `boolean`
+
+#### Returns
+
+`boolean`
+
+#### Defined in
+
+[base/Root/Module/ItemDefinition/PropertyDefinition/index.ts:2292](https://github.com/onzag/itemize/blob/a24376ed/base/Root/Module/ItemDefinition/PropertyDefinition/index.ts#L2292)
+
+___
+
+### isPointerList
+
+▸ **isPointerList**(): `boolean`
+
+#### Returns
+
+`boolean`
+
+#### Defined in
+
+[base/Root/Module/ItemDefinition/PropertyDefinition/index.ts:2296](https://github.com/onzag/itemize/blob/a24376ed/base/Root/Module/ItemDefinition/PropertyDefinition/index.ts#L2296)
 
 ___
 
@@ -1471,7 +1531,7 @@ a boolean
 
 #### Defined in
 
-[base/Root/Module/ItemDefinition/PropertyDefinition/index.ts:2131](https://github.com/onzag/itemize/blob/f2db74a5/base/Root/Module/ItemDefinition/PropertyDefinition/index.ts#L2131)
+[base/Root/Module/ItemDefinition/PropertyDefinition/index.ts:2153](https://github.com/onzag/itemize/blob/a24376ed/base/Root/Module/ItemDefinition/PropertyDefinition/index.ts#L2153)
 
 ___
 
@@ -1489,7 +1549,7 @@ a boolean
 
 #### Defined in
 
-[base/Root/Module/ItemDefinition/PropertyDefinition/index.ts:2203](https://github.com/onzag/itemize/blob/f2db74a5/base/Root/Module/ItemDefinition/PropertyDefinition/index.ts#L2203)
+[base/Root/Module/ItemDefinition/PropertyDefinition/index.ts:2225](https://github.com/onzag/itemize/blob/a24376ed/base/Root/Module/ItemDefinition/PropertyDefinition/index.ts#L2225)
 
 ___
 
@@ -1507,7 +1567,7 @@ a boolean
 
 #### Defined in
 
-[base/Root/Module/ItemDefinition/PropertyDefinition/index.ts:2195](https://github.com/onzag/itemize/blob/f2db74a5/base/Root/Module/ItemDefinition/PropertyDefinition/index.ts#L2195)
+[base/Root/Module/ItemDefinition/PropertyDefinition/index.ts:2217](https://github.com/onzag/itemize/blob/a24376ed/base/Root/Module/ItemDefinition/PropertyDefinition/index.ts#L2217)
 
 ___
 
@@ -1525,7 +1585,7 @@ a boolean
 
 #### Defined in
 
-[base/Root/Module/ItemDefinition/PropertyDefinition/index.ts:2262](https://github.com/onzag/itemize/blob/f2db74a5/base/Root/Module/ItemDefinition/PropertyDefinition/index.ts#L2262)
+[base/Root/Module/ItemDefinition/PropertyDefinition/index.ts:2284](https://github.com/onzag/itemize/blob/a24376ed/base/Root/Module/ItemDefinition/PropertyDefinition/index.ts#L2284)
 
 ___
 
@@ -1543,7 +1603,7 @@ a boolean
 
 #### Defined in
 
-[base/Root/Module/ItemDefinition/PropertyDefinition/index.ts:2362](https://github.com/onzag/itemize/blob/f2db74a5/base/Root/Module/ItemDefinition/PropertyDefinition/index.ts#L2362)
+[base/Root/Module/ItemDefinition/PropertyDefinition/index.ts:2411](https://github.com/onzag/itemize/blob/a24376ed/base/Root/Module/ItemDefinition/PropertyDefinition/index.ts#L2411)
 
 ___
 
@@ -1562,7 +1622,7 @@ a boolean
 
 #### Defined in
 
-[base/Root/Module/ItemDefinition/PropertyDefinition/index.ts:2212](https://github.com/onzag/itemize/blob/f2db74a5/base/Root/Module/ItemDefinition/PropertyDefinition/index.ts#L2212)
+[base/Root/Module/ItemDefinition/PropertyDefinition/index.ts:2234](https://github.com/onzag/itemize/blob/a24376ed/base/Root/Module/ItemDefinition/PropertyDefinition/index.ts#L2234)
 
 ___
 
@@ -1576,7 +1636,7 @@ ___
 
 #### Defined in
 
-[base/Root/Module/ItemDefinition/PropertyDefinition/index.ts:2266](https://github.com/onzag/itemize/blob/f2db74a5/base/Root/Module/ItemDefinition/PropertyDefinition/index.ts#L2266)
+[base/Root/Module/ItemDefinition/PropertyDefinition/index.ts:2288](https://github.com/onzag/itemize/blob/a24376ed/base/Root/Module/ItemDefinition/PropertyDefinition/index.ts#L2288)
 
 ___
 
@@ -1594,7 +1654,7 @@ a boolean
 
 #### Defined in
 
-[base/Root/Module/ItemDefinition/PropertyDefinition/index.ts:2171](https://github.com/onzag/itemize/blob/f2db74a5/base/Root/Module/ItemDefinition/PropertyDefinition/index.ts#L2171)
+[base/Root/Module/ItemDefinition/PropertyDefinition/index.ts:2193](https://github.com/onzag/itemize/blob/a24376ed/base/Root/Module/ItemDefinition/PropertyDefinition/index.ts#L2193)
 
 ___
 
@@ -1621,7 +1681,7 @@ the invalid reason as a string
 
 #### Defined in
 
-[base/Root/Module/ItemDefinition/PropertyDefinition/index.ts:2055](https://github.com/onzag/itemize/blob/f2db74a5/base/Root/Module/ItemDefinition/PropertyDefinition/index.ts#L2055)
+[base/Root/Module/ItemDefinition/PropertyDefinition/index.ts:2077](https://github.com/onzag/itemize/blob/a24376ed/base/Root/Module/ItemDefinition/PropertyDefinition/index.ts#L2077)
 
 ___
 
@@ -1650,7 +1710,7 @@ the invalid reason as a string
 
 #### Defined in
 
-[base/Root/Module/ItemDefinition/PropertyDefinition/index.ts:1994](https://github.com/onzag/itemize/blob/f2db74a5/base/Root/Module/ItemDefinition/PropertyDefinition/index.ts#L1994)
+[base/Root/Module/ItemDefinition/PropertyDefinition/index.ts:2016](https://github.com/onzag/itemize/blob/a24376ed/base/Root/Module/ItemDefinition/PropertyDefinition/index.ts#L2016)
 
 ___
 
@@ -1673,7 +1733,7 @@ Marks a property definition as a policy type
 
 #### Defined in
 
-[base/Root/Module/ItemDefinition/PropertyDefinition/index.ts:2102](https://github.com/onzag/itemize/blob/f2db74a5/base/Root/Module/ItemDefinition/PropertyDefinition/index.ts#L2102)
+[base/Root/Module/ItemDefinition/PropertyDefinition/index.ts:2124](https://github.com/onzag/itemize/blob/a24376ed/base/Root/Module/ItemDefinition/PropertyDefinition/index.ts#L2124)
 
 ___
 
@@ -1696,7 +1756,7 @@ of the same kind (only its language data)
 
 #### Defined in
 
-[base/Root/Module/ItemDefinition/PropertyDefinition/index.ts:2598](https://github.com/onzag/itemize/blob/f2db74a5/base/Root/Module/ItemDefinition/PropertyDefinition/index.ts#L2598)
+[base/Root/Module/ItemDefinition/PropertyDefinition/index.ts:2647](https://github.com/onzag/itemize/blob/a24376ed/base/Root/Module/ItemDefinition/PropertyDefinition/index.ts#L2647)
 
 ___
 
@@ -1718,7 +1778,7 @@ Removes an added listener
 
 #### Defined in
 
-[base/Root/Module/ItemDefinition/PropertyDefinition/index.ts:1135](https://github.com/onzag/itemize/blob/f2db74a5/base/Root/Module/ItemDefinition/PropertyDefinition/index.ts#L1135)
+[base/Root/Module/ItemDefinition/PropertyDefinition/index.ts:1143](https://github.com/onzag/itemize/blob/a24376ed/base/Root/Module/ItemDefinition/PropertyDefinition/index.ts#L1143)
 
 ___
 
@@ -1742,7 +1802,7 @@ applied value
 
 #### Defined in
 
-[base/Root/Module/ItemDefinition/PropertyDefinition/index.ts:1963](https://github.com/onzag/itemize/blob/f2db74a5/base/Root/Module/ItemDefinition/PropertyDefinition/index.ts#L1963)
+[base/Root/Module/ItemDefinition/PropertyDefinition/index.ts:1985](https://github.com/onzag/itemize/blob/a24376ed/base/Root/Module/ItemDefinition/PropertyDefinition/index.ts#L1985)
 
 ___
 
@@ -1774,7 +1834,7 @@ value it will be converted to null
 
 #### Defined in
 
-[base/Root/Module/ItemDefinition/PropertyDefinition/index.ts:1702](https://github.com/onzag/itemize/blob/f2db74a5/base/Root/Module/ItemDefinition/PropertyDefinition/index.ts#L1702)
+[base/Root/Module/ItemDefinition/PropertyDefinition/index.ts:1710](https://github.com/onzag/itemize/blob/a24376ed/base/Root/Module/ItemDefinition/PropertyDefinition/index.ts#L1710)
 
 ___
 
@@ -1798,7 +1858,7 @@ the value from
 
 #### Defined in
 
-[base/Root/Module/ItemDefinition/PropertyDefinition/index.ts:1664](https://github.com/onzag/itemize/blob/f2db74a5/base/Root/Module/ItemDefinition/PropertyDefinition/index.ts#L1664)
+[base/Root/Module/ItemDefinition/PropertyDefinition/index.ts:1672](https://github.com/onzag/itemize/blob/a24376ed/base/Root/Module/ItemDefinition/PropertyDefinition/index.ts#L1672)
 
 ___
 
@@ -1824,7 +1884,7 @@ be another property definition to extract the value from
 
 #### Defined in
 
-[base/Root/Module/ItemDefinition/PropertyDefinition/index.ts:1496](https://github.com/onzag/itemize/blob/f2db74a5/base/Root/Module/ItemDefinition/PropertyDefinition/index.ts#L1496)
+[base/Root/Module/ItemDefinition/PropertyDefinition/index.ts:1504](https://github.com/onzag/itemize/blob/a24376ed/base/Root/Module/ItemDefinition/PropertyDefinition/index.ts#L1504)
 
 ___
 
@@ -1850,7 +1910,7 @@ slot id, note a super enforced value won't override the global
 
 #### Defined in
 
-[base/Root/Module/ItemDefinition/PropertyDefinition/index.ts:1530](https://github.com/onzag/itemize/blob/f2db74a5/base/Root/Module/ItemDefinition/PropertyDefinition/index.ts#L1530)
+[base/Root/Module/ItemDefinition/PropertyDefinition/index.ts:1538](https://github.com/onzag/itemize/blob/a24376ed/base/Root/Module/ItemDefinition/PropertyDefinition/index.ts#L1538)
 
 ___
 
@@ -1868,7 +1928,7 @@ the json form
 
 #### Defined in
 
-[base/Root/Module/ItemDefinition/PropertyDefinition/index.ts:2579](https://github.com/onzag/itemize/blob/f2db74a5/base/Root/Module/ItemDefinition/PropertyDefinition/index.ts#L2579)
+[base/Root/Module/ItemDefinition/PropertyDefinition/index.ts:2628](https://github.com/onzag/itemize/blob/a24376ed/base/Root/Module/ItemDefinition/PropertyDefinition/index.ts#L2628)
 
 ___
 
@@ -1891,7 +1951,7 @@ Performs a check agains the json definition value for a property definition
 
 #### Defined in
 
-[base/Root/Module/ItemDefinition/PropertyDefinition/index.ts:526](https://github.com/onzag/itemize/blob/f2db74a5/base/Root/Module/ItemDefinition/PropertyDefinition/index.ts#L526)
+[base/Root/Module/ItemDefinition/PropertyDefinition/index.ts:534](https://github.com/onzag/itemize/blob/a24376ed/base/Root/Module/ItemDefinition/PropertyDefinition/index.ts#L534)
 
 ___
 
@@ -1914,7 +1974,7 @@ ___
 
 #### Defined in
 
-[base/Root/Module/ItemDefinition/PropertyDefinition/index.ts:491](https://github.com/onzag/itemize/blob/f2db74a5/base/Root/Module/ItemDefinition/PropertyDefinition/index.ts#L491)
+[base/Root/Module/ItemDefinition/PropertyDefinition/index.ts:499](https://github.com/onzag/itemize/blob/a24376ed/base/Root/Module/ItemDefinition/PropertyDefinition/index.ts#L499)
 
 ___
 
@@ -1939,7 +1999,7 @@ a prefixed string that represents the qualified policy
 
 #### Defined in
 
-[base/Root/Module/ItemDefinition/PropertyDefinition/index.ts:514](https://github.com/onzag/itemize/blob/f2db74a5/base/Root/Module/ItemDefinition/PropertyDefinition/index.ts#L514)
+[base/Root/Module/ItemDefinition/PropertyDefinition/index.ts:522](https://github.com/onzag/itemize/blob/a24376ed/base/Root/Module/ItemDefinition/PropertyDefinition/index.ts#L522)
 
 ___
 
@@ -1973,7 +2033,7 @@ a boolean on whether the value is valid
 
 #### Defined in
 
-[base/Root/Module/ItemDefinition/PropertyDefinition/index.ts:564](https://github.com/onzag/itemize/blob/f2db74a5/base/Root/Module/ItemDefinition/PropertyDefinition/index.ts#L564)
+[base/Root/Module/ItemDefinition/PropertyDefinition/index.ts:572](https://github.com/onzag/itemize/blob/a24376ed/base/Root/Module/ItemDefinition/PropertyDefinition/index.ts#L572)
 
 ___
 
@@ -1993,4 +2053,4 @@ ___
 
 #### Defined in
 
-[base/Root/Module/ItemDefinition/PropertyDefinition/index.ts:504](https://github.com/onzag/itemize/blob/f2db74a5/base/Root/Module/ItemDefinition/PropertyDefinition/index.ts#L504)
+[base/Root/Module/ItemDefinition/PropertyDefinition/index.ts:512](https://github.com/onzag/itemize/blob/a24376ed/base/Root/Module/ItemDefinition/PropertyDefinition/index.ts#L512)

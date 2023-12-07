@@ -69,7 +69,7 @@ React.Component&lt;IPagedSearchLoaderProps, IPagedSearchLoaderState\&gt;.constru
 
 #### Defined in
 
-[client/components/search/PagedSearchLoader.tsx:86](https://github.com/onzag/itemize/blob/f2db74a5/client/components/search/PagedSearchLoader.tsx#L86)
+[client/components/search/PagedSearchLoader.tsx:99](https://github.com/onzag/itemize/blob/a24376ed/client/components/search/PagedSearchLoader.tsx#L99)
 
 ## Properties
 
@@ -564,7 +564,7 @@ ___
 
 ### goToNextPage
 
-▸ **goToNextPage**(`currentPage`, `hasNextPage`, `setState`): `void`
+▸ **goToNextPage**(`currentPage`, `hasNextPage`, `setState`, `pLoc`): `void`
 
 #### Parameters
 
@@ -572,7 +572,8 @@ ___
 | :------ | :------ |
 | `currentPage` | `number` |
 | `hasNextPage` | `boolean` |
-| `setState` | (`qs`: { `p`: `string` ; `r`: `string`  }) => `void` |
+| `setState` | (`qs`: { [pLoc: string]: `string`; `r`: `string`  }) => `void` |
+| `pLoc` | `string` |
 
 #### Returns
 
@@ -580,19 +581,20 @@ ___
 
 #### Defined in
 
-[client/components/search/PagedSearchLoader.tsx:99](https://github.com/onzag/itemize/blob/f2db74a5/client/components/search/PagedSearchLoader.tsx#L99)
+[client/components/search/PagedSearchLoader.tsx:112](https://github.com/onzag/itemize/blob/a24376ed/client/components/search/PagedSearchLoader.tsx#L112)
 
 ___
 
 ### goToPage
 
-▸ **goToPage**(`setState`, `page`): `void`
+▸ **goToPage**(`setState`, `pLoc`, `page`): `void`
 
 #### Parameters
 
 | Name | Type |
 | :------ | :------ |
-| `setState` | (`qs`: { `p`: `string` ; `r`: `string`  }) => `void` |
+| `setState` | (`qs`: { [pLoc: string]: `string`; `r`: `string`  }) => `void` |
+| `pLoc` | `string` |
 | `page` | `number` |
 
 #### Returns
@@ -601,13 +603,13 @@ ___
 
 #### Defined in
 
-[client/components/search/PagedSearchLoader.tsx:117](https://github.com/onzag/itemize/blob/f2db74a5/client/components/search/PagedSearchLoader.tsx#L117)
+[client/components/search/PagedSearchLoader.tsx:130](https://github.com/onzag/itemize/blob/a24376ed/client/components/search/PagedSearchLoader.tsx#L130)
 
 ___
 
 ### goToPrevPage
 
-▸ **goToPrevPage**(`currentPage`, `hasPrevPage`, `setState`): `void`
+▸ **goToPrevPage**(`currentPage`, `hasPrevPage`, `setState`, `pLoc`): `void`
 
 #### Parameters
 
@@ -615,7 +617,8 @@ ___
 | :------ | :------ |
 | `currentPage` | `number` |
 | `hasPrevPage` | `boolean` |
-| `setState` | (`qs`: { `p`: `string` ; `r`: `string`  }) => `void` |
+| `setState` | (`qs`: { [pLoc: string]: `string`; `r`: `string`  }) => `void` |
+| `pLoc` | `string` |
 
 #### Returns
 
@@ -623,20 +626,21 @@ ___
 
 #### Defined in
 
-[client/components/search/PagedSearchLoader.tsx:108](https://github.com/onzag/itemize/blob/f2db74a5/client/components/search/PagedSearchLoader.tsx#L108)
+[client/components/search/PagedSearchLoader.tsx:121](https://github.com/onzag/itemize/blob/a24376ed/client/components/search/PagedSearchLoader.tsx#L121)
 
 ___
 
 ### onSearchDataChange
 
-▸ **onSearchDataChange**(`actualP`, `setState`, `searchId`, `wasRestored`): `number`
+▸ **onSearchDataChange**(`actualP`, `setState`, `pLoc`, `searchId`, `wasRestored`): `number`
 
 #### Parameters
 
 | Name | Type |
 | :------ | :------ |
 | `actualP` | `number` |
-| `setState` | (`qs`: { `p`: `string` ; `r`: `string`  }) => `void` |
+| `setState` | (`qs`: { [pLoc: string]: `string`; `r`: `string`  }) => `void` |
+| `pLoc` | `string` |
 | `searchId` | `string` |
 | `wasRestored` | `boolean` |
 
@@ -646,7 +650,7 @@ ___
 
 #### Defined in
 
-[client/components/search/PagedSearchLoader.tsx:127](https://github.com/onzag/itemize/blob/f2db74a5/client/components/search/PagedSearchLoader.tsx#L127)
+[client/components/search/PagedSearchLoader.tsx:140](https://github.com/onzag/itemize/blob/a24376ed/client/components/search/PagedSearchLoader.tsx#L140)
 
 ___
 
@@ -664,20 +668,21 @@ React.Component.render
 
 #### Defined in
 
-[client/components/search/PagedSearchLoader.tsx:167](https://github.com/onzag/itemize/blob/f2db74a5/client/components/search/PagedSearchLoader.tsx#L167)
+[client/components/search/PagedSearchLoader.tsx:181](https://github.com/onzag/itemize/blob/a24376ed/client/components/search/PagedSearchLoader.tsx#L181)
 
 ___
 
 ### renderPagedLoader
 
-▸ **renderPagedLoader**(`state`, `setState`): `Element`
+▸ **renderPagedLoader**(`state`, `setState`, `pLoc`): `Element`
 
 #### Parameters
 
 | Name | Type |
 | :------ | :------ |
 | `state` | `IPagedSearchLoaderState` |
-| `setState` | (`qs`: { `p`: `string` ; `r`: `string`  }) => `void` |
+| `setState` | (`qs`: { [pLoc: string]: `string`; `r`: `string`  }) => `void` |
+| `pLoc` | `string` |
 
 #### Returns
 
@@ -685,7 +690,7 @@ ___
 
 #### Defined in
 
-[client/components/search/PagedSearchLoader.tsx:143](https://github.com/onzag/itemize/blob/f2db74a5/client/components/search/PagedSearchLoader.tsx#L143)
+[client/components/search/PagedSearchLoader.tsx:156](https://github.com/onzag/itemize/blob/a24376ed/client/components/search/PagedSearchLoader.tsx#L156)
 
 ___
 
@@ -740,4 +745,4 @@ React.Component.shouldComponentUpdate
 
 #### Defined in
 
-[client/components/search/PagedSearchLoader.tsx:123](https://github.com/onzag/itemize/blob/f2db74a5/client/components/search/PagedSearchLoader.tsx#L123)
+[client/components/search/PagedSearchLoader.tsx:136](https://github.com/onzag/itemize/blob/a24376ed/client/components/search/PagedSearchLoader.tsx#L136)

@@ -23,6 +23,7 @@ The props for the html resource loader
 ### Methods
 
 - [children](client_components_resources_ResourceLoader.IResourceLoaderProps.md#children)
+- [clientSideResolver](client_components_resources_ResourceLoader.IResourceLoaderProps.md#clientsideresolver)
 - [serverSideResolver](client_components_resources_ResourceLoader.IResourceLoaderProps.md#serversideresolver)
 
 ## Properties
@@ -35,7 +36,7 @@ Includes the token in the header for usage in validation as token
 
 #### Defined in
 
-[client/components/resources/ResourceLoader.tsx:26](https://github.com/onzag/itemize/blob/f2db74a5/client/components/resources/ResourceLoader.tsx#L26)
+[client/components/resources/ResourceLoader.tsx:29](https://github.com/onzag/itemize/blob/a24376ed/client/components/resources/ResourceLoader.tsx#L29)
 
 ___
 
@@ -49,7 +50,7 @@ screen does not blink
 
 #### Defined in
 
-[client/components/resources/ResourceLoader.tsx:68](https://github.com/onzag/itemize/blob/f2db74a5/client/components/resources/ResourceLoader.tsx#L68)
+[client/components/resources/ResourceLoader.tsx:78](https://github.com/onzag/itemize/blob/a24376ed/client/components/resources/ResourceLoader.tsx#L78)
 
 ___
 
@@ -61,7 +62,7 @@ the source path as a string, by default it is /rest/resource/
 
 #### Defined in
 
-[client/components/resources/ResourceLoader.tsx:30](https://github.com/onzag/itemize/blob/f2db74a5/client/components/resources/ResourceLoader.tsx#L30)
+[client/components/resources/ResourceLoader.tsx:33](https://github.com/onzag/itemize/blob/a24376ed/client/components/resources/ResourceLoader.tsx#L33)
 
 ___
 
@@ -73,20 +74,20 @@ Causes the resource to be requested with pooling
 
 #### Defined in
 
-[client/components/resources/ResourceLoader.tsx:62](https://github.com/onzag/itemize/blob/f2db74a5/client/components/resources/ResourceLoader.tsx#L62)
+[client/components/resources/ResourceLoader.tsx:72](https://github.com/onzag/itemize/blob/a24376ed/client/components/resources/ResourceLoader.tsx#L72)
 
 ___
 
 ### src
 
-• **src**: `string`
+• `Optional` **src**: `string`
 
 the source as a string, without the /rest/resource/ part, which is
 defined in the path
 
 #### Defined in
 
-[client/components/resources/ResourceLoader.tsx:42](https://github.com/onzag/itemize/blob/f2db74a5/client/components/resources/ResourceLoader.tsx#L42)
+[client/components/resources/ResourceLoader.tsx:52](https://github.com/onzag/itemize/blob/a24376ed/client/components/resources/ResourceLoader.tsx#L52)
 
 ___
 
@@ -98,7 +99,7 @@ sw cacheable flag, defaults to true
 
 #### Defined in
 
-[client/components/resources/ResourceLoader.tsx:50](https://github.com/onzag/itemize/blob/f2db74a5/client/components/resources/ResourceLoader.tsx#L50)
+[client/components/resources/ResourceLoader.tsx:60](https://github.com/onzag/itemize/blob/a24376ed/client/components/resources/ResourceLoader.tsx#L60)
 
 ___
 
@@ -110,7 +111,7 @@ sw network first flag, defaults to false
 
 #### Defined in
 
-[client/components/resources/ResourceLoader.tsx:54](https://github.com/onzag/itemize/blob/f2db74a5/client/components/resources/ResourceLoader.tsx#L54)
+[client/components/resources/ResourceLoader.tsx:64](https://github.com/onzag/itemize/blob/a24376ed/client/components/resources/ResourceLoader.tsx#L64)
 
 ___
 
@@ -122,7 +123,7 @@ sw recheck flag, rechecks the content after done, defaults to false
 
 #### Defined in
 
-[client/components/resources/ResourceLoader.tsx:58](https://github.com/onzag/itemize/blob/f2db74a5/client/components/resources/ResourceLoader.tsx#L58)
+[client/components/resources/ResourceLoader.tsx:68](https://github.com/onzag/itemize/blob/a24376ed/client/components/resources/ResourceLoader.tsx#L68)
 
 ___
 
@@ -134,7 +135,7 @@ Type to load
 
 #### Defined in
 
-[client/components/resources/ResourceLoader.tsx:72](https://github.com/onzag/itemize/blob/f2db74a5/client/components/resources/ResourceLoader.tsx#L72)
+[client/components/resources/ResourceLoader.tsx:82](https://github.com/onzag/itemize/blob/a24376ed/client/components/resources/ResourceLoader.tsx#L82)
 
 ## Methods
 
@@ -158,29 +159,55 @@ To define how the data is to be used
 
 #### Defined in
 
-[client/components/resources/ResourceLoader.tsx:46](https://github.com/onzag/itemize/blob/f2db74a5/client/components/resources/ResourceLoader.tsx#L46)
+[client/components/resources/ResourceLoader.tsx:56](https://github.com/onzag/itemize/blob/a24376ed/client/components/resources/ResourceLoader.tsx#L56)
+
+___
+
+### clientSideResolver
+
+▸ `Optional` **clientSideResolver**(`fullsrc`): `string` \| `Promise`<`string`\>
+
+A client side resolver to resolve instead of using fetch
+
+does not support binary types
+
+#### Parameters
+
+| Name | Type |
+| :------ | :------ |
+| `fullsrc` | `string` |
+
+#### Returns
+
+`string` \| `Promise`<`string`\>
+
+#### Defined in
+
+[client/components/resources/ResourceLoader.tsx:47](https://github.com/onzag/itemize/blob/a24376ed/client/components/resources/ResourceLoader.tsx#L47)
 
 ___
 
 ### serverSideResolver
 
-▸ `Optional` **serverSideResolver**(`appData`): `Promise`<[`IResourceCollectionResult`](server_ssr_collect.IResourceCollectionResult.md)\>
+▸ `Optional` **serverSideResolver**(`appData`, `fullsrc`): [`IResourceCollectionResult`](server_ssr_collect.IResourceCollectionResult.md) \| `Promise`<[`IResourceCollectionResult`](server_ssr_collect.IResourceCollectionResult.md)\>
 
 The server side resolver
-TODO this has to do with the generator in order
 to realize how this is resolved we need to support resources
 in our SSR and request manager
+
+does not support binary types
 
 #### Parameters
 
 | Name | Type |
 | :------ | :------ |
 | `appData` | [`IAppDataType`](server.IAppDataType.md) |
+| `fullsrc` | `string` |
 
 #### Returns
 
-`Promise`<[`IResourceCollectionResult`](server_ssr_collect.IResourceCollectionResult.md)\>
+[`IResourceCollectionResult`](server_ssr_collect.IResourceCollectionResult.md) \| `Promise`<[`IResourceCollectionResult`](server_ssr_collect.IResourceCollectionResult.md)\>
 
 #### Defined in
 
-[client/components/resources/ResourceLoader.tsx:37](https://github.com/onzag/itemize/blob/f2db74a5/client/components/resources/ResourceLoader.tsx#L37)
+[client/components/resources/ResourceLoader.tsx:41](https://github.com/onzag/itemize/blob/a24376ed/client/components/resources/ResourceLoader.tsx#L41)

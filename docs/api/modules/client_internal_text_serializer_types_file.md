@@ -36,4 +36,4 @@ reigstry
 
 #### Defined in
 
-[client/internal/text/serializer/types/file.tsx:19](https://github.com/onzag/itemize/blob/f2db74a5/client/internal/text/serializer/types/file.tsx#L19)
+[client/internal/text/serializer/types/file.tsx:19](https://github.com/onzag/itemize/blob/a24376ed/client/internal/text/serializer/types/file.tsx#L19)

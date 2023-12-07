@@ -32,4 +32,4 @@ This is the wrapper drawer itself
 
 #### Defined in
 
-[client/fast-prototyping/components/slate/drawer/index.tsx:44](https://github.com/onzag/itemize/blob/f2db74a5/client/fast-prototyping/components/slate/drawer/index.tsx#L44)
+[client/fast-prototyping/components/slate/drawer/index.tsx:72](https://github.com/onzag/itemize/blob/a24376ed/client/fast-prototyping/components/slate/drawer/index.tsx#L72)

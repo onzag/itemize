@@ -97,7 +97,7 @@ The styles of the renderer
 
 #### Defined in
 
-[client/fast-prototyping/renderers/PropertyEntry/PropertyEntryTagList.tsx:32](https://github.com/onzag/itemize/blob/f2db74a5/client/fast-prototyping/renderers/PropertyEntry/PropertyEntryTagList.tsx#L32)
+[client/fast-prototyping/renderers/PropertyEntry/PropertyEntryTagList.tsx:32](https://github.com/onzag/itemize/blob/a24376ed/client/fast-prototyping/renderers/PropertyEntry/PropertyEntryTagList.tsx#L32)
 
 ## Functions
 
@@ -124,4 +124,4 @@ a react element
 
 #### Defined in
 
-[client/fast-prototyping/renderers/PropertyEntry/PropertyEntryTagList.tsx:159](https://github.com/onzag/itemize/blob/f2db74a5/client/fast-prototyping/renderers/PropertyEntry/PropertyEntryTagList.tsx#L159)
+[client/fast-prototyping/renderers/PropertyEntry/PropertyEntryTagList.tsx:159](https://github.com/onzag/itemize/blob/a24376ed/client/fast-prototyping/renderers/PropertyEntry/PropertyEntryTagList.tsx#L159)

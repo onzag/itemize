@@ -15,14 +15,15 @@
 - [checkLimit](server_resolvers_basic.md#checklimit)
 - [checkLimiters](server_resolvers_basic.md#checklimiters)
 - [checkListTypes](server_resolvers_basic.md#checklisttypes)
-- [checkReadPoliciesAllowThisUserToSearch](server_resolvers_basic.md#checkreadpoliciesallowthisusertosearch)
 - [checkUserCanSearch](server_resolvers_basic.md#checkusercansearch)
 - [checkUserExists](server_resolvers_basic.md#checkuserexists)
 - [defaultTriggerForbiddenFunction](server_resolvers_basic.md#defaulttriggerforbiddenfunction)
 - [defaultTriggerInvalidForbiddenFunction](server_resolvers_basic.md#defaulttriggerinvalidforbiddenfunction)
+- [defaultTriggerSearchInvalidForbiddenFunction](server_resolvers_basic.md#defaulttriggersearchinvalidforbiddenfunction)
 - [defaultTriggerWaitForPromiseFunction](server_resolvers_basic.md#defaulttriggerwaitforpromisefunction)
 - [filterAndPrepareGQLValue](server_resolvers_basic.md#filterandpreparegqlvalue)
 - [getDictionary](server_resolvers_basic.md#getdictionary)
+- [handleConflictError](server_resolvers_basic.md#handleconflicterror)
 - [retrieveSince](server_resolvers_basic.md#retrievesince)
 - [retrieveUntil](server_resolvers_basic.md#retrieveuntil)
 - [runPolicyCheck](server_resolvers_basic.md#runpolicycheck)
@@ -30,6 +31,7 @@
 - [splitArgsInGraphqlQuery](server_resolvers_basic.md#splitargsingraphqlquery)
 - [validateContainerIdIsReal](server_resolvers_basic.md#validatecontaineridisreal)
 - [validateCustomId](server_resolvers_basic.md#validatecustomid)
+- [validateCustomVersion](server_resolvers_basic.md#validatecustomversion)
 - [validateParentingRules](server_resolvers_basic.md#validateparentingrules)
 - [validateTokenAndGetData](server_resolvers_basic.md#validatetokenandgetdata)
 - [validateTokenIsntBlocked](server_resolvers_basic.md#validatetokenisntblocked)
@@ -56,7 +58,7 @@ by the graphql resolver
 
 #### Defined in
 
-[server/resolvers/basic.ts:517](https://github.com/onzag/itemize/blob/f2db74a5/server/resolvers/basic.ts#L517)
+[server/resolvers/basic.ts:716](https://github.com/onzag/itemize/blob/a24376ed/server/resolvers/basic.ts#L716)
 
 ___
 
@@ -81,7 +83,7 @@ defintion allows
 
 #### Defined in
 
-[server/resolvers/basic.ts:476](https://github.com/onzag/itemize/blob/f2db74a5/server/resolvers/basic.ts#L476)
+[server/resolvers/basic.ts:675](https://github.com/onzag/itemize/blob/a24376ed/server/resolvers/basic.ts#L675)
 
 ___
 
@@ -102,7 +104,7 @@ ___
 
 #### Defined in
 
-[server/resolvers/basic.ts:324](https://github.com/onzag/itemize/blob/f2db74a5/server/resolvers/basic.ts#L324)
+[server/resolvers/basic.ts:463](https://github.com/onzag/itemize/blob/a24376ed/server/resolvers/basic.ts#L463)
 
 ___
 
@@ -123,31 +125,7 @@ ___
 
 #### Defined in
 
-[server/resolvers/basic.ts:487](https://github.com/onzag/itemize/blob/f2db74a5/server/resolvers/basic.ts#L487)
-
-___
-
-### checkReadPoliciesAllowThisUserToSearch
-
-▸ **checkReadPoliciesAllowThisUserToSearch**(`itemDefinition`, `role`): `void`
-
-Users cannot search if they have an active read policy in their roles
-this function checks and throws an error if there's such a thing
-
-#### Parameters
-
-| Name | Type | Description |
-| :------ | :------ | :------ |
-| `itemDefinition` | [`default`](../classes/base_Root_Module_ItemDefinition.default.md) | the item definition to check read policies for |
-| `role` | `string` | the role |
-
-#### Returns
-
-`void`
-
-#### Defined in
-
-[server/resolvers/basic.ts:924](https://github.com/onzag/itemize/blob/f2db74a5/server/resolvers/basic.ts#L924)
+[server/resolvers/basic.ts:686](https://github.com/onzag/itemize/blob/a24376ed/server/resolvers/basic.ts#L686)
 
 ___
 
@@ -172,7 +150,7 @@ as it was requested
 
 #### Defined in
 
-[server/resolvers/basic.ts:544](https://github.com/onzag/itemize/blob/f2db74a5/server/resolvers/basic.ts#L544)
+[server/resolvers/basic.ts:743](https://github.com/onzag/itemize/blob/a24376ed/server/resolvers/basic.ts#L743)
 
 ___
 
@@ -193,13 +171,13 @@ ___
 
 #### Defined in
 
-[server/resolvers/basic.ts:659](https://github.com/onzag/itemize/blob/f2db74a5/server/resolvers/basic.ts#L659)
+[server/resolvers/basic.ts:858](https://github.com/onzag/itemize/blob/a24376ed/server/resolvers/basic.ts#L858)
 
 ___
 
 ### defaultTriggerForbiddenFunction
 
-▸ **defaultTriggerForbiddenFunction**(`message`, `customCode?`): `void`
+▸ **defaultTriggerForbiddenFunction**(`message`, `customCode?`, `data?`): `void`
 
 #### Parameters
 
@@ -207,6 +185,7 @@ ___
 | :------ | :------ |
 | `message` | `string` |
 | `customCode?` | `string` |
+| `data?` | `any` |
 
 #### Returns
 
@@ -214,13 +193,13 @@ ___
 
 #### Defined in
 
-[server/resolvers/basic.ts:45](https://github.com/onzag/itemize/blob/f2db74a5/server/resolvers/basic.ts#L45)
+[server/resolvers/basic.ts:46](https://github.com/onzag/itemize/blob/a24376ed/server/resolvers/basic.ts#L46)
 
 ___
 
 ### defaultTriggerInvalidForbiddenFunction
 
-▸ **defaultTriggerInvalidForbiddenFunction**(`message`, `customCode?`): `void`
+▸ **defaultTriggerInvalidForbiddenFunction**(`message`, `customCode?`, `data?`): `void`
 
 #### Parameters
 
@@ -228,6 +207,7 @@ ___
 | :------ | :------ |
 | `message` | `string` |
 | `customCode?` | `string` |
+| `data?` | `any` |
 
 #### Returns
 
@@ -235,7 +215,29 @@ ___
 
 #### Defined in
 
-[server/resolvers/basic.ts:56](https://github.com/onzag/itemize/blob/f2db74a5/server/resolvers/basic.ts#L56)
+[server/resolvers/basic.ts:61](https://github.com/onzag/itemize/blob/a24376ed/server/resolvers/basic.ts#L61)
+
+___
+
+### defaultTriggerSearchInvalidForbiddenFunction
+
+▸ **defaultTriggerSearchInvalidForbiddenFunction**(`message`, `customCode?`, `data?`): `void`
+
+#### Parameters
+
+| Name | Type |
+| :------ | :------ |
+| `message` | `string` |
+| `customCode?` | `string` |
+| `data?` | `any` |
+
+#### Returns
+
+`void`
+
+#### Defined in
+
+[server/resolvers/basic.ts:76](https://github.com/onzag/itemize/blob/a24376ed/server/resolvers/basic.ts#L76)
 
 ___
 
@@ -249,7 +251,7 @@ ___
 
 #### Defined in
 
-[server/resolvers/basic.ts:52](https://github.com/onzag/itemize/blob/f2db74a5/server/resolvers/basic.ts#L52)
+[server/resolvers/basic.ts:57](https://github.com/onzag/itemize/blob/a24376ed/server/resolvers/basic.ts#L57)
 
 ___
 
@@ -283,7 +285,7 @@ the form comes with the DATA and the externalized fields
 
 #### Defined in
 
-[server/resolvers/basic.ts:704](https://github.com/onzag/itemize/blob/f2db74a5/server/resolvers/basic.ts#L704)
+[server/resolvers/basic.ts:903](https://github.com/onzag/itemize/blob/a24376ed/server/resolvers/basic.ts#L903)
 
 ___
 
@@ -307,7 +309,31 @@ and the language of choice
 
 #### Defined in
 
-[server/resolvers/basic.ts:576](https://github.com/onzag/itemize/blob/f2db74a5/server/resolvers/basic.ts#L576)
+[server/resolvers/basic.ts:775](https://github.com/onzag/itemize/blob/a24376ed/server/resolvers/basic.ts#L775)
+
+___
+
+### handleConflictError
+
+▸ **handleConflictError**(`pathOfThisIdef`, `pathOfThisModule`, `appData`, `error`, `rowValue`): `Promise`<`boolean`\>
+
+#### Parameters
+
+| Name | Type |
+| :------ | :------ |
+| `pathOfThisIdef` | `string` |
+| `pathOfThisModule` | `string` |
+| `appData` | [`IAppDataType`](../interfaces/server.IAppDataType.md) |
+| `error` | [`EndpointErrorType`](base_errors.md#endpointerrortype) |
+| `rowValue` | [`ISQLTableRowValue`](../interfaces/base_Root_sql.ISQLTableRowValue.md) |
+
+#### Returns
+
+`Promise`<`boolean`\>
+
+#### Defined in
+
+[server/resolvers/basic.ts:109](https://github.com/onzag/itemize/blob/a24376ed/server/resolvers/basic.ts#L109)
 
 ___
 
@@ -327,7 +353,7 @@ ___
 
 #### Defined in
 
-[server/resolvers/basic.ts:293](https://github.com/onzag/itemize/blob/f2db74a5/server/resolvers/basic.ts#L293)
+[server/resolvers/basic.ts:432](https://github.com/onzag/itemize/blob/a24376ed/server/resolvers/basic.ts#L432)
 
 ___
 
@@ -347,7 +373,7 @@ ___
 
 #### Defined in
 
-[server/resolvers/basic.ts:308](https://github.com/onzag/itemize/blob/f2db74a5/server/resolvers/basic.ts#L308)
+[server/resolvers/basic.ts:447](https://github.com/onzag/itemize/blob/a24376ed/server/resolvers/basic.ts#L447)
 
 ___
 
@@ -373,9 +399,11 @@ Runs a policy check on the requested information
 | `arg.parentVersion?` | `string` | - |
 | `arg.policyTypes` | `string`[] | - |
 | `arg.role` | `string` | the role of the current user |
+| `arg.rolesManager` | [`CustomRoleManager`](../classes/server_resolvers_roles.CustomRoleManager.md) \| (`content`: [`ISQLTableRowValue`](../interfaces/base_Root_sql.ISQLTableRowValue.md)) => [`CustomRoleManager`](../classes/server_resolvers_roles.CustomRoleManager.md) | - |
+| `arg.userId` | `string` | - |
 | `arg.version` | `string` | the version of the item definition on the database |
 | `arg.preParentValidation?` | (`content`: [`ISQLTableRowValue`](../interfaces/base_Root_sql.ISQLTableRowValue.md)) => `void` \| [`ISQLTableRowValue`](../interfaces/base_Root_sql.ISQLTableRowValue.md) | - |
-| `arg.preValidation?` | (`content`: [`ISQLTableRowValue`](../interfaces/base_Root_sql.ISQLTableRowValue.md)) => `void` \| [`ISQLTableRowValue`](../interfaces/base_Root_sql.ISQLTableRowValue.md) | - |
+| `arg.preValidation?` | (`content`: [`ISQLTableRowValue`](../interfaces/base_Root_sql.ISQLTableRowValue.md)) => `void` \| [`ISQLTableRowValue`](../interfaces/base_Root_sql.ISQLTableRowValue.md) \| `Promise`<`void` \| [`ISQLTableRowValue`](../interfaces/base_Root_sql.ISQLTableRowValue.md)\> | - |
 
 #### Returns
 
@@ -383,7 +411,7 @@ Runs a policy check on the requested information
 
 #### Defined in
 
-[server/resolvers/basic.ts:994](https://github.com/onzag/itemize/blob/f2db74a5/server/resolvers/basic.ts#L994)
+[server/resolvers/basic.ts:1178](https://github.com/onzag/itemize/blob/a24376ed/server/resolvers/basic.ts#L1178)
 
 ___
 
@@ -414,7 +442,7 @@ you should run itemDefinition.applyValue(gqlArgValue);
 
 #### Defined in
 
-[server/resolvers/basic.ts:803](https://github.com/onzag/itemize/blob/f2db74a5/server/resolvers/basic.ts#L803)
+[server/resolvers/basic.ts:1002](https://github.com/onzag/itemize/blob/a24376ed/server/resolvers/basic.ts#L1002)
 
 ___
 
@@ -439,7 +467,7 @@ that are used within the query
 
 #### Defined in
 
-[server/resolvers/basic.ts:952](https://github.com/onzag/itemize/blob/f2db74a5/server/resolvers/basic.ts#L952)
+[server/resolvers/basic.ts:1125](https://github.com/onzag/itemize/blob/a24376ed/server/resolvers/basic.ts#L1125)
 
 ___
 
@@ -463,7 +491,7 @@ to store data in
 
 #### Defined in
 
-[server/resolvers/basic.ts:587](https://github.com/onzag/itemize/blob/f2db74a5/server/resolvers/basic.ts#L587)
+[server/resolvers/basic.ts:786](https://github.com/onzag/itemize/blob/a24376ed/server/resolvers/basic.ts#L786)
 
 ___
 
@@ -483,13 +511,33 @@ ___
 
 #### Defined in
 
-[server/resolvers/basic.ts:71](https://github.com/onzag/itemize/blob/f2db74a5/server/resolvers/basic.ts#L71)
+[server/resolvers/basic.ts:92](https://github.com/onzag/itemize/blob/a24376ed/server/resolvers/basic.ts#L92)
+
+___
+
+### validateCustomVersion
+
+▸ **validateCustomVersion**(`version`): `void`
+
+#### Parameters
+
+| Name | Type |
+| :------ | :------ |
+| `version` | `string` |
+
+#### Returns
+
+`void`
+
+#### Defined in
+
+[server/resolvers/basic.ts:100](https://github.com/onzag/itemize/blob/a24376ed/server/resolvers/basic.ts#L100)
 
 ___
 
 ### validateParentingRules
 
-▸ **validateParentingRules**(`appData`, `parentId`, `parentVersion`, `parentType`, `itemDefinition`, `userId`, `actualFinalOwnerId`, `role`, `rolesManager`, `isReparenting`): `Promise`<`void`\>
+▸ **validateParentingRules**(`appData`, `parentId`, `parentVersion`, `parentType`, `itemDefinition`, `userId`, `actualFinalOwnerId`, `role`, `rolesManager`, `isReparenting`): `Promise`<[`ISQLTableRowValue`](../interfaces/base_Root_sql.ISQLTableRowValue.md)\>
 
 Validates that the parenting rules are respected for the item definition
 in question that wants to be created
@@ -511,11 +559,11 @@ in question that wants to be created
 
 #### Returns
 
-`Promise`<`void`\>
+`Promise`<[`ISQLTableRowValue`](../interfaces/base_Root_sql.ISQLTableRowValue.md)\>
 
 #### Defined in
 
-[server/resolvers/basic.ts:130](https://github.com/onzag/itemize/blob/f2db74a5/server/resolvers/basic.ts#L130)
+[server/resolvers/basic.ts:195](https://github.com/onzag/itemize/blob/a24376ed/server/resolvers/basic.ts#L195)
 
 ___
 
@@ -539,7 +587,7 @@ for use in the system
 
 #### Defined in
 
-[server/resolvers/basic.ts:85](https://github.com/onzag/itemize/blob/f2db74a5/server/resolvers/basic.ts#L85)
+[server/resolvers/basic.ts:150](https://github.com/onzag/itemize/blob/a24376ed/server/resolvers/basic.ts#L150)
 
 ___
 
@@ -563,4 +611,4 @@ by the rules of the session id, user is removed, or invalid credentials
 
 #### Defined in
 
-[server/resolvers/basic.ts:610](https://github.com/onzag/itemize/blob/f2db74a5/server/resolvers/basic.ts#L610)
+[server/resolvers/basic.ts:809](https://github.com/onzag/itemize/blob/a24376ed/server/resolvers/basic.ts#L809)

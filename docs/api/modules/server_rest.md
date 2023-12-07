@@ -9,6 +9,7 @@ This provides the rest endpoints for the itemize app
 ### Functions
 
 - [default](server_rest.md#default)
+- [secureEndpointRouter](server_rest.md#secureendpointrouter)
 
 ## Functions
 
@@ -37,4 +38,27 @@ by returning a router that holds them inside the
 
 #### Defined in
 
-[server/rest.ts:28](https://github.com/onzag/itemize/blob/f2db74a5/server/rest.ts#L28)
+[server/rest.ts:63](https://github.com/onzag/itemize/blob/a24376ed/server/rest.ts#L63)
+
+___
+
+### secureEndpointRouter
+
+▸ **secureEndpointRouter**(`appData`, `req`, `res`, `next`): `void`
+
+#### Parameters
+
+| Name | Type |
+| :------ | :------ |
+| `appData` | [`IAppDataType`](../interfaces/server.IAppDataType.md) |
+| `req` | `Request`<`ParamsDictionary`, `any`, `any`, `ParsedQs`, `Record`<`string`, `any`\>\> |
+| `res` | `Response`<`any`, `Record`<`string`, `any`\>\> |
+| `next` | () => `void` |
+
+#### Returns
+
+`void`
+
+#### Defined in
+
+[server/rest.ts:22](https://github.com/onzag/itemize/blob/a24376ed/server/rest.ts#L22)

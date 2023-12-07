@@ -26,7 +26,7 @@ or run alongside it
 
 #### Defined in
 
-[config.ts:359](https://github.com/onzag/itemize/blob/f2db74a5/config.ts#L359)
+[config.ts:355](https://github.com/onzag/itemize/blob/a24376ed/config.ts#L355)
 
 ___
 
@@ -39,7 +39,7 @@ that is shared within instances
 
 #### Defined in
 
-[config.ts:349](https://github.com/onzag/itemize/blob/f2db74a5/config.ts#L349)
+[config.ts:345](https://github.com/onzag/itemize/blob/a24376ed/config.ts#L345)
 
 ___
 
@@ -52,4 +52,4 @@ but used to inform changes of data to instances
 
 #### Defined in
 
-[config.ts:354](https://github.com/onzag/itemize/blob/f2db74a5/config.ts#L354)
+[config.ts:350](https://github.com/onzag/itemize/blob/a24376ed/config.ts#L350)

@@ -54,7 +54,7 @@ a void promise, this is basically for the same reason of changeLanguageTo
 
 #### Defined in
 
-[client/internal/providers/locale-provider.tsx:39](https://github.com/onzag/itemize/blob/f2db74a5/client/internal/providers/locale-provider.tsx#L39)
+[client/internal/providers/locale-provider.tsx:39](https://github.com/onzag/itemize/blob/a24376ed/client/internal/providers/locale-provider.tsx#L39)
 
 ___
 
@@ -81,7 +81,7 @@ To change the currency to a new code
 
 #### Defined in
 
-[client/internal/providers/locale-provider.tsx:25](https://github.com/onzag/itemize/blob/f2db74a5/client/internal/providers/locale-provider.tsx#L25)
+[client/internal/providers/locale-provider.tsx:25](https://github.com/onzag/itemize/blob/a24376ed/client/internal/providers/locale-provider.tsx#L25)
 
 ___
 
@@ -111,7 +111,7 @@ has been changed successfully and as such the app has updated
 
 #### Defined in
 
-[client/internal/providers/locale-provider.tsx:18](https://github.com/onzag/itemize/blob/f2db74a5/client/internal/providers/locale-provider.tsx#L18)
+[client/internal/providers/locale-provider.tsx:18](https://github.com/onzag/itemize/blob/a24376ed/client/internal/providers/locale-provider.tsx#L18)
 
 ## Variables
 
@@ -124,4 +124,4 @@ to any component that demands it
 
 #### Defined in
 
-[client/internal/providers/locale-provider.tsx:96](https://github.com/onzag/itemize/blob/f2db74a5/client/internal/providers/locale-provider.tsx#L96)
+[client/internal/providers/locale-provider.tsx:96](https://github.com/onzag/itemize/blob/a24376ed/client/internal/providers/locale-provider.tsx#L96)

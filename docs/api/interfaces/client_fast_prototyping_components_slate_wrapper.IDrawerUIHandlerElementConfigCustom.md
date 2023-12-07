@@ -19,7 +19,7 @@
 
 #### Defined in
 
-[client/fast-prototyping/components/slate/wrapper.tsx:374](https://github.com/onzag/itemize/blob/f2db74a5/client/fast-prototyping/components/slate/wrapper.tsx#L374)
+[client/fast-prototyping/components/slate/wrapper.tsx:376](https://github.com/onzag/itemize/blob/a24376ed/client/fast-prototyping/components/slate/wrapper.tsx#L376)
 
 ___
 
@@ -29,4 +29,4 @@ ___
 
 #### Defined in
 
-[client/fast-prototyping/components/slate/wrapper.tsx:373](https://github.com/onzag/itemize/blob/f2db74a5/client/fast-prototyping/components/slate/wrapper.tsx#L373)
+[client/fast-prototyping/components/slate/wrapper.tsx:375](https://github.com/onzag/itemize/blob/a24376ed/client/fast-prototyping/components/slate/wrapper.tsx#L375)

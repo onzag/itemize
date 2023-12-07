@@ -36,7 +36,7 @@ IBaseTemplateArg.editorArgs
 
 #### Defined in
 
-[client/internal/text/serializer/template-args.ts:196](https://github.com/onzag/itemize/blob/f2db74a5/client/internal/text/serializer/template-args.ts#L196)
+[client/internal/text/serializer/template-args.ts:196](https://github.com/onzag/itemize/blob/a24376ed/client/internal/text/serializer/template-args.ts#L196)
 
 ___
 
@@ -50,7 +50,7 @@ IBaseTemplateArg.label
 
 #### Defined in
 
-[client/internal/text/serializer/template-args.ts:189](https://github.com/onzag/itemize/blob/f2db74a5/client/internal/text/serializer/template-args.ts#L189)
+[client/internal/text/serializer/template-args.ts:189](https://github.com/onzag/itemize/blob/a24376ed/client/internal/text/serializer/template-args.ts#L189)
 
 ___
 
@@ -60,7 +60,7 @@ ___
 
 #### Defined in
 
-[client/internal/text/serializer/template-args.ts:291](https://github.com/onzag/itemize/blob/f2db74a5/client/internal/text/serializer/template-args.ts#L291)
+[client/internal/text/serializer/template-args.ts:303](https://github.com/onzag/itemize/blob/a24376ed/client/internal/text/serializer/template-args.ts#L303)
 
 ___
 
@@ -74,21 +74,17 @@ IBaseTemplateArg.nonRootInheritable
 
 #### Defined in
 
-[client/internal/text/serializer/template-args.ts:190](https://github.com/onzag/itemize/blob/f2db74a5/client/internal/text/serializer/template-args.ts#L190)
+[client/internal/text/serializer/template-args.ts:190](https://github.com/onzag/itemize/blob/a24376ed/client/internal/text/serializer/template-args.ts#L190)
 
 ___
 
 ### properties
 
-• **properties**: `Object`
-
-#### Index signature
-
-▪ [key: `string`]: [`ITemplateArgContextDefinition`](client_internal_text_serializer_template_args.ITemplateArgContextDefinition.md) \| [`ITemplateArgUIHandlerDefinition`](client_internal_text_serializer_template_args.ITemplateArgUIHandlerDefinition.md) \| [`ITemplateArgTextDefinition`](client_internal_text_serializer_template_args.ITemplateArgTextDefinition.md) \| [`ITemplateArgLinkDefinition`](client_internal_text_serializer_template_args.ITemplateArgLinkDefinition.md) \| [`ITemplateArgHTMLDefinition`](client_internal_text_serializer_template_args.ITemplateArgHTMLDefinition.md) \| [`ITemplateArgFunctionDefinition`](client_internal_text_serializer_template_args.ITemplateArgFunctionDefinition.md) \| [`ITemplateArgBooleanDefinition`](client_internal_text_serializer_template_args.ITemplateArgBooleanDefinition.md)
+• **properties**: [`ITemplateProperties`](client_internal_text_serializer_template_args.ITemplateProperties.md)
 
 #### Defined in
 
-[client/internal/text/serializer/template-args.ts:292](https://github.com/onzag/itemize/blob/f2db74a5/client/internal/text/serializer/template-args.ts#L292)
+[client/internal/text/serializer/template-args.ts:304](https://github.com/onzag/itemize/blob/a24376ed/client/internal/text/serializer/template-args.ts#L304)
 
 ___
 
@@ -98,4 +94,4 @@ ___
 
 #### Defined in
 
-[client/internal/text/serializer/template-args.ts:290](https://github.com/onzag/itemize/blob/f2db74a5/client/internal/text/serializer/template-args.ts#L290)
+[client/internal/text/serializer/template-args.ts:302](https://github.com/onzag/itemize/blob/a24376ed/client/internal/text/serializer/template-args.ts#L302)

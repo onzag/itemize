@@ -31,4 +31,4 @@ loadValue
 
 #### Defined in
 
-[client/providers/item.tsx:141](https://github.com/onzag/itemize/blob/f2db74a5/client/providers/item.tsx#L141)
+[client/providers/item.tsx:168](https://github.com/onzag/itemize/blob/a24376ed/client/providers/item.tsx#L168)

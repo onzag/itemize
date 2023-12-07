@@ -10,6 +10,7 @@
 
 - [customRoles](server.IServerCustomizationDataType.md#customroles)
 - [customRouterEndpoint](server.IServerCustomizationDataType.md#customrouterendpoint)
+- [customSearchEngineIndexing](server.IServerCustomizationDataType.md#customsearchengineindexing)
 - [customTokenGQLQueries](server.IServerCustomizationDataType.md#customtokengqlqueries)
 - [customTriggers](server.IServerCustomizationDataType.md#customtriggers)
 - [globalManagerInitialServerDataFunction](server.IServerCustomizationDataType.md#globalmanagerinitialserverdatafunction)
@@ -29,7 +30,7 @@
 
 #### Defined in
 
-[server/index.ts:248](https://github.com/onzag/itemize/blob/f2db74a5/server/index.ts#L248)
+[server/index.ts:278](https://github.com/onzag/itemize/blob/a24376ed/server/index.ts#L278)
 
 ___
 
@@ -39,7 +40,17 @@ ___
 
 #### Defined in
 
-[server/index.ts:245](https://github.com/onzag/itemize/blob/f2db74a5/server/index.ts#L245)
+[server/index.ts:275](https://github.com/onzag/itemize/blob/a24376ed/server/index.ts#L275)
+
+___
+
+### customSearchEngineIndexing
+
+• `Optional` **customSearchEngineIndexing**: `ICustomSearchEngineIndexingType`
+
+#### Defined in
+
+[server/index.ts:279](https://github.com/onzag/itemize/blob/a24376ed/server/index.ts#L279)
 
 ___
 
@@ -49,7 +60,7 @@ ___
 
 #### Defined in
 
-[server/index.ts:243](https://github.com/onzag/itemize/blob/f2db74a5/server/index.ts#L243)
+[server/index.ts:273](https://github.com/onzag/itemize/blob/a24376ed/server/index.ts#L273)
 
 ___
 
@@ -59,7 +70,7 @@ ___
 
 #### Defined in
 
-[server/index.ts:247](https://github.com/onzag/itemize/blob/f2db74a5/server/index.ts#L247)
+[server/index.ts:277](https://github.com/onzag/itemize/blob/a24376ed/server/index.ts#L277)
 
 ___
 
@@ -69,7 +80,7 @@ ___
 
 #### Defined in
 
-[server/index.ts:251](https://github.com/onzag/itemize/blob/f2db74a5/server/index.ts#L251)
+[server/index.ts:283](https://github.com/onzag/itemize/blob/a24376ed/server/index.ts#L283)
 
 ## Methods
 
@@ -89,7 +100,7 @@ ___
 
 #### Defined in
 
-[server/index.ts:249](https://github.com/onzag/itemize/blob/f2db74a5/server/index.ts#L249)
+[server/index.ts:281](https://github.com/onzag/itemize/blob/a24376ed/server/index.ts#L281)
 
 ___
 
@@ -109,7 +120,7 @@ ___
 
 #### Defined in
 
-[server/index.ts:244](https://github.com/onzag/itemize/blob/f2db74a5/server/index.ts#L244)
+[server/index.ts:274](https://github.com/onzag/itemize/blob/a24376ed/server/index.ts#L274)
 
 ___
 
@@ -129,7 +140,7 @@ ___
 
 #### Defined in
 
-[server/index.ts:242](https://github.com/onzag/itemize/blob/f2db74a5/server/index.ts#L242)
+[server/index.ts:272](https://github.com/onzag/itemize/blob/a24376ed/server/index.ts#L272)
 
 ___
 
@@ -149,4 +160,4 @@ ___
 
 #### Defined in
 
-[server/index.ts:246](https://github.com/onzag/itemize/blob/f2db74a5/server/index.ts#L246)
+[server/index.ts:276](https://github.com/onzag/itemize/blob/a24376ed/server/index.ts#L276)

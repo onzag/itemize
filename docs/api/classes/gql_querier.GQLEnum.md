@@ -45,7 +45,7 @@ A graphql enum
 
 #### Defined in
 
-[gql-querier.ts:558](https://github.com/onzag/itemize/blob/f2db74a5/gql-querier.ts#L558)
+[gql-querier.ts:613](https://github.com/onzag/itemize/blob/a24376ed/gql-querier.ts#L613)
 
 ## Properties
 
@@ -59,7 +59,7 @@ A graphql enum
 
 #### Defined in
 
-[gql-querier.ts:574](https://github.com/onzag/itemize/blob/f2db74a5/gql-querier.ts#L574)
+[gql-querier.ts:629](https://github.com/onzag/itemize/blob/a24376ed/gql-querier.ts#L629)
 
 ___
 
@@ -73,7 +73,7 @@ ___
 
 #### Defined in
 
-[gql-querier.ts:555](https://github.com/onzag/itemize/blob/f2db74a5/gql-querier.ts#L555)
+[gql-querier.ts:610](https://github.com/onzag/itemize/blob/a24376ed/gql-querier.ts#L610)
 
 ## Methods
 
@@ -96,4 +96,4 @@ ___
 
 #### Defined in
 
-[gql-querier.ts:561](https://github.com/onzag/itemize/blob/f2db74a5/gql-querier.ts#L561)
+[gql-querier.ts:616](https://github.com/onzag/itemize/blob/a24376ed/gql-querier.ts#L616)

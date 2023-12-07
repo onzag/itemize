@@ -9,12 +9,16 @@
 - [findLastRecordDate](server_resolvers_actions_search.md#findlastrecorddate)
 - [searchItemDefinition](server_resolvers_actions_search.md#searchitemdefinition)
 - [searchItemDefinitionFn](server_resolvers_actions_search.md#searchitemdefinitionfn)
+- [searchItemDefinitionFnRQ](server_resolvers_actions_search.md#searchitemdefinitionfnrq)
 - [searchItemDefinitionTraditional](server_resolvers_actions_search.md#searchitemdefinitiontraditional)
 - [searchItemDefinitionTraditionalFn](server_resolvers_actions_search.md#searchitemdefinitiontraditionalfn)
+- [searchItemDefinitionTraditionalFnRQ](server_resolvers_actions_search.md#searchitemdefinitiontraditionalfnrq)
 - [searchModule](server_resolvers_actions_search.md#searchmodule)
 - [searchModuleFn](server_resolvers_actions_search.md#searchmodulefn)
+- [searchModuleFnRQ](server_resolvers_actions_search.md#searchmodulefnrq)
 - [searchModuleTraditional](server_resolvers_actions_search.md#searchmoduletraditional)
 - [searchModuleTraditionalFn](server_resolvers_actions_search.md#searchmoduletraditionalfn)
+- [searchModuleTraditionalFnRQ](server_resolvers_actions_search.md#searchmoduletraditionalfnrq)
 
 ## Functions
 
@@ -36,13 +40,13 @@
 
 #### Defined in
 
-[server/resolvers/actions/search.ts:45](https://github.com/onzag/itemize/blob/f2db74a5/server/resolvers/actions/search.ts#L45)
+[server/resolvers/actions/search.ts:47](https://github.com/onzag/itemize/blob/a24376ed/server/resolvers/actions/search.ts#L47)
 
 ___
 
 ### searchItemDefinition
 
-▸ **searchItemDefinition**(`appData`, `resolverArgs`, `resolverItemDefinition`, `traditional?`): `Promise`<[`IGQLSearchRecordsContainer`](../interfaces/gql_querier.IGQLSearchRecordsContainer.md) \| [`IGQLSearchResultsContainer`](../interfaces/gql_querier.IGQLSearchResultsContainer.md)\>
+▸ **searchItemDefinition**(`appData`, `resolverArgs`, `resolverItemDefinition`, `opts?`): `Promise`<[`IGQLSearchRecordsContainer`](../interfaces/gql_querier.IGQLSearchRecordsContainer.md) \| [`IGQLSearchResultsContainer`](../interfaces/gql_querier.IGQLSearchResultsContainer.md)\>
 
 #### Parameters
 
@@ -51,7 +55,9 @@ ___
 | `appData` | [`IAppDataType`](../interfaces/server.IAppDataType.md) |
 | `resolverArgs` | [`IGraphQLIdefResolverArgs`](../interfaces/base_Root_gql.IGraphQLIdefResolverArgs.md) |
 | `resolverItemDefinition` | [`default`](../classes/base_Root_Module_ItemDefinition.default.md) |
-| `traditional?` | `boolean` |
+| `opts` | `Object` |
+| `opts.noLimitOffset?` | `boolean` |
+| `opts.traditional?` | `boolean` |
 
 #### Returns
 
@@ -59,7 +65,7 @@ ___
 
 #### Defined in
 
-[server/resolvers/actions/search.ts:712](https://github.com/onzag/itemize/blob/f2db74a5/server/resolvers/actions/search.ts#L712)
+[server/resolvers/actions/search.ts:1024](https://github.com/onzag/itemize/blob/a24376ed/server/resolvers/actions/search.ts#L1024)
 
 ___
 
@@ -79,7 +85,27 @@ ___
 
 #### Defined in
 
-[server/resolvers/actions/search.ts:1369](https://github.com/onzag/itemize/blob/f2db74a5/server/resolvers/actions/search.ts#L1369)
+[server/resolvers/actions/search.ts:2014](https://github.com/onzag/itemize/blob/a24376ed/server/resolvers/actions/search.ts#L2014)
+
+___
+
+### searchItemDefinitionFnRQ
+
+▸ **searchItemDefinitionFnRQ**(`appData`): [`FRQIdefResolverType`](base_Root_rq.md#frqidefresolvertype)
+
+#### Parameters
+
+| Name | Type |
+| :------ | :------ |
+| `appData` | [`IAppDataType`](../interfaces/server.IAppDataType.md) |
+
+#### Returns
+
+[`FRQIdefResolverType`](base_Root_rq.md#frqidefresolvertype)
+
+#### Defined in
+
+[server/resolvers/actions/search.ts:2030](https://github.com/onzag/itemize/blob/a24376ed/server/resolvers/actions/search.ts#L2030)
 
 ___
 
@@ -101,7 +127,7 @@ ___
 
 #### Defined in
 
-[server/resolvers/actions/search.ts:704](https://github.com/onzag/itemize/blob/f2db74a5/server/resolvers/actions/search.ts#L704)
+[server/resolvers/actions/search.ts:1016](https://github.com/onzag/itemize/blob/a24376ed/server/resolvers/actions/search.ts#L1016)
 
 ___
 
@@ -121,13 +147,33 @@ ___
 
 #### Defined in
 
-[server/resolvers/actions/search.ts:1377](https://github.com/onzag/itemize/blob/f2db74a5/server/resolvers/actions/search.ts#L1377)
+[server/resolvers/actions/search.ts:2022](https://github.com/onzag/itemize/blob/a24376ed/server/resolvers/actions/search.ts#L2022)
+
+___
+
+### searchItemDefinitionTraditionalFnRQ
+
+▸ **searchItemDefinitionTraditionalFnRQ**(`appData`): [`FRQIdefResolverType`](base_Root_rq.md#frqidefresolvertype)
+
+#### Parameters
+
+| Name | Type |
+| :------ | :------ |
+| `appData` | [`IAppDataType`](../interfaces/server.IAppDataType.md) |
+
+#### Returns
+
+[`FRQIdefResolverType`](base_Root_rq.md#frqidefresolvertype)
+
+#### Defined in
+
+[server/resolvers/actions/search.ts:2038](https://github.com/onzag/itemize/blob/a24376ed/server/resolvers/actions/search.ts#L2038)
 
 ___
 
 ### searchModule
 
-▸ **searchModule**(`appData`, `resolverArgs`, `mod`, `traditional?`): `Promise`<[`IGQLSearchRecordsContainer`](../interfaces/gql_querier.IGQLSearchRecordsContainer.md) \| [`IGQLSearchResultsContainer`](../interfaces/gql_querier.IGQLSearchResultsContainer.md)\>
+▸ **searchModule**(`appData`, `resolverArgs`, `mod`, `opts?`): `Promise`<[`IGQLSearchRecordsContainer`](../interfaces/gql_querier.IGQLSearchRecordsContainer.md) \| [`IGQLSearchResultsContainer`](../interfaces/gql_querier.IGQLSearchResultsContainer.md)\>
 
 #### Parameters
 
@@ -136,7 +182,9 @@ ___
 | `appData` | [`IAppDataType`](../interfaces/server.IAppDataType.md) |
 | `resolverArgs` | [`IGraphQLIdefResolverArgs`](../interfaces/base_Root_gql.IGraphQLIdefResolverArgs.md) |
 | `mod` | [`default`](../classes/base_Root_Module.default.md) |
-| `traditional?` | `boolean` |
+| `opts` | `Object` |
+| `opts.noLimitOffset?` | `boolean` |
+| `opts.traditional?` | `boolean` |
 
 #### Returns
 
@@ -144,7 +192,7 @@ ___
 
 #### Defined in
 
-[server/resolvers/actions/search.ts:66](https://github.com/onzag/itemize/blob/f2db74a5/server/resolvers/actions/search.ts#L66)
+[server/resolvers/actions/search.ts:68](https://github.com/onzag/itemize/blob/a24376ed/server/resolvers/actions/search.ts#L68)
 
 ___
 
@@ -164,7 +212,27 @@ ___
 
 #### Defined in
 
-[server/resolvers/actions/search.ts:1373](https://github.com/onzag/itemize/blob/f2db74a5/server/resolvers/actions/search.ts#L1373)
+[server/resolvers/actions/search.ts:2018](https://github.com/onzag/itemize/blob/a24376ed/server/resolvers/actions/search.ts#L2018)
+
+___
+
+### searchModuleFnRQ
+
+▸ **searchModuleFnRQ**(`appData`): [`FRQModResolverType`](base_Root_rq.md#frqmodresolvertype)
+
+#### Parameters
+
+| Name | Type |
+| :------ | :------ |
+| `appData` | [`IAppDataType`](../interfaces/server.IAppDataType.md) |
+
+#### Returns
+
+[`FRQModResolverType`](base_Root_rq.md#frqmodresolvertype)
+
+#### Defined in
+
+[server/resolvers/actions/search.ts:2034](https://github.com/onzag/itemize/blob/a24376ed/server/resolvers/actions/search.ts#L2034)
 
 ___
 
@@ -186,7 +254,7 @@ ___
 
 #### Defined in
 
-[server/resolvers/actions/search.ts:58](https://github.com/onzag/itemize/blob/f2db74a5/server/resolvers/actions/search.ts#L58)
+[server/resolvers/actions/search.ts:60](https://github.com/onzag/itemize/blob/a24376ed/server/resolvers/actions/search.ts#L60)
 
 ___
 
@@ -206,4 +274,24 @@ ___
 
 #### Defined in
 
-[server/resolvers/actions/search.ts:1381](https://github.com/onzag/itemize/blob/f2db74a5/server/resolvers/actions/search.ts#L1381)
+[server/resolvers/actions/search.ts:2026](https://github.com/onzag/itemize/blob/a24376ed/server/resolvers/actions/search.ts#L2026)
+
+___
+
+### searchModuleTraditionalFnRQ
+
+▸ **searchModuleTraditionalFnRQ**(`appData`): [`FRQModResolverType`](base_Root_rq.md#frqmodresolvertype)
+
+#### Parameters
+
+| Name | Type |
+| :------ | :------ |
+| `appData` | [`IAppDataType`](../interfaces/server.IAppDataType.md) |
+
+#### Returns
+
+[`FRQModResolverType`](base_Root_rq.md#frqmodresolvertype)
+
+#### Defined in
+
+[server/resolvers/actions/search.ts:2042](https://github.com/onzag/itemize/blob/a24376ed/server/resolvers/actions/search.ts#L2042)

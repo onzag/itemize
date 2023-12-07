@@ -25,7 +25,7 @@
 
 #### Defined in
 
-[client/components/accessibility/util.tsx:29](https://github.com/onzag/itemize/blob/f2db74a5/client/components/accessibility/util.tsx#L29)
+[client/components/accessibility/util.tsx:30](https://github.com/onzag/itemize/blob/a24376ed/client/components/accessibility/util.tsx#L30)
 
 ## Functions
 
@@ -97,7 +97,7 @@ Then use the deserialize function to get a tree, and feed that output to reactif
 
 #### Defined in
 
-[client/components/accessibility/util.tsx:585](https://github.com/onzag/itemize/blob/f2db74a5/client/components/accessibility/util.tsx#L585)
+[client/components/accessibility/util.tsx:607](https://github.com/onzag/itemize/blob/a24376ed/client/components/accessibility/util.tsx#L607)
 
 ___
 
@@ -117,4 +117,4 @@ ___
 
 #### Defined in
 
-[client/components/accessibility/util.tsx:12](https://github.com/onzag/itemize/blob/f2db74a5/client/components/accessibility/util.tsx#L12)
+[client/components/accessibility/util.tsx:13](https://github.com/onzag/itemize/blob/a24376ed/client/components/accessibility/util.tsx#L13)

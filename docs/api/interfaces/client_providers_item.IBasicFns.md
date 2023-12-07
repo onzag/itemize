@@ -44,7 +44,7 @@ cleans performs the cleanup of properties and policies
 
 #### Defined in
 
-[client/providers/item.tsx:925](https://github.com/onzag/itemize/blob/f2db74a5/client/providers/item.tsx#L925)
+[client/providers/item.tsx:1111](https://github.com/onzag/itemize/blob/a24376ed/client/providers/item.tsx#L1111)
 
 ___
 
@@ -62,7 +62,7 @@ a response with the status
 
 #### Defined in
 
-[client/providers/item.tsx:917](https://github.com/onzag/itemize/blob/f2db74a5/client/providers/item.tsx#L917)
+[client/providers/item.tsx:1103](https://github.com/onzag/itemize/blob/a24376ed/client/providers/item.tsx#L1103)
 
 ___
 
@@ -84,7 +84,7 @@ Poke elements
 
 #### Defined in
 
-[client/providers/item.tsx:892](https://github.com/onzag/itemize/blob/f2db74a5/client/providers/item.tsx#L892)
+[client/providers/item.tsx:1078](https://github.com/onzag/itemize/blob/a24376ed/client/providers/item.tsx#L1078)
 
 ___
 
@@ -108,7 +108,7 @@ do a hard refresh and bypass the cache
 
 #### Defined in
 
-[client/providers/item.tsx:905](https://github.com/onzag/itemize/blob/f2db74a5/client/providers/item.tsx#L905)
+[client/providers/item.tsx:1091](https://github.com/onzag/itemize/blob/a24376ed/client/providers/item.tsx#L1091)
 
 ___
 
@@ -133,7 +133,7 @@ mode because there are no endpoints otherwise
 
 #### Defined in
 
-[client/providers/item.tsx:934](https://github.com/onzag/itemize/blob/f2db74a5/client/providers/item.tsx#L934)
+[client/providers/item.tsx:1120](https://github.com/onzag/itemize/blob/a24376ed/client/providers/item.tsx#L1120)
 
 ___
 
@@ -158,7 +158,7 @@ a response with the status
 
 #### Defined in
 
-[client/providers/item.tsx:912](https://github.com/onzag/itemize/blob/f2db74a5/client/providers/item.tsx#L912)
+[client/providers/item.tsx:1098](https://github.com/onzag/itemize/blob/a24376ed/client/providers/item.tsx#L1098)
 
 ___
 
@@ -174,4 +174,4 @@ unpokes all elements
 
 #### Defined in
 
-[client/providers/item.tsx:897](https://github.com/onzag/itemize/blob/f2db74a5/client/providers/item.tsx#L897)
+[client/providers/item.tsx:1083](https://github.com/onzag/itemize/blob/a24376ed/client/providers/item.tsx#L1083)

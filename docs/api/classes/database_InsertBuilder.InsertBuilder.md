@@ -63,7 +63,7 @@ Builds a new insert query
 
 #### Defined in
 
-[database/InsertBuilder.ts:62](https://github.com/onzag/itemize/blob/f2db74a5/database/InsertBuilder.ts#L62)
+[database/InsertBuilder.ts:62](https://github.com/onzag/itemize/blob/a24376ed/database/InsertBuilder.ts#L62)
 
 ## Properties
 
@@ -80,7 +80,7 @@ as a string itself
 
 #### Defined in
 
-[database/InsertBuilder.ts:31](https://github.com/onzag/itemize/blob/f2db74a5/database/InsertBuilder.ts#L31)
+[database/InsertBuilder.ts:31](https://github.com/onzag/itemize/blob/a24376ed/database/InsertBuilder.ts#L31)
 
 ___
 
@@ -92,7 +92,7 @@ What to do on conflict
 
 #### Defined in
 
-[database/InsertBuilder.ts:55](https://github.com/onzag/itemize/blob/f2db74a5/database/InsertBuilder.ts#L55)
+[database/InsertBuilder.ts:55](https://github.com/onzag/itemize/blob/a24376ed/database/InsertBuilder.ts#L55)
 
 ___
 
@@ -102,7 +102,7 @@ ___
 
 #### Defined in
 
-[database/InsertBuilder.ts:57](https://github.com/onzag/itemize/blob/f2db74a5/database/InsertBuilder.ts#L57)
+[database/InsertBuilder.ts:57](https://github.com/onzag/itemize/blob/a24376ed/database/InsertBuilder.ts#L57)
 
 ___
 
@@ -112,7 +112,7 @@ ___
 
 #### Defined in
 
-[database/InsertBuilder.ts:56](https://github.com/onzag/itemize/blob/f2db74a5/database/InsertBuilder.ts#L56)
+[database/InsertBuilder.ts:56](https://github.com/onzag/itemize/blob/a24376ed/database/InsertBuilder.ts#L56)
 
 ___
 
@@ -124,7 +124,7 @@ The returning builder to specify the returning condition
 
 #### Defined in
 
-[database/InsertBuilder.ts:46](https://github.com/onzag/itemize/blob/f2db74a5/database/InsertBuilder.ts#L46)
+[database/InsertBuilder.ts:46](https://github.com/onzag/itemize/blob/a24376ed/database/InsertBuilder.ts#L46)
 
 ___
 
@@ -136,7 +136,7 @@ The table name we try to insert at
 
 #### Defined in
 
-[database/InsertBuilder.ts:51](https://github.com/onzag/itemize/blob/f2db74a5/database/InsertBuilder.ts#L51)
+[database/InsertBuilder.ts:51](https://github.com/onzag/itemize/blob/a24376ed/database/InsertBuilder.ts#L51)
 
 ___
 
@@ -148,7 +148,7 @@ The set builder for an upsert
 
 #### Defined in
 
-[database/InsertBuilder.ts:36](https://github.com/onzag/itemize/blob/f2db74a5/database/InsertBuilder.ts#L36)
+[database/InsertBuilder.ts:36](https://github.com/onzag/itemize/blob/a24376ed/database/InsertBuilder.ts#L36)
 
 ___
 
@@ -160,7 +160,7 @@ The where builder for an upsert
 
 #### Defined in
 
-[database/InsertBuilder.ts:41](https://github.com/onzag/itemize/blob/f2db74a5/database/InsertBuilder.ts#L41)
+[database/InsertBuilder.ts:41](https://github.com/onzag/itemize/blob/a24376ed/database/InsertBuilder.ts#L41)
 
 ___
 
@@ -176,7 +176,7 @@ into a string form, for example
 
 #### Defined in
 
-[database/InsertBuilder.ts:22](https://github.com/onzag/itemize/blob/f2db74a5/database/InsertBuilder.ts#L22)
+[database/InsertBuilder.ts:22](https://github.com/onzag/itemize/blob/a24376ed/database/InsertBuilder.ts#L22)
 
 ## Methods
 
@@ -202,7 +202,7 @@ Adds a binding source to the binding source list in order
 
 #### Defined in
 
-[database/base.ts:69](https://github.com/onzag/itemize/blob/f2db74a5/database/base.ts#L69)
+[database/base.ts:69](https://github.com/onzag/itemize/blob/a24376ed/database/base.ts#L69)
 
 ___
 
@@ -228,7 +228,7 @@ Adds many binding sources to the bindings sources list
 
 #### Defined in
 
-[database/base.ts:77](https://github.com/onzag/itemize/blob/f2db74a5/database/base.ts#L77)
+[database/base.ts:77](https://github.com/onzag/itemize/blob/a24376ed/database/base.ts#L77)
 
 ___
 
@@ -247,7 +247,7 @@ itself
 
 #### Defined in
 
-[database/InsertBuilder.ts:90](https://github.com/onzag/itemize/blob/f2db74a5/database/InsertBuilder.ts#L90)
+[database/InsertBuilder.ts:90](https://github.com/onzag/itemize/blob/a24376ed/database/InsertBuilder.ts#L90)
 
 ___
 
@@ -267,7 +267,7 @@ Removes all binding sources
 
 #### Defined in
 
-[database/base.ts:105](https://github.com/onzag/itemize/blob/f2db74a5/database/base.ts#L105)
+[database/base.ts:105](https://github.com/onzag/itemize/blob/a24376ed/database/base.ts#L105)
 
 ___
 
@@ -285,7 +285,7 @@ itself
 
 #### Defined in
 
-[database/InsertBuilder.ts:76](https://github.com/onzag/itemize/blob/f2db74a5/database/InsertBuilder.ts#L76)
+[database/InsertBuilder.ts:76](https://github.com/onzag/itemize/blob/a24376ed/database/InsertBuilder.ts#L76)
 
 ___
 
@@ -307,7 +307,7 @@ a string that represents the compiled result
 
 #### Defined in
 
-[database/InsertBuilder.ts:231](https://github.com/onzag/itemize/blob/f2db74a5/database/InsertBuilder.ts#L231)
+[database/InsertBuilder.ts:231](https://github.com/onzag/itemize/blob/a24376ed/database/InsertBuilder.ts#L231)
 
 ___
 
@@ -330,7 +330,7 @@ a list of basic bindings
 
 #### Defined in
 
-[database/base.ts:168](https://github.com/onzag/itemize/blob/f2db74a5/database/base.ts#L168)
+[database/base.ts:168](https://github.com/onzag/itemize/blob/a24376ed/database/base.ts#L168)
 
 ___
 
@@ -354,7 +354,7 @@ itself
 
 #### Defined in
 
-[database/InsertBuilder.ts:114](https://github.com/onzag/itemize/blob/f2db74a5/database/InsertBuilder.ts#L114)
+[database/InsertBuilder.ts:114](https://github.com/onzag/itemize/blob/a24376ed/database/InsertBuilder.ts#L114)
 
 ___
 
@@ -376,7 +376,7 @@ ___
 
 #### Defined in
 
-[database/InsertBuilder.ts:183](https://github.com/onzag/itemize/blob/f2db74a5/database/InsertBuilder.ts#L183)
+[database/InsertBuilder.ts:183](https://github.com/onzag/itemize/blob/a24376ed/database/InsertBuilder.ts#L183)
 
 ___
 
@@ -401,7 +401,7 @@ itself
 
 #### Defined in
 
-[database/InsertBuilder.ts:203](https://github.com/onzag/itemize/blob/f2db74a5/database/InsertBuilder.ts#L203)
+[database/InsertBuilder.ts:203](https://github.com/onzag/itemize/blob/a24376ed/database/InsertBuilder.ts#L203)
 
 ___
 
@@ -423,7 +423,7 @@ ___
 
 #### Defined in
 
-[database/InsertBuilder.ts:190](https://github.com/onzag/itemize/blob/f2db74a5/database/InsertBuilder.ts#L190)
+[database/InsertBuilder.ts:190](https://github.com/onzag/itemize/blob/a24376ed/database/InsertBuilder.ts#L190)
 
 ___
 
@@ -443,7 +443,7 @@ Removes the last added biding source and returns it
 
 #### Defined in
 
-[database/base.ts:112](https://github.com/onzag/itemize/blob/f2db74a5/database/base.ts#L112)
+[database/base.ts:112](https://github.com/onzag/itemize/blob/a24376ed/database/base.ts#L112)
 
 ___
 
@@ -470,7 +470,7 @@ list
 
 #### Defined in
 
-[database/base.ts:89](https://github.com/onzag/itemize/blob/f2db74a5/database/base.ts#L89)
+[database/base.ts:89](https://github.com/onzag/itemize/blob/a24376ed/database/base.ts#L89)
 
 ___
 
@@ -497,7 +497,7 @@ list
 
 #### Defined in
 
-[database/base.ts:98](https://github.com/onzag/itemize/blob/f2db74a5/database/base.ts#L98)
+[database/base.ts:98](https://github.com/onzag/itemize/blob/a24376ed/database/base.ts#L98)
 
 ___
 
@@ -521,7 +521,7 @@ itself
 
 #### Defined in
 
-[database/InsertBuilder.ts:104](https://github.com/onzag/itemize/blob/f2db74a5/database/InsertBuilder.ts#L104)
+[database/InsertBuilder.ts:104](https://github.com/onzag/itemize/blob/a24376ed/database/InsertBuilder.ts#L104)
 
 ___
 
@@ -543,4 +543,4 @@ a sql builder result with the bindings and the query itself
 
 #### Defined in
 
-[database/base.ts:129](https://github.com/onzag/itemize/blob/f2db74a5/database/base.ts#L129)
+[database/base.ts:129](https://github.com/onzag/itemize/blob/a24376ed/database/base.ts#L129)

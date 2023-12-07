@@ -70,7 +70,7 @@ React.Component&lt;IPropertyViewRichTextViewerProps, IPropertyViewRichTextViewer
 
 #### Defined in
 
-[client/fast-prototyping/renderers/PropertyView/PropertyViewText.tsx:199](https://github.com/onzag/itemize/blob/f2db74a5/client/fast-prototyping/renderers/PropertyView/PropertyViewText.tsx#L199)
+[client/fast-prototyping/renderers/PropertyView/PropertyViewText.tsx:201](https://github.com/onzag/itemize/blob/a24376ed/client/fast-prototyping/renderers/PropertyView/PropertyViewText.tsx#L201)
 
 ## Properties
 
@@ -82,7 +82,7 @@ A cheap div we use for transformations
 
 #### Defined in
 
-[client/fast-prototyping/renderers/PropertyView/PropertyViewText.tsx:193](https://github.com/onzag/itemize/blob/f2db74a5/client/fast-prototyping/renderers/PropertyView/PropertyViewText.tsx#L193)
+[client/fast-prototyping/renderers/PropertyView/PropertyViewText.tsx:195](https://github.com/onzag/itemize/blob/a24376ed/client/fast-prototyping/renderers/PropertyView/PropertyViewText.tsx#L195)
 
 ___
 
@@ -122,7 +122,7 @@ The reference for our div
 
 #### Defined in
 
-[client/fast-prototyping/renderers/PropertyView/PropertyViewText.tsx:189](https://github.com/onzag/itemize/blob/f2db74a5/client/fast-prototyping/renderers/PropertyView/PropertyViewText.tsx#L189)
+[client/fast-prototyping/renderers/PropertyView/PropertyViewText.tsx:191](https://github.com/onzag/itemize/blob/a24376ed/client/fast-prototyping/renderers/PropertyView/PropertyViewText.tsx#L191)
 
 ___
 
@@ -335,7 +335,7 @@ Attach the events that are required for lazyloading
 
 #### Defined in
 
-[client/fast-prototyping/renderers/PropertyView/PropertyViewText.tsx:286](https://github.com/onzag/itemize/blob/f2db74a5/client/fast-prototyping/renderers/PropertyView/PropertyViewText.tsx#L286)
+[client/fast-prototyping/renderers/PropertyView/PropertyViewText.tsx:288](https://github.com/onzag/itemize/blob/a24376ed/client/fast-prototyping/renderers/PropertyView/PropertyViewText.tsx#L288)
 
 ___
 
@@ -381,7 +381,7 @@ React.Component.componentDidMount
 
 #### Defined in
 
-[client/fast-prototyping/renderers/PropertyView/PropertyViewText.tsx:354](https://github.com/onzag/itemize/blob/f2db74a5/client/fast-prototyping/renderers/PropertyView/PropertyViewText.tsx#L354)
+[client/fast-prototyping/renderers/PropertyView/PropertyViewText.tsx:356](https://github.com/onzag/itemize/blob/a24376ed/client/fast-prototyping/renderers/PropertyView/PropertyViewText.tsx#L356)
 
 ___
 
@@ -399,7 +399,7 @@ React.Component.componentDidUpdate
 
 #### Defined in
 
-[client/fast-prototyping/renderers/PropertyView/PropertyViewText.tsx:361](https://github.com/onzag/itemize/blob/f2db74a5/client/fast-prototyping/renderers/PropertyView/PropertyViewText.tsx#L361)
+[client/fast-prototyping/renderers/PropertyView/PropertyViewText.tsx:363](https://github.com/onzag/itemize/blob/a24376ed/client/fast-prototyping/renderers/PropertyView/PropertyViewText.tsx#L363)
 
 ___
 
@@ -576,7 +576,7 @@ that is going to be rendered instead for the inner html
 
 #### Defined in
 
-[client/fast-prototyping/renderers/PropertyView/PropertyViewText.tsx:215](https://github.com/onzag/itemize/blob/f2db74a5/client/fast-prototyping/renderers/PropertyView/PropertyViewText.tsx#L215)
+[client/fast-prototyping/renderers/PropertyView/PropertyViewText.tsx:217](https://github.com/onzag/itemize/blob/a24376ed/client/fast-prototyping/renderers/PropertyView/PropertyViewText.tsx#L217)
 
 ___
 
@@ -624,7 +624,7 @@ Prepares the lazy loader, runs on mounting or changing
 
 #### Defined in
 
-[client/fast-prototyping/renderers/PropertyView/PropertyViewText.tsx:257](https://github.com/onzag/itemize/blob/f2db74a5/client/fast-prototyping/renderers/PropertyView/PropertyViewText.tsx#L257)
+[client/fast-prototyping/renderers/PropertyView/PropertyViewText.tsx:259](https://github.com/onzag/itemize/blob/a24376ed/client/fast-prototyping/renderers/PropertyView/PropertyViewText.tsx#L259)
 
 ___
 
@@ -642,7 +642,7 @@ React.Component.render
 
 #### Defined in
 
-[client/fast-prototyping/renderers/PropertyView/PropertyViewText.tsx:376](https://github.com/onzag/itemize/blob/f2db74a5/client/fast-prototyping/renderers/PropertyView/PropertyViewText.tsx#L376)
+[client/fast-prototyping/renderers/PropertyView/PropertyViewText.tsx:379](https://github.com/onzag/itemize/blob/a24376ed/client/fast-prototyping/renderers/PropertyView/PropertyViewText.tsx#L379)
 
 ___
 
@@ -698,7 +698,7 @@ React.Component.shouldComponentUpdate
 
 #### Defined in
 
-[client/fast-prototyping/renderers/PropertyView/PropertyViewText.tsx:367](https://github.com/onzag/itemize/blob/f2db74a5/client/fast-prototyping/renderers/PropertyView/PropertyViewText.tsx#L367)
+[client/fast-prototyping/renderers/PropertyView/PropertyViewText.tsx:369](https://github.com/onzag/itemize/blob/a24376ed/client/fast-prototyping/renderers/PropertyView/PropertyViewText.tsx#L369)
 
 ___
 
@@ -720,4 +720,4 @@ updates the html
 
 #### Defined in
 
-[client/fast-prototyping/renderers/PropertyView/PropertyViewText.tsx:277](https://github.com/onzag/itemize/blob/f2db74a5/client/fast-prototyping/renderers/PropertyView/PropertyViewText.tsx#L277)
+[client/fast-prototyping/renderers/PropertyView/PropertyViewText.tsx:279](https://github.com/onzag/itemize/blob/a24376ed/client/fast-prototyping/renderers/PropertyView/PropertyViewText.tsx#L279)

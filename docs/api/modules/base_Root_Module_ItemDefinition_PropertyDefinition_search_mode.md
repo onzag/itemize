@@ -8,11 +8,17 @@ item definition and alternative property that is used during searches
 
 ## Table of contents
 
+### Interfaces
+
+- [IValueForLimiterRule](../interfaces/base_Root_Module_ItemDefinition_PropertyDefinition_search_mode.IValueForLimiterRule.md)
+
 ### Functions
 
 - [buildSearchModePaymentProperty](base_Root_Module_ItemDefinition_PropertyDefinition_search_mode.md#buildsearchmodepaymentproperty)
 - [buildSearchModePropertyDefinitions](base_Root_Module_ItemDefinition_PropertyDefinition_search_mode.md#buildsearchmodepropertydefinitions)
 - [getConversionIds](base_Root_Module_ItemDefinition_PropertyDefinition_search_mode.md#getconversionids)
+- [getConversionIdsForCheckingAgainstLimiters](base_Root_Module_ItemDefinition_PropertyDefinition_search_mode.md#getconversionidsforcheckingagainstlimiters)
+- [getValuesStrategyForLimiters](base_Root_Module_ItemDefinition_PropertyDefinition_search_mode.md#getvaluesstrategyforlimiters)
 
 ## Functions
 
@@ -33,7 +39,7 @@ item definition and alternative property that is used during searches
 
 #### Defined in
 
-[base/Root/Module/ItemDefinition/PropertyDefinition/search-mode.ts:118](https://github.com/onzag/itemize/blob/f2db74a5/base/Root/Module/ItemDefinition/PropertyDefinition/search-mode.ts#L118)
+[base/Root/Module/ItemDefinition/PropertyDefinition/search-mode.ts:295](https://github.com/onzag/itemize/blob/a24376ed/base/Root/Module/ItemDefinition/PropertyDefinition/search-mode.ts#L295)
 
 ___
 
@@ -59,7 +65,7 @@ an array of property definitions
 
 #### Defined in
 
-[base/Root/Module/ItemDefinition/PropertyDefinition/search-mode.ts:256](https://github.com/onzag/itemize/blob/f2db74a5/base/Root/Module/ItemDefinition/PropertyDefinition/search-mode.ts#L256)
+[base/Root/Module/ItemDefinition/PropertyDefinition/search-mode.ts:433](https://github.com/onzag/itemize/blob/a24376ed/base/Root/Module/ItemDefinition/PropertyDefinition/search-mode.ts#L433)
 
 ___
 
@@ -84,4 +90,47 @@ an array of string for the ids in search mode for the property
 
 #### Defined in
 
-[base/Root/Module/ItemDefinition/PropertyDefinition/search-mode.ts:27](https://github.com/onzag/itemize/blob/f2db74a5/base/Root/Module/ItemDefinition/PropertyDefinition/search-mode.ts#L27)
+[base/Root/Module/ItemDefinition/PropertyDefinition/search-mode.ts:204](https://github.com/onzag/itemize/blob/a24376ed/base/Root/Module/ItemDefinition/PropertyDefinition/search-mode.ts#L204)
+
+___
+
+### getConversionIdsForCheckingAgainstLimiters
+
+▸ **getConversionIdsForCheckingAgainstLimiters**(`rawData`): `string`[][]
+
+Specifies the list of properties that there should be at least
+during a limited request for a property that is request limited
+
+#### Parameters
+
+| Name | Type |
+| :------ | :------ |
+| `rawData` | [`IPropertyDefinitionRawJSONDataType`](../interfaces/base_Root_Module_ItemDefinition_PropertyDefinition.IPropertyDefinitionRawJSONDataType.md) |
+
+#### Returns
+
+`string`[][]
+
+#### Defined in
+
+[base/Root/Module/ItemDefinition/PropertyDefinition/search-mode.ts:105](https://github.com/onzag/itemize/blob/a24376ed/base/Root/Module/ItemDefinition/PropertyDefinition/search-mode.ts#L105)
+
+___
+
+### getValuesStrategyForLimiters
+
+▸ **getValuesStrategyForLimiters**(`rawData`): [`IValueForLimiterRule`](../interfaces/base_Root_Module_ItemDefinition_PropertyDefinition_search_mode.IValueForLimiterRule.md)[]
+
+#### Parameters
+
+| Name | Type |
+| :------ | :------ |
+| `rawData` | [`IPropertyDefinitionRawJSONDataType`](../interfaces/base_Root_Module_ItemDefinition_PropertyDefinition.IPropertyDefinitionRawJSONDataType.md) |
+
+#### Returns
+
+[`IValueForLimiterRule`](../interfaces/base_Root_Module_ItemDefinition_PropertyDefinition_search_mode.IValueForLimiterRule.md)[]
+
+#### Defined in
+
+[base/Root/Module/ItemDefinition/PropertyDefinition/search-mode.ts:25](https://github.com/onzag/itemize/blob/a24376ed/base/Root/Module/ItemDefinition/PropertyDefinition/search-mode.ts#L25)

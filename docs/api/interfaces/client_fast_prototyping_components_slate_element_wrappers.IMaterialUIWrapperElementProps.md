@@ -41,7 +41,7 @@ be returned
 
 #### Defined in
 
-[client/fast-prototyping/components/slate/index.tsx:751](https://github.com/onzag/itemize/blob/f2db74a5/client/fast-prototyping/components/slate/index.tsx#L751)
+[client/fast-prototyping/components/slate/index.tsx:764](https://github.com/onzag/itemize/blob/a24376ed/client/fast-prototyping/components/slate/index.tsx#L764)
 
 ___
 
@@ -57,7 +57,7 @@ The element being selected
 
 #### Defined in
 
-[client/fast-prototyping/components/slate/index.tsx:734](https://github.com/onzag/itemize/blob/f2db74a5/client/fast-prototyping/components/slate/index.tsx#L734)
+[client/fast-prototyping/components/slate/index.tsx:747](https://github.com/onzag/itemize/blob/a24376ed/client/fast-prototyping/components/slate/index.tsx#L747)
 
 ___
 
@@ -73,7 +73,7 @@ The feature support
 
 #### Defined in
 
-[client/fast-prototyping/components/slate/index.tsx:755](https://github.com/onzag/itemize/blob/f2db74a5/client/fast-prototyping/components/slate/index.tsx#L755)
+[client/fast-prototyping/components/slate/index.tsx:768](https://github.com/onzag/itemize/blob/a24376ed/client/fast-prototyping/components/slate/index.tsx#L768)
 
 ___
 
@@ -89,7 +89,7 @@ The helpers functions
 
 #### Defined in
 
-[client/fast-prototyping/components/slate/index.tsx:746](https://github.com/onzag/itemize/blob/f2db74a5/client/fast-prototyping/components/slate/index.tsx#L746)
+[client/fast-prototyping/components/slate/index.tsx:759](https://github.com/onzag/itemize/blob/a24376ed/client/fast-prototyping/components/slate/index.tsx#L759)
 
 ___
 
@@ -101,7 +101,7 @@ A generic error message
 
 #### Defined in
 
-[client/fast-prototyping/components/slate/element-wrappers.tsx:72](https://github.com/onzag/itemize/blob/f2db74a5/client/fast-prototyping/components/slate/element-wrappers.tsx#L72)
+[client/fast-prototyping/components/slate/element-wrappers.tsx:72](https://github.com/onzag/itemize/blob/a24376ed/client/fast-prototyping/components/slate/element-wrappers.tsx#L72)
 
 ___
 
@@ -113,7 +113,7 @@ A generic ok
 
 #### Defined in
 
-[client/fast-prototyping/components/slate/element-wrappers.tsx:76](https://github.com/onzag/itemize/blob/f2db74a5/client/fast-prototyping/components/slate/element-wrappers.tsx#L76)
+[client/fast-prototyping/components/slate/element-wrappers.tsx:76](https://github.com/onzag/itemize/blob/a24376ed/client/fast-prototyping/components/slate/element-wrappers.tsx#L76)
 
 ___
 
@@ -125,7 +125,7 @@ The whole of the i18n rich information that is given by default
 
 #### Defined in
 
-[client/fast-prototyping/components/slate/element-wrappers.tsx:80](https://github.com/onzag/itemize/blob/f2db74a5/client/fast-prototyping/components/slate/element-wrappers.tsx#L80)
+[client/fast-prototyping/components/slate/element-wrappers.tsx:80](https://github.com/onzag/itemize/blob/a24376ed/client/fast-prototyping/components/slate/element-wrappers.tsx#L80)
 
 ___
 
@@ -137,7 +137,7 @@ The input variant for elements
 
 #### Defined in
 
-[client/fast-prototyping/components/slate/element-wrappers.tsx:92](https://github.com/onzag/itemize/blob/f2db74a5/client/fast-prototyping/components/slate/element-wrappers.tsx#L92)
+[client/fast-prototyping/components/slate/element-wrappers.tsx:92](https://github.com/onzag/itemize/blob/a24376ed/client/fast-prototyping/components/slate/element-wrappers.tsx#L92)
 
 ___
 
@@ -153,7 +153,7 @@ wether is selected
 
 #### Defined in
 
-[client/fast-prototyping/components/slate/index.tsx:742](https://github.com/onzag/itemize/blob/f2db74a5/client/fast-prototyping/components/slate/index.tsx#L742)
+[client/fast-prototyping/components/slate/index.tsx:755](https://github.com/onzag/itemize/blob/a24376ed/client/fast-prototyping/components/slate/index.tsx#L755)
 
 ___
 
@@ -169,7 +169,7 @@ Whether the selection is primary
 
 #### Defined in
 
-[client/fast-prototyping/components/slate/index.tsx:738](https://github.com/onzag/itemize/blob/f2db74a5/client/fast-prototyping/components/slate/index.tsx#L738)
+[client/fast-prototyping/components/slate/index.tsx:751](https://github.com/onzag/itemize/blob/a24376ed/client/fast-prototyping/components/slate/index.tsx#L751)
 
 ___
 
@@ -183,4 +183,4 @@ usually a value of 1
 
 #### Defined in
 
-[client/fast-prototyping/components/slate/element-wrappers.tsx:87](https://github.com/onzag/itemize/blob/f2db74a5/client/fast-prototyping/components/slate/element-wrappers.tsx#L87)
+[client/fast-prototyping/components/slate/element-wrappers.tsx:87](https://github.com/onzag/itemize/blob/a24376ed/client/fast-prototyping/components/slate/element-wrappers.tsx#L87)

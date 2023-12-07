@@ -32,4 +32,4 @@ a react component
 
 #### Defined in
 
-[client/fast-prototyping/components/item-loader.tsx:125](https://github.com/onzag/itemize/blob/f2db74a5/client/fast-prototyping/components/item-loader.tsx#L125)
+[client/fast-prototyping/components/item-loader.tsx:125](https://github.com/onzag/itemize/blob/a24376ed/client/fast-prototyping/components/item-loader.tsx#L125)

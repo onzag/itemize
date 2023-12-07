@@ -25,6 +25,7 @@ as the product interfaces for these queries
 - [IGQLSearchRecordsContainer](../interfaces/gql_querier.IGQLSearchRecordsContainer.md)
 - [IGQLSearchResultsContainer](../interfaces/gql_querier.IGQLSearchResultsContainer.md)
 - [IGQLValue](../interfaces/gql_querier.IGQLValue.md)
+- [IRQRequestFields](../interfaces/gql_querier.IRQRequestFields.md)
 - [IXMLHttpRequestProgressInfo](../interfaces/gql_querier.IXMLHttpRequestProgressInfo.md)
 
 ### Type aliases
@@ -60,7 +61,7 @@ as the product interfaces for these queries
 
 #### Defined in
 
-[gql-querier.ts:163](https://github.com/onzag/itemize/blob/f2db74a5/gql-querier.ts#L163)
+[gql-querier.ts:180](https://github.com/onzag/itemize/blob/a24376ed/gql-querier.ts#L180)
 
 ## Functions
 
@@ -84,7 +85,7 @@ a grapqhl query class instance
 
 #### Defined in
 
-[gql-querier.ts:740](https://github.com/onzag/itemize/blob/f2db74a5/gql-querier.ts#L740)
+[gql-querier.ts:870](https://github.com/onzag/itemize/blob/a24376ed/gql-querier.ts#L870)
 
 ___
 
@@ -108,7 +109,7 @@ a grapqhl query class instance
 
 #### Defined in
 
-[gql-querier.ts:731](https://github.com/onzag/itemize/blob/f2db74a5/gql-querier.ts#L731)
+[gql-querier.ts:861](https://github.com/onzag/itemize/blob/a24376ed/gql-querier.ts#L861)
 
 ___
 
@@ -137,7 +138,7 @@ a promise for a graphql endpoint value
 
 #### Defined in
 
-[gql-querier.ts:803](https://github.com/onzag/itemize/blob/f2db74a5/gql-querier.ts#L803)
+[gql-querier.ts:934](https://github.com/onzag/itemize/blob/a24376ed/gql-querier.ts#L934)
 
 ___
 
@@ -159,4 +160,4 @@ ___
 
 #### Defined in
 
-[gql-querier.ts:757](https://github.com/onzag/itemize/blob/f2db74a5/gql-querier.ts#L757)
+[gql-querier.ts:888](https://github.com/onzag/itemize/blob/a24376ed/gql-querier.ts#L888)

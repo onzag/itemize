@@ -35,13 +35,13 @@ when such a function returns a react node
 
 #### Defined in
 
-[client/components/localization/I18nReadMany.tsx:91](https://github.com/onzag/itemize/blob/f2db74a5/client/components/localization/I18nReadMany.tsx#L91)
+[client/components/localization/I18nReadMany.tsx:112](https://github.com/onzag/itemize/blob/a24376ed/client/components/localization/I18nReadMany.tsx#L112)
 
 ___
 
 ### i18nReadManyInternal
 
-▸ **i18nReadManyInternal**(`localeContext`, `dataContext`, `moduleContextualValue`, `itemContextualValue`, `includeContext`, `props`): `ReactNode`
+▸ **i18nReadManyInternal**(`root`, `localeContext`, `dataContext`, `moduleContextualValue`, `itemContextualValue`, `includeContext`, `props`): `ReactNode`
 
 The internal read many functionality, somewhat less refined
 than the previous because this one doesn't need an optimizer
@@ -51,6 +51,7 @@ on itself
 
 | Name | Type | Description |
 | :------ | :------ | :------ |
+| `root` | [`default`](../classes/base_Root.default.md) | - |
 | `localeContext` | [`ILocaleContextType`](../interfaces/client_internal_providers_locale_provider.ILocaleContextType.md) | the locale context (always available) |
 | `dataContext` | [`IDataContextType`](../interfaces/client_internal_providers_appdata_provider.IDataContextType.md) | data context for root data app access (available for errors) |
 | `moduleContextualValue` | [`IModuleContextType`](../interfaces/client_providers_module.IModuleContextType.md) | module context (avaiable for standard display if exists) |
@@ -64,4 +65,4 @@ on itself
 
 #### Defined in
 
-[client/components/localization/I18nReadMany.tsx:47](https://github.com/onzag/itemize/blob/f2db74a5/client/components/localization/I18nReadMany.tsx#L47)
+[client/components/localization/I18nReadMany.tsx:51](https://github.com/onzag/itemize/blob/a24376ed/client/components/localization/I18nReadMany.tsx#L51)

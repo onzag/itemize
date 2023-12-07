@@ -35,7 +35,7 @@ Provides the value of a cookie using a very cheap method
 
 #### Defined in
 
-[server/mode.ts:18](https://github.com/onzag/itemize/blob/f2db74a5/server/mode.ts#L18)
+[server/mode.ts:18](https://github.com/onzag/itemize/blob/a24376ed/server/mode.ts#L18)
 
 ___
 
@@ -58,4 +58,4 @@ Specifies the mode that our application is running at
 
 #### Defined in
 
-[server/mode.ts:34](https://github.com/onzag/itemize/blob/f2db74a5/server/mode.ts#L34)
+[server/mode.ts:34](https://github.com/onzag/itemize/blob/a24376ed/server/mode.ts#L34)

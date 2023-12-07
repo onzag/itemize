@@ -37,4 +37,4 @@ a react element
 
 #### Defined in
 
-[client/fast-prototyping/renderers/PropertyView/PropertyViewLocation.tsx:191](https://github.com/onzag/itemize/blob/f2db74a5/client/fast-prototyping/renderers/PropertyView/PropertyViewLocation.tsx#L191)
+[client/fast-prototyping/renderers/PropertyView/PropertyViewLocation.tsx:215](https://github.com/onzag/itemize/blob/a24376ed/client/fast-prototyping/renderers/PropertyView/PropertyViewLocation.tsx#L215)

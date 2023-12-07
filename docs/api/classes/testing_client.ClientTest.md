@@ -64,7 +64,7 @@
 
 #### Defined in
 
-[testing/client/index.ts:18](https://github.com/onzag/itemize/blob/f2db74a5/testing/client/index.ts#L18)
+[testing/client/index.ts:18](https://github.com/onzag/itemize/blob/a24376ed/testing/client/index.ts#L18)
 
 ## Properties
 
@@ -74,7 +74,7 @@
 
 #### Defined in
 
-[testing/client/index.ts:16](https://github.com/onzag/itemize/blob/f2db74a5/testing/client/index.ts#L16)
+[testing/client/index.ts:16](https://github.com/onzag/itemize/blob/a24376ed/testing/client/index.ts#L16)
 
 ___
 
@@ -84,7 +84,7 @@ ___
 
 #### Defined in
 
-[testing/client/index.ts:11](https://github.com/onzag/itemize/blob/f2db74a5/testing/client/index.ts#L11)
+[testing/client/index.ts:11](https://github.com/onzag/itemize/blob/a24376ed/testing/client/index.ts#L11)
 
 ___
 
@@ -94,7 +94,7 @@ ___
 
 #### Defined in
 
-[testing/client/index.ts:13](https://github.com/onzag/itemize/blob/f2db74a5/testing/client/index.ts#L13)
+[testing/client/index.ts:13](https://github.com/onzag/itemize/blob/a24376ed/testing/client/index.ts#L13)
 
 ___
 
@@ -104,7 +104,7 @@ ___
 
 #### Defined in
 
-[testing/client/index.ts:12](https://github.com/onzag/itemize/blob/f2db74a5/testing/client/index.ts#L12)
+[testing/client/index.ts:12](https://github.com/onzag/itemize/blob/a24376ed/testing/client/index.ts#L12)
 
 ___
 
@@ -114,7 +114,7 @@ ___
 
 #### Defined in
 
-[testing/client/index.ts:14](https://github.com/onzag/itemize/blob/f2db74a5/testing/client/index.ts#L14)
+[testing/client/index.ts:14](https://github.com/onzag/itemize/blob/a24376ed/testing/client/index.ts#L14)
 
 ___
 
@@ -124,7 +124,7 @@ ___
 
 #### Defined in
 
-[testing/client/index.ts:10](https://github.com/onzag/itemize/blob/f2db74a5/testing/client/index.ts#L10)
+[testing/client/index.ts:10](https://github.com/onzag/itemize/blob/a24376ed/testing/client/index.ts#L10)
 
 ## Methods
 
@@ -145,7 +145,7 @@ use for cleanup
 
 #### Defined in
 
-[testing/client/index.ts:52](https://github.com/onzag/itemize/blob/f2db74a5/testing/client/index.ts#L52)
+[testing/client/index.ts:52](https://github.com/onzag/itemize/blob/a24376ed/testing/client/index.ts#L52)
 
 ___
 
@@ -167,7 +167,7 @@ well
 
 #### Defined in
 
-[testing/client/index.ts:34](https://github.com/onzag/itemize/blob/f2db74a5/testing/client/index.ts#L34)
+[testing/client/index.ts:34](https://github.com/onzag/itemize/blob/a24376ed/testing/client/index.ts#L34)
 
 ___
 
@@ -187,7 +187,7 @@ Build a brand new instance
 
 #### Defined in
 
-[testing/index.ts:71](https://github.com/onzag/itemize/blob/f2db74a5/testing/index.ts#L71)
+[testing/index.ts:71](https://github.com/onzag/itemize/blob/a24376ed/testing/index.ts#L71)
 
 ___
 
@@ -214,7 +214,7 @@ Define a new test
 
 #### Defined in
 
-[testing/index.ts:114](https://github.com/onzag/itemize/blob/f2db74a5/testing/index.ts#L114)
+[testing/index.ts:114](https://github.com/onzag/itemize/blob/a24376ed/testing/index.ts#L114)
 
 ___
 
@@ -234,7 +234,7 @@ Executes during just after before has been executed
 
 #### Defined in
 
-[testing/client/index.ts:38](https://github.com/onzag/itemize/blob/f2db74a5/testing/client/index.ts#L38)
+[testing/client/index.ts:38](https://github.com/onzag/itemize/blob/a24376ed/testing/client/index.ts#L38)
 
 ___
 
@@ -258,7 +258,7 @@ ___
 
 #### Defined in
 
-[testing/index.ts:162](https://github.com/onzag/itemize/blob/f2db74a5/testing/index.ts#L162)
+[testing/index.ts:162](https://github.com/onzag/itemize/blob/a24376ed/testing/index.ts#L162)
 
 ___
 
@@ -285,7 +285,7 @@ Define a new assertion
 
 #### Defined in
 
-[testing/index.ts:129](https://github.com/onzag/itemize/blob/f2db74a5/testing/index.ts#L129)
+[testing/index.ts:129](https://github.com/onzag/itemize/blob/a24376ed/testing/index.ts#L129)
 
 ___
 
@@ -305,7 +305,7 @@ Quits this test
 
 #### Defined in
 
-[testing/index.ts:220](https://github.com/onzag/itemize/blob/f2db74a5/testing/index.ts#L220)
+[testing/index.ts:220](https://github.com/onzag/itemize/blob/a24376ed/testing/index.ts#L220)
 
 ___
 
@@ -326,7 +326,7 @@ and by all it means all of them
 
 #### Defined in
 
-[testing/index.ts:186](https://github.com/onzag/itemize/blob/f2db74a5/testing/index.ts#L186)
+[testing/index.ts:186](https://github.com/onzag/itemize/blob/a24376ed/testing/index.ts#L186)
 
 ___
 
@@ -348,7 +348,7 @@ this
 
 #### Defined in
 
-[testing/index.ts:201](https://github.com/onzag/itemize/blob/f2db74a5/testing/index.ts#L201)
+[testing/index.ts:201](https://github.com/onzag/itemize/blob/a24376ed/testing/index.ts#L201)
 
 ___
 
@@ -369,7 +369,7 @@ they should be on the same layer
 
 #### Defined in
 
-[testing/index.ts:172](https://github.com/onzag/itemize/blob/f2db74a5/testing/index.ts#L172)
+[testing/index.ts:172](https://github.com/onzag/itemize/blob/a24376ed/testing/index.ts#L172)
 
 ___
 
@@ -393,7 +393,7 @@ ___
 
 #### Defined in
 
-[testing/index.ts:141](https://github.com/onzag/itemize/blob/f2db74a5/testing/index.ts#L141)
+[testing/index.ts:141](https://github.com/onzag/itemize/blob/a24376ed/testing/index.ts#L141)
 
 ___
 
@@ -417,7 +417,7 @@ ___
 
 #### Defined in
 
-[testing/index.ts:211](https://github.com/onzag/itemize/blob/f2db74a5/testing/index.ts#L211)
+[testing/index.ts:211](https://github.com/onzag/itemize/blob/a24376ed/testing/index.ts#L211)
 
 ___
 
@@ -441,4 +441,4 @@ ___
 
 #### Defined in
 
-[testing/index.ts:152](https://github.com/onzag/itemize/blob/f2db74a5/testing/index.ts#L152)
+[testing/index.ts:152](https://github.com/onzag/itemize/blob/a24376ed/testing/index.ts#L152)

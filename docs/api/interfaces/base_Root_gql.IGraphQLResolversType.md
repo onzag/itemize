@@ -29,7 +29,7 @@ This is all the base resolvers we are expecting out off itemize
 
 #### Defined in
 
-[base/Root/gql.ts:53](https://github.com/onzag/itemize/blob/f2db74a5/base/Root/gql.ts#L53)
+[base/Root/gql.ts:53](https://github.com/onzag/itemize/blob/a24376ed/base/Root/gql.ts#L53)
 
 ___
 
@@ -39,7 +39,7 @@ ___
 
 #### Defined in
 
-[base/Root/gql.ts:55](https://github.com/onzag/itemize/blob/f2db74a5/base/Root/gql.ts#L55)
+[base/Root/gql.ts:55](https://github.com/onzag/itemize/blob/a24376ed/base/Root/gql.ts#L55)
 
 ___
 
@@ -49,7 +49,7 @@ ___
 
 #### Defined in
 
-[base/Root/gql.ts:54](https://github.com/onzag/itemize/blob/f2db74a5/base/Root/gql.ts#L54)
+[base/Root/gql.ts:54](https://github.com/onzag/itemize/blob/a24376ed/base/Root/gql.ts#L54)
 
 ___
 
@@ -59,7 +59,7 @@ ___
 
 #### Defined in
 
-[base/Root/gql.ts:46](https://github.com/onzag/itemize/blob/f2db74a5/base/Root/gql.ts#L46)
+[base/Root/gql.ts:46](https://github.com/onzag/itemize/blob/a24376ed/base/Root/gql.ts#L46)
 
 ___
 
@@ -69,7 +69,7 @@ ___
 
 #### Defined in
 
-[base/Root/gql.ts:47](https://github.com/onzag/itemize/blob/f2db74a5/base/Root/gql.ts#L47)
+[base/Root/gql.ts:47](https://github.com/onzag/itemize/blob/a24376ed/base/Root/gql.ts#L47)
 
 ___
 
@@ -79,7 +79,7 @@ ___
 
 #### Defined in
 
-[base/Root/gql.ts:52](https://github.com/onzag/itemize/blob/f2db74a5/base/Root/gql.ts#L52)
+[base/Root/gql.ts:52](https://github.com/onzag/itemize/blob/a24376ed/base/Root/gql.ts#L52)
 
 ___
 
@@ -89,7 +89,7 @@ ___
 
 #### Defined in
 
-[base/Root/gql.ts:48](https://github.com/onzag/itemize/blob/f2db74a5/base/Root/gql.ts#L48)
+[base/Root/gql.ts:48](https://github.com/onzag/itemize/blob/a24376ed/base/Root/gql.ts#L48)
 
 ___
 
@@ -99,7 +99,7 @@ ___
 
 #### Defined in
 
-[base/Root/gql.ts:49](https://github.com/onzag/itemize/blob/f2db74a5/base/Root/gql.ts#L49)
+[base/Root/gql.ts:49](https://github.com/onzag/itemize/blob/a24376ed/base/Root/gql.ts#L49)
 
 ___
 
@@ -109,7 +109,7 @@ ___
 
 #### Defined in
 
-[base/Root/gql.ts:50](https://github.com/onzag/itemize/blob/f2db74a5/base/Root/gql.ts#L50)
+[base/Root/gql.ts:50](https://github.com/onzag/itemize/blob/a24376ed/base/Root/gql.ts#L50)
 
 ___
 
@@ -119,4 +119,4 @@ ___
 
 #### Defined in
 
-[base/Root/gql.ts:51](https://github.com/onzag/itemize/blob/f2db74a5/base/Root/gql.ts#L51)
+[base/Root/gql.ts:51](https://github.com/onzag/itemize/blob/a24376ed/base/Root/gql.ts#L51)

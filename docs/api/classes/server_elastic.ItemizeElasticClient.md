@@ -54,7 +54,9 @@ to perform queries against elastic
 - [executeQuery](server_elastic.ItemizeElasticClient.md#executequery)
 - [generateMissingIndexInGroup](server_elastic.ItemizeElasticClient.md#generatemissingindexingroup)
 - [getAllStoredPingsAt](server_elastic.ItemizeElasticClient.md#getallstoredpingsat)
+- [getDocumentBasicInfo](server_elastic.ItemizeElasticClient.md#getdocumentbasicinfo)
 - [getSelectBuilder](server_elastic.ItemizeElasticClient.md#getselectbuilder)
+- [getSeqNoInfo](server_elastic.ItemizeElasticClient.md#getseqnoinfo)
 - [guessGeoIpFor](server_elastic.ItemizeElasticClient.md#guessgeoipfor)
 - [guessLanguageFor](server_elastic.ItemizeElasticClient.md#guesslanguagefor)
 - [informNewServerData](server_elastic.ItemizeElasticClient.md#informnewserverdata)
@@ -89,7 +91,7 @@ to perform queries against elastic
 
 #### Defined in
 
-[server/elastic.ts:211](https://github.com/onzag/itemize/blob/f2db74a5/server/elastic.ts#L211)
+[server/elastic.ts:237](https://github.com/onzag/itemize/blob/a24376ed/server/elastic.ts#L237)
 
 ## Properties
 
@@ -103,7 +105,7 @@ to perform queries against elastic
 
 #### Defined in
 
-[server/elastic.ts:206](https://github.com/onzag/itemize/blob/f2db74a5/server/elastic.ts#L206)
+[server/elastic.ts:232](https://github.com/onzag/itemize/blob/a24376ed/server/elastic.ts#L232)
 
 ___
 
@@ -113,7 +115,7 @@ ___
 
 #### Defined in
 
-[server/elastic.ts:191](https://github.com/onzag/itemize/blob/f2db74a5/server/elastic.ts#L191)
+[server/elastic.ts:217](https://github.com/onzag/itemize/blob/a24376ed/server/elastic.ts#L217)
 
 ___
 
@@ -123,7 +125,7 @@ ___
 
 #### Defined in
 
-[server/elastic.ts:195](https://github.com/onzag/itemize/blob/f2db74a5/server/elastic.ts#L195)
+[server/elastic.ts:221](https://github.com/onzag/itemize/blob/a24376ed/server/elastic.ts#L221)
 
 ___
 
@@ -133,7 +135,7 @@ ___
 
 #### Defined in
 
-[server/elastic.ts:197](https://github.com/onzag/itemize/blob/f2db74a5/server/elastic.ts#L197)
+[server/elastic.ts:223](https://github.com/onzag/itemize/blob/a24376ed/server/elastic.ts#L223)
 
 ___
 
@@ -143,7 +145,7 @@ ___
 
 #### Defined in
 
-[server/elastic.ts:208](https://github.com/onzag/itemize/blob/f2db74a5/server/elastic.ts#L208)
+[server/elastic.ts:234](https://github.com/onzag/itemize/blob/a24376ed/server/elastic.ts#L234)
 
 ___
 
@@ -153,7 +155,7 @@ ___
 
 #### Defined in
 
-[server/elastic.ts:209](https://github.com/onzag/itemize/blob/f2db74a5/server/elastic.ts#L209)
+[server/elastic.ts:235](https://github.com/onzag/itemize/blob/a24376ed/server/elastic.ts#L235)
 
 ___
 
@@ -163,7 +165,7 @@ ___
 
 #### Defined in
 
-[server/elastic.ts:203](https://github.com/onzag/itemize/blob/f2db74a5/server/elastic.ts#L203)
+[server/elastic.ts:229](https://github.com/onzag/itemize/blob/a24376ed/server/elastic.ts#L229)
 
 ___
 
@@ -181,7 +183,7 @@ ___
 
 #### Defined in
 
-[server/elastic.ts:204](https://github.com/onzag/itemize/blob/f2db74a5/server/elastic.ts#L204)
+[server/elastic.ts:230](https://github.com/onzag/itemize/blob/a24376ed/server/elastic.ts#L230)
 
 ___
 
@@ -191,7 +193,7 @@ ___
 
 #### Defined in
 
-[server/elastic.ts:192](https://github.com/onzag/itemize/blob/f2db74a5/server/elastic.ts#L192)
+[server/elastic.ts:218](https://github.com/onzag/itemize/blob/a24376ed/server/elastic.ts#L218)
 
 ___
 
@@ -201,7 +203,7 @@ ___
 
 #### Defined in
 
-[server/elastic.ts:193](https://github.com/onzag/itemize/blob/f2db74a5/server/elastic.ts#L193)
+[server/elastic.ts:219](https://github.com/onzag/itemize/blob/a24376ed/server/elastic.ts#L219)
 
 ___
 
@@ -211,7 +213,7 @@ ___
 
 #### Defined in
 
-[server/elastic.ts:194](https://github.com/onzag/itemize/blob/f2db74a5/server/elastic.ts#L194)
+[server/elastic.ts:220](https://github.com/onzag/itemize/blob/a24376ed/server/elastic.ts#L220)
 
 ___
 
@@ -225,7 +227,7 @@ ___
 
 #### Defined in
 
-[server/elastic.ts:198](https://github.com/onzag/itemize/blob/f2db74a5/server/elastic.ts#L198)
+[server/elastic.ts:224](https://github.com/onzag/itemize/blob/a24376ed/server/elastic.ts#L224)
 
 ___
 
@@ -235,7 +237,7 @@ ___
 
 #### Defined in
 
-[server/elastic.ts:196](https://github.com/onzag/itemize/blob/f2db74a5/server/elastic.ts#L196)
+[server/elastic.ts:222](https://github.com/onzag/itemize/blob/a24376ed/server/elastic.ts#L222)
 
 ___
 
@@ -245,7 +247,7 @@ ___
 
 #### Defined in
 
-[server/elastic.ts:200](https://github.com/onzag/itemize/blob/f2db74a5/server/elastic.ts#L200)
+[server/elastic.ts:226](https://github.com/onzag/itemize/blob/a24376ed/server/elastic.ts#L226)
 
 ___
 
@@ -263,7 +265,7 @@ ___
 
 #### Defined in
 
-[server/elastic.ts:201](https://github.com/onzag/itemize/blob/f2db74a5/server/elastic.ts#L201)
+[server/elastic.ts:227](https://github.com/onzag/itemize/blob/a24376ed/server/elastic.ts#L227)
 
 ## Methods
 
@@ -277,13 +279,13 @@ ___
 
 #### Defined in
 
-[server/elastic.ts:332](https://github.com/onzag/itemize/blob/f2db74a5/server/elastic.ts#L332)
+[server/elastic.ts:423](https://github.com/onzag/itemize/blob/a24376ed/server/elastic.ts#L423)
 
 ___
 
 ### \_rebuildIndexGroup
 
-▸ `Private` **_rebuildIndexGroup**(`qualifiedName`, `value`): `Promise`<`void`\>
+▸ `Private` **_rebuildIndexGroup**(`qualifiedName`, `value`, `isInitialRebuildIndexes`): `Promise`<`void`\>
 
 This function is used to internally rebuild an index
 
@@ -293,6 +295,7 @@ This function is used to internally rebuild an index
 | :------ | :------ |
 | `qualifiedName` | `string` |
 | `value` | [`IElasticIndexDefinitionType`](../interfaces/base_Root_sql.IElasticIndexDefinitionType.md) |
+| `isInitialRebuildIndexes` | `boolean` |
 
 #### Returns
 
@@ -300,31 +303,33 @@ This function is used to internally rebuild an index
 
 #### Defined in
 
-[server/elastic.ts:555](https://github.com/onzag/itemize/blob/f2db74a5/server/elastic.ts#L555)
+[server/elastic.ts:645](https://github.com/onzag/itemize/blob/a24376ed/server/elastic.ts#L645)
 
 ___
 
 ### \_runConsistencyCheck
 
-▸ `Private` **_runConsistencyCheck**(`idef`, `timeRan`, `batchNumber`, `knownStatusInfo`, `ensuranceCache`): `Promise`<`void`\>
+▸ `Private` **_runConsistencyCheck**(`rawDBClient`, `idef`, `timeRan`, `batchNumber`, `knownStatusInfo`, `knownLimiters`, `ensuranceCache`): `Promise`<`boolean`\>
 
 #### Parameters
 
 | Name | Type |
 | :------ | :------ |
+| `rawDBClient` | [`ItemizeRawDB`](server_raw_db.ItemizeRawDB.md) |
 | `idef` | [`default`](base_Root_Module_ItemDefinition.default.md) |
 | `timeRan` | `Date` |
 | `batchNumber` | `number` |
 | `knownStatusInfo` | `IElasticIndexInformationType` |
+| `knownLimiters` | [`ISearchLimitersType`](../interfaces/base_Root.ISearchLimitersType.md) |
 | `ensuranceCache` | `any` |
 
 #### Returns
 
-`Promise`<`void`\>
+`Promise`<`boolean`\>
 
 #### Defined in
 
-[server/elastic.ts:950](https://github.com/onzag/itemize/blob/f2db74a5/server/elastic.ts#L950)
+[server/elastic.ts:1088](https://github.com/onzag/itemize/blob/a24376ed/server/elastic.ts#L1088)
 
 ___
 
@@ -348,7 +353,7 @@ ___
 
 #### Defined in
 
-[server/elastic.ts:1885](https://github.com/onzag/itemize/blob/f2db74a5/server/elastic.ts#L1885)
+[server/elastic.ts:2573](https://github.com/onzag/itemize/blob/a24376ed/server/elastic.ts#L2573)
 
 ___
 
@@ -370,7 +375,7 @@ ___
 
 #### Defined in
 
-[server/elastic.ts:1723](https://github.com/onzag/itemize/blob/f2db74a5/server/elastic.ts#L1723)
+[server/elastic.ts:2229](https://github.com/onzag/itemize/blob/a24376ed/server/elastic.ts#L2229)
 
 ___
 
@@ -391,7 +396,7 @@ ___
 
 #### Defined in
 
-[server/elastic.ts:470](https://github.com/onzag/itemize/blob/f2db74a5/server/elastic.ts#L470)
+[server/elastic.ts:560](https://github.com/onzag/itemize/blob/a24376ed/server/elastic.ts#L560)
 
 ___
 
@@ -418,7 +423,7 @@ ___
 
 #### Defined in
 
-[server/elastic.ts:1965](https://github.com/onzag/itemize/blob/f2db74a5/server/elastic.ts#L1965)
+[server/elastic.ts:2653](https://github.com/onzag/itemize/blob/a24376ed/server/elastic.ts#L2653)
 
 ___
 
@@ -441,7 +446,7 @@ ___
 
 #### Defined in
 
-[server/elastic.ts:1672](https://github.com/onzag/itemize/blob/f2db74a5/server/elastic.ts#L1672)
+[server/elastic.ts:2178](https://github.com/onzag/itemize/blob/a24376ed/server/elastic.ts#L2178)
 
 ___
 
@@ -463,7 +468,7 @@ ___
 
 #### Defined in
 
-[server/elastic.ts:1656](https://github.com/onzag/itemize/blob/f2db74a5/server/elastic.ts#L1656)
+[server/elastic.ts:2162](https://github.com/onzag/itemize/blob/a24376ed/server/elastic.ts#L2162)
 
 ___
 
@@ -476,7 +481,7 @@ ___
 | Name | Type |
 | :------ | :------ |
 | `itemDefinition` | `string` \| [`default`](base_Root_Module_ItemDefinition.default.md) |
-| `ids` | { `id`: `string` ; `version`: `string`  }[] |
+| `ids` | (`string` \| { `id`: `string` ; `version`: `string`  })[] |
 
 #### Returns
 
@@ -484,7 +489,7 @@ ___
 
 #### Defined in
 
-[server/elastic.ts:1611](https://github.com/onzag/itemize/blob/f2db74a5/server/elastic.ts#L1611)
+[server/elastic.ts:2117](https://github.com/onzag/itemize/blob/a24376ed/server/elastic.ts#L2117)
 
 ___
 
@@ -506,7 +511,7 @@ ___
 
 #### Defined in
 
-[server/elastic.ts:2047](https://github.com/onzag/itemize/blob/f2db74a5/server/elastic.ts#L2047)
+[server/elastic.ts:2735](https://github.com/onzag/itemize/blob/a24376ed/server/elastic.ts#L2735)
 
 ___
 
@@ -529,7 +534,7 @@ ___
 
 #### Defined in
 
-[server/elastic.ts:1538](https://github.com/onzag/itemize/blob/f2db74a5/server/elastic.ts#L1538)
+[server/elastic.ts:1967](https://github.com/onzag/itemize/blob/a24376ed/server/elastic.ts#L1967)
 
 ___
 
@@ -550,7 +555,7 @@ ___
 
 #### Defined in
 
-[server/elastic.ts:746](https://github.com/onzag/itemize/blob/f2db74a5/server/elastic.ts#L746)
+[server/elastic.ts:872](https://github.com/onzag/itemize/blob/a24376ed/server/elastic.ts#L872)
 
 ___
 
@@ -572,19 +577,20 @@ ___
 
 #### Defined in
 
-[server/elastic.ts:701](https://github.com/onzag/itemize/blob/f2db74a5/server/elastic.ts#L701)
+[server/elastic.ts:827](https://github.com/onzag/itemize/blob/a24376ed/server/elastic.ts#L827)
 
 ___
 
 ### executeCountQuery
 
-▸ **executeCountQuery**(`elasticQuery`): `Promise`<`CountResponse`\>
+▸ **executeCountQuery**(`elasticQuery`, `options?`): `Promise`<`CountResponse`\>
 
 #### Parameters
 
 | Name | Type |
 | :------ | :------ |
 | `elasticQuery` | [`ElasticQueryBuilder`](server_elastic.ElasticQueryBuilder.md) |
+| `options` | `ElasticRequestOptions` |
 
 #### Returns
 
@@ -592,7 +598,7 @@ ___
 
 #### Defined in
 
-[server/elastic.ts:1955](https://github.com/onzag/itemize/blob/f2db74a5/server/elastic.ts#L1955)
+[server/elastic.ts:2643](https://github.com/onzag/itemize/blob/a24376ed/server/elastic.ts#L2643)
 
 ___
 
@@ -612,7 +618,7 @@ ___
 
 #### Defined in
 
-[server/elastic.ts:1979](https://github.com/onzag/itemize/blob/f2db74a5/server/elastic.ts#L1979)
+[server/elastic.ts:2667](https://github.com/onzag/itemize/blob/a24376ed/server/elastic.ts#L2667)
 
 ___
 
@@ -626,19 +632,20 @@ ___
 
 #### Defined in
 
-[server/elastic.ts:2029](https://github.com/onzag/itemize/blob/f2db74a5/server/elastic.ts#L2029)
+[server/elastic.ts:2717](https://github.com/onzag/itemize/blob/a24376ed/server/elastic.ts#L2717)
 
 ___
 
 ### executeQuery
 
-▸ **executeQuery**(`elasticQuery`): `Promise`<`SearchResponse`<[`ISQLTableRowValue`](../interfaces/base_Root_sql.ISQLTableRowValue.md), `Record`<`string`, `AggregationsAggregate`\>\>\>
+▸ **executeQuery**(`elasticQuery`, `options?`): `Promise`<`SearchResponse`<[`ISQLTableRowValue`](../interfaces/base_Root_sql.ISQLTableRowValue.md), `Record`<`string`, `AggregationsAggregate`\>\>\>
 
 #### Parameters
 
 | Name | Type |
 | :------ | :------ |
 | `elasticQuery` | [`ElasticQueryBuilder`](server_elastic.ElasticQueryBuilder.md) |
+| `options` | `ElasticRequestOptions` |
 
 #### Returns
 
@@ -646,7 +653,7 @@ ___
 
 #### Defined in
 
-[server/elastic.ts:1946](https://github.com/onzag/itemize/blob/f2db74a5/server/elastic.ts#L1946)
+[server/elastic.ts:2634](https://github.com/onzag/itemize/blob/a24376ed/server/elastic.ts#L2634)
 
 ___
 
@@ -668,7 +675,7 @@ ___
 
 #### Defined in
 
-[server/elastic.ts:1575](https://github.com/onzag/itemize/blob/f2db74a5/server/elastic.ts#L1575)
+[server/elastic.ts:2004](https://github.com/onzag/itemize/blob/a24376ed/server/elastic.ts#L2004)
 
 ___
 
@@ -694,7 +701,29 @@ ___
 
 #### Defined in
 
-[server/elastic.ts:2033](https://github.com/onzag/itemize/blob/f2db74a5/server/elastic.ts#L2033)
+[server/elastic.ts:2721](https://github.com/onzag/itemize/blob/a24376ed/server/elastic.ts#L2721)
+
+___
+
+### getDocumentBasicInfo
+
+▸ **getDocumentBasicInfo**(`itemDefinition`, `id`, `version`): `Promise`<`IDocumentBasicInfo`[]\>
+
+#### Parameters
+
+| Name | Type |
+| :------ | :------ |
+| `itemDefinition` | `string` \| [`default`](base_Root_Module_ItemDefinition.default.md) |
+| `id` | `string` |
+| `version` | `string` |
+
+#### Returns
+
+`Promise`<`IDocumentBasicInfo`[]\>
+
+#### Defined in
+
+[server/elastic.ts:2070](https://github.com/onzag/itemize/blob/a24376ed/server/elastic.ts#L2070)
 
 ___
 
@@ -716,7 +745,27 @@ ___
 
 #### Defined in
 
-[server/elastic.ts:1917](https://github.com/onzag/itemize/blob/f2db74a5/server/elastic.ts#L1917)
+[server/elastic.ts:2605](https://github.com/onzag/itemize/blob/a24376ed/server/elastic.ts#L2605)
+
+___
+
+### getSeqNoInfo
+
+▸ **getSeqNoInfo**(`info`): `Promise`<`IDocumentSeqNoInfo`\>
+
+#### Parameters
+
+| Name | Type |
+| :------ | :------ |
+| `info` | `IDocumentBasicInfo` |
+
+#### Returns
+
+`Promise`<`IDocumentSeqNoInfo`\>
+
+#### Defined in
+
+[server/elastic.ts:2040](https://github.com/onzag/itemize/blob/a24376ed/server/elastic.ts#L2040)
 
 ___
 
@@ -736,7 +785,7 @@ ___
 
 #### Defined in
 
-[server/elastic.ts:2101](https://github.com/onzag/itemize/blob/f2db74a5/server/elastic.ts#L2101)
+[server/elastic.ts:2789](https://github.com/onzag/itemize/blob/a24376ed/server/elastic.ts#L2789)
 
 ___
 
@@ -756,7 +805,7 @@ ___
 
 #### Defined in
 
-[server/elastic.ts:2142](https://github.com/onzag/itemize/blob/f2db74a5/server/elastic.ts#L2142)
+[server/elastic.ts:2830](https://github.com/onzag/itemize/blob/a24376ed/server/elastic.ts#L2830)
 
 ___
 
@@ -779,7 +828,7 @@ data has been obtained, you should not use it by yourself
 
 #### Defined in
 
-[server/elastic.ts:248](https://github.com/onzag/itemize/blob/f2db74a5/server/elastic.ts#L248)
+[server/elastic.ts:274](https://github.com/onzag/itemize/blob/a24376ed/server/elastic.ts#L274)
 
 ___
 
@@ -799,7 +848,7 @@ ___
 
 #### Defined in
 
-[server/elastic.ts:944](https://github.com/onzag/itemize/blob/f2db74a5/server/elastic.ts#L944)
+[server/elastic.ts:1082](https://github.com/onzag/itemize/blob/a24376ed/server/elastic.ts#L1082)
 
 ___
 
@@ -825,7 +874,7 @@ This is the function you use
 
 #### Defined in
 
-[server/elastic.ts:1907](https://github.com/onzag/itemize/blob/f2db74a5/server/elastic.ts#L1907)
+[server/elastic.ts:2595](https://github.com/onzag/itemize/blob/a24376ed/server/elastic.ts#L2595)
 
 ___
 
@@ -845,7 +894,7 @@ a void promise
 
 #### Defined in
 
-[server/elastic.ts:282](https://github.com/onzag/itemize/blob/f2db74a5/server/elastic.ts#L282)
+[server/elastic.ts:373](https://github.com/onzag/itemize/blob/a24376ed/server/elastic.ts#L373)
 
 ___
 
@@ -869,7 +918,7 @@ supposed to use it
 
 #### Defined in
 
-[server/elastic.ts:680](https://github.com/onzag/itemize/blob/f2db74a5/server/elastic.ts#L680)
+[server/elastic.ts:805](https://github.com/onzag/itemize/blob/a24376ed/server/elastic.ts#L805)
 
 ___
 
@@ -895,7 +944,7 @@ whatever it finds, or null if the index does not exist
 
 #### Defined in
 
-[server/elastic.ts:401](https://github.com/onzag/itemize/blob/f2db74a5/server/elastic.ts#L401)
+[server/elastic.ts:491](https://github.com/onzag/itemize/blob/a24376ed/server/elastic.ts#L491)
 
 ___
 
@@ -918,7 +967,7 @@ consistency
 
 #### Defined in
 
-[server/elastic.ts:445](https://github.com/onzag/itemize/blob/f2db74a5/server/elastic.ts#L445)
+[server/elastic.ts:535](https://github.com/onzag/itemize/blob/a24376ed/server/elastic.ts#L535)
 
 ___
 
@@ -977,7 +1026,7 @@ all the records that match given ids on the list, if it finds two of those, one 
 
 #### Defined in
 
-[server/elastic.ts:897](https://github.com/onzag/itemize/blob/f2db74a5/server/elastic.ts#L897)
+[server/elastic.ts:1023](https://github.com/onzag/itemize/blob/a24376ed/server/elastic.ts#L1023)
 
 ___
 
@@ -1001,24 +1050,27 @@ of indexes given its qualified name
 
 #### Defined in
 
-[server/elastic.ts:425](https://github.com/onzag/itemize/blob/f2db74a5/server/elastic.ts#L425)
+[server/elastic.ts:515](https://github.com/onzag/itemize/blob/a24376ed/server/elastic.ts#L515)
 
 ___
 
 ### updateDocument
 
-▸ **updateDocument**(`itemDefinition`, `originalLanguage`, `language`, `id`, `version`, `value?`): `Promise`<`void`\>
+▸ **updateDocument**(`itemDefinition`, `language`, `id`, `version`, `value?`): `Promise`<`void`\>
 
 Updates a document for a given index
 if the index does not exist the whole operation is ingored and instead
 a rebuild operation is launched for the given index (which should fetch everything up to date)
+
+The execution will not do a thing if
+1. the item itself is not search engine enabled
+2. it's determined that it doesn't pass the specified limiter
 
 #### Parameters
 
 | Name | Type |
 | :------ | :------ |
 | `itemDefinition` | `string` \| [`default`](base_Root_Module_ItemDefinition.default.md) |
-| `originalLanguage` | `string` |
 | `language` | `string` |
 | `id` | `string` |
 | `version` | `string` |
@@ -1030,7 +1082,7 @@ a rebuild operation is launched for the given index (which should fetch everythi
 
 #### Defined in
 
-[server/elastic.ts:1791](https://github.com/onzag/itemize/blob/f2db74a5/server/elastic.ts#L1791)
+[server/elastic.ts:2331](https://github.com/onzag/itemize/blob/a24376ed/server/elastic.ts#L2331)
 
 ___
 
@@ -1052,7 +1104,7 @@ ___
 
 #### Defined in
 
-[server/elastic.ts:1747](https://github.com/onzag/itemize/blob/f2db74a5/server/elastic.ts#L1747)
+[server/elastic.ts:2268](https://github.com/onzag/itemize/blob/a24376ed/server/elastic.ts#L2268)
 
 ___
 
@@ -1076,7 +1128,7 @@ ___
 
 #### Defined in
 
-[server/elastic.ts:1773](https://github.com/onzag/itemize/blob/f2db74a5/server/elastic.ts#L1773)
+[server/elastic.ts:2309](https://github.com/onzag/itemize/blob/a24376ed/server/elastic.ts#L2309)
 
 ___
 
@@ -1102,7 +1154,7 @@ if it believes it is doing something that warrants that mechanism
 
 #### Defined in
 
-[server/elastic.ts:850](https://github.com/onzag/itemize/blob/f2db74a5/server/elastic.ts#L850)
+[server/elastic.ts:976](https://github.com/onzag/itemize/blob/a24376ed/server/elastic.ts#L976)
 
 ___
 
@@ -1121,4 +1173,4 @@ a void promise
 
 #### Defined in
 
-[server/elastic.ts:268](https://github.com/onzag/itemize/blob/f2db74a5/server/elastic.ts#L268)
+[server/elastic.ts:359](https://github.com/onzag/itemize/blob/a24376ed/server/elastic.ts#L359)

@@ -43,4 +43,4 @@ a react element
 
 #### Defined in
 
-[client/fast-prototyping/renderers/PropertyView/PropertyViewPayment.tsx:29](https://github.com/onzag/itemize/blob/f2db74a5/client/fast-prototyping/renderers/PropertyView/PropertyViewPayment.tsx#L29)
+[client/fast-prototyping/renderers/PropertyView/PropertyViewPayment.tsx:29](https://github.com/onzag/itemize/blob/a24376ed/client/fast-prototyping/renderers/PropertyView/PropertyViewPayment.tsx#L29)

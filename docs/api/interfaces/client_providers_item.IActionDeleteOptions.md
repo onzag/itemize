@@ -63,7 +63,7 @@ once the action is completed
 
 #### Defined in
 
-[client/providers/item.tsx:291](https://github.com/onzag/itemize/blob/f2db74a5/client/providers/item.tsx#L291)
+[client/providers/item.tsx:323](https://github.com/onzag/itemize/blob/a24376ed/client/providers/item.tsx#L323)
 
 ___
 
@@ -82,7 +82,7 @@ once the action is completed
 
 #### Defined in
 
-[client/providers/item.tsx:298](https://github.com/onzag/itemize/blob/f2db74a5/client/providers/item.tsx#L298)
+[client/providers/item.tsx:330](https://github.com/onzag/itemize/blob/a24376ed/client/providers/item.tsx#L330)
 
 ___
 
@@ -101,7 +101,7 @@ once the action is completed
 
 #### Defined in
 
-[client/providers/item.tsx:284](https://github.com/onzag/itemize/blob/f2db74a5/client/providers/item.tsx#L284)
+[client/providers/item.tsx:316](https://github.com/onzag/itemize/blob/a24376ed/client/providers/item.tsx#L316)
 
 ___
 
@@ -125,7 +125,7 @@ back to empty or what they used to be as it may otherwise do nothing, cleaning I
 
 #### Defined in
 
-[client/providers/item.tsx:349](https://github.com/onzag/itemize/blob/f2db74a5/client/providers/item.tsx#L349)
+[client/providers/item.tsx:381](https://github.com/onzag/itemize/blob/a24376ed/client/providers/item.tsx#L381)
 
 ___
 
@@ -149,7 +149,7 @@ back to empty or what they used to be as it may otherwise do nothing, cleaning I
 
 #### Defined in
 
-[client/providers/item.tsx:337](https://github.com/onzag/itemize/blob/f2db74a5/client/providers/item.tsx#L337)
+[client/providers/item.tsx:369](https://github.com/onzag/itemize/blob/a24376ed/client/providers/item.tsx#L369)
 
 ___
 
@@ -173,7 +173,7 @@ back to empty or what they used to be as it may otherwise do nothing, cleaning I
 
 #### Defined in
 
-[client/providers/item.tsx:325](https://github.com/onzag/itemize/blob/f2db74a5/client/providers/item.tsx#L325)
+[client/providers/item.tsx:357](https://github.com/onzag/itemize/blob/a24376ed/client/providers/item.tsx#L357)
 
 ___
 
@@ -185,7 +185,7 @@ Id to delete for instead of the current one, allows for deleting another item fr
 
 #### Defined in
 
-[client/providers/item.tsx:547](https://github.com/onzag/itemize/blob/f2db74a5/client/providers/item.tsx#L547)
+[client/providers/item.tsx:611](https://github.com/onzag/itemize/blob/a24376ed/client/providers/item.tsx#L611)
 
 ___
 
@@ -197,7 +197,7 @@ Version to delete for instead of the current one
 
 #### Defined in
 
-[client/providers/item.tsx:551](https://github.com/onzag/itemize/blob/f2db74a5/client/providers/item.tsx#L551)
+[client/providers/item.tsx:615](https://github.com/onzag/itemize/blob/a24376ed/client/providers/item.tsx#L615)
 
 ___
 
@@ -218,7 +218,7 @@ after the action is performed it will apply to that value
 
 #### Defined in
 
-[client/providers/item.tsx:241](https://github.com/onzag/itemize/blob/f2db74a5/client/providers/item.tsx#L241)
+[client/providers/item.tsx:273](https://github.com/onzag/itemize/blob/a24376ed/client/providers/item.tsx#L273)
 
 ___
 
@@ -239,7 +239,7 @@ after the action is performed it will apply to that value
 
 #### Defined in
 
-[client/providers/item.tsx:250](https://github.com/onzag/itemize/blob/f2db74a5/client/providers/item.tsx#L250)
+[client/providers/item.tsx:282](https://github.com/onzag/itemize/blob/a24376ed/client/providers/item.tsx#L282)
 
 ___
 
@@ -260,7 +260,7 @@ after the action is performed it will apply to that value
 
 #### Defined in
 
-[client/providers/item.tsx:232](https://github.com/onzag/itemize/blob/f2db74a5/client/providers/item.tsx#L232)
+[client/providers/item.tsx:264](https://github.com/onzag/itemize/blob/a24376ed/client/providers/item.tsx#L264)
 
 ___
 
@@ -272,7 +272,7 @@ Delete policies to include
 
 #### Defined in
 
-[client/providers/item.tsx:555](https://github.com/onzag/itemize/blob/f2db74a5/client/providers/item.tsx#L555)
+[client/providers/item.tsx:619](https://github.com/onzag/itemize/blob/a24376ed/client/providers/item.tsx#L619)
 
 ___
 
@@ -288,7 +288,7 @@ Cleans the value of a policy back to null
 
 #### Defined in
 
-[client/providers/item.tsx:192](https://github.com/onzag/itemize/blob/f2db74a5/client/providers/item.tsx#L192)
+[client/providers/item.tsx:224](https://github.com/onzag/itemize/blob/a24376ed/client/providers/item.tsx#L224)
 
 ___
 
@@ -304,7 +304,7 @@ Cleans the value of a policy back to null
 
 #### Defined in
 
-[client/providers/item.tsx:196](https://github.com/onzag/itemize/blob/f2db74a5/client/providers/item.tsx#L196)
+[client/providers/item.tsx:228](https://github.com/onzag/itemize/blob/a24376ed/client/providers/item.tsx#L228)
 
 ___
 
@@ -320,7 +320,7 @@ Cleans the value of a policy back to null
 
 #### Defined in
 
-[client/providers/item.tsx:188](https://github.com/onzag/itemize/blob/f2db74a5/client/providers/item.tsx#L188)
+[client/providers/item.tsx:220](https://github.com/onzag/itemize/blob/a24376ed/client/providers/item.tsx#L220)
 
 ___
 
@@ -333,7 +333,7 @@ in deletes this is mostly useless since it's basically instant
 
 #### Defined in
 
-[client/providers/item.tsx:567](https://github.com/onzag/itemize/blob/f2db74a5/client/providers/item.tsx#L567)
+[client/providers/item.tsx:631](https://github.com/onzag/itemize/blob/a24376ed/client/providers/item.tsx#L631)
 
 ___
 
@@ -354,7 +354,7 @@ after the action is performed it will apply to that value
 
 #### Defined in
 
-[client/providers/item.tsx:214](https://github.com/onzag/itemize/blob/f2db74a5/client/providers/item.tsx#L214)
+[client/providers/item.tsx:246](https://github.com/onzag/itemize/blob/a24376ed/client/providers/item.tsx#L246)
 
 ___
 
@@ -375,7 +375,7 @@ after the action is performed it will apply to that value
 
 #### Defined in
 
-[client/providers/item.tsx:223](https://github.com/onzag/itemize/blob/f2db74a5/client/providers/item.tsx#L223)
+[client/providers/item.tsx:255](https://github.com/onzag/itemize/blob/a24376ed/client/providers/item.tsx#L255)
 
 ___
 
@@ -396,7 +396,7 @@ after the action is performed it will apply to that value
 
 #### Defined in
 
-[client/providers/item.tsx:205](https://github.com/onzag/itemize/blob/f2db74a5/client/providers/item.tsx#L205)
+[client/providers/item.tsx:237](https://github.com/onzag/itemize/blob/a24376ed/client/providers/item.tsx#L237)
 
 ___
 
@@ -413,7 +413,7 @@ given action completes
 
 #### Defined in
 
-[client/providers/item.tsx:308](https://github.com/onzag/itemize/blob/f2db74a5/client/providers/item.tsx#L308)
+[client/providers/item.tsx:340](https://github.com/onzag/itemize/blob/a24376ed/client/providers/item.tsx#L340)
 
 ___
 
@@ -430,7 +430,7 @@ given action, completes and FAILED
 
 #### Defined in
 
-[client/providers/item.tsx:313](https://github.com/onzag/itemize/blob/f2db74a5/client/providers/item.tsx#L313)
+[client/providers/item.tsx:345](https://github.com/onzag/itemize/blob/a24376ed/client/providers/item.tsx#L345)
 
 ___
 
@@ -447,7 +447,7 @@ given action, completes and SUCCEEDS
 
 #### Defined in
 
-[client/providers/item.tsx:303](https://github.com/onzag/itemize/blob/f2db74a5/client/providers/item.tsx#L303)
+[client/providers/item.tsx:335](https://github.com/onzag/itemize/blob/a24376ed/client/providers/item.tsx#L335)
 
 ___
 
@@ -468,7 +468,7 @@ and make it not show an error
 
 #### Defined in
 
-[client/providers/item.tsx:268](https://github.com/onzag/itemize/blob/f2db74a5/client/providers/item.tsx#L268)
+[client/providers/item.tsx:300](https://github.com/onzag/itemize/blob/a24376ed/client/providers/item.tsx#L300)
 
 ___
 
@@ -489,7 +489,7 @@ and make it not show an error
 
 #### Defined in
 
-[client/providers/item.tsx:277](https://github.com/onzag/itemize/blob/f2db74a5/client/providers/item.tsx#L277)
+[client/providers/item.tsx:309](https://github.com/onzag/itemize/blob/a24376ed/client/providers/item.tsx#L309)
 
 ___
 
@@ -510,7 +510,7 @@ and make it not show an error
 
 #### Defined in
 
-[client/providers/item.tsx:259](https://github.com/onzag/itemize/blob/f2db74a5/client/providers/item.tsx#L259)
+[client/providers/item.tsx:291](https://github.com/onzag/itemize/blob/a24376ed/client/providers/item.tsx#L291)
 
 ## Methods
 
@@ -529,4 +529,4 @@ a boolean or a promise with a boolean on whether one should proceed
 
 #### Defined in
 
-[client/providers/item.tsx:562](https://github.com/onzag/itemize/blob/f2db74a5/client/providers/item.tsx#L562)
+[client/providers/item.tsx:626](https://github.com/onzag/itemize/blob/a24376ed/client/providers/item.tsx#L626)

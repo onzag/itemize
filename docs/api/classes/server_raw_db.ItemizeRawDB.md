@@ -19,22 +19,33 @@ get mantained and the caches get properly invalidated
 - [cachedSelects](server_raw_db.ItemizeRawDB.md#cachedselects)
 - [databaseConnection](server_raw_db.ItemizeRawDB.md#databaseconnection)
 - [elastic](server_raw_db.ItemizeRawDB.md#elastic)
+- [eventQueue](server_raw_db.ItemizeRawDB.md#eventqueue)
+- [fakeListener](server_raw_db.ItemizeRawDB.md#fakelistener)
+- [memCachedSelects](server_raw_db.ItemizeRawDB.md#memcachedselects)
 - [redisGlobal](server_raw_db.ItemizeRawDB.md#redisglobal)
 - [redisPub](server_raw_db.ItemizeRawDB.md#redispub)
 - [redisSub](server_raw_db.ItemizeRawDB.md#redissub)
 - [root](server_raw_db.ItemizeRawDB.md#root)
+- [singleClientMode](server_raw_db.ItemizeRawDB.md#singleclientmode)
 - [transacting](server_raw_db.ItemizeRawDB.md#transacting)
-- [transactingQueue](server_raw_db.ItemizeRawDB.md#transactingqueue)
 
 ### Methods
 
 - [\_retrieveRawDBSelect](server_raw_db.ItemizeRawDB.md#_retrieverawdbselect)
+- [\_retrieveRawDBSelectSimple](server_raw_db.ItemizeRawDB.md#_retrieverawdbselectsimple)
 - [\_updateCachedSelect](server_raw_db.ItemizeRawDB.md#_updatecachedselect)
+- [changeRowLanguageFn](server_raw_db.ItemizeRawDB.md#changerowlanguagefn)
 - [checkRowValidityForInformingChanges](server_raw_db.ItemizeRawDB.md#checkrowvalidityforinformingchanges)
+- [closeRawDBCursor](server_raw_db.ItemizeRawDB.md#closerawdbcursor)
+- [completeRowData](server_raw_db.ItemizeRawDB.md#completerowdata)
+- [consumeEventQueue](server_raw_db.ItemizeRawDB.md#consumeeventqueue)
 - [createGloballyCachedRawDBSelect](server_raw_db.ItemizeRawDB.md#creategloballycachedrawdbselect)
+- [declareRawDBCursorSelect](server_raw_db.ItemizeRawDB.md#declarerawdbcursorselect)
 - [deleteGloballyCachedRawDBSelect](server_raw_db.ItemizeRawDB.md#deletegloballycachedrawdbselect)
 - [executeGloballyCachedRawDBSelect](server_raw_db.ItemizeRawDB.md#executegloballycachedrawdbselect)
+- [fetchFromRawDBCursor](server_raw_db.ItemizeRawDB.md#fetchfromrawdbcursor)
 - [handleIncomingMessage](server_raw_db.ItemizeRawDB.md#handleincomingmessage)
+- [hookInto](server_raw_db.ItemizeRawDB.md#hookinto)
 - [informChangeOnRow](server_raw_db.ItemizeRawDB.md#informchangeonrow)
 - [informChangeOnRowElastic](server_raw_db.ItemizeRawDB.md#informchangeonrowelastic)
 - [informChangeOnRows](server_raw_db.ItemizeRawDB.md#informchangeonrows)
@@ -45,22 +56,24 @@ get mantained and the caches get properly invalidated
 - [informRowsHaveBeenDeletedElasticOnly](server_raw_db.ItemizeRawDB.md#informrowshavebeendeletedelasticonly)
 - [informRowsHaveBeenModified](server_raw_db.ItemizeRawDB.md#informrowshavebeenmodified)
 - [informRowsHaveBeenModifiedElasticOnly](server_raw_db.ItemizeRawDB.md#informrowshavebeenmodifiedelasticonly)
+- [moveFromRawDBCursor](server_raw_db.ItemizeRawDB.md#movefromrawdbcursor)
 - [performBatchRawDBDelete](server_raw_db.ItemizeRawDB.md#performbatchrawdbdelete)
 - [performBatchRawDBUpdate](server_raw_db.ItemizeRawDB.md#performbatchrawdbupdate)
 - [performModuleBatchRawDBUpdate](server_raw_db.ItemizeRawDB.md#performmodulebatchrawdbupdate)
+- [performRawDBCursorSelect](server_raw_db.ItemizeRawDB.md#performrawdbcursorselect)
 - [performRawDBDelete](server_raw_db.ItemizeRawDB.md#performrawdbdelete)
 - [performRawDBInsert](server_raw_db.ItemizeRawDB.md#performrawdbinsert)
 - [performRawDBSelect](server_raw_db.ItemizeRawDB.md#performrawdbselect)
+- [performRawDBSelectAgainstDeletedRegistry](server_raw_db.ItemizeRawDB.md#performrawdbselectagainstdeletedregistry)
 - [performRawDBUpdate](server_raw_db.ItemizeRawDB.md#performrawdbupdate)
 - [processGQLValue](server_raw_db.ItemizeRawDB.md#processgqlvalue)
 - [provideHashableV5Id](server_raw_db.ItemizeRawDB.md#providehashablev5id)
 - [provideRandomV4Id](server_raw_db.ItemizeRawDB.md#providerandomv4id)
-- [redoDictionariesFn](server_raw_db.ItemizeRawDB.md#redodictionariesfn)
 - [retrieveGloballyCachedRawDBSelect](server_raw_db.ItemizeRawDB.md#retrievegloballycachedrawdbselect)
 - [retrieveRawDBSelect](server_raw_db.ItemizeRawDB.md#retrieverawdbselect)
 - [setupElastic](server_raw_db.ItemizeRawDB.md#setupelastic)
+- [startSingleClientOperation](server_raw_db.ItemizeRawDB.md#startsingleclientoperation)
 - [startTransaction](server_raw_db.ItemizeRawDB.md#starttransaction)
-- [storeInDeleteRegistry](server_raw_db.ItemizeRawDB.md#storeindeleteregistry)
 - [updateTrackers](server_raw_db.ItemizeRawDB.md#updatetrackers)
 
 ## Constructors
@@ -83,7 +96,7 @@ Builds a new instance of the change informer
 
 #### Defined in
 
-[server/raw-db.ts:94](https://github.com/onzag/itemize/blob/f2db74a5/server/raw-db.ts#L94)
+[server/raw-db.ts:124](https://github.com/onzag/itemize/blob/a24376ed/server/raw-db.ts#L124)
 
 ## Properties
 
@@ -97,7 +110,7 @@ Builds a new instance of the change informer
 
 #### Defined in
 
-[server/raw-db.ts:74](https://github.com/onzag/itemize/blob/f2db74a5/server/raw-db.ts#L74)
+[server/raw-db.ts:95](https://github.com/onzag/itemize/blob/a24376ed/server/raw-db.ts#L95)
 
 ___
 
@@ -107,7 +120,7 @@ ___
 
 #### Defined in
 
-[server/raw-db.ts:86](https://github.com/onzag/itemize/blob/f2db74a5/server/raw-db.ts#L86)
+[server/raw-db.ts:116](https://github.com/onzag/itemize/blob/a24376ed/server/raw-db.ts#L116)
 
 ___
 
@@ -117,7 +130,41 @@ ___
 
 #### Defined in
 
-[server/raw-db.ts:69](https://github.com/onzag/itemize/blob/f2db74a5/server/raw-db.ts#L69)
+[server/raw-db.ts:89](https://github.com/onzag/itemize/blob/a24376ed/server/raw-db.ts#L89)
+
+___
+
+### eventQueue
+
+• `Private` **eventQueue**: `Function`[] = `[]`
+
+#### Defined in
+
+[server/raw-db.ts:93](https://github.com/onzag/itemize/blob/a24376ed/server/raw-db.ts#L93)
+
+___
+
+### fakeListener
+
+• `Private` **fakeListener**: [`Listener`](server_listener.Listener.md)
+
+#### Defined in
+
+[server/raw-db.ts:86](https://github.com/onzag/itemize/blob/a24376ed/server/raw-db.ts#L86)
+
+___
+
+### memCachedSelects
+
+• `Private` **memCachedSelects**: `Object` = `{}`
+
+#### Index signature
+
+▪ [uniqueID: `string`]: { `err?`: `Error` ; `ready`: `boolean` ; `value`: [`ISQLTableRowValue`](../interfaces/base_Root_sql.ISQLTableRowValue.md)[] ; `waitingPromise`: `Promise`<`void`\>  }
+
+#### Defined in
+
+[server/raw-db.ts:107](https://github.com/onzag/itemize/blob/a24376ed/server/raw-db.ts#L107)
 
 ___
 
@@ -127,7 +174,7 @@ ___
 
 #### Defined in
 
-[server/raw-db.ts:66](https://github.com/onzag/itemize/blob/f2db74a5/server/raw-db.ts#L66)
+[server/raw-db.ts:84](https://github.com/onzag/itemize/blob/a24376ed/server/raw-db.ts#L84)
 
 ___
 
@@ -137,7 +184,7 @@ ___
 
 #### Defined in
 
-[server/raw-db.ts:64](https://github.com/onzag/itemize/blob/f2db74a5/server/raw-db.ts#L64)
+[server/raw-db.ts:82](https://github.com/onzag/itemize/blob/a24376ed/server/raw-db.ts#L82)
 
 ___
 
@@ -147,7 +194,7 @@ ___
 
 #### Defined in
 
-[server/raw-db.ts:65](https://github.com/onzag/itemize/blob/f2db74a5/server/raw-db.ts#L65)
+[server/raw-db.ts:83](https://github.com/onzag/itemize/blob/a24376ed/server/raw-db.ts#L83)
 
 ___
 
@@ -157,7 +204,17 @@ ___
 
 #### Defined in
 
-[server/raw-db.ts:68](https://github.com/onzag/itemize/blob/f2db74a5/server/raw-db.ts#L68)
+[server/raw-db.ts:88](https://github.com/onzag/itemize/blob/a24376ed/server/raw-db.ts#L88)
+
+___
+
+### singleClientMode
+
+• `Private` **singleClientMode**: `boolean`
+
+#### Defined in
+
+[server/raw-db.ts:92](https://github.com/onzag/itemize/blob/a24376ed/server/raw-db.ts#L92)
 
 ___
 
@@ -167,23 +224,13 @@ ___
 
 #### Defined in
 
-[server/raw-db.ts:71](https://github.com/onzag/itemize/blob/f2db74a5/server/raw-db.ts#L71)
-
-___
-
-### transactingQueue
-
-• `Private` **transactingQueue**: `Function`[] = `[]`
-
-#### Defined in
-
-[server/raw-db.ts:72](https://github.com/onzag/itemize/blob/f2db74a5/server/raw-db.ts#L72)
+[server/raw-db.ts:91](https://github.com/onzag/itemize/blob/a24376ed/server/raw-db.ts#L91)
 
 ## Methods
 
 ### \_retrieveRawDBSelect
 
-▸ `Private` **_retrieveRawDBSelect**(`itemDefinitionOrModule`, `selecter`, `preventJoin?`): [`SelectBuilder`](database_SelectBuilder.SelectBuilder.md)
+▸ `Private` **_retrieveRawDBSelect**(`itemDefinitionOrModule`, `selecter`, `options?`): [`SelectBuilder`](database_SelectBuilder.SelectBuilder.md)
 
 #### Parameters
 
@@ -191,7 +238,8 @@ ___
 | :------ | :------ |
 | `itemDefinitionOrModule` | `string` \| [`default`](base_Root_Module.default.md) \| [`default`](base_Root_Module_ItemDefinition.default.md) |
 | `selecter` | (`builder`: [`SelectBuilder`](database_SelectBuilder.SelectBuilder.md)) => `void` |
-| `preventJoin?` | `boolean` |
+| `options` | `Object` |
+| `options.preventJoin?` | `boolean` |
 
 #### Returns
 
@@ -199,7 +247,28 @@ ___
 
 #### Defined in
 
-[server/raw-db.ts:1310](https://github.com/onzag/itemize/blob/f2db74a5/server/raw-db.ts#L1310)
+[server/raw-db.ts:1986](https://github.com/onzag/itemize/blob/a24376ed/server/raw-db.ts#L1986)
+
+___
+
+### \_retrieveRawDBSelectSimple
+
+▸ `Private` **_retrieveRawDBSelectSimple**(`table`, `selecter`): [`SelectBuilder`](database_SelectBuilder.SelectBuilder.md)
+
+#### Parameters
+
+| Name | Type |
+| :------ | :------ |
+| `table` | `string` |
+| `selecter` | (`builder`: [`SelectBuilder`](database_SelectBuilder.SelectBuilder.md)) => `void` |
+
+#### Returns
+
+[`SelectBuilder`](database_SelectBuilder.SelectBuilder.md)
+
+#### Defined in
+
+[server/raw-db.ts:2027](https://github.com/onzag/itemize/blob/a24376ed/server/raw-db.ts#L2027)
 
 ___
 
@@ -223,7 +292,36 @@ redis
 
 #### Defined in
 
-[server/raw-db.ts:1490](https://github.com/onzag/itemize/blob/f2db74a5/server/raw-db.ts#L1490)
+[server/raw-db.ts:2454](https://github.com/onzag/itemize/blob/a24376ed/server/raw-db.ts#L2454)
+
+___
+
+### changeRowLanguageFn
+
+▸ `Private` **changeRowLanguageFn**(`itemDefinitionOrModule`, `setBuilder`, `language`, `dictionary`, `propertyOrInclude`, `property`): `void`
+
+A private helper function to use a item definition
+and a set builder in order to update the dictionaries
+of given properties
+
+#### Parameters
+
+| Name | Type |
+| :------ | :------ |
+| `itemDefinitionOrModule` | [`default`](base_Root_Module.default.md) \| [`default`](base_Root_Module_ItemDefinition.default.md) |
+| `setBuilder` | [`SetBuilder`](database_SetBuilder.SetBuilder.md) |
+| `language` | `string` |
+| `dictionary` | `string` |
+| `propertyOrInclude` | `string` |
+| `property` | `string` |
+
+#### Returns
+
+`void`
+
+#### Defined in
+
+[server/raw-db.ts:1399](https://github.com/onzag/itemize/blob/a24376ed/server/raw-db.ts#L1399)
 
 ___
 
@@ -231,21 +329,94 @@ ___
 
 ▸ `Private` **checkRowValidityForInformingChanges**(`row`, `idef`, `doNotCheckTracked?`): `Promise`<`boolean`\>
 
+Takes a row and stores it in the deleted registry
+
 #### Parameters
 
-| Name | Type |
-| :------ | :------ |
-| `row` | [`ISQLTableRowValue`](../interfaces/base_Root_sql.ISQLTableRowValue.md) |
-| `idef` | [`default`](base_Root_Module_ItemDefinition.default.md) |
-| `doNotCheckTracked?` | `boolean` |
+| Name | Type | Description |
+| :------ | :------ | :------ |
+| `row` | [`ISQLTableRowValue`](../interfaces/base_Root_sql.ISQLTableRowValue.md) | the row to store |
+| `idef` | [`default`](base_Root_Module_ItemDefinition.default.md) | - |
+| `doNotCheckTracked?` | `boolean` | - |
 
 #### Returns
 
 `Promise`<`boolean`\>
 
+the transaction time
+
 #### Defined in
 
-[server/raw-db.ts:264](https://github.com/onzag/itemize/blob/f2db74a5/server/raw-db.ts#L264)
+[server/raw-db.ts:491](https://github.com/onzag/itemize/blob/a24376ed/server/raw-db.ts#L491)
+
+___
+
+### closeRawDBCursor
+
+▸ **closeRawDBCursor**(`cursorName`): `Promise`<`QueryResult`<`any`\>\>
+
+Removes a given cursor
+
+#### Parameters
+
+| Name | Type |
+| :------ | :------ |
+| `cursorName` | `string` |
+
+#### Returns
+
+`Promise`<`QueryResult`<`any`\>\>
+
+#### Defined in
+
+[server/raw-db.ts:2135](https://github.com/onzag/itemize/blob/a24376ed/server/raw-db.ts#L2135)
+
+___
+
+### completeRowData
+
+▸ **completeRowData**(`rows`): `Promise`<[[`ISQLTableRowValue`](../interfaces/base_Root_sql.ISQLTableRowValue.md)[], `boolean`]\>
+
+Given incomplete row data this function will complete the row data (if possible)
+and return completed array, note that this will likely be out of the order given
+as the order in and out is not guaranteed
+
+#### Parameters
+
+| Name | Type | Description |
+| :------ | :------ | :------ |
+| `rows` | [`ISQLTableRowValue`](../interfaces/base_Root_sql.ISQLTableRowValue.md)[] | the rows, they should all have at least, id, version and type defined |
+
+#### Returns
+
+`Promise`<[[`ISQLTableRowValue`](../interfaces/base_Root_sql.ISQLTableRowValue.md)[], `boolean`]\>
+
+the entire row data
+
+#### Defined in
+
+[server/raw-db.ts:362](https://github.com/onzag/itemize/blob/a24376ed/server/raw-db.ts#L362)
+
+___
+
+### consumeEventQueue
+
+▸ **consumeEventQueue**(`options?`): `Promise`<`void`\>
+
+#### Parameters
+
+| Name | Type |
+| :------ | :------ |
+| `options` | `Object` |
+| `options.ensureOrder?` | `boolean` |
+
+#### Returns
+
+`Promise`<`void`\>
+
+#### Defined in
+
+[server/raw-db.ts:172](https://github.com/onzag/itemize/blob/a24376ed/server/raw-db.ts#L172)
 
 ___
 
@@ -297,7 +468,35 @@ use doNotProbe if you want to create it regardless which will considerably speed
 
 #### Defined in
 
-[server/raw-db.ts:1408](https://github.com/onzag/itemize/blob/f2db74a5/server/raw-db.ts#L1408)
+[server/raw-db.ts:2372](https://github.com/onzag/itemize/blob/a24376ed/server/raw-db.ts#L2372)
+
+___
+
+### declareRawDBCursorSelect
+
+▸ **declareRawDBCursorSelect**(`itemDefinitionOrModule`, `cursorName`, `selecter`, `options?`): `Promise`<`QueryResult`<`any`\>\>
+
+Declares a new cursor agains a select statment and does nothing about it
+
+#### Parameters
+
+| Name | Type |
+| :------ | :------ |
+| `itemDefinitionOrModule` | `string` \| [`default`](base_Root_Module.default.md) \| [`default`](base_Root_Module_ItemDefinition.default.md) |
+| `cursorName` | `string` |
+| `selecter` | (`builder`: [`SelectBuilder`](database_SelectBuilder.SelectBuilder.md)) => `void` |
+| `options` | `Object` |
+| `options.noScroll?` | `boolean` |
+| `options.preventJoin?` | `boolean` |
+| `options.withHold?` | `boolean` |
+
+#### Returns
+
+`Promise`<`QueryResult`<`any`\>\>
+
+#### Defined in
+
+[server/raw-db.ts:2045](https://github.com/onzag/itemize/blob/a24376ed/server/raw-db.ts#L2045)
 
 ___
 
@@ -317,7 +516,7 @@ ___
 
 #### Defined in
 
-[server/raw-db.ts:1613](https://github.com/onzag/itemize/blob/f2db74a5/server/raw-db.ts#L1613)
+[server/raw-db.ts:2579](https://github.com/onzag/itemize/blob/a24376ed/server/raw-db.ts#L2579)
 
 ___
 
@@ -340,7 +539,30 @@ in the cache
 
 #### Defined in
 
-[server/raw-db.ts:1584](https://github.com/onzag/itemize/blob/f2db74a5/server/raw-db.ts#L1584)
+[server/raw-db.ts:2550](https://github.com/onzag/itemize/blob/a24376ed/server/raw-db.ts#L2550)
+
+___
+
+### fetchFromRawDBCursor
+
+▸ **fetchFromRawDBCursor**(`cursorName`, `fetcher`): `Promise`<[`ISQLTableRowValue`](../interfaces/base_Root_sql.ISQLTableRowValue.md)[]\>
+
+Fetches from a cursor that was already declared
+
+#### Parameters
+
+| Name | Type |
+| :------ | :------ |
+| `cursorName` | `string` |
+| `fetcher` | (`builder`: [`FetchOrMoveFromCursorBuilder`](database_FetchOrMoveFromCursorBuilder.FetchOrMoveFromCursorBuilder.md)) => `void` |
+
+#### Returns
+
+`Promise`<[`ISQLTableRowValue`](../interfaces/base_Root_sql.ISQLTableRowValue.md)[]\>
+
+#### Defined in
+
+[server/raw-db.ts:2106](https://github.com/onzag/itemize/blob/a24376ed/server/raw-db.ts#L2106)
 
 ___
 
@@ -361,7 +583,34 @@ ___
 
 #### Defined in
 
-[server/raw-db.ts:1643](https://github.com/onzag/itemize/blob/f2db74a5/server/raw-db.ts#L1643)
+[server/raw-db.ts:2609](https://github.com/onzag/itemize/blob/a24376ed/server/raw-db.ts#L2609)
+
+___
+
+### hookInto
+
+▸ **hookInto**(`connection`, `options?`): [`ItemizeRawDB`](server_raw_db.ItemizeRawDB.md)
+
+Hooks into an existing database connection to give it raw db capabilities
+
+#### Parameters
+
+| Name | Type | Description |
+| :------ | :------ | :------ |
+| `connection` | [`DatabaseConnection`](database.DatabaseConnection.md) | the connection in question |
+| `options` | `Object` | the options given |
+| `options.singleClient?` | `boolean` | - |
+| `options.transacting?` | `boolean` | if transacting please make sure to consume the events yourself by calling consumeTransactingEventQueue once the changes have been commited |
+
+#### Returns
+
+[`ItemizeRawDB`](server_raw_db.ItemizeRawDB.md)
+
+a new instance of raw db
+
+#### Defined in
+
+[server/raw-db.ts:209](https://github.com/onzag/itemize/blob/a24376ed/server/raw-db.ts#L209)
 
 ___
 
@@ -387,7 +636,7 @@ row
 
 #### Defined in
 
-[server/raw-db.ts:396](https://github.com/onzag/itemize/blob/f2db74a5/server/raw-db.ts#L396)
+[server/raw-db.ts:645](https://github.com/onzag/itemize/blob/a24376ed/server/raw-db.ts#L645)
 
 ___
 
@@ -411,7 +660,7 @@ ___
 
 #### Defined in
 
-[server/raw-db.ts:291](https://github.com/onzag/itemize/blob/f2db74a5/server/raw-db.ts#L291)
+[server/raw-db.ts:518](https://github.com/onzag/itemize/blob/a24376ed/server/raw-db.ts#L518)
 
 ___
 
@@ -439,13 +688,13 @@ the clients that are related to those rows
 
 #### Defined in
 
-[server/raw-db.ts:493](https://github.com/onzag/itemize/blob/f2db74a5/server/raw-db.ts#L493)
+[server/raw-db.ts:771](https://github.com/onzag/itemize/blob/a24376ed/server/raw-db.ts#L771)
 
 ___
 
 ### informChangeOnRowsElasticOnly
 
-▸ `Private` **informChangeOnRowsElasticOnly**(`rows`, `action`, `elasticLanguageOverride`, `rowDataIsComplete`): `void`
+▸ `Private` **informChangeOnRowsElasticOnly**(`rows`, `action`, `elasticLanguageOverride`, `rowDataIsComplete`): `Promise`<`void`\>
 
 #### Parameters
 
@@ -458,11 +707,11 @@ ___
 
 #### Returns
 
-`void`
+`Promise`<`void`\>
 
 #### Defined in
 
-[server/raw-db.ts:474](https://github.com/onzag/itemize/blob/f2db74a5/server/raw-db.ts#L474)
+[server/raw-db.ts:733](https://github.com/onzag/itemize/blob/a24376ed/server/raw-db.ts#L733)
 
 ___
 
@@ -503,7 +752,7 @@ for the database for the value
 
 #### Defined in
 
-[server/raw-db.ts:1092](https://github.com/onzag/itemize/blob/f2db74a5/server/raw-db.ts#L1092)
+[server/raw-db.ts:1380](https://github.com/onzag/itemize/blob/a24376ed/server/raw-db.ts#L1380)
 
 ___
 
@@ -525,7 +774,7 @@ ___
 
 #### Defined in
 
-[server/raw-db.ts:1095](https://github.com/onzag/itemize/blob/f2db74a5/server/raw-db.ts#L1095)
+[server/raw-db.ts:1383](https://github.com/onzag/itemize/blob/a24376ed/server/raw-db.ts#L1383)
 
 ___
 
@@ -562,7 +811,7 @@ last_modified
 
 #### Defined in
 
-[server/raw-db.ts:1057](https://github.com/onzag/itemize/blob/f2db74a5/server/raw-db.ts#L1057)
+[server/raw-db.ts:1345](https://github.com/onzag/itemize/blob/a24376ed/server/raw-db.ts#L1345)
 
 ___
 
@@ -582,7 +831,7 @@ ___
 
 #### Defined in
 
-[server/raw-db.ts:1062](https://github.com/onzag/itemize/blob/f2db74a5/server/raw-db.ts#L1062)
+[server/raw-db.ts:1350](https://github.com/onzag/itemize/blob/a24376ed/server/raw-db.ts#L1350)
 
 ___
 
@@ -628,7 +877,7 @@ for the database for an updated value.
 
 #### Defined in
 
-[server/raw-db.ts:1030](https://github.com/onzag/itemize/blob/f2db74a5/server/raw-db.ts#L1030)
+[server/raw-db.ts:1318](https://github.com/onzag/itemize/blob/a24376ed/server/raw-db.ts#L1318)
 
 ___
 
@@ -650,31 +899,57 @@ ___
 
 #### Defined in
 
-[server/raw-db.ts:1033](https://github.com/onzag/itemize/blob/f2db74a5/server/raw-db.ts#L1033)
+[server/raw-db.ts:1321](https://github.com/onzag/itemize/blob/a24376ed/server/raw-db.ts#L1321)
+
+___
+
+### moveFromRawDBCursor
+
+▸ **moveFromRawDBCursor**(`cursorName`, `mover`): `Promise`<`QueryResult`<`any`\>\>
+
+Moves from a cursor that was already declared
+
+#### Parameters
+
+| Name | Type |
+| :------ | :------ |
+| `cursorName` | `string` |
+| `mover` | (`builder`: [`FetchOrMoveFromCursorBuilder`](database_FetchOrMoveFromCursorBuilder.FetchOrMoveFromCursorBuilder.md)) => `void` |
+
+#### Returns
+
+`Promise`<`QueryResult`<`any`\>\>
+
+#### Defined in
+
+[server/raw-db.ts:2121](https://github.com/onzag/itemize/blob/a24376ed/server/raw-db.ts#L2121)
 
 ___
 
 ### performBatchRawDBDelete
 
-▸ **performBatchRawDBDelete**(`itemDefinitionOrModule`, `deleter`): `Promise`<`void`\>
+▸ **performBatchRawDBDelete**(`itemDefinitionOrModule`, `where`, `deleteFiles?`, `deleter?`): `Promise`<[`ISQLTableRowValue`](../interfaces/base_Root_sql.ISQLTableRowValue.md)[]\>
 
 #### Parameters
 
 | Name | Type |
 | :------ | :------ |
 | `itemDefinitionOrModule` | `string` \| [`default`](base_Root_Module.default.md) \| [`default`](base_Root_Module_ItemDefinition.default.md) |
+| `where` | (`builder`: [`WhereBuilder`](database_WhereBuilder.WhereBuilder.md)) => `void` |
+| `deleteFiles?` | ``false`` \| { `domain`: `string` ; `storage`: [`IStorageProvidersObject`](../interfaces/server_services_base_StorageProvider.IStorageProvidersObject.md)  } |
 | `deleter` | `Object` |
 | `deleter.dangerousUseSilentMode?` | `boolean` |
-| `deleter.preventJoin?` | `boolean` |
-| `deleter.select` | (`builder`: [`SelectBuilder`](database_SelectBuilder.SelectBuilder.md)) => `void` |
+| `deleter.returningAll?` | `boolean` |
+| `deleter.useJoinedReturn?` | `boolean` |
+| `deleter.useJoinedWhere?` | `boolean` |
 
 #### Returns
 
-`Promise`<`void`\>
+`Promise`<[`ISQLTableRowValue`](../interfaces/base_Root_sql.ISQLTableRowValue.md)[]\>
 
 #### Defined in
 
-[server/raw-db.ts:1172](https://github.com/onzag/itemize/blob/f2db74a5/server/raw-db.ts#L1172)
+[server/raw-db.ts:1475](https://github.com/onzag/itemize/blob/a24376ed/server/raw-db.ts#L1475)
 
 ___
 
@@ -686,6 +961,16 @@ Performs a raw db update for many rows
 in the database this is a very powerful and quite
 advanced method
 
+Updating tracked properties will result in slower speeds for the query
+try to avoid updating tracked properties using a raw db query
+
+NOTE: A raw db update is unable to update the pointers properly as it will
+only update the pointer in the given side while ignoring the pointers
+of the other side, normally the raw db update will refuse to update pointers
+(that is able to detect) unless dangerousForceUpdatePointers is specified
+
+NOTE a raw db update is unable to trigger side effects
+
 #### Parameters
 
 | Name | Type | Description |
@@ -694,11 +979,13 @@ advanced method
 | `updater` | `Object` |  |
 | `updater.dangerousForceElasticLangUpdateTo?` | `string` | Forces a language update to the given language, will ignore silent mode if provided |
 | `updater.dangerousForceElasticUpdate?` | `boolean` | Will update search indices anyway |
+| `updater.dangerousForceUpdatePointers?` | `boolean` | Update pointers columns anyway  A raw db update is unable to update the pointers properly as it will only update the pointer in the given side while ignoring the pointers of the other side, normally the raw db update will refuse to update pointers (that is able to detect) unless dangerousForceUpdatePointers is specified |
 | `updater.dangerousUseSilentMode?` | `boolean` | Does not inform of updates or anything to the clusters or elastic or anything at all, does not modify the last modified signature |
 | `updater.itemTableUpdate?` | [`IManyValueType`](../interfaces/database_base.IManyValueType.md) | - |
 | `updater.moduleTableUpdate?` | [`IManyValueType`](../interfaces/database_base.IManyValueType.md) | - |
-| `updater.itemTableUpdater?` | (`arg`: [`SetBuilder`](database_SetBuilder.SetBuilder.md), `redoDictionaries`: `RedoDictionariesFn`) => `void` | - |
-| `updater.moduleTableUpdater?` | (`arg`: [`SetBuilder`](database_SetBuilder.SetBuilder.md), `redoDictionaries`: `RedoDictionariesFn`) => `void` | - |
+| `updater.returnOldColumnsFor?` | `string`[] | List of properties to return old columns for, give the property names and the old values for such properties will be returned note that there's quite a big overhead for such query |
+| `updater.itemTableUpdater?` | (`arg`: [`SetBuilder`](database_SetBuilder.SetBuilder.md), `changeRowLanguage`: `changeRowLanguageFn`) => `void` | - |
+| `updater.moduleTableUpdater?` | (`arg`: [`SetBuilder`](database_SetBuilder.SetBuilder.md), `changeRowLanguage`: `changeRowLanguageFn`) => `void` | - |
 | `updater.whereCriteriaSelector` | (`arg`: [`WhereBuilder`](database_WhereBuilder.WhereBuilder.md)) => `void` | - |
 
 #### Returns
@@ -707,7 +994,7 @@ advanced method
 
 #### Defined in
 
-[server/raw-db.ts:1687](https://github.com/onzag/itemize/blob/f2db74a5/server/raw-db.ts#L1687)
+[server/raw-db.ts:2663](https://github.com/onzag/itemize/blob/a24376ed/server/raw-db.ts#L2663)
 
 ___
 
@@ -727,9 +1014,10 @@ advanced method
 | `updater` | `Object` |  |
 | `updater.dangerousForceElasticLangUpdateTo?` | `string` | Forces a language update to the given language, will ignore silent mode if provided |
 | `updater.dangerousForceElasticUpdate?` | `boolean` | Will update search indices anyway |
+| `updater.dangerousSplitIntoItemUpdatesIfTrackedPropertiesPresent?` | `boolean` | When tracked properties are present a module based update isnt possible, however by using this you may split the update into several sub-updates that are item based  A transaction will not be used, changes will be commited instantly |
 | `updater.dangerousUseSilentMode?` | `boolean` | Does not inform of updates or anything to the clusters or elastic or anything at all, does not modify the last modified signature |
 | `updater.moduleTableUpdate?` | [`IManyValueType`](../interfaces/database_base.IManyValueType.md) | - |
-| `updater.moduleTableUpdater?` | (`arg`: [`SetBuilder`](database_SetBuilder.SetBuilder.md), `redoDictionaries`: `RedoDictionariesFnPropertyBased`) => `void` | - |
+| `updater.moduleTableUpdater?` | (`arg`: [`SetBuilder`](database_SetBuilder.SetBuilder.md), `changeRowLanguage`: `changeRowLanguageFnPropertyBased`) => `void` | - |
 | `updater.whereCriteriaSelector` | (`arg`: [`WhereBuilder`](database_WhereBuilder.WhereBuilder.md)) => `void` | - |
 
 #### Returns
@@ -738,13 +1026,49 @@ advanced method
 
 #### Defined in
 
-[server/raw-db.ts:2114](https://github.com/onzag/itemize/blob/f2db74a5/server/raw-db.ts#L2114)
+[server/raw-db.ts:3206](https://github.com/onzag/itemize/blob/a24376ed/server/raw-db.ts#L3206)
+
+___
+
+### performRawDBCursorSelect
+
+▸ **performRawDBCursorSelect**(`itemDefinitionOrModule`, `selecter`, `options?`): `AsyncGenerator`<[`ISQLTableRowValue`](../interfaces/base_Root_sql.ISQLTableRowValue.md)[], `void`, `boolean`\>
+
+This generator peforms a cursos based raw db select
+executing a select function batch by batch with a given
+batch size that defaults to 100 until all records of the
+select are consumed
+
+Whenever retrieving the next value you can provide a boolean
+on whether the process should continue or it should stop, you should always ensure
+that either the entire rows are consumed or if you need to abruptly stop
+the processing to pass false to the next iterator because otherwise
+the cursor will remain in the database hogging memory
+
+#### Parameters
+
+| Name | Type |
+| :------ | :------ |
+| `itemDefinitionOrModule` | `string` \| [`default`](base_Root_Module.default.md) \| [`default`](base_Root_Module_ItemDefinition.default.md) |
+| `selecter` | (`builder`: [`SelectBuilder`](database_SelectBuilder.SelectBuilder.md)) => `void` |
+| `options` | `Object` |
+| `options.batchSize?` | `number` |
+| `options.preventJoin?` | `boolean` |
+| `options.withHold?` | `boolean` |
+
+#### Returns
+
+`AsyncGenerator`<[`ISQLTableRowValue`](../interfaces/base_Root_sql.ISQLTableRowValue.md)[], `void`, `boolean`\>
+
+#### Defined in
+
+[server/raw-db.ts:2155](https://github.com/onzag/itemize/blob/a24376ed/server/raw-db.ts#L2155)
 
 ___
 
 ### performRawDBDelete
 
-▸ **performRawDBDelete**(`itemDefinitionOrModule`, `id`, `version`, `deleter`): `Promise`<`void`\>
+▸ **performRawDBDelete**(`itemDefinitionOrModule`, `id`, `version`, `deleteFiles?`, `deleter?`): `Promise`<[`ISQLTableRowValue`](../interfaces/base_Root_sql.ISQLTableRowValue.md)[]\>
 
 #### Parameters
 
@@ -753,16 +1077,21 @@ ___
 | `itemDefinitionOrModule` | `string` \| [`default`](base_Root_Module.default.md) \| [`default`](base_Root_Module_ItemDefinition.default.md) |
 | `id` | `string` |
 | `version` | `string` |
+| `deleteFiles?` | ``false`` \| { `domain`: `string` ; `storage`: [`IStorageProvidersObject`](../interfaces/server_services_base_StorageProvider.IStorageProvidersObject.md)  } |
 | `deleter` | `Object` |
 | `deleter.dangerousUseSilentMode?` | `boolean` |
+| `deleter.returnAll?` | `boolean` |
+| `deleter.useJoinedReturn?` | `boolean` |
+| `deleter.useJoinedWhere?` | `boolean` |
+| `deleter.where?` | (`builder`: [`WhereBuilder`](database_WhereBuilder.WhereBuilder.md)) => `void` |
 
 #### Returns
 
-`Promise`<`void`\>
+`Promise`<[`ISQLTableRowValue`](../interfaces/base_Root_sql.ISQLTableRowValue.md)[]\>
 
 #### Defined in
 
-[server/raw-db.ts:1158](https://github.com/onzag/itemize/blob/f2db74a5/server/raw-db.ts#L1158)
+[server/raw-db.ts:1446](https://github.com/onzag/itemize/blob/a24376ed/server/raw-db.ts#L1446)
 
 ___
 
@@ -779,7 +1108,7 @@ has to be specified and it is easy to mess up
 refer to processGQLValue in order to aid yourself a little when doing a raw db
 insert
 
-TODO returning builder access in order to modify what to return
+NOTE a raw db insert is unable to trigger side effects
 
 #### Parameters
 
@@ -798,13 +1127,13 @@ TODO returning builder access in order to modify what to return
 
 #### Defined in
 
-[server/raw-db.ts:1202](https://github.com/onzag/itemize/blob/f2db74a5/server/raw-db.ts#L1202)
+[server/raw-db.ts:1878](https://github.com/onzag/itemize/blob/a24376ed/server/raw-db.ts#L1878)
 
 ___
 
 ### performRawDBSelect
 
-▸ **performRawDBSelect**(`itemDefinitionOrModule`, `selecter`, `preventJoin?`): `Promise`<[`ISQLTableRowValue`](../interfaces/base_Root_sql.ISQLTableRowValue.md)[]\>
+▸ **performRawDBSelect**(`itemDefinitionOrModule`, `selecter`, `options?`): `Promise`<[`ISQLTableRowValue`](../interfaces/base_Root_sql.ISQLTableRowValue.md)[]\>
 
 Provides a db query builder for the given item or a module
 
@@ -814,7 +1143,10 @@ Provides a db query builder for the given item or a module
 | :------ | :------ | :------ |
 | `itemDefinitionOrModule` | `string` \| [`default`](base_Root_Module.default.md) \| [`default`](base_Root_Module_ItemDefinition.default.md) | the item or module |
 | `selecter` | (`builder`: [`SelectBuilder`](database_SelectBuilder.SelectBuilder.md)) => `void` | - |
-| `preventJoin?` | `boolean` | when using an item, if you will not be using properties that are in the module table, like id, parents, creators, and prop extensions then you can prevent the join from happening |
+| `options` | `Object` | - |
+| `options.preventJoin?` | `boolean` | - |
+| `options.useMemoryCache?` | `string` | - |
+| `options.useMemoryCacheMs?` | `number` | - |
 
 #### Returns
 
@@ -822,7 +1154,27 @@ Provides a db query builder for the given item or a module
 
 #### Defined in
 
-[server/raw-db.ts:1352](https://github.com/onzag/itemize/blob/f2db74a5/server/raw-db.ts#L1352)
+[server/raw-db.ts:2255](https://github.com/onzag/itemize/blob/a24376ed/server/raw-db.ts#L2255)
+
+___
+
+### performRawDBSelectAgainstDeletedRegistry
+
+▸ **performRawDBSelectAgainstDeletedRegistry**(`selecter`): `Promise`<[`ISQLTableRowValue`](../interfaces/base_Root_sql.ISQLTableRowValue.md)[]\>
+
+#### Parameters
+
+| Name | Type |
+| :------ | :------ |
+| `selecter` | (`builder`: [`SelectBuilder`](database_SelectBuilder.SelectBuilder.md)) => `void` |
+
+#### Returns
+
+`Promise`<[`ISQLTableRowValue`](../interfaces/base_Root_sql.ISQLTableRowValue.md)[]\>
+
+#### Defined in
+
+[server/raw-db.ts:2240](https://github.com/onzag/itemize/blob/a24376ed/server/raw-db.ts#L2240)
 
 ___
 
@@ -832,8 +1184,6 @@ ___
 
 Performs a raw database update, use this method in order to update critical data that could
 lead to race conditions, otherwise stay by updating through the cache
-
-TODO returning builder access will affect tracked properties
 
 #### Parameters
 
@@ -848,8 +1198,8 @@ TODO returning builder access will affect tracked properties
 | `updater.dangerousUseSilentMode?` | `boolean` | Does not inform of updates or anything to the clusters or elastic or anything at all, does not modify the last modified signature |
 | `updater.itemTableUpdate?` | [`IManyValueType`](../interfaces/database_base.IManyValueType.md) | - |
 | `updater.moduleTableUpdate?` | [`IManyValueType`](../interfaces/database_base.IManyValueType.md) | - |
-| `updater.itemTableUpdater?` | (`arg`: [`SetBuilder`](database_SetBuilder.SetBuilder.md), `redoDictionaries`: `RedoDictionariesFn`) => `void` | - |
-| `updater.moduleTableUpdater?` | (`arg`: [`SetBuilder`](database_SetBuilder.SetBuilder.md), `redoDictionaries`: `RedoDictionariesFn`) => `void` | - |
+| `updater.itemTableUpdater?` | (`arg`: [`SetBuilder`](database_SetBuilder.SetBuilder.md), `changeRowLanguage`: `changeRowLanguageFn`) => `void` | - |
+| `updater.moduleTableUpdater?` | (`arg`: [`SetBuilder`](database_SetBuilder.SetBuilder.md), `changeRowLanguage`: `changeRowLanguageFn`) => `void` | - |
 
 #### Returns
 
@@ -857,7 +1207,7 @@ TODO returning builder access will affect tracked properties
 
 #### Defined in
 
-[server/raw-db.ts:2314](https://github.com/onzag/itemize/blob/f2db74a5/server/raw-db.ts#L2314)
+[server/raw-db.ts:3435](https://github.com/onzag/itemize/blob/a24376ed/server/raw-db.ts#L3435)
 
 ___
 
@@ -897,7 +1247,7 @@ an object which contains the total or partial values of the row to be inserted o
 
 #### Defined in
 
-[server/raw-db.ts:183](https://github.com/onzag/itemize/blob/f2db74a5/server/raw-db.ts#L183)
+[server/raw-db.ts:311](https://github.com/onzag/itemize/blob/a24376ed/server/raw-db.ts#L311)
 
 ___
 
@@ -922,7 +1272,7 @@ a url safe v5 uuid
 
 #### Defined in
 
-[server/raw-db.ts:158](https://github.com/onzag/itemize/blob/f2db74a5/server/raw-db.ts#L158)
+[server/raw-db.ts:286](https://github.com/onzag/itemize/blob/a24376ed/server/raw-db.ts#L286)
 
 ___
 
@@ -943,36 +1293,7 @@ a url safe v4 uuid
 
 #### Defined in
 
-[server/raw-db.ts:148](https://github.com/onzag/itemize/blob/f2db74a5/server/raw-db.ts#L148)
-
-___
-
-### redoDictionariesFn
-
-▸ `Private` **redoDictionariesFn**(`itemDefinitionOrModule`, `setBuilder`, `language`, `dictionary`, `propertyOrInclude`, `property`): `void`
-
-A private helper function to use a item definition
-and a set builder in order to update the dictionaries
-of given properties
-
-#### Parameters
-
-| Name | Type |
-| :------ | :------ |
-| `itemDefinitionOrModule` | [`default`](base_Root_Module.default.md) \| [`default`](base_Root_Module_ItemDefinition.default.md) |
-| `setBuilder` | [`SetBuilder`](database_SetBuilder.SetBuilder.md) |
-| `language` | `string` |
-| `dictionary` | `string` |
-| `propertyOrInclude` | `string` |
-| `property` | `string` |
-
-#### Returns
-
-`void`
-
-#### Defined in
-
-[server/raw-db.ts:1111](https://github.com/onzag/itemize/blob/f2db74a5/server/raw-db.ts#L1111)
+[server/raw-db.ts:276](https://github.com/onzag/itemize/blob/a24376ed/server/raw-db.ts#L276)
 
 ___
 
@@ -997,13 +1318,13 @@ provide the select results from that query
 
 #### Defined in
 
-[server/raw-db.ts:1545](https://github.com/onzag/itemize/blob/f2db74a5/server/raw-db.ts#L1545)
+[server/raw-db.ts:2511](https://github.com/onzag/itemize/blob/a24376ed/server/raw-db.ts#L2511)
 
 ___
 
 ### retrieveRawDBSelect
 
-▸ **retrieveRawDBSelect**(`itemDefinitionOrModule`, `selecter`, `preventJoin?`): [`string`, [`BasicBindingType`](../modules/database_base.md#basicbindingtype)[]]
+▸ **retrieveRawDBSelect**(`itemDefinitionOrModule`, `selecter`, `options?`): [`string`, [`BasicBindingType`](../modules/database_base.md#basicbindingtype)[]]
 
 Retrieves a raw db select query in order to be used to assign values in updates
 
@@ -1013,7 +1334,8 @@ Retrieves a raw db select query in order to be used to assign values in updates
 | :------ | :------ |
 | `itemDefinitionOrModule` | `string` \| [`default`](base_Root_Module.default.md) \| [`default`](base_Root_Module_ItemDefinition.default.md) |
 | `selecter` | (`builder`: [`SelectBuilder`](database_SelectBuilder.SelectBuilder.md)) => `void` |
-| `preventJoin?` | `boolean` |
+| `options` | `Object` |
+| `options.preventJoin?` | `boolean` |
 
 #### Returns
 
@@ -1021,7 +1343,7 @@ Retrieves a raw db select query in order to be used to assign values in updates
 
 #### Defined in
 
-[server/raw-db.ts:1369](https://github.com/onzag/itemize/blob/f2db74a5/server/raw-db.ts#L1369)
+[server/raw-db.ts:2331](https://github.com/onzag/itemize/blob/a24376ed/server/raw-db.ts#L2331)
 
 ___
 
@@ -1044,13 +1366,47 @@ elastic instance, as such elastic adds itself in here when initialized
 
 #### Defined in
 
-[server/raw-db.ts:120](https://github.com/onzag/itemize/blob/f2db74a5/server/raw-db.ts#L120)
+[server/raw-db.ts:168](https://github.com/onzag/itemize/blob/a24376ed/server/raw-db.ts#L168)
+
+___
+
+### startSingleClientOperation
+
+▸ **startSingleClientOperation**<`T`\>(`fn`, `opts?`): `Promise`<`T`\>
+
+Starts a new instance of raw db but for a single client
+operation, it's useful for cursors and in fact itemize
+will reject cursors not started in transactions
+
+#### Type parameters
+
+| Name |
+| :------ |
+| `T` |
+
+#### Parameters
+
+| Name | Type | Description |
+| :------ | :------ | :------ |
+| `fn` | (`transactingRawDB`: [`ItemizeRawDB`](server_raw_db.ItemizeRawDB.md)) => `Promise`<`T`\> | the transactional function |
+| `opts` | `Object` | - |
+| `opts.ensureEventConsumptionOrder?` | `boolean` | - |
+
+#### Returns
+
+`Promise`<`T`\>
+
+whatever is returned in the transactional function
+
+#### Defined in
+
+[server/raw-db.ts:252](https://github.com/onzag/itemize/blob/a24376ed/server/raw-db.ts#L252)
 
 ___
 
 ### startTransaction
 
-▸ **startTransaction**<`T`\>(`fn`): `Promise`<`T`\>
+▸ **startTransaction**<`T`\>(`fn`, `opts?`): `Promise`<`T`\>
 
 Starts a new instance of raw db but in transaction mode
 
@@ -1065,6 +1421,8 @@ Starts a new instance of raw db but in transaction mode
 | Name | Type | Description |
 | :------ | :------ | :------ |
 | `fn` | (`transactingRawDB`: [`ItemizeRawDB`](server_raw_db.ItemizeRawDB.md)) => `Promise`<`T`\> | the transactional function |
+| `opts` | `Object` | - |
+| `opts.ensureEventConsumptionOrder?` | `boolean` | - |
 
 #### Returns
 
@@ -1074,33 +1432,7 @@ whatever is returned in the transactional function
 
 #### Defined in
 
-[server/raw-db.ts:129](https://github.com/onzag/itemize/blob/f2db74a5/server/raw-db.ts#L129)
-
-___
-
-### storeInDeleteRegistry
-
-▸ `Private` **storeInDeleteRegistry**(`row`, `moduleName`, `trackedProperties`): `Promise`<`string`\>
-
-Takes a row and stores it in the deleted registry
-
-#### Parameters
-
-| Name | Type | Description |
-| :------ | :------ | :------ |
-| `row` | [`ISQLTableRowValue`](../interfaces/base_Root_sql.ISQLTableRowValue.md) | the row to store |
-| `moduleName` | `string` | the module that it belongs to (based on the type) |
-| `trackedProperties` | `string`[] | - |
-
-#### Returns
-
-`Promise`<`string`\>
-
-the transaction time
-
-#### Defined in
-
-[server/raw-db.ts:232](https://github.com/onzag/itemize/blob/f2db74a5/server/raw-db.ts#L232)
+[server/raw-db.ts:228](https://github.com/onzag/itemize/blob/a24376ed/server/raw-db.ts#L228)
 
 ___
 
@@ -1123,4 +1455,4 @@ ___
 
 #### Defined in
 
-[server/raw-db.ts:1970](https://github.com/onzag/itemize/blob/f2db74a5/server/raw-db.ts#L1970)
+[server/raw-db.ts:3036](https://github.com/onzag/itemize/blob/a24376ed/server/raw-db.ts#L3036)

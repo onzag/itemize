@@ -25,7 +25,7 @@ Which properties differ
 
 #### Defined in
 
-[client/components/item/DifferingIncludesRetriever.tsx:30](https://github.com/onzag/itemize/blob/f2db74a5/client/components/item/DifferingIncludesRetriever.tsx#L30)
+[client/components/item/DifferingIncludesRetriever.tsx:30](https://github.com/onzag/itemize/blob/a24376ed/client/components/item/DifferingIncludesRetriever.tsx#L30)
 
 ___
 
@@ -37,7 +37,7 @@ Whether the exclusion state differs
 
 #### Defined in
 
-[client/components/item/DifferingIncludesRetriever.tsx:26](https://github.com/onzag/itemize/blob/f2db74a5/client/components/item/DifferingIncludesRetriever.tsx#L26)
+[client/components/item/DifferingIncludesRetriever.tsx:26](https://github.com/onzag/itemize/blob/a24376ed/client/components/item/DifferingIncludesRetriever.tsx#L26)
 
 ___
 
@@ -49,4 +49,4 @@ this is the id of the include
 
 #### Defined in
 
-[client/components/item/DifferingIncludesRetriever.tsx:22](https://github.com/onzag/itemize/blob/f2db74a5/client/components/item/DifferingIncludesRetriever.tsx#L22)
+[client/components/item/DifferingIncludesRetriever.tsx:22](https://github.com/onzag/itemize/blob/a24376ed/client/components/item/DifferingIncludesRetriever.tsx#L22)

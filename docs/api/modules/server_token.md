@@ -44,7 +44,7 @@ Decode a JWT token and does not verify whether it's valid
 
 #### Defined in
 
-[server/token.ts:96](https://github.com/onzag/itemize/blob/f2db74a5/server/token.ts#L96)
+[server/token.ts:96](https://github.com/onzag/itemize/blob/a24376ed/server/token.ts#L96)
 
 ___
 
@@ -68,7 +68,7 @@ Sign a payload
 
 #### Defined in
 
-[server/token.ts:18](https://github.com/onzag/itemize/blob/f2db74a5/server/token.ts#L18)
+[server/token.ts:18](https://github.com/onzag/itemize/blob/a24376ed/server/token.ts#L18)
 
 ___
 
@@ -98,7 +98,7 @@ Verify and decode a key
 
 #### Defined in
 
-[server/token.ts:40](https://github.com/onzag/itemize/blob/f2db74a5/server/token.ts#L40)
+[server/token.ts:40](https://github.com/onzag/itemize/blob/a24376ed/server/token.ts#L40)
 
 ___
 
@@ -129,4 +129,4 @@ Verify and decode a key using two keys
 
 #### Defined in
 
-[server/token.ts:63](https://github.com/onzag/itemize/blob/f2db74a5/server/token.ts#L63)
+[server/token.ts:63](https://github.com/onzag/itemize/blob/a24376ed/server/token.ts#L63)

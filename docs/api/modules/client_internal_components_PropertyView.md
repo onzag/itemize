@@ -46,7 +46,7 @@ areact element
 
 #### Defined in
 
-[client/internal/components/PropertyView/index.tsx:363](https://github.com/onzag/itemize/blob/f2db74a5/client/internal/components/PropertyView/index.tsx#L363)
+[client/internal/components/PropertyView/index.tsx:370](https://github.com/onzag/itemize/blob/a24376ed/client/internal/components/PropertyView/index.tsx#L370)
 
 ___
 
@@ -66,4 +66,4 @@ ___
 
 #### Defined in
 
-[client/internal/components/PropertyView/index.tsx:422](https://github.com/onzag/itemize/blob/f2db74a5/client/internal/components/PropertyView/index.tsx#L422)
+[client/internal/components/PropertyView/index.tsx:429](https://github.com/onzag/itemize/blob/a24376ed/client/internal/components/PropertyView/index.tsx#L429)

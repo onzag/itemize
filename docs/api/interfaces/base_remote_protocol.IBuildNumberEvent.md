@@ -21,4 +21,4 @@ within itsefl
 
 #### Defined in
 
-[base/remote-protocol.ts:25](https://github.com/onzag/itemize/blob/f2db74a5/base/remote-protocol.ts#L25)
+[base/remote-protocol.ts:25](https://github.com/onzag/itemize/blob/a24376ed/base/remote-protocol.ts#L25)

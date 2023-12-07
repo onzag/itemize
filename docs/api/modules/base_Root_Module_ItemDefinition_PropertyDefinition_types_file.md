@@ -22,7 +22,7 @@ Contains the single file type description
 
 #### Defined in
 
-[base/Root/Module/ItemDefinition/PropertyDefinition/types/file.ts:13](https://github.com/onzag/itemize/blob/f2db74a5/base/Root/Module/ItemDefinition/PropertyDefinition/types/file.ts#L13)
+[base/Root/Module/ItemDefinition/PropertyDefinition/types/file.ts:13](https://github.com/onzag/itemize/blob/a24376ed/base/Root/Module/ItemDefinition/PropertyDefinition/types/file.ts#L13)
 
 ## Variables
 
@@ -34,4 +34,4 @@ The type value represents the behaviour of files in the app
 
 #### Defined in
 
-[base/Root/Module/ItemDefinition/PropertyDefinition/types/file.ts:27](https://github.com/onzag/itemize/blob/f2db74a5/base/Root/Module/ItemDefinition/PropertyDefinition/types/file.ts#L27)
+[base/Root/Module/ItemDefinition/PropertyDefinition/types/file.ts:27](https://github.com/onzag/itemize/blob/a24376ed/base/Root/Module/ItemDefinition/PropertyDefinition/types/file.ts#L27)

@@ -54,7 +54,7 @@ a react component
 
 #### Defined in
 
-[client/components/property/Setter.tsx:72](https://github.com/onzag/itemize/blob/f2db74a5/client/components/property/Setter.tsx#L72)
+[client/components/property/Setter.tsx:72](https://github.com/onzag/itemize/blob/a24376ed/client/components/property/Setter.tsx#L72)
 
 ___
 
@@ -84,7 +84,7 @@ a react component
 
 #### Defined in
 
-[client/components/property/Setter.tsx:137](https://github.com/onzag/itemize/blob/f2db74a5/client/components/property/Setter.tsx#L137)
+[client/components/property/Setter.tsx:137](https://github.com/onzag/itemize/blob/a24376ed/client/components/property/Setter.tsx#L137)
 
 ___
 
@@ -114,7 +114,7 @@ a react component
 
 #### Defined in
 
-[client/components/property/Setter.tsx:201](https://github.com/onzag/itemize/blob/f2db74a5/client/components/property/Setter.tsx#L201)
+[client/components/property/Setter.tsx:201](https://github.com/onzag/itemize/blob/a24376ed/client/components/property/Setter.tsx#L201)
 
 ___
 
@@ -144,7 +144,7 @@ a react component
 
 #### Defined in
 
-[client/components/property/Setter.tsx:217](https://github.com/onzag/itemize/blob/f2db74a5/client/components/property/Setter.tsx#L217)
+[client/components/property/Setter.tsx:217](https://github.com/onzag/itemize/blob/a24376ed/client/components/property/Setter.tsx#L217)
 
 ___
 
@@ -174,7 +174,7 @@ a react component
 
 #### Defined in
 
-[client/components/property/Setter.tsx:265](https://github.com/onzag/itemize/blob/f2db74a5/client/components/property/Setter.tsx#L265)
+[client/components/property/Setter.tsx:265](https://github.com/onzag/itemize/blob/a24376ed/client/components/property/Setter.tsx#L265)
 
 ___
 
@@ -204,7 +204,7 @@ a react component
 
 #### Defined in
 
-[client/components/property/Setter.tsx:281](https://github.com/onzag/itemize/blob/f2db74a5/client/components/property/Setter.tsx#L281)
+[client/components/property/Setter.tsx:281](https://github.com/onzag/itemize/blob/a24376ed/client/components/property/Setter.tsx#L281)
 
 ___
 
@@ -234,7 +234,7 @@ a react component
 
 #### Defined in
 
-[client/components/property/Setter.tsx:105](https://github.com/onzag/itemize/blob/f2db74a5/client/components/property/Setter.tsx#L105)
+[client/components/property/Setter.tsx:105](https://github.com/onzag/itemize/blob/a24376ed/client/components/property/Setter.tsx#L105)
 
 ___
 
@@ -264,7 +264,7 @@ a react component
 
 #### Defined in
 
-[client/components/property/Setter.tsx:121](https://github.com/onzag/itemize/blob/f2db74a5/client/components/property/Setter.tsx#L121)
+[client/components/property/Setter.tsx:121](https://github.com/onzag/itemize/blob/a24376ed/client/components/property/Setter.tsx#L121)
 
 ___
 
@@ -294,7 +294,7 @@ a react component
 
 #### Defined in
 
-[client/components/property/Setter.tsx:233](https://github.com/onzag/itemize/blob/f2db74a5/client/components/property/Setter.tsx#L233)
+[client/components/property/Setter.tsx:233](https://github.com/onzag/itemize/blob/a24376ed/client/components/property/Setter.tsx#L233)
 
 ___
 
@@ -324,7 +324,7 @@ a react component
 
 #### Defined in
 
-[client/components/property/Setter.tsx:88](https://github.com/onzag/itemize/blob/f2db74a5/client/components/property/Setter.tsx#L88)
+[client/components/property/Setter.tsx:88](https://github.com/onzag/itemize/blob/a24376ed/client/components/property/Setter.tsx#L88)
 
 ___
 
@@ -354,7 +354,7 @@ a react component
 
 #### Defined in
 
-[client/components/property/Setter.tsx:249](https://github.com/onzag/itemize/blob/f2db74a5/client/components/property/Setter.tsx#L249)
+[client/components/property/Setter.tsx:249](https://github.com/onzag/itemize/blob/a24376ed/client/components/property/Setter.tsx#L249)
 
 ___
 
@@ -384,7 +384,7 @@ a react component
 
 #### Defined in
 
-[client/components/property/Setter.tsx:169](https://github.com/onzag/itemize/blob/f2db74a5/client/components/property/Setter.tsx#L169)
+[client/components/property/Setter.tsx:169](https://github.com/onzag/itemize/blob/a24376ed/client/components/property/Setter.tsx#L169)
 
 ___
 
@@ -414,7 +414,7 @@ a react component
 
 #### Defined in
 
-[client/components/property/Setter.tsx:297](https://github.com/onzag/itemize/blob/f2db74a5/client/components/property/Setter.tsx#L297)
+[client/components/property/Setter.tsx:297](https://github.com/onzag/itemize/blob/a24376ed/client/components/property/Setter.tsx#L297)
 
 ___
 
@@ -444,7 +444,7 @@ a react component
 
 #### Defined in
 
-[client/components/property/Setter.tsx:153](https://github.com/onzag/itemize/blob/f2db74a5/client/components/property/Setter.tsx#L153)
+[client/components/property/Setter.tsx:153](https://github.com/onzag/itemize/blob/a24376ed/client/components/property/Setter.tsx#L153)
 
 ___
 
@@ -474,7 +474,7 @@ a react component
 
 #### Defined in
 
-[client/components/property/Setter.tsx:185](https://github.com/onzag/itemize/blob/f2db74a5/client/components/property/Setter.tsx#L185)
+[client/components/property/Setter.tsx:185](https://github.com/onzag/itemize/blob/a24376ed/client/components/property/Setter.tsx#L185)
 
 ___
 
@@ -521,4 +521,4 @@ a react component
 
 #### Defined in
 
-[client/components/property/Setter.tsx:56](https://github.com/onzag/itemize/blob/f2db74a5/client/components/property/Setter.tsx#L56)
+[client/components/property/Setter.tsx:56](https://github.com/onzag/itemize/blob/a24376ed/client/components/property/Setter.tsx#L56)

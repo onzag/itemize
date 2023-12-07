@@ -28,4 +28,4 @@ a react element
 
 #### Defined in
 
-[client/fast-prototyping/components/navbar/external-dialogs.tsx:31](https://github.com/onzag/itemize/blob/f2db74a5/client/fast-prototyping/components/navbar/external-dialogs.tsx#L31)
+[client/fast-prototyping/components/navbar/external-dialogs.tsx:31](https://github.com/onzag/itemize/blob/a24376ed/client/fast-prototyping/components/navbar/external-dialogs.tsx#L31)

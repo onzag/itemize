@@ -34,7 +34,7 @@ the property
 
 #### Defined in
 
-[client/components/item/PokeActioner.tsx:47](https://github.com/onzag/itemize/blob/f2db74a5/client/components/item/PokeActioner.tsx#L47)
+[client/components/item/PokeActioner.tsx:47](https://github.com/onzag/itemize/blob/a24376ed/client/components/item/PokeActioner.tsx#L47)
 
 ___
 
@@ -47,7 +47,7 @@ is currently invalid
 
 #### Defined in
 
-[client/components/item/PokeActioner.tsx:32](https://github.com/onzag/itemize/blob/f2db74a5/client/components/item/PokeActioner.tsx#L32)
+[client/components/item/PokeActioner.tsx:32](https://github.com/onzag/itemize/blob/a24376ed/client/components/item/PokeActioner.tsx#L32)
 
 ___
 
@@ -60,7 +60,7 @@ is currently invalid
 
 #### Defined in
 
-[client/components/item/PokeActioner.tsx:37](https://github.com/onzag/itemize/blob/f2db74a5/client/components/item/PokeActioner.tsx#L37)
+[client/components/item/PokeActioner.tsx:37](https://github.com/onzag/itemize/blob/a24376ed/client/components/item/PokeActioner.tsx#L37)
 
 ___
 
@@ -73,7 +73,7 @@ is currently invalid
 
 #### Defined in
 
-[client/components/item/PokeActioner.tsx:27](https://github.com/onzag/itemize/blob/f2db74a5/client/components/item/PokeActioner.tsx#L27)
+[client/components/item/PokeActioner.tsx:27](https://github.com/onzag/itemize/blob/a24376ed/client/components/item/PokeActioner.tsx#L27)
 
 ___
 
@@ -86,7 +86,7 @@ definition
 
 #### Defined in
 
-[client/components/item/PokeActioner.tsx:42](https://github.com/onzag/itemize/blob/f2db74a5/client/components/item/PokeActioner.tsx#L42)
+[client/components/item/PokeActioner.tsx:42](https://github.com/onzag/itemize/blob/a24376ed/client/components/item/PokeActioner.tsx#L42)
 
 ## Methods
 
@@ -110,7 +110,7 @@ Runs the clean function from the item definition provider
 
 #### Defined in
 
-[client/components/item/PokeActioner.tsx:63](https://github.com/onzag/itemize/blob/f2db74a5/client/components/item/PokeActioner.tsx#L63)
+[client/components/item/PokeActioner.tsx:63](https://github.com/onzag/itemize/blob/a24376ed/client/components/item/PokeActioner.tsx#L63)
 
 ___
 
@@ -132,7 +132,7 @@ Standard poke functionality
 
 #### Defined in
 
-[client/components/item/PokeActioner.tsx:59](https://github.com/onzag/itemize/blob/f2db74a5/client/components/item/PokeActioner.tsx#L59)
+[client/components/item/PokeActioner.tsx:59](https://github.com/onzag/itemize/blob/a24376ed/client/components/item/PokeActioner.tsx#L59)
 
 ___
 
@@ -148,7 +148,7 @@ Pokes the elements to poke
 
 #### Defined in
 
-[client/components/item/PokeActioner.tsx:55](https://github.com/onzag/itemize/blob/f2db74a5/client/components/item/PokeActioner.tsx#L55)
+[client/components/item/PokeActioner.tsx:55](https://github.com/onzag/itemize/blob/a24376ed/client/components/item/PokeActioner.tsx#L55)
 
 ___
 
@@ -164,4 +164,4 @@ Unpokeseverything
 
 #### Defined in
 
-[client/components/item/PokeActioner.tsx:51](https://github.com/onzag/itemize/blob/f2db74a5/client/components/item/PokeActioner.tsx#L51)
+[client/components/item/PokeActioner.tsx:51](https://github.com/onzag/itemize/blob/a24376ed/client/components/item/PokeActioner.tsx#L51)

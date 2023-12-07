@@ -19,7 +19,7 @@
 
 #### Defined in
 
-[client/internal/gql-client-util.ts:172](https://github.com/onzag/itemize/blob/f2db74a5/client/internal/gql-client-util.ts#L172)
+[client/internal/gql-client-util.ts:172](https://github.com/onzag/itemize/blob/a24376ed/client/internal/gql-client-util.ts#L172)
 
 ___
 
@@ -29,4 +29,4 @@ ___
 
 #### Defined in
 
-[client/internal/gql-client-util.ts:173](https://github.com/onzag/itemize/blob/f2db74a5/client/internal/gql-client-util.ts#L173)
+[client/internal/gql-client-util.ts:173](https://github.com/onzag/itemize/blob/a24376ed/client/internal/gql-client-util.ts#L173)

@@ -31,4 +31,4 @@ that does a lot of the heavy lifting
 
 #### Defined in
 
-[server/ssr/generator.tsx:49](https://github.com/onzag/itemize/blob/f2db74a5/server/ssr/generator.tsx#L49)
+[server/ssr/generator.tsx:52](https://github.com/onzag/itemize/blob/a24376ed/server/ssr/generator.tsx#L52)

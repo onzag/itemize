@@ -20,4 +20,4 @@
 
 #### Defined in
 
-[client/components/accessibility/AltText.tsx:42](https://github.com/onzag/itemize/blob/f2db74a5/client/components/accessibility/AltText.tsx#L42)
+[client/components/accessibility/AltText.tsx:47](https://github.com/onzag/itemize/blob/a24376ed/client/components/accessibility/AltText.tsx#L47)

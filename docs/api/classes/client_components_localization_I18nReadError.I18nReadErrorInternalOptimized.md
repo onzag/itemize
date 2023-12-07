@@ -590,7 +590,7 @@ React.PureComponent.render
 
 #### Defined in
 
-[client/components/localization/I18nReadError.tsx:209](https://github.com/onzag/itemize/blob/f2db74a5/client/components/localization/I18nReadError.tsx#L209)
+[client/components/localization/I18nReadError.tsx:209](https://github.com/onzag/itemize/blob/a24376ed/client/components/localization/I18nReadError.tsx#L209)
 
 ___
 

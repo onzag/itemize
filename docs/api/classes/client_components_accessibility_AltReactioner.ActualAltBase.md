@@ -49,6 +49,7 @@
 - [componentWillUpdate](client_components_accessibility_AltReactioner.ActualAltBase.md#componentwillupdate)
 - [focus](client_components_accessibility_AltReactioner.ActualAltBase.md#focus)
 - [forceUpdate](client_components_accessibility_AltReactioner.ActualAltBase.md#forceupdate)
+- [getContainer](client_components_accessibility_AltReactioner.ActualAltBase.md#getcontainer)
 - [getElement](client_components_accessibility_AltReactioner.ActualAltBase.md#getelement)
 - [getPriority](client_components_accessibility_AltReactioner.ActualAltBase.md#getpriority)
 - [getSignature](client_components_accessibility_AltReactioner.ActualAltBase.md#getsignature)
@@ -94,7 +95,7 @@ React.PureComponent&lt;P, S\&gt;.constructor
 
 #### Defined in
 
-[client/components/accessibility/AltReactioner.tsx:959](https://github.com/onzag/itemize/blob/f2db74a5/client/components/accessibility/AltReactioner.tsx#L959)
+[client/components/accessibility/AltReactioner.tsx:1042](https://github.com/onzag/itemize/blob/a24376ed/client/components/accessibility/AltReactioner.tsx#L1042)
 
 ## Properties
 
@@ -104,7 +105,7 @@ React.PureComponent&lt;P, S\&gt;.constructor
 
 #### Defined in
 
-[client/components/accessibility/AltReactioner.tsx:957](https://github.com/onzag/itemize/blob/f2db74a5/client/components/accessibility/AltReactioner.tsx#L957)
+[client/components/accessibility/AltReactioner.tsx:1040](https://github.com/onzag/itemize/blob/a24376ed/client/components/accessibility/AltReactioner.tsx#L1040)
 
 ___
 
@@ -343,7 +344,7 @@ ___
 
 #### Defined in
 
-[client/components/accessibility/AltReactioner.tsx:1275](https://github.com/onzag/itemize/blob/f2db74a5/client/components/accessibility/AltReactioner.tsx#L1275)
+[client/components/accessibility/AltReactioner.tsx:1415](https://github.com/onzag/itemize/blob/a24376ed/client/components/accessibility/AltReactioner.tsx#L1415)
 
 ___
 
@@ -389,7 +390,7 @@ React.PureComponent.componentDidMount
 
 #### Defined in
 
-[client/components/accessibility/AltReactioner.tsx:1300](https://github.com/onzag/itemize/blob/f2db74a5/client/components/accessibility/AltReactioner.tsx#L1300)
+[client/components/accessibility/AltReactioner.tsx:1440](https://github.com/onzag/itemize/blob/a24376ed/client/components/accessibility/AltReactioner.tsx#L1440)
 
 ___
 
@@ -413,7 +414,7 @@ React.PureComponent.componentDidUpdate
 
 #### Defined in
 
-[client/components/accessibility/AltReactioner.tsx:994](https://github.com/onzag/itemize/blob/f2db74a5/client/components/accessibility/AltReactioner.tsx#L994)
+[client/components/accessibility/AltReactioner.tsx:1085](https://github.com/onzag/itemize/blob/a24376ed/client/components/accessibility/AltReactioner.tsx#L1085)
 
 ___
 
@@ -501,7 +502,7 @@ React.PureComponent.componentWillUnmount
 
 #### Defined in
 
-[client/components/accessibility/AltReactioner.tsx:1304](https://github.com/onzag/itemize/blob/f2db74a5/client/components/accessibility/AltReactioner.tsx#L1304)
+[client/components/accessibility/AltReactioner.tsx:1444](https://github.com/onzag/itemize/blob/a24376ed/client/components/accessibility/AltReactioner.tsx#L1444)
 
 ___
 
@@ -560,7 +561,7 @@ ___
 
 #### Defined in
 
-[client/components/accessibility/AltReactioner.tsx:1252](https://github.com/onzag/itemize/blob/f2db74a5/client/components/accessibility/AltReactioner.tsx#L1252)
+[client/components/accessibility/AltReactioner.tsx:1367](https://github.com/onzag/itemize/blob/a24376ed/client/components/accessibility/AltReactioner.tsx#L1367)
 
 ___
 
@@ -588,6 +589,20 @@ node_modules/@types/react/index.d.ts:496
 
 ___
 
+### getContainer
+
+▸ **getContainer**(): `HTMLElement`
+
+#### Returns
+
+`HTMLElement`
+
+#### Defined in
+
+[client/components/accessibility/AltReactioner.tsx:1132](https://github.com/onzag/itemize/blob/a24376ed/client/components/accessibility/AltReactioner.tsx#L1132)
+
+___
+
 ### getElement
 
 ▸ **getElement**(): `HTMLElement`
@@ -598,7 +613,7 @@ ___
 
 #### Defined in
 
-[client/components/accessibility/AltReactioner.tsx:1029](https://github.com/onzag/itemize/blob/f2db74a5/client/components/accessibility/AltReactioner.tsx#L1029)
+[client/components/accessibility/AltReactioner.tsx:1120](https://github.com/onzag/itemize/blob/a24376ed/client/components/accessibility/AltReactioner.tsx#L1120)
 
 ___
 
@@ -612,7 +627,7 @@ ___
 
 #### Defined in
 
-[client/components/accessibility/AltReactioner.tsx:1009](https://github.com/onzag/itemize/blob/f2db74a5/client/components/accessibility/AltReactioner.tsx#L1009)
+[client/components/accessibility/AltReactioner.tsx:1100](https://github.com/onzag/itemize/blob/a24376ed/client/components/accessibility/AltReactioner.tsx#L1100)
 
 ___
 
@@ -626,7 +641,7 @@ ___
 
 #### Defined in
 
-[client/components/accessibility/AltReactioner.tsx:1164](https://github.com/onzag/itemize/blob/f2db74a5/client/components/accessibility/AltReactioner.tsx#L1164)
+[client/components/accessibility/AltReactioner.tsx:1279](https://github.com/onzag/itemize/blob/a24376ed/client/components/accessibility/AltReactioner.tsx#L1279)
 
 ___
 
@@ -676,7 +691,7 @@ the root and ending with the current
 
 #### Defined in
 
-[client/components/accessibility/AltReactioner.tsx:1047](https://github.com/onzag/itemize/blob/f2db74a5/client/components/accessibility/AltReactioner.tsx#L1047)
+[client/components/accessibility/AltReactioner.tsx:1146](https://github.com/onzag/itemize/blob/a24376ed/client/components/accessibility/AltReactioner.tsx#L1146)
 
 ___
 
@@ -696,21 +711,21 @@ ___
 
 #### Defined in
 
-[client/components/accessibility/AltReactioner.tsx:1072](https://github.com/onzag/itemize/blob/f2db74a5/client/components/accessibility/AltReactioner.tsx#L1072)
+[client/components/accessibility/AltReactioner.tsx:1171](https://github.com/onzag/itemize/blob/a24376ed/client/components/accessibility/AltReactioner.tsx#L1171)
 
 ___
 
 ### isBlocking
 
-▸ **isBlocking**(): `boolean`
+▸ **isBlocking**(): `boolean` \| `P`[``"blocksQuickActionsWhileFocused"``]
 
 #### Returns
 
-`boolean`
+`boolean` \| `P`[``"blocksQuickActionsWhileFocused"``]
 
 #### Defined in
 
-[client/components/accessibility/AltReactioner.tsx:973](https://github.com/onzag/itemize/blob/f2db74a5/client/components/accessibility/AltReactioner.tsx#L973)
+[client/components/accessibility/AltReactioner.tsx:1056](https://github.com/onzag/itemize/blob/a24376ed/client/components/accessibility/AltReactioner.tsx#L1056)
 
 ___
 
@@ -724,7 +739,7 @@ ___
 
 #### Defined in
 
-[client/components/accessibility/AltReactioner.tsx:1013](https://github.com/onzag/itemize/blob/f2db74a5/client/components/accessibility/AltReactioner.tsx#L1013)
+[client/components/accessibility/AltReactioner.tsx:1104](https://github.com/onzag/itemize/blob/a24376ed/client/components/accessibility/AltReactioner.tsx#L1104)
 
 ___
 
@@ -738,7 +753,7 @@ ___
 
 #### Defined in
 
-[client/components/accessibility/AltReactioner.tsx:969](https://github.com/onzag/itemize/blob/f2db74a5/client/components/accessibility/AltReactioner.tsx#L969)
+[client/components/accessibility/AltReactioner.tsx:1052](https://github.com/onzag/itemize/blob/a24376ed/client/components/accessibility/AltReactioner.tsx#L1052)
 
 ___
 
@@ -752,7 +767,7 @@ ___
 
 #### Defined in
 
-[client/components/accessibility/AltReactioner.tsx:1005](https://github.com/onzag/itemize/blob/f2db74a5/client/components/accessibility/AltReactioner.tsx#L1005)
+[client/components/accessibility/AltReactioner.tsx:1096](https://github.com/onzag/itemize/blob/a24376ed/client/components/accessibility/AltReactioner.tsx#L1096)
 
 ___
 
@@ -766,7 +781,7 @@ ___
 
 #### Defined in
 
-[client/components/accessibility/AltReactioner.tsx:1280](https://github.com/onzag/itemize/blob/f2db74a5/client/components/accessibility/AltReactioner.tsx#L1280)
+[client/components/accessibility/AltReactioner.tsx:1420](https://github.com/onzag/itemize/blob/a24376ed/client/components/accessibility/AltReactioner.tsx#L1420)
 
 ___
 
@@ -780,7 +795,7 @@ ___
 
 #### Defined in
 
-[client/components/accessibility/AltReactioner.tsx:965](https://github.com/onzag/itemize/blob/f2db74a5/client/components/accessibility/AltReactioner.tsx#L965)
+[client/components/accessibility/AltReactioner.tsx:1048](https://github.com/onzag/itemize/blob/a24376ed/client/components/accessibility/AltReactioner.tsx#L1048)
 
 ___
 
@@ -794,7 +809,7 @@ ___
 
 #### Defined in
 
-[client/components/accessibility/AltReactioner.tsx:1271](https://github.com/onzag/itemize/blob/f2db74a5/client/components/accessibility/AltReactioner.tsx#L1271)
+[client/components/accessibility/AltReactioner.tsx:1411](https://github.com/onzag/itemize/blob/a24376ed/client/components/accessibility/AltReactioner.tsx#L1411)
 
 ___
 
@@ -814,7 +829,7 @@ ___
 
 #### Defined in
 
-[client/components/accessibility/AltReactioner.tsx:1170](https://github.com/onzag/itemize/blob/f2db74a5/client/components/accessibility/AltReactioner.tsx#L1170)
+[client/components/accessibility/AltReactioner.tsx:1285](https://github.com/onzag/itemize/blob/a24376ed/client/components/accessibility/AltReactioner.tsx#L1285)
 
 ___
 
@@ -832,7 +847,7 @@ React.PureComponent.render
 
 #### Defined in
 
-[client/components/accessibility/AltReactioner.tsx:1284](https://github.com/onzag/itemize/blob/f2db74a5/client/components/accessibility/AltReactioner.tsx#L1284)
+[client/components/accessibility/AltReactioner.tsx:1424](https://github.com/onzag/itemize/blob/a24376ed/client/components/accessibility/AltReactioner.tsx#L1424)
 
 ___
 
@@ -854,7 +869,7 @@ when another alt is blocking this triggers
 
 #### Defined in
 
-[client/components/accessibility/AltReactioner.tsx:990](https://github.com/onzag/itemize/blob/f2db74a5/client/components/accessibility/AltReactioner.tsx#L990)
+[client/components/accessibility/AltReactioner.tsx:1081](https://github.com/onzag/itemize/blob/a24376ed/client/components/accessibility/AltReactioner.tsx#L1081)
 
 ___
 
@@ -940,4 +955,4 @@ ___
 
 #### Defined in
 
-[client/components/accessibility/AltReactioner.tsx:1208](https://github.com/onzag/itemize/blob/f2db74a5/client/components/accessibility/AltReactioner.tsx#L1208)
+[client/components/accessibility/AltReactioner.tsx:1323](https://github.com/onzag/itemize/blob/a24376ed/client/components/accessibility/AltReactioner.tsx#L1323)

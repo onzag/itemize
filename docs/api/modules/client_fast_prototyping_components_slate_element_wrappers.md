@@ -20,4 +20,4 @@
 
 #### Defined in
 
-[client/fast-prototyping/components/slate/element-wrappers.tsx:453](https://github.com/onzag/itemize/blob/f2db74a5/client/fast-prototyping/components/slate/element-wrappers.tsx#L453)
+[client/fast-prototyping/components/slate/element-wrappers.tsx:587](https://github.com/onzag/itemize/blob/a24376ed/client/fast-prototyping/components/slate/element-wrappers.tsx#L587)

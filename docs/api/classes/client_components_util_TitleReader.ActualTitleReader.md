@@ -61,7 +61,7 @@ React.Component&lt;ActualTitleReaderProps, {}\&gt;.constructor
 
 #### Defined in
 
-[client/components/util/TitleReader.tsx:23](https://github.com/onzag/itemize/blob/f2db74a5/client/components/util/TitleReader.tsx#L23)
+[client/components/util/TitleReader.tsx:23](https://github.com/onzag/itemize/blob/a24376ed/client/components/util/TitleReader.tsx#L23)
 
 ## Properties
 
@@ -102,7 +102,7 @@ before the reader has the time to register
 
 #### Defined in
 
-[client/components/util/TitleReader.tsx:21](https://github.com/onzag/itemize/blob/f2db74a5/client/components/util/TitleReader.tsx#L21)
+[client/components/util/TitleReader.tsx:21](https://github.com/onzag/itemize/blob/a24376ed/client/components/util/TitleReader.tsx#L21)
 
 ___
 
@@ -345,7 +345,7 @@ React.Component.componentDidMount
 
 #### Defined in
 
-[client/components/util/TitleReader.tsx:26](https://github.com/onzag/itemize/blob/f2db74a5/client/components/util/TitleReader.tsx#L26)
+[client/components/util/TitleReader.tsx:26](https://github.com/onzag/itemize/blob/a24376ed/client/components/util/TitleReader.tsx#L26)
 
 ___
 
@@ -463,7 +463,7 @@ React.Component.componentWillUnmount
 
 #### Defined in
 
-[client/components/util/TitleReader.tsx:34](https://github.com/onzag/itemize/blob/f2db74a5/client/components/util/TitleReader.tsx#L34)
+[client/components/util/TitleReader.tsx:34](https://github.com/onzag/itemize/blob/a24376ed/client/components/util/TitleReader.tsx#L34)
 
 ___
 
@@ -576,7 +576,7 @@ React.Component.render
 
 #### Defined in
 
-[client/components/util/TitleReader.tsx:38](https://github.com/onzag/itemize/blob/f2db74a5/client/components/util/TitleReader.tsx#L38)
+[client/components/util/TitleReader.tsx:38](https://github.com/onzag/itemize/blob/a24376ed/client/components/util/TitleReader.tsx#L38)
 
 ___
 

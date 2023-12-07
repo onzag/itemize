@@ -41,7 +41,7 @@ The local storage reader
 
 #### Defined in
 
-[client/components/util/LocalStorageReader.tsx:108](https://github.com/onzag/itemize/blob/f2db74a5/client/components/util/LocalStorageReader.tsx#L108)
+[client/components/util/LocalStorageReader.tsx:108](https://github.com/onzag/itemize/blob/a24376ed/client/components/util/LocalStorageReader.tsx#L108)
 
 ___
 
@@ -64,7 +64,7 @@ and JSON parses it
 
 #### Defined in
 
-[client/components/util/LocalStorageReader.tsx:45](https://github.com/onzag/itemize/blob/f2db74a5/client/components/util/LocalStorageReader.tsx#L45)
+[client/components/util/LocalStorageReader.tsx:45](https://github.com/onzag/itemize/blob/a24376ed/client/components/util/LocalStorageReader.tsx#L45)
 
 ___
 
@@ -88,7 +88,7 @@ it uses JSON stringify to store the value
 
 #### Defined in
 
-[client/components/util/LocalStorageReader.tsx:26](https://github.com/onzag/itemize/blob/f2db74a5/client/components/util/LocalStorageReader.tsx#L26)
+[client/components/util/LocalStorageReader.tsx:26](https://github.com/onzag/itemize/blob/a24376ed/client/components/util/LocalStorageReader.tsx#L26)
 
 ___
 
@@ -116,4 +116,4 @@ Hooks version for the local storage reader
 
 #### Defined in
 
-[client/components/util/LocalStorageReader.tsx:68](https://github.com/onzag/itemize/blob/f2db74a5/client/components/util/LocalStorageReader.tsx#L68)
+[client/components/util/LocalStorageReader.tsx:68](https://github.com/onzag/itemize/blob/a24376ed/client/components/util/LocalStorageReader.tsx#L68)

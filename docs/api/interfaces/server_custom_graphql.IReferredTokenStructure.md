@@ -34,7 +34,7 @@ this data should be serializable
 
 #### Defined in
 
-[server/custom-graphql/index.ts:43](https://github.com/onzag/itemize/blob/f2db74a5/server/custom-graphql/index.ts#L43)
+[server/custom-graphql/index.ts:43](https://github.com/onzag/itemize/blob/a24376ed/server/custom-graphql/index.ts#L43)
 
 ___
 
@@ -46,7 +46,7 @@ Will throw an error when this is provided and not provide any token
 
 #### Defined in
 
-[server/custom-graphql/index.ts:47](https://github.com/onzag/itemize/blob/f2db74a5/server/custom-graphql/index.ts#L47)
+[server/custom-graphql/index.ts:47](https://github.com/onzag/itemize/blob/a24376ed/server/custom-graphql/index.ts#L47)
 
 ___
 
@@ -58,7 +58,7 @@ Specifies an expiration date
 
 #### Defined in
 
-[server/custom-graphql/index.ts:36](https://github.com/onzag/itemize/blob/f2db74a5/server/custom-graphql/index.ts#L36)
+[server/custom-graphql/index.ts:36](https://github.com/onzag/itemize/blob/a24376ed/server/custom-graphql/index.ts#L36)
 
 ___
 
@@ -70,7 +70,7 @@ Specifies an user id that the token should be built for
 
 #### Defined in
 
-[server/custom-graphql/index.ts:26](https://github.com/onzag/itemize/blob/f2db74a5/server/custom-graphql/index.ts#L26)
+[server/custom-graphql/index.ts:26](https://github.com/onzag/itemize/blob/a24376ed/server/custom-graphql/index.ts#L26)
 
 ___
 
@@ -84,4 +84,4 @@ stick to being a guest
 
 #### Defined in
 
-[server/custom-graphql/index.ts:32](https://github.com/onzag/itemize/blob/f2db74a5/server/custom-graphql/index.ts#L32)
+[server/custom-graphql/index.ts:32](https://github.com/onzag/itemize/blob/a24376ed/server/custom-graphql/index.ts#L32)

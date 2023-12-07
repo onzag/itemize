@@ -25,7 +25,7 @@ Records being searched that will eventually have an applied value
 
 #### Defined in
 
-[client/providers/item.tsx:1285](https://github.com/onzag/itemize/blob/f2db74a5/client/providers/item.tsx#L1285)
+[client/providers/item.tsx:1475](https://github.com/onzag/itemize/blob/a24376ed/client/providers/item.tsx#L1475)
 
 ___
 
@@ -37,7 +37,7 @@ Fields that are being searched
 
 #### Defined in
 
-[client/providers/item.tsx:1289](https://github.com/onzag/itemize/blob/f2db74a5/client/providers/item.tsx#L1289)
+[client/providers/item.tsx:1479](https://github.com/onzag/itemize/blob/a24376ed/client/providers/item.tsx#L1479)
 
 ___
 
@@ -49,4 +49,4 @@ Records that are overall in the search that is active avobe
 
 #### Defined in
 
-[client/providers/item.tsx:1293](https://github.com/onzag/itemize/blob/f2db74a5/client/providers/item.tsx#L1293)
+[client/providers/item.tsx:1483](https://github.com/onzag/itemize/blob/a24376ed/client/providers/item.tsx#L1483)

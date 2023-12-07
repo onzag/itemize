@@ -25,7 +25,7 @@
 
 #### Defined in
 
-[server/resolvers/roles.ts:45](https://github.com/onzag/itemize/blob/f2db74a5/server/resolvers/roles.ts#L45)
+[server/resolvers/roles.ts:75](https://github.com/onzag/itemize/blob/a24376ed/server/resolvers/roles.ts#L75)
 
 ___
 
@@ -35,7 +35,7 @@ ___
 
 #### Defined in
 
-[server/resolvers/roles.ts:44](https://github.com/onzag/itemize/blob/f2db74a5/server/resolvers/roles.ts#L44)
+[server/resolvers/roles.ts:74](https://github.com/onzag/itemize/blob/a24376ed/server/resolvers/roles.ts#L74)
 
 ___
 
@@ -45,7 +45,7 @@ ___
 
 #### Defined in
 
-[server/resolvers/roles.ts:47](https://github.com/onzag/itemize/blob/f2db74a5/server/resolvers/roles.ts#L47)
+[server/resolvers/roles.ts:77](https://github.com/onzag/itemize/blob/a24376ed/server/resolvers/roles.ts#L77)
 
 ___
 
@@ -55,7 +55,7 @@ ___
 
 #### Defined in
 
-[server/resolvers/roles.ts:43](https://github.com/onzag/itemize/blob/f2db74a5/server/resolvers/roles.ts#L43)
+[server/resolvers/roles.ts:73](https://github.com/onzag/itemize/blob/a24376ed/server/resolvers/roles.ts#L73)
 
 ## Methods
 
@@ -75,4 +75,4 @@ ___
 
 #### Defined in
 
-[server/resolvers/roles.ts:46](https://github.com/onzag/itemize/blob/f2db74a5/server/resolvers/roles.ts#L46)
+[server/resolvers/roles.ts:76](https://github.com/onzag/itemize/blob/a24376ed/server/resolvers/roles.ts#L76)

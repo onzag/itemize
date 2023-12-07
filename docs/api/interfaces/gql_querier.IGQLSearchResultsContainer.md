@@ -15,6 +15,7 @@ of traditional searches rather than records based search
 - [highlights](gql_querier.IGQLSearchResultsContainer.md#highlights)
 - [last\_modified](gql_querier.IGQLSearchResultsContainer.md#last_modified)
 - [limit](gql_querier.IGQLSearchResultsContainer.md#limit)
+- [metadata](gql_querier.IGQLSearchResultsContainer.md#metadata)
 - [offset](gql_querier.IGQLSearchResultsContainer.md#offset)
 - [results](gql_querier.IGQLSearchResultsContainer.md#results)
 
@@ -26,7 +27,7 @@ of traditional searches rather than records based search
 
 #### Defined in
 
-[gql-querier.ts:62](https://github.com/onzag/itemize/blob/f2db74a5/gql-querier.ts#L62)
+[gql-querier.ts:63](https://github.com/onzag/itemize/blob/a24376ed/gql-querier.ts#L63)
 
 ___
 
@@ -36,7 +37,7 @@ ___
 
 #### Defined in
 
-[gql-querier.ts:66](https://github.com/onzag/itemize/blob/f2db74a5/gql-querier.ts#L66)
+[gql-querier.ts:67](https://github.com/onzag/itemize/blob/a24376ed/gql-querier.ts#L67)
 
 ___
 
@@ -46,7 +47,7 @@ ___
 
 #### Defined in
 
-[gql-querier.ts:65](https://github.com/onzag/itemize/blob/f2db74a5/gql-querier.ts#L65)
+[gql-querier.ts:66](https://github.com/onzag/itemize/blob/a24376ed/gql-querier.ts#L66)
 
 ___
 
@@ -56,7 +57,17 @@ ___
 
 #### Defined in
 
-[gql-querier.ts:63](https://github.com/onzag/itemize/blob/f2db74a5/gql-querier.ts#L63)
+[gql-querier.ts:64](https://github.com/onzag/itemize/blob/a24376ed/gql-querier.ts#L64)
+
+___
+
+### metadata
+
+• **metadata**: `string`
+
+#### Defined in
+
+[gql-querier.ts:68](https://github.com/onzag/itemize/blob/a24376ed/gql-querier.ts#L68)
 
 ___
 
@@ -66,7 +77,7 @@ ___
 
 #### Defined in
 
-[gql-querier.ts:64](https://github.com/onzag/itemize/blob/f2db74a5/gql-querier.ts#L64)
+[gql-querier.ts:65](https://github.com/onzag/itemize/blob/a24376ed/gql-querier.ts#L65)
 
 ___
 
@@ -76,4 +87,4 @@ ___
 
 #### Defined in
 
-[gql-querier.ts:61](https://github.com/onzag/itemize/blob/f2db74a5/gql-querier.ts#L61)
+[gql-querier.ts:62](https://github.com/onzag/itemize/blob/a24376ed/gql-querier.ts#L62)

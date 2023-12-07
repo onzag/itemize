@@ -71,19 +71,15 @@
 
 ### constructor
 
-• **new FakeSMSService**(`config`, `registry`, `configs`)
+• **new FakeSMSService**(`c`, `registry`, `configs`)
 
 #### Parameters
 
 | Name | Type |
 | :------ | :------ |
-| `config` | ``null`` |
+| `c` | ``null`` |
 | `registry` | [`RegistryService`](server_services_registry.RegistryService.md) |
-| `configs` | `Object` |
-| `configs.config` | [`IConfigRawJSONDataType`](../interfaces/config.IConfigRawJSONDataType.md) |
-| `configs.dbConfig` | [`IDBConfigRawJSONDataType`](../interfaces/config.IDBConfigRawJSONDataType.md) |
-| `configs.redisConfig` | [`IRedisConfigRawJSONDataType`](../interfaces/config.IRedisConfigRawJSONDataType.md) |
-| `configs.sensitiveConfig` | [`ISensitiveConfigRawJSONDataType`](../interfaces/config.ISensitiveConfigRawJSONDataType.md) |
+| `configs` | `any` |
 
 #### Inherited from
 
@@ -91,7 +87,7 @@
 
 #### Defined in
 
-[server/services/index.ts:58](https://github.com/onzag/itemize/blob/f2db74a5/server/services/index.ts#L58)
+[server/services/base/PhoneProvider.ts:46](https://github.com/onzag/itemize/blob/a24376ed/server/services/base/PhoneProvider.ts#L46)
 
 ## Properties
 
@@ -105,7 +101,7 @@
 
 #### Defined in
 
-[server/services/index.ts:35](https://github.com/onzag/itemize/blob/f2db74a5/server/services/index.ts#L35)
+[server/services/index.ts:35](https://github.com/onzag/itemize/blob/a24376ed/server/services/index.ts#L35)
 
 ___
 
@@ -119,7 +115,7 @@ ___
 
 #### Defined in
 
-[server/services/index.ts:37](https://github.com/onzag/itemize/blob/f2db74a5/server/services/index.ts#L37)
+[server/services/index.ts:37](https://github.com/onzag/itemize/blob/a24376ed/server/services/index.ts#L37)
 
 ___
 
@@ -133,7 +129,7 @@ ___
 
 #### Defined in
 
-[server/services/index.ts:38](https://github.com/onzag/itemize/blob/f2db74a5/server/services/index.ts#L38)
+[server/services/index.ts:38](https://github.com/onzag/itemize/blob/a24376ed/server/services/index.ts#L38)
 
 ___
 
@@ -147,7 +143,7 @@ ___
 
 #### Defined in
 
-[server/services/index.ts:36](https://github.com/onzag/itemize/blob/f2db74a5/server/services/index.ts#L36)
+[server/services/index.ts:36](https://github.com/onzag/itemize/blob/a24376ed/server/services/index.ts#L36)
 
 ___
 
@@ -161,7 +157,7 @@ ___
 
 #### Defined in
 
-[server/services/index.ts:33](https://github.com/onzag/itemize/blob/f2db74a5/server/services/index.ts#L33)
+[server/services/index.ts:33](https://github.com/onzag/itemize/blob/a24376ed/server/services/index.ts#L33)
 
 ___
 
@@ -179,7 +175,7 @@ ___
 
 #### Defined in
 
-[server/services/index.ts:48](https://github.com/onzag/itemize/blob/f2db74a5/server/services/index.ts#L48)
+[server/services/index.ts:48](https://github.com/onzag/itemize/blob/a24376ed/server/services/index.ts#L48)
 
 ___
 
@@ -193,7 +189,7 @@ ___
 
 #### Defined in
 
-[server/services/index.ts:40](https://github.com/onzag/itemize/blob/f2db74a5/server/services/index.ts#L40)
+[server/services/index.ts:40](https://github.com/onzag/itemize/blob/a24376ed/server/services/index.ts#L40)
 
 ___
 
@@ -207,7 +203,7 @@ ___
 
 #### Defined in
 
-[server/services/index.ts:55](https://github.com/onzag/itemize/blob/f2db74a5/server/services/index.ts#L55)
+[server/services/index.ts:55](https://github.com/onzag/itemize/blob/a24376ed/server/services/index.ts#L55)
 
 ___
 
@@ -221,7 +217,7 @@ ___
 
 #### Defined in
 
-[server/services/index.ts:46](https://github.com/onzag/itemize/blob/f2db74a5/server/services/index.ts#L46)
+[server/services/index.ts:46](https://github.com/onzag/itemize/blob/a24376ed/server/services/index.ts#L46)
 
 ___
 
@@ -235,7 +231,7 @@ ___
 
 #### Defined in
 
-[server/services/index.ts:47](https://github.com/onzag/itemize/blob/f2db74a5/server/services/index.ts#L47)
+[server/services/index.ts:47](https://github.com/onzag/itemize/blob/a24376ed/server/services/index.ts#L47)
 
 ___
 
@@ -249,7 +245,7 @@ ___
 
 #### Defined in
 
-[server/services/index.ts:44](https://github.com/onzag/itemize/blob/f2db74a5/server/services/index.ts#L44)
+[server/services/index.ts:44](https://github.com/onzag/itemize/blob/a24376ed/server/services/index.ts#L44)
 
 ___
 
@@ -263,7 +259,7 @@ ___
 
 #### Defined in
 
-[server/services/index.ts:43](https://github.com/onzag/itemize/blob/f2db74a5/server/services/index.ts#L43)
+[server/services/index.ts:43](https://github.com/onzag/itemize/blob/a24376ed/server/services/index.ts#L43)
 
 ___
 
@@ -277,7 +273,7 @@ ___
 
 #### Defined in
 
-[server/services/index.ts:41](https://github.com/onzag/itemize/blob/f2db74a5/server/services/index.ts#L41)
+[server/services/index.ts:41](https://github.com/onzag/itemize/blob/a24376ed/server/services/index.ts#L41)
 
 ___
 
@@ -291,7 +287,7 @@ ___
 
 #### Defined in
 
-[server/services/index.ts:42](https://github.com/onzag/itemize/blob/f2db74a5/server/services/index.ts#L42)
+[server/services/index.ts:42](https://github.com/onzag/itemize/blob/a24376ed/server/services/index.ts#L42)
 
 ___
 
@@ -305,7 +301,7 @@ ___
 
 #### Defined in
 
-[server/services/index.ts:45](https://github.com/onzag/itemize/blob/f2db74a5/server/services/index.ts#L45)
+[server/services/index.ts:45](https://github.com/onzag/itemize/blob/a24376ed/server/services/index.ts#L45)
 
 ___
 
@@ -319,7 +315,7 @@ ___
 
 #### Defined in
 
-[server/services/index.ts:54](https://github.com/onzag/itemize/blob/f2db74a5/server/services/index.ts#L54)
+[server/services/index.ts:54](https://github.com/onzag/itemize/blob/a24376ed/server/services/index.ts#L54)
 
 ___
 
@@ -333,7 +329,7 @@ ___
 
 #### Defined in
 
-[server/services/index.ts:52](https://github.com/onzag/itemize/blob/f2db74a5/server/services/index.ts#L52)
+[server/services/index.ts:52](https://github.com/onzag/itemize/blob/a24376ed/server/services/index.ts#L52)
 
 ___
 
@@ -347,7 +343,7 @@ ___
 
 #### Defined in
 
-[server/services/index.ts:56](https://github.com/onzag/itemize/blob/f2db74a5/server/services/index.ts#L56)
+[server/services/index.ts:56](https://github.com/onzag/itemize/blob/a24376ed/server/services/index.ts#L56)
 
 ___
 
@@ -361,7 +357,7 @@ ___
 
 #### Defined in
 
-[server/services/index.ts:34](https://github.com/onzag/itemize/blob/f2db74a5/server/services/index.ts#L34)
+[server/services/index.ts:34](https://github.com/onzag/itemize/blob/a24376ed/server/services/index.ts#L34)
 
 ## Methods
 
@@ -382,7 +378,7 @@ it will do the run function and then re-run as specified
 
 #### Defined in
 
-[server/services/index.ts:170](https://github.com/onzag/itemize/blob/f2db74a5/server/services/index.ts#L170)
+[server/services/index.ts:170](https://github.com/onzag/itemize/blob/a24376ed/server/services/index.ts#L170)
 
 ___
 
@@ -406,7 +402,7 @@ ___
 
 #### Defined in
 
-[server/services/index.ts:116](https://github.com/onzag/itemize/blob/f2db74a5/server/services/index.ts#L116)
+[server/services/index.ts:116](https://github.com/onzag/itemize/blob/a24376ed/server/services/index.ts#L116)
 
 ___
 
@@ -424,7 +420,7 @@ ___
 
 #### Defined in
 
-[server/services/index.ts:80](https://github.com/onzag/itemize/blob/f2db74a5/server/services/index.ts#L80)
+[server/services/index.ts:80](https://github.com/onzag/itemize/blob/a24376ed/server/services/index.ts#L80)
 
 ___
 
@@ -462,7 +458,7 @@ The router gets attached to /rest/service
 
 #### Defined in
 
-[server/services/index.ts:266](https://github.com/onzag/itemize/blob/f2db74a5/server/services/index.ts#L266)
+[server/services/index.ts:266](https://github.com/onzag/itemize/blob/a24376ed/server/services/index.ts#L266)
 
 ___
 
@@ -485,7 +481,7 @@ should run over again
 
 #### Defined in
 
-[server/services/index.ts:239](https://github.com/onzag/itemize/blob/f2db74a5/server/services/index.ts#L239)
+[server/services/index.ts:239](https://github.com/onzag/itemize/blob/a24376ed/server/services/index.ts#L239)
 
 ___
 
@@ -508,7 +504,7 @@ so that they trigger just as normal trigger will do
 
 #### Defined in
 
-[server/services/index.ts:293](https://github.com/onzag/itemize/blob/f2db74a5/server/services/index.ts#L293)
+[server/services/index.ts:293](https://github.com/onzag/itemize/blob/a24376ed/server/services/index.ts#L293)
 
 ___
 
@@ -535,7 +531,7 @@ this function executes
 
 #### Defined in
 
-[server/services/index.ts:230](https://github.com/onzag/itemize/blob/f2db74a5/server/services/index.ts#L230)
+[server/services/index.ts:230](https://github.com/onzag/itemize/blob/a24376ed/server/services/index.ts#L230)
 
 ___
 
@@ -553,7 +549,7 @@ ___
 
 #### Defined in
 
-[server/services/index.ts:84](https://github.com/onzag/itemize/blob/f2db74a5/server/services/index.ts#L84)
+[server/services/index.ts:84](https://github.com/onzag/itemize/blob/a24376ed/server/services/index.ts#L84)
 
 ___
 
@@ -571,7 +567,7 @@ ___
 
 #### Defined in
 
-[server/services/index.ts:88](https://github.com/onzag/itemize/blob/f2db74a5/server/services/index.ts#L88)
+[server/services/index.ts:88](https://github.com/onzag/itemize/blob/a24376ed/server/services/index.ts#L88)
 
 ___
 
@@ -601,7 +597,7 @@ ___
 
 #### Defined in
 
-[server/services/index.ts:96](https://github.com/onzag/itemize/blob/f2db74a5/server/services/index.ts#L96)
+[server/services/index.ts:96](https://github.com/onzag/itemize/blob/a24376ed/server/services/index.ts#L96)
 
 ___
 
@@ -631,7 +627,7 @@ ___
 
 #### Defined in
 
-[server/services/index.ts:100](https://github.com/onzag/itemize/blob/f2db74a5/server/services/index.ts#L100)
+[server/services/index.ts:100](https://github.com/onzag/itemize/blob/a24376ed/server/services/index.ts#L100)
 
 ___
 
@@ -661,7 +657,7 @@ ___
 
 #### Defined in
 
-[server/services/index.ts:92](https://github.com/onzag/itemize/blob/f2db74a5/server/services/index.ts#L92)
+[server/services/index.ts:92](https://github.com/onzag/itemize/blob/a24376ed/server/services/index.ts#L92)
 
 ___
 
@@ -683,7 +679,7 @@ Executes some code
 
 #### Defined in
 
-[server/services/index.ts:247](https://github.com/onzag/itemize/blob/f2db74a5/server/services/index.ts#L247)
+[server/services/index.ts:247](https://github.com/onzag/itemize/blob/a24376ed/server/services/index.ts#L247)
 
 ___
 
@@ -710,7 +706,7 @@ needs to send an email
 
 #### Defined in
 
-[server/services/fake-sms.ts:8](https://github.com/onzag/itemize/blob/f2db74a5/server/services/fake-sms.ts#L8)
+[server/services/fake-sms.ts:8](https://github.com/onzag/itemize/blob/a24376ed/server/services/fake-sms.ts#L8)
 
 ___
 
@@ -747,7 +743,7 @@ Sends a template based SMS to a given user
 
 #### Defined in
 
-[server/services/base/PhoneProvider.ts:227](https://github.com/onzag/itemize/blob/f2db74a5/server/services/base/PhoneProvider.ts#L227)
+[server/services/base/PhoneProvider.ts:242](https://github.com/onzag/itemize/blob/a24376ed/server/services/base/PhoneProvider.ts#L242)
 
 ___
 
@@ -780,7 +776,7 @@ will not filter any of these users
 
 #### Defined in
 
-[server/services/base/PhoneProvider.ts:58](https://github.com/onzag/itemize/blob/f2db74a5/server/services/base/PhoneProvider.ts#L58)
+[server/services/base/PhoneProvider.ts:73](https://github.com/onzag/itemize/blob/a24376ed/server/services/base/PhoneProvider.ts#L73)
 
 ___
 
@@ -804,7 +800,7 @@ ___
 
 #### Defined in
 
-[server/services/index.ts:76](https://github.com/onzag/itemize/blob/f2db74a5/server/services/index.ts#L76)
+[server/services/index.ts:76](https://github.com/onzag/itemize/blob/a24376ed/server/services/index.ts#L76)
 
 ___
 
@@ -835,7 +831,7 @@ ___
 
 #### Defined in
 
-[server/services/index.ts:124](https://github.com/onzag/itemize/blob/f2db74a5/server/services/index.ts#L124)
+[server/services/index.ts:124](https://github.com/onzag/itemize/blob/a24376ed/server/services/index.ts#L124)
 
 ___
 
@@ -859,7 +855,7 @@ ___
 
 #### Defined in
 
-[server/services/index.ts:148](https://github.com/onzag/itemize/blob/f2db74a5/server/services/index.ts#L148)
+[server/services/index.ts:148](https://github.com/onzag/itemize/blob/a24376ed/server/services/index.ts#L148)
 
 ___
 
@@ -883,7 +879,7 @@ ___
 
 #### Defined in
 
-[server/services/index.ts:120](https://github.com/onzag/itemize/blob/f2db74a5/server/services/index.ts#L120)
+[server/services/index.ts:120](https://github.com/onzag/itemize/blob/a24376ed/server/services/index.ts#L120)
 
 ___
 
@@ -919,7 +915,7 @@ the router gets attached to /rest/service
 
 #### Defined in
 
-[server/services/index.ts:283](https://github.com/onzag/itemize/blob/f2db74a5/server/services/index.ts#L283)
+[server/services/index.ts:283](https://github.com/onzag/itemize/blob/a24376ed/server/services/index.ts#L283)
 
 ___
 
@@ -944,7 +940,7 @@ This gets attached if a class is used rather than per instance
 
 #### Defined in
 
-[server/services/index.ts:305](https://github.com/onzag/itemize/blob/f2db74a5/server/services/index.ts#L305)
+[server/services/index.ts:305](https://github.com/onzag/itemize/blob/a24376ed/server/services/index.ts#L305)
 
 ___
 
@@ -968,7 +964,7 @@ it will instead have access to the global resources
 
 #### Defined in
 
-[server/services/fake-sms.ts:5](https://github.com/onzag/itemize/blob/f2db74a5/server/services/fake-sms.ts#L5)
+[server/services/fake-sms.ts:5](https://github.com/onzag/itemize/blob/a24376ed/server/services/fake-sms.ts#L5)
 
 ___
 
@@ -998,7 +994,7 @@ ___
 
 #### Defined in
 
-[server/services/index.ts:108](https://github.com/onzag/itemize/blob/f2db74a5/server/services/index.ts#L108)
+[server/services/index.ts:108](https://github.com/onzag/itemize/blob/a24376ed/server/services/index.ts#L108)
 
 ___
 
@@ -1028,7 +1024,7 @@ ___
 
 #### Defined in
 
-[server/services/index.ts:112](https://github.com/onzag/itemize/blob/f2db74a5/server/services/index.ts#L112)
+[server/services/index.ts:112](https://github.com/onzag/itemize/blob/a24376ed/server/services/index.ts#L112)
 
 ___
 
@@ -1058,4 +1054,4 @@ ___
 
 #### Defined in
 
-[server/services/index.ts:104](https://github.com/onzag/itemize/blob/f2db74a5/server/services/index.ts#L104)
+[server/services/index.ts:104](https://github.com/onzag/itemize/blob/a24376ed/server/services/index.ts#L104)

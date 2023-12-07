@@ -40,4 +40,4 @@ and item definitions
 
 #### Defined in
 
-[base/Root/Module/index.ts:108](https://github.com/onzag/itemize/blob/f2db74a5/base/Root/Module/index.ts#L108)
+[base/Root/Module/index.ts:108](https://github.com/onzag/itemize/blob/a24376ed/base/Root/Module/index.ts#L108)

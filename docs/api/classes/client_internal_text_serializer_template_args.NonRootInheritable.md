@@ -30,7 +30,7 @@ Makes a value non root inheritable
 
 #### Defined in
 
-[client/internal/text/serializer/template-args.ts:136](https://github.com/onzag/itemize/blob/f2db74a5/client/internal/text/serializer/template-args.ts#L136)
+[client/internal/text/serializer/template-args.ts:136](https://github.com/onzag/itemize/blob/a24376ed/client/internal/text/serializer/template-args.ts#L136)
 
 ## Properties
 
@@ -40,4 +40,4 @@ Makes a value non root inheritable
 
 #### Defined in
 
-[client/internal/text/serializer/template-args.ts:135](https://github.com/onzag/itemize/blob/f2db74a5/client/internal/text/serializer/template-args.ts#L135)
+[client/internal/text/serializer/template-args.ts:135](https://github.com/onzag/itemize/blob/a24376ed/client/internal/text/serializer/template-args.ts#L135)

@@ -19,7 +19,7 @@
 
 #### Defined in
 
-[server/user/queries.ts:37](https://github.com/onzag/itemize/blob/f2db74a5/server/user/queries.ts#L37)
+[server/user/queries.ts:43](https://github.com/onzag/itemize/blob/a24376ed/server/user/queries.ts#L43)
 
 ___
 
@@ -29,4 +29,4 @@ ___
 
 #### Defined in
 
-[server/user/queries.ts:36](https://github.com/onzag/itemize/blob/f2db74a5/server/user/queries.ts#L36)
+[server/user/queries.ts:42](https://github.com/onzag/itemize/blob/a24376ed/server/user/queries.ts#L42)

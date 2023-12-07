@@ -31,4 +31,4 @@
 
 #### Defined in
 
-[server/user/queries.ts:45](https://github.com/onzag/itemize/blob/f2db74a5/server/user/queries.ts#L45)
+[server/user/queries.ts:51](https://github.com/onzag/itemize/blob/a24376ed/server/user/queries.ts#L51)

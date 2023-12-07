@@ -16,4 +16,4 @@
 
 #### Defined in
 
-[server/user/triggers.ts:7](https://github.com/onzag/itemize/blob/f2db74a5/server/user/triggers.ts#L7)
+[server/user/triggers.ts:7](https://github.com/onzag/itemize/blob/a24376ed/server/user/triggers.ts#L7)

@@ -49,7 +49,7 @@ rather than a string
 
 #### Defined in
 
-[client/components/localization/I18nRead.tsx:84](https://github.com/onzag/itemize/blob/f2db74a5/client/components/localization/I18nRead.tsx#L84)
+[client/components/localization/I18nRead.tsx:85](https://github.com/onzag/itemize/blob/a24376ed/client/components/localization/I18nRead.tsx#L85)
 
 ___
 
@@ -65,7 +65,7 @@ Whether to capitalize the output
 
 #### Defined in
 
-[client/components/localization/I18nRead.tsx:104](https://github.com/onzag/itemize/blob/f2db74a5/client/components/localization/I18nRead.tsx#L104)
+[client/components/localization/I18nRead.tsx:105](https://github.com/onzag/itemize/blob/a24376ed/client/components/localization/I18nRead.tsx#L105)
 
 ___
 
@@ -81,7 +81,7 @@ A context to override the current pass a registry key
 
 #### Defined in
 
-[client/components/localization/I18nRead.tsx:65](https://github.com/onzag/itemize/blob/f2db74a5/client/components/localization/I18nRead.tsx#L65)
+[client/components/localization/I18nRead.tsx:66](https://github.com/onzag/itemize/blob/a24376ed/client/components/localization/I18nRead.tsx#L66)
 
 ___
 
@@ -99,7 +99,7 @@ does not serialize
 
 #### Defined in
 
-[client/components/localization/I18nRead.tsx:96](https://github.com/onzag/itemize/blob/f2db74a5/client/components/localization/I18nRead.tsx#L96)
+[client/components/localization/I18nRead.tsx:97](https://github.com/onzag/itemize/blob/a24376ed/client/components/localization/I18nRead.tsx#L97)
 
 ___
 
@@ -115,7 +115,7 @@ The wrapping tag for using in the html mode, by default is a div
 
 #### Defined in
 
-[client/components/localization/I18nRead.tsx:100](https://github.com/onzag/itemize/blob/f2db74a5/client/components/localization/I18nRead.tsx#L100)
+[client/components/localization/I18nRead.tsx:101](https://github.com/onzag/itemize/blob/a24376ed/client/components/localization/I18nRead.tsx#L101)
 
 ___
 
@@ -148,7 +148,7 @@ if nothing found in this last context, an error is thrown
 
 #### Defined in
 
-[client/components/localization/I18nRead.tsx:61](https://github.com/onzag/itemize/blob/f2db74a5/client/components/localization/I18nRead.tsx#L61)
+[client/components/localization/I18nRead.tsx:62](https://github.com/onzag/itemize/blob/a24376ed/client/components/localization/I18nRead.tsx#L62)
 
 ___
 
@@ -164,7 +164,7 @@ A policy name to use as context, must go along policy type
 
 #### Defined in
 
-[client/components/localization/I18nRead.tsx:77](https://github.com/onzag/itemize/blob/f2db74a5/client/components/localization/I18nRead.tsx#L77)
+[client/components/localization/I18nRead.tsx:78](https://github.com/onzag/itemize/blob/a24376ed/client/components/localization/I18nRead.tsx#L78)
 
 ___
 
@@ -180,7 +180,7 @@ A policy type to use as context, must go along policy name
 
 #### Defined in
 
-[client/components/localization/I18nRead.tsx:73](https://github.com/onzag/itemize/blob/f2db74a5/client/components/localization/I18nRead.tsx#L73)
+[client/components/localization/I18nRead.tsx:74](https://github.com/onzag/itemize/blob/a24376ed/client/components/localization/I18nRead.tsx#L74)
 
 ___
 
@@ -196,7 +196,7 @@ A property id to use as context
 
 #### Defined in
 
-[client/components/localization/I18nRead.tsx:69](https://github.com/onzag/itemize/blob/f2db74a5/client/components/localization/I18nRead.tsx#L69)
+[client/components/localization/I18nRead.tsx:70](https://github.com/onzag/itemize/blob/a24376ed/client/components/localization/I18nRead.tsx#L70)
 
 ___
 
@@ -212,7 +212,7 @@ Override for the whitespace style property
 
 #### Defined in
 
-[client/components/localization/I18nRead.tsx:109](https://github.com/onzag/itemize/blob/f2db74a5/client/components/localization/I18nRead.tsx#L109)
+[client/components/localization/I18nRead.tsx:110](https://github.com/onzag/itemize/blob/a24376ed/client/components/localization/I18nRead.tsx#L110)
 
 ## Methods
 
@@ -240,7 +240,7 @@ or strings, this will affect anything that is not the args if set
 
 #### Defined in
 
-[client/components/localization/I18nRead.tsx:90](https://github.com/onzag/itemize/blob/f2db74a5/client/components/localization/I18nRead.tsx#L90)
+[client/components/localization/I18nRead.tsx:91](https://github.com/onzag/itemize/blob/a24376ed/client/components/localization/I18nRead.tsx#L91)
 
 ___
 
@@ -263,4 +263,4 @@ otherwise it's just rendered
 
 #### Defined in
 
-[client/components/localization/I18nRead.tsx:120](https://github.com/onzag/itemize/blob/f2db74a5/client/components/localization/I18nRead.tsx#L120)
+[client/components/localization/I18nRead.tsx:121](https://github.com/onzag/itemize/blob/a24376ed/client/components/localization/I18nRead.tsx#L121)

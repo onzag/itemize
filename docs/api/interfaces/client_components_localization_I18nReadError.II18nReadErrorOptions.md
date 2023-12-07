@@ -29,7 +29,7 @@ Whether the error message should be capitalized
 
 #### Defined in
 
-[client/components/localization/I18nReadError.tsx:36](https://github.com/onzag/itemize/blob/f2db74a5/client/components/localization/I18nReadError.tsx#L36)
+[client/components/localization/I18nReadError.tsx:36](https://github.com/onzag/itemize/blob/a24376ed/client/components/localization/I18nReadError.tsx#L36)
 
 ___
 
@@ -42,4 +42,4 @@ so they can be displayed by passing it here
 
 #### Defined in
 
-[client/components/localization/I18nReadError.tsx:32](https://github.com/onzag/itemize/blob/f2db74a5/client/components/localization/I18nReadError.tsx#L32)
+[client/components/localization/I18nReadError.tsx:32](https://github.com/onzag/itemize/blob/a24376ed/client/components/localization/I18nReadError.tsx#L32)

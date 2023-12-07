@@ -45,7 +45,7 @@ Builds a sql query for an include
 
 #### Defined in
 
-[base/Root/Module/ItemDefinition/Include/sql.ts:369](https://github.com/onzag/itemize/blob/f2db74a5/base/Root/Module/ItemDefinition/Include/sql.ts#L369)
+[base/Root/Module/ItemDefinition/Include/sql.ts:369](https://github.com/onzag/itemize/blob/a24376ed/base/Root/Module/ItemDefinition/Include/sql.ts#L369)
 
 ___
 
@@ -74,7 +74,7 @@ Builds a sql query for an include
 
 #### Defined in
 
-[base/Root/Module/ItemDefinition/Include/sql.ts:302](https://github.com/onzag/itemize/blob/f2db74a5/base/Root/Module/ItemDefinition/Include/sql.ts#L302)
+[base/Root/Module/ItemDefinition/Include/sql.ts:302](https://github.com/onzag/itemize/blob/a24376ed/base/Root/Module/ItemDefinition/Include/sql.ts#L302)
 
 ___
 
@@ -109,7 +109,7 @@ the partial sql result to be added into the table
 
 #### Defined in
 
-[base/Root/Module/ItemDefinition/Include/sql.ts:222](https://github.com/onzag/itemize/blob/f2db74a5/base/Root/Module/ItemDefinition/Include/sql.ts#L222)
+[base/Root/Module/ItemDefinition/Include/sql.ts:222](https://github.com/onzag/itemize/blob/a24376ed/base/Root/Module/ItemDefinition/Include/sql.ts#L222)
 
 ___
 
@@ -133,7 +133,7 @@ ___
 
 #### Defined in
 
-[base/Root/Module/ItemDefinition/Include/sql.ts:172](https://github.com/onzag/itemize/blob/f2db74a5/base/Root/Module/ItemDefinition/Include/sql.ts#L172)
+[base/Root/Module/ItemDefinition/Include/sql.ts:172](https://github.com/onzag/itemize/blob/a24376ed/base/Root/Module/ItemDefinition/Include/sql.ts#L172)
 
 ___
 
@@ -163,7 +163,7 @@ a partial graphql value
 
 #### Defined in
 
-[base/Root/Module/ItemDefinition/Include/sql.ts:127](https://github.com/onzag/itemize/blob/f2db74a5/base/Root/Module/ItemDefinition/Include/sql.ts#L127)
+[base/Root/Module/ItemDefinition/Include/sql.ts:127](https://github.com/onzag/itemize/blob/a24376ed/base/Root/Module/ItemDefinition/Include/sql.ts#L127)
 
 ___
 
@@ -186,7 +186,7 @@ ___
 
 #### Defined in
 
-[base/Root/Module/ItemDefinition/Include/sql.ts:28](https://github.com/onzag/itemize/blob/f2db74a5/base/Root/Module/ItemDefinition/Include/sql.ts#L28)
+[base/Root/Module/ItemDefinition/Include/sql.ts:28](https://github.com/onzag/itemize/blob/a24376ed/base/Root/Module/ItemDefinition/Include/sql.ts#L28)
 
 ___
 
@@ -212,4 +212,4 @@ the partial table definition schema for the include, prefixed and with the exclu
 
 #### Defined in
 
-[base/Root/Module/ItemDefinition/Include/sql.ts:82](https://github.com/onzag/itemize/blob/f2db74a5/base/Root/Module/ItemDefinition/Include/sql.ts#L82)
+[base/Root/Module/ItemDefinition/Include/sql.ts:82](https://github.com/onzag/itemize/blob/a24376ed/base/Root/Module/ItemDefinition/Include/sql.ts#L82)

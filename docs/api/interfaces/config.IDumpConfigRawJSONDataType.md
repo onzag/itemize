@@ -32,7 +32,7 @@ Specifies how the dump is to be loaded
 
 #### Defined in
 
-[config.ts:199](https://github.com/onzag/itemize/blob/f2db74a5/config.ts#L199)
+[config.ts:199](https://github.com/onzag/itemize/blob/a24376ed/config.ts#L199)
 
 ___
 
@@ -46,4 +46,4 @@ we only dump specific modules
 
 #### Defined in
 
-[config.ts:194](https://github.com/onzag/itemize/blob/f2db74a5/config.ts#L194)
+[config.ts:194](https://github.com/onzag/itemize/blob/a24376ed/config.ts#L194)

@@ -121,7 +121,7 @@ global mode, even if specified
 
 #### Defined in
 
-[server/services/base/LoggingProvider.ts:50](https://github.com/onzag/itemize/blob/f2db74a5/server/services/base/LoggingProvider.ts#L50)
+[server/services/base/LoggingProvider.ts:50](https://github.com/onzag/itemize/blob/a24376ed/server/services/base/LoggingProvider.ts#L50)
 
 ## Properties
 
@@ -135,7 +135,7 @@ global mode, even if specified
 
 #### Defined in
 
-[server/services/index.ts:35](https://github.com/onzag/itemize/blob/f2db74a5/server/services/index.ts#L35)
+[server/services/index.ts:35](https://github.com/onzag/itemize/blob/a24376ed/server/services/index.ts#L35)
 
 ___
 
@@ -149,7 +149,7 @@ ___
 
 #### Defined in
 
-[server/services/index.ts:37](https://github.com/onzag/itemize/blob/f2db74a5/server/services/index.ts#L37)
+[server/services/index.ts:37](https://github.com/onzag/itemize/blob/a24376ed/server/services/index.ts#L37)
 
 ___
 
@@ -163,7 +163,7 @@ ___
 
 #### Defined in
 
-[server/services/index.ts:38](https://github.com/onzag/itemize/blob/f2db74a5/server/services/index.ts#L38)
+[server/services/index.ts:38](https://github.com/onzag/itemize/blob/a24376ed/server/services/index.ts#L38)
 
 ___
 
@@ -177,7 +177,7 @@ ___
 
 #### Defined in
 
-[server/services/index.ts:36](https://github.com/onzag/itemize/blob/f2db74a5/server/services/index.ts#L36)
+[server/services/index.ts:36](https://github.com/onzag/itemize/blob/a24376ed/server/services/index.ts#L36)
 
 ___
 
@@ -191,7 +191,7 @@ ___
 
 #### Defined in
 
-[server/services/index.ts:33](https://github.com/onzag/itemize/blob/f2db74a5/server/services/index.ts#L33)
+[server/services/index.ts:33](https://github.com/onzag/itemize/blob/a24376ed/server/services/index.ts#L33)
 
 ___
 
@@ -201,7 +201,7 @@ ___
 
 #### Defined in
 
-[server/services/base/LoggingProvider.ts:44](https://github.com/onzag/itemize/blob/f2db74a5/server/services/base/LoggingProvider.ts#L44)
+[server/services/base/LoggingProvider.ts:44](https://github.com/onzag/itemize/blob/a24376ed/server/services/base/LoggingProvider.ts#L44)
 
 ___
 
@@ -211,7 +211,7 @@ ___
 
 #### Defined in
 
-[server/services/base/LoggingProvider.ts:38](https://github.com/onzag/itemize/blob/f2db74a5/server/services/base/LoggingProvider.ts#L38)
+[server/services/base/LoggingProvider.ts:38](https://github.com/onzag/itemize/blob/a24376ed/server/services/base/LoggingProvider.ts#L38)
 
 ___
 
@@ -221,7 +221,7 @@ ___
 
 #### Defined in
 
-[server/services/base/LoggingProvider.ts:37](https://github.com/onzag/itemize/blob/f2db74a5/server/services/base/LoggingProvider.ts#L37)
+[server/services/base/LoggingProvider.ts:37](https://github.com/onzag/itemize/blob/a24376ed/server/services/base/LoggingProvider.ts#L37)
 
 ___
 
@@ -239,7 +239,7 @@ ___
 
 #### Defined in
 
-[server/services/index.ts:48](https://github.com/onzag/itemize/blob/f2db74a5/server/services/index.ts#L48)
+[server/services/index.ts:48](https://github.com/onzag/itemize/blob/a24376ed/server/services/index.ts#L48)
 
 ___
 
@@ -253,7 +253,7 @@ ___
 
 #### Defined in
 
-[server/services/index.ts:40](https://github.com/onzag/itemize/blob/f2db74a5/server/services/index.ts#L40)
+[server/services/index.ts:40](https://github.com/onzag/itemize/blob/a24376ed/server/services/index.ts#L40)
 
 ___
 
@@ -267,7 +267,7 @@ ___
 
 #### Defined in
 
-[server/services/index.ts:55](https://github.com/onzag/itemize/blob/f2db74a5/server/services/index.ts#L55)
+[server/services/index.ts:55](https://github.com/onzag/itemize/blob/a24376ed/server/services/index.ts#L55)
 
 ___
 
@@ -281,7 +281,7 @@ ___
 
 #### Defined in
 
-[server/services/index.ts:46](https://github.com/onzag/itemize/blob/f2db74a5/server/services/index.ts#L46)
+[server/services/index.ts:46](https://github.com/onzag/itemize/blob/a24376ed/server/services/index.ts#L46)
 
 ___
 
@@ -295,7 +295,7 @@ ___
 
 #### Defined in
 
-[server/services/index.ts:47](https://github.com/onzag/itemize/blob/f2db74a5/server/services/index.ts#L47)
+[server/services/index.ts:47](https://github.com/onzag/itemize/blob/a24376ed/server/services/index.ts#L47)
 
 ___
 
@@ -309,7 +309,7 @@ ___
 
 #### Defined in
 
-[server/services/index.ts:44](https://github.com/onzag/itemize/blob/f2db74a5/server/services/index.ts#L44)
+[server/services/index.ts:44](https://github.com/onzag/itemize/blob/a24376ed/server/services/index.ts#L44)
 
 ___
 
@@ -323,7 +323,7 @@ ___
 
 #### Defined in
 
-[server/services/index.ts:43](https://github.com/onzag/itemize/blob/f2db74a5/server/services/index.ts#L43)
+[server/services/index.ts:43](https://github.com/onzag/itemize/blob/a24376ed/server/services/index.ts#L43)
 
 ___
 
@@ -337,7 +337,7 @@ ___
 
 #### Defined in
 
-[server/services/index.ts:41](https://github.com/onzag/itemize/blob/f2db74a5/server/services/index.ts#L41)
+[server/services/index.ts:41](https://github.com/onzag/itemize/blob/a24376ed/server/services/index.ts#L41)
 
 ___
 
@@ -351,7 +351,7 @@ ___
 
 #### Defined in
 
-[server/services/index.ts:42](https://github.com/onzag/itemize/blob/f2db74a5/server/services/index.ts#L42)
+[server/services/index.ts:42](https://github.com/onzag/itemize/blob/a24376ed/server/services/index.ts#L42)
 
 ___
 
@@ -365,7 +365,7 @@ ___
 
 #### Defined in
 
-[server/services/index.ts:45](https://github.com/onzag/itemize/blob/f2db74a5/server/services/index.ts#L45)
+[server/services/index.ts:45](https://github.com/onzag/itemize/blob/a24376ed/server/services/index.ts#L45)
 
 ___
 
@@ -375,7 +375,7 @@ ___
 
 #### Defined in
 
-[server/services/base/LoggingProvider.ts:43](https://github.com/onzag/itemize/blob/f2db74a5/server/services/base/LoggingProvider.ts#L43)
+[server/services/base/LoggingProvider.ts:43](https://github.com/onzag/itemize/blob/a24376ed/server/services/base/LoggingProvider.ts#L43)
 
 ___
 
@@ -389,7 +389,7 @@ ___
 
 #### Defined in
 
-[server/services/index.ts:54](https://github.com/onzag/itemize/blob/f2db74a5/server/services/index.ts#L54)
+[server/services/index.ts:54](https://github.com/onzag/itemize/blob/a24376ed/server/services/index.ts#L54)
 
 ___
 
@@ -403,7 +403,7 @@ ___
 
 #### Defined in
 
-[server/services/index.ts:52](https://github.com/onzag/itemize/blob/f2db74a5/server/services/index.ts#L52)
+[server/services/index.ts:52](https://github.com/onzag/itemize/blob/a24376ed/server/services/index.ts#L52)
 
 ___
 
@@ -417,7 +417,7 @@ ___
 
 #### Defined in
 
-[server/services/index.ts:56](https://github.com/onzag/itemize/blob/f2db74a5/server/services/index.ts#L56)
+[server/services/index.ts:56](https://github.com/onzag/itemize/blob/a24376ed/server/services/index.ts#L56)
 
 ___
 
@@ -427,7 +427,7 @@ ___
 
 #### Defined in
 
-[server/services/base/LoggingProvider.ts:41](https://github.com/onzag/itemize/blob/f2db74a5/server/services/base/LoggingProvider.ts#L41)
+[server/services/base/LoggingProvider.ts:41](https://github.com/onzag/itemize/blob/a24376ed/server/services/base/LoggingProvider.ts#L41)
 
 ___
 
@@ -437,7 +437,7 @@ ___
 
 #### Defined in
 
-[server/services/base/LoggingProvider.ts:40](https://github.com/onzag/itemize/blob/f2db74a5/server/services/base/LoggingProvider.ts#L40)
+[server/services/base/LoggingProvider.ts:40](https://github.com/onzag/itemize/blob/a24376ed/server/services/base/LoggingProvider.ts#L40)
 
 ___
 
@@ -451,7 +451,7 @@ ___
 
 #### Defined in
 
-[server/services/index.ts:34](https://github.com/onzag/itemize/blob/f2db74a5/server/services/index.ts#L34)
+[server/services/index.ts:34](https://github.com/onzag/itemize/blob/a24376ed/server/services/index.ts#L34)
 
 ## Methods
 
@@ -471,7 +471,7 @@ ___
 
 #### Defined in
 
-[server/services/base/LoggingProvider.ts:159](https://github.com/onzag/itemize/blob/f2db74a5/server/services/base/LoggingProvider.ts#L159)
+[server/services/base/LoggingProvider.ts:159](https://github.com/onzag/itemize/blob/a24376ed/server/services/base/LoggingProvider.ts#L159)
 
 ___
 
@@ -492,7 +492,7 @@ it will do the run function and then re-run as specified
 
 #### Defined in
 
-[server/services/index.ts:170](https://github.com/onzag/itemize/blob/f2db74a5/server/services/index.ts#L170)
+[server/services/index.ts:170](https://github.com/onzag/itemize/blob/a24376ed/server/services/index.ts#L170)
 
 ___
 
@@ -516,7 +516,7 @@ ___
 
 #### Defined in
 
-[server/services/index.ts:116](https://github.com/onzag/itemize/blob/f2db74a5/server/services/index.ts#L116)
+[server/services/index.ts:116](https://github.com/onzag/itemize/blob/a24376ed/server/services/index.ts#L116)
 
 ___
 
@@ -534,7 +534,7 @@ ___
 
 #### Defined in
 
-[server/services/index.ts:80](https://github.com/onzag/itemize/blob/f2db74a5/server/services/index.ts#L80)
+[server/services/index.ts:80](https://github.com/onzag/itemize/blob/a24376ed/server/services/index.ts#L80)
 
 ___
 
@@ -548,7 +548,7 @@ ___
 
 #### Defined in
 
-[server/services/base/LoggingProvider.ts:155](https://github.com/onzag/itemize/blob/f2db74a5/server/services/base/LoggingProvider.ts#L155)
+[server/services/base/LoggingProvider.ts:155](https://github.com/onzag/itemize/blob/a24376ed/server/services/base/LoggingProvider.ts#L155)
 
 ___
 
@@ -571,7 +571,7 @@ ___
 
 #### Defined in
 
-[server/services/base/LoggingProvider.ts:163](https://github.com/onzag/itemize/blob/f2db74a5/server/services/base/LoggingProvider.ts#L163)
+[server/services/base/LoggingProvider.ts:163](https://github.com/onzag/itemize/blob/a24376ed/server/services/base/LoggingProvider.ts#L163)
 
 ___
 
@@ -609,7 +609,7 @@ The router gets attached to /rest/service
 
 #### Defined in
 
-[server/services/index.ts:266](https://github.com/onzag/itemize/blob/f2db74a5/server/services/index.ts#L266)
+[server/services/index.ts:266](https://github.com/onzag/itemize/blob/a24376ed/server/services/index.ts#L266)
 
 ___
 
@@ -632,7 +632,7 @@ should run over again
 
 #### Defined in
 
-[server/services/index.ts:239](https://github.com/onzag/itemize/blob/f2db74a5/server/services/index.ts#L239)
+[server/services/index.ts:239](https://github.com/onzag/itemize/blob/a24376ed/server/services/index.ts#L239)
 
 ___
 
@@ -655,7 +655,7 @@ so that they trigger just as normal trigger will do
 
 #### Defined in
 
-[server/services/index.ts:293](https://github.com/onzag/itemize/blob/f2db74a5/server/services/index.ts#L293)
+[server/services/index.ts:293](https://github.com/onzag/itemize/blob/a24376ed/server/services/index.ts#L293)
 
 ___
 
@@ -682,7 +682,7 @@ this function executes
 
 #### Defined in
 
-[server/services/index.ts:230](https://github.com/onzag/itemize/blob/f2db74a5/server/services/index.ts#L230)
+[server/services/index.ts:230](https://github.com/onzag/itemize/blob/a24376ed/server/services/index.ts#L230)
 
 ___
 
@@ -700,7 +700,7 @@ ___
 
 #### Defined in
 
-[server/services/index.ts:84](https://github.com/onzag/itemize/blob/f2db74a5/server/services/index.ts#L84)
+[server/services/index.ts:84](https://github.com/onzag/itemize/blob/a24376ed/server/services/index.ts#L84)
 
 ___
 
@@ -718,7 +718,7 @@ ___
 
 #### Defined in
 
-[server/services/index.ts:88](https://github.com/onzag/itemize/blob/f2db74a5/server/services/index.ts#L88)
+[server/services/index.ts:88](https://github.com/onzag/itemize/blob/a24376ed/server/services/index.ts#L88)
 
 ___
 
@@ -748,7 +748,7 @@ is restored
 
 #### Defined in
 
-[server/services/base/LoggingProvider.ts:151](https://github.com/onzag/itemize/blob/f2db74a5/server/services/base/LoggingProvider.ts#L151)
+[server/services/base/LoggingProvider.ts:151](https://github.com/onzag/itemize/blob/a24376ed/server/services/base/LoggingProvider.ts#L151)
 
 ___
 
@@ -766,7 +766,7 @@ ___
 
 #### Defined in
 
-[server/services/base/LoggingProvider.ts:66](https://github.com/onzag/itemize/blob/f2db74a5/server/services/base/LoggingProvider.ts#L66)
+[server/services/base/LoggingProvider.ts:66](https://github.com/onzag/itemize/blob/a24376ed/server/services/base/LoggingProvider.ts#L66)
 
 ___
 
@@ -784,7 +784,7 @@ ___
 
 #### Defined in
 
-[server/services/base/LoggingProvider.ts:71](https://github.com/onzag/itemize/blob/f2db74a5/server/services/base/LoggingProvider.ts#L71)
+[server/services/base/LoggingProvider.ts:71](https://github.com/onzag/itemize/blob/a24376ed/server/services/base/LoggingProvider.ts#L71)
 
 ___
 
@@ -802,7 +802,7 @@ ___
 
 #### Defined in
 
-[server/services/base/LoggingProvider.ts:76](https://github.com/onzag/itemize/blob/f2db74a5/server/services/base/LoggingProvider.ts#L76)
+[server/services/base/LoggingProvider.ts:76](https://github.com/onzag/itemize/blob/a24376ed/server/services/base/LoggingProvider.ts#L76)
 
 ___
 
@@ -825,7 +825,7 @@ ___
 
 #### Defined in
 
-[server/services/base/LoggingProvider.ts:96](https://github.com/onzag/itemize/blob/f2db74a5/server/services/base/LoggingProvider.ts#L96)
+[server/services/base/LoggingProvider.ts:96](https://github.com/onzag/itemize/blob/a24376ed/server/services/base/LoggingProvider.ts#L96)
 
 ___
 
@@ -845,7 +845,7 @@ ___
 
 #### Defined in
 
-[server/services/base/LoggingProvider.ts:120](https://github.com/onzag/itemize/blob/f2db74a5/server/services/base/LoggingProvider.ts#L120)
+[server/services/base/LoggingProvider.ts:120](https://github.com/onzag/itemize/blob/a24376ed/server/services/base/LoggingProvider.ts#L120)
 
 ___
 
@@ -867,7 +867,7 @@ Executes some code
 
 #### Defined in
 
-[server/services/index.ts:247](https://github.com/onzag/itemize/blob/f2db74a5/server/services/index.ts#L247)
+[server/services/index.ts:247](https://github.com/onzag/itemize/blob/a24376ed/server/services/index.ts#L247)
 
 ___
 
@@ -891,7 +891,7 @@ ___
 
 #### Defined in
 
-[server/services/index.ts:76](https://github.com/onzag/itemize/blob/f2db74a5/server/services/index.ts#L76)
+[server/services/index.ts:76](https://github.com/onzag/itemize/blob/a24376ed/server/services/index.ts#L76)
 
 ___
 
@@ -922,7 +922,7 @@ ___
 
 #### Defined in
 
-[server/services/index.ts:124](https://github.com/onzag/itemize/blob/f2db74a5/server/services/index.ts#L124)
+[server/services/index.ts:124](https://github.com/onzag/itemize/blob/a24376ed/server/services/index.ts#L124)
 
 ___
 
@@ -946,7 +946,7 @@ ___
 
 #### Defined in
 
-[server/services/index.ts:148](https://github.com/onzag/itemize/blob/f2db74a5/server/services/index.ts#L148)
+[server/services/index.ts:148](https://github.com/onzag/itemize/blob/a24376ed/server/services/index.ts#L148)
 
 ___
 
@@ -967,7 +967,7 @@ ___
 
 #### Defined in
 
-[server/services/base/LoggingProvider.ts:135](https://github.com/onzag/itemize/blob/f2db74a5/server/services/base/LoggingProvider.ts#L135)
+[server/services/base/LoggingProvider.ts:135](https://github.com/onzag/itemize/blob/a24376ed/server/services/base/LoggingProvider.ts#L135)
 
 ___
 
@@ -991,7 +991,7 @@ ___
 
 #### Defined in
 
-[server/services/index.ts:120](https://github.com/onzag/itemize/blob/f2db74a5/server/services/index.ts#L120)
+[server/services/index.ts:120](https://github.com/onzag/itemize/blob/a24376ed/server/services/index.ts#L120)
 
 ___
 
@@ -1027,7 +1027,7 @@ the router gets attached to /rest/service
 
 #### Defined in
 
-[server/services/index.ts:283](https://github.com/onzag/itemize/blob/f2db74a5/server/services/index.ts#L283)
+[server/services/index.ts:283](https://github.com/onzag/itemize/blob/a24376ed/server/services/index.ts#L283)
 
 ___
 
@@ -1052,7 +1052,7 @@ This gets attached if a class is used rather than per instance
 
 #### Defined in
 
-[server/services/index.ts:305](https://github.com/onzag/itemize/blob/f2db74a5/server/services/index.ts#L305)
+[server/services/index.ts:305](https://github.com/onzag/itemize/blob/a24376ed/server/services/index.ts#L305)
 
 ___
 
@@ -1076,7 +1076,7 @@ it will instead have access to the global resources
 
 #### Defined in
 
-[server/services/base/LoggingProvider.ts:46](https://github.com/onzag/itemize/blob/f2db74a5/server/services/base/LoggingProvider.ts#L46)
+[server/services/base/LoggingProvider.ts:46](https://github.com/onzag/itemize/blob/a24376ed/server/services/base/LoggingProvider.ts#L46)
 
 ___
 
@@ -1094,7 +1094,7 @@ ___
 
 #### Defined in
 
-[server/services/base/LoggingProvider.ts:81](https://github.com/onzag/itemize/blob/f2db74a5/server/services/base/LoggingProvider.ts#L81)
+[server/services/base/LoggingProvider.ts:81](https://github.com/onzag/itemize/blob/a24376ed/server/services/base/LoggingProvider.ts#L81)
 
 ___
 
@@ -1112,7 +1112,7 @@ ___
 
 #### Defined in
 
-[server/services/base/LoggingProvider.ts:86](https://github.com/onzag/itemize/blob/f2db74a5/server/services/base/LoggingProvider.ts#L86)
+[server/services/base/LoggingProvider.ts:86](https://github.com/onzag/itemize/blob/a24376ed/server/services/base/LoggingProvider.ts#L86)
 
 ___
 
@@ -1130,4 +1130,4 @@ ___
 
 #### Defined in
 
-[server/services/base/LoggingProvider.ts:91](https://github.com/onzag/itemize/blob/f2db74a5/server/services/base/LoggingProvider.ts#L91)
+[server/services/base/LoggingProvider.ts:91](https://github.com/onzag/itemize/blob/a24376ed/server/services/base/LoggingProvider.ts#L91)

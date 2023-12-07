@@ -71,6 +71,8 @@ internal usage and to keep configuration and have an idea
 - [MAX\_SUPPORTED\_YEAR](constants.md#max_supported_year)
 - [MEMCACHED\_DESTRUCTION\_MARKERS\_LOCATION](constants.md#memcached_destruction_markers_location)
 - [MEMCACHED\_SEARCH\_DESTRUCTION\_MARKERS\_LOCATION](constants.md#memcached_search_destruction_markers_location)
+- [MEMCACHED\_UNMOUNT\_DESTRUCTION\_MARKERS\_LOCATION](constants.md#memcached_unmount_destruction_markers_location)
+- [MEMCACHED\_UNMOUNT\_SEARCH\_DESTRUCTION\_MARKERS\_LOCATION](constants.md#memcached_unmount_search_destruction_markers_location)
 - [MIN\_SUPPORTED\_INTEGER](constants.md#min_supported_integer)
 - [MIN\_SUPPORTED\_REAL](constants.md#min_supported_real)
 - [MIN\_SUPPORTED\_YEAR](constants.md#min_supported_year)
@@ -79,8 +81,11 @@ internal usage and to keep configuration and have an idea
 - [MODULE\_AND\_ITEM\_DEF\_I18N\_SEARCHABLE](constants.md#module_and_item_def_i18n_searchable)
 - [MODULE\_PREFIX](constants.md#module_prefix)
 - [ORDERBY\_NULLS\_PRIORITY](constants.md#orderby_nulls_priority)
+- [ORDERBY\_NULLS\_PRIORITY\_RQ](constants.md#orderby_nulls_priority_rq)
 - [ORDERBY\_RULE](constants.md#orderby_rule)
 - [ORDERBY\_RULE\_DIRECTION](constants.md#orderby_rule_direction)
+- [ORDERBY\_RULE\_DIRECTION\_RQ](constants.md#orderby_rule_direction_rq)
+- [ORDERBY\_RULE\_RQ](constants.md#orderby_rule_rq)
 - [OWNER\_METAROLE](constants.md#owner_metarole)
 - [PARENT\_INDEX](constants.md#parent_index)
 - [PING\_DATA\_IDENTIFIER](constants.md#ping_data_identifier)
@@ -102,24 +107,30 @@ internal usage and to keep configuration and have an idea
 - [REGISTRY\_IDENTIFIER](constants.md#registry_identifier)
 - [REPROCESSED\_RESOURCES](constants.md#reprocessed_resources)
 - [RESERVED\_ADD\_PROPERTIES](constants.md#reserved_add_properties)
+- [RESERVED\_ADD\_PROPERTIES\_RQ](constants.md#reserved_add_properties_rq)
 - [RESERVED\_BASE\_PROPERTIES](constants.md#reserved_base_properties)
 - [RESERVED\_BASE\_PROPERTIES\_ELASTIC](constants.md#reserved_base_properties_elastic)
+- [RESERVED\_BASE\_PROPERTIES\_RQ](constants.md#reserved_base_properties_rq)
 - [RESERVED\_CHANGE\_PROPERTIES](constants.md#reserved_change_properties)
+- [RESERVED\_CHANGE\_PROPERTIES\_RQ](constants.md#reserved_change_properties_rq)
 - [RESERVED\_GETTER\_LIST\_PROPERTIES](constants.md#reserved_getter_list_properties)
+- [RESERVED\_GETTER\_LIST\_PROPERTIES\_RQ](constants.md#reserved_getter_list_properties_rq)
 - [RESERVED\_GETTER\_PROPERTIES](constants.md#reserved_getter_properties)
+- [RESERVED\_GETTER\_PROPERTIES\_RQ](constants.md#reserved_getter_properties_rq)
 - [ROOT\_REQUIRED\_LOCALE\_I18N](constants.md#root_required_locale_i18n)
 - [SEARCH\_DESTRUCTION\_MARKERS\_LOCATION](constants.md#search_destruction_markers_location)
 - [SEARCH\_MODE\_MODULE\_PREFIX](constants.md#search_mode_module_prefix)
 - [SEARCH\_RECORDS\_CONTAINER\_GQL](constants.md#search_records_container_gql)
+- [SEARCH\_RECORDS\_CONTAINER\_RQ](constants.md#search_records_container_rq)
 - [SEARCH\_RECORD\_GQL](constants.md#search_record_gql)
 - [SEARCH\_RECORD\_INPUT\_GQL](constants.md#search_record_input_gql)
+- [SEARCH\_RECORD\_RQ](constants.md#search_record_rq)
 - [SECONDARY\_JWT\_KEY](constants.md#secondary_jwt_key)
 - [SERVER\_BLOCK\_UNTIL\_REFRESH\_TIME](constants.md#server_block_until_refresh_time)
 - [SERVER\_DATA\_IDENTIFIER](constants.md#server_data_identifier)
 - [SERVER\_DATA\_MIN\_UPDATE\_TIME](constants.md#server_data_min_update_time)
 - [SERVER\_ELASTIC\_CONSISTENCY\_CHECK\_TIME](constants.md#server_elastic_consistency_check_time)
 - [SERVER\_ELASTIC\_PING\_INTERVAL\_TIME](constants.md#server_elastic_ping_interval_time)
-- [SERVER\_MAPPING\_TIME](constants.md#server_mapping_time)
 - [SERVER\_USER\_KICK\_IDENTIFIER](constants.md#server_user_kick_identifier)
 - [SQL\_CONSTRAINT\_PREFIX](constants.md#sql_constraint_prefix)
 - [STANDARD\_ACCESSIBLE\_RESERVED\_BASE\_PROPERTIES](constants.md#standard_accessible_reserved_base_properties)
@@ -127,6 +138,8 @@ internal usage and to keep configuration and have an idea
 - [TRACKERS\_INDEX](constants.md#trackers_index)
 - [TRACKERS\_REGISTRY\_IDENTIFIER](constants.md#trackers_registry_identifier)
 - [UNIT\_SUBTYPES](constants.md#unit_subtypes)
+- [UNMOUNT\_DESTRUCTION\_MARKERS\_LOCATION](constants.md#unmount_destruction_markers_location)
+- [UNMOUNT\_SEARCH\_DESTRUCTION\_MARKERS\_LOCATION](constants.md#unmount_search_destruction_markers_location)
 - [UNSPECIFIED\_OWNER](constants.md#unspecified_owner)
 - [USER\_EXTRA\_CUSTOM\_I18N](constants.md#user_extra_custom_i18n)
 
@@ -136,7 +149,9 @@ internal usage and to keep configuration and have an idea
 - [PREFIX\_BUILD](constants.md#prefix_build)
 - [RESERVED\_BASE\_PROPERTIES\_SQL](constants.md#reserved_base_properties_sql)
 - [RESERVED\_IDEF\_SEARCH\_PROPERTIES](constants.md#reserved_idef_search_properties)
+- [RESERVED\_IDEF\_SEARCH\_PROPERTIES\_RQ](constants.md#reserved_idef_search_properties_rq)
 - [RESERVED\_MODULE\_SEARCH\_PROPERTIES](constants.md#reserved_module_search_properties)
+- [RESERVED\_MODULE\_SEARCH\_PROPERTIES\_RQ](constants.md#reserved_module_search_properties_rq)
 - [SUFFIX\_BUILD](constants.md#suffix_build)
 
 ## Type aliases
@@ -147,7 +162,7 @@ internal usage and to keep configuration and have an idea
 
 #### Defined in
 
-[constants.ts:1246](https://github.com/onzag/itemize/blob/f2db74a5/constants.ts#L1246)
+[constants.ts:1433](https://github.com/onzag/itemize/blob/a24376ed/constants.ts#L1433)
 
 ## Variables
 
@@ -159,7 +174,7 @@ Role that means anyone logged in
 
 #### Defined in
 
-[constants.ts:1470](https://github.com/onzag/itemize/blob/f2db74a5/constants.ts#L1470)
+[constants.ts:1971](https://github.com/onzag/itemize/blob/a24376ed/constants.ts#L1971)
 
 ___
 
@@ -171,7 +186,7 @@ Role that means, well, anyone
 
 #### Defined in
 
-[constants.ts:1466](https://github.com/onzag/itemize/blob/f2db74a5/constants.ts#L1466)
+[constants.ts:1967](https://github.com/onzag/itemize/blob/a24376ed/constants.ts#L1967)
 
 ___
 
@@ -184,7 +199,7 @@ for currency conversion in redis
 
 #### Defined in
 
-[constants.ts:1570](https://github.com/onzag/itemize/blob/f2db74a5/constants.ts#L1570)
+[constants.ts:2071](https://github.com/onzag/itemize/blob/a24376ed/constants.ts#L2071)
 
 ___
 
@@ -196,7 +211,7 @@ Location for cached selects in the global
 
 #### Defined in
 
-[constants.ts:1585](https://github.com/onzag/itemize/blob/f2db74a5/constants.ts#L1585)
+[constants.ts:2086](https://github.com/onzag/itemize/blob/a24376ed/constants.ts#L2086)
 
 ___
 
@@ -208,7 +223,7 @@ Standard i18n fields required for properties
 
 #### Defined in
 
-[constants.ts:615](https://github.com/onzag/itemize/blob/f2db74a5/constants.ts#L615)
+[constants.ts:626](https://github.com/onzag/itemize/blob/a24376ed/constants.ts#L626)
 
 ___
 
@@ -220,7 +235,7 @@ Optional i18n fields in properties
 
 #### Defined in
 
-[constants.ts:643](https://github.com/onzag/itemize/blob/f2db74a5/constants.ts#L643)
+[constants.ts:654](https://github.com/onzag/itemize/blob/a24376ed/constants.ts#L654)
 
 ___
 
@@ -233,7 +248,7 @@ they are searchable
 
 #### Defined in
 
-[constants.ts:623](https://github.com/onzag/itemize/blob/f2db74a5/constants.ts#L623)
+[constants.ts:634](https://github.com/onzag/itemize/blob/a24376ed/constants.ts#L634)
 
 ___
 
@@ -246,7 +261,7 @@ searchable
 
 #### Defined in
 
-[constants.ts:650](https://github.com/onzag/itemize/blob/f2db74a5/constants.ts#L650)
+[constants.ts:661](https://github.com/onzag/itemize/blob/a24376ed/constants.ts#L661)
 
 ___
 
@@ -259,7 +274,7 @@ when they use a ranged search
 
 #### Defined in
 
-[constants.ts:657](https://github.com/onzag/itemize/blob/f2db74a5/constants.ts#L657)
+[constants.ts:668](https://github.com/onzag/itemize/blob/a24376ed/constants.ts#L668)
 
 ___
 
@@ -272,7 +287,7 @@ when they use a ranged search
 
 #### Defined in
 
-[constants.ts:667](https://github.com/onzag/itemize/blob/f2db74a5/constants.ts#L667)
+[constants.ts:678](https://github.com/onzag/itemize/blob/a24376ed/constants.ts#L678)
 
 ___
 
@@ -282,7 +297,7 @@ ___
 
 #### Defined in
 
-[constants.ts:824](https://github.com/onzag/itemize/blob/f2db74a5/constants.ts#L824)
+[constants.ts:921](https://github.com/onzag/itemize/blob/a24376ed/constants.ts#L921)
 
 ___
 
@@ -295,7 +310,7 @@ with the item definition table
 
 #### Defined in
 
-[constants.ts:1029](https://github.com/onzag/itemize/blob/f2db74a5/constants.ts#L1029)
+[constants.ts:1126](https://github.com/onzag/itemize/blob/a24376ed/constants.ts#L1126)
 
 ___
 
@@ -308,7 +323,7 @@ with the item definition table
 
 #### Defined in
 
-[constants.ts:1034](https://github.com/onzag/itemize/blob/f2db74a5/constants.ts#L1034)
+[constants.ts:1131](https://github.com/onzag/itemize/blob/a24376ed/constants.ts#L1131)
 
 ___
 
@@ -318,7 +333,7 @@ ___
 
 #### Defined in
 
-[constants.ts:821](https://github.com/onzag/itemize/blob/f2db74a5/constants.ts#L821)
+[constants.ts:918](https://github.com/onzag/itemize/blob/a24376ed/constants.ts#L918)
 
 ___
 
@@ -328,7 +343,7 @@ ___
 
 #### Defined in
 
-[constants.ts:822](https://github.com/onzag/itemize/blob/f2db74a5/constants.ts#L822)
+[constants.ts:919](https://github.com/onzag/itemize/blob/a24376ed/constants.ts#L919)
 
 ___
 
@@ -341,7 +356,7 @@ factor information
 
 #### Defined in
 
-[constants.ts:1544](https://github.com/onzag/itemize/blob/f2db74a5/constants.ts#L1544)
+[constants.ts:2045](https://github.com/onzag/itemize/blob/a24376ed/constants.ts#L2045)
 
 ___
 
@@ -354,7 +369,7 @@ these represent the SQL form, does not support nano date
 
 #### Defined in
 
-[constants.ts:718](https://github.com/onzag/itemize/blob/f2db74a5/constants.ts#L718)
+[constants.ts:729](https://github.com/onzag/itemize/blob/a24376ed/constants.ts#L729)
 
 ___
 
@@ -367,7 +382,7 @@ parsing
 
 #### Defined in
 
-[constants.ts:723](https://github.com/onzag/itemize/blob/f2db74a5/constants.ts#L723)
+[constants.ts:734](https://github.com/onzag/itemize/blob/a24376ed/constants.ts#L734)
 
 ___
 
@@ -380,7 +395,7 @@ the SQL form
 
 #### Defined in
 
-[constants.ts:733](https://github.com/onzag/itemize/blob/f2db74a5/constants.ts#L733)
+[constants.ts:744](https://github.com/onzag/itemize/blob/a24376ed/constants.ts#L744)
 
 ___
 
@@ -392,7 +407,7 @@ An identifier for the deleted table information stuff
 
 #### Defined in
 
-[constants.ts:1549](https://github.com/onzag/itemize/blob/f2db74a5/constants.ts#L1549)
+[constants.ts:2050](https://github.com/onzag/itemize/blob/a24376ed/constants.ts#L2050)
 
 ___
 
@@ -404,7 +419,7 @@ Where the destruction markers are located
 
 #### Defined in
 
-[constants.ts:322](https://github.com/onzag/itemize/blob/f2db74a5/constants.ts#L322)
+[constants.ts:312](https://github.com/onzag/itemize/blob/a24376ed/constants.ts#L312)
 
 ___
 
@@ -420,6 +435,7 @@ Graphql endpoint errors codes that can be thrown
 | :------ | :------ |
 | `BLOCKED` | `string` |
 | `CANT_CONNECT` | `string` |
+| `CONFLICT` | `string` |
 | `FORBIDDEN` | `string` |
 | `INTERNAL_SERVER_ERROR` | `string` |
 | `INVALID_CREDENTIALS` | `string` |
@@ -439,7 +455,7 @@ Graphql endpoint errors codes that can be thrown
 
 #### Defined in
 
-[constants.ts:347](https://github.com/onzag/itemize/blob/f2db74a5/constants.ts#L347)
+[constants.ts:357](https://github.com/onzag/itemize/blob/a24376ed/constants.ts#L357)
 
 ___
 
@@ -451,7 +467,7 @@ The suffix added to refer to the exclusion state of an include in SQL or graphql
 
 #### Defined in
 
-[constants.ts:1073](https://github.com/onzag/itemize/blob/f2db74a5/constants.ts#L1073)
+[constants.ts:1170](https://github.com/onzag/itemize/blob/a24376ed/constants.ts#L1170)
 
 ___
 
@@ -465,7 +481,7 @@ these atrributes can only be accessed outside of it
 
 #### Defined in
 
-[constants.ts:687](https://github.com/onzag/itemize/blob/f2db74a5/constants.ts#L687)
+[constants.ts:698](https://github.com/onzag/itemize/blob/a24376ed/constants.ts#L698)
 
 ___
 
@@ -477,7 +493,7 @@ Supported image types
 
 #### Defined in
 
-[constants.ts:265](https://github.com/onzag/itemize/blob/f2db74a5/constants.ts#L265)
+[constants.ts:255](https://github.com/onzag/itemize/blob/a24376ed/constants.ts#L255)
 
 ___
 
@@ -489,7 +505,7 @@ Role that means any guest
 
 #### Defined in
 
-[constants.ts:1474](https://github.com/onzag/itemize/blob/f2db74a5/constants.ts#L1474)
+[constants.ts:1975](https://github.com/onzag/itemize/blob/a24376ed/constants.ts#L1975)
 
 ___
 
@@ -501,7 +517,7 @@ Every include when used within the database or graphql is prefixed with
 
 #### Defined in
 
-[constants.ts:1057](https://github.com/onzag/itemize/blob/f2db74a5/constants.ts#L1057)
+[constants.ts:1154](https://github.com/onzag/itemize/blob/a24376ed/constants.ts#L1154)
 
 ___
 
@@ -513,7 +529,7 @@ The properties for i18n a callout excluded item should have
 
 #### Defined in
 
-[constants.ts:315](https://github.com/onzag/itemize/blob/f2db74a5/constants.ts#L315)
+[constants.ts:305](https://github.com/onzag/itemize/blob/a24376ed/constants.ts#L305)
 
 ___
 
@@ -525,7 +541,7 @@ The properties for i18n an item that can be excluded should have
 
 #### Defined in
 
-[constants.ts:297](https://github.com/onzag/itemize/blob/f2db74a5/constants.ts#L297)
+[constants.ts:287](https://github.com/onzag/itemize/blob/a24376ed/constants.ts#L287)
 
 ___
 
@@ -537,7 +553,7 @@ Every item definition when used within the database, graphql or its qualified na
 
 #### Defined in
 
-[constants.ts:1069](https://github.com/onzag/itemize/blob/f2db74a5/constants.ts#L1069)
+[constants.ts:1166](https://github.com/onzag/itemize/blob/a24376ed/constants.ts#L1166)
 
 ___
 
@@ -549,7 +565,7 @@ The item optional data
 
 #### Defined in
 
-[constants.ts:308](https://github.com/onzag/itemize/blob/f2db74a5/constants.ts#L308)
+[constants.ts:298](https://github.com/onzag/itemize/blob/a24376ed/constants.ts#L298)
 
 ___
 
@@ -561,7 +577,7 @@ Key for the registry where the jwt key is stored
 
 #### Defined in
 
-[constants.ts:1575](https://github.com/onzag/itemize/blob/f2db74a5/constants.ts#L1575)
+[constants.ts:2076](https://github.com/onzag/itemize/blob/a24376ed/constants.ts#L2076)
 
 ___
 
@@ -573,7 +589,7 @@ Store a last rich text change size global to use to save memory for lenght calcu
 
 #### Defined in
 
-[constants.ts:342](https://github.com/onzag/itemize/blob/f2db74a5/constants.ts#L342)
+[constants.ts:352](https://github.com/onzag/itemize/blob/a24376ed/constants.ts#L352)
 
 ___
 
@@ -585,7 +601,7 @@ This is for small use anywhere language data
 
 #### Defined in
 
-[constants.ts:386](https://github.com/onzag/itemize/blob/f2db74a5/constants.ts#L386)
+[constants.ts:397](https://github.com/onzag/itemize/blob/a24376ed/constants.ts#L397)
 
 ___
 
@@ -598,7 +614,7 @@ when they use a location search
 
 #### Defined in
 
-[constants.ts:675](https://github.com/onzag/itemize/blob/f2db74a5/constants.ts#L675)
+[constants.ts:686](https://github.com/onzag/itemize/blob/a24376ed/constants.ts#L686)
 
 ___
 
@@ -610,7 +626,7 @@ Used for logging, usually as a temporary solution
 
 #### Defined in
 
-[constants.ts:1564](https://github.com/onzag/itemize/blob/f2db74a5/constants.ts#L1564)
+[constants.ts:2065](https://github.com/onzag/itemize/blob/a24376ed/constants.ts#L2065)
 
 ___
 
@@ -623,7 +639,7 @@ the number is set to a precision of 6
 
 #### Defined in
 
-[constants.ts:159](https://github.com/onzag/itemize/blob/f2db74a5/constants.ts#L159)
+[constants.ts:154](https://github.com/onzag/itemize/blob/a24376ed/constants.ts#L154)
 
 ___
 
@@ -636,7 +652,7 @@ is the size of the graphql query, 1MB should be way more than enough for a graph
 
 #### Defined in
 
-[constants.ts:206](https://github.com/onzag/itemize/blob/f2db74a5/constants.ts#L206)
+[constants.ts:201](https://github.com/onzag/itemize/blob/a24376ed/constants.ts#L201)
 
 ___
 
@@ -648,7 +664,7 @@ how many files can be used in one item field at once
 
 #### Defined in
 
-[constants.ts:193](https://github.com/onzag/itemize/blob/f2db74a5/constants.ts#L193)
+[constants.ts:188](https://github.com/onzag/itemize/blob/a24376ed/constants.ts#L188)
 
 ___
 
@@ -661,7 +677,7 @@ in a single request, this is more of a security concern
 
 #### Defined in
 
-[constants.ts:198](https://github.com/onzag/itemize/blob/f2db74a5/constants.ts#L198)
+[constants.ts:193](https://github.com/onzag/itemize/blob/a24376ed/constants.ts#L193)
 
 ___
 
@@ -673,7 +689,7 @@ The max file size (for either images and binary files)
 
 #### Defined in
 
-[constants.ts:189](https://github.com/onzag/itemize/blob/f2db74a5/constants.ts#L189)
+[constants.ts:184](https://github.com/onzag/itemize/blob/a24376ed/constants.ts#L184)
 
 ___
 
@@ -687,7 +703,7 @@ this check is expensive so checking twice is not good
 
 #### Defined in
 
-[constants.ts:185](https://github.com/onzag/itemize/blob/f2db74a5/constants.ts#L185)
+[constants.ts:180](https://github.com/onzag/itemize/blob/a24376ed/constants.ts#L180)
 
 ___
 
@@ -699,7 +715,7 @@ The maximum amount of remote listeners a socket supports
 
 #### Defined in
 
-[constants.ts:252](https://github.com/onzag/itemize/blob/f2db74a5/constants.ts#L252)
+[constants.ts:242](https://github.com/onzag/itemize/blob/a24376ed/constants.ts#L242)
 
 ___
 
@@ -711,7 +727,7 @@ Size in characters of the search field
 
 #### Defined in
 
-[constants.ts:220](https://github.com/onzag/itemize/blob/f2db74a5/constants.ts#L220)
+[constants.ts:215](https://github.com/onzag/itemize/blob/a24376ed/constants.ts#L215)
 
 ___
 
@@ -724,7 +740,7 @@ used for the actual search results
 
 #### Defined in
 
-[constants.ts:216](https://github.com/onzag/itemize/blob/f2db74a5/constants.ts#L216)
+[constants.ts:211](https://github.com/onzag/itemize/blob/a24376ed/constants.ts#L211)
 
 ___
 
@@ -737,7 +753,7 @@ used for the actual search results
 
 #### Defined in
 
-[constants.ts:211](https://github.com/onzag/itemize/blob/f2db74a5/constants.ts#L211)
+[constants.ts:206](https://github.com/onzag/itemize/blob/a24376ed/constants.ts#L206)
 
 ___
 
@@ -749,7 +765,7 @@ Defines how many characters a string might have
 
 #### Defined in
 
-[constants.ts:179](https://github.com/onzag/itemize/blob/f2db74a5/constants.ts#L179)
+[constants.ts:174](https://github.com/onzag/itemize/blob/a24376ed/constants.ts#L174)
 
 ___
 
@@ -761,7 +777,7 @@ Defines the max supported integer, it should match up the database
 
 #### Defined in
 
-[constants.ts:150](https://github.com/onzag/itemize/blob/f2db74a5/constants.ts#L150)
+[constants.ts:145](https://github.com/onzag/itemize/blob/a24376ed/constants.ts#L145)
 
 ___
 
@@ -773,7 +789,7 @@ Defines how big can decimal numbers get
 
 #### Defined in
 
-[constants.ts:163](https://github.com/onzag/itemize/blob/f2db74a5/constants.ts#L163)
+[constants.ts:158](https://github.com/onzag/itemize/blob/a24376ed/constants.ts#L158)
 
 ___
 
@@ -785,7 +801,7 @@ Years max
 
 #### Defined in
 
-[constants.ts:171](https://github.com/onzag/itemize/blob/f2db74a5/constants.ts#L171)
+[constants.ts:166](https://github.com/onzag/itemize/blob/a24376ed/constants.ts#L166)
 
 ___
 
@@ -797,7 +813,7 @@ Where destruction markers get memory cached
 
 #### Defined in
 
-[constants.ts:332](https://github.com/onzag/itemize/blob/f2db74a5/constants.ts#L332)
+[constants.ts:332](https://github.com/onzag/itemize/blob/a24376ed/constants.ts#L332)
 
 ___
 
@@ -809,7 +825,31 @@ Where destruction markers get memory cached
 
 #### Defined in
 
-[constants.ts:337](https://github.com/onzag/itemize/blob/f2db74a5/constants.ts#L337)
+[constants.ts:342](https://github.com/onzag/itemize/blob/a24376ed/constants.ts#L342)
+
+___
+
+### MEMCACHED\_UNMOUNT\_DESTRUCTION\_MARKERS\_LOCATION
+
+• **MEMCACHED\_UNMOUNT\_DESTRUCTION\_MARKERS\_LOCATION**: `string`
+
+Where destruction markers get memory cached
+
+#### Defined in
+
+[constants.ts:337](https://github.com/onzag/itemize/blob/a24376ed/constants.ts#L337)
+
+___
+
+### MEMCACHED\_UNMOUNT\_SEARCH\_DESTRUCTION\_MARKERS\_LOCATION
+
+• **MEMCACHED\_UNMOUNT\_SEARCH\_DESTRUCTION\_MARKERS\_LOCATION**: `string`
+
+Where the destruction markers are located
+
+#### Defined in
+
+[constants.ts:347](https://github.com/onzag/itemize/blob/a24376ed/constants.ts#L347)
 
 ___
 
@@ -821,7 +861,7 @@ Defines the min supported integer, it should match up the database too
 
 #### Defined in
 
-[constants.ts:154](https://github.com/onzag/itemize/blob/f2db74a5/constants.ts#L154)
+[constants.ts:149](https://github.com/onzag/itemize/blob/a24376ed/constants.ts#L149)
 
 ___
 
@@ -833,7 +873,7 @@ Defines how small can decimal numbers get
 
 #### Defined in
 
-[constants.ts:167](https://github.com/onzag/itemize/blob/f2db74a5/constants.ts#L167)
+[constants.ts:162](https://github.com/onzag/itemize/blob/a24376ed/constants.ts#L162)
 
 ___
 
@@ -845,7 +885,7 @@ Years min
 
 #### Defined in
 
-[constants.ts:175](https://github.com/onzag/itemize/blob/f2db74a5/constants.ts#L175)
+[constants.ts:170](https://github.com/onzag/itemize/blob/a24376ed/constants.ts#L170)
 
 ___
 
@@ -858,7 +898,7 @@ is always custom in the properties
 
 #### Defined in
 
-[constants.ts:292](https://github.com/onzag/itemize/blob/f2db74a5/constants.ts#L292)
+[constants.ts:282](https://github.com/onzag/itemize/blob/a24376ed/constants.ts#L282)
 
 ___
 
@@ -870,7 +910,7 @@ The properties for i18n a module should have
 
 #### Defined in
 
-[constants.ts:276](https://github.com/onzag/itemize/blob/f2db74a5/constants.ts#L276)
+[constants.ts:266](https://github.com/onzag/itemize/blob/a24376ed/constants.ts#L266)
 
 ___
 
@@ -882,7 +922,7 @@ The properties for i18n a searchable module and item definition should have
 
 #### Defined in
 
-[constants.ts:282](https://github.com/onzag/itemize/blob/f2db74a5/constants.ts#L282)
+[constants.ts:272](https://github.com/onzag/itemize/blob/a24376ed/constants.ts#L272)
 
 ___
 
@@ -894,7 +934,7 @@ Every module when used within the database, graphql or its qualified name is pre
 
 #### Defined in
 
-[constants.ts:1061](https://github.com/onzag/itemize/blob/f2db74a5/constants.ts#L1061)
+[constants.ts:1158](https://github.com/onzag/itemize/blob/a24376ed/constants.ts#L1158)
 
 ___
 
@@ -906,7 +946,17 @@ And this is for the order by rule enum nulls
 
 #### Defined in
 
-[constants.ts:1225](https://github.com/onzag/itemize/blob/f2db74a5/constants.ts#L1225)
+[constants.ts:1388](https://github.com/onzag/itemize/blob/a24376ed/constants.ts#L1388)
+
+___
+
+### ORDERBY\_NULLS\_PRIORITY\_RQ
+
+• **ORDERBY\_NULLS\_PRIORITY\_RQ**: [`RQArg`](../interfaces/base_Root_rq.RQArg.md)
+
+#### Defined in
+
+[constants.ts:1393](https://github.com/onzag/itemize/blob/a24376ed/constants.ts#L1393)
 
 ___
 
@@ -916,7 +966,7 @@ ___
 
 #### Defined in
 
-[constants.ts:1230](https://github.com/onzag/itemize/blob/f2db74a5/constants.ts#L1230)
+[constants.ts:1398](https://github.com/onzag/itemize/blob/a24376ed/constants.ts#L1398)
 
 ___
 
@@ -928,7 +978,27 @@ And this is for the order by rule enum
 
 #### Defined in
 
-[constants.ts:1217](https://github.com/onzag/itemize/blob/f2db74a5/constants.ts#L1217)
+[constants.ts:1375](https://github.com/onzag/itemize/blob/a24376ed/constants.ts#L1375)
+
+___
+
+### ORDERBY\_RULE\_DIRECTION\_RQ
+
+• **ORDERBY\_RULE\_DIRECTION\_RQ**: [`RQArg`](../interfaces/base_Root_rq.RQArg.md)
+
+#### Defined in
+
+[constants.ts:1380](https://github.com/onzag/itemize/blob/a24376ed/constants.ts#L1380)
+
+___
+
+### ORDERBY\_RULE\_RQ
+
+• **ORDERBY\_RULE\_RQ**: [`RQArg`](../interfaces/base_Root_rq.RQArg.md)
+
+#### Defined in
+
+[constants.ts:1414](https://github.com/onzag/itemize/blob/a24376ed/constants.ts#L1414)
 
 ___
 
@@ -940,7 +1010,7 @@ Role that means the owner of this item
 
 #### Defined in
 
-[constants.ts:1462](https://github.com/onzag/itemize/blob/f2db74a5/constants.ts#L1462)
+[constants.ts:1963](https://github.com/onzag/itemize/blob/a24376ed/constants.ts#L1963)
 
 ___
 
@@ -950,7 +1020,7 @@ ___
 
 #### Defined in
 
-[constants.ts:823](https://github.com/onzag/itemize/blob/f2db74a5/constants.ts#L823)
+[constants.ts:920](https://github.com/onzag/itemize/blob/a24376ed/constants.ts#L920)
 
 ___
 
@@ -962,7 +1032,7 @@ An identifier for the ping information
 
 #### Defined in
 
-[constants.ts:1531](https://github.com/onzag/itemize/blob/f2db74a5/constants.ts#L1531)
+[constants.ts:2032](https://github.com/onzag/itemize/blob/a24376ed/constants.ts#L2032)
 
 ___
 
@@ -972,7 +1042,7 @@ ___
 
 #### Defined in
 
-[constants.ts:1532](https://github.com/onzag/itemize/blob/f2db74a5/constants.ts#L1532)
+[constants.ts:2033](https://github.com/onzag/itemize/blob/a24376ed/constants.ts#L2033)
 
 ___
 
@@ -984,7 +1054,7 @@ Policies can also recieve an optional description
 
 #### Defined in
 
-[constants.ts:1123](https://github.com/onzag/itemize/blob/f2db74a5/constants.ts#L1123)
+[constants.ts:1220](https://github.com/onzag/itemize/blob/a24376ed/constants.ts#L1220)
 
 ___
 
@@ -1006,7 +1076,7 @@ in order to create complex rules
 
 #### Defined in
 
-[constants.ts:1106](https://github.com/onzag/itemize/blob/f2db74a5/constants.ts#L1106)
+[constants.ts:1203](https://github.com/onzag/itemize/blob/a24376ed/constants.ts#L1203)
 
 ___
 
@@ -1020,7 +1090,7 @@ the given language, and a fail error message for when they fail
 
 #### Defined in
 
-[constants.ts:1117](https://github.com/onzag/itemize/blob/f2db74a5/constants.ts#L1117)
+[constants.ts:1214](https://github.com/onzag/itemize/blob/a24376ed/constants.ts#L1214)
 
 ___
 
@@ -1032,7 +1102,7 @@ The prefix used in the graphql endpoint for adding item definitions
 
 #### Defined in
 
-[constants.ts:1093](https://github.com/onzag/itemize/blob/f2db74a5/constants.ts#L1093)
+[constants.ts:1190](https://github.com/onzag/itemize/blob/a24376ed/constants.ts#L1190)
 
 ___
 
@@ -1044,7 +1114,7 @@ The prefix used in the graphql endpoint for deleting item definitions
 
 #### Defined in
 
-[constants.ts:1101](https://github.com/onzag/itemize/blob/f2db74a5/constants.ts#L1101)
+[constants.ts:1198](https://github.com/onzag/itemize/blob/a24376ed/constants.ts#L1198)
 
 ___
 
@@ -1056,7 +1126,7 @@ The prefix used in the graphql endpoint for editing item definitions
 
 #### Defined in
 
-[constants.ts:1097](https://github.com/onzag/itemize/blob/f2db74a5/constants.ts#L1097)
+[constants.ts:1194](https://github.com/onzag/itemize/blob/a24376ed/constants.ts#L1194)
 
 ___
 
@@ -1068,7 +1138,7 @@ The prefix used in the graphql endpoint for getting item definitions
 
 #### Defined in
 
-[constants.ts:1085](https://github.com/onzag/itemize/blob/f2db74a5/constants.ts#L1085)
+[constants.ts:1182](https://github.com/onzag/itemize/blob/a24376ed/constants.ts#L1182)
 
 ___
 
@@ -1080,7 +1150,7 @@ The prefix used in the graphql endpoint for getting lists of item definitions an
 
 #### Defined in
 
-[constants.ts:1089](https://github.com/onzag/itemize/blob/f2db74a5/constants.ts#L1089)
+[constants.ts:1186](https://github.com/onzag/itemize/blob/a24376ed/constants.ts#L1186)
 
 ___
 
@@ -1092,7 +1162,7 @@ The prefix used in the graphql endpoint for searches of modules and item definit
 
 #### Defined in
 
-[constants.ts:1077](https://github.com/onzag/itemize/blob/f2db74a5/constants.ts#L1077)
+[constants.ts:1174](https://github.com/onzag/itemize/blob/a24376ed/constants.ts#L1174)
 
 ___
 
@@ -1104,7 +1174,7 @@ The prefix used in the graphql endpoint for searches of modules and item definit
 
 #### Defined in
 
-[constants.ts:1081](https://github.com/onzag/itemize/blob/f2db74a5/constants.ts#L1081)
+[constants.ts:1178](https://github.com/onzag/itemize/blob/a24376ed/constants.ts#L1178)
 
 ___
 
@@ -1116,7 +1186,7 @@ Resources that are protected from fetching without specifying the devkey
 
 #### Defined in
 
-[constants.ts:1514](https://github.com/onzag/itemize/blob/f2db74a5/constants.ts#L1514)
+[constants.ts:2015](https://github.com/onzag/itemize/blob/a24376ed/constants.ts#L2015)
 
 ___
 
@@ -1128,7 +1198,7 @@ The protected usernames that cannot be taken by the users
 
 #### Defined in
 
-[constants.ts:257](https://github.com/onzag/itemize/blob/f2db74a5/constants.ts#L257)
+[constants.ts:247](https://github.com/onzag/itemize/blob/a24376ed/constants.ts#L247)
 
 ___
 
@@ -1140,7 +1210,7 @@ Reduced i18n required for properties
 
 #### Defined in
 
-[constants.ts:630](https://github.com/onzag/itemize/blob/f2db74a5/constants.ts#L630)
+[constants.ts:641](https://github.com/onzag/itemize/blob/a24376ed/constants.ts#L641)
 
 ___
 
@@ -1153,7 +1223,7 @@ they are searchable
 
 #### Defined in
 
-[constants.ts:637](https://github.com/onzag/itemize/blob/f2db74a5/constants.ts#L637)
+[constants.ts:648](https://github.com/onzag/itemize/blob/a24376ed/constants.ts#L648)
 
 ___
 
@@ -1165,7 +1235,7 @@ An identifier for the internal global registry
 
 #### Defined in
 
-[constants.ts:1559](https://github.com/onzag/itemize/blob/f2db74a5/constants.ts#L1559)
+[constants.ts:2060](https://github.com/onzag/itemize/blob/a24376ed/constants.ts#L2060)
 
 ___
 
@@ -1175,7 +1245,7 @@ ___
 
 #### Defined in
 
-[constants.ts:1518](https://github.com/onzag/itemize/blob/f2db74a5/constants.ts#L1518)
+[constants.ts:2019](https://github.com/onzag/itemize/blob/a24376ed/constants.ts#L2019)
 
 ___
 
@@ -1198,6 +1268,9 @@ Properties required in order to add something
 | `in_behalf_of` | `Object` |
 | `in_behalf_of.description` | `string` |
 | `in_behalf_of.type` | `GraphQLScalarType` |
+| `indexing` | `Object` |
+| `indexing.description` | `string` |
+| `indexing.type` | `GraphQLScalarType` |
 | `language` | `Object` |
 | `language.description` | `string` |
 | `language.type` | `GraphQLNonNull`<`GraphQLNullableType`\> |
@@ -1222,7 +1295,23 @@ Properties required in order to add something
 
 #### Defined in
 
-[constants.ts:1421](https://github.com/onzag/itemize/blob/f2db74a5/constants.ts#L1421)
+[constants.ts:1870](https://github.com/onzag/itemize/blob/a24376ed/constants.ts#L1870)
+
+___
+
+### RESERVED\_ADD\_PROPERTIES\_RQ
+
+• **RESERVED\_ADD\_PROPERTIES\_RQ**: `Object`
+
+Properties required in order to add something
+
+#### Index signature
+
+▪ [id: `string`]: [`RQArg`](../interfaces/base_Root_rq.RQArg.md)
+
+#### Defined in
+
+[constants.ts:1915](https://github.com/onzag/itemize/blob/a24376ed/constants.ts#L1915)
 
 ___
 
@@ -1235,7 +1324,7 @@ and should mirror the database
 
 #### Defined in
 
-[constants.ts:739](https://github.com/onzag/itemize/blob/f2db74a5/constants.ts#L739)
+[constants.ts:750](https://github.com/onzag/itemize/blob/a24376ed/constants.ts#L750)
 
 ___
 
@@ -1245,7 +1334,21 @@ ___
 
 #### Defined in
 
-[constants.ts:951](https://github.com/onzag/itemize/blob/f2db74a5/constants.ts#L951)
+[constants.ts:1048](https://github.com/onzag/itemize/blob/a24376ed/constants.ts#L1048)
+
+___
+
+### RESERVED\_BASE\_PROPERTIES\_RQ
+
+• **RESERVED\_BASE\_PROPERTIES\_RQ**: `Object`
+
+#### Index signature
+
+▪ [id: `string`]: [`RQArg`](../interfaces/base_Root_rq.RQArg.md)
+
+#### Defined in
+
+[constants.ts:832](https://github.com/onzag/itemize/blob/a24376ed/constants.ts#L832)
 
 ___
 
@@ -1272,6 +1375,12 @@ either edit or delete
 | `id` | `Object` |
 | `id.description` | `string` |
 | `id.type` | `GraphQLNonNull`<`GraphQLNullableType`\> |
+| `if_last_modified` | `Object` |
+| `if_last_modified.description` | `string` |
+| `if_last_modified.type` | `GraphQLScalarType` |
+| `indexing` | `Object` |
+| `indexing.description` | `string` |
+| `indexing.type` | `GraphQLScalarType` |
 | `language` | `Object` |
 | `language.description` | `string` |
 | `language.type` | `GraphQLNonNull`<`GraphQLNullableType`\> |
@@ -1296,7 +1405,24 @@ either edit or delete
 
 #### Defined in
 
-[constants.ts:1358](https://github.com/onzag/itemize/blob/f2db74a5/constants.ts#L1358)
+[constants.ts:1723](https://github.com/onzag/itemize/blob/a24376ed/constants.ts#L1723)
+
+___
+
+### RESERVED\_CHANGE\_PROPERTIES\_RQ
+
+• **RESERVED\_CHANGE\_PROPERTIES\_RQ**: `Object`
+
+Properties required in order to change something
+either edit or delete
+
+#### Index signature
+
+▪ [id: `string`]: [`RQArg`](../interfaces/base_Root_rq.RQArg.md)
+
+#### Defined in
+
+[constants.ts:1767](https://github.com/onzag/itemize/blob/a24376ed/constants.ts#L1767)
 
 ___
 
@@ -1334,7 +1460,23 @@ Properties required in order to get a list
 
 #### Defined in
 
-[constants.ts:1393](https://github.com/onzag/itemize/blob/f2db74a5/constants.ts#L1393)
+[constants.ts:1811](https://github.com/onzag/itemize/blob/a24376ed/constants.ts#L1811)
+
+___
+
+### RESERVED\_GETTER\_LIST\_PROPERTIES\_RQ
+
+• **RESERVED\_GETTER\_LIST\_PROPERTIES\_RQ**: `Object`
+
+Properties required in order to get a list
+
+#### Index signature
+
+▪ [id: `string`]: [`RQArg`](../interfaces/base_Root_rq.RQArg.md)
+
+#### Defined in
+
+[constants.ts:1840](https://github.com/onzag/itemize/blob/a24376ed/constants.ts#L1840)
 
 ___
 
@@ -1363,7 +1505,23 @@ Properties required in order to get
 
 #### Defined in
 
-[constants.ts:1342](https://github.com/onzag/itemize/blob/f2db74a5/constants.ts#L1342)
+[constants.ts:1690](https://github.com/onzag/itemize/blob/a24376ed/constants.ts#L1690)
+
+___
+
+### RESERVED\_GETTER\_PROPERTIES\_RQ
+
+• **RESERVED\_GETTER\_PROPERTIES\_RQ**: `Object`
+
+Properties required in order to get
+
+#### Index signature
+
+▪ [id: `string`]: [`RQArg`](../interfaces/base_Root_rq.RQArg.md)
+
+#### Defined in
+
+[constants.ts:1705](https://github.com/onzag/itemize/blob/a24376ed/constants.ts#L1705)
 
 ___
 
@@ -1375,7 +1533,7 @@ Root required i18n properties
 
 #### Defined in
 
-[constants.ts:606](https://github.com/onzag/itemize/blob/f2db74a5/constants.ts#L606)
+[constants.ts:617](https://github.com/onzag/itemize/blob/a24376ed/constants.ts#L617)
 
 ___
 
@@ -1387,7 +1545,7 @@ Where the destruction markers are located
 
 #### Defined in
 
-[constants.ts:327](https://github.com/onzag/itemize/blob/f2db74a5/constants.ts#L327)
+[constants.ts:322](https://github.com/onzag/itemize/blob/a24376ed/constants.ts#L322)
 
 ___
 
@@ -1399,7 +1557,7 @@ The search mode module is prefixed with
 
 #### Defined in
 
-[constants.ts:1065](https://github.com/onzag/itemize/blob/f2db74a5/constants.ts#L1065)
+[constants.ts:1162](https://github.com/onzag/itemize/blob/a24376ed/constants.ts#L1162)
 
 ___
 
@@ -1412,7 +1570,20 @@ with the records and the last record of the given records
 
 #### Defined in
 
-[constants.ts:1165](https://github.com/onzag/itemize/blob/f2db74a5/constants.ts#L1165)
+[constants.ts:1284](https://github.com/onzag/itemize/blob/a24376ed/constants.ts#L1284)
+
+___
+
+### SEARCH\_RECORDS\_CONTAINER\_RQ
+
+• **SEARCH\_RECORDS\_CONTAINER\_RQ**: [`RQArg`](../interfaces/base_Root_rq.RQArg.md)
+
+The id container contains the way that search results are returned
+with the records and the last record of the given records
+
+#### Defined in
+
+[constants.ts:1318](https://github.com/onzag/itemize/blob/a24376ed/constants.ts#L1318)
 
 ___
 
@@ -1424,7 +1595,7 @@ The ID element in graphql form
 
 #### Defined in
 
-[constants.ts:1149](https://github.com/onzag/itemize/blob/f2db74a5/constants.ts#L1149)
+[constants.ts:1246](https://github.com/onzag/itemize/blob/a24376ed/constants.ts#L1246)
 
 ___
 
@@ -1436,7 +1607,17 @@ The ID element as input form
 
 #### Defined in
 
-[constants.ts:1156](https://github.com/onzag/itemize/blob/f2db74a5/constants.ts#L1156)
+[constants.ts:1253](https://github.com/onzag/itemize/blob/a24376ed/constants.ts#L1253)
+
+___
+
+### SEARCH\_RECORD\_RQ
+
+• **SEARCH\_RECORD\_RQ**: [`RQArg`](../interfaces/base_Root_rq.RQArg.md)
+
+#### Defined in
+
+[constants.ts:1258](https://github.com/onzag/itemize/blob/a24376ed/constants.ts#L1258)
 
 ___
 
@@ -1448,7 +1629,7 @@ Key for the registry where the secondary jwt key is stored
 
 #### Defined in
 
-[constants.ts:1580](https://github.com/onzag/itemize/blob/f2db74a5/constants.ts#L1580)
+[constants.ts:2081](https://github.com/onzag/itemize/blob/a24376ed/constants.ts#L2081)
 
 ___
 
@@ -1461,7 +1642,7 @@ that automatically gets removed
 
 #### Defined in
 
-[constants.ts:237](https://github.com/onzag/itemize/blob/f2db74a5/constants.ts#L237)
+[constants.ts:227](https://github.com/onzag/itemize/blob/a24376ed/constants.ts#L227)
 
 ___
 
@@ -1473,7 +1654,7 @@ An identifier for the server data
 
 #### Defined in
 
-[constants.ts:1526](https://github.com/onzag/itemize/blob/f2db74a5/constants.ts#L1526)
+[constants.ts:2027](https://github.com/onzag/itemize/blob/a24376ed/constants.ts#L2027)
 
 ___
 
@@ -1487,7 +1668,7 @@ updating the currency information
 
 #### Defined in
 
-[constants.ts:226](https://github.com/onzag/itemize/blob/f2db74a5/constants.ts#L226)
+[constants.ts:221](https://github.com/onzag/itemize/blob/a24376ed/constants.ts#L221)
 
 ___
 
@@ -1499,7 +1680,7 @@ The time it takes to run a cleanup process into the elastic instance
 
 #### Defined in
 
-[constants.ts:242](https://github.com/onzag/itemize/blob/f2db74a5/constants.ts#L242)
+[constants.ts:232](https://github.com/onzag/itemize/blob/a24376ed/constants.ts#L232)
 
 ___
 
@@ -1511,19 +1692,7 @@ The time to inform ping information
 
 #### Defined in
 
-[constants.ts:247](https://github.com/onzag/itemize/blob/f2db74a5/constants.ts#L247)
-
-___
-
-### SERVER\_MAPPING\_TIME
-
-• **SERVER\_MAPPING\_TIME**: `number`
-
-The time it takes for sitemaps to be refreshed
-
-#### Defined in
-
-[constants.ts:231](https://github.com/onzag/itemize/blob/f2db74a5/constants.ts#L231)
+[constants.ts:237](https://github.com/onzag/itemize/blob/a24376ed/constants.ts#L237)
 
 ___
 
@@ -1536,7 +1705,7 @@ login (aka sudden remote logout)
 
 #### Defined in
 
-[constants.ts:1538](https://github.com/onzag/itemize/blob/f2db74a5/constants.ts#L1538)
+[constants.ts:2039](https://github.com/onzag/itemize/blob/a24376ed/constants.ts#L2039)
 
 ___
 
@@ -1548,7 +1717,7 @@ Used for creation of sql contraints
 
 #### Defined in
 
-[constants.ts:1053](https://github.com/onzag/itemize/blob/f2db74a5/constants.ts#L1053)
+[constants.ts:1150](https://github.com/onzag/itemize/blob/a24376ed/constants.ts#L1150)
 
 ___
 
@@ -1561,7 +1730,7 @@ the DATA field
 
 #### Defined in
 
-[constants.ts:702](https://github.com/onzag/itemize/blob/f2db74a5/constants.ts#L702)
+[constants.ts:713](https://github.com/onzag/itemize/blob/a24376ed/constants.ts#L713)
 
 ___
 
@@ -1574,7 +1743,7 @@ this is the SQL form
 
 #### Defined in
 
-[constants.ts:728](https://github.com/onzag/itemize/blob/f2db74a5/constants.ts#L728)
+[constants.ts:739](https://github.com/onzag/itemize/blob/a24376ed/constants.ts#L739)
 
 ___
 
@@ -1584,7 +1753,7 @@ ___
 
 #### Defined in
 
-[constants.ts:825](https://github.com/onzag/itemize/blob/f2db74a5/constants.ts#L825)
+[constants.ts:922](https://github.com/onzag/itemize/blob/a24376ed/constants.ts#L922)
 
 ___
 
@@ -1596,7 +1765,7 @@ An identifier for the trackers table information stuff
 
 #### Defined in
 
-[constants.ts:1554](https://github.com/onzag/itemize/blob/f2db74a5/constants.ts#L1554)
+[constants.ts:2055](https://github.com/onzag/itemize/blob/a24376ed/constants.ts#L2055)
 
 ___
 
@@ -1609,7 +1778,31 @@ are for the unit subtype
 
 #### Defined in
 
-[constants.ts:1480](https://github.com/onzag/itemize/blob/f2db74a5/constants.ts#L1480)
+[constants.ts:1981](https://github.com/onzag/itemize/blob/a24376ed/constants.ts#L1981)
+
+___
+
+### UNMOUNT\_DESTRUCTION\_MARKERS\_LOCATION
+
+• **UNMOUNT\_DESTRUCTION\_MARKERS\_LOCATION**: ``"UNMOUNT_DESTRUCTION_MARKERS"``
+
+Where the destruction markers are located
+
+#### Defined in
+
+[constants.ts:317](https://github.com/onzag/itemize/blob/a24376ed/constants.ts#L317)
+
+___
+
+### UNMOUNT\_SEARCH\_DESTRUCTION\_MARKERS\_LOCATION
+
+• **UNMOUNT\_SEARCH\_DESTRUCTION\_MARKERS\_LOCATION**: ``"UNMOUNT_SEARCH_DESTRUCTION_MARKERS"``
+
+Where the destruction markers are located
+
+#### Defined in
+
+[constants.ts:327](https://github.com/onzag/itemize/blob/a24376ed/constants.ts#L327)
 
 ___
 
@@ -1623,7 +1816,7 @@ the same value
 
 #### Defined in
 
-[constants.ts:1509](https://github.com/onzag/itemize/blob/f2db74a5/constants.ts#L1509)
+[constants.ts:2010](https://github.com/onzag/itemize/blob/a24376ed/constants.ts#L2010)
 
 ___
 
@@ -1636,7 +1829,7 @@ of the validation email and the recovery email
 
 #### Defined in
 
-[constants.ts:372](https://github.com/onzag/itemize/blob/f2db74a5/constants.ts#L372)
+[constants.ts:383](https://github.com/onzag/itemize/blob/a24376ed/constants.ts#L383)
 
 ## Functions
 
@@ -1658,7 +1851,7 @@ an utility to concat prefixes
 
 #### Defined in
 
-[constants.ts:1049](https://github.com/onzag/itemize/blob/f2db74a5/constants.ts#L1049)
+[constants.ts:1146](https://github.com/onzag/itemize/blob/a24376ed/constants.ts#L1146)
 
 ___
 
@@ -1680,7 +1873,7 @@ an utility to build prefixes
 
 #### Defined in
 
-[constants.ts:1039](https://github.com/onzag/itemize/blob/f2db74a5/constants.ts#L1039)
+[constants.ts:1136](https://github.com/onzag/itemize/blob/a24376ed/constants.ts#L1136)
 
 ___
 
@@ -1703,7 +1896,7 @@ The reserved base properties but in SQL form
 
 #### Defined in
 
-[constants.ts:830](https://github.com/onzag/itemize/blob/f2db74a5/constants.ts#L830)
+[constants.ts:927](https://github.com/onzag/itemize/blob/a24376ed/constants.ts#L927)
 
 ___
 
@@ -1729,6 +1922,18 @@ and these are included in every search
 | `created_by` | `Object` |
 | `created_by.description` | `string` |
 | `created_by.type` | `GraphQLScalarType` |
+| `created_by_filter` | `Object` |
+| `created_by_filter.description` | `string` |
+| `created_by_filter.type` | `GraphQLList`<`GraphQLType`\> |
+| `created_by_filter_out` | `Object` |
+| `created_by_filter_out.description` | `string` |
+| `created_by_filter_out.type` | `GraphQLList`<`GraphQLType`\> |
+| `ids_filter` | `Object` |
+| `ids_filter.description` | `string` |
+| `ids_filter.type` | `GraphQLList`<`GraphQLType`\> |
+| `ids_filter_out` | `Object` |
+| `ids_filter_out.description` | `string` |
+| `ids_filter_out.type` | `GraphQLList`<`GraphQLType`\> |
 | `language` | `Object` |
 | `language.description` | `string` |
 | `language.type` | `GraphQLNonNull`<`GraphQLNullableType`\> |
@@ -1744,9 +1949,21 @@ and these are included in every search
 | `parent_id` | `Object` |
 | `parent_id.description` | `string` |
 | `parent_id.type` | `GraphQLScalarType` |
+| `parent_ids_filter` | `Object` |
+| `parent_ids_filter.description` | `string` |
+| `parent_ids_filter.type` | `GraphQLList`<`GraphQLType`\> |
+| `parent_ids_filter_out` | `Object` |
+| `parent_ids_filter_out.description` | `string` |
+| `parent_ids_filter_out.type` | `GraphQLList`<`GraphQLType`\> |
 | `parent_type` | `Object` |
 | `parent_type.description` | `string` |
 | `parent_type.type` | `GraphQLScalarType` |
+| `parent_type_filter` | `Object` |
+| `parent_type_filter.description` | `string` |
+| `parent_type_filter.type` | `GraphQLList`<`GraphQLType`\> |
+| `parent_type_filter_out` | `Object` |
+| `parent_type_filter_out.description` | `string` |
+| `parent_type_filter_out.type` | `GraphQLList`<`GraphQLType`\> |
 | `parent_version` | `Object` |
 | `parent_version.description` | `string` |
 | `parent_version.type` | `GraphQLScalarType` |
@@ -1768,10 +1985,33 @@ and these are included in every search
 | `version_filter` | `Object` |
 | `version_filter.description` | `string` |
 | `version_filter.type` | `GraphQLScalarType` |
+| `version_filter_out` | `Object` |
+| `version_filter_out.description` | `string` |
+| `version_filter_out.type` | `GraphQLScalarType` |
 
 #### Defined in
 
-[constants.ts:1275](https://github.com/onzag/itemize/blob/f2db74a5/constants.ts#L1275)
+[constants.ts:1474](https://github.com/onzag/itemize/blob/a24376ed/constants.ts#L1474)
+
+___
+
+### RESERVED\_IDEF\_SEARCH\_PROPERTIES\_RQ
+
+▸ `Const` **RESERVED_IDEF_SEARCH_PROPERTIES_RQ**(`orderByRule`): `Object`
+
+#### Parameters
+
+| Name | Type |
+| :------ | :------ |
+| `orderByRule` | [`RQArg`](../interfaces/base_Root_rq.RQArg.md) |
+
+#### Returns
+
+`Object`
+
+#### Defined in
+
+[constants.ts:1563](https://github.com/onzag/itemize/blob/a24376ed/constants.ts#L1563)
 
 ___
 
@@ -1796,6 +2036,18 @@ These apply when doing module searches
 | `created_by` | `Object` |
 | `created_by.description` | `string` |
 | `created_by.type` | `GraphQLScalarType` |
+| `created_by_filter` | `Object` |
+| `created_by_filter.description` | `string` |
+| `created_by_filter.type` | `GraphQLList`<`GraphQLType`\> |
+| `created_by_filter_out` | `Object` |
+| `created_by_filter_out.description` | `string` |
+| `created_by_filter_out.type` | `GraphQLList`<`GraphQLType`\> |
+| `ids_filter` | `Object` |
+| `ids_filter.description` | `string` |
+| `ids_filter.type` | `GraphQLList`<`GraphQLType`\> |
+| `ids_filter_out` | `Object` |
+| `ids_filter_out.description` | `string` |
+| `ids_filter_out.type` | `GraphQLList`<`GraphQLType`\> |
 | `language` | `Object` |
 | `language.description` | `string` |
 | `language.type` | `GraphQLNonNull`<`GraphQLNullableType`\> |
@@ -1811,9 +2063,21 @@ These apply when doing module searches
 | `parent_id` | `Object` |
 | `parent_id.description` | `string` |
 | `parent_id.type` | `GraphQLScalarType` |
+| `parent_ids_filter` | `Object` |
+| `parent_ids_filter.description` | `string` |
+| `parent_ids_filter.type` | `GraphQLList`<`GraphQLType`\> |
+| `parent_ids_filter_out` | `Object` |
+| `parent_ids_filter_out.description` | `string` |
+| `parent_ids_filter_out.type` | `GraphQLList`<`GraphQLType`\> |
 | `parent_type` | `Object` |
 | `parent_type.description` | `string` |
 | `parent_type.type` | `GraphQLScalarType` |
+| `parent_type_filter` | `Object` |
+| `parent_type_filter.description` | `string` |
+| `parent_type_filter.type` | `GraphQLList`<`GraphQLType`\> |
+| `parent_type_filter_out` | `Object` |
+| `parent_type_filter_out.description` | `string` |
+| `parent_type_filter_out.type` | `GraphQLList`<`GraphQLType`\> |
 | `parent_version` | `Object` |
 | `parent_version.description` | `string` |
 | `parent_version.type` | `GraphQLScalarType` |
@@ -1838,10 +2102,35 @@ These apply when doing module searches
 | `version_filter` | `Object` |
 | `version_filter.description` | `string` |
 | `version_filter.type` | `GraphQLScalarType` |
+| `version_filter_out` | `Object` |
+| `version_filter_out.description` | `string` |
+| `version_filter_out.type` | `GraphQLScalarType` |
 
 #### Defined in
 
-[constants.ts:1331](https://github.com/onzag/itemize/blob/f2db74a5/constants.ts#L1331)
+[constants.ts:1667](https://github.com/onzag/itemize/blob/a24376ed/constants.ts#L1667)
+
+___
+
+### RESERVED\_MODULE\_SEARCH\_PROPERTIES\_RQ
+
+▸ `Const` **RESERVED_MODULE_SEARCH_PROPERTIES_RQ**(`orderByRule`): `Object`
+
+These apply when doing module searches
+
+#### Parameters
+
+| Name | Type |
+| :------ | :------ |
+| `orderByRule` | [`RQArg`](../interfaces/base_Root_rq.RQArg.md) |
+
+#### Returns
+
+`Object`
+
+#### Defined in
+
+[constants.ts:1678](https://github.com/onzag/itemize/blob/a24376ed/constants.ts#L1678)
 
 ___
 
@@ -1863,4 +2152,4 @@ an utility to build suffixes
 
 #### Defined in
 
-[constants.ts:1044](https://github.com/onzag/itemize/blob/f2db74a5/constants.ts#L1044)
+[constants.ts:1141](https://github.com/onzag/itemize/blob/a24376ed/constants.ts#L1141)

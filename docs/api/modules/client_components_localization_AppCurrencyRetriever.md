@@ -39,7 +39,7 @@ a react node
 
 #### Defined in
 
-[client/components/localization/AppCurrencyRetriever.tsx:60](https://github.com/onzag/itemize/blob/f2db74a5/client/components/localization/AppCurrencyRetriever.tsx#L60)
+[client/components/localization/AppCurrencyRetriever.tsx:60](https://github.com/onzag/itemize/blob/a24376ed/client/components/localization/AppCurrencyRetriever.tsx#L60)
 
 ___
 
@@ -59,4 +59,4 @@ ___
 
 #### Defined in
 
-[client/components/localization/AppCurrencyRetriever.tsx:83](https://github.com/onzag/itemize/blob/f2db74a5/client/components/localization/AppCurrencyRetriever.tsx#L83)
+[client/components/localization/AppCurrencyRetriever.tsx:83](https://github.com/onzag/itemize/blob/a24376ed/client/components/localization/AppCurrencyRetriever.tsx#L83)

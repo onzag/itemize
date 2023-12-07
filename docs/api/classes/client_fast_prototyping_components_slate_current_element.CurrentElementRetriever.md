@@ -61,7 +61,7 @@ React.PureComponent&lt;ICurrentElementRetrieverProps\&gt;.constructor
 
 #### Defined in
 
-[client/fast-prototyping/components/slate/current-element.tsx:49](https://github.com/onzag/itemize/blob/f2db74a5/client/fast-prototyping/components/slate/current-element.tsx#L49)
+[client/fast-prototyping/components/slate/current-element.tsx:49](https://github.com/onzag/itemize/blob/a24376ed/client/fast-prototyping/components/slate/current-element.tsx#L49)
 
 ## Properties
 
@@ -514,7 +514,7 @@ ___
 
 #### Defined in
 
-[client/fast-prototyping/components/slate/current-element.tsx:55](https://github.com/onzag/itemize/blob/f2db74a5/client/fast-prototyping/components/slate/current-element.tsx#L55)
+[client/fast-prototyping/components/slate/current-element.tsx:55](https://github.com/onzag/itemize/blob/a24376ed/client/fast-prototyping/components/slate/current-element.tsx#L55)
 
 ___
 
@@ -588,7 +588,7 @@ React.PureComponent.render
 
 #### Defined in
 
-[client/fast-prototyping/components/slate/current-element.tsx:85](https://github.com/onzag/itemize/blob/f2db74a5/client/fast-prototyping/components/slate/current-element.tsx#L85)
+[client/fast-prototyping/components/slate/current-element.tsx:85](https://github.com/onzag/itemize/blob/a24376ed/client/fast-prototyping/components/slate/current-element.tsx#L85)
 
 ___
 

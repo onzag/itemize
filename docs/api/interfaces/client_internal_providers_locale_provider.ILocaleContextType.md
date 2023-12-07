@@ -31,7 +31,7 @@ information for using in the application
 
 #### Defined in
 
-[client/internal/providers/locale-provider.tsx:54](https://github.com/onzag/itemize/blob/f2db74a5/client/internal/providers/locale-provider.tsx#L54)
+[client/internal/providers/locale-provider.tsx:54](https://github.com/onzag/itemize/blob/a24376ed/client/internal/providers/locale-provider.tsx#L54)
 
 ___
 
@@ -41,7 +41,7 @@ ___
 
 #### Defined in
 
-[client/internal/providers/locale-provider.tsx:53](https://github.com/onzag/itemize/blob/f2db74a5/client/internal/providers/locale-provider.tsx#L53)
+[client/internal/providers/locale-provider.tsx:53](https://github.com/onzag/itemize/blob/a24376ed/client/internal/providers/locale-provider.tsx#L53)
 
 ___
 
@@ -51,7 +51,7 @@ ___
 
 #### Defined in
 
-[client/internal/providers/locale-provider.tsx:52](https://github.com/onzag/itemize/blob/f2db74a5/client/internal/providers/locale-provider.tsx#L52)
+[client/internal/providers/locale-provider.tsx:52](https://github.com/onzag/itemize/blob/a24376ed/client/internal/providers/locale-provider.tsx#L52)
 
 ___
 
@@ -63,7 +63,7 @@ The current country code
 
 #### Defined in
 
-[client/internal/providers/locale-provider.tsx:76](https://github.com/onzag/itemize/blob/f2db74a5/client/internal/providers/locale-provider.tsx#L76)
+[client/internal/providers/locale-provider.tsx:76](https://github.com/onzag/itemize/blob/a24376ed/client/internal/providers/locale-provider.tsx#L76)
 
 ___
 
@@ -75,7 +75,7 @@ The current currency code
 
 #### Defined in
 
-[client/internal/providers/locale-provider.tsx:66](https://github.com/onzag/itemize/blob/f2db74a5/client/internal/providers/locale-provider.tsx#L66)
+[client/internal/providers/locale-provider.tsx:66](https://github.com/onzag/itemize/blob/a24376ed/client/internal/providers/locale-provider.tsx#L66)
 
 ___
 
@@ -91,7 +91,7 @@ The current currency factors
 
 #### Defined in
 
-[client/internal/providers/locale-provider.tsx:70](https://github.com/onzag/itemize/blob/f2db74a5/client/internal/providers/locale-provider.tsx#L70)
+[client/internal/providers/locale-provider.tsx:70](https://github.com/onzag/itemize/blob/a24376ed/client/internal/providers/locale-provider.tsx#L70)
 
 ___
 
@@ -103,7 +103,7 @@ The root i18n data
 
 #### Defined in
 
-[client/internal/providers/locale-provider.tsx:89](https://github.com/onzag/itemize/blob/f2db74a5/client/internal/providers/locale-provider.tsx#L89)
+[client/internal/providers/locale-provider.tsx:89](https://github.com/onzag/itemize/blob/a24376ed/client/internal/providers/locale-provider.tsx#L89)
 
 ___
 
@@ -115,7 +115,7 @@ The language locales available, and their given direction
 
 #### Defined in
 
-[client/internal/providers/locale-provider.tsx:85](https://github.com/onzag/itemize/blob/f2db74a5/client/internal/providers/locale-provider.tsx#L85)
+[client/internal/providers/locale-provider.tsx:85](https://github.com/onzag/itemize/blob/a24376ed/client/internal/providers/locale-provider.tsx#L85)
 
 ___
 
@@ -127,7 +127,7 @@ The current language code
 
 #### Defined in
 
-[client/internal/providers/locale-provider.tsx:58](https://github.com/onzag/itemize/blob/f2db74a5/client/internal/providers/locale-provider.tsx#L58)
+[client/internal/providers/locale-provider.tsx:58](https://github.com/onzag/itemize/blob/a24376ed/client/internal/providers/locale-provider.tsx#L58)
 
 ___
 
@@ -139,7 +139,7 @@ Whether this current language is rtl
 
 #### Defined in
 
-[client/internal/providers/locale-provider.tsx:62](https://github.com/onzag/itemize/blob/f2db74a5/client/internal/providers/locale-provider.tsx#L62)
+[client/internal/providers/locale-provider.tsx:62](https://github.com/onzag/itemize/blob/a24376ed/client/internal/providers/locale-provider.tsx#L62)
 
 ___
 
@@ -152,4 +152,4 @@ with updating the language as it has to be refetched
 
 #### Defined in
 
-[client/internal/providers/locale-provider.tsx:81](https://github.com/onzag/itemize/blob/f2db74a5/client/internal/providers/locale-provider.tsx#L81)
+[client/internal/providers/locale-provider.tsx:81](https://github.com/onzag/itemize/blob/a24376ed/client/internal/providers/locale-provider.tsx#L81)

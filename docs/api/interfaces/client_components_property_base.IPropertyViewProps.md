@@ -25,6 +25,7 @@ The view props
 - [cacheFiles](client_components_property_base.IPropertyViewProps.md#cachefiles)
 - [capitalize](client_components_property_base.IPropertyViewProps.md#capitalize)
 - [displayHidden](client_components_property_base.IPropertyViewProps.md#displayhidden)
+- [handleAs](client_components_property_base.IPropertyViewProps.md#handleas)
 - [id](client_components_property_base.IPropertyViewProps.md#id)
 - [policyName](client_components_property_base.IPropertyViewProps.md#policyname)
 - [policyType](client_components_property_base.IPropertyViewProps.md#policytype)
@@ -43,7 +44,7 @@ whether to cache files when running the url absoluter
 
 #### Defined in
 
-[client/components/property/base.tsx:199](https://github.com/onzag/itemize/blob/f2db74a5/client/components/property/base.tsx#L199)
+[client/components/property/base.tsx:220](https://github.com/onzag/itemize/blob/a24376ed/client/components/property/base.tsx#L220)
 
 ___
 
@@ -55,7 +56,7 @@ Whether to capitalize
 
 #### Defined in
 
-[client/components/property/base.tsx:189](https://github.com/onzag/itemize/blob/f2db74a5/client/components/property/base.tsx#L189)
+[client/components/property/base.tsx:210](https://github.com/onzag/itemize/blob/a24376ed/client/components/property/base.tsx#L210)
 
 ___
 
@@ -67,7 +68,27 @@ Will display even if it's hidden
 
 #### Defined in
 
-[client/components/property/base.tsx:203](https://github.com/onzag/itemize/blob/f2db74a5/client/components/property/base.tsx#L203)
+[client/components/property/base.tsx:224](https://github.com/onzag/itemize/blob/a24376ed/client/components/property/base.tsx#L224)
+
+___
+
+### handleAs
+
+• `Optional` **handleAs**: `Object`
+
+Handle as the given type subtype rather than
+the default
+
+#### Type declaration
+
+| Name | Type |
+| :------ | :------ |
+| `subtype?` | `string` |
+| `type` | `string` |
+
+#### Defined in
+
+[client/components/property/base.tsx:229](https://github.com/onzag/itemize/blob/a24376ed/client/components/property/base.tsx#L229)
 
 ___
 
@@ -84,7 +105,7 @@ provider
 
 #### Defined in
 
-[client/components/property/base.tsx:28](https://github.com/onzag/itemize/blob/f2db74a5/client/components/property/base.tsx#L28)
+[client/components/property/base.tsx:28](https://github.com/onzag/itemize/blob/a24376ed/client/components/property/base.tsx#L28)
 
 ___
 
@@ -100,7 +121,7 @@ the policy name, should be provided with a policy type
 
 #### Defined in
 
-[client/components/property/base.tsx:47](https://github.com/onzag/itemize/blob/f2db74a5/client/components/property/base.tsx#L47)
+[client/components/property/base.tsx:47](https://github.com/onzag/itemize/blob/a24376ed/client/components/property/base.tsx#L47)
 
 ___
 
@@ -116,7 +137,7 @@ the policy type, should be provided with a policy name
 
 #### Defined in
 
-[client/components/property/base.tsx:43](https://github.com/onzag/itemize/blob/f2db74a5/client/components/property/base.tsx#L43)
+[client/components/property/base.tsx:43](https://github.com/onzag/itemize/blob/a24376ed/client/components/property/base.tsx#L43)
 
 ___
 
@@ -132,7 +153,7 @@ the renderer in charge of rendering the output
 
 #### Defined in
 
-[client/components/property/base.tsx:57](https://github.com/onzag/itemize/blob/f2db74a5/client/components/property/base.tsx#L57)
+[client/components/property/base.tsx:57](https://github.com/onzag/itemize/blob/a24376ed/client/components/property/base.tsx#L57)
 
 ___
 
@@ -148,7 +169,7 @@ Extra renderer args
 
 #### Defined in
 
-[client/components/property/base.tsx:61](https://github.com/onzag/itemize/blob/f2db74a5/client/components/property/base.tsx#L61)
+[client/components/property/base.tsx:61](https://github.com/onzag/itemize/blob/a24376ed/client/components/property/base.tsx#L61)
 
 ___
 
@@ -165,7 +186,7 @@ only truly available in search mode
 
 #### Defined in
 
-[client/components/property/base.tsx:33](https://github.com/onzag/itemize/blob/f2db74a5/client/components/property/base.tsx#L33)
+[client/components/property/base.tsx:33](https://github.com/onzag/itemize/blob/a24376ed/client/components/property/base.tsx#L33)
 
 ___
 
@@ -179,4 +200,4 @@ with the server
 
 #### Defined in
 
-[client/components/property/base.tsx:195](https://github.com/onzag/itemize/blob/f2db74a5/client/components/property/base.tsx#L195)
+[client/components/property/base.tsx:216](https://github.com/onzag/itemize/blob/a24376ed/client/components/property/base.tsx#L216)

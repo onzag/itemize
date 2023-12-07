@@ -26,4 +26,4 @@
 
 #### Defined in
 
-[client/components/util/GrowableBox.tsx:17](https://github.com/onzag/itemize/blob/f2db74a5/client/components/util/GrowableBox.tsx#L17)
+[client/components/util/GrowableBox.tsx:17](https://github.com/onzag/itemize/blob/a24376ed/client/components/util/GrowableBox.tsx#L17)

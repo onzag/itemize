@@ -39,6 +39,7 @@ handlers, they receive all the main handler props and these
 - [forId](client_internal_components_PropertyEntry.IPropertyEntryHandlerProps.md#forid)
 - [forVersion](client_internal_components_PropertyEntry.IPropertyEntryHandlerProps.md#forversion)
 - [forceInvalid](client_internal_components_PropertyEntry.IPropertyEntryHandlerProps.md#forceinvalid)
+- [handleAs](client_internal_components_PropertyEntry.IPropertyEntryHandlerProps.md#handleas)
 - [hideDescription](client_internal_components_PropertyEntry.IPropertyEntryHandlerProps.md#hidedescription)
 - [hideLabel](client_internal_components_PropertyEntry.IPropertyEntryHandlerProps.md#hidelabel)
 - [hidePlaceholder](client_internal_components_PropertyEntry.IPropertyEntryHandlerProps.md#hideplaceholder)
@@ -57,6 +58,7 @@ handlers, they receive all the main handler props and these
 - [ssr](client_internal_components_PropertyEntry.IPropertyEntryHandlerProps.md#ssr)
 - [state](client_internal_components_PropertyEntry.IPropertyEntryHandlerProps.md#state)
 - [tokenData](client_internal_components_PropertyEntry.IPropertyEntryHandlerProps.md#tokendata)
+- [useAppliedValue](client_internal_components_PropertyEntry.IPropertyEntryHandlerProps.md#useappliedvalue)
 
 ### Methods
 
@@ -80,7 +82,7 @@ Developer Provided check base.tsx
 
 #### Defined in
 
-[client/internal/components/PropertyEntry/index.tsx:261](https://github.com/onzag/itemize/blob/f2db74a5/client/internal/components/PropertyEntry/index.tsx#L261)
+[client/internal/components/PropertyEntry/index.tsx:261](https://github.com/onzag/itemize/blob/a24376ed/client/internal/components/PropertyEntry/index.tsx#L261)
 
 ___
 
@@ -98,7 +100,7 @@ Developer Provided check base.tsx
 
 #### Defined in
 
-[client/internal/components/PropertyEntry/index.tsx:267](https://github.com/onzag/itemize/blob/f2db74a5/client/internal/components/PropertyEntry/index.tsx#L267)
+[client/internal/components/PropertyEntry/index.tsx:267](https://github.com/onzag/itemize/blob/a24376ed/client/internal/components/PropertyEntry/index.tsx#L267)
 
 ___
 
@@ -116,7 +118,7 @@ Developer Provided check base.tsx
 
 #### Defined in
 
-[client/internal/components/PropertyEntry/index.tsx:285](https://github.com/onzag/itemize/blob/f2db74a5/client/internal/components/PropertyEntry/index.tsx#L285)
+[client/internal/components/PropertyEntry/index.tsx:285](https://github.com/onzag/itemize/blob/a24376ed/client/internal/components/PropertyEntry/index.tsx#L285)
 
 ___
 
@@ -134,7 +136,7 @@ Developer Provided check base.tsx
 
 #### Defined in
 
-[client/internal/components/PropertyEntry/index.tsx:291](https://github.com/onzag/itemize/blob/f2db74a5/client/internal/components/PropertyEntry/index.tsx#L291)
+[client/internal/components/PropertyEntry/index.tsx:291](https://github.com/onzag/itemize/blob/a24376ed/client/internal/components/PropertyEntry/index.tsx#L291)
 
 ___
 
@@ -151,7 +153,7 @@ via the url
 
 #### Defined in
 
-[client/internal/components/PropertyEntry/index.tsx:324](https://github.com/onzag/itemize/blob/f2db74a5/client/internal/components/PropertyEntry/index.tsx#L324)
+[client/internal/components/PropertyEntry/index.tsx:324](https://github.com/onzag/itemize/blob/a24376ed/client/internal/components/PropertyEntry/index.tsx#L324)
 
 ___
 
@@ -165,7 +167,7 @@ Context Provided, Conditional, Standard Handler Only
 
 #### Defined in
 
-[client/internal/components/PropertyEntry/index.tsx:354](https://github.com/onzag/itemize/blob/f2db74a5/client/internal/components/PropertyEntry/index.tsx#L354)
+[client/internal/components/PropertyEntry/index.tsx:368](https://github.com/onzag/itemize/blob/a24376ed/client/internal/components/PropertyEntry/index.tsx#L368)
 
 ___
 
@@ -186,7 +188,7 @@ retrieved from the applied value from the item-definition.tsx context in the giv
 
 #### Defined in
 
-[client/internal/components/PropertyEntry/index.tsx:195](https://github.com/onzag/itemize/blob/f2db74a5/client/internal/components/PropertyEntry/index.tsx#L195)
+[client/internal/components/PropertyEntry/index.tsx:195](https://github.com/onzag/itemize/blob/a24376ed/client/internal/components/PropertyEntry/index.tsx#L195)
 
 ___
 
@@ -200,7 +202,7 @@ Context Provided, Standard Handler Only
 
 #### Defined in
 
-[client/internal/components/PropertyEntry/index.tsx:398](https://github.com/onzag/itemize/blob/f2db74a5/client/internal/components/PropertyEntry/index.tsx#L398)
+[client/internal/components/PropertyEntry/index.tsx:412](https://github.com/onzag/itemize/blob/a24376ed/client/internal/components/PropertyEntry/index.tsx#L412)
 
 ___
 
@@ -214,7 +216,7 @@ Context Provided, Standard Handler Only
 
 #### Defined in
 
-[client/internal/components/PropertyEntry/index.tsx:386](https://github.com/onzag/itemize/blob/f2db74a5/client/internal/components/PropertyEntry/index.tsx#L386)
+[client/internal/components/PropertyEntry/index.tsx:400](https://github.com/onzag/itemize/blob/a24376ed/client/internal/components/PropertyEntry/index.tsx#L400)
 
 ___
 
@@ -230,7 +232,7 @@ Developer provider check base.tsx
 
 #### Defined in
 
-[client/internal/components/PropertyEntry/index.tsx:328](https://github.com/onzag/itemize/blob/f2db74a5/client/internal/components/PropertyEntry/index.tsx#L328)
+[client/internal/components/PropertyEntry/index.tsx:328](https://github.com/onzag/itemize/blob/a24376ed/client/internal/components/PropertyEntry/index.tsx#L328)
 
 ___
 
@@ -246,7 +248,7 @@ Will display even if it's hidden
 
 #### Defined in
 
-[client/internal/components/PropertyEntry/index.tsx:332](https://github.com/onzag/itemize/blob/f2db74a5/client/internal/components/PropertyEntry/index.tsx#L332)
+[client/internal/components/PropertyEntry/index.tsx:332](https://github.com/onzag/itemize/blob/a24376ed/client/internal/components/PropertyEntry/index.tsx#L332)
 
 ___
 
@@ -265,7 +267,7 @@ retrieved from the item-definition.tsx context
 
 #### Defined in
 
-[client/internal/components/PropertyEntry/index.tsx:227](https://github.com/onzag/itemize/blob/f2db74a5/client/internal/components/PropertyEntry/index.tsx#L227)
+[client/internal/components/PropertyEntry/index.tsx:227](https://github.com/onzag/itemize/blob/a24376ed/client/internal/components/PropertyEntry/index.tsx#L227)
 
 ___
 
@@ -284,7 +286,7 @@ retrieved from the item-definition.tsx context
 
 #### Defined in
 
-[client/internal/components/PropertyEntry/index.tsx:234](https://github.com/onzag/itemize/blob/f2db74a5/client/internal/components/PropertyEntry/index.tsx#L234)
+[client/internal/components/PropertyEntry/index.tsx:234](https://github.com/onzag/itemize/blob/a24376ed/client/internal/components/PropertyEntry/index.tsx#L234)
 
 ___
 
@@ -303,7 +305,31 @@ Developer Provided check base.tsx
 
 #### Defined in
 
-[client/internal/components/PropertyEntry/index.tsx:249](https://github.com/onzag/itemize/blob/f2db74a5/client/internal/components/PropertyEntry/index.tsx#L249)
+[client/internal/components/PropertyEntry/index.tsx:249](https://github.com/onzag/itemize/blob/a24376ed/client/internal/components/PropertyEntry/index.tsx#L249)
+
+___
+
+### handleAs
+
+• `Optional` **handleAs**: `Object`
+
+Handle as a given type/subtype instead
+of the basic form
+
+#### Type declaration
+
+| Name | Type |
+| :------ | :------ |
+| `subtype?` | `string` |
+| `type` | `string` |
+
+#### Inherited from
+
+[IPropertyEntryMainHandlerProps](client_internal_components_PropertyEntry.IPropertyEntryMainHandlerProps.md).[handleAs](client_internal_components_PropertyEntry.IPropertyEntryMainHandlerProps.md#handleas)
+
+#### Defined in
+
+[client/internal/components/PropertyEntry/index.tsx:345](https://github.com/onzag/itemize/blob/a24376ed/client/internal/components/PropertyEntry/index.tsx#L345)
 
 ___
 
@@ -321,7 +347,7 @@ Developer Provided check base.tsx
 
 #### Defined in
 
-[client/internal/components/PropertyEntry/index.tsx:255](https://github.com/onzag/itemize/blob/f2db74a5/client/internal/components/PropertyEntry/index.tsx#L255)
+[client/internal/components/PropertyEntry/index.tsx:255](https://github.com/onzag/itemize/blob/a24376ed/client/internal/components/PropertyEntry/index.tsx#L255)
 
 ___
 
@@ -339,7 +365,7 @@ Developer Provided check base.tsx
 
 #### Defined in
 
-[client/internal/components/PropertyEntry/index.tsx:273](https://github.com/onzag/itemize/blob/f2db74a5/client/internal/components/PropertyEntry/index.tsx#L273)
+[client/internal/components/PropertyEntry/index.tsx:273](https://github.com/onzag/itemize/blob/a24376ed/client/internal/components/PropertyEntry/index.tsx#L273)
 
 ___
 
@@ -357,7 +383,7 @@ Developer Provided check base.tsx
 
 #### Defined in
 
-[client/internal/components/PropertyEntry/index.tsx:279](https://github.com/onzag/itemize/blob/f2db74a5/client/internal/components/PropertyEntry/index.tsx#L279)
+[client/internal/components/PropertyEntry/index.tsx:279](https://github.com/onzag/itemize/blob/a24376ed/client/internal/components/PropertyEntry/index.tsx#L279)
 
 ___
 
@@ -371,7 +397,7 @@ Context Provided, Standard Handler Only
 
 #### Defined in
 
-[client/internal/components/PropertyEntry/index.tsx:392](https://github.com/onzag/itemize/blob/f2db74a5/client/internal/components/PropertyEntry/index.tsx#L392)
+[client/internal/components/PropertyEntry/index.tsx:406](https://github.com/onzag/itemize/blob/a24376ed/client/internal/components/PropertyEntry/index.tsx#L406)
 
 ___
 
@@ -391,7 +417,7 @@ Developer Provided check base.tsx
 
 #### Defined in
 
-[client/internal/components/PropertyEntry/index.tsx:299](https://github.com/onzag/itemize/blob/f2db74a5/client/internal/components/PropertyEntry/index.tsx#L299)
+[client/internal/components/PropertyEntry/index.tsx:299](https://github.com/onzag/itemize/blob/a24376ed/client/internal/components/PropertyEntry/index.tsx#L299)
 
 ___
 
@@ -410,7 +436,7 @@ retrieved from the item-definition.tsx context
 
 #### Defined in
 
-[client/internal/components/PropertyEntry/index.tsx:179](https://github.com/onzag/itemize/blob/f2db74a5/client/internal/components/PropertyEntry/index.tsx#L179)
+[client/internal/components/PropertyEntry/index.tsx:179](https://github.com/onzag/itemize/blob/a24376ed/client/internal/components/PropertyEntry/index.tsx#L179)
 
 ___
 
@@ -430,7 +456,7 @@ retrieved from the item-definition.tsx context
 
 #### Defined in
 
-[client/internal/components/PropertyEntry/index.tsx:165](https://github.com/onzag/itemize/blob/f2db74a5/client/internal/components/PropertyEntry/index.tsx#L165)
+[client/internal/components/PropertyEntry/index.tsx:165](https://github.com/onzag/itemize/blob/a24376ed/client/internal/components/PropertyEntry/index.tsx#L165)
 
 ___
 
@@ -444,7 +470,7 @@ Context Provided, Standard Handler Only
 
 #### Defined in
 
-[client/internal/components/PropertyEntry/index.tsx:374](https://github.com/onzag/itemize/blob/f2db74a5/client/internal/components/PropertyEntry/index.tsx#L374)
+[client/internal/components/PropertyEntry/index.tsx:388](https://github.com/onzag/itemize/blob/a24376ed/client/internal/components/PropertyEntry/index.tsx#L388)
 
 ___
 
@@ -464,7 +490,7 @@ value if it has its own
 
 #### Defined in
 
-[client/internal/components/PropertyEntry/index.tsx:428](https://github.com/onzag/itemize/blob/f2db74a5/client/internal/components/PropertyEntry/index.tsx#L428)
+[client/internal/components/PropertyEntry/index.tsx:442](https://github.com/onzag/itemize/blob/a24376ed/client/internal/components/PropertyEntry/index.tsx#L442)
 
 ___
 
@@ -483,7 +509,7 @@ calculated from the item-definition.tsx context
 
 #### Defined in
 
-[client/internal/components/PropertyEntry/index.tsx:241](https://github.com/onzag/itemize/blob/f2db74a5/client/internal/components/PropertyEntry/index.tsx#L241)
+[client/internal/components/PropertyEntry/index.tsx:241](https://github.com/onzag/itemize/blob/a24376ed/client/internal/components/PropertyEntry/index.tsx#L241)
 
 ___
 
@@ -502,7 +528,7 @@ Developer provided check base.tsx
 
 #### Defined in
 
-[client/internal/components/PropertyEntry/index.tsx:319](https://github.com/onzag/itemize/blob/f2db74a5/client/internal/components/PropertyEntry/index.tsx#L319)
+[client/internal/components/PropertyEntry/index.tsx:319](https://github.com/onzag/itemize/blob/a24376ed/client/internal/components/PropertyEntry/index.tsx#L319)
 
 ___
 
@@ -521,7 +547,7 @@ retrieved from the item-definition.tsx context
 
 #### Defined in
 
-[client/internal/components/PropertyEntry/index.tsx:186](https://github.com/onzag/itemize/blob/f2db74a5/client/internal/components/PropertyEntry/index.tsx#L186)
+[client/internal/components/PropertyEntry/index.tsx:186](https://github.com/onzag/itemize/blob/a24376ed/client/internal/components/PropertyEntry/index.tsx#L186)
 
 ___
 
@@ -543,7 +569,7 @@ Calculated, Standard Handler Only
 
 #### Defined in
 
-[client/internal/components/PropertyEntry/index.tsx:409](https://github.com/onzag/itemize/blob/f2db74a5/client/internal/components/PropertyEntry/index.tsx#L409)
+[client/internal/components/PropertyEntry/index.tsx:423](https://github.com/onzag/itemize/blob/a24376ed/client/internal/components/PropertyEntry/index.tsx#L423)
 
 ___
 
@@ -566,7 +592,7 @@ Calculated, Standard Handler Only
 
 #### Defined in
 
-[client/internal/components/PropertyEntry/index.tsx:420](https://github.com/onzag/itemize/blob/f2db74a5/client/internal/components/PropertyEntry/index.tsx#L420)
+[client/internal/components/PropertyEntry/index.tsx:434](https://github.com/onzag/itemize/blob/a24376ed/client/internal/components/PropertyEntry/index.tsx#L434)
 
 ___
 
@@ -580,7 +606,7 @@ Context Provided, Standard Handler Only
 
 #### Defined in
 
-[client/internal/components/PropertyEntry/index.tsx:380](https://github.com/onzag/itemize/blob/f2db74a5/client/internal/components/PropertyEntry/index.tsx#L380)
+[client/internal/components/PropertyEntry/index.tsx:394](https://github.com/onzag/itemize/blob/a24376ed/client/internal/components/PropertyEntry/index.tsx#L394)
 
 ___
 
@@ -595,7 +621,7 @@ Context Provided, Conditional, Standard Handler Only
 
 #### Defined in
 
-[client/internal/components/PropertyEntry/index.tsx:367](https://github.com/onzag/itemize/blob/f2db74a5/client/internal/components/PropertyEntry/index.tsx#L367)
+[client/internal/components/PropertyEntry/index.tsx:381](https://github.com/onzag/itemize/blob/a24376ed/client/internal/components/PropertyEntry/index.tsx#L381)
 
 ___
 
@@ -615,7 +641,7 @@ filtered for this specific property from the item-definition.tsx context state v
 
 #### Defined in
 
-[client/internal/components/PropertyEntry/index.tsx:203](https://github.com/onzag/itemize/blob/f2db74a5/client/internal/components/PropertyEntry/index.tsx#L203)
+[client/internal/components/PropertyEntry/index.tsx:203](https://github.com/onzag/itemize/blob/a24376ed/client/internal/components/PropertyEntry/index.tsx#L203)
 
 ___
 
@@ -629,7 +655,24 @@ Context Provided, Conditional, Standard Handler Only
 
 #### Defined in
 
-[client/internal/components/PropertyEntry/index.tsx:360](https://github.com/onzag/itemize/blob/f2db74a5/client/internal/components/PropertyEntry/index.tsx#L360)
+[client/internal/components/PropertyEntry/index.tsx:374](https://github.com/onzag/itemize/blob/a24376ed/client/internal/components/PropertyEntry/index.tsx#L374)
+
+___
+
+### useAppliedValue
+
+• `Optional` **useAppliedValue**: `boolean`
+
+Use the applied value rather than the stateful value
+NOTE: this makes the field virtually readonly
+
+#### Inherited from
+
+[IPropertyEntryMainHandlerProps](client_internal_components_PropertyEntry.IPropertyEntryMainHandlerProps.md).[useAppliedValue](client_internal_components_PropertyEntry.IPropertyEntryMainHandlerProps.md#useappliedvalue)
+
+#### Defined in
+
+[client/internal/components/PropertyEntry/index.tsx:354](https://github.com/onzag/itemize/blob/a24376ed/client/internal/components/PropertyEntry/index.tsx#L354)
 
 ## Methods
 
@@ -658,7 +701,7 @@ same as the item-definition.tsx context function
 
 #### Defined in
 
-[client/internal/components/PropertyEntry/index.tsx:172](https://github.com/onzag/itemize/blob/f2db74a5/client/internal/components/PropertyEntry/index.tsx#L172)
+[client/internal/components/PropertyEntry/index.tsx:172](https://github.com/onzag/itemize/blob/a24376ed/client/internal/components/PropertyEntry/index.tsx#L172)
 
 ___
 
@@ -690,7 +733,7 @@ based on the change function from the item-definition.tsx context
 
 #### Defined in
 
-[client/internal/components/PropertyEntry/index.tsx:212](https://github.com/onzag/itemize/blob/f2db74a5/client/internal/components/PropertyEntry/index.tsx#L212)
+[client/internal/components/PropertyEntry/index.tsx:212](https://github.com/onzag/itemize/blob/a24376ed/client/internal/components/PropertyEntry/index.tsx#L212)
 
 ___
 
@@ -714,4 +757,4 @@ based on the restore function from the item-definition.tsx context
 
 #### Defined in
 
-[client/internal/components/PropertyEntry/index.tsx:220](https://github.com/onzag/itemize/blob/f2db74a5/client/internal/components/PropertyEntry/index.tsx#L220)
+[client/internal/components/PropertyEntry/index.tsx:220](https://github.com/onzag/itemize/blob/a24376ed/client/internal/components/PropertyEntry/index.tsx#L220)

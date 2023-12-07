@@ -30,4 +30,4 @@
 
 #### Defined in
 
-[server/user/rest.ts:16](https://github.com/onzag/itemize/blob/f2db74a5/server/user/rest.ts#L16)
+[server/user/rest.ts:16](https://github.com/onzag/itemize/blob/a24376ed/server/user/rest.ts#L16)

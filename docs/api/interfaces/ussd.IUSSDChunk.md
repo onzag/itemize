@@ -21,7 +21,7 @@ Represents actions that belong to this chunk
 
 #### Defined in
 
-[ussd/index.ts:47](https://github.com/onzag/itemize/blob/f2db74a5/ussd/index.ts#L47)
+[ussd/index.ts:47](https://github.com/onzag/itemize/blob/a24376ed/ussd/index.ts#L47)
 
 ___
 
@@ -37,4 +37,4 @@ content you should go to its children chunks
 
 #### Defined in
 
-[ussd/index.ts:42](https://github.com/onzag/itemize/blob/f2db74a5/ussd/index.ts#L42)
+[ussd/index.ts:42](https://github.com/onzag/itemize/blob/a24376ed/ussd/index.ts#L42)

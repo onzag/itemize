@@ -30,7 +30,7 @@ A subscription has popped up (was created) or changed and it's in a active state
 
 #### Defined in
 
-[server/services/base/PaymentProvider.ts:62](https://github.com/onzag/itemize/blob/f2db74a5/server/services/base/PaymentProvider.ts#L62)
+[server/services/base/PaymentProvider.ts:62](https://github.com/onzag/itemize/blob/a24376ed/server/services/base/PaymentProvider.ts#L62)
 
 ___
 
@@ -45,7 +45,7 @@ the payment begins to exist
 
 #### Defined in
 
-[server/services/base/PaymentProvider.ts:30](https://github.com/onzag/itemize/blob/f2db74a5/server/services/base/PaymentProvider.ts#L30)
+[server/services/base/PaymentProvider.ts:30](https://github.com/onzag/itemize/blob/a24376ed/server/services/base/PaymentProvider.ts#L30)
 
 ___
 
@@ -58,7 +58,7 @@ made it go null, or a delete event rid of the row
 
 #### Defined in
 
-[server/services/base/PaymentProvider.ts:35](https://github.com/onzag/itemize/blob/f2db74a5/server/services/base/PaymentProvider.ts#L35)
+[server/services/base/PaymentProvider.ts:35](https://github.com/onzag/itemize/blob/a24376ed/server/services/base/PaymentProvider.ts#L35)
 
 ___
 
@@ -71,7 +71,7 @@ use this state for
 
 #### Defined in
 
-[server/services/base/PaymentProvider.ts:49](https://github.com/onzag/itemize/blob/f2db74a5/server/services/base/PaymentProvider.ts#L49)
+[server/services/base/PaymentProvider.ts:49](https://github.com/onzag/itemize/blob/a24376ed/server/services/base/PaymentProvider.ts#L49)
 
 ___
 
@@ -83,7 +83,7 @@ A subscription has popped up (was created) or changed and it's in a inactive sta
 
 #### Defined in
 
-[server/services/base/PaymentProvider.ts:58](https://github.com/onzag/itemize/blob/f2db74a5/server/services/base/PaymentProvider.ts#L58)
+[server/services/base/PaymentProvider.ts:58](https://github.com/onzag/itemize/blob/a24376ed/server/services/base/PaymentProvider.ts#L58)
 
 ___
 
@@ -96,7 +96,7 @@ note that this state is for when refunds are paid as well
 
 #### Defined in
 
-[server/services/base/PaymentProvider.ts:44](https://github.com/onzag/itemize/blob/f2db74a5/server/services/base/PaymentProvider.ts#L44)
+[server/services/base/PaymentProvider.ts:44](https://github.com/onzag/itemize/blob/a24376ed/server/services/base/PaymentProvider.ts#L44)
 
 ___
 
@@ -108,7 +108,7 @@ A payment popped up (was created) or changed and is in a pending state
 
 #### Defined in
 
-[server/services/base/PaymentProvider.ts:39](https://github.com/onzag/itemize/blob/f2db74a5/server/services/base/PaymentProvider.ts#L39)
+[server/services/base/PaymentProvider.ts:39](https://github.com/onzag/itemize/blob/a24376ed/server/services/base/PaymentProvider.ts#L39)
 
 ___
 
@@ -121,4 +121,4 @@ A payment has been reversed from its disputed state
 
 #### Defined in
 
-[server/services/base/PaymentProvider.ts:54](https://github.com/onzag/itemize/blob/f2db74a5/server/services/base/PaymentProvider.ts#L54)
+[server/services/base/PaymentProvider.ts:54](https://github.com/onzag/itemize/blob/a24376ed/server/services/base/PaymentProvider.ts#L54)

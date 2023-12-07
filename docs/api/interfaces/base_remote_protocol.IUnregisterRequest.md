@@ -28,7 +28,7 @@ This mirrors [IRegisterRequest](base_remote_protocol.IRegisterRequest.md)
 
 #### Defined in
 
-[base/remote-protocol.ts:260](https://github.com/onzag/itemize/blob/f2db74a5/base/remote-protocol.ts#L260)
+[base/remote-protocol.ts:260](https://github.com/onzag/itemize/blob/a24376ed/base/remote-protocol.ts#L260)
 
 ___
 
@@ -38,7 +38,7 @@ ___
 
 #### Defined in
 
-[base/remote-protocol.ts:259](https://github.com/onzag/itemize/blob/f2db74a5/base/remote-protocol.ts#L259)
+[base/remote-protocol.ts:259](https://github.com/onzag/itemize/blob/a24376ed/base/remote-protocol.ts#L259)
 
 ___
 
@@ -48,4 +48,4 @@ ___
 
 #### Defined in
 
-[base/remote-protocol.ts:261](https://github.com/onzag/itemize/blob/f2db74a5/base/remote-protocol.ts#L261)
+[base/remote-protocol.ts:261](https://github.com/onzag/itemize/blob/a24376ed/base/remote-protocol.ts#L261)

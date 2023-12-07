@@ -8,6 +8,7 @@
 
 - [deleteItemDefinition](server_resolvers_actions_delete.md#deleteitemdefinition)
 - [deleteItemDefinitionFn](server_resolvers_actions_delete.md#deleteitemdefinitionfn)
+- [deleteItemDefinitionFnRQ](server_resolvers_actions_delete.md#deleteitemdefinitionfnrq)
 
 ## Functions
 
@@ -29,7 +30,7 @@
 
 #### Defined in
 
-[server/resolvers/actions/delete.ts:29](https://github.com/onzag/itemize/blob/f2db74a5/server/resolvers/actions/delete.ts#L29)
+[server/resolvers/actions/delete.ts:30](https://github.com/onzag/itemize/blob/a24376ed/server/resolvers/actions/delete.ts#L30)
 
 ___
 
@@ -49,4 +50,24 @@ ___
 
 #### Defined in
 
-[server/resolvers/actions/delete.ts:359](https://github.com/onzag/itemize/blob/f2db74a5/server/resolvers/actions/delete.ts#L359)
+[server/resolvers/actions/delete.ts:413](https://github.com/onzag/itemize/blob/a24376ed/server/resolvers/actions/delete.ts#L413)
+
+___
+
+### deleteItemDefinitionFnRQ
+
+▸ **deleteItemDefinitionFnRQ**(`appData`): [`FRQIdefResolverType`](base_Root_rq.md#frqidefresolvertype)
+
+#### Parameters
+
+| Name | Type |
+| :------ | :------ |
+| `appData` | [`IAppDataType`](../interfaces/server.IAppDataType.md) |
+
+#### Returns
+
+[`FRQIdefResolverType`](base_Root_rq.md#frqidefresolvertype)
+
+#### Defined in
+
+[server/resolvers/actions/delete.ts:417](https://github.com/onzag/itemize/blob/a24376ed/server/resolvers/actions/delete.ts#L417)

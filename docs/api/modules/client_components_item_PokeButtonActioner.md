@@ -35,4 +35,4 @@ a react node
 
 #### Defined in
 
-[client/components/item/PokeButtonActioner.tsx:61](https://github.com/onzag/itemize/blob/f2db74a5/client/components/item/PokeButtonActioner.tsx#L61)
+[client/components/item/PokeButtonActioner.tsx:61](https://github.com/onzag/itemize/blob/a24376ed/client/components/item/PokeButtonActioner.tsx#L61)

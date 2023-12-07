@@ -19,7 +19,7 @@
 
 #### Defined in
 
-[server/services/base/USSDProvider.ts:51](https://github.com/onzag/itemize/blob/f2db74a5/server/services/base/USSDProvider.ts#L51)
+[server/services/base/USSDProvider.ts:51](https://github.com/onzag/itemize/blob/a24376ed/server/services/base/USSDProvider.ts#L51)
 
 ___
 
@@ -29,4 +29,4 @@ ___
 
 #### Defined in
 
-[server/services/base/USSDProvider.ts:50](https://github.com/onzag/itemize/blob/f2db74a5/server/services/base/USSDProvider.ts#L50)
+[server/services/base/USSDProvider.ts:50](https://github.com/onzag/itemize/blob/a24376ed/server/services/base/USSDProvider.ts#L50)

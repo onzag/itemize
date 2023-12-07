@@ -66,7 +66,7 @@ React.Component&lt;ITitleSetterProps, {}\&gt;.constructor
 
 #### Defined in
 
-[client/components/util/TitleSetter.tsx:79](https://github.com/onzag/itemize/blob/f2db74a5/client/components/util/TitleSetter.tsx#L79)
+[client/components/util/TitleSetter.tsx:106](https://github.com/onzag/itemize/blob/a24376ed/client/components/util/TitleSetter.tsx#L106)
 
 ## Properties
 
@@ -573,7 +573,7 @@ React.Component.render
 
 #### Defined in
 
-[client/components/util/TitleSetter.tsx:82](https://github.com/onzag/itemize/blob/f2db74a5/client/components/util/TitleSetter.tsx#L82)
+[client/components/util/TitleSetter.tsx:109](https://github.com/onzag/itemize/blob/a24376ed/client/components/util/TitleSetter.tsx#L109)
 
 ___
 

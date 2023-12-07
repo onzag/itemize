@@ -30,7 +30,7 @@
 
 #### Defined in
 
-[client/components/util/BaseSyncer.tsx:9](https://github.com/onzag/itemize/blob/f2db74a5/client/components/util/BaseSyncer.tsx#L9)
+[client/components/util/BaseSyncer.tsx:6](https://github.com/onzag/itemize/blob/a24376ed/client/components/util/BaseSyncer.tsx#L6)
 
 ___
 
@@ -50,7 +50,7 @@ ___
 
 #### Defined in
 
-[client/components/util/BaseSyncer.tsx:10](https://github.com/onzag/itemize/blob/f2db74a5/client/components/util/BaseSyncer.tsx#L10)
+[client/components/util/BaseSyncer.tsx:7](https://github.com/onzag/itemize/blob/a24376ed/client/components/util/BaseSyncer.tsx#L7)
 
 ___
 
@@ -71,4 +71,4 @@ ___
 
 #### Defined in
 
-[client/components/util/BaseSyncer.tsx:11](https://github.com/onzag/itemize/blob/f2db74a5/client/components/util/BaseSyncer.tsx#L11)
+[client/components/util/BaseSyncer.tsx:8](https://github.com/onzag/itemize/blob/a24376ed/client/components/util/BaseSyncer.tsx#L8)

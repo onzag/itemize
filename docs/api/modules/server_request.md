@@ -32,4 +32,4 @@
 
 #### Defined in
 
-[server/request.ts:26](https://github.com/onzag/itemize/blob/f2db74a5/server/request.ts#L26)
+[server/request.ts:28](https://github.com/onzag/itemize/blob/a24376ed/server/request.ts#L28)

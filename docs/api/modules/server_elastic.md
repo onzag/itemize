@@ -11,5 +11,6 @@
 
 ### Interfaces
 
+- [IElasticChildrenRule](../interfaces/server_elastic.IElasticChildrenRule.md)
 - [IElasticPing](../interfaces/server_elastic.IElasticPing.md)
 - [IPingEvent](../interfaces/server_elastic.IPingEvent.md)

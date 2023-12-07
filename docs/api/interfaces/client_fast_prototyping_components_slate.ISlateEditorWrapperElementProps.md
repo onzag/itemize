@@ -36,7 +36,7 @@ be returned
 
 #### Defined in
 
-[client/fast-prototyping/components/slate/index.tsx:751](https://github.com/onzag/itemize/blob/f2db74a5/client/fast-prototyping/components/slate/index.tsx#L751)
+[client/fast-prototyping/components/slate/index.tsx:764](https://github.com/onzag/itemize/blob/a24376ed/client/fast-prototyping/components/slate/index.tsx#L764)
 
 ___
 
@@ -48,7 +48,7 @@ The element being selected
 
 #### Defined in
 
-[client/fast-prototyping/components/slate/index.tsx:734](https://github.com/onzag/itemize/blob/f2db74a5/client/fast-prototyping/components/slate/index.tsx#L734)
+[client/fast-prototyping/components/slate/index.tsx:747](https://github.com/onzag/itemize/blob/a24376ed/client/fast-prototyping/components/slate/index.tsx#L747)
 
 ___
 
@@ -60,7 +60,7 @@ The feature support
 
 #### Defined in
 
-[client/fast-prototyping/components/slate/index.tsx:755](https://github.com/onzag/itemize/blob/f2db74a5/client/fast-prototyping/components/slate/index.tsx#L755)
+[client/fast-prototyping/components/slate/index.tsx:768](https://github.com/onzag/itemize/blob/a24376ed/client/fast-prototyping/components/slate/index.tsx#L768)
 
 ___
 
@@ -72,7 +72,7 @@ The helpers functions
 
 #### Defined in
 
-[client/fast-prototyping/components/slate/index.tsx:746](https://github.com/onzag/itemize/blob/f2db74a5/client/fast-prototyping/components/slate/index.tsx#L746)
+[client/fast-prototyping/components/slate/index.tsx:759](https://github.com/onzag/itemize/blob/a24376ed/client/fast-prototyping/components/slate/index.tsx#L759)
 
 ___
 
@@ -84,7 +84,7 @@ wether is selected
 
 #### Defined in
 
-[client/fast-prototyping/components/slate/index.tsx:742](https://github.com/onzag/itemize/blob/f2db74a5/client/fast-prototyping/components/slate/index.tsx#L742)
+[client/fast-prototyping/components/slate/index.tsx:755](https://github.com/onzag/itemize/blob/a24376ed/client/fast-prototyping/components/slate/index.tsx#L755)
 
 ___
 
@@ -96,4 +96,4 @@ Whether the selection is primary
 
 #### Defined in
 
-[client/fast-prototyping/components/slate/index.tsx:738](https://github.com/onzag/itemize/blob/f2db74a5/client/fast-prototyping/components/slate/index.tsx#L738)
+[client/fast-prototyping/components/slate/index.tsx:751](https://github.com/onzag/itemize/blob/a24376ed/client/fast-prototyping/components/slate/index.tsx#L751)

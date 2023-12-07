@@ -22,7 +22,7 @@ These represent the enum of the include and exclusion state of an include
 
 #### Defined in
 
-[base/Root/Module/ItemDefinition/Include/index.ts:27](https://github.com/onzag/itemize/blob/f2db74a5/base/Root/Module/ItemDefinition/Include/index.ts#L27)
+[base/Root/Module/ItemDefinition/Include/index.ts:27](https://github.com/onzag/itemize/blob/a24376ed/base/Root/Module/ItemDefinition/Include/index.ts#L27)
 
 ___
 
@@ -32,7 +32,7 @@ ___
 
 #### Defined in
 
-[base/Root/Module/ItemDefinition/Include/index.ts:25](https://github.com/onzag/itemize/blob/f2db74a5/base/Root/Module/ItemDefinition/Include/index.ts#L25)
+[base/Root/Module/ItemDefinition/Include/index.ts:25](https://github.com/onzag/itemize/blob/a24376ed/base/Root/Module/ItemDefinition/Include/index.ts#L25)
 
 ___
 
@@ -42,4 +42,4 @@ ___
 
 #### Defined in
 
-[base/Root/Module/ItemDefinition/Include/index.ts:26](https://github.com/onzag/itemize/blob/f2db74a5/base/Root/Module/ItemDefinition/Include/index.ts#L26)
+[base/Root/Module/ItemDefinition/Include/index.ts:26](https://github.com/onzag/itemize/blob/a24376ed/base/Root/Module/ItemDefinition/Include/index.ts#L26)

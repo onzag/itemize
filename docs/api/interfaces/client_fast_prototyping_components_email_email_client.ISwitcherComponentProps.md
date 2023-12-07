@@ -22,7 +22,7 @@
 
 #### Defined in
 
-[client/fast-prototyping/components/email/email-client.tsx:152](https://github.com/onzag/itemize/blob/f2db74a5/client/fast-prototyping/components/email/email-client.tsx#L152)
+[client/fast-prototyping/components/email/email-client.tsx:152](https://github.com/onzag/itemize/blob/a24376ed/client/fast-prototyping/components/email/email-client.tsx#L152)
 
 ## Methods
 
@@ -43,4 +43,4 @@
 
 #### Defined in
 
-[client/fast-prototyping/components/email/email-client.tsx:153](https://github.com/onzag/itemize/blob/f2db74a5/client/fast-prototyping/components/email/email-client.tsx#L153)
+[client/fast-prototyping/components/email/email-client.tsx:153](https://github.com/onzag/itemize/blob/a24376ed/client/fast-prototyping/components/email/email-client.tsx#L153)

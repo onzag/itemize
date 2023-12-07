@@ -17,10 +17,12 @@ A response given by search
 ### Properties
 
 - [cached](client_providers_item.IActionResponseWithSearchResults.md#cached)
+- [cancelled](client_providers_item.IActionResponseWithSearchResults.md#cancelled)
 - [count](client_providers_item.IActionResponseWithSearchResults.md#count)
 - [error](client_providers_item.IActionResponseWithSearchResults.md#error)
 - [limit](client_providers_item.IActionResponseWithSearchResults.md#limit)
 - [offset](client_providers_item.IActionResponseWithSearchResults.md#offset)
+- [polyfilled](client_providers_item.IActionResponseWithSearchResults.md#polyfilled)
 - [records](client_providers_item.IActionResponseWithSearchResults.md#records)
 - [results](client_providers_item.IActionResponseWithSearchResults.md#results)
 - [searchId](client_providers_item.IActionResponseWithSearchResults.md#searchid)
@@ -33,7 +35,19 @@ A response given by search
 
 #### Defined in
 
-[client/providers/item.tsx:176](https://github.com/onzag/itemize/blob/f2db74a5/client/providers/item.tsx#L176)
+[client/providers/item.tsx:203](https://github.com/onzag/itemize/blob/a24376ed/client/providers/item.tsx#L203)
+
+___
+
+### cancelled
+
+• **cancelled**: `boolean`
+
+Only truly relevant when pileSearch is used
+
+#### Defined in
+
+[client/providers/item.tsx:208](https://github.com/onzag/itemize/blob/a24376ed/client/providers/item.tsx#L208)
 
 ___
 
@@ -43,7 +57,7 @@ ___
 
 #### Defined in
 
-[client/providers/item.tsx:173](https://github.com/onzag/itemize/blob/f2db74a5/client/providers/item.tsx#L173)
+[client/providers/item.tsx:200](https://github.com/onzag/itemize/blob/a24376ed/client/providers/item.tsx#L200)
 
 ___
 
@@ -57,7 +71,7 @@ ___
 
 #### Defined in
 
-[client/providers/item.tsx:141](https://github.com/onzag/itemize/blob/f2db74a5/client/providers/item.tsx#L141)
+[client/providers/item.tsx:168](https://github.com/onzag/itemize/blob/a24376ed/client/providers/item.tsx#L168)
 
 ___
 
@@ -67,7 +81,7 @@ ___
 
 #### Defined in
 
-[client/providers/item.tsx:174](https://github.com/onzag/itemize/blob/f2db74a5/client/providers/item.tsx#L174)
+[client/providers/item.tsx:201](https://github.com/onzag/itemize/blob/a24376ed/client/providers/item.tsx#L201)
 
 ___
 
@@ -77,7 +91,17 @@ ___
 
 #### Defined in
 
-[client/providers/item.tsx:175](https://github.com/onzag/itemize/blob/f2db74a5/client/providers/item.tsx#L175)
+[client/providers/item.tsx:202](https://github.com/onzag/itemize/blob/a24376ed/client/providers/item.tsx#L202)
+
+___
+
+### polyfilled
+
+• **polyfilled**: `boolean`
+
+#### Defined in
+
+[client/providers/item.tsx:204](https://github.com/onzag/itemize/blob/a24376ed/client/providers/item.tsx#L204)
 
 ___
 
@@ -87,7 +111,7 @@ ___
 
 #### Defined in
 
-[client/providers/item.tsx:171](https://github.com/onzag/itemize/blob/f2db74a5/client/providers/item.tsx#L171)
+[client/providers/item.tsx:198](https://github.com/onzag/itemize/blob/a24376ed/client/providers/item.tsx#L198)
 
 ___
 
@@ -97,7 +121,7 @@ ___
 
 #### Defined in
 
-[client/providers/item.tsx:172](https://github.com/onzag/itemize/blob/f2db74a5/client/providers/item.tsx#L172)
+[client/providers/item.tsx:199](https://github.com/onzag/itemize/blob/a24376ed/client/providers/item.tsx#L199)
 
 ___
 
@@ -107,4 +131,4 @@ ___
 
 #### Defined in
 
-[client/providers/item.tsx:170](https://github.com/onzag/itemize/blob/f2db74a5/client/providers/item.tsx#L170)
+[client/providers/item.tsx:197](https://github.com/onzag/itemize/blob/a24376ed/client/providers/item.tsx#L197)

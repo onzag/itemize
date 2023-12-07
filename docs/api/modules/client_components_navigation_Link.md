@@ -25,4 +25,4 @@ language if the location is absolute
 
 #### Defined in
 
-[client/components/navigation/Link.tsx:78](https://github.com/onzag/itemize/blob/f2db74a5/client/components/navigation/Link.tsx#L78)
+[client/components/navigation/Link.tsx:100](https://github.com/onzag/itemize/blob/a24376ed/client/components/navigation/Link.tsx#L100)

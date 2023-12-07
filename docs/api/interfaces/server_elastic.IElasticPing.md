@@ -32,7 +32,7 @@
 
 #### Defined in
 
-[server/elastic.ts:19](https://github.com/onzag/itemize/blob/f2db74a5/server/elastic.ts#L19)
+[server/elastic.ts:38](https://github.com/onzag/itemize/blob/a24376ed/server/elastic.ts#L38)
 
 ___
 
@@ -42,7 +42,7 @@ ___
 
 #### Defined in
 
-[server/elastic.ts:18](https://github.com/onzag/itemize/blob/f2db74a5/server/elastic.ts#L18)
+[server/elastic.ts:37](https://github.com/onzag/itemize/blob/a24376ed/server/elastic.ts#L37)
 
 ___
 
@@ -52,4 +52,4 @@ ___
 
 #### Defined in
 
-[server/elastic.ts:17](https://github.com/onzag/itemize/blob/f2db74a5/server/elastic.ts#L17)
+[server/elastic.ts:36](https://github.com/onzag/itemize/blob/a24376ed/server/elastic.ts#L36)

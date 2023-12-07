@@ -29,7 +29,7 @@ These are the args that the graphql query needs to take
 
 #### Defined in
 
-[server/custom-graphql/index.ts:80](https://github.com/onzag/itemize/blob/f2db74a5/server/custom-graphql/index.ts#L80)
+[server/custom-graphql/index.ts:80](https://github.com/onzag/itemize/blob/a24376ed/server/custom-graphql/index.ts#L80)
 
 ## Methods
 
@@ -56,4 +56,4 @@ This is the resolve function on how to resolve this graphql query
 
 #### Defined in
 
-[server/custom-graphql/index.ts:60](https://github.com/onzag/itemize/blob/f2db74a5/server/custom-graphql/index.ts#L60)
+[server/custom-graphql/index.ts:60](https://github.com/onzag/itemize/blob/a24376ed/server/custom-graphql/index.ts#L60)

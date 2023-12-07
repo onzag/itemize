@@ -26,4 +26,4 @@
 
 #### Defined in
 
-[client/components/property/ReaderMany.tsx:68](https://github.com/onzag/itemize/blob/f2db74a5/client/components/property/ReaderMany.tsx#L68)
+[client/components/property/ReaderMany.tsx:68](https://github.com/onzag/itemize/blob/a24376ed/client/components/property/ReaderMany.tsx#L68)

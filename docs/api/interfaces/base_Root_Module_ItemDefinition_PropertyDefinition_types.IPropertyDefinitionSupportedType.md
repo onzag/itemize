@@ -19,6 +19,7 @@ How every supported type behaviour should be described
 - [allowsMaxDecimalCountDefined](base_Root_Module_ItemDefinition_PropertyDefinition_types.IPropertyDefinitionSupportedType.md#allowsmaxdecimalcountdefined)
 - [allowsMinMaxDefined](base_Root_Module_ItemDefinition_PropertyDefinition_types.IPropertyDefinitionSupportedType.md#allowsminmaxdefined)
 - [allowsMinMaxLengthDefined](base_Root_Module_ItemDefinition_PropertyDefinition_types.IPropertyDefinitionSupportedType.md#allowsminmaxlengthdefined)
+- [configOptions](base_Root_Module_ItemDefinition_PropertyDefinition_types.IPropertyDefinitionSupportedType.md#configoptions)
 - [gql](base_Root_Module_ItemDefinition_PropertyDefinition_types.IPropertyDefinitionSupportedType.md#gql)
 - [gqlAddFileToFields](base_Root_Module_ItemDefinition_PropertyDefinition_types.IPropertyDefinitionSupportedType.md#gqladdfiletofields)
 - [gqlFields](base_Root_Module_ItemDefinition_PropertyDefinition_types.IPropertyDefinitionSupportedType.md#gqlfields)
@@ -27,9 +28,9 @@ How every supported type behaviour should be described
 - [json](base_Root_Module_ItemDefinition_PropertyDefinition_types.IPropertyDefinitionSupportedType.md#json)
 - [ownLanguageProperty](base_Root_Module_ItemDefinition_PropertyDefinition_types.IPropertyDefinitionSupportedType.md#ownlanguageproperty)
 - [requiresValues](base_Root_Module_ItemDefinition_PropertyDefinition_types.IPropertyDefinitionSupportedType.md#requiresvalues)
+- [rq](base_Root_Module_ItemDefinition_PropertyDefinition_types.IPropertyDefinitionSupportedType.md#rq)
 - [searchInterface](base_Root_Module_ItemDefinition_PropertyDefinition_types.IPropertyDefinitionSupportedType.md#searchinterface)
 - [searchable](base_Root_Module_ItemDefinition_PropertyDefinition_types.IPropertyDefinitionSupportedType.md#searchable)
-- [config](base_Root_Module_ItemDefinition_PropertyDefinition_types.IPropertyDefinitionSupportedType.md#config)
 - [supportedSubtypes](base_Root_Module_ItemDefinition_PropertyDefinition_types.IPropertyDefinitionSupportedType.md#supportedsubtypes)
 
 ### Methods
@@ -72,7 +73,7 @@ and contains decimal
 
 #### Defined in
 
-[base/Root/Module/ItemDefinition/PropertyDefinition/types/index.ts:457](https://github.com/onzag/itemize/blob/f2db74a5/base/Root/Module/ItemDefinition/PropertyDefinition/types/index.ts#L457)
+[base/Root/Module/ItemDefinition/PropertyDefinition/types/index.ts:472](https://github.com/onzag/itemize/blob/a24376ed/base/Root/Module/ItemDefinition/PropertyDefinition/types/index.ts#L472)
 
 ___
 
@@ -85,7 +86,7 @@ some way numeric
 
 #### Defined in
 
-[base/Root/Module/ItemDefinition/PropertyDefinition/types/index.ts:452](https://github.com/onzag/itemize/blob/f2db74a5/base/Root/Module/ItemDefinition/PropertyDefinition/types/index.ts#L452)
+[base/Root/Module/ItemDefinition/PropertyDefinition/types/index.ts:467](https://github.com/onzag/itemize/blob/a24376ed/base/Root/Module/ItemDefinition/PropertyDefinition/types/index.ts#L467)
 
 ___
 
@@ -98,7 +99,19 @@ but a combination of things, eg. characters, files,
 
 #### Defined in
 
-[base/Root/Module/ItemDefinition/PropertyDefinition/types/index.ts:462](https://github.com/onzag/itemize/blob/f2db74a5/base/Root/Module/ItemDefinition/PropertyDefinition/types/index.ts#L462)
+[base/Root/Module/ItemDefinition/PropertyDefinition/types/index.ts:477](https://github.com/onzag/itemize/blob/a24376ed/base/Root/Module/ItemDefinition/PropertyDefinition/types/index.ts#L477)
+
+___
+
+### configOptions
+
+• `Optional` **configOptions**: { `name`: `string` ; `required?`: `boolean` \| `string`[] ; `type`: ``"string"`` \| ``"number"`` \| ``"boolean"`` \| ``"property-set"`` \| ``"any"`` \| ``"array-string"`` \| ``"array-number"`` \| ``"array-boolean"``  }[]
+
+special attributes that might be added specific to that type
+
+#### Defined in
+
+[base/Root/Module/ItemDefinition/PropertyDefinition/types/index.ts:458](https://github.com/onzag/itemize/blob/a24376ed/base/Root/Module/ItemDefinition/PropertyDefinition/types/index.ts#L458)
 
 ___
 
@@ -111,7 +124,7 @@ gqlFields should be defined
 
 #### Defined in
 
-[base/Root/Module/ItemDefinition/PropertyDefinition/types/index.ts:250](https://github.com/onzag/itemize/blob/f2db74a5/base/Root/Module/ItemDefinition/PropertyDefinition/types/index.ts#L250)
+[base/Root/Module/ItemDefinition/PropertyDefinition/types/index.ts:261](https://github.com/onzag/itemize/blob/a24376ed/base/Root/Module/ItemDefinition/PropertyDefinition/types/index.ts#L261)
 
 ___
 
@@ -125,7 +138,7 @@ to worry about the validation of file fields
 
 #### Defined in
 
-[base/Root/Module/ItemDefinition/PropertyDefinition/types/index.ts:265](https://github.com/onzag/itemize/blob/f2db74a5/base/Root/Module/ItemDefinition/PropertyDefinition/types/index.ts#L265)
+[base/Root/Module/ItemDefinition/PropertyDefinition/types/index.ts:280](https://github.com/onzag/itemize/blob/a24376ed/base/Root/Module/ItemDefinition/PropertyDefinition/types/index.ts#L280)
 
 ___
 
@@ -138,7 +151,7 @@ types, only basic types are allowed
 
 #### Defined in
 
-[base/Root/Module/ItemDefinition/PropertyDefinition/types/index.ts:255](https://github.com/onzag/itemize/blob/f2db74a5/base/Root/Module/ItemDefinition/PropertyDefinition/types/index.ts#L255)
+[base/Root/Module/ItemDefinition/PropertyDefinition/types/index.ts:270](https://github.com/onzag/itemize/blob/a24376ed/base/Root/Module/ItemDefinition/PropertyDefinition/types/index.ts#L270)
 
 ___
 
@@ -150,7 +163,7 @@ Whether this object represents a list, this affects everything
 
 #### Defined in
 
-[base/Root/Module/ItemDefinition/PropertyDefinition/types/index.ts:259](https://github.com/onzag/itemize/blob/f2db74a5/base/Root/Module/ItemDefinition/PropertyDefinition/types/index.ts#L259)
+[base/Root/Module/ItemDefinition/PropertyDefinition/types/index.ts:274](https://github.com/onzag/itemize/blob/a24376ed/base/Root/Module/ItemDefinition/PropertyDefinition/types/index.ts#L274)
 
 ___
 
@@ -182,7 +195,7 @@ these will be used for checking more than anything
 
 #### Defined in
 
-[base/Root/Module/ItemDefinition/PropertyDefinition/types/index.ts:473](https://github.com/onzag/itemize/blob/f2db74a5/base/Root/Module/ItemDefinition/PropertyDefinition/types/index.ts#L473)
+[base/Root/Module/ItemDefinition/PropertyDefinition/types/index.ts:488](https://github.com/onzag/itemize/blob/a24376ed/base/Root/Module/ItemDefinition/PropertyDefinition/types/index.ts#L488)
 
 ___
 
@@ -198,7 +211,7 @@ as types that are not settable do not have a json form
 
 #### Defined in
 
-[base/Root/Module/ItemDefinition/PropertyDefinition/types/index.ts:234](https://github.com/onzag/itemize/blob/f2db74a5/base/Root/Module/ItemDefinition/PropertyDefinition/types/index.ts#L234)
+[base/Root/Module/ItemDefinition/PropertyDefinition/types/index.ts:245](https://github.com/onzag/itemize/blob/a24376ed/base/Root/Module/ItemDefinition/PropertyDefinition/types/index.ts#L245)
 
 ___
 
@@ -210,7 +223,7 @@ whether it has an own language property
 
 #### Defined in
 
-[base/Root/Module/ItemDefinition/PropertyDefinition/types/index.ts:244](https://github.com/onzag/itemize/blob/f2db74a5/base/Root/Module/ItemDefinition/PropertyDefinition/types/index.ts#L244)
+[base/Root/Module/ItemDefinition/PropertyDefinition/types/index.ts:255](https://github.com/onzag/itemize/blob/a24376ed/base/Root/Module/ItemDefinition/PropertyDefinition/types/index.ts#L255)
 
 ___
 
@@ -222,7 +235,19 @@ This field is required to have specified specific values
 
 #### Defined in
 
-[base/Root/Module/ItemDefinition/PropertyDefinition/types/index.ts:466](https://github.com/onzag/itemize/blob/f2db74a5/base/Root/Module/ItemDefinition/PropertyDefinition/types/index.ts#L466)
+[base/Root/Module/ItemDefinition/PropertyDefinition/types/index.ts:481](https://github.com/onzag/itemize/blob/a24376ed/base/Root/Module/ItemDefinition/PropertyDefinition/types/index.ts#L481)
+
+___
+
+### rq
+
+• **rq**: [`RQField`](base_Root_rq.RQField.md)
+
+The rq type
+
+#### Defined in
+
+[base/Root/Module/ItemDefinition/PropertyDefinition/types/index.ts:265](https://github.com/onzag/itemize/blob/a24376ed/base/Root/Module/ItemDefinition/PropertyDefinition/types/index.ts#L265)
 
 ___
 
@@ -235,7 +260,7 @@ otherwise it would mess up
 
 #### Defined in
 
-[base/Root/Module/ItemDefinition/PropertyDefinition/types/index.ts:439](https://github.com/onzag/itemize/blob/f2db74a5/base/Root/Module/ItemDefinition/PropertyDefinition/types/index.ts#L439)
+[base/Root/Module/ItemDefinition/PropertyDefinition/types/index.ts:454](https://github.com/onzag/itemize/blob/a24376ed/base/Root/Module/ItemDefinition/PropertyDefinition/types/index.ts#L454)
 
 ___
 
@@ -247,19 +272,7 @@ whether it is searchable or not
 
 #### Defined in
 
-[base/Root/Module/ItemDefinition/PropertyDefinition/types/index.ts:434](https://github.com/onzag/itemize/blob/f2db74a5/base/Root/Module/ItemDefinition/PropertyDefinition/types/index.ts#L434)
-
-___
-
-### config
-
-• `Optional` **config**: { `name`: `string` ; `required?`: `boolean` \| `string`[] ; `type`: ``"string"`` \| ``"number"`` \| ``"boolean"`` \| ``"property-set"`` \| ``"any"`` \| ``"array-string"`` \| ``"array-number"`` \| ``"array-boolean"``  }[]
-
-special attributes that might be added specific to that type
-
-#### Defined in
-
-[base/Root/Module/ItemDefinition/PropertyDefinition/types/index.ts:443](https://github.com/onzag/itemize/blob/f2db74a5/base/Root/Module/ItemDefinition/PropertyDefinition/types/index.ts#L443)
+[base/Root/Module/ItemDefinition/PropertyDefinition/types/index.ts:449](https://github.com/onzag/itemize/blob/a24376ed/base/Root/Module/ItemDefinition/PropertyDefinition/types/index.ts#L449)
 
 ___
 
@@ -271,7 +284,7 @@ supported subtypes of the type
 
 #### Defined in
 
-[base/Root/Module/ItemDefinition/PropertyDefinition/types/index.ts:239](https://github.com/onzag/itemize/blob/f2db74a5/base/Root/Module/ItemDefinition/PropertyDefinition/types/index.ts#L239)
+[base/Root/Module/ItemDefinition/PropertyDefinition/types/index.ts:250](https://github.com/onzag/itemize/blob/a24376ed/base/Root/Module/ItemDefinition/PropertyDefinition/types/index.ts#L250)
 
 ## Methods
 
@@ -294,7 +307,7 @@ it's used inside the mappings for creating the elastic index
 
 #### Defined in
 
-[base/Root/Module/ItemDefinition/PropertyDefinition/types/index.ts:280](https://github.com/onzag/itemize/blob/f2db74a5/base/Root/Module/ItemDefinition/PropertyDefinition/types/index.ts#L280)
+[base/Root/Module/ItemDefinition/PropertyDefinition/types/index.ts:295](https://github.com/onzag/itemize/blob/a24376ed/base/Root/Module/ItemDefinition/PropertyDefinition/types/index.ts#L295)
 
 ___
 
@@ -316,7 +329,7 @@ Defines how to perform elastic search into the property
 
 #### Defined in
 
-[base/Root/Module/ItemDefinition/PropertyDefinition/types/index.ts:320](https://github.com/onzag/itemize/blob/f2db74a5/base/Root/Module/ItemDefinition/PropertyDefinition/types/index.ts#L320)
+[base/Root/Module/ItemDefinition/PropertyDefinition/types/index.ts:335](https://github.com/onzag/itemize/blob/a24376ed/base/Root/Module/ItemDefinition/PropertyDefinition/types/index.ts#L335)
 
 ___
 
@@ -340,7 +353,7 @@ be appended to the array of sort that elasticsearch expects
 
 #### Defined in
 
-[base/Root/Module/ItemDefinition/PropertyDefinition/types/index.ts:375](https://github.com/onzag/itemize/blob/f2db74a5/base/Root/Module/ItemDefinition/PropertyDefinition/types/index.ts#L375)
+[base/Root/Module/ItemDefinition/PropertyDefinition/types/index.ts:390](https://github.com/onzag/itemize/blob/a24376ed/base/Root/Module/ItemDefinition/PropertyDefinition/types/index.ts#L390)
 
 ___
 
@@ -362,7 +375,7 @@ Represents a str based search using the elastic interface
 
 #### Defined in
 
-[base/Root/Module/ItemDefinition/PropertyDefinition/types/index.ts:330](https://github.com/onzag/itemize/blob/f2db74a5/base/Root/Module/ItemDefinition/PropertyDefinition/types/index.ts#L330)
+[base/Root/Module/ItemDefinition/PropertyDefinition/types/index.ts:345](https://github.com/onzag/itemize/blob/a24376ed/base/Root/Module/ItemDefinition/PropertyDefinition/types/index.ts#L345)
 
 ___
 
@@ -384,7 +397,7 @@ use to establish the value for null, by default it is null
 
 #### Defined in
 
-[base/Root/Module/ItemDefinition/PropertyDefinition/types/index.ts:424](https://github.com/onzag/itemize/blob/f2db74a5/base/Root/Module/ItemDefinition/PropertyDefinition/types/index.ts#L424)
+[base/Root/Module/ItemDefinition/PropertyDefinition/types/index.ts:439](https://github.com/onzag/itemize/blob/a24376ed/base/Root/Module/ItemDefinition/PropertyDefinition/types/index.ts#L439)
 
 ___
 
@@ -407,7 +420,7 @@ establish when a field will be considered null
 
 #### Defined in
 
-[base/Root/Module/ItemDefinition/PropertyDefinition/types/index.ts:419](https://github.com/onzag/itemize/blob/f2db74a5/base/Root/Module/ItemDefinition/PropertyDefinition/types/index.ts#L419)
+[base/Root/Module/ItemDefinition/PropertyDefinition/types/index.ts:434](https://github.com/onzag/itemize/blob/a24376ed/base/Root/Module/ItemDefinition/PropertyDefinition/types/index.ts#L434)
 
 ___
 
@@ -431,7 +444,7 @@ from the sql behaviour
 
 #### Defined in
 
-[base/Root/Module/ItemDefinition/PropertyDefinition/types/index.ts:363](https://github.com/onzag/itemize/blob/f2db74a5/base/Root/Module/ItemDefinition/PropertyDefinition/types/index.ts#L363)
+[base/Root/Module/ItemDefinition/PropertyDefinition/types/index.ts:378](https://github.com/onzag/itemize/blob/a24376ed/base/Root/Module/ItemDefinition/PropertyDefinition/types/index.ts#L378)
 
 ___
 
@@ -456,7 +469,7 @@ the item can't be sorted by
 
 #### Defined in
 
-[base/Root/Module/ItemDefinition/PropertyDefinition/types/index.ts:382](https://github.com/onzag/itemize/blob/f2db74a5/base/Root/Module/ItemDefinition/PropertyDefinition/types/index.ts#L382)
+[base/Root/Module/ItemDefinition/PropertyDefinition/types/index.ts:397](https://github.com/onzag/itemize/blob/a24376ed/base/Root/Module/ItemDefinition/PropertyDefinition/types/index.ts#L397)
 
 ___
 
@@ -480,7 +493,7 @@ the same
 
 #### Defined in
 
-[base/Root/Module/ItemDefinition/PropertyDefinition/types/index.ts:341](https://github.com/onzag/itemize/blob/f2db74a5/base/Root/Module/ItemDefinition/PropertyDefinition/types/index.ts#L341)
+[base/Root/Module/ItemDefinition/PropertyDefinition/types/index.ts:356](https://github.com/onzag/itemize/blob/a24376ed/base/Root/Module/ItemDefinition/PropertyDefinition/types/index.ts#L356)
 
 ___
 
@@ -503,7 +516,7 @@ than the entire value to match against, make it null to avoid supporting it
 
 #### Defined in
 
-[base/Root/Module/ItemDefinition/PropertyDefinition/types/index.ts:346](https://github.com/onzag/itemize/blob/f2db74a5/base/Root/Module/ItemDefinition/PropertyDefinition/types/index.ts#L346)
+[base/Root/Module/ItemDefinition/PropertyDefinition/types/index.ts:361](https://github.com/onzag/itemize/blob/a24376ed/base/Root/Module/ItemDefinition/PropertyDefinition/types/index.ts#L361)
 
 ___
 
@@ -531,7 +544,7 @@ names and their types by hand
 
 #### Defined in
 
-[base/Root/Module/ItemDefinition/PropertyDefinition/types/index.ts:275](https://github.com/onzag/itemize/blob/f2db74a5/base/Root/Module/ItemDefinition/PropertyDefinition/types/index.ts#L275)
+[base/Root/Module/ItemDefinition/PropertyDefinition/types/index.ts:290](https://github.com/onzag/itemize/blob/a24376ed/base/Root/Module/ItemDefinition/PropertyDefinition/types/index.ts#L290)
 
 ___
 
@@ -554,7 +567,7 @@ when an index is added via a request limiter in the module
 
 #### Defined in
 
-[base/Root/Module/ItemDefinition/PropertyDefinition/types/index.ts:335](https://github.com/onzag/itemize/blob/f2db74a5/base/Root/Module/ItemDefinition/PropertyDefinition/types/index.ts#L335)
+[base/Root/Module/ItemDefinition/PropertyDefinition/types/index.ts:350](https://github.com/onzag/itemize/blob/a24376ed/base/Root/Module/ItemDefinition/PropertyDefinition/types/index.ts#L350)
 
 ___
 
@@ -577,7 +590,7 @@ similar to sql in in how it works
 
 #### Defined in
 
-[base/Root/Module/ItemDefinition/PropertyDefinition/types/index.ts:304](https://github.com/onzag/itemize/blob/f2db74a5/base/Root/Module/ItemDefinition/PropertyDefinition/types/index.ts#L304)
+[base/Root/Module/ItemDefinition/PropertyDefinition/types/index.ts:319](https://github.com/onzag/itemize/blob/a24376ed/base/Root/Module/ItemDefinition/PropertyDefinition/types/index.ts#L319)
 
 ___
 
@@ -600,7 +613,7 @@ same with the sql prefix as the search
 
 #### Defined in
 
-[base/Root/Module/ItemDefinition/PropertyDefinition/types/index.ts:351](https://github.com/onzag/itemize/blob/f2db74a5/base/Root/Module/ItemDefinition/PropertyDefinition/types/index.ts#L351)
+[base/Root/Module/ItemDefinition/PropertyDefinition/types/index.ts:366](https://github.com/onzag/itemize/blob/a24376ed/base/Root/Module/ItemDefinition/PropertyDefinition/types/index.ts#L366)
 
 ___
 
@@ -625,7 +638,7 @@ by default if not set this function just sets {property_id: value}
 
 #### Defined in
 
-[base/Root/Module/ItemDefinition/PropertyDefinition/types/index.ts:293](https://github.com/onzag/itemize/blob/f2db74a5/base/Root/Module/ItemDefinition/PropertyDefinition/types/index.ts#L293)
+[base/Root/Module/ItemDefinition/PropertyDefinition/types/index.ts:308](https://github.com/onzag/itemize/blob/a24376ed/base/Root/Module/ItemDefinition/PropertyDefinition/types/index.ts#L308)
 
 ___
 
@@ -650,7 +663,7 @@ for fields without mantenience
 
 #### Defined in
 
-[base/Root/Module/ItemDefinition/PropertyDefinition/types/index.ts:389](https://github.com/onzag/itemize/blob/f2db74a5/base/Root/Module/ItemDefinition/PropertyDefinition/types/index.ts#L389)
+[base/Root/Module/ItemDefinition/PropertyDefinition/types/index.ts:404](https://github.com/onzag/itemize/blob/a24376ed/base/Root/Module/ItemDefinition/PropertyDefinition/types/index.ts#L404)
 
 ___
 
@@ -674,7 +687,7 @@ be ordered by, attempts to order by it will give an error
 
 #### Defined in
 
-[base/Root/Module/ItemDefinition/PropertyDefinition/types/index.ts:369](https://github.com/onzag/itemize/blob/f2db74a5/base/Root/Module/ItemDefinition/PropertyDefinition/types/index.ts#L369)
+[base/Root/Module/ItemDefinition/PropertyDefinition/types/index.ts:384](https://github.com/onzag/itemize/blob/a24376ed/base/Root/Module/ItemDefinition/PropertyDefinition/types/index.ts#L384)
 
 ___
 
@@ -698,7 +711,7 @@ data[property_id]
 
 #### Defined in
 
-[base/Root/Module/ItemDefinition/PropertyDefinition/types/index.ts:299](https://github.com/onzag/itemize/blob/f2db74a5/base/Root/Module/ItemDefinition/PropertyDefinition/types/index.ts#L299)
+[base/Root/Module/ItemDefinition/PropertyDefinition/types/index.ts:314](https://github.com/onzag/itemize/blob/a24376ed/base/Root/Module/ItemDefinition/PropertyDefinition/types/index.ts#L314)
 
 ___
 
@@ -728,7 +741,7 @@ on delete as it's too expensive because of deletition cascading
 
 #### Defined in
 
-[base/Root/Module/ItemDefinition/PropertyDefinition/types/index.ts:413](https://github.com/onzag/itemize/blob/f2db74a5/base/Root/Module/ItemDefinition/PropertyDefinition/types/index.ts#L413)
+[base/Root/Module/ItemDefinition/PropertyDefinition/types/index.ts:428](https://github.com/onzag/itemize/blob/a24376ed/base/Root/Module/ItemDefinition/PropertyDefinition/types/index.ts#L428)
 
 ___
 
@@ -750,7 +763,7 @@ SQL to redo the dictionary based index
 
 #### Defined in
 
-[base/Root/Module/ItemDefinition/PropertyDefinition/types/index.ts:394](https://github.com/onzag/itemize/blob/f2db74a5/base/Root/Module/ItemDefinition/PropertyDefinition/types/index.ts#L394)
+[base/Root/Module/ItemDefinition/PropertyDefinition/types/index.ts:409](https://github.com/onzag/itemize/blob/a24376ed/base/Root/Module/ItemDefinition/PropertyDefinition/types/index.ts#L409)
 
 ___
 
@@ -774,7 +787,7 @@ with raw database data
 
 #### Defined in
 
-[base/Root/Module/ItemDefinition/PropertyDefinition/types/index.ts:357](https://github.com/onzag/itemize/blob/f2db74a5/base/Root/Module/ItemDefinition/PropertyDefinition/types/index.ts#L357)
+[base/Root/Module/ItemDefinition/PropertyDefinition/types/index.ts:372](https://github.com/onzag/itemize/blob/a24376ed/base/Root/Module/ItemDefinition/PropertyDefinition/types/index.ts#L372)
 
 ___
 
@@ -804,7 +817,7 @@ to the selection, these represent arguments for a raw select query
 
 #### Defined in
 
-[base/Root/Module/ItemDefinition/PropertyDefinition/types/index.ts:316](https://github.com/onzag/itemize/blob/f2db74a5/base/Root/Module/ItemDefinition/PropertyDefinition/types/index.ts#L316)
+[base/Root/Module/ItemDefinition/PropertyDefinition/types/index.ts:331](https://github.com/onzag/itemize/blob/a24376ed/base/Root/Module/ItemDefinition/PropertyDefinition/types/index.ts#L331)
 
 ___
 
@@ -820,7 +833,7 @@ for traditional search mainly
 
 | Name | Type |
 | :------ | :------ |
-| `arg` | [`ISQLArgInfo`](base_Root_Module_ItemDefinition_PropertyDefinition_types.ISQLArgInfo.md) |
+| `arg` | [`IArgInfo`](base_Root_Module_ItemDefinition_PropertyDefinition_types.IArgInfo.md) |
 
 #### Returns
 
@@ -828,7 +841,7 @@ for traditional search mainly
 
 #### Defined in
 
-[base/Root/Module/ItemDefinition/PropertyDefinition/types/index.ts:286](https://github.com/onzag/itemize/blob/f2db74a5/base/Root/Module/ItemDefinition/PropertyDefinition/types/index.ts#L286)
+[base/Root/Module/ItemDefinition/PropertyDefinition/types/index.ts:301](https://github.com/onzag/itemize/blob/a24376ed/base/Root/Module/ItemDefinition/PropertyDefinition/types/index.ts#L301)
 
 ___
 
@@ -851,7 +864,7 @@ once the type has been modified
 
 #### Defined in
 
-[base/Root/Module/ItemDefinition/PropertyDefinition/types/index.ts:400](https://github.com/onzag/itemize/blob/f2db74a5/base/Root/Module/ItemDefinition/PropertyDefinition/types/index.ts#L400)
+[base/Root/Module/ItemDefinition/PropertyDefinition/types/index.ts:415](https://github.com/onzag/itemize/blob/a24376ed/base/Root/Module/ItemDefinition/PropertyDefinition/types/index.ts#L415)
 
 ___
 
@@ -875,7 +888,7 @@ return a boolean on whether it searched by it or it didn't
 
 #### Defined in
 
-[base/Root/Module/ItemDefinition/PropertyDefinition/types/index.ts:326](https://github.com/onzag/itemize/blob/f2db74a5/base/Root/Module/ItemDefinition/PropertyDefinition/types/index.ts#L326)
+[base/Root/Module/ItemDefinition/PropertyDefinition/types/index.ts:341](https://github.com/onzag/itemize/blob/a24376ed/base/Root/Module/ItemDefinition/PropertyDefinition/types/index.ts#L341)
 
 ___
 
@@ -899,4 +912,4 @@ is valid,
 
 #### Defined in
 
-[base/Root/Module/ItemDefinition/PropertyDefinition/types/index.ts:430](https://github.com/onzag/itemize/blob/f2db74a5/base/Root/Module/ItemDefinition/PropertyDefinition/types/index.ts#L430)
+[base/Root/Module/ItemDefinition/PropertyDefinition/types/index.ts:445](https://github.com/onzag/itemize/blob/a24376ed/base/Root/Module/ItemDefinition/PropertyDefinition/types/index.ts#L445)

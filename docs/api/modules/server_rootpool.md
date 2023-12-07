@@ -32,4 +32,4 @@ Provides a pool of root
 
 #### Defined in
 
-[server/rootpool.ts:19](https://github.com/onzag/itemize/blob/f2db74a5/server/rootpool.ts#L19)
+[server/rootpool.ts:19](https://github.com/onzag/itemize/blob/a24376ed/server/rootpool.ts#L19)

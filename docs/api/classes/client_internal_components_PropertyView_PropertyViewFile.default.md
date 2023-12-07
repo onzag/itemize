@@ -58,12 +58,12 @@
 #### Overrides
 
 React.Component&lt;
-  IPropertyViewHandlerProps&lt;PropertyDefinitionSupportedFileType, IPropertyViewFileRendererProps\&gt;
-\&gt;.constructor
+    IPropertyViewHandlerProps&lt;PropertyDefinitionSupportedFileType, IPropertyViewFileRendererProps\&gt;
+  \&gt;.constructor
 
 #### Defined in
 
-[client/internal/components/PropertyView/PropertyViewFile.tsx:48](https://github.com/onzag/itemize/blob/f2db74a5/client/internal/components/PropertyView/PropertyViewFile.tsx#L48)
+[client/internal/components/PropertyView/PropertyViewFile.tsx:48](https://github.com/onzag/itemize/blob/a24376ed/client/internal/components/PropertyView/PropertyViewFile.tsx#L48)
 
 ## Properties
 
@@ -566,7 +566,7 @@ ___
 
 #### Defined in
 
-[client/internal/components/PropertyView/PropertyViewFile.tsx:67](https://github.com/onzag/itemize/blob/f2db74a5/client/internal/components/PropertyView/PropertyViewFile.tsx#L67)
+[client/internal/components/PropertyView/PropertyViewFile.tsx:67](https://github.com/onzag/itemize/blob/a24376ed/client/internal/components/PropertyView/PropertyViewFile.tsx#L67)
 
 ___
 
@@ -584,7 +584,7 @@ React.Component.render
 
 #### Defined in
 
-[client/internal/components/PropertyView/PropertyViewFile.tsx:75](https://github.com/onzag/itemize/blob/f2db74a5/client/internal/components/PropertyView/PropertyViewFile.tsx#L75)
+[client/internal/components/PropertyView/PropertyViewFile.tsx:97](https://github.com/onzag/itemize/blob/a24376ed/client/internal/components/PropertyView/PropertyViewFile.tsx#L97)
 
 ___
 
@@ -639,4 +639,4 @@ React.Component.shouldComponentUpdate
 
 #### Defined in
 
-[client/internal/components/PropertyView/PropertyViewFile.tsx:53](https://github.com/onzag/itemize/blob/f2db74a5/client/internal/components/PropertyView/PropertyViewFile.tsx#L53)
+[client/internal/components/PropertyView/PropertyViewFile.tsx:53](https://github.com/onzag/itemize/blob/a24376ed/client/internal/components/PropertyView/PropertyViewFile.tsx#L53)

@@ -20,13 +20,18 @@ Here it is, the mighty
 
 ### Properties
 
+- [activeSearchPromise](client_providers_item.ActualItemProvider.md#activesearchpromise)
+- [activeSearchPromiseAwaiter](client_providers_item.ActualItemProvider.md#activesearchpromiseawaiter)
 - [activeSubmitPromise](client_providers_item.ActualItemProvider.md#activesubmitpromise)
 - [activeSubmitPromiseAwaiter](client_providers_item.ActualItemProvider.md#activesubmitpromiseawaiter)
 - [automaticSearchTimeout](client_providers_item.ActualItemProvider.md#automaticsearchtimeout)
 - [blockIdClean](client_providers_item.ActualItemProvider.md#blockidclean)
 - [changedSearchListenerLastCollectedSearchId](client_providers_item.ActualItemProvider.md#changedsearchlistenerlastcollectedsearchid)
+- [consumableQsState](client_providers_item.ActualItemProvider.md#consumableqsstate)
+- [consumeQsStateTimeout](client_providers_item.ActualItemProvider.md#consumeqsstatetimeout)
 - [context](client_providers_item.ActualItemProvider.md#context)
 - [initialAutomaticNextSearch](client_providers_item.ActualItemProvider.md#initialautomaticnextsearch)
+- [internalSearchDestructionMarkers](client_providers_item.ActualItemProvider.md#internalsearchdestructionmarkers)
 - [internalUUID](client_providers_item.ActualItemProvider.md#internaluuid)
 - [isCMounted](client_providers_item.ActualItemProvider.md#iscmounted)
 - [isUnmounted](client_providers_item.ActualItemProvider.md#isunmounted)
@@ -82,6 +87,7 @@ Here it is, the mighty
 - [getSnapshotBeforeUpdate](client_providers_item.ActualItemProvider.md#getsnapshotbeforeupdate)
 - [giveEmulatedInvalidError](client_providers_item.ActualItemProvider.md#giveemulatedinvaliderror)
 - [injectSubmitBlockPromise](client_providers_item.ActualItemProvider.md#injectsubmitblockpromise)
+- [installInternalSearchDestructionMarker](client_providers_item.ActualItemProvider.md#installinternalsearchdestructionmarker)
 - [installPrefills](client_providers_item.ActualItemProvider.md#installprefills)
 - [installSetters](client_providers_item.ActualItemProvider.md#installsetters)
 - [loadListener](client_providers_item.ActualItemProvider.md#loadlistener)
@@ -97,6 +103,7 @@ Here it is, the mighty
 - [onIncludeSetExclusionState](client_providers_item.ActualItemProvider.md#onincludesetexclusionstate)
 - [onPropertyChange](client_providers_item.ActualItemProvider.md#onpropertychange)
 - [onPropertyChangeOrRestoreFinal](client_providers_item.ActualItemProvider.md#onpropertychangeorrestorefinal)
+- [onPropertyChangeOrRestoreQsSync](client_providers_item.ActualItemProvider.md#onpropertychangeorrestoreqssync)
 - [onPropertyClearEnforce](client_providers_item.ActualItemProvider.md#onpropertyclearenforce)
 - [onPropertyEnforce](client_providers_item.ActualItemProvider.md#onpropertyenforce)
 - [onPropertyEnforceOrClearFinal](client_providers_item.ActualItemProvider.md#onpropertyenforceorclearfinal)
@@ -143,17 +150,37 @@ React.Component&lt;IActualItemProviderProps, IActualItemProviderState\&gt;.const
 
 #### Defined in
 
-[client/providers/item.tsx:2034](https://github.com/onzag/itemize/blob/f2db74a5/client/providers/item.tsx#L2034)
+[client/providers/item.tsx:2292](https://github.com/onzag/itemize/blob/a24376ed/client/providers/item.tsx#L2292)
 
 ## Properties
 
-### activeSubmitPromise
+### activeSearchPromise
 
-• `Private` **activeSubmitPromise**: `Promise`<[`IActionSubmitResponse`](../interfaces/client_providers_item.IActionSubmitResponse.md)\> = `null`
+• `Private` **activeSearchPromise**: `Promise`<{ `options`: [`IActionSearchOptions`](../interfaces/client_providers_item.IActionSearchOptions.md) ; `response`: [`IActionResponseWithSearchResults`](../interfaces/client_providers_item.IActionResponseWithSearchResults.md)  }\> = `null`
 
 #### Defined in
 
-[client/providers/item.tsx:2027](https://github.com/onzag/itemize/blob/f2db74a5/client/providers/item.tsx#L2027)
+[client/providers/item.tsx:2285](https://github.com/onzag/itemize/blob/a24376ed/client/providers/item.tsx#L2285)
+
+___
+
+### activeSearchPromiseAwaiter
+
+• `Private` **activeSearchPromiseAwaiter**: `string` = `null`
+
+#### Defined in
+
+[client/providers/item.tsx:2286](https://github.com/onzag/itemize/blob/a24376ed/client/providers/item.tsx#L2286)
+
+___
+
+### activeSubmitPromise
+
+• `Private` **activeSubmitPromise**: `Promise`<{ `options`: [`IActionSubmitOptions`](../interfaces/client_providers_item.IActionSubmitOptions.md) ; `response`: [`IActionSubmitResponse`](../interfaces/client_providers_item.IActionSubmitResponse.md)  }\> = `null`
+
+#### Defined in
+
+[client/providers/item.tsx:2281](https://github.com/onzag/itemize/blob/a24376ed/client/providers/item.tsx#L2281)
 
 ___
 
@@ -163,7 +190,7 @@ ___
 
 #### Defined in
 
-[client/providers/item.tsx:2028](https://github.com/onzag/itemize/blob/f2db74a5/client/providers/item.tsx#L2028)
+[client/providers/item.tsx:2282](https://github.com/onzag/itemize/blob/a24376ed/client/providers/item.tsx#L2282)
 
 ___
 
@@ -173,7 +200,7 @@ ___
 
 #### Defined in
 
-[client/providers/item.tsx:1712](https://github.com/onzag/itemize/blob/f2db74a5/client/providers/item.tsx#L1712)
+[client/providers/item.tsx:1956](https://github.com/onzag/itemize/blob/a24376ed/client/providers/item.tsx#L1956)
 
 ___
 
@@ -183,7 +210,7 @@ ___
 
 #### Defined in
 
-[client/providers/item.tsx:2021](https://github.com/onzag/itemize/blob/f2db74a5/client/providers/item.tsx#L2021)
+[client/providers/item.tsx:2275](https://github.com/onzag/itemize/blob/a24376ed/client/providers/item.tsx#L2275)
 
 ___
 
@@ -204,7 +231,29 @@ search id was changed and for what, and trigger automatic search
 
 #### Defined in
 
-[client/providers/item.tsx:1665](https://github.com/onzag/itemize/blob/f2db74a5/client/providers/item.tsx#L1665)
+[client/providers/item.tsx:1909](https://github.com/onzag/itemize/blob/a24376ed/client/providers/item.tsx#L1909)
+
+___
+
+### consumableQsState
+
+• `Private` **consumableQsState**: `any` = `null`
+
+The consumabel qs state that is being set
+
+#### Defined in
+
+[client/providers/item.tsx:1970](https://github.com/onzag/itemize/blob/a24376ed/client/providers/item.tsx#L1970)
+
+___
+
+### consumeQsStateTimeout
+
+• `Private` **consumeQsStateTimeout**: `Timeout` = `null`
+
+#### Defined in
+
+[client/providers/item.tsx:1971](https://github.com/onzag/itemize/blob/a24376ed/client/providers/item.tsx#L1971)
 
 ___
 
@@ -242,7 +291,17 @@ ___
 
 #### Defined in
 
-[client/providers/item.tsx:1669](https://github.com/onzag/itemize/blob/f2db74a5/client/providers/item.tsx#L1669)
+[client/providers/item.tsx:1913](https://github.com/onzag/itemize/blob/a24376ed/client/providers/item.tsx#L1913)
+
+___
+
+### internalSearchDestructionMarkers
+
+• `Private` **internalSearchDestructionMarkers**: [`string`, `string`, `string`, [`string`, `string`, `string`], [`string`, `string`]][] = `[]`
+
+#### Defined in
+
+[client/providers/item.tsx:1889](https://github.com/onzag/itemize/blob/a24376ed/client/providers/item.tsx#L1889)
 
 ___
 
@@ -252,7 +311,7 @@ ___
 
 #### Defined in
 
-[client/providers/item.tsx:1645](https://github.com/onzag/itemize/blob/f2db74a5/client/providers/item.tsx#L1645)
+[client/providers/item.tsx:1887](https://github.com/onzag/itemize/blob/a24376ed/client/providers/item.tsx#L1887)
 
 ___
 
@@ -262,7 +321,7 @@ ___
 
 #### Defined in
 
-[client/providers/item.tsx:1650](https://github.com/onzag/itemize/blob/f2db74a5/client/providers/item.tsx#L1650)
+[client/providers/item.tsx:1894](https://github.com/onzag/itemize/blob/a24376ed/client/providers/item.tsx#L1894)
 
 ___
 
@@ -272,7 +331,7 @@ ___
 
 #### Defined in
 
-[client/providers/item.tsx:1649](https://github.com/onzag/itemize/blob/f2db74a5/client/providers/item.tsx#L1649)
+[client/providers/item.tsx:1893](https://github.com/onzag/itemize/blob/a24376ed/client/providers/item.tsx#L1893)
 
 ___
 
@@ -288,7 +347,7 @@ event
 
 #### Defined in
 
-[client/providers/item.tsx:1708](https://github.com/onzag/itemize/blob/f2db74a5/client/providers/item.tsx#L1708)
+[client/providers/item.tsx:1952](https://github.com/onzag/itemize/blob/a24376ed/client/providers/item.tsx#L1952)
 
 ___
 
@@ -298,7 +357,7 @@ ___
 
 #### Defined in
 
-[client/providers/item.tsx:1709](https://github.com/onzag/itemize/blob/f2db74a5/client/providers/item.tsx#L1709)
+[client/providers/item.tsx:1953](https://github.com/onzag/itemize/blob/a24376ed/client/providers/item.tsx#L1953)
 
 ___
 
@@ -316,7 +375,7 @@ ___
 
 #### Defined in
 
-[client/providers/item.tsx:1710](https://github.com/onzag/itemize/blob/f2db74a5/client/providers/item.tsx#L1710)
+[client/providers/item.tsx:1954](https://github.com/onzag/itemize/blob/a24376ed/client/providers/item.tsx#L1954)
 
 ___
 
@@ -331,7 +390,7 @@ value and not overwrite if we have changed such value hot
 
 #### Defined in
 
-[client/providers/item.tsx:1698](https://github.com/onzag/itemize/blob/f2db74a5/client/providers/item.tsx#L1698)
+[client/providers/item.tsx:1942](https://github.com/onzag/itemize/blob/a24376ed/client/providers/item.tsx#L1942)
 
 ___
 
@@ -341,7 +400,7 @@ ___
 
 #### Defined in
 
-[client/providers/item.tsx:1699](https://github.com/onzag/itemize/blob/f2db74a5/client/providers/item.tsx#L1699)
+[client/providers/item.tsx:1943](https://github.com/onzag/itemize/blob/a24376ed/client/providers/item.tsx#L1943)
 
 ___
 
@@ -351,7 +410,7 @@ ___
 
 #### Defined in
 
-[client/providers/item.tsx:2019](https://github.com/onzag/itemize/blob/f2db74a5/client/providers/item.tsx#L2019)
+[client/providers/item.tsx:2273](https://github.com/onzag/itemize/blob/a24376ed/client/providers/item.tsx#L2273)
 
 ___
 
@@ -367,7 +426,7 @@ a change event while this instance is mounting, during cleanup
 
 #### Defined in
 
-[client/providers/item.tsx:1658](https://github.com/onzag/itemize/blob/f2db74a5/client/providers/item.tsx#L1658)
+[client/providers/item.tsx:1902](https://github.com/onzag/itemize/blob/a24376ed/client/providers/item.tsx#L1902)
 
 ___
 
@@ -395,7 +454,7 @@ is not requested
 
 #### Defined in
 
-[client/providers/item.tsx:1690](https://github.com/onzag/itemize/blob/f2db74a5/client/providers/item.tsx#L1690)
+[client/providers/item.tsx:1934](https://github.com/onzag/itemize/blob/a24376ed/client/providers/item.tsx#L1934)
 
 ___
 
@@ -440,7 +499,7 @@ ___
 
 #### Defined in
 
-[client/providers/item.tsx:2032](https://github.com/onzag/itemize/blob/f2db74a5/client/providers/item.tsx#L2032)
+[client/providers/item.tsx:2290](https://github.com/onzag/itemize/blob/a24376ed/client/providers/item.tsx#L2290)
 
 ___
 
@@ -450,7 +509,7 @@ ___
 
 #### Defined in
 
-[client/providers/item.tsx:1670](https://github.com/onzag/itemize/blob/f2db74a5/client/providers/item.tsx#L1670)
+[client/providers/item.tsx:1914](https://github.com/onzag/itemize/blob/a24376ed/client/providers/item.tsx#L1914)
 
 ___
 
@@ -460,7 +519,7 @@ ___
 
 #### Defined in
 
-[client/providers/item.tsx:1716](https://github.com/onzag/itemize/blob/f2db74a5/client/providers/item.tsx#L1716)
+[client/providers/item.tsx:1960](https://github.com/onzag/itemize/blob/a24376ed/client/providers/item.tsx#L1960)
 
 ___
 
@@ -484,7 +543,7 @@ ___
 
 #### Defined in
 
-[client/providers/item.tsx:1721](https://github.com/onzag/itemize/blob/f2db74a5/client/providers/item.tsx#L1721)
+[client/providers/item.tsx:1965](https://github.com/onzag/itemize/blob/a24376ed/client/providers/item.tsx#L1965)
 
 ___
 
@@ -494,7 +553,7 @@ ___
 
 #### Defined in
 
-[client/providers/item.tsx:2024](https://github.com/onzag/itemize/blob/f2db74a5/client/providers/item.tsx#L2024)
+[client/providers/item.tsx:2278](https://github.com/onzag/itemize/blob/a24376ed/client/providers/item.tsx#L2278)
 
 ___
 
@@ -504,7 +563,7 @@ ___
 
 #### Defined in
 
-[client/providers/item.tsx:2014](https://github.com/onzag/itemize/blob/f2db74a5/client/providers/item.tsx#L2014)
+[client/providers/item.tsx:2268](https://github.com/onzag/itemize/blob/a24376ed/client/providers/item.tsx#L2268)
 
 ___
 
@@ -672,7 +731,7 @@ ___
 
 #### Defined in
 
-[client/providers/item.tsx:2108](https://github.com/onzag/itemize/blob/f2db74a5/client/providers/item.tsx#L2108)
+[client/providers/item.tsx:2357](https://github.com/onzag/itemize/blob/a24376ed/client/providers/item.tsx#L2357)
 
 ___
 
@@ -692,7 +751,7 @@ ___
 
 #### Defined in
 
-[client/providers/item.tsx:2856](https://github.com/onzag/itemize/blob/f2db74a5/client/providers/item.tsx#L2856)
+[client/providers/item.tsx:3279](https://github.com/onzag/itemize/blob/a24376ed/client/providers/item.tsx#L3279)
 
 ___
 
@@ -706,7 +765,7 @@ ___
 
 #### Defined in
 
-[client/providers/item.tsx:2804](https://github.com/onzag/itemize/blob/f2db74a5/client/providers/item.tsx#L2804)
+[client/providers/item.tsx:3225](https://github.com/onzag/itemize/blob/a24376ed/client/providers/item.tsx#L3225)
 
 ___
 
@@ -732,7 +791,7 @@ ___
 
 #### Defined in
 
-[client/providers/item.tsx:3667](https://github.com/onzag/itemize/blob/f2db74a5/client/providers/item.tsx#L3667)
+[client/providers/item.tsx:4204](https://github.com/onzag/itemize/blob/a24376ed/client/providers/item.tsx#L4204)
 
 ___
 
@@ -754,7 +813,7 @@ ___
 
 #### Defined in
 
-[client/providers/item.tsx:3971](https://github.com/onzag/itemize/blob/f2db74a5/client/providers/item.tsx#L3971)
+[client/providers/item.tsx:4510](https://github.com/onzag/itemize/blob/a24376ed/client/providers/item.tsx#L4510)
 
 ___
 
@@ -777,7 +836,7 @@ ___
 
 #### Defined in
 
-[client/providers/item.tsx:3983](https://github.com/onzag/itemize/blob/f2db74a5/client/providers/item.tsx#L3983)
+[client/providers/item.tsx:4522](https://github.com/onzag/itemize/blob/a24376ed/client/providers/item.tsx#L4522)
 
 ___
 
@@ -823,7 +882,7 @@ React.Component.componentDidMount
 
 #### Defined in
 
-[client/providers/item.tsx:2237](https://github.com/onzag/itemize/blob/f2db74a5/client/providers/item.tsx#L2237)
+[client/providers/item.tsx:2585](https://github.com/onzag/itemize/blob/a24376ed/client/providers/item.tsx#L2585)
 
 ___
 
@@ -848,7 +907,7 @@ React.Component.componentDidUpdate
 
 #### Defined in
 
-[client/providers/item.tsx:2461](https://github.com/onzag/itemize/blob/f2db74a5/client/providers/item.tsx#L2461)
+[client/providers/item.tsx:2849](https://github.com/onzag/itemize/blob/a24376ed/client/providers/item.tsx#L2849)
 
 ___
 
@@ -936,7 +995,7 @@ React.Component.componentWillUnmount
 
 #### Defined in
 
-[client/providers/item.tsx:3634](https://github.com/onzag/itemize/blob/f2db74a5/client/providers/item.tsx#L3634)
+[client/providers/item.tsx:4171](https://github.com/onzag/itemize/blob/a24376ed/client/providers/item.tsx#L4171)
 
 ___
 
@@ -995,7 +1054,7 @@ ___
 
 #### Defined in
 
-[client/providers/item.tsx:3848](https://github.com/onzag/itemize/blob/f2db74a5/client/providers/item.tsx#L3848)
+[client/providers/item.tsx:4387](https://github.com/onzag/itemize/blob/a24376ed/client/providers/item.tsx#L4387)
 
 ___
 
@@ -1009,7 +1068,7 @@ ___
 
 #### Defined in
 
-[client/providers/item.tsx:5244](https://github.com/onzag/itemize/blob/f2db74a5/client/providers/item.tsx#L5244)
+[client/providers/item.tsx:6034](https://github.com/onzag/itemize/blob/a24376ed/client/providers/item.tsx#L6034)
 
 ___
 
@@ -1023,7 +1082,7 @@ ___
 
 #### Defined in
 
-[client/providers/item.tsx:5268](https://github.com/onzag/itemize/blob/f2db74a5/client/providers/item.tsx#L5268)
+[client/providers/item.tsx:6058](https://github.com/onzag/itemize/blob/a24376ed/client/providers/item.tsx#L6058)
 
 ___
 
@@ -1037,7 +1096,7 @@ ___
 
 #### Defined in
 
-[client/providers/item.tsx:5236](https://github.com/onzag/itemize/blob/f2db74a5/client/providers/item.tsx#L5236)
+[client/providers/item.tsx:6026](https://github.com/onzag/itemize/blob/a24376ed/client/providers/item.tsx#L6026)
 
 ___
 
@@ -1051,7 +1110,7 @@ ___
 
 #### Defined in
 
-[client/providers/item.tsx:5276](https://github.com/onzag/itemize/blob/f2db74a5/client/providers/item.tsx#L5276)
+[client/providers/item.tsx:6066](https://github.com/onzag/itemize/blob/a24376ed/client/providers/item.tsx#L6066)
 
 ___
 
@@ -1065,7 +1124,7 @@ ___
 
 #### Defined in
 
-[client/providers/item.tsx:5348](https://github.com/onzag/itemize/blob/f2db74a5/client/providers/item.tsx#L5348)
+[client/providers/item.tsx:6146](https://github.com/onzag/itemize/blob/a24376ed/client/providers/item.tsx#L6146)
 
 ___
 
@@ -1079,7 +1138,7 @@ ___
 
 #### Defined in
 
-[client/providers/item.tsx:5252](https://github.com/onzag/itemize/blob/f2db74a5/client/providers/item.tsx#L5252)
+[client/providers/item.tsx:6042](https://github.com/onzag/itemize/blob/a24376ed/client/providers/item.tsx#L6042)
 
 ___
 
@@ -1093,7 +1152,7 @@ ___
 
 #### Defined in
 
-[client/providers/item.tsx:5260](https://github.com/onzag/itemize/blob/f2db74a5/client/providers/item.tsx#L5260)
+[client/providers/item.tsx:6050](https://github.com/onzag/itemize/blob/a24376ed/client/providers/item.tsx#L6050)
 
 ___
 
@@ -1114,7 +1173,7 @@ ___
 
 #### Defined in
 
-[client/providers/item.tsx:3044](https://github.com/onzag/itemize/blob/f2db74a5/client/providers/item.tsx#L3044)
+[client/providers/item.tsx:3468](https://github.com/onzag/itemize/blob/a24376ed/client/providers/item.tsx#L3468)
 
 ___
 
@@ -1137,7 +1196,7 @@ ___
 
 #### Defined in
 
-[client/providers/item.tsx:3047](https://github.com/onzag/itemize/blob/f2db74a5/client/providers/item.tsx#L3047)
+[client/providers/item.tsx:3471](https://github.com/onzag/itemize/blob/a24376ed/client/providers/item.tsx#L3471)
 
 ___
 
@@ -1181,7 +1240,7 @@ ___
 
 #### Defined in
 
-[client/providers/item.tsx:2853](https://github.com/onzag/itemize/blob/f2db74a5/client/providers/item.tsx#L2853)
+[client/providers/item.tsx:3276](https://github.com/onzag/itemize/blob/a24376ed/client/providers/item.tsx#L3276)
 
 ___
 
@@ -1237,7 +1296,7 @@ ___
 
 #### Defined in
 
-[client/providers/item.tsx:3793](https://github.com/onzag/itemize/blob/f2db74a5/client/providers/item.tsx#L3793)
+[client/providers/item.tsx:4330](https://github.com/onzag/itemize/blob/a24376ed/client/providers/item.tsx#L4330)
 
 ___
 
@@ -1257,7 +1316,28 @@ ___
 
 #### Defined in
 
-[client/providers/item.tsx:2124](https://github.com/onzag/itemize/blob/f2db74a5/client/providers/item.tsx#L2124)
+[client/providers/item.tsx:2373](https://github.com/onzag/itemize/blob/a24376ed/client/providers/item.tsx#L2373)
+
+___
+
+### installInternalSearchDestructionMarker
+
+▸ `Private` **installInternalSearchDestructionMarker**(`marker`, `unmark`): `void`
+
+#### Parameters
+
+| Name | Type |
+| :------ | :------ |
+| `marker` | [`string`, `string`, `string`, [`string`, `string`, `string`], [`string`, `string`]] |
+| `unmark` | `boolean` |
+
+#### Returns
+
+`void`
+
+#### Defined in
+
+[client/providers/item.tsx:6183](https://github.com/onzag/itemize/blob/a24376ed/client/providers/item.tsx#L6183)
 
 ___
 
@@ -1277,7 +1357,7 @@ ___
 
 #### Defined in
 
-[client/providers/item.tsx:2201](https://github.com/onzag/itemize/blob/f2db74a5/client/providers/item.tsx#L2201)
+[client/providers/item.tsx:2505](https://github.com/onzag/itemize/blob/a24376ed/client/providers/item.tsx#L2505)
 
 ___
 
@@ -1297,7 +1377,7 @@ ___
 
 #### Defined in
 
-[client/providers/item.tsx:2185](https://github.com/onzag/itemize/blob/f2db74a5/client/providers/item.tsx#L2185)
+[client/providers/item.tsx:2489](https://github.com/onzag/itemize/blob/a24376ed/client/providers/item.tsx#L2489)
 
 ___
 
@@ -1314,7 +1394,7 @@ loader triggers it
 
 #### Defined in
 
-[client/providers/item.tsx:2947](https://github.com/onzag/itemize/blob/f2db74a5/client/providers/item.tsx#L2947)
+[client/providers/item.tsx:3370](https://github.com/onzag/itemize/blob/a24376ed/client/providers/item.tsx#L3370)
 
 ___
 
@@ -1336,7 +1416,7 @@ ___
 
 #### Defined in
 
-[client/providers/item.tsx:3021](https://github.com/onzag/itemize/blob/f2db74a5/client/providers/item.tsx#L3021)
+[client/providers/item.tsx:3445](https://github.com/onzag/itemize/blob/a24376ed/client/providers/item.tsx#L3445)
 
 ___
 
@@ -1360,13 +1440,19 @@ ___
 
 #### Defined in
 
-[client/providers/item.tsx:3024](https://github.com/onzag/itemize/blob/f2db74a5/client/providers/item.tsx#L3024)
+[client/providers/item.tsx:3448](https://github.com/onzag/itemize/blob/a24376ed/client/providers/item.tsx#L3448)
 
 ___
 
 ### loadStoredState
 
-▸ **loadStoredState**(): `Promise`<`void`\>
+▸ **loadStoredState**(`location`): `Promise`<`void`\>
+
+#### Parameters
+
+| Name | Type |
+| :------ | :------ |
+| `location` | `IStoredStateLocation` |
 
 #### Returns
 
@@ -1374,7 +1460,7 @@ ___
 
 #### Defined in
 
-[client/providers/item.tsx:3064](https://github.com/onzag/itemize/blob/f2db74a5/client/providers/item.tsx#L3064)
+[client/providers/item.tsx:3503](https://github.com/onzag/itemize/blob/a24376ed/client/providers/item.tsx#L3503)
 
 ___
 
@@ -1394,7 +1480,7 @@ ___
 
 #### Defined in
 
-[client/providers/item.tsx:3100](https://github.com/onzag/itemize/blob/f2db74a5/client/providers/item.tsx#L3100)
+[client/providers/item.tsx:3540](https://github.com/onzag/itemize/blob/a24376ed/client/providers/item.tsx#L3540)
 
 ___
 
@@ -1414,27 +1500,35 @@ ___
 
 #### Defined in
 
-[client/providers/item.tsx:3376](https://github.com/onzag/itemize/blob/f2db74a5/client/providers/item.tsx#L3376)
+[client/providers/item.tsx:3822](https://github.com/onzag/itemize/blob/a24376ed/client/providers/item.tsx#L3822)
 
 ___
 
 ### markForDestruction
 
-▸ **markForDestruction**(): `void`
+▸ **markForDestruction**(`unmount`, `unmark`, `props?`): `Promise`<`void`\>
+
+#### Parameters
+
+| Name | Type |
+| :------ | :------ |
+| `unmount` | `boolean` |
+| `unmark` | `boolean` |
+| `props` | `IActualItemProviderProps` |
 
 #### Returns
 
-`void`
+`Promise`<`void`\>
 
 #### Defined in
 
-[client/providers/item.tsx:2127](https://github.com/onzag/itemize/blob/f2db74a5/client/providers/item.tsx#L2127)
+[client/providers/item.tsx:2376](https://github.com/onzag/itemize/blob/a24376ed/client/providers/item.tsx#L2376)
 
 ___
 
 ### markSearchForDestruction
 
-▸ **markSearchForDestruction**(`type`, `qualifiedName`, `owner`, `parent`, `property`): `void`
+▸ **markSearchForDestruction**(`type`, `qualifiedName`, `owner`, `parent`, `property`, `unmount`, `unmark`): `Promise`<`void`\>
 
 #### Parameters
 
@@ -1445,14 +1539,16 @@ ___
 | `owner` | `string` |
 | `parent` | [`string`, `string`, `string`] |
 | `property` | [`string`, `string`] |
+| `unmount` | `boolean` |
+| `unmark` | `boolean` |
 
 #### Returns
 
-`void`
+`Promise`<`void`\>
 
 #### Defined in
 
-[client/providers/item.tsx:2154](https://github.com/onzag/itemize/blob/f2db74a5/client/providers/item.tsx#L2154)
+[client/providers/item.tsx:2428](https://github.com/onzag/itemize/blob/a24376ed/client/providers/item.tsx#L2428)
 
 ___
 
@@ -1472,7 +1568,7 @@ ___
 
 #### Defined in
 
-[client/providers/item.tsx:2307](https://github.com/onzag/itemize/blob/f2db74a5/client/providers/item.tsx#L2307)
+[client/providers/item.tsx:2692](https://github.com/onzag/itemize/blob/a24376ed/client/providers/item.tsx#L2692)
 
 ___
 
@@ -1486,7 +1582,7 @@ ___
 
 #### Defined in
 
-[client/providers/item.tsx:2221](https://github.com/onzag/itemize/blob/f2db74a5/client/providers/item.tsx#L2221)
+[client/providers/item.tsx:2564](https://github.com/onzag/itemize/blob/a24376ed/client/providers/item.tsx#L2564)
 
 ___
 
@@ -1507,7 +1603,7 @@ ___
 
 #### Defined in
 
-[client/providers/item.tsx:3649](https://github.com/onzag/itemize/blob/f2db74a5/client/providers/item.tsx#L3649)
+[client/providers/item.tsx:4186](https://github.com/onzag/itemize/blob/a24376ed/client/providers/item.tsx#L4186)
 
 ___
 
@@ -1519,7 +1615,7 @@ ___
 
 | Name | Type |
 | :------ | :------ |
-| `property` | [`default`](base_Root_Module_ItemDefinition_PropertyDefinition.default.md) |
+| `property` | `string` \| [`default`](base_Root_Module_ItemDefinition_PropertyDefinition.default.md) \| [`IPropertyCoreProps`](../interfaces/client_components_property_base.IPropertyCoreProps.md) |
 | `value` | [`PropertyDefinitionSupportedType`](../modules/base_Root_Module_ItemDefinition_PropertyDefinition_types.md#propertydefinitionsupportedtype) |
 | `internalValue` | `any` |
 
@@ -1529,7 +1625,7 @@ ___
 
 #### Defined in
 
-[client/providers/item.tsx:3548](https://github.com/onzag/itemize/blob/f2db74a5/client/providers/item.tsx#L3548)
+[client/providers/item.tsx:4045](https://github.com/onzag/itemize/blob/a24376ed/client/providers/item.tsx#L4045)
 
 ___
 
@@ -1543,7 +1639,27 @@ ___
 
 #### Defined in
 
-[client/providers/item.tsx:3487](https://github.com/onzag/itemize/blob/f2db74a5/client/providers/item.tsx#L3487)
+[client/providers/item.tsx:3944](https://github.com/onzag/itemize/blob/a24376ed/client/providers/item.tsx#L3944)
+
+___
+
+### onPropertyChangeOrRestoreQsSync
+
+▸ `Private` **onPropertyChangeOrRestoreQsSync**(`property`): `void`
+
+#### Parameters
+
+| Name | Type |
+| :------ | :------ |
+| `property` | [`default`](base_Root_Module_ItemDefinition_PropertyDefinition.default.md) |
+
+#### Returns
+
+`void`
+
+#### Defined in
+
+[client/providers/item.tsx:3991](https://github.com/onzag/itemize/blob/a24376ed/client/providers/item.tsx#L3991)
 
 ___
 
@@ -1555,7 +1671,7 @@ ___
 
 | Name | Type |
 | :------ | :------ |
-| `property` | [`default`](base_Root_Module_ItemDefinition_PropertyDefinition.default.md) |
+| `property` | `string` \| [`default`](base_Root_Module_ItemDefinition_PropertyDefinition.default.md) \| [`IPropertyCoreProps`](../interfaces/client_components_property_base.IPropertyCoreProps.md) |
 | `givenForId` | `string` |
 | `givenForVersion` | `string` |
 | `internal?` | `boolean` |
@@ -1566,7 +1682,7 @@ ___
 
 #### Defined in
 
-[client/providers/item.tsx:3603](https://github.com/onzag/itemize/blob/f2db74a5/client/providers/item.tsx#L3603)
+[client/providers/item.tsx:4108](https://github.com/onzag/itemize/blob/a24376ed/client/providers/item.tsx#L4108)
 
 ___
 
@@ -1578,7 +1694,7 @@ ___
 
 | Name | Type |
 | :------ | :------ |
-| `property` | [`default`](base_Root_Module_ItemDefinition_PropertyDefinition.default.md) |
+| `property` | `string` \| [`default`](base_Root_Module_ItemDefinition_PropertyDefinition.default.md) \| [`IPropertyCoreProps`](../interfaces/client_components_property_base.IPropertyCoreProps.md) |
 | `value` | [`PropertyDefinitionSupportedType`](../modules/base_Root_Module_ItemDefinition_PropertyDefinition_types.md#propertydefinitionsupportedtype) |
 | `givenForId` | `string` |
 | `givenForVersion` | `string` |
@@ -1590,7 +1706,7 @@ ___
 
 #### Defined in
 
-[client/providers/item.tsx:3588](https://github.com/onzag/itemize/blob/f2db74a5/client/providers/item.tsx#L3588)
+[client/providers/item.tsx:4090](https://github.com/onzag/itemize/blob/a24376ed/client/providers/item.tsx#L4090)
 
 ___
 
@@ -1612,7 +1728,7 @@ ___
 
 #### Defined in
 
-[client/providers/item.tsx:3569](https://github.com/onzag/itemize/blob/f2db74a5/client/providers/item.tsx#L3569)
+[client/providers/item.tsx:4070](https://github.com/onzag/itemize/blob/a24376ed/client/providers/item.tsx#L4070)
 
 ___
 
@@ -1624,7 +1740,7 @@ ___
 
 | Name | Type |
 | :------ | :------ |
-| `property` | [`default`](base_Root_Module_ItemDefinition_PropertyDefinition.default.md) |
+| `property` | `string` \| [`default`](base_Root_Module_ItemDefinition_PropertyDefinition.default.md) \| [`IPropertyCoreProps`](../interfaces/client_components_property_base.IPropertyCoreProps.md) |
 
 #### Returns
 
@@ -1632,7 +1748,7 @@ ___
 
 #### Defined in
 
-[client/providers/item.tsx:3534](https://github.com/onzag/itemize/blob/f2db74a5/client/providers/item.tsx#L3534)
+[client/providers/item.tsx:4027](https://github.com/onzag/itemize/blob/a24376ed/client/providers/item.tsx#L4027)
 
 ___
 
@@ -1652,7 +1768,7 @@ ___
 
 #### Defined in
 
-[client/providers/item.tsx:5284](https://github.com/onzag/itemize/blob/f2db74a5/client/providers/item.tsx#L5284)
+[client/providers/item.tsx:6074](https://github.com/onzag/itemize/blob/a24376ed/client/providers/item.tsx#L6074)
 
 ___
 
@@ -1672,7 +1788,7 @@ ___
 
 #### Defined in
 
-[client/providers/item.tsx:5364](https://github.com/onzag/itemize/blob/f2db74a5/client/providers/item.tsx#L5364)
+[client/providers/item.tsx:6162](https://github.com/onzag/itemize/blob/a24376ed/client/providers/item.tsx#L6162)
 
 ___
 
@@ -1692,7 +1808,7 @@ ___
 
 #### Defined in
 
-[client/providers/item.tsx:2116](https://github.com/onzag/itemize/blob/f2db74a5/client/providers/item.tsx#L2116)
+[client/providers/item.tsx:2365](https://github.com/onzag/itemize/blob/a24376ed/client/providers/item.tsx#L2365)
 
 ___
 
@@ -1706,7 +1822,7 @@ ___
 
 #### Defined in
 
-[client/providers/item.tsx:2787](https://github.com/onzag/itemize/blob/f2db74a5/client/providers/item.tsx#L2787)
+[client/providers/item.tsx:3208](https://github.com/onzag/itemize/blob/a24376ed/client/providers/item.tsx#L3208)
 
 ___
 
@@ -1727,7 +1843,7 @@ ___
 
 #### Defined in
 
-[client/providers/item.tsx:5310](https://github.com/onzag/itemize/blob/f2db74a5/client/providers/item.tsx#L5310)
+[client/providers/item.tsx:6108](https://github.com/onzag/itemize/blob/a24376ed/client/providers/item.tsx#L6108)
 
 ___
 
@@ -1747,7 +1863,7 @@ ___
 
 #### Defined in
 
-[client/providers/item.tsx:2193](https://github.com/onzag/itemize/blob/f2db74a5/client/providers/item.tsx#L2193)
+[client/providers/item.tsx:2497](https://github.com/onzag/itemize/blob/a24376ed/client/providers/item.tsx#L2497)
 
 ___
 
@@ -1765,7 +1881,7 @@ React.Component.render
 
 #### Defined in
 
-[client/providers/item.tsx:5385](https://github.com/onzag/itemize/blob/f2db74a5/client/providers/item.tsx#L5385)
+[client/providers/item.tsx:6198](https://github.com/onzag/itemize/blob/a24376ed/client/providers/item.tsx#L6198)
 
 ___
 
@@ -1785,19 +1901,19 @@ ___
 
 #### Defined in
 
-[client/providers/item.tsx:3614](https://github.com/onzag/itemize/blob/f2db74a5/client/providers/item.tsx#L3614)
+[client/providers/item.tsx:4121](https://github.com/onzag/itemize/blob/a24376ed/client/providers/item.tsx#L4121)
 
 ___
 
 ### search
 
-▸ **search**(`options`): `Promise`<[`IActionResponseWithSearchResults`](../interfaces/client_providers_item.IActionResponseWithSearchResults.md)\>
+▸ **search**(`originalOptions`): `Promise`<[`IActionResponseWithSearchResults`](../interfaces/client_providers_item.IActionResponseWithSearchResults.md)\>
 
 #### Parameters
 
 | Name | Type |
 | :------ | :------ |
-| `options` | [`IActionSearchOptions`](../interfaces/client_providers_item.IActionSearchOptions.md) |
+| `originalOptions` | [`IActionSearchOptions`](../interfaces/client_providers_item.IActionSearchOptions.md) |
 
 #### Returns
 
@@ -1805,7 +1921,7 @@ ___
 
 #### Defined in
 
-[client/providers/item.tsx:4715](https://github.com/onzag/itemize/blob/f2db74a5/client/providers/item.tsx#L4715)
+[client/providers/item.tsx:5312](https://github.com/onzag/itemize/blob/a24376ed/client/providers/item.tsx#L5312)
 
 ___
 
@@ -1825,7 +1941,7 @@ ___
 
 #### Defined in
 
-[client/providers/item.tsx:4669](https://github.com/onzag/itemize/blob/f2db74a5/client/providers/item.tsx#L4669)
+[client/providers/item.tsx:5266](https://github.com/onzag/itemize/blob/a24376ed/client/providers/item.tsx#L5266)
 
 ___
 
@@ -1846,7 +1962,7 @@ ___
 
 #### Defined in
 
-[client/providers/item.tsx:4604](https://github.com/onzag/itemize/blob/f2db74a5/client/providers/item.tsx#L4604)
+[client/providers/item.tsx:5197](https://github.com/onzag/itemize/blob/a24376ed/client/providers/item.tsx#L5197)
 
 ___
 
@@ -1897,7 +2013,7 @@ ___
 
 #### Defined in
 
-[client/providers/item.tsx:3455](https://github.com/onzag/itemize/blob/f2db74a5/client/providers/item.tsx#L3455)
+[client/providers/item.tsx:3912](https://github.com/onzag/itemize/blob/a24376ed/client/providers/item.tsx#L3912)
 
 ___
 
@@ -1911,7 +2027,7 @@ ___
 
 #### Defined in
 
-[client/providers/item.tsx:2350](https://github.com/onzag/itemize/blob/f2db74a5/client/providers/item.tsx#L2350)
+[client/providers/item.tsx:2735](https://github.com/onzag/itemize/blob/a24376ed/client/providers/item.tsx#L2735)
 
 ___
 
@@ -1936,7 +2052,7 @@ React.Component.shouldComponentUpdate
 
 #### Defined in
 
-[client/providers/item.tsx:2425](https://github.com/onzag/itemize/blob/f2db74a5/client/providers/item.tsx#L2425)
+[client/providers/item.tsx:2811](https://github.com/onzag/itemize/blob/a24376ed/client/providers/item.tsx#L2811)
 
 ___
 
@@ -1950,7 +2066,7 @@ ___
 
 #### Defined in
 
-[client/providers/item.tsx:2769](https://github.com/onzag/itemize/blob/f2db74a5/client/providers/item.tsx#L2769)
+[client/providers/item.tsx:3180](https://github.com/onzag/itemize/blob/a24376ed/client/providers/item.tsx#L3180)
 
 ___
 
@@ -1970,7 +2086,7 @@ ___
 
 #### Defined in
 
-[client/providers/item.tsx:4154](https://github.com/onzag/itemize/blob/f2db74a5/client/providers/item.tsx#L4154)
+[client/providers/item.tsx:4693](https://github.com/onzag/itemize/blob/a24376ed/client/providers/item.tsx#L4693)
 
 ___
 
@@ -1984,7 +2100,7 @@ ___
 
 #### Defined in
 
-[client/providers/item.tsx:2392](https://github.com/onzag/itemize/blob/f2db74a5/client/providers/item.tsx#L2392)
+[client/providers/item.tsx:2778](https://github.com/onzag/itemize/blob/a24376ed/client/providers/item.tsx#L2778)
 
 ___
 
@@ -1998,7 +2114,7 @@ ___
 
 #### Defined in
 
-[client/providers/item.tsx:5373](https://github.com/onzag/itemize/blob/f2db74a5/client/providers/item.tsx#L5373)
+[client/providers/item.tsx:6171](https://github.com/onzag/itemize/blob/a24376ed/client/providers/item.tsx#L6171)
 
 ___
 
@@ -2019,7 +2135,7 @@ ___
 
 #### Defined in
 
-[client/providers/item.tsx:1835](https://github.com/onzag/itemize/blob/f2db74a5/client/providers/item.tsx#L1835)
+[client/providers/item.tsx:2087](https://github.com/onzag/itemize/blob/a24376ed/client/providers/item.tsx#L2087)
 
 ___
 
@@ -2040,7 +2156,7 @@ ___
 
 #### Defined in
 
-[client/providers/item.tsx:1743](https://github.com/onzag/itemize/blob/f2db74a5/client/providers/item.tsx#L1743)
+[client/providers/item.tsx:1993](https://github.com/onzag/itemize/blob/a24376ed/client/providers/item.tsx#L1993)
 
 ___
 
@@ -2060,7 +2176,7 @@ ___
 
 #### Defined in
 
-[client/providers/item.tsx:1723](https://github.com/onzag/itemize/blob/f2db74a5/client/providers/item.tsx#L1723)
+[client/providers/item.tsx:1973](https://github.com/onzag/itemize/blob/a24376ed/client/providers/item.tsx#L1973)
 
 ___
 
@@ -2080,4 +2196,4 @@ ___
 
 #### Defined in
 
-[client/providers/item.tsx:1899](https://github.com/onzag/itemize/blob/f2db74a5/client/providers/item.tsx#L1899)
+[client/providers/item.tsx:2151](https://github.com/onzag/itemize/blob/a24376ed/client/providers/item.tsx#L2151)

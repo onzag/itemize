@@ -18,4 +18,4 @@ This file represents the renderer context for the fast prototyping USSD mechanis
 
 #### Defined in
 
-[client/fast-prototyping/renderers-ussd/index.ts:16](https://github.com/onzag/itemize/blob/f2db74a5/client/fast-prototyping/renderers-ussd/index.ts#L16)
+[client/fast-prototyping/renderers-ussd/index.ts:16](https://github.com/onzag/itemize/blob/a24376ed/client/fast-prototyping/renderers-ussd/index.ts#L16)

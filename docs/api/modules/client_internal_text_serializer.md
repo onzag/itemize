@@ -36,6 +36,7 @@ to handle the standard itemize text specification
 - [getParentNodeFor](client_internal_text_serializer.md#getparentnodefor)
 - [getUIHandlerValueFor](client_internal_text_serializer.md#getuihandlervaluefor)
 - [getUIHandlerValueWithKnownContextFor](client_internal_text_serializer.md#getuihandlervaluewithknowncontextfor)
+- [getUUIDFor](client_internal_text_serializer.md#getuuidfor)
 - [isBlock](client_internal_text_serializer.md#isblock)
 - [isElement](client_internal_text_serializer.md#iselement)
 - [isInline](client_internal_text_serializer.md#isinline)
@@ -58,7 +59,7 @@ but it's not a text
 
 #### Defined in
 
-[client/internal/text/serializer/index.ts:699](https://github.com/onzag/itemize/blob/f2db74a5/client/internal/text/serializer/index.ts#L699)
+[client/internal/text/serializer/index.ts:724](https://github.com/onzag/itemize/blob/a24376ed/client/internal/text/serializer/index.ts#L724)
 
 ## Variables
 
@@ -71,7 +72,7 @@ by default is started up empty
 
 #### Defined in
 
-[client/internal/text/serializer/index.ts:312](https://github.com/onzag/itemize/blob/f2db74a5/client/internal/text/serializer/index.ts#L312)
+[client/internal/text/serializer/index.ts:312](https://github.com/onzag/itemize/blob/a24376ed/client/internal/text/serializer/index.ts#L312)
 
 ## Functions
 
@@ -91,7 +92,7 @@ by default is started up empty
 
 #### Defined in
 
-[client/internal/text/serializer/index.ts:416](https://github.com/onzag/itemize/blob/f2db74a5/client/internal/text/serializer/index.ts#L416)
+[client/internal/text/serializer/index.ts:416](https://github.com/onzag/itemize/blob/a24376ed/client/internal/text/serializer/index.ts#L416)
 
 ___
 
@@ -116,7 +117,7 @@ a boolean on whether they should merge
 
 #### Defined in
 
-[client/internal/text/serializer/index.ts:1839](https://github.com/onzag/itemize/blob/f2db74a5/client/internal/text/serializer/index.ts#L1839)
+[client/internal/text/serializer/index.ts:1998](https://github.com/onzag/itemize/blob/a24376ed/client/internal/text/serializer/index.ts#L1998)
 
 ___
 
@@ -142,7 +143,7 @@ a root level document
 
 #### Defined in
 
-[client/internal/text/serializer/index.ts:816](https://github.com/onzag/itemize/blob/f2db74a5/client/internal/text/serializer/index.ts#L816)
+[client/internal/text/serializer/index.ts:935](https://github.com/onzag/itemize/blob/a24376ed/client/internal/text/serializer/index.ts#L935)
 
 ___
 
@@ -162,7 +163,7 @@ ___
 
 #### Defined in
 
-[client/internal/text/serializer/index.ts:1818](https://github.com/onzag/itemize/blob/f2db74a5/client/internal/text/serializer/index.ts#L1818)
+[client/internal/text/serializer/index.ts:1975](https://github.com/onzag/itemize/blob/a24376ed/client/internal/text/serializer/index.ts#L1975)
 
 ___
 
@@ -186,7 +187,7 @@ that is like a rich text, but split in paragraphs
 
 #### Defined in
 
-[client/internal/text/serializer/index.ts:1920](https://github.com/onzag/itemize/blob/f2db74a5/client/internal/text/serializer/index.ts#L1920)
+[client/internal/text/serializer/index.ts:2079](https://github.com/onzag/itemize/blob/a24376ed/client/internal/text/serializer/index.ts#L2079)
 
 ___
 
@@ -206,7 +207,7 @@ ___
 
 #### Defined in
 
-[client/internal/text/serializer/index.ts:398](https://github.com/onzag/itemize/blob/f2db74a5/client/internal/text/serializer/index.ts#L398)
+[client/internal/text/serializer/index.ts:398](https://github.com/onzag/itemize/blob/a24376ed/client/internal/text/serializer/index.ts#L398)
 
 ___
 
@@ -214,22 +215,26 @@ ___
 
 ▸ **getContextFor**(`path`, `level`, `rootElement`, `rootContext`): [`ITemplateArgContextDefinition`](../interfaces/client_internal_text_serializer_template_args.ITemplateArgContextDefinition.md)
 
+Provides the context for a given path
+
 #### Parameters
 
-| Name | Type |
-| :------ | :------ |
-| `path` | `number`[] |
-| `level` | ``"final"`` \| ``"select-context"`` \| ``"select-loop"`` |
-| `rootElement` | [`IRootLevelDocument`](../interfaces/client_internal_text_serializer.IRootLevelDocument.md) |
-| `rootContext` | [`ITemplateArgContextDefinition`](../interfaces/client_internal_text_serializer_template_args.ITemplateArgContextDefinition.md) |
+| Name | Type | Description |
+| :------ | :------ | :------ |
+| `path` | `number`[] | the path for the element to give context for |
+| `level` | ``"final"`` \| ``"select-context"`` \| ``"select-loop"`` | the level the context is wanted, final means the context the element is at currently, select-context is the context where its own context resides, and select-loop is for loopable contexts |
+| `rootElement` | [`IRootLevelDocument`](../interfaces/client_internal_text_serializer.IRootLevelDocument.md) | the root document |
+| `rootContext` | [`ITemplateArgContextDefinition`](../interfaces/client_internal_text_serializer_template_args.ITemplateArgContextDefinition.md) | the root context |
 
 #### Returns
 
 [`ITemplateArgContextDefinition`](../interfaces/client_internal_text_serializer_template_args.ITemplateArgContextDefinition.md)
 
+a context object or null if no context found or invalid
+
 #### Defined in
 
-[client/internal/text/serializer/index.ts:515](https://github.com/onzag/itemize/blob/f2db74a5/client/internal/text/serializer/index.ts#L515)
+[client/internal/text/serializer/index.ts:524](https://github.com/onzag/itemize/blob/a24376ed/client/internal/text/serializer/index.ts#L524)
 
 ___
 
@@ -254,7 +259,7 @@ the node information
 
 #### Defined in
 
-[client/internal/text/serializer/index.ts:642](https://github.com/onzag/itemize/blob/f2db74a5/client/internal/text/serializer/index.ts#L642)
+[client/internal/text/serializer/index.ts:661](https://github.com/onzag/itemize/blob/a24376ed/client/internal/text/serializer/index.ts#L661)
 
 ___
 
@@ -275,7 +280,7 @@ ___
 
 #### Defined in
 
-[client/internal/text/serializer/index.ts:478](https://github.com/onzag/itemize/blob/f2db74a5/client/internal/text/serializer/index.ts#L478)
+[client/internal/text/serializer/index.ts:478](https://github.com/onzag/itemize/blob/a24376ed/client/internal/text/serializer/index.ts#L478)
 
 ___
 
@@ -296,7 +301,7 @@ ___
 
 #### Defined in
 
-[client/internal/text/serializer/index.ts:494](https://github.com/onzag/itemize/blob/f2db74a5/client/internal/text/serializer/index.ts#L494)
+[client/internal/text/serializer/index.ts:494](https://github.com/onzag/itemize/blob/a24376ed/client/internal/text/serializer/index.ts#L494)
 
 ___
 
@@ -319,7 +324,7 @@ ___
 
 #### Defined in
 
-[client/internal/text/serializer/index.ts:454](https://github.com/onzag/itemize/blob/f2db74a5/client/internal/text/serializer/index.ts#L454)
+[client/internal/text/serializer/index.ts:454](https://github.com/onzag/itemize/blob/a24376ed/client/internal/text/serializer/index.ts#L454)
 
 ___
 
@@ -341,7 +346,29 @@ ___
 
 #### Defined in
 
-[client/internal/text/serializer/index.ts:434](https://github.com/onzag/itemize/blob/f2db74a5/client/internal/text/serializer/index.ts#L434)
+[client/internal/text/serializer/index.ts:434](https://github.com/onzag/itemize/blob/a24376ed/client/internal/text/serializer/index.ts#L434)
+
+___
+
+### getUUIDFor
+
+▸ **getUUIDFor**(`data`): `string`
+
+Provides the correct uuid for a given text data
+
+#### Parameters
+
+| Name | Type |
+| :------ | :------ |
+| `data` | `string` |
+
+#### Returns
+
+`string`
+
+#### Defined in
+
+[client/internal/text/serializer/index.ts:915](https://github.com/onzag/itemize/blob/a24376ed/client/internal/text/serializer/index.ts#L915)
 
 ___
 
@@ -361,7 +388,7 @@ ___
 
 #### Defined in
 
-[client/internal/text/serializer/index.ts:384](https://github.com/onzag/itemize/blob/f2db74a5/client/internal/text/serializer/index.ts#L384)
+[client/internal/text/serializer/index.ts:384](https://github.com/onzag/itemize/blob/a24376ed/client/internal/text/serializer/index.ts#L384)
 
 ___
 
@@ -381,7 +408,7 @@ ___
 
 #### Defined in
 
-[client/internal/text/serializer/index.ts:373](https://github.com/onzag/itemize/blob/f2db74a5/client/internal/text/serializer/index.ts#L373)
+[client/internal/text/serializer/index.ts:373](https://github.com/onzag/itemize/blob/a24376ed/client/internal/text/serializer/index.ts#L373)
 
 ___
 
@@ -401,7 +428,7 @@ ___
 
 #### Defined in
 
-[client/internal/text/serializer/index.ts:377](https://github.com/onzag/itemize/blob/f2db74a5/client/internal/text/serializer/index.ts#L377)
+[client/internal/text/serializer/index.ts:377](https://github.com/onzag/itemize/blob/a24376ed/client/internal/text/serializer/index.ts#L377)
 
 ___
 
@@ -421,7 +448,7 @@ ___
 
 #### Defined in
 
-[client/internal/text/serializer/index.ts:365](https://github.com/onzag/itemize/blob/f2db74a5/client/internal/text/serializer/index.ts#L365)
+[client/internal/text/serializer/index.ts:365](https://github.com/onzag/itemize/blob/a24376ed/client/internal/text/serializer/index.ts#L365)
 
 ___
 
@@ -441,7 +468,7 @@ ___
 
 #### Defined in
 
-[client/internal/text/serializer/index.ts:391](https://github.com/onzag/itemize/blob/f2db74a5/client/internal/text/serializer/index.ts#L391)
+[client/internal/text/serializer/index.ts:391](https://github.com/onzag/itemize/blob/a24376ed/client/internal/text/serializer/index.ts#L391)
 
 ___
 
@@ -461,7 +488,7 @@ ___
 
 #### Defined in
 
-[client/internal/text/serializer/index.ts:361](https://github.com/onzag/itemize/blob/f2db74a5/client/internal/text/serializer/index.ts#L361)
+[client/internal/text/serializer/index.ts:361](https://github.com/onzag/itemize/blob/a24376ed/client/internal/text/serializer/index.ts#L361)
 
 ___
 
@@ -481,7 +508,7 @@ ___
 
 #### Defined in
 
-[client/internal/text/serializer/index.ts:425](https://github.com/onzag/itemize/blob/f2db74a5/client/internal/text/serializer/index.ts#L425)
+[client/internal/text/serializer/index.ts:425](https://github.com/onzag/itemize/blob/a24376ed/client/internal/text/serializer/index.ts#L425)
 
 ___
 
@@ -502,7 +529,7 @@ ___
 
 #### Defined in
 
-[client/internal/text/serializer/index.ts:891](https://github.com/onzag/itemize/blob/f2db74a5/client/internal/text/serializer/index.ts#L891)
+[client/internal/text/serializer/index.ts:1048](https://github.com/onzag/itemize/blob/a24376ed/client/internal/text/serializer/index.ts#L1048)
 
 ___
 
@@ -526,7 +553,7 @@ ___
 
 #### Defined in
 
-[client/internal/text/serializer/index.ts:1275](https://github.com/onzag/itemize/blob/f2db74a5/client/internal/text/serializer/index.ts#L1275)
+[client/internal/text/serializer/index.ts:1432](https://github.com/onzag/itemize/blob/a24376ed/client/internal/text/serializer/index.ts#L1432)
 
 ___
 
@@ -550,4 +577,4 @@ or a string for plain documents
 
 #### Defined in
 
-[client/internal/text/serializer/index.ts:719](https://github.com/onzag/itemize/blob/f2db74a5/client/internal/text/serializer/index.ts#L719)
+[client/internal/text/serializer/index.ts:744](https://github.com/onzag/itemize/blob/a24376ed/client/internal/text/serializer/index.ts#L744)

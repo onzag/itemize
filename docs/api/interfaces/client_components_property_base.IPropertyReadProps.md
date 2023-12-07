@@ -47,7 +47,7 @@ whether to cache files when running the url absoluter
 
 #### Defined in
 
-[client/components/property/base.tsx:168](https://github.com/onzag/itemize/blob/f2db74a5/client/components/property/base.tsx#L168)
+[client/components/property/base.tsx:185](https://github.com/onzag/itemize/blob/a24376ed/client/components/property/base.tsx#L185)
 
 ___
 
@@ -64,7 +64,7 @@ provider
 
 #### Defined in
 
-[client/components/property/base.tsx:28](https://github.com/onzag/itemize/blob/f2db74a5/client/components/property/base.tsx#L28)
+[client/components/property/base.tsx:28](https://github.com/onzag/itemize/blob/a24376ed/client/components/property/base.tsx#L28)
 
 ___
 
@@ -80,7 +80,7 @@ the policy name, should be provided with a policy type
 
 #### Defined in
 
-[client/components/property/base.tsx:47](https://github.com/onzag/itemize/blob/f2db74a5/client/components/property/base.tsx#L47)
+[client/components/property/base.tsx:47](https://github.com/onzag/itemize/blob/a24376ed/client/components/property/base.tsx#L47)
 
 ___
 
@@ -96,7 +96,7 @@ the policy type, should be provided with a policy name
 
 #### Defined in
 
-[client/components/property/base.tsx:43](https://github.com/onzag/itemize/blob/f2db74a5/client/components/property/base.tsx#L43)
+[client/components/property/base.tsx:43](https://github.com/onzag/itemize/blob/a24376ed/client/components/property/base.tsx#L43)
 
 ___
 
@@ -113,7 +113,7 @@ only truly available in search mode
 
 #### Defined in
 
-[client/components/property/base.tsx:33](https://github.com/onzag/itemize/blob/f2db74a5/client/components/property/base.tsx#L33)
+[client/components/property/base.tsx:33](https://github.com/onzag/itemize/blob/a24376ed/client/components/property/base.tsx#L33)
 
 ___
 
@@ -131,13 +131,13 @@ with the server
 
 #### Defined in
 
-[client/components/property/base.tsx:164](https://github.com/onzag/itemize/blob/f2db74a5/client/components/property/base.tsx#L164)
+[client/components/property/base.tsx:181](https://github.com/onzag/itemize/blob/a24376ed/client/components/property/base.tsx#L181)
 
 ## Methods
 
 ### children
 
-▸ `Optional` **children**(`value`, `state`): `ReactNode`
+▸ `Optional` **children**(`value`, `state`, `setter`): `ReactNode`
 
 The reader callback
 
@@ -147,6 +147,7 @@ The reader callback
 | :------ | :------ |
 | `value` | `T` |
 | `state` | [`IPropertyDefinitionState`](base_Root_Module_ItemDefinition_PropertyDefinition.IPropertyDefinitionState.md)<`T`\> |
+| `setter` | `ReadSetterCallback`<`T`\> |
 
 #### Returns
 
@@ -154,4 +155,4 @@ The reader callback
 
 #### Defined in
 
-[client/components/property/base.tsx:179](https://github.com/onzag/itemize/blob/f2db74a5/client/components/property/base.tsx#L179)
+[client/components/property/base.tsx:200](https://github.com/onzag/itemize/blob/a24376ed/client/components/property/base.tsx#L200)

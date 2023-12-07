@@ -68,7 +68,7 @@ React.PureComponent&lt;NeedsSubmitPromptProps\&gt;.constructor
 
 #### Defined in
 
-[client/components/navigation/NeedsSubmitPrompt.tsx:87](https://github.com/onzag/itemize/blob/f2db74a5/client/components/navigation/NeedsSubmitPrompt.tsx#L87)
+[client/components/navigation/NeedsSubmitPrompt.tsx:97](https://github.com/onzag/itemize/blob/a24376ed/client/components/navigation/NeedsSubmitPrompt.tsx#L97)
 
 ## Properties
 
@@ -106,7 +106,7 @@ ___
 
 #### Defined in
 
-[client/components/navigation/NeedsSubmitPrompt.tsx:85](https://github.com/onzag/itemize/blob/f2db74a5/client/components/navigation/NeedsSubmitPrompt.tsx#L85)
+[client/components/navigation/NeedsSubmitPrompt.tsx:95](https://github.com/onzag/itemize/blob/a24376ed/client/components/navigation/NeedsSubmitPrompt.tsx#L95)
 
 ___
 
@@ -331,7 +331,7 @@ a react component
 
 #### Defined in
 
-[client/components/navigation/NeedsSubmitPrompt.tsx:130](https://github.com/onzag/itemize/blob/f2db74a5/client/components/navigation/NeedsSubmitPrompt.tsx#L130)
+[client/components/navigation/NeedsSubmitPrompt.tsx:140](https://github.com/onzag/itemize/blob/a24376ed/client/components/navigation/NeedsSubmitPrompt.tsx#L140)
 
 ___
 
@@ -567,7 +567,7 @@ a promise for an error (or null)
 
 #### Defined in
 
-[client/components/navigation/NeedsSubmitPrompt.tsx:99](https://github.com/onzag/itemize/blob/f2db74a5/client/components/navigation/NeedsSubmitPrompt.tsx#L99)
+[client/components/navigation/NeedsSubmitPrompt.tsx:109](https://github.com/onzag/itemize/blob/a24376ed/client/components/navigation/NeedsSubmitPrompt.tsx#L109)
 
 ___
 
@@ -583,7 +583,7 @@ Closes the dialog manually and performs the prompt execution that is expected
 
 #### Defined in
 
-[client/components/navigation/NeedsSubmitPrompt.tsx:156](https://github.com/onzag/itemize/blob/f2db74a5/client/components/navigation/NeedsSubmitPrompt.tsx#L156)
+[client/components/navigation/NeedsSubmitPrompt.tsx:167](https://github.com/onzag/itemize/blob/a24376ed/client/components/navigation/NeedsSubmitPrompt.tsx#L167)
 
 ___
 
@@ -659,7 +659,7 @@ React.PureComponent.render
 
 #### Defined in
 
-[client/components/navigation/NeedsSubmitPrompt.tsx:163](https://github.com/onzag/itemize/blob/f2db74a5/client/components/navigation/NeedsSubmitPrompt.tsx#L163)
+[client/components/navigation/NeedsSubmitPrompt.tsx:174](https://github.com/onzag/itemize/blob/a24376ed/client/components/navigation/NeedsSubmitPrompt.tsx#L174)
 
 ___
 

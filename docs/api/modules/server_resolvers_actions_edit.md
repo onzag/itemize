@@ -8,6 +8,7 @@
 
 - [editItemDefinition](server_resolvers_actions_edit.md#edititemdefinition)
 - [editItemDefinitionFn](server_resolvers_actions_edit.md#edititemdefinitionfn)
+- [editItemDefinitionFnRQ](server_resolvers_actions_edit.md#edititemdefinitionfnrq)
 
 ## Functions
 
@@ -29,7 +30,7 @@
 
 #### Defined in
 
-[server/resolvers/actions/edit.ts:37](https://github.com/onzag/itemize/blob/f2db74a5/server/resolvers/actions/edit.ts#L37)
+[server/resolvers/actions/edit.ts:39](https://github.com/onzag/itemize/blob/a24376ed/server/resolvers/actions/edit.ts#L39)
 
 ___
 
@@ -49,4 +50,24 @@ ___
 
 #### Defined in
 
-[server/resolvers/actions/edit.ts:583](https://github.com/onzag/itemize/blob/f2db74a5/server/resolvers/actions/edit.ts#L583)
+[server/resolvers/actions/edit.ts:679](https://github.com/onzag/itemize/blob/a24376ed/server/resolvers/actions/edit.ts#L679)
+
+___
+
+### editItemDefinitionFnRQ
+
+▸ **editItemDefinitionFnRQ**(`appData`): [`FRQIdefResolverType`](base_Root_rq.md#frqidefresolvertype)
+
+#### Parameters
+
+| Name | Type |
+| :------ | :------ |
+| `appData` | [`IAppDataType`](../interfaces/server.IAppDataType.md) |
+
+#### Returns
+
+[`FRQIdefResolverType`](base_Root_rq.md#frqidefresolvertype)
+
+#### Defined in
+
+[server/resolvers/actions/edit.ts:683](https://github.com/onzag/itemize/blob/a24376ed/server/resolvers/actions/edit.ts#L683)

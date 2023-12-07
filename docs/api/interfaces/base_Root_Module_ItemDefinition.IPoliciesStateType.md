@@ -23,7 +23,7 @@ Represents all the state of policies
 
 #### Defined in
 
-[base/Root/Module/ItemDefinition/index.ts:384](https://github.com/onzag/itemize/blob/f2db74a5/base/Root/Module/ItemDefinition/index.ts#L384)
+[base/Root/Module/ItemDefinition/index.ts:407](https://github.com/onzag/itemize/blob/a24376ed/base/Root/Module/ItemDefinition/index.ts#L407)
 
 ___
 
@@ -33,7 +33,7 @@ ___
 
 #### Defined in
 
-[base/Root/Module/ItemDefinition/index.ts:383](https://github.com/onzag/itemize/blob/f2db74a5/base/Root/Module/ItemDefinition/index.ts#L383)
+[base/Root/Module/ItemDefinition/index.ts:406](https://github.com/onzag/itemize/blob/a24376ed/base/Root/Module/ItemDefinition/index.ts#L406)
 
 ___
 
@@ -43,7 +43,7 @@ ___
 
 #### Defined in
 
-[base/Root/Module/ItemDefinition/index.ts:386](https://github.com/onzag/itemize/blob/f2db74a5/base/Root/Module/ItemDefinition/index.ts#L386)
+[base/Root/Module/ItemDefinition/index.ts:409](https://github.com/onzag/itemize/blob/a24376ed/base/Root/Module/ItemDefinition/index.ts#L409)
 
 ___
 
@@ -53,4 +53,4 @@ ___
 
 #### Defined in
 
-[base/Root/Module/ItemDefinition/index.ts:385](https://github.com/onzag/itemize/blob/f2db74a5/base/Root/Module/ItemDefinition/index.ts#L385)
+[base/Root/Module/ItemDefinition/index.ts:408](https://github.com/onzag/itemize/blob/a24376ed/base/Root/Module/ItemDefinition/index.ts#L408)

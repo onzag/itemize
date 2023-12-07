@@ -42,7 +42,7 @@ The renderer args
 
 #### Defined in
 
-[client/internal/renderer.ts:19](https://github.com/onzag/itemize/blob/f2db74a5/client/internal/renderer.ts#L19)
+[client/internal/renderer.ts:19](https://github.com/onzag/itemize/blob/a24376ed/client/internal/renderer.ts#L19)
 
 ___
 
@@ -58,7 +58,7 @@ The current value to be displayed
 
 #### Defined in
 
-[client/internal/components/PropertyView/index.tsx:44](https://github.com/onzag/itemize/blob/f2db74a5/client/internal/components/PropertyView/index.tsx#L44)
+[client/internal/components/PropertyView/index.tsx:44](https://github.com/onzag/itemize/blob/a24376ed/client/internal/components/PropertyView/index.tsx#L44)
 
 ___
 
@@ -70,7 +70,7 @@ database format used for parsing
 
 #### Defined in
 
-[client/internal/components/PropertyView/PropertyViewDateTime.tsx:25](https://github.com/onzag/itemize/blob/f2db74a5/client/internal/components/PropertyView/PropertyViewDateTime.tsx#L25)
+[client/internal/components/PropertyView/PropertyViewDateTime.tsx:25](https://github.com/onzag/itemize/blob/a24376ed/client/internal/components/PropertyView/PropertyViewDateTime.tsx#L25)
 
 ___
 
@@ -83,7 +83,7 @@ in the user's language
 
 #### Defined in
 
-[client/internal/components/PropertyView/PropertyViewDateTime.tsx:30](https://github.com/onzag/itemize/blob/f2db74a5/client/internal/components/PropertyView/PropertyViewDateTime.tsx#L30)
+[client/internal/components/PropertyView/PropertyViewDateTime.tsx:30](https://github.com/onzag/itemize/blob/a24376ed/client/internal/components/PropertyView/PropertyViewDateTime.tsx#L30)
 
 ___
 
@@ -96,7 +96,7 @@ using moment
 
 #### Defined in
 
-[client/internal/components/PropertyView/PropertyViewDateTime.tsx:35](https://github.com/onzag/itemize/blob/f2db74a5/client/internal/components/PropertyView/PropertyViewDateTime.tsx#L35)
+[client/internal/components/PropertyView/PropertyViewDateTime.tsx:35](https://github.com/onzag/itemize/blob/a24376ed/client/internal/components/PropertyView/PropertyViewDateTime.tsx#L35)
 
 ___
 
@@ -108,7 +108,7 @@ Current value as moment type
 
 #### Defined in
 
-[client/internal/components/PropertyView/PropertyViewDateTime.tsx:21](https://github.com/onzag/itemize/blob/f2db74a5/client/internal/components/PropertyView/PropertyViewDateTime.tsx#L21)
+[client/internal/components/PropertyView/PropertyViewDateTime.tsx:21](https://github.com/onzag/itemize/blob/a24376ed/client/internal/components/PropertyView/PropertyViewDateTime.tsx#L21)
 
 ___
 
@@ -124,4 +124,4 @@ Whether it is in rtl mode for a rtl language
 
 #### Defined in
 
-[client/internal/renderer.ts:15](https://github.com/onzag/itemize/blob/f2db74a5/client/internal/renderer.ts#L15)
+[client/internal/renderer.ts:15](https://github.com/onzag/itemize/blob/a24376ed/client/internal/renderer.ts#L15)

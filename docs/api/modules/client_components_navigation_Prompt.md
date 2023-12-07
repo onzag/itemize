@@ -27,4 +27,4 @@ it needs to consume such component
 
 #### Defined in
 
-[client/components/navigation/Prompt.tsx:19](https://github.com/onzag/itemize/blob/f2db74a5/client/components/navigation/Prompt.tsx#L19)
+[client/components/navigation/Prompt.tsx:19](https://github.com/onzag/itemize/blob/a24376ed/client/components/navigation/Prompt.tsx#L19)

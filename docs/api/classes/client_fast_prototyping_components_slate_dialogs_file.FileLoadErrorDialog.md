@@ -64,7 +64,7 @@ React.PureComponent&lt;IFileLoadErrorDialogProps\&gt;.constructor
 
 #### Defined in
 
-[client/fast-prototyping/components/slate/dialogs/file.tsx:41](https://github.com/onzag/itemize/blob/f2db74a5/client/fast-prototyping/components/slate/dialogs/file.tsx#L41)
+[client/fast-prototyping/components/slate/dialogs/file.tsx:41](https://github.com/onzag/itemize/blob/a24376ed/client/fast-prototyping/components/slate/dialogs/file.tsx#L41)
 
 ## Properties
 
@@ -567,7 +567,7 @@ ___
 
 #### Defined in
 
-[client/fast-prototyping/components/slate/dialogs/file.tsx:46](https://github.com/onzag/itemize/blob/f2db74a5/client/fast-prototyping/components/slate/dialogs/file.tsx#L46)
+[client/fast-prototyping/components/slate/dialogs/file.tsx:46](https://github.com/onzag/itemize/blob/a24376ed/client/fast-prototyping/components/slate/dialogs/file.tsx#L46)
 
 ___
 
@@ -587,7 +587,7 @@ React.PureComponent.render
 
 #### Defined in
 
-[client/fast-prototyping/components/slate/dialogs/file.tsx:52](https://github.com/onzag/itemize/blob/f2db74a5/client/fast-prototyping/components/slate/dialogs/file.tsx#L52)
+[client/fast-prototyping/components/slate/dialogs/file.tsx:52](https://github.com/onzag/itemize/blob/a24376ed/client/fast-prototyping/components/slate/dialogs/file.tsx#L52)
 
 ___
 

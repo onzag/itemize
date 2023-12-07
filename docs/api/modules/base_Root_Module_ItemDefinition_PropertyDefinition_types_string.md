@@ -25,7 +25,7 @@ The string type is described, by, you guessed it, a string
 
 #### Defined in
 
-[base/Root/Module/ItemDefinition/PropertyDefinition/types/string.ts:61](https://github.com/onzag/itemize/blob/f2db74a5/base/Root/Module/ItemDefinition/PropertyDefinition/types/string.ts#L61)
+[base/Root/Module/ItemDefinition/PropertyDefinition/types/string.ts:59](https://github.com/onzag/itemize/blob/a24376ed/base/Root/Module/ItemDefinition/PropertyDefinition/types/string.ts#L59)
 
 ## Variables
 
@@ -37,7 +37,7 @@ The behaviour of strings is described by this type
 
 #### Defined in
 
-[base/Root/Module/ItemDefinition/PropertyDefinition/types/string.ts:82](https://github.com/onzag/itemize/blob/f2db74a5/base/Root/Module/ItemDefinition/PropertyDefinition/types/string.ts#L82)
+[base/Root/Module/ItemDefinition/PropertyDefinition/types/string.ts:82](https://github.com/onzag/itemize/blob/a24376ed/base/Root/Module/ItemDefinition/PropertyDefinition/types/string.ts#L82)
 
 ___
 
@@ -47,4 +47,4 @@ ___
 
 #### Defined in
 
-[base/Root/Module/ItemDefinition/PropertyDefinition/types/string.ts:63](https://github.com/onzag/itemize/blob/f2db74a5/base/Root/Module/ItemDefinition/PropertyDefinition/types/string.ts#L63)
+[base/Root/Module/ItemDefinition/PropertyDefinition/types/string.ts:61](https://github.com/onzag/itemize/blob/a24376ed/base/Root/Module/ItemDefinition/PropertyDefinition/types/string.ts#L61)

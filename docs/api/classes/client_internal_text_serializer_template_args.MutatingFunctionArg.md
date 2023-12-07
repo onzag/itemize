@@ -30,7 +30,7 @@ Allows to specify a context mutating function into the serializer during a dynam
 
 #### Defined in
 
-[client/internal/text/serializer/template-args.ts:177](https://github.com/onzag/itemize/blob/f2db74a5/client/internal/text/serializer/template-args.ts#L177)
+[client/internal/text/serializer/template-args.ts:177](https://github.com/onzag/itemize/blob/a24376ed/client/internal/text/serializer/template-args.ts#L177)
 
 ## Properties
 
@@ -40,4 +40,4 @@ Allows to specify a context mutating function into the serializer during a dynam
 
 #### Defined in
 
-[client/internal/text/serializer/template-args.ts:176](https://github.com/onzag/itemize/blob/f2db74a5/client/internal/text/serializer/template-args.ts#L176)
+[client/internal/text/serializer/template-args.ts:176](https://github.com/onzag/itemize/blob/a24376ed/client/internal/text/serializer/template-args.ts#L176)

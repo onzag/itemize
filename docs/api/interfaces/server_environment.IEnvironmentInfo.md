@@ -26,7 +26,7 @@
 
 #### Defined in
 
-[server/environment.ts:84](https://github.com/onzag/itemize/blob/f2db74a5/server/environment.ts#L84)
+[server/environment.ts:87](https://github.com/onzag/itemize/blob/a24376ed/server/environment.ts#L87)
 
 ___
 
@@ -36,7 +36,7 @@ ___
 
 #### Defined in
 
-[server/environment.ts:87](https://github.com/onzag/itemize/blob/f2db74a5/server/environment.ts#L87)
+[server/environment.ts:90](https://github.com/onzag/itemize/blob/a24376ed/server/environment.ts#L90)
 
 ___
 
@@ -50,18 +50,17 @@ ___
 | :------ | :------ |
 | `INSTANCE_CREATION_TIME` | `Date` |
 | `INSTANCE_GROUP_ID` | `string` |
-| `INSTANCE_MODE` | ``"CLUSTER_MANAGER"`` \| ``"GLOBAL_MANAGER"`` \| ``"ABSOLUTE"`` \| ``"EXTENDED"`` \| ``"BUILD_DATABASE"`` \| ``"LOAD_DATABASE_DUMP"`` \| ``"CLEAN_STORAGE"`` \| ``"CLEAN_SITEMAPS"`` |
+| `INSTANCE_MODE` | ``"CLUSTER_MANAGER"`` \| ``"GLOBAL_MANAGER"`` \| ``"ABSOLUTE"`` \| ``"EXTENDED"`` \| ``"BUILD_DATABASE"`` \| ``"LOAD_DATABASE_DUMP"`` \| ``"CLEAN_STORAGE"`` |
 | `INSTANCE_UUID` | `string` |
 | `LOG_LEVEL` | ``"error"`` \| ``"info"`` \| ``"debug"`` \| ``"silly"`` |
 | `NODE_ENV` | ``"production"`` \| ``"development"`` |
 | `NO_SEO` | `boolean` |
 | `NO_SSR` | `boolean` |
-| `PING_GOOGLE` | `boolean` |
 | `USING_DOCKER` | `boolean` |
 
 #### Defined in
 
-[server/environment.ts:92](https://github.com/onzag/itemize/blob/f2db74a5/server/environment.ts#L92)
+[server/environment.ts:95](https://github.com/onzag/itemize/blob/a24376ed/server/environment.ts#L95)
 
 ___
 
@@ -71,7 +70,7 @@ ___
 
 #### Defined in
 
-[server/environment.ts:83](https://github.com/onzag/itemize/blob/f2db74a5/server/environment.ts#L83)
+[server/environment.ts:86](https://github.com/onzag/itemize/blob/a24376ed/server/environment.ts#L86)
 
 ___
 
@@ -81,7 +80,7 @@ ___
 
 #### Defined in
 
-[server/environment.ts:85](https://github.com/onzag/itemize/blob/f2db74a5/server/environment.ts#L85)
+[server/environment.ts:88](https://github.com/onzag/itemize/blob/a24376ed/server/environment.ts#L88)
 
 ___
 
@@ -91,7 +90,7 @@ ___
 
 #### Defined in
 
-[server/environment.ts:91](https://github.com/onzag/itemize/blob/f2db74a5/server/environment.ts#L91)
+[server/environment.ts:94](https://github.com/onzag/itemize/blob/a24376ed/server/environment.ts#L94)
 
 ___
 
@@ -101,7 +100,7 @@ ___
 
 #### Defined in
 
-[server/environment.ts:89](https://github.com/onzag/itemize/blob/f2db74a5/server/environment.ts#L89)
+[server/environment.ts:92](https://github.com/onzag/itemize/blob/a24376ed/server/environment.ts#L92)
 
 ___
 
@@ -111,7 +110,7 @@ ___
 
 #### Defined in
 
-[server/environment.ts:88](https://github.com/onzag/itemize/blob/f2db74a5/server/environment.ts#L88)
+[server/environment.ts:91](https://github.com/onzag/itemize/blob/a24376ed/server/environment.ts#L91)
 
 ___
 
@@ -121,4 +120,4 @@ ___
 
 #### Defined in
 
-[server/environment.ts:90](https://github.com/onzag/itemize/blob/f2db74a5/server/environment.ts#L90)
+[server/environment.ts:93](https://github.com/onzag/itemize/blob/a24376ed/server/environment.ts#L93)

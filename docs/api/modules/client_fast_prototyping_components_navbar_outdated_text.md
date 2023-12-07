@@ -32,4 +32,4 @@ a react element
 
 #### Defined in
 
-[client/fast-prototyping/components/navbar/outdated-text.tsx:27](https://github.com/onzag/itemize/blob/f2db74a5/client/fast-prototyping/components/navbar/outdated-text.tsx#L27)
+[client/fast-prototyping/components/navbar/outdated-text.tsx:27](https://github.com/onzag/itemize/blob/a24376ed/client/fast-prototyping/components/navbar/outdated-text.tsx#L27)

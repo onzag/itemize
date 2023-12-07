@@ -8,13 +8,19 @@
 
 ### Properties
 
+- [action](server_resolvers_triggers.ISearchTriggerArgType.md#action)
 - [appData](server_resolvers_triggers.ISearchTriggerArgType.md#appdata)
 - [args](server_resolvers_triggers.ISearchTriggerArgType.md#args)
 - [dictionary](server_resolvers_triggers.ISearchTriggerArgType.md#dictionary)
 - [elasticQueryBuilder](server_resolvers_triggers.ISearchTriggerArgType.md#elasticquerybuilder)
+- [elasticResponse](server_resolvers_triggers.ISearchTriggerArgType.md#elasticresponse)
 - [itemDefinition](server_resolvers_triggers.ISearchTriggerArgType.md#itemdefinition)
 - [language](server_resolvers_triggers.ISearchTriggerArgType.md#language)
 - [module](server_resolvers_triggers.ISearchTriggerArgType.md#module)
+- [records](server_resolvers_triggers.ISearchTriggerArgType.md#records)
+- [results](server_resolvers_triggers.ISearchTriggerArgType.md#results)
+- [sqlResponse](server_resolvers_triggers.ISearchTriggerArgType.md#sqlresponse)
+- [traditional](server_resolvers_triggers.ISearchTriggerArgType.md#traditional)
 - [user](server_resolvers_triggers.ISearchTriggerArgType.md#user)
 - [usesElastic](server_resolvers_triggers.ISearchTriggerArgType.md#useselastic)
 - [whereBuilder](server_resolvers_triggers.ISearchTriggerArgType.md#wherebuilder)
@@ -22,8 +28,21 @@
 ### Methods
 
 - [forbid](server_resolvers_triggers.ISearchTriggerArgType.md#forbid)
+- [setSearchMetadata](server_resolvers_triggers.ISearchTriggerArgType.md#setsearchmetadata)
 
 ## Properties
+
+### action
+
+• **action**: [`SearchTriggerActions`](../enums/server_resolvers_triggers.SearchTriggerActions.md)
+
+The action being ran
+
+#### Defined in
+
+[server/resolvers/triggers.ts:164](https://github.com/onzag/itemize/blob/a24376ed/server/resolvers/triggers.ts#L164)
+
+___
 
 ### appData
 
@@ -31,7 +50,7 @@
 
 #### Defined in
 
-[server/resolvers/triggers.ts:150](https://github.com/onzag/itemize/blob/f2db74a5/server/resolvers/triggers.ts#L150)
+[server/resolvers/triggers.ts:170](https://github.com/onzag/itemize/blob/a24376ed/server/resolvers/triggers.ts#L170)
 
 ___
 
@@ -41,7 +60,7 @@ ___
 
 #### Defined in
 
-[server/resolvers/triggers.ts:153](https://github.com/onzag/itemize/blob/f2db74a5/server/resolvers/triggers.ts#L153)
+[server/resolvers/triggers.ts:173](https://github.com/onzag/itemize/blob/a24376ed/server/resolvers/triggers.ts#L173)
 
 ___
 
@@ -53,7 +72,7 @@ The dictionary that was obtained from the language
 
 #### Defined in
 
-[server/resolvers/triggers.ts:148](https://github.com/onzag/itemize/blob/f2db74a5/server/resolvers/triggers.ts#L148)
+[server/resolvers/triggers.ts:168](https://github.com/onzag/itemize/blob/a24376ed/server/resolvers/triggers.ts#L168)
 
 ___
 
@@ -63,7 +82,17 @@ ___
 
 #### Defined in
 
-[server/resolvers/triggers.ts:161](https://github.com/onzag/itemize/blob/f2db74a5/server/resolvers/triggers.ts#L161)
+[server/resolvers/triggers.ts:181](https://github.com/onzag/itemize/blob/a24376ed/server/resolvers/triggers.ts#L181)
+
+___
+
+### elasticResponse
+
+• **elasticResponse**: `SearchResponse`<`unknown`, `Record`<`string`, `AggregationsAggregate`\>\>
+
+#### Defined in
+
+[server/resolvers/triggers.ts:183](https://github.com/onzag/itemize/blob/a24376ed/server/resolvers/triggers.ts#L183)
 
 ___
 
@@ -73,7 +102,7 @@ ___
 
 #### Defined in
 
-[server/resolvers/triggers.ts:151](https://github.com/onzag/itemize/blob/f2db74a5/server/resolvers/triggers.ts#L151)
+[server/resolvers/triggers.ts:171](https://github.com/onzag/itemize/blob/a24376ed/server/resolvers/triggers.ts#L171)
 
 ___
 
@@ -83,7 +112,7 @@ ___
 
 #### Defined in
 
-[server/resolvers/triggers.ts:149](https://github.com/onzag/itemize/blob/f2db74a5/server/resolvers/triggers.ts#L149)
+[server/resolvers/triggers.ts:169](https://github.com/onzag/itemize/blob/a24376ed/server/resolvers/triggers.ts#L169)
 
 ___
 
@@ -93,7 +122,47 @@ ___
 
 #### Defined in
 
-[server/resolvers/triggers.ts:152](https://github.com/onzag/itemize/blob/f2db74a5/server/resolvers/triggers.ts#L152)
+[server/resolvers/triggers.ts:172](https://github.com/onzag/itemize/blob/a24376ed/server/resolvers/triggers.ts#L172)
+
+___
+
+### records
+
+• **records**: [`IGQLSearchRecordsContainer`](gql_querier.IGQLSearchRecordsContainer.md)
+
+#### Defined in
+
+[server/resolvers/triggers.ts:185](https://github.com/onzag/itemize/blob/a24376ed/server/resolvers/triggers.ts#L185)
+
+___
+
+### results
+
+• **results**: [`IGQLSearchResultsContainer`](gql_querier.IGQLSearchResultsContainer.md)
+
+#### Defined in
+
+[server/resolvers/triggers.ts:186](https://github.com/onzag/itemize/blob/a24376ed/server/resolvers/triggers.ts#L186)
+
+___
+
+### sqlResponse
+
+• **sqlResponse**: [`ISQLTableRowValue`](base_Root_sql.ISQLTableRowValue.md)[]
+
+#### Defined in
+
+[server/resolvers/triggers.ts:182](https://github.com/onzag/itemize/blob/a24376ed/server/resolvers/triggers.ts#L182)
+
+___
+
+### traditional
+
+• **traditional**: `boolean`
+
+#### Defined in
+
+[server/resolvers/triggers.ts:184](https://github.com/onzag/itemize/blob/a24376ed/server/resolvers/triggers.ts#L184)
 
 ___
 
@@ -111,7 +180,7 @@ ___
 
 #### Defined in
 
-[server/resolvers/triggers.ts:154](https://github.com/onzag/itemize/blob/f2db74a5/server/resolvers/triggers.ts#L154)
+[server/resolvers/triggers.ts:174](https://github.com/onzag/itemize/blob/a24376ed/server/resolvers/triggers.ts#L174)
 
 ___
 
@@ -121,7 +190,7 @@ ___
 
 #### Defined in
 
-[server/resolvers/triggers.ts:159](https://github.com/onzag/itemize/blob/f2db74a5/server/resolvers/triggers.ts#L159)
+[server/resolvers/triggers.ts:179](https://github.com/onzag/itemize/blob/a24376ed/server/resolvers/triggers.ts#L179)
 
 ___
 
@@ -131,13 +200,13 @@ ___
 
 #### Defined in
 
-[server/resolvers/triggers.ts:160](https://github.com/onzag/itemize/blob/f2db74a5/server/resolvers/triggers.ts#L160)
+[server/resolvers/triggers.ts:180](https://github.com/onzag/itemize/blob/a24376ed/server/resolvers/triggers.ts#L180)
 
 ## Methods
 
 ### forbid
 
-▸ **forbid**(`message`, `customCode?`): `void`
+▸ **forbid**(`message`, `customCode?`, `data?`): `void`
 
 #### Parameters
 
@@ -145,6 +214,7 @@ ___
 | :------ | :------ |
 | `message` | `string` |
 | `customCode?` | `string` |
+| `data?` | `any` |
 
 #### Returns
 
@@ -152,4 +222,24 @@ ___
 
 #### Defined in
 
-[server/resolvers/triggers.ts:162](https://github.com/onzag/itemize/blob/f2db74a5/server/resolvers/triggers.ts#L162)
+[server/resolvers/triggers.ts:187](https://github.com/onzag/itemize/blob/a24376ed/server/resolvers/triggers.ts#L187)
+
+___
+
+### setSearchMetadata
+
+▸ **setSearchMetadata**(`metadata`): `void`
+
+#### Parameters
+
+| Name | Type |
+| :------ | :------ |
+| `metadata` | `string` |
+
+#### Returns
+
+`void`
+
+#### Defined in
+
+[server/resolvers/triggers.ts:188](https://github.com/onzag/itemize/blob/a24376ed/server/resolvers/triggers.ts#L188)

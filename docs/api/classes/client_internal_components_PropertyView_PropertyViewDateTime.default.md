@@ -62,7 +62,7 @@ React.Component&lt;IPropertyViewHandlerProps&lt;string, IPropertyViewDateTimeRen
 
 #### Defined in
 
-[client/internal/components/PropertyView/PropertyViewDateTime.tsx:46](https://github.com/onzag/itemize/blob/f2db74a5/client/internal/components/PropertyView/PropertyViewDateTime.tsx#L46)
+[client/internal/components/PropertyView/PropertyViewDateTime.tsx:46](https://github.com/onzag/itemize/blob/a24376ed/client/internal/components/PropertyView/PropertyViewDateTime.tsx#L46)
 
 ## Properties
 
@@ -333,7 +333,7 @@ React.Component.componentDidMount
 
 #### Defined in
 
-[client/internal/components/PropertyView/PropertyViewDateTime.tsx:53](https://github.com/onzag/itemize/blob/f2db74a5/client/internal/components/PropertyView/PropertyViewDateTime.tsx#L53)
+[client/internal/components/PropertyView/PropertyViewDateTime.tsx:53](https://github.com/onzag/itemize/blob/a24376ed/client/internal/components/PropertyView/PropertyViewDateTime.tsx#L53)
 
 ___
 
@@ -567,7 +567,7 @@ React.Component.render
 
 #### Defined in
 
-[client/internal/components/PropertyView/PropertyViewDateTime.tsx:74](https://github.com/onzag/itemize/blob/f2db74a5/client/internal/components/PropertyView/PropertyViewDateTime.tsx#L74)
+[client/internal/components/PropertyView/PropertyViewDateTime.tsx:74](https://github.com/onzag/itemize/blob/a24376ed/client/internal/components/PropertyView/PropertyViewDateTime.tsx#L74)
 
 ___
 
@@ -623,4 +623,4 @@ React.Component.shouldComponentUpdate
 
 #### Defined in
 
-[client/internal/components/PropertyView/PropertyViewDateTime.tsx:58](https://github.com/onzag/itemize/blob/f2db74a5/client/internal/components/PropertyView/PropertyViewDateTime.tsx#L58)
+[client/internal/components/PropertyView/PropertyViewDateTime.tsx:58](https://github.com/onzag/itemize/blob/a24376ed/client/internal/components/PropertyView/PropertyViewDateTime.tsx#L58)

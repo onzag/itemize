@@ -43,7 +43,7 @@ The application name
 
 #### Defined in
 
-[config.ts:48](https://github.com/onzag/itemize/blob/f2db74a5/config.ts#L48)
+[config.ts:48](https://github.com/onzag/itemize/blob/a24376ed/config.ts#L48)
 
 ___
 
@@ -56,7 +56,7 @@ that these hostnames should be cached
 
 #### Defined in
 
-[config.ts:88](https://github.com/onzag/itemize/blob/f2db74a5/config.ts#L88)
+[config.ts:88](https://github.com/onzag/itemize/blob/a24376ed/config.ts#L88)
 
 ___
 
@@ -69,7 +69,7 @@ that are external
 
 #### Defined in
 
-[config.ts:79](https://github.com/onzag/itemize/blob/f2db74a5/config.ts#L79)
+[config.ts:79](https://github.com/onzag/itemize/blob/a24376ed/config.ts#L79)
 
 ___
 
@@ -82,7 +82,7 @@ in addition of the standard ones
 
 #### Defined in
 
-[config.ts:74](https://github.com/onzag/itemize/blob/f2db74a5/config.ts#L74)
+[config.ts:74](https://github.com/onzag/itemize/blob/a24376ed/config.ts#L74)
 
 ___
 
@@ -100,7 +100,7 @@ eg. myopenstackprovider.com/mycontainer/AUTH_123/ or whatever custom domain you 
 
 #### Defined in
 
-[config.ts:141](https://github.com/onzag/itemize/blob/f2db74a5/config.ts#L141)
+[config.ts:141](https://github.com/onzag/itemize/blob/a24376ed/config.ts#L141)
 
 ___
 
@@ -118,7 +118,7 @@ the value should be container id
 
 #### Defined in
 
-[config.ts:133](https://github.com/onzag/itemize/blob/f2db74a5/config.ts#L133)
+[config.ts:133](https://github.com/onzag/itemize/blob/a24376ed/config.ts#L133)
 
 ___
 
@@ -134,7 +134,7 @@ Special custom configuration
 
 #### Defined in
 
-[config.ts:147](https://github.com/onzag/itemize/blob/f2db74a5/config.ts#L147)
+[config.ts:147](https://github.com/onzag/itemize/blob/a24376ed/config.ts#L147)
 
 ___
 
@@ -146,7 +146,7 @@ The hostname used in development mode, used to avoid SEO hijaking
 
 #### Defined in
 
-[config.ts:111](https://github.com/onzag/itemize/blob/f2db74a5/config.ts#L111)
+[config.ts:111](https://github.com/onzag/itemize/blob/a24376ed/config.ts#L111)
 
 ___
 
@@ -158,7 +158,7 @@ The schema entry, usually schema/root
 
 #### Defined in
 
-[config.ts:44](https://github.com/onzag/itemize/blob/f2db74a5/config.ts#L44)
+[config.ts:44](https://github.com/onzag/itemize/blob/a24376ed/config.ts#L44)
 
 ___
 
@@ -171,7 +171,7 @@ also the default for development
 
 #### Defined in
 
-[config.ts:95](https://github.com/onzag/itemize/blob/f2db74a5/config.ts#L95)
+[config.ts:95](https://github.com/onzag/itemize/blob/a24376ed/config.ts#L95)
 
 ___
 
@@ -184,7 +184,7 @@ also the default for development
 
 #### Defined in
 
-[config.ts:105](https://github.com/onzag/itemize/blob/f2db74a5/config.ts#L105)
+[config.ts:105](https://github.com/onzag/itemize/blob/a24376ed/config.ts#L105)
 
 ___
 
@@ -197,7 +197,7 @@ also the default for development
 
 #### Defined in
 
-[config.ts:100](https://github.com/onzag/itemize/blob/f2db74a5/config.ts#L100)
+[config.ts:100](https://github.com/onzag/itemize/blob/a24376ed/config.ts#L100)
 
 ___
 
@@ -209,7 +209,7 @@ The font name to use
 
 #### Defined in
 
-[config.ts:83](https://github.com/onzag/itemize/blob/f2db74a5/config.ts#L83)
+[config.ts:83](https://github.com/onzag/itemize/blob/a24376ed/config.ts#L83)
 
 ___
 
@@ -221,7 +221,7 @@ The font url to use
 
 #### Defined in
 
-[config.ts:69](https://github.com/onzag/itemize/blob/f2db74a5/config.ts#L69)
+[config.ts:69](https://github.com/onzag/itemize/blob/a24376ed/config.ts#L69)
 
 ___
 
@@ -233,7 +233,7 @@ The mail domain that is used when sending emails from
 
 #### Defined in
 
-[config.ts:120](https://github.com/onzag/itemize/blob/f2db74a5/config.ts#L120)
+[config.ts:120](https://github.com/onzag/itemize/blob/a24376ed/config.ts#L120)
 
 ___
 
@@ -247,7 +247,7 @@ as emails get added there
 
 #### Defined in
 
-[config.ts:126](https://github.com/onzag/itemize/blob/f2db74a5/config.ts#L126)
+[config.ts:126](https://github.com/onzag/itemize/blob/a24376ed/config.ts#L126)
 
 ___
 
@@ -259,7 +259,7 @@ The web manifest configuration
 
 #### Defined in
 
-[config.ts:65](https://github.com/onzag/itemize/blob/f2db74a5/config.ts#L65)
+[config.ts:65](https://github.com/onzag/itemize/blob/a24376ed/config.ts#L65)
 
 ___
 
@@ -271,7 +271,7 @@ The hostname used in production mode, used to avoid SEO hijacking
 
 #### Defined in
 
-[config.ts:115](https://github.com/onzag/itemize/blob/f2db74a5/config.ts#L115)
+[config.ts:115](https://github.com/onzag/itemize/blob/a24376ed/config.ts#L115)
 
 ___
 
@@ -284,7 +284,7 @@ ADMIN is an expected role for this
 
 #### Defined in
 
-[config.ts:61](https://github.com/onzag/itemize/blob/f2db74a5/config.ts#L61)
+[config.ts:61](https://github.com/onzag/itemize/blob/a24376ed/config.ts#L61)
 
 ___
 
@@ -296,7 +296,7 @@ Of the supported languages, which ones are right to left
 
 #### Defined in
 
-[config.ts:56](https://github.com/onzag/itemize/blob/f2db74a5/config.ts#L56)
+[config.ts:56](https://github.com/onzag/itemize/blob/a24376ed/config.ts#L56)
 
 ___
 
@@ -313,7 +313,7 @@ but kept into the sensitive or standard file (eg. client side api keys)
 
 #### Defined in
 
-[config.ts:154](https://github.com/onzag/itemize/blob/f2db74a5/config.ts#L154)
+[config.ts:154](https://github.com/onzag/itemize/blob/a24376ed/config.ts#L154)
 
 ___
 
@@ -325,4 +325,4 @@ The supported languages as an array of string
 
 #### Defined in
 
-[config.ts:52](https://github.com/onzag/itemize/blob/f2db74a5/config.ts#L52)
+[config.ts:52](https://github.com/onzag/itemize/blob/a24376ed/config.ts#L52)

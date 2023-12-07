@@ -19,7 +19,7 @@
 
 #### Defined in
 
-[base/Root/Module/ItemDefinition/index.ts:78](https://github.com/onzag/itemize/blob/f2db74a5/base/Root/Module/ItemDefinition/index.ts#L78)
+[base/Root/Module/ItemDefinition/index.ts:82](https://github.com/onzag/itemize/blob/a24376ed/base/Root/Module/ItemDefinition/index.ts#L82)
 
 ___
 
@@ -29,4 +29,4 @@ ___
 
 #### Defined in
 
-[base/Root/Module/ItemDefinition/index.ts:79](https://github.com/onzag/itemize/blob/f2db74a5/base/Root/Module/ItemDefinition/index.ts#L79)
+[base/Root/Module/ItemDefinition/index.ts:83](https://github.com/onzag/itemize/blob/a24376ed/base/Root/Module/ItemDefinition/index.ts#L83)

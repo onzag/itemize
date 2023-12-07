@@ -38,7 +38,7 @@ a react element
 
 #### Defined in
 
-[client/components/user/UserDataRetriever.tsx:33](https://github.com/onzag/itemize/blob/f2db74a5/client/components/user/UserDataRetriever.tsx#L33)
+[client/components/user/UserDataRetriever.tsx:33](https://github.com/onzag/itemize/blob/a24376ed/client/components/user/UserDataRetriever.tsx#L33)
 
 ___
 
@@ -57,4 +57,4 @@ ___
 
 #### Defined in
 
-[client/components/user/UserDataRetriever.tsx:48](https://github.com/onzag/itemize/blob/f2db74a5/client/components/user/UserDataRetriever.tsx#L48)
+[client/components/user/UserDataRetriever.tsx:48](https://github.com/onzag/itemize/blob/a24376ed/client/components/user/UserDataRetriever.tsx#L48)

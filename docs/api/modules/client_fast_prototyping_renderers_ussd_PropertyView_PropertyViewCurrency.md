@@ -28,4 +28,4 @@ Contains the property view currency renderer
 
 #### Defined in
 
-[client/fast-prototyping/renderers-ussd/PropertyView/PropertyViewCurrency.tsx:10](https://github.com/onzag/itemize/blob/f2db74a5/client/fast-prototyping/renderers-ussd/PropertyView/PropertyViewCurrency.tsx#L10)
+[client/fast-prototyping/renderers-ussd/PropertyView/PropertyViewCurrency.tsx:10](https://github.com/onzag/itemize/blob/a24376ed/client/fast-prototyping/renderers-ussd/PropertyView/PropertyViewCurrency.tsx#L10)

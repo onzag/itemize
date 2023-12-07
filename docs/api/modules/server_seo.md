@@ -8,8 +8,6 @@ Contains the interfaces for generating SEO
 
 ### Interfaces
 
-- [ISEOCollectedData](../interfaces/server_seo.ISEOCollectedData.md)
-- [ISEOCollectedResult](../interfaces/server_seo.ISEOCollectedResult.md)
 - [ISEOCollectionRequest](../interfaces/server_seo.ISEOCollectionRequest.md)
 - [ISEOParametrizer](../interfaces/server_seo.ISEOParametrizer.md)
 - [ISEORule](../interfaces/server_seo.ISEORule.md)

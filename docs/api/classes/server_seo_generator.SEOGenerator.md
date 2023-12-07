@@ -40,32 +40,23 @@ because it is an entry type all their urls will be prefixed for the webpage with
 
 ### Properties
 
+- [buildnumber](server_seo_generator.SEOGenerator.md#buildnumber)
 - [hostname](server_seo_generator.SEOGenerator.md#hostname)
-- [mainIndex](server_seo_generator.SEOGenerator.md#mainindex)
-- [pingGoogle](server_seo_generator.SEOGenerator.md#pinggoogle)
-- [primaryIndex](server_seo_generator.SEOGenerator.md#primaryindex)
 - [rawDB](server_seo_generator.SEOGenerator.md#rawdb)
 - [root](server_seo_generator.SEOGenerator.md#root)
 - [rules](server_seo_generator.SEOGenerator.md#rules)
-- [seoCache](server_seo_generator.SEOGenerator.md#seocache)
-- [storageClient](server_seo_generator.SEOGenerator.md#storageclient)
 - [supportedLanguages](server_seo_generator.SEOGenerator.md#supportedlanguages)
 
 ### Methods
 
-- [checkExist](server_seo_generator.SEOGenerator.md#checkexist)
-- [checkIndexFile](server_seo_generator.SEOGenerator.md#checkindexfile)
 - [defaultParametrizer](server_seo_generator.SEOGenerator.md#defaultparametrizer)
-- [run](server_seo_generator.SEOGenerator.md#run)
-- [runFor](server_seo_generator.SEOGenerator.md#runfor)
-- [writeFile](server_seo_generator.SEOGenerator.md#writefile)
-- [writeSitemapFile](server_seo_generator.SEOGenerator.md#writesitemapfile)
+- [provide](server_seo_generator.SEOGenerator.md#provide)
 
 ## Constructors
 
 ### constructor
 
-• **new SEOGenerator**(`rules`, `storageClient`, `rawDB`, `root`, `supportedLanguages`, `hostname`, `pingGoogle`)
+• **new SEOGenerator**(`rules`, `rawDB`, `root`, `supportedLanguages`, `hostname`, `buildnumber`)
 
 Buillds a new seo generator
 
@@ -74,18 +65,27 @@ Buillds a new seo generator
 | Name | Type | Description |
 | :------ | :------ | :------ |
 | `rules` | [`ISEORuleSet`](../interfaces/server_seo.ISEORuleSet.md) | the seo rules |
-| `storageClient` | [`default`](server_services_base_StorageProvider.default.md)<`any`\> | the storageClient with the XML files |
 | `rawDB` | [`ItemizeRawDB`](server_raw_db.ItemizeRawDB.md) | the raw db instance |
 | `root` | [`default`](base_Root.default.md) | the root for definitions |
 | `supportedLanguages` | `string`[] | the supporte languages |
 | `hostname` | `string` | the hostname that we are creating sitemaps for |
-| `pingGoogle` | `boolean` | whether to ping google once we have updated our sitemaps |
+| `buildnumber` | `string` | - |
 
 #### Defined in
 
-[server/seo/generator.ts:85](https://github.com/onzag/itemize/blob/f2db74a5/server/seo/generator.ts#L85)
+[server/seo/generator.ts:59](https://github.com/onzag/itemize/blob/a24376ed/server/seo/generator.ts#L59)
 
 ## Properties
+
+### buildnumber
+
+• `Private` **buildnumber**: `string`
+
+#### Defined in
+
+[server/seo/generator.ts:48](https://github.com/onzag/itemize/blob/a24376ed/server/seo/generator.ts#L48)
+
+___
 
 ### hostname
 
@@ -93,37 +93,7 @@ Buillds a new seo generator
 
 #### Defined in
 
-[server/seo/generator.ts:67](https://github.com/onzag/itemize/blob/f2db74a5/server/seo/generator.ts#L67)
-
-___
-
-### mainIndex
-
-• `Private` **mainIndex**: [`ISitemapJSONType`](../interfaces/server_seo_sitemaps.ISitemapJSONType.md) = `null`
-
-#### Defined in
-
-[server/seo/generator.ts:71](https://github.com/onzag/itemize/blob/f2db74a5/server/seo/generator.ts#L71)
-
-___
-
-### pingGoogle
-
-• `Private` **pingGoogle**: `boolean`
-
-#### Defined in
-
-[server/seo/generator.ts:68](https://github.com/onzag/itemize/blob/f2db74a5/server/seo/generator.ts#L68)
-
-___
-
-### primaryIndex
-
-• `Private` **primaryIndex**: [`ISitemapJSONType`](../interfaces/server_seo_sitemaps.ISitemapJSONType.md) = `null`
-
-#### Defined in
-
-[server/seo/generator.ts:70](https://github.com/onzag/itemize/blob/f2db74a5/server/seo/generator.ts#L70)
+[server/seo/generator.ts:47](https://github.com/onzag/itemize/blob/a24376ed/server/seo/generator.ts#L47)
 
 ___
 
@@ -133,7 +103,7 @@ ___
 
 #### Defined in
 
-[server/seo/generator.ts:63](https://github.com/onzag/itemize/blob/f2db74a5/server/seo/generator.ts#L63)
+[server/seo/generator.ts:44](https://github.com/onzag/itemize/blob/a24376ed/server/seo/generator.ts#L44)
 
 ___
 
@@ -143,7 +113,7 @@ ___
 
 #### Defined in
 
-[server/seo/generator.ts:62](https://github.com/onzag/itemize/blob/f2db74a5/server/seo/generator.ts#L62)
+[server/seo/generator.ts:43](https://github.com/onzag/itemize/blob/a24376ed/server/seo/generator.ts#L43)
 
 ___
 
@@ -153,31 +123,7 @@ ___
 
 #### Defined in
 
-[server/seo/generator.ts:65](https://github.com/onzag/itemize/blob/f2db74a5/server/seo/generator.ts#L65)
-
-___
-
-### seoCache
-
-• `Private` **seoCache**: `Object` = `{}`
-
-#### Index signature
-
-▪ [key: `string`]: [`ISEOCollectedData`](../interfaces/server_seo.ISEOCollectedData.md)[]
-
-#### Defined in
-
-[server/seo/generator.ts:72](https://github.com/onzag/itemize/blob/f2db74a5/server/seo/generator.ts#L72)
-
-___
-
-### storageClient
-
-• `Private` **storageClient**: [`default`](server_services_base_StorageProvider.default.md)<`any`\>
-
-#### Defined in
-
-[server/seo/generator.ts:64](https://github.com/onzag/itemize/blob/f2db74a5/server/seo/generator.ts#L64)
+[server/seo/generator.ts:45](https://github.com/onzag/itemize/blob/a24376ed/server/seo/generator.ts#L45)
 
 ___
 
@@ -187,57 +133,21 @@ ___
 
 #### Defined in
 
-[server/seo/generator.ts:66](https://github.com/onzag/itemize/blob/f2db74a5/server/seo/generator.ts#L66)
+[server/seo/generator.ts:46](https://github.com/onzag/itemize/blob/a24376ed/server/seo/generator.ts#L46)
 
 ## Methods
-
-### checkExist
-
-▸ `Private` **checkExist**(`at`): `Promise`<`boolean`\>
-
-#### Parameters
-
-| Name | Type |
-| :------ | :------ |
-| `at` | `string` |
-
-#### Returns
-
-`Promise`<`boolean`\>
-
-#### Defined in
-
-[server/seo/generator.ts:326](https://github.com/onzag/itemize/blob/f2db74a5/server/seo/generator.ts#L326)
-
-___
-
-### checkIndexFile
-
-▸ `Private` **checkIndexFile**(): `Promise`<`void`\>
-
-#### Returns
-
-`Promise`<`void`\>
-
-#### Defined in
-
-[server/seo/generator.ts:373](https://github.com/onzag/itemize/blob/f2db74a5/server/seo/generator.ts#L373)
-
-___
 
 ### defaultParametrizer
 
 ▸ `Private` **defaultParametrizer**(`arg`): [`ISEOParametrizer`](../interfaces/server_seo.ISEOParametrizer.md)[]
 
-defines how the parameters are collected from the given
-SEO results
-
 #### Parameters
 
-| Name | Type | Description |
-| :------ | :------ | :------ |
-| `arg` | `Object` | the collected results argument |
-| `arg.collectedResults` | [`ISEOCollectedResult`](../interfaces/server_seo.ISEOCollectedResult.md)[] | - |
+| Name | Type |
+| :------ | :------ |
+| `arg` | `Object` |
+| `arg.buildnumber` | `string` |
+| `arg.collectedResults` | [`ISQLTableRowValue`](../interfaces/base_Root_sql.ISQLTableRowValue.md)[] |
 
 #### Returns
 
@@ -245,15 +155,22 @@ SEO results
 
 #### Defined in
 
-[server/seo/generator.ts:616](https://github.com/onzag/itemize/blob/f2db74a5/server/seo/generator.ts#L616)
+[server/seo/generator.ts:193](https://github.com/onzag/itemize/blob/a24376ed/server/seo/generator.ts#L193)
 
 ___
 
-### run
+### provide
 
-▸ **run**(): `Promise`<`void`\>
+▸ **provide**(`req`, `res`): `Promise`<`void`\>
 
-Run the seo generator mechanism, usually run once a day
+This is what does the processing hooking directly into the sitemap.xml
+
+#### Parameters
+
+| Name | Type | Description |
+| :------ | :------ | :------ |
+| `req` | `any` | the relevant request |
+| `res` | `any` |  |
 
 #### Returns
 
@@ -261,75 +178,4 @@ Run the seo generator mechanism, usually run once a day
 
 #### Defined in
 
-[server/seo/generator.ts:115](https://github.com/onzag/itemize/blob/f2db74a5/server/seo/generator.ts#L115)
-
-___
-
-### runFor
-
-▸ `Private` **runFor**(`key`, `rule`): `Promise`<`ISEOPreResult`\>
-
-uses a seo rule in order to build the sitemap
-
-#### Parameters
-
-| Name | Type | Description |
-| :------ | :------ | :------ |
-| `key` | `string` | the comma separated urls that represents the key |
-| `rule` | [`ISEORule`](../interfaces/server_seo.ISEORule.md) | the rule that we are following |
-
-#### Returns
-
-`Promise`<`ISEOPreResult`\>
-
-#### Defined in
-
-[server/seo/generator.ts:458](https://github.com/onzag/itemize/blob/f2db74a5/server/seo/generator.ts#L458)
-
-___
-
-### writeFile
-
-▸ `Private` **writeFile**(`data`, `target`): `Promise`<`void`\>
-
-Writes a file at the specified endpoint
-
-#### Parameters
-
-| Name | Type | Description |
-| :------ | :------ | :------ |
-| `data` | `string` | the data to write |
-| `target` | `string` | the target endpoint url |
-
-#### Returns
-
-`Promise`<`void`\>
-
-#### Defined in
-
-[server/seo/generator.ts:335](https://github.com/onzag/itemize/blob/f2db74a5/server/seo/generator.ts#L335)
-
-___
-
-### writeSitemapFile
-
-▸ `Private` **writeSitemapFile**(`src`, `target`, `prefix?`, `suffix?`): `Promise`<`void`\>
-
-Converts a JSON sitemap type to a xml type
-
-#### Parameters
-
-| Name | Type | Description |
-| :------ | :------ | :------ |
-| `src` | [`ISitemapJSONType`](../interfaces/server_seo_sitemaps.ISitemapJSONType.md) | the source JSON type |
-| `target` | `string` | the target where to write the file |
-| `prefix?` | `string` | an optional prefix to add before the url that is supposed to be added but not before the openstack prefix |
-| `suffix?` | `string` | an optional suffix to add after the url that is supposed to be added |
-
-#### Returns
-
-`Promise`<`void`\>
-
-#### Defined in
-
-[server/seo/generator.ts:358](https://github.com/onzag/itemize/blob/f2db74a5/server/seo/generator.ts#L358)
+[server/seo/generator.ts:83](https://github.com/onzag/itemize/blob/a24376ed/server/seo/generator.ts#L83)

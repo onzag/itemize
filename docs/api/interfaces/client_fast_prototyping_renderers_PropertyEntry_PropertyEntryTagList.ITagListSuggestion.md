@@ -19,7 +19,7 @@
 
 #### Defined in
 
-[client/fast-prototyping/renderers/PropertyEntry/PropertyEntryTagList.tsx:142](https://github.com/onzag/itemize/blob/f2db74a5/client/fast-prototyping/renderers/PropertyEntry/PropertyEntryTagList.tsx#L142)
+[client/fast-prototyping/renderers/PropertyEntry/PropertyEntryTagList.tsx:142](https://github.com/onzag/itemize/blob/a24376ed/client/fast-prototyping/renderers/PropertyEntry/PropertyEntryTagList.tsx#L142)
 
 ___
 
@@ -29,4 +29,4 @@ ___
 
 #### Defined in
 
-[client/fast-prototyping/renderers/PropertyEntry/PropertyEntryTagList.tsx:143](https://github.com/onzag/itemize/blob/f2db74a5/client/fast-prototyping/renderers/PropertyEntry/PropertyEntryTagList.tsx#L143)
+[client/fast-prototyping/renderers/PropertyEntry/PropertyEntryTagList.tsx:143](https://github.com/onzag/itemize/blob/a24376ed/client/fast-prototyping/renderers/PropertyEntry/PropertyEntryTagList.tsx#L143)

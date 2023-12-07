@@ -79,7 +79,7 @@ React.Component&lt;IAppProps, IAppState\&gt;.constructor
 
 #### Defined in
 
-[client/internal/app/index.tsx:155](https://github.com/onzag/itemize/blob/f2db74a5/client/internal/app/index.tsx#L155)
+[client/internal/app/index.tsx:155](https://github.com/onzag/itemize/blob/a24376ed/client/internal/app/index.tsx#L155)
 
 ## Properties
 
@@ -156,7 +156,7 @@ as well as buildnumbers, currency factors changed info, etc...
 
 #### Defined in
 
-[client/internal/app/index.tsx:149](https://github.com/onzag/itemize/blob/f2db74a5/client/internal/app/index.tsx#L149)
+[client/internal/app/index.tsx:149](https://github.com/onzag/itemize/blob/a24376ed/client/internal/app/index.tsx#L149)
 
 ___
 
@@ -184,7 +184,7 @@ as well as the update functions need token provider
 
 #### Defined in
 
-[client/internal/app/index.tsx:143](https://github.com/onzag/itemize/blob/f2db74a5/client/internal/app/index.tsx#L143)
+[client/internal/app/index.tsx:143](https://github.com/onzag/itemize/blob/a24376ed/client/internal/app/index.tsx#L143)
 
 ___
 
@@ -360,7 +360,7 @@ of currency and language
 
 #### Defined in
 
-[client/internal/app/index.tsx:471](https://github.com/onzag/itemize/blob/f2db74a5/client/internal/app/index.tsx#L471)
+[client/internal/app/index.tsx:471](https://github.com/onzag/itemize/blob/a24376ed/client/internal/app/index.tsx#L471)
 
 ___
 
@@ -384,7 +384,7 @@ given its 3 letter uppercase code
 
 #### Defined in
 
-[client/internal/app/index.tsx:589](https://github.com/onzag/itemize/blob/f2db74a5/client/internal/app/index.tsx#L589)
+[client/internal/app/index.tsx:589](https://github.com/onzag/itemize/blob/a24376ed/client/internal/app/index.tsx#L589)
 
 ___
 
@@ -407,7 +407,7 @@ Changes the language for the one specified by that locale
 
 #### Defined in
 
-[client/internal/app/index.tsx:390](https://github.com/onzag/itemize/blob/f2db74a5/client/internal/app/index.tsx#L390)
+[client/internal/app/index.tsx:390](https://github.com/onzag/itemize/blob/a24376ed/client/internal/app/index.tsx#L390)
 
 ___
 
@@ -453,7 +453,7 @@ React.Component.componentDidMount
 
 #### Defined in
 
-[client/internal/app/index.tsx:579](https://github.com/onzag/itemize/blob/f2db74a5/client/internal/app/index.tsx#L579)
+[client/internal/app/index.tsx:579](https://github.com/onzag/itemize/blob/a24376ed/client/internal/app/index.tsx#L579)
 
 ___
 
@@ -627,7 +627,7 @@ ___
 
 #### Defined in
 
-[client/internal/app/index.tsx:566](https://github.com/onzag/itemize/blob/f2db74a5/client/internal/app/index.tsx#L566)
+[client/internal/app/index.tsx:566](https://github.com/onzag/itemize/blob/a24376ed/client/internal/app/index.tsx#L566)
 
 ___
 
@@ -652,7 +652,7 @@ includes changing the url
 
 #### Defined in
 
-[client/internal/app/index.tsx:340](https://github.com/onzag/itemize/blob/f2db74a5/client/internal/app/index.tsx#L340)
+[client/internal/app/index.tsx:340](https://github.com/onzag/itemize/blob/a24376ed/client/internal/app/index.tsx#L340)
 
 ___
 
@@ -730,7 +730,7 @@ Checks whether there is a locale data for a given language
 
 #### Defined in
 
-[client/internal/app/index.tsx:329](https://github.com/onzag/itemize/blob/f2db74a5/client/internal/app/index.tsx#L329)
+[client/internal/app/index.tsx:329](https://github.com/onzag/itemize/blob/a24376ed/client/internal/app/index.tsx#L329)
 
 ___
 
@@ -750,7 +750,7 @@ React.Component.render
 
 #### Defined in
 
-[client/internal/app/index.tsx:628](https://github.com/onzag/itemize/blob/f2db74a5/client/internal/app/index.tsx#L628)
+[client/internal/app/index.tsx:628](https://github.com/onzag/itemize/blob/a24376ed/client/internal/app/index.tsx#L628)
 
 ___
 
@@ -774,7 +774,7 @@ of the app is blocked from update as it can't access indexeddb
 
 #### Defined in
 
-[client/internal/app/index.tsx:233](https://github.com/onzag/itemize/blob/f2db74a5/client/internal/app/index.tsx#L233)
+[client/internal/app/index.tsx:233](https://github.com/onzag/itemize/blob/a24376ed/client/internal/app/index.tsx#L233)
 
 ___
 
@@ -830,7 +830,7 @@ provider state is needed here, it's streamed here once it's ready, as well as on
 
 #### Defined in
 
-[client/internal/app/index.tsx:248](https://github.com/onzag/itemize/blob/f2db74a5/client/internal/app/index.tsx#L248)
+[client/internal/app/index.tsx:248](https://github.com/onzag/itemize/blob/a24376ed/client/internal/app/index.tsx#L248)
 
 ___
 
@@ -887,7 +887,7 @@ Currency factors is also service worked so it should work offline
 
 #### Defined in
 
-[client/internal/app/index.tsx:210](https://github.com/onzag/itemize/blob/f2db74a5/client/internal/app/index.tsx#L210)
+[client/internal/app/index.tsx:210](https://github.com/onzag/itemize/blob/a24376ed/client/internal/app/index.tsx#L210)
 
 ___
 
@@ -913,4 +913,4 @@ in practique this is used to update app_language, app_currency and app_country
 
 #### Defined in
 
-[client/internal/app/index.tsx:269](https://github.com/onzag/itemize/blob/f2db74a5/client/internal/app/index.tsx#L269)
+[client/internal/app/index.tsx:269](https://github.com/onzag/itemize/blob/a24376ed/client/internal/app/index.tsx#L269)

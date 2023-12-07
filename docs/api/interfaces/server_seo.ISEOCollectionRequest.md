@@ -9,9 +9,12 @@
 ### Properties
 
 - [collectAllVersions](server_seo.ISEOCollectionRequest.md#collectallversions)
-- [extraProperties](server_seo.ISEOCollectionRequest.md#extraproperties)
-- [item](server_seo.ISEOCollectionRequest.md#item)
-- [module](server_seo.ISEOCollectionRequest.md#module)
+- [extraColumns](server_seo.ISEOCollectionRequest.md#extracolumns)
+- [itemOrModule](server_seo.ISEOCollectionRequest.md#itemormodule)
+
+### Methods
+
+- [customWhere](server_seo.ISEOCollectionRequest.md#customwhere)
 
 ## Properties
 
@@ -23,34 +26,44 @@ By default only the base version is collected, if you wish you can collect all t
 
 #### Defined in
 
-[server/seo/index.ts:44](https://github.com/onzag/itemize/blob/f2db74a5/server/seo/index.ts#L44)
+[server/seo/index.ts:33](https://github.com/onzag/itemize/blob/a24376ed/server/seo/index.ts#L33)
 
 ___
 
-### extraProperties
+### extraColumns
 
-• `Optional` **extraProperties**: `string`[]
+• `Optional` **extraColumns**: `string`[]
 
 #### Defined in
 
-[server/seo/index.ts:40](https://github.com/onzag/itemize/blob/f2db74a5/server/seo/index.ts#L40)
+[server/seo/index.ts:28](https://github.com/onzag/itemize/blob/a24376ed/server/seo/index.ts#L28)
 
 ___
 
-### item
+### itemOrModule
 
-• `Optional` **item**: `string`
-
-#### Defined in
-
-[server/seo/index.ts:39](https://github.com/onzag/itemize/blob/f2db74a5/server/seo/index.ts#L39)
-
-___
-
-### module
-
-• **module**: `string`
+• **itemOrModule**: `string`
 
 #### Defined in
 
-[server/seo/index.ts:38](https://github.com/onzag/itemize/blob/f2db74a5/server/seo/index.ts#L38)
+[server/seo/index.ts:27](https://github.com/onzag/itemize/blob/a24376ed/server/seo/index.ts#L27)
+
+## Methods
+
+### customWhere
+
+▸ `Optional` **customWhere**(`b`): `void`
+
+#### Parameters
+
+| Name | Type |
+| :------ | :------ |
+| `b` | [`WhereBuilder`](../classes/database_WhereBuilder.WhereBuilder.md) |
+
+#### Returns
+
+`void`
+
+#### Defined in
+
+[server/seo/index.ts:29](https://github.com/onzag/itemize/blob/a24376ed/server/seo/index.ts#L29)

@@ -31,7 +31,7 @@ The unregister version of [IOwnedSearchRegisterRequest](base_remote_protocol.IOw
 
 #### Defined in
 
-[base/remote-protocol.ts:489](https://github.com/onzag/itemize/blob/f2db74a5/base/remote-protocol.ts#L489)
+[base/remote-protocol.ts:489](https://github.com/onzag/itemize/blob/a24376ed/base/remote-protocol.ts#L489)
 
 ___
 
@@ -45,4 +45,4 @@ IBaseSearchUnregisterRequest.qualifiedPathName
 
 #### Defined in
 
-[base/remote-protocol.ts:478](https://github.com/onzag/itemize/blob/f2db74a5/base/remote-protocol.ts#L478)
+[base/remote-protocol.ts:478](https://github.com/onzag/itemize/blob/a24376ed/base/remote-protocol.ts#L478)

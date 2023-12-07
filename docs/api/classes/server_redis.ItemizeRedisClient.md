@@ -55,7 +55,7 @@ Construct a new itemize redis client
 
 #### Defined in
 
-[server/redis.ts:41](https://github.com/onzag/itemize/blob/f2db74a5/server/redis.ts#L41)
+[server/redis.ts:42](https://github.com/onzag/itemize/blob/a24376ed/server/redis.ts#L42)
 
 ## Properties
 
@@ -79,7 +79,7 @@ Construct a new itemize redis client
 
 #### Defined in
 
-[server/redis.ts:29](https://github.com/onzag/itemize/blob/f2db74a5/server/redis.ts#L29)
+[server/redis.ts:30](https://github.com/onzag/itemize/blob/a24376ed/server/redis.ts#L30)
 
 ___
 
@@ -103,7 +103,7 @@ ___
 
 #### Defined in
 
-[server/redis.ts:33](https://github.com/onzag/itemize/blob/f2db74a5/server/redis.ts#L33)
+[server/redis.ts:34](https://github.com/onzag/itemize/blob/a24376ed/server/redis.ts#L34)
 
 ___
 
@@ -128,7 +128,7 @@ ___
 
 #### Defined in
 
-[server/redis.ts:32](https://github.com/onzag/itemize/blob/f2db74a5/server/redis.ts#L32)
+[server/redis.ts:33](https://github.com/onzag/itemize/blob/a24376ed/server/redis.ts#L33)
 
 ___
 
@@ -146,7 +146,7 @@ ___
 
 #### Defined in
 
-[server/redis.ts:31](https://github.com/onzag/itemize/blob/f2db74a5/server/redis.ts#L31)
+[server/redis.ts:32](https://github.com/onzag/itemize/blob/a24376ed/server/redis.ts#L32)
 
 ___
 
@@ -170,7 +170,7 @@ ___
 
 #### Defined in
 
-[server/redis.ts:24](https://github.com/onzag/itemize/blob/f2db74a5/server/redis.ts#L24)
+[server/redis.ts:25](https://github.com/onzag/itemize/blob/a24376ed/server/redis.ts#L25)
 
 ___
 
@@ -195,7 +195,7 @@ ___
 
 #### Defined in
 
-[server/redis.ts:30](https://github.com/onzag/itemize/blob/f2db74a5/server/redis.ts#L30)
+[server/redis.ts:31](https://github.com/onzag/itemize/blob/a24376ed/server/redis.ts#L31)
 
 ___
 
@@ -220,7 +220,7 @@ ___
 
 #### Defined in
 
-[server/redis.ts:34](https://github.com/onzag/itemize/blob/f2db74a5/server/redis.ts#L34)
+[server/redis.ts:35](https://github.com/onzag/itemize/blob/a24376ed/server/redis.ts#L35)
 
 ___
 
@@ -245,7 +245,7 @@ ___
 
 #### Defined in
 
-[server/redis.ts:25](https://github.com/onzag/itemize/blob/f2db74a5/server/redis.ts#L25)
+[server/redis.ts:26](https://github.com/onzag/itemize/blob/a24376ed/server/redis.ts#L26)
 
 ___
 
@@ -269,7 +269,7 @@ ___
 
 #### Defined in
 
-[server/redis.ts:26](https://github.com/onzag/itemize/blob/f2db74a5/server/redis.ts#L26)
+[server/redis.ts:27](https://github.com/onzag/itemize/blob/a24376ed/server/redis.ts#L27)
 
 ___
 
@@ -295,7 +295,7 @@ ___
 
 #### Defined in
 
-[server/redis.ts:28](https://github.com/onzag/itemize/blob/f2db74a5/server/redis.ts#L28)
+[server/redis.ts:29](https://github.com/onzag/itemize/blob/a24376ed/server/redis.ts#L29)
 
 ___
 
@@ -305,7 +305,7 @@ ___
 
 #### Defined in
 
-[server/redis.ts:20](https://github.com/onzag/itemize/blob/f2db74a5/server/redis.ts#L20)
+[server/redis.ts:21](https://github.com/onzag/itemize/blob/a24376ed/server/redis.ts#L21)
 
 ___
 
@@ -315,7 +315,7 @@ ___
 
 #### Defined in
 
-[server/redis.ts:19](https://github.com/onzag/itemize/blob/f2db74a5/server/redis.ts#L19)
+[server/redis.ts:20](https://github.com/onzag/itemize/blob/a24376ed/server/redis.ts#L20)
 
 ___
 
@@ -325,7 +325,7 @@ ___
 
 #### Defined in
 
-[server/redis.ts:22](https://github.com/onzag/itemize/blob/f2db74a5/server/redis.ts#L22)
+[server/redis.ts:23](https://github.com/onzag/itemize/blob/a24376ed/server/redis.ts#L23)
 
 ___
 
@@ -335,7 +335,7 @@ ___
 
 #### Defined in
 
-[server/redis.ts:23](https://github.com/onzag/itemize/blob/f2db74a5/server/redis.ts#L23)
+[server/redis.ts:24](https://github.com/onzag/itemize/blob/a24376ed/server/redis.ts#L24)
 
 ___
 
@@ -360,7 +360,7 @@ ___
 
 #### Defined in
 
-[server/redis.ts:27](https://github.com/onzag/itemize/blob/f2db74a5/server/redis.ts#L27)
+[server/redis.ts:28](https://github.com/onzag/itemize/blob/a24376ed/server/redis.ts#L28)
 
 ## Methods
 
@@ -396,7 +396,7 @@ Just wrap the standard promise function so that it won't execute when redis is d
 
 #### Defined in
 
-[server/redis.ts:153](https://github.com/onzag/itemize/blob/f2db74a5/server/redis.ts#L153)
+[server/redis.ts:154](https://github.com/onzag/itemize/blob/a24376ed/server/redis.ts#L154)
 
 ___
 
@@ -421,4 +421,4 @@ to take on connections
 
 #### Defined in
 
-[server/redis.ts:67](https://github.com/onzag/itemize/blob/f2db74a5/server/redis.ts#L67)
+[server/redis.ts:68](https://github.com/onzag/itemize/blob/a24376ed/server/redis.ts#L68)

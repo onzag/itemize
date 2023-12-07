@@ -37,7 +37,7 @@ Adds a custom children at the end of the toolbar
 
 #### Defined in
 
-[client/fast-prototyping/components/slate/wrapper.tsx:310](https://github.com/onzag/itemize/blob/f2db74a5/client/fast-prototyping/components/slate/wrapper.tsx#L310)
+[client/fast-prototyping/components/slate/wrapper.tsx:312](https://github.com/onzag/itemize/blob/a24376ed/client/fast-prototyping/components/slate/wrapper.tsx#L312)
 
 ___
 
@@ -52,7 +52,7 @@ of the element
 
 #### Defined in
 
-[client/fast-prototyping/components/slate/wrapper.tsx:280](https://github.com/onzag/itemize/blob/f2db74a5/client/fast-prototyping/components/slate/wrapper.tsx#L280)
+[client/fast-prototyping/components/slate/wrapper.tsx:282](https://github.com/onzag/itemize/blob/a24376ed/client/fast-prototyping/components/slate/wrapper.tsx#L282)
 
 ___
 
@@ -64,7 +64,7 @@ The element to be added
 
 #### Defined in
 
-[client/fast-prototyping/components/slate/wrapper.tsx:256](https://github.com/onzag/itemize/blob/f2db74a5/client/fast-prototyping/components/slate/wrapper.tsx#L256)
+[client/fast-prototyping/components/slate/wrapper.tsx:258](https://github.com/onzag/itemize/blob/a24376ed/client/fast-prototyping/components/slate/wrapper.tsx#L258)
 
 ___
 
@@ -76,7 +76,7 @@ The fast key value, if any
 
 #### Defined in
 
-[client/fast-prototyping/components/slate/wrapper.tsx:284](https://github.com/onzag/itemize/blob/f2db74a5/client/fast-prototyping/components/slate/wrapper.tsx#L284)
+[client/fast-prototyping/components/slate/wrapper.tsx:286](https://github.com/onzag/itemize/blob/a24376ed/client/fast-prototyping/components/slate/wrapper.tsx#L286)
 
 ___
 
@@ -88,7 +88,7 @@ Given icon to use in the toolbar
 
 #### Defined in
 
-[client/fast-prototyping/components/slate/wrapper.tsx:245](https://github.com/onzag/itemize/blob/f2db74a5/client/fast-prototyping/components/slate/wrapper.tsx#L245)
+[client/fast-prototyping/components/slate/wrapper.tsx:247](https://github.com/onzag/itemize/blob/a24376ed/client/fast-prototyping/components/slate/wrapper.tsx#L247)
 
 ___
 
@@ -100,7 +100,7 @@ whether it should be marked as selected
 
 #### Defined in
 
-[client/fast-prototyping/components/slate/wrapper.tsx:305](https://github.com/onzag/itemize/blob/f2db74a5/client/fast-prototyping/components/slate/wrapper.tsx#L305)
+[client/fast-prototyping/components/slate/wrapper.tsx:307](https://github.com/onzag/itemize/blob/a24376ed/client/fast-prototyping/components/slate/wrapper.tsx#L307)
 
 ___
 
@@ -115,7 +115,7 @@ eg. the i18nRead element
 
 #### Defined in
 
-[client/fast-prototyping/components/slate/wrapper.tsx:252](https://github.com/onzag/itemize/blob/f2db74a5/client/fast-prototyping/components/slate/wrapper.tsx#L252)
+[client/fast-prototyping/components/slate/wrapper.tsx:254](https://github.com/onzag/itemize/blob/a24376ed/client/fast-prototyping/components/slate/wrapper.tsx#L254)
 
 ___
 
@@ -128,7 +128,7 @@ alt actioner priority
 
 #### Defined in
 
-[client/fast-prototyping/components/slate/wrapper.tsx:300](https://github.com/onzag/itemize/blob/f2db74a5/client/fast-prototyping/components/slate/wrapper.tsx#L300)
+[client/fast-prototyping/components/slate/wrapper.tsx:302](https://github.com/onzag/itemize/blob/a24376ed/client/fast-prototyping/components/slate/wrapper.tsx#L302)
 
 ___
 
@@ -141,7 +141,7 @@ for the alt badge reactioner
 
 #### Defined in
 
-[client/fast-prototyping/components/slate/wrapper.tsx:289](https://github.com/onzag/itemize/blob/f2db74a5/client/fast-prototyping/components/slate/wrapper.tsx#L289)
+[client/fast-prototyping/components/slate/wrapper.tsx:291](https://github.com/onzag/itemize/blob/a24376ed/client/fast-prototyping/components/slate/wrapper.tsx#L291)
 
 ___
 
@@ -154,7 +154,7 @@ alt
 
 #### Defined in
 
-[client/fast-prototyping/components/slate/wrapper.tsx:294](https://github.com/onzag/itemize/blob/f2db74a5/client/fast-prototyping/components/slate/wrapper.tsx#L294)
+[client/fast-prototyping/components/slate/wrapper.tsx:296](https://github.com/onzag/itemize/blob/a24376ed/client/fast-prototyping/components/slate/wrapper.tsx#L296)
 
 ## Methods
 
@@ -176,7 +176,7 @@ Trigger on any keydown event
 
 #### Defined in
 
-[client/fast-prototyping/components/slate/wrapper.tsx:273](https://github.com/onzag/itemize/blob/f2db74a5/client/fast-prototyping/components/slate/wrapper.tsx#L273)
+[client/fast-prototyping/components/slate/wrapper.tsx:275](https://github.com/onzag/itemize/blob/a24376ed/client/fast-prototyping/components/slate/wrapper.tsx#L275)
 
 ___
 
@@ -199,7 +199,7 @@ Alternatively an action
 
 #### Defined in
 
-[client/fast-prototyping/components/slate/wrapper.tsx:260](https://github.com/onzag/itemize/blob/f2db74a5/client/fast-prototyping/components/slate/wrapper.tsx#L260)
+[client/fast-prototyping/components/slate/wrapper.tsx:262](https://github.com/onzag/itemize/blob/a24376ed/client/fast-prototyping/components/slate/wrapper.tsx#L262)
 
 ___
 
@@ -222,4 +222,4 @@ Handle refocus attempts during the click event
 
 #### Defined in
 
-[client/fast-prototyping/components/slate/wrapper.tsx:267](https://github.com/onzag/itemize/blob/f2db74a5/client/fast-prototyping/components/slate/wrapper.tsx#L267)
+[client/fast-prototyping/components/slate/wrapper.tsx:269](https://github.com/onzag/itemize/blob/a24376ed/client/fast-prototyping/components/slate/wrapper.tsx#L269)

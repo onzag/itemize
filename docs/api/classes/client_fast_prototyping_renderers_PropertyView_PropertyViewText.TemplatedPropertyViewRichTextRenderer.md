@@ -65,7 +65,7 @@ React.Component&lt;
 
 #### Defined in
 
-[client/fast-prototyping/renderers/PropertyView/PropertyViewText.tsx:400](https://github.com/onzag/itemize/blob/f2db74a5/client/fast-prototyping/renderers/PropertyView/PropertyViewText.tsx#L400)
+[client/fast-prototyping/renderers/PropertyView/PropertyViewText.tsx:404](https://github.com/onzag/itemize/blob/a24376ed/client/fast-prototyping/renderers/PropertyView/PropertyViewText.tsx#L404)
 
 ## Properties
 
@@ -572,7 +572,7 @@ React.Component.render
 
 #### Defined in
 
-[client/fast-prototyping/renderers/PropertyView/PropertyViewText.tsx:410](https://github.com/onzag/itemize/blob/f2db74a5/client/fast-prototyping/renderers/PropertyView/PropertyViewText.tsx#L410)
+[client/fast-prototyping/renderers/PropertyView/PropertyViewText.tsx:415](https://github.com/onzag/itemize/blob/a24376ed/client/fast-prototyping/renderers/PropertyView/PropertyViewText.tsx#L415)
 
 ___
 
@@ -627,4 +627,4 @@ React.Component.shouldComponentUpdate
 
 #### Defined in
 
-[client/fast-prototyping/renderers/PropertyView/PropertyViewText.tsx:403](https://github.com/onzag/itemize/blob/f2db74a5/client/fast-prototyping/renderers/PropertyView/PropertyViewText.tsx#L403)
+[client/fast-prototyping/renderers/PropertyView/PropertyViewText.tsx:407](https://github.com/onzag/itemize/blob/a24376ed/client/fast-prototyping/renderers/PropertyView/PropertyViewText.tsx#L407)

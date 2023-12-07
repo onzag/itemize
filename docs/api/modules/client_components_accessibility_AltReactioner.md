@@ -29,6 +29,8 @@ users without hands
 - [hideAll](client_components_accessibility_AltReactioner.md#hideall)
 - [showLayereds](client_components_accessibility_AltReactioner.md#showlayereds)
 - [toggleAlt](client_components_accessibility_AltReactioner.md#togglealt)
+- [triggerAltCycle](client_components_accessibility_AltReactioner.md#triggeraltcycle)
+- [triggerTabCycle](client_components_accessibility_AltReactioner.md#triggertabcycle)
 
 ## Variables
 
@@ -38,7 +40,7 @@ users without hands
 
 #### Defined in
 
-[client/components/accessibility/AltReactioner.tsx:1542](https://github.com/onzag/itemize/blob/f2db74a5/client/components/accessibility/AltReactioner.tsx#L1542)
+[client/components/accessibility/AltReactioner.tsx:1733](https://github.com/onzag/itemize/blob/a24376ed/client/components/accessibility/AltReactioner.tsx#L1733)
 
 ## Functions
 
@@ -59,7 +61,7 @@ users without hands
 
 #### Defined in
 
-[client/components/accessibility/AltReactioner.tsx:338](https://github.com/onzag/itemize/blob/f2db74a5/client/components/accessibility/AltReactioner.tsx#L338)
+[client/components/accessibility/AltReactioner.tsx:372](https://github.com/onzag/itemize/blob/a24376ed/client/components/accessibility/AltReactioner.tsx#L372)
 
 ___
 
@@ -79,7 +81,7 @@ ___
 
 #### Defined in
 
-[client/components/accessibility/AltReactioner.tsx:237](https://github.com/onzag/itemize/blob/f2db74a5/client/components/accessibility/AltReactioner.tsx#L237)
+[client/components/accessibility/AltReactioner.tsx:271](https://github.com/onzag/itemize/blob/a24376ed/client/components/accessibility/AltReactioner.tsx#L271)
 
 ___
 
@@ -99,7 +101,7 @@ ___
 
 #### Defined in
 
-[client/components/accessibility/AltReactioner.tsx:397](https://github.com/onzag/itemize/blob/f2db74a5/client/components/accessibility/AltReactioner.tsx#L397)
+[client/components/accessibility/AltReactioner.tsx:431](https://github.com/onzag/itemize/blob/a24376ed/client/components/accessibility/AltReactioner.tsx#L431)
 
 ___
 
@@ -113,4 +115,38 @@ ___
 
 #### Defined in
 
-[client/components/accessibility/AltReactioner.tsx:744](https://github.com/onzag/itemize/blob/f2db74a5/client/components/accessibility/AltReactioner.tsx#L744)
+[client/components/accessibility/AltReactioner.tsx:779](https://github.com/onzag/itemize/blob/a24376ed/client/components/accessibility/AltReactioner.tsx#L779)
+
+___
+
+### triggerAltCycle
+
+▸ **triggerAltCycle**(`tabNavigation`): `void`
+
+#### Parameters
+
+| Name | Type |
+| :------ | :------ |
+| `tabNavigation` | `boolean` |
+
+#### Returns
+
+`void`
+
+#### Defined in
+
+[client/components/accessibility/AltReactioner.tsx:1489](https://github.com/onzag/itemize/blob/a24376ed/client/components/accessibility/AltReactioner.tsx#L1489)
+
+___
+
+### triggerTabCycle
+
+▸ **triggerTabCycle**(): `void`
+
+#### Returns
+
+`void`
+
+#### Defined in
+
+[client/components/accessibility/AltReactioner.tsx:1516](https://github.com/onzag/itemize/blob/a24376ed/client/components/accessibility/AltReactioner.tsx#L1516)

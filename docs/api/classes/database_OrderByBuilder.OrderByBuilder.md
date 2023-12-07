@@ -53,7 +53,7 @@ Builds a new order by query
 
 #### Defined in
 
-[database/OrderByBuilder.ts:30](https://github.com/onzag/itemize/blob/f2db74a5/database/OrderByBuilder.ts#L30)
+[database/OrderByBuilder.ts:30](https://github.com/onzag/itemize/blob/a24376ed/database/OrderByBuilder.ts#L30)
 
 ## Properties
 
@@ -65,7 +65,7 @@ The expressions we are ordering by
 
 #### Defined in
 
-[database/OrderByBuilder.ts:25](https://github.com/onzag/itemize/blob/f2db74a5/database/OrderByBuilder.ts#L25)
+[database/OrderByBuilder.ts:25](https://github.com/onzag/itemize/blob/a24376ed/database/OrderByBuilder.ts#L25)
 
 ## Methods
 
@@ -91,7 +91,7 @@ Adds a binding source to the binding source list in order
 
 #### Defined in
 
-[database/base.ts:69](https://github.com/onzag/itemize/blob/f2db74a5/database/base.ts#L69)
+[database/base.ts:69](https://github.com/onzag/itemize/blob/a24376ed/database/base.ts#L69)
 
 ___
 
@@ -117,7 +117,7 @@ Adds many binding sources to the bindings sources list
 
 #### Defined in
 
-[database/base.ts:77](https://github.com/onzag/itemize/blob/f2db74a5/database/base.ts#L77)
+[database/base.ts:77](https://github.com/onzag/itemize/blob/a24376ed/database/base.ts#L77)
 
 ___
 
@@ -135,7 +135,7 @@ itself
 
 #### Defined in
 
-[database/OrderByBuilder.ts:113](https://github.com/onzag/itemize/blob/f2db74a5/database/OrderByBuilder.ts#L113)
+[database/OrderByBuilder.ts:113](https://github.com/onzag/itemize/blob/a24376ed/database/OrderByBuilder.ts#L113)
 
 ___
 
@@ -155,7 +155,7 @@ Removes all binding sources
 
 #### Defined in
 
-[database/base.ts:105](https://github.com/onzag/itemize/blob/f2db74a5/database/base.ts#L105)
+[database/base.ts:105](https://github.com/onzag/itemize/blob/a24376ed/database/base.ts#L105)
 
 ___
 
@@ -177,7 +177,7 @@ a string that represents the compiled result
 
 #### Defined in
 
-[database/OrderByBuilder.ts:123](https://github.com/onzag/itemize/blob/f2db74a5/database/OrderByBuilder.ts#L123)
+[database/OrderByBuilder.ts:123](https://github.com/onzag/itemize/blob/a24376ed/database/OrderByBuilder.ts#L123)
 
 ___
 
@@ -200,7 +200,7 @@ a list of basic bindings
 
 #### Defined in
 
-[database/base.ts:168](https://github.com/onzag/itemize/blob/f2db74a5/database/base.ts#L168)
+[database/base.ts:168](https://github.com/onzag/itemize/blob/a24376ed/database/base.ts#L168)
 
 ___
 
@@ -227,7 +227,7 @@ itself
 
 #### Defined in
 
-[database/OrderByBuilder.ts:72](https://github.com/onzag/itemize/blob/f2db74a5/database/OrderByBuilder.ts#L72)
+[database/OrderByBuilder.ts:72](https://github.com/onzag/itemize/blob/a24376ed/database/OrderByBuilder.ts#L72)
 
 ___
 
@@ -253,7 +253,7 @@ itself
 
 #### Defined in
 
-[database/OrderByBuilder.ts:60](https://github.com/onzag/itemize/blob/f2db74a5/database/OrderByBuilder.ts#L60)
+[database/OrderByBuilder.ts:60](https://github.com/onzag/itemize/blob/a24376ed/database/OrderByBuilder.ts#L60)
 
 ___
 
@@ -280,7 +280,7 @@ itself
 
 #### Defined in
 
-[database/OrderByBuilder.ts:42](https://github.com/onzag/itemize/blob/f2db74a5/database/OrderByBuilder.ts#L42)
+[database/OrderByBuilder.ts:42](https://github.com/onzag/itemize/blob/a24376ed/database/OrderByBuilder.ts#L42)
 
 ___
 
@@ -307,7 +307,7 @@ itself
 
 #### Defined in
 
-[database/OrderByBuilder.ts:94](https://github.com/onzag/itemize/blob/f2db74a5/database/OrderByBuilder.ts#L94)
+[database/OrderByBuilder.ts:94](https://github.com/onzag/itemize/blob/a24376ed/database/OrderByBuilder.ts#L94)
 
 ___
 
@@ -327,7 +327,7 @@ Removes the last added biding source and returns it
 
 #### Defined in
 
-[database/base.ts:112](https://github.com/onzag/itemize/blob/f2db74a5/database/base.ts#L112)
+[database/base.ts:112](https://github.com/onzag/itemize/blob/a24376ed/database/base.ts#L112)
 
 ___
 
@@ -354,7 +354,7 @@ list
 
 #### Defined in
 
-[database/base.ts:89](https://github.com/onzag/itemize/blob/f2db74a5/database/base.ts#L89)
+[database/base.ts:89](https://github.com/onzag/itemize/blob/a24376ed/database/base.ts#L89)
 
 ___
 
@@ -381,7 +381,7 @@ list
 
 #### Defined in
 
-[database/base.ts:98](https://github.com/onzag/itemize/blob/f2db74a5/database/base.ts#L98)
+[database/base.ts:98](https://github.com/onzag/itemize/blob/a24376ed/database/base.ts#L98)
 
 ___
 
@@ -403,4 +403,4 @@ a sql builder result with the bindings and the query itself
 
 #### Defined in
 
-[database/base.ts:129](https://github.com/onzag/itemize/blob/f2db74a5/database/base.ts#L129)
+[database/base.ts:129](https://github.com/onzag/itemize/blob/a24376ed/database/base.ts#L129)

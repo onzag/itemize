@@ -67,7 +67,7 @@ React.Component&lt;
 
 #### Defined in
 
-[client/internal/components/PropertyEntry/PropertyEntryBoolean.tsx:46](https://github.com/onzag/itemize/blob/f2db74a5/client/internal/components/PropertyEntry/PropertyEntryBoolean.tsx#L46)
+[client/internal/components/PropertyEntry/PropertyEntryBoolean.tsx:46](https://github.com/onzag/itemize/blob/a24376ed/client/internal/components/PropertyEntry/PropertyEntryBoolean.tsx#L46)
 
 ## Properties
 
@@ -514,7 +514,7 @@ ___
 
 #### Defined in
 
-[client/internal/components/PropertyEntry/PropertyEntryBoolean.tsx:94](https://github.com/onzag/itemize/blob/f2db74a5/client/internal/components/PropertyEntry/PropertyEntryBoolean.tsx#L94)
+[client/internal/components/PropertyEntry/PropertyEntryBoolean.tsx:95](https://github.com/onzag/itemize/blob/a24376ed/client/internal/components/PropertyEntry/PropertyEntryBoolean.tsx#L95)
 
 ___
 
@@ -588,7 +588,7 @@ might be bad if null is a non default value, and we want to restore to false
 
 #### Defined in
 
-[client/internal/components/PropertyEntry/PropertyEntryBoolean.tsx:62](https://github.com/onzag/itemize/blob/f2db74a5/client/internal/components/PropertyEntry/PropertyEntryBoolean.tsx#L62)
+[client/internal/components/PropertyEntry/PropertyEntryBoolean.tsx:62](https://github.com/onzag/itemize/blob/a24376ed/client/internal/components/PropertyEntry/PropertyEntryBoolean.tsx#L62)
 
 ___
 
@@ -606,7 +606,7 @@ React.Component.render
 
 #### Defined in
 
-[client/internal/components/PropertyEntry/PropertyEntryBoolean.tsx:99](https://github.com/onzag/itemize/blob/f2db74a5/client/internal/components/PropertyEntry/PropertyEntryBoolean.tsx#L99)
+[client/internal/components/PropertyEntry/PropertyEntryBoolean.tsx:100](https://github.com/onzag/itemize/blob/a24376ed/client/internal/components/PropertyEntry/PropertyEntryBoolean.tsx#L100)
 
 ___
 
@@ -662,4 +662,4 @@ React.Component.shouldComponentUpdate
 
 #### Defined in
 
-[client/internal/components/PropertyEntry/PropertyEntryBoolean.tsx:73](https://github.com/onzag/itemize/blob/f2db74a5/client/internal/components/PropertyEntry/PropertyEntryBoolean.tsx#L73)
+[client/internal/components/PropertyEntry/PropertyEntryBoolean.tsx:73](https://github.com/onzag/itemize/blob/a24376ed/client/internal/components/PropertyEntry/PropertyEntryBoolean.tsx#L73)

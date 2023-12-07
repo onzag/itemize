@@ -11,7 +11,7 @@ Do not have two title setters at once as this would cause an error
 
 ## Hierarchy
 
-- `Component`<`ITitleSetterProps`, {}\>
+- `Component`<`ITitleSetterProps`, { `changedTitle`: `boolean`  }\>
 
   ↳ **`ActualTitleSetter`**
 
@@ -62,11 +62,11 @@ Do not have two title setters at once as this would cause an error
 
 #### Overrides
 
-React.Component&lt;ITitleSetterProps, {}\&gt;.constructor
+React.Component&lt;ITitleSetterProps, {changedTitle: boolean}\&gt;.constructor
 
 #### Defined in
 
-[client/components/util/TitleSetter.tsx:37](https://github.com/onzag/itemize/blob/f2db74a5/client/components/util/TitleSetter.tsx#L37)
+[client/components/util/TitleSetter.tsx:38](https://github.com/onzag/itemize/blob/a24376ed/client/components/util/TitleSetter.tsx#L38)
 
 ## Properties
 
@@ -135,7 +135,7 @@ ___
 
 ### state
 
-• **state**: `Readonly`<{}\>
+• **state**: `Readonly`<{ `changedTitle`: `boolean`  }\>
 
 #### Inherited from
 
@@ -155,7 +155,7 @@ Stores title readers to inform them of changes
 
 #### Defined in
 
-[client/components/util/TitleSetter.tsx:35](https://github.com/onzag/itemize/blob/f2db74a5/client/components/util/TitleSetter.tsx#L35)
+[client/components/util/TitleSetter.tsx:36](https://github.com/onzag/itemize/blob/a24376ed/client/components/util/TitleSetter.tsx#L36)
 
 ___
 
@@ -290,7 +290,7 @@ prevents this from being invoked.
 | Name | Type |
 | :------ | :------ |
 | `nextProps` | `Readonly`<`ITitleSetterProps`\> |
-| `nextState` | `Readonly`<{}\> |
+| `nextState` | `Readonly`<{ `changedTitle`: `boolean`  }\> |
 | `nextContext` | `any` |
 
 #### Returns
@@ -349,7 +349,7 @@ React.Component.componentDidMount
 
 #### Defined in
 
-[client/components/util/TitleSetter.tsx:40](https://github.com/onzag/itemize/blob/f2db74a5/client/components/util/TitleSetter.tsx#L40)
+[client/components/util/TitleSetter.tsx:45](https://github.com/onzag/itemize/blob/a24376ed/client/components/util/TitleSetter.tsx#L45)
 
 ___
 
@@ -373,7 +373,7 @@ React.Component.componentDidUpdate
 
 #### Defined in
 
-[client/components/util/TitleSetter.tsx:54](https://github.com/onzag/itemize/blob/f2db74a5/client/components/util/TitleSetter.tsx#L54)
+[client/components/util/TitleSetter.tsx:60](https://github.com/onzag/itemize/blob/a24376ed/client/components/util/TitleSetter.tsx#L60)
 
 ___
 
@@ -461,7 +461,7 @@ React.Component.componentWillUnmount
 
 #### Defined in
 
-[client/components/util/TitleSetter.tsx:61](https://github.com/onzag/itemize/blob/f2db74a5/client/components/util/TitleSetter.tsx#L61)
+[client/components/util/TitleSetter.tsx:68](https://github.com/onzag/itemize/blob/a24376ed/client/components/util/TitleSetter.tsx#L68)
 
 ___
 
@@ -487,7 +487,7 @@ prevents this from being invoked.
 | Name | Type |
 | :------ | :------ |
 | `nextProps` | `Readonly`<`ITitleSetterProps`\> |
-| `nextState` | `Readonly`<{}\> |
+| `nextState` | `Readonly`<{ `changedTitle`: `boolean`  }\> |
 | `nextContext` | `any` |
 
 #### Returns
@@ -544,7 +544,7 @@ lifecycle events from running.
 | Name | Type |
 | :------ | :------ |
 | `prevProps` | `Readonly`<`ITitleSetterProps`\> |
-| `prevState` | `Readonly`<{}\> |
+| `prevState` | `Readonly`<{ `changedTitle`: `boolean`  }\> |
 
 #### Returns
 
@@ -574,7 +574,7 @@ React.Component.render
 
 #### Defined in
 
-[client/components/util/TitleSetter.tsx:65](https://github.com/onzag/itemize/blob/f2db74a5/client/components/util/TitleSetter.tsx#L65)
+[client/components/util/TitleSetter.tsx:72](https://github.com/onzag/itemize/blob/a24376ed/client/components/util/TitleSetter.tsx#L72)
 
 ___
 
@@ -586,13 +586,13 @@ ___
 
 | Name | Type |
 | :------ | :------ |
-| `K` | extends `never` |
+| `K` | extends ``"changedTitle"`` |
 
 #### Parameters
 
 | Name | Type |
 | :------ | :------ |
-| `state` | {} \| (`prevState`: `Readonly`<{}\>, `props`: `Readonly`<`ITitleSetterProps`\>) => {} \| `Pick`<{}, `K`\> \| `Pick`<{}, `K`\> |
+| `state` | { `changedTitle`: `boolean`  } \| (`prevState`: `Readonly`<{ `changedTitle`: `boolean`  }\>, `props`: `Readonly`<`ITitleSetterProps`\>) => { `changedTitle`: `boolean`  } \| `Pick`<{ `changedTitle`: `boolean`  }, `K`\> \| `Pick`<{ `changedTitle`: `boolean`  }, `K`\> |
 | `callback?` | () => `void` |
 
 #### Returns
@@ -627,7 +627,7 @@ and `componentDidUpdate` will not be called.
 | Name | Type |
 | :------ | :------ |
 | `nextProps` | `Readonly`<`ITitleSetterProps`\> |
-| `nextState` | `Readonly`<{}\> |
+| `nextState` | `Readonly`<{ `changedTitle`: `boolean`  }\> |
 | `nextContext` | `any` |
 
 #### Returns

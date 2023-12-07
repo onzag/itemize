@@ -24,7 +24,7 @@ A password type is described by a string
 
 #### Defined in
 
-[base/Root/Module/ItemDefinition/PropertyDefinition/types/password.ts:17](https://github.com/onzag/itemize/blob/f2db74a5/base/Root/Module/ItemDefinition/PropertyDefinition/types/password.ts#L17)
+[base/Root/Module/ItemDefinition/PropertyDefinition/types/password.ts:17](https://github.com/onzag/itemize/blob/a24376ed/base/Root/Module/ItemDefinition/PropertyDefinition/types/password.ts#L17)
 
 ## Variables
 
@@ -36,4 +36,4 @@ The behaviour of passwords is specified by this type
 
 #### Defined in
 
-[base/Root/Module/ItemDefinition/PropertyDefinition/types/password.ts:22](https://github.com/onzag/itemize/blob/f2db74a5/base/Root/Module/ItemDefinition/PropertyDefinition/types/password.ts#L22)
+[base/Root/Module/ItemDefinition/PropertyDefinition/types/password.ts:22](https://github.com/onzag/itemize/blob/a24376ed/base/Root/Module/ItemDefinition/PropertyDefinition/types/password.ts#L22)

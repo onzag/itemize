@@ -26,14 +26,16 @@ The options for submitting, ediitng, adding, etc...
 - [cleanStateOnAny](client_providers_item.IActionSubmitOptions.md#cleanstateonany)
 - [cleanStateOnFailure](client_providers_item.IActionSubmitOptions.md#cleanstateonfailure)
 - [cleanStateOnSuccess](client_providers_item.IActionSubmitOptions.md#cleanstateonsuccess)
-- [clearStoredStateIfConnected](client_providers_item.IActionSubmitOptions.md#clearstoredstateifconnected)
+- [clearStoredStateIfSubmitted](client_providers_item.IActionSubmitOptions.md#clearstoredstateifsubmitted)
 - [differingOnly](client_providers_item.IActionSubmitOptions.md#differingonly)
+- [ifLastModified](client_providers_item.IActionSubmitOptions.md#iflastmodified)
 - [inBehalfOf](client_providers_item.IActionSubmitOptions.md#inbehalfof)
 - [includeOverrides](client_providers_item.IActionSubmitOptions.md#includeoverrides)
 - [includes](client_providers_item.IActionSubmitOptions.md#includes)
 - [includesToRestoreOnAny](client_providers_item.IActionSubmitOptions.md#includestorestoreonany)
 - [includesToRestoreOnFailure](client_providers_item.IActionSubmitOptions.md#includestorestoreonfailure)
 - [includesToRestoreOnSuccess](client_providers_item.IActionSubmitOptions.md#includestorestoreonsuccess)
+- [indexing](client_providers_item.IActionSubmitOptions.md#indexing)
 - [languageOverride](client_providers_item.IActionSubmitOptions.md#languageoverride)
 - [parentedBy](client_providers_item.IActionSubmitOptions.md#parentedby)
 - [parentedByAddOnly](client_providers_item.IActionSubmitOptions.md#parentedbyaddonly)
@@ -54,6 +56,7 @@ The options for submitting, ediitng, adding, etc...
 - [restoreStateOnSuccess](client_providers_item.IActionSubmitOptions.md#restorestateonsuccess)
 - [stateOverride](client_providers_item.IActionSubmitOptions.md#stateoverride)
 - [storeStateIfCantConnect](client_providers_item.IActionSubmitOptions.md#storestateifcantconnect)
+- [storeStateIfCantConnectApplyEnforced](client_providers_item.IActionSubmitOptions.md#storestateifcantconnectapplyenforced)
 - [submitForId](client_providers_item.IActionSubmitOptions.md#submitforid)
 - [submitForItem](client_providers_item.IActionSubmitOptions.md#submitforitem)
 - [submitForVersion](client_providers_item.IActionSubmitOptions.md#submitforversion)
@@ -77,7 +80,7 @@ if the item exists and holds an applied value it will be editing, use this to ma
 
 #### Defined in
 
-[client/providers/item.tsx:414](https://github.com/onzag/itemize/blob/f2db74a5/client/providers/item.tsx#L414)
+[client/providers/item.tsx:447](https://github.com/onzag/itemize/blob/a24376ed/client/providers/item.tsx#L447)
 
 ___
 
@@ -89,7 +92,7 @@ The reason for a blocking, this reason can be accessed by owners of the item
 
 #### Defined in
 
-[client/providers/item.tsx:428](https://github.com/onzag/itemize/blob/f2db74a5/client/providers/item.tsx#L428)
+[client/providers/item.tsx:461](https://github.com/onzag/itemize/blob/a24376ed/client/providers/item.tsx#L461)
 
 ___
 
@@ -102,7 +105,7 @@ users, setting it to true makes it blocked, the user must have blocking rights
 
 #### Defined in
 
-[client/providers/item.tsx:419](https://github.com/onzag/itemize/blob/f2db74a5/client/providers/item.tsx#L419)
+[client/providers/item.tsx:452](https://github.com/onzag/itemize/blob/a24376ed/client/providers/item.tsx#L452)
 
 ___
 
@@ -115,7 +118,7 @@ using the createDateTimeValue function to get the correct format
 
 #### Defined in
 
-[client/providers/item.tsx:424](https://github.com/onzag/itemize/blob/f2db74a5/client/providers/item.tsx#L424)
+[client/providers/item.tsx:457](https://github.com/onzag/itemize/blob/a24376ed/client/providers/item.tsx#L457)
 
 ___
 
@@ -134,7 +137,7 @@ once the action is completed
 
 #### Defined in
 
-[client/providers/item.tsx:291](https://github.com/onzag/itemize/blob/f2db74a5/client/providers/item.tsx#L291)
+[client/providers/item.tsx:323](https://github.com/onzag/itemize/blob/a24376ed/client/providers/item.tsx#L323)
 
 ___
 
@@ -153,7 +156,7 @@ once the action is completed
 
 #### Defined in
 
-[client/providers/item.tsx:298](https://github.com/onzag/itemize/blob/f2db74a5/client/providers/item.tsx#L298)
+[client/providers/item.tsx:330](https://github.com/onzag/itemize/blob/a24376ed/client/providers/item.tsx#L330)
 
 ___
 
@@ -172,7 +175,7 @@ once the action is completed
 
 #### Defined in
 
-[client/providers/item.tsx:284](https://github.com/onzag/itemize/blob/f2db74a5/client/providers/item.tsx#L284)
+[client/providers/item.tsx:316](https://github.com/onzag/itemize/blob/a24376ed/client/providers/item.tsx#L316)
 
 ___
 
@@ -196,7 +199,7 @@ back to empty or what they used to be as it may otherwise do nothing, cleaning I
 
 #### Defined in
 
-[client/providers/item.tsx:349](https://github.com/onzag/itemize/blob/f2db74a5/client/providers/item.tsx#L349)
+[client/providers/item.tsx:381](https://github.com/onzag/itemize/blob/a24376ed/client/providers/item.tsx#L381)
 
 ___
 
@@ -220,7 +223,7 @@ back to empty or what they used to be as it may otherwise do nothing, cleaning I
 
 #### Defined in
 
-[client/providers/item.tsx:337](https://github.com/onzag/itemize/blob/f2db74a5/client/providers/item.tsx#L337)
+[client/providers/item.tsx:369](https://github.com/onzag/itemize/blob/a24376ed/client/providers/item.tsx#L369)
 
 ___
 
@@ -244,22 +247,27 @@ back to empty or what they used to be as it may otherwise do nothing, cleaning I
 
 #### Defined in
 
-[client/providers/item.tsx:325](https://github.com/onzag/itemize/blob/f2db74a5/client/providers/item.tsx#L325)
+[client/providers/item.tsx:357](https://github.com/onzag/itemize/blob/a24376ed/client/providers/item.tsx#L357)
 
 ___
 
-### clearStoredStateIfConnected
+### clearStoredStateIfSubmitted
 
-• `Optional` **clearStoredStateIfConnected**: `boolean`
+• `Optional` **clearStoredStateIfSubmitted**: `string` \| `boolean` \| `IStoredStateLocation`
 
 After a draft has been used, it's likely that you don't need this value anymore as it reflects what the server side holds, so
-storeStateIfCantConnect option and clearStoredStateIfConnected tend to be used in conjunction
+storeStateIfCantConnect option and clearStoredStateIfSubmitted tend to be used in conjunction
+
+when a successful submit is executed that is the state will be cleared
 
 This allows to clear the state from the local database and free the space
 
+when used as a string represents an unique slot where it will be stored
+otherwise the one specified forId will be used
+
 #### Defined in
 
-[client/providers/item.tsx:537](https://github.com/onzag/itemize/blob/f2db74a5/client/providers/item.tsx#L537)
+[client/providers/item.tsx:581](https://github.com/onzag/itemize/blob/a24376ed/client/providers/item.tsx#L581)
 
 ___
 
@@ -272,7 +280,25 @@ to be different from the current applied value
 
 #### Defined in
 
-[client/providers/item.tsx:366](https://github.com/onzag/itemize/blob/f2db74a5/client/providers/item.tsx#L366)
+[client/providers/item.tsx:399](https://github.com/onzag/itemize/blob/a24376ed/client/providers/item.tsx#L399)
+
+___
+
+### ifLastModified
+
+• `Optional` **ifLastModified**: `string`
+
+Specify the last modified value of the current value in an edit action and it will only overwrite values
+if the last modified matches what is given here, this is for usage of concurrency when making updates with offline
+support by storing states in drafts, when using onStateLoadedFromStore you will receive metadata that specifies the last_modified
+signature of the given known loaded value when it was attempted to be written (be so one was loaded) this will allow to specify that
+overwriteLastModified as the ifLastModified so a CONFLICT error will be raised if the submit fails to write due to that reason
+
+You may resolve conflicts manually
+
+#### Defined in
+
+[client/providers/item.tsx:601](https://github.com/onzag/itemize/blob/a24376ed/client/providers/item.tsx#L601)
 
 ___
 
@@ -286,7 +312,7 @@ given here, and not the person that executes the action
 
 #### Defined in
 
-[client/providers/item.tsx:452](https://github.com/onzag/itemize/blob/f2db74a5/client/providers/item.tsx#L452)
+[client/providers/item.tsx:485](https://github.com/onzag/itemize/blob/a24376ed/client/providers/item.tsx#L485)
 
 ___
 
@@ -300,7 +326,7 @@ the request
 
 #### Defined in
 
-[client/providers/item.tsx:474](https://github.com/onzag/itemize/blob/f2db74a5/client/providers/item.tsx#L474)
+[client/providers/item.tsx:507](https://github.com/onzag/itemize/blob/a24376ed/client/providers/item.tsx#L507)
 
 ___
 
@@ -316,7 +342,7 @@ The list of includes and their properties that are to be submitted
 
 #### Defined in
 
-[client/providers/item.tsx:370](https://github.com/onzag/itemize/blob/f2db74a5/client/providers/item.tsx#L370)
+[client/providers/item.tsx:403](https://github.com/onzag/itemize/blob/a24376ed/client/providers/item.tsx#L403)
 
 ___
 
@@ -337,7 +363,7 @@ after the action is performed it will apply to that value
 
 #### Defined in
 
-[client/providers/item.tsx:241](https://github.com/onzag/itemize/blob/f2db74a5/client/providers/item.tsx#L241)
+[client/providers/item.tsx:273](https://github.com/onzag/itemize/blob/a24376ed/client/providers/item.tsx#L273)
 
 ___
 
@@ -358,7 +384,7 @@ after the action is performed it will apply to that value
 
 #### Defined in
 
-[client/providers/item.tsx:250](https://github.com/onzag/itemize/blob/f2db74a5/client/providers/item.tsx#L250)
+[client/providers/item.tsx:282](https://github.com/onzag/itemize/blob/a24376ed/client/providers/item.tsx#L282)
 
 ___
 
@@ -379,7 +405,25 @@ after the action is performed it will apply to that value
 
 #### Defined in
 
-[client/providers/item.tsx:232](https://github.com/onzag/itemize/blob/f2db74a5/client/providers/item.tsx#L232)
+[client/providers/item.tsx:264](https://github.com/onzag/itemize/blob/a24376ed/client/providers/item.tsx#L264)
+
+___
+
+### indexing
+
+• `Optional` **indexing**: ``"wait_for"`` \| ``"detached"``
+
+Specifices what to do about searchengine indexes, wait for ensures that search engine indexes have been (tried) to be
+updated before the request is released from the server, while the indexing may have failed (and that's silent) this can be
+used to wait for indexing to be attempted and done/or fail just so that in most cases scenarios after this is released
+search shall be guaranteed to contain updated results to whatever changed occurred
+
+this doesn't apply for SQL indexes that don't use search engine, SQL indexes are consistent and are assured to be consistent
+this is only concerning search engine synchronization
+
+#### Defined in
+
+[client/providers/item.tsx:591](https://github.com/onzag/itemize/blob/a24376ed/client/providers/item.tsx#L591)
 
 ___
 
@@ -397,7 +441,7 @@ to the server criteria (and the server criteria is to use the same language as t
 
 #### Defined in
 
-[client/providers/item.tsx:484](https://github.com/onzag/itemize/blob/f2db74a5/client/providers/item.tsx#L484)
+[client/providers/item.tsx:517](https://github.com/onzag/itemize/blob/a24376ed/client/providers/item.tsx#L517)
 
 ___
 
@@ -421,7 +465,7 @@ because reparenting may be not desired
 
 #### Defined in
 
-[client/providers/item.tsx:387](https://github.com/onzag/itemize/blob/f2db74a5/client/providers/item.tsx#L387)
+[client/providers/item.tsx:420](https://github.com/onzag/itemize/blob/a24376ed/client/providers/item.tsx#L420)
 
 ___
 
@@ -437,7 +481,7 @@ to prevent errors of repareting to the same parent (which the server will compla
 
 #### Defined in
 
-[client/providers/item.tsx:409](https://github.com/onzag/itemize/blob/f2db74a5/client/providers/item.tsx#L409)
+[client/providers/item.tsx:442](https://github.com/onzag/itemize/blob/a24376ed/client/providers/item.tsx#L442)
 
 ___
 
@@ -462,7 +506,7 @@ Instead this function will ensure to wait so that submits are "piled" and only t
 
 #### Defined in
 
-[client/providers/item.tsx:510](https://github.com/onzag/itemize/blob/f2db74a5/client/providers/item.tsx#L510)
+[client/providers/item.tsx:543](https://github.com/onzag/itemize/blob/a24376ed/client/providers/item.tsx#L543)
 
 ___
 
@@ -474,7 +518,7 @@ The list of policies to submit
 
 #### Defined in
 
-[client/providers/item.tsx:374](https://github.com/onzag/itemize/blob/f2db74a5/client/providers/item.tsx#L374)
+[client/providers/item.tsx:407](https://github.com/onzag/itemize/blob/a24376ed/client/providers/item.tsx#L407)
 
 ___
 
@@ -490,7 +534,7 @@ Cleans the value of a policy back to null
 
 #### Defined in
 
-[client/providers/item.tsx:192](https://github.com/onzag/itemize/blob/f2db74a5/client/providers/item.tsx#L192)
+[client/providers/item.tsx:224](https://github.com/onzag/itemize/blob/a24376ed/client/providers/item.tsx#L224)
 
 ___
 
@@ -506,7 +550,7 @@ Cleans the value of a policy back to null
 
 #### Defined in
 
-[client/providers/item.tsx:196](https://github.com/onzag/itemize/blob/f2db74a5/client/providers/item.tsx#L196)
+[client/providers/item.tsx:228](https://github.com/onzag/itemize/blob/a24376ed/client/providers/item.tsx#L228)
 
 ___
 
@@ -522,7 +566,7 @@ Cleans the value of a policy back to null
 
 #### Defined in
 
-[client/providers/item.tsx:188](https://github.com/onzag/itemize/blob/f2db74a5/client/providers/item.tsx#L188)
+[client/providers/item.tsx:220](https://github.com/onzag/itemize/blob/a24376ed/client/providers/item.tsx#L220)
 
 ___
 
@@ -536,7 +580,7 @@ do not get an error but instead get emulated success
 
 #### Defined in
 
-[client/providers/item.tsx:517](https://github.com/onzag/itemize/blob/f2db74a5/client/providers/item.tsx#L517)
+[client/providers/item.tsx:550](https://github.com/onzag/itemize/blob/a24376ed/client/providers/item.tsx#L550)
 
 ___
 
@@ -548,7 +592,7 @@ Informs about the progress of the submit as a percentage
 
 #### Defined in
 
-[client/providers/item.tsx:493](https://github.com/onzag/itemize/blob/f2db74a5/client/providers/item.tsx#L493)
+[client/providers/item.tsx:526](https://github.com/onzag/itemize/blob/a24376ed/client/providers/item.tsx#L526)
 
 ___
 
@@ -560,7 +604,7 @@ Specifies the list of properties that are going to be sumbitted to the server
 
 #### Defined in
 
-[client/providers/item.tsx:361](https://github.com/onzag/itemize/blob/f2db74a5/client/providers/item.tsx#L361)
+[client/providers/item.tsx:394](https://github.com/onzag/itemize/blob/a24376ed/client/providers/item.tsx#L394)
 
 ___
 
@@ -581,7 +625,7 @@ after the action is performed it will apply to that value
 
 #### Defined in
 
-[client/providers/item.tsx:214](https://github.com/onzag/itemize/blob/f2db74a5/client/providers/item.tsx#L214)
+[client/providers/item.tsx:246](https://github.com/onzag/itemize/blob/a24376ed/client/providers/item.tsx#L246)
 
 ___
 
@@ -602,7 +646,7 @@ after the action is performed it will apply to that value
 
 #### Defined in
 
-[client/providers/item.tsx:223](https://github.com/onzag/itemize/blob/f2db74a5/client/providers/item.tsx#L223)
+[client/providers/item.tsx:255](https://github.com/onzag/itemize/blob/a24376ed/client/providers/item.tsx#L255)
 
 ___
 
@@ -623,7 +667,7 @@ after the action is performed it will apply to that value
 
 #### Defined in
 
-[client/providers/item.tsx:205](https://github.com/onzag/itemize/blob/f2db74a5/client/providers/item.tsx#L205)
+[client/providers/item.tsx:237](https://github.com/onzag/itemize/blob/a24376ed/client/providers/item.tsx#L237)
 
 ___
 
@@ -637,7 +681,7 @@ the request
 
 #### Defined in
 
-[client/providers/item.tsx:467](https://github.com/onzag/itemize/blob/f2db74a5/client/providers/item.tsx#L467)
+[client/providers/item.tsx:500](https://github.com/onzag/itemize/blob/a24376ed/client/providers/item.tsx#L500)
 
 ___
 
@@ -654,7 +698,7 @@ given action completes
 
 #### Defined in
 
-[client/providers/item.tsx:308](https://github.com/onzag/itemize/blob/f2db74a5/client/providers/item.tsx#L308)
+[client/providers/item.tsx:340](https://github.com/onzag/itemize/blob/a24376ed/client/providers/item.tsx#L340)
 
 ___
 
@@ -671,7 +715,7 @@ given action, completes and FAILED
 
 #### Defined in
 
-[client/providers/item.tsx:313](https://github.com/onzag/itemize/blob/f2db74a5/client/providers/item.tsx#L313)
+[client/providers/item.tsx:345](https://github.com/onzag/itemize/blob/a24376ed/client/providers/item.tsx#L345)
 
 ___
 
@@ -688,7 +732,7 @@ given action, completes and SUCCEEDS
 
 #### Defined in
 
-[client/providers/item.tsx:303](https://github.com/onzag/itemize/blob/f2db74a5/client/providers/item.tsx#L303)
+[client/providers/item.tsx:335](https://github.com/onzag/itemize/blob/a24376ed/client/providers/item.tsx#L335)
 
 ___
 
@@ -704,13 +748,13 @@ a state that is used internally, these also work, but it does not hold binary da
 
 #### Defined in
 
-[client/providers/item.tsx:460](https://github.com/onzag/itemize/blob/f2db74a5/client/providers/item.tsx#L460)
+[client/providers/item.tsx:493](https://github.com/onzag/itemize/blob/a24376ed/client/providers/item.tsx#L493)
 
 ___
 
 ### storeStateIfCantConnect
 
-• `Optional` **storeStateIfCantConnect**: `boolean`
+• `Optional` **storeStateIfCantConnect**: `string` \| `boolean` \| `IStoredStateLocation`
 
 Useful to create drafts that exist only in the client side, when submitting either adding or editing the connection may not be available
 causing a CANT_CONNECT error where internet is not available, in this case the client will try to save the current state in the
@@ -719,11 +763,24 @@ also onStateStored will trigger, if this fails storedState will be false and onS
 
 Check loadStoredState for retrieving this state from the item's provider when loading a value
 
-The option clearStoredStateIfConnected tends to be used in conjunction with this one
+The option clearStoredStateIfSubmitted tends to be used in conjunction with this one
 
 #### Defined in
 
-[client/providers/item.tsx:529](https://github.com/onzag/itemize/blob/f2db74a5/client/providers/item.tsx#L529)
+[client/providers/item.tsx:562](https://github.com/onzag/itemize/blob/a24376ed/client/providers/item.tsx#L562)
+
+___
+
+### storeStateIfCantConnectApplyEnforced
+
+• `Optional` **storeStateIfCantConnectApplyEnforced**: `boolean`
+
+Normally when storing state the enforced values that have been set via setters are not in use
+as those are set on top of the current value, use this to force them to be applied in the stored value
+
+#### Defined in
+
+[client/providers/item.tsx:568](https://github.com/onzag/itemize/blob/a24376ed/client/providers/item.tsx#L568)
 
 ___
 
@@ -740,7 +797,7 @@ the same data, copying to a new slot, if the id is supposed to be specific
 
 #### Defined in
 
-[client/providers/item.tsx:437](https://github.com/onzag/itemize/blob/f2db74a5/client/providers/item.tsx#L437)
+[client/providers/item.tsx:470](https://github.com/onzag/itemize/blob/a24376ed/client/providers/item.tsx#L470)
 
 ___
 
@@ -753,7 +810,7 @@ one, use the path format or the qualified path format for this
 
 #### Defined in
 
-[client/providers/item.tsx:446](https://github.com/onzag/itemize/blob/f2db74a5/client/providers/item.tsx#L446)
+[client/providers/item.tsx:479](https://github.com/onzag/itemize/blob/a24376ed/client/providers/item.tsx#L479)
 
 ___
 
@@ -765,7 +822,7 @@ Same as submitForId but instead specifies the version
 
 #### Defined in
 
-[client/providers/item.tsx:441](https://github.com/onzag/itemize/blob/f2db74a5/client/providers/item.tsx#L441)
+[client/providers/item.tsx:474](https://github.com/onzag/itemize/blob/a24376ed/client/providers/item.tsx#L474)
 
 ___
 
@@ -786,7 +843,7 @@ and make it not show an error
 
 #### Defined in
 
-[client/providers/item.tsx:268](https://github.com/onzag/itemize/blob/f2db74a5/client/providers/item.tsx#L268)
+[client/providers/item.tsx:300](https://github.com/onzag/itemize/blob/a24376ed/client/providers/item.tsx#L300)
 
 ___
 
@@ -807,7 +864,7 @@ and make it not show an error
 
 #### Defined in
 
-[client/providers/item.tsx:277](https://github.com/onzag/itemize/blob/f2db74a5/client/providers/item.tsx#L277)
+[client/providers/item.tsx:309](https://github.com/onzag/itemize/blob/a24376ed/client/providers/item.tsx#L309)
 
 ___
 
@@ -828,7 +885,7 @@ and make it not show an error
 
 #### Defined in
 
-[client/providers/item.tsx:259](https://github.com/onzag/itemize/blob/f2db74a5/client/providers/item.tsx#L259)
+[client/providers/item.tsx:291](https://github.com/onzag/itemize/blob/a24376ed/client/providers/item.tsx#L291)
 
 ___
 
@@ -841,7 +898,7 @@ this is not very useful for submit requests where they should be more "instant",
 
 #### Defined in
 
-[client/providers/item.tsx:489](https://github.com/onzag/itemize/blob/f2db74a5/client/providers/item.tsx#L489)
+[client/providers/item.tsx:522](https://github.com/onzag/itemize/blob/a24376ed/client/providers/item.tsx#L522)
 
 ## Methods
 
@@ -859,4 +916,4 @@ a boolean that represents whether the action should continue or not
 
 #### Defined in
 
-[client/providers/item.tsx:379](https://github.com/onzag/itemize/blob/f2db74a5/client/providers/item.tsx#L379)
+[client/providers/item.tsx:412](https://github.com/onzag/itemize/blob/a24376ed/client/providers/item.tsx#L412)

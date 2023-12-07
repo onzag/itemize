@@ -52,7 +52,7 @@ this will prevent users from class injection
 
 #### Defined in
 
-[client/internal/text/index.tsx:31](https://github.com/onzag/itemize/blob/f2db74a5/client/internal/text/index.tsx#L31)
+[client/internal/text/index.tsx:31](https://github.com/onzag/itemize/blob/a24376ed/client/internal/text/index.tsx#L31)
 
 ___
 
@@ -64,7 +64,7 @@ The list of allowed prefixes
 
 #### Defined in
 
-[client/internal/text/index.tsx:46](https://github.com/onzag/itemize/blob/f2db74a5/client/internal/text/index.tsx#L46)
+[client/internal/text/index.tsx:46](https://github.com/onzag/itemize/blob/a24376ed/client/internal/text/index.tsx#L46)
 
 ___
 
@@ -74,7 +74,7 @@ ___
 
 #### Defined in
 
-[client/internal/text/index.tsx:38](https://github.com/onzag/itemize/blob/f2db74a5/client/internal/text/index.tsx#L38)
+[client/internal/text/index.tsx:38](https://github.com/onzag/itemize/blob/a24376ed/client/internal/text/index.tsx#L38)
 
 ___
 
@@ -84,7 +84,7 @@ ___
 
 #### Defined in
 
-[client/internal/text/index.tsx:39](https://github.com/onzag/itemize/blob/f2db74a5/client/internal/text/index.tsx#L39)
+[client/internal/text/index.tsx:39](https://github.com/onzag/itemize/blob/a24376ed/client/internal/text/index.tsx#L39)
 
 ___
 
@@ -94,7 +94,7 @@ ___
 
 #### Defined in
 
-[client/internal/text/index.tsx:40](https://github.com/onzag/itemize/blob/f2db74a5/client/internal/text/index.tsx#L40)
+[client/internal/text/index.tsx:40](https://github.com/onzag/itemize/blob/a24376ed/client/internal/text/index.tsx#L40)
 
 ___
 
@@ -104,7 +104,7 @@ ___
 
 #### Defined in
 
-[client/internal/text/index.tsx:37](https://github.com/onzag/itemize/blob/f2db74a5/client/internal/text/index.tsx#L37)
+[client/internal/text/index.tsx:37](https://github.com/onzag/itemize/blob/a24376ed/client/internal/text/index.tsx#L37)
 
 ___
 
@@ -124,7 +124,7 @@ Sanitazation standard configuraton
 
 #### Defined in
 
-[client/internal/text/index.tsx:18](https://github.com/onzag/itemize/blob/f2db74a5/client/internal/text/index.tsx#L18)
+[client/internal/text/index.tsx:18](https://github.com/onzag/itemize/blob/a24376ed/client/internal/text/index.tsx#L18)
 
 ___
 
@@ -137,7 +137,7 @@ the template args
 
 #### Defined in
 
-[client/internal/text/index.tsx:90](https://github.com/onzag/itemize/blob/f2db74a5/client/internal/text/index.tsx#L90)
+[client/internal/text/index.tsx:90](https://github.com/onzag/itemize/blob/a24376ed/client/internal/text/index.tsx#L90)
 
 ___
 
@@ -150,7 +150,7 @@ use args
 
 #### Defined in
 
-[client/internal/text/index.tsx:99](https://github.com/onzag/itemize/blob/f2db74a5/client/internal/text/index.tsx#L99)
+[client/internal/text/index.tsx:99](https://github.com/onzag/itemize/blob/a24376ed/client/internal/text/index.tsx#L99)
 
 ___
 
@@ -163,7 +163,7 @@ exist as data-on-[event]="{{event}}"
 
 #### Defined in
 
-[client/internal/text/index.tsx:54](https://github.com/onzag/itemize/blob/f2db74a5/client/internal/text/index.tsx#L54)
+[client/internal/text/index.tsx:54](https://github.com/onzag/itemize/blob/a24376ed/client/internal/text/index.tsx#L54)
 
 ___
 
@@ -176,7 +176,7 @@ exist as data-[supportedTemplateStyle]-style="position:absolute;"
 
 #### Defined in
 
-[client/internal/text/index.tsx:81](https://github.com/onzag/itemize/blob/f2db74a5/client/internal/text/index.tsx#L81)
+[client/internal/text/index.tsx:81](https://github.com/onzag/itemize/blob/a24376ed/client/internal/text/index.tsx#L81)
 
 ___
 
@@ -186,7 +186,7 @@ ___
 
 #### Defined in
 
-[client/internal/text/index.tsx:41](https://github.com/onzag/itemize/blob/f2db74a5/client/internal/text/index.tsx#L41)
+[client/internal/text/index.tsx:41](https://github.com/onzag/itemize/blob/a24376ed/client/internal/text/index.tsx#L41)
 
 ___
 
@@ -196,7 +196,7 @@ ___
 
 #### Defined in
 
-[client/internal/text/index.tsx:1085](https://github.com/onzag/itemize/blob/f2db74a5/client/internal/text/index.tsx#L1085)
+[client/internal/text/index.tsx:1119](https://github.com/onzag/itemize/blob/a24376ed/client/internal/text/index.tsx#L1119)
 
 ## Functions
 
@@ -219,7 +219,7 @@ compares two text for equivalence
 
 #### Defined in
 
-[client/internal/text/index.tsx:1060](https://github.com/onzag/itemize/blob/f2db74a5/client/internal/text/index.tsx#L1060)
+[client/internal/text/index.tsx:1094](https://github.com/onzag/itemize/blob/a24376ed/client/internal/text/index.tsx#L1094)
 
 ___
 
@@ -242,7 +242,7 @@ compares two plain text for equivalence
 
 #### Defined in
 
-[client/internal/text/index.tsx:1080](https://github.com/onzag/itemize/blob/f2db74a5/client/internal/text/index.tsx#L1080)
+[client/internal/text/index.tsx:1114](https://github.com/onzag/itemize/blob/a24376ed/client/internal/text/index.tsx#L1114)
 
 ___
 
@@ -262,7 +262,7 @@ ___
 
 #### Defined in
 
-[client/internal/text/index.tsx:1111](https://github.com/onzag/itemize/blob/f2db74a5/client/internal/text/index.tsx#L1111)
+[client/internal/text/index.tsx:1145](https://github.com/onzag/itemize/blob/a24376ed/client/internal/text/index.tsx#L1145)
 
 ___
 
@@ -284,7 +284,7 @@ Counts the size of the document
 
 #### Defined in
 
-[client/internal/text/index.tsx:698](https://github.com/onzag/itemize/blob/f2db74a5/client/internal/text/index.tsx#L698)
+[client/internal/text/index.tsx:732](https://github.com/onzag/itemize/blob/a24376ed/client/internal/text/index.tsx#L732)
 
 ___
 
@@ -306,7 +306,7 @@ Counts the size and words of the document
 
 #### Defined in
 
-[client/internal/text/index.tsx:735](https://github.com/onzag/itemize/blob/f2db74a5/client/internal/text/index.tsx#L735)
+[client/internal/text/index.tsx:769](https://github.com/onzag/itemize/blob/a24376ed/client/internal/text/index.tsx#L769)
 
 ___
 
@@ -326,7 +326,7 @@ ___
 
 #### Defined in
 
-[client/internal/text/index.tsx:717](https://github.com/onzag/itemize/blob/f2db74a5/client/internal/text/index.tsx#L717)
+[client/internal/text/index.tsx:751](https://github.com/onzag/itemize/blob/a24376ed/client/internal/text/index.tsx#L751)
 
 ___
 
@@ -355,7 +355,7 @@ the given content
 
 #### Defined in
 
-[client/internal/text/index.tsx:764](https://github.com/onzag/itemize/blob/f2db74a5/client/internal/text/index.tsx#L764)
+[client/internal/text/index.tsx:798](https://github.com/onzag/itemize/blob/a24376ed/client/internal/text/index.tsx#L798)
 
 ___
 
@@ -383,7 +383,7 @@ a node
 
 #### Defined in
 
-[client/internal/text/index.tsx:338](https://github.com/onzag/itemize/blob/f2db74a5/client/internal/text/index.tsx#L338)
+[client/internal/text/index.tsx:338](https://github.com/onzag/itemize/blob/a24376ed/client/internal/text/index.tsx#L338)
 
 ___
 
@@ -418,7 +418,7 @@ use the renderTemplateDynamically method
 
 #### Defined in
 
-[client/internal/text/index.tsx:972](https://github.com/onzag/itemize/blob/f2db74a5/client/internal/text/index.tsx#L972)
+[client/internal/text/index.tsx:1006](https://github.com/onzag/itemize/blob/a24376ed/client/internal/text/index.tsx#L1006)
 
 ___
 
@@ -444,7 +444,7 @@ this function does not sanitize!!!
 
 #### Defined in
 
-[client/internal/text/index.tsx:939](https://github.com/onzag/itemize/blob/f2db74a5/client/internal/text/index.tsx#L939)
+[client/internal/text/index.tsx:973](https://github.com/onzag/itemize/blob/a24376ed/client/internal/text/index.tsx#L973)
 
 ___
 
@@ -477,7 +477,7 @@ takes a document instead
 
 #### Defined in
 
-[client/internal/text/index.tsx:998](https://github.com/onzag/itemize/blob/f2db74a5/client/internal/text/index.tsx#L998)
+[client/internal/text/index.tsx:1032](https://github.com/onzag/itemize/blob/a24376ed/client/internal/text/index.tsx#L1032)
 
 ___
 
@@ -504,7 +504,7 @@ then be passed to the serializer or displayed as it is
 
 #### Defined in
 
-[client/internal/text/index.tsx:282](https://github.com/onzag/itemize/blob/f2db74a5/client/internal/text/index.tsx#L282)
+[client/internal/text/index.tsx:282](https://github.com/onzag/itemize/blob/a24376ed/client/internal/text/index.tsx#L282)
 
 ___
 
@@ -527,7 +527,7 @@ HTML
 
 #### Defined in
 
-[client/internal/text/index.tsx:677](https://github.com/onzag/itemize/blob/f2db74a5/client/internal/text/index.tsx#L677)
+[client/internal/text/index.tsx:677](https://github.com/onzag/itemize/blob/a24376ed/client/internal/text/index.tsx#L677)
 
 ___
 
@@ -550,4 +550,4 @@ rather than a bunch of nodes
 
 #### Defined in
 
-[client/internal/text/index.tsx:686](https://github.com/onzag/itemize/blob/f2db74a5/client/internal/text/index.tsx#L686)
+[client/internal/text/index.tsx:692](https://github.com/onzag/itemize/blob/a24376ed/client/internal/text/index.tsx#L692)

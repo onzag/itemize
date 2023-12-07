@@ -42,7 +42,7 @@ IBaseSearchFeedbackRequest.lastModified
 
 #### Defined in
 
-[base/remote-protocol.ts:628](https://github.com/onzag/itemize/blob/f2db74a5/base/remote-protocol.ts#L628)
+[base/remote-protocol.ts:628](https://github.com/onzag/itemize/blob/a24376ed/base/remote-protocol.ts#L628)
 
 ___
 
@@ -52,7 +52,7 @@ ___
 
 #### Defined in
 
-[base/remote-protocol.ts:707](https://github.com/onzag/itemize/blob/f2db74a5/base/remote-protocol.ts#L707)
+[base/remote-protocol.ts:707](https://github.com/onzag/itemize/blob/a24376ed/base/remote-protocol.ts#L707)
 
 ___
 
@@ -62,7 +62,7 @@ ___
 
 #### Defined in
 
-[base/remote-protocol.ts:706](https://github.com/onzag/itemize/blob/f2db74a5/base/remote-protocol.ts#L706)
+[base/remote-protocol.ts:706](https://github.com/onzag/itemize/blob/a24376ed/base/remote-protocol.ts#L706)
 
 ___
 
@@ -72,7 +72,7 @@ ___
 
 #### Defined in
 
-[base/remote-protocol.ts:708](https://github.com/onzag/itemize/blob/f2db74a5/base/remote-protocol.ts#L708)
+[base/remote-protocol.ts:708](https://github.com/onzag/itemize/blob/a24376ed/base/remote-protocol.ts#L708)
 
 ___
 
@@ -89,4 +89,4 @@ IBaseSearchFeedbackRequest.qualifiedPathName
 
 #### Defined in
 
-[base/remote-protocol.ts:622](https://github.com/onzag/itemize/blob/f2db74a5/base/remote-protocol.ts#L622)
+[base/remote-protocol.ts:622](https://github.com/onzag/itemize/blob/a24376ed/base/remote-protocol.ts#L622)

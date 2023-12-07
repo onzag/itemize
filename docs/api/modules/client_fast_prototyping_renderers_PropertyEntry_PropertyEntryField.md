@@ -95,4 +95,4 @@ The styles for the field
 
 #### Defined in
 
-[client/fast-prototyping/renderers/PropertyEntry/PropertyEntryField.tsx:44](https://github.com/onzag/itemize/blob/f2db74a5/client/fast-prototyping/renderers/PropertyEntry/PropertyEntryField.tsx#L44)
+[client/fast-prototyping/renderers/PropertyEntry/PropertyEntryField.tsx:44](https://github.com/onzag/itemize/blob/a24376ed/client/fast-prototyping/renderers/PropertyEntry/PropertyEntryField.tsx#L44)

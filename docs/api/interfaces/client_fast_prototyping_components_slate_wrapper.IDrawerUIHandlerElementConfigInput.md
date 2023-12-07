@@ -26,7 +26,7 @@ of type input
 
 #### Defined in
 
-[client/fast-prototyping/components/slate/wrapper.tsx:341](https://github.com/onzag/itemize/blob/f2db74a5/client/fast-prototyping/components/slate/wrapper.tsx#L341)
+[client/fast-prototyping/components/slate/wrapper.tsx:343](https://github.com/onzag/itemize/blob/a24376ed/client/fast-prototyping/components/slate/wrapper.tsx#L343)
 
 ___
 
@@ -36,7 +36,7 @@ ___
 
 #### Defined in
 
-[client/fast-prototyping/components/slate/wrapper.tsx:338](https://github.com/onzag/itemize/blob/f2db74a5/client/fast-prototyping/components/slate/wrapper.tsx#L338)
+[client/fast-prototyping/components/slate/wrapper.tsx:340](https://github.com/onzag/itemize/blob/a24376ed/client/fast-prototyping/components/slate/wrapper.tsx#L340)
 
 ___
 
@@ -46,7 +46,7 @@ ___
 
 #### Defined in
 
-[client/fast-prototyping/components/slate/wrapper.tsx:339](https://github.com/onzag/itemize/blob/f2db74a5/client/fast-prototyping/components/slate/wrapper.tsx#L339)
+[client/fast-prototyping/components/slate/wrapper.tsx:341](https://github.com/onzag/itemize/blob/a24376ed/client/fast-prototyping/components/slate/wrapper.tsx#L341)
 
 ___
 
@@ -61,7 +61,7 @@ eg. the i18nRead element
 
 #### Defined in
 
-[client/fast-prototyping/components/slate/wrapper.tsx:349](https://github.com/onzag/itemize/blob/f2db74a5/client/fast-prototyping/components/slate/wrapper.tsx#L349)
+[client/fast-prototyping/components/slate/wrapper.tsx:351](https://github.com/onzag/itemize/blob/a24376ed/client/fast-prototyping/components/slate/wrapper.tsx#L351)
 
 ___
 
@@ -71,7 +71,7 @@ ___
 
 #### Defined in
 
-[client/fast-prototyping/components/slate/wrapper.tsx:340](https://github.com/onzag/itemize/blob/f2db74a5/client/fast-prototyping/components/slate/wrapper.tsx#L340)
+[client/fast-prototyping/components/slate/wrapper.tsx:342](https://github.com/onzag/itemize/blob/a24376ed/client/fast-prototyping/components/slate/wrapper.tsx#L342)
 
 ___
 
@@ -81,4 +81,4 @@ ___
 
 #### Defined in
 
-[client/fast-prototyping/components/slate/wrapper.tsx:337](https://github.com/onzag/itemize/blob/f2db74a5/client/fast-prototyping/components/slate/wrapper.tsx#L337)
+[client/fast-prototyping/components/slate/wrapper.tsx:339](https://github.com/onzag/itemize/blob/a24376ed/client/fast-prototyping/components/slate/wrapper.tsx#L339)

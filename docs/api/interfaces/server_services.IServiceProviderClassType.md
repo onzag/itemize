@@ -42,7 +42,7 @@
 
 #### Defined in
 
-[server/services/index.ts:311](https://github.com/onzag/itemize/blob/f2db74a5/server/services/index.ts#L311)
+[server/services/index.ts:311](https://github.com/onzag/itemize/blob/a24376ed/server/services/index.ts#L311)
 
 ## Methods
 
@@ -62,7 +62,7 @@
 
 #### Defined in
 
-[server/services/index.ts:321](https://github.com/onzag/itemize/blob/f2db74a5/server/services/index.ts#L321)
+[server/services/index.ts:321](https://github.com/onzag/itemize/blob/a24376ed/server/services/index.ts#L321)
 
 ___
 
@@ -76,7 +76,7 @@ ___
 
 #### Defined in
 
-[server/services/index.ts:322](https://github.com/onzag/itemize/blob/f2db74a5/server/services/index.ts#L322)
+[server/services/index.ts:322](https://github.com/onzag/itemize/blob/a24376ed/server/services/index.ts#L322)
 
 ___
 
@@ -90,4 +90,4 @@ ___
 
 #### Defined in
 
-[server/services/index.ts:323](https://github.com/onzag/itemize/blob/f2db74a5/server/services/index.ts#L323)
+[server/services/index.ts:323](https://github.com/onzag/itemize/blob/a24376ed/server/services/index.ts#L323)

@@ -43,7 +43,7 @@ can be added as replacement, you can also design your own wrapper based on this 
 
 #### Defined in
 
-[client/fast-prototyping/components/slate/wrapper.tsx:413](https://github.com/onzag/itemize/blob/f2db74a5/client/fast-prototyping/components/slate/wrapper.tsx#L413)
+[client/fast-prototyping/components/slate/wrapper.tsx:415](https://github.com/onzag/itemize/blob/a24376ed/client/fast-prototyping/components/slate/wrapper.tsx#L415)
 
 ___
 
@@ -53,7 +53,7 @@ ___
 
 #### Defined in
 
-[client/fast-prototyping/components/slate/wrapper.tsx:406](https://github.com/onzag/itemize/blob/f2db74a5/client/fast-prototyping/components/slate/wrapper.tsx#L406)
+[client/fast-prototyping/components/slate/wrapper.tsx:408](https://github.com/onzag/itemize/blob/a24376ed/client/fast-prototyping/components/slate/wrapper.tsx#L408)
 
 ___
 
@@ -77,7 +77,7 @@ ___
 
 #### Defined in
 
-[client/fast-prototyping/components/slate/wrapper.tsx:410](https://github.com/onzag/itemize/blob/f2db74a5/client/fast-prototyping/components/slate/wrapper.tsx#L410)
+[client/fast-prototyping/components/slate/wrapper.tsx:412](https://github.com/onzag/itemize/blob/a24376ed/client/fast-prototyping/components/slate/wrapper.tsx#L412)
 
 ___
 
@@ -87,4 +87,4 @@ ___
 
 #### Defined in
 
-[client/fast-prototyping/components/slate/wrapper.tsx:385](https://github.com/onzag/itemize/blob/f2db74a5/client/fast-prototyping/components/slate/wrapper.tsx#L385)
+[client/fast-prototyping/components/slate/wrapper.tsx:387](https://github.com/onzag/itemize/blob/a24376ed/client/fast-prototyping/components/slate/wrapper.tsx#L387)

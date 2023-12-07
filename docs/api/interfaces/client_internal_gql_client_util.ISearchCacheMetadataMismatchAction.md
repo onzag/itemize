@@ -26,7 +26,7 @@ REFETCH_RECORDS will refetch specific records based on the recordsRefetchConditi
 
 #### Defined in
 
-[client/internal/gql-client-util.ts:106](https://github.com/onzag/itemize/blob/f2db74a5/client/internal/gql-client-util.ts#L106)
+[client/internal/gql-client-util.ts:106](https://github.com/onzag/itemize/blob/a24376ed/client/internal/gql-client-util.ts#L106)
 
 ___
 
@@ -38,13 +38,13 @@ The condition to use when REFETCH_RECORDS is used
 
 #### Defined in
 
-[client/internal/gql-client-util.ts:117](https://github.com/onzag/itemize/blob/f2db74a5/client/internal/gql-client-util.ts#L117)
+[client/internal/gql-client-util.ts:117](https://github.com/onzag/itemize/blob/a24376ed/client/internal/gql-client-util.ts#L117)
 
 ___
 
 ### rewrite
 
-• **rewrite**: ``"IF_CONDITION_SUCCEEDS"`` \| ``"ALWAYS"`` \| ``"NEVER"``
+• **rewrite**: ``"ALWAYS"`` \| ``"IF_CONDITION_SUCCEEDS"`` \| ``"NEVER"``
 
 Specifies whether the metadata itself should be rewritten
 into the cache, ALWAYS is preferrable
@@ -53,4 +53,4 @@ IF_CONDITION_SUCCEEDS is only useful when it is set to REFETCH_RECORDS
 
 #### Defined in
 
-[client/internal/gql-client-util.ts:113](https://github.com/onzag/itemize/blob/f2db74a5/client/internal/gql-client-util.ts#L113)
+[client/internal/gql-client-util.ts:113](https://github.com/onzag/itemize/blob/a24376ed/client/internal/gql-client-util.ts#L113)

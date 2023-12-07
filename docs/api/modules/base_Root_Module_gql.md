@@ -45,7 +45,7 @@ all the fields definition for the module
 
 #### Defined in
 
-[base/Root/Module/gql.ts:40](https://github.com/onzag/itemize/blob/f2db74a5/base/Root/Module/gql.ts#L40)
+[base/Root/Module/gql.ts:40](https://github.com/onzag/itemize/blob/a24376ed/base/Root/Module/gql.ts#L40)
 
 ___
 
@@ -71,7 +71,7 @@ a query fields definition type for all the sub definitions
 
 #### Defined in
 
-[base/Root/Module/gql.ts:335](https://github.com/onzag/itemize/blob/f2db74a5/base/Root/Module/gql.ts#L335)
+[base/Root/Module/gql.ts:338](https://github.com/onzag/itemize/blob/a24376ed/base/Root/Module/gql.ts#L338)
 
 ___
 
@@ -100,7 +100,7 @@ the fields for the main query object to do GET_LIST and SEARCH
 
 #### Defined in
 
-[base/Root/Module/gql.ts:199](https://github.com/onzag/itemize/blob/f2db74a5/base/Root/Module/gql.ts#L199)
+[base/Root/Module/gql.ts:199](https://github.com/onzag/itemize/blob/a24376ed/base/Root/Module/gql.ts#L199)
 
 ___
 
@@ -125,7 +125,7 @@ the output type for the module object
 
 #### Defined in
 
-[base/Root/Module/gql.ts:118](https://github.com/onzag/itemize/blob/f2db74a5/base/Root/Module/gql.ts#L118)
+[base/Root/Module/gql.ts:118](https://github.com/onzag/itemize/blob/a24376ed/base/Root/Module/gql.ts#L118)
 
 ___
 
@@ -150,4 +150,4 @@ the module type this module refers to (it is cached)
 
 #### Defined in
 
-[base/Root/Module/gql.ts:85](https://github.com/onzag/itemize/blob/f2db74a5/base/Root/Module/gql.ts#L85)
+[base/Root/Module/gql.ts:85](https://github.com/onzag/itemize/blob/a24376ed/base/Root/Module/gql.ts#L85)

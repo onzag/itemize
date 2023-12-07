@@ -12,6 +12,13 @@ You might extend this class and require extra props, these
 props might be passed by using the wrapperArgs from
 the main component which will pass them to the wrapper
 
+When implementing the wrapper you may add a selectiveHardBlur function
+for which triggers when the element is blurred to prevent real blurring (aka executing hardBlur)
+depending on if something is selected in the wrapper
+
+The selectiveHardBlur should take a (ev: KeyboardEvent, target: HTMLElement) if you wish to prevent
+the blur from happening
+
 ## Hierarchy
 
 - **`ISlateEditorWrapperBaseProps`**
@@ -46,7 +53,7 @@ where it is expected to be used
 
 #### Defined in
 
-[client/fast-prototyping/components/slate/index.tsx:807](https://github.com/onzag/itemize/blob/f2db74a5/client/fast-prototyping/components/slate/index.tsx#L807)
+[client/fast-prototyping/components/slate/index.tsx:827](https://github.com/onzag/itemize/blob/a24376ed/client/fast-prototyping/components/slate/index.tsx#L827)
 
 ___
 
@@ -62,7 +69,7 @@ indeed provide this as a prop for the render
 
 #### Defined in
 
-[client/fast-prototyping/components/slate/index.tsx:815](https://github.com/onzag/itemize/blob/f2db74a5/client/fast-prototyping/components/slate/index.tsx#L815)
+[client/fast-prototyping/components/slate/index.tsx:835](https://github.com/onzag/itemize/blob/a24376ed/client/fast-prototyping/components/slate/index.tsx#L835)
 
 ___
 
@@ -74,7 +81,7 @@ Whether it is disabled
 
 #### Defined in
 
-[client/fast-prototyping/components/slate/index.tsx:783](https://github.com/onzag/itemize/blob/f2db74a5/client/fast-prototyping/components/slate/index.tsx#L783)
+[client/fast-prototyping/components/slate/index.tsx:803](https://github.com/onzag/itemize/blob/a24376ed/client/fast-prototyping/components/slate/index.tsx#L803)
 
 ___
 
@@ -88,7 +95,7 @@ and whatnot from it
 
 #### Defined in
 
-[client/fast-prototyping/components/slate/index.tsx:795](https://github.com/onzag/itemize/blob/f2db74a5/client/fast-prototyping/components/slate/index.tsx#L795)
+[client/fast-prototyping/components/slate/index.tsx:815](https://github.com/onzag/itemize/blob/a24376ed/client/fast-prototyping/components/slate/index.tsx#L815)
 
 ___
 
@@ -101,7 +108,7 @@ and modify nodes
 
 #### Defined in
 
-[client/fast-prototyping/components/slate/index.tsx:800](https://github.com/onzag/itemize/blob/f2db74a5/client/fast-prototyping/components/slate/index.tsx#L800)
+[client/fast-prototyping/components/slate/index.tsx:820](https://github.com/onzag/itemize/blob/a24376ed/client/fast-prototyping/components/slate/index.tsx#L820)
 
 ___
 
@@ -115,7 +122,7 @@ so it can get state information
 
 #### Defined in
 
-[client/fast-prototyping/components/slate/index.tsx:789](https://github.com/onzag/itemize/blob/f2db74a5/client/fast-prototyping/components/slate/index.tsx#L789)
+[client/fast-prototyping/components/slate/index.tsx:809](https://github.com/onzag/itemize/blob/a24376ed/client/fast-prototyping/components/slate/index.tsx#L809)
 
 ## Methods
 
@@ -132,4 +139,4 @@ as the currentLoadError
 
 #### Defined in
 
-[client/fast-prototyping/components/slate/index.tsx:820](https://github.com/onzag/itemize/blob/f2db74a5/client/fast-prototyping/components/slate/index.tsx#L820)
+[client/fast-prototyping/components/slate/index.tsx:840](https://github.com/onzag/itemize/blob/a24376ed/client/fast-prototyping/components/slate/index.tsx#L840)

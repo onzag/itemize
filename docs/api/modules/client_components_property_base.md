@@ -47,4 +47,4 @@ a react component
 
 #### Defined in
 
-[client/components/property/base.tsx:219](https://github.com/onzag/itemize/blob/f2db74a5/client/components/property/base.tsx#L219)
+[client/components/property/base.tsx:248](https://github.com/onzag/itemize/blob/a24376ed/client/components/property/base.tsx#L248)

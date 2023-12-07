@@ -40,7 +40,7 @@ whether it represents a default value (it is not user set in this case)
 
 #### Defined in
 
-[base/Root/Module/ItemDefinition/PropertyDefinition/index.ts:289](https://github.com/onzag/itemize/blob/f2db74a5/base/Root/Module/ItemDefinition/PropertyDefinition/index.ts#L289)
+[base/Root/Module/ItemDefinition/PropertyDefinition/index.ts:297](https://github.com/onzag/itemize/blob/a24376ed/base/Root/Module/ItemDefinition/PropertyDefinition/index.ts#L297)
 
 ___
 
@@ -52,7 +52,7 @@ whether the value is enforced (by enforcedProperties or other means), not user s
 
 #### Defined in
 
-[base/Root/Module/ItemDefinition/PropertyDefinition/index.ts:293](https://github.com/onzag/itemize/blob/f2db74a5/base/Root/Module/ItemDefinition/PropertyDefinition/index.ts#L293)
+[base/Root/Module/ItemDefinition/PropertyDefinition/index.ts:301](https://github.com/onzag/itemize/blob/a24376ed/base/Root/Module/ItemDefinition/PropertyDefinition/index.ts#L301)
 
 ___
 
@@ -64,7 +64,7 @@ whether the property is mean to be hidden and not interacted by the user
 
 #### Defined in
 
-[base/Root/Module/ItemDefinition/PropertyDefinition/index.ts:297](https://github.com/onzag/itemize/blob/f2db74a5/base/Root/Module/ItemDefinition/PropertyDefinition/index.ts#L297)
+[base/Root/Module/ItemDefinition/PropertyDefinition/index.ts:305](https://github.com/onzag/itemize/blob/a24376ed/base/Root/Module/ItemDefinition/PropertyDefinition/index.ts#L305)
 
 ___
 
@@ -81,7 +81,7 @@ are basically only returned if the state value is the current value
 
 #### Defined in
 
-[base/Root/Module/ItemDefinition/PropertyDefinition/index.ts:319](https://github.com/onzag/itemize/blob/f2db74a5/base/Root/Module/ItemDefinition/PropertyDefinition/index.ts#L319)
+[base/Root/Module/ItemDefinition/PropertyDefinition/index.ts:327](https://github.com/onzag/itemize/blob/a24376ed/base/Root/Module/ItemDefinition/PropertyDefinition/index.ts#L327)
 
 ___
 
@@ -93,7 +93,7 @@ the reason of why it is not valid (it can also be a custom reason)
 
 #### Defined in
 
-[base/Root/Module/ItemDefinition/PropertyDefinition/index.ts:305](https://github.com/onzag/itemize/blob/f2db74a5/base/Root/Module/ItemDefinition/PropertyDefinition/index.ts#L305)
+[base/Root/Module/ItemDefinition/PropertyDefinition/index.ts:313](https://github.com/onzag/itemize/blob/a24376ed/base/Root/Module/ItemDefinition/PropertyDefinition/index.ts#L313)
 
 ___
 
@@ -105,7 +105,7 @@ the property id in question
 
 #### Defined in
 
-[base/Root/Module/ItemDefinition/PropertyDefinition/index.ts:350](https://github.com/onzag/itemize/blob/f2db74a5/base/Root/Module/ItemDefinition/PropertyDefinition/index.ts#L350)
+[base/Root/Module/ItemDefinition/PropertyDefinition/index.ts:358](https://github.com/onzag/itemize/blob/a24376ed/base/Root/Module/ItemDefinition/PropertyDefinition/index.ts#L358)
 
 ___
 
@@ -119,7 +119,7 @@ the original value
 
 #### Defined in
 
-[base/Root/Module/ItemDefinition/PropertyDefinition/index.ts:332](https://github.com/onzag/itemize/blob/f2db74a5/base/Root/Module/ItemDefinition/PropertyDefinition/index.ts#L332)
+[base/Root/Module/ItemDefinition/PropertyDefinition/index.ts:340](https://github.com/onzag/itemize/blob/a24376ed/base/Root/Module/ItemDefinition/PropertyDefinition/index.ts#L340)
 
 ___
 
@@ -134,7 +134,7 @@ usually the internal value is correlated to the state value
 
 #### Defined in
 
-[base/Root/Module/ItemDefinition/PropertyDefinition/index.ts:326](https://github.com/onzag/itemize/blob/f2db74a5/base/Root/Module/ItemDefinition/PropertyDefinition/index.ts#L326)
+[base/Root/Module/ItemDefinition/PropertyDefinition/index.ts:334](https://github.com/onzag/itemize/blob/a24376ed/base/Root/Module/ItemDefinition/PropertyDefinition/index.ts#L334)
 
 ___
 
@@ -150,7 +150,7 @@ or user input as long as it was used accordingly
 
 #### Defined in
 
-[base/Root/Module/ItemDefinition/PropertyDefinition/index.ts:346](https://github.com/onzag/itemize/blob/f2db74a5/base/Root/Module/ItemDefinition/PropertyDefinition/index.ts#L346)
+[base/Root/Module/ItemDefinition/PropertyDefinition/index.ts:354](https://github.com/onzag/itemize/blob/a24376ed/base/Root/Module/ItemDefinition/PropertyDefinition/index.ts#L354)
 
 ___
 
@@ -164,7 +164,7 @@ once the field is touched even once
 
 #### Defined in
 
-[base/Root/Module/ItemDefinition/PropertyDefinition/index.ts:338](https://github.com/onzag/itemize/blob/f2db74a5/base/Root/Module/ItemDefinition/PropertyDefinition/index.ts#L338)
+[base/Root/Module/ItemDefinition/PropertyDefinition/index.ts:346](https://github.com/onzag/itemize/blob/a24376ed/base/Root/Module/ItemDefinition/PropertyDefinition/index.ts#L346)
 
 ___
 
@@ -176,7 +176,7 @@ whether this value was user set
 
 #### Defined in
 
-[base/Root/Module/ItemDefinition/PropertyDefinition/index.ts:285](https://github.com/onzag/itemize/blob/f2db74a5/base/Root/Module/ItemDefinition/PropertyDefinition/index.ts#L285)
+[base/Root/Module/ItemDefinition/PropertyDefinition/index.ts:293](https://github.com/onzag/itemize/blob/a24376ed/base/Root/Module/ItemDefinition/PropertyDefinition/index.ts#L293)
 
 ___
 
@@ -188,7 +188,7 @@ whether the value is valid
 
 #### Defined in
 
-[base/Root/Module/ItemDefinition/PropertyDefinition/index.ts:301](https://github.com/onzag/itemize/blob/f2db74a5/base/Root/Module/ItemDefinition/PropertyDefinition/index.ts#L301)
+[base/Root/Module/ItemDefinition/PropertyDefinition/index.ts:309](https://github.com/onzag/itemize/blob/a24376ed/base/Root/Module/ItemDefinition/PropertyDefinition/index.ts#L309)
 
 ___
 
@@ -201,4 +201,4 @@ values because
 
 #### Defined in
 
-[base/Root/Module/ItemDefinition/PropertyDefinition/index.ts:310](https://github.com/onzag/itemize/blob/f2db74a5/base/Root/Module/ItemDefinition/PropertyDefinition/index.ts#L310)
+[base/Root/Module/ItemDefinition/PropertyDefinition/index.ts:318](https://github.com/onzag/itemize/blob/a24376ed/base/Root/Module/ItemDefinition/PropertyDefinition/index.ts#L318)

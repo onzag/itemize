@@ -37,4 +37,4 @@ and contain properties that are used to define the content
 
 #### Defined in
 
-[client/components/util/Fragment.tsx:162](https://github.com/onzag/itemize/blob/f2db74a5/client/components/util/Fragment.tsx#L162)
+[client/components/util/Fragment.tsx:162](https://github.com/onzag/itemize/blob/a24376ed/client/components/util/Fragment.tsx#L162)

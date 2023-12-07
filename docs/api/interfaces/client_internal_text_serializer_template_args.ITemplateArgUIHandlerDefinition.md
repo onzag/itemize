@@ -42,7 +42,7 @@ IBaseTemplateArg.editorArgs
 
 #### Defined in
 
-[client/internal/text/serializer/template-args.ts:196](https://github.com/onzag/itemize/blob/f2db74a5/client/internal/text/serializer/template-args.ts#L196)
+[client/internal/text/serializer/template-args.ts:196](https://github.com/onzag/itemize/blob/a24376ed/client/internal/text/serializer/template-args.ts#L196)
 
 ___
 
@@ -55,7 +55,7 @@ this argument is very specific to the editor being used
 
 #### Defined in
 
-[client/internal/text/serializer/template-args.ts:286](https://github.com/onzag/itemize/blob/f2db74a5/client/internal/text/serializer/template-args.ts#L286)
+[client/internal/text/serializer/template-args.ts:286](https://github.com/onzag/itemize/blob/a24376ed/client/internal/text/serializer/template-args.ts#L286)
 
 ___
 
@@ -69,7 +69,7 @@ IBaseTemplateArg.label
 
 #### Defined in
 
-[client/internal/text/serializer/template-args.ts:189](https://github.com/onzag/itemize/blob/f2db74a5/client/internal/text/serializer/template-args.ts#L189)
+[client/internal/text/serializer/template-args.ts:189](https://github.com/onzag/itemize/blob/a24376ed/client/internal/text/serializer/template-args.ts#L189)
 
 ___
 
@@ -83,7 +83,7 @@ but are not limited to that
 
 #### Defined in
 
-[client/internal/text/serializer/template-args.ts:261](https://github.com/onzag/itemize/blob/f2db74a5/client/internal/text/serializer/template-args.ts#L261)
+[client/internal/text/serializer/template-args.ts:261](https://github.com/onzag/itemize/blob/a24376ed/client/internal/text/serializer/template-args.ts#L261)
 
 ___
 
@@ -97,7 +97,7 @@ IBaseTemplateArg.nonRootInheritable
 
 #### Defined in
 
-[client/internal/text/serializer/template-args.ts:190](https://github.com/onzag/itemize/blob/f2db74a5/client/internal/text/serializer/template-args.ts#L190)
+[client/internal/text/serializer/template-args.ts:190](https://github.com/onzag/itemize/blob/a24376ed/client/internal/text/serializer/template-args.ts#L190)
 
 ___
 
@@ -107,7 +107,7 @@ ___
 
 #### Defined in
 
-[client/internal/text/serializer/template-args.ts:255](https://github.com/onzag/itemize/blob/f2db74a5/client/internal/text/serializer/template-args.ts#L255)
+[client/internal/text/serializer/template-args.ts:255](https://github.com/onzag/itemize/blob/a24376ed/client/internal/text/serializer/template-args.ts#L255)
 
 ## Methods
 
@@ -136,7 +136,7 @@ such thing
 
 #### Defined in
 
-[client/internal/text/serializer/template-args.ts:271](https://github.com/onzag/itemize/blob/f2db74a5/client/internal/text/serializer/template-args.ts#L271)
+[client/internal/text/serializer/template-args.ts:271](https://github.com/onzag/itemize/blob/a24376ed/client/internal/text/serializer/template-args.ts#L271)
 
 ___
 
@@ -160,7 +160,7 @@ applies to this element itself, rather than its
 
 #### Defined in
 
-[client/internal/text/serializer/template-args.ts:281](https://github.com/onzag/itemize/blob/f2db74a5/client/internal/text/serializer/template-args.ts#L281)
+[client/internal/text/serializer/template-args.ts:281](https://github.com/onzag/itemize/blob/a24376ed/client/internal/text/serializer/template-args.ts#L281)
 
 ___
 
@@ -184,4 +184,4 @@ return null if not possible
 
 #### Defined in
 
-[client/internal/text/serializer/template-args.ts:276](https://github.com/onzag/itemize/blob/f2db74a5/client/internal/text/serializer/template-args.ts#L276)
+[client/internal/text/serializer/template-args.ts:276](https://github.com/onzag/itemize/blob/a24376ed/client/internal/text/serializer/template-args.ts#L276)

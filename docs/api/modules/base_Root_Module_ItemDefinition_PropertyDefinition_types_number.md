@@ -24,7 +24,7 @@ The number type is described by a simple number
 
 #### Defined in
 
-[base/Root/Module/ItemDefinition/PropertyDefinition/types/number.ts:44](https://github.com/onzag/itemize/blob/f2db74a5/base/Root/Module/ItemDefinition/PropertyDefinition/types/number.ts#L44)
+[base/Root/Module/ItemDefinition/PropertyDefinition/types/number.ts:44](https://github.com/onzag/itemize/blob/a24376ed/base/Root/Module/ItemDefinition/PropertyDefinition/types/number.ts#L44)
 
 ## Variables
 
@@ -36,4 +36,4 @@ The type of the number describe how numbers behave in the app
 
 #### Defined in
 
-[base/Root/Module/ItemDefinition/PropertyDefinition/types/number.ts:49](https://github.com/onzag/itemize/blob/f2db74a5/base/Root/Module/ItemDefinition/PropertyDefinition/types/number.ts#L49)
+[base/Root/Module/ItemDefinition/PropertyDefinition/types/number.ts:49](https://github.com/onzag/itemize/blob/a24376ed/base/Root/Module/ItemDefinition/PropertyDefinition/types/number.ts#L49)

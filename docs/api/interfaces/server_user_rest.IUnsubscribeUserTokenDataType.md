@@ -19,7 +19,7 @@
 
 #### Defined in
 
-[server/user/rest.ts:13](https://github.com/onzag/itemize/blob/f2db74a5/server/user/rest.ts#L13)
+[server/user/rest.ts:13](https://github.com/onzag/itemize/blob/a24376ed/server/user/rest.ts#L13)
 
 ___
 
@@ -29,4 +29,4 @@ ___
 
 #### Defined in
 
-[server/user/rest.ts:12](https://github.com/onzag/itemize/blob/f2db74a5/server/user/rest.ts#L12)
+[server/user/rest.ts:12](https://github.com/onzag/itemize/blob/a24376ed/server/user/rest.ts#L12)

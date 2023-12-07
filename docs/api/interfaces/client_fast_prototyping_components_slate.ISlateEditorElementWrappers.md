@@ -25,7 +25,7 @@ The element wrappers
 
 #### Defined in
 
-[client/fast-prototyping/components/slate/index.tsx:762](https://github.com/onzag/itemize/blob/f2db74a5/client/fast-prototyping/components/slate/index.tsx#L762)
+[client/fast-prototyping/components/slate/index.tsx:775](https://github.com/onzag/itemize/blob/a24376ed/client/fast-prototyping/components/slate/index.tsx#L775)
 
 ___
 
@@ -39,4 +39,4 @@ ___
 
 #### Defined in
 
-[client/fast-prototyping/components/slate/index.tsx:765](https://github.com/onzag/itemize/blob/f2db74a5/client/fast-prototyping/components/slate/index.tsx#L765)
+[client/fast-prototyping/components/slate/index.tsx:778](https://github.com/onzag/itemize/blob/a24376ed/client/fast-prototyping/components/slate/index.tsx#L778)

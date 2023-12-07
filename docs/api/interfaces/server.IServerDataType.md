@@ -19,7 +19,7 @@
 
 #### Defined in
 
-[server/index.ts:216](https://github.com/onzag/itemize/blob/f2db74a5/server/index.ts#L216)
+[server/index.ts:218](https://github.com/onzag/itemize/blob/a24376ed/server/index.ts#L218)
 
 ___
 
@@ -33,4 +33,4 @@ ___
 
 #### Defined in
 
-[server/index.ts:217](https://github.com/onzag/itemize/blob/f2db74a5/server/index.ts#L217)
+[server/index.ts:219](https://github.com/onzag/itemize/blob/a24376ed/server/index.ts#L219)

@@ -9,4 +9,5 @@ this setter only has effect server side
 
 ### Classes
 
+- [ActualDescriptionSetter](../classes/client_components_util_DescriptionSetter.ActualDescriptionSetter.md)
 - [default](../classes/client_components_util_DescriptionSetter.default.md)

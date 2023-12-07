@@ -94,7 +94,7 @@ React.PureComponent&lt;ITotalPagedSearchLoaderProps, ITotalPagedSearchLoaderStat
 
 #### Defined in
 
-[client/components/search/TotalPagedSearchLoader.tsx:308](https://github.com/onzag/itemize/blob/f2db74a5/client/components/search/TotalPagedSearchLoader.tsx#L308)
+[client/components/search/TotalPagedSearchLoader.tsx:323](https://github.com/onzag/itemize/blob/a24376ed/client/components/search/TotalPagedSearchLoader.tsx#L323)
 
 ## Properties
 
@@ -601,13 +601,13 @@ React.PureComponent.render
 
 #### Defined in
 
-[client/components/search/TotalPagedSearchLoader.tsx:327](https://github.com/onzag/itemize/blob/f2db74a5/client/components/search/TotalPagedSearchLoader.tsx#L327)
+[client/components/search/TotalPagedSearchLoader.tsx:343](https://github.com/onzag/itemize/blob/a24376ed/client/components/search/TotalPagedSearchLoader.tsx#L343)
 
 ___
 
 ### renderPagedLoader
 
-▸ **renderPagedLoader**(`limit`, `offset`, `count`, `state`, `setState`): `Element`
+▸ **renderPagedLoader**(`limit`, `offset`, `count`, `state`, `setState`, `pLoc`): `Element`
 
 #### Parameters
 
@@ -618,6 +618,7 @@ ___
 | `count` | `number` |
 | `state` | `ITotalPagedSearchLoaderState` |
 | `setState` | (`qs`: `Partial`<`ITotalPagedSearchLoaderState`\>) => `void` |
+| `pLoc` | `string` |
 
 #### Returns
 
@@ -625,7 +626,7 @@ ___
 
 #### Defined in
 
-[client/components/search/TotalPagedSearchLoader.tsx:315](https://github.com/onzag/itemize/blob/f2db74a5/client/components/search/TotalPagedSearchLoader.tsx#L315)
+[client/components/search/TotalPagedSearchLoader.tsx:330](https://github.com/onzag/itemize/blob/a24376ed/client/components/search/TotalPagedSearchLoader.tsx#L330)
 
 ___
 

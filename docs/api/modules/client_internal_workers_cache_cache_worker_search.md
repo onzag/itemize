@@ -18,7 +18,7 @@ Contains the filtering and ordering function to perform actual searches
 
 ### search
 
-▸ **search**(`rootProxy`, `db`, `searchRecords`, `searchArgs`, `returnSourceResults`, `noLimitOffset`): `Promise`<{ `count`: `number` ; `filteredRecords`: [`IGQLSearchRecord`](../interfaces/gql_querier.IGQLSearchRecord.md)[] ; `filteredResults`: [`IGQLValue`](../interfaces/gql_querier.IGQLValue.md)[] ; `sourceResults`: [`ICacheMatchType`](../interfaces/client_internal_workers_cache_cache_worker.ICacheMatchType.md)[]  }\>
+▸ **search**(`rootProxy`, `db`, `searchRecords`, `searchArgs`, `returnSourceResults`, `cacheNoLimitOffset`): `Promise`<{ `count`: `number` ; `filteredRecords`: [`IGQLSearchRecord`](../interfaces/gql_querier.IGQLSearchRecord.md)[] ; `filteredResults`: [`IGQLValue`](../interfaces/gql_querier.IGQLValue.md)[] ; `sourceResults`: [`ICacheMatchType`](../interfaces/client_internal_workers_cache_cache_worker_class.ICacheMatchType.md)[]  }\>
 
 Given a bunch of search records it will perform
 the ordering and filtering of such records to return
@@ -30,16 +30,16 @@ cache, this is a heavy process
 | Name | Type | Description |
 | :------ | :------ | :------ |
 | `rootProxy` | [`default`](../classes/base_Root.default.md) | the root proxy we need to extract the functionality for ordering and checking equality |
-| `db` | `IDBPDatabase`<[`ICacheDB`](../interfaces/client_internal_workers_cache_cache_worker.ICacheDB.md)\> | the database object |
+| `db` | `IDBPDatabase`<[`ICacheDB`](../interfaces/client_internal_workers_cache_cache_worker_class.ICacheDB.md)\> | the database object |
 | `searchRecords` | [`IGQLSearchRecord`](../interfaces/gql_querier.IGQLSearchRecord.md)[] | the search records we got |
 | `searchArgs` | [`IGQLArgs`](../interfaces/gql_querier.IGQLArgs.md) | the search arguments (that would be sent to the server) an we need to emulate for |
 | `returnSourceResults` | `boolean` | - |
-| `noLimitOffset` | `boolean` | - |
+| `cacheNoLimitOffset` | `boolean` | - |
 
 #### Returns
 
-`Promise`<{ `count`: `number` ; `filteredRecords`: [`IGQLSearchRecord`](../interfaces/gql_querier.IGQLSearchRecord.md)[] ; `filteredResults`: [`IGQLValue`](../interfaces/gql_querier.IGQLValue.md)[] ; `sourceResults`: [`ICacheMatchType`](../interfaces/client_internal_workers_cache_cache_worker.ICacheMatchType.md)[]  }\>
+`Promise`<{ `count`: `number` ; `filteredRecords`: [`IGQLSearchRecord`](../interfaces/gql_querier.IGQLSearchRecord.md)[] ; `filteredResults`: [`IGQLValue`](../interfaces/gql_querier.IGQLValue.md)[] ; `sourceResults`: [`ICacheMatchType`](../interfaces/client_internal_workers_cache_cache_worker_class.ICacheMatchType.md)[]  }\>
 
 #### Defined in
 
-[client/internal/workers/cache/cache.worker.search.ts:66](https://github.com/onzag/itemize/blob/f2db74a5/client/internal/workers/cache/cache.worker.search.ts#L66)
+[client/internal/workers/cache/cache.worker.search.ts:66](https://github.com/onzag/itemize/blob/a24376ed/client/internal/workers/cache/cache.worker.search.ts#L66)

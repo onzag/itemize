@@ -25,7 +25,7 @@ The graphql alias
 
 #### Defined in
 
-[gql-querier.ts:538](https://github.com/onzag/itemize/blob/f2db74a5/gql-querier.ts#L538)
+[gql-querier.ts:593](https://github.com/onzag/itemize/blob/a24376ed/gql-querier.ts#L593)
 
 ___
 
@@ -37,7 +37,7 @@ The arguments to use
 
 #### Defined in
 
-[gql-querier.ts:542](https://github.com/onzag/itemize/blob/f2db74a5/gql-querier.ts#L542)
+[gql-querier.ts:597](https://github.com/onzag/itemize/blob/a24376ed/gql-querier.ts#L597)
 
 ___
 
@@ -49,7 +49,7 @@ And the fields
 
 #### Defined in
 
-[gql-querier.ts:546](https://github.com/onzag/itemize/blob/f2db74a5/gql-querier.ts#L546)
+[gql-querier.ts:601](https://github.com/onzag/itemize/blob/a24376ed/gql-querier.ts#L601)
 
 ___
 
@@ -61,4 +61,4 @@ The grapqhl query name
 
 #### Defined in
 
-[gql-querier.ts:534](https://github.com/onzag/itemize/blob/f2db74a5/gql-querier.ts#L534)
+[gql-querier.ts:589](https://github.com/onzag/itemize/blob/a24376ed/gql-querier.ts#L589)

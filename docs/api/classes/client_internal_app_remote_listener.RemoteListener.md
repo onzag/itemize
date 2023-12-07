@@ -17,9 +17,15 @@ as to keep things up to date and reactive
 ### Properties
 
 - [appUpdatedListeners](client_internal_app_remote_listener.RemoteListener.md#appupdatedlisteners)
+- [awaitingOwnedParentedSearchRequests](client_internal_app_remote_listener.RemoteListener.md#awaitingownedparentedsearchrequests)
+- [awaitingOwnedSearchRequests](client_internal_app_remote_listener.RemoteListener.md#awaitingownedsearchrequests)
+- [awaitingParentedSearchRequests](client_internal_app_remote_listener.RemoteListener.md#awaitingparentedsearchrequests)
+- [awaitingPropertySearchRequests](client_internal_app_remote_listener.RemoteListener.md#awaitingpropertysearchrequests)
 - [connectionListeners](client_internal_app_remote_listener.RemoteListener.md#connectionlisteners)
+- [connectionOnConnectOnceListeners](client_internal_app_remote_listener.RemoteListener.md#connectiononconnectoncelisteners)
 - [currencyFactorsHandler](client_internal_app_remote_listener.RemoteListener.md#currencyfactorshandler)
 - [delayedFeedbacks](client_internal_app_remote_listener.RemoteListener.md#delayedfeedbacks)
+- [hasBeenReadyOnce](client_internal_app_remote_listener.RemoteListener.md#hasbeenreadyonce)
 - [hasSetToken](client_internal_app_remote_listener.RemoteListener.md#hassettoken)
 - [isReady](client_internal_app_remote_listener.RemoteListener.md#isready)
 - [lastRecievedBuildNumber](client_internal_app_remote_listener.RemoteListener.md#lastrecievedbuildnumber)
@@ -33,6 +39,7 @@ as to keep things up to date and reactive
 - [propertySearchListeners](client_internal_app_remote_listener.RemoteListener.md#propertysearchlisteners)
 - [root](client_internal_app_remote_listener.RemoteListener.md#root)
 - [setupTime](client_internal_app_remote_listener.RemoteListener.md#setuptime)
+- [slowPoolingTimer](client_internal_app_remote_listener.RemoteListener.md#slowpoolingtimer)
 - [socket](client_internal_app_remote_listener.RemoteListener.md#socket)
 - [token](client_internal_app_remote_listener.RemoteListener.md#token)
 - [uuid](client_internal_app_remote_listener.RemoteListener.md#uuid)
@@ -42,6 +49,7 @@ as to keep things up to date and reactive
 - [addAppUpdatedListener](client_internal_app_remote_listener.RemoteListener.md#addappupdatedlistener)
 - [addConnectStatusListener](client_internal_app_remote_listener.RemoteListener.md#addconnectstatuslistener)
 - [addItemDefinitionListenerFor](client_internal_app_remote_listener.RemoteListener.md#additemdefinitionlistenerfor)
+- [addOnConnectOnceListener](client_internal_app_remote_listener.RemoteListener.md#addonconnectoncelistener)
 - [addOwnedParentedSearchListenerFor](client_internal_app_remote_listener.RemoteListener.md#addownedparentedsearchlistenerfor)
 - [addOwnedSearchListenerFor](client_internal_app_remote_listener.RemoteListener.md#addownedsearchlistenerfor)
 - [addParentedSearchListenerFor](client_internal_app_remote_listener.RemoteListener.md#addparentedsearchlistenerfor)
@@ -53,6 +61,7 @@ as to keep things up to date and reactive
 - [attachParentedSearchListenerFor](client_internal_app_remote_listener.RemoteListener.md#attachparentedsearchlistenerfor)
 - [attachPropertySearchListener](client_internal_app_remote_listener.RemoteListener.md#attachpropertysearchlistener)
 - [consumeDelayedFeedbacks](client_internal_app_remote_listener.RemoteListener.md#consumedelayedfeedbacks)
+- [executeSlowPollingFeedbacks](client_internal_app_remote_listener.RemoteListener.md#executeslowpollingfeedbacks)
 - [getUUID](client_internal_app_remote_listener.RemoteListener.md#getuuid)
 - [isAppUpdated](client_internal_app_remote_listener.RemoteListener.md#isappupdated)
 - [isOffline](client_internal_app_remote_listener.RemoteListener.md#isoffline)
@@ -71,6 +80,7 @@ as to keep things up to date and reactive
 - [removeAppUpdatedListener](client_internal_app_remote_listener.RemoteListener.md#removeappupdatedlistener)
 - [removeConnectStatusListener](client_internal_app_remote_listener.RemoteListener.md#removeconnectstatuslistener)
 - [removeItemDefinitionListenerFor](client_internal_app_remote_listener.RemoteListener.md#removeitemdefinitionlistenerfor)
+- [removeOnConnectOnceListener](client_internal_app_remote_listener.RemoteListener.md#removeonconnectoncelistener)
 - [removeOwnedParentedSearchListenerFor](client_internal_app_remote_listener.RemoteListener.md#removeownedparentedsearchlistenerfor)
 - [removeOwnedSearchListenerFor](client_internal_app_remote_listener.RemoteListener.md#removeownedsearchlistenerfor)
 - [removeParentedSearchListenerFor](client_internal_app_remote_listener.RemoteListener.md#removeparentedsearchlistenerfor)
@@ -101,7 +111,7 @@ Instantiates a new remote listener
 
 #### Defined in
 
-[client/internal/app/remote-listener.ts:305](https://github.com/onzag/itemize/blob/f2db74a5/client/internal/app/remote-listener.ts#L305)
+[client/internal/app/remote-listener.ts:353](https://github.com/onzag/itemize/blob/a24376ed/client/internal/app/remote-listener.ts#L353)
 
 ## Properties
 
@@ -114,7 +124,49 @@ event is received
 
 #### Defined in
 
-[client/internal/app/remote-listener.ts:256](https://github.com/onzag/itemize/blob/f2db74a5/client/internal/app/remote-listener.ts#L256)
+[client/internal/app/remote-listener.ts:300](https://github.com/onzag/itemize/blob/a24376ed/client/internal/app/remote-listener.ts#L300)
+
+___
+
+### awaitingOwnedParentedSearchRequests
+
+• `Private` **awaitingOwnedParentedSearchRequests**: [`IOwnedParentedSearchFeedbackRequest`](../interfaces/base_remote_protocol.IOwnedParentedSearchFeedbackRequest.md)[] = `[]`
+
+#### Defined in
+
+[client/internal/app/remote-listener.ts:113](https://github.com/onzag/itemize/blob/a24376ed/client/internal/app/remote-listener.ts#L113)
+
+___
+
+### awaitingOwnedSearchRequests
+
+• `Private` **awaitingOwnedSearchRequests**: [`IOwnedSearchFeedbackRequest`](../interfaces/base_remote_protocol.IOwnedSearchFeedbackRequest.md)[] = `[]`
+
+Awaiting search requests to prevent spamming
+
+#### Defined in
+
+[client/internal/app/remote-listener.ts:111](https://github.com/onzag/itemize/blob/a24376ed/client/internal/app/remote-listener.ts#L111)
+
+___
+
+### awaitingParentedSearchRequests
+
+• `Private` **awaitingParentedSearchRequests**: [`IParentedSearchFeedbackRequest`](../interfaces/base_remote_protocol.IParentedSearchFeedbackRequest.md)[] = `[]`
+
+#### Defined in
+
+[client/internal/app/remote-listener.ts:112](https://github.com/onzag/itemize/blob/a24376ed/client/internal/app/remote-listener.ts#L112)
+
+___
+
+### awaitingPropertySearchRequests
+
+• `Private` **awaitingPropertySearchRequests**: [`IPropertySearchFeedbackRequest`](../interfaces/base_remote_protocol.IPropertySearchFeedbackRequest.md)[] = `[]`
+
+#### Defined in
+
+[client/internal/app/remote-listener.ts:114](https://github.com/onzag/itemize/blob/a24376ed/client/internal/app/remote-listener.ts#L114)
 
 ___
 
@@ -126,7 +178,19 @@ Listeners for connection change status, offline/online
 
 #### Defined in
 
-[client/internal/app/remote-listener.ts:251](https://github.com/onzag/itemize/blob/f2db74a5/client/internal/app/remote-listener.ts#L251)
+[client/internal/app/remote-listener.ts:291](https://github.com/onzag/itemize/blob/a24376ed/client/internal/app/remote-listener.ts#L291)
+
+___
+
+### connectionOnConnectOnceListeners
+
+• `Private` **connectionOnConnectOnceListeners**: () => `void`[] = `[]`
+
+Listeners for connection change status, offline/online
+
+#### Defined in
+
+[client/internal/app/remote-listener.ts:295](https://github.com/onzag/itemize/blob/a24376ed/client/internal/app/remote-listener.ts#L295)
 
 ___
 
@@ -147,7 +211,7 @@ sets this function
 
 #### Defined in
 
-[client/internal/app/remote-listener.ts:295](https://github.com/onzag/itemize/blob/f2db74a5/client/internal/app/remote-listener.ts#L295)
+[client/internal/app/remote-listener.ts:343](https://github.com/onzag/itemize/blob/a24376ed/client/internal/app/remote-listener.ts#L343)
 
 ___
 
@@ -161,7 +225,19 @@ a little bit
 
 #### Defined in
 
-[client/internal/app/remote-listener.ts:247](https://github.com/onzag/itemize/blob/f2db74a5/client/internal/app/remote-listener.ts#L247)
+[client/internal/app/remote-listener.ts:287](https://github.com/onzag/itemize/blob/a24376ed/client/internal/app/remote-listener.ts#L287)
+
+___
+
+### hasBeenReadyOnce
+
+• **hasBeenReadyOnce**: `boolean` = `false`
+
+Whether it's been ready at least once
+
+#### Defined in
+
+[client/internal/app/remote-listener.ts:329](https://github.com/onzag/itemize/blob/a24376ed/client/internal/app/remote-listener.ts#L329)
 
 ___
 
@@ -173,19 +249,19 @@ whether the identifying token has been set
 
 #### Defined in
 
-[client/internal/app/remote-listener.ts:273](https://github.com/onzag/itemize/blob/f2db74a5/client/internal/app/remote-listener.ts#L273)
+[client/internal/app/remote-listener.ts:317](https://github.com/onzag/itemize/blob/a24376ed/client/internal/app/remote-listener.ts#L317)
 
 ___
 
 ### isReady
 
-• `Private` **isReady**: `boolean` = `false`
+• **isReady**: `boolean` = `false`
 
 Whether it's ready to attach events
 
 #### Defined in
 
-[client/internal/app/remote-listener.ts:281](https://github.com/onzag/itemize/blob/f2db74a5/client/internal/app/remote-listener.ts#L281)
+[client/internal/app/remote-listener.ts:325](https://github.com/onzag/itemize/blob/a24376ed/client/internal/app/remote-listener.ts#L325)
 
 ___
 
@@ -198,7 +274,7 @@ buildnumber
 
 #### Defined in
 
-[client/internal/app/remote-listener.ts:261](https://github.com/onzag/itemize/blob/f2db74a5/client/internal/app/remote-listener.ts#L261)
+[client/internal/app/remote-listener.ts:305](https://github.com/onzag/itemize/blob/a24376ed/client/internal/app/remote-listener.ts#L305)
 
 ___
 
@@ -210,7 +286,7 @@ Counts how many listeners have been registered
 
 #### Defined in
 
-[client/internal/app/remote-listener.ts:299](https://github.com/onzag/itemize/blob/f2db74a5/client/internal/app/remote-listener.ts#L299)
+[client/internal/app/remote-listener.ts:347](https://github.com/onzag/itemize/blob/a24376ed/client/internal/app/remote-listener.ts#L347)
 
 ___
 
@@ -223,14 +299,14 @@ listening for changes
 
 #### Index signature
 
-▪ [qualifiedPathNameWithId: `string`]: { `parentInstances`: `any`[] ; `request`: [`IRegisterRequest`](../interfaces/base_remote_protocol.IRegisterRequest.md)  }
+▪ [qualifiedPathNameWithId: `string`]: { `parentInstances`: `any`[] ; `pooling`: `boolean` ; `request`: [`IRegisterRequest`](../interfaces/base_remote_protocol.IRegisterRequest.md)  }
 
 The qualified path name with id is the item definition qualified pathname plus the id and
 the version, we only need one listener at a time
 
 #### Defined in
 
-[client/internal/app/remote-listener.ts:100](https://github.com/onzag/itemize/blob/f2db74a5/client/internal/app/remote-listener.ts#L100)
+[client/internal/app/remote-listener.ts:120](https://github.com/onzag/itemize/blob/a24376ed/client/internal/app/remote-listener.ts#L120)
 
 ___
 
@@ -251,7 +327,7 @@ this comes from the current active token provider
 
 #### Defined in
 
-[client/internal/app/remote-listener.ts:286](https://github.com/onzag/itemize/blob/f2db74a5/client/internal/app/remote-listener.ts#L286)
+[client/internal/app/remote-listener.ts:334](https://github.com/onzag/itemize/blob/a24376ed/client/internal/app/remote-listener.ts#L334)
 
 ___
 
@@ -263,7 +339,7 @@ Whether it's currently offline
 
 #### Defined in
 
-[client/internal/app/remote-listener.ts:269](https://github.com/onzag/itemize/blob/f2db74a5/client/internal/app/remote-listener.ts#L269)
+[client/internal/app/remote-listener.ts:313](https://github.com/onzag/itemize/blob/a24376ed/client/internal/app/remote-listener.ts#L313)
 
 ___
 
@@ -276,14 +352,14 @@ changes to a owned+parent based search that updates
 
 #### Index signature
 
-▪ [qualifiedPathNameWithParenting: `string`]: { `callbacks`: `RemoteListenerRecordsCallback`[] ; `lastModified`: `string` ; `request`: [`IOwnedParentedSearchRegisterRequest`](../interfaces/base_remote_protocol.IOwnedParentedSearchRegisterRequest.md) ; `useCacheWorker`: `boolean`[]  }
+▪ [qualifiedPathNameWithParenting: `string`]: { `callbacks`: `RemoteListenerRecordsCallback`[] ; `lastModified`: `string` ; `pooling`: `boolean` ; `request`: [`IOwnedParentedSearchRegisterRequest`](../interfaces/base_remote_protocol.IOwnedParentedSearchRegisterRequest.md) ; `useCacheWorker`: `boolean`[]  }
 
 Similar to the owned one but contains all the
 parenting information of what we are listening to
 
 #### Defined in
 
-[client/internal/app/remote-listener.ts:217](https://github.com/onzag/itemize/blob/f2db74a5/client/internal/app/remote-listener.ts#L217)
+[client/internal/app/remote-listener.ts:253](https://github.com/onzag/itemize/blob/a24376ed/client/internal/app/remote-listener.ts#L253)
 
 ___
 
@@ -296,14 +372,14 @@ for changes to an owned search cache
 
 #### Index signature
 
-▪ [qualifiedPathNameWithOwnerId: `string`]: { `callbacks`: `RemoteListenerRecordsCallback`[] ; `lastModified`: `string` ; `request`: [`IOwnedSearchRegisterRequest`](../interfaces/base_remote_protocol.IOwnedSearchRegisterRequest.md) ; `useCacheWorker`: `boolean`[]  }
+▪ [qualifiedPathNameWithOwnerId: `string`]: { `callbacks`: `RemoteListenerRecordsCallback`[] ; `lastModified`: `string` ; `pooling`: `boolean` ; `request`: [`IOwnedSearchRegisterRequest`](../interfaces/base_remote_protocol.IOwnedSearchRegisterRequest.md) ; `useCacheWorker`: `boolean`[]  }
 
 Similar with the qualified path name of either a item definition
 or a module with the owner id attached to it as an identifier
 
 #### Defined in
 
-[client/internal/app/remote-listener.ts:124](https://github.com/onzag/itemize/blob/f2db74a5/client/internal/app/remote-listener.ts#L124)
+[client/internal/app/remote-listener.ts:148](https://github.com/onzag/itemize/blob/a24376ed/client/internal/app/remote-listener.ts#L148)
 
 ___
 
@@ -316,14 +392,14 @@ changes to a parent based search that updates
 
 #### Index signature
 
-▪ [qualifiedPathNameWithParenting: `string`]: { `callbacks`: `RemoteListenerRecordsCallback`[] ; `lastModified`: `string` ; `request`: [`IParentedSearchRegisterRequest`](../interfaces/base_remote_protocol.IParentedSearchRegisterRequest.md) ; `useCacheWorker`: `boolean`[]  }
+▪ [qualifiedPathNameWithParenting: `string`]: { `callbacks`: `RemoteListenerRecordsCallback`[] ; `lastModified`: `string` ; `pooling`: `boolean` ; `request`: [`IParentedSearchRegisterRequest`](../interfaces/base_remote_protocol.IParentedSearchRegisterRequest.md) ; `useCacheWorker`: `boolean`[]  }
 
 Similar to the owned one but contains all the
 parenting information of what we are listening to
 
 #### Defined in
 
-[client/internal/app/remote-listener.ts:188](https://github.com/onzag/itemize/blob/f2db74a5/client/internal/app/remote-listener.ts#L188)
+[client/internal/app/remote-listener.ts:220](https://github.com/onzag/itemize/blob/a24376ed/client/internal/app/remote-listener.ts#L220)
 
 ___
 
@@ -336,14 +412,14 @@ for changes to an property based search cache
 
 #### Index signature
 
-▪ [qualifiedPathNameWithPropertyInfo: `string`]: { `callbacks`: `RemoteListenerRecordsCallback`[] ; `lastModified`: `string` ; `request`: [`IPropertySearchRegisterRequest`](../interfaces/base_remote_protocol.IPropertySearchRegisterRequest.md) ; `useCacheWorker`: `boolean`[]  }
+▪ [qualifiedPathNameWithPropertyInfo: `string`]: { `callbacks`: `RemoteListenerRecordsCallback`[] ; `lastModified`: `string` ; `pooling`: `boolean` ; `request`: [`IPropertySearchRegisterRequest`](../interfaces/base_remote_protocol.IPropertySearchRegisterRequest.md) ; `useCacheWorker`: `boolean`[]  }
 
 Similar with the qualified path name of either a item definition
 or a module with the owner id attached to it as an identifier
 
 #### Defined in
 
-[client/internal/app/remote-listener.ts:156](https://github.com/onzag/itemize/blob/f2db74a5/client/internal/app/remote-listener.ts#L156)
+[client/internal/app/remote-listener.ts:184](https://github.com/onzag/itemize/blob/a24376ed/client/internal/app/remote-listener.ts#L184)
 
 ___
 
@@ -355,7 +431,7 @@ The root we are using
 
 #### Defined in
 
-[client/internal/app/remote-listener.ts:94](https://github.com/onzag/itemize/blob/f2db74a5/client/internal/app/remote-listener.ts#L94)
+[client/internal/app/remote-listener.ts:101](https://github.com/onzag/itemize/blob/a24376ed/client/internal/app/remote-listener.ts#L101)
 
 ___
 
@@ -367,7 +443,19 @@ The time when this instance was instantiated
 
 #### Defined in
 
-[client/internal/app/remote-listener.ts:290](https://github.com/onzag/itemize/blob/f2db74a5/client/internal/app/remote-listener.ts#L290)
+[client/internal/app/remote-listener.ts:338](https://github.com/onzag/itemize/blob/a24376ed/client/internal/app/remote-listener.ts#L338)
+
+___
+
+### slowPoolingTimer
+
+• `Private` **slowPoolingTimer**: `any`
+
+Time when a last feedback was requested
+
+#### Defined in
+
+[client/internal/app/remote-listener.ts:106](https://github.com/onzag/itemize/blob/a24376ed/client/internal/app/remote-listener.ts#L106)
 
 ___
 
@@ -379,7 +467,7 @@ The socket io client
 
 #### Defined in
 
-[client/internal/app/remote-listener.ts:90](https://github.com/onzag/itemize/blob/f2db74a5/client/internal/app/remote-listener.ts#L90)
+[client/internal/app/remote-listener.ts:97](https://github.com/onzag/itemize/blob/a24376ed/client/internal/app/remote-listener.ts#L97)
 
 ___
 
@@ -391,7 +479,7 @@ The token that has been set
 
 #### Defined in
 
-[client/internal/app/remote-listener.ts:277](https://github.com/onzag/itemize/blob/f2db74a5/client/internal/app/remote-listener.ts#L277)
+[client/internal/app/remote-listener.ts:321](https://github.com/onzag/itemize/blob/a24376ed/client/internal/app/remote-listener.ts#L321)
 
 ___
 
@@ -403,7 +491,7 @@ An uuid to randomly identify this listener
 
 #### Defined in
 
-[client/internal/app/remote-listener.ts:265](https://github.com/onzag/itemize/blob/f2db74a5/client/internal/app/remote-listener.ts#L265)
+[client/internal/app/remote-listener.ts:309](https://github.com/onzag/itemize/blob/a24376ed/client/internal/app/remote-listener.ts#L309)
 
 ## Methods
 
@@ -425,7 +513,7 @@ Adds a listener for when the app updates (aka buildnumber mismatch)
 
 #### Defined in
 
-[client/internal/app/remote-listener.ts:447](https://github.com/onzag/itemize/blob/f2db74a5/client/internal/app/remote-listener.ts#L447)
+[client/internal/app/remote-listener.ts:498](https://github.com/onzag/itemize/blob/a24376ed/client/internal/app/remote-listener.ts#L498)
 
 ___
 
@@ -447,13 +535,13 @@ Adds a listener for when the app online status changes
 
 #### Defined in
 
-[client/internal/app/remote-listener.ts:473](https://github.com/onzag/itemize/blob/f2db74a5/client/internal/app/remote-listener.ts#L473)
+[client/internal/app/remote-listener.ts:524](https://github.com/onzag/itemize/blob/a24376ed/client/internal/app/remote-listener.ts#L524)
 
 ___
 
 ### addItemDefinitionListenerFor
 
-▸ **addItemDefinitionListenerFor**(`parentInstance`, `itemDefinitionQualifiedPathName`, `forId`, `forVersion`): `void`
+▸ **addItemDefinitionListenerFor**(`parentInstance`, `itemDefinitionQualifiedPathName`, `forId`, `forVersion`, `pooling`): `void`
 
 Adds an item definition listener for when the item definition value changes
 so that a reload can be called
@@ -466,6 +554,7 @@ so that a reload can be called
 | `itemDefinitionQualifiedPathName` | `string` | the qualifie path name of the item definition |
 | `forId` | `string` | for which id |
 | `forVersion` | `string` | for which version (null allowed) |
+| `pooling` | `boolean` | uses slow pooling to keep for updates |
 
 #### Returns
 
@@ -473,13 +562,39 @@ so that a reload can be called
 
 #### Defined in
 
-[client/internal/app/remote-listener.ts:556](https://github.com/onzag/itemize/blob/f2db74a5/client/internal/app/remote-listener.ts#L556)
+[client/internal/app/remote-listener.ts:637](https://github.com/onzag/itemize/blob/a24376ed/client/internal/app/remote-listener.ts#L637)
+
+___
+
+### addOnConnectOnceListener
+
+▸ **addOnConnectOnceListener**(`listener`): `void`
+
+Adds a listener for when the app online status changes
+to connected, only once
+
+if the listener is currently connected the function will be
+called right away
+
+#### Parameters
+
+| Name | Type | Description |
+| :------ | :------ | :------ |
+| `listener` | () => `void` | the listener to add |
+
+#### Returns
+
+`void`
+
+#### Defined in
+
+[client/internal/app/remote-listener.ts:548](https://github.com/onzag/itemize/blob/a24376ed/client/internal/app/remote-listener.ts#L548)
 
 ___
 
 ### addOwnedParentedSearchListenerFor
 
-▸ **addOwnedParentedSearchListenerFor**(`itemDefinitionOrModuleQualifiedPathName`, `createdBy`, `parentType`, `parentId`, `parentVersion`, `lastModified`, `callback`, `useCacheWorker`): `void`
+▸ **addOwnedParentedSearchListenerFor**(`itemDefinitionOrModuleQualifiedPathName`, `createdBy`, `parentType`, `parentId`, `parentVersion`, `lastModified`, `callback`, `useCacheWorker`, `pooling`): `void`
 
 Adds a parented and owned search listener for a cached search via parenting
 
@@ -495,6 +610,7 @@ Adds a parented and owned search listener for a cached search via parenting
 | `lastModified` | `string` | the last known record date this listener knows of its stored values |
 | `callback` | `RemoteListenerRecordsCallback` | the callback to trigger for |
 | `useCacheWorker` | `boolean` | - |
+| `pooling` | `boolean` | - |
 
 #### Returns
 
@@ -502,13 +618,13 @@ Adds a parented and owned search listener for a cached search via parenting
 
 #### Defined in
 
-[client/internal/app/remote-listener.ts:1102](https://github.com/onzag/itemize/blob/f2db74a5/client/internal/app/remote-listener.ts#L1102)
+[client/internal/app/remote-listener.ts:1263](https://github.com/onzag/itemize/blob/a24376ed/client/internal/app/remote-listener.ts#L1263)
 
 ___
 
 ### addOwnedSearchListenerFor
 
-▸ **addOwnedSearchListenerFor**(`itemDefinitionOrModuleQualifiedPathName`, `createdBy`, `lastModified`, `callback`, `useCacheWorker`): `void`
+▸ **addOwnedSearchListenerFor**(`itemDefinitionOrModuleQualifiedPathName`, `createdBy`, `lastModified`, `callback`, `useCacheWorker`, `pooling`): `void`
 
 Adds a listener for an owned search
 
@@ -521,6 +637,7 @@ Adds a listener for an owned search
 | `lastModified` | `string` | the last known record added date |
 | `callback` | `RemoteListenerRecordsCallback` | a callback to trigger when the listener matches |
 | `useCacheWorker` | `boolean` | - |
+| `pooling` | `boolean` | - |
 
 #### Returns
 
@@ -528,13 +645,13 @@ Adds a listener for an owned search
 
 #### Defined in
 
-[client/internal/app/remote-listener.ts:801](https://github.com/onzag/itemize/blob/f2db74a5/client/internal/app/remote-listener.ts#L801)
+[client/internal/app/remote-listener.ts:899](https://github.com/onzag/itemize/blob/a24376ed/client/internal/app/remote-listener.ts#L899)
 
 ___
 
 ### addParentedSearchListenerFor
 
-▸ **addParentedSearchListenerFor**(`itemDefinitionOrModuleQualifiedPathName`, `parentType`, `parentId`, `parentVersion`, `lastModified`, `callback`, `useCacheWorker`): `void`
+▸ **addParentedSearchListenerFor**(`itemDefinitionOrModuleQualifiedPathName`, `parentType`, `parentId`, `parentVersion`, `lastModified`, `callback`, `useCacheWorker`, `pooling`): `void`
 
 Adds a parented search listener for a cached search via parenting
 
@@ -549,6 +666,7 @@ Adds a parented search listener for a cached search via parenting
 | `lastModified` | `string` | the last known record date this listener knows of its stored values |
 | `callback` | `RemoteListenerRecordsCallback` | the callback to trigger for |
 | `useCacheWorker` | `boolean` | - |
+| `pooling` | `boolean` | - |
 
 #### Returns
 
@@ -556,13 +674,13 @@ Adds a parented search listener for a cached search via parenting
 
 #### Defined in
 
-[client/internal/app/remote-listener.ts:1043](https://github.com/onzag/itemize/blob/f2db74a5/client/internal/app/remote-listener.ts#L1043)
+[client/internal/app/remote-listener.ts:1195](https://github.com/onzag/itemize/blob/a24376ed/client/internal/app/remote-listener.ts#L1195)
 
 ___
 
 ### addPropertySearchListenerFor
 
-▸ **addPropertySearchListenerFor**(`itemDefinitionOrModuleQualifiedPathName`, `propertyId`, `propertyValue`, `lastModified`, `callback`, `useCacheWorker`): `void`
+▸ **addPropertySearchListenerFor**(`itemDefinitionOrModuleQualifiedPathName`, `propertyId`, `propertyValue`, `lastModified`, `callback`, `useCacheWorker`, `pooling`): `void`
 
 #### Parameters
 
@@ -574,6 +692,7 @@ ___
 | `lastModified` | `string` |
 | `callback` | `RemoteListenerRecordsCallback` |
 | `useCacheWorker` | `boolean` |
+| `pooling` | `boolean` |
 
 #### Returns
 
@@ -581,7 +700,7 @@ ___
 
 #### Defined in
 
-[client/internal/app/remote-listener.ts:748](https://github.com/onzag/itemize/blob/f2db74a5/client/internal/app/remote-listener.ts#L748)
+[client/internal/app/remote-listener.ts:837](https://github.com/onzag/itemize/blob/a24376ed/client/internal/app/remote-listener.ts#L837)
 
 ___
 
@@ -597,7 +716,7 @@ Reattachs the detached requests
 
 #### Defined in
 
-[client/internal/app/remote-listener.ts:1795](https://github.com/onzag/itemize/blob/f2db74a5/client/internal/app/remote-listener.ts#L1795)
+[client/internal/app/remote-listener.ts:2154](https://github.com/onzag/itemize/blob/a24376ed/client/internal/app/remote-listener.ts#L2154)
 
 ___
 
@@ -620,7 +739,7 @@ item definition using a register request
 
 #### Defined in
 
-[client/internal/app/remote-listener.ts:599](https://github.com/onzag/itemize/blob/f2db74a5/client/internal/app/remote-listener.ts#L599)
+[client/internal/app/remote-listener.ts:688](https://github.com/onzag/itemize/blob/a24376ed/client/internal/app/remote-listener.ts#L688)
 
 ___
 
@@ -643,7 +762,7 @@ as in the app is online
 
 #### Defined in
 
-[client/internal/app/remote-listener.ts:1181](https://github.com/onzag/itemize/blob/f2db74a5/client/internal/app/remote-listener.ts#L1181)
+[client/internal/app/remote-listener.ts:1351](https://github.com/onzag/itemize/blob/a24376ed/client/internal/app/remote-listener.ts#L1351)
 
 ___
 
@@ -665,7 +784,7 @@ Attaches if possible the owned search listener for a cached by owner search type
 
 #### Defined in
 
-[client/internal/app/remote-listener.ts:849](https://github.com/onzag/itemize/blob/f2db74a5/client/internal/app/remote-listener.ts#L849)
+[client/internal/app/remote-listener.ts:956](https://github.com/onzag/itemize/blob/a24376ed/client/internal/app/remote-listener.ts#L956)
 
 ___
 
@@ -688,7 +807,7 @@ as in the app is online
 
 #### Defined in
 
-[client/internal/app/remote-listener.ts:1158](https://github.com/onzag/itemize/blob/f2db74a5/client/internal/app/remote-listener.ts#L1158)
+[client/internal/app/remote-listener.ts:1328](https://github.com/onzag/itemize/blob/a24376ed/client/internal/app/remote-listener.ts#L1328)
 
 ___
 
@@ -708,7 +827,7 @@ ___
 
 #### Defined in
 
-[client/internal/app/remote-listener.ts:866](https://github.com/onzag/itemize/blob/f2db74a5/client/internal/app/remote-listener.ts#L866)
+[client/internal/app/remote-listener.ts:973](https://github.com/onzag/itemize/blob/a24376ed/client/internal/app/remote-listener.ts#L973)
 
 ___
 
@@ -724,7 +843,21 @@ Consumes the delayed feedbacks that might exist
 
 #### Defined in
 
-[client/internal/app/remote-listener.ts:717](https://github.com/onzag/itemize/blob/f2db74a5/client/internal/app/remote-listener.ts#L717)
+[client/internal/app/remote-listener.ts:806](https://github.com/onzag/itemize/blob/a24376ed/client/internal/app/remote-listener.ts#L806)
+
+___
+
+### executeSlowPollingFeedbacks
+
+▸ `Private` **executeSlowPollingFeedbacks**(): `Promise`<`void`\>
+
+#### Returns
+
+`Promise`<`void`\>
+
+#### Defined in
+
+[client/internal/app/remote-listener.ts:2063](https://github.com/onzag/itemize/blob/a24376ed/client/internal/app/remote-listener.ts#L2063)
 
 ___
 
@@ -740,7 +873,7 @@ Provides the remote listener uuid
 
 #### Defined in
 
-[client/internal/app/remote-listener.ts:431](https://github.com/onzag/itemize/blob/f2db74a5/client/internal/app/remote-listener.ts#L431)
+[client/internal/app/remote-listener.ts:482](https://github.com/onzag/itemize/blob/a24376ed/client/internal/app/remote-listener.ts#L482)
 
 ___
 
@@ -756,7 +889,7 @@ Checks whether the app is uppdated compared to what we are running right now
 
 #### Defined in
 
-[client/internal/app/remote-listener.ts:465](https://github.com/onzag/itemize/blob/f2db74a5/client/internal/app/remote-listener.ts#L465)
+[client/internal/app/remote-listener.ts:516](https://github.com/onzag/itemize/blob/a24376ed/client/internal/app/remote-listener.ts#L516)
 
 ___
 
@@ -773,7 +906,7 @@ which also defines whether the app itself is offline
 
 #### Defined in
 
-[client/internal/app/remote-listener.ts:439](https://github.com/onzag/itemize/blob/f2db74a5/client/internal/app/remote-listener.ts#L439)
+[client/internal/app/remote-listener.ts:490](https://github.com/onzag/itemize/blob/a24376ed/client/internal/app/remote-listener.ts#L490)
 
 ___
 
@@ -797,7 +930,7 @@ triggers just on connection, as well as on update
 
 #### Defined in
 
-[client/internal/app/remote-listener.ts:528](https://github.com/onzag/itemize/blob/f2db74a5/client/internal/app/remote-listener.ts#L528)
+[client/internal/app/remote-listener.ts:608](https://github.com/onzag/itemize/blob/a24376ed/client/internal/app/remote-listener.ts#L608)
 
 ___
 
@@ -819,7 +952,7 @@ Triggers on a changed or a feedback event
 
 #### Defined in
 
-[client/internal/app/remote-listener.ts:1370](https://github.com/onzag/itemize/blob/f2db74a5/client/internal/app/remote-listener.ts#L1370)
+[client/internal/app/remote-listener.ts:1589](https://github.com/onzag/itemize/blob/a24376ed/client/internal/app/remote-listener.ts#L1589)
 
 ___
 
@@ -835,7 +968,7 @@ Triggers once the websocket connects
 
 #### Defined in
 
-[client/internal/app/remote-listener.ts:1744](https://github.com/onzag/itemize/blob/f2db74a5/client/internal/app/remote-listener.ts#L1744)
+[client/internal/app/remote-listener.ts:2010](https://github.com/onzag/itemize/blob/a24376ed/client/internal/app/remote-listener.ts#L2010)
 
 ___
 
@@ -851,7 +984,7 @@ Triggers when losing connection
 
 #### Defined in
 
-[client/internal/app/remote-listener.ts:1885](https://github.com/onzag/itemize/blob/f2db74a5/client/internal/app/remote-listener.ts#L1885)
+[client/internal/app/remote-listener.ts:2254](https://github.com/onzag/itemize/blob/a24376ed/client/internal/app/remote-listener.ts#L2254)
 
 ___
 
@@ -874,7 +1007,7 @@ a remote error event
 
 #### Defined in
 
-[client/internal/app/remote-listener.ts:503](https://github.com/onzag/itemize/blob/f2db74a5/client/internal/app/remote-listener.ts#L503)
+[client/internal/app/remote-listener.ts:583](https://github.com/onzag/itemize/blob/a24376ed/client/internal/app/remote-listener.ts#L583)
 
 ___
 
@@ -893,7 +1026,7 @@ void or a void promise for when it's done
 
 #### Defined in
 
-[client/internal/app/remote-listener.ts:1712](https://github.com/onzag/itemize/blob/f2db74a5/client/internal/app/remote-listener.ts#L1712)
+[client/internal/app/remote-listener.ts:1978](https://github.com/onzag/itemize/blob/a24376ed/client/internal/app/remote-listener.ts#L1978)
 
 ___
 
@@ -910,13 +1043,13 @@ by a logout all event
 
 #### Defined in
 
-[client/internal/app/remote-listener.ts:492](https://github.com/onzag/itemize/blob/f2db74a5/client/internal/app/remote-listener.ts#L492)
+[client/internal/app/remote-listener.ts:572](https://github.com/onzag/itemize/blob/a24376ed/client/internal/app/remote-listener.ts#L572)
 
 ___
 
 ### onOwnedParentedSearchRecordsEvent
 
-▸ `Private` **onOwnedParentedSearchRecordsEvent**(`event`): `Promise`<`void`\>
+▸ **onOwnedParentedSearchRecordsEvent**(`event`): `Promise`<`void`\>
 
 Triggers once the server indicates that values have been added to a search
 result that is cached by parent
@@ -933,13 +1066,13 @@ result that is cached by parent
 
 #### Defined in
 
-[client/internal/app/remote-listener.ts:1651](https://github.com/onzag/itemize/blob/f2db74a5/client/internal/app/remote-listener.ts#L1651)
+[client/internal/app/remote-listener.ts:1903](https://github.com/onzag/itemize/blob/a24376ed/client/internal/app/remote-listener.ts#L1903)
 
 ___
 
 ### onOwnedSearchRecordsEvent
 
-▸ `Private` **onOwnedSearchRecordsEvent**(`event`): `Promise`<`void`\>
+▸ **onOwnedSearchRecordsEvent**(`event`): `Promise`<`void`\>
 
 Triggers once the server indicates that values have been added to a search
 result that is cached by owner
@@ -956,13 +1089,13 @@ result that is cached by owner
 
 #### Defined in
 
-[client/internal/app/remote-listener.ts:1473](https://github.com/onzag/itemize/blob/f2db74a5/client/internal/app/remote-listener.ts#L1473)
+[client/internal/app/remote-listener.ts:1692](https://github.com/onzag/itemize/blob/a24376ed/client/internal/app/remote-listener.ts#L1692)
 
 ___
 
 ### onParentedSearchRecordsEvent
 
-▸ `Private` **onParentedSearchRecordsEvent**(`event`): `Promise`<`void`\>
+▸ **onParentedSearchRecordsEvent**(`event`): `Promise`<`void`\>
 
 Triggers once the server indicates that values have been added to a search
 result that is cached by parent
@@ -979,13 +1112,13 @@ result that is cached by parent
 
 #### Defined in
 
-[client/internal/app/remote-listener.ts:1533](https://github.com/onzag/itemize/blob/f2db74a5/client/internal/app/remote-listener.ts#L1533)
+[client/internal/app/remote-listener.ts:1760](https://github.com/onzag/itemize/blob/a24376ed/client/internal/app/remote-listener.ts#L1760)
 
 ___
 
 ### onPropertySearchRecordsEvent
 
-▸ `Private` **onPropertySearchRecordsEvent**(`event`): `Promise`<`void`\>
+▸ **onPropertySearchRecordsEvent**(`event`): `Promise`<`void`\>
 
 #### Parameters
 
@@ -999,7 +1132,7 @@ ___
 
 #### Defined in
 
-[client/internal/app/remote-listener.ts:1591](https://github.com/onzag/itemize/blob/f2db74a5/client/internal/app/remote-listener.ts#L1591)
+[client/internal/app/remote-listener.ts:1831](https://github.com/onzag/itemize/blob/a24376ed/client/internal/app/remote-listener.ts#L1831)
 
 ___
 
@@ -1023,7 +1156,7 @@ to the given slot in the socket data
 
 #### Defined in
 
-[client/internal/app/remote-listener.ts:383](https://github.com/onzag/itemize/blob/f2db74a5/client/internal/app/remote-listener.ts#L383)
+[client/internal/app/remote-listener.ts:433](https://github.com/onzag/itemize/blob/a24376ed/client/internal/app/remote-listener.ts#L433)
 
 ___
 
@@ -1045,7 +1178,7 @@ Removes a listener for when the app updates (aka buildnumber mismatch)
 
 #### Defined in
 
-[client/internal/app/remote-listener.ts:455](https://github.com/onzag/itemize/blob/f2db74a5/client/internal/app/remote-listener.ts#L455)
+[client/internal/app/remote-listener.ts:506](https://github.com/onzag/itemize/blob/a24376ed/client/internal/app/remote-listener.ts#L506)
 
 ___
 
@@ -1067,7 +1200,7 @@ Removes a listener for when the app online status changes
 
 #### Defined in
 
-[client/internal/app/remote-listener.ts:481](https://github.com/onzag/itemize/blob/f2db74a5/client/internal/app/remote-listener.ts#L481)
+[client/internal/app/remote-listener.ts:532](https://github.com/onzag/itemize/blob/a24376ed/client/internal/app/remote-listener.ts#L532)
 
 ___
 
@@ -1092,7 +1225,30 @@ Remove an item definition listener for a given parent instance
 
 #### Defined in
 
-[client/internal/app/remote-listener.ts:623](https://github.com/onzag/itemize/blob/f2db74a5/client/internal/app/remote-listener.ts#L623)
+[client/internal/app/remote-listener.ts:712](https://github.com/onzag/itemize/blob/a24376ed/client/internal/app/remote-listener.ts#L712)
+
+___
+
+### removeOnConnectOnceListener
+
+▸ **removeOnConnectOnceListener**(`listener`): `void`
+
+Removes a listener for when the app online status changes
+to connected, only once
+
+#### Parameters
+
+| Name | Type | Description |
+| :------ | :------ | :------ |
+| `listener` | () => `void` | the listener to remove |
+
+#### Returns
+
+`void`
+
+#### Defined in
+
+[client/internal/app/remote-listener.ts:561](https://github.com/onzag/itemize/blob/a24376ed/client/internal/app/remote-listener.ts#L561)
 
 ___
 
@@ -1120,7 +1276,7 @@ that is related to
 
 #### Defined in
 
-[client/internal/app/remote-listener.ts:1269](https://github.com/onzag/itemize/blob/f2db74a5/client/internal/app/remote-listener.ts#L1269)
+[client/internal/app/remote-listener.ts:1439](https://github.com/onzag/itemize/blob/a24376ed/client/internal/app/remote-listener.ts#L1439)
 
 ___
 
@@ -1144,7 +1300,7 @@ Removes an owned search listener
 
 #### Defined in
 
-[client/internal/app/remote-listener.ts:889](https://github.com/onzag/itemize/blob/f2db74a5/client/internal/app/remote-listener.ts#L889)
+[client/internal/app/remote-listener.ts:996](https://github.com/onzag/itemize/blob/a24376ed/client/internal/app/remote-listener.ts#L996)
 
 ___
 
@@ -1171,7 +1327,7 @@ that is related to
 
 #### Defined in
 
-[client/internal/app/remote-listener.ts:1208](https://github.com/onzag/itemize/blob/f2db74a5/client/internal/app/remote-listener.ts#L1208)
+[client/internal/app/remote-listener.ts:1378](https://github.com/onzag/itemize/blob/a24376ed/client/internal/app/remote-listener.ts#L1378)
 
 ___
 
@@ -1196,7 +1352,7 @@ Removes an property search listener
 
 #### Defined in
 
-[client/internal/app/remote-listener.ts:942](https://github.com/onzag/itemize/blob/f2db74a5/client/internal/app/remote-listener.ts#L942)
+[client/internal/app/remote-listener.ts:1049](https://github.com/onzag/itemize/blob/a24376ed/client/internal/app/remote-listener.ts#L1049)
 
 ___
 
@@ -1220,7 +1376,7 @@ hasn't somehow changed since it was last checked
 
 #### Defined in
 
-[client/internal/app/remote-listener.ts:679](https://github.com/onzag/itemize/blob/f2db74a5/client/internal/app/remote-listener.ts#L679)
+[client/internal/app/remote-listener.ts:768](https://github.com/onzag/itemize/blob/a24376ed/client/internal/app/remote-listener.ts#L768)
 
 ___
 
@@ -1242,7 +1398,7 @@ Requests feedback for a parented seach, if possible
 
 #### Defined in
 
-[client/internal/app/remote-listener.ts:1348](https://github.com/onzag/itemize/blob/f2db74a5/client/internal/app/remote-listener.ts#L1348)
+[client/internal/app/remote-listener.ts:1542](https://github.com/onzag/itemize/blob/a24376ed/client/internal/app/remote-listener.ts#L1542)
 
 ___
 
@@ -1264,7 +1420,7 @@ Requests feedback for an owned search, if possible
 
 #### Defined in
 
-[client/internal/app/remote-listener.ts:994](https://github.com/onzag/itemize/blob/f2db74a5/client/internal/app/remote-listener.ts#L994)
+[client/internal/app/remote-listener.ts:1101](https://github.com/onzag/itemize/blob/a24376ed/client/internal/app/remote-listener.ts#L1101)
 
 ___
 
@@ -1286,7 +1442,7 @@ Requests feedback for a parented seach, if possible
 
 #### Defined in
 
-[client/internal/app/remote-listener.ts:1326](https://github.com/onzag/itemize/blob/f2db74a5/client/internal/app/remote-listener.ts#L1326)
+[client/internal/app/remote-listener.ts:1496](https://github.com/onzag/itemize/blob/a24376ed/client/internal/app/remote-listener.ts#L1496)
 
 ___
 
@@ -1308,7 +1464,7 @@ Requests feedback for an property based search, if possible
 
 #### Defined in
 
-[client/internal/app/remote-listener.ts:1016](https://github.com/onzag/itemize/blob/f2db74a5/client/internal/app/remote-listener.ts#L1016)
+[client/internal/app/remote-listener.ts:1145](https://github.com/onzag/itemize/blob/a24376ed/client/internal/app/remote-listener.ts#L1145)
 
 ___
 
@@ -1331,7 +1487,7 @@ done immediately after initialization
 
 #### Defined in
 
-[client/internal/app/remote-listener.ts:364](https://github.com/onzag/itemize/blob/f2db74a5/client/internal/app/remote-listener.ts#L364)
+[client/internal/app/remote-listener.ts:414](https://github.com/onzag/itemize/blob/a24376ed/client/internal/app/remote-listener.ts#L414)
 
 ___
 
@@ -1354,7 +1510,7 @@ if the user has been kicked by a logout all event
 
 #### Defined in
 
-[client/internal/app/remote-listener.ts:373](https://github.com/onzag/itemize/blob/f2db74a5/client/internal/app/remote-listener.ts#L373)
+[client/internal/app/remote-listener.ts:423](https://github.com/onzag/itemize/blob/a24376ed/client/internal/app/remote-listener.ts#L423)
 
 ___
 
@@ -1379,7 +1535,7 @@ Makes the app ready
 
 #### Defined in
 
-[client/internal/app/remote-listener.ts:406](https://github.com/onzag/itemize/blob/f2db74a5/client/internal/app/remote-listener.ts#L406)
+[client/internal/app/remote-listener.ts:456](https://github.com/onzag/itemize/blob/a24376ed/client/internal/app/remote-listener.ts#L456)
 
 ___
 
@@ -1397,4 +1553,4 @@ as they might have changed
 
 #### Defined in
 
-[client/internal/app/remote-listener.ts:355](https://github.com/onzag/itemize/blob/f2db74a5/client/internal/app/remote-listener.ts#L355)
+[client/internal/app/remote-listener.ts:405](https://github.com/onzag/itemize/blob/a24376ed/client/internal/app/remote-listener.ts#L405)

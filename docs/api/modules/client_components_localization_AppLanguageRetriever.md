@@ -40,7 +40,7 @@ a react node
 
 #### Defined in
 
-[client/components/localization/AppLanguageRetriever.tsx:70](https://github.com/onzag/itemize/blob/f2db74a5/client/components/localization/AppLanguageRetriever.tsx#L70)
+[client/components/localization/AppLanguageRetriever.tsx:70](https://github.com/onzag/itemize/blob/a24376ed/client/components/localization/AppLanguageRetriever.tsx#L70)
 
 ___
 
@@ -61,4 +61,4 @@ ___
 
 #### Defined in
 
-[client/components/localization/AppLanguageRetriever.tsx:108](https://github.com/onzag/itemize/blob/f2db74a5/client/components/localization/AppLanguageRetriever.tsx#L108)
+[client/components/localization/AppLanguageRetriever.tsx:108](https://github.com/onzag/itemize/blob/a24376ed/client/components/localization/AppLanguageRetriever.tsx#L108)

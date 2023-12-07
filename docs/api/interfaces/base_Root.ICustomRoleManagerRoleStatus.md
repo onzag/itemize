@@ -20,7 +20,7 @@
 
 #### Defined in
 
-[base/Root/index.ts:57](https://github.com/onzag/itemize/blob/f2db74a5/base/Root/index.ts#L57)
+[base/Root/index.ts:67](https://github.com/onzag/itemize/blob/a24376ed/base/Root/index.ts#L67)
 
 ___
 
@@ -30,7 +30,7 @@ ___
 
 #### Defined in
 
-[base/Root/index.ts:56](https://github.com/onzag/itemize/blob/f2db74a5/base/Root/index.ts#L56)
+[base/Root/index.ts:66](https://github.com/onzag/itemize/blob/a24376ed/base/Root/index.ts#L66)
 
 ___
 
@@ -40,4 +40,4 @@ ___
 
 #### Defined in
 
-[base/Root/index.ts:55](https://github.com/onzag/itemize/blob/f2db74a5/base/Root/index.ts#L55)
+[base/Root/index.ts:65](https://github.com/onzag/itemize/blob/a24376ed/base/Root/index.ts#L65)

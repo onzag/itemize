@@ -15,9 +15,20 @@ everything you need
 
 ### Properties
 
+- [lastModified](server_seo.ISEOParametrizer.md#lastmodified)
 - [params](server_seo.ISEOParametrizer.md#params)
 
 ## Properties
+
+### lastModified
+
+• **lastModified**: `Date`
+
+#### Defined in
+
+[server/seo/index.ts:23](https://github.com/onzag/itemize/blob/a24376ed/server/seo/index.ts#L23)
+
+___
 
 ### params
 
@@ -29,4 +40,4 @@ everything you need
 
 #### Defined in
 
-[server/seo/index.ts:18](https://github.com/onzag/itemize/blob/f2db74a5/server/seo/index.ts#L18)
+[server/seo/index.ts:20](https://github.com/onzag/itemize/blob/a24376ed/server/seo/index.ts#L20)

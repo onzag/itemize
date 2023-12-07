@@ -13,7 +13,7 @@ be defined in the json form
 
 ### Variables
 
-- [SpecialPropertyValueSetSchema](base_Root_Module_ItemDefinition_PropertyDefinition_schema.md#specialpropertyvaluesetschema)
+- [ConfigValueSetSchema](base_Root_Module_ItemDefinition_PropertyDefinition_schema.md#configvaluesetschema)
 
 ## Properties
 
@@ -35,6 +35,10 @@ be defined in the json form
 | `properties` | `Object` |
 | `properties.coerceNullsIntoDefault` | `Object` |
 | `properties.coerceNullsIntoDefault.type` | `string` |
+| `properties.config` | `Object` |
+| `properties.config.additionalProperties` | `boolean` |
+| `properties.config.properties` | `Object` |
+| `properties.config.type` | `string` |
 | `properties.createRoleAccess` | `Object` |
 | `properties.createRoleAccess.items` | `Object` |
 | `properties.createRoleAccess.items.type` | `string` |
@@ -130,6 +134,17 @@ be defined in the json form
 | `properties.searchDefaultIf.items.required` | `string`[] |
 | `properties.searchDefaultIf.items.type` | `string` |
 | `properties.searchDefaultIf.type` | `string` |
+| `properties.searchEnforcedValue` | `Object` |
+| `properties.searchEnforcedValues` | `Object` |
+| `properties.searchEnforcedValues.items` | `Object` |
+| `properties.searchEnforcedValues.items.additionalProperties` | `boolean` |
+| `properties.searchEnforcedValues.items.properties` | `Object` |
+| `properties.searchEnforcedValues.items.properties.if` | `Object` |
+| `properties.searchEnforcedValues.items.properties.if.$ref` | `string` |
+| `properties.searchEnforcedValues.items.properties.value` | `Object` |
+| `properties.searchEnforcedValues.items.required` | `string`[] |
+| `properties.searchEnforcedValues.items.type` | `string` |
+| `properties.searchEnforcedValues.type` | `string` |
 | `properties.searchEngineBoost` | `Object` |
 | `properties.searchEngineBoost.type` | `string` |
 | `properties.searchHidden` | `Object` |
@@ -156,10 +171,6 @@ be defined in the json form
 | `properties.softReadRoleAccess.items` | `Object` |
 | `properties.softReadRoleAccess.items.type` | `string` |
 | `properties.softReadRoleAccess.type` | `string` |
-| `properties.config` | `Object` |
-| `properties.config.additionalProperties` | `boolean` |
-| `properties.config.properties` | `Object` |
-| `properties.config.type` | `string` |
 | `properties.subtype` | `Object` |
 | `properties.subtype.type` | `string` |
 | `properties.type` | `Object` |
@@ -175,11 +186,11 @@ be defined in the json form
 
 ## Variables
 
-### SpecialPropertyValueSetSchema
+### ConfigValueSetSchema
 
-• **SpecialPropertyValueSetSchema**: `Object`
+• **ConfigValueSetSchema**: `Object`
 
-This represents the special property value
+This represents the config property value
 for use with property set
 
 #### Type declaration
@@ -193,4 +204,4 @@ for use with property set
 
 #### Defined in
 
-[base/Root/Module/ItemDefinition/PropertyDefinition/schema.ts:14](https://github.com/onzag/itemize/blob/f2db74a5/base/Root/Module/ItemDefinition/PropertyDefinition/schema.ts#L14)
+[base/Root/Module/ItemDefinition/PropertyDefinition/schema.ts:14](https://github.com/onzag/itemize/blob/a24376ed/base/Root/Module/ItemDefinition/PropertyDefinition/schema.ts#L14)

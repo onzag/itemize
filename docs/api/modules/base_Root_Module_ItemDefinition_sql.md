@@ -50,7 +50,7 @@ a list of raw added selected fields
 
 #### Defined in
 
-[base/Root/Module/ItemDefinition/sql.ts:627](https://github.com/onzag/itemize/blob/f2db74a5/base/Root/Module/ItemDefinition/sql.ts#L627)
+[base/Root/Module/ItemDefinition/sql.ts:627](https://github.com/onzag/itemize/blob/a24376ed/base/Root/Module/ItemDefinition/sql.ts#L627)
 
 ___
 
@@ -84,7 +84,7 @@ a list of raw added selected fields
 
 #### Defined in
 
-[base/Root/Module/ItemDefinition/sql.ts:475](https://github.com/onzag/itemize/blob/f2db74a5/base/Root/Module/ItemDefinition/sql.ts#L475)
+[base/Root/Module/ItemDefinition/sql.ts:475](https://github.com/onzag/itemize/blob/a24376ed/base/Root/Module/ItemDefinition/sql.ts#L475)
 
 ___
 
@@ -119,7 +119,7 @@ a sql value
 
 #### Defined in
 
-[base/Root/Module/ItemDefinition/sql.ts:378](https://github.com/onzag/itemize/blob/f2db74a5/base/Root/Module/ItemDefinition/sql.ts#L378)
+[base/Root/Module/ItemDefinition/sql.ts:378](https://github.com/onzag/itemize/blob/a24376ed/base/Root/Module/ItemDefinition/sql.ts#L378)
 
 ___
 
@@ -142,7 +142,7 @@ ___
 
 #### Defined in
 
-[base/Root/Module/ItemDefinition/sql.ts:315](https://github.com/onzag/itemize/blob/f2db74a5/base/Root/Module/ItemDefinition/sql.ts#L315)
+[base/Root/Module/ItemDefinition/sql.ts:315](https://github.com/onzag/itemize/blob/a24376ed/base/Root/Module/ItemDefinition/sql.ts#L315)
 
 ___
 
@@ -173,7 +173,7 @@ a graphql value
 
 #### Defined in
 
-[base/Root/Module/ItemDefinition/sql.ts:260](https://github.com/onzag/itemize/blob/f2db74a5/base/Root/Module/ItemDefinition/sql.ts#L260)
+[base/Root/Module/ItemDefinition/sql.ts:260](https://github.com/onzag/itemize/blob/a24376ed/base/Root/Module/ItemDefinition/sql.ts#L260)
 
 ___
 
@@ -196,7 +196,7 @@ ___
 
 #### Defined in
 
-[base/Root/Module/ItemDefinition/sql.ts:50](https://github.com/onzag/itemize/blob/f2db74a5/base/Root/Module/ItemDefinition/sql.ts#L50)
+[base/Root/Module/ItemDefinition/sql.ts:50](https://github.com/onzag/itemize/blob/a24376ed/base/Root/Module/ItemDefinition/sql.ts#L50)
 
 ___
 
@@ -224,7 +224,7 @@ a complete table definition type
 
 #### Defined in
 
-[base/Root/Module/ItemDefinition/sql.ts:107](https://github.com/onzag/itemize/blob/f2db74a5/base/Root/Module/ItemDefinition/sql.ts#L107)
+[base/Root/Module/ItemDefinition/sql.ts:107](https://github.com/onzag/itemize/blob/a24376ed/base/Root/Module/ItemDefinition/sql.ts#L107)
 
 ___
 
@@ -250,4 +250,4 @@ a partial sql schema definition for the whole database (adds tables)
 
 #### Defined in
 
-[base/Root/Module/ItemDefinition/sql.ts:229](https://github.com/onzag/itemize/blob/f2db74a5/base/Root/Module/ItemDefinition/sql.ts#L229)
+[base/Root/Module/ItemDefinition/sql.ts:229](https://github.com/onzag/itemize/blob/a24376ed/base/Root/Module/ItemDefinition/sql.ts#L229)

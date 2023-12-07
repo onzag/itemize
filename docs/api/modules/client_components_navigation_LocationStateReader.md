@@ -7,9 +7,15 @@ obtained via the browser history api or the query string
 
 ## Table of contents
 
+### Interfaces
+
+- [ILocationStateReaderOptions](../interfaces/client_components_navigation_LocationStateReader.ILocationStateReaderOptions.md)
+- [ILocationStateReaderProps](../interfaces/client_components_navigation_LocationStateReader.ILocationStateReaderProps.md)
+
 ### Functions
 
 - [default](client_components_navigation_LocationStateReader.md#default)
+- [useLocationStateReader](client_components_navigation_LocationStateReader.md#uselocationstatereader)
 
 ## Functions
 
@@ -29,7 +35,7 @@ The location state reader component
 
 | Name | Type | Description |
 | :------ | :------ | :------ |
-| `props` | `ILocationStateReaderProps`<`S`\> | the props |
+| `props` | [`ILocationStateReaderProps`](../interfaces/client_components_navigation_LocationStateReader.ILocationStateReaderProps.md)<`S`\> | the props |
 
 #### Returns
 
@@ -39,4 +45,30 @@ a react component
 
 #### Defined in
 
-[client/components/navigation/LocationStateReader.tsx:48](https://github.com/onzag/itemize/blob/f2db74a5/client/components/navigation/LocationStateReader.tsx#L48)
+[client/components/navigation/LocationStateReader.tsx:171](https://github.com/onzag/itemize/blob/a24376ed/client/components/navigation/LocationStateReader.tsx#L171)
+
+___
+
+### useLocationStateReader
+
+▸ **useLocationStateReader**<`S`\>(`options`): [`S`, (`state`: `Partial`<`S`\>, `replace?`: `boolean`) => `void`, `boolean`, (`fn`: () => `void`) => `void`]
+
+#### Type parameters
+
+| Name |
+| :------ |
+| `S` |
+
+#### Parameters
+
+| Name | Type |
+| :------ | :------ |
+| `options` | [`ILocationStateReaderOptions`](../interfaces/client_components_navigation_LocationStateReader.ILocationStateReaderOptions.md)<`S`\> |
+
+#### Returns
+
+[`S`, (`state`: `Partial`<`S`\>, `replace?`: `boolean`) => `void`, `boolean`, (`fn`: () => `void`) => `void`]
+
+#### Defined in
+
+[client/components/navigation/LocationStateReader.tsx:49](https://github.com/onzag/itemize/blob/a24376ed/client/components/navigation/LocationStateReader.tsx#L49)

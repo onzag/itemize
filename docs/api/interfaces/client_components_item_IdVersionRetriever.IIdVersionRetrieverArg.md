@@ -21,7 +21,7 @@ The arg that it provides
 
 #### Defined in
 
-[client/components/item/IdVersionRetriever.tsx:19](https://github.com/onzag/itemize/blob/f2db74a5/client/components/item/IdVersionRetriever.tsx#L19)
+[client/components/item/IdVersionRetriever.tsx:19](https://github.com/onzag/itemize/blob/a24376ed/client/components/item/IdVersionRetriever.tsx#L19)
 
 ___
 
@@ -31,4 +31,4 @@ ___
 
 #### Defined in
 
-[client/components/item/IdVersionRetriever.tsx:20](https://github.com/onzag/itemize/blob/f2db74a5/client/components/item/IdVersionRetriever.tsx#L20)
+[client/components/item/IdVersionRetriever.tsx:20](https://github.com/onzag/itemize/blob/a24376ed/client/components/item/IdVersionRetriever.tsx#L20)

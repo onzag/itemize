@@ -16,6 +16,7 @@ The loader props themselves
 - [enableExternalChecks](client_components_search_SearchLoader.ISearchLoaderProps.md#enableexternalchecks)
 - [includePolicies](client_components_search_SearchLoader.ISearchLoaderProps.md#includepolicies)
 - [pageSize](client_components_search_SearchLoader.ISearchLoaderProps.md#pagesize)
+- [startInSearchingState](client_components_search_SearchLoader.ISearchLoaderProps.md#startinsearchingstate)
 - [static](client_components_search_SearchLoader.ISearchLoaderProps.md#static)
 
 ### Methods
@@ -35,7 +36,7 @@ off a search
 
 #### Defined in
 
-[client/components/search/SearchLoader.tsx:186](https://github.com/onzag/itemize/blob/f2db74a5/client/components/search/SearchLoader.tsx#L186)
+[client/components/search/SearchLoader.tsx:192](https://github.com/onzag/itemize/blob/a24376ed/client/components/search/SearchLoader.tsx#L192)
 
 ___
 
@@ -47,7 +48,7 @@ Whether the resulting search results should clean on dismount
 
 #### Defined in
 
-[client/components/search/SearchLoader.tsx:175](https://github.com/onzag/itemize/blob/f2db74a5/client/components/search/SearchLoader.tsx#L175)
+[client/components/search/SearchLoader.tsx:181](https://github.com/onzag/itemize/blob/a24376ed/client/components/search/SearchLoader.tsx#L181)
 
 ___
 
@@ -56,10 +57,12 @@ ___
 • **currentPage**: `number`
 
 The current page we are in
+if pageSize is ALL the current page should be 0
+otherwise this will cause an error
 
 #### Defined in
 
-[client/components/search/SearchLoader.tsx:162](https://github.com/onzag/itemize/blob/f2db74a5/client/components/search/SearchLoader.tsx#L162)
+[client/components/search/SearchLoader.tsx:168](https://github.com/onzag/itemize/blob/a24376ed/client/components/search/SearchLoader.tsx#L168)
 
 ___
 
@@ -72,7 +75,7 @@ results provider props
 
 #### Defined in
 
-[client/components/search/SearchLoader.tsx:180](https://github.com/onzag/itemize/blob/f2db74a5/client/components/search/SearchLoader.tsx#L180)
+[client/components/search/SearchLoader.tsx:186](https://github.com/onzag/itemize/blob/a24376ed/client/components/search/SearchLoader.tsx#L186)
 
 ___
 
@@ -85,13 +88,13 @@ item definition loader props
 
 #### Defined in
 
-[client/components/search/SearchLoader.tsx:171](https://github.com/onzag/itemize/blob/f2db74a5/client/components/search/SearchLoader.tsx#L171)
+[client/components/search/SearchLoader.tsx:177](https://github.com/onzag/itemize/blob/a24376ed/client/components/search/SearchLoader.tsx#L177)
 
 ___
 
 ### pageSize
 
-• **pageSize**: `number`
+• **pageSize**: `number` \| ``"ALL"``
 
 The page size, be careful on not making the page size too
 large as this can be forbidden, depends on max search results
@@ -99,7 +102,23 @@ at once
 
 #### Defined in
 
-[client/components/search/SearchLoader.tsx:158](https://github.com/onzag/itemize/blob/f2db74a5/client/components/search/SearchLoader.tsx#L158)
+[client/components/search/SearchLoader.tsx:162](https://github.com/onzag/itemize/blob/a24376ed/client/components/search/SearchLoader.tsx#L162)
+
+___
+
+### startInSearchingState
+
+• `Optional` **startInSearchingState**: `boolean`
+
+Searching will be set to true until at least
+a first search is retrieved
+
+mainly used for SSR purposes so that searching always
+starts at true
+
+#### Defined in
+
+[client/components/search/SearchLoader.tsx:200](https://github.com/onzag/itemize/blob/a24376ed/client/components/search/SearchLoader.tsx#L200)
 
 ___
 
@@ -119,13 +138,13 @@ this is why total is the better option
 
 #### Defined in
 
-[client/components/search/SearchLoader.tsx:198](https://github.com/onzag/itemize/blob/f2db74a5/client/components/search/SearchLoader.tsx#L198)
+[client/components/search/SearchLoader.tsx:212](https://github.com/onzag/itemize/blob/a24376ed/client/components/search/SearchLoader.tsx#L212)
 
 ## Methods
 
 ### children
 
-▸ **children**(`arg`): `any`
+▸ `Optional` **children**(`arg`): `any`
 
 The children function which specifies how to retrieve these results
 
@@ -141,7 +160,7 @@ The children function which specifies how to retrieve these results
 
 #### Defined in
 
-[client/components/search/SearchLoader.tsx:166](https://github.com/onzag/itemize/blob/f2db74a5/client/components/search/SearchLoader.tsx#L166)
+[client/components/search/SearchLoader.tsx:172](https://github.com/onzag/itemize/blob/a24376ed/client/components/search/SearchLoader.tsx#L172)
 
 ___
 
@@ -164,4 +183,4 @@ Triggers when the search data changes, as in a new search id
 
 #### Defined in
 
-[client/components/search/SearchLoader.tsx:202](https://github.com/onzag/itemize/blob/f2db74a5/client/components/search/SearchLoader.tsx#L202)
+[client/components/search/SearchLoader.tsx:216](https://github.com/onzag/itemize/blob/a24376ed/client/components/search/SearchLoader.tsx#L216)

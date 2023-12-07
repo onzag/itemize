@@ -69,7 +69,7 @@ React.PureComponent&lt;IReactifiedElementWithHoverAndActiveProps, IReactifiedEle
 
 #### Defined in
 
-[client/internal/text/serializer/dynamic-component.tsx:33](https://github.com/onzag/itemize/blob/f2db74a5/client/internal/text/serializer/dynamic-component.tsx#L33)
+[client/internal/text/serializer/dynamic-component.tsx:33](https://github.com/onzag/itemize/blob/a24376ed/client/internal/text/serializer/dynamic-component.tsx#L33)
 
 ## Properties
 
@@ -121,7 +121,7 @@ ___
 
 #### Defined in
 
-[client/internal/text/serializer/dynamic-component.tsx:32](https://github.com/onzag/itemize/blob/f2db74a5/client/internal/text/serializer/dynamic-component.tsx#L32)
+[client/internal/text/serializer/dynamic-component.tsx:32](https://github.com/onzag/itemize/blob/a24376ed/client/internal/text/serializer/dynamic-component.tsx#L32)
 
 ___
 
@@ -550,7 +550,7 @@ ___
 
 #### Defined in
 
-[client/internal/text/serializer/dynamic-component.tsx:79](https://github.com/onzag/itemize/blob/f2db74a5/client/internal/text/serializer/dynamic-component.tsx#L79)
+[client/internal/text/serializer/dynamic-component.tsx:79](https://github.com/onzag/itemize/blob/a24376ed/client/internal/text/serializer/dynamic-component.tsx#L79)
 
 ___
 
@@ -603,7 +603,7 @@ ___
 
 #### Defined in
 
-[client/internal/text/serializer/dynamic-component.tsx:71](https://github.com/onzag/itemize/blob/f2db74a5/client/internal/text/serializer/dynamic-component.tsx#L71)
+[client/internal/text/serializer/dynamic-component.tsx:71](https://github.com/onzag/itemize/blob/a24376ed/client/internal/text/serializer/dynamic-component.tsx#L71)
 
 ___
 
@@ -624,7 +624,7 @@ ___
 
 #### Defined in
 
-[client/internal/text/serializer/dynamic-component.tsx:63](https://github.com/onzag/itemize/blob/f2db74a5/client/internal/text/serializer/dynamic-component.tsx#L63)
+[client/internal/text/serializer/dynamic-component.tsx:63](https://github.com/onzag/itemize/blob/a24376ed/client/internal/text/serializer/dynamic-component.tsx#L63)
 
 ___
 
@@ -645,7 +645,7 @@ ___
 
 #### Defined in
 
-[client/internal/text/serializer/dynamic-component.tsx:55](https://github.com/onzag/itemize/blob/f2db74a5/client/internal/text/serializer/dynamic-component.tsx#L55)
+[client/internal/text/serializer/dynamic-component.tsx:55](https://github.com/onzag/itemize/blob/a24376ed/client/internal/text/serializer/dynamic-component.tsx#L55)
 
 ___
 
@@ -666,7 +666,7 @@ ___
 
 #### Defined in
 
-[client/internal/text/serializer/dynamic-component.tsx:47](https://github.com/onzag/itemize/blob/f2db74a5/client/internal/text/serializer/dynamic-component.tsx#L47)
+[client/internal/text/serializer/dynamic-component.tsx:47](https://github.com/onzag/itemize/blob/a24376ed/client/internal/text/serializer/dynamic-component.tsx#L47)
 
 ___
 
@@ -684,7 +684,7 @@ React.PureComponent.render
 
 #### Defined in
 
-[client/internal/text/serializer/dynamic-component.tsx:83](https://github.com/onzag/itemize/blob/f2db74a5/client/internal/text/serializer/dynamic-component.tsx#L83)
+[client/internal/text/serializer/dynamic-component.tsx:83](https://github.com/onzag/itemize/blob/a24376ed/client/internal/text/serializer/dynamic-component.tsx#L83)
 
 ___
 

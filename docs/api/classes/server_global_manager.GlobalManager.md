@@ -32,8 +32,6 @@
 - [registry](server_global_manager.GlobalManager.md#registry)
 - [root](server_global_manager.GlobalManager.md#root)
 - [sensitiveConfig](server_global_manager.GlobalManager.md#sensitiveconfig)
-- [seoGenLastUpdated](server_global_manager.GlobalManager.md#seogenlastupdated)
-- [seoGenerator](server_global_manager.GlobalManager.md#seogenerator)
 - [serverData](server_global_manager.GlobalManager.md#serverdata)
 - [serverDataLastUpdated](server_global_manager.GlobalManager.md#serverdatalastupdated)
 
@@ -54,7 +52,6 @@
 - [runForIdef](server_global_manager.GlobalManager.md#runforidef)
 - [runForModule](server_global_manager.GlobalManager.md#runformodule)
 - [runOnce](server_global_manager.GlobalManager.md#runonce)
-- [setSEOGenerator](server_global_manager.GlobalManager.md#setseogenerator)
 
 ## Constructors
 
@@ -84,7 +81,7 @@
 
 #### Defined in
 
-[server/global-manager.ts:86](https://github.com/onzag/itemize/blob/f2db74a5/server/global-manager.ts#L86)
+[server/global-manager.ts:82](https://github.com/onzag/itemize/blob/a24376ed/server/global-manager.ts#L82)
 
 ## Properties
 
@@ -94,7 +91,7 @@
 
 #### Defined in
 
-[server/global-manager.ts:73](https://github.com/onzag/itemize/blob/f2db74a5/server/global-manager.ts#L73)
+[server/global-manager.ts:70](https://github.com/onzag/itemize/blob/a24376ed/server/global-manager.ts#L70)
 
 ___
 
@@ -104,7 +101,7 @@ ___
 
 #### Defined in
 
-[server/global-manager.ts:60](https://github.com/onzag/itemize/blob/f2db74a5/server/global-manager.ts#L60)
+[server/global-manager.ts:58](https://github.com/onzag/itemize/blob/a24376ed/server/global-manager.ts#L58)
 
 ___
 
@@ -114,7 +111,7 @@ ___
 
 #### Defined in
 
-[server/global-manager.ts:77](https://github.com/onzag/itemize/blob/f2db74a5/server/global-manager.ts#L77)
+[server/global-manager.ts:74](https://github.com/onzag/itemize/blob/a24376ed/server/global-manager.ts#L74)
 
 ___
 
@@ -124,7 +121,7 @@ ___
 
 #### Defined in
 
-[server/global-manager.ts:74](https://github.com/onzag/itemize/blob/f2db74a5/server/global-manager.ts#L74)
+[server/global-manager.ts:71](https://github.com/onzag/itemize/blob/a24376ed/server/global-manager.ts#L71)
 
 ___
 
@@ -138,7 +135,7 @@ ___
 
 #### Defined in
 
-[server/global-manager.ts:79](https://github.com/onzag/itemize/blob/f2db74a5/server/global-manager.ts#L79)
+[server/global-manager.ts:75](https://github.com/onzag/itemize/blob/a24376ed/server/global-manager.ts#L75)
 
 ___
 
@@ -148,7 +145,7 @@ ___
 
 #### Defined in
 
-[server/global-manager.ts:61](https://github.com/onzag/itemize/blob/f2db74a5/server/global-manager.ts#L61)
+[server/global-manager.ts:59](https://github.com/onzag/itemize/blob/a24376ed/server/global-manager.ts#L59)
 
 ___
 
@@ -158,7 +155,7 @@ ___
 
 #### Defined in
 
-[server/global-manager.ts:63](https://github.com/onzag/itemize/blob/f2db74a5/server/global-manager.ts#L63)
+[server/global-manager.ts:61](https://github.com/onzag/itemize/blob/a24376ed/server/global-manager.ts#L61)
 
 ___
 
@@ -168,7 +165,7 @@ ___
 
 #### Defined in
 
-[server/global-manager.ts:72](https://github.com/onzag/itemize/blob/f2db74a5/server/global-manager.ts#L72)
+[server/global-manager.ts:69](https://github.com/onzag/itemize/blob/a24376ed/server/global-manager.ts#L69)
 
 ___
 
@@ -178,7 +175,7 @@ ___
 
 #### Defined in
 
-[server/global-manager.ts:64](https://github.com/onzag/itemize/blob/f2db74a5/server/global-manager.ts#L64)
+[server/global-manager.ts:62](https://github.com/onzag/itemize/blob/a24376ed/server/global-manager.ts#L62)
 
 ___
 
@@ -188,7 +185,7 @@ ___
 
 #### Defined in
 
-[server/global-manager.ts:67](https://github.com/onzag/itemize/blob/f2db74a5/server/global-manager.ts#L67)
+[server/global-manager.ts:65](https://github.com/onzag/itemize/blob/a24376ed/server/global-manager.ts#L65)
 
 ___
 
@@ -198,7 +195,7 @@ ___
 
 #### Defined in
 
-[server/global-manager.ts:84](https://github.com/onzag/itemize/blob/f2db74a5/server/global-manager.ts#L84)
+[server/global-manager.ts:80](https://github.com/onzag/itemize/blob/a24376ed/server/global-manager.ts#L80)
 
 ___
 
@@ -208,7 +205,7 @@ ___
 
 #### Defined in
 
-[server/global-manager.ts:76](https://github.com/onzag/itemize/blob/f2db74a5/server/global-manager.ts#L76)
+[server/global-manager.ts:73](https://github.com/onzag/itemize/blob/a24376ed/server/global-manager.ts#L73)
 
 ___
 
@@ -218,7 +215,7 @@ ___
 
 #### Defined in
 
-[server/global-manager.ts:68](https://github.com/onzag/itemize/blob/f2db74a5/server/global-manager.ts#L68)
+[server/global-manager.ts:66](https://github.com/onzag/itemize/blob/a24376ed/server/global-manager.ts#L66)
 
 ___
 
@@ -228,7 +225,7 @@ ___
 
 #### Defined in
 
-[server/global-manager.ts:83](https://github.com/onzag/itemize/blob/f2db74a5/server/global-manager.ts#L83)
+[server/global-manager.ts:79](https://github.com/onzag/itemize/blob/a24376ed/server/global-manager.ts#L79)
 
 ___
 
@@ -238,7 +235,7 @@ ___
 
 #### Defined in
 
-[server/global-manager.ts:62](https://github.com/onzag/itemize/blob/f2db74a5/server/global-manager.ts#L62)
+[server/global-manager.ts:60](https://github.com/onzag/itemize/blob/a24376ed/server/global-manager.ts#L60)
 
 ___
 
@@ -248,7 +245,7 @@ ___
 
 #### Defined in
 
-[server/global-manager.ts:65](https://github.com/onzag/itemize/blob/f2db74a5/server/global-manager.ts#L65)
+[server/global-manager.ts:63](https://github.com/onzag/itemize/blob/a24376ed/server/global-manager.ts#L63)
 
 ___
 
@@ -258,7 +255,7 @@ ___
 
 #### Defined in
 
-[server/global-manager.ts:66](https://github.com/onzag/itemize/blob/f2db74a5/server/global-manager.ts#L66)
+[server/global-manager.ts:64](https://github.com/onzag/itemize/blob/a24376ed/server/global-manager.ts#L64)
 
 ___
 
@@ -268,7 +265,7 @@ ___
 
 #### Defined in
 
-[server/global-manager.ts:82](https://github.com/onzag/itemize/blob/f2db74a5/server/global-manager.ts#L82)
+[server/global-manager.ts:78](https://github.com/onzag/itemize/blob/a24376ed/server/global-manager.ts#L78)
 
 ___
 
@@ -278,7 +275,7 @@ ___
 
 #### Defined in
 
-[server/global-manager.ts:59](https://github.com/onzag/itemize/blob/f2db74a5/server/global-manager.ts#L59)
+[server/global-manager.ts:57](https://github.com/onzag/itemize/blob/a24376ed/server/global-manager.ts#L57)
 
 ___
 
@@ -288,27 +285,7 @@ ___
 
 #### Defined in
 
-[server/global-manager.ts:75](https://github.com/onzag/itemize/blob/f2db74a5/server/global-manager.ts#L75)
-
-___
-
-### seoGenLastUpdated
-
-• `Private` **seoGenLastUpdated**: `number`
-
-#### Defined in
-
-[server/global-manager.ts:71](https://github.com/onzag/itemize/blob/f2db74a5/server/global-manager.ts#L71)
-
-___
-
-### seoGenerator
-
-• `Private` **seoGenerator**: [`SEOGenerator`](server_seo_generator.SEOGenerator.md)
-
-#### Defined in
-
-[server/global-manager.ts:78](https://github.com/onzag/itemize/blob/f2db74a5/server/global-manager.ts#L78)
+[server/global-manager.ts:72](https://github.com/onzag/itemize/blob/a24376ed/server/global-manager.ts#L72)
 
 ___
 
@@ -318,7 +295,7 @@ ___
 
 #### Defined in
 
-[server/global-manager.ts:69](https://github.com/onzag/itemize/blob/f2db74a5/server/global-manager.ts#L69)
+[server/global-manager.ts:67](https://github.com/onzag/itemize/blob/a24376ed/server/global-manager.ts#L67)
 
 ___
 
@@ -328,7 +305,7 @@ ___
 
 #### Defined in
 
-[server/global-manager.ts:70](https://github.com/onzag/itemize/blob/f2db74a5/server/global-manager.ts#L70)
+[server/global-manager.ts:68](https://github.com/onzag/itemize/blob/a24376ed/server/global-manager.ts#L68)
 
 ## Methods
 
@@ -342,7 +319,7 @@ ___
 
 #### Defined in
 
-[server/global-manager.ts:221](https://github.com/onzag/itemize/blob/f2db74a5/server/global-manager.ts#L221)
+[server/global-manager.ts:214](https://github.com/onzag/itemize/blob/a24376ed/server/global-manager.ts#L214)
 
 ___
 
@@ -356,7 +333,7 @@ ___
 
 #### Defined in
 
-[server/global-manager.ts:1221](https://github.com/onzag/itemize/blob/f2db74a5/server/global-manager.ts#L1221)
+[server/global-manager.ts:1209](https://github.com/onzag/itemize/blob/a24376ed/server/global-manager.ts#L1209)
 
 ___
 
@@ -370,7 +347,7 @@ ___
 
 #### Defined in
 
-[server/global-manager.ts:543](https://github.com/onzag/itemize/blob/f2db74a5/server/global-manager.ts#L543)
+[server/global-manager.ts:590](https://github.com/onzag/itemize/blob/a24376ed/server/global-manager.ts#L590)
 
 ___
 
@@ -384,7 +361,7 @@ ___
 
 #### Defined in
 
-[server/global-manager.ts:1248](https://github.com/onzag/itemize/blob/f2db74a5/server/global-manager.ts#L1248)
+[server/global-manager.ts:1236](https://github.com/onzag/itemize/blob/a24376ed/server/global-manager.ts#L1236)
 
 ___
 
@@ -398,7 +375,7 @@ ___
 
 #### Defined in
 
-[server/global-manager.ts:202](https://github.com/onzag/itemize/blob/f2db74a5/server/global-manager.ts#L202)
+[server/global-manager.ts:195](https://github.com/onzag/itemize/blob/a24376ed/server/global-manager.ts#L195)
 
 ___
 
@@ -418,7 +395,7 @@ ___
 
 #### Defined in
 
-[server/global-manager.ts:181](https://github.com/onzag/itemize/blob/f2db74a5/server/global-manager.ts#L181)
+[server/global-manager.ts:174](https://github.com/onzag/itemize/blob/a24376ed/server/global-manager.ts#L174)
 
 ___
 
@@ -438,7 +415,7 @@ ___
 
 #### Defined in
 
-[server/global-manager.ts:470](https://github.com/onzag/itemize/blob/f2db74a5/server/global-manager.ts#L470)
+[server/global-manager.ts:516](https://github.com/onzag/itemize/blob/a24376ed/server/global-manager.ts#L516)
 
 ___
 
@@ -458,7 +435,7 @@ ___
 
 #### Defined in
 
-[server/global-manager.ts:431](https://github.com/onzag/itemize/blob/f2db74a5/server/global-manager.ts#L431)
+[server/global-manager.ts:477](https://github.com/onzag/itemize/blob/a24376ed/server/global-manager.ts#L477)
 
 ___
 
@@ -472,7 +449,7 @@ ___
 
 #### Defined in
 
-[server/global-manager.ts:557](https://github.com/onzag/itemize/blob/f2db74a5/server/global-manager.ts#L557)
+[server/global-manager.ts:604](https://github.com/onzag/itemize/blob/a24376ed/server/global-manager.ts#L604)
 
 ___
 
@@ -492,7 +469,7 @@ ___
 
 #### Defined in
 
-[server/global-manager.ts:521](https://github.com/onzag/itemize/blob/f2db74a5/server/global-manager.ts#L521)
+[server/global-manager.ts:567](https://github.com/onzag/itemize/blob/a24376ed/server/global-manager.ts#L567)
 
 ___
 
@@ -506,7 +483,7 @@ ___
 
 #### Defined in
 
-[server/global-manager.ts:611](https://github.com/onzag/itemize/blob/f2db74a5/server/global-manager.ts#L611)
+[server/global-manager.ts:658](https://github.com/onzag/itemize/blob/a24376ed/server/global-manager.ts#L658)
 
 ___
 
@@ -529,7 +506,7 @@ ___
 
 #### Defined in
 
-[server/global-manager.ts:1081](https://github.com/onzag/itemize/blob/f2db74a5/server/global-manager.ts#L1081)
+[server/global-manager.ts:1069](https://github.com/onzag/itemize/blob/a24376ed/server/global-manager.ts#L1069)
 
 ___
 
@@ -549,7 +526,7 @@ ___
 
 #### Defined in
 
-[server/global-manager.ts:1033](https://github.com/onzag/itemize/blob/f2db74a5/server/global-manager.ts#L1033)
+[server/global-manager.ts:1021](https://github.com/onzag/itemize/blob/a24376ed/server/global-manager.ts#L1021)
 
 ___
 
@@ -569,7 +546,7 @@ ___
 
 #### Defined in
 
-[server/global-manager.ts:1010](https://github.com/onzag/itemize/blob/f2db74a5/server/global-manager.ts#L1010)
+[server/global-manager.ts:998](https://github.com/onzag/itemize/blob/a24376ed/server/global-manager.ts#L998)
 
 ___
 
@@ -583,24 +560,4 @@ ___
 
 #### Defined in
 
-[server/global-manager.ts:1002](https://github.com/onzag/itemize/blob/f2db74a5/server/global-manager.ts#L1002)
-
-___
-
-### setSEOGenerator
-
-▸ **setSEOGenerator**(`seoGenerator`): `void`
-
-#### Parameters
-
-| Name | Type |
-| :------ | :------ |
-| `seoGenerator` | [`SEOGenerator`](server_seo_generator.SEOGenerator.md) |
-
-#### Returns
-
-`void`
-
-#### Defined in
-
-[server/global-manager.ts:178](https://github.com/onzag/itemize/blob/f2db74a5/server/global-manager.ts#L178)
+[server/global-manager.ts:990](https://github.com/onzag/itemize/blob/a24376ed/server/global-manager.ts#L990)

@@ -36,4 +36,4 @@ a react element
 
 #### Defined in
 
-[client/fast-prototyping/components/navbar/menu.tsx:211](https://github.com/onzag/itemize/blob/f2db74a5/client/fast-prototyping/components/navbar/menu.tsx#L211)
+[client/fast-prototyping/components/navbar/menu.tsx:211](https://github.com/onzag/itemize/blob/a24376ed/client/fast-prototyping/components/navbar/menu.tsx#L211)

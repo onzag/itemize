@@ -7,16 +7,19 @@
 ### Enumerations
 
 - [IOTriggerActions](../enums/server_resolvers_triggers.IOTriggerActions.md)
+- [SearchTriggerActions](../enums/server_resolvers_triggers.SearchTriggerActions.md)
 
 ### Interfaces
 
 - [IBaseTriggerRegistry](../interfaces/server_resolvers_triggers.IBaseTriggerRegistry.md)
+- [IOConflictTriggerArgType](../interfaces/server_resolvers_triggers.IOConflictTriggerArgType.md)
 - [IOTriggerArgType](../interfaces/server_resolvers_triggers.IOTriggerArgType.md)
 - [ISearchTriggerArgType](../interfaces/server_resolvers_triggers.ISearchTriggerArgType.md)
 - [ITriggerRegistry](../interfaces/server_resolvers_triggers.ITriggerRegistry.md)
 
 ### Type aliases
 
+- [IOConflictTriggerType](server_resolvers_triggers.md#ioconflicttriggertype)
 - [IOTriggerType](server_resolvers_triggers.md#iotriggertype)
 - [SearchTriggerType](server_resolvers_triggers.md#searchtriggertype)
 
@@ -25,6 +28,33 @@
 - [mergeTriggerRegistries](server_resolvers_triggers.md#mergetriggerregistries)
 
 ## Type aliases
+
+### IOConflictTriggerType
+
+Ƭ **IOConflictTriggerType**: (`arg`: [`IOConflictTriggerArgType`](../interfaces/server_resolvers_triggers.IOConflictTriggerArgType.md)) => `void` \| `boolean` \| `Promise`<`void` \| `boolean`\>
+
+#### Type declaration
+
+▸ (`arg`): `void` \| `boolean` \| `Promise`<`void` \| `boolean`\>
+
+return true to overwrite
+false to throw the error
+
+##### Parameters
+
+| Name | Type |
+| :------ | :------ |
+| `arg` | [`IOConflictTriggerArgType`](../interfaces/server_resolvers_triggers.IOConflictTriggerArgType.md) |
+
+##### Returns
+
+`void` \| `boolean` \| `Promise`<`void` \| `boolean`\>
+
+#### Defined in
+
+[server/resolvers/triggers.ts:211](https://github.com/onzag/itemize/blob/a24376ed/server/resolvers/triggers.ts#L211)
+
+___
 
 ### IOTriggerType
 
@@ -46,7 +76,7 @@
 
 #### Defined in
 
-[server/resolvers/triggers.ts:165](https://github.com/onzag/itemize/blob/f2db74a5/server/resolvers/triggers.ts#L165)
+[server/resolvers/triggers.ts:204](https://github.com/onzag/itemize/blob/a24376ed/server/resolvers/triggers.ts#L204)
 
 ___
 
@@ -70,7 +100,7 @@ ___
 
 #### Defined in
 
-[server/resolvers/triggers.ts:166](https://github.com/onzag/itemize/blob/f2db74a5/server/resolvers/triggers.ts#L166)
+[server/resolvers/triggers.ts:205](https://github.com/onzag/itemize/blob/a24376ed/server/resolvers/triggers.ts#L205)
 
 ## Functions
 
@@ -90,4 +120,4 @@ ___
 
 #### Defined in
 
-[server/resolvers/triggers.ts:247](https://github.com/onzag/itemize/blob/f2db74a5/server/resolvers/triggers.ts#L247)
+[server/resolvers/triggers.ts:315](https://github.com/onzag/itemize/blob/a24376ed/server/resolvers/triggers.ts#L315)
