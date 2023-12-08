@@ -254,28 +254,47 @@ class ActualTokenProvider extends React.Component<IActualTokenProviderProps, IAc
       isLoggingIn: true,
     });
 
-    // we do the token request
-    const data = await gqlQuery(
-      buildGqlQuery(
-        {
-          name: "token",
-          args: {
-            username,
-            password,
-            token,
-            country: this.props.localeContext.country,
-          },
-          fields: {
-            id: {},
-            role: {},
-            token: {},
-          },
+    let data: any;
+    try {
+      data = await (await fetch("/rest/user/token", {
+        method: "POST",
+        cache: "no-cache",
+        headers: {
+          token,
+          "Content-Type": "application/json",
         },
-      ),
-    );
+        body: JSON.stringify({username, password, country: this.props.localeContext.country}),
+      })).json();
+    } catch (err) {
+      data = {
+        error: {
+          code: ENDPOINT_ERRORS.CANT_CONNECT,
+        }
+      }
+    }
+
+    // // we do the token request
+    // const data = await gqlQuery(
+    //   buildGqlQuery(
+    //     {
+    //       name: "token",
+    //       args: {
+    //         username,
+    //         password,
+    //         token,
+    //         country: this.props.localeContext.country,
+    //       },
+    //       fields: {
+    //         id: {},
+    //         role: {},
+    //         token: {},
+    //       },
+    //     },
+    //   ),
+    // );
 
     // and get the error
-    const error = data.errors ? data.errors[0].extensions : null;
+    const error: EndpointErrorType = data.error;
     // maybe it's offline, in which case we don't want to make the user
     // seem as logged out as that would break the flow
     const isOffline = error && error.code === ENDPOINT_ERRORS.CANT_CONNECT;
@@ -405,6 +424,7 @@ class ActualTokenProvider extends React.Component<IActualTokenProviderProps, IAc
         // we build the grapqhl query for it and run it raw
         const userLanguageData = await gqlQuery(
           buildGqlQuery(
+            null,
             {
               name: "GET_MOD_users__IDEF_user",
               args: {

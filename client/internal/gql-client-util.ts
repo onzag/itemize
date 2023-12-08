@@ -1002,7 +1002,8 @@ export async function runGetQueryFor(
     arg.version,
   );
 
-  const query = buildGqlQuery({
+  const rqSchema = arg.itemDefinition.getParentModule().getParentRoot().getRQSchema();
+  const query = buildGqlQuery(rqSchema, {
     name: queryName,
     args,
     fields: arg.fields,
@@ -1117,7 +1118,8 @@ export async function runDeleteQueryFor(
   args.listener_uuid = arg.listenerUUID;
 
   // build the mutation
-  const query = buildGqlMutation({
+  const rqSchema = arg.itemDefinition.getParentModule().getParentRoot().getRQSchema();
+  const query = buildGqlMutation(rqSchema, {
     name: queryName,
     args,
     fields: {
@@ -1187,7 +1189,8 @@ export function getAddQueryFor(
 
   args.container_id = arg.containerId;
 
-  const query = buildGqlMutation({
+  const rqSchema = arg.itemDefinition.getParentModule().getParentRoot().getRQSchema();
+  const query = buildGqlMutation(rqSchema, {
     name: queryName,
     args,
     // last modified is necessary for cache manipulation
@@ -1391,7 +1394,8 @@ export function getEditQueryFor(
   );
   args.listener_uuid = arg.listenerUUID;
 
-  const query = buildGqlMutation({
+  const rqSchema = arg.itemDefinition.getParentModule().getParentRoot().getRQSchema();
+  const query = buildGqlMutation(rqSchema, {
     name: queryName,
     args,
     // last modified is necessary for cache manipulation
@@ -1669,7 +1673,8 @@ export function getSearchQueryFor(
 
   const searchArgs = getSearchArgsFor(arg);
 
-  const query = buildGqlQuery({
+  const rqSchema = arg.itemDefinition.getParentModule().getParentRoot().getRQSchema();
+  const query = buildGqlQuery(rqSchema, {
     name: queryName,
     args: searchArgs,
     fields: arg.traditional ? {
@@ -2031,7 +2036,8 @@ export async function runSearchQueryFor(
       message: "There is no support for cache worker yet the search did not fallback to simple search",
     }
   } else if (!arg.traditional && !useCacheWorker) {
-    const query = buildGqlQuery({
+    const rqSchema = arg.itemDefinition.getParentModule().getParentRoot().getRQSchema();
+    const query = buildGqlQuery(rqSchema, {
       name: queryName,
       args: searchArgs,
       fields: {
@@ -2061,7 +2067,8 @@ export async function runSearchQueryFor(
       lastModified = data.last_modified as string;
     }
   } else if (!useCacheWorker) {
-    const query = buildGqlQuery({
+    const rqSchema = arg.itemDefinition.getParentModule().getParentRoot().getRQSchema();
+    const query = buildGqlQuery(rqSchema, {
       name: queryName,
       args: searchArgs,
       fields: {

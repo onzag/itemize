@@ -12,9 +12,9 @@
 import React, { useContext } from "react";
 import { TokenContext } from "../../internal/providers/token-provider";
 import { EndpointErrorType } from "../../../base/errors";
-import { gqlQuery, buildGqlQuery } from "../../../gql-querier";
 import { ItemContext, IItemContextType } from "../../providers/item";
 import equals from "deep-equal";
+import { ENDPOINT_ERRORS } from "../../../constants";
 
 /**
  * The user actioner arg information that allows
@@ -204,25 +204,44 @@ class ActualUserActioner extends React.Component<IActualUserActionerProps, IActu
       onProgress: true,
     });
 
-    // we build our graphql query
-    const data = await gqlQuery(
-      buildGqlQuery(
-        {
-          name: "send_validate",
-          args: {
-            // with the token
-            token: this.props.token,
-            type,
-          },
-          fields: {
-            status: {},
-          },
+    let data: any;
+    try {
+      data = await (await fetch("/rest/user/send-validate", {
+        method: "POST",
+        cache: "no-cache",
+        body: JSON.stringify({type}),
+        headers: {
+          token: this.props.token,
+          "Content-Type": "application/json",
         },
-      ),
-    );
+      })).json();
+    } catch (err) {
+      data = {
+        error: {
+          code: ENDPOINT_ERRORS.CANT_CONNECT,
+        }
+      }
+    }
+
+    // we build our graphql query
+    // const data = await gqlQuery(
+    //   buildGqlQuery(
+    //     {
+    //       name: "send_validate",
+    //       args: {
+    //         // with the token
+    //         token: this.props.token,
+    //         type,
+    //       },
+    //       fields: {
+    //         status: {},
+    //       },
+    //     },
+    //   ),
+    // );
 
     // and now we try to see if we have an error
-    const error = data.errors ? data.errors[0].extensions : null;
+    const error: EndpointErrorType = data.error;
 
     // if we have an error
     if (error) {
@@ -266,23 +285,41 @@ class ActualUserActioner extends React.Component<IActualUserActionerProps, IActu
     const propertyState = this.props.userContext.state.properties.find((p) => p.propertyId === type);
     const propertyValue = propertyState ? propertyState.value as string : null;
 
-    // execute the send reset password query
-    const data = await gqlQuery(
-      buildGqlQuery(
-        {
-          name: "send_reset_password",
-          args: {
-            [type]: propertyValue,
-          },
-          fields: {
-            status: {},
-          },
+    let data: any;
+    try {
+      data = await (await fetch("/rest/user/send-reset-password", {
+        method: "POST",
+        cache: "no-cache",
+        headers: {
+          "Content-Type": "application/json",
         },
-      ),
-    );
+        body: JSON.stringify({type, value: propertyValue}),
+      })).json();
+    } catch (err) {
+      data = {
+        error: {
+          code: ENDPOINT_ERRORS.CANT_CONNECT,
+        }
+      }
+    }
+
+    // execute the send reset password query
+    // const data = await gqlQuery(
+    //   buildGqlQuery(
+    //     {
+    //       name: "send_reset_password",
+    //       args: {
+    //         [type]: propertyValue,
+    //       },
+    //       fields: {
+    //         status: {},
+    //       },
+    //     },
+    //   ),
+    // );
 
     // let's get a possible error
-    const error = data.errors ? data.errors[0].extensions : null;
+    const error: EndpointErrorType = data.error;
 
     // if we have an error
     if (error) {
@@ -315,23 +352,40 @@ class ActualUserActioner extends React.Component<IActualUserActionerProps, IActu
       onProgress: true,
     });
 
-    // execute the send reset password query
-    const data = await gqlQuery(
-      buildGqlQuery(
-        {
-          name: "validate",
-          args: {
-            user_id: this.props.userContext.forId,
-            random_id: randomId,
-          },
-          fields: {
-            status: {},
-          },
+    let data: any;
+    try {
+      data = await (await fetch("/rest/user/validate", {
+        method: "POST",
+        cache: "no-cache",
+        headers: {
+          "Content-Type": "application/json",
         },
-      ),
-    );
+        body: JSON.stringify({type, value: randomId}),
+      })).json();
+    } catch (err) {
+      data = {
+        error: {
+          code: ENDPOINT_ERRORS.CANT_CONNECT,
+        }
+      }
+    }
 
-    const error = data.errors ? data.errors[0].extensions : null;
+    // execute the send reset password query
+    // const data = await gqlQuery(
+    //   buildGqlQuery(
+    //     {
+    //       name: "validate",
+    //       args: {
+    //         user_id: this.props.userContext.forId,
+    //         random_id: randomId,
+    //       },
+    //       fields: {
+    //         status: {},
+    //       },
+    //     },
+    //   ),
+    // );
+    const error: EndpointErrorType = data.error;
 
     if (error) {
       this.setState({
@@ -373,30 +427,49 @@ class ActualUserActioner extends React.Component<IActualUserActionerProps, IActu
     const passwordPropertyState = this.props.userContext.state.properties.find((p) => p.propertyId === "password");
     const passwordPropertyValue = passwordPropertyState ? passwordPropertyState.value as string : null;
 
-    const args = {
-      [type]: tokenOrRandomId,
-      new_password: passwordPropertyValue,
-    }
+    // const args = {
+    //   [type]: tokenOrRandomId,
+    //   new_password: passwordPropertyValue,
+    // }
 
-    if (method) {
-      args[method] = methodValue;
-    }
+    // if (method) {
+    //   args[method] = methodValue;
+    // }
 
-    // do the reset password call, also passing our token
-    const data = await gqlQuery(
-      buildGqlQuery(
-        {
-          name: "reset_password",
-          args,
-          fields: {
-            status: {},
-          },
+    let data: any;
+    try {
+      data = await (await fetch("/rest/user/reset-password", {
+        method: "POST",
+        cache: "no-cache",
+        headers: {
+          "Content-Type": "application/json",
         },
-      ),
-    );
+        body: JSON.stringify({[type]: tokenOrRandomId, [method]: methodValue, newpass: passwordPropertyValue}),
+      })).json();
+    } catch (err) {
+      data = {
+        error: {
+          code: ENDPOINT_ERRORS.CANT_CONNECT,
+        }
+      }
+    }
+
+
+    // // do the reset password call, also passing our token
+    // const data = await gqlQuery(
+    //   buildGqlQuery(
+    //     {
+    //       name: "reset_password",
+    //       args,
+    //       fields: {
+    //         status: {},
+    //       },
+    //     },
+    //   ),
+    // );
 
     // same as before we handle the error this way
-    const error = data.errors ? data.errors[0].extensions : null;
+    const error: EndpointErrorType = data.error;
 
     if (error) {
       this.setState({

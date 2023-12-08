@@ -19,7 +19,7 @@ import {
 import { IGQLFieldsDefinitionType } from "./base/Root/gql";
 import { IElasticIndexDefinitionType, ISQLTableDefinitionType } from "./base/Root/sql";
 import path from "path";
-import type { RQArg } from "./base/Root/rq";
+import type { RQArg, RQField } from "./base/Root/rq";
 
 export interface IItemizeConstantsConfig {
   /**
@@ -1255,9 +1255,9 @@ export const SEARCH_RECORD_INPUT_GQL = GraphQLInputObjectType && new GraphQLInpu
   fields: SEARCH_RECORD_FIELDS,
 });
 
-export const SEARCH_RECORD_RQ: RQArg = {
+export const SEARCH_RECORD_RQ: RQField = {
   type: "object",
-  properties: {
+  stdFields: {
     id: {
       type: "string",
       required: true,
@@ -1275,6 +1275,11 @@ export const SEARCH_RECORD_RQ: RQArg = {
       required: true,
     },
   }
+};
+
+export const SEARCH_RECORD_RQ_ARG: RQArg = {
+  type: "object",
+  properties: SEARCH_RECORD_RQ.stdFields,
 };
 
 /**
@@ -1315,9 +1320,9 @@ export const SEARCH_RECORDS_CONTAINER_GQL = GraphQLObjectType && new GraphQLObje
  * The id container contains the way that search results are returned
  * with the records and the last record of the given records
  */
-export const SEARCH_RECORDS_CONTAINER_RQ: RQArg = {
+export const SEARCH_RECORDS_CONTAINER_RQ: RQField = {
   type: "object",
-  properties: {
+  stdFields: {
     records: {
       array: true,
       required: true,
@@ -1842,7 +1847,7 @@ export const RESERVED_GETTER_LIST_PROPERTIES_RQ: {[id: string]: RQArg} = {
   records: {
     required: true,
     array: true,
-    ...SEARCH_RECORD_RQ,
+    ...SEARCH_RECORD_RQ_ARG,
     description: "the records to fetch for that item",
   },
   search: {

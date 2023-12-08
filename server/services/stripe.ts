@@ -1,8 +1,8 @@
 import { IAppDataType } from "../../server";
 import PaymentProvider from "./base/PaymentProvider";
 import Stripe from "stripe";
-import bodyParser from "body-parser";
 import { PaymentStatusType } from "../../base/Root/Module/ItemDefinition/PropertyDefinition/types/payment";
+import express from "express";
 
 const zeroDecimalCurrencies = [
   "BIF",
@@ -71,7 +71,7 @@ export class StripeService extends PaymentProvider<IStripeConfig> {
 
     router.post(
       "/webhook",
-      bodyParser.raw({
+      express.raw({
         type: "application/json",
       }),
       (req, res) => {

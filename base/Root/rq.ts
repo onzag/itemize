@@ -43,15 +43,6 @@ export interface RQField extends RQBase {
   stdFields?: {
     [id: string]: RQField;
   };
-  /**
-   * Signals the precense of a DATA layer that contains both
-   * std fields and own fields
-   * 
-   * if not present then it's null
-   */
-  extFields?: {
-    [id: string]: RQField;
-  };
   ownFields?: {
     [id: string]: RQField;
   };
@@ -63,15 +54,6 @@ export interface RQQuery {
     [id: string]: RQArg;
   };
   stdFields: {
-    [id: string]: RQField;
-  };
-  /**
-   * Signals the precense of a DATA layer that contains both
-   * std fields and own fields
-   * 
-   * if not present then it's null
-   */
-  extFields?: {
     [id: string]: RQField;
   };
   ownFields: {
@@ -162,10 +144,6 @@ export function rqFieldsToRqArgs(field: RQField): RQArg {
     Object.assign(copy.properties, (copy as RQField).stdFields);
     delete (copy as RQField).stdFields;
   }
-  if ((copy as RQField).extFields) {
-    Object.assign(copy.properties, (copy as RQField).extFields);
-    delete (copy as RQField).extFields;
-  }
   if ((copy as RQField).ownFields) {
     Object.assign(copy.properties, (copy as RQField).ownFields);
     delete (copy as RQField).ownFields;
@@ -174,5 +152,20 @@ export function rqFieldsToRqArgs(field: RQField): RQArg {
   Object.keys(copy.properties).forEach((p) => {
     copy.properties[p] = rqFieldsToRqArgs(copy.properties[p]);
   });
+  return copy;
+}
+
+export function rqArgsToRqFieldsStdOnly(arg: RQArg): RQField {
+  if (arg.type !== "object") {
+    return arg;
+  }
+
+  const copy: RQField = {stdFields: arg.properties, ...arg};
+  delete (copy as any).properties;
+
+  Object.keys(copy.stdFields).forEach((p) => {
+    copy.stdFields[p] = rqArgsToRqFieldsStdOnly(copy.stdFields[p]);
+  });
+
   return copy;
 }

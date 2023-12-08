@@ -43,15 +43,20 @@ export function getRQDefinitionForItemDefinition(
   },
 ): RQField {
   const stdFields: { [id: string]: RQField } = {};
-  const extFields: { [id: string]: RQField } = {};
-  const ownFields: { [id: string]: RQField } = {};
 
   if (!options.excludeBase) {
     Object.keys(RESERVED_BASE_PROPERTIES_RQ).forEach((property) => {
       if (EXTERNALLY_ACCESSIBLE_RESERVED_BASE_PROPERTIES.includes(property)) {
-        extFields[property] = RESERVED_BASE_PROPERTIES_RQ[property];
-      } else {
         stdFields[property] = RESERVED_BASE_PROPERTIES_RQ[property];
+      } else {
+        if (!stdFields.DATA) {
+          stdFields.DATA = {
+            type: "object",
+            stdFields: {},
+            ownFields: {},
+          }
+        }
+        stdFields.DATA.stdFields[property] = RESERVED_BASE_PROPERTIES_RQ[property];
       }
     });
   }
@@ -66,8 +71,16 @@ export function getRQDefinitionForItemDefinition(
       return;
     }
 
+    if (!stdFields.DATA) {
+      stdFields.DATA = {
+        type: "object",
+        stdFields: {},
+        ownFields: {},
+      }
+    }
+
     // and basically get the fields for that property
-    Object.assign(ownFields, getRQDefinitionForProperty(propDef, {
+    Object.assign(stdFields.DATA.ownFields, getRQDefinitionForProperty(propDef, {
       optionalForm: options.optionalForm,
       prefix: "",
     }));
@@ -80,7 +93,14 @@ export function getRQDefinitionForItemDefinition(
         optionalForm: options.optionalForm,
       });
       if (includeFields) {
-        Object.assign(ownFields, includeFields);
+        if (!stdFields.DATA) {
+          stdFields.DATA = {
+            type: "object",
+            stdFields: {},
+            ownFields: {},
+          }
+        }
+        Object.assign(stdFields.DATA.ownFields, includeFields);
       }
     });
   }
@@ -94,12 +114,6 @@ export function getRQDefinitionForItemDefinition(
       if (policyField.stdFields) {
         Object.assign(stdFields, policyField.stdFields);
       }
-      if (policyField.extFields) {
-        Object.assign(extFields, policyField.extFields);
-      }
-      if (policyField.ownFields) {
-        Object.assign(ownFields, policyField.ownFields);
-      }
     });
   } else if (options.includePolicy) {
     const policyField: RQField = getRQDefinitionForItemDefinitionPolicies(itemDefinition, {
@@ -109,20 +123,12 @@ export function getRQDefinitionForItemDefinition(
     if (policyField.stdFields) {
       Object.assign(stdFields, policyField.stdFields);
     }
-    if (policyField.extFields) {
-      Object.assign(extFields, policyField.extFields);
-    }
-    if (policyField.ownFields) {
-      Object.assign(ownFields, policyField.ownFields);
-    }
   }
 
   // return that
   return {
     type: "object",
-    ownFields,
     stdFields,
-    extFields,
   };
 }
 
@@ -229,7 +235,6 @@ export function getRQSchemaForItemDefinition(
       },
       ownFields: rqFiledIdef.ownFields,
       stdFields: rqFiledIdef.stdFields,
-      extFields: rqFiledIdef.extFields,
     },
     // The edition uses the standard getter properties to fetch
     // an item definition instance given its id, version and then
@@ -242,7 +247,6 @@ export function getRQSchemaForItemDefinition(
       },
       ownFields: rqFiledIdef.ownFields,
       stdFields: rqFiledIdef.stdFields,
-      extFields: rqFiledIdef.extFields,
     },
     // The delete uses the standard getter properties to fetch
     // the item definition instance, and basically deletes it
@@ -255,7 +259,6 @@ export function getRQSchemaForItemDefinition(
       },
       ownFields: rqFiledIdef.ownFields,
       stdFields: rqFiledIdef.stdFields,
-      extFields: rqFiledIdef.extFields,
     },
   };
   // the query fields for the query
@@ -268,7 +271,6 @@ export function getRQSchemaForItemDefinition(
       },
       ownFields: rqFiledIdef.ownFields,
       stdFields: rqFiledIdef.stdFields,
-      extFields: rqFiledIdef.extFields,
     },
   };
 
@@ -308,7 +310,6 @@ export function getRQSchemaForItemDefinition(
       onlyTextFilters: false,
       includePolicy: null,
     });
-    delete rqFiledIdef2.extFields;
     delete rqFiledIdef2.stdFields;
     const rqFiledModule2AsArg = rqFieldsToRqArgs(rqFiledIdef2);
 
@@ -326,12 +327,12 @@ export function getRQSchemaForItemDefinition(
     };
 
     query[PREFIX_SEARCH + idef.getQualifiedPathName()] = {
-      stdFields: SEARCH_RECORDS_CONTAINER_RQ.properties,
+      stdFields: SEARCH_RECORDS_CONTAINER_RQ.stdFields,
       ownFields: {},
       args: searchArgs,
     };
 
-    const traditionalStdFields = { ...SEARCH_RECORDS_CONTAINER_RQ.properties };
+    const traditionalStdFields = { ...SEARCH_RECORDS_CONTAINER_RQ.stdFields };
     delete traditionalStdFields.records;
     delete traditionalStdFields.earliest_created_at;
     delete traditionalStdFields.oldest_created_at;

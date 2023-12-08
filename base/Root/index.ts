@@ -15,6 +15,7 @@ import Module, { IModuleRawJSONDataType } from "./Module";
 import ItemDefinition from "./Module/ItemDefinition";
 import type { IGQLRequestFields } from "../../gql-querier";
 import type { PropertyDefinitionSupportedType } from "./Module/ItemDefinition/PropertyDefinition/types";
+import { RQRootSchema, getRQSchemaForRoot } from "./rq";
 
 /**
  * The standard i18n information for usage
@@ -251,6 +252,11 @@ export default class Root {
    * @internal
    */
   private serverFlags: string[] = null;
+
+  /**
+   * Root rq schema
+   */
+  private rqSchema: RQRootSchema;
 
   /**
    * Builds a root from raw data
@@ -555,5 +561,14 @@ export default class Root {
    */
   public getServerFlags(): string[] {
     return this.serverFlags;
+  }
+
+  public getRQSchema(): RQRootSchema {
+    if (this.rqSchema) {
+      return this.rqSchema;
+    }
+
+    this.rqSchema = getRQSchemaForRoot(this, null);
+    return this.rqSchema;
   }
 }

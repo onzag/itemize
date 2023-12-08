@@ -46,15 +46,20 @@ export function getRQDefinitionForModule(
   },
 ): RQField {
   const stdFields: { [id: string]: RQField } = {};
-  const extFields: { [id: string]: RQField } = {};
-  const ownFields: { [id: string]: RQField } = {};
 
   if (!options.excludeBase) {
     Object.keys(RESERVED_BASE_PROPERTIES_RQ).forEach((property) => {
       if (EXTERNALLY_ACCESSIBLE_RESERVED_BASE_PROPERTIES.includes(property)) {
-        extFields[property] = RESERVED_BASE_PROPERTIES_RQ[property];
-      } else {
         stdFields[property] = RESERVED_BASE_PROPERTIES_RQ[property];
+      } else {
+        if (!stdFields.DATA) {
+          stdFields.DATA = {
+            type: "object",
+            stdFields: {},
+            ownFields: {},
+          }
+        }
+        stdFields.DATA.stdFields[property] = RESERVED_BASE_PROPERTIES_RQ[property];
       }
     });
   }
@@ -69,8 +74,16 @@ export function getRQDefinitionForModule(
       return;
     }
 
+    if (!stdFields.DATA) {
+      stdFields.DATA = {
+        type: "object",
+        stdFields: {},
+        ownFields: {},
+      }
+    }
+
     // and basically get the fields for that property
-    Object.assign(ownFields, getRQDefinitionForProperty(propExtension, {
+    Object.assign(stdFields.DATA.ownFields, getRQDefinitionForProperty(propExtension, {
       optionalForm: options.optionalForm,
       prefix: "",
     }));
@@ -79,9 +92,7 @@ export function getRQDefinitionForModule(
   // return that
   return {
     type: "object",
-    ownFields,
     stdFields,
-    extFields,
   };
 }
 
@@ -141,7 +152,6 @@ export function getRQSchemaForModule(
       optionalForm: true,
       onlyTextFilters: false,
     });
-    delete rqFiledModule2.extFields;
     delete rqFiledModule2.stdFields;
     const rqFiledModule2AsArg = rqFieldsToRqArgs(rqFiledModule2);
 
@@ -159,12 +169,12 @@ export function getRQSchemaForModule(
     };
 
     query[PREFIX_SEARCH + mod.getQualifiedPathName()] = {
-      stdFields: SEARCH_RECORDS_CONTAINER_RQ.properties,
+      stdFields: SEARCH_RECORDS_CONTAINER_RQ.stdFields,
       ownFields: {},
       args: searchArgs,
     };
 
-    const traditionalStdFields = { ...SEARCH_RECORDS_CONTAINER_RQ.properties };
+    const traditionalStdFields = { ...SEARCH_RECORDS_CONTAINER_RQ.stdFields };
     delete traditionalStdFields.records;
     delete traditionalStdFields.earliest_created_at;
     delete traditionalStdFields.oldest_created_at;

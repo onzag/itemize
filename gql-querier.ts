@@ -13,6 +13,7 @@ import { ENDPOINT_ERRORS, EXTERNALLY_ACCESSIBLE_RESERVED_BASE_PROPERTIES, MAX_FI
 import equals from "deep-equal";
 import { requestFieldsAreContained } from "./gql-util";
 import type { ReadStream } from "fs";
+import type { RQField, RQQuery, RQRootSchema } from "./base/Root/rq";
 
 /**
  * Search results as they are provided
@@ -213,6 +214,11 @@ export class GQLQuery {
   public reply: IGQLEndpointValue = null;
 
   /**
+   * The rq schema used
+   */
+  private rqSchema: RQRootSchema;
+
+  /**
    * Build a graphql query
    * @param type query or mutation
    * @param queries the queries that we want to execute
@@ -220,9 +226,11 @@ export class GQLQuery {
   constructor(
     type: "query" | "mutation",
     queries: IGQLQueryObj[],
+    rqSchema: RQRootSchema,
   ) {
     this.type = type;
     this.foundUnprocessedArgFiles = [];
+    this.rqSchema = rqSchema;
 
     this.findFilesAndProcessArgs = this.findFilesAndProcessArgs.bind(this);
     this.isNameMergableWith = this.isNameMergableWith.bind(this);
@@ -447,7 +455,7 @@ export class GQLQuery {
   }
 
   public getRQOperations() {
-    return buildRQThing(...this.processedQueries);
+    return buildRQThing(this.rqSchema, ...this.processedQueries);
   }
 
   public getType() {
@@ -641,6 +649,7 @@ type RqFieldList = Array<string | RqFieldList>;
 
 // TODO add the schema info to be able to compress this
 function buildRQFields(
+  schema: RQQuery | RQField,
   fields: IRQRequestFields,
   keyd?: string,
 ) {
@@ -651,14 +660,22 @@ function buildRQFields(
   }
 
   Object.keys(fields).forEach((fKey) => {
-    // we are in the external
-    if (fKey === "DATA") {
-      rs.push(buildRQFields(fields[fKey], fKey));
-    }
-
+    // this is the internal
     const subFields = Object.keys(fields[fKey]);
     if (subFields.length === 0) {
       rs.push(fKey);
+    } else {
+      const subSchema = schema ?
+        (
+          schema.ownFields[fKey] ||
+          schema.stdFields[fKey]
+        ) : null;
+
+      if (schema && !subSchema) {
+        console.warn("Could not find RQ fields definition for field " + fKey);
+      }
+
+      rs.push(buildRQFields(subSchema, fields[fKey], fKey))
     }
   });
 
@@ -836,14 +853,20 @@ function buildGqlThing(type: "mutation" | "query", mainArgs: IGQLArgs, ...querie
   return queryStr;
 }
 
-function buildRQThing(...queries: IGQLQueryObj[]) {
+function buildRQThing(rqSchema: RQRootSchema, ...queries: IGQLQueryObj[]) {
   const qs: any = {};
   queries.forEach((query) => {
+    const targetInQuestion = rqSchema ? (rqSchema.mutation[query.name] || rqSchema.query[query.name]) : null;
+
+    if (rqSchema && !targetInQuestion) {
+      console.warn("Could not find a matching query in the schema for " + query.name);
+    }
+
     const qObj: any = {
       n: query.name,
     };
     if (query.fields) {
-      qObj.f = buildRQFields(query.fields);
+      qObj.f = buildRQFields(targetInQuestion, query.fields);
     }
     if (query.args) {
       qObj.args = buildRQArgs(query.args);
@@ -858,8 +881,8 @@ function buildRQThing(...queries: IGQLQueryObj[]) {
  * @param queries the queries to run
  * @returns a grapqhl query class instance
  */
-export function buildGqlQuery(...queries: IGQLQueryObj[]) {
-  return new GQLQuery("query", queries);
+export function buildGqlQuery(rqSchema: RQRootSchema, ...queries: IGQLQueryObj[]) {
+  return new GQLQuery("query", queries, rqSchema);
 }
 
 /**
@@ -867,8 +890,8 @@ export function buildGqlQuery(...queries: IGQLQueryObj[]) {
  * @param mutations the mutations to run
  * @returns a grapqhl query class instance
  */
-export function buildGqlMutation(...mutations: IGQLQueryObj[]) {
-  return new GQLQuery("mutation", mutations);
+export function buildGqlMutation(rqSchema: RQRootSchema, ...mutations: IGQLQueryObj[]) {
+  return new GQLQuery("mutation", mutations, rqSchema);
 }
 
 function wait(ms: number): Promise<void> {
@@ -1045,12 +1068,12 @@ export async function gqlQuery(query: GQLQuery, options?: {
   // everything graphql must be gone
 
   // if (true) {
-    // append this stuff to the form data
-    formData.append("operations", JSON.stringify(query.getOperations()));
-    formData.append("map", JSON.stringify(query.getMap()));
+  // append this stuff to the form data
+  formData.append("operations", JSON.stringify(query.getOperations()));
+  formData.append("map", JSON.stringify(query.getMap()));
   // } else {
   //   formData.append(this.getType(), JSON.stringify(query.getOperations()));
-    //console.log(query.getRQOperations());
+  console.log(query.getRQOperations());
   // }
 
   // now let's get all the attachents and append them to the form data

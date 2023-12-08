@@ -11,7 +11,6 @@ import Module from "../base/Root/Module";
 import { serverSideIndexChecker } from "../base/Root/Module/ItemDefinition/PropertyDefinition/server-checkers";
 import PropertyDefinition from "../base/Root/Module/ItemDefinition/PropertyDefinition";
 import ItemDefinition from "../base/Root/Module/ItemDefinition";
-import bodyParser from "body-parser";
 import { PROTECTED_RESOURCES, ENDPOINT_ERRORS, PING_DATA_IDENTIFIER, PING_STATUS_IDENTIFIER, JWT_KEY, REPROCESSED_RESOURCES } from "../constants";
 import { getMode } from "./mode";
 import { ENVIRONMENT_DETAILS, TRUST_ALL_INBOUND_CONNECTIONS } from "./environment";
@@ -66,7 +65,7 @@ export default function restServices(appData: IAppDataType) {
   // and the body parser of json type, non strict
   // to allow for simple single json values such as null, false,
   // etc...
-  const bodyParserJSON = bodyParser.json({
+  const bodyParserJSON = express.json({
     strict: false,
   });
 

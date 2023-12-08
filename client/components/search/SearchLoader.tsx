@@ -824,8 +824,9 @@ class ActualSearchLoader extends React.Component<IActualSearchLoaderProps, IActu
         }
       }
 
+      const rqSchema = this.props.itemDefinitionInstance.getParentModule().getParentRoot().getRQSchema();
       // and now we make a grapqhl query for this
-      const listQuery = buildGqlQuery({
+      const listQuery = buildGqlQuery(rqSchema, {
         name: getListQueryName,
         args,
         fields: {

@@ -1995,7 +1995,7 @@ export default class CacheWorker {
 
         // we request the server for this, in this case
         // it might not have been able to connect
-        const query = buildGqlQuery({
+        const query = buildGqlQuery(this.root.getRQSchema(), {
           name: searchQueryName,
           args: actualArgsToUseInGQLSearch,
           fields: {
@@ -2044,7 +2044,7 @@ export default class CacheWorker {
         while (resultsCount > resultsToProcess.length) {
           // now let's try to get these batches
           actualArgsToUseInGQLSearch.until = oldestCreatedAt;
-          const query = buildGqlQuery({
+          const query = buildGqlQuery(this.root.getRQSchema(), {
             name: searchQueryName,
             args: actualArgsToUseInGQLSearch,
             fields: {
@@ -2327,7 +2327,7 @@ export default class CacheWorker {
           args.created_by = searchArgs.created_by;
         }
         // we build the query, using the get list functionality
-        const listQuery = buildGqlQuery({
+        const listQuery = buildGqlQuery(this.root.getRQSchema(), {
           name: getListQueryName,
           args,
           fields: {
