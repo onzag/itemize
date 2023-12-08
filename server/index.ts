@@ -16,7 +16,6 @@ import PropertyDefinition from "../base/Root/Module/ItemDefinition/PropertyDefin
 import { serverSideIndexChecker } from "../base/Root/Module/ItemDefinition/PropertyDefinition/server-checkers";
 import { Listener } from "./listener";
 import { Cache } from "./cache";
-import { ICustomTokensType } from "./custom-graphql";
 import { IConfigRawJSONDataType, ISensitiveConfigRawJSONDataType, IDBConfigRawJSONDataType, IRedisConfigRawJSONDataType } from "../config";
 import { ITriggerRegistry, mergeTriggerRegistries } from "./resolvers/triggers";
 import { customUserTriggers } from "./user/triggers";
@@ -194,7 +193,6 @@ export interface IAppDataType {
   buildnumber: string;
   triggers: ITriggerRegistry;
   storage: IStorageProvidersObject;
-  customUserTokenQuery: any;
   logger: ILoggerType;
   mailService: MailProvider<any>;
   phoneService: PhoneProvider<any>;
@@ -212,6 +210,7 @@ export interface IAppDataType {
   rawDB: ItemizeRawDB;
   elastic: ItemizeElasticClient;
   domain: string;
+  userTokenQuery: (arg: {token?: string, username?: string, password?: string, country?: string}) => Promise<{id: string; token: string; role: string}>;
 }
 
 export interface IServerDataType {
@@ -269,9 +268,6 @@ interface ICustomSearchEngineIndexingType {
 }
 
 export interface IServerCustomizationDataType {
-  customGQLQueries?: (appData: IAppDataType) => IGQLQueryFieldsDefinitionType;
-  customTokenGQLQueries?: ICustomTokensType;
-  customGQLMutations?: (appData: IAppDataType) => IGQLQueryFieldsDefinitionType;
   customRouterEndpoint?: string;
   customRouter?: (appData: IAppDataType) => express.Router;
   customTriggers?: ITriggerRegistry;
@@ -1218,7 +1214,7 @@ export async function initializeServer(
       express,
       domain,
       // assigned later during rest setup
-      customUserTokenQuery: null,
+      userTokenQuery: null,
     };
 
     // inform the cache about this app data

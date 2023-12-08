@@ -1,6 +1,6 @@
 import { IAppDataType } from "..";
 import { logger } from "../logger";
-import { Router } from "express";
+import express, { Router } from "express";
 import { ENDPOINT_ERRORS, CONNECTOR_SQL_COLUMN_ID_FK_NAME, SECONDARY_JWT_KEY, JWT_KEY, CONNECTOR_SQL_COLUMN_VERSION_FK_NAME } from "../../constants";
 import { jwtVerify, jwtSign } from "../token";
 import { ISQLTableRowValue } from "../../base/Root/sql";
@@ -8,6 +8,7 @@ import bcyrpt from "bcrypt";
 import { IServerSideTokenDataType } from "../resolvers/basic";
 import { capitalize, checkIsPossiblePhoneNumber, convertPhoneNumberToInternational } from "../../util";
 import { NODE_ENV } from "../environment";
+import { EndpointError } from "../../base/errors";
 
 const chars = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ";
 function generateRandomId(size: number) {
@@ -74,45 +75,51 @@ export function userRestServices(appData: IAppDataType) {
   const phonePropertyDescription = phoneProperty && phoneProperty.getPropertyDefinitionDescription();
   const pValidatedPropertyDescription = pValidatedProperty && pValidatedProperty.getPropertyDefinitionDescription();
 
-  const router = Router();
-  router.post("/token", async (req, res) => {
-    res.setHeader("content-type", "application/json; charset=utf-8");
+  async function tokenQuery(res: express.Response, arg: { username: string; token: string; password: string; country: string }) {
+    if (res) {
+      res.setHeader("content-type", "application/json; charset=utf-8");
+    }
 
     try {
-      const username = req.body.username;
-      const token = req.headers.token as string;
-      const password = req.body.password;
-      const country = req.body.country;
-
       // if there is no username and there is no token
       // the credentials are automatically invalid
-      if (!username && !token) {
-        res.status(403).end(JSON.stringify({
-          error: {
-            message: "Invalid Credentials",
-            code: ENDPOINT_ERRORS.INVALID_CREDENTIALS,
-          },
-        }))
-        return;
+      if (!arg.username && !arg.token) {
+        const error = {
+          message: "Invalid Credentials",
+          code: ENDPOINT_ERRORS.INVALID_CREDENTIALS,
+        };
+        if (!res) {
+          throw new EndpointError(error);
+        } else {
+          res.status(403).end(JSON.stringify({
+            error,
+          }));
+          return;
+        }
       }
 
       let preGeneratedToken: string = null;
       let resultUser: ISQLTableRowValue = null;
 
       // if we have a token provided
-      if (token) {
+      if (arg.token) {
         let decoded: IServerSideTokenDataType = null;
         try {
           // we attempt to decode it
-          decoded = await jwtVerify<IServerSideTokenDataType>(token, await appData.registry.getJWTSecretFor(JWT_KEY));
+          decoded = await jwtVerify<IServerSideTokenDataType>(arg.token, await appData.registry.getJWTSecretFor(JWT_KEY));
         } catch (err) {
-          res.status(403).end(JSON.stringify({
-            error: {
-              message: "Token is invalid",
-              code: ENDPOINT_ERRORS.INVALID_CREDENTIALS,
-            },
-          }))
-          return;
+          const error = {
+            message: "Token is invalid",
+            code: ENDPOINT_ERRORS.INVALID_CREDENTIALS,
+          };
+          if (!res) {
+            throw new EndpointError(error);
+          } else {
+            res.status(403).end(JSON.stringify({
+              error,
+            }))
+            return;
+          }
         }
 
         // only real user tokens can be used here for these
@@ -123,17 +130,22 @@ export function userRestServices(appData: IAppDataType) {
           typeof decoded.role !== "string" ||
           typeof decoded.sessionId !== "number"
         ) {
-          res.status(400).end(JSON.stringify({
-            error: {
-              message: "Token is invalid due to wrong shape",
-              code: ENDPOINT_ERRORS.INVALID_CREDENTIALS,
-            },
-          }))
-          return;
+          const error = {
+            message: "Token is invalid due to wrong shape",
+            code: ENDPOINT_ERRORS.INVALID_CREDENTIALS,
+          };
+          if (!res) {
+            throw new EndpointError(error);
+          } else {
+            res.status(400).end(JSON.stringify({
+              error,
+            }))
+            return;
+          }
         }
 
         // and set the token as the pre generated token so we reuse it
-        preGeneratedToken = token;
+        preGeneratedToken = arg.token;
         try {
           resultUser = await appData.cache.requestValue(
             userIdef,
@@ -153,38 +165,66 @@ export function userRestServices(appData: IAppDataType) {
               },
             },
           );
-          throw err;
+
+          const error = {
+            message: "Internal Server Error",
+            code: ENDPOINT_ERRORS.INTERNAL_SERVER_ERROR,
+          };
+
+          if (!res) {
+            throw new EndpointError(error);
+          } else {
+            res.status(500).end(JSON.stringify({
+              error,
+            }));
+            return;
+          }
         }
 
         // now we check the session id to see if it has been cancelled
         if (!resultUser || (resultUser.session_id || 0) !== decoded.sessionId) {
-          res.status(403).end(JSON.stringify({
-            error: {
-              message: "Session has been cancelled",
-              code: ENDPOINT_ERRORS.INVALID_CREDENTIALS,
-            },
-          }));
-          return;
+          const error = {
+            message: "Session has been cancelled",
+            code: ENDPOINT_ERRORS.INVALID_CREDENTIALS,
+          };
+          if (!res) {
+            throw new EndpointError(error);
+          } else {
+            res.status(403).end(JSON.stringify({
+              error,
+            }));
+            return;
+          }
         } else if (resultUser.role !== decoded.role) {
-          res.status(403).end(JSON.stringify({
-            error: {
-              message: "Token role mismatch",
-              code: ENDPOINT_ERRORS.INVALID_CREDENTIALS,
-            },
-          }));
-          return;
+          const error = {
+            message: "Token role mismatch",
+            code: ENDPOINT_ERRORS.INVALID_CREDENTIALS,
+          };
+          if (!res) {
+            throw new EndpointError(error);
+          } else {
+            res.status(403).end(JSON.stringify({
+              error,
+            }));
+            return;
+          }
         }
 
       } else {
+        if (!arg.country) {
+          const error = {
+            message: "You must specify a country when loggin in via credentials, this is used to ensure proper phone numbers",
+            code: ENDPOINT_ERRORS.UNSPECIFIED,
+          };
 
-        if (!country) {
-          res.status(400).end(JSON.stringify({
-            error: {
-              message: "You must specify a country when loggin in via credentials, this is used to ensure proper phone numbers",
-              code: ENDPOINT_ERRORS.UNSPECIFIED,
-            },
-          }));
-          return;
+          if (!res) {
+            throw new EndpointError(error);
+          } else {
+            res.status(400).end(JSON.stringify({
+              error,
+            }));
+            return;
+          }
         }
 
         // now we prepare the query we use to get the
@@ -209,7 +249,7 @@ export function userRestServices(appData: IAppDataType) {
                 serverData: appData.cache.getServerData(),
                 itemDefinition: userIdef,
                 include: null,
-                value: username as string,
+                value: arg.username as string,
                 property: usernameProperty,
                 whereBuilder: internalOrQueryBuilder,
                 appData,
@@ -234,7 +274,7 @@ export function userRestServices(appData: IAppDataType) {
                     serverData: appData.cache.getServerData(),
                     itemDefinition: userIdef,
                     include: null,
-                    value: username as string,
+                    value: arg.username as string,
                     property: usernameProperty,
                     whereBuilder: internalUsernameWhereBuilder,
                     appData,
@@ -258,10 +298,10 @@ export function userRestServices(appData: IAppDataType) {
           }
 
           // cannot search by phone if these properties are missing
-          if (phoneProperty && pValidatedProperty && checkIsPossiblePhoneNumber(username as string)) {
+          if (phoneProperty && pValidatedProperty && checkIsPossiblePhoneNumber(arg.username as string)) {
             const phoneNumberIntValue = convertPhoneNumberToInternational(
-              username as string,
-              country,
+              arg.username as string,
+              arg.country,
             );
 
             subqueryBuilder.orWhere(
@@ -306,78 +346,93 @@ export function userRestServices(appData: IAppDataType) {
             serverData: appData.cache.getServerData(),
             itemDefinition: userIdef,
             include: null,
-            value: password as string,
+            value: arg.password as string,
             property: passwordProperty,
             whereBuilder: internalPasswordWhereBuilder,
             appData,
           })
         });
 
-        // Security slowdown
-        // should prevent brute force logins even if they are using different IPs
-        // yes it has the potential to affect the user, making its login slow too
-        try {
-          // get the last login data if any
-          const lastLoginAttemptData = await appData.redisGlobal.get(
-            "USER_LAST_LOGIN_ATTEMPT." + username,
-          );
-          const lastLoginAttemptDataParsed: [string, number] = (lastLoginAttemptData && JSON.parse(lastLoginAttemptData)) || [null, 0];
+        if (res) {
+          // Security slowdown
+          // should prevent brute force logins even if they are using different IPs
+          // yes it has the potential to affect the user, making its login slow too
+          try {
+            // get the last login data if any
+            const lastLoginAttemptData = await appData.redisGlobal.get(
+              "USER_LAST_LOGIN_ATTEMPT." + arg.username,
+            );
+            const lastLoginAttemptDataParsed: [string, number] = (lastLoginAttemptData && JSON.parse(lastLoginAttemptData)) || [null, 0];
 
-          // save the current last login attempt for the user
-          const currentDate = new Date();
-          await appData.redisGlobal.set(
-            "USER_LAST_LOGIN_ATTEMPT." + username,
-            JSON.stringify([currentDate.toISOString(), lastLoginAttemptDataParsed[1] + 1]),
-          );
-          // make it expire 10 seconds
-          await appData.redisGlobal.expire(
-            "USER_LAST_LOGIN_ATTEMPT." + username,
-            10,
-          );
+            // save the current last login attempt for the user
+            const currentDate = new Date();
+            await appData.redisGlobal.set(
+              "USER_LAST_LOGIN_ATTEMPT." + arg.username,
+              JSON.stringify([currentDate.toISOString(), lastLoginAttemptDataParsed[1] + 1]),
+            );
+            // make it expire 10 seconds
+            await appData.redisGlobal.expire(
+              "USER_LAST_LOGIN_ATTEMPT." + arg.username,
+              10,
+            );
 
-          // we have a date that we last tried
-          if (lastLoginAttemptDataParsed[0]) {
-            // lets parse it
-            const lastLoginAttemptTime = (new Date(lastLoginAttemptDataParsed[0])).getTime();
-            // current time
-            const currentTime = currentDate.getTime();
+            // we have a date that we last tried
+            if (lastLoginAttemptDataParsed[0]) {
+              // lets parse it
+              const lastLoginAttemptTime = (new Date(lastLoginAttemptDataParsed[0])).getTime();
+              // current time
+              const currentTime = currentDate.getTime();
 
-            // the amount of time it ellapsed
-            const diff = currentTime - lastLoginAttemptTime;
-            // so we add 100ms to the number of attempts within 10 seconds, that's the smallest
-            // time we are allowed to try to login again
-            let minAllowedDiff = 100 * lastLoginAttemptDataParsed[1];
-            // make it 10 seconds tops
-            if (minAllowedDiff > 10000) {
-              minAllowedDiff = 10000;
-            }
+              // the amount of time it ellapsed
+              const diff = currentTime - lastLoginAttemptTime;
+              // so we add 100ms to the number of attempts within 10 seconds, that's the smallest
+              // time we are allowed to try to login again
+              let minAllowedDiff = 100 * lastLoginAttemptDataParsed[1];
+              // make it 10 seconds tops
+              if (minAllowedDiff > 10000) {
+                minAllowedDiff = 10000;
+              }
 
-            // so if we tried to login again in less than the allowed minimum time
-            if (diff < minAllowedDiff) {
-              // the amount of time necessary to make up for those milliseconds
-              const msDiff = minAllowedDiff - diff;
+              // so if we tried to login again in less than the allowed minimum time
+              if (diff < minAllowedDiff) {
+                // the amount of time necessary to make up for those milliseconds
+                const msDiff = minAllowedDiff - diff;
 
-              // only relevant if more than 100ms
-              if (msDiff >= 100) {
-                // make it slow
-                await wait(msDiff);
+                // only relevant if more than 100ms
+                if (msDiff >= 100) {
+                  // make it slow
+                  await wait(msDiff);
+                }
               }
             }
-          }
-        } catch (err) {
-          logger.error(
-            {
-              functionName: "userRestServices",
-              endpoint: "token",
-              message: "Failed to perform the security slowdown for preventing brute force login attempts",
-              serious: true,
-              err,
-              data: {
-                username: username,
+          } catch (err) {
+            logger.error(
+              {
+                functionName: "userRestServices",
+                endpoint: "token",
+                message: "Failed to perform the security slowdown for preventing brute force login attempts",
+                serious: true,
+                err,
+                data: {
+                  username: arg.username,
+                },
               },
-            },
-          );
-          throw err;
+            );
+
+            const error = {
+              message: "Internal Server Error",
+              code: ENDPOINT_ERRORS.INTERNAL_SERVER_ERROR,
+            };
+
+            if (!res) {
+              throw new EndpointError(error);
+            } else {
+              res.status(500).end(JSON.stringify({
+                error,
+              }));
+              return;
+            }
+          }
         }
 
         try {
@@ -392,24 +447,41 @@ export function userRestServices(appData: IAppDataType) {
               serious: true,
               err,
               data: {
-                username: username,
+                username: arg.username,
               },
             },
           );
-          throw err;
+          const error = {
+            message: "Internal Server Error",
+            code: ENDPOINT_ERRORS.INTERNAL_SERVER_ERROR,
+          };
+          if (!res) {
+            throw new EndpointError(error);
+          } else {
+            res.status(500).end(JSON.stringify({
+              error,
+            }));
+            return;
+          }
         }
 
         if (!resultUser) {
           // if we don't get an user and we previously
           // have used a username and password combination
           // we give an invalid credentials error
-          res.status(403).end(JSON.stringify({
-            error: {
-              message: "Invalid Credentials",
-              code: ENDPOINT_ERRORS.INVALID_CREDENTIALS,
-            },
-          }));
-          return;
+          const error = {
+            message: "Invalid Credentials",
+            code: ENDPOINT_ERRORS.INVALID_CREDENTIALS,
+          };
+
+          if (!res) {
+            throw new EndpointError(error);
+          } else {
+            res.status(403).end(JSON.stringify({
+              error,
+            }));
+            return;
+          }
         }
       }
 
@@ -417,15 +489,20 @@ export function userRestServices(appData: IAppDataType) {
       if (resultUser) {
         // if the user is blocked
         if (resultUser.blocked_at) {
-          // we give an error for that
-          res.status(403).end(JSON.stringify({
-            error: {
-              message: "User is Blocked",
-              code: ENDPOINT_ERRORS.USER_BLOCKED,
-            },
-            blocked_until: resultUser.blocked_until || null,
-          }));
-          return;
+          const error = {
+            message: "User is Blocked",
+            code: ENDPOINT_ERRORS.USER_BLOCKED,
+          };
+          if (!res) {
+            throw new EndpointError(error);
+          } else {
+            // we give an error for that
+            res.status(403).end(JSON.stringify({
+              error,
+              blocked_until: resultUser.blocked_until || null,
+            }));
+            return;
+          }
         }
 
         try {
@@ -454,38 +531,82 @@ export function userRestServices(appData: IAppDataType) {
               },
             },
           );
-          throw err;
+
+
+          const error = {
+            message: "Internal Server Error",
+            code: ENDPOINT_ERRORS.INTERNAL_SERVER_ERROR,
+          };
+          if (!res) {
+            throw new EndpointError(error);
+          } else {
+            res.status(500).end(JSON.stringify({
+              error,
+            }));
+            return;
+          }
         }
       } else {
+        const error = {
+          message: "User has been removed",
+          code: ENDPOINT_ERRORS.USER_REMOVED,
+        };
         // otherwise the user has been removed as the id
         // is not found, this can happen if the user
         // has kept a session active after nuking his account
-        res.status(404).end(JSON.stringify({
-          error: {
-            message: "User has been removed",
-            code: ENDPOINT_ERRORS.USER_REMOVED,
-          },
-        }));
+        if (!res) {
+          throw new EndpointError(error);
+        } else {
+          res.status(404).end(JSON.stringify({
+            error,
+          }));
+        }
         return;
       }
     } catch (err) {
-      logger.error(
-        {
-          className: "userRestServices",
-          endpoint: "token",
-          message: "Error while trying to login",
-          serious: true,
-          err,
-        },
-      );
-      res.status(500).end(JSON.stringify({
-        error: {
+      if (err instanceof EndpointError) {
+        throw err;
+      } else {
+        logger.error(
+          {
+            className: "userRestServices",
+            endpoint: "token",
+            message: "Error while trying to login",
+            serious: true,
+            err,
+          },
+        );
+        const error = {
           message: "Internal Server Error",
           code: ENDPOINT_ERRORS.INTERNAL_SERVER_ERROR,
-        },
-      }));
-      return;
+        };
+        if (!res) {
+          throw new EndpointError(error);
+        } else {
+          res.status(500).end(JSON.stringify({
+            error,
+          })); 
+        }
+        return;
+      }
     }
+  }
+
+  appData.userTokenQuery = tokenQuery.bind(null, null);
+
+  const router = Router();
+  router.post("/token", async (req, res) => {
+    const username = req.body.username;
+    const token = req.headers.token as string;
+    const password = req.body.password;
+    const country = req.body.country;
+
+    tokenQuery(res, {
+      username,
+      token,
+      password,
+      country,
+    });
   });
   router.get("/validate", async (req, res) => {
     const noRedirect = req.query.noRedirect;

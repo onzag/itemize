@@ -213,9 +213,9 @@ export async function ssrGenerator(
     // mounts immediately and something can be rendered
     if (currentToken) {
       try {
-        const tokenData = await appData.customUserTokenQuery(null, {
+        const tokenData = await appData.userTokenQuery({
           token: currentToken,
-        })
+        });
         userAfterValidate.id = tokenData.id;
         userAfterValidate.token = tokenData.token;
         userAfterValidate.role = tokenData.role;
