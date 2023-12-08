@@ -685,7 +685,6 @@ export class MailgunService extends MailProvider<IMailgunConfig> {
     router.post(
       "/mailgun/callback",
       async (req, res) => {
-        //crypto.createHmac("sha256", MAILGUN_KEY).update(timestamp + token).digest("hex") === signature
         if (req.headers["content-type"]) {
           const isURLEncoded = req.headers["content-type"].startsWith("application/x-www-form-urlencoded");
           const isFormData = req.headers["content-type"].startsWith("multipart/form-data");

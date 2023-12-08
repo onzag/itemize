@@ -855,6 +855,8 @@ function buildGqlThing(type: "mutation" | "query", mainArgs: IGQLArgs, ...querie
 
 function buildRQThing(rqSchema: RQRootSchema, ...queries: IGQLQueryObj[]) {
   const qs: any = {};
+  const tokens: {[key: string]: number} = {};
+
   queries.forEach((query) => {
     const targetInQuestion = rqSchema ? (rqSchema.mutation[query.name] || rqSchema.query[query.name]) : null;
 
@@ -870,10 +872,34 @@ function buildRQThing(rqSchema: RQRootSchema, ...queries: IGQLQueryObj[]) {
     }
     if (query.args) {
       qObj.args = buildRQArgs(query.args);
+      if (qObj.args.token) {
+        if (!tokens[qObj.args.token]) {
+          tokens[qObj.args.token] = 0;
+        }
+        tokens[qObj.args.token]++;
+      }
     }
     qs[query.alias || query.name] = qObj;
   });
-  return qs;
+
+  const allTokens = Object.keys(tokens);
+  let mostUsedToken: string = null;
+  if (allTokens.length) {
+    mostUsedToken = allTokens.reduce((tokenA, tokenB) => {
+      if (tokens[tokenA] > tokens[tokenB]) {
+        return tokenA;
+      }
+      return tokenB;
+    });
+  }
+  if (mostUsedToken) {
+    Object.keys(qs).forEach((requestKey) => {
+      if (qs[requestKey].args && qs[requestKey].args.token === mostUsedToken) {
+        delete qs[requestKey].args.token;
+      }
+    });
+  }
+  return [qs, mostUsedToken];
 }
 
 /**
