@@ -6,8 +6,6 @@
  * @module
  */
 
-import { GraphQLOutputType } from "graphql";
-import { IGQLFieldsDefinitionType } from "../../../../gql";
 import type { ISQLTableRowValue, ISQLTableDefinitionType, IElasticIndexDefinitionType } from "../../../../sql";
 import PropertyDefinition, { PropertyInvalidReason, IPropertyDefinitionRawJSONDataType } from "../../PropertyDefinition";
 import boolean, { PropertyDefinitionSupportedBooleanType } from "./boolean";
@@ -27,7 +25,7 @@ import year, { PropertyDefinitionSupportedYearType } from "./year";
 import payment, { IPropertyDefinitionSupportedPaymentType } from "./payment";
 import taglist, { PropertyDefinitionSupportedTagListType } from "./taglist";
 import { PropertyDefinitionSearchInterfacesType } from "../search-interfaces";
-import { IGQLArgs, IGQLValue } from "../../../../../../gql-querier";
+import { IRQArgs, IRQValue } from "../../../../../../rq-querier";
 import file, { PropertyDefinitionSupportedFileType } from "./file";
 import ItemDefinition from "../..";
 import Include from "../../Include";
@@ -105,7 +103,7 @@ export interface ISQLSearchInfo extends ISQLArgInfo {
   language: string;
   dictionary: string;
   whereBuilder: WhereBuilder;
-  args: IGQLArgs;
+  args: IRQArgs;
   isOrderedByIt: boolean;
 }
 
@@ -113,7 +111,7 @@ export interface IElasticSearchInfo extends ISQLArgInfo {
   language: string;
   dictionary: string;
   elasticQueryBuilder: ElasticQueryBuilder;
-  args: IGQLArgs;
+  args: IRQArgs;
   isOrderedByIt: boolean;
   boost: number;
 }
@@ -181,20 +179,20 @@ export interface ISQLOrderByInfo extends ISQLArgInfo {
   nulls: "first" | "last";
   wasIncludedInSearch: boolean;
   wasIncludedInStrSearch: boolean;
-  args: IGQLArgs;
+  args: IRQArgs;
 }
 
 export interface ISQLBtreeIndexableInfo extends ISQLArgInfo {
 }
 
 export interface ILocalSearchInfo extends IArgInfo {
-  args: IGQLArgs;
-  gqlValue: IGQLValue;
+  args: IRQArgs;
+  gqlValue: IRQValue;
 }
 
 export interface ILocalStrSearchInfo extends IArgInfo {
   search: string;
-  gqlValue: IGQLValue;
+  gqlValue: IRQValue;
 }
 
 export interface ILocalEqualInfo<T> extends IArgInfo {
@@ -253,31 +251,26 @@ export interface IPropertyDefinitionSupportedType<T> {
    * whether it has an own language property
    */
   ownLanguageProperty?: string;
-
-  /**
-   * graphql type, either a output type or a string, when it's a string
-   * gqlFields should be defined
-   */
-  gql: GraphQLOutputType | string;
   /**
    * The rq type
    */
   rq: RQField;
   /**
-   * when gql is a string, the fields that it represents, this is for complex
-   * types, only basic types are allowed
+   * Whether it currently represents a rq file
+   * within the structure that is ought to be processed
+   * by file manageent
+   * 
+   * such field must therefore contain
+   * id string
+   * name string
+   * metadata string
+   * url string
+   * src binary
+   * size integer-positive
+   * 
+   * to fit in the IRQFile structure
    */
-  gqlFields?: IGQLFieldsDefinitionType;
-  /**
-   * Whether this object represents a list, this affects everything
-   */
-  gqlList?: boolean;
-  /**
-   * Whether this complex type (must be a complex type), should be merged
-   * with IGQL file fields for supporting files and streams, you do not need
-   * to worry about the validation of file fields
-   */
-  gqlAddFileToFields?: boolean;
+  rqRepresentsFile?: boolean;
   /**
    * sql definition
    * or a function where the id is the id is a property id

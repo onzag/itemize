@@ -39,7 +39,7 @@ import { SubmitButton } from "../buttons";
 import Chip from "@mui/material/Chip";
 import ItemLoader from "../../../components/item/ItemLoader";
 import { ConfigContext } from "../../../internal/providers/config-provider";
-import { runSearchQueryFor } from "../../../internal/gql-client-util";
+import { runSearchQueryFor } from "../../../internal/rq-client-util";
 import { TokenContext } from "../../../internal/providers/token-provider";
 import { UNSPECIFIED_OWNER } from "../../../../constants";
 import type { ITagListSuggestion } from "../../renderers/PropertyEntry/PropertyEntryTagList";

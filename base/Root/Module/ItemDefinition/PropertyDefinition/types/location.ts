@@ -5,7 +5,6 @@
  */
 
 import { IPropertyDefinitionSupportedType } from "../types";
-import { GraphQLNonNull, GraphQLFloat, GraphQLString } from "graphql";
 import { PropertyInvalidReason } from "../../PropertyDefinition";
 import { CLASSIC_BASE_I18N, CLASSIC_OPTIONAL_I18N, LOCATION_SEARCH_I18N,
   CLASSIC_SEARCH_OPTIONAL_I18N, INCLUDE_PREFIX, SQL_CONSTRAINT_PREFIX } from "../../../../../../constants";
@@ -65,24 +64,6 @@ export interface IPropertyDefinitionSupportedLocationType {
  * The type describes the behaviour of the location in the app
  */
 const typeValue: IPropertyDefinitionSupportedType<IPropertyDefinitionSupportedLocationType> = {
-  gql: "PROPERTY_TYPE__Location",
-  gqlFields: {
-    lng: {
-      type: GraphQLNonNull && GraphQLNonNull(GraphQLFloat),
-    },
-    lat: {
-      type: GraphQLNonNull && GraphQLNonNull(GraphQLFloat),
-    },
-    txt: {
-      type: GraphQLNonNull && GraphQLNonNull(GraphQLString),
-    },
-    atxt: {
-      type: GraphQLNonNull && GraphQLNonNull(GraphQLString),
-    },
-    id: {
-      type: GraphQLNonNull && GraphQLNonNull(GraphQLString),
-    },
-  },
   rq: {
     type: "object",
     stdFields: {

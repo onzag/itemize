@@ -11,8 +11,8 @@ import equals from "deep-equal";
 import ItemDefinition, { IItemDefinitionGQLValueType } from "../../../base/Root/Module/ItemDefinition";
 import { PREFIX_GET_LIST, PREFIX_GET } from "../../../constants";
 import CacheWorkerInstance from "../../internal/workers/cache";
-import { requestFieldsAreContained, deepMerge } from "../../../gql-util";
-import { buildGqlQuery, gqlQuery, IGQLSearchRecord, IGQLRequestFields, IGQLValue } from "../../../gql-querier";
+import { requestFieldsAreContained, deepMerge } from "../../../rq-util";
+import { buildGqlQuery, gqlQuery, IRQSearchRecord, IRQRequestFields, IRQValue } from "../../../rq-querier";
 import { LocaleContext, ILocaleContextType } from "../../internal/providers/locale-provider";
 import { TokenContext, ITokenContextType } from "../../internal/providers/token-provider";
 import { EndpointErrorType } from "../../../base/errors";
@@ -31,7 +31,7 @@ interface IItemProviderPropsWithKey extends
  * Basically a normal graphql search record but with information on
  * how to populate it, aka its own item definition and the provider props
  */
-interface IGQLSearchRecordWithPopulateData extends IGQLSearchRecord {
+interface IGQLSearchRecordWithPopulateData extends IRQSearchRecord {
   /**
    * The provider properties used to instantiate your own item definition
    * data
@@ -59,7 +59,7 @@ interface IGQLSearchRecordWithPopulateData extends IGQLSearchRecord {
   /**
    * The search result that you have retrieved
    */
-  searchResult?: IGQLValue;
+  searchResult?: IRQValue;
   /**
    * The highlight information retrieved
    */
@@ -223,8 +223,8 @@ export interface ISearchLoaderProps {
  */
 interface IActualSearchLoaderProps extends ISearchLoaderProps {
   // all these come from the item definition context with few exceptions
-  searchRecords: IGQLSearchRecord[];
-  searchResults: IGQLValue[];
+  searchRecords: IRQSearchRecord[];
+  searchResults: IRQValue[];
   searchCount: number;
   searchLimit: number;
   searchOffset: number;
@@ -240,7 +240,7 @@ interface IActualSearchLoaderProps extends ISearchLoaderProps {
   searchWasRestored: "NO" | "FROM_LOCATION" | "FROM_STATE";
   searchOwner: string;
   searchShouldCache: boolean;
-  searchFields: IGQLRequestFields;
+  searchFields: IRQRequestFields;
   searchMetadata: string;
   searchRequestedProperties: string[];
   searchRequestedIncludes: { [include: string]: string[] };
@@ -258,11 +258,11 @@ interface IActualSearchLoaderProps extends ISearchLoaderProps {
  * is stateful and does not share its loaded records with other search loaders
  */
 interface IActualSearchLoaderState {
-  currentlySearching: IGQLSearchRecord[];
-  searchFields: IGQLRequestFields;
-  currentSearchResults: IGQLValue[];
-  currentSearchRecords: IGQLSearchRecord[];
-  currentSearchResultsFromTheRecords: IGQLValue[];
+  currentlySearching: IRQSearchRecord[];
+  searchFields: IRQRequestFields;
+  currentSearchResults: IRQValue[];
+  currentSearchRecords: IRQSearchRecord[];
+  currentSearchResultsFromTheRecords: IRQValue[];
   error: EndpointErrorType;
   retrievedHighlights: IElasticHighlightRecordInfo;
   currentSearchTime: number;
@@ -327,7 +327,7 @@ function loadSearchResults(props: IActualSearchLoaderProps) {
 function loadValues(
   props: IActualSearchLoaderProps,
   state: IActualSearchLoaderState,
-  currentSearchRecords: IGQLSearchRecord[],
+  currentSearchRecords: IRQSearchRecord[],
   isUnmounted?: boolean,
   isConstruct?: boolean,
   context?: ActualSearchLoader,
@@ -553,7 +553,7 @@ class ActualSearchLoader extends React.Component<IActualSearchLoaderProps, IActu
    * we need to cleanup the search results still
    * @param props 
    */
-  public ensureCleanupOfOldSearchResults(props: IActualSearchLoaderProps, currentRecords: IGQLSearchRecord[]) {
+  public ensureCleanupOfOldSearchResults(props: IActualSearchLoaderProps, currentRecords: IRQSearchRecord[]) {
     const root = this.props.itemDefinitionInstance.getParentModule().getParentRoot();
     const oldRecords = (props.searchRecords || []);
     const newRecords = (currentRecords || []);
@@ -638,8 +638,8 @@ class ActualSearchLoader extends React.Component<IActualSearchLoaderProps, IActu
 
   private async loadValuesAsyncPart(
     currentSearchLoadTime: number,
-    currentSearchResultsFromTheRecords: IGQLValue[],
-    currentSearchRecords: IGQLSearchRecord[],
+    currentSearchResultsFromTheRecords: IRQValue[],
+    currentSearchRecords: IRQSearchRecord[],
     willItProduceNewHighlights: boolean,
   ) {
     // We are done with this since all that follows is async and cannot be executed
@@ -659,7 +659,7 @@ class ActualSearchLoader extends React.Component<IActualSearchLoaderProps, IActu
     const getListQueryName: string = PREFIX_GET_LIST + queryBase;
 
     // and now we need to request
-    const uncachedResults: IGQLSearchRecord[] = [];
+    const uncachedResults: IRQSearchRecord[] = [];
     const newSearchResultsFromTheRecords = [...currentSearchResultsFromTheRecords];
 
     // we are already handling it
@@ -690,7 +690,7 @@ class ActualSearchLoader extends React.Component<IActualSearchLoaderProps, IActu
     });
 
     // first we try to request our indexeddb worker cache and memory cache, one by one
-    const workerCachedResults = await Promise.all(currentSearchRecords.map(async (searchRecord: IGQLSearchRecord, index) => {
+    const workerCachedResults = await Promise.all(currentSearchRecords.map(async (searchRecord: IRQSearchRecord, index) => {
       // we already found it in our applied value check
       if (foundIndexes[index]) {
         return null;
@@ -848,7 +848,7 @@ class ActualSearchLoader extends React.Component<IActualSearchLoaderProps, IActu
       let error: EndpointErrorType = null;
       if (gqlValue.errors) {
         // if the server itself returned an error, we use that error
-        error = gqlValue.errors[0].extensions;
+        error = gqlValue.errors[0].error;
       }
 
       // now we set these so that once
@@ -896,7 +896,7 @@ class ActualSearchLoader extends React.Component<IActualSearchLoaderProps, IActu
         }
 
         // and we loop into them
-        (gqlValue.data[getListQueryName].results as IGQLValue[]).forEach((value) => {
+        (gqlValue.data[getListQueryName].results as IRQValue[]).forEach((value) => {
           const indexOfSearchResultInUncached = uncachedResults.findIndex((v) => value.id === v.id);
 
           // somehow received a record that wasn't asked for

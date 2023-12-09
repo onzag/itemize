@@ -23,11 +23,10 @@ import {
   MAX_SEARCH_RESULTS_DEFAULT,
   ENDPOINT_ERRORS,
 } from "../../../constants";
-import { GraphQLObjectType } from "graphql";
 import { buildSearchModeModule } from "./search-mode";
 import Root, { ICustomRoleManager, Ii18NType, ISearchLimitersType } from "..";
 import { EndpointError } from "../../errors";
-import { IGQLRequestFields, IGQLValue } from "../../../gql-querier";
+import { IRQRequestFields, IRQValue } from "../../../rq-querier";
 
 /**
  * Specific locale information contained within modules and item
@@ -299,19 +298,6 @@ export default class Module {
    * The raw data of the module
    */
   public rawData: IModuleRawJSONDataType;
-
-  /**
-   * The graphql object for this module (cached)
-   * only exists when used the graphql functions
-   */
-  // tslint:disable-next-line: variable-name
-  public _gqlObj: GraphQLObjectType;
-  /**
-   * The graphql query object for this module (cached)
-   * only exists when used the graphql functions
-   */
-  // tslint:disable-next-line: variable-name
-  public _gqlQueryObj: GraphQLObjectType;
 
   /**
    * The root that contains the module
@@ -877,7 +863,7 @@ export default class Module {
     userId: string,
     ownerUserId: string,
     rolesManager: ICustomRoleManager,
-    value: IGQLValue,
+    value: IRQValue,
   ): Promise<void> {
 
     if (!value) {
@@ -949,7 +935,7 @@ export default class Module {
     role: string,
     userId: string,
     ownerUserId: string,
-    requestedFields: IGQLRequestFields,
+    requestedFields: IRQRequestFields,
     rolesManager: ICustomRoleManager,
     throwError: boolean,
   ) {

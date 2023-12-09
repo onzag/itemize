@@ -7,7 +7,6 @@
 import {
   IPropertyDefinitionSupportedType,
 } from "../types";
-import { GraphQLString } from "graphql";
 import { standardSQLEqualFn } from "../sql";
 import {
   standardSQLSSCacheEqualFn,
@@ -47,15 +46,6 @@ export interface IPropertyDefinitionSupportedTextType {
  * The type describes how the text type behaves in the app, this includes rich text
  */
 const typeValue: IPropertyDefinitionSupportedType<IPropertyDefinitionSupportedTextType> = {
-  gql: "PROPERTY_TYPE__Text",
-  gqlFields: {
-    value: {
-      type: GraphQLString,
-    },
-    language: {
-      type: GraphQLString,
-    },
-  },
   rq: {
     type: "object",
     stdFields: {

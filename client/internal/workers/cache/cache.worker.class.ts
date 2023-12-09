@@ -7,11 +7,11 @@
  */
 
 import { openDB, DBSchema, IDBPDatabase } from "idb";
-import { requestFieldsAreContained, deepMerge } from "../../../../gql-util";
+import { requestFieldsAreContained, deepMerge } from "../../../../rq-util";
 import {
-  IGQLSearchRecord, buildGqlQuery, gqlQuery, GQLEnum,
-  IGQLValue, IGQLRequestFields, IGQLArgs, IGQLEndpointValue, IGQLFile
-} from "../../../../gql-querier";
+  IRQSearchRecord, buildGqlQuery, gqlQuery, GQLEnum,
+  IRQValue, IRQRequestFields, IRQArgs, IRQEndpointValue, IRQFile
+} from "../../../../rq-querier";
 import { PREFIX_GET, ENDPOINT_ERRORS } from "../../../../constants";
 import type { EndpointErrorType } from "../../../../base/errors";
 import { search } from "./cache.worker.search";
@@ -95,11 +95,11 @@ export interface ICacheMatchType {
   /**
    * The value of the match
    */
-  value: IGQLValue;
+  value: IRQValue;
   /**
    * The fields that can be requested for that value
    */
-  fields: IGQLRequestFields;
+  fields: IRQRequestFields;
 }
 
 /**
@@ -111,7 +111,7 @@ export interface ICachedSearchResult {
   /**
    * The graphql value that it emulates from the server side
    */
-  gqlValue: IGQLEndpointValue;
+  gqlValue: IRQEndpointValue;
   /**
    * Whether the data might be stale, as in old data that needs
    * to be rechecked an update
@@ -126,7 +126,7 @@ export interface ICachedSearchResult {
    * were searched for in the search, not just the matching ones that were
    * requested, this list may be very large
    */
-  sourceRecords: IGQLSearchRecord[];
+  sourceRecords: IRQSearchRecord[];
   /**
    * The source results that were used in the search, if requested, this
    * is basically the source records themselves but containing all the fields
@@ -151,11 +151,11 @@ export interface ISearchMatchType {
    * The fields that were requested and should be contained
    * in each one of these search matches
    */
-  fields: IGQLRequestFields;
+  fields: IRQRequestFields;
   /**
    * The value as a list of search records
    */
-  value: IGQLSearchRecord[];
+  value: IRQSearchRecord[];
   /**
    * Whether all the records in that list have been preloaded
    * as matched on the cache itself
@@ -217,7 +217,7 @@ export interface ICacheDB extends DBSchema {
 }
 
 function fixOneFile(
-  file: IGQLFile,
+  file: IRQFile,
 ) {
   if (!file.src) {
     return;
@@ -228,7 +228,7 @@ function fixOneFile(
 }
 
 export function fixFilesURLAt(
-  partialValue: IGQLValue,
+  partialValue: IRQValue,
   itemDef: ItemDefinition,
   include: Include,
   property: PropertyDefinition,
@@ -802,7 +802,7 @@ export default class CacheWorker {
   }
 
   private _fileURLAbsoluter(
-    file: IGQLFile,
+    file: IRQFile,
     itemDef: ItemDefinition,
     include: Include,
     property: PropertyDefinition,
@@ -856,7 +856,7 @@ export default class CacheWorker {
   }
 
   private async obtainOneFile(
-    file: IGQLFile,
+    file: IRQFile,
     itemDef: ItemDefinition,
     include: Include,
     property: PropertyDefinition,
@@ -901,7 +901,7 @@ export default class CacheWorker {
   }
 
   private async processFilesAt(
-    partialValue: IGQLValue,
+    partialValue: IRQValue,
     itemDef: ItemDefinition,
     include: Include,
     property: PropertyDefinition,
@@ -953,8 +953,8 @@ export default class CacheWorker {
     queryName: string,
     id: string,
     version: string,
-    partialValue: IGQLValue,
-    partialFields: IGQLRequestFields,
+    partialValue: IRQValue,
+    partialFields: IRQRequestFields,
     options?: {
       allowFallbackWritesToPolyfill?: boolean,
     }
@@ -1104,7 +1104,7 @@ export default class CacheWorker {
 
   public async writeSearchMetadata(
     queryName: string,
-    searchArgs: IGQLArgs,
+    searchArgs: IRQArgs,
     cachePolicy: "by-owner" | "by-parent" | "by-owner-and-parent" | "by-property",
     trackedProperty: string,
     createdByIfKnown: string,
@@ -1255,7 +1255,7 @@ export default class CacheWorker {
 
   public async readSearchMetadata(
     queryName: string,
-    searchArgs: IGQLArgs,
+    searchArgs: IRQArgs,
     cachePolicy: "by-owner" | "by-parent" | "by-owner-and-parent" | "by-property",
     trackedProperty: string,
     createdByIfKnown: string,
@@ -1488,8 +1488,8 @@ export default class CacheWorker {
     queryName: string,
     id: string,
     version: string,
-    partialValue: IGQLValue,
-    partialFields: IGQLRequestFields,
+    partialValue: IRQValue,
+    partialFields: IRQRequestFields,
     options?: {
       allowFallbackWritesToPolyfill?: boolean,
     },
@@ -1572,7 +1572,7 @@ export default class CacheWorker {
     queryName: string,
     id: string,
     version: string,
-    requestedFields?: IGQLRequestFields,
+    requestedFields?: IRQRequestFields,
   ): Promise<ICacheMatchType> {
     checkIdVersionThrowErr(id);
     checkIdVersionThrowErr(version);
@@ -1672,11 +1672,11 @@ export default class CacheWorker {
     parentVersionIfKnown: string,
     trackedProperty: string,
     cachePropertyValue: string,
-    newRecords: IGQLSearchRecord[],
-    createdRecords: IGQLSearchRecord[],
-    modifiedRecords: IGQLSearchRecord[],
-    lostRecords: IGQLSearchRecord[],
-    deletedRecords: IGQLSearchRecord[],
+    newRecords: IRQSearchRecord[],
+    createdRecords: IRQSearchRecord[],
+    modifiedRecords: IRQSearchRecord[],
+    lostRecords: IRQSearchRecord[],
+    deletedRecords: IRQSearchRecord[],
     newLastModified: string,
     cachePolicy: "by-owner" | "by-parent" | "by-property" | "by-owner-and-parent",
   ): Promise<boolean> {
@@ -1796,7 +1796,7 @@ export default class CacheWorker {
 
         // we need to filter the new records to stop duplicates from occurring
         // this can happen when there are several listeners going on at the same time
-        const newRecordsFiltered: IGQLSearchRecord[] = newRecords.concat(createdRecords).filter((nr) => {
+        const newRecordsFiltered: IRQSearchRecord[] = newRecords.concat(createdRecords).filter((nr) => {
           const recordAlreadyAdded = newValue.find((r) => r.id === nr.id && r.version === nr.version);
           return !recordAlreadyAdded;
         });
@@ -1806,7 +1806,7 @@ export default class CacheWorker {
 
         // this list will fill when a row is modified but it was actually reparented
         // so it registers as modified but it is now in our current list of values
-        const recordsThatRequestedModificationButArentInTheList: IGQLSearchRecord[] = modifiedRecords.filter((mr) => {
+        const recordsThatRequestedModificationButArentInTheList: IRQSearchRecord[] = modifiedRecords.filter((mr) => {
           // only not found passes
           return newValue.findIndex((r) => r.id === mr.id && r.version === mr.version) === -1;
         });
@@ -1861,11 +1861,11 @@ export default class CacheWorker {
    */
   public async runCachedSearch(
     searchQueryName: string,
-    searchArgs: IGQLArgs,
+    searchArgs: IRQArgs,
     getListQueryName: string,
     getListTokenArg: string,
     getListLangArg: string,
-    getListRequestedFields: IGQLRequestFields,
+    getListRequestedFields: IRQRequestFields,
     cachePolicy: "by-owner" | "by-parent" | "by-owner-and-parent" | "by-property",
     cacheNoLimitOffset: boolean,
     trackedProperty: string,
@@ -1873,7 +1873,7 @@ export default class CacheWorker {
     maxGetListResultsAtOnce: number,
     returnSources: boolean,
     redoSearch: boolean,
-    redoRecords: boolean | IGQLSearchRecord[],
+    redoRecords: boolean | IRQSearchRecord[],
     options?: {
       allowFallbackWritesToPolyfill?: boolean,
     }
@@ -1930,7 +1930,7 @@ export default class CacheWorker {
     // first we build an array for the results that we need to process
     // this means results that are not loaded in memory or partially loaded
     // in memory for some reason, say if the last search failed partially
-    let resultsToProcess: IGQLSearchRecord[];
+    let resultsToProcess: IRQSearchRecord[];
     let resultsCount: number;
     // this is what the fields end up being, say that there are two different
     // cached searches with different fields, we need both to be merged
@@ -1965,7 +1965,7 @@ export default class CacheWorker {
         // we need to remove the specifics of the search
         // as we are caching everything to the given criteria
         // and then using client side to filter
-        const actualArgsToUseInGQLSearch: IGQLArgs = {
+        const actualArgsToUseInGQLSearch: IRQArgs = {
           token: searchArgs.token,
           language: searchArgs.language,
           order_by: {
@@ -2031,9 +2031,9 @@ export default class CacheWorker {
         }
 
         // now these are the results that we need to process
-        // from the search query, the IGQLSearchRecord that we
+        // from the search query, the IRQSearchRecord that we
         // need to process
-        resultsToProcess = firstServerValue.data[searchQueryName].records as IGQLSearchRecord[];
+        resultsToProcess = firstServerValue.data[searchQueryName].records as IRQSearchRecord[];
         lastModified = firstServerValue.data[searchQueryName].last_modified as string;
         let lastModifiedNano = !lastModified ? null : new NanoSecondComposedDate(lastModified);
         resultsCount = firstServerValue.data[searchQueryName].count as number;
@@ -2075,7 +2075,7 @@ export default class CacheWorker {
             };
           }
 
-          const resultsToProcessOfBatch = firstServerValue.data[searchQueryName].records as IGQLSearchRecord[];
+          const resultsToProcessOfBatch = firstServerValue.data[searchQueryName].records as IRQSearchRecord[];
           const lastModifiedOfBatch = firstServerValue.data[searchQueryName].last_modified as string;
           const lastModifiedOfBatchNano = lastModifiedOfBatch ? new NanoSecondComposedDate(lastModifiedOfBatch) : null;
 
@@ -2114,7 +2114,7 @@ export default class CacheWorker {
             const records = searchResponse.filteredRecords;
             const results = searchResponse.filteredResults;
             const sourceResults = searchResponse.sourceResults;
-            const gqlValue: IGQLEndpointValue = {
+            const gqlValue: IRQEndpointValue = {
               data: {
                 [searchQueryName]: {
                   records,
@@ -2148,7 +2148,7 @@ export default class CacheWorker {
 
       // yet some other errors might come here
       // we return an unspecified error if we hit an error
-      const gqlValue: IGQLEndpointValue = {
+      const gqlValue: IRQEndpointValue = {
         data: null,
         errors: [
           {
@@ -2214,7 +2214,7 @@ export default class CacheWorker {
           };
           polyfilled = true;
         } else {
-          const gqlValue: IGQLEndpointValue = {
+          const gqlValue: IRQEndpointValue = {
             data: null,
             errors: [
               {
@@ -2241,7 +2241,7 @@ export default class CacheWorker {
     // results to process and actually has managed to make it to the database
     // this can happens when something fails in between, or it is loaded by another
     // part of the application
-    const uncachedOrOutdatedResultsToProcess: IGQLSearchRecord[] = [];
+    const uncachedOrOutdatedResultsToProcess: IRQSearchRecord[] = [];
     // so now we check all the results we are asked to process
     await Promise.all(resultsToProcess.map(async (resultToProcess) => {
       // manual set for redoing records
@@ -2286,7 +2286,7 @@ export default class CacheWorker {
 
     // now it's time to preload, there's a limit on how big the batches can be on the server side
     // so we have to limit our batches size
-    const batches: IGQLSearchRecord[][] = [[]];
+    const batches: IRQSearchRecord[][] = [[]];
     let lastBatchIndex = 0;
     // for that we run a each event in all our uncached results
     uncachedOrOutdatedResultsToProcess.forEach((uncachedOrOutdatedResultToProcess) => {
@@ -2301,7 +2301,7 @@ export default class CacheWorker {
     });
 
     // now we need to load all those batches into graphql queries
-    let processedBatches: Array<{ gqlValue: IGQLEndpointValue, batch: IGQLSearchRecord[] }>;
+    let processedBatches: Array<{ gqlValue: IRQEndpointValue, batch: IRQSearchRecord[] }>;
     try {
       processedBatches = await Promise.all(batches.map(async (batch) => {
         // makes no sense sending a request with nothing to fetch
@@ -2318,7 +2318,7 @@ export default class CacheWorker {
           }
         }
 
-        const args: IGQLArgs = {
+        const args: IRQArgs = {
           token: getListTokenArg,
           language: getListLangArg,
           records: batch,
@@ -2353,7 +2353,7 @@ export default class CacheWorker {
     } catch (err) {
       console.error(err);
 
-      const gqlValue: IGQLEndpointValue = {
+      const gqlValue: IRQEndpointValue = {
         data: null,
         errors: [
           {
@@ -2390,7 +2390,7 @@ export default class CacheWorker {
       if (resultingValue.errors) {
         // if there's an error, we use that error as the error
         somethingFailed = true;
-        error = resultingValue.errors[0].extensions;
+        error = resultingValue.errors[0].error;
       } else if (
         !resultingValue.data ||
         !resultingValue.data[getListQueryName] ||
@@ -2405,7 +2405,7 @@ export default class CacheWorker {
         // otherwise now we need to set all that in memory right now
         // and so we will do
         await Promise.all(
-          (resultingValue.data[getListQueryName].results as IGQLValue[]).map(async (value, index) => {
+          (resultingValue.data[getListQueryName].results as IRQValue[]).map(async (value, index) => {
             const originalBatchRequest = originalBatch[index];
             let suceedStoring: boolean;
             if (value === null) {
@@ -2490,7 +2490,7 @@ export default class CacheWorker {
           } else {
             console.error(err);
 
-            const gqlValue: IGQLEndpointValue = {
+            const gqlValue: IRQEndpointValue = {
               data: null,
               errors: [
                 {
@@ -2519,7 +2519,7 @@ export default class CacheWorker {
       const results = searchResponse.filteredResults;
       const records = searchResponse.filteredRecords;
       const sourceResults = searchResponse.sourceResults;
-      const gqlValue: IGQLEndpointValue = {
+      const gqlValue: IRQEndpointValue = {
         data: {
           [searchQueryName]: {
             last_modified: lastModified,
@@ -2543,7 +2543,7 @@ export default class CacheWorker {
     } else if (error) {
       // if we managed to catch an error, we pretend
       // to be graphql
-      const gqlValue: IGQLEndpointValue = {
+      const gqlValue: IRQEndpointValue = {
         data: null,
         errors: [
           {
@@ -2565,7 +2565,7 @@ export default class CacheWorker {
       // of connection failure (or database error)
       // we return an unspecified error if we hit an error
       // actually it seems impossible to get to this state
-      const gqlValue: IGQLEndpointValue = {
+      const gqlValue: IRQEndpointValue = {
         data: null,
         errors: [
           {

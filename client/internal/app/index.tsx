@@ -12,7 +12,7 @@ import { countries, currencies } from "../../../imported-resources";
 import { TokenProvider, IActualTokenProviderState } from "../providers/token-provider";
 import { RemoteListener } from "./remote-listener";
 import "../workers/service";
-import { runEditQueryFor } from "../gql-client-util";
+import { runEditQueryFor } from "../rq-client-util";
 import CacheWorkerInstance from "../workers/cache";
 import { proxy } from "comlink";
 import { IConfigRawJSONDataType } from "../../../config";

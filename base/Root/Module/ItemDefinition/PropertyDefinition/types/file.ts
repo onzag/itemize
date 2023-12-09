@@ -7,10 +7,10 @@
 import { IPropertyDefinitionSupportedType } from "../types";
 import { getStandardSQLFnFor, stardardSQLInWithJSONStringifyFn, standardSQLOutWithJSONParseFn, standardSQLSelect, standardSQLElasticInFn, getStandardElasticFor } from "../sql";
 import { CLASSIC_BASE_I18N, CLASSIC_OPTIONAL_I18N } from "../../../../../../constants";
-import { IGQLFile } from "../../../../../../gql-querier";
+import { IRQFile } from "../../../../../../rq-querier";
 import { standardLocalEqual } from "../local-sql";
 
-export type PropertyDefinitionSupportedFileType = IGQLFile;
+export type PropertyDefinitionSupportedFileType = IRQFile;
 
 const fakefile: PropertyDefinitionSupportedFileType = {
   id: null,
@@ -25,10 +25,6 @@ const fakefile: PropertyDefinitionSupportedFileType = {
  * The type value represents the behaviour of files in the app
  */
 const typeValue: IPropertyDefinitionSupportedType<PropertyDefinitionSupportedFileType> = {
-  gql: "PROPERTY_TYPE__File",
-  gqlFields: {},
-  gqlAddFileToFields: true,
-  gqlList: false,
   rq: {
     type: "object",
     stdFields: {
@@ -44,7 +40,7 @@ const typeValue: IPropertyDefinitionSupportedType<PropertyDefinitionSupportedFil
         required: true,
       },
       size: {
-        type: "number",
+        type: "integer-positive",
         required: true,
       },
       type: {
@@ -62,6 +58,7 @@ const typeValue: IPropertyDefinitionSupportedType<PropertyDefinitionSupportedFil
       },
     },
   },
+  rqRepresentsFile: true,
 
   searchable: false,
   configOptions: [

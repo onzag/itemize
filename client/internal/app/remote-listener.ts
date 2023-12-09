@@ -62,7 +62,7 @@ import {
   PROPERTY_SEARCH_RECORDS_EVENT,
 } from "../../../base/remote-protocol";
 import ItemDefinition from "../../../base/Root/Module/ItemDefinition";
-import type { IGQLSearchRecord } from "../../../gql-querier";
+import type { IRQSearchRecord } from "../../../rq-querier";
 
 const SLOW_POLLING_MIN_TIME = 60 * 1000;
 const SLOW_POLLING_TIME_BETWEEN_REQUESTS = 5 * 1000;
@@ -76,11 +76,11 @@ async function wait(ms: number) {
  * by the callback
  */
 export interface IRemoteListenerRecordsCallbackArg {
-  newRecords: IGQLSearchRecord[];
-  modifiedRecords: IGQLSearchRecord[];
-  lostRecords: IGQLSearchRecord[];
-  createdRecords: IGQLSearchRecord[];
-  deletedRecords: IGQLSearchRecord[];
+  newRecords: IRQSearchRecord[];
+  modifiedRecords: IRQSearchRecord[];
+  lostRecords: IRQSearchRecord[];
+  createdRecords: IRQSearchRecord[];
+  deletedRecords: IRQSearchRecord[];
 }
 
 type RemoteListenerRecordsCallback = (arg: IRemoteListenerRecordsCallbackArg) => void;

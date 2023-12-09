@@ -377,10 +377,6 @@ export async function getStorageProviders(
  * Initializes the itemize server with its custom configuration
  * @param ssrConfig the server side rendering rules
  * @param custom the customization details
- * @param custom.customGQLQueries custom graphql queries
- * @param custom.customTokenGQLQueries custom token graphql queries for generating custom tokens
- * while customGQLQueries can be used for the same purpose, this makes it easier and compliant
- * @param custom.customGQLMutations custom graphql mutations
  * @param custom.customRouterEndpoint an endpoint to add a custom router, otherwise it gets
  * attached to the root
  * @param custom.customRouter a custom router to attach to the rest endpoint

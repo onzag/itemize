@@ -8,7 +8,7 @@
  * @module
  */
 
-import { IGQLSearchRecord } from "../gql-querier";
+import { IRQSearchRecord } from "../rq-querier";
 
 // EVENTS
 
@@ -108,17 +108,17 @@ interface IBaseSearchRecordsEvent {
   /**
    * the new records that have been added
    */
-  newRecords: IGQLSearchRecord[];
-  createdRecords: IGQLSearchRecord[];
+  newRecords: IRQSearchRecord[];
+  createdRecords: IRQSearchRecord[];
   /**
    * the records that have been deleted
    */
-  lostRecords: IGQLSearchRecord[];
-  deletedRecords: IGQLSearchRecord[];
+  lostRecords: IRQSearchRecord[];
+  deletedRecords: IRQSearchRecord[];
   /**
    * the records that have been modified
    */
-  modifiedRecords: IGQLSearchRecord[];
+  modifiedRecords: IRQSearchRecord[];
   /**
    * the new last record search result
    */

@@ -60,9 +60,6 @@ const IGNORES = [
     resourceRegExp: /readable-stream/,
   },
   {
-    resourceRegExp: /graphql/,
-  },
-  {
     resourceRegExp: /^pg$/,
   },
   {

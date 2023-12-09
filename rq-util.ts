@@ -5,7 +5,7 @@
  * @module
  */
 
-import { IGQLRequestFields, IGQLValue } from "./gql-querier";
+import { IRQRequestFields, IRQValue } from "./rq-querier";
 
 /**
  * Checks whether a subset is contained within other subset of
@@ -15,8 +15,8 @@ import { IGQLRequestFields, IGQLValue } from "./gql-querier";
  * @returns a boolean
  */
 export function requestFieldsAreContained(
-  requestFieldsSubset: IGQLRequestFields,
-  requestFieldsOrValueMain: IGQLRequestFields | IGQLValue,
+  requestFieldsSubset: IRQRequestFields,
+  requestFieldsOrValueMain: IRQRequestFields | IRQValue,
 ): boolean {
   // if it's null, it's contained
   if (requestFieldsOrValueMain === null || requestFieldsSubset === null) {
@@ -97,7 +97,7 @@ export function deepMerge(gqlValueOrFieldsOverride: any, gqlValueOfFieldsOverrid
  * into the flattened form without the DATA but all data free
  * @param recievedFields the recieved fields or value
  */
-export function flattenRawGQLValueOrFields(fieldsOrValue: IGQLValue | IGQLRequestFields) {
+export function flattenRawGQLValueOrFields(fieldsOrValue: IRQValue | IRQRequestFields) {
   if (!fieldsOrValue) {
     return fieldsOrValue;
   }

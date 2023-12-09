@@ -25,9 +25,9 @@ import {
   convertSQLValueToGQLValueForItemDefinition,
 } from "../../../base/Root/Module/ItemDefinition/sql";
 import { EndpointError, EndpointErrorType } from "../../../base/errors";
-import { flattenRawGQLValueOrFields } from "../../../gql-util";
+import { flattenRawGQLValueOrFields } from "../../../rq-util";
 import { ISQLTableRowValue } from "../../../base/Root/sql";
-import { IGQLArgs, IGQLValue } from "../../../gql-querier";
+import { IRQArgs, IRQValue } from "../../../rq-querier";
 import { IOTriggerActions } from "../triggers";
 import Root from "../../../base/Root";
 import { CustomRoleGranterEnvironment, CustomRoleManager } from "../roles";
@@ -92,7 +92,7 @@ export async function editItemDefinition(
       },
     );
 
-    let currentWholeValueAsGQL: IGQLValue;
+    let currentWholeValueAsGQL: IRQValue;
     let rolesManager: CustomRoleManager;
     let ownerUserId: string;
 
@@ -313,7 +313,7 @@ export async function editItemDefinition(
     // now we need to setup what we want to convert, since the
     // converting functions can take the whole args with its extra
     // stuff by default it's just the whole args
-    let gqlValueToConvert: IGQLArgs = resolverArgs.args;
+    let gqlValueToConvert: IRQArgs = resolverArgs.args;
 
     // now we need to find the triggers
     const pathOfThisIdef = itemDefinition.getAbsolutePath().join("/");
@@ -324,7 +324,7 @@ export async function editItemDefinition(
 
     const dictionary = getDictionary(appData, resolverArgs.args);
 
-    let extraArgs: IGQLArgs;
+    let extraArgs: IRQArgs;
     const triggerCache = {};
     const modTriggerCache = {};
 

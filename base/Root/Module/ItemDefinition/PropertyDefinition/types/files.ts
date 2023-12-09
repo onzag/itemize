@@ -8,15 +8,15 @@ import { IPropertyDefinitionSupportedType } from "../types";
 import { getStandardSQLFnFor, stardardSQLInWithJSONStringifyFn, standardSQLOutWithJSONParseFn, standardSQLSelect, standardSQLElasticInFn, getStandardElasticFor } from "../sql";
 import { PropertyInvalidReason } from "../../PropertyDefinition";
 import { MAX_FILES_PER_PROPERTY, CLASSIC_BASE_I18N, CLASSIC_OPTIONAL_I18N } from "../../../../../../constants";
-import { IGQLFile } from "../../../../../../gql-querier";
+import { IRQFile } from "../../../../../../rq-querier";
 import { standardLocalEqual } from "../local-sql";
 
 // tslint:disable-next-line: no-empty-interface
-export interface IPropertyDefinitionSupportedSingleFilesType extends IGQLFile {
+export interface IPropertyDefinitionSupportedSingleFilesType extends IRQFile {
 }
 
 /**
- * The type of a files type is an array of single files that itself are of type IGQLFile as they use
+ * The type of a files type is an array of single files that itself are of type IRQFile as they use
  * the gqlFields and the gqlAddFileToFields which adds file functionality
  */
 export type PropertyDefinitionSupportedFilesType = IPropertyDefinitionSupportedSingleFilesType[];
@@ -25,10 +25,6 @@ export type PropertyDefinitionSupportedFilesType = IPropertyDefinitionSupportedS
  * The type value represents the behaviour of files in the app
  */
 const typeValue: IPropertyDefinitionSupportedType<PropertyDefinitionSupportedFilesType> = {
-  gql: "PROPERTY_TYPE__Files",
-  gqlFields: {},
-  gqlAddFileToFields: true,
-  gqlList: true,
   rq: {
     type: "object",
     array: true,
@@ -45,7 +41,7 @@ const typeValue: IPropertyDefinitionSupportedType<PropertyDefinitionSupportedFil
         required: true,
       },
       size: {
-        type: "number",
+        type: "integer-positive",
         required: true,
       },
       type: {

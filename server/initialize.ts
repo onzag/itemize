@@ -8,15 +8,10 @@
 import { IAppDataType, IServerCustomizationDataType, app } from ".";
 import { logger } from "./logger";
 import express from "express";
-import graphqlHTTP from "express-graphql";
 import path from "path";
-import { resolvers, resolversRQ } from "./resolvers";
-import { getGQLSchemaForRoot } from "../base/Root/gql";
-import { MAX_FILES_PER_REQUEST, MAX_FILE_SIZE, MAX_FIELD_SIZE, ENDPOINT_ERRORS } from "../constants";
-import { GraphQLError } from "graphql";
-import { EndpointError, EndpointErrorType } from "../base/errors";
+import { resolversRQ } from "./resolvers";
+import { MAX_FILES_PER_REQUEST, MAX_FILE_SIZE, MAX_FIELD_SIZE } from "../constants";
 import restServices, { secureEndpointRouter } from "./rest";
-import { graphqlUploadExpress } from "graphql-upload";
 import { getMode } from "./mode";
 import { userRestServices } from "./user/rest";
 import { NODE_ENV, NO_SEO } from "./environment";
@@ -25,44 +20,6 @@ import { ssrGenerator } from "./ssr/generator";
 import { SEOGenerator } from "./seo/generator";
 import { getRQSchemaForRoot } from "../base/Root/rq";
 import { rqSystem } from "./rq";
-
-/**
- * This is the function that catches the errors that are thrown
- * within graphql
- * @param error the error that is thrown
- */
-const customFormatErrorFn = (error: GraphQLError) => {
-  const originalError = error.originalError;
-  let constructor = null;
-  if (originalError) {
-    constructor = originalError.constructor;
-  }
-
-  let extensions: EndpointErrorType;
-  switch (constructor) {
-    case EndpointError:
-      const gqlDataInputError = error.originalError as EndpointError;
-      extensions = gqlDataInputError.data;
-      break;
-    default:
-      logger.error(
-        {
-          functionName: "customFormatErrorFn",
-          message: "Caught unexpected error from graphql parsing",
-          err: error,
-        },
-      );
-      extensions = {
-        message: "Unspecified Error while parsing data",
-        code: ENDPOINT_ERRORS.UNSPECIFIED,
-      };
-  }
-
-  return {
-    extensions,
-    ...error,
-  };
-};
 
 /**
  * Initializes the server application with its configuration
@@ -93,28 +50,6 @@ export function initializeApp(appData: IAppDataType, custom: IServerCustomizatio
 
   const { router, reprocessedCache } = restServices(appData);
   app.use("/rest", router);
-
-  // now weadd the graphql endpoint
-  // TODO dispose of graphql, it's inefficient
-  // alternative protocol can be implemented using form data
-  app.use(
-    "/graphql",
-    graphqlUploadExpress({
-      maxFileSize: MAX_FILE_SIZE,
-      maxFiles: MAX_FILES_PER_REQUEST,
-      maxFieldSize: MAX_FIELD_SIZE,
-    }),
-    graphqlHTTP({
-      schema: getGQLSchemaForRoot(
-        appData.root,
-        {},
-        {},
-        resolvers(appData),
-      ),
-      graphiql: true,
-      customFormatErrorFn,
-    }),
-  );
 
   app.use(
     "/rq",

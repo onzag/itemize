@@ -29,9 +29,9 @@ import {
   EXCLUSION_STATE_SUFFIX,
 } from "../../../constants";
 import { buildElasticQueryForItemDefinition, buildSQLQueryForItemDefinition, convertSQLValueToGQLValueForItemDefinition } from "../../../base/Root/Module/ItemDefinition/sql";
-import { IGQLSearchRecord, IGQLSearchRecordsContainer, IGQLSearchResultsContainer } from "../../../gql-querier";
+import { IRQSearchRecord, IRQSearchRecordsContainer, IRQSearchResultsContainer } from "../../../rq-querier";
 import { convertVersionsIntoNullsWhenNecessary } from "../../version-null-value";
-import { flattenRawGQLValueOrFields } from "../../../gql-util";
+import { flattenRawGQLValueOrFields } from "../../../rq-util";
 import { NanoSecondComposedDate } from "../../../nanodate";
 import Root from "../../../base/Root";
 import { EndpointError } from "../../../base/errors";
@@ -709,7 +709,7 @@ export async function searchModule(
       generalFields.oldest_created_at
     );
     baseResult = requestBaseResult ?
-      (await appData.databaseConnection.queryRows(queryModel)).map(convertVersionsIntoNullsWhenNecessary) as IGQLSearchRecord[] :
+      (await appData.databaseConnection.queryRows(queryModel)).map(convertVersionsIntoNullsWhenNecessary) as IRQSearchRecord[] :
       [];
 
     queryModel.clear();
@@ -730,7 +730,7 @@ export async function searchModule(
   }
 
   if (opts.traditional) {
-    const finalResult: IGQLSearchResultsContainer = {
+    const finalResult: IRQSearchResultsContainer = {
       results: await Promise.all(
         baseResult.filter((r) => {
           const itemDefinition = appData.root.registry[r.type] as ItemDefinition;
@@ -940,9 +940,9 @@ export async function searchModule(
 
     return finalResult;
   } else {
-    const finalResult: IGQLSearchRecordsContainer = {
+    const finalResult: IRQSearchRecordsContainer = {
       // again these records may hold more stuff than it is required from then
-      records: baseResult as IGQLSearchRecord[],
+      records: baseResult as IRQSearchRecord[],
       last_modified: generalFields.last_modified ? findLastRecordDate("max", "last_modified", baseResult) : null,
       earliest_created_at: generalFields.earliest_created_at ? findLastRecordDate("min", "created_at", baseResult) : null,
       oldest_created_at: generalFields.oldest_created_at ? findLastRecordDate("max", "created_at", baseResult) : null,
@@ -1699,7 +1699,7 @@ export async function searchItemDefinition(
         generalFields.oldest_created_at
       );
       baseResult = requestBaseResult ?
-        (await appData.databaseConnection.queryRows(queryModel)).map(convertVersionsIntoNullsWhenNecessary) as IGQLSearchRecord[] :
+        (await appData.databaseConnection.queryRows(queryModel)).map(convertVersionsIntoNullsWhenNecessary) as IRQSearchRecord[] :
         [];
 
       sqlResponse = baseResult;
@@ -1722,7 +1722,7 @@ export async function searchItemDefinition(
     }
 
     if (opts.traditional) {
-      const finalResult: IGQLSearchResultsContainer = {
+      const finalResult: IRQSearchResultsContainer = {
         results: await Promise.all(
           baseResult.map(async (r) => {
             const valueToProvide = await filterAndPrepareGQLValue(
@@ -1920,10 +1920,10 @@ export async function searchItemDefinition(
       appData.rootPool.release(pooledRoot);
       return finalResult;
     } else {
-      const finalResult: IGQLSearchRecordsContainer = {
+      const finalResult: IRQSearchRecordsContainer = {
         // these records don't match the shape perfectly, they may hold more stuff, such as created_at
         // but they should work just fine
-        records: baseResult as IGQLSearchRecord[],
+        records: baseResult as IRQSearchRecord[],
         last_modified: generalFields.last_modified ? findLastRecordDate("max", "last_modified", baseResult) : null,
         earliest_created_at: generalFields.earliest_created_at ? findLastRecordDate("min", "created_at", baseResult) : null,
         oldest_created_at: generalFields.oldest_created_at ? findLastRecordDate("max", "created_at", baseResult) : null,

@@ -5,7 +5,6 @@
  */
 
 import { IPropertyDefinitionSupportedType } from "../types";
-import { GraphQLString } from "graphql";
 import {
   standardSQLInFn,
   standardSQLOutFn,
@@ -80,7 +79,6 @@ export const exactStringSearchSubtypes = [
  * The behaviour of strings is described by this type
  */
 const typeValue: IPropertyDefinitionSupportedType<PropertyDefinitionSupportedStringType> = {
-  gql: GraphQLString,
   rq: {
     type: "string",
   },

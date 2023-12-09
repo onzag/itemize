@@ -9,8 +9,8 @@
 import { EXCLUSION_STATE_SUFFIX } from "../../../../../constants";
 import {
   getSQLTableDefinitionForProperty,
-  convertSQLValueToGQLValueForProperty,
-  convertGQLValueToSQLValueForProperty,
+  convertSQLValueToRQValueForProperty,
+  convertRQValueToSQLValueForProperty,
   buildSQLQueryForProperty,
   getElasticSchemaForProperty,
   convertSQLValueToElasticSQLValueForProperty,
@@ -19,7 +19,7 @@ import {
 import Include, { IncludeExclusionState } from "../Include";
 import { ISQLTableDefinitionType, ISQLTableRowValue, ISQLStreamComposedTableRowValue, ConsumeStreamsFnType, IElasticIndexDefinitionType } from "../../../sql";
 import ItemDefinition from "..";
-import { IGQLValue, IGQLArgs } from "../../../../../gql-querier";
+import { IRQValue, IRQArgs } from "../../../../../rq-querier";
 import StorageProvider from "../../../../../server/services/base/StorageProvider";
 import { WhereBuilder } from "../../../../../database/WhereBuilder";
 import type { ElasticQueryBuilder } from "../../../../../server/elastic";
@@ -131,7 +131,7 @@ export function convertSQLValueToGQLValueForInclude(
   include: Include,
   row: ISQLTableRowValue,
   graphqlFields?: any,
-): IGQLValue {
+): IRQValue {
   // now this is the result, of the graphql parent field because this is
   // an object that contains an object, the item sinking properties
   // are contained within that prefix, for example if the sql is
@@ -139,7 +139,7 @@ export function convertSQLValueToGQLValueForInclude(
   // the output should be
   // ITEM_wheel__EXCLUSION_STATE: ..., ITEM_wheel: {bolt: ... rubber: ...}
   // this gqlParentResult represents what is in ITEM_wheel
-  const gqlParentResult: IGQLValue = {};
+  const gqlParentResult: IRQValue = {};
 
   // for that we need all the sinking properties
   include.getSinkingProperties().filter(
@@ -150,7 +150,7 @@ export function convertSQLValueToGQLValueForInclude(
     // the sql data with ITEM_wheel_
     Object.assign(
       gqlParentResult,
-      convertSQLValueToGQLValueForProperty(
+      convertSQLValueToRQValueForProperty(
         serverData,
         appData,
         itemDefinition,
@@ -175,7 +175,7 @@ export function convertSQLValueToElasticSQLValueForInclude(
   itemDefinition: ItemDefinition, 
   include: Include,
   row: ISQLTableRowValue,
-): IGQLValue {
+): IRQValue {
   let result: ISQLTableRowValue = {
     [include.getQualifiedExclusionStateIdentifier()]: row[include.getQualifiedExclusionStateIdentifier()],
   };
@@ -224,8 +224,8 @@ export function convertGQLValueToSQLValueForInclude(
   appData: IAppDataType,
   itemDefinition: ItemDefinition,
   include: Include,
-  data: IGQLArgs,
-  oldData: IGQLValue,
+  data: IRQArgs,
+  oldData: IRQValue,
   uploadsClient: StorageProvider<any>,
   domain: string,
   language: string | ISQLTableRowValue,
@@ -259,15 +259,15 @@ export function convertGQLValueToSQLValueForInclude(
         // are an object within there, we pass that, as all the info should be
         // there, the prefix then represents the fact, we want all the added properties
         // to be prefixed with what we are giving, in this case ITEM_wheel_
-        const addedFieldsByProperty = convertGQLValueToSQLValueForProperty(
+        const addedFieldsByProperty = convertRQValueToSQLValueForProperty(
           serverData,
           appData,
           itemDefinition.getParentModule(),
           itemDefinition,
           include,
           sinkingProperty,
-          data[include.getQualifiedIdentifier()] as IGQLValue,
-          (oldData && oldData[include.getQualifiedIdentifier()] as IGQLValue) || null,
+          data[include.getQualifiedIdentifier()] as IRQValue,
+          (oldData && oldData[include.getQualifiedIdentifier()] as IRQValue) || null,
           uploadsClient,
           domain,
           language,
@@ -304,7 +304,7 @@ export function buildSQLQueryForInclude(
   appData: IAppDataType,
   itemDefinition: ItemDefinition,
   include: Include,
-  args: IGQLArgs,
+  args: IRQArgs,
   whereBuilder: WhereBuilder,
   language: string,
   dictionary: string,
@@ -327,7 +327,7 @@ export function buildSQLQueryForInclude(
         secondBuilder.andWhereColumn(exclusionStateQualifiedId, IncludeExclusionState.INCLUDED);
 
         // get the args for that specific include
-        const includeArgs = args[include.getQualifiedIdentifier()] as IGQLArgs;
+        const includeArgs = args[include.getQualifiedIdentifier()] as IRQArgs;
 
         // and apply the search for all the sinking properties
         include.getSinkingProperties().forEach((pd) => {
@@ -371,7 +371,7 @@ export function buildSQLQueryForInclude(
   appData: IAppDataType,
   itemDefinition: ItemDefinition,
   include: Include,
-  args: IGQLArgs,
+  args: IRQArgs,
   elasticQueryBuilder: ElasticQueryBuilder,
   language: string,
   dictionary: string,
@@ -400,7 +400,7 @@ export function buildSQLQueryForInclude(
         });
 
         // get the args for that specific include
-        const includeArgs = args[include.getQualifiedIdentifier()] as IGQLArgs;
+        const includeArgs = args[include.getQualifiedIdentifier()] as IRQArgs;
 
         // and apply the search for all the sinking properties
         include.getSinkingProperties().forEach((pd) => {

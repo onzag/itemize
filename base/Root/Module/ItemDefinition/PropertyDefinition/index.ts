@@ -26,7 +26,7 @@ import supportedTypesStandard, { PropertyDefinitionSupportedType, PropertyDefini
 import { EndpointError } from "../../../../errors";
 import { DOMWindow } from "../../../../../util";
 import equals from "deep-equal";
-import { IGQLFile } from "../../../../../gql-querier";
+import { IRQFile } from "../../../../../rq-querier";
 import Include from "../Include";
 import { ICustomRoleManager } from "../../../../Root";
 import type { PropertyDefinitionSupportedFilesType } from "./types/files";
@@ -587,12 +587,12 @@ export default class PropertyDefinition {
     if (checkAgainstValues && propertyDefinitionRaw.values) {
       // Check against the values if allowed
       if (
-        !definition.gqlList &&
+        !definition.rq.array &&
         !propertyDefinitionRaw.values.includes(value)
       ) {
         return PropertyInvalidReason.INVALID_VALUE;
       } else if (
-        definition.gqlList &&
+        definition.rq.array &&
         !(value as any[]).every((v) => propertyDefinitionRaw.values.includes(v))
       ) {
         return PropertyInvalidReason.INVALID_VALUE;
@@ -604,18 +604,21 @@ export default class PropertyDefinition {
       return PropertyInvalidReason.INVALID_VALUE;
     }
 
-    // if this is a graphql list
-    if (definition.gqlList) {
+    // if this is a rq list
+    if (definition.rq.array) {
       // then we check if it's an array
       if (!Array.isArray(value)) {
         // if it's not is invalid
         return PropertyInvalidReason.INVALID_VALUE;
       }
 
+      // TODO here we validate the RQ type rather than doing this crazyness
+      // we need to use the RQ shape to validate rather than doing this gql madness
+
       // if this is specified as a file content array data
       if (definition.gqlAddFileToFields) {
         // we have to do this madness for every file
-        if (!(value as PropertyDefinitionSupportedFilesType).every((v: IGQLFile) => {
+        if (!(value as PropertyDefinitionSupportedFilesType).every((v: IRQFile) => {
           // check that all the types match
           return typeof v.id === "string" &&
             typeof v.name === "string" &&
@@ -651,7 +654,7 @@ export default class PropertyDefinition {
       // Otherwise if we are adding the file info, but it's not an array
     } else if (definition.gqlAddFileToFields) {
       // we get is casted as a file
-      const valueAsIGQLFile: IGQLFile = value as unknown as IGQLFile;
+      const valueAsIGQLFile: IRQFile = value as unknown as IRQFile;
 
       // and now we got to check if any of these, does not match
       // we are doing the opposite we did before with .every
@@ -1827,8 +1830,8 @@ export default class PropertyDefinition {
         newValue
       ) {
         if (this.getType() === "files") {
-          newValue = (currentValue as IGQLFile[]).map((v) => {
-            const serverProvidedValue = (value as IGQLFile[]).find((v2) => v2.id === v.id);
+          newValue = (currentValue as IRQFile[]).map((v) => {
+            const serverProvidedValue = (value as IRQFile[]).find((v2) => v2.id === v.id);
             if (serverProvidedValue) {
               return {
                 ...serverProvidedValue,
@@ -1850,10 +1853,10 @@ export default class PropertyDefinition {
             return v;
           });
         } else {
-          if ((newValue as IGQLFile).id === (currentValue as IGQLFile).id) {
+          if ((newValue as IRQFile).id === (currentValue as IRQFile).id) {
             // we keep our current url as it may be a blob type
             // and we prefer blob types because they are local
-            (newValue as IGQLFile).url = (currentValue as IGQLFile).url;
+            (newValue as IRQFile).url = (currentValue as IRQFile).url;
           }
         }
       }
@@ -1893,25 +1896,25 @@ export default class PropertyDefinition {
         if (previousValueToWorkWith) {
           if (this.getType() === "file") {
             if (
-              (previousValueToWorkWith as IGQLFile).url.startsWith("blob:") &&
-              (!actualValue || (actualValue as IGQLFile).url !== (previousValueToWorkWith as IGQLFile).url) &&
-              (!actualAppliedValue || (actualAppliedValue as IGQLFile).url !== (actualAppliedValue as IGQLFile).url)
+              (previousValueToWorkWith as IRQFile).url.startsWith("blob:") &&
+              (!actualValue || (actualValue as IRQFile).url !== (previousValueToWorkWith as IRQFile).url) &&
+              (!actualAppliedValue || (actualAppliedValue as IRQFile).url !== (actualAppliedValue as IRQFile).url)
             ) {
-              PropertyDefinition.revokeFileForProperty(previousValueToWorkWith as IGQLFile);
+              PropertyDefinition.revokeFileForProperty(previousValueToWorkWith as IRQFile);
             }
           } else {
-            let actualValueArr: IGQLFile[] = [];
+            let actualValueArr: IRQFile[] = [];
             if (actualValue) {
-              actualValueArr = actualValueArr.concat(actualValue as IGQLFile[]);
+              actualValueArr = actualValueArr.concat(actualValue as IRQFile[]);
             }
             if (actualAppliedValue) {
-              actualValueArr = actualValueArr.concat(actualAppliedValue as IGQLFile[]);
+              actualValueArr = actualValueArr.concat(actualAppliedValue as IRQFile[]);
             }
-            (previousValueToWorkWith as IGQLFile[]).forEach((p) => {
+            (previousValueToWorkWith as IRQFile[]).forEach((p) => {
               if (!p.url.startsWith("blob:")) {
                 return;
               }
-              const shouldRevoke = !(actualValueArr as IGQLFile[]).find((v) => v.url === p.url);
+              const shouldRevoke = !(actualValueArr as IRQFile[]).find((v) => v.url === p.url);
               if (shouldRevoke) {
                 PropertyDefinition.revokeFileForProperty(p);
               }
@@ -1951,11 +1954,11 @@ export default class PropertyDefinition {
       // we will revoke anything of the urls that are in memory for files
       if (actualValue) {
         if (this.getType() === "file") {
-          if ((actualValue as IGQLFile).url.startsWith("blob:")) {
-            PropertyDefinition.revokeFileForProperty(actualValue as IGQLFile);
+          if ((actualValue as IRQFile).url.startsWith("blob:")) {
+            PropertyDefinition.revokeFileForProperty(actualValue as IRQFile);
           }
         } else {
-          (actualValue as IGQLFile[]).forEach((p) => {
+          (actualValue as IRQFile[]).forEach((p) => {
             p.url.startsWith("blob:") && PropertyDefinition.revokeFileForProperty(p)
           });
         }

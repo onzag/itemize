@@ -83,6 +83,7 @@ export function getRQDefinitionForItemDefinition(
     Object.assign(stdFields.DATA.ownFields, getRQDefinitionForProperty(propDef, {
       optionalForm: options.optionalForm,
       prefix: "",
+      retrievalMode: options.retrievalMode,
     }));
   });
 
@@ -91,6 +92,7 @@ export function getRQDefinitionForItemDefinition(
     itemDefinition.getAllIncludes().forEach((i) => {
       const includeFields = getRQDefinitionForInclude(i, {
         optionalForm: options.optionalForm,
+        retrievalMode: options.retrievalMode,
       });
       if (includeFields) {
         if (!stdFields.DATA) {
@@ -161,6 +163,7 @@ export function getRQDefinitionForItemDefinitionPolicies(
         getRQDefinitionForProperty(pd, {
           optionalForm: true,
           prefix: PREFIX_BUILD(POLICY_PREFIXES[options.policy] + policyName),
+          retrievalMode: false,
         }),
       );
     });

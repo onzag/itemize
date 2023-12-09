@@ -1,4 +1,4 @@
-import { IGQLArgs, IGQLValue } from "../../gql-querier";
+import { IRQArgs, IRQValue } from "../../rq-querier";
 import Module from "../../base/Root/Module";
 import ItemDefinition from "../../base/Root/Module/ItemDefinition";
 import { Cache } from "../../server/cache";
@@ -39,11 +39,11 @@ export interface ICustomRoleGranterArg {
   rawDB: ItemizeRawDB;
   item: ItemDefinition;
   module: Module;
-  value: IGQLValue;
+  value: IRQValue;
   id: string;
   version: string;
   environment: CustomRoleGranterEnvironment;
-  requestArgs: IGQLArgs;
+  requestArgs: IRQArgs;
   /**
    * Represents the expected owner of the given item
    * and it's affected by executing actions in behalf of someone else

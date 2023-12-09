@@ -6,7 +6,7 @@
  */
 
 import React from "react";
-import { IGQLFile } from "../../../gql-querier";
+import { IRQFile } from "../../../rq-querier";
 import PropertyDefinition from "../../../base/Root/Module/ItemDefinition/PropertyDefinition";
 
 /**
@@ -23,7 +23,7 @@ import PropertyDefinition from "../../../base/Root/Module/ItemDefinition/Propert
  * it is calculated
  */
 export function imageSrcSetRetriever(
-  fileData: IGQLFile,
+  fileData: IRQFile,
   property: PropertyDefinition,
   imageSizes?: IImageSizes,
 ) {
@@ -195,7 +195,7 @@ export interface IImageSizes {
  * custom sizes can be used and it needs access to the property in order to know these urls
  */
 export function imageSizeRetriever(
-  fileData: IGQLFile,
+  fileData: IRQFile,
 ): IImageSizes {
   // the final value by default is just the url itself
   const finalValue = {

@@ -1,6 +1,6 @@
 import React, { useRef, useCallback, useEffect, useState, useMemo } from "react";
 import type { EndpointErrorType } from "../../../base/errors";
-import type { IGQLValue } from "../../../gql-querier";
+import type { IRQValue } from "../../../rq-querier";
 import CacheWorkerInstance from "../../internal/workers/cache";
 import { IActionResponseWithValue, ItemProvider } from "../../providers/item";
 import { ModuleProvider } from "../../providers/module";
@@ -55,7 +55,7 @@ interface IItemSyncerProps {
 }
 
 export interface ILoadedValue {
-  value: IGQLValue,
+  value: IRQValue,
   cached: boolean,
   loaded: boolean,
   id: string,

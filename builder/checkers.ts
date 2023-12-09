@@ -1222,7 +1222,7 @@ export function checkPropertyDefinition(
     rawData.values.forEach((value, index) => {
       const invalidreason = PropertyDefinition.isValidValue(
         rawData,
-        (propertyDefintionTypeStandard.gqlList ? [value] : value) as any,
+        (propertyDefintionTypeStandard.rq.array ? [value] : value) as any,
         false,
       );
       if (invalidreason) {

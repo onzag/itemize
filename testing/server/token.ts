@@ -33,8 +33,8 @@ export class TokenTest extends Test {
         if (
           !gqlAnswer.errors ||
           !gqlAnswer.errors[0] ||
-          !gqlAnswer.errors[0].extensions ||
-          gqlAnswer.errors[0].extensions.code !== ENDPOINT_ERRORS.INVALID_CREDENTIALS
+          !gqlAnswer.errors[0].error ||
+          gqlAnswer.errors[0].error.code !== ENDPOINT_ERRORS.INVALID_CREDENTIALS
         ) {
           assert.fail("Did not return code for " + ENDPOINT_ERRORS.INVALID_CREDENTIALS);
         }
@@ -61,8 +61,8 @@ export class TokenTest extends Test {
         if (
           gqlAnswer.errors
         ) {
-          if (gqlAnswer.errors[0] && gqlAnswer.errors[0].extensions && gqlAnswer.errors[0].extensions.code) {
-            assert.fail("Did not provide the same token but rather gave error code " + gqlAnswer.errors[0].extensions.code);
+          if (gqlAnswer.errors[0] && gqlAnswer.errors[0].error && gqlAnswer.errors[0].error.code) {
+            assert.fail("Did not provide the same token but rather gave error code " + gqlAnswer.errors[0].error.code);
           }
           assert.fail("Provided an error without code");
         }
@@ -101,8 +101,8 @@ export class TokenTest extends Test {
         if (
           !gqlAnswer.errors ||
           !gqlAnswer.errors[0] ||
-          !gqlAnswer.errors[0].extensions ||
-          gqlAnswer.errors[0].extensions.code !== ENDPOINT_ERRORS.NOTHING_TO_UPDATE
+          !gqlAnswer.errors[0].error ||
+          gqlAnswer.errors[0].error.code !== ENDPOINT_ERRORS.NOTHING_TO_UPDATE
         ) {
           assert.fail("Did not return code for " + ENDPOINT_ERRORS.NOTHING_TO_UPDATE);
         }
@@ -151,8 +151,8 @@ export class TokenTest extends Test {
           if (
             !gqlAnswer.errors ||
             !gqlAnswer.errors[0] ||
-            !gqlAnswer.errors[0].extensions ||
-            gqlAnswer.errors[0].extensions.code !== ENDPOINT_ERRORS.INVALID_CREDENTIALS
+            !gqlAnswer.errors[0].error ||
+            gqlAnswer.errors[0].error.code !== ENDPOINT_ERRORS.INVALID_CREDENTIALS
           ) {
             assert.fail("Did not return code for " + ENDPOINT_ERRORS.INVALID_CREDENTIALS);
           }
@@ -191,8 +191,8 @@ export class TokenTest extends Test {
           if (
             !gqlAnswer.errors ||
             !gqlAnswer.errors[0] ||
-            !gqlAnswer.errors[0].extensions ||
-            gqlAnswer.errors[0].extensions.code !== ENDPOINT_ERRORS.INVALID_CREDENTIALS
+            !gqlAnswer.errors[0].error ||
+            gqlAnswer.errors[0].error.code !== ENDPOINT_ERRORS.INVALID_CREDENTIALS
           ) {
             console.log(gqlAnswer);
             assert.fail("Did not return code for " + ENDPOINT_ERRORS.INVALID_CREDENTIALS);

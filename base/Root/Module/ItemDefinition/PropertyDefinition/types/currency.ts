@@ -8,7 +8,6 @@ import { currencies } from "../../../../../../imported-resources";
 import {
   IPropertyDefinitionSupportedType,
 } from "../types";
-import { GraphQLNonNull, GraphQLFloat, GraphQLString } from "graphql";
 import { PropertyInvalidReason } from "../../PropertyDefinition";
 import {
   MAX_SUPPORTED_REAL,
@@ -43,18 +42,6 @@ export interface IPropertyDefinitionSupportedCurrencyType {
  * The type of a curreny type specifies how it behaves in the app
  */
 const typeValue: IPropertyDefinitionSupportedType<IPropertyDefinitionSupportedCurrencyType> = {
-  // the graphql is a new type
-  gql: "PROPERTY_TYPE__Currency",
-  // it contains the following fields, note how they
-  // are conditional due to the fact this goes to the client side as well
-  gqlFields: {
-    value: {
-      type: GraphQLNonNull && GraphQLNonNull(GraphQLFloat),
-    },
-    currency: {
-      type: GraphQLNonNull && GraphQLNonNull(GraphQLString),
-    },
-  },
   rq: {
     type: "object",
     stdFields: {

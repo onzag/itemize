@@ -18,7 +18,7 @@ import { PropertyDefinitionSearchInterfacesPrefixes } from "../search-interfaces
 import ItemDefinition from "../..";
 import Include from "../../Include";
 import { processFileListFor, processSingleFileFor } from "./file-management";
-import { IGQLArgs, IGQLValue } from "../../../../../../gql-querier";
+import { IRQArgs, IRQValue } from "../../../../../../rq-querier";
 import { MAX_DECIMAL_COUNT, SQL_CONSTRAINT_PREFIX } from "../../../../../../constants";
 import Module from "../../..";
 import StorageProvider from "../../../../../../server/services/base/StorageProvider";
@@ -548,14 +548,14 @@ export function getElasticSchemaForProperty(
  * @param row the row that we want to extract information from
  * @returns the graphql value for the property
  */
-export function convertSQLValueToGQLValueForProperty(
+export function convertSQLValueToRQValueForProperty(
   serverData: any,
   appData: IAppDataType,
   itemDefinition: ItemDefinition,
   include: Include,
   propertyDefinition: PropertyDefinition,
   row: ISQLTableRowValue,
-): IGQLValue {
+): IRQValue {
   // we get the column name we are supposed to extract the data
   // from, usually properties in sql are stored as their raw id, eg.
   // "distance", "size", etc... but they might be prefixed
@@ -616,7 +616,7 @@ export function convertSQLValueToElasticSQLValueForProperty(
   include: Include,
   propertyDefinition: PropertyDefinition,
   row: ISQLTableRowValue,
-): IGQLValue {
+): IRQValue {
   const sqlElasticIn = propertyDefinition.getPropertyDefinitionDescription().sqlElasticIn;
   let value = sqlElasticIn({
     row,
@@ -647,15 +647,15 @@ export function convertSQLValueToElasticSQLValueForProperty(
  * @returns a composed value with a partial row value and the consume streams functionality
  * included in it
  */
-export function convertGQLValueToSQLValueForProperty(
+export function convertRQValueToSQLValueForProperty(
   serverData: any,
   appData: IAppDataType,
   mod: Module,
   itemDefinition: ItemDefinition,
   include: Include,
   propertyDefinition: PropertyDefinition,
-  data: IGQLArgs,
-  oldData: IGQLValue,
+  data: IRQArgs,
+  oldData: IRQValue,
   uploadsClient: StorageProvider<any>,
   domain: string,
   language: string | ISQLTableRowValue,
@@ -684,10 +684,10 @@ export function convertGQLValueToSQLValueForProperty(
 
   let consumeStreams: ConsumeStreamsFnType;
   const description = propertyDefinition.getPropertyDefinitionDescription();
-  if (description.gqlAddFileToFields) {
+  if (description.rqRepresentsFile) {
     const oldValue: any = (oldData && oldData[propertyDefinition.getId()]) || null;
     const newValue = gqlPropertyValue;
-    if (description.gqlList) {
+    if (description.rq.array) {
       const processedValue = processFileListFor(
         newValue,
         oldValue,
@@ -755,7 +755,7 @@ export function buildSQLQueryForProperty(
   itemDefinition: ItemDefinition,
   include: Include,
   propertyDefinition: PropertyDefinition,
-  args: IGQLArgs,
+  args: IRQArgs,
   whereBuilder: WhereBuilder,
   language: string,
   dictionary: string,
@@ -795,7 +795,7 @@ export function buildElasticQueryForProperty(
   itemDefinition: ItemDefinition,
   include: Include,
   propertyDefinition: PropertyDefinition,
-  args: IGQLArgs,
+  args: IRQArgs,
   elasticQueryBuilder: ElasticQueryBuilder,
   language: string,
   dictionary: string,
@@ -841,7 +841,7 @@ export function buildSQLStrSearchQueryForProperty(
   itemDefinition: ItemDefinition,
   include: Include,
   propertyDefinition: PropertyDefinition,
-  args: IGQLArgs,
+  args: IRQArgs,
   search: string,
   whereBuilder: WhereBuilder,
   language: string,
@@ -887,7 +887,7 @@ export function buildElasticStrSearchQueryForProperty(
   itemDefinition: ItemDefinition,
   include: Include,
   propertyDefinition: PropertyDefinition,
-  args: IGQLArgs,
+  args: IRQArgs,
   search: string,
   elasticQueryBuilder: ElasticQueryBuilder,
   language: string,
@@ -947,7 +947,7 @@ export function buildSQLOrderByForProperty(
   itemDefinition: ItemDefinition,
   include: Include,
   propertyDefinition: PropertyDefinition,
-  args: IGQLArgs,
+  args: IRQArgs,
   orderByBuilder: OrderByBuilder,
   direction: "asc" | "desc",
   nulls: "first" | "last",
@@ -1002,7 +1002,7 @@ export function buildElasticOrderByForProperty(
   itemDefinition: ItemDefinition,
   include: Include,
   propertyDefinition: PropertyDefinition,
-  args: IGQLArgs,
+  args: IRQArgs,
   direction: "asc" | "desc",
   nulls: "first" | "last",
   wasIncludedInSearch: boolean,
@@ -1046,7 +1046,7 @@ export function buildElasticOrderByForProperty(
 export function buildSQLOrderByForInternalRequiredProperty(
   itemDefinition: ItemDefinition,
   which: string,
-  args: IGQLArgs,
+  args: IRQArgs,
   orderByBuilder: OrderByBuilder,
   direction: "asc" | "desc",
   nulls: "first" | "last",
@@ -1088,7 +1088,7 @@ export function buildSQLOrderByForInternalRequiredProperty(
 export function buildElasticOrderByForInternalRequiredProperty(
   itemDefinition: ItemDefinition,
   which: string,
-  args: IGQLArgs,
+  args: IRQArgs,
   direction: "asc" | "desc",
   nulls: "first" | "last",
 ) {

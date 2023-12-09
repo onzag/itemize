@@ -16,7 +16,7 @@ import PropertyEntry from "../../internal/components/PropertyEntry";
 import PropertySetter from "../../internal/components/PropertySetter";
 import { IncludeContext } from "../../providers/include";
 import { fileURLAbsoluter, fileArrayURLAbsoluter } from "../../../util";
-import { IGQLFile } from "../../../gql-querier";
+import { IRQFile } from "../../../rq-querier";
 import { ConfigContext } from "../../internal/providers/config-provider";
 import equals from "deep-equal";
 
@@ -344,7 +344,7 @@ export function EntryViewReadSet(
           const value = fileURLAbsoluter(
             domain,
             config.containersHostnamePrefixes,
-            props.useAppliedValue ? propertyState.stateAppliedValue as IGQLFile : propertyState.value as IGQLFile,
+            props.useAppliedValue ? propertyState.stateAppliedValue as IRQFile : propertyState.value as IRQFile,
             itemContextualValue.idef,
             itemContextualValue.forId,
             itemContextualValue.forVersion,
@@ -363,7 +363,7 @@ export function EntryViewReadSet(
           const value = fileArrayURLAbsoluter(
             domain,
             config.containersHostnamePrefixes,
-            props.useAppliedValue ? propertyState.stateAppliedValue as IGQLFile[] : propertyState.value as IGQLFile[],
+            props.useAppliedValue ? propertyState.stateAppliedValue as IRQFile[] : propertyState.value as IRQFile[],
             itemContextualValue.idef,
             itemContextualValue.forId,
             itemContextualValue.forVersion,

@@ -10,8 +10,8 @@ import { RESERVED_BASE_PROPERTIES_SQL, RESERVED_BASE_PROPERTIES, COMBINED_INDEX,
 import Module from ".";
 import {
   getSQLTableDefinitionForProperty,
-  convertGQLValueToSQLValueForProperty,
-  convertSQLValueToGQLValueForProperty,
+  convertRQValueToSQLValueForProperty,
+  convertSQLValueToRQValueForProperty,
   buildSQLQueryForProperty,
   buildSQLStrSearchQueryForProperty,
   buildSQLOrderByForProperty,
@@ -25,7 +25,7 @@ import {
 } from "./ItemDefinition/PropertyDefinition/sql";
 import { getElasticSchemaForItemDefinition, getSQLTablesSchemaForItemDefinition } from "./ItemDefinition/sql";
 import { ISQLTableDefinitionType, ISQLSchemaDefinitionType, ISQLTableRowValue, ISQLStreamComposedTableRowValue, ConsumeStreamsFnType, IElasticSchemaDefinitionType } from "../sql";
-import { IGQLRequestFields, IGQLValue, IGQLArgs } from "../../../gql-querier";
+import { IRQRequestFields, IRQValue, IRQArgs } from "../../../rq-querier";
 import StorageProvider from "../../../server/services/base/StorageProvider";
 import { WhereBuilder } from "../../../database/WhereBuilder";
 import { OrderByBuilder } from "../../../database/OrderByBuilder";
@@ -248,13 +248,13 @@ export function convertGQLValueToSQLValueForModule(
   serverData: any,
   appData: IAppDataType,
   mod: Module,
-  data: IGQLArgs,
-  oldData: IGQLValue,
+  data: IRQArgs,
+  oldData: IRQValue,
   uploadsClient: StorageProvider<any>,
   domain: string,
   language: string | ISQLTableRowValue,
   dictionary: string | ISQLTableRowValue,
-  partialFields?: IGQLRequestFields | IGQLArgs | IGQLValue,
+  partialFields?: IRQRequestFields | IRQArgs | IRQValue,
 ): ISQLStreamComposedTableRowValue {
   // first we create the row value
   const result: ISQLTableRowValue = {};
@@ -267,7 +267,7 @@ export function convertGQLValueToSQLValueForModule(
       (partialFields && typeof partialFields[pd.getId()] !== "undefined") ||
       !partialFields
     ) {
-      const addedFieldsByProperty = convertGQLValueToSQLValueForProperty(
+      const addedFieldsByProperty = convertRQValueToSQLValueForProperty(
         serverData,
         appData,
         mod,
@@ -317,10 +317,10 @@ export function convertSQLValueToGQLValueForModule(
   appData: IAppDataType,
   mod: Module,
   row: ISQLTableRowValue,
-  graphqlFields: IGQLRequestFields,
-): IGQLValue {
+  graphqlFields: IRQRequestFields,
+): IRQValue {
   // first we create the graphql result
-  const result: IGQLValue = {};
+  const result: IRQValue = {};
 
   // now we take all the base properties that we have
   // in the graphql model
@@ -337,7 +337,7 @@ export function convertSQLValueToGQLValueForModule(
   ).forEach((pd) => {
     Object.assign(
       result,
-      convertSQLValueToGQLValueForProperty(serverData, appData, null, null, pd, row),
+      convertSQLValueToRQValueForProperty(serverData, appData, null, null, pd, row),
     );
   });
 
@@ -390,7 +390,7 @@ export function buildSQLQueryForModule(
   serverData: any,
   appData: IAppDataType,
   mod: Module,
-  args: IGQLArgs,
+  args: IRQArgs,
   whereBuilder: WhereBuilder,
   orderByBuilder: OrderByBuilder,
   language: string,
@@ -500,7 +500,7 @@ export function buildSQLQueryForModule(
   serverData: any,
   appData: IAppDataType,
   mod: Module,
-  args: IGQLArgs,
+  args: IRQArgs,
   elasticQueryBuilder: ElasticQueryBuilder,
   language: string,
   dictionary: string,

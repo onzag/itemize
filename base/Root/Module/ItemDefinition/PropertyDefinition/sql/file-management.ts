@@ -1,5 +1,5 @@
 /**
- * Contains the functionality that makes it so that when files come from graphql
+ * Contains the functionality that makes it so that when files come from rq
  * streams and are to be stored in the database the files are sent somewhere else
  * and the url is actually what it's stored
  *
@@ -13,7 +13,7 @@ import { ReadStream } from "fs";
 import path from "path";
 import { FILE_SUPPORTED_IMAGE_TYPES } from "../../../../../../constants";
 import { runImageConversions } from "./image-conversions";
-import { IGQLFile } from "../../../../../../gql-querier";
+import { IRQFile } from "../../../../../../rq-querier";
 import { ConsumeStreamsFnType } from "../../../../sql";
 import sharp from "sharp";
 import { logger } from "../../../../../../server/logger";
@@ -36,15 +36,15 @@ import {
  * streams to store in the remote storage solution
  */
 export function processFileListFor(
-  newValues: IGQLFile[],
-  oldValues: IGQLFile[],
+  newValues: IRQFile[],
+  oldValues: IRQFile[],
   uploadsClient: StorageProvider<any>,
   domain: string,
   itemDefinitionOrModule: ItemDefinition | Module,
   include: Include,
   propertyDefinition: PropertyDefinition,
 ): {
-  value: IGQLFile[],
+  value: IRQFile[],
   consumeStreams: ConsumeStreamsFnType;
 } {
   // the values might be null so let's ensure them
@@ -118,15 +118,15 @@ export function processFileListFor(
  * streams to store in the remote storage solution
  */
 export function processSingleFileFor(
-  newValue: IGQLFile,
-  oldValue: IGQLFile,
+  newValue: IRQFile,
+  oldValue: IRQFile,
   uploadsClient: StorageProvider<any>,
   domain: string,
   itemDefinitionOrModule: ItemDefinition | Module,
   include: Include,
   propertyDefinition: PropertyDefinition,
 ): {
-  value: IGQLFile,
+  value: IRQFile,
   consumeStreams: ConsumeStreamsFnType;
 } {
   if (oldValue && oldValue.id === newValue.id) {
@@ -184,15 +184,15 @@ export function processSingleFileFor(
  * streams to store in the remote storage solution
  */
 function processOneFileAndItsSameIDReplacement(
-  newVersion: IGQLFile,
-  oldVersion: IGQLFile,
+  newVersion: IRQFile,
+  oldVersion: IRQFile,
   uploadsClient: StorageProvider<any>,
   domain: string,
   itemDefinitionOrModule: ItemDefinition | Module,
   include: Include,
   propertyDefinition: PropertyDefinition,
 ): {
-  value: IGQLFile,
+  value: IRQFile,
   consumeStreams: ConsumeStreamsFnType;
 } {
   // if the new version is null, this means that the old file
@@ -418,7 +418,7 @@ async function addFileFor(
   curatedFileName: string,
   uploadsClient: StorageProvider<any>,
   domain: string,
-  value: IGQLFile,
+  value: IRQFile,
   propertyDefinition: PropertyDefinition,
 ): Promise<void> {
   // first we get the createReadStream function from the source gql file

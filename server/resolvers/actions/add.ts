@@ -32,10 +32,10 @@ import {
 import {
   convertSQLValueToGQLValueForItemDefinition,
 } from "../../../base/Root/Module/ItemDefinition/sql";
-import { flattenRawGQLValueOrFields } from "../../../gql-util";
+import { flattenRawGQLValueOrFields } from "../../../rq-util";
 import { ISQLTableRowValue } from "../../../base/Root/sql";
 import { EndpointError } from "../../../base/errors";
-import { IGQLArgs } from "../../../gql-querier";
+import { IRQArgs } from "../../../rq-querier";
 import { IOTriggerActions } from "../triggers";
 import Root from "../../../base/Root";
 import { CustomRoleGranterEnvironment, CustomRoleManager } from "../roles";
@@ -365,7 +365,7 @@ export async function addItemDefinition(
     // now we need to setup what we want to convert, since the
     // converting functions can take the whole args with its extra
     // stuff by default it's just the whole args
-    let gqlValueToConvert: IGQLArgs = resolverArgs.args;
+    let gqlValueToConvert: IRQArgs = resolverArgs.args;
 
     // however now we need to check if we have triggers, for that we get
     // the absolute paths
@@ -378,8 +378,8 @@ export async function addItemDefinition(
     const triggerCache = {};
     const modTriggerCache = {};
 
-    let itemDefinitionSpecificArgs: IGQLArgs = null;
-    let extraArgs: IGQLArgs = null;
+    let itemDefinitionSpecificArgs: IRQArgs = null;
+    let extraArgs: IRQArgs = null;
     let forId: string = null;
     let forVersion: string = undefined;
     // if we got any of them convert

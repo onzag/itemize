@@ -34,7 +34,7 @@ import type { IAppDataType, IStorageProviders } from "../server";
 import { DeclareCursorBuilder } from "../database/DeclareCursorBuilder";
 import { CloseCursorBuilder } from "../database/CloseCursorBuilder";
 import { FetchOrMoveFromCursorBuilder } from "../database/FetchOrMoveFromCursorBuilder";
-import type { IGQLSearchRecord } from "../gql-querier";
+import type { IRQSearchRecord } from "../rq-querier";
 import { IStorageProvidersObject } from "./services/base/StorageProvider";
 import { deleteEverythingInFilesContainerId } from "../base/Root/Module/ItemDefinition/PropertyDefinition/sql/file-management";
 import { analyzeModuleForPossibleParent } from "./cache";

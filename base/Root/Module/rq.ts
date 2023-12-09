@@ -86,6 +86,7 @@ export function getRQDefinitionForModule(
     Object.assign(stdFields.DATA.ownFields, getRQDefinitionForProperty(propExtension, {
       optionalForm: options.optionalForm,
       prefix: "",
+      retrievalMode: options.retrievalMode,
     }));
   });
 

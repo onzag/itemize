@@ -8,7 +8,7 @@ import MomentDef from "moment";
 import { JSDOM as JSDOMDef } from "jsdom";
 import createDOMPurify from "dompurify";
 import { DATETIME_FORMAT, DATE_FORMAT, FILE_SUPPORTED_IMAGE_TYPES, TIME_FORMAT } from "./constants";
-import { IGQLFile } from "./gql-querier";
+import { IRQFile } from "./rq-querier";
 import ItemDefinition from "./base/Root/Module/ItemDefinition";
 import Include from "./base/Root/Module/ItemDefinition/Include";
 import PropertyDefinition from "./base/Root/Module/ItemDefinition/PropertyDefinition";
@@ -530,14 +530,14 @@ export function parseDateTime(datetime: string) {
  * @param include the include (or null)
  * @param property the property it came from
  * @param cacheable whether the resulting url should be cached
- * @returns a new IGQLFile but absolute
+ * @returns a new IRQFile but absolute
  */
 export function fileURLAbsoluter(
   domain: string,
   containerHostnamePrefixes: {
     [key: string]: string,
   },
-  file: IGQLFile,
+  file: IRQFile,
   itemDefinition: ItemDefinition,
   id: string,
   version: string,
@@ -546,7 +546,7 @@ export function fileURLAbsoluter(
   property: PropertyDefinition,
   cacheable: boolean,
   forceFullURLs?: boolean,
-): IGQLFile {
+): IRQFile {
   if (file === null || !property) {
     return null;
   }
@@ -629,7 +629,7 @@ export function fileArrayURLAbsoluter(
   containerHostnamePrefixes: {
     [key: string]: string,
   },
-  files: IGQLFile[],
+  files: IRQFile[],
   itemDefinition: ItemDefinition,
   id: string,
   version: string,

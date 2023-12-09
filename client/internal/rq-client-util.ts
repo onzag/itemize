@@ -21,8 +21,8 @@ import {
   INCLUDE_PREFIX,
 } from "../../constants";
 import ItemDefinition, { IItemStateType } from "../../base/Root/Module/ItemDefinition";
-import { IGQLValue, IGQLRequestFields, IGQLArgs, buildGqlQuery, gqlQuery, buildGqlMutation, IGQLEndpointValue, IGQLSearchRecord, GQLEnum, IGQLFile, ProgresserFn, GQLQuery } from "../../gql-querier";
-import { deepMerge, requestFieldsAreContained } from "../../gql-util";
+import { IRQValue, IRQRequestFields, IRQArgs, buildGqlQuery, gqlQuery, buildGqlMutation, IRQEndpointValue, IRQSearchRecord, GQLEnum, IRQFile, ProgresserFn, GQLQuery } from "../../rq-querier";
+import { deepMerge, requestFieldsAreContained } from "../../rq-util";
 import CacheWorkerInstance from "./workers/cache";
 import { EndpointErrorType } from "../../base/errors";
 import { RemoteListener } from "./app/remote-listener";
@@ -605,7 +605,7 @@ export async function reprocessQueryArgumentsForFiles(
  * @param options options for restoring the source
  */
 export async function reprocessFileArgument(
-  files: IGQLFile | IGQLFile[],
+  files: IRQFile | IRQFile[],
   options: {
     config: IConfigRawJSONDataType;
     itemDefinition: ItemDefinition;
@@ -615,7 +615,7 @@ export async function reprocessFileArgument(
     forVersion: string;
     containerId: string;
   }
-): Promise<IGQLFile | IGQLFile[]> {
+): Promise<IRQFile | IRQFile[]> {
   // for array we recurse as an array
   if (Array.isArray(files)) {
     return await Promise.all((files as any).map((f: any) => reprocessFileArgument(f, options)));
@@ -694,14 +694,14 @@ function deleteNulls<T>(
  * @param version the version we are requesting for (optional)
  */
 function getQueryArgsFor(
-  args: IGQLArgs,
+  args: IRQArgs,
   token: string,
   language: string,
   id?: string,
   version?: string,
 ) {
   // basic args, the base args usually are for policies and whatnot
-  const newArgs: IGQLArgs = {
+  const newArgs: IRQArgs = {
     token: token,
     language: language.split("-")[0],
     ...args,
@@ -732,12 +732,12 @@ async function storeAndCombineStorageValuesFor(
   itemDefinition: ItemDefinition,
   id: string,
   version: string,
-  value: IGQLValue,
-  fields: IGQLRequestFields,
+  value: IRQValue,
+  fields: IRQRequestFields,
   cacheStore: boolean,
 ) {
-  let mergedValue: IGQLValue = value;
-  let mergedFields: IGQLRequestFields = fields;
+  let mergedValue: IRQValue = value;
+  let mergedFields: IRQRequestFields = fields;
   let cached: boolean = false;
 
   // The combining only happens if the value is found
@@ -819,8 +819,8 @@ async function storeAndCombineStorageValuesFor(
  */
 export async function runGetQueryFor(
   arg: {
-    args: IGQLArgs,
-    fields: IGQLRequestFields,
+    args: IRQArgs,
+    fields: IRQRequestFields,
     returnMemoryCachedValues: boolean,
     returnWorkerCachedValues: boolean,
     returnWorkerCachedValuesIfNoInternet?: boolean;
@@ -839,10 +839,10 @@ export async function runGetQueryFor(
   options: IRunQueryOptions,
 ): Promise<{
   error: EndpointErrorType,
-  value: IGQLValue,
+  value: IRQValue,
   memoryCached: boolean,
   cached: boolean,
-  getQueryFields: IGQLRequestFields,
+  getQueryFields: IRQRequestFields,
 }> {
   // now we get the currently applied value in memory
   const appliedGQLValue = arg.itemDefinition.getGQLAppliedValue(
@@ -1021,7 +1021,7 @@ export async function runGetQueryFor(
 
   if (gqlValue.errors) {
     // if the server itself returned an error, we use that error
-    error = gqlValue.errors[0].extensions;
+    error = gqlValue.errors[0].error;
   }
 
   const value = (gqlValue.data && gqlValue.data[queryName]) || null;
@@ -1092,7 +1092,7 @@ export async function runGetQueryFor(
  */
 export async function runDeleteQueryFor(
   arg: {
-    args: IGQLArgs,
+    args: IRQArgs,
     itemDefinition: ItemDefinition,
     id: string,
     version: string,
@@ -1139,7 +1139,7 @@ export async function runDeleteQueryFor(
 
   if (gqlValue.errors) {
     // if the server itself returned an error, we use that error
-    error = gqlValue.errors[0].extensions;
+    error = gqlValue.errors[0].error;
   }
 
   if (!error) {
@@ -1160,8 +1160,8 @@ export async function runDeleteQueryFor(
 
 export function getAddQueryFor(
   arg: {
-    args: IGQLArgs,
-    fields: IGQLRequestFields,
+    args: IRQArgs,
+    fields: IRQRequestFields,
     itemDefinition: ItemDefinition,
     token: string,
     language: string,
@@ -1206,8 +1206,8 @@ export function getAddQueryFor(
 }
 
 function preserveSingleBlobFileAt(
-  unpreserved: IGQLFile,
-  sources: IGQLFile[],
+  unpreserved: IRQFile,
+  sources: IRQFile[],
 ) {
   // somehow already has a source
   if (unpreserved.src) {
@@ -1227,8 +1227,8 @@ function preserveSingleBlobFileAt(
 function preserveBlobFilesAt(
   include: Include,
   property: PropertyDefinition,
-  args: IGQLArgs,
-  unpreservedValue: IGQLValue,
+  args: IRQArgs,
+  unpreservedValue: IRQValue,
 ) {
   const idLocation = include ? include.getId() : property.getId();
   const idLocationLevel2 = include ? property.getId() : null;
@@ -1272,8 +1272,8 @@ function preserveBlobFilesAt(
  */
 function preserveBlobFilesInValue(
   idef: ItemDefinition,
-  args: IGQLArgs,
-  unpreservedValue: IGQLValue,
+  args: IRQArgs,
+  unpreservedValue: IRQValue,
 ) {
   idef.getAllPropertyDefinitionsAndExtensions().forEach(async (p) => {
     preserveBlobFilesAt(null, p, args, unpreservedValue);
@@ -1307,8 +1307,8 @@ function preserveBlobFilesInValue(
  */
 export async function runAddQueryFor(
   arg: {
-    args: IGQLArgs,
-    fields: IGQLRequestFields,
+    args: IRQArgs,
+    fields: IRQRequestFields,
     itemDefinition: ItemDefinition,
     token: string,
     language: string,
@@ -1323,8 +1323,8 @@ export async function runAddQueryFor(
   options: IRunQueryOptions,
 ): Promise<{
   error: EndpointErrorType,
-  value: IGQLValue,
-  getQueryFields: IGQLRequestFields,
+  value: IRQValue,
+  getQueryFields: IRQRequestFields,
 }> {
   const query = getAddQueryFor(arg);
   const queryName = query.getQueryByIndex(0).name;
@@ -1341,7 +1341,7 @@ export async function runAddQueryFor(
 
   if (gqlValue.errors) {
     // if the server itself returned an error, we use that error
-    error = gqlValue.errors[0].extensions;
+    error = gqlValue.errors[0].error;
   }
 
   const value = (gqlValue.data && gqlValue.data[queryName]) || null;
@@ -1373,8 +1373,8 @@ export async function runAddQueryFor(
 
 export function getEditQueryFor(
   arg: {
-    args: IGQLArgs,
-    fields: IGQLRequestFields,
+    args: IRQArgs,
+    fields: IRQRequestFields,
     itemDefinition: ItemDefinition,
     token: string,
     language: string,
@@ -1426,8 +1426,8 @@ export function getEditQueryFor(
  */
 export async function runEditQueryFor(
   arg: {
-    args: IGQLArgs,
-    fields: IGQLRequestFields,
+    args: IRQArgs,
+    fields: IRQRequestFields,
     itemDefinition: ItemDefinition,
     token: string,
     language: string,
@@ -1440,8 +1440,8 @@ export async function runEditQueryFor(
   },
 ): Promise<{
   error: EndpointErrorType,
-  value: IGQLValue,
-  getQueryFields: IGQLRequestFields,
+  value: IRQValue,
+  getQueryFields: IRQRequestFields,
 }> {
   const query = getEditQueryFor(arg);
   const queryName = query.getQueryByIndex(0).name;
@@ -1458,7 +1458,7 @@ export async function runEditQueryFor(
 
   if (gqlValue.errors) {
     // if the server itself returned an error, we use that error
-    error = gqlValue.errors[0].extensions;
+    error = gqlValue.errors[0].error;
   }
 
   const value = (gqlValue.data && gqlValue.data[queryName]) || null;
@@ -1507,8 +1507,8 @@ function convertOrderByRule(orderBy: IOrderByRuleType) {
 }
 
 interface ISearchQueryArg {
-  args: IGQLArgs,
-  fields: IGQLRequestFields,
+  args: IRQArgs,
+  fields: IRQRequestFields,
   itemDefinition: ItemDefinition,
   orderBy: IOrderByRuleType;
   createdBy: string;
@@ -1563,8 +1563,8 @@ interface IRunSearchQuerySearchOptions {
 
 interface IRunSearchQueryResult {
   error: EndpointErrorType;
-  results?: IGQLValue[];
-  records: IGQLSearchRecord[];
+  results?: IRQValue[];
+  records: IRQSearchRecord[];
   count: number;
   limit: number;
   offset: number;
@@ -1772,7 +1772,7 @@ export async function runSearchQueryFor(
   // in practice the last modified of the last record
   let lastModified: string = null;
 
-  let gqlValue: IGQLEndpointValue;
+  let gqlValue: IRQEndpointValue;
   let cached: boolean = false;
   let polyfilled: boolean = false;
   let useCacheWorker: boolean = serverEnvironment ? false : (
@@ -1863,7 +1863,7 @@ export async function runSearchQueryFor(
         // we can specify these actions
         let redoSearch: boolean = false;
         let refetchAllRecords: boolean = false;
-        let refetchSpecificRecords: IGQLSearchRecord[] = null;
+        let refetchSpecificRecords: IRQSearchRecord[] = null;
 
         // if we have a value there and it differs
         if (!equals(currentMetadata, arg.cacheStoreMetadata, { strict: true })) {
@@ -2130,16 +2130,16 @@ export async function runSearchQueryFor(
 
   if (gqlValue && gqlValue.errors) {
     // if the server itself returned an error, we use that error
-    error = gqlValue.errors[0].extensions;
+    error = gqlValue.errors[0].error;
   }
 
   // the cache worker is actually always returning
   // search results regardless of what method was
   // used
   if (!arg.traditional && !useCacheWorker) {
-    const records: IGQLSearchRecord[] = (
+    const records: IRQSearchRecord[] = (
       data && data.records
-    ) as IGQLSearchRecord[] || null;
+    ) as IRQSearchRecord[] || null;
 
     return {
       error,
@@ -2157,18 +2157,18 @@ export async function runSearchQueryFor(
   } else {
     // we may get records anyway eg. when using cache worker
     // if not we need to rebuild them from the results
-    const records: IGQLSearchRecord[] = data && data.records ? (data.records as IGQLSearchRecord[]) : ((
-      data && (data.results as IGQLValue[]).map((v) => ({
+    const records: IRQSearchRecord[] = data && data.records ? (data.records as IRQSearchRecord[]) : ((
+      data && (data.results as IRQValue[]).map((v) => ({
         type: v.type,
         version: v.version || null,
         id: v.id || null,
         last_modified: v.last_modified || null
       }))
-    ) as IGQLSearchRecord[] || null);
+    ) as IRQSearchRecord[] || null);
 
     return {
       error,
-      results: data && data.results as IGQLValue[],
+      results: data && data.results as IRQValue[],
       records,
       limit,
       offset,

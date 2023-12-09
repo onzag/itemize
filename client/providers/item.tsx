@@ -20,8 +20,8 @@ import {
   MEMCACHED_UNMOUNT_DESTRUCTION_MARKERS_LOCATION,
   UNMOUNT_DESTRUCTION_MARKERS_LOCATION,
 } from "../../constants";
-import { IGQLSearchRecord, IGQLValue, IGQLRequestFields, ProgresserFn } from "../../gql-querier";
-import { requestFieldsAreContained } from "../../gql-util";
+import { IRQSearchRecord, IRQValue, IRQRequestFields, ProgresserFn } from "../../rq-querier";
+import { requestFieldsAreContained } from "../../rq-util";
 import { EndpointErrorType } from "../../base/errors";
 import equals from "deep-equal";
 import { ModuleContext } from "./module";
@@ -31,7 +31,7 @@ import uuid from "uuid";
 import {
   getFieldsAndArgs, runGetQueryFor, runDeleteQueryFor, runEditQueryFor, runAddQueryFor, runSearchQueryFor, IIncludeOverride,
   IPropertyOverride, ICacheMetadataMismatchAction, ISearchCacheMetadataMismatchAction, reprocessQueryArgumentsForFiles, getPropertyListForSearchMode, SearchCacheMetadataMismatchActionFn, getPropertyListDefault
-} from "../internal/gql-client-util";
+} from "../internal/rq-client-util";
 import { IPropertyCoreProps, IPropertySetterProps } from "../components/property/base";
 import { PropertyDefinitionSearchInterfacesPrefixes } from "../../base/Root/Module/ItemDefinition/PropertyDefinition/search-interfaces";
 import { ConfigContext } from "../internal/providers/config-provider";
@@ -195,8 +195,8 @@ export interface IActionSubmitResponse extends IBasicActionResponse {
  */
 export interface IActionResponseWithSearchResults extends IBasicActionResponse {
   searchId: string;
-  records: IGQLSearchRecord[];
-  results: IGQLValue[];
+  records: IRQSearchRecord[];
+  results: IRQValue[];
   count: number;
   limit: number;
   offset: number;
@@ -634,7 +634,7 @@ export interface IActionDeleteOptions extends IActionCleanOptions {
 /**
  * @ignore
  */
-export type CacheMetadataGeneratorFn = (record: IGQLSearchRecord) => any;
+export type CacheMetadataGeneratorFn = (record: IRQSearchRecord) => any;
 
 /**
  * The options for searching
@@ -1214,11 +1214,11 @@ export interface IItemContextType extends IBasicFns {
    * the obtained search results from the graphql endpoint
    * just as they come
    */
-  searchRecords: IGQLSearchRecord[];
+  searchRecords: IRQSearchRecord[];
   /**
    * The search results (only available if a traditional search was performed)
    */
-  searchResults: IGQLValue[];
+  searchResults: IRQValue[];
   /**
    * The limit used in the given search
    */
@@ -1472,15 +1472,15 @@ export interface ISearchItemValueContextType {
   /**
    * Records being searched that will eventually have an applied value
    */
-  currentlySearching: IGQLSearchRecord[];
+  currentlySearching: IRQSearchRecord[];
   /**
    * Fields that are being searched
    */
-  searchFields: IGQLRequestFields;
+  searchFields: IRQRequestFields;
   /**
    * Records that are overall in the search that is active avobe
    */
-  searchRecords: IGQLSearchRecord[];
+  searchRecords: IRQSearchRecord[];
 }
 
 /**
@@ -4949,9 +4949,9 @@ export class ActualItemProvider extends
       });
     }
 
-    let value: IGQLValue;
+    let value: IRQValue;
     let error: EndpointErrorType;
-    let getQueryFields: IGQLRequestFields;
+    let getQueryFields: IRQRequestFields;
 
     // if we are in edit as we have specified an action that is meant to be edit
     // or if we have a submit for id that is also our current item id and it is indeed found which means that we are sure

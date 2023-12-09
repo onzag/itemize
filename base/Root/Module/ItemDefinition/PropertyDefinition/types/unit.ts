@@ -7,7 +7,6 @@
 import {
   IPropertyDefinitionSupportedType,
 } from "../types";
-import { GraphQLNonNull, GraphQLFloat, GraphQLString } from "graphql";
 import {
   UNIT_SUBTYPES,
   MAX_SUPPORTED_REAL,
@@ -41,21 +40,6 @@ export interface IPropertyDefinitionSupportedUnitType {
  * The description of the unit type as it behaves in the app
  */
 const typeValue: IPropertyDefinitionSupportedType<IPropertyDefinitionSupportedUnitType> = {
-  gql: "PROPERTY_TYPE__Unit",
-  gqlFields: {
-    value: {
-      type: GraphQLNonNull && GraphQLNonNull(GraphQLFloat),
-    },
-    unit: {
-      type: GraphQLNonNull && GraphQLNonNull(GraphQLString),
-    },
-    normalizedValue: {
-      type: GraphQLNonNull && GraphQLNonNull(GraphQLFloat),
-    },
-    normalizedUnit: {
-      type: GraphQLNonNull && GraphQLNonNull(GraphQLString),
-    },
-  },
   rq: {
     type: "object",
     stdFields: {

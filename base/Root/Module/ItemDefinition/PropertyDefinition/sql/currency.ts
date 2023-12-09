@@ -8,7 +8,7 @@ import { ISQLArgInfo, ISQLInInfo, ISQLOutInfo, ISQLSearchInfo, ISQLOrderByInfo, 
 import { IPropertyDefinitionSupportedCurrencyType } from "../types/currency";
 import { CURRENCY_FACTORS_IDENTIFIER } from "../../../../../../constants";
 import { PropertyDefinitionSearchInterfacesPrefixes } from "../search-interfaces";
-import { IGQLArgs } from "../../../../../../gql-querier";
+import { IRQArgs } from "../../../../../../rq-querier";
 import { arrCurrencies, currencies } from "../../../../../../imported-resources";
 
 /**
@@ -207,7 +207,7 @@ export function currencySQLSearch(arg: ISQLSearchInfo) {
 
   // if we have an exact search
   if (typeof arg.args[exactName] !== "undefined" && arg.args[exactName] !== null) {
-    const exactArg = arg.args[exactName] as IGQLArgs;
+    const exactArg = arg.args[exactName] as IRQArgs;
     // we just match it as it is
     arg.whereBuilder.andWhereColumn(arg.prefix + arg.id + "_CURRENCY", exactArg.currency as string);
     arg.whereBuilder.andWhereColumn(arg.prefix + arg.id + "_VALUE", exactArg.value as number);
@@ -263,7 +263,7 @@ export function currencyElasticSearch(arg: IElasticSearchInfo) {
   let searchedByIt: boolean = false;
 
   if (typeof arg.args[exactName] !== "undefined" && arg.args[exactName] !== null) {
-    const exactArg = arg.args[exactName] as IGQLArgs;
+    const exactArg = arg.args[exactName] as IRQArgs;
     arg.elasticQueryBuilder.mustTerm({
       [arg.prefix + arg.id + "_CURRENCY"]: exactArg.currency as string,
       [arg.prefix + arg.id + "_VALUE"]: exactArg.value as number,

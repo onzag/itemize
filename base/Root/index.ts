@@ -13,7 +13,7 @@ import type { IResourceCollectionResult } from "../../server/ssr/collect";
 import type { IAppDataType } from "../../server";
 import Module, { IModuleRawJSONDataType } from "./Module";
 import ItemDefinition from "./Module/ItemDefinition";
-import type { IGQLRequestFields } from "../../gql-querier";
+import type { IRQRequestFields } from "../../rq-querier";
 import type { PropertyDefinitionSupportedType } from "./Module/ItemDefinition/PropertyDefinition/types";
 import { RQRootSchema, getRQSchemaForRoot } from "./rq";
 
@@ -76,7 +76,7 @@ export interface ICustomRoleManager {
   checkRoleAccessFor: (roles: string[]) => Promise<ICustomRoleManagerRoleStatus>;
 }
 
-type RequestManagerFn = (itemDefinition: ItemDefinition, id: string, version: string, requestFields: IGQLRequestFields) => Promise<void>;
+type RequestManagerFn = (itemDefinition: ItemDefinition, id: string, version: string, requestFields: IRQRequestFields) => Promise<void>;
 type RequestManagerSearchFn = (itemDefinition: ItemDefinition, id: string, version: string, args: any) => Promise<void>;
 type RequestManagerResourceFn = (finalPath: string, customResolver?: (appData: IAppDataType, finalPath: string) => IResourceCollectionResult | Promise<IResourceCollectionResult>) => Promise<string>;
 
@@ -363,7 +363,7 @@ export default class Root {
    * @param version the version
    * @internal
    */
-  public async callRequestManager(itemDefinition: ItemDefinition, id: string, version: string, requestFields: IGQLRequestFields) {
+  public async callRequestManager(itemDefinition: ItemDefinition, id: string, version: string, requestFields: IRQRequestFields) {
     await this.requestManager(itemDefinition, id, version, requestFields);
   }
 

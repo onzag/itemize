@@ -4,7 +4,7 @@
  */
 
 import React from "react";
-import { gqlQuery, buildGqlQuery, IGQLValue } from "../../../gql-querier";
+import { gqlQuery, buildGqlQuery, IRQValue } from "../../../rq-querier";
 import { EndpointErrorType } from "../../../base/errors";
 import { ILocaleContextType } from "./locale-provider";
 import { GUEST_METAROLE, ENDPOINT_ERRORS } from "../../../constants";
@@ -404,9 +404,9 @@ class ActualTokenProvider extends React.Component<IActualTokenProviderProps, IAc
         // and if we got one, we will update
         if (cachedValue && cachedValue.value && cachedValue.value.DATA) {
           // first saved the cachedData we got
-          cachedData.app_country = (cachedValue.value.DATA as IGQLValue).app_country as string;
-          cachedData.app_currency = (cachedValue.value.DATA as IGQLValue).app_currency as string;
-          cachedData.app_language = (cachedValue.value.DATA as IGQLValue).app_language as string;
+          cachedData.app_country = (cachedValue.value.DATA as IRQValue).app_country as string;
+          cachedData.app_currency = (cachedValue.value.DATA as IRQValue).app_currency as string;
+          cachedData.app_language = (cachedValue.value.DATA as IRQValue).app_language as string;
           console.log("cached user locale is", cachedData);
 
           // and then we will update if deemed necessary
@@ -443,7 +443,7 @@ class ActualTokenProvider extends React.Component<IActualTokenProviderProps, IAc
 
         // now if the request actually succeeded
         if (userLanguageData && userLanguageData.data && userLanguageData.data.GET_MOD_users__IDEF_user) {
-          const localeUserData: IGQLValue = userLanguageData.data.GET_MOD_users__IDEF_user.DATA as IGQLValue;
+          const localeUserData: IRQValue = userLanguageData.data.GET_MOD_users__IDEF_user.DATA as IRQValue;
           // we still check everything just in case the user is blocked
           if (localeUserData) {
             console.log("user locale is", localeUserData);

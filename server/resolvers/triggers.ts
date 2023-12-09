@@ -1,4 +1,4 @@
-import { IGQLValue, IGQLArgs, IGQLSearchRecordsContainer, IGQLSearchResultsContainer } from "../../gql-querier";
+import { IRQValue, IRQArgs, IRQSearchRecordsContainer, IRQSearchResultsContainer } from "../../rq-querier";
 import ItemDefinition from "../../base/Root/Module/ItemDefinition";
 import { IAppDataType } from "..";
 import Module from "../../base/Root/Module";
@@ -43,7 +43,7 @@ export interface IOTriggerArgType {
   /**
    * the current value that the database is hosting
    */
-  originalValue: IGQLValue;
+  originalValue: IRQValue;
   /**
    * The original value in sql form
    */
@@ -56,7 +56,7 @@ export interface IOTriggerArgType {
    * the new value that it is hosting usually only available
    * on done requests
    */
-  newValue: IGQLValue;
+  newValue: IRQValue;
   /**
    * The new value when sql is done
    */
@@ -69,7 +69,7 @@ export interface IOTriggerArgType {
    * A partial arg based update for the value, remember this is a partial
    * value
    */
-  requestedUpdate: IGQLArgs;
+  requestedUpdate: IRQArgs;
   /**
    * The creator for the requested update
    * only truly exists during an add action and represents
@@ -102,7 +102,7 @@ export interface IOTriggerArgType {
   /**
    * Arguments that are not part of the patch that were passed to graphql
    */
-  extraArgs: IGQLArgs;
+  extraArgs: IRQArgs;
   /**
    * the item definition in question
    */
@@ -170,7 +170,7 @@ export interface ISearchTriggerArgType {
   appData: IAppDataType;
   itemDefinition: ItemDefinition;
   module: Module;
-  args: IGQLArgs;
+  args: IRQArgs;
   user: {
     role: string;
     id: string;
@@ -182,8 +182,8 @@ export interface ISearchTriggerArgType {
   sqlResponse: ISQLTableRowValue[];
   elasticResponse: SearchResponse;
   traditional: boolean;
-  records: IGQLSearchRecordsContainer,
-  results: IGQLSearchResultsContainer,
+  records: IRQSearchRecordsContainer,
+  results: IRQSearchResultsContainer,
   forbid: (message: string, customCode?: string, data?: any) => void;
   setSearchMetadata: (metadata: string) => void;
 }
@@ -201,7 +201,7 @@ export interface IOConflictTriggerArgType {
   row: ISQLTableRowValue;
 }
 
-export type IOTriggerType = (arg: IOTriggerArgType) => IGQLValue | Promise<IGQLValue> | IGQLArgs | Promise<IGQLArgs>;
+export type IOTriggerType = (arg: IOTriggerArgType) => IRQValue | Promise<IRQValue> | IRQArgs | Promise<IRQArgs>;
 export type SearchTriggerType = (arg: ISearchTriggerArgType) => void | Promise<void>;
 
 /**

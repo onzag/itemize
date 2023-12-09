@@ -12,7 +12,7 @@ import {
   UNSPECIFIED_OWNER, ENDPOINT_ERRORS, INCLUDE_PREFIX, EXCLUSION_STATE_SUFFIX, DELETED_REGISTRY_IDENTIFIER, CACHED_CURRENCY_RESPONSE, SERVER_DATA_IDENTIFIER, RESERVED_BASE_PROPERTIES, TRACKERS_REGISTRY_IDENTIFIER, JWT_KEY
 } from "../constants";
 import { ISQLTableRowValue, ISQLStreamComposedTableRowValue, ConsumeStreamsFnType } from "../base/Root/sql";
-import { IGQLSearchRecord, IGQLArgs, IGQLValue } from "../gql-querier";
+import { IRQSearchRecord, IRQArgs, IRQValue } from "../rq-querier";
 import { convertVersionsIntoNullsWhenNecessary } from "./version-null-value";
 import ItemDefinition from "../base/Root/Module/ItemDefinition";
 import { Listener } from "./listener";
@@ -35,7 +35,7 @@ import { IManyValueType } from "../database/base";
 import { WithBuilder } from "../database/WithBuilder";
 import { UpdateBuilder } from "../database/UpdateBuilder";
 import { SelectBuilder } from "../database/SelectBuilder";
-import { convertSQLValueToGQLValueForProperty } from "../base/Root/Module/ItemDefinition/PropertyDefinition/sql";
+import { convertSQLValueToRQValueForProperty } from "../base/Root/Module/ItemDefinition/PropertyDefinition/sql";
 import type PropertyDefinition from "../base/Root/Module/ItemDefinition/PropertyDefinition";
 
 import {
@@ -111,7 +111,7 @@ export interface ICopyOptions extends IWritingOptions {
 
 export interface IUpdateOptions extends IBasicOptions {
   currentSQLValue?: ISQLTableRowValue;
-  currentGQLValue?: IGQLValue;
+  currentGQLValue?: IRQValue;
   editedBy?: string;
   language: string;
   dictionary: string;
@@ -470,7 +470,7 @@ export class Cache {
       version: string,
     },
     propertyMap: IPropertyMapElement[],
-    record: IGQLSearchRecord,
+    record: IRQSearchRecord,
     location: "new" | "deleted" | "modified",
   ) {
     const newRecordArr = [record];
@@ -988,7 +988,7 @@ export class Cache {
    */
   public async requestCreation(
     itemDefinition: ItemDefinition,
-    value: IGQLArgs | IGQLValue | ISQLTableRowValue,
+    value: IRQArgs | IRQValue | ISQLTableRowValue,
     options: ICreationOptions,
   ): Promise<ISQLTableRowValue> {
     const selfTable = itemDefinition.getQualifiedPathName();
@@ -1409,7 +1409,7 @@ export class Cache {
         options.listenerUUID,
       );
 
-      const searchResultForThisValue: IGQLSearchRecord = {
+      const searchResultForThisValue: IRQSearchRecord = {
         id: sqlValue.id,
         version: sqlValue.version || null,
         type: selfTable,
@@ -1444,7 +1444,7 @@ export class Cache {
         const sideEffectFn = description.sqlSideEffect;
 
         // now we can get this new value
-        const newValue = convertSQLValueToGQLValueForProperty(
+        const newValue = convertSQLValueToRQValueForProperty(
           this.getServerData(),
           this.appData,
           itemDefinition,
@@ -1672,7 +1672,7 @@ export class Cache {
     item: ItemDefinition | string,
     id: string,
     version: string,
-    update: IGQLArgs,
+    update: IRQArgs,
     options: IUpdateOptions,
   ): Promise<ISQLTableRowValue> {
     const itemDefinition = item instanceof ItemDefinition ? item : this.root.registry[item] as ItemDefinition;
@@ -1788,7 +1788,7 @@ export class Cache {
           newValue = update[preSideEffectedProperty.property.getId()];
         }
 
-        const originalValue = convertSQLValueToGQLValueForProperty(
+        const originalValue = convertSQLValueToRQValueForProperty(
           this.getServerData(),
           this.appData,
           itemDefinition,
@@ -1825,7 +1825,7 @@ export class Cache {
 
     // We get only the fields that we expect to be updated
     // in the definition
-    const partialUpdateFields: IGQLArgs = {};
+    const partialUpdateFields: IRQArgs = {};
     Object.keys(update).map(async (arg) => {
       if (
         itemDefinition.hasPropertyDefinitionFor(arg, true) ||
@@ -2328,7 +2328,7 @@ export class Cache {
         options.listenerUUID || null,
       );
 
-      const searchRecord: IGQLSearchRecord = {
+      const searchRecord: IRQSearchRecord = {
         id,
         version: version || null,
         type: selfTable,
@@ -2367,7 +2367,7 @@ export class Cache {
         const sideEffectFn = description.sqlSideEffect;
 
         // now we can get this new value
-        const newValue = convertSQLValueToGQLValueForProperty(
+        const newValue = convertSQLValueToRQValueForProperty(
           this.getServerData(),
           this.appData,
           itemDefinition,
@@ -2377,7 +2377,7 @@ export class Cache {
         )[sideEffectedProperty.property.getId()] as any;
 
         // get the original value
-        const originalValue = convertSQLValueToGQLValueForProperty(
+        const originalValue = convertSQLValueToRQValueForProperty(
           this.getServerData(),
           this.appData,
           itemDefinition,
@@ -2683,7 +2683,7 @@ export class Cache {
     // it takes the record that represents what we are deleting, the parent (or null) and the creator
     const performProperDeleteOf = async (
       row: ISQLTableRowValue,
-      record: IGQLSearchRecord,
+      record: IRQSearchRecord,
       parent: { id: string; version: string; type: string },
       createdBy: string,
       trackedProperties: string[],
@@ -2896,7 +2896,7 @@ export class Cache {
           // this version can be null (aka empty string)
           // we need to construct the record
           // the last modified is the transaction time of the deletition
-          const record: IGQLSearchRecord = {
+          const record: IRQSearchRecord = {
             id: row.id,
             version: row.version || null,
             last_modified: row.last_modified,
@@ -2995,7 +2995,7 @@ export class Cache {
         });
 
         // now we can build our search record
-        const record: IGQLSearchRecord = {
+        const record: IRQSearchRecord = {
           id,
           version: version || null,
           last_modified: row.last_modified,
@@ -3027,7 +3027,7 @@ export class Cache {
 
             rowsToPerformDeleteSideEffects.forEach((sqlValue) => {
               // now we can get this new value
-              const originalValue = convertSQLValueToGQLValueForProperty(
+              const originalValue = convertSQLValueToRQValueForProperty(
                 this.getServerData(),
                 this.appData,
                 itemDefinition,
@@ -3304,7 +3304,7 @@ export class Cache {
    * @param records the records to request for
    * @returns a list of whole sql combined table row values
    */
-  public async requestListCache(records: IGQLSearchRecord[]): Promise<ISQLTableRowValue[]> {
+  public async requestListCache(records: IRQSearchRecord[]): Promise<ISQLTableRowValue[]> {
     const resultValues = await Promise.all(records.map((recordContainer) => {
       const itemDefinition = this.root.registry[recordContainer.type] as ItemDefinition;
       return this.requestValue(itemDefinition, recordContainer.id, recordContainer.version);

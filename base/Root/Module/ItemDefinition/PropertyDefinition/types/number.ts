@@ -5,7 +5,6 @@
  */
 
 import { IPropertyDefinitionSupportedType } from "../types";
-import { GraphQLFloat } from "graphql";
 import {
   standardSQLInFn,
   standardSQLOutFn,
@@ -52,7 +51,6 @@ const typeValue: IPropertyDefinitionSupportedType<PropertyDefinitionSupportedNum
   rq: {
     type: "number",
   },
-  gql: GraphQLFloat,
   sql: getStandardSQLFnFor && getStandardSQLFnFor("REAL"),
   elastic: getStandardElasticForWithNullField && getStandardElasticForWithNullField("float"),
   sqlSelect: standardSQLSelect,

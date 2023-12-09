@@ -5,7 +5,7 @@
 
 import type { ICompoundSearchStateType } from "../../../base/Root/Module/ItemDefinition";
 import React from "react";
-import type { IGQLValue, IGQLRequestFields } from "../../../gql-querier";
+import type { IRQValue, IRQRequestFields } from "../../../rq-querier";
 
 /**
  * The SSR collected information
@@ -26,11 +26,11 @@ export interface ISSRCollectedQueryType {
   /**
    * The value that is collected
    */
-  value: IGQLValue,
+  value: IRQValue,
   /**
    * The fields we collected for
    */
-  fields: IGQLRequestFields,
+  fields: IRQRequestFields,
 }
 
 /**

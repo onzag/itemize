@@ -25,18 +25,17 @@ import {
   RESERVED_BASE_PROPERTIES,
   CONNECTOR_SQL_COLUMN_VERSION_FK_NAME,
 } from "../../../../constants";
-import { GraphQLOutputType, GraphQLObjectType } from "graphql";
 import { EndpointError, EndpointErrorType } from "../../../errors";
 import uuid from "uuid";
-import { flattenRawGQLValueOrFields, requestFieldsAreContained } from "../../../../gql-util";
-import { IGQLValue, IGQLRequestFields, IGQLFile, IGQLSearchRecord } from "../../../../gql-querier";
+import { flattenRawGQLValueOrFields, requestFieldsAreContained } from "../../../../rq-util";
+import { IRQValue, IRQRequestFields, IRQFile, IRQSearchRecord } from "../../../../rq-querier";
 import { countries } from "../../../../imported-resources";
 import Root, { ICustomRoleManager, ISearchLimitersType } from "../../../Root";
 import { transferrableToBlob, blobToTransferrable, fileURLAbsoluter } from "../../../../util";
 import type { IConfigRawJSONDataType } from "../../../../config";
 import type { IElasticHighlightRecordInfo, PropertyDefinitionSupportedType } from "./PropertyDefinition/types";
 import type { IActionSearchOptions } from "../../../../client/providers/item";
-import { IPropertyOverride } from "../../../../client/internal/gql-client-util";
+import { IPropertyOverride } from "../../../../client/internal/rq-client-util";
 
 export interface IItemSearchStateHighlightType {
   [pId: string]: string[];
@@ -50,8 +49,8 @@ export interface IItemSearchStateHighlightArgsType {
 export interface IItemSearchStateType {
   searchError: EndpointErrorType;
   searching: boolean;
-  searchRecords: IGQLSearchRecord[];
-  searchResults: IGQLValue[];
+  searchRecords: IRQSearchRecord[];
+  searchResults: IRQValue[];
   searchLimit: number;
   searchOffset: number;
   searchCount: number;
@@ -440,7 +439,7 @@ export interface IItemStateType {
   /**
    * The original graphql flattened value that was applied (if any)
    */
-  gqlOriginalFlattenedValue: IGQLValue;
+  gqlOriginalFlattenedValue: IRQValue;
   /**
    * The id that was used
    */
@@ -478,15 +477,15 @@ export interface IItemDefinitionGQLValueType {
   /**
    * The value as it came from graphql endpoint
    */
-  rawValue: IGQLValue;
+  rawValue: IRQValue;
   /**
    * The flattened value without DATA fields
    */
-  flattenedValue: IGQLValue;
+  flattenedValue: IRQValue;
   /**
    * The requested fields that were used
    */
-  requestFields: IGQLRequestFields;
+  requestFields: IRQRequestFields;
 }
 
 /**
@@ -511,13 +510,13 @@ export interface IPoliciesType {
 }
 
 function resolveFile(
-  file: IGQLFile,
+  file: IRQFile,
   propertyId: string,
   include: string,
   originalState: IItemStateType,
   root: Root,
   config: IConfigRawJSONDataType,
-): IGQLFile {
+): IRQFile {
   const domain = process.env.NODE_ENV === "production" ? config.productionHostname : config.developmentHostname;
 
   const containerId: string = (originalState.gqlOriginalFlattenedValue &&
@@ -746,16 +745,6 @@ export default class ItemDefinition {
    * compiled
    */
   public rawData: IItemDefinitionRawJSONDataType;
-  /**
-   * A cached graphql object
-   */
-  // tslint:disable-next-line: variable-name
-  public _gqlObj: GraphQLOutputType;
-  /**
-   * A cached graphql query object
-   */
-  // tslint:disable-next-line: variable-name
-  public _gqlQueryObj: GraphQLObjectType;
 
   /**
    * The include instances compiled from the raw data
@@ -1833,9 +1822,9 @@ export default class ItemDefinition {
   public applyValue(
     id: string,
     version: string,
-    value: IGQLValue,
+    value: IRQValue,
     excludeExtensions: boolean,
-    requestFields: IGQLRequestFields,
+    requestFields: IRQRequestFields,
     doNotApplyValueInPropertyIfPropertyHasBeenManuallySet: boolean,
     forceApply?: boolean,
   ): boolean {
@@ -2264,7 +2253,7 @@ export default class ItemDefinition {
       return null;
     }
 
-    const requestFields: IGQLRequestFields = {};
+    const requestFields: IRQRequestFields = {};
 
     // now we add all the reserver properties
     Object.keys(RESERVED_BASE_PROPERTIES).forEach((pKey) => {
@@ -2307,7 +2296,7 @@ export default class ItemDefinition {
     userId: string,
     ownerUserId: string,
     rolesManager: ICustomRoleManager,
-    value: IGQLValue,
+    value: IRQValue,
   ): Promise<void> {
 
     if (!value) {
@@ -2383,7 +2372,7 @@ export default class ItemDefinition {
     role: string,
     userId: string,
     ownerUserId: string,
-    requestedFields: IGQLRequestFields,
+    requestedFields: IRQRequestFields,
     knownSqlValue: any,
     rolesManager: ICustomRoleManager,
   ): Promise<{ policyName: string, applyingPropertyOrInclude: string }> {
@@ -2489,7 +2478,7 @@ export default class ItemDefinition {
     role: string,
     userId: string,
     ownerUserId: string,
-    requestedFields: IGQLRequestFields,
+    requestedFields: IRQRequestFields,
     rolesManager: ICustomRoleManager,
     throwError: boolean,
   ) {

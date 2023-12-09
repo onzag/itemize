@@ -3,7 +3,7 @@
  * @module
  */
 
-import { IGQLArgs, IGQLSearchRecord, IGQLValue } from "../../../../gql-querier";
+import { IRQArgs, IRQSearchRecord, IRQValue } from "../../../../rq-querier";
 import { IDBPDatabase } from "idb";
 import { fixFilesURLAt, ICacheDB, ICacheMatchType, QUERIES_TABLE_NAME, POLYFILLED_INDEXED_DB } from "./cache.worker.class";
 import { PREFIX_GET, IOrderByRuleType } from "../../../../constants";
@@ -66,14 +66,14 @@ export class DataCorruptionError extends Error {
 export async function search(
   rootProxy: Root,
   db: IDBPDatabase<ICacheDB>,
-  searchRecords: IGQLSearchRecord[],
-  searchArgs: IGQLArgs,
+  searchRecords: IRQSearchRecord[],
+  searchArgs: IRQArgs,
   returnSourceResults: boolean,
   cacheNoLimitOffset: boolean,
 ): Promise<
   {
-    filteredRecords: IGQLSearchRecord[];
-    filteredResults: IGQLValue[];
+    filteredRecords: IRQSearchRecord[];
+    filteredResults: IRQValue[];
     sourceResults: ICacheMatchType[];
     count: number;
   }
@@ -233,11 +233,11 @@ interface IGQLSearchRecordChecked {
   /**
    * The search record itself
    */
-  searchRecord: IGQLSearchRecord;
+  searchRecord: IRQSearchRecord;
   /**
    * The search result
    */
-  searchResult: IGQLValue;
+  searchResult: IRQValue;
 }
 
 /**
@@ -250,8 +250,8 @@ interface IGQLSearchRecordChecked {
  */
 async function checkOne(
   rootProxy: Root,
-  searchRecord: IGQLSearchRecord,
-  value: IGQLValue,
+  searchRecord: IRQSearchRecord,
+  value: IRQValue,
   searchArgs: any,
 ): Promise<IGQLSearchRecordChecked> {
   // so by default we included

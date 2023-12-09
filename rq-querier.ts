@@ -9,9 +9,9 @@ import FormDataNode from "form-data";
 // TODO remove to go back to just using plain http and https
 import fetchNode from "node-fetch";
 import { EndpointErrorType } from "./base/errors";
-import { ENDPOINT_ERRORS, EXTERNALLY_ACCESSIBLE_RESERVED_BASE_PROPERTIES, MAX_FILES_PER_REQUEST, STANDARD_ACCESSIBLE_RESERVED_BASE_PROPERTIES } from "./constants";
+import { ENDPOINT_ERRORS, MAX_FILES_PER_REQUEST } from "./constants";
 import equals from "deep-equal";
-import { requestFieldsAreContained } from "./gql-util";
+import { requestFieldsAreContained } from "./rq-util";
 import type { ReadStream } from "fs";
 import type { RQField, RQQuery, RQRootSchema } from "./base/Root/rq";
 
@@ -21,7 +21,7 @@ import type { RQField, RQQuery, RQRootSchema } from "./base/Root/rq";
  * on the SEARCH_RECORD in the graphql types
  * that graphql returns
  */
-export interface IGQLSearchRecord {
+export interface IRQSearchRecord {
   /**
    * The type of the search record, basically a qualified name
    */
@@ -44,8 +44,8 @@ export interface IGQLSearchRecord {
  * The records container represents what the server retruns
  * when it returns a bunch of records
  */
-export interface IGQLSearchRecordsContainer {
-  records: IGQLSearchRecord[];
+export interface IRQSearchRecordsContainer {
+  records: IRQSearchRecord[];
   last_modified: string;
   count: number;
   limit: number;
@@ -59,8 +59,8 @@ export interface IGQLSearchRecordsContainer {
  * The search container represents the results for the case
  * of traditional searches rather than records based search
  */
-export interface IGQLSearchResultsContainer {
-  results: IGQLValue[];
+export interface IRQSearchResultsContainer {
+  results: IRQValue[];
   count: number;
   limit: number;
   offset: number;
@@ -73,7 +73,7 @@ export interface IGQLSearchResultsContainer {
  * This is how a graphql file is meant
  * to be and send
  */
-export interface IGQLFile {
+export interface IRQFile {
   /**
    * the name of the file
    */
@@ -119,21 +119,6 @@ export interface IGQLFile {
  * }
  * ```
  */
-export interface IGQLRequestFields {
-  [key: string]: IGQLRequestFields;
-}
-
-/**
- * Request fields for rq in the exploded form
- * ```
- * {
- *   field: {},
- *   other: {
- *     field: {}
- *   }
- * }
- * ```
- */
 export interface IRQRequestFields {
   [key: string]: IRQRequestFields;
 }
@@ -141,42 +126,42 @@ export interface IRQRequestFields {
 /**
  * Single arg, can take many shapes
  */
-type GQLArg = boolean | string | number | null | GQLRaw | GQLEnum | GQLVar | IGQLFile | IGQLSearchRecord | IGQLArgs;
+type RQArg = boolean | string | number | null | GQLRaw | GQLEnum | GQLVar | IRQFile | IRQSearchRecord | IRQArgs;
 
 /**
  * The args field
  */
-export interface IGQLArgs {
-  [key: string]: GQLArg | GQLArg[];
+export interface IRQArgs {
+  [key: string]: RQArg | RQArg[];
 }
 
 /**
  * A grapqhl single value
  */
-type GQLValue = boolean | string | number | null | IGQLSearchRecord | IGQLValue;
+type RQValue = boolean | string | number | null | IRQSearchRecord | IRQValue;
 
 /**
  * A graphql many value
  */
-export interface IGQLValue {
-  [key: string]: GQLValue | GQLValue[];
+export interface IRQValue {
+  [key: string]: RQValue | RQValue[];
 }
 
 /**
  * A graphql endpoint output
  */
-export interface IGQLEndpointValue {
+export interface IRQEndpointValue {
   data: {
-    [key: string]: IGQLValue,
+    [key: string]: IRQValue,
   };
   errors?: Array<{
-    extensions: EndpointErrorType,
+    error: EndpointErrorType,
     // might be null, global errors
     path?: string[];
   }>;
 }
 
-type IGQLQueryListenerType = (response: IGQLEndpointValue) => void;
+type IRQQueryListenerType = (response: IRQEndpointValue) => void;
 
 export type ProgresserFn = (arg: IXMLHttpRequestProgressInfo) => void;
 
@@ -198,11 +183,11 @@ export class GQLQuery {
   /**
    * Files that have been found that are unprocessed
    */
-  private foundUnprocessedArgFiles: IGQLFile[];
+  private foundUnprocessedArgFiles: IRQFile[];
   /**
    * list of listeners
    */
-  private listeners: IGQLQueryListenerType[] = [];
+  private listeners: IRQQueryListenerType[] = [];
   /**
    * list of progress listeners
    */
@@ -211,7 +196,7 @@ export class GQLQuery {
   /**
    * The current known reply for the query
    */
-  public reply: IGQLEndpointValue = null;
+  public reply: IRQEndpointValue = null;
 
   /**
    * The rq schema used
@@ -393,7 +378,7 @@ export class GQLQuery {
   /**
    * inform a reply to the query in case this has event listeners to that
    */
-  public informReply(reply: IGQLEndpointValue) {
+  public informReply(reply: IRQEndpointValue) {
     this.listeners.forEach((l) => l(reply));
     this.reply = reply;
   }
@@ -422,7 +407,7 @@ export class GQLQuery {
   /**
    * add a listener for when a reply is informed
    */
-  public addEventListenerOnReplyInformed(listener: IGQLQueryListenerType) {
+  public addEventListenerOnReplyInformed(listener: IRQQueryListenerType) {
     this.listeners.push(listener);
   }
 
@@ -477,7 +462,7 @@ export class GQLQuery {
   /**
    * Provides all the attached files
    */
-  public getAttachments(): IGQLFile[] {
+  public getAttachments(): IRQFile[] {
     return this.foundUnprocessedArgFiles;
   }
 
@@ -511,7 +496,7 @@ export class GQLQuery {
    * @param arg the argument in question
    * @returns new processed args
    */
-  private findFilesAndProcessArgs(arg: IGQLArgs): any {
+  private findFilesAndProcessArgs(arg: IRQArgs): any {
     // if we have any of this
     if (!arg || arg === null || typeof arg !== "object") {
       // return it as it is
@@ -528,7 +513,7 @@ export class GQLQuery {
       (Stream && arg.src instanceof Stream.Readable)
     ) {
       // let's build the unprocessed file
-      const detectedUnprocessedFile: IGQLFile = {
+      const detectedUnprocessedFile: IRQFile = {
         name: arg.name as string,
         id: arg.id as string,
         type: arg.type as string,
@@ -579,7 +564,7 @@ export class GQLQuery {
     const newResult = {};
     Object.keys(arg).forEach((argKey) => {
       // to process it
-      newResult[argKey] = this.findFilesAndProcessArgs(arg[argKey] as IGQLArgs);
+      newResult[argKey] = this.findFilesAndProcessArgs(arg[argKey] as IRQArgs);
     });
 
     // and return that
@@ -602,11 +587,11 @@ export interface IGQLQueryObj {
   /**
    * The arguments to use
    */
-  args?: IGQLArgs;
+  args?: IRQArgs;
   /**
    * And the fields
    */
-  fields?: IGQLRequestFields;
+  fields?: IRQRequestFields;
 }
 
 /**
@@ -736,7 +721,7 @@ function buildRQFields(
  * @param fields the fields to convert
  * @returns a string with the {...} part of the request fields
  */
-function buildFields(fields: IGQLRequestFields) {
+function buildFields(fields: IRQRequestFields) {
   // we start with the open bracket
   let fieldsStr = "{";
   // we check every field
@@ -800,7 +785,7 @@ function buildArgsServerSide(
  * @returns the serialized args
  */
 function buildArgs(
-  args: IGQLArgs,
+  args: IRQArgs,
   keyOpenType: string,
   keyCloseType: string,
 ): string {
@@ -824,12 +809,12 @@ function buildArgs(
 
   // otherwise we just make the object with the keys we were requested
   return keyOpenType + Object.keys(args).map((argKey) => {
-    return argKey + ":" + buildArgs(args[argKey] as IGQLArgs, "{", "}");
+    return argKey + ":" + buildArgs(args[argKey] as IRQArgs, "{", "}");
   }).join(",") + keyCloseType;
 }
 
 function buildRQArgs(
-  args: IGQLArgs,
+  args: IRQArgs,
 ): any {
   // if it's not an object or if it's null
   if (typeof args !== "object" || args === null) {
@@ -864,7 +849,7 @@ function buildRQArgs(
  * @param mainArgs the main arguments that this is wrapped around
  * @param queries the queries to run
  */
-function buildGqlThing(type: "mutation" | "query", mainArgs: IGQLArgs, ...queries: IGQLQueryObj[]) {
+function buildGqlThing(type: "mutation" | "query", mainArgs: IRQArgs, ...queries: IGQLQueryObj[]) {
   // so we add the type
   let queryStr = type;
   // if we have args we build those args eg. mutation(arg1: Upload!, arg2: Upload!)
@@ -1039,7 +1024,7 @@ export async function gqlQuery(query: GQLQuery, options?: {
   merge?: boolean;
   mergeMS?: number;
   progresser?: (arg: IXMLHttpRequestProgressInfo) => void;
-}): Promise<IGQLEndpointValue> {
+}): Promise<IRQEndpointValue> {
   const host = (options && options.host) || "";
   const merge = options && options.merge;
 
@@ -1094,7 +1079,7 @@ export async function gqlQuery(query: GQLQuery, options?: {
         // we use the listener as the resolve
         queryThatCanMergeWith.addEventListenerOnReplyInformed((response) => {
           // once we get the response we need to remap
-          const newResponse: IGQLEndpointValue = {
+          const newResponse: IRQEndpointValue = {
             data: {},
           };
           remapper.forEach((rs) => {
@@ -1179,7 +1164,7 @@ export async function gqlQuery(query: GQLQuery, options?: {
     query.addProgresserListener(options.progresser);
   }
 
-  let reply: IGQLEndpointValue;
+  let reply: IRQEndpointValue;
   // now we try
   try {
     if (fetchMethod === "fetch") {

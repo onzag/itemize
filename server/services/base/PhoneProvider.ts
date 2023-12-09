@@ -11,7 +11,7 @@ import ItemDefinition from "../../../base/Root/Module/ItemDefinition";
 import PropertyDefinition from "../../../base/Root/Module/ItemDefinition/PropertyDefinition";
 import { ISQLTableRowValue } from "../../../base/Root/sql";
 import { renderTemplateAsNode, convertNodeToText } from "../../../client/internal/text";
-import type { IGQLValue } from "../../../gql-querier";
+import type { IRQValue } from "../../../rq-querier";
 import { ServiceProvider, ServiceProviderType } from "..";
 import { FORCE_ALL_OUTBOUND_SMS_TO, NODE_ENV } from "../../environment";
 import type { RegistryService } from "../registry";
@@ -241,7 +241,7 @@ export default class PhoneProvider<T> extends ServiceProvider<T> {
    */
   public async sendTemplateSMS(
     arg: {
-      to: string | IGQLValue | ISQLTableRowValue | Array<string | IGQLValue | ISQLTableRowValue>;
+      to: string | IRQValue | ISQLTableRowValue | Array<string | IRQValue | ISQLTableRowValue>;
       itemDefinition: string | ItemDefinition;
       property: string | PropertyDefinition;
       id: string;
@@ -310,7 +310,7 @@ export default class PhoneProvider<T> extends ServiceProvider<T> {
 
       // we need the user value, if we have a number
       // we will have to request it from the cache
-      let userData: ISQLTableRowValue | IGQLValue = u;
+      let userData: ISQLTableRowValue | IRQValue = u;
       if (typeof userData === "string") {
         userData = this.isInstanceLocal() ?
           await this.localAppData.cache.requestValue(

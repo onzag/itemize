@@ -5,7 +5,6 @@
  */
 
 import { IPropertyDefinitionSupportedType } from "../types";
-import { GraphQLString } from "graphql";
 import {
   standardSQLInFn,
   standardSQLOutFn,
@@ -47,7 +46,6 @@ export type PropertyDefinitionSupportedTimeType = string;
  * The behaviour of the time is described by this type
  */
 const typeValue: IPropertyDefinitionSupportedType<PropertyDefinitionSupportedTimeType> = {
-  gql: GraphQLString,
   rq: {
     type: "string",
   },

@@ -20,7 +20,7 @@ import {
 import { ISQLTableRowValue } from "../../../base/Root/sql";
 import { convertSQLValueToGQLValueForItemDefinition } from "../../../base/Root/Module/ItemDefinition/sql";
 import { IOTriggerActions } from "../triggers";
-import { IGQLValue } from "../../../gql-querier";
+import { IRQValue } from "../../../rq-querier";
 import { CustomRoleGranterEnvironment, CustomRoleManager } from "../roles";
 import { CAN_LOG_DEBUG } from "../../environment";
 import { FRQIdefResolverType } from "../../../base/Root/rq";
@@ -58,7 +58,7 @@ export async function deleteItemDefinition(
     },
   );
 
-  let currentWholeValueAsGQL: IGQLValue;
+  let currentWholeValueAsGQL: IRQValue;
   let rolesManager: CustomRoleManager;
 
   // we need to run the policy check for delete,

@@ -7,7 +7,6 @@
  */
 
 import { IPropertyDefinitionSupportedType } from "../types";
-import { GraphQLString } from "graphql";
 import {
   standardSQLOutFn,
   getStandardSQLFnFor,
@@ -37,9 +36,7 @@ export type PropertyDefinitionSupportedTagListType = string[];
  * The behaviour of strings is described by this type
  */
 const typeValue: IPropertyDefinitionSupportedType<PropertyDefinitionSupportedTagListType> = {
-  gql: GraphQLString,
   json: "string",
-  gqlList: true,
   rq: {
     type: "string",
     array: true,

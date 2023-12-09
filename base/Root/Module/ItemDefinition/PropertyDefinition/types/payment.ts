@@ -8,7 +8,6 @@
 import {
   IPropertyDefinitionSupportedType,
 } from ".";
-import { GraphQLNonNull, GraphQLFloat, GraphQLString } from "graphql";
 import { PropertyInvalidReason } from "..";
 import {
   MAX_SUPPORTED_REAL,
@@ -65,33 +64,6 @@ export interface IPropertyDefinitionSupportedPaymentType {
  * The type of a curreny type specifies how it behaves in the app
  */
 const typeValue: IPropertyDefinitionSupportedType<IPropertyDefinitionSupportedPaymentType> = {
-  // the graphql is a new type
-  gql: "PROPERTY_TYPE__Payment",
-  // it contains the following fields, note how they
-  // are conditional due to the fact this goes to the client side as well
-  gqlFields: {
-    type: {
-      type: GraphQLNonNull && GraphQLNonNull(GraphQLString),
-    },
-    amount: {
-      type: GraphQLNonNull && GraphQLNonNull(GraphQLFloat),
-    },
-    currency: {
-      type: GraphQLNonNull && GraphQLNonNull(GraphQLString),
-    },
-    status: {
-      type: GraphQLNonNull && GraphQLNonNull(GraphQLString),
-    },
-    metadata: {
-      type: GraphQLString,
-    },
-    rometadata: {
-      type: GraphQLString,
-    },
-    target: {
-      type: GraphQLString,
-    },
-  },
   rq: {
     type: "object",
     stdFields: {

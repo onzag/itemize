@@ -1,6 +1,6 @@
 import React, { useCallback, useEffect, useState } from "react";
 import type { EndpointErrorType } from "../../../base/errors";
-import type { IGQLValue } from "../../../gql-querier";
+import type { IRQValue } from "../../../rq-querier";
 import { IActionResponseWithSearchResults, IActionSearchOptions, ItemProvider } from "../../providers/item";
 import { ModuleProvider } from "../../providers/module";
 import { IBaseSyncerHandle, IBaseSyncerHandleMechanism, useHandleMechanism } from "../util/BaseSyncer";
@@ -65,7 +65,7 @@ interface ISearchSyncerProps {
    */
   allowPolyfilledFallback?: boolean;
   parentHandle?: IBaseSyncerHandle;
-  onBulkLoad?: (values: IGQLValue[]) => void;
+  onBulkLoad?: (values: IRQValue[]) => void;
 
   /**
    * Normally children are not rendered unless the values are ready, use this in order
@@ -88,14 +88,14 @@ interface ISearchSyncerProps {
    * as true this means that they were not actually cached and these values are just fallback
    * which is a good sign not to keep chaining providers as they will all not sync
    */
-  children?: (values: IGQLValue[], handle: IBaseSyncerHandleMechanism, info: { fallback: boolean }) => React.ReactNode;
+  children?: (values: IRQValue[], handle: IBaseSyncerHandleMechanism, info: { fallback: boolean }) => React.ReactNode;
 }
 
 // buggy typescript I must return any because it's buggy
 export default function SearchSyncer(props: ISearchSyncerProps): any {
   const [selfSynced, setSelfSynced] = useState(true);
   const [failed, setFailed] = useState(null as EndpointErrorType);
-  const [selfSearchResults, setSelfSearchResults] = useState(null as IGQLValue[]);
+  const [selfSearchResults, setSelfSearchResults] = useState(null as IRQValue[]);
   const [selfUsedFallback, setSelfUsedFallback] = useState(false);
 
   const handleMechanism = useHandleMechanism(

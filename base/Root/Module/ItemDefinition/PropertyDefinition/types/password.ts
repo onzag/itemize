@@ -5,7 +5,6 @@
  */
 
 import { IPropertyDefinitionSupportedType } from "../types";
-import { GraphQLString } from "graphql";
 import { standardSQLOutFn, getStandardSQLFnFor, standardSQLSelect } from "../sql";
 import { PropertyInvalidReason } from "../../PropertyDefinition";
 import { MAX_STRING_LENGTH, CLASSIC_BASE_I18N, CLASSIC_OPTIONAL_I18N } from "../../../../../../constants";
@@ -20,7 +19,6 @@ export type PropertyDefinitionSupportedPasswordType = string;
  * The behaviour of passwords is specified by this type
  */
 const typeValue: IPropertyDefinitionSupportedType<PropertyDefinitionSupportedPasswordType> = {
-  gql: GraphQLString,
   rq: {
     type: "string",
   },

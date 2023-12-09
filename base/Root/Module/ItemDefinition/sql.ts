@@ -14,9 +14,9 @@ import {
   COMBINED_INDEX,
 } from "../../../../constants";
 import {
-  convertSQLValueToGQLValueForProperty,
+  convertSQLValueToRQValueForProperty,
   getSQLTableDefinitionForProperty,
-  convertGQLValueToSQLValueForProperty,
+  convertRQValueToSQLValueForProperty,
   buildSQLQueryForProperty,
   buildSQLStrSearchQueryForProperty,
   buildSQLOrderByForProperty,
@@ -39,7 +39,7 @@ import {
   buildElasticQueryForInclude,
 } from "./Include/sql";
 import { ISQLTableDefinitionType, ISQLSchemaDefinitionType, ISQLTableRowValue, ISQLStreamComposedTableRowValue, ConsumeStreamsFnType, IElasticIndexDefinitionType, IElasticSchemaDefinitionType } from "../../sql";
-import { IGQLValue, IGQLRequestFields, IGQLArgs } from "../../../../gql-querier";
+import { IRQValue, IRQRequestFields, IRQArgs } from "../../../../rq-querier";
 import StorageProvider from "../../../../server/services/base/StorageProvider";
 import { WhereBuilder } from "../../../../database/WhereBuilder";
 import { OrderByBuilder } from "../../../../database/OrderByBuilder";
@@ -262,10 +262,10 @@ export function convertSQLValueToGQLValueForItemDefinition(
   appData: IAppDataType,
   itemDefinition: ItemDefinition,
   row: ISQLTableRowValue,
-  graphqlFields?: IGQLRequestFields,
-): IGQLValue {
+  graphqlFields?: IRQRequestFields,
+): IRQValue {
   // first we create the graphql result
-  const result: IGQLValue = {};
+  const result: IRQValue = {};
 
   // now we take all the base properties that we have
   // in the graphql model
@@ -288,7 +288,7 @@ export function convertSQLValueToGQLValueForItemDefinition(
   ).forEach((pd) => {
     Object.assign(
       result,
-      convertSQLValueToGQLValueForProperty(serverData, appData, itemDefinition, null, pd, row),
+      convertSQLValueToRQValueForProperty(serverData, appData, itemDefinition, null, pd, row),
     );
   });
 
@@ -317,7 +317,7 @@ export function convertSQLValueToElasticSQLValueForItemDefinition(
   appData: IAppDataType,
   itemDefinition: ItemDefinition,
   row: ISQLTableRowValue,
-): IGQLValue {
+): IRQValue {
   const result: ISQLTableRowValue = {};
 
   // now we take all the base properties that we have
@@ -379,13 +379,13 @@ export function convertGQLValueToSQLValueForItemDefinition(
   serverData: any,
   appData: IAppDataType,
   itemDefinition: ItemDefinition,
-  data: IGQLArgs,
-  oldData: IGQLValue,
+  data: IRQArgs,
+  oldData: IRQValue,
   uploadsClient: StorageProvider<any>,
   domain: string,
   language: string | ISQLTableRowValue,
   dictionary: string | ISQLTableRowValue,
-  partialFields?: IGQLRequestFields | IGQLArgs | IGQLValue,
+  partialFields?: IRQRequestFields | IRQArgs | IRQValue,
 ): ISQLStreamComposedTableRowValue {
   // first we create the row value
   const result: ISQLTableRowValue = {};
@@ -398,7 +398,7 @@ export function convertGQLValueToSQLValueForItemDefinition(
       (partialFields && typeof partialFields[pd.getId()] !== "undefined") ||
       !partialFields
     ) {
-      const addedFieldsByProperty = convertGQLValueToSQLValueForProperty(
+      const addedFieldsByProperty = convertRQValueToSQLValueForProperty(
         serverData,
         appData,
         itemDefinition.getParentModule(),
@@ -476,7 +476,7 @@ export function buildSQLQueryForItemDefinition(
   serverData: any,
   appData: IAppDataType,
   itemDefinition: ItemDefinition,
-  args: IGQLArgs,
+  args: IRQArgs,
   whereBuilder: WhereBuilder,
   orderByBuilder: OrderByBuilder,
   language: string,
@@ -628,7 +628,7 @@ export function buildElasticQueryForItemDefinition(
   serverData: any,
   appData: IAppDataType,
   itemDefinition: ItemDefinition,
-  args: IGQLArgs,
+  args: IRQArgs,
   elasticQueryBuilder: ElasticQueryBuilder,
   language: string,
   dictionary: string,

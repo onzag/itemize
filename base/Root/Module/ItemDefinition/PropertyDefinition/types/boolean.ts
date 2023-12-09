@@ -5,7 +5,6 @@
  */
 
 import { IPropertyDefinitionSupportedType } from "../types";
-import { GraphQLBoolean } from "graphql";
 import {
   standardSQLInFn,
   standardSQLOutFn,
@@ -36,7 +35,6 @@ export type PropertyDefinitionSupportedBooleanType = boolean;
 const typeValue: IPropertyDefinitionSupportedType<PropertyDefinitionSupportedBooleanType> = {
   // a boolean type can be written as a boolean
   json: "boolean",
-  gql: GraphQLBoolean,
   rq: {
     type: "boolean",
   },

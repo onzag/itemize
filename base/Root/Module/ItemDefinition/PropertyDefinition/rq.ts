@@ -24,8 +24,9 @@ export function getRQDefinitionForProperty(
   options: {
     optionalForm: boolean,
     prefix: string,
+    retrievalMode: boolean,
   },
-): {[id: string]: RQField} {
+): { [id: string]: RQField } {
   // for documentation purposes
   const englishData = propertyDefinition.getI18nDataFor("en");
   // for the description
@@ -40,12 +41,39 @@ export function getRQDefinitionForProperty(
 
   const propDescr = propertyDefinition.getPropertyDefinitionDescription();
 
-  // return it
-  return {
-    [options.prefix + propertyDefinition.getId()]: {
-      ...propDescr.rq,
-      required: !options.optionalForm,
-      description,
+  if (options.retrievalMode && propDescr.rqRepresentsFile) {
+    const descCopy = {...propDescr.rq};
+    if (descCopy.ownFields.src) {
+      descCopy.ownFields = {...descCopy.ownFields};
+      delete descCopy.ownFields.src;
+
+      if (Object.keys(descCopy.ownFields).length === 0) {
+        delete descCopy.ownFields;
+      }
+    } else if (descCopy.stdFields.src) {
+      descCopy.stdFields = {...descCopy.stdFields};
+      delete descCopy.stdFields.src;
+
+      if (Object.keys(descCopy.stdFields).length === 0) {
+        delete descCopy.stdFields;
+      }
     }
-  };
+    // return it
+    return {
+      [options.prefix + propertyDefinition.getId()]: {
+        ...descCopy,
+        required: !options.optionalForm,
+        description,
+      }
+    };
+  } else {
+    // return it
+    return {
+      [options.prefix + propertyDefinition.getId()]: {
+        ...propDescr.rq,
+        required: !options.optionalForm,
+        description,
+      }
+    };
+  }
 }

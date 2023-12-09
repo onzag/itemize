@@ -5,7 +5,6 @@
  */
 
 import { IPropertyDefinitionSupportedType } from "../types";
-import { GraphQLInt } from "graphql";
 import {
   standardSQLInFn,
   standardSQLOutFn,
@@ -46,7 +45,6 @@ export type PropertyDefinitionSupportedYearType = number;
  * The type describes how the year type behaves in the app
  */
 const typeValue: IPropertyDefinitionSupportedType<PropertyDefinitionSupportedYearType> = {
-  gql: GraphQLInt,
   rq: {
     type: "integer-positive",
   },

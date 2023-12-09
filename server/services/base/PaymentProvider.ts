@@ -10,7 +10,7 @@ import type ItemDefinition from "../../../base/Root/Module/ItemDefinition";
 import type Include from "../../../base/Root/Module/ItemDefinition/Include";
 import type PropertyDefinition from "../../../base/Root/Module/ItemDefinition/PropertyDefinition";
 import type { ISQLTableRowValue } from "../../../base/Root/sql";
-import type { IGQLArgs, IGQLValue } from "../../../gql-querier";
+import type { IRQArgs, IRQValue } from "../../../rq-querier";
 
 import { IPropertyDefinitionSupportedPaymentType, PaymentStatusType } from "../../../base/Root/Module/ItemDefinition/PropertyDefinition/types/payment";
 import { ServiceProvider, ServiceProviderType } from "..";
@@ -633,7 +633,7 @@ export default class PaymentProvider<T> extends ServiceProvider<T> {
     status: PaymentStatusType,
     uuidOrLocation: string | IPaymentUniqueLocation,
     extras: {
-      knownValue?: ISQLTableRowValue | IGQLValue;
+      knownValue?: ISQLTableRowValue | IRQValue;
       metadata?: string;
       rometadata?: string;
     } = {}
@@ -663,7 +663,7 @@ export default class PaymentProvider<T> extends ServiceProvider<T> {
       newValue.rometadata = extras.rometadata;
     }
 
-    const update: IGQLArgs = {
+    const update: IRQArgs = {
       [paymentObject.property.getId()]: newValue as any,
     };
 

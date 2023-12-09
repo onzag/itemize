@@ -25,6 +25,7 @@ export function getRQDefinitionForInclude(
   include: Include,
   options: {
     optionalForm: boolean,
+    retrievalMode: boolean,
   },
 ): {[id: string]: RQField} {
   // the exclusion state needs to be stored in the schema bit

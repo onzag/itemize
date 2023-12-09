@@ -22,7 +22,7 @@ import Include, { IncludeExclusionState } from "../../base/Root/Module/ItemDefin
 import { jwtVerify } from "../token";
 import { Cache } from "../cache";
 import { ISQLTableRowValue } from "../../base/Root/sql";
-import { IGQLValue, IGQLSearchRecord, IGQLArgs, IGQLRequestFields } from "../../gql-querier";
+import { IRQValue, IRQSearchRecord, IRQArgs, IRQRequestFields } from "../../rq-querier";
 import { PropertyDefinitionSupportedType } from "../../base/Root/Module/ItemDefinition/PropertyDefinition/types";
 import { ISensitiveConfigRawJSONDataType } from "../../config";
 import { getConversionIdsForCheckingAgainstLimiters, getValuesStrategyForLimiters } from "../../base/Root/Module/ItemDefinition/PropertyDefinition/search-mode";
@@ -429,7 +429,7 @@ export async function validateParentingRules(
   return null;
 }
 
-export function retrieveSince(args: IGQLArgs): string {
+export function retrieveSince(args: IRQArgs): string {
   if (args.since) {
     const date = new Date(args.since as string);
     if (date instanceof Date && !isNaN(date.getTime())) {
@@ -444,7 +444,7 @@ export function retrieveSince(args: IGQLArgs): string {
   return null;
 }
 
-export function retrieveUntil(args: IGQLArgs): string {
+export function retrieveUntil(args: IRQArgs): string {
   if (args.until) {
     const date = new Date(args.since as string);
     if (date instanceof Date && !isNaN(date.getTime())) {
@@ -460,7 +460,7 @@ export function retrieveUntil(args: IGQLArgs): string {
 }
 
 
-export function checkLimiters(args: IGQLArgs, idefOrMod: Module | ItemDefinition) {
+export function checkLimiters(args: IRQArgs, idefOrMod: Module | ItemDefinition) {
   const mod = idefOrMod instanceof Module ? idefOrMod : idefOrMod.getParentModule();
   const modLimiters = mod.getSearchLimiters();
   const idefLimiters = idefOrMod instanceof ItemDefinition ? idefOrMod.getSearchLimiters() : null;
@@ -683,7 +683,7 @@ export function checkLimit(limit: number, idefOrMod: Module | ItemDefinition, tr
   }
 }
 
-export function checkListTypes(records: IGQLSearchRecord[], mod: Module) {
+export function checkListTypes(records: IRQSearchRecord[], mod: Module) {
   records.forEach((idContainer) => {
     const itemDefinition = mod.getParentRoot().registry[idContainer.type];
     if (!itemDefinition) {
@@ -904,7 +904,7 @@ export async function filterAndPrepareGQLValue(
   serverData: any,
   appData: IAppDataType,
   value: ISQLTableRowValue,
-  requestedFields: IGQLRequestFields,
+  requestedFields: IRQRequestFields,
   role: string,
   userId: string,
   ownerUserId: string,
@@ -1001,7 +1001,7 @@ export async function filterAndPrepareGQLValue(
  */
 export async function serverSideCheckItemDefinitionAgainst(
   itemDefinition: ItemDefinition,
-  gqlArgValue: IGQLValue,
+  gqlArgValue: IRQValue,
   id: string,
   version: string,
   referredInclude?: Include,
@@ -1105,7 +1105,7 @@ export async function serverSideCheckItemDefinitionAgainst(
     // specific item data, that's where we use our referred item
     await serverSideCheckItemDefinitionAgainst(
       include.getItemDefinition(),
-      gqlIncludeValue as IGQLValue,
+      gqlIncludeValue as IRQValue,
       id,
       version,
       include,
@@ -1124,10 +1124,10 @@ const reservedKeys = Object.keys(RESERVED_BASE_PROPERTIES);
  */
 export function splitArgsInGraphqlQuery(
   moduleOrItemDefinition: Module | ItemDefinition,
-  args: IGQLArgs,
-): [IGQLArgs, IGQLArgs] {
-  const resultingSelfValues: IGQLArgs = {};
-  const resultingExtraArgs: IGQLArgs = {};
+  args: IRQArgs,
+): [IRQArgs, IRQArgs] {
+  const resultingSelfValues: IRQArgs = {};
+  const resultingExtraArgs: IRQArgs = {};
   const propertyIds = (moduleOrItemDefinition instanceof Module ?
     moduleOrItemDefinition.getAllPropExtensions() :
     moduleOrItemDefinition.getAllPropertyDefinitionsAndExtensions()).map((p) => p.getId());
@@ -1183,7 +1183,7 @@ export async function runPolicyCheck(
     version: string,
     role: string,
     userId: string,
-    gqlArgValue: IGQLValue,
+    gqlArgValue: IRQValue,
     gqlFlattenedRequestedFiels: any,
     appData: IAppDataType,
     preValidation?: (content: ISQLTableRowValue) => void | ISQLTableRowValue | Promise<void | ISQLTableRowValue>,

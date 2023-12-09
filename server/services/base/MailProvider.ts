@@ -11,7 +11,7 @@ import ItemDefinition from "../../../base/Root/Module/ItemDefinition";
 import PropertyDefinition from "../../../base/Root/Module/ItemDefinition/PropertyDefinition";
 import { ISQLTableRowValue } from "../../../base/Root/sql";
 import { renderTemplate, sanitize } from "../../../client/internal/text";
-import type { IGQLValue } from "../../../gql-querier";
+import type { IRQValue } from "../../../rq-querier";
 import { jwtSign } from "../../token";
 import { IUnsubscribeUserTokenDataType } from "../../user/rest";
 import { ServiceProvider, ServiceProviderType } from "..";
@@ -812,7 +812,7 @@ export default class MailProvider<T> extends ServiceProvider<T> {
     arg: {
       fromUsername: string,
       fromEmailHandle: string,
-      to: string | IGQLValue | ISQLTableRowValue | Array<string | IGQLValue | ISQLTableRowValue>;
+      to: string | IRQValue | ISQLTableRowValue | Array<string | IRQValue | ISQLTableRowValue>;
       subject: string;
       itemDefinition: string | ItemDefinition;
       property: string | PropertyDefinition;
@@ -903,7 +903,7 @@ export default class MailProvider<T> extends ServiceProvider<T> {
 
       // we need the user value, if we have a number
       // we will have to request it from the cache
-      let userData: ISQLTableRowValue | IGQLValue = u;
+      let userData: ISQLTableRowValue | IRQValue = u;
       if (typeof userData === "string") {
         userData = this.isInstanceLocal() ?
           await this.localAppData.cache.requestValue(

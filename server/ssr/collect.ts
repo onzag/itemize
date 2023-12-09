@@ -5,7 +5,7 @@
  */
 
 import { ISQLTableRowValue } from "../../base/Root/sql";
-import { IGQLRequestFields, IGQLSearchRecord, IGQLSearchResultsContainer, IGQLValue } from "../../gql-querier";
+import { IRQRequestFields, IRQSearchRecord, IRQSearchResultsContainer, IRQValue } from "../../rq-querier";
 import ItemDefinition, { IItemSearchStateType, ItemDefinitionIOActions } from "../../base/Root/Module/ItemDefinition";
 import { filterAndPrepareGQLValue } from "../resolvers/basic";
 import { IAppDataType } from "../../server";
@@ -19,10 +19,10 @@ import { convertSQLValueToGQLValueForItemDefinition } from "../../base/Root/Modu
 import type { IActionSearchOptions } from "../../client/providers/item";
 import fs from "fs";
 import path from "path";
-import { getFieldsAndArgs, getPropertyListForSearchMode, getSearchQueryFor } from "../../client/internal/gql-client-util";
+import { getFieldsAndArgs, getPropertyListForSearchMode, getSearchQueryFor } from "../../client/internal/rq-client-util";
 import { searchItemDefinition, searchModule } from "../resolvers/actions/search";
 import { EndpointError } from "../../base/errors";
-import { deepMerge } from "../../gql-util";
+import { deepMerge } from "../../rq-util";
 
 function noop() {};
 
@@ -71,7 +71,7 @@ export interface IQueryCollectionResult extends IBaseCollectionResult {
    * this contains the value and all the attributes
    */
   query: ISSRCollectedQueryType;
-  requestFieldsAcc: IGQLRequestFields;
+  requestFieldsAcc: IRQRequestFields;
   type: "query";
 };
 
@@ -476,7 +476,7 @@ export class Collector {
       // depending on what we are doing we need those records and for that
       // we will use a traditional search
       const isModuleSearch = idef.isExtensionsInstance();
-      let rs: IGQLSearchResultsContainer;
+      let rs: IRQSearchResultsContainer;
       if (isModuleSearch) {
         rs = await searchModule(
           this.appData,
@@ -486,7 +486,7 @@ export class Collector {
           },
           idef.getParentModule().getStandardModule(),
           {traditional: true, noLimitOffset: args.ssrNoLimitOffset},
-        ) as IGQLSearchResultsContainer;
+        ) as IRQSearchResultsContainer;
       } else {
         rs = await searchItemDefinition(
           this.appData,
@@ -496,15 +496,15 @@ export class Collector {
           },
           idef.getStandardCounterpart(),
           {traditional: true, noLimitOffset: args.ssrNoLimitOffset},
-        ) as IGQLSearchResultsContainer;
+        ) as IRQSearchResultsContainer;
       }
 
-      const records = (rs.results as IGQLValue[]).map((v) => ({
+      const records = (rs.results as IRQValue[]).map((v) => ({
         type: v.type,
         version: v.version || null,
         id: v.id || null,
         last_modified: v.last_modified || null
-      })) as IGQLSearchRecord[];
+      })) as IRQSearchRecord[];
 
       let searchParent: [string, string, string] = null;
       if (args.parentedBy && args.parentedBy.id) {
@@ -614,7 +614,7 @@ export class Collector {
    * @param id the id we want
    * @param version the version we want
    */
-  public async collect(idef: ItemDefinition, id: string, version: string, requestFields: IGQLRequestFields): Promise<void> {
+  public async collect(idef: ItemDefinition, id: string, version: string, requestFields: IRQRequestFields): Promise<void> {
     // now we build the merged id
     const mergedID = idef.getQualifiedPathName() + "." + id + "." + (version || "");
 
@@ -727,7 +727,7 @@ export class Collector {
     // TODO we also need some form of SSR prevented properties even on top of that
     // to use in our item provider, some things may just be way too heavy, let it refresh
     // when it gets to the client side
-    const fields: IGQLRequestFields = await idef.buildFieldsForRoleAccess(
+    const fields: IRQRequestFields = await idef.buildFieldsForRoleAccess(
       ItemDefinitionIOActions.READ,
       this.appliedRule.forUser.role,
       this.appliedRule.forUser.id,

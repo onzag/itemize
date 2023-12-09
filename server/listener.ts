@@ -78,7 +78,7 @@ import {
   IPropertySearchRecordsEvent,
   PROPERTY_SEARCH_RECORDS_EVENT,
 } from "../base/remote-protocol";
-import { IGQLSearchRecord } from "../gql-querier";
+import { IRQSearchRecord } from "../rq-querier";
 import { convertVersionsIntoNullsWhenNecessary } from "./version-null-value";
 import { logger } from "./logger";
 import {
@@ -1555,7 +1555,7 @@ export class Listener {
         true,
       );
 
-      const deletedRecords: IGQLSearchRecord[] = (await deletedQuery)
+      const deletedRecords: IRQSearchRecord[] = (await deletedQuery)
         .map(convertVersionsIntoNullsWhenNecessary).map((r) => (
           {
             id: r.id,
@@ -1568,7 +1568,7 @@ export class Listener {
       const totalDiffRecordCount = createdAndModifiedRecordsSQL.length + deletedRecords.length;
 
       if (totalDiffRecordCount) {
-        const createdRecords: IGQLSearchRecord[] = createdAndModifiedRecordsSQL.filter((r) => r.WAS_CREATED).map((r) => (
+        const createdRecords: IRQSearchRecord[] = createdAndModifiedRecordsSQL.filter((r) => r.WAS_CREATED).map((r) => (
           {
             id: r.id,
             version: r.version,
@@ -1576,7 +1576,7 @@ export class Listener {
             last_modified: r.last_modified,
           }
         ));
-        const modifiedRecords: IGQLSearchRecord[] = createdAndModifiedRecordsSQL.filter((r) => !r.WAS_CREATED).map((r) => (
+        const modifiedRecords: IRQSearchRecord[] = createdAndModifiedRecordsSQL.filter((r) => !r.WAS_CREATED).map((r) => (
           {
             id: r.id,
             version: r.version,
@@ -1878,7 +1878,7 @@ export class Listener {
         true,
       );
 
-      const deletedRecords: IGQLSearchRecord[] = (await deletedQuery)
+      const deletedRecords: IRQSearchRecord[] = (await deletedQuery)
         .map(convertVersionsIntoNullsWhenNecessary).map((r) => (
           {
             id: r.id,
@@ -1915,7 +1915,7 @@ export class Listener {
       const totalDiffRecordCount = createdAndModifiedRecordsSQL.length + deletedRecords.length + gainedOrLostRecordsSQL.length;
 
       if (totalDiffRecordCount) {
-        const createdRecords: IGQLSearchRecord[] = createdAndModifiedRecordsSQL.filter((r) => r.WAS_CREATED).map((r) => (
+        const createdRecords: IRQSearchRecord[] = createdAndModifiedRecordsSQL.filter((r) => r.WAS_CREATED).map((r) => (
           {
             id: r.id,
             version: r.version,
@@ -1923,7 +1923,7 @@ export class Listener {
             last_modified: r.last_modified,
           }
         ));
-        const modifiedRecords: IGQLSearchRecord[] = createdAndModifiedRecordsSQL.filter((r) => !r.WAS_CREATED).map((r) => (
+        const modifiedRecords: IRQSearchRecord[] = createdAndModifiedRecordsSQL.filter((r) => !r.WAS_CREATED).map((r) => (
           {
             id: r.id,
             version: r.version,
@@ -1931,7 +1931,7 @@ export class Listener {
             last_modified: r.last_modified,
           }
         ));
-        const newRecords: IGQLSearchRecord[] = gainedOrLostRecordsSQL.filter((r) => r.status).map((r) => (
+        const newRecords: IRQSearchRecord[] = gainedOrLostRecordsSQL.filter((r) => r.status).map((r) => (
           {
             id: r.id,
             version: r.version,
@@ -1939,7 +1939,7 @@ export class Listener {
             last_modified: r.last_modified,
           }
         ));
-        const lostRecords: IGQLSearchRecord[] = gainedOrLostRecordsSQL.filter((r) => !r.status).map((r) => (
+        const lostRecords: IRQSearchRecord[] = gainedOrLostRecordsSQL.filter((r) => !r.status).map((r) => (
           {
             id: r.id,
             version: r.version,
@@ -2204,7 +2204,7 @@ export class Listener {
         true,
       );
 
-      const deletedRecords: IGQLSearchRecord[] = (await deletedQuery)
+      const deletedRecords: IRQSearchRecord[] = (await deletedQuery)
         .map(convertVersionsIntoNullsWhenNecessary).map((r) => (
           {
             id: r.id,
@@ -2241,7 +2241,7 @@ export class Listener {
       const totalDiffRecordCount = createdAndModifiedRecordsSQL.length + deletedRecords.length + gainedOrLostRecordsSQL.length;
 
       if (totalDiffRecordCount) {
-        const createdRecords: IGQLSearchRecord[] = createdAndModifiedRecordsSQL.filter((r) => r.WAS_CREATED).map((r) => (
+        const createdRecords: IRQSearchRecord[] = createdAndModifiedRecordsSQL.filter((r) => r.WAS_CREATED).map((r) => (
           {
             id: r.id,
             version: r.version,
@@ -2249,7 +2249,7 @@ export class Listener {
             last_modified: r.last_modified,
           }
         ));
-        const modifiedRecords: IGQLSearchRecord[] = createdAndModifiedRecordsSQL.filter((r) => !r.WAS_CREATED).map((r) => (
+        const modifiedRecords: IRQSearchRecord[] = createdAndModifiedRecordsSQL.filter((r) => !r.WAS_CREATED).map((r) => (
           {
             id: r.id,
             version: r.version,
@@ -2257,7 +2257,7 @@ export class Listener {
             last_modified: r.last_modified,
           }
         ));
-        const newRecords: IGQLSearchRecord[] = gainedOrLostRecordsSQL.filter((r) => r.status).map((r) => (
+        const newRecords: IRQSearchRecord[] = gainedOrLostRecordsSQL.filter((r) => r.status).map((r) => (
           {
             id: r.id,
             version: r.version,
@@ -2265,7 +2265,7 @@ export class Listener {
             last_modified: r.last_modified,
           }
         ));
-        const lostRecords: IGQLSearchRecord[] = gainedOrLostRecordsSQL.filter((r) => !r.status).map((r) => (
+        const lostRecords: IRQSearchRecord[] = gainedOrLostRecordsSQL.filter((r) => !r.status).map((r) => (
           {
             id: r.id,
             version: r.version,
@@ -2534,7 +2534,7 @@ export class Listener {
         true,
       );
 
-      const deletedRecords: IGQLSearchRecord[] = (await deletedQuery)
+      const deletedRecords: IRQSearchRecord[] = (await deletedQuery)
         .map(convertVersionsIntoNullsWhenNecessary).map((r) => (
           {
             id: r.id,
@@ -2571,7 +2571,7 @@ export class Listener {
       const totalDiffRecordCount = createdAndModifiedRecordsSQL.length + deletedRecords.length + gainedOrLostRecordsSQL.length;
 
       if (totalDiffRecordCount) {
-        const createdRecords: IGQLSearchRecord[] = createdAndModifiedRecordsSQL.filter((r) => r.WAS_CREATED).map((r) => (
+        const createdRecords: IRQSearchRecord[] = createdAndModifiedRecordsSQL.filter((r) => r.WAS_CREATED).map((r) => (
           {
             id: r.id,
             version: r.version,
@@ -2579,7 +2579,7 @@ export class Listener {
             last_modified: r.last_modified,
           }
         ));
-        const modifiedRecords: IGQLSearchRecord[] = createdAndModifiedRecordsSQL.filter((r) => !r.WAS_CREATED).map((r) => (
+        const modifiedRecords: IRQSearchRecord[] = createdAndModifiedRecordsSQL.filter((r) => !r.WAS_CREATED).map((r) => (
           {
             id: r.id,
             version: r.version,
@@ -2587,7 +2587,7 @@ export class Listener {
             last_modified: r.last_modified,
           }
         ));
-        const newRecords: IGQLSearchRecord[] = gainedOrLostRecordsSQL.filter((r) => r.status).map((r) => (
+        const newRecords: IRQSearchRecord[] = gainedOrLostRecordsSQL.filter((r) => r.status).map((r) => (
           {
             id: r.id,
             version: r.version,
@@ -2595,7 +2595,7 @@ export class Listener {
             last_modified: r.last_modified,
           }
         ));
-        const lostRecords: IGQLSearchRecord[] = gainedOrLostRecordsSQL.filter((r) => !r.status).map((r) => (
+        const lostRecords: IRQSearchRecord[] = gainedOrLostRecordsSQL.filter((r) => !r.status).map((r) => (
           {
             id: r.id,
             version: r.version,
@@ -3370,12 +3370,12 @@ export class Listener {
     // we are going to check and compare all the records
     const recordsLocList = ["createdRecords", "deletedRecords", "lostRecords", "modifiedRecords", "newRecords"];
     recordsLocList.forEach((location: string) => {
-      patch[location].forEach((rPatch: IGQLSearchRecord) => {
+      patch[location].forEach((rPatch: IRQSearchRecord) => {
         let shouldAdd = true;
 
         recordsLocList.forEach((location2: string) => {
-          const existantValue: IGQLSearchRecord = src[location2]
-            .find((r2: IGQLSearchRecord) => r2.id === rPatch.id && r2.version === rPatch.version && rPatch.type === r2.type);
+          const existantValue: IRQSearchRecord = src[location2]
+            .find((r2: IRQSearchRecord) => r2.id === rPatch.id && r2.version === rPatch.version && rPatch.type === r2.type);
 
           if (existantValue) {
             const nanodatesrc = new NanoSecondComposedDate(existantValue.last_modified);
@@ -3389,7 +3389,7 @@ export class Listener {
               // we patch and we need to remove the current record
               // that is older than our patch
               src[location2] = src[location2]
-                .filter((r2: IGQLSearchRecord) => !(r2.id === rPatch.id && r2.version === rPatch.version && rPatch.type === r2.type));
+                .filter((r2: IRQSearchRecord) => !(r2.id === rPatch.id && r2.version === rPatch.version && rPatch.type === r2.type));
             }
           }
         });

@@ -15,7 +15,7 @@ import {
   IActionSearchOptions,
 } from "../../providers/item";
 import equals from "deep-equal";
-import { IGQLSearchRecord } from "../../../gql-querier";
+import { IRQSearchRecord } from "../../../rq-querier";
 
 /**
  * This is what the search actioner callback receives as argument
@@ -41,7 +41,7 @@ export interface ISearchActionerInfoArgType {
   /**
    * Search records (whole context)
    */
-  searchRecords: IGQLSearchRecord[];
+  searchRecords: IRQSearchRecord[];
   /**
    * search frunction from the context
    */

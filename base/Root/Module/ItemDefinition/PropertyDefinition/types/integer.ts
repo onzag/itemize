@@ -5,7 +5,6 @@
  */
 
 import { IPropertyDefinitionSupportedType } from "../types";
-import { GraphQLInt } from "graphql";
 import {
   standardSQLInFn,
   standardSQLOutFn,
@@ -50,7 +49,6 @@ const typeValue: IPropertyDefinitionSupportedType<PropertyDefinitionSupportedInt
   rq: {
     type: "integer",
   },
-  gql: GraphQLInt,
   sql: getStandardSQLFnFor && getStandardSQLFnFor("INTEGER"),
   elastic: getStandardElasticForWithNullField && getStandardElasticForWithNullField("long"),
   sqlSelect: standardSQLSelect,

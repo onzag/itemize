@@ -15,7 +15,7 @@ import Module from "../..";
 import PropertyDefinition from "../PropertyDefinition";
 import PropertiesValueMappingDefiniton, { IPropertiesValueMappingDefinitonRawJSONDataType } from "../PropertiesValueMappingDefiniton";
 import { INCLUDE_PREFIX, PREFIX_BUILD, EXCLUSION_STATE_SUFFIX } from "../../../../../constants";
-import { IGQLRequestFields, IGQLValue } from "../../../../../gql-querier";
+import { IRQRequestFields, IRQValue } from "../../../../../rq-querier";
 import { ICustomRoleManager } from "../../../../Root";
 
 /**
@@ -352,7 +352,7 @@ export default class Include {
     userId: string,
     ownerUserId: string,
     rolesManager: ICustomRoleManager,
-    value: IGQLValue,
+    value: IRQValue,
   ): Promise<void> {
     if (!value) {
       return;
@@ -383,7 +383,7 @@ export default class Include {
     role: string,
     userId: string,
     ownerUserId: string,
-    requestedFields: IGQLRequestFields,
+    requestedFields: IRQRequestFields,
     rolesManager: ICustomRoleManager,
     throwError: boolean,
   ) {
@@ -425,7 +425,7 @@ export default class Include {
     }
 
     // now we start building the results
-    const requestFields: IGQLRequestFields = {};
+    const requestFields: IRQRequestFields = {};
 
     // we go through the sinking properties
     await Promise.all(this.getSinkingProperties().map(async (sp) => {
@@ -680,7 +680,7 @@ export default class Include {
   public applyValue(
     id: string,
     version: string,
-    value: IGQLValue,
+    value: IRQValue,
     exclusionState: IncludeExclusionState,
     doNotApplyValueInPropertyIfPropertyHasBeenManuallySet: boolean,
   ) {
