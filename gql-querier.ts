@@ -659,10 +659,32 @@ function buildRQFields(
     rs.push(keyd);
   }
 
-  Object.keys(fields).forEach((fKey) => {
-    // this is the internal
+  const fieldsKeys = Object.keys(fields);
+
+  const stdKeys = (schema && schema.stdFields && Object.keys(schema.stdFields)) || [];
+  const containsAllStd = stdKeys.length && stdKeys.every((stdFieldKey) => {
+    return fieldsKeys.includes(stdFieldKey);
+  });
+
+  if (containsAllStd) {
+    rs.push("&STD");
+  }
+
+  fieldsKeys.forEach((fKey) => {
+    const isStd = stdKeys.includes(fKey);
     const subFields = Object.keys(fields[fKey]);
+
+    // no subfields just a basic field of a singular value
     if (subFields.length === 0) {
+      // if all standard fields are contained and we are the standard too
+      if (containsAllStd && isStd) {
+        // we don't need to be included
+        // note that it may be included for specifications
+        // in case of extended fields
+        return;
+      }
+
+      // add the key to the list
       rs.push(fKey);
     } else {
       const subSchema = schema ?
@@ -675,7 +697,33 @@ function buildRQFields(
         console.warn("Could not find RQ fields definition for field " + fKey);
       }
 
-      rs.push(buildRQFields(subSchema, fields[fKey], fKey))
+      const definition = buildRQFields(subSchema, fields[fKey], fKey);
+
+      // is a std that contains all the STD therefore it's done for
+      if (
+        definition[1] === "&STD" &&
+        definition.length === 2
+      ) {
+        if (
+          containsAllStd &&
+          isStd
+        ) {
+          // it contains all the standard fields and this is a standard field
+          // that is loading all its own standard fields, therefore it can be skipped
+          // as that it's assumed
+          return;
+        } else {
+          // we are not in a standard field that contains all standard fields
+          // but we ourselves have only standard fields to load here
+          // that's the default, so we leave string alone without expanded form
+          rs.push(fKey);
+          return;
+        }
+      }
+
+      // otherwise we must be specific, and specify what are all the fields we
+      // are trying to load
+      rs.push(definition);
     }
   });
 
@@ -899,7 +947,7 @@ function buildRQThing(rqSchema: RQRootSchema, ...queries: IGQLQueryObj[]) {
       }
     });
   }
-  return [qs, mostUsedToken];
+  return [qs, mostUsedToken ? {token: mostUsedToken} : null];
 }
 
 /**
@@ -938,11 +986,17 @@ export async function oldXMLHttpRequest(
   host: string,
   body: FormData,
   query: GQLQuery,
+  headers?: any,
 ): Promise<any> {
   return new Promise((resolve, reject) => {
     const request = new XMLHttpRequest();
     request.open("POST", host + "/graphql");
     request.setRequestHeader('Cache-Control', 'no-cache');
+    if (headers) {
+      Object.keys(headers).forEach((k) => {
+        request.setRequestHeader(k, headers[k]);
+      });
+    }
 
     const rejectFn = (ev: any) => {
       reject(new Error(ev.type));
@@ -1099,13 +1153,24 @@ export async function gqlQuery(query: GQLQuery, options?: {
   formData.append("map", JSON.stringify(query.getMap()));
   // } else {
   //   formData.append(this.getType(), JSON.stringify(query.getOperations()));
-  console.log(query.getRQOperations());
   // }
+
+  const formDataRq = typeof FormData !== "undefined" ? new FormData() : new FormDataNode();
+  const [rqOperations, rqHeaders] = query.getRQOperations();
+  formDataRq.append("rq", process.env.NODE_ENV === "development" ? JSON.stringify(rqOperations, null, 2) : JSON.stringify(rqOperations));
 
   // now let's get all the attachents and append them to the form data
   query.getAttachments().forEach((attachment) => {
     formData.append(attachment.id, attachment.src as File);
+    formDataRq.append(attachment.id, attachment.src as File);
   });
+
+  // rq test, it will fail
+  await fetch(host + "/rq", {
+    method: "POST",
+    cache: "no-cache",
+    body: formDataRq as any,
+  } as any);
 
   // the fetch we need to use
   const fetchMethod = typeof XMLHttpRequest !== "undefined" ? "xhr" : "fetch";

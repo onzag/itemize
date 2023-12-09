@@ -56,6 +56,8 @@ const typeValue: IPropertyDefinitionSupportedType<PropertyDefinitionSupportedFil
         type: "string",
         required: true,
       },
+    },
+    ownFields: {
       src: {
         type: "binary",
       },

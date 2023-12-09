@@ -178,7 +178,10 @@ export function getRQSchemaForModule(
     delete traditionalStdFields.records;
     delete traditionalStdFields.earliest_created_at;
     delete traditionalStdFields.oldest_created_at;
-    traditionalStdFields.resuts = resultsField;
+    traditionalStdFields.highlights ={
+      type: "string",
+    };
+    traditionalStdFields.results = resultsField;
 
     query[PREFIX_TRADITIONAL_SEARCH + mod.getQualifiedPathName()] = {
       args: searchArgs,
