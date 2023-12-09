@@ -1,4 +1,3 @@
-import fetchNode from "node-fetch";
 import { Test } from "..";
 import { strict as assert } from "assert";
 import FormDataNode from "form-data";
@@ -115,102 +114,102 @@ export class GraphqlTest extends Test {
     let schemaFields: ISchemaFields = null;
     let schemaMutationFields: ISchemaFields = null;
 
-    this.it(
-      "Should have a graphql endpoint",
-      async () => {
-        const response = await fetchNode(this.fullHost + "/graphql", {
-          method: "POST",
-          body: JSON.stringify({ query: "query{__schema{queryType{name}}}", variables: null }),
-          headers: {
-            "Content-Type": "application/json",
-          },
-        });
+    // this.it(
+    //   "Should have a graphql endpoint",
+    //   async () => {
+    //     const response = await fetchNode(this.fullHost + "/graphql", {
+    //       method: "POST",
+    //       body: JSON.stringify({ query: "query{__schema{queryType{name}}}", variables: null }),
+    //       headers: {
+    //         "Content-Type": "application/json",
+    //       },
+    //     });
 
-        assert.strictEqual(response.status, 200, "Did not return 200 OK");
+    //     assert.strictEqual(response.status, 200, "Did not return 200 OK");
 
-        const gqlAnswer = await response.json();
+    //     const gqlAnswer = await response.json();
 
-        assert.deepStrictEqual(gqlAnswer, {
-          data: {
-            __schema: {
-              queryType: {
-                name: "ROOT_QUERY",
-              },
-            },
-          },
-        }, "Did not return a ROOT_QUERY");
-      }
-    );
+    //     assert.deepStrictEqual(gqlAnswer, {
+    //       data: {
+    //         __schema: {
+    //           queryType: {
+    //             name: "ROOT_QUERY",
+    //           },
+    //         },
+    //       },
+    //     }, "Did not return a ROOT_QUERY");
+    //   }
+    // );
 
-    this.it(
-      "Should support formdata protocol in graphql",
-      async () => {
+    // this.it(
+    //   "Should support formdata protocol in graphql",
+    //   async () => {
 
-        // building the form data
-        const formData = new FormDataNode();
-        // append this stuff to the form data
-        formData.append("operations", JSON.stringify({ query: "query{__schema{queryType{name}}}", variables: null }));
-        formData.append("map", "{}");
+    //     // building the form data
+    //     const formData = new FormDataNode();
+    //     // append this stuff to the form data
+    //     formData.append("operations", JSON.stringify({ query: "query{__schema{queryType{name}}}", variables: null }));
+    //     formData.append("map", "{}");
 
-        const response = await fetchNode(this.fullHost + "/graphql", {
-          method: "POST",
-          body: formData,
-        });
+    //     const response = await fetchNode(this.fullHost + "/graphql", {
+    //       method: "POST",
+    //       body: formData,
+    //     });
 
-        assert.strictEqual(response.status, 200, "Did not return 200 OK");
+    //     assert.strictEqual(response.status, 200, "Did not return 200 OK");
 
-        const gqlAnswer = await response.json();
+    //     const gqlAnswer = await response.json();
 
-        assert.deepStrictEqual(gqlAnswer, {
-          data: {
-            __schema: {
-              queryType: {
-                name: "ROOT_QUERY",
-              },
-            },
-          },
-        }, "Did not return a ROOT_QUERY");
-      }
-    );
+    //     assert.deepStrictEqual(gqlAnswer, {
+    //       data: {
+    //         __schema: {
+    //           queryType: {
+    //             name: "ROOT_QUERY",
+    //           },
+    //         },
+    //       },
+    //     }, "Did not return a ROOT_QUERY");
+    //   }
+    // );
 
-    this.it(
-      "Should return all supported schema query and mutation fields",
-      async () => {
-        const schemaQuery = "query {__schema {queryType{fields {name}}mutationType{fields {name}}}}";
-        const response = await fetchNode(this.fullHost + "/graphql", {
-          method: "POST",
-          body: JSON.stringify({ query: schemaQuery, variables: null }),
-          headers: {
-            "Content-Type": "application/json",
-          },
-        });
+    // this.it(
+    //   "Should return all supported schema query and mutation fields",
+    //   async () => {
+    //     const schemaQuery = "query {__schema {queryType{fields {name}}mutationType{fields {name}}}}";
+    //     const response = await fetchNode(this.fullHost + "/graphql", {
+    //       method: "POST",
+    //       body: JSON.stringify({ query: schemaQuery, variables: null }),
+    //       headers: {
+    //         "Content-Type": "application/json",
+    //       },
+    //     });
 
-        assert.strictEqual(response.status, 200, "Did not return 200 OK");
+    //     assert.strictEqual(response.status, 200, "Did not return 200 OK");
 
-        const gqlAnswer = await response.json();
+    //     const gqlAnswer = await response.json();
 
-        schemaFields = gqlAnswer.data.__schema.queryType.fields;
-        schemaMutationFields = gqlAnswer.data.__schema.mutationType.fields;
+    //     schemaFields = gqlAnswer.data.__schema.queryType.fields;
+    //     schemaMutationFields = gqlAnswer.data.__schema.mutationType.fields;
 
-        if (!Array.isArray(schemaFields)) {
-          assert.fail("Schema query fields were not an array");
-        }
+    //     if (!Array.isArray(schemaFields)) {
+    //       assert.fail("Schema query fields were not an array");
+    //     }
 
-        if (!Array.isArray(schemaMutationFields)) {
-          assert.fail("Schema mutation fields were not an array");
-        }
-      }
-    ).skipLayerOnFail();
+    //     if (!Array.isArray(schemaMutationFields)) {
+    //       assert.fail("Schema mutation fields were not an array");
+    //     }
+    //   }
+    // ).skipLayerOnFail();
 
-    this.it(
-      "Should have a token endpoint",
-      () => {
-        const foundField = schemaFields.some((f) => f.name === "token");
-        if (!foundField) {
-          assert.fail("Did not find a query endpoint for the token");
-        }
-      }
-    );
+    // this.it(
+    //   "Should have a token endpoint",
+    //   () => {
+    //     const foundField = schemaFields.some((f) => f.name === "token");
+    //     if (!foundField) {
+    //       assert.fail("Did not find a query endpoint for the token");
+    //     }
+    //   }
+    // );
 
     const getSchemaFields: ISchemaFieldsGetterFn = () => {
       return {

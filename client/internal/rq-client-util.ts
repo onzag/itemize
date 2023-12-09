@@ -21,7 +21,7 @@ import {
   INCLUDE_PREFIX,
 } from "../../constants";
 import ItemDefinition, { IItemStateType } from "../../base/Root/Module/ItemDefinition";
-import { IRQValue, IRQRequestFields, IRQArgs, buildGqlQuery, gqlQuery, buildGqlMutation, IRQEndpointValue, IRQSearchRecord, GQLEnum, IRQFile, ProgresserFn, GQLQuery } from "../../rq-querier";
+import { IRQValue, IRQRequestFields, IRQArgs, buillRQQuery, gqlQuery, buildRQMutation, IRQEndpointValue, IRQSearchRecord, GQLEnum, IRQFile, ProgresserFn, RQQueryBuilder } from "../../rq-querier";
 import { deepMerge, requestFieldsAreContained } from "../../rq-util";
 import CacheWorkerInstance from "./workers/cache";
 import { EndpointErrorType } from "../../base/errors";
@@ -1003,7 +1003,7 @@ export async function runGetQueryFor(
   );
 
   const rqSchema = arg.itemDefinition.getParentModule().getParentRoot().getRQSchema();
-  const query = buildGqlQuery(rqSchema, {
+  const query = buillRQQuery(rqSchema, {
     name: queryName,
     args,
     fields: arg.fields,
@@ -1119,7 +1119,7 @@ export async function runDeleteQueryFor(
 
   // build the mutation
   const rqSchema = arg.itemDefinition.getParentModule().getParentRoot().getRQSchema();
-  const query = buildGqlMutation(rqSchema, {
+  const query = buildRQMutation(rqSchema, {
     name: queryName,
     args,
     fields: {
@@ -1172,7 +1172,7 @@ export function getAddQueryFor(
     containerId: string,
     waitAndMerge?: boolean,
   },
-): GQLQuery {
+): RQQueryBuilder {
   const queryName = PREFIX_ADD + arg.itemDefinition.getQualifiedPathName();
   const args = getQueryArgsFor(
     arg.args,
@@ -1190,7 +1190,7 @@ export function getAddQueryFor(
   args.container_id = arg.containerId;
 
   const rqSchema = arg.itemDefinition.getParentModule().getParentRoot().getRQSchema();
-  const query = buildGqlMutation(rqSchema, {
+  const query = buildRQMutation(rqSchema, {
     name: queryName,
     args,
     // last modified is necessary for cache manipulation
@@ -1395,7 +1395,7 @@ export function getEditQueryFor(
   args.listener_uuid = arg.listenerUUID;
 
   const rqSchema = arg.itemDefinition.getParentModule().getParentRoot().getRQSchema();
-  const query = buildGqlMutation(rqSchema, {
+  const query = buildRQMutation(rqSchema, {
     name: queryName,
     args,
     // last modified is necessary for cache manipulation
@@ -1674,7 +1674,7 @@ export function getSearchQueryFor(
   const searchArgs = getSearchArgsFor(arg);
 
   const rqSchema = arg.itemDefinition.getParentModule().getParentRoot().getRQSchema();
-  const query = buildGqlQuery(rqSchema, {
+  const query = buillRQQuery(rqSchema, {
     name: queryName,
     args: searchArgs,
     fields: arg.traditional ? {
@@ -2037,7 +2037,7 @@ export async function runSearchQueryFor(
     }
   } else if (!arg.traditional && !useCacheWorker) {
     const rqSchema = arg.itemDefinition.getParentModule().getParentRoot().getRQSchema();
-    const query = buildGqlQuery(rqSchema, {
+    const query = buillRQQuery(rqSchema, {
       name: queryName,
       args: searchArgs,
       fields: {
@@ -2068,7 +2068,7 @@ export async function runSearchQueryFor(
     }
   } else if (!useCacheWorker) {
     const rqSchema = arg.itemDefinition.getParentModule().getParentRoot().getRQSchema();
-    const query = buildGqlQuery(rqSchema, {
+    const query = buillRQQuery(rqSchema, {
       name: queryName,
       args: searchArgs,
       fields: {

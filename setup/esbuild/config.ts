@@ -66,9 +66,6 @@ const IGNORES = [
     resourceRegExp: /^pg-native$/,
   },
   {
-    resourceRegExp: /^node-fetch$/,
-  },
-  {
     resourceRegExp: /^form-data$/,
   },
   {
@@ -78,6 +75,9 @@ const IGNORES = [
   {
     resourceRegExp: /sql/,
     contextRegExp: /node_modules\/@onzag\/itemize/,
+  },
+  {
+    resourceRegExp: /^\.\/server\/request$/
   },
 ];
 

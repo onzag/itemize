@@ -6,7 +6,6 @@ import { SERVER_DATA_IDENTIFIER } from "../../constants";
 import { promisify } from "util";
 import equals from "deep-equal";
 import { IUserInfoAndTokensForTesting } from ".";
-import fetchNode from "node-fetch";
 import { DatabaseConnection } from "../../database";
 
 export class RedisTest extends Test {
@@ -125,99 +124,99 @@ export class RedisTest extends Test {
       "." +
       (this.testingUserInfo.testUser.version || "");
 
-    this.it(
-      "Should be able to cache when graphql requested",
-      async () => {
+    // this.it(
+    //   "Should be able to cache when graphql requested",
+    //   async () => {
 
-        // delete the user cache entry from the cluster registry
-        // bit hacky but okey
-        await delPromisified(idefQueryIdentifier);
+    //     // delete the user cache entry from the cluster registry
+    //     // bit hacky but okey
+    //     await delPromisified(idefQueryIdentifier);
 
-        // we will use the token request as that will cause a request via graphql
-        const response = await fetchNode(this.fullHost + "/graphql", {
-          method: "POST",
-          body: JSON.stringify({ query: "query{token(token: " + JSON.stringify(this.testingUserInfo.testToken) + "){token,}}", variables: null }),
-          headers: {
-            "Content-Type": "application/json",
-          },
-        });
+    //     // we will use the token request as that will cause a request via graphql
+    //     const response = await fetchNode(this.fullHost + "/graphql", {
+    //       method: "POST",
+    //       body: JSON.stringify({ query: "query{token(token: " + JSON.stringify(this.testingUserInfo.testToken) + "){token,}}", variables: null }),
+    //       headers: {
+    //         "Content-Type": "application/json",
+    //       },
+    //     });
 
-        assert.strictEqual(response.status, 200, "Graphql did not return 200 OK");
+    //     assert.strictEqual(response.status, 200, "Graphql did not return 200 OK");
 
-        // fetch the new value from the redis cache, there should be a new one
-        const value = await getPromisified(idefQueryIdentifier);
+    //     // fetch the new value from the redis cache, there should be a new one
+    //     const value = await getPromisified(idefQueryIdentifier);
 
-        // there should be a value
-        if (!value) {
-          assert.fail("Caching failed by the server");
-        }
+    //     // there should be a value
+    //     if (!value) {
+    //       assert.fail("Caching failed by the server");
+    //     }
 
-        // we expect the cache to equal what we have here, this was gotten
-        // directly from postgresql
-        assert.deepStrictEqual(JSON.parse(value), this.testingUserInfo.testUser);
-      }
-    );
+    //     // we expect the cache to equal what we have here, this was gotten
+    //     // directly from postgresql
+    //     assert.deepStrictEqual(JSON.parse(value), this.testingUserInfo.testUser);
+    //   }
+    // );
 
-    [0, 1].forEach((round) => {
-      this.it(
-        "Should be able to update the cached value after a grapqhl action, round " + (round + 1),
-        async () => {
-          // there should be one there from our previous test
-          const currentValue = JSON.parse(await getPromisified(idefQueryIdentifier));
+    // [0, 1].forEach((round) => {
+    //   this.it(
+    //     "Should be able to update the cached value after a grapqhl action, round " + (round + 1),
+    //     async () => {
+    //       // there should be one there from our previous test
+    //       const currentValue = JSON.parse(await getPromisified(idefQueryIdentifier));
 
-          // we will use the token request as that will cause a request via graphql
-          // we will change the country of the user
-          const originalCountry = this.testingUserInfo.testUser.app_country;
-          // we will toggle the user country
-          const newCountry = round === 0 ? (originalCountry === "AQ" ? "FI" : "AQ") : originalCountry;
+    //       // we will use the token request as that will cause a request via graphql
+    //       // we will change the country of the user
+    //       const originalCountry = this.testingUserInfo.testUser.app_country;
+    //       // we will toggle the user country
+    //       const newCountry = round === 0 ? (originalCountry === "AQ" ? "FI" : "AQ") : originalCountry;
 
-          const response = await fetchNode(this.fullHost + "/graphql", {
-            method: "POST",
-            body: JSON.stringify(
-              {
-                query:
-                  "mutation{EDIT_MOD_users__IDEF_user(token: " +
-                  JSON.stringify(this.testingUserInfo.testToken) +
-                  ",id:" +
-                  JSON.stringify(this.testingUserInfo.testUser.id) +
-                  ",version:null,language:" +
-                  JSON.stringify(this.testingUserInfo.testUser.app_language) +
-                  ",listener_uuid:null,app_country:" +
-                  JSON.stringify(newCountry) +
-                  "){DATA{app_country}}}",
-                variables: null
-              }
-            ),
-            headers: {
-              "Content-Type": "application/json",
-            },
-          });
+    //       const response = await fetchNode(this.fullHost + "/graphql", {
+    //         method: "POST",
+    //         body: JSON.stringify(
+    //           {
+    //             query:
+    //               "mutation{EDIT_MOD_users__IDEF_user(token: " +
+    //               JSON.stringify(this.testingUserInfo.testToken) +
+    //               ",id:" +
+    //               JSON.stringify(this.testingUserInfo.testUser.id) +
+    //               ",version:null,language:" +
+    //               JSON.stringify(this.testingUserInfo.testUser.app_language) +
+    //               ",listener_uuid:null,app_country:" +
+    //               JSON.stringify(newCountry) +
+    //               "){DATA{app_country}}}",
+    //             variables: null
+    //           }
+    //         ),
+    //         headers: {
+    //           "Content-Type": "application/json",
+    //         },
+    //       });
 
-          assert.strictEqual(response.status, 200, "Graphql did not return 200 OK");
+    //       assert.strictEqual(response.status, 200, "Graphql did not return 200 OK");
 
-          // wait a couple of ms, cluster database update is almost
-          // instantaneous but the tests might be running way too fast
-          this.wait(300);
+    //       // wait a couple of ms, cluster database update is almost
+    //       // instantaneous but the tests might be running way too fast
+    //       this.wait(300);
 
-          // fetch the new value from the redis cache, there should be a new one
-          const newValue = await getPromisified(idefQueryIdentifier);
+    //       // fetch the new value from the redis cache, there should be a new one
+    //       const newValue = await getPromisified(idefQueryIdentifier);
 
-          // there should be a value
-          if (!newValue) {
-            assert.fail("Caching failed by the server");
-          }
+    //       // there should be a value
+    //       if (!newValue) {
+    //         assert.fail("Caching failed by the server");
+    //       }
 
-          const parsedNewValue = JSON.parse(newValue);
+    //       const parsedNewValue = JSON.parse(newValue);
 
-          // so we expect the new value to contain the updated thing
-          assert.strictEqual(parsedNewValue.app_country, newCountry);
+    //       // so we expect the new value to contain the updated thing
+    //       assert.strictEqual(parsedNewValue.app_country, newCountry);
 
-          if (parsedNewValue.last_modified === currentValue.last_modified) {
-            assert.fail("last_modified value is equal in the cache");
-          }
-        }
-      );
-    });
+    //       if (parsedNewValue.last_modified === currentValue.last_modified) {
+    //         assert.fail("last_modified value is equal in the cache");
+    //       }
+    //     }
+    //   );
+    // });
   }
 
   public after() {

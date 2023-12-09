@@ -9,7 +9,7 @@
 import { openDB, DBSchema, IDBPDatabase } from "idb";
 import { requestFieldsAreContained, deepMerge } from "../../../../rq-util";
 import {
-  IRQSearchRecord, buildGqlQuery, gqlQuery, GQLEnum,
+  IRQSearchRecord, buillRQQuery, gqlQuery, GQLEnum,
   IRQValue, IRQRequestFields, IRQArgs, IRQEndpointValue, IRQFile
 } from "../../../../rq-querier";
 import { PREFIX_GET, ENDPOINT_ERRORS } from "../../../../constants";
@@ -1995,7 +1995,7 @@ export default class CacheWorker {
 
         // we request the server for this, in this case
         // it might not have been able to connect
-        const query = buildGqlQuery(this.root.getRQSchema(), {
+        const query = buillRQQuery(this.root.getRQSchema(), {
           name: searchQueryName,
           args: actualArgsToUseInGQLSearch,
           fields: {
@@ -2044,7 +2044,7 @@ export default class CacheWorker {
         while (resultsCount > resultsToProcess.length) {
           // now let's try to get these batches
           actualArgsToUseInGQLSearch.until = oldestCreatedAt;
-          const query = buildGqlQuery(this.root.getRQSchema(), {
+          const query = buillRQQuery(this.root.getRQSchema(), {
             name: searchQueryName,
             args: actualArgsToUseInGQLSearch,
             fields: {
@@ -2152,7 +2152,7 @@ export default class CacheWorker {
         data: null,
         errors: [
           {
-            extensions: {
+            error: {
               code: ENDPOINT_ERRORS.UNSPECIFIED,
               message: "Unspecified error in worker",
             },
@@ -2218,7 +2218,7 @@ export default class CacheWorker {
             data: null,
             errors: [
               {
-                extensions: {
+                error: {
                   code: ENDPOINT_ERRORS.UNSPECIFIED,
                   message: "Error at the cache worker level, you may want to allowFallbackWritesToPolyfill",
                 },
@@ -2327,7 +2327,7 @@ export default class CacheWorker {
           args.created_by = searchArgs.created_by;
         }
         // we build the query, using the get list functionality
-        const listQuery = buildGqlQuery(this.root.getRQSchema(), {
+        const listQuery = buillRQQuery(this.root.getRQSchema(), {
           name: getListQueryName,
           args,
           fields: {
@@ -2357,7 +2357,7 @@ export default class CacheWorker {
         data: null,
         errors: [
           {
-            extensions: {
+            error: {
               code: ENDPOINT_ERRORS.UNSPECIFIED,
               message: "Error at the cache worker level, fetch has failed",
             },
@@ -2494,7 +2494,7 @@ export default class CacheWorker {
               data: null,
               errors: [
                 {
-                  extensions: {
+                  error: {
                     code: ENDPOINT_ERRORS.UNSPECIFIED,
                     message: "Error at the cache worker level, storing the new all results preloaded state failed",
                   },
@@ -2547,7 +2547,7 @@ export default class CacheWorker {
         data: null,
         errors: [
           {
-            extensions: error,
+            error: error,
           },
         ],
       };
@@ -2569,7 +2569,7 @@ export default class CacheWorker {
         data: null,
         errors: [
           {
-            extensions: {
+            error: {
               code: ENDPOINT_ERRORS.UNSPECIFIED,
               message: "Unspecified error in worker",
             },

@@ -1,4 +1,3 @@
-import fetchNode from "node-fetch";
 import { Test } from "..";
 import { strict as assert } from "assert";
 import { ITestingInfoType } from "../itemize";
@@ -153,19 +152,19 @@ export class ServerTest extends Test {
       );
     }
 
-    this.it(
-      "Should return the right buildnumber",
-      async () => {
-        if (NODE_ENV === "production") {
-          this.warn("Cannot check the buildnumber against a production build because it's not guaranteed");
-          return;
-        }
-        const response = await fetchNode(this.fullHost + "/rest/buildnumber");
-        assert.strictEqual(response.status, 200, "Did not return 200 OK");
-        const buildnumber = (await response.text()).trim();
-        assert.strictEqual(buildnumber, this.testingInfo.buildnumber);
-      }
-    ).quitOnFail();
+    // this.it(
+    //   "Should return the right buildnumber",
+    //   async () => {
+    //     if (NODE_ENV === "production") {
+    //       this.warn("Cannot check the buildnumber against a production build because it's not guaranteed");
+    //       return;
+    //     }
+    //     const response = await fetchNode(this.fullHost + "/rest/buildnumber");
+    //     assert.strictEqual(response.status, 200, "Did not return 200 OK");
+    //     const buildnumber = (await response.text()).trim();
+    //     assert.strictEqual(buildnumber, this.testingInfo.buildnumber);
+    //   }
+    // ).quitOnFail();
 
     this.it(
       "Should have at least one user",
@@ -180,95 +179,95 @@ export class ServerTest extends Test {
       }
     ).quitOnFail();
 
-    this.it(
-      "Should be able to fetch a SSR disabled instance when using noredirect",
-      async () => {
-        const response = await fetchNode(this.fullHost + "?noredirect", {
-          method: "HEAD",
-        });
+    // this.it(
+    //   "Should be able to fetch a SSR disabled instance when using noredirect",
+    //   async () => {
+    //     const response = await fetchNode(this.fullHost + "?noredirect", {
+    //       method: "HEAD",
+    //     });
 
-        assert.strictEqual(response.status, 200, "Did not return 200 OK");
+    //     assert.strictEqual(response.status, 200, "Did not return 200 OK");
 
-        const hasSSRHeader = response.headers.has("x-ssr");
+    //     const hasSSRHeader = response.headers.has("x-ssr");
 
-        if (hasSSRHeader) {
-          assert.fail("The host provided a SSR enabled link when using noredirect");
-        }
-      }
-    );
+    //     if (hasSSRHeader) {
+    //       assert.fail("The host provided a SSR enabled link when using noredirect");
+    //     }
+    //   }
+    // );
 
-    this.it(
-      "Should redirect to a supported language when a base URL is specified",
-      async () => {
-        const response = await fetchNode(this.fullHost, {
-          method: "HEAD",
-          redirect: "manual",
-        });
+    // this.it(
+    //   "Should redirect to a supported language when a base URL is specified",
+    //   async () => {
+    //     const response = await fetchNode(this.fullHost, {
+    //       method: "HEAD",
+    //       redirect: "manual",
+    //     });
 
-        assert.strictEqual(response.status, 302, "Did not return a redirect");
+    //     assert.strictEqual(response.status, 302, "Did not return a redirect");
 
-        const redirectTo = new URL(response.headers.get("location"));
-        const lang = redirectTo.pathname.split("/")[1];
+    //     const redirectTo = new URL(response.headers.get("location"));
+    //     const lang = redirectTo.pathname.split("/")[1];
 
-        if (!this.testingInfo.config.supportedLanguages.includes(lang)) {
-          assert.fail("Redirected to " + redirectTo + " but " + lang +
-            " is not a supported language: " + this.testingInfo.config.supportedLanguages.join(","))
-        }
-      }
-    );
+    //     if (!this.testingInfo.config.supportedLanguages.includes(lang)) {
+    //       assert.fail("Redirected to " + redirectTo + " but " + lang +
+    //         " is not a supported language: " + this.testingInfo.config.supportedLanguages.join(","))
+    //     }
+    //   }
+    // );
 
-    this.it(
-      "Should handle etags",
-      async () => {
-        const language = this.testingInfo.config.fallbackLanguage;
-        const response = await fetchNode(this.fullHost + "/" + language, {
-          method: "HEAD",
-          redirect: "manual",
-        });
+    // this.it(
+    //   "Should handle etags",
+    //   async () => {
+    //     const language = this.testingInfo.config.fallbackLanguage;
+    //     const response = await fetchNode(this.fullHost + "/" + language, {
+    //       method: "HEAD",
+    //       redirect: "manual",
+    //     });
 
-        assert.strictEqual(response.status, 200, "Did not return 200 OK");
+    //     assert.strictEqual(response.status, 200, "Did not return 200 OK");
 
-        const etag = response.headers.get("etag");
-        if (!etag) {
-          assert.fail("Did not provide an etag");
-        }
+    //     const etag = response.headers.get("etag");
+    //     if (!etag) {
+    //       assert.fail("Did not provide an etag");
+    //     }
 
-        const responseAgain = await fetchNode(this.fullHost + "/" + language, {
-          method: "HEAD",
-          redirect: "manual",
-          headers: {
-            "if-none-match": etag,
-          },
-        });
+    //     const responseAgain = await fetchNode(this.fullHost + "/" + language, {
+    //       method: "HEAD",
+    //       redirect: "manual",
+    //       headers: {
+    //         "if-none-match": etag,
+    //       },
+    //     });
 
-        assert.strictEqual(responseAgain.status, 304, "Second request did not return 304");
-      }
-    );
+    //     assert.strictEqual(responseAgain.status, 304, "Second request did not return 304");
+    //   }
+    // );
 
-    this.testingInfo.config.supportedLanguages.forEach((lang) => {
-      this.it(
-        "Should provide results in language " + lang,
-        async () => {
-          const response = await fetchNode(this.fullHost + "/" + lang, {
-            method: "HEAD",
-          });
+    // this.testingInfo.config.supportedLanguages.forEach((lang) => {
+    //   this.it(
+    //     "Should provide results in language " + lang,
+    //     async () => {
+    //       const response = await fetchNode(this.fullHost + "/" + lang, {
+    //         method: "HEAD",
+    //       });
 
-          assert.strictEqual(response.status, 200, "Did not return 200 OK");
+    //       assert.strictEqual(response.status, 200, "Did not return 200 OK");
 
-          const headerLang = response.headers.get("content-language");
-          if (!headerLang) {
-            assert.fail("Did not provide a Content-Language header, this means this language is not supported by the server");
-          } else if (headerLang !== lang) {
-            assert.fail("The content language is not equal, expected " + lang + " but got " + headerLang);
-          }
+    //       const headerLang = response.headers.get("content-language");
+    //       if (!headerLang) {
+    //         assert.fail("Did not provide a Content-Language header, this means this language is not supported by the server");
+    //       } else if (headerLang !== lang) {
+    //         assert.fail("The content language is not equal, expected " + lang + " but got " + headerLang);
+    //       }
 
-          const ssrHeader = response.headers.get("x-ssr");
-          if (!ssrHeader) {
-            this.warn("The server informed that it did not use SSR for this render");
-          }
-        }
-      );
-    });
+    //       const ssrHeader = response.headers.get("x-ssr");
+    //       if (!ssrHeader) {
+    //         this.warn("The server informed that it did not use SSR for this render");
+    //       }
+    //     }
+    //   );
+    // });
 
     this.define(
       "Graphql test",

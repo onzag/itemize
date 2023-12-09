@@ -12,6 +12,7 @@ interface IHTTPRequestInfo {
   method: string;
   stream?: ReadStream;
   formData?: { [key: string]: any };
+  formDataRaw?: FormDataNode;
   urlEncoded?: { [key: string]: string | string[] };
   headers?: { [key: string]: any };
   dontProcessResponse?: boolean;
@@ -70,8 +71,13 @@ export function httpRequest<T>(data: IHTTPRequestInfo): Promise<IHTTPResponse<T>
         }
 
         stream = formData as any;
+      } else if (data.formDataRaw) {
+        headers = data.formDataRaw.getHeaders();
+        if (data.headers) {
+          Object.assign(headers, data.headers);
+        }
+        stream = data.formDataRaw as any;
       }
-
 
       let urlEncodedToWrite: string = null;
       if (data.urlEncoded) {
