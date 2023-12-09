@@ -9,7 +9,7 @@
 import {
   CONNECTOR_SQL_COLUMN_ID_FK_NAME,
   CONNECTOR_SQL_COLUMN_VERSION_FK_NAME,
-  RESERVED_BASE_PROPERTIES,
+  RESERVED_BASE_PROPERTIES_RQ,
   IOrderByRuleType,
   COMBINED_INDEX,
 } from "../../../../constants";
@@ -269,7 +269,7 @@ export function convertSQLValueToGQLValueForItemDefinition(
 
   // now we take all the base properties that we have
   // in the graphql model
-  Object.keys(RESERVED_BASE_PROPERTIES).filter(
+  Object.keys(RESERVED_BASE_PROPERTIES_RQ).filter(
     (baseProperty) => !graphqlFields ? true : graphqlFields[baseProperty],
   ).forEach((basePropertyKey) => {
     result[basePropertyKey] = row[basePropertyKey] || null;
@@ -322,7 +322,7 @@ export function convertSQLValueToElasticSQLValueForItemDefinition(
 
   // now we take all the base properties that we have
   // in the graphql model
-  Object.keys(RESERVED_BASE_PROPERTIES).forEach((basePropertyKey) => {
+  Object.keys(RESERVED_BASE_PROPERTIES_RQ).forEach((basePropertyKey) => {
     result[basePropertyKey] = row[basePropertyKey] || null;
   });
 

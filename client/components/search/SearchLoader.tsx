@@ -12,7 +12,7 @@ import ItemDefinition, { IItemDefinitionGQLValueType } from "../../../base/Root/
 import { PREFIX_GET_LIST, PREFIX_GET } from "../../../constants";
 import CacheWorkerInstance from "../../internal/workers/cache";
 import { requestFieldsAreContained, deepMerge } from "../../../rq-util";
-import { buildGqlQuery, gqlQuery, IRQSearchRecord, IRQRequestFields, IRQValue } from "../../../rq-querier";
+import { buildRQQuery, IRQSearchRecord, IRQRequestFields, IRQValue, rqQuery } from "../../../rq-querier";
 import { LocaleContext, ILocaleContextType } from "../../internal/providers/locale-provider";
 import { TokenContext, ITokenContextType } from "../../internal/providers/token-provider";
 import { EndpointErrorType } from "../../../base/errors";
@@ -427,16 +427,16 @@ function loadValues(
     // check if it's in memory cache, in such a case the value will have already loaded(
     // as the item definition would have applied it initially, as in it would have loaded
     // already and it can be pretty much ignored
-    const appliedGQLValue = itemDefintionInQuestion.getGQLAppliedValue(searchRecord.id, searchRecord.version);
+    const appliedRQValue = itemDefintionInQuestion.getRQAppliedValue(searchRecord.id, searchRecord.version);
     if (
-      appliedGQLValue &&
-      requestFieldsAreContained(props.searchFields, appliedGQLValue.requestFields) &&
-      appliedGQLValue.flattenedValue.last_modified === searchRecord.last_modified
+      appliedRQValue &&
+      requestFieldsAreContained(props.searchFields, appliedRQValue.requestFields) &&
+      appliedRQValue.flattenedValue.last_modified === searchRecord.last_modified
     ) {
       if (!willItProduceNewHighlights) {
         foundIndexes[index] = true;
       }
-      return appliedGQLValue.rawValue;
+      return appliedRQValue.rawValue;
     }
 
     return null;
@@ -564,7 +564,7 @@ class ActualSearchLoader extends React.Component<IActualSearchLoaderProps, IActu
       const id = r.id;
       const version = r.version || null;
       const itemDefintionInQuestion = root.registry[r.type as string] as ItemDefinition;
-      const currentValue = itemDefintionInQuestion.getGQLAppliedValue(id, version);
+      const currentValue = itemDefintionInQuestion.getRQAppliedValue(id, version);
       if (currentValue) {
         itemDefintionInQuestion.cleanValueFor(id, version);
         itemDefintionInQuestion.triggerListeners("change", id, version);
@@ -681,11 +681,11 @@ class ActualSearchLoader extends React.Component<IActualSearchLoaderProps, IActu
       // check if it's in memory cache, in such a case the value will have already loaded
       // as the item definition would have applied it initially, as in it would have loaded
       // already and it can be pretty much ignored
-      const appliedGQLValue = itemDefintionInQuestion.getGQLAppliedValue(searchRecord.id, searchRecord.version);
+      const appliedRQValue = itemDefintionInQuestion.getRQAppliedValue(searchRecord.id, searchRecord.version);
       return (
-        appliedGQLValue &&
-        requestFieldsAreContained(this.props.searchFields, appliedGQLValue.requestFields) &&
-        appliedGQLValue.flattenedValue.last_modified === searchRecord.last_modified
+        appliedRQValue &&
+        requestFieldsAreContained(this.props.searchFields, appliedRQValue.requestFields) &&
+        appliedRQValue.flattenedValue.last_modified === searchRecord.last_modified
       );
     });
 
@@ -826,7 +826,7 @@ class ActualSearchLoader extends React.Component<IActualSearchLoaderProps, IActu
 
       const rqSchema = this.props.itemDefinitionInstance.getParentModule().getParentRoot().getRQSchema();
       // and now we make a grapqhl query for this
-      const listQuery = buildGqlQuery(rqSchema, {
+      const listQuery = buildRQQuery(rqSchema, {
         name: getListQueryName,
         args,
         fields: {
@@ -836,7 +836,7 @@ class ActualSearchLoader extends React.Component<IActualSearchLoaderProps, IActu
       });
 
       // and then we get the value
-      const gqlValue = await gqlQuery(
+      const rqValue = await rqQuery(
         listQuery,
       );
 
@@ -846,9 +846,9 @@ class ActualSearchLoader extends React.Component<IActualSearchLoaderProps, IActu
 
       // now we got to check for errors
       let error: EndpointErrorType = null;
-      if (gqlValue.errors) {
+      if (rqValue.errors) {
         // if the server itself returned an error, we use that error
-        error = gqlValue.errors[0].error;
+        error = rqValue.errors[0].error;
       }
 
       // now we set these so that once
@@ -864,10 +864,10 @@ class ActualSearchLoader extends React.Component<IActualSearchLoaderProps, IActu
       // now we need to see if we got information
       if (
         !error &&
-        gqlValue &&
-        gqlValue.data &&
-        gqlValue.data[getListQueryName] &&
-        gqlValue.data[getListQueryName].results
+        rqValue &&
+        rqValue.data &&
+        rqValue.data[getListQueryName] &&
+        rqValue.data[getListQueryName].results
       ) {
         const loadedNewSearchResultsFromTheRecords = [
           ...newSearchResultsFromTheRecords,
@@ -875,7 +875,7 @@ class ActualSearchLoader extends React.Component<IActualSearchLoaderProps, IActu
 
         let highlightsParsed: any;
         try {
-          highlightsParsed = JSON.parse(gqlValue.data[getListQueryName].highlights as any) || {};
+          highlightsParsed = JSON.parse(rqValue.data[getListQueryName].highlights as any) || {};
         } catch {
           highlightsParsed = {};
         }
@@ -896,7 +896,7 @@ class ActualSearchLoader extends React.Component<IActualSearchLoaderProps, IActu
         }
 
         // and we loop into them
-        (gqlValue.data[getListQueryName].results as IRQValue[]).forEach((value) => {
+        (rqValue.data[getListQueryName].results as IRQValue[]).forEach((value) => {
           const indexOfSearchResultInUncached = uncachedResults.findIndex((v) => value.id === v.id);
 
           // somehow received a record that wasn't asked for
@@ -926,24 +926,24 @@ class ActualSearchLoader extends React.Component<IActualSearchLoaderProps, IActu
             // otherwise we will see, first the search fields we used
             let mergedQueryFields = this.props.searchFields;
             // we try to get the current applied value, in case there's any
-            const appliedGQLValue = itemDefintionInQuestion.getGQLAppliedValue(
+            const appliedRQValue = itemDefintionInQuestion.getRQAppliedValue(
               value.id as string, value.version as string);
 
             // and if we have one, which matches our last modified date
             if (
-              appliedGQLValue &&
-              appliedGQLValue.rawValue &&
-              appliedGQLValue.rawValue.last_modified === valueToApply.last_modified
+              appliedRQValue &&
+              appliedRQValue.rawValue &&
+              appliedRQValue.rawValue.last_modified === valueToApply.last_modified
             ) {
               // then we merge our values togethe in the value to apply
               valueToApply = deepMerge(
                 valueToApply,
-                appliedGQLValue.rawValue,
+                appliedRQValue.rawValue,
               );
               // and we do that as well for the fields
               mergedQueryFields = deepMerge(
                 this.props.searchFields,
-                appliedGQLValue.requestFields,
+                appliedRQValue.requestFields,
               );
             }
 
@@ -1070,7 +1070,7 @@ class ActualSearchLoader extends React.Component<IActualSearchLoaderProps, IActu
                 searchResult,
                 highlights,
                 getAppliedValue: () => {
-                  return itemDefinition.getGQLAppliedValue(searchRecord.id, searchRecord.version || null);
+                  return itemDefinition.getRQAppliedValue(searchRecord.id, searchRecord.version || null);
                 },
               } as IGQLSearchRecordWithPopulateData;
             }),

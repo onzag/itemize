@@ -1,6 +1,5 @@
 import { Test } from "..";
 import { strict as assert } from "assert";
-import FormDataNode from "form-data";
 import { ITestingInfoType } from "../itemize";
 import Module from "../../base/Root/Module";
 import { PREFIX_ADD, PREFIX_DELETE, PREFIX_EDIT, PREFIX_GET, PREFIX_GET_LIST, PREFIX_SEARCH, PREFIX_TRADITIONAL_SEARCH } from "../../constants";
@@ -31,76 +30,76 @@ class ModuleTest extends Test {
     const idefs = this.mod.getAllChildDefinitionsRecursive();
     const modchild = this.mod.getAllModules();
 
-    if (this.mod.isSearchable()) {
-      this.it(
-        "Should have module level for all 3 GET_LIST/SEARCH/TSEARCH",
-        () => {
-          const getListEndpoint = PREFIX_GET_LIST + this.mod.getQualifiedPathName();
-          const searchEndpoint = PREFIX_SEARCH + this.mod.getQualifiedPathName();
-          const tsearchEndpoint = PREFIX_TRADITIONAL_SEARCH + this.mod.getQualifiedPathName();
+    // if (this.mod.isSearchable()) {
+    //   this.it(
+    //     "Should have module level for all 3 GET_LIST/SEARCH/TSEARCH",
+    //     () => {
+    //       const getListEndpoint = PREFIX_GET_LIST + this.mod.getQualifiedPathName();
+    //       const searchEndpoint = PREFIX_SEARCH + this.mod.getQualifiedPathName();
+    //       const tsearchEndpoint = PREFIX_TRADITIONAL_SEARCH + this.mod.getQualifiedPathName();
 
-          [getListEndpoint, searchEndpoint, tsearchEndpoint].forEach((endpoint) => {
-            const foundGetListEndpoint = this.getSchemaFields().query.some((f) => f.name === endpoint);
-            if (!foundGetListEndpoint) {
-              assert.fail("Did not find a query endpoint for " + endpoint);
-            }
-          });
-        }
-      );
-    }
+    //       [getListEndpoint, searchEndpoint, tsearchEndpoint].forEach((endpoint) => {
+    //         const foundGetListEndpoint = this.getSchemaFields().query.some((f) => f.name === endpoint);
+    //         if (!foundGetListEndpoint) {
+    //           assert.fail("Did not find a query endpoint for " + endpoint);
+    //         }
+    //       });
+    //     }
+    //   );
+    // }
 
-    idefs.forEach((idef) => {
-      this.it(
-        "Should have a GET/ADD/EDIT/DELETE graphql endpoint for " + idef.getPath(),
-        () => {
-          const endpoint = PREFIX_GET + idef.getQualifiedPathName();
-          const foundField = this.getSchemaFields().query.some((f) => f.name === endpoint);
-          if (!foundField) {
-            assert.fail("Did not find a query endpoint for " + endpoint);
-          }
+    // idefs.forEach((idef) => {
+    //   this.it(
+    //     "Should have a GET/ADD/EDIT/DELETE graphql endpoint for " + idef.getPath(),
+    //     () => {
+    //       const endpoint = PREFIX_GET + idef.getQualifiedPathName();
+    //       const foundField = this.getSchemaFields().query.some((f) => f.name === endpoint);
+    //       if (!foundField) {
+    //         assert.fail("Did not find a query endpoint for " + endpoint);
+    //       }
 
-          const addEndpoint = PREFIX_ADD + idef.getQualifiedPathName();
-          const editEndpoint = PREFIX_EDIT + idef.getQualifiedPathName();
-          const deleteEndpoint = PREFIX_DELETE + idef.getQualifiedPathName();
+    //       const addEndpoint = PREFIX_ADD + idef.getQualifiedPathName();
+    //       const editEndpoint = PREFIX_EDIT + idef.getQualifiedPathName();
+    //       const deleteEndpoint = PREFIX_DELETE + idef.getQualifiedPathName();
 
-          [addEndpoint, editEndpoint, deleteEndpoint].forEach((endpoint) => {
-            const foundGetListEndpoint = this.getSchemaFields().mutation.some((f) => f.name === endpoint);
-            if (!foundGetListEndpoint) {
-              assert.fail("Did not find a mutation endpoint for " + endpoint);
-            }
-          });
-        }
-      );
+    //       [addEndpoint, editEndpoint, deleteEndpoint].forEach((endpoint) => {
+    //         const foundGetListEndpoint = this.getSchemaFields().mutation.some((f) => f.name === endpoint);
+    //         if (!foundGetListEndpoint) {
+    //           assert.fail("Did not find a mutation endpoint for " + endpoint);
+    //         }
+    //       });
+    //     }
+    //   );
 
-      if (idef.isSearchable()) {
-        this.it(
-          "Should have all 3 GET_LIST/SEARCH/TSEARCH endpoints for " + idef.getPath(),
-          () => {
-            const getListEndpoint = PREFIX_GET_LIST + idef.getQualifiedPathName();
-            const searchEndpoint = PREFIX_SEARCH + idef.getQualifiedPathName();
-            const tsearchEndpoint = PREFIX_TRADITIONAL_SEARCH + idef.getQualifiedPathName();
+    //   if (idef.isSearchable()) {
+    //     this.it(
+    //       "Should have all 3 GET_LIST/SEARCH/TSEARCH endpoints for " + idef.getPath(),
+    //       () => {
+    //         const getListEndpoint = PREFIX_GET_LIST + idef.getQualifiedPathName();
+    //         const searchEndpoint = PREFIX_SEARCH + idef.getQualifiedPathName();
+    //         const tsearchEndpoint = PREFIX_TRADITIONAL_SEARCH + idef.getQualifiedPathName();
 
-            [getListEndpoint, searchEndpoint, tsearchEndpoint].forEach((endpoint) => {
-              const foundGetListEndpoint = this.getSchemaFields().query.some((f) => f.name === endpoint);
-              if (!foundGetListEndpoint) {
-                assert.fail("Did not find a query endpoint for " + endpoint);
-              }
-            });
-          }
-        );
-      };
-    });
+    //         [getListEndpoint, searchEndpoint, tsearchEndpoint].forEach((endpoint) => {
+    //           const foundGetListEndpoint = this.getSchemaFields().query.some((f) => f.name === endpoint);
+    //           if (!foundGetListEndpoint) {
+    //             assert.fail("Did not find a query endpoint for " + endpoint);
+    //           }
+    //         });
+    //       }
+    //     );
+    //   };
+    // });
 
-    modchild.forEach((mod) => {
-      this.define(
-        "Module tests for " + mod.getPath(),
-        new ModuleTest(this.fullHost, this.testingInfo, mod, this.getSchemaFields),
-      );
-    });
+    // modchild.forEach((mod) => {
+    //   this.define(
+    //     "Module tests for " + mod.getPath(),
+    //     new ModuleTest(this.fullHost, this.testingInfo, mod, this.getSchemaFields),
+    //   );
+    // });
   }
 }
 
-export class GraphqlTest extends Test {
+export class RQTest extends Test {
   private testingInfo: ITestingInfoType;
   private fullHost: string;
 

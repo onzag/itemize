@@ -9,7 +9,6 @@ import http from "http";
 import path from "path";
 import fs from "fs";
 import Root, { IRootRawJSONDataType, ILangLocalesType } from "../base/Root";
-import { IGQLQueryFieldsDefinitionType } from "../base/Root/gql";
 import { types } from "pg";
 import { SERVER_DATA_IDENTIFIER, CACHED_CURRENCY_RESPONSE, PING_DATA_IDENTIFIER, PING_STATUS_IDENTIFIER } from "../constants";
 import PropertyDefinition from "../base/Root/Module/ItemDefinition/PropertyDefinition";

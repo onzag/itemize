@@ -1551,9 +1551,9 @@ export class ItemizeRawDB {
         // first we need to find if we have any file type in either the property
         // definitions of the prop extensions, any will do
         const someFilesInItemDef = itemDefinition.getAllPropertyDefinitions()
-          .some((pdef) => pdef.getPropertyDefinitionDescription().gqlAddFileToFields);
+          .some((pdef) => pdef.getPropertyDefinitionDescription().rqRepresentsFile);
         const someFilesInModule = itemDefinition.getParentModule().getAllPropExtensions()
-          .some((pdef) => pdef.getPropertyDefinitionDescription().gqlAddFileToFields);
+          .some((pdef) => pdef.getPropertyDefinitionDescription().rqRepresentsFile);
 
         const containerExists = deleteFiles && deleteFiles[containerId];
 

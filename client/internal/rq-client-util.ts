@@ -21,7 +21,7 @@ import {
   INCLUDE_PREFIX,
 } from "../../constants";
 import ItemDefinition, { IItemStateType } from "../../base/Root/Module/ItemDefinition";
-import { IRQValue, IRQRequestFields, IRQArgs, buillRQQuery, gqlQuery, buildRQMutation, IRQEndpointValue, IRQSearchRecord, GQLEnum, IRQFile, ProgresserFn, RQQueryBuilder } from "../../rq-querier";
+import { IRQValue, IRQRequestFields, IRQArgs, buildRQQuery, rqQuery, buildRQMutation, IRQEndpointValue, IRQSearchRecord, IRQFile, ProgresserFn, RQQueryBuilder } from "../../rq-querier";
 import { deepMerge, requestFieldsAreContained } from "../../rq-util";
 import CacheWorkerInstance from "./workers/cache";
 import { EndpointErrorType } from "../../base/errors";
@@ -307,7 +307,7 @@ export function getFieldsAndArgs(
   // don't match because during an edit event there might be side effects, this will ensure
   // values remain updated with whatever is used even in the cache
   if (options.uniteFieldsWithAppliedValue) {
-    const appliedValue = options.itemDefinitionInstance.getGQLAppliedValue(
+    const appliedValue = options.itemDefinitionInstance.getRQAppliedValue(
       typeof options.submitForId !== "undefined" ? options.submitForId : options.forId,
       typeof options.submitForVersion !== "undefined" ? options.submitForVersion : options.forVersion
     );
@@ -406,12 +406,12 @@ export function getFieldsAndArgs(
         const currentValue = currentOverride ? currentOverride.value : pd.getCurrentValue(options.forId || null, options.forVersion || null);
         const pdDescr = pd.getPropertyDefinitionDescription();
         if (options.differingPropertiesOnlyForArgs) {
-          const appliedGQLValue = pd.getAppliedValue(options.forId || null, options.forVersion || null);
+          const appliedRQValue = pd.getAppliedValue(options.forId || null, options.forVersion || null);
           const isEqual = pdDescr.localEqual({
             itemDefinition: options.itemDefinitionInstance,
             property: pd,
             include: null,
-            a: appliedGQLValue,
+            a: appliedRQValue,
             b: currentValue,
             id: pd.getId(),
             prefix: "",
@@ -424,7 +424,7 @@ export function getFieldsAndArgs(
         nothingToUpdate = false;
         argumentsForQuery[pd.getId()] = currentValue;
 
-        if (pdDescr.gqlAddFileToFields) {
+        if (pdDescr.rqRepresentsFile) {
           argumentsFoundFilePaths.push([pd.getId()]);
         }
       });
@@ -499,12 +499,12 @@ export function getFieldsAndArgs(
             options.forId || null, options.forVersion || null);
           const spDescr = sp.getPropertyDefinitionDescription();
           if (options.differingIncludesOnlyForArgs) {
-            const appliedGQLValue = sp.getAppliedValue(options.forId || null, options.forVersion || null);
+            const appliedRQValue = sp.getAppliedValue(options.forId || null, options.forVersion || null);
             const isEqual = spDescr.localEqual({
               itemDefinition: options.itemDefinitionInstance,
               property: sp,
               include,
-              a: appliedGQLValue,
+              a: appliedRQValue,
               b: currentValue,
               id: sp.getId(),
               prefix: include.getPrefixedQualifiedIdentifier(),
@@ -516,7 +516,7 @@ export function getFieldsAndArgs(
 
           argumentsForQuery[qualifiedId][sp.getId()] = currentValue;
 
-          if (spDescr.gqlAddFileToFields) {
+          if (spDescr.rqRepresentsFile) {
             argumentsFoundFilePaths.push([qualifiedId, sp.getId()]);
           }
         });
@@ -750,21 +750,21 @@ async function storeAndCombineStorageValuesFor(
     // always gets downloaded, and with this we ensure that
     // the data is cacheable of the same modification date we
     // don't want data of different versions to be colliding
-    const appliedGQLValue = itemDefinition.getGQLAppliedValue(
+    const appliedRQValue = itemDefinition.getRQAppliedValue(
       id || null, version || null,
     );
     if (
-      appliedGQLValue &&
-      appliedGQLValue.rawValue &&
-      appliedGQLValue.rawValue.last_modified === value.last_modified
+      appliedRQValue &&
+      appliedRQValue.rawValue &&
+      appliedRQValue.rawValue.last_modified === value.last_modified
     ) {
       mergedValue = deepMerge(
         mergedValue,
-        appliedGQLValue.rawValue,
+        appliedRQValue.rawValue,
       );
       mergedFields = deepMerge(
         mergedFields,
-        appliedGQLValue.requestFields,
+        appliedRQValue.requestFields,
       );
     }
   }
@@ -845,21 +845,21 @@ export async function runGetQueryFor(
   getQueryFields: IRQRequestFields,
 }> {
   // now we get the currently applied value in memory
-  const appliedGQLValue = arg.itemDefinition.getGQLAppliedValue(
+  const appliedRQValue = arg.itemDefinition.getRQAppliedValue(
     arg.id || null, arg.version || null,
   );
   if (arg.returnMemoryCachedValues) {
     // let's check if the memory cached and the requested value match
     if (
-      appliedGQLValue &&
-      requestFieldsAreContained(arg.fields, appliedGQLValue.requestFields)
+      appliedRQValue &&
+      requestFieldsAreContained(arg.fields, appliedRQValue.requestFields)
     ) {
       return {
         error: null,
-        value: appliedGQLValue.rawValue,
+        value: appliedRQValue.rawValue,
         memoryCached: true,
         cached: false,
-        getQueryFields: appliedGQLValue.requestFields,
+        getQueryFields: appliedRQValue.requestFields,
       };
     }
   }
@@ -1003,7 +1003,7 @@ export async function runGetQueryFor(
   );
 
   const rqSchema = arg.itemDefinition.getParentModule().getParentRoot().getRQSchema();
-  const query = buillRQQuery(rqSchema, {
+  const query = buildRQQuery(rqSchema, {
     name: queryName,
     args,
     fields: arg.fields,
@@ -1011,7 +1011,7 @@ export async function runGetQueryFor(
 
   // now we get the gql value using the gql query function
   // and this function will always run using the network
-  const gqlValue = await gqlQuery(query, {
+  const gqlValue = await rqQuery(query, {
     merge: arg.waitAndMerge,
     progresser: arg.progresser,
   });
@@ -1129,7 +1129,7 @@ export async function runDeleteQueryFor(
 
   // now we get the gql value using the gql query function
   // and this function will always run using the network
-  const gqlValue = await gqlQuery(query, {
+  const gqlValue = await rqQuery(query, {
     merge: arg.waitAndMerge,
     progresser: arg.progresser,
   });
@@ -1331,7 +1331,7 @@ export async function runAddQueryFor(
 
   // now we get the gql value using the gql query function
   // and this function will always run using the network
-  const gqlValue = await gqlQuery(query, {
+  const gqlValue = await rqQuery(query, {
     merge: arg.waitAndMerge,
     progresser: arg.progresser,
   });
@@ -1448,7 +1448,7 @@ export async function runEditQueryFor(
 
   // now we get the gql value using the gql query function
   // and this function will always run using the network
-  const gqlValue = await gqlQuery(query, {
+  const gqlValue = await rqQuery(query, {
     merge: arg.waitAndMerge,
     progresser: arg.progresser,
   });
@@ -1499,8 +1499,8 @@ function convertOrderByRule(orderBy: IOrderByRuleType) {
     const rule = orderBy[property];
     result[property] = {
       priority: rule.priority,
-      nulls: new GQLEnum(rule.nulls.toUpperCase()),
-      direction: new GQLEnum(rule.direction.toUpperCase()),
+      nulls: rule.nulls.toUpperCase(),
+      direction: rule.direction.toUpperCase(),
     }
   });
   return result;
@@ -1674,7 +1674,7 @@ export function getSearchQueryFor(
   const searchArgs = getSearchArgsFor(arg);
 
   const rqSchema = arg.itemDefinition.getParentModule().getParentRoot().getRQSchema();
-  const query = buillRQQuery(rqSchema, {
+  const query = buildRQQuery(rqSchema, {
     name: queryName,
     args: searchArgs,
     fields: arg.traditional ? {
@@ -2037,7 +2037,7 @@ export async function runSearchQueryFor(
     }
   } else if (!arg.traditional && !useCacheWorker) {
     const rqSchema = arg.itemDefinition.getParentModule().getParentRoot().getRQSchema();
-    const query = buillRQQuery(rqSchema, {
+    const query = buildRQQuery(rqSchema, {
       name: queryName,
       args: searchArgs,
       fields: {
@@ -2057,7 +2057,7 @@ export async function runSearchQueryFor(
 
     // now we get the gql value using the gql query function
     // and this function will always run using the network
-    gqlValue = await gqlQuery(query, {
+    gqlValue = await rqQuery(query, {
       merge: arg.waitAndMerge,
       progresser: arg.progresser,
     });
@@ -2068,7 +2068,7 @@ export async function runSearchQueryFor(
     }
   } else if (!useCacheWorker) {
     const rqSchema = arg.itemDefinition.getParentModule().getParentRoot().getRQSchema();
-    const query = buillRQQuery(rqSchema, {
+    const query = buildRQQuery(rqSchema, {
       name: queryName,
       args: searchArgs,
       fields: {
@@ -2084,7 +2084,7 @@ export async function runSearchQueryFor(
 
     // now we get the gql value using the gql query function
     // and this function will always run using the network
-    gqlValue = await gqlQuery(query, {
+    gqlValue = await rqQuery(query, {
       merge: arg.waitAndMerge,
       progresser: arg.progresser,
     });

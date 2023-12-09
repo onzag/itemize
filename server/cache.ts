@@ -9,7 +9,7 @@
 
 import {
   CONNECTOR_SQL_COLUMN_ID_FK_NAME, CONNECTOR_SQL_COLUMN_VERSION_FK_NAME,
-  UNSPECIFIED_OWNER, ENDPOINT_ERRORS, INCLUDE_PREFIX, EXCLUSION_STATE_SUFFIX, DELETED_REGISTRY_IDENTIFIER, CACHED_CURRENCY_RESPONSE, SERVER_DATA_IDENTIFIER, RESERVED_BASE_PROPERTIES, TRACKERS_REGISTRY_IDENTIFIER, JWT_KEY
+  UNSPECIFIED_OWNER, ENDPOINT_ERRORS, INCLUDE_PREFIX, EXCLUSION_STATE_SUFFIX, DELETED_REGISTRY_IDENTIFIER, CACHED_CURRENCY_RESPONSE, SERVER_DATA_IDENTIFIER, RESERVED_BASE_PROPERTIES_RQ, TRACKERS_REGISTRY_IDENTIFIER, JWT_KEY
 } from "../constants";
 import { ISQLTableRowValue, ISQLStreamComposedTableRowValue, ConsumeStreamsFnType } from "../base/Root/sql";
 import { IRQSearchRecord, IRQArgs, IRQValue } from "../rq-querier";
@@ -2584,9 +2584,9 @@ export class Cache {
       // first we need to find if we have any file type in either the property
       // definitions of the prop extensions, any will do
       const someFilesInItemDef = itemDefinition.getAllPropertyDefinitions()
-        .some((pdef) => pdef.getPropertyDefinitionDescription().gqlAddFileToFields);
+        .some((pdef) => pdef.getPropertyDefinitionDescription().rqRepresentsFile);
       const someFilesInModule = itemDefinition.getParentModule().getAllPropExtensions()
-        .some((pdef) => pdef.getPropertyDefinitionDescription().gqlAddFileToFields);
+        .some((pdef) => pdef.getPropertyDefinitionDescription().rqRepresentsFile);
 
       const containerExists = this.storageClients && this.storageClients[containerId];
 

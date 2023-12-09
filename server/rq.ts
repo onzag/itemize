@@ -15,9 +15,8 @@ export function rqSystem(options: {
     res.status(200);
     res.end(stringified);
   });
-  // // TODO
-  // router.post("/", (req, res) => {
+  router.post("/", (req, res) => {
     
-  // });
+  });
   return router;
 }

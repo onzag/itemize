@@ -1597,10 +1597,10 @@ export class RemoteListener {
     // first we need to see what item definition we matched
     const itemDefinition: ItemDefinition = this.root.registry[event.itemDefinition] as ItemDefinition;
     // and let's get the applied value for it we currently have
-    const appliedGQLValue = itemDefinition.getGQLAppliedValue(event.id, event.version);
+    const appliedRQValue = itemDefinition.getRQAppliedValue(event.id, event.version);
 
     // so if we have one
-    if (appliedGQLValue) {
+    if (appliedRQValue) {
 
       // so if the event is a modified type
       // or a created type or it's a feedback that gives
@@ -1612,9 +1612,9 @@ export class RemoteListener {
           (
             // our applied value is null, basically we have save and stored
             // the item as not found
-            !appliedGQLValue.flattenedValue ||
+            !appliedRQValue.flattenedValue ||
             // our last modified event differs, means it's newer
-            event.lastModified !== appliedGQLValue.flattenedValue.last_modified
+            event.lastModified !== appliedRQValue.flattenedValue.last_modified
           )
         )
       ) {
@@ -1623,7 +1623,7 @@ export class RemoteListener {
 
         // otherwise it was deleted and we are currently not aware that this is the
         // situation
-      } else if (event.type === "not_found" && appliedGQLValue.rawValue !== null) {
+      } else if (event.type === "not_found" && appliedRQValue.rawValue !== null) {
         // we clean the value
         // itemDefinition.cleanValueFor(event.id, event.version);
         itemDefinition.applyValue(

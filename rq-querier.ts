@@ -504,7 +504,7 @@ export class RQQueryBuilder {
  */
 export interface IGQLQueryObj {
   /**
-   * The grapqhl query name
+   * The rq query name
    */
   name: string;
   /**
@@ -686,7 +686,7 @@ function buildRQThing(rqSchema: RQRootSchema, ...queries: IGQLQueryObj[]) {
  * @param queries the queries to run
  * @returns a grapqhl query class instance
  */
-export function buillRQQuery(rqSchema: RQRootSchema, ...queries: IGQLQueryObj[]) {
+export function buildRQQuery(rqSchema: RQRootSchema, ...queries: IGQLQueryObj[]) {
   return new RQQueryBuilder("query", queries, rqSchema);
 }
 
@@ -765,7 +765,7 @@ export async function oldXMLHttpRequest(
  * @param options.progresser to track progress
  * @returns a promise for a graphql endpoint value
  */
-export async function gqlQuery(query: RQQueryBuilder, options?: {
+export async function rqQuery(query: RQQueryBuilder, options?: {
   host?: string;
   merge?: boolean;
   mergeMS?: number;

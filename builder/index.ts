@@ -1270,7 +1270,7 @@ async function getI18nPropertyData(
     ) ||
     (
       definition.i18n.tooLargeErrorInclude &&
-      definition.gqlList
+      definition.rq.array
     )
   ) {
     if (Array.isArray(definition.i18n.tooLargeErrorInclude)) {
@@ -1340,7 +1340,7 @@ async function getI18nPropertyData(
     ) &&
     (
       !property.values ||
-      definition.gqlList
+      definition.rq.array
     )
   ) {
     if (
@@ -1360,7 +1360,7 @@ async function getI18nPropertyData(
     definition.i18n.tooManyDecimalsErrorInclude &&
     (
       !property.values ||
-      definition.gqlList
+      definition.rq.array
     )
   ) {
     if (Array.isArray(definition.i18n.tooManyDecimalsErrorInclude)) {
@@ -1376,7 +1376,7 @@ async function getI18nPropertyData(
   if (
     typeof property.minDecimalCount !== "undefined" && (
       !property.values ||
-      definition.gqlList
+      definition.rq.array
     )) {
     errorRequiredProperties.push("error.TOO_FEW_DECIMALS");
   }

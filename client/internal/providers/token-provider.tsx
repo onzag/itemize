@@ -4,7 +4,7 @@
  */
 
 import React from "react";
-import { gqlQuery, buildGqlQuery, IRQValue } from "../../../rq-querier";
+import { rqQuery, buildRQQuery, IRQValue } from "../../../rq-querier";
 import { EndpointErrorType } from "../../../base/errors";
 import { ILocaleContextType } from "./locale-provider";
 import { GUEST_METAROLE, ENDPOINT_ERRORS } from "../../../constants";
@@ -278,7 +278,7 @@ class ActualTokenProvider extends React.Component<IActualTokenProviderProps, IAc
     }
 
     // // we do the token request
-    // const data = await gqlQuery(
+    // const data = await rqQuery(
     //   buildGqlQuery(
     //     {
     //       name: "token",
@@ -426,8 +426,8 @@ class ActualTokenProvider extends React.Component<IActualTokenProviderProps, IAc
       // do this one and actually request the server for info
       if (!isOffline) {
         // we build the grapqhl query for it and run it raw
-        const userLanguageData = await gqlQuery(
-          buildGqlQuery(
+        const userLanguageData = await rqQuery(
+          buildRQQuery(
             null,
             {
               name: "GET_MOD_users__IDEF_user",

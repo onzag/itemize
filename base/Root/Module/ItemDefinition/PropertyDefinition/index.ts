@@ -26,12 +26,13 @@ import supportedTypesStandard, { PropertyDefinitionSupportedType, PropertyDefini
 import { EndpointError } from "../../../../errors";
 import { DOMWindow } from "../../../../../util";
 import equals from "deep-equal";
-import { IRQFile } from "../../../../../rq-querier";
+import { IRQFile, IRQRequestFields } from "../../../../../rq-querier";
 import Include from "../Include";
 import { ICustomRoleManager } from "../../../../Root";
 import type { PropertyDefinitionSupportedFilesType } from "./types/files";
 import type { PropertyDefinitionSupportedFileType } from "./types/file";
 import type { IPropertyDefinitionSupportedTextType } from "./types/text";
+import { validateRQShape } from "./rq";
 
 /**
  * These are the main errors a property is able to give
@@ -531,22 +532,14 @@ export default class PropertyDefinition {
    * @param v 
    * @returns 
    */
-  public static checkAgainstJSONDefinition(properyDefinitionRaw: IPropertyDefinitionRawJSONDataType, v: PropertyDefinitionSupportedType) {
+  public static checkAgainstRQDefinition(properyDefinitionRaw: IPropertyDefinitionRawJSONDataType, v: PropertyDefinitionSupportedType) {
     if (v === null) {
       return true;
     }
 
     const definition = supportedTypesStandard[properyDefinitionRaw.type];
 
-    if (definition.json) {
-      if (definition.gqlList) {
-        return Array.isArray(v) && (v as any[]).every((sb) => typeof sb === definition.json);
-      }
-
-      return typeof v === definition.json;
-    }
-
-    return true;
+    return validateRQShape(definition.rq, v);
   }
 
   /**
@@ -600,93 +593,11 @@ export default class PropertyDefinition {
     }
 
     // These basic checks are the most important
-    if (!PropertyDefinition.checkAgainstJSONDefinition(propertyDefinitionRaw, value)) {
+    if (!PropertyDefinition.checkAgainstRQDefinition(propertyDefinitionRaw, value)) {
       return PropertyInvalidReason.INVALID_VALUE;
     }
 
-    // if this is a rq list
-    if (definition.rq.array) {
-      // then we check if it's an array
-      if (!Array.isArray(value)) {
-        // if it's not is invalid
-        return PropertyInvalidReason.INVALID_VALUE;
-      }
 
-      // TODO here we validate the RQ type rather than doing this crazyness
-      // we need to use the RQ shape to validate rather than doing this gql madness
-
-      // if this is specified as a file content array data
-      if (definition.gqlAddFileToFields) {
-        // we have to do this madness for every file
-        if (!(value as PropertyDefinitionSupportedFilesType).every((v: IRQFile) => {
-          // check that all the types match
-          return typeof v.id === "string" &&
-            typeof v.name === "string" &&
-            typeof v.type === "string" &&
-            typeof v.url === "string" &&
-            typeof v.size === "number" &&
-            // metadata must be string and less than equal 128 characters, or otherwise null
-            ((typeof v.metadata === "string" && v.metadata.length <= 128) || v.metadata === null) &&
-            // check that the file size isn't too large
-            v.size <= MAX_FILE_SIZE &&
-            (
-              // check that the source is either a promise (aka a readable stream)
-              v.src === null ||
-              typeof v.src === "undefined" ||
-              (v.src as Promise<any>).then ||
-              // or check that the source is a file
-              (
-                typeof File !== "undefined" &&
-                v.src instanceof File
-              ) ||
-              // or check that the source is a blob
-              (
-                typeof Blob !== "undefined" &&
-                v.src instanceof Blob
-              )
-            );
-        })) {
-          // if any of those checks fail then it's invalid
-          return PropertyInvalidReason.INVALID_VALUE;
-        }
-      }
-
-      // Otherwise if we are adding the file info, but it's not an array
-    } else if (definition.gqlAddFileToFields) {
-      // we get is casted as a file
-      const valueAsIGQLFile: IRQFile = value as unknown as IRQFile;
-
-      // and now we got to check if any of these, does not match
-      // we are doing the opposite we did before with .every
-      if (
-        // if any type does not match
-        typeof valueAsIGQLFile.id !== "string" ||
-        typeof valueAsIGQLFile.name !== "string" ||
-        typeof valueAsIGQLFile.type !== "string" ||
-        typeof valueAsIGQLFile.url !== "string" ||
-        typeof valueAsIGQLFile.size !== "number" ||
-        // metadata is not string, or metadata is longer than 128 characters an metadata is not null as well, invalid
-        ((typeof valueAsIGQLFile.metadata !== "string" || valueAsIGQLFile.metadata.length > 128) && valueAsIGQLFile !== null) ||
-        // or file is too large
-        valueAsIGQLFile.size > MAX_FILE_SIZE ||
-        // or the source is not null and not undefined
-        // and it's not a promise and it's not a file
-        (
-          valueAsIGQLFile.src !== null &&
-          typeof valueAsIGQLFile.src !== "undefined" &&
-          !(valueAsIGQLFile.src as Promise<any>).then && (
-            typeof File === "undefined" ||
-            !(valueAsIGQLFile.src instanceof File)
-          ) && (
-            typeof Blob === "undefined" ||
-            !(valueAsIGQLFile.src instanceof Blob)
-          )
-        )
-      ) {
-        // This means it's an invalid IGQL file structure
-        return PropertyInvalidReason.INVALID_VALUE;
-      }
-    }
 
     if (propertyDefinitionRaw.pattern && typeof value === "string") {
       const regxp = CACHED_REGEXP[propertyDefinitionRaw.pattern] || new RegExp(propertyDefinitionRaw.pattern);
@@ -1153,31 +1064,23 @@ export default class PropertyDefinition {
   /**
    * Provides the request fields that are necessary
    * and contained within this property in order to be
-   * graphql requested, these come from the property description
+   * rq requested, these come from the property description
    * @returns the requested fields that are necessary
    */
-  public getRequestFields() {
+  public getRequestFields(): IRQRequestFields {
     let requestFields = {};
     // now we get the description for this field
     const propertyDescription = this.getPropertyDefinitionDescription();
     // if there are graphql fields defined
-    if (propertyDescription.gqlFields) {
+    if (propertyDescription.rq) {
       // we add each one of them
-      Object.keys(propertyDescription.gqlFields).forEach((field) => {
+      Object.keys(propertyDescription.rq.ownFields).forEach((field) => {
         requestFields[field] = {};
       });
-    }
-
-    if (propertyDescription.gqlAddFileToFields) {
-      requestFields = {
-        ...requestFields,
-        name: {},
-        url: {},
-        id: {},
-        size: {},
-        type: {},
-        metadata: {},
-      };
+      // we add each one of them
+      Object.keys(propertyDescription.rq.stdFields).forEach((field) => {
+        requestFields[field] = {};
+      });
     }
 
     return requestFields;
@@ -1493,8 +1396,8 @@ export default class PropertyDefinition {
     return stateValue;
   }
 
-  public checkAgainstJSONDefinition(v: PropertyDefinitionSupportedType) {
-    return PropertyDefinition.checkAgainstJSONDefinition(this.rawData, v);
+  public checkAgainstRQDefinition(v: PropertyDefinitionSupportedType) {
+    return PropertyDefinition.checkAgainstRQDefinition(this.rawData, v);
   }
 
   /**
@@ -1517,7 +1420,7 @@ export default class PropertyDefinition {
       // we run some very basic validations, if this is a number and you put in
       // a string then something is clearly wrong
       // other kinds of invalid values are ok
-      if (!this.checkAgainstJSONDefinition(actualValue)) {
+      if (!this.checkAgainstRQDefinition(actualValue)) {
         throw new Error("Invalid super enforced " + JSON.stringify(actualValue) + " on " + this.getId());
       }
     }
@@ -1554,7 +1457,7 @@ export default class PropertyDefinition {
       // we run some very basic validations, if this is a number and you put in
       // a string then something is clearly wrong
       // other kinds of invalid values are ok
-      if (!this.checkAgainstJSONDefinition(actualValue)) {
+      if (!this.checkAgainstRQDefinition(actualValue)) {
         throw new Error("Invalid super enforced " + JSON.stringify(actualValue) + " on " + this.getId());
       }
     }
@@ -1685,7 +1588,7 @@ export default class PropertyDefinition {
       // we run some very basic validations, if this is a number and you put in
       // a string then something is clearly wrong
       // other kinds of invalid values are ok
-      if (!this.checkAgainstJSONDefinition(actualValue)) {
+      if (!this.checkAgainstRQDefinition(actualValue)) {
         throw new Error("Invalid super default " + JSON.stringify(actualValue) + " on " + this.getId());
       }
     }
@@ -1726,7 +1629,7 @@ export default class PropertyDefinition {
       // we run some very basic validations, if this is a number and you put in
       // a string then something is clearly wrong
       // other kinds of invalid values are ok
-      if (!this.checkAgainstJSONDefinition(newActualValue)) {
+      if (!this.checkAgainstRQDefinition(newActualValue)) {
         throw new Error("Invalid value " + JSON.stringify(newActualValue) + " on " + this.getId());
       }
     }
@@ -2261,7 +2164,7 @@ export default class PropertyDefinition {
    * @returns a boolean
    */
   public isList() {
-    return !!this.getPropertyDefinitionDescription().gqlList;
+    return !!this.getPropertyDefinitionDescription().rq.array;
   }
 
   /**

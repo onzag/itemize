@@ -27,7 +27,7 @@ export function getValuesStrategyForLimiters(rawData: IPropertyDefinitionRawJSON
   const propertyDefinitionDescription = PropertyDefinition.supportedTypesStandard[rawData.type];
 
   // values not allowed in complex types
-  if (propertyDefinitionDescription.gqlFields) {
+  if (propertyDefinitionDescription.rq.type === "object") {
     return null;
   }
 

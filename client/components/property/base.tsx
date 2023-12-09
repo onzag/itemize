@@ -10,7 +10,7 @@ import { IPropertyDefinitionState } from "../../../base/Root/Module/ItemDefiniti
 import { PropertyDefinitionSupportedType } from "../../../base/Root/Module/ItemDefinition/PropertyDefinition/types";
 import { ItemContext } from "../../providers/item";
 import { PropertyDefinitionSearchInterfacesPrefixes } from "../../../base/Root/Module/ItemDefinition/PropertyDefinition/search-interfaces";
-import { RESERVED_BASE_PROPERTIES, SearchVariants } from "../../../constants";
+import { RESERVED_BASE_PROPERTIES_RQ, SearchVariants } from "../../../constants";
 import PropertyView, { RawBasePropertyView } from "../../internal/components/PropertyView";
 import PropertyEntry from "../../internal/components/PropertyEntry";
 import PropertySetter from "../../internal/components/PropertySetter";
@@ -277,7 +277,7 @@ export function EntryViewReadSet(
   }
 
   // now we need to check if this is a meta property such a created_at, edited_at, etc...
-  const isMetaProperty = !!RESERVED_BASE_PROPERTIES[actualId];
+  const isMetaProperty = !!RESERVED_BASE_PROPERTIES_RQ[actualId];
   // and once we know that we can get the value, basically we
   // don't have a property definition if is a meta property, and we need to extract
   // it from the include if it's available
@@ -333,14 +333,14 @@ export function EntryViewReadSet(
       const setter = property ? itemContextualValue.onPropertyChange.bind(null, property) : null;
 
       // to check if we are talking about file, or files
-      if (propertyDescription.gqlAddFileToFields) {
+      if (propertyDescription.rqRepresentsFile) {
         // and if that is the case, now we need to check if it's a
         // list or a single value
         const domain = process.env.NODE_ENV === "production" ? config.productionHostname : config.developmentHostname;
 
         // and as such we absolute the files so that their urls
         // are indeed proper, being a read operation, there's no risk on it
-        if (!propertyDescription.gqlList) {
+        if (!propertyDescription.rq.array) {
           const value = fileURLAbsoluter(
             domain,
             config.containersHostnamePrefixes,

@@ -318,7 +318,7 @@ export function getRQSchemaForItemDefinition(
 
     const searchArgs: { [id: string]: RQArg } = {
       // as you can realize the arguments exclude the base and make it into input mode
-      // that means no RESERVED_BASE_PROPERTIES
+      // that means no RESERVED_BASE_PROPERTIES_RQ
       ...rqFiledModule2AsArg.properties,
       ...RESERVED_IDEF_SEARCH_PROPERTIES_RQ(orderByRuleArg),
     };

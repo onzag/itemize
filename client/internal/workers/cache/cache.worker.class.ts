@@ -9,7 +9,7 @@
 import { openDB, DBSchema, IDBPDatabase } from "idb";
 import { requestFieldsAreContained, deepMerge } from "../../../../rq-util";
 import {
-  IRQSearchRecord, buillRQQuery, gqlQuery, GQLEnum,
+  IRQSearchRecord, buildRQQuery, rqQuery,
   IRQValue, IRQRequestFields, IRQArgs, IRQEndpointValue, IRQFile
 } from "../../../../rq-querier";
 import { PREFIX_GET, ENDPOINT_ERRORS } from "../../../../constants";
@@ -1970,8 +1970,8 @@ export default class CacheWorker {
           language: searchArgs.language,
           order_by: {
             created_at: {
-              nulls: new GQLEnum("LAST"),
-              direction: new GQLEnum("DESC"),
+              nulls: "LAST",
+              direction: "DESC",
               priority: 0,
             },
           },
@@ -1995,7 +1995,7 @@ export default class CacheWorker {
 
         // we request the server for this, in this case
         // it might not have been able to connect
-        const query = buillRQQuery(this.root.getRQSchema(), {
+        const query = buildRQQuery(this.root.getRQSchema(), {
           name: searchQueryName,
           args: actualArgsToUseInGQLSearch,
           fields: {
@@ -2014,7 +2014,7 @@ export default class CacheWorker {
         });
 
         // so we get the server value
-        const firstServerValue = await gqlQuery(query);
+        const firstServerValue = await rqQuery(query);
 
         // if we get an error from the server, return the
         // server value and let it be handled
@@ -2044,7 +2044,7 @@ export default class CacheWorker {
         while (resultsCount > resultsToProcess.length) {
           // now let's try to get these batches
           actualArgsToUseInGQLSearch.until = oldestCreatedAt;
-          const query = buillRQQuery(this.root.getRQSchema(), {
+          const query = buildRQQuery(this.root.getRQSchema(), {
             name: searchQueryName,
             args: actualArgsToUseInGQLSearch,
             fields: {
@@ -2061,7 +2061,7 @@ export default class CacheWorker {
             },
           });
 
-          const serverValueOfBatch = await gqlQuery(query);
+          const serverValueOfBatch = await rqQuery(query);
 
           if (serverValueOfBatch.errors) {
             // return it
@@ -2327,7 +2327,7 @@ export default class CacheWorker {
           args.created_by = searchArgs.created_by;
         }
         // we build the query, using the get list functionality
-        const listQuery = buillRQQuery(this.root.getRQSchema(), {
+        const listQuery = buildRQQuery(this.root.getRQSchema(), {
           name: getListQueryName,
           args,
           fields: {
@@ -2335,7 +2335,7 @@ export default class CacheWorker {
           },
         });
         // and execute it
-        const gqlValue = await gqlQuery(
+        const gqlValue = await rqQuery(
           listQuery,
           // let's not do that, this thing batches
           // because requests are big

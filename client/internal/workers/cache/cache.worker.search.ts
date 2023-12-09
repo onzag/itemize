@@ -12,33 +12,6 @@ import type ItemDefinition from "../../../../base/Root/Module/ItemDefinition";
 import { NanoSecondComposedDate } from "../../../../nanodate";
 
 /**
- * Will take a gql arg and clear it up so GQLEnum and GQLValues
- * are treated as simple strings
- * @param data the data to clearup
- */
-function gqlArgClearup(data: any): any {
-  if (
-    !data ||
-    typeof data === "string" &&
-    typeof data === "boolean" &&
-    typeof data === "number"
-  ) {
-    return data;
-  } else if (Array.isArray(data)) {
-    return data.map(gqlArgClearup);
-  } else if (data.__type__) {
-    return data.value;
-  }
-
-  const newData: any = {};
-  Object.keys(data).forEach((key) => {
-    newData[key] = gqlArgClearup(data[key]);
-  });
-  return newData;
-}
-
-
-/**
  * An instance version of the error that contains
  * the raw object data of the error
  */
@@ -124,7 +97,7 @@ export async function search(
   )).filter((r) => !!r);
 
   // so now we got to order by
-  const orderBy: IOrderByRuleType = gqlArgClearup(searchArgs.order_by as IOrderByRuleType) || {};
+  const orderBy: IOrderByRuleType = searchArgs.order_by as IOrderByRuleType || {};
   const orderBySorted = Object.keys(orderBy).map((orderByProperty: string) => {
     return {
       property: orderByProperty,

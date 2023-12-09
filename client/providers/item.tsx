@@ -2158,7 +2158,7 @@ export class ActualItemProvider extends
     // by default we don't know
     let isNotFound = false;
     if (memoryLoaded) {
-      const appliedGQLValue = props.itemDefinitionInstance.getGQLAppliedValue(
+      const appliedRQValue = props.itemDefinitionInstance.getRQAppliedValue(
         props.forId || null, props.forVersion || null,
       );
       // this is the same as for loadValue we are tyring to predict
@@ -2174,10 +2174,10 @@ export class ActualItemProvider extends
       });
       // this will work even for null values, and null requestFields
       memoryLoadedAndValid = (
-        appliedGQLValue &&
-        requestFieldsAreContained(requestFields, appliedGQLValue.requestFields)
+        appliedRQValue &&
+        requestFieldsAreContained(requestFields, appliedRQValue.requestFields)
       );
-      isNotFound = memoryLoadedAndValid && appliedGQLValue.rawValue === null;
+      isNotFound = memoryLoadedAndValid && appliedRQValue.rawValue === null;
     }
 
     let searchWasRestored: "NO" | "FROM_STATE" | "FROM_LOCATION" = "NO";
@@ -3314,7 +3314,7 @@ export class ActualItemProvider extends
     // 5. feedback arrives and listener considers that the signature matches, data has been deleted for the other provider
     let dataIsCorrupted = false;
     if (this.props.forId) {
-      const appliedValue = this.props.itemDefinitionInstance.getGQLAppliedValue(
+      const appliedValue = this.props.itemDefinitionInstance.getRQAppliedValue(
         this.props.forId || null,
         this.props.forVersion || null,
       );
@@ -3392,10 +3392,10 @@ export class ActualItemProvider extends
     const forId = this.props.forId || null;
     const forVersion = this.props.forVersion || null;
 
-    const appliedGQLValue = this.props.itemDefinitionInstance.getGQLAppliedValue(
+    const appliedRQValue = this.props.itemDefinitionInstance.getRQAppliedValue(
       forId, forVersion,
     );
-    if (appliedGQLValue) {
+    if (appliedRQValue) {
       let cached: boolean = false;
       // we need to cache what we have been just specified
       if (
@@ -3404,13 +3404,13 @@ export class ActualItemProvider extends
         this.props.longTermCaching
       ) {
         const qualifiedName = this.props.itemDefinitionInstance.getQualifiedPathName();
-        if (appliedGQLValue.rawValue) {
+        if (appliedRQValue.rawValue) {
           cached = await CacheWorkerInstance.instance.mergeCachedValue(
             PREFIX_GET + qualifiedName,
             forId,
             forVersion || null,
-            appliedGQLValue.rawValue,
-            appliedGQLValue.requestFields,
+            appliedRQValue.rawValue,
+            appliedRQValue.requestFields,
           );
         } else {
           cached = await CacheWorkerInstance.instance.setCachedValue(
@@ -3424,7 +3424,7 @@ export class ActualItemProvider extends
       }
 
       const completedValue = {
-        value: appliedGQLValue.rawValue,
+        value: appliedRQValue.rawValue,
         error: null as any,
         cached,
         id: forId,
@@ -3649,12 +3649,12 @@ export class ActualItemProvider extends
 
     if (!denyCaches && !denyMemoryCache && !this.props.doNotUseMemoryCache) {
       // Prevent loading at all if value currently available and memoryCached
-      const appliedGQLValue = this.props.itemDefinitionInstance.getGQLAppliedValue(
+      const appliedRQValue = this.props.itemDefinitionInstance.getRQAppliedValue(
         forId, forVersion,
       );
       if (
-        appliedGQLValue &&
-        requestFieldsAreContained(requestFields, appliedGQLValue.requestFields)
+        appliedRQValue &&
+        requestFieldsAreContained(requestFields, appliedRQValue.requestFields)
       ) {
         if (window.TESTING && process.env.NODE_ENV === "development") {
           this.mountOrUpdateIdefForTesting(true);
@@ -3677,14 +3677,14 @@ export class ActualItemProvider extends
           this.props.longTermCaching &&
           !this.props.searchContext
         ) {
-          if (appliedGQLValue.rawValue) {
+          if (appliedRQValue.rawValue) {
             try {
               cached = await CacheWorkerInstance.instance.mergeCachedValue(
                 PREFIX_GET + qualifiedName,
                 forId,
                 forVersion || null,
-                appliedGQLValue.rawValue,
-                appliedGQLValue.requestFields,
+                appliedRQValue.rawValue,
+                appliedRQValue.requestFields,
               );
             } catch { }
           } else {
@@ -3701,7 +3701,7 @@ export class ActualItemProvider extends
         }
 
         return this.loadValueCompleted({
-          value: appliedGQLValue.rawValue,
+          value: appliedRQValue.rawValue,
           error: null,
           cached,
           id: forId,
@@ -4232,7 +4232,7 @@ export class ActualItemProvider extends
       // from the applied value
       if (options.onlyIncludeIfDiffersFromAppliedValue) {
         // we get the current applied value, if any
-        const currentAppliedValue = this.props.itemDefinitionInstance.getGQLAppliedValue(
+        const currentAppliedValue = this.props.itemDefinitionInstance.getRQAppliedValue(
           this.props.forId || null, this.props.forVersion || null);
         // if there is an applied value for that property
         if (currentAppliedValue && typeof currentAppliedValue.flattenedValue[p.propertyId] !== "undefined") {
@@ -4287,7 +4287,7 @@ export class ActualItemProvider extends
         // from the applied value
         if (options.onlyIncludeIfDiffersFromAppliedValue) {
           // we get the current applied value, if any
-          const currentAppliedValue = this.props.itemDefinitionInstance.getGQLAppliedValue(
+          const currentAppliedValue = this.props.itemDefinitionInstance.getRQAppliedValue(
             this.props.forId || null, this.props.forVersion || null);
           // if there is an applied value for that property
           if (currentAppliedValue && currentAppliedValue.flattenedValue[include.getQualifiedIdentifier()]) {
@@ -4964,7 +4964,7 @@ export class ActualItemProvider extends
         // if we are submitting to edit to a different target to our own
         // basically copying during an edit action we need to do the same we do
         // in creating new values via copying
-        const appliedValue = this.props.itemDefinitionInstance.getGQLAppliedValue(
+        const appliedValue = this.props.itemDefinitionInstance.getRQAppliedValue(
           this.props.forId || null,
           this.props.forVersion || null,
         );
@@ -5022,7 +5022,7 @@ export class ActualItemProvider extends
       // another of another kind, either new with undefined id or
       // a different version, we need to ensure all the files
       // are going to be there nicely and copied
-      const appliedValue = this.props.itemDefinitionInstance.getGQLAppliedValue(
+      const appliedValue = this.props.itemDefinitionInstance.getRQAppliedValue(
         this.props.forId || null,
         this.props.forVersion || null,
       );
@@ -5082,7 +5082,7 @@ export class ActualItemProvider extends
           this.props.forId || null,
           this.props.forVersion || null,
         );
-        const appliedValue = this.props.itemDefinitionInstance.getGQLAppliedValue(
+        const appliedValue = this.props.itemDefinitionInstance.getRQAppliedValue(
           this.props.forId || null,
           this.props.forVersion || null,
         );
@@ -6099,7 +6099,7 @@ export class ActualItemProvider extends
     const root = this.props.itemDefinitionInstance.getParentModule().getParentRoot();
     arg.modifiedRecords.forEach((record) => {
       const iDef = root.registry[record.type] as ItemDefinition;
-      const gqlValue = iDef.getGQLAppliedValue(record.id, record.version);
+      const gqlValue = iDef.getRQAppliedValue(record.id, record.version);
       if (!gqlValue || !gqlValue.flattenedValue || gqlValue.flattenedValue.last_modified !== record.last_modified) {
         iDef.triggerListeners("reload", record.id, record.version);
       }

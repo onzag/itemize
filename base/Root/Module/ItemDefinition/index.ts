@@ -22,7 +22,7 @@ import {
   ENDPOINT_ERRORS,
   PREFIX_BUILD,
   POLICY_PREFIXES,
-  RESERVED_BASE_PROPERTIES,
+  RESERVED_BASE_PROPERTIES_RQ,
   CONNECTOR_SQL_COLUMN_VERSION_FK_NAME,
 } from "../../../../constants";
 import { EndpointError, EndpointErrorType } from "../../../errors";
@@ -1660,7 +1660,7 @@ export default class ItemDefinition {
         ii.getStateNoExternalChecking(id, version, null, emulateExternalChecking));
     }
 
-    const gqlOriginal = this.getGQLAppliedValue(id, version);
+    const gqlOriginal = this.getRQAppliedValue(id, version);
     const searchState = this.getSearchState(id, version);
     return {
       moduleName: this.getModuleName(),
@@ -1730,7 +1730,7 @@ export default class ItemDefinition {
       includes = await Promise.all(this.includeInstances.map((ii: Include) => ii.getState(id, version, null)));
     }
 
-    const gqlOriginal = this.getGQLAppliedValue(id, version);
+    const gqlOriginal = this.getRQAppliedValue(id, version);
     const searchState = this.getSearchState(id, version);
     return {
       moduleName: this.getModuleName(),
@@ -2115,10 +2115,10 @@ export default class ItemDefinition {
    * @param version the version
    * @returns the applied value structure
    */
-  public getGQLAppliedValue(id: string, version: string): IItemDefinitionGQLValueType {
+  public getRQAppliedValue(id: string, version: string): IItemDefinitionGQLValueType {
     const mergedID = id + "." + (version || "");
-    const appliedGQLValue = this.stateGQLAppliedValue[mergedID] || null;
-    return appliedGQLValue;
+    const appliedRQValue = this.stateGQLAppliedValue[mergedID] || null;
+    return appliedRQValue;
   }
 
   /**
@@ -2256,7 +2256,7 @@ export default class ItemDefinition {
     const requestFields: IRQRequestFields = {};
 
     // now we add all the reserver properties
-    Object.keys(RESERVED_BASE_PROPERTIES).forEach((pKey) => {
+    Object.keys(RESERVED_BASE_PROPERTIES_RQ).forEach((pKey) => {
       requestFields[pKey] = {};
     });
 

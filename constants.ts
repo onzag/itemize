@@ -6,17 +6,6 @@
  * @module
  */
 
-import {
-  GraphQLInt,
-  GraphQLNonNull,
-  GraphQLString,
-  GraphQLEnumType,
-  GraphQLList,
-  GraphQLObjectType,
-  GraphQLInputObjectType,
-  GraphQLBoolean,
-} from "graphql";
-import { IGQLFieldsDefinitionType } from "./base/Root/gql";
 import { IElasticIndexDefinitionType, ISQLTableDefinitionType } from "./base/Root/sql";
 import path from "path";
 import type { RQArg, RQField } from "./base/Root/rq";
@@ -747,88 +736,6 @@ export const DATE_FORMAT = "YYYY-MM-DD";
  * The reserved base properties that are exists within every graphql query
  * and should mirror the database
  */
-export const RESERVED_BASE_PROPERTIES: IGQLFieldsDefinitionType = {
-  id: {
-    type: GraphQLNonNull && GraphQLNonNull(GraphQLString),
-    description: "The id of the item",
-  },
-  version: {
-    type: GraphQLString,
-    description: "An optional version of the item, the item must have versioning enabled",
-  },
-  type: {
-    type: GraphQLNonNull && GraphQLNonNull(GraphQLString),
-    description: "The type (qualified name) of the item",
-  },
-  parent_id: {
-    type: GraphQLString,
-    description: "If exists, a parent id of this item",
-  },
-  parent_version: {
-    type: GraphQLString,
-    description: "If exists, the parent version of this item",
-  },
-  parent_type: {
-    type: GraphQLString,
-    description: "If exists, a parent type of this item",
-  },
-  container_id: {
-    type: GraphQLNonNull && GraphQLNonNull(GraphQLString),
-    description: "The storage location id where data is stored",
-  },
-  created_at: {
-    type: GraphQLNonNull && GraphQLNonNull(GraphQLString),
-    description: "When the item was created",
-  },
-  created_by: {
-    type: GraphQLNonNull && GraphQLNonNull(GraphQLString),
-    description: "The id of the user who created this item",
-  },
-  edited_at: {
-    type: GraphQLString,
-    description: "Whenever the item was modified, otherwise null",
-  },
-  edited_by: {
-    type: GraphQLString,
-    description: "Whoever modified this item, otherwise null",
-  },
-  reviewed_at: {
-    type: GraphQLString,
-    description: "When a moderator or admin reviewed this item",
-  },
-  reviewed_by: {
-    type: GraphQLString,
-    description: "The user id who reviewed it",
-  },
-  last_modified: {
-    type: GraphQLNonNull && GraphQLNonNull(GraphQLString),
-    description: "An internal variable that represents when the whole item, as a whole " +
-      " was last modified, by any factor, edited_at servers a UI purpose when things were " +
-      " modified by normal means whereas last_modified is a global factor, it could be the " +
-      " server that did the change, or a side effect, edited_at can be used in the UI " +
-      " last modified is for usage which checking if items updated",
-  },
-  blocked_at: {
-    type: GraphQLString,
-    description: "When the item was blocked, blocked items are not searchable or retrievable by normal means; " +
-      "if you as an user own this item, you will only see it blocked, unlike deleted items, blocked items remain " +
-      "in the database until they are manually removed by an admin or moderator, none can access the data of this " +
-      "item, the API will null all the fields, with the exception of blocked_at, blocked_by, blocked_until and blocked_reason",
-  },
-  blocked_until: {
-    type: GraphQLString,
-    description: "Basically makes the block be temporary and will be automatically lifted by the database",
-  },
-  blocked_by: {
-    type: GraphQLString,
-    description: "By whom it was blocked",
-  },
-  blocked_reason: {
-    type: GraphQLString,
-    description: "A written text of why it was blocked",
-  },
-};
-
 export const RESERVED_BASE_PROPERTIES_RQ: {
   [id: string]: RQArg;
 } = {
@@ -1221,40 +1128,6 @@ export const POLICY_OPTIONAL_I18N = [
   "description",
 ];
 
-/**
- * The ID element fields are the id and type unique identifiers
- * that make the client able to run requests for a given item id
- * @ignore
- */
-const SEARCH_RECORD_FIELDS = {
-  id: {
-    type: GraphQLNonNull && GraphQLNonNull(GraphQLString),
-  },
-  type: {
-    type: GraphQLNonNull && GraphQLNonNull(GraphQLString),
-  },
-  version: {
-    type: GraphQLString,
-  },
-  last_modified: {
-    type: GraphQLNonNull && GraphQLNonNull(GraphQLString),
-  },
-};
-/**
- * The ID element in graphql form
- */
-export const SEARCH_RECORD_GQL = GraphQLObjectType && new GraphQLObjectType({
-  name: "SEARCH_RECORD",
-  fields: SEARCH_RECORD_FIELDS,
-});
-/**
- * The ID element as input form
- */
-export const SEARCH_RECORD_INPUT_GQL = GraphQLInputObjectType && new GraphQLInputObjectType({
-  name: "SEARCH_RECORD_INPUT",
-  fields: SEARCH_RECORD_FIELDS,
-});
-
 export const SEARCH_RECORD_RQ: RQField = {
   type: "object",
   stdFields: {
@@ -1281,40 +1154,6 @@ export const SEARCH_RECORD_RQ_ARG: RQArg = {
   type: "object",
   properties: SEARCH_RECORD_RQ.stdFields,
 };
-
-/**
- * The id container contains the way that search results are returned
- * with the records and the last record of the given records
- */
-export const SEARCH_RECORDS_CONTAINER_GQL = GraphQLObjectType && new GraphQLObjectType({
-  name: "SEARCH_RECORDS_CONTAINER",
-  fields: {
-    records: {
-      type: GraphQLList && GraphQLList(GraphQLNonNull(SEARCH_RECORD_GQL)),
-    },
-    last_modified: {
-      type: GraphQLString,
-    },
-    count: {
-      type: GraphQLNonNull(GraphQLInt),
-    },
-    limit: {
-      type: GraphQLNonNull(GraphQLInt),
-    },
-    offset: {
-      type: GraphQLNonNull(GraphQLInt),
-    },
-    earliest_created_at: {
-      type: GraphQLString,
-    },
-    oldest_created_at: {
-      type: GraphQLString,
-    },
-    metadata: {
-      type: GraphQLString,
-    },
-  },
-});
 
 /**
  * The id container contains the way that search results are returned
@@ -1377,11 +1216,6 @@ const searchOptionsNullOrderOptions = {};
 /**
  * And this is for the order by rule enum
  */
-export const ORDERBY_RULE_DIRECTION = GraphQLEnumType && new GraphQLEnumType({
-  name: "RESERVED_SEARCH_PROPERTY_ENUM_ORDER_BY",
-  values: searchOptionsOrderByOptions,
-});
-
 export const ORDERBY_RULE_DIRECTION_RQ: RQArg = {
   type: "string",
   values: ["asc", "desc"],
@@ -1390,31 +1224,10 @@ export const ORDERBY_RULE_DIRECTION_RQ: RQArg = {
 /**
  * And this is for the order by rule enum nulls
  */
-export const ORDERBY_NULLS_PRIORITY = GraphQLEnumType && new GraphQLEnumType({
-  name: "RESERVED_SEARCH_PROPERTY_NULLS",
-  values: searchOptionsNullOrderOptions,
-});
-
 export const ORDERBY_NULLS_PRIORITY_RQ: RQArg = {
   type: "string",
   values: ["first", "last"],
 };
-
-export const ORDERBY_RULE = GraphQLInputObjectType && new GraphQLInputObjectType({
-  name: "RESERVED_ORDERBY_RULE",
-  fields: {
-    direction: {
-      type: GraphQLNonNull(ORDERBY_RULE_DIRECTION),
-    },
-    priority: {
-      type: GraphQLNonNull(GraphQLInt),
-    },
-    nulls: {
-      type: GraphQLNonNull(ORDERBY_NULLS_PRIORITY),
-    },
-  },
-  description: "Order by the property, which might be an extension, in any direction",
-});
 
 export const ORDERBY_RULE_RQ: RQArg = {
   type: "object",
@@ -1449,17 +1262,6 @@ export interface IOrderByRuleType {
  * These are the base query properties that are
  * used in a search and get list query
  */
-const BASE_QUERY_PROPERTIES = {
-  token: {
-    type: GraphQLString,
-    description: "the access token provided by the app",
-  },
-  language: {
-    type: GraphQLNonNull && GraphQLNonNull(GraphQLString),
-    description: "A supported language (dictionary wise) 2 digit code, it is used for FTS purposes and text analysis",
-  },
-};
-
 const BASE_QUERY_PROPERTIES_RQ: {[id: string]: RQArg} = {
   token: {
     type: "string",
@@ -1476,95 +1278,6 @@ const BASE_QUERY_PROPERTIES_RQ: {[id: string]: RQArg} = {
  * The reserved search properties represent how searches are done
  * and these are included in every search
  */
-export const RESERVED_IDEF_SEARCH_PROPERTIES = (orderByRule: any) => ({
-  ...BASE_QUERY_PROPERTIES,
-  limit: {
-    type: GraphQLNonNull && GraphQLNonNull(GraphQLInt),
-    description: "The SQL limit to use in order to page the amount of results",
-  },
-  offset: {
-    type: GraphQLNonNull && GraphQLNonNull(GraphQLInt),
-    description: "The SQL offset to use in order to page the amount of results",
-  },
-  order_by: {
-    type: GraphQLNonNull && orderByRule && GraphQLNonNull(orderByRule),
-    description: "An order type",
-  },
-  since: {
-    type: GraphQLString,
-    description: "Basically a limiter that causes the values to only be returned since that date, the date must be an ISO type",
-  },
-  created_by: {
-    type: GraphQLString,
-    description: "An specified owner to filter by (this affects permissions)",
-  },
-  parent_id: {
-    type: GraphQLString,
-    description: "a parent id for the item (must be specified with parent_type)",
-  },
-  parent_version: {
-    type: GraphQLString,
-    description: "a parent version for the item (must be specified with parent_type)",
-  },
-  parent_type: {
-    type: GraphQLString,
-    description: "a parent item definition qualified path (must be specified with parent_id)",
-  },
-  version_filter: {
-    type: GraphQLString,
-    description: "Allow only items that are of this version",
-  },
-  version_filter_out: {
-    type: GraphQLString,
-    description: "Allow only items that are not of this version",
-  },
-  ids_filter: {
-    type: GraphQLList && GraphQLList(GraphQLString),
-    description: "Only allows the given ids",
-  },
-  ids_filter_out: {
-    type: GraphQLList && GraphQLList(GraphQLString),
-    description: "Blacklists the given ids",
-  },
-  created_by_filter: {
-    type: GraphQLList && GraphQLList(GraphQLString),
-    description: "Only allows the given creators (note this is a filter and does not replace created_by)",
-  },
-  created_by_filter_out: {
-    type: GraphQLList && GraphQLList(GraphQLString),
-    description: "Blacklists the given creators (note that this is a filter and does not replace created_by)",
-  },
-  parent_ids_filter: {
-    type: GraphQLList && GraphQLList(GraphQLString),
-    description: "Only allows the given parent ids (note this is a filter and does not replace parent_id parent_type and parent_version)",
-  },
-  parent_ids_filter_out: {
-    type: GraphQLList && GraphQLList(GraphQLString),
-    description: "Blacklists the given parent ids (note that this is a filter and does not replace parent_id parent_type and parent_version)",
-  },
-  parent_type_filter: {
-    type: GraphQLList && GraphQLList(GraphQLString),
-    description: "Only allows the given parent types (note this is a filter and does not replace parent_id parent_type and parent_version)",
-  },
-  parent_type_filter_out: {
-    type: GraphQLList && GraphQLList(GraphQLString),
-    description: "Blacklists the given parent types (note that this is a filter and does not replace parent_id parent_type and parent_version)",
-  },
-  search: {
-    type: GraphQLString,
-    description: "A search string, searches within the prop extensions and the prop extensions only",
-  },
-  searchengine: {
-    type: GraphQLBoolean,
-    description: "Wether to use the search engine instead of searching from database records (results can be differ)",
-  },
-  searchengine_language: {
-    type: GraphQLString,
-    description: "A ISO code for a language to use to limit the search engine indexes against " +
-      "for example if you are sure you only want english results that have been indexed in english, then pass en here",
-  }
-});
-
 export const RESERVED_IDEF_SEARCH_PROPERTIES_RQ: (orderByRule: RQArg) => {[id: string]: RQArg} = (orderByRule: RQArg) => ({
   ...BASE_QUERY_PROPERTIES_RQ,
   limit: {
@@ -1669,17 +1382,6 @@ export const RESERVED_IDEF_SEARCH_PROPERTIES_RQ: (orderByRule: RQArg) => {[id: s
 /**
  * These apply when doing module searches
  */
-export const RESERVED_MODULE_SEARCH_PROPERTIES = (orderByRule: any) => ({
-  ...RESERVED_IDEF_SEARCH_PROPERTIES(orderByRule),
-  types: {
-    type: GraphQLList && GraphQLList(GraphQLNonNull(GraphQLString)),
-    description: "A list of types (qualified names) to filter by",
-  },
-});
-
-/**
- * These apply when doing module searches
- */
 export const RESERVED_MODULE_SEARCH_PROPERTIES_RQ: (orderByRule: RQArg) => {[id: string]: RQArg} = (orderByRule: RQArg) => ({
   ...RESERVED_IDEF_SEARCH_PROPERTIES_RQ(orderByRule),
   types: {
@@ -1688,21 +1390,6 @@ export const RESERVED_MODULE_SEARCH_PROPERTIES_RQ: (orderByRule: RQArg) => {[id:
     description: "A list of types (qualified names) to filter by",
   },
 });
-
-/**
- * Properties required in order to get
- */
-export const RESERVED_GETTER_PROPERTIES = {
-  ...BASE_QUERY_PROPERTIES,
-  id: {
-    type: GraphQLNonNull && GraphQLNonNull(GraphQLString),
-    description: "the id for that item",
-  },
-  version: {
-    type: GraphQLString,
-    description: "a version for this item",
-  },
-};
 
 /**
  * Properties required in order to get
@@ -1718,50 +1405,6 @@ export const RESERVED_GETTER_PROPERTIES_RQ: {[id: string]: RQArg} = {
     type: "string",
     required: true,
     description: "a version for this item",
-  },
-};
-
-/**
- * Properties required in order to change something
- * either edit or delete
- */
-export const RESERVED_CHANGE_PROPERTIES = {
-  ...RESERVED_GETTER_PROPERTIES,
-  listener_uuid: {
-    type: GraphQLString,
-    description: "An uuid to identify the creator of this action",
-  },
-  indexing: {
-    type: GraphQLString,
-    description: "Respective to the indexing, specifically search engine indexes, what do to regarding it",
-  },
-  parent_id: {
-    type: GraphQLString,
-    description: "A new parent to move this node to (the id)",
-  },
-  parent_version: {
-    type: GraphQLString,
-    description: "A new parent to move this node to (the version)",
-  },
-  parent_type: {
-    type: GraphQLString,
-    description: "A new parent to move this node to (the type)",
-  },
-  blocked: {
-    type: GraphQLBoolean,
-    description: "Makes the item to be blocked (or unblocks it)",
-  },
-  blocked_reason: {
-    type: GraphQLString,
-    description: "Given if block is set to true, this will set a short reason for the blocking",
-  },
-  blocked_until: {
-    type: GraphQLString,
-    description: "A date in the future to make a temporary blockage",
-  },
-  if_last_modified: {
-    type: GraphQLString,
-    description: "Will only edit if the current value was last modified at the exact given date otherwise raises a conflict error",
   },
 };
 
@@ -1813,35 +1456,6 @@ export const RESERVED_CHANGE_PROPERTIES_RQ: {[id: string]: RQArg} = {
 /**
  * Properties required in order to get a list
  */
-export const RESERVED_GETTER_LIST_PROPERTIES = {
-  ...BASE_QUERY_PROPERTIES,
-  records: {
-    type: GraphQLNonNull && GraphQLNonNull(GraphQLList(SEARCH_RECORD_INPUT_GQL)),
-    description: "the records to fetch for that item",
-  },
-  search: {
-    type: GraphQLString,
-    description: "A search string, searches within the prop extensions and the prop extensions only",
-  },
-  searchengine: {
-    type: GraphQLBoolean,
-    description: "Wether to use the search engine instead of searching from database records (results can be differ)",
-  },
-  searchengine_language: {
-    type: GraphQLString,
-    description: "A ISO code for a language to use to limit the search engine indexes against " +
-      "for example if you are sure you only want english results that have been indexed in english, then pass en here",
-  },
-  created_by: {
-    type: GraphQLString,
-    description: "An specified owner to filter by (this affects permissions)",
-  },
-};
-
-
-/**
- * Properties required in order to get a list
- */
 export const RESERVED_GETTER_LIST_PROPERTIES_RQ: {[id: string]: RQArg} = {
   ...BASE_QUERY_PROPERTIES_RQ,
   records: {
@@ -1866,51 +1480,6 @@ export const RESERVED_GETTER_LIST_PROPERTIES_RQ: {[id: string]: RQArg} = {
   created_by: {
     type: "string",
     description: "An specified owner to filter by (this affects permissions)",
-  },
-};
-
-/**
- * Properties required in order to add something
- */
-export const RESERVED_ADD_PROPERTIES = {
-  ...BASE_QUERY_PROPERTIES,
-  listener_uuid: {
-    type: GraphQLString,
-    description: "An uuid to identify the creator of this action",
-  },
-  indexing: {
-    type: GraphQLString,
-    description: "Respective to the indexing, specifically search engine indexes, what do to regarding it",
-  },
-  in_behalf_of: {
-    type: GraphQLString,
-    description: "an user id that will be the true owner",
-  },
-  parent_id: {
-    type: GraphQLString,
-    description: "a parent id that will namespace this item (must be specified with parent_module and idef)",
-  },
-  parent_version: {
-    type: GraphQLString,
-    description: "a parent version that will namespace this item (must be specified with parent_module and idef)",
-  },
-  parent_type: {
-    type: GraphQLString,
-    description: "a parent item definition qualified path (must be specified with parent_id)",
-  },
-  container_id: {
-    type: GraphQLNonNull && GraphQLNonNull(GraphQLString),
-    description: "the storage id where storage data is stored according to definitions",
-  },
-  for_id: {
-    type: GraphQLString,
-    description: "If specified create this item for this given id, the id must already exist and be of the same type," +
-      " this comes in handy for versioning as you need to specify an id to create different versions, please avoid collisions or" +
-      " it will raise an error",
-  },
-  version: {
-    type: GraphQLString,
-    description: "An optional version set a for_id without specifying a version",
   },
 };
 

@@ -6,7 +6,7 @@
  * @module
  */
 
-import { RESERVED_BASE_PROPERTIES_SQL, RESERVED_BASE_PROPERTIES, COMBINED_INDEX, IOrderByRuleType, RESERVED_BASE_PROPERTIES_ELASTIC } from "../../../constants";
+import { RESERVED_BASE_PROPERTIES_SQL, RESERVED_BASE_PROPERTIES_RQ, COMBINED_INDEX, IOrderByRuleType, RESERVED_BASE_PROPERTIES_ELASTIC } from "../../../constants";
 import Module from ".";
 import {
   getSQLTableDefinitionForProperty,
@@ -324,7 +324,7 @@ export function convertSQLValueToGQLValueForModule(
 
   // now we take all the base properties that we have
   // in the graphql model
-  Object.keys(RESERVED_BASE_PROPERTIES).forEach((basePropertyKey) => {
+  Object.keys(RESERVED_BASE_PROPERTIES_RQ).forEach((basePropertyKey) => {
     result[basePropertyKey] = row[basePropertyKey] || null;
   });
 
@@ -355,7 +355,7 @@ export function convertSQLValueToElasticSQLValueForModule(
 
   // now we take all the base properties that we have
   // in the graphql model
-  Object.keys(RESERVED_BASE_PROPERTIES).forEach((basePropertyKey) => {
+  Object.keys(RESERVED_BASE_PROPERTIES_RQ).forEach((basePropertyKey) => {
     result[basePropertyKey] = row[basePropertyKey] || null;
   });
 

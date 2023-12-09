@@ -11,11 +11,11 @@ import Root, { IRootRawJSONDataType } from "../base/Root";
 import CheckUpError from "./Error";
 import Traceback from "./Traceback";
 import {
-  RESERVED_BASE_PROPERTIES,
-  RESERVED_IDEF_SEARCH_PROPERTIES,
-  RESERVED_MODULE_SEARCH_PROPERTIES,
-  RESERVED_GETTER_PROPERTIES,
-  RESERVED_CHANGE_PROPERTIES,
+  RESERVED_BASE_PROPERTIES_RQ,
+  RESERVED_IDEF_SEARCH_PROPERTIES_RQ,
+  RESERVED_MODULE_SEARCH_PROPERTIES_RQ,
+  RESERVED_GETTER_PROPERTIES_RQ,
+  RESERVED_CHANGE_PROPERTIES_RQ,
   OWNER_METAROLE,
   ANYONE_METAROLE,
   GUEST_METAROLE,
@@ -987,11 +987,11 @@ export function checkPropertyDefinition(
   traceback: Traceback,
 ) {
   // These properties are not valid, they are reserved
-  if (Object.keys(RESERVED_BASE_PROPERTIES).includes(rawData.id) ||
-    Object.keys(RESERVED_IDEF_SEARCH_PROPERTIES(null)).includes(rawData.id) ||
-    Object.keys(RESERVED_MODULE_SEARCH_PROPERTIES(null)).includes(rawData.id) ||
-    Object.keys(RESERVED_GETTER_PROPERTIES).includes(rawData.id) ||
-    Object.keys(RESERVED_CHANGE_PROPERTIES).includes(rawData.id)) {
+  if (Object.keys(RESERVED_BASE_PROPERTIES_RQ).includes(rawData.id) ||
+    Object.keys(RESERVED_IDEF_SEARCH_PROPERTIES_RQ(null)).includes(rawData.id) ||
+    Object.keys(RESERVED_MODULE_SEARCH_PROPERTIES_RQ(null)).includes(rawData.id) ||
+    Object.keys(RESERVED_GETTER_PROPERTIES_RQ).includes(rawData.id) ||
+    Object.keys(RESERVED_CHANGE_PROPERTIES_RQ).includes(rawData.id)) {
     throw new CheckUpError(
       "Property '" + rawData.id + "' is reserved",
       traceback.newTraceToBit("id"),

@@ -228,7 +228,7 @@ class ActualUserActioner extends React.Component<IActualUserActionerProps, IActu
     }
 
     // we build our graphql query
-    // const data = await gqlQuery(
+    // const data = await rqQuery(
     //   buildGqlQuery(
     //     {
     //       name: "send_validate",
@@ -308,7 +308,7 @@ class ActualUserActioner extends React.Component<IActualUserActionerProps, IActu
     }
 
     // execute the send reset password query
-    // const data = await gqlQuery(
+    // const data = await rqQuery(
     //   buildGqlQuery(
     //     {
     //       name: "send_reset_password",
@@ -372,7 +372,7 @@ class ActualUserActioner extends React.Component<IActualUserActionerProps, IActu
     }
 
     // execute the send reset password query
-    // const data = await gqlQuery(
+    // const data = await rqQuery(
     //   buildGqlQuery(
     //     {
     //       name: "validate",
@@ -457,7 +457,7 @@ class ActualUserActioner extends React.Component<IActualUserActionerProps, IActu
 
 
     // // do the reset password call, also passing our token
-    // const data = await gqlQuery(
+    // const data = await rqQuery(
     //   buildGqlQuery(
     //     {
     //       name: "reset_password",

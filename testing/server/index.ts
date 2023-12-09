@@ -2,7 +2,7 @@ import { Test } from "..";
 import { strict as assert } from "assert";
 import { ITestingInfoType } from "../itemize";
 import { RobotsTest } from "./robots";
-import { GraphqlTest } from "./graphql";
+import { RQTest } from "./rq";
 import { DatabaseTest } from "./database";
 import { RedisTest } from "./redis";
 import { CONNECTOR_SQL_COLUMN_ID_FK_NAME, CONNECTOR_SQL_COLUMN_VERSION_FK_NAME, JWT_KEY, REGISTRY_IDENTIFIER } from "../../constants";
@@ -270,8 +270,8 @@ export class ServerTest extends Test {
     // });
 
     this.define(
-      "Graphql test",
-      new GraphqlTest(this.fullHost, this.testingInfo),
+      "RQ test",
+      new RQTest(this.fullHost, this.testingInfo),
     );
 
     this.define(
