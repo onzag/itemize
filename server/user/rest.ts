@@ -514,10 +514,18 @@ export function userRestServices(appData: IAppDataType) {
             sessionId: resultUser.session_id || 0,
           }, await appData.registry.getJWTSecretFor(JWT_KEY)));
           // and we return the information back to the user
-          return {
-            ...resultUser,
+          const rs = {
+            id: resultUser.id,
+            role: resultUser.role,
             token,
           };
+
+          if (res) {
+            res.status(200).end(JSON.stringify(rs));
+            return;
+          } else {
+            return rs;
+          }
         } catch (err) {
           logger.error(
             {
@@ -595,6 +603,27 @@ export function userRestServices(appData: IAppDataType) {
   appData.userTokenQuery = tokenQuery.bind(null, null);
 
   const router = Router();
+
+  const bodyParserJSON = express.json({
+    strict: false,
+  });
+
+  // now we use the body parse router
+  router.use((req, res, next) => {
+    bodyParserJSON(req, res, (err) => {
+      if (err) {
+        res.setHeader("content-type", "application/json; charset=utf-8");
+        res.status(400);
+        res.end(JSON.stringify({
+          message: "malformed json",
+          code: ENDPOINT_ERRORS.UNSPECIFIED,
+        }));
+      } else {
+        next();
+      }
+    });
+  });
+
   router.post("/token", async (req, res) => {
     const username = req.body.username;
     const token = req.headers.token as string;

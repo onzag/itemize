@@ -206,14 +206,18 @@ class ActualUserActioner extends React.Component<IActualUserActionerProps, IActu
 
     let data: any;
     try {
+      const headers: any = {
+        "Content-Type": "application/json",
+      }
+      if (this.props.token) {
+        headers.token = this.props.token;
+      }
+
       data = await (await fetch("/rest/user/send-validate", {
         method: "POST",
         cache: "no-cache",
         body: JSON.stringify({type}),
-        headers: {
-          token: this.props.token,
-          "Content-Type": "application/json",
-        },
+        headers,
       })).json();
     } catch (err) {
       data = {

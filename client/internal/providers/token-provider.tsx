@@ -254,15 +254,19 @@ class ActualTokenProvider extends React.Component<IActualTokenProviderProps, IAc
       isLoggingIn: true,
     });
 
+    const headers: any = {
+      "Content-Type": "application/json",
+    };
+    if (token) {
+      headers["token"] = token;
+    }
+
     let data: any;
     try {
       data = await (await fetch("/rest/user/token", {
         method: "POST",
         cache: "no-cache",
-        headers: {
-          token,
-          "Content-Type": "application/json",
-        },
+        headers,
         body: JSON.stringify({username, password, country: this.props.localeContext.country}),
       })).json();
     } catch (err) {
@@ -307,7 +311,7 @@ class ActualTokenProvider extends React.Component<IActualTokenProviderProps, IAc
     // if we are not offline
     if (!isOffline) {
       // then let's get the token data our server has given us
-      const tokenData = data.data && data.data.token;
+      const tokenData = data;
       // as well as these
       tokenDataId = tokenData ? tokenData.id as string : null;
       tokenDataRole = tokenData ? tokenData.role as string : GUEST_METAROLE;

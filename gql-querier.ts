@@ -667,8 +667,8 @@ function buildRQFields(
     } else {
       const subSchema = schema ?
         (
-          schema.ownFields[fKey] ||
-          schema.stdFields[fKey]
+          (schema.ownFields && schema.ownFields[fKey]) ||
+          (schema.stdFields && schema.stdFields[fKey])
         ) : null;
 
       if (schema && !subSchema) {
