@@ -1075,11 +1075,15 @@ export default class PropertyDefinition {
     if (propertyDescription.rq) {
       // we add each one of them
       propertyDescription.rq.ownFields && Object.keys(propertyDescription.rq.ownFields).forEach((field) => {
-        requestFields[field] = {};
+        if (propertyDescription.rq.ownFields[field].type !== "binary") {
+          requestFields[field] = {};
+        }
       });
       // we add each one of them
       propertyDescription.rq.stdFields && Object.keys(propertyDescription.rq.stdFields).forEach((field) => {
-        requestFields[field] = {};
+        if (propertyDescription.rq.stdFields[field].type !== "binary") {
+          requestFields[field] = {};
+        }
       });
     }
 

@@ -74,7 +74,7 @@ export interface IRQResolverArgs {
 
 export type FQGenericResolverType = (
   resolverArgs: IRQResolverArgs,
-) => IRQValue
+) => Promise<IRQValue>;
 
 /**
  * This is how a item definition resolver is supposed to
@@ -83,7 +83,7 @@ export type FQGenericResolverType = (
 export type FRQIdefResolverType = (
   itemDefinition: ItemDefinition,
   resolverArgs: IRQResolverArgs,
-) => IRQValue;
+) => Promise<IRQValue>;
 
 /**
  * This is how a module resolver is supposed to be defined
@@ -91,7 +91,7 @@ export type FRQIdefResolverType = (
 export type FRQModResolverType = (
   module: Module,
   resolverArgs: IRQResolverArgs,
-) => IRQValue;
+) => Promise<IRQValue>;
 
 /**
  * This is all the base resolvers we are expecting out off itemize

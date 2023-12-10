@@ -538,7 +538,7 @@ export function rqSystem(options: {
           const fields = rqRequest[alias].fields;
 
           // it must exist because it has been checked
-          const value: IRQValue = schemaRegion.resolve({
+          const value: IRQValue = await schemaRegion.resolve({
             args,
             fields,
           });
