@@ -480,21 +480,21 @@ export class Collector {
       if (isModuleSearch) {
         rs = await searchModule(
           this.appData,
+          idef.getParentModule().getStandardModule(),
           {
             args: basicQueryElement.args,
             fields: basicQueryElement.fields,
           },
-          idef.getParentModule().getStandardModule(),
           {traditional: true, noLimitOffset: args.ssrNoLimitOffset},
         ) as IRQSearchResultsContainer;
       } else {
         rs = await searchItemDefinition(
           this.appData,
+          idef.getStandardCounterpart(),
           {
             args: basicQueryElement.args,
             fields: basicQueryElement.fields,
           },
-          idef.getStandardCounterpart(),
           {traditional: true, noLimitOffset: args.ssrNoLimitOffset},
         ) as IRQSearchResultsContainer;
       }
