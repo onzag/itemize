@@ -125,13 +125,13 @@ export interface IRQRequestFields {
 /**
  * Single arg, can take many shapes
  */
-type RQArg = boolean | string | number | null | IRQFile | IRQSearchRecord | IRQArgs;
+export type RQArgsValue = boolean | string | number | null | IRQFile | IRQSearchRecord | IRQArgs;
 
 /**
  * The args field
  */
 export interface IRQArgs {
-  [key: string]: RQArg | RQArg[];
+  [key: string]: RQArgsValue | RQArgsValue[];
 }
 
 /**
@@ -156,7 +156,12 @@ export interface IRQEndpointValue {
   errors?: Array<{
     error: EndpointErrorType,
     // might be null, global errors
-    path?: string[];
+    source?: string;
+  }>;
+  warnings?: Array<{
+    warning: EndpointErrorType,
+    // might be null, global warnings
+    source?: string;
   }>;
 }
 
@@ -643,9 +648,10 @@ function buildRQThing(rqSchema: RQRootSchema, ...queries: IGQLQueryObj[]) {
       console.warn("Could not find a matching query in the schema for " + query.name);
     }
 
-    const qObj: any = {
-      n: query.name,
-    };
+    const qObj: any = {};
+    if (query.alias) {
+      qObj.n = query.name;
+    }
     if (query.fields) {
       qObj.f = buildRQFields(targetInQuestion, query.fields);
     }
@@ -836,10 +842,10 @@ export async function rqQuery(query: RQQueryBuilder, options?: {
 
             if (response.errors) {
               response.errors.forEach((e) => {
-                if (!e.path || e.path[0] === alias) {
+                if (!e.source || e.source === alias) {
                   const newError = { ...e };
-                  if (newError.path) {
-                    newError.path = [origName];
+                  if (newError.source) {
+                    newError.source = origName;
                   }
                   if (!newResponse.errors) {
                     newResponse.errors = [];

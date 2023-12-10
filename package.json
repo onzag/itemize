@@ -61,6 +61,7 @@
     "dompurify": "^2.2.9",
     "express": "^4.17.1",
     "form-data": "^4.0.0",
+    "fs-capacitor": "^8.0.0",
     "history": "^4.10.1",
     "html-minifier": "^4.0.0",
     "idb": "^6.1.2",
