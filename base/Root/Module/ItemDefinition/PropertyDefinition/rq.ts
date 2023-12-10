@@ -21,10 +21,13 @@ export function validateRQShape(
     (
       value === null ||
       typeof value === "undefined"
-    ) &&
-    schema.required
+    )
   ) {
-    return false;
+    if (schema.required) {
+      return false;
+    } else {
+      return true;
+    }
   }
   if (schema.array && !options.ignoreArray) {
     if (!Array.isArray(value)) {

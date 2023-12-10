@@ -40,7 +40,7 @@ function processSingleArg(
   alwaysRequired: boolean,
   parent: any,
   parentKey: string | number,
-  varErr: string = "",
+  varErr: string,
 ) {
   if (typeof argValue === "undefined" || argValue === null) {
     if (schema.required || alwaysRequired) {
@@ -54,7 +54,32 @@ function processSingleArg(
     }
   }
 
-  if (schema.type === "any") {
+  // compression of a record in an argument
+  if (schema.recordsObj && typeof argValue === "string") {
+    const splitted = argValue.split(".");
+    const type = splitted[0];
+    const id = splitted[1];
+    const version = splitted[2];
+
+    if (!type) {
+      throw new EndpointError({
+        code: ENDPOINT_ERRORS.UNSPECIFIED,
+        message: "compressed record for " + varErr + " could not determine a type",
+      });
+    } else if (!id) {
+      throw new EndpointError({
+        code: ENDPOINT_ERRORS.UNSPECIFIED,
+        message: "compressed record for " + varErr + " could not determine an id",
+      });
+    }
+
+    parent[parentKey] = {
+      id,
+      version: version || null,
+      last_modified: null,
+      type,
+    };
+  } else if (schema.type === "any") {
     return;
   } else if (schema.type === "binary") {
     if (typeof argValue !== "string") {
@@ -123,11 +148,11 @@ function processSingleArg(
   }
 }
 
-function processArgs(files: IFilesAwaiterContainer, schema: { [id: string]: RQArg }, args: IRQArgs, prefixErrr: string = "") {
+function processArgs(files: IFilesAwaiterContainer, schema: { [id: string]: RQArg }, args: IRQArgs, prefixErrr: string) {
   if (typeof args !== "object" || args === null || typeof args === "undefined" || Array.isArray(args)) {
     throw new EndpointError({
       code: ENDPOINT_ERRORS.UNSPECIFIED,
-      message: (prefixErrr ? "base arguments" : prefixErrr) + " should be an object",
+      message: (!prefixErrr ? "base arguments" : prefixErrr) + " should be an object",
     });
   }
   Object.keys(schema).forEach((argKey) => {
@@ -216,15 +241,13 @@ function processFields(
     }
   });
 
-  const realFieldsSrc = fieldsSrc.filter((v) => {
-    v !== "&STD";
-  });
+  const realFieldsSrc = fieldsSrc.filter((v) => v !== "&STD");
   // it found some STD and we must add the standard
   if (realFieldsSrc.length !== fieldsSrc.length) {
     // now we will look
     Object.keys(stdFields).forEach((stdField) => {
       // if it's not already included and more defined
-      if (!realFieldsSrc.includes(stdField)) {
+      if (!realFieldsSrc.find((v) => v === stdField || (Array.isArray(v) && v[0] === stdField))) {
         // we add it into
         realFieldsSrc.push(stdField);
       }
@@ -244,7 +267,7 @@ function processFields(
           message: prefixErrr + "[" + index + "][0] main key is not a string",
         });
       }
-      const schemaField = stdFields[mainKey] || ownFields[mainKey];
+      const schemaField = (stdFields && stdFields[mainKey]) || (ownFields && ownFields[mainKey]);
       if (!schemaField) {
         throw new EndpointError({
           code: ENDPOINT_ERRORS.UNSPECIFIED,
@@ -259,15 +282,15 @@ function processFields(
           allToAddFields,
           1,
           prefixErrr + "[" + index + "]",
-        )
+        );
       } else {
         throw new EndpointError({
           code: ENDPOINT_ERRORS.UNSPECIFIED,
-          message: prefixErrr + "[" + index + "] refers to an object type but the schema says it's " + schemaField.type,
+          message: prefixErrr + "[" + index + "][0] refers to an object type but the schema says it's " + schemaField.type,
         });
       }
     } else {
-      const schemaField = stdFields[field] || ownFields[field];
+      const schemaField = (stdFields && stdFields[field]) || (ownFields && ownFields[field]);
       if (!schemaField) {
         throw new EndpointError({
           code: ENDPOINT_ERRORS.UNSPECIFIED,
@@ -482,9 +505,11 @@ export function rqSystem(options: {
               // now let's find the potential binaries
               // only in the args of course since only
               // the args can have a binary
-              processArgs(files, schemaRegion.args, rqRequest[alias].args);
-              processFields(schemaRegion.stdFields, schemaRegion.ownFields, rqRequest[alias].f);
-            }
+              processArgs(files, schemaRegion.args, rqRequest[alias].args, "");
+              const reprocessedFields = processFields(schemaRegion.stdFields, schemaRegion.ownFields, rqRequest[alias].f);
+              // we just overwrite
+              rqRequest[alias].f = reprocessedFields;
+             }
           } catch (err) {
             if (!rqResponse.errors) {
               rqResponse.errors = [];
@@ -535,7 +560,7 @@ export function rqSystem(options: {
 
           // our already processed arguments
           const args = rqRequest[alias].args;
-          const fields = rqRequest[alias].fields;
+          const fields = rqRequest[alias].f;
 
           // it must exist because it has been checked
           const value: IRQValue = await schemaRegion.resolve({
@@ -578,7 +603,7 @@ export function rqSystem(options: {
 
           // we got a value add it
           if (typeof r.value !== "undefined") {
-            rqResponse[r.source] = r.value;
+            rqResponse.data[r.source] = r.value;
           }
           // we got an error
           if (r.err) {

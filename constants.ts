@@ -1130,6 +1130,7 @@ export const POLICY_OPTIONAL_I18N = [
 
 export const SEARCH_RECORD_RQ: RQField = {
   type: "object",
+  recordsObj: true,
   stdFields: {
     id: {
       type: "string",
@@ -1141,7 +1142,6 @@ export const SEARCH_RECORD_RQ: RQField = {
     },
     version: {
       type: "string",
-      required: true,
     },
     last_modified: {
       type: "string",
@@ -1152,6 +1152,7 @@ export const SEARCH_RECORD_RQ: RQField = {
 
 export const SEARCH_RECORD_RQ_ARG: RQArg = {
   type: "object",
+  recordsObj: true,
   properties: SEARCH_RECORD_RQ.stdFields,
 };
 

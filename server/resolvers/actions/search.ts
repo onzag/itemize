@@ -15,6 +15,7 @@ import {
   checkUserCanSearch,
   retrieveUntil,
   defaultTriggerSearchInvalidForbiddenFunction,
+  filterAndPrepareRQRecords,
 } from "../basic";
 import ItemDefinition, { ItemDefinitionIOActions } from "../../../base/Root/Module/ItemDefinition";
 import { buildElasticQueryForModule, buildSQLQueryForModule } from "../../../base/Root/Module/sql";
@@ -950,6 +951,7 @@ export async function searchModule(
       count,
       metadata,
     };
+    filterAndPrepareRQRecords(finalResult.records);
 
     CAN_LOG_DEBUG && logger.debug(
       {
@@ -1931,6 +1933,7 @@ export async function searchItemDefinition(
         count,
         metadata,
       };
+      filterAndPrepareRQRecords(finalResult.records);
 
       if (moduleTrigger || idefTrigger) {
         const args: ISearchTriggerArgType = {

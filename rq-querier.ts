@@ -528,7 +528,30 @@ export interface IRQQueryObj {
 
 type RqFieldList = Array<string | RqFieldList>;
 
-// TODO add the schema info to be able to compress this
+/**
+ * used for compressing records in a more reliable form
+ * @param schema 
+ * @param args 
+ */
+function patchRQArgs(
+  schema: RQQuery,
+  args: IRQArgs,
+) {
+  if (!schema) {
+    return;
+  }
+  Object.keys(schema.args).forEach((argKey) => {
+    if (args[argKey]) {
+      const schemaDef = schema.args[argKey];
+      if (schemaDef.recordsObj) {
+        args[argKey] = (args[argKey] as any).map((v: IRQSearchRecord) => {
+          return v.type + "." + v.id + (v.version ? "." + v.version : "");
+        });
+      }
+    }
+  });
+}
+
 function buildRQFields(
   schema: RQQuery | RQField,
   fields: IRQRequestFields,
@@ -631,6 +654,7 @@ function buildRQThing(rqSchema: RQRootSchema, ...queries: IRQQueryObj[]) {
     }
     if (query.args) {
       qObj.args = query.args;
+      patchRQArgs(targetInQuestion, qObj.args);
       if (qObj.args.token) {
         if (!tokens[qObj.args.token]) {
           tokens[qObj.args.token] = 0;

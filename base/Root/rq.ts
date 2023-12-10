@@ -28,6 +28,7 @@ interface RQBase {
   values?: any[];
   required?: boolean;
   description?: string;
+  recordsObj?: boolean;
 }
 
 export interface RQArg extends RQBase {

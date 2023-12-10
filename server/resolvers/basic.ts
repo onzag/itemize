@@ -889,6 +889,32 @@ export interface IFilteredAndPreparedValueType {
   requestFields: any;
 }
 
+const validKeys = [
+  "last_modified",
+  "type",
+  "version",
+  "id",
+];
+/**
+ * Modifies the records in place
+ * in order to ensure they match the shape
+ */
+export function filterAndPrepareRQRecords(
+  records: IRQSearchRecord[],
+) {
+  if (records) {
+    records.forEach((r) => {
+      if (r) {
+        Object.keys(r).forEach((rKey) => {
+          if (!validKeys.includes(rKey)) {
+            delete r[rKey];
+          }
+        });
+      }
+    });
+  }
+}
+
 /**
  * Filters and prepares a rq value for output to the rest endpoint
  * given the value that has given by the server, the requested fields

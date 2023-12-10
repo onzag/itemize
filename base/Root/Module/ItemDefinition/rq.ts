@@ -398,11 +398,6 @@ async function resolveGenericFunction(
   resolvers: IRQResolversType,
   args: IRQResolverArgs,
 ): Promise<any> {
-  console.log(args);
-  throw new EndpointError({
-    message: "CRAZY",
-    code: ENDPOINT_ERRORS.INTERNAL_SERVER_ERROR,
-  });
   // so firstly the value is null
   let value = null;
   // if we have a resolvers
@@ -425,6 +420,7 @@ async function resolveGenericFunction(
       });
     }
   }
+
   // return the value we got
   return value;
 }
