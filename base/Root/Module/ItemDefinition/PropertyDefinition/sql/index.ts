@@ -540,13 +540,13 @@ export function getElasticSchemaForProperty(
 
 /**
  * Takes row data information that is in the SQL form and converts
- * it into a graphql form, only for this specific property
+ * it into a rq form, only for this specific property
  * @param serverData the server data
  * @param itemDefinition the item definition that contains the property
  * @param include the include within the item definition, or null
  * @param propertyDefinition the property definition in question
  * @param row the row that we want to extract information from
- * @returns the graphql value for the property
+ * @returns the rq value for the property
  */
 export function convertSQLValueToRQValueForProperty(
   serverData: any,
@@ -597,10 +597,10 @@ export function convertSQLValueToRQValueForProperty(
     colValue = propertyDefinition.getDefaultValue();
   }
 
-  // because we are returning from graphql, the information
+  // because we are returning from rq, the information
   // is not prefixed and is rather returned in plain form
   // so the id is all what you get for the property, remember
-  // properties are always in its singular name in graphql form
+  // properties are always in its singular name in rq form
   // the only prefixed things are ITEM_
   // and the properties are into its own object if they
   // happen to be sinking properties
@@ -632,15 +632,15 @@ export function convertSQLValueToElasticSQLValueForProperty(
 }
 
 /**
- * Converts a graphql value into a sql value, that is graphql data into row
+ * Converts a rq value into a sql value, that is rq data into row
  * data to be immediately added to the database as it is
  * @param serverData the server data
  * @param mod the module
  * @param itemDefinition the item definition that contains the property
  * @param include the include within the item definition, or null
  * @param propertyDefinition the property definition in question
- * @param data the graphql data
- * @param oldData the old graphql data
+ * @param data the rq data
+ * @param oldData the old rq data
  * @param uploadsContainer the uploads container that is to be used (to manage files)
  * @param uploadsPrefix the uploads prefix of such container
  * @param dictionary the dictionary to use in full text search mode
@@ -664,29 +664,29 @@ export function convertRQValueToSQLValueForProperty(
   // and this is the value of the property, again, properties
   // are not prefixed, they are either in their own object
   // or in the root
-  let gqlPropertyValue: any = data[propertyDefinition.getId()] as any;
+  let rqPropertyValue: any = data[propertyDefinition.getId()] as any;
 
   // we treat undefined as null, and set it to default
   // if it is coerced into null
   if (
     propertyDefinition.isCoercedIntoDefaultWhenNull() &&
     (
-      gqlPropertyValue === null ||
-      typeof gqlPropertyValue === "undefined"
+      rqPropertyValue === null ||
+      typeof rqPropertyValue === "undefined"
     )
   ) {
-    gqlPropertyValue = propertyDefinition.getDefaultValue() as any;
+    rqPropertyValue = propertyDefinition.getDefaultValue() as any;
   }
   // we also got to set to null any undefined value
-  if (typeof gqlPropertyValue === "undefined") {
-    gqlPropertyValue = null;
+  if (typeof rqPropertyValue === "undefined") {
+    rqPropertyValue = null;
   }
 
   let consumeStreams: ConsumeStreamsFnType;
   const description = propertyDefinition.getPropertyDefinitionDescription();
   if (description.rqRepresentsFile) {
     const oldValue: any = (oldData && oldData[propertyDefinition.getId()]) || null;
-    const newValue = gqlPropertyValue;
+    const newValue = rqPropertyValue;
     if (description.rq.array) {
       const processedValue = processFileListFor(
         newValue,
@@ -697,7 +697,7 @@ export function convertRQValueToSQLValueForProperty(
         include,
         propertyDefinition,
       );
-      gqlPropertyValue = processedValue.value;
+      rqPropertyValue = processedValue.value;
       consumeStreams = processedValue.consumeStreams;
     } else {
       const processedValue = processSingleFileFor(
@@ -709,7 +709,7 @@ export function convertRQValueToSQLValueForProperty(
         include,
         propertyDefinition,
       );
-      gqlPropertyValue = processedValue.value;
+      rqPropertyValue = processedValue.value;
       consumeStreams = processedValue.consumeStreams;
     }
   } else {
@@ -722,7 +722,7 @@ export function convertRQValueToSQLValueForProperty(
   // we return as it is
   return {
     value: sqlIn({
-      value: gqlPropertyValue,
+      value: rqPropertyValue,
       prefix: include ? include.getPrefixedQualifiedIdentifier() : "",
       serverData,
       appData,
@@ -917,9 +917,9 @@ export function buildElasticStrSearchQueryForProperty(
 
 
 // Just in case to avoid sql injection
-// if for some reason the gql security is taken
+// if for some reason the rq security is taken
 // remember that the direction variable, and nulls, comes directly
-// from the graphql query
+// from the rq query
 const actualDirection = {
   "asc": "ASC",
   "desc": "DESC",

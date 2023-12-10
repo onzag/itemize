@@ -227,23 +227,6 @@ class ActualUserActioner extends React.Component<IActualUserActionerProps, IActu
       }
     }
 
-    // we build our graphql query
-    // const data = await rqQuery(
-    //   buildGqlQuery(
-    //     {
-    //       name: "send_validate",
-    //       args: {
-    //         // with the token
-    //         token: this.props.token,
-    //         type,
-    //       },
-    //       fields: {
-    //         status: {},
-    //       },
-    //     },
-    //   ),
-    // );
-
     // and now we try to see if we have an error
     const error: EndpointErrorType = data.error;
 
@@ -307,21 +290,6 @@ class ActualUserActioner extends React.Component<IActualUserActionerProps, IActu
       }
     }
 
-    // execute the send reset password query
-    // const data = await rqQuery(
-    //   buildGqlQuery(
-    //     {
-    //       name: "send_reset_password",
-    //       args: {
-    //         [type]: propertyValue,
-    //       },
-    //       fields: {
-    //         status: {},
-    //       },
-    //     },
-    //   ),
-    // );
-
     // let's get a possible error
     const error: EndpointErrorType = data.error;
 
@@ -371,21 +339,6 @@ class ActualUserActioner extends React.Component<IActualUserActionerProps, IActu
       }
     }
 
-    // execute the send reset password query
-    // const data = await rqQuery(
-    //   buildGqlQuery(
-    //     {
-    //       name: "validate",
-    //       args: {
-    //         user_id: this.props.userContext.forId,
-    //         random_id: randomId,
-    //       },
-    //       fields: {
-    //         status: {},
-    //       },
-    //     },
-    //   ),
-    // );
     const error: EndpointErrorType = data.error;
 
     if (error) {
@@ -454,20 +407,6 @@ class ActualUserActioner extends React.Component<IActualUserActionerProps, IActu
         }
       }
     }
-
-
-    // // do the reset password call, also passing our token
-    // const data = await rqQuery(
-    //   buildGqlQuery(
-    //     {
-    //       name: "reset_password",
-    //       args,
-    //       fields: {
-    //         status: {},
-    //       },
-    //     },
-    //   ),
-    // );
 
     // same as before we handle the error this way
     const error: EndpointErrorType = data.error;

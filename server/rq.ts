@@ -3,7 +3,7 @@ import type { RQArg, RQField, RQRootSchema } from "../base/Root/rq";
 import { ENDPOINT_ERRORS, MAX_FIELD_SIZE, MAX_FILES_PER_REQUEST, MAX_FILE_SIZE } from "../constants";
 import busboy from "busboy";
 import { logger } from "./logger";
-import { ReadStreamOptions, WriteStream, ReadStream } from "fs-capacitor";
+import { ReadStreamOptions, WriteStream, ReadStream } from "./fs-capacitor";
 import { EndpointError, EndpointErrorType } from "../base/errors";
 import { IRQArgs, IRQEndpointValue, IRQRequestFields, IRQValue, RQArgsValue } from "../rq-querier";
 
@@ -293,7 +293,7 @@ function processFields(
 
 /**
  * The rq system is used to be a simplified version
- * of a graphql client with upload potential that doesn't need
+ * of a rq client with upload potential that doesn't need
  * a custom format and is optimized for simplicity
  * 
  * @param options 
@@ -444,6 +444,13 @@ export function rqSystem(options: {
         // try to parse it
         try {
           rqRequest = JSON.parse(val);
+
+          if (typeof rqRequest !== "object" || Array.isArray(rqRequest) || rqRequest === null) {
+            exit({
+              message: "Rq field should be object",
+              code: ENDPOINT_ERRORS.UNSPECIFIED,
+            }, true);
+          }
         } catch (err) {
           // if not that's a deadly error, no way to process that thing
           exit({

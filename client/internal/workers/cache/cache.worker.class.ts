@@ -109,9 +109,9 @@ export interface ICacheMatchType {
  */
 export interface ICachedSearchResult {
   /**
-   * The graphql value that it emulates from the server side
+   * The rq value that it emulates from the server side
    */
-  gqlValue: IRQEndpointValue;
+  rqValue: IRQEndpointValue;
   /**
    * Whether the data might be stale, as in old data that needs
    * to be rechecked an update
@@ -1565,7 +1565,7 @@ export default class CacheWorker {
    * @param queryName the query name that is necessary to match against
    * @param id the id of the item definition instance
    * @param version the version of the item definition instance
-   * @param requestedFields the requested fields from graphql, optional the function
+   * @param requestedFields the requested fields from rq, optional the function
    * will only return if it contains all those requested fields
    */
   public async getCachedValue(
@@ -1965,7 +1965,7 @@ export default class CacheWorker {
         // we need to remove the specifics of the search
         // as we are caching everything to the given criteria
         // and then using client side to filter
-        const actualArgsToUseInGQLSearch: IRQArgs = {
+        const actualArgsToUseInRQSearch: IRQArgs = {
           token: searchArgs.token,
           language: searchArgs.language,
           order_by: {
@@ -1980,24 +1980,24 @@ export default class CacheWorker {
         };
 
         if (cachePolicy === "by-owner" || cachePolicy === "by-owner-and-parent") {
-          actualArgsToUseInGQLSearch.created_by = searchArgs.created_by;
+          actualArgsToUseInRQSearch.created_by = searchArgs.created_by;
         }
 
         if (cachePolicy === "by-parent" || cachePolicy === "by-owner-and-parent") {
-          actualArgsToUseInGQLSearch.parent_type = searchArgs.parent_type;
-          actualArgsToUseInGQLSearch.parent_id = searchArgs.parent_id;
-          actualArgsToUseInGQLSearch.parent_version = searchArgs.parent_version;
+          actualArgsToUseInRQSearch.parent_type = searchArgs.parent_type;
+          actualArgsToUseInRQSearch.parent_id = searchArgs.parent_id;
+          actualArgsToUseInRQSearch.parent_version = searchArgs.parent_version;
         }
 
         if (cachePolicy === "by-property") {
-          actualArgsToUseInGQLSearch["SEARCH_" + trackedProperty] = cachePropertyValue;
+          actualArgsToUseInRQSearch["SEARCH_" + trackedProperty] = cachePropertyValue;
         }
 
         // we request the server for this, in this case
         // it might not have been able to connect
         const query = buildRQQuery(this.root.getRQSchema(), {
           name: searchQueryName,
-          args: actualArgsToUseInGQLSearch,
+          args: actualArgsToUseInRQSearch,
           fields: {
             records: {
               id: {},
@@ -2021,7 +2021,7 @@ export default class CacheWorker {
         if (firstServerValue.errors) {
           // return it
           return {
-            gqlValue: firstServerValue,
+            rqValue: firstServerValue,
             dataMightBeStale: false,
             lastModified: null,
             sourceRecords: null,
@@ -2043,10 +2043,10 @@ export default class CacheWorker {
         // there are still more results to process and we need more batches
         while (resultsCount > resultsToProcess.length) {
           // now let's try to get these batches
-          actualArgsToUseInGQLSearch.until = oldestCreatedAt;
+          actualArgsToUseInRQSearch.until = oldestCreatedAt;
           const query = buildRQQuery(this.root.getRQSchema(), {
             name: searchQueryName,
-            args: actualArgsToUseInGQLSearch,
+            args: actualArgsToUseInRQSearch,
             fields: {
               records: {
                 id: {},
@@ -2066,7 +2066,7 @@ export default class CacheWorker {
           if (serverValueOfBatch.errors) {
             // return it
             return {
-              gqlValue: serverValueOfBatch,
+              rqValue: serverValueOfBatch,
               dataMightBeStale: false,
               lastModified: null,
               sourceRecords: null,
@@ -2114,7 +2114,7 @@ export default class CacheWorker {
             const records = searchResponse.filteredRecords;
             const results = searchResponse.filteredResults;
             const sourceResults = searchResponse.sourceResults;
-            const gqlValue: IRQEndpointValue = {
+            const rqValue: IRQEndpointValue = {
               data: {
                 [searchQueryName]: {
                   records,
@@ -2128,7 +2128,7 @@ export default class CacheWorker {
             };
 
             return {
-              gqlValue,
+              rqValue,
               dataMightBeStale,
               lastModified,
               sourceRecords: resultsToProcess,
@@ -2148,7 +2148,7 @@ export default class CacheWorker {
 
       // yet some other errors might come here
       // we return an unspecified error if we hit an error
-      const gqlValue: IRQEndpointValue = {
+      const rqValue: IRQEndpointValue = {
         data: null,
         errors: [
           {
@@ -2161,7 +2161,7 @@ export default class CacheWorker {
       };
 
       return {
-        gqlValue,
+        rqValue,
         dataMightBeStale,
         lastModified,
         sourceRecords: null,
@@ -2214,7 +2214,7 @@ export default class CacheWorker {
           };
           polyfilled = true;
         } else {
-          const gqlValue: IRQEndpointValue = {
+          const rqValue: IRQEndpointValue = {
             data: null,
             errors: [
               {
@@ -2226,7 +2226,7 @@ export default class CacheWorker {
             ],
           };
           return {
-            gqlValue,
+            rqValue,
             dataMightBeStale,
             lastModified,
             sourceRecords: null,
@@ -2300,14 +2300,14 @@ export default class CacheWorker {
       batches[lastBatchIndex].push(uncachedOrOutdatedResultToProcess);
     });
 
-    // now we need to load all those batches into graphql queries
-    let processedBatches: Array<{ gqlValue: IRQEndpointValue, batch: IRQSearchRecord[] }>;
+    // now we need to load all those batches into rq queries
+    let processedBatches: Array<{ rqValue: IRQEndpointValue, batch: IRQSearchRecord[] }>;
     try {
       processedBatches = await Promise.all(batches.map(async (batch) => {
         // makes no sense sending a request with nothing to fetch
         if (batch.length === 0) {
           return {
-            gqlValue: {
+            rqValue: {
               data: {
                 [getListQueryName]: {
                   results: [],
@@ -2335,7 +2335,7 @@ export default class CacheWorker {
           },
         });
         // and execute it
-        const gqlValue = await rqQuery(
+        const rqValue = await rqQuery(
           listQuery,
           // let's not do that, this thing batches
           // because requests are big
@@ -2348,12 +2348,12 @@ export default class CacheWorker {
         );
 
         // return the value, whatever it is, null, error, etc..
-        return { gqlValue, batch };
+        return { rqValue, batch };
       }));
     } catch (err) {
       console.error(err);
 
-      const gqlValue: IRQEndpointValue = {
+      const rqValue: IRQEndpointValue = {
         data: null,
         errors: [
           {
@@ -2365,7 +2365,7 @@ export default class CacheWorker {
         ],
       };
       return {
-        gqlValue,
+        rqValue,
         dataMightBeStale,
         lastModified,
         sourceRecords: null,
@@ -2385,8 +2385,8 @@ export default class CacheWorker {
     // now we call every processed batch
     await Promise.all(processedBatches.map(async (processedBatch) => {
       const originalBatch = processedBatch.batch;
-      const resultingValue = processedBatch.gqlValue;
-      // the resulting value is what gql gave us
+      const resultingValue = processedBatch.rqValue;
+      // the resulting value is what rq gave us
       if (resultingValue.errors) {
         // if there's an error, we use that error as the error
         somethingFailed = true;
@@ -2490,7 +2490,7 @@ export default class CacheWorker {
           } else {
             console.error(err);
 
-            const gqlValue: IRQEndpointValue = {
+            const rqValue: IRQEndpointValue = {
               data: null,
               errors: [
                 {
@@ -2502,7 +2502,7 @@ export default class CacheWorker {
               ],
             };
             return {
-              gqlValue,
+              rqValue,
               dataMightBeStale,
               lastModified,
               sourceRecords: null,
@@ -2519,7 +2519,7 @@ export default class CacheWorker {
       const results = searchResponse.filteredResults;
       const records = searchResponse.filteredRecords;
       const sourceResults = searchResponse.sourceResults;
-      const gqlValue: IRQEndpointValue = {
+      const rqValue: IRQEndpointValue = {
         data: {
           [searchQueryName]: {
             last_modified: lastModified,
@@ -2533,7 +2533,7 @@ export default class CacheWorker {
       };
 
       return {
-        gqlValue,
+        rqValue,
         dataMightBeStale,
         lastModified,
         sourceResults,
@@ -2542,8 +2542,8 @@ export default class CacheWorker {
       };
     } else if (error) {
       // if we managed to catch an error, we pretend
-      // to be graphql
-      const gqlValue: IRQEndpointValue = {
+      // to be rq
+      const rqValue: IRQEndpointValue = {
         data: null,
         errors: [
           {
@@ -2552,7 +2552,7 @@ export default class CacheWorker {
         ],
       };
       return {
-        gqlValue,
+        rqValue,
         dataMightBeStale,
         lastModified,
         sourceRecords: null,
@@ -2565,7 +2565,7 @@ export default class CacheWorker {
       // of connection failure (or database error)
       // we return an unspecified error if we hit an error
       // actually it seems impossible to get to this state
-      const gqlValue: IRQEndpointValue = {
+      const rqValue: IRQEndpointValue = {
         data: null,
         errors: [
           {
@@ -2578,7 +2578,7 @@ export default class CacheWorker {
       };
 
       return {
-        gqlValue,
+        rqValue,
         dataMightBeStale,
         lastModified,
         sourceRecords: null,

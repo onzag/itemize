@@ -277,26 +277,6 @@ class ActualTokenProvider extends React.Component<IActualTokenProviderProps, IAc
       }
     }
 
-    // // we do the token request
-    // const data = await rqQuery(
-    //   buildGqlQuery(
-    //     {
-    //       name: "token",
-    //       args: {
-    //         username,
-    //         password,
-    //         token,
-    //         country: this.props.localeContext.country,
-    //       },
-    //       fields: {
-    //         id: {},
-    //         role: {},
-    //         token: {},
-    //       },
-    //     },
-    //   ),
-    // );
-
     // and get the error
     const error: EndpointErrorType = data.error;
     // maybe it's offline, in which case we don't want to make the user

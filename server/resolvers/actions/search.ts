@@ -7,7 +7,7 @@ import {
   getDictionary,
   serverSideCheckItemDefinitionAgainst,
   validateTokenIsntBlocked,
-  filterAndPrepareGQLValue,
+  filterAndPrepareRQValue,
   retrieveSince,
   checkLimit,
   checkLimiters,
@@ -30,7 +30,7 @@ import {
 import { buildElasticQueryForItemDefinition, buildSQLQueryForItemDefinition, convertSQLValueToRQValueForItemDefinition } from "../../../base/Root/Module/ItemDefinition/sql";
 import { IRQSearchRecord, IRQSearchRecordsContainer, IRQSearchResultsContainer } from "../../../rq-querier";
 import { convertVersionsIntoNullsWhenNecessary } from "../../version-null-value";
-import { flattenRawGQLValueOrFields } from "../../../rq-util";
+import { flattenRawRQValueOrFields } from "../../../rq-util";
 import { NanoSecondComposedDate } from "../../../nanodate";
 import Root from "../../../base/Root";
 import { EndpointError } from "../../../base/errors";
@@ -222,7 +222,7 @@ export async function searchModule(
   let requestedFields: any = null;
   const generalFields = resolverArgs.fields;
   if (opts.traditional) {
-    requestedFields = flattenRawGQLValueOrFields(generalFields.results);
+    requestedFields = flattenRawRQValueOrFields(generalFields.results);
     const fieldsToRequestRawValue = Object.keys(requestedFields);
 
     const requestedFieldsInMod = {};
@@ -748,7 +748,7 @@ export async function searchModule(
 
           return true;
         }).map(async (r) => {
-          const valueToProvide = await filterAndPrepareGQLValue(
+          const valueToProvide = await filterAndPrepareRQValue(
             appData.cache.getServerData(),
             appData,
             r,
@@ -768,7 +768,7 @@ export async function searchModule(
           const itemDefinitionTrigger = appData.triggers.item.io[pathOfThisIdef]
 
           if (moduleTrigger || itemDefinitionTrigger) {
-            const currentWholeValueAsGQL = convertSQLValueToRQValueForItemDefinition(
+            const currentWholeValueAsRQ = convertSQLValueToRQValueForItemDefinition(
               appData.cache.getServerData(),
               appData,
               itemDefinition,
@@ -782,7 +782,7 @@ export async function searchModule(
                 appData,
                 itemDefinition,
                 module: mod,
-                originalValue: currentWholeValueAsGQL,
+                originalValue: currentWholeValueAsRQ,
                 originalValueSQL: r,
                 originalValueBlocked: !!r.blocked_at,
                 requestedUpdate: null,
@@ -817,7 +817,7 @@ export async function searchModule(
                 appData,
                 itemDefinition,
                 module: mod,
-                originalValue: currentWholeValueAsGQL,
+                originalValue: currentWholeValueAsRQ,
                 originalValueSQL: r,
                 originalValueBlocked: !!r.blocked_at,
                 requestedUpdate: null,
@@ -1177,7 +1177,7 @@ export async function searchItemDefinition(
     let requestedFields: any = null;
     const generalFields = resolverArgs.fields;
     if (opts.traditional) {
-      requestedFields = flattenRawGQLValueOrFields(generalFields.results);
+      requestedFields = flattenRawRQValueOrFields(generalFields.results);
       const fieldsToRequestRawValue = Object.keys(requestedFields);
 
       const requestedFieldsInIdef = {};
@@ -1242,7 +1242,7 @@ export async function searchItemDefinition(
         sqlFieldsToRequest.push("last_modified");
       }
       // we need these to get the DATA properly populated
-      // as the filterAndPrepareGQLValue will use of those
+      // as the filterAndPrepareRQValue will use of those
       // to know if the value is blocked to return to user
       if (!sqlFieldsToRequest.includes("blocked_at")) {
         sqlFieldsToRequest.push("blocked_at");
@@ -1724,7 +1724,7 @@ export async function searchItemDefinition(
       const finalResult: IRQSearchResultsContainer = {
         results: await Promise.all(
           baseResult.map(async (r) => {
-            const valueToProvide = await filterAndPrepareGQLValue(
+            const valueToProvide = await filterAndPrepareRQValue(
               appData.cache.getServerData(),
               appData,
               r,
@@ -1742,7 +1742,7 @@ export async function searchItemDefinition(
             const itemDefinitionTrigger = appData.triggers.item.io[pathOfThisIdef]
 
             if (moduleTrigger || itemDefinitionTrigger) {
-              const currentWholeValueAsGQL = convertSQLValueToRQValueForItemDefinition(
+              const currentWholeValueAsRQ = convertSQLValueToRQValueForItemDefinition(
                 appData.cache.getServerData(),
                 appData,
                 itemDefinition,
@@ -1756,7 +1756,7 @@ export async function searchItemDefinition(
                   appData,
                   itemDefinition,
                   module: mod,
-                  originalValue: currentWholeValueAsGQL,
+                  originalValue: currentWholeValueAsRQ,
                   originalValueSQL: r,
                   originalValueBlocked: !!r.blocked_at,
                   requestedUpdate: null,
@@ -1791,7 +1791,7 @@ export async function searchItemDefinition(
                   appData,
                   itemDefinition,
                   module: mod,
-                  originalValue: currentWholeValueAsGQL,
+                  originalValue: currentWholeValueAsRQ,
                   originalValueSQL: r,
                   originalValueBlocked: !!r.blocked_at,
                   requestedUpdate: null,

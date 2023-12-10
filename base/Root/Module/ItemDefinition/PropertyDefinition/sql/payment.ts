@@ -505,7 +505,7 @@ export function paymentSQLSSCacheEqual(arg: ISQLSSCacheEqualInfo) {
 /**
  * Provides a side effect that triggers once a payment status changes, it's created, destroyed
  * or comes into existance, this is the standard type server side effect that occurs when
- * graphql does things to it, and this will trigger what is necessary to  it
+ * rq does things to it, and this will trigger what is necessary to  it
  * @param arg 
  */
 export function paymentSQLSideEffect(arg: ISQLSideEffectType<IPropertyDefinitionSupportedPaymentType>) {
@@ -594,7 +594,7 @@ export function paymentSQLSideEffect(arg: ISQLSideEffectType<IPropertyDefinition
 /**
  * Provides a side effect that triggers once a payment status changes, it's created, destroyed
  * or comes into existance, this is the standard type server side effect that occurs when
- * graphql does things to it, and this will trigger what is necessary to  it
+ * rq does things to it, and this will trigger what is necessary to  it
  * @param arg 
  */
 export function paymentSQLPreSideEffect(arg: ISQLSideEffectType<IPropertyDefinitionSupportedPaymentType>) {

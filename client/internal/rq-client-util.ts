@@ -1,5 +1,5 @@
 /**
- * Contains utilities for building a grapqhl client to interact
+ * Contains utilities for building a rq client to interact
  * with the server, this is meant only for the javascript context
  * itself as it performs a lot of storing, checking and so on
  * @module
@@ -323,7 +323,7 @@ export function getFieldsAndArgs(
       };
     }
   }
-  // and these would be the arguments for the graphql query
+  // and these would be the arguments for the rq query
   const argumentsForQuery: any = {};
 
   if (options.block && typeof options.block.status === "boolean") {
@@ -361,7 +361,7 @@ export function getFieldsAndArgs(
     if (options.includes) {
       Object.keys(options.includes).forEach((iId) => {
         const include = options.itemDefinitionInstance.getIncludeFor(iId);
-        // and now we get the qualified identifier that grapqhl expects
+        // and now we get the qualified identifier that rq expects
         const qualifiedId = include.getQualifiedIdentifier();
         requestFields.DATA[include.getQualifiedExclusionStateIdentifier()] = {};
         requestFields.DATA[qualifiedId] = {};
@@ -450,7 +450,7 @@ export function getFieldsAndArgs(
           }
         }
 
-        // and now we get the qualified identifier that grapqhl expects
+        // and now we get the qualified identifier that rq expects
         const qualifiedId = include.getQualifiedIdentifier();
         const qualifiedExlcusionStateId = include.getQualifiedExclusionStateIdentifier();
         const exclusionState = currentOverride && currentOverride.exclusionState ? currentOverride.exclusionState : include.getExclusionState(options.forId || null, options.forVersion || null);
@@ -1009,9 +1009,9 @@ export async function runGetQueryFor(
     fields: arg.fields,
   })
 
-  // now we get the gql value using the gql query function
+  // now we get the rq value using the rq query function
   // and this function will always run using the network
-  const gqlValue = await rqQuery(query, {
+  const rqValue = await rqQuery(query, {
     merge: arg.waitAndMerge,
     progresser: arg.progresser,
   });
@@ -1019,12 +1019,12 @@ export async function runGetQueryFor(
   // now we got to check for errors
   let error: EndpointErrorType = null;
 
-  if (gqlValue.errors) {
+  if (rqValue.errors) {
     // if the server itself returned an error, we use that error
-    error = gqlValue.errors[0].error;
+    error = rqValue.errors[0].error;
   }
 
-  const value = (gqlValue.data && gqlValue.data[queryName]) || null;
+  const value = (rqValue.data && rqValue.data[queryName]) || null;
 
   if (!error) {
     const mergedResults = await storeAndCombineStorageValuesFor(
@@ -1127,9 +1127,9 @@ export async function runDeleteQueryFor(
     },
   })
 
-  // now we get the gql value using the gql query function
+  // now we get the rq value using the rq query function
   // and this function will always run using the network
-  const gqlValue = await rqQuery(query, {
+  const rqValue = await rqQuery(query, {
     merge: arg.waitAndMerge,
     progresser: arg.progresser,
   });
@@ -1137,9 +1137,9 @@ export async function runDeleteQueryFor(
   // now we got to check for errors
   let error: EndpointErrorType = null;
 
-  if (gqlValue.errors) {
+  if (rqValue.errors) {
     // if the server itself returned an error, we use that error
-    error = gqlValue.errors[0].error;
+    error = rqValue.errors[0].error;
   }
 
   if (!error) {
@@ -1289,7 +1289,7 @@ function preserveBlobFilesInValue(
 /**
  * Runs an add query for a given item definition
  * @param arg the arg information
- * @param arg.args the graphql args for the add query that contains the information
+ * @param arg.args the rq args for the add query that contains the information
  * for the stuff we want to add, contains the values, as well as the policies
  * @param arg.fields the fields we want to retrieve as a result of our addition
  * @param arg.itemDefinition the item definition we are adding for
@@ -1329,9 +1329,9 @@ export async function runAddQueryFor(
   const query = getAddQueryFor(arg);
   const queryName = query.getQueryByIndex(0).name;
 
-  // now we get the gql value using the gql query function
+  // now we get the rq value using the rq query function
   // and this function will always run using the network
-  const gqlValue = await rqQuery(query, {
+  const rqValue = await rqQuery(query, {
     merge: arg.waitAndMerge,
     progresser: arg.progresser,
   });
@@ -1339,12 +1339,12 @@ export async function runAddQueryFor(
   // now we got to check for errors
   let error: EndpointErrorType = null;
 
-  if (gqlValue.errors) {
+  if (rqValue.errors) {
     // if the server itself returned an error, we use that error
-    error = gqlValue.errors[0].error;
+    error = rqValue.errors[0].error;
   }
 
-  const value = (gqlValue.data && gqlValue.data[queryName]) || null;
+  const value = (rqValue.data && rqValue.data[queryName]) || null;
   preserveBlobFilesInValue(arg.itemDefinition, arg.args, value);
 
   if (!error) {
@@ -1446,9 +1446,9 @@ export async function runEditQueryFor(
   const query = getEditQueryFor(arg);
   const queryName = query.getQueryByIndex(0).name;
 
-  // now we get the gql value using the gql query function
+  // now we get the rq value using the rq query function
   // and this function will always run using the network
-  const gqlValue = await rqQuery(query, {
+  const rqValue = await rqQuery(query, {
     merge: arg.waitAndMerge,
     progresser: arg.progresser,
   });
@@ -1456,12 +1456,12 @@ export async function runEditQueryFor(
   // now we got to check for errors
   let error: EndpointErrorType = null;
 
-  if (gqlValue.errors) {
+  if (rqValue.errors) {
     // if the server itself returned an error, we use that error
-    error = gqlValue.errors[0].error;
+    error = rqValue.errors[0].error;
   }
 
-  const value = (gqlValue.data && gqlValue.data[queryName]) || null;
+  const value = (rqValue.data && rqValue.data[queryName]) || null;
   preserveBlobFilesInValue(arg.itemDefinition, arg.args, value);
 
   if (!error) {
@@ -1772,7 +1772,7 @@ export async function runSearchQueryFor(
   // in practice the last modified of the last record
   let lastModified: string = null;
 
-  let gqlValue: IRQEndpointValue;
+  let rqValue: IRQEndpointValue;
   let cached: boolean = false;
   let polyfilled: boolean = false;
   let useCacheWorker: boolean = serverEnvironment ? false : (
@@ -1841,7 +1841,7 @@ export async function runSearchQueryFor(
       // now if we have a mismatch rule
       if (
         arg.cacheStoreMetadataMismatchAction &&
-        !cacheWorkerGivenSearchValue.gqlValue.errors
+        !cacheWorkerGivenSearchValue.rqValue.errors
       ) {
         // let's get our current metadata
         const currentMetadataRaw = await CacheWorkerInstance.instance.readSearchMetadata(
@@ -1943,7 +1943,7 @@ export async function runSearchQueryFor(
       if (
         arg.cacheStoreMetadata &&
         cacheWorkerGivenSearchValue &&
-        !cacheWorkerGivenSearchValue.gqlValue.errors &&
+        !cacheWorkerGivenSearchValue.rqValue.errors &&
         metadataWasMismatch &&
         shouldWriteMetadata
       ) {
@@ -1969,7 +1969,7 @@ export async function runSearchQueryFor(
       } else {
         // cached depends on whether we got no errors
         // errors indicate it didn't cache
-        cached = !cacheWorkerGivenSearchValue.gqlValue.errors;
+        cached = !cacheWorkerGivenSearchValue.rqValue.errors;
         polyfilled = cacheWorkerGivenSearchValue.polyfilled;
 
         // last record date of the given record
@@ -1979,15 +1979,15 @@ export async function runSearchQueryFor(
         // note that this value doesn't contain the count, it contains
         // the limit and the offset but not the count that is because
         // the count is considered irrelevant for these cache values
-        gqlValue = cacheWorkerGivenSearchValue.gqlValue;
+        rqValue = cacheWorkerGivenSearchValue.rqValue;
         // example the original search was traditional but the worker
         // cannot use that we need to patch
-        if (queryNameForCacheWorker !== queryName && gqlValue && gqlValue.data) {
-          gqlValue.data[queryName] = gqlValue.data[queryNameForCacheWorker];
-          delete gqlValue.data[queryNameForCacheWorker];
+        if (queryNameForCacheWorker !== queryName && rqValue && rqValue.data) {
+          rqValue.data[queryName] = rqValue.data[queryNameForCacheWorker];
+          delete rqValue.data[queryNameForCacheWorker];
         }
 
-        if (gqlValue && gqlValue.data) {
+        if (rqValue && rqValue.data) {
           if (cacheWorkerGivenSearchValue.dataMightBeStale && !searchOptions.preventCacheStaleFeeback) {
             if (arg.cachePolicy === "by-owner") {
               searchOptions.remoteListener.requestOwnedSearchFeedbackFor({
@@ -2030,7 +2030,7 @@ export async function runSearchQueryFor(
   // not using cache worker despite cache policy not being none
   // and being asked not to fallback, must be unsupported
   if (!useCacheWorker && arg.cachePolicy !== "none" && arg.cacheDoNotFallbackToSimpleSearch) {
-    gqlValue = null;
+    rqValue = null;
     internalError = {
       code: "UNSPECIFIED",
       message: "There is no support for cache worker yet the search did not fallback to simple search",
@@ -2055,14 +2055,14 @@ export async function runSearchQueryFor(
       },
     });
 
-    // now we get the gql value using the gql query function
+    // now we get the rq value using the rq query function
     // and this function will always run using the network
-    gqlValue = await rqQuery(query, {
+    rqValue = await rqQuery(query, {
       merge: arg.waitAndMerge,
       progresser: arg.progresser,
     });
 
-    const data = gqlValue && gqlValue.data && gqlValue.data[queryName];
+    const data = rqValue && rqValue.data && rqValue.data[queryName];
     if (data) {
       lastModified = data.last_modified as string;
     }
@@ -2082,20 +2082,20 @@ export async function runSearchQueryFor(
       },
     });
 
-    // now we get the gql value using the gql query function
+    // now we get the rq value using the rq query function
     // and this function will always run using the network
-    gqlValue = await rqQuery(query, {
+    rqValue = await rqQuery(query, {
       merge: arg.waitAndMerge,
       progresser: arg.progresser,
     });
 
-    const data = gqlValue && gqlValue.data && gqlValue.data[queryName];
+    const data = rqValue && rqValue.data && rqValue.data[queryName];
     if (data) {
       lastModified = data.last_modified as string;
     }
   }
 
-  const data = gqlValue && gqlValue.data && gqlValue.data[queryName];
+  const data = rqValue && rqValue.data && rqValue.data[queryName];
   let limit: number = (data && data.limit as number);
   let offset: number = (data && data.offset as number);
   let count: number = (data && data.count as number);
@@ -2128,9 +2128,9 @@ export async function runSearchQueryFor(
   // now we got to check for errors
   let error: EndpointErrorType = internalError || null;
 
-  if (gqlValue && gqlValue.errors) {
+  if (rqValue && rqValue.errors) {
     // if the server itself returned an error, we use that error
-    error = gqlValue.errors[0].error;
+    error = rqValue.errors[0].error;
   }
 
   // the cache worker is actually always returning

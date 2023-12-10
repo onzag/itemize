@@ -7,7 +7,7 @@
 import { ISQLTableRowValue } from "../../base/Root/sql";
 import { IRQRequestFields, IRQSearchRecord, IRQSearchResultsContainer, IRQValue } from "../../rq-querier";
 import ItemDefinition, { IItemSearchStateType, ItemDefinitionIOActions } from "../../base/Root/Module/ItemDefinition";
-import { filterAndPrepareGQLValue } from "../resolvers/basic";
+import { filterAndPrepareRQValue } from "../resolvers/basic";
 import { IAppDataType } from "../../server";
 import { logger } from "../logger";
 import { ENDPOINT_ERRORS, PROTECTED_RESOURCES, UNSPECIFIED_OWNER } from "../../constants";
@@ -739,7 +739,7 @@ export class Collector {
     // which is possible
     if (fields) {
       // we build the value for the given role with the given fields
-      const value = rowValue === null ? null : await filterAndPrepareGQLValue(
+      const value = rowValue === null ? null : await filterAndPrepareRQValue(
         this.appData.cache.getServerData(),
         this.appData,
         rowValue,

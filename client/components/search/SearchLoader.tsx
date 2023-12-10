@@ -8,7 +8,7 @@
 import React, { useContext, useEffect } from "react";
 import { ItemContext, SearchItemValueContext, IItemProviderProps } from "../../providers/item";
 import equals from "deep-equal";
-import ItemDefinition, { IItemDefinitionGQLValueType } from "../../../base/Root/Module/ItemDefinition";
+import ItemDefinition, { IItemDefinitionRQValueType } from "../../../base/Root/Module/ItemDefinition";
 import { PREFIX_GET_LIST, PREFIX_GET } from "../../../constants";
 import CacheWorkerInstance from "../../internal/workers/cache";
 import { requestFieldsAreContained, deepMerge } from "../../../rq-util";
@@ -28,10 +28,10 @@ interface IItemProviderPropsWithKey extends
 }
 
 /**
- * Basically a normal graphql search record but with information on
+ * Basically a normal rq search record but with information on
  * how to populate it, aka its own item definition and the provider props
  */
-interface IGQLSearchRecordWithPopulateData extends IRQSearchRecord {
+interface IRQSearchRecordWithPopulateData extends IRQSearchRecord {
   /**
    * The provider properties used to instantiate your own item definition
    * data
@@ -55,7 +55,7 @@ interface IGQLSearchRecordWithPopulateData extends IRQSearchRecord {
    * 
    * The applied value might be null if no value applied
    */
-  getAppliedValue: () => IItemDefinitionGQLValueType;
+  getAppliedValue: () => IItemDefinitionRQValueType;
   /**
    * The search result that you have retrieved
    */
@@ -94,7 +94,7 @@ export interface ISearchLoaderArg {
    * the search records are records that allow to be requested
    * as well as organized, partial information of a search result
    */
-  searchRecords: IGQLSearchRecordWithPopulateData[];
+  searchRecords: IRQSearchRecordWithPopulateData[];
   /**
    * The page count given the number of total pages, despite
    * this not being a pagination based mechanism, still
@@ -1072,7 +1072,7 @@ class ActualSearchLoader extends React.Component<IActualSearchLoaderProps, IActu
                 getAppliedValue: () => {
                   return itemDefinition.getRQAppliedValue(searchRecord.id, searchRecord.version || null);
                 },
-              } as IGQLSearchRecordWithPopulateData;
+              } as IRQSearchRecordWithPopulateData;
             }),
             pageCount,
             accessibleCount,

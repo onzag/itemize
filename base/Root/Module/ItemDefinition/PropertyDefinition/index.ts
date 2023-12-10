@@ -449,7 +449,7 @@ async function clientSideIndexChecker(
     property.getParentItemDefinition().getQualifiedPathName();
 
   // and we call the index check function that should be present on the server side
-  // /rest endpoint, this is not a graphql endpoint, it's just rest
+  // /rest endpoint, this is not a rq endpoint, it's just rest
   try {
     // This should never be cached, indexes might change on the fly
     const result = await fetch("/rest/index-check/" + qualifiedParentName + "/" + property.getId(), {
@@ -1071,14 +1071,14 @@ export default class PropertyDefinition {
     let requestFields = {};
     // now we get the description for this field
     const propertyDescription = this.getPropertyDefinitionDescription();
-    // if there are graphql fields defined
+    // if there are rq fields defined
     if (propertyDescription.rq) {
       // we add each one of them
-      Object.keys(propertyDescription.rq.ownFields).forEach((field) => {
+      propertyDescription.rq.ownFields && Object.keys(propertyDescription.rq.ownFields).forEach((field) => {
         requestFields[field] = {};
       });
       // we add each one of them
-      Object.keys(propertyDescription.rq.stdFields).forEach((field) => {
+      propertyDescription.rq.stdFields && Object.keys(propertyDescription.rq.stdFields).forEach((field) => {
         requestFields[field] = {};
       });
     }

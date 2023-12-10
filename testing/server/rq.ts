@@ -50,7 +50,7 @@ class ModuleTest extends Test {
 
     // idefs.forEach((idef) => {
     //   this.it(
-    //     "Should have a GET/ADD/EDIT/DELETE graphql endpoint for " + idef.getPath(),
+    //     "Should have a GET/ADD/EDIT/DELETE rq endpoint for " + idef.getPath(),
     //     () => {
     //       const endpoint = PREFIX_GET + idef.getQualifiedPathName();
     //       const foundField = this.getSchemaFields().query.some((f) => f.name === endpoint);
@@ -114,9 +114,9 @@ export class RQTest extends Test {
     let schemaMutationFields: ISchemaFields = null;
 
     // this.it(
-    //   "Should have a graphql endpoint",
+    //   "Should have a rq endpoint",
     //   async () => {
-    //     const response = await fetchNode(this.fullHost + "/graphql", {
+    //     const response = await fetchNode(this.fullHost + "/rq", {
     //       method: "POST",
     //       body: JSON.stringify({ query: "query{__schema{queryType{name}}}", variables: null }),
     //       headers: {
@@ -126,9 +126,9 @@ export class RQTest extends Test {
 
     //     assert.strictEqual(response.status, 200, "Did not return 200 OK");
 
-    //     const gqlAnswer = await response.json();
+    //     const rqAnswer = await response.json();
 
-    //     assert.deepStrictEqual(gqlAnswer, {
+    //     assert.deepStrictEqual(rqAnswer, {
     //       data: {
     //         __schema: {
     //           queryType: {
@@ -141,7 +141,7 @@ export class RQTest extends Test {
     // );
 
     // this.it(
-    //   "Should support formdata protocol in graphql",
+    //   "Should support formdata protocol in rq",
     //   async () => {
 
     //     // building the form data
@@ -150,16 +150,16 @@ export class RQTest extends Test {
     //     formData.append("operations", JSON.stringify({ query: "query{__schema{queryType{name}}}", variables: null }));
     //     formData.append("map", "{}");
 
-    //     const response = await fetchNode(this.fullHost + "/graphql", {
+    //     const response = await fetchNode(this.fullHost + "/rq", {
     //       method: "POST",
     //       body: formData,
     //     });
 
     //     assert.strictEqual(response.status, 200, "Did not return 200 OK");
 
-    //     const gqlAnswer = await response.json();
+    //     const rqAnswer = await response.json();
 
-    //     assert.deepStrictEqual(gqlAnswer, {
+    //     assert.deepStrictEqual(rqAnswer, {
     //       data: {
     //         __schema: {
     //           queryType: {
@@ -175,7 +175,7 @@ export class RQTest extends Test {
     //   "Should return all supported schema query and mutation fields",
     //   async () => {
     //     const schemaQuery = "query {__schema {queryType{fields {name}}mutationType{fields {name}}}}";
-    //     const response = await fetchNode(this.fullHost + "/graphql", {
+    //     const response = await fetchNode(this.fullHost + "/rq", {
     //       method: "POST",
     //       body: JSON.stringify({ query: schemaQuery, variables: null }),
     //       headers: {
@@ -185,10 +185,10 @@ export class RQTest extends Test {
 
     //     assert.strictEqual(response.status, 200, "Did not return 200 OK");
 
-    //     const gqlAnswer = await response.json();
+    //     const rqAnswer = await response.json();
 
-    //     schemaFields = gqlAnswer.data.__schema.queryType.fields;
-    //     schemaMutationFields = gqlAnswer.data.__schema.mutationType.fields;
+    //     schemaFields = rqAnswer.data.__schema.queryType.fields;
+    //     schemaMutationFields = rqAnswer.data.__schema.mutationType.fields;
 
     //     if (!Array.isArray(schemaFields)) {
     //       assert.fail("Schema query fields were not an array");

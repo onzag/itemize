@@ -16,7 +16,7 @@ import {
   checkUserExists,
   validateParentingRules,
   runPolicyCheck,
-  splitArgsInGraphqlQuery,
+  splitArgsInRQQuery,
   validateContainerIdIsReal,
   defaultTriggerForbiddenFunction,
   defaultTriggerInvalidForbiddenFunction,
@@ -31,7 +31,7 @@ import {
 import {
   convertSQLValueToRQValueForItemDefinition,
 } from "../../../base/Root/Module/ItemDefinition/sql";
-import { flattenRawGQLValueOrFields } from "../../../rq-util";
+import { flattenRawRQValueOrFields } from "../../../rq-util";
 import { ISQLTableRowValue } from "../../../base/Root/sql";
 import { EndpointError } from "../../../base/errors";
 import { IRQArgs } from "../../../rq-querier";
@@ -194,7 +194,7 @@ export async function addItemDefinition(
     // now we see which fields are being requested for the answer after adding, first
     // we flatten the fields, remember that we have external and internal fields
     // contained in the DATA value, we flatten that first
-    const requestedFields = flattenRawGQLValueOrFields(resolverArgs.fields);
+    const requestedFields = flattenRawRQValueOrFields(resolverArgs.fields);
 
     // now we extract the fields that we are actually adding to the item
     // definition, that is what is valid for adding and nothing else
@@ -286,7 +286,7 @@ export async function addItemDefinition(
     );
 
     // if all that has succeed we take the item definition and apply
-    // the value from graphql, now you should understand how this is handled
+    // the value from rq, now you should understand how this is handled
     // the values are applied so that the whole item definition value is
     // fulfilled
     itemDefinition.applyValue(null, null, resolverArgs.args, false, null, false);
@@ -309,8 +309,8 @@ export async function addItemDefinition(
         version: null,
         role: tokenData.role,
         userId: tokenData.id,
-        gqlArgValue: resolverArgs.args,
-        gqlFlattenedRequestedFiels: requestedFields,
+        rqArgValue: resolverArgs.args,
+        rqFlattenedRequestedFields: requestedFields,
         appData,
         parentModule,
         parentType: resolverArgs.args.parent_type,
@@ -364,7 +364,7 @@ export async function addItemDefinition(
     // now we need to setup what we want to convert, since the
     // converting functions can take the whole args with its extra
     // stuff by default it's just the whole args
-    let gqlValueToConvert: IRQArgs = resolverArgs.args;
+    let rqValueToConvert: IRQArgs = resolverArgs.args;
 
     // however now we need to check if we have triggers, for that we get
     // the absolute paths
@@ -385,20 +385,20 @@ export async function addItemDefinition(
     if (
       itemDefinitionTrigger || moduleTrigger
     ) {
-      // we split the args in the graphql query for that which belongs to the
+      // we split the args in the rq query for that which belongs to the
       // item definition and that which is extra
-      [itemDefinitionSpecificArgs, extraArgs] = splitArgsInGraphqlQuery(
+      [itemDefinitionSpecificArgs, extraArgs] = splitArgsInRQQuery(
         itemDefinition,
         resolverArgs.args,
       );
       // so now we just want to convert the values setup here, as done
       // some heavy lifting
-      gqlValueToConvert = itemDefinitionSpecificArgs;
+      rqValueToConvert = itemDefinitionSpecificArgs;
       // and if we have a module trigger
       if (moduleTrigger) {
         // we execute the trigger
         const isNowParenting = !!(
-          gqlValueToConvert.parent_id || gqlValueToConvert.parent_type || gqlValueToConvert.parent_version
+          rqValueToConvert.parent_id || rqValueToConvert.parent_type || rqValueToConvert.parent_version
         );
         const newValueAccordingToModule = await moduleTrigger({
           language: resolverArgs.args.language,
@@ -409,12 +409,12 @@ export async function addItemDefinition(
           originalValue: null,
           originalValueSQL: null,
           originalValueBlocked: null,
-          requestedUpdate: gqlValueToConvert,
+          requestedUpdate: rqValueToConvert,
           requestedUpdateCreatedBy: ownerId,
           requestedUpdateParent: isNowParenting ? {
-            id: gqlValueToConvert.parent_id as string,
-            version: gqlValueToConvert.parent_version as string,
-            type: gqlValueToConvert.parent_type as string,
+            id: rqValueToConvert.parent_id as string,
+            version: rqValueToConvert.parent_version as string,
+            type: rqValueToConvert.parent_type as string,
             value: knownParent,
           } : null,
           requestedUpdateToBlock: false,
@@ -445,14 +445,14 @@ export async function addItemDefinition(
         // and if we have a new value
         if (newValueAccordingToModule) {
           // that will be our new value
-          gqlValueToConvert = newValueAccordingToModule;
+          rqValueToConvert = newValueAccordingToModule;
         }
       }
       // same with the item definition
       if (itemDefinitionTrigger) {
         // we call the trigger
         const isNowParenting = !!(
-          gqlValueToConvert.parent_id || gqlValueToConvert.parent_type || gqlValueToConvert.parent_version
+          rqValueToConvert.parent_id || rqValueToConvert.parent_type || rqValueToConvert.parent_version
         );
         const newValueAccordingToIdef = await itemDefinitionTrigger({
           language: resolverArgs.args.language,
@@ -463,11 +463,11 @@ export async function addItemDefinition(
           originalValue: null,
           originalValueSQL: null,
           originalValueBlocked: null,
-          requestedUpdate: gqlValueToConvert,
+          requestedUpdate: rqValueToConvert,
           requestedUpdateParent: isNowParenting ? {
-            id: gqlValueToConvert.parent_id as string,
-            version: gqlValueToConvert.parent_version as string,
-            type: gqlValueToConvert.parent_type as string,
+            id: rqValueToConvert.parent_id as string,
+            version: rqValueToConvert.parent_version as string,
+            type: rqValueToConvert.parent_type as string,
             value: knownParent,
           } : null,
           requestedUpdateCreatedBy: ownerId,
@@ -498,20 +498,20 @@ export async function addItemDefinition(
         });
         // and make it the new value if such trigger was registered
         if (newValueAccordingToIdef) {
-          gqlValueToConvert = newValueAccordingToIdef;
+          rqValueToConvert = newValueAccordingToIdef;
         }
       }
     }
 
     const isNowParenting = !!(
-      gqlValueToConvert.parent_id || gqlValueToConvert.parent_type || gqlValueToConvert.parent_version
+      rqValueToConvert.parent_id || rqValueToConvert.parent_type || rqValueToConvert.parent_version
     );
 
     // the creation will ensure that the for_id and version
     // are valid and do not create strange data structures
     const value = await appData.cache.requestCreation(
       itemDefinition,
-      gqlValueToConvert,
+      rqValueToConvert,
       {
         forId: forId || resolverArgs.args.for_id || null,
         version: typeof forVersion !== "undefined" ? forVersion : (resolverArgs.args.version || null),
@@ -520,9 +520,9 @@ export async function addItemDefinition(
         dictionary,
         containerId,
         parent: isNowParenting ? {
-          id: gqlValueToConvert.parent_id as string,
-          version: gqlValueToConvert.parent_version as string,
-          type: gqlValueToConvert.parent_type as string,
+          id: rqValueToConvert.parent_id as string,
+          version: rqValueToConvert.parent_version as string,
+          type: rqValueToConvert.parent_type as string,
         } : null,
         listenerUUID: resolverArgs.args.listener_uuid || null,
         indexing: resolverArgs.args.indexing || "detached",
@@ -536,12 +536,12 @@ export async function addItemDefinition(
       },
     );
 
-    // now we convert that SQL value to the respective GQL value
+    // now we convert that SQL value to the respective RQ value
     // the reason we pass the requested fields is to filter by the fields
-    // that we actually want, not passing this would make the gql value
+    // that we actually want, not passing this would make the rq value
     // be full (of nulls) our value is incomplete, so we need to
     // pass the requestedFields anyway
-    const gqlValue = convertSQLValueToRQValueForItemDefinition(
+    const rqValue = convertSQLValueToRQValueForItemDefinition(
       appData.cache.getServerData(),
       appData,
       itemDefinition,
@@ -560,17 +560,17 @@ export async function addItemDefinition(
         originalValue: null as any,
         originalValueSQL: null as any,
         originalValueBlocked: null as any,
-        requestedUpdate: gqlValueToConvert,
+        requestedUpdate: rqValueToConvert,
         requestedUpdateParent: isNowParenting ? {
-          id: gqlValueToConvert.parent_id as string,
-          version: gqlValueToConvert.parent_version as string,
-          type: gqlValueToConvert.parent_type as string,
+          id: rqValueToConvert.parent_id as string,
+          version: rqValueToConvert.parent_version as string,
+          type: rqValueToConvert.parent_type as string,
           value: knownParent,
         } : null,
         requestedUpdateCreatedBy: ownerId,
         requestedUpdateToBlock: false,
         requestedUpdateToUnblock: false,
-        newValue: gqlValue,
+        newValue: rqValue,
         newValueSQL: value,
         newValueBlocked: false,
         extraArgs,
@@ -617,17 +617,17 @@ export async function addItemDefinition(
         originalValue: null as any,
         originalValueSQL: null as any,
         originalValueBlocked: null as any,
-        requestedUpdate: gqlValueToConvert,
+        requestedUpdate: rqValueToConvert,
         requestedUpdateToBlock: false,
         requestedUpdateToUnblock: false,
         requestedUpdateParent: isNowParenting ? {
-          id: gqlValueToConvert.parent_id as string,
-          version: gqlValueToConvert.parent_version as string,
-          type: gqlValueToConvert.parent_type as string,
+          id: rqValueToConvert.parent_id as string,
+          version: rqValueToConvert.parent_version as string,
+          type: rqValueToConvert.parent_type as string,
           value: knownParent,
         } : null,
         requestedUpdateCreatedBy: ownerId,
-        newValue: gqlValue,
+        newValue: rqValue,
         newValueSQL: value,
         newValueBlocked: false,
         extraArgs,
@@ -667,7 +667,7 @@ export async function addItemDefinition(
 
     const newRolesManagerWithKnownValue = rolesManager.subEnvironment({
       environment: CustomRoleGranterEnvironment.RETRIEVING,
-      value: gqlValue,
+      value: rqValue,
       customId: null,
       id: value.id,
       version: value.version || null,
@@ -691,12 +691,12 @@ export async function addItemDefinition(
       tokenData.id,
       finalOwner,
       newRolesManagerWithKnownValue,
-      gqlValue,
+      rqValue,
     );
 
     const finalOutput = {
-      DATA: gqlValue,
-      ...gqlValue,
+      DATA: rqValue,
+      ...rqValue,
     };
 
     if (

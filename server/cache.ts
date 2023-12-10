@@ -17,8 +17,8 @@ import { convertVersionsIntoNullsWhenNecessary } from "./version-null-value";
 import ItemDefinition from "../base/Root/Module/ItemDefinition";
 import { Listener } from "./listener";
 import Root from "../base/Root";
-import { convertGQLValueToSQLValueForItemDefinition, convertSQLValueToRQValueForItemDefinition } from "../base/Root/Module/ItemDefinition/sql";
-import { convertGQLValueToSQLValueForModule } from "../base/Root/Module/sql";
+import { convertRQValueToSQLValueForItemDefinition, convertSQLValueToRQValueForItemDefinition } from "../base/Root/Module/ItemDefinition/sql";
+import { convertRQValueToSQLValueForModule } from "../base/Root/Module/sql";
 import { deleteEverythingInFilesContainerId } from "../base/Root/Module/ItemDefinition/PropertyDefinition/sql/file-management";
 import { IOwnedParentedSearchRecordsEvent, IOwnedSearchRecordsEvent, IParentedSearchRecordsEvent, IPropertySearchRecordsEvent } from "../base/remote-protocol";
 import { IChangedFeedbackEvent } from "../base/remote-protocol";
@@ -111,7 +111,7 @@ export interface ICopyOptions extends IWritingOptions {
 
 export interface IUpdateOptions extends IBasicOptions {
   currentSQLValue?: ISQLTableRowValue;
-  currentGQLValue?: IRQValue;
+  currentrqValue?: IRQValue;
   editedBy?: string;
   language: string;
   dictionary: string;
@@ -1006,7 +1006,7 @@ export class Cache {
 
     const isSQLType = !!value.MODULE_ID;
 
-    const gqlValue = isSQLType ? (
+    const rqValue = isSQLType ? (
       convertSQLValueToRQValueForItemDefinition(
         this.serverData,
         this.appData,
@@ -1062,10 +1062,10 @@ export class Cache {
         // now we can get this new value
         let newValue: any;
         if (preSideEffectedProperty.include) {
-          const includeValue = gqlValue[preSideEffectedProperty.include.getQualifiedIdentifier()];
+          const includeValue = rqValue[preSideEffectedProperty.include.getQualifiedIdentifier()];
           newValue = includeValue && includeValue[preSideEffectedProperty.property.getId()];
         } else {
-          newValue = gqlValue[preSideEffectedProperty.property.getId()];
+          newValue = rqValue[preSideEffectedProperty.property.getId()];
         }
 
         if (typeof newValue !== "undefined") {
@@ -1098,11 +1098,11 @@ export class Cache {
 
     // now we extract the SQL information for both item definition table
     // and the module table, this value is database ready
-    const sqlIdefDataComposed: ISQLStreamComposedTableRowValue = convertGQLValueToSQLValueForItemDefinition(
+    const sqlIdefDataComposed: ISQLStreamComposedTableRowValue = convertRQValueToSQLValueForItemDefinition(
       this.serverData,
       this.appData,
       itemDefinition,
-      gqlValue, // when this is a SQL type it gets converted into the gql type so it can be processed here
+      rqValue, // when this is a SQL type it gets converted into the rq type so it can be processed here
       null,
       containerExists ? this.storageClients[options.containerId] : null,
       this.domain,
@@ -1111,11 +1111,11 @@ export class Cache {
       options.language ? options.language : (isSQLType ? value as ISQLTableRowValue : null),
       options.dictionary ? options.dictionary : (isSQLType ? value as ISQLTableRowValue : null),
     );
-    const sqlModDataComposed: ISQLStreamComposedTableRowValue = convertGQLValueToSQLValueForModule(
+    const sqlModDataComposed: ISQLStreamComposedTableRowValue = convertRQValueToSQLValueForModule(
       this.serverData,
       this.appData,
       itemDefinition.getParentModule(),
-      gqlValue, // when this is a SQL type it gets converted into the gql type so it can be processed here
+      rqValue, // when this is a SQL type it gets converted into the rq type so it can be processed here
       null,
       containerExists ? this.storageClients[options.containerId] : null,
       this.domain,
@@ -1648,8 +1648,8 @@ export class Cache {
    * @param version the version of that id to update
    * @param update the update in question (partial values are allowed)
    * @param currentSQLValue the same value but as the raw row
-   * @param currentValue a current value as graphql, the current value can be requested from the
-   * cache itself, and then converted into graphql, but this is expensive, while for the edit process
+   * @param currentValue a current value as rq, the current value can be requested from the
+   * cache itself, and then converted into rq, but this is expensive, while for the edit process
    * this is done anyway because of checks, if you are running this manually you might not need to pass these
    * the reason current value are necessary is in order to perform a diffing operation and remove orphan files
    * if your update process doesn't leave orphan files, as in you are not updating any file field, you can
@@ -1666,7 +1666,7 @@ export class Cache {
    * get a notification, you can pass null for this if this is a computer operation and let every listener to be informed
    * while it doesn't hurt to keep listenerUUID as null, it is expensive to send messages when they will be of no use the
    * listener uuid ensures only those that needs updates will get them
-   * @returns a total combined table row value that can be converted into graphql
+   * @returns a total combined table row value that can be converted into rq
    */
   public async requestUpdate(
     item: ItemDefinition | string,
@@ -1702,7 +1702,7 @@ export class Cache {
 
     const currentSQLValue = options.currentSQLValue || await this.requestValue(itemDefinition, id, version);
     const editedBy = options.editedBy || UNSPECIFIED_OWNER;
-    const currentValueAsGQL = options.currentGQLValue || convertSQLValueToRQValueForItemDefinition(
+    const currentValueAsRQ = options.currentrqValue || convertSQLValueToRQValueForItemDefinition(
       this.serverData,
       this.appData,
       itemDefinition,
@@ -1845,24 +1845,24 @@ export class Cache {
     // that we only want the editingFields to be returned
     // into the SQL value, this is valid in here because
     // we don't want things to be defaulted in the query
-    const sqlIdefDataComposed = convertGQLValueToSQLValueForItemDefinition(
+    const sqlIdefDataComposed = convertRQValueToSQLValueForItemDefinition(
       this.serverData,
       this.appData,
       itemDefinition,
       update,
-      currentValueAsGQL,
+      currentValueAsRQ,
       containerExists ? this.storageClients[options.containerId] : null,
       this.domain,
       options.language,
       options.dictionary,
       partialUpdateFields,
     );
-    const sqlModDataComposed = convertGQLValueToSQLValueForModule(
+    const sqlModDataComposed = convertRQValueToSQLValueForModule(
       this.serverData,
       this.appData,
       itemDefinition.getParentModule(),
       update,
-      currentValueAsGQL,
+      currentValueAsRQ,
       containerExists ? this.storageClients[options.containerId] : null,
       this.domain,
       options.language,
@@ -3134,7 +3134,7 @@ export class Cache {
    * @param options.useMemoryCache a total opposite of refresh, (do not use together as refresh beats this one)
    * which will use a 1 second memory cache to retrieve values and store them, use this if you think the value
    * might be used consecutively and you don't care about accuraccy that much
-   * @returns a whole sql value that can be converted into graphql if necessary
+   * @returns a whole sql value that can be converted into rq if necessary
    */
   public async requestValue(
     item: ItemDefinition | string,

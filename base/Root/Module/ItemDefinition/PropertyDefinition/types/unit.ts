@@ -94,11 +94,11 @@ const typeValue: IPropertyDefinitionSupportedType<IPropertyDefinitionSupportedUn
   },
   localSearch: (arg) => {
     // item is deleted
-    if (!arg.gqlValue) {
+    if (!arg.rqValue) {
       return false;
     }
     // item is blocked
-    if (arg.gqlValue.DATA === null) {
+    if (arg.rqValue.DATA === null) {
       return false;
     }
 
@@ -114,7 +114,7 @@ const typeValue: IPropertyDefinitionSupportedType<IPropertyDefinitionSupportedUn
       typeof usefulArgs[toName] !== "undefined" && usefulArgs[toName] !== null
     ) {
       const propertyValue: IPropertyDefinitionSupportedUnitType =
-        arg.include ? arg.gqlValue.DATA[arg.include.getId()][arg.id] : arg.gqlValue.DATA[arg.id];
+        arg.include ? arg.rqValue.DATA[arg.include.getId()][arg.id] : arg.rqValue.DATA[arg.id];
 
       if (typeof propertyValue === "undefined") {
         console.warn("Attempted to local search by the property " + arg.id + " but could not find it in the local given value");

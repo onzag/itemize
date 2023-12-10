@@ -207,7 +207,7 @@ export async function ssrGenerator(
     // and we get such from the cookie itself
     const currentToken = ussdToken || getCookie(splittedCookies, "token");
     // if we have it we need to extract its data, we are going to use, we are actually
-    // kind of cheating this graphql call, first is the request fields info and second are the
+    // kind of cheating this rq call, first is the request fields info and second are the
     // args, we only concerned about the args so we pass the token, in the client the TokenProvider
     // would do this call but we do this right here, right now in the server so the token provider
     // mounts immediately and something can be rendered

@@ -125,11 +125,11 @@ const typeValue: IPropertyDefinitionSupportedType<IPropertyDefinitionSupportedPa
   localOrderBy: null,
   localSearch: (arg) => {
     // item is deleted
-    if (!arg.gqlValue) {
+    if (!arg.rqValue) {
       return false;
     }
     // item is blocked
-    if (!arg.gqlValue.DATA === null) {
+    if (!arg.rqValue.DATA === null) {
       return false;
     }
 
@@ -145,7 +145,7 @@ const typeValue: IPropertyDefinitionSupportedType<IPropertyDefinitionSupportedPa
     const usefulArgs = includeId ? arg.args[INCLUDE_PREFIX + includeId] || {} : arg.args;
 
     const propertyValue: IPropertyDefinitionSupportedPaymentType =
-      includeId ? arg.gqlValue.DATA[includeId][arg.id] : arg.gqlValue.DATA[arg.id];
+      includeId ? arg.rqValue.DATA[includeId][arg.id] : arg.rqValue.DATA[arg.id];
 
     if (
       typeof usefulArgs[exactName] !== "undefined" ||

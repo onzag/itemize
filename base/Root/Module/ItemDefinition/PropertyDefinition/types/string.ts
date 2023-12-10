@@ -100,16 +100,16 @@ const typeValue: IPropertyDefinitionSupportedType<PropertyDefinitionSupportedStr
   elasticStrSearch: stringElasticStrSearch,
   localStrSearch: (arg) => {
     // item is deleted
-    if (!arg.gqlValue) {
+    if (!arg.rqValue) {
       return false;
     }
     // item is blocked
-    if (arg.gqlValue.DATA === null) {
+    if (arg.rqValue.DATA === null) {
       return false;
     }
 
     if (arg.search) {
-      const propertyValue = arg.include ? arg.gqlValue.DATA[arg.include.getId()][arg.id] : arg.gqlValue.DATA[arg.id];
+      const propertyValue = arg.include ? arg.rqValue.DATA[arg.include.getId()][arg.id] : arg.rqValue.DATA[arg.id];
 
       if (exactStringSearchSubtypes.includes(arg.property.getSubtype())) {
         return propertyValue === arg.search;
@@ -127,11 +127,11 @@ const typeValue: IPropertyDefinitionSupportedType<PropertyDefinitionSupportedStr
 
   localSearch: (arg) => {
     // item is deleted
-    if (!arg.gqlValue) {
+    if (!arg.rqValue) {
       return false;
     }
     // item is blocked
-    if (arg.gqlValue.DATA === null) {
+    if (arg.rqValue.DATA === null) {
       return false;
     }
 
@@ -140,7 +140,7 @@ const typeValue: IPropertyDefinitionSupportedType<PropertyDefinitionSupportedStr
 
     if (typeof usefulArgs[searchName] !== "undefined") {
       const searchMatch = usefulArgs[searchName];
-      const propertyValue = arg.include ? arg.gqlValue.DATA[arg.include.getId()][arg.id] : arg.gqlValue.DATA[arg.id];
+      const propertyValue = arg.include ? arg.rqValue.DATA[arg.include.getId()][arg.id] : arg.rqValue.DATA[arg.id];
 
       if (typeof propertyValue === "undefined") {
         console.warn("Attempted to local search by the property " + arg.id + " but could not find it in the local given value");
@@ -155,7 +155,7 @@ const typeValue: IPropertyDefinitionSupportedType<PropertyDefinitionSupportedStr
       // to be good, but it gets the job done
       return propertyValue.includes(searchMatch);
     } else if (usefulArgs[searchName] === null) {
-      const propertyValue = arg.include ? arg.gqlValue.DATA[arg.include.getId()][arg.id] : arg.gqlValue.DATA[arg.id];
+      const propertyValue = arg.include ? arg.rqValue.DATA[arg.include.getId()][arg.id] : arg.rqValue.DATA[arg.id];
       if (typeof propertyValue === "undefined") {
         console.warn("Attempted to local search by the property " + arg.id + " but could not find it in the local given value");
         return false;

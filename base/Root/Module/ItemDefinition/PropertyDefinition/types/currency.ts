@@ -98,11 +98,11 @@ const typeValue: IPropertyDefinitionSupportedType<IPropertyDefinitionSupportedCu
   },
   localSearch: (arg) => {
     // item is deleted
-    if (!arg.gqlValue) {
+    if (!arg.rqValue) {
       return false;
     }
     // item is blocked
-    if (!arg.gqlValue.DATA === null) {
+    if (!arg.rqValue.DATA === null) {
       return false;
     }
 
@@ -120,7 +120,7 @@ const typeValue: IPropertyDefinitionSupportedType<IPropertyDefinitionSupportedCu
     ) {
 
       const propertyValue: IPropertyDefinitionSupportedCurrencyType =
-        includeId ? arg.gqlValue.DATA[includeId][arg.id] : arg.gqlValue.DATA[arg.id];
+        includeId ? arg.rqValue.DATA[includeId][arg.id] : arg.rqValue.DATA[arg.id];
 
       if (typeof propertyValue === "undefined") {
         console.warn("Attempted to local search by the property " + arg.id + " but could not find it in the local given value");

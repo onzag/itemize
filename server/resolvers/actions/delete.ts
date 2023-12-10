@@ -57,7 +57,7 @@ export async function deleteItemDefinition(
     },
   );
 
-  let currentWholeValueAsGQL: IRQValue;
+  let currentWholeValueAsRQ: IRQValue;
   let rolesManager: CustomRoleManager;
 
   // we need to run the policy check for delete,
@@ -76,12 +76,12 @@ export async function deleteItemDefinition(
       version: resolverArgs.args.version || null,
       role: tokenData.role,
       userId: tokenData.id,
-      gqlArgValue: resolverArgs.args,
-      gqlFlattenedRequestedFiels: null,
+      rqArgValue: resolverArgs.args,
+      rqFlattenedRequestedFields: null,
       appData,
       rolesManager: (sqlValue: ISQLTableRowValue) => {
         const ownerUserId = sqlValue ? (itemDefinition.isOwnerObjectId() ? sqlValue.id : sqlValue.created_by) : null;
-        currentWholeValueAsGQL = convertSQLValueToRQValueForItemDefinition(
+        currentWholeValueAsRQ = convertSQLValueToRQValueForItemDefinition(
           appData.cache.getServerData(),
           appData,
           itemDefinition,
@@ -91,7 +91,7 @@ export async function deleteItemDefinition(
           cache: appData.cache,
           databaseConnection: appData.databaseConnection,
           rawDB: appData.rawDB,
-          value: currentWholeValueAsGQL,
+          value: currentWholeValueAsRQ,
           item: itemDefinition,
           module: itemDefinition.getParentModule(),
           root: appData.root,
@@ -212,7 +212,7 @@ export async function deleteItemDefinition(
         appData,
         itemDefinition,
         module: mod,
-        originalValue: currentWholeValueAsGQL,
+        originalValue: currentWholeValueAsRQ,
         originalValueSQL: wholeSqlStoredValue,
         originalValueBlocked: !!wholeSqlStoredValue.blocked_at,
         requestedUpdate: null,
@@ -248,7 +248,7 @@ export async function deleteItemDefinition(
         appData,
         itemDefinition,
         module: mod,
-        originalValue: currentWholeValueAsGQL,
+        originalValue: currentWholeValueAsRQ,
         originalValueSQL: wholeSqlStoredValue,
         originalValueBlocked: !!wholeSqlStoredValue.blocked_at,
         requestedUpdate: null,
@@ -294,7 +294,7 @@ export async function deleteItemDefinition(
       appData,
       itemDefinition,
       module: mod,
-      originalValue: currentWholeValueAsGQL,
+      originalValue: currentWholeValueAsRQ,
       originalValueSQL: wholeSqlStoredValue,
       originalValueBlocked: !!wholeSqlStoredValue.blocked_at,
       requestedUpdate: null as any,
@@ -349,7 +349,7 @@ export async function deleteItemDefinition(
       appData,
       itemDefinition,
       module: mod,
-      originalValue: currentWholeValueAsGQL,
+      originalValue: currentWholeValueAsRQ,
       originalValueSQL: wholeSqlStoredValue,
       originalValueBlocked: !!wholeSqlStoredValue.blocked_at,
       requestedUpdate: null as any,

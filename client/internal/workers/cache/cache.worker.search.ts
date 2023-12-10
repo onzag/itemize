@@ -54,7 +54,7 @@ export async function search(
   let sourceResults: ICacheMatchType[] = returnSourceResults ? [] : null;
 
   // so now we get the new records with a promise where we read a bunch of stuff
-  let newSearchRecords: IGQLSearchRecordChecked[] = (await Promise.all(
+  let newSearchRecords: IRQSearchRecordChecked[] = (await Promise.all(
     // for that we map our current records
     searchRecords.map(async (result, index) => {
       try {
@@ -198,7 +198,7 @@ export async function search(
 /**
  * A helper interface for records that have been checked
  */
-interface IGQLSearchRecordChecked {
+interface IRQSearchRecordChecked {
   /**
    * whether should record should be included
    */
@@ -226,7 +226,7 @@ async function checkOne(
   searchRecord: IRQSearchRecord,
   value: IRQValue,
   searchArgs: any,
-): Promise<IGQLSearchRecordChecked> {
+): Promise<IRQSearchRecordChecked> {
   // so by default we included
   let shouldBeIncluded = true;
 
@@ -303,7 +303,7 @@ async function checkOne(
       const description = pd.getPropertyDefinitionDescription();
       return description.localSearch({
         args: searchArgs,
-        gqlValue: value,
+        rqValue: value,
         property: pd,
         id: pd.getId(),
         prefix: "",
@@ -339,7 +339,7 @@ async function checkOne(
             const sinkingDescription = sp.getPropertyDefinitionDescription();
             return sinkingDescription.localSearch({
               args: searchArgs,
-              gqlValue: value,
+              rqValue: value,
               property: sp,
               id: sp.getId(),
               prefix: i.getPrefixedQualifiedIdentifier(),

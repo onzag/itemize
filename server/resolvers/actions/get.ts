@@ -4,7 +4,7 @@ import ItemDefinition, { ItemDefinitionIOActions } from "../../../base/Root/Modu
 import {
   checkLanguage,
   validateTokenAndGetData,
-  filterAndPrepareGQLValue,
+  filterAndPrepareRQValue,
   checkLimit,
   validateTokenIsntBlocked,
   checkListTypes,
@@ -19,7 +19,7 @@ import {
 } from "../../../constants";
 import { ISQLTableRowValue } from "../../../base/Root/sql";
 import Module from "../../../base/Root/Module";
-import { flattenRawGQLValueOrFields } from "../../../rq-util";
+import { flattenRawRQValueOrFields } from "../../../rq-util";
 import { EndpointError } from "../../../base/errors";
 import { IRQSearchRecord, IRQValue } from "../../../rq-querier";
 import { IOTriggerActions } from "../triggers";
@@ -52,9 +52,9 @@ export async function getItemDefinition(
   // now we find the requested fields that are requested
   // in the get request
   const rawFields = resolverArgs.fields;
-  const requestedFields = flattenRawGQLValueOrFields(rawFields);
+  const requestedFields = flattenRawRQValueOrFields(rawFields);
 
-  let currentWholeValueAsGQL: IRQValue;
+  let currentWholeValueAsRQ: IRQValue;
   let ownerId: string;
   let rolesManager: CustomRoleManager;
 
@@ -68,11 +68,11 @@ export async function getItemDefinition(
       version: resolverArgs.args.version || null,
       role: tokenData.role,
       userId: tokenData.id,
-      gqlArgValue: resolverArgs.args,
-      gqlFlattenedRequestedFiels: requestedFields,
+      rqArgValue: resolverArgs.args,
+      rqFlattenedRequestedFields: requestedFields,
       appData,
       rolesManager: (sqlValue: ISQLTableRowValue) => {
-        currentWholeValueAsGQL = sqlValue ? convertSQLValueToRQValueForItemDefinition(
+        currentWholeValueAsRQ = sqlValue ? convertSQLValueToRQValueForItemDefinition(
           appData.cache.getServerData(),
           appData,
           itemDefinition,
@@ -84,7 +84,7 @@ export async function getItemDefinition(
           cache: appData.cache,
           databaseConnection: appData.databaseConnection,
           rawDB: appData.rawDB,
-          value: currentWholeValueAsGQL,
+          value: currentWholeValueAsRQ,
           item: itemDefinition,
           module: itemDefinition.getParentModule(),
           root: appData.root,
@@ -188,7 +188,7 @@ export async function getItemDefinition(
     },
   );
 
-  const valueToProvide = await filterAndPrepareGQLValue(
+  const valueToProvide = await filterAndPrepareRQValue(
     appData.cache.getServerData(),
     appData,
     selectQueryValue,
@@ -220,7 +220,7 @@ export async function getItemDefinition(
         appData,
         itemDefinition,
         module: mod,
-        originalValue: currentWholeValueAsGQL,
+        originalValue: currentWholeValueAsRQ,
         originalValueSQL: selectQueryValue,
         originalValueBlocked: !!selectQueryValue.blocked_at,
         requestedUpdate: null,
@@ -255,7 +255,7 @@ export async function getItemDefinition(
         appData,
         itemDefinition,
         module: mod,
-        originalValue: currentWholeValueAsGQL,
+        originalValue: currentWholeValueAsRQ,
         originalValueSQL: selectQueryValue,
         originalValueBlocked: !!selectQueryValue.blocked_at,
         requestedUpdate: null,
@@ -303,7 +303,7 @@ export async function getItemDefinition(
   CAN_LOG_DEBUG && logger.debug(
     {
       functionName: "getItemDefinition",
-      message: "GQL ouput retrieved",
+      message: "RQ ouput retrieved",
     },
   );
 
@@ -343,7 +343,7 @@ export async function getItemDefinitionList(
 
   // now we find the requested fields that are requested
   // in the get request
-  const requestedFields = flattenRawGQLValueOrFields(resolverArgs.fields.results);
+  const requestedFields = flattenRawRQValueOrFields(resolverArgs.fields.results);
 
   // we get the requested fields that take part of the item definition
   // description
@@ -453,7 +453,7 @@ export async function getItemDefinitionList(
           message: "Checking role access for read",
         },
       );
-      const currentWholeValueAsGQL = convertSQLValueToRQValueForItemDefinition(
+      const currentWholeValueAsRQ = convertSQLValueToRQValueForItemDefinition(
         appData.cache.getServerData(),
         appData,
         itemDefinition,
@@ -465,7 +465,7 @@ export async function getItemDefinitionList(
         cache: appData.cache,
         databaseConnection: appData.databaseConnection,
         rawDB: appData.rawDB,
-        value: currentWholeValueAsGQL,
+        value: currentWholeValueAsRQ,
         item: itemDefinition,
         module: itemDefinition.getParentModule(),
         root: appData.root,
@@ -513,7 +513,7 @@ export async function getItemDefinitionList(
         });
       }
 
-      const valueToProvide = await filterAndPrepareGQLValue(
+      const valueToProvide = await filterAndPrepareRQValue(
         appData.cache.getServerData(),
         appData,
         value,
@@ -535,7 +535,7 @@ export async function getItemDefinitionList(
             appData,
             itemDefinition,
             module: mod,
-            originalValue: currentWholeValueAsGQL,
+            originalValue: currentWholeValueAsRQ,
             originalValueSQL: value,
             originalValueBlocked: !!value.blocked_at,
             requestedUpdate: null,
@@ -570,7 +570,7 @@ export async function getItemDefinitionList(
             appData,
             itemDefinition,
             module: mod,
-            originalValue: currentWholeValueAsGQL,
+            originalValue: currentWholeValueAsRQ,
             originalValueSQL: value,
             originalValueBlocked: !!value.blocked_at,
             requestedUpdate: null,
@@ -666,7 +666,7 @@ export async function getModuleList(
 
   // now we find the requested fields that are requested
   // in the get request
-  const requestedFields = flattenRawGQLValueOrFields(resolverArgs.fields.results);
+  const requestedFields = flattenRawRQValueOrFields(resolverArgs.fields.results);
 
   // we get the requested fields that take part of the item definition
   // description
@@ -753,7 +753,7 @@ export async function getModuleList(
       const moduleTrigger = appData.triggers.module.io[pathOfThisModule];
       const itemDefinitionTrigger = appData.triggers.item.io[pathOfThisIdef];
 
-      const currentWholeValueAsGQL = convertSQLValueToRQValueForItemDefinition(
+      const currentWholeValueAsRQ = convertSQLValueToRQValueForItemDefinition(
         appData.cache.getServerData(),
         appData,
         itemDefinition,
@@ -771,7 +771,7 @@ export async function getModuleList(
         cache: appData.cache,
         databaseConnection: appData.databaseConnection,
         rawDB: appData.rawDB,
-        value: currentWholeValueAsGQL,
+        value: currentWholeValueAsRQ,
         item: itemDefinition,
         module: itemDefinition.getParentModule(),
         root: appData.root,
@@ -800,7 +800,7 @@ export async function getModuleList(
         true,
       );
 
-      const valueToProvide = await filterAndPrepareGQLValue(
+      const valueToProvide = await filterAndPrepareRQValue(
         appData.cache.getServerData(),
         appData,
         value,
@@ -822,7 +822,7 @@ export async function getModuleList(
             appData,
             itemDefinition,
             module: mod,
-            originalValue: currentWholeValueAsGQL,
+            originalValue: currentWholeValueAsRQ,
             originalValueSQL: value,
             originalValueBlocked: !!value.blocked_at,
             requestedUpdate: null,
@@ -857,7 +857,7 @@ export async function getModuleList(
             appData,
             itemDefinition,
             module: mod,
-            originalValue: currentWholeValueAsGQL,
+            originalValue: currentWholeValueAsRQ,
             originalValueSQL: value,
             originalValueBlocked: !!value.blocked_at,
             requestedUpdate: null,

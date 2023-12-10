@@ -218,7 +218,7 @@ export default class PhoneProvider<T> extends ServiceProvider<T> {
    * Sends a template based SMS to a given user
    * @param arg the args
    * @param arg.to this is a special list of values to send to the users that we want to send to, they can be
-   * specified as the list of ids, aka user identifiers of the given users, but grapqhl values or sql values
+   * specified as the list of ids, aka user identifiers of the given users, but rq values or sql values
    * are allowed as well and they improve speed up, remember to pass whole results with all the properties
    * you are using or otherwise it might misbehave
    * @param arg.itemDefinition either a string that represents an item definition that can be pulled from the registry

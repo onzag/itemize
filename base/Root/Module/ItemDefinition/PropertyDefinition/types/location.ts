@@ -110,11 +110,11 @@ const typeValue: IPropertyDefinitionSupportedType<IPropertyDefinitionSupportedLo
 
   localSearch: (arg) => {
     // item is deleted
-    if (!arg.gqlValue) {
+    if (!arg.rqValue) {
       return false;
     }
     // item is blocked
-    if (arg.gqlValue.DATA === null) {
+    if (arg.rqValue.DATA === null) {
       return false;
     }
 
@@ -123,7 +123,7 @@ const typeValue: IPropertyDefinitionSupportedType<IPropertyDefinitionSupportedLo
 
     const usefulArgs = arg.include ? arg.args[INCLUDE_PREFIX + arg.include.getId()] || {} : arg.args;
     if (typeof usefulArgs[locationName] === null) {
-      const propertyValue = arg.include ? arg.gqlValue.DATA[arg.include.getId()][arg.id] : arg.gqlValue.DATA[arg.id];
+      const propertyValue = arg.include ? arg.rqValue.DATA[arg.include.getId()][arg.id] : arg.rqValue.DATA[arg.id];
 
       if (typeof propertyValue === "undefined") {
         console.warn("Attempted to local search by the property " + arg.id + " but could not find it in the local given value");
@@ -135,7 +135,7 @@ const typeValue: IPropertyDefinitionSupportedType<IPropertyDefinitionSupportedLo
       typeof usefulArgs[locationName] !== "undefined" && usefulArgs[locationName] !== null &&
       typeof usefulArgs[radiusName] !== "undefined" && usefulArgs[radiusName] !== null
     ) {
-      const propertyValue = arg.include ? arg.gqlValue.DATA[arg.include.getId()][arg.id] : arg.gqlValue.DATA[arg.id];
+      const propertyValue = arg.include ? arg.rqValue.DATA[arg.include.getId()][arg.id] : arg.rqValue.DATA[arg.id];
 
       if (typeof propertyValue === "undefined") {
         console.warn("Attempted to local search by the property " + arg.id + " but could not find it in the local given value");

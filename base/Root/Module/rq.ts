@@ -253,6 +253,11 @@ async function resolveGenericFunction(
   resolvers: IRQResolversType,
   args: IRQResolverArgs,
 ): Promise<any> {
+  console.log(args);
+  throw new EndpointError({
+    message: "CRAZY",
+    code: ENDPOINT_ERRORS.INTERNAL_SERVER_ERROR,
+  });
   let value = null;
   if (resolvers) {
     try {

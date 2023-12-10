@@ -187,12 +187,12 @@ export interface ISQLBtreeIndexableInfo extends ISQLArgInfo {
 
 export interface ILocalSearchInfo extends IArgInfo {
   args: IRQArgs;
-  gqlValue: IRQValue;
+  rqValue: IRQValue;
 }
 
 export interface ILocalStrSearchInfo extends IArgInfo {
   search: string;
-  gqlValue: IRQValue;
+  rqValue: IRQValue;
 }
 
 export interface ILocalEqualInfo<T> extends IArgInfo {
@@ -312,7 +312,7 @@ export interface IPropertyDefinitionSupportedType<T> {
   sqlElasticIn: (arg: ISQLOutInfo) => ISQLTableRowValue;
   /**
    * Represents a search for an item
-   * data is the graphql value obtained from the search query mode item definition
+   * data is the rq value obtained from the search query mode item definition
    * sqlPrefix is a prefix that everything is prefixed in sql, usually for the item
    * id is the id of the property
    * whereBuilder is the builder that is being used so it can attach the where queries to it
@@ -342,7 +342,7 @@ export interface IPropertyDefinitionSupportedType<T> {
    */
   sqlBtreeIndexable: (arg: ISQLBtreeIndexableInfo) => string[];
   /**
-   * represents a local search checkup performed locally with a graphql value
+   * represents a local search checkup performed locally with a rq value
    * raw (that is with DATA) the property id and the include id, the args are
    * the same
    */

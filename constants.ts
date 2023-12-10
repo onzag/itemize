@@ -42,7 +42,7 @@ export interface IItemizeConstantsConfig {
    */
   MAX_FILES_PER_REQUEST?: number;
   /**
-   * The maximum size of a given graphql query in bytes
+   * The maximum size of a given rq query in bytes
    */
   MAX_FIELD_SIZE?: number;
   /**
@@ -185,7 +185,7 @@ export const MAX_FILES_PER_REQUEST =
     MAX_FILES_PER_PROPERTY * 10;
 /**
  * Another just a security concern, this
- * is the size of the graphql query, 1MB should be way more than enough for a graphql query
+ * is the size of the rq query, 1MB should be way more than enough for a rq query
  */
 export const MAX_FIELD_SIZE = R_ITEMIZE_CONSTANTS_CONFIG.MAX_FIELD_SIZE || 1000000; // equivalent to 1MB
 /**
@@ -341,7 +341,7 @@ export const MEMCACHED_UNMOUNT_SEARCH_DESTRUCTION_MARKERS_LOCATION = "MEMCACHED_
 export const LAST_RICH_TEXT_CHANGE_LENGTH = "LAST_RICH_TEXT_CHANGE_LENGTH";
 
 /**
- * Graphql endpoint errors codes that can be thrown
+ * Rq endpoint errors codes that can be thrown
  */
 export const ENDPOINT_ERRORS = {
   UNSPECIFIED: "UNSPECIFIED",
@@ -680,7 +680,7 @@ export const LOCATION_SEARCH_I18N = [
 ];
 
 /**
- * Graphql values come in a DATA form, because they can be blocked
+ * Rq values come in a DATA form, because they can be blocked
  * however some attributes are meant to leak and be externally accessible
  * these atrributes can only be accessed outside of it
  */
@@ -733,7 +733,7 @@ export const TIME_FORMAT = "HH:mm:ss";
 export const DATE_FORMAT = "YYYY-MM-DD";
 
 /**
- * The reserved base properties that are exists within every graphql query
+ * The reserved base properties that are exists within every rq query
  * and should mirror the database
  */
 export const RESERVED_BASE_PROPERTIES_RQ: {
@@ -1056,11 +1056,11 @@ export const PREFIXED_CONCAT = (...args: string[]) => args.join("__");
  */
 export const SQL_CONSTRAINT_PREFIX = PREFIX_BUILD("CONSTRAINT");
 /**
- * Every include when used within the database or graphql is prefixed with
+ * Every include when used within the database or rq is prefixed with
  */
 export const INCLUDE_PREFIX = PREFIX_BUILD("INCLUDE");
 /**
- * Every module when used within the database, graphql or its qualified name is prefixed with
+ * Every module when used within the database, rq or its qualified name is prefixed with
  */
 export const MODULE_PREFIX = PREFIX_BUILD("MOD");
 /**
@@ -1068,39 +1068,39 @@ export const MODULE_PREFIX = PREFIX_BUILD("MOD");
  */
 export const SEARCH_MODE_MODULE_PREFIX = PREFIX_BUILD("SEARCH_MODE");
 /**
- * Every item definition when used within the database, graphql or its qualified name is prefixed with
+ * Every item definition when used within the database, rq or its qualified name is prefixed with
  */
 export const ITEM_DEFINITION_PREFIX = PREFIX_BUILD("IDEF");
 /**
- * The suffix added to refer to the exclusion state of an include in SQL or graphql
+ * The suffix added to refer to the exclusion state of an include in SQL or rq
  */
 export const EXCLUSION_STATE_SUFFIX = SUFFIX_BUILD("EXCLUSION_STATE");
 /**
- * The prefix used in the graphql endpoint for searches of modules and item definitions
+ * The prefix used in the rq endpoint for searches of modules and item definitions
  */
 export const PREFIX_SEARCH = PREFIX_BUILD("SEARCH");
 /**
- * The prefix used in the graphql endpoint for searches of modules and item definitions in traditional mode
+ * The prefix used in the rq endpoint for searches of modules and item definitions in traditional mode
  */
 export const PREFIX_TRADITIONAL_SEARCH = PREFIX_BUILD("TSEARCH");
 /**
- * The prefix used in the graphql endpoint for getting item definitions
+ * The prefix used in the rq endpoint for getting item definitions
  */
 export const PREFIX_GET = PREFIX_BUILD("GET");
 /**
- * The prefix used in the graphql endpoint for getting lists of item definitions and modules
+ * The prefix used in the rq endpoint for getting lists of item definitions and modules
  */
 export const PREFIX_GET_LIST = PREFIX_BUILD("GET_LIST");
 /**
- * The prefix used in the graphql endpoint for adding item definitions
+ * The prefix used in the rq endpoint for adding item definitions
  */
 export const PREFIX_ADD = PREFIX_BUILD("ADD");
 /**
- * The prefix used in the graphql endpoint for editing item definitions
+ * The prefix used in the rq endpoint for editing item definitions
  */
 export const PREFIX_EDIT = PREFIX_BUILD("EDIT");
 /**
- * The prefix used in the graphql endpoint for deleting item definitions
+ * The prefix used in the rq endpoint for deleting item definitions
  */
 export const PREFIX_DELETE = PREFIX_BUILD("DELETE");
 /**
@@ -1403,7 +1403,6 @@ export const RESERVED_GETTER_PROPERTIES_RQ: {[id: string]: RQArg} = {
   },
   version: {
     type: "string",
-    required: true,
     description: "a version for this item",
   },
 };

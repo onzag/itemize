@@ -82,11 +82,11 @@ const typeValue: IPropertyDefinitionSupportedType<PropertyDefinitionSupportedTag
 
   localSearch: (arg) => {
     // item is deleted
-    if (!arg.gqlValue) {
+    if (!arg.rqValue) {
       return false;
     }
     // item is blocked
-    if (arg.gqlValue.DATA === null) {
+    if (arg.rqValue.DATA === null) {
       return false;
     }
 
@@ -95,7 +95,7 @@ const typeValue: IPropertyDefinitionSupportedType<PropertyDefinitionSupportedTag
 
     if (typeof usefulArgs[searchName] !== "undefined" && usefulArgs[searchName] !== null) {
       const searchMatch = usefulArgs[searchName];
-      const propertyValue = arg.include ? arg.gqlValue.DATA[arg.include.getId()][arg.id] : arg.gqlValue.DATA[arg.id];
+      const propertyValue = arg.include ? arg.rqValue.DATA[arg.include.getId()][arg.id] : arg.rqValue.DATA[arg.id];
 
       if (propertyValue === null) {
         return false;
@@ -103,7 +103,7 @@ const typeValue: IPropertyDefinitionSupportedType<PropertyDefinitionSupportedTag
 
       return propertyValue.every((v: string) => searchMatch.includes(v)) && searchMatch.every((v: string) => propertyValue.includes(v));
     } else if (usefulArgs[searchName] === null) {
-      const propertyValue = arg.include ? arg.gqlValue.DATA[arg.include.getId()][arg.id] : arg.gqlValue.DATA[arg.id];
+      const propertyValue = arg.include ? arg.rqValue.DATA[arg.include.getId()][arg.id] : arg.rqValue.DATA[arg.id];
       return propertyValue === null;
     }
 

@@ -1,5 +1,5 @@
 /**
- * This file contains all the graphql related helper functions that are used in order to
+ * This file contains all the rq related helper functions that are used in order to
  * retrieve and set the values of properties, it doesn't contain the conversion functions
  * sql.ts does
  *
@@ -81,7 +81,7 @@ export function validateRQShape(
  * @param options.propertiesAsInput if the property should be as an input object, for use within args
  * @param options.optionalForm makes all the properties optional, nullable
  * @param options.prefix a prefix to prefix the fields by, usually the include prefix if exists
- * @returns the partial graphql fields definition for the property
+ * @returns the partial rq fields definition for the property
  */
 export function getRQDefinitionForProperty(
   propertyDefinition: PropertyDefinition,

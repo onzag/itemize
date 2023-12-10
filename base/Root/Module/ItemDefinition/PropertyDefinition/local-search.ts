@@ -1,6 +1,6 @@
 /**
  * This file contains helper local functions that are used against
- * graphql values in order to perform local searches as if it was
+ * rq values in order to perform local searches as if it was
  * running in the server side, these tend to run in the IndexedDB
  * database
  *
@@ -20,11 +20,11 @@ import { ILocalSearchInfo } from "./types";
  */
 export function standardLocalSearchExactAndRange(arg: ILocalSearchInfo) {
   // item is deleted
-  if (!arg.gqlValue) {
+  if (!arg.rqValue) {
     return false;
   }
   // item is blocked
-  if (arg.gqlValue.DATA === null) {
+  if (arg.rqValue.DATA === null) {
     return false;
   }
 
@@ -43,7 +43,7 @@ export function standardLocalSearchExactAndRange(arg: ILocalSearchInfo) {
   ) {
     // the property value also comes from the value as a whole, the value is not
     // flattened
-    const propertyValue = arg.include ? arg.gqlValue.DATA[arg.include.getId()][arg.id] : arg.gqlValue.DATA[arg.id];
+    const propertyValue = arg.include ? arg.rqValue.DATA[arg.include.getId()][arg.id] : arg.rqValue.DATA[arg.id];
 
     if (typeof propertyValue === "undefined") {
       console.warn("Attempted to local search by the property " + arg.id + " but could not find it in the local given value");
@@ -95,11 +95,11 @@ export function dateLocalSearchExactAndRange(
   arg: ILocalSearchInfo
 ) {
   // item is deleted
-  if (!arg.gqlValue) {
+  if (!arg.rqValue) {
     return false;
   }
   // item is blocked
-  if (arg.gqlValue.DATA === null) {
+  if (arg.rqValue.DATA === null) {
     return false;
   }
 
@@ -118,7 +118,7 @@ export function dateLocalSearchExactAndRange(
   ) {
 
     // now we use moment to parse our string value
-    const propertyValue = arg.include ? arg.gqlValue.DATA[arg.include.getId()][arg.id] : arg.gqlValue.DATA[arg.id];
+    const propertyValue = arg.include ? arg.rqValue.DATA[arg.include.getId()][arg.id] : arg.rqValue.DATA[arg.id];
 
     if (typeof propertyValue === "undefined") {
       console.warn("Attempted to local search by the property " + arg.id + " but could not find it in the local given value");

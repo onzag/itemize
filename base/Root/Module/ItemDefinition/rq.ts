@@ -1,5 +1,5 @@
 /**
- * This file contains all the graphql functions that need to be used to request
+ * This file contains all the rq functions that need to be used to request
  * and process an item definition, from the definition to how it must be queried
  *
  * @module
@@ -140,7 +140,7 @@ export function getRQDefinitionForItemDefinition(
  * @param itemDefinition the item definition in question
  * @param options.policy the policy type that should be included, eg "edit", "delete", "read" and "parent"
  * @param options.propertiesAsInput if the properties should be in input form
- * @returns a partial graphql fields definition that only contains the policies
+ * @returns a partial rq fields definition that only contains the policies
  */
 export function getRQDefinitionForItemDefinitionPolicies(
   idef: ItemDefinition,
@@ -378,7 +378,7 @@ export function getRQSchemaForItemDefinition(
 
 /**
  * A generic function that is used for the resolver in the
- * graphql endpoint in order to specify which resolve to
+ * rq endpoint in order to specify which resolve to
  * be used and catch errors, this is what the client
  * actually recieves, all processing should be done here
  * this however only affects the generic processing of these
@@ -386,8 +386,8 @@ export function getRQSchemaForItemDefinition(
  * @param resolveToUse which resolve to use
  * @param itemDefinition the item definition in question
  * @param resolvers the resolvers object
- * @param source parameter source obtained from graphql
- * @param args obtained from graphql as well
+ * @param source parameter source obtained from rq
+ * @param args obtained from rq as well
  * @param context same
  * @param info also
  * @returns a promise that returns whatever the resolvers return
@@ -398,6 +398,11 @@ async function resolveGenericFunction(
   resolvers: IRQResolversType,
   args: IRQResolverArgs,
 ): Promise<any> {
+  console.log(args);
+  throw new EndpointError({
+    message: "CRAZY",
+    code: ENDPOINT_ERRORS.INTERNAL_SERVER_ERROR,
+  });
   // so firstly the value is null
   let value = null;
   // if we have a resolvers

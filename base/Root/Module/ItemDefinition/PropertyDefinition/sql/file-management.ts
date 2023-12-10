@@ -421,7 +421,7 @@ async function addFileFor(
   value: IRQFile,
   propertyDefinition: PropertyDefinition,
 ): Promise<void> {
-  // first we get the createReadStream function from the source gql file
+  // first we get the createReadStream function from the source rq file
   let stream: ReadStream = null;
 
   if (value.src instanceof Promise) {

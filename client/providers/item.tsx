@@ -1211,7 +1211,7 @@ export interface IItemContextType extends IBasicFns {
    */
   searching: boolean;
   /**
-   * the obtained search results from the graphql endpoint
+   * the obtained search results from the rq endpoint
    * just as they come
    */
   searchRecords: IRQSearchRecord[];
@@ -3182,8 +3182,8 @@ export class ActualItemProvider extends
       const location = getStoredStateLocation(this.props.storeStateOnChange, this.props.forId, this.props.forVersion);
       const serializable = ItemDefinition.getSerializableState(this.state.itemState, null, this.props.storeStateOnChangeApplyEnforced);
       const metadataSource = this.state.itemState &&
-        this.state.itemState.gqlOriginalFlattenedValue &&
-        (this.state.itemState.gqlOriginalFlattenedValue as any);
+        this.state.itemState.rqOriginalFlattenedValue &&
+        (this.state.itemState.rqOriginalFlattenedValue as any);
       const stateWasStored = await CacheWorkerInstance.instance.storeState(
         this.props.itemDefinitionQualifiedName,
         location.id,
@@ -6099,8 +6099,8 @@ export class ActualItemProvider extends
     const root = this.props.itemDefinitionInstance.getParentModule().getParentRoot();
     arg.modifiedRecords.forEach((record) => {
       const iDef = root.registry[record.type] as ItemDefinition;
-      const gqlValue = iDef.getRQAppliedValue(record.id, record.version);
-      if (!gqlValue || !gqlValue.flattenedValue || gqlValue.flattenedValue.last_modified !== record.last_modified) {
+      const rqValue = iDef.getRQAppliedValue(record.id, record.version);
+      if (!rqValue || !rqValue.flattenedValue || rqValue.flattenedValue.last_modified !== record.last_modified) {
         iDef.triggerListeners("reload", record.id, record.version);
       }
     });
@@ -6234,7 +6234,7 @@ export class ActualItemProvider extends
           loadError: this.state.loadError,
           loading: this.state.loading,
           loaded: this.state.loaded,
-          holdsRemoteState: !!this.state.itemState.gqlOriginalFlattenedValue,
+          holdsRemoteState: !!this.state.itemState.rqOriginalFlattenedValue,
           submitError: this.state.submitError,
           submitting: this.state.submitting,
           submitted: this.state.submitted,

@@ -27,7 +27,7 @@ import {
 } from "../../../../constants";
 import { EndpointError, EndpointErrorType } from "../../../errors";
 import uuid from "uuid";
-import { flattenRawGQLValueOrFields, requestFieldsAreContained } from "../../../../rq-util";
+import { flattenRawRQValueOrFields, requestFieldsAreContained } from "../../../../rq-util";
 import { IRQValue, IRQRequestFields, IRQFile, IRQSearchRecord } from "../../../../rq-querier";
 import { countries } from "../../../../imported-resources";
 import Root, { ICustomRoleManager, ISearchLimitersType } from "../../../Root";
@@ -437,9 +437,9 @@ export interface IItemStateType {
    */
   policies: IPoliciesStateType;
   /**
-   * The original graphql flattened value that was applied (if any)
+   * The original rq flattened value that was applied (if any)
    */
-  gqlOriginalFlattenedValue: IRQValue;
+  rqOriginalFlattenedValue: IRQValue;
   /**
    * The id that was used
    */
@@ -469,13 +469,13 @@ export enum ItemDefinitionIOActions {
 }
 
 /**
- * This is how graphql applied values are stored within
+ * This is how rq applied values are stored within
  * the item definition, using this structure, for the
  * application state
  */
-export interface IItemDefinitionGQLValueType {
+export interface IItemDefinitionRQValueType {
   /**
-   * The value as it came from graphql endpoint
+   * The value as it came from rq endpoint
    */
   rawValue: IRQValue;
   /**
@@ -519,8 +519,8 @@ function resolveFile(
 ): IRQFile {
   const domain = process.env.NODE_ENV === "production" ? config.productionHostname : config.developmentHostname;
 
-  const containerId: string = (originalState.gqlOriginalFlattenedValue &&
-    originalState.gqlOriginalFlattenedValue.container_id as string) || null;
+  const containerId: string = (originalState.rqOriginalFlattenedValue &&
+    originalState.rqOriginalFlattenedValue.container_id as string) || null;
 
   const idef = root.registry[originalState.itemDefQualifiedName] as ItemDefinition;
 
@@ -822,8 +822,8 @@ export default class ItemDefinition {
   /**
    * Contains the information about the specific applied value to an slot
    */
-  private stateGQLAppliedValue: {
-    [mergedID: string]: IItemDefinitionGQLValueType;
+  private stateRQAppliedValue: {
+    [mergedID: string]: IItemDefinitionRQValueType;
   };
   /**
    * The internal state
@@ -904,7 +904,7 @@ export default class ItemDefinition {
 
   public cleanState(init?: boolean) {
     this.stateHasAppliedValueTo = {};
-    this.stateGQLAppliedValue = {};
+    this.stateRQAppliedValue = {};
     this.stateSearch = {};
     this.cleansBlocked = {};
 
@@ -1660,7 +1660,7 @@ export default class ItemDefinition {
         ii.getStateNoExternalChecking(id, version, null, emulateExternalChecking));
     }
 
-    const gqlOriginal = this.getRQAppliedValue(id, version);
+    const rqOriginal = this.getRQAppliedValue(id, version);
     const searchState = this.getSearchState(id, version);
     return {
       moduleName: this.getModuleName(),
@@ -1669,7 +1669,7 @@ export default class ItemDefinition {
       includes,
       properties,
       policies,
-      gqlOriginalFlattenedValue: (gqlOriginal && gqlOriginal.flattenedValue) || null,
+      rqOriginalFlattenedValue: (rqOriginal && rqOriginal.flattenedValue) || null,
       forId: id,
       forVersion: version,
       searchState,
@@ -1730,7 +1730,7 @@ export default class ItemDefinition {
       includes = await Promise.all(this.includeInstances.map((ii: Include) => ii.getState(id, version, null)));
     }
 
-    const gqlOriginal = this.getRQAppliedValue(id, version);
+    const rqOriginal = this.getRQAppliedValue(id, version);
     const searchState = this.getSearchState(id, version);
     return {
       moduleName: this.getModuleName(),
@@ -1739,7 +1739,7 @@ export default class ItemDefinition {
       includes,
       properties,
       policies,
-      gqlOriginalFlattenedValue: (gqlOriginal && gqlOriginal.flattenedValue) || null,
+      rqOriginalFlattenedValue: (rqOriginal && rqOriginal.flattenedValue) || null,
       forId: id,
       forVersion: version,
       searchState,
@@ -1802,10 +1802,10 @@ export default class ItemDefinition {
   }
 
   /**
-   * Applies a value from graphql to the item definition state
+   * Applies a value from rq to the item definition state
    * @param id the id that this state is for (can be null)
    * @param version the version of this state is for (can be null)
-   * @param value the value itself from graphql, DATA values and flattened values are valid.
+   * @param value the value itself from rq, DATA values and flattened values are valid.
    * @param excludeExtensions whether to exclude the extensions for applying the value
    * @param requestFields the fields that were used to request this data (can be null) but be careful
    * this might be used for catching
@@ -1829,29 +1829,29 @@ export default class ItemDefinition {
     forceApply?: boolean,
   ): boolean {
     // first we flatten the value if necessary
-    const flattenedValue = value === null ? value : (typeof value.DATA !== "undefined" ? flattenRawGQLValueOrFields(value) : value);
+    const flattenedValue = value === null ? value : (typeof value.DATA !== "undefined" ? flattenRawRQValueOrFields(value) : value);
     const mergedID = id + "." + (version || "");
 
     // we already have a value for that
     if (!forceApply && this.stateHasAppliedValueTo[mergedID]) {
-      if (this.stateGQLAppliedValue[mergedID].flattenedValue === null && value === null) {
-        const currentRequestFields = this.stateGQLAppliedValue[mergedID].requestFields;
+      if (this.stateRQAppliedValue[mergedID].flattenedValue === null && value === null) {
+        const currentRequestFields = this.stateRQAppliedValue[mergedID].requestFields;
         if (!requestFieldsAreContained(requestFields, currentRequestFields)) {
-          this.stateGQLAppliedValue[mergedID].requestFields = requestFields;
+          this.stateRQAppliedValue[mergedID].requestFields = requestFields;
         }
         return false;
       }
 
-      const fieldsAlreadyGot = this.stateGQLAppliedValue[mergedID].requestFields;
+      const fieldsAlreadyGot = this.stateRQAppliedValue[mergedID].requestFields;
       if (
         requestFieldsAreContained(requestFields, fieldsAlreadyGot) &&
         (
           (
-            this.stateGQLAppliedValue[mergedID].flattenedValue &&
+            this.stateRQAppliedValue[mergedID].flattenedValue &&
             value &&
-            this.stateGQLAppliedValue[mergedID].flattenedValue.last_modified === value.last_modified
+            this.stateRQAppliedValue[mergedID].flattenedValue.last_modified === value.last_modified
           ) || (
-            this.stateGQLAppliedValue[mergedID].rawValue === value
+            this.stateRQAppliedValue[mergedID].rawValue === value
           )
         )
       ) {
@@ -1863,7 +1863,7 @@ export default class ItemDefinition {
     this.stateHasAppliedValueTo[mergedID] = true;
     this.stateSearch[mergedID] = null;
     // and set all the data regarding that value
-    this.stateGQLAppliedValue[mergedID] = {
+    this.stateRQAppliedValue[mergedID] = {
       rawValue: value,
       flattenedValue,
       requestFields,
@@ -1926,7 +1926,7 @@ export default class ItemDefinition {
   ) {
     const mergedID = id + "." + (version || "");
     if (this.stateHasAppliedValueTo[mergedID]) {
-      const entireValue = this.stateGQLAppliedValue[mergedID];
+      const entireValue = this.stateRQAppliedValue[mergedID];
       this.applyValue(
         id,
         version,
@@ -1955,16 +1955,16 @@ export default class ItemDefinition {
     const mergedID = id + "." + (version || "");
     if (
       !this.stateHasAppliedValueTo[mergedID] ||
-      !this.stateGQLAppliedValue[mergedID] ||
-      !this.stateGQLAppliedValue[mergedID].flattenedValue
+      !this.stateRQAppliedValue[mergedID] ||
+      !this.stateRQAppliedValue[mergedID].flattenedValue
     ) {
       return UNSPECIFIED_OWNER;
     }
 
     if (this.isOwnerObjectId()) {
-      return (this.stateGQLAppliedValue[mergedID].flattenedValue.id || UNSPECIFIED_OWNER) as string;
+      return (this.stateRQAppliedValue[mergedID].flattenedValue.id || UNSPECIFIED_OWNER) as string;
     }
-    return (this.stateGQLAppliedValue[mergedID].flattenedValue.created_by || UNSPECIFIED_OWNER) as string;
+    return (this.stateRQAppliedValue[mergedID].flattenedValue.created_by || UNSPECIFIED_OWNER) as string;
   }
 
   /**
@@ -2045,7 +2045,7 @@ export default class ItemDefinition {
 
     // delete all from memory
     delete this.stateHasAppliedValueTo[mergedID];
-    delete this.stateGQLAppliedValue[mergedID];
+    delete this.stateRQAppliedValue[mergedID];
     delete this.stateSearch[mergedID];
 
     // gather the properties
@@ -2115,9 +2115,9 @@ export default class ItemDefinition {
    * @param version the version
    * @returns the applied value structure
    */
-  public getRQAppliedValue(id: string, version: string): IItemDefinitionGQLValueType {
+  public getRQAppliedValue(id: string, version: string): IItemDefinitionRQValueType {
     const mergedID = id + "." + (version || "");
-    const appliedRQValue = this.stateGQLAppliedValue[mergedID] || null;
+    const appliedRQValue = this.stateRQAppliedValue[mergedID] || null;
     return appliedRQValue;
   }
 
@@ -2219,7 +2219,7 @@ export default class ItemDefinition {
   }
 
   /**
-   * Returns the FLATTENED fields for the graphql request
+   * Returns the FLATTENED fields for the rq request
    * @param action 
    * @param role 
    * @param userId 
@@ -2282,7 +2282,7 @@ export default class ItemDefinition {
   }
 
   /**
-   * For a given requested graphql value it will
+   * For a given requested rq value it will
    * tell which fields need to be filtered for soft
    * read role access
    * @param role 

@@ -1,5 +1,5 @@
 /**
- * Contains graphql utlity functions that are used everywhere accross
+ * Contains rq utlity functions that are used everywhere accross
  * the itemize app
  * 
  * @module
@@ -54,37 +54,37 @@ export function requestFieldsAreContained(
 
 /**
  * Merges request fields or values together
- * @param gqlValueOrFieldsOverride the value that overrides
- * @param gqlValueOfFieldsOverriden the value that is overriden
+ * @param rqValueOrFieldsOverride the value that overrides
+ * @param rqValueOfFieldsOverriden the value that is overriden
  * @returns new merged request fields
  */
-export function deepMerge(gqlValueOrFieldsOverride: any, gqlValueOfFieldsOverriden: any): any {
+export function deepMerge(rqValueOrFieldsOverride: any, rqValueOfFieldsOverriden: any): any {
   // if our override is not an object or it's null
-  if (typeof gqlValueOrFieldsOverride !== "object" || gqlValueOrFieldsOverride === null) {
+  if (typeof rqValueOrFieldsOverride !== "object" || rqValueOrFieldsOverride === null) {
     // we get the override
-    return gqlValueOrFieldsOverride;
-  } else if (Array.isArray(gqlValueOrFieldsOverride)) {
+    return rqValueOrFieldsOverride;
+  } else if (Array.isArray(rqValueOrFieldsOverride)) {
     // also if it's an array
-    return gqlValueOrFieldsOverride;
+    return rqValueOrFieldsOverride;
   }
 
   // we build the new object that is the merge from the overriden
   // note that if the overriden is null, this will be an empty object
   const newObjMerge = {
-    ...gqlValueOfFieldsOverriden,
+    ...rqValueOfFieldsOverriden,
   };
 
   // and now we loop
-  Object.keys(gqlValueOrFieldsOverride).forEach((key) => {
+  Object.keys(rqValueOrFieldsOverride).forEach((key) => {
     // and merge in each case
     if (newObjMerge[key]) {
       newObjMerge[key] = deepMerge(
-        gqlValueOrFieldsOverride[key],
+        rqValueOrFieldsOverride[key],
         newObjMerge[key],
       );
     } else {
       // or add if not there
-      newObjMerge[key] = gqlValueOrFieldsOverride[key];
+      newObjMerge[key] = rqValueOrFieldsOverride[key];
     }
   });
 
@@ -97,7 +97,7 @@ export function deepMerge(gqlValueOrFieldsOverride: any, gqlValueOfFieldsOverrid
  * into the flattened form without the DATA but all data free
  * @param recievedFields the recieved fields or value
  */
-export function flattenRawGQLValueOrFields(fieldsOrValue: IRQValue | IRQRequestFields) {
+export function flattenRawRQValueOrFields(fieldsOrValue: IRQValue | IRQRequestFields) {
   if (!fieldsOrValue) {
     return fieldsOrValue;
   }

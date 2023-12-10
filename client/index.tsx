@@ -737,7 +737,7 @@ if (typeof document !== "undefined" && process.env.NODE_ENV === "development") {
     function processIdef(idef: ItemDefinition) {
       const absPath = idef.getAbsolutePath().join("/");
       state.idefs[absPath] = {
-        appliedValue: (idef as any).stateGQLAppliedValue,
+        appliedValue: (idef as any).stateRQAppliedValue,
         internalState: (idef as any).stateInternal,
         properties: {},
         includes: {}

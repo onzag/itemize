@@ -1,5 +1,5 @@
 /**
- * This file contains the graphql utility functions for managing
+ * This file contains the rq utility functions for managing
  * Includes that exist within item definitions, it doesn't contain
  * the conversion function sql.ts does
  *
@@ -11,15 +11,15 @@ import { RQField } from "../../../rq";
 import { getRQDefinitionForProperty } from "../PropertyDefinition/rq";
 
 /**
- * Provides the graphql definition that will be required to store
+ * Provides the rq definition that will be required to store
  * this include bit
  * @param include the include
  * @param options.propertiesAsInput if it's in input mode to get
- * graphql input fields instead
+ * rq input fields instead
  * @param options.optionalForm makes all the field of the include optional
  * so they can be decided
- * @returns a list of field definitions that represent the include in graphql form
- * for use within the graphql description
+ * @returns a list of field definitions that represent the include in rq form
+ * for use within the rq description
  */
 export function getRQDefinitionForInclude(
   include: Include,
@@ -43,7 +43,7 @@ export function getRQDefinitionForInclude(
   const description = include.getI18nDataFor("en").name ||
     include.getItemDefinition().getI18nDataFor("en").name;
 
-  // now we add the exclusion state, and the graphql object, depending to
+  // now we add the exclusion state, and the rq object, depending to
   // what we have
   return {
     [include.getQualifiedExclusionStateIdentifier()]: {

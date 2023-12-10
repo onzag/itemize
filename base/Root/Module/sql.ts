@@ -228,10 +228,10 @@ export function getSQLTablesSchemaForModule(mod: Module): ISQLSchemaDefinitionTy
 }
 
 /**
- * Converts a graphql value, with all its items and everything it
+ * Converts a rq value, with all its items and everything it
  * has into a SQL row data value for this specific module
  * @param mod the module in question
- * @param data the graphql data
+ * @param data the rq data
  * @param oldData the old stored value for this module
  * @param uploadsClient the uploads client
  * @param dictionary the postgresql dictionary
@@ -244,7 +244,7 @@ export function getSQLTablesSchemaForModule(mod: Module): ISQLSchemaDefinitionTy
  * in a partial field value, don't use partial fields to create
  * @returns the composed row value with the consume streams function
  */
-export function convertGQLValueToSQLValueForModule(
+export function convertRQValueToSQLValueForModule(
   serverData: any,
   appData: IAppDataType,
   mod: Module,
@@ -299,7 +299,7 @@ export function convertGQLValueToSQLValueForModule(
 
 /**
  * Converts a SQL value directly coming from the database as it is
- * to a graphql value for this specific module, this
+ * to a rq value for this specific module, this
  * only includes prop extensions and standard properties
  * and excludes everything else
  * @param serverData the server data information
@@ -307,33 +307,33 @@ export function convertGQLValueToSQLValueForModule(
  * @param row the row value, with all the columns it has; the row
  * can be overblown with other field data, this will extract only the
  * data required for this module
- * @param graphqlFields contains the only properties that are required
+ * @param rqFields contains the only properties that are required
  * in the request provided by grapql fields,
  * eg {id: {}, name: {}}
- * @returns a graphql value
+ * @returns a rq value
  */
-export function convertSQLValueToGQLValueForModule(
+export function convertSQLValueToRQValueForModule(
   serverData: any,
   appData: IAppDataType,
   mod: Module,
   row: ISQLTableRowValue,
-  graphqlFields: IRQRequestFields,
+  rqFields: IRQRequestFields,
 ): IRQValue {
-  // first we create the graphql result
+  // first we create the rq result
   const result: IRQValue = {};
 
   // now we take all the base properties that we have
-  // in the graphql model
+  // in the rq model
   Object.keys(RESERVED_BASE_PROPERTIES_RQ).forEach((basePropertyKey) => {
     result[basePropertyKey] = row[basePropertyKey] || null;
   });
 
   // we also take all the property definitions we have
   // in this item definitions, and convert them one by one
-  // with the row data, this basically also gives graphql value
+  // with the row data, this basically also gives rq value
   // in the key:value format
   mod.getAllPropExtensions().filter(
-    (property) => graphqlFields[property.getId()],
+    (property) => rqFields[property.getId()],
   ).forEach((pd) => {
     Object.assign(
       result,
@@ -350,18 +350,18 @@ export function convertSQLValueToElasticSQLValueForModule(
   mod: Module,
   row: ISQLTableRowValue,
 ) {
-  // first we create the graphql result
+  // first we create the rq result
   const result: ISQLTableRowValue = {};
 
   // now we take all the base properties that we have
-  // in the graphql model
+  // in the rq model
   Object.keys(RESERVED_BASE_PROPERTIES_RQ).forEach((basePropertyKey) => {
     result[basePropertyKey] = row[basePropertyKey] || null;
   });
 
   // we also take all the property definitions we have
   // in this item definitions, and convert them one by one
-  // with the row data, this basically also gives graphql value
+  // with the row data, this basically also gives rq value
   // in the key:value format
   mod.getAllPropExtensions().forEach((pd) => {
     Object.assign(
@@ -379,7 +379,7 @@ export function convertSQLValueToElasticSQLValueForModule(
  * within itself in the database
  * @param serverData the server data
  * @param mod the module in question
- * @param args the args for the query from graphql
+ * @param args the args for the query from rq
  * @param whereBuilder the where builder
  * @param orderByBuilder the order by builder
  * @param dictionary the dictionary used
@@ -490,7 +490,7 @@ export function buildSQLQueryForModule(
  * within itself in the database
  * @param serverData the server data
  * @param mod the module in question
- * @param args the args for the query from graphql
+ * @param args the args for the query from rq
  * @param elasticQueryBuilder the where builder
  * @param dictionary the dictionary used
  * @param search the search

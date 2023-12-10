@@ -321,8 +321,8 @@ export function EntryViewReadSet(
 
   // now we need to get the container id, the container id refers to where the data was stored
   // in the server side information container, we might have one already
-  const containerId: string = (itemContextualValue.state.gqlOriginalFlattenedValue &&
-    itemContextualValue.state.gqlOriginalFlattenedValue.container_id as string) || null;
+  const containerId: string = (itemContextualValue.state.rqOriginalFlattenedValue &&
+    itemContextualValue.state.rqOriginalFlattenedValue.container_id as string) || null;
 
   // so now we can start in conditional rendering
   if (type === "read") {
@@ -399,26 +399,26 @@ export function EntryViewReadSet(
 
     // if we are talking a meta property
     if (isMetaProperty) {
-      let gqlValue: any;
+      let rqValue: any;
       if (actualId === "id") {
-        gqlValue = itemContextualValue.forId;
+        rqValue = itemContextualValue.forId;
       } else if (actualId === "version") {
-        gqlValue = itemContextualValue.forVersion;
+        rqValue = itemContextualValue.forVersion;
       } else {
-        gqlValue = itemContextualValue.state.gqlOriginalFlattenedValue &&
-          itemContextualValue.state.gqlOriginalFlattenedValue[actualId];
+        rqValue = itemContextualValue.state.rqOriginalFlattenedValue &&
+          itemContextualValue.state.rqOriginalFlattenedValue[actualId];
       }
 
       // if it's undefined we give null
-      if (typeof gqlValue === "undefined") {
-        gqlValue = null;
+      if (typeof rqValue === "undefined") {
+        rqValue = null;
       }
       // and then call the children
       if (use) {
-        return [gqlValue, null];
+        return [rqValue, null];
       }
 
-      return props.children(gqlValue as any, null, null);
+      return props.children(rqValue as any, null, null);
     }
 
     if (process.env.NODE_ENV === "development" && !props.suppressWarnings) {
@@ -478,23 +478,23 @@ export function EntryViewReadSet(
     // if we have a meta property nevertheless
     if (isMetaProperty) {
       // we need to read its value
-      let gqlValue = itemContextualValue.state.gqlOriginalFlattenedValue &&
-        itemContextualValue.state.gqlOriginalFlattenedValue[actualId];
-      if (typeof gqlValue === "undefined") {
-        gqlValue = null;
+      let rqValue = itemContextualValue.state.rqOriginalFlattenedValue &&
+        itemContextualValue.state.rqOriginalFlattenedValue[actualId];
+      if (typeof rqValue === "undefined") {
+        rqValue = null;
       }
 
       // and then pass it to the raw base property view, which will
       // use the appropiate rendered for this
-      if (typeof gqlValue === "number") {
+      if (typeof rqValue === "number") {
         return <RawBasePropertyView
-          value={gqlValue.toString()}
+          value={rqValue.toString()}
           renderer={props.renderer}
           rendererArgs={props.rendererArgs}
         />;
       } else {
         return <RawBasePropertyView
-          value={gqlValue as any}
+          value={rqValue as any}
           renderer={props.renderer}
           rendererArgs={props.rendererArgs}
         />;

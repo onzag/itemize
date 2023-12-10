@@ -850,7 +850,7 @@ export class RemoteListener {
       const index = this.propertySearchListeners[qualifiedIdentifier].callbacks.indexOf(callback)
       // and if this callback is not included yet
       // this can actually hit here very often since every time that a search gets called
-      // in gql and it has a cache policy, it will attempt to add a listener
+      // in rq and it has a cache policy, it will attempt to add a listener
       // and the same listener might have already been added before
       if (index === -1) {
         // so we push the callback
@@ -911,7 +911,7 @@ export class RemoteListener {
       const index = this.ownedSearchListeners[qualifiedIdentifier].callbacks.indexOf(callback)
       // and if this callback is not included yet
       // this can actually hit here very often since every time that a search gets called
-      // in gql and it has a cache policy, it will attempt to add a listener
+      // in rq and it has a cache policy, it will attempt to add a listener
       // and the same listener might have already been added before
       if (index === -1) {
         // so we push the callback

@@ -14,7 +14,7 @@ import { EndpointError, EndpointErrorType } from "../../base/errors";
 import ItemDefinition, { IItemStateType } from "../../base/Root/Module/ItemDefinition";
 import Module from "../../base/Root/Module";
 import { convertSQLValueToRQValueForItemDefinition } from "../../base/Root/Module/ItemDefinition/sql";
-import { convertSQLValueToGQLValueForModule } from "../../base/Root/Module/sql";
+import { convertSQLValueToRQValueForModule } from "../../base/Root/Module/sql";
 import { IAppDataType } from "..";
 import { logger } from "../logger";
 import equals from "deep-equal";
@@ -709,7 +709,7 @@ export function checkListTypes(records: IRQSearchRecord[], mod: Module) {
 
 /**
  * Checks the language and region given the arguments passed
- * by the graphql resolver
+ * by the rq resolver
  * @param appData the app data that is currently in context
  * @param args the args themselves being passed to the resolver
  */
@@ -770,7 +770,7 @@ export function checkUserCanSearch(args: any, moduleOrIdef: Module | ItemDefinit
  * This just extracts the dictionary given the app data
  * and the language of choice
  * @param appData the app data
- * @param args the whole args of the graphql request
+ * @param args the whole args of the rq request
  */
 export function getDictionary(appData: IAppDataType, args: any): string {
   const dictionary = appData.databaseConfig.dictionaries[args.language] || appData.databaseConfig.dictionaries["*"];
@@ -890,7 +890,7 @@ export interface IFilteredAndPreparedValueType {
 }
 
 /**
- * Filters and prepares a graphql value for output to the rest endpoint
+ * Filters and prepares a rq value for output to the rest endpoint
  * given the value that has given by the server, the requested fields
  * that are supposed to be outputted, the role of the current user
  * and the parent module or item definition this value belongs to,
@@ -900,7 +900,7 @@ export interface IFilteredAndPreparedValueType {
  * @param role the role of the user requesting the data
  * @param parentModuleOrIdef the parent module or item definition the value belongs to
  */
-export async function filterAndPrepareGQLValue(
+export async function filterAndPrepareRQValue(
   serverData: any,
   appData: IAppDataType,
   value: ISQLTableRowValue,
@@ -925,7 +925,7 @@ export async function filterAndPrepareGQLValue(
     );
   } else {
     // same for modules
-    valueOfTheItem = convertSQLValueToGQLValueForModule(
+    valueOfTheItem = convertSQLValueToRQValueForModule(
       serverData,
       appData,
       parentModuleOrIdef,
@@ -988,12 +988,12 @@ export async function filterAndPrepareGQLValue(
 
 /**
  * Checks that an item definition current state is
- * valid and that the gqlArgValue provided is a match
+ * valid and that the rqArgValue provided is a match
  * for this item definition current value, remember
- * that in order to set the state to the gqlArgValue
- * you should run itemDefinition.applyValue(gqlArgValue);
+ * that in order to set the state to the rqArgValue
+ * you should run itemDefinition.applyValue(rqArgValue);
  * @param itemDefinition the item definition in question
- * @param gqlArgValue the arg value that was set
+ * @param rqArgValue the arg value that was set
  * @param id the stored item id, if available, or null
  * @param version the stored item version if avaliable
  * @param referredInclude this is an optional include used to basically
@@ -1001,7 +1001,7 @@ export async function filterAndPrepareGQLValue(
  */
 export async function serverSideCheckItemDefinitionAgainst(
   itemDefinition: ItemDefinition,
-  gqlArgValue: IRQValue,
+  rqArgValue: IRQValue,
   id: string,
   version: string,
   referredInclude?: Include,
@@ -1032,8 +1032,8 @@ export async function serverSideCheckItemDefinitionAgainst(
 
   // now we are going to loop over the properties of that value
   currentValue.properties.forEach((propertyValue) => {
-    // and we get what is set in the graphql value
-    const gqlPropertyValue = gqlArgValue[propertyValue.propertyId];
+    // and we get what is set in the rq value
+    const rqPropertyValue = rqArgValue[propertyValue.propertyId];
     // now we check if it has an invalid reason
     if (propertyValue.invalidReason) {
       // throw an error then
@@ -1049,11 +1049,11 @@ export async function serverSideCheckItemDefinitionAgainst(
       });
 
       // we also check that the values are matching, but only if they have been
-      // defined in the graphql value
-    } else if (typeof gqlPropertyValue !== "undefined" && !equals(gqlPropertyValue, propertyValue.value)) {
+      // defined in the rq value
+    } else if (typeof rqPropertyValue !== "undefined" && !equals(rqPropertyValue, propertyValue.value)) {
       throw new EndpointError({
         message: `validation failed at property ${propertyValue.propertyId} with a mismatch of calculated` +
-          ` value expected ${JSON.stringify(propertyValue.value)} received ${JSON.stringify(gqlPropertyValue)}`,
+          ` value expected ${JSON.stringify(propertyValue.value)} received ${JSON.stringify(rqPropertyValue)}`,
         code: ENDPOINT_ERRORS.INVALID_PROPERTY,
         // someone might have been trying to hack for this to happen
         // a null pcode is a red flag, well almost all these checks show tampering
@@ -1072,16 +1072,16 @@ export async function serverSideCheckItemDefinitionAgainst(
   for (const includeValue of currentValue.includes) {
     // now we take the item itself
     const include = itemDefinition.getIncludeFor(includeValue.includeId);
-    // the graphql item value
-    let gqlIncludeValue = gqlArgValue[include.getQualifiedIdentifier()];
+    // the rq item value
+    let rqIncludeValue = rqArgValue[include.getQualifiedIdentifier()];
     // if it's undefined we make it null
-    if (typeof gqlIncludeValue === "undefined") {
-      gqlIncludeValue = null;
+    if (typeof rqIncludeValue === "undefined") {
+      rqIncludeValue = null;
     }
-    // the graphql exclusion state value
-    const gqlExclusionState = gqlArgValue[include.getQualifiedExclusionStateIdentifier()] || null;
+    // the rq exclusion state value
+    const rqExclusionState = rqArgValue[include.getQualifiedExclusionStateIdentifier()] || null;
     // now we check if the exclusion states match
-    if (includeValue.exclusionState !== gqlExclusionState) {
+    if (includeValue.exclusionState !== rqExclusionState) {
       throw new EndpointError({
         message: `validation failed at include ${includeValue.includeId} with a mismatch of exclusion state`,
         code: ENDPOINT_ERRORS.INVALID_INCLUDE,
@@ -1091,7 +1091,7 @@ export async function serverSideCheckItemDefinitionAgainst(
         includeIdItemDefPath: referredParentOfInclude && referredParentOfInclude.getPath(),
       });
       // and we check if the there's a value set despite it being excluded
-    } else if (gqlExclusionState === IncludeExclusionState.EXCLUDED && gqlIncludeValue !== null) {
+    } else if (rqExclusionState === IncludeExclusionState.EXCLUDED && rqIncludeValue !== null) {
       throw new EndpointError({
         message: `validation failed at include ${includeValue.includeId} with an excluded item but data set for it`,
         code: ENDPOINT_ERRORS.INVALID_INCLUDE,
@@ -1105,7 +1105,7 @@ export async function serverSideCheckItemDefinitionAgainst(
     // specific item data, that's where we use our referred item
     await serverSideCheckItemDefinitionAgainst(
       include.getItemDefinition(),
-      gqlIncludeValue as IRQValue,
+      rqIncludeValue as IRQValue,
       id,
       version,
       include,
@@ -1116,13 +1116,13 @@ export async function serverSideCheckItemDefinitionAgainst(
 
 const reservedKeys = Object.keys(RESERVED_BASE_PROPERTIES_RQ);
 /**
- * Splits the arguments in a graphql query from what it comes to be part
+ * Splits the arguments in a rq query from what it comes to be part
  * of the item definition or module in question and what is extra arguments
  * that are used within the query
  * @param moduleOrItemDefinition the module or item definition
  * @param args the arguments to split
  */
-export function splitArgsInGraphqlQuery(
+export function splitArgsInRQQuery(
   moduleOrItemDefinition: Module | ItemDefinition,
   args: IRQArgs,
 ): [IRQArgs, IRQArgs] {
@@ -1163,9 +1163,9 @@ function getOwnerUserId(row: ISQLTableRowValue, root: Root) {
  * @param arg.id the id of that item definition on the database
  * @param arg.version the version of the item definition on the database
  * @param arg.role the role of the current user
- * @param arg.gqlArgValue the arg value given in the arguments from graphql, where the info should be
+ * @param arg.rqArgValue the arg value given in the arguments from rq, where the info should be
  * in qualified path names for the policies
- * @param arg.gqlFlattenedRequestedFiels the flattened request fields that have been requested to read
+ * @param arg.rqFlattenedRequestedFields the flattened request fields that have been requested to read
  * @param arg.cache the cache instance
  * @param arg.preValidation a validation to do, validate if the row doesn't exist here, and anything else necessary
  * the function will crash by Internal server error if no validation is done if the row is null; return
@@ -1183,8 +1183,8 @@ export async function runPolicyCheck(
     version: string,
     role: string,
     userId: string,
-    gqlArgValue: IRQValue,
-    gqlFlattenedRequestedFiels: any,
+    rqArgValue: IRQValue,
+    rqFlattenedRequestedFields: any,
     appData: IAppDataType,
     preValidation?: (content: ISQLTableRowValue) => void | ISQLTableRowValue | Promise<void | ISQLTableRowValue>,
     parentModule?: string,
@@ -1285,7 +1285,7 @@ export async function runPolicyCheck(
       // also applying includes
       if (policyType !== "delete" && policyType !== "parent") {
         // now we can use our policy 
-        const gqlCheckingElement = policyType === "read" ? arg.gqlFlattenedRequestedFiels : arg.gqlArgValue;
+        const rqCheckingElement = policyType === "read" ? arg.rqFlattenedRequestedFields : arg.rqArgValue;
 
         // now we are going to see if we are respcting them
         const applyingPropertyIds =
@@ -1302,7 +1302,7 @@ export async function runPolicyCheck(
             // now we check whether it is being modified, or read
             applyingPropertyIds.some(
               (applyingPropertyId) => {
-                const isDefinedInReadOrEdit = typeof gqlCheckingElement[applyingPropertyId] !== "undefined";
+                const isDefinedInReadOrEdit = typeof rqCheckingElement[applyingPropertyId] !== "undefined";
                 const isCurrentlyNull = selectQueryValue[applyingPropertyId] === null;
                 // and we do respect if we care about non-nulls
                 if (applyingPropertyOnlyAppliesWhenCurrentIsNonNull && isCurrentlyNull) {
@@ -1322,8 +1322,8 @@ export async function runPolicyCheck(
                 (applyingIncludeId) => {
                   const include = arg.itemDefinition.getIncludeFor(applyingIncludeId);
                   return (
-                    typeof gqlCheckingElement[include.getQualifiedIdentifier()] !== "undefined" ||
-                    typeof gqlCheckingElement[include.getQualifiedExclusionStateIdentifier()] !== "undefined"
+                    typeof rqCheckingElement[include.getQualifiedIdentifier()] !== "undefined" ||
+                    typeof rqCheckingElement[include.getQualifiedExclusionStateIdentifier()] !== "undefined"
                   );
                 },
               );
@@ -1388,7 +1388,7 @@ export async function runPolicyCheck(
         // the value for this policy is stored
         const qualifiedPolicyIdentifier = property.getQualifiedPolicyIdentifier(policyType, policyName);
         // and like that we get the value that has been set for that policy
-        let policyValueForTheProperty = arg.gqlArgValue[qualifiedPolicyIdentifier] as PropertyDefinitionSupportedType;
+        let policyValueForTheProperty = arg.rqArgValue[qualifiedPolicyIdentifier] as PropertyDefinitionSupportedType;
         // if it's undefined, we set it to null
         if (typeof policyValueForTheProperty === "undefined") {
           policyValueForTheProperty = null;

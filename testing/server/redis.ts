@@ -125,15 +125,15 @@ export class RedisTest extends Test {
       (this.testingUserInfo.testUser.version || "");
 
     // this.it(
-    //   "Should be able to cache when graphql requested",
+    //   "Should be able to cache when rq requested",
     //   async () => {
 
     //     // delete the user cache entry from the cluster registry
     //     // bit hacky but okey
     //     await delPromisified(idefQueryIdentifier);
 
-    //     // we will use the token request as that will cause a request via graphql
-    //     const response = await fetchNode(this.fullHost + "/graphql", {
+    //     // we will use the token request as that will cause a request via rq
+    //     const response = await fetchNode(this.fullHost + "/rq", {
     //       method: "POST",
     //       body: JSON.stringify({ query: "query{token(token: " + JSON.stringify(this.testingUserInfo.testToken) + "){token,}}", variables: null }),
     //       headers: {
@@ -141,7 +141,7 @@ export class RedisTest extends Test {
     //       },
     //     });
 
-    //     assert.strictEqual(response.status, 200, "Graphql did not return 200 OK");
+    //     assert.strictEqual(response.status, 200, "Rq did not return 200 OK");
 
     //     // fetch the new value from the redis cache, there should be a new one
     //     const value = await getPromisified(idefQueryIdentifier);
@@ -159,18 +159,18 @@ export class RedisTest extends Test {
 
     // [0, 1].forEach((round) => {
     //   this.it(
-    //     "Should be able to update the cached value after a grapqhl action, round " + (round + 1),
+    //     "Should be able to update the cached value after a rq action, round " + (round + 1),
     //     async () => {
     //       // there should be one there from our previous test
     //       const currentValue = JSON.parse(await getPromisified(idefQueryIdentifier));
 
-    //       // we will use the token request as that will cause a request via graphql
+    //       // we will use the token request as that will cause a request via rq
     //       // we will change the country of the user
     //       const originalCountry = this.testingUserInfo.testUser.app_country;
     //       // we will toggle the user country
     //       const newCountry = round === 0 ? (originalCountry === "AQ" ? "FI" : "AQ") : originalCountry;
 
-    //       const response = await fetchNode(this.fullHost + "/graphql", {
+    //       const response = await fetchNode(this.fullHost + "/rq", {
     //         method: "POST",
     //         body: JSON.stringify(
     //           {
@@ -192,7 +192,7 @@ export class RedisTest extends Test {
     //         },
     //       });
 
-    //       assert.strictEqual(response.status, 200, "Graphql did not return 200 OK");
+    //       assert.strictEqual(response.status, 200, "rq did not return 200 OK");
 
     //       // wait a couple of ms, cluster database update is almost
     //       // instantaneous but the tests might be running way too fast

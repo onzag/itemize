@@ -145,16 +145,6 @@ export default class Include {
    */
   public parentModule: Module;
 
-  // graphql helper
-  // tslint:disable-next-line: variable-name
-  public _gqlInObj: any;
-  // tslint:disable-next-line: variable-name
-  public _gqlOutObj: any;
-  // tslint:disable-next-line: variable-name
-  public _gqlInObjOpt: any;
-  // tslint:disable-next-line: variable-name
-  public _gqlOutObjOpt: any;
-
   /**
    * The item definition the include refers to
    */
@@ -338,7 +328,7 @@ export default class Include {
   }
 
   /**
-   * For a given requested graphql value it will
+   * For a given requested rq value it will
    * tell which fields need to be filtered for soft
    * read role access
    * @param role 
@@ -399,13 +389,13 @@ export default class Include {
   }
 
   /**
-   * Builds the fileds as grapqhl fields for a given role that wants to execute a given
+   * Builds the fileds as rq fields for a given role that wants to execute a given
    * action, that will be the maximum fields of the include this user can request
    * @param action the action that is to be executed
    * @param role the role that is executing it
    * @param userId the user id of that user
    * @param ownerUserId the owner of the item definition where the include is localed
-   * @returns a graphql fields object
+   * @returns a rq fields object
    */
   public async buildFieldsForRoleAccess(
     action: ItemDefinitionIOActions,
@@ -715,7 +705,7 @@ export default class Include {
       value || {},
       // exclude all extensions
       true,
-      // graphql requested fields, none
+      // rq requested fields, none
       null,
       doNotApplyValueInPropertyIfPropertyHasBeenManuallySet,
     );

@@ -118,7 +118,7 @@ export function initializeApp(appData: IAppDataType, custom: IServerCustomizatio
     }
 
     let result: string = "user-agent: *\ndisallow: /rest/util/*\ndisallow: /rest/index-check/*\n" +
-      "disallow: /rest/currency-factors\ndisallow: /graphql\ndisallow: /rq\n";
+      "disallow: /rest/currency-factors\ndisallow: /rq\ndisallow: /rq\n";
 
     if (appData.seoConfig) {
       Object.keys(appData.seoConfig.seoRules).forEach((urlSet) => {

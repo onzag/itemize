@@ -8,7 +8,7 @@ import {
   serverSideCheckItemDefinitionAgainst,
   runPolicyCheck,
   validateTokenIsntBlocked,
-  splitArgsInGraphqlQuery,
+  splitArgsInRQQuery,
   defaultTriggerForbiddenFunction,
   defaultTriggerInvalidForbiddenFunction,
   validateParentingRules,
@@ -24,7 +24,7 @@ import {
   convertSQLValueToRQValueForItemDefinition,
 } from "../../../base/Root/Module/ItemDefinition/sql";
 import { EndpointError, EndpointErrorType } from "../../../base/errors";
-import { flattenRawGQLValueOrFields } from "../../../rq-util";
+import { flattenRawRQValueOrFields } from "../../../rq-util";
 import { ISQLTableRowValue } from "../../../base/Root/sql";
 import { IRQArgs, IRQValue } from "../../../rq-querier";
 import { IOTriggerActions } from "../triggers";
@@ -78,7 +78,7 @@ export async function editItemDefinition(
     await validateTokenIsntBlocked(appData.cache, tokenData);
 
     // now we get the requested fields, and check they are available for the given role
-    const requestedFields = flattenRawGQLValueOrFields(resolverArgs.fields);
+    const requestedFields = flattenRawRQValueOrFields(resolverArgs.fields);
 
     // now we get the basic information
     const mod = itemDefinition.getParentModule();
@@ -91,7 +91,7 @@ export async function editItemDefinition(
       },
     );
 
-    let currentWholeValueAsGQL: IRQValue;
+    let currentWholeValueAsRQ: IRQValue;
     let rolesManager: CustomRoleManager;
     let ownerUserId: string;
 
@@ -105,14 +105,14 @@ export async function editItemDefinition(
         version: resolverArgs.args.version,
         role: tokenData.role,
         userId: tokenData.id,
-        gqlArgValue: resolverArgs.args,
-        gqlFlattenedRequestedFiels: requestedFields,
+        rqArgValue: resolverArgs.args,
+        rqFlattenedRequestedFields: requestedFields,
         appData,
         rolesManager: (sqlValue: ISQLTableRowValue) => {
           // Now that the policies have been checked, and that we get the value of the entire item
-          // definition, we need to convert that value to GQL value, and for that we use the converter
+          // definition, we need to convert that value to RQ value, and for that we use the converter
           // note how we don't pass the requested fields because we want it all
-          currentWholeValueAsGQL = convertSQLValueToRQValueForItemDefinition(
+          currentWholeValueAsRQ = convertSQLValueToRQValueForItemDefinition(
             appData.cache.getServerData(),
             appData,
             itemDefinition,
@@ -124,7 +124,7 @@ export async function editItemDefinition(
             cache: appData.cache,
             databaseConnection: appData.databaseConnection,
             rawDB: appData.rawDB,
-            value: currentWholeValueAsGQL,
+            value: currentWholeValueAsRQ,
             item: itemDefinition,
             module: itemDefinition.getParentModule(),
             root: appData.root,
@@ -243,11 +243,11 @@ export async function editItemDefinition(
     // values take precedence, yes there will be pollution, with token, id, and whatnot, but that
     // doesn't matter because the apply function ignores those
     const expectedUpdatedValue = {
-      ...currentWholeValueAsGQL,
+      ...currentWholeValueAsRQ,
       ...resolverArgs.args,
     };
 
-    // and as so we apply the value from graphql
+    // and as so we apply the value from rq
     itemDefinition.applyValue(
       resolverArgs.args.id,
       resolverArgs.args.version || null,
@@ -312,7 +312,7 @@ export async function editItemDefinition(
     // now we need to setup what we want to convert, since the
     // converting functions can take the whole args with its extra
     // stuff by default it's just the whole args
-    let gqlValueToConvert: IRQArgs = resolverArgs.args;
+    let rqValueToConvert: IRQArgs = resolverArgs.args;
 
     // now we need to find the triggers
     const pathOfThisIdef = itemDefinition.getAbsolutePath().join("/");
@@ -331,9 +331,9 @@ export async function editItemDefinition(
     if (
       itemDefinitionTrigger || moduleTrigger
     ) {
-      // we split the args in the graphql query for that which belongs to the
+      // we split the args in the rq query for that which belongs to the
       // item definition and that which is extra
-      const [itemDefinitionSpecificArgs, extraArgsFromSplit] = splitArgsInGraphqlQuery(
+      const [itemDefinitionSpecificArgs, extraArgsFromSplit] = splitArgsInRQQuery(
         itemDefinition,
         resolverArgs.args,
       );
@@ -341,12 +341,12 @@ export async function editItemDefinition(
 
       // so now we just want to convert the values setup here, as done
       // some heavy lifting
-      gqlValueToConvert = itemDefinitionSpecificArgs;
+      rqValueToConvert = itemDefinitionSpecificArgs;
       // and if we have a module trigger
       if (moduleTrigger) {
         // we execute the trigger
         const isReparenting = !!(
-          gqlValueToConvert.parent_id || gqlValueToConvert.parent_type || gqlValueToConvert.parent_version
+          rqValueToConvert.parent_id || rqValueToConvert.parent_type || rqValueToConvert.parent_version
         );
         const newValueAccordingToModule = await moduleTrigger({
           language: resolverArgs.args.language,
@@ -354,10 +354,10 @@ export async function editItemDefinition(
           appData,
           itemDefinition,
           module: mod,
-          originalValue: currentWholeValueAsGQL,
+          originalValue: currentWholeValueAsRQ,
           originalValueSQL: wholeSqlStoredValue,
           originalValueBlocked: !!wholeSqlStoredValue.blocked_at,
-          requestedUpdate: gqlValueToConvert,
+          requestedUpdate: rqValueToConvert,
           requestedUpdateToBlock: isToBlock,
           requestedUpdateToUnblock: isToUnblock,
           requestedUpdateParent: isReparenting ? {
@@ -388,14 +388,14 @@ export async function editItemDefinition(
         // and if we have a new value
         if (newValueAccordingToModule) {
           // that will be our new value
-          gqlValueToConvert = newValueAccordingToModule;
+          rqValueToConvert = newValueAccordingToModule;
         }
       }
       // same with the item definition
       if (itemDefinitionTrigger) {
         // we call the trigger
         const isReparenting = !!(
-          gqlValueToConvert.parent_id || gqlValueToConvert.parent_type || gqlValueToConvert.parent_version
+          rqValueToConvert.parent_id || rqValueToConvert.parent_type || rqValueToConvert.parent_version
         );
         const newValueAccordingToIdef = await itemDefinitionTrigger({
           language: resolverArgs.args.language,
@@ -403,10 +403,10 @@ export async function editItemDefinition(
           appData,
           itemDefinition,
           module: mod,
-          originalValue: currentWholeValueAsGQL,
+          originalValue: currentWholeValueAsRQ,
           originalValueSQL: wholeSqlStoredValue,
           originalValueBlocked: !!wholeSqlStoredValue.blocked_at,
-          requestedUpdate: gqlValueToConvert,
+          requestedUpdate: rqValueToConvert,
           requestedUpdateToBlock: isToBlock,
           requestedUpdateToUnblock: isToUnblock,
           requestedUpdateParent: isReparenting ? {
@@ -436,22 +436,22 @@ export async function editItemDefinition(
         });
         // and make it the new value if such trigger was registered
         if (newValueAccordingToIdef) {
-          gqlValueToConvert = newValueAccordingToIdef;
+          rqValueToConvert = newValueAccordingToIdef;
         }
       }
     }
 
     const isReparenting = !!(
-      gqlValueToConvert.parent_id || gqlValueToConvert.parent_type || gqlValueToConvert.parent_version
+      rqValueToConvert.parent_id || rqValueToConvert.parent_type || rqValueToConvert.parent_version
     );
 
     const sqlValue = await appData.cache.requestUpdate(
       itemDefinition,
       resolverArgs.args.id,
       resolverArgs.args.version || null,
-      gqlValueToConvert,
+      rqValueToConvert,
       {
-        currentGQLValue: currentWholeValueAsGQL,
+        currentrqValue: currentWholeValueAsRQ,
         currentSQLValue: wholeSqlStoredValue,
         editedBy: tokenData.id,
         language: resolverArgs.args.language,
@@ -459,9 +459,9 @@ export async function editItemDefinition(
         containerId: wholeSqlStoredValue.container_id as string,
         listenerUUID: resolverArgs.args.listener_uuid || null,
         reparent: isReparenting ? {
-          id: gqlValueToConvert.parent_id as string,
-          version: gqlValueToConvert.parent_version as string,
-          type: gqlValueToConvert.parent_type as string,
+          id: rqValueToConvert.parent_id as string,
+          version: rqValueToConvert.parent_version as string,
+          type: rqValueToConvert.parent_type as string,
         } : null,
         blocking: (isToUnblock || isToBlock) ? {
           reason: resolverArgs.args.blocked_reason,
@@ -480,7 +480,7 @@ export async function editItemDefinition(
     );
 
     // convert it using the requested fields for that, and ignoring everything else
-    const gqlValue = convertSQLValueToRQValueForItemDefinition(
+    const rqValue = convertSQLValueToRQValueForItemDefinition(
       appData.cache.getServerData(),
       appData,
       itemDefinition,
@@ -494,20 +494,20 @@ export async function editItemDefinition(
         appData,
         itemDefinition,
         module: mod,
-        originalValue: currentWholeValueAsGQL,
+        originalValue: currentWholeValueAsRQ,
         originalValueSQL: wholeSqlStoredValue,
         originalValueBlocked: !!wholeSqlStoredValue.blocked_at,
-        requestedUpdate: gqlValueToConvert,
+        requestedUpdate: rqValueToConvert,
         requestedUpdateToBlock: isToBlock,
         requestedUpdateToUnblock: isToUnblock,
         requestedUpdateCreatedBy: null as string,
         requestedUpdateParent: isReparenting ? {
-          id: gqlValueToConvert.parent_id as string,
-          version: gqlValueToConvert.parent_version as string,
-          type: gqlValueToConvert.parent_type as string,
+          id: rqValueToConvert.parent_id as string,
+          version: rqValueToConvert.parent_version as string,
+          type: rqValueToConvert.parent_type as string,
           value: knownParent,
         } : null,
-        newValue: gqlValue,
+        newValue: rqValue,
         newValueSQL: sqlValue,
         newValueBlocked: !!sqlValue.blocked_at,
         extraArgs,
@@ -553,20 +553,20 @@ export async function editItemDefinition(
         appData,
         itemDefinition,
         module: mod,
-        originalValue: currentWholeValueAsGQL,
+        originalValue: currentWholeValueAsRQ,
         originalValueSQL: wholeSqlStoredValue,
         originalValueBlocked: !!wholeSqlStoredValue.blocked_at,
-        requestedUpdate: gqlValueToConvert,
+        requestedUpdate: rqValueToConvert,
         requestedUpdateToBlock: isToBlock,
         requestedUpdateToUnblock: isToUnblock,
         requestedUpdateCreatedBy: null as string,
         requestedUpdateParent: isReparenting ? {
-          id: gqlValueToConvert.parent_id as string,
-          version: gqlValueToConvert.parent_version as string,
-          type: gqlValueToConvert.parent_type as string,
+          id: rqValueToConvert.parent_id as string,
+          version: rqValueToConvert.parent_version as string,
+          type: rqValueToConvert.parent_type as string,
           value: knownParent,
         } : null,
-        newValue: gqlValue,
+        newValue: rqValue,
         newValueSQL: sqlValue,
         newValueBlocked: !!sqlValue.blocked_at,
         extraArgs,
@@ -607,7 +607,7 @@ export async function editItemDefinition(
 
     const newRolesManagerWithEditedValue = rolesManager.subEnvironment({
       environment: CustomRoleGranterEnvironment.RETRIEVING,
-      value: gqlValue,
+      value: rqValue,
       customId: null,
     });
 
@@ -630,15 +630,15 @@ export async function editItemDefinition(
       tokenData.id,
       ownerUserId,
       newRolesManagerWithEditedValue,
-      gqlValue,
+      rqValue,
     );
 
     // we don't need to check for blocked or deleted because such items cannot be edited,
     // see before, so we return immediately, read has been checked already
-    // we use the same strategy, all extra data will be chopped anyway by graphql
+    // we use the same strategy, all extra data will be chopped anyway by rq
     const finalOutput = {
-      DATA: gqlValue,
-      ...gqlValue,
+      DATA: rqValue,
+      ...rqValue,
     };
 
     if (
@@ -660,7 +660,7 @@ export async function editItemDefinition(
     CAN_LOG_DEBUG && logger.debug(
       {
         functionName: "editItemDefinition",
-        message: "GQL ouput retrieved",
+        message: "RQ ouput retrieved",
       },
     );
 

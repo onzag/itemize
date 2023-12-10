@@ -115,41 +115,41 @@ export function getSQLTableDefinitionForInclude(itemDefinition: ItemDefinition, 
 
 /**
  * Given a SQL row it converts the value of the data contained
- * within that row into the valid graphql output
+ * within that row into the valid rq output
  * @param serverData the server data that is currently in use
  * @param include the include in question
  * @param row the row sql data
- * @param graphqlFields (optional) contains the only properties that are required
+ * @param rqFields (optional) contains the only properties that are required
  * in the request provided by grapql fields,
  * eg {id: {}, name: {}}
- * @returns a partial graphql value
+ * @returns a partial rq value
  */
-export function convertSQLValueToGQLValueForInclude(
+export function convertSQLValueToRQValueForInclude(
   serverData: any,
   appData: IAppDataType,
   itemDefinition: ItemDefinition, 
   include: Include,
   row: ISQLTableRowValue,
-  graphqlFields?: any,
+  rqFields?: any,
 ): IRQValue {
-  // now this is the result, of the graphql parent field because this is
+  // now this is the result, of the rq parent field because this is
   // an object that contains an object, the item sinking properties
   // are contained within that prefix, for example if the sql is
   // ITEM_wheel__EXCLUSION_STATE, ITEM_wheel_bolt, ITEM_wheel_rubber
   // the output should be
   // ITEM_wheel__EXCLUSION_STATE: ..., ITEM_wheel: {bolt: ... rubber: ...}
-  // this gqlParentResult represents what is in ITEM_wheel
-  const gqlParentResult: IRQValue = {};
+  // this rqParentResult represents what is in ITEM_wheel
+  const rqParentResult: IRQValue = {};
 
   // for that we need all the sinking properties
   include.getSinkingProperties().filter(
-    (property) => !graphqlFields ? true : graphqlFields[property.getId()],
+    (property) => !rqFields ? true : rqFields[property.getId()],
   ).forEach((sinkingProperty) => {
     // and we add them for the row data, notice how we add the prefix
     // telling the property definition that its properties are prefixed in
     // the sql data with ITEM_wheel_
     Object.assign(
-      gqlParentResult,
+      rqParentResult,
       convertSQLValueToRQValueForProperty(
         serverData,
         appData,
@@ -165,7 +165,7 @@ export function convertSQLValueToGQLValueForInclude(
   // prefixed as necessary
   return {
     [include.getQualifiedExclusionStateIdentifier()]: row[include.getQualifiedExclusionStateIdentifier()],
-    [include.getQualifiedIdentifier()]: gqlParentResult,
+    [include.getQualifiedIdentifier()]: rqParentResult,
   };
 }
 
@@ -201,13 +201,13 @@ export function convertSQLValueToElasticSQLValueForInclude(
 }
 
 /**
- * Converts a GraphQL value into a SQL row data, it takes apart a complex
- * graphql value and converts it into a serializable sql form
+ * Converts a rq value into a SQL row data, it takes apart a complex
+ * rq value and converts it into a serializable sql form
  * @param serverData the server data
  * @param itemDefinition the item definition in question
  * @param include the include in question
- * @param data the graphql data value
- * @param oldData the old graphql data value that used to be stored for that include
+ * @param data the rq data value
+ * @param oldData the old rq data value that used to be stored for that include
  * @param uploadsClient the uploads client
  * @param dictionary the dictionary to use in full text search mode
  * @param partialFields fields to make a partial value rather than a total
@@ -219,7 +219,7 @@ export function convertSQLValueToElasticSQLValueForInclude(
  * in a partial field value, don't use partial fields to create
  * @returns the partial sql result to be added into the table
  */
-export function convertGQLValueToSQLValueForInclude(
+export function convertRQValueToSQLValueForInclude(
   serverData: any,
   appData: IAppDataType,
   itemDefinition: ItemDefinition,
@@ -232,20 +232,20 @@ export function convertGQLValueToSQLValueForInclude(
   dictionary: string | ISQLTableRowValue,
   partialFields?: any,
 ): ISQLStreamComposedTableRowValue {
-  // the exclusion state in the graphql information should be included in
+  // the exclusion state in the rq information should be included in
   // the root data as ITEM_wheel__EXCLUSION_STATE so we extract it
-  const exclusionStateAccordingToGQL = data[include.getQualifiedExclusionStateIdentifier()];
+  const exclusionStateAccordingToRQ = data[include.getQualifiedExclusionStateIdentifier()];
 
   // we add that data to the sql result
   let result: ISQLTableRowValue = {
-    [include.getQualifiedExclusionStateIdentifier()]: exclusionStateAccordingToGQL,
+    [include.getQualifiedExclusionStateIdentifier()]: exclusionStateAccordingToRQ,
   };
   const consumeStreamsFns: ConsumeStreamsFnType[] = []
 
   // now the information that is specific about the sql value is only
   // necessary if the state is not excluded, excluded means it should be
   // null, even if the info is there, it will be ignored
-  if (exclusionStateAccordingToGQL !== IncludeExclusionState.EXCLUDED) {
+  if (exclusionStateAccordingToRQ !== IncludeExclusionState.EXCLUDED) {
     // so we get the sinking properties
     include.getSinkingProperties().forEach((sinkingProperty) => {
       // partial fields checkup

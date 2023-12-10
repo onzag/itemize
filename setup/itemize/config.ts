@@ -43,7 +43,7 @@ module.exports = {
      *   it multiplies the file size by this number and that's the limit
      * 
      * MAX_FIELD_SIZE
-     *   The maximum size in bytes of a graphql request, the text portion
+     *   The maximum size in bytes of a rq request, the text portion
      *   only
      * 
      * MAX_SEARCH_RESULTS_DEFAULT

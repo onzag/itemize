@@ -259,7 +259,7 @@ export default class App extends React.Component<IAppProps, IAppState> {
 
   /**
    * updates an user property from the property list of user properties
-   * and it performs a graphql request to do such
+   * and it performs a rq request to do such
    * 
    * in practique this is used to update app_language, app_currency and app_country
    * 

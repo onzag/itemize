@@ -849,7 +849,7 @@ export default class Module {
   }
 
   /**
-   * For a given requested graphql value it will
+   * For a given requested rq value it will
    * tell which fields need to be filtered for soft
    * read role access
    * @param role 

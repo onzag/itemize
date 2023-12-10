@@ -783,7 +783,7 @@ export default class MailProvider<T> extends ServiceProvider<T> {
    * @param arg.fromUserName the username that is sending this email (this is not the email, just the username)
    * @param arg.fromEmailHandle this is the email handle side before the @domain.com
    * @param arg.to this is a special list of values to send to the users that we want to send to, they can be
-   * specified as the list of ids, aka user identifiers of the given users, but grapqhl values or sql values
+   * specified as the list of ids, aka user identifiers of the given users, but rq values or sql values
    * are allowed as well and they improve speed up, remember to pass whole results with all the properties
    * you are using or otherwise it might misbehave
    * @param arg.subject the subject of the message

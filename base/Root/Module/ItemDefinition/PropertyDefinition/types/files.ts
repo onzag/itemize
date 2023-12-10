@@ -17,7 +17,7 @@ export interface IPropertyDefinitionSupportedSingleFilesType extends IRQFile {
 
 /**
  * The type of a files type is an array of single files that itself are of type IRQFile as they use
- * the gqlFields and the gqlAddFileToFields which adds file functionality
+ * the rqFields and the rqAddFileToFields which adds file functionality
  */
 export type PropertyDefinitionSupportedFilesType = IPropertyDefinitionSupportedSingleFilesType[];
 

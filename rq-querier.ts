@@ -1,5 +1,5 @@
 /**
- * Contains functions to perform gql queries as well
+ * Contains functions to perform rq queries as well
  * as the product interfaces for these queries
  * @module
  */
@@ -135,7 +135,7 @@ export interface IRQArgs {
 }
 
 /**
- * A grapqhl single value
+ * A rq single value
  */
 type RQValue = boolean | string | number | null | IRQSearchRecord | IRQValue;
 
@@ -177,8 +177,8 @@ export class RQQueryBuilder {
   /**
    * All the processed queries from the query list
    */
-  private processedQueries: IGQLQueryObj[];
-  private unprocessedQueries: IGQLQueryObj[];
+  private processedQueries: IRQQueryObj[];
+  private unprocessedQueries: IRQQueryObj[];
   /**
    * The type of this query
    */
@@ -213,7 +213,7 @@ export class RQQueryBuilder {
    */
   constructor(
     type: "query" | "mutation",
-    queries: IGQLQueryObj[],
+    queries: IRQQueryObj[],
     rqSchema: RQRootSchema,
   ) {
     this.type = type;
@@ -293,7 +293,7 @@ export class RQQueryBuilder {
     });
   }
 
-  private isNameMergableWith(ourValue: IGQLQueryObj, theirValue: IGQLQueryObj) {
+  private isNameMergableWith(ourValue: IRQQueryObj, theirValue: IRQQueryObj) {
     if (!equals(ourValue.args, theirValue.args, { strict: true })) {
       return false;
     }
@@ -421,7 +421,7 @@ export class RQQueryBuilder {
    * @param index 
    * @returns 
    */
-  public getServerSideQueryByIndex(index: number): IGQLQueryObj {
+  public getServerSideQueryByIndex(index: number): IRQQueryObj {
     const newQuery = {
       ...this.getQueryByIndex(index, true),
     }
@@ -444,7 +444,7 @@ export class RQQueryBuilder {
   }
 
   /**
-   * Finds files in the graphql query and processes
+   * Finds files in the rq query and processes
    * all the files as they are required in order to retrieve
    * their streams and file content
    * @param arg the argument in question
@@ -507,7 +507,7 @@ export class RQQueryBuilder {
 /**
  * This is what a query object is expected to look like
  */
-export interface IGQLQueryObj {
+export interface IRQQueryObj {
   /**
    * The rq query name
    */
@@ -611,33 +611,7 @@ function buildRQFields(
   return rs;
 }
 
-/**
- * Build all the fields from the request field list
- * for the graphql query string
- * @param fields the fields to convert
- * @returns a string with the {...} part of the request fields
- */
-function buildFields(fields: IRQRequestFields) {
-  // we start with the open bracket
-  let fieldsStr = "{";
-  // we check every field
-  Object.keys(fields).forEach((fieldKey) => {
-    // and add it
-    fieldsStr += fieldKey;
-    // if this is a subfield object
-    if (Object.keys(fields[fieldKey]).length) {
-      // we recurse in it
-      fieldsStr += buildFields(fields[fieldKey]);
-    }
-    // add a comma
-    fieldsStr += ",";
-  });
-  // close the bracket
-  fieldsStr += "}";
-  return fieldsStr;
-}
-
-function buildRQThing(rqSchema: RQRootSchema, ...queries: IGQLQueryObj[]) {
+function buildRQThing(rqSchema: RQRootSchema, ...queries: IRQQueryObj[]) {
   const qs: any = {};
   const tokens: {[key: string]: number} = {};
 
@@ -688,20 +662,20 @@ function buildRQThing(rqSchema: RQRootSchema, ...queries: IGQLQueryObj[]) {
 }
 
 /**
- * Builds a graphql query
+ * Builds a rq query
  * @param queries the queries to run
- * @returns a grapqhl query class instance
+ * @returns a rq query class instance
  */
-export function buildRQQuery(rqSchema: RQRootSchema, ...queries: IGQLQueryObj[]) {
+export function buildRQQuery(rqSchema: RQRootSchema, ...queries: IRQQueryObj[]) {
   return new RQQueryBuilder("query", queries, rqSchema);
 }
 
 /**
- * Builds a graphql mutation
+ * Builds a rq mutation
  * @param mutations the mutations to run
- * @returns a grapqhl query class instance
+ * @returns a rq query class instance
  */
-export function buildRQMutation(rqSchema: RQRootSchema, ...mutations: IGQLQueryObj[]) {
+export function buildRQMutation(rqSchema: RQRootSchema, ...mutations: IRQQueryObj[]) {
   return new RQQueryBuilder("mutation", mutations, rqSchema);
 }
 
@@ -727,7 +701,7 @@ export async function oldXMLHttpRequest(
 ): Promise<any> {
   return new Promise((resolve, reject) => {
     const request = new XMLHttpRequest();
-    request.open("POST", host + "/graphql");
+    request.open("POST", host + "/rq");
     request.setRequestHeader('Cache-Control', 'no-cache');
     if (headers) {
       Object.keys(headers).forEach((k) => {
@@ -763,13 +737,13 @@ export async function oldXMLHttpRequest(
 }
 
 /**
- * Executes a graphql query
+ * Executes a rq query
  * @param query the query to run
  * @param options.host a host, required when running in NodeJS
- * @param options.merge whether to merge graphql queries in one, adds delay to the queries, might be unwanted
+ * @param options.merge whether to merge rq queries in one, adds delay to the queries, might be unwanted
  * @param options.mergeMS how many ms of delay to add, default 70
  * @param options.progresser to track progress
- * @returns a promise for a graphql endpoint value
+ * @returns a promise for a rq endpoint value
  */
 export async function rqQuery(query: RQQueryBuilder, options?: {
   host?: string;
@@ -782,7 +756,7 @@ export async function rqQuery(query: RQQueryBuilder, options?: {
 
   // if we are in browser context and we have no host
   if (typeof fetch === "undefined" && !host) {
-    throw new Error("You must provide a host when using graphql querier outside of the browser, eg: http://mysite.com");
+    throw new Error("You must provide a host when using rq querier outside of the browser, eg: http://mysite.com");
   }
 
   // check in network

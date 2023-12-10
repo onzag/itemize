@@ -100,7 +100,7 @@ export interface IOTriggerArgType {
    */
   requestedUpdateToUnblock: boolean;
   /**
-   * Arguments that are not part of the patch that were passed to graphql
+   * Arguments that are not part of the patch that were passed to rq
    */
   extraArgs: IRQArgs;
   /**

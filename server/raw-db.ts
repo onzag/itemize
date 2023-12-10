@@ -23,8 +23,8 @@ import { SelectBuilder } from "../database/SelectBuilder";
 import { WhereBuilder } from "../database/WhereBuilder";
 import { SetBuilder } from "../database/SetBuilder";
 import { WithBuilder } from "../database/WithBuilder";
-import { convertGQLValueToSQLValueForModule } from "../base/Root/Module/sql";
-import { convertGQLValueToSQLValueForItemDefinition } from "../base/Root/Module/ItemDefinition/sql";
+import { convertRQValueToSQLValueForModule } from "../base/Root/Module/sql";
+import { convertRQValueToSQLValueForItemDefinition } from "../base/Root/Module/ItemDefinition/sql";
 import uuid from "uuid";
 import uuidv5 from "uuid/v5";
 import type PropertyDefinition from "../base/Root/Module/ItemDefinition/PropertyDefinition";
@@ -288,7 +288,7 @@ export class ItemizeRawDB {
   }
 
   /**
-   * Will convert a graphql style value into a full row SQL value in order to execute many value
+   * Will convert a rq style value into a full row SQL value in order to execute many value
    * types functionality and directly insert values in a safer way
    * 
    * Note that this method is incapable of passing the required data for consuming stream which means
@@ -304,11 +304,11 @@ export class ItemizeRawDB {
    * @param dictionary the dictionary to use
    * @param partialFields by default it will populate the entire row information that is necessary to fill each one of the required
    * properties (not including the base) so with partial fields you can get partial values which are useful for updates, these
-   * are the same as graphql fields
+   * are the same as rq fields
    * 
    * @returns an object which contains the total or partial values of the row to be inserted or updated
    */
-  public processGQLValue(
+  public processrqValue(
     item: ItemDefinition | string,
     value: any,
     appData: IAppDataType,
@@ -321,7 +321,7 @@ export class ItemizeRawDB {
     const itemDefinition = item instanceof ItemDefinition ? item : this.root.registry[item] as ItemDefinition;
     const mod = itemDefinition.getParentModule();
 
-    const modSQL = convertGQLValueToSQLValueForModule(
+    const modSQL = convertRQValueToSQLValueForModule(
       appData.cache.getServerData(),
       appData,
       mod,
@@ -333,7 +333,7 @@ export class ItemizeRawDB {
       partialFields,
     ).value;
 
-    const itemSQL = convertGQLValueToSQLValueForItemDefinition(
+    const itemSQL = convertRQValueToSQLValueForItemDefinition(
       appData.cache.getServerData(),
       appData,
       itemDefinition,
@@ -1866,7 +1866,7 @@ export class ItemizeRawDB {
    * It is a rather advanced method to use as every row value to be inserted
    * has to be specified and it is easy to mess up
    * 
-   * refer to processGQLValue in order to aid yourself a little when doing a raw db
+   * refer to processrqValue in order to aid yourself a little when doing a raw db
    * insert
    * 
    * NOTE a raw db insert is unable to trigger side effects

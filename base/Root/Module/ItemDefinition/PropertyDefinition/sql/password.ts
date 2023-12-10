@@ -75,7 +75,7 @@ export function passwordSQLSearch(): any {
   // EXACT_password will never exist in the search module
   // however passwords can be retrieved, its hash, they have to be explicitly set
   // disable retrieval to true, in the document definition itself, not doing so
-  // is a leak, but should be obvious when checking /graphql
+  // is a leak, but should be obvious when checking /rq
 
   // we throw an error still
   throw new Error(

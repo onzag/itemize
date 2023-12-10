@@ -31,8 +31,8 @@ import {
 import ItemDefinition from ".";
 import {
   getSQLTableDefinitionForInclude,
-  convertSQLValueToGQLValueForInclude,
-  convertGQLValueToSQLValueForInclude,
+  convertSQLValueToRQValueForInclude,
+  convertRQValueToSQLValueForInclude,
   buildSQLQueryForInclude,
   getElasticSchemaForInclude,
   convertSQLValueToElasticSQLValueForInclude,
@@ -244,7 +244,7 @@ export function getSQLTablesSchemaForItemDefinition(itemDefinition: ItemDefiniti
 
 /**
  * Converts a SQL value directly coming from the database as it is
- * to a graphql value for this specific item definition,
+ * to a rq value for this specific item definition,
  * this includes the prop extensions and the reserved base properties
  * This value is FLATTENED
  * @param serverData the server data we are working with
@@ -252,38 +252,38 @@ export function getSQLTablesSchemaForItemDefinition(itemDefinition: ItemDefiniti
  * @param row the row value, with all the columns it has; the row
  * can be overblown with other field data, this will extract only the
  * data required for this item definition
- * @param graphqlFields contains the only properties that are required
+ * @param rqFields contains the only properties that are required
  * in the request provided by grapql fields,
  * eg {id: {}, name: {}, ITEM_kitten: {purrs: {}}}
- * @returns a graphql value
+ * @returns a rq value
  */
 export function convertSQLValueToRQValueForItemDefinition(
   serverData: any,
   appData: IAppDataType,
   itemDefinition: ItemDefinition,
   row: ISQLTableRowValue,
-  graphqlFields?: IRQRequestFields,
+  rqFields?: IRQRequestFields,
 ): IRQValue {
-  // first we create the graphql result
+  // first we create the rq result
   const result: IRQValue = {};
 
   // now we take all the base properties that we have
-  // in the graphql model
+  // in the rq model
   Object.keys(RESERVED_BASE_PROPERTIES_RQ).filter(
-    (baseProperty) => !graphqlFields ? true : graphqlFields[baseProperty],
+    (baseProperty) => !rqFields ? true : rqFields[baseProperty],
   ).forEach((basePropertyKey) => {
     result[basePropertyKey] = row[basePropertyKey] || null;
   });
 
   // we also take all the property definitions we have
   // in this item definitions, and convert them one by one
-  // with the row data, this basically also gives graphql value
+  // with the row data, this basically also gives rq value
   // in the key:value format
   itemDefinition.getParentModule().getAllPropExtensions().filter(
-    (property) => !graphqlFields ? true : graphqlFields[property.getId()],
+    (property) => !rqFields ? true : rqFields[property.getId()],
   ).concat(
     itemDefinition.getAllPropertyDefinitions().filter(
-      (property) => !graphqlFields ? true : graphqlFields[property.getId()],
+      (property) => !rqFields ? true : rqFields[property.getId()],
     ),
   ).forEach((pd) => {
     Object.assign(
@@ -294,17 +294,17 @@ export function convertSQLValueToRQValueForItemDefinition(
 
   // now we do the same for the items
   itemDefinition.getAllIncludes().filter(
-    (include) => !graphqlFields ? true : graphqlFields[include.getQualifiedIdentifier()],
+    (include) => !rqFields ? true : rqFields[include.getQualifiedIdentifier()],
   ).forEach((include) => {
     Object.assign(
       result,
-      convertSQLValueToGQLValueForInclude(
+      convertSQLValueToRQValueForInclude(
         serverData,
         appData,
         itemDefinition,
         include,
         row,
-        !graphqlFields ? null : graphqlFields[include.getQualifiedIdentifier()],
+        !rqFields ? null : rqFields[include.getQualifiedIdentifier()],
       ),
     );
   });
@@ -321,14 +321,14 @@ export function convertSQLValueToElasticSQLValueForItemDefinition(
   const result: ISQLTableRowValue = {};
 
   // now we take all the base properties that we have
-  // in the graphql model
+  // in the rq model
   Object.keys(RESERVED_BASE_PROPERTIES_RQ).forEach((basePropertyKey) => {
     result[basePropertyKey] = row[basePropertyKey] || null;
   });
 
   // we also take all the property definitions we have
   // in this item definitions, and convert them one by one
-  // with the row data, this basically also gives graphql value
+  // with the row data, this basically also gives rq value
   // in the key:value format
   itemDefinition.getParentModule().getAllPropExtensions().concat(
     itemDefinition.getAllPropertyDefinitions()
@@ -357,12 +357,12 @@ export function convertSQLValueToElasticSQLValueForItemDefinition(
 }
 
 /**
- * Converts a graphql value, with all its items and everything it
+ * Converts a rq value, with all its items and everything it
  * has into a SQL row data value for this specific item definition
  * it doesn't include its prop extensions
  * @param serverData the server data
  * @param itemDefinition the item definition in question
- * @param data the graphql data
+ * @param data the rq data
  * @param uploadsContainer the uploads container from openstack
  * @param uploadsPrefix the uploads prefix of the container
  * @param dictionary the dictionary to use in full text search mode
@@ -375,7 +375,7 @@ export function convertSQLValueToElasticSQLValueForItemDefinition(
  * in a partial field value, don't use partial fields to create
  * @returns a sql value
  */
-export function convertGQLValueToSQLValueForItemDefinition(
+export function convertRQValueToSQLValueForItemDefinition(
   serverData: any,
   appData: IAppDataType,
   itemDefinition: ItemDefinition,
@@ -430,7 +430,7 @@ export function convertGQLValueToSQLValueForItemDefinition(
       !partialFields
     ) {
       const innerPartialFields = !partialFields ? null : partialFields[includeNameInPartialFields];
-      const addedFieldsByInclude = convertGQLValueToSQLValueForInclude(
+      const addedFieldsByInclude = convertRQValueToSQLValueForInclude(
         serverData,
         appData,
         itemDefinition,
