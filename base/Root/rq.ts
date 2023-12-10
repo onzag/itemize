@@ -7,6 +7,7 @@
  * @module
  */
 
+import type { IRQArgs, IRQRequestFields, IRQValue } from "../../rq-querier";
 import Root from ".";
 import Module from "./Module";
 import ItemDefinition from "./Module/ItemDefinition";
@@ -59,34 +60,38 @@ export interface RQQuery {
   ownFields: {
     [id: string]: RQField;
   };
-  resolve?: FRQIdefResolverType | FRQModResolverType;
+  resolve?: FQGenericResolverType;
 }
 
 /**
  * This is how we path the resolver args to the function
  * rather than passing four args
  */
-export interface IRQIdefResolverArgs {
-  args: any;
-  fields: any;
+export interface IRQResolverArgs {
+  args: any;//IRQArgs;
+  fields: any;//IRQRequestFields;
 }
+
+export type FQGenericResolverType = (
+  resolverArgs: IRQResolverArgs,
+) => IRQValue
 
 /**
  * This is how a item definition resolver is supposed to
  * be defined
  */
 export type FRQIdefResolverType = (
-  resolverArgs: IRQIdefResolverArgs,
   itemDefinition: ItemDefinition,
-) => any;
+  resolverArgs: IRQResolverArgs,
+) => IRQValue;
 
 /**
  * This is how a module resolver is supposed to be defined
  */
 export type FRQModResolverType = (
-  resolverArgs: IRQIdefResolverArgs,
   module: Module,
-) => any;
+  resolverArgs: IRQResolverArgs,
+) => IRQValue;
 
 /**
  * This is all the base resolvers we are expecting out off itemize

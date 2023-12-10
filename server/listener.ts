@@ -92,7 +92,7 @@ import { IServerSideTokenDataType } from "./resolvers/basic";
 import { ItemizeRedisClient } from "./redis";
 import { findLastRecordDate } from "./resolvers/actions/search";
 import { CustomRoleGranterEnvironment, CustomRoleManager, ICustomRoleType } from "./resolvers/roles";
-import { convertSQLValueToGQLValueForItemDefinition } from "../base/Root/Module/ItemDefinition/sql";
+import { convertSQLValueToRQValueForItemDefinition } from "../base/Root/Module/ItemDefinition/sql";
 import { ItemizeRawDB } from "./raw-db";
 import { CAN_LOG_DEBUG, INSTANCE_GROUP_ID, INSTANCE_MODE } from "./environment";
 import { RegistryService } from "./services/registry";
@@ -671,7 +671,7 @@ export class Listener {
         user: listenerData.user,
         module: itemDefinition.getParentModule(),
         root: this.root,
-        value: value ? convertSQLValueToGQLValueForItemDefinition(
+        value: value ? convertSQLValueToRQValueForItemDefinition(
           this.cache.getServerData(),
           null,
           itemDefinition,
@@ -2769,7 +2769,7 @@ export class Listener {
         user: listenerData.user,
         module: itemDefinition.getParentModule(),
         root: this.root,
-        value: value ? convertSQLValueToGQLValueForItemDefinition(
+        value: value ? convertSQLValueToRQValueForItemDefinition(
           this.cache.getServerData(),
           null,
           itemDefinition,

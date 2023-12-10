@@ -17,7 +17,7 @@ import { convertVersionsIntoNullsWhenNecessary } from "./version-null-value";
 import ItemDefinition from "../base/Root/Module/ItemDefinition";
 import { Listener } from "./listener";
 import Root from "../base/Root";
-import { convertGQLValueToSQLValueForItemDefinition, convertSQLValueToGQLValueForItemDefinition } from "../base/Root/Module/ItemDefinition/sql";
+import { convertGQLValueToSQLValueForItemDefinition, convertSQLValueToRQValueForItemDefinition } from "../base/Root/Module/ItemDefinition/sql";
 import { convertGQLValueToSQLValueForModule } from "../base/Root/Module/sql";
 import { deleteEverythingInFilesContainerId } from "../base/Root/Module/ItemDefinition/PropertyDefinition/sql/file-management";
 import { IOwnedParentedSearchRecordsEvent, IOwnedSearchRecordsEvent, IParentedSearchRecordsEvent, IPropertySearchRecordsEvent } from "../base/remote-protocol";
@@ -1007,7 +1007,7 @@ export class Cache {
     const isSQLType = !!value.MODULE_ID;
 
     const gqlValue = isSQLType ? (
-      convertSQLValueToGQLValueForItemDefinition(
+      convertSQLValueToRQValueForItemDefinition(
         this.serverData,
         this.appData,
         itemDefinition,
@@ -1702,7 +1702,7 @@ export class Cache {
 
     const currentSQLValue = options.currentSQLValue || await this.requestValue(itemDefinition, id, version);
     const editedBy = options.editedBy || UNSPECIFIED_OWNER;
-    const currentValueAsGQL = options.currentGQLValue || convertSQLValueToGQLValueForItemDefinition(
+    const currentValueAsGQL = options.currentGQLValue || convertSQLValueToRQValueForItemDefinition(
       this.serverData,
       this.appData,
       itemDefinition,

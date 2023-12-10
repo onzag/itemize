@@ -1,6 +1,5 @@
 import { IAppDataType } from "../../../server";
 import { logger } from "../../logger";
-import { IGraphQLIdefResolverArgs, FGraphQLIdefResolverType, FGraphQLModResolverType } from "../../../base/Root/gql";
 import Module from "../../../base/Root/Module";
 import {
   checkLanguage,
@@ -28,7 +27,7 @@ import {
   ENDPOINT_ERRORS,
   EXCLUSION_STATE_SUFFIX,
 } from "../../../constants";
-import { buildElasticQueryForItemDefinition, buildSQLQueryForItemDefinition, convertSQLValueToGQLValueForItemDefinition } from "../../../base/Root/Module/ItemDefinition/sql";
+import { buildElasticQueryForItemDefinition, buildSQLQueryForItemDefinition, convertSQLValueToRQValueForItemDefinition } from "../../../base/Root/Module/ItemDefinition/sql";
 import { IRQSearchRecord, IRQSearchRecordsContainer, IRQSearchResultsContainer } from "../../../rq-querier";
 import { convertVersionsIntoNullsWhenNecessary } from "../../version-null-value";
 import { flattenRawGQLValueOrFields } from "../../../rq-util";
@@ -42,7 +41,7 @@ import type { SelectBuilder } from "../../../database/SelectBuilder";
 import type { ElasticQueryBuilder } from "../../elastic";
 import type { IElasticHighlightRecordInfo } from "../../../base/Root/Module/ItemDefinition/PropertyDefinition/types";
 import { SearchResponse } from "@elastic/elasticsearch/lib/api/types";
-import { FRQIdefResolverType, FRQModResolverType } from "../../../base/Root/rq";
+import { FRQIdefResolverType, FRQModResolverType, IRQResolverArgs } from "../../../base/Root/rq";
 
 export function findLastRecordDate(comp: "min" | "max", p: string, ...records: ISQLTableRowValue[][]): string {
   const recordsRespectiveNanoSecondAccuracyArray = records.flat().map((r) => new NanoSecondComposedDate(r[p]));
@@ -59,16 +58,16 @@ function noop() { };
 
 export function searchModuleTraditional(
   appData: IAppDataType,
-  resolverArgs: IGraphQLIdefResolverArgs,
   mod: Module,
+  resolverArgs: IRQResolverArgs,
 ) {
-  return searchModule(appData, resolverArgs, mod, {traditional: true});
+  return searchModule(appData, mod, resolverArgs, {traditional: true});
 }
 
 export async function searchModule(
   appData: IAppDataType,
-  resolverArgs: IGraphQLIdefResolverArgs,
   mod: Module,
+  resolverArgs: IRQResolverArgs,
   opts: {
     traditional?: boolean,
     noLimitOffset?: boolean,
@@ -769,7 +768,7 @@ export async function searchModule(
           const itemDefinitionTrigger = appData.triggers.item.io[pathOfThisIdef]
 
           if (moduleTrigger || itemDefinitionTrigger) {
-            const currentWholeValueAsGQL = convertSQLValueToGQLValueForItemDefinition(
+            const currentWholeValueAsGQL = convertSQLValueToRQValueForItemDefinition(
               appData.cache.getServerData(),
               appData,
               itemDefinition,
@@ -1015,16 +1014,16 @@ export async function searchModule(
 
 export function searchItemDefinitionTraditional(
   appData: IAppDataType,
-  resolverArgs: IGraphQLIdefResolverArgs,
   itemDefinition: ItemDefinition,
+  resolverArgs: IRQResolverArgs,
 ) {
-  return searchItemDefinition(appData, resolverArgs, itemDefinition, {traditional: true});
+  return searchItemDefinition(appData, itemDefinition, resolverArgs, {traditional: true});
 }
 
 export async function searchItemDefinition(
   appData: IAppDataType,
-  resolverArgs: IGraphQLIdefResolverArgs,
   resolverItemDefinition: ItemDefinition,
+  resolverArgs: IRQResolverArgs,
   opts: {
     traditional?: boolean,
     noLimitOffset?: boolean,
@@ -1743,7 +1742,7 @@ export async function searchItemDefinition(
             const itemDefinitionTrigger = appData.triggers.item.io[pathOfThisIdef]
 
             if (moduleTrigger || itemDefinitionTrigger) {
-              const currentWholeValueAsGQL = convertSQLValueToGQLValueForItemDefinition(
+              const currentWholeValueAsGQL = convertSQLValueToRQValueForItemDefinition(
                 appData.cache.getServerData(),
                 appData,
                 itemDefinition,
@@ -2009,22 +2008,6 @@ export async function searchItemDefinition(
     appData.rootPool.release(pooledRoot);
     throw err;
   }
-}
-
-export function searchItemDefinitionFn(appData: IAppDataType): FGraphQLIdefResolverType {
-  return searchItemDefinition.bind(null, appData);
-}
-
-export function searchModuleFn(appData: IAppDataType): FGraphQLModResolverType {
-  return searchModule.bind(null, appData);
-}
-
-export function searchItemDefinitionTraditionalFn(appData: IAppDataType): FGraphQLIdefResolverType {
-  return searchItemDefinitionTraditional.bind(null, appData);
-}
-
-export function searchModuleTraditionalFn(appData: IAppDataType): FGraphQLModResolverType {
-  return searchModuleTraditional.bind(null, appData);
 }
 
 export function searchItemDefinitionFnRQ(appData: IAppDataType): FRQIdefResolverType {

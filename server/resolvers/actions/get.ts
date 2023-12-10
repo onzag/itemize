@@ -1,7 +1,6 @@
 import { IAppDataType } from "../../";
 import { logger } from "../../logger";
 import ItemDefinition, { ItemDefinitionIOActions } from "../../../base/Root/Module/ItemDefinition";
-import { IGraphQLIdefResolverArgs, FGraphQLIdefResolverType, FGraphQLModResolverType } from "../../../base/Root/gql";
 import {
   checkLanguage,
   validateTokenAndGetData,
@@ -24,19 +23,19 @@ import { flattenRawGQLValueOrFields } from "../../../rq-util";
 import { EndpointError } from "../../../base/errors";
 import { IRQSearchRecord, IRQValue } from "../../../rq-querier";
 import { IOTriggerActions } from "../triggers";
-import { buildElasticQueryForItemDefinition, convertSQLValueToGQLValueForItemDefinition } from "../../../base/Root/Module/ItemDefinition/sql";
+import { buildElasticQueryForItemDefinition, convertSQLValueToRQValueForItemDefinition } from "../../../base/Root/Module/ItemDefinition/sql";
 import { CustomRoleGranterEnvironment, CustomRoleManager } from "../roles";
 import { CAN_LOG_DEBUG } from "../../environment";
 import type { IElasticHighlightReply, IElasticHighlightRecordInfo } from "../../../base/Root/Module/ItemDefinition/PropertyDefinition/types";
 import { buildElasticQueryForModule } from "../../../base/Root/Module/sql";
-import { FRQIdefResolverType, FRQModResolverType } from "../../../base/Root/rq";
+import { FRQIdefResolverType, FRQModResolverType, IRQResolverArgs } from "../../../base/Root/rq";
 
 function noop() { };
 
 export async function getItemDefinition(
   appData: IAppDataType,
-  resolverArgs: IGraphQLIdefResolverArgs,
   itemDefinition: ItemDefinition,
+  resolverArgs: IRQResolverArgs,
 ) {
   CAN_LOG_DEBUG && logger.debug(
     {
@@ -73,7 +72,7 @@ export async function getItemDefinition(
       gqlFlattenedRequestedFiels: requestedFields,
       appData,
       rolesManager: (sqlValue: ISQLTableRowValue) => {
-        currentWholeValueAsGQL = sqlValue ? convertSQLValueToGQLValueForItemDefinition(
+        currentWholeValueAsGQL = sqlValue ? convertSQLValueToRQValueForItemDefinition(
           appData.cache.getServerData(),
           appData,
           itemDefinition,
@@ -314,8 +313,8 @@ export async function getItemDefinition(
 
 export async function getItemDefinitionList(
   appData: IAppDataType,
-  resolverArgs: IGraphQLIdefResolverArgs,
   itemDefinition: ItemDefinition,
+  resolverArgs: IRQResolverArgs,
 ) {
   CAN_LOG_DEBUG && logger.debug(
     {
@@ -454,7 +453,7 @@ export async function getItemDefinitionList(
           message: "Checking role access for read",
         },
       );
-      const currentWholeValueAsGQL = convertSQLValueToGQLValueForItemDefinition(
+      const currentWholeValueAsGQL = convertSQLValueToRQValueForItemDefinition(
         appData.cache.getServerData(),
         appData,
         itemDefinition,
@@ -637,8 +636,8 @@ export async function getItemDefinitionList(
 
 export async function getModuleList(
   appData: IAppDataType,
-  resolverArgs: IGraphQLIdefResolverArgs,
   mod: Module,
+  resolverArgs: IRQResolverArgs,
 ) {
   CAN_LOG_DEBUG && logger.debug(
     {
@@ -754,7 +753,7 @@ export async function getModuleList(
       const moduleTrigger = appData.triggers.module.io[pathOfThisModule];
       const itemDefinitionTrigger = appData.triggers.item.io[pathOfThisIdef];
 
-      const currentWholeValueAsGQL = convertSQLValueToGQLValueForItemDefinition(
+      const currentWholeValueAsGQL = convertSQLValueToRQValueForItemDefinition(
         appData.cache.getServerData(),
         appData,
         itemDefinition,
@@ -919,18 +918,6 @@ export async function getModuleList(
     message: "Done",
   });
   return resultAsObject;
-}
-
-export function getItemDefinitionFn(appData: IAppDataType): FGraphQLIdefResolverType {
-  return getItemDefinition.bind(null, appData);
-}
-
-export function getItemDefinitionListFn(appData: IAppDataType): FGraphQLIdefResolverType {
-  return getItemDefinitionList.bind(null, appData);
-}
-
-export function getModuleListFn(appData: IAppDataType): FGraphQLModResolverType {
-  return getModuleList.bind(null, appData);
 }
 
 export function getItemDefinitionFnRQ(appData: IAppDataType): FRQIdefResolverType {

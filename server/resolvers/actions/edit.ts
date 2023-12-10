@@ -1,7 +1,6 @@
 import { IAppDataType } from "../../";
 import { logger } from "../../logger";
 import ItemDefinition, { ItemDefinitionIOActions } from "../../../base/Root/Module/ItemDefinition";
-import { IGraphQLIdefResolverArgs, FGraphQLIdefResolverType } from "../../../base/Root/gql";
 import {
   checkLanguage,
   validateTokenAndGetData,
@@ -22,7 +21,7 @@ import {
   UNSPECIFIED_OWNER,
 } from "../../../constants";
 import {
-  convertSQLValueToGQLValueForItemDefinition,
+  convertSQLValueToRQValueForItemDefinition,
 } from "../../../base/Root/Module/ItemDefinition/sql";
 import { EndpointError, EndpointErrorType } from "../../../base/errors";
 import { flattenRawGQLValueOrFields } from "../../../rq-util";
@@ -32,14 +31,14 @@ import { IOTriggerActions } from "../triggers";
 import Root from "../../../base/Root";
 import { CustomRoleGranterEnvironment, CustomRoleManager } from "../roles";
 import { CAN_LOG_DEBUG } from "../../environment";
-import { FRQIdefResolverType } from "../../../base/Root/rq";
+import { FRQIdefResolverType, IRQResolverArgs } from "../../../base/Root/rq";
 
 function noop() { }
 
 export async function editItemDefinition(
   appData: IAppDataType,
-  resolverArgs: IGraphQLIdefResolverArgs,
   resolverItemDefinition: ItemDefinition,
+  resolverArgs: IRQResolverArgs,
 ) {
   let pooledRoot: Root;
   try {
@@ -113,7 +112,7 @@ export async function editItemDefinition(
           // Now that the policies have been checked, and that we get the value of the entire item
           // definition, we need to convert that value to GQL value, and for that we use the converter
           // note how we don't pass the requested fields because we want it all
-          currentWholeValueAsGQL = convertSQLValueToGQLValueForItemDefinition(
+          currentWholeValueAsGQL = convertSQLValueToRQValueForItemDefinition(
             appData.cache.getServerData(),
             appData,
             itemDefinition,
@@ -481,7 +480,7 @@ export async function editItemDefinition(
     );
 
     // convert it using the requested fields for that, and ignoring everything else
-    const gqlValue = convertSQLValueToGQLValueForItemDefinition(
+    const gqlValue = convertSQLValueToRQValueForItemDefinition(
       appData.cache.getServerData(),
       appData,
       itemDefinition,
@@ -674,10 +673,6 @@ export async function editItemDefinition(
     appData.rootPool.release(pooledRoot);
     throw err;
   }
-}
-
-export function editItemDefinitionFn(appData: IAppDataType): FGraphQLIdefResolverType {
-  return editItemDefinition.bind(null, appData);
 }
 
 export function editItemDefinitionFnRQ(appData: IAppDataType): FRQIdefResolverType {

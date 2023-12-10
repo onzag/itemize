@@ -257,7 +257,7 @@ export function getSQLTablesSchemaForItemDefinition(itemDefinition: ItemDefiniti
  * eg {id: {}, name: {}, ITEM_kitten: {purrs: {}}}
  * @returns a graphql value
  */
-export function convertSQLValueToGQLValueForItemDefinition(
+export function convertSQLValueToRQValueForItemDefinition(
   serverData: any,
   appData: IAppDataType,
   itemDefinition: ItemDefinition,

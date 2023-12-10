@@ -7,7 +7,6 @@
 import { IAppDataType } from "../../";
 import { logger } from "../../logger";
 import ItemDefinition, { ItemDefinitionIOActions } from "../../../base/Root/Module/ItemDefinition";
-import { IGraphQLIdefResolverArgs, FGraphQLIdefResolverType } from "../../../base/Root/gql";
 import {
   checkLanguage,
   validateTokenAndGetData,
@@ -30,7 +29,7 @@ import {
   ENDPOINT_ERRORS,
 } from "../../../constants";
 import {
-  convertSQLValueToGQLValueForItemDefinition,
+  convertSQLValueToRQValueForItemDefinition,
 } from "../../../base/Root/Module/ItemDefinition/sql";
 import { flattenRawGQLValueOrFields } from "../../../rq-util";
 import { ISQLTableRowValue } from "../../../base/Root/sql";
@@ -42,14 +41,14 @@ import { CustomRoleGranterEnvironment, CustomRoleManager } from "../roles";
 import {
   CAN_LOG_DEBUG,
 } from "../../environment";
-import { FRQIdefResolverType } from "../../../base/Root/rq";
+import { FRQIdefResolverType, IRQResolverArgs } from "../../../base/Root/rq";
 
 function noop() {};
 
 export async function addItemDefinition(
   appData: IAppDataType,
-  resolverArgs: IGraphQLIdefResolverArgs,
   resolverItemDefinition: ItemDefinition,
+  resolverArgs: IRQResolverArgs,
 ) {
   let pooledRoot: Root;
   try {
@@ -542,7 +541,7 @@ export async function addItemDefinition(
     // that we actually want, not passing this would make the gql value
     // be full (of nulls) our value is incomplete, so we need to
     // pass the requestedFields anyway
-    const gqlValue = convertSQLValueToGQLValueForItemDefinition(
+    const gqlValue = convertSQLValueToRQValueForItemDefinition(
       appData.cache.getServerData(),
       appData,
       itemDefinition,
@@ -726,10 +725,6 @@ export async function addItemDefinition(
     appData.rootPool.release(pooledRoot);
     throw err;
   }
-}
-
-export function addItemDefinitionFn(appData: IAppDataType): FGraphQLIdefResolverType {
-  return addItemDefinition.bind(null, appData);
 }
 
 export function addItemDefinitionFnRQ(appData: IAppDataType): FRQIdefResolverType {

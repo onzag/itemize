@@ -13,7 +13,7 @@ import {
 import { EndpointError, EndpointErrorType } from "../../base/errors";
 import ItemDefinition, { IItemStateType } from "../../base/Root/Module/ItemDefinition";
 import Module from "../../base/Root/Module";
-import { convertSQLValueToGQLValueForItemDefinition } from "../../base/Root/Module/ItemDefinition/sql";
+import { convertSQLValueToRQValueForItemDefinition } from "../../base/Root/Module/ItemDefinition/sql";
 import { convertSQLValueToGQLValueForModule } from "../../base/Root/Module/sql";
 import { IAppDataType } from "..";
 import { logger } from "../logger";
@@ -413,7 +413,7 @@ export async function validateParentingRules(
         version: result.parent_version || null,
         type: result.parent_type,
       } : null,
-      value: convertSQLValueToGQLValueForItemDefinition(
+      value: convertSQLValueToRQValueForItemDefinition(
         appData.cache.getServerData(),
         appData,
         parentingItemDefinition,
@@ -916,7 +916,7 @@ export async function filterAndPrepareGQLValue(
   if (parentModuleOrIdef instanceof ItemDefinition) {
     // we convert the value we were provided, of course, we only need
     // to process what was requested
-    valueOfTheItem = convertSQLValueToGQLValueForItemDefinition(
+    valueOfTheItem = convertSQLValueToRQValueForItemDefinition(
       serverData,
       appData,
       parentModuleOrIdef,

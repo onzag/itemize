@@ -1,7 +1,6 @@
 import { IAppDataType, } from "../../";
 import { logger } from "../../logger";
 import ItemDefinition, { ItemDefinitionIOActions } from "../../../base/Root/Module/ItemDefinition";
-import { IGraphQLIdefResolverArgs, FGraphQLIdefResolverType } from "../../../base/Root/gql";
 import {
   checkLanguage,
   validateTokenAndGetData,
@@ -18,19 +17,19 @@ import {
   OWNER_METAROLE
 } from "../../../constants";
 import { ISQLTableRowValue } from "../../../base/Root/sql";
-import { convertSQLValueToGQLValueForItemDefinition } from "../../../base/Root/Module/ItemDefinition/sql";
+import { convertSQLValueToRQValueForItemDefinition } from "../../../base/Root/Module/ItemDefinition/sql";
 import { IOTriggerActions } from "../triggers";
 import { IRQValue } from "../../../rq-querier";
 import { CustomRoleGranterEnvironment, CustomRoleManager } from "../roles";
 import { CAN_LOG_DEBUG } from "../../environment";
-import { FRQIdefResolverType } from "../../../base/Root/rq";
+import { FRQIdefResolverType, IRQResolverArgs } from "../../../base/Root/rq";
 
 function noop() { };
 
 export async function deleteItemDefinition(
   appData: IAppDataType,
-  resolverArgs: IGraphQLIdefResolverArgs,
   itemDefinition: ItemDefinition,
+  resolverArgs: IRQResolverArgs,
 ): Promise<any> {
   CAN_LOG_DEBUG && logger.debug(
     {
@@ -82,7 +81,7 @@ export async function deleteItemDefinition(
       appData,
       rolesManager: (sqlValue: ISQLTableRowValue) => {
         const ownerUserId = sqlValue ? (itemDefinition.isOwnerObjectId() ? sqlValue.id : sqlValue.created_by) : null;
-        currentWholeValueAsGQL = convertSQLValueToGQLValueForItemDefinition(
+        currentWholeValueAsGQL = convertSQLValueToRQValueForItemDefinition(
           appData.cache.getServerData(),
           appData,
           itemDefinition,
@@ -408,10 +407,6 @@ export async function deleteItemDefinition(
   // however we are not running the check on the fields that can be read
   // but anyway there's no usable data, so why would we need a check
   return null;
-}
-
-export function deleteItemDefinitionFn(appData: IAppDataType): FGraphQLIdefResolverType {
-  return deleteItemDefinition.bind(null, appData);
 }
 
 export function deleteItemDefinitionFnRQ(appData: IAppDataType): FRQIdefResolverType {

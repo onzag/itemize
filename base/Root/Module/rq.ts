@@ -20,7 +20,7 @@ import {
 import Module from ".";
 // import { getRQSchemaForItem } from "./ItemDefinition/rq";
 // import { getRQDefinitionForProperty } from "./ItemDefinition/PropertyDefinition/rq";
-import { IRQIdefResolverArgs, IRQResolversType, RQArg, RQField, RQQuery, RQRootSchema, rqFieldsToRqArgs } from "../rq";
+import { IRQResolverArgs, IRQResolversType, RQArg, RQField, RQQuery, RQRootSchema, rqFieldsToRqArgs } from "../rq";
 import { EndpointError } from "../../errors";
 import { getRQSchemaForItemDefinition } from "./ItemDefinition/rq";
 import { getRQDefinitionForProperty } from "./ItemDefinition/PropertyDefinition/rq";
@@ -251,17 +251,16 @@ async function resolveGenericFunction(
   resolveToUse: string,
   mod: Module,
   resolvers: IRQResolversType,
-  args: IRQIdefResolverArgs,
+  args: IRQResolverArgs,
 ): Promise<any> {
   let value = null;
   if (resolvers) {
     try {
-      value = await resolvers[resolveToUse](args, mod);
+      value = await resolvers[resolveToUse](mod, args);
     } catch (err) {
       if (err instanceof EndpointError) {
         throw err;
       }
-      console.error(err.stack);
       throw new EndpointError({
         message: "Internal Server Error",
         code: ENDPOINT_ERRORS.INTERNAL_SERVER_ERROR,

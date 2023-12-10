@@ -15,7 +15,7 @@ import { ISSRCollectedQueryType, ISSRCollectedResourcesType, ISSRCollectedSearch
 import { ISSRRule } from ".";
 import { IOTriggerActions } from "../resolvers/triggers";
 import { CustomRoleGranterEnvironment, CustomRoleManager } from "../resolvers/roles";
-import { convertSQLValueToGQLValueForItemDefinition } from "../../base/Root/Module/ItemDefinition/sql";
+import { convertSQLValueToRQValueForItemDefinition } from "../../base/Root/Module/ItemDefinition/sql";
 import type { IActionSearchOptions } from "../../client/providers/item";
 import fs from "fs";
 import path from "path";
@@ -710,7 +710,7 @@ export class Collector {
         requestArgs: null,
         tokenData: this.appliedRule.forUser,
         user: this.appliedRule.forUser,
-        value: rowValue ? convertSQLValueToGQLValueForItemDefinition(
+        value: rowValue ? convertSQLValueToRQValueForItemDefinition(
           this.appData.cache.getServerData(),
           this.appData,
           idef,

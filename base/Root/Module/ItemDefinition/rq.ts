@@ -28,7 +28,7 @@ import {
 } from "../../../../constants";
 import ItemDefinition from ".";
 import { EndpointError } from "../../../errors";
-import { IRQIdefResolverArgs, IRQResolversType, RQArg, RQField, RQQuery, RQRootSchema, rqFieldsToRqArgs } from "../../../Root/rq";
+import { IRQResolverArgs, IRQResolversType, RQArg, RQField, RQQuery, RQRootSchema, rqFieldsToRqArgs } from "../../../Root/rq";
 import { getRQDefinitionForProperty } from "./PropertyDefinition/rq";
 import { getRQDefinitionForInclude } from "./Include/rq";
 
@@ -396,7 +396,7 @@ async function resolveGenericFunction(
   resolveToUse: string,
   itemDefinition: ItemDefinition,
   resolvers: IRQResolversType,
-  args: IRQIdefResolverArgs,
+  args: IRQResolverArgs,
 ): Promise<any> {
   // so firstly the value is null
   let value = null;
@@ -405,7 +405,7 @@ async function resolveGenericFunction(
     // we try to get the value, resolvers
     // are expected to be async functions
     try {
-      value = await resolvers[resolveToUse](args, itemDefinition);
+      value = await resolvers[resolveToUse](itemDefinition, args);
     } catch (err) {
       // if we catch an error, we check
       // if it's an expected error the user should see
@@ -414,7 +414,6 @@ async function resolveGenericFunction(
       }
       // otherwise this is an internal server error
       // the user shouldn't receive that
-      console.error(err.stack);
       throw new EndpointError({
         message: "Internal Server Error",
         code: ENDPOINT_ERRORS.INTERNAL_SERVER_ERROR,
