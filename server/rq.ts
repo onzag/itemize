@@ -106,6 +106,11 @@ function processSingleArg(
       } else {
         // file was used twice?
         // should work just fine
+        // no it wouldn't
+        throw new EndpointError({
+          code: ENDPOINT_ERRORS.UNSPECIFIED,
+          message: "argument representing file " + varErr + " was used twice, this is currently not supported",
+        });
       }
     }
   } else if (schema.type === "boolean") {
@@ -155,9 +160,12 @@ function processArgs(files: IFilesAwaiterContainer, schema: { [id: string]: RQAr
       message: (!prefixErrr ? "base arguments" : prefixErrr) + " should be an object",
     });
   }
+
   Object.keys(schema).forEach((argKey) => {
     const argSchema = schema[argKey];
     const argValue = args[argKey];
+
+    console.log(argKey, "GAVE UP THEN");
 
     if (argSchema.array) {
       if (typeof argValue === "undefined" || argValue === null) {
@@ -628,14 +636,14 @@ export function rqSystem(options: {
       if (!rqRequest) {
         exit({
           code: ENDPOINT_ERRORS.UNSPECIFIED,
-          message: "Received file with " + id + " before rq operations",
+          message: "Received file with id " + id + " before rq operations",
         }, true);
       } else if (!files[id]) {
         rqResponse.warnings = rqResponse.warnings || [];
         rqResponse.warnings.push({
           warning: {
             code: ENDPOINT_ERRORS.UNSPECIFIED,
-            message: "Received file with " + id + " which is not present in rq operation",
+            message: "Received file with id " + id + " which is not present in rq operation",
           },
         });
         // drain the file without anything

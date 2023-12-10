@@ -158,20 +158,13 @@ export function rqFieldsToRqArgs(field: RQField): RQArg {
   Object.keys(copy.properties).forEach((p) => {
     copy.properties[p] = rqFieldsToRqArgs(copy.properties[p]);
   });
-  return copy;
-}
 
-export function rqArgsToRqFieldsStdOnly(arg: RQArg): RQField {
-  if (arg.type !== "object") {
-    return arg;
+  // if it has the data property
+  if (copy.properties.DATA) {
+    // move it towards main
+    Object.assign(copy.properties, copy.properties.DATA.properties);
+    delete copy.properties.DATA;
   }
-
-  const copy: RQField = {stdFields: arg.properties, ...arg};
-  delete (copy as any).properties;
-
-  Object.keys(copy.stdFields).forEach((p) => {
-    copy.stdFields[p] = rqArgsToRqFieldsStdOnly(copy.stdFields[p]);
-  });
 
   return copy;
 }

@@ -916,6 +916,27 @@ export function filterAndPrepareRQRecords(
 }
 
 /**
+ * Modifies the records in place
+ * in order to ensure they match the shape
+ */
+export function filterAndPrepareRQValueSimple(
+  value: IRQValue,
+) {
+  const finalValue = {
+    DATA: value,
+  };
+
+  EXTERNALLY_ACCESSIBLE_RESERVED_BASE_PROPERTIES.forEach((p) => {
+    if (typeof finalValue.DATA[p] !== "undefined") {
+      finalValue[p] = finalValue.DATA[p];
+      delete finalValue.DATA[p];
+    }
+  });
+
+  return finalValue;
+}
+
+/**
  * Filters and prepares a rq value for output to the rest endpoint
  * given the value that has given by the server, the requested fields
  * that are supposed to be outputted, the role of the current user

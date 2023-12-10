@@ -13,6 +13,7 @@ import {
   defaultTriggerInvalidForbiddenFunction,
   validateParentingRules,
   handleConflictError,
+  filterAndPrepareRQValueSimple,
 } from "../basic";
 import {
   INCLUDE_PREFIX,
@@ -636,10 +637,7 @@ export async function editItemDefinition(
     // we don't need to check for blocked or deleted because such items cannot be edited,
     // see before, so we return immediately, read has been checked already
     // we use the same strategy, all extra data will be chopped anyway by rq
-    const finalOutput = {
-      DATA: rqValue,
-      ...rqValue,
-    };
+    const finalOutput = filterAndPrepareRQValueSimple(rqValue);
 
     if (
       !await

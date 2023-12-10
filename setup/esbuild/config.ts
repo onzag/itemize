@@ -73,7 +73,7 @@ const IGNORES = [
     contextRegExp: /node_modules\/@onzag\/itemize/
   },
   {
-    resourceRegExp: /sql/,
+    resourceRegExp: /\/sql/,
     contextRegExp: /node_modules\/@onzag\/itemize/,
   },
   {

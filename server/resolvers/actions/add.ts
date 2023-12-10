@@ -22,6 +22,7 @@ import {
   defaultTriggerInvalidForbiddenFunction,
   validateCustomId,
   validateCustomVersion,
+  filterAndPrepareRQValueSimple,
 } from "../basic";
 import {
   INCLUDE_PREFIX,
@@ -694,10 +695,7 @@ export async function addItemDefinition(
       rqValue,
     );
 
-    const finalOutput = {
-      DATA: rqValue,
-      ...rqValue,
-    };
+    const finalOutput = filterAndPrepareRQValueSimple(rqValue);
 
     if (
       !await itemDefinition.checkRoleCanReadOwner(
