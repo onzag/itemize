@@ -690,6 +690,7 @@ export async function initializeServer(
         null,
         null,
         [],
+        config,
         sensitiveConfig,
       );
       listener.init();
@@ -1010,6 +1011,7 @@ export async function initializeServer(
       rawDB,
       server,
       custom.customRoles || [],
+      config,
       sensitiveConfig,
     );
     listener.init();

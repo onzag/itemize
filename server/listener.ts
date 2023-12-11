@@ -1,9 +1,8 @@
-import { Socket } from "socket.io";
 import { ISQLTableRowValue } from "../base/Root/sql";
 import { Cache } from "./cache";
 import { Server } from "http";
 import Root from "../base/Root";
-import ioMain from "socket.io";
+import { Socket, Server as IOServer } from "socket.io";
 import ItemDefinition, { ItemDefinitionIOActions } from "../base/Root/Module/ItemDefinition";
 import Module from "../base/Root/Module";
 import {
@@ -87,14 +86,14 @@ import {
 } from "../constants";
 import Ajv from "ajv";
 import { jwtVerify } from "./token";
-import { ISensitiveConfigRawJSONDataType } from "../config";
+import { IConfigRawJSONDataType, ISensitiveConfigRawJSONDataType } from "../config";
 import { IServerSideTokenDataType } from "./resolvers/basic";
 import { ItemizeRedisClient } from "./redis";
 import { findLastRecordDate } from "./resolvers/actions/search";
 import { CustomRoleGranterEnvironment, CustomRoleManager, ICustomRoleType } from "./resolvers/roles";
 import { convertSQLValueToRQValueForItemDefinition } from "../base/Root/Module/ItemDefinition/sql";
 import { ItemizeRawDB } from "./raw-db";
-import { CAN_LOG_DEBUG, INSTANCE_GROUP_ID, INSTANCE_MODE } from "./environment";
+import { CAN_LOG_DEBUG, INSTANCE_GROUP_ID, INSTANCE_MODE, TRUST_ALL_INBOUND_CONNECTIONS } from "./environment";
 import { RegistryService } from "./services/registry";
 import { NanoSecondComposedDate } from "../nanodate";
 
@@ -169,7 +168,7 @@ const CLUSTER_MANAGER_REGISTER_SS = "CLUSTER_MANAGER_REGISTER_SS";
 const CLUSTER_MANAGER_RESET = "CLUSTER_MANAGER_RESET";
 
 export class Listener {
-  private io: ioMain.Server;
+  private io: IOServer;
 
   private listeners: IListenerList = {};
   private listensSS: IServerListensList = {};
@@ -182,6 +181,7 @@ export class Listener {
   private root: Root;
   private rawDB: ItemizeRawDB;
   private cache: Cache;
+  private config: IConfigRawJSONDataType;
   private sensitiveConfig: ISensitiveConfigRawJSONDataType;
   private registry: RegistryService;
   private server: Server;
@@ -212,6 +212,7 @@ export class Listener {
     rawDB: ItemizeRawDB,
     server: Server,
     customRoles: ICustomRoleType[],
+    config: IConfigRawJSONDataType,
     sensitiveConfig: ISensitiveConfigRawJSONDataType,
   ) {
     this.redisGlobalSub = redisGlobalSub;
@@ -222,6 +223,7 @@ export class Listener {
     this.root = root;
     this.cache = cache;
     this.rawDB = rawDB;
+    this.config = config;
     this.sensitiveConfig = sensitiveConfig;
     this.customRoles = customRoles;
     this.registry = registry;
@@ -276,7 +278,39 @@ export class Listener {
       return;
     }
 
-    this.io = ioMain(this.server);
+    this.io = new IOServer(this.server, {
+      cors: (req, callback) => {
+        const originOfRequest = req.headers["origin"];
+        const isOriginLocalhost = originOfRequest === "http://localhost" || originOfRequest === "https://localhost";
+
+        let originAllowed: string;
+
+        // request does not come from locahost and we aren't trusting
+        if (!isOriginLocalhost && !TRUST_ALL_INBOUND_CONNECTIONS) {
+          // we will allow it depending of which
+          if (originOfRequest === ("https://" + this.config.developmentHostname)) {
+            originAllowed = this.config.developmentHostname;
+          } else {
+            originAllowed = this.config.productionHostname;
+          }
+        } else {
+          // otherwise request is coming from localhost or we are trusting of all
+          // if trusting of all
+          if (TRUST_ALL_INBOUND_CONNECTIONS) {
+            // trusting all
+            originAllowed = "*";
+          } else {
+            // otherwise we just allow it
+            originAllowed = originOfRequest;
+          }
+        }
+
+        callback(null, {
+          origin: originAllowed,
+          methods: ["GET", "POST"],
+        });
+      }
+    });
     this.io.on("connection", (socket) => {
       this.addSocket(socket);
       socket.on(REGISTER_REQUEST, (request: IRegisterRequest) => {

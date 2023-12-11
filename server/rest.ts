@@ -20,10 +20,11 @@ import fs from "fs";
 
 export function secureEndpointRouter(appData: IAppDataType, req: express.Request, res: express.Response, next: () => void) {
   const hostname = req.headers["host"];
-  const isLocalhost = hostname === "localhost" || hostname.indexOf("localhost") === 0;
+  const isHostLocalhost = hostname === "localhost" || hostname.indexOf("localhost") === 0;
+
   if (
     !TRUST_ALL_INBOUND_CONNECTIONS &&
-    !isLocalhost &&
+    !isHostLocalhost &&
     hostname !== appData.config.developmentHostname &&
     hostname !== appData.config.productionHostname
   ) {
@@ -31,21 +32,32 @@ export function secureEndpointRouter(appData: IAppDataType, req: express.Request
     return;
   }
 
-  if (!isLocalhost && !TRUST_ALL_INBOUND_CONNECTIONS) {
-    if (hostname === appData.config.developmentHostname) {
+  const originOfRequest = req.headers["origin"];
+  const isOriginLocalhost = originOfRequest === "http://localhost" || originOfRequest === "https://localhost";
+
+  // request does not come from locahost and we aren't trusting
+  if (!isOriginLocalhost && !TRUST_ALL_INBOUND_CONNECTIONS) {
+    // we will allow it depending of which
+    if (originOfRequest === ("https://" + appData.config.developmentHostname)) {
       res.set("Access-Control-Allow-Origin", appData.config.developmentHostname);
     } else {
       res.set("Access-Control-Allow-Origin", appData.config.productionHostname);
     }
   } else {
+    // otherwise request is coming from localhost or we are trusting of all
+    // if trusting of all
     if (TRUST_ALL_INBOUND_CONNECTIONS) {
+      // trusting all
       res.set("Access-Control-Allow-Origin", "*");
     } else {
-      res.set("Access-Control-Allow-Origin", req.hostname);
+      // otherwise we just allow it
+      res.set("Access-Control-Allow-Origin", originOfRequest);
     }
   }
 
-  if (!isLocalhost && !TRUST_ALL_INBOUND_CONNECTIONS) {
+  // not coming from localhost and not trusitng all
+  if (!isOriginLocalhost && !TRUST_ALL_INBOUND_CONNECTIONS) {
+    // setting HSTS to force https
     res.set("Strict-Transport-Security", "max-age=63072000; includeSubDomains; preload");
   }
 

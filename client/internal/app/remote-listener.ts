@@ -6,7 +6,7 @@
  * @module
  */
 
-import io from "socket.io-client";
+import io, { Socket } from "socket.io-client";
 import Root from "../../../base/Root";
 import uuid from "uuid";
 import CacheWorkerInstance from "../workers/cache";
@@ -94,7 +94,7 @@ export class RemoteListener {
   /**
    * The socket io client
    */
-  private socket: SocketIOClient.Socket;
+  private socket: Socket;
   /**
    * The root we are using
    */
