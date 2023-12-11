@@ -10,10 +10,9 @@ import fs from "fs";
 import path from "path";
 import colors from "colors/safe";
 import htmlMinifier from "html-minifier";
-import Svgo from "svgo";
+import svgo from "svgo";
 import { checkExists } from "./util";
 import { IBuilderBasicConfigType } from "./config";
-const svgo = new Svgo();
 const fsAsync = fs.promises;
 
 /**
@@ -164,7 +163,7 @@ async function copyOneDirectoryLevel(pathname: string, constructedPath: string) 
     } else if (fileNameInDirectory.endsWith(".svg")) {
       // for svg images we use svgo
       try {
-        minified = (await svgo.optimize(await fsAsync.readFile(currentTotalFilePathName, "utf8"))).data;
+        minified = svgo.optimize(await fsAsync.readFile(currentTotalFilePathName, "utf8")).data;
         optimizer = "SVGO";
       } catch (err) {
         console.log("failed to SVG minify " + colors.red(currentTotalFilePathName));
