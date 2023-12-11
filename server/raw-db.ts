@@ -157,6 +157,7 @@ export class ItemizeRawDB {
       null,
       null,
       null,
+      null,
     );
   }
 
